@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.192';
+our $VERSION = '1.193';
 
 use Quiq::Math;
 use Quiq::Json;
@@ -513,8 +513,8 @@ sub html {
                 let x = d.data[0].x;
                 if (x.length == 0)
                     return;
-                let xMin = d.layout.xaxis.range[0];
-                let xMax = d.layout.xaxis.range[1];
+                let xMin = Number(d.layout.xaxis.range[0]);
+                let xMax = Number(d.layout.xaxis.range[1]);
                 let y = d.data[0].y;
                 let yMin, yMax;
                 for (let i = 0; i < x.length; i++) {
@@ -525,7 +525,7 @@ sub html {
                             yMax = y[i]
                     }
                 }
-                // alert(xMin+' '+xMax+' '+yMin+' '+yMax);
+                // console.log(xMin+' '+xMax+' '+yMin+' '+yMax);
                 Plotly.relayout(dId,{'yaxis.range': [yMin,yMax]})
             };
 
@@ -1063,7 +1063,7 @@ sub htmlDiagram {
                         ' splines or show markers',
                 ).
                 ' | FillArea:'.Quiq::Html::Widget::CheckBox->html($h,
-                     id =>  "$name-y$i",
+                     id =>  "$name-f$i",
                      option => 1,
                      value => 1,
                      style => 'vertical-align: middle',
@@ -1153,8 +1153,14 @@ sub jsDiagram {
 
     # JavaScript erzeugen
 
-    my $xMin = $par->xMin // 'undefined';
-    my $xMax = $par->xMax // 'undefined';
+    my $xMin = $par->xMin;
+    if (!defined($xMin) || $xMin eq '') {
+        $xMin = 'undefined';
+    }
+    my $xMax = $par->xMax;
+    if (!defined($xMax) || $xMax eq '') {
+        $xMax = 'undefined';
+    }
     my $yMin = $par->yMin // 'undefined';
     my $yMax = $par->yMax // 'undefined';
     my $showRangeSlider = $i == 1? 'true': 'false';
@@ -1181,7 +1187,7 @@ sub jsDiagram {
 
 =head1 VERSION
 
-1.192
+1.193
 
 =head1 AUTHOR
 
@@ -1189,7 +1195,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2020 Frank Seitz
+Copyright (C) 2021 Frank Seitz
 
 =head1 LICENSE
 

@@ -6,12 +6,13 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.192';
+our $VERSION = '1.193';
 
 use Quiq::Hash;
 use Quiq::Option;
 use Scalar::Util ();
 use Quiq::Database::ResultSet;
+use Quiq::AnsiColor;
 
 # -----------------------------------------------------------------------------
 
@@ -1160,9 +1161,27 @@ sub isRaw {
 
 =head4 Synopsis
 
-  $str = $row->asRecord;
-  $str = $row->asRecord($null);
-  $str = $row->asRecord($null,$indent);
+  $str = $row->asRecord(@opt);
+
+=head4 Options
+
+=over 4
+
+=item -color => $a
+
+AnsiColor-Objekt.
+
+=item -indent => $n (Default: 4)
+
+Tiefe der Einrückung der Werte.
+
+=item -null => $str (Default: 'NULL')
+
+Gibt an, welcher Wert für einen Nullwert ausgegeben wird. Ist -null undef,
+wird das Attribut nicht ausgegeben (weder Name noch Wert).
+Ist $null ein Leerstring (''), wird nur der Wert nicht ausgegeben.
+
+=back
 
 =head4 Description
 
@@ -1175,27 +1194,26 @@ Die Darstellung hat den Aufbau:
       <val2>
   ...
 
-Der optionale Parameter $null gibt an, welcher Wert für einen Nullwert
-ausgegeben wird. Per Default wird NULL ausgegeben. Ist $null undef,
-wird das Attribut nicht ausgegeben (weder Name noch Wert).
-Ist $null '' (Leerstring), wird nur der Wert nicht ausgegeben.
-
-Der optionale Parameter $indent gibt an, wie tief die Werte
-eingerückt werden. Per Default werden die Werte um 4 Leerzeichen
-eingerückt.
-
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub asRecord {
     my $self = shift;
-    # @_: $null,$indent
 
-    my $null = @_? shift: 'NULL';
+    # Optionen und Argumente
 
-    my $indent = shift;
-    $indent = 4 if !defined $indent;
+    my $color = undef;
+    my $indent = 4;
+    my $null = 'NULL';
+
+    my $opt = $self->parameters(\@_,
+        -color => \$color,
+        -indent => \$indent,
+        -null => \$null,
+    );
+
+    my $a = $color // Quiq::AnsiColor->new(1);
     $indent = ' ' x $indent;
 
     my $str = '';
@@ -1207,7 +1225,8 @@ sub asRecord {
             }
             $val = $null;
         }
-        $str .= "$key:\n";
+        $str .= $a->str('bold',"$key:")."\n";
+	$val = $a->str($val eq $null? 'red': 'green',$val);
         $val =~ s/^/$indent/mg;
         $val .= "\n";
         $str .= $val;
@@ -1635,7 +1654,7 @@ sub AUTOLOAD {
 
 =head1 VERSION
 
-1.192
+1.193
 
 =head1 AUTHOR
 
@@ -1643,7 +1662,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2020 Frank Seitz
+Copyright (C) 2021 Frank Seitz
 
 =head1 LICENSE
 

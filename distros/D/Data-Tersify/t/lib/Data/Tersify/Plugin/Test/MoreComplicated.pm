@@ -1,4 +1,4 @@
-package Data::Tersify::Plugin::MoreComplicatedTest;
+package Data::Tersify::Plugin::Test::MoreComplicated;
 
 use strict;
 use warnings;

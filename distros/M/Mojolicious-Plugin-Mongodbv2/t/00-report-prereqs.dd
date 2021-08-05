@@ -16,7 +16,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Mojo::Base' => '0',
+                                      'Mojolicious' => '8.23',
                                       'MongoDB' => '0',
                                       'strict' => '0',
                                       'warnings' => '0'
@@ -29,8 +29,6 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'Mojolicious::Lite' => '0',
-                                   'Test::Mojo' => '0',
                                    'Test::More' => '0'
                                  }
                  }

@@ -1,16 +1,5 @@
 use strict; use warnings;
 
-BEGIN {
-	if ($ENV{HARNESS_ACTIVE}) {
-		print "1..0 # Skipped: not a regression test\n";
-		exit;
-	}
-	unless (eval { require Benchmark; }) {
-		print "1..0 # Skipped: this test requires Benchmark.pm\n";
-		exit;
-	}
-}
-
 #From:     dnsparks@juno.com
 #Subject:  Text::Wrap suggestions
 #To:       muir@idiom.com
@@ -127,8 +116,7 @@ unless ($x ne $y) {
 	exit;
 }
 
-my $cnt = -T STDOUT ? 200 : 40;
-my $results = timethese($cnt, {
+my $results = timethese(-5, {
 	mine => sub { my $res = prefix($columns, $testString) },
 	module => sub { my $res = wrap("", "", $testString) },
 });

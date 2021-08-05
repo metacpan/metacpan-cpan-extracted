@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Mojolicious::Plugin::Mongodbv2;
-
+$Mojolicious::Plugin::Mongodbv2::VERSION = '1.01';
 use Mojo::Base 'Mojolicious::Plugin';
 use MongoDB;
 
@@ -25,7 +25,7 @@ sub register {
 }
 
 package Mojolicious::Plugin::Mongodbv2::Client;
-
+$Mojolicious::Plugin::Mongodbv2::Client::VERSION = '1.01';
 use Mojo::Base -base;
 
 has 'conf' => sub { {host => 'mongodb://localhost/mongodbv2' } };
@@ -48,7 +48,7 @@ Mojolicious::Plugin::Mongodbv2 - MongoDB v2 driver in Mojolicious
 
 =head1 VERSION
 
-version 1.00
+version 1.01
 
 =head1 SYNOPSIS
 

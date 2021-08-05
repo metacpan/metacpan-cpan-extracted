@@ -9,7 +9,7 @@ BEGIN { require Exporter; *import = \&Exporter::import }
 our @EXPORT = qw( wrap fill );
 our @EXPORT_OK = qw( $columns $break $huge );
 
-our $VERSION = '2021.0726';
+our $VERSION = '2021.0804';
 our $SUBVERSION = 'modern'; # back-compat vestige
 
 our $columns = 76;  # <= screen width

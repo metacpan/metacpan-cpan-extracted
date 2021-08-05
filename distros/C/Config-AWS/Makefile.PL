@@ -6,18 +6,11 @@ use 5.010;
 
 use ExtUtils::MakeMaker;
 
-use File::ShareDir::Install;
-$File::ShareDir::Install::INCLUDE_DOTFILES = 1;
-$File::ShareDir::Install::INCLUDE_DOTDIRS = 1;
-install_share dist => "share";
-
-
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Parse AWS config files",
   "AUTHOR" => "Jos\x{e9} Joaqu\x{ed}n Atria <jjatria\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0,
-    "File::ShareDir::Install" => "0.06"
+    "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Config-AWS",
   "LICENSE" => "perl",
@@ -30,11 +23,14 @@ my %WriteMakefileArgs = (
     "Ref::Util" => 0
   },
   "TEST_REQUIRES" => {
+    "ExtUtils::MakeMaker" => 0,
     "File::Share" => "0.03",
+    "File::Spec" => 0,
     "Test2::Tools::Spec" => 0,
-    "Test2::V0" => 0
+    "Test2::V0" => 0,
+    "Test::More" => 0
   },
-  "VERSION" => "0.07",
+  "VERSION" => "0.080002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,12 +39,15 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Exporter::Tiny" => 1,
+  "ExtUtils::MakeMaker" => 0,
   "File::Glob" => 0,
   "File::Share" => "0.03",
+  "File::Spec" => 0,
   "Path::Tiny" => "0.076",
   "Ref::Util" => 0,
   "Test2::Tools::Spec" => 0,
-  "Test2::V0" => 0
+  "Test2::V0" => 0,
+  "Test::More" => 0
 );
 
 
@@ -62,9 +61,3 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
-
-{
-package
-MY;
-use File::ShareDir::Install qw(postamble);
-}

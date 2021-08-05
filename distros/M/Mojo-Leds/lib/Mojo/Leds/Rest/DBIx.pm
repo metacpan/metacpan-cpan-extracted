@@ -1,10 +1,8 @@
 package Mojo::Leds::Rest::DBIx;
-$Mojo::Leds::Rest::DBIx::VERSION = '1.04';
+$Mojo::Leds::Rest::DBIx::VERSION = '1.05';
 use Mojo::Base 'Mojo::Leds::Rest';
-use vars qw($AUTOLOAD);
 
-has pk => 'id';
-
+has pk       => 'id';
 has dbHelper => 'schema';    # here dbHelper is schema
 
 sub _create {
@@ -52,7 +50,7 @@ sub _update {
     return $c->_raise_error( 'Element not found', 404 ) unless ($rec);
 
     # annullo tutti i campi
-    $rec->$_(undef) foreach ( grep !/^${pk}$/, keys %{$c->_rec2json} );
+    $rec->$_(undef) foreach ( grep !/^${pk}$/, keys %{ $c->_rec2json } );
     while ( my ( $k, $v ) = each %$set ) {
         $rec->$k($v);
     }
@@ -68,44 +66,31 @@ sub _delete {
     return $rec;
 }
 
-sub list {
-    my $c     = shift;
-    my $query = $c->param('query');
-    return $c->$query(@_) if ($query);
+sub _list {
+    my ( $c, $rec, $qry, $opt, $rc ) = @_;
 
-    my ( $qry, $opt, $rc ) = $c->_qs2q;
-    my $rec  = $c->_dbfind( $qry, $opt );
-    my @recs = $rec->all;
-    my $ret  = [];
-    foreach (@recs) {
-        push @$ret, $c->_rec2json($_);
+    my $recs = [];
+    while ($_ = $rec->next) {
+        push @$recs, $c->_rec2json($_);
     }
     if ($rc) {
-        $ret = { count => $rec->pager->total_entries, recs => $ret };
+        $recs = { count => $rec->pager->total_entries, recs => $recs };
     }
 
-    $c->render_json($ret);
+    return $recs;
 }
 
-sub listupdate {
-    my $c = shift;
-    return $c->_raise_error( "Resource is read-only", 403 ) if $c->ro;
-    my $json = $c->_json_from_body;
-    return unless ($json);
-
-    # json deve essere un array
-    return $c->_raise_error( 'Not an array of records', 422 )
-      unless ( ref($json) eq 'ARRAY' );
+sub _listupdate {
+    my $c    = shift;
+    my $json = shift;
 
     my @recs;
-
     foreach my $item (@$json) {
         my $rec = $c->tableDB->update_or_create($item);
         push @recs, $c->_rec2json($rec);
-
     }
 
-    $c->render_json( \@recs );
+    return @recs;
 }
 
 sub _qs2q {
@@ -117,12 +102,16 @@ sub _qs2q {
 
     while ( my ( $k, $v ) = each %$flt ) {
         for ($k) {
+
+            # match exact filter
             if (/^q\[(.*?)\]/) { $qry->{$1} = $v }
 
             # match regexp filter
             elsif (/^qre\[(.*?)\]/) {
                 $qry->{$1} = { -like => $v };
             }
+
+            # advanced sort
             elsif (/^sort\[(.*?)\]/) {
                 my $order = $v == 1 ? '-asc' : '-desc';
                 push @{ $opt->{'order_by'} }, { $order => $1 };
@@ -145,20 +134,6 @@ sub _qs2q {
     return ( $qry, $opt, $rc );
 }
 
-sub _dbfind {
-    my $c   = shift;
-    my $qry = shift;
-    my $opt = shift;
-
-    return $c->tableDB->search( $qry, $opt );
-}
-
-sub _tableDB {
-    my $c      = shift;
-    my $helper = $c->dbHelper;
-    return $c->helpers->$helper->resultset( $c->table );
-}
-
 sub _resource_lookup {
     my $c  = shift;
     my $id = $c->restify->current_id;
@@ -175,7 +150,7 @@ Mojo::Leds::Rest::DBIx - A RESTFul interface to Class::DBIx
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 

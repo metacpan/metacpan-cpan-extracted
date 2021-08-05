@@ -1,11 +1,11 @@
 
 
 This archive contains the distribution Data-Tersify-Plugin-DBIx-Class,
-version 1.001:
+version 1.003:
 
   tersify DBIx::Class objects
 
-This software is copyright (c) 2018 by Sam Kington <skington@cpan.org>.
+This software is copyright (c) 2021 by Sam Kington <skington@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

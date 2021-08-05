@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.192';
+our $VERSION = '1.193';
 
 use Quiq::Epoch;
 
@@ -22,6 +22,36 @@ Quiq::Formatter - Formatierung von Werten
 L<Quiq::Object>
 
 =head1 METHODS
+
+=head2 Konstruktor
+
+=head3 new() - Instantiiere Objekt
+
+=head4 Synopsis
+
+  $f = $class->new;
+
+=head4 Returns
+
+Path-Objekt
+
+=head4 Description
+
+Instantiiere ein Objekt der Klasse und liefere eine Referenz auf
+dieses Objekt zurück. Da die Klasse ausschließlich Klassenmethoden
+enthält, hat das Objekt ausschließlich die Funktion, eine abkürzende
+Aufrufschreibweise zu ermöglichen.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub new {
+    my $class = shift;
+    return bless \(my $dummy),$class;
+}
+
+# -----------------------------------------------------------------------------
 
 =head2 Zahlen
 
@@ -223,7 +253,7 @@ sub reducedIsoTime {
 
 =head1 VERSION
 
-1.192
+1.193
 
 =head1 AUTHOR
 
@@ -231,7 +261,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2020 Frank Seitz
+Copyright (C) 2021 Frank Seitz
 
 =head1 LICENSE
 

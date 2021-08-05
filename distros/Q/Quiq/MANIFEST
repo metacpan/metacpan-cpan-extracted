@@ -181,6 +181,7 @@ lib/Quiq/Sql.pm
 lib/Quiq/Sql/Analyzer.pm
 lib/Quiq/Sql/Composer.pm
 lib/Quiq/Sql/Script/Reader.pm
+lib/Quiq/SQLite.pm
 lib/Quiq/SqlPlus.pm
 lib/Quiq/Ssh.pm
 lib/Quiq/Stacktrace.pm
@@ -397,6 +398,7 @@ t/bin/Quiq/Sql.t
 t/bin/Quiq/Sql/Analyzer.t
 t/bin/Quiq/Sql/Composer.t
 t/bin/Quiq/Sql/Script/Reader.t
+t/bin/Quiq/SQLite.t
 t/bin/Quiq/SqlPlus.t
 t/bin/Quiq/Ssh.t
 t/bin/Quiq/Stacktrace.t

@@ -22,5 +22,5 @@ requires:
 resources:
   bugtracker: https://github.com/ap/Text-Tabs/issues
   repository: git://github.com/ap/Text-Tabs.git
-version: '2021.0726'
+version: '2021.0804'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,9 +1,9 @@
 package App::dateseq::idn;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-30'; # DATE
+our $DATE = '2021-03-09'; # DATE
 our $DIST = 'App-dateseq-idn'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -72,7 +72,7 @@ _
 
             if (defined $holiday) {
                 my $date = $dt->ymd;
-                my $res = Calendar::Indonesia::Holiday::is_id_holiday(date=>$date, detail=>1);
+                my $res = Calendar::Indonesia::Holiday::is_idn_holiday(date=>$date, detail=>1);
                 unless ($res->[0] == 200) {
                     log_error "Cannot determine if %s is a holiday: %s", $date, $res;
                     return 0;
@@ -108,7 +108,7 @@ App::dateseq::idn - Like dateseq, but with built-in support for Indonesian holid
 
 =head1 VERSION
 
-This document describes version 0.003 of App::dateseq::idn (from Perl distribution App-dateseq-idn), released on 2021-01-30.
+This document describes version 0.004 of App::dateseq::idn (from Perl distribution App-dateseq-idn), released on 2021-03-09.
 
 =head1 FUNCTIONS
 
@@ -251,7 +251,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-dateseq-idn>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-dateseq-idn>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-dateseq-idn/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.192';
+our $VERSION = '1.193';
 
 =encoding utf8
 
@@ -14,7 +14,7 @@ Quiq - Class library for rapid development
 =head1 DESCRIPTION
 
 Diese Klassenbibliothek enthält anwendungsunabhängige Klassen,
-die ich in Projekten (nur Unix/Linux) nutze. Sie sind nach
+die ich in Projekten nutze. Sie sind nach
 einheitlichen Prinzipien konzipiert. Die Bibliothek befindet
 sich unter kontinuierlicher Weiterentwicklung.
 
@@ -696,6 +696,10 @@ L<Quiq::Rsync> - Aufruf von rsync von Perl aus
 
 =item *
 
+L<Quiq::SQLite> - Operationen auf einer SQLite-Datenbank
+
+=item *
+
 L<Quiq::Schedule> - Matrix von zeitlichen Vorgängen
 
 =item *
@@ -878,7 +882,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.192
+1.193
 
 =head1 AUTHOR
 

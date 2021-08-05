@@ -1,5 +1,5 @@
 package Mojo::Leds;
-$Mojo::Leds::VERSION = '1.04';
+$Mojo::Leds::VERSION = '1.05';
 use Mojo::Base 'Mojolicious';
 use Mojo::Log;
 use Mojo::File 'path';
@@ -64,13 +64,72 @@ Mojo::Leds - Leds aka Light Environment (emi) for Development System based on Mo
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
+Leds is a Mojolicious app to use a filesystem similiar to classical web site
+
 =encoding UTF-8
+
+=head1 DIFFERENCES WITH MOJOLICIOUS
+
+L<Mojolicious> applications use a filesystem structure closer to a CPAN distribution
+which is not (IMHO) intuitive.
+
+This is a classical Mojolicios applications
+
+    myapp                      # Application directory
+    |- script                  # Script directory
+    |  +- my_app               # Application script
+    |- lib                     # Library directory
+    |  |- MyApp.pm             # Application class
+    |  +- MyApp                # Application namespace
+    |     +- Controller        # Controller namespace
+    |        +- Example.pm     # Controller class
+    |- public                  # Static file directory (served automatically)
+    |  |- index.html           # Static HTML file
+    |  +- css                  # Static CSS file
+    |     +- example           # Static CSS for "Example" controller
+    |       +- welcome.css     # Static CSS for "welcome" action
+    |  |- js                   # Static JS file
+    |     +- example           # Static js for "Example" controller
+    |        +- welcome.js     # Static js for "welcome" action
+    +- templates               # Template directory
+       |- layouts              # Template directory for layouts
+       |  +- default.html.ep   # Layout template
+       +- example              # Template directory for "Example" controller
+          +- welcome.html.ep   # Template for "welcome" action
+
+And, as you can see, the "page" welcome has its controller in
+C<lib/MyApp/Controller/Example.pm>, the html code in C<templates/example/welcome.html.ep>,
+the CSS code in C<public/css/example/welcome.css> and its JS code in
+C<public/js/example/welcome.js>.
+
+In Mojo::Leds the scructure is quite different
+    myapp                      # Application directory
+    |- script                  # Script directory
+    |  +- my_app               # Application script
+    |- lib                     # Library directory
+    |  |- MyApp.pm             # Application class
+    |- www                     # DocumentRoot :-)
+        |- public              # Static files directory (served automatically)
+        |  |- index.html       # Static Home page HTML
+        |  |- css              # Static CSS file
+        |     + app.css        # Global Static CSS file
+        |  +- js               # Static JS file
+        |     + app.js         # Global Static JS file
+        |- layouts
+        |  +- default.html.ep  # Layout template
+        +- welcome             # Directory for welcome page
+           |- page.pm          # Controller for welcome page
+           |- page.html.ep     # Template for welcome page
+           |- page.css         # CSS File for welcome page
+           +- page.js          # JS File for welcome page
+
+and here, controller, html code, css and js are all inside C<www/example/> directory.
 
 =head1 BUGS/CONTRIBUTING
 

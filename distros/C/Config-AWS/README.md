@@ -36,7 +36,7 @@ Although it is common to see these files parsed as standard INI files, this
 is not appropriate since AWS config files have an idiosyncratic format for
 nested values (as shown in the link above).
 
-Standard INI parsers (like [Config::INI](https://metacpan.org/pod/Config::INI)) are not made to parse this sort of
+Standard INI parsers (like [Config::INI](https://metacpan.org/pod/Config%3A%3AINI)) are not made to parse this sort of
 structure (nor should they). So Config::AWS exists to provide a suitable
 and lightweight ad-hoc parser that can be used in other applications.
 
@@ -113,7 +113,7 @@ by the AWS CLI interface. These can be imported with the `:aws` tag.
 ## Compatibility with Config::INI
 
 This module includes routines that allow it to be used as a drop-in
-replacement of [Config::INI](https://metacpan.org/pod/Config::INI). The **read\_file**, **read\_string**, and
+replacement of [Config::INI](https://metacpan.org/pod/Config%3A%3AINI). The **read\_file**, **read\_string**, and
 **read\_handle** functions behave like those described in the documentation
 for that distribution. They can be imported with the `:ini` tag.
 

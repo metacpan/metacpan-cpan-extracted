@@ -10,6 +10,8 @@ script/ansifold
 t/00_compile.t
 t/01_run.t
 t/02_exec.t
+t/04_linebreak.t
+t/04_linebreak.txt
 t/Util.pm
 META.yml
 MANIFEST

@@ -637,26 +637,50 @@ sub test_rename_except : Test(1) {
 
 # -----------------------------------------------------------------------------
 
-sub test_split : Test(14) {
+sub test_split : Test(30) {
     my $self = shift;
 
-    my ($dir,$file,$base,$ext) = Quiq::Path->split('datei');
+    my ($dir,$file,$base,$ext,$shortBase,$longExt) =
+        Quiq::Path->split('datei');
     $self->is($dir,'');
     $self->is($file,'datei');
     $self->is($base,'datei');
     $self->is($ext,'');
+    $self->is($shortBase,'datei');
+    $self->is($longExt,'');
 
-    ($dir,$file,$base,$ext) = Quiq::Path->split('datei.ext');
+    ($dir,$file,$base,$ext,$shortBase,$longExt) =
+        Quiq::Path->split('datei.ext');
     $self->is($dir,'');
     $self->is($file,'datei.ext');
     $self->is($base,'datei');
     $self->is($ext,'ext');
+    $self->is($shortBase,'datei');
+    $self->is($longExt,'ext');
+
+    ($dir,$file,$base,$ext,$shortBase,$longExt) =
+        Quiq::Path->split('datei.ext1.ext2');
+    $self->is($dir,'');
+    $self->is($file,'datei.ext1.ext2');
+    $self->is($base,'datei.ext1');
+    $self->is($ext,'ext2');
+    $self->is($shortBase,'datei');
+    $self->is($longExt,'ext1.ext2');
 
     ($dir,$file,$base,$ext) = Quiq::Path->split('/ein/pfad/datei.ext');
     $self->is($dir,'/ein/pfad');
     $self->is($file,'datei.ext');
     $self->is($base,'datei');
     $self->is($ext,'ext');
+
+    ($dir,$file,$base,$ext,$shortBase,$longExt) =
+        Quiq::Path->split('/ein/pfad/datei.ext1.ext2');
+    $self->is($dir,'/ein/pfad');
+    $self->is($file,'datei.ext1.ext2');
+    $self->is($base,'datei.ext1');
+    $self->is($ext,'ext2');
+    $self->is($shortBase,'datei');
+    $self->is($longExt,'ext1.ext2');
 
     ($dir,undef,$base,undef) = Quiq::Path->split('/ein/pfad/datei.ext');
     $self->is($dir,'/ein/pfad');

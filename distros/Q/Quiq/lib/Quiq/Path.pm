@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.192';
+our $VERSION = '1.193';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -19,6 +19,7 @@ use Quiq::Terminal;
 use Encode::Guess ();
 use Quiq::String;
 use Encode ();
+use Digest::SHA ();
 use Quiq::Unindent;
 use Fcntl qw/:DEFAULT/;
 use Quiq::Perl;
@@ -226,6 +227,7 @@ sub compare {
 =head4 Synopsis
 
   $bool = $class->compareData($file,$data);
+  $bool = $class->compareData($file,$data,$encoding);
 
 =head4 Alias
 
@@ -242,15 +244,15 @@ nicht existieren.
 # -----------------------------------------------------------------------------
 
 sub compareData {
-    my $class = shift;
-    my $file = shift;
-    # @_: $data
+    my ($class,$file,$data,$encoding) = @_;
 
-    if (!-e $file || -s $file != length $_[0]) {
+    require bytes;
+    if (!-e $file || -s $file != bytes::length($data)) {
         return 1;
     }
 
-    return $class->read($file) eq $_[0]? 0: 1;
+    my $fileData = $class->read($file,-decode=>$encoding);
+    return $fileData eq $data? 0: 1;
 }
 
 {
@@ -482,11 +484,12 @@ sub duplicate {
 
 # -----------------------------------------------------------------------------
 
-=head3 edit() - Bearbeite Datei im Editor
+=head3 edit() - Bearbeite Datei oder Daten im Editor
 
 =head4 Synopsis
 
   $changed = $this->edit($file,@opt);
+  $changed = $this->edit(\$data,@opt);
 
 =head4 Arguments
 
@@ -496,38 +499,66 @@ sub duplicate {
 
 Datei, die bearbeitet werden soll.
 
+=item $data
+
+Daten, die bearbeitet werden sollen.
+
 =back
 
 =head4 Returns
 
-Boolschen Wert, der anzeigt, ob die Datei verändert wurde.
+Boolschen Wert, der anzeigt, ob die Datei oder die Daten
+verändert wurden.
 
 =head4 Description
 
-Öffne Datei $file im Editor, so dass diese vom Benutzer bearbeitet werden
-kann. Die Methode prüft nach Verlassen des Editors, ob die Datei geändert
-wurde. Falls ja, wird der Benutzer gefragt, ob er die Änderungen
-beibehalten möchte. Falls ja, liefert die Methode wahr, andernfalls
-falsch.
+Öffne Datei $file oder Daten $data im Editor, so dass diese vom
+Benutzer bearbeitet werden können. Die Methode prüft nach
+Verlassen des Editors, ob die Datei bzw. Daten geändert
+wurden. Falls ja, wird der Benutzer gefragt, ob er die Änderungen
+beibehalten möchte. Falls ja, liefert die Methode wahr,
+andernfalls falsch.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub edit {
-    my ($this,$file) = @_;
+    my $this = shift;
+    my ($file,$dataR) = ref $_[0]? (undef,shift): (shift,undef);
+    # @_: $file -or- \$data
 
-    # Erzeuge eine temporäre Kopie
-
-    my $tmpFile = Quiq::TempFile->new;
-    $this->copy($file,$tmpFile);
-
-    # Öffne Datei im Editor
-
+    my $encoding = 'utf-8';
     my $changed = 0;
+    my $tmpFile = Quiq::TempFile->new;
+
+    if ($file) {
+        # Erzeuge eine temporäre Kopie
+        $this->copy($file,$tmpFile);
+    }
+    else { # $dataR
+        # Schreibe Daten auf temporäre Datei
+        $this->write($tmpFile,$$dataR,-encode=>$encoding);
+    }
+
+    # Öffne Tempdatei im Editor
+
     my $editor = $ENV{'EDITOR'} || 'vi';
     Quiq::Shell->exec("$editor $tmpFile");
-    if ($this->compare($tmpFile,$file)) {
+
+    my $ask = 0;
+    if ($file) {    
+        if ($this->compare($tmpFile,$file)) {
+            $ask = 1;
+        }
+    }
+    else {
+        if ($this->compareData($tmpFile,$$dataR,$encoding)) {
+            $ask = 1;
+        }
+    }
+
+    if ($ask) {
         # Rückfrage an Benutzer
 
         my $answ = Quiq::Terminal->askUser(
@@ -538,7 +569,12 @@ sub edit {
         if ($answ eq 'y') {
             # Schreibe die Änderungen auf die Datei
 
-            $this->copy($tmpFile,$file);
+            if ($file) {
+                $this->copy($tmpFile,$file);
+            }
+            else {
+                $$dataR = $this->read($tmpFile,-decode=>'utf-8');
+            }
             $changed = 1;
         }
     }
@@ -614,7 +650,17 @@ sub encoding {
 
 =head4 Synopsis
 
-  $class->link($path,$link);
+  $this->link($path,$link);
+
+=head4 Options
+
+=over 4
+
+=item -force => $bool (Default: 0)
+
+Lösche die Datei $link, falls sie bereits existiert.
+
+=back
 
 =head4 Description
 
@@ -626,10 +672,22 @@ Die Methode liefert keinen Wert zurück.
 # -----------------------------------------------------------------------------
 
 sub link {
-    my ($class,$path,$link) = @_;
+    my $this = shift;
 
+    my $force = 0;
+
+    my $argA = $this->parameters(2,2,\@_,
+        -force => \$force,
+    );
+    my $path = $this->expandTilde(shift @$argA);
+    my $link = $this->expandTilde(shift @$argA);
+
+    if (-f $link && $force) {
+        $this->delete($link);
+    }
+    
     CORE::link $path,$link or do {
-        $class->throw(
+        $this->throw(
             'FS-00002: Kann Link nicht erzeugen',
             Path => $path,
             Link => $link,
@@ -940,6 +998,42 @@ sub read {
     }
 
     return $data;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 sha1() - SHA1 Hex Digest
+
+=head4 Synopsis
+
+  $this->sha1($file);
+
+=head4 Arguments
+
+=over 4
+
+=item $file
+
+Pfad der Datei.
+
+=back
+
+=head4 Description
+
+Ermittele den SHA1 Hex Digest der Datei $file und liefere diesen zurück.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub sha1 {
+    my $this = shift;
+    my $file = $this->expandTilde(shift);
+
+    my $sha = Digest::SHA->new(1);
+    $sha->addfile($file);
+
+    return $sha->hexdigest;;
 }
 
 # -----------------------------------------------------------------------------
@@ -1306,6 +1400,42 @@ sub count {
     $dh->close;
 
     return $n;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 deleteContent() - Lösche Inhalt des Verzeichnis
+
+=head4 Synopsis
+
+  $this->deleteContent($dir);
+
+=head4 Arguments
+
+=over 4
+
+=item $dir
+
+Pfad des Verzeichnisses
+
+=back
+
+=head4 Description
+
+Lösche den Inhalt des Verzeichnisses $dir.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub deleteContent {
+    my ($this,$dir) = @_;
+
+    for my $entry ($this->entries($dir)) {
+        $this->delete("$dir/$entry");
+    }
+
+    return;
 }
 
 # -----------------------------------------------------------------------------
@@ -2769,7 +2899,7 @@ sub removeExtension {
 
 =head4 Synopsis
 
-  $class->rename($oldPath,$newPath,@opt);
+  $this->rename($oldPath,$newPath,@opt);
 
 =head4 Options
 
@@ -2811,9 +2941,9 @@ Nach Ausführung existiert der der Pfad /tmp/x/b/c/d/f, aber der Pfad
 # -----------------------------------------------------------------------------
 
 sub rename {
-    my $class = shift;
-    my $oldPath = shift;
-    my $newPath = shift;
+    my $this = shift;
+    my $oldPath = $this->expandTilde(shift);
+    my $newPath = $this->expandTilde(shift);
     # @_: @opt
 
     # Nichts tun, wenn die Pfade identisch sind
@@ -2833,7 +2963,7 @@ sub rename {
     );
 
     if (!$overwrite && -e $newPath) {
-        $class->throw(
+        $this->throw(
             'PATH-00099: Zieldatei existiert bereits',
             Path => $newPath,
         );
@@ -2844,12 +2974,12 @@ sub rename {
     if ($recursive) {
         my $newDir = (Quiq::Path->split($newPath))[0];
         if ($newDir && !-d $newDir) {
-            $class->mkdir($newDir,-recursive=>1);
+            $this->mkdir($newDir,-recursive=>1);
         }
     }
 
     CORE::rename $oldPath,$newPath or do {
-        $class->throw(
+        $this->throw(
             'PATH-00010: Kann Pfad nicht umbenennen',
             Error => "$!",
             OldPath => $oldPath,
@@ -2874,7 +3004,7 @@ sub rename {
 
 # -----------------------------------------------------------------------------
 
-=head3 numberBasePaths() - Nummeriere die Basisnamen der Pfade
+=head3 numberBasePaths() - Nummeriere die (kurzen) Basisnamen der Pfade
 
 =head4 Synopsis
 
@@ -2898,13 +3028,27 @@ Die Schrittweite der Nummerierung.
 
 =back
 
+=head4 Options
+
+=over 4
+
+=item -start => $n (Default: $step)
+
+Startwert.
+
+=item -verbose => $bool (Default: 0)
+
+Gib Information aus.
+
+=back
+
 =head4 Description
 
-Sortiere die Basisnamen der Pfade B<@paths> lexikalisch und
+Sortiere die (kurzen) Basisnamen der Pfade B<@paths> lexikalisch und
 nummeriere ihre Basisnamen durch, beginnend mit Nummer B<$step> und
-Schrittweite B<$step>. Pfade mit dem gleichen Basisnamen aber
-unterschiedlichen Extensions erhalten die gleiche Nummer, behalten
-aber ihre unterschiedliche Extension.
+Schrittweite B<$step>. Pfade mit dem gleichen (kurzen) Basisnamen aber
+unterschiedlichen (lange) Extensions erhalten die gleiche Nummer, behalten
+aber ihre unterschiedliche (lange) Extension.
 
 =head4 Example
 
@@ -2925,15 +3069,26 @@ aber ihre unterschiedliche Extension.
 # -----------------------------------------------------------------------------
 
 sub numberBasePaths {
-    my ($this,$pathA,$width,$step) = @_;
+    my $this = shift;
 
+    # Optionen und Argumente
+
+    my $start = undef;
     my $verbose = 0;
+
+    my $argA = $this->parameters(3,3,\@_,
+        -start => \$start,
+        -verbose => \$verbose,
+    );
+    my ($pathA,$width,$step) = @$argA;
+    $start //= $step;
 
     # Baue Liste der Basisnamen auf
 
     my %basePath;
     for my $path (@$pathA) {
-        my ($dir,undef,$base,$ext) = $this->split($path);
+        # my ($dir,undef,$base,$ext) = $this->split($path);
+        my ($dir,undef,undef,undef,$base,$ext) = $this->split($path);
 
         if ($dir ne '') {
             $base = "$dir/$base";
@@ -2942,7 +3097,7 @@ sub numberBasePaths {
         push @$arr,$ext;
     }
 
-    my $n = $step;
+    my $n = $start;
     my @newPaths;
     for (sort keys %basePath) {
         my $oldBasePath = $_;
@@ -3134,6 +3289,7 @@ sub numberPaths {
             $tmpPath .= ".$ext";
         }
         $tmpPath .= '.tmp';
+
         push @tmpPath,$tmpPath;
 
         $this->rename($path,$tmpPath,-overwrite=>0);
@@ -3157,7 +3313,7 @@ sub numberPaths {
 
 =head4 Synopsis
 
-  ($dir,$file,$base,$ext) = $class->split($path);
+  ($dir,$file,$base,$ext,$shortBase,$longExt) = $class->split($path);
 
 =head4 Description
 
@@ -3175,7 +3331,7 @@ geliefert.
 sub split {
     my ($class,$path) = @_;
 
-    my ($dir,$file,$base,$ext) = ('') x 4;
+    my ($dir,$file,$base,$ext,$shortBase,$longExt) = ('') x 6;
 
     $dir = $1 if $path =~ s|(.*)/||;
     $file = $path;
@@ -3183,7 +3339,12 @@ sub split {
     $ext = $1 if $path =~ s/\.([^.]+)$//;
     $base = $path;
 
-    return ($dir,$file,$base,$ext);
+    $longExt = $ext;
+    if (($shortBase = $base) =~ s/\.(.+)$//) {
+        $longExt = "$1.$longExt";
+    }
+
+    return ($dir,$file,$base,$ext,$shortBase,$longExt);
 }
 
 # -----------------------------------------------------------------------------
@@ -3479,7 +3640,7 @@ sub uid {
 
 =head1 VERSION
 
-1.192
+1.193
 
 =head1 AUTHOR
 
@@ -3487,7 +3648,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2020 Frank Seitz
+Copyright (C) 2021 Frank Seitz
 
 =head1 LICENSE
 

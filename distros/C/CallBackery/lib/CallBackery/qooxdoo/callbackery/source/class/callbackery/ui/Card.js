@@ -40,7 +40,6 @@ qx.Class.define("callbackery.ui.Card", {
             init:   "cred-card"
         }
     },
-    events:  {reloadData: 'qx.event.type.Event'},
     members: {
         _cardCfg      : null,
         _formCfg      : null,
@@ -115,16 +114,23 @@ qx.Class.define("callbackery.ui.Card", {
             formCfg.forEach(function(cfg) {
                 var labelCfg = cfg.label;
                 var fieldCfg = cfg.field;
+
                 // add label
                 if (labelCfg) {
-                    var label = new qx.ui.basic.Label(labelCfg.value).set({
+                    var label = new qx.ui.basic.Label().set({
                         textColor    : 'material-label',
                         allowShrinkX : true,
                         allowGrowX   : true,
                         font         : 'cardLabel'
                     });
-                    if (labelCfg.set) 
+                    if (labelCfg.set) {
                         label.set(labelCfg.set);
+                        // canot use set({}) with xtr().
+                        // TODO: fix xtr() return
+                        if (labelCfg.set.value) {
+                            label.setValue(this.xtr(labelCfg.set.value));
+                        }
+                    }
                     this._add(label, labelCfg.addSet);
                 }
 

@@ -52,6 +52,7 @@ sub test_result_source {
 }
 
 sub test_result_set {
+    # We can tersify a resultset object...
     my %data = (
         result_set => bless {
             _result_class => 'Arbitrary::Class::Name',
@@ -70,5 +71,18 @@ sub test_result_set {
         ${ $tersified->{result_set} },
         qr{^ DBIx::Class::ResultSet \s \S+ \s Arbitrary::Class::Name $}x,
         'We just summarised the result class of a result set'
+    );
+
+    # ...even if it's not actually *called* a ResultSet.
+    %Some::Other::Parent::Class:: = ();
+    @Some::Kind::Of::ResultSet::ISA = ('Some::Other::Parent::Class', 'DBIx::Class::ResultSet');
+    %Some::Component::Or::Other:: = ();
+    @Our::Actual::Class::ISA = ('Some::Component::Or::Other', 'Some::Kind::Of::ResultSet');
+    bless $data{result_set} => 'Our::Actual::Class';
+    $tersified = tersify(\%data);
+    like(
+        ${ $tersified->{result_set} },
+        qr{^ Our::Actual::Class \s \S+ \s Arbitrary::Class::Name $}x,
+        'We also tersified a subclass of a result set'
     );
 }

@@ -1,5 +1,9 @@
 Revision history for JSON-Schema-Tiny
 
+0.009     2021-08-05 03:51:04Z
+          - skip acceptance test for integer overflow when nvsize is too
+            large to produce the expected error
+
 0.008     2021-08-03 03:50:09Z
           - better handling of blessed data types and other references
           - support for specification versions draft7 and draft2020-12,

@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.192';
+our $VERSION = '1.193';
 
 use Quiq::Option;
 use DBI ();
@@ -240,6 +240,7 @@ sub new {
                 # $dbh->{'unicode'} = 1;
                 $dbh->{'sqlite_unicode'} = 1;
             }
+            $dbh->do('PRAGMA foreign_keys = ON'); # Schalte Foreign Keys ein
         }
         elsif ($dbms eq 'access') {
             if ($utf8) {
@@ -539,7 +540,7 @@ sub sql {
 
 =head1 VERSION
 
-1.192
+1.193
 
 =head1 AUTHOR
 
@@ -547,7 +548,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2020 Frank Seitz
+Copyright (C) 2021 Frank Seitz
 
 =head1 LICENSE
 

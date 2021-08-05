@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.192';
+our $VERSION = '1.193';
 
 use Quiq::Option;
 use Quiq::Array;
@@ -611,7 +611,7 @@ sub rows {
 
 =head1 VERSION
 
-1.192
+1.193
 
 =head1 AUTHOR
 

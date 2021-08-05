@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.192';
+our $VERSION = '1.193';
 
 use Quiq::Sql;
 use Quiq::Object;
@@ -25,6 +25,7 @@ use Time::HiRes ();
 use Quiq::AnsiColor;
 use Quiq::Unindent;
 use Quiq::Database::ResultSet;
+use Quiq::Parameters;
 
 # -----------------------------------------------------------------------------
 
@@ -2882,7 +2883,11 @@ sub insert {
 
     my $sloppy = 0;
 
-    Quiq::Option->extract(\@_,
+    #Quiq::Option->extract(\@_,
+    #    -sloppy => \$sloppy,
+    #);
+
+    $self->parameters(1,\@_,
         -sloppy => \$sloppy,
     );
 
@@ -3010,6 +3015,25 @@ sub insertMulti {
     my $self = shift;
     # @_: $table,$keyA,$recordA
     my $stmt = $self->stmt->insertMulti(@_);
+    return $self->sql($stmt);
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 insertResultSet() - Füge Datensätze eines Resultset zu Tabelle hinzu
+
+=head4 Synopsis
+
+  $cur = $db->insertResultSet($table,$tab);
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub insertResultSet {
+    my ($self,$table,$tab) = @_;
+    my $stmt = $self->stmt->insertMulti($table,scalar($tab->titles),
+        scalar($tab->rows));
     return $self->sql($stmt);
 }
 
@@ -4903,6 +4927,175 @@ sub diff {
 
 # -----------------------------------------------------------------------------
 
+=head3 updateNToM() - Verwalte N-zu-M Relation
+
+=head4 Synopsis
+
+  $db->updateNToM($masterId,\@values1,\@values2,
+      a => $a,
+      b => $b,
+      b_pk => $b_pk,
+      b_col => $b_col,
+      a_b => $a_b,
+      a_b_fk_a => $a_b_fk_a,
+      a_b_fk_b => $a_b_fk_b,
+  );
+
+=head4 Arguments
+
+=over 4
+
+=item $masterId
+
+Primärschlüssel-Wert des Master-Datensatzes.
+
+=item @values1
+
+Liste der dem Master-Datensatz zugeordneten B-Werte I<vor>
+der Änderung.
+
+=item @values2
+
+Dito. nach der Änderung.
+
+=item a => $a,
+
+Name der Master-Tabelle.
+
+=item b => $b,
+
+Name der Slave-Tabelle.
+
+=item b_pk => $b_pk,
+
+Name der Primärschlüsselkolumne der Slave-Tabelle.
+
+=item b_col => $b_col,
+
+Name der Wert-Kolumne der Slave-Tabelle.
+
+=item a_b => $a_b,
+
+Name der Relations-Tabelle.
+
+=item a_b_fk_a => $a_b_fk_a,
+
+Name der Fremdschlüsselkolumne in der Relationstabelle
+auf die Master-Tabelle.
+
+=item a_b_fk_b => $a_b_fk_b,
+
+Name der Fremdschlüsselkolumne in der Relationstabelle
+auf die Slave-Tabelle.
+
+=back
+
+=head4 Description
+
+Folgendes Datenmodell:
+
+  A <-- A_B --> B
+
+Beispiel: A = Tabelle mit Texten, B = Tabelle mit Schlagworten,
+A_B = Relationstabelle für die Zuordnung von Schlagworten zu Texten.
+
+Die Methode sorgt dafür, daß für einen Datensatz in A mit der Id
+$masterId eine Änderung der Schlagwortliste von @values1 nach @values2
+die Relationsdatensätze in A_B gemäß dieser Änderung aktualisiert werden.
+Neue Schlagworte in @values2 werden zu B hinzugefügt, Schlagworte,
+die wegfallen und nicht von anderen Texten referenziert werden,
+werden entfernt.
+
+=head4 Example
+
+Siehe KnowledgeBase::System->edit()
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub updateNToM {
+    my ($self,$masterId,$values1A,$values2A) = splice @_,0,4;
+    # @_: s. Synopsis
+
+    my ($a,$a_pk,$b,$b_pk,$b_col,$a_b,$a_b_fk_a,$a_b_fk_b);
+
+    Quiq::Parameters->extractPropertiesToVariables(\@_,
+        a => \$a,
+        b => \$b,
+        bPk => \$b_pk,
+        bCol => \$b_col,
+        aB => \$a_b,
+        aBFkA => \$a_b_fk_a,
+        aBFkB => \$a_b_fk_b,
+    );
+
+    my ($only1A,$only2A) = Quiq::Array->different($values1A,$values2A);
+
+    if (@$only1A) {
+        my $keywords = join ', ',map {"'$_'"} @$only1A;
+        $self->sql(qq~
+            DELETE FROM $a_b
+            WHERE
+                $a_b_fk_b IN (
+                    SELECT
+                        $b_pk
+                    FROM
+                        $b
+                    WHERE
+                        $b_col IN ($keywords)
+                )
+        ~);
+    }
+    if (@$only2A) {
+        # Ergänze alle Keywords, die noch nicht existieren
+
+        my %keyword = $self->values(
+            -select => $b_col, 1,
+            -from => $b,
+            -where, $b_col => ['IN',@$only2A],
+        );
+        for (@$only2A) {
+            if (!$keyword{$_}) {
+                $self->insert($b,$b_col=>$_);
+            }
+        }
+
+        # Verknüpfe mit allen Keywords, die noch nicht verknüpft sind
+
+        my @ids = $self->values(
+            -select => $b_pk,
+            -from => $b,
+            -where, $b_col => ['IN',@$only2A],
+        );
+        for (@ids) {
+            $self->insert($a_b,
+                $a_b_fk_a => $masterId,
+                $a_b_fk_b => $_,
+            );
+        }
+    }
+
+    # Lösche unverknüpfte Keywords
+
+    $self->sql(qq~
+        DELETE FROM $b
+        WHERE
+            NOT EXISTS (
+                SELECT
+                    1
+                FROM
+                    $a_b
+                WHERE
+                    $a_b_fk_b = $b_pk
+            )
+    ~);
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
 =head1 DETAILS
 
 =head2 Zeitmessung
@@ -5262,7 +5455,7 @@ Von Perl aus auf die Access-Datenbank zugreifen:
 
 =head1 VERSION
 
-1.192
+1.193
 
 =head1 AUTHOR
 
@@ -5270,7 +5463,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2020 Frank Seitz
+Copyright (C) 2021 Frank Seitz
 
 =head1 LICENSE
 

@@ -1,6 +1,7 @@
 Changelog for Mojolicious-Plugin-AutoRoutePm
 
-0.18 2021-08-03T17:09:37
+0.19 2021-08-04T20:41:40
+ - Add version number to module
  - Solved a bug where route paths that begins with /pl fail
  - 0.17
  - Update prereq version for Mojolicious
@@ -15,6 +16,9 @@ Changelog for Mojolicious-Plugin-AutoRoutePm
  - [Minor] Add weaver.ini config file for badges
  - Solved a bug where system template paths are changed.
  - Change link to travis badge
+
+0.18 2021-08-03T13:48:29
+ - Solved a bug where route paths that begins with /pl fail
 
 0.17 2021-08-02T16:43:04
  - Update prereq version for Mojolicious

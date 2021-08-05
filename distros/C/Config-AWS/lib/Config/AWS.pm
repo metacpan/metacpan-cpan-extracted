@@ -21,7 +21,7 @@ use Exporter::Shiny qw(
     default_profile
 );
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 our %EXPORT_TAGS = (
     ini  => [qw( read_file read_string read_handle )],
     aws  => [qw( config_file default_profile credentials_file )],

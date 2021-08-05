@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.192';
+our $VERSION = '1.193';
 
 use POSIX ();
 use Time::Local ();
@@ -139,7 +139,8 @@ sub snakeCaseToCamelCase {
     my ($this,$str) = @_;
 
     # Eingebettete Bindestriche und Unterstriche in Camel Case wandeln
-    $str =~ s/(.)[_-](.)/$1\U$2/g;
+    # $str =~ s/(.)[_-](.)/$1\U$2/g;
+    $str =~ s/[_-](.)/\U$1/g;
 
     return $str;
 }
@@ -671,7 +672,7 @@ sub stringToKeyVal {
 
 =head1 VERSION
 
-1.192
+1.193
 
 =head1 AUTHOR
 
@@ -679,7 +680,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2020 Frank Seitz
+Copyright (C) 2021 Frank Seitz
 
 =head1 LICENSE
 

@@ -21,8 +21,8 @@ describe 'Config::AWS environment tests' => sub {
         is Config::AWS::credentials_file(), 'some-credentials';
 
         delete $ENV{AWS_SHARED_CREDENTIALS_FILE};
-        is path(Config::AWS::credentials_file())->stringify,
-            path('~/.aws/credentials')->stringify;
+        is path( Config::AWS::credentials_file )
+            ->relative('~/.aws/credentials')->stringify, '.';
     };
 
     tests 'config_file' => sub {
@@ -30,8 +30,8 @@ describe 'Config::AWS environment tests' => sub {
         is Config::AWS::config_file(), 'some-config';
 
         delete $ENV{AWS_CONFIG_FILE};
-        is path(Config::AWS::config_file())->stringify,
-            path('~/.aws/config')->stringify;
+        is path( Config::AWS::config_file )
+            ->relative('~/.aws/config')->stringify, '.';
     };
 };
 

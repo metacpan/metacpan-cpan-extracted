@@ -5,7 +5,7 @@ ansifold - fold command handling ANSI terminal sequences
 
 # VERSION
 
-Version 1.0901
+Version 1.0902
 
 # SYNOPSIS
 
@@ -28,6 +28,8 @@ ansifold \[ options \]
           --tabhead=char           Tab-head character (default space)
           --tabspace=char          Tab-space character (default space)
           --tabstyle=style         Tab expansion style (shade, dot, symbol)
+    -h    --help                   Show help message
+    -v    --version                Show version
 
 # DESCRIPTION
 

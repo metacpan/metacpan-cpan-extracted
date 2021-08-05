@@ -5,11 +5,10 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.192';
+our $VERSION = '1.193';
 
 use Quiq::Option;
 use Quiq::Hash;
-use Quiq::Array;
 use Quiq::Formatter;
 
 # -----------------------------------------------------------------------------
@@ -59,83 +58,6 @@ sub lookupSub {
     }
 
     return undef;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 values() - Liefere Kolumnenwerte als Liste oder Hash
-
-=head4 Synopsis
-
-  @vals|$valA = $tab->values($key,@opt);
-  %vals|$valH = $tab->values($key,@opt,-hash=>1);
-
-=head4 Options
-
-=over 4
-
-=item -distinct => $bool (Default: 0)
-
-Liefere in der Resultatliste nur verschiedene Kolumenwerte. Wird ein
-Hash geliefert, ist dies zwangsläufig der Fall. Der Wert findet
-sich in der Resultatliste an der Stelle seines ersten Auftretens.
-
-=item -hash => $bool (Default: 0)
-
-Liefere einen Hash bzw. eine Hashreferenz (Quiq::Hash) mit den
-Kolumnenwerten als Schlüssel und 1 als Wert.
-
-=item -notNull => $bool (Default: 0)
-
-Ignoriere Nullwerte, d.h. nimm sie nicht ins Resultat auf.
-
-=back
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub values {
-    my $self = shift;
-    my $key = shift;
-    # @_: @opt
-
-    my $distinct = 0;
-    my $hash = 0;
-    my $notNull = 0;
-
-    if (@_) {
-        Quiq::Option->extract(\@_,
-            -distinct => \$distinct,
-            -hash => \$hash,
-            -notNull => \$notNull,
-        );
-    }
-
-    my (@arr,%seen);
-    for my $row (@{$self->rows}) {
-        my $val = $row->$key;
-        if ($notNull && $val eq '') {
-            next;
-        }
-        if ($distinct && $seen{$val}++) {
-            next;
-        }
-        CORE::push @arr,$val;
-        if ($hash) {
-            CORE::push @arr,1;
-        }
-    }
-
-    if (wantarray) {
-        return @arr;
-    }
-    elsif ($hash) {
-        return Quiq::Hash->new({@arr})->unlockKeys;
-    }
-    else {
-        return Quiq::Array->new(\@arr);
-    }
 }
 
 # -----------------------------------------------------------------------------
@@ -836,7 +758,7 @@ sub selectParentRows {
 
 =head1 VERSION
 
-1.192
+1.193
 
 =head1 AUTHOR
 
@@ -844,7 +766,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2020 Frank Seitz
+Copyright (C) 2021 Frank Seitz
 
 =head1 LICENSE
 

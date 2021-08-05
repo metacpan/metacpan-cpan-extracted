@@ -20,7 +20,7 @@ use Term::ANSIColor qw/colored/;
 use File::chdir;
 use Time::HiRes qw/sleep/;
 
-our $VERSION = version->new('0.7.5');
+our $VERSION = version->new('0.7.6');
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 main();
@@ -379,7 +379,7 @@ group-git - Perform operations over many git repositories at once
 
 =head1 VERSION
 
-This documentation refers to group-git version 0.7.5.
+This documentation refers to group-git version 0.7.6.
 
 =head1 SYNOPSIS
 
@@ -394,15 +394,22 @@ This documentation refers to group-git version 0.7.5.
   -R --remote   Use any management type defined to for remote git servers.
                 Only useful if you have a group-git.yml file defining Github,
                 Bitbucked or Gitosis types.
+     --no-remote
+                Don't connect to check upstream repositories
   -t --tag[=]str
                 Only opperate on repositories tagged with str. Tags can be
                 specified in the config file (see --man), with a file .[tag].tag
                 in the project directory or programatically by tagger plugin.
+  -g --tag-group[=]str
+                Operate only on groups of repositories (configured in the local
+                group-git.yml file)
      --bw       Don't colour the repository names in the output.
 
   Finding projects:
   -r --recurse  Recurses into subdirectories to check if they contain git
                 repositories rather than only stopping at the current level.
+     --no-recurse
+                Don't recurse to subdirectories
 
   Output:
   -p --page     Turns on paginating out put uses $PAGER environment variable if

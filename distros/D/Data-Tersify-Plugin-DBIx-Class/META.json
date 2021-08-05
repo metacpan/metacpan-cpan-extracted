@@ -4,7 +4,7 @@
       "Sam Kington <skington@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -22,8 +22,7 @@
       "runtime" : {
          "requires" : {
             "DBIx::Class" : "0",
-            "Data::Tersify" : "1.000",
-            "DateTime" : "0",
+            "Data::Tersify" : "1.003",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -32,7 +31,6 @@
          "requires" : {
             "DBIx::Class" : "0",
             "Data::Dumper" : "0",
-            "Data::Tersify" : "1.000",
             "Test::More" : "0",
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "1.08"
@@ -50,7 +48,7 @@
          "web" : "https://github.com/skington/data-tersify"
       }
    },
-   "version" : "1.001",
+   "version" : "1.003",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

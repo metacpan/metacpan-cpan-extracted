@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.192';
+our $VERSION = '1.193';
 
 use Quiq::String;
 use Quiq::Option;
@@ -120,6 +120,10 @@ sub fromString {
     if (substr($$ref,0,1) eq '@') {
         @keys = $$ref =~ /^\@\@([\w-]+)\@\@ */gm;
         @vals = split /^\@\@[\w-]+\@\@ */m,$$ref;
+    }
+    elsif (substr($$ref,0,1) eq '=') {
+        @keys = $$ref =~ /^==([\w-]+)== */gm;
+        @vals = split /^==[\w-]+== */m,$$ref;
     }
     else {
         @keys = $$ref =~ /^([\w-]+) *[:=] */gm;
@@ -332,7 +336,7 @@ sub toFile {
 
 =head1 VERSION
 
-1.192
+1.193
 
 =head1 AUTHOR
 
@@ -340,7 +344,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2020 Frank Seitz
+Copyright (C) 2021 Frank Seitz
 
 =head1 LICENSE
 

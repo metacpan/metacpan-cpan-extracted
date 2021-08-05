@@ -9,7 +9,6 @@ t/39548.t
 t/79766.t
 t/belg4mit.t
 t/dandv.t
-t/dnsparks.t
 t/fill.t
 t/Jacobson.t
 t/Jacobson2.t
@@ -22,5 +21,6 @@ t/tabs.t
 t/Wrap-JLB.t
 t/wrap.t
 t/wrap_separator2.t
+xt/bench/dnsparks.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

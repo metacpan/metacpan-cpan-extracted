@@ -3,8 +3,8 @@ NAME
     Indonesian holidays
 
 VERSION
-    This document describes version 0.003 of App::dateseq::idn (from Perl
-    distribution App-dateseq-idn), released on 2021-01-30.
+    This document describes version 0.004 of App::dateseq::idn (from Perl
+    distribution App-dateseq-idn), released on 2021-03-09.
 
 FUNCTIONS
   dateseq_idn
@@ -140,7 +140,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-dateseq-idn>
+    <https://github.com/perlancar/perl-App-dateseq-idn/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

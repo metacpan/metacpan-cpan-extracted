@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::AutoRoutePm;
-
+$Mojolicious::Plugin::AutoRoutePm::VERSION = '0.19';
 use Mojo::Base 'Mojolicious::Plugin';
 # ABSTRACT: Mojolicious plugin to create routes by *.pm modules which are a controller
 
@@ -130,7 +130,7 @@ Mojolicious::Plugin::AutoRoutePm - Mojolicious plugin to create routes by *.pm m
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 

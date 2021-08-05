@@ -1,3 +1,9 @@
+2.05    2021-08-05
+
+    - Add new time zones for Yukon Standard Time and South Sudan Standard Time.
+
+    - Change minimum version of DateTime::TimeZone for testing.
+
 2.04    2019-04-20
 
     - Add new time zone for Qyzylorda Standard Time.
@@ -32,7 +38,7 @@
     - Add new time zone for Sudan Standard Time.
 
     - Calculate Windows time offsets from TZI value rather than Display.
-    
+
     - Month displayed in test results changed to match month being tested.
 
     - Add known bad time zones for author testing as Microsoft has not fully adopted
@@ -62,23 +68,23 @@
 1.94    2016-09-19
 
     - Add new time zone for Omsk Standard Time.
-    
+
     - Removed known bad time zone for author testing as time is now fixed.
-    
+
     - Updated documentation to reflect newer operating systems.
 
 1.93    2016-08-13
 
     - Run certain tests only during automated testing to avoid user test failures
       should time zones change before the module is updated.
-      
+
     - Build changes to improve CPANTS Kwalitee score.
 
 1.92    2016-08-12
 
     - Correct test failure when running as Administrator on Windows when using older
       versions of DateTime::TimeZone. RT 116909.
-      
+
     - Added time zone as a known bad zone until Microsoft fixes updates. This affects
       author testing only and not functionality.
 
@@ -95,17 +101,17 @@
 
     - Many new time zones and updates from May 2016 and June 2016 DST and time
       zone updates for Windows.
-    
+
     - Fix test warnings when testing from non-admin shell using readonly registry values.
-    
+
     - Remove Chile time zone as exception to prevent author test from failing.
 
 1.88    2016-04-16
 
     - Add support for new time zones in Russia.
-    
+
     - Fix test failure when new time zone exists but is not handled in library.
-    
+
     - Mark Chile time zone as not being updated yet by Microsoft to prevent
       author test from failing.
 
@@ -116,11 +122,11 @@
 1.86    2015-12-13
 
     - Add support for new time zone in North Korea.
-    
+
     - Reorganize tests so that many tests can run with only read access to the
       registry. Currently, most testers have all tests skipped because they are
       not running as an Administrator during testing.
-      
+
     - Add internal method to read Windows to IANA hash so as to enable testing for
       those with only read access to the registry.
 
@@ -128,10 +134,10 @@
 
     - Change compile test to an author test due to possibility of
       DateTime::TimeZone::Local not being present. Patch by Dave Rolsky.
-      
+
     - Change environment variable for author testing in main test script to
       be consistent with conventions.
-      
+
     - Include extra modules when reporting prerequisites from testing.
 
 1.84    2015-06-22
@@ -142,34 +148,34 @@
 1.83    2015-06-22
 
     - Remove prerequisite to DateTime::TimeZone::Local and DateTime.
-    
+
     - Update tests to run conditionally on presence of DateTime::TimeZone::Local
       and DateTime.
-      
+
     - Require maintainer tests to work only on a recent build of DateTime::TimeZone.
-    
+
     - Rename references to Olson to IANA as the current maintainer of the tz database.
-    
+
     - Modify prerequisite versions for some modules.
 
 1.82    2015-02-19
 
     - Add support for upcoming Windows time zone update for March 2015, which
       will have a new time zone for Mexico.
-    
+
     - Require latest DateTime-TimeZone-Local to ensure Windows mappings
       map to existing IANA time zones.
 
 
 1.81    2015-02-18
 
-    - Required Win32-TieRegistry v0.27 to fix failures on Perl 5.20.1.  
+    - Required Win32-TieRegistry v0.27 to fix failures on Perl 5.20.1.
       RT #100334 & 102178.
-    
+
     - Fix failures on Windows 2008 when newlines appear following null
       character in time zone name.  Patch in main code by Stuart Watt and for
       test by Tom Koelman.  RT #68607 & 70989.
-      
+
     - Fix maintainer test to appropriate test time zones in current time, not
       historical time.
 

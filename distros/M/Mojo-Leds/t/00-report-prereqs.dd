@@ -24,8 +24,7 @@ do { my $x = {
                                       'Scalar::Util' => '0',
                                       'Tie::IxHash' => '0',
                                       'boolean' => '0',
-                                      'perl' => '5.014',
-                                      'vars' => '0'
+                                      'perl' => '5.014'
                                     }
                     },
        'test' => {

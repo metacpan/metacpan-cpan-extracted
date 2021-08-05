@@ -17,11 +17,11 @@ Device::Yeelight - Controller for Yeelight smart devices
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 =head1 SYNOPSIS
 
@@ -31,6 +31,7 @@ protocol and sending commands via control protocol in the JSON format.
 Device::Yeelight module provides base class for detecting Yeelight devices.
 
     use Device::Yeelight;
+    use feature 'say';
 
     my $yeelight = Device::Yeelight->new();
     my @devices = @{$yeelight->search()};

@@ -1,3 +1,10 @@
+1.003 2020-08-05
+
+    [Features]
+    
+        Let plugins say they support tersifying subclasses of the classes
+        they can tersify. This was particularly useful for DBIx::Class.
+
 1.001 2020-03-11
 
     [Bug fixes]

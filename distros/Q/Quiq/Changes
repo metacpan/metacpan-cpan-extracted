@@ -1,3 +1,76 @@
+1.193 2021-08-05
+================
+
+[Quiq::ContentProcessor::SubType]
+* Doku bearbeitet
+
+[Quiq::ContentProcessor::Type]
+* outputFiles() - Methode entfernt
+
+[Quiq::Database::Api::Dbi::Connection]
+* SQLite: Foreign Keys werden per Default aktiviert
+
+[Quiq::Database::ResultSet::Array]
+* values() - Methode in Basisklasse verlegt
+
+[Quiq::Database::ResultSet::Object]
+* values() - Methode in Basisklasse verlegt
+
+[Quiq::Database::Row::Object::Join]
+* Doku bearbeitet
+
+[Quiq::Database::Row::Object]
+* asRecord() - Optionen statt Positionsparameter und farbige Ausgabe ergänzt
+
+[Quiq::Database::Connection]
+* insert() - Optionsverarbeitung auf Methode parameters() umgestellt
+* insertResultSet() - Methode hinzugefügt
+* updateNToM() - Methode hinzugefügt
+
+[Quiq::Database::ResultSet]
+* values() - Methode aus Subklassen hierhin verlagert
+
+[Quiq::PlotlyJs::XY::DiagramGroup]
+* Detailverbesserungen
+
+[Quiq::Assert]
+* pathExists() - Methode hinzugefügt
+
+[Quiq::Converter]
+* snakeCaseToCamelCase() - Bug gefixt
+
+[Quiq::Formatter]
+* new() - Konstruktor eingeführt
+
+[Quiq::Hash]
+* Exception übersetzt
+
+[Quiq::Object]
+* Kosmetik
+
+[Quiq::Path]
+* compareData() - Encoding hinzugefügt
+* edit() - Bearbeitung von In-Memory-Daten ergänzt
+* link() - Option -force und Tilde-Expansion hinzugefügt
+* sha1() - Methode hinzugefügt
+* deleteContent() - Methode hinzugefügt
+* rename() - Tilde-Expansion hinzugefügt
+* numberBasePaths() - Nummerierung auf kurze Basisnamen beschränkt
+* split() - Kurzen Basisnamen und lange Extension hinzugefügt
+
+[Quiq::Record]
+* fromString() - "==" als Begrenzer hinzugefügt
+
+[Quiq::SQLite]
+* Klasse hinzugefügt
+
+[Quiq::Sql]
+* createTable() - Foreign Keys hinzugefügt
+* delete() - Keine WHERE-Klausel, wenn +null als einzige Angabe
+
+[Quiq::TempDir]
+* new() - Cleanup zum Default gemacht
+
 1.192 2020-12-09
 ================
 

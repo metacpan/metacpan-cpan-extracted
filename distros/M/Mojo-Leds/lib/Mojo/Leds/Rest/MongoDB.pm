@@ -1,14 +1,15 @@
 package Mojo::Leds::Rest::MongoDB;
-$Mojo::Leds::Rest::MongoDB::VERSION = '1.04';
-use boolean;
-
+$Mojo::Leds::Rest::MongoDB::VERSION = '1.05';
 use Mojo::Base 'Mojo::Leds::Rest';
+use boolean;
 
 use Scalar::Util qw(looks_like_number);
 use BSON::OID;
 use Tie::IxHash;
 
-has pk => '_id';
+has pk       => '_id';
+has f_search => 'find';
+has f_table  => 'coll';
 
 sub _create {
     my $c   = shift;
@@ -50,12 +51,6 @@ sub _patch {
     return $rec;
 }
 
-sub _tableDB {
-    my $c = shift;
-    my $helper = $c->dbHelper;
-    return $c->helpers->$helper->coll( $c->table );
-}
-
 sub _update {
     my $c   = shift;
     my $set = shift;
@@ -80,42 +75,26 @@ sub _delete {
     return $rec;
 }
 
-# da spostare nel padre quando si capira' come funziona DBIx
-sub list {
-    my $c     = shift;
-    my $query = $c->param('query');
-    return $c->$query(@_) if ($query);
+sub _list {
+    my ( $c, $rec, $qry, $opt, $rc ) = @_;
 
-    my ( $qry, $opt, $with_count ) = $c->_qs2q;
-    my $rec  = $c->_dbfind( $qry, $opt );
-    my @recs = $rec->all;
-
-    my $ret = [@recs];
-
-    if ($with_count) {
+    my $recs = [$rec->all];
+    if ($rc) {
         my $count =
           ( exists $opt->{limit} || exists $opt->{page} || exists $opt->{skip} )
           ? $c->tableDB->count_documents($qry)
-          : scalar(@recs);
-        $ret = { count => $count, recs => [@recs] };
+          : scalar(@$recs);
+        $recs = { count => $count, recs => $recs };
     }
 
-    $c->render_json($ret);
+    return $recs;
 }
 
-# da spostare nel padre quando si capira' come funziona DBIx
-sub listupdate {
-    my $c = shift;
-    return $c->_raise_error( "Resource is read-only", 403 ) if $c->ro;
-    my $json = $c->_json_from_body;
-    return unless ($json);
-
-    # json deve essere un array
-    return $c->_raise_error( 'Not an array of records', 422 )
-      unless ( ref($json) eq 'ARRAY' );
+sub _listupdate {
+    my $c    = shift;
+    my $json = shift;
 
     my @recs;
-
     foreach my $item (@$json) {
         if ( exists $item->{ $c->pk } ) {
             $c->app->log->debug(
@@ -131,11 +110,9 @@ sub listupdate {
             push @recs, $rec;
         }
     }
-
-    $c->render_json( \@recs );
+    return @recs;
 }
 
-# da spostare sul parent una volta capito come funziona DBIx
 sub _qs2q {
     my $c   = shift;
     my $flt = $c->req->query_params->to_hash;
@@ -188,14 +165,6 @@ sub _qs2q {
           . Data::Dumper::Dumper($opt) );
 
     return ( $qry, $opt, $rc );
-}
-
-sub _dbfind {
-    my $c   = shift;
-    my $qry = shift;
-    my $opt = shift;
-
-    return $c->tableDB->find( $qry, $opt );
 }
 
 sub _query_builder {
@@ -256,7 +225,7 @@ Mojo::Leds::Rest::MongoDB - A RESTFul interface to MongoDB
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 

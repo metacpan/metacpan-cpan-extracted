@@ -7,5 +7,6 @@ requires 'Getopt::EX::Hashed' => '0.9906';
 on 'test' => sub {
     requires 'Test::More' => '0.98';
     requires 'Command::Runner';
+    requires 'List::Util', '1.29';
 };
 

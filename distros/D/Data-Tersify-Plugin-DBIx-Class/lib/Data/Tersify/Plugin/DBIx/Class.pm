@@ -3,9 +3,9 @@ package Data::Tersify::Plugin::DBIx::Class;
 use strict;
 use warnings;
 
-use DateTime;
+use Data::Tersify 1.003;
 
-our $VERSION = '1.001';
+our $VERSION = '1.003';
 $VERSION = eval $VERSION;
 
 =head1 NAME
@@ -14,7 +14,7 @@ Data::Tersify::Plugin::DBIx::Class - tersify DBIx::Class objects
 
 =head1 VERSION
 
-This is version 1.001.
+This is version 1.003.
 
 =head1 SYNOPSIS
 
@@ -66,13 +66,20 @@ sub handles {
     );
 }
 
+=head2 handles_subclasses
+
+It handles subclasses of those classes as well.
+
+=cut
+
+sub handles_subclasses { 1 }
+
 =head2 tersify
 
-It tersifies DBIx::Class::ResultSource::Table or
-DBIx::Class::ResultSource::View objects into just the name of
-the table or view respectively.
+It tersifies DBIx::Class::ResultSource::Table or ...::View objects into just
+the name of the table or view respectively.
 
-It tersifies DBIx::Class::ResultSet into the name of the result class.
+It tersifies DBIx::Class::ResultSet objects into the name of the result class.
 
 This tends to be the source of the vast majority of the unwanted chaff that
 fills your screen. 
@@ -82,9 +89,11 @@ fills your screen.
 sub tersify {
     my ($self, $dbic_object) = @_;
 
-    if (ref($dbic_object) =~ /^ DBIx::Class::ResultSource /x) {
+    if (   $dbic_object->isa('DBIx::Class::ResultSource::Table')
+        || $dbic_object->isa('DBIx::Class::ResultSource::View'))
+    {
         return $dbic_object->{name};
-    } elsif (ref($dbic_object) eq 'DBIx::Class::ResultSet') {
+    } elsif ($dbic_object->isa('DBIx::Class::ResultSet')) {
         return $dbic_object->{_result_class};
     }
 }

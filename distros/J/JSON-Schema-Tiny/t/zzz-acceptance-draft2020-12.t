@@ -52,17 +52,17 @@ acceptance_tests(
         ] },
       { file => 'unknownKeyword.json', group_description => '$id inside an unknown keyword is not a real identifier', test_description => 'type matches second anyOf, which has a real schema in it' },
       { file => [
-          'optional/bignum.json',                     # TODO: see JSD2 issue #10
-          'optional/ecmascript-regex.json',           # TODO: see JSD2 issue #27
+          'optional/bignum.json',                     # TODO: see JSM issue #10
+          'optional/ecmascript-regex.json',           # TODO: see JSM issue #27
           'optional/float-overflow.json',             # see slack logs re multipleOf algo
         ] },
       # various edge cases that are difficult to accomodate
-      $Config{ivsize} < 8 || $Config{nvsize} < 8 ?    # see JSD2 issue #10
+      $Config{ivsize} < 8 || $Config{nvsize} < 8 ?    # see JSM issue #10
         { file => 'const.json',
           group_description => 'float and integers are equal up to 64-bit representation limits',
           test_description => 'float is valid' }
         : (),
-      $Config{nvsize} >= 16 ? # see https://github.com/json-schema-org/JSON-Schema-Test-Suite/pull/438#issuecomment-714670854
+      $Config{nvsize} >= 12 ? # see https://github.com/json-schema-org/JSON-Schema-Test-Suite/pull/438#issuecomment-714670854
         { file => 'multipleOf.json',
           group_description => 'invalid instance should not raise error when float division = inf',
           test_description => 'always invalid, but naive implementations may raise an overflow error' }
@@ -85,5 +85,4 @@ DIAG
 
 done_testing;
 __END__
-
-see t/results/draft2020-12.txt for test results
+see t/results/draft2020-12-acceptance.txt for test results

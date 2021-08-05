@@ -5,8 +5,9 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.192';
+our $VERSION = '1.193';
 
+use Quiq::Path;
 use Quiq::Math;
 
 # -----------------------------------------------------------------------------
@@ -206,6 +207,78 @@ sub check {
         Value => $val,
         -stacktrace => $self->{'stacktrace'},
     );
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 pathExists() - Prüfe Existenz von Pfad
+
+=head4 Synopsis
+
+  $this->pathExists($path);         # Exception
+  $bool = $this->pathExists($path); # Rückgabewert
+
+=head4 Aliases
+
+=over 2
+
+=item *
+
+fileExists()
+
+=item *
+
+dirExists()
+
+=back
+
+=head4 Arguments
+
+=over 4
+
+=item $path (String)
+
+Pfad
+
+=back
+
+=head4 Returns
+
+Boolean
+
+=head4 Description
+
+Prüfe, ob Pfad $path existiert. Ist dies nicht der Fall, wirf eine
+Exception, wenn die Methode im Void-Kontext gerufen wurde, andernfalls 0.
+Ein leerer Wert verletzt die Bedingung nicht.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub pathExists {
+    my $self = ref $_[0]? shift: shift->new;
+    my $path = shift;
+
+    # Prüfung
+
+    if (!defined($path) || $path eq '' || Quiq::Path->exists($path)) {
+        return 1;
+    }
+    elsif (defined wantarray) {
+        return 0;
+    }
+
+    $self->throw(
+        'ASSERT-00001: Path does not exist',
+        Path => $path,
+    );
+}
+
+{
+    no warnings 'once';
+    *fileExists = \&pathExists;
+    *dirExists = \&pathExists;
 }
 
 # -----------------------------------------------------------------------------
@@ -444,7 +517,7 @@ sub isNumber {
 
 =head1 VERSION
 
-1.192
+1.193
 
 =head1 AUTHOR
 
@@ -452,7 +525,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2020 Frank Seitz
+Copyright (C) 2021 Frank Seitz
 
 =head1 LICENSE
 

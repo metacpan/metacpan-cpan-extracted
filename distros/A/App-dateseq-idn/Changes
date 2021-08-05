@@ -1,3 +1,9 @@
+0.004   2021-03-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to Calendar::Indonesia::Holiday 0.338+ (is_id_holiday ->
+	  is_idn_holiday).
+
+
 0.003   2021-01-30  Released-By: PERLANCAR; Urgency: medium
 
         - Rename app dateseq-id -> dateseq-idn to avoid ambiguity of 'id'.

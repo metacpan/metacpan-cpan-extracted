@@ -1,5 +1,14 @@
 Revision history for Config::AWS
 
+0.09      2021-08-04 21:10:32+01:00 Europe/London
+
+  No changes from 0.080001.
+
+0.080001  2021-07-16 19:24:33+01:00 Europe/London (TRIAL RELEASE)
+
+  Fixes:
+    * Fix tests in environemnts that have a credentials file
+
 0.07      2019-09-14 13:34:43+01:00 Europe/London
 
   Changes:

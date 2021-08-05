@@ -34,9 +34,14 @@ and (b) implement the class methods L<handles> and L<tersify>.
 
 Because Data::Tersify will not tersify an object via a plugin if it's the root
 structure passed to it, but I<will> tersify an object if it's part of the
-internals of another object which isn't handled by a plugin, you should
-consider implementing your plugin by tersifying I<various components> of an
-object, rather than the entire object. FIXME: why?
+internals of another data structure, or an object which isn't handled by a
+plugin, you should consider implementing your plugin by tersifying I<various
+components> of an object, rather than the entire object.
+
+That way, you'll get identical results if you get passed (a) an object directly
+(Data::Tersify preserves the top-level elements, but will let you tersify
+any sub-elements), or (b) an object as part of a data structure or another
+object (Data::Tersify will offer to let you tersify the object as a whole).
 
 =head2 handles
 
@@ -44,6 +49,13 @@ object, rather than the entire object. FIXME: why?
 
 This method returns one or more class names. These are classes that you're
 prepared to handle in your L<tersify> method.
+
+=head2 handles_subclasses
+
+ Out: $handles_subclasses
+
+Optional. Return a true value from this method if you're I<also> prepared to
+tersify subclasses of any of your handled classes.
 
 =head2 tersify
 

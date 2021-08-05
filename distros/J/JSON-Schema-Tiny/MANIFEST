@@ -70,12 +70,14 @@ t/results/draft2019-09-acceptance.txt
 t/results/draft2019-09-additional-tests.txt
 t/results/draft2020-12-acceptance.txt
 t/results/draft2020-12-additional-tests.txt
+t/results/draft7-acceptance.txt
 t/results/draft7-additional-tests.txt
 t/specification_version.t
 t/type.t
 t/unsupported-keywords.t
 t/zzz-acceptance-draft2019-09.t
 t/zzz-acceptance-draft2020-12.t
+t/zzz-acceptance-draft7.t
 xt/author/00-compile.t
 xt/author/clean-namespaces.t
 xt/author/distmeta.t

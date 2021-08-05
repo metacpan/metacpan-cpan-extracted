@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.192';
+our $VERSION = '1.193';
 
 use Quiq::Hash;
 use Quiq::Option;
@@ -1465,6 +1465,10 @@ sub splitTableName {
 
 =over 4
 
+=item -reference => [[\@cols => $refTable,@opt], ...]
+
+Liste von Fremdschlüssel-Verweisen.
+
 =item -tableSpace => $tableSpaceName (Default: keiner)
 
 Name des Tablespace, in dem die Tabelle erzeugt wird
@@ -1547,11 +1551,13 @@ sub createTable {
 
     # Optionen
 
+    my $referenceA = [];
     my $tableSpace = undef;
     my $tableType = 'InnoDB';
 
     if (@_) {
         Quiq::Option->extract(-mode=>'sloppy',\@_,
+             -references => \$referenceA,
              -tableSpace => \$tableSpace,
              -tableType => \$tableType,
         );
@@ -1571,6 +1577,14 @@ sub createTable {
     my $stmt = "CREATE TABLE $table (";
     if ($cols) {
         $stmt .= "\n$cols\n";
+    }
+    if (@$referenceA) {
+        for (@$referenceA) {
+            my $constr = $self->addForeignKeyConstraint($table,@$_);
+            $constr =~ s/\s+/ /g;
+            $constr =~ s/.*?(FOREIGN)/$1/;
+            $stmt .= "    , $constr\n";
+        }
     }
     $stmt .= ')';
 
@@ -2214,7 +2228,7 @@ sub addForeignKeyConstraint {
     my ($oracle,$postgresql,$sqlite,$mysql) = $self->dbmsTestVector;
 
     my $stmt;
-    if ($postgresql || $oracle || $mysql) {
+    if ($postgresql || $oracle || $sqlite || $mysql) {
         # ALTER TABLE
 
         $stmt = sprintf "ALTER TABLE %s ADD\n".
@@ -4548,7 +4562,9 @@ sub delete {
     }
     $stmt .= " FROM $table";
 
-    if (@_) {
+    # FIXME: Optionale Angabe +null eleganter feststellen
+
+    if (@_ && !(@_ == 1 && $_[0] eq '+null')) {
         $stmt .= "\nWHERE\n    ";
         $stmt .= $self->whereClause(@_);
     }
@@ -5613,7 +5629,7 @@ sub diff {
 
 =head1 VERSION
 
-1.192
+1.193
 
 =head1 AUTHOR
 
@@ -5621,7 +5637,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2020 Frank Seitz
+Copyright (C) 2021 Frank Seitz
 
 =head1 LICENSE
 

@@ -17,20 +17,18 @@ my %WriteMakefileArgs = (
   "NAME" => "Data::Tersify::Plugin::DBIx::Class",
   "PREREQ_PM" => {
     "DBIx::Class" => 0,
-    "Data::Tersify" => "1.000",
-    "DateTime" => 0,
+    "Data::Tersify" => "1.003",
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "DBIx::Class" => 0,
     "Data::Dumper" => 0,
-    "Data::Tersify" => "1.000",
     "Test::More" => 0,
     "Test::Pod" => 0,
     "Test::Pod::Coverage" => "1.08"
   },
-  "VERSION" => "1.001",
+  "VERSION" => "1.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,8 +38,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "DBIx::Class" => 0,
   "Data::Dumper" => 0,
-  "Data::Tersify" => "1.000",
-  "DateTime" => 0,
+  "Data::Tersify" => "1.003",
   "Test::More" => 0,
   "Test::Pod" => 0,
   "Test::Pod::Coverage" => "1.08",

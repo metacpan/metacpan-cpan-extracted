@@ -35,7 +35,7 @@ get '/coll/:cname' => sub {
 my $t = Test::Mojo->new;
 
 $t->get_ok('/connection')->status_is(200)->content_is('MongoDB::MongoClient');
-$t->get_ok('/dbname')->status_is(200)->content_is('mongodbv2');
+$t->get_ok('/dbname')->status_is(200)->content_is($t->app->db->name);
 $t->get_ok('/coll/collname')->status_is(200)->content_is('collname');
 
 # change helper
@@ -48,6 +48,6 @@ get '/dbname2' => sub {
     $s->render(text => $s->foo->name);
 };
 
-$t->get_ok('/dbname2')->status_is(200)->content_is('mongodbv2');
+$t->get_ok('/dbname2')->status_is(200)->content_is($t->app->foo->name);
 
 done_testing();

@@ -4,7 +4,7 @@ use utf8;
 use strict;
 use warnings;
 
-$Acme::Glue::VERSION = "2019.11";
+$Acme::Glue::VERSION = "2021.08";
 
 =encoding utf8
 
@@ -14,14 +14,22 @@ Acme::Glue - A placeholder module for code accompanying a Perl photo project
 
 =head1 VERSION
 
-2019.11
+2021.08
 
 =head1 DESCRIPTION
 
 Acme::Glue is the companion Perl module for a Perl photo project, the idea
 for the photo project is to have each photo include a small snippet of code.
 The code does not have to be Perl, it just has to be something you're quite
-fond of for whatever reason
+fond of for whatever reason.
+
+"Glue" is a series of photos shot at Perl conferences and workshops in Europe
+and America. Perl was one of the programming languages that bootstrapped a
+lot of internet based companies in the mid/late 1990s and early 2000s. Perl
+was considered a “glue” language by some, but has fallen out of favour as
+newer languages have taken its place. The title is a metaphor not just for
+the language but also for shrinking of the community at the events the photos
+are shot at.
 
 =head1 SNIPPETS
 
@@ -85,7 +93,7 @@ Thanks to all who contributed a snippet
 
 =head1 SEE ALSO
 
-L<https://leejo.github.io/projects/>
+L<https://www.formulanon.com/glue>
 
 L<https://www.youtube.com/watch?v=ir6f2SvsXPA&feature=youtu.be&list=PLOOlhkMvt_o4y627mpaCGrO4ughSEeUgb&t=1046>
 

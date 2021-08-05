@@ -23,8 +23,7 @@ my %WriteMakefileArgs = (
     "Mojolicious::Plugin::RenderFile" => 0,
     "Scalar::Util" => 0,
     "Tie::IxHash" => 0,
-    "boolean" => 0,
-    "vars" => 0
+    "boolean" => 0
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -34,7 +33,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.04",
+  "VERSION" => "1.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,7 +53,6 @@ my %FallbackPrereqs = (
   "boolean" => 0,
   "lib" => 0,
   "strict" => 0,
-  "vars" => 0,
   "warnings" => 0
 );
 

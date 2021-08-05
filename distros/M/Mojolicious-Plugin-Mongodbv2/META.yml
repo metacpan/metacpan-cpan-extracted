@@ -5,13 +5,11 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
-  Mojolicious::Lite: '0'
-  Test::Mojo: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,18 +26,19 @@ no_index:
 provides:
   Mojolicious::Plugin::Mongodbv2:
     file: lib/Mojolicious/Plugin/Mongodbv2.pm
-    version: '1.00'
+    version: '1.01'
   Mojolicious::Plugin::Mongodbv2::Client:
     file: lib/Mojolicious/Plugin/Mongodbv2.pm
-    version: '1.00'
+    version: '1.01'
 requires:
-  Mojo::Base: '0'
+  Mojolicious: '8.23'
   MongoDB: '0'
   strict: '0'
   warnings: '0'
 resources:
   homepage: https://github.com/EmilianoBruni/mojolicious-plugin-mongodbv2
   repository: https://github.com/EmilianoBruni/mojolicious-plugin-mongodbv2.git
-version: '1.00'
+version: '1.01'
 x_generated_by_perl: v5.14.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

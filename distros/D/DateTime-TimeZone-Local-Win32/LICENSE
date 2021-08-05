@@ -1,5 +1,5 @@
 Copyright (C) 2007-2014 Dave Rolsky <autarch@urth.org>
-Copyright (C) 2014-2019 by David Pinkowitz <dapink@cpan.org>
+Copyright (C) 2014-2021 by David Pinkowitz <dapink@cpan.org>
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -14,7 +14,7 @@ b) the "Artistic License"
 --- The GNU General Public License, Version 1, February 1989 ---
 
 Copyright (C) 2007-2014 Dave Rolsky <autarch@urth.org>
-Copyright (C) 2014-2019 by David Pinkowitz <dapink@cpan.org>
+Copyright (C) 2014-2021 by David Pinkowitz <dapink@cpan.org>
 
 This is free software, licensed under:
 
@@ -275,7 +275,7 @@ That's all there is to it!
 --- The Artistic License 1.0 ---
 
 Copyright (C) 2007-2014 Dave Rolsky <autarch@urth.org>
-Copyright (C) 2014-2019 by David Pinkowitz <dapink@cpan.org>
+Copyright (C) 2014-2021 by David Pinkowitz <dapink@cpan.org>
 
 This is free software, licensed under:
 

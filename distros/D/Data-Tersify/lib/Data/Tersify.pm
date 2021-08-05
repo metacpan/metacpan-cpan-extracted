@@ -8,7 +8,7 @@ use parent 'Exporter';
 our @EXPORT_OK = qw(tersify tersify_many);
 
 # Have you updated the version number in the POD below?
-our $VERSION = '1.001';
+our $VERSION = '1.003';
 $VERSION = eval $VERSION;
 
 use Carp;
@@ -22,7 +22,7 @@ Data::Tersify - generate terse equivalents of complex data structures
 
 =head1 VERSION
 
-This is version 1.001 of Data::Tersify.
+This is version 1.003 of Data::Tersify.
 
 =head1 SYNOPSIS
 
@@ -344,11 +344,14 @@ provided in separate distributions.
 =cut
 
 {
-    my (%handled_by_plugin);
+    my (%handled_by_plugin, %plugin_handles_subclasses);
+    my $subclass_lookup_initialised;
 
     sub _tersify_via_plugin {
         my ($object) = @_;
 
+        # A simple lookup of "this type of object is handled by this class".
+        # If the plugin doesn't handle subclasses of objects, this is fine.
         if (!keys %handled_by_plugin) {
             for my $plugin (plugins()) {
                 for my $class ($plugin->handles) {
@@ -357,12 +360,37 @@ provided in separate distributions.
             }
         }
 
-        ### FIXME: subclasses also. Loop the other way, go through
-        ### the types we know about and see if $object->isa(...)
-        ### rather than hard-coding the ref($object).
-        if (my $plugin = $handled_by_plugin{ref($object)}) {
+        # A more complex lookup of "this class handles subclasses".
+        if (!$subclass_lookup_initialised) {
+            for my $plugin (plugins()) {
+                if (   $plugin->can('handles_subclasses')
+                    && $plugin->handles_subclasses)
+                {
+                    $plugin_handles_subclasses{$plugin} = [ $plugin->handles ];
+                }
+            }
+            $subclass_lookup_initialised = 1;
+        }
+
+        # With that in mind, look for a plugin that handles this object
+        # one way or another.
+        my $chosen_plugin = $handled_by_plugin{ref($object)};
+        if (!$chosen_plugin && keys %plugin_handles_subclasses) {
+            plugin:
+            for my $plugin (sort keys %plugin_handles_subclasses) {
+                for my $class (@{ $plugin_handles_subclasses{$plugin} }) {
+                    if ($object->isa($class)) {
+                        $chosen_plugin = $plugin;
+                        last plugin;
+                    }
+                }
+            }
+        }
+
+        # And use it to summarise the object if we can.
+        if ($chosen_plugin) {
             return _summarise_object_as_string($object,
-                $plugin->tersify($object));
+                $chosen_plugin->tersify($object));
         }
         return $object;
     }

@@ -1,5 +1,5 @@
 package Mojo::Leds::Rest;
-$Mojo::Leds::Rest::VERSION = '1.04';
+$Mojo::Leds::Rest::VERSION = '1.05';
 use Mojo::Base 'Mojo::Leds::Page';
 use Mojo::Util qw(decamelize class_to_path);
 use Mojo::JSON qw(decode_json);
@@ -11,6 +11,8 @@ has table => sub {
 has pk       => 'id';
 has ro       => 0;
 has dbHelper => 'db';
+has f_search => 'search';
+has f_table  => 'resultset';
 
 sub create {
     my $c = shift;
@@ -19,7 +21,7 @@ sub create {
     return unless ($rec);
     $rec = $c->_create($rec);
     return unless ($rec);
-    $c->render_json($c->_rec2json($rec));
+    $c->render_json( $c->_rec2json($rec) );
 }
 
 sub delete {
@@ -29,6 +31,33 @@ sub delete {
     return $c->_raise_error( 'Element not found', 404 ) unless $rec;
     $c->_delete($rec);
     $c->render_json( undef, 204 );
+}
+
+sub list {
+    my $c     = shift;
+    my $query = $c->param('query');
+    return $c->$query(@_) if ($query);
+
+    my ( $qry, $opt, $rc ) = $c->_qs2q;
+    my $rec  = $c->searchDB( $qry, $opt );
+    my $recs = $c->_list( $rec, $qry, $opt, $rc );
+
+    $c->render_json($recs);
+}
+
+sub listupdate {
+    my $c = shift;
+    return $c->_raise_error( "Resource is read-only", 403 ) if $c->ro;
+    my $json = $c->_json_from_body;
+    return unless ($json);
+
+    # json deve essere un array
+    return $c->_raise_error( 'Not an array of records', 422 )
+      unless ( ref($json) eq 'ARRAY' );
+
+    my @recs = $c->_listupdate($json);
+
+    $c->render_json( \@recs );
 }
 
 sub patch {
@@ -61,8 +90,20 @@ sub resource_lookup {
     return $rec;
 }
 
+sub searchDB {
+    my $c   = shift;
+    my $qry = shift;
+    my $opt = shift;
+
+    my $f_search = $c->f_search;
+    return $c->tableDB->$f_search( $qry, $opt );
+}
+
 sub tableDB {
-    return shift->_tableDB;
+    my $c       = shift;
+    my $helper  = $c->dbHelper;
+    my $f_table = $c->f_table;
+    return $c->helpers->$helper->$f_table( $c->table );
 }
 
 sub update {
@@ -115,7 +156,7 @@ Mojo::Leds::Rest - Abstract class for RESTFul webservices interface
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 RESTFul API
 

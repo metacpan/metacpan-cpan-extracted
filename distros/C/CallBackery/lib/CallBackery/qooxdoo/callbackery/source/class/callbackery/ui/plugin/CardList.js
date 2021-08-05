@@ -63,29 +63,32 @@ qx.Class.define("callbackery.ui.plugin.CardList", {
 
         setData : function (data) {
             if (!Array.isArray(data)) {
-                console.warn('data is not an array');
+                console.warn('data is not an array: data=', data);
                 return;
             }
-            var cards = this.__cards;
-            var currentKeys = {};
-            var that = this;
+            let cards = this.__cards;
+            let currentKeys = {};
+            let that = this;
 
             // add new cards
             var buttonMap = this._action.getButtonMap();
-            if (data.forEach) {
-                data.forEach(function(row){
-                    var key = row.id;
-                    currentKeys[key] = 1;
-                    if (!cards[key]){
-                        var card = cards[key] = new callbackery.ui.Card(this._cfg, buttonMap, that);
-                        that.__cardList.addAt(card, 0);
-                        card.addListener('reloadData', function(){
-                            this._loadData();
-                        }, that);
-                    }
+            data.forEach(function(row){
+                let key = row.id;
+                currentKeys[key] = 1;
+                if (!cards[key]){
+                    let card = cards[key] = new callbackery.ui.Card(this._cfg, buttonMap, that);
+                    that.__cardList.addAt(card, 0);
+                }
+                let focusedWidget = qx.ui.core.FocusHandler.getInstance().getFocusedWidget();
+                let focusParent;
+                if (focusedWidget && focusedWidget.getLayoutParent) {
+                    focusParent = focusedWidget.getLayoutParent();
+                }
+                if (cards[key] !== focusParent) {
                     cards[key].setData(row);
-                },this);
-            }
+                }
+            },this);
+
             // remove deleted cards
             for ( var key in cards ) {
                 if (!currentKeys[key]){

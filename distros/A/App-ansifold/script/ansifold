@@ -4,7 +4,7 @@ use v5.14;
 use warnings;
 use utf8;
 
-our $VERSION = "1.0901";
+our $VERSION = "1.0902";
 
 =encoding utf-8
 
@@ -14,7 +14,7 @@ ansifold - fold command handling ANSI terminal sequences
 
 =head1 VERSION
 
-Version 1.0901
+Version 1.0902
 
 =head1 SYNOPSIS
 
@@ -37,6 +37,8 @@ ansifold [ options ]
           --tabhead=char           Tab-head character (default space)
           --tabspace=char          Tab-space character (default space)
           --tabstyle=style         Tab expansion style (shade, dot, symbol)
+    -h    --help                   Show help message
+    -v    --version                Show version
 
 =head1 DESCRIPTION
 
@@ -280,29 +282,41 @@ if ($0 =~ /expand$/) {
 
 use Getopt::EX::Hashed 'has';
 
-has width     => spec => "w =s " , default => [];
-has boundary  => spec => "  =s " , default => "none";
-has padding   => spec => "  !  " , ;
-has padchar   => spec => "  =s " , ;
-has ambiguous => spec => "  =s " , ;
-has paragraph => spec => "p +  " , default => 0;
-has separate  => spec => "  =s " , default => "\n";
-has runin     => spec => "  =i " , default => 4;
-has runout    => spec => "  =i " , default => 4;
-has nonewline => spec => "n    " , action  => sub { $_{separate} = "" };
-has expand    => spec => "x :-1" , default => $DEFAULT_EXPAND;
-has tabstop   => spec => "  =i " ;
-has tabhead   => spec => "  =s " ;
-has tabspace  => spec => "  =s " ;
-has tabstyle  => spec => "  =s " ;
-has discard   => spec => "  =s " , default => [];
-has version   => spec => "v    " , action  => sub {
-    print "Version: $VERSION\n ";
+has width     => spec => "w =s@ " , default => [];
+has boundary  => spec => "  =s  " , default => "none";
+has padding   => spec => "  !   " ;
+has padchar   => spec => "  =s  " ;
+has ambiguous => spec => "  =s  " ;
+has paragraph => spec => "p +   " , default => 0;
+has separate  => spec => "  =s  " , default => "\n";
+has linebreak => spec => "  =s  " , alias   => 'lb';
+has runin     => spec => "  =i  " , default => 4;
+has runout    => spec => "  =i  " , default => 4;
+has nonewline => spec => "n     " ;
+has smart     => spec => "s !   " ;
+has expand    => spec => "x :-1 " , default => $DEFAULT_EXPAND;
+has tabstop   => spec => "  =i  " ;
+has tabhead   => spec => "  =s  " ;
+has tabspace  => spec => "  =s  " ;
+has tabstyle  => spec => "  =s  " ;
+has discard   => spec => "  =s@ " , default => [];
+has help      => spec => "h     " ;
+has version   => spec => "v     " ;
+
+has '+help' => action => sub {
+    pod2usage;
+};
+
+has '+version' => action  => sub {
+    print "Version: $VERSION\n";
     exit;
 };
 
-has linebreak =>
-    spec => "=s lb",
+has '+nonewline' => action  => sub {
+    $_{separate} = "";
+};
+
+has '+linebreak' =>
     default => LINEBREAK_NONE,
     action => sub {
 	my($name, $value) = @_;
@@ -316,11 +330,11 @@ has linebreak =>
 	};
     };
 
-has smart =>
-    spec => "s !",
+has '+smart' =>
     action => sub {
+	my $smart = $_->{$_[0]} = $_[1];
 	($_->{boundary}, $_->{linebreak}) = do {
-	    if ($_[1]) {
+	    if ($smart) {
 		('word', LINEBREAK_ALL);
 	    } else {
 		('none', LINEBREAK_NONE);
@@ -331,9 +345,11 @@ has smart =>
 no Getopt::EX::Hashed;
 
 use Getopt::EX::Long;
+Getopt::EX::Long::ExConfigure
+    BASECLASS => [ __PACKAGE__, 'Getopt::EX' ];
 Getopt::Long::Configure("bundling");
 my $opt = Getopt::EX::Hashed->new() or die;
-GetOptions($opt, $opt->optspec) || pod2usage();
+GetOptions($opt->optspec) || pod2usage();
 
 my @width_map;
 my @width_index;

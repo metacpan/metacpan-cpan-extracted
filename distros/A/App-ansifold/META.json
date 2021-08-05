@@ -51,6 +51,7 @@
       "test" : {
          "requires" : {
             "Command::Runner" : "0",
+            "List::Util" : "1.29",
             "Test::More" : "0.98"
          }
       }
@@ -58,7 +59,7 @@
    "provides" : {
       "App::ansifold" : {
          "file" : "lib/App/ansifold.pm",
-         "version" : "1.0901"
+         "version" : "1.0902"
       }
    },
    "release_status" : "stable",
@@ -72,7 +73,7 @@
          "web" : "https://github.com/kaz-utashiro/ansifold"
       }
    },
-   "version" : "1.0901",
+   "version" : "1.0902",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>",

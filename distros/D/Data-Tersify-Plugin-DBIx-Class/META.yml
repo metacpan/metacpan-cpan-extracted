@@ -5,14 +5,13 @@ author:
 build_requires:
   DBIx::Class: '0'
   Data::Dumper: '0'
-  Data::Tersify: '1.000'
   Test::More: '0'
   Test::Pod: '0'
   Test::Pod::Coverage: '1.08'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,12 +19,11 @@ meta-spec:
 name: Data-Tersify-Plugin-DBIx-Class
 requires:
   DBIx::Class: '0'
-  Data::Tersify: '1.000'
-  DateTime: '0'
+  Data::Tersify: '1.003'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/skington/data-tersify/issues
   repository: git://github.com/skington/data-tersify.git
-version: '1.001'
+version: '1.003'
 x_serialization_backend: 'YAML::Tiny version 1.70'

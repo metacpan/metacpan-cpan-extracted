@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Tiny; # git description: v0.007-10-gafb2a2f
+package JSON::Schema::Tiny; # git description: v0.008-8-gfd19373
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema, minimally
 # KEYWORDS: JSON Schema data validation structure specification tiny
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 use 5.016;  # for the unicode_strings feature
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -1359,7 +1359,7 @@ JSON::Schema::Tiny - Validate data against a schema, minimally
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -1492,7 +1492,7 @@ Defaults to undef.
 
 =head1 UNSUPPORTED JSON-SCHEMA FEATURES
 
-Unlike L<JSON::Schema::Draft201909>, this is not a complete implementation of the JSON Schema
+Unlike L<JSON::Schema::Modern>, this is not a complete implementation of the JSON Schema
 specification. Some features and keywords are left unsupported in order to keep the code small and
 the execution fast. These features are not available:
 
@@ -1513,7 +1513,7 @@ use of C<$ref> other than to locations in the local schema in json-pointer forma
 =back
 
 In addition, these keywords are implemented only partially or not at all (their presence in a schema
-will result in an error):
+will be ignored or possibly result in an error):
 
 =over 4
 
@@ -1531,7 +1531,7 @@ C<$anchor>
 
 =item *
 
-C<$recursiveAnchor> and C<$recursiveRef>
+C<$recursiveAnchor> and C<$recursiveRef> (draft2019-09), and C<$dynamicAnchor> and C<$dynamicRef> (draft2020-12 and thereafter)
 
 =item *
 
@@ -1548,7 +1548,7 @@ C<format> (does not cause an error when used)
 =back
 
 For a more full-featured implementation of the JSON Schema specification, see
-L<JSON::Schema::Draft201909>.
+L<JSON::Schema::Modern>.
 
 =head1 LIMITATIONS
 
@@ -1577,7 +1577,7 @@ SOURCES.>
 
 =item *
 
-L<JSON::Schema::Draft201909>: a more specification-compliant JSON Schema evaluator
+L<JSON::Schema::Modern>: a more specification-compliant JSON Schema evaluator
 
 =item *
 

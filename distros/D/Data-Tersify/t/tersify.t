@@ -10,10 +10,13 @@ use Scalar::Util qw(refaddr reftype);
 use Test::More;
 
 use Data::Tersify qw(tersify tersify_many);
+use Renamed::Subclass;
 use TestObject;
 use TestObject::Overloaded;
 use TestObject::Overloaded::JustImport;
 use TestObject::Overloaded::OtherOperator;
+use TestObject::Subclassable;
+use TestObject::Subclassable::Subclassed;
 use TestObject::WithName;
 use TestObject::WithUUID;
 
@@ -180,6 +183,31 @@ sub test_plugin {
         'The object with a UUID was summarised'
     );
     
+    # Even subclasses.
+    my $original_subclasses = {
+        base_class       => TestObject::Subclassable->new('Jim'),
+        trivial_subclass => TestObject::Subclassable::Subclassed->new('Joe'),
+        renamed_subclass => Renamed::Subclass->new('Not called Joe'),
+    };
+    my $tersified_subclasses = tersify($original_subclasses);
+    like(
+        ${ $tersified_subclasses->{base_class} },
+        qr{^ TestObject::Subclassable \s $re_refaddr \s
+             Base \s class: \s Jim $}x,
+        'The base class was summarised'
+    );
+    like(
+        ${ $tersified_subclasses->{trivial_subclass} },
+        qr{^ TestObject::Subclassable::Subclassed \s $re_refaddr \s
+             Subclassed: \s Joe $}x,
+        'A trivial subclass was summarised',
+    );
+    like(
+        ${ $tersified_subclasses->{renamed_subclass} },
+        qr{^ Renamed::Subclass \s $re_refaddr \s
+             \QSomething completely different: Not called Joe\E $}x,
+        'A subclass with a completely unrelated name was summarised',
+    );
 }
 
 # Our plugins will apply to the guts of blessed objects as well.

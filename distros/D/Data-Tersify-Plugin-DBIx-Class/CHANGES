@@ -1,3 +1,10 @@
+1.003 2021-08-05
+
+    [Bugfix]
+    
+        Say that we can tersify subclasses, so we tersify related
+        resultsets.
+
 1.001 2020-03-09
 
     [Bugfix]
