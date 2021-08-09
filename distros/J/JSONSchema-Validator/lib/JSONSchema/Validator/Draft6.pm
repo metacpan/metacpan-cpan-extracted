@@ -38,7 +38,7 @@ JSONSchema::Validator::Draft6 - Validator for JSON Schema Draft6
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

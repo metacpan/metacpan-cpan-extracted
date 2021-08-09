@@ -2,8 +2,8 @@ NAME
     Ubuntu::Releases - List Ubuntu releases
 
 VERSION
-    This document describes version 20210115.1 of Ubuntu::Releases (from
-    Perl distribution Ubuntu-Releases), released on 2021-01-15.
+    This document describes version 20210115.2 of Ubuntu::Releases (from
+    Perl distribution Ubuntu-Releases), released on 2021-08-06.
 
 SYNOPSIS
      use Ubuntu::Releases;
@@ -17,11 +17,14 @@ DESCRIPTION
     <http://distrowatch.com>. Additional data source:
     <https://github.com/sharyanto/gudangdata> (table/ubuntu_release_animal).
 
+CONTRIBUTOR
+    Steven Haryanto <sharyanto@cpan.org>
+
 FUNCTIONS
   list_ubuntu_releases
     Usage:
 
-     list_ubuntu_releases(%args) -> [status, msg, payload, meta]
+     list_ubuntu_releases(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Ubuntu releases.
 
@@ -937,12 +940,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -956,7 +962,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-Ubuntu-Releases/issues>
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Ubuntu-Releases>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

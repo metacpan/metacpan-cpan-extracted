@@ -122,11 +122,11 @@ EOF
         [
             'MIME-Version' => '1.0',
             'Date'         => 'Sun, 29 May 2011 11:22:22 -0500',
-            'Message-ID' =>
+            'Message-ID'   =>
                 '<BANLkTimjF2BDbOKO_2jFJsp6t+0KvqxCwQ@mail.gmail.com>',
-            'Subject' => 'Testing',
-            'From'    => 'Dave Rolsky <autarch@gmail.com>',
-            'To'      => 'Dave Rolsky <autarch@urth.org>',
+            'Subject'      => 'Testing',
+            'From'         => 'Dave Rolsky <autarch@gmail.com>',
+            'To'           => 'Dave Rolsky <autarch@urth.org>',
             'Content-Type' =>
                 'multipart/alternative; boundary=20cf3071cfd06272ae04a46c9306',
         ],

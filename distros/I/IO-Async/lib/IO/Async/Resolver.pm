@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2007-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2007-2021 -- leonerd@leonerd.org.uk
 
 package IO::Async::Resolver;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( IO::Async::Function );
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 # Socket 2.006 fails to getaddrinfo() AI_NUMERICHOST properly on MSWin32
 use Socket 2.007 qw(
@@ -41,26 +41,23 @@ C<IO::Async::Resolver> - performing name resolutions asynchronously
 
 This object is used indirectly via an L<IO::Async::Loop>:
 
- use IO::Async::Loop;
- my $loop = IO::Async::Loop->new;
+   use IO::Async::Loop;
+   my $loop = IO::Async::Loop->new;
 
- $loop->resolver->getaddrinfo(
-    host    => "www.example.com",
-    service => "http",
- )->on_done( sub {
-    foreach my $addr ( @_ ) {
-       printf "http://www.example.com can be reached at " .
-          "socket(%d,%d,%d) + connect('%v02x')\n",
-          @{$addr}{qw( family socktype protocol addr )};
-    }
- });
+   my @results = $loop->resolver->getaddrinfo(
+      host    => "www.example.com",
+      service => "http",
+   )->get;
 
- $loop->resolve( type => 'getpwuid', data => [ $< ] )
-    ->on_done( sub {
-    print "My passwd ent: " . join( "|", @_ ) . "\n";
- });
+   foreach my $addr ( @results ) {
+      printf "http://www.example.com can be reached at " .
+         "socket(%d,%d,%d) + connect('%v02x')\n",
+         @{$addr}{qw( family socktype protocol addr )};
+   }
 
- $loop->run;
+   my @pwent = $loop->resolve( type => 'getpwuid', data => [ $< ] )->get;
+
+   print "My passwd ent: " . join( "|", @pwent ) . "\n";
 
 =head1 DESCRIPTION
 
@@ -90,28 +87,32 @@ sub _init
    my ( $params ) = @_;
    $self->SUPER::_init( @_ );
 
-   $params->{code} = sub {
-      my ( $type, $timeout, @data ) = @_;
-
-      if( my $code = $METHODS{$type} ) {
-         local $SIG{ALRM} = sub { die "Timed out\n" };
-
-         alarm( $timeout );
-         my @ret = eval { $code->( @data ) };
-         alarm( 0 );
-
-         die $@ if $@;
-         return @ret;
-      }
-      else {
-         die "Unrecognised resolver request '$type'";
-      }
-   };
+   $params->{module} = __PACKAGE__;
+   $params->{func}   = "_resolve";
 
    $params->{idle_timeout} = 30;
    $params->{min_workers}  = 0;
 
    $started = 1;
+}
+
+sub _resolve
+{
+   my ( $type, $timeout, @data ) = @_;
+
+   if( my $code = $METHODS{$type} ) {
+      local $SIG{ALRM} = sub { die "Timed out\n" };
+
+      alarm( $timeout );
+      my @ret = eval { $code->( @data ) };
+      alarm( 0 );
+
+      die $@ if $@;
+      return @ret;
+   }
+   else {
+      die "Unrecognised resolver request '$type'";
+   }
 }
 
 sub debug_printf_call
@@ -180,7 +181,7 @@ On failure, the fail category name is C<resolve>; the details give the
 individual resolver function name (e.g. C<getaddrinfo>), followed by other
 error details specific to the resolver in question.
 
- ->fail( $message, resolve => $type => @details )
+   ->fail( $message, resolve => $type => @details )
 
 =head2 resolve (void)
 
@@ -196,7 +197,7 @@ continuations to invoke on success or failure:
 A continuation that is invoked when the resolver function returns a successful
 result. It will be passed the array returned by the resolver function.
 
- $on_resolved->( @result )
+   $on_resolved->( @result )
 
 =item on_error => CODE
 
@@ -307,7 +308,7 @@ C<canonname> field will also be present.
 On failure, the detail field will give the error number, which should match
 one of the C<Socket::EAI_*> constants.
 
- ->fail( $message, resolve => getaddrinfo => $eai_errno )
+   ->fail( $message, resolve => getaddrinfo => $eai_errno )
 
 As a specific optimisation, this method will try to perform a lookup of
 numeric values synchronously, rather than asynchronously, if it looks likely
@@ -331,13 +332,13 @@ continuations to invoke on success or failure:
 
 Callback which is invoked after a successful lookup.
 
- $on_resolved->( @addrs )
+   $on_resolved->( @addrs )
 
 =item on_error => CODE
 
 Callback which is invoked after a failed lookup, including for a timeout.
 
- $on_error->( $exception )
+   $on_error->( $exception )
 
 =back
 
@@ -455,7 +456,7 @@ Time in seconds after which to abort the lookup with a C<Timed out> exception
 On failure, the detail field will give the error number, which should match
 one of the C<Socket::EAI_*> constants.
 
- ->fail( $message, resolve => getnameinfo => $eai_errno )
+   ->fail( $message, resolve => getnameinfo => $eai_errno )
 
 As a specific optimisation, this method will try to perform a lookup of
 numeric values synchronously, rather than asynchronously, if both the
@@ -474,13 +475,13 @@ continuations to invoke on success or failure:
 
 Callback which is invoked after a successful lookup.
 
- $on_resolved->( $host, $service )
+   $on_resolved->( $host, $service )
 
 =item on_error => CODE
 
 Callback which is invoked after a failed lookup, including for a timeout.
 
- $on_error->( $exception )
+   $on_error->( $exception )
 
 =back
 
@@ -585,12 +586,12 @@ sub register_resolver
 The following resolver names are implemented by the same-named perl function,
 taking and returning a list of values exactly as the perl function does:
 
- getpwnam getpwuid
- getgrnam getgrgid
- getservbyname getservbyport
- gethostbyname gethostbyaddr
- getnetbyname getnetbyaddr
- getprotobyname getprotobynumber
+   getpwnam getpwuid
+   getgrnam getgrgid
+   getservbyname getservbyport
+   gethostbyname gethostbyaddr
+   getnetbyname getnetbyaddr
+   getprotobyname getprotobynumber
 
 =cut
 
@@ -618,9 +619,9 @@ register_resolver getprotobynumber => sub { my @r = getprotobynumber( $_[0] ) or
 
 The following three resolver names are implemented using the L<Socket> module.
 
- getaddrinfo
- getaddrinfo_array
- getnameinfo
+   getaddrinfo
+   getaddrinfo_array
+   getnameinfo
 
 The C<getaddrinfo> resolver takes arguments in a hash of name/value pairs and
 returns a list of hash structures, as the C<Socket::getaddrinfo> function
@@ -709,22 +710,22 @@ either type of key, where both functions return the same type of list. This is
 purely a convention, and is in no way required or enforced by the
 L<IO::Async::Resolver> itself.
 
- @numbers = qw( zero  one   two   three four
-                five  six   seven eight nine  );
+   @numbers = qw( zero  one   two   three four
+                  five  six   seven eight nine  );
 
- register_resolver getnumberbyindex => sub {
-    my ( $index ) = @_;
-    die "Bad index $index" unless $index >= 0 and $index < @numbers;
-    return ( $index, $numbers[$index] );
- };
+   register_resolver getnumberbyindex => sub {
+      my ( $index ) = @_;
+      die "Bad index $index" unless $index >= 0 and $index < @numbers;
+      return ( $index, $numbers[$index] );
+   };
 
- register_resolver getnumberbyname => sub {
-    my ( $name ) = @_;
-    foreach my $index ( 0 .. $#numbers ) {
-       return ( $index, $name ) if $numbers[$index] eq $name;
-    }
-    die "Bad name $name";
- };
+   register_resolver getnumberbyname => sub {
+      my ( $name ) = @_;
+      foreach my $index ( 0 .. $#numbers ) {
+         return ( $index, $name ) if $numbers[$index] eq $name;
+      }
+      die "Bad name $name";
+   };
 
 =head1 AUTHOR
 

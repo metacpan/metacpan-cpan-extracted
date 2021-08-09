@@ -2,8 +2,9 @@ use strict;
 use warnings;
 
 use Module::Build;
+use Object::Pad::ExtensionBuilder;
 
-my @extra_compiler_flags = qw( -Iinclude );
+my @extra_compiler_flags;
 
 push @extra_compiler_flags, qw( -DDEBUGGING=-g ) if $^X =~ m|/debugperl|;
 
@@ -16,13 +17,14 @@ if( $Config{ccname} eq "gcc" ) {
 my $build = Module::Build->new(
    module_name => 'Object::Pad::SlotAttr::LazyInit',
    requires => {
-      'Object::Pad' => '0.48',
+      'Object::Pad' => '0.50',
    },
    test_requires => {
       'Test::More' => '0.88', # done_testing
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
+      'Object::Pad::ExtensionBuilder' => '0.50',
    },
    license => 'perl',
    create_license => 1,
@@ -30,5 +32,7 @@ my $build = Module::Build->new(
 
    extra_compiler_flags => \@extra_compiler_flags,
 );
+
+Object::Pad::ExtensionBuilder->extend_module_build( $build );
 
 $build->create_build_script;

@@ -1,3 +1,13 @@
+0.212   2021-08-06  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Add our prefix to all log statement and warn/die messages
+	  (GH#2).
+
+	- [doc] Tweak argument summary for clarity (GH#3).
+
+	- Add options: --log-combined-{dir,size,histories,period}.
+
+
 0.211   2020-08-18  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
 
 	- [incompatible change] Rename --restart to --restart-if-failed.

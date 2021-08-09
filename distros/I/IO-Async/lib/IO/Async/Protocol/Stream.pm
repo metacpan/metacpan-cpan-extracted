@@ -8,7 +8,7 @@ package IO::Async::Protocol::Stream;
 use strict;
 use warnings;
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 use base qw( IO::Async::Protocol );
 
@@ -23,36 +23,36 @@ C<IO::Async::Protocol::Stream> - base class for stream-based protocols
 Most likely this class will be subclassed to implement a particular network
 protocol.
 
- package Net::Async::HelloWorld;
+   package Net::Async::HelloWorld;
 
- use strict;
- use warnings;
- use base qw( IO::Async::Protocol::Stream );
+   use strict;
+   use warnings;
+   use base qw( IO::Async::Protocol::Stream );
 
- sub on_read
- {
-    my $self = shift;
-    my ( $buffref, $eof ) = @_;
+   sub on_read
+   {
+      my $self = shift;
+      my ( $buffref, $eof ) = @_;
 
-    return 0 unless $$buffref =~ s/^(.*)\n//;
-    my $line = $1;
+      return 0 unless $$buffref =~ s/^(.*)\n//;
+      my $line = $1;
 
-    if( $line =~ m/^HELLO (.*)/ ) {
-       my $name = $1;
+      if( $line =~ m/^HELLO (.*)/ ) {
+         my $name = $1;
 
-       $self->invoke_event( on_hello => $name );
-    }
+         $self->invoke_event( on_hello => $name );
+      }
 
-    return 1;
- }
+      return 1;
+   }
 
- sub send_hello
- {
-    my $self = shift;
-    my ( $name ) = @_;
+   sub send_hello
+   {
+      my $self = shift;
+      my ( $name ) = @_;
 
-    $self->write( "HELLO $name\n" );
- }
+      $self->write( "HELLO $name\n" );
+   }
 
 This small example elides such details as error handling, which a real
 protocol implementation would be likely to contain.

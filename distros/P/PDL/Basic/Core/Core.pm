@@ -3968,84 +3968,50 @@ sub PDL::fhdr {
     return \%hdr;
 }
 
-use Fcntl;
-
-BEGIN {
-   eval 'use File::Map 0.47 qw(:all)';
-   if ($@) {
-      carp "No File::Map found, using legacy mmap (if available)\n" if $PDL::verbose;
-      sub sys_map;
-      sub PROT_READ();
-      sub PROT_WRITE();
-      sub MAP_SHARED();
-      sub MAP_PRIVATE();
-   }
-}
-
-# Implement File::Map::sys_map bug fix.  Also, might be possible
-# to implement without so many external (non-Core perl) modules.
-#
-# sub pdl_do_sys_map {
-#         my (undef, $length, $protection, $flags, $fh, $offset) = @_;
-#         my $utf8 = File::Map::_check_layers($fh);
-#         my $fd = ($flags & MAP_ANONYMOUS) ? (-1) : fileno($fh);
-#         $offset ||= 0;
-#         File::Map::_mmap_impl($_[0], $length, $protection, $flags, $fd, $offset, $utf8);
-#         return;
-# }
-
 sub PDL::set_data_by_file_map {
+   require Fcntl;
+   require File::Map;
    my ($pdl,$name,$len,$shared,$writable,$creat,$mode,$trunc) = @_;
    my $pdl_dataref = $pdl->get_dataref();
 
-   # Assume we have no data to free for now
-   # pdl_freedata($pdl);
-
-   sysopen(my $fh, $name, ($writable && $shared ? O_RDWR : O_RDONLY) | ($creat ? O_CREAT : 0), $mode)
+   sysopen(my $fh, $name, ($writable && $shared ? Fcntl::O_RDWR() : Fcntl::O_RDONLY()) | ($creat ? Fcntl::O_CREAT() : 0), $mode)
       or die "Error opening file '$name'\n";
 
    binmode $fh;
 
    if ($trunc) {
-      truncate($fh,0) or die "set_data_by_mmap: truncate('$name',0) failed, $!";
-      truncate($fh,$len) or die "set_data_by_mmap: truncate('$name',$len) failed, $!";
+      truncate($fh,0) or die "set_data_by_file_map: truncate('$name',0) failed, $!";
+      truncate($fh,$len) or die "set_data_by_file_map: truncate('$name',$len) failed, $!";
    }
 
    if ($len) {
 
-      #eval {
-      # pdl_do_sys_map(  # will croak if the mapping fails
       if ($PDL::debug) {
          printf STDERR
          "set_data_by_file_map: calling sys_map(%s,%d,%d,%d,%s,%d)\n",
          $pdl_dataref,
          $len,
-         PROT_READ | ($writable ?  PROT_WRITE : 0),
-         ($shared ? MAP_SHARED : MAP_PRIVATE),
+         File::Map::PROT_READ() | ($writable ?  File::Map::PROT_WRITE() : 0),
+         ($shared ? File::Map::MAP_SHARED() : File::Map::MAP_PRIVATE()),
          $fh,
          0;
       }
 
-      sys_map(  # will croak if the mapping fails
+      File::Map::sys_map(
          ${$pdl_dataref},
          $len,
-         PROT_READ | ($writable ?  PROT_WRITE : 0),
-         ($shared ? MAP_SHARED : MAP_PRIVATE),
+         File::Map::PROT_READ() | ($writable ?  File::Map::PROT_WRITE() : 0),
+         ($shared ? File::Map::MAP_SHARED() : File::Map::MAP_PRIVATE()),
          $fh,
          0
       );
-      #};
-
-         #if ($@) {
-         #die("Error mmapping!, '$@'\n");
-         #}
 
       $pdl->upd_data;
 
       if ($PDL::debug) {
          printf STDERR "set_data_by_file_map: length \${\$pdl_dataref} is %d.\n", length ${$pdl_dataref};
       }
-      $pdl->set_state_and_add_deletedata_magic( length ${$pdl_dataref} );
+      $pdl->set_donttouchdata;
 
    } else {
 

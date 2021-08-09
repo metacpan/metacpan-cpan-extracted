@@ -1,8 +1,12 @@
+#define PERL_NO_GET_CONTEXT
+
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
 
 #include "object_pad.h"
+#include "class.h"
+#include "slot.h"
 
 #undef register_slot_attribute
 
@@ -24,7 +28,18 @@ SlotMeta *ObjectPad_mop_create_slot(pTHX_ SV *slotname, ClassMeta *classmeta)
   return slotmeta;
 }
 
-void ObjectPad_mop_slot_set_param(pTHX_ SlotMeta *slotmeta, SV *paramname)
+SV *ObjectPad_mop_slot_get_name(pTHX_ SlotMeta *slotmeta)
+{
+  return slotmeta->name;
+}
+
+char ObjectPad_mop_slot_get_sigil(pTHX_ SlotMeta *slotmeta)
+{
+  return (SvPVX(slotmeta->name))[0];
+}
+
+#define mop_slot_set_param(slotmeta, paramname)  S_mop_slot_set_param(aTHX_ slotmeta, paramname)
+static void S_mop_slot_set_param(pTHX_ SlotMeta *slotmeta, SV *paramname)
 {
   ClassMeta *classmeta = slotmeta->class;
 
@@ -87,7 +102,7 @@ void ObjectPad_mop_slot_apply_attribute(pTHX_ SlotMeta *slotmeta, const char *na
 {
   HV *hints = GvHV(PL_hintgv);
 
-  if(!SvPOK(value) || !SvCUR(value))
+  if(value && (!SvPOK(value) || !SvCUR(value)))
     value = NULL;
 
   SlotAttributeRegistration *reg;
@@ -105,7 +120,7 @@ void ObjectPad_mop_slot_apply_attribute(pTHX_ SlotMeta *slotmeta, const char *na
       croak("Attribute :%s requires a value", name);
 
     if(reg->funcs->apply)
-      if((*reg->funcs->apply)(aTHX_ slotmeta, value))
+      if(!(*reg->funcs->apply)(aTHX_ slotmeta, value))
         return;
 
     if(!slotmeta->hooks)
@@ -311,7 +326,7 @@ static void S_generate_slot_accessor_method(pTHX_ SlotMeta *slotmeta, SV *mname,
   LEAVE;
 }
 
-static void slothook_reader_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata, int __dummy)
+static void slothook_reader_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata)
 {
   SV *mname = make_accessor_mnamesv(aTHX_ slotmeta, hookdata, "%s");
   SAVEFREESV(mname);
@@ -336,7 +351,7 @@ static struct SlotHookFuncs slothooks_reader = {
 
 /* :writer */
 
-static void slothook_writer_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata, int __dummy)
+static void slothook_writer_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata)
 {
   SV *mname = make_accessor_mnamesv(aTHX_ slotmeta, hookdata, "set_%s");
   SAVEFREESV(mname);
@@ -365,7 +380,7 @@ static struct SlotHookFuncs slothooks_writer = {
 
 /* :mutator */
 
-static void slothook_mutator_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata, int __dummy)
+static void slothook_mutator_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata)
 {
   SV *mname = make_accessor_mnamesv(aTHX_ slotmeta, hookdata, "%s");
   SAVEFREESV(mname);
@@ -392,6 +407,10 @@ static struct SlotHookFuncs slothooks_mutator = {
 
 void ObjectPad_register_slot_attribute(pTHX_ const char *name, const struct SlotHookFuncs *funcs)
 {
+  if(funcs->ver != OBJECTPAD_ABIVERSION)
+    croak("Mismatch in third-party slot attribute ABI version field: attribute supplies %d, module wants %d\n",
+        funcs->ver, OBJECTPAD_ABIVERSION);
+
   if(!name || !(name[0] >= 'A' && name[0] <= 'Z'))
     croak("Third-party slot attribute names must begin with a capital letter");
 

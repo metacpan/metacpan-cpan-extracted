@@ -7,6 +7,7 @@ use Carp;
 
 use URI;
 use JSON; # imports encode_json, decode_json, to_json and from_json.
+use IPC::Cmd qw[ run ];
 
 require Exporter;
 
@@ -14,7 +15,7 @@ our @ISA = qw(Exporter);
 
 our @EXPORT_OK = ();
 our @EXPORT = ();
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 my @categories = (
               '',                     '',             '', 'Fraud Orders',  'DDoS Attack', #   0  ...   4
@@ -69,6 +70,29 @@ sub new( $@ )
 }
 
 
+#
+# All purpose curl syscall sent via IPC::Cmd with suitable HTTP headers.
+# Simplifies the rest of the API operations.
+#
+sub curlv2
+{
+    my $this = shift;
+    my @args = @_;
+    unshift @args, '-H', "Key: $this->{v2Key}";
+    unshift @args, '-H', 'Accept: application/json';
+    unshift @args, '/usr/bin/curl';
+    my @result = run( command => \@args, verbose => $this->{Debug});
+    if( !$result[ 0 ])
+    {
+        # Failed to run
+        croak( "curl failure " . $result[ 1 ]);
+    }
+    # Usually first line is sufficient but long lines are split
+    # into 4096 byte chunks which we join back into one big string.
+    return join('', @{$result[ 3 ]});
+}
+
+
 sub v2get( $$ )
 {
     my $this = shift;
@@ -83,19 +107,7 @@ sub v2get( $$ )
         elsif(   $ip eq '192.168.0.3' ) {   return( $url->as_string );  }
     }
 
-    my $fh;
-    my $cmd = "/usr/bin/curl -H 'Accept: application/json' -H 'Key: $this->{v2Key}' -s '$url'";
-    if( $this->{Debug})
-    {
-        print STDERR "CMD:   $cmd\n";
-    }
-    open( $fh, '-|', $cmd );
-    unless( $fh ) { croak( "Cannout pipe from curl" ); }
-    my $json = '';
-    while( <$fh> )
-    {
-        $json .= $_;
-    }
+    my $json = $this->curlv2('-s', $url);
     if ($this->{Debug})
     {
         print STDERR "JSON:  $json\n";
@@ -227,6 +239,11 @@ sub report( $$$@ )
     my @catg = ();
     my $category;
 
+    unless( defined( $this->{v2Key}) and length( $this->{v2Key}) > 2 )
+    {
+        croak( "report() function supports v2 API only." );
+    }
+
     while( @_ )
     {
         $category = shift;
@@ -243,27 +260,17 @@ sub report( $$$@ )
     }
     $category = join( ',', @catg );
 
-    my $url = URI->new( "$this->{BaseURL}report/json" );
-    $url->query_form( key => $this->{Key}, category => $category, comment => $comment, ip => $ip );
+    my $url = URI->new( "$this->{BaseURL}api/v2/report" );
 
     if( $this->{BaseURL} eq 'test://' )
     {
         if(   $ip eq '192.168.0.3' ) {   return( $url->as_string );  }
     }
 
-    my $fh;
-    my $cmd = "/usr/bin/curl -s '$url'";
-    if( $this->{Debug})
-    {
-        print STDERR "CMD:   $cmd\n";
-    }
-    open( $fh, '-|', $cmd );
-    unless( $fh ) { croak( "Cannout pipe from curl" ); }
-    my $json = '';
-    while( <$fh> )
-    {
-        $json .= $_;
-    }
+    my $json = $this->curlv2('-s', $url,
+                          '--data-urlencode', "ip=$ip",
+                          '-d', "categories=$category",
+                          '--data-urlencode', "comment=$comment");
     if ($this->{Debug})
     {
         print STDERR "JSON:  $json\n";
@@ -306,19 +313,7 @@ sub blacklist( $$ )
         die( "NOT IMPLEMENTED" );
     }
 
-    my $fh;
-    my $cmd = "/usr/bin/curl -H 'Accept: application/json' -H 'Key: $this->{v2Key}' -s '$url'";
-    if( $this->{Debug})
-    {
-        print STDERR "CMD:   $cmd\n";
-    }
-    open( $fh, '-|', $cmd );
-    unless( $fh ) { croak( "Cannout pipe from curl" ); }
-    my $json = '';
-    while( <$fh> )
-    {
-        $json .= $_;
-    }
+    my $json = $this->curlv2('-s', $url);
     if ($this->{Debug})
     {
         print STDERR "JSON:  $json\n";
@@ -367,23 +362,23 @@ Sendmail::AbuseIPDB - API access for IP address abuse database
 
 =head1 DESCRIPTION
 
-    Convenient toolbox for Version-2 API access to https://www.abuseipdb.com/
+Convenient toolbox for Version-2 API access to https://www.abuseipdb.com/
 
-    Potentially for other sites with compatible API if you want to change the BaseURL.
+Potentially for other sites with compatible API if you want to change the BaseURL.
 
 =head1 METHODS
 
 =head2 new( v2Key => $key, ... )
 
-    Additional parameters are: BaseURL, Days, Debug
+Additional parameters are: BaseURL, Days, Debug
 
-    Old parameter was Key which is for v1 API calls, supported for compatibility,
-    but most of the old v1 API has been shut down by the provider.
+Old parameter was Key which is for v1 API calls, supported for compatibility,
+but most of the old v1 API has been shut down by the provider.
 
 
 =head2 get( $ip )
 
-    Do a query to check an IP address. Returns single reference, looking similar to this:
+Do a query to check an IP address. Returns single reference, looking similar to this:
 
        {
            'data' => {
@@ -406,11 +401,13 @@ Sendmail::AbuseIPDB - API access for IP address abuse database
 
 =head2 report( $ip, $comment, @category_list )
 
-    Report an abusive IP address back to the database.
-    The comment can be "" empty string or any other brief comment to explain why
-    you believe this IP has done something wrong.
-    One or more categories must be included, these can be numbers or printable
-    string categories. e.g. :
+NOTE: Only available in v2 now, no longer supporting v1 API.
+
+Report an abusive IP address back to the database.
+The comment can be "" empty string or any other brief comment to explain why
+you believe this IP has done something wrong.
+One or more categories must be included, these can be numbers or printable
+string categories. e.g. :
 
     $db->report( '142.93.218.225', 'Very annoying IP address', 'Brute-Force', 'Port Scan' );
 
@@ -422,12 +419,12 @@ Sendmail::AbuseIPDB - API access for IP address abuse database
 
 =head2 blacklist( $confidence )
 
-    Get a list of IP addresses where $confidence is the minimum confidence score
-    (percentage) that this IP address is likely to be abusive.
-    Depending on your account the server might force your $confidence value upwards
-    (in the case of free accounts only 100% confidence results are provided).
+Get a list of IP addresses where $confidence is the minimum confidence score
+(percentage) that this IP address is likely to be abusive.
+Depending on your account the server might force your $confidence value upwards
+(in the case of free accounts only 100% confidence results are provided).
 
-    Result format is like this:
+Result format is like this:
 
         {
             'data' => [
@@ -448,11 +445,11 @@ Sendmail::AbuseIPDB - API access for IP address abuse database
             }
         }
 
-    It requires apallingly bad behaviour to achieve 100% confidence of abuse,
-    so the worst offender IP addresses should be filtered without remorse.
-    When using the "ipset" Linux kernel feature, set a reasonable timeout so that
-    old IP addresses will automatically be removed from the list once they are
-    no longer abusive. Hopefully most compromised systems do get cleaned up.
+It requires apallingly bad behaviour to achieve 100% confidence of abuse,
+so the worst offender IP addresses should be filtered without remorse.
+When using the "ipset" Linux kernel feature, set a reasonable timeout so that
+old IP addresses will automatically be removed from the list once they are
+no longer abusive. Hopefully most compromised systems do get cleaned up.
 
 
 =head1 SEE ALSO
@@ -473,8 +470,8 @@ Sendmail::AbuseIPDB - API access for IP address abuse database
 
 =head1 COPYRIGHT AND LICENSE
 
-    This library is free software; you can redistribute it and/or modify
-    it under the same terms as Perl itself, either Perl version 5.10.1 or,
-    at your option, any later version of Perl 5 you may have available.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
 
 =cut

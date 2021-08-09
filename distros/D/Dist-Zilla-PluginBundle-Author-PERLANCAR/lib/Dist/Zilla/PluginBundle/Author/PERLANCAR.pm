@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::Author::PERLANCAR;
 
-our $DATE = '2021-06-04'; # DATE
-our $VERSION = '0.604'; # VERSION
+our $DATE = '2021-08-09'; # DATE
+our $VERSION = '0.605'; # VERSION
 
 use Moose;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -37,6 +37,7 @@ sub configure {
         'IfBuilt',
         'MetaJSON',
         'MetaConfig',
+        'MetaProvides::Package',
         #'GenShellCompletion', # 2017-07-07 - disabled because i want to use DZP:StaticInstall to set x_static_install whenever possible. DZP:StaticInstall doesn't allow InstallTool plugins other than from MakeMaker and ModuleBuildTiny
         ['PERLANCAR::Authority' => {locate_comment=>1}],
         'OurDate',
@@ -78,7 +79,7 @@ Dist::Zilla::PluginBundle::Author::PERLANCAR - Dist::Zilla like PERLANCAR when y
 
 =head1 VERSION
 
-This document describes version 0.604 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2021-06-04.
+This document describes version 0.605 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2021-08-09.
 
 =head1 SYNOPSIS
 
@@ -143,7 +144,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexandr Ciornii perlancar (@pc-office) Steven Haryanto (on Asus Zenbook)
+=for stopwords Alexandr Ciornii Steven Haryanto (on Asus Zenbook)
 
 =over 4
 
@@ -153,17 +154,13 @@ Alexandr Ciornii <alexchorny@gmail.com>
 
 =item *
 
-perlancar (@pc-office) <perlancar@gmail.com>
-
-=item *
-
 Steven Haryanto (on Asus Zenbook) <stevenharyanto@gmail.com>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

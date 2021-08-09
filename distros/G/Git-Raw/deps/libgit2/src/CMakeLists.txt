@@ -6,7 +6,13 @@ IF(DEBUG_POOL)
 ENDIF()
 ADD_FEATURE_INFO(debugpool GIT_DEBUG_POOL "debug pool allocator")
 
+IF(DEBUG_STRICT_ALLOC)
+	SET(GIT_DEBUG_STRICT_ALLOC 1)
+ENDIF()
+ADD_FEATURE_INFO(debugalloc GIT_DEBUG_STRICT_ALLOC "debug strict allocators")
+
 INCLUDE(PkgBuildConfig)
+INCLUDE(SanitizeBool)
 
 # This variable will contain the libraries we need to put into
 # libgit2.pc's Requires.private. That is, what we're linking to or
@@ -32,10 +38,10 @@ IF(ENABLE_TRACE)
 ENDIF()
 ADD_FEATURE_INFO(tracing GIT_TRACE "tracing support")
 
-CHECK_FUNCTION_EXISTS(futimens HAVE_FUTIMENS)
 IF (HAVE_FUTIMENS)
 	SET(GIT_USE_FUTIMENS 1)
 ENDIF ()
+ADD_FEATURE_INFO(futimens GIT_USE_FUTIMENS "futimens support")
 
 CHECK_PROTOTYPE_DEFINITION(qsort_r
 	"void qsort_r(void *base, size_t nmemb, size_t size, void *thunk, int (*compar)(void *, const void *, const void *))"
@@ -186,7 +192,12 @@ ELSE()
 ENDIF()
 
 # Optional external dependency: zlib
-IF(NOT USE_BUNDLED_ZLIB)
+SanitizeBool(USE_BUNDLED_ZLIB)
+IF(USE_BUNDLED_ZLIB STREQUAL ON)
+	SET(USE_BUNDLED_ZLIB "Bundled")
+ENDIF()
+
+IF(USE_BUNDLED_ZLIB STREQUAL "OFF")
 	FIND_PACKAGE(ZLIB)
 	IF(ZLIB_FOUND)
 		LIST(APPEND LIBGIT2_SYSTEM_INCLUDES ${ZLIB_INCLUDE_DIRS})
@@ -201,7 +212,12 @@ IF(NOT USE_BUNDLED_ZLIB)
 		MESSAGE(STATUS "zlib was not found; using bundled 3rd-party sources." )
 	ENDIF()
 ENDIF()
-IF(USE_BUNDLED_ZLIB OR NOT ZLIB_FOUND)
+IF(USE_BUNDLED_ZLIB STREQUAL "Chromium")
+	ADD_SUBDIRECTORY("${libgit2_SOURCE_DIR}/deps/chromium-zlib" "${libgit2_BINARY_DIR}/deps/chromium-zlib")
+	LIST(APPEND LIBGIT2_INCLUDES "${libgit2_SOURCE_DIR}/deps/chromium-zlib")
+	LIST(APPEND LIBGIT2_OBJECTS $<TARGET_OBJECTS:chromium_zlib>)
+	ADD_FEATURE_INFO(zlib ON "using (Chromium) bundled zlib")
+ELSEIF(USE_BUNDLED_ZLIB OR NOT ZLIB_FOUND)
 	ADD_SUBDIRECTORY("${libgit2_SOURCE_DIR}/deps/zlib" "${libgit2_BINARY_DIR}/deps/zlib")
 	LIST(APPEND LIBGIT2_INCLUDES "${libgit2_SOURCE_DIR}/deps/zlib")
 	LIST(APPEND LIBGIT2_OBJECTS $<TARGET_OBJECTS:zlib>)

@@ -2,9 +2,11 @@ use utf8;
 use strict;
 use warnings;
 use File::Temp qw/ tempdir /;
-use Graphics::Fig;
 use Test::More tests => 6;
-use t::FigCmp;
+use lib "lib";
+use Graphics::Fig;
+use lib "t";
+use FigCmp;
 
 #
 # Create temp directory.

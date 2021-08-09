@@ -56,7 +56,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -1497,15 +1497,23 @@ let updateManager = new Promise((resolve, reject) => {
       updateStatus["updateStatusCode"] = 'CANNOT_APPLY_UPDATES';
       reject(updateStatus);
     }
+    if (updateService.canUsuallyStageUpdates) {
+      if (!updateService.canStageUpdates) {
+        updateStatus["updateStatusCode"] = 'CANNOT_STAGE_UPDATES';
+        reject(updateStatus);
+      }
+    }
+    if ((updateService.isOtherInstanceHandlingUpdates) && (updateService.isOtherInstanceHandlingUpdates())) {
+      updateStatus["updateStatusCode"] = 'ANOTHER_INSTANCE_IS_HANDLING_UPDATES';
+      reject(updateStatus);
+    }
     let updateChecker = Components.classes["@mozilla.org/updates/update-checker;1"].createInstance(Components.interfaces.nsIUpdateChecker);
     if (updateChecker.stopCurrentCheck) {
       updateChecker.stopCurrentCheck();
     }
     let updateServiceListener = {
       onCheckComplete: (request, updates) => {
-        for (let i = 0; i < updates.length; i++) {
-          latestUpdate = update = updates[i];
-        }
+        latestUpdate = updateService.selectUpdate(updates, true);
         updateStatus["numberOfUpdates"] = updates.length;
         if (latestUpdate === null) {
           updateStatus["updateStatusCode"] = 'NO_UPDATES_AVAILABLE';
@@ -1518,6 +1526,9 @@ let updateManager = new Promise((resolve, reject) => {
           }
           let result = updateService.downloadUpdate(latestUpdate, false);
           let updateProcessor = Components.classes["@mozilla.org/updates/update-processor;1"].createInstance(Components.interfaces.nsIUpdateProcessor);
+          if (updateProcessor.fixUpdateDirectoryPermissions) {
+            updateProcessor.fixUpdateDirectoryPermissions(true);
+          }
           updateProcessor.processUpdate(latestUpdate);
 
           let previousState = null;
@@ -2393,6 +2404,7 @@ sub _search_for_version_in_application_ini {
             }
         }
         my ( $active_update_handle, $active_update_path );
+        my $active_update_version;
         if ($found_active_update) {
             if ( $self->_ssh() ) {
                 $active_update_path =
@@ -2412,7 +2424,6 @@ sub _search_for_version_in_application_ini {
 "Failed to open $active_update_path for reading:$EXTENDED_OS_ERROR"
                   );
             }
-            my $active_update_version;
             if ($active_update_handle) {
                 my $active_update_contents =
                   $self->_read_and_close_handle( $active_update_handle,
@@ -2428,25 +2439,25 @@ sub _search_for_version_in_application_ini {
                 );
                 $parser->parse($active_update_contents);
             }
-            my $application_ini_path =
-              File::Spec->catfile( $binary_directory, 'application.ini' );
-            my $application_ini_handle =
-              FileHandle->new( $application_ini_path, Fcntl::O_RDONLY() );
-            if ($application_ini_handle) {
-                my $config =
-                  Config::INI::Reader->read_handle($application_ini_handle);
-                if ( my $app = $config->{App} ) {
-                    if (
-                        ( $app->{SourceRepository} )
-                        && ( $app->{SourceRepository} eq
-                            'https://hg.mozilla.org/releases/mozilla-beta' )
-                      )
-                    {
-                        $self->{developer_edition} = 1;
-                    }
-                    return join q[ ], $app->{Vendor}, $app->{Name},
-                      $active_update_version || $app->{Version};
+        }
+        my $application_ini_path =
+          File::Spec->catfile( $binary_directory, 'application.ini' );
+        my $application_ini_handle =
+          FileHandle->new( $application_ini_path, Fcntl::O_RDONLY() );
+        if ($application_ini_handle) {
+            my $config =
+              Config::INI::Reader->read_handle($application_ini_handle);
+            if ( my $app = $config->{App} ) {
+                if (
+                    ( $app->{SourceRepository} )
+                    && ( $app->{SourceRepository} eq
+                        'https://hg.mozilla.org/releases/mozilla-beta' )
+                  )
+                {
+                    $self->{developer_edition} = 1;
                 }
+                return join q[ ], $app->{Vendor}, $app->{Name},
+                  $active_update_version || $app->{Version};
             }
         }
     }
@@ -8452,7 +8463,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 1.11
+Version 1.12
 
 =head1 SYNOPSIS
 
@@ -10280,11 +10291,7 @@ Currently the following Marionette methods have not been implemented;
 
 =back
 
-No bugs have been reported.
-
-Please report any bugs or feature requests to
-C<bug-firefox-marionette@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org>.
+To report a bug, or view the current list of bugs, please visit L<https://github.com/david-dick/firefox-marionette/issues>
 
 =head1 SEE ALSO
 
@@ -10337,7 +10344,7 @@ Thanks also to the authors of the documentation in the following sources;
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2020, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
+Copyright (c) 2021, David Dick C<< <ddick@cpan.org> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic/perlartistic>.

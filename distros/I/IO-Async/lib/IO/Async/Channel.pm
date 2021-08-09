@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
 
 package IO::Async::Channel;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( IO::Async::Notifier );
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 use Carp;
 
@@ -82,6 +82,26 @@ its containing L<IO::Async::Routine> object.
 
 =cut
 
+# Undocumented convenience constructors for running IaRoutine in 'spawn' mode
+sub new_sync
+{
+   my $class = shift;
+   my ( $fd ) = @_;
+
+   my $self = $class->new;
+   $self->setup_sync_mode( $fd );
+   return $self;
+}
+
+sub new_stdin  { shift->new_sync( \*STDIN  ); }
+sub new_stdout { shift->new_sync( \*STDOUT ); }
+
+sub DESTROY
+{
+   my $self = shift;
+   eval { $self->close }; # ignore any error
+}
+
 =head1 METHODS
 
 The following methods documented with a trailing call to C<< ->get >> return
@@ -103,14 +123,14 @@ used to change details of the Channel's operation.
 May only be set on an async mode channel. If present, will be invoked whenever
 a new value is received, rather than using the C<recv> method.
 
- $on_recv->( $channel, $data )
+   $on_recv->( $channel, $data )
 
 =item on_eof => CODE
 
 May only be set on an async mode channel. If present, will be invoked when the
 channel gets closed by the peer.
 
- $on_eof->( $channel )
+   $on_eof->( $channel )
 
 =back
 
@@ -196,13 +216,24 @@ method will not block.
 
 =cut
 
+my %SENDMETHODS;
 sub send
 {
    my $self = shift;
    my ( $data ) = @_;
 
-   $self->send_encoded( $self->{encode}->( $data ) );
+   defined( my $mode = $self->{mode} ) or die "Cannot ->send without being set up";
+
+   my $code = ( $SENDMETHODS{$mode} ||= $self->can( "_send_$mode" ) )
+      or die "IO::Async::Channel cannot send in unrecognised mode '$mode'";
+
+   $self->$code( $data );
 }
+
+*_send_sync = *_send_async = sub {
+   my ( $self, $data ) = @_;
+   $self->send_encoded( $self->{encode}->( $data ) );
+};
 
 =head2 send_encoded
 
@@ -222,8 +253,8 @@ sub send_encoded
 
    defined $self->{mode} or die "Cannot ->send without being set up";
 
-   return $self->_send_sync( $bytes )  if $self->{mode} eq "sync";
-   return $self->_send_async( $bytes ) if $self->{mode} eq "async";
+   return $self->_sendbytes_sync( $bytes )  if $self->{mode} eq "sync";
+   return $self->_sendbytes_async( $bytes ) if $self->{mode} eq "async";
 }
 
 =head2 encode
@@ -233,8 +264,8 @@ sub send_encoded
 Takes a Perl reference and returns a serialised string that can be passed to
 C<send_encoded>. The following two forms are equivalent
 
- $channel->send( $data )
- $channel->send_encoded( $channel->encode( $data ) )
+   $channel->send( $data )
+   $channel->send_encoded( $channel->encode( $data ) )
 
 This is provided for the use-case where data needs to be serialised into a
 fixed string to "snapshot it" but not sent yet; the returned string can be
@@ -259,19 +290,6 @@ sub encode
       $default_encode ||= do { ( $self->can( "_make_codec_" . _default_codec )->() )[0] }
    )->( $data );
 }
-
-=head2 send_frozen
-
-   $channel->send_frozen( $record )
-
-Legacy name for C<send_encoded>. This is no longer preferred as it expects
-the data to be encoded using C<Storable>, which prevents (or at least makes
-more awkward) the use of other codecs on a channel by default. This method
-should not be used in new code and may be removed in a later version.
-
-=cut
-
-*send_frozen = \&send_encoded;
 
 =head2 recv
 
@@ -302,27 +320,30 @@ When not returning a future, takes the following named arguments:
 Called when a new Perl reference value is available. Will be passed the
 Channel object and the reference data.
 
- $on_recv->( $channel, $data )
+   $on_recv->( $channel, $data )
 
 =item on_eof => CODE
 
 Called if the Channel was closed before a new value was ready. Will be passed
 the Channel object.
 
- $on_eof->( $channel )
+   $on_eof->( $channel )
 
 =back
 
 =cut
 
+my %RECVMETHODS;
 sub recv
 {
    my $self = shift;
 
-   defined $self->{mode} or die "Cannot ->recv without being set up";
+   defined( my $mode = $self->{mode} ) or die "Cannot ->recv without being set up";
 
-   return $self->_recv_sync( @_ )  if $self->{mode} eq "sync";
-   return $self->_recv_async( @_ ) if $self->{mode} eq "async";
+   my $code = ( $RECVMETHODS{$mode} ||= $self->can( "_recv_$mode" ) )
+      or die "IO::Async::Channel cannot recv in unrecognised mode '$mode'";
+
+   return $self->$code( @_ );
 }
 
 =head2 close
@@ -334,12 +355,17 @@ or the queued C<on_eof> callbacks to be invoked.
 
 =cut
 
+my %CLOSEMETHODS;
 sub close
 {
    my $self = shift;
 
-   return $self->_close_sync  if $self->{mode} eq "sync";
-   return $self->_close_async if $self->{mode} eq "async";
+   defined( my $mode = $self->{mode} ) or return;
+
+   my $code = ( $CLOSEMETHODS{$mode} ||= $self->can( "_close_$mode" ) )
+      or die "IO::Async::Channel cannot close in unrecognised mode '$mode'";
+
+   return $self->$code;
 }
 
 # Leave this undocumented for now
@@ -388,7 +414,7 @@ sub _recv_sync
    return $self->{decode}->( $record );
 }
 
-sub _send_sync
+sub _sendbytes_sync
 {
    my $self = shift;
    my ( $bytes ) = @_;
@@ -434,7 +460,7 @@ sub _build_stream
    };
 }
 
-sub _send_async
+sub _sendbytes_async
 {
    my $self = shift;
    my ( $bytes ) = @_;

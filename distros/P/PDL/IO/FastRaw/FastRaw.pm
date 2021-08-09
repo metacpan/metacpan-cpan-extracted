@@ -316,13 +316,6 @@ package PDL::IO::FastRaw;
 our $VERSION = '0.000003';
 $VERSION = eval $VERSION;
 
-BEGIN {
-   our $have_file_map = 0;
-
-   eval "use File::Map 0.57 qw(:all)";
-   $have_file_map = 1 unless $@;
-}
-
 require Exporter;
 use PDL::Core '';
 use PDL::Exporter;
@@ -418,36 +411,19 @@ sub PDL::mapfraw {
 	for(@{$hdr->{Dims}}) {
 		$s *= $_;
 	}
-	my $pdl = $class->zeroes(new PDL::Type($hdr->{Type}));
+	my $pdl = $class->zeroes(PDL::Type->new($hdr->{Type}));
+        $pdl->set_data_by_file_map(
+            $name,
+            $s,
+            1,
+            ($opts->{ReadOnly}?0:1),
+            ($opts->{Creat}?1:0),
+            (0644),
+            ($opts->{Creat} || $opts->{Trunc} ? 1:0)
+        );
 	$pdl->setdims($hdr->{Dims});
-
-        if ($have_file_map and not defined($PDL::force_use_mmap_code) ) {
-           $pdl->set_data_by_file_map(
-              $name,
-              $s,
-              1,
-              ($opts->{ReadOnly}?0:1),
-              ($opts->{Creat}?1:0),
-              (0644),
-              ($opts->{Creat} || $opts->{Trunc} ? 1:0)
-           );
-        } else {
-           warn "mapfraw: direct mmap support will be deprecated, please install File::Map\n";
-           $pdl->set_data_by_mmap(
-              $name,
-              $s,
-              1,
-              ($opts->{ReadOnly}?0:1),
-              ($opts->{Creat}?1:0),
-              (0644),
-              ($opts->{Creat} || $opts->{Trunc} ? 1:0)
-           );
-        }
-
-	if($opts->{Creat}) {
-		_writefrawhdr($pdl,$name,$opts);
-	}
-	return $pdl;
+	_writefrawhdr($pdl,$name,$opts) if $opts->{Creat};
+	$pdl;
 }
 
 sub PDL::maptextfraw {

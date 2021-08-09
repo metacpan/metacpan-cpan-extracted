@@ -1,10 +1,17 @@
-0.002   2019-06-20 (PERLANCAR)
+0.003   2021-08-06  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Fix Synopsis (GH#1).
+
+
+0.002   2019-06-20  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [doc] Tweak docs.
 
 
-0.001   2019-06-18 (PERLANCAR)
+0.001   2019-06-18  Released-By: PERLANCAR
 
         - First release.

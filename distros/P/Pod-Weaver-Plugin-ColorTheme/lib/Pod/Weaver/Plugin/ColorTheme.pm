@@ -1,9 +1,9 @@
 package Pod::Weaver::Plugin::ColorTheme;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-08'; # DATE
+our $DATE = '2021-08-08'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-ColorTheme'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -40,10 +40,9 @@ sub weave_section {
                 {
                     local @INC = ("lib");
                     $res = Module::List::list_modules(
-                        "", {list_modules=>1});
+                        "ColorTheme::", {list_modules=>1, recurse=>1});
                 }
                 for my $mod (keys %$res) {
-                    next unless $mod =~ /(?:\A|::)ColorTheme::/;
                     $colorthemes{$mod} = \%{"$mod\::THEME"};
                 }
             }
@@ -129,7 +128,7 @@ _
 
             $self->log(["Generated POD for '%s'", $filename]);
 
-        } # Sah::Schema::*
+        } # ColorTheme::*
     }
 }
 
@@ -148,7 +147,7 @@ Pod::Weaver::Plugin::ColorTheme - Plugin to use when building distribution which
 
 =head1 VERSION
 
-This document describes version 0.001 of Pod::Weaver::Plugin::ColorTheme (from Perl distribution Pod-Weaver-Plugin-ColorTheme), released on 2020-06-08.
+This document describes version 0.002 of Pod::Weaver::Plugin::ColorTheme (from Perl distribution Pod-Weaver-Plugin-ColorTheme), released on 2021-08-08.
 
 =head1 SYNOPSIS
 
@@ -209,7 +208,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

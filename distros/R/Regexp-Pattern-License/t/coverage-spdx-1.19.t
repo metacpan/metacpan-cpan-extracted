@@ -8,7 +8,7 @@ plan 1;
 # Data source: <https://web.archive.org/web/20130927213143/http://spdx.org:80/licenses/>
 
 like(
-	license_org_metadata( 'spdx', '20130912', '1_19' ),
+	license_org_metadata( 'spdx', { date => '20130912', rev => '1_19' } ),
 	hash {
 		field 'Academic Free License v1.1'          => 'AFL-1.1';
 		field 'Academic Free License v1.2'          => 'AFL-1.2';

@@ -8,7 +8,7 @@ package IO::Async::Protocol;
 use strict;
 use warnings;
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 use base qw( IO::Async::Notifier );
 
@@ -138,7 +138,7 @@ continuation will be used; otherwise C<on_socket> will be used.
 Optional. If supplied, will be invoked once the connection has been
 established.
 
- $on_connected->( $protocol )
+   $on_connected->( $protocol )
 
 =item transport => IO::Async::Handle
 
@@ -195,7 +195,7 @@ sub connect
 
 The following methods are delegated to the transport object
 
- close
+   close
 
 =cut
 

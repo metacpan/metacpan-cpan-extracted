@@ -73,7 +73,7 @@ JSONSchema::Validator::Error - Error class
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AUTHORS
 

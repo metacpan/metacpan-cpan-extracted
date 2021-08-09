@@ -18,6 +18,7 @@ lib/IO/Async/Future.pm
 lib/IO/Async/Handle.pm
 lib/IO/Async/Internals/ChildManager.pm
 lib/IO/Async/Internals/Connector.pm
+lib/IO/Async/Internals/FunctionWorker.pm
 lib/IO/Async/Internals/TimeQueue.pm
 lib/IO/Async/Listener.pm
 lib/IO/Async/Loop.pm
@@ -114,5 +115,6 @@ t/63handle-connect.t
 t/64handle-bind.t
 t/70future-io.t
 t/99pod.t
+t/RoutineTester.pm
 t/StupidLoop.pm
 t/TimeAbout.pm

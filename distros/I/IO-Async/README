@@ -4,41 +4,41 @@ NAME
 
 SYNOPSIS
 
-     use IO::Async::Stream;
-     use IO::Async::Loop;
+       use IO::Async::Stream;
+       use IO::Async::Loop;
     
-     my $loop = IO::Async::Loop->new;
+       my $loop = IO::Async::Loop->new;
     
-     $loop->connect(
-        host     => "some.other.host",
-        service  => 12345,
-        socktype => 'stream',
+       $loop->connect(
+          host     => "some.other.host",
+          service  => 12345,
+          socktype => 'stream',
     
-        on_stream => sub {
-           my ( $stream ) = @_;
+          on_stream => sub {
+             my ( $stream ) = @_;
     
-           $stream->configure(
-              on_read => sub {
-                 my ( $self, $buffref, $eof ) = @_;
+             $stream->configure(
+                on_read => sub {
+                   my ( $self, $buffref, $eof ) = @_;
     
-                 while( $$buffref =~ s/^(.*\n)// ) {
-                    print "Received a line $1";
-                 }
+                   while( $$buffref =~ s/^(.*\n)// ) {
+                      print "Received a line $1";
+                   }
     
-                 return 0;
-              }
-           );
+                   return 0;
+                }
+             );
     
-           $stream->write( "An initial line here\n" );
+             $stream->write( "An initial line here\n" );
     
-           $loop->add( $stream );
-        },
+             $loop->add( $stream );
+          },
     
-        on_resolve_error => sub { die "Cannot resolve - $_[-1]\n"; },
-        on_connect_error => sub { die "Cannot connect - $_[0] failed $_[-1]\n"; },
-     );
+          on_resolve_error => sub { die "Cannot resolve - $_[-1]\n"; },
+          on_connect_error => sub { die "Cannot connect - $_[0] failed $_[-1]\n"; },
+       );
     
-     $loop->run;
+       $loop->run;
 
 DESCRIPTION
 
@@ -202,9 +202,9 @@ DESCRIPTION
     conventions for the Future's fail arguments to relate it to the legacy
     on_error-style callbacks.
 
-     $on_NAME_error->( $message, @argmuents )
+       $on_NAME_error->( $message, @argmuents )
     
-     $f->fail( $message, NAME, @arguments )
+       $f->fail( $message, NAME, @arguments )
 
     where $message is a message intended for humans to read (so that this
     is the message displayed by $f->get if the failure is not otherwise
@@ -255,7 +255,7 @@ SUPPORT
 
     Bugs may be reported via RT at
 
-     https://rt.cpan.org/Public/Dist/Display.html?Name=IO-Async
+       https://rt.cpan.org/Public/Dist/Display.html?Name=IO-Async
 
     Support by IRC may also be found on irc.perl.org in the #io-async
     channel.

@@ -29,7 +29,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Text-ANSI-Util/issues
   homepage: https://metacpan.org/release/Text-ANSI-Util
   repository: git://github.com/perlancar/perl-Text-ANSI-Util.git
-version: '0.231'
+version: '0.232'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -37,7 +37,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::InsertBlock
       name: InsertBlock
-      version: '0.100'
+      version: '0.101'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
       name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'

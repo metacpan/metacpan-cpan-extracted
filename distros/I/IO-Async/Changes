@@ -1,5 +1,15 @@
 Revision history for IO-Async
 
+0.79    2021-08-06
+        [CHANGES]
+         * Permit IO::Async::Routine or Function by module+func names instead
+           of CODE reference
+         * Added new Routine/Function model of `spawn`
+         * Implement IO::Async::Resolver by module+func rather than code
+
+        [BUGFIXES]
+         * Require Socket 2.029 on MSWin32 because of AF_UNIX fix (RT133018)
+
 0.78    2021-01-21
         [CHANGES]
          * Warn on attempts to ->connect to INADDR(6)_LOOPBACK as some OSes

@@ -1,5 +1,9 @@
 Revision history for Alien::libsdl2
 
+1.03
+
+	- Prep for bundle
+
 1.02
 
 	- Attempt to build libs on bsd

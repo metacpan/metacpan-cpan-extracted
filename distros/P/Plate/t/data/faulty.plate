@@ -1,0 +1,4 @@
+%%# The errors should be on lines 2 & 4 of faulty
+<% This.is %>\
+%%#line 4 faulty
+<& +broken &>

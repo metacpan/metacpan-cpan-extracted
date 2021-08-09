@@ -43,6 +43,9 @@ is( $db->catg( 14 ), 'Port Scan', 'Category conversion' );
 # ====== Magic URL check reporting ======
 $url = $db->report( '192.168.0.3', 'Test Only', 'Port Scan', 'Exploited Host' );
 
-is( $url, 'test://report/json?key=123456&category=14%2C20&comment=Test+Only&ip=192.168.0.3', 'Check URL parameters for report()' );
+is( $url, 'test://api/v2/report', 'Check URL parameters for report()' );
+# TODO: this is not a good test, should check the curl args internally.
+
+# TODO: check v2 tests as well.
 
 

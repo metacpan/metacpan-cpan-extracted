@@ -1,4 +1,4 @@
-/* vi: set ft=c inde=: */
+/* vi: set ft=c : */
 
 #define padlist_dump_depth(pl, depth)  S_padlist_dump_depth(aTHX_ pl, depth)
 static void S_padlist_dump_depth(pTHX_ PADLIST *padlist, I32 depth)
@@ -18,15 +18,17 @@ static void S_padlist_dump_depth(pTHX_ PADLIST *padlist, I32 depth)
         pn && PadnamePV(pn) ? PadnamePV(pn) :
                               "(--)");
 
-    if(PadnameOUTER(pn))
-      fprintf(stderr, " *OUTER");
-    if(PadnameIsSTATE(pn))
-      fprintf(stderr, " *STATE");
-    if(PadnameLVALUE(pn))
-      fprintf(stderr, " *LV");
+    if(pn) {
+      if(PadnameOUTER(pn))
+        fprintf(stderr, " *OUTER");
+      if(PadnameIsSTATE(pn))
+        fprintf(stderr, " *STATE");
+      if(PadnameLVALUE(pn))
+        fprintf(stderr, " *LV");
 
-    fprintf(stderr, " [%d..%d]",
-        COP_SEQ_RANGE_LOW(pn), COP_SEQ_RANGE_HIGH(pn));
+      fprintf(stderr, " [%d..%d]",
+          COP_SEQ_RANGE_LOW(pn), COP_SEQ_RANGE_HIGH(pn));
+    }
 
     fprintf(stderr, " = %p\n", PadARRAY(pad)[padix]);
   }

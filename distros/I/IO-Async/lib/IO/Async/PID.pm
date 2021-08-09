@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( IO::Async::Notifier );
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 use Carp;
 
@@ -19,36 +19,36 @@ C<IO::Async::PID> - event callback on exit of a child process
 
 =head1 SYNOPSIS
 
- use IO::Async::PID;
- use POSIX qw( WEXITSTATUS );
+   use IO::Async::PID;
+   use POSIX qw( WEXITSTATUS );
 
- use IO::Async::Loop;
- my $loop = IO::Async::Loop->new;
+   use IO::Async::Loop;
+   my $loop = IO::Async::Loop->new;
 
- my $kid = $loop->fork(
-    code => sub {
-       print "Child sleeping..\n";
-       sleep 10;
-       print "Child exiting\n";
-       return 20;
-    },
- );
+   my $kid = $loop->fork(
+      code => sub {
+         print "Child sleeping..\n";
+         sleep 10;
+         print "Child exiting\n";
+         return 20;
+      },
+   );
 
- print "Child process $kid started\n";
+   print "Child process $kid started\n";
 
- my $pid = IO::Async::PID->new(
-    pid => $kid,
+   my $pid = IO::Async::PID->new(
+      pid => $kid,
 
-    on_exit => sub {
-       my ( $self, $exitcode ) = @_;
-       printf "Child process %d exited with status %d\n",
-          $self->pid, WEXITSTATUS($exitcode);
-    },
- );
+      on_exit => sub {
+         my ( $self, $exitcode ) = @_;
+         printf "Child process %d exited with status %d\n",
+            $self->pid, WEXITSTATUS($exitcode);
+      },
+   );
 
- $loop->add( $pid );
+   $loop->add( $pid );
 
- $loop->run;
+   $loop->run;
 
 =head1 DESCRIPTION
 

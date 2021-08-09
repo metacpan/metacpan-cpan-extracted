@@ -1,5 +1,11 @@
-SYNOPSIS
+NAME
+    tainting - (DEPRECATED) Enable taint mode lexically
 
+VERSION
+    This document describes version 0.031 of tainting (from Perl
+    distribution tainting), released on 2021-08-06.
+
+SYNOPSIS
     To enable tainting in a lexical block:
 
      {
@@ -18,17 +24,46 @@ SYNOPSIS
      # tainting is enabled again
 
 DESCRIPTION
+    DEPRECATION NOTICE: tainting.pm is broken and will be purged from CPAN
+    because the lexical switching is done at compile time while tainting is
+    performed at runtime. Please see Taint::Runtime and localize $TAINT
+    instead.
 
     This module provides a simpler interface to Taint::Runtime. The idea is
-    so that there is no functions or variables to import. Just use or no,
-    like warnings or strict. Tainting of %ENV will be done one time
+    so that there is no functions or variables to import. Just "use" or
+    "no", like warnings or strict. Tainting of %ENV will be done one time
     automatically the first time this module is used.
 
     Please (PLEASE) read Taint::Runtime's documentation first about the
-    pro's and con's of enabling/disabling tainting at runtime. TL;DR: Use
-    -T if you can.
+    pro's and con's of enabling/disabling tainting at runtime. TL;DR: Use -T
+    if you can.
+
+CONTRIBUTOR
+    Steven Haryanto <sharyanto@cpan.org>
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/tainting>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-tainting>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=tainting>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Taint::Runtime
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2017, 2012 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

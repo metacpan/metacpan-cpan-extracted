@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2021 -- leonerd@leonerd.org.uk
 
 package IO::Async::Routine;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 use base qw( IO::Async::Notifier );
 
@@ -17,51 +17,53 @@ use Carp;
 use IO::Async::OS;
 use IO::Async::Process;
 
+use Struct::Dumb qw( readonly_struct );
+
 =head1 NAME
 
 C<IO::Async::Routine> - execute code in an independent sub-process or thread
 
 =head1 SYNOPSIS
 
- use IO::Async::Routine;
- use IO::Async::Channel;
+   use IO::Async::Routine;
+   use IO::Async::Channel;
 
- use IO::Async::Loop;
- my $loop = IO::Async::Loop->new;
+   use IO::Async::Loop;
+   my $loop = IO::Async::Loop->new;
 
- my $nums_ch = IO::Async::Channel->new;
- my $ret_ch  = IO::Async::Channel->new;
+   my $nums_ch = IO::Async::Channel->new;
+   my $ret_ch  = IO::Async::Channel->new;
 
- my $routine = IO::Async::Routine->new(
-    channels_in  => [ $nums_ch ],
-    channels_out => [ $ret_ch ],
+   my $routine = IO::Async::Routine->new(
+      channels_in  => [ $nums_ch ],
+      channels_out => [ $ret_ch ],
 
-    code => sub {
-       my @nums = @{ $nums_ch->recv };
-       my $ret = 0; $ret += $_ for @nums;
+      code => sub {
+         my @nums = @{ $nums_ch->recv };
+         my $ret = 0; $ret += $_ for @nums;
 
-       # Can only send references
-       $ret_ch->send( \$ret );
-    },
+         # Can only send references
+         $ret_ch->send( \$ret );
+      },
 
-    on_finish => sub {
-       say "The routine aborted early - $_[-1]";
-       $loop->stop;
-    },
- );
+      on_finish => sub {
+         say "The routine aborted early - $_[-1]";
+         $loop->stop;
+      },
+   );
 
- $loop->add( $routine );
+   $loop->add( $routine );
 
- $nums_ch->send( [ 10, 20, 30 ] );
- $ret_ch->recv(
-    on_recv => sub {
-       my ( $ch, $totalref ) = @_;
-       say "The total of 10, 20, 30 is: $$totalref";
-       $loop->stop;
-    }
- );
+   $nums_ch->send( [ 10, 20, 30 ] );
+   $ret_ch->recv(
+      on_recv => sub {
+         my ( $ch, $totalref ) = @_;
+         say "The total of 10, 20, 30 is: $$totalref";
+         $loop->stop;
+      }
+   );
 
- $loop->run;
+   $loop->run;
 
 =head1 DESCRIPTION
 
@@ -70,22 +72,59 @@ sub-process or thread, allowing it to act independently of the main program.
 Once set up, all communication with the code happens by values passed into or
 out of the Routine via L<IO::Async::Channel> objects.
 
-A choice of detachment model is available, with options being a C<fork()>ed
-child process, or a thread. In both cases the code contained within the
-Routine is free to make blocking calls without stalling the rest of the
-program. This makes it useful for using existing code which has no option not
-to block within an L<IO::Async>-based program.
-
-Code running inside a C<fork()>-based Routine runs within its own process; it
-is isolated from the rest of the program in terms of memory, CPU time, and
-other resources. Code running in a thread-based Routine however, shares memory
-and other resources such as open filehandles with the main thread.
+The code contained within the Routine is free to make blocking calls without
+stalling the rest of the program. This makes it useful for using existing code
+which has no option not to block within an L<IO::Async>-based program.
 
 To create asynchronous wrappers of functions that return a value based only on
 their arguments, and do not generally maintain state within the process it may
 be more convenient to use an L<IO::Async::Function> instead, which uses an
 C<IO::Async::Routine> to contain the body of the function and manages the
 Channels itself.
+
+=head2 Models
+
+A choice of detachment model is available. Each has various advantages and
+disadvantages. Not all of them may be available on a particular system.
+
+=head3 The C<fork> model
+
+The code in this model runs within its own process, created by calling
+C<fork()> from the main process. It is isolated from the rest of the program
+in terms of memory, CPU time, and other resources. Because it is started
+using C<fork()>, the initial process state is a clone of the main process.
+
+This model performs well on UNIX-like operating systems which possess a true
+native C<fork()> system call, but is not available on C<MSWin32> for example,
+because the operating system does not provide full fork-like semantics.
+
+=head3 The C<thread> model
+
+The code in this model runs inside a separate thread within the main process.
+It therefore shares memory and other resources such as open filehandles with
+the main thread. As with the C<fork> model, the initial thread state is cloned
+from the main controlling thread.
+
+This model is only available on perls built to support threading.
+
+=head3 The C<spawn> model
+
+The code in this model runs within its own freshly-created process running
+another copy of the perl interpreter. Similar to the C<fork> model it
+therefore has its own memory, CPU time, and other resources. However, since it
+is started freshly rather than by cloning the main process, it starts up in a
+clean state, without any shared resources from its parent.
+
+Since this model creates a new fresh process rather than sharing existing
+state, it cannot use the C<code> argument to specify the routine body; it must
+instead use only the C<module> and C<func> arguments.
+
+In the current implementation this model requires exactly one input channel
+and exactly one output channel; both must be present, and there cannot be more
+than one of either.
+
+This model performs well on both UNIX and Windows-like operating systems,
+because it does not need full fork semantics.
 
 =cut
 
@@ -120,11 +159,10 @@ Invoked if the code block fails with an exception.
 
 The following named parameters may be passed to C<new> or C<configure>:
 
-=head2 model => "fork" | "thread"
+=head2 model => "fork" | "thread" | "spawn"
 
 Optional. Defines how the routine will detach itself from the main process.
-C<fork> uses a child process detached using an L<IO::Async::Process>.
-C<thread> uses a thread, and is only available on threaded Perls.
+See the L</Models> section above for more detail.
 
 If the model is not specified, the environment variable
 C<IO_ASYNC_ROUTINE_MODEL> is used to pick a default. If that isn't defined,
@@ -144,6 +182,22 @@ out of the Routine.
 
 CODE reference to the body of the Routine, to execute once the channels are
 set up.
+
+When using the C<spawn> model, this is not permitted; you must use C<module>
+and C<func> instead.
+
+=head2 module => STRING
+
+=head2 func => STRING
+
+An alternative to the C<code> argument, which names a module to load and a
+function to call within it. C<module> should give a perl module name (i.e.
+C<Some::Name>, not a filename like F<Some/Name.pm>), and C<func> should give
+the basename of a function within that module (i.e. without the module name
+prefixed). It will be invoked as the main code body of the object, and passed
+in a list of all the channels; first the input ones then the output ones.
+
+   module::func( @channels_in, @channels_out )
 
 =head2 setup => ARRAY
 
@@ -168,20 +222,28 @@ sub _init
    $self->SUPER::_init( @_ );
 }
 
+my %SETUP_CODE;
+
 sub configure
 {
    my $self = shift;
    my %params = @_;
 
    # TODO: Can only reconfigure when not running
-   foreach (qw( channels_in channels_out code setup on_finish on_return on_die )) {
+   foreach (qw( channels_in channels_out code module func setup on_finish on_return on_die )) {
       $self->{$_} = delete $params{$_} if exists $params{$_};
    }
 
-   if( defined( my $model = delete $params{model} ) ) {
-      $model eq "fork" or $model eq "thread" or
-         croak "Expected 'model' to be either 'fork' or 'thread'";
+   defined $self->{code} and defined $self->{func} and
+      croak "Cannot ->configure both 'code' and 'func'";
+   defined $self->{func} and !defined $self->{module} and
+      croak "'func' parameter requires a 'module' as well";
 
+   if( defined( my $model = delete $params{model} ) ) {
+      ( $SETUP_CODE{$model} ||= $self->can( "_setup_$model" ) )
+         or die "Unrecognised Routine model $model";
+
+      # TODO: optional plugin "configure" check here?
       $model eq "fork" and !IO::Async::OS->HAVE_POSIX_FORK and
          croak "Cannot use 'fork' model as fork() is not available";
       $model eq "thread" and !IO::Async::OS->HAVE_THREADS and
@@ -199,39 +261,87 @@ sub _add_to_loop
    my ( $loop ) = @_;
    $self->SUPER::_add_to_loop( $loop );
 
-   return $self->_setup_fork   if $self->{model} eq "fork";
-   return $self->_setup_thread if $self->{model} eq "thread";
+   my $model = $self->{model};
 
-   die "TODO: unrecognised Routine model $self->{model}";
+   my $code = ( $SETUP_CODE{$model} ||= $self->can( "_setup_$model" ) )
+      or die "Unrecognised Routine model $model";
+
+   $self->$code();
 }
 
-sub _setup_fork
+readonly_struct ChannelSetup => [qw( chan myfd otherfd )];
+
+sub _create_channels_in
 {
    my $self = shift;
 
-   my @setup;
    my @channels_in;
-   my @channels_out;
 
    foreach my $ch ( @{ $self->{channels_in} || [] } ) {
       my ( $rd, $wr );
       unless( $rd = $ch->_extract_read_handle ) {
          ( $rd, $wr ) = IO::Async::OS->pipepair;
       }
-      push @setup, $rd => "keep";
-      push @channels_in, [ $ch, $wr, $rd ];
+      push @channels_in, ChannelSetup( $ch, $wr, $rd );
    }
+
+   return @channels_in;
+}
+
+sub _create_channels_out
+{
+   my $self = shift;
+
+   my @channels_out;
 
    foreach my $ch ( @{ $self->{channels_out} || [] } ) {
       my ( $rd, $wr );
       unless( $wr = $ch->_extract_write_handle ) {
          ( $rd, $wr ) = IO::Async::OS->pipepair;
       }
-      push @setup, $wr => "keep";
-      push @channels_out, [ $ch, $rd, $wr ];
+      push @channels_out, ChannelSetup( $ch, $rd, $wr );
    }
 
-   my $code  = $self->{code};
+   return @channels_out;
+}
+
+sub _adopt_channels_in
+{
+   my $self = shift;
+   my ( @channels_in ) = @_;
+
+   foreach ( @channels_in ) {
+      my $ch = $_->chan;
+      $ch->setup_async_mode( write_handle => $_->myfd );
+      $self->add_child( $ch ) unless $ch->parent;
+   }
+}
+
+sub _adopt_channels_out
+{
+   my $self = shift;
+   my ( @channels_out ) = @_;
+
+   foreach ( @channels_out ) {
+      my $ch = $_->chan;
+      $ch->setup_async_mode( read_handle => $_->myfd );
+      $self->add_child( $ch ) unless $ch->parent;
+   }
+}
+
+sub _setup_fork
+{
+   my $self = shift;
+
+   my @channels_in  = $self->_create_channels_in;
+   my @channels_out = $self->_create_channels_out;
+
+   my $code = $self->{code};
+
+   my $module = $self->{module};
+   my $func   = $self->{func};
+
+   my @setup = map { $_->otherfd => "keep" } @channels_in, @channels_out;
 
    my $setup = $self->{setup};
    push @setup, @$setup if $setup;
@@ -239,20 +349,22 @@ sub _setup_fork
    my $process = IO::Async::Process->new(
       setup => \@setup,
       code => sub {
-         foreach ( @channels_in ) {
-            my ( $ch, undef, $rd ) = @$_;
-            $ch->setup_sync_mode( $rd );
-         }
-         foreach ( @channels_out ) {
-            my ( $ch, undef, $wr ) = @$_;
-            $ch->setup_sync_mode( $wr );
+         foreach ( @channels_in, @channels_out ) {
+            $_->chan->setup_sync_mode( $_->otherfd );
          }
 
-         my $ret = $code->();
+         if( defined $module ) {
+            ( my $file = "$module.pm" ) =~ s{::}{/}g;
+            require $file;
+
+            $code = $module->can( $func ) or
+               die "Module '$module' has no '$func'\n";
+         }
+
+         my $ret = $code->( map { $_->chan } @channels_in, @channels_out );
 
          foreach ( @channels_in, @channels_out ) {
-            my ( $ch ) = @$_;
-            $ch->close;
+            $_->chan->close;
          }
 
          return $ret;
@@ -276,74 +388,46 @@ sub _setup_fork
       }),
    );
 
-   foreach ( @channels_in ) {
-      my ( $ch, $wr ) = @$_;
-
-      $ch->setup_async_mode( write_handle => $wr );
-
-      $self->add_child( $ch ) unless $ch->parent;
-   }
-
-   foreach ( @channels_out ) {
-      my ( $ch, $rd ) = @$_;
-
-      $ch->setup_async_mode( read_handle => $rd );
-
-      $self->add_child( $ch ) unless $ch->parent;
-   }
+   $self->_adopt_channels_in ( @channels_in  );
+   $self->_adopt_channels_out( @channels_out );
 
    $self->add_child( $self->{process} = $process );
    $self->{id} = "P" . $process->pid;
 
-   foreach ( @channels_in, @channels_out ) {
-      my ( undef, undef, $other ) = @$_;
-      $other->close;
-   }
+   $_->otherfd->close for @channels_in, @channels_out;
 }
 
 sub _setup_thread
 {
    my $self = shift;
 
-   my @channels_in;
-   my @channels_out;
-
-   foreach my $ch ( @{ $self->{channels_in} || [] } ) {
-      my ( $rd, $wr );
-      unless( $rd = $ch->_extract_read_handle ) {
-         ( $rd, $wr ) = IO::Async::OS->pipepair;
-      }
-      push @channels_in, [ $ch, $wr, $rd ];
-   }
-
-   foreach my $ch ( @{ $self->{channels_out} || [] } ) {
-      my ( $rd, $wr );
-      unless( $wr = $ch->_extract_write_handle ) {
-         ( $rd, $wr ) = IO::Async::OS->pipepair;
-      }
-      push @channels_out, [ $ch, $rd, $wr ];
-   }
+   my @channels_in  = $self->_create_channels_in;
+   my @channels_out = $self->_create_channels_out;
 
    my $code = $self->{code};
 
+   my $module = $self->{module};
+   my $func   = $self->{func};
+
    my $tid = $self->loop->create_thread(
       code => sub {
-         foreach ( @channels_in ) {
-            my ( $ch, $wr, $rd ) = @$_;
-            $ch->setup_sync_mode( $rd );
-            $wr->close if $wr;
-         }
-         foreach ( @channels_out ) {
-            my ( $ch, $rd, $wr ) = @$_;
-            $ch->setup_sync_mode( $wr );
-            $rd->close if $rd;
+         foreach ( @channels_in, @channels_out ) {
+            $_->chan->setup_sync_mode( $_->otherfd );
+            $_->myfd->close;
          }
 
-         my $ret = $code->();
+         if( defined $func ) {
+            ( my $file = "$module.pm" ) =~ s{::}{/}g;
+            require $file;
+
+            $code = $module->can( $func ) or
+               die "Module '$module' has no '$func'\n";
+         }
+
+         my $ret = $code->( map { $_->chan } @channels_in, @channels_out );
 
          foreach ( @channels_in, @channels_out ) {
-            my ( $ch ) = @$_;
-            $ch->close;
+            $_->chan->close;
          }
 
          return $ret;
@@ -369,23 +453,72 @@ sub _setup_thread
    $self->{tid} = $tid;
    $self->{id} = "T" . $tid;
 
-   foreach ( @channels_in ) {
-      my ( $ch, $wr, $rd ) = @$_;
+   $self->_adopt_channels_in ( @channels_in  );
+   $self->_adopt_channels_out( @channels_out );
 
-      $ch->setup_async_mode( write_handle => $wr );
-      $rd->close;
+   $_->otherfd->close for @channels_in, @channels_out;
+}
 
-      $self->add_child( $ch ) unless $ch->parent;
-   }
+# The injected program that goes into spawn mode
+use constant PERL_RUNNER => <<'EOF';
+( my ( $module, $func ), @INC ) = @ARGV;
+( my $file = "$module.pm" ) =~ s{::}{/}g;
+require $file;
+my $code = $module->can( $func ) or die "Module '$module' has no '$func'\n";
+require IO::Async::Channel;
+exit $code->( IO::Async::Channel->new_stdin, IO::Async::Channel->new_stdout );
+EOF
 
-   foreach ( @channels_out ) {
-      my ( $ch, $rd, $wr ) = @$_;
+sub _setup_spawn
+{
+   my $self = shift;
 
-      $ch->setup_async_mode( read_handle => $rd );
-      $wr->close;
+   $self->{code} and
+      die "Cannot run IO::Async::Routine in 'spawn' with code\n";
 
-      $self->add_child( $ch ) unless $ch->parent;
-   }
+   @{ $self->{channels_in} } == 1 or
+      die "IO::Async::Routine in 'spawn' mode requires exactly one input channel\n";
+   @{ $self->{channels_out} } == 1 or
+      die "IO::Async::Routine in 'spawn' mode requires exactly one output channel\n";
+
+   my @channels_in  = $self->_create_channels_in;
+   my @channels_out = $self->_create_channels_out;
+
+   my $module = $self->{module};
+   my $func   = $self->{func};
+
+   my $process = IO::Async::Process->new(
+      setup => [
+         stdin  => $channels_in[0]->otherfd,
+         stdout => $channels_out[0]->otherfd,
+      ],
+      command => [ $^X, "-E", PERL_RUNNER, $module, $func, grep { !ref } @INC ],
+      on_finish => $self->_replace_weakself( sub {
+         my $self = shift or return;
+         my ( $exitcode ) = @_;
+         $self->maybe_invoke_event( on_finish => $exitcode );
+
+         unless( $exitcode & 0x7f ) {
+            $self->maybe_invoke_event( on_return => ($exitcode >> 8) );
+            $self->result_future->done( $exitcode >> 8 );
+         }
+      }),
+      on_exception => $self->_replace_weakself( sub {
+         my $self = shift or return;
+         my ( $exception, $errno, $exitcode ) = @_;
+
+         $self->maybe_invoke_event( on_die => $exception );
+         $self->result_future->fail( $exception, routine => );
+      }),
+   );
+
+   $self->_adopt_channels_in ( @channels_in  );
+   $self->_adopt_channels_out( @channels_out );
+
+   $self->add_child( $self->{process} = $process );
+   $self->{id} = "P" . $process->pid;
+
+   $_->otherfd->close for @channels_in, @channels_out;
 }
 
 =head1 METHODS

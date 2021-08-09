@@ -1,0 +1,9 @@
+<&| outer, @_ &>\
+% my $var = 'Tom, Dick & Harry';
+$var = "<% $var %>"
+Some <&| 'inner', @_ &>between</&> line.
+</&>
+% warn 'test-6-warn';
+<% "@_" |%>
+<% "@_" |html %>
+<% "@_" |html |html %>

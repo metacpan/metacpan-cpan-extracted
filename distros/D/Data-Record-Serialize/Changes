@@ -1,3 +1,12 @@
+0.25      2021-08-06 11:29:25-04:00 America/New_York
+
+  [BUILD FIX]
+
+    * test requires Exporter::Tiny >= 1.002 to export scalars
+
+    * incorrect dependency on YAML::Any; only YAML::PP and YAML::XS is
+      supported
+
 0.24      2021-07-30 23:35:07-04:00 America/New_York
 
   [API BREAKAGE]

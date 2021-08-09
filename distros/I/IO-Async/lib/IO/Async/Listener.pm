@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( IO::Async::Handle );
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 use IO::Async::Handle;
 use IO::Async::OS;
@@ -28,54 +28,54 @@ C<IO::Async::Listener> - listen on network sockets for incoming connections
 
 =head1 SYNOPSIS
 
- use IO::Async::Listener;
+   use IO::Async::Listener;
 
- use IO::Async::Loop;
- my $loop = IO::Async::Loop->new;
+   use IO::Async::Loop;
+   my $loop = IO::Async::Loop->new;
 
- my $listener = IO::Async::Listener->new(
-    on_stream => sub {
-       my ( undef, $stream ) = @_;
+   my $listener = IO::Async::Listener->new(
+      on_stream => sub {
+         my ( undef, $stream ) = @_;
 
-       $stream->configure(
-          on_read => sub {
-             my ( $self, $buffref, $eof ) = @_;
-             $self->write( $$buffref );
-             $$buffref = "";
-             return 0;
-          },
-       );
+         $stream->configure(
+            on_read => sub {
+               my ( $self, $buffref, $eof ) = @_;
+               $self->write( $$buffref );
+               $$buffref = "";
+               return 0;
+            },
+         );
 
-       $loop->add( $stream );
-    },
- );
+         $loop->add( $stream );
+      },
+   );
 
- $loop->add( $listener );
+   $loop->add( $listener );
 
- $listener->listen(
-    service  => "echo",
-    socktype => 'stream',
- )->get;
+   $listener->listen(
+      service  => "echo",
+      socktype => 'stream',
+   )->get;
 
- $loop->run;
+   $loop->run;
 
 This object can also be used indirectly via an L<IO::Async::Loop>:
 
- use IO::Async::Stream;
+   use IO::Async::Stream;
 
- use IO::Async::Loop;
- my $loop = IO::Async::Loop->new;
+   use IO::Async::Loop;
+   my $loop = IO::Async::Loop->new;
 
- $loop->listen(
-    service  => "echo",
-    socktype => 'stream',
+   $loop->listen(
+      service  => "echo",
+      socktype => 'stream',
 
-    on_stream => sub {
-       ...
-    },
- )->get;
+      on_stream => sub {
+         ...
+      },
+   )->get;
 
- $loop->run;
+   $loop->run;
 
 =head1 DESCRIPTION
 
@@ -154,11 +154,11 @@ client socket is accepted from the listening socket. It is passed the listener
 object itself, and is expected to return a new instance of
 L<IO::Async::Handle> or a subclass, used to wrap the new client socket.
 
- $handle = $handle_constructor->( $listener )
+   $handle = $handle_constructor->( $listener )
 
 This can also be given as a subclass method
 
- $handle = $listener->handle_constructor()
+   $handle = $listener->handle_constructor()
 
 =head2 handle_class => STRING
 
@@ -166,20 +166,20 @@ Optional. If defined and C<handle_constructor> isn't, then new wrapper handles
 are constructed by invoking the C<new> method on the given class name, passing
 in no additional parameters.
 
- $handle = $handle_class->new()
+   $handle = $handle_class->new()
 
 This can also be given as a subclass method
 
- $handle = $listener->handle_class->new
+   $handle = $listener->handle_class->new
 
 =head2 acceptor => STRING|CODE
 
 Optional. If defined, gives the name of a method or a CODE reference to use to
 implement the actual accept behaviour. This will be invoked as:
 
- ( $accepted ) = $listener->acceptor( $socket )->get
+   ( $accepted ) = $listener->acceptor( $socket )->get
 
- ( $handle ) = $listener->acceptor( $socket, handle => $handle )->get
+   ( $handle ) = $listener->acceptor( $socket, handle => $handle )->get
 
 It is invoked with the listening socket as its its argument, and optionally
 an L<IO::Async::Handle> instance as a named parameter, and is expected to
@@ -429,7 +429,7 @@ Optional. A callback that is invoked when the listening socket is ready.
 Similar to that on the underlying loop method, except it is passed the
 listener object itself.
 
- $on_listen->( $listener )
+   $on_listen->( $listener )
 
 =back
 
@@ -458,41 +458,41 @@ The C<handle> argument can be passed an existing socket already in listening
 mode, making it possible to listen on other types of socket such as UNIX
 sockets.
 
- use IO::Async::Listener;
- use IO::Socket::UNIX;
+   use IO::Async::Listener;
+   use IO::Socket::UNIX;
 
- use IO::Async::Loop;
- my $loop = IO::Async::Loop->new;
+   use IO::Async::Loop;
+   my $loop = IO::Async::Loop->new;
 
- my $listener = IO::Async::Listener->new(
-    on_stream => sub {
-       my ( undef, $stream ) = @_;
+   my $listener = IO::Async::Listener->new(
+      on_stream => sub {
+         my ( undef, $stream ) = @_;
 
-       $stream->configure(
-          on_read => sub {
-             my ( $self, $buffref, $eof ) = @_;
-             $self->write( $$buffref );
-             $$buffref = "";
-             return 0;
-          },
-       );
+         $stream->configure(
+            on_read => sub {
+               my ( $self, $buffref, $eof ) = @_;
+               $self->write( $$buffref );
+               $$buffref = "";
+               return 0;
+            },
+         );
 
-       $loop->add( $stream );
-    },
- );
+         $loop->add( $stream );
+      },
+   );
 
- $loop->add( $listener );
+   $loop->add( $listener );
 
- my $socket = IO::Socket::UNIX->new(
-    Local => "echo.sock",
-    Listen => 1,
- ) or die "Cannot make UNIX socket - $!\n";
+   my $socket = IO::Socket::UNIX->new(
+      Local => "echo.sock",
+      Listen => 1,
+   ) or die "Cannot make UNIX socket - $!\n";
 
- $listener->listen(
-    handle => $socket,
- );
+   $listener->listen(
+      handle => $socket,
+   );
 
- $loop->run;
+   $loop->run;
 
 =head2 Passing Plain Socket Addresses
 
@@ -502,27 +502,27 @@ method can use.
 
 This example shows how to listen on TCP port 8001 on address 10.0.0.1:
 
- $listener->listen(
-    addr => {
-       family   => "inet",
-       socktype => "stream",
-       port     => 8001,
-       ip       => "10.0.0.1",
-    },
-    ...
- );
+   $listener->listen(
+      addr => {
+         family   => "inet",
+         socktype => "stream",
+         port     => 8001,
+         ip       => "10.0.0.1",
+      },
+      ...
+   );
 
 This example shows another way to listen on a UNIX socket, similar to the
 earlier example:
 
- $listener->listen(
-    addr => {
-       family   => "unix",
-       socktype => "stream",
-       path     => "echo.sock",
-    },
-    ...
- );
+   $listener->listen(
+      addr => {
+         family   => "unix",
+         socktype => "stream",
+         path     => "echo.sock",
+      },
+      ...
+   );
 
 =head2 Using A Kernel-Assigned Port Number
 
@@ -534,27 +534,27 @@ picked, inspect the C<sockport> accessor on the actual socket filehandle.
 
 Either use the L<Future> returned by the C<listen> method:
 
- $listener->listen(
-    addr => { family => "inet" },
- )->on_done( sub {
-    my ( $listener ) = @_;
-    my $socket = $listener->read_handle;
+   $listener->listen(
+      addr => { family => "inet" },
+   )->on_done( sub {
+      my ( $listener ) = @_;
+      my $socket = $listener->read_handle;
 
-    say "Now listening on port ", $socket->sockport;
- });
+      say "Now listening on port ", $socket->sockport;
+   });
 
 Or pass an C<on_listen> continuation:
 
- $listener->listen(
-    addr => { family => "inet" },
+   $listener->listen(
+      addr => { family => "inet" },
 
-    on_listen => sub {
-       my ( $listener ) = @_;
-       my $socket = $listener->read_handle;
+      on_listen => sub {
+         my ( $listener ) = @_;
+         my $socket = $listener->read_handle;
 
-       say "Now listening on port ", $socket->sockport;
-    },
- );
+         say "Now listening on port ", $socket->sockport;
+      },
+   );
 
 =head1 AUTHOR
 

@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/ColorThemeUtils/show_color_theme_swatch
-# and generated automatically using Perinci::CmdLine::Gen version 0.497
+# and generated automatically using Perinci::CmdLine::Gen version 0.499
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-20'; # DATE
+our $DATE = '2021-08-08'; # DATE
 our $DIST = 'App-ColorThemeUtils'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,16 +40,13 @@ show-color-theme-swatch - show-color-theme-swatch
 
 =head1 VERSION
 
-This document describes version 0.010 of show-color-theme-swatch (from Perl distribution App-ColorThemeUtils), released on 2021-01-20.
+This document describes version 0.011 of show-color-theme-swatch (from Perl distribution App-ColorThemeUtils), released on 2021-08-08.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % show-color-theme-swatch [--debug] [--format=name] [--json]
-     [--log-level=level] [--(no)naked-res] [--page-result[=program]]
-     [--quiet] [--trace] [--verbose] [--view-result[=program]] [-w=s]
-     [--width=s] <theme>
+% B<show-color-theme-swatch> [B<--debug>] [B<--format>=I<name>] [B<--json>] [B<--log-level>=I<level>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]] [B<--quiet>] [B<--trace>] [B<--verbose>] [B<--view-result>[=I<program>]] [B<--width>=I<posint>|B<-w>=I<posint>] -- E<lt>I<theme>E<gt>
 
 =head1 OPTIONS
 
@@ -60,6 +57,8 @@ C<*> marks required options.
 =over
 
 =item B<--theme>=I<s>*, B<-m>
+
+Can also be specified as the 1st command-line argument.
 
 =item B<--width>=I<s>, B<-w>
 
@@ -200,7 +199,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-ColorThemeUtils>
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-ColorThemeUtils/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ColorThemeUtils>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -216,7 +215,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

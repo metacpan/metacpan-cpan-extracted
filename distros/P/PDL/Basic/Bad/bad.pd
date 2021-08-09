@@ -584,7 +584,7 @@ foreach my $op (
 sub PDL::$op->[0] {
 	my(\$x) = \@_; my \$tmp;
 	\$x->clump(-1)->$op->[1](\$tmp=PDL->nullcreate(\$x) );
-	return \$tmp->at();
+	return \$tmp;
 }
 EOD
 
@@ -910,7 +910,7 @@ operation, it clears the bad flag.
     },
     Code => q{
         if ( $ISBAD(a()) ) {
-            $b() = PDL->NaN_$TFDGC(float,double,cfloat,cdouble);
+            $b() = $TFDGC(NAN,NAN,NAN+I*NAN,NAN+I*NAN);
         }
         else {
             $b() = $a();

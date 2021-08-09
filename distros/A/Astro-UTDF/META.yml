@@ -18,13 +18,14 @@ meta-spec:
 name: Astro-UTDF
 no_index:
   directory:
+    - eg
     - inc
     - t
     - xt
 provides:
   Astro::UTDF:
     file: lib/Astro/UTDF.pm
-    version: '0.011'
+    version: '0.012'
 requires:
   Carp: '0'
   IO::File: '0'
@@ -40,5 +41,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-UTDF
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Astro-UTDF.git
-version: '0.011'
+version: '0.012'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

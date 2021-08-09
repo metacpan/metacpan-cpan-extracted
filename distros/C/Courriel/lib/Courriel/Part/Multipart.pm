@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 use Courriel::HeaderAttribute;
 use Courriel::Helpers qw( unique_boundary );
@@ -122,7 +122,7 @@ Courriel::Part::Multipart - A part which contains other parts
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 SYNOPSIS
 
@@ -152,8 +152,8 @@ required, but could be empty.
 
 =item * content_type
 
-A L<Courriel::Header::ContentType> object. This defaults to one with a mime type of
-"multipart/mixed".
+A L<Courriel::Header::ContentType> object. This defaults to one with a mime
+type of "multipart/mixed".
 
 =item * boundary
 
@@ -161,8 +161,8 @@ The part boundary. If none is provided, a unique value will be generated.
 
 =item * preamble
 
-Content that appears before the first part boundary. This will be seen by
-email clients that don't understand multipart messages.
+Content that appears before the first part boundary. This will be seen by email
+clients that don't understand multipart messages.
 
 =item * epilogue
 
@@ -223,10 +223,10 @@ part belongs, if any. This is set when the part is added to another object.
 
 =head2 $part->stream_to( output => $output )
 
-This method will send the stringified part to the specified output. The
-output can be a subroutine reference, a filehandle, or an object with a
-C<print()> method. The output may be sent as a single string, as a list of
-strings, or via multiple calls to the output.
+This method will send the stringified part to the specified output. The output
+can be a subroutine reference, a filehandle, or an object with a C<print()>
+method. The output may be sent as a single string, as a list of strings, or via
+multiple calls to the output.
 
 =head2 $part->as_string()
 
@@ -254,7 +254,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Dave Rolsky.
+This software is Copyright (c) 2021 by Dave Rolsky.
 
 This is free software, licensed under:
 

@@ -1,7 +1,7 @@
 # ABSTRACT: take structured address data and format it according to the various global/country rules
 
 package Geo::Address::Formatter;
-$Geo::Address::Formatter::VERSION = '1.95';
+$Geo::Address::Formatter::VERSION = '1.96';
 use strict;
 use warnings;
 use feature qw(say);
@@ -198,22 +198,26 @@ sub format_address {
     if (defined($rh_options->{address_template})) {
         $template_text = $rh_options->{address_template};
     }
-    elsif (defined($rh_config->{address_template})) {
-        $template_text = $rh_config->{address_template};
-    } elsif (defined($self->{templates}{default}{address_template})) {
-        $template_text = $self->{templates}{default}{address_template};
-    }
-    
-    # do we have the minimal components for an address?
-    # or should we instead use the fallback template?
-    if (!$self->_minimal_components($rh_components)) {
-        say STDERR "using fallback" if ($debug);
-        if (defined($rh_config->{fallback_template})) {
-            $template_text = $rh_config->{fallback_template};
-        } elsif (defined($self->{templates}{default}{fallback_template})) {
-            $template_text = $self->{templates}{default}{fallback_template};
+    else {
+
+        if (defined($rh_config->{address_template})) {
+            $template_text = $rh_config->{address_template};
+        } elsif (defined($self->{templates}{default}{address_template})) {
+            $template_text = $self->{templates}{default}{address_template};
         }
-        # no fallback
+    
+        # do we have the minimal components for an address?
+        # or should we instead use the fallback template?
+        if (!$self->_minimal_components($rh_components)) {
+            say STDERR "using fallback" if ($debug);
+            if (defined($rh_config->{fallback_template})) {
+                $template_text = $rh_config->{fallback_template};
+            } elsif (defined($self->{templates}{default}{fallback_template})) {
+                $template_text = $self->{templates}{default}{fallback_template};
+            }
+            # no fallback
+        }
+
     }
 
     say STDERR 'template text: ' . $template_text if ($debug);
@@ -786,7 +790,7 @@ Geo::Address::Formatter - take structured address data and format it according t
 
 =head1 VERSION
 
-version 1.95
+version 1.96
 
 =head1 SYNOPSIS
 

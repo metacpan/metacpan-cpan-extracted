@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( IO::Async::Timer );
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 use Carp;
 
@@ -19,25 +19,25 @@ C<IO::Async::Timer::Countdown> - event callback after a fixed delay
 
 =head1 SYNOPSIS
 
- use IO::Async::Timer::Countdown;
+   use IO::Async::Timer::Countdown;
 
- use IO::Async::Loop;
- my $loop = IO::Async::Loop->new;
+   use IO::Async::Loop;
+   my $loop = IO::Async::Loop->new;
 
- my $timer = IO::Async::Timer::Countdown->new(
-    delay => 10,
+   my $timer = IO::Async::Timer::Countdown->new(
+      delay => 10,
 
-    on_expire => sub {
-       print "Sorry, your time's up\n";
-       $loop->stop;
-    },
- );
+      on_expire => sub {
+         print "Sorry, your time's up\n";
+         $loop->stop;
+      },
+   );
 
- $timer->start;
+   $timer->start;
 
- $loop->add( $timer );
+   $loop->add( $timer );
 
- $loop->run;
+   $loop->run;
 
 =head1 DESCRIPTION
 
@@ -196,42 +196,42 @@ expire and run its callback.
 
 For example, to expire an accepted connection after 30 seconds of inactivity:
 
- ...
+   ...
 
- on_accept => sub {
-    my ( $newclient ) = @_;
+   on_accept => sub {
+      my ( $newclient ) = @_;
 
-    my $watchdog = IO::Async::Timer::Countdown->new(
-       delay => 30,
+      my $watchdog = IO::Async::Timer::Countdown->new(
+         delay => 30,
 
-       on_expire => sub {
-          my $self = shift;
+         on_expire => sub {
+            my $self = shift;
 
-          my $stream = $self->parent;
-          $stream->close;
-       },
-    );
+            my $stream = $self->parent;
+            $stream->close;
+         },
+      );
 
-    my $stream = IO::Async::Stream->new(
-       handle => $newclient,
+      my $stream = IO::Async::Stream->new(
+         handle => $newclient,
 
-       on_read => sub {
-          my ( $self, $buffref, $eof ) = @_;
-          $watchdog->reset;
+         on_read => sub {
+            my ( $self, $buffref, $eof ) = @_;
+            $watchdog->reset;
 
-          ...
-       },
+            ...
+         },
 
-       on_closed => sub {
-          $watchdog->stop;
-       },
-    ) );
+         on_closed => sub {
+            $watchdog->stop;
+         },
+      ) );
 
-    $stream->add_child( $watchdog );
-    $watchdog->start;
+      $stream->add_child( $watchdog );
+      $watchdog->start;
 
-    $loop->add( $watchdog );
- }
+      $loop->add( $watchdog );
+   }
 
 Rather than setting up a lexical variable to store the Stream so that the
 Timer's C<on_expire> closure can call C<close> on it, the parent/child
@@ -251,20 +251,20 @@ creates an arrangement similar to an L<IO::Async::Timer::Periodic>, except
 that it will wait until the previous invocation has indicated it is finished,
 before starting the countdown for the next call.
 
- my $timer = IO::Async::Timer::Countdown->new(
-    delay => 60,
+   my $timer = IO::Async::Timer::Countdown->new(
+      delay => 60,
 
-    on_expire => sub {
-       my $self = shift;
+      on_expire => sub {
+         my $self = shift;
 
-       start_some_operation(
-          on_complete => sub { $self->start },
-       );
-    },
- );
+         start_some_operation(
+            on_complete => sub { $self->start },
+         );
+      },
+   );
 
- $timer->start;
- $loop->add( $timer );
+   $timer->start;
+   $loop->add( $timer );
 
 This example invokes the C<start_some_operation> function 60 seconds after the
 previous iteration has indicated it has finished.

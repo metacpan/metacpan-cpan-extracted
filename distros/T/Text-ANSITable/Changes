@@ -1,3 +1,16 @@
+0.604   2021-08-09  Released-By: PERLANCAR; Urgency: low
+
+	- Declare Module::Feature features.
+
+
+0.603   2021-08-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Make sure column names are unique (GH#3).
+
+	- [ux] Provide backward-compatible (0.5xx) color theme & border style
+          names.
+
+
 0.602   2021-02-19  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Don't emit color reset sequence \e[0m when not using

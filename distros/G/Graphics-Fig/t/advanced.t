@@ -2,9 +2,11 @@ use strict;
 use warnings;
 use Test::More tests => 1;
 use File::Temp qw/ tempdir /;
-use Graphics::Fig;
 use Math::Trig;
-use t::FigCmp;
+use lib "lib";
+use Graphics::Fig;
+use lib "t";
+use FigCmp;
 
 #
 # Create temp directory.
@@ -29,7 +31,7 @@ eval {
 
     #
     # Draw arrows from a given center to the corners of a pentagon.
-    # Save # the endpoints.
+    # Save the endpoints.
     #
     my $N = 5;
     my $R = 2;

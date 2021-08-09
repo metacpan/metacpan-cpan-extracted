@@ -8,7 +8,7 @@ package IO::Async::OS;
 use strict;
 use warnings;
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 our @ISA = qw( IO::Async::OS::_Base );
 
@@ -303,20 +303,20 @@ parent process.
 When creating a L<IO::Async::Stream> or subclass of it, the C<read_handle>
 and C<write_handle> parameters should always be used.
 
- my ( $childRd, $myWr, $myRd, $childWr ) = IO::Async::OS->pipequad;
+   my ( $childRd, $myWr, $myRd, $childWr ) = IO::Async::OS->pipequad;
 
- $loop->open_process(
-    stdin  => $childRd,
-    stdout => $childWr,
-    ...
- );
+   $loop->open_process(
+      stdin  => $childRd,
+      stdout => $childWr,
+      ...
+   );
 
- my $str = IO::Async::Stream->new(
-    read_handle  => $myRd,
-    write_handle => $myWr,
-    ...
- );
- $loop->add( $str );
+   my $str = IO::Async::Stream->new(
+      read_handle  => $myRd,
+      write_handle => $myWr,
+      ...
+   );
+   $loop->add( $str );
 
 =cut
 
@@ -385,11 +385,11 @@ address suitable for C<connect> or C<bind>.
 
 If given an ARRAY it should be in the following form:
 
- [ $family, $socktype, $protocol, $addr ]
+   [ $family, $socktype, $protocol, $addr ]
 
 If given a HASH it should contain the following keys:
 
- family socktype protocol addr
+   family socktype protocol addr
 
 Each field in the result will be initialised to 0 (or empty string for the
 address) if not defined in the C<$ai> value.

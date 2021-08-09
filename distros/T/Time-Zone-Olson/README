@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    Version 0.36
+    Version 0.38
 
 SYNOPSIS
 
@@ -298,11 +298,8 @@ BUGS AND LIMITATIONS
     parsing is not complete. It should cover all existing cases in the
     Olson time zone database though.
 
-    Please report any bugs or feature requests to bug-time-zone-olson at
-    rt.cpan.org, or through the web interface at
-    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Time-Zone-Olson. I will
-    be notified, and then you'll automatically be notified of progress on
-    your bug as I make changes.
+    To report a bug, or view the current list of bugs, please visit
+    https://github.com/david-dick/time-zone-olson/issues
 
 SEE ALSO
 
@@ -322,7 +319,7 @@ AUTHOR
 
 LICENSE AND COPYRIGHT
 
-    Copyright 2019 David Dick.
+    Copyright 2021 David Dick.
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of either: the GNU General Public License as published

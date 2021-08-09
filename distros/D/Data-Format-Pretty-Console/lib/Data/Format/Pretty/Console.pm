@@ -1,7 +1,7 @@
 package Data::Format::Pretty::Console;
 
-our $DATE = '2021-04-23'; # DATE
-our $VERSION = '0.390'; # VERSION
+our $DATE = '2021-08-08'; # DATE
+our $VERSION = '0.391'; # VERSION
 
 use 5.010001;
 use strict;
@@ -485,7 +485,7 @@ Data::Format::Pretty::Console - Pretty-print data structure for console output
 
 =head1 VERSION
 
-This document describes version 0.390 of Data::Format::Pretty::Console (from Perl distribution Data-Format-Pretty-Console), released on 2021-04-23.
+This document describes version 0.391 of Data::Format::Pretty::Console (from Perl distribution Data-Format-Pretty-Console), released on 2021-08-08.
 
 =head1 SYNOPSIS
 
@@ -705,7 +705,7 @@ Source repository is at L<https://github.com/perlancar/perl-Data-Format-Pretty-C
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Data-Format-Pretty-Console/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Format-Pretty-Console>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -720,6 +720,12 @@ L<Data::Format::Pretty>
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <sharyanto@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

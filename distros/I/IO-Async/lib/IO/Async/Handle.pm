@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( IO::Async::Notifier );
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 use Carp;
 
@@ -31,24 +31,24 @@ to handle more specific cases. Here is an example of how it would be used to
 watch a listening socket for new connections. In real code, it is likely that
 the C<< Loop->listen >> method would be used instead.
 
- use IO::Socket::INET;
- use IO::Async::Handle;
+   use IO::Socket::INET;
+   use IO::Async::Handle;
 
- use IO::Async::Loop;
- my $loop = IO::Async::Loop->new;
+   use IO::Async::Loop;
+   my $loop = IO::Async::Loop->new;
 
- my $socket = IO::Socket::INET->new( LocalPort => 1234, Listen => 1 );
+   my $socket = IO::Socket::INET->new( LocalPort => 1234, Listen => 1 );
 
- my $handle = IO::Async::Handle->new(
-    handle => $socket,
+   my $handle = IO::Async::Handle->new(
+      handle => $socket,
 
-    on_read_ready  => sub {
-       my $new_client = $socket->accept; 
-       ...
-    },
- );
+      on_read_ready  => sub {
+         my $new_client = $socket->accept; 
+         ...
+      },
+   );
 
- $loop->add( $handle );
+   $loop->add( $handle );
 
 For most other uses with sockets, pipes or other filehandles that carry a byte
 stream, the L<IO::Async::Stream> class is likely to be more suitable. For
@@ -385,7 +385,7 @@ sub set_handles
 
 Shortcut for
 
- $handle->configure( handle => $fh )
+   $handle->configure( handle => $fh )
 
 =cut
 

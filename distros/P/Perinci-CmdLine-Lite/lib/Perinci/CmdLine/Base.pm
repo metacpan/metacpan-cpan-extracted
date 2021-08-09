@@ -1,9 +1,10 @@
+## no critic: ControlStructures::ProhibitUnreachableCode
 package Perinci::CmdLine::Base;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-11'; # DATE
+our $DATE = '2021-08-06'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.906'; # VERSION
+our $VERSION = '1.907'; # VERSION
 
 use 5.010001;
 use strict;
@@ -97,8 +98,8 @@ has cleanser => (
     is => 'rw',
     lazy => 1,
     default => sub {
-        require Data::Clean::JSON;
-        Data::Clean::JSON->get_cleanser;
+        require Data::Clean::ForJSON;
+        Data::Clean::ForJSON->get_cleanser;
     },
 );
 has use_cleanser => (is=>'rw', default=>1);
@@ -1892,6 +1893,28 @@ sub display_result {
 
 sub run {
     my ($self) = @_;
+
+  DEBUG_COMPLETION:
+    {
+        last; # disabled
+        last unless $ENV{PERINCI_CMDLINE_DEBUG_COMPLETION};
+        no warnings;
+        open my $fh, ">>", ($ENV{PERINCI_CMDLINE_DEBUG_COMPLETION_FILE} // "/tmp/pericmd-completion.log")
+            or do { warn "Can't open completion log file, skipped: $!"; last };
+        print $fh sprintf(
+            "[%s] [prog %s] [pid %d] [uid %d] COMP_LINE=<%s> (%d char(s)) COMP_POINT=<%s>\n",
+            scalar(localtime),
+            $0,
+            $$,
+            $>,
+            $ENV{COMP_LINE},
+            length($ENV{COMP_LINE}),
+            $ENV{COMP_POINT},
+        );
+        print $fh join("", map {"  $_=$ENV{$_}\n"} sort keys %ENV);
+        close $fh;
+    }
+
     log_trace("[pericmd] -> run(), \@ARGV=%s", \@ARGV);
 
     my $co = $self->common_opts;
@@ -2131,7 +2154,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.906 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2021-07-11.
+This document describes version 1.907 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2021-08-06.
 
 =head1 DESCRIPTION
 
@@ -3063,13 +3086,13 @@ directory entry.
 =head2 cleanser => obj
 
 Object to cleanse result for JSON output. By default this is an instance of
-L<Data::Clean::JSON> and should not be set to other value in most cases.
+L<Data::Clean::ForJSON> and should not be set to other value in most cases.
 
 =head2 use_cleanser => bool (default: 1)
 
 When a function returns result, and the user wants to display the result as
-JSON, the result might need to be cleansed first (using L<Data::Clean::JSON> by
-default) before it can be encoded to JSON, for example it might contain Perl
+JSON, the result might need to be cleansed first (using L<Data::Clean::ForJSON>
+by default) before it can be encoded to JSON, for example it might contain Perl
 objects or scalar references or other stuffs. If you are sure that your function
 does not produce those kinds of data, you can set this to false to produce a
 more lightweight script.
@@ -3207,7 +3230,7 @@ Output directory must already exist, or Perinci::CmdLine will display a warning
 and then skip saving output.
 
 Data that is not representable as JSON will be cleansed using
-L<Data::Clean::JSON>.
+L<Data::Clean::ForJSON>.
 
 Streaming output will not be saved appropriately, because streaming output
 contains coderef that will be called repeatedly during the normal displaying of

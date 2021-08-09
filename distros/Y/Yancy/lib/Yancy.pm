@@ -1,5 +1,5 @@
 package Yancy;
-our $VERSION = '1.074';
+our $VERSION = '1.075';
 # ABSTRACT: The Best Web Framework Deserves the Best CMS
 
 # "Mr. Fry: Son, your name is Yancy, just like me and my grandfather and
@@ -51,7 +51,7 @@ our $VERSION = '1.074';
 #pod =back
 #pod
 #pod If you're familiar with developing Mojolicious applications, you can start
-#pod from the app skeleton at L<https://github.com/preaction/Yancy/eg/skeleton>.
+#pod from the app skeleton at L<https://github.com/preaction/Yancy/tree/master/eg/skeleton>.
 #pod
 #pod =for comment XXX: Create `yancy generate app` and `yancy generate lite-app` commands
 #pod
@@ -158,7 +158,7 @@ sub startup {
         # trigger a re-read of the schema.
         my ( $backend_type ) = ( lc ref $app->yancy->backend ) =~ m{::([^:]+)$};
         if ( my $sql = data_section __PACKAGE__, "migrations.yancy_logins.$backend_type.sql" ) {
-            my $migrations = (ref $app->yancy->backend->mojodb->migrations)->new( $backend_type => $app->yancy->backend->mojodb );
+            my $migrations = (ref $app->yancy->backend->driver->migrations)->new( $backend_type => $app->yancy->backend->driver );
             $migrations->name( 'yancy_logins' )->from_string( $sql )->migrate;
             for my $table ( qw( yancy_logins yancy_login_roles ) ) {
                 my $schema = $app->yancy->backend->read_schema( $table );
@@ -203,7 +203,7 @@ Yancy - The Best Web Framework Deserves the Best CMS
 
 =head1 VERSION
 
-version 1.074
+version 1.075
 
 =head1 DESCRIPTION
 
@@ -246,7 +246,7 @@ web application. Apps that inherit from Yancy get these features out-of-the-box:
 =back
 
 If you're familiar with developing Mojolicious applications, you can start
-from the app skeleton at L<https://github.com/preaction/Yancy/eg/skeleton>.
+from the app skeleton at L<https://github.com/preaction/Yancy/tree/master/eg/skeleton>.
 
 =for comment XXX: Create `yancy generate app` and `yancy generate lite-app` commands
 

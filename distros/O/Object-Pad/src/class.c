@@ -1,8 +1,14 @@
+#define PERL_NO_GET_CONTEXT
+
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
 
 #include "object_pad.h"
+#include "class.h"
+#include "slot.h"
+
+#undef register_class_attribute
 
 #include "perl-backcompat.c.inc"
 #include "perl-additions.c.inc"
@@ -10,7 +16,96 @@
 /* Empty MGVTBL simply for locating instance slots AV */
 static MGVTBL vtbl_slotsav = {};
 
-SV *ObjectPad_obj_get_slotsav(pTHX_ SV *self, enum ReprType repr, bool create)
+typedef struct ClassAttributeRegistration ClassAttributeRegistration;
+
+struct ClassAttributeRegistration {
+  ClassAttributeRegistration *next;
+
+  const char *name;
+  STRLEN permit_hintkeylen;
+
+  const struct ClassHookFuncs *funcs;
+};
+
+static ClassAttributeRegistration *classattrs = NULL;
+
+static void register_class_attribute(const char *name, const struct ClassHookFuncs *funcs)
+{
+  ClassAttributeRegistration *reg;
+  Newx(reg, 1, struct ClassAttributeRegistration);
+
+  reg->name = name;
+  reg->funcs = funcs;
+
+  if(funcs->permit_hintkey)
+    reg->permit_hintkeylen = strlen(funcs->permit_hintkey);
+  else
+    reg->permit_hintkeylen = 0;
+
+  reg->next  = classattrs;
+  classattrs = reg;
+}
+
+void ObjectPad_register_class_attribute(pTHX_ const char *name, const struct ClassHookFuncs *funcs)
+{
+  if(funcs->ver != OBJECTPAD_ABIVERSION)
+    croak("Mismatch in third-party class attribute ABI version field: attribute supplies %d, module wants %d\n",
+        funcs->ver, OBJECTPAD_ABIVERSION);
+
+  if(!name || !(name[0] >= 'A' && name[0] <= 'Z'))
+    croak("Third-party class attribute names must begin with a capital letter");
+
+  if(!funcs->permit_hintkey)
+    croak("Third-party class attributes require a permit hinthash key");
+
+  register_class_attribute(name, funcs);
+}
+
+void ObjectPad_mop_class_apply_attribute(pTHX_ ClassMeta *classmeta, const char *name, SV *value)
+{
+  HV *hints = GvHV(PL_hintgv);
+
+  if(value && (!SvPOK(value) || !SvCUR(value)))
+    value = NULL;
+
+  ClassAttributeRegistration *reg;
+  for(reg = classattrs; reg; reg = reg->next) {
+    if(!strEQ(name, reg->name))
+      continue;
+
+    if(reg->funcs->permit_hintkey &&
+        (!hints || !hv_fetch(hints, reg->funcs->permit_hintkey, reg->permit_hintkeylen, 0)))
+      continue;
+
+    if((reg->funcs->flags & OBJECTPAD_FLAG_ATTR_NO_VALUE) && value)
+      croak("Attribute :%s does not permit a value", name);
+    if((reg->funcs->flags & OBJECTPAD_FLAG_ATTR_MUST_VALUE) && !value)
+      croak("Attribute :%s requires a value", name);
+
+    if(reg->funcs->apply)
+      if(!(*reg->funcs->apply)(aTHX_ classmeta, value))
+        return;
+
+    if(!classmeta->hooks)
+      classmeta->hooks = newAV();
+
+    struct ClassHook *hook;
+    Newx(hook, 1, struct ClassHook);
+
+    hook->funcs = reg->funcs;
+    hook->hookdata = value;
+
+    av_push(classmeta->hooks, (SV *)hook);
+
+    return;
+  }
+
+  croak("Unrecognised class attribute :%s", name);
+}
+
+/* TODO: get attribute */
+
+SV *ObjectPad_get_obj_slotsav(pTHX_ SV *self, enum ReprType repr, bool create)
 {
   SV *rv = SvRV(self);
 
@@ -170,6 +265,8 @@ SlotMeta *ObjectPad_mop_class_add_slot(pTHX_ ClassMeta *meta, SV *slotname)
   av_push(slots, (SV *)slotmeta);
   meta->next_slotix++;
 
+  MOP_CLASS_RUN_HOOKS(meta, post_add_slot, slotmeta);
+
   return slotmeta;
 }
 
@@ -192,7 +289,8 @@ void ObjectPad_mop_class_add_ADJUST(pTHX_ ClassMeta *meta, CV *cv)
   av_push(meta->adjustblocks, (SV *)cv);
 }
 
-static bool mop_class_implements_role(ClassMeta *classmeta, ClassMeta *rolemeta)
+#define mop_class_implements_role(classmeta, rolemeta)  S_mop_class_implements_role(aTHX_ classmeta, rolemeta)
+static bool S_mop_class_implements_role(pTHX_ ClassMeta *classmeta, ClassMeta *rolemeta)
 {
   U32 i, n = av_count(classmeta->roles);
   RoleEmbedding **arr = (RoleEmbedding **)AvARRAY(classmeta->roles);
@@ -291,7 +389,8 @@ void ObjectPad_mop_class_compose_role(pTHX_ ClassMeta *classmeta, ClassMeta *rol
   }
 }
 
-void ObjectPad_mop_class_apply_role(pTHX_ RoleEmbedding *embedding)
+#define mop_class_apply_role(embedding)  S_mop_class_apply_role(aTHX_ embedding)
+static void S_mop_class_apply_role(pTHX_ RoleEmbedding *embedding)
 {
   ClassMeta *classmeta = embedding->classmeta;
   ClassMeta *rolemeta  = embedding->rolemeta;
@@ -1086,6 +1185,7 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *su
   meta->role_is_invokable = false;
   meta->strict_params = false;
   meta->start_slotix = 0;
+  meta->hooks   = NULL;
   meta->slots   = newAV();
   meta->methods = newAV();
   meta->parammap = NULL;
@@ -1244,4 +1344,84 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *su
   }
 
   return meta;
+}
+
+/*******************
+ * Attribute hooks *
+ *******************/
+
+/* :repr */
+
+static bool classhook_repr_apply(pTHX_ ClassMeta *classmeta, SV *value)
+{
+  char *val = SvPV_nolen(value); /* all comparisons are ASCII */
+
+  if(strEQ(val, "native")) {
+    if(classmeta->foreign_new)
+      croak("Cannot switch a subclass of a foreign superclass type to :repr(native)");
+    classmeta->repr = REPR_NATIVE;
+  }
+  else if(strEQ(val, "HASH"))
+    classmeta->repr = REPR_HASH;
+  else if(strEQ(val, "magic")) {
+    if(!classmeta->foreign_new)
+      croak("Cannot switch to :repr(magic) without a foreign superclass");
+    classmeta->repr = REPR_MAGIC;
+  }
+  else if(strEQ(val, "default") || strEQ(val, "autoselect"))
+    classmeta->repr = REPR_AUTOSELECT;
+  else
+    croak("Unrecognised class representation type %" SVf, SVfARG(value));
+
+  return FALSE;
+}
+
+static const struct ClassHookFuncs classhooks_repr = {
+  .flags = OBJECTPAD_FLAG_ATTR_MUST_VALUE,
+  .apply = &classhook_repr_apply,
+};
+
+/* :compat */
+
+static bool classhook_compat_apply(pTHX_ ClassMeta *classmeta, SV *value)
+{
+  if(strEQ(SvPV_nolen(value), "invokable")) {
+    if(classmeta->type != METATYPE_ROLE)
+      croak(":compat(invokable) only applies to a role");
+
+    classmeta->role_is_invokable = true;
+  }
+  else
+    croak("Unrecognised class compatibility argument %" SVf, SVfARG(value));
+
+  return FALSE;
+}
+
+static const struct ClassHookFuncs classhooks_compat = {
+  .flags = OBJECTPAD_FLAG_ATTR_MUST_VALUE,
+  .apply = &classhook_compat_apply,
+};
+
+/* :strict */
+
+static bool classhook_strict_apply(pTHX_ ClassMeta *classmeta, SV *value)
+{
+  if(strEQ(SvPV_nolen(value), "params"))
+    classmeta->strict_params = TRUE;
+  else
+    croak("Unrecognised class strictness type %" SVf, SVfARG(value));
+
+  return FALSE;
+}
+
+static const struct ClassHookFuncs classhooks_strict = {
+  .flags = OBJECTPAD_FLAG_ATTR_MUST_VALUE,
+  .apply = &classhook_strict_apply,
+};
+
+void ObjectPad__boot_classes(void)
+{
+  register_class_attribute("repr", &classhooks_repr);
+  register_class_attribute("compat", &classhooks_compat);
+  register_class_attribute("strict", &classhooks_strict);
 }

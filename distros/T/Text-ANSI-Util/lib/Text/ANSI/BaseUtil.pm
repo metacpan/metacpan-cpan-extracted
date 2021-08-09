@@ -1,7 +1,7 @@
 package Text::ANSI::BaseUtil;
 
-our $DATE = '2021-01-23'; # DATE
-our $VERSION = '0.231'; # VERSION
+our $DATE = '2021-04-14'; # DATE
+our $VERSION = '0.232'; # VERSION
 
 use 5.010001;
 use strict;
@@ -837,7 +837,7 @@ Text::ANSI::BaseUtil - Base for Text::ANSI::{Util,WideUtil}
 
 =head1 VERSION
 
-This document describes version 0.231 of Text::ANSI::BaseUtil (from Perl distribution Text-ANSI-Util), released on 2021-01-23.
+This document describes version 0.232 of Text::ANSI::BaseUtil (from Perl distribution Text-ANSI-Util), released on 2021-04-14.
 
 =for Pod::Coverage .*
 

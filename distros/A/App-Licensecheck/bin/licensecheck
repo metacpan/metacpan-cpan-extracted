@@ -41,11 +41,11 @@ licensecheck - simple license checker for source files
 
 =head1 VERSION
 
-Version v3.2.5
+Version v3.2.6
 
 =cut
 
-our $VERSION = version->declare('v3.2.5');
+our $VERSION = version->declare('v3.2.6');
 
 my $progname = path($0)->basename;
 
@@ -521,7 +521,7 @@ Specific to Debian packages.
 
 Written in Python.
 
-)item L<Licensee|http://ben.balter.com/licensee/>
+=item L<Licensee|http://ben.balter.com/licensee/>
 
 Written in Ruby.
 
@@ -561,9 +561,9 @@ originally introduced by Stefan Westerfeld C<< <stefan@space.twc.de> >>.
 
   Copyright © 2012 Francesco Poli
 
-  Copyright © 2016-2020 Jonas Smedegaard
+  Copyright © 2016-2021 Jonas Smedegaard
 
-  Copyright © 2017-2020 Purism SPC
+  Copyright © 2017-2021 Purism SPC
 
 This program is free software:
 you can redistribute it and/or modify it

@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown",
       "open_source"
@@ -39,8 +39,8 @@
             "Data::Dumper" : "0",
             "PadWalker" : "0",
             "Probe::Perl" : "0",
-            "Test::More" : "0.88",
-            "tainting" : "0"
+            "Taint::Runtime" : "0",
+            "Test::More" : "0.88"
          }
       }
    },
@@ -53,6 +53,6 @@
          "url" : "https://github.com/DrHyde/perl-modules-Unix-Sudo"
       }
    },
-   "version" : "4",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "v4.567.89",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

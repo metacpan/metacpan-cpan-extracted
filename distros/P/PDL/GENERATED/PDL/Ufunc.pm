@@ -1321,7 +1321,7 @@ sub PDL::pct {
 	my($x, $p) = @_; 
     my $tmp;
 	$x->clump(-1)->pctover($p, $tmp=PDL->nullcreate($x));
-	return $tmp->at();
+	return $tmp;
 }
 
 
@@ -1347,7 +1347,7 @@ sub PDL::oddpct {
 	my($x, $p) = @_; 
     my $tmp;
 	$x->clump(-1)->oddpctover($p, $tmp=PDL->nullcreate($x));
-	return $tmp->at();
+	return $tmp;
 }
 
 
@@ -1375,7 +1375,7 @@ This routine handles bad values.
 sub PDL::avg {
 	my($x) = @_; my $tmp;
 	$x->clump(-1)->average( $tmp=PDL->nullcreate($x) );
-	return $tmp->at();
+	return $tmp;
 }
 
 
@@ -1402,7 +1402,7 @@ This routine handles bad values.
 sub PDL::sum {
 	my($x) = @_; my $tmp;
 	$x->clump(-1)->sumover( $tmp=PDL->nullcreate($x) );
-	return $tmp->at();
+	return $tmp;
 }
 
 
@@ -1429,7 +1429,7 @@ This routine handles bad values.
 sub PDL::prod {
 	my($x) = @_; my $tmp;
 	$x->clump(-1)->prodover( $tmp=PDL->nullcreate($x) );
-	return $tmp->at();
+	return $tmp;
 }
 
 
@@ -1456,7 +1456,7 @@ This routine handles bad values.
 sub PDL::davg {
 	my($x) = @_; my $tmp;
 	$x->clump(-1)->daverage( $tmp=PDL->nullcreate($x) );
-	return $tmp->at();
+	return $tmp;
 }
 
 
@@ -1483,7 +1483,7 @@ This routine handles bad values.
 sub PDL::dsum {
 	my($x) = @_; my $tmp;
 	$x->clump(-1)->dsumover( $tmp=PDL->nullcreate($x) );
-	return $tmp->at();
+	return $tmp;
 }
 
 
@@ -1510,7 +1510,7 @@ This routine handles bad values.
 sub PDL::dprod {
 	my($x) = @_; my $tmp;
 	$x->clump(-1)->dprodover( $tmp=PDL->nullcreate($x) );
-	return $tmp->at();
+	return $tmp;
 }
 
 
@@ -1537,7 +1537,7 @@ This routine handles bad values.
 sub PDL::zcheck {
 	my($x) = @_; my $tmp;
 	$x->clump(-1)->zcover( $tmp=PDL->nullcreate($x) );
-	return $tmp->at();
+	return $tmp;
 }
 
 
@@ -1564,7 +1564,7 @@ This routine handles bad values.
 sub PDL::and {
 	my($x) = @_; my $tmp;
 	$x->clump(-1)->andover( $tmp=PDL->nullcreate($x) );
-	return $tmp->at();
+	return $tmp;
 }
 
 
@@ -1591,7 +1591,7 @@ This routine handles bad values.
 sub PDL::band {
 	my($x) = @_; my $tmp;
 	$x->clump(-1)->bandover( $tmp=PDL->nullcreate($x) );
-	return $tmp->at();
+	return $tmp;
 }
 
 
@@ -1618,7 +1618,7 @@ This routine handles bad values.
 sub PDL::or {
 	my($x) = @_; my $tmp;
 	$x->clump(-1)->orover( $tmp=PDL->nullcreate($x) );
-	return $tmp->at();
+	return $tmp;
 }
 
 
@@ -1645,7 +1645,7 @@ This routine handles bad values.
 sub PDL::bor {
 	my($x) = @_; my $tmp;
 	$x->clump(-1)->borover( $tmp=PDL->nullcreate($x) );
-	return $tmp->at();
+	return $tmp;
 }
 
 
@@ -1672,7 +1672,7 @@ This routine handles bad values.
 sub PDL::min {
 	my($x) = @_; my $tmp;
 	$x->clump(-1)->minimum( $tmp=PDL->nullcreate($x) );
-	return $tmp->at();
+	return $tmp;
 }
 
 
@@ -1699,7 +1699,7 @@ This routine handles bad values.
 sub PDL::max {
 	my($x) = @_; my $tmp;
 	$x->clump(-1)->maximum( $tmp=PDL->nullcreate($x) );
-	return $tmp->at();
+	return $tmp;
 }
 
 
@@ -1726,7 +1726,7 @@ This routine handles bad values.
 sub PDL::median {
 	my($x) = @_; my $tmp;
 	$x->clump(-1)->medover( $tmp=PDL->nullcreate($x) );
-	return $tmp->at();
+	return $tmp;
 }
 
 
@@ -1753,7 +1753,7 @@ This routine handles bad values.
 sub PDL::mode {
 	my($x) = @_; my $tmp;
 	$x->clump(-1)->modeover( $tmp=PDL->nullcreate($x) );
-	return $tmp->at();
+	return $tmp;
 }
 
 
@@ -1780,7 +1780,7 @@ This routine handles bad values.
 sub PDL::oddmedian {
 	my($x) = @_; my $tmp;
 	$x->clump(-1)->oddmedover( $tmp=PDL->nullcreate($x) );
-	return $tmp->at();
+	return $tmp;
 }
 
 

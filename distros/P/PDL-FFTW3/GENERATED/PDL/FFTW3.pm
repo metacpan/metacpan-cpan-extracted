@@ -13,7 +13,7 @@ use DynaLoader;
 
 
 
-   our $VERSION = '0.15';
+   our $VERSION = '0.16';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::FFTW3 $VERSION;
@@ -622,9 +622,11 @@ use warnings;
 
 use PDL::Types;
 use List::Util 'reduce';
+use threads::shared;
 
-# when I compute an FFTW plan, it goes here
-my %existingPlans;
+# When I compute an FFTW plan, it goes here.
+# This is :shared so that it can be used with Perl threads.
+my %existingPlans :shared;
 
 # these are for the unit tests
 our $_Nplans = 0;
@@ -1003,6 +1005,7 @@ sub getPlan
                     @dims);
   if ( !exists $existingPlans{$planID} )
   {
+    lock(%existingPlans);
     $existingPlans{$planID} = compute_plan( \@dims, $do_double_precision, $is_real_fft, $do_inverse_fft,
                                             $in, $out, $in_alignment, $out_alignment );
     $_Nplans++;

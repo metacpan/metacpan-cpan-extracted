@@ -28,9 +28,9 @@ PDL::Core::Dev::loadmod_Types();
 # version 13 for complex data types (native complex support)
 # version 14: NaN support for native complex, per-PDL badval on
 # version 15: threadid, ndims become PDL_Indx
-# FOR NEXT VERSION DELETE .tmp AND RENAME pdl_barf/pdl_warn/pdlnew WITHOUT pdl_?
+# version 16: zap tmp, flushcache, NaN_*, qsort_ for complex, add_deletedata_magic
 use vars qw( $pdl_core_version );
-$pdl_core_version = 15;
+$pdl_core_version = 16;
 
 # List explicitly here the variables you want Configure to
 # generate.  Metaconfig only looks for shell variables, so you
@@ -98,23 +98,6 @@ print OUT <<'!NO!SUBS!';
 
 #define BIGGESTOF(a,b) ( a->nvals>b->nvals ? a->nvals : b->nvals )
 #define SVavref(x) (SvROK(x) && SvTYPE(SvRV(x))==SVt_PVAV)
-
-/* Create portable NaN's with the NaN_float and NaN_double macros.
- * The end values are 7f to turn off sign bit to avoid printing "-NaN".
- * This produces QNaN's or quiet nan's on architectures that support it.
- *
- * The below uses IEEE-754, so it should be portable.  Also note the symmetry
- * which makes the bigendian vs little-endian issue moot.  If platforms should
- * arise which require further consideration, use the pdl function,
- * PDL::Core::Dev::isbigendian() which returns a boolean value (a false value
- * garantees little-endian), and #ifdef's for exotic architectures.  You'll be
- * hard pressed to find an architecture that doesn't support ieee-754 but does
- * support NaN.  See http://en.wikipedia.org/wiki/NaN to understand why
- * this works. */
-static const union {unsigned char c[4]; float f;}
-   union_nan_float = {{0x7f, 0xff, 0xff, 0x7f}};
-static const union {unsigned char c[8]; double d;}
-   union_nan_double = {{0x7f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f}};
 
 /*  Use our own barf and our own warn.
  *  We defer barf (and warn) handling until after multi-threaded (i.e pthreading)
@@ -241,14 +224,6 @@ void pdl_trans_changed(pdl_trans *trans,int what);
 void pdl_set_trans_childtrans(pdl *it, pdl_trans *trans, PDL_Indx nth);
 void pdl_set_trans_parenttrans(pdl *it, pdl_trans *trans, PDL_Indx nth);
 
-/* pdlhash.c */
-
-pdl*    pdl_getcache( HV* hash );       /* Retrieve address of $$x{PDL} */
-pdl*    pdl_fillcache( HV* hash, SV* ref);       /* Fill/create $$x{PDL} cache */
-void    pdl_fillcache_partial( HV *hash, pdl *thepdl ) ;
-SV*     pdl_getKey( HV* hash, char* key );  /* Get $$x{Key} SV* with deref */
-void pdl_flushcache( pdl *thepdl );	     /* flush cache */
-
 /* pdlconv.c */
 
 void pdl_writebackdata_vaffine(pdl *it);
@@ -287,7 +262,6 @@ struct Core {
     pdl*   (*SvPDLV)      ( SV*  );
     void   (*SetSV_PDL)   ( SV *sv, pdl *it );
     pdl*   (*pdlnew)      ( );
-    pdl*   (*tmp)         ( );
     pdl*   (*create)      (int type);
     void   (*destroy)     (pdl *it);
     pdl*   (*null)        ();
@@ -303,7 +277,6 @@ struct Core {
                             PDL_Indx ndims );
     void   (*grow)        ( pdl* a, PDL_Indx newsize); /* Change pdl 'Data' size */
     PDL_Anyval (*at0)     ( pdl* x );
-    void (*flushcache)( pdl *thepdl );	     /* flush cache */
     void (*reallocdims) ( pdl *it,PDL_Indx ndims );  /* reallocate dims and incs */
     void (*reallocthreadids) ( pdl *it,PDL_Indx ndims );
     void (*resize_defaultincs) ( pdl *it );     /* Make incs out of dims */
@@ -318,8 +291,6 @@ int (*iterthreadloop)(pdl_thread *thread, PDL_Indx which);
 void (*freethreadloop)(pdl_thread *thread);
 void (*thread_create_parameter)(pdl_thread *thread,PDL_Indx j,PDL_Indx *dims,
 				int temp);
-void (*add_deletedata_magic) (pdl *it,void (*func)(pdl *, Size_t param), Size_t param); /* Automagic destructor */
-                             /* This needs to be fixed to work correctly for File::Map implementation */
 
 /* XXX NOT YET IMPLEMENTED */
 void (*setdims_careful)(pdl *pdl);
@@ -354,16 +325,11 @@ void (*make_physvaffine)(pdl *it);
 void (*allocdata) (pdl *it);
 PDL_Indx (*safe_indterm)(PDL_Indx dsz, PDL_Indx at, char *file, int lineno);
 
-float NaN_float;
-double NaN_double;
-complex float NaN_cfloat;
-complex double NaN_cdouble;
-
 !NO!SUBS!
 
 # set up the qsort routines
 
-for my $t(PDL::Types::types()) {
+for my $t(grep $_->real, PDL::Types::types()) {
    my ($ctype, $ppsym) = map $t->$_, qw(ctype ppsym);
    print OUT <<EOF;
 void (*qsort_$ppsym) ($ctype *xx, PDL_Indx a, PDL_Indx b );

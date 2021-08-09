@@ -1,3 +1,6 @@
+1.04 2021-08-09
+	- Fix operation without -d option
+	
 1.03 2021-02-13
 	- Fix metadata
 	

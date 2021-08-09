@@ -15,70 +15,7 @@ use Fcntl qw(:seek);
 use Encode;
 use Array::IntSpan;
 use Regexp::Pattern::License 3.4.0;
-use Regexp::Pattern 0.2.12 (
-	're',
-	'License::*' => (
-		engine            => 'RE2',
-		subject           => 'trait',
-		-prefix           => 'EXCEPTION_',
-		-has_tag_matching => '^type:trait:exception(?:\z|:)',
-	),
-	'License::*' => (
-		engine              => 'RE2',
-		capture             => 'named',
-		subject             => 'trait',
-		-prefix             => 'TRAIT_',
-		-has_tag_matching   => '^type:trait(?:\z|:)',
-		-lacks_tag_matching => '^type:trait:exception(?:\z|:)',
-	),
-	'License::version' => (
-		engine     => 'RE2',
-		capture    => 'named',
-		subject    => 'trait',
-		anchorleft => 1,
-		-prefix    => 'ANCHORLEFT_NAMED_',
-	),
-	'License::version_later' => (
-		engine     => 'RE2',
-		capture    => 'named',
-		subject    => 'trait',
-		anchorleft => 1,
-		-prefix    => 'ANCHORLEFT_NAMED_',
-	),
-	'License::licensed_under' => (
-		subject => 'trait',
-		-prefix => 'LOCAL_TRAIT_',
-	),
-	'License::version' => (
-		capture => 'numbered',
-		subject => 'trait',
-		-prefix => 'LOCAL_TRAIT_KEEP_',
-	),
-	'License::version_numberstring' => (
-		capture => 'numbered',
-		subject => 'trait',
-		-prefix => 'LOCAL_TRAIT_KEEP_',
-	),
-	'License::*' => (
-		engine              => 'RE2',
-		subject             => 'name',
-		-prefix             => 'NAME_',
-		anchorleft          => 1,
-		-lacks_tag_matching => '^type:trait(?:\z|:)',
-	),
-	'License::*' => (
-		engine              => 'RE2',
-		subject             => 'grant',
-		-prefix             => 'GRANT_',
-		-lacks_tag_matching => '^type:trait(?:\z|:)',
-	),
-	'License::*' => (
-		engine              => 'RE2',
-		subject             => 'license',
-		-prefix             => 'LICENSE_',
-		-lacks_tag_matching => '^type:trait(?:\z|:)',
-	),
-);
+use Regexp::Pattern 0.2.12;
 use String::Copyright 0.003 {
 	format => sub { join ' ', $_->[0] || (), $_->[1] || () }
 };
@@ -182,11 +119,11 @@ App::Licensecheck - functions for a simple license checker for source files
 
 =head1 VERSION
 
-Version v3.2.5
+Version v3.2.6
 
 =cut
 
-our $VERSION = version->declare('v3.2.5');
+our $VERSION = version->declare('v3.2.6');
 
 =head1 SYNOPSIS
 
@@ -205,12 +142,6 @@ to check for licenses of source files.
 See the script for casual usage.
 
 =cut
-
-my %L;
-
-my @RE_EXCEPTION = sort map /^EXCEPTION_(.*)/, keys(%RE);
-my @RE_LICENSE   = sort map /^LICENSE_(.*)/,   keys(%RE);
-my @RE_NAME      = sort map /^NAME_(.*)/,      keys(%RE);
 
 my $default_check_regex = q!
 	/[\w-]+$ # executable scripts or README like file
@@ -349,16 +280,34 @@ sub list_licenses
 {
 	my ($self) = @_;
 
-	my %L = $self->licensepatterns;
+	my %names;
+	for my $key ( keys %Regexp::Pattern::License::RE ) {
+		for ( keys %{ $Regexp::Pattern::License::RE{$key} } ) {
+			my @attr = split /[.]/;
+			next unless $attr[0] eq 'name';
+			my %attr = @attr[ 2 .. $#attr ];
 
-	print "$_\n" for sort map { $L{name}{$_} } @RE_LICENSE;
+			# TODO: drop version check when R::P::License v3.8.1 is required
+			for (qw(until version)) {
+				next if exists $attr{$_};
+			}
+			for my $org ( @{ $self->shortname_scheme } ) {
+				if ( exists $attr{$org} ) {
+					$names{$key} //= $attr{$org};
+					next KEY;
+				}
+			}
+		}
+		$names{$key} //= $Regexp::Pattern::License::RE{$key}{name} || $key;
+	}
+
+	print "$_\n" for sort { lc $a cmp lc $b } values %names;
 }
 
 sub list_naming_schemes
 {
 	my ($self) = @_;
 
-	my %L     = $self->licensepatterns;
 	my $_prop = '(?:[a-z][a-z0-9_]*)';
 	my $_any  = '[a-z0-9_.()]';
 
@@ -640,37 +589,106 @@ sub best_value
 	return $value;
 }
 
-sub licensepatterns
+my $type_re = qr/^type:([a-z][a-z0-9_]*)(?::([a-z][a-z0-9_]*))?/;
+
+our %RE;
+my ( %L, @RE_EXCEPTION, @RE_LICENSE, @RE_NAME );
+
+sub init_licensepatterns
 {
 	my ($self) = @_;
 
 	# reuse if already resolved
-	return %L if %L;
+	return %L if exists $L{re_trait};
 
-	my %list;
+	Regexp::Pattern->import(
+		're',
+		'License::*' => (
+			engine            => 'RE2',
+			subject           => 'trait',
+			-prefix           => 'EXCEPTION_',
+			-has_tag_matching => '^type:trait:exception(?:\z|:)',
+		),
+		'License::*' => (
+			engine              => 'RE2',
+			capture             => 'named',
+			subject             => 'trait',
+			-prefix             => 'TRAIT_',
+			-has_tag_matching   => '^type:trait(?:\z|:)',
+			-lacks_tag_matching => '^type:trait:exception(?:\z|:)',
+		),
+		'License::version' => (
+			engine     => 'RE2',
+			capture    => 'named',
+			subject    => 'trait',
+			anchorleft => 1,
+			-prefix    => 'ANCHORLEFT_NAMED_',
+		),
+		'License::version_later' => (
+			engine     => 'RE2',
+			capture    => 'named',
+			subject    => 'trait',
+			anchorleft => 1,
+			-prefix    => 'ANCHORLEFT_NAMED_',
+		),
+		'License::licensed_under' => (
+			subject => 'trait',
+			-prefix => 'LOCAL_TRAIT_',
+		),
+		'License::version' => (
+			capture => 'numbered',
+			subject => 'trait',
+			-prefix => 'LOCAL_TRAIT_KEEP_',
+		),
+		'License::version_numberstring' => (
+			capture => 'numbered',
+			subject => 'trait',
+			-prefix => 'LOCAL_TRAIT_KEEP_',
+		),
+		'License::*' => (
+			engine              => 'RE2',
+			subject             => 'name',
+			-prefix             => 'NAME_',
+			anchorleft          => 1,
+			-lacks_tag_matching => '^type:trait(?:\z|:)',
+		),
+		'License::*' => (
+			engine              => 'RE2',
+			subject             => 'grant',
+			-prefix             => 'GRANT_',
+			-lacks_tag_matching => '^type:trait(?:\z|:)',
+		),
+		'License::*' => (
+			engine              => 'RE2',
+			subject             => 'license',
+			-prefix             => 'LICENSE_',
+			-lacks_tag_matching => '^type:trait(?:\z|:)',
+		),
+	);
+
+	@RE_EXCEPTION = sort map /^EXCEPTION_(.*)/, keys(%RE);
+	@RE_LICENSE   = sort map /^LICENSE_(.*)/,   keys(%RE);
+	@RE_NAME      = sort map /^NAME_(.*)/,      keys(%RE);
 
 	foreach my $key ( grep {/^[a-z]/} keys(%Regexp::Pattern::License::RE) ) {
 		my $val = $Regexp::Pattern::License::RE{$key};
-		$list{name}{$key} = $self->best_value( $val, 'name' ) || $key;
-		$list{caption}{$key}
+		$L{name}{$key} = $self->best_value( $val, 'name' ) || $key;
+		$L{caption}{$key}
 			= $self->best_value( $val, 'caption' ) || $val->{name} || $key;
 		foreach ( @{ $val->{tags} } ) {
-			/^(family|type):([a-z][a-z0-9_]*)(?::([a-z][a-z0-9_]*))?/;
-			$list{family}{$2}{$key} = 1
-				if ( $2 and $1 eq 'family' );
-			$list{type}{$2}{$key} = 1
-				if ( $2 and $1 eq 'type' );
-			if ( $3 and $1 eq 'type' and $2 eq 'singleversion' ) {
-				$list{series}{$key} = $3;
+			/$type_re/ or next;
+			$L{type}{$1}{$key} = 1;
+			if ( $2 and $1 eq 'singleversion' ) {
+				$L{series}{$key} = $2;
 			}
-			if ( $3 and $1 eq 'type' and $2 eq 'usage' ) {
-				$list{usage}{$key} = $3;
+			if ( $2 and $1 eq 'usage' ) {
+				$L{usage}{$key} = $2;
 			}
 		}
 		foreach my $subject (qw(grant_license name)) {
 			my $re = re( "License::$key", subject => $subject =~ tr/_/,/r )
 				or next;
-			$list{"re_$subject"}{$key} = ref($re) ? $re : qr/$re/;
+			$L{"re_$subject"}{$key} = ref($re) ? $re : qr/$re/;
 		}
 	}
 	foreach my $trait (
@@ -680,26 +698,23 @@ sub licensepatterns
 		)
 	{
 		my $re = re( "License::$trait", subject => 'trait' );
-		$list{re_trait}{$trait} = ref($re) ? $re : qr/$re/;
+		$L{re_trait}{$trait} = ref($re) ? $re : qr/$re/;
 	}
 
 	#<<<  do not let perltidy touch this (keep long regex on one line)
-	$list{re_grant_license}{local}{multi}{1} = qr/$RE{LOCAL_TRAIT_licensed_under}$list{re_trait}{any_of}(?:[^.]|\.\S)*$list{re_name}{lgpl}$RE{LOCAL_TRAIT_KEEP_version}?/i;
-	$list{re_grant_license}{local}{multi}{2} = qr/$RE{LOCAL_TRAIT_licensed_under}$list{re_trait}{any_of}(?:[^.]|\.\S)*$list{re_name}{gpl}$RE{LOCAL_TRAIT_KEEP_version}?/i;
-	$list{re_grant_license}{local}{lgpl}{4} = qr/$RE{LOCAL_TRAIT_licensed_under}$RE{LOCAL_TRAIT_KEEP_version}? of $list{re_name}{lgpl}/i;
-	$list{re_grant_license}{local}{lgpl}{5} = qr/$RE{LOCAL_TRAIT_licensed_under}$list{re_name}{lgpl}\b[,;:]?(?: either)? ?$RE{LOCAL_TRAIT_KEEP_version_numberstring},? $list{re_trait}{or_at_option} $RE{LOCAL_TRAIT_KEEP_version_numberstring}/i;
-	$list{re_grant_license}{local}{gpl}{7} = qr/either $list{re_name}{gpl}$RE{LOCAL_TRAIT_KEEP_version}?(?: \((?:the )?"?GPL"?\))?, or $list{re_name}{lgpl}$RE{LOCAL_TRAIT_KEEP_version}?/i;
-	$list{re_grant_license}{local}{bsd}{1} = qr/THIS SOFTWARE IS PROVIDED (?:BY (?:\S+ ){1,15})?AS IS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY/;
-	$list{re_grant_license}{local}{apache}{1} = qr/$list{re_name}{apache}$RE{LOCAL_TRAIT_KEEP_version}?(?:(?: or)? [^ ,]*?apache[^ ,]*| \([^(),]+\))*,? or $list{re_name}{gpl}$RE{LOCAL_TRAIT_KEEP_version}?/i;
-	$list{re_grant_license}{local}{apache}{2} = qr/$list{re_name}{apache}$RE{LOCAL_TRAIT_KEEP_version}?(?:(?: or)? [^ ,]*?apache[^ ,]*| \([^(),]\))*,? or(?: the)? bsd(?:[ -](\d)-clause)?\b/i;
-	$list{re_grant_license}{local}{apache}{4} = qr/$list{re_name}{apache}$RE{LOCAL_TRAIT_KEEP_version}?(?:(?: or)? [^ ,]*?apache[^ ,]*| \([^(),]\))*,? or $list{re_name}{mit}\b/i;
-	$list{re_grant_license}{local}{fsful}{1} = qr/This (\w+)(?: (?:file|script))? is free software; $list{re_trait}{fsf_unlimited}/i;
-	$list{re_grant_license}{local}{fsfullr}{1} = qr/This (\w+)(?: (?:file|script))?  is free software; $list{re_trait}{fsf_unlimited_retention}/i;
-	$list{re_grant_license}{local}{trailing_space} = qr/\s+$/;
-	$list{re_grant_license}{local}{LEFTANCHOR_version_of} = qr/^ of /;
+	$L{re_grant_license}{local}{multi}{1} = qr/$RE{LOCAL_TRAIT_licensed_under}$L{re_trait}{any_of}(?:[^.]|\.\S)*$L{re_name}{lgpl}$RE{LOCAL_TRAIT_KEEP_version}?/i;
+	$L{re_grant_license}{local}{multi}{2} = qr/$RE{LOCAL_TRAIT_licensed_under}$L{re_trait}{any_of}(?:[^.]|\.\S)*$L{re_name}{gpl}$RE{LOCAL_TRAIT_KEEP_version}?/i;
+	$L{re_grant_license}{local}{lgpl}{5} = qr/$RE{LOCAL_TRAIT_licensed_under}$L{re_name}{lgpl}\b[,;:]?(?: either)? ?$RE{LOCAL_TRAIT_KEEP_version_numberstring},? $L{re_trait}{or_at_option} $RE{LOCAL_TRAIT_KEEP_version_numberstring}/i;
+	$L{re_grant_license}{local}{gpl}{7} = qr/either $L{re_name}{gpl}$RE{LOCAL_TRAIT_KEEP_version}?(?: \((?:the )?"?GPL"?\))?, or $L{re_name}{lgpl}$RE{LOCAL_TRAIT_KEEP_version}?/i;
+	$L{re_grant_license}{local}{bsd}{1} = qr/THIS SOFTWARE IS PROVIDED (?:BY (?:\S+ ){1,15})?AS IS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY/;
+	$L{re_grant_license}{local}{apache}{1} = qr/$L{re_name}{apache}$RE{LOCAL_TRAIT_KEEP_version}?(?:(?: or)? [^ ,]*?apache[^ ,]*| \([^(),]+\))*,? or $L{re_name}{gpl}$RE{LOCAL_TRAIT_KEEP_version}?/i;
+	$L{re_grant_license}{local}{apache}{2} = qr/$L{re_name}{apache}$RE{LOCAL_TRAIT_KEEP_version}?(?:(?: or)? [^ ,]*?apache[^ ,]*| \([^(),]\))*,? or(?: the)? bsd(?:[ -](\d)-clause)?\b/i;
+	$L{re_grant_license}{local}{apache}{4} = qr/$L{re_name}{apache}$RE{LOCAL_TRAIT_KEEP_version}?(?:(?: or)? [^ ,]*?apache[^ ,]*| \([^(),]\))*,? or $L{re_name}{mit}\b/i;
+	$L{re_grant_license}{local}{fsful}{1} = qr/This (\w+)(?: (?:file|script))? is free software; $L{re_trait}{fsf_unlimited}/i;
+	$L{re_grant_license}{local}{fsfullr}{1} = qr/This (\w+)(?: (?:file|script))?  is free software; $L{re_trait}{fsf_unlimited_retention}/i;
+	$L{re_grant_license}{local}{trailing_space} = qr/\s+$/;
+	$L{re_grant_license}{local}{LEFTANCHOR_version_of} = qr/^ of /;
 	#>>>
-
-	return %L = %list;
 }
 
 # license objects where atomic scan must always be applied
@@ -708,8 +723,7 @@ my %L_grant_stepwise_incomplete = (
 	# usage
 
 	# singleversion
-	apache_2   => 1,
-	cecill_2_1 => 1,
+	apache_2 => 1,
 
 	# versioned
 	gpl  => 1,
@@ -747,27 +761,29 @@ my %L_grant_atomic_incomplete = (
 my $skip_stepwise = 0;
 my $force_atomic  = 0;
 
+my $contains_bsd2_re = qr/^license:contains:license:bsd_2_clause/;
+my @L_contains_bsd   = grep {
+	$Regexp::Pattern::License::RE{$_}{tags}
+		and grep /$contains_bsd2_re/,
+		@{ $Regexp::Pattern::License::RE{$_}{tags} }
+} keys(%Regexp::Pattern::License::RE);
+
+my $id2patterns_re = qr/(.*)(?:_(\d+(?:\.\d+)*)(_or_later)?)?/;
+
 sub parse_license
 {
 	my ( $self, $licensetext, $path, $position ) = @_;
 
 	my $file = File [ $path, $licensetext ];
 
-	my %L = $self->licensepatterns;
+	$self->init_licensepatterns;
 
-	my @L_family_cc          = sort keys %{ $L{family}{cc} };
 	my @L_type_usage         = sort keys %{ $L{type}{usage} };
 	my @L_type_singleversion = sort keys %{ $L{type}{singleversion} };
 	my @L_type_versioned     = sort keys %{ $L{type}{versioned} };
 	my @L_type_unversioned   = sort keys %{ $L{type}{unversioned} };
 	my @L_type_combo         = sort keys %{ $L{type}{combo} };
 	my @L_type_group         = sort keys %{ $L{type}{group} };
-
-	my @L_contains_bsd = grep {
-		$Regexp::Pattern::License::RE{$_}{tags}
-			and grep /^license:contains:license:bsd_2_clause/,
-			@{ $Regexp::Pattern::License::RE{$_}{tags} }
-	} keys(%Regexp::Pattern::License::RE);
 
 	my $license = "";
 	my @spdx_gplver;
@@ -794,7 +810,7 @@ sub parse_license
 		return "${id}_$_";
 	};
 	my $id2patterns = sub {
-		return $_[0] =~ /(.*)(?:_(\d+(?:\.\d+)*)(_or_later)?)?/;
+		return $_[0] =~ /$id2patterns_re/;
 	};
 	my $gen_license = sub {
 		my ( $id, $v, $later, $id2, $v2, $later2 ) = @_;
@@ -1443,9 +1459,9 @@ originally introduced by Stefan Westerfeld C<< <stefan@space.twc.de> >>.
 
   Copyright © 2012 Francesco Poli
 
-  Copyright © 2016-2020 Jonas Smedegaard
+  Copyright © 2016-2021 Jonas Smedegaard
 
-  Copyright © 2017-2020 Purism SPC
+  Copyright © 2017-2021 Purism SPC
 
 This program is free software:
 you can redistribute it and/or modify it

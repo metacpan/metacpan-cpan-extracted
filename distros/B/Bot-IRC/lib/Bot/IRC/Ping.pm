@@ -4,7 +4,7 @@ package Bot::IRC::Ping;
 use 5.014;
 use exact;
 
-our $VERSION = '1.36'; # VERSION
+our $VERSION = '1.37'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -46,7 +46,7 @@ Bot::IRC::Ping - Bot::IRC ping the bot and check its health
 
 =head1 VERSION
 
-version 1.36
+version 1.37
 
 =head1 SYNOPSIS
 

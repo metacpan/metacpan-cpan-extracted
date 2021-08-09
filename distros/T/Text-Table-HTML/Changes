@@ -1,16 +1,23 @@
-0.003   2017-01-25 (PERLANCAR)
+0.004   2021-03-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Allow cell to be hashref containing keys like 'text', 'colspan'
+	  (optional), and 'rowspan' (optional), just like in
+	  Text::Table::More.
+
+
+0.003   2017-01-25  Released-By: PERLANCAR
 
 	- [dist][Bugfix] Don't comment-out 'use 5.010001' because we need
 	  state variable.
 
 
-0.002   2016-12-29 (PERLANCAR)
+0.002   2016-12-29  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [dist] Delete extraneous files.
 
 
-0.001   2016-12-29 (PERLANCAR)
+0.001   2016-12-29  Released-By: PERLANCAR
 
         - First release.

@@ -7,6 +7,7 @@ build_requires:
   Test::More: '0.88'
 configure_requires:
   Module::Build: '0.4004'
+  Object::Pad::ExtensionBuilder: '0.50'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -17,10 +18,10 @@ name: Object-Pad-SlotAttr-Final
 provides:
   Object::Pad::SlotAttr::Final:
     file: lib/Object/Pad/SlotAttr/Final.pm
-    version: '0.02'
+    version: '0.03'
 requires:
-  Object::Pad: '0.48'
+  Object::Pad: '0.50'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -38,7 +38,7 @@ use Safe;
 
 my $progname = basename($0);
 my $progdescr = "Notifies translationproject.org about new POT file";
-our $VERSION = "1.03";
+our $VERSION = "1.04";
 
 my $keep;          # Keep temporary directory on errors
 my $signature_file = "$ENV{HOME}/.signature"; # Signature file
@@ -123,13 +123,11 @@ sub download {
 
     my $dest = delete $opt{dest} || basename($url->path);
     my %args;
-    if ($verbose) {
-	if (ref($dest) eq '') {
-	    $args{':content_file'} = $dest;
-	    info("downloading $source to $wd/$dest");
-	} else {
-	    info("downloading $source");
-	}
+    if (ref($dest) eq '') {
+	$args{':content_file'} = $dest;
+	info("downloading $source to $wd/$dest") if $verbose;
+    } else {
+	info("downloading $source") if $verbose;
     }
 
     my $scheme = $url->scheme;
@@ -273,7 +271,7 @@ EOT
 # Returns a reference to a hash: header-name => value.
 sub po_header {
     my $name = shift;
-    print "READING $name\n";
+
     (my $h = Locale::PO->load_file_asarray($name)->[0]->msgstr)
 	=~ s/^"(.*)"$/$1/;
     my %ret;
@@ -335,7 +333,7 @@ sub read_signature {
     if (defined($signature_file)) {
 	if (open(my $fd, '<', $signature_file)) {
 	    local $/;
-	    my $sig = <$fd>;
+	    chomp(my $sig = <$fd>);
 	    close($fd);
 	    return $sig;
 	}
@@ -360,7 +358,7 @@ sub expand_template {
 		   $release_type
 		   $topdir
 		   $signature));
-    chomp(${$cpt->varglob('signature')} = read_signature);
+    ${$cpt->varglob('signature')} = read_signature;
 
     (my $tmpl = $template) =~ s/\@/\\\@/g;
     if ($cpt->reval("\$_ = qq{$tmpl}",1)) {

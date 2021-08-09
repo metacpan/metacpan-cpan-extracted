@@ -3,9 +3,9 @@ NAME
     PERLANCAR when you build your dists
 
 VERSION
-    This document describes version 0.604 of
+    This document describes version 0.605 of
     Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution
-    Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2021-06-04.
+    Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2021-08-09.
 
 SYNOPSIS
      # dist.ini
@@ -65,13 +65,11 @@ AUTHOR
 CONTRIBUTORS
     *   Alexandr Ciornii <alexchorny@gmail.com>
 
-    *   perlancar (@pc-office) <perlancar@gmail.com>
-
     *   Steven Haryanto (on Asus Zenbook) <stevenharyanto@gmail.com>
 
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015,
-    2014, 2013, 2012 by perlancar@cpan.org.
+    2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -1,8 +1,41 @@
-SYNOPSIS
+NAME
+    Carp::Always::DieOnly - Like Carp::Always, but only print stacktrace on
+    die()
 
+VERSION
+    This document describes version 0.020 of Carp::Always::DieOnly (from
+    Perl distribution Carp-Always-DieOnly), released on 2021-08-09.
+
+SYNOPSIS
      % perl -MCarp::Always::DieOnly script.pl
 
-SEE ALSO
+CONTRIBUTOR
+    Adriano Ferreira <a.r.ferreira@gmail.com>
 
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Carp-Always-DieOnly>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Carp-Always-DieOnly>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Carp-Always-DieOnly>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Carp::Always
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

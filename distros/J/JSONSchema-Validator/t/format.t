@@ -3,7 +3,11 @@
 use strict;
 use warnings;
 use utf8;
+use Test::More;
 
+use lib 't/lib';
+
+use Helper 'detect_warnings';
 use JSONSchema::Validator::Format qw/
     validate_uuid
     validate_date validate_time validate_date_time
@@ -19,8 +23,6 @@ use JSONSchema::Validator::Format qw/
     validate_iri validate_iri_reference
     validate_uri_template
 /;
-
-use Test::More;
 
 is validate_uuid('123e4567-e89b-12d3-a456-426652340001'), 1, 'uuid ok';
 is validate_uuid('123e4567-e89b-a2d3-a456-426652340001'), 1, 'uuid ok version a for future use';
@@ -325,4 +327,5 @@ is validate_idn_email('!#$%&`*+/=?^`{|}~@iana.org'), 1, 'idn-email ok atext asci
 is validate_idn_email('василий@петька.сергеевич'), 1, 'idn-email ok atext utf8';
 is validate_idn_email(' василий@петька.сергеевич'), 0, 'idn-email space at begin';
 
+ok detect_warnings() == 0, 'no warnings';
 done_testing;

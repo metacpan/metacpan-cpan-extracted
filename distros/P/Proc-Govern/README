@@ -2,8 +2,8 @@ NAME
     Proc::Govern - Run child process and govern its various aspects
 
 VERSION
-    This document describes version 0.211 of Proc::Govern (from Perl
-    distribution Proc-Govern), released on 2020-08-18.
+    This document describes version 0.212 of Proc::Govern (from Perl
+    distribution Proc-Govern), released on 2021-08-06.
 
 SYNOPSIS
     To use as Perl module:
@@ -33,6 +33,11 @@ SYNOPSIS
          },
          log_stdout => {                          # optional, passed to File::Write::Rotate
              dir       => '/var/log/myapp.out',
+             size      => '16M',
+             histories => 12,
+         },
+         log_combined => {                        # optional, passed to File::Write::Rotate
+             dir       => '/var/log/myapp',
              size      => '16M',
              histories => 12,
          },
@@ -95,7 +100,7 @@ DESCRIPTION
 
     Currently the following governing functionalities are available:
 
-    *   logging of STDOUT & STDERR output to an autorotated file
+    *   logging of STDOUT & STDERR (or both) output to an autorotated file
 
     *   execution time limit
 
@@ -198,7 +203,7 @@ FUNCTIONS
 
     *   load_check_every => *duration* (default: 10)
 
-        Frequency of load checking.
+        Frequency of load checking (in seconds).
 
     *   load_high_limit => *int|code*
 
@@ -226,6 +231,23 @@ FUNCTIONS
         system load is too high and resumed if system load returns to a
         lower limit.
 
+    *   log_combined => *hash*
+
+        Will be passed as arguments to `File::Write::Rotate`.
+
+        Specify logging for STDOUT and STDERR. Logging will be done using
+        File::Write::Rotate. Known hash keys: "dir" (STR, defaults to
+        "/var/log", directory, preferably absolute, where the log file(s)
+        will reside, should already exist and be writable, will be passed to
+        File::Write::Rotate's constructor), "size" (int, also passed to
+        File::Write::Rotate's constructor), "histories" (int, also passed to
+        File::Write::Rotate's constructor), "period" (str, also passed to
+        File::Write::Rotate's constructor).
+
+        Instead of this option, you can also use "log_stdout" and
+        "log_stderr" separately to log stdout and stderr to different
+        directory.
+
     *   log_stderr => *hash*
 
         Will be passed as arguments to `File::Write::Rotate`.
@@ -239,9 +261,24 @@ FUNCTIONS
         File::Write::Rotate's constructor), "period" (str, also passed to
         File::Write::Rotate's constructor).
 
+        Instead of this option, you can also use "log_combined" to log both
+        stdout and stderr to the same directory.
+
     *   log_stdout => *hash*
 
         Will be passed as arguments to `File::Write::Rotate`.
+
+        Specify logging for STDOUT. Logging will be done using
+        File::Write::Rotate. Known hash keys: "dir" (STR, defaults to
+        "/var/log", directory, preferably absolute, where the log file(s)
+        will reside, should already exist and be writable, will be passed to
+        File::Write::Rotate's constructor), "size" (int, also passed to
+        File::Write::Rotate's constructor), "histories" (int, also passed to
+        File::Write::Rotate's constructor), "period" (str, also passed to
+        File::Write::Rotate's constructor).
+
+        Instead of this option, you can also use "log_combined" to log both
+        stdout and stderr to the same directory.
 
     *   name => *str*
 
@@ -406,11 +443,16 @@ SEE ALSO
     into a single function wrapper.
 
 AUTHOR
-    perlancar <perlancar@cpan.org>
+    perlancar
+
+CONTRIBUTORS
+    *   perlancar <perlancar@cpan.org>
+
+    *   Steven Haryanto <sharyanto@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014,
-    2013, 2012 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015,
+    2014, 2013, 2012 by perlancar.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

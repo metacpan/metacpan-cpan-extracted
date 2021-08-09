@@ -161,7 +161,7 @@ SKIP: {
        'Allowed to construct a Socket without an on_recv handler' );
    ok( exception { $loop->add( $no_on_recv_socket ) },
        'Not allowed to add an on_recv-less Socket to a Loop' );
- }
+}
 
 # Subclass
 

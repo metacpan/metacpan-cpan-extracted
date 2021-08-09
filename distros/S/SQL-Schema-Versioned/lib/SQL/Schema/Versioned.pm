@@ -1,7 +1,9 @@
 package SQL::Schema::Versioned;
 
-our $DATE = '2019-01-13'; # DATE
-our $VERSION = '0.237'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-08-08'; # DATE
+our $DIST = 'SQL-Schema-Versioned'; # DIST
+our $VERSION = '0.239'; # VERSION
 
 use 5.010001;
 use strict;
@@ -275,7 +277,7 @@ _
     "x.perinci.sub.wrapper.disable_validate_args" => 1,
 };
 sub create_or_update_db_schema {
-    my %args = @_; no warnings ('void');require Scalar::Util::Numeric;my $arg_err; if (exists($args{'create_from_version'})) { ((defined($args{'create_from_version'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((Scalar::Util::Numeric::isint($args{'create_from_version'})) ? 1 : (($arg_err //= "Not of type integer"),0)); if ($arg_err) { return [400, "Invalid argument value for create_from_version: $arg_err"] } }no warnings ('void');require Scalar::Util;if (exists($args{'dbh'})) { ((defined($args{'dbh'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((Scalar::Util::blessed($args{'dbh'})) ? 1 : (($arg_err //= "Not of type object"),0)); if ($arg_err) { return [400, "Invalid argument value for dbh: $arg_err"] } }if (!exists($args{'dbh'})) { return [400, "Missing argument: dbh"] } no warnings ('void');if (exists($args{'spec'})) { ((defined($args{'spec'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((ref($args{'spec'}) eq 'HASH') ? 1 : (($arg_err //= "Not of type hash"),0)); if ($arg_err) { return [400, "Invalid argument value for spec: $arg_err"] } }if (!exists($args{'spec'})) { return [400, "Missing argument: spec"] } # VALIDATE_ARGS
+    my %args = @_; my $arg_err; { no warnings ('void');require Scalar::Util::Numeric;if (exists($args{'create_from_version'})) { ((defined($args{'create_from_version'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((Scalar::Util::Numeric::isint($args{'create_from_version'})) ? 1 : (($arg_err //= "Not of type integer"),0)); if ($arg_err) { return [400, "Invalid argument value for create_from_version: $arg_err"] } }no warnings ('void');require Scalar::Util;if (exists($args{'dbh'})) { ((defined($args{'dbh'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((Scalar::Util::blessed($args{'dbh'})) ? 1 : (($arg_err //= "Not of type object"),0)); if ($arg_err) { return [400, "Invalid argument value for dbh: $arg_err"] } }if (!exists($args{'dbh'})) { return [400, "Missing argument: dbh"] } no warnings ('void');if (exists($args{'spec'})) { ((defined($args{'spec'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((ref($args{'spec'}) eq 'HASH') ? 1 : (($arg_err //= "Not of type hash"),0)); if ($arg_err) { return [400, "Invalid argument value for spec: $arg_err"] } }if (!exists($args{'spec'})) { return [400, "Missing argument: spec"] } } # VALIDATE_ARGS
 
     my $spec   = $args{spec};
     my $dbh    = $args{dbh};
@@ -573,7 +575,7 @@ SQL::Schema::Versioned - Routine and convention to create/update your applicatio
 
 =head1 VERSION
 
-This document describes version 0.237 of SQL::Schema::Versioned (from Perl distribution SQL-Schema-Versioned), released on 2019-01-13.
+This document describes version 0.239 of SQL::Schema::Versioned (from Perl distribution SQL-Schema-Versioned), released on 2021-08-08.
 
 =head1 DESCRIPTION
 
@@ -582,7 +584,33 @@ routine at the start of your program/script, e.g.:
 
  use DBI;
  use SQL::Schema::Versioned qw(create_or_update_db_schema);
- my $spec = {...}; # the schema specification
+ my $spec = { # the schema specification
+    latest_v => 3,
+
+    install => [
+        "CREATE TABLE t1 (i INT)",
+        "CREATE TABLE t4 (i INT)",
+    ],
+
+    upgrade_to_v1 => [
+        "CREATE TABLE t1 (i INT)",
+        "CREATE TABLE t2 (i INT)",
+        "CREATE TABLE t3 (i INT)",
+    ],
+    upgrade_to_v2 => [
+        "CREATE TABLE t4 (i INT)",
+        "DROP TABLE t3",
+    ],
+    upgrade_to_v3 => [
+        "DROP TABLE t2",
+    ],
+
+    install_v2 => [
+        "CREATE TABLE t1 (i INT)",
+        "CREATE TABLE t2 (i INT)",
+        "CREATE TABLE t4 (i INT)",
+    ],
+ };
  my $dbh = DBI->connect(...);
  my $res = create_or_update_db_schema(dbh=>$dbh, spec=>$spec);
  die "Cannot run the application: cannot create/upgrade database schema: $res->[1]"
@@ -590,6 +618,9 @@ routine at the start of your program/script, e.g.:
 
 This way, your program automatically creates/updates database schema when run.
 Users need not know anything.
+
+See more elaborate examples in some applications that use this module like
+L<App::lcpan> or L<SQLite::Counter::Simple>.
 
 =head1 BEST PRACTICES
 
@@ -604,9 +635,9 @@ C<install_v1> so you can test migration from v1->v2, v2->v3, and so on.
 
 Usage:
 
- create_or_update_db_schema(%args) -> [status, msg, payload, meta]
+ create_or_update_db_schema(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Routine and convention to create/update your application's DB schema.
+Routine and convention to createE<sol>update your application's DB schema.
 
 With this routine (and some convention) you can easily create and update
 database schema for your application in a simple way using pure SQL.
@@ -809,16 +840,17 @@ Example:
      ],
  }
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -881,9 +913,15 @@ pretty awesome and something which I hope to use for more complex applications.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <sharyanto@cpan.org>
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2018, 2017, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

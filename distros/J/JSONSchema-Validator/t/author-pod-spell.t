@@ -33,6 +33,7 @@ Ibaev
 Ivan
 JSONPointer
 JSONSchema
+James
 Khozov
 OAS30
 OpenAPI
@@ -41,8 +42,10 @@ Stavrov
 URIResolver
 Util
 Validator
+Waters
 andrey
 dionys
+james
 lib
 logioniz
 tosha

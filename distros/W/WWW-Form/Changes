@@ -1,5 +1,11 @@
 Revision history for Perl extension WWW::Form.
 
+1.23    2021-08-06
+    - https://rt.cpan.org/Ticket/Display.html?id=138467
+        - "No $VERSION?"
+        - Convert dist.ini to @SHLOMIF
+        - Thanks to SREZIC.
+
 1.22    2021-08-04
     - Update $VERSION.
 
@@ -10,6 +16,6 @@ Revision history for Perl extension WWW::Form.
         - Thanks to PETDANCE .
 
 0.01    2003-04-22
-	- original version; created by h2xs 1.2 with options
-		-X -n WWW::Form
+    - original version; created by h2xs 1.2 with options
+        -X -n WWW::Form
 

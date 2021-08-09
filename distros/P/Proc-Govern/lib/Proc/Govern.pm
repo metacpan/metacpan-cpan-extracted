@@ -1,9 +1,9 @@
 package Proc::Govern;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-18'; # DATE
+our $DATE = '2021-08-06'; # DATE
 our $DIST = 'Proc-Govern'; # DIST
-our $VERSION = '0.211'; # VERSION
+our $VERSION = '0.212'; # VERSION
 
 use 5.010001;
 use strict;
@@ -148,7 +148,7 @@ _
         },
         load_check_every => {
             schema => [duration => {default => 10, 'x.perl.coerce_rules'=>['From_str::human']}],
-            summary => 'Frequency of load checking',
+            summary => 'Frequency of load checking (in seconds)',
             tags => ['category:load-control'],
         },
         load_high_limit => {
@@ -193,6 +193,20 @@ _
         },
         log_stdout => {
             summary => 'Will be passed as arguments to `File::Write::Rotate`',
+            description => <<'_',
+
+Specify logging for STDOUT. Logging will be done using <pm:File::Write::Rotate>.
+Known hash keys: `dir` (STR, defaults to `/var/log`, directory, preferably
+absolute, where the log file(s) will reside, should already exist and be
+writable, will be passed to <pm:File::Write::Rotate>'s constructor), `size`
+(int, also passed to <pm:File::Write::Rotate>'s constructor), `histories` (int,
+also passed to <pm:File::Write::Rotate>'s constructor), `period` (str, also
+passed to <pm:File::Write::Rotate>'s constructor).
+
+Instead of this option, you can also use `log_combined` to log both stdout and
+stderr to the same directory.
+
+_
             schema => ['hash*' => keys => {
                 dir       => 'str*',
                 size      => 'str*',
@@ -217,6 +231,9 @@ writable, will be passed to <pm:File::Write::Rotate>'s constructor), `size`
 also passed to <pm:File::Write::Rotate>'s constructor), `period` (str, also
 passed to <pm:File::Write::Rotate>'s constructor).
 
+Instead of this option, you can also use `log_combined` to log both stdout and
+stderr to the same directory.
+
 _
             schema => ['hash*' => keys => {
                 dir       => 'str*',
@@ -235,6 +252,30 @@ Can be used to turn off STDERR output. If you turn this off and set
 
 _
             tags => ['category:output-control'],
+        },
+        log_combined => {
+            summary => 'Will be passed as arguments to `File::Write::Rotate`',
+            description => <<'_',
+
+Specify logging for STDOUT and STDERR. Logging will be done using
+<pm:File::Write::Rotate>. Known hash keys: `dir` (STR, defaults to `/var/log`,
+directory, preferably absolute, where the log file(s) will reside, should
+already exist and be writable, will be passed to <pm:File::Write::Rotate>'s
+constructor), `size` (int, also passed to <pm:File::Write::Rotate>'s
+constructor), `histories` (int, also passed to <pm:File::Write::Rotate>'s
+constructor), `period` (str, also passed to <pm:File::Write::Rotate>'s
+constructor).
+
+Instead of this option, you can also use `log_stdout` and `log_stderr`
+separately to log stdout and stderr to different directory.
+
+_
+            schema => ['hash*' => keys => {
+                dir       => 'str*',
+                size      => 'str*',
+                histories => 'int*',
+            }],
+            tags => ['category:logging'],
         },
         timeout => {
             schema => ['duration*', 'x.perl.coerce_rules'=>['From_str::human']],
@@ -310,7 +351,11 @@ _
             [load_low_limit   => ['load_watch']], # XXX should only be allowed when load_watch is true
             [load_high_limit  => ['load_watch']], # XXX should only be allowed when load_watch is true
             [load_check_every => ['load_watch']], # XXX should only be allowed when load_watch is true
-         ],
+        ],
+        'choose_once&' => {
+            ['log_stdout', 'log_combined'],
+            ['log_stderr', 'log_combined'],
+        },
 
     },
     result_naked => 1,
@@ -337,7 +382,7 @@ sub govern_process {
             $args{euid} = $pw[2] if @pw;
         }
         $args{euid} =~ /\A[0-9]+\z/
-            or die "euid ('$args{euid}') has to be integer";
+            or die "govproc: euid ('$args{euid}') has to be integer";
     }
     if (defined $args{egid}) {
         # coerce from groupname
@@ -346,7 +391,7 @@ sub govern_process {
             $args{egid} = $gr[2] if @gr;
         }
         $args{egid} =~ /\A[0-9]+( [0-9]+)*\z/
-            or die "egid ('$args{egid}') has to be integer or ".
+            or die "govproc: egid ('$args{egid}') has to be integer or ".
             "integers separated by space";
     }
 
@@ -357,8 +402,8 @@ sub govern_process {
     my $exitcode;
 
     my $cmd = $args{command};
-    defined($cmd) or die "Please specify command";
-    ref($cmd) eq 'ARRAY' or die "Command must be arrayref of strings";
+    defined($cmd) or die "govproc: Please specify command";
+    ref($cmd) eq 'ARRAY' or die "govproc: Command must be arrayref of strings";
 
     my $name = $args{name};
     if (!defined($name)) {
@@ -366,8 +411,8 @@ sub govern_process {
         $name =~ s!.*/!!; $name =~ s/\W+/_/g;
         length($name) or $name = "prog";
     }
-    defined($name) or die "Please specify name";
-    $name =~ /\A\w+\z/ or die "Invalid name, please use letters/numbers only";
+    defined($name) or die "govproc: Please specify name";
+    $name =~ /\A\w+\z/ or die "govproc: Invalid name, please use letters/numbers only";
     $self->{name} = $name;
 
     if ($args{single_instance}) {
@@ -378,7 +423,7 @@ sub govern_process {
                     $args{on_multiple_instance} eq 'exit') {
                 $exitcode = 202; goto EXIT;
             } else {
-                warn "Program $name already running";
+                warn "govproc: Program $name already running";
                 $exitcode = 202; goto EXIT;
             }
         }
@@ -400,67 +445,87 @@ sub govern_process {
     my $out;
     my $last_out_time = time(); # for restarting after no output for some time
   LOG_STDOUT: {
-        if ($args{log_stdout}) {
-            require File::Write::Rotate;
-            my %fwrargs = %{$args{log_stdout}};
-            $fwrargs{dir}    //= "/var/log";
-            $fwrargs{prefix}   = $name;
-            my $fwr = File::Write::Rotate->new(%fwrargs);
-            $out = sub {
-                $last_out_time = time();
-                print STDOUT $_[0]//'' if $showout;
-                # XXX prefix with timestamp, how long script starts,
-                $_[0] =~ s/^/STDOUT: /mg;
-                $fwr->write($_[0]);
-            };
-        } else {
-            $out = sub {
-                $last_out_time = time();
-                print STDOUT $_[0]//'' if $showout;
-            };
-        }
+        last unless $args{log_stdout};
+
+        require File::Write::Rotate;
+        my %fwrargs = %{$args{log_stdout}};
+        $fwrargs{dir}    //= "/var/log";
+        $fwrargs{prefix}   = $name;
+        my $fwr = File::Write::Rotate->new(%fwrargs);
+        $out = sub {
+            $last_out_time = time();
+            print STDOUT $_[0]//'' if $showout;
+            # XXX prefix with timestamp, how long script starts,
+            $_[0] =~ s/^/STDOUT: /mg;
+            $fwr->write($_[0]);
+        };
     }
 
     my $err;
   LOG_STDERR: {
-        if ($args{log_stderr}) {
-            require File::Write::Rotate;
-            my %fwrargs = %{$args{log_stderr}};
-            $fwrargs{dir}    //= "/var/log";
-            $fwrargs{prefix}   = $name;
-            my $fwr = File::Write::Rotate->new(%fwrargs);
-            $err = sub {
-                print STDERR $_[0]//'' if $showerr;
-                # XXX prefix with timestamp, how long script starts,
-                $_[0] =~ s/^/STDERR: /mg;
-                $fwr->write($_[0]);
-            };
-        } else {
-            $err = sub {
-                print STDERR $_[0]//'' if $showerr;
-            };
-        }
+        last unless $args{log_stderr};
+
+        require File::Write::Rotate;
+        my %fwrargs = %{$args{log_stderr}};
+        $fwrargs{dir}    //= "/var/log";
+        $fwrargs{prefix}   = $name;
+        my $fwr = File::Write::Rotate->new(%fwrargs);
+        $err = sub {
+            print STDERR $_[0]//'' if $showerr;
+            # XXX prefix with timestamp, how long script starts,
+            $_[0] =~ s/^/STDERR: /mg;
+            $fwr->write($_[0]);
+        };
     }
+
+  LOG_COMBINED: {
+        last unless $args{log_combined};
+
+        require File::Write::Rotate;
+        my %fwrargs = %{$args{log_combined}};
+        $fwrargs{dir}    //= "/var/log";
+        $fwrargs{prefix}   = $name;
+        my $fwr = File::Write::Rotate->new(%fwrargs);
+        $out = sub {
+            print $_[0]//'' if $showout;
+            # XXX prefix with timestamp, how long script starts,
+            $_[0] =~ s/^/STDOUT: /mg;
+            $fwr->write($_[0]);
+        };
+        $err = sub {
+            print STDERR $_[0]//'' if $showerr;
+            # XXX prefix with timestamp, how long script starts,
+            $_[0] =~ s/^/STDERR: /mg;
+            $fwr->write($_[0]);
+        };
+    }
+
+    $out //= sub {
+        print STDERR $_[0]//'' if $showerr;
+    };
+    $err //= sub {
+        print STDERR $_[0]//'' if $showerr;
+    };
 
     my $prevented_sleep;
   PREVENT_SLEEP: {
         last unless $nosleep;
         my $res = PowerManagement::Any::sleep_is_prevented();
         unless ($res->[0] == 200) {
-            log_warn "Cannot check if sleep is being prevented (%s), ".
+            log_warn "[govproc] Cannot check if sleep is being prevented (%s), ".
                 "will not be preventing sleep", $res;
             last;
         }
         if ($res->[2]) {
-            log_info "Sleep is already being prevented";
+            log_info "[govproc] Sleep is already being prevented";
             last;
         }
         $res = PowerManagement::Any::prevent_sleep();
         unless ($res->[0] == 200 || $res->[0] == 304) {
-            log_warn "Cannot prevent sleep (%s), will be running anyway", $res;
+            log_warn "[govproc] Cannot prevent sleep (%s), will be running anyway", $res;
             last;
         }
-        log_info "Prevented sleep (%s)", $res;
+        log_info "[govproc] Prevented sleep (%s)", $res;
         $prevented_sleep++;
     }
 
@@ -468,7 +533,7 @@ sub govern_process {
         return unless $prevented_sleep;
         my $res = PowerManagement::Any::unprevent_sleep();
         unless ($res->[0] == 200 || $res->[0] == 304) {
-            log_warn "Cannot unprevent sleep (%s)", $res;
+            log_warn "[govproc] Cannot unprevent sleep (%s)", $res;
         }
         $prevented_sleep = 0;
     };
@@ -488,7 +553,7 @@ sub govern_process {
         $to = IPC::Run::timeout(1);
         #$self->{to} = $to;
         $h  = IPC::Run::start($cmd, \*STDIN, $out, $err, $to)
-            or die "Can't start program: $?";
+            or die "govproc: Can't start program: $?";
         $self->{h} = $h;
 
         if (defined $args{nice}) {
@@ -613,7 +678,7 @@ sub govern_process {
             if (!$noss_lastprevent_time) {
                 $noss_screensaver = Screensaver::Any::detect_screensaver();
                 if (!$noss_screensaver) {
-                    warn "Can't detect any known screensaver, ".
+                    warn "govproc: Can't detect any known screensaver, ".
                         "will skip preventing screensaver from activating";
                     $noss = 0;
                     last NOSS;
@@ -622,7 +687,7 @@ sub govern_process {
                     screensaver => $noss_screensaver,
                 );
                 if ($res->[0] != 200) {
-                    warn "Can't get screensaver timeout ($res->[0]: $res->[1])".
+                    warn "govproc: Can't get screensaver timeout ($res->[0]: $res->[1])".
                         ", will skip preventing screensaver from activating";
                     $noss = 0;
                     last NOSS;
@@ -633,7 +698,7 @@ sub govern_process {
                 screensaver => $noss_screensaver,
             );
             if ($res->[0] != 200) {
-                warn "Can't prevent screensaver from activating ".
+                warn "govproc: Can't prevent screensaver from activating ".
                     "($res->[0]: $res->[1])";
             }
             $noss_lastprevent_time = $now;
@@ -662,7 +727,7 @@ Proc::Govern - Run child process and govern its various aspects
 
 =head1 VERSION
 
-This document describes version 0.211 of Proc::Govern (from Perl distribution Proc-Govern), released on 2020-08-18.
+This document describes version 0.212 of Proc::Govern (from Perl distribution Proc-Govern), released on 2021-08-06.
 
 =head1 SYNOPSIS
 
@@ -693,6 +758,11 @@ To use as Perl module:
      },
      log_stdout => {                          # optional, passed to File::Write::Rotate
          dir       => '/var/log/myapp.out',
+         size      => '16M',
+         histories => 12,
+     },
+     log_combined => {                        # optional, passed to File::Write::Rotate
+         dir       => '/var/log/myapp',
          size      => '16M',
          histories => 12,
      },
@@ -756,7 +826,7 @@ Currently the following governing functionalities are available:
 
 =over
 
-=item * logging of STDOUT & STDERR output to an autorotated file
+=item * logging of STDOUT & STDERR (or both) output to an autorotated file
 
 =item * execution time limit
 
@@ -871,7 +941,7 @@ This requires L<Proc::Killfam> CPAN module, which is installed separately.
 
 =item * B<load_check_every> => I<duration> (default: 10)
 
-Frequency of load checking.
+Frequency of load checking (in seconds).
 
 =item * B<load_high_limit> => I<int|code>
 
@@ -896,6 +966,22 @@ Note: C<load_watch> needs to be set to true first for this to be effective.
 If set to 1, enable load watching. Program will be suspended when system load is
 too high and resumed if system load returns to a lower limit.
 
+=item * B<log_combined> => I<hash>
+
+Will be passed as arguments to `File::Write::Rotate`.
+
+Specify logging for STDOUT and STDERR. Logging will be done using
+L<File::Write::Rotate>. Known hash keys: C<dir> (STR, defaults to C</var/log>,
+directory, preferably absolute, where the log file(s) will reside, should
+already exist and be writable, will be passed to L<File::Write::Rotate>'s
+constructor), C<size> (int, also passed to L<File::Write::Rotate>'s
+constructor), C<histories> (int, also passed to L<File::Write::Rotate>'s
+constructor), C<period> (str, also passed to L<File::Write::Rotate>'s
+constructor).
+
+Instead of this option, you can also use C<log_stdout> and C<log_stderr>
+separately to log stdout and stderr to different directory.
+
 =item * B<log_stderr> => I<hash>
 
 Will be passed as arguments to `File::Write::Rotate`.
@@ -908,9 +994,23 @@ writable, will be passed to L<File::Write::Rotate>'s constructor), C<size>
 also passed to L<File::Write::Rotate>'s constructor), C<period> (str, also
 passed to L<File::Write::Rotate>'s constructor).
 
+Instead of this option, you can also use C<log_combined> to log both stdout and
+stderr to the same directory.
+
 =item * B<log_stdout> => I<hash>
 
 Will be passed as arguments to `File::Write::Rotate`.
+
+Specify logging for STDOUT. Logging will be done using L<File::Write::Rotate>.
+Known hash keys: C<dir> (STR, defaults to C</var/log>, directory, preferably
+absolute, where the log file(s) will reside, should already exist and be
+writable, will be passed to L<File::Write::Rotate>'s constructor), C<size>
+(int, also passed to L<File::Write::Rotate>'s constructor), C<histories> (int,
+also passed to L<File::Write::Rotate>'s constructor), C<period> (str, also
+passed to L<File::Write::Rotate>'s constructor).
+
+Instead of this option, you can also use C<log_combined> to log both stdout and
+stderr to the same directory.
 
 =item * B<name> => I<str>
 
@@ -1085,11 +1185,27 @@ function wrapper.
 
 =head1 AUTHOR
 
+perlancar
+
+=head1 CONTRIBUTORS
+
+=for stopwords perlancar Steven Haryanto
+
+=over 4
+
+=item *
+
 perlancar <perlancar@cpan.org>
+
+=item *
+
+Steven Haryanto <sharyanto@cpan.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

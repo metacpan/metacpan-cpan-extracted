@@ -3,16 +3,12 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Object::Pad::SlotAttr::Final 0.02;
+package Object::Pad::SlotAttr::Final 0.03;
 
 use v5.14;
 use warnings;
 
-use Object::Pad 0.48;
-BEGIN {
-   $Object::Pad::VERSION eq "0.48" or
-      die "Require exactly Object::Pad version 0.48";
-}
+use Object::Pad 0.50;
 
 require XSLoader;
 XSLoader::load( __PACKAGE__, our $VERSION );
@@ -45,11 +41,7 @@ readonly when the constructor returns, disallowing further modification to it.
 
 B<WARNING> The ability for L<Object::Pad> to take third-party slot attributes
 is still new and highly experimental, and subject to much API change in
-future. As a result, this module should be considered equally experimental. As
-a further point, it is currently pinned to requiring an exact
-C<$Object::Pad::VERSION> of 0.48, to defend against possible API or ABI
-breakage. It is expected that as the API eventually stablises, this
-restriction can be removed.
+future. As a result, this module should be considered equally experimental.
 
 =head1 SLOT ATTRIBUTES
 

@@ -1,9 +1,9 @@
 package ColorTheme::Perinci::CmdLine::Classic::DefaultWhiteBG;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-11'; # DATE
+our $DATE = '2021-08-06'; # DATE
 our $DIST = 'Perinci-CmdLine-Classic'; # DIST
-our $VERSION = '1.815'; # VERSION
+our $VERSION = '1.816'; # VERSION
 
 use strict;
 use warnings;
@@ -31,7 +31,7 @@ ColorTheme::Perinci::CmdLine::Classic::DefaultWhiteBG
 
 =head1 VERSION
 
-This document describes version 1.815 of ColorTheme::Perinci::CmdLine::Classic::DefaultWhiteBG (from Perl distribution Perinci-CmdLine-Classic), released on 2021-07-11.
+This document describes version 1.816 of ColorTheme::Perinci::CmdLine::Classic::DefaultWhiteBG (from Perl distribution Perinci-CmdLine-Classic), released on 2021-08-06.
 
 =head1 HOMEPAGE
 

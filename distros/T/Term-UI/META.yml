@@ -27,5 +27,5 @@ requires:
   parent: '0'
 resources:
   repository: git://github.com/jib/term-ui.git
-version: '0.48'
+version: '0.50'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

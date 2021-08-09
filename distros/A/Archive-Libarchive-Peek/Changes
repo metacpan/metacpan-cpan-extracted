@@ -1,5 +1,8 @@
 Revision history for Archive-Libarchive-Peek},
 
+0.04      2021-08-06 17:19:00 -0600
+  - Fixed bug where entry content might be truncated (gh#4)
+
 0.03      2021-06-23 12:28:50 -0600
   - Add memory option for reading archive directly from memory (gh#3)
 

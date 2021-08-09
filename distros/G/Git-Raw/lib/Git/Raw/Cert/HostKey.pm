@@ -1,5 +1,5 @@
 package Git::Raw::Cert::HostKey;
-$Git::Raw::Cert::HostKey::VERSION = '0.87';
+$Git::Raw::Cert::HostKey::VERSION = '0.88';
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ Git::Raw::Cert::HostKey - Git hostkey class
 
 =head1 VERSION
 
-version 0.87
+version 0.88
 
 =head1 DESCRIPTION
 

@@ -8,7 +8,7 @@ package IO::Async::Loop::Select;
 use strict;
 use warnings;
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 use constant API_VERSION => '0.49';
 
 use base qw( IO::Async::Loop );
@@ -37,22 +37,22 @@ Normally an instance of this class would not be directly constructed by a
 program. It may however, be useful for runinng L<IO::Async> with an existing
 program already using a C<select> call.
 
- use IO::Async::Loop::Select;
+   use IO::Async::Loop::Select;
 
- my $loop = IO::Async::Loop::Select->new;
+   my $loop = IO::Async::Loop::Select->new;
 
- $loop->add( ... );
+   $loop->add( ... );
 
- while(1) {
-    my ( $rvec, $wvec, $evec ) = ('') x 3;
-    my $timeout;
+   while(1) {
+      my ( $rvec, $wvec, $evec ) = ('') x 3;
+      my $timeout;
 
-    $loop->pre_select( \$rvec, \$wvec, \$evec, \$timeout );
-    ...
-    my $ret = select( $rvec, $wvec, $evec, $timeout );
-    ...
-    $loop->post_select( $rvec, $evec, $wvec );
- }
+      $loop->pre_select( \$rvec, \$wvec, \$evec, \$timeout );
+      ...
+      my $ret = select( $rvec, $wvec, $evec, $timeout );
+      ...
+      $loop->post_select( $rvec, $evec, $wvec );
+   }
 
 =head1 DESCRIPTION
 

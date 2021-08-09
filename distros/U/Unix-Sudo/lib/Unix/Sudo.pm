@@ -3,7 +3,7 @@ package Unix::Sudo;
 use strict;
 use warnings;
 
-our $VERSION = '4';
+our $VERSION = '4.567.89';
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -16,7 +16,7 @@ use Probe::Perl;
 
 =head1 NAME
 
-Unix::Sudo
+Unix::Sudo - Run a block of code as root
 
 =head1 DESCRIPTION
 
@@ -30,7 +30,7 @@ As a normal user who can C<sudo> ...
 
     print `whoami`;          # shows your normal username
     sudo {
-        eval "no tainting";
+        eval "use Taint::Runtime qw(disable)";
         print `whoami`;      # root
     };
     print `whoami`;          # back to normal
@@ -96,8 +96,8 @@ pre-pended to your code.
 
 Your code will always have C<strict> and C<warnings> turned on, and be run with
 taint-checking enabled. If you need to you can turn tainting off as shown in
-the synopsis. Note that you can't just say 'no tainting', the C<eval> is
-required, otherwise C<no>, just like C<use>, will be run at compile-time I<in
+the synopsis. Note that you can't just say 'use Taint::Runtime qw(disable)', the C<eval> is
+required, otherwise the C<use> will be run at compile-time I<in
 the calling code> and not in the child process where you need it.
 
 If your code needs to C<use> any modules, or any subroutines that are imported,
@@ -151,7 +151,7 @@ your code to then run other stuff as root.
 That means that any input to your code from the outside world is internally
 marked as being untrusted, and you are restricted in what you can do with it.
 You can of course circumvent this by untainting, either in the usual regexy
-ways or as noted above via C<no tainting>.
+ways or as noted above via C<Taint::Runtime>.
 
 =back
 
@@ -181,7 +181,7 @@ L<git://github.com/DrHyde/perl-modules-Unix-Sudo.git>
 
 =head1 AUTHOR, COPYRIGHT and LICENCE
 
-Copyright 2019 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
+Copyright 2021 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
 
 This software is free-as-in-speech software, and may be used, distributed, and
 modified under the terms of either the GNU General Public Licence version 2 or

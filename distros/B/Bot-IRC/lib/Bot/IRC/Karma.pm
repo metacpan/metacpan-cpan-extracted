@@ -4,7 +4,7 @@ package Bot::IRC::Karma;
 use 5.014;
 use exact;
 
-our $VERSION = '1.36'; # VERSION
+our $VERSION = '1.37'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -98,7 +98,7 @@ Bot::IRC::Karma - Bot::IRC track karma for things
 
 =head1 VERSION
 
-version 1.36
+version 1.37
 
 =head1 SYNOPSIS
 

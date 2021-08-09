@@ -11,7 +11,7 @@ Yancy::Guides - Guide to Yancy Documentation
 
 =head1 VERSION
 
-version 1.074
+version 1.075
 
 =head1 BASICS
 

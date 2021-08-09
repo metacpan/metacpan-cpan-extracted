@@ -1,5 +1,5 @@
 package WWW::FieldValidator;
-
+$WWW::FieldValidator::VERSION = '1.23';
 use 5.014;
 use strict;
 use warnings;
@@ -153,7 +153,7 @@ WWW::FieldValidator
 
 =head1 VERSION
 
-version 1.22
+version 1.23
 
 =head1 SYNOPSIS
 
@@ -166,6 +166,14 @@ This document covers using the WWW::FieldValidator module as part of a Form
 object.  In this case, the only thing you need to know how to do is to
 instantiate WWW::FieldValidators properly.  All the validation is handled
 internally by WWW::Form.
+
+=head1 NAME
+
+WWW::FieldValidator
+
+=head1 VERSION
+
+version 1.23
 
 =head1 NAME
 
@@ -337,6 +345,17 @@ a user-defined validation type.)
 
 This program is free software.  You may copy or redistribute it under the same
 terms as Perl itself.
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2003 by Benjamin Schmaus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =head1 AUTHOR
 

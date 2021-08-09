@@ -3,8 +3,8 @@ NAME
     ANSI colors
 
 VERSION
-    This document describes version 0.602 of Text::ANSITable (from Perl
-    distribution Text-ANSITable), released on 2021-02-19.
+    This document describes version 0.604 of Text::ANSITable (from Perl
+    distribution Text-ANSITable), released on 2021-08-09.
 
 SYNOPSIS
      use 5.010;
@@ -17,7 +17,7 @@ SYNOPSIS
 
      # set styles
      $t->border_style('UTF8::SingleLineBold');  # if not, a nice default is picked
-     $t->color_theme('Text::ANSITable::Standard::NoGradation');  # if not, a nice default is picked
+     $t->color_theme('Standard::NoGradation');  # if not, a nice default is picked
 
      # fill data
      $t->columns(["name"       , "color" , "price"]);
@@ -58,6 +58,199 @@ DESCRIPTION
     instead of "CamelCase", and it uses arrayref for "columns" and
     "add_row". When specifying border styles, the order of characters are
     slightly different. More fine-grained options to customize appearance.
+
+DECLARED FEATURES
+    Features declared by this module:
+
+  From feature set TextTable
+    Features from feature set TextTable declared by this module:
+
+    *   can_align_cell_containing_color_code
+
+        Value: yes.
+
+    *   can_align_cell_containing_newline
+
+        Value: yes.
+
+    *   can_align_cell_containing_wide_character
+
+        Value: yes.
+
+    *   can_color
+
+        Can produce colored table.
+
+        Value: yes.
+
+    *   can_color_theme
+
+        Allow choosing colors from a named set of palettes.
+
+        Value: yes.
+
+    *   can_colspan
+
+        Value: no.
+
+    *   can_customize_border
+
+        Let user customize border character in some way, e.g. selecting from
+        several available borders, disable border.
+
+        Value: yes.
+
+    *   can_halign
+
+        Provide a way for user to specify horizontal alignment
+        (left/middle/right) of cells.
+
+        Value: yes.
+
+    *   can_halign_individual_cell
+
+        Provide a way for user to specify different horizontal alignment
+        (left/middle/right) for individual cells.
+
+        Value: yes.
+
+    *   can_halign_individual_column
+
+        Provide a way for user to specify different horizontal alignment
+        (left/middle/right) for individual columns.
+
+        Value: yes.
+
+    *   can_halign_individual_row
+
+        Provide a way for user to specify different horizontal alignment
+        (left/middle/right) for individual rows.
+
+        Value: yes.
+
+    *   can_hpad
+
+        Provide a way for user to specify horizontal padding of cells.
+
+        Value: yes.
+
+    *   can_hpad_individual_cell
+
+        Provide a way for user to specify different horizontal padding of
+        individual cells.
+
+        Value: yes.
+
+    *   can_hpad_individual_column
+
+        Provide a way for user to specify different horizontal padding of
+        individual columns.
+
+        Value: yes.
+
+    *   can_hpad_individual_row
+
+        Provide a way for user to specify different horizontal padding of
+        individual rows.
+
+        Value: yes.
+
+    *   can_rowspan
+
+        Value: no.
+
+    *   can_set_cell_height
+
+        Allow setting height of rows.
+
+        Value: yes.
+
+    *   can_set_cell_height_of_individual_row
+
+        Allow setting height of individual rows.
+
+        Value: yes.
+
+    *   can_set_cell_width
+
+        Allow setting height of rows.
+
+        Value: yes.
+
+    *   can_set_cell_width_of_individual_column
+
+        Allow setting height of individual rows.
+
+        Value: yes.
+
+    *   can_use_box_character
+
+        Can use terminal box-drawing character when drawing border.
+
+        Value: yes.
+
+    *   can_valign
+
+        Provide a way for user to specify vertical alignment
+        (top/middle/bottom) of cells.
+
+        Value: yes.
+
+    *   can_valign_individual_cell
+
+        Provide a way for user to specify different vertical alignment
+        (top/middle/bottom) for individual cells.
+
+        Value: yes.
+
+    *   can_valign_individual_column
+
+        Provide a way for user to specify different vertical alignment
+        (top/middle/bottom) for individual columns.
+
+        Value: yes.
+
+    *   can_valign_individual_row
+
+        Provide a way for user to specify different vertical alignment
+        (top/middle/bottom) for individual rows.
+
+        Value: yes.
+
+    *   can_vpad
+
+        Provide a way for user to specify vertical padding of cells.
+
+        Value: yes.
+
+    *   can_vpad_individual_cell
+
+        Provide a way for user to specify different vertical padding of
+        individual cells.
+
+        Value: yes.
+
+    *   can_vpad_individual_column
+
+        Provide a way for user to specify different vertical padding of
+        individual columns.
+
+        Value: yes.
+
+    *   can_vpad_individual_row
+
+        Provide a way for user to specify different vertical padding of
+        individual rows.
+
+        Value: yes.
+
+    *   speed
+
+        Subjective speed rating, relative to other text table modules.
+
+        Value: "slow".
+
+    For more details on module features, see Module::Features.
 
 REFERRING TO COLUMNS
     Columns can be referred to be integer number (0-based) or name (string).
@@ -135,13 +328,13 @@ COLOR THEMES
      # during construction
      my $t = Text::ANSITable->new(
          ...
-         color_theme => "Text::ANSITable::Standard::NoGradation",
+         color_theme => "Standard::NoGradation",
          ...
      );
 
      # after the object is constructed
-     $t->color_theme("Text::ANSITable::Standard::NoGradation");
-     $t->color_theme(["Lens::Darken", {theme=>"Text::ANSITable::Standard::NoGradation"}]);
+     $t->color_theme("Standard::NoGradation");
+     $t->color_theme(["Lens::Darken", {theme=>"Standard::NoGradation"}]);
 
     If no color theme is selected explicitly, a nice default will be chosen.
     You can also set the "ANSITABLE_COLOR_THEME" environment variable to set
@@ -464,7 +657,9 @@ STYLE SETS
     other existing style set modules for more examples.
 
 ATTRIBUTES
-  columns => ARRAY OF STR
+  columns
+    Array of str. Must be unique.
+
     Store column names. Note that when drawing, you can omit some columns,
     reorder them, or display some more than once (see "column_filter"
     attribute).
@@ -548,10 +743,19 @@ ATTRIBUTES
     explicitly enable or disable wide-character support here.
 
   border_style => STR
-    Border style name to use.
+    Border style name to use. This is a module name in the
+    "BorderStyle::Text::ANSITable::*", "BorderStyle::*", or
+    "BorderStyle::Text::ANSITable::OldCompat::*" namespace, without the
+    prefix. See the BorderStyle specification on how to create a new border
+    style.
 
   color_theme => STR
-    Color theme name to use.
+    Color theme name to use. This is a module name in the
+    "ColorTheme::Text::ANSITable::*", "ColorTheme::*", or
+    "ColorTheme::Text::ANSITable::OldCompat::*" namespace, without the
+    prefix. See the ColorTheme and an example existing color theme module
+    like ColorTheme::Text::ANSITable::Standard::Gradation specification on
+    how to create a new border style.
 
   show_header => BOOL (default: 1)
     When drawing, whether to show header.
@@ -1128,7 +1332,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-Text-ANSITable/issues>
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-ANSITable>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -1174,9 +1378,14 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTORS
+    *   Mario Zieschang <mario@zieschang.info>
+
+    *   Steven Haryanto (on PC) <stevenharyanto@gmail.com>
+
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2021, 2020, 2018, 2017, 2016, 2015, 2014,
-    2013 by perlancar@cpan.org.
+    2013 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

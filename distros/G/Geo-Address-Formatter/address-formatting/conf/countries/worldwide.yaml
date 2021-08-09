@@ -31,7 +31,8 @@ generic4: &generic4 |
         {{{attention}}}
         {{{house}}}
         {{{house_number}}} {{{road}}}
-        {{#first}} {{{city}}} || {{{town}}} || {{{state_district}}} || {{{village}}} || {{{hamlet}}} || {{{suburb}}} || {{{municipality}}} || {{{county}}} {{/first}}, {{#first}} {{{state_code}}} || {{{state}}} {{/first}} {{{postcode}}}
+        {{#first}} {{{village}}} || {{{hamlet}}} {{/first}}
+        {{#first}} {{{city}}} || {{{town}}} || {{{state_district}}} || {{{suburb}}} || {{{municipality}}} || {{{county}}} {{/first}}, {{#first}} {{{state_code}}} || {{{state}}} {{/first}} {{{postcode}}}
         {{{country}}}
 
 # no postcode
@@ -588,7 +589,10 @@ CO:
         {{{postcode}}} {{#first}} {{{city}}} || {{{town}}} || {{{state_district}}} || {{{village}}} || {{{hamlet}}} {{/first}}, {{#first}} {{{state_code}}} || {{{state}}} {{/first}}
         {{{country}}}
     postformat_replace:
+        - ["Localidad "," "]    
         - ["Bogota, Bogota","Bogota"]
+        - ["Bogota, Bogotá Distrito Capital","Bogota"]
+        - ["Bogotá, Bogotá Distrito Capital","Bogotá"]
 
 # Costa Rica
 CR:
@@ -1697,7 +1701,12 @@ SE:
 
 # Singapore
 SG:
-    address_template: *generic2
+    address_template: |
+        {{{attention}}}
+        {{#first}} {{{house}}}, {{{quarter}}} || {{{house}}} {{/first}}
+        {{{house_number}}} {{{road}}}, {{{residential}}}
+        {{#first}} {{{village}}} || {{{town}}} || {{{city}}} || {{{municipality}}} || {{{hamlet}}} || {{{country}}} || {{{county}}} {{/first}} {{{postcode}}}
+        {{#first}} {{{country}}} || {{{state}}} {{/first}}
 
 # Saint Helena, Ascension and Tristan da Cunha - same as UK
 SH:

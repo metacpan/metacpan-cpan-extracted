@@ -1,0 +1,4 @@
+.cirrus.yml
+.travis.yml
+.git
+.gitignore

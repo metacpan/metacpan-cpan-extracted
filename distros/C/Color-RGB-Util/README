@@ -2,8 +2,8 @@ NAME
     Color::RGB::Util - Utilities related to RGB colors
 
 VERSION
-    This document describes version 0.604 of Color::RGB::Util (from Perl
-    distribution Color-RGB-Util), released on 2021-01-19.
+    This document describes version 0.606 of Color::RGB::Util (from Perl
+    distribution Color-RGB-Util), released on 2021-08-06.
 
 SYNOPSIS
      use Color::RGB::Util qw(
@@ -49,7 +49,8 @@ SYNOPSIS
 
      say reverse_rgb_color('0033CC');                # => ffcc33
 
-     say rgb2grayscale('0033CC');                    # => 555555
+     say rgb2grayscale('0033CC');                     # => 555555 # default 'average' algo
+     say rgb2grayscale('0033CC', 'weighted_average'); # => 353535
 
      say rgb2int("ffffff");                          # 16777215 (which is 0xffffff)
 
@@ -88,6 +89,8 @@ FUNCTIONS
     (160bit, 20 bytes) of the string, then taking the first, 10th, and last
     byte to become the RGB color.
 
+    See also: "assign_rgb_dark_color" and "assign_rgb_light_color".
+
   assign_rgb_dark_color
     Like "assign_rgb_color" except that it will make sure the assigned color
     is dark.
@@ -103,6 +106,8 @@ FUNCTIONS
 
     Convert HSL to HSV.
 
+    See also: "hsv2hsl".
+
   hsl2rgb
     Usage:
 
@@ -113,7 +118,9 @@ FUNCTIONS
     red, 120 is green, 240 is blue and 360 is back to red. S (saturation)
     has a range from 0-1 where 0 is gray and 1 is fully saturated hue. L
     (lumination) has a range from 0-1 where 0 is fully black, 0.5 fully
-    saturated, and 1 is fully white. See also "rgb2hsl".
+    saturated, and 1 is fully white.
+
+    See also "rgb2hsl".
 
   hsv2hsl
     Usage:
@@ -121,6 +128,8 @@ FUNCTIONS
      my $hsl = hsv2hsl("0 1 1"); # => "0 1 0.5"
 
     Convert HSV to HSL.
+
+    See also "hsl2hsv".
 
   hsv2rgb
     Usage:
@@ -131,8 +140,9 @@ FUNCTIONS
     values e.g. "0 1 1". H (hue degree) has a range from 0-360 where 0 is
     red, 120 is green, 240 is blue and 360 is back to red. S (saturation)
     has a range from 0-1 where 0 is gray and 1 is fully saturated hue. V
-    (value) has a range from 0-1 where 0 is black and 1 is white. See also
-    "rgb2hsv".
+    (value) has a range from 0-1 where 0 is black and 1 is white.
+
+    See also "rgb2hsv".
 
   int2rgb
     Usage:
@@ -140,6 +150,8 @@ FUNCTIONS
      my $rgb = int2rgb(0xffffff); # => ffffff
 
     Convert integer to RGB string.
+
+    See also "rgb2int".
 
   mix_2_rgb_colors
     Usage:
@@ -149,12 +161,16 @@ FUNCTIONS
     Mix 2 RGB colors. $pct is a number between 0 and 1, by default 0.5
     (halfway), the closer to 1 the closer the resulting color to $rgb2.
 
+    See also "mix_rgb_colors", "tint_rgb_color".
+
   mix_rgb_colors
     Usage:
 
      my $mixed_rgb = mix_rgb_colors($color1, $weight1, $color2, $weight2, ...);
 
     Mix several RGB colors.
+
+    See also "mix_2_rgb_colors".
 
   rand_rgb_color
     Usage:
@@ -163,6 +179,8 @@ FUNCTIONS
 
     Generate a random RGB color. You can specify the limit. Otherwise, they
     default to the full range (000000 to ffffff).
+
+    See also "rand_rgb_colors".
 
   rand_rgb_colors
     Usage:
@@ -203,6 +221,8 @@ FUNCTIONS
         Whether to add hash prefix to produced color codes ("#123456") or
         not ("123456").
 
+    See also "rand_rgb_color".
+
   reverse_rgb_color
     Usage:
 
@@ -213,9 +233,30 @@ FUNCTIONS
   rgb2grayscale
     Usage:
 
-     my $rgb_gs = rgb2grayscale($rgb);
+     my $rgb_gs = rgb2grayscale($rgb [ , $algo ]);
 
-    Convert $rgb to grayscale RGB value.
+    Convert $rgb to grayscale RGB value. There are several algorithms
+    ($algo) to choose from:
+
+    *   average
+
+        The Average method takes the average value of R, G, and B as the
+        grayscale value.
+
+         Grayscale = (R + G + B ) / 3.
+
+        The average method is simple but does not take into account the
+        non-linearity of human vision (eyes are most sensitive to green,
+        less to red, least to blue).
+
+    *   weighted_average
+
+        This method gives weights to each of red, green, blue elements to
+        take into account the sensitivity of human eyes.
+
+         Grayscale  = 0.299R + 0.587G + 0.114B
+
+    See also rgb2sepia.
 
   rgb2hsl
     Usage:
@@ -225,13 +266,17 @@ FUNCTIONS
     Convert RGB (0-255) to HSL. The result is a space-separated H, S, L
     values.
 
+    See also "hsl2rgb".
+
   rgb2hsv
     Usage:
 
      my $hsv = rgb2hsv($rgb); # example: "0 1 255"
 
     Convert RGB (0-255) to HSV. The result is a space-separated H, S, V
-    values. See
+    values.
+
+    See also "hsv2rgb".
 
   rgb2int
     Usage:
@@ -240,12 +285,16 @@ FUNCTIONS
 
     Convert RGB string to integer.
 
+    See also "int2rgb".
+
   rgb2sepia
     Usage:
 
      my $rgb_sepia = rgb2sepia($rgb);
 
     Convert $rgb to sepia tone RGB value.
+
+    See also rgb2grayscale.
 
   rgb_diff
     Usage:
@@ -302,6 +351,8 @@ FUNCTIONS
 
     [1] https://www.compuphase.com/cmetric.htm
 
+    See also rgb_distance.
+
   rgb_distance
     Usage:
 
@@ -314,6 +365,8 @@ FUNCTIONS
     For example, the distance between "000000" and "ffffff" is ~441.67,
     while the distance between "ffff00" and "ffffff" is 255.
 
+    See also rgb_diff.
+
   rgb_is_dark
     Usage:
 
@@ -322,6 +375,8 @@ FUNCTIONS
     Return true if $rgb is a "dark" color, which is determined by checking
     if the RGB distance to "000000" is smaller than to "ffffff".
 
+    See also "rgb_is_light".
+
   rgb_is_light
     Usage:
 
@@ -329,6 +384,8 @@ FUNCTIONS
 
     Return true if $rgb is a "light" color, which is determined by checking
     if the RGB distance to "000000" is larger than to "ffffff".
+
+    See also "rgb_is_dark".
 
   rgb_luminance
     Usage:
@@ -352,17 +409,19 @@ FUNCTIONS
     the tint color. This has the effect of black color still being black
     instead of becoming tinted.
 
+    See also mix_2_rgb_colors, mix_rgb_colors.
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Color-RGB-Util>.
 
 SOURCE
     Source repository is at
-    <https://github.com/perlancar/perl-Color-RGB-Util>.
+    <https://github.com/perlancar/perl-SHARYANTO-Color-Util>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-Color-RGB-Util/issues>
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Color-RGB-Util>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -372,6 +431,11 @@ SEE ALSO
 
 AUTHOR
     perlancar <perlancar@cpan.org>
+
+CONTRIBUTORS
+    *   ryosh2 (on pc-office) <ryosharyanto@gmail.com>
+
+    *   Steven Haryanto <sharyanto@cpan.org>
 
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2021, 2020, 2019, 2018, 2015, 2014, 2013

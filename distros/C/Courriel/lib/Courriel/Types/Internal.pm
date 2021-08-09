@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 use List::AllUtils qw( all );
 use Scalar::Util qw( blessed );
@@ -19,7 +19,7 @@ use MooseX::Types -declare => [
         Printable
         Streamable
         StringRef
-        )
+    )
 ];
 use MooseX::Types::Common::String qw( NonEmptyStr );
 use MooseX::Types::Moose

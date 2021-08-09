@@ -1,7 +1,9 @@
 package Text::Table::HTML;
 
-our $DATE = '2017-01-25'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-03-11'; # DATE
+our $DIST = 'Text-Table-HTML'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -34,16 +36,20 @@ sub table {
         } else {
             if ($i == 1) { push @table, "<tbody>\n" }
         }
-        push @table, join(
-	    "",
-            "<tr>",
-	    (map {(
-                $in_header ? "<th>" : "<td>",
-                _encode($row->[$_] // ''),
-                $in_header ? "</th>" : "</td>",
-            )} 0..$max_index),
-            "</tr>\n",
-	);
+        push @table, "<tr>";
+        for my $cell (@$row) {
+            my $text    = ref $cell eq 'HASH' ? $cell->{text} : $cell;
+            my $rowspan = int((ref $cell eq 'HASH' ? $cell->{rowspan} : undef) // 1);
+            my $colspan = int((ref $cell eq 'HASH' ? $cell->{colspan} : undef) // 1);
+            push @table,
+                ($in_header ? "<th" : "<td"),
+                ($rowspan > 1 ? " rowspan=$rowspan" : ""),
+                ($colspan > 1 ? " colspan=$colspan" : ""),
+                ">",
+                _encode($text // ''),
+                $in_header ? "</th>" : "</td>";
+	}
+        push @table, "</tr>\n";
         if ($i == 0 && $params{header_row}) {
             push @table, "</thead>\n";
         }
@@ -87,7 +93,7 @@ Text::Table::HTML - Generate HTML table
 
 =head1 VERSION
 
-This document describes version 0.003 of Text::Table::HTML (from Perl distribution Text-Table-HTML), released on 2017-01-25.
+This document describes version 0.004 of Text::Table::HTML (from Perl distribution Text-Table-HTML), released on 2021-03-11.
 
 =head1 SYNOPSIS
 
@@ -136,7 +142,9 @@ The C<table> function understands these arguments, which are passed as a hash.
 =item * rows (aoaos)
 
 Takes an array reference which should contain one or more rows of data, where
-each row is an array reference.
+each row is an array reference. And each array element is a string (cell
+content) or hashref (with key C<text> to contain the cell text, and optionally
+attributes too like C<rowspan>, C<colspan>).
 
 =back
 
@@ -150,7 +158,7 @@ Source repository is at L<https://github.com/perlancar/perl-Text-Table-HTML>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Table-HTML>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Text-Table-HTML/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -170,7 +178,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

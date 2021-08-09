@@ -1,8 +1,6 @@
 #ifndef WIN32
 #include <unistd.h>
-#include <sys/mman.h>
 #include <fcntl.h>
-#define USE_MMAP
 #endif
 
 #include "EXTERN.h"   /* std perl include */
@@ -63,20 +61,6 @@ static SV* pdl_unpackint ( PDL_Indx *dims, int ndims ) {
          av_store( array, i, newSViv( (IV)dims[i] ) );
 
    return (SV*) array;
-}
-
-/*
- * Free the data if possible; used by mmapper
- * Moved from pdlhash.c July 10 2006 DJB
- */
-static void pdl_freedata (pdl *a) {
-	if(a->datasv) {
-		SvREFCNT_dec(a->datasv);
-		a->datasv=0;
-		a->data=0;
-	} else if(a->data) {
-		die("Trying to free data of untouchable (mmapped?) pdl");
-	}
 }
 
 /* newval = 1 means set flag, 0 means clear it */
@@ -202,64 +186,6 @@ iscontig(x)
 
 INCLUDE_COMMAND: $^X -e "require q{./Dev.pm}; PDL::Core::Dev::generate_core_flags()"
 
-#if 0
-=begin windows_mmap
-
-I found this at http://mollyrocket.com/forums/viewtopic.php?p=2529&sid=973b8e0a1e639e3008d7ef05f686c6fa
-and thougt we might consider using it to make windows mmapping possible.
-
--David Mertens
-
- /*
- This code was placed in the public domain by the author,
- Sean Barrett, in November 2007. Do with it as you will.
- (Seee the page for stb_vorbis or the mollyrocket source
- page for a longer description of the public domain non-license).
- */
-
- #define WIN32_LEAN_AND_MEAN
- #include <windows.h>
-
- typedef struct
- {
-    HANDLE f;
-    HANDLE m;
-    void *p;
- } SIMPLE_UNMMAP;
-
- // map 'filename' and return a pointer to it. fill out *length and *un if not-NULL
- void *simple_mmap(const char *filename, int *length, SIMPLE_UNMMAP *un)
- {
-    HANDLE f = CreateFile(filename, GENERIC_READ, FILE_SHARE_READ,  NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-    HANDLE m;
-    void *p;
-    if (!f) return NULL;
-    m = CreateFileMapping(f, NULL, PAGE_READONLY, 0,0, NULL);
-    if (!m) { CloseHandle(f); return NULL; }
-    p = MapViewOfFile(m, FILE_MAP_READ, 0,0,0);
-    if (!p) { CloseHandle(m); CloseHandle(f); return NULL; }
-    if (n) *n = GetFileSize(f, NULL);
-    if (un) {
-       un->f = f;
-       un->m = m;
-       un->p = p;
-    }
-    return p;
- }
-
- void simple_unmmap(SIMPLE_UNMMAP *un)
- {
-    UnmapViewOfFile(un->p);
-    CloseHandle(un->m);
-    CloseHandle(un->f);
- }
-
-=end windows_mmap
-
-=cut
-
-#endif /* 0 - commented out */
-
 void
 set_inplace(self,val)
   pdl *self;
@@ -292,73 +218,26 @@ sever(src)
 		RETVAL
 
 int
-set_data_by_mmap(it,fname,len,shared,writable,creat,mode,trunc)
-	pdl *it
-	char *fname
-	STRLEN len
-	int writable
-	int shared
-	int creat
-	int mode
-	int trunc
-	CODE:
-#ifdef USE_MMAP
-       int fd;
-       pdl_freedata(it);
-       fd = open(fname,(writable && shared ? O_RDWR : O_RDONLY)|
-               (creat ? O_CREAT : 0),mode);
-       if(fd < 0) {
-               croak("Error opening file");
-       }
-       if(trunc) {
-               int error = ftruncate(fd,0);   /* Clear all previous data */
-               
-               if(error)
-               {
-					fprintf(stderr,"Failed to set length of '%s' to %d. errno=%d",fname,(int)len,(int)error);
-					croak("set_data_by_mmap: first ftruncate failed");
-               }
-               
-               error = ftruncate(fd,len); /* And make it long enough */
-               
-               if(error)
-               {
-					fprintf(stderr,"Failed to set length of '%s' to %d. errno=%d",fname,(int)len,(int)error);
-					croak("set_data_by_mmap: second ftruncate failed");
-               }
-       }
-       if(len) {
-		it->data = mmap(0,len,PROT_READ | (writable ?
-					PROT_WRITE : 0),
-				(shared ? MAP_SHARED : MAP_PRIVATE),
-				fd,0);
-		if(!it->data)
-			croak("Error mmapping!");
-       } else {
-               /* Special case: zero-length file */
-               it->data = NULL;
-       }
-       PDLDEBUG_f(printf("PDL::MMap: mapped to %p\n",it->data);)
-       it->state |= PDL_DONTTOUCHDATA | PDL_ALLOCATED;
-       pdl_add_deletedata_magic(it, pdl_delete_mmapped_data, len);
-       close(fd);
-#else
-	croak("mmap not supported on this architecture");
-#endif
-       RETVAL = 1;
-OUTPUT:
-       RETVAL
-
-int
-set_state_and_add_deletedata_magic(it,len)
+set_donttouchdata(it)
       pdl *it
-      STRLEN len
       CODE:
             it->state |= PDL_DONTTOUCHDATA | PDL_ALLOCATED;
-            pdl_add_deletedata_magic(it, pdl_delete_mmapped_data, len);
             RETVAL = 1;
       OUTPUT:
             RETVAL
+
+# Free the datasv if possible
+void
+freedata(it)
+      pdl *it
+      CODE:
+	if(it->datasv) {
+		SvREFCNT_dec(it->datasv);
+		it->datasv=0;
+		it->data=0;
+	} else if(it->data) {
+		die("Trying to free data of pdl with data != 0 and datasv==0");
+	}
 
 int
 set_data_by_offset(it,orig,offset)
@@ -366,7 +245,6 @@ set_data_by_offset(it,orig,offset)
       pdl *orig
       STRLEN offset
       CODE:
-              pdl_freedata(it);
               it->data = ((char *) orig->data) + offset;
 	      it->datasv = orig->sv;
               (void)SvREFCNT_inc(it->datasv);
@@ -444,7 +322,7 @@ _ci(...)
 void
 _nan(...)
  PPCODE:
-  PDL_XS_SCALAR(PDL_D, PDL_Double, PDL.NaN_double)
+  PDL_XS_SCALAR(PDL_D, PDL_Double, (PDL_Double)NAN)
 
 void
 _inf(...)
@@ -640,7 +518,6 @@ BOOT:
    PDL_CORE_BOOT(SetSV_PDL)
    PDL_CORE_BOOT(create)
    PDL_CORE_BOOT(pdlnew)
-   PDL.tmp         = NULL; /* only here for binary back-compat */
    PDL_CORE_BOOT(destroy)
    PDL_CORE_BOOT(null)
    PDL_CORE_BOOT(copy)
@@ -654,7 +531,6 @@ BOOT:
    PDL_CORE_BOOT(setdims)
    PDL_CORE_BOOT(grow)
    PDL_CORE_BOOT(at0)
-   PDL.flushcache  = NULL;
    PDL_CORE_BOOT(reallocdims)
    PDL_CORE_BOOT(reallocthreadids)
    PDL_CORE_BOOT(resize_defaultincs)
@@ -666,7 +542,6 @@ BOOT:
    PDL_CORE_BOOT(iterthreadloop)
    PDL_CORE_BOOT(freethreadloop)
    PDL_CORE_BOOT(thread_create_parameter)
-   PDL_CORE_BOOT(add_deletedata_magic)
 
    PDL_CORE_BOOT(setdims_careful)
    PDL_CORE_BOOT(put_offs)
@@ -690,10 +565,6 @@ BOOT:
    PDL_CORE_BOOT(changed)
    PDL_CORE_BOOT(vaffinechanged)
 
-   PDL.NaN_float  = union_nan_float.f;
-   PDL.NaN_double = union_nan_double.d;
-   PDL.NaN_cfloat  = union_nan_float.f + I*union_nan_float.f;
-   PDL.NaN_cdouble = union_nan_double.d + I*union_nan_double.d;
    PDL_CORE_BOOT(propagate_badflag)
    PDL_CORE_BOOT(propagate_badvalue)
    PDL_CORE_BOOT(get_pdl_badvalue)

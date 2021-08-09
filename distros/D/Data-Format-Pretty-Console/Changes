@@ -1,3 +1,9 @@
+0.391   2021-08-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump prereq version Text::ANSITable to 0.601+ to fix missing
+	  dependency (GH#1).
+
+
 0.390   2021-04-22  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Update color theme and border style name (RT#135253).

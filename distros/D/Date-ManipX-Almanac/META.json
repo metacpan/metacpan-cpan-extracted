@@ -61,19 +61,19 @@
    "provides" : {
       "Date::ManipX::Almanac" : {
          "file" : "lib/Date/ManipX/Almanac.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Date::ManipX::Almanac::Date" : {
          "file" : "lib/Date/ManipX/Almanac/Date.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Date::ManipX::Almanac::Lang" : {
          "file" : "lib/Date/ManipX/Almanac/Lang.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Date::ManipX::Almanac::Lang::english" : {
          "file" : "lib/Date/ManipX/Almanac/Lang/english.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -91,6 +91,6 @@
          "web" : "https://github.com/trwyant/perl-Date-ManipX-Almanac"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

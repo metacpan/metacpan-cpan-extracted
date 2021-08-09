@@ -1,32 +1,14 @@
 package Carp::Always::DieOnly;
 
-our $DATE = '2015-01-05'; # DATE
-our $VERSION = '0.01'; # VERSION
+our $DATE = '2021-08-09'; # DATE
+our $VERSION = '0.020'; # VERSION
 
 use 5.006;
 
-use Carp ();
+use Carp::Always 0.15 ();
+BEGIN { our @ISA = qw(Carp::Always) }
 
-sub _die {
-    die @_ if ref($_[0]);
-    if ($_[-1] =~ /\n$/s) {
-        my $arg = pop @_;
-        $arg =~ s/(.*)( at .*? line .*?\n$)/$1/s;
-        push @_, $arg;
-    }
-    die &Carp::longmess;
-}
-
-my %OLD_SIG;
-
-BEGIN {
-  @OLD_SIG{qw(__DIE__)} = @SIG{qw(__DIE__)};
-  $SIG{__DIE__} = \&_die;
-}
-
-END {
-  @SIG{qw(__DIE__)} = @OLD_SIG{qw(__DIE__)};
-}
+sub _warn { warn @_ }
 
 1;
 # ABSTRACT: Like Carp::Always, but only print stacktrace on die()
@@ -43,15 +25,17 @@ Carp::Always::DieOnly - Like Carp::Always, but only print stacktrace on die()
 
 =head1 VERSION
 
-This document describes version 0.01 of Carp::Always::DieOnly (from Perl distribution Carp-Always-DieOnly), released on 2015-01-05.
+This document describes version 0.020 of Carp::Always::DieOnly (from Perl distribution Carp-Always-DieOnly), released on 2021-08-09.
 
 =head1 SYNOPSIS
 
  % perl -MCarp::Always::DieOnly script.pl
 
-=head1 SEE ALSO
+=head1 CONTRIBUTOR
 
-L<Carp::Always>
+=for stopwords Adriano Ferreira
+
+Adriano Ferreira <a.r.ferreira@gmail.com>
 
 =head1 HOMEPAGE
 
@@ -69,13 +53,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Carp::Always>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

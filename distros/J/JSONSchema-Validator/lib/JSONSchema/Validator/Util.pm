@@ -193,7 +193,7 @@ sub is_bool {
     return 1 if ref $_[0] eq 'JSON::PP::Boolean';
     return 0 if $_[1]; # is strict
     my $is_number = looks_like_number($_[0]) && ($_[0] == 1 || $_[0] == 0);
-    my $is_string = $_[0] eq '';
+    my $is_string = defined $_[0] && $_[0] eq '';
     my $is_undef = !defined $_[0];
     return 1 if $is_number || $is_string || $is_undef;
     return 0;
@@ -203,6 +203,7 @@ sub is_bool {
 sub is_integer {
     return 1 if B::svref_2object(\$_[0])->FLAGS & B::SVf_IOK();
     return 0 if $_[1]; # is strict
+    return 0 if ref $_[0];
     return 1 if looks_like_number($_[0]) && int($_[0]) == $_[0];
     return 0;
 }
@@ -211,6 +212,7 @@ sub is_integer {
 sub is_number {
     return 1 if B::svref_2object(\$_[0])->FLAGS & (B::SVf_IOK() | B::SVf_NOK());
     return 0 if $_[1]; # is strict
+    return 0 if ref $_[0];
     return 1 if looks_like_number($_[0]);
     return 0;
 }
@@ -267,7 +269,7 @@ JSONSchema::Validator::Util - Useful functions
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AUTHORS
 

@@ -46,7 +46,7 @@ JSONSchema::Validator::Constraints::Draft7 - JSON Schema Draft7 specification co
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AUTHORS
 

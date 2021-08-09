@@ -1,5 +1,5 @@
 package Yancy::Plugin::Roles;
-our $VERSION = '1.074';
+our $VERSION = '1.075';
 # ABSTRACT: Role-based access controls (RBAC)
 
 #pod =head1 SYNOPSIS
@@ -137,7 +137,7 @@ Yancy::Plugin::Roles - Role-based access controls (RBAC)
 
 =head1 VERSION
 
-version 1.074
+version 1.075
 
 =head1 SYNOPSIS
 

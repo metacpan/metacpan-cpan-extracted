@@ -1,7 +1,7 @@
 use alienfile;
 use FFI::CheckLib qw[find_lib_or_die];
 use Config;
-plugin 'PkgConfig' => 'libsdl2';
+plugin 'PkgConfig' => 'sdl2';
 
 my $version = $ENV{ALIEN_LIBSDL2_VERSION} || '2.0.14';
 my $arch    = 'x86_64';
@@ -29,15 +29,16 @@ share {
         plugin Extract => 'zip';
     }
     else {    # Linux, OSX, etc.
+
         plugin 'Download' => ( url => "https://libsdl.org/release/SDL2-$version.tar.gz" );
         plugin Extract    => 'tar.xz';
         plugin 'Build::Autoconf';
         plugin 'Build::Make' => 'gmake';
         build [
-            'mkdir build',
-            'cd build',
-            '../%{configure}',
-            '%{gmake}',
+            #'mkdir build',
+            #'cd build',
+            '%{configure} --prefix=%{.install.prefix}',    # --enable-threads=no',
+            '%{gmake} -j 10',
             '%{gmake} install',
         ];
     }
@@ -48,8 +49,8 @@ share {
         my ($build) = @_;
         $build->runtime_prop->{version} = $version;
         $build->runtime_prop->{version} =~ s/^v//;
-        $build->runtime_prop->{cflags} = "-I@{[ $build->runtime_prop->{prefix} ]}/include ";
-        $build->runtime_prop->{libs}   = "-L@{[ $build->runtime_prop->{prefix} ]}/lib -lsdl2 ";
+        $build->runtime_prop->{cflags} = "-I@{[ $build->runtime_prop->{prefix} ]}/include";
+        $build->runtime_prop->{libs}   = "-L@{[ $build->runtime_prop->{prefix} ]}/lib -lSDL2";
     };
 
     plugin 'Gather::IsolateDynamic';

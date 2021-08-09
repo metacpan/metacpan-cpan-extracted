@@ -3,12 +3,16 @@ Changes
 hax/dumpers.c.inc
 hax/perl-additions.c.inc
 hax/perl-backcompat.c.inc
+include/class.h
 include/object_pad.h
+include/slot.h
 lib/Object/mop-class.xsi
 lib/Object/mop-method.xsi
 lib/Object/mop-slot.xsi
 lib/Object/Pad.pm
 lib/Object/Pad.xs
+lib/Object/Pad/ExtensionBuilder.pm
+lib/Object/Pad/ExtensionBuilder_data.pm.PL
 lib/Object/Pad/MOP/Class.pm
 lib/Object/Pad/MOP/Method.pm
 lib/Object/Pad/MOP/Slot.pm

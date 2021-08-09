@@ -1,0 +1,113 @@
+NAME
+    App::MineralUtils - Utilities related to minerals (and mineral
+    supplements)
+
+VERSION
+    This document describes version 0.001 of App::MineralUtils (from Perl
+    distribution App-MineralUtils), released on 2021-08-08.
+
+DESCRIPTION
+    This distributions provides the following command-line utilities:
+
+    *   convert-magnesium-unit
+
+FUNCTIONS
+  convert_magnesium_unit
+    Usage:
+
+     convert_magnesium_unit(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Convert a magnesium quantity from one unit to another.
+
+    Examples:
+
+    *   Show all possible conversions:
+
+         convert_magnesium_unit(quantity => "mg");
+
+        Result:
+
+         [
+           200,
+           "OK",
+           [
+             { amount => 1, unit => "mg" },
+             { amount => 1, unit => "mg-magnesium-elemental" },
+             { amount => 8.90471950133571, unit => "mg-magnesium-citrate" },
+             { amount => 7.09219858156028, unit => "mg-magnesium-glycinate" },
+             { amount => 13.8888888888889, unit => "mg-magnesium-l-threonate" },
+             { amount => 1.65837479270315, unit => "mg-magnesium-oxide" },
+           ],
+           {},
+         ]
+
+    *   Find out how many mg of elemental magnesium is in 1000mg of
+        magnesium l-threonate:
+
+         convert_magnesium_unit(
+           quantity => "1000 mg-magnesium-l-threonate",
+           to_unit  => "mg-magnesium-elemental"
+         );
+
+        Result:
+
+         [200, "OK", 72, {}]
+
+    If target unit is not specified, will show all known conversions.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   quantity* => *str*
+
+    *   to_unit => *str*
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-MineralUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-MineralUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-MineralUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    App::VitaminUtils
+
+    Physics::Unit
+
+    Online vitamin converters:
+    <https://www.rfaregulatoryaffairs.com/vitamin-converter>,
+    <https://avsnutrition.com.au/wp-content/themes/avs-nutrition/vitamin-con
+    verter.html>.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -8,7 +8,7 @@ package IO::Async::Loop;
 use strict;
 use warnings;
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 # When editing this value don't forget to update the docs below
 use constant NEED_API_VERSION => '0.33';
@@ -90,31 +90,31 @@ C<IO::Async::Loop> - core loop of the C<IO::Async> framework
 
 =head1 SYNOPSIS
 
- use IO::Async::Stream;
- use IO::Async::Timer::Countdown;
+   use IO::Async::Stream;
+   use IO::Async::Timer::Countdown;
 
- use IO::Async::Loop;
+   use IO::Async::Loop;
 
- my $loop = IO::Async::Loop->new;
+   my $loop = IO::Async::Loop->new;
 
- $loop->add( IO::Async::Timer::Countdown->new(
-    delay => 10,
-    on_expire => sub { print "10 seconds have passed\n" },
- )->start );
+   $loop->add( IO::Async::Timer::Countdown->new(
+      delay => 10,
+      on_expire => sub { print "10 seconds have passed\n" },
+   )->start );
 
- $loop->add( IO::Async::Stream->new_for_stdin(
-    on_read => sub {
-       my ( $self, $buffref, $eof ) = @_;
+   $loop->add( IO::Async::Stream->new_for_stdin(
+      on_read => sub {
+         my ( $self, $buffref, $eof ) = @_;
 
-       while( $$buffref =~ s/^(.*)\n// ) {
-          print "You typed a line $1\n";
-       }
+         while( $$buffref =~ s/^(.*)\n// ) {
+            print "You typed a line $1\n";
+         }
 
-       return 0;
-    },
- ) );
+         return 0;
+      },
+   ) );
 
- $loop->run;
+   $loop->run;
 
 =head1 DESCRIPTION
 
@@ -227,12 +227,12 @@ module for another event system.
 For example, the following two C<$loop> variables will refer to the same
 object:
 
- use IO::Async::Loop;
- use IO::Async::Loop::Poll;
+   use IO::Async::Loop;
+   use IO::Async::Loop::Poll;
 
- my $loop_poll = IO::Async::Loop::Poll->new;
+   my $loop_poll = IO::Async::Loop::Poll->new;
 
- my $loop = IO::Async::Loop->new;
+   my $loop = IO::Async::Loop->new;
 
 While it is not advised to do so under normal circumstances, if the program
 really wishes to construct more than one Loop object, it can call the
@@ -645,7 +645,7 @@ sub new_future
 Blocks until the given future is ready, as indicated by its C<is_ready> method.
 As a convenience it returns the future, to simplify code:
 
- my @result = $loop->await( $future )->get;
+   my @result = $loop->await( $future )->get;
 
 =cut
 
@@ -946,7 +946,7 @@ process before running the code or command. See below.
 A continuation to be called when the child processes exits. It will be invoked
 in the following way:
 
- $on_exit->( $pid, $exitcode, $dollarbang, $dollarat )
+   $on_exit->( $pid, $exitcode, $dollarbang, $dollarat )
 
 The second argument is passed the plain perl C<$?> value.
 
@@ -1019,7 +1019,7 @@ Shortcut for passing C<fdI<n>>, where I<n> is the fileno of the IO
 reference. In this case, the key must be a reference that implements the
 C<fileno> method. This is mostly useful for
 
- $handle => 'keep'
+   $handle => 'keep'
 
 =item fdI<n> => IO
 
@@ -1042,10 +1042,10 @@ existing one. If you want to simply add new keys or change the values of some
 keys without removing the other existing ones, you can simply copy C<%ENV>
 into the hash before setting new keys:
 
- env => {
-    %ENV,
-    ANOTHER => "key here",
- }
+   env => {
+      %ENV,
+      ANOTHER => "key here",
+   }
 
 =item nice => INT
 
@@ -1372,7 +1372,7 @@ C<run_process>:
 A continuation to be called when the child process exits and closed its STDOUT
 and STDERR streams. It will be invoked in the following way:
 
- $on_finish->( $pid, $exitcode, $stdout, $stderr )
+   $on_finish->( $pid, $exitcode, $stdout, $stderr )
 
 The second argument is passed the plain perl C<$?> value.
 
@@ -1518,26 +1518,26 @@ format recognised by L<IO::Async::OS>'s C<extract_addrinfo> method.
 This example shows how to use the C<Socket> functions to construct one for TCP
 port 8001 on address 10.0.0.1:
 
- $loop->connect(
-    addr => {
-       family   => "inet",
-       socktype => "stream",
-       port     => 8001,
-       ip       => "10.0.0.1",
-    },
-    ...
- );
+   $loop->connect(
+      addr => {
+         family   => "inet",
+         socktype => "stream",
+         port     => 8001,
+         ip       => "10.0.0.1",
+      },
+      ...
+   );
 
 This example shows another way to connect to a UNIX socket at F<echo.sock>.
 
- $loop->connect(
-    addr => {
-       family   => "unix",
-       socktype => "stream",
-       path     => "echo.sock",
-    },
-    ...
- );
+   $loop->connect(
+      addr => {
+         family   => "unix",
+         socktype => "stream",
+         path     => "echo.sock",
+      },
+      ...
+   );
 
 =item peer => IO
 
@@ -1619,11 +1619,11 @@ this callback is invoked to inform of the error. It is passed the name of the
 syscall that failed, the arguments that were passed to it, and the error it
 generated. I.e.
 
- $on_fail->( "socket", $family, $socktype, $protocol, $! );
+   $on_fail->( "socket", $family, $socktype, $protocol, $! );
 
- $on_fail->( "bind", $sock, $address, $! );
+   $on_fail->( "bind", $sock, $address, $! );
 
- $on_fail->( "connect", $sock, $address, $! );
+   $on_fail->( "connect", $sock, $address, $! );
 
 Because of the "try all" nature when given a list of multiple addresses, this
 callback may be invoked multiple times, even before an eventual success.
@@ -1648,7 +1648,7 @@ A continuation that is invoked on a successful C<connect(2)> call to a valid
 socket. It will be passed the connected socket handle, as an C<IO::Socket>
 object.
 
- $on_connected->( $handle )
+   $on_connected->( $handle )
 
 =item on_stream => CODE
 
@@ -1657,14 +1657,14 @@ of L<IO::Async::Stream> when the socket is connected. This is provided as a
 convenience for the common case that a Stream object is required as the
 transport for a Protocol object.
 
- $on_stream->( $stream )
+   $on_stream->( $stream )
 
 =item on_socket => CODE
 
 Similar to C<on_stream>, but constructs an instance of L<IO::Async::Socket>.
 This is most useful for C<SOCK_DGRAM> or C<SOCK_RAW> sockets.
 
- $on_socket->( $socket )
+   $on_socket->( $socket )
 
 =item on_connect_error => CODE
 
@@ -1674,7 +1674,7 @@ occurred, and the name of the operation it occurred in. Errors from the
 C<connect(2)> syscall are considered most significant, then C<bind(2)>, then
 finally C<socket(2)>.
 
- $on_connect_error->( $syscall, $! )
+   $on_connect_error->( $syscall, $! )
 
 =item on_resolve_error => CODE
 
@@ -1865,13 +1865,13 @@ Optional. A callback that is invoked if a syscall fails while attempting to
 create a listening sockets. It is passed the name of the syscall that failed,
 the arguments that were passed to it, and the error generated. I.e.
 
- $on_fail->( "socket", $family, $socktype, $protocol, $! );
+   $on_fail->( "socket", $family, $socktype, $protocol, $! );
 
- $on_fail->( "sockopt", $sock, $optname, $optval, $! );
+   $on_fail->( "sockopt", $sock, $optname, $optval, $! );
 
- $on_fail->( "bind", $sock, $address, $! );
+   $on_fail->( "bind", $sock, $address, $! );
 
- $on_fail->( "listen", $sock, $queuesize, $! );
+   $on_fail->( "listen", $sock, $queuesize, $! );
 
 =item queuesize => INT
 
@@ -1912,7 +1912,7 @@ continuations to invoke on success or failure.
 Optional. A callback that is invoked when the Listener object is ready to
 receive connections. The callback is passed the Listener object itself.
 
- $on_notifier->( $listener )
+   $on_notifier->( $listener )
 
 If this callback is required, it may instead be better to construct the
 Listener object directly.
@@ -1923,7 +1923,7 @@ Optional. A callback that is invoked when the listening socket is ready.
 Typically this would be used in the name resolver case, in order to inspect
 the socket's sockname address, or otherwise inspect the filehandle.
 
- $on_listen->( $socket )
+   $on_listen->( $socket )
 
 =item on_listen_error => CODE
 
@@ -2202,7 +2202,7 @@ thows an exception).
 A optional continuation to be called when the child processes exits. It will
 be invoked in the following way:
 
- $on_exit->( $pid, $exitcode )
+   $on_exit->( $pid, $exitcode )
 
 The second argument is passed the plain perl C<$?> value.
 
@@ -2285,11 +2285,11 @@ C<scalar> if not supplied.
 Callback to invoke when the thread function returns or throws an exception.
 If it returned, this callback will be invoked with its result
 
- $on_joined->( return => @result )
+   $on_joined->( return => @result )
 
 If it threw an exception the callback is invoked with the value of C<$@>
 
- $on_joined->( died => $! )
+   $on_joined->( died => $! )
 
 =back
 
@@ -2397,7 +2397,7 @@ The current API version is C<0.49>.
 
 This method may be implemented using C<constant>; e.g
 
- use constant API_VERSION => '0.49';
+   use constant API_VERSION => '0.49';
 
 =cut
 
@@ -2948,7 +2948,7 @@ The PID to watch. Will report on all child processes if this is 0.
 
 A CODE reference to the exit handler. It will be invoked as
 
- $code->( $pid, $? )
+   $code->( $pid, $? )
 
 The second argument is passed the plain perl C<$?> value.
 
@@ -3141,17 +3141,17 @@ remaining ones in another C<extensions> parameter.
 
 For example,
 
- $loop->connect(
-    extensions => [qw( FOO BAR )],
-    %args
- )
+   $loop->connect(
+      extensions => [qw( FOO BAR )],
+      %args
+   )
 
 will become
 
- $loop->FOO_connect(
-    extensions => [qw( BAR )],
-    %args
- )
+   $loop->FOO_connect(
+      extensions => [qw( BAR )],
+      %args
+   )
 
 This is provided so that extension modules, such as L<IO::Async::SSL> can
 easily be invoked indirectly, by passing extra arguments to C<connect> methods
@@ -3161,8 +3161,8 @@ also use it.
 
 The following methods take an C<extensions> parameter:
 
- $loop->connect
- $loop->listen
+   $loop->connect
+   $loop->listen
 
 If an extension C<listen> method is invoked, it will be passed a C<listener>
 parameter even if one was not provided to the original C<< $loop->listen >>

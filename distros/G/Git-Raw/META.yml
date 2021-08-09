@@ -29,7 +29,7 @@ configure_requires:
   Getopt::Long: '2.35'
   perl: '5.004'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.020, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -38,184 +38,184 @@ name: Git-Raw
 provides:
   Git::Raw:
     file: lib/Git/Raw.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::AnnotatedCommit:
     file: lib/Git/Raw/AnnotatedCommit.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Blame:
     file: lib/Git/Raw/Blame.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Blame::Hunk:
     file: lib/Git/Raw/Blame/Hunk.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Blob:
     file: lib/Git/Raw/Blob.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Branch:
     file: lib/Git/Raw/Branch.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Cert:
     file: lib/Git/Raw/Cert.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Cert::HostKey:
     file: lib/Git/Raw/Cert/HostKey.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Cert::X509:
     file: lib/Git/Raw/Cert/X509.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Commit:
     file: lib/Git/Raw/Commit.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Config:
     file: lib/Git/Raw/Config.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Cred:
     file: lib/Git/Raw/Cred.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Diff:
     file: lib/Git/Raw/Diff.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Diff::Delta:
     file: lib/Git/Raw/Diff/Delta.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Diff::File:
     file: lib/Git/Raw/Diff/File.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Diff::Hunk:
     file: lib/Git/Raw/Diff/Hunk.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Diff::Stats:
     file: lib/Git/Raw/Diff/Stats.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Error:
     file: lib/Git/Raw/Error.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Error::Category:
     file: lib/Git/Raw/Error/Category.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Filter:
     file: lib/Git/Raw/Filter.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Filter::List:
     file: lib/Git/Raw/Filter/List.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Filter::Source:
     file: lib/Git/Raw/Filter/Source.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Graph:
     file: lib/Git/Raw/Graph.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Index:
     file: lib/Git/Raw/Index.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Index::Conflict:
     file: lib/Git/Raw/Index/Conflict.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Index::Entry:
     file: lib/Git/Raw/Index/Entry.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Indexer:
     file: lib/Git/Raw/Indexer.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Mempack:
     file: lib/Git/Raw/Mempack.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Merge::File::Result:
     file: lib/Git/Raw/Merge/File/Result.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Note:
     file: lib/Git/Raw/Note.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Object:
     file: lib/Git/Raw/Object.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Odb:
     file: lib/Git/Raw/Odb.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Odb::Backend:
     file: lib/Git/Raw/Odb/Backend.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Odb::Backend::Loose:
     file: lib/Git/Raw/Odb/Backend/Loose.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Odb::Backend::OnePack:
     file: lib/Git/Raw/Odb/Backend/OnePack.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Odb::Backend::Pack:
     file: lib/Git/Raw/Odb/Backend/Pack.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Odb::Object:
     file: lib/Git/Raw/Odb/Object.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Packbuilder:
     file: lib/Git/Raw/Packbuilder.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Patch:
     file: lib/Git/Raw/Patch.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::PathSpec:
     file: lib/Git/Raw/PathSpec.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::PathSpec::MatchList:
     file: lib/Git/Raw/PathSpec/MatchList.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Rebase:
     file: lib/Git/Raw/Rebase.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Rebase::Operation:
     file: lib/Git/Raw/Rebase/Operation.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::RefSpec:
     file: lib/Git/Raw/RefSpec.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Reference:
     file: lib/Git/Raw/Reference.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Reflog:
     file: lib/Git/Raw/Reflog.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Reflog::Entry:
     file: lib/Git/Raw/Reflog/Entry.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Remote:
     file: lib/Git/Raw/Remote.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Repository:
     file: lib/Git/Raw/Repository.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Signature:
     file: lib/Git/Raw/Signature.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Stash:
     file: lib/Git/Raw/Stash.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Stash::Progress:
     file: lib/Git/Raw/Stash/Progress.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Submodule:
     file: lib/Git/Raw/Submodule.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Tag:
     file: lib/Git/Raw/Tag.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::TransferProgress:
     file: lib/Git/Raw/TransferProgress.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Tree:
     file: lib/Git/Raw/Tree.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Tree::Builder:
     file: lib/Git/Raw/Tree/Builder.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Tree::Entry:
     file: lib/Git/Raw/Tree/Entry.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Walker:
     file: lib/Git/Raw/Walker.pm
-    version: '0.87'
+    version: '0.88'
   Git::Raw::Worktree:
     file: lib/Git/Raw/Worktree.pm
-    version: '0.87'
+    version: '0.88'
 requires:
   Carp: '0'
   XSLoader: '0'
@@ -227,10 +227,10 @@ resources:
   bugtracker: https://github.com/jacquesg/p5-Git-Raw/issues
   homepage: http://metacpan.org/release/Git-Raw/
   repository: git://github.com/jacquesg/p5-Git-Raw.git
-version: '0.87'
+version: '0.88'
 x_Dist_Zilla:
   perl:
-    version: '5.030001'
+    version: '5.034000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GatherDir
@@ -244,62 +244,62 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@Author::JACQUESG/GatherDir'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Author::JACQUESG/PruneCruft'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::JACQUESG/ManifestSkip'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::JACQUESG/MetaYAML'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Author::JACQUESG/License'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@Author::JACQUESG/Readme'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Author::JACQUESG/ExtraTests'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::JACQUESG/ExecDir'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::JACQUESG/ShareDir'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::JACQUESG/Manifest'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Author::JACQUESG/TestRelease'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::JACQUESG/ConfirmRelease'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::GitHub::Meta
       name: '@Author::JACQUESG/@GitHub/GitHub::Meta'
-      version: '0.47'
+      version: '0.48'
     -
       class: Dist::Zilla::Plugin::GitHub::Update
       config:
         Dist::Zilla::Plugin::GitHub::Update:
           metacpan: 1
       name: '@Author::JACQUESG/@GitHub/GitHub::Update'
-      version: '0.47'
+      version: '0.48'
     -
       class: Dist::Zilla::Plugin::Git::NextVersion
       config:
@@ -308,34 +308,34 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.28.0
+          git_version: 2.25.1
           repo_root: .
       name: '@Author::JACQUESG/Git::NextVersion'
-      version: '2.046'
+      version: '2.047'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::JACQUESG/MetaConfig'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::JACQUESG/MetaJSON'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@Author::JACQUESG/AutoPrereqs'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::PodVersion
       name: '@Author::JACQUESG/PodVersion'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@Author::JACQUESG/PkgVersion'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@Author::JACQUESG/NextRelease'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
@@ -361,17 +361,18 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::JACQUESG/PodSyntaxTests'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: '@Author::JACQUESG/PodCoverageTests'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
           commit_msg: v%V%n%n%c
+          signoff: '0'
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Changes
@@ -379,12 +380,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.28.0
+          git_version: 2.25.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::JACQUESG/Git::Commit'
-      version: '2.046'
+      version: '2.047'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -392,16 +393,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.87
+          tag: v0.88
           tag_format: v%V
           tag_message: '%N %v'
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.28.0
+          git_version: 2.25.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::JACQUESG/Git::Tag'
-      version: '2.046'
+      version: '2.047'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -410,14 +411,14 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.28.0
+          git_version: 2.25.1
           repo_root: .
       name: '@Author::JACQUESG/Git::Push'
-      version: '2.046'
+      version: '2.047'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Author::JACQUESG/UploadToCPAN'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::InstallRelease
       name: '@Author::JACQUESG/InstallRelease'
@@ -433,7 +434,7 @@ x_Dist_Zilla:
           phase: configure
           type: requires
       name: ConfigureRequires
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -441,7 +442,7 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: TestRequires
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::MinimumPerl
       name: MinimumPerl
@@ -454,7 +455,7 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: MetaProvides::Package/AUTOVIV/:InstallModulesPM
-              version: '6.014'
+              version: '6.020'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
@@ -462,7 +463,7 @@ x_Dist_Zilla:
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000036'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: MetaProvides::Package
       version: '2.004003'
@@ -471,67 +472,67 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::MakeMaker:
           make_path: make
-          version: '6.014'
+          version: '6.020'
         Dist::Zilla::Plugin::MakeMaker::Awesome:
           version: '0.48'
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
-          version: '6.014'
+          version: '6.020'
       name: MakeMaker
       version: ~
     -
       class: Dist::Zilla::Plugin::PruneFiles
       name: PruneFiles
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.014'
+      version: '6.020'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: MetaProvides::Package/AUTOVIV/:InstallModulesPM
-      version: '6.014'
+      version: '6.020'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.014'
-x_generated_by_perl: v5.30.1
+    version: '6.020'
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

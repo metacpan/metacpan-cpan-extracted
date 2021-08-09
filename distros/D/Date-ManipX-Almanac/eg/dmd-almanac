@@ -14,7 +14,7 @@ use FindBin qw{ $Bin };
 use Getopt::Long 2.33 qw{ :config auto_version };
 use Pod::Usage;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 my %opt = (
     almanacconfigfile	=> "$Bin/@{[ basename( $0 ) ]}.cfg",

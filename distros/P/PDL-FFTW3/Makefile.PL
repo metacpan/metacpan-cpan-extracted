@@ -90,6 +90,11 @@ $descriptor{META_MERGE} = {
         'CPAN::Changes' => 0,
       },
     },
+    test => {
+      requires => {
+        'Test::More' => '0.98',
+      },
+    },
   },
 };
 

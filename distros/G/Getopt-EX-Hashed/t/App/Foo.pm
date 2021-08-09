@@ -6,6 +6,14 @@ use Data::Dumper;
 
 use Getopt::EX::Hashed;
 
+# DEFAULT: is => 'ro' / 'rw'
+if (our $ACCESSOR_DEFAULT_RO) {
+    Getopt::EX::Hashed->configure(DEFAULT => [ is => 'ro' ]);
+}
+if (our $ACCESSOR_DEFAULT_RW) {
+    Getopt::EX::Hashed->configure(DEFAULT => [ is => 'rw' ]);
+}
+
 has string   => ( spec => '=s' );
 has say      => ( spec => '=s', default => "Hello" );
 has number   => ( spec => '=i' );
@@ -28,6 +36,15 @@ has '+both' => default => sub {
 has android => ;
 has paranoid => spec => '=s',
 		action => sub { $_->{android} = $_[1] };
+
+# is => 'ro'
+if (our $ACCESSOR_RO) {
+    has [ qw(
+	+string +say +number +implicit +start +finish +tricia +zaphord +so_long +list +hash 
+	+left +right +both
+	+android +paranoid
+    ) ] => is => 'ro' ;
+}
 
 # erroneous incremental usage: live or die?
 if (our $WRONG_INCREMENTAL) {

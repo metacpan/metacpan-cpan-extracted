@@ -3,7 +3,7 @@ package Firefox::Marionette::Certificate;
 use strict;
 use warnings;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 sub _NUMBER_OF_MICROSECOND_DIGITS { return -6 }
 
@@ -166,7 +166,7 @@ Firefox::Marionette::Certificate - Represents a x509 Certificate from Firefox
 
 =head1 VERSION
 
-Version 1.11
+Version 1.12
 
 =head1 SYNOPSIS
 
@@ -314,11 +314,7 @@ None reported.
 
 =head1 BUGS AND LIMITATIONS
 
-No bugs have been reported.
-
-Please report any bugs or feature requests to
-C<bug-firefox-marionette@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org>.
+To report a bug, or view the current list of bugs, please visit L<https://github.com/david-dick/firefox-marionette/issues>
 
 =head1 AUTHOR
 

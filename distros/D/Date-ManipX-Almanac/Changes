@@ -1,2 +1,12 @@
+0.002		2021-08-09	T. R. Wyant
+    In English, add 'up' and 'down' as synonyms for 'rise' and 'set'.
+
+    English did not parse twilight types at the beginning of twilight.
+    That is "end of astronomical twilight" was parsed, but "beginning of
+    astronomical twilight" was not. Fixed.
+
+    In English, Allow (but ignore) "when" before bodies, as in "tomorrow
+    when the sun rises"
+
 0.001		2021-07-13	T. R. Wyant
     Initial production release.

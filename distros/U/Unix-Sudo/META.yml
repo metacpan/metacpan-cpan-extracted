@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,10 +24,10 @@ requires:
   Data::Dumper: '0'
   PadWalker: '0'
   Probe::Perl: '0'
+  Taint::Runtime: '0'
   Test::More: '0.88'
-  tainting: '0'
 resources:
   bugtracker: https://github.com/DrHyde/perl-modules-Unix-Sudo/issues
   repository: https://github.com/DrHyde/perl-modules-Unix-Sudo
-version: '4'
+version: v4.567.89
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

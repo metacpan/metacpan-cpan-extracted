@@ -7,7 +7,7 @@ use exact;
 use DateTime;
 use DateTime::Format::Human::Duration;
 
-our $VERSION = '1.36'; # VERSION
+our $VERSION = '1.37'; # VERSION
 
 sub init {
     my ($bot)    = @_;
@@ -62,7 +62,7 @@ Bot::IRC::Greeting - Bot::IRC greet joining users to channels
 
 =head1 VERSION
 
-version 1.36
+version 1.37
 
 =head1 SYNOPSIS
 

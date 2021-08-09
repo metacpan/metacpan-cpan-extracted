@@ -2,8 +2,8 @@ NAME
     Text::ANSI::Util - Routines for text containing ANSI color codes
 
 VERSION
-    This document describes version 0.231 of Text::ANSI::Util (from Perl
-    distribution Text-ANSI-Util), released on 2021-01-23.
+    This document describes version 0.232 of Text::ANSI::Util (from Perl
+    distribution Text-ANSI-Util), released on 2021-04-14.
 
 SYNOPSIS
      use Text::ANSI::Util qw(
@@ -286,6 +286,11 @@ FUNCTIONS
     See also: "ta_mbwrap()" in Text::ANSI::WideUtil.
 
 FAQ
+  Why split functionalities of wide character and color support into multiple modules/distributions?
+    Performance (see numbers in the function description), dependency
+    (Unicode::GCString is used for wide character support), and overhead
+    (loading Unicode::GCString).
+
   How do I highlight a string case-insensitively?
     You can currently use a regex for the $needle and use the "i" modifier.
     Example:

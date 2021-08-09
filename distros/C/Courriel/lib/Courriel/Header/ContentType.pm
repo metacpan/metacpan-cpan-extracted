@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 use Courriel::Types qw( Maybe NonEmptyStr );
 
@@ -96,7 +96,7 @@ Courriel::Header::ContentType - The content type for an email part
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 SYNOPSIS
 
@@ -156,8 +156,8 @@ A string like "text/plain" or "multipart/alternative". This is required.
 
 A hash reference of attributes from the header, such as a boundary, charset,
 etc. The keys are attribute names and the values can either be strings or
-L<Courriel::HeaderAttribute> objects. Values which are strings will be
-inflated into objects by the constructor.
+L<Courriel::HeaderAttribute> objects. Values which are strings will be inflated
+into objects by the constructor.
 
 This is optional, and can be an empty hash reference or omitted entirely.
 
@@ -173,8 +173,8 @@ The raw header value.
 
 =head2 $ct->mime_type()
 
-Returns the mime type value passed to the constructor. However, this value
-will be in all lower-case, regardless of the original casing passed to the
+Returns the mime type value passed to the constructor. However, this value will
+be in all lower-case, regardless of the original casing passed to the
 constructor.
 
 =head2 $ct->charset()
@@ -189,8 +189,7 @@ Returns a hash (not a reference) of the attributes passed to the constructor.
 Attributes are L<Courriel::HeaderAttribute> objects.
 
 The keys of the hash are all lower case, though the original casing is
-preserved in the C<name()> returned by the L<Courriel::HeaderAttribute>
-object.
+preserved in the C<name()> returned by the L<Courriel::HeaderAttribute> object.
 
 =head2 $ct->is_binary()
 
@@ -213,9 +212,9 @@ The attribute is a L<Courriel::HeaderAttribute> object.
 
 =head2 $ct->as_header_value()
 
-Returns the object as a string suitable for a header value (but not
-folded). Note that this uses the original casing of the mime type as passed to
-the constructor.
+Returns the object as a string suitable for a header value (but not folded).
+Note that this uses the original casing of the mime type as passed to the
+constructor.
 
 =head1 EXTENDS
 
@@ -241,7 +240,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Dave Rolsky.
+This software is Copyright (c) 2021 by Dave Rolsky.
 
 This is free software, licensed under:
 

@@ -11,12 +11,12 @@ use JSONSchema::Validator::Util qw(is_type serialize unbool);
 
 use parent 'JSONSchema::Validator::Constraints::Draft4';
 
-# params: $self, $value, $type
+# params: $self, $value, $type, $strict
 sub check_type {
     if ($_[2] eq 'integer') {
-        return is_type($_[1], 'number', $_[0]->strict) && int($_[1]) == $_[1];
+        return is_type($_[1], 'number', $_[3] // $_[0]->strict) && int($_[1]) == $_[1];
     }
-    return is_type($_[1], $_[2], $_[0]->strict);
+    return is_type($_[1], $_[2], $_[3] // $_[0]->strict);
 }
 
 sub exclusiveMaximum {
@@ -99,16 +99,17 @@ sub const {
 
     my $result = 0;
 
-    if ($self->check_type($const, 'boolean')) {
+    # schema must have strict check
+    if ($self->check_type($const, 'boolean', 1)) {
         $result = $self->check_type($instance, 'boolean')
                     ? unbool($instance) eq unbool($const)
                     : 0
-    } elsif ($self->check_type($const, 'object') || $self->check_type($const, 'array')) {
+    } elsif ($self->check_type($const, 'object', 1) || $self->check_type($const, 'array', 1)) {
         $result =   $self->check_type($instance, 'object') ||
                     $self->check_type($instance, 'array')
                     ? serialize($instance) eq serialize($const)
                     : 0;
-    } elsif ($self->check_type($const, 'number')) {
+    } elsif ($self->check_type($const, 'number', 1)) {
         $result =   $self->check_type($instance, 'number')
                     ? $const == $instance
                     : 0;
@@ -142,7 +143,7 @@ JSONSchema::Validator::Constraints::Draft6 - JSON Schema Draft6 specification co
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AUTHORS
 

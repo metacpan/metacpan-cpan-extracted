@@ -3,9 +3,11 @@ use strict;
 use warnings;
 use Test::More tests => 4;
 use File::Temp qw/ tempdir /;
-use Graphics::Fig;
 use Math::Trig;
-use t::FigCmp;
+use lib "lib";
+use Graphics::Fig;
+use lib "t";
+use FigCmp;
 
 #
 # Create temp directory.

@@ -241,7 +241,7 @@ add_slot(self, slotname, ...)
           break;
 
         case 1: /* param */
-          mop_slot_set_param(slotmeta, kwval);
+          mop_slot_apply_attribute(slotmeta, "param", kwval);
           break;
 
         case 2: /* reader */
@@ -266,7 +266,7 @@ add_slot(self, slotname, ...)
       }
     }
 
-    MOP_SLOT_RUN_HOOKS(slotmeta, seal_slot, 0);
+    MOP_SLOT_RUN_HOOKS_NOARGS(slotmeta, seal_slot);
 
     RETVAL = newSV(0);
     sv_setref_uv(RETVAL, "Object::Pad::MOP::Slot", PTR2UV(slotmeta));

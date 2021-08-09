@@ -35,8 +35,8 @@ t/client-connect-async.t
 t/client-connect.t
 t/client-disconnect-async.t
 t/client-leak.t
-t/client-monitoreditems.t
 t/client-monitoreditems-multiple.t
+t/client-monitoreditems.t
 t/client-read-async.t
 t/client-server-read-write.t
 t/client-statecallback.t

@@ -13,7 +13,7 @@ plan 1;
 # <https://web.archive.org/web/20150516014452/http://spdx.org:80/news/2015-05-13/this-is-a-milestone-day-for-spdx-the-release-of-version-2.0.-this-release-is-a-great>
 
 like(
-	license_org_metadata( 'spdx', '20150513', '2' ),
+	license_org_metadata( 'spdx', { date => '20150513', rev => '2' } ),
 	hash {
 		field '3dfx Glide License'                              => 'Glide';
 		field 'Abstyles License'                                => 'Abstyles';

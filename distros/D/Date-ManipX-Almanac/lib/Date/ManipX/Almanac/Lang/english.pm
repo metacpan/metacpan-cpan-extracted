@@ -9,7 +9,7 @@ use parent qw{ Date::ManipX::Almanac::Lang };
 
 use Carp;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 our $LangName = 'English';
 
@@ -18,11 +18,10 @@ sub __body_data {
     my ( $self ) = @_;
     my @season = $self->__season_to_detail();
     return [
-	[ 'Astro::Coord::ECI::Sun'	=> qr/ (?: the \s* )? sun /smxi,
-	    qr/ (?: the \s* )? (?:
-		(?<detail> begin ) (?: ning )? (?: \s* of )? \s*
-		    (?<specific> twilight ) |
-		(?<detail> end ) (?: ing )? (?: \s* of )? \s*
+	[ 'Astro::Coord::ECI::Sun'	=>
+	    qr/ (?: (?: when | at ) \s* )? (?: the \s* )? sun /smxi,
+	    qr/ (?: at \s* )? (?: the \s* )? (?:
+		(?<detail> beginn? | end ) (?: ing )? (?: \s* of )? \s*
 		    (?<qual> astronomical | civil | nautical )? \s*
 		    (?<specific> twilight ) |
 		(?<qual> astronomical | civil | nautical )? \s*
@@ -64,6 +63,7 @@ sub __body_data {
 		],
 		twilight	=> [ twilight => {
 			begin	=> 1,
+			beginn	=> 1,
 			end	=> 0,
 			evening	=> 0,
 			morning	=> 1,
@@ -76,8 +76,9 @@ sub __body_data {
 		],
 	    },
 	],
-	[ 'Astro::Coord::ECI::Moon'	=> qr/ (?: the \s* )? moon /smxi,
-	    qr/ (?: the \s* )? (?:
+	[ 'Astro::Coord::ECI::Moon'	=>
+	    qr/ (?: (?: when | at ) \s* )? (?: the \s* )? moon /smxi,
+	    qr/ (?: at \s* )? (?: the \s* )? (?:
 		(?<specific> first | last ) \s* \s* quarter (?: \s* moon )? |
 		(?<specific> full | new ) (?: \s* moon )?
 	    ) /smxi,
@@ -96,13 +97,20 @@ sub __body_data {
 	# language.
 	# NOTE we don't need the Sun here, because ::VSOP87D::Sun is a
 	# subclass of ::Sun.
-	[ 'Astro::Coord::ECI::VSOP87D::Mercury'	=> qr/ mercury /smxi ],
-	[ 'Astro::Coord::ECI::VSOP87D::Venus'	=> qr/ venus /smxi ],
-	[ 'Astro::Coord::ECI::VSOP87D::Mars'	=> qr/ mars /smxi ],
-	[ 'Astro::Coord::ECI::VSOP87D::Jupiter'	=> qr/ jupiter /smxi ],
-	[ 'Astro::Coord::ECI::VSOP87D::Saturn'	=> qr/ saturn /smxi ],
-	[ 'Astro::Coord::ECI::VSOP87D::Uranus'	=> qr/ uranus /smxi ],
-	[ 'Astro::Coord::ECI::VSOP87D::Neptune'	=> qr/ neptune /smxi ],
+	[ 'Astro::Coord::ECI::VSOP87D::Mercury'	=>
+	    qr/ (?: when \s* )? mercury /smxi ],
+	[ 'Astro::Coord::ECI::VSOP87D::Venus'	=>
+	    qr/ (?: when \s* )? venus /smxi ],
+	[ 'Astro::Coord::ECI::VSOP87D::Mars'	=>
+	    qr/ (?: when \s* )? mars /smxi ],
+	[ 'Astro::Coord::ECI::VSOP87D::Jupiter'	=>
+	    qr/ (?: when \s* )? jupiter /smxi ],
+	[ 'Astro::Coord::ECI::VSOP87D::Saturn'	=>
+	    qr/ (?: when \s* )? saturn /smxi ],
+	[ 'Astro::Coord::ECI::VSOP87D::Uranus'	=>
+	    qr/ (?: when \s* )? uranus /smxi ],
+	[ 'Astro::Coord::ECI::VSOP87D::Neptune'	=>
+	    qr/ (?: when \s* )? neptune /smxi ],
     ];
 }
 
@@ -115,10 +123,10 @@ sub __general_event_re {
     return qr/
 	(?: the \s* )? (?<general> culminat ) (?: es? | ion ) (?: \s* of )? |
 	(?: is \s* )? (?: the \s* )? (?<general> highest ) |
-	(?<general> rise ) s? |
+	(?<general> rise | set ) s? |
 	(?: the \s* )? (?<general> rising ) (?: \s* of )? |
-	(?<general> set ) s? |
-	(?: the \s* )? (?<general> setting ) (?: \s* of )?
+	(?: the \s* )? (?<general> setting ) (?: \s* of )? |
+	(?: is \s* )? (?<general> up | down )
     /smxi;
 }
 
@@ -132,11 +140,13 @@ sub __general_event_interp {
     return [
 	{
 	    culminat	=> $highest,
+	    down	=> $set,
 	    highest	=> $highest,
 	    rise	=> $rise,
 	    rising	=> $rise,
 	    set		=> $set,
 	    setting	=> $set,
+	    up		=> $rise,
 	},
     ];
 }
@@ -176,7 +186,9 @@ The following astronomical bodies are recognized:
  uranus
  neptune
 
-The word C<'the'> is optional.
+The word C<'the'> is optional. So is the word C<'when'> before the
+entire body name string; that is, C<'when the sun'> but not
+C<'the when sun'>.
 
 =head1 ALMANAC EVENTS
 
@@ -209,7 +221,8 @@ This module recognizes
  the culmination of
  is the highest
 
-The words C<'is'>, C<'the'>, and C<'of'> are optional.
+The words C<'is'>, C<'the'>, and C<'of'> are optional. So is the word
+C<'at'> before the name of the event.
 
 =item Rise
 
@@ -220,8 +233,10 @@ module recognizes
  rise
  rises
  the rising of
+ is up
 
-The words C<'the'> and C<'of'> are optional.
+The words C<'the'>, C<'of'>, and C<'is'> are optional. So is the word
+C<'at'> before the name of the event.
 
 =item Set
 
@@ -232,8 +247,10 @@ module recognizes
  set
  sets
  the setting of
+ is down
 
-The words C<'the'> and C<'of'> are optional.
+The words C<'the'>, C<'of'>, and C<'is'> are optional. So is the word
+C<'at'> before the name of the event.
 
 =back
 
@@ -253,7 +270,8 @@ The following specific events should be recognized by any subclass:
 This implies the Moon. It computes the first occurrence of the specified
 phase on or after the specified date.
 
-The words C<'the'> and C<'moon'> are optional.
+The words C<'the'> and C<'moon'> are optional. So is the word
+C<'at'> before the name of the event.
 
 =item Solar quarters
 
@@ -271,7 +289,8 @@ This implies the Sun. It computes the first occurrence of the specified
 quarter after the specified date. B<Note> that the time specified by the
 seasonal names differs between Northern and Southern Hemispheres.
 
-The word C<'the'> is optional.
+The word C<'the'> is optional. So is the word
+C<'at'> before the name of the event.
 
 =item twilight
 
@@ -293,7 +312,8 @@ One of the words C<'civil'>, C<'nautical'>, or C<'astronomical'> can
 optionally be inserted before C<'twilight'>, specifying that the Sun be
 6, 12, or 18 degrees below the horizon, respectively.
 
-The words C<'the'> and C<'of'> are optional.
+The words C<'the'> and C<'of'> are optional. So is the word
+C<'at'> before the name of the event.
 
 =item noon
 
@@ -302,6 +322,8 @@ The words C<'the'> and C<'of'> are optional.
 
 This implies the Sun. The C<'local noon'> specification is equivalent to
 C<'sun culminates'>.
+
+The word C<'at'> may optionally appear before the name of the event.
 
 =back
 

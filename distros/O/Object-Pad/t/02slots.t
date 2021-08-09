@@ -114,4 +114,18 @@ class Holder {
 
 Sequencing->new->test;
 
+# Slots are visible to string-eval()
+{
+   class Evil {
+      has $slot;
+
+      method test {
+         $slot = "the value";
+         ::is( eval '$slot', "the value", 'slots are visible to string eval()' );
+      }
+   }
+
+   Evil->new->test;
+}
+
 done_testing;

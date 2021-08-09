@@ -1,9 +1,9 @@
 package Text::Table::More;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-06'; # DATE
+our $DATE = '2021-08-09'; # DATE
 our $DIST = 'Text-Table-More'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 use 5.010001;
 use strict;
@@ -607,7 +607,7 @@ Text::Table::More - Generate text table with simple interface and many options
 
 =head1 VERSION
 
-This document describes version 0.014 of Text::Table::More (from Perl distribution Text-Table-More), released on 2021-04-06.
+This document describes version 0.016 of Text::Table::More (from Perl distribution Text-Table-More), released on 2021-08-09.
 
 =head1 SYNOPSIS
 
@@ -1102,7 +1102,7 @@ Source repository is at L<https://github.com/perlancar/perl-Text-Table-More>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Text-Table-More/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Table-More>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -1129,7 +1129,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

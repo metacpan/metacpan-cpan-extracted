@@ -1,3 +1,8 @@
+0.055   2021-08-06  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix bug in regexp (wrong capture).
+
+
 0.054   2021-05-21  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Don't add extraneous newline to output.

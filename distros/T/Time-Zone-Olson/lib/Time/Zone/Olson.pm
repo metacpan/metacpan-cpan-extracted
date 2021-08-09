@@ -20,7 +20,7 @@ BEGIN {
     }
 }
 
-our $VERSION = '0.36';
+our $VERSION = '0.38';
 
 sub _SIZE_OF_TZ_HEADER                     { return 44 }
 sub _SIZE_OF_TRANSITION_TIME_V1            { return 4 }
@@ -3197,7 +3197,7 @@ Time::Zone::Olson - Provides an Olson timezone database interface
 
 =head1 VERSION
 
-Version 0.36
+Version 0.38
 
 =cut
 
@@ -3397,9 +3397,7 @@ On Windows platforms, the Olson TZ database is usually unavailable.  In an attem
 
 For perl versions less than 5.10, support for TZ environment variable parsing is not complete.  It should cover all existing cases in the Olson time zone database though.
 
-Please report any bugs or feature requests to C<bug-time-zone-olson at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Time-Zone-Olson>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+To report a bug, or view the current list of bugs, please visit L<https://github.com/david-dick/time-zone-olson/issues>
 
 =head1 SEE ALSO
 
@@ -3428,7 +3426,7 @@ David Dick, C<< <ddick at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2019 David Dick.
+Copyright 2021 David Dick.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

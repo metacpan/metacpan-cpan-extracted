@@ -1,5 +1,5 @@
 package Git::Raw::TransferProgress;
-$Git::Raw::TransferProgress::VERSION = '0.87';
+$Git::Raw::TransferProgress::VERSION = '0.88';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ Git::Raw::TransferProgress - Git transfer progress class
 
 =head1 VERSION
 
-version 0.87
+version 0.88
 
 =head1 DESCRIPTION
 

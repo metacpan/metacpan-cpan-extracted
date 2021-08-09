@@ -1,17 +1,20 @@
 Revision history for JSONSchema-Validator
 
+0.006  2021-08-07
+    - Fixed warnings when using undef variables
+
 0.005  2021-08-04
-    - fixed bug with dereference undefined value (j-waters)
+    - Fixed bug with dereference undefined value (j-waters)
 
 0.004  2021-08-02
-    - add json schema draft7 validator
+    - Added JSON Schema draft7 validator
 
 0.003  2021-08-01
-    - Fix error "eval-group at runtime" in regexp
-    - add json schema draft6 validator
+    - Fixed error "eval-group at runtime" in regexp
+    - Added JSON Schema draft6 validator
 
 0.002  2021-07-22
-    - Fix bug with import JSON::PP
+    - Fixed bug with import JSON::PP
 
 0.001  2021-07-22
     - First release.

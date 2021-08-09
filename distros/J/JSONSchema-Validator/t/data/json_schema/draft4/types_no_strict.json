@@ -1,0 +1,338 @@
+[
+    {
+        "subject": "type boolean",
+        "schema": {
+            "type": "boolean"
+        },
+        "tests": [
+            {
+                "description": "boolean true",
+                "data": true,
+                "valid": true,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "boolean false",
+                "data": false,
+                "valid": true,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "undef",
+                "data": null,
+                "valid": true,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "empty string",
+                "data": "",
+                "valid": true,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "string",
+                "data": "qwe",
+                "valid": false,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "array",
+                "data": [],
+                "valid": false,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "object",
+                "data": {},
+                "valid": false,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "integer",
+                "data": 12,
+                "valid": false,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "number",
+                "data": 12.2,
+                "valid": false,
+                "new_params" : {
+                    "strict" : 0
+                }
+            }
+        ]
+    },
+    {
+        "subject": "type integer",
+        "schema": {
+            "type": "integer"
+        },
+        "tests": [
+            {
+                "description": "boolean true",
+                "data": true,
+                "valid": false,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "boolean false",
+                "data": false,
+                "valid": false,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "undef",
+                "data": null,
+                "valid": false,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "empty string",
+                "data": "",
+                "valid": false,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "string",
+                "data": "qwe",
+                "valid": false,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "string like integer",
+                "data": "123",
+                "valid": true,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "array",
+                "data": [],
+                "valid": false,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "object",
+                "data": {},
+                "valid": false,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "integer",
+                "data": 12,
+                "valid": true,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "number",
+                "data": 12.2,
+                "valid": false,
+                "new_params" : {
+                    "strict" : 0
+                }
+            }
+        ]
+    },
+    {
+        "subject": "type number",
+        "schema": {
+            "type": "number"
+        },
+        "tests": [
+            {
+                "description": "boolean true",
+                "data": true,
+                "valid": false,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "boolean false",
+                "data": false,
+                "valid": false,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "undef",
+                "data": null,
+                "valid": false,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "empty string",
+                "data": "",
+                "valid": false,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "string",
+                "data": "qwe",
+                "valid": false,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "string like number",
+                "data": "123.2",
+                "valid": true,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "array",
+                "data": [],
+                "valid": false,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "object",
+                "data": {},
+                "valid": false,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "integer",
+                "data": 12,
+                "valid": true,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "number",
+                "data": 12.2,
+                "valid": true,
+                "new_params" : {
+                    "strict" : 0
+                }
+            }
+        ]
+    },
+    {
+        "subject": "type null",
+        "schema": {
+            "type": "null"
+        },
+        "tests": [
+            {
+                "description": "boolean true",
+                "data": true,
+                "valid": false,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "boolean false",
+                "data": false,
+                "valid": false,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "undef",
+                "data": null,
+                "valid": true,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "empty string",
+                "data": "",
+                "valid": false,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "string",
+                "data": "qwe",
+                "valid": false,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "array",
+                "data": [],
+                "valid": false,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "object",
+                "data": {},
+                "valid": false,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "integer",
+                "data": 12,
+                "valid": false,
+                "new_params" : {
+                    "strict" : 0
+                }
+            },
+            {
+                "description": "number",
+                "data": 12.2,
+                "valid": false,
+                "new_params" : {
+                    "strict" : 0
+                }
+            }
+        ]
+    }
+]

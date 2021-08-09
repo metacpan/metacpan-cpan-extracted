@@ -7,7 +7,7 @@ use Moo::Role;
 use Data::Record::Serialize::Error { errors => [ 'yaml_backend' ] }, -all;
 use Types::Standard qw[ Enum ];
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use JSON::PP;
 
@@ -103,7 +103,7 @@ Data::Record::Serialize::Encode::yaml - encode a record as YAML
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 SYNOPSIS
 

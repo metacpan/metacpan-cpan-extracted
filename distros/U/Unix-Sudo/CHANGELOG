@@ -1,4 +1,7 @@
-Date          Version    Notes
+4.567.89    2021-08-06
+
+- recommend Taint::Runtime instead of the 'tainting' module, which
+  is deprecated by its author
 
 2019-02-12    4          Catch errors more robustly (but still not perfectly)
 

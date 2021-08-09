@@ -26,23 +26,38 @@ my $re_prop_attrs = qr/
 
 sub license_org_metadata
 {
-	my ( $org, $date ) = @_;
+	my ( %opts, @args );
+	for (@_) {
+		next unless defined;
+		if    ( !ref )          { push @args, $_ }
+		elsif ( ref eq 'HASH' ) { @opts{ keys %$_ } = values %$_ }
+		else                    { die "Bad ref: $_"; }
+	}
+	my ($org) = @args;
 
-	my %names = map {
-		my $key        = $_;
-		my $date_but_1 = $date;
+	my %names;
+	for my $key ( keys %RE ) {
+		next
+			unless grep {
+			/^(?:name|caption|summary)\.alt\.org\.$org(?:\.|\z)/
+				and not /\.version\./
+			}
+			keys %{ $RE{$key} };
+
+		my $date_but_1 = $opts{date};
 		$date_but_1 = 1
-			if defined $date and $date == 0;
-		my @names     = get_org_props( $key, 'name',    $org, $date );
+			if defined $opts{date} and $opts{date} == 0;
+		my @names     = get_org_props( $key, 'name',    $org, $opts{date} );
 		my @captions  = get_org_props( $key, 'caption', $org, $date_but_1 );
 		my @summaries = get_org_props( $key, 'summary', $org, $date_but_1 );
 		my $name      = shift @names;
-		$name ? map { $_ => $name } @names, @captions, @summaries : ();
+
+		if ($name) {
+			for ( @names, @captions, @summaries ) {
+				$names{$_} = $name;
+			}
 		}
-		grep {
-		grep { /^name\.alt\.org\.$org(?:\.|\z)/ and not /\.version\./ }
-			keys %{ $RE{$_} }
-		} keys %RE;
+	}
 
 	return \%names;
 }
@@ -83,10 +98,14 @@ sub get_org_props
 	}
 	die "More than one main $prop tied to $org for $key: ", join '; ', @main
 		if @main > 1;
-	push @main, $RE{$key}{$prop}
-		if not @main
-		and not $skipcount
-		and defined $RE{$key}{$prop};
+	if ( not @main and not $skipcount ) {
+		if ( exists $RE{$key}{$prop} ) {
+			push @main, $RE{$key}{$prop};
+		}
+		elsif ( $prop eq 'name' ) {
+			push @main, $key;
+		}
+	}
 
 	return @main, @extra;
 }

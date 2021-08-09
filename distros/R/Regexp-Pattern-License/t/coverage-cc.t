@@ -12,7 +12,7 @@ plan 1;
 # and https://creativecommons.org/publicdomain/zero/1.0/
 
 like(
-	license_org_metadata( 'cc', 99999999 ),
+	license_org_metadata( 'cc', { date => 99999999 } ),
 	hash {
 		# Attribution
 		field 'Creative Commons Attribution' => 'CC-BY';

@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '1.074';
+our $VERSION = '1.075';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -651,6 +651,13 @@ sub register {
         for my $schema_name ( keys %{ $config->{schema} } ) {
             my $schema = $config->{schema}{ $schema_name };
             next if $schema->{ 'x-ignore' }; # XXX Should we just delete x-ignore schema?
+
+            # Deprecate x-view. Yancy::Model is a much better
+            # solution to that.
+            derp q{x-view is deprecated and will be removed in v2. }
+                . q{Use Yancy::Model or your database's CREATE VIEW instead}
+                if $schema->{'x-view'};
+
             $schema->{ type } //= 'object';
             my $real_schema_name = ( $schema->{'x-view'} || {} )->{schema} // $schema_name;
             my $props = $schema->{properties}
@@ -1050,7 +1057,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 1.074
+version 1.075
 
 =head1 SYNOPSIS
 

@@ -10,7 +10,7 @@ use 5.022;
 use experimental qw( signatures refaliasing postderef );
 
 # ABSTRACT: Peek into archives without extracting them
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 sub new ($class, %options)
@@ -136,18 +136,21 @@ sub _entry_data ($self, $r, $e, $content)
 
   if($e->size > 0)
   {
-    my $buffer;
-    my $ret = $r->read_data(\$buffer);
-    last if $ret == 0;
-    if($ret == ARCHIVE_WARN)
+    while(1)
     {
-      Carp::carp($r->error_string);
+      my $buffer;
+      my $ret = $r->read_data(\$buffer);
+      last if $ret == 0;
+      if($ret == ARCHIVE_WARN)
+      {
+        Carp::carp($r->error_string);
+      }
+      elsif($ret < ARCHIVE_WARN)
+      {
+        Carp::croak($r->error_string);
+      }
+      $$content .= $buffer;
     }
-    elsif($ret < ARCHIVE_WARN)
-    {
-      Carp::croak($r->error_string);
-    }
-    $$content .= $buffer;
   }
 }
 
@@ -253,7 +256,7 @@ Archive::Libarchive::Peek - Peek into archives without extracting them
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

@@ -70,6 +70,7 @@ lib/Quiq/Gd/Component/Grid.pm
 lib/Quiq/Gd/Component/ScatterGraph.pm
 lib/Quiq/Gd/Font.pm
 lib/Quiq/Gd/Image.pm
+lib/Quiq/Gimp.pm
 lib/Quiq/Gnuplot/Arrow.pm
 lib/Quiq/Gnuplot/Graph.pm
 lib/Quiq/Gnuplot/Label.pm
@@ -287,6 +288,7 @@ t/bin/Quiq/Gd/Component/Grid.t
 t/bin/Quiq/Gd/Component/ScatterGraph.t
 t/bin/Quiq/Gd/Font.t
 t/bin/Quiq/Gd/Image.t
+t/bin/Quiq/Gimp.t
 t/bin/Quiq/Gnuplot/Arrow.t
 t/bin/Quiq/Gnuplot/Graph.t
 t/bin/Quiq/Gnuplot/Label.t

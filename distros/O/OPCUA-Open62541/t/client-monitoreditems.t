@@ -7,7 +7,7 @@ use OPCUA::Open62541::Test::Server;
 
 use Test::More tests =>
     OPCUA::Open62541::Test::Server::planning() +
-    OPCUA::Open62541::Test::Client::planning() + 26;
+    OPCUA::Open62541::Test::Client::planning() + 41;
 use Test::Deep;
 use Test::Exception;
 use Test::LeakTrace;
@@ -24,12 +24,25 @@ $client->run();
 
 # pre create subscription
 
-my $subcontext;
+my (%subcontext, @notifications);
 my $request = OPCUA::Open62541::Client->CreateSubscriptionRequest_default();
-my $response = $client->{client}->Subscriptions_create($request, \$subcontext, undef, undef);
-is($response->{CreateSubscriptionResponse_responseHeader}{ResponseHeader_serviceResult},
-   "Good",
-   "subscription create response statuscode");
+my $response = $client->{client}->Subscriptions_create(
+    $request,
+    \%subcontext,
+    sub {
+	my ($cl, $sid, $sctx, $n) = @_;
+	$sctx->{sub}++;
+	push @notifications, $n;
+    },
+    sub {
+	my ($cl, $sid, $sctx) = @_;
+	$sctx->{sub_delete}++;
+    },
+);
+is($response->{CreateSubscriptionResponse_responseHeader}
+    {ResponseHeader_serviceResult},
+    "Good",
+    "subscription create response statuscode");
 my $subid = $response->{CreateSubscriptionResponse_subscriptionId};
 
 # MonitoredItemCreateRequest_default
@@ -71,19 +84,14 @@ throws_ok { $client->{client}->MonitoredItems_createDataChange(
     (qr/XS_unpack_UA_UInt32: Unsigned value \d+ greater than UA_UINT32_MAX/,
     "monitored items create negative subscription ID");
 
-my ($deleted, $moncontext, @values);
+my ($deleted, %moncontext, @values);
 $response = $client->{client}->MonitoredItems_createDataChange(
     999,
     TIMESTAMPSTORETURN_BOTH,
     $request,
-    \$moncontext,
+    \%moncontext,
+    sub {},
     sub {
-	my ($cl, $sid, $sctx, $mid, $mctx, $v) = @_;
-	$$mctx++;
-	push @values, $v->{DataValue_value}{Variant_scalar};
-    },
-    sub {
-	my ($cl, $sid, $sctx, $mid, $mctx) = @_;
 	$deleted = 1;
     },
 );
@@ -92,10 +100,8 @@ is($response->{MonitoredItemCreateResult_statusCode},
    "BadSubscriptionIdInvalid",
    "monitored items create fail response statuscode");
 
-is($deleted,
-   1,
+ok($deleted,
    "subscription deleted callback");
-$deleted = undef;
 
 my $expected_response = {
     MonitoredItemCreateResult_filterResult => ignore(),
@@ -109,15 +115,17 @@ $response = $client->{client}->MonitoredItems_createDataChange(
     $subid,
     TIMESTAMPSTORETURN_BOTH,
     $request,
-    \$moncontext,
+    \%moncontext,
     sub {
 	my ($cl, $sid, $sctx, $mid, $mctx, $v) = @_;
-	$$mctx++;
+	$sctx->{mon}++;
+	$mctx->{mon}++;
 	push @values, $v->{DataValue_value}{Variant_scalar};
     },
     sub {
 	my ($cl, $sid, $sctx, $mid, $mctx) = @_;
-	$deleted = 1;
+	$sctx->{mon_delete}++;
+	$mctx->{mon_delete}++;
     },
 );
 
@@ -129,27 +137,32 @@ is($response->{MonitoredItemCreateResult_statusCode},
    "Good",
    "monitored items create response statuscode");
 
-is($deleted,
-   undef,
-   "subscription not deleted callback");
-is($subcontext,
-   undef,
+is($subcontext{mon}, undef,
    "subscription context callback");
-is($moncontext,
-   undef,
+is($moncontext{mon}, undef,
    "monitored item context callback");
+is($subcontext{mon_delete}, undef,
+   "subscription context delete callback");
+is($moncontext{mon_delete}, undef,
+   "monitored item context delete callback");
 
 my $monid = $response->{MonitoredItemCreateResult_monitoredItemId};
 
 my $i;
 $client->iterate(sub {sleep 1; ++$i > 3});
 
-ok($moncontext > 3,
+cmp_ok($subcontext{mon}, '==', 6,
+   "subscription context multiple calls");
+cmp_ok($moncontext{mon}, '==', 6,
    "monitored item context multiple calls");
-ok(@values == $moncontext,
+cmp_ok(@values, '==', 6,
    "monitored item context same as values");
-ok("@values" eq "@{[sort @values]}",
+is("@values", "@{[sort @values]}",
    "monitored item values sorted");
+is($subcontext{mon_delete}, undef,
+   "subscription context no mon delete calls");
+is($moncontext{mon_delete}, undef,
+   "monitored item context no mon delete calls");
 
 # delete monitored items
 
@@ -157,6 +170,13 @@ $response = $client->{client}->MonitoredItems_deleteSingle($subid, $monid);
 is($response,
    "Good",
    "subscription delete response statuscode");
+
+cmp_ok($subcontext{mon_delete}, '==', 1,
+   "subscription context mon delete call");
+cmp_ok($moncontext{mon_delete}, '==', 1,
+   "monitored item context mon delete call");
+is($subcontext{sub_delete}, undef,
+   "subscription context no sub delete calls");
 
 # delete subscription and monitored items
 
@@ -172,18 +192,43 @@ is($response,
    "Good",
    "subscription delete response statuscode");
 
-is($deleted,
-   1,
-   "subscription deleted callback");
+cmp_ok($subcontext{mon_delete}, '==', 1,
+   "subscription context mon delete call");
+cmp_ok($moncontext{mon_delete}, '==', 1,
+   "monitored item context mon delete call");
+cmp_ok($subcontext{sub_delete}, '==', 1,
+   "subscription context sub delete call");
 
 ################################################################################
 
 $request = OPCUA::Open62541::Client->CreateSubscriptionRequest_default();
-$response = $client->{client}->Subscriptions_create($request, \$subcontext, undef, undef);
-is($response->{CreateSubscriptionResponse_responseHeader}{ResponseHeader_serviceResult},
-   "Good",
-   "subscription create response statuscode");
+$response = $client->{client}->Subscriptions_create(
+    $request,
+    \%subcontext,
+    sub {
+	my ($cl, $sid, $sctx, $n) = @_;
+	$sctx->{sub}++;
+    },
+    sub {
+	my ($cl, $sid, $sctx) = @_;
+	$sctx->{sub_delete}++;
+    },
+);
+is($response->{CreateSubscriptionResponse_responseHeader}
+    {ResponseHeader_serviceResult},
+    "Good",
+    "subscription create response statuscode");
 $subid = $response->{CreateSubscriptionResponse_subscriptionId};
+
+# create multiple MonitoredItemCreateRequests to check memory managemnt
+
+for (1..5) {
+    ok(OPCUA::Open62541::Client->MonitoredItemCreateRequest_default({
+	NodeId_namespaceIndex => 1,
+	NodeId_identifierType => NODEIDTYPE_STRING,
+	NodeId_identifier     => "var1",
+    }), "multi MonitoredItemCreateRequest_default $_");
+}
 
 # no_leaks
 
@@ -226,13 +271,16 @@ no_leaks_ok {
 	999,
 	TIMESTAMPSTORETURN_BOTH,
 	$request,
-	\$moncontext,
+	\%moncontext,
 	sub {
 	    my ($cl, $sid, $sctx, $mid, $mctx, $v) = @_;
-	    $$mctx++;
+	    $sctx->{mon}++;
+	    $mctx->{mon}++;
 	},
 	sub {
-	    $deleted = 1;
+	    my ($cl, $sid, $sctx, $mid, $mctx, $v) = @_;
+	    $sctx->{mon_delete}++;
+	    $mctx->{mon_delete}++;
 	},
     );
 } "MonitoredItems_createDataChange fail callback leak";
@@ -246,18 +294,31 @@ no_leaks_ok {
 	$subid,
 	TIMESTAMPSTORETURN_BOTH,
 	$request,
-	\$moncontext,
+	\%moncontext,
 	sub {
 	    my ($cl, $sid, $sctx, $mid, $mctx, $v) = @_;
-	    $$mctx++;
+	    $sctx->{mon}++;
+	    $mctx->{mon}++;
 	},
 	sub {
-	    $deleted = 1;
+	    my ($cl, $sid, $sctx, $mid, $mctx, $v) = @_;
+	    $sctx->{mon_delete}++;
+	    $mctx->{mon_delete}++;
 	},
     );
     $monid = $response->{MonitoredItemCreateResult_monitoredItemId};
     $response = $client->{client}->MonitoredItems_deleteSingle($subid, $monid);
 } "MonitoredItems_createDataChange + delete callback leak";
+
+no_leaks_ok {
+    for (1..5) {
+	OPCUA::Open62541::Client->MonitoredItemCreateRequest_default({
+	    NodeId_namespaceIndex => 1,
+	    NodeId_identifierType => NODEIDTYPE_STRING,
+	    NodeId_identifier     => "var1",
+	});
+    }
+} "multi MonitoredItemCreateRequest_default leak";
 
 $client->stop();
 $server->stop();

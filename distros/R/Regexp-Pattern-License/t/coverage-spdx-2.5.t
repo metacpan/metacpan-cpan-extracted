@@ -10,7 +10,7 @@ plan 1;
 # <https://web.archive.org/web/20160805023356/http://spdx.org:80/licenses/exceptions-index.html>
 
 like(
-	license_org_metadata( 'spdx', '20160721', '2_5' ),
+	license_org_metadata( 'spdx', { date => '20160721', rev => '2_5' } ),
 	hash {
 		field 'BSD Zero Clause License'       => '0BSD';
 		field 'Attribution Assurance License' => 'AAL';

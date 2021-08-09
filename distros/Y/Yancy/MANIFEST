@@ -110,12 +110,12 @@ lib/Mojolicious/Plugin/Yancy/resources/templates/yancy/component/table.html.ep
 lib/Mojolicious/Plugin/Yancy/resources/templates/yancy/index.html.ep
 lib/Mojolicious/Plugin/Yancy/resources/templates/yancy/table.html.ep
 lib/Yancy.pm
-lib/Yancy/Backend.pod
+lib/Yancy/Backend.pm
 lib/Yancy/Backend/Dbic.pm
+lib/Yancy/Backend/MojoDB.pm
 lib/Yancy/Backend/Mysql.pm
 lib/Yancy/Backend/Pg.pm
-lib/Yancy/Backend/Role/MojoAsync.pm
-lib/Yancy/Backend/Role/Relational.pm
+lib/Yancy/Backend/Role/DBI.pm
 lib/Yancy/Backend/Role/Sync.pm
 lib/Yancy/Backend/Sqlite.pm
 lib/Yancy/Command/backend.pm

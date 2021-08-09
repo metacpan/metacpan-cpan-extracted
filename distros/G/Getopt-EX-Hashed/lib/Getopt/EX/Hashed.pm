@@ -1,6 +1,6 @@
 package Getopt::EX::Hashed;
 
-our $VERSION = '0.9906';
+our $VERSION = '0.9908';
 
 =head1 NAME
 
@@ -8,7 +8,7 @@ Getopt::EX::Hashed - Hash store object automation
 
 =head1 VERSION
 
-Version 0.9906
+Version 0.9908
 
 =head1 SYNOPSIS
 
@@ -26,7 +26,7 @@ Version 0.9906
       my $app = shift;
       use Getopt::Long;
       $app->getopt or pod2usage();
-      if ($app->{start}) {
+      if ($app->start) {
           ...
 
 =head1 DESCRIPTION
@@ -40,6 +40,9 @@ other modules included in B<Getopt::EX>, so far.
 In the current implementation, using B<Getopt::Long>, or compatible
 module such as B<Getopt::EX::Long> is assumed.  It is configurable,
 but no other module is supported now.
+
+Accessor methods are automatically generated when appropiate parameter
+is given.
 
 =head1 FUNCTION
 
@@ -61,6 +64,11 @@ current value.
 Following parameters are available.
 
 =over 7
+
+=item B<is> => I<ro> | I<rw>
+
+If an B<is> parameter is given, accessor method for the member,
+read-only for I<ro> and read-write for I<rw>, is generated.
 
 =item B<spec> => I<string>
 
@@ -240,15 +248,17 @@ my %Config = (
     REPLACE_UNDERSCORE => 1,
     RESET_AFTER_NEW    => 0,
     GETOPT             => 'GetOptions',
+    ACCESSOR_PREFIX    => '',
+    DEFAULT            => undef,
     );
 lock_keys %Config;
 
 sub configure {
-    my $obj = shift;
+    my $class = shift;
     while (my($key, $value) = splice @_, 0, 2) {
 	$Config{$key} = $value;
     }
-    return $obj;
+    return $class;
 }
 
 sub unimport {
@@ -273,6 +283,11 @@ sub has {
 	    push @{$Member[$i]}, @param;
 	} else {
 	    defined $i and die "$name: Duplicated\n";
+	    if (my $default = $Config{DEFAULT}) {
+		if (ref $default eq 'ARRAY') {
+		    unshift @param, @{$default};
+		}
+	    }
 	    push @Member, [ $name, @param ];
 	}
     }
@@ -292,10 +307,29 @@ sub new {
     for my $key (@{$order}) {
 	my $m = $member->{$key};
 	$obj->{$key} = $m->{default};
+	if (my $is = $m->{is}) {
+	    no strict 'refs';
+	    my $access = $Config{ACCESSOR_PREFIX} . $key;
+	    *{"$class\::$access"} = _accessor($is, $key);
+	}
     }
     lock_keys %{$obj} if $Config{LOCK_KEYS};
     __PACKAGE__->reset if $Config{RESET_AFTER_NEW};
     $obj;
+}
+
+sub _accessor {
+    my($is, $name) = @_;
+    {
+	ro => sub {
+	    $#_ and die "$name is readonly\n";
+	    $_[0]{$name};
+	},
+	rw => sub {
+	    $#_ and do { $_[0]{$name} = $_[1]; return $_[0] };
+	    $_[0]{$name};
+	}
+    }->{$is} or die "$name has invalid 'is' parameter.\n";
 }
 
 sub optspec {

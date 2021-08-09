@@ -4,6 +4,7 @@ author:
   - 'Dima Kogan <dima@secretsauce.net>, Craig DeForest <deforest@boulder.swri.edu>'
 build_requires:
   PDL::PP: '0'
+  Test::More: '0.98'
 configure_requires:
   IPC::Run: '0'
   PDL::Core::Dev: '0'
@@ -26,5 +27,5 @@ resources:
   X_url: git://github.com/PDLPorters/pdl-fftw3.git
   X_web: http://github.com/PDLPorters/pdl-fftw3
   bugtracker: http://github.com/PDLPorters/pdl-fftw3/issues
-version: '0.15'
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

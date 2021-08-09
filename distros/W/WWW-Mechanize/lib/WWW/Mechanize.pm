@@ -6,20 +6,20 @@ package WWW::Mechanize;
 use strict;
 use warnings;
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 
 use Tie::RefHash;
 use HTTP::Request 1.30;
 use LWP::UserAgent 6.45;
 use HTML::Form 1.00;
-use HTML::TokeParser;
+use HTML::TokeParser ();
 use Scalar::Util qw(tainted);
 
 use base 'LWP::UserAgent';
 
 our $HAS_ZLIB;
 BEGIN {
-    $HAS_ZLIB = eval 'use Compress::Zlib (); 1;';
+    $HAS_ZLIB = eval {require Compress::Zlib; 1;};
 }
 
 
@@ -104,7 +104,8 @@ sub agent_alias {
 
 
 sub known_agent_aliases {
-    return sort keys %known_agents;
+    my @aliases = sort keys %known_agents;
+    return @aliases;
 }
 
 
@@ -162,6 +163,22 @@ sub _SUPER_put {
     my($self, @parameters) = @_;
     my @suff = $self->_process_colonic_headers(\@parameters,1);
     return $self->request( HTTP::Request::Common::PUT( @parameters ), @suff );
+}
+
+
+sub head {
+    my $self = shift;
+    my $uri = shift;
+
+    $uri = $uri->url if ref($uri) eq 'WWW::Mechanize::Link';
+
+    $uri = $self->base
+            ? URI->new_abs( $uri, $self->base )
+            : URI->new( $uri );
+
+    # It appears we are returning a super-class method,
+    # but it in turn calls the request() method here in Mechanize
+    return $self->SUPER::head( $uri->as_string, @_ );
 }
 
 
@@ -1783,7 +1800,7 @@ WWW::Mechanize - Handy web browsing in a Perl object
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 SYNOPSIS
 
@@ -2102,10 +2119,10 @@ internals is deprecated and subject to change in the future.
 C<get()> is a well-behaved overloaded version of the method in
 L<LWP::UserAgent>.  This lets you do things like
 
-    $mech->get( $uri, ':content_file' => $tempfile );
+    $mech->get( $uri, ':content_file' => $filename );
 
 and you can rest assured that the params will get filtered down
-appropriately.
+appropriately. See L<LWP::UserAgent/get> for more details.
 
 B<NOTE:> Because C<:content_file> causes the page contents to be
 stored in a file instead of the response object, some Mech functions
@@ -2113,13 +2130,22 @@ that expect it to be there won't work as expected. Use with caution.
 
 =head2 $mech->post( $uri, content => $content )
 
-POSTs I<$content> to $uri.  Returns an L<HTTP::Response> object.
+POSTs I<$content> to I<$uri>.  Returns an L<HTTP::Response> object.
 I<$uri> can be a well-formed URI string, a L<URI> object, or a
 L<WWW::Mechanize::Link> object.
 
 =head2 $mech->put( $uri, content => $content )
 
-PUTs I<$content> to $uri.  Returns an L<HTTP::Response> object.
+PUTs I<$content> to I<$uri>.  Returns an L<HTTP::Response> object.
+I<$uri> can be a well-formed URI string, a L<URI> object, or a
+L<WWW::Mechanize::Link> object.
+
+    my $res = $mech->head( $uri );
+    my $res = $mech->head( $uri , $field_name => $value, ... );
+
+=head2 $mech->head ($uri )
+
+Performs a HEAD request to I<$uri>. Returns an L<HTTP::Response> object.
 I<$uri> can be a well-formed URI string, a L<URI> object, or a
 L<WWW::Mechanize::Link> object.
 
@@ -2299,7 +2325,7 @@ repeatedly.
 =head2 $mech->links()
 
 Lists all the links on the current page.  Each link is a
-WWW::Mechanize::Link object. In list context, returns a list of all
+L<WWW::Mechanize::Link> object. In list context, returns a list of all
 links.  In scalar context, returns an array reference of all links.
 
 =head2 $mech->follow_link(...)
@@ -2504,7 +2530,7 @@ ignoring other types of input controls like text and checkboxes.
 =head2 $mech->images
 
 Lists all the images on the current page.  Each image is a
-WWW::Mechanize::Image object. In list context, returns a list of all
+L<WWW::Mechanize::Image> object. In list context, returns a list of all
 images.  In scalar context, returns an array reference of all images.
 
 =head2 $mech->find_image()
@@ -2662,7 +2688,7 @@ C<L<< click()|"$mech->click( $button [, $x, $y] )" >>>.
 
 Returns undef if no form is found.
 
-=head2 $mech->form_id( $name )
+=head2 $mech->form_id( $id )
 
 Selects a form by ID.  If there is more than one form on the page
 with that ID, then the first one is used, and a warning is generated.
@@ -3490,8 +3516,6 @@ Acts as a proxy for web interaction, and then generates WWW::Mechanize scripts.
 Just like Mech, but using Microsoft Internet Explorer to do the work.
 
 =item * L<WWW::Bugzilla>
-
-=item * L<WWW::CheckSite>
 
 =item * L<WWW::Google::Groups>
 

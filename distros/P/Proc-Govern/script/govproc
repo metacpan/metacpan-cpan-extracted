@@ -1,9 +1,9 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-18'; # DATE
+our $DATE = '2021-08-06'; # DATE
 our $DIST = 'Proc-Govern'; # DIST
-our $VERSION = '0.211'; # VERSION
+our $VERSION = '0.212'; # VERSION
 
 use 5.010;
 use strict;
@@ -42,6 +42,10 @@ my $success = GetOptions(
     "log-stdout-size=i"      => \$opts{log_stdout_size},
     "log-stdout-histories=i" => \$opts{log_stdout_histories},
     "log-stdout-period=s"    => \$opts{log_stdout_period},
+    "log-combined-dir=s"       => \$opts{log_combined_dir},
+    "log-combined-size=i"      => \$opts{log_combined_size},
+    "log-combined-histories=i" => \$opts{log_combined_histories},
+    "log-combined-period=s"    => \$opts{log_combined_period},
     "timeout=i"              => \$opts{timeout},
     "pid-dir=s"              => \$opts{pid_dir},
     "on-multiple-instance=s" => \$opts{on_multiple_instance},
@@ -86,6 +90,10 @@ Options:
   --log-stdout-size=N       Set log file size limit, in bytes, default 10MB.
   --log-stdout-histories=N  Set number of rotated log files to keep, default 10.
   --log-stdout-period=S     Enable periodic rotation (daily/monthly/yearly).
+  --log-combined-dir=S      Enable logging of both stdout/err and set log directory.
+  --log-combined-size=N     Set log file size limit, in bytes, default 10MB.
+  --log-combined-histories=N  Set number of rotated log files to keep, default 10.
+  --log-combined-period=S   Enable periodic rotation (daily/monthly/yearly).
   --timeout=N               Set execution time limit, in seconds.
   --pid-dir=S               Directory to put PID file, if --single-instance set.
   --on-multiple-instance=S  Can be set to 'exit' to silently exit when another
@@ -136,6 +144,14 @@ if ($opts{log_stdout_dir}) {
         period    => $opts{log_stdout_period},
     };
 }
+if ($opts{log_combined_dir}) {
+    $ga{log_combined} = {
+        dir       => $opts{log_combined_dir},
+        size      => $opts{log_combined_size},
+        histories => $opts{log_combined_histories},
+        period    => $opts{log_combined_period},
+    };
+}
 if ($opts{load_watch}) {
     $ga{load_watch} = 1;
     $ga{load_high_limit}  = $opts{load_high_limit};
@@ -167,7 +183,7 @@ govproc - Run child process and govern its various aspects
 
 =head1 VERSION
 
-This document describes version 0.211 of govproc (from Perl distribution Proc-Govern), released on 2020-08-18.
+This document describes version 0.212 of govproc (from Perl distribution Proc-Govern), released on 2021-08-06.
 
 =head1 SYNOPSIS
 
@@ -214,11 +230,11 @@ L<after>
 
 =head1 AUTHOR
 
-perlancar <perlancar@cpan.org>
+perlancar
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

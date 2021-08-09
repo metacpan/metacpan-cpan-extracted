@@ -12,7 +12,8 @@ my $build = Module::Build->new(
       'File::stat' => 0,
       'IO::Poll' => 0,
       'List::Util' => 0,
-      'Socket' => '2.007',
+      # Require Socket 2.029 on MSWin32 because of AF_UNIX (RT133018)
+      ( 'Socket' => ( $^O eq "MSWin32" ? '2.029' : '2.007' ) ),
       'Storable' => 0,
       'Struct::Dumb' => 0,
       'Time::HiRes' => 0,

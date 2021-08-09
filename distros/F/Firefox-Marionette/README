@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 1.11
+    Version 1.12
 
 SYNOPSIS
 
@@ -2337,11 +2337,8 @@ BUGS AND LIMITATIONS
 
       * WebDriver:SetScreenOrientation
 
-    No bugs have been reported.
-
-    Please report any bugs or feature requests to
-    bug-firefox-marionette@rt.cpan.org, or through the web interface at
-    http://rt.cpan.org.
+    To report a bug, or view the current list of bugs, please visit
+    https://github.com/david-dick/firefox-marionette/issues
 
 SEE ALSO
 
@@ -2392,7 +2389,7 @@ ACKNOWLEDGEMENTS
 
 LICENSE AND COPYRIGHT
 
-    Copyright (c) 2020, David Dick <ddick@cpan.org>. All rights reserved.
+    Copyright (c) 2021, David Dick <ddick@cpan.org>. All rights reserved.
 
     This module is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself. See "perlartistic" in

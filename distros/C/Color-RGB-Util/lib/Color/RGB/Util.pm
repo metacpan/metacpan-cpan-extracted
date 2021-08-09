@@ -1,9 +1,9 @@
 package Color::RGB::Util;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-19'; # DATE
+our $DATE = '2021-08-06'; # DATE
 our $DIST = 'Color-RGB-Util'; # DIST
-our $VERSION = '0.604'; # VERSION
+our $VERSION = '0.606'; # VERSION
 
 use 5.010001;
 use strict;
@@ -206,15 +206,22 @@ sub reverse_rgb_color {
 }
 
 sub rgb2grayscale {
-    my ($rgb) = @_;
+    my ($rgb, $algo) = @_;
 
     my ($r, $g, $b) =
         $rgb =~ $re_rgb or die "Invalid rgb color '$rgb', must be in 'ffffff' form";
     for ($r, $g, $b) { $_ = hex $_ }
 
-    # basically we just average the R, G, B
-    my $avg = int(($r + $g + $b)/3);
-    return sprintf("%02x%02x%02x", $avg, $avg, $avg);
+    $algo //= 'average';
+    if ($algo eq 'weighted_average') {
+        my $avg = int(0.299*$r + 0.587*$g + 0.114*$b);
+        return sprintf("%02x%02x%02x", $avg, $avg, $avg);
+    } elsif ($algo eq 'average') {
+        my $avg = int(($r + $g + $b)/3);
+        return sprintf("%02x%02x%02x", $avg, $avg, $avg);
+    } else {
+        die "Unknown algo '$algo'";
+    }
 }
 
 sub rgb2int {
@@ -282,8 +289,10 @@ sub rgb_diff {
         } else { # hsv_euclidean
             return ($dh2 + $ds2 + $dv2)**0.5;
         }
-    } else { # euclidean
+    } elsif ($algo eq 'euclidean') {
         return ($dr2 + $dg2 + $db2)**0.5;
+    } else {
+        die "Unknown algo '$algo'";
     }
 }
 
@@ -525,7 +534,7 @@ Color::RGB::Util - Utilities related to RGB colors
 
 =head1 VERSION
 
-This document describes version 0.604 of Color::RGB::Util (from Perl distribution Color-RGB-Util), released on 2021-01-19.
+This document describes version 0.606 of Color::RGB::Util (from Perl distribution Color-RGB-Util), released on 2021-08-06.
 
 =head1 SYNOPSIS
 
@@ -572,7 +581,8 @@ This document describes version 0.604 of Color::RGB::Util (from Perl distributio
 
  say reverse_rgb_color('0033CC');                # => ffcc33
 
- say rgb2grayscale('0033CC');                    # => 555555
+ say rgb2grayscale('0033CC');                     # => 555555 # default 'average' algo
+ say rgb2grayscale('0033CC', 'weighted_average'); # => 353535
 
  say rgb2int("ffffff");                          # 16777215 (which is 0xffffff)
 
@@ -614,6 +624,8 @@ Map a string to an RGB color. This is done by producing SHA-1 digest (160bit, 20
 bytes) of the string, then taking the first, 10th, and last byte to become the
 RGB color.
 
+See also: L</assign_rgb_dark_color> and L</assign_rgb_light_color>.
+
 =head2 assign_rgb_dark_color
 
 Like L</assign_rgb_color> except that it will make sure the assigned color is
@@ -632,6 +644,8 @@ Usage:
 
 Convert HSL to HSV.
 
+See also: L</hsv2hsl>.
+
 =head2 hsl2rgb
 
 Usage:
@@ -642,8 +656,9 @@ Convert HSL to RGB. HSL should be given in a whitespace-separated H,S,L values
 e.g. "0 1 0.5". H (hue degree) has a range from 0-360 where 0 is red, 120 is
 green, 240 is blue and 360 is back to red. S (saturation) has a range from 0-1
 where 0 is gray and 1 is fully saturated hue. L (lumination) has a range from
-0-1 where 0 is fully black, 0.5 fully saturated, and 1 is fully white. See also
-L</rgb2hsl>.
+0-1 where 0 is fully black, 0.5 fully saturated, and 1 is fully white.
+
+See also L</rgb2hsl>.
 
 =head2 hsv2hsl
 
@@ -652,6 +667,8 @@ Usage:
  my $hsl = hsv2hsl("0 1 1"); # => "0 1 0.5"
 
 Convert HSV to HSL.
+
+See also L</hsl2hsv>.
 
 =head2 hsv2rgb
 
@@ -663,7 +680,9 @@ Convert HSV to RGB. HSV should be given in a whitespace-separated H,S,V values
 e.g. "0 1 1". H (hue degree) has a range from 0-360 where 0 is red, 120 is
 green, 240 is blue and 360 is back to red. S (saturation) has a range from 0-1
 where 0 is gray and 1 is fully saturated hue. V (value) has a range from 0-1
-where 0 is black and 1 is white. See also L</rgb2hsv>.
+where 0 is black and 1 is white.
+
+See also L</rgb2hsv>.
 
 =head2 int2rgb
 
@@ -672,6 +691,8 @@ Usage:
  my $rgb = int2rgb(0xffffff); # => ffffff
 
 Convert integer to RGB string.
+
+See also L</rgb2int>.
 
 =head2 mix_2_rgb_colors
 
@@ -682,6 +703,8 @@ Usage:
 Mix 2 RGB colors. C<$pct> is a number between 0 and 1, by default 0.5 (halfway),
 the closer to 1 the closer the resulting color to C<$rgb2>.
 
+See also L</mix_rgb_colors>, L</tint_rgb_color>.
+
 =head2 mix_rgb_colors
 
 Usage:
@@ -689,6 +712,8 @@ Usage:
  my $mixed_rgb = mix_rgb_colors($color1, $weight1, $color2, $weight2, ...);
 
 Mix several RGB colors.
+
+See also L</mix_2_rgb_colors>.
 
 =head2 rand_rgb_color
 
@@ -698,6 +723,8 @@ Usage:
 
 Generate a random RGB color. You can specify the limit. Otherwise, they default
 to the full range (000000 to ffffff).
+
+See also L</rand_rgb_colors>.
 
 =head2 rand_rgb_colors
 
@@ -742,6 +769,8 @@ Whether to add hash prefix to produced color codes ("#123456") or not
 
 =back
 
+See also L</rand_rgb_color>.
+
 =head2 reverse_rgb_color
 
 Usage:
@@ -754,9 +783,33 @@ Reverse C<$rgb>.
 
 Usage:
 
- my $rgb_gs = rgb2grayscale($rgb);
+ my $rgb_gs = rgb2grayscale($rgb [ , $algo ]);
 
-Convert C<$rgb> to grayscale RGB value.
+Convert C<$rgb> to grayscale RGB value. There are several algorithms (C<$algo>)
+to choose from:
+
+=over
+
+=item * average
+
+The Average method takes the average value of R, G, and B as the grayscale
+value.
+
+ Grayscale = (R + G + B ) / 3.
+
+The average method is simple but does not take into account the non-linearity of
+human vision (eyes are most sensitive to green, less to red, least to blue).
+
+=item * weighted_average
+
+This method gives weights to each of red, green, blue elements to take into
+account the sensitivity of human eyes.
+
+ Grayscale  = 0.299R + 0.587G + 0.114B
+
+=back
+
+See also L<rgb2sepia>.
 
 =head2 rgb2hsl
 
@@ -766,13 +819,17 @@ Usage:
 
 Convert RGB (0-255) to HSL. The result is a space-separated H, S, L values.
 
+See also L</hsl2rgb>.
+
 =head2 rgb2hsv
 
 Usage:
 
  my $hsv = rgb2hsv($rgb); # example: "0 1 255"
 
-Convert RGB (0-255) to HSV. The result is a space-separated H, S, V values. See
+Convert RGB (0-255) to HSV. The result is a space-separated H, S, V values.
+
+See also L</hsv2rgb>.
 
 =head2 rgb2int
 
@@ -782,6 +839,8 @@ Usage:
 
 Convert RGB string to integer.
 
+See also L</int2rgb>.
+
 =head2 rgb2sepia
 
 Usage:
@@ -789,6 +848,8 @@ Usage:
  my $rgb_sepia = rgb2sepia($rgb);
 
 Convert C<$rgb> to sepia tone RGB value.
+
+See also L<rgb2grayscale>.
 
 =head2 rgb_diff
 
@@ -848,6 +909,8 @@ L<https://en.wikipedia.org/wiki/Color_difference>.
 
 [1] https://www.compuphase.com/cmetric.htm
 
+See also L<rgb_distance>.
+
 =head2 rgb_distance
 
 Usage:
@@ -861,6 +924,8 @@ Calculate the euclidean RGB distance, using this formula:
 For example, the distance between "000000" and "ffffff" is ~441.67, while the
 distance between "ffff00" and "ffffff" is 255.
 
+See also L<rgb_diff>.
+
 =head2 rgb_is_dark
 
 Usage:
@@ -870,6 +935,8 @@ Usage:
 Return true if C<$rgb> is a "dark" color, which is determined by checking if the
 RGB distance to "000000" is smaller than to "ffffff".
 
+See also L</rgb_is_light>.
+
 =head2 rgb_is_light
 
 Usage:
@@ -878,6 +945,8 @@ Usage:
 
 Return true if C<$rgb> is a "light" color, which is determined by checking if
 the RGB distance to "000000" is larger than to "ffffff".
+
+See also L</rgb_is_dark>.
 
 =head2 rgb_luminance
 
@@ -901,17 +970,19 @@ Tint C<$rgb> with C<$tint_rgb>. $pct is by default 0.5. It is similar to mixing,
 but the less luminance the color is the less it is tinted with the tint color.
 This has the effect of black color still being black instead of becoming tinted.
 
+See also L<mix_2_rgb_colors>, L<mix_rgb_colors>.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Color-RGB-Util>.
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Color-RGB-Util>.
+Source repository is at L<https://github.com/perlancar/perl-SHARYANTO-Color-Util>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Color-RGB-Util/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Color-RGB-Util>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -924,6 +995,22 @@ L<Color::ANSI::Util>
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTORS
+
+=for stopwords ryosh2 (on pc-office) Steven Haryanto
+
+=over 4
+
+=item *
+
+ryosh2 (on pc-office) <ryosharyanto@gmail.com>
+
+=item *
+
+Steven Haryanto <sharyanto@cpan.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

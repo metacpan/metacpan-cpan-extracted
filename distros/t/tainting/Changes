@@ -1,10 +1,15 @@
-0.02    2017-07-04 (PERLANCAR)
+0.031   2021-08-06  Released-By: PERLANCAR; Urgency: medium
+
+	- Mention Taint::Runtime instead.
+
+
+0.02    2017-07-04  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild to use Makefile.PL instead of Build.PL.
 
 
-0.01    2012-12-28 (SHARYANTO)
+0.01    2012-12-28  Released-By: SHARYANTO
 
         - First release.

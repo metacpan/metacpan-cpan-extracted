@@ -28,7 +28,7 @@ use POSIX qw( SIGTERM );
 use Socket qw( sockaddr_family AF_UNIX );
 use Time::HiRes qw( time );
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 # Abstract Units of Time
 use constant AUT => $ENV{TEST_QUICK_TIMERS} ? 0.1 : 1;
@@ -44,8 +44,8 @@ C<IO::Async::LoopTests> - acceptance testing for L<IO::Async::Loop> subclasses
 
 =head1 SYNOPSIS
 
- use IO::Async::LoopTests;
- run_tests( 'IO::Async::Loop::Shiney', 'io' );
+   use IO::Async::LoopTests;
+   run_tests( 'IO::Async::Loop::Shiney', 'io' );
 
 =head1 DESCRIPTION
 
@@ -65,7 +65,7 @@ timers are preferred on automated smoke-testing machines, to help guard
 against false negatives reported simply because of scheduling delays or high
 system load while testing.
 
- TEST_QUICK_TIMERS=1 ./Build test
+   $ TEST_QUICK_TIMERS=1 ./Build test
 
 =cut
 

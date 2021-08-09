@@ -8,7 +8,7 @@ package IO::Async::Stream;
 use strict;
 use warnings;
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 use base qw( IO::Async::Handle );
 
@@ -50,33 +50,33 @@ filehandle
 
 =head1 SYNOPSIS
 
- use IO::Async::Stream;
+   use IO::Async::Stream;
 
- use IO::Async::Loop;
- my $loop = IO::Async::Loop->new;
+   use IO::Async::Loop;
+   my $loop = IO::Async::Loop->new;
 
- my $stream = IO::Async::Stream->new(
-    read_handle  => \*STDIN,
-    write_handle => \*STDOUT,
+   my $stream = IO::Async::Stream->new(
+      read_handle  => \*STDIN,
+      write_handle => \*STDOUT,
 
-    on_read => sub {
-       my ( $self, $buffref, $eof ) = @_;
+      on_read => sub {
+         my ( $self, $buffref, $eof ) = @_;
 
-       while( $$buffref =~ s/^(.*\n)// ) {
-          print "Received a line $1";
-       }
+         while( $$buffref =~ s/^(.*\n)// ) {
+            print "Received a line $1";
+         }
 
-       if( $eof ) {
-          print "EOF; last partial line is $$buffref\n";
-       }
+         if( $eof ) {
+            print "EOF; last partial line is $$buffref\n";
+         }
 
-       return 0;
-    }
- );
+         return 0;
+      }
+   );
 
- $loop->add( $stream );
+   $loop->add( $stream );
 
- $stream->write( "An initial line here\n" );
+   $stream->write( "An initial line here\n" );
 
 =head1 DESCRIPTION
 
@@ -180,7 +180,7 @@ and re-enable notifications again once something has read enough to cause it to
 drop. If these events are overridden, the overriding code will have to perform
 this behaviour if required, by using
 
- $self->want_readready_for_read(...)
+   $self->want_readready_for_read(...)
 
 =head2 on_outgoing_empty
 
@@ -325,8 +325,8 @@ Optional. If defined, gives the name of a method or a CODE reference to use
 to implement the actual reading from or writing to the filehandle. These will
 be invoked as
 
- $stream->reader( $read_handle, $buffer, $len )
- $stream->writer( $write_handle, $buffer, $len )
+   $stream->reader( $read_handle, $buffer, $len )
+   $stream->writer( $write_handle, $buffer, $len )
 
 Each is expected to modify the passed buffer; C<reader> by appending to it,
 C<writer> by removing a prefix from it. Each is expected to return a true
@@ -571,8 +571,8 @@ handles, and removes the stream from its containing loop. If the write buffer
 still contains data, then this is deferred until the buffer is empty. This is
 intended for "write-then-close" one-shot streams.
 
- $stream->write( "Here is my final data\n" );
- $stream->close_when_empty;
+   $stream->write( "Here is my final data\n" );
+   $stream->close_when_empty;
 
 Because of this deferred nature, it may not be suitable for error handling.
 See instead the C<close_now> method.
@@ -668,14 +668,14 @@ C<Future>s, as well as plain strings.
 
 For example, to stream the contents of an existing opened filehandle:
 
- open my $fileh, "<", $path or die "Cannot open $path - $!";
+   open my $fileh, "<", $path or die "Cannot open $path - $!";
 
- $stream->write( sub {
-    my ( $stream ) = @_;
+   $stream->write( sub {
+      my ( $stream ) = @_;
 
-    sysread $fileh, my $buffer, 8192 or return;
-    return $buffer;
- } );
+      sysread $fileh, my $buffer, 8192 or return;
+      return $buffer;
+   } );
 
 Takes the following optional named parameters in C<%params>:
 
@@ -693,7 +693,7 @@ that were written by this call, which may not be the entire length of the
 buffer - if it takes more than one C<syscall> operation to empty the buffer
 then this callback will be invoked multiple times.
 
- $on_write->( $stream, $len )
+   $on_write->( $stream, $len )
 
 =item on_flush => CODE
 
@@ -701,14 +701,14 @@ A CODE reference which will be invoked once the data queued by this C<write>
 call has been flushed. This will be invoked even if the buffer itself is not
 yet empty; if more data has been queued since the call.
 
- $on_flush->( $stream )
+   $on_flush->( $stream )
 
 =item on_error => CODE
 
 A CODE reference which will be invoked if a C<syswrite> error happens while
 performing this write. Invoked as for the C<Stream>'s C<on_write_error> event.
 
- $on_error->( $stream, $errno )
+   $on_error->( $stream, $errno )
 
 =back
 
@@ -1117,9 +1117,9 @@ enough data has been read by the Stream into its buffer. At this point, the
 data is removed from the buffer and given to the C<Future> object to complete
 it.
 
- my $f = $stream->read_...
+   my $f = $stream->read_...
 
- my ( $string ) = $f->get;
+   my ( $string ) = $f->get;
 
 Unlike the C<on_read> event handlers, these methods don't allow for access to
 "partial" results; they only provide the final result once it is ready.
@@ -1133,17 +1133,17 @@ C<Future>-returning methods instead of the C<on_read> event, it may be useful
 to configure a trivial return-false event handler to keep it from consuming
 any input, and to allow it to be added to a C<Loop> in the first place.
 
- my $stream = IO::Async::Stream->new( on_read => sub { 0 }, ... );
- $loop->add( $stream );
+   my $stream = IO::Async::Stream->new( on_read => sub { 0 }, ... );
+   $loop->add( $stream );
 
- my $f = $stream->read_...
+   my $f = $stream->read_...
 
 If a read EOF or error condition happens while there are read C<Future>s
 pending, they are all completed. In the case of a read EOF, they are done with
 C<undef>; in the case of a read error they are failed using the C<$!> error
 value as the failure.
 
- $f->fail( $message, sysread => $! )
+   $f->fail( $message, sysread => $! )
 
 If a read EOF condition happens to the currently-processing read C<Future>, it
 will return a partial result. The calling code can detect this by the fact
@@ -1152,7 +1152,7 @@ short in C<read_exactly>'s case, or lacking the ending pattern in
 C<read_until>'s case). Additionally, each C<Future> will yield the C<$eof>
 value in its results.
 
- my ( $string, $eof ) = $f->get;
+   my ( $string, $eof ) = $f->get;
 
 =cut
 
@@ -1340,17 +1340,17 @@ Log byte buffers as data is written to a Stream
 The following C<on_read> method accepts incoming C<\n>-terminated lines and
 prints them to the program's C<STDOUT> stream.
 
- sub on_read
- {
-    my $self = shift;
-    my ( $buffref, $eof ) = @_;
+   sub on_read
+   {
+      my $self = shift;
+      my ( $buffref, $eof ) = @_;
 
-    while( $$buffref =~ s/^(.*\n)// ) {
-       print "Received a line: $1";
-    }
+      while( $$buffref =~ s/^(.*\n)// ) {
+         print "Received a line: $1";
+      }
 
-    return 0;
- }
+      return 0;
+   }
 
 Because a reference to the buffer itself is passed, it is simple to use a
 C<s///> regular expression on the scalar it points at, to both check if data
@@ -1363,23 +1363,23 @@ again when it has finished, so it can return a constant C<0>.
 This C<on_read> method accepts incoming records in 16-byte chunks, printing
 each one.
 
- sub on_read
- {
-    my ( $self, $buffref, $eof ) = @_;
+   sub on_read
+   {
+      my ( $self, $buffref, $eof ) = @_;
 
-    if( length $$buffref >= 16 ) {
-       my $record = substr( $$buffref, 0, 16, "" );
-       print "Received a 16-byte record: $record\n";
+      if( length $$buffref >= 16 ) {
+         my $record = substr( $$buffref, 0, 16, "" );
+         print "Received a 16-byte record: $record\n";
 
-       return 1;
-    }
+         return 1;
+      }
 
-    if( $eof and length $$buffref ) {
-       print "EOF: a partial record still exists\n";
-    }
+      if( $eof and length $$buffref ) {
+         print "EOF: a partial record still exists\n";
+      }
 
-    return 0;
- }
+      return 0;
+   }
 
 This time, rather than a C<while()> loop we have decided to have the handler
 just process one record, and use the C<return 1> mechanism to ask that the
@@ -1394,23 +1394,23 @@ A lot of protocols use a fixed-size header, followed by a variable-sized body
 of data, whose size is given by one of the fields of the header. The following
 C<on_read> method extracts messages in such a protocol.
 
- sub on_read
- {
-    my ( $self, $buffref, $eof ) = @_;
+   sub on_read
+   {
+      my ( $self, $buffref, $eof ) = @_;
 
-    return 0 unless length $$buffref >= 8; # "N n n" consumes 8 bytes
+      return 0 unless length $$buffref >= 8; # "N n n" consumes 8 bytes
 
-    my ( $len, $x, $y ) = unpack "N n n", $$buffref;
+      my ( $len, $x, $y ) = unpack "N n n", $$buffref;
 
-    return 0 unless length $$buffref >= 8 + $len;
+      return 0 unless length $$buffref >= 8 + $len;
 
-    substr( $$buffref, 0, 8, "" );
-    my $data = substr( $$buffref, 0, $len, "" );
+      substr( $$buffref, 0, 8, "" );
+      my $data = substr( $$buffref, 0, $len, "" );
 
-    print "A record with values x=$x y=$y\n";
+      print "A record with values x=$x y=$y\n";
 
-    return 1;
- }
+      return 1;
+   }
 
 In this example, the header is C<unpack()>ed first, to extract the body
 length, and then the body is extracted. If the buffer does not have enough
@@ -1425,41 +1425,41 @@ C<\n>-terminated lines that may have an optional data block attached. The
 presence of such a data block, as well as its size, is indicated by the line
 prefix.
 
- sub on_read
- {
-    my $self = shift;
-    my ( $buffref, $eof ) = @_;
+   sub on_read
+   {
+      my $self = shift;
+      my ( $buffref, $eof ) = @_;
 
-    if( $$buffref =~ s/^DATA (\d+):(.*)\n// ) {
-       my $length = $1;
-       my $line   = $2;
+      if( $$buffref =~ s/^DATA (\d+):(.*)\n// ) {
+         my $length = $1;
+         my $line   = $2;
 
-       return sub {
-          my $self = shift;
-          my ( $buffref, $eof ) = @_;
+         return sub {
+            my $self = shift;
+            my ( $buffref, $eof ) = @_;
 
-          return 0 unless length $$buffref >= $length;
+            return 0 unless length $$buffref >= $length;
 
-          # Take and remove the data from the buffer
-          my $data = substr( $$buffref, 0, $length, "" );
+            # Take and remove the data from the buffer
+            my $data = substr( $$buffref, 0, $length, "" );
 
-          print "Received a line $line with some data ($data)\n";
+            print "Received a line $line with some data ($data)\n";
 
-          return undef; # Restore the original method
-       }
-    }
-    elsif( $$buffref =~ s/^LINE:(.*)\n// ) {
-       my $line = $1;
+            return undef; # Restore the original method
+         }
+      }
+      elsif( $$buffref =~ s/^LINE:(.*)\n// ) {
+         my $line = $1;
 
-       print "Received a line $line with no data\n";
+         print "Received a line $line with no data\n";
 
-       return 1;
-    }
-    else {
-       print STDERR "Unrecognised input\n";
-       # Handle it somehow
-    }
- }
+         return 1;
+      }
+      else {
+         print STDERR "Unrecognised input\n";
+         # Handle it somehow
+      }
+   }
 
 In the case where trailing data is supplied, a new temporary C<on_read>
 callback is provided in a closure. This closure captures the C<$length>

@@ -5,7 +5,7 @@ Getopt::EX::Hashed - Hash store object automation
 
 # VERSION
 
-Version 0.9906
+Version 0.9908
 
 # SYNOPSIS
 
@@ -23,7 +23,7 @@ Version 0.9906
         my $app = shift;
         use Getopt::Long;
         $app->getopt or pod2usage();
-        if ($app->{start}) {
+        if ($app->start) {
             ...
 
 # DESCRIPTION
@@ -37,6 +37,9 @@ other modules included in **Getopt::EX**, so far.
 In the current implementation, using **Getopt::Long**, or compatible
 module such as **Getopt::EX::Long** is assumed.  It is configurable,
 but no other module is supported now.
+
+Accessor methods are automatically generated when appropiate parameter
+is given.
 
 # FUNCTION
 
@@ -56,6 +59,11 @@ current value.
     has '+left' => ( default => 1 );
 
 Following parameters are available.
+
+- **is** => _ro_ | _rw_
+
+    If an **is** parameter is given, accessor method for the member,
+    read-only for _ro_ and read-write for _rw_, is generated.
 
 - **spec** => _string_
 

@@ -1,10 +1,17 @@
-0.1.1   2019-06-19 (PERLANCAR)
+0.1.2   2021-08-08  Released-By: PERLANCAR; Urgency: low
+
+	- No spec changes.
+
+	- Note that CSVJ and CSVJS are unrelated.
+
+
+0.1.1   2019-06-19  Released-By: PERLANCAR
 
 	- No spec changes.
 
 	- Plan stable spec in 1.0, not 0.2.
 
 
-0.1.0   2019-06-19 (PERLANCAR)
+0.1.0   2019-06-19  Released-By: PERLANCAR
 
         - First release.

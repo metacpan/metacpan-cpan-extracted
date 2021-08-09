@@ -4,7 +4,7 @@ Courriel - High level email parsing and manipulation
 
 # VERSION
 
-version 0.48
+version 0.49
 
 # SYNOPSIS
 
@@ -24,8 +24,8 @@ version 0.48
 
 This class exists to provide a high level API for working with emails,
 particular for processing incoming email. It is primarily a wrapper around the
-other classes in the Courriel distro, especially [Courriel::Headers](https://metacpan.org/pod/Courriel::Headers),
-[Courriel::Part::Single](https://metacpan.org/pod/Courriel::Part::Single), and [Courriel::Part::Multipart](https://metacpan.org/pod/Courriel::Part::Multipart). If you need lower
+other classes in the Courriel distro, especially [Courriel::Headers](https://metacpan.org/pod/Courriel%3A%3AHeaders),
+[Courriel::Part::Single](https://metacpan.org/pod/Courriel%3A%3APart%3A%3ASingle), and [Courriel::Part::Multipart](https://metacpan.org/pod/Courriel%3A%3APart%3A%3AMultipart). If you need lower
 level information about an email, it should be available from one of these
 classes.
 
@@ -46,9 +46,9 @@ means that it has not been decoded into utf-8 with `Encode::decode()` or by
 using a `:encoding(UTF-8)` IO layer.
 
 In practice, this doesn't matter for most emails, since they either contain
-only ASCII data or they actually do contain binary (non-character)
-data. However, if an email is using the 8bit Content-Transfer-Encoding, then
-this does matter.
+only ASCII data or they actually do contain binary (non-character) data.
+However, if an email is using the 8bit Content-Transfer-Encoding, then this
+does matter.
 
 If the email has already been decoded, you must set `is_character` to a true
 value.
@@ -89,13 +89,13 @@ these exists, it just returns `DateTime->now()`.
 
 ## $email->from()
 
-This returns a single [Email::Address::XS](https://metacpan.org/pod/Email::Address::XS) object based on the From header of
+This returns a single [Email::Address::XS](https://metacpan.org/pod/Email%3A%3AAddress%3A%3AXS) object based on the From header of
 the email. If the email has no From header or if the From header is broken, it
 returns `undef`.
 
 ## $email->participants()
 
-This returns a list of [Email::Address::XS](https://metacpan.org/pod/Email::Address::XS) objects, one for each unique
+This returns a list of [Email::Address::XS](https://metacpan.org/pod/Email%3A%3AAddress%3A%3AXS) objects, one for each unique
 participant in the email. This includes any address in the From, To, or CC
 headers.
 
@@ -103,94 +103,94 @@ Just like with the From header, broken addresses will not be included.
 
 ## $email->recipients()
 
-This returns a list of [Email::Address::XS](https://metacpan.org/pod/Email::Address::XS) objects, one for each unique
+This returns a list of [Email::Address::XS](https://metacpan.org/pod/Email%3A%3AAddress%3A%3AXS) objects, one for each unique
 recipient in the email. This includes any address in the To or CC headers.
 
 Just like with the From header, broken addresses will not be included.
 
 ## $email->to()
 
-This returns a list of [Email::Address::XS](https://metacpan.org/pod/Email::Address::XS) objects, one for each unique
+This returns a list of [Email::Address::XS](https://metacpan.org/pod/Email%3A%3AAddress%3A%3AXS) objects, one for each unique
 address in the To header.
 
 Just like with the From header, broken addresses will not be included.
 
 ## $email->cc()
 
-This returns a list of [Email::Address::XS](https://metacpan.org/pod/Email::Address::XS) objects, one for each unique
+This returns a list of [Email::Address::XS](https://metacpan.org/pod/Email%3A%3AAddress%3A%3AXS) objects, one for each unique
 address in the CC header.
 
 Just like with the From header, broken addresses will not be included.
 
 ## $email->plain\_body\_part()
 
-This returns the first [Courriel::Part::Single](https://metacpan.org/pod/Courriel::Part::Single) object in the email with a
+This returns the first [Courriel::Part::Single](https://metacpan.org/pod/Courriel%3A%3APart%3A%3ASingle) object in the email with a
 mime type of "text/plain" and an inline disposition, if one exists.
 
 ## $email->html\_body\_part()
 
-This returns the first [Courriel::Part::Single](https://metacpan.org/pod/Courriel::Part::Single) object in the email with a
+This returns the first [Courriel::Part::Single](https://metacpan.org/pod/Courriel%3A%3APart%3A%3ASingle) object in the email with a
 mime type of "text/html" and an inline disposition, if one exists.
 
 ## $email->clone\_without\_attachments()
 
-Returns a new Courriel object that only contains inline parts from the
-original email, effectively removing all attachments.
+Returns a new Courriel object that only contains inline parts from the original
+email, effectively removing all attachments.
 
 ## $email->first\_part\_matching( sub { ... } )
 
 Given a subroutine reference, this method calls that subroutine for each part
 in the email, in a depth-first search.
 
-The subroutine receives the part as its only argument. If it returns true,
-this method returns that part.
+The subroutine receives the part as its only argument. If it returns true, this
+method returns that part.
 
 ## $email->all\_parts\_matching( sub { ... } )
 
 Given a subroutine reference, this method calls that subroutine for each part
 in the email, in a depth-first search.
 
-The subroutine receives the part as its only argument. If it returns true,
-this method includes that part.
+The subroutine receives the part as its only argument. If it returns true, this
+method includes that part.
 
 This method returns all of the parts that match the subroutine.
 
 ## $email->content\_type()
 
-Returns the [Courriel::Header::ContentType](https://metacpan.org/pod/Courriel::Header::ContentType) object associated with the email.
+Returns the [Courriel::Header::ContentType](https://metacpan.org/pod/Courriel%3A%3AHeader%3A%3AContentType) object associated with the email.
 
 ## $email->headers()
 
-Returns the [Courriel::Headers](https://metacpan.org/pod/Courriel::Headers) object for this email.
+Returns the [Courriel::Headers](https://metacpan.org/pod/Courriel%3A%3AHeaders) object for this email.
 
 ## $email->stream\_to( output => $output )
 
-This method will send the stringified email to the specified output. The
-output can be a subroutine reference, a filehandle, or an object with a
-`print()` method. The output may be sent as a single string, as a list of
-strings, or via multiple calls to the output.
+This method will send the stringified email to the specified output. The output
+can be a subroutine reference, a filehandle, or an object with a `print()`
+method. The output may be sent as a single string, as a list of strings, or via
+multiple calls to the output.
 
-For large emails, streaming can be much more memory efficient than generating
-a single string in memory.
+For large emails, streaming can be much more memory efficient than generating a
+single string in memory.
 
 ## $email->as\_string()
 
-Returns the email as a string, along with its headers. Lines will be
-terminated with "\\r\\n".
+Returns the email as a string, along with its headers. Lines will be terminated
+with "\\r\\n".
 
 # ROBUSTNESS PRINCIPLE
 
-Courriel aims to respect the common Internet robustness principle (aka
-Postel's law). Courriel is conservative in the output it generates, and
-liberal in what it accepts.
+Courriel aims to respect the common Internet robustness principle (aka Postel's
+law). Courriel is conservative in the output it generates, and liberal in what
+it accepts.
 
-When parsing, the goal is to never die and always return as much information
-as possible. Any input that causes the `Courriel->parse()` to die means
+When parsing, the goal is to never die and always return as much information as
+possible. Any input that causes the `Courriel->parse()` to die means
 there's a bug in the parser. Please report these bugs.
 
 Conversely, Courriel aims to respect all relevant RFCs in its output, except
 when it preserves the original data in a parsed email. If you're using
-[Courriel::Builder](https://metacpan.org/pod/Courriel::Builder) to create emails from scratch, any output that isn't
+[Courriel::Builder](https://metacpan.org/pod/Courriel%3A%3ABuilder) to create emails from scratch, any output that isn't
 RFC-compliant is a bug.
 
 # FUTURE PLANS
@@ -209,14 +209,14 @@ Stay tuned for details.
 
 There a lot of email modules/distros on CPAN. Why didn't I use/fix one of them?
 
-- [Mail::Box](https://metacpan.org/pod/Mail::Box)
+- [Mail::Box](https://metacpan.org/pod/Mail%3A%3ABox)
 
     This one probably does everything this module does and more, but it's really,
     really big and complicated, forcing the end user to make a lot of choices just
     to get started. If you need it, it's great, but I generally find it to be too
     much module for me.
 
-- [Email::Simple](https://metacpan.org/pod/Email::Simple) and [Email::MIME](https://metacpan.org/pod/Email::MIME)
+- [Email::Simple](https://metacpan.org/pod/Email%3A%3ASimple) and [Email::MIME](https://metacpan.org/pod/Email%3A%3AMIME)
 
     These are surprisingly **not** simple. They suffer from a problematic API (too
     high level in some spots, too low in others), and a poor separation of
@@ -263,7 +263,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at [http://www.urth.org/~autarch/fs-donation.html](http://www.urth.org/~autarch/fs-donation.html).
+button at [https://www.urth.org/fs-donation.html](https://www.urth.org/fs-donation.html).
 
 # AUTHOR
 
@@ -273,11 +273,12 @@ Dave Rolsky <autarch@urth.org>
 
 - Gregory Oschwald <goschwald@maxmind.com>
 - Ricardo Signes <rjbs@users.noreply.github.com>
+- Vitaly Gimly <vgimly@gmail.com>
 - Zbigniew Łukasiak <zzbbyy@gmail.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Dave Rolsky.
+This software is Copyright (c) 2021 by Dave Rolsky.
 
 This is free software, licensed under:
 

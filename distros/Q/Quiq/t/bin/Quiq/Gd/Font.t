@@ -213,7 +213,7 @@ sub test_charHeight_ttf : Test(1) {
 
     my $fnt = $self->get('ttFont');
     # Verschiedene Ergebnisse möglich, je nach Font oder libgd-Version
-    $self->in($fnt->charHeight,[24,27,28]);
+    $self->in($fnt->charHeight,[24,25,27,28]);
 }
 
 sub test_charHeight_gd : Test(5) {

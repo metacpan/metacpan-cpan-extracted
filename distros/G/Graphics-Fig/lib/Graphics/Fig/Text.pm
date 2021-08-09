@@ -15,7 +15,7 @@
 # program.  If not, see <http://www.perlfoundation.org/artistic_license_2_0>.
 #
 package Graphics::Fig::Text;
-our $VERSION = 'v1.0.5';
+our $VERSION = 'v1.0.7';
 
 use strict;
 use warnings;

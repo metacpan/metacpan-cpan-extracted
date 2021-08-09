@@ -1,6 +1,11 @@
 Changelog for Mojo-Leds
 
-1.05 2021-08-05T15:14:34
+1.06 2021-08-05T17:12:58
+ - Add command leds_app to generate application directory structures for
+   fully functional Mojo::Leds applications
+ - [Minor]: Pod syntax error
+
+1.05 2021-08-05T15:14:12
  - Add documentation
  - Solved a bug in DBIx
  - Moved duplicated code from Rest/*.pm to Rest.pm

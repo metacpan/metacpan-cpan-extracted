@@ -1,3 +1,9 @@
+1.907   2021-08-06  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename dependency Data::Clean::JSON -> Data::Clean::ForJSON
+	  (GH#12).
+
+
 1.906   2021-07-11  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Provide key to common options to be able to group them in

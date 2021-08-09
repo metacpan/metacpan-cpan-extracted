@@ -164,7 +164,7 @@ JSONSchema::Validator::Draft4 - Validator for JSON Schema Draft4
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

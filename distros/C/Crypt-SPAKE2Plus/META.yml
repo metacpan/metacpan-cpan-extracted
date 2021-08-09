@@ -1,0 +1,24 @@
+---
+abstract: 'SPAKE2+ protocol'
+author:
+  - 'abbypan <abbypan@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-SPAKE2Plus
+requires:
+  Crypt::Perl: '0'
+  Crypt::ScryptKDF: '0'
+  CryptX: '0'
+resources:
+  repository: https://github.com/abbypan/Crypt-SPAKE2Plus.git
+version: '0.02'
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

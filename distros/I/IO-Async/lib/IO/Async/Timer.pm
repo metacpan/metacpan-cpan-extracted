@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( IO::Async::Notifier );
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 use Carp;
 
@@ -129,7 +129,7 @@ duration after the time it was added.
 As a convenience, C<$timer> is returned. This may be useful for starting
 timers at construction time:
 
- $loop->add( IO::Async::Timer->new( ... )->start );
+   $loop->add( IO::Async::Timer->new( ... )->start );
 
 =cut
 

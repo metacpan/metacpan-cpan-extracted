@@ -10,7 +10,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(format_pretty);
 
-our $VERSION = '0.390'; # VERSION
+our $VERSION = '0.391'; # VERSION
 
 sub content_type { "text/plain" }
 
@@ -36,7 +36,7 @@ Data::Format::Pretty::Text - Pretty-print data structure as text
 
 =head1 VERSION
 
-This document describes version 0.390 of Data::Format::Pretty::Text (from Perl distribution Data-Format-Pretty-Console), released on 2021-04-23.
+This document describes version 0.391 of Data::Format::Pretty::Text (from Perl distribution Data-Format-Pretty-Console), released on 2021-08-08.
 
 =head1 SYNOPSIS
 
@@ -84,7 +84,7 @@ Source repository is at L<https://github.com/perlancar/perl-Data-Format-Pretty-C
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Data-Format-Pretty-Console/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Format-Pretty-Console>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

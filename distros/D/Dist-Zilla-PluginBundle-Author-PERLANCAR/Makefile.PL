@@ -30,6 +30,7 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Plugin::GenShellCompletion" => 0,
     "Dist::Zilla::Plugin::Git::Contributors" => 0,
     "Dist::Zilla::Plugin::IfBuilt" => 0,
+    "Dist::Zilla::Plugin::MetaProvides::Package" => 0,
     "Dist::Zilla::Plugin::OurDate" => 0,
     "Dist::Zilla::Plugin::OurDist" => 0,
     "Dist::Zilla::Plugin::OurPkgVersion" => "0.15",
@@ -74,7 +75,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.604",
+  "VERSION" => "0.605",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -95,6 +96,7 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Plugin::GenShellCompletion" => 0,
   "Dist::Zilla::Plugin::Git::Contributors" => 0,
   "Dist::Zilla::Plugin::IfBuilt" => 0,
+  "Dist::Zilla::Plugin::MetaProvides::Package" => 0,
   "Dist::Zilla::Plugin::OurDate" => 0,
   "Dist::Zilla::Plugin::OurDist" => 0,
   "Dist::Zilla::Plugin::OurPkgVersion" => "0.15",

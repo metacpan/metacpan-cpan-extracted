@@ -75,9 +75,9 @@ sub new {
 sub validator { shift->{validator} }
 sub strict { shift->{strict} }
 
-# params: $self, $value, $type
+# params: $self, $value, $type, $strict
 sub check_type {
-    return is_type($_[1], $_[2], $_[0]->strict);
+    return is_type($_[1], $_[2], $_[3] // $_[0]->strict);
 }
 
 sub type {
@@ -221,7 +221,8 @@ sub dependencies {
         my $dep = $dependencies->{$prop};
         my $spath = json_pointer->append($schema_path, $prop);
 
-        if ($self->check_type($dep, 'array')) {
+        # need strict check beacase of schema check
+        if ($self->check_type($dep, 'array', 1)) {
             for my $idx (0 .. $#{$dep}) {
                 my $p = $dep->[$idx];
                 next if exists $instance->{$p};
@@ -246,11 +247,13 @@ sub dependencies {
 sub additionalItems {
     my ($self, $instance, $additionalItems, $schema, $instance_path, $schema_path, $data) = @_;
     return 1 unless $self->check_type($instance, 'array');
-    return 1 if $self->check_type($schema->{items} // {}, 'object');
+    # need strict check beacase of schema check
+    return 1 if $self->check_type($schema->{items} // {}, 'object', 1);
 
     my $len_items = scalar @{$schema->{items}};
 
-    if ($self->check_type($additionalItems, 'boolean')) {
+    # need strict check beacase of schema check
+    if ($self->check_type($additionalItems, 'boolean', 1)) {
         return 1 if $additionalItems;
         if  (scalar @$instance > $len_items) {
             push @{$data->{errors}}, error(
@@ -295,7 +298,8 @@ sub additionalProperties {
 
     return 1 unless @extra_props;
 
-    if ($self->check_type($addProps, 'object')) {
+    # need strict check beacase of schema check
+    if ($self->check_type($addProps, 'object', 1)) {
         my $result = 1;
         for my $p (@extra_props) {
             my $ipath = json_pointer->append($instance_path, $p);
@@ -413,16 +417,17 @@ sub enum {
 
     my $result = 0;
     for my $e (@$enum) {
-        if ($self->check_type($e, 'boolean')) {
+        # schema must have strict check
+        if ($self->check_type($e, 'boolean', 1)) {
             $result = $self->check_type($instance, 'boolean')
                         ? unbool($instance) eq unbool($e)
                         : 0
-        } elsif ($self->check_type($e, 'object') || $self->check_type($e, 'array')) {
+        } elsif ($self->check_type($e, 'object', 1) || $self->check_type($e, 'array', 1)) {
             $result =   $self->check_type($instance, 'object') ||
                         $self->check_type($instance, 'array')
                         ? serialize($instance) eq serialize($e)
                         : 0;
-        } elsif ($self->check_type($e, 'number')) {
+        } elsif ($self->check_type($e, 'number', 1)) {
             $result =   $self->check_type($instance, 'number')
                         ? $e == $instance
                         : 0;
@@ -451,7 +456,7 @@ sub items {
     return 1 unless $self->check_type($instance, 'array');
 
     my $result = 1;
-    if ($self->check_type($items, 'array')) {
+    if ($self->check_type($items, 'array', 1)) {
         my $min = $#{$items} > $#{$instance} ? $#{$instance} : $#{$items};
         for my $i (0 .. $min) {
             my $item = $instance->[$i];
@@ -701,7 +706,7 @@ JSONSchema::Validator::Constraints::Draft4 - JSON Schema Draft4 specification co
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AUTHORS
 

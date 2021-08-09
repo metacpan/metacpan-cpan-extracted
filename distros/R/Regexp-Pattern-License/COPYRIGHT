@@ -11,8 +11,11 @@ Files: Changes
  lib/Regexp/Pattern/License/Parts.pm
  t/01-basic.t
  t/02-regexp-pattern.t
+ t/02-structure.t
+ t/03-match-normalized.t
  t/coverage-cc-deprecated.t
  t/coverage-cc.t
+ t/coverage-fedora-2.53.t
  t/coverage-osi.t
  t/coverage-perl.t
  t/coverage-spdx-1.16.t
@@ -31,8 +34,6 @@ Files: Changes
  t/coverage-tldr.t
  t/lib/MyTest.pm
  t/lib/Test2/Regexp/Pattern/License.pm
- t/normalized.t
- t/re2.t
 Copyright: Copyright 2021 Jonas Smedegaard.
 License: GPL-3.0
 
@@ -49,13 +50,13 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: Makefile.PL
-Copyright: Copyright 2020 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: dist.ini
 Copyright: Copyright 2017 Jonas Smedegaard.
 License: GPL-3.0
+
+Files: Makefile.PL
+Copyright: Copyright 2020 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
 
 License: GPL-3.0
  This software is Copyright (c) 2021 by Jonas Smedegaard.

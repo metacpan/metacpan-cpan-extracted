@@ -13,7 +13,7 @@ use Pod::Usage;
 use lib qw{ tools };
 use My::Symdump;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 my %opt;
 

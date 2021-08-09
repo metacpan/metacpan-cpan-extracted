@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 use Courriel::HeaderAttribute;
 use Courriel::Helpers qw( quote_and_escape_attribute_value );
@@ -189,7 +189,7 @@ Courriel::HeaderAttribute - A single attribute belonging to a header
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 SYNOPSIS
 
@@ -249,9 +249,8 @@ The attribute's language.
 
 =head2 $attribute->as_string()
 
-This returns the attribute in a form suitable for putting in an email. This
-may involve escaping, quoting, splitting up, and otherwise messing with the
-value.
+This returns the attribute in a form suitable for putting in an email. This may
+involve escaping, quoting, splitting up, and otherwise messing with the value.
 
 If the value needs to be split across continuations, each name/value pair is
 returned separate by a space, but not folded across multiple lines.
@@ -283,7 +282,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Dave Rolsky.
+This software is Copyright (c) 2021 by Dave Rolsky.
 
 This is free software, licensed under:
 

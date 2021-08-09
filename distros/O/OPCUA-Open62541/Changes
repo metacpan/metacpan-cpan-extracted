@@ -1,5 +1,11 @@
 Revision history for Perl extension OPCUA::Open62541.
 
+0.028 2021-08-09
+    - Use specific structs to store subscription context and monitored
+      item context.
+    - Pass subscription context to monitored item callback.
+    - Fix memory management of MonitoredItemCreateRequest_default().
+
 0.027 2021-07-29
     - Implement wrapper for subscription functions of open62541.
     - Call back change and delete notifications to Perl.

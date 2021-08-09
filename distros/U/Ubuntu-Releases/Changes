@@ -1,6 +1,13 @@
+20210115.2  2021-08-06  Released-By: PERLANCAR; Urgency: medium
+
+            - No functional changes.
+
+            - [build] Rebuild to redirect issues back to RT from GitHub.
+
+
 20210115.1  2021-01-15  Released-By: PERLANCAR; Urgency: low
 
-            - No functinal changes.
+            - No functional changes.
 
 	    - [doc] Fix typo, add note on additional data source.
 

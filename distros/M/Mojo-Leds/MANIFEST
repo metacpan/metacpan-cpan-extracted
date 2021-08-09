@@ -18,6 +18,7 @@ lib/Mojo/Leds/resources/public/img/exception.production.gif
 lib/Mojo/Leds/resources/public/img/sailboat_storm.webp
 lib/Mojo/Leds/resources/templates/exception.production.html.ep
 lib/Mojo/Leds/resources/templates/not_found.production.html.ep
+lib/Mojolicious/Command/Author/generate/leds_app.pm
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/10-www.t

@@ -27,10 +27,7 @@ DESCRIPTION
     WARNING The ability for Object::Pad to take third-party slot attributes
     is still new and highly experimental, and subject to much API change in
     future. As a result, this module should be considered equally
-    experimental. As a further point, it is currently pinned to requiring
-    an exact $Object::Pad::VERSION of 0.48, to defend against possible API
-    or ABI breakage. It is expected that as the API eventually stablises,
-    this restriction can be removed.
+    experimental.
 
 SLOT ATTRIBUTES
 

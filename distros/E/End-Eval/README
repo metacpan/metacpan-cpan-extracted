@@ -1,0 +1,49 @@
+NAME
+    End::Eval - Take code from import arguments, then eval it in END block
+
+VERSION
+    This document describes version 0.001 of End::Eval (from Perl
+    distribution End-Eval), released on 2021-08-06.
+
+SYNOPSIS
+    On the command-line:
+
+     % perl -MEnd::Eval='use Data::Dump; dd \%INC' `which some-perl-script.pl` ...
+     % PERL5OPT='-mData::Dump -MEnd::Eval=Data::Dump::dd\%INC' some-perl-script.pl ...
+
+DESCRIPTION
+    This module allows you to specify a code in import arguments, basically
+    for convenience in one-liners.
+
+    Caveat: specifying in PERL5OPT is tricky because of the limited syntax.
+
+FAQ
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/End-Eval>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-End-Eval>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=End-Eval>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Other "End::Eval::*" (like End::Eval::FirstArg) and "End::*" modules.
+
+    Other "Devel::End::*" modules (but this namespace is deprecated in favor
+    of "End").
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

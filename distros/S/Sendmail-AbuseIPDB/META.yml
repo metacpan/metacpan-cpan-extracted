@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Sendmail-AbuseIPDB
-version:            0.21
+version:            0.22
 abstract:           API access for IP address abuse database
 author:
     - TTNDY <ttndy@cpan.org>
@@ -11,8 +11,9 @@ configure_requires:
 build_requires:
     ExtUtils::MakeMaker:  0
 requires:
-    JSON:  2.15
-    URI:   1.4
+    IPC::Cmd:  0
+    JSON:      2.15
+    URI:       1.4
 no_index:
     directory:
         - t

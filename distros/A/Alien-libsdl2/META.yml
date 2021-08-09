@@ -26,7 +26,7 @@ configure_requires:
   Alien::Build::Plugin::Probe::Vcpkg: '2.40'
   ExtUtils::MakeMaker: '7.62'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.023, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -43,7 +43,7 @@ no_index:
 provides:
   Alien::libsdl2:
     file: lib/Alien/libsdl2.pm
-    version: '1.02'
+    version: '1.03'
 requires:
   Alien::Base: '2.40'
   base: '0'
@@ -54,9 +54,9 @@ resources:
   bugtracker: https://github.com/sanko/Alien-libsdl2/issues
   homepage: https://github.com/sanko/Alien-libsdl2
   repository: https://github.com/sanko/Alien-libsdl2.git
-version: '1.02'
+version: '1.03'
 x_alienfile:
-  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.31'
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:
     share:
       Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'

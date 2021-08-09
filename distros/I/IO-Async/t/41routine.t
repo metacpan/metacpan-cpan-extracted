@@ -14,6 +14,8 @@ use IO::Async::Routine;
 use IO::Async::Channel;
 use IO::Async::Loop;
 
+use lib ".";
+
 my $loop = IO::Async::Loop->new_builtin;
 
 testing_loop( $loop );
@@ -155,6 +157,40 @@ foreach my $model (qw( fork thread )) {
          if $model eq "fork" and not IO::Async::OS->HAVE_POSIX_FORK;
 
       test_with_model( $model );
+   }
+}
+
+foreach my $model (qw( fork thread spawn )) {
+   SKIP: {
+      skip "This Perl does not support threads", 1
+         if $model eq "thread" and not IO::Async::OS->HAVE_THREADS;
+      skip "This Perl does not support fork()", 1
+         if $model eq "fork" and not IO::Async::OS->HAVE_POSIX_FORK;
+
+      my $in  = IO::Async::Channel->new;
+      my $out = IO::Async::Channel->new;
+
+      my $routine = IO::Async::Routine->new(
+         model => $model,
+         module => "t::RoutineTester",
+         func   => "test_routine",
+         channels_in  => [ $in  ],
+         channels_out => [ $out ],
+         on_finish => sub {
+            print STDERR "Process exited @_\n";
+         },
+      );
+
+      $loop->add( $routine );
+
+      $in->send( \"value" );
+
+      my $f = wait_for_future $out->recv;
+
+      my $result = eval { $f->get };
+      is( ${$result}, "VALUE", "Result for $model model via module+func" );
+
+      $loop->remove( $routine );
    }
 }
 

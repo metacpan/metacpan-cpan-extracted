@@ -7,7 +7,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use constant REF_ARRAY			=> ref [];
 
@@ -351,7 +351,7 @@ sub __midnight {
 
 =head2 __normalize_capture
 
- my $normalized_capture = $dmad->__normalize_key( $capture_name, $capture_content );
+ my $normalized_capture = $dmad->__normalize_capture( $capture_name, $capture_content );
 
 This method is called by L<__event_capture()|/__event_capture> when a
 string is captured.  The arguments are the capture name and its

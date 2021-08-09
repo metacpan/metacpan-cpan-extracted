@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( IO::Async::Notifier );
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 use Carp;
 
@@ -25,58 +25,58 @@ C<IO::Async::Process> - start and manage a child process
 
 =head1 SYNOPSIS
 
- use IO::Async::Process;
+   use IO::Async::Process;
 
- use IO::Async::Loop;
- my $loop = IO::Async::Loop->new;
+   use IO::Async::Loop;
+   my $loop = IO::Async::Loop->new;
 
- my $process = IO::Async::Process->new(
-    command => [ "tr", "a-z", "n-za-m" ],
-    stdin => {
-       from => "hello world\n",
-    },
-    stdout => {
-       on_read => sub {
-          my ( $stream, $buffref ) = @_;
-          while( $$buffref =~ s/^(.*)\n// ) {
-             print "Rot13 of 'hello world' is '$1'\n";
-          }
+   my $process = IO::Async::Process->new(
+      command => [ "tr", "a-z", "n-za-m" ],
+      stdin => {
+         from => "hello world\n",
+      },
+      stdout => {
+         on_read => sub {
+            my ( $stream, $buffref ) = @_;
+            while( $$buffref =~ s/^(.*)\n// ) {
+               print "Rot13 of 'hello world' is '$1'\n";
+            }
 
-          return 0;
-       },
-    },
+            return 0;
+         },
+      },
 
-    on_finish => sub {
-       $loop->stop;
-    },
- );
+      on_finish => sub {
+         $loop->stop;
+      },
+   );
 
- $loop->add( $process );
+   $loop->add( $process );
 
- $loop->run;
+   $loop->run;
 
 Also accessible via the L<IO::Async::Loop/open_process> method:
 
- $loop->open_process(
-    command => [ "/bin/ping", "-c4", "some.host" ],
+   $loop->open_process(
+      command => [ "/bin/ping", "-c4", "some.host" ],
 
-    stdout => {
-       on_read => sub {
-          my ( $stream, $buffref, $eof ) = @_;
-          while( $$buffref =~ s/^(.*)\n// ) {
-             print "PING wrote: $1\n";
-          }
-          return 0;
-       },
-    },
+      stdout => {
+         on_read => sub {
+            my ( $stream, $buffref, $eof ) = @_;
+            while( $$buffref =~ s/^(.*)\n// ) {
+               print "PING wrote: $1\n";
+            }
+            return 0;
+         },
+      },
 
-    on_finish => sub {
-       my $process = shift;
-       my ( $exitcode ) = @_;
-       my $status = ( $exitcode >> 8 );
-       ...
-    },
- );
+      on_finish => sub {
+         my $process = shift;
+         my ( $exitcode ) = @_;
+         my $status = ( $exitcode >> 8 );
+         ...
+      },
+   );
 
 =head1 DESCRIPTION
 
@@ -115,21 +115,21 @@ C<on_exit> handler in a different order it is possible that the C<$exception>
 field will be an empty string. It will however always be defined. This can be
 used to distinguish the two cases:
 
- on_exception => sub {
-    my $self = shift;
-    my ( $exception, $errno, $exitcode ) = @_;
+   on_exception => sub {
+      my $self = shift;
+      my ( $exception, $errno, $exitcode ) = @_;
 
-    if( length $exception ) {
-       print STDERR "The process died with the exception $exception " .
-          "(errno was $errno)\n";
-    }
-    elsif( ( my $status = W_EXITSTATUS($exitcode) ) == 255 ) {
-       print STDERR "The process failed to exec() - $errno\n";
-    }
-    else {
-       print STDERR "The process exited with exit status $status\n";
-    }
- }
+      if( length $exception ) {
+         print STDERR "The process died with the exception $exception " .
+            "(errno was $errno)\n";
+      }
+      elsif( ( my $status = W_EXITSTATUS($exitcode) ) == 255 ) {
+         print STDERR "The process failed to exec() - $errno\n";
+      }
+      else {
+         print STDERR "The process exited with exit status $status\n";
+      }
+   }
 
 =cut
 
@@ -265,7 +265,7 @@ use C<setsockopt(3)>) from the controlling parent, before the child code runs.
 The arguments passed in are the L<IO::Socket> objects for the parent and child
 ends of the socket.
 
- $prefork->( $localfd, $childfd )
+   $prefork->( $localfd, $childfd )
 
 =back
 
@@ -830,19 +830,19 @@ sub stdio  { shift->fd( 'io' ) }
 By configuring the C<stdout> filehandle of the process using the C<into> key,
 data written by the process can be captured.
 
- my $stdout;
- my $process = IO::Async::Process->new(
-    command => [ "writing-program", "arguments" ],
-    stdout => { into => \$stdout },
-    on_finish => sub {
-       my $process = shift;
-       my ( $exitcode ) = @_;
-       print "Process has exited with code $exitcode, and wrote:\n";
-       print $stdout;
-    }
- );
+   my $stdout;
+   my $process = IO::Async::Process->new(
+      command => [ "writing-program", "arguments" ],
+      stdout => { into => \$stdout },
+      on_finish => sub {
+         my $process = shift;
+         my ( $exitcode ) = @_;
+         print "Process has exited with code $exitcode, and wrote:\n";
+         print $stdout;
+      }
+   );
 
- $loop->add( $process );
+   $loop->add( $process );
 
 Note that until C<on_finish> is invoked, no guarantees are made about how much
 of the data actually written by the process is yet in the C<$stdout> scalar.
@@ -853,24 +853,24 @@ To handle data more interactively as it arrives, the C<on_read> key can
 instead be used, to provide a callback function to invoke whenever more data
 is available from the process.
 
- my $process = IO::Async::Process->new(
-    command => [ "writing-program", "arguments" ],
-    stdout => {
-       on_read => sub {
-          my ( $stream, $buffref ) = @_;
-          while( $$buffref =~ s/^(.*)\n// ) {
-             print "The process wrote a line: $1\n";
-          }
+   my $process = IO::Async::Process->new(
+      command => [ "writing-program", "arguments" ],
+      stdout => {
+         on_read => sub {
+            my ( $stream, $buffref ) = @_;
+            while( $$buffref =~ s/^(.*)\n// ) {
+               print "The process wrote a line: $1\n";
+            }
 
-          return 0;
-       },
-    },
-    on_finish => sub {
-       print "The process has finished\n";
-    }
- );
+            return 0;
+         },
+      },
+      on_finish => sub {
+         print "The process has finished\n";
+      }
+   );
 
- $loop->add( $process );
+   $loop->add( $process );
 
 If the code to handle data read from the process isn't available yet when
 the object is constructed, it can be supplied later by using the C<configure>
@@ -878,41 +878,41 @@ method on the C<stdout> filestream at some point before it gets added to the
 Loop. In this case, C<stdin> should be configured using C<pipe_read> in the
 C<via> key.
 
- my $process = IO::Async::Process->new(
-    command => [ "writing-program", "arguments" ],
-    stdout => { via => "pipe_read" },
-    on_finish => sub {
-       print "The process has finished\n";
-    }
- );
+   my $process = IO::Async::Process->new(
+      command => [ "writing-program", "arguments" ],
+      stdout => { via => "pipe_read" },
+      on_finish => sub {
+         print "The process has finished\n";
+      }
+   );
 
- $process->stdout->configure(
-    on_read => sub {
-       my ( $stream, $buffref ) = @_;
-       while( $$buffref =~ s/^(.*)\n// ) {
-          print "The process wrote a line: $1\n";
-       }
+   $process->stdout->configure(
+      on_read => sub {
+         my ( $stream, $buffref ) = @_;
+         while( $$buffref =~ s/^(.*)\n// ) {
+            print "The process wrote a line: $1\n";
+         }
 
-       return 0;
-    },
- );
+         return 0;
+      },
+   );
 
- $loop->add( $process );
+   $loop->add( $process );
 
 =head2 Sending data to STDIN of a process
 
 By configuring the C<stdin> filehandle of the process using the C<from> key,
 data can be written into the C<STDIN> stream of the process.
 
- my $process = IO::Async::Process->new(
-    command => [ "reading-program", "arguments" ],
-    stdin => { from => "Here is the data to send\n" },
-    on_finish => sub { 
-       print "The process has finished\n";
-    }
- );
+   my $process = IO::Async::Process->new(
+      command => [ "reading-program", "arguments" ],
+      stdin => { from => "Here is the data to send\n" },
+      on_finish => sub { 
+         print "The process has finished\n";
+      }
+   );
 
- $loop->add( $process );
+   $loop->add( $process );
 
 The data in this scalar will be written until it is all consumed, then the
 handle will be closed. This may be useful if the program waits for EOF on
@@ -922,17 +922,17 @@ To have the ability to write more data into the process once it has started.
 the C<write> method on the C<stdin> stream can be used, when it is configured
 using the C<pipe_write> value for C<via>:
 
- my $process = IO::Async::Process->new(
-    command => [ "reading-program", "arguments" ],
-    stdin => { via => "pipe_write" },
-    on_finish => sub { 
-       print "The process has finished\n";
-    }
- );
+   my $process = IO::Async::Process->new(
+      command => [ "reading-program", "arguments" ],
+      stdin => { via => "pipe_write" },
+      on_finish => sub { 
+         print "The process has finished\n";
+      }
+   );
 
- $loop->add( $process );
+   $loop->add( $process );
 
- $process->stdin->write( "Here is some more data\n" );
+   $process->stdin->write( "Here is some more data\n" );
 
 =head2 Setting socket options
 
@@ -941,24 +941,24 @@ size at both ends of the socket before the child is forked (at which point it
 would be too late for the parent to be able to change the child end of the
 socket).
 
- use Socket qw( SOL_SOCKET SO_RCVBUF );
+   use Socket qw( SOL_SOCKET SO_RCVBUF );
 
- my $process = IO::Async::Process->new(
-    command => [ "command-to-read-from-and-write-to", "arguments" ],
-    stdio => {
-       via => "socketpair",
-       prefork => sub {
-          my ( $parentfd, $childfd ) = @_;
+   my $process = IO::Async::Process->new(
+      command => [ "command-to-read-from-and-write-to", "arguments" ],
+      stdio => {
+         via => "socketpair",
+         prefork => sub {
+            my ( $parentfd, $childfd ) = @_;
 
-          # Set parent end of socket receive buffer to 3 MB
-          $parentfd->setsockopt(SOL_SOCKET, SO_RCVBUF, 3 * 1024 * 1024);
-          # Set child end of socket receive buffer to 3 MB
-          $childfd ->setsockopt(SOL_SOCKET, SO_RCVBUF, 3 * 1024 * 1024);
-       },
-    },
- );
+            # Set parent end of socket receive buffer to 3 MB
+            $parentfd->setsockopt(SOL_SOCKET, SO_RCVBUF, 3 * 1024 * 1024);
+            # Set child end of socket receive buffer to 3 MB
+            $childfd ->setsockopt(SOL_SOCKET, SO_RCVBUF, 3 * 1024 * 1024);
+         },
+      },
+   );
 
- $loop->add( $process );
+   $loop->add( $process );
 
 =cut
 

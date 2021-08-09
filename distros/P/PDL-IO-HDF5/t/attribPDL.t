@@ -47,7 +47,7 @@ my $group2=$hdf2->group('Radiometric information');
 my $dataset2=$group2->dataset('SP_BT');
 my $expected;
 
-$expected = '
+$expected = pdl '
 [
  [1.2 1.3 1.4]
  [1.5 1.6 1.7]
@@ -55,20 +55,20 @@ $expected = '
 ]
 ';
 my $bt2=$dataset2->get();
-is("$bt2", $expected);
+ok all(approx($bt2, $expected)) or diag "got: $bt2";
 
 $expected = 'K';
 my ($units)=$dataset2->attrGet('UNITS');
 is($units, $expected);
 
-$expected = '
+$expected = pdl '
 [
  [1 2 3]
  [4 5 6]
 ]
 ';
 my ($numcol)=$dataset2->attrGet('NUM_COL');
-is("$numcol", $expected);
+ok all(approx($numcol, $expected)) or diag "got: $numcol";
 
 isa_ok($numcol, 'PDL');
 
@@ -90,9 +90,9 @@ $expected = 'pepe';
 my ($scaling)=$dataset2->attrGet('SCALING');
 is($scaling, $expected);
 
-$expected = '[0.0074]';
+$expected = pdl '[0.0074]';
 my ($offset)=$dataset2->attrGet('OFFSET');
-is("$offset", $expected);
+ok all(approx($offset, $expected)) or diag "got: $offset";
 
 $expected = '87';
 my ($id)=$dataset2->attrGet('ID');
@@ -104,19 +104,19 @@ if($have_LL) {
   is("$idlong", $expected);
 }
 
-$expected = '3.1415927';
+$expected = pdl '3.1415927';
 my ($temperature)=$dataset2->attrGet('TEMPERATURE');
-is("$temperature", $expected);
+ok all(approx($temperature, $expected)) or diag "got: $temperature";
 
 # Check Group PDL Attribute
-$expected = '
+$expected = pdl '
 [
  [1 2 3]
  [4 5 6]
 ]
 ';
 my ($numcol2)=$group2->attrGet('GroupPDLAttr');
-is("$numcol2", $expected);
+ok all(approx($numcol2, $expected)) or diag "got: $numcol2";
 isa_ok($numcol2, 'PDL');
 
 # clean up file

@@ -5,7 +5,7 @@ package Data::Record::Serialize::Role::EncodeAndSink;
 use strict;
 use warnings;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use Data::Record::Serialize::Error { errors => [ qw( internal  ) ] }, -all;
 
@@ -47,7 +47,7 @@ Data::Record::Serialize::Role::EncodeAndSink - Both an Encode and Sink. handle u
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =for Pod::Coverage say
 print

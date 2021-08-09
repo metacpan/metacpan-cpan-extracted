@@ -8,7 +8,7 @@ package IO::Async::Loop::Poll;
 use strict;
 use warnings;
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 use constant API_VERSION => '0.49';
 
 use base qw( IO::Async::Loop );
@@ -46,19 +46,19 @@ Normally an instance of this class would not be directly constructed by a
 program. It may however, be useful for runinng L<IO::Async> with an existing
 program already using an C<IO::Poll> object.
 
- use IO::Poll;
- use IO::Async::Loop::Poll;
+   use IO::Poll;
+   use IO::Async::Loop::Poll;
 
- my $poll = IO::Poll->new;
- my $loop = IO::Async::Loop::Poll->new( poll => $poll );
+   my $poll = IO::Poll->new;
+   my $loop = IO::Async::Loop::Poll->new( poll => $poll );
 
- $loop->add( ... );
+   $loop->add( ... );
 
- while(1) {
-    my $timeout = ...
-    my $ret = $poll->poll( $timeout );
-    $loop->post_poll;
- }
+   while(1) {
+      my $timeout = ...
+      my $ret = $poll->poll( $timeout );
+      $loop->post_poll;
+   }
 
 =head1 DESCRIPTION
 

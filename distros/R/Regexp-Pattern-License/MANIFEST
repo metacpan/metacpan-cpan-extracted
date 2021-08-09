@@ -16,8 +16,11 @@ lib/Regexp/Pattern/License.pm
 lib/Regexp/Pattern/License/Parts.pm
 t/01-basic.t
 t/02-regexp-pattern.t
+t/02-structure.t
+t/03-match-normalized.t
 t/coverage-cc-deprecated.t
 t/coverage-cc.t
+t/coverage-fedora-2.53.t
 t/coverage-osi.t
 t/coverage-perl.t
 t/coverage-spdx-1.16.t
@@ -36,5 +39,3 @@ t/coverage-spdx-3.0.t
 t/coverage-tldr.t
 t/lib/MyTest.pm
 t/lib/Test2/Regexp/Pattern/License.pm
-t/normalized.t
-t/re2.t

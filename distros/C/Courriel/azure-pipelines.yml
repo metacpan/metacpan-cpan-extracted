@@ -1,0 +1,28 @@
+resources:
+  repositories:
+    - repository: ci-perl-helpers
+      type: github
+      name: houseabsolute/ci-perl-helpers
+      endpoint: houseabsolute
+
+stages:
+  - template: templates/helpers/build.yml@ci-perl-helpers
+    parameters:
+      debug: true
+
+  - template: templates/helpers/linux.yml@ci-perl-helpers
+    parameters:
+      apt:
+        - libmagic-dev
+        - libmagic1
+      coverage: codecov
+      debug: true
+      test_xt: true
+      from_perl: "5.12"
+
+  - template: templates/helpers/macos.yml@ci-perl-helpers
+    parameters:
+      brew:
+        - libmagic
+      debug: true
+      use_default_perls: true

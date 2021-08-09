@@ -1,5 +1,5 @@
 package Mojo::Leds::Page;
-$Mojo::Leds::Page::VERSION = '1.05';
+$Mojo::Leds::Page::VERSION = '1.06';
 use 5.014;    # because s///r usage
 use Mojo::Base 'Mojolicious::Controller';
 use Mojo::Util qw(class_to_path);
@@ -119,7 +119,7 @@ Mojo::Leds::Page - Standard page controller for Mojo::Leds
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =head1 SYNOPSIS
 

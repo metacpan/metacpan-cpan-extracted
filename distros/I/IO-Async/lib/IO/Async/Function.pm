@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
 
 package IO::Async::Function;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 use base qw( IO::Async::Notifier );
 use IO::Async::Timer::Countdown;
@@ -27,28 +27,28 @@ C<IO::Async::Function> - call a function asynchronously
 
 =head1 SYNOPSIS
 
- use IO::Async::Function;
+   use IO::Async::Function;
 
- use IO::Async::Loop;
- my $loop = IO::Async::Loop->new;
+   use IO::Async::Loop;
+   my $loop = IO::Async::Loop->new;
 
- my $function = IO::Async::Function->new(
-    code => sub {
-       my ( $number ) = @_;
-       return is_prime( $number );
-    },
- );
+   my $function = IO::Async::Function->new(
+      code => sub {
+         my ( $number ) = @_;
+         return is_prime( $number );
+      },
+   );
 
- $loop->add( $function );
+   $loop->add( $function );
 
- $function->call(
-    args => [ 123454321 ],
- )->on_done( sub {
-    my $isprime = shift;
-    print "123454321 " . ( $isprime ? "is" : "is not" ) . " a prime number\n";
- })->on_fail( sub {
-    print STDERR "Cannot determine if it's prime - $_[0]\n";
- })->get;
+   $function->call(
+      args => [ 123454321 ],
+   )->on_done( sub {
+      my $isprime = shift;
+      print "123454321 " . ( $isprime ? "is" : "is not" ) . " a prime number\n";
+   })->on_fail( sub {
+      print STDERR "Cannot determine if it's prime - $_[0]\n";
+   })->get;
 
 =head1 DESCRIPTION
 
@@ -111,7 +111,7 @@ The following named parameters may be passed to C<new> or C<configure>:
 
 The body of the function to execute.
 
- @result = $code->( @args )
+   @result = $code->( @args )
 
 =head2 init_code => CODE
 
@@ -119,9 +119,33 @@ Optional. If defined, this is invoked exactly once in every child process or
 thread, after it is created, but before the first invocation of the function
 body itself.
 
- $init_code->()
+   $init_code->()
 
-=head2 model => "fork" | "thread"
+=head2 module => STRING
+
+=head2 func => STRING
+
+An alternative to the C<code> argument, which names a module to load and a
+function to call within it. C<module> should give a perl module name (i.e.
+C<Some::Name>, not a filename like F<Some/Name.pm>), and C<func> should give
+the basename of a function within that module (i.e. without the module name
+prefixed). It will be invoked, without extra arguments, as the main code
+body of the object.
+
+The task of loading this module and resolving the resulting function from it
+is only performed on the remote worker side, so the controlling process will
+not need to actually load the module.
+
+=head2 init_func => STRING or ARRAY [ STRING, ... ]
+
+Optional addition to the C<module> and C<func> alternatives. Names a function
+within the module to call each time a new worker is created.
+
+If this value is an array reference, its first element must be a string giving
+the name of the function; the remaining values are passed to that function as
+arguments.
+
+=head2 model => "fork" | "thread" | "spawn"
 
 Optional. Requests a specific L<IO::Async::Routine> model. If not supplied,
 leaves the default choice up to Routine.
@@ -229,9 +253,14 @@ sub configure
 
    my $need_restart;
 
-   foreach (qw( init_code code setup )) {
+   foreach (qw( init_code code module init_func func setup )) {
       $need_restart++, $self->{$_} = delete $params{$_} if exists $params{$_};
    }
+
+   defined $self->{code} and defined $self->{func} and
+      croak "Cannot ->configure both 'code' and 'func'";
+   defined $self->{func} and !defined $self->{module} and
+      croak "'func' parameter requires a 'module' as well";
 
    $self->SUPER::configure( %params );
 
@@ -386,12 +415,12 @@ arguments give continuations to handle successful results or failure.
 A continuation that is invoked when the code has been executed. If the code
 returned normally, it is called as:
 
- $on_result->( 'return', @values )
+   $on_result->( 'return', @values )
 
 If the code threw an exception, or some other error occurred such as a closed
 connection or the process died, it is called as:
 
- $on_result->( 'error', $exception_name )
+   $on_result->( 'error', $exception_name )
 
 =item on_return => CODE and on_error => CODE
 
@@ -562,7 +591,7 @@ sub _new_worker
    my $self = shift;
 
    my $worker = IO::Async::Function::Worker->new(
-      ( map { $_ => $self->{$_} } qw( model init_code code setup exit_on_die ) ),
+      ( map { $_ => $self->{$_} } qw( model init_code code module init_func func setup exit_on_die ) ),
       max_calls => $self->{max_worker_calls},
 
       on_finish => $self->_capture_weakself( sub {
@@ -637,7 +666,11 @@ package # hide from indexer
 
 use base qw( IO::Async::Routine );
 
+use Carp;
+
 use IO::Async::Channel;
+
+use IO::Async::Internals::FunctionWorker;
 
 sub new
 {
@@ -647,28 +680,31 @@ sub new
    my $arg_channel = IO::Async::Channel->new;
    my $ret_channel = IO::Async::Channel->new;
 
-   my $init = delete $params{init_code};
-   my $code = delete $params{code};
-   $params{code} = sub {
-      $init->() if defined $init;
+   my $send_initial;
 
-      while( my $args = $arg_channel->recv ) {
-         my @ret;
-         my $ok = eval { @ret = $code->( @$args ); 1 };
+   if( defined( my $code = $params{code} ) ) {
+      my $init_code = $params{init_code};
 
-         if( $ok ) {
-            $ret_channel->send( [ r => @ret ] );
-         }
-         elsif( ref $@ ) {
-            # Presume that $@ is an ARRAYref of error results
-            $ret_channel->send( [ e => @{ $@ } ] );
-         }
-         else {
-            chomp( my $e = "$@" );
-            $ret_channel->send( [ e => $e, error => ] );
-         }
-      }
-   };
+      $params{code} = sub {
+         $init_code->() if defined $init_code;
+
+         IO::Async::Internals::FunctionWorker::runloop( $code, $arg_channel, $ret_channel );
+      };
+   }
+   elsif( defined( my $func = $params{func} ) ) {
+      my $module    = $params{module};
+      my $init_func = $params{init_func};
+      my @init_args;
+
+      $params{module} = "IO::Async::Internals::FunctionWorker";
+      $params{func}   = "run_worker";
+
+      ( $init_func, @init_args ) = @$init_func if ref( $init_func ) eq "ARRAY";
+
+      $send_initial = [ $module, $func, $init_func, @init_args ];
+   }
+
+   delete @params{qw( init_code init_func )};
 
    my $worker = $class->SUPER::new(
       %params,
@@ -679,7 +715,17 @@ sub new
    $worker->{arg_channel} = $arg_channel;
    $worker->{ret_channel} = $ret_channel;
 
+   $worker->{send_initial} = $send_initial if $send_initial;
+
    return $worker;
+}
+
+sub _add_to_loop
+{
+   my $self = shift;
+   $self->SUPER::_add_to_loop( @_ );
+
+   $self->{arg_channel}->send( delete $self->{send_initial} ) if $self->{send_initial};
 }
 
 sub configure
@@ -769,15 +815,15 @@ sub call
 The array-unpacking form of exception indiciation allows the function body to
 more precicely control the resulting failure from the C<call> future.
 
- my $divider = IO::Async::Function->new(
-    code => sub {
-       my ( $numerator, $divisor ) = @_;
-       $divisor == 0 and
-          die [ "Cannot divide by zero", div_zero => $numerator, $divisor ];
+   my $divider = IO::Async::Function->new(
+      code => sub {
+         my ( $numerator, $divisor ) = @_;
+         $divisor == 0 and
+            die [ "Cannot divide by zero", div_zero => $numerator, $divisor ];
 
-       return $numerator / $divisor;
-    }
- );
+         return $numerator / $divisor;
+      }
+   );
 
 =head1 NOTES
 

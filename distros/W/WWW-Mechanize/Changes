@@ -1,5 +1,12 @@
 Revision history for WWW::Mechanize
 
+2.04      2021-08-06 12:28:31Z
+    [ENHANCEMENTS]
+    - Add a head() method to allow relative URLs (GH#321) (Julien Fiegehenn)
+
+    [DOCUMENTATION]
+    - Document that form_id() accepts an id, not a name (GH#319) (Olaf Alders)
+
 2.03      2020-11-10 14:47:04Z
     [FIXED]
     - Validate exclusive button selectors (GH#314) (Ferenc Erki)

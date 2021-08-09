@@ -8,7 +8,7 @@ plan 1;
 # Data source: <https://web.archive.org/web/20120628221015/http://spdx.org:80/licenses>
 
 like(
-	license_org_metadata( 'spdx', '20120620', '1_16' ),
+	license_org_metadata( 'spdx', { date => '20120620', rev => '1_16' } ),
 	hash {
 		field 'Attribution Assurance License'          => 'AAL';
 		field 'Academic Free License v1.1'             => 'AFL-1.1';

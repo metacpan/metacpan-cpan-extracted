@@ -45,5 +45,6 @@ inc/Devel/AssertOS/AIX.pm
 t/dont-mess-with-globals.t
 t/lib/sudosanity.pm
 CHANGELOG
+MANIFEST.SKIP
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

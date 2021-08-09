@@ -1,9 +1,9 @@
 package Acme::CPANModules;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-20'; # DATE
+our $DATE = '2021-02-20'; # DATE
 our $DIST = 'Acme-CPANModules'; # DIST
-our $VERSION = '0.1.7'; # VERSION
+our $VERSION = '0.1.8'; # VERSION
 
 1;
 # ABSTRACT: CPAN modules
@@ -24,7 +24,7 @@ Acme::CPANModules - CPAN modules
 
 =head1 VERSION
 
-This document describes version 0.1.7 of Acme::CPANModules (from Perl distribution Acme-CPANModules), released on 2021-01-20.
+This document describes version 0.1.8 of Acme::CPANModules (from Perl distribution Acme-CPANModules), released on 2021-02-20.
 
 =head1 DESCRIPTION
 
@@ -74,8 +74,10 @@ structure is this:
      ## define features to be used by entries. this can be used to generate a
      ## feature comparison matrix among the entries.
      # entry_features => { # optional
-     #     feature1 => 'Summary of feature1',
-     #     feature2 => 'Summary of feature2',
+     #     feature1 => {summary=>'Summary of feature1', schema=>'str*'}, # default schema is 'bool' if not specified
+     #     feature2 => {summary=>'Summary of feature2', ...},
+     #     feature3 => {...},
+     #     feature4 => {...},
      #     ...
      # },
 
@@ -117,9 +119,10 @@ Each entry is another DefHash:
      ## used to generate feature comparison matrix. see
      ## Acme::CPANModulesUtil::FeatureMatrix.
      # features => {
-     #     feature1 => 1,
-     #     feature2 => 0,
-     #     feature4 => {value=>0, summary=>'Irrelevant because foo bar'},
+     #     feature1 => 'foo',   # string, value is "foo"
+     #     feature2 => 0,       # bool, value is false ("no")
+     #                          # since feature3 is not specified for this module, the value is "N/A"
+     #     feature4 => {value=>0, summary=>'Irrelevant because foo bar'},  # bool, value is false. with additional note.
      #     ...
      # },
 

@@ -2,14 +2,12 @@ lib/Graphics/Fig.pm
 lib/Graphics/Fig/Arc.pm
 lib/Graphics/Fig/Color.pm
 lib/Graphics/Fig/Compound.pm
-lib/Graphics/Fig/diffs
 lib/Graphics/Fig/Ellipse.pm
 lib/Graphics/Fig/Matrix.pm
 lib/Graphics/Fig/Parameters.pm
 lib/Graphics/Fig/Polyline.pm
 lib/Graphics/Fig/Spline.pm
 lib/Graphics/Fig/Text.pm
-lib/Graphics/Fig/x.ex
 lib/Graphics/LICENSE
 Makefile.PL
 MANIFEST			This list of files
@@ -56,19 +54,6 @@ t/ellipse4.fig
 t/ellipse5.fig
 t/ellipse6.fig
 t/FigCmp.pm
-t/Graphics/Fig.pm
-t/Graphics/Fig/Arc.pm
-t/Graphics/Fig/Color.pm
-t/Graphics/Fig/Compound.pm
-t/Graphics/Fig/diffs
-t/Graphics/Fig/Ellipse.pm
-t/Graphics/Fig/Matrix.pm
-t/Graphics/Fig/Parameters.pm
-t/Graphics/Fig/Polyline.pm
-t/Graphics/Fig/Spline.pm
-t/Graphics/Fig/Text.pm
-t/Graphics/Fig/x.ex
-t/Graphics/LICENSE
 t/horse-2090626_640.jpg
 t/lineto.t
 t/lineto1.fig

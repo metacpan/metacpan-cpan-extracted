@@ -1,3 +1,22 @@
+0.121		2021-08-08	T. R. Wyant
+    Fix implementation of Borkowski's algorithm for converting
+    geocentric to geodetic coordinates.  An edge case in my
+    implementation resulted in a divide-by-zero error at geocentric
+    latitude 90 degrees.  Thanks to Jason Venner for reporting this
+    issue.
+
+    Address divide-by-zero in azel() velocity calculation when range is
+    0.  Because some effort has been made to provide a position result
+    in this case (rather than an error), I decided that since the
+    velocity is undefined in this case I would just not return it.
+    Thanks to Jason Venner for reporting this issue.
+
+    Correct generation of 'provides' metadata.  Thanks to Favio Poletti
+    for blogging
+    https://github.polettix.it/ETOOBUSY/2021/06/15/the-real-pause-workaround/,
+    and ultimately to Joel Berger for the pointer to
+    https://metacpan.org/pod/CPAN::Meta::Spec#no_index
+
 0.120		2021-05-20	T. R. Wyant
     Use Heavens-Above intrinsic magnitude for Tianhe and the ISS.
 

@@ -3,10 +3,15 @@
 use 5.010;
 use strict;
 use warnings;
-
 use Test::Exception;
 use Test::More 0.98;
+
 use Text::ANSITable;
+
+subtest columns => sub {
+    my $t = Text::ANSITable->new;
+    dies_ok { $t->columns(["a", "b", "a"]) } "duplicate column anmes -> dies";
+};
 
 subtest "add_row, add_rows, {get,set}_cell" => sub {
     my $t = Text::ANSITable->new;

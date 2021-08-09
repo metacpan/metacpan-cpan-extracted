@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.48;
+package Object::Pad 0.50;
 
 use v5.14;
 use warnings;
@@ -14,6 +14,8 @@ sub dl_load_flags { 0x01 }
 
 require DynaLoader;
 __PACKAGE__->DynaLoader::bootstrap( our $VERSION );
+
+our $XSAPI_VERSION = "0.48";
 
 # So that feature->import will work in `class`
 require feature;

@@ -12,7 +12,7 @@ use IO::Socket::IP -register;
 use IO::Socket::SSL;
 use Time::Crontab;
 
-our $VERSION = '1.36'; # VERSION
+our $VERSION = '1.37'; # VERSION
 
 sub new {
     my $class = shift;
@@ -35,10 +35,11 @@ sub new {
 
     $self->{nick} = $self->{connect}{nick};
 
-    $self->{hooks}  = [];
-    $self->{ticks}  = [];
-    $self->{helps}  = {};
-    $self->{loaded} = {};
+    $self->{hooks}    = [];
+    $self->{ticks}    = [];
+    $self->{helps}    = {};
+    $self->{loaded}   = {};
+    $self->{numerics} = [];
 
     $self->{send_user_nick} ||= 'on_parent';
     croak('"send_user_nick" optional value set to invalid value') if (
@@ -130,6 +131,10 @@ sub _parent {
 
         $device->message( $random_child, @_ );
     };
+    my $broadcast = sub {
+        my @messages = @_;
+        $device->message( $_, @messages ) for ( @{ $device->children } );
+    };
 
     local $SIG{ALRM} = sub {
         alarm 1;
@@ -213,7 +218,12 @@ sub _parent {
             my $now = time();
 
             unless ( grep { $_->{line} eq $line and $_->{time} + 1 > $now } @lines ) {
-                $delegate->($line);
+                unless ( $line =~ /^:\S+\s\d{3}\s/ ) {
+                    $delegate->($line);
+                }
+                else {
+                    $broadcast->($line);
+                }
             }
             else {
                 $self->note("### Skipped repeated line: $line");
@@ -247,6 +257,9 @@ sub _on_message {
             my $charset = detect($line);
             $line = decode( $charset => $line ) if ( $charset and $charset eq $self->{encoding} );
         }
+
+        push( @{ $self->{numerics} }, $line )
+            if ( $line =~ /^:\S+\s\d{3}\s/ and @{ $self->{numerics} } < 100 );
 
         if ( $line =~ /^>>>\sNICK\s(.*)/ ) {
             $self->{nick} = $1;
@@ -681,6 +694,11 @@ sub health {
     };
 }
 
+sub numerics {
+    my ($self) = @_;
+    return $self->{numerics};
+}
+
 1;
 
 __END__
@@ -695,7 +713,7 @@ Bot::IRC - Yet Another IRC Bot
 
 =head1 VERSION
 
-version 1.36
+version 1.37
 
 =for markdown [![test](https://github.com/gryphonshafer/Bot-IRC/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bot-IRC/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bot-IRC/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bot-IRC)
@@ -1354,6 +1372,12 @@ use C<note>:
     $bot->note('Message');           # writes a message to the log file
     $bot->note( 'Message', 'warn' ); # writes a message to the error file
     $bot->note( 'Message', 'die' );  # writes a message to the error file the dies
+
+=head2 numerics
+
+This method will return an arrayref of scalar strings, each an IRC numeric line
+from the server. The arrayref is limited to the first 100 numerics from the
+server.
 
 =head1 SEE ALSO
 

@@ -12,7 +12,7 @@ use warnings;
 # It is provided simply to keep CPAN happy:
 #   cpan -i IO::Async
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 =head1 NAME
 
@@ -20,41 +20,41 @@ C<IO::Async> - Asynchronous event-driven programming
 
 =head1 SYNOPSIS
 
- use IO::Async::Stream;
- use IO::Async::Loop;
+   use IO::Async::Stream;
+   use IO::Async::Loop;
 
- my $loop = IO::Async::Loop->new;
+   my $loop = IO::Async::Loop->new;
 
- $loop->connect(
-    host     => "some.other.host",
-    service  => 12345,
-    socktype => 'stream',
+   $loop->connect(
+      host     => "some.other.host",
+      service  => 12345,
+      socktype => 'stream',
 
-    on_stream => sub {
-       my ( $stream ) = @_;
+      on_stream => sub {
+         my ( $stream ) = @_;
 
-       $stream->configure(
-          on_read => sub {
-             my ( $self, $buffref, $eof ) = @_;
+         $stream->configure(
+            on_read => sub {
+               my ( $self, $buffref, $eof ) = @_;
 
-             while( $$buffref =~ s/^(.*\n)// ) {
-                print "Received a line $1";
-             }
+               while( $$buffref =~ s/^(.*\n)// ) {
+                  print "Received a line $1";
+               }
 
-             return 0;
-          }
-       );
+               return 0;
+            }
+         );
 
-       $stream->write( "An initial line here\n" );
+         $stream->write( "An initial line here\n" );
 
-       $loop->add( $stream );
-    },
+         $loop->add( $stream );
+      },
 
-    on_resolve_error => sub { die "Cannot resolve - $_[-1]\n"; },
-    on_connect_error => sub { die "Cannot connect - $_[0] failed $_[-1]\n"; },
- );
+      on_resolve_error => sub { die "Cannot resolve - $_[-1]\n"; },
+      on_connect_error => sub { die "Cannot connect - $_[0] failed $_[-1]\n"; },
+   );
 
- $loop->run;
+   $loop->run;
 
 =head1 DESCRIPTION
 
@@ -220,9 +220,9 @@ failures that are reported will, in general, use the same conventions for the
 Future's C<fail> arguments to relate it to the legacy C<on_error>-style
 callbacks.
 
- $on_NAME_error->( $message, @argmuents )
+   $on_NAME_error->( $message, @argmuents )
 
- $f->fail( $message, NAME, @arguments )
+   $f->fail( $message, NAME, @arguments )
 
 where C<$message> is a message intended for humans to read (so that this is
 the message displayed by C<< $f->get >> if the failure is not otherwise
@@ -284,7 +284,7 @@ things like L<IO::Async::Process> exits, or L<IO::Async::Handle> close.
 
 Bugs may be reported via RT at
 
- https://rt.cpan.org/Public/Dist/Display.html?Name=IO-Async
+   https://rt.cpan.org/Public/Dist/Display.html?Name=IO-Async
 
 Support by IRC may also be found on F<irc.perl.org> in the F<#io-async>
 channel.

@@ -1,3 +1,11 @@
+0.232   2021-04-14  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Add FAQ item about the reason for splitting functionalities
+	  over modules/distributions.
+
+
 0.231   2021-01-23  Released-By: PERLANCAR; Urgency: medium
 
 	- ta_wrap, ta_mbwrap: Add option keep_trailing_space.

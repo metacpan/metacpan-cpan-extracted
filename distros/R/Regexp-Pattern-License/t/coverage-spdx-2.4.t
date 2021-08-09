@@ -10,7 +10,7 @@ plan 1;
 # <https://web.archive.org/web/20160410185120/http://spdx.org/licenses/exceptions-index.html>
 
 like(
-	license_org_metadata( 'spdx', '20160323', '2_4' ),
+	license_org_metadata( 'spdx', { date => '20160323', rev => '2_4' } ),
 	hash {
 		field '3dfx Glide License'                              => 'Glide';
 		field 'Abstyles License'                                => 'Abstyles';

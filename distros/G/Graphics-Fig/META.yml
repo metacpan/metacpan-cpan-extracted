@@ -22,5 +22,5 @@ requires:
   Graphics::ColorNames: v3.5.0
   Image::Info: '1.37'
   Math::Trig: '1'
-version: v1.0.5
+version: v1.0.7
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

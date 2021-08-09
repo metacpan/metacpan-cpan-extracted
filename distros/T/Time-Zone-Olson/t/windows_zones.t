@@ -106,6 +106,7 @@ if ( $OSNAME eq 'MSWin32' ) {
 												Sao[ ]Tome|
 												Saratov|
 												Sudan|
+												South[ ]Sudan|
 												Volgograd|
 												Yukon
 											)[ ]Standard[ ]Time(?:[ ]2)?|

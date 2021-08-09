@@ -3,9 +3,9 @@ NAME
     distribution which has ColorTheme::* modules
 
 VERSION
-    This document describes version 0.001 of Pod::Weaver::Plugin::ColorTheme
+    This document describes version 0.002 of Pod::Weaver::Plugin::ColorTheme
     (from Perl distribution Pod-Weaver-Plugin-ColorTheme), released on
-    2020-06-08.
+    2021-08-08.
 
 SYNOPSIS
     In your weaver.ini:
@@ -52,7 +52,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

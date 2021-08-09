@@ -50,6 +50,6 @@
          "web" : "https://github.com/jib/term-ui"
       }
    },
-   "version" : "0.48",
+   "version" : "0.50",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

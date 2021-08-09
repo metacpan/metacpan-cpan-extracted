@@ -1,9 +1,9 @@
 package Dist::Zilla::Plugin::InsertCodeResult;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-21'; # DATE
+our $DATE = '2021-08-06'; # DATE
 our $DIST = 'Dist-Zilla-Plugin-InsertCodeResult'; # DIST
-our $VERSION = '0.054'; # VERSION
+our $VERSION = '0.055'; # VERSION
 
 use 5.010001;
 use strict;
@@ -33,7 +33,7 @@ sub munge_file {
     my ($self, $file) = @_;
     my $content_as_bytes = $file->encoded_content;
     if ($content_as_bytes =~ s{
-                                  ^\#\s*CODE:\s*(.*)\s*(\R|\z) |
+                                  ^\#\s*CODE:\s*(.*)\s*(?:\R|\z) |
                                   ^\#\s*BEGIN_CODE\s*\R((?:.|\R)*?)^\#\s*END_CODE\s*(?:\R|\z)
                           }{
                               my $res = $self->_code_result($1 // $2);
@@ -82,7 +82,7 @@ Dist::Zilla::Plugin::InsertCodeResult - Insert the result of Perl code into your
 
 =head1 VERSION
 
-This document describes version 0.054 of Dist::Zilla::Plugin::InsertCodeResult (from Perl distribution Dist-Zilla-Plugin-InsertCodeResult), released on 2021-05-21.
+This document describes version 0.055 of Dist::Zilla::Plugin::InsertCodeResult (from Perl distribution Dist-Zilla-Plugin-InsertCodeResult), released on 2021-08-06.
 
 =head1 SYNOPSIS
 
@@ -126,7 +126,7 @@ Source repository is at L<https://github.com/perlancar/perl-Dist-Zilla-Plugin-In
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Dist-Zilla-Plugin-InsertCodeResult/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-InsertCodeResult>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

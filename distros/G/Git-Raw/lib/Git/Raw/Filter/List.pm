@@ -1,5 +1,5 @@
 package Git::Raw::Filter::List;
-$Git::Raw::Filter::List::VERSION = '0.87';
+$Git::Raw::Filter::List::VERSION = '0.88';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ Git::Raw::Filter::List - Git filter list class
 
 =head1 VERSION
 
-version 0.87
+version 0.88
 
 =head1 DESCRIPTION
 

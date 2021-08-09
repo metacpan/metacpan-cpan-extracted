@@ -3,7 +3,7 @@ package Courriel::Helpers;
 use strict;
 use warnings;
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 use Encode qw( decode );
 use Exporter qw( import );
@@ -119,24 +119,20 @@ sub _parse_attributes {
     while ( $attr_text =~ /\G$attr_re/g ) {
         my $name = $+{name};
 
-        my $value;
         my $charset;
         my $language;
+        my $value;
 
         my $order = $+{order} || 0;
 
         if ( $+{is_encoded} ) {
             if ($order) {
-                $value = _decode_raw_value(
-                    $+{value},
-                    $attrs->{$name}[$order]{charset},
-                );
+                $value = $+{value};
             }
             else {
                 ( $charset, $language, my $raw ) = split /\'/, $+{value}, 3;
                 $language = undef unless length $language;
-
-                $value = _decode_raw_value( $raw, $charset );
+                $value    = $raw;
             }
         }
         elsif ( defined $+{quoted_value} ) {
@@ -159,6 +155,24 @@ sub _parse_attributes {
     };
 }
 
+sub _inflate_attribute {
+    my $name     = shift;
+    my $raw_data = shift;
+
+    my $value = join q{}, grep {defined} map { $_->{value} } @{$raw_data};
+    my %p     = (
+        name  => $_,
+        value => $value,
+    );
+    for my $key (qw( charset language )) {
+        $p{$key} = $raw_data->[0]{$key}
+            if defined $raw_data->[0]{$key};
+    }
+    $p{value} = _decode_raw_value( $p{value}, $p{charset} );
+
+    return Courriel::HeaderAttribute->new(%p);
+}
+
 sub _decode_raw_value {
     my $raw     = shift;
     my $charset = shift;
@@ -168,25 +182,6 @@ sub _decode_raw_value {
     return $raw unless defined $charset;
 
     return decode( $charset, $raw );
-}
-
-sub _inflate_attribute {
-    my $name     = shift;
-    my $raw_data = shift;
-
-    my $value = join q{}, grep {defined} map { $_->{value} } @{$raw_data};
-
-    my %p = (
-        name  => $_,
-        value => $value,
-    );
-
-    for my $key (qw( charset language )) {
-        $p{$key} = $raw_data->[0]{$key}
-            if defined $raw_data->[0]{$key};
-    }
-
-    return Courriel::HeaderAttribute->new(%p);
 }
 
 sub unique_boundary {

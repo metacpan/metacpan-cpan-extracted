@@ -1,7 +1,9 @@
 package Retry::Backoff;
 
-our $DATE = '2019-06-20'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-08-06'; # DATE
+our $DIST = 'Retry-Backoff'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -129,7 +131,7 @@ Retry::Backoff - Retry a piece of code, with backoff strategies
 
 =head1 VERSION
 
-This document describes version 0.002 of Retry::Backoff (from Perl distribution Retry-Backoff), released on 2019-06-20.
+This document describes version 0.003 of Retry::Backoff (from Perl distribution Retry-Backoff), released on 2021-08-06.
 
 =head1 SYNOPSIS
 
@@ -143,7 +145,7 @@ This document describes version 0.002 of Retry::Backoff (from Perl distribution 
 
  # select backoff strategy (see corresponding Algorithm::Backoff::* for list of
  # parameters)
- retry { ... } strategy=>'Constant', delay=>1, max_attempts=>10;
+ retry { ... } strategy=>'Constant', initial_delay=>1, max_attempts=>10;
 
  # other available 'retry' arguments
  retry { ... }
@@ -260,7 +262,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

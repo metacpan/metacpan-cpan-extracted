@@ -465,7 +465,7 @@ flag set.
 sub PDL::nbad {
 	my($x) = @_; my $tmp;
 	$x->clump(-1)->nbadover($tmp=PDL->nullcreate($x) );
-	return $tmp->at();
+	return $tmp;
 }
 
 
@@ -474,7 +474,7 @@ sub PDL::nbad {
 sub PDL::ngood {
 	my($x) = @_; my $tmp;
 	$x->clump(-1)->ngoodover($tmp=PDL->nullcreate($x) );
-	return $tmp->at();
+	return $tmp;
 }
 
 

@@ -22,6 +22,7 @@ DateTime
 Dave
 Disposition
 Email
+Gimly
 Gregory
 Header
 HeaderAttribute
@@ -44,6 +45,7 @@ Streams
 Types
 UTC
 UTF
+Vitaly
 Zbigniew
 ascii
 attribute's
@@ -60,6 +62,7 @@ lookup
 multipart
 rjbs
 utf
+vgimly
 zh
 zzbbyy
 Łukasiak

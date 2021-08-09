@@ -1,3 +1,20 @@
+0.606   2021-08-06  Released-By: PERLANCAR; Urgency: medium
+
+	- [function rgb2grayscale] Add 'algo' argument, offer
+	  'weighted_average' algorithm instead of the default 'average'
+	  method. (GH#4)
+
+	- [ux] [function rgb_diff] Die if fed unknown algo instead of using
+	  default 'euclidean'.
+
+
+0.605   2021-03-12  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Cross-reference more between functions.
+
+
 0.604   2021-01-19  Released-By: PERLANCAR; Urgency: medium
 
 	- rand_rgb_colors(): Add option 'hash_prefix'.

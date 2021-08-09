@@ -3,8 +3,8 @@ NAME
     application's DB schema
 
 VERSION
-    This document describes version 0.237 of SQL::Schema::Versioned (from
-    Perl distribution SQL-Schema-Versioned), released on 2019-01-13.
+    This document describes version 0.239 of SQL::Schema::Versioned (from
+    Perl distribution SQL-Schema-Versioned), released on 2021-08-08.
 
 DESCRIPTION
     To use this module, you typically run the "create_or_update_db_schema"()
@@ -12,7 +12,33 @@ DESCRIPTION
 
      use DBI;
      use SQL::Schema::Versioned qw(create_or_update_db_schema);
-     my $spec = {...}; # the schema specification
+     my $spec = { # the schema specification
+        latest_v => 3,
+
+        install => [
+            "CREATE TABLE t1 (i INT)",
+            "CREATE TABLE t4 (i INT)",
+        ],
+
+        upgrade_to_v1 => [
+            "CREATE TABLE t1 (i INT)",
+            "CREATE TABLE t2 (i INT)",
+            "CREATE TABLE t3 (i INT)",
+        ],
+        upgrade_to_v2 => [
+            "CREATE TABLE t4 (i INT)",
+            "DROP TABLE t3",
+        ],
+        upgrade_to_v3 => [
+            "DROP TABLE t2",
+        ],
+
+        install_v2 => [
+            "CREATE TABLE t1 (i INT)",
+            "CREATE TABLE t2 (i INT)",
+            "CREATE TABLE t4 (i INT)",
+        ],
+     };
      my $dbh = DBI->connect(...);
      my $res = create_or_update_db_schema(dbh=>$dbh, spec=>$spec);
      die "Cannot run the application: cannot create/upgrade database schema: $res->[1]"
@@ -20,6 +46,9 @@ DESCRIPTION
 
     This way, your program automatically creates/updates database schema
     when run. Users need not know anything.
+
+    See more elaborate examples in some applications that use this module
+    like App::lcpan or SQLite::Counter::Simple.
 
 BEST PRACTICES
     It is recommended that after you create the second and subsequent
@@ -31,7 +60,7 @@ FUNCTIONS
   create_or_update_db_schema
     Usage:
 
-     create_or_update_db_schema(%args) -> [status, msg, payload, meta]
+     create_or_update_db_schema(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Routine and convention to create/update your application's DB schema.
 
@@ -243,12 +272,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -303,8 +335,11 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTOR
+    Steven Haryanto <sharyanto@cpan.org>
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2017, 2015, 2014, 2013 by
+    This software is copyright (c) 2021, 2018, 2017, 2015, 2014, 2013 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

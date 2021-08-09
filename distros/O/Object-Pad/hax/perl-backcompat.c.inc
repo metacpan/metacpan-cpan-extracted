@@ -3,6 +3,10 @@
 #define HAVE_PERL_VERSION(R, V, S) \
     (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
 
+#ifndef NOT_REACHED
+#  define NOT_REACHED  assert(0)
+#endif
+
 #ifndef SvTRUE_NN
 #  define SvTRUE_NN(sv)  SvTRUE(sv)
 #endif
@@ -43,6 +47,10 @@ typedef SV PADNAME;
 #  define intro_my()             Perl_intro_my(aTHX)
 #endif
 
+#ifndef pad_alloc
+#  define pad_alloc(a,b)         Perl_pad_alloc(aTHX_ a,b)
+#endif
+
 #ifndef CX_CUR
 #  define CX_CUR() (&cxstack[cxstack_ix])
 #endif
@@ -71,14 +79,31 @@ typedef SV PADNAME;
 static OP *S_op_convert_list(pTHX_ I32 type, I32 flags, OP *o)
 {
   /* A minimal recreation just for our purposes */
+  assert(
+    /* A hardcoded list of the optypes we know this will work for */
+    type == OP_ENTERSUB ||
+    type == OP_JOIN ||
+    type == OP_PUSH ||
+    0);
+
   o->op_type = type;
   o->op_flags |= flags;
   o->op_ppaddr = PL_ppaddr[type];
 
   o = PL_check[type](aTHX_ o);
 
+  /* op_std_init() */
+  if(PL_opargs[type] & OA_RETSCALAR)
+    o = op_contextualize(o, G_SCALAR);
+  if(PL_opargs[type] & OA_TARGET && !o->op_targ)
+    o->op_targ = pad_alloc(type, SVs_PADTMP);
+
   return o;
 }
+#endif
+
+#ifndef newMETHOP_named
+#  define newMETHOP_named(type, flags, name)  newSVOP(type, flags, name)
 #endif
 
 #ifndef PARENT_PAD_INDEX_set

@@ -3,6 +3,7 @@
  *
  *  (C) Paul Evans, 2019-2021 -- leonerd@leonerd.org.uk
  */
+#define PERL_NO_GET_CONTEXT
 
 #include "EXTERN.h"
 #include "perl.h"
@@ -29,6 +30,17 @@
 #endif
 
 #include "object_pad.h"
+#include "class.h"
+#include "slot.h"
+
+typedef void AttributeHandler(pTHX_ void *target, const char *value, void *data);
+
+struct AttributeDefinition {
+  char *attrname;
+  /* TODO: int flags */
+  AttributeHandler *apply;
+  void *applydata;
+};
 
 /*********************************
  * Class and Slot Implementation *
@@ -284,59 +296,6 @@ static void S_compclassmeta_set(pTHX_ ClassMeta *meta)
   sv_setiv(sv, (IV)meta);
 }
 
-static void S_set_class_repr(pTHX_ ClassMeta *meta, const char *val, void *_)
-{
-  if(!val)
-    croak(":repr attribute requires a representation type specification");
-
-  if(strEQ(val, "native")) {
-    if(meta->foreign_new)
-      croak("Cannot switch a subclass of a foreign superclass type to :repr(native)");
-    meta->repr = REPR_NATIVE;
-  }
-  else if(strEQ(val, "HASH"))
-    meta->repr = REPR_HASH;
-  else if(strEQ(val, "magic")) {
-    if(!meta->foreign_new)
-      croak("Cannot switch to :repr(magic) without a foreign superclass");
-    meta->repr = REPR_MAGIC;
-  }
-  else if(strEQ(val, "default") || strEQ(val, "autoselect"))
-    meta->repr = REPR_AUTOSELECT;
-  else
-    croak("Unrecognised class representation type %s", val);
-}
-
-static void S_set_class_compat(pTHX_ ClassMeta *meta, const char *val, void *_)
-{
-  if(!val)
-    croak(":compat attribute requires an argument");
-
-  if(strEQ(val, "invokable")) {
-    if(meta->type != METATYPE_ROLE)
-      croak(":compat(invokable) only applies to a role");
-
-    meta->role_is_invokable = true;
-  }
-  else
-    croak("Unrecognised class compatibility argument %s", val);
-}
-
-static void S_set_class_strict(pTHX_ ClassMeta *meta, const char *val, void *_)
-{
-  if(strEQ(val, "params"))
-    meta->strict_params = TRUE;
-  else
-    croak("Unrecognised class strictness type %s", val);
-}
-
-static struct AttributeDefinition class_attributes[] = {
-  { "repr", (AttributeHandler *)&S_set_class_repr, NULL },
-  { "compat", (AttributeHandler *)&S_set_class_compat, NULL },
-  { "strict", (AttributeHandler *)&S_set_class_strict, NULL },
-  { 0 },
-};
-
 XS_INTERNAL(xsub_mop_class_seal)
 {
   dXSARGS;
@@ -361,7 +320,8 @@ XS_INTERNAL(xsub_mop_class_seal)
   mop_class_seal(meta);
 }
 
-static bool is_valid_ident_utf8(const U8 *s)
+#define is_valid_ident_utf8(s)  S_is_valid_ident_utf8(aTHX_ s)
+static bool S_is_valid_ident_utf8(pTHX_ const U8 *s)
 {
   const U8 *e = s + strlen((char *)s);
 
@@ -495,19 +455,8 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
       SV *attrname = args[argi]->attr.name;
       SV *attrval  = args[argi]->attr.value;
 
-      struct AttributeDefinition *def;
-      for(def = class_attributes; def->attrname; def++) {
-        if(!strEQ(SvPVX(attrname), def->attrname))
-          continue;
+      mop_class_apply_attribute(meta, SvPVX(attrname), attrval);
 
-        (*def->apply)(aTHX_ meta, SvPOK(attrval) ? SvPVX(attrval) : NULL, def->applydata);
-
-        goto done;
-      }
-
-      croak("Unrecognised class attribute :%" SVf, SVfARG(attrname));
-
-done:
       argi++;
     }
   }
@@ -681,7 +630,7 @@ static int build_has(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, 
       newSVOP_CUSTOM(PL_ppaddr[OP_CONST], 0, SvREFCNT_inc(slotmeta->defaultsv)));
   }
 
-  MOP_SLOT_RUN_HOOKS(slotmeta, seal_slot, 0);
+  MOP_SLOT_RUN_HOOKS_NOARGS(slotmeta, seal_slot);
 
   return KEYWORD_PLUGIN_STMT;
 }
@@ -853,6 +802,10 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *ho
   PADNAME **padnames = PadnamelistARRAY(PadlistNAMES(CvPADLIST(PL_compcv)));
   OP *slotops = NULL;
 
+#if HAVE_PERL_VERSION(5, 22, 0)
+  U32 cop_seq_low = COP_SEQ_RANGE_LOW(padnames[PADIX_SELF]);
+#endif
+
   {
     ENTER;
     SAVEVPTR(PL_curcop);
@@ -924,6 +877,12 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *ho
     PADNAME *newpadname = newPADNAMEpvn(PadnamePV(slotname), PadnameLEN(slotname));
     PadnameREFCNT_dec(padnames[padix]);
     padnames[padix] = newpadname;
+
+    /* Turn off OUTER and set a valid COP sequence range, so the lexical is
+     * visible to eval(), PadWalker, perldb, etc.. */
+    PadnameOUTER_off(newpadname);
+    COP_SEQ_RANGE_LOW(newpadname) = cop_seq_low;
+    COP_SEQ_RANGE_HIGH(newpadname) = PL_cop_seqmax;
 #endif
   }
 
@@ -1151,7 +1110,7 @@ BOOT:
   DMD_SET_PACKAGE_HELPER("Object::Pad::MOP::Class", &dumppackage_class);
 #endif
 
-  boot_xs_parse_keyword(0.08); /* XPK_OPTIONAL(XPK_CHOICE...) */
+  boot_xs_parse_keyword(0.10); /* XPK_OPTIONAL(XPK_CHOICE...) */
 
   register_xs_parse_keyword("class", &kwhooks_class, (void *)METATYPE_CLASS);
   register_xs_parse_keyword("role",  &kwhooks_role,  (void *)METATYPE_ROLE);
@@ -1167,4 +1126,5 @@ BOOT:
 
   register_xs_parse_sublike("method", &parse_method_hooks, (void *)PHASER_NONE);
 
+  ObjectPad__boot_classes();
   ObjectPad__boot_slots();

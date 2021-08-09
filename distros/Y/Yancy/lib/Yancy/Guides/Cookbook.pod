@@ -11,7 +11,7 @@ Yancy::Guides::Cookbook - Recipes for Yancy apps
 
 =head1 VERSION
 
-version 1.074
+version 1.075
 
 =head1 How can I limit which schemas and fields a user can edit inside the Yancy editor?
 

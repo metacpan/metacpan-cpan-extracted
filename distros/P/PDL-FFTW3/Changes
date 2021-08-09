@@ -1,3 +1,6 @@
+0.16 2021-08-08
+- planning now works on threaded Perl - thanks @zmughal
+
 0.15 2021-05-08
 - fix ifftn bug with native complex
 

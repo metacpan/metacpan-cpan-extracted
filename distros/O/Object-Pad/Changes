@@ -1,5 +1,37 @@
 Revision history for Object-Pad
 
+0.50    2021-08-08
+        [CHANGES]
+         * Provide Object::Pad::ExtensionBuilder to assist 3rd party extension
+           module building
+         * Generally tidy up the exposed `object_pad.h` file to remove some
+           definitions we don't want to make public
+         * Add ABI version constants and fields in exposed hook function
+           structures for (hopefully) better forward compatibility
+         * Add the concept of class hooks, analogous to slot hooks
+
+        Developement time for this release was sponsored by Deriv
+
+0.49    2021-08-06
+        [CHANGES]
+         * Provide $XSAPI_VERSION to allow non-API-breaking changes to be made
+           without disturbing compiled 3rd party modules
+         * Better searching for Pad.so in t/99exported-symbols.t
+           (thanks ppisar@redhat.com) (RT138320)
+         * Gain a (small) runtime performance boost by remembering to set
+           PERL_NO_GET_CONTEXT
+
+        [BUGFIXES]
+         * Ignore some internal linker symbols in t/99exported-symbols.t
+           (RT138315)
+         * Remember to bump the version requirement of XS::Parse::Keyword in
+           the XS source (RT138318)
+         * Make slots visible to string-eval(), PadWalker, perl -d, etc..
+           (RT138399)
+
+        Developement time for this release was partly sponsored by
+        Perl-Verein Schweiz
+
 0.48    2021-08-02
         [CHANGES]
          * Added features to slothooks:
@@ -13,6 +45,9 @@ Revision history for Object-Pad
          * Fixed many classes of UTF-8 bug on class/slot/method names
            (RT138073)
          * Fixed segfault caused by runtime generation of roles (RT137952)
+
+        Developement time for this release was sponsored by Deriv and
+        Perl-Verein Schweiz
 
 0.47    2021-07-29
         [CHANGES]

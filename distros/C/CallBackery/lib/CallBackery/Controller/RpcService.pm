@@ -1,12 +1,10 @@
 package CallBackery::Controller::RpcService;
 
-use Mojo::Base qw(Mojolicious::Plugin::Qooxdoo::JsonRpcController), 
+use Mojo::Base qw(Mojolicious::Plugin::Qooxdoo::JsonRpcController),
     -signatures,-async_await;
 use CallBackery::Exception qw(mkerror);
 use CallBackery::Translate qw(trm);
-
 use CallBackery::User;
-# use Data::Dumper;
 use Scalar::Util qw(blessed weaken);
 use Mojo::JSON qw(encode_json decode_json from_json);
 use Syntax::Keyword::Try;
@@ -17,7 +15,8 @@ CallBackery::RpcService - RPC services for CallBackery
 
 =head1 SYNOPSIS
 
-This module gets instantiated by L<CallBackery> and provides backend functionality.
+This module gets instantiated by L<CallBackery> and provides backend
+functionality.
 
 =head1 DESCRIPTION
 
@@ -53,7 +52,6 @@ has config => sub ($self) {
 
 has user => sub ($self) {
     my $obj = $self->app->userObject->new(controller=>$self,log=>$self->log);
-    #
     weaken $obj->{controller};
     return $obj;
 };
@@ -79,14 +77,12 @@ sub allow_rpc_access ($self,$method) {
         /3/ && do {
             my $plugin = $self->rpcParams->[0];
             if ($self->config->instantiatePlugin($plugin,$self->user)->mayAnonymous){
-                return 1;    
+                return 1;
             }
         };
     }
     return 0;
 };
-
-# dataCleaner($data)
 
 has passMatch => sub ($self) {
     qr{(?i)(?:password|_pass)};
@@ -106,11 +102,10 @@ sub perMethodCleaner ($self,$method=undef) {
 };
 
 sub dataCleaner ($self,$data,$method=undef) {
-
     if (my $perMethodCleaner = $self->perMethodCleaner($method)){
         return $perMethodCleaner->($data);
     }
-    
+
     my $match = $self->passMatch;
     my $type = ref $data;
     for ($type) {
@@ -133,7 +128,9 @@ sub dataCleaner ($self,$data,$method=undef) {
 
 =head2 logRpcCall
 
-set CALLBACKERY_RPC_LOG for extensive logging messages. Note that all values with keys matching /password|_pass/ do get replaced with 'xxx' in the output.
+Set CALLBACKERY_RPC_LOG for extensive logging messages. Note that all
+values with keys matching /password|_pass/ do get replaced with 'xxx'
+in the output.
 
 =cut
 
@@ -155,7 +152,9 @@ sub logRpcCall {
 
 =head2 logRpcReturn
 
-set CALLBACKERY_RPC_LOG for extensive logging messages. Note that all values with keys matching /password|_pass/ do get replaced with 'xxx' in the output.
+Set CALLBACKERY_RPC_LOG for extensive logging messages. Note that all
+values with keys matching /password|_pass/ do get replaced with 'xxx'
+in the output.
 
 =cut
 
@@ -268,11 +267,12 @@ handle form sumissions
 async sub processPluginData {
     my $self = shift;
     my $plugin = shift;
-    # creating two statements will make things
-    # easier to debug since there is only one
-    # thing that can go wrong per line.
+    # "Localizing" required as it seems to be changed somewhere.
+    my @args = @_;
+    # Creating two statements will make things easier to debug since
+    # there is only one thing that can go wrong per line.
     my $instance = await $self->instantiatePlugin_p($plugin);
-    return $instance->processData(@_);
+    return $instance->processData(@args);
 }
 
 =head2 validateField(plugin,args)
@@ -284,8 +284,10 @@ validate the content of the given field for the given plugin
 async sub validatePluginData {
     my $self = shift;
     my $plugin = shift;
+    # "Localizing" required as it seems to be changed somewhere.
+    my @args = @_;
     return (await $self->instantiatePlugin_p($plugin))
-        ->validateData(@_);
+        ->validateData(@args);
 }
 
 =head2 getPluginData(plugin,args);
@@ -297,8 +299,10 @@ return the current value for the given field
 async sub getPluginData {
     my $self = shift;
     my $plugin = shift;
+    # "Localizing" required as it seems to be changed somewhere.
+    my @args = @_;
     return (await $self->instantiatePlugin_p($plugin))
-        ->getData(@_);
+        ->getData(@args);
 }
 
 
@@ -335,8 +339,8 @@ async sub getUserConfig {
 
 =head2 getPluginConfig(plugin,args)
 
-returns a plugin configuration removing all the 'back end' keys and non ARRAY or HASH
-references in the process.
+Returns a plugin configuration removing all the 'back end' keys and
+non ARRAY or HASH references in the process.
 
 =cut
 
@@ -350,8 +354,8 @@ async sub getPluginConfig {
 
 =head2 runEventActions(event[,args])
 
-Call the eventAction handlers of all configured plugins. Currently the following events
-are known.
+Call the eventAction handlers of all configured plugins. Currently the
+following events are known:
 
    changeConfig
 

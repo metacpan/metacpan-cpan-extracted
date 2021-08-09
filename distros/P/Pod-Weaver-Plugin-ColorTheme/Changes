@@ -1,3 +1,8 @@
+0.002   2021-08-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Only look at ColorTheme::* namespace.
+
+
 0.001   2020-06-08  Released-By: PERLANCAR
 
         - First release.

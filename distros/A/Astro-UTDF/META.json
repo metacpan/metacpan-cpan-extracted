@@ -15,6 +15,7 @@
    "name" : "Astro-UTDF",
    "no_index" : {
       "directory" : [
+         "eg",
          "inc",
          "t",
          "xt"
@@ -52,7 +53,7 @@
    "provides" : {
       "Astro::UTDF" : {
          "file" : "lib/Astro/UTDF.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       }
    },
    "release_status" : "stable",
@@ -70,6 +71,6 @@
          "web" : "https://github.com/trwyant/perl-Astro-UTDF"
       }
    },
-   "version" : "0.011",
+   "version" : "0.012",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

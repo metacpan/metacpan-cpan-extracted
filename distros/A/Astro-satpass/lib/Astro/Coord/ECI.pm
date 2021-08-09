@@ -92,7 +92,7 @@ package Astro::Coord::ECI;
 use strict;
 use warnings;
 
-our $VERSION = '0.120';
+our $VERSION = '0.121';
 
 use Astro::Coord::ECI::Utils qw{ @CARP_NOT :mainstream };
 use Carp;
@@ -240,6 +240,11 @@ C<refraction> attribute is true. The invocant's
 C<correct_for_refraction()> method is the one used; that is, if
 C<$coord> and C<$coord2> have different C<correct_for_refraction()>
 methods, the C<$coord> object's method is used.
+
+B<Note> that the C<correct_for_refraction> attribute defaults to true.
+For cases where both invocant and argument are ground-based objects, you
+should probably set the invocant's C<correct_for_refraction> false
+before invoking this method.
 
 This method is implemented in terms of azel_offset(). See that method's
 documentation for further details.
@@ -1448,8 +1453,16 @@ sub geodetic {
 		+ $E) / 2;
 	my $t = sqrt ($G * $G + ($F - $v * $G)	# Borkowski (12)
 		/ (2 * $G - $E)) - $G;
-	my $phi = atan2 (($a * (1 - $t * $t)) /	# Borkowski (18)
-	    (2 * $b * $t), 1);			# equivalent to atan (arg1)
+
+	# Borkowski (18)
+	# equivalent to atan (arg1)
+	my $phi = do {
+	    my $Y = $a * ( 1 - $t * $t );
+	    my $X = 2 * $b * $t;
+	    ( $Y, $X ) = ( -$Y, -$X ) if $X < 0;
+	    atan2 $Y, $X;
+	};
+
 	my $h = ($r - $a * $t) * cos ($phi) +	# Borkowski (19)
 	    ($z - $b) * sin ($phi);
 
@@ -3304,34 +3317,38 @@ sub _convert_cartesian_to_spherical {
 		$sin_phi = 0;
 		$cos_phi = 1;
 	    }
+
+	    # phi = - sin Phi x + cos phi y
+	    # theta = - sin Theta cos Phi x - sin Theta sin Phi y + cos Theta z
+	    # r = cos Theta cos Phi x + cos Theta sin Phi y + sin Theta z
+
+	    my $az_hat = [ - $sin_phi, $cos_phi, 0 ];
+	    my $el_hat = [ - $sin_theta * $cos_phi, - $sin_theta * $sin_phi,
+		$cos_theta ];
+	    my $rng_hat = [ $cos_theta * $cos_phi, $cos_theta * $sin_phi,
+		$sin_theta ];
+
+	    while ( @cart_data ) {
+
+		# Each triplet is then converted by projecting the
+		# Cartesian vector onto the appropriate unit vector.
+		# Azimuth and elevation are also converted to radians by
+		# dividing by the range. NOTE that this is the
+		# small-angle approximation, but since we assume we're
+		# dealing with derivitaves, it's OK.
+
+		my @cart_info = splice @cart_data, 0, 3;
+		push @rslt, vector_dot_product( $az_hat, \@cart_info ) / $range;
+		push @rslt, vector_dot_product( $el_hat, \@cart_info ) / $range;
+		push @rslt, vector_dot_product( $rng_hat, \@cart_info );
+	    }
 	} else {
-	    $sin_theta = $sin_phi = 0;
-	    $cos_theta = $cos_phi = 1;
-	}
-
-	# phi = - sin Phi x + cos phi y
-	# theta = - sin Theta cos Phi x - sin Theta sin Phi y + cos Theta z
-	# r = cos Theta cos Phi x + cos Theta sin Phi y + sin Theta z
-
-	my $az_hat = [ - $sin_phi, $cos_phi, 0 ];
-	my $el_hat = [ - $sin_theta * $cos_phi, - $sin_theta * $sin_phi,
-	    $cos_theta ];
-	my $rng_hat = [ $cos_theta * $cos_phi, $cos_theta * $sin_phi,
-	    $sin_theta ];
-
-	while ( @cart_data ) {
-
-	    # Each triplet is then converted by projecting the Cartesian
-	    # vector onto the appropriate unit vector. Azimuth and
-	    # elevation are also converted to radians by dividing by the
-	    # range. NOTE that this is the small-angle approximation,
-	    # but since we assume we're dealing with derivitaves, it's
-	    # OK.
-
-	    my @cart_info = splice @cart_data, 0, 3;
-	    push @rslt, vector_dot_product( $az_hat, \@cart_info ) / $range;
-	    push @rslt, vector_dot_product( $el_hat, \@cart_info ) / $range;
-	    push @rslt, vector_dot_product( $rng_hat, \@cart_info );
+	    # $sin_theta = $sin_phi = 0;
+	    # $cos_theta = $cos_phi = 1;
+	    # We used to do the above and then drop through and do the
+	    # velocity calculation if needed. But in this case the
+	    # velocity calulation blows up. So for the moment we are
+	    # just going to punt.
 	}
 
     }

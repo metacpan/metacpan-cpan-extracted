@@ -5,10 +5,12 @@ use Test2::Regexp::Pattern::License;
 
 plan 1;
 
-# Data source: <https://creativecommons.org/retiredlicenses/>
+# Data sources:
+# <https://creativecommons.org/retiredlicenses/>
+# <https://web.archive.org/web/20101011132223/http://creativecommons.org:80/choose/>
 
 like(
-	license_org_metadata( 'cc', 0 ),
+	license_org_metadata( 'cc', { date => 0 } ),
 	hash {
 		# Developing Nations
 		field 'Creative Commons Developing Nations' => 'CC-DevNations';
@@ -93,6 +95,12 @@ like(
 		field 'Creative Commons Sampling Plus' => 'CC-Sampling+';
 		field 'Sampling Plus 1.0'              => 'CC-Sampling+-1.0';  # legal
 		field 'CC Sampling+ 1.0' => 'CC-Sampling+-1.0';    # shortname
+
+		# Software
+		field 'Creative Commons GNU GPL'  => 'GPL-2';
+		field 'CC-GNU GPL'                => 'GPL-2';       # deed
+		field 'Creative Commons GNU LGPL' => 'LGPL-2.1';
+		field 'CC-GNU LGPL'               => 'LGPL-2.1';    # deed
 
 		end();
 	},

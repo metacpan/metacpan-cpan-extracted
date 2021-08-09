@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( IO::Async::Timer );
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 use Carp;
 
@@ -19,24 +19,24 @@ C<IO::Async::Timer::Periodic> - event callback at regular intervals
 
 =head1 SYNOPSIS
 
- use IO::Async::Timer::Periodic;
+   use IO::Async::Timer::Periodic;
 
- use IO::Async::Loop;
- my $loop = IO::Async::Loop->new;
+   use IO::Async::Loop;
+   my $loop = IO::Async::Loop->new;
 
- my $timer = IO::Async::Timer::Periodic->new(
-    interval => 60,
+   my $timer = IO::Async::Timer::Periodic->new(
+      interval => 60,
 
-    on_tick => sub {
-       print "You've had a minute\n";
-    },
- );
+      on_tick => sub {
+         print "You've had a minute\n";
+      },
+   );
 
- $timer->start;
+   $timer->start;
 
- $loop->add( $timer );
+   $loop->add( $timer );
 
- $loop->run;
+   $loop->run;
 
 =head1 DESCRIPTION
 

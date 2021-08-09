@@ -1,11 +1,17 @@
-0.007   2019-02-15 (PERLANCAR)
+0.008   2021-03-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to Calendar::Indonesia::Holiday 0.338+ (list_id_holidays
+	  -> list_idn_holidays).
+
+
+0.007   2019-02-15  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [refactor] Refactoring of roles.
 
 
-0.006   2019-02-14 (PERLANCAR)
+0.006   2019-02-14  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -13,7 +19,7 @@
 	  Calendar::DatesRoles::From{Data,EntriesVar}.
 
 
-0.005    2019-02-14 (PERLANCAR)
+0.005    2019-02-14  Released-By: PERLANCAR
 
          - No functional changes.
 
@@ -21,7 +27,7 @@
            rendering.
 
 
-0.004    2019-02-14 (PERLANCAR)
+0.004    2019-02-14  Released-By: PERLANCAR
 
          - No functional changes.
 
@@ -29,20 +35,20 @@
            Synopsis.
 
 
-0.003    2019-02-14 (PERLANCAR)
+0.003    2019-02-14  Released-By: PERLANCAR
 
          - No functional changes.
 
          - [dist] Rebuild with DZP:Calendar::Dates & PWP:Calendar::Dates.
 
 
-0.002   2019-02-13 (PERLANCAR)
+0.002   2019-02-13  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Add description and mention Calendar::Dates.
 
 
-0.001   2019-02-13 (PERLANCAR)
+0.001   2019-02-13  Released-By: PERLANCAR
 
         - First release.

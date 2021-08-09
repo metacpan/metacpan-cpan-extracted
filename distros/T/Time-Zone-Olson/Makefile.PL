@@ -27,9 +27,28 @@ WriteMakefile(
     AUTHOR             => q{David Dick <ddick@cpan.org>},
     VERSION_FROM       => 'lib/Time/Zone/Olson.pm',
     ABSTRACT_FROM      => 'lib/Time/Zone/Olson.pm',
-    LICENSE            => 'perl',
+    ( $ExtUtils::MakeMaker::VERSION >= 6.3002
+        ? ( 'LICENSE' => 'perl' )
+        : () ),
+    (
+        $ExtUtils::MakeMaker::VERSION >= 6.48
+        ? ( 'MIN_PERL_VERSION' => '5.006' )
+        : ()
+    ),
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources   => {
+            repository => {
+                url  => 'https://github.com/david-dick/time-zone-olson',
+                web  => 'https://github.com/david-dick/time-zone-olson',
+                type => 'git',
+            },
+            bugtracker => {
+                web => 'https://github.com/david-dick/time-zone-olson/issues'
+            },
+        },
+    },
     PL_FILES           => {},
-    MIN_PERL_VERSION   => 5.008,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
     },

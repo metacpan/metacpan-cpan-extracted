@@ -1,8 +1,20 @@
+0.016   2021-08-09  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+        - [build] Rebuild to fix Declared Features POD section.
+
+
+0.015   2021-08-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Force prereq version: BorderStyleBase 0.009 (GH#3).
+
+
 0.014   2021-04-04  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.
 
-	- [build] Rebuild with updated Pod::Weaver plugin [ModuleFeatures] to
+	- [build] Rebuild with updated Pod::Weaver plugin [-Module::Features] to
           fix the generated POD.
 
 

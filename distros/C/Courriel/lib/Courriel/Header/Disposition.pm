@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 use Courriel::Types qw( Bool Maybe NonEmptyStr );
 use DateTime;
@@ -114,7 +114,7 @@ Courriel::Header::Disposition - The content disposition for an email part
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 SYNOPSIS
 
@@ -225,8 +225,7 @@ Returns a hash (not a reference) of the attributes passed to the constructor.
 Attributes are L<Courriel::HeaderAttribute> objects.
 
 The keys of the hash are all lower case, though the original casing is
-preserved in the C<name()> returned by the L<Courriel::HeaderAttribute>
-object.
+preserved in the C<name()> returned by the L<Courriel::HeaderAttribute> object.
 
 =head2 $disp->attribute($key)
 
@@ -270,7 +269,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Dave Rolsky.
+This software is Copyright (c) 2021 by Dave Rolsky.
 
 This is free software, licensed under:
 

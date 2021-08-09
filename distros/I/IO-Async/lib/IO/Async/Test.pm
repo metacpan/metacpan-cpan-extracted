@@ -8,7 +8,7 @@ package IO::Async::Test;
 use strict;
 use warnings;
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 use Exporter 'import';
 our @EXPORT = qw(
@@ -24,37 +24,37 @@ C<IO::Async::Test> - utility functions for use in test scripts
 
 =head1 SYNOPSIS
 
- use Test::More tests => 1;
- use IO::Async::Test;
+   use Test::More tests => 1;
+   use IO::Async::Test;
 
- use IO::Async::Loop;
- my $loop = IO::Async::Loop->new;
- testing_loop( $loop );
+   use IO::Async::Loop;
+   my $loop = IO::Async::Loop->new;
+   testing_loop( $loop );
 
- my $result;
+   my $result;
 
- $loop->do_something( 
-    some => args,
+   $loop->do_something( 
+      some => args,
 
-    on_done => sub {
-       $result = the_outcome;
-    }
- );
+      on_done => sub {
+         $result = the_outcome;
+      }
+   );
 
- wait_for { defined $result };
+   wait_for { defined $result };
 
- is( $result, what_we_expected, 'The event happened' );
+   is( $result, what_we_expected, 'The event happened' );
 
- ...
+   ...
 
- my $buffer = "";
- my $handle = IO::Handle-> ...
+   my $buffer = "";
+   my $handle = IO::Handle-> ...
 
- wait_for_stream { length $buffer >= 10 } $handle => $buffer;
+   wait_for_stream { length $buffer >= 10 } $handle => $buffer;
 
- is( substr( $buffer, 0, 10, "" ), "0123456789", 'Buffer was correct' );
+   is( substr( $buffer, 0, 10, "" ), "0123456789", 'Buffer was correct' );
 
- my $result = wait_for_future( $stream->read_until( "\n" ) )->get;
+   my $result = wait_for_future( $stream->read_until( "\n" ) )->get;
 
 =head1 DESCRIPTION
 

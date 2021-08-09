@@ -4,7 +4,7 @@ package Array::Iterator::BiDirectional;
 use strict;
 use warnings;
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.130'; # VERSION
 
 use Array::Iterator;
 our @ISA = qw(Array::Iterator);
@@ -71,7 +71,7 @@ Array::Iterator::BiDirectional - A subclass of Array::Iterator to allow forwards
 
 =head1 VERSION
 
-This document describes version 0.12 of Array::Iterator::BiDirectional (from Perl distribution Array-Iterator), released on 2017-07-04.
+This document describes version 0.130 of Array::Iterator::BiDirectional (from Perl distribution Array-Iterator), released on 2021-08-09.
 
 =head1 SYNOPSIS
 
@@ -96,19 +96,6 @@ This document describes version 0.12 of Array::Iterator::BiDirectional (from Per
 Occasionally it is useful for an iterator to go in both directions, forward and backward. One example would be token processing. When looping though tokens it is sometimes necessary to advance forward looking for a match to a rule. If the match fails, a bi-directional iterator can be moved back so that the next rule can be tried.
 
 =for Pod::Coverage .+
-
-=head1 ORIGINAL AUTHOR
-
-stevan little, E<lt>stevan@iinteractive.comE<gt>
-
-=head1 ORIGINAL COPYRIGHT AND LICENSE
-
-Copyright 2004 by Infinity Interactive, Inc.
-
-L<http://www.iinteractive.com>
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
 
 =head1 METHODS
 
@@ -144,7 +131,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Array-Iter
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Array-Iterator>.
+Source repository is at L<https://github.com/perlancar/perl-Array-Iterator>.
 
 =head1 BUGS
 
@@ -162,11 +149,24 @@ This is a subclass of B<Array::Iterator>, please refer to it for more documenati
 
 perlancar <perlancar@cpan.org>
 
+=head1 ORIGINAL AUTHOR
+
+stevan little, E<lt>stevan@iinteractive.comE<gt>
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 ORIGINAL COPYRIGHT AND LICENSE
+
+Copyright 2004 by Infinity Interactive, Inc.
+
+L<http://www.iinteractive.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut

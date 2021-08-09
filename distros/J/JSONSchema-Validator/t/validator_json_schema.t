@@ -6,7 +6,7 @@ use Test::More;
 
 use lib 't/lib';
 
-use Helper 'test_dir';
+use Helper qw/test_dir detect_warnings/;
 use JSONSchema::Validator;
 use JSONSchema::Validator::Util qw/read_file decode_content/;
 
@@ -94,4 +94,5 @@ for my $validator_class (@{$JSONSchema::Validator::JSON_SCHEMA_VALIDATORS}) {
     like $@, qr/invalid schema/, "check exception message on wrong meta schema validation of $resource";
 }
 
+ok detect_warnings() == 0, 'no warnings';
 done_testing;

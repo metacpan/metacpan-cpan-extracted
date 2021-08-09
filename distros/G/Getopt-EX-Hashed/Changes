@@ -1,5 +1,14 @@
 Revision history for Perl extension Getopt-EX-Hashed
 
+0.9908 2021-08-09T02:51:02Z
+
+    - Now 'is' parameter is required to generate accessor method.
+
+0.9907 2021-08-08T08:00:30Z
+
+    - Implement accessor method generation
+      with ACCESSOR and ACCESSOR_PREFIX config parameter.
+
 0.9906 2021-08-01T12:32:40Z
 
     - Update the way to use Getopt::Long interface and now

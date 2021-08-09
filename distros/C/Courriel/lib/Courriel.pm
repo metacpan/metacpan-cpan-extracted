@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 use Courriel::Headers;
 use Courriel::Helpers qw( unique_boundary );
@@ -37,7 +37,7 @@ has top_level_part => (
             headers
             is_multipart
             stream_to
-            )
+        )
     ],
 );
 
@@ -159,7 +159,7 @@ sub clone_without_attachments {
             part => Courriel::Part::Multipart->new(
                 content_type => $ct,
                 headers      => $headers,
-                parts => [ $plain_body, $html_body ],
+                parts        => [ $plain_body, $html_body ],
             )
         );
     }
@@ -196,7 +196,7 @@ sub _build_subject {
 }
 
 {
-    my $mail_parser = DateTime::Format::Mail->new( loose => 1 );
+    my $mail_parser    = DateTime::Format::Mail->new( loose => 1 );
     my $natural_parser = DateTime::Format::Natural->new( time_zone => 'UTC' );
 
     sub _build_datetime {
@@ -510,7 +510,7 @@ sub _parse_multipart {
                 && $epilogue =~ /\S/ ? ( epilogue => $epilogue ) : ()
         ),
         boundary => $boundary,
-        parts => [ map { $class->_parse( \$_ ) } @part_text ],
+        parts    => [ map { $class->_parse( \$_ ) } @part_text ],
     );
 }
 
@@ -532,7 +532,7 @@ Courriel - High level email parsing and manipulation
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 SYNOPSIS
 
@@ -574,9 +574,9 @@ means that it has not been decoded into utf-8 with C<Encode::decode()> or by
 using a C<:encoding(UTF-8)> IO layer.
 
 In practice, this doesn't matter for most emails, since they either contain
-only ASCII data or they actually do contain binary (non-character)
-data. However, if an email is using the 8bit Content-Transfer-Encoding, then
-this does matter.
+only ASCII data or they actually do contain binary (non-character) data.
+However, if an email is using the 8bit Content-Transfer-Encoding, then this
+does matter.
 
 If the email has already been decoded, you must set C<is_character> to a true
 value.
@@ -662,24 +662,24 @@ mime type of "text/html" and an inline disposition, if one exists.
 
 =head2 $email->clone_without_attachments()
 
-Returns a new Courriel object that only contains inline parts from the
-original email, effectively removing all attachments.
+Returns a new Courriel object that only contains inline parts from the original
+email, effectively removing all attachments.
 
 =head2 $email->first_part_matching( sub { ... } )
 
 Given a subroutine reference, this method calls that subroutine for each part
 in the email, in a depth-first search.
 
-The subroutine receives the part as its only argument. If it returns true,
-this method returns that part.
+The subroutine receives the part as its only argument. If it returns true, this
+method returns that part.
 
 =head2 $email->all_parts_matching( sub { ... } )
 
 Given a subroutine reference, this method calls that subroutine for each part
 in the email, in a depth-first search.
 
-The subroutine receives the part as its only argument. If it returns true,
-this method includes that part.
+The subroutine receives the part as its only argument. If it returns true, this
+method includes that part.
 
 This method returns all of the parts that match the subroutine.
 
@@ -693,27 +693,27 @@ Returns the L<Courriel::Headers> object for this email.
 
 =head2 $email->stream_to( output => $output )
 
-This method will send the stringified email to the specified output. The
-output can be a subroutine reference, a filehandle, or an object with a
-C<print()> method. The output may be sent as a single string, as a list of
-strings, or via multiple calls to the output.
+This method will send the stringified email to the specified output. The output
+can be a subroutine reference, a filehandle, or an object with a C<print()>
+method. The output may be sent as a single string, as a list of strings, or via
+multiple calls to the output.
 
-For large emails, streaming can be much more memory efficient than generating
-a single string in memory.
+For large emails, streaming can be much more memory efficient than generating a
+single string in memory.
 
 =head2 $email->as_string()
 
-Returns the email as a string, along with its headers. Lines will be
-terminated with "\r\n".
+Returns the email as a string, along with its headers. Lines will be terminated
+with "\r\n".
 
 =head1 ROBUSTNESS PRINCIPLE
 
-Courriel aims to respect the common Internet robustness principle (aka
-Postel's law). Courriel is conservative in the output it generates, and
-liberal in what it accepts.
+Courriel aims to respect the common Internet robustness principle (aka Postel's
+law). Courriel is conservative in the output it generates, and liberal in what
+it accepts.
 
-When parsing, the goal is to never die and always return as much information
-as possible. Any input that causes the C<< Courriel->parse() >> to die means
+When parsing, the goal is to never die and always return as much information as
+possible. Any input that causes the C<< Courriel->parse() >> to die means
 there's a bug in the parser. Please report these bugs.
 
 Conversely, Courriel aims to respect all relevant RFCs in its output, except
@@ -795,7 +795,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at L<http://www.urth.org/~autarch/fs-donation.html>.
+button at L<https://www.urth.org/fs-donation.html>.
 
 =head1 AUTHOR
 
@@ -803,7 +803,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Gregory Oschwald Ricardo Signes Zbigniew Łukasiak
+=for stopwords Gregory Oschwald Ricardo Signes Vitaly Gimly Zbigniew Łukasiak
 
 =over 4
 
@@ -817,13 +817,17 @@ Ricardo Signes <rjbs@users.noreply.github.com>
 
 =item *
 
+Vitaly Gimly <vgimly@gmail.com>
+
+=item *
+
 Zbigniew Łukasiak <zzbbyy@gmail.com>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Dave Rolsky.
+This software is Copyright (c) 2021 by Dave Rolsky.
 
 This is free software, licensed under:
 

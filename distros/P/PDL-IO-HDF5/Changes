@@ -1,3 +1,6 @@
+0.75 2021-08-08
+- fix t/attribPDL.t to work on longdouble - thanks @eserte for report
+
 0.74 2021-08-01
 - applied various Debian patches - thanks @sebastic
 

@@ -66,6 +66,7 @@ static void lazyinit_post_initslot(pTHX_ SlotMeta *slotmeta, SV *hookdata, SV *s
 }
 
 static const struct SlotHookFuncs lazyinit_hooks = {
+  .ver   = OBJECTPAD_ABIVERSION,
   .flags = OBJECTPAD_FLAG_ATTR_MUST_VALUE,
   .permit_hintkey = "Object::Pad::SlotAttr::LazyInit/LazyInit",
   .post_initslot = &lazyinit_post_initslot,

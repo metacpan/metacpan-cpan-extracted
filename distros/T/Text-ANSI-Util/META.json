@@ -60,7 +60,7 @@
          "web" : "https://github.com/perlancar/perl-Text-ANSI-Util"
       }
    },
-   "version" : "0.231",
+   "version" : "0.232",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -69,7 +69,7 @@
          {
             "class" : "Dist::Zilla::Plugin::InsertBlock",
             "name" : "InsertBlock",
-            "version" : "0.100"
+            "version" : "0.101"
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease",

@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Classic;
 
-our $DATE = '2021-07-11'; # DATE
-our $VERSION = '1.815'; # VERSION
+our $DATE = '2021-08-06'; # DATE
+our $VERSION = '1.816'; # VERSION
 
 use 5.010001;
 #use strict; # enabled by Moo
@@ -778,7 +778,7 @@ Perinci::CmdLine::Classic - Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.815 of Perinci::CmdLine::Classic (from Perl distribution Perinci-CmdLine-Classic), released on 2021-07-11.
+This document describes version 1.816 of Perinci::CmdLine::Classic (from Perl distribution Perinci-CmdLine-Classic), released on 2021-08-06.
 
 =head1 SYNOPSIS
 

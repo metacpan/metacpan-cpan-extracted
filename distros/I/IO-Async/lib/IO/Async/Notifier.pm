@@ -8,7 +8,7 @@ package IO::Async::Notifier;
 use strict;
 use warnings;
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 use Carp;
 use Scalar::Util qw( weaken );
@@ -28,44 +28,44 @@ C<IO::Async::Notifier> - base class for L<IO::Async> event objects
 
 Usually not directly used by a program, but one valid use case may be:
 
- use IO::Async::Notifier;
+   use IO::Async::Notifier;
 
- use IO::Async::Stream;
- use IO::Async::Signal;
+   use IO::Async::Stream;
+   use IO::Async::Signal;
 
- use IO::Async::Loop;
- my $loop = IO::Async::Loop->new;
+   use IO::Async::Loop;
+   my $loop = IO::Async::Loop->new;
 
- my $notifier = IO::Async::Notifier->new;
+   my $notifier = IO::Async::Notifier->new;
 
- $notifier->add_child(
-    IO::Async::Stream->new_for_stdin(
-       on_read => sub {
-          my $self = shift;
-          my ( $buffref, $eof ) = @_;
+   $notifier->add_child(
+      IO::Async::Stream->new_for_stdin(
+         on_read => sub {
+            my $self = shift;
+            my ( $buffref, $eof ) = @_;
 
-          while( $$buffref =~ s/^(.*)\n// ) {
-             print "You said $1\n";
-          }
+            while( $$buffref =~ s/^(.*)\n// ) {
+               print "You said $1\n";
+            }
 
-          return 0;
-       },
-    )
- );
+            return 0;
+         },
+      )
+   );
 
- $notifier->add_child(
-    IO::Async::Signal->new(
-       name => 'INT',
-       on_receipt => sub {
-          print "Goodbye!\n";
-          $loop->stop;
-       },
-    )
- );
+   $notifier->add_child(
+      IO::Async::Signal->new(
+         name => 'INT',
+         on_receipt => sub {
+            print "Goodbye!\n";
+            $loop->stop;
+         },
+      )
+   );
 
- $loop->add( $notifier );
+   $loop->add( $notifier );
 
- $loop->run;
+   $loop->run;
 
 =head1 DESCRIPTION
 
@@ -138,24 +138,24 @@ C<"IO_Async_Notifier__"> for namespace purposes.
 This is intended mainly for defining a subclass of some other object that is
 also an C<IO::Async::Notifier>, suitable to be added to an L<IO::Async::Loop>.
 
- package SomeEventSource::Async;
- use base qw( SomeEventSource IO::Async::Notifier );
+   package SomeEventSource::Async;
+   use base qw( SomeEventSource IO::Async::Notifier );
 
- sub _add_to_loop
- {
-    my $self = shift;
-    my ( $loop ) = @_;
+   sub _add_to_loop
+   {
+      my $self = shift;
+      my ( $loop ) = @_;
 
-    # Code here to set up event handling on $loop that may be required
- }
+      # Code here to set up event handling on $loop that may be required
+   }
 
- sub _remove_from_loop
- {
-    my $self = shift;
-    my ( $loop ) = @_;
+   sub _remove_from_loop
+   {
+      my $self = shift;
+      my ( $loop ) = @_;
 
-    # Code here to undo the event handling set up above
- }
+      # Code here to undo the event handling set up above
+   }
 
 Since all the methods documented here will be available, the implementation
 may wish to use the C<configure> and C<make_event_cb> or C<invoke_event>
@@ -332,7 +332,7 @@ C<< $f->fail >>. To avoid this being fatal if the failure is handled
 elsewhere, use the C<else_done> method on the future to obtain a sequence one
 that never fails.
 
- $notifier->adopt_future( $f->else_done() )
+   $notifier->adopt_future( $f->else_done() )
 
 The future itself is returned.
 
@@ -609,12 +609,12 @@ stored in the Notifier itself without creating a cycle.
 
 For example,
 
- my $mref = $notifier->_capture_weakself( sub {
-    my ( $notifier, $arg ) = @_;
-    print "Notifier $notifier got argument $arg\n";
- } );
+   my $mref = $notifier->_capture_weakself( sub {
+      my ( $notifier, $arg ) = @_;
+      print "Notifier $notifier got argument $arg\n";
+   } );
 
- $mref->( 123 );
+   $mref->( 123 );
 
 This is provided as a utility for Notifier subclasses to use to build a
 callback CODEref to pass to a Loop method, but which may also want to store
@@ -633,11 +633,11 @@ is possible that it has been destroyed by the time the code runs, and so the
 reference will be passed as C<undef>. This should be protected against by the
 code body.
 
- $other_object->{on_event} = $notifier->_capture_weakself( sub {
-    my $notifier = shift or return;
-    my ( @event_args ) = @_;
-    ...
- } );
+   $other_object->{on_event} = $notifier->_capture_weakself( sub {
+      my $notifier = shift or return;
+      my ( @event_args ) = @_;
+      ...
+   } );
 
 For stand-alone generic implementation of this behaviour, see also L<curry>
 and C<curry::weak>.
@@ -684,12 +684,12 @@ stored in the Notifier itself without creating a cycle.
 
 For example,
 
- my $mref = $notifier->_replace_weakself( sub {
-    my ( $notifier, $arg ) = @_;
-    print "Notifier $notifier got argument $arg\n";
- } );
+   my $mref = $notifier->_replace_weakself( sub {
+      my ( $notifier, $arg ) = @_;
+      print "Notifier $notifier got argument $arg\n";
+   } );
 
- $mref->( $object, 123 );
+   $mref->( $object, 123 );
 
 This is provided as a utility for Notifier subclasses to use for event
 callbacks on other objects, where the delegated object is passed in the
@@ -877,22 +877,22 @@ be the class name of the notifier, and any parent notifiers it is contained
 by, joined by an arrow C<< <- >>. To ensure this string does not grow too
 long, certain prefixes are abbreviated:
 
- IO::Async::Protocol::  =>  IaP:
- IO::Async::            =>  Ia:
- Net::Async::           =>  Na:
+   IO::Async::Protocol::  =>  IaP:
+   IO::Async::            =>  Ia:
+   Net::Async::           =>  Na:
 
 Finally, each notifier that has a name defined using the C<notifier_name>
 parameter has that name appended in braces.
 
 For example, invoking
 
- $stream->debug_printf( "EVENT on_read" )
+   $stream->debug_printf( "EVENT on_read" )
 
 On an L<IO::Async::Stream> instance reading and writing a file descriptor
 whose C<fileno> is 4, which is a child of an L<IO::Async::Protocol::Stream>,
 will produce a line of output:
 
- [Ia:Stream{rw=4}<-IaP:Stream] EVENT on_read
+   [Ia:Stream{rw=4}<-IaP:Stream] EVENT on_read
 
 =cut
 

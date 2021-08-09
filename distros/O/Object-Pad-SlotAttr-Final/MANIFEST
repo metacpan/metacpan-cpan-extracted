@@ -1,6 +1,5 @@
 Build.PL
 Changes
-include/object_pad.h
 lib/Object/Pad/SlotAttr/Final.pm
 lib/Object/Pad/SlotAttr/Final.xs
 LICENSE

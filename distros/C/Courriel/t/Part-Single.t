@@ -142,7 +142,7 @@ EOF
 
 {
     my $part = Courriel::Part::Single->new(
-        headers => Courriel::Headers->new(),
+        headers      => Courriel::Headers->new(),
         content_type =>
             Courriel::Header::ContentType->new( mime_type => 'image/jpeg' ),
         disposition => Courriel::Header::Disposition->new(
@@ -253,7 +253,7 @@ EOF
 
 {
     my $part = Courriel::Part::Single->new(
-        headers => Courriel::Headers->new(),
+        headers      => Courriel::Headers->new(),
         content_type =>
             Courriel::Header::ContentType->new( mime_type => 'image/jpeg' ),
         encoded_content => 'foo',
@@ -267,7 +267,7 @@ EOF
 
 {
     my $part = Courriel::Part::Single->new(
-        headers => Courriel::Headers->new(),
+        headers      => Courriel::Headers->new(),
         content_type =>
             Courriel::Header::ContentType->new( mime_type => 'image/jpeg' ),
         content => 'foo',

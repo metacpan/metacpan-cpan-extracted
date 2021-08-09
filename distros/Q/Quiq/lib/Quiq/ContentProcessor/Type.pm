@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.193';
+our $VERSION = '1.194';
 
 # -----------------------------------------------------------------------------
 
@@ -637,7 +637,7 @@ sub needsUpdate {
 
 =head1 VERSION
 
-1.193
+1.194
 
 =head1 AUTHOR
 

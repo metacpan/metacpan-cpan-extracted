@@ -1,9 +1,9 @@
 package App::ColorThemeUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-20'; # DATE
+our $DATE = '2021-08-08'; # DATE
 our $DIST = 'App-ColorThemeUtils'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,6 +11,17 @@ use warnings;
 use Log::ger;
 
 our %SPEC;
+
+sub _is_rgb_code {
+    my $code = shift;
+    $code =~ /\A#?[0-9A-Fa-f]{6}\z/;
+}
+
+sub _ansi_code_to_color_name {
+    my $code = shift;
+    $code =~ s/\e\[(.+)m/$1/g;
+    "ansi:$code";
+}
 
 $SPEC{list_color_theme_modules} = {
     v => 1.1,
@@ -44,7 +55,7 @@ $SPEC{show_color_theme_swatch} = {
     v => 1.1,
     args => {
         theme => {
-            schema => 'perl::modname_with_optional_args*',
+            schema => 'perl::colortheme::modname_with_optional_args*',
             req => 1,
             pos => 0,
             cmdline_aliases => {m=>{}},
@@ -78,24 +89,47 @@ sub show_color_theme_swatch {
         my $color0 = $theme->get_item_color($item_name);
         my $color_summary = ref $color0 eq 'HASH' && defined($color0->{summary}) ?
             String::Pad::pad($color0->{summary}, $width, "center", " ", 1) : undef;
-        my $fg_color = ref $color0 eq 'HASH' ? $color0->{fg} : $color0;
-        my $bg_color = ref $color0 eq 'HASH' ? $color0->{bg} : undef;
-        my $color = $fg_color // $bg_color;
-        my $text_bar  = String::Pad::pad(
-            "$item_name (".($fg_color // "-").(defined $bg_color ? " on $bg_color" : "").")",
-            $width, "center", " ", 1);
-        my $bartext_color = Color::RGB::Util::rgb_is_dark($color) ? "ffffff" : "000000";
-        my $bar = join(
-            "",
-            Color::ANSI::Util::ansibg($color), $empty_bar, $reset, "\n",
-            Color::ANSI::Util::ansibg($color), Color::ANSI::Util::ansifg($bartext_color), $text_bar, $reset, "\n",
-            defined $color_summary ? (
-                Color::ANSI::Util::ansibg($color), Color::ANSI::Util::ansifg($bartext_color), $color_summary, $reset, "\n",
 
-            ) : (),
-            Color::ANSI::Util::ansibg($color), $empty_bar, $reset, "\n",
-            $empty_bar, "\n",
-        );
+        my $fg_color_code = ref $color0 eq 'HASH' ? ($color0->{ansi_fg} ? $color0->{ansi_fg} : $color0->{fg}) : $color0;
+        my $bg_color_code = ref $color0 eq 'HASH' ? ($color0->{ansi_bg} ? $color0->{ansi_bg} : $color0->{bg}) : undef;
+        die "Error in code for color item '$item_name': at least one of bgcolor or fgcolor must be defined"
+            unless defined $fg_color_code || defined $bg_color_code;
+        my $color_code = $fg_color_code // $bg_color_code;
+
+        my $fg_color_name = !defined($fg_color_code) ? "undef" : _is_rgb_code($fg_color_code) ? "rgb:$fg_color_code" : _ansi_code_to_color_name($fg_color_code);
+        my $bg_color_name = !defined($bg_color_code) ? "undef" : _is_rgb_code($bg_color_code) ? "rgb:$bg_color_code" : _ansi_code_to_color_name($bg_color_code);
+        my $color_name = $fg_color_name // $bg_color_name;
+
+        my $text_bar  = String::Pad::pad(
+            "$item_name ($fg_color_name on $bg_color_name)",
+            $width, "center", " ", 1);
+
+        my $bar;
+        if ($color_name =~ /^rgb:/) {
+            my $bartext_color = Color::RGB::Util::rgb_is_dark($fg_color_code // 'ffffff') ? "ffffff" : "000000";
+            $bar = join(
+                "",
+                Color::ANSI::Util::ansibg($color_code), $empty_bar, $reset, "\n",
+                Color::ANSI::Util::ansibg($color_code), Color::ANSI::Util::ansifg($bartext_color), $text_bar, $reset, "\n",
+                defined $color_summary ? (
+                    Color::ANSI::Util::ansibg($color_code), Color::ANSI::Util::ansifg($bartext_color), $color_summary, $reset, "\n",
+
+                ) : (),
+                Color::ANSI::Util::ansibg($color_code), $empty_bar, $reset, "\n",
+                $empty_bar, "\n",
+            );
+        } else {
+            # color is ansi
+            $bar = join(
+                "",
+                ($fg_color_code // '').($bg_color_code // ''), $empty_bar, $reset, "\n",
+                ($fg_color_code // '').($bg_color_code // ''), $text_bar, $reset, "\n",
+                defined $color_summary ? (
+                    ($fg_color_code // '').($bg_color_code // ''), $color_summary, $reset, "\n",
+                ) : (),
+                $empty_bar, "\n",
+            );
+        }
         print $bar;
     }
     [200];
@@ -138,7 +172,7 @@ App::ColorThemeUtils - CLI utilities related to color themes
 
 =head1 VERSION
 
-This document describes version 0.010 of App::ColorThemeUtils (from Perl distribution App-ColorThemeUtils), released on 2021-01-20.
+This document describes version 0.011 of App::ColorThemeUtils (from Perl distribution App-ColorThemeUtils), released on 2021-08-08.
 
 =head1 DESCRIPTION
 
@@ -161,7 +195,7 @@ This distribution contains the following CLI utilities:
 
 Usage:
 
- list_color_theme_items(%args) -> [status, msg, payload, meta]
+ list_color_theme_items(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 This function is not exported.
 
@@ -176,12 +210,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -191,7 +225,7 @@ Return value:  (any)
 
 Usage:
 
- list_color_theme_modules(%args) -> [status, msg, payload, meta]
+ list_color_theme_modules(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List ColorTheme modules.
 
@@ -208,12 +242,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -223,7 +257,7 @@ Return value:  (any)
 
 Usage:
 
- show_color_theme_swatch(%args) -> [status, msg, payload, meta]
+ show_color_theme_swatch(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 This function is not exported.
 
@@ -231,7 +265,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<theme>* => I<perl::modname_with_optional_args>
+=item * B<theme>* => I<perl::colortheme::modname_with_optional_args>
 
 =item * B<width> => I<posint> (default: 80)
 
@@ -240,12 +274,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -259,7 +293,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-ColorThemeUtils>
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-ColorThemeUtils/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ColorThemeUtils>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -275,7 +309,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

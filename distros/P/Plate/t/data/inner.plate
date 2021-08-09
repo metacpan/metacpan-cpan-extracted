@@ -1,0 +1,2 @@
+<inner args="<% "@_" %>"><& _ &></inner>\
+% warn 'inner-2-warn';

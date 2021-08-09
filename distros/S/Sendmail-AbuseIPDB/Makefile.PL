@@ -6,6 +6,7 @@ WriteMakefile(
     PREREQ_PM         => {
                             'JSON' => 2.15,
                             'URI' => 1.4,
+                            'IPC::Cmd' => 0,
                          },
     ($] >= 5.005 ?
       (ABSTRACT_FROM  => 'lib/Sendmail/AbuseIPDB.pm', # retrieve abstract from module

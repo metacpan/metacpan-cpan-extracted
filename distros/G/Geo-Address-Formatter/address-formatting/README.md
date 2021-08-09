@@ -6,7 +6,7 @@ This project contains templates and test cases for address formats used in terri
 
 ### Build Status
 
-[![Build Status](https://travis-ci.org/OpenCageData/address-formatting.svg?branch=master)](https://travis-ci.org/OpenCageData/address-formatting)
+[![Build Status](https://travis-ci.com/OpenCageData/address-formatting.svg?branch=master)](https://travis-ci.com/OpenCageData/address-formatting)
 [![Twitter Follow](https://img.shields.io/twitter/follow/OpenCage?label=Follow%20OpenCage&style=social)](https://twitter.com/opencage)
 
 ### An example:
@@ -52,7 +52,7 @@ Unlike [physical post (office) mail](http://www.bitboost.com/ref/international-a
 Our goal with this repository is a series of (programming) language independent templates. Those templates can then be processed by whatever software you like. 
 
 There are open-source implementations in
-
+  * [Elixir](https://github.com/dkuku/ex_address_formatting)
   * [Java](https://github.com/placemarkt/address-formatter-java)
   * [Javascript](https://github.com/fragaria/address-formatter)
   * [Perl](https://metacpan.org/release/Geo-Address-Formatter)

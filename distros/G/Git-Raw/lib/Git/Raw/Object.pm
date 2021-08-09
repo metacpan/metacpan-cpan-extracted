@@ -1,5 +1,5 @@
 package Git::Raw::Object;
-$Git::Raw::Object::VERSION = '0.87';
+$Git::Raw::Object::VERSION = '0.88';
 use strict;
 use warnings;
 use Carp;
@@ -29,7 +29,7 @@ Git::Raw::Object - Git object
 
 =head1 VERSION
 
-version 0.87
+version 0.88
 
 =head1 DESCRIPTION
 

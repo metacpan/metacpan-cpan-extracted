@@ -1,3 +1,19 @@
+0.011   2021-08-08  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 0.010 & 0.010.2.
+
+
+0.010.2 2021-08-01  Released-By: PERLANCAR; Urgency: medium
+
+        - UPDATE 2021-08-08: rename release from 0.010 0.010.2 due to duplicate.
+
+	[cli show-color-theme-swatch]
+
+        - Support ANSI codes in color item.
+
+        - Some fixes.
+
+
 0.010   2021-01-20  Released-By: PERLANCAR; Urgency: medium
 
 	- Add CLI: list-color-theme-items.

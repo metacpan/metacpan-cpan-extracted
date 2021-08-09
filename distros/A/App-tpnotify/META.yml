@@ -41,4 +41,4 @@ requires:
 resources:
   bugtracker: https://puszcza.gnu.org.ua/bugs/?group=tpnotify
   repository: git://git.gnu.org.ua/tpnotify.git
-version: '1.03'
+version: '1.04'

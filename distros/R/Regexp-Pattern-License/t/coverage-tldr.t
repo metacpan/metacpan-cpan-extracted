@@ -6,15 +6,16 @@ use Regexp::Pattern::License;
 
 my %RE = %Regexp::Pattern::License::RE;
 
-# dirty dump (needs manually stripping bofus entries):
+# dirty dump (needs manually stripping bogus entries):
 # curl 'https://tldrlegal.com/search?reverse=true' | perl -nE 'm{<a href="/license/([^"]+)"><h3 class="nomargin-v">([^<]+)</h3></a>} and say '"\"\\t\\tfield '\$2' => '\$1'\"" | sort > tldr.t
 
 # Key is page title (including shortname).
 # Value is page name.
 my %names = map {
 	my $key = $_;
-	my $id  = $RE{$key}{'name.alt.org.tldr.synth.nogrant'}
-		// $RE{$key}{'name.alt.org.tldr'};
+	my $id  = $RE{$key}{'iri.alt.org.tldr.synth.nogrant'}
+		// $RE{$key}{'iri.alt.org.tldr'};
+	$id =~ s!https://tldrlegal.com/license/!!;
 	my $maincaption = $RE{$key}{'caption.alt.org.tldr.synth.nogrant'}
 		// $RE{$key}{'caption.alt.org.tldr'} // $RE{$key}{caption};
 	my @altcaptions = map { $RE{$key}{$_} } (
@@ -26,7 +27,7 @@ my %names = map {
 	map { $_ => $id } $maincaption, @altcaptions;
 	}
 	grep {
-	grep {/^name\.alt\.org\.tldr(?:\.synth\.nogrant)?$/}
+	grep {/^iri\.alt\.org\.tldr(?:\.synth\.nogrant)?$/}
 		keys %{ $RE{$_} }
 	}
 	keys %RE;

@@ -7,6 +7,23 @@ Home page:    <https://metacpan.org/release/App-Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.2.6	2021-08-07
+
+ [ Documentation ]
+ - correct typo in SEE ALSO entry
+ - extend copyright to include present year
+
+ [ Test Suite ]
+ - update author tests to cover Regexp::Pattern::License v3.8.0
+
+ [ Packaging ]
+ - tighten test-recommendation on Regexp::Pattern::License
+
+ [ Other ]
+ - optimixe: compile some internal regexes only once
+ - postpone compiling regexes, to speedup response time for non-scanning
+   command-line options
+
 v3.2.5	2021-07-22
 
  [ Bug Fixes ]

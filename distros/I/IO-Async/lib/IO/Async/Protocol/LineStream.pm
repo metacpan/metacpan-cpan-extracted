@@ -8,7 +8,7 @@ package IO::Async::Protocol::LineStream;
 use strict;
 use warnings;
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 use base qw( IO::Async::Protocol::Stream );
 
@@ -24,31 +24,31 @@ text
 Most likely this class will be subclassed to implement a particular network
 protocol.
 
- package Net::Async::HelloWorld;
+   package Net::Async::HelloWorld;
 
- use strict;
- use warnings;
- use base qw( IO::Async::Protocol::LineStream );
+   use strict;
+   use warnings;
+   use base qw( IO::Async::Protocol::LineStream );
 
- sub on_read_line
- {
-    my $self = shift;
-    my ( $line ) = @_;
+   sub on_read_line
+   {
+      my $self = shift;
+      my ( $line ) = @_;
 
-    if( $line =~ m/^HELLO (.*)/ ) {
-       my $name = $1;
+      if( $line =~ m/^HELLO (.*)/ ) {
+         my $name = $1;
 
-       $self->invoke_event( on_hello => $name );
-    }
- }
+         $self->invoke_event( on_hello => $name );
+      }
+   }
 
- sub send_hello
- {
-    my $self = shift;
-    my ( $name ) = @_;
+   sub send_hello
+   {
+      my $self = shift;
+      my ( $name ) = @_;
 
-    $self->write_line( "HELLO $name" );
- }
+      $self->write_line( "HELLO $name" );
+   }
 
 This small example elides such details as error handling, which a real
 protocol implementation would be likely to contain.

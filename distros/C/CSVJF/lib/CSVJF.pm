@@ -1,7 +1,7 @@
 package CSVJF;
 
-our $DATE = '2019-06-19'; # DATE
-our $VERSION = '0.1.1'; # VERSION
+our $DATE = '2021-08-08'; # DATE
+our $VERSION = '0.1.2'; # VERSION
 
 1;
 # ABSTRACT: CSVJF (CSV with JSON Fields) file format specification
@@ -18,7 +18,7 @@ CSVJF - CSVJF (CSV with JSON Fields) file format specification
 
 =head1 VERSION
 
-This document describes version 0.1.1 of CSVJF (from Perl distribution CSVJF), released on 2019-06-19.
+This document describes version 0.1.2 of CSVJF (from Perl distribution CSVJF), released on 2021-08-08.
 
 =head1 HOMEPAGE
 
@@ -42,7 +42,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

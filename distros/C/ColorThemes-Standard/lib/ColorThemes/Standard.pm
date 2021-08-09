@@ -1,9 +1,9 @@
 package ColorThemes::Standard;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-19'; # DATE
+our $DATE = '2021-08-08'; # DATE
 our $DIST = 'ColorThemes-Standard'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: A standard collection of generic color themes
@@ -20,7 +20,17 @@ ColorThemes::Standard - A standard collection of generic color themes
 
 =head1 VERSION
 
-This document describes version 0.002 of ColorThemes::Standard (from Perl distribution ColorThemes-Standard), released on 2020-06-19.
+This document describes version 0.003 of ColorThemes::Standard (from Perl distribution ColorThemes-Standard), released on 2021-08-08.
+
+=head1 COLOR THEMES
+
+=over
+
+=item * L<ColorTheme::NoColor>
+
+An empty color theme that provides no items.
+
+=back
 
 =head1 HOMEPAGE
 
@@ -50,7 +60,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

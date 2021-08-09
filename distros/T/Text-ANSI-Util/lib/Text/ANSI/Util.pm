@@ -1,9 +1,9 @@
 package Text::ANSI::Util;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-23'; # DATE
+our $DATE = '2021-04-14'; # DATE
 our $DIST = 'Text-ANSI-Util'; # DIST
-our $VERSION = '0.231'; # VERSION
+our $VERSION = '0.232'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -48,7 +48,7 @@ Text::ANSI::Util - Routines for text containing ANSI color codes
 
 =head1 VERSION
 
-This document describes version 0.231 of Text::ANSI::Util (from Perl distribution Text-ANSI-Util), released on 2021-01-23.
+This document describes version 0.232 of Text::ANSI::Util (from Perl distribution Text-ANSI-Util), released on 2021-04-14.
 
 =head1 SYNOPSIS
 
@@ -343,6 +343,20 @@ moderate amount of color codes).
 See also: C<ta_mbwrap()> in L<Text::ANSI::WideUtil>.
 
 =head1 FAQ
+
+=over 11
+
+=back BEGIN_BLOCK: why_split
+
+=head2 Why split functionalities of wide character and color support into multiple modules/distributions?
+
+Performance (see numbers in the function description), dependency
+(L<Unicode::GCString> is used for wide character support), and overhead (loading
+Unicode::GCString).
+
+=over 11
+
+=back END_BLOCK: why_split
 
 =head2 How do I highlight a string case-insensitively?
 

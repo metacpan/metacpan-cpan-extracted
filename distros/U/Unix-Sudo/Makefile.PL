@@ -35,7 +35,7 @@ WriteMakefile(
     'Data::Dumper'   => 0,
     'PadWalker'      => 0,
     'Probe::Perl',   => 0,
+    'Taint::Runtime' => 0,
     'Test::More'     => '0.88', # need done_testing (0.88)
-    'tainting'       => 0,
   },
 );

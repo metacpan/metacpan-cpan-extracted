@@ -1,9 +1,9 @@
 package Text::ANSITable;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-19'; # DATE
+our $DATE = '2021-08-09'; # DATE
 our $DIST = 'Text-ANSITable'; # DIST
-our $VERSION = '0.602'; # VERSION
+our $VERSION = '0.604'; # VERSION
 
 use 5.010001;
 use Carp;
@@ -15,6 +15,48 @@ use ColorThemeUtil::ANSI qw(item_color_to_ansi);
 #use List::Util qw(first);
 use Scalar::Util 'looks_like_number';
 require Win32::Console::ANSI if $^O =~ /Win/;
+
+# see Module::Features for more details on this
+our %FEATURES = (
+    set_v => {
+        TextTable => 1,
+    },
+
+    features => {
+        TextTable => {
+            can_align_cell_containing_wide_character => 1,
+            can_align_cell_containing_color_code     => 1,
+            can_align_cell_containing_newline        => 1,
+            can_use_box_character                    => 1,
+            can_customize_border                     => 1,
+            can_halign                               => 1,
+            can_halign_individual_row                => 1,
+            can_halign_individual_column             => 1,
+            can_halign_individual_cell               => 1,
+            can_valign                               => 1,
+            can_valign_individual_row                => 1,
+            can_valign_individual_column             => 1,
+            can_valign_individual_cell               => 1,
+            can_rowspan                              => 0,
+            can_colspan                              => 0,
+            can_color                                => 1,
+            can_color_theme                          => 1,
+            can_set_cell_height                      => 1,
+            can_set_cell_height_of_individual_row    => 1,
+            can_set_cell_width                       => 1,
+            can_set_cell_width_of_individual_column  => 1,
+            speed                                    => 'slow',
+            can_hpad                                 => 1,
+            can_hpad_individual_row                  => 1,
+            can_hpad_individual_column               => 1,
+            can_hpad_individual_cell                 => 1,
+            can_vpad                                 => 1,
+            can_vpad_individual_row                  => 1,
+            can_vpad_individual_column               => 1,
+            can_vpad_individual_cell                 => 1,
+        },
+    },
+);
 
 my $ATTRS = [qw(
 
@@ -52,7 +94,7 @@ has border_style => (
         my ($self, $val) = @_;
         $self->{border_style_obj} =
             Module::Load::Util::instantiate_class_with_optional_args(
-                {ns_prefix=>'BorderStyle'}, $val);
+                {ns_prefixes=>['BorderStyle::Text::ANSITable', 'BorderStyle', 'BorderStyle::Text::ANSITable::OldCompat']}, $val);
     },
 );
 
@@ -63,7 +105,7 @@ has color_theme => (
         my ($self, $val) = @_;
         $self->{color_theme_obj} =
             Module::Load::Util::instantiate_class_with_optional_args(
-                {ns_prefix=>'ColorTheme'}, $val);
+                {ns_prefixes=>['ColorTheme::Text::ANSITable', 'ColorTheme', 'ColorTheme::Text::ANSITable::OldCompat']}, $val);
     },
 );
 
@@ -72,6 +114,11 @@ has columns => (
     default => sub { [] },
     trigger => sub {
         my $self = shift;
+
+        # check that column names are unique
+        my %seen;
+        for (@{$_[0]}) { die "Duplicate column name '$_'" if $seen{$_}++ }
+
         $self->{_columns_set}++;
     },
 );
@@ -282,10 +329,10 @@ sub BUILD {
         } elsif ($self->use_color) {
             my $bg = $self->detect_terminal->{default_bgcolor} // '';
             if ($self->color_depth >= 2**24) {
-                $ct = 'Text::ANSITable::Standard::Gradation' .
+                $ct = 'Standard::Gradation' .
                     ($bg eq 'ffffff' ? 'WhiteBG' : '');
             } else {
-                $ct = 'Text::ANSITable::Standard::NoGradation' .
+                $ct = 'Standard::NoGradation' .
                     ($bg eq 'ffffff' ? 'WhiteBG' : '');;
             }
         } else {
@@ -1715,7 +1762,7 @@ Text::ANSITable - Create nice formatted tables using extended ASCII and ANSI col
 
 =head1 VERSION
 
-This document describes version 0.602 of Text::ANSITable (from Perl distribution Text-ANSITable), released on 2021-02-19.
+This document describes version 0.604 of Text::ANSITable (from Perl distribution Text-ANSITable), released on 2021-08-09.
 
 =head1 SYNOPSIS
 
@@ -1729,7 +1776,7 @@ This document describes version 0.602 of Text::ANSITable (from Perl distribution
 
  # set styles
  $t->border_style('UTF8::SingleLineBold');  # if not, a nice default is picked
- $t->color_theme('Text::ANSITable::Standard::NoGradation');  # if not, a nice default is picked
+ $t->color_theme('Standard::NoGradation');  # if not, a nice default is picked
 
  # fill data
  $t->columns(["name"       , "color" , "price"]);
@@ -1789,6 +1836,190 @@ fine-grained options to customize appearance.
 <p><img src="http://blogs.perl.org/users/steven_haryanto/ansitable5.png" /></p>
 
 =end HTML
+
+=head1 DECLARED FEATURES
+
+Features declared by this module:
+
+=head2 From feature set TextTable
+
+Features from feature set L<TextTable|Module::Features::TextTable> declared by this module:
+
+=over
+
+=item * can_align_cell_containing_color_code
+
+Value: yes.
+
+=item * can_align_cell_containing_newline
+
+Value: yes.
+
+=item * can_align_cell_containing_wide_character
+
+Value: yes.
+
+=item * can_color
+
+Can produce colored table.
+
+Value: yes.
+
+=item * can_color_theme
+
+Allow choosing colors from a named set of palettes.
+
+Value: yes.
+
+=item * can_colspan
+
+Value: no.
+
+=item * can_customize_border
+
+Let user customize border character in some way, e.g. selecting from several available borders, disable border.
+
+Value: yes.
+
+=item * can_halign
+
+Provide a way for user to specify horizontal alignment (leftE<sol>middleE<sol>right) of cells.
+
+Value: yes.
+
+=item * can_halign_individual_cell
+
+Provide a way for user to specify different horizontal alignment (leftE<sol>middleE<sol>right) for individual cells.
+
+Value: yes.
+
+=item * can_halign_individual_column
+
+Provide a way for user to specify different horizontal alignment (leftE<sol>middleE<sol>right) for individual columns.
+
+Value: yes.
+
+=item * can_halign_individual_row
+
+Provide a way for user to specify different horizontal alignment (leftE<sol>middleE<sol>right) for individual rows.
+
+Value: yes.
+
+=item * can_hpad
+
+Provide a way for user to specify horizontal padding of cells.
+
+Value: yes.
+
+=item * can_hpad_individual_cell
+
+Provide a way for user to specify different horizontal padding of individual cells.
+
+Value: yes.
+
+=item * can_hpad_individual_column
+
+Provide a way for user to specify different horizontal padding of individual columns.
+
+Value: yes.
+
+=item * can_hpad_individual_row
+
+Provide a way for user to specify different horizontal padding of individual rows.
+
+Value: yes.
+
+=item * can_rowspan
+
+Value: no.
+
+=item * can_set_cell_height
+
+Allow setting height of rows.
+
+Value: yes.
+
+=item * can_set_cell_height_of_individual_row
+
+Allow setting height of individual rows.
+
+Value: yes.
+
+=item * can_set_cell_width
+
+Allow setting height of rows.
+
+Value: yes.
+
+=item * can_set_cell_width_of_individual_column
+
+Allow setting height of individual rows.
+
+Value: yes.
+
+=item * can_use_box_character
+
+Can use terminal box-drawing character when drawing border.
+
+Value: yes.
+
+=item * can_valign
+
+Provide a way for user to specify vertical alignment (topE<sol>middleE<sol>bottom) of cells.
+
+Value: yes.
+
+=item * can_valign_individual_cell
+
+Provide a way for user to specify different vertical alignment (topE<sol>middleE<sol>bottom) for individual cells.
+
+Value: yes.
+
+=item * can_valign_individual_column
+
+Provide a way for user to specify different vertical alignment (topE<sol>middleE<sol>bottom) for individual columns.
+
+Value: yes.
+
+=item * can_valign_individual_row
+
+Provide a way for user to specify different vertical alignment (topE<sol>middleE<sol>bottom) for individual rows.
+
+Value: yes.
+
+=item * can_vpad
+
+Provide a way for user to specify vertical padding of cells.
+
+Value: yes.
+
+=item * can_vpad_individual_cell
+
+Provide a way for user to specify different vertical padding of individual cells.
+
+Value: yes.
+
+=item * can_vpad_individual_column
+
+Provide a way for user to specify different vertical padding of individual columns.
+
+Value: yes.
+
+=item * can_vpad_individual_row
+
+Provide a way for user to specify different vertical padding of individual rows.
+
+Value: yes.
+
+=item * speed
+
+Subjective speed rating, relative to other text table modules.
+
+Value: "slow".
+
+=back
+
+For more details on module features, see L<Module::Features>.
 
 =head1 REFERRING TO COLUMNS
 
@@ -1869,13 +2100,13 @@ arguments:
  # during construction
  my $t = Text::ANSITable->new(
      ...
-     color_theme => "Text::ANSITable::Standard::NoGradation",
+     color_theme => "Standard::NoGradation",
      ...
  );
 
  # after the object is constructed
- $t->color_theme("Text::ANSITable::Standard::NoGradation");
- $t->color_theme(["Lens::Darken", {theme=>"Text::ANSITable::Standard::NoGradation"}]);
+ $t->color_theme("Standard::NoGradation");
+ $t->color_theme(["Lens::Darken", {theme=>"Standard::NoGradation"}]);
 
 If no color theme is selected explicitly, a nice default will be chosen. You can
 also set the C<ANSITABLE_COLOR_THEME> environment variable to set the default.
@@ -2225,7 +2456,9 @@ examples.
 
 =head1 ATTRIBUTES
 
-=head2 columns => ARRAY OF STR
+=head2 columns
+
+Array of str. Must be unique.
 
 Store column names. Note that when drawing, you can omit some columns, reorder
 them, or display some more than once (see C<column_filter> attribute).
@@ -2315,11 +2548,19 @@ disable wide-character support here.
 
 =head2 border_style => STR
 
-Border style name to use.
+Border style name to use. This is a module name in the
+C<BorderStyle::Text::ANSITable::*>, C<BorderStyle::*>, or
+C<BorderStyle::Text::ANSITable::OldCompat::*> namespace, without the prefix.
+See the L<BorderStyle> specification on how to create a new border style.
 
 =head2 color_theme => STR
 
-Color theme name to use.
+Color theme name to use. This is a module name in the
+C<ColorTheme::Text::ANSITable::*>, C<ColorTheme::*>, or
+C<ColorTheme::Text::ANSITable::OldCompat::*> namespace, without the prefix. See
+the L<ColorTheme> and an example existing color theme module like
+L<ColorTheme::Text::ANSITable::Standard::Gradation> specification on how to
+create a new border style.
 
 =head2 show_header => BOOL (default: 1)
 
@@ -2988,7 +3229,7 @@ Source repository is at L<https://github.com/perlancar/perl-Text-ANSITable>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Text-ANSITable/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-ANSITable>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -3043,9 +3284,25 @@ Unix command B<column> (e.g. C<column -t>).
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTORS
+
+=for stopwords Mario Zieschang Steven Haryanto (on PC)
+
+=over 4
+
+=item *
+
+Mario Zieschang <mario@zieschang.info>
+
+=item *
+
+Steven Haryanto (on PC) <stevenharyanto@gmail.com>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,9 @@
 Revision history for Object-Pad-SlotAttr-Final
 
+0.03    2021-08-08
+        [CHANGES]
+         * Updated for Object::Pad 0.50
+
 0.02    2021-08-02
         [CHANGES]
          * Updated for Object::Pad 0.48

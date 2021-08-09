@@ -1,5 +1,5 @@
 package WWW::Form;
-
+$WWW::Form::VERSION = '1.23';
 use strict;
 use warnings;
 
@@ -857,7 +857,7 @@ sub _getInputHTML {
     my $field = $self->getField($fieldName);
 
     my $inputHTML = "<input type='$field->{type}'"
-		. " name='$fieldName' id='$fieldName' value=\"";
+    . " name='$fieldName' id='$fieldName' value=\"";
 
     my $value_to_put;
     if ($field->{type} eq 'checkbox') {
@@ -904,7 +904,7 @@ sub getSubmitButtonHTML {
             warn(
                 "Won't be able to display image submit button properly" .
                 " because src for image was not specified"
-	        );
+            );
         }
 
         $xhtml .= " src='$img_src'";
@@ -991,11 +991,11 @@ sub _getRadioButtonHTML {
                 $isChecked = " checked='checked'";
             }
 
-	    $inputHTML .= "<input type='$field->{type}'"
-	        . " name='$fieldName'";
+            $inputHTML .= "<input type='$field->{type}'"
+            . " name='$fieldName'";
 
         $inputHTML .= " value=\"". $self->_escapeValue($value) . "\" ";
-	    $inputHTML .= $attributesString
+        $inputHTML .= $attributesString
             . $isChecked
             . " /> $label</label><br />";
         }
@@ -1017,7 +1017,7 @@ sub _getTextAreaHTML {
     my $field = $self->getField($fieldName);
 
     my $textarea = "<textarea name='" . $fieldName . "'"
-		. $attributesString;
+    . $attributesString;
 
     $textarea .= ">";
     $textarea .= $self->_escapeValue($field->{value});
@@ -1053,7 +1053,7 @@ sub _getSelectBoxHTML {
                 $isSelected = "";
             }
             $html .= "<option value=\"" . $self->_escapeValue($value)
-				. "\"${isSelected}>$label</option>\n";
+            . "\"${isSelected}>$label</option>\n";
         }
     }
     else {
@@ -1084,7 +1084,7 @@ WWW::Form
 
 =head1 VERSION
 
-version 1.22
+version 1.23
 
 =head1 SYNOPSIS
 
@@ -1398,6 +1398,14 @@ be selected by default, if it is 0 it will not be selected by default.
       type => 'checkbox',
       validators => []
   }
+
+=head1 NAME
+
+WWW::Form
+
+=head1 VERSION
+
+version 1.23
 
 =head1 NAME
 
@@ -2077,6 +2085,17 @@ http://svn.berlios.de/wsvn/web-cpan/www-form
 
 This program is free software.  You may copy or redistribute it under the same
 terms as Perl itself.
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2003 by Benjamin Schmaus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =head1 AUTHOR
 

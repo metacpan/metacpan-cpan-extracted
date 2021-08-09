@@ -14,7 +14,7 @@ use JSONSchema::Validator::Draft7;
 use JSONSchema::Validator::OAS30;
 use JSONSchema::Validator::Util qw(get_resource decode_content read_file);
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 my $SPECIFICATIONS = {
     JSONSchema::Validator::OAS30::ID => JSONSchema::Validator::OAS30::SPECIFICATION,
@@ -25,6 +25,7 @@ my $SPECIFICATIONS = {
 
 our $JSON_SCHEMA_VALIDATORS = ['JSONSchema::Validator::Draft4', 'JSONSchema::Validator::Draft6', 'JSONSchema::Validator::Draft7'];
 our $OAS_VALIDATORS = ['JSONSchema::Validator::OAS30'];
+
 
 sub new {
     my ($class, %params) = @_;
@@ -54,6 +55,7 @@ sub new {
     return $validator_class->new(schema => $schema, base_uri => $base_uri, %params);
 }
 
+
 sub validate_paths {
     my ($class, $globs) = @_;
     my $results = {};
@@ -68,6 +70,7 @@ sub validate_paths {
     return $results;
 }
 
+
 sub validate_resource {
     my ($class, $resource, %params) = @_;
     my $schema_to_validate = resource_schema($resource, \%params);
@@ -77,6 +80,7 @@ sub validate_resource {
 
     return $class->validate_resource_schema($schema_to_validate, $validator_class->SPECIFICATION);
 }
+
 
 sub validate_resource_schema {
     my ($class, $schema_to_validate, $schema_specification) = @_;
@@ -145,7 +149,7 @@ JSONSchema::Validator - Validator for JSON Schema Draft4/Draft6/Draft7 and OpenA
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -190,7 +194,7 @@ version 0.005
 
 OpenAPI specification and JSON Schema Draft4/Draft6/Draft7 validators with minimum dependencies.
 
-=head1 CLASS METHODS
+=head1 METHODS
 
 =head2 new
 
@@ -235,12 +239,16 @@ Currently there are validators: JSONSchema::Validator::Draft4, JSONSchema::Valid
 
 =head2 validate_paths
 
-Validate all files specified by path globs.
+Validates all files specified by path globs.
 
     my $result = JSONSchema::Validator->validate_paths(['/some/path/to/openapi.*.yaml', '/some/path/to/jsonschema.*.json']);
     for my $file (keys %$result) {
         my ($res, $errors) = @{$result->{$file}};
     }
+
+=head2 validate_resource
+
+=head2 validate_resource_schema
 
 =head1 AUTHORS
 
@@ -267,6 +275,12 @@ Denis Ibaev <dionys@gmail.com>
 Andrey Khozov <andrey@rydlab.ru>
 
 =back
+
+=head1 CONTRIBUTOR
+
+=for stopwords James Waters
+
+James Waters <james@jcwaters.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 

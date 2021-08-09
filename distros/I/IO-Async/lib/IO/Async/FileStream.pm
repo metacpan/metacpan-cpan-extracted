@@ -8,7 +8,7 @@ package IO::Async::FileStream;
 use strict;
 use warnings;
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 use base qw( IO::Async::Stream );
 
@@ -23,36 +23,36 @@ C<IO::Async::FileStream> - read the tail of a file
 
 =head1 SYNOPSIS
 
- use IO::Async::FileStream;
+   use IO::Async::FileStream;
 
- use IO::Async::Loop;
- my $loop = IO::Async::Loop->new;
+   use IO::Async::Loop;
+   my $loop = IO::Async::Loop->new;
 
- open my $logh, "<", "var/logs/daemon.log" or
-    die "Cannot open logfile - $!";
+   open my $logh, "<", "var/logs/daemon.log" or
+      die "Cannot open logfile - $!";
 
- my $filestream = IO::Async::FileStream->new(
-    read_handle => $logh,
+   my $filestream = IO::Async::FileStream->new(
+      read_handle => $logh,
 
-    on_initial => sub {
-       my ( $self ) = @_;
-       $self->seek_to_last( "\n" );
-    },
+      on_initial => sub {
+         my ( $self ) = @_;
+         $self->seek_to_last( "\n" );
+      },
 
-    on_read => sub {
-       my ( $self, $buffref ) = @_;
+      on_read => sub {
+         my ( $self, $buffref ) = @_;
 
-       while( $$buffref =~ s/^(.*\n)// ) {
-          print "Received a line $1";
-       }
+         while( $$buffref =~ s/^(.*\n)// ) {
+            print "Received a line $1";
+         }
 
-       return 0;
-    },
- );
+         return 0;
+      },
+   );
 
- $loop->add( $filestream );
+   $loop->add( $filestream );
 
- $loop->run;
+   $loop->run;
 
 =head1 DESCRIPTION
 
@@ -281,10 +281,10 @@ C<SEEK_SET> if not provided.
 
 Normally this would be used to seek to the end of the file, for example
 
- on_initial => sub {
-    my ( $self, $filesize ) = @_;
-    $self->seek( $filesize );
- }
+   on_initial => sub {
+      my ( $self, $filesize ) = @_;
+      $self->seek( $filesize );
+   }
 
 =cut
 
@@ -342,10 +342,10 @@ This is most likely useful for seeking after the last complete line in a
 line-based log file, to commence reading from the end, while still managing to
 capture any partial content that isn't yet a complete line.
 
- on_initial => sub {
-    my $self = shift;
-    $self->seek_to_last( "\n" );
- }
+   on_initial => sub {
+      my $self = shift;
+      $self->seek_to_last( "\n" );
+   }
 
 =cut
 

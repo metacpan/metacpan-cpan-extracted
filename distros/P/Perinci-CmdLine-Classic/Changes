@@ -1,3 +1,8 @@
+1.816   2021-08-06  Released-By: PERLANCAR; Urgency: medium
+
+	- Add missing dependency to ColorThemeRole::ANSI (GH#1).
+
+
 1.815   2021-07-11  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Provide key to common options to be able to group them in

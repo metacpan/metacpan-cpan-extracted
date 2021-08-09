@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( IO::Async::Timer );
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 use Carp;
 
@@ -19,27 +19,27 @@ C<IO::Async::Timer::Absolute> - event callback at a fixed future time
 
 =head1 SYNOPSIS
 
- use IO::Async::Timer::Absolute;
+   use IO::Async::Timer::Absolute;
 
- use POSIX qw( mktime );
+   use POSIX qw( mktime );
 
- use IO::Async::Loop;
- my $loop = IO::Async::Loop->new;
+   use IO::Async::Loop;
+   my $loop = IO::Async::Loop->new;
 
- my @time = gmtime;
+   my @time = gmtime;
 
- my $timer = IO::Async::Timer::Absolute->new(
-    time => mktime( 0, 0, 0, $time[3]+1, $time[4], $time[5] ),
+   my $timer = IO::Async::Timer::Absolute->new(
+      time => mktime( 0, 0, 0, $time[3]+1, $time[4], $time[5] ),
 
-    on_expire => sub {
-       print "It's midnight\n";
-       $loop->stop;
-    },
- );
+      on_expire => sub {
+         print "It's midnight\n";
+         $loop->stop;
+      },
+   );
 
- $loop->add( $timer );
+   $loop->add( $timer );
 
- $loop->run;
+   $loop->run;
 
 =head1 DESCRIPTION
 

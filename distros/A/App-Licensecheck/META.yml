@@ -31,7 +31,7 @@ optional_features: {}
 provides:
   App::Licensecheck:
     file: lib/App/Licensecheck.pm
-    version: v3.2.5
+    version: v3.2.6
 requires:
   Array::IntSpan: '0'
   Encode: '0'
@@ -64,12 +64,12 @@ resources:
   homepage: https://metacpan.org/pod/App::Licensecheck
   license: http://www.gnu.org/licenses/agpl-3.0.txt
   repository: https://salsa.debian.org/build-common-team/licensecheck.git
-version: v3.2.5
+version: v3.2.6
 x_contributors:
   - 'Paul Wise <pabs@debian.org>'
 x_help_wanted:
-  - tester
   - documenter
+  - tester
 x_provides_scripts:
   licensecheck:
     file: bin/licensecheck

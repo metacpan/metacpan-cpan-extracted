@@ -452,7 +452,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
     }
 
     my ($fmin,$fedm,$errdef,$npari,$nparx,$istat) = PDL::Minuit::mnstat();
-    my $n = $npari->sum;
+    my $n = $npari->sum->at;
     my $mat = zeroes($n,$n);
 
     PDL::Minuit::mnemat($mat);

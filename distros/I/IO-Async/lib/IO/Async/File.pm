@@ -8,7 +8,7 @@ package IO::Async::File;
 use strict;
 use warnings;
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 use base qw( IO::Async::Timer::Periodic );
 
@@ -24,23 +24,23 @@ C<IO::Async::File> - watch a file for changes
 
 =head1 SYNOPSIS
 
- use IO::Async::File;
+   use IO::Async::File;
 
- use IO::Async::Loop;
- my $loop = IO::Async::Loop->new;
+   use IO::Async::Loop;
+   my $loop = IO::Async::Loop->new;
 
- my $file = IO::Async::File->new(
-    filename => "config.ini",
-    on_mtime_changed => sub {
-       my ( $self ) = @_;
-       print STDERR "Config file has changed\n";
-       reload_config( $self->handle );
-    }
- );
+   my $file = IO::Async::File->new(
+      filename => "config.ini",
+      on_mtime_changed => sub {
+         my ( $self ) = @_;
+         print STDERR "Config file has changed\n";
+         reload_config( $self->handle );
+      }
+   );
 
- $loop->add( $file );
+   $loop->add( $file );
 
- $loop->run;
+   $loop->run;
 
 =head1 DESCRIPTION
 

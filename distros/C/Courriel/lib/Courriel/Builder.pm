@@ -3,7 +3,7 @@ package Courriel::Builder;
 use strict;
 use warnings;
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 use Carp qw( croak );
 use Courriel;
@@ -137,8 +137,8 @@ sub _add_required_headers {
 
     unless ( $keys{date} ) {
         push @{$headers},
-            ( Date =>
-                DateTime::Format::Mail->format_datetime( DateTime->now ) );
+            ( Date => DateTime::Format::Mail->format_datetime( DateTime->now )
+            );
     }
 
     unless ( $keys{'message-id'} ) {
@@ -323,8 +323,7 @@ sub attach {
         : @_;
 
     return {
-        attachment => $p{file} ? _part_for_file(%p) : _part_for_content(%p)
-    };
+        attachment => $p{file} ? _part_for_file(%p) : _part_for_content(%p) };
 }
 
 my $flm = File::LibMagic->new;
@@ -452,7 +451,7 @@ Courriel::Builder - Build emails with sugar
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 SYNOPSIS
 
@@ -476,8 +475,8 @@ version 0.48
 =head1 DESCRIPTION
 
 This module provides some sugar syntax for emails of all shapes sizes, from
-simple emails with a plain text body to emails with both plain and html
-bodies, html with attached images, etc.
+simple emails with a plain text body to emails with both plain and html bodies,
+html with attached images, etc.
 
 =head1 API
 
@@ -487,24 +486,24 @@ functions with different names. See L<Sub::Exporter> for details.
 
 =head2 build_email( ... )
 
-This function returns a new L<Courriel> object. It takes the results of all
-the other functions you call as input.
+This function returns a new L<Courriel> object. It takes the results of all the
+other functions you call as input.
 
-It expects you to pass in a body of some sort, whether text, html, or both,
-and will throw an error if you don't.
+It expects you to pass in a body of some sort, whether text, html, or both, and
+will throw an error if you don't.
 
 It will add Date and Message-ID headers to your email if you don't provide
 them, ensuring that the email is RFC-compliant.
 
 =head2 subject($subject)
 
-This sets the subject of the email. It expects a single string. You can pass
-an empty string, but not C<undef>.
+This sets the subject of the email. It expects a single string. You can pass an
+empty string, but not C<undef>.
 
 =head2 from($from)
 
-This sets the From header of the email. It expects a single string or
-an object with a C<format()> method like C<Email::Address::XS>.
+This sets the From header of the email. It expects a single string or an object
+with a C<format()> method like C<Email::Address::XS>.
 
 =head2 to($from)
 
@@ -519,8 +518,8 @@ objects with a C<format()> method like C<Email::Address::XS>.
 =head2 header( $name => $value )
 
 This sets a header's value. You can call it as many times as you want, and you
-can call it more than once with the same header name to set multiple values
-for that header.
+can call it more than once with the same header name to set multiple values for
+that header.
 
 =head2 plain_body( ... )
 
@@ -720,7 +719,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Dave Rolsky.
+This software is Copyright (c) 2021 by Dave Rolsky.
 
 This is free software, licensed under:
 

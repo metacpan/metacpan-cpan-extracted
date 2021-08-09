@@ -71,6 +71,10 @@ do { my $x = {
                                     }
                     },
        'runtime' => {
+                      'recommends' => {
+                                        'JSON::PP' => '0',
+                                        'YAML::XS' => '0'
+                                      },
                       'requires' => {
                                       'JSON::MaybeXS' => '0',
                                       'List::Util' => '1.33',
@@ -79,7 +83,7 @@ do { my $x = {
                                       'Ref::Util' => '0',
                                       'SQL::Translator' => '0',
                                       'Types::Standard' => '1.010003',
-                                      'YAML::Any' => '0',
+                                      'YAML::PP' => '0',
                                       'custom::failures' => '0',
                                       'enum' => '0',
                                       'namespace::clean' => '0',
@@ -93,6 +97,7 @@ do { my $x = {
                                      'DBD::SQLite' => '1.31'
                                    },
                    'requires' => {
+                                   'Exporter::Tiny' => '1.002',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Slurper' => '0',
                                    'File::Spec' => '0',

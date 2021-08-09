@@ -8,7 +8,7 @@ plan 1;
 # Data source: <https://web.archive.org/web/20140816010724/http://spdx.org/licenses/>
 
 like(
-	license_org_metadata( 'spdx', '20140807', '1_20' ),
+	license_org_metadata( 'spdx', { date => '20140807', rev => '1_20' } ),
 	hash {
 		field '3dfx Glide License'                              => 'Glide';
 		field 'Abstyles License'                                => 'Abstyles';

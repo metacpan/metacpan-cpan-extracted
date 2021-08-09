@@ -6,14 +6,15 @@ use warnings;
 
 use Test::More;
 
-plan tests => 6;
+plan tests => 7;
 
 my @module_files = (
     'Mojo/Leds.pm',
     'Mojo/Leds/Page.pm',
     'Mojo/Leds/Rest.pm',
     'Mojo/Leds/Rest/DBIx.pm',
-    'Mojo/Leds/Rest/MongoDB.pm'
+    'Mojo/Leds/Rest/MongoDB.pm',
+    'Mojolicious/Command/Author/generate/leds_app.pm'
 );
 
 

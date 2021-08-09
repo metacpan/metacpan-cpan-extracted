@@ -7,6 +7,63 @@ Home page:    <https://metacpan.org/release/Regexp-Pattern-License>
 Bug tracker:  <https://bugs.debian.org/libregexp-pattern-license-perl>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.8.1	2021-08-07
+
+ [ Bug Fixes ]
+ - avoid non-destructive substitution to support older perls
+ - avoid randomly skipping Fedora IRIs, by normalizing property names
+ - avoid randomly skipping chinese IRIs, by fully aligning with DefHash
+   spec 1.0.13 which permits uppercase chararacters in properties
+ - drop alternate names related to Thrift from objects bsl bsl_1: Different
+   not yet included license
+ - expand annotation [ / ]
+ - fix default name for object antlr_pd
+ - fix license pattern for object wordnet_3
+ - fix licenseversion hint for object cecill_2
+ - fix scope for glide and gpl_2 license patterns
+ - rename attribute alt.archive.date_* -> alt.archive.time-* for iri
+   property of wordnet
+ - rename attribute lang -> alt.lang to comply with DefHash spec
+
+ [ Documentation ]
+ - add examples to objcts gpl_3 gpl_3_only
+
+ [ Test Suite ]
+ - add test to check DefHash structure
+ - improve test library to dinstinguish default name from no name, and
+   check for caption and summary regardless of org-specific name
+ - rename large test to improve parallelization
+ - restructure test function license_org_metadata() to take options as
+   hashref
+ - simplify tests to rely on examples (not inspect raw regex code)
+ - test object mit_unixcrypt
+ - tighten test 03-match-normalized.t by wrapping lines more aggressively
+
+ [ Other ]
+ - add alternative camelcase shortname for CeCill objects
+ - add annotations [. ] [". ]
+ - add default name for objects mit_cmu_warranty mpich2
+ - add description with origin to object cua_opl_1
+ - add steward's alternative caption for object cnri_jython
+ - add/update lots of alt.org.fedora names and captions, and historical
+   alt.org.cc names for some GNU licenses
+ - annotate characters / + ( ), in synthesized patterns, and stop escape
+   space or comma
+ - consistently use attribute iri (not web or none) for IRI-related
+   properties
+ - minor optimizations
+ - optimize annotation expansion
+ - optimize module bootstrapping
+ - optimize synthesizing metadata iri from name or caption, and stop
+   synthesize useless metadata name from caption
+ - optimize tag parsing
+ - optimize: stop duplicate patterns and metadata to group objects
+ - reduce DefHash size by annotating traits as (:...:)
+ - update object beerware to fix examples and add IRI
+ - use annotation [*)] in object catosl_1_1 and in cc objects
+ - use attribute alt.org.steward, dropping (coding but not license naming)
+   organizers facebook freebsd gzip inria python
+
 v3.8.0	2021-07-27
 
  [ Bug Fixes ]

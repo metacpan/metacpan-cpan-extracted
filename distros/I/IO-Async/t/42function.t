@@ -362,6 +362,29 @@ SKIP: {
    $loop->remove( $function );
 }
 
+# module + func in all models
+foreach my $model (qw( fork thread spawn )) {
+   SKIP: {
+      skip "This Perl does not support threads", 9
+         if $model eq "thread" and not IO::Async::OS->HAVE_THREADS;
+      skip "This Perl does not support fork()", 9
+         if $model eq "fork" and not IO::Async::OS->HAVE_POSIX_FORK;
+
+      my $function = IO::Async::Function->new(
+         model  => $model,
+         # We're sure to have List::Util::sum available as that has been core since 5.8
+         module => "List::Util",
+         func   => "sum",
+      );
+
+      $loop->add( $function );
+
+      my $f = wait_for_future $function->call( args => [ 10, 20, 30 ] );
+
+      is( scalar $f->get, 60, "result by module + func in '$model' model" );
+   }
+}
+
 ## Now test that parallel runs really are parallel
 {
    # touch $dir/$n in each worker, touch $dir/done to finish it

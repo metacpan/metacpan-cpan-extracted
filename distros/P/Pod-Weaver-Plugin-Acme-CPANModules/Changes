@@ -1,3 +1,8 @@
+0.010   2021-08-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Mention App::lcpan::Cmd::related_mods in generated FAQ section.
+
+
 0.009   2021-05-22  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Mention using cpanm-cpanmodules in the generated POD.

@@ -76,6 +76,7 @@ my @files = (
     't/local/follow.t',
     't/local/form.t',
     't/local/get.t',
+    't/local/head.t',
     't/local/log-server',
     't/local/nonascii.html',
     't/local/nonascii.t',

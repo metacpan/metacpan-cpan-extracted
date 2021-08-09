@@ -232,8 +232,9 @@ my $configure_php=sub {
    ($stdout,$stderr)=$handle->cmd($sudo.
       'wget -qO- http://xmlsoft.org/news.html');
    $stdout=~s/^.*?public releases.*?v(.*?):.*$/$1/s;
+   my $lxmlver=$stdout;
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "ls -1 /usr/local/lib | grep libxml2.so.$stdout");
+      "ls -1 /usr/local/lib | grep libxml2.so.$lxmlver");
    unless ($stdout) {
       ($stdout,$stderr)=$handle->cmd($sudo.
          'ls -1 | grep libxml2');
@@ -246,7 +247,7 @@ my $configure_php=sub {
       my $done=0;my $gittry=0;
       while ($done==0) {
          ($stdout,$stderr)=$handle->cmd($sudo.
-            'git https://gitlab.gnome.org/GNOME/libxml2.git',
+            'git clone https://gitlab.gnome.org/GNOME/libxml2.git',
             '__display__');
          if (++$gittry>5) {
             print "\n\n   FATAL ERROR: $stderr\n\n";
@@ -260,6 +261,9 @@ my $configure_php=sub {
       }
       ($stdout,$stderr)=$handle->cwd('libxml2');
       ($stdout,$stderr)=$handle->cmd($sudo.
+         "git checkout v$lxmlver",'__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         '"ACLOCAL_PATH=/usr/share/aclocal" '.
          './autogen.sh','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'make','__display__');
@@ -280,6 +284,7 @@ my $configure_php=sub {
       'tar zxvf sqlite.tar.gz','__display__');
    ($stdout,$stderr)=$handle->cwd('sqlite');
    ($stdout,$stderr)=$handle->cmd($sudo.
+      'CFLAGS="-DSQLITE_ENABLE_COLUMN_METADATA=1" '.
       './configure','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'make','3600','__display__');
@@ -695,7 +700,7 @@ $stdout='rel-1-6-1';
          '/usr/local/php'.$vn.'/etc/php-fpm.d/www.conf');
       my $zend=<<END;
 ; Zend OPcache
-extension=opcache.so
+zend_extension=opcache.so
 END
       ($stdout,$stderr)=$handle->cmd("echo -e \"$zend\" > ".
          '/usr/local/php'.$vn.'/etc/conf.d/modules.ini');

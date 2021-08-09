@@ -8,7 +8,7 @@ plan 1;
 # Data source: <https://web.archive.org/web/20171230141353/https://spdx.org/licenses/>
 
 like(
-	license_org_metadata( 'spdx', '20171228', '3' ),
+	license_org_metadata( 'spdx', { date => '20171228', rev => '3' } ),
 	hash {
 		field 'BSD Zero Clause License'       => '0BSD';
 		field 'Attribution Assurance License' => 'AAL';

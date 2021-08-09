@@ -6,7 +6,7 @@ use Test::More;
 
 use lib 't/lib';
 
-use Helper 'test_dir';
+use Helper qw/test_dir detect_warnings/;
 use JSONSchema::Validator;
 
 my $glob_ok = test_dir('data/validator_json_schema/*-1-schema.json');
@@ -26,4 +26,5 @@ for my $file (keys %$result_wrong) {
     ok @$errors > 0, "check errors of validation of $file";
 }
 
+ok detect_warnings() == 0, 'no warnings';
 done_testing;

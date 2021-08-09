@@ -15,13 +15,14 @@ static void final_post_construct(pTHX_ SlotMeta *slotmeta, SV *_hookdata, SV *sl
   SvREADONLY_on(slot);
 }
 
-static void final_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata, int __dummy)
+static void final_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata)
 {
   if(mop_slot_get_attribute(slotmeta, "writer"))
-    warn("Applying :Final attribute to slot %" SVf " which already has :writer", SVfARG(slotmeta->name));
+    warn("Applying :Final attribute to slot %" SVf " which already has :writer", SVfARG(mop_slot_get_name(slotmeta)));
 }
 
 static const struct SlotHookFuncs final_hooks = {
+  .ver   = OBJECTPAD_ABIVERSION,
   .flags = OBJECTPAD_FLAG_ATTR_NO_VALUE,
   .permit_hintkey = "Object::Pad::SlotAttr::Final/Final",
 

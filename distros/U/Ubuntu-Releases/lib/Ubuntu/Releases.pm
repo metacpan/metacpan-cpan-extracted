@@ -1,9 +1,9 @@
 package Ubuntu::Releases;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-15'; # DATE
+our $DATE = '2021-08-06'; # DATE
 our $DIST = 'Ubuntu-Releases'; # DIST
-our $VERSION = '20210115.1'; # VERSION
+our $VERSION = '20210115.2'; # VERSION
 
 use 5.010001;
 use strict;
@@ -669,7 +669,7 @@ Ubuntu::Releases - List Ubuntu releases
 
 =head1 VERSION
 
-This document describes version 20210115.1 of Ubuntu::Releases (from Perl distribution Ubuntu-Releases), released on 2021-01-15.
+This document describes version 20210115.2 of Ubuntu::Releases (from Perl distribution Ubuntu-Releases), released on 2021-08-06.
 
 =head1 SYNOPSIS
 
@@ -685,6 +685,12 @@ which in turn is retrieved from L<http://distrowatch.com>. Additional data
 source: L<https://github.com/sharyanto/gudangdata>
 (table/ubuntu_release_animal).
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <sharyanto@cpan.org>
+
 =head1 FUNCTIONS
 
 
@@ -692,7 +698,7 @@ source: L<https://github.com/sharyanto/gudangdata>
 
 Usage:
 
- list_ubuntu_releases(%args) -> [status, msg, payload, meta]
+ list_ubuntu_releases(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Ubuntu releases.
 
@@ -1442,12 +1448,12 @@ as list/array (field value, field value, ...).
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1461,7 +1467,7 @@ Source repository is at L<https://github.com/perlancar/perl-Ubuntu-Releases>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Ubuntu-Releases/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Ubuntu-Releases>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

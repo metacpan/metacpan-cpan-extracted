@@ -3,9 +3,9 @@ NAME
     output
 
 VERSION
-    This document describes version 0.390 of Data::Format::Pretty::Console
+    This document describes version 0.391 of Data::Format::Pretty::Console
     (from Perl distribution Data-Format-Pretty-Console), released on
-    2021-04-23.
+    2021-08-08.
 
 SYNOPSIS
     In your program:
@@ -215,7 +215,8 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-Data-Format-Pretty-Console/issues>
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Format-Pretty-Co
+    nsole>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -227,6 +228,9 @@ SEE ALSO
 
 AUTHOR
     perlancar <perlancar@cpan.org>
+
+CONTRIBUTOR
+    Steven Haryanto <sharyanto@cpan.org>
 
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2021, 2017, 2016, 2015, 2014, 2013, 2012,

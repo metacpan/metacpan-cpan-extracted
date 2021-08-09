@@ -18,7 +18,7 @@ CSVJF - CSVJF (CSV with JSON Fields) file format specification
 
 =head1 VERSION
 
-This document describes version 0.1.1 of CSVJF (from Perl distribution CSVJF), released on 2019-06-19.
+This document describes version 0.1.2 of CSVJF (from Perl distribution CSVJF), released on 2021-08-08.
 
 =head1 STATUS
 
@@ -94,7 +94,8 @@ CSVJ file format, L<https://csvj.org/>. This file format attempts to standardize
 the CSV format with JSON rules. It's basically JSON array with the "[" and "]"
 square brackets removed (implied), with additional restriction of elements
 cannot be array/object. Thus, every string field must be quoted except when a
-field is a number, boolean C<true>/C<false> literal, or C<null>.
+field is a number, boolean C<true>/C<false> literal, or C<null>. Note that
+despite the similar name, CSVJ and CSVJS are unrelated.
 
 IOD format specification, L<IOD>, which also employs the use of encoding
 prefixes C<">, C<[> and C<{> to embed JSON string, array, and hash,
@@ -106,7 +107,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

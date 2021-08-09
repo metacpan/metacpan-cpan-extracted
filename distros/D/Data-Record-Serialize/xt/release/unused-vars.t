@@ -9,6 +9,6 @@ SKIP: {
     Test::Vars->import;
 
     subtest 'unused vars' => sub {
-        all_vars_ok();
+all_vars_ok();
     };
 };

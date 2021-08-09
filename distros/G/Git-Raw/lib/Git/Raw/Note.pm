@@ -1,5 +1,5 @@
 package Git::Raw::Note;
-$Git::Raw::Note::VERSION = '0.87';
+$Git::Raw::Note::VERSION = '0.88';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ Git::Raw::Note - Git note class
 
 =head1 VERSION
 
-version 0.87
+version 0.88
 
 =head1 DESCRIPTION
 
@@ -31,7 +31,7 @@ L<Git::Raw::Note> object.
 =head2 read( $repo, $commitish, [$refname] )
 
 Read the note for C<$commitish>. Returns a L<Git::Raw::Note> object if a note
-is associated with C<$commitish>, otherise C<undef>.
+is associated with C<$commitish>, otherwise C<undef>.
 
 =head2 remove( $repo, $commitish, [$refname] )
 

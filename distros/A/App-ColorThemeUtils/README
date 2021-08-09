@@ -2,8 +2,8 @@ NAME
     App::ColorThemeUtils - CLI utilities related to color themes
 
 VERSION
-    This document describes version 0.010 of App::ColorThemeUtils (from Perl
-    distribution App-ColorThemeUtils), released on 2021-01-20.
+    This document describes version 0.011 of App::ColorThemeUtils (from Perl
+    distribution App-ColorThemeUtils), released on 2021-08-08.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
@@ -18,7 +18,7 @@ FUNCTIONS
   list_color_theme_items
     Usage:
 
-     list_color_theme_items(%args) -> [status, msg, payload, meta]
+     list_color_theme_items(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     This function is not exported.
 
@@ -28,19 +28,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   list_color_theme_modules
     Usage:
 
-     list_color_theme_modules(%args) -> [status, msg, payload, meta]
+     list_color_theme_modules(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     List ColorTheme modules.
 
@@ -52,36 +55,42 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   show_color_theme_swatch
     Usage:
 
-     show_color_theme_swatch(%args) -> [status, msg, payload, meta]
+     show_color_theme_swatch(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
 
-    *   theme* => *perl::modname_with_optional_args*
+    *   theme* => *perl::colortheme::modname_with_optional_args*
 
     *   width => *posint* (default: 80)
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -95,7 +104,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-App-ColorThemeUtils/issues>
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-ColorThemeUtils>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -107,8 +116,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2019, 2018 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2019, 2018 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

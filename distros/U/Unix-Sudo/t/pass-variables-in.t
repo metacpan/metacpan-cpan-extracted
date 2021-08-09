@@ -40,4 +40,4 @@ sudosanity::checks && do {
     is(sudo { $code->() }, 11, "Can read variables from the parent context");
 };
 
-END { done_testing }
+done_testing();

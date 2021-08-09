@@ -137,7 +137,7 @@ use warnings;
 
 use base qw{ Astro::Coord::ECI::TLE };
 
-our $VERSION = '0.130';
+our $VERSION = '0.131';
 
 use Astro::Coord::ECI::Utils 0.091 qw{:all};
 use Carp;

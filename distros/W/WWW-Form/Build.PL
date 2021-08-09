@@ -11,7 +11,6 @@ my %module_build_args = (
     "Module::Build" => "0.28"
   },
   "configure_requires" => {
-    "ExtUtils::MakeMaker" => 0,
     "Module::Build" => "0.28"
   },
   "dist_abstract" => "Object-oriented module for HTML form input validation and display",
@@ -19,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "WWW-Form",
-  "dist_version" => "1.22",
+  "dist_version" => "1.23",
   "license" => "perl",
   "module_name" => "WWW::Form",
   "recursive_test_files" => 1,
@@ -36,7 +35,7 @@ my %module_build_args = (
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test" => 0,
-    "Test::More" => 0,
+    "Test::More" => "0.88",
     "lib" => 0
   }
 );
@@ -48,7 +47,7 @@ my %fallback_build_requires = (
   "IPC::Open3" => 0,
   "Module::Build" => "0.28",
   "Test" => 0,
-  "Test::More" => 0,
+  "Test::More" => "0.88",
   "lib" => 0
 );
 

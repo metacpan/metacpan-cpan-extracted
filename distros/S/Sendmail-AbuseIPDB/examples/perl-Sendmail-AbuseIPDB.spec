@@ -1,6 +1,6 @@
 Summary: Sendmail-AbuseIPDB Perl module
 Name: perl-Sendmail-AbuseIPDB
-Version: 0.21
+Version: 0.22
 Release: 1
 License: GPL or Artistic
 Group: Development/Libraries
@@ -13,7 +13,7 @@ Requires: curl
 Requires: perl(URI) >= 1.4
 Requires: perl(JSON) >= 2.15
 Requires: perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
-Source0: Sendmail-AbuseIPDB-0.21.tar.gz
+Source0: Sendmail-AbuseIPDB-0.22.tar.gz
 
 %description
 %{summary}.
@@ -43,6 +43,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man3/Sendmail::AbuseIPDB.3pm.gz
 
 %changelog
+* Wed Jul 14 2021 <ttndy@cpan.org> - 0.22-1
+- Reporting upgraded to v2 with no fallback. Tidy up docs.
+
 * Fri Jun 25 2021 <ttndy@cpan.org> - 0.21-1
 - Clean up documentation and better examples.
 

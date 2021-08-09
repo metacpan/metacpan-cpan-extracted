@@ -1,3 +1,9 @@
+0.605   2021-08-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Add plugin [MetaProvides::Package] (suggested by paultcochrane in
+	  https://github.com/perlancar/perl-Perinci-CmdLine-Lite/pull/6).
+
+
 0.604   2021-06-04  Released-By: PERLANCAR; Urgency: medium
 
 	- Add plugin: Git::Contributors.

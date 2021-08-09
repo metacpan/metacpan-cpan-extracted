@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( IO::Async::Notifier );
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 use Carp;
 
@@ -19,22 +19,22 @@ C<IO::Async::Signal> - event callback on receipt of a POSIX signal
 
 =head1 SYNOPSIS
 
- use IO::Async::Signal;
+   use IO::Async::Signal;
 
- use IO::Async::Loop;
- my $loop = IO::Async::Loop->new;
+   use IO::Async::Loop;
+   my $loop = IO::Async::Loop->new;
 
- my $signal = IO::Async::Signal->new(
-    name => "HUP",
+   my $signal = IO::Async::Signal->new(
+      name => "HUP",
 
-    on_receipt => sub {
-        print "I caught SIGHUP\n";
-    },
- );
+      on_receipt => sub {
+          print "I caught SIGHUP\n";
+      },
+   );
 
- $loop->add( $signal );
+   $loop->add( $signal );
 
- $loop->run;
+   $loop->run;
 
 =head1 DESCRIPTION
 

@@ -7,13 +7,27 @@ use Test::Requires {
 
 use Test::Fatal;
 use Test::More 0.88;
-use Test::Warnings;
+use Test::Warnings qw( warnings );
 
 use Courriel::Builder;
 
 ## no critic (Variables::RequireLocalizedPunctuationVars)
 BEGIN { $ENV{EMAIL_SENDER_TRANSPORT} = 'Test' }
-use Email::Sender::Simple qw( sendmail );
+
+my @warnings = warnings {
+    require Email::Sender::Simple;
+    Email::Sender::Simple->import(qw( sendmail ));
+};
+if ( $] >= 5.018 && $] < 5.020 ) {
+    if ( @warnings == 1 ) {
+        like(
+            shift @warnings,
+            qr/Module::Pluggable will be removed from the Perl core distribution in the next major release/,
+            'Got warning about Module::Pluggable',
+        );
+    }
+}
+is_deeply( \@warnings, [], 'no warnings loading Email::Sender::Simple' );
 
 {
     Email::Sender::Simple->default_transport->clear_deliveries;

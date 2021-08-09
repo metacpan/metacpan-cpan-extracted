@@ -12,11 +12,11 @@ Regexp::Pattern::License - Regular expressions for legal licenses
 
 =head1 VERSION
 
-Version v3.8.0
+Version v3.8.1
 
 =cut
 
-our $VERSION = version->declare("v3.8.0");
+our $VERSION = version->declare("v3.8.1");
 
 =head1 SYNOPSIS
 
@@ -44,12 +44,14 @@ L<Regexp::Pattern> is a convention for organizing reusable regex patterns.
 # [  ]          end-of-paragraph space
 # [ ]           end-of-sentence space
 # [.]           full stop
+# [. ]          full stop and either one or two spaces or newline
 # [, ]          comma and space (space optional for wide comma)
 # [:]           colon
 # [:"]          colon and maybe one or two quotes
 # [;]           semicolon or colon or comma
 # [']           apostrophe
 # ["]           quote
+# [". ]         full stop and either one or two spaces or newline, maybe quote before
 # ["*]          quote or bullet
 # [*]           bullet
 # [*)]          start-of-sentence bullet or count
@@ -78,44 +80,48 @@ L<Regexp::Pattern> is a convention for organizing reusable regex patterns.
 # [ word]       space and word
 
 # TODO: tighten [:] and [http://] when App::Licensecheck stop strip colons
-my @_re = (
-	[ qr/\Q[, ]/,  '(?:, |[、，] ?)' ],
-	[ qr/\Q[*)]/,  '(?:\W{0,5}\S{0,2}\W{0,3})' ],
-	[ qr/\Q[:]/,   '(?::?)' ],
-	[ qr/\Q[:"]/,  '(?::\W{0,2})' ],                    #"
-	[ qr/\Q[-]/,   '(?:(?:[-–]\s{0,3})?)' ],
-	[ qr/\Q[--]/,  '(?:[-–—][-–]?)' ],
-	[ qr/\Q[-#]/,  '[-–\d]' ],
-	[ qr/\Q[- ]/,  '[-– ]' ],
-	[ qr/\Q[ - ]/, '(?: [-–—]{1,2} )' ],
-	[ qr/\Q[(]/,   '[(（]' ],
-	[ qr/\Q[)]/,   '[)）]' ],
-	[ qr/\Q[> ]/,  '(?:> ?|)' ],
-	[ qr/\Q[#.]/,  '(?:\d+(?:\.\d+)?)' ],
-	[ qr/\Q[#-,]/, '(?:\d+(?: ?[-–] ?\d+)?,? ?)' ],
-	[ qr/\Q[ ]/,   '(?:\s{1,3})' ],
-	[ qr/\Q[  ]/,  '(?:\s{1,3})' ],
-	[ qr/\Q["]/, "(?:[\"«»˝̏“”„]|['<>`´‘’‹›‚]{0,2})" ],
-	[ qr/\Q[']/, "(?:['`´‘’]?)" ],
-	[ qr/\Q["*]/, '(?:\W{0,2})' ],                      #"
-	[ qr/\Q[;]/,  '[;:,、，]' ],
-	[ qr/\Q[\/]/, '(?:[ /]?)' ],
+my %_ANNOTATIONS = (
+	'[. ]'  => '(?:\.\s{1,3})',
+	'[, ]'  => '(?:, |[、，] ?)',
+	'[*)]'  => '(?:\W{0,5}\S{0,2}\W{0,3})',
+	'[:]'   => '(?::?)',
+	'[:"]'  => '(?::\W{0,2})',
+	'[-]'   => '(?:(?:[-–]\s{0,3})?)',
+	'[--]'  => '(?:[-–—][-–]?)',
+	'[-#]'  => '[-–\d]',
+	'[- ]'  => '[-– ]',
+	'[ - ]' => '(?: [-–—]{1,2} )',
+	'[(]'   => '[(（]',
+	'[)]'   => '[)）]',
+	'[> ]'  => '(?:> ?|)',
+	'[#.]'  => '(?:\d+(?:\.\d+)?)',
+	'[#-,]' => '(?:\d+(?: ?[-–] ?\d+)?,? ?)',
+	'[ ]'   => '(?:\s{1,3})',
+	'[  ]'  => '(?:\s{1,3})',
+	'["]'   => '(?:["«»˝̏“”„]|[\'<>`´‘’‹›‚]{0,2})',
+	'[. ]' =>
+		'(?:(?:["«»˝̏“”„]|[\'<>`´‘’‹›‚]{0,2})?\.\s{1,3})',
+	'[\']'  => '(?:[\'`´‘’]?)',
+	'["*]'  => '(?:\W{0,2})',
+	'[;]'   => '[;:,、，]',
+	'[/]'   => '(?:[ /]?)',
+	'[ / ]' => '(?: ?[/] ?)',
 
-	[ qr/\Q[à]/, '(?:[àa]?)' ],
-	[ qr/\Q[è]/, '(?:[èe]?)' ],
-	[ qr/\Q[é]/, '(?:[ée]?)' ],
-	[ qr/\Q[ê]/, '(?:[êe]?)' ],
-	[ qr/\Q[l-]/, '(?:[łl]?)' ],
+	'[à]' => '(?:[àa]?)',
+	'[è]' => '(?:[èe]?)',
+	'[é]' => '(?:[ée]?)',
+	'[ê]' => '(?:[êe]?)',
+	'[l-]' => '(?:[łl]?)',
 
-	[ qr/\Q[c]/,       '(?: ?©| ?\([Cc]\))' ],
-	[ qr/\Q[as is]/,   '(?:\W{0,2}[Aa][Ss][- ][Ii][Ss]\W{0,2})' ],
-	[ qr/\Q[eg]/,      '(?:ex?\.? ?gr?\.?)' ],
-	[ qr!\Q[http://]!, '(?:(?:https?:?)?(?://)?)' ],
-	[ qr/\Q[ie]/,      '(?:i\.? ?e\.?)' ],
-	[ qr/\Q[r]/,       '(?: ?®| ?\([Rr]\))' ],
-	[ qr/\Q[tm]/,      '(?: ?™| ?\([Tt][Mm]\))' ],
-	[ qr/\Q[word]/,    '(?:\S+)' ],
-	[ qr/\Q[ word]/,   '(?: \S+)' ],
+	'[c]'       => '(?: ?©| ?\([Cc]\))',
+	'[as is]'   => '(?:\W{0,2}[Aa][Ss][- ][Ii][Ss]\W{0,2})',
+	'[eg]'      => '(?:ex?\.? ?gr?\.?)',
+	'[http://]' => '(?:(?:https?:?)?(?://)?)',
+	'[ie]'      => '(?:i\.? ?e\.?)',
+	'[r]'       => '(?: ?®| ?\([Rr]\))',
+	'[tm]'      => '(?: ?™| ?\([Tt][Mm]\))',
+	'[word]'    => '(?:\S+)',
+	'[ word]'   => '(?: \S+)',
 );
 
 my %P;
@@ -126,24 +132,24 @@ while ( my ( $key, $val ) = each %Regexp::Pattern::License::Parts::RE ) {
 my $the = '(?:[Tt]he )';
 
 my $cc_no_law_firm
-	= 'CREATIVE COMMONS CORPORATION IS NOT A LAW FIRM AND DOES NOT PROVIDE LEGAL SERVICES[.] ';
+	= 'CREATIVE COMMONS CORPORATION IS NOT A LAW FIRM AND DOES NOT PROVIDE LEGAL SERVICES[. ]';
 my $cc_dist_no_rel
-	= 'DISTRIBUTION OF THIS LICENSE DOES NOT CREATE AN ATTORNEY[-]CLIENT RELATIONSHIP[.] ';
+	= 'DISTRIBUTION OF THIS LICENSE DOES NOT CREATE AN ATTORNEY[-]CLIENT RELATIONSHIP[. ]';
 my $cc_dist_no_rel_draft
-	= 'DISTRIBUTION OF THIS DRAFT LICENSE DOES NOT CREATE AN ATTORNEY[-]CLIENT RELATIONSHIP[.] ';
+	= 'DISTRIBUTION OF THIS DRAFT LICENSE DOES NOT CREATE AN ATTORNEY[-]CLIENT RELATIONSHIP[. ]';
 my $cc_dist_no_rel_doc
-	= 'DISTRIBUTION OF THIS DOCUMENT DOES NOT CREATE AN ATTORNEY[-]CLIENT RELATIONSHIP[.] ';
+	= 'DISTRIBUTION OF THIS DOCUMENT DOES NOT CREATE AN ATTORNEY[-]CLIENT RELATIONSHIP[. ]';
 my $cc_info_asis_discl
-	= 'CREATIVE COMMONS PROVIDES THIS INFORMATION ON AN [as is] BASIS[.] '
+	= 'CREATIVE COMMONS PROVIDES THIS INFORMATION ON AN [as is] BASIS[. ]'
 	. 'CREATIVE COMMONS MAKES NO WARRANTIES REGARDING THE INFORMATION PROVIDED, '
 	. 'AND DISCLAIMS LIABILITY FOR DAMAGES RESULTING FROM ITS USE[.]';
 my $cc_info_asis_discl_doc
-	= 'CREATIVE COMMONS PROVIDES THIS INFORMATION ON AN [as is] BASIS[.] '
+	= 'CREATIVE COMMONS PROVIDES THIS INFORMATION ON AN [as is] BASIS[. ]'
 	. 'CREATIVE COMMONS MAKES NO WARRANTIES REGARDING THE USE OF THIS DOCUMENT OR THE INFORMATION OR WORKS PROVIDED HEREUNDER, '
 	. 'AND DISCLAIMS LIABILITY FOR DAMAGES RESULTING FROM THE USE OF THIS DOCUMENT OR THE INFORMATION OR WORKS PROVIDED HEREUNDER[.]';
 my $cc_work_protected
-	= 'THE WORK [(]?AS DEFINED BELOW[)]? IS PROVIDED UNDER THE TERMS OF THIS CREATIVE COMMONS PUBLIC LICENSE [(]?["]?CCPL["]? OR ["]?LICENSE["]?[)]?[.] '
-	. 'THE WORK IS PROTECTED BY COPYRIGHT AND[/]OR OTHER APPLICABLE LAW[.] ';
+	= 'THE WORK [(]?AS DEFINED BELOW[)]? IS PROVIDED UNDER THE TERMS OF THIS CREATIVE COMMONS PUBLIC LICENSE [(]?["]?CCPL["]? OR ["]?LICENSE["]?[)]?[. ]'
+	. 'THE WORK IS PROTECTED BY COPYRIGHT AND[/]OR OTHER APPLICABLE LAW[. ]';
 my $cc_auth_lic_prohib
 	= 'ANY USE OF THE WORK OTHER THAN AS AUTHORIZED UNDER THIS LICENSE IS PROHIBITED[.][  ]?';
 my $cc_auth_lic_copylaw_prohib
@@ -195,12 +201,8 @@ my $fsf_ullr
 	. 'with or without modifications, as long as this notice is preserved';
 
 # internal-only patterns
-# _lang is "basic variants" regex at <https://stackoverflow.com/a/48300605>
-# TODO: maybe tighten _lang to subset of _prop
-# as discussed at <https://github.com/perlancar/perl-DefHash/issues/1>
-my $_delim = '[.(]';
-my $_prop  = '(?:[a-z][a-z0-9_]*)';
-my $_any   = '[a-z0-9_.()]';
+my $_prop = '(?:[A-Za-z][A-Za-z0-9_]*)';
+my $_any  = '[A-Za-z0-9_.]';
 
 our %RE;
 
@@ -455,8 +457,11 @@ $RE{except_389} = {
 	name                                    => '389-exception',
 	'name.alt.org.debian'                   => '389',
 	'name.alt.org.spdx.since.date_20150730' => '389-exception',
-	caption => '389 Directory Server Exception',
-	tags    => [
+	caption                  => '389 Directory Server Exception',
+	'caption.alt.org.fedora' => 'Fedora Directory Server License',
+	'iri.alt.org.fedora.archive.time_20140723121431' =>
+		'http://directory.fedoraproject.org/wiki/GPL_Exception_License_Text',
+	tags => [
 		'family:gnu:gpl',
 		'type:trait:exception',
 	],
@@ -467,7 +472,7 @@ $RE{except_389} = {
 		. 'with code not covered under the GNU General Public License '
 		. '[(]["]Non-GPL Code["][)] '
 		. 'and to distribute linked combinations including the two, '
-		. 'subject to the limitations in this paragraph[.] '
+		. 'subject to the limitations in this paragraph[. ]'
 		. 'Non[-]GPL Code permitted under this exception '
 		. 'must only link to the code of this Program '
 		. 'through those well defined interfaces identified '
@@ -615,7 +620,7 @@ $RE{except_bison_1_24} = {
 		'when this file is copied by Bison into a Bison output file',
 	'pat.alt.subject.trait.scope.multisection.part.part1' =>
 		'when this file is copied by Bison into a Bison output file, '
-		. 'you may use that output file without restriction[.][ ]',
+		. 'you may use that output file without restriction[. ]',
 	'pat.alt.subject.trait.scope.multisection.part.part2' =>
 		'This special exception was added by the Free Software Foundation'
 		. 'in version 1\.24 of Bison[.]'
@@ -666,6 +671,7 @@ $RE{except_classpath_2} = {
 		'GPL-2.0-with-classpath-exception',
 	'name.alt.org.spdx.since.date_20150513' => 'Classpath-exception-2.0',
 	caption                                 => 'Classpath exception 2.0',
+	'caption.alt.org.fedora'                => 'Classpath exception',
 	'caption.alt.org.spdx.until.date_20150513' =>
 		'GNU General Public License v2.0 w/Classpath exception',
 	'caption.alt.org.spdx.since.date_20150513' => 'Classpath exception 2.0',
@@ -678,7 +684,7 @@ $RE{except_classpath_2} = {
 		'link this library with independent modules',
 	'pat.alt.subject.trait.scope.multisection.part.intro' =>
 		'Linking this library statically or dynamically with other modules '
-		. 'is making a combined work based on this library[.][ ]'
+		. 'is making a combined work based on this library[. ]'
 		. 'Thus, the terms and conditions of the GNU General Public License '
 		. 'cover the whole combination[.][  ]',
 	'pat.alt.subject.trait.scope.multisection.part.part1' =>
@@ -689,13 +695,13 @@ $RE{except_classpath_2} = {
 		. 'under terms of your choice, '
 		. 'provided that you also meet, '
 		. 'for each linked independent module, '
-		. 'the terms and conditions of the license of that module[.][ ]?',
+		. 'the terms and conditions of the license of that module[. ]?',
 	'pat.alt.subject.trait.scope.multisection.part.part2' =>
 		'An independent module is a module '
-		. 'which is not derived from or based on this library[.] '
+		. 'which is not derived from or based on this library[. ]'
 		. 'If you modify this library, '
 		. 'you may extend this exception to your version of the library, '
-		. 'but you are not obligated to do so[.] '
+		. 'but you are not obligated to do so[. ]'
 		. 'If you do not wish to do so, '
 		. 'delete this exception statement from your version[.]',
 };
@@ -748,10 +754,10 @@ $RE{except_epl} = {
 	'pat.alt.subject.trait.scope.paragraph.part.all' =>
 		'you have the permission to link the code of this program '
 		. 'with any library released under the EPL license '
-		. 'and distribute linked combinations including the two[.][ ]'
+		. 'and distribute linked combinations including the two[. ]'
 		. 'If you modify this file, '
 		. 'you may extend this exception to your version of the file, '
-		. 'but you are not obligated to do so[.][ ]'
+		. 'but you are not obligated to do so[. ]'
 		. 'If you do not wish to do so, '
 		. 'delete this exception statement from your version[.]',
 };
@@ -808,6 +814,7 @@ $RE{except_font_2} = {
 	'name.alt.org.spdx.until.date_20150513' => 'GPL-2.0-with-font-exception',
 	'name.alt.org.spdx.since.date_20150513' => 'Font-exception-2.0',
 	caption                                 => 'Font exception 2.0',
+	'caption.alt.org.fedora'                => 'font embedding exception',
 	'caption.alt.org.spdx.until.date_20150513' =>
 		'GNU General Public License v2.0 w/Font exception',
 	'caption.alt.org.spdx.since.date_20150513' => 'Font exception 2.0',
@@ -822,15 +829,13 @@ $RE{except_font_2} = {
 		'if you create a document which uses this font, '
 		. 'and embed this font or unaltered portions of this font into the document, '
 		. 'this font does not by itself cause the resulting document '
-		. 'to be covered by the GNU General Public License'
-		. '[.][ ]'
+		. 'to be covered by the GNU General Public License' . '[. ]'
 		. 'This exception does not however invalidate any other reasons why '
 		. 'the document might be covered by the GNU General Public License'
-		. '[.][ ]'
+		. '[. ]'
 		. 'If you modify this font, '
 		. 'you may extend this exception to your version of the font, '
-		. 'but you are not obligated to do so'
-		. '[.][ ]'
+		. 'but you are not obligated to do so' . '[. ]'
 		. 'If you do not wish to do so, delete this exception statement from your version[.]',
 };
 
@@ -892,7 +897,7 @@ $RE{except_gstreamer} = {
 	'pat.alt.subject.trait.scope.multisection.part.all' =>
 		'The[ word]{1,3} project hereby grant permission '
 		. 'for non-gpl compatible GStreamer plugins '
-		. 'to be used and distributed together with GStreamer and[ word]{1,3}[.] '
+		. 'to be used and distributed together with GStreamer and[ word]{1,3}[. ]'
 		. 'This permission are above and beyond '
 		. 'the permissions granted by the GPL license[ word]{1,3} is covered by[.]',
 };
@@ -934,17 +939,17 @@ $RE{except_mif} = {
 
 	'pat.alt.subject.trait.scope.multisection.part.first' =>
 		'you may use this file '
-		. 'as part of a free software library without restriction[.][ ]'
+		. 'as part of a free software library without restriction[. ]'
 		. 'Specifically, if other files instantiate templates ',
 	'pat.alt.subject.trait.scope.multisection.part.all' =>
 		'you may use this file '
-		. 'as part of a free software library without restriction[.][ ]'
+		. 'as part of a free software library without restriction[. ]'
 		. 'Specifically, if other files instantiate templates '
 		. 'or use macros or inline functions from this file, '
 		. 'or you compile this file and link it with other files '
 		. 'to produce an executable, '
 		. 'this file does not by itself cause the resulting executable '
-		. 'to be covered by the GNU General Public License[.][ ]'
+		. 'to be covered by the GNU General Public License[. ]'
 		. 'This exception does not however invalidate any other reasons '
 		. 'why the executable file might be covered '
 		. 'by the GNU General Public License[.]',
@@ -975,7 +980,7 @@ $RE{except_openssl} = {
 		. '(?:the authors of[ word]{1,8} grant you'
 		. '|the (?:copyright holder|licensors|Free Software Foundation) grants? you'
 		. '|you are granted) '
-		. 'additional permission to convey the resulting work[.] '
+		. 'additional permission to convey the resulting work[. ]'
 		. 'Corresponding Source for a non-source form '
 		. 'of such a combination '
 		. 'shall include the source code for the parts of OpenSSL used '
@@ -1093,7 +1098,7 @@ $RE{except_prefix_generic} = {
 		'(?:In addition, as a special exception, '
 		. '|(?:Exception [*)]FIXME[  ])?'
 		. 'As a special exception, '
-		. '|Grant of Additional Permission[.][ ])',
+		. '|Grant of Additional Permission[. ])',
 };
 
 $RE{except_prefix_gpl} = {
@@ -1123,7 +1128,7 @@ $RE{except_prefix_gpl_clisp} = {
 		. 'that run in CLISP and third-party packages not part of CLISP, '
 		. "if [*)]$clisp_they_only_ref_clisp, "
 		. '[ie] if they don[\']t rely on CLISP internals '
-		. 'and would as well run in any other Common Lisp implementation[.] '
+		. 'and would as well run in any other Common Lisp implementation[. ]'
 		. "Or [*)]$clisp_they_only_ref_clisp "
 		. 'and some external, not CLISP specific, symbols '
 		. 'in third[-]party packages '
@@ -1131,12 +1136,12 @@ $RE{except_prefix_gpl_clisp} = {
 		. 'and that run in a great number of Common Lisp implementations, '
 		. '[ie] if they rely on CLISP internals only to the extent needed '
 		. 'for gaining some functionality also available '
-		. 'in a great number of Common Lisp implementations[.] '
+		. 'in a great number of Common Lisp implementations[. ]'
 		. 'Such user programs are not covered '
-		. 'by the term ["]derived work["] used in the GNU GPL[.] '
+		. 'by the term ["]derived work["] used in the GNU GPL[. ]'
 		. 'Neither is their compiled code, '
 		. '[ie] the result of compiling them '
-		. 'by use of the function COMPILE-FILE[.] '
+		. 'by use of the function COMPILE-FILE[. ]'
 		. 'We refer to such user programs '
 		. 'as ["]independent work["][.][  ]',
 };
@@ -1201,7 +1206,7 @@ $RE{except_qt_gpl_1} = {
 		'you have permission to combine this application with Plugins '
 		. 'licensed under the terms of your choice, '
 		. 'to produce an executable, and to copy and distribute the resulting executable '
-		. 'under the terms of your choice[.] '
+		. 'under the terms of your choice[. ]'
 		. 'However, the executable must be accompanied by a prominent notice '
 		. 'offering all users of the executable the entire source code to this application, '
 		. 'excluding the source code of the independent modules, '
@@ -1246,10 +1251,10 @@ $RE{except_qt_gpl_openssl} = {
 	'pat.alt.subject.trait.scope.paragraph.part.part2' =>
 		' You must comply with the GNU General Public License version 2 '
 		. 'in all respects for all of the code used '
-		. 'other than the ["]OpenSSL["] code[.] '
+		. 'other than the ["]OpenSSL["] code[. ]'
 		. 'If you modify this file, '
 		. 'you may extend this exception to your version of the file, '
-		. 'but you are not obligated to do so[.] '
+		. 'but you are not obligated to do so[. ]'
 		. 'If you do not wish to do so, '
 		. 'delete this exception statement '
 		. 'from your version of this file[.]'
@@ -1289,7 +1294,7 @@ $RE{except_qt_lgpl_1_1} = {
 	'pat.alt.subject.trait.type.reference' =>
 		'(?:Digia|Nokia|The Qt Company) gives you certain',
 	'pat.alt.subject.trait.scope.sentence.type.reference' =>
-		'(?:Digia|Nokia|The Qt Company) gives you certain additional rights[.] '
+		'(?:Digia|Nokia|The Qt Company) gives you certain additional rights[. ]'
 		. 'These rights are described '
 		. 'in The (?:Digia Qt|Nokia Qt|Qt Company) LGPL Exception version 1\.1, '
 		. 'included in the file [word] in this package'
@@ -1347,7 +1352,7 @@ $RE{except_sdc} = {
 		. 'or at your option under any later version[)] '
 		. 'without this special exception[.][  ]',
 	'pat.alt.subject.trait.scope.multisection.part.part3' =>
-		'This special exception was added by Jaros[l-]aw Staniek[.][ ]'
+		'This special exception was added by Jaros[l-]aw Staniek[. ]'
 		. 'Contact him for more licensing options, '
 		. '[eg] using in non-Open Source projects[.]',
 };
@@ -1407,7 +1412,7 @@ $RE{except_warzone} = {
 		. 'give you permission to combine Warzone 2100 '
 		. 'with code included in the standard release of libraries '
 		. 'that are accessible, redistributable and linkable '
-		. 'free of charge[.] '
+		. 'free of charge[. ]'
 		. 'You may copy and distribute such a system '
 		. 'following the terms of the GNU GPL '
 		. 'for Warzone 2100 '
@@ -1416,7 +1421,7 @@ $RE{except_warzone} = {
 		'Note that people who make modified versions of Warzone 2100 '
 		. 'are not obligated to grant this special exception '
 		. 'for their modified versions; '
-		. 'it is their choice whether to do so[.] '
+		. 'it is their choice whether to do so[. ]'
 		. 'The GNU General Public License gives permission '
 		. 'to release a modified version without this exception; '
 		. 'this exception also makes it possible '
@@ -1469,14 +1474,14 @@ $RE{except_wxwindows} = {
 		. 'distributed under the terms of the GNU General Public Licence '
 		. 'or the GNU Library General Public Licence '
 		. 'into a copy of this library, as this licence permits, '
-		. 'the exception does not apply to the code that you add in this way[.][ ]'
+		. 'the exception does not apply to the code that you add in this way[. ]'
 		. 'To avoid misleading anyone as to the status of such modified files, '
 		. 'you must delete this exception notice from such code '
 		. 'and[/]or adjust the licensing conditions notice accordingly[.][  ]',
 	'pat.alt.subject.trait.scope.multisection.part.part4' =>
 		'[*)]If you write modifications of your own for this library, '
 		. 'it is your choice whether to permit this exception '
-		. 'to apply to your modifications[.][ ]'
+		. 'to apply to your modifications[. ]'
 		. 'If you do not wish that, '
 		. 'you must delete the exception notice from such code '
 		. 'and[/]or adjust the licensing conditions notice accordingly[.]',
@@ -1503,20 +1508,20 @@ $RE{except_xerces} = {
 		. 'to link this program with the Xerces-C\+\+ library '
 		. '[(]or with modified versions of Xerces-C\+\+ '
 		. 'that use the same license as Xerces-C\+\+[)], '
-		. 'and distribute linked combinations including the two[.] '
+		. 'and distribute linked combinations including the two[. ]'
 		. 'You must obey the GNU General Public License version 2 '
 		. 'in all respects '
-		. 'for all of the code used other than Xerces-C\+\+[.] '
+		. 'for all of the code used other than Xerces-C\+\+[. ]'
 		. 'If you modify this copy of the program, '
 		. 'you may extend this exception '
 		. 'to your version of the program, '
-		. 'but you are not obligated to do so[.] '
+		. 'but you are not obligated to do so[. ]'
 		. 'If you do not wish to do so, '
 		. 'delete this exception statement from your version[.][  ]',
 	'pat.alt.subject.trait.scope.multisection.part.part2' =>
 		'Furthermore, Code Synthesis Tools CC makes a special exception '
 		. 'for the Free[/]Libre and Open Source Software [(]FLOSS[)] '
-		. 'which is described in the accompanying FLOSSE file[.] '
+		. 'which is described in the accompanying FLOSSE file[. ]'
 };
 
 =item * fsf_unlimited
@@ -1566,17 +1571,17 @@ $RE{generated} = {
 
 # too weak: does not mention file explicitly, so may reflect only a subset
 #		'Generated (?:automatically|by|from|data|with)',
-#		'generated (?:by|from|using)(?: the)?[ word]{1,2}(?: compiler)?[.][ ]'
+#		'generated (?:by|from|using)(?: the)?[ word]{1,2}(?: compiler)?[. ]'
 #			. '(please )?Do not (edit|modify)',
-#		'Machine generated[.][ ](please )?Do not (edit|modify)',
-#		'Do not (edit|modify)[.][ ]Generated (?:by|from|using)',
-#		'(?:created with|trained by)[ word][.][ ](please )?Do not edit',
+#		'Machine generated[. ](please )?Do not (edit|modify)',
+#		'Do not (edit|modify)[. ]Generated (?:by|from|using)',
+#		'(?:created with|trained by)[ word][. ](please )?Do not edit',
 	],
 	'_pat.alt.subject.trait.scope.sentence.target.autotools' => [
 		'Makefile\.in generated by automake [#.]+ from Makefile\.am[.]',
 		'generated automatically by aclocal [#.]+ -\*?- Autoconf',
 		'Generated(?: from[ word])? by GNU Autoconf',
-		'(?:Attempt to guess a canonical system name|Configuration validation subroutine script)[.][ ]'
+		'(?:Attempt to guess a canonical system name|Configuration validation subroutine script)[. ]'
 			. 'Copyright[c] [#-,]+Free Software Foundation',
 		'Calling this script install[-]sh is preferred over install[.]sh, to prevent',
 		'depcomp - compile a program generating dependencies as side-effects[  ]'
@@ -1867,7 +1872,7 @@ $RE{aal} = {
 
 $RE{abstyles} = {
 	name                                    => 'Abstyles',
-	'name.alt.org.fedora.web'               => 'Abstyles',
+	'name.alt.org.fedora.iri.self'          => 'Abstyles',
 	'name.alt.org.spdx.since.date_20140807' => 'Abstyles',
 	caption                                 => 'Abstyles License',
 	'caption.alt.org.tldr'                  => 'Abstyles License',
@@ -1893,13 +1898,13 @@ $RE{adobe_2006} = {
 	name                                    => 'Adobe-2006',
 	'name.alt.misc.scancode'                => 'adobe-scl',
 	'name.alt.org.fedora.synth.nogrant'     => 'Adobe',
-	'name.alt.org.fedora.web'               => 'AdobeLicense',
+	'name.alt.org.fedora.iri.self'          => 'AdobeLicense',
 	'name.alt.org.spdx.since.date_20140807' => 'Adobe-2006',
 	'name.alt.org.tldr' =>
 		'adobe-systems-incorporated-source-code-license-agreement',
 	caption => 'Adobe Systems Incorporated Source Code License Agreement',
-	'caption.alt.org.fedora.web.synth.nogrant' => 'Adobe License',
-	tags                                       => [
+	'caption.alt.org.fedora.misc.web.synth.nogrant' => 'Adobe License',
+	tags                                            => [
 		'license:is:grant',
 		'type:unversioned',
 	],
@@ -1914,12 +1919,13 @@ $RE{adobe_2006} = {
 
 $RE{adobe_glyph} = {
 	name                                    => 'Adobe-Glyph',
-	'name.alt.org.fedora.web.mit.short'     => 'AdobeGlyph',
+	'name.alt.org.fedora.iri.mit_short'     => 'AdobeGlyph',
 	'name.alt.org.spdx.since.date_20140807' => 'Adobe-Glyph',
 	caption                                 => 'Adobe Glyph List License',
-	'caption.alt.org.fedora.web.mit'        => 'Adobe Glyph List Variant',
 	'caption.alt.org.tldr'                  => 'Adobe Glyph List License',
-	tags                                    => [
+	'summary.alt.org.fedora.iri.mit' =>
+		'MIT-style license, Adobe Glyph List Variant',
+	tags => [
 		'license:is:grant',
 		'type:unversioned',
 	],
@@ -1934,7 +1940,8 @@ $RE{adobe_glyph} = {
 
 $RE{adsl} = {
 	name                                    => 'ADSL',
-	'name.alt.org.fedora.web'               => 'AmazonDigitalServicesLicense',
+	'name.alt.org.fedora'                   => 'ADSL',
+	'name.alt.org.fedora.iri.self'          => 'AmazonDigitalServicesLicense',
 	'name.alt.org.spdx.since.date_20140807' => 'ADSL',
 	caption => 'Amazon Digital Services License',
 	tags    => [
@@ -1962,7 +1969,7 @@ $RE{adsl} = {
 =cut
 
 my $termination_for_patent_including_counterclaim
-	= '[*)]Termination for Patent Action[.][ ]'
+	= '[*)]Termination for Patent Action[. ]'
 	. 'This License shall terminate automatically '
 	. 'and You may no longer exercise any of the rights '
 	. 'granted to You by this License '
@@ -1981,7 +1988,7 @@ $RE{afl} = {
 
 # TODO: readd when children cover same region
 #	'pat.alt.subject.license.scope.line.scope.paragraph' =>
-#		'Exclusions [Ff]rom License Grant[.][ ]Neither',
+#		'Exclusions [Ff]rom License Grant[. ]Neither',
 };
 
 $RE{afl_1_1} = {
@@ -2053,14 +2060,15 @@ $RE{afl_2_1} = {
 };
 
 $RE{afl_3} = {
-	name                                => 'AFL-3.0',
-	'name.alt.org.fedora.synth.nogrant' => 'AFL',
-	'name.alt.org.fsf'                  => 'Academic_Free_License_3.0',
-	'name.alt.org.osi'                  => 'AFL-3.0',
-	'name.alt.org.spdx'                 => 'AFL-3.0',
-	'name.alt.org.tldr.path.short'      => 'afl3',
-	'name.alt.misc.fossology_old'       => 'AFL_v3.0',
-	caption                             => 'Academic Free License v3.0',
+	name                                   => 'AFL-3.0',
+	'name.alt.org.fedora.synth.nogrant'    => 'AFL',
+	'name.alt.org.fsf'                     => 'Academic_Free_License_3.0',
+	'name.alt.org.osi'                     => 'AFL-3.0',
+	'name.alt.org.spdx'                    => 'AFL-3.0',
+	'name.alt.org.tldr.path.short'         => 'afl3',
+	'name.alt.misc.fossology_old'          => 'AFL_v3.0',
+	caption                                => 'Academic Free License v3.0',
+	'caption.alt.org.fedora.synth.nogrant' => 'Academic Free License',
 	'caption.alt.org.osi'           => 'Academic Free License ("AFL") v. 3.0',
 	'caption.alt.org.osi.misc.list' => 'Academic Free License 3.0',
 	'caption.alt.org.tldr'          => 'Academic Free License 3.0 (AFL)',
@@ -2083,7 +2091,7 @@ $RE{afl_3} = {
 
 $RE{afmparse} = {
 	name                                    => 'Afmparse',
-	'name.alt.org.fedora.web'               => 'Afmparse',
+	'name.alt.org.fedora.iri.self'          => 'Afmparse',
 	'name.alt.org.spdx.since.date_20140807' => 'Afmparse',
 	caption                                 => 'Afmparse License',
 	'caption.alt.org.tldr'                  => 'Afmparse License',
@@ -2117,13 +2125,13 @@ $RE{afmparse} = {
 
 $RE{agpl} = {
 	name                          => 'AGPL',
-	'name.alt.org.gnu'            => 'AGPL',
+	'name.alt.org.fsf'            => 'AGPL',
 	'name.alt.org.wikidata'       => 'Q1131681',
 	'name.alt.misc.fossology_old' => 'Affero',
 	caption                       => 'GNU Affero General Public License',
 	'caption.alt.misc.short'      => 'Affero GPL',
 	'caption.alt.misc.informal'   => 'Affero License',
-	'caption.alt.org.gnu'       => 'GNU Affero General Public License (AGPL)',
+	'caption.alt.org.fsf'       => 'GNU Affero General Public License (AGPL)',
 	'caption.alt.org.wikipedia' => 'GNU Affero General Public License',
 	tags                        => [
 		'family:gpl',
@@ -2135,9 +2143,11 @@ $RE{agpl} = {
 $RE{agpl_1} = {
 	name                                    => 'AGPLv1',
 	'name.alt.org.debian'                   => 'AGPL-1',
+	'name.alt.org.fedora'                   => 'AGPLv1',
 	'name.alt.org.spdx.since.date_20130410' => 'AGPL-1.0',
 	'name.alt.misc.fossology_old'           => 'Affero_v1',
-	caption => 'Affero General Public License v1.0',
+	caption                  => 'Affero General Public License v1.0',
+	'caption.alt.org.fedora' => 'Affero General Public License 1.0',
 	'caption.alt.org.spdx.until.date_20140807' =>
 		'GNU Affero General Public License v1.0',
 	'caption.alt.org.spdx.since.date_20140807' =>
@@ -2201,14 +2211,16 @@ $RE{agpl_2} = {
 $RE{agpl_3} = {
 	name                                    => 'AGPLv3',
 	'name.alt.org.debian'                   => 'AGPL-3',
-	'name.alt.org.gnu'                      => 'AGPLv3.0',
+	'name.alt.org.fsf'                      => 'AGPLv3.0',
+	'name.alt.org.fedora'                   => 'AGPLv3',
 	'name.alt.org.osi'                      => 'AGPL-3.0',
 	'name.alt.org.perl'                     => 'agpl_3',
 	'name.alt.org.spdx.until.date_20171228' => 'AGPL-3.0',
 	'name.alt.org.tldr.path.short'          => 'agpl3',
 	'name.alt.misc.fossology_old'           => 'Affero_v3',
-	caption => 'GNU Affero General Public License v3.0',
-	'caption.alt.org.gnu' =>
+	caption                  => 'GNU Affero General Public License v3.0',
+	'caption.alt.org.fedora' => 'Affero General Public License 3.0',
+	'caption.alt.org.fsf' =>
 		'GNU Affero General Public License (AGPL) version 3',
 	'caption.alt.org.osi'   => 'GNU Affero General Public License version 3',
 	'caption.alt.org.perl'  => 'GNU Affero General Public License, Version 3',
@@ -2273,10 +2285,12 @@ $RE{agpl_3_only} = {
 $RE{agpl_3_or_later} = {
 	name                                    => 'AGPL-3.0-or-later',
 	'name.alt.org.debian'                   => 'AGPL-3+',
+	'name.alt.org.fedora'                   => 'AGPLv3+',
 	'name.alt.org.spdx.since.date_20171228' => 'AGPL-3.0-or-later',
 	'name.alt.org.trove'                    => 'AGPLv3+',
 	'name.alt.misc.fossology_old'           => 'Affero_v3+',
 	caption => 'GNU Affero General Public License v3.0 or later',
+	'caption.alt.org.fedora' => 'Affero General Public License 3.0 or later',
 	'caption.alt.org.trove' =>
 		'GNU Affero General Public License v3 or later (AGPLv3+)',
 	tags => [
@@ -2295,11 +2309,12 @@ $RE{agpl_3_or_later} = {
 =cut
 
 $RE{aladdin} = {
-	name                    => 'Aladdin',
-	'name.alt.misc.short'   => 'AFPL',
-	caption                 => 'Aladdin Free Public License',
-	'caption.alt.org.trove' => 'Aladdin Free Public License (AFPL)',
-	tags                    => [
+	name                     => 'Aladdin',
+	'name.alt.misc.short'    => 'AFPL',
+	caption                  => 'Aladdin Free Public License',
+	'caption.alt.org.fedora' => 'Aladdin Free Public License',
+	'caption.alt.org.trove'  => 'Aladdin Free Public License (AFPL)',
+	tags                     => [
 		'type:versioned:decimal',
 	],
 };
@@ -2317,7 +2332,7 @@ $RE{aladdin_8} = {
 	licenseversion => '8',
 
 	'pat.alt.subject.license.scope.multisection' =>
-		'laws of the appropriate country[.][  ]0[.] Subject Matter',
+		'laws of the appropriate country[.][  ]0[. ]Subject Matter',
 };
 
 $RE{aladdin_9} = {
@@ -2334,7 +2349,7 @@ $RE{aladdin_9} = {
 	licenseversion => '9',
 
 	'pat.alt.subject.license' =>
-		'This License is not an Open Source license[:] among other things',
+		'This License is not an Open Source license[:][ ]among other things',
 };
 
 =item * amdplpa
@@ -2343,8 +2358,10 @@ $RE{aladdin_9} = {
 
 $RE{amdplpa} = {
 	name                                    => 'AMDPLPA',
+	'name.alt.org.fedora'                   => 'AMDPLPA',
 	'name.alt.org.spdx.since.date_20140807' => 'AMDPLPA',
 	caption                                 => 'AMD\'s plpa_map.c License',
+	'caption.alt.org.fedora.iri.self'       => 'AMD plpa map License',
 	'caption.alt.org.spdx.since.date_20140807.until.date_20201125' =>
 		'AMD\'s plpa_map.c License',
 	'caption.alt.org.spdx.since.date_20201125.until.date_20210307' =>
@@ -2365,8 +2382,10 @@ $RE{amdplpa} = {
 
 $RE{aml} = {
 	name                                    => 'AML',
+	'name.alt.org.fedora'                   => 'AML',
 	'name.alt.org.spdx.since.date_20140807' => 'AML',
 	caption                                 => 'Apple MIT License',
+	'caption.alt.org.fedora.iri.self'       => 'Apple MIT License',
 	'caption.alt.org.tldr'                  => 'Apple MIT License (AML)',
 	tags                                    => [
 		'family:mit',
@@ -2384,10 +2403,14 @@ $RE{aml} = {
 
 $RE{ampas} = {
 	name                                    => 'AMPAS',
+	'name.alt.org.fedora.iri.bsd'           => 'AMPASBSD',
 	'name.alt.org.spdx.since.date_20140807' => 'AMPAS',
 	caption => 'Academy of Motion Picture Arts and Sciences BSD',
+	'caption.alt.org.fedora.misc.short' => 'AMPAS BSD',
 	'caption.alt.org.tldr' =>
 		'Academy of Motion Picture Arts and Sciences BSD',
+	'summary.alt.org.fedora' =>
+		'Academy of Motion Picture Arts and Sciences BSD Variant',
 	tags => [
 		'family:bsd',
 		'license:is:grant',
@@ -2407,9 +2430,10 @@ $RE{ampas} = {
 =cut
 
 $RE{antlr_pd} = {
-	name                   => 'ANTAL-PD',
-	'name.alt.org.spdx'    => 'ANTLR-PD',
-	caption                => 'ANTLR Software Rights Notice',
+	name                           => 'ANTLR-PD',
+	'name.alt.org.fedora.iri.self' => 'ANTLR-PD',
+	'name.alt.org.spdx'            => 'ANTLR-PD',
+	caption                        => 'ANTLR Software Rights Notice',
 	'caption.alt.org.tldr' => 'ANTLR Software Rights Notice (ANTLR-PD)',
 	tags                   => [
 		'license:is:grant',
@@ -2447,12 +2471,15 @@ $RE{apache} = {
 };
 
 $RE{apache_1} = {
-	name                          => 'Apache-1.0',
-	'name.alt.org.spdx'           => 'Apache-1.0',
-	'name.alt.misc.fossology_old' => 'Apache_v1.0',
-	caption                       => 'Apache License 1.0',
-	'caption.alt.org.tldr'        => 'Apache License 1.0 (Apache-1.0)',
-	description                   => <<'END',
+	name                                => 'Apache-1.0',
+	'name.alt.org.fedora'               => 'Apache-1.0',
+	'name.alt.org.spdx'                 => 'Apache-1.0',
+	'name.alt.misc.fossology_old'       => 'Apache_v1.0',
+	caption                             => 'Apache License 1.0',
+	'caption.alt.org.fedora'            => 'Apache Software License 1.0',
+	'caption.alt.org.fedora.misc.short' => 'ASL 1.0',
+	'caption.alt.org.tldr'              => 'Apache License 1.0 (Apache-1.0)',
+	description                         => <<'END',
 Identical to BSD (4 clause), except...
 * extend advertising clause to also require advertising purpose
 * extend non-endorsement clause to include contact info
@@ -2475,19 +2502,21 @@ END
 		. '[word][ word]{0,14}'
 		. '[.][  ][*)]?'
 		. $P{nopromo_neither}
-		. '[.] For written permission, please contact [word]'
+		. '[. ]For written permission, please contact [word]'
 		. '[.][  ]' . '[*)]?'
 		. 'Products derived from this software may not be called'
 };
 
 $RE{apache_1_1} = {
-	name                            => 'Apache-1.1',
-	'name.alt.org.osi'              => 'Apache-1.1',
-	'name.alt.org.perl'             => 'apache_1_1',
-	'name.alt.org.spdx'             => 'Apache-1.1',
-	'name.alt.org.tldr'             => 'apache-license-1.1',
-	'name.alt.misc.fossology_old'   => 'Apache_v1.1',
-	caption                         => 'Apache License 1.1',
+	name                                => 'Apache-1.1',
+	'name.alt.org.osi'                  => 'Apache-1.1',
+	'name.alt.org.perl'                 => 'apache_1_1',
+	'name.alt.org.spdx'                 => 'Apache-1.1',
+	'name.alt.org.tldr'                 => 'apache-license-1.1',
+	'name.alt.misc.fossology_old'       => 'Apache_v1.1',
+	caption                             => 'Apache License 1.1',
+	'caption.alt.org.fedora'            => 'Apache Software License 1.1',
+	'caption.alt.org.fedora.misc.short' => 'ASL 1.1',
 	'caption.alt.org.osi'           => 'Apache Software License, version 1.1',
 	'caption.alt.org.osi.misc.list' => 'Apache Software License 1.1',
 	'caption.alt.org.perl'          => 'Apache Software License, Version 1.1',
@@ -2532,6 +2561,8 @@ $RE{apache_2} = {
 	'name.alt.misc.fossology_old'       => 'Apache_v2.0',
 	'name.alt.misc.fossology_old_short' => 'Apache2.0',
 	caption                             => 'Apache License 2.0',
+	'caption.alt.org.fedora'            => 'Apache Software License 2.0',
+	'caption.alt.org.fedora.misc.short' => 'ASL 2.0',
 	'caption.alt.org.osi'               => 'Apache License, Version 2.0',
 	'caption.alt.org.osi.misc.list'     => 'Apache License 2.0',
 	'caption.alt.org.perl'              => 'Apache License, Version 2.0',
@@ -2563,7 +2594,7 @@ $RE{apache_2} = {
 $RE{apafml} = {
 	name                                    => 'APAFML',
 	'name.alt.org.fedora'                   => 'APAFML',
-	'name.alt.org.fedora.web'               => 'AdobePostscriptAFM',
+	'name.alt.org.fedora.iri.self'          => 'AdobePostscriptAFM',
 	'name.alt.org.spdx.since.date_20140807' => 'APAFML',
 	'name.alt.misc.fossology'               => 'AdobeAFM',
 	'name.alt.misc.fossology_old'           => 'Adobe-AFM',
@@ -2640,8 +2671,9 @@ $RE{apsl_1} = {
 	'name.alt.misc.fossology_old'                     => 'APSL_v1.0',
 	'name.alt.misc.fossology_old_short'               => 'APSL1.0',
 	'name.alt.misc.fossology_old_vague.synth.nogrant' => 'Apple',
-	caption => 'Apple Public Source License 1.0',
-	tags    => [
+	caption                           => 'Apple Public Source License 1.0',
+	'caption.alt.org.fedora.iri.self' => 'Apple Public Source License 1.0',
+	tags                              => [
 		'type:singleversion:apsl',
 	],
 	licenseversion => '1.0',
@@ -2660,6 +2692,7 @@ $RE{apsl_1_1} = {
 	'name.alt.misc.fossology_old'       => 'APSL_v1.',
 	'name.alt.misc.fossology_old_short' => 'APSL1.1',
 	caption                             => 'Apple Public Source License 1.1',
+	'caption.alt.org.fedora.iri.self'   => 'Apple Public Source License 1.1',
 	tags                                => [
 		'type:singleversion:apsl',
 	],
@@ -2679,6 +2712,7 @@ $RE{apsl_1_2} = {
 	'name.alt.misc.fossology_old'       => 'APSL_v1.2',
 	'name.alt.misc.fossology_old_short' => 'APSL1.2',
 	caption                             => 'Apple Public Source License 1.2',
+	'caption.alt.org.fedora.iri.self'   => 'Apple Public Source License 1.2',
 	tags                                => [
 		'type:singleversion:apsl',
 	],
@@ -2698,7 +2732,9 @@ $RE{apsl_2} = {
 	'name.alt.org.spdx'                          => 'APSL-2.0',
 	'name.alt.org.tldr.path.short.synth.nogrant' => 'aspl2',
 	'name.alt.misc.fossology_old'                => 'APSL_v2.0',
-	caption                => 'Apple Public Source License 2.0',
+	caption                             => 'Apple Public Source License 2.0',
+	'caption.alt.org.fedora'            => 'Apple Public Source License 2.0',
+	'caption.alt.org.fedora.misc.short' => 'APSL 2.0',
 	'caption.alt.org.tldr' => 'Apple Public Source License 2.0 (APSL)',
 	'caption.alt.org.osi.misc.cat_list.synth.nogrant' =>
 		'Apple Public Source License',
@@ -2777,14 +2813,14 @@ $RE{artistic_1_cl8} = {
 };
 
 $RE{artistic_1_clarified} = {
-	name                           => 'Artistic-1.0-clarified',
-	'name.alt.org.spdx'            => 'ClArtistic',
-	caption                        => 'Clarified Artistic License',
-	'caption.alt.org.fedora'       => 'Artistic (clarified)',
-	'caption.alt.org.fedora.short' => 'Artistic clarified',
-	'caption.alt.org.fedora.web'   => 'Artistic Clarified',
-	'caption.alt.org.spdx'         => 'Clarified Artistic License',
-	'caption.alt.org.tldr'         => 'Clarified Artistic License',
+	name                                => 'Artistic-1.0-clarified',
+	'name.alt.org.fedora.iri.self'      => 'ArtisticClarified',
+	'name.alt.org.spdx'                 => 'ClArtistic',
+	caption                             => 'Clarified Artistic License',
+	'caption.alt.org.fedora'            => 'Artistic (clarified)',
+	'caption.alt.org.fedora.misc.short' => 'Artistic clarified',
+	'caption.alt.org.spdx'              => 'Clarified Artistic License',
+	'caption.alt.org.tldr'              => 'Clarified Artistic License',
 	iri =>
 		'http://gianluca.dellavedova.org/2011/01/03/clarified-artistic-license/',
 	tags => [
@@ -2828,6 +2864,7 @@ $RE{artistic_2} = {
 	'name.alt.misc.fossology_old'                => 'Artistic_v2.0',
 	'name.alt.misc.fossology_old_short'          => 'Artistic2.0',
 	caption                                      => 'Artistic License 2.0',
+	'caption.alt.org.fedora'                     => 'Artistic 2.0',
 	'caption.alt.org.osi.misc.cat_list'          => 'Artistic license 2.0',
 	'caption.alt.org.perl'      => 'Artistic License, Version 2.0',
 	'caption.alt.org.tldr'      => 'Artistic License 2.0 (Artistic-2.0)',
@@ -2849,6 +2886,7 @@ $RE{artistic_2} = {
 
 $RE{bahyph} = {
 	name                                    => 'Bahyph',
+	'name.alt.org.fedora.iri.self'          => 'Bahyph',
 	'name.alt.org.spdx.since.date_20140807' => 'Bahyph',
 	caption                                 => 'Bahyph License',
 	'caption.alt.org.tldr'                  => 'Bahyph License',
@@ -2867,6 +2905,7 @@ $RE{bahyph} = {
 
 $RE{barr} = {
 	name                                    => 'Barr',
+	'name.alt.org.fedora.iri.self'          => 'Barr',
 	'name.alt.org.spdx.since.date_20140807' => 'Barr',
 	caption                                 => 'Barr License',
 	'caption.alt.org.tldr'                  => 'Barr License',
@@ -2884,11 +2923,10 @@ $RE{barr} = {
 =cut
 
 $RE{bdwgc} = {
-	'name.alt.org.debian'               => 'MIT~Boehm',
-	'name.alt.org.fedora.web.mit.short' => 'AnotherMinimalVariant',
-	caption                             => 'Boehm GC License',
-	'caption.alt.org.fedora.web.mit' =>
-		'Another Minimal variant (found in libatomic_ops)',
+	'name.alt.org.debian' => 'MIT~Boehm',
+	caption               => 'Boehm GC License',
+	'summary.alt.org.fedora.iri.mit' =>
+		'MIT-style license, Another Minimal variant (found in libatomic_ops)',
 	description => <<'END',
 Origin: Possibly Boehm-Demers-Weiser conservative C/C++ Garbage Collector (libgc, bdwgc, boehm-gc).
 END
@@ -2901,8 +2939,7 @@ END
 	'pat.alt.subject.license.scope.paragraph' => $P{perm_granted}
 		. $P{to_copy_prg}
 		. $P{any_purpose}
-		. $P{retain_notices_all}
-		. '[.][ ]'
+		. $P{retain_notices_all} . '[. ]'
 		. $P{perm_dist_mod}
 		. $P{granted}
 		. $P{retain_notices}
@@ -2926,17 +2963,14 @@ END
 	'pat.alt.subject.license.scope.paragraph' => $P{perm_granted}
 		. $P{to_copy_prg}
 		. $P{any_purpose}
-		. $P{retain_notices_all}
-		. '[.][ ]'
+		. $P{retain_notices_all} . '[. ]'
 		. $P{repro_code_cite_authors_copr}
-		. $P{and_used_by_perm} . '[ ]'
-		. $P{repro_matlab_cite_authors}
-		. '[.][ ]'
+		. $P{and_used_by_perm} . '[". ]'
+		. $P{repro_matlab_cite_authors} . '[. ]'
 		. $P{perm_dist_mod}
 		. $P{granted}
 		. $P{retain_notices}
-		. $P{note_mod_inc_with_copr}
-		. '[.][ ]'
+		. $P{note_mod_inc_with_copr} . '[. ]'
 		. $P{retain_you_avail_orig} . '[.]',
 	'pat.alt.subject.license.part.credit' => 'must cite the Authors',
 };
@@ -2948,14 +2982,15 @@ END
 $RE{beerware} = {
 	name                                    => 'Beerware',
 	'name.alt.misc.dash'                    => 'Beer-ware',
-	'name.alt.org.fedora.web'               => 'Beerware',
+	'name.alt.org.fedora.iri.self'          => 'Beerware',
 	'name.alt.org.spdx.since.date_20140807' => 'Beerware',
 	'name.alt.org.tldr.path.short'          => 'beerware',
 	'name.alt.org.wikidata'                 => 'Q10249',
 	caption                                 => 'Beerware License',
 	'caption.alt.org.tldr'                  => 'Beerware License',
 	'caption.alt.org.wikipedia'             => 'Beerware',
-	tags                                    => [
+	iri  => 'https://people.freebsd.org/~phk/',
+	tags => [
 		'license:is:grant',
 		'type:unversioned',
 	],
@@ -2964,24 +2999,54 @@ $RE{beerware} = {
 
 	#<<<  do not let perltidy touch this (keep long regex on one line)
 	examples => [
-		{   summary => 'pattern with subject "license" matches original license with title omitted',
-			gen_args => { grant => 'license' },
+		{   summary => 'pattern with subject "license" matches canonical license',
+			gen_args => { subject => 'license' },
 			str => 'As long as you retain this notice you can do whatever you want with this stuff. If we meet some day, and you think this stuff is worth it, you can buy me a beer in return.',
 			matches => 1,
 		},
-		{   summary => 'pattern with subject "grant" matches original license with title omitted (license is commonly granted by stating the whole license)',
-			gen_args => { grant => 'grant' },
+		{   summary => 'pattern with subject "grant" doesn\'t match canonical license',
+			gen_args => { subject => 'grant' },
 			str => 'As long as you retain this notice you can do whatever you want with this stuff. If we meet some day, and you think this stuff is worth it, you can buy me a beer in return.',
+			matches => 0,
+		},
+		{   summary => 'pattern with subject "grant" matches a license grant',
+			gen_args => { subject => 'grant' },
+			str => 'Licensed under the Beerware License.',
 			matches => 1,
 		},
-		{   summary => 'original license with title omitted doesn\'t match name pattern',
+		{   summary => 'pattern with subject "name" matches canonical license',
+			gen_args => { subject => 'name' },
+			str => 'Beerware License',
+			matches => 1,
+		},
+		{   summary => 'pattern with subject "name" doesn\'t match canonical license',
 			gen_args => { subject => 'name' },
 			str => 'As long as you retain this notice you can do whatever you want with this stuff. If we meet some day, and you think this stuff is worth it, you can buy me a beer in return.',
 			matches => 0,
 		},
-		{   summary => 'pattern with subject "iri" doesn\'t match original license with title omitted',
+		{   summary => 'pattern with subject "name" matches a license grant',
+			gen_args => { subject => 'name' },
+			str => 'Licensed under the Beerware License.',
+			matches => 1,
+		},
+		{   summary => 'pattern with subject "name" doesn\'t match canonical license IRI',
+			gen_args => { subject => 'name' },
+			str => 'https://people.freebsd.org/~phk/',
+			matches => 0,
+		},
+		{   summary => 'pattern with subject "iri" doesn\'t match original license',
 			gen_args => { subject => 'iri' },
 			str => 'As long as you retain this notice you can do whatever you want with this stuff. If we meet some day, and you think this stuff is worth it, you can buy me a beer in return.',
+			matches => 0,
+		},
+		{   summary => 'pattern with subject "iri" doesn\'t match canonical license name',
+			gen_args => { subject => 'iri' },
+			str => 'Beerware License',
+			matches => 0,
+		},
+		{   summary => 'pattern with subject "iri" doesn\'t match a license shortname',
+			gen_args => { subject => 'iri' },
+			str => 'Beerware',
 			matches => 0,
 		},
 	],
@@ -2998,10 +3063,12 @@ $RE{beerware} = {
 =cut
 
 $RE{bittorrent} = {
-	name                          => 'BitTorrent',
-	'name.alt.misc.fossology_old' => 'Bittorrent',
-	caption                       => 'BitTorrent Open Source License',
-	tags                          => [
+	name                              => 'BitTorrent',
+	'name.alt.misc.fossology_old'     => 'Bittorrent',
+	caption                           => 'BitTorrent Open Source License',
+	'caption.alt.org.fedora'          => 'BitTorrent License',
+	'caption.alt.org.fedora.iri.self' => 'BitTorrent Open Source License',
+	tags                              => [
 		'type:versioned:decimal',
 	],
 };
@@ -3030,7 +3097,7 @@ END
 		. 'This BitTorrent Open Source License',
 	'pat.alt.subject.license.scope.multisection.part.part4' =>
 		' has been made available'
-		. '[.][ ]You are responsible for ensuring'
+		. '[. ]You are responsible for ensuring'
 		. ' that the Source Code version remains available'
 		. ' even if the Electronic Distribution Mechanism is maintained by a third party'
 		. '[.][  ][*)]'
@@ -3056,7 +3123,7 @@ $RE{bittorrent_1_1} = {
 		. 'This BitTorrent Open Source License',
 	'pat.alt.subject.license.scope.multisection.part.part4' =>
 		' is distributed by you'
-		. '[.][ ]You are responsible for ensuring'
+		. '[. ]You are responsible for ensuring'
 		. ' that the Source Code version remains available'
 		. ' even if the Electronic Distribution Mechanism is maintained by a third party'
 		. '[.][  ][*)]'
@@ -3069,6 +3136,7 @@ $RE{bittorrent_1_1} = {
 
 $RE{borceux} = {
 	name                                    => 'Borceux',
+	'name.alt.org.fedora.iri.self'          => 'Borceux',
 	'name.alt.org.spdx.since.date_20140807' => 'Borceux',
 	caption                                 => 'Borceux license',
 	'caption.alt.org.tldr'                  => 'Borceux license',
@@ -3087,11 +3155,14 @@ $RE{borceux} = {
 
 $RE{bsd_0_clause} = {
 	name                                    => '0BSD',
+	'name.alt.org.fedora'                   => '0BSD',
+	'name.alt.org.fedora.iri.self'          => 'ZeroClauseBSD',
 	'name.alt.org.osi'                      => '0BSD',
 	'name.alt.org.osi.misc.free'            => 'FPL-1.0.0',
 	'name.alt.org.spdx.since.date_20150930' => '0BSD',
 	'name.alt.org.tldr'                     => 'bsd-0-clause-license',
 	caption                                 => 'BSD 0-Clause License',
+	'caption.alt.org.fedora'                => 'Zero-Clause BSD',
 	'caption.alt.org.osi'                   => 'Zero-Clause BSD',
 	'caption.alt.org.osi.misc.old' =>
 		'Zero-Clause BSD / Free Public License 1.0.0',
@@ -3155,8 +3226,6 @@ $RE{bsd_1_clause} = {
 $RE{bsd_2_clause} = {
 	name                                => 'BSD-2-Clause',
 	'name.alt.org.debian'               => 'BSD-2-clause',
-	'name.alt.org.fedora.synth.nogrant' => 'BSD',
-	'name.alt.org.fedora.web.bsd'       => '2ClauseBSD',
 	'name.alt.org.osi'                  => 'BSD-2-Clause',
 	'name.alt.org.perl'                 => 'freebsd',
 	'name.alt.org.spdx'                 => 'BSD-2-Clause',
@@ -3166,7 +3235,7 @@ $RE{bsd_2_clause} = {
 	'name.alt.misc.freebsd'             => 'FreeBSD',
 	'name.alt.misc.simplified'          => 'Simplified-BSD',
 	caption                             => 'BSD 2-Clause License',
-	'caption.alt.org.fedora'            => 'BSD License (two clause)',
+	'caption.alt.org.fedora.misc.cc'    => 'Creative Commons BSD',
 	'caption.alt.org.osi'               => 'The 2-Clause BSD License',
 	'caption.alt.org.osi.misc.list'     => '2-clause BSD License',
 	'caption.alt.org.osi.misc.cat_list' => '2-clause BSD license',
@@ -3176,12 +3245,14 @@ $RE{bsd_2_clause} = {
 	'caption.alt.org.spdx.since.date_20171228' =>
 		'BSD 2-Clause "Simplified" License',
 	'caption.alt.org.tldr' => 'BSD 2-Clause License (FreeBSD/Simplified)',
-	'caption.alt.org.wikipedia.bsd' =>
+	'caption.alt.org.wikipedia.iri.bsd' =>
 		'2-clause license ("Simplified BSD License" or "FreeBSD License")',
 	'caption.alt.misc.parens'     => 'BSD (2 clause)',
 	'caption.alt.misc.simplified' => 'Simplified BSD License',
 	'caption.alt.misc.qemu' =>
 		'BSD Licence (without advertising or endorsement clauses)',
+	'iri.alt.org.cc.archive.time_20110401183132.until.date_20110401' =>
+		'http://creativecommons.org/licenses/BSD/', # TODO: find official date
 	tags => [
 		'family:bsd',
 		'license:is:grant',
@@ -3202,16 +3273,19 @@ $RE{bsd_2_clause} = {
 
 $RE{bsd_2_clause_freebsd} = {
 	name                                    => 'BSD-2-Clause-FreeBSD',
+	'name.alt.org.fedora.iri.bsd'           => '2ClauseBSD',
 	'name.alt.org.spdx.until.date_20200803' => 'BSD-2-Clause-FreeBSD',
 	caption                                 => 'BSD 2-clause FreeBSD License',
-	'caption.alt.org.freebsd'               => 'FreeBSD License',
+	'caption.alt.org.fedora'                => 'BSD License (two clause)',
+	'caption.alt.org.steward'               => 'FreeBSD License',
 	'caption.alt.org.spdx.until.date_20130117' =>
 		'BSD 2-clause "FreeBSD" License',
 	'caption.alt.org.spdx.since.date_20130117.until.date_20171228' =>
 		'BSD 2-clause FreeBSD License',
 	'caption.alt.org.spdx.since.date_20171228' =>
 		'BSD 2-Clause FreeBSD License',
-	tags => [
+	'summary.alt.org.fedora.iri.bsd' => 'FreeBSD BSD Variant (2 clause BSD)',
+	tags                             => [
 		'family:bsd',
 		'license:contains:license:bsd_2_clause_views',
 		'license:is:grant',
@@ -3223,8 +3297,7 @@ $RE{bsd_2_clause_freebsd} = {
 		. '[.][  ]'
 		. $P{repro_copr_cond_discl}
 		. '[.][  ]'
-		. $P{discl_warranties}
-		. '[.][ ]'
+		. $P{discl_warranties} . '[. ]'
 		. $P{discl_liability}
 		. '[.][  ]'
 		. 'The views and conclusions contained in the software and documentation '
@@ -3272,10 +3345,13 @@ $RE{bsd_2_clause_netbsd} = {
 
 $RE{bsd_2_clause_patent} = {
 	name                                    => 'BSD+Patent',
+	'name.alt.org.fedora'                   => 'BSD-2-Clause-Patent',
+	'name.alt.org.fedora.iri.self'          => 'BSD-2-Clause-Patent',
 	'name.alt.org.osi'                      => 'BSDplusPatent',
 	'name.alt.org.osi.misc.shortname'       => 'BSD-2-Clause-Patent',
 	'name.alt.org.spdx.since.date_20171228' => 'BSD-2-Clause-Patent',
-	caption => 'BSD 2-Clause Plus Patent License',
+	caption                  => 'BSD 2-Clause Plus Patent License',
+	'caption.alt.org.fedora' => 'BSD + Patent',
 	'caption.alt.org.spdx.since.date_20171228' =>
 		'BSD 2-Clause Plus Patent License',
 	'caption.alt.org.spdx.since.date_20171228' =>
@@ -3320,8 +3396,7 @@ $RE{bsd_2_clause_views} = {
 		. '[.][  ]'
 		. $P{repro_copr_cond_discl}
 		. '[.][  ]'
-		. $P{discl_warranties}
-		. '[.][ ]'
+		. $P{discl_warranties} . '[. ]'
 		. $P{discl_liability}
 		. '[.][  ]'
 		. 'The views and conclusions contained in the software and documentation '
@@ -3335,20 +3410,21 @@ $RE{bsd_2_clause_views} = {
 =cut
 
 $RE{bsd_3_clause} = {
-	name                                  => 'BSD-3-Clause',
-	'name.alt.org.debian'                 => 'BSD-3-clause',
-	'name.alt.org.fedora.synth.nogrant'   => 'BSD',
-	'name.alt.org.fedora.web.bsd'         => '3ClauseBSD',
-	'name.alt.org.osi'                    => 'BSD-3-Clause',
-	'name.alt.org.perl.synth.nogrant'     => 'bsd',
-	'name.alt.org.spdx'                   => 'BSD-3-Clause',
-	'name.alt.org.tldr.path.short'        => 'bsd3',
-	'name.alt.misc.clauses'               => '3-clause-BSD',
-	'name.alt.misc.eclipse'               => 'EPL',
-	'name.alt.misc.eclipse_1'             => 'EPL-1.0',
-	'name.alt.misc.modified'              => 'Modified-BSD',
-	caption                               => 'BSD 3-Clause License',
-	'caption.alt.org.fedora'              => 'BSD License (no advertising)',
+	name                              => 'BSD-3-Clause',
+	'name.alt.org.debian'             => 'BSD-3-clause',
+	'name.alt.org.fedora.iri.bsd'     => '3ClauseBSD',
+	'name.alt.org.osi'                => 'BSD-3-Clause',
+	'name.alt.org.perl.synth.nogrant' => 'bsd',
+	'name.alt.org.spdx'               => 'BSD-3-Clause',
+	'name.alt.org.tldr.path.short'    => 'bsd3',
+	'name.alt.misc.clauses'           => '3-clause-BSD',
+	'name.alt.misc.eclipse'           => 'EPL',
+	'name.alt.misc.eclipse_1'         => 'EPL-1.0',
+	'name.alt.misc.modified'          => 'Modified-BSD',
+	caption                           => 'BSD 3-Clause License',
+	'caption.alt.org.fedora'          => 'New BSD',
+	'caption.alt.org.fedora.misc.eclipse' =>
+		'Eclipse Distribution License 1.0',
 	'caption.alt.org.osi'                 => 'The 3-Clause BSD License',
 	'caption.alt.org.osi.misc.list'       => '3-clause BSD License',
 	'caption.alt.org.osi.misc.list_lower' => '3-clause BSD license',
@@ -3358,16 +3434,18 @@ $RE{bsd_3_clause} = {
 	'caption.alt.org.spdx.since.date_20171228' =>
 		'BSD 3-Clause "New" or "Revised" License',
 	'caption.alt.org.tldr' => 'BSD 3-Clause License (Revised)',
-	'caption.alt.org.wikipedia.bsd' =>
+	'caption.alt.org.wikipedia.iri.bsd' =>
 		'3-clause license ("BSD License 2.0", "Revised BSD License", "New BSD License", or "Modified BSD License")',
 	'caption.alt.misc.eclipse'    => 'Eclipse Distribution License',
 	'caption.alt.misc.modified'   => 'Modified BSD License',
-	'caption.alt.misc.new'        => 'New BSD License',
 	'caption.alt.misc.new_lower'  => 'new BSD License',
 	'caption.alt.misc.new_parens' => '(new) BSD License',
 	'caption.alt.misc.parens'     => 'BSD (3 clause)',
-	'caption.alt.misc.qemu' => 'BSD Licence (without advertising clause)',
-	tags                    => [
+	'caption.alt.misc.qemu'  => 'BSD Licence (without advertising clause)',
+	'summary.alt.org.fedora' => 'BSD License (no advertising)',
+	'summary.alt.org.fedora.misc.new_bsd' =>
+		'New BSD (no advertising, 3 clause)',
+	tags => [
 		'family:bsd',
 		'license:contains:license:bsd_2_clause',
 		'license:is:grant',
@@ -3394,7 +3472,12 @@ $RE{bsd_3_clause_attribution} = {
 	name                                    => 'BSD-3-Clause-Attribution',
 	'name.alt.org.spdx.since.date_20140807' => 'BSD-3-Clause-Attribution',
 	caption                                 => 'BSD with attribution',
-	tags                                    => [
+	'caption.alt.org.fedora.iri.self'       => 'BSD with attribution',
+
+	# has word "Attribution title-cased, unlike caption
+	'iri.alt.org.fedora.iri.self' =>
+		'https://fedoraproject.org/wiki/Licensing/BSD_with_Attribution',
+	tags => [
 		'family:bsd',
 		'license:contains:license:bsd_3_clause',
 		'license:is:grant',
@@ -3430,7 +3513,7 @@ $RE{bsd_3_clause_clear} = {
 		$P{nopromo_neither}
 		. '[.][  ]'
 		. 'NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY[\']S PATENT RIGHTS ARE GRANTED BY THIS LICENSE'
-		. '[.][ ]'
+		. '[. ]'
 		. $P{discl_warranties},
 };
 
@@ -3440,9 +3523,11 @@ $RE{bsd_3_clause_clear} = {
 
 $RE{bsd_3_clause_lbnl} = {
 	name                                    => 'BSD-3-Clause-LBNL',
+	'name.alt.org.fedora.iri.self'          => 'LBNLBSD',
 	'name.alt.org.osi'                      => 'BSD-3-Clause-LBNL',
 	'name.alt.org.spdx.since.date_20140807' => 'BSD-3-Clause-LBNL',
 	caption => 'Lawrence Berkeley National Labs BSD variant license',
+	'caption.alt.org.fedora.misc.short' => 'LBNL BSD',
 	'caption.alt.org.osi' =>
 		'Lawrence Berkeley National Labs BSD Variant License',
 	'caption.alt.org.osi.misc.list_bsd' => 'BSD-3-Clause-LBNL',
@@ -3455,9 +3540,8 @@ $RE{bsd_3_clause_lbnl} = {
 		$P{nopromo_neither}
 		. '[.][  ]'
 		. 'NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY[\']S PATENT RIGHTS ARE GRANTED BY THIS LICENSE'
-		. '[.][ ]'
-		. $P{discl_warranties}
-		. '[.][ ]'
+		. '[. ]'
+		. $P{discl_warranties} . '[. ]'
 		. $P{discl_liability}
 		. '[.][  ]'
 		. 'You are under no obligation whatsoever to provide any bug fixes',
@@ -3508,8 +3592,7 @@ $RE{bsd_3_clause_no_military_license} = {
 	'pat.alt.subject.license.scope.multisection.part.second_half' =>
 		$P{nopromo_neither}
 		. '[.][  ]'
-		. $P{discl_warranties}
-		. '[.][ ]'
+		. $P{discl_warranties} . '[. ]'
 		. $P{discl_liability}
 		. '[.][  ]'
 		. 'YOU ACKNOWLEDGE THAT THIS SOFTWARE'
@@ -3537,12 +3620,9 @@ $RE{bsd_3_clause_no_nuclear_license} = {
 	'pat.alt.subject.license.scope.multisection.part.second_half' =>
 		$P{nopromo_neither}
 		. '[.][  ]'
-		. $P{discl_warranties_any_kind}
-		. '[.][ ]'
-		. $P{discl_warranties_excluded}
-		. '[.][ ]'
-		. $P{discl_liability_suffered}
-		. '[.][ ]'
+		. $P{discl_warranties_any_kind} . '[. ]'
+		. $P{discl_warranties_excluded} . '[. ]'
+		. $P{discl_liability_suffered} . '[. ]'
 		. $P{discl_liability_revenue}
 		. '[.][  ]'
 		. 'You acknowledge that this software'
@@ -3570,8 +3650,7 @@ $RE{bsd_3_clause_no_nuclear_license_2014} = {
 	'pat.alt.subject.license.scope.multisection.part.second_half' =>
 		$P{nopromo_neither}
 		. '[.][  ]'
-		. $P{discl_warranties}
-		. '[.][ ]'
+		. $P{discl_warranties} . '[. ]'
 		. $P{discl_liability}
 		. '[.][  ]'
 		. 'You acknowledge that this software'
@@ -3603,12 +3682,9 @@ $RE{bsd_3_clause_no_nuclear_warranty} = {
 	'pat.alt.subject.license.scope.multisection.part.second_half' =>
 		$P{nopromo_neither}
 		. '[.][  ]'
-		. $P{discl_warranties_any_kind}
-		. '[.][ ]'
-		. $P{discl_warranties_excluded}
-		. '[.][ ]'
-		. $P{discl_liability_suffered}
-		. '[.][ ]'
+		. $P{discl_warranties_any_kind} . '[. ]'
+		. $P{discl_warranties_excluded} . '[. ]'
+		. $P{discl_liability_suffered} . '[. ]'
 		. $P{discl_liability_revenue}
 		. '[.][  ]'
 		. 'You acknowledge that this software'
@@ -3622,25 +3698,27 @@ $RE{bsd_3_clause_no_nuclear_warranty} = {
 =cut
 
 $RE{bsd_4_clause} = {
-	name                           => 'BSD-4-Clause',
-	'name.alt.org.debian'          => 'BSD-4-clause',
-	'name.alt.org.fedora.web.bsd'  => 'BSDwithAdvertising',
-	'name.alt.org.spdx'            => 'BSD-4-Clause',
-	'name.alt.org.tldr'            => '4-clause-bsd',
-	'name.alt.misc.clauses'        => '4-clause-BSD',
-	caption                        => 'BSD 4-Clause License',
-	'caption.alt.org.fedora'       => 'BSD License (original)',
-	'caption.alt.org.fedora.short' => 'BSD with advertising',
+	name                                  => 'BSD-4-Clause',
+	'name.alt.org.debian'                 => 'BSD-4-clause',
+	'name.alt.org.fedora.iri.bsd'         => 'BSDwithAdvertising',
+	'name.alt.org.spdx'                   => 'BSD-4-Clause',
+	'name.alt.org.tldr'                   => '4-clause-bsd',
+	'name.alt.misc.clauses'               => '4-clause-BSD',
+	caption                               => 'BSD 4-Clause License',
+	'caption.alt.org.fedora'              => 'BSD License (original)',
+	'caption.alt.org.fedora.misc.summary' => 'Original BSD License',
 	'caption.alt.org.spdx.until.date_20171228' =>
 		'BSD 4-clause "Original" or "Old" License',
 	'caption.alt.org.spdx.since.date_20171228' =>
 		'BSD 4-Clause "Original" or "Old" License',
 	'caption.alt.org.tldr' => '4-Clause BSD',
-	'caption.alt.org.wikipedia.bsd' =>
+	'caption.alt.org.wikipedia.iri.bsd' =>
 		'4-clause license (original "BSD License")',
 	'caption.alt.misc.qemu'   => 'BSD Licence (with advertising clause)',
 	'caption.alt.misc.parens' => 'BSD (4 clause)',
-	tags                      => [
+	'summary.alt.org.fedora.iri.bsd' =>
+		'Original BSD License (BSD with advertising)',
+	tags => [
 		'family:bsd',
 		'license:contains:license:bsd_3_clause',
 		'license:is:grant',
@@ -3669,11 +3747,10 @@ $RE{bsd_4_clause} = {
 =cut
 
 $RE{bsd_4_clause_uc} = {
-	name                          => 'BSD-4-Clause-UC',
-	'name.alt.org.fedora.web.bsd' => 'BSDwithAdvertising',
-	'name.alt.org.spdx'           => 'BSD-4-Clause-UC',
-	caption     => 'BSD-4-Clause (University of California-Specific)',
-	description => <<'END',
+	name                => 'BSD-4-Clause-UC',
+	'name.alt.org.spdx' => 'BSD-4-Clause-UC',
+	caption             => 'BSD-4-Clause (University of California-Specific)',
+	description         => <<'END',
 Specific instance of BSD 4-Clause License,
 tied to "University of California, Berkeley".
 END
@@ -3706,6 +3783,8 @@ $RE{bsd_protection} = {
 	name                                    => 'BSD-Protection',
 	'name.alt.org.spdx.since.date_20140807' => 'BSD-Protection',
 	caption                                 => 'BSD Protection License',
+	'caption.alt.org.fedora.iri.self'       => 'BSD Protection License',
+	'caption.alt.org.fedora.misc.short'     => 'BSD Protection',
 	tags                                    => [
 		'type:unversioned',
 	],
@@ -3721,12 +3800,10 @@ $RE{bsd_protection} = {
 =cut
 
 $RE{bsl} = {
-	name                                => 'BSL',
-	'name.alt.misc.fossology_old'       => 'Boost',
-	'name.alt.org.fedora.web.mit.short' => 'Thrift',
-	caption                             => 'Boost Software License',
-	'caption.alt.misc.mixedcase'        => 'boost Software License',
-	'caption.alt.org.fedora.web.mit'    => 'Thrift variant',
+	name                          => 'BSL',
+	'name.alt.misc.fossology_old' => 'Boost',
+	caption                       => 'Boost Software License',
+	'caption.alt.misc.mixedcase'  => 'boost Software License',
 	'iri.alt.org.wikipedia' =>
 		'https://en.wikipedia.org/wiki/Boost_Software_License#License',
 	tags => [
@@ -3735,22 +3812,21 @@ $RE{bsl} = {
 };
 
 $RE{bsl_1} = {
-	name                => 'BSL-1.0',
-	'name.alt.org.osi'  => 'BSL-1.0',
-	'name.alt.org.spdx' => 'BSL-1.0',
+	name                                => 'BSL-1.0',
+	'name.alt.org.osi'                  => 'BSL-1.0',
+	'name.alt.org.fedora.synth.nogrant' => 'Boost',
+	'name.alt.org.spdx'                 => 'BSL-1.0',
 	'name.alt.org.tldr' => 'boost-software-license-1.0-explained',
 	'name.alt.org.tldr.path.short.synth.nogrant' => 'boost',
 	'name.alt.misc.fossology_old'                => 'Boost_v1.0',
-	caption                      => 'Boost Software License 1.0',
+	caption                                => 'Boost Software License 1.0',
+	'caption.alt.org.fedora.synth.nogrant' => 'Boost Software License',
 	'caption.alt.misc.mixedcase' => 'boost Software License, Version 1.0',
 	'caption.alt.org.osi.misc.list.synth.nogrant' => 'Boost Software License',
-	'caption.alt.org.tldr'     => 'Boost Software License 1.0 (BSL-1.0)',
-	'caption.alt.org.trove'    => 'Boost Software License 1.0 (BSL-1.0)',
-	'caption.alt.org.facebook' => 'Thrift Software License',
-	iri                        => 'http://www.boost.org/LICENSE_1_0.txt',
-	'iri.alt.org.facebook.archive.time_20070630190325' =>
-		'http://developers.facebook.com/thrift/',
-	tags => [
+	'caption.alt.org.tldr'  => 'Boost Software License 1.0 (BSL-1.0)',
+	'caption.alt.org.trove' => 'Boost Software License 1.0 (BSL-1.0)',
+	iri                     => 'http://www.boost.org/LICENSE_1_0.txt',
+	tags                    => [
 		'license:is:grant',
 		'type:singleversion:bsl',
 	],
@@ -3780,7 +3856,7 @@ $RE{bzip2} = {
 		. 'the above copyright notice, this list of conditions '
 		. 'and the following disclaimer[.][  ]'
 		. '[*)]The origin of this software must not be misrepresented[;] '
-		. 'you must not claim that you wrote the original software[.] '
+		. 'you must not claim that you wrote the original software[. ]'
 		. 'If you use this software in a product, '
 		. 'an acknowledgment in the product documentation '
 		. 'would be appreciated but is not required[.][  ]'
@@ -3893,10 +3969,11 @@ $RE{catosl} = {
 };
 
 $RE{catosl_1_1} = {
-	name                          => 'CATOSL-1.1',
-	'name.alt.org.osi'            => 'CATOSL-1.1',
-	'name.alt.org.spdx'           => 'CATOSL-1.1',
-	'name.alt.misc.fossology_old' => 'CA1.1',
+	name                                => 'CATOSL-1.1',
+	'name.alt.org.fedora.synth.nogrant' => 'CATOSL',
+	'name.alt.org.osi'                  => 'CATOSL-1.1',
+	'name.alt.org.spdx'                 => 'CATOSL-1.1',
+	'name.alt.misc.fossology_old'       => 'CA1.1',
 	caption => 'Computer Associates Trusted Open Source License 1.1',
 	'caption.alt.org.tldr' =>
 		'Computer Associates Trusted Open Source License 1.1 (CATOSL-1.1)',
@@ -3906,7 +3983,7 @@ $RE{catosl_1_1} = {
 	licenseversion => '1.1',
 
 	'pat.alt.subject.license' =>
-		'Contribution means [(]a[)] in the case of CA, the Original Program',
+		'Contribution means[*)]in the case of CA, the Original Program',
 };
 
 =item * cc_by
@@ -3936,14 +4013,14 @@ my $credit_author_if_supplied
 	= ' give the Original Author credit reasonable to the medium or means You are utilizing by conveying the name [(]or pseudonym if applicable[)] of the Original Author if supplied;';
 my $credit_author_or_designated_party
 	= ' provide, reasonable to the medium or means You are utilizing[:]?'
-	. ' [(]i[)] the name of the Original Author [(]or pseudonym, if applicable[)] if supplied, and[/]or'
-	. ' [(]ii[)] if the Original Author and[/]or Licensor designate another party or parties'
+	. ' [*)] the name of the Original Author [(]or pseudonym, if applicable[)] if supplied, and[/]or'
+	. ' [*)] if the Original Author and[/]or Licensor designate another party or parties'
 	. ' [(][eg] a sponsor institute, publishing entity, journal[)]'
 	. ' for attribution in Licensor[\']?s copyright notice, terms of service or by other reasonable means,'
 	. ' the name of such party or parties;';
 
 #" if the Original Author and[/]or Licensor designate another party or parties [(][eg], a sponsor institute, publishing entity, journal[)] for attribution [(]["]Attribution Parties["][)] in Licensor[']?s copyright notice, terms of service or by other reasonable means, the name of such party or parties;";
-#' [(]ii[)] the title of the Work if supplied;';
+#' [*)] the title of the Work if supplied;';
 my $to_extend_URI
 	= ' to the extent reasonably practicable, the Uniform Resource Identifier, if any, that Licensor specifies to be associated with the Work,'
 	. ' unless such URI does not refer to the copyright notice or licensing information for the Work; and';
@@ -3953,11 +4030,13 @@ my $to_extend_URI
 
 $RE{cc_by} = {
 	name                                                    => 'CC-BY',
+	'name.alt.org.fedora'                                   => 'CC-BY',
 	'name.alt.org.cc'                                       => 'CC-BY',
 	'name.alt.misc.fossology_old_vague.synth.nogrant'       => 'CCPL',
 	'name.alt.misc.fossology_old_vague_short.synth.nogrant' => 'CCA',
-	caption => 'Creative Commons Attribution',
-	tags    => [
+	caption                  => 'Creative Commons Attribution',
+	'caption.alt.org.fedora' => 'Creative Commons Attribution license',
+	tags                     => [
 		'family:cc:standard',
 		'type:versioned:decimal',
 	],
@@ -3994,7 +4073,7 @@ $RE{cc_by_1} = {
 	licenseversion => '1.0',
 
 	'pat.alt.subject.license.scope.multisection.part.part4' =>
-		'as requested[.][ ]' . '[*)]?'
+		'as requested[. ]' . '[*)]?'
 		. $if_dist_work_or_works_keep_intact_notices
 		. $credit_author_if_supplied
 		. ' the title of the Work if supplied;'
@@ -4026,7 +4105,7 @@ $RE{cc_by_2} = {
 	licenseversion => '2.0',
 
 	'pat.alt.subject.license.scope.multisection.part.part4' =>
-		'as requested[.][ ]' . '[*)]?'
+		'as requested[. ]' . '[*)]?'
 		. $if_dist_work_or_works_keep_intact_notices
 		. $credit_author_if_supplied
 		. ' the title of the Work if supplied;'
@@ -4061,7 +4140,7 @@ $RE{cc_by_2_5} = {
 	licenseversion => '2.5',
 
 	'pat.alt.subject.license.scope.multisection.part.part4' =>
-		'as requested[.][ ]' . '[*)]?'
+		'as requested[. ]' . '[*)]?'
 		. $if_dist_work_or_works_keep_intact_notices
 		. $credit_author_or_designated_party
 		. ' the title of the Work if supplied;'
@@ -4100,7 +4179,7 @@ $RE{cc_by_3} = {
 	licenseversion => '3.0',
 
 	'pat.alt.subject.license.scope.multisection.part.part4' =>
-		'as requested[.][ ]' . '[*)]?'
+		'as requested[. ]' . '[*)]?'
 		. $if_dist_work_or_collections_keep_intact_notices
 
 #              . $credit_author_or_designated_party
@@ -4159,10 +4238,11 @@ $RE{cc_by_4} = {
 =cut
 
 $RE{cc_by_nc} = {
-	name              => 'CC-BY-NC',
-	'name.alt.org.cc' => 'CC-BY-NC',
-	caption           => 'Creative Commons Attribution-NonCommercial',
-	tags              => [
+	name                     => 'CC-BY-NC',
+	'name.alt.org.cc'        => 'CC-BY-NC',
+	caption                  => 'Creative Commons Attribution-NonCommercial',
+	'caption.alt.org.fedora' => 'Creative Commons Attribution-NonCommercial',
+	tags                     => [
 		'family:cc:standard',
 		'type:versioned:decimal',
 	],
@@ -4341,6 +4421,8 @@ $RE{cc_by_nc_nd} = {
 		'Creative Commons Attribution-NonCommercial-NoDerivs',
 	'caption.alt.org.cc.misc.abbrev_flipped' =>
 		'Creative Commons Attribution-NoDerivs-NonCommercial',
+	'caption.alt.org.fedora' =>
+		'Creative Commons Attribution-NonCommercial-NoDerivs',
 	tags => [
 		'family:cc:standard',
 		'type:versioned:decimal',
@@ -4516,7 +4598,9 @@ $RE{cc_by_nc_sa} = {
 	name              => 'CC-BY-NC-SA',
 	'name.alt.org.cc' => 'CC-BY-NC-SA',
 	caption => 'Creative Commons Attribution-NonCommercial-ShareAlike',
-	tags    => [
+	'caption.alt.org.fedora' =>
+		'Creative Commons Attribution-NonCommercial-ShareAlike',
+	tags => [
 		'family:cc:standard',
 		'type:versioned:decimal',
 	],
@@ -4687,12 +4771,14 @@ $RE{cc_by_nc_sa_4} = {
 =cut
 
 $RE{cc_by_nd} = {
-	name              => 'CC-BY-ND',
-	'name.alt.org.cc' => 'CC-BY-ND',
-	caption           => 'Creative Commons Attribution-NoDerivatives',
+	name                  => 'CC-BY-ND',
+	'name.alt.org.cc'     => 'CC-BY-ND',
+	'name.alt.org.fedora' => 'CC-BY-ND',
+	caption               => 'Creative Commons Attribution-NoDerivatives',
 	'caption.alt.org.cc.misc.abbrev' =>
 		'Creative Commons Attribution-NoDerivs',
-	tags => [
+	'caption.alt.org.fedora' => 'Creative Commons Attribution-NoDerivs',
+	tags                     => [
 		'family:cc:standard',
 		'type:versioned:decimal',
 	],
@@ -4860,6 +4946,7 @@ $RE{cc_by_nd_4} = {
 $RE{cc_by_sa} = {
 	name                          => 'CC-BY-SA',
 	'name.alt.org.cc'             => 'CC-BY-SA',
+	'name.alt.org.fedora'         => 'CC-BY-SA',
 	'name.alt.misc.fossology_old' => 'CCA_SA',
 	caption => 'Creative Commons Attribution-ShareAlike',
 	tags    => [
@@ -5026,10 +5113,11 @@ $RE{cc_by_sa_4} = {
 =cut
 
 $RE{cc_cc0} = {
-	name                    => 'CC0',
-	'name.alt.org.cc'       => 'CC0',
-	caption                 => 'Creative Commons CC0',
-	'caption.alt.misc.zero' => 'Creative Commons Zero',
+	name                     => 'CC0',
+	'name.alt.org.cc'        => 'CC0',
+	caption                  => 'Creative Commons CC0',
+	'caption.alt.org.fedora' => 'Creative Commons Zero 1.0 Universal',
+	'caption.alt.misc.zero'  => 'Creative Commons Zero',
 	'iri.alt.org.wikipedia' =>
 		'https://en.wikipedia.org/wiki/Creative_Commons_license#Zero_/_public_domain',
 	tags => [
@@ -5439,7 +5527,7 @@ END
 	licenseversion => '1.0',
 
 	'pat.alt.subject.license.scope.line.scope.paragraph.part.part3a' =>
-		'Re-creativity[.][ ]You may',
+		'Re-creativity[. ]You may',
 };
 
 =item * cc_sp
@@ -5473,6 +5561,7 @@ $RE{cc_sp_1} = {
 	caption              => 'Creative Commons Sampling Plus 1.0',
 	'caption.alt.org.cc' => 'Sampling Plus 1.0',
 	'caption.alt.org.cc.misc.shortname.synth.nogrant' => 'CC Sampling+ 1.0',
+	'caption.alt.org.fedora' => 'Creative Commons Sampling Plus 1.0',
 	iri         => 'https://creativecommons.org/licenses/sampling+/1.0/',
 	description => <<'END',
 Release: <https://creativecommons.org/2003/10/20/samplinglicenses/>
@@ -5498,9 +5587,10 @@ END
 =cut
 
 $RE{cddl} = {
-	name                    => 'CDDL',
-	'name.alt.org.wikidata' => 'Q304628',
-	caption                 => 'Common Development and Distribution License',
+	name                           => 'CDDL',
+	'name.alt.org.fedora.iri.self' => 'CDDL',
+	'name.alt.org.wikidata'        => 'Q304628',
+	caption => 'Common Development and Distribution License',
 	'caption.alt.org.wikipedia' =>
 		'Common Development and Distribution License',
 	tags => [
@@ -5509,15 +5599,18 @@ $RE{cddl} = {
 };
 
 $RE{cddl_1} = {
-	name                => 'CDDL-1.0',
-	'name.alt.org.osi'  => 'CDDL-1.0',
-	'name.alt.org.spdx' => 'CDDL-1.0',
+	name                  => 'CDDL-1.0',
+	'name.alt.org.fedora' => 'CDDL-1.0',
+	'name.alt.org.osi'    => 'CDDL-1.0',
+	'name.alt.org.spdx'   => 'CDDL-1.0',
 	'name.alt.org.tldr.synth.nogrant' =>
 		'common-development-and-distribution-license-(cddl-1.0)-explained',
 	'name.alt.org.tldr.path.short'      => 'cddl',
 	'name.alt.misc.fossology_old'       => 'CDDL_v1.0',
 	'name.alt.misc.fossology_old_short' => 'CDDL1.0',
 	caption => 'Common Development and Distribution License 1.0',
+	'caption.alt.org.fedora' => 'Common Development Distribution License 1.0',
+	'caption.alt.org.fedora.iri.cddl' => 'CDDL 1.0',
 	'caption.alt.org.osi' =>
 		'Common Development and Distribution License 1.0',
 	'caption.alt.org.tldr' =>
@@ -5532,10 +5625,13 @@ $RE{cddl_1} = {
 };
 
 $RE{cddl_1_1} = {
-	name                => 'CDDL-1.1',
-	'name.alt.org.spdx' => 'CDDL-1.1',
-	caption             => 'Common Development and Distribution License 1.1',
-	tags                => [
+	name                  => 'CDDL-1.1',
+	'name.alt.org.fedora' => 'CDDL-1.1',
+	'name.alt.org.spdx'   => 'CDDL-1.1',
+	caption => 'Common Development and Distribution License 1.1',
+	'caption.alt.org.fedora' => 'Common Development Distribution License 1.1',
+	'caption.alt.org.fedora.iri.cddl' => 'CDDL 1.1',
+	tags                              => [
 		'type:singleversion:cddl',
 	],
 	licenseversion => '1.1',
@@ -5557,14 +5653,15 @@ $RE{cddl_1_1} = {
 =cut
 
 $RE{cecill} = {
-	name                    => 'CECILL',
-	'name.alt.org.wikidata' => 'Q1052189',
-	caption                 => 'CeCILL License',
+	name                            => 'CECILL',
+	'name.alt.org.wikidata'         => 'Q1052189',
+	'name.alt.misc.short_camelcase' => 'CeCILL',
+	caption                         => 'CeCILL License',
 	'caption.alt.misc.last.lang.en' =>
 		'FREE SOFTWARE LICENSE AGREEMENT CeCILL',
-	'caption.alt.org.inria.lang.en' =>
+	'caption.alt.org.steward.lang.en' =>
 		'CeCILL FREE SOFTWARE LICENSE AGREEMENT',
-	'caption.alt.org.inria.lang.fr' =>
+	'caption.alt.org.steward.lang.fr' =>
 		'CONTRAT DE LICENCE DE LOGICIEL LIBRE CeCILL',
 	'caption.alt.org.wikipedia' => 'CeCILL',
 	'iri.alt.path.sloppy'       => 'http://www.cecill.info',
@@ -5588,11 +5685,12 @@ $RE{cecill} = {
 };
 
 $RE{cecill_1} = {
-	name                          => 'CECILL-1.0',
-	'name.alt.org.spdx'           => 'CECILL-1.0',
-	'name.alt.misc.fossology_old' => 'CeCILL1.0',
+	name                            => 'CECILL-1.0',
+	'name.alt.org.spdx'             => 'CECILL-1.0',
+	'name.alt.misc.fossology_old'   => 'CeCILL1.0',
+	'name.alt.misc.short_camelcase' => 'CeCILL-1.0',
 	caption => 'CeCILL Free Software License Agreement v1.0',
-	'caption.alt.org.inria' =>
+	'caption.alt.org.steward' =>
 		'CONTRAT DE LICENCE DE LOGICIEL LIBRE CeCILL Version 1',
 	'caption.alt.org.tldr' =>
 		'CeCILL Free Software License Agreement v1.0 (CECILL-1.0)',
@@ -5612,11 +5710,14 @@ $RE{cecill_1} = {
 
 $RE{cecill_1_1} = {
 	name                                => 'CECILL-1.1',
+	'name.alt.org.fedora.synth.nogrant' => 'CeCILL',
 	'name.alt.org.spdx'                 => 'CECILL-1.1',
 	'name.alt.misc.fossology_old'       => 'CeCILL_v1.1',
 	'name.alt.misc.fossology_old_short' => 'CeCILL1.1',
-	caption => 'CeCILL Free Software License Agreement v1.1',
-	'caption.alt.org.inria' =>
+	'name.alt.misc.short_camelcase'     => 'CeCILL-1.1',
+	caption                  => 'CeCILL Free Software License Agreement v1.1',
+	'caption.alt.org.fedora' => 'CeCILL License v1.1',
+	'caption.alt.org.steward' =>
 		'FREE SOFTWARE LICENSING AGREEMENT CeCILL Version 1.1',
 	'caption.alt.org.tldr' =>
 		'CeCILL Free Software License Agreement v1.1 (CECILL-1.1)',
@@ -5670,27 +5771,32 @@ $RE{cecill_1_1} = {
 		. 'or a subsequent version, '
 		. 'subject to the provisions of article',
 	'pat.alt.subject.license.scope.paragraph.part.part13_1_en' =>
-		'The Agreement is governed by French law[.] '
+		'The Agreement is governed by French law[. ]'
 		. 'The Parties agree to endeavor to settle',
 };
 
 $RE{cecill_2} = {
 	name                                  => 'CECILL-2.0',
+	'name.alt.org.fedora.synth.nogrant'   => 'CeCILL',
 	'name.alt.org.spdx'                   => 'CECILL-2.0',
 	'name.alt.org.tldr'                   => 'cecill-v2',
 	'name.alt.misc.fossology_old'         => 'CeCILL_v2.0',
 	'name.alt.misc.fossology_old_short'   => 'CeCILL2.0',
 	'name.alt.misc.fossology_old_shorter' => 'CeCILL_v2',
-	caption => 'CeCILL Free Software License Agreement v2.0',
-	'caption.alt.org.inria.lang.en' =>
+	'name.alt.misc.short_camelcase'       => 'CeCILL-2.0',
+	caption                  => 'CeCILL Free Software License Agreement v2.0',
+	'caption.alt.org.fedora' => 'CeCILL License v2',
+	'caption.alt.org.steward.lang.en' =>
 		'CeCILL FREE SOFTWARE LICENSE AGREEMENT Version 2.0',
-	'caption.alt.org.inria.lang.fr' =>
+	'caption.alt.org.steward.lang.fr' =>
 		'CONTRAT DE LICENCE DE LOGICIEL LIBRE CeCILL Version 2.0',
 	'caption.alt.org.tldr' =>
 		'CeCILL Free Software License Agreement v2.0 (CECILL-2.0)',
 	'caption.alt.misc.short' => 'CeCILL License 2.0',
-	'iri.lang.en' => 'https://cecill.info/licences/Licence_CeCILL_V2-en.html',
-	'iri.lang.fr' => 'https://cecill.info/licences/Licence_CeCILL_V2-fr.html',
+	'iri.alt.lang.en' =>
+		'https://cecill.info/licences/Licence_CeCILL_V2-en.html',
+	'iri.alt.lang.fr' =>
+		'https://cecill.info/licences/Licence_CeCILL_V2-fr.html',
 	'iri.alt.format.txt.lang.en' =>
 		'https://cecill.info/licences/Licence_CeCILL_V2-en.txt',
 	'iri.alt.format.txt.lang.fr' =>
@@ -5698,7 +5804,7 @@ $RE{cecill_2} = {
 	tags => [
 		'type:singleversion:cecill',
 	],
-	licenseversion => '1.2',
+	licenseversion => '2.0',
 
 	'pat.alt.subject.license.lang.en' => 'Version 2\.0 dated 2006[-]09[-]05',
 	'pat.alt.subject.license.lang.fr' => 'Version 2\.0 du 2006[-]09[-]05',
@@ -5710,19 +5816,20 @@ $RE{cecill_2_1} = {
 	name                                    => 'CECILL-2.1',
 	'name.alt.org.osi'                      => 'CECILL-2.1',
 	'name.alt.org.spdx.since.date_20150930' => 'CECILL-2.1',
+	'name.alt.misc.short_camelcase'         => 'CeCILL-2.1',
 	caption => 'CeCILL Free Software License Agreement v2.1',
-	'caption.alt.org.inria.lang.en' =>
+	'caption.alt.org.steward.lang.en' =>
 		'CeCILL FREE SOFTWARE LICENSE AGREEMENT Version 2.1',
-	'caption.alt.org.inria.lang.fr' =>
+	'caption.alt.org.steward.lang.fr' =>
 		'CONTRAT DE LICENCE DE LOGICIEL LIBRE CeCILL Version 2.1',
 	'caption.alt.org.osi' =>
 		'Cea Cnrs Inria Logiciel Libre License, version 2.1',
 	'caption.alt.org.osi.misc.list' => 'CeCILL License 2.1',
 	'caption.alt.org.trove' =>
 		'CEA CNRS Inria Logiciel Libre License, version 2.1 (CeCILL-2.1)',
-	'iri.lang.en' =>
+	'iri.alt.lang.en' =>
 		'https://cecill.info/licences/Licence_CeCILL_V2.1-en.html',
-	'iri.lang.fr' =>
+	'iri.alt.lang.fr' =>
 		'https://cecill.info/licences/Licence_CeCILL_V2.1-fr.html',
 	'iri.alt.format.txt.lang.en' =>
 		'https://cecill.info/licences/Licence_CeCILL_V2.1-en.txt',
@@ -5750,17 +5857,19 @@ $RE{cecill_2_1} = {
 =cut
 
 $RE{cecill_b} = {
-	name    => 'CECILL-B',
-	caption => 'CeCILL-B License',
-	'caption.alt.org.inria.lang.en' =>
+	name                            => 'CECILL-B',
+	'name.alt.org.fedora'           => 'CeCILL-B',
+	'name.alt.misc.short_camelcase' => 'CeCILL-B',
+	caption                         => 'CeCILL-B License',
+	'caption.alt.org.steward.lang.en' =>
 		'CeCILL-B FREE SOFTWARE LICENSE AGREEMENT',
-	'caption.alt.org.inria.lang.fr' =>
+	'caption.alt.org.steward.lang.fr' =>
 		'CONTRAT DE LICENCE DE LOGICIEL LIBRE CeCILL-B',
 	'caption.alt.org.trove' =>
 		'CeCILL-B Free Software License Agreement (CECILL-B)',
-	'iri.lang.en' =>
+	'iri.alt.lang.en' =>
 		'https://cecill.info/licences/Licence_CeCILL-B_V1-en.html',
-	'iri.lang.fr' =>
+	'iri.alt.lang.fr' =>
 		'https://cecill.info/licences/Licence_CeCILL-B_V1-en.html',
 	'iri.alt.format.txt.lang.en' =>
 		'https://cecill.info/licences/Licence_CeCILL-B_V1-en.txt',
@@ -5780,18 +5889,19 @@ $RE{cecill_b} = {
 
 $RE{cecill_b_1} = {
 	name                              => 'CECILL-B-1.0',
+	'name.alt.misc.short_camelcase'   => 'CeCILL-B-1.0',
 	'name.alt.org.spdx.synth.nogrant' => 'CECILL-B',
 	caption => 'CeCILL-B Free Software License Agreement v1.0',
-	'caption.alt.org.inria.lang.en' =>
+	'caption.alt.org.steward.lang.en' =>
 		'CeCILL-B FREE SOFTWARE LICENSE AGREEMENT Version 1.0',
-	'caption.alt.org.inria.lang.fr' =>
+	'caption.alt.org.steward.lang.fr' =>
 		'CONTRAT DE LICENCE DE LOGICIEL LIBRE CeCILL-B Version 1.0',
 	'caption.alt.org.spdx.synth.nogrant' =>
 		'CeCILL-B Free Software License Agreement',
 	'caption.alt.misc.short' => 'CeCILL-B License 1.0',
-	'iri.lang.en' =>
+	'iri.alt.lang.en' =>
 		'https://cecill.info/licences/Licence_CeCILL-B_V1-en.html',
-	'iri.lang.fr' =>
+	'iri.alt.lang.fr' =>
 		'https://cecill.info/licences/Licence_CeCILL-B_V1-en.html',
 	'iri.alt.format.txt.lang.en' =>
 		'https://cecill.info/licences/Licence_CeCILL-B_V1-en.txt',
@@ -5803,7 +5913,7 @@ $RE{cecill_b_1} = {
 	licenseversion => '1.0',
 
 	'pat.alt.subject.grant.lang.en' => 'governed by the CeCILL-B license',
-	'pat.alt.subject.grant.license.lang.fr' =>
+	'pat.alt.subject.grant.lang.fr' =>
 		'Ce logiciel est r[é]gi par la licence CeCILL-B soumise',
 	'pat.alt.subject.license.lang.en' =>
 		'The exercising of this freedom is conditional upon a strong',
@@ -5819,17 +5929,19 @@ $RE{cecill_b_1} = {
 
 # TODO: synthesize patterns (except name) from cecill_c_1: they are all duplicates
 $RE{cecill_c} = {
-	name    => 'CECILL-C',
-	caption => 'CeCILL-C License',
-	'caption.alt.org.inria.lang.en' =>
+	name                            => 'CECILL-C',
+	'name.alt.org.fedora'           => 'CeCILL-C',
+	'name.alt.misc.short_camelcase' => 'CeCILL-C',
+	caption                         => 'CeCILL-C License',
+	'caption.alt.org.steward.lang.en' =>
 		'CeCILL-C FREE SOFTWARE LICENSE AGREEMENT',
-	'caption.alt.org.inria.lang.fr' =>
+	'caption.alt.org.steward.lang.fr' =>
 		'CONTRAT DE LICENCE DE LOGICIEL LIBRE CeCILL-C',
 	'caption.alt.org.trove' =>
 		'CeCILL-C Free Software License Agreement (CECILL-C)',
-	'iri.lang.en' =>
+	'iri.alt.lang.en' =>
 		'https://cecill.info/licences/Licence_CeCILL-C_V1-en.html',
-	'iri.lang.fr' =>
+	'iri.alt.lang.fr' =>
 		'https://cecill.info/licences/Licence_CeCILL-C_V1-fr.html',
 	tags => [
 		'type:versioned:decimal',
@@ -5854,17 +5966,18 @@ $RE{cecill_c} = {
 $RE{cecill_c_1} = {
 	name                              => 'CECILL-C-1.0',
 	'name.alt.org.spdx.synth.nogrant' => 'CECILL-C',
+	'name.alt.misc.short_camelcase'   => 'CeCILL-C-1.0',
 	caption => 'CeCILL-C Free Software License Agreement v1.0',
-	'caption.alt.org.inria.lang.en' =>
+	'caption.alt.org.steward.lang.en' =>
 		'CeCILL-C FREE SOFTWARE LICENSE AGREEMENT Version 1.0',
-	'caption.alt.org.inria.lang.fr' =>
+	'caption.alt.org.steward.lang.fr' =>
 		'CONTRAT DE LICENCE DE LOGICIEL LIBRE CeCILL-C Version 1.0',
 	'caption.alt.org.spdx.synth.nogrant' =>
 		'CeCILL-C Free Software License Agreement',
 	'caption.alt.misc.short' => 'CeCILL-C License 1.0',
-	'iri.lang.en' =>
+	'iri.alt.lang.en' =>
 		'https://cecill.info/licences/Licence_CeCILL-C_V1-en.html',
-	'iri.lang.fr' =>
+	'iri.alt.lang.fr' =>
 		'https://cecill.info/licences/Licence_CeCILL-C_V1-fr.html',
 	'iri.alt.format.txt.lang.en' =>
 		'https://cecill.info/licences/Licence_CeCILL-C_V1-en.txt',
@@ -5901,9 +6014,12 @@ $RE{cecill_c_1} = {
 
 $RE{cnri_jython} = {
 	name                                    => 'CNRI-Jython',
+	'name.alt.org.fedora'                   => 'JPython',
 	'name.alt.org.spdx.since.date_20150730' => 'CNRI-Jython',
 	caption                                 => 'CNRI Jython License',
+	'caption.alt.org.fedora'                => 'JPython License (old)',
 	'caption.alt.org.tldr'                  => 'CNRI Jython License',
+	'caption.alt.org.steward'               => 'JPython License',
 	iri => 'http://www.jython.org/license.html',
 
 	tags => [
@@ -5920,11 +6036,13 @@ $RE{cnri_jython} = {
 
 $RE{cnri_python} = {
 	name                                 => 'CNRI-Python',
+	'name.alt.org.fedora'                => 'CNRI',
 	'name.alt.org.osi'                   => 'CNRI-Python',
 	'name.alt.org.spdx'                  => 'CNRI-Python',
 	'name.alt.org.wikidata'              => 'Q5975028',
 	'name.alt.org.wikipedia'             => 'Python_License',
 	caption                              => 'CNRI Python License',
+	'caption.alt.org.fedora'             => 'CNRI License (Old Python)',
 	'caption.alt.org.osi'                => 'CNRI Python license',
 	'caption.alt.org.osi.misc.shortname' => 'CNRI portion of Python License',
 	'caption.alt.org.tldr' => 'CNRI Python License (CNRI-Python)',
@@ -5973,6 +6091,7 @@ $RE{cnri_python_gpl_compat} = {
 
 $RE{condor} = {
 	name                   => 'Condor',
+	'name.alt.org.fedora'  => 'Condor',
 	caption                => 'Condor Public License',
 	'caption.alt.org.tldr' => 'Condor Public License v1.1 (Condor-1.1)',
 	tags                   => [
@@ -6008,11 +6127,13 @@ $RE{cpal} = {
 };
 
 $RE{cpal_1} = {
-	name                          => 'CPAL-1.0',
-	'name.alt.org.osi'            => 'CPAL-1.0',
-	'name.alt.org.spdx'           => 'CPAL-1.0',
-	'name.alt.misc.fossology_old' => 'CPAL_v1.0',
-	caption                       => 'Common Public Attribution License 1.0',
+	name                                => 'CPAL-1.0',
+	'name.alt.org.fedora.synth.nogrant' => 'CPAL',
+	'name.alt.org.osi'                  => 'CPAL-1.0',
+	'name.alt.org.spdx'                 => 'CPAL-1.0',
+	'name.alt.misc.fossology_old'       => 'CPAL_v1.0',
+	caption                  => 'Common Public Attribution License 1.0',
+	'caption.alt.org.fedora' => 'CPAL License 1.0',
 	'caption.alt.org.osi' => 'Common Public Attribution License Version 1.0',
 	'caption.alt.org.osi.misc.list' =>
 		'Common Public Attribution License 1.0',
@@ -6037,6 +6158,7 @@ $RE{cpal_1} = {
 
 $RE{cpl} = {
 	name                                   => 'CPL',
+	'name.alt.org.fedora'                  => 'CPL',
 	'name.alt.org.wikidata'                => 'Q2477807',
 	'name.alt.misc.fossology_old'          => 'CPL_v1.0',
 	caption                                => 'Common Public License',
@@ -6069,7 +6191,7 @@ $RE{cpl_1} = {
 		'IBM is the initial Agreement Steward',
 	'pat.alt.subject.license.scope.multisection.part.head' =>
 		'(?:Common Public License Version 1\.0[  ])?'
-		. 'THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS COMMON PUBLIC LICENSE [(]["]AGREEMENT["][)][.][ ]'
+		. 'THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS COMMON PUBLIC LICENSE [(]["]AGREEMENT["][)][. ]'
 		. 'ANY USE, REPRODUCTION OR DISTRIBUTION OF THE PROGRAM CONSTITUTES RECIPIENT[\']S ACCEPTANCE OF THIS AGREEMENT[.](?: |[  ])'
 		. '[*)][  ]?DEFINITIONS[  ]'
 		. '["]Contribution["] means[:"]?[  ]'
@@ -6083,9 +6205,10 @@ $RE{cpl_1} = {
 =cut
 
 $RE{cpol} = {
-	name    => 'CPOL',
-	caption => 'The Code Project Open License',
-	tags    => [
+	name                     => 'CPOL',
+	caption                  => 'The Code Project Open License',
+	'caption.alt.org.fedora' => 'CodeProject Open License (CPOL)',
+	tags                     => [
 		'type:versioned:decimal',
 	],
 };
@@ -6110,6 +6233,7 @@ $RE{cpol_1_02} = {
 
 $RE{crossword} = {
 	name                                    => 'Crossword',
+	'name.alt.org.fedora.iri.self'          => 'Crossword',
 	'name.alt.org.spdx.since.date_20140807' => 'Crossword',
 	caption                                 => 'Crossword License',
 	'caption.alt.org.tldr'                  => 'Crossword License',
@@ -6128,11 +6252,12 @@ $RE{crossword} = {
 
 $RE{cryptix} = {
 	name                     => 'Cryptix',
-	'name.alt.org.gnu'       => 'CryptixGeneralLicense',
+	'name.alt.org.fsf'       => 'CryptixGeneralLicense',
 	'name.alt.org.wikidata'  => 'Q5190781',
 	'name.alt.org.wikipedia' => 'Cryptix_General_License',
 	caption                  => 'Cryptix Public License',
-	'caption.alt.org.gnu'    => 'Cryptix General License',
+	'caption.alt.org.fedora' => 'Cryptix General License',
+	'caption.alt.org.fsf'    => 'Cryptix General License',
 	iri                      => 'http://cryptix.org/LICENSE.TXT',
 	description              => <<'END',
 Identical to BSD 2 Clause, except...
@@ -6169,15 +6294,20 @@ $RE{cua_opl} = {
 
 $RE{cua_opl_1} = {
 	name                                => 'CPAL-1.0',
+	'name.alt.org.fedora.synth.nogrant' => 'MPLv1.1',
 	'name.alt.org.osi'                  => 'CUA-OPL-1.0',
 	'name.alt.org.spdx'                 => 'CUA-OPL-1.0',
 	'name.alt.misc.fossology_old'       => 'CUA_v1.0',
 	caption                             => 'CUA Office Public License v1.0',
+	'caption.alt.org.fedora' => 'CUA Office Public License Version 1.0',
 	'caption.alt.org.osi.synth.nogrant' => 'CUA Office Public License',
 	'caption.alt.org.osi.misc.list' =>
 		'CUA Office Public License Version 1.0',
 	'caption.alt.org.tldr' => 'CUA Office Public License v1.0 (CUA-OPL-1.0)',
-	tags                   => [
+	description            => <<'END',
+Origin: Mozilla Public License Version 1.1
+END
+	tags => [
 		'type:singleversion:cua_opl',
 	],
 	licenseversion => '1.0',
@@ -6193,6 +6323,7 @@ $RE{cua_opl_1} = {
 
 $RE{cube} = {
 	name                                    => 'Cube',
+	'name.alt.org.fedora.iri.self'          => 'Cube',
 	'name.alt.org.spdx.since.date_20140807' => 'Cube',
 	caption                                 => 'Cube License',
 	'caption.alt.org.tldr'                  => 'Cube License',
@@ -6204,8 +6335,7 @@ $RE{cube} = {
 
 	'pat.alt.subject.license.scope.multisection' =>
 		$P{origin_sw_no_misrepresent}
-		. $P{you_not_claim_wrote}
-		. '[.][ ]'
+		. $P{you_not_claim_wrote} . '[. ]'
 		. $P{use_ack_apprec_not_req}
 		. '[.][  ]'
 		. $P{altered_srcver_mark}
@@ -6242,6 +6372,8 @@ $RE{cvw} = {
 	name               => 'CVW',
 	'name.alt.org.osi' => 'CVW',
 	caption            => 'MITRE Collaborative Virtual Workspace License',
+	'caption.alt.org.fedora' =>
+		'MITRE Collaborative Virtual Workspace License (CVW)',
 	'caption.alt.org.osi' =>
 		'The MITRE Collaborative Virtual Workspace License',
 	'caption.alt.org.osi.misc.list' =>
@@ -6420,12 +6552,12 @@ $RE{dont_ask} = {
 
 $RE{dsdp} = {
 	name                                    => 'DSDP',
-	'name.alt.org.fedora.web'               => 'DSDP',
+	'name.alt.org.fedora.iri.self'          => 'DSDP',
 	'name.alt.org.spdx.since.date_20140807' => 'DSDP',
 	caption                                 => 'DSDP License',
-	'caption.alt.org.fedora.web.mit'        => 'PetSC variant',
 	'caption.alt.org.tldr'                  => 'DSDP License',
-	tags                                    => [
+	'summary.alt.org.fedora.iri.mit' => 'MIT-style license, PetSC Variant',
+	tags                             => [
 		'family:mit',
 		'license:is:grant',
 		'type:unversioned',
@@ -6434,7 +6566,7 @@ $RE{dsdp} = {
 	'pat.alt.subject.license.part.part1' =>
 		'This program discloses material protectable',
 	'pat.alt.subject.license.scope.paragraph' => $P{asis_expr_warranty}
-		. '[.][ ]'
+		. '[. ]'
 		. $P{perm_granted},
 };
 
@@ -6462,7 +6594,9 @@ $RE{ecl_1} = {
 	'name.alt.org.osi'            => 'ECL-1.0',
 	'name.alt.org.spdx'           => 'ECL-1.0',
 	'name.alt.misc.fossology_old' => 'ECL1.0',
-	caption                => 'Educational Community License, Version 1.0',
+	caption                  => 'Educational Community License, Version 1.0',
+	'caption.alt.org.fedora' => 'Educational Community License 1.0',
+	'caption.alt.org.fedora.misc.short' => 'ECL 1.0',
 	'caption.alt.org.osi'  => 'Educational Community License, Version 1.0',
 	'caption.alt.org.spdx' => 'Educational Community License v1.0',
 	tags                   => [
@@ -6480,7 +6614,9 @@ $RE{ecl_2} = {
 	'name.alt.org.spdx'            => 'ECL-2.0',
 	'name.alt.org.tldr.path.short' => 'ecl-2.0',
 	'name.alt.misc.fossology_old'  => 'ECL2.0',
-	caption                => 'Educational Community License, Version 2.0',
+	caption                  => 'Educational Community License, Version 2.0',
+	'caption.alt.org.fedora' => 'Educational Community License 2.0',
+	'caption.alt.org.fedora.misc.short' => 'ECL 2.0',
 	'caption.alt.org.spdx' => 'Educational Community License v2.0',
 	'caption.alt.org.tldr' =>
 		'Educational Community License, Version 2.0 (ECL-2.0)',
@@ -6520,9 +6656,11 @@ $RE{ecos_1_1} = {
 # Yes, it is unversioned
 $RE{ecos_2} = {
 	name                                    => 'eCos-2.0',
+	'name.alt.org.fedora.synth.nogrant'     => 'eCos',
 	'name.alt.org.osi'                      => 'eCos-2.0',
 	'name.alt.org.spdx.until.date_20150513' => 'eCos-2.0',
 	caption                                 => 'eCos license version 2.0',
+	'caption.alt.org.fedora'                => 'eCos License v2.0',
 	'caption.alt.org.osi'                   => 'eCos License version 2.0',
 	tags                                    => [
 		'contains.grant.gpl_2',
@@ -6568,6 +6706,8 @@ $RE{efl_1} = {
 	'name.alt.misc.fossology_old'       => 'Eiffel_1.0',
 	'name.alt.misc.fossology_old_short' => 'Eiffel_v1',
 	caption                             => 'Eiffel Forum License v1.0',
+	'caption.alt.org.fedora'            => 'Eiffel Forum License 1.0',
+	'caption.alt.org.fedora.iri.self'   => 'Eiffel Forum License V1',
 	'caption.alt.org.osi'           => 'The Eiffel Forum License, version 1',
 	'caption.alt.org.osi.misc.list' => 'Eiffel Forum License V1.0',
 	'caption.alt.org.osi.misc.do_not_use_list' =>
@@ -6591,6 +6731,8 @@ $RE{efl_2} = {
 	'name.alt.misc.fossology_old'       => 'Eiffel_2.0',
 	'name.alt.misc.fossology_old_short' => 'Eiffel_v2',
 	caption                             => 'Eiffel Forum License v2.0',
+	'caption.alt.org.fedora'            => 'Eiffel Forum License 2.0',
+	'caption.alt.org.fedora.misc.short' => 'EFL 2.0',
 	'caption.alt.org.osi'               => 'Eiffel Forum License, Version 2',
 	'caption.alt.org.osi.misc.list'     => 'Eiffel Forum License V2.0',
 	'caption.alt.org.tldr' => 'Eiffel Forum License v2.0 (EFL-2.0)',
@@ -6613,10 +6755,12 @@ $RE{efl_2} = {
 
 $RE{entessa} = {
 	name                            => 'Entessa',
+	'name.alt.org.fedora'           => 'Entessa',
 	'name.alt.org.osi'              => 'Entessa',
 	'name.alt.org.spdx'             => 'Entessa',
 	'name.alt.misc.fossology_old'   => 'Entessa1.0',
 	caption                         => 'Entessa Public License v1.0',
+	'caption.alt.org.fedora'        => 'Entessa Public License',
 	'caption.alt.org.osi'           => 'Entessa Public License Version. 1.0',
 	'caption.alt.org.osi.misc.list' => 'Entessa Public License',
 	'caption.alt.org.tldr' => 'Entessa Public License v1.0 (Entessa)',
@@ -6662,6 +6806,7 @@ END
 
 $RE{epl_1} = {
 	name                          => 'EPL-1.0',
+	'name.alt.org.fedora'         => 'EPL-1.0',
 	'name.alt.org.osi'            => 'EPL-1.0',
 	'name.alt.org.spdx'           => 'EPL-1.0',
 	'name.alt.misc.fossology_old' => 'Eclipse_1.0',
@@ -6677,7 +6822,7 @@ $RE{epl_1} = {
 		'Eclipse Public License[ - ]v 1\.0[  ]THE ACCOMPANYING',
 	'pat.alt.subject.license.scope.multisection.part.head' =>
 		'(?:Eclipse Public License[ - ]v 1\.0[  ])?'
-		. 'THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS ECLIPSE PUBLIC LICENSE [(]["]AGREEMENT["][)][.][ ]'
+		. 'THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS ECLIPSE PUBLIC LICENSE [(]["]AGREEMENT["][)][. ]'
 		. 'ANY USE, REPRODUCTION OR DISTRIBUTION OF THE PROGRAM CONSTITUTES RECIPIENT[\']S ACCEPTANCE OF THIS AGREEMENT[.](?: |[  ])'
 		. '[*)][  ]?DEFINITIONS[  ]'
 		. '["]Contribution["] means[:"]?[  ]'
@@ -6686,6 +6831,7 @@ $RE{epl_1} = {
 
 $RE{epl_2} = {
 	name                                    => 'EPL-2.0',
+	'name.alt.org.fedora'                   => 'EPL-2.0',
 	'name.alt.org.osi'                      => 'EPL-2.0',
 	'name.alt.org.spdx.since.date_20171228' => 'EPL-2.0',
 	caption                                 => 'Eclipse Public License 2.0',
@@ -6701,7 +6847,7 @@ $RE{epl_2} = {
 		'Eclipse Public License[ - ]v 2\.0[  ]THE ACCOMPANYING',
 	'pat.alt.subject.license.scope.multisection.part.head' =>
 		'(?:Eclipse Public License[ - ]v 1\.0[  ])?'
-		. 'THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS ECLIPSE PUBLIC LICENSE [(]["]AGREEMENT["][)][.][ ]'
+		. 'THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS ECLIPSE PUBLIC LICENSE [(]["]AGREEMENT["][)][. ]'
 		. 'ANY USE, REPRODUCTION OR DISTRIBUTION OF THE PROGRAM CONSTITUTES RECIPIENT[\']S ACCEPTANCE OF THIS AGREEMENT[.](?: |[  ])'
 		. '[*)][  ]?DEFINITIONS[  ]'
 		. '["]Contribution["] means[:"]?[  ]'
@@ -6723,11 +6869,14 @@ $RE{erlpl} = {
 };
 
 $RE{erlpl_1_1} = {
-	name                   => 'ErlPL-1.1',
-	'name.alt.org.spdx'    => 'ErlPL-1.1',
-	caption                => 'Erlang Public License v1.1',
-	'caption.alt.org.tldr' => 'Erlang Public License v1.1 (ErlPL-1.1)',
-	description            => <<'END',
+	name                                         => 'ErlPL-1.1',
+	'name.alt.org.fedora.synth.nogrant'          => 'ERPL',
+	'name.alt.org.fedora.iri.self.synth.nogrant' => 'ErlangPublicLicense',
+	'name.alt.org.spdx'                          => 'ErlPL-1.1',
+	caption                  => 'Erlang Public License v1.1',
+	'caption.alt.org.fedora' => 'Erlang Public License 1.1',
+	'caption.alt.org.tldr'   => 'Erlang Public License v1.1 (ErlPL-1.1)',
+	description              => <<'END',
 Origin: Mozilla Public License 1.0
 END
 	tags => [
@@ -6749,6 +6898,8 @@ $RE{eudatagrid} = {
 	'name.alt.org.spdx'                 => 'EUDatagrid',
 	'name.alt.misc.fossology_old_short' => 'Datagrid',
 	caption                             => 'EU DataGrid Software License',
+	'caption.alt.org.fedora'            => 'EU Datagrid Software License',
+	'caption.alt.org.fedora.misc.short' => 'EU Datagrid',
 	'caption.alt.org.tldr' => 'EU DataGrid Software License (EUDatagrid)',
 	tags                   => [
 		'type:unversioned',
@@ -6779,11 +6930,12 @@ $RE{eupl} = {
 };
 
 $RE{eupl_1} = {
-	name                   => 'EUPL-1.0',
-	'name.alt.org.spdx'    => 'EUPL-1.0',
-	caption                => 'European Union Public License, Version 1.0',
-	'caption.alt.org.spdx' => 'European Union Public License 1.0',
-	tags                   => [
+	name                     => 'EUPL-1.0',
+	'name.alt.org.spdx'      => 'EUPL-1.0',
+	caption                  => 'European Union Public License, Version 1.0',
+	'caption.alt.org.fedora' => 'European Union Public License v1.0',
+	'caption.alt.org.spdx'   => 'European Union Public License 1.0',
+	tags                     => [
 		'license:contains:grant',
 		'type:singleversion:eupl',
 	],
@@ -6798,7 +6950,9 @@ $RE{eupl_1_1} = {
 	'name.alt.org.spdx'            => 'EUPL-1.1',
 	'name.alt.org.tldr'            => 'european-union-public-licence',
 	'name.alt.org.tldr.path.short' => 'eupl-1.1',
-	caption                => 'European Union Public License, Version 1.1',
+	caption                  => 'European Union Public License, Version 1.1',
+	'caption.alt.org.fedora' => 'European Union Public License 1.1',
+	'caption.alt.org.fedora.misc.short' => 'EUPL 1.1',
 	'caption.alt.org.spdx' => 'European Union Public License 1.1',
 	'caption.alt.org.tldr' => 'European Union Public License 1.1 (EUPL-1.1)',
 	tags                   => [
@@ -6815,7 +6969,9 @@ $RE{eupl_1_2} = {
 	name                                    => 'EUPL-1.2',
 	'name.alt.org.osi'                      => 'EUPL-1.2',
 	'name.alt.org.spdx.since.date_20171228' => 'EUPL-1.2',
-	caption               => 'European Union Public License, Version 1.2',
+	caption                  => 'European Union Public License, Version 1.2',
+	'caption.alt.org.fedora' => 'European Union Public License 1.2',
+	'caption.alt.org.fedora.misc.short' => 'EUPL 1.2',
 	'caption.alt.org.osi' => 'European Union Public License, version 1.2',
 	'caption.alt.org.osi.misc.list' => 'European Union Public License 1.2',
 	'caption.alt.org.osi.misc.cat_list.synth.nogrant' =>
@@ -6839,6 +6995,7 @@ $RE{eupl_1_2} = {
 
 $RE{eurosym} = {
 	name                                    => 'Eurosym',
+	'name.alt.org.fedora.iri.self'          => 'Eurosym',
 	'name.alt.org.spdx.since.date_20140807' => 'Eurosym',
 	caption                                 => 'Eurosym License',
 	'caption.alt.org.tldr'                  => 'Eurosym License',
@@ -6850,8 +7007,7 @@ $RE{eurosym} = {
 
 	'pat.alt.subject.license.scope.multisection' =>
 		$P{origin_sw_no_misrepresent}
-		. $P{you_not_claim_wrote}
-		. '[.][ ]'
+		. $P{you_not_claim_wrote} . '[. ]'
 		. $P{use_ack_apprec}
 		. '[.][  ]'
 		. $P{altered_srcver_mark}
@@ -6870,6 +7026,7 @@ $RE{eurosym} = {
 
 $RE{fair} = {
 	name                           => 'Fair',
+	'name.alt.org.fedora'          => 'Fair',
 	'name.alt.org.osi'             => 'Fair',
 	'name.alt.org.spdx'            => 'Fair',
 	'name.alt.org.tldr'            => 'fair-license',
@@ -6925,15 +7082,17 @@ $RE{fair_source_0_9} = {
 =cut
 
 $RE{fal} = {
-	name                             => 'FAL',
-	caption                          => 'Free Art License',
-	'caption.alt.misc.legal.lang.de' => 'Lizenz Freie Kunst',
-	'caption.alt.misc.legal.lang.es' => 'Licencia Arte Libre',
-	'caption.alt.misc.legal.lang.fr' => 'Licence Art Libre',
-	'caption.alt.misc.legal.lang.it' => 'Licenza Arte Libera',
-	'caption.alt.misc.legal.lang.pl' => 'Licencja Wolnej Sztuki',
-	iri                              => 'https://artlibre.org/',
-	tags                             => [
+	name                                => 'FAL',
+	caption                             => 'Free Art License',
+	'caption.alt.org.fedora'            => 'Free Art License',
+	'caption.alt.org.fedora.misc.short' => 'Free Art',
+	'caption.alt.misc.legal.lang.de'    => 'Lizenz Freie Kunst',
+	'caption.alt.misc.legal.lang.es'    => 'Licencia Arte Libre',
+	'caption.alt.misc.legal.lang.fr'    => 'Licence Art Libre',
+	'caption.alt.misc.legal.lang.it'    => 'Licenza Arte Libera',
+	'caption.alt.misc.legal.lang.pl'    => 'Licencja Wolnej Sztuki',
+	iri                                 => 'https://artlibre.org/',
+	tags                                => [
 		'type:versioned:decimal',
 	],
 };
@@ -7009,11 +7168,10 @@ $RE{fal_1_3} = {
 =cut
 
 $RE{festival} = {
-	name                                => 'Festival',
-	'name.alt.org.fedora.web.short'     => 'Festival',
-	'name.alt.org.fedora.synth.nogrant' => 'MIT',
-	'caption.alt.org.fedora.web.mit'    => 'Festival variant',
-	tags                                => [
+	name                             => 'Festival',
+	'name.alt.org.fedora.iri.short'  => 'Festival',
+	'summary.alt.org.fedora.iri.mit' => 'MIT-style license, Festival variant',
+	tags                             => [
 		'family:mit',
 		'license:is:grant',
 		'type:unversioned',
@@ -7038,13 +7196,14 @@ $RE{frameworx} = {
 };
 
 $RE{frameworx_1} = {
-	name                                => 'Frameworx-1.0',
-	'name.alt.org.osi'                  => 'Frameworx-1.0',
-	'name.alt.org.spdx'                 => 'Frameworx-1.0',
-	'name.alt.misc.fossology_old'       => 'Frameworx_v1.0',
-	'name.alt.misc.fossology_old_short' => 'Frameworx1.0',
-	caption                             => 'Frameworx Open License 1.0',
-	'caption.alt.org.osi'               => 'Frameworx License 1.0',
+	name                                   => 'Frameworx-1.0',
+	'name.alt.org.osi'                     => 'Frameworx-1.0',
+	'name.alt.org.spdx'                    => 'Frameworx-1.0',
+	'name.alt.misc.fossology_old'          => 'Frameworx_v1.0',
+	'name.alt.misc.fossology_old_short'    => 'Frameworx1.0',
+	caption                                => 'Frameworx Open License 1.0',
+	'caption.alt.org.fedora.synth.nogrant' => 'Frameworx License',
+	'caption.alt.org.osi'                  => 'Frameworx License 1.0',
 	'caption.alt.org.osi.misc.list.synth.nogrant' => 'Frameworx License',
 	'caption.alt.org.tldr' => 'Frameworx Open License 1.0 (Frameworx-1.0)',
 	'iri.alt.old.osi'      => 'http://opensource.org/licenses/frameworx.php',
@@ -7065,10 +7224,12 @@ $RE{frameworx_1} = {
 
 $RE{fsfap} = {
 	name                                    => 'FSFAP',
-	'name.alt.org.gnu'                      => 'GNUAllPermissive',
+	'name.alt.org.fedora.iri.self'          => 'FSFAP',
+	'name.alt.org.fsf'                      => 'GNUAllPermissive',
 	'name.alt.org.spdx.since.date_20160323' => 'FSFAP',
 	caption                                 => 'FSF All Permissive License',
-	'caption.alt.org.gnu'                   => 'GNU All-Permissive License',
+	'caption.alt.org.fedora'                => 'FSF All Permissive license',
+	'caption.alt.org.fsf'                   => 'GNU All-Permissive License',
 	iri =>
 		'https://www.gnu.org/prep/maintain/html_node/License-Notices-for-Other-Files.html',
 	tags => [
@@ -7086,8 +7247,10 @@ $RE{fsfap} = {
 
 $RE{fsful} = {
 	name                                    => 'FSFUL',
+	'name.alt.org.fedora'                   => 'FSFUL',
 	'name.alt.org.spdx.since.date_20140807' => 'FSFUL',
 	caption                                 => 'FSF Unlimited License',
+	'caption.alt.org.fedora.iri.self'       => 'FSF Unlimited License',
 	tags                                    => [
 		'license:is:grant',
 		'type:unversioned',
@@ -7103,6 +7266,7 @@ $RE{fsful} = {
 
 $RE{fsfullr} = {
 	name                                    => 'FSFULLR',
+	'name.alt.org.fedora'                   => 'FSFULLR',
 	'name.alt.org.spdx.since.date_20140807' => 'FSFULLR',
 	caption => 'FSF Unlimited License (with License Retention)',
 	tags    => [
@@ -7120,12 +7284,14 @@ $RE{fsfullr} = {
 
 $RE{ftl} = {
 	name                                    => 'FTL',
+	'name.alt.org.fedora'                   => 'FTL',
 	'name.alt.org.spdx.since.date_20130117' => 'FTL',
 	'name.alt.misc.fossology_old'           => 'Freetype',
 	'name.alt.misc.fossology_old_upper'     => 'FreeType',
 	caption                                 => 'Freetype Project License',
-	'caption.misc.short_camelcase'          => 'FreeType License',
-	'caption.misc.legal_license'            => 'The Freetype Project LICENSE',
+	'caption.alt.misc.short_camelcase'      => 'FreeType License',
+	'caption.alt.misc.legal_license'        => 'The Freetype Project LICENSE',
+	'caption.alt.org.fedora'                => 'Freetype License',
 	'caption.alt.org.tldr' => 'Freetype Project License (FTL)',
 	iri                    => 'https://www.freetype.org/license.html',
 	description            => <<'END',
@@ -7163,7 +7329,8 @@ END
 
 $RE{gfdl} = {
 	name                    => 'GFDL',
-	'name.alt.org.gnu'      => 'FDL',
+	'name.alt.org.fedora'   => 'GFDL',
+	'name.alt.org.fsf'      => 'FDL',
 	caption                 => 'GNU Free Documentation License',
 	'caption.alt.org.trove' => 'GNU Free Documentation License (FDL)',
 	tags                    => [
@@ -7173,7 +7340,7 @@ $RE{gfdl} = {
 
 $RE{gfdl_1_1} = {
 	name                                    => 'GFDL-1.1',
-	'name.alt.org.gnu'                      => 'fdl-1.1',
+	'name.alt.org.fsf'                      => 'fdl-1.1',
 	'name.alt.org.spdx.until.date_20171228' => 'GFDL-1.1',
 	'name.alt.misc.fossology_old'           => 'GFDL_v1.1',
 	caption => 'GNU Free Documentation License v1.1',
@@ -7216,7 +7383,7 @@ $RE{gfdl_1_1_or_later} = {
 
 $RE{gfdl_1_2} = {
 	name                                    => 'GFDL-1.2',
-	'name.alt.org.gnu'                      => 'fdl-1.2',
+	'name.alt.org.fsf'                      => 'fdl-1.2',
 	'name.alt.org.perl'                     => 'gfdl_1_2',
 	'name.alt.org.spdx.until.date_20171228' => 'GFDL-1.2',
 	'name.alt.misc.fossology_old'           => 'GFDL_v1.2',
@@ -7260,7 +7427,7 @@ $RE{gfdl_1_2_or_later} = {
 
 $RE{gfdl_1_3} = {
 	name                                    => 'GFDL-1.3',
-	'name.alt.org.gnu'                      => 'fdl-1.3',
+	'name.alt.org.fsf'                      => 'fdl-1.3',
 	'name.alt.org.perl'                     => 'gfdl_1_3',
 	'name.alt.org.spdx.until.date_20171228' => 'GFDL-1.3',
 	'name.alt.org.tldr' => 'gnu-free-documentation-license',
@@ -7329,6 +7496,7 @@ $RE{gfdl_niv} = {
 
 $RE{glide} = {
 	name                                    => 'Glide',
+	'name.alt.org.fedora'                   => 'Glide',
 	'name.alt.org.spdx.since.date_20140807' => 'Glide',
 	caption                                 => '3dfx Glide License',
 	'caption.alt.org.tldr'                  => '3dfx Glide License',
@@ -7338,7 +7506,7 @@ $RE{glide} = {
 		'type:unversioned',
 	],
 
-	'pat.alt.subject.license.sclope.line.scope.sentence.part.intro' =>
+	'pat.alt.subject.license.scope.line.scope.sentence.part.intro' =>
 		'This license is for software that provides a 3D graphics',
 };
 
@@ -7366,13 +7534,14 @@ $RE{glide} = {
 
 $RE{gpl} = {
 	name                              => 'GPL',
-	'name.alt.org.gnu'                => 'GNUGPL',
+	'name.alt.org.fsf'                => 'GNUGPL',
 	'name.alt.org.osi'                => 'gpl-license',
 	'name.alt.org.osi.misc.shortname' => 'GPL',
 	'name.alt.org.wikidata'           => 'Q7603',
 	'name.alt.misc.fossology_old'     => 'CC_GPL',
 	caption                           => 'GNU General Public License',
-	'caption.alt.org.gnu'             => 'GNU General Public License (GPL)',
+	'caption.alt.org.fedora'          => 'GNU General Public License',
+	'caption.alt.org.fsf'             => 'GNU General Public License (GPL)',
 	'caption.alt.org.osi'             => 'GNU General Public License',
 	'caption.alt.org.trove'           => 'GNU General Public License (GPL)',
 	'caption.alt.org.wikipedia'       => 'GNU General Public License',
@@ -7421,6 +7590,7 @@ $RE{gpl_1} = {
 
 $RE{gpl_1_only} = {
 	name                                                  => 'GPL-1.0-only',
+	'name.alt.org.fedora.synth.nogrant'                   => 'GPLv1',
 	'name.alt.org.spdx.until.date_20171228.synth.nogrant' => 'GPL-1.0',
 	'name.alt.org.spdx.since.date_20171228'               => 'GPL-1.0-only',
 	caption                  => 'GNU General Public License v1.0 only',
@@ -7434,6 +7604,7 @@ $RE{gpl_1_only} = {
 
 $RE{gpl_1_or_later} = {
 	name                                    => 'GPL-1.0-or-later',
+	'name.alt.org.fedora'                   => 'GPL+',
 	'name.alt.org.debian'                   => 'GPL-1+',
 	'name.alt.org.spdx.until.date_20150513' => 'GPL-1.0+',
 	'name.alt.org.spdx.since.date_20171228' => 'GPL-1.0-or-later',
@@ -7452,7 +7623,7 @@ $RE{gpl_2} = {
 	name                                => 'GPL-2',
 	'name.alt.misc.short'               => 'GPLv2',
 	'name.alt.org.debian'               => 'GPL-2',
-	'name.alt.org.gnu'                  => 'GNUGPLv2',
+	'name.alt.org.fsf'                  => 'GNUGPLv2',
 	'name.alt.org.osi'                  => 'GPL-2.0',
 	'name.alt.org.perl'                 => 'gpl_2',
 	'name.alt.org.tldr'                 => 'gnu-general-public-license-v2',
@@ -7460,8 +7631,13 @@ $RE{gpl_2} = {
 	'name.alt.misc.fossology_old'       => 'GPL2.0',
 	'name.alt.misc.fossology_old_cc'    => 'CC_GPL_v2',
 	'name.alt.misc.fossology_old_short' => 'GPL_v2',
-	caption                 => 'GNU General Public License, Version 2',
-	'caption.alt.org.gnu'   => 'GNU General Public License (GPL) version 2',
+	caption => 'GNU General Public License, Version 2',
+	'caption.alt.org.cc.until.date_20100915' =>
+		'Creative Commons GNU GPL',    # TODO: find official date
+	'caption.alt.org.cc.misc.short.until.date_20100915' =>
+		'CC-GNU GPL',                  # TODO: find official date
+	'caption.alt.org.fedora.misc.cc' => 'Creative Commons GNU GPL',
+	'caption.alt.org.fsf'   => 'GNU General Public License (GPL) version 2',
 	'caption.alt.org.trove' => 'GNU General Public License v2 (GPLv2)',
 	'caption.alt.org.osi'   => 'GNU General Public License version 2',
 	'caption.alt.org.osi.misc.list' =>
@@ -7471,14 +7647,19 @@ $RE{gpl_2} = {
 	'iri.alt.format.txt' =>
 		'https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt',
 	'iri.alt.path.short' => 'http://www.gnu.org/licenses/gpl-2.0.html',
-	tags                 => [
+	'iri.alt.org.cc.archive.time_20101028012914.until.date_20101028' =>
+		'http://creativecommons.org/licenses/GPL/2.0/'
+	,    # TODO: find official date
+	'iri.alt.org.cc.archive.time_20100915084134.until.date_20100915' =>
+		'http://creativecommons.org/choose/cc-gpl', # TODO: find official date
+	tags => [
 		'family:gpl',
 		'license:published:by_fsf',
 		'type:singleversion:gpl',
 	],
 	licenseversion => '2.0',
 
-	'pat.alt.subject.license.scope.part.preamble' =>
+	'pat.alt.subject.license.scope.sentence.part.preamble' =>
 		'[(]Some other Free Software Foundation software is covered by t?he GNU (Library|Lesser)',
 	'pat.alt.subject.license.scope.multisection.part.tail_sample' =>
 		'[<]?name of author[>]?[  ]'
@@ -7491,6 +7672,7 @@ $RE{gpl_2} = {
 
 $RE{gpl_2_only} = {
 	name                                                  => 'GPL-2.0-only',
+	'name.alt.org.fedora.synth.nogrant'                   => 'GPLv2',
 	'name.alt.org.spdx.until.date_20171228.synth.nogrant' => 'GPL-2.0',
 	'name.alt.org.spdx.since.date_20171228'               => 'GPL-2.0-only',
 	caption                  => 'GNU General Public License v2.0 only',
@@ -7504,7 +7686,9 @@ $RE{gpl_2_only} = {
 
 $RE{gpl_2_or_later} = {
 	name                                    => 'GPL-2.0-or-later',
+	'name.alt.org.fedora'                   => 'GPLv2+',
 	'name.alt.org.debian'                   => 'GPL-2+',
+	'name.alt.org.fedora'                   => 'GPLv2+',
 	'name.alt.org.spdx.until.date_20150513' => 'GPL-2.0+',
 	'name.alt.org.spdx.since.date_20171228' => 'GPL-2.0-or-later',
 	'name.alt.org.trove'                    => 'GPLv2+',
@@ -7524,14 +7708,14 @@ $RE{gpl_3} = {
 	name                                => 'GPL-3',
 	'name.alt.misc.short'               => 'GPLv3',
 	'name.alt.org.debian'               => 'GPL-3',
-	'name.alt.org.gnu'                  => 'GNUGPLv3',
+	'name.alt.org.fsf'                  => 'GNUGPLv3',
 	'name.alt.org.osi'                  => 'GPL-3.0',
 	'name.alt.org.perl'                 => 'gpl_3',
 	'name.alt.org.tldr.path.short'      => 'gpl-3.0',
 	'name.alt.misc.fossology_old'       => 'GPL3.0',
 	'name.alt.misc.fossology_old_short' => 'GPL_v3',
 	caption               => 'GNU General Public License, Version 3',
-	'caption.alt.org.gnu' => 'GNU General Public License (GPL) version 3',
+	'caption.alt.org.fsf' => 'GNU General Public License (GPL) version 3',
 	'caption.alt.org.osi' => 'GNU General Public License version 3',
 	'caption.alt.org.osi.misc.list' =>
 		'GNU General Public License, version 3',
@@ -7562,10 +7746,62 @@ $RE{gpl_3} = {
 		. 'under the terms of the GNU General Public License '
 		. 'as published by the Free Software Foundation[;]? '
 		. 'either version 3 of the License, or',
+
+	#<<<  do not let perltidy touch this (keep long regex on one line)
+	examples => [
+		{   summary => 'pattern with subject "license" matches canonical license grant with adequate context',
+			gen_args => { subject => 'license' },
+			## no Test::Tabs
+			str => <<'END',
+Copyright (C) <year>  <name of author>
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+END
+			## use Test::Tabs
+			matches => 1,
+		},
+		{   summary => 'pattern with subject "license" doesn\'t match canonical license grant only',
+			gen_args => { subject => 'license' },
+			str => 'This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.',
+			matches => 0,
+		},
+		{   summary => 'pattern with subject "grant" matches canonical license grant',
+			gen_args => { subject => 'grant' },
+			str => 'This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.',
+			matches => 1,
+		},
+		{   summary => 'pattern with subject "grant" matches a license grant without usage specified',
+			gen_args => { subject => 'grant' },
+			str => 'Licensed under the GNU General Public License version 3.',
+			matches => 1,
+		},
+		{   summary => 'pattern with subject "grant" doesn\'t match license grant with usage in front',
+			gen_args => { subject => 'grant' },
+			str => 'Licensed under v3 or newer of the GNU General Public License.',
+			matches => 0,
+		},
+		{   summary => 'pattern with subject "grant" doesn\'t match license name only',
+			gen_args => { subject => 'grant' },
+			str => 'GNU General Public License v3',
+			matches => 0,
+		},
+		{   summary => 'pattern with subject "name" matches license name',
+			gen_args => { subject => 'name' },
+			str => 'GNU General Public License v3',
+			matches => 1,
+		},
+		{   summary => 'pattern with subject "iri" doesn\'t match license name',
+			gen_args => { subject => 'iri' },
+			str => 'GNU General Public License v3',
+			matches => 0,
+		},
+	],
+	#>>>
 };
 
 $RE{gpl_3_only} = {
 	name                                                  => 'GPL-3.0-only',
+	'name.alt.org.fedora.synth.nogrant'                   => 'GPLv3',
 	'name.alt.org.spdx.until.date_20171228.synth.nogrant' => 'GPL-3.0',
 	'name.alt.org.spdx.since.date_20171228'               => 'GPL-3.0-only',
 	caption                  => 'GNU General Public License v3.0 only',
@@ -7575,10 +7811,82 @@ $RE{gpl_3_only} = {
 		'license:published:by_fsf',
 		'type:usage:gpl_3:only',
 	],
+
+	#<<<  do not let perltidy touch this (keep long regex on one line)
+	examples => [
+		{   summary => 'pattern with subject "license" doesn\'t match canonical license grant even with context',
+			gen_args => { subject => 'license' },
+			## no Test::Tabs
+			str => <<'END',
+Copyright (C) <year>  <name of author>
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+END
+			## use Test::Tabs
+			matches => 0,
+		},
+		{   summary => 'pattern with subject "license" doesn\'t match canonical license grant only',
+			gen_args => { subject => 'license' },
+			str => 'This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3 only of the License.',
+			matches => 0,
+		},
+		{   summary => 'pattern with subject "license" doesn\'t match a non-canonical license grant',
+			gen_args => { subject => 'license' },
+			str => 'modify it under the terms of the GNU General Public License',
+			matches => 0,
+		},
+		{   summary => 'pattern with subject "grant" matches canonical license grant',
+			gen_args => { subject => 'grant' },
+			str => 'This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3 only of the License.',
+			matches => 1,
+		},
+		{   summary => 'pattern with subject "grant" matches license grant with usage in front',
+			gen_args => { subject => 'grant' },
+			str => 'Licensed under v3 only of the GNU General Public License.',
+			matches => 1,
+		},
+		{   summary => 'pattern with subject "grant" doesn\'t match a license grant without usage specified',
+			gen_args => { subject => 'grant' },
+			str => 'This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.',
+			matches => 0,
+		},
+		{   summary => 'pattern with subject "grant" doesn\'t match license grant with different usage',
+			gen_args => { subject => 'grant' },
+			str => 'This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.',
+			matches => 0,
+		},
+		{   summary => 'pattern with subject "grant" doesn\'t match license name only',
+			gen_args => { subject => 'grant' },
+			str => 'GNU General Public License v3.0 only',
+			matches => 0,
+		},
+		{   summary => 'pattern with subject "name" matches canonical license name',
+			gen_args => { subject => 'name' },
+			str => 'GNU General Public License v3.0 only',
+			matches => 1,
+		},
+		{   summary => 'pattern with subject "name" doesn\'t match a license name without usage specified',
+			gen_args => { subject => 'name' },
+			str => 'GNU General Public License v3.0',
+			matches => 0,
+		},
+		{   summary => 'pattern with subject "name" doesn\'t match a license name with different usage',
+			gen_args => { subject => 'name' },
+			str => 'GNU General Public License v3.0 or later',
+			matches => 0,
+		},
+		{   summary => 'pattern with subject "iri" doesn\'t match canonical license name',
+			gen_args => { subject => 'iri' },
+			str => 'GNU General Public License v3.0 only',
+			matches => 0,
+		},
+	],
+	#>>>
 };
 
 $RE{gpl_3_or_later} = {
 	name                                    => 'GPL-3.0-or-later',
+	'name.alt.org.fedora'                   => 'GPLv3+',
 	'name.alt.org.debian'                   => 'GPL-3+',
 	'name.alt.org.spdx.until.date_20150513' => 'GPL-3.0+',
 	'name.alt.org.spdx.since.date_20171228' => 'GPL-3.0-or-later',
@@ -7610,10 +7918,11 @@ $RE{gsoap} = {
 };
 
 $RE{gsoap_1_3b} = {
-	name                => 'gSOAP-1.3b',
-	'name.alt.org.spdx' => 'gSOAP-1.3b',
-	caption             => 'gSOAP Public License v1.3b',
-	description         => <<'END',
+	name                                   => 'gSOAP-1.3b',
+	'name.alt.org.spdx'                    => 'gSOAP-1.3b',
+	caption                                => 'gSOAP Public License v1.3b',
+	'caption.alt.org.fedora.synth.nogrant' => 'gSOAP Public License',
+	description                            => <<'END',
 Origin: Mozilla Public License Version 1.1
 END
 	tags => [
@@ -7638,6 +7947,7 @@ $RE{hpnd} = {
 	'name.alt.org.wikidata'  => 'Q5773924',
 	'name.alt.org.wikipedia' => 'Historical_Permission_Notice_and_Disclaimer',
 	caption                  => 'Historical Permission Notice and Disclaimer',
+	'caption.alt.org.fedora' => 'Historical Permission Notice and Disclaimer',
 	'caption.alt.org.spdx.until.date_20171228' =>
 		'Historic Permission Notice and Disclaimer',
 	'caption.alt.org.spdx.since.date_20171228' =>
@@ -7670,9 +7980,9 @@ END
 		. '(?:, and that the name [word][ word]{0,14} not be used '
 		. 'in advertising or publicity pertaining to distribution '
 		. 'of the software without specific, written prior permission'
-		. '[.][ ][word][ word]{0,14} makes no representations '
+		. '[. ][word][ word]{0,14} makes no representations '
 		. 'about the suitability of this software for any purpose'
-		. '[.][ ]It is provided [as is] without express or implied warranty[.])?',
+		. '[. ]It is provided [as is] without express or implied warranty[.])?',
 };
 
 =item * hpnd_sell
@@ -7712,9 +8022,9 @@ END
 		. '(?:, and that the name [word][ word]{0,14} not be used '
 		. 'in advertising or publicity pertaining to distribution '
 		. 'of the software without specific, written prior permission'
-		. '[.][ ][word][ word]{0,14} makes no representations '
+		. '[. ][word][ word]{0,14} makes no representations '
 		. 'about the suitability of this software for any purpose'
-		. '[.][ ]It is provided [as is] without express or implied warranty[.])?',
+		. '[. ]It is provided [as is] without express or implied warranty[.])?',
 };
 
 =item * ibm_pibs
@@ -7744,8 +8054,9 @@ $RE{icu} = {
 	name                                    => 'ICU',
 	'name.alt.org.spdx.since.date_20150513' => 'ICU',
 	caption                                 => 'ICU License',
-	'caption.alt.org.fedora.web.mit'        => 'Modern style (ICU Variant)',
-	tags                                    => [
+	'summary.alt.org.fedora.iri.mit' =>
+		'MIT-style license, Modern style (ICU Variant)',
+	tags => [
 		'family:mit',
 		'license:is:grant',
 		'type:unversioned',
@@ -7756,7 +8067,7 @@ $RE{icu} = {
 		. $P{repro_copr_perm_appear_doc}
 		. '[.][  ]'
 		. $P{asis_sw_warranty}
-		. '(?:[^.]+[.][ ]){2}'
+		. '(?:[^.]+[. ]){2}'
 		. $P{nopromo_except},
 };
 
@@ -7766,6 +8077,7 @@ $RE{icu} = {
 
 $RE{ijg} = {
 	name                                    => 'IJG',
+	'name.alt.org.fedora.iri.self'          => 'IJG',
 	'name.alt.org.spdx.since.date_20130117' => 'IJG',
 	caption                => 'Independent JPEG Group License',
 	'caption.alt.org.tldr' => 'Independent JPEG Group License (IJG)',
@@ -7774,8 +8086,7 @@ $RE{ijg} = {
 	],
 
 	'pat.alt.subject.license.scope.section.part.intro' =>
-		"We don[']t promise that this software works"
-		. '[.][ ]'
+		"We don[']t promise that this software works" . '[. ]'
 		. '[(]But if you find any bugs, please let us know[!][)]',
 };
 
@@ -7785,6 +8096,7 @@ $RE{ijg} = {
 
 $RE{imlib2} = {
 	name                                    => 'Imlib2',
+	'name.alt.org.fedora.iri.self'          => 'Imlib2',
 	'name.alt.org.spdx.since.date_20130117' => 'Imlib2',
 	caption                                 => 'Imlib2 License',
 	'caption.alt.org.tldr'                  => 'Imlib2 License (Imlib2)',
@@ -7807,22 +8119,20 @@ END
 		. $P{subj_cond}
 		. $P{to_copy_sublicence_conditions}
 		. '[:]?[ ]'
-		. $P{retain_copr_perm_sw_copr}
-		. '[.][ ]'
-		. $P{ack_pub_use_nosrc}
-		. '[.][ ]'
+		. $P{retain_copr_perm_sw_copr} . '[. ]'
+		. $P{ack_pub_use_nosrc} . '[. ]'
 		. 'Making the source available publicly means '
 		. 'including the source for this software with the distribution, '
 		. 'or a method to get this software via some reasonable mechanism '
 		. '[(]electronic transfer via a network or media[)] '
 		. 'as well as making an offer to supply the source on request'
-		. '[.][ ]'
+		. '[. ]'
 		. 'This Copyright notice serves as an offer to supply the source on on request as well'
-		. '[.][ ]'
+		. '[. ]'
 		. 'Instead of this, supplying acknowledgments of use of this software '
 		. 'in either Copyright notices, Manuals, Publicity and Marketing documents '
 		. 'or any documentation provided '
-		. 'with any product containing this software[.][ ]'
+		. 'with any product containing this software[. ]'
 		. $P{license_not_lib} . '[.]',
 	'pat.alt.subject.license.scope.line' =>
 		'Making the source available publicly means including',
@@ -7837,6 +8147,7 @@ $RE{intel} = {
 	'name.alt.org.osi'                      => 'Intel',
 	'name.alt.org.spdx.since.date_20130117' => 'Intel',
 	caption                                 => 'Intel Open Source License',
+	'caption.alt.org.fedora'                => 'Intel Open Source License',
 	'caption.alt.org.osi'           => 'The Intel Open Source License',
 	'caption.alt.org.osi.misc.list' => 'Intel Open Source License',
 	'caption.alt.org.tldr'          => 'Intel Open Source License (Intel)',
@@ -7857,8 +8168,7 @@ END
 		. '|This condition was removed[.])\]?)?' . '[*)]'
 		. $P{nopromo_neither}
 		. '[.][  ]'
-		. $P{discl_warranties}
-		. '[.][ ]'
+		. $P{discl_warranties} . '[. ]'
 		. $P{discl_liability}
 		. '[.][  ]'
 		. 'EXPORT LAWS[:] THIS LICENSE ADDS NO RESTRICTIONS TO THE EXPORT LAWS',
@@ -7872,6 +8182,7 @@ END
 
 $RE{ipa} = {
 	name                           => 'IPA',
+	'name.alt.org.fedora'          => 'IPA',
 	'name.alt.org.osi'             => 'IPA',
 	'name.alt.org.spdx'            => 'IPA',
 	'name.alt.org.tldr.path.short' => 'ipa',
@@ -7893,6 +8204,7 @@ $RE{ipa} = {
 
 $RE{ipl} = {
 	name                                              => 'IPL',
+	'name.alt.org.fedora.synth.nogrant'               => 'IBM',
 	'name.alt.org.wikidata'                           => 'Q288745',
 	'name.alt.org.wikipedia'                          => 'IBM_Public_License',
 	'name.alt.misc.fossology_old'                     => 'IBM-PL',
@@ -7926,7 +8238,7 @@ END
 	'pat.alt.subject.license.scope.sentence' => 'UNDER THE TERMS OF THIS IBM',
 	'pat.alt.subject.license.scope.multisection.part.head' =>
 		'(?:IBM Public License Version 1\.0[  ])?'
-		. 'THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS IBM PUBLIC LICENSE [(]["]AGREEMENT["][)][.][ ]'
+		. 'THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS IBM PUBLIC LICENSE [(]["]AGREEMENT["][)][. ]'
 		. 'ANY USE, REPRODUCTION OR DISTRIBUTION OF THE PROGRAM CONSTITUTES RECIPIENT[\']S ACCEPTANCE OF THIS AGREEMENT[.][  ]'
 		. '[*)][  ]?DEFINITIONS[  ]'
 		. '["]Contribution["] means[:"]?[  ]'
@@ -7939,6 +8251,7 @@ END
 
 $RE{isc} = {
 	name                           => 'ISC',
+	'name.alt.org.fedora'          => 'ISC',
 	'name.alt.org.osi'             => 'ISC',
 	'name.alt.org.spdx'            => 'ISC',
 	'name.alt.org.tldr'            => '-isc-license',
@@ -7949,6 +8262,7 @@ $RE{isc} = {
 	'caption.alt.org.tldr'         => 'ISC License',
 	'caption.alt.org.trove'        => 'ISC License (ISCL)',
 	'caption.alt.org.wikipedia'    => 'ISC license',
+	'summary.alt.org.fedora'       => 'ISC License (Bind, DHCP Server)',
 	tags                           => [
 		'family:mit',
 		'license:is:grant',
@@ -7966,6 +8280,7 @@ $RE{isc} = {
 
 $RE{jabberpl} = {
 	name                          => 'jabberpl',
+	'name.alt.org.fedora'         => 'Jabber',
 	'name.alt.org.osi'            => 'jabberpl',
 	'name.alt.misc.fossology_old' => 'Jabber',
 	caption                       => 'Jabber Open Source License',
@@ -7987,6 +8302,7 @@ $RE{json} = {
 	name                                    => 'JSON',
 	'name.alt.org.spdx.since.date_20130117' => 'JSON',
 	caption                                 => 'JSON License',
+	'caption.alt.org.fedora'                => 'JSON License',
 	'caption.alt.org.tldr'                  => 'The JSON License',
 	tags                                    => [
 		'license:is:grant',
@@ -8040,6 +8356,7 @@ $RE{kevlin_henney} = {
 
 $RE{leptonica} = {
 	name                                    => 'Leptonica',
+	'name.alt.org.fedora.iri.self'          => 'Leptonica',
 	'name.alt.org.spdx.since.date_20140807' => 'Leptonica',
 	caption                                 => 'Leptonica License',
 	description                             => <<'END',
@@ -8085,13 +8402,13 @@ END
 
 $RE{lgpl} = {
 	name                              => 'LGPL',
-	'name.alt.org.gnu'                => 'LGPL',
+	'name.alt.org.fsf'                => 'LGPL',
 	'name.alt.org.osi'                => 'lgpl-license',
 	'name.alt.org.osi.misc.shortname' => 'LGPL',
 	'name.alt.org.wikidata'           => 'Q192897',
 	'name.alt.misc.fossology_old'     => 'CC_LGPL',
 	caption                           => 'GNU Lesser General Public License',
-	'caption.alt.org.gnu' => 'GNU Lesser General Public License (LGPL)',
+	'caption.alt.org.fsf' => 'GNU Lesser General Public License (LGPL)',
 	'caption.alt.org.osi' => 'GNU LGPL',
 	'caption.alt.org.osi.misc.list' => 'GNU Lesser General Public License',
 	'caption.alt.org.trove' =>
@@ -8121,11 +8438,11 @@ $RE{lgpl_2} = {
 	name                          => 'LGPL-2',
 	'name.alt.misc.short'         => 'LGPLv2',
 	'name.alt.org.debian'         => 'LGPL-2',
-	'name.alt.org.gnu'            => 'LGPLv2.0',
+	'name.alt.org.fsf'            => 'LGPLv2.0',
 	'name.alt.org.osi'            => 'LGPL-2.0',
 	'name.alt.misc.fossology_old' => 'LGPL_v2',
 	caption => 'GNU Library General Public License, Version 2.0',
-	'caption.alt.org.gnu' =>
+	'caption.alt.org.fsf' =>
 		'GNU Library General Public License (LGPL) version 2.0',
 	'caption.alt.org.osi' => 'GNU Library General Public License version 2',
 	iri                   => 'https://www.gnu.org/licenses/lgpl-2.0.html',
@@ -8162,12 +8479,15 @@ $RE{lgpl_2_only} = {
 
 $RE{lgpl_2_or_later} = {
 	name                                    => 'LGPL-2-or-later',
+	'name.alt.org.fedora.synth.nogrant'     => 'LGPLv2+',
 	'name.alt.org.debian'                   => 'LGPL-2+',
 	'name.alt.org.spdx.until.date_20150513' => 'LGPL-2.0+',
 	'name.alt.org.spdx.since.date_20171228' => 'LGPL-2.0-or-later',
 	'name.alt.org.trove'                    => 'LGPLv2+',
 	'name.alt.misc.fossology_old'           => 'LGPL_v2+',
 	caption => 'GNU Library General Public License v2 or later',
+	'caption.alt.org.fedora' =>
+		'GNU Lesser General Public License v2 (or 2.1) or later',
 	'caption.alt.org.trove' =>
 		'GNU Library General Public License v2 or later (LGPLv2+)',
 	tags => [
@@ -8180,7 +8500,7 @@ $RE{lgpl_2_or_later} = {
 $RE{lgpl_2_1} = {
 	name                                => 'LGPL-2.1',
 	'name.alt.misc.short'               => 'LGPLv2.1',
-	'name.alt.org.gnu'                  => 'LGPLv2.1',
+	'name.alt.org.fsf'                  => 'LGPLv2.1',
 	'name.alt.org.osi'                  => 'LGPL-2.1',
 	'name.alt.org.perl'                 => 'lgpl_2_1',
 	'name.alt.org.tldr.path.short'      => 'lgpl2',
@@ -8189,7 +8509,12 @@ $RE{lgpl_2_1} = {
 	'name.alt.misc.fossology_old_cc'    => 'CCGPL2.1',
 	'name.alt.misc.fossology_old_short' => 'LGPL2.1',
 	caption => 'GNU Lesser General Public License, Version 2.1',
-	'caption.alt.org.gnu' =>
+	'caption.alt.org.cc.until.date_20100912' =>
+		'Creative Commons GNU LGPL',    # TODO: find official date
+	'caption.alt.org.cc.misc.short.until.date_20100912' =>
+		'CC-GNU LGPL',                  # TODO: find official date
+	'caption.alt.org.fedora.misc.cc' => 'Creative Commons GNU LGPL',
+	'caption.alt.org.fsf' =>
 		'GNU Lesser General Public License (LGPL) version 2.1',
 	'caption.alt.org.trove' =>
 		'GNU Lesser General Public License v2 (LGPLv2)',
@@ -8199,7 +8524,13 @@ $RE{lgpl_2_1} = {
 	'caption.alt.misc.uppercase' => 'GNU LESSER GENERAL PUBLIC LICENSE',
 	iri                  => 'https://www.gnu.org/licenses/lgpl-2.1.html',
 	'iri.alt.format.txt' => 'https://www.gnu.org/licenses/lgpl-2.1.txt',
-	tags                 => [
+	'iri.alt.org.cc.archive.time_20101027034910.until.date_20101027' =>
+		'http://creativecommons.org/licenses/LGPL/2.1/'
+	,    # TODO: find official date
+	'iri.alt.org.cc.archive.time_20100912081720.until.date_20100912' =>
+		'http://creativecommons.org/choose/cc-lgpl'
+	,    # TODO: find official date
+	tags => [
 		'family:gpl',
 		'license:published:by_fsf',
 		'type:singleversion:lgpl',
@@ -8250,7 +8581,7 @@ $RE{lgpl_3} = {
 	name                  => 'LGPL-3',
 	'name.alt.misc.short' => 'LGPLv3',
 	'name.alt.org.debian' => 'LGPL-3',
-	'name.alt.org.gnu'    => 'LGPLv3',
+	'name.alt.org.fsf'    => 'LGPLv3',
 	'name.alt.org.osi'    => 'LGPL-3.0',
 	'name.alt.org.perl'   => 'lgpl_3_0',
 	'name.alt.org.tldr'   => 'gnu-lesser-general-public-license-v3-(lgpl-3)',
@@ -8258,7 +8589,7 @@ $RE{lgpl_3} = {
 	'name.alt.misc.fossology_old'       => 'LGPL_v3',
 	'name.alt.misc.fossology_old_short' => 'LGPL3.0',
 	caption => 'GNU Lesser General Public License, Version 3',
-	'caption.alt.org.gnu' =>
+	'caption.alt.org.fsf' =>
 		'GNU Lesser General Public License (LGPL) version 3',
 	'caption.alt.org.osi' => 'GNU Lesser General Public License version 3',
 	'caption.alt.org.perl' =>
@@ -8283,6 +8614,7 @@ $RE{lgpl_3} = {
 
 $RE{lgpl_3_only} = {
 	name                                                  => 'LGPL-3.0-only',
+	'name.alt.org.fedora.synth.nogrant'                   => 'LGPLv3',
 	'name.alt.org.spdx.until.date_20171228.synth.nogrant' => 'LGPL-3.0',
 	'name.alt.org.spdx.since.date_20171228'               => 'LGPL-3.0-only',
 	caption => 'GNU Lesser General Public License v3.0 only',
@@ -8295,6 +8627,7 @@ $RE{lgpl_3_only} = {
 
 $RE{lgpl_3_or_later} = {
 	name                                    => 'LGPL-3.0-or-later',
+	'name.alt.org.fedora'                   => 'LGPLv3+',
 	'name.alt.org.debian'                   => 'LGPL-3+',
 	'name.alt.org.spdx.until.date_20150513' => 'LGPL-3.0+',
 	'name.alt.org.spdx.since.date_20171228' => 'LGPL-3.0-or-later',
@@ -8333,7 +8666,7 @@ END
 		. $P{retain_copr_avail_orig}
 		. '[.][  ]'
 		. $P{repro_code_modcode_cite_copr_avail_note}
-		. $P{and_used_by_perm} . '[ ]'
+		. $P{and_used_by_perm} . '[". ]'
 		. $P{perm_dist_mod}
 		. $P{granted}
 		. $P{retain_copr_avail_note}
@@ -8367,13 +8700,13 @@ $RE{libpng} = {
 
 $RE{libtiff} = {
 	name                                    => 'libtiff',
-	'name.alt.org.fedora.synth.nogrant'     => 'MIT',
-	'name.alt.org.fedora.web.mit.short'     => 'Hylafax',
+	'name.alt.org.fedora.iri.self'          => 'libtiff',
+	'name.alt.org.fedora.iri.mit_short'     => 'Hylafax',
 	'name.alt.org.spdx.since.date_20140807' => 'libtiff',
 	caption                                 => 'libtiff License',
-	'caption.alt.org.fedora.web.mit'        => 'Hylafax Variant',
 	'caption.alt.org.tldr'                  => 'libtiff License',
-	tags                                    => [
+	'summary.alt.org.fedora.iri.mit' => 'MIT-style license, Hylafax Variant',
+	tags                             => [
 		'type:unversioned',
 	],
 
@@ -8496,13 +8829,15 @@ $RE{liliq_r_plus_1_1} = {
 =cut
 
 $RE{llgpl} = {
-	name                   => 'LLGPL',
-	'name.alt.org.tldr'    => 'lisp-lesser-general-public-license',
-	caption                => 'Lisp Lesser General Public License',
-	'caption.alt.org.tldr' => 'Lisp Lesser General Public License (LLGPL)',
-	iri                    => 'http://opensource.franz.com/preamble.html',
-	'iri.alt.misc.cliki'   => 'http://www.cliki.net/LLGPL',
-	tags                   => [
+	name                     => 'LLGPL',
+	'name.alt.org.fedora'    => 'LLGPL',
+	'name.alt.org.tldr'      => 'lisp-lesser-general-public-license',
+	caption                  => 'Lisp Lesser General Public License',
+	'caption.alt.org.fedora' => 'Lisp Library General Public License',
+	'caption.alt.org.tldr'   => 'Lisp Lesser General Public License (LLGPL)',
+	iri                      => 'http://opensource.franz.com/preamble.html',
+	'iri.alt.misc.cliki'     => 'http://www.cliki.net/LLGPL',
+	tags                     => [
 		'license:contains:license:lgpl_2_1',
 		'type:unversioned',
 	],
@@ -8517,9 +8852,11 @@ $RE{llgpl} = {
 =cut
 
 $RE{lpl} = {
-	name    => 'LPL',
-	caption => 'Lucent Public License',
-	tags    => [
+	name                     => 'LPL',
+	'name.alt.org.fedora'    => 'LPL',
+	caption                  => 'Lucent Public License',
+	'caption.alt.org.fedora' => 'Lucent Public License (Plan9)',
+	tags                     => [
 		'type:versioned:decimal',
 	],
 };
@@ -8545,7 +8882,7 @@ $RE{lpl_1} = {
 
 	'pat.alt.subject.license.scope.multisection.part.head' =>
 		'(?:Lucent Public License Version 1\.0[  ])?'
-		. 'THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS PUBLIC LICENSE [(]["]AGREEMENT["][)][.][ ]'
+		. 'THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS PUBLIC LICENSE [(]["]AGREEMENT["][)][. ]'
 		. "ANY USE, REPRODUCTION OR DISTRIBUTION OF THE PROGRAM CONSTITUTES RECIPIENT[']S ACCEPTANCE OF THIS AGREEMENT[.][  ]"
 		. '[*)][  ]?DEFINITIONS[  ]'
 		. '["]Contribution["] means[:"]?[  ]'
@@ -8578,7 +8915,7 @@ END
 
 	'pat.alt.subject.license.scope.multisection.part.head' =>
 		'(?:Lucent Public License Version 1\.02[  ])?'
-		. 'THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS PUBLIC LICENSE [(]["]AGREEMENT["][)][.][ ]'
+		. 'THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS PUBLIC LICENSE [(]["]AGREEMENT["][)][. ]'
 		. "ANY USE, REPRODUCTION OR DISTRIBUTION OF THE PROGRAM CONSTITUTES RECIPIENT[']S ACCEPTANCE OF THIS AGREEMENT[.][  ]"
 		. '[*)][  ]?DEFINITIONS[  ]'
 		. '["]Contribution["] means[:"]?[  ]'
@@ -8605,6 +8942,7 @@ END
 
 $RE{lppl} = {
 	name                     => 'LPPL',
+	'name.alt.org.fedora'    => 'LPPL',
 	'name.alt.org.wikidata'  => 'Q1050635',
 	'name.alt.org.wikipedia' => 'LaTeX_Project_Public_License',
 	caption                  => 'LaTeX Project Public License',
@@ -8708,9 +9046,11 @@ $RE{lppl_1_3c} = {
 
 $RE{miros} = {
 	name                                       => 'MirOS',
+	'name.alt.org.fedora'                      => 'MirOS',
 	'name.alt.org.osi'                         => 'MirOS',
 	'name.alt.org.spdx'                        => 'MirOS',
 	caption                                    => 'The MirOS License',
+	'caption.alt.org.fedora'                   => 'MirOS License',
 	'caption.alt.org.osi'                      => 'MirOS Licence',
 	'caption.alt.org.spdx.until.date_20171228' => 'MirOS Licence',
 	'caption.alt.org.spdx.since.date_20171228.until.date_20191022' =>
@@ -8731,12 +9071,15 @@ $RE{miros} = {
 =cut
 
 $RE{mit_0} = {
-	name                                    => 'MIT-0',
-	'name.alt.org.osi'                      => 'MIT-0',
-	'name.alt.org.spdx.since.date_20180414' => 'MIT-0',
-	caption                                 => 'MIT No Attribution',
-	'caption.alt.org.osi'                   => 'MIT No Attribution License',
-	description                             => <<'END',
+	name                                               => 'MIT-0',
+	'name.alt.org.fedora.iri.self.since.date_20210215' => 'MIT-0',
+	'name.alt.org.osi'                                 => 'MIT-0',
+	'name.alt.org.spdx.since.date_20180414'            => 'MIT-0',
+	caption => 'MIT No Attribution',
+	'caption.alt.org.fedora.since.date_20210215' =>
+		'MIT No Attribution (MIT-0)',
+	'caption.alt.org.osi' => 'MIT No Attribution License',
+	description           => <<'END',
 Identical to MIT (Expat), except...
 * omit retention clause
 END
@@ -8756,9 +9099,12 @@ END
 =cut
 
 $RE{mit_advertising} = {
-	name                                    => 'MIT-advertising',
+	name => 'MIT-advertising',
+
+#	'name.alt.org.fedora.iri.self' => 'MIT_With_Advertising',
 	'name.alt.org.spdx.since.date_20140807' => 'MIT-advertising',
 	caption                                 => 'Enlightenment License (e16)',
+	'caption.alt.org.fedora.iri.self'       => 'MIT With Advertising',
 	tags                                    => [
 		'family:mit',
 		'license:is:grant',
@@ -8778,7 +9124,8 @@ $RE{mit_cmu} = {
 	name                                    => 'MIT-CMU',
 	'name.alt.org.spdx.since.date_20140807' => 'MIT-CMU',
 	caption                                 => 'CMU License',
-	'caption.alt.org.fedora.web.mit'        => 'CMU Style',
+	'caption.alt.org.fedora'                => 'CMU License (BSD like)',
+	'caption.alt.org.fedora.iri.mit'        => 'CMU Style',
 	'caption.alt.org.tldr'                  => 'CMU License',
 	description                             => <<'END',
 Identical to NTP, except...
@@ -8814,16 +9161,18 @@ END
 =cut
 
 $RE{mit_cmu_warranty} = {
+	name                                    => 'SMLNJ',
 	'name.alt.org.debian'                   => 'MIT-CMU~warranty',
 	'name.alt.org.spdx.since.date_20130117' => 'SMLNJ',
 	'name.alt.org.spdx.misc.long.since.date_20140807.until.date_20150513' =>
 		'StandardML-NJ',
-	'name.alt.misc.tldr_shortname'   => 'SMLNJ',
-	caption                          => 'Standard ML of New Jersey License',
-	'caption.alt.org.fedora.web.mit' => 'Standard ML of New Jersey Variant',
-	'caption.alt.org.fedora.web.mit.short' => 'MLton variant',
+	caption                => 'Standard ML of New Jersey License',
 	'caption.alt.org.tldr' => 'Standard ML of New Jersey License (SMLNJ)',
-	description            => <<'END',
+	'summary.alt.org.fedora.iri.mit' =>
+		'MIT-style license, Standard ML of New Jersey Variant',
+	'summary.alt.org.fedora.iri.mit.misc.short' =>
+		'MIT-style license, MLton variant',
+	description => <<'END',
 Identical to MIT-CMU, except...
 * add requirement of "warranty disclaimer" appearing in documentation
 END
@@ -8851,12 +9200,12 @@ END
 
 $RE{mit_enna} = {
 	name                                    => 'MIT-enna',
-	'name.alt.org.fedora.web.mit.short'     => 'enna',
+	'name.alt.org.fedora.iri.mit_short'     => 'enna',
 	'name.alt.org.spdx.since.date_20140807' => 'MIT-enna',
 	caption                                 => 'enna License',
-	'caption.alt.org.fedora.web.mit'        => 'enna variant',
 	'caption.alt.org.tldr'                  => 'enna License',
-	tags                                    => [
+	'summary.alt.org.fedora.iri.mit' => 'MIT-style license, enna variant',
+	tags                             => [
 		'family:mit',
 		'license:is:grant',
 		'type:unversioned',
@@ -8870,14 +9219,12 @@ $RE{mit_enna} = {
 		. $P{subj_cond}
 		. $P{to_copy_sublicence_conditions}
 		. '[:]?[ ]'
-		. $P{retain_copr_perm_sw_copr}
-		. '[.][ ]'
-		. $P{ack_pub_use_nosrc}
-		. '[.][ ]'
+		. $P{retain_copr_perm_sw_copr} . '[. ]'
+		. $P{ack_pub_use_nosrc} . '[. ]'
 		. 'This includes acknowledgments '
 		. 'in either Copyright notices, Manuals, Publicity and Marketing documents '
 		. 'or any documentation provided '
-		. 'with any product containing this software[.][ ]'
+		. 'with any product containing this software[. ]'
 		. $P{license_not_lib} . '[.]',
 	'pat.alt.subject.license.scope.line' => $P{ack_pub_use_nosrc},
 };
@@ -8887,11 +9234,9 @@ $RE{mit_enna} = {
 =cut
 
 $RE{mit_epinions} = {
-	'name.alt.org.debian'               => 'MIT~Epinions',
-	'name.alt.org.fedora.synth.nogrant' => 'MIT',
-	caption                             => 'Mit Epinions Variant',
-	'caption.alt.org.fedora.web.mit'    => 'Epinions Variant',
-	tags                                => [
+	'name.alt.org.debian'            => 'MIT~Epinions',
+	'summary.alt.org.fedora.iri.mit' => 'MIT-style license, Epinions Variant',
+	tags                             => [
 		'family:mit',
 		'license:is:grant',
 		'type:unversioned',
@@ -8907,12 +9252,12 @@ $RE{mit_epinions} = {
 
 $RE{mit_feh} = {
 	name                                    => 'MIT-feh',
-	'name.alt.org.fedora.web.mit.short'     => 'feh',
+	'name.alt.org.fedora.iri.mit_short'     => 'feh',
 	'name.alt.org.spdx.since.date_20140807' => 'MIT-feh',
 	caption                                 => 'feh License',
-	'caption.alt.org.fedora.web.mit'        => 'feh variant',
 	'caption.alt.org.tldr'                  => 'feh License',
-	tags                                    => [
+	'summary.alt.org.fedora.iri.mit' => 'MIT-style license, feh variant',
+	tags                             => [
 		'family:mit',
 		'license:is:grant',
 		'type:unversioned',
@@ -8935,7 +9280,6 @@ $RE{mit_feh} = {
 
 $RE{mit_new} = {
 	'name.alt.org.debian'               => 'Expat',
-	'name.alt.org.fedora'               => 'MIT',
 	'name.alt.org.osi'                  => 'MIT',
 	'name.alt.org.perl'                 => 'mit',
 	'name.alt.org.spdx'                 => 'MIT',
@@ -8943,12 +9287,14 @@ $RE{mit_new} = {
 	'name.alt.org.tldr.path.short'      => 'mit',
 	caption                             => 'MIT License',
 	'caption.alt.org.debian'            => 'Expat License',
-	'caption.alt.org.fedora.web.mit'    => 'Modern Style with sublicense',
+	'caption.alt.org.fedora'            => 'MIT license (also X11)',
 	'caption.alt.org.osi'               => 'The MIT License',
 	'caption.alt.org.osi.misc.list'     => 'MIT License',
 	'caption.alt.org.osi.misc.cat_list' => 'MIT license',
 	'caption.alt.org.perl'              => 'MIT (aka X11) License',
 	'caption.alt.org.tldr'              => 'MIT License (Expat)',
+	'summary.alt.org.fedora.iri.mit' =>
+		'MIT-style license, Modern Style with sublicense',
 	iri                     => 'http://www.jclark.com/xml/copying.txt',
 	'iri.alt.org.wikipedia' => 'https://en.wikipedia.org/wiki/MIT_License',
 	tags                    => [
@@ -9008,7 +9354,7 @@ $RE{mit_old} = {
 $RE{mit_oldstyle} = {
 	'name.alt.org.debian'            => 'MIT~oldstyle',
 	caption                          => 'MIT (Old Style)',
-	'caption.alt.org.fedora.web.mit' => 'Old Style',
+	'summary.alt.org.fedora.iri.mit' => 'MIT-style license, Old Style',
 	description                      => <<'END',
 Origin: Possibly by Jamie Zawinski in 1993 for xscreensaver.
 END
@@ -9019,7 +9365,7 @@ END
 	],
 
 	'pat.alt.subject.license.scope.line.scope.paragraph' =>
-		'documentation[.][ ]No representations are made',
+		'documentation[. ]No representations are made',
 };
 
 =item * mit_oldstyle_disclaimer
@@ -9027,10 +9373,11 @@ END
 =cut
 
 $RE{mit_oldstyle_disclaimer} = {
-	'name.alt.org.debian'            => 'MIT~oldstyle~disclaimer',
-	caption                          => 'MIT (Old Style, legal disclaimer)',
-	'caption.alt.org.fedora.web.mit' => 'Old Style with legal disclaimer',
-	tags                             => [
+	'name.alt.org.debian' => 'MIT~oldstyle~disclaimer',
+	caption               => 'MIT (Old Style, legal disclaimer)',
+	'summary.alt.org.fedora.iri.mit' =>
+		'MIT-style license, Old Style with legal disclaimer',
+	tags => [
 		'family:mit',
 		'license:is:grant',
 		'type:unversioned',
@@ -9046,8 +9393,8 @@ $RE{mit_oldstyle_disclaimer} = {
 
 $RE{mit_oldstyle_permission} = {
 	'name.alt.org.debian' => 'MIT~oldstyle~permission',
-	'caption.alt.org.fedora.web.mit' =>
-		'Old Style (no advertising without permission)',
+	'summary.alt.org.fedora.iri.mit' =>
+		'MIT-style license, Old Style (no advertising without permission)',
 	tags => [
 		'family:mit',
 		'license:is:grant',
@@ -9097,10 +9444,10 @@ END
 =cut
 
 $RE{mit_openvision} = {
-	'name.alt.org.debian'               => 'MIT~OpenVision',
-	'name.alt.org.fedora.synth.nogrant' => 'MIT',
-	'caption.alt.org.fedora.web.mit'    => 'OpenVision Variant',
-	tags                                => [
+	'name.alt.org.debian' => 'MIT~OpenVision',
+	'summary.alt.org.fedora.iri.mit' =>
+		'MIT-style license, OpenVision Variant',
+	tags => [
 		'family:mit',
 		'license:is:grant',
 		'type:unversioned',
@@ -9115,10 +9462,9 @@ $RE{mit_openvision} = {
 =cut
 
 $RE{mit_osf} = {
-	'name.alt.org.debian'               => 'MIT~OSF',
-	'name.alt.org.fedora.synth.nogrant' => 'MIT',
-	'caption.alt.org.fedora.web.mit'    => 'HP Variant',
-	tags                                => [
+	'name.alt.org.debian'            => 'MIT~OSF',
+	'summary.alt.org.fedora.iri.mit' => 'MIT-style license, HP Variant',
+	tags                             => [
 		'family:mit',
 		'license:is:grant',
 		'type:unversioned',
@@ -9133,10 +9479,10 @@ $RE{mit_osf} = {
 =cut
 
 $RE{mit_unixcrypt} = {
-	'name.alt.org.debian'               => 'MIT~UnixCrypt',
-	'name.alt.org.fedora.synth.nogrant' => 'MIT',
-	'caption.alt.org.fedora.web.mit'    => 'UnixCrypt Variant',
-	tags                                => [
+	'name.alt.org.debian' => 'MIT~UnixCrypt',
+	'summary.alt.org.fedora.iri.mit' =>
+		'MIT-style license, UnixCrypt Variant',
+	tags => [
 		'family:mit',
 		'license:is:grant',
 		'type:unversioned',
@@ -9151,10 +9497,9 @@ $RE{mit_unixcrypt} = {
 =cut
 
 $RE{mit_whatever} = {
-	'name.alt.org.debian'               => 'MIT~whatever',
-	'name.alt.org.fedora.synth.nogrant' => 'MIT',
-	'caption.alt.org.fedora.web.mit'    => 'Whatever Variant',
-	tags                                => [
+	'name.alt.org.debian'            => 'MIT~whatever',
+	'summary.alt.org.fedora.iri.mit' => 'MIT-style license, Whatever Variant',
+	tags                             => [
 		'family:mit',
 		'license:is:grant',
 		'type:unversioned',
@@ -9169,10 +9514,9 @@ $RE{mit_whatever} = {
 =cut
 
 $RE{mit_widget} = {
-	'name.alt.org.debian'               => 'MIT~Widget',
-	'name.alt.org.fedora.synth.nogrant' => 'MIT',
-	'caption.alt.org.fedora.web.mit'    => 'Nuclear Variant',
-	tags                                => [
+	'name.alt.org.debian'            => 'MIT~Widget',
+	'summary.alt.org.fedora.iri.mit' => 'MIT-style license, Nuclear Variant',
+	tags                             => [
 		'family:mit',
 		'license:is:grant',
 		'type:unversioned',
@@ -9188,9 +9532,8 @@ $RE{mit_widget} = {
 
 $RE{mit_xfig} = {
 	'name.alt.org.debian'               => 'MIT~Xfig',
-	'name.alt.org.fedora.synth.nogrant' => 'MIT',
-	'name.alt.org.fedora.web.mit.short' => 'Xfig',
-	'caption.alt.org.fedora.web.mit'    => 'Xfig Variant',
+	'name.alt.org.fedora.iri.mit_short' => 'Xfig',
+	'summary.alt.org.fedora.iri.mit'    => 'MIT-style license, Xfig Variant',
 	tags                                => [
 		'family:mit',
 		'license:is:grant',
@@ -9207,6 +9550,7 @@ $RE{mit_xfig} = {
 
 $RE{motosoto} = {
 	name                          => 'Motosoto',
+	'name.alt.org.fedora'         => 'Motosoto',
 	'name.alt.org.osi'            => 'Motosoto',
 	'name.alt.org.spdx'           => 'Motosoto',
 	'name.alt.misc.fossology_old' => 'Motosoto_v0.9.1',
@@ -9233,7 +9577,7 @@ END
 	'pat.alt.subject.license.scope.multisection.part.part7' =>
 		'Versions of This License'
 		. '[.][  ][*)]'
-		. 'Version[.][ ]The Motosoto Open Source License is derived',
+		. 'Version[. ]The Motosoto Open Source License is derived',
 };
 
 =item * mpich2
@@ -9241,20 +9585,19 @@ END
 =cut
 
 $RE{mpich2} = {
-	'name.alt.org.fedora.synth.nogrant'     => 'MIT',
-	'name.alt.org.fedora.web.mit.short'     => 'mpich2',
+	name                                    => 'mpich2',
 	'name.alt.org.spdx.since.date_20140807' => 'mpich2',
 	caption                                 => 'mpich2 License',
-	'caption.alt.org.fedora.web.mit'        => 'mpich2 variant',
-	tags                                    => [
+	'caption.alt.org.fedora'                => 'mpich2 License',
+	'summary.alt.org.fedora.iri.mit' => 'MIT-style license, mpich2 variant',
+	tags                             => [
 		'family:mit',
 		'license:is:grant',
 		'type:unversioned',
 	],
 
 	'pat.alt.subject.license.scope.paragraph' => $P{perm_granted}
-		. $P{to_reproduce}
-		. '[.][ ]'
+		. $P{to_reproduce} . '[. ]'
 		. 'This software was authored by',
 };
 
@@ -9285,12 +9628,14 @@ $RE{mpl} = {
 
 $RE{mpl_1} = {
 	name                                => 'MPL-1.0',
+	'name.alt.org.fedora'               => 'MPLv1.0',
 	'name.alt.org.osi'                  => 'MPL-1.0',
 	'name.alt.org.perl'                 => 'mozilla_1_0',
 	'name.alt.org.spdx'                 => 'MPL-1.0',
 	'name.alt.misc.fossology_old'       => 'Mozilla1.0',
 	'name.alt.misc.fossology_old_short' => 'MPL_v1.0',
 	caption                             => 'Mozilla Public License 1.0',
+	'caption.alt.org.fedora'            => 'Mozilla Public License v1.0',
 	'caption.alt.org.osi' => 'The Mozilla Public License (MPL), version 1.0',
 	'caption.alt.org.osi.misc.list' => 'Mozilla Public License 1.0',
 	'caption.alt.org.osi.misc.do_not_use_list' =>
@@ -9313,12 +9658,14 @@ END
 
 $RE{mpl_1_1} = {
 	name                                => 'MPL-1.1',
+	'name.alt.org.fedora'               => 'MPLv1.1',
 	'name.alt.org.osi'                  => 'MPL-1.1',
 	'name.alt.org.perl'                 => 'mozilla_1_1',
 	'name.alt.org.spdx'                 => 'MPL-1.1',
 	'name.alt.misc.fossology_old'       => 'Mozilla1.1',
 	'name.alt.misc.fossology_old_short' => 'MPL_v1.1',
 	caption                             => 'Mozilla Public License 1.1',
+	'caption.alt.org.fedora'            => 'Mozilla Public License v1.1',
 	'caption.alt.org.osi.misc.do_not_use_list' =>
 		'Mozilla Public License, version 1.1',
 	'caption.alt.org.perl'   => 'Mozilla Public License, Version 1.1',
@@ -9336,11 +9683,13 @@ $RE{mpl_1_1} = {
 
 $RE{mpl_2} = {
 	name                          => 'MPL-2.0',
+	'name.alt.org.fedora'         => 'MPLv2.0',
 	'name.alt.org.osi'            => 'MPL-2.0',
 	'name.alt.org.spdx'           => 'MPL-2.0',
 	'name.alt.org.tldr'           => 'mozilla-public-license-2.0-(mpl-2)',
 	'name.alt.misc.fossology_old' => 'MPL_v2.0',
 	caption                       => 'Mozilla Public License 2.0',
+	'caption.alt.org.fedora'      => 'Mozilla Public License v2.0',
 	'caption.alt.org.osi'         => 'Mozilla Public License 2.0',
 	'caption.alt.org.tldr'        => 'Mozilla Public License 2.0 (MPL-2.0)',
 	'caption.alt.misc.trove'      => 'Mozilla Public License 2.0 (MPL 2.0)',
@@ -9391,6 +9740,7 @@ $RE{ms_cl} = {
 
 $RE{ms_pl} = {
 	name                           => 'MS-PL',
+	'name.alt.org.fedora'          => 'MS-PL',
 	'name.alt.org.osi'             => 'MS-PL',
 	'name.alt.org.spdx'            => 'MS-PL',
 	'name.alt.org.tldr.path.short' => 'mspl',
@@ -9414,6 +9764,7 @@ $RE{ms_pl} = {
 
 $RE{ms_rl} = {
 	name                           => 'MS-RL',
+	'name.alt.org.fedora'          => 'MS-RL',
 	'name.alt.org.osi'             => 'MS-RL',
 	'name.alt.org.spdx'            => 'MS-RL',
 	'name.alt.org.tldr.path.short' => 'nsrl',
@@ -9442,10 +9793,10 @@ $RE{ms_rl} = {
 =cut
 
 $RE{mulan} = {
-	name                 => 'MulanPSL',
-	caption              => 'Mulan Permissive Software License',
-	'caption.lang.zh_CN' => '木兰宽松许可证',
-	tags                 => [
+	name                     => 'MulanPSL',
+	caption                  => 'Mulan Permissive Software License',
+	'caption.alt.lang.zh_CN' => '木兰宽松许可证',
+	tags                     => [
 		'type:versioned:decimal',
 	],
 };
@@ -9453,8 +9804,8 @@ $RE{mulan} = {
 $RE{mulan_1} = {
 	name                                    => 'MulanPSL-1',
 	'name.alt.org.spdx.since.date_20191022' => 'MulanPSL-1.0',
-	caption              => 'Mulan Permissive Software License, Version 1',
-	'caption.lang.zh_CN' => '木兰宽松许可证， 第1版',
+	caption => 'Mulan Permissive Software License, Version 1',
+	'caption.alt.lang.zh_CN'     => '木兰宽松许可证， 第1版',
 	'caption.alt.misc.shortname' => 'Mulan PSL v1',
 	iri                          => 'https://license.coscl.org.cn/MulanPSL',
 	tags                         => [
@@ -9473,7 +9824,7 @@ $RE{mulan_1} = {
 		. '[, ]修改及分发受木兰宽松许可证[, ]第1版[(]["]本许可证["][)]'
 		. '的如下条款的约束',
 	'pat.alt.subject.license.scope.multisection.part.grant' =>
-		'[*]Software Name[*] is licensed under the Mulan PSL v1[.][ ]'
+		'[*]Software Name[*] is licensed under the Mulan PSL v1[. ]'
 		. 'You can use this software'
 		. ' according to the terms and conditions of the Mulan PSL v1'
 };
@@ -9482,9 +9833,9 @@ $RE{mulan_2} = {
 	name                                    => 'MulanPSL-2',
 	'name.alt.org.osi'                      => 'MulanPSL-2.0',
 	'name.alt.org.spdx.since.date_20200515' => 'MulanPSL-2.0',
-	caption               => 'Mulan Permissive Software License, Version 2',
-	'caption.lang.zh_CN'  => '木兰宽松许可证， 第2版',
-	'caption.alt.org.osi' => 'Mulan Permissive Software License v2',
+	caption => 'Mulan Permissive Software License, Version 2',
+	'caption.alt.lang.zh_CN' => '木兰宽松许可证， 第2版',
+	'caption.alt.org.osi'    => 'Mulan Permissive Software License v2',
 	'caption.alt.org.osi.misc.shortname' => 'MulanPSL - 2.0',
 	'caption.alt.misc.shortname'         => 'Mulan PSL v2',
 	iri  => 'https://license.coscl.org.cn/MulanPSL2',
@@ -9504,7 +9855,7 @@ $RE{mulan_2} = {
 		. '[, ]修改及分发受木兰宽松许可证[, ]第2版[(]["]本许可证["][)]'
 		. '的如下条款的约束',
 	'pat.alt.subject.license.scope.multisection.part.grant' =>
-		'[*]Software Name[*] is licensed under Mulan PSL v2[.][ ]'
+		'[*]Software Name[*] is licensed under Mulan PSL v2[. ]'
 		. 'You can use this software'
 		. ' according to the terms and conditions of the Mulan PSL v2',
 };
@@ -9566,8 +9917,11 @@ $RE{nasa_1_3} = {
 	'name.alt.misc.fossology_old'       => 'NASA_v1.3',
 	'name.alt.misc.fossology_old_short' => 'NASA1.3',
 	caption                             => 'NASA Open Source Agreement 1.3',
-	'caption.alt.org.osi'               => 'NASA Open Source Agreement v1.3',
-	'caption.alt.org.osi.misc.list'     => 'NASA Open Source Agreement 1.3',
+	'caption.alt.org.fedora'            => 'NASA Open Source Agreement v1.3',
+	'caption.alt.org.fedora.iri.self.synth.nogrant' =>
+		'NASA Open Source Agreement',
+	'caption.alt.org.osi'           => 'NASA Open Source Agreement v1.3',
+	'caption.alt.org.osi.misc.list' => 'NASA Open Source Agreement 1.3',
 	'caption.alt.org.tldr' => 'NASA Open Source Agreement 1.3 (NASA-1.3)',
 	iri                    => 'https://ti.arc.nasa.gov/opensource/nosa/',
 	tags                   => [
@@ -9585,6 +9939,7 @@ $RE{nasa_1_3} = {
 
 $RE{naumen} = {
 	name                            => 'Naumen',
+	'name.alt.org.fedora'           => 'Naumen',
 	'name.alt.org.osi'              => 'Naumen',
 	'name.alt.org.spdx'             => 'Naumen',
 	'name.alt.misc.fossology_old'   => 'NAUMEN',
@@ -9650,12 +10005,15 @@ END
 
 $RE{ncsa} = {
 	name                    => 'NCSA',
+	'name.alt.org.fedora'   => 'NCSA',
 	'name.alt.org.osi'      => 'NCSA',
 	'name.alt.org.spdx'     => 'NCSA',
 	'name.alt.org.wikidata' => 'Q2495855',
 	'name.alt.org.wikipedia' =>
 		'University_of_Illinois/NCSA_Open_Source_License',
 	caption => 'University of Illinois/NCSA Open Source License',
+	'caption.alt.org.fedora' =>
+		'NCSA/University of Illinois Open Source License',
 	'caption.alt.misc.short' => 'UIUC license',
 	'caption.alt.org.osi' =>
 		'The University of Illinois/NCSA Open Source License',
@@ -9693,6 +10051,7 @@ END
 
 $RE{ngpl} = {
 	name                            => 'NGPL',
+	'name.alt.org.fedora'           => 'NGPL',
 	'name.alt.org.osi'              => 'NGPL',
 	'name.alt.org.spdx'             => 'NGPL',
 	'name.alt.misc.fossology_old'   => 'Nethack',
@@ -9714,6 +10073,7 @@ $RE{ngpl} = {
 
 $RE{nokia} = {
 	name                          => 'Nokia',
+	'name.alt.org.fedora'         => 'Nokia',
 	'name.alt.org.osi'            => 'Nokia',
 	'name.alt.org.osi.misc.upper' => 'NOKIA',
 	'name.alt.org.spdx'           => 'Nokia',
@@ -9756,9 +10116,11 @@ $RE{nosl} = {
 };
 
 $RE{nosl_1} = {
-	name                              => 'NOSL-1.0',
-	'name.alt.org.spdx.synth.nogrant' => 'NOSL',
-	caption                           => 'Netizen Open Source License 1.0',
+	name                                => 'NOSL-1.0',
+	'name.alt.org.fedora.synth.nogrant' => 'NOSL',
+	'name.alt.org.spdx.synth.nogrant'   => 'NOSL',
+	caption                             => 'Netizen Open Source License 1.0',
+	'caption.alt.org.fedora.synth.nogrant' => 'Netizen Open Source License',
 	'caption.alt.org.spdx.since.date_20130117.synth.nogrant' =>
 		'Netizen Open Source License',
 	description => <<'END',
@@ -9800,9 +10162,11 @@ $RE{npl} = {
 
 $RE{npl_1} = {
 	name                                    => 'NPL-1.0',
+	'name.alt.org.fedora.synth.nogrant'     => 'Netscape',
 	'name.alt.org.spdx.since.date_20130117' => 'NPL-1.0',
 	'name.alt.misc.fossology_old'           => 'NPL_v1.0',
 	caption                                 => 'Netscape Public License v1.0',
+	'caption.alt.org.fedora.synth.nogrant'  => 'Netscape Public License',
 	iri =>
 		'https://website-archive.mozilla.org/www.mozilla.org/mpl/MPL/NPL/1.0/',
 	tags => [
@@ -9873,7 +10237,7 @@ END
 		. '[*)]Grant of Copyright License[.]',
 	'pat.alt.subject.license.scope.paragraph' =>
 		'Warranty of Provenance and Disclaimer of Warranty'
-		. '[.][ ]The Original Work is provided',
+		. '[. ]The Original Work is provided',
 };
 
 =item * ntp
@@ -9881,12 +10245,13 @@ END
 =cut
 
 $RE{ntp} = {
-	name                   => 'NTP',
-	'name.alt.org.osi'     => 'NTP',
-	'name.alt.org.spdx'    => 'NTP',
-	caption                => 'NTP License',
-	'caption.alt.org.tldr' => 'NTP License (NTP)',
-	tags                   => [
+	name                             => 'NTP',
+	'name.alt.org.osi'               => 'NTP',
+	'name.alt.org.spdx'              => 'NTP',
+	caption                          => 'NTP License',
+	'caption.alt.org.tldr'           => 'NTP License (NTP)',
+	'summary.alt.org.fedora.iri.mit' => 'MIT-style license, NTP variant',
+	tags                             => [
 		'family:mit',
 		'license:is:grant',
 		'type:unversioned',
@@ -9909,7 +10274,7 @@ $RE{ntp_disclaimer} = {
 	],
 
 	'pat.alt.subject.license.scope.paragraph' => $P{asis_expr_warranty}
-		. '[.][ ]'
+		. '[. ]'
 		. $P{discl_name_warranties},
 };
 
@@ -9948,6 +10313,7 @@ $RE{oclc_2} = {
 	'name.alt.org.spdx'           => 'OCLC-2.0',
 	'name.alt.misc.fossology_old' => 'OCLC_v2.0',
 	caption                       => 'OCLC Research Public License 2.0',
+	'caption.alt.org.fedora'      => 'OCLC Public Research License 2.0',
 	'caption.alt.org.osi' => 'The OCLC Research Public License 2.0 License',
 	'caption.alt.org.osi.misc.list' => 'OCLC Research Public License 2.0',
 	'caption.alt.org.tldr' => 'OCLC Research Public License 2.0 (OCLC-2.0)',
@@ -10080,9 +10446,10 @@ END
 };
 
 $RE{ofl_1_1} = {
-	name                              => 'OFL-1.1',
-	'name.alt.org.osi'                => 'OFL-1.1',
-	'name.alt.org.spdx'               => 'OFL-1.1',
+	name                                => 'OFL-1.1',
+	'name.alt.org.fedora.synth.nogrant' => 'OFL',
+	'name.alt.org.osi'                  => 'OFL-1.1',
+	'name.alt.org.spdx'                 => 'OFL-1.1',
 	'name.alt.org.tldr.synth.nogrant' => 'open-font-license-(ofl)-explained',
 	caption                           => 'SIL Open Font License 1.1',
 	'caption.alt.org.osi.synth.nogrant' => 'SIL OPEN FONT LICENSE',
@@ -10161,6 +10528,7 @@ $RE{ogtsl} = {
 	'name.alt.org.osi'              => 'OGTSL',
 	'name.alt.org.spdx'             => 'OGTSL',
 	caption                         => 'Open Group Test Suite License',
+	'caption.alt.org.fedora'        => 'Open Group Test Suite License',
 	'caption.alt.org.osi'           => 'The Open Group Test Suite License',
 	'caption.alt.org.osi.misc.list' => 'Open Group Test Suite License',
 	'caption.alt.org.tldr' => 'Open Group Test Suite License (OGTSL)',
@@ -10209,10 +10577,11 @@ $RE{ogtsl} = {
 =cut
 
 $RE{oldap} = {
-	name                          => 'OLDAP',
-	'name.alt.misc.fossology_old' => 'OpenLDAP',
-	caption                       => 'Open LDAP Public License',
-	tags                          => [
+	name                     => 'OLDAP',
+	'name.alt.org.fedora'    => 'OpenLDAP',
+	caption                  => 'Open LDAP Public License',
+	'caption.alt.org.fedora' => 'OpenLDAP License',
+	tags                     => [
 		'type:versioned:decimal',
 	],
 };
@@ -10273,7 +10642,7 @@ $RE{oldap_1_4} = {
 		'The OpenLDAP Public License[  ]Version 1\.4, 18 January 1999',
 	'pat.alt.subject.license.part.part8' =>
 		' and do not automatically fall under the copyright of this Package'
-		. '[.][ ]Executables produced by linking',
+		. '[. ]Executables produced by linking',
 };
 
 $RE{oldap_2} = {
@@ -10294,11 +10663,11 @@ $RE{oldap_2} = {
 		'The OpenLDAP Public License[  ]Version 2\.0, 7 June 1999',
 	'pat.alt.subject.license.part.clauses_minimal' =>
 		'without prior written permission of the OpenLDAP Foundation'
-		. '[.][ ]OpenLDAP is a registered trademark of the OpenLDAP Foundation',
+		. '[. ]OpenLDAP is a registered trademark of the OpenLDAP Foundation',
 	'pat.alt.subject.license.scope.multisection.part.clauses' =>
 		'[*)]Redistributions of source code must retain'
 		. ' copyright statements and notices'
-		. '[.] Redistributions must also contain a copy of this document'
+		. '[. ]Redistributions must also contain a copy of this document'
 		. '[.][  ][*)]'
 		. 'Redistributions in binary form must reproduce'
 		. ' the above copyright notice'
@@ -10310,12 +10679,12 @@ $RE{oldap_2} = {
 		. 'The name ["]OpenLDAP["] must not be used'
 		. ' to endorse or promote products derived from this Software'
 		. ' without prior written permission of the OpenLDAP Foundation'
-		. '[.][ ]For written permission, please contact foundation\@openldap.org'
+		. '[. ]For written permission, please contact foundation\@openldap.org'
 		. '[.][  ][*)]'
 		. 'Products derived from this Software may not be called ["]OpenLDAP["]'
 		. ' nor may ["]OpenLDAP["] appear in their names'
 		. ' without prior written permission of the OpenLDAP Foundation'
-		. '[.][ ]OpenLDAP is a registered trademark of the OpenLDAP Foundation'
+		. '[. ]OpenLDAP is a registered trademark of the OpenLDAP Foundation'
 		. '[.][  ][*)]'
 		. 'Due credit should be given to the OpenLDAP Project'
 		. ' [(][http://]www.openldap.org[/][)]'
@@ -10336,7 +10705,7 @@ $RE{oldap_2_0_1} = {
 	'pat.alt.subject.license.scope.multisection.part.clauses' =>
 		'[*)]Redistributions of source code must retain'
 		. ' copyright statements and notices'
-		. '[.] Redistributions must also contain a copy of this document'
+		. '[. ]Redistributions must also contain a copy of this document'
 		. '[.][  ][*)]'
 		. 'Redistributions in binary form must reproduce'
 		. ' the above copyright notice'
@@ -10348,12 +10717,12 @@ $RE{oldap_2_0_1} = {
 		. 'The name ["]OpenLDAP["] must not be used'
 		. ' to endorse or promote products derived from this Software'
 		. ' without prior written permission of the OpenLDAP Foundation'
-		. '[.][ ]For written permission, please contact foundation\@openldap.org'
+		. '[. ]For written permission, please contact foundation\@openldap.org'
 		. '[.][  ][*)]'
 		. 'Products derived from this Software may not be called ["]OpenLDAP["]'
 		. ' nor may ["]OpenLDAP["] appear in their names'
 		. ' without prior written permission of the OpenLDAP Foundation'
-		. '[.][ ]OpenLDAP is a trademark of the OpenLDAP Foundation'
+		. '[. ]OpenLDAP is a trademark of the OpenLDAP Foundation'
 		. '[.][  ][*)]'
 		. 'Due credit should be given to the OpenLDAP Project'
 		. ' [(][http://]www.openldap.org[/][)]'
@@ -10377,7 +10746,7 @@ $RE{oldap_2_1} = {
 	'pat.alt.subject.license.scope.multisection.part.clauses' =>
 		'[*)]Redistributions of source code must retain'
 		. ' copyright statements and notices'
-		. '[.][ ]Redistributions must also contain a copy of this document'
+		. '[. ]Redistributions must also contain a copy of this document'
 		. '[.][  ][*)]'
 		. 'Redistributions in binary form must reproduce'
 		. ' the above copyright notice'
@@ -10389,20 +10758,19 @@ $RE{oldap_2_1} = {
 		. 'The name ["]OpenLDAP["] must not be used'
 		. ' to endorse or promote products derived from this Software'
 		. ' without prior written permission of the OpenLDAP Foundation'
-		. '[.][ ]For written permission, please contact foundation\@openldap.org'
+		. '[. ]For written permission, please contact foundation\@openldap.org'
 		. '[.][  ][*)]'
 		. 'Products derived from this Software may not be called ["]OpenLDAP["]'
 		. ' nor may ["]OpenLDAP["] appear in their names'
 		. ' without prior written permission of the OpenLDAP Foundation'
-		. '[.][ ]OpenLDAP is a trademark of the OpenLDAP Foundation'
+		. '[. ]OpenLDAP is a trademark of the OpenLDAP Foundation'
 		. '[.][  ][*)]'
 		. 'Due credit should be given to the OpenLDAP Project'
 		. ' [(]http://www.openldap.org[/][)]'
 		. '[.][  ][*)]'
 		. 'The OpenLDAP Foundation may revise this license from time to time'
-		. '[.][ ]'
-		. 'Each revision is distinguished by a version number'
-		. '[.][ ]'
+		. '[. ]'
+		. 'Each revision is distinguished by a version number' . '[. ]'
 		. 'You may use the Software under terms of this license revision'
 		. ' or under the terms of any subsequent license revision[.]',
 };
@@ -10421,7 +10789,7 @@ $RE{oldap_2_2} = {
 	'pat.alt.subject.license.scope.multisection.part.clauses' =>
 		'[*)]Redistributions of source code must retain'
 		. ' copyright statements and notices'
-		. '[.][ ]Redistributions must also contain a copy of this document'
+		. '[. ]Redistributions must also contain a copy of this document'
 		. '[.][  ][*)]'
 		. 'Redistributions in binary form must reproduce'
 		. ' the above copyright notice'
@@ -10442,9 +10810,8 @@ $RE{oldap_2_2} = {
 		. ' [(][http://]www.openldap.org[/][)]'
 		. '[.][  ][*)]'
 		. 'The OpenLDAP Foundation may revise this license from time to time'
-		. '[.][ ]'
-		. 'Each revision is distinguished by a version number'
-		. '[.][ ]'
+		. '[. ]'
+		. 'Each revision is distinguished by a version number' . '[. ]'
 		. 'You may use the Software under terms of this license revision'
 		. ' or under the terms of any subsequent the license[.]',
 };
@@ -10463,7 +10830,7 @@ $RE{oldap_2_2_1} = {
 	'pat.alt.subject.license.scope.multisection.part.clauses' =>
 		'[*)]Redistributions of source code must retain'
 		. ' copyright statements and notices'
-		. '[.][ ]Redistributions must also contain a copy of this document'
+		. '[. ]Redistributions must also contain a copy of this document'
 		. '[.][  ][*)]'
 		. 'Redistributions in binary form must reproduce'
 		. ' the above copyright notice'
@@ -10484,9 +10851,8 @@ $RE{oldap_2_2_1} = {
 		. ' [(]http://www.openldap.org[/][)]'
 		. '[.][  ][*)]'
 		. 'The OpenLDAP Foundation may revise this license from time to time'
-		. '[.][ ]'
-		. 'Each revision is distinguished by a version number'
-		. '[.][ ]'
+		. '[. ]'
+		. 'Each revision is distinguished by a version number' . '[. ]'
 		. 'You may use the Software under terms of this license revision'
 		. ' or under the terms of any subsequent revision of the license[.]',
 };
@@ -10531,9 +10897,8 @@ $RE{oldap_2_2_2} = {
 		. ' [(][http://]www.openldap.org[/][)]'
 		. '[.][  ][*)]'
 		. 'The OpenLDAP Foundation may revise this license from time to time'
-		. '[.][ ]'
-		. 'Each revision is distinguished by a version number'
-		. '[.][ ]'
+		. '[. ]'
+		. 'Each revision is distinguished by a version number' . '[. ]'
 		. 'You may use the Software under terms of this license revision'
 		. ' or under the terms of any subsequent revision of the license[.]',
 };
@@ -10578,9 +10943,8 @@ $RE{oldap_2_3} = {
 		. ' [(][http://]www.openldap.org[/][)]'
 		. '[.][  ][*)]'
 		. 'The OpenLDAP Foundation may revise this license from time to time'
-		. '[.][ ]'
-		. 'Each revision is distinguished by a version number'
-		. '[.][ ]'
+		. '[. ]'
+		. 'Each revision is distinguished by a version number' . '[. ]'
 		. 'You may use the Software under terms of this license revision'
 		. ' or under the terms of any subsequent revision of the license[.]',
 };
@@ -10620,9 +10984,8 @@ $RE{oldap_2_4} = {
 		. 'Due credit should be given to the OpenLDAP Project'
 		. '[.][  ][*)]'
 		. 'The OpenLDAP Foundation may revise this license from time to time'
-		. '[.][ ]'
-		. 'Each revision is distinguished by a version number'
-		. '[.][ ]'
+		. '[. ]'
+		. 'Each revision is distinguished by a version number' . '[. ]'
 		. 'You may use the Software under terms of this license revision'
 		. ' or under the terms of any subsequent revision of the license[.]',
 };
@@ -10664,9 +11027,8 @@ $RE{oldap_2_5} = {
 		. 'Due credit should be given to the authors of the Software'
 		. '[.][  ][*)]'
 		. 'The OpenLDAP Foundation may revise this license from time to time'
-		. '[.][ ]'
-		. 'Each revision is distinguished by a version number'
-		. '[.][ ]'
+		. '[. ]'
+		. 'Each revision is distinguished by a version number' . '[. ]'
 		. 'You may use the Software under terms of this license revision'
 		. ' or under the terms of any subsequent revision of the license[.]',
 };
@@ -10706,9 +11068,8 @@ $RE{oldap_2_6} = {
 		. ' without specific, written prior permission'
 		. '[.][  ][*)]'
 		. 'The OpenLDAP Foundation may revise this license from time to time'
-		. '[.][ ]'
-		. 'Each revision is distinguished by a version number'
-		. '[.][ ]'
+		. '[. ]'
+		. 'Each revision is distinguished by a version number' . '[. ]'
 		. 'You may use the Software under terms of this license revision'
 		. ' or under the terms of any subsequent revision of the license[.]',
 };
@@ -10787,6 +11148,7 @@ $RE{oldap_2_8} = {
 
 $RE{openssl} = {
 	name                   => 'OpenSSL',
+	'name.alt.org.fedora'  => 'OpenSSL',
 	'name.alt.org.perl'    => 'openssl',
 	'name.alt.org.spdx'    => 'OpenSSL',
 	caption                => 'OpenSSL License',
@@ -10808,10 +11170,10 @@ END
 		$P{repro_copr_cond_discl}
 		. '[.][  ]' . '[*)]?'
 		. $P{ad_mat_ack_this}
-		. 'the OpenSSL Project for use in the OpenSSL Toolkit[.] [(][http://]www\.openssl\.org[/][)]["]'
+		. 'the OpenSSL Project for use in the OpenSSL Toolkit[. ][(][http://]www\.openssl\.org[/][)]["]'
 		. '[  ]' . '[*)]?'
 		. $P{nopromo_neither}
-		. '[.] For written permission, please contact openssl[-]core[@]openssl\.org'
+		. '[. ]For written permission, please contact openssl[-]core[@]openssl\.org'
 		. '[.][  ]' . '[*)]?'
 		. 'Products derived from this software may not be called ["]OpenSSL["]',
 	'pat.alt.subject.license.scope.paragraph.part.apache_1_overlap' =>
@@ -10819,14 +11181,13 @@ END
 		. 'the OpenSSL Project for use in the OpenSSL Toolkit',
 	'pat.alt.subject.license.scope.multisection.part.second_half' =>
 		$P{redist_ack_this}
-		. 'the OpenSSL Project for use in the OpenSSL Toolkit[.] [(][http://]www\.openssl\.org[/][)]["]'
+		. 'the OpenSSL Project for use in the OpenSSL Toolkit[. ][(][http://]www\.openssl\.org[/][)]["]'
 		. '[  ]'
-		. $P{discl_warranties}
-		. '[.][ ]'
+		. $P{discl_warranties} . '[. ]'
 		. $P{discl_liability}
 		. '[.][  ]'
 		. 'This product includes cryptographic software written by Eric Young [(]eay[@]cryptsoft\.com[)]'
-		. '[.][ ]'
+		. '[. ]'
 		. 'This product includes software written by Tim Hudson [(]tjh[@]cryptsoft\.com[)]'
 		. '[.][  ]',
 };
@@ -10854,6 +11215,7 @@ $RE{opl_1} = {
 	'name.alt.misc.fossology_old'           => 'Open-Publication_v1.0',
 	'name.alt.misc.fossology_old_short'     => 'OpenPL_v1.0',
 	caption                                 => 'Open Public License v1.0',
+	'caption.alt.org.fedora.iri.self.synth.nogrant' => 'Open Public License',
 	'caption.alt.org.tldr'       => 'Open Public License v1.0 (OPL-1.0)',
 	'caption.alt.misc.shortname' => 'OpenPL 1.0',
 	description                  => <<'END',
@@ -10938,6 +11300,8 @@ $RE{osl_1} = {
 	'name.alt.misc.fossology_old'       => 'OpenSoftware1.0',
 	'name.alt.misc.fossology_old_short' => 'OSL_v1.0',
 	caption                             => 'Open Software License 1.0',
+	'caption.alt.org.fedora'            => 'Open Software License 1.0',
+	'caption.alt.org.fedora.misc.short' => 'OSL 1.0',
 	'caption.alt.org.osi'           => 'Open Software License, version 1.0',
 	'caption.alt.org.osi.misc.list' => 'Open Software License 1.0',
 	'caption.alt.org.tldr'          => 'Open Software License 1.0 (OSL-1.0)',
@@ -10954,10 +11318,13 @@ $RE{osl_1} = {
 
 $RE{osl_1_1} = {
 	name                                    => 'OSL-1.1',
+	'name.alt.org.fedora'                   => 'OSL1.1',
 	'name.alt.org.spdx.since.date_20140807' => 'OSL-1.1',
 	'name.alt.misc.fossology_old'           => 'OpenSoftware1.1',
 	'name.alt.misc.fossology_old_short'     => 'OSL_v1.1',
 	caption                                 => 'Open Software License 1.1',
+	'caption.alt.org.fedora'                => 'Open Software License 1.1',
+	'caption.alt.org.fedora.misc.short'     => 'OSL 1.1',
 	'caption.alt.org.tldr' => 'Open Software License 1.1 (OSL-1.1)',
 	tags                   => [
 		'license:contains:grant',
@@ -10976,6 +11343,8 @@ $RE{osl_2} = {
 	'name.alt.misc.fossology_old'       => 'OpenSoftware2.0',
 	'name.alt.misc.fossology_old_short' => 'OSL_v2.0',
 	caption                             => 'Open Software License 2.0',
+	'caption.alt.org.fedora'            => 'Open Software License 2.0',
+	'caption.alt.org.fedora.misc.short' => 'OSL 2.0',
 	'caption.alt.org.tldr' => 'Open Software License 2.0 (OSL-2.0)',
 	tags                   => [
 		'license:contains:grant',
@@ -10999,11 +11368,14 @@ $RE{osl_2} = {
 
 $RE{osl_2_1} = {
 	name                                => 'OSL-2.1',
+	'name.alt.org.fedora'               => 'OSL2.1',
 	'name.alt.org.osi'                  => 'OSL-2.1',
 	'name.alt.org.spdx'                 => 'OSL-2.1',
 	'name.alt.misc.fossology_old'       => 'OpenSoftware2.1',
 	'name.alt.misc.fossology_old_short' => 'OSL_v2.1',
 	caption                             => 'Open Software License 2.1',
+	'caption.alt.org.fedora'            => 'Open Software License 2.1',
+	'caption.alt.org.fedora.misc.short' => 'OSL 2.1',
 	'caption.alt.org.osi'               => 'The Open Software License 2.1',
 	'caption.alt.org.osi.misc.list'     => 'Open Software License 2.1',
 	'caption.alt.org.tldr' => 'Open Software License 2.1 (OSL-2.1)',
@@ -11025,6 +11397,8 @@ $RE{osl_3} = {
 	'name.alt.misc.fossology_old'       => 'OpenSoftware3.0',
 	'name.alt.misc.fossology_old_short' => 'OSL_v3.0',
 	caption                             => 'Open Software License 3.0',
+	'caption.alt.org.fedora'            => 'Open Software License 3.0',
+	'caption.alt.org.fedora.misc.short' => 'OSL 3.0',
 	'caption.alt.org.osi'               => 'The Open Software License 3.0',
 	'caption.alt.org.osi.misc.list'     => 'Open Software License 3.0',
 	'caption.alt.org.osi.misc.cat_list.synth.nogrant' =>
@@ -11056,9 +11430,13 @@ $RE{pddl} = {
 };
 
 $RE{pddl_1} = {
-	name                => 'PDDL-1.0',
-	'name.alt.org.spdx' => 'PDDL-1.0',
+	name                                         => 'PDDL-1.0',
+	'name.alt.org.fedora'                        => 'PDDL-1.0',
+	'name.alt.org.fedora.iri.self.synth.nogrant' => 'PDDL',
+	'name.alt.org.spdx'                          => 'PDDL-1.0',
 	caption => 'Open Data Commons Public Domain Dedication & License 1.0',
+	'caption.alt.org.fedora.synth.nogrant' =>
+		'Open Data Commons Public Domain Dedication and Licence',
 	'caption.alt.org.spdx.until.date_20210307' =>
 		'ODC Public Domain Dedication & License 1.0',
 	'caption.alt.org.spdx.since.date_20210307' =>
@@ -11115,16 +11493,17 @@ $RE{php} = {
 };
 
 $RE{php_3} = {
-	name                            => 'PHP-3.0',
-	'name.alt.org.osi'              => 'PHP-3.0',
-	'name.alt.org.spdx'             => 'PHP-3.0',
-	'name.alt.org.tldr.path.short'  => 'php',
-	'name.alt.misc.fossology_old'   => 'PHP_v3.0',
-	caption                         => 'PHP License v3.0',
-	'caption.alt.org.osi'           => 'The PHP License 3.0',
-	'caption.alt.org.osi.misc.list' => 'PHP License 3.0',
-	'caption.alt.org.tldr'          => 'PHP License 3.0 (PHP)',
-	description                     => <<'END',
+	name                                => 'PHP-3.0',
+	'name.alt.org.fedora.synth.nogrant' => 'PHP',
+	'name.alt.org.osi'                  => 'PHP-3.0',
+	'name.alt.org.spdx'                 => 'PHP-3.0',
+	'name.alt.org.tldr.path.short'      => 'php',
+	'name.alt.misc.fossology_old'       => 'PHP_v3.0',
+	caption                             => 'PHP License v3.0',
+	'caption.alt.org.osi'               => 'The PHP License 3.0',
+	'caption.alt.org.osi.misc.list'     => 'PHP License 3.0',
+	'caption.alt.org.tldr'              => 'PHP License 3.0 (PHP)',
+	description                         => <<'END',
 Origin: Possibly OpenSSL License
 END
 	tags => [
@@ -11140,28 +11519,25 @@ END
 		. '[.][  ]'
 		. '[*)]The name ["]PHP["] must not be used '
 		. 'to endorse or promote products derived from this software '
-		. 'without prior written permission'
-		. '[.][ ]'
+		. 'without prior written permission' . '[. ]'
 		. 'For written permission, please contact group\@php\.net'
 		. '[.][  ]'
 		. '[*)]Products derived from this software may not be called ["]PHP["], '
 		. 'nor may ["]PHP["] appear in their name, '
-		. 'without prior written permission from group\@php\.net'
-		. '[.][ ]'
+		. 'without prior written permission from group\@php\.net' . '[. ]'
 		. 'You may indicate that your software works in conjunction with PHP '
 		. 'by saying ["]Foo for PHP["] instead of calling it ["]PHP Foo["] or ["]phpfoo["]'
 		. '[  ]'
 		. '[*)]The PHP Group may publish revised and[/]or new versions of the license from time to time'
-		. '[.][ ]'
+		. '[. ]'
 		. 'Each version will be given a distinguishing version number'
-		. '[.][ ]'
+		. '[. ]'
 		. 'Once covered code has been published under a particular version of the license, '
 		. 'you may always continue to use it under the terms of that version'
-		. '[.][ ]'
+		. '[. ]'
 		. 'You may also choose to use such covered code '
 		. 'under the terms of any subsequent version of the license '
-		. 'published by the PHP Group'
-		. '[.][ ]'
+		. 'published by the PHP Group' . '[. ]'
 		. 'No one other than the PHP Group has the right to modify the terms '
 		. 'applicable to covered code created under this License'
 		. '[.][  ]'
@@ -11199,28 +11575,25 @@ $RE{php_3_01} = {
 		. '[.][  ]'
 		. '[*)]The name ["]PHP["] must not be used '
 		. 'to endorse or promote products derived from this software '
-		. 'without prior written permission'
-		. '[.][ ]'
+		. 'without prior written permission' . '[. ]'
 		. 'For written permission, please contact group\@php\.net'
 		. '[.][  ]'
 		. '[*)]Products derived from this software may not be called ["]PHP["], '
 		. 'nor may ["]PHP["] appear in their name, '
-		. 'without prior written permission from group\@php\.net'
-		. '[.][ ]'
+		. 'without prior written permission from group\@php\.net' . '[. ]'
 		. 'You may indicate that your software works in conjunction with PHP '
 		. 'by saying ["]Foo for PHP["] instead of calling it ["]PHP Foo["] or ["]phpfoo["]'
 		. '[  ]'
 		. '[*)]The PHP Group may publish revised and[/]or new versions of the license from time to time'
-		. '[.][ ]'
+		. '[. ]'
 		. 'Each version will be given a distinguishing version number'
-		. '[.][ ]'
+		. '[. ]'
 		. 'Once covered code has been published under a particular version of the license, '
 		. 'you may always continue to use it under the terms of that version'
-		. '[.][ ]'
+		. '[. ]'
 		. 'You may also choose to use such covered code '
 		. 'under the terms of any subsequent version of the license '
-		. 'published by the PHP Group'
-		. '[.][ ]'
+		. 'published by the PHP Group' . '[. ]'
 		. 'No one other than the PHP Group has the right to modify the terms '
 		. 'applicable to covered code created under this License'
 		. '[.][  ]'
@@ -11236,17 +11609,19 @@ $RE{php_3_01} = {
 =cut
 
 $RE{postgresql} = {
-	name                             => 'PostgreSQL',
-	'name.alt.org.osi'               => 'PostgreSQL',
-	'name.alt.org.spdx'              => 'PostgreSQL',
-	caption                          => 'PostgreSQL License',
-	'caption.alt.org.fedora.web'     => 'PostgreSQL License',
-	'caption.alt.org.fedora.web.mit' => 'PostgreSQL License (MIT Variant)',
-	'caption.alt.org.osi'            => 'The PostgreSQL Licence',
-	'caption.alt.org.osi.misc.list'  => 'The PostgreSQL License',
-	'caption.alt.org.tldr'           => 'PostgreSQL License (PostgreSQL)',
-	'caption.alt.org.trove'          => 'PostgreSQL License',
-	tags                             => [
+	name                              => 'PostgreSQL',
+	'name.alt.org.fedora'             => 'PostgreSQL',
+	'name.alt.org.osi'                => 'PostgreSQL',
+	'name.alt.org.spdx'               => 'PostgreSQL',
+	caption                           => 'PostgreSQL License',
+	'caption.alt.org.fedora.iri.self' => 'PostgreSQL License',
+	'caption.alt.org.osi'             => 'The PostgreSQL Licence',
+	'caption.alt.org.osi.misc.list'   => 'The PostgreSQL License',
+	'caption.alt.org.tldr'            => 'PostgreSQL License (PostgreSQL)',
+	'caption.alt.org.trove'           => 'PostgreSQL License',
+	'summary.alt.org.fedora.iri.mit' =>
+		'MIT-style license, PostgreSQL License (MIT Variant)',
+	tags => [
 		'family:mit',
 		'license:is:grant',
 		'type:unversioned',
@@ -11261,9 +11636,10 @@ $RE{postgresql} = {
 
 $RE{public_domain} = {
 	name                          => 'public-domain',
-	'name.alt.org.gnu'            => 'PublicDomain',
+	'name.alt.org.fsf'            => 'PublicDomain',
 	'name.alt.misc.case_and_dash' => 'Public-Domain',
 	caption                       => 'Public domain',
+	'caption.alt.org.fedora'      => 'Public Domain',
 	'caption.alt.org.trove'       => 'Public Domain',
 	'iri.alt.org.linfo'           => 'http://www.linfo.org/publicdomain.html',
 	tags                          => [
@@ -11297,12 +11673,14 @@ $RE{public_domain}{'_pat.alt.subject.grant'} = [
 
 $RE{python} = {
 	name                        => 'Python',
+	'name.alt.org.fedora'       => 'Python',
 	'name.alt.misc.short'       => 'PSFL',
 	'name.alt.misc.shortest'    => 'PSF',
 	'name.alt.org.wikidata'     => 'Q2600299',
 	caption                     => 'Python Software Foundation License',
+	'caption.alt.org.fedora'    => 'Python License',
 	'caption.alt.org.osi'       => 'Python License',
-	'caption.alt.org.python'    => 'PSF License Agreement',
+	'caption.alt.org.steward'   => 'PSF License Agreement',
 	'caption.alt.org.trove'     => 'Python Software Foundation License',
 	'caption.alt.misc.desc'     => 'new Python license',
 	'caption.alt.org.wikipedia' => 'Python Software Foundation License',
@@ -11346,6 +11724,7 @@ $RE{python_2} = {
 
 $RE{qpl} = {
 	name                        => 'QPL',
+	'name.alt.org.fedora'       => 'QPL',
 	caption                     => 'Q Public License',
 	'caption.alt.org.trove'     => 'Qt Public License (QPL)',
 	'caption.alt.org.wikipedia' => 'Q Public License',
@@ -11362,7 +11741,7 @@ $RE{qpl_1} = {
 	'name.alt.org.wikidata'       => 'Q1396282',
 	'name.alt.misc.fossology_old' => 'QPL_v1.0',
 	caption                       => 'Q Public License 1.0',
-	'caption.alt.org.gnu'         => 'Q Public License (QPL), Version 1.0',
+	'caption.alt.org.fsf'         => 'Q Public License (QPL), Version 1.0',
 	'caption.alt.org.osi.synth.nogrant' => 'The Q Public License Version',
 	'caption.alt.org.osi.misc.list.synth.nogrant' => 'Q Public License',
 	'caption.alt.org.perl' => 'Q Public License, Version 1.0',
@@ -11397,6 +11776,7 @@ $RE{rpl} = {
 	'name.alt.org.wikidata'  => 'Q7302458',
 	'name.alt.org.wikipedia' => 'Reciprocal_Public_License',
 	caption                  => 'Reciprocal Public License',
+	'caption.alt.org.fedora' => 'Reciprocal Public License',
 	tags                     => [
 		'type:versioned:decimal',
 	],
@@ -11524,7 +11904,7 @@ $RE{rpsl_1} = {
 	licenseversion => '1.0',
 
 	'pat.alt.subject.license' =>
-		'General Definitions[.] This License applies to any program or other work',
+		'General Definitions[. ]This License applies to any program or other work',
 };
 
 =item * ruby
@@ -11533,6 +11913,7 @@ $RE{rpsl_1} = {
 
 $RE{ruby} = {
 	name                   => 'Ruby',
+	'name.alt.org.fedora'  => 'Ruby',
 	'name.alt.org.spdx'    => 'Ruby',
 	caption                => 'Ruby License',
 	'caption.alt.org.tldr' => 'Ruby License (Ruby)',
@@ -11555,6 +11936,7 @@ $RE{rscpl} = {
 	'name.alt.misc.fossology_old'        => 'Ricoh',
 	'name.alt.misc.fossology_old_verson' => 'Ricoh_v1.0',
 	caption                         => 'Ricoh Source Code Public License',
+	'caption.alt.org.fedora'        => 'Ricoh Source Code Public License',
 	'caption.alt.org.osi'           => 'The Ricoh Source Code Public License',
 	'caption.alt.org.osi.misc.list' => 'Ricoh Source Code Public License',
 	'caption.alt.org.tldr' => 'Ricoh Source Code Public License (RSCPL)',
@@ -11563,7 +11945,7 @@ $RE{rscpl} = {
 	],
 
 	'pat.alt.subject.license.scope.sentence' =>
-		'Endorsements[.] The names ["]Ricoh,["] ["]Ricoh Silicon Valley,["] and ["]RSV["] must not'
+		'Endorsements[. ]The names ["]Ricoh,["] ["]Ricoh Silicon Valley,["] and ["]RSV["] must not'
 };
 
 =item * sax_pd
@@ -11610,7 +11992,7 @@ END
 	],
 	licenseversion => '1.0.0',
 
-	'pat.alt.subject.license.scope.line.scope.sentence.section.part4_2' =>
+	'pat.alt.subject.license.scope.line.scope.sentence.part.part4_2' =>
 		'If the clause 4\.1 becomes true the licensee must pay',
 };
 
@@ -11646,7 +12028,7 @@ $RE{sgi_b_1} = {
 	licenseversion => '1.0',
 
 	'pat.alt.subject.license.scope.line.scope.paragraph' =>
-		'License Grant[.] Subject to the provisions',
+		'License Grant[. ]Subject to the provisions',
 	'pat.alt.subject.license.scope.multiparagraph.part.head' =>
 		'SGI FREE SOFTWARE LICENSE B[ ][(]Version 1\.0 1[/]25[/]2000[)][  ]'
 		. '[*)]Definitions[.]',
@@ -11672,7 +12054,8 @@ $RE{sgi_b_1_1} = {
 $RE{sgi_b_2} = {
 	name                                    => 'SGI-B-2.0',
 	'name.alt.org.spdx.since.date_20130117' => 'SGI-B-2.0',
-	caption                => 'SGI Free Software License B v2.0',
+	caption                  => 'SGI Free Software License B v2.0',
+	'caption.alt.org.fedora' => 'SGI Free Software License B 2.0',
 	'caption.alt.org.tldr' => 'SGI Free Software License B v2.0 (SGI-B-2.0)',
 	'name.alt.misc.fossology_old'                     => 'RPSL_v1.1',
 	'name.alt.misc.fossology_old'                     => 'SGI-B2.0',
@@ -11687,7 +12070,7 @@ $RE{sgi_b_2} = {
 	'pat.alt.subject.license.scope.multiparagraph.part.head' =>
 		'SGI FREE SOFTWARE LICENSE B[  ]'
 		. '[(]Version 2\.0, Sept\. 18, 2008[)] '
-		. 'Copyright[c] \[dates of first publication\] Silicon Graphics, Inc\. '
+		. 'Copyright[c] \[dates of first publication\] Silicon Graphics, Inc[. ]'
 		. 'All Rights Reserved[.][  ]'
 		. $P{perm_granted},
 };
@@ -11773,6 +12156,7 @@ END
 
 $RE{sissl} = {
 	name                     => 'SISSL',
+	'name.alt.org.fedora'    => 'SISSL',
 	'name.alt.org.perl'      => 'sun',
 	'name.alt.org.wikipedia' => 'Sun_Industry_Standards_Source_License',
 	'name.alt.org.wikidata'  => 'Q635577',
@@ -11835,6 +12219,7 @@ $RE{sissl_1_2} = {
 
 $RE{sleepycat} = {
 	name                            => 'Sleepycat',
+	'name.alt.org.fedora.iri.self'  => 'Sleepycat',
 	'name.alt.org.osi'              => 'Sleepycat',
 	'name.alt.org.spdx'             => 'Sleepycat',
 	'name.alt.org.wikipedia'        => 'Sleepycat_License',
@@ -11842,6 +12227,7 @@ $RE{sleepycat} = {
 	caption                         => 'Sleepycat License',
 	'caption.alt.misc.berkeley'     => 'Berkeley Database License',
 	'caption.alt.misc.public'       => 'Sleepycat Public License',
+	'caption.alt.org.fedora'        => 'Sleepycat Software Product License',
 	'caption.alt.org.osi'           => 'The Sleepycat License',
 	'caption.alt.org.osi.misc.list' => 'Sleepycat License',
 	'caption.alt.org.tldr'          => 'Sleepycat License',
@@ -11892,7 +12278,7 @@ END
 	],
 	licenseversion => '1.10.0',
 
-	'pat.alt.subject.license.scope.line.scope.sentence.section.part1_6' =>
+	'pat.alt.subject.license.scope.line.scope.sentence.part.part1_6' =>
 		'If the 1\.5 clause becomes true the licensee must pay',
 };
 
@@ -11908,7 +12294,7 @@ END
 	],
 	licenseversion => '2.0.1',
 
-	'pat.alt.subject.license.scope.line.scope.sentence.section.part3_2' =>
+	'pat.alt.subject.license.scope.line.scope.sentence.part.part3_2' =>
 		'If the 3\.1 clause becaumes true the licensee must pay',
 };
 
@@ -11942,7 +12328,7 @@ END
 	],
 	licenseversion => '2.1.0',
 
-	'pat.alt.subject.license.scope.line.scope.sentence.section.part1_3_4' =>
+	'pat.alt.subject.license.scope.line.scope.sentence.part.part1_3_4' =>
 		'The same rule about commercial use stated in clause 1\.1 applies here',
 };
 
@@ -11958,7 +12344,7 @@ END
 	],
 	licenseversion => '2.3.0',
 
-	'pat.alt.subject.license.scope.line.scope.sentence.section.part3_2' =>
+	'pat.alt.subject.license.scope.line.scope.sentence.part.part3_2' =>
 		'If the clause 3\.1 becomes true the licensee must pay',
 };
 
@@ -11970,6 +12356,7 @@ END
 
 $RE{spl} = {
 	name                     => 'SPL',
+	'name.alt.org.fedora'    => 'SPL',
 	'name.alt.org.wikidata'  => 'Q648252',
 	'name.alt.org.wikipedia' => 'Sun_Public_License',
 	caption                  => 'Sun Public License',
@@ -12026,10 +12413,9 @@ $RE{ssleay} = {
 =cut
 
 $RE{stlport} = {
-	name                                => 'STLport',
-	'name.alt.org.fedora.synth.nogrant' => 'MIT',
-	caption                             => 'STLport License Agreement',
-	'caption.alt.org.fedora.web.mit'    => 'Cheusov variant',
+	name                             => 'STLport',
+	caption                          => 'STLport License Agreement',
+	'summary.alt.org.fedora.iri.mit' => 'MIT-style license, Cheusov variant',
 	iri  => 'http://www.stlport.org/doc/license.html',
 	tags => [
 		'family:mit',
@@ -12077,9 +12463,11 @@ $RE{sugarcrm_1_1_3} = {
 # Yes, it is unversioned
 $RE{tosl} = {
 	name                                    => 'TOSL',
+	'name.alt.org.fedora'                   => 'TOSL',
 	'name.alt.org.spdx.since.date_20140807' => 'TOSL',
 	'name.alt.misc.legal'                   => 'TRUST',
 	caption                                 => 'Trusster Open Source License',
+	'caption.alt.org.fedora'                => 'Trusster Open Source License',
 	'caption.alt.misc.legal' =>
 		'Trusster Open Source License version 1.0a (TRUST)',
 	description => <<'END',
@@ -12108,9 +12496,10 @@ END
 =cut
 
 $RE{truecrypt} = {
-	name    => 'TrueCrypt',
-	caption => 'TrueCrypt License',
-	tags    => [
+	name                     => 'TrueCrypt',
+	caption                  => 'TrueCrypt License',
+	'caption.alt.org.fedora' => 'TrueCrypt License',
+	tags                     => [
 		'type:versioned:decimal',
 	],
 };
@@ -12166,8 +12555,10 @@ $RE{ucl_1} = {
 
 $RE{unicode_dfs_2015} = {
 	name                                    => 'Unicode-DFS-2015',
+	'name.alt.org.fedora.synth.nogrant'     => 'Unicode',
 	'name.alt.org.spdx.since.date_20170106' => 'Unicode-DFS-2015',
 	caption => 'Unicode License Agreement - Data Files and Software (2015)',
+	'caption.alt.org.fedora' => 'Unicode License',
 	'iri.alt.archive.time_20160426001149' =>
 		'http://www.unicode.org/copyright.html#Exhibit1',
 	tags => [
@@ -12247,6 +12638,7 @@ $RE{unlicense} = {
 	'iri.alt.org.wikidata'                  => 'Q21659044',
 	'iri.alt.org.wikipedia'                 => 'Unlicense',
 	caption                                 => 'The Unlicense',
+	'caption.alt.org.fedora.iri.self'       => 'Unlicense',
 	'caption.alt.org.tldr'                  => 'Unlicense',
 	iri                                     => 'https://unlicense.org/',
 	'iri.alt.format.txt' => 'https://unlicense.org/UNLICENSE',
@@ -12265,9 +12657,10 @@ $RE{unlicense} = {
 =cut
 
 $RE{upl} = {
-	name    => 'UPL',
-	caption => 'Universal Permissive License',
-	tags    => [
+	name                           => 'UPL',
+	'name.alt.org.fedora.iri.self' => 'UPL',
+	caption                        => 'Universal Permissive License',
+	tags                           => [
 		'type:versioned:decimal',
 	],
 };
@@ -12309,10 +12702,12 @@ $RE{vsl} = {
 };
 
 $RE{vsl_1} = {
-	name                            => 'VSL-1.0',
-	'name.alt.org.osi'              => 'VSL-1.0',
-	'name.alt.org.spdx'             => 'VSL-1.0',
-	caption                         => 'Vovida Software License v1.0',
+	name                                => 'VSL-1.0',
+	'name.alt.org.fedora.synth.nogrant' => 'VSL',
+	'name.alt.org.osi'                  => 'VSL-1.0',
+	'name.alt.org.spdx'                 => 'VSL-1.0',
+	caption                             => 'Vovida Software License v1.0',
+	'caption.alt.org.fedora'            => 'Vovida Software License v. 1.0',
 	'caption.alt.org.osi'           => 'The Vovida Software License v. 1.0',
 	'caption.alt.org.osi.misc.list' => 'Vovida Software License v. 1.0',
 	'caption.alt.org.tldr' => 'Vovida Software License v1.0 (VSL-1.0)',
@@ -12352,8 +12747,7 @@ $RE{vspl} = {
 	'pat.alt.subject.license.scope.sentence' =>
 		'You can modify, distribute and use this software '
 		. 'for any purpose without any restrictions '
-		. 'as long as you keep this copyright notice intact'
-		. '[.][ ]'
+		. 'as long as you keep this copyright notice intact' . '[. ]'
 		. 'The software is provided without any warranty[.]',
 };
 
@@ -12423,11 +12817,14 @@ $RE{w3c_19980720} = {
 };
 
 $RE{w3c_20021231} = {
-	name                              => 'W3C-20021231',
-	'name.alt.org.debian'             => 'W3C-20021231',
-	'name.alt.org.osi.synth.nogrant'  => 'W3C',
-	'name.alt.org.spdx.synth.nogrant' => 'W3C',
+	name                                => 'W3C-20021231',
+	'name.alt.org.debian'               => 'W3C-20021231',
+	'name.alt.org.fedora.synth.nogrant' => 'W3C',
+	'name.alt.org.osi.synth.nogrant'    => 'W3C',
+	'name.alt.org.spdx.synth.nogrant'   => 'W3C',
 	caption => 'W3C Software Notice and License (2002-12-31)',
+	'caption.alt.org.fedora.synth.nogrant' =>
+		'W3C Software Notice and License',
 	'caption.alt.org.osi.synth.nogrant' =>
 		'The W3C® SOFTWARE NOTICE AND LICENSE',
 	'caption.alt.org.osi.misc.list.synth.nogrant' => 'W3C License',
@@ -12502,7 +12899,8 @@ $RE{watcom_1} = {
 	'name.alt.org.spdx' => 'Watcom-1.0',
 	'name.alt.org.tldr' =>
 		'sybase-open-watcom-public-license-1.0-(watcom-1.0)',
-	caption => 'Sybase Open Watcom Public License 1.0',
+	caption                  => 'Sybase Open Watcom Public License 1.0',
+	'caption.alt.org.fedora' => 'Sybase Open Watcom Public License 1.0',
 	'caption.alt.org.osi.synth.nogrant' => 'The Sybase Open Source Licence',
 	'caption.alt.org.osi.misc.list' =>
 		'Sybase Open Watcom Public License 1.0',
@@ -12525,11 +12923,9 @@ $RE{watcom_1} = {
 =cut
 
 $RE{wordnet} = {
-	'name.alt.org.fedora.synth.nogrant' => 'MIT',
-	caption                             => 'WordNet license',
-	'caption.alt.org.fedora.web.mit'    => 'WordNet Variant',
-	iri => 'https://wordnet.princeton.edu/license-and-commercial-use',
-	'iri.alt.archive.date_20180118074053' =>
+	caption => 'WordNet license',
+	iri     => 'https://wordnet.princeton.edu/license-and-commercial-use',
+	'iri.alt.archive.time_20180118074053' =>
 		'https://wordnet.princeton.edu/wordnet/license',
 	tags => [
 		'family:mit',
@@ -12539,17 +12935,22 @@ $RE{wordnet} = {
 };
 
 $RE{wordnet_3} = {
-	caption => 'WordNet 3.0 license',
-	'caption.alt.org.fedora.web.mit' =>
-		'Old Style (no advertising without permission)',
-	tags => [
+	caption                          => 'WordNet 3.0 license',
+	'summary.alt.org.fedora.iri.mit' => 'MIT-style license, WordNet Variant',
+	tags                             => [
 		'family:mit',
 		'type:singleversion:wordnet',
 	],
 	licenseversion => '3.0',
 
-	'pat.alt.subject.license.scope.line.scope.sentence' =>
+	'pat.alt.subject.license.scope.line.scope.sentence.part.intro' =>
 		'This software and database is being provided',
+	'_pat.alt.subject.license.scope.line.scope.sentence.part.permissions' => [
+
+		# cover line wrapping at either side of word "database"
+		'distribute this software and database',
+		'database and its documentation for any purpose',
+	],
 };
 
 =item * wtfpl
@@ -12561,12 +12962,12 @@ $RE{wordnet_3} = {
 =cut
 
 $RE{wtfpl} = {
-	name                     => 'WTFPL',
-	'name.alt.org.wikidata'  => 'Q152481',
-	'name.alt.org.wikipedia' => 'WTFPL',
+	name                           => 'WTFPL',
+	'name.alt.org.fedora.iri.self' => 'WTFPL',
+	'name.alt.org.wikidata'        => 'Q152481',
+	'name.alt.org.wikipedia'       => 'WTFPL',
 	caption                  => 'do What The Fuck you want to Public License',
-	'caption.alt.misc.censored' =>
-		'Do What The F*ck You Want To Public License',
+	'caption.alt.org.fedora' => 'Do What The F*ck You Want To Public License',
 	'caption.alt.misc.shorter' => 'WTF Public License',
 	iri                        => 'http://www.wtfpl.net/',
 	'iri.alt.misc.old'         => 'http://sam.zoy.org/wtfpl/COPYING',
@@ -12652,7 +13053,7 @@ $RE{wtfnmfpl_1} = {
 		'Do What The Fuck You Want To But It\'s Not My Fault Public License v1 (WTFNMFPL-1.0)',
 	iri =>
 		'http://www.adversary.org/wp/2013/10/14/do-what-the-fuck-you-want-but-its-not-my-fault/',
-	'iri.alt.web.github' => 'https://github.com/adversary-org/wtfnmf',
+	'iri.alt.iri.github' => 'https://github.com/adversary-org/wtfnmf',
 	tags                 => [
 		'license:is:grant',
 		'type:singleversion:wtfnmfpl',
@@ -12689,8 +13090,7 @@ END
 		. '[:][  ]'
 		. $P{retain_copr_perm_subst}
 		. '[.][  ]'
-		. $P{discl_warranties_any_kind_noninfringement}
-		. '[.][ ]'
+		. $P{discl_warranties_any_kind_noninfringement} . '[. ]'
 		. $P{discl_liability_claim}
 		. '[.][  ]'
 		. 'Except as contained in this notice, the name of the X Consortium'
@@ -12746,6 +13146,7 @@ $RE{xnet} = {
 	'name.alt.org.osi'              => 'Xnet',
 	'name.alt.org.spdx'             => 'Xnet',
 	caption                         => 'X.Net License',
+	'caption.alt.org.fedora'        => 'X.Net License',
 	'caption.alt.org.osi'           => 'The X.Net, Inc. License',
 	'caption.alt.org.osi.misc.list' => 'X.Net License',
 	'caption.alt.org.tldr'          => 'X.Net License (Xnet)',
@@ -12781,9 +13182,10 @@ $RE{ypl} = {
 };
 
 $RE{ypl_1} = {
-	name                => 'YPL-1.0',
-	'name.alt.org.spdx' => 'YPL-1.0',
-	caption             => 'Yahoo! Public License v1.0',
+	name                     => 'YPL-1.0',
+	'name.alt.org.spdx'      => 'YPL-1.0',
+	caption                  => 'Yahoo! Public License v1.0',
+	'caption.alt.org.fedora' => 'Yahoo Public License 1.0',
 	iri  => 'https://www.zimbra.com/license/yahoo_public_license_1.0.html',
 	tags => [
 		'type:singleversion:ypl',
@@ -12795,10 +13197,12 @@ $RE{ypl_1} = {
 };
 
 $RE{ypl_1_1} = {
-	name                   => 'YPL-1.1',
-	'name.alt.org.spdx'    => 'YPL-1.1',
-	caption                => 'Yahoo! Public License v1.1',
-	'caption.alt.org.tldr' => 'Yahoo! Public License v1.1 (YPL-1.1)',
+	name                     => 'YPL-1.1',
+	'name.alt.org.fedora'    => 'YPLv1.1',
+	'name.alt.org.spdx'      => 'YPL-1.1',
+	caption                  => 'Yahoo! Public License v1.1',
+	'caption.alt.org.fedora' => 'Yahoo Public License v 1.1',
+	'caption.alt.org.tldr'   => 'Yahoo! Public License v1.1 (YPL-1.1)',
 	iri  => 'http://www.zimbra.com/license/yahoo_public_license_1.1.html',
 	tags => [
 		'type:singleversion:ypl',
@@ -12815,6 +13219,7 @@ $RE{ypl_1_1} = {
 
 $RE{zed} = {
 	name                                    => 'Zed',
+	'name.alt.org.fedora'                   => 'Zed',
 	'name.alt.org.spdx.since.date_20140807' => 'Zed',
 	caption                                 => 'Zed License',
 	'caption.alt.org.tldr'                  => 'Zed License',
@@ -12845,8 +13250,10 @@ $RE{zend} = {
 $RE{zend_2} = {
 	name                                    => 'ZEL-2.00',
 	'name.alt.misc.fsf'                     => 'ZELv2.0',
+	'name.alt.org.fedora.synth.nogrant'     => 'Zend',
 	'name.alt.org.spdx.since.date_20140807' => 'Zend-2.0',
 	caption                                 => 'Zend License v2.0',
+	'caption.alt.org.fedora'                => 'Zend License v2.0',
 	'caption.alt.misc.legal' => 'The Zend Engine License, version 2.00',
 	iri                      => 'http://www.zend.com/license/2_00.txt',
 	tags                     => [
@@ -12880,6 +13287,7 @@ $RE{zimbra_1_3} = {
 	'name.alt.org.fsf'       => 'ZPLv1.3',
 	'name.alt.org.spdx'      => 'Zimbra-1.3',
 	caption                  => 'Zimbra Public License v1.3',
+	'caption.alt.org.fedora' => 'Zimbra Public License 1.3',
 	'caption.alt.org.tldr'   => 'Zimbra Public License v1.3 (Zimbra-1.3)',
 	'caption.alt.misc.legal' => 'Zimbra Public License, Version 1.3 (ZPL)',
 	iri  => 'http://www.zimbra.com/license/zimbra-public-license-1-3.html',
@@ -12914,6 +13322,7 @@ $RE{zimbra_1_4} = {
 
 $RE{zlib} = {
 	name                                  => 'Zlib',
+	'name.alt.org.fedora'                 => 'zlib',
 	'name.alt.org.fsf'                    => 'Zlib',
 	'name.alt.org.osi'                    => 'Zlib',
 	'name.alt.org.perl'                   => 'zlib',
@@ -12921,14 +13330,15 @@ $RE{zlib} = {
 	'name.alt.org.tldr.path.short'        => 'zlib',
 	'name.alt.org.wikidata'               => 'Q207243',
 	caption                               => 'zlib License',
+	'caption.alt.org.fedora'              => 'zlib/libpng License',
 	'caption.alt.org.osi'                 => 'The zlib/libpng License',
 	'caption.alt.org.osi.misc.list'       => 'zlib/libpng license',
 	'caption.alt.org.tldr'                => 'Zlib-Libpng License (Zlib)',
 	'caption.alt.org.trove'               => 'zlib/libpng License',
 	'caption.alt.org.wikipedia.misc.case' => 'zlib license',
-	iri                => 'http://zlib.net/zlib_license.html',
-	'iri.alt.org.gzip' => 'http://www.gzip.org/zlib/zlib_license.html',
-	tags               => [
+	iri                   => 'http://zlib.net/zlib_license.html',
+	'iri.alt.org.steward' => 'http://www.gzip.org/zlib/zlib_license.html',
+	tags                  => [
 		'family:zlib',
 		'license:is:grant',
 		'type:unversioned',
@@ -12936,8 +13346,7 @@ $RE{zlib} = {
 
 	'pat.alt.subject.license.scope.multisection' =>
 		$P{origin_sw_no_misrepresent}
-		. $P{you_not_claim_wrote}
-		. '[.][ ]'
+		. $P{you_not_claim_wrote} . '[. ]'
 		. $P{use_ack_apprec_not_req}
 		. '[.][  ]'
 		. $P{altered_srcver_mark}
@@ -12951,10 +13360,14 @@ $RE{zlib} = {
 
 $RE{zlib_acknowledgement} = {
 	name                                    => 'zlib-acknowledgement',
+	'name.alt.org.fedora.iri.self'          => 'Nunit',
 	'name.alt.org.spdx.since.date_20140807' => 'zlib-acknowledgement',
 	'name.alt.org.spdx.misc.old.since.date_20140807.until.date_20171228' =>
 		'Nunit',
-	caption                => 'zlib/libpng License with Acknowledgement',
+	caption                  => 'zlib/libpng License with Acknowledgement',
+	'caption.alt.org.fedora' => 'zlib/libpng License with Acknowledgement',
+	'caption.alt.org.fedora.misc.short' => 'zlib with acknowledgement',
+	'caption.alt.org.fedora.misc.nunit' => 'Nunit License',
 	'caption.alt.org.spdx' => 'zlib/libpng License with Acknowledgement',
 	'caption.alt.org.spdx.misc.old.until.date_20171228' => 'Nunit License',
 	tags                                                => [
@@ -12965,8 +13378,7 @@ $RE{zlib_acknowledgement} = {
 
 	'pat.alt.subject.license.scope.multisection' =>
 		$P{origin_sw_no_misrepresent}
-		. $P{you_not_claim_wrote}
-		. '[.][ ]'
+		. $P{you_not_claim_wrote} . '[. ]'
 		. $P{use_ack_req}
 		. '[.][  ]Portions Copyright \S+ [-#]+ Charlie Poole '
 		. 'or Copyright \S+ [-#]+ James W\. Newkirk, Michael C\. Two, Alexei A\. Vorontsov '
@@ -13003,8 +13415,10 @@ $RE{zpl} = {
 
 $RE{zpl_1} = {
 	name                     => 'ZPL-1.0',
+	'name.alt.org.fedora'    => 'ZPLv1.0',
 	'name.alt.org.fsf'       => 'ZopePLv1.0',
 	caption                  => 'Zope Public License (ZPL) Version 1.0',
+	'caption.alt.org.fedora' => 'Zope Public License v 1.0',
 	'caption.alt.misc.plain' => 'Zope Public License 1.0',
 	'iri.alt.archive.time_20000816090640' =>
 		'http://www.zope.org/Resources/ZPL',
@@ -13028,12 +13442,14 @@ $RE{zpl_1_1} = {
 
 $RE{zpl_2} = {
 	name                                => 'ZPL-2.0',
+	'name.alt.org.fedora'               => 'ZPLv2.0',
 	'name.alt.org.osi'                  => 'ZPL-2.0',
 	'name.alt.org.spdx'                 => 'ZPL-2.0',
 	'name.alt.org.tldr.path.short'      => 'zpl-2.0',
 	'name.alt.misc.fossology_old'       => 'Zope-PL_v2.0',
 	'name.alt.misc.fossology_old_short' => 'ZPL2.0',
 	caption                             => 'Zope Public License 2.0',
+	'caption.alt.org.fedora'            => 'Zope Public License v 2.0',
 	'caption.alt.org.osi'               => 'The Zope Public License Ver.2.0',
 	'caption.alt.org.osi.misc.list'     => 'Zope Public License 2.0',
 	'caption.alt.org.osi.misc.cat_list' => 'Zope Public License 2.o',
@@ -13059,10 +13475,12 @@ $RE{zpl_2} = {
 
 $RE{zpl_2_1} = {
 	name                          => 'ZPL-2.1',
+	'name.alt.org.fedora'         => 'ZPLv2.1',
 	'name.alt.org.fsf'            => 'ZPL-2.1',
 	'name.alt.org.spdx'           => 'ZPL-2.1',
 	'name.alt.misc.fossology_old' => 'ZPL2.1',
 	caption                       => 'Zope Public License 2.1',
+	'caption.alt.org.fedora'      => 'Zope Public License v 2.1',
 	'caption.alt.org.fsf'         => 'Zope Public License Version 2.1',
 	'caption.alt.org.tldr'        => 'Zope Public License 2.1 (ZPL-2.1)',
 	iri                           => 'http://old.zope.org/Resources/ZPL/',
@@ -13122,6 +13540,7 @@ $RE{perl} = {
 	'name.alt.org.perl'      => 'perl_5',
 	'name.alt.misc.spdx'     => 'Artistic or GPL-1+',
 	caption                  => 'The Perl 5 License',
+	'caption.alt.org.fedora' => 'Perl License',
 	'caption.alt.misc.short' => 'Perl License',
 	'caption.alt.misc.long'  => 'The Perl 5 programming language License',
 	'caption.alt.org.perl' =>
@@ -13159,19 +13578,18 @@ Each of these patterns has the tag B< type:group >.
 =cut
 
 $RE{bsd} = {
-	name                        => 'BSD',
-	'name.alt.org.debian'       => 'BSD~unspecified',
-	'name.alt.org.fedora.web'   => 'BSD',
-	'name.alt.org.wikidata'     => 'Q191307',
-	'name.alt.misc.style'       => 'BSD-style',
-	caption                     => 'BSD license',
-	'caption.alt.org.debian'    => 'BSD (unspecified)',
-	'caption.alt.org.trove'     => 'BSD License',
-	'caption.alt.org.wikipedia' => 'BSD licenses',
-	'caption.alt.misc.style'    => 'a BSD-style license',
-	'caption.alt.misc.long'     => 'Berkeley Software Distribution License',
-	summary                     => 'a BSD-style license',
-	tags                        => [
+	name                           => 'BSD',
+	'name.alt.org.debian'          => 'BSD~unspecified',
+	'name.alt.org.fedora.iri.self' => 'BSD',
+	'name.alt.org.wikidata'        => 'Q191307',
+	'name.alt.misc.style'          => 'BSD-style',
+	caption                        => 'BSD license',
+	'caption.alt.org.debian'       => 'BSD (unspecified)',
+	'caption.alt.org.trove'        => 'BSD License',
+	'caption.alt.org.wikipedia'    => 'BSD licenses',
+	'caption.alt.misc.long' => 'Berkeley Software Distribution License',
+	summary                 => 'a BSD-style license',
+	tags                    => [
 		'type:group',
 	],
 
@@ -13226,15 +13644,14 @@ $RE{gnu} = {
 =cut
 
 $RE{mit} = {
-	name                        => 'MIT',
-	'name.alt.org.debian'       => 'MIT~unspecified',
-	'name.alt.org.fedora.web'   => 'MIT',
-	'name.alt.org.wikidata'     => 'Q334661',
-	'name.alt.misc.style'       => 'MIT-style',
-	caption                     => 'MIT license',
-	'caption.alt.org.trove'     => 'MIT License',
-	'caption.alt.org.wikipedia' => 'MIT License',
-	'caption.alt.misc.style'    => 'an MIT-style license',
+	name                           => 'MIT',
+	'name.alt.org.debian'          => 'MIT~unspecified',
+	'name.alt.org.fedora.iri.self' => 'MIT',
+	'name.alt.org.wikidata'        => 'Q334661',
+	'name.alt.misc.style'          => 'MIT-style',
+	caption                        => 'MIT license',
+	'caption.alt.org.trove'        => 'MIT License',
+	'caption.alt.org.wikipedia'    => 'MIT License',
 	'iri.alt.org.wikipedia' => 'https://en.wikipedia.org/wiki/MIT_License',
 	summary                 => 'an MIT-style license',
 	tags                    => [
@@ -13347,22 +13764,42 @@ my %_TYPE;
 my %_SERIES;
 my %_USAGE;
 
+for (
+	qw(license_label_trove license_label licensed_under version_number_suffix version_only version_later)
+	)
+{
+	$_ANNOTATIONS{"(:$_:)"} = $RE{$_}{'pat.alt.subject.trait'};
+	$_ANNOTATIONS{"(:$_:)"}
+		=~ s/\[.+?\]/exists $_ANNOTATIONS{$&} ? $_ANNOTATIONS{$&} : $&/ego;
+}
+$_ANNOTATIONS{"(:version_prefix:)"}
+	= $RE{version_prefix}{'pat.alt.subject.trait.scope.line.scope.sentence'};
+$_ANNOTATIONS{"(:version_prefix:)"}
+	=~ s/\[.+?\]/exists $_ANNOTATIONS{$&} ? $_ANNOTATIONS{$&} : $&/ego;
+
+my $tag_license_re    = qr/^license:published:\K$_prop(?::|\z)/;
+my $tag_type_re       = qr/^type:($_prop)(?::($_prop)(?::($_prop))?)?/;
+my $tag_type_usage_re = qr/^type:usage:\K$_prop/;
+
+my $prop_web_re
+	= qr/^(name|caption|summary)\.(alt\.org\.($_prop)((?:\.iri\.($_prop?))?$_any*?))(?:\.synth\.nogrant|)$/;
+
+my $pat_subject_re = qr/^_?pat\.alt\.subject\.\K$_prop(?=\.)/;
+
 # process metadata tags
 @_ = ();
 for my $id ( grep {/^[a-z]/} keys %RE ) {
-
-	# resolve publisher
 	for ( @{ $RE{$id}{tags} } ) {
-		/^license:published:($_prop)/;
-		$_PUBLISHER{$id} = $1
-			if ($1);
-	}
 
-	# resolve series
-	for ( @{ $RE{$id}{tags} } ) {
-		/^type:($_prop)(?::($_prop)(?::($_prop))?)?/;
-		$_TYPE{$id} = $1
-			if ($1);
+		# resolve publisher
+		if (/$tag_license_re/) {
+			$_PUBLISHER{$id} = $&;
+		}
+
+		# resolve series
+		/$tag_type_re/
+			or next;
+		$_TYPE{$id} = $1;
 		if ( $2 and $1 eq 'singleversion' ) {
 			push @_OBJECTS, $id;
 			push @{ $_SERIES{$id} }, $2;
@@ -13370,9 +13807,11 @@ for my $id ( grep {/^[a-z]/} keys %RE ) {
 		else {
 			push @_, $id;
 		}
+
+		# resolve usage
 		if ( $2 and $RE{$2} and $1 eq 'usage' ) {
 			$RE{$id}{licenseversion} = $RE{$2}{licenseversion}
-				|| die "missing version for $id (needed by $1)";
+				or die "missing version for $id (needed by $1)";
 			$_USAGE{$id}{series} //= $2;
 			if ( $_USAGE{$id}{series} ne $2 ) {
 				die 'multi-origin usage for $id';
@@ -13383,9 +13822,6 @@ for my $id ( grep {/^[a-z]/} keys %RE ) {
 				qw( only or_later rfn no_rfn no_copyleft_exception ) );
 		}
 	}
-
-	# synthesize metadata: series alternate caption from caption
-	_prop_populate( $id, 'caption', $_ ) for ( @{ $_SERIES{$id} } );
 }
 
 # ensure versioned objects are processed after single-version objects
@@ -13395,130 +13831,122 @@ for my $id (@_OBJECTS) {
 
 	# resolve publisher
 	for ( @{ $RE{$id}{tags} } ) {
-		/^type:usage:($_prop)/;
-		$_PUBLISHER{$id} = $_PUBLISHER{$1}
-			if ( $1 and $_PUBLISHER{$1} );
-	}
-}
-
-# process metadata caption
-for my $id (@_OBJECTS) {
-
-	# synthesize metadata: name from caption
-	CAPTION: for ( keys %{ $RE{$id} } ) {
-		my ( $slug, $org ) = (/^caption\.(alt\.org\.($_prop)$_any*)/);
-		next CAPTION unless ($org);
-		next CAPTION if ( $RE{$id}{"name.$slug"} );
-		if ( $org eq 'fedora' and $slug =~ /alt\.org\.fedora\.web/ ) {
-			$_ = $RE{$id}{$_};
-			s/\s/_/g;
-			s/\(/.28/g;
-			s/\)/.29/g;
-			$RE{$id}{"name.$slug"} = $_;
-			next CAPTION;
-		}
-		if ( $org eq 'tldr' ) {
-			$_ = lc( $RE{$id}{$_} );
-			s/ /-/g;
-			$RE{$id}{"name.$slug"} = $_
-				if ( $slug =~ /^alt\.org\.tldr(?:\.synth\.nogrant)?$/ );
-			$RE{$id}{"name.alt.org.$slug"} = $_
-				if ( $slug eq 'alt.org.tldr.path.short' );
-			next CAPTION;
-		}
-		if ( $org eq 'wikipedia' ) {
-			$_ = $RE{$id}{$_};
-			s/ /_/g;
-			s/"/%22/g;    #"
-			$RE{$id}{"name.$slug"} = $_;
-			next CAPTION;
+		if (/$tag_type_usage_re/) {
+			if ( exists $_PUBLISHER{$&} ) {
+				$_PUBLISHER{$id} = $_PUBLISHER{$&};
+				$_ANNOTATIONS{"(:$_PUBLISHER{$&}:)"}
+					= $RE{ $_PUBLISHER{$&} }{'pat.alt.subject.trait'};
+				$_ANNOTATIONS{"(:$_PUBLISHER{$&}:)"}
+					=~ s/\[.+?\]/exists $_ANNOTATIONS{$&} ? $_ANNOTATIONS{$&} : $&/ego;
+			}
 		}
 	}
 
-	# synthesize metadata: series alternate name from name
-	_prop_populate( $id, 'name', $_ ) for ( @{ $_SERIES{$id} } );
-}
+	# synthesize metadata: iri from name or caption
+	for ( keys %{ $RE{$id} } ) {
+		my ( $prop, $slug, $org, $trail, $web ) = (/$prop_web_re/)
+			or next;
+		next unless $org;
+		next
+			if $prop eq 'caption'
+			and ( exists $RE{$id}{"name.$slug"}
+			or exists $RE{$id}{"name.$slug.synth.nogrant"} );
 
-# process metadata name
-for my $id (@_OBJECTS) {
-
-	# synthesize metadata: iri from name
-	NAME: for ( keys %{ $RE{$id} } ) {
-		my ( $slug, $org, $trail, $web, $weborg, $webtrail )
-			= (
-			/^name\.(alt\.org\.($_prop)((?:\.(web\b)\.?($_prop?))?($_any*)))/
-			);
-
-		$RE{$id}{"iri.alt.org.fedora.$weborg$webtrail"}
-			||= "https://fedoraproject.org/wiki/Licensing/BSD#$RE{$id}{$_}"
-			and next NAME
-			if ( $weborg and $org eq 'fedora' and $weborg eq 'bsd' );
-		$RE{$id}{"iri.alt.org.fedora.$weborg$webtrail"}
-			||= "https://fedoraproject.org/wiki/Licensing/MIT#$RE{$id}{$_}"
-			and next NAME
-			if ( $weborg and $org eq 'fedora' and $weborg eq 'mit' );
-		$RE{$id}{"iri.alt.org.fedora$webtrail"}
-			||= "https://fedoraproject.org/wiki/Licensing/$RE{$id}{$_}"
-			and next NAME
-			if ( $web and !$weborg and $org eq 'fedora' );
-		$RE{$id}{"iri.alt.org.fedora$trail"}
-			||= "https://fedoraproject.org/wiki/Licensing/$RE{$id}{$_}"
-			and next NAME
-			if ( $org and !$web and $org eq 'fedora' );
-
-		$RE{$id}{"iri.$slug"}
-			||= "https://directory.fsf.org/wiki?title=License:$RE{$id}{$_}"
-			and next NAME
-			if ( $org and $org eq 'fsf' );
-		if ( $org and $org eq 'gnu' ) {
-			$RE{$id}{"iri.$slug"}
-				||= "https://www.gnu.org/licenses/license-list.html#$RE{$id}{$_}";
+		my ( $base, @variants );
+		$_ = $RE{$id}{$_};
+		if ( $web and $org eq 'fedora' ) {
+			$base = 'https://fedoraproject.org/wiki/Licensing/';
+			if ( $web eq 'bsd' ) {
+				$base .= 'BSD#';
+			}
+			elsif ( substr( $web, 0, 4 ) eq 'cddl' ) {
+				$base .= 'CDDL#';
+			}
+			elsif ( substr( $web, 0, 3 ) eq 'mit' ) {
+				$base .= 'MIT#';
+			}
+			s/^(?:BSD|MIT)-style license, //go;
+			tr/ /_/;
+			s/\(/.28/go;
+			s/\)/.29/go;
+		}
+		elsif ( $slug and $slug eq 'alt.org.tldr.path.short' ) {
+			$base = 'https://tldrlegal.com/l/';
+			$_    = lc $_;
+			tr/ /-/;
+		}
+		elsif ( $slug and $slug eq 'alt.org.tldr' ) {
+			$base = 'https://tldrlegal.com/license/';
+			$_    = lc $_;
+			tr/ /-/;
+		}
+		elsif ( $org eq 'wikipedia' ) {
+			$base = 'https://en.wikipedia.org/wiki/';
+			tr/ /_/;
+			s/"/%22/go;    #"
+		}
+		elsif ( $prop eq 'caption' ) {
+			next;
+		}
+		elsif ( $org eq 'fsf' ) {
+			$base = 'https://directory.fsf.org/wiki?title=License:';
+		}
+		elsif ( $org eq 'gnu' ) {
+			push @variants, [
+				"iri.$slug",
+				'https://www.gnu.org/licenses/license-list.html#',
+				$_,
+				'',
+			];
 			for my $lang (@gnu_langs) {
 				( my $weblang = lc $lang ) =~ tr/_/-/;
-				$RE{$id}{"iri.$slug.lang.$lang"}
-					||= "https://www.gnu.org/licenses/license-list.$weblang.html#$RE{$id}{$_}";
+				push @variants, [
+					"iri.$slug.lang.$lang",
+					"https://www.gnu.org/licenses/license-list.$weblang.html#",
+					$_,
+					'',
+				];
 			}
-			next NAME;
 		}
-		$RE{$id}{"iri.$slug"} ||= "https://tldrlegal.com/l/$RE{$id}{$_}"
-			and next NAME
-			if ( $slug and $slug eq 'alt.org.tldr.path.short' );
-		$RE{$id}{"iri.$slug"}
-			||= "https://tldrlegal.com/license/$RE{$id}{$_}"
-			and next NAME
-			if ( $slug and $slug eq 'alt.org.tldr' );
-		$RE{$id}{"iri.$slug"}
-			||= "https://opensource.org/licenses/$RE{$id}{$_}"
-			and next NAME
-			if ( $org and $org eq 'osi' );
-		if ( $org and $org eq 'spdx' ) {
-			$RE{$id}{"iri.$slug"}
-				||= "https://spdx.org/licenses/$RE{$id}{$_}";
+		elsif ( $org eq 'osi' ) {
+			$base = 'https://opensource.org/licenses/';
+		}
+		elsif ( $org eq 'spdx' ) {
+			push @variants, [
+				"iri.$slug",
+				'https://spdx.org/licenses/',
+				$_,
+				'',
+			];
 			for my $ext (qw(txt html json)) {
-				$RE{$id}{"iri.$slug.format.$ext"}
-					||= "https://spdx.org/licenses/$RE{$id}{$_}.$ext";
+				push @variants, [
+					"iri.$slug.format.$ext",
+					'https://spdx.org/licenses/',
+					$_,
+					".$ext",
+				];
 			}
-			next NAME;
 		}
-		if ( $org and $org eq 'wikidata' ) {
-			$RE{$id}{"iri.$slug"}
-				||= "https://www.wikidata.org/wiki/Special:EntityPage/$RE{$id}{$_}";
-			$RE{$id}{"iri.$slug.path.wiki"}
-				||= "https://www.wikidata.org/wiki/$RE{$id}{$_}";
-			next NAME;
+		elsif ( $org eq 'wikidata' ) {
+			push @variants, [
+				"iri.$slug",
+				'https://www.wikidata.org/wiki/Special:EntityPage/',
+				$_,
+				'',
+			];
+			push @variants, [
+				"iri.$slug.path.wiki",
+				'https://www.wikidata.org/wiki/',
+				$_,
+				''
+			];
 		}
-		$RE{$id}{"iri.$slug"}
-			||= "https://en.wikipedia.org/wiki/$RE{$id}{$_}"
-			and next NAME
-			if ( $org and $org eq 'wikipedia' );
+		$RE{$id}{"iri.$slug"} //= "$base$_"
+			if defined $base;
+		for (@variants) {
+			$RE{$id}{ $$_[0] } //= $$_[1] . $$_[2] . $$_[3];
+		}
 	}
-
-	# synthesize metadata: series alternate iri from iri
-	_prop_populate( $id, 'iri', $_ ) for ( @{ $_SERIES{$id} } );
-}
-
-# process patterns
-for my $id (@_OBJECTS) {
 
 	# synthesize patterns: iri from metadata iri
 	unless ( $RE{$id}{'pat.alt.subject.iri'} ) {
@@ -13536,9 +13964,7 @@ for my $id (@_OBJECTS) {
 			s!/$!/?!;
 			push @subpat, $_;
 		}
-		my $pat = _join_pats(@subpat);
-		$RE{$id}{'pat.alt.subject.iri'} = $pat
-			if $pat;
+		_join_pats( { assign => [ $id, 'pat.alt.subject.iri' ] }, @subpat );
 	}
 
 	# synthesize subject pattern name from metadata name and caption
@@ -13546,10 +13972,7 @@ for my $id (@_OBJECTS) {
 		or $_TYPE{$id} eq 'trait' )
 	{
 		my $published_by = '';
-		$published_by
-			= '(?: '
-			. $RE{ $_PUBLISHER{$id} }{'pat.alt.subject.trait'}
-			. "(?: ?[;]?|[']s))?"
+		$published_by = '(?: (:' . $_PUBLISHER{$id} . ':)(?: ?[;]?|[\']s))?'
 			if $_PUBLISHER{$id}
 			and $RE{ $_PUBLISHER{$id} }
 			and $RE{ $_PUBLISHER{$id} }{'pat.alt.subject.trait'};
@@ -13570,27 +13993,27 @@ for my $id (@_OBJECTS) {
 		my $version             = '';
 		my $version_usage       = '';
 		my $version_usage_maybe = '';
-		my $ver_re;
+		my ( $ver, $ver_re, $ver_z_re );
 		if ( $_ = $RE{$id}{licenseversion} ) {
 			s/\./\\./g;
 			s/\\\.0\\\.0$/(?:\\.0(?:\\.0)?)?/;
 			s/\\\.0$/(?:\\.0)?/;
 			s/\\\.\K0{0,2}0/0{1,3}/g;
 			s/\\\.\K0{0,2}(?=[1-9])/0{0,2}/g;
-			$version
-				= $RE{version_prefix}
-				{'pat.alt.subject.trait.scope.line.scope.sentence'} . $_;
+			$version = '(:version_prefix:)' . $_;
 			if ($is_only_this_version) {
-				$version_usage = $RE{version_only}{'pat.alt.subject.trait'};
+				$version_usage = '(:version_only:)';
 			}
 			elsif ($is_also_later_versions) {
-				$version_usage = $RE{version_later}{'pat.alt.subject.trait'};
+				$version_usage = '(:version_later:)';
 			}
 			$version_usage_maybe = $version_usage . '?'
 				if $version_usage;
-			my $ver = '_?' . $version . $version_usage_maybe;
-			$ver =~ s/$_->[0]/$_->[1]/g for (@_re);
-			$ver_re = qr/$ver/;
+			$ver = '_?' . $version . $version_usage_maybe;
+			$ver
+				=~ s/(?:\[|\(:)[^\]]+?(?:\]|:\))/exists $_ANNOTATIONS{$&} ? $_ANNOTATIONS{$&} : $&/ego;
+			$ver_re   = qr/$ver/;
+			$ver_z_re = qr/$ver$/;
 		}
 
 		my $version_stopgap = '(?:[^\d.]|\.\D|\.\z|\z)';
@@ -13598,10 +14021,10 @@ for my $id (@_OBJECTS) {
 		my %meta_names;
 		foreach my $candidate (@candidates) {
 			for ( keys %{ $RE{$candidate} } ) {
-				next unless /^name(?:$_delim|\z)/;
+				next unless /^name(?:\.|\z)/;
 				next if /\.version\./;
-				next if /^name\.alt\.org\.wikidata(?:$_delim|\z)/;
-				next if /\.synth\.nogrant(?:$_delim|\z)/;
+				next if /^name\.alt\.org\.wikidata(?:\.|\z)/;
+				next if /\.synth\.nogrant(?:\.|\z)/;
 
 				$_ = $RE{$candidate}{$_};
 				next if /-\(/;
@@ -13616,22 +14039,25 @@ for my $id (@_OBJECTS) {
 			},
 			sort keys %meta_names
 		);
-		my $shortname_re = qr/$shortname$/;
+		my $shortname_z_re = $shortname;
+		$shortname_z_re
+			=~ s/(?:\[|\(:)[^\]]+?(?:\]|:\))/exists $_ANNOTATIONS{$&} ? $_ANNOTATIONS{$&} : $&/ego;
+		$shortname_z_re = qr/$shortname_z_re$/;
 
 		my $suffix = $shortname . $published_by;
 
 		my %meta_captions;
 		for ( keys %{ $RE{$id} } ) {
-			next unless /^caption(?:$_delim|\z)/;
-			next if /\.synth\.nogrant(?:$_delim|\z)/;
+			next unless /^caption(?:\.|\z)/;
+			next if /\.synth\.nogrant(?:\.|\z)/;
 
 			$_ = $RE{$id}{$_};
 
 			# mangle words
-			s/$shortname_re//;
+			s/$shortname_z_re//;
 			if ($version) {
-				s/$ver_re$//;
-				s/$shortname_re//;
+				s/$ver_z_re//;
+				s/$shortname_z_re//;
 			}
 
 			# mangle characters
@@ -13657,7 +14083,9 @@ for my $id (@_OBJECTS) {
 			sort keys %meta_captions,
 			_join_pats(
 				{ prefix => '\b', suffix => $version ? '' : '\b' },
-				map      {s/-/[-]/gr}
+
+				# TODO: use { s/-/[-]/gr } when needing perl 5.14 anyway
+				map      { my $s = $_; $s =~ s/-/[-]/g; $s; }
 					grep { not defined $meta_captions{$_} }
 					sort keys %meta_names,
 			),
@@ -13668,8 +14096,7 @@ for my $id (@_OBJECTS) {
 			# extra pattern with (non-optional) leading version
 			push @{ $RE{$id}{'_pat.alt.subject.name.synth.caption'} },
 				'(?:'
-				. $RE{version_prefix}
-				{'pat.alt.subject.trait.scope.line.scope.sentence'}
+				. '(:version_prefix:)'
 				. "$version$version_usage"
 				. " of $stem"
 				. $published_by . ')';
@@ -13678,12 +14105,11 @@ for my $id (@_OBJECTS) {
 				= '(?:'
 				. $version
 				. $version_usage_maybe
-				. $RE{version_number_suffix}{'pat.alt.subject.trait'}
-				. ')?'
+				. '(:version_number_suffix:)' . ')?'
 				. $shortname
 				. $published_by
 				. $version
-				. $RE{version_number_suffix}{'pat.alt.subject.trait'}
+				. '(:version_number_suffix:)'
 				. $version_usage
 				. $shortname
 				. $version_stopgap;
@@ -13701,15 +14127,14 @@ for my $id (@_OBJECTS) {
 		my %pat;
 		for (
 			grep { !/-\(/ }
-			grep { !/,[_~]/ }
 			map  { $RE{$id}{$_} }
-			grep { !/^name\.alt\.org\.wikidata(?:$_delim|\z)/ }
-			grep {/^name(?:$_delim|\z)/}
+			grep { !/^name\.alt\.org\.wikidata(?:\.|\z)/ }
+			grep {/^name(?:\.|\z)/}
 			keys %{ $RE{$id} }
 			)
 		{
-			$_ = quotemeta;
-			s/\\-/[-]/g;
+			s/[~.,]/\\$&/g;
+			s/[-+()\/]/[$&]/g;
 			if (/\d$/) {
 				s/\\\.0$/\(?:\\.0\)?/;
 				$_ .= '(?:[^\d.]|\.\D|\.\z|\z)';
@@ -13717,18 +14142,18 @@ for my $id (@_OBJECTS) {
 			else {
 				$_ .= '(?:[\s]|\z)';
 			}
-			$pat{$_} = 1;
+			$pat{$_} = undef;
 		}
 		if ( $RE{$id}{'_pat.alt.subject.name.synth.caption'} ) {
-			$pat{$_} = 1
+			$pat{$_} = undef
 				for @{ $RE{$id}{'_pat.alt.subject.name.synth.caption'} };
 		}
-		my $pat = _join_pats(
-			{ prefix => $RE{license_label}{'pat.alt.subject.trait'} . ' ?' },
+		_join_pats(
+			{   assign => [ $id, '_pat.alt.subject.grant.synth.name' ],
+				prefix => '(:license_label:) ?'
+			},
 			sort keys %pat
 		);
-		$RE{$id}{'_pat.alt.subject.grant.synth.name'} = $pat
-			if $pat;
 	}
 
 	# synthesize subject pattern grant from Trove caption
@@ -13737,15 +14162,13 @@ for my $id (@_OBJECTS) {
 	{
 		my %pat;
 		for (
-			grep { !/-\(/ }
-			grep { !/,[_~]/ }
 			map  { $RE{$id}{$_} }
-			grep {/^caption\.alt\.org\.trove(?:$_delim|\z)/}
+			grep {/^caption\.alt\.org\.trove(?:\.|\z)/}
 			keys %{ $RE{$id} }
 			)
 		{
-			$_ = quotemeta;
-			s/\\-/[-]/g;
+			s/[-+()]/[$&]/g;
+			s/[.]/\\./g;
 			if (/\d$/) {
 				s/\\\.0$/\(?:\\.0\)?/;
 				$_ .= '(?:[^\d.]|\.\D|\.\z|\z)';
@@ -13753,16 +14176,14 @@ for my $id (@_OBJECTS) {
 			else {
 				$_ .= '(?:[\s]|\z)';
 			}
-			$pat{$_} = 1;
+			$pat{$_} = undef;
 		}
-		my $pat = _join_pats(
-			{   prefix => $RE{license_label_trove}{'pat.alt.subject.trait'}
-					. ' ?'
+		_join_pats(
+			{   assign => [ $id, '_pat.alt.subject.grant.synth.trove' ],
+				prefix => '(:license_label_trove:) ?'
 			},
 			sort keys %pat
 		);
-		$RE{$id}{'_pat.alt.subject.grant.synth.trove'} = $pat
-			if $pat;
 	}
 
 	# synthesize subject pattern grant from subject pattern name
@@ -13770,69 +14191,64 @@ for my $id (@_OBJECTS) {
 		or $_TYPE{$id} eq 'trait' )
 	{
 		# TODO: use resolved patterns (not subpatterns)
-		my $pat = _join_pats(
-			{ prefix => $RE{licensed_under}{'pat.alt.subject.trait'} },
+		_join_pats(
+			{   assign => [ $id, '_pat.alt.subject.grant.synth.caption' ],
+				prefix => '(:licensed_under:)'
+			},
 			@{ $RE{$id}{'_pat.alt.subject.name.synth.caption'} }
 		);
-		$RE{$id}{'_pat.alt.subject.grant.synth.caption'} = $pat
-			if $pat;
 	}
 
 	# synthesize CC subject pattern license from metadata caption
 	if ( $id eq 'cc_cc0_1' ) {
 		$RE{$id}{'pat.alt.subject.license.scope.sentence.synth.cc'}
-			||= "(?:$RE{$id}{caption})?" . "[  ]$cc_intro_cc0";
+			//= "(?:$RE{$id}{caption})?" . "[  ]$cc_intro_cc0";
 	}
 	elsif ( $id =~ /^cc.*_1$/ ) {
 		$RE{$id}{'pat.alt.subject.license.scope.sentence.synth.cc'}
-			||= $RE{$id}{caption} . "[  ]$cc_intro_1";
+			//= $RE{$id}{caption} . "[  ]$cc_intro_1";
 	}
 	elsif ( $id =~ /^cc.*_(?:2|2_5)$/ ) {
 		$RE{$id}{'pat.alt.subject.license.scope.sentence.synth.cc'}
-			||= $RE{$id}{caption} . "[  ]$cc_intro";
+			//= $RE{$id}{caption} . "[  ]$cc_intro";
 	}
 	elsif ( $id =~ /^cc.*_3$/ ) {
 		$RE{$id}{'pat.alt.subject.license.scope.sentence.synth.cc'}
-			||= $RE{$id}{caption} . ' Unported' . "[  ]$cc_intro";
+			//= $RE{$id}{caption} . ' Unported' . "[  ]$cc_intro";
 	}
 	elsif ( $id =~ /^cc.*_4$/ ) {
 		$RE{$id}{'pat.alt.subject.license.scope.sentence.synth.cc'}
-			||= $RE{$id}{caption}
+			//= $RE{$id}{caption}
 			. '(?: Public License)?[  ]'
 			. $cc_by_exercising_you_accept_this
 			. $RE{$id}{caption};
 	}
 
 	# resolve subject patterns from subpatterns
+	my %subject_pat;
+	for ( keys %{ $RE{$id} } ) {
+
+		# collect alternatives ahead (to traverse once, not once per subject)
+		if (/$pat_subject_re/) {
+			my $unseed = substr $_, 1;  # seed -> nonseed, or nonseed -> bogus
+			$subject_pat{$&}{ exists $RE{$id}{$unseed} ? $unseed : $_ }
+				= undef;
+		}
+	}
 	for my $subject (@_SUBJECTSTACK) {
 
-		# use explicit pattern
-		next if $RE{$id}{"pat.alt.subject.$subject"};
-
-		# synthesize from seed pattern
-		my $pat = _join_pats( $RE{$id}{"_pat.alt.subject.$subject"} );
-		$RE{$id}{"pat.alt.subject.$subject"} = $pat
-			and next
-			if $pat;
-
-		# synthesize from alternatives or their seeds
-		my @pat;
-		for (
-			sort
-			grep {/^_?pat\.alt\.subject\.$subject$_delim/}
-			keys %{ $RE{$id} }
-			)
-		{
-			s/_\K//;
-			push @pat, $RE{$id}{$_} || $RE{$id}{"_$_"};
-		}
-		$pat = _join_pats(@pat);
-		$RE{$id}{"pat.alt.subject.$subject"} = $pat
-			if ($pat);
+		# if not explicitly defined, synthesize from seed or all alt seeds
+		$RE{$id}{"pat.alt.subject.$subject"}
+			//= _join_pats( $RE{$id}{"_pat.alt.subject.$subject"} )
+			|| _join_pats(
+			map { $RE{$id}{$_} }
+			sort keys %{ $subject_pat{$subject} }
+			) or delete $RE{$id}{"pat.alt.subject.$subject"};
 	}
 
 	# resolve available patterns
-	my @pat_subject = grep { $RE{$id}{"pat.alt.subject.$_"} } @_SUBJECTSTACK;
+	my @pat_subject
+		= grep { exists $RE{$id}{"pat.alt.subject.$_"} } @_SUBJECTSTACK;
 
 	# provide default dynamic pattern: all available patterns
 	$RE{$id}{gen} = sub {
@@ -13843,15 +14259,13 @@ for my $id (@_OBJECTS) {
 		my $subjects
 			= $args{subject}
 			? [ split( /,/, $args{subject} ) ]
-			: [@pat_subject];
+			: \@pat_subject;
 
 		my $pat = _join_pats( map { $RE{$id}{"pat.alt.subject.$_"} }
 				@{$subjects} );
 
 		return ''
 			unless ($pat);
-
-		$pat =~ s/$_->[0]/$_->[1]/g for (@_re);
 
 		if ( $capture eq 'named' ) {
 			$pat =~ s/\(\?P<\K_//g;
@@ -13864,7 +14278,8 @@ for my $id (@_OBJECTS) {
 			$pat =~ s/\(\?P<[^>]+>/(?:/g;
 		}
 
-		$pat =~ s/$_->[0]/$_->[1]/g for (@_re);
+		$pat
+			=~ s/(?:\[|\(:)[^\]]+?(?:\]|:\))/exists $_ANNOTATIONS{$&} ? $_ANNOTATIONS{$&} : $&/ego;
 
 		# TODO: document if not obsoleted
 		# by <https://github.com/perlancar/perl-Regexp-Pattern/issues/4>
@@ -13899,7 +14314,7 @@ for my $id (@_OBJECTS) {
 	# option subject: which subject(s) to cover in pattern
 	$RE{$id}{gen_args}{subject} = {
 		summary => 'Choose subject (or several, comma-separated)',
-		schema  => [ 'str*', in => [@pat_subject] ],
+		schema  => [ 'str*', in => \@pat_subject ],
 		default => join ',', @pat_subject,
 		req     => 1,
 	};
@@ -13909,20 +14324,6 @@ for my $id (@_OBJECTS) {
 		summary => 'Enable custom regexp engine (perl module re::engine::*)',
 		schema  => ['str*'],
 	};
-}
-
-# mirror property + attributes to alternate attributes of series object
-sub _prop_populate
-{
-	my ( $id, $property, $series ) = @_;
-
-	for ( keys %{ $RE{$id} } ) {
-		if (/^$property(?:\.alt)?((?:$_delim$_prop)*)((?:${_delim}lang$_delim$_prop)?)/
-			)
-		{
-			$RE{$series}{"$property.alt$1.version.$id$2"} ||= $RE{$id}{$_};
-		}
-	}
 }
 
 sub _join_pats
@@ -13945,13 +14346,17 @@ sub _join_pats
 	my $prefix = $opts{prefix} // '';
 	my $suffix = $opts{suffix} // '';
 
-	return ''
+	return $opts{assign} ? 0 : ''
 		unless @pats;
-	return $label ne ':'
-		? "$prefix(?$label" . $pats[0] . ")$suffix"
-		: $prefix . $pats[0] . $suffix
-		if @pats == 1;
-	return "$prefix(?$label" . join( '|', @pats ) . ")$suffix";
+	my $result
+		= ( @pats > 1 or $label ne ':' )
+		? "$prefix(?$label" . join( '|', @pats ) . ")$suffix"
+		: $prefix . $pats[0] . $suffix;
+	if ( $opts{assign} ) {
+		$RE{ $opts{assign}[0] }{ $opts{assign}[1] } = $result;
+		return scalar @pats;
+	}
+	return $result;
 }
 
 =head2 TAGS

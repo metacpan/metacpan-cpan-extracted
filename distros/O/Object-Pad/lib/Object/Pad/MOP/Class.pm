@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Class 0.48;
+package Object::Pad::MOP::Class 0.50;
 
 use v5.14;
 use warnings;

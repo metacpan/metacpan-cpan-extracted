@@ -15,8 +15,10 @@
    "name" : "Astro-Coord-ECI-VSOP87D",
    "no_index" : {
       "directory" : [
+         "eg",
          "inc",
          "t",
+         "tools",
          "xt"
       ]
    },
@@ -60,39 +62,39 @@
    "provides" : {
       "Astro::Coord::ECI::VSOP87D" : {
          "file" : "lib/Astro/Coord/ECI/VSOP87D.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Astro::Coord::ECI::VSOP87D::Jupiter" : {
          "file" : "lib/Astro/Coord/ECI/VSOP87D/Jupiter.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Astro::Coord::ECI::VSOP87D::Mars" : {
          "file" : "lib/Astro/Coord/ECI/VSOP87D/Mars.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Astro::Coord::ECI::VSOP87D::Mercury" : {
          "file" : "lib/Astro/Coord/ECI/VSOP87D/Mercury.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Astro::Coord::ECI::VSOP87D::Neptune" : {
          "file" : "lib/Astro/Coord/ECI/VSOP87D/Neptune.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Astro::Coord::ECI::VSOP87D::Saturn" : {
          "file" : "lib/Astro/Coord/ECI/VSOP87D/Saturn.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Astro::Coord::ECI::VSOP87D::Sun" : {
          "file" : "lib/Astro/Coord/ECI/VSOP87D/Sun.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Astro::Coord::ECI::VSOP87D::Uranus" : {
          "file" : "lib/Astro/Coord/ECI/VSOP87D/Uranus.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Astro::Coord::ECI::VSOP87D::Venus" : {
          "file" : "lib/Astro/Coord/ECI/VSOP87D/Venus.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -110,6 +112,6 @@
          "web" : "https://github.com/trwyant/perl-Astro-Coord-ECI-VSOP87D"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

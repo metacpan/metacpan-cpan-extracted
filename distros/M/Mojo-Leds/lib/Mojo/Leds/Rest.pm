@@ -1,5 +1,5 @@
 package Mojo::Leds::Rest;
-$Mojo::Leds::Rest::VERSION = '1.05';
+$Mojo::Leds::Rest::VERSION = '1.06';
 use Mojo::Base 'Mojo::Leds::Page';
 use Mojo::Util qw(decamelize class_to_path);
 use Mojo::JSON qw(decode_json);
@@ -156,7 +156,7 @@ Mojo::Leds::Rest - Abstract class for RESTFul webservices interface
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =head1 RESTFul API
 

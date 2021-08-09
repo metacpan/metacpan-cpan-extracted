@@ -8,7 +8,7 @@ package IO::Async::Future;
 use strict;
 use warnings;
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 use base qw( Future );
 Future->VERSION( '0.05' ); # to respect subclassing
@@ -21,15 +21,15 @@ C<IO::Async::Future> - use L<Future> with L<IO::Async>
 
 =head1 SYNOPSIS
 
- use IO::Async::Loop;
+   use IO::Async::Loop;
 
- my $loop = IO::Async::Loop->new;
+   my $loop = IO::Async::Loop->new;
 
- my $future = $loop->new_future;
+   my $future = $loop->new_future;
 
- $loop->watch_time( after => 3, code => sub { $future->done( "Done" ) } );
+   $loop->watch_time( after => 3, code => sub { $future->done( "Done" ) } );
 
- print $future->get, "\n";
+   print $future->get, "\n";
 
 =head1 DESCRIPTION
 

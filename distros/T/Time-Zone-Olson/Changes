@@ -1,5 +1,11 @@
 Revision history for Time-Zone-Olson
 
+0.38   Mon Aug 09 20:55:00 2021
+       Checking for solaris oddness in CPAN Testers
+
+0.37   Sat Aug 07 10:42:00 2021
+       Importing into github
+
 0.36   Fri Nov 27 20:51:00 2020
        Fixed tests to allow for old WinXP environments and Unix environments where there is no default timezone
 

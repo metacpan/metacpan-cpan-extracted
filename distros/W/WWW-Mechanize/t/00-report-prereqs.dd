@@ -16,7 +16,6 @@ do { my $x = {
                                       'Code::TidyAll::Plugin::SortLines::Naturally' => '0.000003',
                                       'Code::TidyAll::Plugin::Test::Vars' => '0.04',
                                       'Code::TidyAll::Plugin::UniqueLines' => '0.000003',
-                                      'Encode' => '0',
                                       'LWP::Protocol::https' => '6.07',
                                       'Parallel::ForkManager' => '1.19',
                                       'Perl::Critic' => '1.132',
@@ -38,6 +37,9 @@ do { my $x = {
                                     }
                     },
        'runtime' => {
+                      'recommends' => {
+                                        'Compress::Zlib' => '0'
+                                      },
                       'requires' => {
                                       'Carp' => '0',
                                       'Getopt::Long' => '0',
@@ -85,6 +87,7 @@ do { my $x = {
                                    'Test::NoWarnings' => '1.04',
                                    'Test::Output' => '0',
                                    'Test::Taint' => '1.08',
+                                   'Test::Warn' => '0',
                                    'Test::Warnings' => '0',
                                    'URI' => '0',
                                    'URI::Escape' => '0',

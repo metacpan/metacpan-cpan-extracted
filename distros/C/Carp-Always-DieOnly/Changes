@@ -1,5 +1,10 @@
 Revision history for Carp-Always-DieOnly
 
+0.020   2021-08-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Rewrite based on Carp::Always 0.15+ (thanks Adriano Ferreira).
+
+
 0.01    2015-01-05 (PERLANCAR)
 
         - First release.

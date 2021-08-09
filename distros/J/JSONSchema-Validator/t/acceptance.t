@@ -3,6 +3,10 @@
 use strict;
 use warnings;
 use Test::More;
+
+use lib 't/lib';
+
+use Helper 'detect_warnings';
 use JSONSchema::Validator;
 use JSONSchema::Validator::Util qw/get_resource/;
 
@@ -42,4 +46,5 @@ for my $validator_class (@{$JSONSchema::Validator::JSON_SCHEMA_VALIDATORS}) {
     );
 }
 
+ok detect_warnings() == 0, 'no warnings';
 done_testing;

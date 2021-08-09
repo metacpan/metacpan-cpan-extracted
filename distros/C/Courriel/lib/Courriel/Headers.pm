@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 use Courriel::Header;
 use Courriel::Header::ContentType;
@@ -402,7 +402,7 @@ sub as_string {
                           (?<content>.*?)             # Base64-encoded contents
                           \?=                         # end encoded word
                           |
-                          (?<unencoded>\S+)
+                          (?<unencoded>\S+?)
                       )
                       (?<ws>[ \t]+)?
                       /x;
@@ -485,7 +485,7 @@ Courriel::Headers - The headers for an email part
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 SYNOPSIS
 
@@ -503,8 +503,8 @@ associated object representing its headers. This class makes no distinction
 between top-level headers and headers for a sub part.
 
 Each individual header name/value pair is represented internally by a
-L<Courriel::Header> object. Some headers have their own special
-subclass. These are:
+L<Courriel::Header> object. Some headers have their own special subclass. These
+are:
 
 =over 4
 
@@ -632,7 +632,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Dave Rolsky.
+This software is Copyright (c) 2021 by Dave Rolsky.
 
 This is free software, licensed under:
 

@@ -6,7 +6,7 @@ use Test::More;
 
 use lib 't/lib';
 
-use Helper 'test_dir';
+use Helper qw/test_dir detect_warnings/;
 use JSONSchema::Validator;
 use JSONSchema::Validator::Util qw/get_resource decode_content/;
 
@@ -41,4 +41,5 @@ for my $validator_class (@{$JSONSchema::Validator::JSON_SCHEMA_VALIDATORS}, @{$J
     }
 }
 
+ok detect_warnings() == 0, 'no warnings';
 done_testing;
