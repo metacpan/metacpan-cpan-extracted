@@ -4,10 +4,13 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::FailWarnings -allow_deps => 1;
 
-for my $mod ( qw( Mojo::Promise  Mojo::IOLoop ) ) {
+for my $mod ( qw( Mojolicious Mojo::Promise Mojo::IOLoop ) ) {
     eval "require $mod" or plan skip_all => "No $mod: $@";
 }
+
+diag "Using Mojolicious $Mojolicious::VERSION";
 
 use Data::Dumper;
 $Data::Dumper::Useqq = 1;

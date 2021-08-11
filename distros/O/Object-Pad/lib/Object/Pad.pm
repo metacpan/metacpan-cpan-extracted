@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.50;
+package Object::Pad 0.51;
 
 use v5.14;
 use warnings;
@@ -34,6 +34,9 @@ C<Object::Pad> - a simple syntax for lexical slot-based objects
 
 =head1 SYNOPSIS
 
+On perl version 5.26 onwards:
+
+   use v5.26;
    use Object::Pad;
 
    class Point {
@@ -41,6 +44,27 @@ C<Object::Pad> - a simple syntax for lexical slot-based objects
       has $y :param = 0;
 
       method move ($dX, $dY) {
+         $x += $dX;
+         $y += $dY;
+      }
+
+      method describe () {
+         print "A point at ($x, $y)\n";
+      }
+   }
+
+   Point->new(x => 5, y => 10)->describe;
+
+Or, for older perls that lack signatures:
+
+   use Object::Pad;
+
+   class Point {
+      has $x :param = 0;
+      has $y :param = 0;
+
+      method move {
+         my ($dX, $dY) = @_;
          $x += $dX;
          $y += $dY;
       }
@@ -106,9 +130,20 @@ not need to chain to the C<SUPER> class first; this is handled automatically.
 
 =head3 The ADJUST phase
 
-Finally, before the new object is returned from the constructor, the C<ADJUST>
-block of every component class is invoked. This happens after the slots are
-assigned their initial values and the C<BUILD> blocks have been run.
+Next, the C<ADJUST> and C<ADJUSTPARAMS> block of every component class is
+invoked. This happens after the slots are assigned their initial values and
+the C<BUILD> blocks have been run.
+
+Note also that both C<ADJUST> and C<ADJUSTPARAMS> blocks happen at the same
+time, in declaration order. The C<ADJUSTPARAMS> blocks do not form their own
+separate phase.
+
+=head3 The strict-checking phase
+
+Finally, before the object is returned, if the L</:strict(params)> class
+attribute is present, then the constructor will throw an exception if there
+are any remaining named arguments left over after assigning them to slots as
+per C<:param> declarations, and running any C<ADJUSTPARAMS> blocks.
 
 =head1 KEYWORDS
 
@@ -238,7 +273,8 @@ I<Since version 0.43.>
 
 Can only be applied to classes that contain no C<BUILD> blocks. If set, then
 the constructor will complain about any unrecognised named arguments passed to
-it (i.e. names that do not correspond to the C<:param> of any defined slot).
+it (i.e. names that do not correspond to the C<:param> of any defined slot and
+left unconsumed by any C<ADJUSTPARAMS> block).
 
 Since C<BUILD> blocks can inspect the arguments arbitrarily, the presence of
 any such block means the constructor cannot determine which named arguments
@@ -247,8 +283,7 @@ are not recognised.
 This attribute is a temporary stepping-stone for compatibility with existing
 code. It is recommended to enable this whenever possible, as a later version
 of this module will likely perform this behaviour unconditionally whenever no
-C<BUILD> blocks are present. How to handle other named arguments that are not
-simply assigned to slots remains an unanswered design question.
+C<BUILD> blocks are present.
 
 =head2 role
 
@@ -533,6 +568,31 @@ passed.
 An adjust block is not a subroutine and thus is not permitted to use
 subroutine attributes. Note that an C<ADJUST> block is a named phaser block
 and not a method; it does not use the C<sub> or C<method> keyword.
+
+=head2 ADJUSTPARAMS
+
+   ADJUSTPARAMS ( $params ) {    # on perl 5.26 onwards
+      ...
+   }
+
+   ADJUSTPARAMS {
+      my $params = shift;
+      ...
+   }
+
+I<Since version 0.51.>
+
+Declares an adjust block for this component class that receives the parameters
+hash reference. This block of code runs within the constructor at the same
+time as L</ADJUST> blocks, but receives in addition a reference to the hash
+containing the current constructor parameters. This hash will not contain any
+constructor parameters already consumed by L</:param> declarations on any
+slots, but only the leftovers once those are processed.
+
+The code in the block should C<delete> from this hash any parameters it wishes
+to consume. Once all the C<ADJUSTPARAMS> blocks have run, any remaining keys
+in the hash will be considered errors, subject to the L</:strict(params)>
+check.
 
 =head2 requires
 

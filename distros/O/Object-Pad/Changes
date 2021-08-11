@@ -1,5 +1,21 @@
 Revision history for Object-Pad
 
+0.51    2021-08-10
+        [CHANGES]
+         * Added `ADJUSTPARAMS` blocks
+         * Allow `apply` hook functions to modify the hookdata value that gets
+           stored by the hook
+         * Store method name data in accessor generator hooks, so other
+           modules can reliably find it
+         * Clarify in SYNOPSIS that the example requires perl 5.26 because of
+           signatures; also provide another copy that doesn't (RT138578)
+
+        [BUGFIXES]
+         * Don't segfault on colliding :param names (RT138633)
+         * Don't ship the authoring test xt/99exported-symbols.t (RT138634)
+
+        Developement time for this release was sponsored by Perl-Verein Schweiz
+
 0.50    2021-08-08
         [CHANGES]
          * Provide Object::Pad::ExtensionBuilder to assist 3rd party extension

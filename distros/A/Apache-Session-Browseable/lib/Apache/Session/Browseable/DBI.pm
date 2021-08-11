@@ -6,7 +6,7 @@ use DBI;
 use Apache::Session;
 use Apache::Session::Browseable::_common;
 
-our $VERSION = '1.3.5';
+our $VERSION = '1.3.9';
 our @ISA     = qw(Apache::Session Apache::Session::Browseable::_common);
 
 sub searchOn {
@@ -124,8 +124,16 @@ sub deleteIfLowerThan {
     my $dbh        = $class->_classDbh($args);
     my $table_name = $args->{TableName}
       || $Apache::Session::Store::DBI::TableName;
-    my $sth = $dbh->do("DELETE FROM $table_name WHERE $query");
-    return 1;
+    my $rows = $dbh->do("DELETE FROM $table_name WHERE $query");
+    return 0 unless defined $rows;
+
+    if (wantarray) {
+        $rows = 0 if $rows == -1;
+        return ( 1, $rows );
+    }
+    else {
+        return 1;
+    }
 }
 
 # Let specialized modules override this syntax if they need to

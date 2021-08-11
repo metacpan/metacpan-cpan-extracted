@@ -12,7 +12,7 @@ use WWW::LogicBoxes::Types qw( Bool DomainName Str );
 
 use Mozilla::PublicSuffix;
 
-our $VERSION = '1.10.1'; # VERSION
+our $VERSION = '1.11.0'; # VERSION
 # ABSTRACT: LogicBoxes Domain Availability Response
 
 has name => (

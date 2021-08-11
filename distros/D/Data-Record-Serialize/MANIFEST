@@ -7,13 +7,8 @@ MANIFEST
 META.json
 META.yml
 README
-README.md.orig
-build-html
-cpanfile
-cpanfile.snapshot
 dist.ini
 lib/Data/Record/Serialize.pm
-lib/Data/Record/Serialize.pm.orig
 lib/Data/Record/Serialize/Encode/dbi.pm
 lib/Data/Record/Serialize/Encode/ddump.pm
 lib/Data/Record/Serialize/Encode/json.pm
@@ -53,7 +48,6 @@ t/field_type_selection.t
 t/field_types.t
 t/lib/My/Test/Encode/both.pm
 t/lib/My/Test/Encode/store.pm
-t/lib/My/Test/Encode/store.pm.orig
 t/lib/My/Test/Encode/types_nis.pm
 t/lib/My/Test/Encode/types_ns.pm
 t/lib/My/Test/Util.pm

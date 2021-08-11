@@ -50,10 +50,10 @@ static void S_mop_slot_set_param(pTHX_ SlotMeta *slotmeta, SV *paramname)
 
   HE *he;
   if((he = hv_fetch_ent(parammap, paramname, 0, 0))) {
-    SlotMeta *colliding_slotmeta = (SlotMeta *)HeVAL(he);
-    if(colliding_slotmeta->class != classmeta)
+    ParamMeta *colliding_parammeta = (ParamMeta *)HeVAL(he);
+    if(colliding_parammeta->slot->class != classmeta)
       croak("Already have a named constructor parameter called '%" SVf "' inherited from %" SVf,
-        SVfARG(paramname), SVfARG(colliding_slotmeta->class->name));
+        SVfARG(paramname), SVfARG(colliding_parammeta->slot->class->name));
     else
       croak("Already have a named constructor parameter called '%" SVf "'", SVfARG(paramname));
   }
@@ -119,9 +119,20 @@ void ObjectPad_mop_slot_apply_attribute(pTHX_ SlotMeta *slotmeta, const char *na
     if((reg->funcs->flags & OBJECTPAD_FLAG_ATTR_MUST_VALUE) && !value)
       croak("Attribute :%s requires a value", name);
 
-    if(reg->funcs->apply)
-      if(!(*reg->funcs->apply)(aTHX_ slotmeta, value))
-        return;
+    SV *hookdata = value;
+
+    if(reg->funcs->apply) {
+      if(reg->funcs->ver >= 51) {
+        if(!(*reg->funcs->apply)(aTHX_ slotmeta, value, &hookdata))
+          return;
+      }
+      else {
+        /* ABIVERSION_MINOR 50 apply did not have hookdata_ptr */
+        bool (*apply)(pTHX_ SlotMeta *, SV *) = (void *)(reg->funcs->apply);
+        if(!(*apply)(aTHX_ slotmeta, value))
+          return;
+      }
+    }
 
     if(!slotmeta->hooks)
       slotmeta->hooks = newAV();
@@ -130,9 +141,12 @@ void ObjectPad_mop_slot_apply_attribute(pTHX_ SlotMeta *slotmeta, const char *na
     Newx(hook, 1, struct SlotHook);
 
     hook->funcs = reg->funcs;
-    hook->hookdata = value;
+    hook->hookdata = hookdata;
 
     av_push(slotmeta->hooks, (SV *)hook);
+
+    if(value && value != hookdata)
+      SvREFCNT_dec(value);
 
     return;
   }
@@ -177,6 +191,11 @@ struct SlotHook *ObjectPad_mop_slot_get_attribute(pTHX_ SlotMeta *slotmeta, cons
   return NULL;
 }
 
+void ObjectPad_mop_slot_seal(pTHX_ SlotMeta *slotmeta)
+{
+  MOP_SLOT_RUN_HOOKS_NOARGS(slotmeta, seal_slot);
+}
+
 /*******************
  * Attribute hooks *
  *******************/
@@ -205,14 +224,14 @@ static void slothook_weak_gen_accessor(pTHX_ SlotMeta *slotmeta, SV *hookdata, e
 }
 
 static struct SlotHookFuncs slothooks_weak = {
-  .flags = OBJECTPAD_FLAG_ATTR_NO_VALUE,
-  .post_construct = &slothook_weak_post_construct,
+  .flags            = OBJECTPAD_FLAG_ATTR_NO_VALUE,
+  .post_construct   = &slothook_weak_post_construct,
   .gen_accessor_ops = &slothook_weak_gen_accessor,
 };
 
 /* :param */
 
-static bool slothook_param_apply(pTHX_ SlotMeta *slotmeta, SV *value)
+static bool slothook_param_apply(pTHX_ SlotMeta *slotmeta, SV *value, SV **hookdata_ptr)
 {
   if(SvPVX(slotmeta->name)[0] != '$')
     croak("Can only add a named constructor parameter for scalar slots");
@@ -240,6 +259,7 @@ static bool slothook_param_apply(pTHX_ SlotMeta *slotmeta, SV *value)
 }
 
 static struct SlotHookFuncs slothooks_param = {
+  .ver   = OBJECTPAD_ABIVERSION,
   .apply = &slothook_param_apply,
 };
 
@@ -326,12 +346,15 @@ static void S_generate_slot_accessor_method(pTHX_ SlotMeta *slotmeta, SV *mname,
   LEAVE;
 }
 
+static bool slothook_reader_apply(pTHX_ SlotMeta *slotmeta, SV *value, SV **hookdata_ptr)
+{
+  *hookdata_ptr = make_accessor_mnamesv(aTHX_ slotmeta, value, "%s");
+  return TRUE;
+}
+
 static void slothook_reader_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata)
 {
-  SV *mname = make_accessor_mnamesv(aTHX_ slotmeta, hookdata, "%s");
-  SAVEFREESV(mname);
-
-  S_generate_slot_accessor_method(aTHX_ slotmeta, mname, ACCESSOR_READER);
+  S_generate_slot_accessor_method(aTHX_ slotmeta, hookdata, ACCESSOR_READER);
 }
 
 static void slothook_gen_reader_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
@@ -345,18 +368,23 @@ static void slothook_gen_reader_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, enum
 }
 
 static struct SlotHookFuncs slothooks_reader = {
-  .seal_slot = &slothook_reader_seal,
+  .ver              = OBJECTPAD_ABIVERSION,
+  .apply            = &slothook_reader_apply,
+  .seal_slot        = &slothook_reader_seal,
   .gen_accessor_ops = &slothook_gen_reader_ops,
 };
 
 /* :writer */
 
+static bool slothook_writer_apply(pTHX_ SlotMeta *slotmeta, SV *value, SV **hookdata_ptr)
+{
+  *hookdata_ptr = make_accessor_mnamesv(aTHX_ slotmeta, value, "set_%s");
+  return TRUE;
+}
+
 static void slothook_writer_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata)
 {
-  SV *mname = make_accessor_mnamesv(aTHX_ slotmeta, hookdata, "set_%s");
-  SAVEFREESV(mname);
-
-  S_generate_slot_accessor_method(aTHX_ slotmeta, mname, ACCESSOR_WRITER);
+  S_generate_slot_accessor_method(aTHX_ slotmeta, hookdata, ACCESSOR_WRITER);
 }
 
 static void slothook_gen_writer_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
@@ -374,7 +402,9 @@ static void slothook_gen_writer_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, enum
 }
 
 static struct SlotHookFuncs slothooks_writer = {
-  .seal_slot = &slothook_writer_seal,
+  .ver              = OBJECTPAD_ABIVERSION,
+  .apply            = &slothook_writer_apply,
+  .seal_slot        = &slothook_writer_seal,
   .gen_accessor_ops = &slothook_gen_writer_ops,
 };
 
@@ -382,10 +412,7 @@ static struct SlotHookFuncs slothooks_writer = {
 
 static void slothook_mutator_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata)
 {
-  SV *mname = make_accessor_mnamesv(aTHX_ slotmeta, hookdata, "%s");
-  SAVEFREESV(mname);
-
-  S_generate_slot_accessor_method(aTHX_ slotmeta, mname, ACCESSOR_LVALUE_MUTATOR);
+  S_generate_slot_accessor_method(aTHX_ slotmeta, hookdata, ACCESSOR_LVALUE_MUTATOR);
 }
 
 static void slothook_gen_mutator_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
@@ -401,13 +428,18 @@ static void slothook_gen_mutator_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, enu
 }
 
 static struct SlotHookFuncs slothooks_mutator = {
-  .seal_slot = &slothook_mutator_seal,
+  .ver              = OBJECTPAD_ABIVERSION,
+  .apply            = &slothook_reader_apply, /* generate method name the same as :reader */
+  .seal_slot        = &slothook_mutator_seal,
   .gen_accessor_ops = &slothook_gen_mutator_ops,
 };
 
 void ObjectPad_register_slot_attribute(pTHX_ const char *name, const struct SlotHookFuncs *funcs)
 {
-  if(funcs->ver != OBJECTPAD_ABIVERSION)
+  if(funcs->ver < 50)
+    croak("Mismatch in third-party slot attribute ABI version field: module wants %d, we require >= 50\n",
+        funcs->ver);
+  if(funcs->ver > OBJECTPAD_ABIVERSION)
     croak("Mismatch in third-party slot attribute ABI version field: attribute supplies %d, module wants %d\n",
         funcs->ver, OBJECTPAD_ABIVERSION);
 

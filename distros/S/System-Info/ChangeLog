@@ -1,3 +1,19 @@
+0.061	- 2021-08-10,  H.Merijn Brand
+    * It's 2021
+    * Add Debian Buster 10.8
+    * Add Raspbian 10.4
+    * Add FreeBSD 12.2
+    * Add Debian Stretch 9.7
+    * Add Debian Buster 10.9
+    * Switch Test::NoWarnings → Test::Warnings
+    * Get more info on Darwin
+    * Add Raspbian 10.9
+    * Add Rocky Linux 8.3 RC1
+    * Add CentOS 8.3
+    * Add CentOS 8 Stream
+    * Add Rocky Linux 8.4
+    * Mac M1 does not show CPU speed: suppress warnings (issue#7)
+
 0.060	- 2020-12-21,  H.Merijn Brand
     * Use sysctl on Darwin
     * Compare to Devel::Platform::Info

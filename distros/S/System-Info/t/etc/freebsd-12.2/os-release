@@ -1,0 +1,9 @@
+NAME=FreeBSD
+VERSION=12.2-RELEASE-p4
+VERSION_ID=12.2
+ID=freebsd
+ANSI_COLOR="0;31"
+PRETTY_NAME="FreeBSD 12.2-RELEASE-p4"
+CPE_NAME=cpe:/o:freebsd:freebsd:12.2
+HOME_URL=https://FreeBSD.org/
+BUG_REPORT_URL=https://bugs.FreeBSD.org/

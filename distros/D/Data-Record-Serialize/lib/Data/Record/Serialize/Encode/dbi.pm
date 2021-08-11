@@ -10,9 +10,10 @@ use Data::Record::Serialize::Error { errors =>
         schema
         create
         insert
+        sqlite_backend
    )] }, -all;
 
-our $VERSION = '0.25';
+our $VERSION = '0.28';
 
 use Data::Record::Serialize::Types -types;
 
@@ -318,8 +319,21 @@ sub setup {
         'private_' . __PACKAGE__ => __FILE__ . __LINE__,
     );
 
-    $attr{sqlite_allow_multiple_statements} = 1
-      if $self->_dbi_driver eq 'SQLite';
+
+    if ( $self->_dbi_driver eq 'SQLite' ) {
+        my $DBD_SQLite_VERSION = 1.31;
+
+        error( 'sqlite_backend',
+            "need DBD::SQLite >= $DBD_SQLite_VERSION; have @{[ DBD::SQLite->VERSION ]}"
+          )
+          unless eval {
+            require DBD::SQLite;
+            DBD::SQLite->VERSION( $DBD_SQLite_VERSION );
+            1;
+          };
+
+        $attr{sqlite_allow_multiple_statements} = 1;
+    }
 
     my $connect = $self->_cached ? 'connect_cached' : 'connect';
 
@@ -592,7 +606,7 @@ Data::Record::Serialize::Encode::dbi - store a record in a database
 
 =head1 VERSION
 
-version 0.25
+version 0.28
 
 =head1 SYNOPSIS
 

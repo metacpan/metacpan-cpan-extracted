@@ -1,0 +1,48 @@
+{
+   "abstract" : "Format records with different templates.",
+   "author" : [
+      "Mathias Weidner <mamawe@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-TypecastTemplates",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Template" : "0",
+            "Text::CSV" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::TypecastTemplates" : {
+         "file" : "lib/App/TypecastTemplates.pm",
+         "version" : "v0.2.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ]
+   },
+   "version" : "v0.2.0",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

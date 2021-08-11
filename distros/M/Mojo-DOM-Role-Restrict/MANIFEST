@@ -12,6 +12,7 @@ t/04-valid.t
 t/05-restrict-basic.t
 t/06-restrict-regex.t
 t/07-restrict-callback.t
+t/08-diff.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

@@ -7,16 +7,15 @@ use Test::Lib;
 
 use Data::Record::Serialize;
 
-use warnings;
-
-eval 'use DBI; 1'
+eval { require DBI; 1 }
   or plan skip_all => "Need DBI to run the DBI backend tests\n";
-
 
 our @DBDs;
 
-eval 'use DBD::SQLite; 1'
-  and push @DBDs, [ 'SQLite', '', '', '' ];
+my $DBD_SQLite_VERSION = 1.31;
+
+eval { require  DBD::SQLite; DBD::SQLite->VERSION( $DBD_SQLite_VERSION ); 1; }
+  && push @DBDs, [ 'SQLite', '', '', '' ];
 
 
 if ( $ENV{DBI_DRIVER} ) {
@@ -35,7 +34,7 @@ if ( $ENV{DBI_DRIVER} ) {
 
 @DBDs
   or plan skip_all =>
-  "Need at least DBD::SQLite to run the DBI backend tests\n";
+  "Need at least DBD::SQLite (>= $DBD_SQLite_VERSION) to run the DBI backend tests\n";
 
 sub tmpfile {
 

@@ -1,5 +1,5 @@
 package Yancy::Util;
-our $VERSION = '1.075';
+our $VERSION = '1.076';
 # ABSTRACT: Utilities for Yancy
 
 #pod =head1 SYNOPSIS
@@ -345,7 +345,7 @@ sub match {
             !defined $test{ $_ } ? !defined $item->{ $_ }
             : ref $test{ $_ } eq 'Regexp' ? $item->{ $_ } =~ $test{ $_ }
             : ref $test{ $_ } eq 'CODE' ? $test{ $_ }->( $item->{ $_ }, $_ )
-            : $item->{ $_ } eq $test{ $_ }
+            : ($item->{ $_ }//'') eq ($test{ $_ }//'')
         }
         keys %test;
 
@@ -526,7 +526,7 @@ Yancy::Util - Utilities for Yancy
 
 =head1 VERSION
 
-version 1.075
+version 1.076
 
 =head1 SYNOPSIS
 

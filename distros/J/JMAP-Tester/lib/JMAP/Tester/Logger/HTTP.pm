@@ -1,6 +1,6 @@
 use 5.14.0;
-package JMAP::Tester::Logger::HTTP;
-$JMAP::Tester::Logger::HTTP::VERSION = '0.026';
+package JMAP::Tester::Logger::HTTP 0.100;
+
 use Moo;
 
 use namespace::clean;
@@ -17,7 +17,7 @@ sub _log_generic {
   return;
 }
 
-for my $which (qw(jmap upload download)) {
+for my $which (qw(jmap misc upload download)) {
   for my $what (qw(request response)) {
     my $method = "log_${which}_${what}";
     no strict 'refs';
@@ -44,7 +44,7 @@ JMAP::Tester::Logger::HTTP
 
 =head1 VERSION
 
-version 0.026
+version 0.100
 
 =head1 AUTHOR
 

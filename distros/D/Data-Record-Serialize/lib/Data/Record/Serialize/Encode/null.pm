@@ -4,7 +4,7 @@ package Data::Record::Serialize::Encode::null;
 
 use Moo::Role;
 
-our $VERSION = '0.25';
+our $VERSION = '0.28';
 
 use namespace::clean;
 
@@ -50,7 +50,7 @@ Data::Record::Serialize::Encode::null - infinite bitbucket
 
 =head1 VERSION
 
-version 0.25
+version 0.28
 
 =head1 SYNOPSIS
 

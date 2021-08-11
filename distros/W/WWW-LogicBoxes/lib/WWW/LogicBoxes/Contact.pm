@@ -11,7 +11,7 @@ use WWW::LogicBoxes::Types qw(Int Str EmailAddress PhoneNumber ContactType);
 
 use WWW::LogicBoxes::PhoneNumber;
 
-our $VERSION = '1.10.1'; # VERSION
+our $VERSION = '1.11.0'; # VERSION
 # ABSTRACT: LogicBoxes Contact
 
 has 'id' => (

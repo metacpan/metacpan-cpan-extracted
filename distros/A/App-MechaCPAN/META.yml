@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.005, Dist::Milla version v1.0.16, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,9 +28,13 @@ resources:
   bugtracker: https://github.com/atrodo/App-MechaCPAN/issues
   homepage: https://github.com/atrodo/App-MechaCPAN
   repository: https://github.com/atrodo/App-MechaCPAN.git
-version: '0.26'
+version: '0.27'
 x_contributors:
   - 'Greg Arnold <greg@arnoldassociates.com>'
   - 'James A. Pattie <james.pattie@gpsinsight.com>'
   - 'Jon Gentle <atrodo@atrodo.org>'
   - 'Tim Heaney <oylenshpeegul@gmail.com>'
+x_generated_by_perl: v5.32.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0
+x_static_install: 0

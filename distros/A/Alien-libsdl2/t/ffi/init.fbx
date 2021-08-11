@@ -1,0 +1,12 @@
+our $DIR;
+my $Win32 = $^O eq 'MSWin32';
+use lib -d '../t' ? './lib' : 't/lib';
+use Alien::libsdl2;
+return {
+  alien   => ['Alien::libsdl2'],
+  cflags  => "-I/include",
+  #libs    => [Alien::libsdl2->libs_static()], #( $Win32 ? `sh sdl-config --libs` : `pkg-config --libs sdl2`),
+  libs          => [ Alien::libsdl2->dynamic_libs ],
+  source  => ["$DIR/*.c"],
+  verbose => 2
+}

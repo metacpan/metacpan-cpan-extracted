@@ -1,5 +1,35 @@
 Revision history for Perl module DNS::Unbound
 
+0.26 Tue, 10 Aug 2021
+- Fix t/mojo.t to ignore spurious warning from some older Mojo versions.
+
+0.25 Mon, 9 Aug 2021
+- BUG FIX: Make the C code not depend on (pure) Perl for memory handling.
+  This intends to fix some longstanding (and hard-to-reproduce)
+  memory-handling nits, but it’s also just much cleaner besides.
+- BUG FIX: We now honour $Config{'ccflags'} when building the module.
+  (This broke at some point on 32-bit RaspiOS.)
+- BUG FIX: Previously we set ub_ctx_debugout() to STDERR immediately before
+  destroying the Unbound instance. This worked around a bug in libunbound,
+  but it also seems occasionally to cause “leftover” log messages then to
+  go to STDERR. We now apply a different workaround: dup() the file descriptor
+  when calling debugout(), which obviates the need to set it back to STDERR
+  (since this is now libunbound’s very own file descriptor).
+- BUG FIX: DNS::Unbound::Mojo no longer tight-loops.
+- BUG FIX: DNS::Unbound::Mojo now removes itself from Mojo’s reactor at
+  DESTROY time; previously it neglected this cleanup step.
+- Fix t/load.t:
+    - The test now runs to completion rather than silently failing.
+    - The test now accommodates old Unbounds that lack `ttl`.
+    - Long TTLs. Unbound’s default was 86400, so responses
+      that had longer TTLs caused a conflict between Net::DNS’s parse
+      and Unbound’s response.
+- Objects now warn() on DESTROY at global destruction. This helps to
+  identify memory leaks. (It also entails a higher Promise::ES6 version
+  dependency.)
+- Internal style improvements.
+- All tests now fail on warnings.
+
 0.24 Tue, 27 Jul 2021
 - BUG FIX: Several memory leaks from errantly-high reference counts.
 - Various tweaks for efficiency: pre-extend arrays, etc.

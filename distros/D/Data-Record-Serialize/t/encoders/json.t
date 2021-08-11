@@ -8,7 +8,19 @@ use My::Test::Util -all;
 
 use Data::Record::Serialize;
 
-use JSON::MaybeXS;
+BEGIN {
+    unless ( eval { require Data::Record::Serialize::Encode::json; 1 } ) {
+        my $err = $@;
+        if ( ref( $err ) eq 'Data::Record::Serialize::Error::json_backend' ) {
+            skip_all( $err->msg );
+        }
+        else {
+            skip_all( $@ );
+        }
+    }
+}
+
+require JSON::PP;
 
 my ( $s, $buf );
 
@@ -27,7 +39,8 @@ ok(
     "constructor"
 ) or diag $@;
 
-my $json = JSON->new;
+
+my $json = JSON::PP->new;
 
 subtest 'record does not require transformation' => sub {
 

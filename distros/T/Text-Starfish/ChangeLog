@@ -1,4 +1,12 @@
-Revision history for Perl extension Text::Starfish.
+Revision history for Perl extension Text::Starfish
+
+1.39 10 Aug 2021
+ - documentation improvements
+ - better distinguishing evaluator functions (evf) (in progress)
+ - renaming _eval_dispatch to _evf_dispatch
+ - minor modification in setting .html.sfish style (a regex to string)
+ - addition to test 07-html
+ - removing META.yml
 
 1.38 3 Aug 2020
  - documentation improvements

@@ -11,7 +11,7 @@ use WWW::LogicBoxes::Types qw( NexusPurpose NexusCategory );
 
 extends 'WWW::LogicBoxes::Contact';
 
-our $VERSION = '1.10.1'; # VERSION
+our $VERSION = '1.11.0'; # VERSION
 # ABSTRACT: Contact for .US Registrations
 
 has 'nexus_purpose' => (

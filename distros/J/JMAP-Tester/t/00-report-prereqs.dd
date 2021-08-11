@@ -1,7 +1,7 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0'
+                                        'ExtUtils::MakeMaker' => '6.78'
                                       }
                       },
        'develop' => {
@@ -12,19 +12,23 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'Carp' => '0',
                                       'Crypt::Mac::HMAC' => '0',
                                       'Crypt::Misc' => '0',
                                       'Data::Dumper' => '0',
+                                      'Data::OptList' => '0',
                                       'Encode' => '0',
+                                      'Future' => '0',
                                       'HTTP::Request' => '0',
                                       'JSON' => '0',
+                                      'JSON::MaybeXS' => '0',
                                       'JSON::Typist' => '0.005',
                                       'LWP::UserAgent' => '0',
                                       'Module::Runtime' => '0',
                                       'Moo' => '0',
                                       'Moo::Role' => '0',
                                       'Params::Util' => '0',
-                                      'Scalar::Util' => '0',
+                                      'Safe::Isa' => '0',
                                       'Sub::Exporter' => '0',
                                       'Throwable::Error' => '0',
                                       'URI' => '0',
@@ -45,6 +49,7 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'HTTP::Response' => '0',
                                    'JSON::Typist' => '0.005',
+                                   'Scalar::Util' => '0',
                                    'Test::Abortable' => '0',
                                    'Test::Deep' => '0',
                                    'Test::Deep::JType' => '0.005',

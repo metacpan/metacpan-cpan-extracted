@@ -7,6 +7,11 @@ use File::Temp qw/tempdir/;
 
 require q[./t/helper.pm];
 
+if ( !&App::MechaCPAN::can_https )
+{
+  plan skip_all => 'Cannot test dependences from cpan when https is unavailable';
+}
+
 # Make sure the prereqs from a previous module don't prevent newer prereqs
 my $pwd = cwd;
 

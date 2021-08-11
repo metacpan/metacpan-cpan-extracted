@@ -1,5 +1,15 @@
 Revision history for JMAP-Tester
 
+0.100     2021-08-10 12:11:55-04:00 America/New_York
+        - [ THIS UPDATE MIGHT BREAK YOUR CODE ]
+        - The $jtester->ua object is now a "UA" object, not just an
+          LWP::UserAgent.  This allows the use of other user agents.  More
+          importantly, the tester can be configured to return Futures instead
+          of immediate responses, which means it can be operated in
+          non-blocking mode.  If you have been interacting with the result of
+          ->ua directly, you should read the details of its new interface in
+          JMAP::Tester::Role::UA and then update your code.
+
 0.026     2019-03-08 15:48:29-05:00 America/New_York
         - fix reference type of accounts collection (thanks, WOLFSAGE)
 

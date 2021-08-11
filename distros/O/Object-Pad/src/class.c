@@ -48,7 +48,10 @@ static void register_class_attribute(const char *name, const struct ClassHookFun
 
 void ObjectPad_register_class_attribute(pTHX_ const char *name, const struct ClassHookFuncs *funcs)
 {
-  if(funcs->ver != OBJECTPAD_ABIVERSION)
+  if(funcs->ver < 50)
+    croak("Mismatch in third-party class attribute ABI version field: module wants %d, we require >= 50\n",
+        funcs->ver);
+  if(funcs->ver > OBJECTPAD_ABIVERSION)
     croak("Mismatch in third-party class attribute ABI version field: attribute supplies %d, module wants %d\n",
         funcs->ver, OBJECTPAD_ABIVERSION);
 
@@ -82,9 +85,20 @@ void ObjectPad_mop_class_apply_attribute(pTHX_ ClassMeta *classmeta, const char 
     if((reg->funcs->flags & OBJECTPAD_FLAG_ATTR_MUST_VALUE) && !value)
       croak("Attribute :%s requires a value", name);
 
-    if(reg->funcs->apply)
-      if(!(*reg->funcs->apply)(aTHX_ classmeta, value))
-        return;
+    SV *hookdata = value;
+
+    if(reg->funcs->apply) {
+      if(reg->funcs->ver >= 51) {
+        if(!(*reg->funcs->apply)(aTHX_ classmeta, value, &hookdata))
+          return;
+      }
+      else {
+        /* ABIVERSION_MINOR 50 apply did not have hookdata_ptr */
+        bool (*apply)(pTHX_ ClassMeta *, SV *) = (void *)(reg->funcs->apply);
+        if(!(*apply)(aTHX_ classmeta, value))
+          return;
+      }
+    }
 
     if(!classmeta->hooks)
       classmeta->hooks = newAV();
@@ -93,9 +107,12 @@ void ObjectPad_mop_class_apply_attribute(pTHX_ ClassMeta *classmeta, const char 
     Newx(hook, 1, struct ClassHook);
 
     hook->funcs = reg->funcs;
-    hook->hookdata = value;
+    hook->hookdata = hookdata;
 
     av_push(classmeta->hooks, (SV *)hook);
+
+    if(value && value != hookdata)
+      SvREFCNT_dec(value);
 
     return;
   }
@@ -286,7 +303,29 @@ void ObjectPad_mop_class_add_ADJUST(pTHX_ ClassMeta *meta, CV *cv)
   if(!meta->adjustblocks)
     meta->adjustblocks = newAV();
 
-  av_push(meta->adjustblocks, (SV *)cv);
+  AdjustBlock *block;
+  Newx(block, 1, struct AdjustBlock);
+
+  block->is_adjustparams = false;
+  block->cv = cv;
+
+  av_push(meta->adjustblocks, (SV *)block);
+}
+
+void ObjectPad_mop_class_add_ADJUSTPARAMS(pTHX_ ClassMeta *meta, CV *cv)
+{
+  if(!meta->adjustblocks)
+    meta->adjustblocks = newAV();
+
+  AdjustBlock *block;
+  Newx(block, 1, struct AdjustBlock);
+
+  block->is_adjustparams = true;
+  block->cv = cv;
+
+  meta->has_adjustparams = true;
+
+  av_push(meta->adjustblocks, (SV *)block);
 }
 
 #define mop_class_implements_role(classmeta, rolemeta)  S_mop_class_implements_role(aTHX_ classmeta, rolemeta)
@@ -345,15 +384,18 @@ void ObjectPad_mop_class_compose_role(pTHX_ ClassMeta *classmeta, ClassMeta *rol
 
   U32 nadjusts = rolemeta->adjustblocks ? av_count(rolemeta->adjustblocks) : 0;
   for(i = 0; i < nadjusts; i++) {
-    CV *adjustblock = (CV *)AvARRAY(rolemeta->adjustblocks)[i];
+    AdjustBlock *block = (AdjustBlock *)AvARRAY(rolemeta->adjustblocks)[i];
 
-    CV *embedded_adjustblock = embed_cv(adjustblock, embedding);
+    CV *embedded_cv = embed_cv(block->cv, embedding);
 
-    if(!classmeta->adjustblocks)
-      classmeta->adjustblocks = newAV();
-
-    av_push(classmeta->adjustblocks, (SV *)embedded_adjustblock);
+    if(block->is_adjustparams)
+      mop_class_add_ADJUSTPARAMS(classmeta, embedded_cv);
+    else
+      mop_class_add_ADJUST(classmeta, embedded_cv);
   }
+
+  if(rolemeta->has_adjustparams)
+    classmeta->has_adjustparams = true;
 
   U32 nmethods = av_count(rolemeta->methods);
   for(i = 0; i < nmethods; i++) {
@@ -955,15 +997,20 @@ XS_INTERNAL(injected_constructor)
     }
   }
 
-  if(meta->parammap) {
+  HV *paramhv = NULL;
+  if(meta->has_adjustparams)
+    paramhv = (HV *)sv_2mortal((SV *)newHV());
+
+  if(meta->parammap || meta->has_adjustparams) {
     /* Assign params from parammap */
     CopLINE_set(PL_curcop, __LINE__);
 
     HV *parammap = meta->parammap;
-    SV *missingslots = newSVsv(meta->requireslots);
-    SAVEFREESV(missingslots);
+    SV *missingslots = meta->requireslots ? newSVsv(meta->requireslots) : NULL;
+    if(missingslots)
+      SAVEFREESV(missingslots);
 
-    char *missingvec = SvPVX(missingslots);
+    char *missingvec = missingslots ? SvPVX(missingslots) : NULL;
 
     if(av_count(args) % 2)
       warn("Odd-length list passed to %" SVf " constructor", class);
@@ -975,26 +1022,26 @@ XS_INTERNAL(injected_constructor)
       SV *name  = argsv[idx];
       SV *value = argsv[idx+1];
 
-      HE *he = hv_fetch_ent(parammap, name, 0, 0);
-      if(!he && meta->strict_params) {
-        PL_curcop = prevcop;
-        croak("Unrecognised parameter '%" SVf "' for %" SVf " constructor",
-          SVfARG(name), SVfARG(meta->name));
+      HE *he = parammap ? hv_fetch_ent(parammap, name, 0, 0) : NULL;
+      if(he) {
+        ParamMeta *parammeta = (ParamMeta *)HeVAL(he);
+        SLOTOFFSET slotix = parammeta->slotix;
+
+        SV *slot = slotsv[slotix];
+
+        sv_setsv_mg(slot, value);
+        missingvec[slotix / 8] &= ~(1 << (slotix % 8));
       }
-      else if(!he)
-        continue;
+      else {
+        if(!paramhv)
+          paramhv = (HV *)sv_2mortal((SV *)newHV());
 
-      ParamMeta *parammeta = (ParamMeta *)HeVAL(he);
-      SLOTOFFSET slotix = parammeta->slotix;
-
-      SV *slot = slotsv[slotix];
-
-      sv_setsv_mg(slot, value);
-      missingvec[slotix / 8] &= ~(1 << (slotix % 8));
+        hv_store_ent(paramhv, name, SvREFCNT_inc(value), 0);
+      }
     }
 
     /* missingvec should be all zeroes if no missing arguments */
-    for(idx = 0; idx < SvCUR(missingslots); idx++) {
+    for(idx = 0; missingslots && idx < SvCUR(missingslots); idx++) {
       if(!missingvec[idx])
         continue;
 
@@ -1058,26 +1105,43 @@ XS_INTERNAL(injected_constructor)
     AV *adjustblocks = meta->adjustblocks;
     U32 i;
     for(i = 0; i < av_count(adjustblocks); i++) {
-      CV *adjustblock = (CV *)AvARRAY(adjustblocks)[i];
+      AdjustBlock *block = (AdjustBlock *)AvARRAY(adjustblocks)[i];
 
       ENTER;
       SAVETMPS;
       SPAGAIN;
 
-      /* No args */
-
-      EXTEND(SP, 1);
+      EXTEND(SP, 1 + !!paramhv);
 
       PUSHMARK(SP);
       PUSHs(self);
+      if(paramhv && block->is_adjustparams)
+        mPUSHs(newRV_inc((SV *)paramhv));
       PUTBACK;
 
-      assert(adjustblock);
-      call_sv((SV *)adjustblock, G_VOID);
+      assert(block->cv);
+      call_sv((SV *)block->cv, G_VOID);
 
       FREETMPS;
       LEAVE;
     }
+  }
+
+  if(paramhv && meta->strict_params && hv_iterinit(paramhv) > 0) {
+    HE *he = hv_iternext(paramhv);
+
+    /* Concat all the param names, in no particular order
+     * TODO: consider sorting them but that's quite expensive and tricky in XS */
+
+    SV *params = newSVsv(HeSVKEY_force(he));
+    SAVEFREESV(params);
+
+    while((he = hv_iternext(paramhv)))
+      sv_catpvf(params, ", %" SVf, SVfARG(HeSVKEY_force(he)));
+
+    PL_curcop = prevcop;
+    croak("Unrecognised parameters for %" SVf " constructor: %" SVf,
+      SVfARG(meta->name), SVfARG(params));
   }
 
   if(meta->slothooks_construct) {
@@ -1184,6 +1248,7 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *su
   meta->sealed = false;
   meta->role_is_invokable = false;
   meta->strict_params = false;
+  meta->has_adjustparams = false;
   meta->start_slotix = 0;
   meta->hooks   = NULL;
   meta->slots   = newAV();
@@ -1352,7 +1417,7 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *su
 
 /* :repr */
 
-static bool classhook_repr_apply(pTHX_ ClassMeta *classmeta, SV *value)
+static bool classhook_repr_apply(pTHX_ ClassMeta *classmeta, SV *value, SV **hookdata_ptr)
 {
   char *val = SvPV_nolen(value); /* all comparisons are ASCII */
 
@@ -1377,13 +1442,14 @@ static bool classhook_repr_apply(pTHX_ ClassMeta *classmeta, SV *value)
 }
 
 static const struct ClassHookFuncs classhooks_repr = {
+  .ver   = OBJECTPAD_ABIVERSION,
   .flags = OBJECTPAD_FLAG_ATTR_MUST_VALUE,
   .apply = &classhook_repr_apply,
 };
 
 /* :compat */
 
-static bool classhook_compat_apply(pTHX_ ClassMeta *classmeta, SV *value)
+static bool classhook_compat_apply(pTHX_ ClassMeta *classmeta, SV *value, SV **hookdata_ptr)
 {
   if(strEQ(SvPV_nolen(value), "invokable")) {
     if(classmeta->type != METATYPE_ROLE)
@@ -1398,13 +1464,14 @@ static bool classhook_compat_apply(pTHX_ ClassMeta *classmeta, SV *value)
 }
 
 static const struct ClassHookFuncs classhooks_compat = {
+  .ver   = OBJECTPAD_ABIVERSION,
   .flags = OBJECTPAD_FLAG_ATTR_MUST_VALUE,
   .apply = &classhook_compat_apply,
 };
 
 /* :strict */
 
-static bool classhook_strict_apply(pTHX_ ClassMeta *classmeta, SV *value)
+static bool classhook_strict_apply(pTHX_ ClassMeta *classmeta, SV *value, SV **hookdata_ptr)
 {
   if(strEQ(SvPV_nolen(value), "params"))
     classmeta->strict_params = TRUE;
@@ -1415,6 +1482,7 @@ static bool classhook_strict_apply(pTHX_ ClassMeta *classmeta, SV *value)
 }
 
 static const struct ClassHookFuncs classhooks_strict = {
+  .ver   = OBJECTPAD_ABIVERSION,
   .flags = OBJECTPAD_FLAG_ATTR_MUST_VALUE,
   .apply = &classhook_strict_apply,
 };

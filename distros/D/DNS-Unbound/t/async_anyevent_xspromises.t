@@ -5,6 +5,9 @@ use warnings;
 
 use Test::More;
 
+# This leaks.
+#use Test::FailWarnings;
+
 for my $mod ( qw( AnyEvent  AnyEvent::XSPromises ) ) {
     eval "require $mod" or plan skip_all => "No $mod: $@";
 }

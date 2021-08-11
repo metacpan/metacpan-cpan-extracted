@@ -29,22 +29,22 @@ no_index:
 provides:
   Mojo::Leds:
     file: lib/Mojo/Leds.pm
-    version: '1.06'
+    version: '1.07'
   Mojo::Leds::Page:
     file: lib/Mojo/Leds/Page.pm
-    version: '1.06'
+    version: '1.07'
   Mojo::Leds::Rest:
     file: lib/Mojo/Leds/Rest.pm
-    version: '1.06'
+    version: '1.07'
   Mojo::Leds::Rest::DBIx:
     file: lib/Mojo/Leds/Rest/DBIx.pm
-    version: '1.06'
+    version: '1.07'
   Mojo::Leds::Rest::MongoDB:
     file: lib/Mojo/Leds/Rest/MongoDB.pm
-    version: '1.06'
+    version: '1.07'
   Mojolicious::Command::Author::generate::leds_app:
     file: lib/Mojolicious/Command/Author/generate/leds_app.pm
-    version: '1.06'
+    version: '1.07'
 requires:
   BSON::OID: '0'
   Mojolicious: '8.23'
@@ -57,7 +57,7 @@ requires:
 resources:
   homepage: https://github.com/EmilianoBruni/Mojo-Leds
   repository: https://github.com/EmilianoBruni/Mojo-Leds.git
-version: '1.06'
+version: '1.07'
 x_generated_by_perl: v5.14.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

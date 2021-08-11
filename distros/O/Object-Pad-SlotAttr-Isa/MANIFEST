@@ -1,0 +1,12 @@
+Build.PL
+lib/Object/Pad/SlotAttr/Isa.pm
+lib/Object/Pad/SlotAttr/Isa.xs
+MANIFEST			This list of files
+t/00use.t
+t/01isa.t
+t/02isa+weak.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

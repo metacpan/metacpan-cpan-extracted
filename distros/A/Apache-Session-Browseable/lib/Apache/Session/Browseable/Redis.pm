@@ -9,7 +9,7 @@ use Apache::Session::Lock::Null;
 use Apache::Session::Serialize::JSON;
 use Apache::Session::Browseable::_common;
 
-our $VERSION = '1.3.5';
+our $VERSION = '1.3.9';
 our @ISA     = qw(Apache::Session);
 
 our $redis = $Apache::Session::Browseable::Store::Redis::redis;
@@ -162,7 +162,7 @@ Apache::Session::Redis
        # Select database (optional)
        #database => 0,
 
-       # Choose your browseable fileds
+       # Choose your browseable fields
        Index          => 'uid mail',
   };
   

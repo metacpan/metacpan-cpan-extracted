@@ -1,6 +1,12 @@
 Changelog for Mojo-Leds
 
-1.06 2021-08-05T17:12:58
+1.07 2021-08-09T22:33:53
+ - [Minor] Update version number
+ - Add comments to some plugins previously loaded in default app but not
+   installed by default in the installation of Mojo::Leds
+ - docker now create a default app using leds_app command
+
+1.06 2021-08-05T17:12:30
  - Add command leds_app to generate application directory structures for
    fully functional Mojo::Leds applications
  - [Minor]: Pod syntax error

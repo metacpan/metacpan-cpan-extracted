@@ -3,6 +3,7 @@
  *
  *  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
  */
+#define PERL_NO_GET_CONTEXT
 
 #include "EXTERN.h"
 #include "perl.h"
@@ -10,10 +11,44 @@
 
 #include "object_pad.h"
 
+#ifndef mg_freeext
+#  define mg_freeext(sv, how, vtbl)  S_mg_freeext(aTHX_ sv, how, vtbl)
+static void S_mg_freeext(pTHX_ SV *sv, int how, const MGVTBL *vtbl)
+{
+  MAGIC *mg, *prevmg, *moremg;
+
+  assert(how == PERL_MAGIC_ext);
+
+  for(prevmg = NULL, mg = SvMAGIC(sv); mg; prevmg = mg, mg = moremg) {
+    moremg = mg->mg_moremagic;
+    if(mg->mg_type == how && mg->mg_virtual == vtbl) {
+      if(prevmg) {
+        prevmg->mg_moremagic = moremg;
+      }
+      else {
+        SvMAGIC_set(sv, moremg);
+      }
+
+      /* mg_free_struct(sv, mg) */
+      if(vtbl->svt_free)
+        vtbl->svt_free(aTHX_ sv, mg);
+      if(mg->mg_ptr) {
+        if(mg->mg_len > 0)
+          Safefree(mg->mg_ptr);
+        else if(mg->mg_len == HEf_SVKEY)
+          SvREFCNT_dec(MUTABLE_SV(mg->mg_ptr));
+      }
+      if(mg->mg_flags & MGf_REFCOUNTED)
+        SvREFCNT_dec(mg->mg_obj);
+    }
+  }
+}
+#endif
+
 static int magic_get(pTHX_ SV *sv, MAGIC *mg);
 static int magic_set(pTHX_ SV *sv, MAGIC *mg);
 
-static MGVTBL vtbl = {
+static const MGVTBL vtbl = {
   .svt_get = &magic_get,
   .svt_set = &magic_set,
 };
@@ -63,6 +98,8 @@ static void lazyinit_post_initslot(pTHX_ SlotMeta *slotmeta, SV *hookdata, SV *s
   sv_rvweaken(weakself);
 
   sv_magicext(slot, weakself, PERL_MAGIC_ext, &vtbl, (char *)hookdata, HEf_SVKEY);
+
+  SvREFCNT_dec(weakself);
 }
 
 static const struct SlotHookFuncs lazyinit_hooks = {

@@ -186,6 +186,14 @@
   is_windows: false
   is_chromeos: false
   version: '1.1'
+- ua: 'Go http package'
+  name: 'Go http-client'
+  is_bot: false
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
 - ua: 'Apache-HttpClient/4.5.2 (Java/1.8.0_171)'
   name: 'Apache-HttpClient'
   is_bot: false
@@ -249,6 +257,15 @@
   is_windows: false
   is_chromeos: false
   version: '2.22.0'
+- ua: 'Python/3.7 aiohttp/3.7.3'
+  name: 'aiohttp'
+  is_bot: false
+  is_ios: false
+  is_android: false
+  is_linux: flase
+  is_windows: false
+  is_chromeos: false
+  version: '3.7.3'
 - ua: 'MT::Plugin::BadLinkFinder/0.9'
   name: 'MT::Plugin::BadLinkFinder'
   is_bot: false
@@ -310,3 +327,12 @@
   is_windows: false
   is_chromeos: false
   version: '7.19.0'
+- ua: 'axios/0.21.1'
+  name: 'axios'
+  is_bot: false
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '0.21.1'

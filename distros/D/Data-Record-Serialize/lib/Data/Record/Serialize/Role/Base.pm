@@ -4,7 +4,7 @@ package Data::Record::Serialize::Role::Base;
 
 use Moo::Role;
 
-our $VERSION = '0.25';
+our $VERSION = '0.28';
 
 use Data::Record::Serialize::Error { errors => [ 'fields', 'types' ] }, -all;
 
@@ -179,6 +179,7 @@ has _can_bool => (
 sub _build_field_list_with_type {
     my ( $self, $list_spec, $type, $error_label ) = @_;
 
+    my $fieldh    = $self->_fieldh;
     my $list = do {
         if ( is_coderef( $list_spec ) ) {
             ( ArrayRef [Str] )->assert_return( $list_spec->( $self ) );
@@ -187,10 +188,13 @@ sub _build_field_list_with_type {
             [@$list_spec];
         }
         else {
-            [ $list_spec ? @{ $self->type_index->[ $type ] } : () ];
+            # want all of the fields. actually just want the ones that will be output,
+            # otherwise the check below will fail.
+            [ grep { exists $fieldh->{$_} } $list_spec ? @{ $self->type_index->[ $type ] } : () ];
         }
     };
-    my $fieldh    = $self->_fieldh;
+
+    # this check is to help catch typos by users
     my @not_field = grep { !exists $fieldh->{$_} } @{$list};
     error( 'fields', "unknown $error_label fields: " . join( ', ', @not_field ) )
       if @not_field;
@@ -259,6 +263,7 @@ sub _trigger_stringify { $_[0]->_clear_stringified }
 
 
 
+
 sub nullified {
     my $self = shift;
     return [ $self->has_fields ? @{$self->_nullified} : () ];
@@ -281,10 +286,12 @@ sub nullified {
 
 
 
+
 sub numified {
     my $self = shift;
     return [ $self->has_fields ? @{$self->_numified} : () ];
 }
+
 
 
 
@@ -699,7 +706,7 @@ Data::Record::Serialize::Role::Base - Base Role for Data::Record::Serialize
 
 =head1 VERSION
 
-version 0.25
+version 0.28
 
 =head1 DESCRIPTION
 
@@ -798,10 +805,11 @@ returns true if L</stringify> has been set.
 
   $fields = $obj->nullified;
 
-Returns a list of fields which are checked for empty values (see L</nullify>).
+Returns a arrayref of fields which are checked for empty values (see L</nullify>).
 
-This will return C<undef> if the list is not yet available (for example, if
-fields names are determined from the first output record and none has been sent).
+This will return an empty array if the list is not yet available (for
+example, if fields names are determined from the first output record
+and none has been sent).
 
 If the list of fields is available, calling B<nullified> may result in
 verification of the list of nullified fields against the list of
@@ -812,10 +820,11 @@ C<Data::Record::Serialize::Error::Role::Base::fields>.
 
   $fields = $obj->numified;
 
-Returns a list of fields which are converted to numbers.
+Returns an arrayref of fields which are converted to numbers.
 
-This will return C<undef> if the list is not yet available (for example, if
-fields names are determined from the first output record and none has been sent).
+This will return an empty array if the list is not yet available (for
+example, if fields names are determined from the first output record
+and none has been sent).
 
 If the list of fields is available, calling B<numified> may result in
 verification of the list of numified fields against the list of
@@ -826,10 +835,11 @@ C<Data::Record::Serialize::Error::Role::Base::fields>.
 
   $fields = $obj->stringified;
 
-Returns a list of fields which are converted to strings.
+Returns an arrayref of fields which are converted to strings.
 
-This will return C<undef> if the list is not yet available (for example, if
-fields names are determined from the first output record and none has been sent).
+This will return an empty array if the list is not yet available (for
+example, if fields names are determined from the first output record
+and none has been sent).
 
 If the list of fields is available, calling B<stringified> may result in
 verification of the list of stringified fields against the list of

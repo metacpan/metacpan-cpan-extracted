@@ -6,7 +6,7 @@ no  warnings "redefine";
 use 5.008003;
 
 use Test::More tests => 12;
-use Test::NoWarnings;
+use Test::Warnings;
 
 BEGIN {
     # redefine the CORE functions to mimic themselfs at compile-time

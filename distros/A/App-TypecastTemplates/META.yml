@@ -1,0 +1,26 @@
+---
+abstract: 'Format records with different templates.'
+author:
+  - 'Mathias Weidner <mamawe@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-TypecastTemplates
+provides:
+  App::TypecastTemplates:
+    file: lib/App/TypecastTemplates.pm
+    version: v0.2.0
+requires:
+  Template: '0'
+  Text::CSV: '0'
+resources:
+  license: http://www.perlfoundation.org/artistic_license_2_0
+version: v0.2.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

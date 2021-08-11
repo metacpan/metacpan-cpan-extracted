@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::FailWarnings;
 
 for my $mod ( qw( AnyEvent ) ) {
     eval "require $mod" or plan skip_all => "No $mod: $@";

@@ -11,6 +11,9 @@ $App::MechaCPAN::TIMEOUT = 0;
 # included, this is so we can test the rest of our functionality
 delete $ENV{PERL_USE_UNSAFE_INC};
 
+# Make sure that none of the dists we're testing run author tests
+delete $ENV{AUTHOR_TESTING};
+
 no strict 'refs';
 no warnings 'redefine';
 *App::MechaCPAN::error = sub

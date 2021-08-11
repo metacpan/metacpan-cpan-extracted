@@ -1,7 +1,7 @@
 use v5.10.0;
-package JMAP::Tester::Response::Sentence;
+package JMAP::Tester::Response::Sentence 0.100;
 # ABSTRACT: a single triple within a JMAP response
-$JMAP::Tester::Response::Sentence::VERSION = '0.026';
+
 use Moo;
 
 use namespace::clean;
@@ -82,13 +82,21 @@ sub as_stripped_pair {
 #pod =cut
 
 sub as_set {
+  my ($self) = @_;
+
+  unless ($self->name =~ m{/set$}) {
+    return $self->sentence_broker->abort(
+      sprintf(qq{tried to call ->as_set on sentence named "%s"}, $self->name)
+    );
+  }
+
   require JMAP::Tester::Response::Sentence::Set;
   return JMAP::Tester::Response::Sentence::Set->new({
-    name         => $_[0]->name,
-    arguments    => $_[0]->arguments,
-    client_id    => $_[0]->client_id,
+    name         => $self->name,
+    arguments    => $self->arguments,
+    client_id    => $self->client_id,
 
-    sentence_broker => $_[0]->sentence_broker,
+    sentence_broker => $self->sentence_broker,
   });
 }
 
@@ -108,7 +116,7 @@ sub assert_named {
 
   return $self if $self->name eq $name;
 
-  $self->sentence_broker->abort_callback->(
+  $self->sentence_broker->abort(
     sprintf qq{expected sentence named "%s" but got "%s"}, $name, $self->name
   );
 }
@@ -127,7 +135,7 @@ JMAP::Tester::Response::Sentence - a single triple within a JMAP response
 
 =head1 VERSION
 
-version 0.026
+version 0.100
 
 =head1 OVERVIEW
 

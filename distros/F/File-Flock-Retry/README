@@ -2,8 +2,8 @@ NAME
     File::Flock::Retry - Yet another flock module
 
 VERSION
-    This document describes version 0.631 of File::Flock::Retry (from Perl
-    distribution File-Flock-Retry), released on 2019-03-12.
+    This document describes version 0.632 of File::Flock::Retry (from Perl
+    distribution File-Flock-Retry), released on 2021-08-10.
 
 SYNOPSIS
      use File::Flock::Retry;
@@ -28,9 +28,6 @@ DESCRIPTION
         I prefer this approach to blocking/waiting indefinitely or failing
         immediately.
 
-CAVEATS
-    Not yet tested on Windows. Some filesystems do not support inode?
-
 METHODS
   lock
     Usage:
@@ -43,8 +40,7 @@ METHODS
     default 60). Will die if failed to acquire lock after all retries.
 
     Will automatically unlock if $lock goes out of scope. Upon unlock, will
-    remove $path if it was created by "lock" and is still empty (this
-    behavior is the same as "File::Flock").
+    remove $path if it is still empty (zero-sized).
 
     Available options:
 
@@ -77,8 +73,7 @@ METHODS
 
      $lock->unlock
 
-    Unlock. will remove lock file if it was created by "lock" and is still
-    empty (this behavior is the same as "File::Flock").
+    Unlock. will remove lock file if it is still empty.
 
   release
     Usage:
@@ -109,6 +104,9 @@ BUGS
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
 
+CAVEATS
+    Not yet tested on Windows. Some filesystems do not support inode?
+
 SEE ALSO
     File::Flock, a bit too heavy in terms of dependencies and startup
     overhead, for my taste. It depends on things like File::Slurp and
@@ -128,8 +126,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2017, 2015, 2014 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2021, 2019, 2017, 2015, 2014 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

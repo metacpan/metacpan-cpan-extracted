@@ -6,10 +6,11 @@ use warnings;
 
 use Test::More;
 
-plan tests => 1 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Pod/Weaver/PluginBundle/Author/PERLANCAR.pm'
+    'Pod/Weaver/PluginBundle/Author/PERLANCAR.pm',
+    'Pod/Weaver/Section/PERLANCAR/Contributing.pm'
 );
 
 

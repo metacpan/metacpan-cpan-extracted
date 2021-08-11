@@ -5,6 +5,7 @@ use warnings;
 use autodie;
 
 use Test::More;
+use Test::FailWarnings;
 
 use_ok('DNS::Unbound');
 

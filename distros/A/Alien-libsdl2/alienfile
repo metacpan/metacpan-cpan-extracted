@@ -1,3 +1,93 @@
+use strict;
+use warnings;
+use alienfile;
+use Config;
+#
+my $Win32 = $^O eq 'MSWin32';
+my $VC    = $Win32                              && ( $Config{ccname} eq 'cl' ? 1 : 0 );
+my $x64   = $Config{archname} =~ /^MSWin32-x64/ && $Config{ptrsize} == 8;
+
+#
+
+probe sub {
+    my ($build) = @_;    # $build is the Alien::Build instance.
+    return 'share';      # We need headers
+    system 'pkg-config --exists sdl2';
+    $? == 0 ? 'system' : 'share';
+};
+share {
+    start_url 'https://libsdl.org/release';
+
+    if ($Win32) {
+        if ($VC) {
+            plugin 'Download' => (
+
+                #https://www.libsdl.org/release/SDL2-devel-2.0.14-VC.zip
+                filter  => qr/^SDL2-devel-[0-9\.]+-VC\.zip$/,
+                version => qr/^SDL2-devel-([0-9\.]+)-VC\.zip$/,
+            );
+            plugin 'Extract' => 'zip';
+            build [
+                'move lib _lib',
+                'move _lib/' . ( $x64 ? 'x64' : 'x86' ) . ' lib'
+            ];
+        }
+        else {
+            plugin 'Download' => (
+
+                #https://libsdl.org/release/SDL2-devel-2.0.14-mingw.tar.gz
+                filter  => qr/^SDL2-devel-[0-9\.]+-mingw\.tar\.gz$/,
+                version => qr/^SDL2-devel-([0-9\.]+)-mingw\.tar\.gz$/,
+            );
+            plugin 'Extract'     => 'tar.gz';
+            plugin 'Build::Make' => 'gmake';
+            build [
+                      '%{make} install-package arch='
+                    . ( $x64 ? 'x86_64' : 'i686' )
+                    . '-w64-mingw32 prefix=%{.install.prefix}',
+            ];
+        }
+    }
+    else {
+        plugin 'Download' => (
+
+            #https://libsdl.org/release/SDL2-2.0.14.tar.gz
+            filter  => qr/^SDL2-[0-9\.]+\.tar\.gz$/,
+            version => qr/^SDL2-([0-9\.]+)\.tar\.gz$/,
+        );
+        plugin 'Extract' => 'tar.gz';
+
+        plugin 'Build::Autoconf';
+        plugin 'Build::Make' => 'gmake';
+        build [
+            '%{configure}',    # --prefix=%{.install.prefix}', # --enable-threads=no',
+            '%{gmake} -j 10',
+            '%{gmake} install',
+        ];
+    }
+};
+
+plugin 'Gather::IsolateDynamic';
+
+gather [
+    [ 'pkg-config --modversion sdl2',                                  \'%{.runtime.version}' ],
+    [ 'pkg-config --cflags ' . ( $Win32 ? '--static' : '' ) . ' sdl2', \'%{.runtime.cflags}' ],
+    [
+        ( $Win32 ? 'cd %{.install.prefix}; sh sdl-config --libs' : 'pkg-config --libs sdl2' ),
+        \'%{.runtime.libs}'
+    ],
+];
+
+#gather sub {
+#        my ($build) = @_;
+#        $build->runtime_prop->{version} = $version;
+#        $build->runtime_prop->{version} =~ s/^v//;
+#        $build->runtime_prop->{cflags} = "-I@{[ $build->runtime_prop->{prefix} ]}/include -lsetupapi -lhid";
+#        $build->runtime_prop->{libs}   = "-L@{[ $build->runtime_prop->{prefix} ]}/lib -lSDL2";
+#    };
+
+__END__
+
 use alienfile;
 use FFI::CheckLib qw[find_lib_or_die];
 use Config;
@@ -44,7 +134,6 @@ share {
     }
 
     plugin 'Build::Copy';
-
     gather sub {
         my ($build) = @_;
         $build->runtime_prop->{version} = $version;

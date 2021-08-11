@@ -1,5 +1,10 @@
 Revision history for JMAP-Tester-WebSocket
 
+0.002     2021-08-11 13:00:27-04:00 America/New_York
+
+        - Update to work with JMAP::Tester 0.100
+        - Fixes to work with cyrus changes
+
 0.001     2018-12-04 12:16:20-05:00 America/New_York
  
         - First release

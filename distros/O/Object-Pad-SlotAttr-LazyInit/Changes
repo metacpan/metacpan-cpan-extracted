@@ -1,5 +1,11 @@
 Revision history for Object-Pad-SlotAttr-LazyInit
 
+0.03    2021-08-10
+        [BUGFIXES]
+         * Back-compat for perls before 5.28 (too old to have `mg_freeext()`)
+         * Avoid leaking the weakself SV
+         * Add PERL_NO_GET_CONTEXT
+
 0.02    2021-08-08
         [CHANGES]
          * Updated for Object::Pad 0.50

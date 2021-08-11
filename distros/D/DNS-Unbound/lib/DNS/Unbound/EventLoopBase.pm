@@ -42,7 +42,7 @@ sub DESTROY {
 
     delete $INSTANCE_REFHOLDER{$self};
 
-    return $self->SUPER::DESTROY();
+    return $self->SUPER::DESTROY() if $self->can('SUPER::DESTROY');
 }
 
 1;

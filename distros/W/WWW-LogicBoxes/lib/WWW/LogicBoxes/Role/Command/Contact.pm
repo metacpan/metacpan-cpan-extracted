@@ -19,7 +19,7 @@ Readonly our $UPDATE_CONTACT_OBSOLETE => 'Due to IRTP Regulations, as of 2016-12
 
 requires 'submit';
 
-our $VERSION = '1.10.1'; # VERSION
+our $VERSION = '1.11.0'; # VERSION
 # ABSTRACT: Contact API Calls
 
 sub create_contact {

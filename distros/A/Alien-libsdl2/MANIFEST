@@ -16,5 +16,9 @@ t/01-diag.t
 t/02-use.t
 t/03-ffi.t
 t/04-xs.t
+t/05-ffi_bundle.t
+t/ffi/init.c
+t/ffi/init.fbx
+t/lib/Init.pm
 xt/author/00-compile.t
 xt/author/pod-syntax.t

@@ -9,5 +9,11 @@ One line.
  # But this is not a comment
 3
 1+1=2
+
+Consider this example:
+<?sf_not a hook!>
+But this will produce 2:
+2
+
 </BODY>
 </HTML>

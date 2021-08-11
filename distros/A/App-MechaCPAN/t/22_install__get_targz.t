@@ -5,6 +5,11 @@ use File::Temp qw/tempdir/;
 
 require q[./t/helper.pm];
 
+if ( !&App::MechaCPAN::can_https )
+{
+  plan skip_all => 'Cannot test getting tar.gz when https is unavailable';
+}
+
 my $has_git = &App::MechaCPAN::has_git;
 local $ENV{GIT_SSL_NO_VERIFY}='true';
 

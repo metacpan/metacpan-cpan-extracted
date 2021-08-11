@@ -1,6 +1,6 @@
 package Getopt::EX::Hashed;
 
-our $VERSION = '0.9908';
+our $VERSION = '0.9911';
 
 =head1 NAME
 
@@ -8,7 +8,7 @@ Getopt::EX::Hashed - Hash store object automation
 
 =head1 VERSION
 
-Version 0.9908
+Version 0.9911
 
 =head1 SYNOPSIS
 
@@ -20,14 +20,239 @@ Version 0.9908
   use Getopt::EX::Hashed;
   has start => ( spec => "=i s begin", default => 1 );
   has end   => ( spec => "=i e" );
+  has file  => ( spec => "=s", is => 'rw' );
   no  Getopt::EX::Hashed;
 
   sub run {
       my $app = shift;
       use Getopt::Long;
       $app->getopt or pod2usage();
-      if ($app->start) {
+      if ($app->{start}) {
           ...
+
+=cut
+
+use v5.14;
+use warnings;
+use Hash::Util qw(lock_keys lock_keys_plus unlock_keys);
+use Carp;
+use Data::Dumper;
+use List::Util qw(first);
+
+# store metadata in caller context
+my  %__DB__;
+sub  __DB__ {
+    $__DB__{$_[0]} //= do {
+	no strict 'refs';
+	state $sub = __PACKAGE__ =~ s/::/_/gr;
+	\%{"$_[0]\::$sub\::__DB__"};
+    };
+}
+sub __Member__ { __DB__(@_)->{Member} //= [] }
+sub __Config__ { __DB__(@_)->{Config} //= {} }
+
+my %DefaultConfig = (
+    DEBUG_PRINT        => 0,
+    LOCK_KEYS          => 1,
+    REPLACE_UNDERSCORE => 1,
+    RESET_AFTER_NEW    => 0,
+    GETOPT             => 'GetOptions',
+    ACCESSOR_PREFIX    => '',
+    DEFAULT            => undef,
+    );
+lock_keys %DefaultConfig;
+
+our @EXPORT = qw(has);
+
+sub import {
+    my $caller = caller;
+    no strict 'refs';
+    push @{"$caller\::ISA"}, __PACKAGE__;
+    *{"$caller\::$_"} = \&{$_} for @EXPORT;
+    my $c = __Config__($caller);
+    unless (%{$c}) {
+	%{$c} = %DefaultConfig;
+	lock_keys %{$c};
+    }
+}
+
+sub configure {
+    my $class = shift;
+    my $pkg = $class ne __PACKAGE__ ? $class : caller;
+    my $c = __Config__($pkg);
+    while (my($key, $value) = splice @_, 0, 2) {
+	$c->{$key} = $value;
+    }
+    return $class;
+}
+
+sub unimport {
+    no strict 'refs';
+    my $caller = caller;
+    delete ${"$caller\::"}{has};
+}
+
+sub reset {
+    my $m = __Member__(caller);
+    @{$m} = ();
+    return $_[0];
+}
+
+sub has {
+    my($key, @param) = @_;
+    my @name = ref $key eq 'ARRAY' ? @$key : $key;
+    my $caller = caller;
+    my $m = __Member__($caller);
+    my $c = __Config__($caller);
+    for my $name (@name) {
+	my $append = $name =~ s/^\+//;
+	my $i = first { ${$m}[$_]->[0] eq $name } 0 .. $#{$m};
+	if ($append) {
+	    defined $i or die "$name: Not found\n";
+	    push @{${$m}[$i]}, @param;
+	} else {
+	    defined $i and die "$name: Duplicated\n";
+	    if (my $default = $c->{DEFAULT}) {
+		if (ref $default eq 'ARRAY') {
+		    unshift @param, @{$default};
+		}
+	    }
+	    push @{$m}, [ $name, @param ];
+	}
+    }
+}
+
+sub new {
+    my $class = shift;
+    my $obj = bless {}, $class;
+    my $pkg = $class ne __PACKAGE__ ? $class : caller;
+    my $m = __Member__($pkg);
+    my $c = __Config__($pkg);
+    my $member = $obj->{__Hash__} = {
+	map {
+	    my($key, %param) = @$_;
+	    $key => \%param;
+	} @{$m}
+    };
+    my $order = $obj->{__Order__} = [ map $_->[0], @{$m} ];
+    for my $key (@{$order}) {
+	my $m = $member->{$key};
+	$obj->{$key} = $m->{default};
+	if (my $is = $m->{is}) {
+	    no strict 'refs';
+	    my $access = $c->{ACCESSOR_PREFIX} . $key;
+	    *{"$class\::$access"} = _accessor($is, $key);
+	}
+    }
+    lock_keys %{$obj} if $c->{LOCK_KEYS};
+    __PACKAGE__->reset if $c->{RESET_AFTER_NEW};
+    $obj;
+}
+
+sub _accessor {
+    my($is, $name) = @_;
+    {
+	ro => sub {
+	    $#_ and die "$name is readonly\n";
+	    $_[0]{$name};
+	},
+	rw => sub {
+	    $#_ and do { $_[0]{$name} = $_[1]; return $_[0] };
+	    $_[0]{$name};
+	}
+    }->{$is} or die "$name has invalid 'is' parameter.\n";
+}
+
+sub optspec {
+    my $obj = shift;
+    my $member = $obj->{__Hash__};
+    my @optlist = do {
+	map  {
+	    my($name, $spec) = @$_;
+	    my $compiled = _compile($obj, $name, $spec);
+	    my $m = $member->{$name};
+	    my $dest = do {
+		if (my $action = $m->{action}) {
+		    ref $action eq 'CODE' or
+			die "$name: action must be coderef.\n";
+		    sub { &$action for $obj };
+		} else {
+		    if (ref $obj->{$name} eq 'CODE') {
+			sub { &{$obj->{$name}} for $obj };
+		    } else {
+			\$obj->{$name};
+		    }
+		}
+	    };
+	    $compiled => $dest;
+	}
+	# spec .= alias
+	map  {
+	    if (my $alias = $member->{$_->[0]}->{alias}) {
+		$_->[1] .= " $alias";
+	    }
+	    $_;
+	}
+	# spec = '' if $name eq = '<>'
+	grep {
+	    $_->[0] eq '<>' and $_->[1] //= '';
+	    defined $_->[1];
+	}
+	# get spec
+	map  { [ $_ => $member->{$_}->{spec} ] }
+	@{$obj->{__Order__}};
+    };
+    @optlist;
+}
+
+my $spec_re = qr/[!+=:]/;
+
+sub _compile {
+    my $obj = shift;
+    my $ref = ref $obj;
+    my $pkg = $ref ne __PACKAGE__ ? $ref : caller;
+    my($name, $args) = @_;
+
+    return $name if $name eq '<>';
+
+    my @args = split ' ', $args;
+    my @spec = grep /$spec_re/, @args;
+    my $spec = do {
+	if    (@spec == 0) { '' }
+	elsif (@spec == 1) { $spec[0] }
+	else               { die }
+    };
+    my @alias = grep !/$spec_re/, @args;
+    my @names = ($name, @alias);
+    my $c = __Config__($pkg);
+    if ($c->{REPLACE_UNDERSCORE}) {
+	for ($name, @alias) {
+	    push @names, tr[_][-]r if /_/;
+	}
+    }
+    push @names, '' if @names and $spec !~ /^($spec_re|$)/;
+    join('|', @names) . $spec;
+}
+
+sub getopt {
+    my $obj = shift;
+    my $ref = ref $obj;
+    my $pkg = $ref ne __PACKAGE__ ? $ref : caller;
+    my $c = __Config__($pkg);
+    my $getopt = caller . "::" . $c->{GETOPT};
+    no strict 'refs';
+    &{$getopt}($obj->optspec);
+}
+
+sub use_keys {
+    my $obj = shift;
+    unlock_keys %{$obj};
+    lock_keys_plus %{$obj}, @_;
+}
+
+1;
+
+__END__
 
 =head1 DESCRIPTION
 
@@ -112,16 +337,16 @@ as C<undef>.
 
 =item B<action> => I<coderef>
 
-Parameter B<action> takes code reference which called to process the
-option.  When called, hash object is passed through C<$_>.
+Parameter B<action> takes code reference which is called to process
+the option.  When called, hash object is passed through C<$_>.
 
     has [ qw(left right both) ] => spec => '=i';
     has "+both" => action => sub {
         $_->{left} = $_->{right} = $_[1];
     };
 
-You can use this for C<< "<>" >> too.  In that case, spec parameter
-does not matter and not required.
+You can use this for C<< "<>" >> to catch everything.  In that case,
+spec parameter does not matter and not required.
 
     has ARGV => default => [];
     has "<>" => action => sub {
@@ -228,189 +453,3 @@ This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
-
-use v5.14;
-use warnings;
-use Hash::Util qw(lock_keys lock_keys_plus unlock_keys);
-use Carp;
-use Data::Dumper;
-
-use Exporter 'import';
-our @EXPORT = qw(has new);
-
-use List::Util qw(first);
-
-my @Member;
-
-my %Config = (
-    DEBUG_PRINT        => 0,
-    LOCK_KEYS          => 1,
-    REPLACE_UNDERSCORE => 1,
-    RESET_AFTER_NEW    => 0,
-    GETOPT             => 'GetOptions',
-    ACCESSOR_PREFIX    => '',
-    DEFAULT            => undef,
-    );
-lock_keys %Config;
-
-sub configure {
-    my $class = shift;
-    while (my($key, $value) = splice @_, 0, 2) {
-	$Config{$key} = $value;
-    }
-    return $class;
-}
-
-sub unimport {
-    no strict 'refs';
-    my $caller = caller;
-    delete ${"$caller\::"}{has};
-}
-
-sub reset {
-    @Member = ();
-    return $_[0];
-}
-
-sub has {
-    my($key, @param) = @_;
-    my @name = ref $key eq 'ARRAY' ? @$key : $key;
-    for my $name (@name) {
-	my $append = $name =~ s/^\+//;
-	my $i = first { $Member[$_]->[0] eq $name } 0 .. $#Member;
-	if ($append) {
-	    defined $i or die "$name: Not found\n";
-	    push @{$Member[$i]}, @param;
-	} else {
-	    defined $i and die "$name: Duplicated\n";
-	    if (my $default = $Config{DEFAULT}) {
-		if (ref $default eq 'ARRAY') {
-		    unshift @param, @{$default};
-		}
-	    }
-	    push @Member, [ $name, @param ];
-	}
-    }
-}
-
-sub new {
-    my $class = shift;
-    my $obj = bless {}, __PACKAGE__;
-    our @ISA = $class if $class ne __PACKAGE__;
-    my $member = $obj->{__Hash__} = {
-	map {
-	    my($key, %param) = @$_;
-	    $key => \%param;
-	} @Member
-    };
-    my $order = $obj->{__Order__} = [ map $_->[0], @Member ];
-    for my $key (@{$order}) {
-	my $m = $member->{$key};
-	$obj->{$key} = $m->{default};
-	if (my $is = $m->{is}) {
-	    no strict 'refs';
-	    my $access = $Config{ACCESSOR_PREFIX} . $key;
-	    *{"$class\::$access"} = _accessor($is, $key);
-	}
-    }
-    lock_keys %{$obj} if $Config{LOCK_KEYS};
-    __PACKAGE__->reset if $Config{RESET_AFTER_NEW};
-    $obj;
-}
-
-sub _accessor {
-    my($is, $name) = @_;
-    {
-	ro => sub {
-	    $#_ and die "$name is readonly\n";
-	    $_[0]{$name};
-	},
-	rw => sub {
-	    $#_ and do { $_[0]{$name} = $_[1]; return $_[0] };
-	    $_[0]{$name};
-	}
-    }->{$is} or die "$name has invalid 'is' parameter.\n";
-}
-
-sub optspec {
-    my $obj = shift;
-    my $member = $obj->{__Hash__};
-    my @optlist = do {
-	map  {
-	    my($name, $spec) = @$_;
-	    my $compiled = _compile($obj, $name, $spec);
-	    my $m = $member->{$name};
-	    my $dest = do {
-		if (my $action = $m->{action}) {
-		    ref $action eq 'CODE' or
-			die "$name: action must be coderef.\n";
-		    sub { &$action for $obj };
-		} else {
-		    if (ref $obj->{$name} eq 'CODE') {
-			sub { &{$obj->{$name}} for $obj };
-		    } else {
-			\$obj->{$name};
-		    }
-		}
-	    };
-	    $compiled => $dest;
-	}
-	# spec .= alias
-	map  {
-	    if (my $alias = $member->{$_->[0]}->{alias}) {
-		$_->[1] .= " $alias";
-	    }
-	    $_;
-	}
-	# spec = '' if $name eq = '<>'
-	grep {
-	    $_->[0] eq '<>' and $_->[1] //= '';
-	    defined $_->[1];
-	}
-	# get spec
-	map  { [ $_ => $member->{$_}->{spec} ] }
-	@{$obj->{__Order__}};
-    };
-    @optlist;
-}
-
-my $spec_re = qr/[!+=:]/;
-
-sub _compile {
-    my $obj = shift;
-    my($name, $args) = @_;
-
-    return $name if $name eq '<>';
-
-    my @args = split ' ', $args;
-    my @spec = grep /$spec_re/, @args;
-    my $spec = do {
-	if    (@spec == 0) { '' }
-	elsif (@spec == 1) { $spec[0] }
-	else               { die }
-    };
-    my @alias = grep !/$spec_re/, @args;
-    my @names = ($name, @alias);
-    if ($Config{REPLACE_UNDERSCORE}) {
-	for ($name, @alias) {
-	    push @names, tr[_][-]r if /_/;
-	}
-    }
-    push @names, '' if @names and $spec !~ /^($spec_re|$)/;
-    join('|', @names) . $spec;
-}
-
-sub getopt {
-    my $obj = shift;
-    my $getopt = caller . "::" . $Config{GETOPT};
-    no strict 'refs';
-    &{$getopt}($obj->optspec);
-}
-
-sub use_keys {
-    my $obj = shift;
-    unlock_keys %{$obj};
-    lock_keys_plus %{$obj}, @_;
-}
-
-1;

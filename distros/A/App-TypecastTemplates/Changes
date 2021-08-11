@@ -1,0 +1,14 @@
+Revision history for App-TypecastTemplates
+
+v0.2.0    Tue Aug 10 11:54:04 CEST 2021
+	- Added option --templatefile to specify other templates
+	- Added default template type '*'
+	- Added tests for the script
+
+v0.1.0    Tue Jul 27 13:57:47 CEST 2021
+        - Basically working
+	- Added dependencies to Build.PL
+	- Edited README
+	- Added example script
+	- Use v$revision.$version.$subversion numbering
+

@@ -8,7 +8,7 @@ use Apache::Session::Browseable::Store::Postgres;
 use Apache::Session::Generate::SHA256;
 use Apache::Session::Serialize::JSON;
 
-our $VERSION = '1.3.5';
+our $VERSION = '1.3.9';
 our @ISA     = qw(Apache::Session);
 
 sub populate {
@@ -110,8 +110,16 @@ sub deleteIfLowerThan {
     my $dbh        = $class->_classDbh($args);
     my $table_name = $args->{TableName}
       || $Apache::Session::Store::DBI::TableName;
-    my $sth = $dbh->do("DELETE FROM $table_name WHERE $query");
-    return 1;
+    my $rows = $dbh->do("DELETE FROM $table_name WHERE $query");
+    return 0 unless defined $rows;
+
+    if (wantarray) {
+        $rows = 0 if $rows == -1;
+        return ( 1, $rows );
+    }
+    else {
+        return 1;
+    }
 }
 
 sub get_key_from_all_sessions {

@@ -1,7 +1,7 @@
 use v5.10.0;
-package JMAP::Tester::Response::Sentence::Set;
+package JMAP::Tester::Response::Sentence::Set 0.100;
 # ABSTRACT: the kind of sentence you get in reply to a setFoos call
-$JMAP::Tester::Response::Sentence::Set::VERSION = '0.026';
+
 use Moo;
 extends 'JMAP::Tester::Response::Sentence';
 
@@ -162,10 +162,10 @@ sub assert_no_errors {
 
   return $self unless @errors;
 
-  $self->sentence_broker->abort_callback->({
-    message     => "errors found in " . $self->name . " sentence",
-    diagnostics => \@errors,
-  });
+  $self->sentence_broker->abort(
+    "errors found in " . $self->name . " sentence",
+    \@errors,
+  );
 }
 
 1;
@@ -182,7 +182,7 @@ JMAP::Tester::Response::Sentence::Set - the kind of sentence you get in reply to
 
 =head1 VERSION
 
-version 0.026
+version 0.100
 
 =head1 OVERVIEW
 

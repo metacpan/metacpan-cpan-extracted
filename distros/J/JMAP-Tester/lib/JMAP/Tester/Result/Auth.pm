@@ -1,9 +1,9 @@
 use v5.10.0;
 use strict;
 
-package JMAP::Tester::Result::Auth;
+package JMAP::Tester::Result::Auth 0.100;
 # ABSTRACT: what you get when you authenticate
-$JMAP::Tester::Result::Auth::VERSION = '0.026';
+
 use Moo;
 with 'JMAP::Tester::Role::HTTPResult';
 
@@ -40,7 +40,7 @@ JMAP::Tester::Result::Auth - what you get when you authenticate
 
 =head1 VERSION
 
-version 0.026
+version 0.100
 
 =head1 OVERVIEW
 

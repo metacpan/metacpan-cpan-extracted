@@ -1,5 +1,5 @@
 package TeX::Encode::charmap;
-our $VERSION = '2.009'; # VERSION
+our $VERSION = '2.010'; # VERSION
 
 =head1 NAME
 
@@ -33,7 +33,7 @@ included in all copies or substantial portions of the Software.
 
 =cut
 
-use vars qw( %RESERVED %BIBTEX_RESERVED %CHARS %ACCENTED_CHARS %LATEX_MACROS %GREEK %TEX_GREEK %MATH %MATH_CHARS %ASTRONOMY %GAMES %KEYS %IPA );
+use vars qw( %RESERVED %BIBTEX_RESERVED %CHARS %ACCENTED_CHARS %LATEX_MACROS %CYR %GREEK %TEX_GREEK %MATH %MATH_CHARS %ASTRONOMY %GAMES %KEYS %IPA );
 
 # reserved latex characters
 %RESERVED = (
@@ -1207,10 +1207,246 @@ chr(0x1e93) => "\\dz", # ẓ
     chr(0x0021) => '!', # !    alveloar/postalveolar click
 );
 
+# Cyrillic alphabet (russian part only)
+%CYR = (
+chr(0X0400) => '\`\CYRE', # Ѐ
+chr(0X0401) => '\CYRYO', # Ё
+chr(0X0402) => '\CYRDJE', # Ђ
+chr(0X0403) => '\'\CYRG', # Ѓ
+chr(0X0404) => '\CYRIE', # Є
+chr(0X0405) => '\CYRDZE', # Ѕ
+chr(0X0406) => '\CYRII', # І
+chr(0X0407) => '\CYRYI', # Ї
+chr(0X0408) => '\CYRJE', # Ј
+chr(0X0409) => '\CYRLJE', # Љ
+chr(0X040A) => '\CYRNJE', # Њ
+chr(0X040B) => '\CYRTSHE', # Ћ
+chr(0X040C) => '\'\CYRK', # Ќ
+chr(0X040D) => '\`\CYRI', # Ѝ
+chr(0X040E) => '\CYRUSHRT', # Ў
+chr(0X040F) => '\CYRDZHE', # Џ
+chr(0X0410) => '\CYRA', # А
+chr(0X0411) => '\CYRB', # Б
+chr(0X0412) => '\CYRV', # В
+chr(0X0413) => '\CYRG', # Г
+chr(0X0414) => '\CYRD', # Д
+chr(0X0415) => '\CYRE', # Е
+chr(0X0416) => '\CYRZH', # Ж
+chr(0X0417) => '\CYRZ', # З
+chr(0X0418) => '\CYRI', # И
+chr(0X0419) => '\CYRISHRT', # Й
+chr(0X041A) => '\CYRK', # К
+chr(0X041B) => '\CYRL', # Л
+chr(0X041C) => '\CYRM', # М
+chr(0X041D) => '\CYRN', # Н
+chr(0X041E) => '\CYRO', # О
+chr(0X041F) => '\CYRP', # П
+chr(0X0420) => '\CYRR', # Р
+chr(0X0421) => '\CYRS', # С
+chr(0X0422) => '\CYRT', # Т
+chr(0X0423) => '\CYRU', # У
+chr(0X0424) => '\CYRF', # Ф
+chr(0X0425) => '\CYRH', # Х
+chr(0X0426) => '\CYRC', # Ц
+chr(0X0427) => '\CYRCH', # Ч
+chr(0X0428) => '\CYRSH', # Ш
+chr(0X0429) => '\CYRSHCH', # Щ
+chr(0X042A) => '\CYRHRDSN', # Ъ
+chr(0X042B) => '\CYRERY', # Ы
+chr(0X042C) => '\CYRSFTSN', # Ь
+chr(0X042D) => '\CYREREV', # Э
+chr(0X042E) => '\CYRYU', # Ю
+chr(0X042F) => '\CYRYA', # Я
+chr(0X0430) => '\cyra', # а
+chr(0X0431) => '\cyrb', # б
+chr(0X0432) => '\cyrv', # в
+chr(0X0433) => '\cyrg', # г
+chr(0X0434) => '\cyrd', # д
+chr(0X0435) => '\cyre', # е
+chr(0X0436) => '\cyrzh', # ж
+chr(0X0437) => '\cyrz', # з
+chr(0X0438) => '\cyri', # и
+chr(0X0439) => '\cyrishrt', # й
+chr(0X043A) => '\cyrk', # к
+chr(0X043B) => '\cyrl', # л
+chr(0X043C) => '\cyrm', # м
+chr(0X043D) => '\cyrn', # н
+chr(0X043E) => '\cyro', # о
+chr(0X043F) => '\cyrp', # п
+chr(0X0440) => '\cyrr', # р
+chr(0X0441) => '\cyrs', # с
+chr(0X0442) => '\cyrt', # т
+chr(0X0443) => '\cyru', # у
+chr(0X0444) => '\cyrf', # ф
+chr(0X0445) => '\cyrh', # х
+chr(0X0446) => '\cyrc', # ц
+chr(0X0447) => '\cyrch', # ч
+chr(0X0448) => '\cyrsh', # ш
+chr(0X0449) => '\cyrshch', # щ
+chr(0X044A) => '\cyrhrdsn', # ъ
+chr(0X044B) => '\cyrery', # ы
+chr(0X044C) => '\cyrsftsn', # ь
+chr(0X044D) => '\cyrerev', # э
+chr(0X044E) => '\cyryu', # ю
+chr(0X044F) => '\cyrya', # я
+chr(0X0450) => '\`\cyre', # ѐ
+chr(0X0451) => '\cyryo', # ё
+chr(0X0452) => '\cyrdje', # ђ
+chr(0X0453) => '\'\cyrg', # ѓ
+chr(0X0454) => '\cyrie', # є
+chr(0X0455) => '\cyrdze', # ѕ
+chr(0X0456) => '\cyrii', # і
+chr(0X0457) => '\cyryi', # ї
+chr(0X0458) => '\cyrje', # ј
+chr(0X0459) => '\cyrlje', # љ
+chr(0X045A) => '\cyrnje', # њ
+chr(0X045B) => '\cyrtshe', # ћ
+chr(0X045C) => '\'\cyrk', # ќ
+chr(0X045D) => '\`\cyri', # ѝ
+chr(0X045E) => '\cyrushrt', # ў
+chr(0X045F) => '\cyrdzhe', # џ
+chr(0X0460) => '\CYROMGA', # Ѡ
+chr(0X0461) => '\cyromga', # ѡ
+chr(0X0462) => '\CYRYAT', # Ѣ
+chr(0X0463) => '\cyryat', # ѣ
+chr(0X0464) => '\CYRIOTEST', # Ѥ
+chr(0X0465) => '\cyriotest', # ѥ
+chr(0X0466) => '\CYRLYUS', # Ѧ
+chr(0X0467) => '\cyrlyus', # ѧ
+chr(0X0468) => '\CYRIOTLYUS', # Ѩ
+chr(0X0469) => '\cyriotlyus', # ѩ
+chr(0X046A) => '\CYRBYUS', # Ѫ
+chr(0X046B) => '\cyrbyus', # ѫ
+chr(0X046C) => '\CYRIOTBYUS', # Ѭ
+chr(0X046D) => '\cyriotbyus', # ѭ
+chr(0X046E) => '\CYRKSI', # Ѯ
+chr(0X046F) => '\cyrksi', # ѯ
+chr(0X0470) => '\CYRPSI', # Ѱ
+chr(0X0471) => '\cyrpsi', # ѱ
+chr(0X0472) => '\CYRFITA', # Ѳ
+chr(0X0473) => '\cyrfita', # ѳ
+chr(0X0474) => '\CYRIZH', # Ѵ
+chr(0X0475) => '\cyrizh', # ѵ
+chr(0X0476) => '\C\CYRIZH', # Ѷ
+chr(0X0477) => '\C\cyrizh', # ѷ
+chr(0X0478) => '\CYRVARUK', # Ѹ
+chr(0X0479) => '\cyrvaruk', # ѹ
+chr(0X047A) => '\CYROMRND', # Ѻ
+chr(0X047B) => '\cyromrnd', # ѻ
+chr(0X047C) => '\CYROMTLO', # Ѽ
+chr(0X047D) => '\cyromtlo', # ѽ
+chr(0X047E) => '\CYROT', # Ѿ
+chr(0X047F) => '\cyrot', # ѿ
+chr(0X0480) => '\CYRKOPPA', # Ҁ
+chr(0X0481) => '\cyrkoppa', # ҁ
+chr(0X0482) => '\CYRthousands{\empty}', # ҂
+chr(0X048C) => '\CYRSEMISFTSN', # Ҍ
+chr(0X048D) => '\cyrsemisftsn', # ҍ
+chr(0X048E) => '\CYRRTICK', # Ҏ
+chr(0X048F) => '\cyrrtick', # ҏ
+chr(0X0490) => '\CYRGUP', # Ґ
+chr(0X0491) => '\cyrgup', # ґ
+chr(0X0492) => '\CYRGHCRS', # Ғ
+chr(0X0493) => '\cyrghcrs', # ғ
+chr(0X0494) => '\CYRGHK', # Ҕ
+chr(0X0495) => '\cyrghk', # ҕ
+chr(0X0496) => '\CYRZHDSC', # Җ
+chr(0X0497) => '\cyrzhdsc', # җ
+chr(0X0498) => '\CYRZDSC', # Ҙ
+chr(0X0499) => '\cyrzdsc', # ҙ
+chr(0X049A) => '\CYRKDSC', # Қ
+chr(0X049B) => '\cyrkdsc', # қ
+chr(0X049C) => '\CYRKVCRS', # Ҝ
+chr(0X049D) => '\cyrkvcrs', # ҝ
+chr(0X049E) => '\CYRKHCRS', # Ҟ
+chr(0X049F) => '\cyrkhcrs', # ҟ
+chr(0X04A0) => '\CYRKBEAK', # Ҡ
+chr(0X04A1) => '\cyrkbeak', # ҡ
+chr(0X04A2) => '\CYRNDSC', # Ң
+chr(0X04A3) => '\cyrndsc', # ң
+chr(0X04A4) => '\CYRNG', # Ҥ
+chr(0X04A5) => '\cyrng', # ҥ
+chr(0X04A6) => '\CYRPHK', # Ҧ
+chr(0X04A7) => '\cyrphk', # ҧ
+chr(0X04A8) => '\CYRABHHA', # Ҩ
+chr(0X04A9) => '\cyrabhha', # ҩ
+chr(0X04AA) => '\CYRSDSC', # Ҫ
+chr(0X04AB) => '\cyrsdsc', # ҫ
+chr(0X04AC) => '\CYRTDSC', # Ҭ
+chr(0X04AD) => '\cyrtdsc', # ҭ
+chr(0X04AE) => '\CYRY', # Ү
+chr(0X04AF) => '\cyry', # ү
+chr(0X04B0) => '\CYRYHCRS', # Ұ
+chr(0X04B1) => '\cyryhcrs', # ұ
+chr(0X04B2) => '\CYRHDSC', # Ҳ
+chr(0X04B3) => '\cyrhdsc', # ҳ
+chr(0X04B4) => '\CYRTETSE', # Ҵ
+chr(0X04B5) => '\cyrtetse', # ҵ
+chr(0X04B6) => '\CYRCHRDSC', # Ҷ
+chr(0X04B7) => '\cyrchrdsc', # ҷ
+chr(0X04B8) => '\CYRCHVCRS', # Ҹ
+chr(0X04B9) => '\cyrchvcrs', # ҹ
+chr(0X04BA) => '\CYRSHHA', # Һ
+chr(0X04BB) => '\cyrshha', # һ
+chr(0X04BC) => '\CYRABHCH', # Ҽ
+chr(0X04BD) => '\cyrabhch', # ҽ
+chr(0X04BE) => '\CYRABHCHDSC', # Ҿ
+chr(0X04BF) => '\cyrabhchdsc', # ҿ
+chr(0X04C0) => '\CYRpalochka', # Ӏ
+chr(0X04C1) => '\U\CYRZH', # Ӂ
+chr(0X04C2) => '\U\cyrzh', # ӂ
+chr(0X04C3) => '\CYRKHK', # Ӄ
+chr(0X04C4) => '\cyrkhk', # ӄ
+chr(0X04C7) => '\CYRNHK', # Ӈ
+chr(0X04C8) => '\cyrnhk', # ӈ
+chr(0X04CB) => '\CYRCHLDSC', # Ӌ
+chr(0X04CC) => '\cyrchldsc', # ӌ
+chr(0X04D0) => '\U\CYRA', # Ӑ
+chr(0X04D1) => '\U\cyra', # ӑ
+chr(0X04D2) => '\"\CYRA', # Ӓ
+chr(0X04D3) => '\"\cyra', # ӓ
+chr(0X04D4) => '\CYRAE', # Ӕ
+chr(0X04D5) => '\cyrae', # ӕ
+chr(0X04D6) => '\U\CYRE', # Ӗ
+chr(0X04D7) => '\U\cyre', # ӗ
+chr(0X04D8) => '\CYRSCHWA', # Ә
+chr(0X04D9) => '\cyrschwa', # ә
+chr(0X04DA) => '\"\CYRSCHWA', # Ӛ
+chr(0X04DB) => '\"\cyrschwa', # ӛ
+chr(0X04DC) => '\"\CYRZH', # Ӝ
+chr(0X04DD) => '\"\cyrzh', # ӝ
+chr(0X04DE) => '\"\CYRZ', # Ӟ
+chr(0X04DF) => '\"\cyrz', # ӟ
+chr(0X04E0) => '\CYRABHDZE', # Ӡ
+chr(0X04E1) => '\cyrabhdze', # ӡ
+chr(0X04E2) => '\=\CYRI', # Ӣ
+chr(0X04E3) => '\=\cyri', # ӣ
+chr(0X04E4) => '\"\CYRI', # Ӥ
+chr(0X04E5) => '\"\cyri', # ӥ
+chr(0X04E6) => '\"\CYRO', # Ӧ
+chr(0X04E7) => '\"\cyro', # ӧ
+chr(0X04E8) => '\CYROTLD', # Ө
+chr(0X04E9) => '\cyrotld', # ө
+chr(0X04EA) => '\"\CYROTLD', # Ӫ
+chr(0X04EB) => '\"\cyrotld', # ӫ
+chr(0X04EC) => '\"\CYREREV', # Ӭ
+chr(0X04ED) => '\"\cyrerev', # ӭ
+chr(0X04EE) => '\=\CYRU', # Ӯ
+chr(0X04EF) => '\=\cyru', # ӯ
+chr(0X04F0) => '\"\CYRU', # Ӱ
+chr(0X04F1) => '\"\cyru', # ӱ
+chr(0X04F2) => '\H\CYRU', # Ӳ
+chr(0X04F3) => '\H\cyru', # ӳ
+chr(0X04F4) => '\"\CYRCH', # Ӵ
+chr(0X04F5) => '\"\cyrch', # ӵ
+chr(0X04F8) => '\"\CYRERY', # Ӹ
+chr(0X04F9) => '\"\cyrery', # ӹ
+);
+
 # derived mappings
 use vars qw( %CHAR_MAP $CHAR_MAP_RE );
 
-%CHAR_MAP = (%CHARS, %ACCENTED_CHARS, %GREEK);
+%CHAR_MAP = (%CHARS, %ACCENTED_CHARS, %GREEK, %CYR);
 for(keys %MATH)
 {
 	$CHAR_MAP{$_} ||= '$' . $MATH{$_} . '$';
@@ -1235,6 +1471,7 @@ use vars qw( %MACROS $MACROS_RE );
 	reverse(%ACCENTED_CHARS),
 	reverse(%MATH),
 	reverse(%ASTRONOMY),
+	reverse(%CYR),
 	reverse(%GAMES),
 	reverse(%KEYS),
 	reverse(%IPA),

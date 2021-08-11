@@ -8,7 +8,7 @@ package String::Tagged;
 use strict;
 use warnings;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use Scalar::Util qw( blessed );
 
@@ -89,7 +89,7 @@ tags that should be considered as equal.
 
 I spent a lot of time considering the name for this module. It seems that a
 number of people across a number of languages all created similar
-functionallity, though named very differently. For the benefit of
+functionality, though named very differently. For the benefit of
 keyword-based search tools and similar, here's a list of some other names this
 sort of object might be known by:
 
@@ -119,6 +119,12 @@ Out-of-band data
 
 =cut
 
+*is_string_tagged =
+   # It would be nice if we could #ifdef HAVE_PERL_VERSION(...)
+   ( $] >= 5.034 ) ?
+      do { eval 'use experimental "isa"; sub { $_[0] isa __PACKAGE__ }' } :
+      do { sub { blessed $_[0] and $_[0]->isa( __PACKAGE__ ) } };
+
 =head1 CONSTRUCTOR
 
 =cut
@@ -141,7 +147,7 @@ sub new
    my $class = shift;
    my ( $str ) = @_;
 
-   return $class->clone( $str ) if blessed $str and $str->isa( __PACKAGE__ );
+   return $class->clone( $str ) if is_string_tagged( $str );
 
    $str = "" unless defined $str;
 
@@ -313,7 +319,7 @@ sub from_sprintf
    # repeatedly replace %... expansions with their required value using
    # ->set_substr, so that embedded tags in the format will behave sensibly.
 
-   my $ret = ( blessed $format and $format->isa( __PACKAGE__ ) ) ?
+   my $ret = ( is_string_tagged( $format ) ) ?
       $class->clone( $format ) :
       $class->new( $format );
 
@@ -347,7 +353,7 @@ sub from_sprintf
          };
 
          if( defined $precision ) {
-            if( blessed $arg and $arg->isa( __PACKAGE__ ) ) {
+            if( is_string_tagged( $arg ) ) {
                $arg = $arg->substr( 0, $precision );
             }
             else {
@@ -390,6 +396,34 @@ sub from_sprintf
 
       $pos += length( $replacement );
    }
+
+   return $ret;
+}
+
+=head2 join
+
+   $str = String::Tagged->join( $sep, @parts )
+
+I<Since version 0.17.>
+
+Returns a new instance of a C<String::Tagged> object, formed by concatenating
+each of the component piece together, joined with the separator string.
+
+The result will be much like the core C<join> function, except that it will
+preserve tags in the resulting string.
+
+=cut
+
+sub join
+{
+   my $class = shift;
+   my ( $sep, @parts ) = @_;
+
+   is_string_tagged( $sep ) or
+      $sep = $class->new( $sep );
+
+   my $ret = shift @parts;
+   $ret .= $sep . $_ for @parts;
 
    return $ret;
 }
@@ -1388,7 +1422,7 @@ sub set_substr
       }
    }
 
-   if( blessed $new and $new->isa( __PACKAGE__ ) ) {
+   if( is_string_tagged( $new ) ) {
       my $atstart = $start == 0;
       my $atend   = $newend == $self->length;
 
@@ -1447,7 +1481,7 @@ sub append
    my $self = shift;
    my ( $new ) = @_;
 
-   return $self->set_substr( $self->length, 0, $new ) if blessed $new and $new->isa( __PACKAGE__ );
+   return $self->set_substr( $self->length, 0, $new ) if is_string_tagged( $new );
 
    # Optimised version
    $self->{str} .= $new;
@@ -1518,7 +1552,7 @@ sub concat
    my ( $other, $swap ) = @_;
 
    # Try to find the "higher" subclass
-   my $class = ( ref $self eq __PACKAGE__ and blessed $other and $other->isa( __PACKAGE__ ) )
+   my $class = ( ref $self eq __PACKAGE__ and is_string_tagged( $other ) )
                   ? ref $other : ref $self;
 
    my $ret = $class->new( $self );

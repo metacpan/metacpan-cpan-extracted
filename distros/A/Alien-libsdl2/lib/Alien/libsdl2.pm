@@ -2,7 +2,7 @@ package Alien::libsdl2;
 use strict;
 use warnings;
 use base qw[Alien::Base];
-our $VERSION = '1.03';
+our $VERSION = '1.06';
 
 1;
 __END__
@@ -39,7 +39,7 @@ require L<libsdl2|http://libsdl.org>.
 
 =over
 
-=item L<libsdl2|http://libsdl.com>
+=item L<libsdl2|http://libsdl.org>
 
 =item L<Alien::SDL2> - Ancient Alien for SDL2 (builds w/ SDL2-2.0.0 from 2013)
 

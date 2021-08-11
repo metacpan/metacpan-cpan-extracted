@@ -35,16 +35,30 @@ foreach my $file (@files)
 {
   my $parser = Pod::Simple->new;
 
+  my $in_end;
+  $parser->cut_handler(
+    sub
+    {
+      my $line        = shift;
+      my $line_number = shift;
+      my $parser      = shift;
+      $ouFH->say(qq{# line $line_number "$file"})
+        unless $in_end;
+    }
+  );
   $parser->code_handler(
     sub
     {
       my $line        = shift;
       my $line_number = shift;
       my $parser      = shift;
+      $in_end = 1
+        if $line =~ m/^__END__/xms;
       $ouFH->say($line)
-        unless $line =~ m/^__END__/xms;
+        unless $in_end;
     }
   );
+  $ouFH->say(qq{# line 1 "$file"});
   $parser->parse_file("$prefix/$file");
 }
 

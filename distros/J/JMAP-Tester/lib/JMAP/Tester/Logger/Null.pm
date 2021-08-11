@@ -1,5 +1,5 @@
-package JMAP::Tester::Logger::Null;
-$JMAP::Tester::Logger::Null::VERSION = '0.026';
+package JMAP::Tester::Logger::Null 0.100;
+
 use Moo;
 with 'JMAP::Tester::Logger';
 
@@ -7,6 +7,9 @@ use namespace::clean;
 
 sub log_jmap_request  {}
 sub log_jmap_response {}
+
+sub log_misc_request  {}
+sub log_misc_response {}
 
 sub log_upload_request  {}
 sub log_upload_response {}
@@ -28,7 +31,7 @@ JMAP::Tester::Logger::Null
 
 =head1 VERSION
 
-version 0.026
+version 0.100
 
 =head1 AUTHOR
 

@@ -1,9 +1,9 @@
 package Pod::Weaver::PluginBundle::Author::PERLANCAR;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-04'; # DATE
+our $DATE = '2021-08-10'; # DATE
 our $DIST = 'Pod-Weaver-PluginBundle-Author-PERLANCAR'; # DIST
-our $VERSION = '0.290'; # VERSION
+our $VERSION = '0.292'; # VERSION
 
 use 5.010001;
 
@@ -39,6 +39,7 @@ sub mvp_bundle_config {
         [ '@Author::PERLANCAR/Bugs::DefaultRT', _exp('Bugs::DefaultRT'), {} ],
         [ '@Author::PERLANCAR/Authors', _exp('Authors'), {} ],
         [ '@Author::PERLANCAR/Contributors', _exp('Contributors'), {} ],
+        [ '@Author::PERLANCAR/PERLANCAR/Contributing', _exp('PERLANCAR::Contributing'), {} ],
         [ '@Author::PERLANCAR/Legal', _exp('Legal'), {} ],
 
         [ '@Author::PERLANCAR/Rinci', _exp('-Rinci'), {} ],
@@ -68,7 +69,7 @@ Pod::Weaver::PluginBundle::Author::PERLANCAR - PERLANCAR's default Pod::Weaver c
 
 =head1 VERSION
 
-This document describes version 0.290 of Pod::Weaver::PluginBundle::Author::PERLANCAR (from Perl distribution Pod-Weaver-PluginBundle-Author-PERLANCAR), released on 2021-06-04.
+This document describes version 0.292 of Pod::Weaver::PluginBundle::Author::PERLANCAR (from Perl distribution Pod-Weaver-PluginBundle-Author-PERLANCAR), released on 2021-08-10.
 
 =head1 SYNOPSIS
 
@@ -113,9 +114,42 @@ L<Dist::Zilla::PluginBundle::Author::PERLANCAR>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTORS
+
+=for stopwords Sergey Romanov Steven Haryanto (on Asus Zenbook)
+
+=over 4
+
+=item *
+
+Sergey Romanov <complefor@rambler.ru>
+
+=item *
+
+Steven Haryanto (on Asus Zenbook) <stevenharyanto@gmail.com>
+
+=back
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017, 2016, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

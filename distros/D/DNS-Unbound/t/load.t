@@ -4,21 +4,27 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::FailWarnings;
 
 use Net::DNS::Parameters;
+use Net::DNS::Packet;
 
 use_ok('DNS::Unbound');
 
 ok( DNS::Unbound->unbound_version() );
 
 diag( "Unbound version: " . DNS::Unbound->unbound_version() );
+diag( "Net::DNS::Packet version: $Net::DNS::Packet::VERSION" );
 
 use Data::Dumper;
 $Data::Dumper::Useqq = 1;
 
 my $dns = DNS::Unbound->new();
 
-eval {
+# Setting to 0 also works but is undocumented.
+$dns->set_option( 'cache-max-ttl' => 0x7fff_ffff );
+
+warn if !eval {
     my $result = $dns->resolve( 'cannot.exist.invalid', 'NS' );
 
     isa_ok( $result, 'DNS::Unbound::Result', 'resolve() response' );
@@ -79,8 +85,18 @@ eval {
 
         isa_ok( $ns_obj, 'Net::DNS::RR::NS', 'parse answer_packet() result' );
 
-        is( $ns_obj->ttl(), $result->ttl(), 'ttl() match' );
-        is( $ns_obj->ttl(), $result->{ttl}, '{ttl} match' );
+      SKIP: {
+            if (!$result->ttl()) {
+                skip 'No TTL in Unbound result (probably an old Unbound)', 2;
+            }
+
+            is( $ns_obj->ttl(), $result->ttl(), 'ttl() match' ) or diag explain [
+                $result,
+                $net_dns_packet,
+            ];
+
+            is( $ns_obj->ttl(), $result->{ttl}, '{ttl} match' );
+        }
 
         is( $ns_obj->class(), 'IN', 'class() match' );
         is( $ns_obj->type(), 'NS', 'type() match' );
@@ -91,6 +107,8 @@ eval {
         # chop off trailing “.”
         is( $ns_obj->nsdname(), substr( $data[0], 0, -1 ), 'nsdname() match' );
     }
+
+    1;
 };
 
 done_testing();

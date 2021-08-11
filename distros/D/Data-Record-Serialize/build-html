@@ -1,2 +1,0 @@
-dzil build
-perl -MPod::Simple::HTMLBatch -e Pod::Simple::HTMLBatch::go Data-Record-Serialize-0.24/lib html

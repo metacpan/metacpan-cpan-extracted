@@ -12,6 +12,7 @@ sub try {
         || $class->_java($d)
         || $class->_golang($d)
         || $class->_ruby($d)
+        || $class->_javascript($d)
         || $class->_vb($d)
         || $class->_tool($d)
     ;
@@ -176,6 +177,16 @@ sub _python {
             $h->{version} = $version if $version;
         }
     }
+    elsif ( index($d->ua, ' aiohttp/') > -1 ) {
+        $h = {
+            name => 'aiohttp',
+        };
+
+        if ($d->opt_version) {
+            my ($version) = ($d->ua =~ m!aiohttp/([\d.]+)!);
+            $h->{version} = $version if $version;
+        }
+    }
 
     return $h;
 }
@@ -322,6 +333,13 @@ sub _golang {
 
         return $h;
     }
+    elsif ( index($d->ua, 'Go http package') == 0 ) {
+        my $h = {
+            name => 'Go http-client',
+        };
+
+        return $h;
+    }
 }
 
 sub _ruby {
@@ -377,6 +395,23 @@ sub _vb {
 
         if ($d->opt_version) {
             my ($version) = ($d->ua =~ m! WinHttp\.WinHttpRequest\.([\d.]+)!);
+            $h->{version} = $version if $version;
+        }
+
+        return $h;
+    }
+}
+
+sub _javascript {
+    my ($class, $d) = @_;
+
+    if ( index($d->ua, 'axios/') == 0 ) {
+        my $h = {
+            name => 'axios',
+        };
+
+        if ($d->opt_version) {
+            my ($version) = ($d->ua =~ m!axios/([\d.]+)!);
             $h->{version} = $version if $version;
         }
 

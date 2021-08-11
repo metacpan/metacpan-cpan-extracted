@@ -68,7 +68,7 @@ NAMING
 
     I spent a lot of time considering the name for this module. It seems
     that a number of people across a number of languages all created
-    similar functionallity, though named very differently. For the benefit
+    similar functionality, though named very differently. For the benefit
     of keyword-based search tools and similar, here's a list of some other
     names this sort of object might be known by:
 
@@ -169,6 +169,19 @@ CONSTRUCTOR
 
     All other conversions are handled individually by the core sprintf
     operator and appended to the result.
+
+ join
+
+       $str = String::Tagged->join( $sep, @parts )
+
+    Since version 0.17.
+
+    Returns a new instance of a String::Tagged object, formed by
+    concatenating each of the component piece together, joined with the
+    separator string.
+
+    The result will be much like the core join function, except that it
+    will preserve tags in the resulting string.
 
 METHODS
 

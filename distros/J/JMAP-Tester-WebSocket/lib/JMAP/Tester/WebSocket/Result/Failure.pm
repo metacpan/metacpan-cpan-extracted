@@ -1,9 +1,9 @@
 use v5.10.0;
 use warnings;
 
-package JMAP::Tester::WebSocket::Result::Failure;
+package JMAP::Tester::WebSocket::Result::Failure 0.002;
 # ABSTRACT: what you get when your JMAP request utterly fails
-$JMAP::Tester::WebSocket::Result::Failure::VERSION = '0.001';
+
 use Moo;
 with 'JMAP::Tester::WebSocket::Role::WebSocketResult';
 
@@ -41,7 +41,7 @@ JMAP::Tester::WebSocket::Result::Failure - what you get when your JMAP request u
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 OVERVIEW
 

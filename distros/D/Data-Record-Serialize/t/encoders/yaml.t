@@ -8,8 +8,20 @@ use My::Test::Util -all;
 
 use Data::Record::Serialize;
 
-use YAML::PP;
-use JSON::PP;
+BEGIN {
+    unless ( eval { require Data::Record::Serialize::Encode::yaml; 1 } ) {
+        my $err = $@;
+        if ( ref( $err ) eq 'Data::Record::Serialize::Error::yaml_backend' ) {
+            skip_all( $err->msg );
+        }
+        else {
+            skip_all( $@ );
+        }
+    }
+}
+
+require YAML::PP;
+require JSON::PP;
 
 my ( $s, $buf );
 

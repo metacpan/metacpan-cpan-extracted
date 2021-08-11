@@ -64,6 +64,51 @@ class WithBuildargs {
 }
 
 {
+   my @called;
+   my $paramsref;
+
+   class WithAdjustParams {
+      ADJUST {
+         push @called, "ADJUST";
+      }
+
+      ADJUSTPARAMS {
+         my ( $href ) = @_;
+         push @called, "ADJUSTPARAMS";
+         $paramsref = $href;
+      }
+
+      ADJUST {
+         push @called, "ADJUST";
+         Test::More::ok( !scalar @_, 'ADJUST block received no arguments' );
+      }
+   }
+
+   WithAdjustParams->new( key => "val" );
+   is_deeply( \@called, [qw( ADJUST ADJUSTPARAMS ADJUST )], 'ADJUST and ADJUSTPARAMS invoked together' );
+   is_deeply( $paramsref, { key => "val" }, 'ADJUSTPARAMS received HASHref' );
+}
+
+{
+   my $paramvalue;
+
+   class StrictlyWithParams :strict(params) {
+      ADJUSTPARAMS {
+         my ($href) = @_;
+         $paramvalue = delete $href->{param};
+      }
+   }
+
+   StrictlyWithParams->new( param => "thevalue" );
+   is( $paramvalue, "thevalue", 'ADJUSTPARAMS captured the value' );
+
+   ok( !defined eval { StrictlyWithParams->new( unknown => "name" ) },
+      ':strict(params) complains about unrecognised param' );
+   like( $@, qr/^Unrecognised parameters for StrictlyWithParams constructor: unknown at /,
+      'message from unrecognised param to constructor' );
+}
+
+{
    my $newarg_destroyed;
    my $buildargs_result_destroyed;
    package DestroyWatch {

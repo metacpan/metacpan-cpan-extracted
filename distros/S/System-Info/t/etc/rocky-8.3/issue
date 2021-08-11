@@ -1,0 +1,22 @@
+    [0;32m`.-/+++++++++/-.`
+ `-+++++++++++++++++-`
+.+++++++++++++++++++++.
+-+++++++++++++++++++++++.
++++++++++++++++/-/+++++++
++++++++++++++/.   ./+++++
++++++++++++:.       ./+++
++++++++++:`   `:/:`   .:/
+-++++++:`   .:+++++:`
+ .+++-`   ./+++++++++:`
+  `-`   ./+++++++++++-
+       -+++++++++:-.`
+[0m
+[1;31mWARNING: THIS RELEASE IS NOT FOR PRODUCTION. YOU SHOULD NOT UPDATE FROM THIS
+         INSTALLATION. THIS INSTALLATION IS NOT SUPPORTED.[0m
+
+         [1;32mPLEASE REPORT ALL PRE-PRODUCTION BUGS OR ISSUES TO OUR BUG TRACKER AT:[0m
+         https://bugs.rockylinux.org
+
+\S -- TEST RELEASE -- EVALUATION ONLY
+Kernel \r on an \m
+

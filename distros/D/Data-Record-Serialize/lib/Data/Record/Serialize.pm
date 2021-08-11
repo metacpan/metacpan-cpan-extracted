@@ -11,7 +11,7 @@ use warnings::register qw( Encode::dbi::queue );
 
 use Data::Record::Serialize::Error -all;
 
-our $VERSION = '0.25';
+our $VERSION = '0.28';
 
 use Package::Variant
   importing => [
@@ -317,7 +317,7 @@ Data::Record::Serialize - Flexible serialization of a record
 
 =head1 VERSION
 
-version 0.25
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -532,13 +532,17 @@ In the following table:
 Automatic type determination is done by examining the first
 record sent to the output stream.
 
+Automatic output field determination is done by examining the first
+record sent to the output stream. Only those fields will be
+output for subsequent records.
+
   fields types default_type  Result
   ------ ----- ------------  ------
 
-  N/all   N        N         All fields are output.
+  N/all   N        N         Output fields are automatically determined.
                              Types are automatically determined.
 
-  N/all   N        Y         All fields are output.
+  N/all   N        Y         Output fields are automatically determined.
                              Types are set to <default_type>.
 
     Y     N        N         Fields in <fields> are output.
@@ -552,11 +556,11 @@ record sent to the output stream.
                              Fields in <types> get the specified type.
                              Types for other fields are set to <default_type>.
 
-   all    Y        N         All fields are output.
+   all    Y        N         Output fields are automatically determined.
                              Fields in <types> get the specified type.
                              Types for other fields are automatically determined.
 
-   all    Y        Y         All fields are output.
+   all    Y        Y         Output fields are automatically determined.
                              Fields in <types> get the specified type.
                              Types for other fields are set to <default_type>.
 

@@ -1,5 +1,5 @@
 package Mojolicious::Command::Author::generate::leds_app;
-$Mojolicious::Command::Author::generate::leds_app::VERSION = '1.06';
+$Mojolicious::Command::Author::generate::leds_app::VERSION = '1.07';
 use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::Util qw(class_to_file class_to_path decamelize);
@@ -61,7 +61,7 @@ Mojolicious::Command::Author::generate::leds_app - Mojo::Leds app generator comm
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =head1 SYNOPSIS
 
@@ -259,9 +259,9 @@ body {
     },
     plugins => [
         { RenderFile              => {} },
-        { AccessLog               => {} },
-        { LinkedContent           => {} },
-        { 'Restify::OtherActions' => {} },
-        { AutoReload              => {} },
+        # { AccessLog               => {} }, # generate an access log
+        # { LinkedContent           => {} }, # manage linked css and js
+        # { 'Restify::OtherActions' => {} }, # shortcuts & helpers for REST coll
+        # { AutoReload              => {} }, # reload browser when app changes
     ],
 }

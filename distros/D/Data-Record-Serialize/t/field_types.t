@@ -95,6 +95,98 @@ subtest "allow type fields to differ from fields" => sub {
 };
 
 
+subtest "type lists follow output fields if numify/stringify/nullify is boolean" => sub {
+
+    subtest 'default type' => sub {
+
+        my $s;
+
+        ok(
+            lives {
+                $s = Data::Record::Serialize->new(
+                    encode       => '+My::Test::Encode::store',
+                    types        => { a => 'N', b => 'S' },
+                    fields       => [qw( b )],
+                    default_type => 'S',
+                    numify => 1,
+                    stringify =>1,
+                    nullify => 1,
+                );
+            },
+            'create serializer'
+        ) or diag $@;
+
+        is( $s->numified, [  ], 'numified' );
+        is( $s->nullified, [ 'b'  ], 'nullified' );
+        is( $s->stringified, [ 'b' ], 'nullified' );
+
+    };
+
+    subtest 'specified types' => sub {
+
+        my $s;
+
+        ok(
+            lives {
+                $s = Data::Record::Serialize->new(
+                    encode       => '+My::Test::Encode::store',
+                    types        => { a => 'N', b => 'S' },
+                    fields       => 'all',
+                    numify => 1,
+                    stringify =>1,
+                    nullify => 1,
+                );
+            },
+            'create serializer'
+        ) or diag $@;
+
+
+        subtest 'before send' => sub {
+            is( $s->numified,    [], 'numified' );
+            is( $s->nullified,   [], 'nullified' );
+            is( $s->stringified, [], 'stringified' );
+        };
+
+        $s->send( { b => 'foo' } );
+
+        subtest 'after send' => sub {
+            is( $s->numified,    [],    'numified' );
+            is( $s->nullified,   ['b'], 'nullified' );
+            is( $s->stringified, ['b'], 'nullified' );
+        };
+
+    };
+
+    subtest 'types from data' => sub {
+
+        my $s;
+
+        ok(
+            lives {
+                $s = Data::Record::Serialize->new(
+                    encode       => '+My::Test::Encode::store',
+                    fields       => [qw( b )],
+                    numify => 1,
+                    stringify =>1,
+                    nullify => 1,
+                );
+            },
+            'create serializer'
+        ) or diag $@;
+
+
+        $s->send( { a => 1, b => 'foo' } );
+
+        is( $s->numified, [  ], 'numified' );
+        is( $s->nullified, [ 'b' ], 'nullified' );
+        is( $s->stringified, [ 'b' ], 'nullified' );
+
+    };
+
+
+};
+
+
 subtest "fold I type into N" => sub {
 
     my $s;

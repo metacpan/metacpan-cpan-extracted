@@ -1,3 +1,7 @@
+v1.11.0 2021-08-11
+  - Thanks to a Pull Request from Boris Voskresenskiy, added submit_auth_code method
+    for the submission of EPP Keys for in progress domain transfers
+
 v1.10.1 2020-07-30
   - Thanks to a Pull Request from Eris Caffee, default to constructing
     a WWW::LogicBoxes::Domain unless the actiontype is 'AddTransferDomain'

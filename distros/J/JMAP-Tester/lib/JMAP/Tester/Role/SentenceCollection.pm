@@ -1,5 +1,5 @@
-package JMAP::Tester::Role::SentenceCollection;
-$JMAP::Tester::Role::SentenceCollection::VERSION = '0.026';
+package JMAP::Tester::Role::SentenceCollection 0.100;
+
 use Moo::Role;
 
 requires 'sentence_broker';
@@ -10,8 +10,9 @@ BEGIN {
     sentence_for_item
     paragraph_for_items
 
-    abort_callback
     strip_json_types
+
+    abort
   )) {
     my $sub = sub {
       my $self = shift;
@@ -51,7 +52,7 @@ sub _index_setup {
 
     if (defined $prev_cid && $prev_cid ne $cid) {
       # We're transition from cid1 to cid2. -- rjbs, 2016-04-08
-      $self->abort_callback->("client_id <$cid> appears in non-contiguous positions")
+      $self->abort("client_id <$cid> appears in non-contiguous positions")
         if $cid_indices{$cid};
 
       $next_para_idx++;
@@ -86,7 +87,7 @@ sub sentence {
   my ($self, $n) = @_;
 
   my @items = $self->items;
-  $self->abort_callback->("there is no sentence for index $n")
+  $self->abort("there is no sentence for index $n")
     unless my $item = $items[$n];
 
   return $self->sentence_for_item($item);
@@ -126,7 +127,7 @@ sub single_sentence {
 
   my @items = $self->items;
   unless (@items == 1) {
-    $self->abort_callback->(
+    $self->abort(
       sprintf("single_sentence called but there are %i sentences", 0+@items)
     );
   }
@@ -135,7 +136,7 @@ sub single_sentence {
 
   my $have = $sentence->name;
   if (defined $name && $have ne $name) {
-    $self->abort_callback->(qq{single sentence has name "$have" not "$name"});
+    $self->abort(qq{single sentence has name "$have" not "$name"});
   }
 
   return $sentence;
@@ -158,11 +159,11 @@ sub sentence_named {
   my @sentences = grep {; $_->name eq $name } $self->sentences;
 
   unless (@sentences) {
-    $self->abort_callback->(qq{no sentence found with name "$name"});
+    $self->abort(qq{no sentence found with name "$name"});
   }
 
   if (@sentences > 1) {
-    $self->abort_callback->(qq{found more than one sentence with name "$name"});
+    $self->abort(qq{found more than one sentence with name "$name"});
   }
 
   return $sentences[0];
@@ -185,7 +186,7 @@ sub assert_n_sentences {
   my @sentences = $self->sentences;
 
   unless (@sentences == $n) {
-    $self->abort_callback->("expected $n sentences but got " . @sentences)
+    $self->abort("expected $n sentences but got " . @sentences)
   }
 
   return @sentences;
@@ -203,7 +204,7 @@ sub assert_n_sentences {
 sub paragraph {
   my ($self, $n) = @_;
 
-  $self->abort_callback->("there is no paragraph for index $n")
+  $self->abort("there is no paragraph for index $n")
     unless my $indices = $self->_para_indices->[$n];
 
   my @items    = $self->items;
@@ -252,7 +253,7 @@ sub assert_n_paragraphs {
 
   my @para_indices = @{ $self->_para_indices };
   unless ($n == @para_indices) {
-    $self->abort_callback->("expected $n paragraphs but got " . @para_indices)
+    $self->abort("expected $n paragraphs but got " . @para_indices)
   }
 
   return $self->paragraphs;
@@ -272,7 +273,7 @@ sub paragraph_by_client_id {
 
   Carp::confess("no client id given") unless defined $cid;
 
-  $self->abort_callback->("there is no paragraph for client_id $cid")
+  $self->abort("there is no paragraph for client_id $cid")
     unless my $indices = $self->_cid_indices->{$cid};
 
   my @items    = $self->items;
@@ -345,7 +346,7 @@ JMAP::Tester::Role::SentenceCollection
 
 =head1 VERSION
 
-version 0.026
+version 0.100
 
 =head1 METHODS
 

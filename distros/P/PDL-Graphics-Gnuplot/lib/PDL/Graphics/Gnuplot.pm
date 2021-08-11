@@ -2019,7 +2019,7 @@ our $echo_eating = 0;                             # Older versions of gnuplot on
 our $debug_echo = 0;                              # If set, mock up Losedows half-duplex pipes
 
 
-our $VERSION = '2.017';
+our $VERSION = '2.018';
 $VERSION = eval $VERSION;
 
 our $gp_version = undef;    # eventually gets the extracted gnuplot(1) version number.
@@ -7651,12 +7651,7 @@ sub _killGnuplot {
 	    $z = waitpid($goner,0);
 
 	} else {
-	    ### Use HUP as the Mr. Nice Guy solution.  
-	    ### This is to avoid a problem of error message jabbering in
-	    ### perl processes that use fork() and IPC. 
-	    #_printGnuplotPipe($this,$suffix,"exit\n");
-
-	    kill 'HUP', $goner;
+	    _printGnuplotPipe($this,$suffix,"exit\n");
 
 	    # Give it 2 seconds to quit, then interrupt it again.
 	    # If that doesn't work kill it dead.

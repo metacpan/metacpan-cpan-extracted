@@ -44,7 +44,6 @@ my @files = (
     't/field_types.t',
     't/lib/My/Test/Encode/both.pm',
     't/lib/My/Test/Encode/store.pm',
-    't/lib/My/Test/Encode/store.pm.orig',
     't/lib/My/Test/Encode/types_nis.pm',
     't/lib/My/Test/Encode/types_ns.pm',
     't/lib/My/Test/Util.pm',

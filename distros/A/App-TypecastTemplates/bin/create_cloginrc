@@ -1,0 +1,123 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+create_cloginrc - create cloginrc files for RANCID
+
+=head1 VERSION
+
+Version v0.2.0
+
+=cut
+
+our $VERSION = 'v0.2.0';
+
+=head1 SYNOPSIS
+
+ create_loginrc -h
+ create_loginrc [options] credentials.csv > .cloginrc
+ create_loginrc [options] < credentials.csv > .cloginrc
+
+=cut
+
+use App::TypecastTemplates;
+use Getopt::Long;
+use Pod::Usage;
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<< --help >>
+
+Print a brief help message and exit.
+
+=item B<< --manual >>
+
+Print the manual page and exit.
+
+=item B<< --templatefile filename >>
+
+Use file I<< filename >> to specify the templates to use
+instead of the builtin templates.
+
+=back
+
+=cut
+
+my $opts = {};
+my @optdefs = qw(
+	help|? manual
+	templatefile=s
+);
+GetOptions($opts, @optdefs)
+	or pod2usage(2);
+pod2usage(-exitval => 0, -verbose => 1) if ($opts->{help});
+pod2usage(-exitval => 0, -verbose => 2) if ($opts->{manual});
+
+if (exists $opts->{templatefile}) {
+	if (open(my $handle,'<', $opts->{templatefile})) {
+		read_templates($handle);
+		close($handle);
+	}
+}
+
+tt_run;
+
+=head1 DESCRIPTION
+
+This program takes a CSV (comma separated value) file
+and turns it into something that is suitable
+to use as credentials file (.cloginrc) for RANCID.
+
+=head2 CSV Input
+
+The CSV file may have arbitrary columns
+as long as there is a column named I<< type >>,
+which is used to switch between different templates,
+and a column for every variable used in the templates.
+
+The column names should be given in the first line of the CSV file.
+
+If the output of some template variables needs escape sequences
+as for instances the .cloginrc file for RANCID
+for left and right braces, space, ampersand and backslash
+the escape sequence should be given in the CSV file.
+
+=head2 Templates
+
+The templates are a list of text lines
+that start with a typename followed by a colon and some text
+which is expanded with the Template Toolkit.
+
+For each input line of the CSV file
+template lines corresponding to the value of the I<< type >> column
+are expanded by the Template Toolkit
+using the other columns of the CSV line to fill in the variables.
+
+Take a look at the following template:
+
+ cisco:### [% name %] (cisco) ###
+ cisco:add method [% name %] {ssh}
+ cisco:add user [% name %] {[% user %]}
+ cisco:add password [% name %] {[% password %]} {[% enablepw %]}
+
+This template would be selected
+if the I<< type >> column had the value "cisco".
+The CSV file would need to contain at least the columns
+type, name, user, password and enablepw
+to expand the template properly.
+
+=cut
+
+__DATA__
+cisco:
+cisco:### [% name %] (cisco) ###
+cisco:add method [% name %] {ssh}
+cisco:add user [% name %] {[% user %]}
+cisco:add password [% name %] {[% password %]} {[% enablepw %]}
+mikrotik:
+mikrotik:### [% name %] (mikrotik) ###
+mikrotik:add method [% name %] {ssh}
+mikrotik:add user [% name %] {[% user %]}
+mikrotik:add password [% name %] {[% password %]}

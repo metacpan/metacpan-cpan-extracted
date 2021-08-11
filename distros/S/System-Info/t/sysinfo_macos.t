@@ -10,7 +10,7 @@ BEGIN { eval qq{use 5.009005}; $not595 = $@ }
 use Test::More $not595
     ? (skip_all => "This is only version $] (needs 5.9.5)")
     : (tests    => 4);
-use Test::NoWarnings;
+use Test::Warnings;
 
 use Carp qw( cluck );
 our $DEBUG = 0;

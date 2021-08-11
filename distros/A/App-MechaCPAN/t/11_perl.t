@@ -14,7 +14,6 @@ if ( $^O eq 'MSWin32' )
 my $pwd = cwd;
 my $tmpdir = tempdir( TEMPLATE => File::Spec->tmpdir . "/mechacpan_t_XXXXXXXX", CLEANUP => 1 );
 chdir $tmpdir;
-my $dir = cwd;
 
 *App::MechaCPAN::logmsg = sub
 {
@@ -28,6 +27,19 @@ is(
   ),
   0,
   'Can install "perl" from a tar.gz'
+);
+
+chdir $pwd;
+$tmpdir = tempdir( TEMPLATE => File::Spec->tmpdir . "/mechacpan_t_XXXXXXXX", CLEANUP => 1 );
+chdir $tmpdir;
+
+is(
+  App::MechaCPAN::main(
+    'perl',
+    "$FindBin::Bin/../test_dists/FakePerlBin-5.12.0.tar.gz"
+  ),
+  0,
+  'Can install "reusable/relocatbale perl" from a tar.gz'
 );
 
 chdir $pwd;

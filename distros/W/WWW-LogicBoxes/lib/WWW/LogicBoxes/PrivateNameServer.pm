@@ -9,7 +9,7 @@ use namespace::autoclean;
 
 use WWW::LogicBoxes::Types qw( DomainName Int IPs );
 
-our $VERSION = '1.10.1'; # VERSION
+our $VERSION = '1.11.0'; # VERSION
 # ABSTRACT: LogicBoxes Private Nameserver
 
 has domain_id => (

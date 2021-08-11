@@ -23,7 +23,7 @@ with 'WWW::LogicBoxes::Role::Command::Raw',
      'WWW::LogicBoxes::Role::Command::Domain::Registration',
      'WWW::LogicBoxes::Role::Command::Domain::Transfer';
 
-our $VERSION = '1.10.1'; # VERSION
+our $VERSION = '1.11.0'; # VERSION
 # ABSTRACT: Submission of LogicBoxes Commands
 
 # Used to force json as the response_type and restore the existing type afterwards

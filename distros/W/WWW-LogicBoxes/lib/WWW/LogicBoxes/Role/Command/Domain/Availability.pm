@@ -16,7 +16,7 @@ use Carp;
 
 requires 'submit';
 
-our $VERSION = '1.10.1'; # VERSION
+our $VERSION = '1.11.0'; # VERSION
 # ABSTRACT: Domain Availability API Calls
 
 sub check_domain_availability {

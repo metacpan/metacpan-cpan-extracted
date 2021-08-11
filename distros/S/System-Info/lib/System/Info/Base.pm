@@ -46,7 +46,7 @@ sub new {
     (my $bc = $class) =~ s/.*://;
     $self->{_distro}   = $self->get_dist_name || ($bc eq "Base" ? "" : $bc);
 
-    $self->{_ncore}    = $self->{_ncpu}
+    $self->{_ncore}  ||= $self->{_ncpu}
 	? (sort { $b <=> $a } ($self->{_ncpu} =~ m/(\d+)/g))[0]
 	: $self->{_ncpu};
 
@@ -251,7 +251,7 @@ __END__
 
 =head1 COPYRIGHT AND LICENSE
 
-(c) 2016-2020, Abe Timmerman & H.Merijn Brand, All rights reserved.
+(c) 2016-2021, Abe Timmerman & H.Merijn Brand, All rights reserved.
 
 With contributions from Jarkko Hietaniemi, Campo Weijerman, Alan Burlison,
 Allen Smith, Alain Barbet, Dominic Dunlop, Rich Rauenzahn, David Cantrell.

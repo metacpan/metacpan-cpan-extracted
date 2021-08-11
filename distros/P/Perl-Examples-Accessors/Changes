@@ -1,23 +1,30 @@
-0.131   2017-10-15 (PERLANCAR)
+0.132   2021-08-03  Released-By: PERLANCAR; Urgency: medium
+
+	- Add :ObjectPad.
+
+	- Remove :EvoClass (code advertised in Synopsis doesn't work).
+
+
+0.131   2017-10-15  Released-By: PERLANCAR
 
 	- Add Perl::Examples::Accessors::ClassAccessorPackedStringSet.
 
 	- Update module name: Class::Accessor::Array::{Glob,Slurpy}.
 
 
-0.130   2017-09-01 (PERLANCAR)
+0.130   2017-09-01  Released-By: PERLANCAR
 
 	- Add Perl::Examples::Accessors::ClassAccessorPackedString.
 
 
-0.12    2016-11-26 (PERLANCAR)
+0.12    2016-11-26  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- test: Skip Moops in t/00-compile.t.
 
 
-0.11    2016-11-26 (PERLANCAR)
+0.11    2016-11-26  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -28,53 +35,53 @@
 	  perl 5.24+ [RT#118963].
 
 
-0.10    2016-11-25 (PERLANCAR)
+0.10    2016-11-25  Released-By: PERLANCAR
 
 	- Add classes: Perl::Examples::Accessors::{ClassStruct,EvoClass,Moops,
           Moos,ObjectTiny,ObjectTinyRW,ObjectTinyRWXS,ObjectTinyXS}.
 
 
-0.09    2016-09-29 (PERLANCAR)
+0.09    2016-09-29  Released-By: PERLANCAR
 
 	- Add class: Perl::Examples::Accessors::MojoBaseXS.
 
 
-0.08    2016-09-09 (PERLANCAR)
+0.08    2016-09-09  Released-By: PERLANCAR
 
 	- Add class: Perl::Examples::Accessors::ClassTiny.
 
 
-0.07    2016-09-09 (PERLANCAR)
+0.07    2016-09-09  Released-By: PERLANCAR
 
 	- [optimize] Optimize manual (Hash/Array) accessors.
 
 
-0.06    2016-06-26 (PERLANCAR)
+0.06    2016-06-26  Released-By: PERLANCAR
 
 	- Add classes: Perl::Examples::Accessors::SimpleAccessor.
 
 
-0.05    2016-04-14 (PERLANCAR)
+0.05    2016-04-14  Released-By: PERLANCAR
 
 	- Add classes: Perl::Examples::Accessors::{MojoBase,ObjectSimple}.
 
 
-0.04    2016-04-14 (PERLANCAR)
+0.04    2016-04-14  Released-By: PERLANCAR
 
 	- Add class: Perl::Examples::Accessors::ClassInsideOut.
 
 
-0.03    2016-03-29 (PERLANCAR)
+0.03    2016-03-29  Released-By: PERLANCAR
 
 	- Remove Class::Build::Array::Glob (it will be re-added if I
 	  resolve the implementation issue).
 
 
-0.02     2016-03-29 (PERLANCAR)
+0.02     2016-03-29  Released-By: PERLANCAR
 
          - Add classes: PEA:ClassAccessorArray, PEA:ClassAccessorArrayGlob.
 
 
-0.01     2016-03-28 (PERLANCAR)
+0.01     2016-03-28  Released-By: PERLANCAR
 
          - First release.

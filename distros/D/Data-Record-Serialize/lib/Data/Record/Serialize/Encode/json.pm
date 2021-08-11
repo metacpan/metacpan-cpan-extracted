@@ -2,11 +2,29 @@ package Data::Record::Serialize::Encode::json;
 
 # ABSTRACT: encoded a record as JSON
 
+use strict;
+use warnings;
+
+use Data::Record::Serialize::Error { errors => [ 'json_backend' ] }, -all;
+
 use Moo::Role;
 
-our $VERSION = '0.25';
+our $VERSION = '0.28';
 
-use JSON::MaybeXS qw[ encode_json ];
+
+BEGIN {
+    my $Cpanel_JSON_XS_VERSION = 3.0236;
+
+    if ( eval { require Cpanel::JSON::XS; Cpanel::JSON::XS->VERSION( $Cpanel_JSON_XS_VERSION ); 1;  } ) {
+        *encode_json = \&Cpanel::JSON::XS::encode_json;
+    }
+    elsif ( eval { require JSON::PP } ) {
+        *encode_json = \&JSON::PP::encode_json;
+    }
+    else {
+        error( 'json_backend', "can't find either Cpanel::JSON::XS (>= $Cpanel_JSON_XS_VERSION) or JSON::PP. Please install one of them." );
+    }
+};
 
 use namespace::clean;
 
@@ -30,7 +48,7 @@ sub to_bool { $_[1] ? \1 : \0 }
 
 
 
-sub encode { shift; goto \&encode_json }
+sub encode { encode_json( $_[1] ) }
 
 with 'Data::Record::Serialize::Role::Encode';
 
@@ -58,7 +76,7 @@ Data::Record::Serialize::Encode::json - encoded a record as JSON
 
 =head1 VERSION
 
-version 0.25
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -99,6 +117,7 @@ Convert a truthy value to something that the JSON encoders will recognize as a b
 
 =for Pod::Coverage numify
 stringify
+encode_json
 
 =head1 INTERFACE
 

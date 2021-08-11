@@ -5,7 +5,7 @@ Getopt::EX::Hashed - Hash store object automation
 
 # VERSION
 
-Version 0.9908
+Version 0.9911
 
 # SYNOPSIS
 
@@ -17,13 +17,14 @@ Version 0.9908
     use Getopt::EX::Hashed;
     has start => ( spec => "=i s begin", default => 1 );
     has end   => ( spec => "=i e" );
+    has file  => ( spec => "=s", is => 'rw' );
     no  Getopt::EX::Hashed;
 
     sub run {
         my $app = shift;
         use Getopt::Long;
         $app->getopt or pod2usage();
-        if ($app->start) {
+        if ($app->{start}) {
             ...
 
 # DESCRIPTION
@@ -107,16 +108,16 @@ Following parameters are available.
 
 - **action** => _coderef_
 
-    Parameter **action** takes code reference which called to process the
-    option.  When called, hash object is passed through `$_`.
+    Parameter **action** takes code reference which is called to process
+    the option.  When called, hash object is passed through `$_`.
 
         has [ qw(left right both) ] => spec => '=i';
         has "+both" => action => sub {
             $_->{left} = $_->{right} = $_[1];
         };
 
-    You can use this for `"<>"` too.  In that case, spec parameter
-    does not matter and not required.
+    You can use this for `"<>"` to catch everything.  In that case,
+    spec parameter does not matter and not required.
 
         has ARGV => default => [];
         has "<>" => action => sub {

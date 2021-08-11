@@ -1,5 +1,9 @@
 Revision history for Perl extension Apache::Session::Browseable.
 
+1.3.9
+    - Return number of deleted rows when called in array context.
+      See [LemonLDAP issue #2428](https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/-/issues/2428)
+
 1.3.8
     - Add specific error handling for old versions (#28)
 

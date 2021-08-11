@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::FailWarnings;
 
 for my $mod ( qw( IO::Async::Loop  IO::Async::Handle ) ) {
     eval "require $mod" or plan skip_all => "No $mod: $@";

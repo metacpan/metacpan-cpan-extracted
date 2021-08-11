@@ -217,7 +217,7 @@ my $configure_emailserver=sub {
       ($stdout,$stderr)=$handle->cmd($sudo.
          "if [ -d $nginx_path/nginx ]; ".
          'then echo EXISTS;else echo NONE; fi');
-      if ($stdout=~/EXISTS/) {
+      if ($stdout=~/EXISTS/s) {
          ($stdout,$stderr)=$handle->cmd($sudo."rm -rvf $nginx_path/nginx",
              '__display__');
       }
@@ -488,6 +488,14 @@ if ($do==1) {
       Net::FullAuto::FA_Core::handle_error($error) if $error
          && $error!~/already exists/;
    } else {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'yum -y remove git','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'yum -y install https://packages.endpoint.com/rhel/7/'.
+         'os/x86_64/endpoint-repo-1.7-1.x86_64.rpm',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'yum -y install git','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'firewall-cmd --zone=public --permanent --add-port=25/tcp',
          '__display__');
@@ -869,9 +877,10 @@ if ($do==1) { # INSTALL LATEST VERSION OF PYTHON
       'wget -qO- https://www.python.org/downloads/release');
    $stdout=~s/^.*list-row-container menu.*?Python (.*?)[<].*$/$1/s;
    my $version=$stdout;
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "if test -f /usr/local/bin/python$version; then echo Exists; fi");
-   unless ($stdout=~/Exists/) {
+   $stdout=~s/\.[0-9]$//;
+   ($stdout,$stderr)=$handle->cmd(
+      "if test -f /usr/local/bin/python$stdout; then echo Exists; fi");
+   unless ($stdout=~/Exists/s) {
       ($stdout,$stderr)=$handle->cmd($sudo.
          'wget --random-wait --progress=dot '.
          "https://python.org/ftp/python/$version/Python-$version.tar.xz",
@@ -1352,6 +1361,40 @@ END
    }
 }
 
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'cmake --version','__display__');
+   $stdout=~s/^.*?\s(\d+\.\d+).*$/$1/;
+   if (!(-e '/usr/local/bin/cmake') && $stdout<3.02) {
+      my $done=0;my $gittry=0;
+      while ($done==0) {
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'git clone https://github.com/Kitware/CMake.git',
+            '__display__');
+         if (++$gittry>5) {
+            print "\n\n   FATAL ERROR: $stderr\n\n";
+            cleanup();
+         }
+         my $gittest='Connection reset by peer|'.
+                     'Could not read from remote repository';
+         $done=1 if $stderr!~/$gittest/s;
+         last if $done;
+         sleep 30;
+      }
+      ($stdout,$stderr)=$handle->cwd('CMake');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         './bootstrap --system-curl -- '.
+         '-DCMAKE_INSTALL_RPATH="/usr/local/lib64"',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make','3600','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make install','__display__');
+      $build_php=1;
+   } else {
+      print "cmake is up to date.\n";
+   }
+
    #
    # echo-ing/streaming files over ssh can be tricky. Use echo -e
    #          and replace these characters with thier HEX
@@ -1363,8 +1406,6 @@ END
    #          "  -   \\x22     \  -  \\x5C
    #          $  -   \\x24     %  -  \\x25
    #
-
-
 
    my $install_mysql=<<'END';
 
@@ -1412,7 +1453,7 @@ END
       ($mysql_status,$stderr)=$handle->cmd($sudo.
          'service mysql status -l','__display__');
    }
-   if ($mysql_version<15.1 || $mysql_status!~/SUCCESS/) {
+   if ($mysql_version<15.1 || $mysql_status!~/Taking your SQL requests/) {
       ($stdout,$stderr)=$handle->cmd($sudo.
          'systemctl stop mysql','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1877,39 +1918,6 @@ END
       $build_php=1;
    } else {
       print "libmcrypt is up to date\n";
-   }
-   ($stdout,$stderr)=$handle->cwd('/opt/source');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'cmake --version','__display__');
-   $stdout=~s/^.*?\s(\d+\.\d+).*$/$1/;
-   if (!(-e '/usr/local/bin/cmake') && $stdout<3.02) {
-      my $done=0;my $gittry=0;
-      while ($done==0) {
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            'git clone https://github.com/Kitware/CMake.git',
-            '__display__');
-         if (++$gittry>5) {
-            print "\n\n   FATAL ERROR: $stderr\n\n";
-            cleanup();
-         }
-         my $gittest='Connection reset by peer|'.
-                     'Could not read from remote repository';
-         $done=1 if $stderr!~/$gittest/s;
-         last if $done;
-         sleep 30;
-      }
-      ($stdout,$stderr)=$handle->cwd('CMake');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         './bootstrap --system-curl -- '.
-         '-DCMAKE_INSTALL_RPATH="/usr/local/lib64"',
-         '__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'make','3600','__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'make install','__display__');
-      $build_php=1;
-   } else {
-      print "cmake is up to date.\n";
    }
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -3712,7 +3720,7 @@ END
       'BUILD_TLS=yes USE_SYSTEMD=yes','__display__');
    ($stdout,$stderr)=$handle->cwd('src');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'cc -pedantic -DREDIS_STATIC= -std=c11 -Wall -W '.
+      '/usr/local/bin/gcc -pedantic -DREDIS_STATIC= -std=c11 -Wall -W '.
       '-Wno-missing-field-initializers -O2 -g -ggdb '.
       '-I../deps/lua/src -I../deps/hiredis '.
       '-I/usr/local/include/openssl -MMD -o '.

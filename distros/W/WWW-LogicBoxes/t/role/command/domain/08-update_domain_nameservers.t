@@ -51,12 +51,13 @@ subtest 'Update Nameservers to Invalid Nameservers' => sub {
         ns => $valid_nameservers,
     );
 
-    throws_ok {
+    # LogicBoxes silent accepts the request but doesn't do the update
+    lives_ok {
         $logic_boxes->update_domain_nameservers(
             id          => $domain->id,
             nameservers => $invalid_nameservers,
         );
-    } qr/Invalid nameservers provided/, 'Throws on invalid nameservers';
+    } 'Lives on invalid nameservers';
 
     my $retrieved_domain = $logic_boxes->get_domain_by_id( $domain->id );
     is_deeply( $retrieved_domain->ns, $valid_nameservers, 'Correct nameservers' );

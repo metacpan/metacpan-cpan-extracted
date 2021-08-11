@@ -1,5 +1,12 @@
 Revision history for String-Tagged
 
+0.17    2021-08-10
+        [CHANGES]
+         * Added a ->join constructor method
+
+        [BUGFIXES]
+         * Fix spelling of "functionality" (RT130181)
+
 0.16    2019-04-12 16:03:33
         [CHANGES]
          * Print a more helpful message when ->sprintf encounters undef

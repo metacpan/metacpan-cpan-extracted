@@ -47,8 +47,6 @@ use parent (
 
 use DNS::Unbound::AsyncQuery::MojoPromise ();
 
-use Scalar::Util ();
-
 use Mojo::IOLoop ();
 use Mojo::Promise ();
 
@@ -63,14 +61,14 @@ sub new {
 
     my $self = $class->SUPER::new(@args);
 
-    my $weak_self = $self;
-    Scalar::Util::weaken($weak_self);
+    my $fh = $self->_get_fh();
 
-    my $handle = Mojo::IOLoop->singleton()->reactor()->io(
-        $self->_get_fh(),
-        sub { $weak_self->process() },
-    );
-    $INSTANCE_HANDLE{$self} = $handle;
+    Mojo::IOLoop->singleton()->reactor()->io(
+        $fh,
+        $self->_create_process_cr(),
+    )->watch($fh, 1, 0);
+
+    $INSTANCE_HANDLE{$self} = $fh;
 
     return $self;
 }
@@ -80,7 +78,9 @@ sub new {
 sub DESTROY {
     my ($self) = @_;
 
-    delete $INSTANCE_HANDLE{$self};
+    my $fh = delete $INSTANCE_HANDLE{$self};
+
+    Mojo::IOLoop->singleton()->reactor()->remove($fh) if $fh;
 
     return $self->SUPER::DESTROY();
 }

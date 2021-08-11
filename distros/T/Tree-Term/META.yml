@@ -15,7 +15,7 @@ name: Tree-Term
 provides:
   Tree::Term:
     file: lib/Tree/Term.pm
-    version: '20210727'
+    version: '20210810'
 requires:
   Carp: '0'
   Data::Dump: '0'
@@ -27,5 +27,5 @@ resources:
   bugtracker: https://github.com/philiprbrenan/TreeTerm/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/philiprbrenan/TreeTerm
-version: '20210727'
+version: '20210810'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

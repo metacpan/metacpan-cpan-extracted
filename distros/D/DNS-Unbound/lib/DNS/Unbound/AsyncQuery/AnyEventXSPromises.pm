@@ -3,6 +3,8 @@ package DNS::Unbound::AsyncQuery::AnyEventXSPromises;
 use strict;
 use warnings;
 
+# This leaks; don’t use it.
+
 use AnyEvent::XSPromises ();
 
 our @ISA;

@@ -1,6 +1,11 @@
 #ifndef __OBJECT_PAD__CLASS_H__
 #define __OBJECT_PAD__CLASS_H__
 
+typedef struct AdjustBlock {
+  unsigned int is_adjustparams : 1;
+  CV *cv;
+} AdjustBlock;
+
 /* Metadata about a class or role */
 struct ClassMeta {
   enum MetaType type : 8;
@@ -9,6 +14,7 @@ struct ClassMeta {
   unsigned int sealed : 1;
   unsigned int role_is_invokable : 1;
   unsigned int strict_params : 1;
+  unsigned int has_adjustparams : 1; /* has at least one ADJUSTPARAMS block */
 
   SLOTOFFSET start_slotix; /* first slot index of this partial within its instance */
   SLOTOFFSET next_slotix;  /* 1 + final slot index of this partial within its instance; includes slots in roles */
@@ -28,7 +34,7 @@ struct ClassMeta {
   CV *foreign_does;    /* superclass is not Object::Pad, here is SUPER::DOES (which could be UNIVERSAL::DOES) */
   CV *initslots;       /* the INITSLOTS method body */
   AV *buildblocks;     /* the BUILD {} phaser blocks; each elem is a CV* directly */
-  AV *adjustblocks;    /* the ADJUST {} phaser blocks; each elem is a CV* directly */
+  AV *adjustblocks;    /* the ADJUST {} phaser blocks; each elem is a AdjustBlock* */
 
   AV *slothooks_postslots; /* NULL, or AV of struct SlotHook, all of whose ->funcs->post_initslot exist */
   AV *slothooks_construct; /* NULL, or AV of struct SlotHook, all of whose ->funcs->post_construct exist */

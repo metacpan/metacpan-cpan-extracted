@@ -1,5 +1,5 @@
-package JMAP::Tester::LogWriter;
-$JMAP::Tester::LogWriter::VERSION = '0.026';
+package JMAP::Tester::LogWriter 0.100;
+
 use Moo::Role;
 
 requires 'write';
@@ -7,9 +7,9 @@ requires 'write';
 use namespace::clean;
 
 {
-  package JMAP::Tester::LogWriter::Code;
-$JMAP::Tester::LogWriter::Code::VERSION = '0.026';
-use Moo;
+  package JMAP::Tester::LogWriter::Code 0.100;
+
+  use Moo;
   use namespace::clean;
   with 'JMAP::Tester::LogWriter';
   has code => (is => 'ro', required => 1);
@@ -17,9 +17,9 @@ use Moo;
 }
 
 {
-  package JMAP::Tester::LogWriter::Handle;
-$JMAP::Tester::LogWriter::Handle::VERSION = '0.026';
-use Moo;
+  package JMAP::Tester::LogWriter::Handle 0.100;
+
+  use Moo;
   use namespace::clean;
   with 'JMAP::Tester::LogWriter';
   has handle => (is => 'ro', required => 1);
@@ -27,9 +27,9 @@ use Moo;
 }
 
 {
-  package JMAP::Tester::LogWriter::Filename;
-$JMAP::Tester::LogWriter::Filename::VERSION = '0.026';
-use Moo;
+  package JMAP::Tester::LogWriter::Filename 0.100;
+
+  use Moo;
   use namespace::clean;
   with 'JMAP::Tester::LogWriter';
   has filename_template => (
@@ -71,7 +71,7 @@ JMAP::Tester::LogWriter
 
 =head1 VERSION
 
-version 0.026
+version 0.100
 
 =head1 AUTHOR
 

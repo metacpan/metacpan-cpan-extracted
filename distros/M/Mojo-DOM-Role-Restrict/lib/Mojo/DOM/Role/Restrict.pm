@@ -1,7 +1,8 @@
 package Mojo::DOM::Role::Restrict;
-use strict; use warnings; our $VERSION = 0.03;
+use strict; use warnings; our $VERSION = 0.04;
 use Mojo::Base -role;
 use Mojo::Util qw(xml_escape);
+use File::Spec;
 
 sub to_string { $_[1] ? ${$_[0]}->render : $_[0]->render; }
 
@@ -26,6 +27,52 @@ sub restrict_spec {
 sub valid { _valid($_[0]->tree, $_[0]->restrict_spec($_[1])) }
 
 sub restrict { _restrict($_[0]->tree, $_[0]->restrict_spec($_[1])) && $_[0] }
+
+sub diff_module {
+	if ( $_[1] && $_[0]->diff_module_name !~ $_[1]) {
+		$_[0]->diff_module_name($_[1]);
+		$_[0]->diff_module_loaded(0);
+	}
+	$_[0]->diff_module_method($_[2]) if $_[2];
+	$_[0]->diff_module_params($_[3]) if defined $_[3];
+	return (
+		$_[0]->diff_module_name,
+		$_[0]->diff_module_method,
+		$_[0]->diff_module_params
+	);
+}
+
+has diff_module_name => 'Text::Diff';
+
+has diff_module_loaded => 0;
+
+has diff_module_method => 'diff';
+
+has diff_module_params => sub {  { style => 'Unified' } };
+
+sub diff {
+	my ($self, $spec) = ($_[0], (shift)->restrict_spec(shift));
+	my ($module, $method, $params) = $self->diff_module(@_);
+	unless ( $self->diff_module_loaded ) {
+		my @parts = split /::|'/, $module, -1;
+    		shift @parts if @parts && !$parts[0];
+    		my $file  =  File::Spec->catfile( @parts );
+		LOAD_DIFF_MODULE: {
+		    my $err;
+		    for my $flag ( qw[1 0] ) {
+			my $load = $file . ($flag ? '.pm' : '');
+			eval { require $load };
+			$@ ? $err .= $@ : last LOAD_DIFF_MODULE;
+		    }
+		    die $err if $err;
+		}
+		$self->diff_module_loaded(1)
+	}
+	{
+		no strict 'refs';
+		return *{"${module}::${method}"}->(\$self->to_string(1), \$self->to_string(), $params);
+	}
+}
 
 # copy, paste and edit via Mojo::DOM::HTML::_render
 
@@ -151,9 +198,10 @@ sub _restrict {
 	return 1;
 }
 
+
 1;
 
-# TODO diff
+# TODO pretty print (for diff) and minmize.
 
 __END__
 
@@ -163,7 +211,7 @@ Mojo::DOM::Role::Restrict - Restrict tags and attributes
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
@@ -343,6 +391,99 @@ Restrict the current DOM against the specification, after calling restrict the s
 	# render without spec validation
 	# <html><head></head><body><p class="okay" data-unknown="abc" id="prefixed-allow">Restrict <b>HTML</b></p></body></html>
 	$dom->to_string(1);
+
+=cut
+
+=head2 diff
+
+Perform a diff comparing the original HTML and the restricted HTML.
+
+	my $html = q|<html>
+		<head>
+			<script>...</script>
+		</head>
+		<body>
+			<p class="okay" id="allow" onclick="not-allow">
+				Restrict
+				<span class="not-okay">HTML</span>
+			</p>
+		</body>
+	</html>|;
+
+	my $spec = {
+		script => 0, # remove all script tags
+		'*' => { # apply to all tags
+			'*' => 1, # allow all attributes by default
+			'onclick' => 0 # disable onclick attributes
+		},
+		span => {
+			class => 0 # disable class attributes on span's
+		}
+	};
+
+	my $dom = Mojo::DOM->with_roles('+Restrict')->new($html, $spec); 
+
+	#@@ -1,11 +1,11 @@
+	# <html>
+	#	<head>
+	#-		<script>...</script>
+	#+		
+	#	</head>
+	#	<body>
+	#-		<p class="okay" id="allow" onclick="not-allow">
+	#+		<p class="okay" id="allow">
+	#			Restrict
+	#-			<span class="not-okay">HTML</span>
+	#+			<span>HTML</span>
+	#		</p>
+	#	</body>
+	# </html>
+	#\\ No newline at end of file
+	my $diff = $dom->diff;
+
+	....
+
+	$dom->diff($spec, 'Text::Diff', 'diff', { style => 'Unified' });
+
+=cut
+
+=head2 diff_module
+
+Configure the module used to perform the diff. The default is Text::Diff::diff.
+
+	$dom->diff_module('Text::Diff', 'diff', { style => 'Unified' });
+
+=cut
+
+=head2 diff_module_name
+
+Get or Set the diff module. The default is Text::Diff.
+
+	$dom->diff_module_name('Text::Diff');
+
+=cut
+
+=head2 diff_module_method
+
+Get or Set the diff module method. The default is diff.
+
+	$dom->diff_module_method('diff');
+
+=cut
+
+=head2 diff_module_params
+
+Get or Set the diff module params that are passed as the third argument when calling the diff_module_method. The default is { style => 'Unified' }.
+
+	$dom->diff_module_method({ style => 'Unified' });
+
+=cut
+
+=head2 diff_module_loaded
+
+Get or Set whether the diff module needs to be loaded. If false the next time the diff method is called on the Mojo::DOM object the module will be required. 
+
+	$dom->diff_module_loaded(1|0);
 
 =cut
 

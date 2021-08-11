@@ -11,7 +11,7 @@ use WWW::LogicBoxes::Types qw( Int );
 
 extends 'WWW::LogicBoxes::DomainRequest';
 
-our $VERSION = '1.10.1'; # VERSION
+our $VERSION = '1.11.0'; # VERSION
 # ABSTRACT: Domain Registration Request
 
 has years => (

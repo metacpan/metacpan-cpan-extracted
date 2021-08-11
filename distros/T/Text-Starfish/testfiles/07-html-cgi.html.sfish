@@ -13,5 +13,11 @@
 3
 <?sf ## This is also allowed for code in .sf
    echo ("1+1=".(1+1)); !>
+
+Consider this example:
+<?sf_not a hook!>
+But this will produce 2:
+<?sf$a=1;echo $a+1;!>
+
 </BODY>
 </HTML>

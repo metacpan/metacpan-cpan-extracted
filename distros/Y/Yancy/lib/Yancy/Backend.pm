@@ -1,5 +1,5 @@
 package Yancy::Backend;
-our $VERSION = '1.075';
+our $VERSION = '1.076';
 # ABSTRACT: Interface to a database
 
 #pod =head1 SYNOPSIS
@@ -129,7 +129,7 @@ sub new {
 
 #pod =head2 list
 #pod
-#pod     my $result = $be->list( $schema, $where, $opt );
+#pod     my $result = $be->list( $schema, $where, %opt );
 #pod     # { total => ..., items => [ ... ] }
 #pod
 #pod Fetch a list of items from a schema. C<$schema> is the
@@ -184,7 +184,7 @@ sub new {
 #pod
 #pod =back
 #pod
-#pod C<$opt> is a hash reference with the following keys:
+#pod C<%opt> is a list of name/value pairs with the following keys:
 #pod
 #pod =over
 #pod
@@ -194,14 +194,21 @@ sub new {
 #pod
 #pod =item * order_by - A L<SQL::Abstract order by clause|SQL::Abstract/ORDER BY CLAUSES>
 #pod
+#pod =item * join - Join one or more tables using a C<x-foreign-key> field.
+#pod This can be the name of a foreign key field on this schema, or the name
+#pod of a table with a foreign key field that refers to this schema. Join
+#pod multiple tables at the same time by passing an arrayref of joins. Fields
+#pod in joined tables can be queried by prefixing the join name to the field,
+#pod separated by a dot.
+#pod
 #pod =back
 #pod
 #pod     # Get the second page of 20 people
-#pod     $be->list( 'people', {}, { limit => 20, offset => 20 } );
+#pod     $be->list( 'people', {}, limit => 20, offset => 20 );
 #pod     # Get the list of people sorted by age, oldest first
-#pod     $be->list( 'people', {}, { order_by => { -desc => 'age' } } );
+#pod     $be->list( 'people', {}, order_by => { -desc => 'age' } );
 #pod     # Get the list of people sorted by age first, then name (ascending)
-#pod     $be->list( 'people', {}, { order_by => [ 'age', 'name' ] } );
+#pod     $be->list( 'people', {}, order_by => [ 'age', 'name' ] );
 #pod
 #pod Returns a hashref with two keys:
 #pod
@@ -224,7 +231,7 @@ sub list { ... }
 
 #pod =head2 list_p
 #pod
-#pod     my $promise = $be->list_p( $schema, $where, $opt );
+#pod     my $promise = $be->list_p( $schema, $where, %opt );
 #pod     $promise->then( sub {
 #pod         my ( $result ) = @_;
 #pod         # { total => ..., items => [ ... ] }
@@ -254,9 +261,9 @@ sub list_p { ... }
 #pod =item join
 #pod
 #pod Join one or more tables using a C<x-foreign-key> field. This can be the
-#pod name of a foreign key field on this schema, or the name of a foreign key
-#pod field that refers to this schema. Join multiple tables at the same time
-#pod by passing an arrayref of joins.
+#pod name of a foreign key field on this schema, or the name of a table with
+#pod a foreign key field that refers to this schema. Join multiple tables at
+#pod the same time by passing an arrayref of joins.
 #pod
 #pod =cut
 
@@ -517,7 +524,7 @@ Yancy::Backend - Interface to a database
 
 =head1 VERSION
 
-version 1.075
+version 1.076
 
 =head1 SYNOPSIS
 
@@ -622,7 +629,7 @@ configuration. See L<Yancy::Guides::Schema> for more information.
 
 =head2 list
 
-    my $result = $be->list( $schema, $where, $opt );
+    my $result = $be->list( $schema, $where, %opt );
     # { total => ..., items => [ ... ] }
 
 Fetch a list of items from a schema. C<$schema> is the
@@ -677,7 +684,7 @@ considered not experimental.
 
 =back
 
-C<$opt> is a hash reference with the following keys:
+C<%opt> is a list of name/value pairs with the following keys:
 
 =over
 
@@ -687,14 +694,21 @@ C<$opt> is a hash reference with the following keys:
 
 =item * order_by - A L<SQL::Abstract order by clause|SQL::Abstract/ORDER BY CLAUSES>
 
+=item * join - Join one or more tables using a C<x-foreign-key> field.
+This can be the name of a foreign key field on this schema, or the name
+of a table with a foreign key field that refers to this schema. Join
+multiple tables at the same time by passing an arrayref of joins. Fields
+in joined tables can be queried by prefixing the join name to the field,
+separated by a dot.
+
 =back
 
     # Get the second page of 20 people
-    $be->list( 'people', {}, { limit => 20, offset => 20 } );
+    $be->list( 'people', {}, limit => 20, offset => 20 );
     # Get the list of people sorted by age, oldest first
-    $be->list( 'people', {}, { order_by => { -desc => 'age' } } );
+    $be->list( 'people', {}, order_by => { -desc => 'age' } );
     # Get the list of people sorted by age first, then name (ascending)
-    $be->list( 'people', {}, { order_by => [ 'age', 'name' ] } );
+    $be->list( 'people', {}, order_by => [ 'age', 'name' ] );
 
 Returns a hashref with two keys:
 
@@ -713,7 +727,7 @@ C<offset>.
 
 =head2 list_p
 
-    my $promise = $be->list_p( $schema, $where, $opt );
+    my $promise = $be->list_p( $schema, $where, %opt );
     $promise->then( sub {
         my ( $result ) = @_;
         # { total => ..., items => [ ... ] }
@@ -739,9 +753,9 @@ names:
 =item join
 
 Join one or more tables using a C<x-foreign-key> field. This can be the
-name of a foreign key field on this schema, or the name of a foreign key
-field that refers to this schema. Join multiple tables at the same time
-by passing an arrayref of joins.
+name of a foreign key field on this schema, or the name of a table with
+a foreign key field that refers to this schema. Join multiple tables at
+the same time by passing an arrayref of joins.
 
 =head2 get_p
 

@@ -1,5 +1,5 @@
 package Yancy::Backend::Dbic;
-our $VERSION = '1.075';
+our $VERSION = '1.076';
 # ABSTRACT: A backend for DBIx::Class schemas
 
 #pod =head1 SYNOPSIS
@@ -217,8 +217,9 @@ sub get {
 }
 
 sub list {
-    my ( $self, $schema_name, $params, $opt ) = @_;
-    $params ||= {}; $opt ||= {};
+    my ( $self, $schema_name, $params, @opt ) = @_;
+    my $opt = @opt % 2 == 0 ? {@opt} : $opt[0];
+    $params ||= {};
     my $schema = $self->schema->{ $schema_name };
     my $real_schema = ( $schema->{'x-view'} || {} )->{schema} // $schema_name;
     my $props = $schema->{properties}
@@ -227,6 +228,12 @@ sub list {
         order_by => $opt->{order_by},
         select => [ keys %$props ],
     );
+    # Prefetch the data so HashRefInflator does the right thing
+    if ( $opt->{join} ) {
+        $rs_opt{join} = $opt->{join};
+        $rs_opt{prefetch} = $opt->{join};
+    }
+    my $count_rs = $self->_rs( $schema_name, $params, \%rs_opt );
     if ( $opt->{limit} ) {
         die "Limit must be number" if !looks_like_number $opt->{limit};
         $rs_opt{ rows } = $opt->{limit};
@@ -238,7 +245,7 @@ sub list {
     my $rs = $self->_rs( $schema_name, $params, \%rs_opt );
     return {
         items => [ map $self->normalize( $schema_name, $_ ), $rs->all ],
-        total => $self->_rs( $schema_name, $params )->count,
+        total => $count_rs->count,
     };
 }
 
@@ -425,7 +432,7 @@ Yancy::Backend::Dbic - A backend for DBIx::Class schemas
 
 =head1 VERSION
 
-version 1.075
+version 1.076
 
 =head1 SYNOPSIS
 

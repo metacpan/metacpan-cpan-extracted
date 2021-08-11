@@ -1,0 +1,61 @@
+App-TypecastTemplates
+
+Format records from a table with different templates.
+
+This module allows to print records from a table using different templates.
+The template to be used for a record is chosen by the value of the column
+named "type" for that record.
+
+The table is expected to be CSV formatted.
+
+The original use case for this module is a script that allows to generate
+.cloginrc files for RANCID to easily add new credentials. The accompanying
+script does exact this and may be used as an example to create other scripts
+using this module.
+
+The module can be used without any script using the following command line:
+
+        perl -MApp::TypecastTemplates -e tt_run
+
+It expects the table in CSV format at STDIN and prints the formatted records
+to STDOUT.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc App::TypecastTemplates
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=App-TypecastTemplates
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/App-TypecastTemplates
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/App-TypecastTemplates
+
+    Search CPAN
+        https://metacpan.org/release/App-TypecastTemplates
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2021 by Mathias Weidner.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

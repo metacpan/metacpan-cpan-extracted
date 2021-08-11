@@ -13,7 +13,7 @@ use WWW::LogicBoxes::Types qw( Bool ResponseType Str URI );
 use Data::Util qw( is_hash_ref );
 use Carp;
 
-our $VERSION = '1.10.1'; # VERSION
+our $VERSION = '1.11.0'; # VERSION
 # ABSTRACT: Interact with LogicBoxes reseller API
 
 use Readonly;
@@ -207,6 +207,8 @@ New Domain Transfers.
 
 =item L<resend_transfer_approval_mail_by_id|WWW::LogicBoxes::Role::Command::Domain::Transfer/resend_transfer_approval_mail_by_id>
 
+=item L<|submit_auth_code|WWW::LogicBoxes::Role::Command::Domain::Transfer/submit_auth_code>
+
 =back
 
 =head2 L<Domain|WWW::LogicBoxes::Role::Command::Domain>
@@ -395,6 +397,8 @@ Special thanks to the following individuals who have offered commits, bug report
 =item David Foster
 
 =item Eris Caffee
+
+=item Boris Voskresenskiy
 
 =back
 

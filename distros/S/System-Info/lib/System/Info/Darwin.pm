@@ -5,7 +5,7 @@ use warnings;
 
 use base "System::Info::BSD";
 
-our $VERSION = "0.054";
+our $VERSION = "0.055";
 
 =head1 NAME
 
@@ -25,7 +25,7 @@ sub prepare_sysinfo {
 
     $self->{__os} .= " (Mac OS X)";
 
-    my $scl = __get_sysctl_list () || {};
+    my $scl = __get_sysctl ();
 
     my $system_profiler = __get_system_profiler () or
 	return $self->SUPER::prepare_sysinfo ();
@@ -51,18 +51,27 @@ sub prepare_sysinfo {
     $scl->{"machdep.cpu.core_count"} and
 	$self->{_ncore}  = $scl->{"machdep.cpu.core_count"};
 
-    chomp ($self->{__osvers} = `sw_vers -productVersion` || "");
+    my $osv = do {
+	local $^W = 0;
+	`sw_vers -productVersion 2>/dev/null`;
+	} || "";
+    chomp ($self->{__osvers} = $osv);
 
     $self->{__memsize} = $scl->{"hw.memsize"};
 
     return $self;
     } # prepare_sysinfo
 
-sub __get_sysctl_list {
-    chomp (my @sl = `sysctl -a 2>/dev/null`) or return;
-    my %h = map { split m/\s*[:=]\s*/, $_, 2 } grep m/[:=]/ => @sl;
-    \%h;
-    } # __get_sysctl_list
+# System::Info::BSD.pm only uses hw
+sub __get_sysctl {
+    my $sysctl_cmd = -x "/sbin/sysctl" ? "/sbin/sysctl" : "sysctl";
+    chomp (my @sysctl = do {
+	local $^W = 0;
+	`$sysctl_cmd -a 2>/dev/null`;
+	});
+    my %sysctl = map { split m/\s*[:=]\s*/, $_, 2 } grep m/[:=]/ => @sysctl;
+    return \%sysctl;
+    } # __get_sysctl
 
 sub __get_system_profiler {
     my $system_profiler_output = do {
@@ -100,9 +109,10 @@ sub __get_system_profiler {
 	}
 
     chomp ($system_profiler{"cpu type"} ||= `uname -m`);
-    $system_profiler{"cpu type"} ||= "Unknown";
-    $system_profiler{"cpu type"}   =~ s/PowerPC\s*(\w+).*/macppc$1/;
-    $system_profiler{"cpu speed"}  =~
+    $system_profiler{"cpu type"}  ||= "Unknown";
+    $system_profiler{"cpu type"}    =~ s/PowerPC\s*(\w+).*/macppc$1/;
+    $system_profiler{"cpu speed"} ||= 0; # Mac M1 does not show CPU speed
+    $system_profiler{"cpu speed"}   =~
 	s/(0(?:\.\d+)?)\s*GHz/sprintf "%d MHz", $1 * 1000/e;
 
     return \%system_profiler;
@@ -134,7 +144,7 @@ Mac::OSVersion
 
 =head1 COPYRIGHT AND LICENSE
 
-(c) 2016-2020, Abe Timmerman & H.Merijn Brand, All rights reserved.
+(c) 2016-2021, Abe Timmerman & H.Merijn Brand, All rights reserved.
 
 With contributions from Jarkko Hietaniemi, Campo Weijerman, Alan Burlison,
 Allen Smith, Alain Barbet, Dominic Dunlop, Rich Rauenzahn, David Cantrell.

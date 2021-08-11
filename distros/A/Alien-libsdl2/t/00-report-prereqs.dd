@@ -17,7 +17,6 @@ do { my $x = {
                         'requires' => {
                                         'Alien::Build' => '2.40',
                                         'Alien::Build::MM' => '2.40',
-                                        'Alien::Build::Plugin::Build::Copy' => '0',
                                         'Alien::Build::Plugin::Build::Make' => '2.40',
                                         'Alien::Build::Plugin::Probe::Vcpkg' => '2.40',
                                         'ExtUtils::MakeMaker' => '7.62'
@@ -47,11 +46,11 @@ do { my $x = {
                     },
        'test' => {
                    'recommends' => {
-                                     'CPAN::Meta' => '2.120900',
-                                     'FFI::Platypus' => '0'
+                                     'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '6.52',
+                                   'FFI::Platypus' => '0',
                                    'File::Spec' => '0',
                                    'Test2::Suite' => '0',
                                    'Test2::V0' => '0',

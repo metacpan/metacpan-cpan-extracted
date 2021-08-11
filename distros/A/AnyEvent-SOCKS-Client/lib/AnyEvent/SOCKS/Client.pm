@@ -4,7 +4,7 @@ AnyEvent::SOCKS::Client - AnyEvent-based SOCKS client!
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
@@ -59,7 +59,7 @@ use AnyEvent::Handle ;
 use AnyEvent::Log ;
 
 require Exporter;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our @ISA = qw/Exporter/;
 our @EXPORT_OK = qw/tcp_connect_via/;
 
@@ -114,7 +114,7 @@ sub connect{
 	my $that = $self->{chain}->[0] ;
 	return tcp_connect $that->{host}, $that->{port}, sub{
 		my $fh = shift ;
-		$c_cb->() unless($fh);
+		return $c_cb->() unless($fh);
 		$self->{hd} = new AnyEvent::Handle( fh => $fh ) ;
 		$self->{hd}->on_error(sub{
 			my ($hd, $fatal, $msg) = @_;

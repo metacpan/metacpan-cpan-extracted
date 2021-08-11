@@ -1,9 +1,9 @@
 use v5.10.0;
 use warnings;
 
-package JMAP::Tester::WebSocket;
+package JMAP::Tester::WebSocket 0.002;
 # ABSTRACT: a WebSocket JMAP client made for testing JMAP servers
-$JMAP::Tester::WebSocket::VERSION = '0.001';
+
 use Moo;
 use IO::Async::Loop;
 use Net::Async::WebSocket::Client 0.13;
@@ -105,6 +105,13 @@ sub request {
 
   $request = $request->{methodCalls}
     if $ENV{JMAP_TESTER_NO_WRAPPER} && _ARRAY0($input_request);
+
+  if ($self->_has_default_using && ! exists $request->{using}) {
+    $request->{using} = $self->default_using;
+  }
+
+  # Required by RFC 8887
+  $request->{'@type'} = 'Request';
 
   my $json = $self->json_encode($request);
 
@@ -210,7 +217,7 @@ JMAP::Tester::WebSocket - a WebSocket JMAP client made for testing JMAP servers
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

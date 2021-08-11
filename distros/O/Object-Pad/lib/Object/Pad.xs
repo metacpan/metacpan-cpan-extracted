@@ -630,7 +630,7 @@ static int build_has(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, 
       newSVOP_CUSTOM(PL_ppaddr[OP_CONST], 0, SvREFCNT_inc(slotmeta->defaultsv)));
   }
 
-  MOP_SLOT_RUN_HOOKS_NOARGS(slotmeta, seal_slot);
+  mop_slot_seal(slotmeta);
 
   return KEYWORD_PLUGIN_STMT;
 }
@@ -662,11 +662,13 @@ enum PhaserType {
   PHASER_NONE, /* A normal `method`; i.e. not a phaser */
   PHASER_BUILD,
   PHASER_ADJUST,
+  PHASER_ADJUSTPARAMS,
 };
 
 static const char *phasertypename[] = {
-  [PHASER_BUILD]  = "BUILD",
-  [PHASER_ADJUST] = "ADJUST",
+  [PHASER_BUILD]        = "BUILD",
+  [PHASER_ADJUST]       = "ADJUST",
+  [PHASER_ADJUSTPARAMS] = "ADJUSTPARAMS",
 };
 
 static bool parse_permit(pTHX_ void *hookdata)
@@ -697,6 +699,7 @@ static void parse_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, void *ho
 
     case PHASER_BUILD:
     case PHASER_ADJUST:
+    case PHASER_ADJUSTPARAMS:
       break;
   }
 
@@ -949,6 +952,10 @@ static void parse_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *hook
     case PHASER_ADJUST:
       mop_class_add_ADJUST(compclassmeta, ctx->cv); /* steal CV */
       break;
+
+    case PHASER_ADJUSTPARAMS:
+      mop_class_add_ADJUSTPARAMS(compclassmeta, ctx->cv); /* steal CV */
+      break;
   }
 
   /* Any phaser should parse as if it was a named method. By setting a junk
@@ -1119,6 +1126,7 @@ BOOT:
 
   register_xs_parse_keyword("BUILD", &kwhooks_phaser, (void *)PHASER_BUILD);
   register_xs_parse_keyword("ADJUST", &kwhooks_phaser, (void *)PHASER_ADJUST);
+  register_xs_parse_keyword("ADJUSTPARAMS", &kwhooks_phaser, (void *)PHASER_ADJUSTPARAMS);
 
   register_xs_parse_keyword("requires", &kwhooks_requires, NULL);
 

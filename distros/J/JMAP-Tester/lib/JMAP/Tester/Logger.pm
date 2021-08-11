@@ -1,5 +1,5 @@
-package JMAP::Tester::Logger;
-$JMAP::Tester::Logger::VERSION = '0.026';
+package JMAP::Tester::Logger 0.100;
+
 use Moo::Role;
 
 use JMAP::Tester::LogWriter;
@@ -70,7 +70,7 @@ JMAP::Tester::Logger
 
 =head1 VERSION
 
-version 0.026
+version 0.100
 
 =head1 AUTHOR
 

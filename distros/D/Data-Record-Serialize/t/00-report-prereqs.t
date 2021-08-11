@@ -60,7 +60,11 @@ sub _merge_prereqs {
 }
 
 my @include = qw(
-
+  JSON::PP
+  JSON::XS
+  Cpanel::JSON::XS
+  YAML::PP
+  YAML::XS
 );
 
 my @exclude = qw(

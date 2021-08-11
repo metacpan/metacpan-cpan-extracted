@@ -1,9 +1,9 @@
 use v5.10.0;
 use strict;
 
-package JMAP::Tester::Result::Logout;
+package JMAP::Tester::Result::Logout 0.100;
 # ABSTRACT: a successful logout
-$JMAP::Tester::Result::Logout::VERSION = '0.026';
+
 use Moo;
 with 'JMAP::Tester::Role::HTTPResult';
 
@@ -31,7 +31,7 @@ JMAP::Tester::Result::Logout - a successful logout
 
 =head1 VERSION
 
-version 0.026
+version 0.100
 
 =head1 OVERVIEW
 

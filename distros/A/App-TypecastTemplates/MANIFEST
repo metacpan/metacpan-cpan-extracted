@@ -1,0 +1,19 @@
+bin/create_cloginrc
+Build.PL
+Changes
+lib/App/TypecastTemplates.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+README
+t/00-load.t
+t/csv/escape.csv
+t/csv/fix.csv
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/script-create_loginrc.t
+t/template/escape.tmpl
+t/template/fix.tmpl
+xt/boilerplate.t

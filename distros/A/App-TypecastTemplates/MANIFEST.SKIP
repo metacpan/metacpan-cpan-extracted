@@ -1,0 +1,13 @@
+^App-TypecastTemplates-*
+.bak$
+^blib/*
+^_build/*
+^Build$
+^.git/*
+^Makefile$
+^MYMETA.yml$
+.pdf$
+.swp$
+^tmp$
+^TODO.otl$
+^MYMETA\.json$

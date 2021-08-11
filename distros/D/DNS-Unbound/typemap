@@ -1,21 +1,16 @@
 TYPEMAP
-dns_unbound_ub_ctx*  DNS_UNBOUND_T_PTROBJ
+DNS__Unbound__Context*  DNS_UNBOUND_T
 
 INPUT
-DNS_UNBOUND_T_PTROBJ
-	if (SvROK($arg) && sv_derived_from($arg, \"${ntype}\")) {
-	    IV tmp = SvIV((SV*)SvRV($arg));
-	    $var = INT2PTR($type,tmp);
+DNS_UNBOUND_T
+	if (SvROK($arg) && sv_derived_from($arg, \"${Package}\")) {
+	    $var = my_get_blessedstruct_ptr($arg);
 	}
 	else {
 		const char* refstr = SvROK($arg) ? \"\" : SvOK($arg) ? \"scalar \" : \"undef\";
 	    Perl_croak_nocontext(\"%s: Expected %s to be of type %s; got %s%\" SVf \" instead\",
 			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
-			\"$var\", \"$ntype\",
+			\"$var\", \"${Package}\",
 			refstr, $arg
 		);
 	}
-
-OUTPUT
-DNS_UNBOUND_T_PTROBJ
-	sv_setref_pv($arg, \"${ntype}\", (void*)$var);

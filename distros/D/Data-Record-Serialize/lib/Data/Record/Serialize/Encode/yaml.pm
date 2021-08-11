@@ -7,11 +7,32 @@ use Moo::Role;
 use Data::Record::Serialize::Error { errors => [ 'yaml_backend' ] }, -all;
 use Types::Standard qw[ Enum ];
 
-our $VERSION = '0.25';
-
-use JSON::PP;
+use JSON::PP; # needed for JSON::PP::true/false
 
 use namespace::clean;
+
+our $VERSION = '0.28';
+
+BEGIN {
+    my $YAML_XS_VERSION = 0.67;
+
+    if ( eval { require YAML::XS; YAML::XS->VERSION( $YAML_XS_VERSION ); 1; } )
+    {
+        *encode = sub {
+            local $YAML::XS::Boolean = 'JSON::PP';
+            YAML::XS::Dump( $_[1] );
+          }
+    }
+    elsif ( eval { require YAML::PP } ) {
+        my $processor = YAML::PP->new( boolean => 'JSON::PP' );
+        *encode = sub { $processor->dump_string( $_[1] ) };
+    }
+    else {
+        error( 'yaml_backend',
+            "can't find either YAML::XS (>= $YAML_XS_VERSION) or YAML::PP. Please install one of them"
+        );
+    }
+}
 
 has '+numify' => ( is => 'ro', default => 1 );
 has '+stringify' => ( is => 'ro', default => 1 );
@@ -32,50 +53,6 @@ sub to_bool { $_[1] ? JSON::PP::true : JSON::PP::false }
 
 
 
-
-has _backend => ( is => 'ro',
-                  init_arg => 'backend',
-                 isa => Enum[ 'YAML::XS', 'YAML::PP' ],
-                 builder => 1
-               );
-
-sub _build__backend {
-
-    if ( eval { require YAML::XS } ) {
-        'YAML::XS';
-    }
-    elsif ( eval { require YAML::PP } ) {
-
-        'YAML::PP'
-    }
-    else {
-        error( 'yaml_backend', "can't find either YAML::XS or YAML::PP. Please install one of them" );
-    }
-}
-
-
-has _encode => ( is => 'lazy',
-                 init_arg => undef,
-                 builder => 1
-               );
-
-sub _build__encode {
-    my $self = shift;
-
-    if ( $self->_backend eq 'YAML::PP' ) {
-        my $processor = YAML::PP->new( boolean => 'JSON::PP' );
-        sub { shift; $processor->dump_string( @_ ) };
-    }
-    elsif ( $self->_backend eq 'YAML::XS' ) {
-        sub { local $YAML::XS::Boolean = 'JSON::PP';
-              shift;
-              YAML::XS::Dump( @_ );
-          }
-    }
-}
-
-
-sub encode { shift->_encode->(@_) }
 
 with 'Data::Record::Serialize::Role::Encode';
 
@@ -103,7 +80,7 @@ Data::Record::Serialize::Encode::yaml - encode a record as YAML
 
 =head1 VERSION
 
-version 0.25
+version 0.28
 
 =head1 SYNOPSIS
 

@@ -70,5 +70,4 @@ t/81async-method+dynamically.t
 t/90leak.t
 t/92legacy-class-keywords.t
 t/95utf8.t
-t/99exported-symbols.t
 t/99pod.t

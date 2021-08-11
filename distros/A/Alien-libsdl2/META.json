@@ -42,7 +42,6 @@
          "requires" : {
             "Alien::Build" : "2.40",
             "Alien::Build::MM" : "2.40",
-            "Alien::Build::Plugin::Build::Copy" : "0",
             "Alien::Build::Plugin::Build::Make" : "2.40",
             "Alien::Build::Plugin::Probe::Vcpkg" : "2.40",
             "ExtUtils::MakeMaker" : "7.62"
@@ -72,11 +71,11 @@
       },
       "test" : {
          "recommends" : {
-            "CPAN::Meta" : "2.120900",
-            "FFI::Platypus" : "0"
+            "CPAN::Meta" : "2.120900"
          },
          "requires" : {
             "ExtUtils::MakeMaker" : "6.52",
+            "FFI::Platypus" : "0",
             "File::Spec" : "0",
             "Test2::Suite" : "0",
             "Test2::V0" : "0",
@@ -88,7 +87,7 @@
    "provides" : {
       "Alien::libsdl2" : {
          "file" : "lib/Alien/libsdl2.pm",
-         "version" : "1.03"
+         "version" : "1.06"
       }
    },
    "release_status" : "stable",
@@ -103,18 +102,24 @@
          "web" : "https://github.com/sanko/Alien-libsdl2"
       }
    },
-   "version" : "1.03",
+   "version" : "1.06",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {
          "share" : {
             "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",
             "Alien::gmake" : "0.11",
+            "Archive::Tar" : "0",
             "Config" : "0",
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
+            "IO::Zlib" : "0",
+            "Mojo::DOM" : "0",
+            "Mojolicious" : "7.00",
             "Net::SSLeay" : "1.49",
-            "URI" : "0"
+            "Sort::Versions" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
          },
          "system" : {}
       }

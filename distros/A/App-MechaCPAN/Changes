@@ -1,5 +1,15 @@
 Revision history for App-MechaCPAN
 
+0.27  2021-08-10 22:53:01 EDT
+  - Add the option to build and install relocatable binary perl archives
+  - Add the --jobs option and try to detect if make doesn't support it
+  - Correct an off-by-one error on the log's month
+  - Be more clear when Makefile.PL or Build.PL couldn't be found and avoid
+    dumping useless and/or binary data to the screen GH#15
+  - Add file/line directives to the built script to aid diagnosis and errors
+  - Improve tests to skip https requests when https is unavailable GH#14
+  - Improve error reporting and error contents
+
 0.26  2018-11-09 00:36:48 EST
   - Use the full form of File::Temp->new for older perls. GH#11
   - Consolidate use of CoreList so we can also check if a module is deprecated

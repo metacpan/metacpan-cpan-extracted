@@ -4,6 +4,9 @@ NAME
 
 SYNOPSIS
 
+    On perl version 5.26 onwards:
+
+       use v5.26;
        use Object::Pad;
     
        class Point {
@@ -11,6 +14,27 @@ SYNOPSIS
           has $y :param = 0;
     
           method move ($dX, $dY) {
+             $x += $dX;
+             $y += $dY;
+          }
+    
+          method describe () {
+             print "A point at ($x, $y)\n";
+          }
+       }
+    
+       Point->new(x => 5, y => 10)->describe;
+
+    Or, for older perls that lack signatures:
+
+       use Object::Pad;
+    
+       class Point {
+          has $x :param = 0;
+          has $y :param = 0;
+    
+          method move {
+             my ($dX, $dY) = @_;
              $x += $dX;
              $y += $dY;
           }
@@ -81,10 +105,21 @@ DESCRIPTION
 
   The ADJUST phase
 
-    Finally, before the new object is returned from the constructor, the
-    ADJUST block of every component class is invoked. This happens after
-    the slots are assigned their initial values and the BUILD blocks have
-    been run.
+    Next, the ADJUST and ADJUSTPARAMS block of every component class is
+    invoked. This happens after the slots are assigned their initial values
+    and the BUILD blocks have been run.
+
+    Note also that both ADJUST and ADJUSTPARAMS blocks happen at the same
+    time, in declaration order. The ADJUSTPARAMS blocks do not form their
+    own separate phase.
+
+  The strict-checking phase
+
+    Finally, before the object is returned, if the ":strict(params)" class
+    attribute is present, then the constructor will throw an exception if
+    there are any remaining named arguments left over after assigning them
+    to slots as per :param declarations, and running any ADJUSTPARAMS
+    blocks.
 
 KEYWORDS
 
@@ -220,7 +255,7 @@ KEYWORDS
     Can only be applied to classes that contain no BUILD blocks. If set,
     then the constructor will complain about any unrecognised named
     arguments passed to it (i.e. names that do not correspond to the :param
-    of any defined slot).
+    of any defined slot and left unconsumed by any ADJUSTPARAMS block).
 
     Since BUILD blocks can inspect the arguments arbitrarily, the presence
     of any such block means the constructor cannot determine which named
@@ -229,9 +264,7 @@ KEYWORDS
     This attribute is a temporary stepping-stone for compatibility with
     existing code. It is recommended to enable this whenever possible, as a
     later version of this module will likely perform this behaviour
-    unconditionally whenever no BUILD blocks are present. How to handle
-    other named arguments that are not simply assigned to slots remains an
-    unanswered design question.
+    unconditionally whenever no BUILD blocks are present.
 
  role
 
@@ -523,6 +556,32 @@ KEYWORDS
     An adjust block is not a subroutine and thus is not permitted to use
     subroutine attributes. Note that an ADJUST block is a named phaser
     block and not a method; it does not use the sub or method keyword.
+
+ ADJUSTPARAMS
+
+       ADJUSTPARAMS ( $params ) {    # on perl 5.26 onwards
+          ...
+       }
+    
+       ADJUSTPARAMS {
+          my $params = shift;
+          ...
+       }
+
+    Since version 0.51.
+
+    Declares an adjust block for this component class that receives the
+    parameters hash reference. This block of code runs within the
+    constructor at the same time as "ADJUST" blocks, but receives in
+    addition a reference to the hash containing the current constructor
+    parameters. This hash will not contain any constructor parameters
+    already consumed by ":param" declarations on any slots, but only the
+    leftovers once those are processed.
+
+    The code in the block should delete from this hash any parameters it
+    wishes to consume. Once all the ADJUSTPARAMS blocks have run, any
+    remaining keys in the hash will be considered errors, subject to the
+    ":strict(params)" check.
 
  requires
 

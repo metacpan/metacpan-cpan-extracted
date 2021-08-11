@@ -30,7 +30,7 @@ The following all return scalars:
 
 =back
 
-C<data()> returns an array reference of strings that contain the query
+C<data()> returns an array reference of byte strings that contain the query
 result in DNS-native RDATA encoding.
 
 =cut

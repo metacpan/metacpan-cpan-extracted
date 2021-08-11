@@ -31,7 +31,11 @@ like( App::MechaCPAN::humane_tmpname($type), qr/^$type_pattern$/, 'Humane name i
 }
 
 # Test temp downloads
+SKIP:
 {
+  skip 'Cannot use https', 6
+    if !App::MechaCPAN::can_https();
+
   my $where  = App::MechaCPAN::fetch_file($test_url);
   my $where2 = "$where";
 
@@ -46,7 +50,11 @@ like( App::MechaCPAN::humane_tmpname($type), qr/^$type_pattern$/, 'Humane name i
 }
 
 # Test relative directory downloads
+SKIP:
 {
+  skip 'Cannot use https', 5
+    if !App::MechaCPAN::can_https();
+
   my $where = App::MechaCPAN::fetch_file( $test_url => 'pkg/' );
   my $where2 = "$where";
 
@@ -61,7 +69,11 @@ like( App::MechaCPAN::humane_tmpname($type), qr/^$type_pattern$/, 'Humane name i
 }
 
 # Test relative file downloads
+SKIP:
 {
+  skip 'Cannot use https', 5
+    if !App::MechaCPAN::can_https();
+
   my $where = App::MechaCPAN::fetch_file( $test_url => "pkg/$test_filename" );
   my $where2 = "$where";
 
@@ -76,7 +88,11 @@ like( App::MechaCPAN::humane_tmpname($type), qr/^$type_pattern$/, 'Humane name i
 }
 
 # Test absolute file downloads
+SKIP:
 {
+  skip 'Cannot use https', 5
+    if !App::MechaCPAN::can_https();
+
   my $where = App::MechaCPAN::fetch_file( $test_url => "$tmpdir/local/pkg/$test_filename" );
   my $where2 = "$where";
 
@@ -91,7 +107,11 @@ like( App::MechaCPAN::humane_tmpname($type), qr/^$type_pattern$/, 'Humane name i
 }
 
 # Test slurp downloads
+SKIP:
 {
+  skip 'Cannot use https', 8
+    if !App::MechaCPAN::can_https();
+
   my $slurp  = '';
   my $url    = 'http://www.cpan.org/src/5.0/perl-5.12.5.tar.gz.md5.txt';
   my $where  = App::MechaCPAN::fetch_file( $url => \$slurp );
@@ -111,7 +131,11 @@ like( App::MechaCPAN::humane_tmpname($type), qr/^$type_pattern$/, 'Humane name i
 }
 
 # Test slurp simple
+SKIP:
 {
+  skip 'Cannot use https', 3
+    if !App::MechaCPAN::can_https();
+
   is_deeply( [ glob("$tmpdir/local/tmp/*") ], [], 'No files in tmp directory before slurp' );
   my $slurp = '';
   my $url   = 'http://www.cpan.org/src/5.0/perl-5.12.5.tar.gz.md5.txt';

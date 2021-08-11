@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Pod/Weaver/PluginBundle/Author/PERLANCAR.pm'];
+my $filenames = ['lib/Pod/Weaver/PluginBundle/Author/PERLANCAR.pm','lib/Pod/Weaver/Section/PERLANCAR/Contributing.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

@@ -41,8 +41,6 @@ use parent (
     'DNS::Unbound::FDFHStorer',
 );
 
-use Scalar::Util ();
-
 use IO::Async::Handle ();
 
 my %INSTANCE_LOOP;
@@ -57,12 +55,9 @@ sub new {
 
     $INSTANCE_LOOP{$self} = $loop;
 
-    my $weak_self = $self;
-    Scalar::Util::weaken($weak_self);
-
     my $handle = IO::Async::Handle->new(
         read_handle => $self->_get_fh(),
-        on_read_ready => sub { $weak_self->process() },
+        on_read_ready => $self->_create_process_cr(),
     );
     $INSTANCE_HANDLE{$self} = $handle;
 

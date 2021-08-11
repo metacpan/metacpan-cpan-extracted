@@ -6,7 +6,7 @@ use Moo::Role;
 
 use namespace::clean;
 
-our $VERSION = '0.25';
+our $VERSION = '0.28';
 
 
 
@@ -46,7 +46,7 @@ Data::Record::Serialize::Sink::null - send output to nowhere.
 
 =head1 VERSION
 
-version 0.25
+version 0.28
 
 =head1 SYNOPSIS
 

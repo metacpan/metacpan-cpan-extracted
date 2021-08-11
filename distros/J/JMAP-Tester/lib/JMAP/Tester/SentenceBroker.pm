@@ -1,12 +1,19 @@
 use v5.10.0;
-package JMAP::Tester::SentenceBroker;
-$JMAP::Tester::SentenceBroker::VERSION = '0.026';
+package JMAP::Tester::SentenceBroker 0.100;
+
 use Moo;
 with 'JMAP::Tester::Role::SentenceBroker';
 
-use JMAP::Tester::Abort 'abort';
+use Data::OptList ();
+use JMAP::Tester::Abort;
 use JMAP::Tester::Response::Sentence;
 use JMAP::Tester::Response::Paragraph;
+
+has response => (
+  is => 'ro',
+  weak_ref => 1,
+  required => 1,
+);
 
 sub client_ids_for_items {
   map {; $_->[2] } @{ $_[1] }
@@ -32,7 +39,42 @@ sub paragraph_for_items {
   });
 }
 
-sub abort_callback { \&abort }
+sub abort {
+  my ($self, $string, $diag_spec) = @_;
+
+  $diag_spec //= [ 'Response sentences', sub { [ $_[0]->items ] } ];
+
+  my @diagnostics;
+
+  if ($diag_spec) {
+    my $todo = Data::OptList::mkopt($diag_spec);
+
+    PAIR: for my $pair (@$todo) {
+      my ($label, $value) = @$pair;
+
+      if (not defined $value) {
+        push @diagnostics, "$label\n";
+        next PAIR;
+      }
+
+      if (ref $value) {
+        if (ref $value eq 'CODE') {
+          $value = $value->($self->response);
+        }
+
+        $value = $self->response->dump_diagnostic($value);
+      }
+
+      push @diagnostics, "$label: $value";
+      $diagnostics[-1] .= "\n" unless $value =~ /\n\z/;
+    }
+  }
+
+  die JMAP::Tester::Abort->new({
+    message => $string,
+    (@diagnostics ? (diagnostics => \@diagnostics) : ()),
+  });
+}
 
 sub strip_json_types {
   state $typist = JSON::Typist->new;
@@ -54,7 +96,7 @@ JMAP::Tester::SentenceBroker
 
 =head1 VERSION
 
-version 0.026
+version 0.100
 
 =head1 AUTHOR
 

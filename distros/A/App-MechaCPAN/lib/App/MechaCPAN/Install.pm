@@ -173,6 +173,7 @@ TARGET:
           "Could not install " . _name_target($target)
         );
 
+        logmsg( $target->{key}, $err );
         error( $target->{key}, $line );
 
         _failed($target);
@@ -235,12 +236,6 @@ sub _resolve
 
   my $src_dir = inflate_archive($src_tgz);
 
-  my @files = glob( $src_dir . '/*' );
-  if ( @files == 1 )
-  {
-    $src_dir = $files[0];
-  }
-
   @{$target}{qw/src_tgz dir was_installed/} = ( $src_tgz, $src_dir, 0 );
   return $target;
 }
@@ -302,8 +297,12 @@ sub _configure
     $maker = 'mm';
   }
 
-  croak 'Unable to configure ' . $target->{src_name}
-    if !defined $maker;
+  if ( !defined $maker )
+  {
+    croak 'Unable to configure '
+      . $target->{src_name}
+      . ' (Could not locate either Makefile.PL or Build.PL)';
+  }
 
   $target->{maker} = $maker;
   return $target;

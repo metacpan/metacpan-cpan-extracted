@@ -1,5 +1,6 @@
 CHANGES
-demo.pl
+examples/demo.pl
+examples/pause-until-close.pl
 lib/PDL/Graphics/Gnuplot.pm
 LICENSE
 Makefile.PL
@@ -7,5 +8,6 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README.pod
 t/plot.t
+t/pdfcairo-output.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

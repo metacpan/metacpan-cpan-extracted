@@ -66,8 +66,10 @@ is( keys %{ $r->keys('*') }, 0, "Make sure database is empty after removal" );
 untie %session;
 
 # Create a bunch of sessions to search on
-my %session1, %session2, %session3, %session4, %session5;
-my $id1,      $id2,      $id3,      $id4,      $id5;
+my (
+    %session1, %session2, %session3, %session4, %session5,
+    $id1,      $id2,      $id3,      $id4,      $id5
+);
 
 tie %session1, 'Apache::Session::Browseable::Redis', undef, $args;
 $session1{uid}   = 'obiwan';

@@ -55,7 +55,15 @@ for my $use_threads_yn ( 0, 1 ) {
             $dns->resolve_async( $_, 'NS' )->then(
                 sub { diag explain [ passed => @_ ] },
                 sub { diag explain [ failed => @_ ] },
-            )->then( sub { $done_count++ } );
+            )->then( sub {
+                $done_count++;
+
+                is(
+                    $dns->count_pending_queries(),
+                    @tlds - $done_count,
+                    "count_pending_queries() ($done_count finished)",
+                );
+            } );
         } @tlds;
 
         $dns->wait() while $done_count < @tlds;

@@ -1,7 +1,7 @@
 package Perl::Examples::Accessors::ClassTiny;
 
-our $DATE = '2017-10-15'; # DATE
-our $VERSION = '0.131'; # VERSION
+our $DATE = '2021-08-03'; # DATE
+our $VERSION = '0.132'; # VERSION
 
 use Class::Tiny qw(attr1);
 
@@ -20,7 +20,7 @@ Perl::Examples::Accessors::ClassTiny
 
 =head1 VERSION
 
-This document describes version 0.131 of Perl::Examples::Accessors::ClassTiny (from Perl distribution Perl-Examples-Accessors), released on 2017-10-15.
+This document describes version 0.132 of Perl::Examples::Accessors::ClassTiny (from Perl distribution Perl-Examples-Accessors), released on 2021-08-03.
 
 =head1 DESCRIPTION
 
@@ -58,7 +58,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,3 +1,25 @@
-0.001   2018-04-29 (PERLANCAR)
+0.004   2021-03-15  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with updated
+          Pod::Weaver::PluginBundle::Author::PERLANCAR to generate Contributing
+          POD section.
+
+
+0.003   2021-03-15  Released-By: PERLANCAR; Urgency: medium
+
+	- Add entry: App::AsciiChart.
+
+	- [doc] Mention some other Acme::CPANModules::PortedFrom::*
+	  modules.
+
+
+0.002   2021-03-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Add entry: App::envset.
+
+
+0.001   2018-04-29  Released-By: PERLANCAR
 
         - First release.

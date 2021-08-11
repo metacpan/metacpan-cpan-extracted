@@ -1,5 +1,18 @@
 Revision history for Perl extension Getopt-EX-Hashed
 
+0.9911 2021-08-11T15:34:09Z
+
+    - Fix bug when called by Getopt::EX::Hashed->new interface.
+
+0.9910 2021-08-11T13:14:30Z
+
+    - Make config data to be stored in caller space too.
+
+0.9909 2021-08-09T23:59:42Z
+
+    - Store member metadata in caller space so that the module can
+      be used in multiple places.
+
 0.9908 2021-08-09T02:51:02Z
 
     - Now 'is' parameter is required to generate accessor method.

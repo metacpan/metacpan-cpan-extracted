@@ -1,7 +1,9 @@
 package File::Flock::Retry;
 
-our $DATE = '2019-03-12'; # DATE
-our $VERSION = '0.631'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-08-10'; # DATE
+our $DIST = 'File-Flock-Retry'; # DIST
+our $VERSION = '0.632'; # VERSION
 
 use 5.010001;
 use strict;
@@ -72,7 +74,7 @@ sub _lock {
             sleep 1;
         }
     }
-    $self->{_created} = !$existed;
+    $self->{_acquired} = 1;
     1;
 }
 
@@ -85,7 +87,7 @@ sub _unlock {
     # don't unlock if we are not holding the lock
     return 0 unless $self->{_fh};
 
-    unlink $self->{path} if $self->{_created} && !(-s $self->{path});
+    unlink $self->{path} if $self->{_acquired} && !(-s $self->{path});
 
     {
         # to shut up warning about flock on closed filehandle (XXX but why
@@ -133,7 +135,7 @@ File::Flock::Retry - Yet another flock module
 
 =head1 VERSION
 
-This document describes version 0.631 of File::Flock::Retry (from Perl distribution File-Flock-Retry), released on 2019-03-12.
+This document describes version 0.632 of File::Flock::Retry (from Perl distribution File-Flock-Retry), released on 2021-08-10.
 
 =head1 SYNOPSIS
 
@@ -165,10 +167,6 @@ I prefer this approach to blocking/waiting indefinitely or failing immediately.
 
 =for Pod::Coverage ^(DESTROY)$
 
-=head1 CAVEATS
-
-Not yet tested on Windows. Some filesystems do not support inode?
-
 =head1 METHODS
 
 =head2 lock
@@ -183,8 +181,7 @@ another process, will retry every second for a number of seconds (by default
 60). Will die if failed to acquire lock after all retries.
 
 Will automatically unlock if C<$lock> goes out of scope. Upon unlock, will
-remove C<$path> if it was created by L</lock> and is still empty (this behavior
-is the same as C<File::Flock>).
+remove C<$path> if it is still empty (zero-sized).
 
 Available options:
 
@@ -220,8 +217,7 @@ Usage:
 
  $lock->unlock
 
-Unlock. will remove lock file if it was created by L</lock> and is still empty
-(this behavior is the same as C<File::Flock>).
+Unlock. will remove lock file if it is still empty.
 
 =head2 release
 
@@ -255,6 +251,10 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 CAVEATS
+
+Not yet tested on Windows. Some filesystems do not support inode?
+
 =head1 SEE ALSO
 
 L<File::Flock>, a bit too heavy in terms of dependencies and startup overhead,
@@ -278,7 +278,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2017, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

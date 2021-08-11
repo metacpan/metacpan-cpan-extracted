@@ -82,6 +82,7 @@ if ($post_diag) {
     spacer;
     $post_diag->();
 }
+spacer;
 
 spacer;
 

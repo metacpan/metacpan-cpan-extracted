@@ -6,7 +6,7 @@
 # podDocumentation
 package Tree::Term;
 use v5.26;
-our $VERSION = 20210727;                                                        # Version
+our $VERSION = 20210810;                                                        # Version
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess cluck);
@@ -25,6 +25,8 @@ our %last;                                                                      
 
 sub new($)                                                                      #P Create a new term from the indicated number of items on top of the stack
  {my ($count) = @_;                                                             # Number of terms
+
+  @$stack >= $count or confess "Stack underflow";
 
   my ($operator, @operands) = splice  @$stack, -$count;                         # Remove lexical items from stack
 
@@ -245,11 +247,12 @@ sub reduce($)                                                                   
        }
      }
 
-    if     (test_b($l))                                                         # Parse parenthesized term
+    if     (test_b($l))                                                         # Parse parenthesized term keeping the opening parenthesis
      {if   (test_B($r))
        {if (test_t($d))
          {pop  @$stack for 1..3;
-          push @$stack, $d;
+          push @$stack, "$l$r", $d;
+          new 2;
           return 1;
          }
        }
@@ -261,7 +264,7 @@ sub reduce($)                                                                   
     if   (test_b($l))                                                           # Empty pair of parentheses
      {if (test_B($r))
        {pop  @$stack for 1..2;
-        push @$stack, 'empty1';
+        push @$stack, "$l$r";
         new 1;
         return 1;
        }
@@ -336,7 +339,7 @@ sub accept_q()                                                                  
 sub accept_s()                                                                  #P Semi colon
  {check_bst;
   if (!test_t($$stack[-1]))                                                     # Insert an empty element between two consecutive semicolons
-   {push @$stack, 'empty2';
+   {push @$stack, 'empty1';
     new 1;
    }
   1 while reduce1;
@@ -376,7 +379,7 @@ END
      }
     else
      {if (test_s($e))                                                           # Semi
-       {push @$stack, 'empty3';
+       {push @$stack, 'empty2';
         new 1;
        }
       push @$stack, $e;
@@ -721,10 +724,10 @@ B<Example:>
 
   ok T [qw(v1 a2 v3 s s s  v4 a5 v6 s s)], <<END;
                                          s
-                              s            empty2
+                              s            empty1
                      s             a5
-            s          empty2   v4    v6
-      a2      empty2
+            s          empty1   v4    v6
+      a2      empty1
    v1    v3
   END
 
@@ -801,12 +804,12 @@ B<Example:>
   END
 
   ok T [qw(b s B)], <<END;
-   empty2
+   empty1
   END
 
   ok T [qw(b s s B)], <<END;
           s
-   empty2   empty2
+   empty1   empty1
   END
 
 
@@ -908,23 +911,23 @@ B<Example:>
 
   ok T [qw(v1 s s)], <<END;
       s
-   v1   empty2
+   v1   empty1
   END
 
   ok T [qw(v1 s b s B)], <<END;
       s
-   v1   empty2
+   v1   empty1
   END
 
   ok T [qw(v1 s b b s s B B)], <<END;
       s
    v1          s
-        empty2   empty2
+        empty1   empty1
   END
 
   ok T [qw(b v1 s B s s)], <<END;
       s
-   v1   empty2
+   v1   empty1
   END
 
   ok T [qw(v1 a b1 b2 v2 B2 B1 s)], <<END;
@@ -975,7 +978,7 @@ B<Example:>
 
   ok T [qw(s1 p1 v1)], <<END;
           s1
-   empty3    p1
+   empty2    p1
              v1
   END
 
@@ -1456,7 +1459,7 @@ test unless caller;
 
 1;
 # podDocumentation
-__DATA__
+#__DATA__
 use Time::HiRes qw(time);
 use Test::More;
 
@@ -1507,12 +1510,12 @@ ok T [qw(v1)], <<END;
 END
 
 ok T [qw(s)], <<END;
- empty3
+ empty2
 END
 
 ok T [qw(s s)], <<END;
         s
- empty3   empty2
+ empty2   empty1
 END
 
 ok T [qw(v1 d2 v3)], <<END;
@@ -1545,31 +1548,38 @@ END
 
 ok T [qw(v1 a2 v3 s s s  v4 a5 v6 s s)], <<END;
                                        s
-                            s            empty2
+                            s            empty1
                    s             a5
-          s          empty2   v4    v6
-    a2      empty2
+          s          empty1   v4    v6
+    a2      empty1
  v1    v3
 END
 
 ok T [qw(b B)], <<END;
- empty1
+ bB
 END
 
 ok T [qw(b b B B)], <<END;
- empty1
+    bB
+ bB
 END
 
 ok T [qw(b b v1 B B)], <<END;
+    bB
+ bB
  v1
 END
 
 ok T [qw(b b v1 a2 v3 B B)], <<END;
+          bB
+       bB
     a2
  v1    v3
 END
 
 ok T [qw(b b v1 a2 v3 d4 v5 B B)], <<END;
+                bB
+             bB
     a2
  v1       d4
        v3    v5
@@ -1625,12 +1635,14 @@ ok T [qw(p2 p1 v1 q1 q2 d3 p4 p3 v2 q3 q4  d4 p6 p5 v3 q5 q6 s)], <<END;
 END
 
 ok T [qw(b s B)], <<END;
- empty2
+        bB
+ empty1
 END
 
 ok T [qw(b s s B)], <<END;
+                 bB
         s
- empty2   empty2
+ empty1   empty1
 END
 
 
@@ -1638,8 +1650,10 @@ if (1) {
 
  my @e = qw(b b p2 p1 v1 q1 q2 B d3 b p4 p3 v2 q3 q4 d4 p6 p5 v3 q5 q6 B s B s);
 
- is_deeply parse(@e)->flat, <<END;
+ ok T [@e], <<END;
+                bB
     d3
+ bB          bB
  q2       d4
  q1    q4    q6
  p2    q3    q5
@@ -1651,6 +1665,8 @@ END
 }
 
 ok T [qw(b b v1 B s B s)], <<END;
+    bB
+ bB
  v1
 END
 
@@ -1660,18 +1676,21 @@ ok T [qw(v1 q1 s)], <<END;
 END
 
 ok T [qw(b b v1 q1 q2 B q3 q4 s B q5 q6  s)], <<END;
- q6
- q5
- q4
- q3
+       q6
+       q5
+    bB
+    q4
+    q3
+ bB
  q2
  q1
  v1
 END
 
 ok T [qw(p1 p2 b v1 B)], <<END;
- p1
- p2
+    p1
+    p2
+ bB
  v1
 END
 
@@ -1683,14 +1702,16 @@ ok T [qw(v1 d1 p1 p2 v2)], <<END;
 END
 
 ok T [qw(p1 p2 b p3 p4 b p5 p6 v1 d1 v2 q1 q2 B q3 q4 s B q5 q6  s)], <<END;
-       q6
-       q5
-       p1
-       p2
-       q4
-       q3
-       p3
-       p4
+             q6
+             q5
+             p1
+             p2
+          bB
+          q4
+          q3
+          p3
+          p4
+       bB
     d1
  p5    q2
  p6    q1
@@ -1698,14 +1719,16 @@ ok T [qw(p1 p2 b p3 p4 b p5 p6 v1 d1 v2 q1 q2 B q3 q4 s B q5 q6  s)], <<END;
 END
 
 ok T [qw(p1 p2 b p3 p4 b p5 p6 v1 a1 v2 q1 q2 B q3 q4 s B q5 q6  s)], <<END;
-       q6
-       q5
-       p1
-       p2
-       q4
-       q3
-       p3
-       p4
+             q6
+             q5
+             p1
+             p2
+          bB
+          q4
+          q3
+          p3
+          p4
+       bB
     a1
  p5    q2
  p6    q1
@@ -1714,13 +1737,15 @@ END
 
 ok T [qw(b v1 B d1 b v2 B)], <<END;
     d1
+ bB    bB
  v1    v2
 END
 
 ok T [qw(b v1 B q1 q2 d1 b v2 B)], <<END;
-    d1
- q2    v2
- q1
+       d1
+    q2    bB
+    q1    v2
+ bB
  v1
 END
 
@@ -1730,34 +1755,42 @@ END
 
 ok T [qw(v1 s s)], <<END;
     s
- v1   empty2
+ v1   empty1
 END
 
 ok T [qw(v1 s b s B)], <<END;
     s
- v1   empty2
+ v1          bB
+      empty1
 END
 
 ok T [qw(v1 s b b s s B B)], <<END;
     s
- v1          s
-      empty2   empty2
+ v1                      bB
+                      bB
+             s
+      empty1   empty1
 END
 
 ok T [qw(b v1 s B s s)], <<END;
     s
- v1   empty2
+ bB   empty1
+ v1
 END
 
 ok T [qw(v1 a b1 b2 v2 B2 B1 s)], <<END;
     a
- v1   v2
+ v1        b1B1
+      b2B2
+      v2
 END
 
 ok T [qw(v1 a1 b1 v2 a2 b2 v3 B2 B1 s)], <<END;
     a1
- v1       a2
-       v2    v3
+ v1               b1B1
+          a2
+       v2    b2B2
+             v3
 END
 
 ok T [qw(v1 a1 p1 v2)], <<END;
@@ -1767,26 +1800,30 @@ ok T [qw(v1 a1 p1 v2)], <<END;
 END
 
 ok T [qw(b1 v1 q1 q2 B1)], <<END;
+ b1B1
  q2
  q1
  v1
 END
 
 ok T [qw(b1 v1 q1 q2 s B1)], <<END;
+ b1B1
  q2
  q1
  v1
 END
 
 ok T [qw(p1 b1 v1 B1 q1)], <<END;
- q1
- p1
+      q1
+      p1
+ b1B1
  v1
 END
 
 ok T [qw(b1 v1 B1 a1 v2)], <<END;
-    a1
- v1    v2
+      a1
+ b1B1    v2
+ v1
 END
 
 ok T [qw(v1 q1 a1 v2)], <<END;
@@ -1797,7 +1834,7 @@ END
 
 ok T [qw(s1 p1 v1)], <<END;
         s1
- empty3    p1
+ empty2    p1
            v1
 END
 
@@ -2053,7 +2090,8 @@ ok T [qw(v_sub a_is v_array as v1 d_== v2 a_then v3 d_plus v4 a_else v5 d_== v6 
                  v1    v2         plus                  then
                                v3      v4         ==                     else
                                                v5    v6         minus            times
-                                                             v7       v8      v9           +
+                                                             v7       v8      v9             bB
+                                                                                           +
                                                                                        v10   v11
 END
 }

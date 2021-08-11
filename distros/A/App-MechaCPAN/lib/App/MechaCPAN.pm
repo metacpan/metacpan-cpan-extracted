@@ -24,16 +24,18 @@ BEGIN
   our @EXPORT_OK = qw/
     url_re git_re git_extract_re
     has_git has_updated_git min_git_ver
+    can_https
     logmsg info success error
     dest_dir get_project_dir
     fetch_file inflate_archive
     humane_tmpname humane_tmpfile humane_tmpdir
     run restart_script
+    rel_start_to_abs
     /;
   our %EXPORT_TAGS = ( go => [@EXPORT_OK] );
 }
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 require App::MechaCPAN::Perl;
 require App::MechaCPAN::Install;
@@ -221,6 +223,35 @@ sub has_git
   return _git_str && has_updated_git;
 }
 
+sub can_https
+{
+  state $can_https;
+
+  # track the blacklist for testing
+  state $ff_blacklist;
+  undef $can_https
+    if $File::Fetch::BLACKLIST ne $ff_blacklist;
+
+  if ( !defined $can_https )
+  {
+    my $test_url = 'https://www.cpan.org/';
+    my $test_str = '';
+
+    local $File::Fetch::WARN;
+    local $@;
+
+    my $ff = File::Fetch->new( uri => $test_url );
+    return 0
+      if !defined $ff;
+
+    $ff->scheme('http');
+    $can_https = defined $ff->fetch( to => \$test_str );
+    $ff_blacklist = $File::Fetch::BLACKLIST;
+  }
+
+  return $can_https;
+}
+
 sub url_re
 {
   state $url_re = qr[
@@ -268,7 +299,8 @@ sub humane_tmpname
   my $now       = sprintf(
     "%04d%02d%02d_%02d%02d%02d",
     $localtime[5] + 1900,
-    @localtime[ 4, 3, 2, 1, 0 ]
+    $localtime[4] + 1,
+    @localtime[ 3, 2, 1, 0 ]
   );
 
   return "mecha_$descr.$now.XXXX";
@@ -315,9 +347,11 @@ sub _setup_log
   mkdir $log_dir
     unless -d $log_dir;
 
+  my $proj_dir = &_get_project_dir;
   my $template = File::Spec->catdir( $log_dir, humane_tmpname('log') );
   my $log_path;
   ( $LOGFH, $log_path ) = tempfile( $template, UNLINK => 0 );
+  $log_path =~ s[^\Q$proj_dir\E/?][];
   info("logging to '$log_path'...\n");
 }
 
@@ -391,8 +425,13 @@ sub _show_line
   my $color = shift;
   my $line  = shift;
 
-  # Clean up the line
-  $line =~ s/\n/ /xmsg;
+  # If the color starts with red, it's an error and we should not touch it,
+  # otherwise, we should clean up the line
+  state $ERR_COLOR = Term::ANSIColor::color('RED');
+  if ( $color !~ m/^\Q$ERR_COLOR/ )
+  {
+    $line =~ s/\n/ /xmsg;
+  }
 
   state @key_lines;
 
@@ -636,7 +675,10 @@ my @inflate = (
     return
       unless $tar;
 
-    my $unzip = $src =~ m/gz$/ ? 'gzip' : $src =~ m/bz2/ ? 'bzip2' : 'xz';
+    my $unzip
+      = $src =~ m/gz$/          ? 'gzip'
+      : $src =~ m/(bz2|bzip2)$/ ? 'bzip2'
+      :                           'xz';
 
     run("$unzip -dc $src | tar xf -");
     return 1;
@@ -664,7 +706,7 @@ sub inflate_archive
   my $dir = shift;
 
   # $src can be a file path or a URL.
-  if ( !-e $src )
+  if ( !-e "$src" )
   {
     $src = fetch_file($src);
   }
@@ -708,7 +750,14 @@ sub inflate_archive
 
   if ( !$is_complete )
   {
-    carp "Could not unpack archive: $src\n";
+    croak "Could not unpack archive: $src\n";
+  }
+
+  # If there's only 1 file and it's a directory, go ahead and chdir into it
+  my @files = glob("$dir/*");
+  if ( @files == 1 && -d $files[0] )
+  {
+    $dir = $files[0];
   }
 
   return $dir;
@@ -745,8 +794,11 @@ sub run
   my $cmd  = shift;
   my @args = @_;
 
+  my $max_lines = 15;
   my $out = "";
   my $err = "";
+  my @err_tail;
+  my @out_tail;
 
   my $dest_out_fh  = $LOGFH;
   my $dest_err_fh  = $LOGFH;
@@ -757,6 +809,7 @@ sub run
   {
     $dest_out_fh = $cmd;
     $cmd         = shift @args;
+    undef $print_output;
   }
 
   # If the output is asked for (non-void context), don't show it anywhere
@@ -816,16 +869,26 @@ sub run
         {
           print $dest_out_fh $line
             if defined $dest_out_fh;
-          $out .= $line
-            unless $wantoutput;
+          if ( !$wantoutput )
+          {
+            $out .= $line;
+            unshift @out_tail, $line;
+            $#out_tail = $max_lines
+              if $#out_tail > $max_lines;
+          }
         }
 
         if ( $fh eq $error )
         {
           print $dest_err_fh $line
             if defined $dest_err_fh;
-          $err .= $line
-            unless $wantoutput;
+          if ( !$wantoutput )
+          {
+            $err .= $line;
+            unshift @err_tail, $line;
+            $#err_tail = $max_lines
+              if $#err_tail > $max_lines;
+          }
         }
 
       }
@@ -846,8 +909,19 @@ sub run
   if ($?)
   {
     my $code = qq/Exit Code: / . ( $? >> 8 );
-    my $sig = ( $? & 127 ) ? qq/Signal: / . ( $? & 127 ) : '';
-    my $core = $? & 128 ? 'Core Dumped' : '';
+    my $sig  = ( $? & 127 ) ? qq/Signal: / . ( $? & 127 ) : '';
+    my $core = $? & 128     ? 'Core Dumped'               : '';
+
+    # There could be a lot of output, ignore all but the very end
+    @out_tail[-1] = "...SKIPPED\n"
+      if scalar @out_tail > $max_lines;
+    my $out_tail = join( '', reverse @out_tail );
+    chomp $out_tail;
+
+    @err_tail[-1] = "...SKIPPED\n"
+      if scalar @err_tail > $max_lines;
+    my $err_tail = join( '', reverse @err_tail );
+    chomp $err_tail;
 
     croak ""
       . Term::ANSIColor::color('RED')
@@ -858,9 +932,9 @@ sub run
       . qq/\t$sig/
       . qq/\t$core/
       . Term::ANSIColor::color('GREEN')
-      . qq/\n$out/
+      . qq/\n$out_tail/
       . Term::ANSIColor::color('YELLOW')
-      . qq/\n$err/
+      . qq/\n$err_tail/
       . Term::ANSIColor::color('RESET') . "\n";
   }
 
@@ -886,7 +960,7 @@ sub _inc_pkg
 my $starting_cwd;
 BEGIN { $starting_cwd = cwd }
 
-sub _mk_starting_abs
+sub rel_start_to_abs
 {
   my $f = shift;
 
@@ -926,10 +1000,10 @@ sub self_install
     foreach my $lib (@INC)
     {
       my $mecha_file
-        = _mk_starting_abs( File::Spec->catdir( $lib, $inc_name ) );
+        = rel_start_to_abs( File::Spec->catdir( $lib, $inc_name ) );
       if ( -e $mecha_file )
       {
-        $mecha_path = _mk_starting_abs $lib;
+        $mecha_path = rel_start_to_abs $lib;
         last;
       }
     }
@@ -992,7 +1066,7 @@ sub restart_script
   return
     if $local_perl eq $this_perl;
 
-  my $real0 = _mk_starting_abs $0;
+  my $real0 = rel_start_to_abs $0;
 
   if ( !-e -r $real0 )
   {

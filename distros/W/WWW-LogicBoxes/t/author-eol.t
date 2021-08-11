@@ -9,7 +9,7 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.18
+# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.19
 
 use Test::More 0.88;
 use Test::EOL;
@@ -44,10 +44,13 @@ my @files = (
     'lib/WWW/LogicBoxes/Types.pm',
     't/00-compile.t',
     't/author-critic.t',
+    't/author-distmeta.t',
     't/author-eol.t',
+    't/author-minimum-version.t',
     't/author-mojibake.t',
     't/author-no-tabs.t',
     't/author-pod-coverage.t',
+    't/author-pod-linkcheck.t',
     't/author-pod-syntax.t',
     't/author-portability.t',
     't/author-test-version.t',
@@ -82,11 +85,8 @@ my @files = (
     't/privatenameserver/00-object.t',
     't/release-cpan-changes.t',
     't/release-dist-manifest.t',
-    't/release-distmeta.t',
     't/release-kwalitee.t',
     't/release-meta-json.t',
-    't/release-minimum-version.t',
-    't/release-pod-linkcheck.t',
     't/release-unused-vars.t',
     't/role/command/00-object.t',
     't/role/command/contact/00-object.t',
@@ -130,6 +130,7 @@ my @files = (
     't/role/command/domain/transfer/02-transfer_domain.t',
     't/role/command/domain/transfer/03-cancel_transfer.t',
     't/role/command/domain/transfer/04-resend_transfer_approval_mail.t',
+    't/role/command/domain/transfer/05-submit_auth_code.t',
     't/role/command/raw/00-object.t'
 );
 

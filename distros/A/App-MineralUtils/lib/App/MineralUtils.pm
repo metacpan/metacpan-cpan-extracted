@@ -1,9 +1,9 @@
 package App::MineralUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-08'; # DATE
+our $DATE = '2021-08-11'; # DATE
 our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -49,6 +49,7 @@ sub convert_magnesium_unit {
         ['mg-magnesium-elemental'], '1 mg',
         ['mg-magnesium-citrate'], '0.1123 mg-magnesium-elemental',
         ['mg-magnesium-glycinate'], '0.141 mg-magnesium-elemental',
+        ['mg-magnesium-bisglycinate'], '0.141 mg-magnesium-elemental',
         ['mg-magnesium-l-threonate'], '0.072 mg-magnesium-elemental',
         ['mg-magnesium-oxide'], '0.603 mg-magnesium-elemental',
     );
@@ -67,6 +68,7 @@ sub convert_magnesium_unit {
             'mg-magnesium-elemental',
             'mg-magnesium-citrate',
             'mg-magnesium-glycinate',
+            'mg-magnesium-bisglycinate',
             'mg-magnesium-l-threonate',
             'mg-magnesium-oxide',
         ) {
@@ -94,7 +96,7 @@ App::MineralUtils - Utilities related to minerals (and mineral supplements)
 
 =head1 VERSION
 
-This document describes version 0.001 of App::MineralUtils (from Perl distribution App-MineralUtils), released on 2021-08-08.
+This document describes version 0.002 of App::MineralUtils (from Perl distribution App-MineralUtils), released on 2021-08-11.
 
 =head1 DESCRIPTION
 
@@ -135,6 +137,7 @@ Result:
      { amount => 1, unit => "mg-magnesium-elemental" },
      { amount => 8.90471950133571, unit => "mg-magnesium-citrate" },
      { amount => 7.09219858156028, unit => "mg-magnesium-glycinate" },
+     { amount => 7.09219858156028, unit => "mg-magnesium-bisglycinate" },
      { amount => 13.8888888888889, unit => "mg-magnesium-l-threonate" },
      { amount => 1.65837479270315, unit => "mg-magnesium-oxide" },
    ],
@@ -209,6 +212,23 @@ L<https://avsnutrition.com.au/wp-content/themes/avs-nutrition/vitamin-converter.
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

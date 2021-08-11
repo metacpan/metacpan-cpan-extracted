@@ -8,6 +8,7 @@ Makefile.PL
 README
 dist.ini
 lib/Pod/Weaver/PluginBundle/Author/PERLANCAR.pm
+lib/Pod/Weaver/Section/PERLANCAR/Contributing.pm
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

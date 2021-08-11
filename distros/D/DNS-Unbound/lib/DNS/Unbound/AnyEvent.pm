@@ -35,8 +35,6 @@ This class provides native L<AnyEvent> compatibility for L<DNS::Unbound>.
 # works with FDs without needing to create Perl filehandles out of them.
 use parent 'DNS::Unbound::EventLoopBase';
 
-use Scalar::Util ();
-
 use AnyEvent ();
 
 # perl -MData::Dumper -MAnyEvent -e'use DNS::Unbound::AnyEvent; my $cv = AnyEvent->condvar(); DNS::Unbound::AnyEvent->new()->resolve_async("perl.org", "A")->then( sub { print Dumper shift } )->finally($cv); $cv->recv()'
@@ -48,13 +46,10 @@ sub new {
 
     my $self = $class->SUPER::new(@args);
 
-    my $weak_self = $self;
-    Scalar::Util::weaken($weak_self);
-
     $INSTANCE_WATCHER{$self} = AnyEvent->io(
         fh => $self->fd(),
         poll => 'r',
-        cb => sub { $weak_self->process() },
+        cb => $self->_create_process_cr(),
     );
 
     return $self;
@@ -65,7 +60,7 @@ sub DESTROY {
 
     delete $INSTANCE_WATCHER{$self};
 
-    return $self->SUPER::DESTROY();
+    $self->SUPER::DESTROY();
 }
 
 1;

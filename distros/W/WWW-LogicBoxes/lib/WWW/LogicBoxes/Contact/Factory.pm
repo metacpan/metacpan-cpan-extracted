@@ -13,7 +13,7 @@ use WWW::LogicBoxes::Contact::US;
 
 use Carp;
 
-our $VERSION = '1.10.1'; # VERSION
+our $VERSION = '1.11.0'; # VERSION
 # ABSTRACT: Abstract Factory For Construction of Contacts
 
 sub construct_from_response {

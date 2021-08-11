@@ -26,7 +26,6 @@ my %WriteMakefileArgs = (
   "CONFIGURE_REQUIRES" => {
     "Alien::Build" => "2.40",
     "Alien::Build::MM" => "2.40",
-    "Alien::Build::Plugin::Build::Copy" => 0,
     "Alien::Build::Plugin::Build::Make" => "2.40",
     "Alien::Build::Plugin::Probe::Vcpkg" => "2.40",
     "ExtUtils::MakeMaker" => "7.62"
@@ -43,13 +42,14 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => "6.52",
+    "FFI::Platypus" => 0,
     "File::Spec" => 0,
     "Test2::Suite" => 0,
     "Test2::V0" => 0,
     "Test::Alien" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "1.03",
+  "VERSION" => "1.06",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -65,6 +65,7 @@ my %FallbackPrereqs = (
   "Alien::gmake" => 0,
   "Config" => 0,
   "ExtUtils::MakeMaker" => "6.52",
+  "FFI::Platypus" => 0,
   "File::Spec" => 0,
   "IPC::Cmd" => 0,
   "Sort::Versions" => 0,

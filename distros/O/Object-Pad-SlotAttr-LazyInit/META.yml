@@ -18,10 +18,10 @@ name: Object-Pad-SlotAttr-LazyInit
 provides:
   Object::Pad::SlotAttr::LazyInit:
     file: lib/Object/Pad/SlotAttr/LazyInit.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Object::Pad: '0.50'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -8,6 +8,8 @@ use utf8;
 use Carp;
 use Data::Dumper;
 
+$ENV{PERL5LIB} = join ':', @INC;
+
 sub new {
     my $class = shift;
     my $obj = $class->SUPER::new();

@@ -39,11 +39,11 @@
    "provides" : {
       "Apache::Session::Browseable" : {
          "file" : "lib/Apache/Session/Browseable.pm",
-         "version" : "v1.3.8"
+         "version" : "v1.3.9"
       },
       "Apache::Session::Browseable::DBI" : {
          "file" : "lib/Apache/Session/Browseable/DBI.pm",
-         "version" : "v1.3.5"
+         "version" : "v1.3.9"
       },
       "Apache::Session::Browseable::File" : {
          "file" : "lib/Apache/Session/Browseable/File.pm",
@@ -63,7 +63,7 @@
       },
       "Apache::Session::Browseable::MySQLJSON" : {
          "file" : "lib/Apache/Session/Browseable/MySQLJSON.pm",
-         "version" : "v1.3.5"
+         "version" : "v1.3.9"
       },
       "Apache::Session::Browseable::Oracle" : {
          "file" : "lib/Apache/Session/Browseable/Oracle.pm",
@@ -71,11 +71,11 @@
       },
       "Apache::Session::Browseable::PgHstore" : {
          "file" : "lib/Apache/Session/Browseable/PgHstore.pm",
-         "version" : "v1.3.5"
+         "version" : "v1.3.9"
       },
       "Apache::Session::Browseable::PgJSON" : {
          "file" : "lib/Apache/Session/Browseable/PgJSON.pm",
-         "version" : "v1.3.5"
+         "version" : "v1.3.9"
       },
       "Apache::Session::Browseable::Postgres" : {
          "file" : "lib/Apache/Session/Browseable/Postgres.pm",
@@ -83,7 +83,7 @@
       },
       "Apache::Session::Browseable::Redis" : {
          "file" : "lib/Apache/Session/Browseable/Redis.pm",
-         "version" : "v1.3.5"
+         "version" : "v1.3.9"
       },
       "Apache::Session::Browseable::SQLite" : {
          "file" : "lib/Apache/Session/Browseable/SQLite.pm",
@@ -155,6 +155,6 @@
          "url" : "https://github.com/LemonLDAPNG/Apache-Session-Browseable"
       }
    },
-   "version" : "v1.3.8",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "v1.3.9",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

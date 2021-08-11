@@ -40,7 +40,7 @@ important to add.
 
 ## AUTHORS
 
- 2001-2020 Vlado Keselj http://web.cs.dal.ca/~vlado
+ 2001-2021 Vlado Keselj http://web.cs.dal.ca/~vlado
  	   and contributing authors:
       2007 Charles Ikeson (overhaul of test.pl)
 

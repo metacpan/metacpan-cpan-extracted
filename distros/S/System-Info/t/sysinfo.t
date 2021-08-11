@@ -6,7 +6,7 @@ use warnings;
 $|++;
 
 use Test::More tests => 70;
-use Test::NoWarnings;
+use Test::Warnings;
 my $verbose = 0;
 
 BEGIN { use_ok "System::Info", qw( sysinfo sysinfo_hash si_uname ) }

@@ -229,7 +229,6 @@ add_slot(self, slotname, ...)
       "writer",
       "mutator",
       "weak",
-      "final",
       NULL,
     };
     while(KWARG_NEXT(args)) {
@@ -259,14 +258,10 @@ add_slot(self, slotname, ...)
         case 5: /* weak */
           mop_slot_apply_attribute(slotmeta, "weak", NULL);
           break;
-
-        case 6: /* final */
-          mop_slot_apply_attribute(slotmeta, "final", NULL);
-          break;
       }
     }
 
-    MOP_SLOT_RUN_HOOKS_NOARGS(slotmeta, seal_slot);
+    mop_slot_seal(slotmeta);
 
     RETVAL = newSV(0);
     sv_setref_uv(RETVAL, "Object::Pad::MOP::Slot", PTR2UV(slotmeta));
