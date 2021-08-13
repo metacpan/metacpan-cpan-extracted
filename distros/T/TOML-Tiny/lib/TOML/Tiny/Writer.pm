@@ -1,5 +1,5 @@
 package TOML::Tiny::Writer;
-$TOML::Tiny::Writer::VERSION = '0.14';
+$TOML::Tiny::Writer::VERSION = '0.15';
 use strict;
 use warnings;
 no warnings qw(experimental);
@@ -71,7 +71,7 @@ sub to_toml {
       }
       #return $data if svref_2object(\$data)->FLAGS & (SVf_IOK | SVf_NOK);
       return $data if $data =~ /$DateTime/;
-      return lc($data) if $data =~ /$SpecialFloat/;
+      return lc($data) if $data =~ /^$SpecialFloat$/;
 
       return to_toml_string($data);
     }
@@ -278,7 +278,7 @@ TOML::Tiny::Writer
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 AUTHOR
 

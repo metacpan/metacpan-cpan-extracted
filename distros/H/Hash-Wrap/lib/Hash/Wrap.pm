@@ -9,12 +9,15 @@ use warnings;
 
 use Scalar::Util;
 use Digest::MD5;
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 our @EXPORT = qw[ wrap_hash ];
 
 our @CARP_NOT = qw( Hash::Wrap );
 our $DEBUG    = 0;
+
+# copied from Damian Conway's PPR: PerlIdentifier
+use constant PerlIdentifier => qr/\A([^\W\d]\w*+)\z/;
 
 our %REGISTRY;
 
@@ -56,6 +59,23 @@ sub _generate_accessor {
     return $coderef;
 }
 
+sub _generate_predicate {
+    my ( $hash_class, $class, $key ) = @_;
+
+    my %dict = (
+        key   => $key,
+        class => $class,
+    );
+
+    my $code = $REGISTRY{$hash_class}{predicate_template};
+    my $coderef = _compile_from_tpl( \$code, \%dict );
+    _croak_about_code( \$code, 'predicate' )
+      if $@;
+
+    return $coderef;
+}
+
+
 sub _autoload {
     my ( $hash_class, $method, $object ) = @_;
 
@@ -63,6 +83,10 @@ sub _autoload {
 
     _croak( qq[Can't locate class method "$key" via package @{[ ref $object]}] )
       unless Scalar::Util::blessed( $object );
+
+    if ( exists $REGISTRY{$hash_class}{predicate_template} && $key =~ /^has_(.*)/ ) {
+        return _generate_predicate( $hash_class, $class, $1 );
+    }
 
     _croak(
         qq[Can't locate object method "$key" via package @{[ ref $object]}] )
@@ -150,7 +174,9 @@ sub import {
 
         # clean out known attributes
         delete @{$args}{
-            qw[ -base -as -class -lvalue -undef -exists -defined -new -copy -clone -immutable -lockkeys -methods -recurse -as_scalar_ref -as_return ]
+            qw[ -as -as_return -as_scalar_ref -base -class -clone
+                -copy -defined -exists -immutable -lockkeys -lvalue
+                -methods -new -predicate -recurse -undef ]
         };
 
         if ( keys %$args ) {
@@ -161,9 +187,6 @@ sub import {
 
     return @return;
 }
-
-# copied from Damian Conway's PPR: PerlIdentifier
-use constant PerlIdentifier => qr/\A([^\W\d]\w*+)\z/;
 
 sub _build_class {
     my ( $caller, $name, $attr ) = @_;
@@ -210,6 +233,7 @@ sub _build_class {
         return_value          => '$self->{q[\<<KEY>>]}',
         recursion_constructor => '',
         meta => [ map { ( qq[q($_) => q($attr->{$_}),] ) } keys %$attr ],
+        predicate_template    => '',
     );
 
     if ( $attr->{-lvalue} ) {
@@ -282,6 +306,30 @@ $recurse_into_hash = $setup_recurse_into_hash;
 END
     }
 
+
+
+    if ( $attr->{-predicate} ) {
+        $dict{predicate_template} = <<'END';
+our $predicate_template = q[
+  package \<<CLASS>>;
+
+  use Scalar::Util ();
+
+  sub has_\<<KEY>> {
+    my $self = shift;
+
+    unless ( Scalar::Util::blessed( $self ) ) {
+      require Carp;
+      Carp::croak( qq[Can't locate class method "has_\<<KEY>>" via package $self] );
+    }
+
+   return exists $self->{\<<KEY>>};
+  }
+  \&has_\<<KEY>>;
+];
+END
+    }
+
     my $class_template = <<'END';
 package <<CLASS>>;
 
@@ -322,6 +370,8 @@ our $accessor_template = q[
   }
   \&\<<KEY>>;
 ];
+
+<<PREDICATE_TEMPLATE>>
 
 
 <<BODY>>
@@ -394,6 +444,11 @@ END
     push @CARP_NOT, $class;
     $rentry->{accessor_template}
       = _find_symbol( $class, "accessor_template", [ "SCALAR", undef ] );
+
+    if ( $attr->{-predicate} ) {
+        $rentry->{predicate_template}
+          = _find_symbol( $class, "predicate_template", [ "SCALAR", undef ] );
+    }
 
     $rentry->{validate} = _find_symbol( $class, 'validate', [ 'REF', 'CODE' ] );
 
@@ -595,7 +650,7 @@ Hash::Wrap - create on-the-fly objects from hashes
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -994,6 +1049,13 @@ or
    $obj = wrap_hash( { a => 1 } );
    $obj->is_present( 'a' );
 
+-item C<-predicate> => I<boolean>
+
+This adds the more traditionally named predicate methods, such as
+C<has_foo> for attribute C<foo>.  Note that this option makes any
+elements which begin with C<has_> unavailable via the generated
+accessors.
+
 =item C<-methods> => { I<method name> => I<code reference>, ... }
 
 Install the passed code references into the class with the specified
@@ -1083,7 +1145,9 @@ Here's a comparison of this module and others on CPAN.
 
 =item * core dependencies only
 
-=item * only applies object paradigm to top level hash
+=item * object tracks additions and deletions of entries in the hash
+
+=item * optionally applies object paradigm recursively
 
 =item * accessors may be lvalue subroutines
 
@@ -1096,9 +1160,11 @@ throws by default, but can optionally return C<undef>
 
 =item * can add additional methods to the hash object's class
 
-=item * object tracks additions and deletions of entries in the hash
+=item * optionally stores the constructor in a scalar
 
-=item * can store the constructor in a scalar
+=item * optionally provides per-attribute predicate methods (e.g. C<has_foo>)
+
+=item * optionally provides methods to check an attribute existence or whether its value is defined
 
 =back
 

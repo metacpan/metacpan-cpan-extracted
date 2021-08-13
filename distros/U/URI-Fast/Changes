@@ -1,3 +1,12 @@
+0.51 2021-08-12
+-feature: new constructor, new_abs($rel, $base)
+-feature: abs() aliased to absolute()
+-feature: rel() aliased to relative()
+-feature: canonical() aliased to normalize() (this was true in prior versions, but undocumented)
+-feature: normalize() now decodes unreserved chars and normalizes + to %20 (RFC 3986, 6.2.2.2)
+-feature: TO_JSON() added as alias of to_string()
+-miscellaneous minor efficiency/speed improvements
+
 0.50 2021-08-03
 -behavior: correct uri_split and uri to treat leading double-slash in input
  string as the beginning of the authority section, as URI and URI::Split do,

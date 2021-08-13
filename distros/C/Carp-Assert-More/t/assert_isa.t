@@ -3,7 +3,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 4;
+use Test::More tests => 5;
 use Carp::Assert::More;
 
 use IO::File; # just for creating objects
@@ -18,12 +18,17 @@ eval {
 };
 is( $@, '' );
 
-eval {
+eval {  # integer is not an object
     my $random = 2112;
     assert_isa( $random, 'IO::File', 'Created an IO::File object' );
 };
 like( $@, qr/Assertion.*failed/ );
 
+eval {  # undef is not an object
+    my $random = undef;
+    assert_isa( $random, 'IO::File', 'Created an IO::File object' );
+};
+like( $@, qr/Assertion.*failed/ );
 
 
 eval {

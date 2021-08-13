@@ -118,7 +118,7 @@ BEGIN {
 	|| sub { return $_[0] };
 }
 
-our $VERSION = '0.045';
+our $VERSION = '0.046';
 
 our @CARP_NOT = qw{Astro::SIMBAD::Client::WSQueryInterfaceService};
 

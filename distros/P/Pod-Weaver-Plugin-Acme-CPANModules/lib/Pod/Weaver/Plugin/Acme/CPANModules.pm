@@ -1,9 +1,9 @@
 package Pod::Weaver::Plugin::Acme::CPANModules;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-08'; # DATE
+our $DATE = '2021-08-13'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-Acme-CPANModules'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -133,6 +133,81 @@ are found.
     $self->log(["Generated POD for '%s'", $filename]);
 }
 
+sub _process_bundle_module {
+    no strict 'refs';
+
+    my ($self, $document, $input, $package) = @_;
+
+    my $filename = $input->{filename};
+
+    # XXX handle dynamically generated module (if there is such thing in the
+    # future)
+    local @INC = ("lib", @INC);
+
+    # collect modules list
+    my %acs;
+    {
+        require Module::List;
+        my $res;
+        {
+            local @INC = ("lib");
+            $res = Module::List::list_modules(
+                "Acme::CPANModules::", {recurse=>1, list_modules=>1});
+        }
+        for my $mod (keys %$res) {
+            my $ac_name = $mod; $ac_name =~ s/^Acme::CPANModules:://;
+            local @INC = ("lib", @INC);
+            my $mod_pm = $mod; $mod_pm =~ s!::!/!g; $mod_pm .= ".pm";
+            require $mod_pm;
+            $acs{$ac_name} = ${"$mod\::LIST"};
+        }
+    }
+
+    # add POD section: ACME::CPANMODULES MODULES
+    {
+        last unless keys %acs;
+        require Markdown::To::POD;
+        my @pod;
+        push @pod, "The following Acme::CPANModules::* modules are included in this distribution:\n\n";
+
+        push @pod, "=over\n\n";
+        for my $name (sort keys %acs) {
+            my $list = $acs{$name};
+            push @pod, "=item * L<$name|Acme::CPANModules::$name>\n\n";
+            if (defined $list->{summary}) {
+                require String::PodQuote;
+                push @pod, String::PodQuote::pod_quote($list->{summary}), ".\n\n";
+            }
+            if ($list->{description}) {
+                my $pod = Markdown::To::POD::markdown_to_pod(
+                    $list->{description});
+                push @pod, $pod, "\n\n";
+            }
+        }
+        push @pod, "=back\n\n";
+        $self->add_text_to_section(
+            $document, join("", @pod), 'ACME::CPANMODULES MODULES',
+            {after_section => ['DESCRIPTION']},
+        );
+    }
+
+    # add POD section: SEE ALSO
+    {
+        # XXX don't add if current See Also already mentions it
+        my @pod = (
+            "L<Acme::CPANModules> - the specification\n\n",
+            "L<App::cpanmodules> - the main CLI\n\n",
+            "L<App::CPANModulesUtils> - other CLIs\n\n",
+        );
+        $self->add_text_to_section(
+            $document, join('', @pod), 'SEE ALSO',
+            {after_section => ['DESCRIPTION']},
+        );
+    }
+
+    $self->log(["Generated POD for '%s'", $filename]);
+}
+
 sub weave_section {
     my ($self, $document, $input) = @_;
 
@@ -141,8 +216,11 @@ sub weave_section {
     return unless $filename =~ m!^lib/(.+)\.pm$!;
     my $package = $1;
     $package =~ s!/!::!g;
-    return unless $package =~ /\AAcme::CPANModules::/;
-    $self->_process_module($document, $input, $package);
+    if ($package =~ /\AAcme::CPANModules::/) {
+        $self->_process_module($document, $input, $package);
+    } elsif ($package =~ /\AAcme::CPANModulesBundle::/) {
+        $self->_process_bundle_module($document, $input, $package);
+    }
 }
 
 1;
@@ -160,7 +238,7 @@ Pod::Weaver::Plugin::Acme::CPANModules - Plugin to use when building Acme::CPANM
 
 =head1 VERSION
 
-This document describes version 0.010 of Pod::Weaver::Plugin::Acme::CPANModules (from Perl distribution Pod-Weaver-Plugin-Acme-CPANModules), released on 2021-08-08.
+This document describes version 0.011 of Pod::Weaver::Plugin::Acme::CPANModules (from Perl distribution Pod-Weaver-Plugin-Acme-CPANModules), released on 2021-08-13.
 
 =head1 SYNOPSIS
 
@@ -173,6 +251,16 @@ In your F<weaver.ini>:
 
 This plugin is used when building Acme::CPANModules::* distributions. It
 currently does the following:
+
+For F<Acme/CPANModulesBundle/*.pm> files:
+
+=over
+
+=item * List Acme::CPANModules::* modules included in the distribution
+
+=back
+
+For F<Acme/CPANModules/*.pm> files:
 
 =over
 
@@ -221,9 +309,26 @@ L<Dist::Zilla::Plugin::Acme::CPANModules>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

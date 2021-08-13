@@ -38,6 +38,26 @@ SYNOPSIS
      # verify, but croak on failure
      Crypt::Ed25519:eddsa_verify_croak $message, $pubkey, $signature;
 
+     ############################################
+     # Key exchange
+
+     # side A:
+     ($pubkey_a, $privkey_a) = Crypt::Ed25519::generate_keypair;
+     # send $pubkey to side B
+
+     # side B:
+     ($pubkey_b, $privkey_b) = Crypt::Ed25519::generate_keypair;
+     # send $pubkey to side A
+
+     # side A then calculates their shared secret:
+     $shared_secret = Crypt::Ed25519::key_exchange $pubkey_b, $privkey_a;
+
+     # and side B does this:
+     $shared_secret = Crypt::Ed25519::key_exchange $pubkey_a, $privkey_b;
+
+     # the generated $shared_secret will be the same - you cna now
+     # hash it with hkdf or something else to generate symmetric private keys
+
 DESCRIPTION
     This module implements Ed25519 public key generation, message signing
     and verification. It is a pretty bare-bones implementation that
@@ -158,12 +178,23 @@ CONVERTING BETWEEN Ed25519 and EdDSA
     secret key to a public/private key pair allows you to sign a small
     message, or many messages, faster.
 
+Key Exchange
+    As an extension to Ed25519, this module implements a key exchange
+    similar (But not identical) to Curve25519. For this, both sides generate
+    a keypair and send their public key to the other side. Then both sides
+    can generate the same shared secret using this function:
+
+    $shared_secret = Crypt::Ed25519::key_exchange $other_public_key,
+    $own_private_key
+        Return the 32 octet shared secret generated from the given public
+        and private key. See SYNOPSIS for an actual example.
+
 SUPPORT FOR THE PERL MULTICORE SPECIFICATION
     This module supports the perl multicore specification
-    (<http://perlmulticore.schmorp.de/>) for key generation (usually the
-    slowest operation), and all signing and verification functions.
+    (<http://perlmulticore.schmorp.de/>) for all operations, although it
+    makes most sense to use it when signing or verifying longer messages.
 
-IMPLEMENTATIOIN
+IMPLEMENTATION
     This module currently uses "Nightcracker's Ed25519" implementation,
     which is unmodified except for some portability fixes and static
     delcarations, but the interface is kept implementation-agnostic to allow
@@ -171,5 +202,5 @@ IMPLEMENTATIOIN
 
 AUTHOR
      Marc Lehmann <schmorp@schmorp.de>
-     http://sfotware.schmorp.de/pkg/Crypt-Ed25519.html
+     http://software.schmorp.de/pkg/Crypt-Ed25519.html
 

@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /WHO/GrowthReference/Table/get_who_growth_reference
-# and generated automatically using Perinci::CmdLine::Gen version 0.497
+# and generated automatically using Perinci::CmdLine::Gen version 0.498
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-11'; # DATE
+our $DATE = '2021-03-15'; # DATE
 our $DIST = 'App-WHOGrowthReferenceUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,7 +38,7 @@ get-who-growth-reference - Lookup height/weight in the WHO growth chart (a.k.a. 
 
 =head1 VERSION
 
-This document describes version 0.003 of get-who-growth-reference (from Perl distribution App-WHOGrowthReferenceUtils), released on 2021-01-11.
+This document describes version 0.004 of get-who-growth-reference (from Perl distribution App-WHOGrowthReferenceUtils), released on 2021-03-15.
 
 =head1 SYNOPSIS
 
@@ -48,6 +48,271 @@ Usage:
      [--height=s] [--json] [--(no)naked-res] [--now=s]
      [--page-result[=program]] [--view-result[=program]] [--weight=s]
      <gender> [dob]
+
+Examples:
+
+Get weight/height information for a boy that is born on May 4, 2017:
+
+ % get-who-growth-reference M 2017-05-04
+ +---------------+---------------+
+ | key           | value         |
+ +---------------+---------------+
+ | age           | 46.0 month(s) |
+ | bmi_P1        | 12.8          |
+ | bmi_P15       | 14.1          |
+ | bmi_P25       | 14.5          |
+ | bmi_P3        | 13.2          |
+ | bmi_P5        | 13.5          |
+ | bmi_P50       | 15.4          |
+ | bmi_P75       | 16.2          |
+ | bmi_P85       | 16.7          |
+ | bmi_P95       | 17.6          |
+ | bmi_P97       | 18.0          |
+ | bmi_P99       | 18.7          |
+ | bmi_SD0       | 15.4          |
+ | bmi_SD1       | 16.7          |
+ | bmi_SD1neg    | 14.2          |
+ | bmi_SD2       | 18.2          |
+ | bmi_SD2neg    | 13.1          |
+ | bmi_SD3       | 19.8          |
+ | bmi_SD3neg    | 12.1          |
+ | bmi_mean      | 15.4          |
+ | gender        | M             |
+ | height_P01    | 89.626        |
+ | height_P1     | 92.783        |
+ | height_P10    | 97.101        |
+ | height_P15    | 98.114        |
+ | height_P25    | 99.61         |
+ | height_P3     | 94.624        |
+ | height_P5     | 95.599        |
+ | height_P50    | 102.397       |
+ | height_P75    | 105.185       |
+ | height_P85    | 106.681       |
+ | height_P90    | 107.694       |
+ | height_P95    | 109.195       |
+ | height_P97    | 110.17        |
+ | height_P99    | 112.011       |
+ | height_P999   | 115.168       |
+ | height_SD0    | 102.397       |
+ | height_SD1    | 106.530       |
+ | height_SD1neg | 98.264        |
+ | height_SD2    | 110.663       |
+ | height_SD2neg | 94.132        |
+ | height_SD3    | 114.795       |
+ | height_SD3neg | 89.999        |
+ | height_SD4    | 118.928       |
+ | height_SD4neg | 85.866        |
+ | height_mean   | 102.397       |
+ | weight_P01    | 10.9          |
+ | weight_P1     | 12            |
+ | weight_P10    | 13.6          |
+ | weight_P15    | 14.1          |
+ | weight_P25    | 14.7          |
+ | weight_P3     | 12.7          |
+ | weight_P5     | 13            |
+ | weight_P50    | 16            |
+ | weight_P75    | 17.4          |
+ | weight_P85    | 18.3          |
+ | weight_P90    | 18.9          |
+ | weight_P95    | 19.8          |
+ | weight_P97    | 20.4          |
+ | weight_P99    | 21.6          |
+ | weight_P999   | 23.9          |
+ | weight_SD0    | 16.0          |
+ | weight_SD1    | 18.2          |
+ | weight_SD1neg | 14.1          |
+ | weight_SD2    | 20.7          |
+ | weight_SD2neg | 12.5          |
+ | weight_SD3    | 23.6          |
+ | weight_SD3neg | 11.0          |
+ | weight_mean   | 16            |
+ +---------------+---------------+
+
+Get weight/height information for a 6.5yo girl:
+
+ % get-who-growth-reference F --age 6.5y
+ +---------------+---------------+
+ | key           | value         |
+ +---------------+---------------+
+ | age           | 78.0 month(s) |
+ | bmi_P01       | 11.645        |
+ | bmi_P1        | 12.365        |
+ | bmi_P10       | 13.525        |
+ | bmi_P15       | 13.832        |
+ | bmi_P25       | 14.315        |
+ | bmi_P3        | 12.832        |
+ | bmi_P5        | 13.096        |
+ | bmi_P50       | 15.32         |
+ | bmi_P75       | 16.492        |
+ | bmi_P85       | 17.206        |
+ | bmi_P90       | 17.728        |
+ | bmi_P95       | 18.57         |
+ | bmi_P97       | 19.165        |
+ | bmi_P99       | 20.41         |
+ | bmi_P999      | 23.013        |
+ | bmi_SD0       | 15.32         |
+ | bmi_SD1       | 17.131        |
+ | bmi_SD1neg    | 13.879        |
+ | bmi_SD2       | 19.482        |
+ | bmi_SD2neg    | 12.704        |
+ | bmi_SD3       | 22.668        |
+ | bmi_SD3neg    | 11.725        |
+ | bmi_SD4       | 25.855        |
+ | bmi_SD4neg    | 10.746        |
+ | bmi_mean      | 15.32         |
+ | gender        | F             |
+ | height_P01    | 101.611       |
+ | height_P1     | 105.657       |
+ | height_P10    | 111.19        |
+ | height_P15    | 112.488       |
+ | height_P25    | 114.405       |
+ | height_P3     | 108.016       |
+ | height_P5     | 109.266       |
+ | height_P50    | 117.977       |
+ | height_P75    | 121.549       |
+ | height_P85    | 123.466       |
+ | height_P90    | 124.764       |
+ | height_P95    | 126.688       |
+ | height_P97    | 127.938       |
+ | height_P99    | 130.297       |
+ | height_P999   | 134.343       |
+ | height_SD0    | 117.977       |
+ | height_SD1    | 123.273       |
+ | height_SD1neg | 112.681       |
+ | height_SD2    | 128.569       |
+ | height_SD2neg | 107.385       |
+ | height_SD3    | 133.865       |
+ | height_SD3neg | 102.089       |
+ | height_SD4    | 139.161       |
+ | height_SD4neg | 96.793        |
+ | height_mean   | 117.977       |
+ | weight_P01    | 13.932        |
+ | weight_P1     | 15.333        |
+ | weight_P10    | 17.626        |
+ | weight_P15    | 18.239        |
+ | weight_P25    | 19.206        |
+ | weight_P3     | 16.252        |
+ | weight_P5     | 16.773        |
+ | weight_P50    | 21.227        |
+ | weight_P75    | 23.591        |
+ | weight_P85    | 25.028        |
+ | weight_P90    | 26.077        |
+ | weight_P95    | 27.761        |
+ | weight_P97    | 28.945        |
+ | weight_P99    | 31.399        |
+ | weight_P999   | 36.41         |
+ | weight_SD0    | 21.227        |
+ | weight_SD1    | 24.877        |
+ | weight_SD1neg | 18.333        |
+ | weight_SD2    | 29.572        |
+ | weight_SD2neg | 15.998        |
+ | weight_SD3    | 35.757        |
+ | weight_SD3neg | 14.087        |
+ | weight_SD4    | 41.942        |
+ | weight_SD4neg | 12.175        |
+ | weight_mean   | 21.227        |
+ +---------------+---------------+
+
+See percentiles/z-scores for a 6yo boy weighing 17kg and having a height of 102cm:
+
+ % get-who-growth-reference M --age 6y --height 102 --weight 17
+ +----------------------+-------------------+
+ | key                  | value             |
+ +----------------------+-------------------+
+ | age                  | 72.0 month(s)     |
+ | bmi                  | 16.3398692810458  |
+ | bmi_P01              | 12.066            |
+ | bmi_P1               | 12.733            |
+ | bmi_P10              | 13.773            |
+ | bmi_P15              | 14.042            |
+ | bmi_P25              | 14.459            |
+ | bmi_P3               | 13.157            |
+ | bmi_P5               | 13.393            |
+ | bmi_P50              | 15.306            |
+ | bmi_P75              | 16.258            |
+ | bmi_P85              | 16.819            |
+ | bmi_P90              | 17.221            |
+ | bmi_P95              | 17.854            |
+ | bmi_P97              | 18.291            |
+ | bmi_P99              | 19.176            |
+ | bmi_P999             | 20.91             |
+ | bmi_SD0              | 15.306            |
+ | bmi_SD1              | 16.761            |
+ | bmi_SD1neg           | 14.083            |
+ | bmi_SD2              | 18.52             |
+ | bmi_SD2neg           | 13.04             |
+ | bmi_SD3              | 20.689            |
+ | bmi_SD3neg           | 12.141            |
+ | bmi_SD4              | 22.858            |
+ | bmi_SD4neg           | 11.242            |
+ | bmi_mean             | 15.306            |
+ | bmi_percentile       | 76.4593454731863  |
+ | bmi_zscore           | 0.71056307975653  |
+ | gender               | M                 |
+ | height_P01           | 100.726           |
+ | height_P1            | 104.49            |
+ | height_P10           | 109.637           |
+ | height_P15           | 110.845           |
+ | height_P25           | 112.628           |
+ | height_P3            | 106.685           |
+ | height_P5            | 107.847           |
+ | height_P50           | 115.951           |
+ | height_P75           | 119.274           |
+ | height_P85           | 121.057           |
+ | height_P90           | 122.265           |
+ | height_P95           | 124.055           |
+ | height_P97           | 125.217           |
+ | height_P99           | 127.412           |
+ | height_P999          | 131.176           |
+ | height_SD0           | 115.951           |
+ | height_SD1           | 120.878           |
+ | height_SD1neg        | 111.024           |
+ | height_SD2           | 125.804           |
+ | height_SD2neg        | 106.097           |
+ | height_SD3           | 130.731           |
+ | height_SD3neg        | 101.171           |
+ | height_SD4           | 135.658           |
+ | height_SD4neg        | 96.244            |
+ | height_mean          | 115.951           |
+ | height_percentile    | 0.404622741764081 |
+ | height_potential     | 155.876968650372  |
+ | height_potential_SD0 | 176.543           |
+ | height_zscore        | -2.83170929760455 |
+ | weight_P01           | 13.913            |
+ | weight_P1            | 15.248            |
+ | weight_P10           | 17.361            |
+ | weight_P15           | 17.912            |
+ | weight_P25           | 18.768            |
+ | weight_P3            | 16.105            |
+ | weight_P5            | 16.585            |
+ | weight_P50           | 20.514            |
+ | weight_P75           | 22.48             |
+ | weight_P85           | 23.637            |
+ | weight_P90           | 24.467            |
+ | weight_P95           | 25.767            |
+ | weight_P97           | 26.661            |
+ | weight_P99           | 28.464            |
+ | weight_P999          | 31.948            |
+ | weight_SD0           | 20.514            |
+ | weight_SD1           | 23.517            |
+ | weight_SD1neg        | 17.996            |
+ | weight_SD2           | 27.129            |
+ | weight_SD2neg        | 15.87             |
+ | weight_SD3           | 31.508            |
+ | weight_SD3neg        | 14.063            |
+ | weight_SD4           | 35.888            |
+ | weight_SD4neg        | 12.256            |
+ | weight_mean          | 20.514            |
+ | weight_percentile    | 7.67396907216494  |
+ | weight_zscore        | -1.46848541862653 |
+ +----------------------+-------------------+
+
+=head1 DESCRIPTION
+
+Caveats:
+
+Currently the z-zcore line values (e.g. height_Z1, height_Z-1, etc) are
+calculated using linear interpolation.
 
 =head1 OPTIONS
 
@@ -186,7 +451,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-WHOGrowthReferen
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-WHOGrowthReferenceUtils>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-WHOGrowthReferenceUtils/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

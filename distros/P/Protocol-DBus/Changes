@@ -1,6 +1,15 @@
 Revision history for Perl module Protocol::DBus
 
-0.17
+0.19 Thu 12 Aug 2021
+- (No production changes.)
+- Fix integration test to ignore external warnings.
+
+0.18 Wed 11 Aug 2021
+- (No production changes.)
+- Fix Mojo test to ignore external warnings.
+- Fix Socket::MsgHdr-dependent tests to check the version.
+
+0.17 Fri 23 Apr 2021
 - BUG FIX: Fix errant remove() in Mojo.pm DESTROY handler.
 - BUG FIX: Fix nonblocking mode on pre-5.14 perls.
 - BUG FIX: Prevent inadvertent event loop stoppage after initialize()

@@ -49,5 +49,4 @@ throws_ok( sub { assert_arrayref_nonempty( $coderef ) }, $FAILED );
 lives_ok( sub { assert_arrayref_nonempty( Foo->new( 14 ) ) } );
 throws_ok( sub { assert_arrayref_nonempty( Foo->new ) }, $FAILED );
 
-done_testing();
 exit 0;

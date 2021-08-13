@@ -1,0 +1,4 @@
+Version 0.90 - 2021-08-13
+  - Initial public release of back-end module originally written
+    2016-04 .. 2016-05, complete with 'now', 'strftime', and
+    'coerce_date' features.

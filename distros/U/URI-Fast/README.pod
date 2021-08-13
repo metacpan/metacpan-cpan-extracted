@@ -57,12 +57,22 @@ Behaves (hopefully) identically to L<URI::Split>, but roughly twice as fast.
 
 See L</ENCODING>.
 
-=head1 CONSTRUCTOR
+=head1 CONSTRUCTORS
+
+=head2 new
 
 If desired, both C<URI::Fast> and L<URI::Fast::IRI> may be instantiated using
 the default constructor, C<new>.
 
   my $uri = URI::Fast->new('http://www.example.com');
+
+=head2 new_abs
+
+Builds a new C<URI::Fast> from a relative URI string and makes it L</absolute>
+in relation to C<$base>.
+
+  my $uri = URI::Fast->new_abs('some/path', 'http://www.example.com/fnord');
+  $uri->to_string; # "http://www.example.com/fnord/some/path"
 
 =head1 ATTRIBUTES
 
@@ -308,6 +318,10 @@ L<URI::Fast> object representing the absolute, merged URI.
   my $uri = uri('some/path')->absolute('http://www.example.com/fnord');
   $uri->to_string; # "http://www.example.com/fnord/some/path"
 
+=head2 abs
+
+Alias of L</absolute>.
+
 =head2 relative
 
 Builds a relative URI using a second URI (either a C<URI::Fast> object or a
@@ -321,6 +335,10 @@ it's behavior should mimic L<URI/rel>'s.
   my $uri = uri('http://example.com/foo/bar/')->relative('http://example.com/foo');
   $uri->to_string; # "foo/bar/"
 
+=head2 rel
+
+Alias of L</relative>.
+
 =head2 normalize
 
 Similar to L<URI/canonical>, performs a minimal normalization on the URI. Only
@@ -328,6 +346,10 @@ generic normalization described in the rfc is performed; no scheme-specific
 normalization is done. Specifically, the scheme and host members are converted
 to lower case, dot segments are collapsed in the path, and any percent-encoded
 characters in the URI are converted to upper case.
+
+=head2 canonical
+
+Alias of L</normalize>.
 
 =head1 ENCODING
 

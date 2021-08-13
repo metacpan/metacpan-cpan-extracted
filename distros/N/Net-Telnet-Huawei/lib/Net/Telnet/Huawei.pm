@@ -1,4 +1,3 @@
-
 =pod
 
 =encoding utf8
@@ -12,7 +11,12 @@ Net::Telnet::Huawei
 	use Net::Telnet::Huawei;
 	my $net_dev=Net::Telnet::Huawei->new;
 	my ($host, $user, $password, $super_password) = ('192.168.1.1', 'admin', 'password', 'super password');
+
 	$net_dev->login($host, $user, $password, $super_password);
+
+	# or ssh login
+	# $net_dev->login($host, $user, $password, $super_password, 1);
+
 	my @lines = $net_dev->exec_cmd('display version');
 	print join("\n", @lines), "\n";
 
@@ -30,23 +34,62 @@ use Array::Utils qw(:all);
 use Carp ();
 use Devel::StackTrace;
 use CPAN::Version;
-#use if CPAN::Version->vgt($^V,  'v5.10.1'), experimental => 'switch';
+use if CPAN::Version->vgt($^V,  'v5.10.1'), experimental => 'switch';
 
-our $VERSION='0.0.2';
+our $VERSION='0.0.5';
 
+# debug flag
 my $debug=0;
+sub DEBUG(){$debug}
 
-sub DEBUG(){
-	$debug;
-}
+sub spawn {
+	my (@cmd) = @_;
+	my ($pid, $pty, $tty, $tty_fd);
+
+    ## Create a new pseudo terminal.
+	eval 'use IO::Pty';
+
+    $pty = IO::Pty->new
+        or die $!;
+
+    ## Execute the program in another process.
+    unless ($pid = fork) {  # child process
+        die "problem spawning program: $!\n" unless defined $pid;
+
+        ## Disassociate process from its controlling terminal.
+        use POSIX ();
+        POSIX::setsid()
+            or die "setsid failed: $!";
+
+        ## Associate process with a new controlling terminal.
+        $pty->make_slave_controlling_terminal;
+        $tty = $pty->slave;
+        $tty_fd = $tty->fileno;
+        close $pty;
+
+        ## Make standard I/O use the new controlling terminal.
+        open STDIN, "<&$tty_fd" or die $!;
+        open STDOUT, ">&$tty_fd" or die $!;
+        open STDERR, ">&STDOUT" or die $!;
+        close $tty;
+
+        ## Execute requested program.
+        exec @cmd
+            or die "problem executing $cmd[0]\n";
+    } # end child process
+
+    $pty;
+} # end sub spawn
 
 =head2 Subs
 
 =over 4
 
-=item DEBUG
+=item debug
 
 Enable/Disable debug mode if passing an argument. Return debug mode if no argument.
+
+=back
 
 =cut
 
@@ -54,6 +97,11 @@ sub debug{
 	my $self=shift;
 	$debug=shift if @_;
 	$debug;
+}
+
+sub qre{
+	my $re=shift;
+	"/$re/";
 }
 
 sub printstack{
@@ -65,8 +113,9 @@ sub printstack{
 
 # initial state
 sub init_state{
-	my ($self) = @_;
+	my ($self, %h) = @_;
 
+	my $prompt=qr'\<(?:[^\<\>]*)\>|\[(?:[^\[\]]*)\]';
 	my $state={
 		USERNAME => '',
 		PASSWORD => '',
@@ -76,28 +125,32 @@ sub init_state{
 		OUTPUT_LOG => DEBUG ? 'output.log' : undef,
 		DUMP_LOG => DEBUG ? 'dump.log': undef,
 
-		TIMEOUT => 20,
-
+		HOST_NAME => '',
 		DEVICE_TYPE => undef,
 		DEVICE_VERSION => undef,
 		MAC_CACHE => undef,
 		LOGIN_CMD => [],
+		PROMPT => qr/$prompt/,
+		PROMPT_END => qr/$prompt$/,
+		PROMPT_RE_END => "/^$prompt\$/m",
+		PROMPT_HOST_NAME => qr/$prompt$/
 	};
 
-	my $prompt = q{[<[](?:[\w_-]+?)[>\]]};
-	$state->{PROMPT} = $prompt;
-	$state->{PROMPT_END} = "$prompt\$";
-	$state->{PROMPT_RE} = "/$prompt/";
-	$state->{PROMPT_RE_END} = "/^$prompt\$/m";
+	while(my ($o, $v) = each %h){
+		$state->{uc($o)}=$v;
+	}
 
 	*$self->{state} = $state;
-
 }
 
+
+=over 4
 
 =item new
 
 Constructor.
+
+=back
 
 =cut
 
@@ -107,31 +160,35 @@ sub new {
 	my $self=$class->SUPER::new(@_);
 
 
-	&init_state($self);
+	&init_state($self, @_);
 
 	
 	bless $self, $class;
 }
 
 
+=over 4
+
 =item wait_prompt
 
 Wait until prompt is found.
+
+=back
 
 =cut
 
 sub wait_prompt{
 	my $self=shift;
 	my $state=&get_state($self);
-
 	my $timeout=shift;
 
-
 	my $data='';
-
 	eval{
-		my $more =  '\\s+---- More ----';
-			while(my ($p, $m) = $self->waitfor(Match => "/$more/", Match => $state->{PROMPT_RE_END}, Timeout => $timeout, @_)){
+		my $more =  '\s+---- More ----';
+			while(my ($p, $m) = $self->waitfor(
+												Match => "/$more/",
+												Match => $state->{PROMPT_RE_END},
+												Timeout => $timeout, @_)){
 			if($m =~ /$more/){
 				$data .= $p;
 				$self->put(' ');
@@ -169,9 +226,13 @@ sub split_result{
 	@r;
 }
 
+=over 4
+
 =item can
 
 Check if a device command exists.
+
+=back
 
 =cut
 
@@ -204,11 +265,11 @@ sub can{
 	$cmd{$cn[$#cn]};
 }
 
-# clear imcomplete command line
+# clear incomplete command line
 sub clear_cmdline{
 	my $self = shift;
 	$self->buffer_empty;
-	return unless $self->print("abort imcomplete command");
+	return unless $self->print("abort incomplete command");
 	return unless $self->wait_prompt;
 	1;
 }
@@ -217,10 +278,11 @@ sub clear_cmdline{
 sub reset {
 	my $self = shift;
 
-	# 删除旧的属性
+	# delete old attributes
 	delete *$self->{state};
 
-	# 设置各属性的初始值。先赋值给一个变量。否则会每次都调用sub造成无限循环。
+	# 设置各属性的初始值。
+	# 先赋值给一个变量。否则会造成sub无限循环。
 	my $init_state = $self->init_state;
 	while(my ($k, $v) = each %$init_state){
 		*$self->{$k} = $v;
@@ -228,9 +290,13 @@ sub reset {
 	1;
 }
 
+=over 4
+
 =item enter_super
 
 Enter privilege view.
+
+=back
 
 =cut
 
@@ -252,16 +318,16 @@ sub enter_super {
 			push @{$state->{LOGIN_CMD}}, 'system-view';
 		}
 		else{
-			die "Unexpected case\n";
+			die "Unexpected error\n";
 		}
 
-		my ( $prm, $match ) = $self->waitfor(Match => '/Password:$/', Match => $prompt);
-		if ( $match =~ /Password:/ ) {
+		my ( $prem, $match ) = $self->waitfor(Match => '/Password:$/i', Match => $prompt);
+		if ( $match =~ /Password:/i ) {
 			$self->print($su_password);
 			push @{$state->{LOGIN_CMD}}, $su_password;
-			($prm, $match) = $self->waitfor(Match => '/Password:$/', Match=>$prompt);
+			($prem, $match) = $self->waitfor(Match => '/Password:$/i', Match=>$prompt);
 		}
-		die if $prm =~ /Access Denied|Error:/;
+		die if $prem =~ /Access Denied|Error:/i;
 
 		if( $self->view eq 'system'){
 			$self->print('quit');
@@ -275,9 +341,13 @@ sub enter_super {
 }
 
 
+=over 4
+
 =item set_vty_no_pause
 
-将当前登录的vty终端设置为不分页。
+Setting no page pause
+
+=back
 
 =cut
 
@@ -302,15 +372,19 @@ sub set_vty_no_pause {
 	};
 
 	if($@){
-		die "set_vty_no_pause\n";
+		die "set_vty_no_pause: $@\n";
 	}
 
 	return 1;
 }
 
+=over 4
+
 =item set_vty_pause
 
- 将当前登录的vty终端设置为分页。
+ Setting page pause
+
+=back
 
 =cut
 
@@ -344,9 +418,11 @@ sub set_vty_pause {
 	return 1;
 }
 
+=over 4
+
 =item prompt_str
 
-返回当前提示符
+Return prompt status
 
 =back
 
@@ -363,6 +439,17 @@ sub prompt_str {
 }
 
 #获取设备sysname
+
+=over 4
+
+=item get_sysname
+
+Return device host name.
+
+=back
+
+=cut
+
 sub get_sysname {
 	my $self=shift;
 	my $prompt_str = $self->prompt_str;
@@ -393,8 +480,24 @@ sub view{
 
 
 #登录到网络设备的用户视图
+
+=over 4
+
+=item login
+
+	$obj->login($host, $username, $password, $ssh )
+
+$ssh: 1  using ssh
+	  0  use telnet
+
+Login to device.
+
+=back
+
+=cut
+
 sub login {
-	my ( $self, $host, $username, $password ) = @_;
+	my ( $self, $host, $username, $password, $ssh ) = @_;
 
 	# 只有处于'NONE'状态才能进行登录
 	return unless $self->reset;
@@ -410,7 +513,6 @@ sub login {
 	$self->output_log($state->{OUTPUT_LOG});
 	$self->dump_log($state->{DUMP_LOG});
 
-	$self->timeout($state->{TIMEOUT});
 	$self->prompt($prompt_end);
 	$self->cmd_remove_mode(0);
 
@@ -419,32 +521,56 @@ sub login {
 		my ($u_count, $p_count) = (0,0);
 		my ($u_retry, $p_retry) = (1, 1);
 
-		$self->open($host);
+	
+		my $s = *$self->{state};
+
+		if($ssh){
+			## Start ssh program.
+			my $pty = spawn("ssh",
+				"-l", $username,
+				"-e", "none",
+				"-F", "/dev/null",
+				"-o", "PreferredAuthentications=password",
+				"-o", "NumberOfPasswordPrompts=1",
+				"-o", "StrictHostKeyChecking=no",
+				"-o", "UserKnownHostsFile=/dev/null",
+				$host);
+			$self->fhopen($pty);
+		}else{
+			$self->open($host);
+		}
+
+		*$self->{state} = $s;
 
 		LOGIN:
 		while(1){
-			my (undef, $m) = $self->waitfor(Match => '/\\s*Password:$/', Match => '/\\s*Username:$/', Match=>$prompt_end);
+			my (undef, $m) = $self->waitfor(Match => '/Password:\s?$/i', 
+											Match => '/Username:\s?$/i', 
+											Match=>$prompt_end,
+											Timeout=>2,
+											);
 			given($m){
-				when(/Username:$/){
+				when(/Username:\s?$/i){
 					die "Retry 'Login' exceed $u_retry\n" unless $u_count++ < $u_retry;
 					$self->print($username);
 				}
-				when(/Password:$/){
+				when(/Password:\s?$/i){
 					die "Retry 'Login' exceed $u_retry\n" unless $p_count++ < $u_retry;
 					$self->print($password);
 				}
-				when(/$state->{PROMPT_END}/){
+				when(/$state->{PROMPT_END}/i){
+					($state->{HOST_NAME})= ($m =~ /^.(.*).$/);
+					$state->{PROMPT_HOST_NAME} = $state->{HOST_NAME} . '\[\>\]\]';
 					last LOGIN;
 				}
 				default{
+                    say STDERR $m;
 					die "Unexpected error\n";
 				}
 			}
 		}
 	};
-
 	if($@){
-		say STDERR "here ******* $@ ";
 		$self->close if $self;
 		return;
 	}
@@ -453,6 +579,19 @@ sub login {
 }
 
 #退出登录
+
+=over 4
+
+=item logout
+
+$obj->logout
+
+Logout from device.
+
+=back
+
+=cut
+
 sub logout {
 	my $self   = shift;
 	my $state=&get_state($self);
@@ -468,9 +607,7 @@ sub logout {
 
 			/^system$/ && do{
 				$self->print('quit');
-				$self->wait_prompt;
-				$self->print('quit');
-				last;
+				$self->wait_prompt; $self->print('quit'); last;
 			};
 
 			$self->print('quit');
@@ -482,7 +619,6 @@ sub logout {
 	};
 
 	if($@){
-		say STDERR "ERROR $@";
 		return;
 	}
 
@@ -490,6 +626,17 @@ sub logout {
 }
 
 #获取设备型号
+
+=over 4
+
+=item get_device_type
+
+Get device type
+
+=back
+
+=cut
+
 sub get_device_type {
 	my $self = shift;
 	my $ret  = undef;
@@ -520,6 +667,17 @@ sub get_device_type {
 }
 
 #返回设备的配置文件名
+
+=over 4
+
+=item get_config_filename
+
+Get configuration filename.
+
+=back
+
+=cut
+
 sub get_config_filename{
 	my $self = shift;
 
@@ -531,6 +689,17 @@ sub get_config_filename{
 }
 
 #将一个指定的文件备份到指定的ftp服务器
+
+=over 4
+
+=item backup_config
+
+backup config file to a ftp server.
+
+=back
+
+=cut
+
 sub backup_config{
 	my $self = shift;
 
@@ -600,6 +769,17 @@ sub change_password {
 }
 
 # get software version
+
+=over 4
+
+=item get_version
+
+Get software version string.
+
+=back
+
+=cut
+
 sub get_version{
 	my $self = shift;
 
@@ -620,6 +800,17 @@ sub get_version{
 }
 
 # execute command
+
+=over 4
+
+=item exec_cmd
+
+Execute command and get output.
+
+=back
+
+=cut
+
 sub exec_cmd {
 	my $self   = shift;
 	my $cmd = shift;
@@ -637,6 +828,17 @@ sub exec_cmd {
 }
 
 # enter system view
+
+=over 4
+
+=item enter_system
+
+Enter system mode.
+
+=back
+
+=cut
+
 sub enter_system{
 	my $self = shift;
 
@@ -654,6 +856,17 @@ sub enter_system{
 }
 
 # quit system view
+
+=over 4
+
+=item quit_system
+
+Quit system mode.
+
+=back
+
+=cut
+
 sub quit_system{
 	my $self = shift;
 
@@ -666,15 +879,52 @@ sub quit_system{
 }
 
 # save config
+
+=over 4
+
+=item save configration file
+
+=back
+
+=cut
+
 sub save_config{
 	my $self = shift;
+	
+	$self->buffer_empty;
 
 	$self->quit_system if $self->view eq 'system';
 	if($self->view eq 'user'){
 		return unless $self->print('save');
-		return unless $self->waitfor('/\?\[Y\/N\]/');
-		return unless $self->print('Y');
+
+		# save errmode
+		my $old_errmode = $self->errmode;
+		$self->errmode('return');
+		
+		while (my ($p, $m) = $self->waitfor(
+				Match => '/\s*\[Y\/N\]\s*:?\s*$/',
+				Match => '/press the enter key/i',
+				Match => '/successfully/i',
+				Timeout => 5, @_
+			)){
+
+			if($m =~ /\[Y\/N\]/){
+				$self->print('Y');
+			}
+			elsif($m =~ /press the enter key/i ){
+				$self->print('');
+			}
+			elsif( $m =~ /successfully/i ) {
+				last;
+			}
+		}
+
+		# restore errmode
+		$self->errmode($old_errmode);
+		$self->buffer_empty;
+
 		return unless $self->wait_prompt;
+
 	}
 	else{
 		return;
@@ -683,6 +933,17 @@ sub save_config{
 }
 
 # get arp list
+
+=over 4
+
+=item get_arp
+
+Get arp list.
+
+=back
+
+=cut
+
 sub get_arp{
 	my $self = shift;
 	my $state=&get_state($self);
@@ -696,7 +957,6 @@ sub get_arp{
 		$data=$self->exec_cmd('display arp');
 	}
 	else{
-		say STDERR 'error';
 		return;
 	}
 
@@ -704,6 +964,17 @@ sub get_arp{
 }
 
 #读取mac列表
+
+=over 4
+
+=item get_maclist
+
+Get mac list.
+
+=back
+
+=cut
+
 sub get_maclist{
 	my $self = shift;
 	$self->enter_system;
@@ -717,9 +988,29 @@ sub get_maclist{
 }
 
 #读取配置文件
+
+=over 4
+
+=item get_config
+
+Get configration file.
+
+=back
+
+=cut
+
 sub get_config{
 	my $self=shift;
+	my $old_timeout=$self->timeout;
+	$self->timeout(30);
+
+	$self->enter_system;
+	$self->set_vty_no_pause;
 	my @result = $self->exec_cmd('display current');
+	$self->quit_system;
+	$self->set_vty_pause;
+
+	$self->timeout($old_timeout);
 
 	# 去除SRG3260时间戳
 	my $date_re = qr<\d{2}:\d{2}:\d{2}\s+\d{4}/\d{2}/\d{2}>;
@@ -743,7 +1034,7 @@ sub parse_interfaces{
 		['access', qr/^\s*port (?:access|default) vlan (.+?)$/mi],
 		['vlan', qr/^\s*vlan-type dot1q (?:vid )?(\d+)$/mi],
 		['ip', qr/^\s*ip address (\S+ \S+)(?:\s*sub)?$/mi],
-		['vrrp_ip', qr/\s*vrrp vrid \d+ virtual-ip (.+?)(?:master|slave)??$/mi],
+		['vrrp_ip', qr/\s*vrrp vrid \d+ virtual-ip ([\d.]+?)(?:master|slave)??$/mi],
 		['conn', qr/\s*\$\$<(.+)>\$\$/mi],
 	];
 
@@ -817,6 +1108,17 @@ sub get_int_mac{
 }
 
 # set device name
+
+=over 4
+
+=item set_sysname
+
+Set the name of the device.
+
+=back
+
+=cut
+
 sub set_sysname{
 	my ($self, $sysname) = @_;
 	return unless $self->enter_system;
@@ -839,7 +1141,6 @@ sub get_login_process {
 	$self->output_log($state->{OUTPUT_LOG});
 	$self->dump_log($state->{DUMP_LOG});
 
-	$self->timeout($state->{TIMEOUT});
 	$self->prompt($prompt_end);
 	$self->cmd_remove_mode(0);
 	
@@ -856,16 +1157,16 @@ sub get_login_process {
 
 		LOGIN:
 		while(1){
-			my (undef, $m) = $self->waitfor(Match => '/\\s*Password:$/', Match => '/\\s*Username:$/', Match=>$prompt_end);
+			my (undef, $m) = $self->waitfor(Match => '/Password: ?$/i', Match => '/Username: ?$/i', Match=>$prompt_end);
 			die "Login timeout\n" unless $m; # time out
 
 			given($m){
-				when(/Username:$/){
+				when(/Username: ?$/i){
 					die "Retry 'Login' exceed $u_retry\n" unless $u_count++ < $u_retry;
 					$self->print($username);
 					push @{$state->{LOGIN_CMD}}, $username;
 				}
-				when(/Password:$/){
+				when(/Password: ?$/i){
 					die "Retry 'Login' exceed $u_retry\n" unless $p_count++ < $u_retry;
 					$self->print($password);
 					push @{$state->{LOGIN_CMD}}, $password;
@@ -887,7 +1188,7 @@ sub get_login_process {
 
 	return unless $self->enter_super($su_password);
 	return unless $self->enter_system;
-	return 1;
+	return @{$state->{LOGIN_CMD}};
 }
 
 sub get_bind_mac_list{

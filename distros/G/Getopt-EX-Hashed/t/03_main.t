@@ -10,10 +10,12 @@ use Getopt::EX::Hashed 'has';
 has string   => ( spec => '=s' );
 has say      => ( spec => '=s', default => "Hello" );
 has number   => ( spec => '=i' );
+has so_long  => ( spec => '' );
 
 @ARGV = qw(
     --string Alice
     --number 42
+    --so-long
     );
 
 use Getopt::Long;
@@ -23,5 +25,6 @@ GetOptions($app->optspec) or die;
 is($app->{string}, "Alice", "String");
 is($app->{say}, "Hello", "String (default)");
 is($app->{number}, 42, "Number");
+is($app->{so_long}, 1, "dash option");
 
 done_testing;

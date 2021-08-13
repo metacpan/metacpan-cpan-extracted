@@ -1,6 +1,6 @@
 package TOML::Tiny;
 # ABSTRACT: a minimal, pure perl TOML parser and serializer
-$TOML::Tiny::VERSION = '0.14';
+$TOML::Tiny::VERSION = '0.15';
 use strict;
 use warnings;
 no warnings qw(experimental);
@@ -92,7 +92,7 @@ TOML::Tiny - a minimal, pure perl TOML parser and serializer
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 

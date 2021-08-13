@@ -21,6 +21,7 @@ t/00-report-prereqs.t
 t/author-pod-syntax.t
 t/numbers.t
 t/parity.t
+t/parser.t
 t/strict_arrays.t
 t/toml-test/invalid/array/missing-separator.t
 t/toml-test/invalid/array/missing-separator.toml

@@ -22,7 +22,7 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(finddeps);
 
-$VERSION = '3.09';
+$VERSION = '3.10';
 
 use constant MAXINT => ~0;
 
@@ -538,7 +538,7 @@ sub _getreqs {
                 # this but it doesn't work, for either zip or tar <shrug>
                 # # my $tar = Archive::Tar->new();
                 # # $tar->read([string opened as file])
-                my($scopeguard, $tempfile) = tempfile('CPAN-FindDependencies-XXXXXXXX', UNLINK => 1, TMPDIR => 1);
+                my(undef, $tempfile) = tempfile('CPAN-FindDependencies-XXXXXXXX', TMPDIR => 1, OPEN => 0);
                 open(my $fh, '>', "$tempfile") || die("Can't write $tempfile: $!\n");
                 binmode($fh); # Windows smells of wee
                 print $fh $file_data;
@@ -559,6 +559,8 @@ sub _getreqs {
                         }
                     }->($tempfile);
                 } else { $rval = $file_data; } # oh, it must have been a meta file
+
+                unlink $tempfile;
 
                 return $rval;
             },

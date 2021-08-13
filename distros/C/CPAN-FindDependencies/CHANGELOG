@@ -1,3 +1,8 @@
+3.10    2021-08-11
+
+- Stop leaking filehandles, so it should still work even when we're not allowed
+  to have many open files.
+
 3.09    2021-07-14
 
 - No functional changes. Internal improvements for handling bzipped archives,

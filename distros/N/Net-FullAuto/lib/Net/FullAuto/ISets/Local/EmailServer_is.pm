@@ -785,13 +785,16 @@ if ($do==1) {
    ($stdout,$stderr)=$handle->cmd($sudo.
       'wget -qO- https://en.wikipedia.org/wiki/OpenSSL');
    $stdout=~s/^.*?Stable release.*?-data["][>](.*?) *[(].*$/$1/s;
-   my $osslv=$stdout;
+   my $sslv=$stdout;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'ls -1 | grep openssl');
+   my $ssldir=0;
+   $ssldir=1 if $stdout=~/^\s*openssl\s*$/s;
    ($stdout,$stderr)=$handle->cmd($sudo.
       'strings /usr/local/lib64/libssl.so | grep OpenSSL');
-   unless ($stdout=~/$osslv/s) {
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'ls -1 | grep openssl');
-      if ($stdout=~/^\s*openssl\s*$/s) {
+   my $ssllib=$stdout;
+   if ($ssllib!~/$sslv/s  || !$ssldir) {
+      if ($ssldir) {
          ($stdout,$stderr)=$handle->cmd($sudo.
              'rm -rvf openssl-old','__display__');
          ($stdout,$stderr)=$handle->cmd($sudo.
@@ -819,29 +822,34 @@ if ($do==1) {
          'https://git.sailfishos.org/mer-core/'.
          'openssl/raw/master/rpm/openssl.spec',
          '__display__');
-      $osslv=~s/\./_/g;
+      my $sslr=$sslv;
+      $sslr=~s/\./_/g;
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "git checkout OpenSSL_$osslv",'__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         './config LDFLAGS="-Wl,-rpath /usr/local/lib -Wl,'.
-         '-rpath /usr/local/lib64"','__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'make install','__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'cp -Pv /etc/ssl/certs/* /usr/local/ssl/certs',
-         '__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'cp -v *.pc /usr/local/lib/pkgconfig',
-         '__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'ldconfig -v','__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'ln -s /usr/local/lib64/libssl.so.1.1 '.
-         '/usr/lib64/libssl.so.1.1');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'ln -s /usr/local/lib64/libcrypto.so.1.1 '.
-         '/usr/lib64/libcrypto.so.1.1');
-      $build_php=1;
+         "git checkout OpenSSL_$sslr",'__display__');
+      if ($ssllib!~/$sslv/s) {
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            './config LDFLAGS="-Wl,-rpath /usr/local/lib -Wl,'.
+            '-rpath /usr/local/lib64"','__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'make install','__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'cp -Pv /etc/ssl/certs/* /usr/local/ssl/certs',
+            '__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'cp -v *.pc /usr/local/lib/pkgconfig',
+            '__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'ldconfig -v','__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'ln -s /usr/local/lib64/libssl.so.1.1 '.
+            '/usr/lib64/libssl.so.1.1');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+           'ln -s /usr/local/lib64/libcrypto.so.1.1 '.
+            '/usr/lib64/libcrypto.so.1.1');
+         $build_php=1;
+      } else {
+         print "libssl is up to date.\n";
+      }
    } else {
       print "libssl is up to date.\n";
    }
@@ -1492,7 +1500,7 @@ END
             '__display__');
          # https://www.linuxfromscratch.org/blfs/view/cvs/server/mariadb.html
          ($stdout,$stderr)=$handle->cmd($sudo.
-            '/bin/cmake -DWITH_SSL=yes '.
+            '/usr/local/bin/cmake -DWITH_SSL=yes '.
             '-DSKIP_TESTS=ON '.
             '-DMYSQL_DATADIR=/var/lib/mysql '.
             '-DCMAKE_INSTALL_PREFIX=/usr/local/mysql '.
@@ -2526,6 +2534,9 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'postconf -e "inet_interfaces = all"','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
+      'postconf -e \'mydestination = $myhostname, localhost.$mydomain, '.
+      'localhost, $mydomain\'','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'postconf -e "mydestination = mail.'.$domain_url.', \$myhostname, '.
       'localhost.\$mydomain, localhost"',
       '__display__');
@@ -2802,6 +2813,13 @@ END
       ($hash,$output,$error)=run_aws_cmd($c);
       ($stdout,$stderr)=$handle->cmd($sudo.
          'rm -rfv ./sespolicy','__display__');
+   } else {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'postconf -e \'smtpd_sasl_type = dovecot\'',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'postconf -e \'smtpd_sasl_path = private/auth\'',
+         '__display__');
    }
    ($stdout,$stderr)=$handle->cmd($sudo.
       'postconf -e \'smtp_tls_CAfile = /etc/ssl/certs/ca-bundle.crt\'',

@@ -25,17 +25,19 @@ for my $case ( @cases ) {
     my ($val,$expected_status) = @$case;
 
     eval { assert_nonempty( $val ) };
-    $val = "undef" if !defined($val);
-    my $desc = "Checking \"$val\"";
+    my $desc = 'Checking ' . ($val // 'undef');
 
     if ( $expected_status eq FAIL ) {
         like( $@, qr/Assertion.+failed/, $desc );
-    } else {
-        is( $@, "", $desc );
+    }
+    else {
+        is( $@, '', $desc );
     }
 }
 
-throws_ok( sub { assert_nonempty( 27 ) }, qr/Not an array or hash reference/ );
+NOT_AN_ARRAY: {
+    throws_ok( sub { assert_nonempty( 27 ) }, qr/Assertion failed!/ );
+}
 
 BLESSED_ARRAY: {
     my $array_object = bless( [], 'WackyPackage' );

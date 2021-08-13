@@ -7,6 +7,8 @@ use parent 'Protocol::DBus::Authn::Mechanism';
 
 use Protocol::DBus::Socket ();
 
+use constant SOCKET_MSGHDR_MINIMUM_VERSION => 0.05;
+
 # The methods of user credential retrieval that the reference D-Bus
 # server relies on prefer “out-of-band” methods like SO_PEERCRED
 # on Linux rather than SCM_CREDS. (See See dbus/dbus-sysdeps-unix.c.)
@@ -50,7 +52,7 @@ sub must_send_initial {
         if (!$can_skip_msghdr) {
             my $ok = eval {
                 require Socket::MsgHdr;
-                Socket::MsgHdr->VERSION(0.05);
+                Socket::MsgHdr->VERSION(SOCKET_MSGHDR_MINIMUM_VERSION);
             };
 
             if (!$ok) {

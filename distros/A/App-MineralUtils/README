@@ -3,8 +3,8 @@ NAME
     supplements)
 
 VERSION
-    This document describes version 0.002 of App::MineralUtils (from Perl
-    distribution App-MineralUtils), released on 2021-08-11.
+    This document describes version 0.003 of App::MineralUtils (from Perl
+    distribution App-MineralUtils), released on 2021-08-12.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:

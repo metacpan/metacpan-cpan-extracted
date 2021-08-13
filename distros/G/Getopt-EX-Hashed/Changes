@@ -1,5 +1,9 @@
 Revision history for Perl extension Getopt-EX-Hashed
 
+0.9912 2021-08-13T00:45:25Z
+
+    - Fix default config access bug.
+
 0.9911 2021-08-11T15:34:09Z
 
     - Fix bug when called by Getopt::EX::Hashed->new interface.

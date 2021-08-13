@@ -1,3 +1,6 @@
+0.21 2021-08-12
+- fix test bug under at least 5.14.1 that had test compare complex numbers
+
 0.20 2021-05-30
 - also export mpinv
 - fix RedoDimsCode for native-complex

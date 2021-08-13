@@ -223,11 +223,16 @@ sub _run_make
   if ( !defined $can_jobs )
   {
     $can_jobs = '';
-    my $make_help = run( $make, '-h' );
+    my $make_help
+      = eval { run( $make, '-h' ) } // eval { run( $make, '--help' ) } // '';
 
     if ( $make_help =~ m/^\s*-j\s+/xms )
     {
       $can_jobs = '-j';
+    }
+    elsif ( $make_help =~ m/^\s*--jobs\s+/xms )
+    {
+      $can_jobs = '--jobs';
     }
   }
 
@@ -300,7 +305,8 @@ sub _check_perl_binary
   # a bare minimum check and it may change in the future
   my @check = qw/-MPOSIX -e crypt('00','test')/;
 
-  return eval { run "$perl_bin", @check; 1 };
+  run "$perl_bin", @check;
+  return 1;
 }
 
 sub build_reusable
@@ -392,9 +398,11 @@ sub build_reusable
   _run_make('install');
 
   # Verify that the relocatable bits worked
-  if ( !_check_perl_binary( "$perl_dir/v$version/bin/perl" ) )
+  eval { _check_perl_binary( "$perl_dir/v$version/bin/perl" ) };
+  my $error = $@;
+  if ( $error )
   {
-    die "The built relocatable binary appears broken";
+    die "The built relocatable binary appears broken: $error\n";
   }
 
   my $slugline = slugline("$perl_dir/v$version/bin/perl");
@@ -433,9 +441,11 @@ sub _install_binary
   }
 
   # Attempt to run something more rigorous
-  if ( !_check_perl_binary( "$src_dir/bin/perl" ) )
+  eval { _check_perl_binary( "$src_dir/bin/perl" ) };
+  my $error = $@;
+  if ( $error )
   {
-    die qq{Binary does not appear to be usable};
+    die "Binary does not appear to be usable: $error";
   }
 
   make_path($perl_dir);

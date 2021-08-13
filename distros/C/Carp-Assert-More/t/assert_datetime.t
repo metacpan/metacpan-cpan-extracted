@@ -35,6 +35,4 @@ my $dt = DateTime->now;
 assert_datetime( $dt );
 pass( 'Got past a valid assertion' );
 
-
-done_testing();
 exit 0;

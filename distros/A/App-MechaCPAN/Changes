@@ -1,5 +1,11 @@
 Revision history for App-MechaCPAN
 
+0.28  2021-08-12 23:26:06 EDT
+  - Include core dependencies, because RedHat. Fixes GH#20
+  - Be more forgiving of the limitations of the underlying OS
+  - Don't fail a test because the optional --jobs option because make doesn't
+    understand -h. Fixes GH#19
+
 0.27  2021-08-10 22:53:01 EDT
   - Add the option to build and install relocatable binary perl archives
   - Add the --jobs option and try to detect if make doesn't support it
@@ -28,7 +34,7 @@ Revision history for App-MechaCPAN
   - Improve restart_script to work better without --directory (GH#8)
   - Copy App::MechaCPAN to the new locations if it doesn't already exist
     in the destination directory (GH#8)
-  - Thanks to James Pattie/pattieja1 for the changes and testing with CH#8
+  - Thanks to James Pattie/pattieja1 for the changes and testing with GH#8
   - Logs now have a much more humane name that includes a timestamp
   - The amount of random, temporary files, both during processing as well as
     after exceptions, has been reduced

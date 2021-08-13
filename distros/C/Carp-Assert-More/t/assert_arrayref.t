@@ -41,5 +41,4 @@ throws_ok( sub { assert_arrayref( $coderef ) }, $FAILED );
 # Foo->new->isa("ARRAY") returns true, so do we
 lives_ok( sub { assert_arrayref( Foo->new ) } );
 
-done_testing();
 exit 0;

@@ -21,4 +21,4 @@ Please also read the perlmodinstall man page, if available.
 
 WHAT MODULES DO I NEED?
 
-    Carp and Carp::Assert
+    Carp, which comes standard with Perl.

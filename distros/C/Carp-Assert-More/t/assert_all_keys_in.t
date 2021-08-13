@@ -32,5 +32,4 @@ throws_ok(
     'Monolith fails on person keys'
 );
 
-done_testing();
 exit 0;

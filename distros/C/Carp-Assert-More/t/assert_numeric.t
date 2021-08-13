@@ -53,5 +53,4 @@ for my $bad ( @bad ) {
 }
 
 
-done_testing();
 exit 0;

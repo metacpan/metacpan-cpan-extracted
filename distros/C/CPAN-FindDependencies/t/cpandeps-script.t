@@ -97,6 +97,18 @@ eq_or_diff($stdout, 'CPAN::FindDependencies (dist: D/DC/DCANTRELL/CPAN-FindDepen
   YAML (dist: I/IN/INGY/YAML-0.66.tar.gz)
 ', "got CPAN::FindDependencies right");
 
+
+if($ENV{AUTHOR_TESTING}) {
+    # Eeuuww, string-system. We need to invoke a shell with a lower ulimit.
+    # And it's author-testing because ulimit isn't sufficiently portable.
+    my($stdout, $stderr) = capture { system(qq{
+        ulimit -n 20;
+        bash -c "$Config{perlpath} }.join(' ', (map { "-I$_" } (@INC))).
+        q{ blib/script/cpandeps CPAN::FindDependencies --perl 5.30.2" }
+    ) };
+    unlike($stdout, qr/\*/, "even with a low ulimit we don't get warnings about not being able to retrieve deps");
+}
+
 };
 
 done_testing;

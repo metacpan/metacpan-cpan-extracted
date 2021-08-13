@@ -10,7 +10,7 @@ use Test::More;
 
 sub fapprox {
 	my($a,$b) = @_;
-	PDL::abs($a-$b)->max < 0.0001;
+	($a-$b)->abs->max < 0.0001;
 }
 
 my $a = pdl([[1.7,3.2],[9.2,7.3]]);

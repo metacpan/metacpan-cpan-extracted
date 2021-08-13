@@ -1,9 +1,9 @@
 package App::MineralUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-11'; # DATE
+our $DATE = '2021-08-12'; # DATE
 our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,17 +11,45 @@ use warnings;
 
 our %SPEC;
 
+my @magnesium_units = (
+    'mg',
+    'mg-magnesium-elemental',
+    'mg-magnesium-citrate',
+    'mg-magnesium-glycinate',
+    'mg-magnesium-bisglycinate',
+    'mg-magnesium-l-threonate',
+    'mg-magnesium-oxide',
+);
+
 # XXX share with App::VitaminUtils
-our %args_common = (
+our %argspecs_magnesium = (
     quantity => {
         # schema => 'physical::mass*', # XXX Perinci::Sub::GetArgs::Argv is not smart enough to coerce from string
         schema => 'str*',
         req => 1,
         pos => 0,
+        completion => sub {
+            require Complete::Sequence;
+
+            my %args = @_;
+            Complete::Sequence::complete_sequence(
+                word => $args{word},
+                sequence => [
+                    # TEMP
+                    #sub {
+                    #    require Complete::Number;
+                    #    my $stash = shift;
+                    #    Complete::Number::complete_int(word => $stash->{cur_word});
+                    #},
+                    #' ',
+                    {alternative=>\@magnesium_units},
+                ],
+            );
+        },
     },
     to_unit => {
         # schema => 'physical::unit', # IU hasn't been added
-        schema => 'str*',
+        schema => ['str*', in=>\@magnesium_units],
         pos => 1,
     },
 );
@@ -35,7 +63,7 @@ If target unit is not specified, will show all known conversions.
 
 _
     args => {
-        %args_common,
+        %argspecs_magnesium,
     },
     examples => [
         {args=>{quantity=>'mg'}, summary=>'Show all possible conversions'},
@@ -64,13 +92,7 @@ sub convert_magnesium_unit {
     } else {
         my @rows;
         for my $u (
-            'mg',
-            'mg-magnesium-elemental',
-            'mg-magnesium-citrate',
-            'mg-magnesium-glycinate',
-            'mg-magnesium-bisglycinate',
-            'mg-magnesium-l-threonate',
-            'mg-magnesium-oxide',
+            @magnesium_units,
         ) {
             push @rows, {
                 unit => $u,
@@ -96,7 +118,7 @@ App::MineralUtils - Utilities related to minerals (and mineral supplements)
 
 =head1 VERSION
 
-This document describes version 0.002 of App::MineralUtils (from Perl distribution App-MineralUtils), released on 2021-08-11.
+This document describes version 0.003 of App::MineralUtils (from Perl distribution App-MineralUtils), released on 2021-08-12.
 
 =head1 DESCRIPTION
 

@@ -32,7 +32,7 @@
 /*#include "ed25519/src/add_scalar.c"*/
 #include "ed25519/src/fixedint.h"
 #include "ed25519/src/keypair.c"
-/*#include "ed25519/src/key_exchange.c"*/
+#include "ed25519/src/key_exchange.c"
 #include "ed25519/src/seed.c"
 #include "ed25519/src/sha512.c"
 #include "ed25519/src/sha512.h"
@@ -51,13 +51,20 @@ MODULE = Crypt::Ed25519		PACKAGE = Crypt::Ed25519
 
 PROTOTYPES: ENABLE
 
+BOOT:
+	perlmulticore_support ();
+
 SV *
 eddsa_secret_key ()
 	CODE:
 {
         unsigned char seed[32];
 
-        if (ed25519_create_seed (seed))
+        perlinterp_release ();
+        int err = ed25519_create_seed (seed);
+        perlinterp_acquire ();
+
+        if (err)
           croak ("Crypt::Ed25519::eddsa_secret_key: ed25519_create_seed failed");
 
         RETVAL = newSVpvn (seed, sizeof seed);
@@ -181,4 +188,27 @@ verify (SV *message, SV *public_key, SV *signature)
 	OUTPUT:
         RETVAL
 
+SV *
+key_exchange (SV *public_key, SV *private_key)
+	CODE:
+{
+        STRLEN public_key_l ; char *public_key_p  = SvPVbyte (public_key , public_key_l );
+        STRLEN private_key_l; char *private_key_p = SvPVbyte (private_key, private_key_l);
+
+        if (public_key_l  != 32)
+          croak ("Crypt::Ed25519::key_exchange: public key has wrong length (!= 32)");
+
+        if (private_key_l != 64)
+          croak ("Crypt::Ed25519::key_exchange: private key has wrong length (!= 64)");
+
+        unsigned char shared_secret[32];
+
+        perlinterp_release ();
+        ed25519_key_exchange (shared_secret, public_key_p, private_key_p);
+        perlinterp_acquire ();
+
+        RETVAL = newSVpvn (shared_secret, sizeof shared_secret);
+}
+        OUTPUT:
+        RETVAL
 

@@ -11,6 +11,11 @@ if ( $^O eq 'MSWin32' )
   plan skip_all => 'Cannot build perl on Win32';
 }
 
+if ( !eval { run(qw/tar --version/) } )
+{
+  plan skip_all => 'Skipping without a usable tar command';
+}
+
 my $pwd = cwd;
 my $tmpdir = tempdir( TEMPLATE => File::Spec->tmpdir . "/mechacpan_t_XXXXXXXX", CLEANUP => 1 );
 chdir $tmpdir;

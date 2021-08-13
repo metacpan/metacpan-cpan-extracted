@@ -1,4 +1,5 @@
 MANIFEST
+META.yml
 Makefile.PL
 lib/Net/Telnet/Huawei.pm
 

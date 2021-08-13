@@ -55,8 +55,7 @@ SKIP: {
       my $s3 = $uri->as_string;
     } 'combined';
 
-
-    no_leaks_ok {
+    subtest 'absolute' => sub{
       my $base = 'http://a/b/c/d;p?q';
 
       my @tests = (
@@ -84,13 +83,24 @@ SKIP: {
         ["../../g" , "http://a/g"],
       );
 
-      foreach my $test (@tests) {
-        my ($rel, $exp) = @$test;
-        my $abs = uri($rel)->absolute(uri($base));
-      }
+      no_leaks_ok {
+        foreach my $test (@tests) {
+          my ($rel, $exp) = @$test;
+          my $abs = uri($rel)->absolute(uri($base));
+        }
 
-      my $uri = uri('some/path')->absolute('http://www.example.com/fnord');
-    } 'absolute';
+        my $absolute = uri('some/path')->absolute('http://www.example.com/fnord');
+      } 'absolute';
+
+      no_leaks_ok {
+        foreach my $test (@tests) {
+          my ($rel, $exp) = @$test;
+          my $abs = uri($rel)->absolute(uri($base));
+        }
+
+        my $new_abs  = URI::Fast->new_abs('some/path', 'http://www.example.com/fnord');
+      } 'new_abs';
+    };
   };
 };
 

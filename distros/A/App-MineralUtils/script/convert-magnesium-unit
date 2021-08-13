@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.499
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-11'; # DATE
+our $DATE = '2021-08-12'; # DATE
 our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ convert-magnesium-unit - Convert a magnesium quantity from one unit to another
 
 =head1 VERSION
 
-This document describes version 0.002 of convert-magnesium-unit (from Perl distribution App-MineralUtils), released on 2021-08-11.
+This document describes version 0.003 of convert-magnesium-unit (from Perl distribution App-MineralUtils), released on 2021-08-12.
 
 =head1 SYNOPSIS
 
@@ -86,6 +86,10 @@ C<*> marks required options.
 Can also be specified as the 1st command-line argument.
 
 =item B<--to-unit>=I<s>
+
+Valid values:
+
+ ["mg","mg-magnesium-elemental","mg-magnesium-citrate","mg-magnesium-glycinate","mg-magnesium-bisglycinate","mg-magnesium-l-threonate","mg-magnesium-oxide"]
 
 Can also be specified as the 2nd command-line argument.
 

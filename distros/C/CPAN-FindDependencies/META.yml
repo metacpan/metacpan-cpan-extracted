@@ -43,5 +43,5 @@ requires:
 resources:
   bugtracker: https://github.com/DrHyde/perl-modules-CPAN-FindDependencies/issues
   repository: https://github.com/DrHyde/perl-modules-CPAN-FindDependencies
-version: '3.09'
+version: '3.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

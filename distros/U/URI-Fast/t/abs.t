@@ -33,13 +33,23 @@ subtest 'normal cases - https://www.rfc-editor.org/rfc/rfc3986.txt 5.4.1' => sub
 
   foreach my $test (@cases) {
     my ($rel, $exp) = @$test;
+
     my $abs = uri($rel)->absolute(uri($base));
-    is $abs, $exp, "abs: $rel -> $exp"
+    is $abs, $exp, "absolute: $rel -> $exp"
       or do{
         diag "rel:    '$rel'";
         diag "base:   '$base'";
         diag "exp:    '$exp'";
         diag "actual: '$abs'";
+      };
+
+    my $new_abs = URI::Fast->new_abs($rel, $base);
+    is $new_abs, $exp, "new_abs: $rel -> $exp"
+      or do{
+        diag "rel:    '$rel'";
+        diag "base:   '$base'";
+        diag "exp:    '$exp'";
+        diag "actual: '$new_abs'";
       };
   }
 };
@@ -68,14 +78,24 @@ subtest 'edge cases - https://www.rfc-editor.org/rfc/rfc3986.txt 5.4.2' => sub{
 
   foreach my $test (@cases) {
     my ($rel, $exp) = @$test;
+
     my $abs = uri($rel)->absolute(uri($base));
-    is $abs, $exp, "abs: $rel -> $exp"
+    is $abs, $exp, "absolute: $rel -> $exp"
       or do{
         diag "rel:    '$rel'";
         diag "base:   '$base'";
         diag "exp:    '$exp'";
         diag "actual: '$abs'";
         bail_out;
+      };
+
+    my $new_abs = URI::Fast->new_abs($rel, $base);
+    is $new_abs, $exp, "new_abs: $rel -> $exp"
+      or do{
+        diag "rel:    '$rel'";
+        diag "base:   '$base'";
+        diag "exp:    '$exp'";
+        diag "actual: '$new_abs'";
       };
   }
 };

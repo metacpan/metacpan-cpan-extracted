@@ -1,6 +1,6 @@
 package Getopt::EX::Hashed;
 
-our $VERSION = '0.9911';
+our $VERSION = '0.9912';
 
 =head1 NAME
 
@@ -8,7 +8,7 @@ Getopt::EX::Hashed - Hash store object automation
 
 =head1 VERSION
 
-Version 0.9911
+Version 0.9912
 
 =head1 SYNOPSIS
 
@@ -69,19 +69,19 @@ sub import {
     no strict 'refs';
     push @{"$caller\::ISA"}, __PACKAGE__;
     *{"$caller\::$_"} = \&{$_} for @EXPORT;
-    my $c = __Config__($caller);
-    unless (%{$c}) {
-	%{$c} = %DefaultConfig;
-	lock_keys %{$c};
+    my $C = __Config__($caller);
+    unless (%{$C}) {
+	%{$C} = %DefaultConfig or die "something wrong!";
+	lock_keys %{$C};
     }
 }
 
 sub configure {
     my $class = shift;
-    my $pkg = $class ne __PACKAGE__ ? $class : caller;
-    my $c = __Config__($pkg);
+    my $ctx = $class ne __PACKAGE__ ? $class : caller;
+    my $C = __Config__($ctx);
     while (my($key, $value) = splice @_, 0, 2) {
-	$c->{$key} = $value;
+	$C->{$key} = $value;
     }
     return $class;
 }
@@ -93,8 +93,8 @@ sub unimport {
 }
 
 sub reset {
-    my $m = __Member__(caller);
-    @{$m} = ();
+    my $M = __Member__(caller);
+    @{$M} = ();
     return $_[0];
 }
 
@@ -102,22 +102,22 @@ sub has {
     my($key, @param) = @_;
     my @name = ref $key eq 'ARRAY' ? @$key : $key;
     my $caller = caller;
-    my $m = __Member__($caller);
-    my $c = __Config__($caller);
+    my $M = __Member__($caller);
+    my $C = __Config__($caller);
     for my $name (@name) {
 	my $append = $name =~ s/^\+//;
-	my $i = first { ${$m}[$_]->[0] eq $name } 0 .. $#{$m};
+	my $i = first { ${$M}[$_]->[0] eq $name } 0 .. $#{$M};
 	if ($append) {
 	    defined $i or die "$name: Not found\n";
-	    push @{${$m}[$i]}, @param;
+	    push @{${$M}[$i]}, @param;
 	} else {
 	    defined $i and die "$name: Duplicated\n";
-	    if (my $default = $c->{DEFAULT}) {
+	    if (my $default = $C->{DEFAULT}) {
 		if (ref $default eq 'ARRAY') {
 		    unshift @param, @{$default};
 		}
 	    }
-	    push @{$m}, [ $name, @param ];
+	    push @{$M}, [ $name, @param ];
 	}
     }
 }
@@ -125,27 +125,27 @@ sub has {
 sub new {
     my $class = shift;
     my $obj = bless {}, $class;
-    my $pkg = $class ne __PACKAGE__ ? $class : caller;
-    my $m = __Member__($pkg);
-    my $c = __Config__($pkg);
+    my $ctx = $class ne __PACKAGE__ ? $class : caller;
+    my $M = __Member__($ctx);
+    my $C = __Config__($ctx);
     my $member = $obj->{__Hash__} = {
 	map {
 	    my($key, %param) = @$_;
 	    $key => \%param;
-	} @{$m}
+	} @{$M}
     };
-    my $order = $obj->{__Order__} = [ map $_->[0], @{$m} ];
+    my $order = $obj->{__Order__} = [ map $_->[0], @{$M} ];
     for my $key (@{$order}) {
 	my $m = $member->{$key};
 	$obj->{$key} = $m->{default};
 	if (my $is = $m->{is}) {
 	    no strict 'refs';
-	    my $access = $c->{ACCESSOR_PREFIX} . $key;
+	    my $access = $C->{ACCESSOR_PREFIX} . $key;
 	    *{"$class\::$access"} = _accessor($is, $key);
 	}
     }
-    lock_keys %{$obj} if $c->{LOCK_KEYS};
-    __PACKAGE__->reset if $c->{RESET_AFTER_NEW};
+    lock_keys %{$obj} if $C->{LOCK_KEYS};
+    __PACKAGE__->reset if $C->{RESET_AFTER_NEW};
     $obj;
 }
 
@@ -165,11 +165,19 @@ sub _accessor {
 
 sub optspec {
     my $obj = shift;
+    my $ref = ref $obj;
+    my $ctx = $ref ne __PACKAGE__ ? $ref : caller;
+    _optspec($obj, $ctx, @_);
+}
+
+sub _optspec {
+    my $obj = shift;
+    my $ctx = shift;
     my $member = $obj->{__Hash__};
     my @optlist = do {
 	map  {
 	    my($name, $spec) = @$_;
-	    my $compiled = _compile($obj, $name, $spec);
+	    my $compiled = _compile($ctx, $name, $spec);
 	    my $m = $member->{$name};
 	    my $dest = do {
 		if (my $action = $m->{action}) {
@@ -208,9 +216,7 @@ sub optspec {
 my $spec_re = qr/[!+=:]/;
 
 sub _compile {
-    my $obj = shift;
-    my $ref = ref $obj;
-    my $pkg = $ref ne __PACKAGE__ ? $ref : caller;
+    my $ctx = shift;
     my($name, $args) = @_;
 
     return $name if $name eq '<>';
@@ -224,8 +230,8 @@ sub _compile {
     };
     my @alias = grep !/$spec_re/, @args;
     my @names = ($name, @alias);
-    my $c = __Config__($pkg);
-    if ($c->{REPLACE_UNDERSCORE}) {
+    my $C = __Config__($ctx);
+    if ($C->{REPLACE_UNDERSCORE}) {
 	for ($name, @alias) {
 	    push @names, tr[_][-]r if /_/;
 	}
@@ -237,11 +243,11 @@ sub _compile {
 sub getopt {
     my $obj = shift;
     my $ref = ref $obj;
-    my $pkg = $ref ne __PACKAGE__ ? $ref : caller;
-    my $c = __Config__($pkg);
-    my $getopt = caller . "::" . $c->{GETOPT};
+    my $ctx = $ref ne __PACKAGE__ ? $ref : caller;
+    my $C = __Config__($ctx);
+    my $getopt = caller . "::" . $C->{GETOPT};
     no strict 'refs';
-    &{$getopt}($obj->optspec);
+    &{$getopt}(_optspec($obj, $ctx));
 }
 
 sub use_keys {

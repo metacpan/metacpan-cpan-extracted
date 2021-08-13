@@ -3,7 +3,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 6;
+use Test::More tests => 7;
 
 use Test::Exception;
 
@@ -19,3 +19,7 @@ throws_ok( sub {
     my $ref    = \$string;
     assert_unlike( $string, $ref, 'Dingo' );
 }, qr/\QAssertion (Dingo) failed/, 'bad reference fails' );
+lives_ok( sub { assert_unlike( undef, qr/something/, 'Monkey' ) }, 'undef string always passes' );
+
+
+exit 0;

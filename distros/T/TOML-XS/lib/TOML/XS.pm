@@ -10,7 +10,7 @@ use Types::Serialiser ();
 use XSLoader ();
 
 BEGIN {
-    $VERSION = '0.04';
+    $VERSION = '0.05';
     XSLoader::load( __PACKAGE__, $VERSION );
 }
 
@@ -101,13 +101,33 @@ On my system the included (I<very> simple!) benchmark outputs:
 *true = *Types::Serialiser::true;
 *false = *Types::Serialiser::false;
 
-sub _croak_err_message_from_pieces {
+sub _croak_malformed_toml {
     my $path_ar = shift;
 
-    s<~><~0>g for @$path_ar;
-    s</><~1>g for @$path_ar;
+    return _croak_with_pointer('Malformed TOML value found!', $path_ar);
+}
 
-    die sprintf "Malformed TOML value found! (JSON pointer: %s)", join('/', q<>, @$path_ar);
+sub _croak_pointer_beyond_datum {
+    my $path_ar = shift;
+
+    return _croak_with_pointer('Can’t descend into non-container!', $path_ar);
+}
+
+sub _croak_with_pointer {
+    my ($msg, $path_ar) = @_;
+
+    die sprintf( "%s (JSON pointer: %s)", $msg, _BUILD_JSON_POINTER($path_ar) );
+}
+
+sub _BUILD_JSON_POINTER {
+    my $pieces_ar = shift;
+
+    my @pieces =  @$pieces_ar;
+
+    s<~><~0>g for @pieces;
+    s</><~1>g for @pieces;
+
+    return join('/', q<>, @pieces);
 }
 
 #----------------------------------------------------------------------

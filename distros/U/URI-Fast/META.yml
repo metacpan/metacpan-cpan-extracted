@@ -6,9 +6,8 @@ build_requires:
   Data::Dumper: '0'
   ExtUtils::MakeMaker: 6.63_03
   ExtUtils::testlib: '0'
-  Test2: '1.302125'
-  Test2::Suite: '0.000100'
-  Test2::V0: '0'
+  Pod::Select: '0'
+  Test2::V0: '0.000141'
   Test::LeakTrace: '0.16'
   URI::Encode::XS: '0.11'
   URI::Split: '0'
@@ -35,5 +34,5 @@ resources:
   bugtracker: https://github.com/sysread/URI-Fast/issues
   homepage: https://github.com/sysread/URI-Fast
   repository: https://github.com/sysread/URI-Fast.git
-version: '0.50'
+version: '0.51'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

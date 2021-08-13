@@ -11,6 +11,8 @@ t/assert_aoh.t
 t/assert_arrayref.t
 t/assert_arrayref_nonempty.t
 t/assert_coderef.t
+t/assert_context_nonvoid.t
+t/assert_context_scalar.t
 t/assert_datetime.t
 t/assert_defined.t
 t/assert_empty.t

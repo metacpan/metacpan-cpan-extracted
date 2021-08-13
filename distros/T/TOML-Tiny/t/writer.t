@@ -42,33 +42,15 @@ subtest 'rfc3339 datetimes' => sub{
 
 subtest 'oddballs and regressions' => sub{
   subtest 'strings that look like numbers' => sub{
-    my $parser = TOML::Tiny->new(
-      inflate_integer => sub{
-        use Math::BigInt;
-        Math::BigInt->new(shift);
-      },
+    my $data = {
+      is_inf  => 'inf',
+      not_inf => 'to infinity and beyond',
+      is_nan  => 'nan',
+      not_nan => 'no nan here',
+    };
 
-      inflate_float => sub{
-        use Math::BigFloat;
-        Math::BigFloat->new(shift);
-      }
-    );
-
-    my $data = $parser->decode(q{
-
-not_an_int = "42"
-is_an_int  = 42
-
-not_a_flt  = "4.2"
-is_a_flt   = 4.2
-
-    });
-
-    ok !ref($data->{not_an_int}), 'strings do not inflate as integers';
-    ok ref($data->{is_an_int}) && $data->{is_an_int}->isa('Math::BigInt'), 'integers do inflate with inflate_integer';
-
-    ok !ref($data->{not_a_flt}), 'strings do not inflate as floats';
-    ok ref($data->{is_a_flt}) && $data->{is_a_flt}->isa('Math::BigFloat'), 'floats do inflate with inflate_float';
+    is to_toml({a => 'no inf here'}), 'a="no inf here"', '"inf" present in string is string';
+    is to_toml({a => 'no nan here'}), 'a="no nan here"', '"nan" present in string is string';
   };
 };
 

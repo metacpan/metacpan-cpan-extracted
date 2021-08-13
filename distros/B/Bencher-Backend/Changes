@@ -1,3 +1,23 @@
+1.060   2021-08-13  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 1.059 and 1.059.2.
+
+
+1.059.2 2021-08-13  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Add option --render-as-benchmark-pm.
+
+        - UPDATE 2021-08-13: rename release from 1.056 to 1.059.2 due to
+          duplicate.
+
+
+1.059   2021-07-31  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix goto bug that caused empty item names.
+
+	- [action list-items] Show _succinct_name for debugging.
+
+
 1.058   2021-07-31  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] When rendering result as Benchmark.pm result, fix

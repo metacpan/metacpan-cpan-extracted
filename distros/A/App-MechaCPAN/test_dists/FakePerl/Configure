@@ -9,7 +9,8 @@ EOF
 if [ ! -z "$DESTDIR" ]; then
 cat >>Makefile <<EOF
 	mkdir -p $DESTDIR/v5.12.0/bin/
-	echo "#!/bin/sh\necho 'v5.12.0'" > $DESTDIR/v5.12.0/bin/perl
+	echo "#!/bin/sh" > $DESTDIR/v5.12.0/bin/perl
+	echo "echo 'v5.12.0'" >> $DESTDIR/v5.12.0/bin/perl
 	chmod 744 $DESTDIR/v5.12.0/bin/perl
 EOF
 fi

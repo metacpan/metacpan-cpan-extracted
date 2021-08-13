@@ -2,7 +2,6 @@
 # https://metacpan.org/release/Module-CPANfile
 
 requires 'Carp' => 0;
-requires 'Carp::Assert' => 0;
 requires 'Scalar::Util' => 0;
 
 on 'test' => sub {

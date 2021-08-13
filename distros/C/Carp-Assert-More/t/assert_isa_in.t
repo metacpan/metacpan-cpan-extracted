@@ -63,5 +63,4 @@ ASSERT_ISA_IN: {
     }
 };
 
-done_testing();
 exit 0;

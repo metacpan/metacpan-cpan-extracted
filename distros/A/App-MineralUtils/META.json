@@ -33,6 +33,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Complete::Sequence" : "0.002",
             "Data::Sah::Compiler::perl::TH::str" : "0.910",
             "Perinci::CmdLine::Any" : "0.152",
             "Perinci::CmdLine::Lite" : "1.905",
@@ -54,7 +55,7 @@
    "provides" : {
       "App::MineralUtils" : {
          "file" : "lib/App/MineralUtils.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -69,7 +70,7 @@
          "web" : "https://github.com/perlancar/perl-App-MineralUtils"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

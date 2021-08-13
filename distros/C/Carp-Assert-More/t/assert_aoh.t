@@ -68,5 +68,4 @@ eval {
 };
 is( $@, '' );
 
-done_testing();
 exit 0;

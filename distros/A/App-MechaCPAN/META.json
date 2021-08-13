@@ -37,8 +37,24 @@
       },
       "runtime" : {
          "requires" : {
+            "Archive::Tar" : "0",
             "CPAN::Meta" : "0",
-            "perl" : "5.014000"
+            "Carp" : "0",
+            "Exporter" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Fetch" : "0",
+            "File::Path" : "0",
+            "File::Temp" : "0",
+            "Getopt::Long" : "0",
+            "JSON::PP" : "0",
+            "List::Util" : "0",
+            "Module::CoreList" : "0",
+            "Scalar::Util" : "0",
+            "Socket" : "0",
+            "Time::localtime" : "0",
+            "autodie" : "0",
+            "perl" : "5.014000",
+            "version" : "0"
          }
       },
       "test" : {
@@ -59,7 +75,7 @@
          "web" : "https://github.com/atrodo/App-MechaCPAN"
       }
    },
-   "version" : "0.27",
+   "version" : "0.28",
    "x_contributors" : [
       "Greg Arnold <greg@arnoldassociates.com>",
       "James A. Pattie <james.pattie@gpsinsight.com>",

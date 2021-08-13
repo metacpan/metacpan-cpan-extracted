@@ -1,3 +1,7 @@
+0.15 2021-08-13
+- bugfix: strings with "inf" or "nan" in them no longer treated as special
+  floats
+
 0.14 2021-08-02
 - Fix an issue with serialisation of nan, inf, and -inf (thanks jjatria)
 - Enforcement of homogenous arrays is no longer supported as it has been

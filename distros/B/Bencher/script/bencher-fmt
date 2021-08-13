@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-08-16'; # DATE
-our $VERSION = '1.051'; # VERSION
+our $DATE = '2021-08-13'; # DATE
+our $VERSION = '1.052'; # VERSION
 
 use 5.010001;
 use strict;
@@ -54,7 +54,7 @@ bencher-fmt - Format bencher result
 
 =head1 VERSION
 
-This document describes version 1.051 of bencher-fmt (from Perl distribution Bencher), released on 2020-08-16.
+This document describes version 1.052 of bencher-fmt (from Perl distribution Bencher), released on 2021-08-13.
 
 =head1 SYNOPSIS
 
@@ -76,6 +76,8 @@ C<*> marks required options.
 
 Enveloped result from bencher.
 
+Can also be specified as the 1st command-line argument.
+
 =item B<--exclude-formatters-json>=I<s>
 
 Exclude Formatters specification (JSON-encoded).
@@ -90,7 +92,11 @@ Exclude Formatters specification.
 
 See C<--options>.
 
+Can also be specified as the 3rd command-line argument.
+
 =item B<--options>=I<s>
+
+Can also be specified as the 3rd command-line argument.
 
 =back
 
@@ -163,6 +169,10 @@ you want to pipe the result for more post-processing. In this case you can use
 
 Filter output through a pager.
 
+=item B<--view-result>
+
+View output using a viewer.
+
 =back
 
 =head2 Other options
@@ -227,7 +237,22 @@ You can put multiple profiles in a single file by using section names like C<[pr
 
 You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
 
-Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable equals some string: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal some string: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when the value of an environment variable includes some string: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. If you only want a section to be read when the value of an environment variable does not include some string: C<[env=HOSTNAME!*=server ...]> or C<[SOMESECTION env=HOSTNAME!*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
+
+ [plugin=DumpArgs]
+ -event=before_validate_args
+ -prio=99
+ 
+ [plugin=Foo]
+ -event=after_validate_args
+ arg1=val1
+ arg2=val2
+
+ 
+
+which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-Foo@after_validate_args,arg1,val1,arg2,val2 >>.
 
 List of available configuration parameters:
 
@@ -271,9 +296,26 @@ feature.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

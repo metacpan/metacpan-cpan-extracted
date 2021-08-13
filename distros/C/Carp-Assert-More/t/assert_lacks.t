@@ -21,5 +21,4 @@ throws_ok( sub { assert_lacks( \%foo, 'name' ); }, qr/Assert.+failed/ );
 lives_ok( sub { assert_lacks( \%foo, [qw( Wango )] ); } );
 lives_ok( sub { assert_lacks( \%foo, [qw( Wango Tango )] ); } );
 throws_ok( sub { assert_lacks( \%foo, [qw( Wango Tango name )] ); }, qr/Assertion.+failed/ );
-lives_ok( sub { assert_lacks( \%foo, [qw()] ) } );
-
+throws_ok( sub { assert_lacks( \%foo, [qw()] ); }, qr/Assertion.+failed/ );

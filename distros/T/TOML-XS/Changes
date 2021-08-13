@@ -1,5 +1,14 @@
 Revision history for Perl extension TOML::XS:
 
+0.05 Thu 12 Aug 2021
+- BUG FIX: Memory leak in array allocation is fixed.
+- BUG FIX: Decoded hash keys are now character-decoded.
+- Update to latest tomlc99
+- to_struct() is renamed to parse(). (The old name remains for compatibility.)
+  This method can now extract specific values without converting the whole
+  document to Perl structures.
+- Add more tests.
+
 0.04 Thu 15 Apr 2021
 - Give explicit args to XSLoader::load().
 

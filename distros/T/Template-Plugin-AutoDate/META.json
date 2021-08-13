@@ -1,0 +1,68 @@
+{
+   "abstract" : "Enhance Template Toolkit with easy access to DateTime and DateTime::Format::Flexible",
+   "author" : [
+      "Michael Conrad <mconrad@intellitree.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Template-Plugin-AutoDate",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Pod::Weaver::Section::Contributors" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::More" : "0.88",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "DateTime::Format::Flexible" : "0",
+            "Template" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Template" : "0",
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/IntelliTree/perl-Template-Plugin-AutoDate/issues"
+      },
+      "homepage" : "https://github.com/IntelliTree/perl-Template-Plugin-AutoDate",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/IntelliTree/perl-Template-Plugin-AutoDate.git",
+         "web" : "https://github.com/IntelliTree/perl-Template-Plugin-AutoDate"
+      }
+   },
+   "version" : "0.90",
+   "x_generated_by_perl" : "v5.26.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.04"
+}
+

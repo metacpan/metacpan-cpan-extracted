@@ -7,7 +7,7 @@ use Astro::SIMBAD::Client;
 use Getopt::Long 2.33;
 use Pod::Usage;
 
-our $VERSION = '0.045';
+our $VERSION = '0.046';
 
 my %opt;
 

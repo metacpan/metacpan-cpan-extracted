@@ -42,5 +42,4 @@ eval {
 };
 like( $@, qr/Assertion.*failed/ );
 
-done_testing();
 exit 0;

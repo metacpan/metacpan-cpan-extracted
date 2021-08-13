@@ -39,6 +39,26 @@ Crypt::Ed25519 - bare-bones Ed25519 public key signing/verification system
  # verify, but croak on failure
  Crypt::Ed25519:eddsa_verify_croak $message, $pubkey, $signature;
 
+ ############################################
+ # Key exchange
+
+ # side A:
+ ($pubkey_a, $privkey_a) = Crypt::Ed25519::generate_keypair;
+ # send $pubkey to side B
+
+ # side B:
+ ($pubkey_b, $privkey_b) = Crypt::Ed25519::generate_keypair;
+ # send $pubkey to side A
+
+ # side A then calculates their shared secret:
+ $shared_secret = Crypt::Ed25519::key_exchange $pubkey_b, $privkey_a;
+
+ # and side B does this:
+ $shared_secret = Crypt::Ed25519::key_exchange $pubkey_a, $privkey_b;
+
+ # the generated $shared_secret will be the same - you cna now
+ # hash it with hkdf or something else to generate symmetric private keys
+
 =head1 DESCRIPTION
 
 This module implements Ed25519 public key generation, message signing and
@@ -76,7 +96,7 @@ fixed lengths.
 package Crypt::Ed25519;
 
 BEGIN {
-   $VERSION = 1.04;
+   $VERSION = 1.05;
 
    require XSLoader;
    XSLoader::load Crypt::Ed25519::, $VERSION;
@@ -188,13 +208,29 @@ private key is faster than using the secret key, so converting the secret
 key to a public/private key pair allows you to sign a small message, or
 many messages, faster.
 
+=head1 Key Exchange
+
+As an extension to Ed25519, this module implements a key exchange similar
+(But not identical) to Curve25519. For this, both sides generate a keypair
+and send their public key to the other side. Then both sides can generate
+the same shared secret using this function:
+
+=over
+
+=item $shared_secret = Crypt::Ed25519::key_exchange $other_public_key, $own_private_key
+
+Return the 32 octet shared secret generated from the given public and
+private key. See SYNOPSIS for an actual example.
+
+=back
+
 =head1 SUPPORT FOR THE PERL MULTICORE SPECIFICATION
         
 This module supports the perl multicore specification
-(L<http://perlmulticore.schmorp.de/>) for key generation (usually the
-slowest operation), and all signing and verification functions.
+(L<http://perlmulticore.schmorp.de/>) for all operations, although it
+makes most sense to use it when signing or verifying longer messages.
 
-=head1 IMPLEMENTATIOIN
+=head1 IMPLEMENTATION
 
 This module currently uses "Nightcracker's Ed25519" implementation, which
 is unmodified except for some portability fixes and static delcarations,
@@ -204,7 +240,7 @@ implementations in the future.
 =head1 AUTHOR
 
  Marc Lehmann <schmorp@schmorp.de>
- http://sfotware.schmorp.de/pkg/Crypt-Ed25519.html
+ http://software.schmorp.de/pkg/Crypt-Ed25519.html
 
 =cut
 

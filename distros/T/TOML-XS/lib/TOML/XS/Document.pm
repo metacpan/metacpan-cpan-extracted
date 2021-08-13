@@ -21,14 +21,26 @@ This class is not directly instantiable.
 
 =head1 METHODS
 
-=head2 $hashref = I<OBJ>->to_struct()
+=head2 $ = I<OBJ>->parse( @POINTER )
 
-Returns a hash reference that represents the parsed TOML document.
-
+Returns some part of the parsed TOML document as a Perl scalar.
 If the read of the TOML structure encounters a malformed data point
-an exception is thrown. As of now that exception is a simple character string
-that includes a L<JSON pointer|https://tools.ietf.org/html/rfc6901>
-to the problematic data point.
+an exception is thrown.
+
+If @POINTER is empty, then the return will be the entire parsed TOML
+document, represented as a hash reference.
+
+@POINTER, if given, refers to some part of the document: $POINTER[0]
+is a key in the document’s top-level table, $POINTER[1] references
+some piece of the structure beneath it, etc. If @POINTER refers to a
+nonexistent part of the document then a suitable exception is thrown.
+
+All elements of @POINTER must be I<character> strings.
+
+As of now thrown exceptions are simple character strings
+that include, where relevant, a
+L<JSON pointer|https://tools.ietf.org/html/rfc6901> to the problematic
+data point.
 
 =cut
 

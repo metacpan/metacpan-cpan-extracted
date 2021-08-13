@@ -1,9 +1,9 @@
 package Bencher::Backend;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-31'; # DATE
+our $DATE = '2021-08-13'; # DATE
 our $DIST = 'Bencher-Backend'; # DIST
-our $VERSION = '1.058'; # VERSION
+our $VERSION = '1.060'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1975,7 +1975,7 @@ sub _compact_participant_names {
     my ($opts, @names) = @_;
 
     my %res;
-    goto RETURN_RESULT if (List::Util::max(map { length } @names) // 0) <= 12;
+    goto UNCOMPACTED_RESULT if (List::Util::max(map { length } @names) // 0) <= 12;
 
     # assume Foo::Bar::baz form to be (module + func). otherwise we assume the
     # whole name is func.
@@ -3266,7 +3266,11 @@ module. The `::` (double colon in the module name will be replaced with `-`
 
 _
         },
-
+        render_as_benchmark_pm => {
+            summary => 'Format result like Benchmark.pm',
+            schema => 'true*',
+            tags => ['category:output'],
+        },
         note => {
             summary => 'Put additional note in the result',
             schema => ['str*'],
@@ -3530,7 +3534,9 @@ sub bencher {
         my @columns;
         for my $it0 (@$items) {
             my $it = {%$it0};
-            delete $it->{$_} for grep {/^_/} keys %$it;
+            for (grep {/^_/} keys %$it) {
+                delete $it->{$_} unless /^_succinct_name/;
+            }
             if (!@columns) {
                 push @columns, sort keys %$it;
             }
@@ -4287,7 +4293,8 @@ sub bencher {
             my $fres = format_result($envres, undef, {
                 sort => $args{sorts},
                 scientific_notation => $args{scientific_notation},
-                render_as_text_table => $is_cli_and_text_format,
+                render_as_benchmark_pm => $args{render_as_benchmark_pm},
+                render_as_text_table => $is_cli_and_text_format && !$args{render_as_benchmark_pm},
             });
 
             if ($is_cli_and_text_format) {
@@ -4366,7 +4373,7 @@ Bencher::Backend - Backend for Bencher
 
 =head1 VERSION
 
-This document describes version 1.058 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2021-07-31.
+This document describes version 1.060 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2021-08-13.
 
 =head1 FUNCTIONS
 
@@ -4712,6 +4719,10 @@ Show "raw" data.
 When action=show-items-result, will print result as-is instead of dumping as
 Perl.
 
+=item * B<render_as_benchmark_pm> => I<true>
+
+Format result like Benchmark.pm.
+
 =item * B<result_dir> => I<dirname>
 
 Directory to use when saving benchmark result.
@@ -5056,9 +5067,26 @@ C<Bencher::Manual::*>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

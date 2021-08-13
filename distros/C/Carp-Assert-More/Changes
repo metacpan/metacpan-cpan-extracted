@@ -1,6 +1,37 @@
 Revision history for Perl extension Carp::Assert::More.
 
 
+2.0.0
+        [DIFFERENCES]
+        Now requires Perl 5.10 or higher.  No longer requires Carp::Assert.
+
+        The numeric functions are more stringent now.  If it expects
+        a number, then you need to pass a number.  For example,
+        assert_nonnegative($x) would pass if $x was a non-numeric
+        string. Now it must be numeric.
+
+        assert_empty() and assert_nonempty() no longer gives a message
+        of "Not an array or hash reference".  If you don't pass an array
+        or hash reference, the assertion will just fail with the message
+        passe3d in.
+
+        assert_aoh() and assert_datetime() no longer provide a default
+        message.
+
+        assert_in() is more strict. Each element of the target array
+        is checked to not be a reference.
+
+        assert_exists() and assert_lacks() are more strict.  The list
+        of keys to check cannot be empty.
+
+        [ENHANCEMENTS]
+        Added assert_context_nonvoid() and assert_context_scalar()
+        to assert on how the executing function has been called.
+
+        assert_in() now lets you use undef as both the needle and one
+        of the values in the haystack.
+
+
 1.26    Sat Dec 26 00:26:23 CST 2020
         [ENHANCEMENTS]
         Add assert_arrayref_nonempty().

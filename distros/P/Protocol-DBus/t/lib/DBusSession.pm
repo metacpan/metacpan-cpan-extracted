@@ -30,6 +30,15 @@ sub skip_if_lack_needed_socket_msghdr {
         skip "Failed to load Socket::MsgHdr: $@", $count;
     }
 
+    my $minver = Protocol::DBus::Authn::Mechanism::EXTERNAL->SOCKET_MSGHDR_MINIMUM_VERSION();
+
+    if ( eval { Socket::MsgHdr->VERSION($minver) } ) {
+        diag "Socket::MsgHdr $Socket::MsgHdr::VERSION is new enough.";
+    }
+    else {
+        skip "$@", $count;
+    }
+
     return;
 }
 

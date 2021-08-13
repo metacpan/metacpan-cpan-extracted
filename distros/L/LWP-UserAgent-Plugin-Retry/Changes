@@ -1,4 +1,11 @@
-0.003   2020-08-14  Released-By: PERLANCAR; Urgency: medium
+0.004   2021-08-13  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Fix typo in Synopsis (RT#138640).
+
+
+0.003   2020-08-14  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
 
 	- [incompatible change] Synchronize features with
 	  HTTP::Tiny::Plugin::Retry: remove retry_{server,client}_errors

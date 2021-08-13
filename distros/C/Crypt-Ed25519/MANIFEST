@@ -25,7 +25,7 @@ ed25519/src/fe.h
 ed25519/src/sign.c
 ed25519/src/sc.c
 ed25519/src/sc.h
-# ed25519/src/key_exchange.c
+ed25519/src/key_exchange.c
 ed25519/src/ge.c
 ed25519/src/ed25519.h
 ed25519/src/verify.c

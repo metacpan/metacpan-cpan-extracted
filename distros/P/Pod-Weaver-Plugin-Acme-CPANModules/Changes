@@ -1,3 +1,9 @@
+0.011   2021-08-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Generate 'Acme::CPANModules Modules' and 'See Also' POD sections
+	  for Acme/CPANModulesBundle/*pm files.
+
+
 0.010   2021-08-08  Released-By: PERLANCAR; Urgency: medium
 
 	- Mention App::lcpan::Cmd::related_mods in generated FAQ section.

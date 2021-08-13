@@ -36,7 +36,7 @@ use Binance::API::Request;
 use Binance::Exception::Parameter::BadValue;
 use Binance::Exception::Parameter::Required;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 =head1 NAME
 
@@ -145,7 +145,7 @@ B<RETURNS>
 =cut
 
 sub ping {
-    return keys %{$_[0]->ua->get('/api/v1/ping')} == 0 ? 1 : 0;
+    return keys %{$_[0]->ua->get('/api/v3/ping')} == 0 ? 1 : 0;
 }
 
 =head2 time
@@ -170,7 +170,7 @@ B<RETURNS>
 sub time {
     my $self = shift;
 
-    my $time = $self->ua->get('/api/v1/time');
+    my $time = $self->ua->get('/api/v3/time');
     return exists $time->{serverTime} ? $time->{serverTime} : 0;
 }
 
@@ -240,7 +240,7 @@ B<RETURNS>
 =cut
 
 sub exchange_info {
-    return $_[0]->ua->get('/api/v1/ticker/exchangeInfo');
+    return $_[0]->ua->get('/api/v3/exchangeInfo');
 }
 
 =head2 depth
@@ -257,7 +257,7 @@ B<PARAMETERS>
 
 =item limit
 
-[OPTIONAL] Default 100; max 100.
+[OPTIONAL] Default 100; max 5000. Valid limits: 5, 10, 20, 50, 100, 500, 1000, 5000.
 
 =back
 
@@ -300,14 +300,14 @@ sub depth {
         limit  => $params{'limit'},
     };
 
-    return $self->ua->get('/api/v1/depth', { query => $query } );
+    return $self->ua->get('/api/v3/depth', { query => $query } );
 }
 
 =head2 trades
 
     $api->trades();
 
-Get recent trades (up to last 500).
+Get recent trades (up to last 1000).
 
 B<PARAMETERS>
 
@@ -319,7 +319,7 @@ B<PARAMETERS>
 
 =item limit
 
-[OPTIONAL] Default 500; max 500.
+[OPTIONAL] Default 500; max 1000.
 
 =back
 
@@ -355,7 +355,7 @@ sub trades {
         limit     => $params{'limit'},
     };
 
-    return $self->ua->get('/api/v1/trades', { query => $query } );
+    return $self->ua->get('/api/v3/trades', { query => $query } );
 }
 
 =head2 historical_trades
@@ -374,7 +374,7 @@ B<PARAMETERS>
 
 =item limit
 
-[OPTIONAL] Default 500; max 500.
+[OPTIONAL] Default 500; max 1000.
 
 =item fromId
 
@@ -415,7 +415,7 @@ sub historical_trades {
         fromId    => $params{'fromId'},
     };
 
-    return $self->ua->get('/api/v1/historicalTrades', { query => $query } );
+    return $self->ua->get('/api/v3/historicalTrades', { query => $query } );
 }
 
 =head2 aggregate_trades
@@ -437,7 +437,6 @@ B<PARAMETERS>
 
 [OPTIONAL] ID to get aggregate trades from INCLUSIVE.
 
-
 =item startTime
 
 [OPTIONAL] timestamp in ms to get aggregate trades from INCLUSIVE.
@@ -448,7 +447,7 @@ B<PARAMETERS>
 
 =item limit
 
-[OPTIONAL] Default 500; max 500.
+[OPTIONAL] Default 500; max 1000.
 
 =back
 
@@ -489,7 +488,7 @@ sub aggregate_trades {
         limit     => $params{'limit'},
     };
 
-    return $self->ua->get('/api/v1/aggTrades', { query => $query } );
+    return $self->ua->get('/api/v3/aggTrades', { query => $query } );
 }
 
 =head2 klines
@@ -513,7 +512,7 @@ B<PARAMETERS>
 
 =item limit
 
-[OPTIONAL] Default 500; max 500.
+[OPTIONAL] Default 500; max 1000.
 
 =item startTime
 
@@ -574,7 +573,7 @@ sub klines {
         limit     => $params{'limit'},
     };
 
-    return $self->ua->get('/api/v1/klines', { query => $query } );
+    return $self->ua->get('/api/v3/klines', { query => $query } );
 }
 
 =head2 ticker
@@ -590,6 +589,7 @@ B<PARAMETERS>
 =item symbol
 
 [OPTIONAL] Symbol, for example C<ETHBTC>.
+Warning: Careful when accessing this with no symbol.
 
 =back
 
@@ -624,7 +624,7 @@ sub ticker {
         symbol    => $params{'symbol'},
     };
 
-    return $self->ua->get('/api/v1/ticker/24hr', { query => $query } );
+    return $self->ua->get('/api/v3/ticker/24hr', { query => $query } );
 }
 
 =head2 ticker_price
@@ -677,9 +677,9 @@ sub ticker_price {
     return $self->ua->get('/api/v3/ticker/price', { query => $query } );
 }
 
-=head2 all_book_tickers
+=head2 book_ticker
 
-    $api->all_book_tickers();
+    $api->book_ticker();
 
 Best price/qty on the order book for all symbols.
 
@@ -687,12 +687,25 @@ B<PARAMETERS>
 
 =over
 
-=item Takes no parameters.
+=item symbol
+
+[OPTIONAL] Symbol, for example C<ETHBTC>. If not given, returns best price/qty of all
+symbols.
 
 =back
 
 B<RETURNS>
-    An array of HASHrefs
+
+    A HASHref
+    {
+      "symbol": "LTCBTC",
+      "bidPrice": "4.00000000",
+      "bidQty": "431.00000000",
+      "askPrice": "4.00000200",
+      "askQty": "9.00000000"
+    }
+
+    OR an ARRAY of HASHrefs
 
     [
       {
@@ -713,39 +726,6 @@ B<RETURNS>
 
 =cut
 
-sub all_book_tickers {
-    return $_[0]->ua->get('/api/v1/ticker/allBookTickers');
-}
-
-=head2 book_ticker
-
-    $api->book_ticker();
-
-Best price/qty on the order book for a symbol or symbols.
-
-B<PARAMETERS>
-
-=over
-
-=item symbol
-
-[OPTIONAL] Symbol, for example C<ETHBTC>.
-
-=back
-
-B<RETURNS>
-    A HASHref
-
-    {
-      "symbol": "LTCBTC",
-      "bidPrice": "4.00000000",
-      "bidQty": "431.00000000",
-      "askPrice": "4.00000200",
-      "askQty": "9.00000000"
-    }
-
-=cut
-
 sub book_ticker {
     my ($self, %params) = @_;
 
@@ -753,7 +733,21 @@ sub book_ticker {
         symbol    => $params{'symbol'},
     };
 
-    return $self->ua->get('/api/v1/bookTicker', { query => $query } );
+    return $_[0]->ua->get('/api/v3/ticker/bookTicker', { query => $query } );
+}
+
+=head2 all_book_tickers
+
+    $api->all_book_tickers();
+
+DEPRECATED: use book_ticker instead.
+
+=cut
+
+sub all_book_tickers {
+    my $self = shift;
+
+    return $self->book_ticker(@_);
 }
 
 =head2 order
@@ -1096,13 +1090,21 @@ B<PARAMETERS>
 
 [OPTIONAL]
 
+=item startTime
+
+[OPTIONAL] Start time
+
+=item endTime
+
+[OPTIONAL] End time
+
 =item limit
 
-[OPTIONAL] Default 500; max 500.
+[OPTIONAL] Default 500; max 1000.
 
 =item recvWindow
 
-[OPTIONAL]
+[OPTIONAL] The value cannot be greater than 60000.
 
 =back
 
@@ -1142,6 +1144,8 @@ sub all_orders {
     my $query = {
         symbol     => $params{'symbol'},
         orderId    => $params{'orderId'},
+        startTime  => $params{'startTime'},
+        endTime    => $params{'endTime'},
         limit      => $params{'limit'},
         recvWindow => $params{'recvWindow'},
     };
@@ -1297,7 +1301,7 @@ B<RETURNS>
 =cut
 
 sub start_user_data_stream {
-    return $_[0]->ua->post('/api/v1/ticker/userDataStream');
+    return $_[0]->ua->post('/api/v3/userDataStream');
 }
 
 =head2 keep_alive_user_data_stream
@@ -1336,7 +1340,7 @@ sub keep_alive_user_data_stream {
     my $query = {
         listenKey  => $params{'listenKey'},
     };
-    return $self->ua->put('/api/v1/userDataStream', { query => $query } );
+    return $self->ua->put('/api/v3/userDataStream', { query => $query } );
 }
 
 =head2 delete_user_data_stream
@@ -1374,7 +1378,7 @@ sub delete_user_data_stream {
     my $query = {
         listenKey  => $params{'listenKey'},
     };
-    return $self->ua->delete('/api/v1/userDataStream', { query => $query } );
+    return $self->ua->delete('/api/v3/userDataStream', { query => $query } );
 }
 
 =head2 log

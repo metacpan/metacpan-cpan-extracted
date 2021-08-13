@@ -1,6 +1,6 @@
 package main;
 
-use 5.006001;
+use 5.10.0;
 
 use strict;
 use warnings;
@@ -16,7 +16,6 @@ my %parms = (
 
     PREREQ_PM   => {
         Carp                => 0,
-        'Carp::Assert'      => 0,
         'Scalar::Util'      => 0,
         'Test::Exception'   => 0,
         'Test::More'        => 0.18,
@@ -49,10 +48,17 @@ package MY;
 
 sub MY::postamble {
     my $postamble = <<'MAKE_FRAG';
-.PHONY: critic
+.PHONY: critic tags
 
 critic:
 	perlcritic -1 -q -profile perlcriticrc More.pm t/*.t
+
+tags:
+	ctags -f tags --recurse --totals \
+		--exclude=blib \
+		--exclude=.git \
+		--exclude='*~' \
+		--languages=Perl --langmap=Perl:+.t \
 
 MAKE_FRAG
 

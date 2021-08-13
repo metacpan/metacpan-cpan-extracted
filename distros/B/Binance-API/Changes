@@ -1,3 +1,7 @@
+1.07 Thu Aug  12 22:11:46 UTC 2021
+    - Upgrade to API Version 3
+    - Fix book_ticker
+
 1.06 Sun Jan  31 17:46:41 UTC 2021
     - Mock API responses for tests
 

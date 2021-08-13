@@ -50,6 +50,10 @@ void toml_set_memutil(void* (*xxmalloc)(size_t),
 #define MALLOC(a)	  ppmalloc(a)
 #define FREE(a)		  ppfree(a)
 
+#define malloc(x)   error:do-not-use---use-MALLOC-instead
+#define free(x)     error:do-not-use---use-FREE-instead
+
+#define calloc(x,y) error:do-not-use---use-CALLOC-instead
 static void* CALLOC(size_t nmemb, size_t sz)
 {
 	int nb = sz * nmemb;
@@ -61,6 +65,7 @@ static void* CALLOC(size_t nmemb, size_t sz)
 }
 
 
+#define strdup(x)	error:do-not-use---use-STRDUP-instead
 static char* STRDUP(const char* s)
 {
 	int len = strlen(s);
@@ -72,6 +77,7 @@ static char* STRDUP(const char* s)
 	return p;
 }
 
+#define strndup(x)	error:do-not-use---use-STRNDUP-instead
 static char* STRNDUP(const char* s, size_t n)
 {
 	size_t len = strnlen(s, n);
@@ -82,6 +88,7 @@ static char* STRNDUP(const char* s, size_t n)
 	}
 	return p;
 }
+
 
 
 
@@ -1682,7 +1689,6 @@ static int scan_string(context_t* ctx, char* p, int lineno, int dotisspecial)
 	if ('\"' == *p) {
 		int hexreq = 0;		/* #hex required */
 		int escape = 0;
-		int sqcnt = 0;		/* count single-quote */
 		for (p++; *p; p++) {
 			if (escape) {
 				escape = 0;
@@ -1696,16 +1702,13 @@ static int scan_string(context_t* ctx, char* p, int lineno, int dotisspecial)
 				if (strchr("0123456789ABCDEF", *p)) continue;
 				return e_syntax(ctx, lineno, "expect hex char");
 			}
-			if (sqcnt) {
-				if (*p == '\'') {
-					if (++sqcnt < 3) continue;
+			if (*p == '\\') { escape = 1; continue; }
+			if (*p == '\'') {
+				if (p[1] == '\'' && p[2] == '\'') {
 					return e_syntax(ctx, lineno, "triple-s-quote inside string lit");
 				}
-				sqcnt = 0;
+				continue;
 			}
-
-			if (*p == '\\') { escape = 1; continue; }
-			if (*p == '\'') { sqcnt = 1; continue; }
 			if (*p == '\n') break;
 			if (*p == '"')  break;
 		}
@@ -1720,7 +1723,7 @@ static int scan_string(context_t* ctx, char* p, int lineno, int dotisspecial)
 	/* check for timestamp without quotes */
 	if (0 == scan_date(p, 0, 0, 0) || 0 == scan_time(p, 0, 0, 0)) {
 		// forward thru the timestamp
-		for ( ; strchr("0123456789.:+-T Z", toupper(*p)); p++);
+		p += strspn(p, "0123456789.:+-T Z");
 		// squeeze out any spaces at end of string
 		for ( ; p[-1] == ' '; p--);
 		// tokenize
@@ -1897,6 +1900,8 @@ toml_table_t* toml_table_at(const toml_array_t* arr, int idx)
 }
 
 
+static int parse_millisec(const char* p, const char** endp);
+
 int toml_rtots(toml_raw_t src_, toml_timestamp_t* ret)
 {
 	if (! src_) return -1;
@@ -1938,17 +1943,9 @@ int toml_rtots(toml_raw_t src_, toml_timestamp_t* ret)
 		/* optionally, parse millisec */
 		p += 8;
 		if (*p == '.') {
-			char* qq;
-			p++;
-			errno = 0;
-			*millisec = strtol(p, &qq, 0);
-			if (errno) {
-				return -1;
-			}
-			while (*millisec > 999) {
-				*millisec /= 10;
-			}
-
+			p++;				/* skip '.' */
+			const char* qq;
+			*millisec = parse_millisec(p, &qq);
 			ret->millisec = millisec;
 			p = qq;
 		}
@@ -2031,7 +2028,7 @@ int toml_rtoi(toml_raw_t src, int64_t* ret_)
 	if (s[0] == '_')
 		return -1;
 
-	/* if 0 ... */
+	/* if 0* ... */
 	if ('0' == s[0]) {
 		switch (s[1]) {
 		case 'x': base = 16; s += 2; break;
@@ -2047,20 +2044,18 @@ int toml_rtoi(toml_raw_t src, int64_t* ret_)
 	/* just strip underscores and pass to strtoll */
 	while (*s && p < q) {
 		int ch = *s++;
-		switch (ch) {
-		case '_':
+		if (ch == '_') {
 			// disallow '__'
 			if (s[0] == '_') return -1;
+			// numbers cannot end with '_'
+			if (s[0] == '\0') return -1;
 			continue;			/* skip _ */
-		default:
-			break;
 		}
 		*p++ = ch;
 	}
-	if (*s || p == q) return -1;
 
-	/* last char cannot be '_' */
-	if (s[-1] == '_') return -1;
+	// if not at end-of-string or we ran out of buffer ...
+	if (*s || p == q) return -1;
 
 	/* cap with NUL */
 	*p = 0;
@@ -2229,7 +2224,7 @@ toml_datum_t toml_timestamp_at(const toml_array_t* arr, int idx)
 	memset(&ret, 0, sizeof(ret));
 	ret.ok = (0 == toml_rtots(toml_raw_at(arr, idx), &ts));
 	if (ret.ok) {
-		ret.ok = !!(ret.u.ts = malloc(sizeof(*ret.u.ts)));
+		ret.ok = !!(ret.u.ts = MALLOC(sizeof(*ret.u.ts)));
 		if (ret.ok) {
 			*ret.u.ts = ts;
 			if (ret.u.ts->year) ret.u.ts->year = &ret.u.ts->__buffer.year;
@@ -2287,7 +2282,7 @@ toml_datum_t toml_timestamp_in(const toml_table_t* arr, const char* key)
 	memset(&ret, 0, sizeof(ret));
 	ret.ok = (0 == toml_rtots(toml_raw_in(arr, key), &ts));
 	if (ret.ok) {
-		ret.ok = !!(ret.u.ts = malloc(sizeof(*ret.u.ts)));
+		ret.ok = !!(ret.u.ts = MALLOC(sizeof(*ret.u.ts)));
 		if (ret.ok) {
 			*ret.u.ts = ts;
 			if (ret.u.ts->year) ret.u.ts->year = &ret.u.ts->__buffer.year;
@@ -2300,5 +2295,17 @@ toml_datum_t toml_timestamp_in(const toml_table_t* arr, const char* key)
 			if (ret.u.ts->z) ret.u.ts->z = ret.u.ts->__buffer.z;
 		}
 	}
+	return ret;
+}
+
+
+static int parse_millisec(const char* p, const char** endp)
+{
+	int ret = 0;
+	int unit = 100;				/* unit in millisec */
+	for ( ; '0' <= *p && *p <= '9'; p++, unit /= 10) {
+		ret += (*p - '0') * unit;
+	}
+	*endp = p;
 	return ret;
 }

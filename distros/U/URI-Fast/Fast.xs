@@ -12,17 +12,17 @@
 
 // Permitted characters
 #define URI_CHARS_AUTH          "!$&'()*+,;:=@"
+#define URI_CHARS_USER          "!$&'()*+,;="
 #define URI_CHARS_PATH          "!$&'()*+,;:=@/"
 #define URI_CHARS_PATH_SEGMENT  "!$&'()*+,;:=@"
 #define URI_CHARS_HOST          "!$&'()[]*+,.;=@/"
 #define URI_CHARS_QUERY         ":@?/&=;"
 #define URI_CHARS_FRAG          ":@?/"
-#define URI_CHARS_USER          "!$&'()*+,;="
 
 // Returns the uri_t* referenced by the blessed URI::Fast object in the SV ref.
 // Croaks if the SV does not point to a URI::Fast object.
 #define URI(obj) \
-  (((sv_isobject(obj) && sv_derived_from(obj, "URI::Fast")) ? NULL : croak("error")), \
+  (((sv_isobject(obj) && sv_derived_from(obj, "URI::Fast")) ? NULL : croak("error: expected instance of URI::Fast")), \
     ((uri_t*) SvIV(SvRV((obj)))))
 
 // Size constants
@@ -245,33 +245,6 @@ typedef struct {
 
 #define str_len(str) ((str)->length)
 #define str_get(str) (str_len(str) == 0 ? "" : (const char*)str->string)
-
-// Searchs str for occurences of string *find. It is up to the caller to ensure
-// that *find is at least len chars long. Returns -1 if not found.
-static
-int str_index(pTHX_ uri_str_t *str, const char *find, size_t len) {
-  size_t i, j;
-  bool found = 0;
-
-  for (i = 0; i < str->length; ++i) {
-    for (j = 0; j < len; ++j) {
-      if (str->string[i + j] != find[j]) {
-        goto STRCHR;
-      }
-    }
-
-    found = 1;
-
-    STRCHR:
-    ;
-  }
-
-  if (found) {
-    return i;
-  } else {
-    return -1;
-  }
-}
 
 // Truncates the string from the right-most occurence of r_char by setting that
 // index to nul. Does not zero out the rest of the string.
@@ -1575,7 +1548,6 @@ SV* new(pTHX_ const char* class, SV* uri_str, int is_iri) {
   obj = newSViv((IV) uri);
   obj_ref = newRV_noinc(obj);
   sv_bless(obj_ref, gv_stashpv(class, GV_ADD));
-  SvREADONLY_on(obj);
 
   // Scan the input string to fill the struct
   if (!SvTRUE(uri_str)) {
@@ -1872,7 +1844,7 @@ void absolute(pTHX_ SV *sv_target, SV *sv_uri, SV *sv_base) {
             str_append(aTHX_ merged, rel->path->string, rel->path->length);
           }
           else {
-            if (str_index(aTHX_ base->path, "/", 1) >= 0) {
+            if (strstr(base->path->string, "/") != NULL) {
               // truncate base path at right-most /, inclusive
               str_append(aTHX_ merged, base->path->string, base->path->length);
               str_rtrim(aTHX_ merged, '/');
@@ -1904,31 +1876,24 @@ void absolute(pTHX_ SV *sv_target, SV *sv_uri, SV *sv_base) {
 }
 
 /*
- * Uppercases a 3-digit hex sequence, if present, in the first 3 indices of
- * *buf. It is the caller's responsibility to ensure that *buf is at least 3
- * chars in length.
+ * Decodes and then reencodes a uri_str_t.
+ *
  */
+// unreserved  = ALPHA / DIGIT / "-" / "." / "_" / "~"
+//       41-5A / 61-7A / 30-39 / 2D  / 2E  / 5F  / 7E
 static inline
-bool uc_hex_3ch(pTHX_ char *buf) {
-  if (buf[0] != '%') return 0;
-  buf[1] = toUPPER(buf[1]);
-  buf[2] = toUPPER(buf[2]);
-  return 1;
-}
-
-/*
- * Uppercases 3-character hex codes over an entire uri_str_t.
- */
-static inline
-void uc_hex(pTHX_ uri_str_t *str) {
-  size_t i = 0;
-  while (i < str->length) {
-    if (i + 2 < str->length && uc_hex_3ch(aTHX_ &str->string[i]) == 1) {
-      i += 3;
-    } else {
-      ++i;
-    }
+void normalize_encoding(pTHX_ uri_str_t *str, char *permitted_chars, int allow_utf8) {
+  if (str->length == 0 || (strchr(str->string, '+') == NULL && strchr(str->string, '%') == NULL)) {
+    return;
   }
+
+  char decoded[str->length + 1];
+  size_t decoded_len = uri_decode(str->string, str->length, decoded, "");
+
+  char encoded[(decoded_len * 3) + 2];
+  size_t encoded_len = uri_encode(decoded, decoded_len, encoded, permitted_chars, allow_utf8);
+
+  str_set(aTHX_ str, encoded, encoded_len);
 }
 
 /*
@@ -1951,23 +1916,24 @@ void normalize(pTHX_ SV *uri_obj) {
   }
 
   // (6.2.2) remove dot segments from path
-  uri_str_t *tmp = str_new(aTHX_ uri->path->length);
-  remove_dot_segments(aTHX_ tmp, uri->path->string, uri->path->length);
-  str_free(aTHX_ uri->path);
-  uri->path = tmp;
+  // This is expensive, so skip it unless the uri has a path with a dot in it.
+  if (uri->path->length > 0
+   && strchr(uri->path->string, '.') != NULL)
+  {
+    uri_str_t *tmp = str_new(aTHX_ uri->path->length);
+    remove_dot_segments(aTHX_ tmp, uri->path->string, uri->path->length);
+    str_free(aTHX_ uri->path);
+    uri->path = tmp;
+  }
 
   // (6.2.2.1) upper case hex codes in each section of the uri
-  uc_hex(aTHX_ uri->scheme);
-  uc_hex(aTHX_ uri->query);
-  uc_hex(aTHX_ uri->path);
-  uc_hex(aTHX_ uri->host);
-  uc_hex(aTHX_ uri->port);
-  uc_hex(aTHX_ uri->frag);
-  uc_hex(aTHX_ uri->usr);
-  uc_hex(aTHX_ uri->pwd);
-
-  // TODO (6.2.2.2) decode any percent-encoded sequences decoding to unreserved
-  // characters.
+  // (6.2.2.2) decode any percent-encoded sequences decoding to unreserved chars
+  normalize_encoding(aTHX_ uri->usr,   URI_CHARS_USER,  uri->is_iri);
+  normalize_encoding(aTHX_ uri->pwd,   URI_CHARS_USER,  uri->is_iri);
+  normalize_encoding(aTHX_ uri->host,  URI_CHARS_HOST,  uri->is_iri);
+  normalize_encoding(aTHX_ uri->path,  URI_CHARS_PATH,  uri->is_iri);
+  normalize_encoding(aTHX_ uri->query, URI_CHARS_QUERY, uri->is_iri);
+  normalize_encoding(aTHX_ uri->frag,  URI_CHARS_FRAG,  uri->is_iri);
 }
 
 
@@ -2046,6 +2012,29 @@ SV* uri(...)
     }
 
     RETVAL = new(aTHX_ (ix == 1) ? "URI::Fast::IRI" : "URI::Fast", str, (ix == 1) ? 1 : 0);
+  OUTPUT:
+    RETVAL
+
+SV* new_abs(class, rel, base)
+  const char* class
+  SV* rel
+  SV* base
+  PREINIT:
+    SV *abs;
+  CODE:
+    if (!sv_isobject(rel) || !sv_derived_from(rel, class)) {
+      rel = sv_2mortal(new(aTHX_ class, rel, 0));
+    }
+
+    if (!sv_isobject(base) || !sv_derived_from(base, class)) {
+      base = sv_2mortal(new(aTHX_ class, base, 0));
+    }
+
+    abs = new(aTHX_ class, sv_2mortal(newSVpvn("", 0)), 0);
+
+    absolute(aTHX_ abs, rel, base);
+
+    RETVAL = abs;
   OUTPUT:
     RETVAL
 
@@ -2323,6 +2312,7 @@ SV* to_string(self, ...)
   SV *self
   ALIAS:
     as_string = 1
+    TO_JSON = 2
   OVERLOAD:
     to_string \"\"
   CODE:
@@ -2339,23 +2329,25 @@ SV* normalize(uri)
   OUTPUT:
     uri
 
-SV* absolute(uri, base)
-  SV *uri
-  SV *base
+SV* absolute(rel, base)
+  SV* rel
+  SV* base
+  ALIAS:
+    abs = 1
   PREINIT:
+    SV *abs;
     const char *class;
-    SV *sv_target;
   CODE:
-    class = class_name(aTHX_ uri);
-    sv_target = new(aTHX_ class, sv_2mortal(newSVpvn("", 0)), 0);
+    class = class_name(aTHX_ rel);
+    abs = new(aTHX_ class, sv_2mortal(newSVpvn("", 0)), 0);
 
     if (!sv_isobject(base) || !sv_derived_from(base, class)) {
-      absolute(aTHX_ sv_target, uri, sv_2mortal(new(aTHX_ class, base, 0)));
-    } else {
-      absolute(aTHX_ sv_target, uri, base);
+      base = sv_2mortal(new(aTHX_ class, base, 0));
     }
 
-    RETVAL = sv_target;
+    absolute(aTHX_ abs, rel, base);
+
+    RETVAL = abs;
   OUTPUT:
     RETVAL
 

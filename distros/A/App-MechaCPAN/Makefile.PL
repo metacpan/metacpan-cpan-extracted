@@ -20,12 +20,28 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "App::MechaCPAN",
   "PREREQ_PM" => {
-    "CPAN::Meta" => 0
+    "Archive::Tar" => 0,
+    "CPAN::Meta" => 0,
+    "Carp" => 0,
+    "Exporter" => 0,
+    "ExtUtils::MakeMaker" => 0,
+    "File::Fetch" => 0,
+    "File::Path" => 0,
+    "File::Temp" => 0,
+    "Getopt::Long" => 0,
+    "JSON::PP" => 0,
+    "List::Util" => 0,
+    "Module::CoreList" => 0,
+    "Scalar::Util" => 0,
+    "Socket" => 0,
+    "Time::localtime" => 0,
+    "autodie" => 0,
+    "version" => 0
   },
   "TEST_REQUIRES" => {
     "Test::More" => "0.96"
   },
-  "VERSION" => "0.27",
+  "VERSION" => "0.28",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -33,8 +49,24 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Archive::Tar" => 0,
   "CPAN::Meta" => 0,
-  "Test::More" => "0.96"
+  "Carp" => 0,
+  "Exporter" => 0,
+  "ExtUtils::MakeMaker" => 0,
+  "File::Fetch" => 0,
+  "File::Path" => 0,
+  "File::Temp" => 0,
+  "Getopt::Long" => 0,
+  "JSON::PP" => 0,
+  "List::Util" => 0,
+  "Module::CoreList" => 0,
+  "Scalar::Util" => 0,
+  "Socket" => 0,
+  "Test::More" => "0.96",
+  "Time::localtime" => 0,
+  "autodie" => 0,
+  "version" => 0
 );
 
 

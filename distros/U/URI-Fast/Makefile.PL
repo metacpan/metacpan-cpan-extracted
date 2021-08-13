@@ -66,13 +66,14 @@ WriteMakefile(
   TEST_REQUIRES => {
     'Data::Dumper'      => '0',
     'ExtUtils::testlib' => '0',
-    'Test2'             => '1.302125',
-    'Test2::Suite'      => '0.000100',
-    'Test2::V0'         => '0',
+    #'Test2'             => '1.302125',
+    #'Test2::Suite'      => '0.000100',
+    'Test2::V0'         => '0.000141',
     'Test::LeakTrace'   => '0.16',
     'URI::Encode::XS'   => '0.11',
     'URI::Split'        => '0',
     'Unicode::GCString' => '0',
+    'Pod::Select'       => '0', # undeclared dep in one of the other test deps, apparently
   },
 
   PREREQ_PM => {

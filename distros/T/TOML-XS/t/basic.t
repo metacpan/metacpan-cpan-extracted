@@ -45,7 +45,9 @@ double = 34.5
 timestamp = 1979-05-27T07:32:00-08:00
 END
 
-my $struct = TOML::XS::from_toml($doc)->to_struct();
+my $docobj = TOML::XS::from_toml($doc);
+
+my $struct = $docobj->to_struct();
 
 my $round_floats = $Config{'uselongdouble'} || $Config{'usequadmath'};
 
@@ -67,9 +69,7 @@ my $the_timestamp_cmp = all(
     ),
 );
 
-cmp_deeply(
-    $struct,
-    {
+my $struct_cmp = {
         'database' => {
             'data' => [
                 [
@@ -120,7 +120,11 @@ cmp_deeply(
      double => 34.5,
      timestamp => $the_timestamp_cmp,
    },
-    },
+    };
+
+cmp_deeply(
+    $struct,
+    $struct_cmp,
     'struct as expected',
 ) or diag explain $struct;
 
@@ -147,6 +151,40 @@ cmp_deeply(
     my $err          = $@;
     diag $err;
     like( $err, qr<.>,           'reject nonsense' );
+}
+
+{
+    my $checkextra = $docobj->parse('checkextra');
+    cmp_deeply(
+        $checkextra,
+        $struct_cmp->{'checkextra'},
+        'parse() - single pointer item',
+    );
+
+    for my $ce_piece (sort keys %{ $struct_cmp->{'checkextra'} }) {
+        my $parsed = $docobj->parse('checkextra', $ce_piece);
+        cmp_deeply(
+            $parsed,
+            $struct_cmp->{'checkextra'}{$ce_piece},
+            "parse(checkextra, $ce_piece)",
+        );
+    }
+
+    for my $i ( 0 .. $#{ $struct_cmp->{'checkextra'}{'alltypes'} } ) {
+        my $parsed = $docobj->parse('checkextra', 'alltypes', $i);
+        cmp_deeply(
+            $parsed,
+            $struct_cmp->{'checkextra'}{'alltypes'}[$i],
+            "parse(checkextra, alltypes, $i)",
+        );
+
+        $parsed = $docobj->parse('checkextra', 'alltypes', "$i");
+        cmp_deeply(
+            $parsed,
+            $struct_cmp->{'checkextra'}{'alltypes'}[$i],
+            qq<parse(checkextra, alltypes, "$i")>,
+        );
+    }
 }
 
 done_testing;
