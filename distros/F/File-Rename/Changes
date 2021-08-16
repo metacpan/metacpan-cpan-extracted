@@ -1,5 +1,29 @@
 Revision history for Perl extension File::Rename.
 
+1.30    Robin Barker 2021-08-16
+    Unicode support: --unicode and File::Rename::Unicode
+
+1.29_06 Robin Barker 2021-08-04 - not released
+    Documented approach to unicode strings in README
+
+1.29_05 Robin Narker 2021-08-03
+    Add encoding to --unicode
+    Reworked C<create()> in testlib.pl:
+        removed unnessary C<die>
+        simplified File-Rename-unicode.t
+
+1.29_04 Robin Narker 2021-08-02
+    Tests which should skip_all: BEGIN { plan skip_all => 
+
+1.29_03 Robin Narker 2021-08-01
+    Fix tests which should skip
+
+1.29_02 Robin Narker 2021-08-01
+    Add File::Rename::Unicode to hide C<use feature>
+
+1.29_01 Robin Narker 2021-07-31
+    Add -u to do utf8::upgrade and unicode_strings
+
 1.20	Robin Barker 2021-03-22
 	On darwin, when built with ExtUtils::MakeMaker, 
 	builds the correct script and passes tests; see

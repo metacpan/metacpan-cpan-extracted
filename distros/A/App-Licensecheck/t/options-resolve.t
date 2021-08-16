@@ -1,5 +1,7 @@
 use Test2::V0;
 
+use Test2::Require::Module 'Regexp::Pattern::License' => '3.7.0';
+
 use Test::Command::Simple;
 
 use Path::Tiny 0.053;

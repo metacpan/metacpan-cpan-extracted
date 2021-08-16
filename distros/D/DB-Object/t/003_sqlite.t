@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/local/bin/perl
 use Test::More qw( no_plan );
 
 BEGIN
@@ -18,8 +18,11 @@ SKIP:
 	{
 		require DBD::SQLite;
 	};
-	skip( "DBD::SQLite is not installed", 60 ) if( $@ );
+	skip( "DBD::SQLite is not installed", 63 ) if( $@ );
 	use_ok( 'DB::Object::SQLite' );
+    use_ok( "DB::Object::SQLite::Query" );
+    use_ok( "DB::Object::SQLite::Statement" );
+    use_ok( "DB::Object::SQLite::Tables" );
 	
 	my( $test_file, $path, $suf ) = File::Basename::fileparse( __FILE__, qr/\.[^\.]+$/ );
 	

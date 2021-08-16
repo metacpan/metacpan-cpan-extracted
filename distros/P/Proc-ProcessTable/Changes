@@ -341,3 +341,7 @@ Revision history for Perl extension Proc::ProcessTable.
   * works again on AIX
   * fixed mswin32 stuff, hope it works now
   * reogranized code and started to use newest version ExtUtils::MakeMaker
+0.60 2021-08-14
+  * compiles on musl
+  * Skip LXC hidden dir in /dev when looking for TTYs
+  * Fix test on OpenBSD

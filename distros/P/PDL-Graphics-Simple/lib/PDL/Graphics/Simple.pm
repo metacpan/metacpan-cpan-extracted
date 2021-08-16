@@ -3,31 +3,31 @@
 PDL::Graphics::Simple - Simple backend-independent plotting for PDL
 
 =head1 SYNOPSIS
- 
+
  # Simple interface - throw plots up on-screen, ASAP
  use PDL::Graphics::Simple;
  imag $a;                     # Display an image PDL
  imag $a, 0, 300;             # Display with color range
  line $rrr, $fit;             # Plot a line
- 
+
  points $rr, $sec;            # Plot points
  hold;                        # Hold graphics so subsequent calls overplot
  line $rrr, $fit;             # Overplot a line in a contrasting color
  release;                     # Release graphics
 
  # Object interface - simple plotting, to file or screen
- an$w = pgswin( size=>[8,4], multi=>[2,2] ); # 2x2 plot grid on an 8"x4" window
+ $w = pgswin( size=>[8,4], multi=>[2,2] ); # 2x2 plot grid on an 8"x4" window
  $w = pgswin( size=>[1000,1000,'px'], output=>'plot.png' ); # output to a PNG
 
- $w->plot( with=>'points', $rr, $sec, with=>'line', $rrr, $fit, 
+ $w->plot( with=>'points', $rr, $sec, with=>'line', $rrr, $fit,
            {title=>"Points and fit", xlabel=>"Abscissa", ylabel=>"Ordinate"});
 
 =head1 DESCRIPTION
 
 PDL can plot through a plethora of external plotting modules.  Each
 module tends to be less widely available than Perl itself, and to
-require an additional step or two to install.  For simple applications 
-("throw up an image on the screen", or "plot a curve") it is useful to 
+require an additional step or two to install.  For simple applications
+("throw up an image on the screen", or "plot a curve") it is useful to
 have a subset of all plotting capability available in a backend-independent
 layer.  PDL::Graphics::Simple provides that capability.
 
@@ -85,7 +85,7 @@ Gnuplot.
 
 =item * PLplot (via PDL::Graphics::PLplot)
 
-PLplot is a moderately full featured plotting package that 
+PLplot is a moderately full featured plotting package that
 generates publication quality output with a simple high-level interface.
 It is supported on MacOS and POSIX.
 
@@ -106,13 +106,13 @@ capabilities.
 
 PDL::Graphics::Simple can be called using plot-atomic or curve-atomic
 plotting styles, using a pidgin form of calls to any of the main
-modules.  The examples are divided into Book-like (very simple), 
+modules.  The examples are divided into Book-like (very simple),
 PGPLOT-like (curve-atomic), and Gnuplot-like (plot-atomic) cases.
 
-There are three main styles of interaction with plot objects that 
+There are three main styles of interaction with plot objects that
 PDL::Graphics::Simple supports, reflective of the pre-existing
 modules' styles of interaction.  You can mix-and-match them to match
-your particular needs and coding style.  Here are examples showing 
+your particular needs and coding style.  Here are examples showing
 convenient ways to call the code.
 
 =head2 First steps (non-object-oriented)
@@ -134,11 +134,11 @@ order until one works.
 =item * Load module and create line plots
 
  use PDL::Graphics::Simple;
- $x = xvals(51)/5; 
+ $x = xvals(51)/5;
  $y = $x**3;
 
  $y->line;
- line( $x, $y );   
+ line( $x, $y );
  line( $x, $y, {title=>"My plot", ylabel=> "Ordinate", xlabel=>"Abscissa"} );
 
 =item * Bin plots
@@ -176,19 +176,19 @@ order until one works.
  points($x, $y, {justify=>1});
 
 =item * Erase/delete the plot window
- 
+
  erase();
 
 =back
 
 =head2 Simple object-oriented plotting
- 
+
 More functionality is accessible through direct use of the PDL::Graphics::Simple
 object.  You can set plot size, direct plots to files, and set up multi-panel plots.
 
 The constructor accepts window configuration options that set the plotting
 environment, including size, driving plot engine, output, and multiple
-panels in a single window.   
+panels in a single window.
 
 For interactive/display plots, the plot is rendered immediately, and lasts until
 the object is destroyed.  For file plots, the file is not guaranteed to exist
@@ -201,7 +201,7 @@ Overplotting is implemented via plot option, via a held/released state
 (as in PGPLOT), and via a convenience method C<oplot> that causes the
 current plot to be overplotted on the previous one.
 
-Plot style (line/points/bins/etc.) is selected via the C<with> curve option.  
+Plot style (line/points/bins/etc.) is selected via the C<with> curve option.
 Several convenience methods exist to create plots in the various styles.
 
 =over 3
@@ -211,14 +211,14 @@ Several convenience methods exist to create plots in the various styles.
  use PDL::Graphics::Simple;
  $x = xvals(51)/5;
  $y = $x**3;
- 
+
  $win = pgswin();                       # plot to a default-shape window
  $win = pgswin( size=>[4,3] );          # size is given in inches by default
  $win = pgswin( size=>[10,5,'cm'] );    # You can feed in other units too
  $win = pgswin( out=>'plot.ps' );       # Plot to a file (type is via suffix)
  $win = pgswin( engine=>'gnuplot' );    # Pick a particular plotting engine
  $win = pgswin( multi=>[2,2] );         # Set up for a 2x2 4-panel plot
- 
+
 =item * Simple plots with C<plot>
 
  $win->plot( with=>'line', $x, $y, {title=>"Simple line plot"} );
@@ -256,7 +256,7 @@ use PDL::Options q/iparse/;
 use File::Temp qw/tempfile tempdir/;
 use Scalar::Util q/looks_like_number/;
 
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 $VERSION = eval $VERSION;
 
 ##############################
@@ -317,7 +317,7 @@ C<pgswin> is a constructor that is exported by default into the using package. C
 C<pgswin(%opts)> is exactly the same as calling C<< PDL::Graphics::Simple->new(%opts) >>.
 
 
-=head2 new 
+=head2 new
 
 =for usage
 
@@ -354,6 +354,10 @@ or "interactive" - though only the leading character is checked.  If
 you don't specify either C<type> or C<output> (below), the default is
 "interactive". If you specify only C<output>, the default is "file".
 
+For PGPLOT, if the type is "interactive", the environment variable
+C<PGPLOT_DEV> is set (eg C</NULL>), that will be used as the output
+device.
+
 =item output
 
 This should be a window number or name for interactive plots, or a
@@ -365,9 +369,9 @@ work.
 
 =item multi
 
-This enables plotting multiple plots on a single screen.  You feed in 
-a single array ref containing (nx, ny).  Subsequent calls to plot 
-send graphics to subsequent locations on the window.  The ordering 
+This enables plotting multiple plots on a single screen.  You feed in
+a single array ref containing (nx, ny).  Subsequent calls to plot
+send graphics to subsequent locations on the window.  The ordering
 is always horizontal first, and left-to-right, top-to-bottom.
 
 =back
@@ -407,7 +411,7 @@ sub new {
 	    if($ENV{'PDL_SIMPLE_ENGINE'}) {
 		push(@try, $ENV{'PDL_SIMPLE_ENGINE'});
 	    }
-	    
+
 	    push(@try, sort keys %$mods);
 
 	    attempt: for my $engine( @try ) {
@@ -433,28 +437,28 @@ sub new {
 	}
 	$opt->{engine} = $last_successful_type;
     }
-    
+
     ##############################
-    # Deal with abbreviations.  
-    # This can't be done at load time since the modules have to self-register then -- so 
+    # Deal with abbreviations.
+    # This can't be done at load time since the modules have to self-register then -- so
     # we do it at run time instead.
     $mod_abbrevs = _make_abbrevs($mods) unless($mod_abbrevs);
-    
+
     my $engine = $mod_abbrevs->{lc($opt->{engine})};
     unless(defined($engine) and defined($mods->{$engine})) {
 	die "$opt->{engine} is not a known plotting engine. Use PDL::Graphics::Simple::show() for a list. ";
     }
     $last_successful_type = $opt->{engine};
-    
+
     my $size = _regularize_size($opt->{size},'in');
 
     my $type = $opt->{type};
     my $output = $opt->{output};
-    
+
     unless($type) {
 	# Default to file if output looks like a filename; to interactive otherwise.
 	$type = (  ($output =~ m/\.(\w{2,4})$/) ? 'f' : 'i'  );
-    }	
+    }
     unless($type =~ m/^[fi]/i) {
 	die "$type is not a known output type (must be 'file' or 'interactive')\n";
     }
@@ -463,7 +467,7 @@ sub new {
     unless($output) {
 	$output = ($type eq 'f') ? "plot.png" : "";
     }
-    
+
     # Hammer it into a '.png' if no suffix is specified
     if( $opt->{type} =~ m/^f/i   and     $output !~ m/\.(\w{2,4})$/  ) {
 	$output .= ".png";
@@ -498,7 +502,7 @@ sub new {
 C<plot> plots zero or more traces of data on a graph.  It accepts two kinds of
 options: plot options that affect the whole plot, and curve options
 that affect each curve.  The arguments are divided into "curve blocks", each
-of which contains a curve options hash followed by data.  
+of which contains a curve options hash followed by data.
 
 If the last argument is a hash ref, it is always treated as plot options.
 If the first and second arguments are both hash refs, then the first argument
@@ -540,7 +544,7 @@ the Y axis.  If it is clear, the axis is autoscaled.
 This should be empty, "x", "y", or "xy" (case and order insensitive).
 Named axes are scaled logarithmically.
 
-=item crange 
+=item crange
 
 If this is set, it is a two-element ARRAY ref containing a range for
 color values, full black to full white.  If it is clear, the engine or
@@ -561,7 +565,7 @@ squares appear square.
 =item legend (EXPERIMENTAL)
 
 The "legend" plot option is intended for full support but it is currently
-experimental:  it is not fully implemented in all the engines, and 
+experimental:  it is not fully implemented in all the engines, and
 implementation is more variable than one would like in the engines that
 do support it.
 
@@ -571,7 +575,7 @@ indicating top, bottom, center, left, right position for the plot
 legend.  For example, 'tl' for top left, 'tc' for center top, 'c' or
 'cc' for dead center.  If left unset, no legend will be plotted.  If
 you set it but don't specify a position (or part of one), it defaults
-to top and left.  
+to top and left.
 
 If you supply even one 'key' curve option in the curves, legend defaults
 to the value 'tl' if it isn't specified.
@@ -648,13 +652,23 @@ you specify the "justify" plot option).
 =item image
 
 This is a monochrome or RGB image.  It takes a 2-D or 3-D array of
-values, as (width x height x color-index).  Images are displayed in 
+values, as (width x height x color-index).  Images are displayed in
 a sepiatone color scale that enhances contrast and preserves intensity
 when converted to grayscale.  If you use the convenience routines
 (C<image> or C<imag>), the "justify" plot option defaults to 1 -- so
-the image will be displayed with square pixel aspect.  If you use 
+the image will be displayed with square pixel aspect.  If you use
 C<< plot(with=>'image' ...) >>, "justify" defaults to 0 and you will have
 to set it if you want square pixels.
+
+For RGB images, the numerical values need to be in the range 0-255,
+as they are interpreted as 8 bits per plane colour values. E.g.:
+
+  $w = pgswin(); # plot to a default-shape window
+  $w->image( pdl(xvals(9,9),yvals(9,9),rvals(9,9))*20 );
+
+  # or, from an image on disk:
+  $image_data = rpic( 'my-image.png' )->mv(0,-1); # need RGB 3-dim last
+  $w->image( $image_data );
 
 =item labels
 
@@ -669,7 +683,7 @@ to denote default justification (left).
 
 =cut
 
-# Plot options have a bunch of names for familiarity to different package users.  
+# Plot options have a bunch of names for familiarity to different package users.
 # They're hammered into a single simplified set for transfer to the engines.
 
 our $plot_options = new PDL::Options( {
@@ -741,7 +755,7 @@ sub plot {
     if($#_ == 1  and  ref($_[0]) eq 'HASH') {
 	die "plot: requires at least one argument to plot, in addition to plot options\n";
     }
-    
+
     ##############################
     # Collect plot options.  These can be in a leading or trailing
     # hash ref, with the leading overriding the trailing one.  If the first
@@ -777,9 +791,9 @@ sub plot {
     ### bounds is a synonym for xrange/yrange together.
     ### (dcm likes it)
     if(defined($po->{bounds})) {
-	if( !ref($po->{bounds})  or  
+	if( !ref($po->{bounds})  or
 	    ref($po->{bounds}) ne 'ARRAY'  or
-	    @{$po->{bounds}} != 2 
+	    @{$po->{bounds}} != 2
 	    ) {
 	    die "Bounds option must be a 2-element ARRAY ref containing (xrange, yrange)\n";
 	}
@@ -796,7 +810,7 @@ sub plot {
     }
 
     if( defined($po->{xrange}) and (
-	    !ref($po->{xrange}) or 
+	    !ref($po->{xrange}) or
 	    ref($po->{xrange}) ne 'ARRAY' or
 	    @{$po->{xrange}} != 2 or
 	    $po->{xrange}->[0] == $po->{xrange}->[1])
@@ -805,7 +819,7 @@ sub plot {
     }
 
     if( defined($po->{yrange}) and (
-	    !ref($po->{yrange}) or 
+	    !ref($po->{yrange}) or
 	    ref($po->{yrange}) ne 'ARRAY' or
 	    @{$po->{yrange}} != 2 or
 	    $po->{yrange}->[0] == $po->{yrange}->[1])
@@ -820,7 +834,7 @@ sub plot {
     if( length($po->{logaxis}) ) {
 	if($po->{logaxis} =~ m/[^xyXY]/) {
 	    die "logaxis must be X, Y, or XY (case insensitive)\n";
-	} 
+	}
 	$po->{logaxis} =~ tr/XY/xy/;
 	$po->{logaxis} =~ s/yx/xy/;
     }
@@ -854,7 +868,7 @@ sub plot {
 		$co->{$a} = $b;
 	    }
 	}
-	
+
 	##############################
 	# Parse curve options and expand into standard form so we can find "with".
 	$curve_options->options({key=>undef});
@@ -882,7 +896,7 @@ sub plot {
 	##############################
 	# Snarf up the other arguments.
 
-	while( @_ and  (  UNIVERSAL::isa($_[0], 'PDL') or 
+	while( @_ and  (  UNIVERSAL::isa($_[0], 'PDL') or
 			  looks_like_number($_[0])  or
 			  ref $_[0] eq 'ARRAY'
 			  )
@@ -892,7 +906,7 @@ sub plot {
 
 
 	##############################
-	# Most array refs get immediately converted to 
+	# Most array refs get immediately converted to
 	# PDLs.  But the last argument to a "with=labels" curve
 	# needs to be left as an array ref. If it's a PDL we throw
 	# an error, since that's a common mistake case.
@@ -908,18 +922,18 @@ sub plot {
 		$args[$i] = pdl($args[$i]) unless(UNIVERSAL::isa($args[$i],'PDL'));
 	    }
 	}
-	    
+
 	##############################
-	# Now check options	
+	# Now check options
 	unless(@args == $pt->{args}->[0]  or  @args == $pt->{args}->[1]) {
 	    die sprintf("plot style %s requires %d or %d columns; you gave %d\n",$ptn,$pt->{args}->[0],$pt->{args}->[1],0+@args);
 	}
-	
+
 	# Add an index variable if needed
 	if(defined($pt->{args}->[1])) {
 	    if( $pt->{args}->[1] - @args == 2 ) {
 		my @dims = ($args[0]->slice(":,:")->dims)[0,1];
-		unshift(@args, xvals(@dims), yvals(@dims)); 
+		unshift(@args, xvals(@dims), yvals(@dims));
 	    }
 	    if( $pt->{args}->[1] - @args == 1 ) {
 		unshift(@args, xvals($args[0]) );
@@ -927,7 +941,7 @@ sub plot {
 	}
 
 	# Check that the PDL arguments all agree in a threading sense.
-	# Since at least one type of args has an array ref in there, we have to 
+	# Since at least one type of args has an array ref in there, we have to
 	# consider that case as a pseudo-PDL.
 	my @dims = map { ref($_) eq 'ARRAY' ? [ 0+@{$_} ] : [$_->dims] } @args;
 	my $dims;
@@ -941,7 +955,7 @@ sub plot {
 	}
 
 	# Check that the number of dimensions is correct...
-	if($dims->dim(0) != $pt->{ndims}->[0]  and  
+	if($dims->dim(0) != $pt->{ndims}->[0]  and
 	   ((!defined($pt->{ndims}->[1])) or ($dims->dim(0) != $pt->{ndims}->[1]))) {
 	    die "Data dimension (".$dims->dim(0)."-D PDLs) is not correct for plot type $ptn";
 	}
@@ -952,16 +966,16 @@ sub plot {
 
 	# Deal with half-pixel offset at edges of images
 	if($args[0]->dims > 1) {
-	    my $xymat = pdl( [ ($args[0]->slice("(1),(0)")-$args[0]->slice("(0),(0)")), 
+	    my $xymat = pdl( [ ($args[0]->slice("(1),(0)")-$args[0]->slice("(0),(0)")),
 			       ($args[0]->slice("(0),(1)")-$args[0]->slice("(0),(0)")) ],
-			     [ ($args[1]->slice("(1),(0)")-$args[1]->slice("(0),(0)")), 
+			     [ ($args[1]->slice("(1),(0)")-$args[1]->slice("(0),(0)")),
 			       ($args[1]->slice("(0),(1)")-$args[1]->slice("(0),(0)")) ]
 		);
 	    $dcorner = ($xymat x pdl(0.5,0.5)->slice("*1"))->slice("(0)")->abs;
 	}
 
 	@minmax = $args[0]->minmax;
-	$minmax[0] -= $dcorner->at(0); 
+	$minmax[0] -= $dcorner->at(0);
 	$minmax[1] += $dcorner->at(0);
 
 	if($po->{logaxis} =~ m/x/) {
@@ -977,10 +991,8 @@ sub plot {
 	$xminmax->[0] = $minmax[0] if( defined($minmax[0])   and   ( !defined($xminmax->[0])  or  $minmax[0] < $xminmax->[0] ));
 	$xminmax->[1] = $minmax[1] if( defined($minmax[1])   and   ( !defined($xminmax->[1])  or  $minmax[1] > $xminmax->[1] ));
 
-
-	
 	@minmax = $args[1]->minmax;
-	$minmax[0] -= $dcorner->at(1); 
+	$minmax[0] -= $dcorner->at(1);
 	$minmax[1] += $dcorner->at(1);
 
 	if($po->{logaxis} =~ m/y/) {
@@ -1010,7 +1022,7 @@ sub plot {
     $po->{yrange}->[1] = $yminmax->[1] unless(defined($po->{yrange}->[1]));
 
     if($po->{xrange}->[0] == $po->{xrange}->[1]) {
-	$po->{xrange}->[0] -= 0.5; 
+	$po->{xrange}->[0] -= 0.5;
 	$po->{xrange}->[1] += 0.5;
     }
 
@@ -1040,7 +1052,7 @@ sub plot {
  $w->plot($data);
  $w->oplot($more_data);
 
-=for ref 
+=for ref
 
 C<oplot> is a convenience interface.  It is exactly
 equivalent to C<plot> except it sets the plot option C<oplot>,
@@ -1058,7 +1070,7 @@ sub oplot {
 	push(@_, $h);
     }
     $h->{replot} = 1;
-    
+
     plot(@_);
 }
 
@@ -1086,7 +1098,7 @@ plot type.
 
 C<imag> is even more DWIMMy for PGPLOT users or PDL Book readers:
 it accepts up to three non-hash arguments at the start of the
-argument list.  The second and third are taken to be values for 
+argument list.  The second and third are taken to be values for
 the C<crange> plot option.
 
 =cut
@@ -1118,20 +1130,20 @@ sub _convenience_plot{
 sub line    { _convenience_plot( 'line',   @_ ); }
 *PDL::line   = \&line;
 
-sub lines   { _convenience_plot( 'line',   @_ ); }  
+sub lines   { _convenience_plot( 'line',   @_ ); }
 *PDL::lines  = \&lines;
 
 sub bins    { _convenience_plot( 'bins',   @_ ); }
 *PDL::bins   = \&bins;
 
-sub points  { _convenience_plot( 'points', @_ ); }  
+sub points  { _convenience_plot( 'points', @_ ); }
 *PDL::points = \&points;
 
-sub image   { 
-    _convenience_plot( 'image', @_ ,{called_from_imag=>1}); 
+sub image   {
+    _convenience_plot( 'image', @_ ,{called_from_imag=>1});
 }   #  Don't PDL-class image since it's so different from imag.
 
-sub imag   { 
+sub imag   {
     my $me;
     if( UNIVERSAL::isa($_[0], 'PDL::Graphics::Simple') ) {
 	$me = shift;
@@ -1142,12 +1154,11 @@ sub imag   {
     my $crange = [];
     unless(ref($_[0]) eq 'HASH') {
 	$crange->[0] = shift;
-	
 	unless(ref($_[0]) eq 'HASH') {
 	    $crange->[1] = shift;
 	}
     }
-    
+
     # Try to put the crange into the plot options, if they are present
     unless( ref($_[$#_]) eq 'HASH' ) {
 	push(@_, {} );
@@ -1160,14 +1171,14 @@ sub imag   {
 
 =head2 erase
 
-=for usage 
+=for usage
 
  use PDL::Graphics::Simple qw/erase hold release/;
  line xvals(10), xvals(10)**2 ;
  sleep 5;
  erase;
 
-=for ref 
+=for ref
 
 C<erase> removes a global plot window.  It should not be called as a method.
 To remove a plot window contained in a variable, undefine it.
@@ -1285,7 +1296,7 @@ our $units = {
 sub _regularize_size {
     my $size = shift;
     my $unit = shift;
-    
+
     $unit =~ tr/A-Z/a-z/;
     die "size specifier unit '$unit' is unrecognized\n" unless($units->{$unit});
 
@@ -1293,7 +1304,7 @@ sub _regularize_size {
 	$size = [ $size, $size, 'in' ];
     } elsif(ref($size) ne 'ARRAY') {
 	die "size option requires an ARRAY ref or scalar\n";
-    } 
+    }
     die "size array must have at least one element\n" unless(@{$size});
     $size->[1] = $size->[0]     if(@{$size}==1);
     $size->[2] = 'in'           if(@{$size}==2);
@@ -1359,7 +1370,7 @@ This is the fully qualified package name of the Perl API for the graphics engine
 
 This is a brief string describing the backend
 
-=item pgs_version 
+=item pgs_version
 
 This is a one-period version number of PDL::Graphics::Simple against which
 the module has been tested.  A warning will be thrown if the version isn't the
@@ -1370,7 +1381,7 @@ same as C<$PDL::Graphics::Simple::VERSION>.
 =cut
 sub register {
     my $module = shift;
-    
+
     my $modname = "\$${module}::mod";
     die "PDL::Graphics::Simple::register: tried to register $module \n\t...but $modname wasn't defined.\n"
 	unless (eval qq{defined($modname) and ref($modname) eq 'HASH';});
@@ -1378,7 +1389,7 @@ sub register {
     my $mod = eval $modname;
 
     for(qw/shortname module engine synopsis pgs_version/) {
-	die "PDL::Graphics::Simple::register: $modname looks fishy; I give up\n" 
+	die "PDL::Graphics::Simple::register: $modname looks fishy; I give up\n"
 	    unless( defined($mod->{$_}));
     }
 
@@ -1422,10 +1433,10 @@ Each interface module supports the following methods:
 
 =cut
 
-# Note that these are =head3; that means they won't be indexed by PDL::Doc, 
+# Note that these are =head3; that means they won't be indexed by PDL::Doc,
 # which is a Good Thing as they are internal routines.
 
-=head3 check 
+=head3 check
 
 C<check> attempts to load the relevant engine module and test that it
 is working.  In addition to returning a boolean value indicating
@@ -1443,9 +1454,9 @@ flag.
 C<new> creates and returns an appropriate plot object, or dies on
 failure.
 
-Each C<new> method should accept the following options, defined as in 
-the description for PDL::Graphics::Simple::new (above).  There is 
-no need to set default values as all arguments should be set to 
+Each C<new> method should accept the following options, defined as in
+the description for PDL::Graphics::Simple::new (above).  There is
+no need to set default values as all arguments should be set to
 reasonable values by the superclass.
 
 For file output, the method should autodetect file type by dot-suffix.
@@ -1474,7 +1485,7 @@ indicates the corresponding plot feature should not be rendered.  The
 C<oplot>, C<xrange>, C<yrange>, C<crange>, C<wedge>, and C<justify>
 parameters are always both present and defined.
 
-If the C<oplot> plot option is set, then the plot should be overlain on 
+If the C<oplot> plot option is set, then the plot should be overlain on
 a previous plot - otherwise the module should display a fresh plot.
 
 Each curve block consists of an ARRAY ref with a hash in the 0 element
@@ -1492,7 +1503,6 @@ C<lines>, C<bins>, C<errorbars>, C<limitbars>, C<circles>
 C<image>, or C<labels>.
 
 =cut
-	
 
 1;
 

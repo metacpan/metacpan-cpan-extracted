@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Step::Magnet;
-$Lab::Moose::Sweep::Step::Magnet::VERSION = '3.762';
+$Lab::Moose::Sweep::Step::Magnet::VERSION = '3.770';
 #ABSTRACT: Step/list sweep of magnetic field
 
 use v5.20;
@@ -107,18 +107,21 @@ Lab::Moose::Sweep::Step::Magnet - Step/list sweep of magnetic field
 
 =head1 VERSION
 
-version 3.762
+version 3.770
 
 =head1 SYNOPSIS
 
  my $sweep = sweep(
      type => 'Step::Magnet',
      instrument => $ips,
-     from => -1, # Tesla
-     to => 1,
-     step => 0.1, # steps of 0.1 Tesla
-     rate => 1, # Tesla/min, mandatory, always positive
-     persistent_mode => 1, # use persistent mode (default: 0)
+     from => -1,           # Tesla
+     to => 1,              # Tesla
+     step => 0.1,          # Tesla
+     rate => 1,            # Tesla/min, mandatory, always positive,
+                           #   used to change the magnetic field
+     start_rate => 1,      # Tesla/min, default equals rate, always positive,
+                           #   used when switch heater is off
+     persistent_mode => 1, # use persistent mode, default 0
  );
 
 =head1 Description
@@ -133,6 +136,14 @@ Uses instruments C<sweep_to_field> method to set the field.
 
 =item *
 
+Uses instruments C<in_persistent_mode> and C<get_persistent_field> methods to query persistent mode status
+
+=item *
+
+Uses instruments C<heater_off> and C<heater_on> to control persistent mode switch
+
+=item *
+
 Default filename extension: C<'Field='>
 
 =back
@@ -143,7 +154,7 @@ This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
 
   Copyright 2018-2019  Simon Reinhardt
             2020       Andreas K. Huettel, Simon Reinhardt
-            2021       Fabian Weinelt
+            2021       Andreas K. Huettel, Fabian Weinelt
 
 
 This is free software; you can redistribute it and/or modify it under

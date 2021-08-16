@@ -2,19 +2,6 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
-sub parseversion
-{
-    my $version;
-  open GP, 'lib/PDL/Graphics/Simple.pm' or die "Couldn't open Simple.pm";
-  for(<GP>){
-      if(m/our \$VERSION = \'([\d\.]+b?)\'/) {$version = $1;}
-      last if($version);
-  }
-  die "Couldn't parse version from Simple.pm" unless($version);
-  close GP;
-  return $version;
-}
-
 sub MY::libscan
 {
     package MY;
@@ -36,8 +23,7 @@ FOO
     return $text;
 }
 
-my %prereq = ( 'Test::More'  => 0,
-               'PDL'         => 0,
+my %prereq = ( 'PDL'         => 0,
 	       'File::Temp'  => 0,
 	       'Time::HiRes' => 0);
 
@@ -46,17 +32,21 @@ $prereq{'Win32::Process'} = 0.14 if $^O =~ /MSWin32/i;
 WriteMakefile(
     NAME                => 'PDL::Graphics::Simple',
     AUTHOR              => ['Craig DeForest <craig@deforest.org>'],
-    VERSION             => parseversion(),
+    VERSION_FROM        => 'lib/PDL/Graphics/Simple.pm',
     ABSTRACT_FROM       => 'lib/PDL/Graphics/Simple.pm',
-    ($ExtUtils::MakeMaker::VERSION >= 6.3002
-     ? ('LICENSE'=> 'perl')
-     : ()),
+    LICENSE=> 'perl',
     PREREQ_PM => \%prereq,
+    CONFIGURE_REQUIRES => {
+        'ExtUtils::MakeMaker' => '7.12', # working .g.c
+    },
+    TEST_REQUIRES => {
+        'Test::More'  => '0.88',
+    },
     META_ADD => {
 	resources => {
-	    homepage => 'http://github.com/drzowie/PDL-Graphics-Simple',
-	    repository => 'git://github.com/drzowie/PDL-Graphics-Simple.git',
-	    bugtracker => 'craig@deforest.org'
+	    homepage => 'http://github.com/PDLPorters/PDL-Graphics-Simple',
+	    repository => 'git://github.com/PDLPorters/PDL-Graphics-Simple.git',
+	    bugtracker => 'http://github.com/PDLPorters/PDL-Graphics-Simple/issues'
 	}
     },
 
@@ -67,15 +57,16 @@ WriteMakefile(
 # reroute the main POD into a separate README.pod if requested. This is here
 # purely to generate a README.pod for the github front page
 my $POD_header = <<EOF;
-=head1 OVERVIEW
+    =head1 OVERVIEW
 
-PDL::Graphics::Simple is a unified plotting interface for PDL.  The
-main distribution site is CPAN; the development repository is on
-github.com.
+    PDL::Graphics::Simple is a unified plotting interface for PDL.  The
+    main distribution site is CPAN; the development repository is on
+    github.com.
 
-=cut
+    =cut
 
 EOF
+$POD_header =~ s{^    }{}gm;
 
 if(exists $ARGV[0] && $ARGV[0] eq 'README.pod')
 {

@@ -74,9 +74,9 @@ WriteMakefile(
     },
     META_ADD => {
         resources => {
-            homepage          => 'http://github.com/drzowie/PDL-Graphics-Gnuplot',
-            repository        => 'git://github.com/drzowie/PDL-Graphics-Gnuplot.git',
-            bugtracker        => 'http://rt.cpan.org/Public/Dist/Display.html?Name=PDL-Graphics-Gnuplot'
+            homepage          => 'http://github.com/PDLPorters/PDL-Graphics-Gnuplot',
+            repository        => 'git://github.com/PDLPorters/PDL-Graphics-Gnuplot.git',
+            bugtracker        => 'http://github.com/PDLPorters/PDL-Graphics-Gnuplot/issues'
         }
     },  
 
@@ -87,16 +87,16 @@ WriteMakefile(
 # reroute the main POD into a separate README.pod if requested. This is here
 # purely to generate a README.pod for the github front page
 my $POD_header = <<EOF;
-=head1 OVERVIEW
+    =head1 OVERVIEW
 
 This is a Gnuplot-based plotter for PDL. This repository stores the history for
 the PDL::Graphics::Gnuplot module on CPAN. Install the module via CPAN. CPAN
-page at L<http://search.cpan.org/~zowie/PDL-Graphics-Gnuplot/lib/PDL/Graphics/Gnuplot.pm>.
+page at L<http://metacpan.org/pod/PDL::Graphics::Gnuplot>.
 
-=cut
+    =cut
 
 EOF
-
+$POD_header =~ s{^    }{}gm;
 
 if(exists $ARGV[0] && $ARGV[0] eq 'README.pod')
 {
@@ -110,4 +110,3 @@ if(exists $ARGV[0] && $ARGV[0] eq 'README.pod')
         if (/^=/../^=cut/) { print README; }
     }
 }
-

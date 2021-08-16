@@ -71,7 +71,7 @@ WriteMakefile(
 	'-Wall -Wpointer-arith -Wuninitialized -Wstrict-prototypes '.
 	'-Wmissing-prototypes -Wunused -Wsign-compare -Wshadow '.
 	'-Wno-pointer-sign',
-    META_MERGE => {
+    META_MERGE		=> {
 	'meta-spec' => { version => 2 },
 	resources => {
 	    repository => {
@@ -81,6 +81,7 @@ WriteMakefile(
 	    },
 	},
     },
+    #OPTIMIZE		=> '-g -O0 -DDEBUG',
     SIGN		=> 1,
     TEST_REQUIRES	=> {
 	'Test::Deep'		=> 0,

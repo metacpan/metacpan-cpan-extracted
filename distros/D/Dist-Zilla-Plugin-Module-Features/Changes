@@ -1,0 +1,8 @@
+0.002   2021-02-26  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Wrong subroutine name in generated test file.
+
+
+0.001   2021-02-26  Released-By: PERLANCAR
+
+        - First release.

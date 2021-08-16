@@ -175,9 +175,13 @@ sub write
         $self->updated( ( stat( $tables_cache_file ) )[9] );
         return( -s( $tables_cache_file ) );
     }
+    elsif( -e( $tables_cache_file ) && !-w( $tables_cache_file ) )
+    {
+        return( $self->error( "Table cache file \"$tables_cache_file\" does not have write permission: $!" ) );
+    }
     else
     {
-        return( $self->error( "Unable to write to file $tables_cache_file: $!" ) );
+        return( $self->error( "Although table cache file \"$tables_cache_file\" is writable, I am unable to write to it: $!" ) );
     }
 }
 
@@ -335,20 +339,19 @@ It returns the size of the cache file or return undef and set the B<error>
 
 Copyright (c) 2000-2019 DEGUEST Pte. Ltd.
 
-=head1 AUTHOR
-
-Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
-
 =head1 SEE ALSO
 
 L<DB::Object>
 
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+Copyright (c) 2018-2021 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.
 
 =cut
-

@@ -1,7 +1,7 @@
 # Perl module: Client ModBus / TCP class 1
-#     Version: 1.57
+#     Version: 1.58
 #     Website: https://github.com/sourceperl/MBclient/
-#        Date: 2014-11-27
+#        Date: 2017-10-25
 #     License: MIT (http://http://opensource.org/licenses/mit-license.php)
 # Description: Client ModBus / TCP command line
 #              Support functions 3 and 16 (class 0)
@@ -32,7 +32,7 @@ use Exporter;
 use Socket;
 use bytes;
 
-our $VERSION = '1.57';
+our $VERSION = '1.58';
 
 ##
 ## Constant
@@ -96,7 +96,7 @@ sub new {
   $self->{LAST_EXCEPT}   = 0;                 # last expect code
   $self->{MODE}          = MODBUS_TCP;        # by default modbus/tcp
   $self->{sock}          = undef;             # socket handle
-  $self->{timeout}       = 30;                # socket timeout
+  $self->{TIMEOUT}       = 30;                # socket timeout
   $self->{hd_tr_id}      = 0;                 # store transaction ID
   $self->{debug}         = 0;                 # enable debug trace
   # object bless
@@ -193,6 +193,23 @@ sub mode {
   # set mode and return mode
   $self->{MODE} = $mode;
   return $self->{MODE};
+}
+
+##
+## Get or set read timeout.
+##
+
+sub timeout {
+  my $self = shift;
+  my $timeout  = shift;
+  # return timeout if no arg
+  return $self->{TIMEOUT} unless defined $timeout;
+  # set timeout and return timeout
+  if (($timeout =~ m/^\d{1,5}$/) and
+      ($timeout < 180)) {
+    $self->{TIMEOUT} = $timeout;
+  }
+  return $self->{TIMEOUT};
 }
 
 ##
@@ -622,7 +639,7 @@ sub _can_read {
   my $self  = shift;
   my $hdl_select = "";
   vec($hdl_select, fileno($self->{sock}), 1) = 1;
-  my $_select = select($hdl_select, undef, undef, $self->{timeout});
+  my $_select = select($hdl_select, undef, undef, $self->{TIMEOUT});
   if ($_select) {
     return $_select;
   } else {
@@ -811,6 +828,14 @@ Use to set modbus mode : TCP (default value) or RTU (add crc16 on every frame).
 define modbus mode.
 
 Example: C<$m-E<gt>mode(MODBUS_RTU);>
+
+=item timeout(TIMEOUT)
+
+Use to set modbus read timeout : 30 default value.
+
+Timeout defines how long will read wait until it exits and aborts communication.
+
+Example: C<$m-E<gt>timeout(5);>
 
 =item host(hostname)
 

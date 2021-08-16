@@ -14,7 +14,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "String-Copyright",
    "no_index" : {
@@ -51,7 +51,7 @@
    "provides" : {
       "String::Copyright" : {
          "file" : "lib/String/Copyright.pm",
-         "version" : "0.003006"
+         "version" : "0.003007"
       }
    },
    "release_status" : "stable",
@@ -59,7 +59,7 @@
       "bugtracker" : {
          "web" : "https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=libstring-copyright-perl"
       },
-      "homepage" : "https://metacpan.org/release/String-Copyright",
+      "homepage" : "https://metacpan.org/pod/String::Copyright",
       "license" : [
          "http://www.gnu.org/licenses/gpl-3.0.txt"
       ],
@@ -69,11 +69,11 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/String-Copyright/project"
    },
-   "version" : "0.003006",
+   "version" : "0.003007",
    "x_help_wanted" : [
       "documenter",
       "tester"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 1
 }

@@ -1,7 +1,7 @@
 use v5.10.0;
 use warnings;
 
-package JMAP::Tester::WebSocket 0.002;
+package JMAP::Tester::WebSocket 0.003;
 # ABSTRACT: a WebSocket JMAP client made for testing JMAP servers
 
 use Moo;
@@ -217,7 +217,7 @@ JMAP::Tester::WebSocket - a WebSocket JMAP client made for testing JMAP servers
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

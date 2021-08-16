@@ -1,7 +1,7 @@
 package Test2::MojoX;
 use Mojo::Base -base;
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 ## "Amy: He knows when you are sleeping.
 ##  Professor: He knows when you're on the can.
@@ -526,8 +526,8 @@ sub websocket_ok {
 
 sub _attr {
   my ($self, $selector, $attr) = @_;
-  return '' unless my $e = $self->tx->res->dom->at($selector);
-  return $e->attr($attr) || '';
+  return undef unless my $e = $self->tx->res->dom->at($selector);
+  return $e->attr($attr) // '';
 }
 
 sub _desc { encode 'UTF-8', shift || shift }
@@ -595,7 +595,7 @@ sub _request_ok {
 }
 
 sub _text {
-  return '' unless my $e = shift->tx->res->dom->at(shift);
+  return undef unless my $e = shift->tx->res->dom->at(shift);
   return $e->text;
 }
 

@@ -1,5 +1,13 @@
 #!/usr/bin/env perl
 
+use v5.14;
+use warnings;
+
+use App::week;
+exit App::week->new->run(@ARGV);
+
+__END__
+
 =encoding utf8
 
 =head1 NAME
@@ -12,14 +20,16 @@ B<week> [ -MI<module> ] [ option ] [ date ]
 
 Options:
 
-    -n      Display n months surronding today (default 3).
-    -A n    Display n months after current month.
-    -B n    Display n months before current month (default 1).
-    -C[n]   Display n months before and after current month (default 4).
-    -y      Display year calendar.
-    -Y[n]   Display n years of calendar
-    -c n    Display calendar in n column (default 3).
-    -l      Display I18N options (See below)
+    -#,-m#  # months surronding today (default 3)
+    -A #    after current month
+    -B #    before current month
+    -C[#]   before and after current month (default 4)
+    -y      year calendar
+    -Y[#]   # years of calendar
+    -c #    number of columns (default 3)
+    -p #    print year on month-# (default current, 0 for none)
+    -P      print year on all months
+    -l      I18N options (See below)
 
     --theme theme
             Apply color theme
@@ -38,21 +48,24 @@ I18N options:
 Color modules:
 
     -Mcolors
-    -Mteams
+    -Mnpb
     -Molympic
 
 =head1 VERSION
 
-Version 0.13
+Version 1.0101
 
 =head1 DESCRIPTION
 
 By default, B<week> command display the previous, current and next
-month surrounding today, just like B<-3> option of B<cal> command.
+month surrounding today, just like B<-3> option of L<cal(1)> command.
 
-Number of month can be given with dash.
+Number of month can be given with dash, or B<-m> option which can be
+mixed up with other parameters.  B<-c> option specifies number of
+columns.
 
     $ week -12
+    $ week -m21c7
 
 Before and after months can be specified with B<-B> and B<-A> option,
 and B<-C> for both.
@@ -65,6 +78,15 @@ Date can given like:
     $ week 2019/9/23
     $ week 9/23        # 9/23 of current year
     $ week 23          # 23rd of current month
+
+And also in Japanese format and era:
+
+    $ week 2019年9月23日
+    $ week 平成31年9月23日
+    $ week H31.9.23
+    $ week 平成31
+    $ week 平31
+    $ week H31
 
 Greater number is handled as year.  Next command displays the calendar of
 the year 1752.
@@ -80,6 +102,8 @@ specified by the B<-Y> option, which will implicitly set the B<-y> option.
 
     $ week -Y 1752     # display 1752 years of calendar (takes long)
 
+=head1 INTERNATIONAL SUPPORT
+
 It is possible display calendar in various language by setting C<LANG>
 environment.
 
@@ -88,11 +112,19 @@ environment.
 This command is come with B<-Mi18n> module which provides easy way to
 specify language by command option.  Option B<-l> displays option list
 provided by B<-Mi18n> module and option B<--i18n> and B<--i18n-v>
-enables them.
+enables them.  See L<Getopt::EX::i18n>.
+
+    $ week --i18n-v --et
+
+=head1 JAPANESE ERA
+
+By default, year is shown on current month and every January.  When
+used in Japanese locale environment, right side year is displayed in
+Japanese era (wareki: 和暦) format.
 
 =head1 COLORMAP
 
-Each field is labled by names.
+Each field is labeled by names.
 
     FRAME       Enclosing frame
     MONTH       Month name
@@ -166,7 +198,7 @@ load appropriate module automatically in default start up module
     --green
     --pastel
 
-=item B<-Mteams>
+=item B<-Mnpb> (Nippon Professional Baseball Organization)
 
     --tigers, --tigers-rev
     --giants, --giants-rev
@@ -175,6 +207,7 @@ load appropriate module automatically in default start up module
 =item B<-Molympic>
 
     --tokyo2020, --tokyo2020-rev
+    --tokyo2020-gold, --tokyo2020-gold-rev
 
 =item B<--theme>
 
@@ -206,10 +239,13 @@ Start up file.  Use like this:
 
 =head1 SEE ALSO
 
+L<App::week>,
 L<https://github.com/kaz-utashiro/App-week>
 
+L<Getopt::EX::termcolor>,
 L<https://github.com/kaz-utashiro/Getopt-EX-termcolor>
 
+L<Getopt::EX::i18n>,
 L<https://github.com/kaz-utashiro/Getopt-EX-i18n>
 
 L<Getopt::EX::Colormap>
@@ -235,324 +271,6 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2018- Kazumasa Utashiro
+Copyright 2018-2021 Kazumasa Utashiro
 
 =cut
-
-use v5.14;
-use strict;
-use warnings;
-
-use App::week;
-our $VERSION = $App::week::VERSION;
-
-use utf8;
-use Time::localtime;
-use List::Util qw(max);
-use Pod::Usage;
-use Data::Dumper;
-
-use open IO => ':utf8', ':std';
-
-my($sec, $min, $hour, $mday, $mon, $year) = CORE::localtime(time);
-$mon++;
-$year += 1900;
-
-my %colormap = (
-	     DAYS => "L05/335",
-	     WEEK => "L05/445",
-	    FRAME => "L05/445",
-	    MONTH => "L05/335",
-	  THISDAY => "522/113",
-	 THISDAYS => "555/113",
-	 THISWEEK => "L05/445",
-	THISMONTH => "555/113",
-	   DOW_SU => "",
-	   DOW_MO => "",
-	   DOW_TU => "",
-	   DOW_WE => "",
-	   DOW_TH => "",
-	   DOW_FR => "",
-	   DOW_SA => "",
-    );
-
-my $months = 0;
-my $opt_A;
-my $opt_B = 1;
-my $opt_C;
-my $opt_column = 3;
-my $opt_colordump;
-my @opt_colormap;
-my $opt_year;
-my $opt_Y;
-my $opt_usage;
-my $opt_rgb24;
-our %debug;
-
-my %month = do {
-    my $i;
-    map { $_ => ++$i } qw(JAN FEB MAR APR MAY JUN JUL AUG SEP OCT NOV DEC)
-};
-
-my @optargs = (
-    "after|A:1"     => \$opt_A,
-    "before|B:1"    => \$opt_B,
-    "C:4"           => sub { $opt_A = $opt_B = $_[1] },
-    "year|y"        => \$opt_year,
-    "Y:1"           => \$opt_Y,
-    "column|c=n"    => \$opt_column,
-    "colormap|cm=s" => \@opt_colormap,
-    "colordump"     => \$opt_colordump,
-    "rgb24!"        => \$opt_rgb24,
-    "usage:s"       => \$opt_usage,
-    "debug=s"       => \%debug,
-    "<>" => sub {
-	local $_ = $_[0];
-	if (/^-+([0-9]+)$/) {
-	    $months = $1;
-	}
-	elsif (/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/i) {
-	    $mon = $month{uc($1)}
-	}
-	elsif (/^-/) {
-	    die "@_: Unknown option\n";
-	}
-	else {
-	    $mday = $1 if s/\/*(\d+)$//;
-	    $mon  = $1 if s/\/*(\d+)$//;
-	    $year = $1 if m/(\d+)$/;
-	    if ($mday > 31) {
-		$year = $mday;
-		undef $mday;
-		$opt_year++;
-	    }
-	}
-    },
-    );
-
-sub usage {
-    pod2usage(-verbose => 0, -exitval => "NOEXIT");
-    print "Version: $VERSION\n";
-    exit 2;
-}
-
-##
-## Getopt staff
-##
-use Getopt::EX::Long qw(:DEFAULT Configure ExConfigure);
-ExConfigure BASECLASS => [ "App::week", "Getopt::EX", "" ];
-Configure qw(bundling no_getopt_compat no_ignore_case pass_through);
-GetOptions(@optargs) || usage({status => 1});
-
-use Getopt::EX::Colormap;
-my $cm = Getopt::EX::Colormap
-    ->new(HASH => \%colormap)
-    ->load_params(@opt_colormap);
-
-if (defined $opt_rgb24) {
-    no warnings 'once';
-    $Getopt::EX::Colormap::RGB24 = $opt_rgb24;
-}
-
-sub color {
-    $cm->color(@_);
-}
-
-if ($opt_colordump) {
-    print $cm->colormap(name => '--changeme', option => '--colormap');
-    exit;
-}
-
-if ($months == 1) {
-    $opt_B = $opt_A = 0;
-}
-elsif ($months > 1) {
-    if (defined $opt_B) {
-	$opt_A = $months - $opt_B - 1;
-    } elsif (defined $opt_A) {
-	$opt_B = $months - $opt_A - 1;
-    } else {
-	use integer;
-	$opt_B = ($months - 1) / 2;
-	$opt_A = $months - $opt_B - 1;
-    }
-}
-elsif ($opt_year or defined $opt_Y) {
-    $months = 12 * ($opt_Y // 1);
-    $opt_B = $mon - 1;
-    $opt_A = $months - $mon;
-}
-else {
-    $opt_B //= 1;
-    $opt_A //= max(0, $opt_column - $opt_B - 1);
-    $months = $opt_B + $opt_A + 1;
-}
-
-$opt_B //= 1;
-$opt_A //= 1;
-
-$year += $year < 50 ? 2000 : $year < 100 ? 1900 : 0;
-
-calendar(
-    ( map { calref($year, $mon + $_) } -$opt_B .. -1 ) ,
-    (       calref($year, $mon, $mday)               ) ,
-    ( map { calref($year, $mon + $_) } 1 .. $opt_A   )
-    );
-
-exit;
-
-######################################################################
-
-sub calendar {
-    my $cols = $opt_column;
-    my $row = 0;
-    my @refs;
-    my $cal_width = 24;
-    my $hr1 = " " x $cal_width;
-    my $gap = "  ";
-    while (@_) {
-	@refs = splice @_, 0, $cols;
-	do {
-	    my $n = $row++ ? $cols : @refs;
-	    print color(FRAME => join('', ' ', ($hr1) x $n, ' '));
-	}
-	and print "\n";
-	for (my $i = 0; 1; $i++) {
-	    my @cols;
-	    for my $ref (@refs) {
-		push @cols, $$ref[$i];
-	    }
-	    last if !grep(defined, @cols);
-	    print join(color(FRAME => $gap), '', @cols, ''), "\n";
-	}
-    }
-    do {
-	print color(FRAME => join('', ' ', ($hr1) x @refs, ' '));
-    }
-    and print "\n";
-}
-
-######################################################################
-
-my @calyear;
-
-sub calref {
-    my($y, $m, $d) = @_;
-
-    while ($m > 12) { $y += 1; $m -= 12 }
-    while ($m <= 0) { $y -= 1; $m += 12 }
-
-    my @cal = @{$calyear[$y][$m]};
-
-    my %label = (
-	month => $d ? "THISMONTH" : "MONTH",
-	week  => $d ? "THISWEEK"  : "WEEK",
-	days  => $d ? "THISDAYS"  : "DAYS",
-	);
-
-    $cal[0] = color($label{month}, $cal[0]);
-    $cal[1] = color($label{week}, state $week = week_line($cal[1]));
-    map {
-	s/(?= \d\b|\d\d\b)( ?$d\b)/color("THISDAY", $1)/e if $d;
-	$_ = color($label{days}, $_);
-    } @cal[2..$#cal];
-
-    return \@cal;
-}
-
-use Text::ANSI::Fold;
-
-sub split_week {
-    state $fold = new Text::ANSI::Fold width => [ (1, 2) x 7, 1 ];
-    $fold->text(+shift)->chops;
-}
-
-sub week_line {
-    my $week = shift;
-    my @week = split_week $week;
-    for (0..6) {
-	my $label = "DOW_" . qw(SU MO TU WE TH FR SA)[$_];
-	if (my $color = $colormap{$label}) {
-	    my $indx = $_ * 2 + 1;
-	    $week[$indx] = color($label, $week[$indx]);
-	}
-    }
-    join '', @week;
-}
-
-package App::week::CalYear {
-    use Encode;
-    use open IO => ':utf8';
-    use Text::VisualWidth::PP qw(vwidth);
-    sub TIEARRAY {
-	my $pkg = shift;
-	bless {}, $pkg;
-    }
-    sub FETCH {
-	my($obj, $year) = @_;
-	$obj->{$year} //= [ CalYear($year) ];
-    }
-    sub CalYear {
-	my $year = sprintf "%4d", shift;
-	my $cal = `cal $year` =~ s/_[\b]//gr;
-	if ($main::debug{crashspace}) {
-	    $cal =~ s/ +$//mg;
-	}
-	if ($main::debug{netbsd}) {
-	    $cal =~ s/(Su|Mo|We|Fr|Sa)/' ' . substr($1,0,1)/mge;
-	}
-	my @cal = split /\n/, $cal, -1;
-	my @month = ( [ $cal[0] ], map [], 1..12 );
-	my @monthline = do {
-	    map  { $_ - 2 }		    # 2 lines up
-	    grep { $cal[$_] =~ /\s 1 \s/x } # find 1st day
-	    0 .. $#cal;
-	};
-	@monthline == 4 or die "cal(1) command format error.\n";
-	state $fields = do {
-	    use Unicode::EastAsianWidth;
-	    my $dow_re = qr/\p{InFullwidth}|[ \S]\S/;
-	    $cal[ $monthline[0] + 1 ] =~
-		m{^   (\s*)
-		      ( (?: $dow_re [ ]){6} $dow_re ) (\s+)
-		      ( (?: $dow_re [ ]){6} $dow_re ) (\s+)
-		      ( (?: $dow_re [ ]){6} $dow_re )
-	    }x or die "cal(1): unexpected day-of-week line.";
-	    my $w = vwidth $2;
-	    my @w = (length $1, $w, length $3, $w, length $5, $w);
-	    my $blank = ' ' x $w;
-	    my $fold = new Text::ANSI::Fold width => \@w, padding => 1;
-	    sub {
-		map $_ // $blank, ($fold->text(shift)->chops)[1, 3, 5];
-	    };
-	};
-	for my $i (0 .. $#monthline) {
-	    my $start = $monthline[$i];
-	    for my $n (0..7) {
-		my @m = $fields->($cal[$start + $n]);
-		push @{$month[$i * 3 + 1]}, $m[0];
-		push @{$month[$i * 3 + 2]}, $m[1];
-		push @{$month[$i * 3 + 3]}, $m[2];
-	    }
-	}
-	for my $month (@month[1..12]) {
-	    for (@{$month}) {
-		$_ = " $_ ";
-	    }
-	    for ($month->[0]) {
-		## Fix month name:
-		## 1) Take care of cal(1) multibyte string bug.
-		## 2) Normalize off-to-right to off-to-left.
-		while (/^ (( +)\S+( +))$/ and length($2) >= length($3)) {
-		    $_ = "$1 ";
-		}
-	    }
-	}
-	$month[1][0] =~ s/(?<=^ ) {4}| {4}(?= $)/$year/g;
-	@month;
-    }
-}
-
-BEGIN {
-    tie @calyear, 'App::week::CalYear';
-}

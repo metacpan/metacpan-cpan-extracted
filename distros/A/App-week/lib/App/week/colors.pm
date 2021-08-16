@@ -28,7 +28,7 @@ option --lavender \
 	--cm THISMONTH=THISDAYS=555/113
 
 define <FG> L23
-option --dark-lavender \
+option --lavender-rev \
 	--cm MONTH=DAYS=<FG>/113 \
 	--cm FRAME=*WEEK=<FG>/223 \
 	--cm THISDAY=<FG>/113 \

@@ -1,14 +1,14 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## Database Object Interface - ~/lib/DB/Object/Mysql.pm
-## Version v0.3.3
-## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
-## Created 2017/07/19
-## Modified 2020/05/22
-## 
+# Database Object Interface - ~/lib/DB/Object/Mysql.pm
+# Version v0.3.3
+# Copyright(c) 2020 DEGUEST Pte. Ltd.
+# Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+# Created 2017/07/19
+# Modified 2020/05/22
+# 
 ##----------------------------------------------------------------------------
-## This is the subclassable module for driver specific ones.
+# This is the subclassable module for driver specific ones.
 package DB::Object::Mysql;
 BEGIN
 {
@@ -18,7 +18,7 @@ BEGIN
     use parent qw( DB::Object );
     require DB::Object::Mysql::Statement;
     require DB::Object::Mysql::Tables;
-    ## use DBD::mysql;
+    # use DBD::mysql;
     eval
     {
         require DBD::mysql;
@@ -26,10 +26,10 @@ BEGIN
     die( $@ ) if( $@ );
     use Net::IP;
     use Nice::Try;
-    ## DBI->trace( 5 );
+    # DBI->trace( 5 );
     our( $VERSION, $DB_ERRSTR, $ERROR, $DEBUG, $CONNECT_VIA, $CACHE_QUERIES, $CACHE_SIZE );
     our( $CACHE_TABLE, $USE_BIND, $USE_CACHE, $MOD_PERL, @DBH );
-    $VERSION     = 'v0.3.3';
+    $VERSION = 'v0.3.3';
     use Devel::Confess;
 };
 
@@ -64,10 +64,10 @@ sub init
 sub attribute($;$@)
 {
     my $self = shift( @_ );
-    ## $h->{AttributeName} = ...;    # set/write
-    ## ... = $h->{AttributeName};    # get/read
-    ## 1 means that the attribute may be modified
-    ## 0 mneas that the attribute may only be read
+    # $h->{AttributeName} = ...;    # set/write
+    # ... = $h->{AttributeName};    # get/read
+    # 1 means that the attribute may be modified
+    # 0 mneas that the attribute may only be read
     my $name  = shift( @_ ) if( @_ == 1 );
     my %arg   = ( @_ );
     my %attr  = 
@@ -97,8 +97,8 @@ sub attribute($;$@)
     'Statement'        => 0, 
     'RowsInCache'    => 0 
     );
-    ## Only those attribute exist
-    ## Using an a non existing attribute produce an exception, so we better avoid
+    # Only those attribute exist
+    # Using an a non existing attribute produce an exception, so we better avoid
     if( $name )
     {
         return( $self->{ 'dbh' }->{ $name } ) if( exists( $attr{ $name } ) );
@@ -108,8 +108,8 @@ sub attribute($;$@)
         my $value;
         while( ( $name, $value ) = each( %arg ) )
         {
-            ## We intend to modifiy the value of an attribute
-            ## we are allowed to modify this value if it is true
+            # We intend to modifiy the value of an attribute
+            # we are allowed to modify this value if it is true
             if( exists( $attr{ $name } ) && 
                 defined( $value ) && 
                 $attr{ $name } )
@@ -154,7 +154,7 @@ sub create_db
     my $opts = {};
     $opts = shift( @_ ) if( $self->_is_hash( $_[0] ) );
     my $params = [];
-    ## https://dev.mysql.com/doc/refman/5.6/en/create-database.html
+    # https://dev.mysql.com/doc/refman/5.6/en/create-database.html
     push( @$params, sprintf( 'CHARACTER SET = %s', $opts->{charset} ) ) if( $opts->{charset} );
     push( @$params, sprintf( 'COLLATE = %s', $opts->{collate} ) ) if( $opts->{collate} );
     my $sql = "CREATE DATABASE " . ( $opts->{if_not_exists} ? 'IF NOT EXISTS ' : '' ) . $name;
@@ -186,10 +186,10 @@ sub create_db
 sub databases
 {
     my $self = shift( @_ );
-    ## return( $self->error( "Not connected to PostgreSQL server yet. Issue $dbh->connect first." ) ) if( !$self->{ 'dbh' } );
+    # return( $self->error( "Not connected to PostgreSQL server yet. Issue $dbh->connect first." ) ) if( !$self->{ 'dbh' } );
     my $dbh;
-    ## If there is no connection yet, then create one using the postgres login.
-    ## There should not be a live user and database just to check what databases there are.
+    # If there is no connection yet, then create one using the postgres login.
+    # There should not be a live user and database just to check what databases there are.
     if( !$self->{dbh} )
     {
         my $con = 
@@ -224,7 +224,7 @@ sub databases
     return( @dbases );
 }
 
-## Specific to Mysql (Postgres also uses it)
+# Specific to Mysql (Postgres also uses it)
 sub having
 {
     my $self  = shift( @_ );
@@ -247,7 +247,7 @@ sub lock
     my $self = shift( @_ );
     my $str  = shift( @_ );
     my $timeout = shift( @_ ) || 2;
-    ## my $res = $self->select( "GET_LOCK( '$str', $timeout )" )->fetchrow();
+    # my $res = $self->select( "GET_LOCK( '$str', $timeout )" )->fetchrow();
     my $sth = $self->{dbh}->prepare( "SELECT GET_LOCK( '$str', $timeout )" ) ||
     return( $self->error( "Error while preparing query to get lock '$str': ", $self->{dbh}->errstr() ) );
     $sth->execute() ||
@@ -292,7 +292,7 @@ sub stat
     }
 }
 
-## sub table_exists inherited from DB::Object
+# sub table_exists inherited from DB::Object
 
 sub table_info
 {
@@ -303,7 +303,7 @@ sub table_info
     my $opts = {};
     $opts = shift( @_ ) if( $self->_is_hash( $_[0] ) );
     my $db = $opts->{database} || $self->database;
-    ## my $sth = $self->{dbh}->table_info( undef(), undef(), $table );
+    # my $sth = $self->{dbh}->table_info( undef(), undef(), $table );
     my $sql = "SELECT * FROM information_schema.tables WHERE table_name=?";
     my $dbh = $self->{dbh} || return( $self->error( "Could not find database handler." ) );
     my $sth = $dbh->prepare_cached( $sql ) || return( $self->error( "An error occured while preparing query to check if table \"$table\" exists in our database: ", $dbh->errstr ) );
@@ -322,7 +322,7 @@ sub table_info
             name        => $ref->{table_name},
             type        => $ref->{table_type},
             };
-            ## example: BASE TABLE
+            # example: BASE TABLE
             if( $ref->{table_type} =~ /^(?:(?:\S+)[[:blank:]]+)?(.*?)$/ )
             {
                 $hash->{type} = $2;
@@ -363,13 +363,13 @@ sub unlock
     my $self = shift( @_ );
     my $str  = shift( @_ ) ||
     return( $self->error( "No lock string identifier provided." ) );
-    ## my $res = $self->select( "RELEASE_LOCK( '$str' )" )->fetchrow();
+    # my $res = $self->select( "RELEASE_LOCK( '$str' )" )->fetchrow();
     my $sth = $self->{dbh}->prepare( "SELECT RELEASE_LOCK( '$str' )" ) ||
     return( $self->error( "Error while preparing query to release lock '$str': ", $self->errstr() ) );
     $sth->execute() ||
     return( $self->error( "Error while executing query to release lock '$str': ", $sth->errstr() ) );
     $sth->finish();
-    ## Take out the lock from the saved locks pile (used by DESTROY)
+    # Take out the lock from the saved locks pile (used by DESTROY)
     my $locks = $self->{ '_locks' } ||= [];
     my @new   = grep{ !/$str/ } @$locks;
     $locks = [ @new ];
@@ -397,18 +397,18 @@ sub variables
     return( $vars->{ $found[ 0 ] } );
 }
 
-## https://dev.mysql.com/doc/refman/8.0/en/show-variables.html
+# https://dev.mysql.com/doc/refman/8.0/en/show-variables.html
 sub version
 {
     my $self  = shift( @_ );
-    ## If we already have the information, let's use our cache instead of making a query
-    return( $self->{ '_db_version' } ) if( length( $self->{ '_db_version' } ) );
+    # If we already have the information, let's use our cache instead of making a query
+    return( $self->{_db_version} ) if( length( $self->{_db_version} ) );
     my $sql = 'SELECT @@innodb_version';
     my $sth = $self->do( $sql ) || return( $self->error( "Unable to issue the sql statement '$sql' to get the server version: ", $self->errstr ) );
     my $ver = $sth->fetchrow;
     $sth->finish;
-    ## We cache it
-    $self->{ '_db_version' } = $ver;
+    # We cache it
+    $self->{_db_version} = version->parse( $ver );
     return( $ver );
 }
 
@@ -416,7 +416,7 @@ sub _connection_options
 {
     my $self  = shift( @_ );
     my $param = shift( @_ );
-    ## This should really not be an option. This decode utf8 in database
+    # This should really not be an option. This decode utf8 in database
     $param->{mysql_enable_utf8} = 1 if( !CORE::exists( $param->{mysql_enable_utf8} ) );
     my @mysql_params = grep( /^mysql_/, keys( %$param ) );
     my $opt = $self->SUPER::_connection_options( $param );
@@ -431,8 +431,8 @@ sub _connection_parameters
     my $param = shift( @_ );
     my $core = [qw( db login passwd host port driver database server opt uri debug )];
     my @mysql_params = grep( /^mysql_/, keys( %$param ) );
-    ## See DBD::mysql for the list of valid parameters
-    ## E.g.: mysql_client_found_rows, mysql_compression mysql_connect_timeout mysql_write_timeout mysql_read_timeout mysql_init_command mysql_skip_secure_auth mysql_read_default_file mysql_read_default_group mysql_socket mysql_ssl mysql_ssl_client_key mysql_ssl_client_cert mysql_ssl_ca_file mysql_ssl_ca_path mysql_ssl_cipher mysql_local_infile mysql_multi_statements mysql_server_prepare mysql_server_prepare_disable_fallback mysql_embedded_options mysql_embedded_groups mysql_conn_attrs 
+    # See DBD::mysql for the list of valid parameters
+    # E.g.: mysql_client_found_rows, mysql_compression mysql_connect_timeout mysql_write_timeout mysql_read_timeout mysql_init_command mysql_skip_secure_auth mysql_read_default_file mysql_read_default_group mysql_socket mysql_ssl mysql_ssl_client_key mysql_ssl_client_cert mysql_ssl_ca_file mysql_ssl_ca_path mysql_ssl_cipher mysql_local_infile mysql_multi_statements mysql_server_prepare mysql_server_prepare_disable_fallback mysql_embedded_options mysql_embedded_groups mysql_conn_attrs 
     push( @$core, @mysql_params );
     return( $core );
 }
@@ -440,7 +440,7 @@ sub _connection_parameters
 sub _dsn
 {
     my $self = shift( @_ );
-    ## "DBI:mysql:database=$sql_db;host=$sql_host;port=$sql_port;mysql_read_default_file=/etc/my.cnf"
+    # "DBI:mysql:database=$sql_db;host=$sql_host;port=$sql_port;mysql_read_default_file=/etc/my.cnf"
     my @params = ( sprintf( 'dbi:%s:database=%s', @$self{ qw( driver database ) } ) );
     if( $self->{host} )
     {
@@ -473,14 +473,14 @@ DESTROY
     my $class = ref( $self ) || $self;
     if( $self->{ 'sth' } )
     {
-        ## $self->message( "DETROY(): Terminating sth '$self' for query:\n$self->{ 'query' }\n" );
+        # $self->message( "DETROY(): Terminating sth '$self' for query:\n$self->{ 'query' }\n" );
         print( STDERR "DESTROY(): Terminating sth '$self' for query:\n$self->{ 'query' }\n" ) if( $DEBUG );
         $self->{ 'sth' }->finish();
     }
     elsif( $self->{ 'dbh' } && $class eq 'DB::Object' )
     {
         local( $SIG{ '__WARN__' } ) = sub { };
-        ## $self->{ 'dbh' }->disconnect();
+        # $self->{ 'dbh' }->disconnect();
         if( $DEBUG )
         {
             my( $pack, $file, $line, $sub ) = ( caller( 0 ) )[ 0, 1, 2, 3 ];
@@ -501,10 +501,10 @@ DESTROY
 
 END
 {
-    ## foreach my $dbh ( @DBH )
-    ## {
-    ##     $dbh->disconnect();
-    ## }
+    # foreach my $dbh ( @DBH )
+    # {
+    #     $dbh->disconnect();
+    # }
 };
 
 1;
@@ -572,7 +572,7 @@ DB::Object::Mysql - Mysql Database Object
     $result = $cust_sth_ins->as_string;
     # INSERT INTO customers (first_name, last_name, email, active) VALUES('Paul', 'Goldman', 'paul\@example.org', '0')
     $dbh->commit;
-    ## Get the last used insert id
+    # Get the last used insert id
     my $id = $dbh->last_insert_id();
     
     $cust->where( email => 'john@example.org' );
@@ -589,14 +589,16 @@ DB::Object::Mysql - Mysql Database Object
     # Would become:
     # UPDATE ONLY customers SET active='0' WHERE email='john\@example.org'
     
-    ## Lets' dump the result of our query
-    ## First to STDERR
+    # Lets' dump the result of our query
+    # First to STDERR
     $login->where( "login='jack'" );
     $login->select->dump();
-    ## Now dump the result to a file
+    # Now dump the result to a file
     $login->select->dump( "my_file.txt" );
     
 =head1 DESCRIPTION
+
+This package inherits from L<DB::Object>, so any method not here, but there you can use.
 
 L<DB::Object> is a SQL API much alike C<DBI>.
 So why use a private module instead of using that great C<DBI> package?
@@ -664,47 +666,45 @@ which will provide you a special shell to install modules in a convenient way.
 
 =head1 METHODS
 
-=over 4
-
-=item B<clear>()
+=head2 clear
 
 Reset error message.
 
-=item B<debug>( [ 0 | 1 ] )
+=head2 debug
 
 Toggle debug mode on/off
 
-=item B<error>( [ $string ] )
+=head2 error
 
 Get set error message.
 If an error message is provided, B<error> will pass it to B<warn>.
 
-=item B<get>( $parameter )
+=head2 get
 
 Get object parameter.
 
-=item B<message>( $string )
+=head2 message
 
 Provided a multi line string, B<message> will display it on the STDERR if either I<verbose> or I<debug> mode is on.
 
-=item B<verbose>()
+=head2 verbose
 
 Toggle verbose mode on/off
 
-=item B<alias>( %parameters )
+=head2 alias
 
 Get/set alias for table fields in SELECT queries. The hash provided thus contain a list of field => alias pairs.
 
-=item B<as_string>()
+=head2 as_string
 
 Return the sql query as a string.
 
-=item B<avoid>( [ @fields | \@fields ] )
+=head2 avoid
 
 Set the provided list of table fields to avoid when returning the query result.
 The list of fields can be provided either as an array of a reference to an array.
 
-=item B<attribute>( $name | %names )
+=head2 attribute
 
 Sets or get the value of database connection parameters.
 
@@ -813,11 +813,11 @@ Read-only.
 
 =back
 
-=item B<available_drivers>()
+=head2 available_drivers
 
 Return the list of available drivers.
 
-=item B<bind>( [ @values ] )
+=head2 bind
 
 If no values to bind to the underlying query is provided, B<bind> simply activate the bind value feature.
 
@@ -826,42 +826,42 @@ If values are provided, they are allocated to the statement object and will be a
 Example:
 
   $dbh->bind()
-  ## or
+  # or
   $dbh->bind->where( "something" )
-  ## or
+  # or
   $dbh->bind->select->fetchrow_hashref()
-  ## and then later
+  # and then later
   $dbh->bind( 'thingy' )->select->fetchrow_hashref()
 
-=item B<cache>()
+=head2 cache
 
 Activate caching.
 
   $tbl->cache->select->fetchrow_hashref();
 
-=item B<check_driver>()
+=head2 check_driver
 
 Check that the driver set in I<$SQL_DRIVER> in ~/etc/common.cfg is indeed available.
 
 It does this by calling B<available_drivers>.
 
-=item B<copy>( [ \%values | %values )
+=head2 copy
 
 Provided with either a reference to an hash or an hash of key => value pairs, B<copy> will first execute a select statement on the table object, then fetch the row of data, then replace the key-value pair in the result by the ones provided, and finally will perform an insert.
 
 Return false if no data to copy were provided, otherwise it always returns true.
 
-=item B<create_table>( @parameters )
+=head2 create_table
 
 The idea is to create a table with the givern parameters.
 
 This is currently heavily designed to work for PoPList. It needs to be rewritten.
 
-=item B<data_sources>( [ %options ] )
+=head2 data_sources
 
 Given an optional list of options, this return the data source of the database handler.
 
-=item B<data_type>( [ \@types | @types ] )
+=head2 data_type
 
 Given a reference to an array or an array of data type, B<data_type> will check their availability in the database driver.
 
@@ -869,11 +869,11 @@ If nothing found, it return an empty list in list context, or undef in scalar co
 
 If something was found, it returns a hash in list context or a reference to a hash in list context.
 
-=item B<database>()
+=head2 database
 
 Return the name of the current database.
 
-=item B<delete>()
+=head2 delete
 
 B<delete> will format a delete query based on previously set parameters, such as B<where>.
 
@@ -882,16 +882,16 @@ B<delete> will refuse to execute a query without a where condition. To achieve t
   $tbl->where( "login" => "jack" );
   $tbl->limit( 1 );
   my $rows_affected = $tbl->delete();
-  ## or passing the where condition directly to delete
+  # or passing the where condition directly to delete
   my( $sth ) = $tbl->delete( "login" => "jack" );
 
-=item B<disconnect>()
+=head2 disconnect
 
 Disconnect from database. Returns the return code.
 
   my $rc = $dbh->disconnect;
 
-=item B<do>( $sql_query, [ \%attributes, \@bind_values ] )
+=head2 do
 
 Execute a sql query directly passed with possible attributes and values to bind.
 
@@ -909,45 +909,45 @@ Example:
        DELETE FROM table WHERE status = ?
   }, undef(), 'DONE' ) || die( $dbh->errstr );
 
-=item B<enhance>( [ @value ] )
+=head2 enhance
 
 Toggle the enhance mode on/off.
 
 When on, the functions I<from_unixtime> and I<unix_timestamp> will be used on date/time field to translate from and to unix time seamlessly.
 
-=item B<err>()
+=head2 err
 
 Get the currently set error.
 
-=item B<errno>()
+=head2 errno
 
 Is just an alias for B<err>.
 
-=item B<errmesg>()
+=head2 errmesg
 
 Is just an alias for B<errstr>.
 
-=item B<errstr>()
+=head2 errstr
 
 Get the currently set error string.
 
-=item B<fatal>( [ 1 | 0 ] )
+=head2 fatal
 
 Toggles fatal mode on/off.
 
-=item B<from_unixtime>( [ @fields | \@fields ] )
+=head2 from_unixtime
 
 Set the list of fields that are to be treated as unix time and converted accordingly after the sql query is executed.
 
 It returns the list of fields in list context or a reference to an array in scalar context.
 
-=item B<format_statement>( [ \@data, \@order, $table ] )
+=head2 format_statement
 
 Format the sql statement.
 
 In list context, it returns 2 strings: one comma-separated list of fields and one comma-separated list of values. In scalar context, it only returns a comma-separated string of fields.
 
-=item B<format_update>( \@data | \%data | %data | @data )
+=head2 format_update
 
 Formats update query based on the following arguments provided:
 
@@ -982,11 +982,11 @@ Finally, otherwise the value is escaped and surrounded by single quotes.
 
 B<format_update> returns a string representing the comma-separated list of fields that will be used.
 
-=item B<getdefault>( %default_values )
+=head2 getdefault
 
 Does some preparation work such as :
 
-=over 8
+=over 4
 
 =item 1
 
@@ -1012,7 +1012,7 @@ it will set the default values provided. This is used for UPDATE queries.
 
 It returns a new L<DB::Object::Tables> object with all the data prepared within.
 
-=item B<group>( @fields | \@fields )
+=head2 group
 
 Format the group by portion of the query.
 
@@ -1023,7 +1023,7 @@ In list context, it returns: $group_by
 
 In scalar context, it returns: GROUP BY $group_by
 
-=item B<insert>( L<DB::Object::Statement> SELECT object, \%key_value | %key_value )
+=head2 insert
 
 Prepares an INSERT query using the field-value pairs provided.
 
@@ -1033,11 +1033,11 @@ Otherwise, B<insert> will build the query based on the fields provided.
 
 In scalar context, it returns the result of B<execute> and in list context, it returns the statement object.
 
-=item B<last_insert_id>()
+=head2 last_insert_id
 
 Get the id of the primary key from the last insert.
 
-=item B<limit>( [ END, [ START, END ] ] )
+=head2 limit
 
 Set or get the limit for the future statement.
 
@@ -1045,36 +1045,36 @@ If only one argument is provided, it is assumed to be the end limit. If 2 are pr
 
 It returns a list of the start and end limit in list context, and the string of the LIMIT in scalar context, such as: LIMIT 1, 10
 
-=item B<local>( %params | \%params )
+=head2 local
 
 Not sure what it does. I forgot.
 
-=item B<lock>( $lock_id, [ $timeout ] )
+=head2 lock
 
 Set a lock using a lock identifier and a timeout.
 By default the timeout is 2 seconds.
 
 If the lock failed (NULL), it returns undef(), otherwise, it returns the return value.
 
-=item B<no_bind>()
+=head2 no_bind
 
 When invoked, B<no_bind> will change any preparation made so far for caching the query with bind parameters, and instead substitute the value in lieu of the question mark placeholder.
 
-=item B<no_cache>()
+=head2 no_cache
 
 Disable caching of queries.
 
-=item B<order>()
+=head2 order
 
 Prepares the ORDER BY clause and returns the value of the clause in list context or the ORDER BY clause in full in scalar context, ie. "ORDER BY $clause"
 
-=item B<param>( $param | %params )
+=head2 param
 
 If only a single parameter is provided, its value is return. If a list of parameters is provided they are set accordingly using the C<SET> sql command.
 
 Supported parameters are:
 
-=over 8
+=over 4
 
 =item SQL_AUTO_IS_NULL
 
@@ -1112,25 +1112,25 @@ It then execute the query and return undef() in case of error.
 
 Otherwise, it returns the object used to call the method.
 
-=item B<ping>()
+=head2 ping
 
 Evals a SELECT 1 statement and returns 0 if errors occurred or the return value.
 
-=item B<prepare>( $query, \%options )
+=head2 prepare
 
 Prepares the query using the options provided. The options are the same as the one in L<DBI> B<prepare> method.
 
 It returns a L<DB::Object::Statement> object upon success or undef if an error occurred. The error can then be retrieved using B<errstr> or B<error>.
 
-=item B<prepare_cached>( $query, \%options )
+=head2 prepare_cached
 
 Same as B<prepare> except the query is cached.
 
-=item B<query>( $query, \%options )
+=head2 query
 
 It prepares and executes the given SQL query with the options provided and return undef() upon error or the statement handler upon success.
 
-=item B<replace>( L>DB::Object::Statement> object, [ %data ] )
+=head2 replace
 
 Just like for the INSERT query, B<replace> takes one optional argument representing a L<DB::Object::Statement> SELECT object or a list of field-value pairs.
 
@@ -1140,17 +1140,17 @@ Otherwise the query will be REPLACE INTO mytable (fields) VALUES(values)
 
 In scalar context, it execute the query and in list context it simply returns the statement handler.
 
-=item B<reset>()
+=head2 reset
 
 This is used to reset a prepared query to its default values. If a field is a date/time type, its default value will be set to NOW()
 
 It execute an update with the reseted value and return the number of affected rows.
 
-=item B<reverse>( [ true ])
+=head2 reverse
 
 Get or set the reverse mode.
 
-=item B<select>( [ \$field, \@fields, @fields ] )
+=head2 select
 
 Given an optional list of fields to fetch, B<select> prepares a SELECT query.
 
@@ -1160,35 +1160,35 @@ B<select> calls upon B<tie>, B<where>, B<group>, B<order>, B<limit> and B<local>
 
 In scalar context, it execute the query and return it. In list context, it just returns the statement handler.
 
-=item B<set>( $var )
+=head2 set
 
 Issues a query to C<SET> the given SQL variable.
 
 If any error occurred, undef will be returned and an error set, otherwise it returns true.
 
-=item B<sort>()
+=head2 sort
 
 It toggles sort mode on and consequently disable reverse mode.
 
-=item B<stat>( [ $type ] )
+=head2 stat
 
 Issue a SHOW STATUS query and if a particular $type is provided, it will returns its value if it exists, otherwise it will return undef.
 
 In absence of particular $type provided, it returns the hash list of values returns or a reference to the hash list in scalar context.
 
-=item B<state>()
+=head2 state
 
 Queries the DBI state and return its value.
 
-=item B<table>( $table_name )
+=head2 table
 
 Given a table name, B<table> will return a L<DB::Object::Tables> object. The object is cached for re-use.
 
-=item B<table_push>( $table_name )
+=head2 table_push
 
 Add the given table name to the stack of cached table names.
 
-=item B<tables>( [ $database ] )
+=head2 tables
 
 Connects to the database and finds out the list of all available tables.
 
@@ -1196,27 +1196,27 @@ Returns undef or empty list in scalar or list context respectively if no table f
 
 Otherwise, it returns the list of table in list context or a reference of it in scalar context.
 
-=item B<tables_refresh>( [ $database ] )
+=head2 tables_refresh
 
 Rebuild the list of available database table.
 
 Returns the list of table in list context or a reference of it in scalar context.
 
-=item B<tie>( [ %fields ] )
+=head2 tie
 
 If provided a hash or a hash ref, it sets the list of fields and their corresponding perl variable to bind their values to.
 
 In list context, it returns the list of those field-variable pair, or a reference to it in scalar context.
 
-=item B<unix_timestamp>( [ \@fields | @fields ] )
+=head2 unix_timestamp
 
 Provided a list of fields or a reference to it, this sets the fields to be treated for seamless conversion from and to unix time.
 
-=item B<unlock>( $lock_id )
+=head2 unlock
 
 Given a lock identifier, B<unlock> releases the lock previously set with B<lock>. It executes the underlying sql command and returns undef() if the result is NULL or the value returned otherwise.
 
-=item B<update>( %data | \%data )
+=head2 update
 
 Given a list of field-value pairs, B<update> prepares a sql update query.
 
@@ -1224,34 +1224,34 @@ It calls upon B<where> and B<limit> as previously set.
 
 It returns undef and sets an error if it failed to prepare the update statement. In scalar context, it execute the query. In list context, it simply return the statement handler.
 
-=item B<use>( $database )
+=head2 use
 
 Given a database, it switch to it, but before it checks that the database exists.
 If the database is different than the current one, it sets the I<multi_db> parameter, which will have the fields in the queries be prefixed by their respective database name.
 
 It returns the database handler.
 
-=item B<use_cache>( [ on | off ] )
+=head2 use_cache
 
 Sets or get the I<use_cache> parameter.
 
-=item B<use_bind>( [ on | off ] )
+=head2 use_bind
 
 Sets or get the I<use_cache> parameter.
 
-=item B<variables>( [ $type ] )
+=head2 variables
 
 Query the SQL variable $type
 
 It returns a blank string if nothing was found, or the value found.
 
-=item B<where>( %args )
+=head2 where
 
 Build the where clause based on the field-value hash provided.
 
 It returns the where clause in list context or the full where clause in scalar context, ie "WHERE $clause"
 
-=item B<_cache_this>( $query )
+=head2 _cache_this
 
 Provided with a query, this will cache it for future re-use.
 
@@ -1259,15 +1259,15 @@ It does some check and maintenance job to ensure the cache does not get too big 
 
 It returns the cached statement as an L<DB::Object::Statement> object.
 
-=item B<_clean_statement>( \$query | $query )
+=head2 _clean_statement
 
 Given a query string or a reference to it, it cleans the statement by removing leading and trailing space before and after line breaks.
 
-=item B<_cleanup>()
+=head2 _cleanup
 
 Removes object attributes, namely where, selected_fields, group_by, order_by, limit, alias, avoid, local, and as_string
 
-=item B<_make_sth>( $package, $hashref )
+=head2 _make_sth
 
 Given a package name and a hashref, this build a statement object with all the necessary parameters.
 
@@ -1275,32 +1275,33 @@ It also sets the query time to the current time with the parameter I<query_time>
 
 It returns an object of the given $package.
 
-=item B<_reset_query>()
+=head2 _reset_query
 
 Being called using a statement handler, this reset the object by removing all the parameters set by various subroutine calls, such as B<where>, B<group>, B<order>, B<avoid>, B<limit>, etc.
 
-=item B<_save_bind>( $query_type )
+=head2 _save_bind
 
 This saves/cache the bin query and return the object used to call it.
 
-=item B<_value2bind>( $query, $ref )
+=head2 _value2bind
 
 Given a sql query and a array reference, B<_value2bind> parse the query and interpolate values for placeholder (?).
 
 It returns true.
 
-=back
-
-=head1 COPYRIGHT
-
-Copyright (c) 2000-2014 DEGUEST Pte. Ltd.
-
-=head1 CREDITS
-
-Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
-
 =head1 SEE ALSO
 
 L<DBI>, L<Apache::DBI>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2019-2021 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
 
 =cut

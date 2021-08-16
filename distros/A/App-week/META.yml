@@ -1,13 +1,13 @@
 ---
 abstract: 'colorful calendar command'
 author:
-  - 'Kazumasa Utashiro <kaz@utashiro.com>'
+  - 'Kazumasa Utashiro'
 build_requires:
   Test::More: '0.98'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,29 +26,36 @@ no_index:
 provides:
   App::week:
     file: lib/App/week.pm
-    version: '0.13'
+    version: '1.0101'
+  App::week::CalYear:
+    file: lib/App/week/CalYear.pm
   App::week::colors:
     file: lib/App/week/colors.pm
   App::week::default:
     file: lib/App/week/default.pm
+  App::week::npb:
+    file: lib/App/week/npb.pm
   App::week::olympic:
     file: lib/App/week/olympic.pm
-  App::week::teams:
-    file: lib/App/week/teams.pm
 requires:
-  Getopt::EX: v1.19.0
-  Getopt::EX::i18n: '0.08'
+  Date::Japanese::Era: '0'
+  Getopt::EX: v1.23.3
+  Getopt::EX::Hashed: '0.9912'
+  Getopt::EX::i18n: '0.09'
   Getopt::EX::termcolor: '1.06'
-  Text::ANSI::Fold: '1.03'
+  Hash::Util: '0'
+  List::Util: '1.45'
+  Text::ANSI::Fold: '2.10'
   Text::VisualWidth::PP: '0.05'
-  perl: '5.014'
+  perl: v5.14.0
 resources:
   bugtracker: https://github.com/kaz-utashiro/App-week/issues
   homepage: https://github.com/kaz-utashiro/App-week
   repository: git://github.com/kaz-utashiro/App-week.git
-version: '0.13'
+version: '1.0101'
 x_authority: cpan:UTASHIRO
 x_contributors:
+  - 'Kazumasa Utashiro <kaz@utashiro.com>'
   - 'Shlomi Fish <shlomif@shlomifish.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
 x_static_install: 0

@@ -22,7 +22,7 @@ use Text::LevenshteinXS qw(distance);
 
 # TODO switch to Text::Levenshtein::XS once AUR/Debian packages become available
 
-our $VERSION = '1.58';
+our $VERSION = '1.59';
 
 # Automatically generated, see share/stations.json
 my @stations = (
@@ -203,6 +203,7 @@ my @stations = (
 ['TATN','Alttann',8000562,9.793037,47.841214],
 ['MAT','Altötting',8000555,12.67479,48.221242],
 ['AAV','Alveslohe',8070185,9.916375,53.791456],
+['XVAL','Alvesta station',7400005,14.55746,56.89899],
 ['FAZB','Alzenau Burg',8077275,9.07434,50.087928],
 ['FAZUN','Alzenau Nord',8077274,9.051385,50.089443],
 ['FAZU','Alzenau(Unterfr)',8007275,9.065603,50.088716],
@@ -4883,6 +4884,7 @@ my @stations = (
 ['XIL','Luino',8300061,8.735784,45.995479],
 ['SLU','Luisenthal(Saar)',8003796,6.904214,49.249595],
 ['XFLUQ','Lumes Halte',8701415,4.783105,49.733092],
+['XVLD','Lund Central',7400115,13.18639,55.70661],
 ['XDLD','Lunde J st',8601509,8.36395,55.756144],
 ['ALU','Lunden',8003798,9.030746,54.331231],
 ['XDLU','Lunderskov st',8601512,9.303791,55.48012],
@@ -5198,6 +5200,7 @@ my @stations = (
 ['FMGH','Mengeringhausen',8003970,8.989763,51.360204],
 ['UMGH','Mengersgereuth-Hämmern',8012333,11.118299,50.392892],
 ['UMHO','Mengersgereuth-Hämmern Ost',8012334,11.127745,50.389471],
+['RMEN','Menningen-Leitishofen',8077779,9.1609604,48.0067397],
 ['XFME','Menton',8700150,7.493155,43.774719],
 ['RMZN','Menzingen(Baden)',8007145,8.775067,49.136233],
 ['XSMEN','Menznau',8508297,8.04092804491874,47.0834344952763],
@@ -5239,6 +5242,7 @@ my @stations = (
 ['UMEU','Meuselbach-Schwarzmühle',8012346,11.079214,50.581412],
 ['WME','Meyenburg',8012348,12.247161,53.311096],
 ['LMF','Meßdorf',8012342,11.546771,52.709899],
+['RMSS','Meßkirch',8077778,9.1161128,47.9951988],
 ['XLMC','Michelau(LUX)',8270730,6.091991,49.896923],
 ['NMI','Michelau(Oberfr)',8004011,11.116245,50.15498],
 ['TMIC','Michelau(Württ)',8007194,9.535256,48.861913],
@@ -6958,6 +6962,7 @@ my @stations = (
 ['TSAT','Satteldorf',8005297,10.078155,49.178443],
 ['KSA','Satzvey',8005298,6.713237,50.622859],
 ['MSR','Sauerlach',8005299,11.654774,47.974061],
+['RSDO','Sauldorf',8077776,9.0946518,47.944482],
 ['MSGB','Saulgrub',8005302,11.025397,47.66609],
 ['FSLH','Saulheim',8004352,8.154249,49.873807],
 ['XFSUD','Saumur Rive Droit',8704969,-0.071562,47.26886],
@@ -7546,6 +7551,7 @@ my @stations = (
 ['FSTH','Stockhausen(Lahn)',8005736,8.325365,50.540536],
 ['NSTH','Stockheim(Oberfr)',8005737,11.282133,50.306822],
 ['NSTU','Stockheim(Unterfr)',8005738,10.271229,50.459952],
+['XVS','Stockholm Central',7400002,18.05566,59.33221],
 ['FSTK','Stockstadt(Main)',8005739,9.063369,49.976627],
 ['FSTR','Stockstadt(Rhein)',8005740,8.47244,49.809433],
 ['USTO','Stolberg(Harz)',8013056,10.956538,51.567398],
@@ -8861,6 +8867,10 @@ sub normalize {
 sub get_station {
 	my ($name) = @_;
 
+	if (not $name) {
+		return;
+	}
+
 	my $ds100_match = firstval { $name eq $_->[0] } @stations;
 
 	if ($ds100_match) {
@@ -8905,6 +8915,10 @@ sub get_station_by_location {
 
 sub get_station_by_name {
 	my ($name) = @_;
+
+	if (not $name) {
+		return;
+	}
 
 	my $nname        = lc($name);
 	my $actual_match = firstval { $nname eq lc( $_->[1] ) } @stations;
@@ -8964,7 +8978,7 @@ Travel::Status::DE::IRIS::Stations - Station name to station code mapping
 
 =head1 VERSION
 
-version 1.58
+version 1.59
 
 =head1 DESCRIPTION
 

@@ -1,11 +1,10 @@
 use Test2::V0;
+use Test2::Require::Module 'Regexp::Pattern::License' => '3.9.0';
 
 use lib 't/lib';
 use Test2::Licensecheck;
 
-my $ver = $Regexp::Pattern::License::VERSION;
-
-plan 54;
+plan 58;
 
 # AFL
 license_is(
@@ -51,7 +50,7 @@ license_is(
 );
 license_is(
 	't/grant/CC-BY-SA_and_more/cewl.rb',
-	[ 'UNKNOWN', 'CC-BY-SA-2.0 or GPL-3' ]
+	[ 'CC-BY-SA-2.0', 'CC-BY-SA-2.0 or GPL-3' ]
 );
 license_is(
 	't/grant/CC-BY-SA_and_more/utilities.scad',
@@ -59,6 +58,18 @@ license_is(
 );
 
 # EPL
+license_is(
+	't/grant/EPL_and_more/Activator.java',
+	[   'EPL-1.0',
+		'BSD-3-clause~Refractions and/or EPL-1.0' # progress, even if not perfect
+	]
+);
+license_is(
+	't/grant/EPL_and_more/Activator.java',
+	[   'EPL-1.0',
+		'BSD-3-clause~Refractions or EPL-1.0'
+	]
+);
 license_is(
 	't/grant/EPL_and_more/Base64Coder.java',
 	[   'UNKNOWN',
@@ -136,7 +147,7 @@ license_is(
 license_is( 't/grant/NTP/gslcdf-module.c', 'NTP~disclaimer' );
 license_is(
 	't/grant/NTP/install.sh',
-	$ver >= v3.6 ? 'HPND-sell-variant' : 'NTP'
+	'HPND-sell-variant'
 );
 
 # WTFPL

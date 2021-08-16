@@ -2,7 +2,7 @@ NAME
     Regexp::Pattern::License - Regular expressions for legal licenses
 
 VERSION
-    Version v3.8.1
+    Version v3.9.1
 
 SYNOPSIS
         use Regexp::Pattern::License;
@@ -27,27 +27,51 @@ PATTERNS
 
     *   addr_fsf
 
+        *Since v3.4.0.*
+
     *   addr_fsf_franklin
+
+        *Since v3.4.0.*
 
     *   addr_fsf_franklin_steet
 
+        *Since v3.4.0.*
+
     *   addr_fsf_mass
+
+        *Since v3.4.0.*
 
     *   addr_fsf_temple
 
+        *Since v3.4.0.*
+
     *   any_of
+
+        *Since v3.1.92.*
 
     *   by
 
+        *Since v3.3.0.*
+
     *   by_apache
+
+        *Since v3.3.0.*
 
     *   by_fsf
 
+        *Since v3.3.0.*
+
     *   by_james_clark
+
+        *Since v3.3.0.*
 
     *   by_psf
 
+        *Since v3.3.0.*
+
     *   by_sam_hocevar
+
+        *Since v3.3.0.*
 
     *   clause_retention
 
@@ -63,23 +87,41 @@ PATTERNS
 
     *   except_autoconf_data
 
+        *Since v3.4.0.*
+
     *   except_autoconf_2
+
+        *Since v3.4.0.*
 
     *   except_autoconf_2_archive
 
+        *Since v3.4.0.*
+
     *   except_autoconf_2_autotroll
+
+        *Since v3.4.0.*
 
     *   except_autoconf_2_g10
 
+        *Since v3.4.0.*
+
     *   except_autoconf_3
+
+        *Since v3.4.0.*
 
     *   except_bison_1_24
 
+        *Since v3.4.0.*
+
     *   except_bison_2_2
+
+        *Since v3.4.0.*
 
     *   except_classpath_2
 
     *   except_ecos_2
+
+        *Since v3.6.0.*
 
     *   except_epl
 
@@ -87,11 +129,19 @@ PATTERNS
 
     *   except_faust
 
+        *Since v3.4.0.*
+
     *   except_font_2
+
+        *Since v3.7.0.*
 
     *   except_gcc_2
 
+        *Since v3.7.0.*
+
     *   except_gcc_3_1
+
+        *Since v3.7.0.*
 
     *   except_gstreamer
 
@@ -101,45 +151,85 @@ PATTERNS
 
     *   except_openssl
 
+        *Since v3.4.0.*
+
     *   except_ocaml-lgpl
 
     *   except_openssl-lgpl
 
+        *Since v3.4.0.*
+
     *   except_openssl_s3
+
+        *Since v3.4.0.*
 
     *   except_prefix_agpl
 
+        *Since v3.4.0.*
+
     *   except_prefix_generic
+
+        *Since v3.4.0.*
 
     *   except_prefix_gpl
 
+        *Since v3.4.0.*
+
     *   except_prefix_gpl_clisp
+
+        *Since v3.4.0.*
 
     *   except_prefix_lgpl
 
+        *Since v3.4.0.*
+
     *   except_proguard
+
+        *Since v3.4.0.*
 
     *   except_qt_gpl_1
 
+        *Since v3.4.0.*
+
     *   except_qt_gpl_eclipse
+
+        *Since v3.4.0.*
 
     *   except_qt_gpl_openssl
 
+        *Since v3.4.0.*
+
     *   except_qt_kernel
+
+        *Since v3.4.0.*
 
     *   except_qt_lgpl_1_1
 
+        *Since v3.4.0.*
+
     *   except_qt_nosource
+
+        *Since v3.4.0.*
 
     *   except_sdc
 
+        *Since v3.4.0.*
+
     *   except_sollya_4_1
+
+        *Since v3.4.0.*
 
     *   except_warzone
 
+        *Since v3.4.0.*
+
     *   except_wxwindows
 
+        *Since v3.6.0.*
+
     *   except_xerces
+
+        *Since v3.4.0.*
 
     *   fsf_unlimited
 
@@ -147,17 +237,33 @@ PATTERNS
 
     *   generated
 
+        *Since v3.4.0.*
+
     *   license_label
+
+    *   license_label_spdx
+
+        *Since v3.9.0.*
 
     *   license_label_trove
 
+        *Since v3.1.100.*
+
     *   licensed_under
+
+        *Since v3.1.92.*
 
     *   or_at_option
 
+        *Since v3.1.92.*
+
     *   usage_rfn
 
+        *Since v3.2.0.*
+
     *   version
+
+        *Since v3.1.92.*
 
     *   version_later
 
@@ -174,6 +280,8 @@ PATTERNS
     *   version_prefix
 
     *   version_numberstring
+
+        *Since v3.1.92.*
 
   Single licenses
     Patterns each covering a single license.
@@ -195,19 +303,31 @@ PATTERNS
 
     *   afl_1_1
 
+        *Since v3.1.95.*
+
     *   afl_1_2
+
+        *Since v3.1.95.*
 
     *   afl_2
 
+        *Since v3.1.95.*
+
     *   afl_2_1
 
+        *Since v3.1.95.*
+
     *   afl_3
+
+        *Since v3.1.95.*
 
     *   afmparse
 
     *   agpl
 
     *   agpl_1
+
+        *Since v3.1.102.*
 
     *   agpl_1_only
 
@@ -225,7 +345,11 @@ PATTERNS
 
     *   aladdin_8
 
+        *Since v3.1.91.*
+
     *   aladdin_9
+
+        *Since v3.1.91.*
 
     *   amdplpa
 
@@ -239,9 +363,15 @@ PATTERNS
 
     *   apache_1
 
+        *Since v3.1.95.*
+
     *   apache_1_1
 
+        *Since v3.1.95.*
+
     *   apache_2
+
+        *Since v3.1.95.*
 
     *   apafml
 
@@ -263,9 +393,15 @@ PATTERNS
 
     *   artistic_1
 
+        *Since v3.1.95.*
+
     *   artistic_1_cl8
 
+        *Since v3.1.95.*
+
     *   artistic_1_perl
+
+        *Since v3.1.95.*
 
     *   artistic_2
 
@@ -275,7 +411,11 @@ PATTERNS
 
     *   bdwgc
 
+        *Since v3.1.0.*
+
     *   bdwgc_matlab
+
+        *Since v3.1.0.*
 
     *   beerware
 
@@ -289,15 +429,25 @@ PATTERNS
 
     *   bsd_0_clause
 
+        *Since v3.5.0.*
+
     *   bsd_1_clause
+
+        *Since v3.6.0.*
 
     *   bsd_2_clause
 
     *   bsd_2_clause_freebsd
 
+        *Since v3.6.0.*
+
     *   bsd_2_clause_netbsd
 
+        *Since v3.6.0.*
+
     *   bsd_2_clause_patent
+
+        *Since v3.6.0.*
 
     *   bsd_2_clause_views
 
@@ -305,29 +455,59 @@ PATTERNS
 
     *   bsd_3_clause_attribution
 
+        *Since v3.6.0.*
+
     *   bsd_3_clause_clear
 
+        *Since v3.6.0.*
+
+    *   bsd_3_clause_eclipse
+
+        *Since v3.9.0.*
+
     *   bsd_3_clause_lbnl
+
+        *Since v3.6.0.*
 
     *   bsd_3_clause_modification
 
     *   bsd_3_clause_no_military_license
 
+        *Since v3.6.0.*
+
     *   bsd_3_clause_no_nuclear_license
+
+        *Since v3.6.0.*
 
     *   bsd_3_clause_no_nuclear_license_2014
 
+        *Since v3.6.0.*
+
     *   bsd_3_clause_no_nuclear_warranty
+
+        *Since v3.6.0.*
+
+    *   bsd_3_clause_refractions
+
+        *Since v3.9.0.*
 
     *   bsd_4_clause
 
     *   bsd_4_clause_uc
 
+        *Since v3.7.0.*
+
     *   bsd_protection
+
+        *Since v3.8.0.*
 
     *   bsl
 
+        *Since v3.1.90.*
+
     *   bsl_1
+
+        *Since v3.1.90.*
 
     *   bzip2
 
@@ -337,7 +517,11 @@ PATTERNS
 
     *   cal
 
+        *Since v3.5.0.*
+
     *   cal_1
+
+        *Since v3.5.0.*
 
     *   caldera
 
@@ -349,125 +533,231 @@ PATTERNS
 
     *   cc_by_1
 
+        *Since v3.1.101.*
+
     *   cc_by_2
+
+        *Since v3.1.101.*
 
     *   cc_by_2_5
 
+        *Since v3.1.101.*
+
     *   cc_by_3
 
+        *Since v3.1.101.*
+
     *   cc_by_4
+
+        *Since v3.1.101.*
 
     *   cc_by_nc
 
     *   cc_by_nc_1
 
+        *Since v3.1.101.*
+
     *   cc_by_nc_2
+
+        *Since v3.1.101.*
 
     *   cc_by_nc_2_5
 
+        *Since v3.1.101.*
+
     *   cc_by_nc_3
 
+        *Since v3.1.101.*
+
     *   cc_by_nc_4
+
+        *Since v3.1.101.*
 
     *   cc_by_nc_nd
 
     *   cc_by_nc_nd_1
 
+        *Since v3.1.101.*
+
     *   cc_by_nc_nd_2
+
+        *Since v3.1.101.*
 
     *   cc_by_nc_nd_2_5
 
+        *Since v3.1.101.*
+
     *   cc_by_nc_nd_3
 
+        *Since v3.1.101.*
+
     *   cc_by_nc_nd_4
+
+        *Since v3.1.101.*
 
     *   cc_by_nc_sa
 
     *   cc_by_nc_sa_1
 
+        *Since v3.1.101.*
+
     *   cc_by_nc_sa_2
+
+        *Since v3.1.101.*
 
     *   cc_by_nc_sa_2_5
 
+        *Since v3.1.101.*
+
     *   cc_by_nc_sa_3
 
+        *Since v3.1.101.*
+
     *   cc_by_nc_sa_4
+
+        *Since v3.1.101.*
 
     *   cc_by_nd
 
     *   cc_by_nd_1
 
+        *Since v3.1.101.*
+
     *   cc_by_nd_2
+
+        *Since v3.1.101.*
 
     *   cc_by_nd_2_5
 
+        *Since v3.1.101.*
+
     *   cc_by_nd_3
 
+        *Since v3.1.101.*
+
     *   cc_by_nd_4
+
+        *Since v3.1.101.*
 
     *   cc_by_sa
 
     *   cc_by_sa_1
 
+        *Since v3.1.101.*
+
     *   cc_by_sa_2
+
+        *Since v3.1.101.*
 
     *   cc_by_sa_2_5
 
+        *Since v3.1.101.*
+
     *   cc_by_sa_3
 
+        *Since v3.1.101.*
+
     *   cc_by_sa_4
+
+        *Since v3.1.101.*
 
     *   cc_cc0
 
     *   cc_cc0_1
 
+        *Since v3.1.101.*
+
     *   cc_devnations
+
+        *Since v3.7.0.*
 
     *   cc_devnations_2
 
+        *Since v3.7.0.*
+
     *   cc_nc
+
+        *Since v3.1.101.*
 
     *   cc_nc_1
 
+        *Since v3.1.101.*
+
     *   cc_nc_sa
+
+        *Since v3.7.0.*
 
     *   cc_nc_sa_1
 
+        *Since v3.7.0.*
+
     *   cc_nc_sp
+
+        *Since v3.7.0.*
 
     *   cc_nc_sp_1
 
+        *Since v3.7.0.*
+
     *   cc_nd_nc
+
+        *Since v3.7.0.*
 
     *   cc_nd_nc_1
 
+        *Since v3.7.0.*
+
     *   cc_nd
+
+        *Since v3.1.101.*
 
     *   cc_nd_1
 
+        *Since v3.1.101.*
+
     *   cc_pd
+
+        *Since v3.7.0.*
 
     *   cc_pdd
 
+        *Since v3.7.0.*
+
     *   cc_pddc
+
+        *Since v3.7.0.*
 
     *   cc_sa
 
+        *Since v3.1.101.*
+
     *   cc_sa_1
+
+        *Since v3.1.101.*
 
     *   cc_sampling
 
+        *Since v3.7.0.*
+
     *   cc_sampling_1
+
+        *Since v3.7.0.*
 
     *   cc_sp
 
     *   cc_sp_1
 
+        *Since v3.7.0.*
+
     *   cddl
 
     *   cddl_1
 
+        *Since v3.1.101.*
+
     *   cddl_1_1
+
+        *Since v3.1.101.*
 
     *   cecill
 
@@ -483,9 +773,13 @@ PATTERNS
 
     *   cecill_b_1
 
+        *Since v3.1.95.*
+
     *   cecill_c
 
     *   cecill_c_1
+
+        *Since v3.1.95.*
 
     *   cnri_jython
 
@@ -495,7 +789,11 @@ PATTERNS
 
     *   condor
 
+        *Since v3.8.0.*
+
     *   condor_1_1
+
+        *Since v3.8.0.*
 
     *   cpal
 
@@ -503,13 +801,19 @@ PATTERNS
 
     *   cpl
 
+        *Since v3.1.101.*
+
     *   cpl_1
+
+        *Since v3.1.101.*
 
     *   cpol
 
     *   cpol_1_02
 
     *   crossword
+
+        *Since v3.8.0.*
 
     *   cryptix
 
@@ -523,21 +827,39 @@ PATTERNS
 
     *   cvw
 
-    *   d_fsd
+        *Since v3.5.0.*
 
-    *   d_fsd_1
+    *   d_fsl
+
+        *Since v3.8.0.*
+
+    *   d_fsl_1
+
+        *Since v3.8.0.*
 
     *   dbad
 
+        *Since v3.8.0.*
+
     *   dbad_0_2
+
+        *Since v3.8.0.*
 
     *   dbad_0_3
 
+        *Since v3.8.0.*
+
     *   dbad_1
+
+        *Since v3.8.0.*
 
     *   dbad_1_1
 
+        *Since v3.8.0.*
+
     *   dont_ask
+
+        *Since v3.8.0.*
 
     *   dsdp
 
@@ -549,15 +871,27 @@ PATTERNS
 
     *   ecos_1_1
 
+        *Since v3.6.0.*
+
     *   ecos_2
+
+        *Since v3.6.0.*
 
     *   efl
 
+        *Since v3.6.0.*
+
     *   efl_1
+
+        *Since v3.6.0.*
 
     *   efl_2
 
+        *Since v3.6.0.*
+
     *   entessa
+
+        *Since v3.6.0.*
 
     *   epl
 
@@ -567,9 +901,15 @@ PATTERNS
 
     *   erlpl
 
+        *Since v3.7.0.*
+
     *   erlpl_1_1
 
+        *Since v3.7.0.*
+
     *   eudatagrid
+
+        *Since v3.6.0.*
 
     *   eupl
 
@@ -583,23 +923,43 @@ PATTERNS
 
     *   fair
 
+        *Since v3.6.0.*
+
     *   fair_source
+
+        *Since v3.8.0.*
 
     *   fair_source_0_9
 
+        *Since v3.8.0.*
+
     *   fal
+
+        *Since v3.8.0.*
 
     *   fal_1_1
 
+        *Since v3.8.0.*
+
     *   fal_1_2
+
+        *Since v3.8.0.*
 
     *   fal_1_3
 
+        *Since v3.8.0.*
+
     *   festival
+
+        *Since v3.8.0.*
 
     *   frameworx
 
+        *Since v3.6.0.*
+
     *   frameworx_1
+
+        *Since v3.6.0.*
 
     *   fsfap
 
@@ -633,9 +993,13 @@ PATTERNS
 
     *   glide
 
+        *Since v3.8.0.*
+
     *   gpl
 
     *   gpl_1
+
+        *Since v3.3.0.*
 
     *   gpl_1_only
 
@@ -643,11 +1007,15 @@ PATTERNS
 
     *   gpl_2
 
+        *Since v3.3.0.*
+
     *   gpl_2_only
 
     *   gpl_2_or_later
 
     *   gpl_3
+
+        *Since v3.3.0.*
 
     *   gpl_3_only
 
@@ -655,23 +1023,41 @@ PATTERNS
 
     *   gsoap
 
+        *Since v3.7.0.*
+
     *   gsoap_1.3b
+
+        *Since v3.7.0.*
 
     *   hpnd
 
+        *Since v3.6.0.*
+
     *   hpnd_sell
 
+        *Since v3.6.0.*
+
     *   ibm_pibs
+
+        *Since v3.8.0.*
 
     *   icu
 
     *   ijg
 
+        *Since v3.8.0.*
+
     *   imlib2
+
+        *Since v3.8.0.*
 
     *   intel
 
+        *Since v3.5.0.*
+
     *   ipa
+
+        *Since v3.6.0.*
 
     *   ipl
 
@@ -681,13 +1067,23 @@ PATTERNS
 
     *   jabberpl
 
+        *Since v3.5.0.*
+
     *   json
+
+        *Since v3.1.90.*
 
     *   jython
 
+        *Since v3.1.90.*
+
     *   kevlin_henney
 
+        *Since v3.1.90.*
+
     *   leptonica
+
+        *Since v3.8.0.*
 
     *   lgpl
 
@@ -711,29 +1107,51 @@ PATTERNS
 
     *   lgpl_bdwgc
 
+        *Since v3.1.0.*
+
     *   libpng
 
     *   libtiff
 
+        *Since v3.8.0.*
+
     *   liliq_p
+
+        *Since v3.6.0.*
 
     *   liliq_p_1_1
 
+        *Since v3.6.0.*
+
     *   liliq_r
+
+        *Since v3.6.0.*
 
     *   liliq_r_1_1
 
+        *Since v3.6.0.*
+
     *   liliq_r_plus
 
+        *Since v3.6.0.*
+
     *   liliq_r_plus_1_1
+
+        *Since v3.6.0.*
 
     *   llgpl
 
     *   lpl
 
+        *Since v3.6.0.*
+
     *   lpl_1
 
+        *Since v3.6.0.*
+
     *   lpl_1_02
+
+        *Since v3.6.0.*
 
     *   lppl
 
@@ -749,7 +1167,11 @@ PATTERNS
 
     *   miros
 
+        *Since v3.6.0.*
+
     *   mit_0
+
+        *Since v3.6.0.*
 
     *   mit_advertising
 
@@ -760,6 +1182,8 @@ PATTERNS
     *   mit_enna
 
     *   mit_epinions
+
+        *Since v3.7.0.*
 
     *   mit_feh
 
@@ -777,31 +1201,61 @@ PATTERNS
 
     *   mit_open_group
 
+        *Since v3.6.0.*
+
     *   mit_openvision
+
+        *Since v3.7.0.*
 
     *   mit_osf
 
+        *Since v3.7.0.*
+
     *   mit_unixcrypt
+
+        *Since v3.7.0.*
 
     *   mit_whatever
 
+        *Since v3.7.0.*
+
     *   mit_widget
+
+        *Since v3.7.0.*
 
     *   mit_xfig
 
+        *Since v3.7.0.*
+
     *   motosoto
 
+        *Since v3.5.0.*
+
     *   mpich2
+
+        *Since v3.8.0.*
 
     *   mpl
 
     *   mpl_1
 
+        *Since v3.1.101.*
+
     *   mpl_1_1
+
+        *Since v3.1.101.*
 
     *   mpl_2
 
+        *Since v3.1.101.*
+
+    *   mpl_2_no_copyleft_exception
+
+        *Since v3.8.0.*
+
     *   ms_cl
+
+        *Since v3.8.0.*
 
     *   ms_pl
 
@@ -809,31 +1263,57 @@ PATTERNS
 
     *   mulan
 
+        *Since v3.5.0.*
+
     *   mulan_1
+
+        *Since v3.5.0.*
 
     *   mulan_2
 
+        *Since v3.5.0.*
+
     *   multics
+
+        *Since v3.6.0.*
 
     *   nasa
 
+        *Since v3.6.0.*
+
     *   nasa_1_3
+
+        *Since v3.6.0.*
 
     *   naumen
 
+        *Since v3.6.0.*
+
     *   nbpl
+
+        *Since v3.8.0.*
 
     *   nbpl_1
 
+        *Since v3.8.0.*
+
     *   ncsa
+
+        *Since v3.6.0.*
 
     *   ngpl
 
     *   nokia
 
+        *Since v3.6.0.*
+
     *   nosl
 
+        *Since v3.8.0.*
+
     *   nosl_1
+
+        *Since v3.8.0.*
 
     *   npl
 
@@ -843,7 +1323,11 @@ PATTERNS
 
     *   nposl
 
+        *Since v3.6.0.*
+
     *   nposl_3
+
+        *Since v3.6.0.*
 
     *   ntp
 
@@ -857,75 +1341,141 @@ PATTERNS
 
     *   odbl
 
+        *Since v3.8.0.*
+
     *   odbl_1
+
+        *Since v3.8.0.*
 
     *   odc_by
 
+        *Since v3.8.0.*
+
     *   odc_by_1
+
+        *Since v3.8.0.*
 
     *   ofl
 
     *   ofl_1
 
+        *Since v3.1.101.*
+
     *   ofl_1_no_rfn
+
+        *Since v3.2.0.*
 
     *   ofl_1_rfn
 
+        *Since v3.2.0.*
+
     *   ofl_1_1
+
+        *Since v3.1.101.*
 
     *   ofl_1_1_no_rfn
 
+        *Since v3.2.0.*
+
     *   ofl_1_1_rfn
+
+        *Since v3.2.0.*
 
     *   ogc
 
+        *Since v3.6.0.*
+
     *   ogc_1
+
+        *Since v3.6.0.*
 
     *   ogtsl
 
     *   oldap
 
+        *Since v3.5.0.*
+
     *   oldap_1_1
+
+        *Since v3.5.0.*
 
     *   oldap_1_2
 
+        *Since v3.5.0.*
+
     *   oldap_1_3
+
+        *Since v3.5.0.*
 
     *   oldap_1_4
 
+        *Since v3.5.0.*
+
     *   oldap_2
+
+        *Since v3.5.0.*
 
     *   oldap_2_0_1
 
+        *Since v3.5.0.*
+
     *   oldap_2_1
+
+        *Since v3.5.0.*
 
     *   oldap_2_2
 
+        *Since v3.5.0.*
+
     *   oldap_2_2_1
+
+        *Since v3.5.0.*
 
     *   oldap_2_2_2
 
+        *Since v3.5.0.*
+
     *   oldap_2_3
+
+        *Since v3.5.0.*
 
     *   oldap_2_4
 
+        *Since v3.5.0.*
+
     *   oldap_2_5
+
+        *Since v3.5.0.*
 
     *   oldap_2_6
 
+        *Since v3.5.0.*
+
     *   oldap_2_7
 
+        *Since v3.5.0.*
+
     *   oldap_2_8
+
+        *Since v3.5.0.*
 
     *   openssl
 
     *   opl
 
+        *Since v3.6.0.*
+
     *   opl_1
+
+        *Since v3.6.0.*
 
     *   oset_pl
 
+        *Since v3.6.0.*
+
     *   oset_pl_2_1
+
+        *Since v3.6.0.*
 
     *   osl
 
@@ -941,23 +1491,35 @@ PATTERNS
 
     *   pddl
 
+        *Since v3.8.0.*
+
     *   pddl_1
+
+        *Since v3.8.0.*
 
     *   peer_production
 
+        *Since v3.8.0.*
+
     *   php
+
+        *Since v3.6.0.*
 
     *   php_3
 
+        *Since v3.6.0.*
+
     *   php_3_01
+
+        *Since v3.6.0.*
 
     *   postgresql
 
+    *   psf_2
+
+        *Since v3.9.0.*
+
     *   public_domain
-
-    *   python
-
-    *   python_2
 
     *   qpl
 
@@ -977,51 +1539,93 @@ PATTERNS
 
     *   rpsl_1
 
+        *Since v3.1.95.*
+
     *   ruby
 
     *   rscpl
 
     *   sax_pd
 
+        *Since v3.8.0.*
+
     *   sds
 
+        *Since v3.8.0.*
+
     *   sds_1
+
+        *Since v3.8.0.*
 
     *   sgi_b
 
     *   sgi_b_1
 
+        *Since v3.1.101.*
+
     *   sgi_b_1_1
+
+        *Since v3.1.101.*
 
     *   sgi_b_2
 
+        *Since v3.1.101.*
+
     *   simpl
+
+        *Since v3.6.0.*
 
     *   simpl_2
 
-    *   simple
+        *Since v3.6.0.*
 
-    *   simple_1_1
+    *   simple_w3c
+
+        *Since v3.6.0.*
+
+    *   simple_w3c_1_1
+
+        *Since v3.6.0.*
 
     *   sissl
 
+        *Since v3.5.0.*
+
     *   sissl_1_1
+
+        *Since v3.5.0.*
 
     *   sissl_1_2
 
+        *Since v3.5.0.*
+
     *   sleepycat
+
+        *Since v3.6.0.*
 
     *   sncl
 
+        *Since v3.8.0.*
+
     *   sncl_1_10
+
+        *Since v3.8.0.*
 
     *   sncl_2_0_1
 
+        *Since v3.8.0.*
+
     *   sncl_2_0_2
+
+        *Since v3.8.0.*
 
     *   sncl_2_1
 
+        *Since v3.8.0.*
+
     *   sncl_2_3
+
+        *Since v3.8.0.*
 
     *   spl
 
@@ -1029,7 +1633,11 @@ PATTERNS
 
     *   ssleay
 
+        *Since v3.2.0.*
+
     *   stlport
+
+        *Since v3.8.0.*
 
     *   sugarcrm
 
@@ -1037,17 +1645,35 @@ PATTERNS
 
     *   tosl
 
+        *Since v3.6.0.*
+
     *   truecrypt
+
+        *Since v3.8.0.*
 
     *   truecrypt_3
 
+        *Since v3.8.0.*
+
     *   ucl
+
+        *Since v3.6.0.*
 
     *   ucl_1
 
+        *Since v3.6.0.*
+
+    *   unicode_dfs
+
+        *Since v3.9.0.*
+
     *   unicode_dfs_2015
 
+        *Since v3.6.0.*
+
     *   unicode_dfs_2016
+
+        *Since v3.6.0.*
 
     *   unicode_strict
 
@@ -1057,23 +1683,43 @@ PATTERNS
 
     *   upl
 
+        *Since v3.6.0.*
+
     *   upl_1
+
+        *Since v3.6.0.*
 
     *   vsl
 
+        *Since v3.6.0.*
+
     *   vsl_1
+
+        *Since v3.6.0.*
 
     *   vspl
 
+        *Since v3.8.0.*
+
     *   w3c
+
+        *Since v3.6.0.*
 
     *   w3c_19980519
 
+        *Since v3.6.0.*
+
     *   w3c_19980720
+
+        *Since v3.6.0.*
 
     *   w3c_20021231
 
+        *Since v3.6.0.*
+
     *   w3c_20150513
+
+        *Since v3.6.0.*
 
     *   watcom
 
@@ -1081,41 +1727,73 @@ PATTERNS
 
     *   wordnet
 
-    *   wordnet_3
+        *Since v3.8.0.*
 
     *   wtfpl
 
     *   wtfpl_1
 
+        *Since v3.1.95.*
+
     *   wtfpl_2
+
+        *Since v3.1.95.*
 
     *   wtfnmfpl
 
+        *Since v3.1.95.*
+
     *   wtfnmfpl_1
+
+        *Since v3.1.95.*
 
     *   x11
 
+        *Since v3.6.0.*
+
     *   xfree86
+
+        *Since v3.8.0.*
 
     *   xfree86_1_1
 
+        *Since v3.8.0.*
+
     *   xnet
+
+        *Since v3.6.0.*
 
     *   ypl
 
+        *Since v3.8.0.*
+
     *   ypl_1
+
+        *Since v3.8.0.*
 
     *   ypl_1_1
 
+        *Since v3.8.0.*
+
     *   zed
+
+        *Since v3.8.0.*
 
     *   zend
 
+        *Since v3.8.0.*
+
     *   zend_2
+
+        *Since v3.8.0.*
 
     *   zimbra
 
+        *Since v3.8.0.*
+
     *   zimbra_1_3
+
+        *Since v3.8.0.*
 
     *   zimbra_1_4
 
@@ -1125,13 +1803,23 @@ PATTERNS
 
     *   zpl
 
+        *Since v3.1.102.*
+
     *   zpl_1
+
+        *Since v3.1.102.*
 
     *   zpl_1_1
 
+        *Since v3.1.102.*
+
     *   zpl_2
 
+        *Since v3.1.102.*
+
     *   zpl_2_1
+
+        *Since v3.1.102.*
 
   License combinations
     Patterns each covering a combination of multiple licenses.
@@ -1140,7 +1828,13 @@ PATTERNS
 
     *   net_snmp
 
+        *Since v3.6.0.*
+
     *   perl
+
+    *   python_2
+
+        *Since v3.9.0.*
 
   License groups
     Patterns each covering either of multiple licenses.
@@ -1150,6 +1844,8 @@ PATTERNS
     *   bsd
 
     *   cc
+
+        *Since v3.6.0.*
 
     *   gnu
 
@@ -1220,6 +1916,22 @@ STRUCTURE
 
     multisection
         Pattern may span multiple sections.
+
+  OBSOLETE OBJECTS
+    License objects obsoleted by improved coverage of other objects, and
+    provided only as dummy objects.
+
+    *   python
+
+        *Since v3.9.0.*
+
+        Replaced by "psf_2" and "python_2".
+
+    *   wordnet_3
+
+        *Since v3.9.0.*
+
+        Replaced by "wordnet".
 
   TAGS
     Pattern defhashes optionally includes tags, which may help in selecting
@@ -1334,7 +2046,9 @@ AUTHOR
     Jonas Smedegaard `<dr@jones.dk>`
 
 COPYRIGHT AND LICENSE
-      Copyright © 2016-2017 Jonas Smedegaard
+      Copyright © 2016-2021 Jonas Smedegaard
+
+      Copyright © 2017-2021 Purism SPC
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the Free

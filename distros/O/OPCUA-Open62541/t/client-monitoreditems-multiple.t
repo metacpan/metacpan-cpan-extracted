@@ -7,13 +7,12 @@ use OPCUA::Open62541::Test::Server;
 
 use Test::More tests =>
     OPCUA::Open62541::Test::Server::planning() +
-    OPCUA::Open62541::Test::Client::planning() + 51;
+    OPCUA::Open62541::Test::Client::planning() + 55;
 use Test::Deep;
 use Test::Exception;
 use Test::LeakTrace;
 use Test::NoWarnings;
 
-use Storable qw(dclone);
 my (@nodes,@actions);
 for my $i (0 .. 2) {
     $nodes[$i] = {
@@ -160,13 +159,36 @@ is($client->{client}->MonitoredItems_deleteSingle($subid, $monids[0]),
    "Good",
    "delete monitored item");
 
-my $items;
-for (0 .. 2) {
-    push @$items, dclone $request->{CreateMonitoredItemsRequest_itemsToCreate}[0];
-    $items->[$_]{MonitoredItemCreateRequest_itemToMonitor}{ReadValueId_nodeId} = $nodes[$_];
-}
-$request->{CreateMonitoredItemsRequest_itemsToCreate} = $items;
+$request->{CreateMonitoredItemsRequest_itemsToCreate} = [ map {
+    OPCUA::Open62541::Client->MonitoredItemCreateRequest_default($_)
+    } @nodes[0 .. 2]
+];
 
+$request->{CreateMonitoredItemsRequest_subscriptionId} = 999;
+my $deleted;
+$response = $client->{client}->MonitoredItems_createDataChanges(
+    $request,
+    [0 .. 2],
+    undef,
+    [ map { sub { $deleted++ } } (0 .. 2) ],
+);
+
+is($response->{CreateMonitoredItemsResponse_responseHeader}
+    {ResponseHeader_serviceResult}, 'BadSubscriptionIdInvalid',
+    "monitored items create fail response statuscode");
+
+ok(my $buildinfo = $server->{config}->getBuildInfo());
+note explain $buildinfo;
+# the semantics whether the callback is called in case of error has changed
+if ($buildinfo->{BuildInfo_softwareVersion} =~ /^1\.0\./) {
+    is($deleted, 3,
+       "subscription deleted callback");
+} else {
+    is($deleted, undef,
+       "subscription deleted callback");
+}
+
+$request->{CreateMonitoredItemsRequest_subscriptionId} = $subid;
 my @values;
 my $called = 0;
 my $datachange = sub {
@@ -179,13 +201,13 @@ $response = $client->{client}->MonitoredItems_createDataChanges(
     $request, [0 .. 2], [$datachange, $datachange, $datachange], undef
 );
 
-is($response->{CreateMonitoredItemsResponse_responseHeader}{ResponseHeader_serviceResult},
-   "Good",
-   "monitored items create response serviceresult");
+is($response->{CreateMonitoredItemsResponse_responseHeader}
+    {ResponseHeader_serviceResult}, 'Good',
+    "monitored items create response serviceresult");
 
-is($response->{CreateMonitoredItemsResponse_results}[$_]{MonitoredItemCreateResult_statusCode},
-   "Good",
-   "monitored items create result $_ statuscode") for (0 .. 2);
+is($response->{CreateMonitoredItemsResponse_results}[$_]
+    {MonitoredItemCreateResult_statusCode}, 'Good',
+    "monitored items create result $_ statuscode") for (0 .. 2);
 
 for (0 .. 2) {
     $monids[$_] = $response->{CreateMonitoredItemsResponse_results}[$_]
@@ -303,6 +325,16 @@ no_leaks_ok {
 	DeleteMonitoredItemsRequest_monitoredItemIds => \@monids,
     });
 } "monitored items creates delete all leak";
+
+no_leaks_ok {
+    $request->{CreateMonitoredItemsRequest_subscriptionId} = 999;
+    $response = $client->{client}->MonitoredItems_createDataChanges(
+	$request,
+	[0 .. 2],
+	undef,
+	[ map { sub { $deleted++ } } (0 .. 2) ],
+    );
+} "monitored items create fail deleted leak";
 
 $client->stop();
 $server->stop();

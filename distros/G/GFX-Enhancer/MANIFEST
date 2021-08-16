@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/GFX-Enhancer.t
+lib/GFX/Enhancer.pm

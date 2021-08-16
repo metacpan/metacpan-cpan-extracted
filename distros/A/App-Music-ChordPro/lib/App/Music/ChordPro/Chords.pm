@@ -338,6 +338,7 @@ sub add_config_chord {
 	    %$info,
 	    %$def,
 	    base    => $base,
+	    baselabeloffset => $def->{baselabeloffset}||0,
 	    frets   => [ $frets && @$frets ? @$frets : () ],
 	    fingers => [ $fingers && @$fingers ? @$fingers : () ],
 	    keys    => [ $keys && @$keys ? @$keys : () ] };
@@ -532,6 +533,7 @@ sub transpose {
     my ( $c, $xpose, $xcode ) = @_;
     return $c unless $xpose || $xcode;
     return $c if $c =~ /^\*/;
+#warn("__XPOSE = ", $xpose, " __XCODE = $xcode");
     my $info = parse_chord($c);
     unless ( $info ) {
 	assert_tuning();

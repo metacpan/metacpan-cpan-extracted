@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::DummySource;
-$Lab::Moose::Instrument::DummySource::VERSION = '3.762';
+$Lab::Moose::Instrument::DummySource::VERSION = '3.770';
 #ABSTRACT: Dummy YokogawaGS200 source for use with 'Debug' connection
 
 use v5.20;
@@ -214,7 +214,7 @@ Lab::Moose::Instrument::DummySource - Dummy YokogawaGS200 source for use with 'D
 
 =head1 VERSION
 
-version 3.762
+version 3.770
 
 =head1 SYNOPSIS
 

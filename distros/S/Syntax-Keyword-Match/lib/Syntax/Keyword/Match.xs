@@ -101,14 +101,17 @@ static OP *pp_dispatch_isa(pTHX)
 }
 #endif
 
-static OP *build_cases(pTHX_ OPCODE matchtype, PADOFFSET padix, size_t n_cases, XSParseKeywordPiece *args[], OP *elseop)
+static OP *build_cases_nondispatch(pTHX_ OPCODE matchtype, PADOFFSET padix, size_t n_cases, XSParseKeywordPiece *caseargs[], OP *block, OP *elseop)
 {
   assert(n_cases);
 
-  if(n_cases == 1) {
-    OP *caseop = args[0]->op;
-    OP *block  = op_scope(args[1]->op);
-    OP *testop = NULL;
+  OP *testop = NULL;
+
+  U32 argi;
+  for(argi = 0; argi < n_cases; argi++) {
+    OP *caseop = caseargs[argi]->op;
+
+    OP *thistestop;
 
     switch(matchtype) {
 #ifdef HAVE_OP_ISA
@@ -116,35 +119,43 @@ static OP *build_cases(pTHX_ OPCODE matchtype, PADOFFSET padix, size_t n_cases, 
 #endif
       case OP_SEQ:
       case OP_EQ:
-        testop = newBINOP(matchtype, 0,
+        thistestop = newBINOP(matchtype, 0,
           newPADSVOP(OP_PADSV, 0, padix), caseop);
         break;
 
       case OP_MATCH:
         if(caseop->op_type != OP_MATCH || cPMOPx(caseop)->op_first)
           croak("Expected a regexp match");
-        testop = caseop;
+        thistestop = caseop;
 #if HAVE_PERL_VERSION(5,22,0)
-        testop->op_targ = padix;
+        thistestop->op_targ = padix;
 #else
-        cPMOPx(testop)->op_first = newPADSVOP(OP_PADSV, 0, padix);
-        testop->op_flags |= OPf_KIDS|OPf_STACKED;
+        cPMOPx(thistestop)->op_first = newPADSVOP(OP_PADSV, 0, padix);
+        thistestop->op_flags |= OPf_KIDS|OPf_STACKED;
 #endif
         break;
     }
 
-    assert(testop);
-
-    if(elseop)
-      return newCONDOP(0, testop, block, elseop);
+    if(testop)
+      testop = newLOGOP(OP_OR, 0, testop, thistestop);
     else
-      return newLOGOP(OP_AND, 0, testop, block);
+      testop = thistestop;
   }
 
-  int idx;
-  for(idx = 0; idx < n_cases; idx++)
-    assert(args[idx*2]->op->op_type == OP_CONST);
+  assert(testop);
+
+  if(elseop)
+    return newCONDOP(0, testop, block, elseop);
+  else
+    return newLOGOP(OP_AND, 0, testop, block);
+}
+
+static OP *build_cases_dispatch(pTHX_ OPCODE matchtype, PADOFFSET padix, size_t n_cases, XSParseKeywordPiece *args[], OP *elseop)
+{
+  assert(n_cases);
   assert(matchtype != OP_MATCH);
+
+  U32 argi;
 
   ENTER;
 
@@ -176,17 +187,31 @@ static OP *build_cases(pTHX_ OPCODE matchtype, PADOFFSET padix, size_t n_cases, 
 
   OP *retop = newUNOP(OP_NULL, 0, (OP *)o);
 
-  for(idx = 0; idx < n_cases; idx++) {
-    OP *caseop = args[idx*2]->op;
-    OP *block  = op_scope(args[idx*2+1]->op);
-
-    values[idx] = SvREFCNT_inc(cSVOPx(caseop)->op_sv);
-    op_free(caseop);
-
-    dispatch[idx] = LINKLIST(block);
+  U32 idx = 0;
+  argi = 0;
+  while(n_cases) {
+    U32 this_n_cases = args[argi++]->i;
+    OP *block = args[argi + this_n_cases]->op;
+    OP *blockstart = LINKLIST(block);
     block->op_next = retop;
 
+    n_cases -= this_n_cases;
+
+    while(this_n_cases) {
+      OP *caseop = args[argi++]->op;
+      assert(caseop->op_type == OP_CONST);
+      values[idx] = SvREFCNT_inc(cSVOPx(caseop)->op_sv);
+      op_free(caseop);
+
+      dispatch[idx] = blockstart;
+
+      idx++;
+      this_n_cases--;
+    }
+
     /* TODO: link chain of siblings */
+
+    argi++; /* block */
   }
 
   if(elseop) {
@@ -212,16 +237,39 @@ static int build_match(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs
   /* args:
    *   [0]: topic expression
    *   [1]: match type
-   *   [2]: count of cases
-   *   [3,4]: first case
-   *   [4,5]: second case ...
-   *   [3+2*ncases]: true if default exists
+   *   [2]: count of blocks
+   *     [3]: count of case exprs = $N
+   *     [4...]: $N * case exprs
+   *     []: block
    *   [LAST]: default case if present
    */
-  OP *topic = args[0]->op;
-  OPCODE matchtype = args[1]->i;
-  int ncases = args[2]->i;
-  bool with_default = args[3 + 2*ncases]->i;
+  U32 argi = 0;
+
+  OP *topic = args[argi++]->op;
+  OPCODE matchtype = args[argi++]->i;
+  int n_blocks = args[argi++]->i;
+
+  /* Since we're going to fold up the blocks into an optree in reverse order,
+   * starting from the end, it's a lot easier if we exchange the count and
+   * block args so we can count backwards
+   */
+  while(n_blocks) {
+    U32 count_argi = argi;
+    int n_cases = args[argi++]->i;
+
+    argi += n_cases;
+    XSParseKeywordPiece *count_arg = args[count_argi];
+    args[count_argi] = args[argi];
+    args[argi] = count_arg;
+
+    argi++;
+    n_blocks--;
+  }
+
+  bool has_default = args[argi]->i;
+  OP *o = NULL;
+  if(has_default)
+    o = args[argi + 1]->op;
 
   bool use_dispatch = hv_fetchs(GvHV(PL_hintgv), "Syntax::Keyword::Match/experimental(dispatch)", 0);
 
@@ -232,48 +280,72 @@ static int build_match(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs
    */
   PADOFFSET padix = pad_add_name_pvs("$(Syntax::Keyword::Match/topic)", 0, NULL, NULL);
 
-  topic = op_contextualize(topic, G_SCALAR);
-
   OP *startop = newBINOP(OP_SASSIGN, 0,
     topic, newPADSVOP(OP_PADSV, OPf_MOD, padix));
 
-  OP *o = NULL;
-  if(with_default)
-    o = op_scope(args[3 + 2*ncases + 1]->op);
+  int n_dispatch = 0;
+  argi--;
 
-  int n_consts = 0;
-  int idx;
-  for (idx = 1 + 2*ncases; idx > 2; idx -= 2) {
-    /* TODO: forbid the , operator in the case label */
-    OP *caseop = args[idx]->op;
+  while(argi > 2) {
+    int n_cases = args[argi--]->i;
 
-    switch(matchtype) {
+    /* for build_cases we'd best put the args back into the right order
+     * again */
+    U32 block_argi = argi - n_cases;
+    XSParseKeywordPiece *block_arg = args[block_argi];
+    args[block_argi] = args[argi+1];
+    args[argi+1] = block_arg;
+
+    /* perl expects a strict optree, where each block appears exactly once.
+     * We can't reüse the block between dispatch and non-dispatch ops, so
+     * we'll have to decide which strategy to use here
+     */
+    bool this_block_dispatch = use_dispatch;
+
+    for( ; argi > block_argi; argi--) {
+      /* TODO: forbid the , operator in the case label */
+      OP *caseop = args[argi]->op;
+
+      switch(matchtype) {
 #ifdef HAVE_OP_ISA
-      case OP_ISA:
-        /* bareword class names are permitted */
-        if(caseop->op_type == OP_CONST && caseop->op_private & OPpCONST_BARE)
-          caseop->op_private &= ~(OPpCONST_BARE|OPpCONST_STRICT);
-        /* FALLTHROUGH */
+        case OP_ISA:
+          /* bareword class names are permitted */
+          if(caseop->op_type == OP_CONST && caseop->op_private & OPpCONST_BARE)
+            caseop->op_private &= ~(OPpCONST_BARE|OPpCONST_STRICT);
+          /* FALLTHROUGH */
 #endif
-      case OP_SEQ:
-      case OP_EQ:
-        args[idx]->op = op_contextualize(caseop, G_SCALAR);
-        if(use_dispatch && caseop->op_type == OP_CONST) {
-          n_consts++;
-          continue;
-        }
-        if(n_consts) {
-          o = build_cases(aTHX_ matchtype, padix, n_consts, args + idx + 2, o);
-          n_consts = 0;
-        }
-        break;
+        case OP_SEQ:
+        case OP_EQ:
+          if(use_dispatch && caseop->op_type == OP_CONST)
+            continue;
+
+          /* FALLTHROUGH */
+        case OP_MATCH:
+          this_block_dispatch = false;
+          break;
+      }
     }
 
-    o = build_cases(aTHX_ matchtype, padix, 1, args + idx, o);
+    argi--;
+
+    if(this_block_dispatch) {
+      n_dispatch += n_cases;
+      continue;
+    }
+
+    if(n_dispatch) {
+      o = build_cases_dispatch(aTHX_ matchtype, padix,
+          n_dispatch, args + argi + n_cases + 3, o);
+      n_dispatch = 0;
+    }
+
+    o = build_cases_nondispatch(aTHX_ matchtype, padix,
+      n_cases, args + argi + 2, block_arg->op, o);
   }
 
-  if(n_consts)
-    o = build_cases(aTHX_ matchtype, padix, n_consts, args + idx + 2, o);
+  if(n_dispatch)
+    o = build_cases_dispatch(aTHX_ matchtype, padix,
+        n_dispatch, args + argi + 1, o);
 
   *out = block_end(floor_ix, newLISTOP(OP_LINESEQ, 0, startop, o));
 
@@ -285,26 +357,28 @@ static const struct XSParseKeywordHooks hooks_match = {
 
   .pieces = (const struct XSParseKeywordPieceType []){
     XPK_PARENSCOPE( /* ( EXPR : OP ) */
-      XPK_TERMEXPR,
+      XPK_TERMEXPR_SCALARCTX,
       XPK_COLON,
       XPK_TAGGEDCHOICE(   /* TODO: relop ? */
-        XPK_STRING("eq"), XPK_TAG(OP_SEQ),
-        XPK_STRING("=="), XPK_TAG(OP_EQ),
-        XPK_STRING("=~"), XPK_TAG(OP_MATCH),
+        XPK_LITERAL("eq"), XPK_TAG(OP_SEQ),
+        XPK_LITERAL("=="), XPK_TAG(OP_EQ),
+        XPK_LITERAL("=~"), XPK_TAG(OP_MATCH),
 #ifdef HAVE_OP_ISA
-        XPK_STRING("isa"), XPK_TAG(OP_ISA),
+        XPK_LITERAL("isa"), XPK_TAG(OP_ISA),
 #endif
         XPK_FAILURE("Expected a comparison operator")
       )
     ),
-    XPK_BRACESCOPE( /* { cases... } */
+    XPK_BRACESCOPE( /* { blocks... } */
       XPK_REPEATED(     /* case (EXPR) {BLOCK} */
-        XPK_STRING("case"),
-        XPK_PARENSCOPE( XPK_TERMEXPR ),
+        XPK_COMMALIST(
+          XPK_LITERAL("case"),
+          XPK_PARENSCOPE( XPK_TERMEXPR_SCALARCTX )
+        ),
         XPK_BLOCK
       ),
       XPK_OPTIONAL( /* default { ... } */
-        XPK_STRING("default"),
+        XPK_LITERAL("default"),
         XPK_BLOCK
       )
     ),
@@ -316,6 +390,6 @@ static const struct XSParseKeywordHooks hooks_match = {
 MODULE = Syntax::Keyword::Match    PACKAGE = Syntax::Keyword::Match
 
 BOOT:
-  boot_xs_parse_keyword(0.04);
+  boot_xs_parse_keyword(0.12);
 
   register_xs_parse_keyword("match", &hooks_match, NULL);

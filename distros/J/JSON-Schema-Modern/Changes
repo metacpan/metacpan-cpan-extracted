@@ -1,5 +1,10 @@
 Revision history for JSON-Schema-Modern
 
+0.516     2021-08-14 19:53:16Z
+          - fix email format tests on older prereqs
+          - avoid errors when enabling validate_formats before evaluating but
+            after loading a schema
+
 0.515     2021-08-03 04:07:02Z
           - no longer calling a keyword's callback during traverse() if that
             keyword has an error

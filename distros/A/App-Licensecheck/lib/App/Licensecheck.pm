@@ -119,11 +119,11 @@ App::Licensecheck - functions for a simple license checker for source files
 
 =head1 VERSION
 
-Version v3.2.6
+Version v3.2.9
 
 =cut
 
-our $VERSION = version->declare('v3.2.6');
+our $VERSION = version->declare('v3.2.9');
 
 =head1 SYNOPSIS
 
@@ -276,6 +276,9 @@ has deb_machine => (
 	is => 'rw',
 );
 
+# TODO: drop when R::P::License v3.8.1 is required
+my $hack_3_8_1 = $Regexp::Pattern::License::VERSION < v3.8.1;
+
 sub list_licenses
 {
 	my ($self) = @_;
@@ -283,13 +286,22 @@ sub list_licenses
 	my %names;
 	for my $key ( keys %Regexp::Pattern::License::RE ) {
 		for ( keys %{ $Regexp::Pattern::License::RE{$key} } ) {
+			my %attr;
 			my @attr = split /[.]/;
-			next unless $attr[0] eq 'name';
-			my %attr = @attr[ 2 .. $#attr ];
 
-			# TODO: drop version check when R::P::License v3.8.1 is required
-			for (qw(until version)) {
-				next if exists $attr{$_};
+			next unless $attr[0] eq 'name';
+
+			# TODO: simplify when R::P::License v3.8.1 is required
+			if ($hack_3_8_1) {
+				push @attr, undef
+					if @attr % 2;
+				%attr = @attr[ 2 .. $#attr ];
+				next if exists $attr{version};
+				next if exists $attr{until};
+			}
+			else {
+				%attr = @attr[ 2 .. $#attr ];
+				next if exists $attr{until};
 			}
 			for my $org ( @{ $self->shortname_scheme } ) {
 				if ( exists $attr{$org} ) {
@@ -508,7 +520,7 @@ sub clean_comments
 	s/^[cC] //gm;
 
 	# Remove C / C++ comments
-	s#(\*/|/[/*])##g;
+	s#(\*/|/\*|(?<!:)//)##g;
 
 	# Strip escaped newline
 	s/\s*\\n\s*/ /g;
@@ -516,11 +528,14 @@ sub clean_comments
 	return $_;
 }
 
+my $html_xml_tags_re = qr/<\/?(?:p|br|ref)(?:\s[^>]*)?>/i;
+
 sub clean_cruft
 {
 	local $_ = shift or return q{};
 
-	s/\/?<(?:p|br)>//gi;
+	# strip common html and xml tags
+	s/$html_xml_tags_re//g;
 
 	# TODO: decode latin1/UTF-8/HTML data instead
 	s/\xcb\x97|\xe2\x80[\x90-\x95|\xe2\x81\x83|\xe2\x88\x92|\xef\x89\xa3|\xef\xbc\x8d]|[&](?:ndash|mdash|horbar|minus|[#](?:727|820[8-9]|821[0-3]|8259|8722|65123|65293|x727|z201[0-5]|x2043|x2212|xFE63|xFF0D))[;]/-/gm;
@@ -540,12 +555,13 @@ sub clean_cruft_and_spaces
 	# (example: disclaimers in GNU autotools file "install-sh")
 	s/-\r?\n//g;
 
-	s/\/?<(?:p|br)>//gi;
+	# strip common html and xml tags
+	s/$html_xml_tags_re//g;
 
 	tr/\t\r\n/ /;
 
 	# this also removes quotes
-	tr% A-Za-z.,@;0-9\(\)/-%%cd;
+	tr% A-Za-z.,:@;0-9\(\)/-%%cd;
 	tr/ //s;
 
 	return $_;
@@ -589,7 +605,8 @@ sub best_value
 	return $value;
 }
 
-my $type_re = qr/^type:([a-z][a-z0-9_]*)(?::([a-z][a-z0-9_]*))?/;
+my $type_re
+	= qr/^type:([a-z][a-z0-9_]*)(?::([a-z][a-z0-9_]*))?(?::([a-z][a-z0-9_]*))?/;
 
 our %RE;
 my ( %L, @RE_EXCEPTION, @RE_LICENSE, @RE_NAME );
@@ -604,10 +621,11 @@ sub init_licensepatterns
 	Regexp::Pattern->import(
 		're',
 		'License::*' => (
-			engine            => 'RE2',
-			subject           => 'trait',
-			-prefix           => 'EXCEPTION_',
-			-has_tag_matching => '^type:trait:exception(?:\z|:)',
+			engine              => 'RE2',
+			subject             => 'trait',
+			-prefix             => 'EXCEPTION_',
+			-has_tag_matching   => '^type:trait:exception(?:\z|:)',
+			-lacks_tag_matching => '^type:trait:exception:prefix(?:\z|:)',
 		),
 		'License::*' => (
 			engine              => 'RE2',
@@ -615,7 +633,7 @@ sub init_licensepatterns
 			subject             => 'trait',
 			-prefix             => 'TRAIT_',
 			-has_tag_matching   => '^type:trait(?:\z|:)',
-			-lacks_tag_matching => '^type:trait:exception(?:\z|:)',
+			-lacks_tag_matching => '^type:trait:exception(?!:prefix)(?:\z|:)',
 		),
 		'License::version' => (
 			engine     => 'RE2',
@@ -631,7 +649,27 @@ sub init_licensepatterns
 			anchorleft => 1,
 			-prefix    => 'ANCHORLEFT_NAMED_',
 		),
+		'License::any_of' => (
+			subject => 'trait',
+			-prefix => 'LOCAL_TRAIT_',
+		),
+		'License::by_fsf' => (
+			subject => 'trait',
+			-prefix => 'LOCAL_TRAIT_',
+		),
+		'License::fsf_unlimited' => (
+			subject => 'trait',
+			-prefix => 'LOCAL_TRAIT_',
+		),
+		'License::fsf_unlimited_retention' => (
+			subject => 'trait',
+			-prefix => 'LOCAL_TRAIT_',
+		),
 		'License::licensed_under' => (
+			subject => 'trait',
+			-prefix => 'LOCAL_TRAIT_',
+		),
+		'License::or_at_option' => (
 			subject => 'trait',
 			-prefix => 'LOCAL_TRAIT_',
 		),
@@ -644,6 +682,22 @@ sub init_licensepatterns
 			capture => 'numbered',
 			subject => 'trait',
 			-prefix => 'LOCAL_TRAIT_KEEP_',
+		),
+		'License::apache' => (
+			subject => 'name',
+			-prefix => 'LOCAL_NAME_',
+		),
+		'License::gpl' => (
+			subject => 'name',
+			-prefix => 'LOCAL_NAME_',
+		),
+		'License::lgpl' => (
+			subject => 'name',
+			-prefix => 'LOCAL_NAME_',
+		),
+		'License::mit' => (
+			subject => 'name',
+			-prefix => 'LOCAL_NAME_',
 		),
 		'License::*' => (
 			engine              => 'RE2',
@@ -684,36 +738,37 @@ sub init_licensepatterns
 			if ( $2 and $1 eq 'usage' ) {
 				$L{usage}{$key} = $2;
 			}
-		}
-		foreach my $subject (qw(grant_license name)) {
-			my $re = re( "License::$key", subject => $subject =~ tr/_/,/r )
-				or next;
-			$L{"re_$subject"}{$key} = ref($re) ? $re : qr/$re/;
+
+			# TODO: simplify when Regexp::Pattern::License v3.9.0 is required
+			if ( $3 and $1 eq 'trait' ) {
+				if ( substr( $key, 0, 14 ) eq 'except_prefix_' ) {
+					$L{TRAITS_exception_prefix}{$key} = undef;
+				}
+				else {
+					$L{"TRAITS_$2_$3"}{$key} = undef;
+				}
+			}
 		}
 	}
-	foreach my $trait (
-		qw(any_of or_at_option
-		fsf_unlimited fsf_unlimited_retention
-		version_later_postfix)
-		)
-	{
-		my $re = re( "License::$trait", subject => 'trait' );
-		$L{re_trait}{$trait} = ref($re) ? $re : qr/$re/;
+
+	# FIXME: drop when perl doesn't mysteriously  freak out over it
+	foreach (qw(any_of)) {
+		$L{re_trait}{$_} = '';
 	}
 
 	#<<<  do not let perltidy touch this (keep long regex on one line)
-	$L{re_grant_license}{local}{multi}{1} = qr/$RE{LOCAL_TRAIT_licensed_under}$L{re_trait}{any_of}(?:[^.]|\.\S)*$L{re_name}{lgpl}$RE{LOCAL_TRAIT_KEEP_version}?/i;
-	$L{re_grant_license}{local}{multi}{2} = qr/$RE{LOCAL_TRAIT_licensed_under}$L{re_trait}{any_of}(?:[^.]|\.\S)*$L{re_name}{gpl}$RE{LOCAL_TRAIT_KEEP_version}?/i;
-	$L{re_grant_license}{local}{lgpl}{5} = qr/$RE{LOCAL_TRAIT_licensed_under}$L{re_name}{lgpl}\b[,;:]?(?: either)? ?$RE{LOCAL_TRAIT_KEEP_version_numberstring},? $L{re_trait}{or_at_option} $RE{LOCAL_TRAIT_KEEP_version_numberstring}/i;
-	$L{re_grant_license}{local}{gpl}{7} = qr/either $L{re_name}{gpl}$RE{LOCAL_TRAIT_KEEP_version}?(?: \((?:the )?"?GPL"?\))?, or $L{re_name}{lgpl}$RE{LOCAL_TRAIT_KEEP_version}?/i;
-	$L{re_grant_license}{local}{bsd}{1} = qr/THIS SOFTWARE IS PROVIDED (?:BY (?:\S+ ){1,15})?AS IS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY/;
-	$L{re_grant_license}{local}{apache}{1} = qr/$L{re_name}{apache}$RE{LOCAL_TRAIT_KEEP_version}?(?:(?: or)? [^ ,]*?apache[^ ,]*| \([^(),]+\))*,? or $L{re_name}{gpl}$RE{LOCAL_TRAIT_KEEP_version}?/i;
-	$L{re_grant_license}{local}{apache}{2} = qr/$L{re_name}{apache}$RE{LOCAL_TRAIT_KEEP_version}?(?:(?: or)? [^ ,]*?apache[^ ,]*| \([^(),]\))*,? or(?: the)? bsd(?:[ -](\d)-clause)?\b/i;
-	$L{re_grant_license}{local}{apache}{4} = qr/$L{re_name}{apache}$RE{LOCAL_TRAIT_KEEP_version}?(?:(?: or)? [^ ,]*?apache[^ ,]*| \([^(),]\))*,? or $L{re_name}{mit}\b/i;
-	$L{re_grant_license}{local}{fsful}{1} = qr/This (\w+)(?: (?:file|script))? is free software; $L{re_trait}{fsf_unlimited}/i;
-	$L{re_grant_license}{local}{fsfullr}{1} = qr/This (\w+)(?: (?:file|script))?  is free software; $L{re_trait}{fsf_unlimited_retention}/i;
-	$L{re_grant_license}{local}{trailing_space} = qr/\s+$/;
-	$L{re_grant_license}{local}{LEFTANCHOR_version_of} = qr/^ of /;
+	$L{multi_1} = qr/$RE{LOCAL_TRAIT_licensed_under}$RE{LOCAL_TRAIT_any_of}(?:[^.]|\.\S)*$RE{LOCAL_NAME_lgpl}$RE{LOCAL_TRAIT_KEEP_version}?/i;
+	$L{multi_2} = qr/$RE{LOCAL_TRAIT_licensed_under}$RE{LOCAL_TRAIT_any_of}(?:[^.]|\.\S)*$RE{LOCAL_NAME_gpl}$RE{LOCAL_TRAIT_KEEP_version}?/i;
+	$L{lgpl_5} = qr/$RE{LOCAL_TRAIT_licensed_under}$RE{LOCAL_NAME_lgpl}(?:$RE{LOCAL_TRAIT_by_fsf})?[,;:]?(?: either)? ?$RE{LOCAL_TRAIT_KEEP_version_numberstring},? $RE{LOCAL_TRAIT_or_at_option} $RE{LOCAL_TRAIT_KEEP_version_numberstring}/i;
+	$L{gpl_7} = qr/either $RE{LOCAL_NAME_gpl}$RE{LOCAL_TRAIT_KEEP_version}?(?: \((?:the )?"?GPL"?\))?, or $RE{LOCAL_NAME_lgpl}$RE{LOCAL_TRAIT_KEEP_version}?/i;
+	$L{bsd_1} = qr/THIS SOFTWARE IS PROVIDED (?:BY (?:\S+ ){1,15})?AS IS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY/;
+	$L{apache_1} = qr/$RE{LOCAL_NAME_apache}$RE{LOCAL_TRAIT_KEEP_version}?(?:(?: or)? [^ ,]*?apache[^ ,]*| \([^(),]+\))*,? or $RE{LOCAL_NAME_gpl}$RE{LOCAL_TRAIT_KEEP_version}?/i;
+	$L{apache_2} = qr/$RE{LOCAL_NAME_apache}$RE{LOCAL_TRAIT_KEEP_version}?(?:(?: or)? [^ ,]*?apache[^ ,]*| \([^(),]\))*,? or(?: the)? bsd(?:[ -](\d)-clause)?\b/i;
+	$L{apache_4} = qr/$RE{LOCAL_NAME_apache}$RE{LOCAL_TRAIT_KEEP_version}?(?:(?: or)? [^ ,]*?apache[^ ,]*| \([^(),]\))*,? or $RE{LOCAL_NAME_mit}\b/i;
+	$L{fsful} = qr/This (\w+)(?: (?:file|script))? is free software; $RE{LOCAL_TRAIT_fsf_unlimited}/i;
+	$L{fsfullr} = qr/This (\w+)(?: (?:file|script))?  is free software; $RE{LOCAL_TRAIT_fsf_unlimited_retention}/i;
+	$L{trailing_space} = qr/\s+$/;
+	$L{LEFTANCHOR_version_of} = qr/^ of /;
 	#>>>
 }
 
@@ -730,6 +785,7 @@ my %L_grant_stepwise_incomplete = (
 	lgpl => 1,
 
 	# other
+	mit_new       => 1,    # misdetects ambiguous "MIT X11" grant
 	public_domain => 1,
 );
 
@@ -859,10 +915,8 @@ sub parse_license
 		}
 	}
 
-	foreach my $trait (
-		qw(except_prefix_generic except_prefix_agpl except_prefix_gpl_clisp except_prefix_lgpl except_prefix_gpl)
-		)
-	{
+	foreach my $trait ( keys %{ $L{TRAITS_exception_prefix} } ) {
+
 		next unless ( $licensetext =~ /$RE{"TRAIT_$trait"}/ );
 		while ( $licensetext =~ /$RE{"TRAIT_$trait"}/g ) {
 			next
@@ -901,7 +955,8 @@ sub parse_license
 
 	# grant, stepwise
 	$self->log->tracef('scan stepwise for license grant');
-	foreach my $trait (qw(license_label_trove license_label licensed_under)) {
+	foreach my $trait ( keys %{ $L{TRAITS_grant_prefix} } ) {
+
 		while ( $licensetext =~ /$RE{"TRAIT_$trait"}/g ) {
 			next
 				if (
@@ -914,15 +969,8 @@ sub parse_license
 	}
 	LICENSED_UNDER:
 	foreach my $licensed_under (
-		(   sort { $a->end <=> $b->end }
-			grep { $_->name eq 'license_label_trove' } @clues
-		),
-		(   sort { $a->end <=> $b->end }
-			grep { $_->name eq 'license_label' } @clues
-			),
-		(   sort { $a->end <=> $b->end }
-			grep { $_->name eq 'licensed_under' } @clues
-			),
+		sort { $a->end <=> $b->end }
+		grep { exists $L{TRAITS_grant_prefix}{ $_->name } } @clues
 		)
 	{
 		my $pos = $licensed_under->end;
@@ -951,7 +999,7 @@ sub parse_license
 				$later = $+{version_later};
 			}
 			if (substr( $licensetext, $pos + $+[0] )
-				=~ $L{re_grant_license}{local}{LEFTANCHOR_version_of} )
+				=~ $L{LEFTANCHOR_version_of} )
 			{
 				push @clues,
 					Trait [ 'version_of', $pos + $-[0], $pos + $+[0], $file ];
@@ -974,6 +1022,7 @@ sub parse_license
 		}
 
 		# pick longest matched license name
+		# TODO: include all of most specific type when more are longest
 		my @names = nsort_by { $match{$_}{name}{$pos}->end }
 		grep { $match{$_} and $match{$_}{name} and $match{$_}{name}{$pos} }
 			@grant_types;
@@ -1095,7 +1144,7 @@ sub parse_license
 	# FIXME: add test covering this pattern
 	if ( grep { $match{$_}{name} } @lgpl ) {
 		$self->log->tracef('scan for LGPL dual-license grant');
-		if ( $licensetext =~ $L{re_grant_license}{local}{multi}{1} ) {
+		if ( $licensetext =~ $L{multi_1} ) {
 			my $meta = Trait [ 'grant(multi#1)', $-[0], $+[0], $file ];
 			$self->log->tracef(
 				'detected custom pattern multi#1: %s %s %s: %s [%s]',
@@ -1109,7 +1158,7 @@ sub parse_license
 	# FIXME: add test covering this pattern
 	if ( grep { $match{$_}{name} } @gpl ) {
 		$self->log->tracef('scan for GPL dual-license grant');
-		if ( $licensetext =~ $L{re_grant_license}{local}{multi}{2} ) {
+		if ( $licensetext =~ $L{multi_2} ) {
 			$self->log->tracef(
 				'detected custom pattern multi#2: %s %s %s: %s [%s]',
 				'gpl', $1, $2, $-[0], $file
@@ -1126,7 +1175,7 @@ sub parse_license
 		given ($licensetext) {
 
 			# LGPL, dual versions last
-			when ( $L{re_grant_license}{local}{lgpl}{5} ) {
+			when ( $L{lgpl_5} ) {
 				my $grant = Trait [ 'grant(lgpl#5)', $-[0], $+[0], $file ];
 				$license = "LGPL (v$1 or v$2) $license";
 				my $expr = "LGPL-$1 or LGPL-$2";
@@ -1143,7 +1192,7 @@ sub parse_license
 	if ( grep { $match{$_}{name} } @gpl ) {
 		$self->log->tracef('scan for GPL or LGPL dual-license grant');
 		given ($licensetext) {
-			when ( $L{re_grant_license}{local}{gpl}{7} ) {
+			when ( $L{gpl_7} ) {
 				my $grant = Trait [ "grant(gpl#7)", $-[0], $+[0], $file ];
 				$gen_license->( 'gpl', $1, $2, 'lgpl', $3, $4 );
 				$match{gpl}{custom}  = 1;
@@ -1154,7 +1203,7 @@ sub parse_license
 
 	# BSD
 	if ( grep { $match{$_}{name} } @L_contains_bsd
-		and $licensetext =~ $L{re_grant_license}{local}{bsd}{1} )
+		and $licensetext =~ $L{bsd_1} )
 	{
 		$self->log->tracef('scan for BSD fulltext');
 		my $grant = Trait [ 'license(bsd#1)', $-[0], $+[0], $file ];
@@ -1193,12 +1242,12 @@ sub parse_license
 	if ( $match{apache}{name} ) {
 		$self->log->tracef('scan for Apache license grant');
 		given ($licensetext) {
-			when ( $L{re_grant_license}{local}{apache}{1} ) {
+			when ( $L{apache_1} ) {
 				my $grant = Trait [ 'grant(apache#1)', $-[0], $+[0], $file ];
 				$gen_license->( 'apache', $1, $2, 'gpl', $3, $4 );
 				$match{ $patterns2id->( 'apache', $1 ) }{custom} = 1;
 			}
-			when ( $L{re_grant_license}{local}{apache}{2} ) {
+			when ( $L{apache_2} ) {
 				my $grant = Trait [ 'grant(apache#2)', $-[0], $+[0], $file ];
 				$gen_license->(
 					'apache', $1, $2,
@@ -1206,7 +1255,7 @@ sub parse_license
 				);
 				$match{ $patterns2id->( 'apache', $1 ) }{custom} = 1;
 			}
-			when ( $L{re_grant_license}{local}{apache}{4} ) {
+			when ( $L{apache_4} ) {
 				my $grant = Trait [ 'grant(apache#4)', $-[0], $+[0], $file ];
 				$gen_license->( 'apache', $1, $2, 'mit', $3, $4 );
 				$match{ $patterns2id->( 'apache', $1 ) }{custom} = 1;
@@ -1219,7 +1268,7 @@ sub parse_license
 	$self->log->tracef('scan for FSFUL fulltext');
 	given ($licensetext) {
 		break if ( $license{fsful} );
-		when ( $L{re_grant_license}{local}{fsful}{1} ) {
+		when ( $L{fsful} ) {
 			my $grant = Trait [ 'grant(fsful#1)', $-[0], $+[0], $file ];
 			$license = "FSF Unlimited ($1 derivation) $license";
 			my $expr = "FSFUL~$1";
@@ -1234,7 +1283,7 @@ sub parse_license
 	$self->log->tracef('scan for FSFULLR fulltext');
 	given ($licensetext) {
 		break if ( $license{fsfullr} );
-		when ( $L{re_grant_license}{local}{fsfullr}{1} ) {
+		when ( $L{fsfullr} ) {
 			my $grant = Trait [ 'grant(fsfullr#1)', $-[0], $+[0], $file ];
 			$license
 				= "FSF Unlimited (with Retention, $1 derivation) $license";
@@ -1394,7 +1443,6 @@ sub parse_license
 		next if ( $license{dsdp}           and $id eq 'ntp' );
 		next if ( $license{mit_cmu}        and $id eq 'ntp_disclaimer' );
 		next if ( $license{ntp_disclaimer} and $id eq 'ntp' );
-		next if ( $license{python_2}       and $id eq 'cnri_python' );
 
 		if (    !$license{$id}
 			and !$grant{$id}
@@ -1419,7 +1467,7 @@ sub parse_license
 		}
 	}
 
-	$license =~ s/$L{re_grant_license}{local}{trailing_space}//;
+	$license =~ s/$L{trailing_space}//;
 	my $expr = join( ' and/or ', sort map { $_->name } @expressions );
 	$expr ||= 'UNKNOWN';
 	if (@exceptions) {

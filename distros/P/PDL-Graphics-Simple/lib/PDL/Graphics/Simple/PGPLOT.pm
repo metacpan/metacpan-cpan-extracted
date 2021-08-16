@@ -23,9 +23,10 @@ our $mod = {
     module=>'PDL::Graphics::Simple::PGPLOT',
     engine => 'PDL::Graphics::PGPLOT::Window',
     synopsis=> 'PGPLOT (venerable but trusted)',
-    pgs_version=> '1.005'
+    pgs_version=> '1.006',
 };
-PDL::Graphics::Simple::register( 'PDL::Graphics::Simple::PGPLOT' );
+eval q{PDL::Graphics::Simple::register( 'PDL::Graphics::Simple::PGPLOT' )};
+print $@;
 
 ##########
 # PDL::Graphics::Simple::PGPLOT::check
@@ -59,17 +60,22 @@ sub check {
     
     $mod->{devices} = { map { chomp; s/^\s*\///; s/\s.*//; ($_,1) } @lines };
 
-    if( $mod->{devices}->{'XWINDOW'} ) {
-	$mod->{disp_dev} = 'XWINDOW';
-    } elsif($mod->{devices}->{'XSERVE'} ) {
-	$mod->{disp_dev} = 'XSERVE';
-    } else {
+    delete $mod->{disp_dev};
+    TRY:for my $try(qw/XWINDOW XSERVE CGW GW/){
+	if($mod->{devices}->{$try}) { 
+	    $mod->{disp_dev} = $try;
+	    last TRY;
+	}
+    }
+    unless(exists($mod->{disp_dev})){
 	$mod->{ok} = 0;
+	$mod->{msg} = "Couldn't identify a PGPLOT display device -- giving up.\n";
 	return 0;
     }
 
     unless( $mod->{devices}->{'VCPS'} ) {
 	$mod->{ok} = 0;
+	$mod->{msg} = "Couldn't find the VCPS file-output device -- giving up.\n";
 	return 0;
     }
 
@@ -109,7 +115,7 @@ sub new {
     my $dev;
 
     if( $opt->{type} =~ m/^i/i) {
-	$dev = ( defined($opt->{output}) ? $opt->{output} : "" ) . "/" . $mod->{disp_dev};
+	$dev = ( defined($opt->{output}) ? $opt->{output} : "" ) . ($ENV{PGPLOT_DEV} || "/$mod->{disp_dev}");
     } else {
 	my $ext;
 
@@ -145,7 +151,6 @@ sub new {
 	push(@params, 'nx=>$opt->{multi}->[0]');
 	push(@params, 'ny=>$opt->{multi}->[1]');
     }
-
     
     my $creator = 'pgwin( $dev, { '. join(",", @params) . '} );';
     $pgw = eval $creator;

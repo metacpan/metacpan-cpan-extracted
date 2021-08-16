@@ -19,11 +19,12 @@ is $assert_facets->[1]->details, 'exact match for selector "#sam"';
 ok $assert_facets->[1]->pass;
 
 $assert_facets = facets assert => intercept {
-  $t->get_ok('/')->text_is('#frodo' => 'Baggins');
+  $t->get_ok('/')->text_is('#frodo' => 'Baggins')->text_is('#frodo' => undef);
 };
-is @$assert_facets, 2;
+is @$assert_facets, 3;
 is $assert_facets->[1]->details, 'exact match for selector "#frodo"';
 ok !$assert_facets->[1]->pass;
+ok $assert_facets->[2]->pass;
 
 ## text_isnt
 $assert_facets = facets assert => intercept {

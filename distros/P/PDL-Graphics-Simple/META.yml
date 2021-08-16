@@ -3,26 +3,28 @@ abstract: 'Simple backend-independent plotting for PDL'
 author:
   - 'Craig DeForest <craig@deforest.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '7.12'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: PDL-Graphics-Simple
 no_index:
   directory:
     - t
     - inc
 requires:
-  File::Temp: 0
-  PDL: 0
-  Test::More: 0
-  Time::HiRes: 0
+  File::Temp: '0'
+  PDL: '0'
+  Time::HiRes: '0'
 resources:
-  homepage: http://github.com/drzowie/PDL-Graphics-Simple
-  repository: git://github.com/drzowie/PDL-Graphics-Simple.git
-version: 1.005
+  bugtracker: http://github.com/PDLPorters/PDL-Graphics-Simple/issues
+  homepage: http://github.com/PDLPorters/PDL-Graphics-Simple
+  repository: git://github.com/PDLPorters/PDL-Graphics-Simple.git
+version: '1.006'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

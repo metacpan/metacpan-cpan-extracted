@@ -1,4 +1,5 @@
 use Test2::V0;
+use Test2::Require::Module 'Regexp::Pattern::License' => '3.7.0';
 
 use Test::Command::Simple;
 
@@ -11,11 +12,10 @@ my $CMD = $ENV{'LICENSECHECK'} || 'bin/licensecheck';
 # ensure local script is executable
 path($CMD)->chmod('a+x') if ( $CMD eq 'bin/licensecheck' );
 
-# TODO: drop later alternative when Regexp::Pattern::License v3.7.0 is required
 subtest 'copyright declared on 2 lines' => sub {
 	run_ok $CMD, qw(-m --copyright t/devscripts/bsd-regents.c);
 	like stdout,
-		qr{(?:BSD 3-Clause License|BSD 3-clause "New" or "Revised" License)\t1987, 1993.*1994 The Regents of the University of California.},
+		qr{BSD 3-Clause License\t1987, 1993.*1994 The Regents of the University of California.},
 		'Testing stdout';
 	is stderr, '', 'No stderr';
 };
@@ -68,11 +68,10 @@ subtest 'machine-readable output w/ copyright' => sub {
 	is stderr, '', 'No stderr';
 };
 
-# TODO: drop later alternative when Regexp::Pattern::License v3.7.0 is required
 subtest 'Fortran comments' => sub {
 	run_ok $CMD, qw(t/devscripts/bsd.f);
 	like stdout,
-		qr{(?:BSD 2-Clause License|BSD 2-clause "Simplified" License)},
+		qr{BSD 2-Clause License},
 		'Testing stdout';
 	is stderr, '', 'No stderr';
 };

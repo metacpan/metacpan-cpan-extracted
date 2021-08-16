@@ -1,20 +1,18 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: String-Copyright
 Upstream-Contact: Jonas Smedegaard (JONASS) <jonass@cpan.org>
-Source: https://metacpan.org/release/String-Copyright
+Source: https://metacpan.org/pod/String::Copyright
 
 Files: Changes
  META.json
  META.yml
- dist.ini
  doap.ttl
  lib/String/Copyright.pm
- t/20_parse.t
  t/50_context.t
- t/50_encoding.t
+ t/50_identifier.t
  t/50_owner.t
  t/50_range.t
-Copyright: Copyright 2018 Jonas Smedegaard.
+Copyright: Copyright 2021 Jonas Smedegaard.
 License: GPL-3.0
 
 Files: INSTALL
@@ -30,26 +28,32 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
+Files: dist.ini
+ t/20_parse.t
+ t/50_encoding.t
+Copyright: Copyright 2018 Jonas Smedegaard.
+License: GPL-3.0
+
 Files: Makefile.PL
-Copyright: Copyright 2013 Toby Inkster.
+Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: GPL-3.0
- This software is Copyright (c) 2018 by Jonas Smedegaard.
+ This software is Copyright (c) 2021 by Jonas Smedegaard.
  
  This is free software, licensed under:
  
    The GNU General Public License, Version 3, June 2007
 
 License: Artistic-1.0
- This software is Copyright (c) 2018 by the copyright holder(s).
+ This software is Copyright (c) 2021 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2018 by the copyright holder(s).
+ This software is Copyright (c) 2021 by the copyright holder(s).
  
  This is free software, licensed under:
  

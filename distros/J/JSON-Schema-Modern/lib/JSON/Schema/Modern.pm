@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.514-13-g52b8174
+package JSON::Schema::Modern; # git description: v0.515-6-g72e2e40
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.515';
+our $VERSION = '0.516';
 
 use 5.016;  # for fc, unicode_strings features
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -131,7 +131,7 @@ sub add_schema {
       _evaluator => $self,  # used only for traversal during document construction
     );
 
-  die(!(caller())[0]->isa(ref($self))
+  die(!(caller())[0]->isa(__PACKAGE__)
     ? join('; ', map $_->keyword_location.': '.$_->error, $document->errors)
     : die JSON::Schema::Modern::Result->new(
       output_format => $self->output_format,
@@ -215,9 +215,7 @@ sub traverse {
     # keyword in the schema and the '$vocabulary' keyword in the metaschema.
     vocabularies => [
       (map use_module('JSON::Schema::Modern::Vocabulary::'.$_)->new,
-        qw(Core Applicator Validation),
-        $self->validate_formats ? 'FormatAssertion' : 'FormatAnnotation',
-        qw(Content MetaData),
+        qw(Core Applicator Validation FormatAnnotation Content MetaData),
         $spec_version eq 'draft2020-12' ? 'Unevaluated' : ()),
     ],
     identifiers => [],
@@ -663,7 +661,7 @@ JSON::Schema::Modern - Validate data against a schema
 
 =head1 VERSION
 
-version 0.515
+version 0.516
 
 =head1 SYNOPSIS
 
@@ -995,7 +993,7 @@ C<date-time>, C<date>, and C<time> require L<Time::Moment>
 
 =item *
 
-C<email> and C<idn-email> require L<Email::Address::XS> version 1.01 (or higher)
+C<email> and C<idn-email> require L<Email::Address::XS> version 1.04 (or higher)
 
 =item *
 

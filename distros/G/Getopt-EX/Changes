@@ -1,5 +1,10 @@
 Revision history for Perl extension Getopt-EX
 
+v1.24.2 2021-08-16T04:13:53Z
+
+    - Evaluate anonymous function in "main" package so that
+      it can call function in "main" without package name.
+
 v1.24.1 2021-07-25T13:27:05Z
 
     - Require Getopt::Long 2.39 to rescure perl5.14.

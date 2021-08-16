@@ -64,8 +64,18 @@ SKIP: {
 	warn $_;
     }
 
-    my $week = Script->new([qw(--cm *= -C0 1752/9/2)])->run;
+    my @default = qw(--cm *= -C0p0 1752/9/2);
+
+    my $week = Script->new([ @default ])->run;
     compare $week->result, $result{"175209_re"}, "1752/9/2";
+
+    my $netbsd =
+	Script->new([qw(--config netbsd=1), @default ])->run;
+    compare $netbsd->result, $result{"175209_re"}, "netbsd emulation";
+
+    my $crashspace =
+	Script->new([qw(--config crashspace=1), @default])->run;
+    compare $crashspace->result, $result{"175209_re"}, "crashspace emulation";
 }
 
 done_testing;

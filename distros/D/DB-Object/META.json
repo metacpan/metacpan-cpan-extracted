@@ -4,7 +4,7 @@
       "Jacques Deguest (jack@deguest.jp)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -54,7 +54,7 @@
             "Want" : "0.29",
             "common::sense" : "3.74",
             "parent" : "0",
-            "perl" : "5.006000",
+            "perl" : "5.016000",
             "strict" : "0",
             "version" : "0"
          }
@@ -67,6 +67,15 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.9.9",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://git.deguest.jp/jack/DB-Object/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://git.deguest.jp/jack/DB-Object"
+      }
+   },
+   "version" : "v0.9.13",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

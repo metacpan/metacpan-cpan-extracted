@@ -1,33 +1,11 @@
 use Test2::V0;
+use Test2::Require::Module 'Regexp::Pattern::License' => '3.7.0';
 
 use lib 't/lib';
 use Test2::Licensecheck;
 
-my $ver = $Regexp::Pattern::License::VERSION;
+plan 22;
 
-plan 36;
-
-# TODO: simplify when Regexp::Pattern::License v3.7.0 is required
-license_like(
-	't/fedora/MIT',
-	[   qr/Adobe\-Glyph/,
-		qr/BSL/,
-		qr/DSDP/,
-		qr/Expat/,
-		qr/ICU/,
-		qr/MIT~Boehm/,
-		qr/MIT\-CMU/,
-		qr/MIT\-CMU~warranty/,
-		qr/MIT\-enna/,
-		qr/MIT\-feh/,
-		qr/MIT~old/,
-		qr/MIT~oldstyle/,
-		qr/MIT~oldstyle~disclaimer/,
-		qr/PostgreSQL/,
-	]
-);
-my $todo = todo 'not implemented yet'
-	if $ver < v3.7;
 license_like(
 	't/fedora/MIT',
 	[   qr/Adobe\-Glyph/,

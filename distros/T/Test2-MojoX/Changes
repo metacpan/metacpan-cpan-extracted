@@ -1,5 +1,9 @@
 Revision history for Test2-MojoX
 
+0.07    2021-08-14
+        - Improved *_attr and *_text methods in Test2::MojoX to return undef instead of empty string for values that do not
+    exist. (Compatibility with Test::Mojo shipped with Mojolicious 9.21)
+
 0.06    2021-03-07
         - Fixed tests to be compatible with Mojolicious 9.0
 

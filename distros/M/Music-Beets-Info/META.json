@@ -1,0 +1,48 @@
+{
+   "abstract" : "Import data from Beets database into a perl data structure",
+   "author" : [
+      "Magnus Woldrich <m@japh.se>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Music-Beets-Info",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "m@japh.se",
+         "web" : "https://github.com/trapd00r/Music-Beets-Info/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/trapd00r/Music-Beets-Info.git",
+         "web" : "https://github.com/trapd00r/Music-Beets-Info"
+      }
+   },
+   "version" : "0.002",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

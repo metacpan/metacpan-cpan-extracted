@@ -4,7 +4,7 @@ use strict;
 BEGIN { eval { require warnings; warnings->import } }
 
 our @EXPORT_OK = qw( rename );
-our $VERSION = '1.20';
+our $VERSION = '1.30';
 
 sub import {
     require Exporter;
@@ -17,101 +17,103 @@ sub import {
 sub rename_files {
     my $code = shift;
     my $options = shift;
-    _default(\$options); 
+    _default(\$options);
 
+    my $sub = $code;
+    if ( $options->{unicode_strings} ) {
+        require File::Rename::Unicode;
+        $sub = File::Rename::Unicode::code($code,
+                            $options->{encoding});
+    }
     my $errors;
     for (@_) {
         my $was = $_;
-	if ( $options->{filename_only} ) {
-	    require File::Spec;
-	    my($vol, $dir, $file) = File::Spec->splitpath($_);
-	    $code->() for ($file);
-	    $_ = File::Spec->catpath($vol, $dir, $file);
-	}
-	else {
-	    $code->();
-	}
+        if ( $options->{filename_only} ) {
+            require File::Spec;
+            my($vol, $dir, $file) = File::Spec->splitpath($_);
+            $sub->() for ($file);
+            $_ = File::Spec->catpath($vol, $dir, $file);
+        }
+        else {
+            $sub->();
+        }
 
-    	if( $was eq $_ ){ }		# ignore quietly
-    	elsif( -e $_ and not $options->{over_write} ) { 
-	    if (/\s/ or $was =~ /\s/ ) {
-		warn  "'$was' not renamed: '$_' already exists\n"; 
-	    }
-	    else {
-		warn  "$was not renamed: $_ already exists\n"; 
-	    }
-	    $errors ++;
-	}
-    	elsif( $options->{no_action} ) { 
-		print "rename($was, $_)\n";
-	}
-    	elsif( CORE::rename($was,$_)) { 
-		print "$was renamed as $_\n" if $options->{verbose}; 
-	}
-    	else { 	warn  "Can't rename $was $_: $!\n"; $errors ++; }
+        if( $was eq $_ ){ }     # ignore quietly
+        elsif( -e $_ and not $options->{over_write} ) {
+            if (/\s/ or $was =~ /\s/ ) {
+                warn  "'$was' not renamed: '$_' already exists\n";
+            }
+            else {
+                warn  "$was not renamed: $_ already exists\n";
+            }
+            $errors ++;
+        }
+        elsif( $options->{no_action} ) {
+            print "rename($was, $_)\n";
+        }
+        elsif( CORE::rename($was,$_)) {
+            print "$was renamed as $_\n" if $options->{verbose};
+        }
+        else {  warn  "Can't rename $was $_: $!\n"; $errors ++; }
     }
     return !$errors;
 }
 
-sub rename_list { 
+sub rename_list {
     my($code, $options, $fh, $file) = @_;
-    _default(\$options); 
+    _default(\$options);
     print "Reading filenames from ",
-	( defined $file ?		$file 
-	: defined *{$fh}{SCALAR} and
-	  defined ${*{$fh}{SCALAR}} ?	${*{$fh}{SCALAR}}
-	:	 			"file handle ($fh)"
-	),
-	"\n" if $options->{verbose};
+      ( defined $file ?                 $file
+        : defined *{$fh}{SCALAR} and
+          defined ${*{$fh}{SCALAR}} ?   ${*{$fh}{SCALAR}}
+        :                               "file handle ($fh)"
+      ),
+      "\n" if $options->{verbose};
     my @file;
     {
-	local $/ = "\0" if $options->{input_null};
-	chop(@file = <$fh>);
-    }	
+        local $/ = "\0" if $options->{input_null};
+        chop(@file = <$fh>);
+    }
     rename_files $code, $options,  @file;
 }
 
-sub rename { 
+sub rename {
     my($argv, $code, $verbose) = @_;
     if( ref $code ) {
-	if( 'HASH' eq ref $code ) {
-	    if(defined $verbose ) {
-	        require Carp;
-		Carp::carp(<<CARP);
+        if( 'HASH' eq ref $code ) {
+            if(defined $verbose ) {
+                require Carp;
+                Carp::carp(<<CARP);
 File::Rename::rename: third argument ($verbose) ignored
 CARP
-	    } 
-	    $verbose = $code;
-	    $code = delete $verbose->{_code};
-	    unless ( $code ) {
-	    	require Carp;
-		Carp::carp(<<CARP);
+            }
+            $verbose = $code;
+            $code = delete $verbose->{_code};
+            unless ( $code ) {
+                require Carp;
+                Carp::carp(<<CARP);
 File::Rename::rename: no _code in $verbose
 CARP
-	    }
+            }
 
-	}	
-    } 
+        }
+    }
     unless( ref $code ) {
-	if( my $eval = eval <<CODE ) 
+        if( my $eval = eval <<CODE )
 sub {
-#line 1
 $code
-#line
 }
 CODE
-	{	
-	    $code = $eval;
-	} 
-	else {
-	    my $error = $@;
-	    $error =~ s/\(eval\s+\d+\)/\(user-supplied code\)/g;
-	    $error =~ s/\s+line\s+1\b//g unless $code =~ /\n/;
-	    $error =~ s/\"[^#"]*\#line\s+1\n/"/;
-	    $error =~ s/\n\#line\n[^#"]*\"/"/;
-	    $error =~ s/\s*\z/\n/;
-	    die $error;
-	}
+        {
+            $code = $eval;
+        }
+        else {
+            my $error = $@;
+            $error =~ s/\b(at\s+)\(eval\s+\d+\)\s/$1/g;
+            $error =~ s/(\s+line\s+)(\d+)\b/$1 . ($2-1)/eg;
+            $error =~ s/\.?\s*\z/, in:\n$code\n/;
+            die $error;
+        }
     }
     if( @$argv ) { rename_files $code, $verbose, @$argv }
     else { rename_list $code, $verbose, \*STDIN, 'STDIN' }
@@ -134,7 +136,7 @@ File::Rename - Perl extension for renaming multiple files
 
 =head1 SYNOPSIS
 
-  use File::Rename qw(rename);		# hide CORE::rename
+  use File::Rename qw(rename);          # hide CORE::rename
   rename \@ARGV, sub { s/\.pl\z/.pm/ }, 1;
 
   use File::Rename;
@@ -234,6 +236,14 @@ Print manual page, provided by B<-m>.
 
 Print version number, provided by B<-V>.
 
+=item B<unicode_strings> 
+
+Enable unicode_strings feature, provided by B<-u>.
+
+=item B<encoding> 
+
+Encoding for filenames, provided by B<-u>.
+
 =back
 
 =head2 EXPORT
@@ -265,7 +275,7 @@ Errors from the code argument are not trapped.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2004, 2005, 2006, 2011, 2018 by Robin Barker
+Copyright (C) 2004, 2005, 2006, 2011, 2018, 2021 by Robin Barker
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,

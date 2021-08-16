@@ -1,4 +1,4 @@
-Math-Cryptarithm version 0.02
+Math-Cryptarithm version v0.20.1
 =============================
 
 The README is used to introduce the module and provide instructions on
@@ -31,7 +31,7 @@ COPYRIGHT AND LICENCE
 
 Put the correct copyright and licence information here.
 
-Copyright (C) 2021 by FUNG CHEOK YIN
+Copyright (C) 2021 by Cheok-Yin Fung
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.34.0 or,

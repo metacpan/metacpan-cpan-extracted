@@ -4,8 +4,10 @@ author:
   - 'Johan Vromans <jv@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::Exception: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.76'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -18,11 +20,7 @@ no_index:
     - t
     - inc
 requires:
-  ExtUtils::MakeMaker: '6.46'
-  Test::Exception: '0.43'
-  Test::More: '1.3'
   perl: '5.010001'
-resources:
-  repository: https://github.com/sciurius/perl-File-LoadLines.git
-version: v1.020.2
+resources: {}
+version: '1.021'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

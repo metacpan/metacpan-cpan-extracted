@@ -31,7 +31,7 @@ use Astro::FITS::HdrTrans::FITS;
 
 use vars qw/ $VERSION /;
 
-$VERSION = "1.63";
+$VERSION = "1.64";
 
 # in each class we have three sets of data.
 #   - constant mappings

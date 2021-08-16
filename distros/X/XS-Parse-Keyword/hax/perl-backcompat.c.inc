@@ -79,6 +79,13 @@ typedef SV PADNAME;
 static OP *S_op_convert_list(pTHX_ I32 type, I32 flags, OP *o)
 {
   /* A minimal recreation just for our purposes */
+  assert(
+    /* A hardcoded list of the optypes we know this will work for */
+    type == OP_ENTERSUB ||
+    type == OP_JOIN ||
+    type == OP_PUSH ||
+    0);
+
   o->op_type = type;
   o->op_flags |= flags;
   o->op_ppaddr = PL_ppaddr[type];
@@ -93,6 +100,10 @@ static OP *S_op_convert_list(pTHX_ I32 type, I32 flags, OP *o)
 
   return o;
 }
+#endif
+
+#ifndef newMETHOP_named
+#  define newMETHOP_named(type, flags, name)  newSVOP(type, flags, name)
 #endif
 
 #ifndef PARENT_PAD_INDEX_set
@@ -115,4 +126,9 @@ PADOFFSET MY_pad_add_name(pTHX_ const char *name, STRLEN len, U32 flags, HV *typ
 
   return Perl_pad_add_name(aTHX_ SvPV_nolen(namesv), SvCUR(namesv), flags, typestash, ourstash);
 }
+#endif
+
+#if !HAVE_PERL_VERSION(5, 26, 0)
+#  define isIDFIRST_utf8_safe(s, e)  (PERL_UNUSED_ARG(e), isIDFIRST_utf8(s))
+#  define isIDCONT_utf8_safe(s, e)   (PERL_UNUSED_ARG(e), isIDCONT_utf8(s))
 #endif

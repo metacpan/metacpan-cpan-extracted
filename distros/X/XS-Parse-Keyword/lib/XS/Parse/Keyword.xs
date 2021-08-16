@@ -131,6 +131,14 @@ static bool probe_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
 
 #define THISARG ((XSParseKeywordPiece *)SvPVX(argsv))[argi]
 
+  THISARG.line = 
+#if HAVE_PERL_VERSION(5, 20, 0)
+    /* on perl 5.20 onwards, CopLINE(PL_curcop) is only set at runtime; during
+     * parse the parser stores the line number directly */
+    (PL_parser->preambling != NOLINE) ? PL_parser->preambling :
+#endif
+    CopLINE(PL_curcop);
+
   U32 type = piece->type & 0xFFFF;
 
   switch(type) {
@@ -162,6 +170,20 @@ static bool probe_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
         return FALSE;
 
       parse_piece(aTHX_ argsv, argidx, piece);
+      return TRUE;
+
+    case XS_PARSE_KEYWORD_IDENT:
+      THISARG.sv = lex_scan_ident();
+      if(!THISARG.sv)
+        return FALSE;
+      (*argidx)++;
+      return TRUE;
+
+    case XS_PARSE_KEYWORD_PACKAGENAME:
+      THISARG.sv = lex_scan_packagename();
+      if(!THISARG.sv)
+        return FALSE;
+      (*argidx)++;
       return TRUE;
 
     case XS_PARSE_KEYWORD_VSTRING:
@@ -210,6 +232,32 @@ static bool probe_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       return FALSE;
     }
 
+    case XS_PARSE_KEYWORD_SEPARATEDLIST:
+    {
+      const struct XSParseKeywordPieceType *pieces = piece->u.pieces;
+      (*argidx)++; /* tentative */
+      if(!probe_piece(aTHX_ argsv, argidx, pieces + 1)) {
+        (*argidx)--;
+        return FALSE;
+      }
+      /* we're now committed */
+      THISARG.i = 1;
+      if(pieces[2].type)
+        parse_pieces(aTHX_ argsv, argidx, pieces + 2);
+
+      if(!probe_piece(aTHX_ argsv, argidx, pieces + 0))
+        return TRUE;
+
+      while(1) {
+        parse_pieces(aTHX_ argsv, argidx, pieces + 1);
+        THISARG.i++;
+
+        if(!probe_piece(aTHX_ argsv, argidx, pieces + 0))
+          break;
+      }
+      return TRUE;
+    }
+
     case XS_PARSE_KEYWORD_PARENSCOPE:
       if(lex_peek_unichar(0) != '(')
         return FALSE;
@@ -250,6 +298,14 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
     SvGROW(argsv, SvLEN(argsv) * 2);
 
 #define THISARG ((XSParseKeywordPiece *)SvPVX(argsv))[argi]
+
+  THISARG.line = 
+#if HAVE_PERL_VERSION(5, 20, 0)
+    /* on perl 5.20 onwards, CopLINE(PL_curcop) is only set at runtime; during
+     * parse the parser stores the line number directly */
+    (PL_parser->preambling != NOLINE) ? PL_parser->preambling :
+#endif
+    CopLINE(PL_curcop);
 
   bool is_optional = !!(piece->type & XPK_TYPEFLAG_OPT);
   bool is_special  = !!(piece->type & XPK_TYPEFLAG_SPECIAL);
@@ -370,11 +426,15 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
 
     case XS_PARSE_KEYWORD_IDENT:
       THISARG.sv = lex_scan_ident();
+      if(!THISARG.sv && !is_optional)
+        yycroak("Expected an identifier");
       (*argidx)++;
       return;
 
     case XS_PARSE_KEYWORD_PACKAGENAME:
       THISARG.sv = lex_scan_packagename();
+      if(!THISARG.sv && !is_optional)
+        yycroak("Expected a package name");
       (*argidx)++;
       return;
 
@@ -494,7 +554,6 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       return;
 
     case XS_PARSE_KEYWORD_SEPARATEDLIST:
-    {
       THISARG.i = 0;
       (*argidx)++;
       while(1) {
@@ -505,7 +564,6 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
           break;
       }
       return;
-    }
 
     case XS_PARSE_KEYWORD_PARENSCOPE:
       if(is_optional) {

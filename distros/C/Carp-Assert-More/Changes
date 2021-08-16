@@ -1,7 +1,15 @@
 Revision history for Perl extension Carp::Assert::More.
 
+2.0.1   Fri Aug 13 11:57:15 CDT 2021
+        [FIXES]
+        assert_all_keys_in() mistakenly required a non-empty list of
+        keys to check.
 
-2.0.0
+        [ENHANCEMENTS]
+        Sped up assert_isa_in(), assert_is().
+
+
+2.0.0   Thu Aug 12 23:00::00 CDT 2021
         [DIFFERENCES]
         Now requires Perl 5.10 or higher.  No longer requires Carp::Assert.
 
@@ -25,6 +33,9 @@ Revision history for Perl extension Carp::Assert::More.
         of keys to check cannot be empty.
 
         [ENHANCEMENTS]
+        Most of the functions are about twice as fast because of reduced
+        number of function calls internally.
+
         Added assert_context_nonvoid() and assert_context_scalar()
         to assert on how the executing function has been called.
 

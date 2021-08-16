@@ -1,9 +1,10 @@
 package Math::Cryptarithm;
 
-use 5.034000;
 use strict;
 use warnings;
 use Algorithm::Permute;
+use v5.10.0;
+use version;
 
 require Exporter;
 
@@ -19,7 +20,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.02';
+our $VERSION = qv('v0.20.2');
 
 
 # Preloaded methods go here.
@@ -82,7 +83,7 @@ sub equations {
     $_[0]->{_equations};
 }
 
-sub solve {
+sub solve_alphabetvalue_hash {
     my ($self) = @_;
     my @eqs = @{$self->equations};
     my @answers = ();
@@ -132,7 +133,7 @@ sub solve {
 sub solve_ans_in_equations {
     my ($self) = @_;
     my @eqs = @{$self->equations};
-    my @answers_of_hashes = $self->solve()->@*;
+    my @answers_of_hashes = $self->solve_alphabetvalue_hash()->@*;
     my @answers_in_eq;
     for my $my_hash (@answers_of_hashes) {
         my @a_set_of_answer_in_eq;
@@ -159,7 +160,7 @@ Math::Cryptarithm - Solving simple cryptarithm.
 
 =head1 VERSION
 
-Version 0.02
+Version 0.20.2
 
 
 =head1 DESCRIPTION
@@ -202,7 +203,7 @@ See L<English Wikipedia: Verbal arithmetic|https://en.wikipedia.org/wiki/Verbal_
         "ABA * B = ABA"
     ];
 
-    my $abcd_ans = Math::Cryptarithm->new($abcd)->solve();
+    my $abcd_ans = Math::Cryptarithm->new($abcd)->solve_alphabetvalue_hash();
 
     say scalar $abcd_ans->@*;             # 1
     say $abcd_ans->[0]->{"A"};            # 2
@@ -212,7 +213,7 @@ See L<English Wikipedia: Verbal arithmetic|https://en.wikipedia.org/wiki/Verbal_
 
 
     my $magical_seven = ["ABCDEF * 6 = DEFABC"];
-    my $magical_seven_ans = Math::Cryptarithm->new($magical_seven)->solve();
+    my $magical_seven_ans = Math::Cryptarithm->new($magical_seven)->solve_alphabetvalue_hash();
 
     print Dumper($magical_seven_ans);
 
@@ -221,7 +222,7 @@ See L<English Wikipedia: Verbal arithmetic|https://en.wikipedia.org/wiki/Verbal_
 
 =head1 METHODS
 
-=head2 solve()
+=head2 solve_alphabetvalue_hash()
 
 Return a list object of hashes with all possible solutions. Different letters represent different digits.
 
@@ -235,9 +236,9 @@ Return the possible solutions in "decrypted equations" form. See the section Syn
 
 Currently the module runs slowly when the number of variables is equal to or more than 6. Using a backtracking as the algorithm should improve the performance of the module.
 
-=head2 setRep($symbol)
+=head2 "?"
 
-To determine whether allow repetitions. 1 is no repetitions. 0 means repetitions are allowed. Default should be 1.
+Allow "?" to represent arbitary digits. See the related Wikipedia entry (L<zh|https://zh.wikipedia.org/wiki/%E8%9F%B2%E9%A3%9F%E7%AE%97> or L<ja|https://ja.wikipedia.org/wiki/%E8%99%AB%E9%A3%9F%E3%81%84%E7%AE%97>) using "square box" representing any possible digits.
 
 =head2 setLeadingZeros($symbol)
 

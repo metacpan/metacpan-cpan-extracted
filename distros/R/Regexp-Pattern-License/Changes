@@ -7,6 +7,76 @@ Home page:    <https://metacpan.org/release/Regexp-Pattern-License>
 Bug tracker:  <https://bugs.debian.org/libregexp-pattern-license-perl>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.9.1	2021-08-16
+
+ - permit RE2 engine to consume up to 16MiB (default 8MiB is insufficient
+   e.g. on ARMv6)
+
+v3.9.0	2021-08-14
+
+ [ Bug Fixes ]
+ - annotate wide comma (for mulan licenses) in synthesized patterns
+ - avoid synth.nogrant (not only alt.org.wikidata) when synthesizing grant
+   patterns
+ - cover trailing zero on synthesized patterns for objects aladdin_8
+   aladdin_9 efl_1 efl_2 mulan_1 mulan_2
+ - de-randomize fedora and osi IRIs
+ - escape . (dot) in synthesized patterns
+ - fix alt.org.fsf metadata for object afl_3
+ - fix alt.org.wikipedia metadata
+ - fix drop bogus data from bsd_3_clause
+ - fix parens in synthesized patterns
+ - re-tag python_2 as type:combo (not type:singleversion), and fix/update
+   patterns and metadata
+ - tag exception prefix traits as type:trait:exception:prefix (not bogusly
+   as type:trait:grant:prefix)
+
+ [ Documentation ]
+ - document object stability (since v3.1.0)
+ - extend copyright to include recent years, and add Purism SPC as
+   copyright holder
+
+ [ Other ]
+ - Added: add license object psf_2
+ - Added: add license object unicode_dfs, and change objects
+   unicode_dfs_2015 unicode_dfs_2016 from unversioned to singleversion
+ - Added: add license objects bsd_3_clause_eclipse bsd_3_clause_refractions
+ - Added: add/update lots of alt.org.wikidata names and captions
+ - Added: support engine => none (for returning a uncompiled regexp string)
+ - Removed: deprecate license object python: superceded by psf_2 and
+   python_2
+ - Removed: deprecate license object wordnet_3: superceded by wordnet
+   (license is unversioned, version belongs to software project)
+ - add alternative clashing names for objects mit_new x11
+ - add annotation [+]
+ - add trait object license_label_spdx, and synthesize SPDX short-form
+   identifiers distinct from other license labels
+ - add/update lots of alt.org.trove names and captions
+ - bump version
+ - improve alt.org.osi historical metadata
+ - improve and simplify license patterns for objects oldap oldap_1_1
+   oldap_2_0_1 oldap_2_1 oldap_2_2 oldap_2_2_1 oldap_2_2_2 oldap_2_3
+   oldap_2_4 oldap_2_5 oldap_2_6 oldap_2_7 oldap_2_8
+ - optimize annotation and mangling of synthesized patterns
+ - optimize: synthesize name and grant patterns in one loop
+ - optimize: synthesize patterns from metadata name in general loop
+ - optimize: synthesize trove patterns in name/grant loop
+ - relax pattern for object license_label to cover german identifier and
+   space before colon
+ - relax pattern for object licensed_under to optionally end with colon
+ - rewrite description for object x11 to cover origin, and add description
+   to object mit_new
+ - simplify structure: stop use attribute version
+ - synthesize name pattern for object apache
+ - tighten annotations [:] [http://] to not implicitly treat colon or slash
+   as optional
+ - tighten synthesized patterns to cover singleword caption only once
+ - tighten version stopgap to exclude ASCII alphabetic characters and plus,
+   and exclude only roman digits, in synthesized patterns
+ - use general version stopgap for synthesized grant patterns from metadata
+   name
+ - use general version stopgap for synthesized trove patterns
+
 v3.8.1	2021-08-07
 
  [ Bug Fixes ]
@@ -82,7 +152,7 @@ v3.8.0	2021-07-27
    fair_source_0_9 fal fal_1_1 fal_1_2 fal_1_3 festival glide ibm_pibs ijg
    imlib2 leptonica libtiff mpich2 mpl_2_no_copyleft_exception ms_cl nbpl
    nbpl_1 nosl nosl_1 odbl odbl_1 odc_by odc_by_1 pddl pddl_1
-   peer_production sax_pd sds sds_1 sncl_1_10 sncl_2_0_1 sncl_2_0_2
+   peer_production sax_pd sds sds_1 sncl sncl_1_10 sncl_2_0_1 sncl_2_0_2
    sncl_2_1 sncl_2_3 stlport truecrypt truecrypt_3 vspl wordnet wordnet_3
    xfree86 xfree86_1_1 ypl ypl_1 ypl_1_1 zed zend zend_2 zimbra zimbra_1_3
    zimbra_1_4

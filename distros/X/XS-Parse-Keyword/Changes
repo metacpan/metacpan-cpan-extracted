@@ -1,5 +1,11 @@
 Revision history for XS-Parse-Keyword
 
+0.12    2021-08-16
+        [CHANGES]
+         * Support probe on XPK_IDENT, XPK_PACKAGENAME, XPK_COMMALIST
+         * Provide optional versions of XPK_IDENT and XPK_PACKAGENAME
+         * Report the line number each piece was parsed from
+
 0.11    2021-08-03
         [BUGFIXES]
          * Split Builder.pm into two parts (static + dynamic), so the static

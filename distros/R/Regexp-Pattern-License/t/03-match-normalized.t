@@ -6,7 +6,7 @@ use warnings;
 
 use lib 't/lib';
 
-use MyTest tests => 466;
+use MyTest tests => 468;
 
 license_covered(
 	'aal',
@@ -427,7 +427,7 @@ C or perl subroutines supplied by you and linked into this Package shall not be 
 8.
 The name of the Copyright Holder may not be used to endorse or promote products derived from this software without specific prior written permission.
 EOF
-	TODO => [qw(iri_iri subject_license)]
+	TODO => [qw(not_iri_name)]
 );
 
 license_covered(
@@ -795,6 +795,33 @@ EOF
 );
 
 license_covered(
+	'bsd_3_clause_eclipse',
+	name => 'Eclipse Distribution License - v 1.0',
+	text => <<EOF,
+Eclipse Distribution License - v 1.0
+
+Copyright (c) 2007, Eclipse Foundation, Inc. and its licensors.
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+*
+Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+*
+Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+*
+Neither the name of the Eclipse Foundation, Inc. nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+EOF
+	TODO => [qw(name_name)]
+);
+
+license_covered(
 	'bsd_3_clause_lbnl',
 	name => 'Lawrence Berkeley National Labs BSD variant license',
 	text => <<EOF,
@@ -889,6 +916,21 @@ IN NO EVENT WILL SUN OR ITS LICENSORS BE LIABLE FOR ANY LOST REVENUE, PROFIT OR 
 
 You acknowledge that this software is not designed or intended for use in the design, construction, operation or maintenance of any nuclear facility.
 EOF
+);
+
+license_covered(
+	'bsd_3_clause_refractions',
+	name => 'Refractions BSD 3 Clause License (BSD) - v 1.0',
+	text => <<EOF,
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+Neither the name of the Refractions Research nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+EOF
+	TODO => [qw(name_name)]
 );
 
 license_covered(
@@ -4156,6 +4198,11 @@ license_covered(
 	'oldap_2_7',
 	name => 'Open LDAP Public License v2.7',
 	text => <<EOF,
+The OpenLDAP Public License
+Version 2.7, 7 September 2001
+
+Redistribution and use of this software and associated documentation ("Software"), with or without modification, are permitted provided that the following conditions are met:
+
 1.
 Redistributions in source form must retain copyright statements and notices,
 
@@ -4453,27 +4500,21 @@ EOF
 );
 
 license_covered(
+	'psf_2',
+	name => 'Python Software Foundation License version 2',
+	text => <<EOF,
+4.
+PSF is making Python available to Licensee on an "AS IS" basis.
+EOF
+);
+
+license_covered(
 	'public_domain',
 	iri   => 'http://www.linfo.org/publicdomain.html',
 	grant => <<EOF,
 This file is put in the public domain
 EOF
 	TODO => [qw(subject_license)]
-);
-
-license_covered(
-	'python',
-	name => 'Python License',
-	TODO => [qw(name_name subject_license)]
-);
-
-license_covered(
-	'python_2',
-	name => 'Python Software Foundation License version 2',
-	text => <<EOF,
-4.
-PSF is making Python available to Licensee on an "AS IS" basis.
-EOF
 );
 
 license_covered(
@@ -4885,6 +4926,12 @@ EOF
 );
 
 license_covered(
+	'unicode_dfs',
+	name => 'Unicode License Agreement - Data Files and Software',
+	TODO => [qw(subject_iri subject_license)]
+);
+
+license_covered(
 	'unicode_dfs_2015',
 	name => 'Unicode License Agreement - Data Files and Software (2015)',
 	text => <<EOF,
@@ -4895,6 +4942,7 @@ this copyright and permission notice appear in associated documentation, and
 (c)
 there is clear notice in each modified Data File or in the Software as well as in the documentation associated with the Data File(s) or Software that the data or software has been modified.
 EOF
+	TODO => [qw(name_name)]
 );
 
 license_covered(
@@ -5093,12 +5141,6 @@ EOF
 
 license_covered(
 	'wordnet',
-	name => '',
-	TODO => [qw(subject_license)]
-);
-
-license_covered(
-	'wordnet_3',
 	name => 'WordNet',
 	text => <<EOF,
 Permission to use, copy, modify and distribute this software and database and its documentation for any purpose and without fee or royalty is hereby granted, provided that you agree to comply with the following copyright notice and statements, including the disclaimer, and that the same appear on ALL copies of the software, database and documentation, including modifications that you make for internal use or for distribution.
@@ -5416,6 +5458,95 @@ THIS SOFTWARE IS PROVIDED BY <COPYRIGHT HOLDER> ''AS IS'' AND ANY EXPRESS OR IMP
 IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 EOF
 	TODO => [qw(not_iri_name)]
+);
+
+license_covered(
+	'python_2',
+	name => 'Python License 2.0',
+	text => <<EOF,
+PYTHON SOFTWARE FOUNDATION LICENSE VERSION 2
+
+1.
+This LICENSE AGREEMENT is between the Python Software Foundation ("PSF"), and the Individual or Organization ("Licensee") accessing and otherwise using this software ("Python") in source or binary form and its associated documentation.
+
+2.
+Subject to the terms and conditions of this License Agreement, PSF hereby grants Licensee a nonexclusive, royalty-free, world-wide license to reproduce, analyze, test, perform and/or display publicly, prepare derivative works, distribute, and otherwise use Python alone or in any derivative version, provided, however, that PSF's License Agreement and PSF's notice of copyright, i.e., "Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Rights Reserved" are retained in Python alone or in any derivative version prepared by Licensee.
+
+3.
+In the event Licensee prepares a derivative work that is based on or incorporates Python or any part thereof, and wants to make the derivative work available to others as provided herein, then Licensee hereby agrees to include in any such work a brief summary of the changes made to Python.
+
+4.
+PSF is making Python available to Licensee on an "AS IS" basis.
+PSF MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED.
+BY WAY OF EXAMPLE, BUT NOT LIMITATION, PSF MAKES NO AND DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF PYTHON WILL NOT INFRINGE ANY THIRD PARTY RIGHTS.
+
+5.
+PSF SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF PYTHON FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS AS A RESULT OF MODIFYING, DISTRIBUTING, OR OTHERWISE USING PYTHON, OR ANY DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
+
+6.
+This License Agreement will automatically terminate upon a material breach of its terms and conditions.
+
+7.
+Nothing in this License Agreement shall be deemed to create any relationship of agency, partnership, or joint venture between PSF and Licensee.
+This License Agreement does not grant permission to use PSF trademarks or trade name in a trademark sense to endorse or promote products or services of Licensee, or any third party.
+
+8.
+By copying, installing or otherwise using Python, Licensee agrees to be bound by the terms and conditions of this License Agreement.
+
+
+BEOPEN.COM LICENSE AGREEMENT FOR PYTHON 2.0
+
+BEOPEN PYTHON OPEN SOURCE LICENSE AGREEMENT VERSION 1
+
+1.
+This LICENSE AGREEMENT is between BeOpen.com ("BeOpen"), having an office at 160 Saratoga Avenue, Santa Clara, CA 95051, and the Individual or Organization ("Licensee") accessing and otherwise using this software in source or binary form and its associated documentation ("the Software").
+
+2.
+Subject to the terms and conditions of this BeOpen Python License Agreement, BeOpen hereby grants Licensee a non-exclusive, royalty-free, world-wide license to reproduce, analyze, test, perform and/or display publicly, prepare derivative works, distribute, and otherwise use the Software alone or in any derivative version, provided, however, that the BeOpen Python License is retained in the Software, alone or in any derivative version prepared by Licensee.
+
+3.
+BeOpen is making the Software available to Licensee on an "AS IS" basis.
+BEOPEN MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED.
+BY WAY OF EXAMPLE, BUT NOT LIMITATION, BEOPEN MAKES NO AND DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE SOFTWARE WILL NOT INFRINGE ANY THIRD PARTY RIGHTS.
+
+4.
+BEOPEN SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF THE SOFTWARE FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS AS A RESULT OF USING, MODIFYING OR DISTRIBUTING THE SOFTWARE, OR ANY DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
+
+5.
+This License Agreement will automatically terminate upon a material breach of its terms and conditions.
+
+6.
+This License Agreement shall be governed by and interpreted in all respects by the law of the State of California, excluding conflict of law provisions.
+Nothing in this License Agreement shall be deemed to create any relationship of agency, partnership, or joint venture between BeOpen and Licensee.
+This License Agreement does not grant permission to use BeOpen trademarks or trade names in a trademark sense to endorse or promote products or services of Licensee, or any third party.
+As an exception, the "BeOpen Python" logos available at http://www.pythonlabs.com/logos.html may be used according to the permissions granted on that web page.
+
+7.
+By copying, installing or otherwise using the software, Licensee agrees to be bound by the terms and conditions of this License Agreement.
+
+CNRI OPEN SOURCE LICENSE AGREEMENT (for Python 1.6b1)
+
+IMPORTANT: PLEASE READ THE FOLLOWING AGREEMENT CAREFULLY.
+
+BY CLICKING ON "ACCEPT" WHERE INDICATED BELOW, OR BY COPYING, INSTALLING OR OTHERWISE USING PYTHON 1.6, beta 1 SOFTWARE, YOU ARE DEEMED TO HAVE AGREED TO THE TERMS AND CONDITIONS OF THIS LICENSE AGREEMENT.
+
+1.
+This LICENSE AGREEMENT is between the Corporation for National Research Initiatives, having an office at 1895 Preston White Drive, Reston, VA 20191 ("CNRI"), and the Individual or Organization ("Licensee") accessing and otherwise using Python 1.6, beta 1 software in source or binary form and its associated documentation, as released at the www.python.org Internet site on August 4, 2000 ("Python 1.6b1").
+
+2.
+Subject to the terms and conditions of this License Agreement, CNRI hereby grants Licensee a non-exclusive, royalty-free, world-wide license to reproduce, analyze, test, perform and/or display publicly, prepare derivative works, distribute, and otherwise use Python 1.6b1 alone or in any derivative version, provided, however, that CNRIs License Agreement is retained in Python 1.6b1, alone or in any derivative version prepared by Licensee.
+
+Alternately, in lieu of CNRIs License Agreement, Licensee may substitute the following text (omitting the quotes): "Python 1.6, beta 1, is made available subject to the terms and conditions in CNRIs License Agreement.
+This Agreement may be located on the Internet using the following unique, persistent identifier (known as a handle): 1895.22/1011.
+This Agreement may also be obtained from a proxy server on the Internet using the URL:http://hdl.handle.net/1895.22/1011".
+
+3.
+In the event Licensee prepares a derivative work that is based on or incorporates Python 1.6b1 or any part thereof, and wants to make the derivative work available to the public as provided herein, then Licensee hereby agrees to indicate in any such work the nature of the modifications made to Python 1.6b1.
+
+4.
+CNRI is making Python 1.6b1 available to Licensee on an "AS IS" basis.
+CNRI MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED.
+EOF
 );
 
 license_covered(

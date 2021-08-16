@@ -22,12 +22,12 @@
       "configure" : {
          "requires" : {
             "Module::Build" : "0.4004",
-            "XS::Parse::Keyword::Builder" : "0"
+            "XS::Parse::Keyword::Builder" : "0.12"
          }
       },
       "runtime" : {
          "requires" : {
-            "XS::Parse::Keyword" : "0.04",
+            "XS::Parse::Keyword" : "0.12",
             "perl" : "5.016"
          }
       },
@@ -40,7 +40,7 @@
    "provides" : {
       "Syntax::Keyword::Match" : {
          "file" : "lib/Syntax/Keyword/Match.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.04",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

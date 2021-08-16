@@ -6,7 +6,7 @@ BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS);
 
-  $VERSION = '0.008';
+  $VERSION = '0.010';
   @ISA     = qw(Exporter);
 
   @EXPORT_OK = qw(
@@ -109,6 +109,8 @@ which yields the combined string:
 L<dzen|https://github.com/robm/dzen>
 
 L<dzen2|https://github.com/minos-org/dzen2>
+
+L<sdorfehs|https://github.com/jcs/sdorfehs> accepts dzen attributes.
 
 =head1 AUTHOR
 

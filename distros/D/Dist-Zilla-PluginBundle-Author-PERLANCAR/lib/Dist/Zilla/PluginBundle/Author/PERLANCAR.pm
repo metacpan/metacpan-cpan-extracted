@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::Author::PERLANCAR;
 
-our $DATE = '2021-08-09'; # DATE
-our $VERSION = '0.605'; # VERSION
+our $DATE = '2021-08-15'; # DATE
+our $VERSION = '0.606'; # VERSION
 
 use Moose;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -79,7 +79,7 @@ Dist::Zilla::PluginBundle::Author::PERLANCAR - Dist::Zilla like PERLANCAR when y
 
 =head1 VERSION
 
-This document describes version 0.605 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2021-08-09.
+This document describes version 0.606 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2021-08-15.
 
 =head1 SYNOPSIS
 
@@ -144,7 +144,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexandr Ciornii Steven Haryanto (on Asus Zenbook)
+=for stopwords Alexandr Ciornii Steven Haryanto
 
 =over 4
 
@@ -154,9 +154,26 @@ Alexandr Ciornii <alexchorny@gmail.com>
 
 =item *
 
-Steven Haryanto (on Asus Zenbook) <stevenharyanto@gmail.com>
+Steven Haryanto <sharyanto@cpan.org>
 
 =back
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

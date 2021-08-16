@@ -1,0 +1,6 @@
+bin/mpd-beets-np
+lib/Music/Beets/Info.pm
+Makefile.PL
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

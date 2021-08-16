@@ -1,4 +1,12 @@
 
+= 2021/08/14
+
+Missing changelog entry
+
+= 2021/08/13
+
+No warnings on undef inputs (broken in 2021.0726)
+
 = 2021/08/04
 
 Removal of reference benchmark from test suite (moved to xt/bench)

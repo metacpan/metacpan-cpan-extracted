@@ -15,13 +15,16 @@ t/File-Rename-script.t
 t/File-Rename-list.t
 t/File-Rename-list-null.t
 t/File-Rename-require.t
+t/File-Rename-unicode.t
 t/File-Rename-V.t
 t/rename-darwin.t
 t/rename-examples.t
+t/File-Rename-dash.t
 t/rename-ostype.t
 t/testlib.pl
 lib/File/Rename.pm
 lib/File/Rename/Options.pm
+lib/File/Rename/Unicode.pm
 rename.PL
 examples/rename.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)

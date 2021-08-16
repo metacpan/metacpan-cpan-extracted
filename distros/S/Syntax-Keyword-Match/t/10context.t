@@ -21,10 +21,7 @@ use Syntax::Keyword::Match;
 }
 
 # in list context
-TODO: {
-   local $TODO = "match/case in list context - RT135138";
-   #  https://rt.cpan.org/Ticket/Display.html?id=135138
-
+{
    my @ret = do {
       my $topic = "x,y";
       match($topic : eq) {

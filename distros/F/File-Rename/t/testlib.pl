@@ -17,9 +17,16 @@ sub tempdir {
 sub create {
     my $d = $tempdir;
     die unless $d and -d $d;
+    my @created;
     for (@_) { 
-        create_file(File::Spec->catfile($d, $_), $_) or die; 
+        my $path = File::Spec->catfile($d, $_);
+        my $text = $_;
+        $text =~ s/[^\x20-\x7e]/?/g;
+        if ( create_file($path, $text) ) {
+            push @created, $path;
+        }
     } 
+    return @created;
 }
 
 sub listdir {
@@ -36,10 +43,10 @@ sub create_file {
     local *FILE; 
     if (open  FILE, '>', $file) {
     	print FILE @_;
-    	close FILE or die $!;
-	return 1;
+        return 1 if close FILE;
     }
-    $file =~ s/\n/\\n/;
+    $file =~ s/\n/\\n/g;
+    $file =~ s/\s/\\ /g;
     diag "Can't create file \"$file\": $!\n";
     return;
 } 

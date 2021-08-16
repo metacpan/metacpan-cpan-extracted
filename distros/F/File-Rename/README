@@ -1,9 +1,9 @@
-File-Rename version 1.20
+File-Rename version 1.30
 ========================
 
 File::Rename provides an implementation of Larry Wall's eg/rename
-command.  All I have done is add some error checking and (more recently)
-add the File/Rename.pm module.
+command.  All I have done is add some error checking and 
+add the File/Rename.pm module.  More options have been added.
 
 An earlier version of the script is out in the Internet and is included
 with some linuxes, and the original eg/rename is not included in the
@@ -18,8 +18,10 @@ has similar options to the revised script.
 For Windows, the script is called file-rename to avoid clashes with
 existing rename command.
 
-In 1.00, File::Require::Options is a separate module, 
+In 1.00, File::Rename::Options is a separate module, 
 and is not made visible by C<require File::Rename>. 
+
+In 1.30, the File::Rename::Unicode module was added.
 
 INSTALLATION
 
@@ -44,9 +46,34 @@ This module requires these other modules and libraries:
 File::Basename File::Path File::Spec Getopt::Long
 (all included with Perl). 
 
+Unicode support depends on Perl version 5.12.0.
+
 Testing requires File::Temp and Test::More which are
 available with perl 5.6.0.  I have successfully installed
 those modules for perl 5.005_05 and tested this module.
+
+Testing on earlier versions of Perl is now only done
+on CPAN Testers.  The earlist Perl version which is
+known to work with recent versions of File::Rename is
+Perl version 5.8.9.
+
+UNICODE SUPPORT
+
+File::Rename is built round CORE::rename(), which expects 
+filenames as octet strings.  By default, File::Rename
+expects all filenames to be octet strings, with no special
+meanings for non-ascii octets.
+
+It is possible for the user-supplied code to treat the 
+filenames as Perl strings consisting of unicode characters,
+while CORE::readme() and other file tests still working on
+octet strings.  This is enabled with -u (--unicode).
+
+It is possible to specify the encoding of filenames, with: 
+--unicode encoding.  Filenames are decoded from octet 
+strings to unicode strings before applying the user code,
+and then the resulting string is encoded for CORE::rename.
+upgrade filenames to unicode (encoded as utf8) by default.
 
 COPYRIGHT AND LICENCE
 

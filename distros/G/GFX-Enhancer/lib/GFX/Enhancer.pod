@@ -1,0 +1,28 @@
+=head1 NAME
+
+GFX::Enhancer - Perl extension for enhancing scanned in images
+
+=head1 SYNOPSIS
+
+  use GFX::Enhancer;
+
+=head1 DESCRIPTION
+
+This software includes filters for PNG images
+
+=head2 EXPORT
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+Kobold Wizard Johan, E<lt>koboldwiz@yahoo.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2021 by Kobold Wizard Johan
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.32.0 or,
+at your option, any later version of Perl 5 you may have available.
+

@@ -18,7 +18,7 @@ BEGIN
     use parent qw( DB::Object::Query );
     use Devel::Confess;
     our( $VERSION, $DEBUG, $VERBOSE );
-    $VERSION = '0.3.6';
+    $VERSION = 'v0.3.6';
     $DEBUG = 0;
     $VERBOSE = 0;
 };
@@ -26,9 +26,9 @@ BEGIN
 sub init
 {
     my $self = shift( @_ );
-    $self->{ 'having' } = '';
+    $self->{having} = '';
     $self->SUPER::init( @_ );
-    $self->{ 'binded_having' } = [];
+    $self->{binded_having} = [];
     return( $self );
 }
 
@@ -45,7 +45,7 @@ sub format_from_epoch
     }
     else
     {
-        return( sprintf( "FROM_UNIXTIME(%s)", $opts->{value} ) );
+        return( sprintf( 'FROM_UNIXTIME(%s)', $opts->{value} ) );
     }
 }
 
@@ -56,7 +56,7 @@ sub format_to_epoch
     $opts = shift( @_ ) if( scalar( @_ ) == 1 && $self->_is_hash( $_[0] ) );
     if( $opts->{bind} )
     {
-        return( "UNIX_TIMESTAMP(?)" );
+        return( 'UNIX_TIMESTAMP(?)' );
     }
     else
     {
@@ -115,7 +115,7 @@ sub replace
     });
     my( $fields, $values ) = $self->format_statement();
     ## $self->{ 'binded_values' } = $db_data->{ 'binded_values' };
-    my $query = $self->{ 'query' } = $select ? "REPLACE INTO $table $select" : "REPLACE INTO $table ($fields) VALUES($values)";
+    my $query = $self->{query} = $select ? "REPLACE INTO $table $select" : "REPLACE INTO $table ($fields) VALUES($values)";
     ## Everything meaningfull lies within the object
     ## If no bind should be done _save_bind does nothing
     $self->_save_bind();
@@ -138,11 +138,12 @@ sub replace
 sub reset
 {
     my $self = shift( @_ );
-    if( !$self->{ 'query_reset' } )
+    if( !$self->{query_reset} )
     {
-        map{ delete( $self->{ $_ } ) } qw( alias local binded binded_values binded_where binded_limit binded_group binded_having binded_order where limit group_by order_by reverse from_unixtime unix_timestamp sorted );
-        $self->{ 'query_reset' }++;
-        $self->{ 'enhance' } = 1;
+        my $keys = [qw( alias local binded binded_values binded_where binded_limit binded_group binded_having binded_order where limit group_by order_by reverse from_unixtime unix_timestamp sorted )];
+        CORE::delete( @$self{ @$keys } );
+        $self->{query_reset}++;
+        $self->{enhance} = 1;
     }
     return( $self );
 }
@@ -167,42 +168,10 @@ sub reset_bind
 sub _query_components
 {
     my $self = shift( @_ );
-    my $type = lc( shift( @_ ) ) || $self->_query_type() || return( $self->error( "You must specify a query type: select, insert, update or delete" ) );
+    my $type = lc( shift( @_ ) ) || $self->_query_type() || return( $self->error( 'You must specify a query type: select, insert, update or delete' ) );
     my( $where, $group, $having, $sort, $order, $limit );
     $where  = $self->where();
-    if( $type eq "select" )
-    {
-        $group  = $self->group();
-        $having = $self->having();
-        $sort  = $self->reverse() ? 'DESC' : $self->sort() ? 'ASC' : '';
-        $order  = $self->order();
-        $limit  = $self->limit();
-    }
-    elsif( $type eq 'update' || $type eq 'delete' )
-    {
-        my( @offset_limit ) = $self->limit;
-        ## $self->message( 3, "limit array value received contains: ", sub{ $self->dumper( \@offset_limit ) } );
-        ## https://dev.mysql.com/doc/refman/5.7/en/update.html
-        ## https://dev.mysql.com/doc/refman/5.7/en/delete.html
-        $limit = sprintf( 'LIMIT %d', $offset_limit[0] ) if( scalar( @offset_limit ) );
-    }
-    my @query = ();
-    push( @query, $where ) if( $where );
-    push( @query, $group ) if( $group  );
-    push( @query, $having ) if( $having );
-    push( @query, $order ) if( $order );
-    push( @query, $sort ) if( $sort && $order );
-    push( @query, $limit ) if( $limit );
-    return( \@query );
-}
-
-sub _query_components
-{
-    my $self = shift( @_ );
-    my $type = lc( shift( @_ ) ) || $self->_query_type() || return( $self->error( "You must specify a query type: select, insert, update or delete" ) );
-    my( $where, $group, $having, $sort, $order, $limit );
-    $where  = $self->where();
-    if( $type eq "select" )
+    if( $type eq 'select' )
     {
         $group  = $self->group();
         $having = $self->having();
@@ -238,3 +207,94 @@ sub _query_components
 1;
 
 __END__
+
+=encoding utf-8
+
+=head1 NAME
+
+DB::Object::Mysql::Query - Query Object for MySQL
+
+=head1 SYNOPSIS
+
+    use DB::Object::Mysql::Query;
+    my $this = DB::Object::Mysql::Query->new || die( DB::Object::Mysql::Query->error, "\n" );
+
+=head1 VERSION
+
+    v0.3.6
+
+=head1 DESCRIPTION
+
+This is a MySQL specific query object.
+
+=head1 METHODS
+
+=head2 binded_having
+
+Sets or gets the array object (L<Module::Generic::Array>) for the binded value in C<HAVING> clauses.
+
+=head2 format_from_epoch
+
+This takes the parameters I<bind> and I<value> and returns a formatted C<FROM_UNIXTIME> expression.
+
+=head2 format_to_epoch
+
+This takes the parameters I<bind>, I<value> and I<quote>  and returns a formatted expression to returns the epoch value out of the given field: C<UNIX_TIMESTAMP>
+
+=head2 having
+
+Calls L<DB::Object::Query/_where_having> to build a C<having> clause.
+
+=head2 limit
+
+Build a new L<DB::Object::Query::Clause> clause object by calling L</_process_limit> and return it.
+
+=head2 replace
+
+This method can take either 1 parameter which would then be a L<DB::Object::Statement> object, or it can also be an hash reference of options.
+
+It can alternatively take an hash of options.
+
+If a statement was provided, it will be stringified calling L<DB::Object::Statement/as_string> and used as a select query in the C<replace> statement.
+
+When preparing the C<replace> query, this will be mindful to avoid fields that are C<null> by default and not provided among the options.
+
+If called in void context, this will execute the prepared statement immediately.
+
+It returns the prepared statement handler (L<DB::Object::Statement>).
+
+=head2 reset
+
+If the object property C<query_reset> is not already set, this will remove the following properties from the current query object, set L<DB::Object::Query/enhance> to true and return the query object.
+
+Properties removed are: alias local binded binded_values binded_where binded_limit binded_group binded_having binded_order where limit group_by order_by reverse from_unixtime unix_timestamp sorted
+
+=head2 reset_bind
+
+Reset all the following object properties to an anonymous array: binded binded_where binded_group binded_having binded_order binded_limit
+
+=head2 _query_components
+
+This is called by the various query methods like L<DB::Object::Query/select>, L<DB::Object::Query/insert>, L<DB::Object::Query/update>, L<DB::Object::Query/delete>
+
+It will get the various query components (group, having, sort, order, limit) that have been set and add them formatted to an array that is returned.
+
+This version of L</_query_components> exists here to provide MySQL specific implementation. See also the generic one in L<DB::Object::Query/_query_components>
+
+=head1 SEE ALSO
+
+L<perl>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2019-2021 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut
+

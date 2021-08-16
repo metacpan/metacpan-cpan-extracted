@@ -8,20 +8,18 @@ use Scalar::Util;
 
 use vars qw( $VERSION @ISA @EXPORT );
 
-sub _any(&;@);
-
 =head1 NAME
 
 Carp::Assert::More - Convenience assertions for common situations
 
 =head1 VERSION
 
-Version 2.0.0
+Version 2.0.1
 
 =cut
 
 BEGIN {
-    $VERSION = '2.0.0';
+    $VERSION = '2.0.1';
     @ISA = qw(Exporter);
     @EXPORT = qw(
         assert_all_keys_in
@@ -82,12 +80,10 @@ Carp::Assert::More is a convenient set of assertions to make the habit
 of writing assertions even easier.
 
 Everything in here is effectively syntactic sugar.  There's no technical
-difference between calling
+difference between calling one of these functions:
 
-    assert_isa( $foo, 'DateTime' );
-
-or
     assert_datetime( $foo );
+    assert_isa( $foo, 'DateTime' );
 
 that are provided by Carp::Assert::More and calling these assertions
 from Carp::Assert
@@ -111,10 +107,12 @@ sub assert_is($$;$) {
     my $match = shift;
     my $name = shift;
 
-    # undef only matches undef
-    return if !defined($string) && !defined($match);
-
-    return if defined($string) && defined($match) && ($string eq $match);
+    if ( defined($string) ) {
+        return if defined($match) && ($string eq $match);
+    }
+    else {
+        return if !defined($match);
+    }
 
     require Carp;
     &Carp::confess( _fail_msg($name) );
@@ -504,7 +502,11 @@ sub assert_isa_in($$;$) {
     my $types = shift;
     my $name  = shift;
 
-    return if _any { Scalar::Util::blessed($obj) && $obj->isa($_) } @{$types};
+    if ( Scalar::Util::blessed($obj) ) {
+        for ( @{$types} ) {
+            return if $obj->isa($_);
+        }
+    }
 
     require Carp;
     &Carp::confess( _fail_msg($name) );
@@ -955,6 +957,8 @@ This is used to ensure that there are no extra keys in a given hash.
 
     assert_all_keys_in( $obj, [qw( height width depth )], '$obj can only contain height, width and depth keys' );
 
+You can pass an empty list of C<@names>.
+
 =cut
 
 sub assert_all_keys_in($$;$) {
@@ -964,7 +968,7 @@ sub assert_all_keys_in($$;$) {
 
     my $ok = 0;
     if ( ref($hash) eq 'HASH' || (Scalar::Util::blessed( $hash ) && $hash->isa( 'HASH' )) ) {
-        if ( ref($keys) eq 'ARRAY' && (@{$keys} > 0) ) {
+        if ( ref($keys) eq 'ARRAY' ) {
             $ok = 1;
             my %keys = map { $_ => 1 } @{$keys};
             for my $key ( keys %{$hash} ) {
@@ -1112,14 +1116,6 @@ accidentally use C<assert($msg)>, which of course never fires.
 sub assert_fail(;$) {
     require Carp;
     &Carp::confess( _fail_msg($_[0]) );
-}
-
-
-# Since List::Util doesn't have any() all the way back.
-sub _any(&;@) {
-    my $sub = shift;
-    $sub->($_) && return 1 for @_;
-    return 0;
 }
 
 

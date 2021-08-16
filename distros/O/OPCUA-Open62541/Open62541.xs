@@ -186,10 +186,18 @@ typedef struct {
 	ClientCallbackData	sc_delete;
 } * SubscriptionContext;
 
-typedef struct {
+typedef struct MonitoredItemContext {
 	ClientCallbackData	mc_change;
 	ClientCallbackData	mc_delete;
+	SV *			mc_arrays;
 } * MonitoredItemContext;
+
+typedef struct MonitoredItemArrays {
+	MonitoredItemContext				ma_mon;
+	void **						ma_context;
+	UA_Client_DataChangeNotificationCallback *	ma_change;
+	UA_Client_DeleteMonitoredItemCallback *		ma_delete;
+} * OPCUA_Open62541_MonitoredItemArrays;
 
 static void XS_pack_OPCUA_Open62541_DataType(SV *, OPCUA_Open62541_DataType)
     __attribute__((unused));
@@ -2117,10 +2125,8 @@ clientDeleteMonitoredItemCallback(UA_Client *client, UA_UInt32 subId,
 	SubscriptionContext sub = subContext;
 	MonitoredItemContext mon = monContext;
 
-	DPRINTF("client %p, sub %p, sc_change %p, sc_delete %p, "
-	    "mon %p, mc_change %p, mc_delete %p",
-	    client, sub, sub->sc_change, sub->sc_delete,
-	    mon, mon->mc_change, mon->mc_delete);
+	DPRINTF("client %p, sub %p, mon %p, mc_change %p, mc_delete %p",
+	    client, sub, mon, mon->mc_change, mon->mc_delete);
 
 	if (mon->mc_delete) {
 		ENTER;
@@ -2150,7 +2156,8 @@ clientDeleteMonitoredItemCallback(UA_Client *client, UA_UInt32 subId,
 
 	if (mon->mc_change)
 		deleteClientCallbackData(mon->mc_change);
-	free(mon);
+
+	SvREFCNT_dec(mon->mc_arrays);
 }
 
 static void
@@ -2664,6 +2671,23 @@ INCLUDE: Open62541-statuscode.xsh
 
 #############################################################################
 INCLUDE: Open62541-destroy.xsh
+
+#############################################################################
+MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::MonitoredItemArrays
+
+void
+MonitoredItemArrays_DESTROY(marr)
+	OPCUA_Open62541_MonitoredItemArrays		marr;
+    CODE:
+	DPRINTF("marr %p, ma_mon %p, ma_context %p, ma_change %p, "
+	    "ma_delete %p",
+	    marr, marr->ma_mon, marr->ma_context, marr->ma_change,
+	    marr->ma_delete);
+	free(marr->ma_delete);
+	free(marr->ma_change);
+	free(marr->ma_context);
+	free(marr->ma_mon);
+	free(marr);
 
 #############################################################################
 MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::Variant	PREFIX = UA_Variant_
@@ -4257,19 +4281,18 @@ UA_Client_MonitoredItems_createDataChanges(client, request, contextsSV, callback
 	SV *						contextsSV
 	SV *						callbacksSV
 	SV *						deleteCallbacksSV
-    INIT:
+    PREINIT:
 	size_t						itemsToCreateSize;
 	size_t						i;
 	ssize_t						top;
-	UA_Client_DataChangeNotificationCallback *	callbacks;
-	UA_Client_DeleteMonitoredItemCallback *		deleteCallbacks;
 	AV *						contextsAV;
 	AV *						callbacksAV;
 	AV *						deleteCallbacksAV;
 	SV **						contextSV;
 	SV **						callbackSV;
 	SV **						deleteCallbackSV;
-	MonitoredItemContext *				mons;
+	OPCUA_Open62541_MonitoredItemArrays		marr;
+	SV *						marrSV;
 	SV *						sv;
     CODE:
 	itemsToCreateSize = request->itemsToCreateSize;
@@ -4289,7 +4312,8 @@ UA_Client_MonitoredItems_createDataChanges(client, request, contextsSV, callback
 		contextsAV = NULL;
 	}
 	if (SvOK(callbacksSV)) {
-		if (!SvROK(callbacksSV) || SvTYPE(SvRV(callbacksSV)) != SVt_PVAV)
+		if (!SvROK(callbacksSV) ||
+		    SvTYPE(SvRV(callbacksSV)) != SVt_PVAV)
 			CROAK("Not an ARRAY reference for callbacks");
 
 		callbacksAV = (AV*)SvRV(callbacksSV);
@@ -4303,7 +4327,8 @@ UA_Client_MonitoredItems_createDataChanges(client, request, contextsSV, callback
 		callbacksAV = NULL;
 	}
 	if (SvOK(deleteCallbacksSV)) {
-		if (!SvROK(deleteCallbacksSV) || SvTYPE(SvRV(deleteCallbacksSV)) != SVt_PVAV)
+		if (!SvROK(deleteCallbacksSV) ||
+		    SvTYPE(SvRV(deleteCallbacksSV)) != SVt_PVAV)
 			CROAK("Not an ARRAY reference for deleteCallbacks");
 
 		deleteCallbacksAV = (AV*)SvRV(deleteCallbacksSV);
@@ -4317,25 +4342,29 @@ UA_Client_MonitoredItems_createDataChanges(client, request, contextsSV, callback
 		deleteCallbacksAV = NULL;
 	}
 
-	callbacks = calloc(itemsToCreateSize,
-	    sizeof(UA_Client_DataChangeNotificationCallback*));
-	if (callbacks == NULL)
+	marr = calloc(1, sizeof(*marr));
+	if (marr == NULL)
 		CROAKE("calloc");
+	/*
+	 * Convert struct MonitoredItemArrays into a PV.  This
+	 * allows to use Perl's ref counting for memory management.
+	 * The destroy function will free everything.  Leaks can
+	 * be found with Test::LeakTrace.
+	 */
+	marrSV = sv_2mortal(sv_setref_pv(newSV(0),
+	    "OPCUA::Open62541::MonitoredItemArrays", marr));
 
-	deleteCallbacks = calloc(itemsToCreateSize,
-	    sizeof(UA_Client_DeleteMonitoredItemCallback*));
-	if (deleteCallbacks == NULL)
+	marr->ma_mon = calloc(itemsToCreateSize, sizeof(*marr->ma_mon));
+	marr->ma_context = calloc(itemsToCreateSize, sizeof(*marr->ma_context));
+	marr->ma_change = calloc(itemsToCreateSize, sizeof(*marr->ma_change));
+	marr->ma_delete = calloc(itemsToCreateSize, sizeof(*marr->ma_delete));
+	if (marr->ma_mon == NULL || marr->ma_context == NULL ||
+	    marr->ma_change == NULL || marr->ma_delete == NULL) {
+		/* The destroy function of the mortal marrSV will free. */
 		CROAKE("calloc");
-
-	mons = calloc(itemsToCreateSize, sizeof(*mons));
-	if (mons == NULL)
-		CROAKE("calloc");
+	}
 
 	for (i = 0; i < itemsToCreateSize; i++) {
-		mons[i] = calloc(2, sizeof(**mons));
-		if (mons[i] == NULL)
-			CROAKE("calloc");
-
 		if (contextsAV != NULL)
 			contextSV = av_fetch(contextsAV, i, 0);
 		else {
@@ -4354,19 +4383,42 @@ UA_Client_MonitoredItems_createDataChanges(client, request, contextsSV, callback
 			deleteCallbackSV = NULL;
 
 		if (callbackSV != NULL && SvOK(*callbackSV))
-			mons[i]->mc_change = newClientCallbackData(
+			marr->ma_mon[i].mc_change = newClientCallbackData(
 			    *callbackSV, ST(0), *contextSV);
-
 		if (deleteCallbackSV != NULL && SvOK(*deleteCallbackSV))
-			mons[i]->mc_delete = newClientCallbackData(
+			marr->ma_mon[i].mc_delete = newClientCallbackData(
 			    *deleteCallbackSV, ST(0), *contextSV);
+		marr->ma_mon[i].mc_arrays = SvREFCNT_inc(marrSV);
 
-		callbacks[i] = clientDataChangeNotificationCallback;
-		deleteCallbacks[i] = clientDeleteMonitoredItemCallback;
+		marr->ma_context[i] = &marr->ma_mon[i];
+		marr->ma_change[i] = clientDataChangeNotificationCallback;
+		marr->ma_delete[i] = clientDeleteMonitoredItemCallback;
 	}
 
+	DPRINTF("client %p, items %zu, marr %p, ma_mon %p, ma_context %p, "
+	    "ma_change %p, ma_delete %p",
+	    client, itemsToCreateSize, marr, marr->ma_mon, marr->ma_context,
+	    marr->ma_change, marr->ma_delete);
+
 	RETVAL = UA_Client_MonitoredItems_createDataChanges(client->cl_client,
-	    *request, (void **)mons, callbacks, deleteCallbacks);
+	    *request, marr->ma_context, marr->ma_change, marr->ma_delete);
+
+	if (SvREFCNT(marrSV) > 1 &&
+	    RETVAL.responseHeader.serviceResult != UA_STATUSCODE_GOOD) {
+		for (i = 0; i < itemsToCreateSize; i++) {
+			if (marr->ma_mon[i].mc_delete)
+				deleteClientCallbackData(
+				    marr->ma_mon[i].mc_delete);
+			if (marr->ma_mon[i].mc_change)
+				deleteClientCallbackData(
+				    marr->ma_mon[i].mc_change);
+			/*
+			 * When mc_arrays ref count reaches 0, Perl will free
+			 * everything in MonitoredItemArrays destroy function.
+			 */
+			SvREFCNT_dec(marr->ma_mon[i].mc_arrays);
+		}
+	}
     OUTPUT:
 	RETVAL
 
@@ -4380,22 +4432,54 @@ UA_Client_MonitoredItems_createDataChange(client, subscriptionId, timestampsToRe
 	SV *						callback
 	SV *						deleteCallback
     PREINIT:
-	MonitoredItemContext				mon;
+	OPCUA_Open62541_MonitoredItemArrays		marr;
+	SV *						marrSV;
     CODE:
-	mon = calloc(1, sizeof(*mon));
-	if (mon == NULL)
+	marr = calloc(1, sizeof(*marr));
+	if (marr == NULL)
 		CROAKE("calloc");
+	/*
+	 * Convert struct MonitoredItemArrays into a PV.  This
+	 * allows to use Perl's ref counting for memory management.
+	 * The destroy function will free everything.  Leaks can
+	 * be found with Test::LeakTrace.
+	 */
+	marrSV = sv_2mortal(sv_setref_pv(newSV(0),
+	    "OPCUA::Open62541::MonitoredItemArrays", marr));
+
+	marr->ma_mon = calloc(1, sizeof(*marr->ma_mon));
+	if (marr->ma_mon == NULL) {
+		/* The destroy function of the mortal marrSV will free. */
+		CROAKE("calloc");
+	}
 	if (SvOK(callback))
-		mon->mc_change = newClientCallbackData(
+		marr->ma_mon[0].mc_change = newClientCallbackData(
 		    callback, ST(0), context);
 	if (SvOK(deleteCallback))
-		mon->mc_delete = newClientCallbackData(
+		marr->ma_mon[0].mc_delete = newClientCallbackData(
 		    deleteCallback, ST(0), context);
+	marr->ma_mon[0].mc_arrays = SvREFCNT_inc(marrSV);
+
+	DPRINTF("client %p, marr %p, ma_mon %p, mc_change %p, mc_delete %p",
+	    client, marr, marr->ma_mon,
+	    marr->ma_mon[0].mc_change, marr->ma_mon[0].mc_delete);
 
 	RETVAL = UA_Client_MonitoredItems_createDataChange(client->cl_client,
-	    subscriptionId, timestampsToReturn, *item, mon,
+	    subscriptionId, timestampsToReturn, *item, &marr->ma_mon[0],
 	    clientDataChangeNotificationCallback,
 	    clientDeleteMonitoredItemCallback);
+
+	if (SvREFCNT(marrSV) > 1 && RETVAL.statusCode != UA_STATUSCODE_GOOD) {
+		if (marr->ma_mon[0].mc_delete)
+			deleteClientCallbackData(marr->ma_mon[0].mc_delete);
+		if (marr->ma_mon[0].mc_change)
+			deleteClientCallbackData(marr->ma_mon[0].mc_change);
+		/*
+		 * When mc_arrays ref count reaches 0, Perl will free
+		 * everything in MonitoredItemArrays destroy function.
+		 */
+		SvREFCNT_dec(marr->ma_mon[0].mc_arrays);
+	}
     OUTPUT:
 	RETVAL
 

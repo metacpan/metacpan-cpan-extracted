@@ -16,7 +16,7 @@ File::LoadLines - Load lines from file
 
 =cut
 
-our $VERSION = '1.02';
+our $VERSION = '1.021';
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@ NAME
     String::Copyright - Representation of text-based copyright statements
 
 VERSION
-    Version 0.003006
+    Version 0.003007
 
 SYNOPSIS
         use String::Copyright;
@@ -38,7 +38,7 @@ OPTIONS
     By default unset: All lines are parsed.
 
   format( \&sub )
-        use String::Copyright { format => \&NGU_style } };
+        use String::Copyright { format => \&GNU_style } };
 
         sub GNU_style {
             my ( $years, $owners ) = @_;

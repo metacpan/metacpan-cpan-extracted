@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/local/bin/perl
 
 use Test::More qw( no_plan );
 select(($|=1,select(STDERR),$|=1)[1]);
@@ -12,7 +12,7 @@ BEGIN
 	use JSON;
 };
 
-## BEGIN { use_ok( 'DB::Object::Postgres' ); };
+# BEGIN { use_ok( 'DB::Object::Postgres' ); };
 
 SKIP:
 {
@@ -20,11 +20,15 @@ SKIP:
 	{
 		require DBD::Pg;
 	};
-	skip( "DBD::Pg is not installed", 20 ) if( $@ );
+	skip( "DBD::Pg is not installed", 24 ) if( $@ );
 	use_ok( 'DB::Object::Postgres' );
+    use_ok( "DB::Object::Postgres::Query" );
+    use_ok( "DB::Object::Postgres::Statement" );
+    use_ok( "DB::Object::Postgres::Lo" );
+    use_ok( "DB::Object::Postgres::Tables" );
 	
-	## Connection parameters are taken from environment variables (DB_NAME, DB_LOGIN, DB_PASSWD, DB_DRIVER, DB_SCHEMA), or from file (DB_CON_FILE) or from uri (DB_CON_URI)
-	## DB_CON_URI=http://localhost:5432?database=postgres&login=jack&
+	# Connection parameters are taken from environment variables (DB_NAME, DB_LOGIN, DB_PASSWD, DB_DRIVER, DB_SCHEMA), or from file (DB_CON_FILE) or from uri (DB_CON_URI)
+	# DB_CON_URI=http://localhost:5432?database=postgres&login=jack&
 	my $con_params =
 	{
 	'db'		=> 'postgres',
@@ -49,7 +53,7 @@ SKIP:
 	# $pg->debug( 3 );
 	ok( $dbh1, "Getting DB::Object::Postgres object" );
 	isa_ok( $dbh1, 'DB::Object::Postgres', "Checking class of object" );
-	## should trigger a connection using our shell login id and postgres database
+	# should trigger a connection using our shell login id and postgres database
 	$ENV{DB_HOST} ||= 'localhost';
 	my @db = $dbh1->databases;
 	ok( @db, "Checking available databases" );
@@ -129,7 +133,7 @@ SQL
 	is( $result, $expected, "Checking INSERT statement" );
 	$cust->reset;
 
-	## Checking select query
+	# Checking select query
 	$cust->where( email => 'john@example.org' );
 	$cust->order( 'last_name' );
 	$cust->having( email => qr/\@example/ );
@@ -138,12 +142,12 @@ SQL
 	pass( "Customer select query object" );
 	$result = $cust_sth_sel->as_string;
 	$expected = <<SQL;
-SELECT id, first_name, last_name, email, created, modified, active, created::ABSTIME::INTEGER AS created_unixtime, modified::ABSTIME::INTEGER AS modified_unixtime, CONCAT(first_name, ' ', last_name) AS name FROM customers WHERE email='john\@example.org' HAVING email ~ '\\\@example' ORDER BY last_name LIMIT 10
+SELECT id, first_name, last_name, email, created, modified, active, EXTRACT( EPOCH FROM created::TIMESTAMP )::INTEGER AS created_unixtime, EXTRACT( EPOCH FROM modified::TIMESTAMP )::INTEGER AS modified_unixtime, CONCAT(first_name, ' ', last_name) AS name FROM customers WHERE email='john\@example.org' HAVING email ~ '\\\@example' ORDER BY last_name LIMIT 10
 SQL
 	chomp( $expected );
 	is( $result, $expected, "Checking SELECT query on customers table" );
 
-	## Checking update query
+	# Checking update query
 	$cust->reset;
 	$cust->where( email => 'john@example.org' );
 	my $cust_sth_upd = $cust->update( active => 0 ) || fail( "An error has occurred while trying to create an update query for table customers: " . $cust->error );
@@ -171,11 +175,11 @@ SQL
 
 END
 {
-	## diag( "Cleaning up using database object $dbh" );
+	# diag( "Cleaning up using database object $dbh" );
 	if( $dbh )
 	{
-		## diag "Cleaning up. Dropping database $test_db";
-		## diag( "Disconnecting from database $test_db" );
+		# diag "Cleaning up. Dropping database $test_db";
+		# diag( "Disconnecting from database $test_db" );
 		#$dbh->disconnect();
 	}
 };

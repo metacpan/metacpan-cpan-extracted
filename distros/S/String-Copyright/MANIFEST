@@ -16,5 +16,6 @@ lib/String/Copyright.pm
 t/20_parse.t
 t/50_context.t
 t/50_encoding.t
+t/50_identifier.t
 t/50_owner.t
 t/50_range.t

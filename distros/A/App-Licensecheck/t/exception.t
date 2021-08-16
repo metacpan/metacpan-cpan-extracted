@@ -1,9 +1,8 @@
 use Test2::V0;
+use Test2::Require::Module 'Regexp::Pattern::License' => '3.5.0';
 
 use lib 't/lib';
 use Test2::Licensecheck;
-
-my $ver = $Regexp::Pattern::License::VERSION;
 
 plan 45;
 
@@ -104,9 +103,7 @@ license_is(
 # Libtool
 license_is(
 	't/exception/Libtool/lt__dirent.h',
-	$ver >= v3.5
-	? 'LGPL-2+ with Libtool exception'
-	: 'LGPL-2+ with libtool exception'
+	'LGPL-2+ with Libtool exception'
 );
 
 # non-GPL

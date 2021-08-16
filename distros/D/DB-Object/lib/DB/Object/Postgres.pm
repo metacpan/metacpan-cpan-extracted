@@ -1,14 +1,17 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## Database Object Interface - ~/lib/DB/Object/Postgres.pm
-## Version v0.4.7
-## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
-## Created 2017/07/19
-## Modified 2020/05/22
-## 
+# Database Object Interface - ~/lib/DB/Object/Postgres.pm
+# Version v0.4.9
+# Copyright(c) 2020 DEGUEST Pte. Ltd.
+# Author: Jacques Deguest <jack@deguest.jp>
+# Created 2017/07/19
+# Modified 2021/03/20
+# All rights reserved
+# 
+# This program is free software; you can redistribute  it  and/or  modify  it
+# under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
-## This is the subclassable module for driver specific ones.
+# This is the subclassable module for driver specific ones.
 package DB::Object::Postgres;
 BEGIN
 {
@@ -17,22 +20,23 @@ BEGIN
     use parent qw( DB::Object );
     use version;
     use DBI;
-    ## use DBD::Pg qw( :pg_types );
+    # use DBD::Pg qw( :pg_types );
     eval
     {
         require DBD::Pg;
         DBD::Pg->import( ':pg_types' );
     };
     die( $@ ) if( $@ );
-    use Nice::Try;
     use DateTime;
     use DateTime::Format::Strptime;
+    use Module::Generic::DateTime;
+    use Nice::Try;
     require DB::Object::Postgres::Statement;
     require DB::Object::Postgres::Tables;
     require DB::Object::Postgres::Lo;
     our( $VERSION, $DB_ERRSTR, $ERROR, $DEBUG, $CONNECT_VIA, $CACHE_QUERIES, $CACHE_SIZE );
     our( $CACHE_TABLE, $USE_BIND, $USE_CACHE, $MOD_PERL, @DBH );
-    $VERSION     = 'v0.4.7';
+    $VERSION     = 'v0.4.9';
     use Devel::Confess;
 };
 
@@ -41,8 +45,8 @@ BEGIN
     $DEBUG         = 0;
     $CACHE_QUERIES = [];
     $CACHE_SIZE    = 10;
-    ## The purpose of this cache is to store table object and avoid the penalty of reloading the structure of a table for every object generated.
-    ## Thus CACHE_TABLE is in no way an exhaustive list of existing table, but existing table object.
+    # The purpose of this cache is to store table object and avoid the penalty of reloading the structure of a table for every object generated.
+    # Thus CACHE_TABLE is in no way an exhaustive list of existing table, but existing table object.
     $CACHE_TABLE   = {};
     $USE_BIND      = 0;
     $USE_CACHE     = 0;
@@ -56,7 +60,7 @@ BEGIN
     }
 }
 
-## sub new is inherited from DB::Object
+# sub new is inherited from DB::Object
 sub init
 {
     my $self = shift( @_ );
@@ -64,106 +68,103 @@ sub init
     $self->{ 'driver' } = 'Pg';
     return( $self );
 }
-##----{ End of generic routines }----##
 
-##----{ ROUTINES PROPRIETAIRE }----##
-## Get/set alias
-## sub alias
+# Get/set alias
+# sub alias
 
-## sub as_string
+# sub as_string
 
-## sub avoid
+# sub avoid
 
 sub attribute($;$@)
 {
     my $self = shift( @_ );
-    ## $h->{AttributeName} = ...;    # set/write
-    ## ... = $h->{AttributeName};    # get/read
-    ## 1 means that the attribute may be modified
-    ## 0 mneas that the attribute may only be read
+    # $h->{AttributeName} = ...;    # set/write
+    # ... = $h->{AttributeName};    # get/read
+    # 1 means that the attribute may be modified
+    # 0 mneas that the attribute may only be read
     my $name  = shift( @_ ) if( @_ == 1 );
     my %arg   = ( @_ );
-    my %attr  = 
+    my %attr =
     (
-    'InactiveDestroy'        => 1, 
-    'AutoInactiveDestroy'    => 1,
-    'RaiseError'            => 1, 
-    'PrintError'            => 1, 
-    'ShowErrorStatement'    => 1,
-    'Warn'                    => 1, 
-    'Executed'                => 0,
-    'TraceLevel'            => 1,
-    'Kids'                    => 0,
-    'ActiveKids'            => 0, 
-    'CachedKids'            => 0,
-    'ChildHandles'            => 0,
-    'PrintWarn'                => 1,
-    'HandleError'            => 1,
-    'HandleSetErr'            => 1,
-    'ErrCount'                => 1,
-    'FetchHashKeyName'        => 1,
-    'ChopBlanks'            => 1,
-    'Taint'                    => 1,
-    'TaintIn'                => 1,
-    'TaintOut'                => 1,
-    'Profile'                => 1,
-    'Type'                    => 1,
-    ## Not used
-    ## 'LongReadLen'            => 1,
-    ## 'LongTruncOk'            => 1,
-    ## 'CompatMode'            => 1,
-    'AutoCommit'            => 1, 
-    'Name'                    => 0, 
-    'RowCacheSize'            => 0, 
-    'NUM_OF_FIELDS'            => 0, 
-    'NUM_OF_PARAMS'            => 0, 
-    'NAME'                    => 0, 
-    'TYPE'                    => 0, 
-    'PRECISION'                => 0, 
-    'SCALE'                    => 0, 
-    'NULLABLE'                => 0, 
-    'CursorName'            => 0, 
-    'Statement'                => 0, 
-    'RowsInCache'            => 0, 
-    ## Indicates if DBD::Pg should attempt to use server-side prepared statements. On by default
-    'pg_server_prepare'        => 1,
-    ## If true, boolean values will be returned as the characters 't' and 'f' instead of '1' and '0'.
-    'pg_bool_tf'            => 1,
-    ## Specifies if the current database connection should be in read-only mode or not.
-    'ReadOnly'                => 1,
-    'pg_switch_prepared'    => 1,
-    ## When true, question marks inside of statements are not treated as placeholders, e.g. geometric operators
-    'pg_placeholder_dollaronly'    => 1,
-    ## When true, colons inside of statements are not treated as placeholders
-    'pg_placeholder_nocolons'    => 1,
-    'pg_enable_utf8'        => 1,
-    ## Valid entries are 0, 1 and 2
-    'pg_errorlevel'            => 1,
-    'pg_lib_version'        => 0,
-    'pg_server_version'        => 0,
-    ## Current database name
-    'Name'                    => 0,
-    'Username'                => 0,
-    'pg_db'                    => 0,
-    'pg_user'                => 0,
-    'pg_host'                => 0,
-    'pg_port'                => 0,
-    'pg_socket'                => 0,
-    'pg_pass'                => 0,
-    'pg_options'            => 0,
-    'pg_default_port'        => 0,
-    'pg_pid'                => 0,
-    'pg_prepare_now'        => 1,
-    'pg_expand_array'        => 1,
-    'pg_async_status'        => 0,
-    'pg_standard_conforming_strings'    => 0,
-    'pg_INV_READ'            => 0,
-    'pg_INV_WRITE'            => 0,
-    'Driver'                => 0,
-    'pg_protocol'            => 0,
+        ActiveKids                     => 0,
+        AutoCommit                     => 1,
+        AutoInactiveDestroy            => 1,
+        CachedKids                     => 0,
+        ChildHandles                   => 0,
+        ChopBlanks                     => 1,
+        CursorName                     => 0,
+        Driver                         => 0,
+        ErrCount                       => 1,
+        Executed                       => 0,
+        FetchHashKeyName               => 1,
+        HandleError                    => 1,
+        HandleSetErr                   => 1,
+        InactiveDestroy                => 1,
+        Kids                           => 0,
+        NAME                           => 0,
+        NULLABLE                       => 0,
+        NUM_OF_FIELDS                  => 0,
+        NUM_OF_PARAMS                  => 0,
+        # Current database name
+        Name                           => 0,
+        PRECISION                      => 0,
+        PrintError                     => 1,
+        PrintWarn                      => 1,
+        Profile                        => 1,
+        RaiseError                     => 1,
+        # Specifies if the current database connection should be in read-only mode or not.
+        ReadOnly                       => 1,
+        RowCacheSize                   => 0,
+        RowsInCache                    => 0,
+        SCALE                          => 0,
+        ShowErrorStatement             => 1,
+        Statement                      => 0,
+        TYPE                           => 0,
+        Taint                          => 1,
+        TaintIn                        => 1,
+        TaintOut                       => 1,
+        TraceLevel                     => 1,
+        Type                           => 1,
+        Username                       => 0,
+        Warn                           => 1,
+        pg_INV_READ                    => 0,
+        pg_INV_WRITE                   => 0,
+        pg_async_status                => 0,
+        # If true, boolean values will be returned as the characters 't' and 'f' instead of '1' and '0'.
+        pg_bool_tf                     => 1,
+        pg_db                          => 0,
+        pg_default_port                => 0,
+        pg_enable_utf8                 => 1,
+        # Valid entries are 0, 1 and 2
+        pg_errorlevel                  => 1,
+        pg_expand_array                => 1,
+        pg_host                        => 0,
+        pg_lib_version                 => 0,
+        pg_options                     => 0,
+        pg_pass                        => 0,
+        pg_pid                         => 0,
+        # When true, question marks inside of statements are not treated as placeholders, e.g. geometric operators
+        pg_placeholder_dollaronly      => 1,
+        # When true, colons inside of statements are not treated as placeholders
+        pg_placeholder_nocolons        => 1,
+        pg_port                        => 0,
+        pg_prepare_now                 => 1,
+        pg_protocol                    => 0,
+        # Indicates if DBD::Pg should attempt to use server-side prepared statements. On by default
+        pg_server_prepare              => 1,
+        pg_server_version              => 0,
+        pg_socket                      => 0,
+        pg_standard_conforming_strings => 0,
+        pg_switch_prepared             => 1,
+        pg_user                        => 0,
+        # Not used
+        # LongReadLen => 1,
+        # LongTruncOk => 1,
+        # CompatMode => 1,
     );
-    ## Only those attribute exist
-    ## Using an a non existing attribute produce an exception, so we better avoid
+    # Only those attribute exist
+    # Using an a non existing attribute produce an exception, so we better avoid
     if( $name )
     {
         return( $self->{ 'dbh' }->{ $name } ) if( exists( $attr{ $name } ) );
@@ -173,8 +174,8 @@ sub attribute($;$@)
         my $value;
         while( ( $name, $value ) = each( %arg ) )
         {
-            ## We intend to modifiy the value of an attribute
-            ## we are allowed to modify this value if it is true
+            # We intend to modifiy the value of an attribute
+            # we are allowed to modify this value if it is true
             if( exists( $attr{ $name } ) && 
                 defined( $value ) && 
                 $attr{ $name } )
@@ -185,7 +186,7 @@ sub attribute($;$@)
     }
 }
 
-## sub available_drivers(@)
+# sub available_drivers(@)
 
 sub begin_work($;$@)
 {
@@ -194,12 +195,12 @@ sub begin_work($;$@)
     return( $self->{dbh}->begin_work( @_ ) );
 }
 
-## This method is common to DB::Object and DB::Object::Statement
-## sub bind
+# This method is common to DB::Object and DB::Object::Statement
+# sub bind
 
-## sub cache
+# sub cache
 
-## sub check_driver(@;$@)
+# sub check_driver(@;$@)
 
 sub commit($;$@)
 {
@@ -208,8 +209,8 @@ sub commit($;$@)
     return( $self->{dbh}->commit( @_ ) );
 }
 
-## Inherited by DB::Object, however, DB::Object::connect() will call our subroutine 
-## _dbi_connect which format in a particular way the dsn.
+# Inherited by DB::Object, however, DB::Object::connect() will call our subroutine 
+# _dbi_connect which format in a particular way the dsn.
 sub connect
 {
     my $that   = shift( @_ );
@@ -218,7 +219,7 @@ sub connect
     return( $that->SUPER::connect( $param ) );
 }
 
-## sub copy
+# sub copy
 
 sub create_db
 {
@@ -227,7 +228,7 @@ sub create_db
     my $opts = {};
     $opts = shift( @_ ) if( $self->_is_hash( $_[0] ) );
     my $params = [];
-    ## https://www.postgresql.org/docs/9.5/sql-createdatabase.html
+    # https://www.postgresql.org/docs/9.5/sql-createdatabase.html
     push( @$params, sprintf( 'OWNER=%s', $opts->{owner} ) ) if( $opts->{owner} );
     push( @$params, sprintf( 'TEMPLATE=%s', $opts->{template} ) ) if( $opts->{template} );
     push( @$params, sprintf( 'ENCODING=%s', $opts->{encoding} ) ) if( $opts->{encoding} );
@@ -267,12 +268,11 @@ sub create_table
 {
     my $self = shift( @_ );
     my $name = shift( @_ ) || return( $self->error( "No table name to create was provided." ) );
-    my $opts = {};
-    $opts = shift( @_ ) if( $self->_is_hash( $_[0] ) );
+    my $opts = $self->_get_args_as_hash( @_ );
     return( $self->error( "Table \"$name\" already exists in the database." ) ) if( $self->table_exists( $name ) );
     my $schema = $self->schema;
     my $sql = $opts->{sql} || return( $self->error( "No sql query was provided to create table \"$name\"." ) );
-    ## The schema is missing
+    # The schema is missing
     if( $schema )
     {
         $sql =~ s/\b(CREATE[[:blank:]]+(?:.*?)\bTABLE(?:[[:blank:]]+IF[[:blank:]]+NOT[[:blank:]]+EXISTS)?)[[:blank:]]+$name\b/$1 ${schema}.${name}/si;
@@ -281,22 +281,22 @@ sub create_table
     return( $rv );
 }
 
-## sub create_table($;%)
+# sub create_table($;%)
 
-## See DB::Object
-## sub data_sources($;\%)
+# See DB::Object
+# sub data_sources($;\%)
 
-## sub data_type
+# sub data_type
 
-## sub database
+# sub database
 
 sub databases
 {
     my $self = shift( @_ );
-    ## return( $self->error( "Not connected to PostgreSQL server yet. Issue $dbh->connect first." ) ) if( !$self->{ 'dbh' } );
+    # return( $self->error( "Not connected to PostgreSQL server yet. Issue $dbh->connect first." ) ) if( !$self->{ 'dbh' } );
     my $dbh;
-    ## If there is no connection yet, then create one using the postgres login.
-    ## There should not be a live user and database just to check what databases there are.
+    # If there is no connection yet, then create one using the postgres login.
+    # There should not be a live user and database just to check what databases there are.
     if( !$self->{dbh} )
     {
         try
@@ -318,70 +318,70 @@ sub databases
     return( @dbases );
 }
 
-## delete() is inherited from DB::Object
-## sub delete
+# delete() is inherited from DB::Object
+# sub delete
 
-## sub disconnect($)
+# sub disconnect($)
 
-## sub do($;$@)
+# sub do($;$@)
 
-## sub enhance
+# sub enhance
 
-## See DB::Object
-## sub err(@)
-## Meaning of the error code
-## 0  Empty query string
-## 1  A command that returns no data successfully completed.
-## 2  A command that returns data successfully completed.
-## 3  A COPY OUT command is still in progress.
-## 4  A COPY IN command is still in progress.
-## 5  A bad response was received from the backend.
-## 6  A nonfatal error occurred (a notice or warning message)
-## 7  A fatal error was returned: the last query failed.
+# See DB::Object
+# sub err(@)
+# Meaning of the error code
+# 0  Empty query string
+# 1  A command that returns no data successfully completed.
+# 2  A command that returns data successfully completed.
+# 3  A COPY OUT command is still in progress.
+# 4  A COPY IN command is still in progress.
+# 5  A bad response was received from the backend.
+# 6  A nonfatal error occurred (a notice or warning message)
+# 7  A fatal error was returned: the last query failed.
 
-## See DB::Object
-## sub errno
+# See DB::Object
+# sub errno
 
-## See DB::Object
-## sub errmesg
+# See DB::Object
+# sub errmesg
 
-## See DB::Object
-## sub errstr(@)
-## Affected by the pg_errorlevel setting
+# See DB::Object
+# sub errstr(@)
+# Affected by the pg_errorlevel setting
 
-## sub fatal
+# sub fatal
 
-## sub from_unixtime
+# sub from_unixtime
 
-## Inherited from DB::Object
-## sub format_statement($;\%\%@)
+# Inherited from DB::Object
+# sub format_statement($;\%\%@)
 
-## sub format_update($;%)
+# sub format_update($;%)
 
 sub func
 {
     my $self      = shift( @_ );
     my $table     = shift( @_ );
-    ## e.g. table_attributes to get the detail information on table columns
+    # e.g. table_attributes to get the detail information on table columns
     my $func_name = shift( @_ );
-    ## Returns:
-    ## NAME        attribute name
-    ## TYPE        attribute type
-    ## SIZE        attribute size (-1 for variable size)
-    ## NULLABLE    flag nullable
-    ## DEFAULT     default value
-    ## CONSTRAINT  constraint
-    ## PRIMARY_KEY flag is_primary_key
-    ## REMARKS     attribute description
+    # Returns:
+    # NAME        attribute name
+    # TYPE        attribute type
+    # SIZE        attribute size (-1 for variable size)
+    # NULLABLE    flag nullable
+    # DEFAULT     default value
+    # CONSTRAINT  constraint
+    # PRIMARY_KEY flag is_primary_key
+    # REMARKS     attribute description
     return( $self->{ 'dbh' }->func( $table, $func_name ) );
 }
 
-## See DB::Object
-## sub getdefault($;%)
+# See DB::Object
+# sub getdefault($;%)
 
-## sub group
+# sub group
 
-## Specific to Postgres
+# Specific to Postgres
 sub having
 {
     my $self  = shift( @_ );
@@ -389,16 +389,16 @@ sub having
     return( $q->having( @_ ) );
 }
 
-## See DB::Object
-## sub insert
+# See DB::Object
+# sub insert
 
 sub large_object
 {
-    ## Parameter is a bitmask mode
+    # Parameter is a bitmask mode
     return( DB::Object::Postgres::Lo->new( $self->{ 'dbh' } ) );
 }
 
-## Must be superseded, or better yet, the one in DB::Object should probably be changed to ours
+# Must be superseded, or better yet, the one in DB::Object should probably be changed to ours
 sub last_insert_id
 {
     my $self  = shift( @_ );
@@ -406,19 +406,19 @@ sub last_insert_id
     return( $self->{ 'dbh' }->last_insert_id( undef, undef, $table, undef ) );
 }
 
-## http://www.postgresql.org/docs/9.3/interactive/queries-limit.html
-## See DB::Object::Postgres::Query
-## sub limit
+# http://www.postgresql.org/docs/9.3/interactive/queries-limit.html
+# See DB::Object::Postgres::Query
+# sub limit
 
-## sub local
+# sub local
 
-## http://www.postgresql.org/docs/current/static/sql-lock.html
+# http://www.postgresql.org/docs/current/static/sql-lock.html
 sub lock
 {
     my $self  = shift( @_ );
     my $table = shift( @_ ) || return( $self->error( "You must provide a table name to lock onto." ) );
-    ## ACCESS SHARE | ROW SHARE | ROW EXCLUSIVE | SHARE UPDATE EXCLUSIVE | 
-    ## SHARE | SHARE ROW EXCLUSIVE | EXCLUSIVE | ACCESS EXCLUSIVE
+    # ACCESS SHARE | ROW SHARE | ROW EXCLUSIVE | SHARE UPDATE EXCLUSIVE | 
+    # SHARE | SHARE ROW EXCLUSIVE | EXCLUSIVE | ACCESS EXCLUSIVE
     my $mode  = shift( @_ ) || undef();
     my $nowait= shift( @_ );
     my $query = "LOCK TABLE $table";
@@ -430,9 +430,9 @@ sub lock
     $sth->execute() ||
     return( $self->error( "Error while executing query to get lock on table '$table': ", $sth->errstr() ) );
     $sth->finish();
-    ## We do not really need to track that information.
-    ## $self->{ '_locks' } ||= [];
-    ## push( @{ $self->{ '_locks' } }, $table ) if( $res && $res ne 'NULL' );
+    # We do not really need to track that information.
+    # $self->{ '_locks' } ||= [];
+    # push( @{ $self->{ '_locks' } }, $table ) if( $res && $res ne 'NULL' );
     return( $res eq 'NULL' ? undef() : $res );
 }
 
@@ -508,13 +508,13 @@ SQL
     my $get_tbl_comment = "SELECT description FROM pg_description WHERE (SELECT relname FROM pg_class WHERE oid=objoid) = ? and objsubid = 0";
     my $get_field_comment = "SELECT d.description, a.attname FROM pg_description d, pg_attribute a WHERE (SELECT relname FROM pg_class WHERE oid=d.objoid) = ? AND a.attnum=d.objsubid AND a.attrelid=d.objoid AND d.objsubid > 0";
     
-    ## Get the max size of the fields to properly format the schema
+    # Get the max size of the fields to properly format the schema
     my $sth = $dbh->{dbh}->prepare_cached( $max_field_size ) || return( $self->error( $dbh->{dbh}->errstr ) );
     $sth->execute() || return( $self->error( $sth->errstr ) );
     my $fsize = $sth->fetchrow;
     $sth->finish;
     
-    ## Get the list of all inherited fields per table, so we can exclude them in the schema we produce.
+    # Get the list of all inherited fields per table, so we can exclude them in the schema we produce.
     $sth = $dbh->{dbh}->prepare_cached( $inherited_fields ) || return( $self->error( $dbh->{dbh}->errstr ) );
     $sth->execute() || return( $self->error( $sth->errstr ) );
     my $all = $sth->fetchall_arrayref( {} );
@@ -529,7 +529,7 @@ SQL
     foreach my $t ( @$tables )
     {
         my @table_def = ( "CREATE TABLE $t (" );
-        ## Get table overall information
+        # Get table overall information
         $dbh->bind( 0 );
         $sth = $dbh->{dbh}->prepare_cached( sprintf( $table_info, $t ) ) || return( $self->error( $dbh->{dbh}->errstr ) );
         $sth->execute() || return( $self->error( $sth->errstr ) );
@@ -537,7 +537,7 @@ SQL
         $sth->finish;
         $dbh->bind( 1 );
         
-        ## Get field info.
+        # Get field info.
         $sth = $dbh->{Dbh}->prepare_cached( $field_info ) || return( $self->error( $dbh->{dbh}->errstr ) );
         $sth->execute( $tbl_info->{ 'oid' } ) || return( $self->error( $sth->errstr ) );
         my $rows = $sth->fetchall_arrayref( {} );
@@ -559,7 +559,7 @@ SQL
         $sth->finish;
         my @constraints = ();
         my @index = ();
-        ## Get primary key and unique index constraints
+        # Get primary key and unique index constraints
         $sth = $dbh->{dbh}->prepare_cached( $get_constraints ) || return( $self->error( $dbh->{dbh}->errstr ) );
         $sth->execute( $tbl_info->{ 'oid' } ) || return( $self->error( $sth->errstr ) );
         $rows = $sth->fetchall_arrayref( {} );
@@ -575,7 +575,7 @@ SQL
             }
         }
         $sth->finish;
-        ## Get CHECK constraints
+        # Get CHECK constraints
         $sth = $dbh->{dbh}->prepare_cached( $get_check_constraint ) || return( $self->error( $dbh->{dbh}->errstr ) );
         $sth->execute( $tbl_info->{ 'oid' } ) || return( $self->error( $sth->errstr ) );
         $rows = $sth->fetchall_arrayref( {} );
@@ -584,7 +584,7 @@ SQL
             push( @constraints, sprintf( "\tCONSTRAINT %s %s", @$r{ qw( conname pg_get_constraintdef ) } ) );
         }
         $sth->finish;
-        ## Get foreign key constraints
+        # Get foreign key constraints
         $sth = $dbh->{dbh}->prepare_cached( $get_fkey_constraint )  || return( $self->error( $dbh->{dbh}->errstr ) );
         $sth->execute( $tbl_info->{ 'oid' } ) || return( $self->error( $sth->errstr ) );
         $rows = $sth->fetchall_arrayref( {} );
@@ -595,14 +595,14 @@ SQL
         $sth->finish;
         push( @table_def, @constraints );
         
-        ## Get table inheritance
+        # Get table inheritance
         $sth = $dbh->{dbh}->prepare_cached( $inheritance )  || return( $self->error( $dbh->{dbh}->errstr ) );
         $sth->execute( $tbl_info->{ 'oid' } ) || return( $self->error( $sth->errstr ) );
         $rows = $sth->fetchall_arrayref( {} );
         my @inherit = map{ $_->{ 'oid' } } @$rows;
         $sth->finish;
         
-        ## Add a comma at the end of each line now we know how many there are.
+        # Add a comma at the end of each line now we know how many there are.
         for( my $i = 0; $i < $#table_def; $i++ )
         {
             $table_def[ $i ] .= ",";
@@ -617,17 +617,17 @@ SQL
             push( @table_def, ');' );
         }
         
-        ## Put here the table indexes
+        # Put here the table indexes
         push( @table_def, @index );
         
-        ## Get comments on the table itself, if any
+        # Get comments on the table itself, if any
         $sth = $dbh->{dbh}->prepare_cached( $get_tbl_comment ) || return( $self->error( $sth->{dbh}->errstr ) );
         $sth->execute( $t ) || return( $self->error( $sth->errstr ) );
         my $ref = $sth->fetchrow_hashref();
         $sth->finish;
         push( @table_def, sprintf( "COMMENT ON TABLE %s IS '%s';", $t, $ref->{ 'description' } ) ) if( $ref->{ 'description' } );
         
-        ## Get comments for each field
+        # Get comments for each field
         $sth = $dbh->{dbh}->prepare_cached( $get_field_comment ) || return( $self->error( $sth->{dbh}->errstr ) );
         $sth->execute( $t ) || return( $self->error( $sth->errstr ) );
         $rows = $sth->fetchall_arrayref( {} );
@@ -641,14 +641,14 @@ SQL
     return( wantarray() ? @schema_tables : join( "\n\n", @schema_tables ) );
 }
 
-## sub no_bind
+# sub no_bind
 
-## sub no_cache
+# sub no_cache
 
-## sub order
+# sub order
 
-## See DB::Object
-## sub param
+# See DB::Object
+# sub param
 
 sub on_conflict
 {
@@ -672,24 +672,24 @@ sub pg_ping(@)
     return( shift->{ 'dbh' }->pg_ping );
 }
 
-## See DB::Object
-## sub ping(@)
+# See DB::Object
+# sub ping(@)
 
-## See DB::Object
-## sub prepare($;$)
+# See DB::Object
+# sub prepare($;$)
 
-## See DB::Object
-## sub prepare_cached
+# See DB::Object
+# sub prepare_cached
 
-## sub quote will be automatically loaded via AUTOLOADER
+# sub quote will be automatically loaded via AUTOLOADER
 
-## sub query($$)
+# sub query($$)
 
 sub query_object { return( shift->_set_get_object( 'query_object', 'DB::Object::Postgres::Query', @_ ) ); }
 
 sub release
 {
-    return( shift->{ 'dbh' }->pg_release( @_ ) );
+    return( shift->{dbh}->pg_release( @_ ) );
 }
 
 sub replace
@@ -697,13 +697,13 @@ sub replace
     return( shift->error( "Replace queries are not supported in PostgreSQL" ) );
 }
 
-## sub reset
+# sub reset
 
-## sub reverse
+# sub reverse
 
-## sub rollback will be automatically loaded via AUTOLOADER
+# sub rollback will be automatically loaded via AUTOLOADER
 
-## Specific to Postgres
+# Specific to Postgres
 sub returning
 {
     my $self  = shift( @_ );
@@ -752,8 +752,8 @@ sub search_path
         my $rc = $sth->execute() || return( $self->error( "Unable to execute sql query to set search path: ", $self->errstr() ) );
         my $val = $sth->fetchrow;
         $sth->finish;
-        my $arr = [ split( /\,[[:blank:]]*/, $val ) ];
-        ## Removing surrounding quotes
+        my $arr = $self->new_array( [ split( /\,[[:blank:]]*/, $val ) ] );
+        # Removing surrounding quotes
         for( my $i = 0; $i < scalar( @$arr ); $i++ )
         {
             $arr->[$i] =~ s/^\"|\"$//g;
@@ -762,38 +762,37 @@ sub search_path
     }
 }
 
-## See DB::Object; _query_component is superseded and this makes the select customised to Posgres needs
-## sub select
+# See DB::Object; _query_component is superseded and this makes the select customised to Posgres needs
+# sub select
 
-## See DB::Object
-## sub set
+# See DB::Object
+# sub set
 
-## See DB::Object
-## sub sort
+# See DB::Object
+# sub sort
 
-## Was previously getfd()
+# Was previously getfd()
 sub socket
 {
-    return( shift->{ 'dbh' }->{ 'pg_socket' } );
+    return( shift->{dbh}->{pg_socket} );
 }
 
-## See DB::Object
-## sub stat
+# See DB::Object
+# sub stat
 
-## See DB::Object
-## sub state(@)
+# See DB::Object
+# sub state(@)
 
-## See DB::Object
-## sub table
+# See DB::Object
+# sub table
 
-## See DB::Object
+# See DB::Object
 sub table_exists
 {
     my $self = shift( @_ );
     my $table = shift( @_ ) || 
     return( $self->error( "You must provide a table name to access the table methods." ) );
-    my $opts = {};
-    $opts = shift( @_ ) if( $self->_is_hash( $_[0] ) );
+    my $opts = $self->_get_args_as_hash( @_ );
     my $schema = $self->schema || $opts->{schema} || '';
     my $cache_tables = $self->cache_tables;
     my $tables_in_cache = $cache_tables->get({
@@ -813,7 +812,7 @@ sub table_exists
             return( 1 );
         }
     }
-    ## We did not find it, so let's try by checking directly the database
+    # We did not find it, so let's try by checking directly the database
     my $def = $self->table_info( $table ) || return;
     return( 1 ) if( scalar( @$def ) );
     return( 0 );
@@ -825,8 +824,7 @@ sub table_info
     my $table = shift( @_ ) || 
     return( $self->error( "You must provide a table name to access the table methods." ) );
     $self->message( 3, "Getting table/view information for '$table'." );
-    my $opts = {};
-    $opts = shift( @_ ) if( $self->_is_hash( $_[0] ) );
+    my $opts = $self->_get_args_as_hash( @_ );
     my $schema = $self->schema || $opts->{schema} || '';
     my $sql = <<'EOT';
 SELECT
@@ -852,21 +850,21 @@ EOT
     return( [] );
 }
 
-## See DB::Object
-## sub table_push
+# See DB::Object
+# sub table_push
 
-## See DB::Object
-## sub tables
+# See DB::Object
+# sub tables
 
 sub tables_info
 {
     my $self = shift( @_ );
-    my $db   = shift( @_ ) || $self->{ 'database' };
+    my $db   = shift( @_ ) || $self->{database};
     my @tables = ();
-    ## Parameters are: ?, schema, table, and type
-    ## my $sth  =  $self->{ 'dbh' }->table_info( undef, undef, $table, "TABLE,VIEW" );
-    ## The original query was fetched by connecting to Postgres with psql -E and executing the command \z
-    ## This revised query will fetch only tables, views, materialised view and foreign tables, but will avoid the mysterious view called sequence_setvals
+    # Parameters are: ?, schema, table, and type
+    # my $sth  =  $self->{ 'dbh' }->table_info( undef, undef, $table, "TABLE,VIEW" );
+    # The original query was fetched by connecting to Postgres with psql -E and executing the command \z
+    # This revised query will fetch only tables, views, materialised view and foreign tables, but will avoid the mysterious view called sequence_setvals
 #     my $query = <<SQL;
 # SELECT n.nspname as "schema",
 #   c.relname as "name"
@@ -890,84 +888,84 @@ WHERE c.relkind IN ('r','p','s','v','m','f','')
       AND c.relname != 'sequence_setvals'
 ORDER BY 1,2
 EOT
-    my $sth = $self->{ 'dbh' }->prepare_cached( $query ) || return( $self->error( sprintf( "Error while preparing query $query: %s", $self->{ 'dbh' }->errstr ) ) );
+    my $sth = $self->{dbh}->prepare_cached( $query ) || return( $self->error( sprintf( "Error while preparing query $query: %s", $self->{dbh}->errstr ) ) );
     $sth->execute() || return( $self->error( sprintf( "Error while executing query $query: %s", $sth->errstr ) ) );
     my $all = $sth->fetchall_arrayref( {} );
     return( $all );
 }
 
-## See DB::Object
-## sub tables_refresh
+# See DB::Object
+# sub tables_refresh
 
-## See DB::Object
-## sub tie
+# See DB::Object
+# sub tie
 
 sub trace($;@)
 {
     my $self = shift( @_ );
-    ## Value is a numeric level; see parse_trace_flag.
-    return( $self->error( "Trace can only be used on active connection. Use connect first." ) ) if( !$self->{ 'dbh' } );
+    # Value is a numeric level; see parse_trace_flag.
+    return( $self->error( "Trace can only be used on active connection. Use connect first." ) ) if( !$self->{dbh} );
     if( @_ )
     {
-        ## my( $opt, $filename ) = @_;
-        $self->{ 'dbh' }->trace( @_ );
+        # my( $opt, $filename ) = @_;
+        $self->{dbh}->trace( @_ );
     }
-    return( $self->{ 'dbh' }->trace );
+    return( $self->{dbh}->trace );
 }
 
 sub trace_msg(@)
 {
     my $self = shift( @_ );
-    return( $self->error( "Trace can only be used on active connection. Use connect first." ) ) if( !$self->{ 'dbh' } );
-    ## $dbh->trace_msg( $message_text, $min_level );
-    return( $self->{ 'dbh' }->trace_msg( @_ ) );
+    return( $self->error( "Trace can only be used on active connection. Use connect first." ) ) if( !$self->{dbh} );
+    # $dbh->trace_msg( $message_text, $min_level );
+    return( $self->{dbh}->trace_msg( @_ ) );
 }
 
-## sub unix_timestamp
+# sub unix_timestamp
 
 sub unlock
 {
     shift->error( "unlock() does not work with Postgres." );
 }
 
-## See DB::Object
-## sub update
+# See DB::Object
+# sub update
 
-## See DB::Object
-## sub use
+# See DB::Object
+# sub use
 
-## See DB::Object
-## sub use_cache
+# See DB::Object
+# sub use_cache
 
-## See DB::Object
-## sub use_bind
+# See DB::Object
+# sub use_bind
 
 sub variables
 {
     return( shift->error( "variables is currently unsupported in Postgres" ) );
 }
 
-## See DB::Object
-## sub where
+# See DB::Object
+# sub where
 
-## https://www.postgresql.org/docs/10/sql-show.html
-## show something exists since at lease from 7.1
+# https://www.postgresql.org/docs/10/sql-show.html
+# show something exists since at lease from 7.1
 sub version
 {
     my $self  = shift( @_ );
-    ## If we already have the information, let's use our cache instead of making a query
-    return( $self->{ '_db_version' } ) if( length( $self->{ '_db_version' } ) );
-    ## e.g. 10.4
+    # If we already have the information, let's use our cache instead of making a query
+    return( $self->{_db_version} ) if( length( $self->{_db_version} ) );
+    # e.g. 10.4
     my $sql = 'SHOW server_version';
     my $sth = $self->do( $sql ) || return( $self->error( "Unable to issue the sql statement '$sql' to get the server version: ", $self->errstr ) );
     my $ver = $sth->fetchrow;
     $sth->finish;
-    ## e.g.:
-    ## 12.1 (Ubuntu 12.1-1.pgdg16.04+1)
-    ## 10.4
+    # e.g.:
+    # 12.1 (Ubuntu 12.1-1.pgdg16.04+1)
+    # 10.4
     $ver =~ s/^(\d+(?:\.\S+)?).*?$/$1/;
-    ## We cache it
-    $self->{ '_db_version' } = version->parse( $ver );
+    # We cache it
+    $self->{_db_version} = version->parse( $ver );
     return( $ver );
 }
 
@@ -975,29 +973,28 @@ sub _check_connect_param
 {
     my $self  = shift( @_ );
     my $param = $self->SUPER::_check_connect_param( @_ );
-    ## This is also what the psql command line tool does
-    $param->{ 'login' } = ( getpwuid( $> ) )[0] if( !$param->{login} );
-    $param->{ 'database' } = 'postgres' if( !$param->{database} );
-    ## By default
-    $param->{ 'port' } = 5432 if( !length( $param->{ 'port' } ) );
+    # This is also what the psql command line tool does
+    $param->{login} = ( getpwuid( $> ) )[0] if( !$param->{login} );
+    $param->{database} = 'postgres' if( !$param->{database} );
+    # By default
+    $param->{port} = 5432 if( !length( $param->{port} ) );
     $self->message( 3, "Returning parameters: ", sub{ $self->dumper( $param ) } );
     return( $param );
 }
 
-## Called from connect once all check was done to see if there are default to set
+# Called from connect once all check was done to see if there are default to set
 sub _check_default_option
 {
     my $self = shift( @_ );
-    my $opts = {};
-    $opts = shift( @_ ) if( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
     return( $self->error( "Provided option is not a hash reference." ) ) if( !$self->_is_hash( $opts ) );
     $opts->{client_encoding} = 'utf8' if( !CORE::exists( $opts->{client_encoding} ) );
-    ## Enabled but with auto-guess
-    $opts->{pg_enable_utf8} = -1 if( !CORE::exists( $opts->{pg_enable_utf8} ) && $opts->{client_encoding} eq 'utf8' );
+    # Enabled but with auto-guess
+    $opts->{pg_enable_utf8} = -1 if( !CORE::exists( $opts->{pg_enable_utf8} ) && ( $opts->{client_encoding} eq 'utf8' || $opts->{client_encoding} eq 'utf-8' ) );
     return( $opts );
 }
 
-## Called by _check_connect_param
+# Called by _check_connect_param
 sub _connection_options
 {
     my $self  = shift( @_ );
@@ -1009,15 +1006,15 @@ sub _connection_options
     return( $opt );
 }
 
-## Called by _check_connect_param
+# Called by _check_connect_param
 sub _connection_parameters
 {
     my $self  = shift( @_ );
     my $param = shift( @_ );
     my $core = [qw( db login passwd host port driver database schema server opt uri debug )];
     my @pg_params = grep( /^pg_/, keys( %$param ) );
-    ## See DBD::mysql for the list of valid parameters
-    ## E.g.: mysql_client_found_rows, mysql_compression mysql_connect_timeout mysql_write_timeout mysql_read_timeout mysql_init_command mysql_skip_secure_auth mysql_read_default_file mysql_read_default_group mysql_socket mysql_ssl mysql_ssl_client_key mysql_ssl_client_cert mysql_ssl_ca_file mysql_ssl_ca_path mysql_ssl_cipher mysql_local_infile mysql_multi_statements mysql_server_prepare mysql_server_prepare_disable_fallback mysql_embedded_options mysql_embedded_groups mysql_conn_attrs 
+    # See DBD::mysql for the list of valid parameters
+    # E.g.: mysql_client_found_rows, mysql_compression mysql_connect_timeout mysql_write_timeout mysql_read_timeout mysql_init_command mysql_skip_secure_auth mysql_read_default_file mysql_read_default_group mysql_socket mysql_ssl mysql_ssl_client_key mysql_ssl_client_cert mysql_ssl_ca_file mysql_ssl_ca_path mysql_ssl_cipher mysql_local_infile mysql_multi_statements mysql_server_prepare mysql_server_prepare_disable_fallback mysql_embedded_options mysql_embedded_groups mysql_conn_attrs 
     push( @$core, @pg_params );
     return( $core );
 }
@@ -1025,18 +1022,17 @@ sub _connection_parameters
 sub _convert_datetime2object
 {
     my $self = shift( @_ );
-    my $opts = {};
-    $opts = shift( @_ ) if( @_ && $self->_is_hash( $_[0] ) );
+    my $opts = $self->_get_args_as_hash( @_ );
     my $sth = $opts->{statement} || return( $self->error( "No statement handler was provided to convert data from json to perl." ) );
-    ## my $data = $opts->{data} || return( $self->error( "No data was provided to convert from json to perl." ) );
+    # my $data = $opts->{data} || return( $self->error( "No data was provided to convert from json to perl." ) );
     return( $opts->{data} ) if( !CORE::length( $opts->{data} ) );
     my $data = $opts->{data};
     my $names = $sth->FETCH('NAME');
     my $types = $sth->FETCH('pg_type');
-    ## $self->messagef( 3, "Found %d fields returned.", scalar( @$names ) );
-    ## $self->message( 3, "PG_JSON is: '", PG_JSON, "' and PG_JSONB is: '", PG_JSONB, "'." );
+    # $self->messagef( 3, "Found %d fields returned.", scalar( @$names ) );
+    # $self->message( 3, "PG_JSON is: '", PG_JSON, "' and PG_JSONB is: '", PG_JSONB, "'." );
     my $pg_types = $sth->{pg_type};
-    ## $self->message( 3, "pg_type has following information: ", sub{ $self->printer( $pg_types ) } );
+    # $self->message( 3, "pg_type has following information: ", sub{ $self->printer( $pg_types ) } );
     my $mode = ref( $data );
     local $convert = sub
     {
@@ -1051,7 +1047,7 @@ sub _convert_datetime2object
             };
             for( qw( hour minute second ) )
             {
-                $hash->{ $_ } = $+{ $_ } if( defined( $+{ $_ } ) );
+                $hash->{ $_ } = int( $+{ $_ } ) if( defined( $+{ $_ } ) );
             }
             $hash->{time_zone} = 'local';
 
@@ -1064,7 +1060,8 @@ sub _convert_datetime2object
                     time_zone => 'local',
                 );
                 $dt->set_formatter( $fmt );
-                return( $dt );
+                # To enable extra features
+                return( Module::Generic::DateTime->new( $dt ) );
             }
             catch( $e )
             {
@@ -1078,7 +1075,7 @@ sub _convert_datetime2object
     };
     for( my $i = 0; $i < scalar( @$names ); $i++ )
     {
-        ## $self->messagef( 3, "Checking field '%s' with type '%s'.", $names->[$i], $types->[$i] );
+        # $self->messagef( 3, "Checking field '%s' with type '%s'.", $names->[$i], $types->[$i] );
         if( $types->[$i] eq PG_DATE || $types->[$i] eq PG_TIMESTAMP || $types->[$i] eq 'date' || $types->[$i] eq 'timestamp' )
         {
             $self->messagef( 3, "Found a date(time) field '%s' of type '%s'.", $names->[$i], $types->[$i] );
@@ -1103,29 +1100,28 @@ sub _convert_datetime2object
 sub _convert_json2hash
 {
     my $self = shift( @_ );
-    my $opts = {};
-    $opts = shift( @_ ) if( @_ && $self->_is_hash( $_[0] ) );
+    my $opts = $self->_get_args_as_hash( @_ );
 #     $self->debug( 3 );
 #     my( $pack, $file, $line ) = caller( 1 );
 #     my $sub = ( caller( 2 ) )[3];
 #     $self->message( 3, "Called from package '$pack' in file '$file' at line '$line' within sub '$sub'." );
-    ## $data can be either hash pr array
+    # $data can be either hash pr array
     my $sth = $opts->{statement} || return( $self->error( "No statement handler was provided to convert data from json to perl." ) );
-    ## my $data = $opts->{data} || return( $self->error( "No data was provided to convert from json to perl." ) );
+    # my $data = $opts->{data} || return( $self->error( "No data was provided to convert from json to perl." ) );
     return( $opts->{data} ) if( !CORE::length( $opts->{data} ) );
     my $data = $opts->{data};
     my $names = $sth->FETCH('NAME');
     my $types = $sth->FETCH('pg_type');
-    ## $self->messagef( 3, "Found %d fields returned.", scalar( @$names ) );
-    ## $self->message( 3, "PG_JSON is: '", PG_JSON, "' and PG_JSONB is: '", PG_JSONB, "'." );
+    # $self->messagef( 3, "Found %d fields returned.", scalar( @$names ) );
+    # $self->message( 3, "PG_JSON is: '", PG_JSON, "' and PG_JSONB is: '", PG_JSONB, "'." );
     my $pg_types = $sth->{pg_type};
-    ## $self->message( 3, "pg_type has following information: ", sub{ $self->printer( $pg_types ) } );
+    # $self->message( 3, "pg_type has following information: ", sub{ $self->printer( $pg_types ) } );
     my $mode = ref( $data );
     # $self->messagef( 3, "%d data received.", scalar( @$data ) ) if( $mode eq 'ARRAY' );
     $self->messagef( 3, "%d data received.", scalar( @$data ) ) if( $self->_is_array( $data ) );
     for( my $i = 0; $i < scalar( @$names ); $i++ )
     {
-        ## $self->messagef( 3, "Checking field '%s' with type '%s'.", $names->[$i], $types->[$i] );
+        # $self->messagef( 3, "Checking field '%s' with type '%s'.", $names->[$i], $types->[$i] );
         if( $types->[$i] eq PG_JSON || $types->[$i] eq PG_JSONB || $types->[$i] eq 'json' || $types->[$i] eq 'jsonb' )
         {
             $self->messagef( 3, "Found a json field '%s' of type '%s'.", $names->[$i], $types->[$i] );
@@ -1143,9 +1139,9 @@ sub _convert_json2hash
             # elsif( $mode eq 'HASH' )
             elsif( $self->_is_hash( $data ) )
             {
-                ## $self->message( 3, "Value is: '", $data->{ $names->[ $i ] }, "'." );
+                # $self->message( 3, "Value is: '", $data->{ $names->[ $i ] }, "'." );
                 my $ref = $self->_decode_json( $data->{ $names->[ $i ] } );
-                ## $self->message( 3, "Converted value is: ", sub{ $self->dumper( $ref ) } );
+                # $self->message( 3, "Converted value is: ", sub{ $self->dumper( $ref ) } );
                 $data->{ $names->[ $i ] } = $ref if( $ref );
             }
         }
@@ -1157,15 +1153,15 @@ sub _dsn
 {
     my $self = shift( @_ );
     my @params = ();
-    $self->message( 3, "\$self contains: ", sub{ $self->dumper( $self ) } );
-    ## See pg_service.conf
+    # $self->message( 3, "\$self contains: ", sub{ $self->dumper( $self ) } );
+    # See pg_service.conf
     if( $self->{service} )
     {
         @params = ( sprintf( 'dbi:%s:%s', @$self{ qw( driver service ) } ) );
     }
     else
     {
-        ## It ends with ':'
+        # It ends with ':'
         @params = ( sprintf( 'dbi:%s:', $self->{driver} ) );
     }
     push( @params, sprintf( 'dbname=%s', $self->{database} ) ) if( $self->{database} );
@@ -1175,59 +1171,59 @@ sub _dsn
     return( join( ';', @params ) );
 }
 
-## See DB::Object
-## sub _cache_this
+# See DB::Object
+# sub _cache_this
 
-## See DB::Object
-## sub _clean_statement
+# See DB::Object
+# sub _clean_statement
 
-## See DB::Object
-## sub _cleanup
+# See DB::Object
+# sub _cleanup
 
-## See DB::Object
-## sub _dbi_connect
+# See DB::Object
+# sub _dbi_connect
 
-## See DB::Object
-## sub _make_sth
+# See DB::Object
+# sub _make_sth
 
-## Moved to DB::Object::Postgres::Query
-## sub _query_components
+# Moved to DB::Object::Postgres::Query
+# sub _query_components
 
-## See DB::Object. The meat of it is really in DB::Object::Query
-## sub _reset_query
+# See DB::Object. The meat of it is really in DB::Object::Query
+# sub _reset_query
 
-## See DB::Object
-## sub _save_bind
+# See DB::Object
+# sub _save_bind
 
-## See DB::Object
-## sub _value2bind
+# See DB::Object
+# sub _value2bind
 
-## AUTOLOAD is inherited
-## AUTOLOAD
+# AUTOLOAD is inherited
+# AUTOLOAD
 
 DESTROY
 {
     my $self  = shift( @_ );
     my $class = ref( $self ) || $self;
-    if( $self->{ 'sth' } )
+    if( $self->{sth} )
     {
-        ## $self->message( "DETROY(): Terminating sth '$self' for query:\n$self->{ 'query' }\n" );
-        print( STDERR "DESTROY(): Terminating sth '$self' for query:\n$self->{ 'query' }\n" ) if( $DEBUG );
-        $self->{ 'sth' }->finish();
+        # $self->message( "DETROY(): Terminating sth '$self' for query:\n$self->{ 'query' }\n" );
+        # print( STDERR "DESTROY(): Terminating sth '$self' for query:\n$self->{ 'query' }\n" ) if( $DEBUG );
+        $self->{sth}->finish();
     }
-    elsif( $self->{ 'dbh' } && $class =~ /^AI\:\:DB\:\:Postgres$/ )
+    elsif( $self->{dbh} && $class =~ /^AI\:\:DB\:\:Postgres$/ )
     {
-        local( $SIG{ '__WARN__' } ) = sub { };
-        ## $self->{ 'dbh' }->disconnect();
+        local( $SIG{__WARN__} ) = sub { };
+        # $self->{ 'dbh' }->disconnect();
         if( $DEBUG )
         {
             my( $pack, $file, $line, $sub ) = ( caller( 0 ) )[ 0, 1, 2, 3 ];
             my( $pack2, $file2, $line2, $sub2 ) = ( caller( 1 ) ) [ 0, 1, 2, 3 ];
-            print( STDERR "DESTROY database handle ($self) [$self->{ 'query' }]\ncalled within sub '$sub' ($sub2) from package '$pack' ($pack2) in file '$file' ($file2) at line '$line' ($line2).\n" );
+            print( STDERR "DESTROY database handle ($self) [$self->{query}]\ncalled within sub '$sub' ($sub2) from package '$pack' ($pack2) in file '$file' ($file2) at line '$line' ($line2).\n" );
         }
         $self->disconnect();
     }
-    my $locks = $self->{ '_locks' };
+    my $locks = $self->{_locks};
     if( $locks && $self->_is_array( $locks ) )
     {
         foreach my $name ( @$locks )
@@ -1239,13 +1235,15 @@ DESTROY
 
 END
 {
-    ## foreach my $dbh ( @DBH )
-    ## {
-    ##     $dbh->disconnect();
-    ## }
+    # foreach my $dbh ( @DBH )
+    # {
+    #     $dbh->disconnect();
+    # }
 };
 
 1;
+
+# XXX POD
 
 __END__
 
@@ -1312,20 +1310,20 @@ DB::Object::Postgres - SQL API
     # INSERT INTO customers (first_name, last_name, email, active) VALUES('Paul', 'Goldman', 'paul\@example.org', '0')
     $dbh->commit;
     
-    ## and more elaborate:
-    ## Ref: https://www.postgresql.org/docs/10/sql-insert.html#SQL-ON-CONFLICT
+    # and more elaborate:
+    # Ref: https://www.postgresql.org/docs/10/sql-insert.html#SQL-ON-CONFLICT
     $login->on_conflict({
-        ## mandatory, can be a constraint name or a field name or array of fields
+        # mandatory, can be a constraint name or a field name or array of fields
         target => 'on constraint idx_prefs_unique',
         action => 'update',
-        ## where => '',
-        ## which fields to update. It can also be more specific by providing a hash ref like fields => { val => 'plop' }
+        # where => '',
+        # which fields to update. It can also be more specific by providing a hash ref like fields => { val => 'plop' }
         fields => [qw( val )],
     });
-    ## would become:
+    # would become:
     insert into login (..) values(...) on conflict on constraint idx_prefs_unique do update set val = EXCLUDED.val;
     
-    ## Get the last used insert id
+    # Get the last used insert id
     my $id = $dbh->last_insert_id();
     
     $cust->where( email => 'john@example.org' );
@@ -1342,14 +1340,16 @@ DB::Object::Postgres - SQL API
     # Would become:
     # UPDATE ONLY customers SET active='0' WHERE email='john\@example.org'
     
-    ## Lets' dump the result of our query
-    ## First to STDERR
+    # Lets' dump the result of our query
+    # First to STDERR
     $login->where( "login='jack'" );
     $login->select->dump();
-    ## Now dump the result to a file
+    # Now dump the result to a file
     $login->select->dump( "my_file.txt" );
     
 =head1 DESCRIPTION
+
+This package inherits from L<DB::Object>, so any method not here, but there you can use.
 
 L<DB::Object::Postgres> is a SQL API much alike L<DBD::Pg>.
 So why use a private module instead of using that great L<DBD::Pg> package?
@@ -1365,44 +1365,41 @@ programmer with an intuitive, user-friendly and hassle free interface.
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>()
+=head2 new
 
 Create a new instance of L<DB::Object::Postgres>. Nothing much to say.
 
-=item B<connect>( DATABASE, LOGIN, PASSWORD, SERVER, DRIVER )
+=head2 connect
 
-Create a new instance of L<DB::Object::Postgres>, but also attempts a conection
-to SQL server.
-You can specify the following arguments:
+Provided with a database, login, password, server, driver, and this will attempt a database connection.
 
-=over 8
+Create a new instance of L<DB::Object::Postgres>, but also attempts a connection to SQL server.
 
-=item I<DATABASE>
+You can specify the following parameters:
+
+=over 4
+
+=item I<datbase>
 
 The database name you wish to connect to
 
-=item I<LOGIN>
+=item I<login>
 
 The login used to access that database
 
-=item I<PASSWORD>
+=item I<password>
 
 The password that goes along
 
-=item I<SERVER>
+=item I<server>
 
 The server, that is hostname of the machine serving a SQL server.
 
-=item I<DRIVER>
+=item I<driver>
 
-The driver you want to use. It needs to be of the same type than the server
-you want to connect to. If you are connecting to a MySQL server, you would use
-C<mysql>, if you would connecto to an Oracle server, you would use C<oracle>.
+The driver you want to use. It needs to be of the same type than the server you want to connect to. If you are connecting to a MySQL server, you would use C<mysql>, if you would connecto to an Oracle server, you would use C<oracle>.
 
-You need to make sure that those driver are properly installed in the system 
-before attempting to connect.
+You need to make sure that those driver are properly installed in the system before attempting to connect.
 
 To install the required driver, you could start with the command line:
 
@@ -1412,648 +1409,644 @@ which will provide you a special shell to install modules in a convenient way.
 
 =back
 
-=back
-
 =head1 METHODS
+
+=head2 attribute
+
+Sets or gets one more pg attributes.
+
+Valid attributes are:
 
 =over 4
 
-=item B<clear>()
-
-Reset error message.
-
-=item B<debug>( [ 0 | 1 ] )
-
-Toggle debug mode on/off
-
-=item B<error>( [ $string ] )
-
-Get set error message.
-If an error message is provided, B<error> will pass it to B<warn>.
-
-=item B<get>( $parameter )
-
-Get object parameter.
-
-=item B<message>( $string )
-
-Provided a multi line string, B<message> will display it on the STDERR if either I<verbose> or I<debug> mode is on.
-
-=item B<verbose>()
-
-Toggle verbose mode on/off
-
-=item B<alias>( %parameters )
-
-Get/set alias for table fields in SELECT queries. The hash provided thus contain a list of field => alias pairs.
-
-=item B<as_string>()
-
-Return the sql query as a string.
-
-=item B<avoid>( [ @fields | \@fields ] )
-
-Set the provided list of table fields to avoid when returning the query result.
-The list of fields can be provided either as an array of a reference to an array.
-
-=item B<attribute>( $name | %names )
-
-Sets or get the value of database connection parameters.
-
-If only one argument is provided, returns its value.
-If multiple arguments in a form of pair => value are provided, it sets the corresponding database parameters.
-
-The authorised parameters are:
-
-=over 8
-
-=item I<Warn>
-
-Can be overridden.
-
-=item I<Active>
-
-Read-only.
-
-=item I<Kids>
-
-Read-only.
-
 =item I<ActiveKids>
 
-Read-only.
-
-=item I<CachedKids>
-
-Read-only.
-
-=item I<InactiveDestroy>
-
-Can be overridden.
-
-=item I<PrintError>
-
-Can be overridden.
-
-=item I<RaiseError>
-
-Can be overridden.
-
-=item I<ChopBlanks>
-
-Can be overridden.
-
-=item I<LongReadLen>
-
-Can be overridden.
-
-=item I<LongTruncOk>
-
-Can be overridden.
+Is read-only.
 
 =item I<AutoCommit>
 
-Can be overridden.
+Can be changed.
 
-=item I<Name>
+=item I<AutoInactiveDestroy>
 
-Read-only.
+Can be changed.
 
-=item I<RowCacheSize>
+=item I<CachedKids>
 
-Read-only.
+Is read-only.
 
-=item I<NUM_OF_FIELDS>
+=item I<ChildHandles>
 
-Read-only.
+Is read-only.
 
-=item I<NUM_OF_PARAMS>
+=item I<ChopBlanks>
 
-Read-only.
-
-=item I<NAME>
-
-Read-only.
-
-=item I<TYPE>
-
-Read-only.
-
-=item I<PRECISION>
-
-Read-only.
-
-=item I<SCALE>
-
-Read-only.
-
-=item I<NULLABLE>
-
-Read-only.
+Can be changed.
 
 =item I<CursorName>
 
-Read-only.
+Is read-only.
 
-=item I<Statement>
+=item I<Driver>
 
-Read-only.
+Is read-only.
+
+=item I<ErrCount>
+
+Can be changed.
+
+=item I<Executed>
+
+Is read-only.
+
+=item I<FetchHashKeyName>
+
+Can be changed.
+
+=item I<HandleError>
+
+Can be changed.
+
+=item I<HandleSetErr>
+
+Can be changed.
+
+=item I<InactiveDestroy>
+
+Can be changed.
+
+=item I<Kids>
+
+Is read-only.
+
+=item I<NAME>
+
+Is read-only.
+
+=item I<NULLABLE>
+
+Is read-only.
+
+=item I<NUM_OF_FIELDS>
+
+Is read-only.
+
+=item I<NUM_OF_PARAMS>
+
+Is read-only.
+
+=item I<Name>
+
+Is read-only.
+
+=item I<PRECISION>
+
+Is read-only.
+
+=item I<PrintError>
+
+Can be changed.
+
+=item I<PrintWarn>
+
+Can be changed.
+
+=item I<Profile>
+
+Can be changed.
+
+=item I<RaiseError>
+
+Can be changed.
+
+=item I<ReadOnly>
+
+Can be changed.
+
+Specifies if the current database connection should be in read-only mode or not.
+
+=item I<RowCacheSize>
+
+Is read-only.
 
 =item I<RowsInCache>
 
-Read-only.
+Is read-only.
+
+=item I<SCALE>
+
+Is read-only.
+
+=item I<ShowErrorStatement>
+
+Can be changed.
+
+=item I<Statement>
+
+Is read-only.
+
+=item I<TYPE>
+
+Is read-only.
+
+=item I<Taint>
+
+Can be changed.
+
+=item I<TaintIn>
+
+Can be changed.
+
+=item I<TaintOut>
+
+Can be changed.
+
+=item I<TraceLevel>
+
+Can be changed.
+
+=item I<Type>
+
+Can be changed.
+
+=item I<Username>
+
+Is read-only.
+
+=item I<Warn>
+
+Can be changed.
+
+=item I<pg_INV_READ>
+
+Is read-only.
+
+=item I<pg_INV_WRITE>
+
+Is read-only.
+
+=item I<pg_async_status>
+
+Is read-only.
+
+=item I<pg_bool_tf>
+
+Can be changed.
+
+If true, boolean values will be returned as the characters 't' and 'f' instead of '1' and '0'.
+
+=item I<pg_db>
+
+Is read-only.
+
+=item I<pg_default_port>
+
+Is read-only.
+
+=item I<pg_enable_utf8>
+
+Can be changed.
+
+=item I<pg_errorlevel>
+
+Can be changed.
+
+Valid entries are 0, 1 and 2
+
+=item I<pg_expand_array>
+
+Can be changed.
+
+=item I<pg_host>
+
+Is read-only.
+
+=item I<pg_lib_version>
+
+Is read-only.
+
+=item I<pg_options>
+
+Is read-only.
+
+=item I<pg_pass>
+
+Is read-only.
+
+=item I<pg_pid>
+
+Is read-only.
+
+=item I<pg_placeholder_dollaronly>
+
+Can be changed.
+
+When true, question marks inside of statements are not treated as placeholders, e.g. geometric operators
+
+=item I<pg_placeholder_nocolons>
+
+Can be changed.
+
+When true, colons inside of statements are not treated as placeholders
+
+=item I<pg_port>
+
+Is read-only.
+
+=item I<pg_prepare_now>
+
+Can be changed.
+
+=item I<pg_protocol>
+
+Is read-only.
+
+=item I<pg_server_prepare>
+
+Can be changed.
+
+Indicates if L<DBD::Pg> should attempt to use server-side prepared statements. On by default
+
+=item I<pg_server_version>
+
+Is read-only.
+
+=item I<pg_socket>
+
+Is read-only.
+
+=item I<pg_standard_conforming_strings>
+
+Is read-only.
+
+=item I<pg_switch_prepared>
+
+Can be changed.
+
+=item I<pg_user>
+
+Is read-only.
 
 =back
 
-=item B<available_drivers>()
+=head2 begin_work
 
-Return the list of available drivers.
+Mark the beginning of a transaction.
 
-=item B<bind>( [ @values ] )
+Any arguments provided are passed along to L<DBD::Pg/begin_work>
 
-If no values to bind to the underlying query is provided, B<bind> simply activate the bind value feature.
+=head2 commit
 
-If values are provided, they are allocated to the statement object and will be applied when the query will be executed.
+Make any change to the database irreversible.
 
-Example:
+This must be used only after having called L</begin_work>
 
-  $dbh->bind()
-  ## or
-  $dbh->bind->where( "something" )
-  ## or
-  $dbh->bind->select->fetchrow_hashref()
-  ## and then later
-  $dbh->bind( 'thingy' )->select->fetchrow_hashref()
+Any arguments provided are passed along to L<DBD::Pg/commit>
 
-=item B<cache>()
+=head2 connect
 
-Activate caching.
+Same as L<DB::Object/connect>, only specific to PostgreSQL.
 
-  $tbl->cache->select->fetchrow_hashref();
+See L</_connection_params2hash>
 
-=item B<check_driver>()
+=head2 create_db
 
-Check that the driver set in I<$SQL_DRIVER> in ~/etc/common.cfg is indeed available.
+Provided with a database name and some optional parameters and this will prepare and execute the query to create the database.
 
-It does this by calling B<available_drivers>.
+Upon failure, this will return an error, and upon success, this will connect to the newly created database and return the database handler.
 
-=item B<copy>( [ \%values | %values )
+Possible options are:
 
-Provided with either a reference to an hash or an hash of key => value pairs, B<copy> will first execute a select statement on the table object, then fetch the row of data, then replace the key-value pair in the result by the ones provided, and finally will perform an insert.
+=over 4
 
-Return false if no data to copy were provided, otherwise it always returns true.
+=item I<allowcon>
 
-=item B<create_table>( @parameters )
+Sets the C<ALLOW_CONNECTIONS> attribute
 
-The idea is to create a table with the givern parameters.
+"If false then no one can connect to this database. The default is true, allowing connections."
 
-This is currently heavily designed to work for PoPList. It needs to be rewritten.
+=item I<connlimit>
 
-=item B<data_sources>( [ %options ] )
+Sets the C<CONNECTION LIMIT> attribute
 
-Given an optional list of options, this return the data source of the database handler.
+"How many concurrent connections can be made to this database. -1 (the default) means no limit."
 
-=item B<data_type>( [ \@types | @types ] )
+=item I<encoding>
 
-Given a reference to an array or an array of data type, B<data_type> will check their availability in the database driver.
+Sets the C<ENCODING> attribute
 
-If nothing found, it return an empty list in list context, or undef in scalar context.
+"Character set encoding to use in the new database."
 
-If something was found, it returns a hash in list context or a reference to a hash in list context.
+=item I<lc_collate>
 
-=item B<database>()
+Sets the C<LC_COLLATE> attribute
 
-Return the name of the current database.
+"Collation order (LC_COLLATE) to use in the new database."
 
-=item B<delete>()
+=item I<lc_ctype>
 
-B<delete> will format a delete query based on previously set parameters, such as B<where>.
+Sets the C<LC_CTYPE> attribute
 
-B<delete> will refuse to execute a query without a where condition. To achieve this, one must prepare the delete query on his/her own by using the B<do> method and passing the sql query directly.
+"Character classification (LC_CTYPE) to use in the new database."
 
-  $tbl->where( "login" => "jack" );
-  $tbl->limit( 1 );
-  my $rows_affected = $tbl->delete();
-  ## or passing the where condition directly to delete
-  my( $sth ) = $tbl->delete( "login" => "jack" );
+=item I<istemplate>
 
-=item B<disconnect>()
+Sets the C<IS_TEMPLATE> attribute
 
-Disconnect from database. Returns the return code.
+"If true, then this database can be cloned by any user with CREATEDB privileges; if false (the default), then only superusers or the owner of the database can clone it."
 
-  my $rc = $dbh->disconnect;
+=item I<owner>
 
-=item B<do>( $sql_query, [ \%attributes, \@bind_values ] )
+Sets the C<OWNER> attribute
 
-Execute a sql query directly passed with possible attributes and values to bind.
+"The role name of the user who will own the new database"
 
-The attributes list will be used to B<prepare> the query and the bind values will be used when executing the query.
+=item I<tablespace>
 
-It returns the statement handler or the number of rows affected.
+Sets the C<TABLESPACE> attribute
 
-Example:
+"The name of the tablespace that will be associated with the new database"
 
-  $rc  = $dbh->do( $statement ) || die( $dbh->errstr );
-  $rc  = $dbh->do( $statement, \%attr ) || die( $dbh->errstr );
-  $rv  = $dbh->do( $statement, \%attr, @bind_values ) || die( $dbh->errstr );
-  my( $rows_deleted ) = $dbh->do(
-  q{
-       DELETE FROM table WHERE status = ?
-  }, undef(), 'DONE' ) || die( $dbh->errstr );
+=item I<template>
 
-=item B<enhance>( [ @value ] )
+Sets the C<TEMPLATE> attribute
 
-Toggle the enhance mode on/off.
-
-When on, the functions I<from_unixtime> and I<unix_timestamp> will be used on date/time field to translate from and to unix time seamlessly.
-
-=item B<err>()
-
-Get the currently set error.
-
-=item B<errno>()
-
-Is just an alias for B<err>.
-
-=item B<errmesg>()
-
-Is just an alias for B<errstr>.
-
-=item B<errstr>()
-
-Get the currently set error string.
-
-=item B<fatal>( [ 1 | 0 ] )
-
-Toggles fatal mode on/off.
-
-=item B<from_unixtime>( [ @fields | \@fields ] )
-
-Set the list of fields that are to be treated as unix time and converted accordingly after the sql query is executed.
-
-It returns the list of fields in list context or a reference to an array in scalar context.
-
-=item B<format_statement>( [ \@data, \@order, $table ] )
-
-Format the sql statement.
-
-In list context, it returns 2 strings: one comma-separated list of fields and one comma-separated list of values. In scalar context, it only returns a comma-separated string of fields.
-
-=item B<format_update>( \@data | \%data | %data | @data )
-
-Formats update query based on the following arguments provided:
-
-=over 8
-
-=item I<data>
-
-An array of key-value pairs to be used in the update query. This array can be provided as the prime argument as a reference to an array, an array, or as the I<data> element of a hash or a reference to a hash provided.
-
-Why an array if eventually we build a list of key-value pair? Because the order of the fields may be important, and if the key-value pair list is provided, B<format_update> honors the order in which the fields are provided.
+"The name of the template from which to create the new database"
 
 =back
 
-B<format_update> will then iterate through each field-value pair, and perform some work:
+See L<PostgreSQL documentation for more information|https://www.postgresql.org/docs/9.5/sql-createdatabase.html>
 
-If the field being reviewed was provided to B<from_unixtime>, then B<format_update> will enclose it in the function FROM_UNIXTIME() as in:
+=head2 create_table
 
-  FROM_UNIXTIME(field_name)
-  
-If the the given value is a reference to a scalar, it will be used as-is, ie. it will not be enclosed in quotes or anything. This is useful if you want to control which function to use around that field.
+Provided with a table name and some options as hash reference and this will create a new table.
 
+A mandatory parameter is I<sql> which must contain the sql script to be used.
 
-If the given value is another field or looks like a function having parenthesis, or if the value is a question mark, the value will be used as-is.
+The sql script is executed using L<DB::Object/do> and the returned value is returned.
 
-If B<bind> is off, the value will be escaped and the pair field='value' created.
+=head2 databases
 
-If the field is a SET data type and the value is a number, the value will be used as-is without surrounding single quote.
+Returns a list of all available databases.
 
-If B<bind> is enabled, a question mark will be used as the value and the original value will be saved as value to bind upon executing the query.
+=head2 func
 
-Finally, otherwise the value is escaped and surrounded by single quotes.
+Provided with a table name and a function name and this will call L<DBD::Pg/func> and returns the result.
 
-B<format_update> returns a string representing the comma-separated list of fields that will be used.
+=head2 having
 
-=item B<getdefault>( %default_values )
+A convenient wrapper to L<DB::Object::Postgres::Query/having>
 
-Does some preparation work such as :
+=head2 large_object
 
-=over 8
+Instantiate a new L<DB::Object::Postgres::Lo> and returns it.
 
-=item 1
-
-the date/time field to use the FROM_UNIXTIME and UNIX_TIMESTAMP functions
-
-=item 2
-
-removing from the query the fields to avoid, ie the ones set with the B<avoid> method.
-
-=item 3
-
-set the fields alias based on the information provided with the B<alias> method.
-
-=item 4
-
-if a field last_name and first_name exist, it will also create an alias I<name> based on the concatenation of the 2.
-
-=item 5
-
-it will set the default values provided. This is used for UPDATE queries.
-
-=back
-
-It returns a new L<DB::Object::Postgres::Tables> object with all the data prepared within.
-
-=item B<group>( @fields | \@fields )
-
-Format the group by portion of the query.
-
-It returns an empty list in list context of undef in scalar context if no group by clause was build.
-Otherwise, it returns the value of the group by clause as a string in list context and the full group by clause in scalar context.
-
-In list context, it returns: $group_by
-
-In scalar context, it returns: GROUP BY $group_by
-
-=item B<insert>( L<DB::Object::Postgres::Statement> SELECT object, \%key_value | %key_value )
-
-Prepares an INSERT query using the field-value pairs provided.
-
-If a L<DB::Object::Postgres::Statement> object is provided as first argument, it will considered as a SELECT query to be used in the INSERT query, as in: INSERT INTO my table SELECT FROM another_table
-
-Otherwise, B<insert> will build the query based on the fields provided.
-
-In scalar context, it returns the result of B<execute> and in list context, it returns the statement object.
-
-=item B<last_insert_id>()
+=head2 last_insert_id
 
 Get the id of the primary key from the last insert.
 
-=item B<limit>( [ END, [ START, END ] ] )
+=head2 lock
 
-Set or get the limit for the future statement.
+Takes a table name, a lock mode and an optional C<nowait> and this will lock the given table by issuing the relevant query.
 
-If only one argument is provided, it is assumed to be the end limit. If 2 are provided, they wil be the start and end.
-
-It returns a list of the start and end limit in list context, and the string of the LIMIT in scalar context, such as: LIMIT 1, 10
-
-=item B<local>( %params | \%params )
-
-Not sure what it does. I forgot.
-
-=item B<lock>( $lock_id, [ $timeout ] )
-
-Set a lock using a lock identifier and a timeout.
-By default the timeout is 2 seconds.
+Supported lock types are: C<SHARE>, C<SHARE ROW EXCLUSIVE>, C<EXCLUSIVE>, C<ACCESS EXCLUSIVE>
 
 If the lock failed (NULL), it returns undef(), otherwise, it returns the return value.
 
-=item B<no_bind>()
+=head2 make_schema
 
-When invoked, B<no_bind> will change any preparation made so far for caching the query with bind parameters, and instead substitute the value in lieu of the question mark placeholder.
+Provided with a database name and this will create its schema.
 
-=item B<no_cache>()
+In list context, it returns an array of schema lines, and in scalar context, it returns the schema as a string.
 
-Disable caching of queries.
+=head2 on_conflict
 
-=item B<order>()
+A convenient wrapper to L<DB::Object::Postgres::Query/on_conflict>
 
-Prepares the ORDER BY clause and returns the value of the clause in list context or the ORDER BY clause in full in scalar context, ie. "ORDER BY $clause"
+=head2 pg_ping
 
-=item B<param>( $param | %params )
+Calls L<DBD::Pg/pg_ping>
 
-If only a single parameter is provided, its value is return. If a list of parameters is provided they are set accordingly using the C<SET> sql command.
+=head2 query_object
 
-Supported parameters are:
+Set or gets the PostgreSQL query object (L<DB::Object::Postgres::Query>) used to process and format queries.
 
-=over 8
+=head2 release
 
-=item SQL_AUTO_IS_NULL
+Calls L<DBD::pg_release> passing it through whatever arguments were provided.
 
-=item AUTOCOMMIT
+=head2 replace
 
-=item SQL_BIG_TABLES
+Replace queries are not supported in PostgreSQL
 
-=item SQL_BIG_SELECTS
+=head2 returning
 
-=item SQL_BUFFER_RESULT
+A convenient wrapper to L<DB::Object::Postgres::Query/returning>
 
-=item SQL_LOW_PRIORITY_UPDATES
+=head2 rollback
 
-=item SQL_MAX_JOIN_SIZE 
+Will roll back any changes made to the database since the last transaction point marked with L</begin_work>
 
-=item SQL_SAFE_MODE
+=head2 rollback_to
 
-=item SQL_SELECT_LIMIT
+Will call L<DBD::Pg/pg_rollback_to> and passing it through whatever arguments were provided.
 
-=item SQL_LOG_OFF
+=head2 savepoint
 
-=item SQL_LOG_UPDATE 
+Will call L<DBD::Pg/pg_savepoint> and passing it through whatever arguments were provided.
 
-=item TIMESTAMP
+=head2 schema
 
-=item INSERT_ID
+Sets or gets the database schema.
 
-=item LAST_INSERT_ID
+It returns the value as a L<Module:Generic::Scalar> object
+
+=head2 search_path
+
+If a search path is provided, this will issue the query to set it using C<SET search_path = $search_path> whatever C<$search_path> is. It returns the returned value from L<DBD::Pg/execute>
+
+If no arguments is provided, this will issue the query C<SHOW search_path> to retrieve the current search path.
+
+It returns an array object (L<Module::Generic::Array>) containing the search paths found.
+
+=head2 socket
+
+This returns the database handler property C<pg_socket>
+
+=head2 table_exists
+
+Provided with a table name and this will check if the table exists.
+
+It accepts the following options:
+
+=over 4
+
+=item I<anywhere>
+
+If true, this will search anywhere.
+
+=item I<schema>
+
+A database schema.
 
 =back
 
-If unsupported parameters are provided, they are considered to be private and not passed to the database handler.
+=head2 table_info
 
-It then execute the query and return undef() in case of error.
+Provided with a table name and some optional parameters and this will retrieve the table information.
 
-Otherwise, it returns the object used to call the method.
+It returns an array reference of tables information found if no schema was provided or if I<anywhere> is true.
 
-=item B<ping>()
+If a schema was provided, and the table found it returns an hash reference for that table.
 
-Evals a SELECT 1 statement and returns 0 if errors occurred or the return value.
+Otherwise, if nothing can be found, it returns an empty array reference.
 
-=item B<prepare>( $query, \%options )
+Optional parameters are:
 
-Prepares the query using the options provided. The options are the same as the one in L<DBI> B<prepare> method.
+=over 4
 
-It returns a L<DB::Object::Postgres::Statement> object upon success or undef if an error occurred. The error can then be retrieved using B<errstr> or B<error>.
+=item I<anywhere>
 
-=item B<prepare_cached>( $query, \%options )
+If true, it will search anywhere.
 
-Same as B<prepare> except the query is cached.
+=item I<schema>
 
-=item B<query>( $query, \%options )
-
-It prepares and executes the given SQL query with the options provided and return undef() upon error or the statement handler upon success.
-
-=item B<replace>( L>DB::Object::Postgres::Statement> object, [ %data ] )
-
-Just like for the INSERT query, B<replace> takes one optional argument representing a L<DB::Object::Postgres::Statement> SELECT object or a list of field-value pairs.
-
-If a SELECT statement is provided, it will be used to construct a query of the type of REPLACE INTO mytable SELECT FROM other_table
-
-Otherwise the query will be REPLACE INTO mytable (fields) VALUES(values)
-
-In scalar context, it execute the query and in list context it simply returns the statement handler.
-
-=item B<reset>()
-
-This is used to reset a prepared query to its default values. If a field is a date/time type, its default value will be set to NOW()
-
-It execute an update with the reseted value and return the number of affected rows.
-
-=item B<reverse>( [ true ])
-
-Get or set the reverse mode.
-
-=item B<select>( [ \$field, \@fields, @fields ] )
-
-Given an optional list of fields to fetch, B<select> prepares a SELECT query.
-
-If no field was provided, B<select> will use default value where appropriate like the NOW() for date/time fields.
-
-B<select> calls upon B<tie>, B<where>, B<group>, B<order>, B<limit> and B<local> to build the query.
-
-In scalar context, it execute the query and return it. In list context, it just returns the statement handler.
-
-=item B<set>( $var )
-
-Issues a query to C<SET> the given SQL variable.
-
-If any error occurred, undef will be returned and an error set, otherwise it returns true.
-
-=item B<sort>()
-
-It toggles sort mode on and consequently disable reverse mode.
-
-=item B<stat>( [ $type ] )
-
-Issue a SHOW STATUS query and if a particular $type is provided, it will returns its value if it exists, otherwise it will return undef.
-
-In absence of particular $type provided, it returns the hash list of values returns or a reference to the hash list in scalar context.
-
-=item B<state>()
-
-Queries the DBI state and return its value.
-
-=item B<table>( $table_name )
-
-Given a table name, B<table> will return a L<DB::Object::Postgres::Tables> object. The object is cached for re-use.
-
-=item B<table_push>( $table_name )
-
-Add the given table name to the stack of cached table names.
-
-=item B<tables>( [ $database ] )
-
-Connects to the database and finds out the list of all available tables.
-
-Returns undef or empty list in scalar or list context respectively if no table found.
-
-Otherwise, it returns the list of table in list context or a reference of it in scalar context.
-
-=item B<tables_refresh>( [ $database ] )
-
-Rebuild the list of available database table.
-
-Returns the list of table in list context or a reference of it in scalar context.
-
-=item B<tie>( [ %fields ] )
-
-If provided a hash or a hash ref, it sets the list of fields and their corresponding perl variable to bind their values to.
-
-In list context, it returns the list of those field-variable pair, or a reference to it in scalar context.
-
-=item B<unix_timestamp>( [ \@fields | @fields ] )
-
-Provided a list of fields or a reference to it, this sets the fields to be treated for seamless conversion from and to unix time.
-
-=item B<unlock>( $lock_id )
-
-Given a lock identifier, B<unlock> releases the lock previously set with B<lock>. It executes the underlying sql command and returns undef() if the result is NULL or the value returned otherwise.
-
-=item B<update>( %data | \%data )
-
-Given a list of field-value pairs, B<update> prepares a sql update query.
-
-It calls upon B<where> and B<limit> as previously set.
-
-It returns undef and sets an error if it failed to prepare the update statement. In scalar context, it execute the query. In list context, it simply return the statement handler.
-
-=item B<use>( $database )
-
-Given a database, it switch to it, but before it checks that the database exists.
-If the database is different than the current one, it sets the I<multi_db> parameter, which will have the fields in the queries be prefixed by their respective database name.
-
-It returns the database handler.
-
-=item B<use_cache>( [ on | off ] )
-
-Sets or get the I<use_cache> parameter.
-
-=item B<use_bind>( [ on | off ] )
-
-Sets or get the I<use_cache> parameter.
-
-=item B<variables>( [ $type ] )
-
-Query the SQL variable $type
-
-It returns a blank string if nothing was found, or the value found.
-
-=item B<where>( %args )
-
-Build the where clause based on the field-value hash provided.
-
-It returns the where clause in list context or the full where clause in scalar context, ie "WHERE $clause"
-
-=item B<_cache_this>( $query )
-
-Provided with a query, this will cache it for future re-use.
-
-It does some check and maintenance job to ensure the cache does not get too big whenever it exceed the value of $CACHE_SIZE set in the main config file.
-
-It returns the cached statement as an L<DB::Object::Postgres::Statement> object.
-
-=item B<_clean_statement>( \$query | $query )
-
-Given a query string or a reference to it, it cleans the statement by removing leading and trailing space before and after line breaks.
-
-=item B<_cleanup>()
-
-Removes object attributes, namely where, selected_fields, group_by, order_by, limit, alias, avoid, local, and as_string
-
-=item B<_make_sth>( $package, $hashref )
-
-Given a package name and a hashref, this build a statement object with all the necessary parameters.
-
-It also sets the query time to the current time with the parameter I<query_time>
-
-It returns an object of the given $package.
-
-=item B<_reset_query>()
-
-Being called using a statement handler, this reset the object by removing all the parameters set by various subroutine calls, such as B<where>, B<group>, B<order>, B<avoid>, B<limit>, etc.
-
-=item B<_save_bind>( $query_type )
-
-This saves/cache the bin query and return the object used to call it.
-
-=item B<_value2bind>( $query, $ref )
-
-Given a sql query and a array reference, B<_value2bind> parse the query and interpolate values for placeholder (?).
-
-It returns true.
+A database schema.
 
 =back
 
-=head1 COPYRIGHT
+=head2 tables_info
 
-Copyright (c) 2000-2019 DEGUEST Pte. Ltd.
+Provided with a database name and this returns all the tables information.
 
-=head1 CREDITS
+Information retrieved from the PostgreSQL system tables for every table found in the given database are:
 
-Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+=over 4
+
+=item I<name>
+
+The object name
+
+=item I<owner>
+
+The object owner (role)
+
+=item I<schema>
+
+Database schema, if any.
+
+=item I<type>
+
+The object type, which may be one of: C<table>, C<view>, C<materialized view>, C<special>, C<foreign table>
+
+=back
+
+=head2 trace
+
+Calls L<DBD::Pg/trace> passing through whatever arguments were provided.
+
+=head2 trace_msg
+
+Calls L<DBD::Pg/trace_msg> and pass it whatever arguments were provided.
+
+
+=head2 unlock
+
+Unlock does not work with PostgreSQL
+
+=head2 variables
+
+Variables are currently unsupported in Postgres
+
+=head2 version
+
+Returns the PostgreSQL database server version.
+
+This information is cached per object for efficiency.
+
+=head2 _check_connect_param
+
+Given some parameters hash and this will return a proper hash reference of parameters suitable for connection parameters.
+
+This will call L</_connection_parameters> to get the valid parameters and L</_connection_options> to get valid connection options based on the arguments provided.
+
+It returns the hash reference of connection parameters.
+
+=head2 _check_default_option
+
+Based on optional arguments and this will enable default options for the parameters provided.
+
+Currently this only check C<client_encoding> and set the default to C<utf8>
+
+It returns an hash reference of those parameters.
+
+=head2 _connection_options
+
+Based on an hash reference of parameters and this will call L<DB::Object/_connection_options> and return a new hash reference of keys starting with C<pg_>
+
+=head2 _connection_parameters
+
+Based on an hash reference of parameters, this will return an array reference of core properties plus additional PostgreSQL specific properties that start with C<pg_>
+
+The core properties are: C<db>, C<login>, C<passwd>, C<host>, C<port>, C<driver>, C<database>, C<schema>, C<server>, C<opt>, C<uri>, C<debug>
+
+=head2 _convert_datetime2object
+
+Based on an hash reference of parameters and this will transcode any datetime column into a L<DateTime> object.
+
+It returns the I<data> hash reference
+
+Possible parameters are:
+
+=over 4
+
+=item I<data>
+
+An hash reference of data typically returned from a L<DBD::Pg/fetchrow_hashref>
+
+=item I<statement>
+
+This is the statement from which to check for columns
+
+=back
+
+=head2 _convert_json2hash
+
+Based on an hash reference of parameters, and this will check for the I<data> for any json column and if found, it will transcode the json to hash reference.
+
+It returns the I<data> hash reference
+
+Possible parameters are:
+
+=over 4
+
+=item I<data>
+
+An hash reference of data typically returned from a L<DBD::Pg/fetchrow_hashref>
+
+=item I<statement>
+
+This is the statement from which to check for columns
+
+=back
+
+=head2 _dsn
+
+This returns a properly formatted C<dsn> as a string.
 
 =head1 SEE ALSO
 
 L<DBI>, L<Apache::DBI>
 
-=cut
+=head1 AUTHOR
 
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2019-2021 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut

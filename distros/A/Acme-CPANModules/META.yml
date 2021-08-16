@@ -1,5 +1,5 @@
 ---
-abstract: 'CPAN modules'
+abstract: 'Categorizing CPAN modules'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
@@ -20,7 +20,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Acme-CPANModules/issues
   homepage: https://metacpan.org/release/Acme-CPANModules
   repository: git://github.com/perlancar/perl-Acme-CPANModules.git
-version: 0.1.8
+version: 0.1.9
 x_Dist_Zilla:
   perl:
     version: '5.030000'

@@ -1,6 +1,6 @@
 name = "App-week"
 readme_from = "script/week"
-badges = ['travis-ci.com', 'metacpan']
+badges = ['github-actions/test', 'metacpan']
 authority="cpan:UTASHIRO"
 
 module_maker="ModuleBuildTiny"

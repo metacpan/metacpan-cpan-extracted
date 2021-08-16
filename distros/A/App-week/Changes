@@ -1,5 +1,17 @@
 Revision history for Perl extension App-week
 
+1.0101 2021-08-15T06:31:43Z
+
+    - Fix revived bug for remove-trailing-space-system.
+
+1.01 2021-08-14T01:51:31Z
+
+    - Introduce Japanese era.
+    - Rename -Mteams to -Mnpb.
+    - Introduce -m# option.
+    - Introduce -p, -P option.
+    - Use Getopt::EX::Hashed for option handling.
+
 0.13 2020-06-29T02:23:37Z
 
     - requires 'Getopt::EX', 'v1.19.0';

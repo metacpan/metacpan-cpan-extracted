@@ -173,6 +173,13 @@ static const struct XSParseKeywordHooks hooks_ident = {
   .build1 = &build_constsv,
 };
 
+static const struct XSParseKeywordHooks hooks_ident_opt = {
+  .permit_hintkey = hintkey,
+
+  .piece1 = XPK_IDENT_OPT,
+  .build1 = &build_constsv_or_undef,
+};
+
 static const struct XSParseKeywordHooks hooks_packagename = {
   .permit_hintkey = hintkey,
 
@@ -248,6 +255,7 @@ BOOT:
   register_xs_parse_keyword("piecelistexpr", &hooks_listexpr, NULL);
 
   register_xs_parse_keyword("pieceident", &hooks_ident, NULL);
+  register_xs_parse_keyword("pieceident_opt", &hooks_ident_opt, NULL);
   register_xs_parse_keyword("piecepkg", &hooks_packagename, NULL);
 
   register_xs_parse_keyword("piecelexvarname", &hooks_lexvar_name, NULL);

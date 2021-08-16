@@ -22,12 +22,11 @@ BEGIN
     use strict;
     use DB::Object::Mysql;
     use DB::Object::Statement;
-    use IO::File;
     use DateTime;
-    use File::Spec;
+    use IO::File;
     use parent qw( DB::Object::Statement DB::Object::Mysql );
     our( $VERSION, $VERBOSE, $DEBUG );
-    $VERSION    = '0.3';
+    $VERSION    = 'v0.300.0';
     $VERBOSE    = 0;
     $DEBUG      = 0;
     use Devel::Confess;
@@ -38,12 +37,11 @@ BEGIN
 
 ## sub commit is called by dbh, so it is in DB::Object::Postgres
 
-## Customised for Postgres
+## Customised for MySQL
 sub distinct
 {
     my $self = shift( @_ );
-    my $what = shift( @_ );
-    my $query = $self->{ 'query' } ||
+    my $query = $self->{query} ||
     return( $self->error( "No query to set as to be ignored." ) );
     
     my $type = uc( ( $query =~ /^\s*(\S+)\s+/ )[ 0 ] );
@@ -77,7 +75,7 @@ sub dump
     my $hsep  = "\n";
     my $width = 35;
     my $fh    = IO::File->new;
-    $fh->fdopen( fileno( STDOUT ), "w" );
+    $fh->fdopen( fileno( STDOUT ), 'w' );
     $vsep  = $args->{vsep} if( exists( $args->{vsep} ) );
     $hsep  = $args->{hsep} if( exists( $args->{hsep} ) );
     $width = $args->{width} if( exists( $args->{width} ) );
@@ -85,10 +83,9 @@ sub dump
     return( $self->error( "No query to dump." ) ) if( !exists( $self->{sth} ) );
     if( exists( $args->{file} ) )
     {
-        my $file = $args->{file};
-        $file = File::Spec->catfile( File::Spec->tmpdir(), $file ) if( !File::Spec->file_name_is_absolute( $file ) );
-        $fh = File::IO->new( ">$file" ) || return( $self->error( "Unable to open file $file in write mode: $!" ) );
-        $fh->binmode( ':utf8' );
+        # new_file is inherited from Module::Generic and uses Module::Generic::File
+        my $file = $self->new_file( $args->{file} ) || return( $self->pass_error );
+        $fh = $file->open( '>', { binmode => 'utf8' }) || return( $self->error( "Unable to open file $file in write mode: $!" ) );
         my @header = sort{ $fields->{ $a } <=> $fields->{ $b } } keys( %$fields );
         my $date = DateTime->now;
         my $table = $self->{table};
@@ -103,13 +100,13 @@ sub dump
         $self->finish();
         return( $self );
     }
-    elsif( exists( $args->{ 'fh' } ) )
+    elsif( exists( $args->{fh} ) )
     {
-        if( !fileno( $args->{ 'fh' } ) )
+        if( !fileno( $args->{fh} ) )
         {
             return( $self->error( "The file descriptor provided does not seem to be valid (not open)" ) );
         }
-        $fh = IO::File->new_from_fd( $args->{ 'fh' }, 'w' ) || return( $self->error( $! ) );
+        $fh = IO::File->new_from_fd( $args->{fh}, 'w' ) || return( $self->error( $! ) );
     }
     my $max    = 0;
     ## foreach my $field ( keys( %$fields ) )
@@ -133,31 +130,31 @@ sub dump
     return( $self );
 }
 
-## Inherited from DB::Object::Statement
-## sub execute
+# Inherited from DB::Object::Statement
+# sub execute
 
-## Inherited from DB::Object::Statement
-## sub executed
+# Inherited from DB::Object::Statement
+# sub executed
 
-## Inherited from DB::Object::Statement
-## sub fetchall_arrayref($@)
+# Inherited from DB::Object::Statement
+# sub fetchall_arrayref($@)
 
-## Inherited from DB::Object::Statement
-## sub fetchcol($;$)
+# Inherited from DB::Object::Statement
+# sub fetchcol($;$)
 
-## Inherited from DB::Object::Statement
-## sub fetchhash(@)
+# Inherited from DB::Object::Statement
+# sub fetchhash(@)
 
-## Inherited from DB::Object::Statement
-## sub fetchrow(@)
+# Inherited from DB::Object::Statement
+# sub fetchrow(@)
 
-## Inherited from DB::Object::Statement
-## sub finish
+# Inherited from DB::Object::Statement
+# sub finish
 
 sub ignore
 {
     my $self = shift( @_ );
-    my $query = $self->{ 'query' } ||
+    my $query = $self->{query} ||
     return( $self->error( "No query to set as to be ignored." ) );
     
     my $type = uc( ( $query =~ /^[[:blank:]]*(\S+)[[:blank:]]+/ )[ 0 ] );
@@ -183,11 +180,11 @@ sub ignore
     return( $sth );
 }
 
-## Inherited from DB::Object::Statement
-## sub join
+# Inherited from DB::Object::Statement
+# sub join
 
-## Inherited from DB::Object::Statement
-## sub object
+# Inherited from DB::Object::Statement
+# sub object
 
 sub only
 {
@@ -206,7 +203,7 @@ sub priority
     ## Bad argument. Do not bother
     return( $self ) if( !exists( $map->{ $prio } ) );
     
-    my $query = $self->{ 'query' } ||
+    my $query = $self->{query} ||
     return( $self->error( "No query to set priority for was provided." ) );
     my $type = uc( ( $query =~ /^[[:blank:]]*(\S+)[[:blank:]]+/ )[ 0 ] );
     my @allowed = qw( DELETE INSERT REPLACE SELECT UPDATE );
@@ -234,18 +231,18 @@ sub priority
     return( $sth );
 }
 
-## rollback is called using the dbh handler and is located in DB::Object::Postgres
+# rollback is called using the dbh handler and is located in DB::Object::Postgres
 
-## Inherited from DB::Object::Statement
-## sub rows(@)
+# Inherited from DB::Object::Statement
+# sub rows(@)
 
-## Inherited from DB::Object::Statement
-## sub undo
+# Inherited from DB::Object::Statement
+# sub undo
 
 sub wait
 {
     my $self = shift( @_ );
-    my $query = $self->{ 'query' } ||
+    my $query = $self->{query} ||
     return( $self->error( "No query to set as to be delayed." ) );
     my $type = ( $query =~ /^[[:blank:]]*(\S+)[[:blank:]]+/ )[ 0 ];
     my @allowed = qw( INSERT REPLACE );
@@ -271,11 +268,111 @@ sub wait
 
 DESTROY
 {
-    ## Do nothing but existing so it is handled by this package
-    ## print( STDERR "DESTROY'ing statement $self ($self->{ 'query' })\n" );
+    # Do nothing but existing so it is handled by this package
+    # print( STDERR "DESTROY'ing statement $self ($self->{ 'query' })\n" );
 };
 
 1;
 
 __END__
+
+=encoding utf-8
+
+=head1 NAME
+
+DB::Object::Mysql::Query - Statement Object for MySQL
+
+=head1 SYNOPSIS
+
+    use DB::Object::Mysql::Statement;
+    my $this = DB::Object::Mysql::Statement->new || die( DB::Object::Mysql::Statement->error, "\n" );
+
+=head1 VERSION
+
+   v0.300.0
+
+=head1 DESCRIPTION
+
+This is a MySQL specific statement object.
+
+=head1 METHODS
+
+=head2 distinct
+
+This takes no argument and this will modify the query to add the keyword C<DISTINCT>
+
+    $sth->distinct;
+    # produces SELECT DISTINCT....
+    $sth->distinct( 'name' );
+    # produces SELECT DISTINCT ON (name)....
+
+If called in void context, this will execute the prepare statement handler immediately.
+
+It returns the newly created statement handler.
+
+See L<MySQL documentation for more information|https://dev.mysql.com/doc/refman/5.7/en/distinct-optimization.html>
+
+=head2 dump
+
+This will dump the result of the query to STDOUT or to a file if I<file> argument is provided, or if a filehandle is provided with I<fh>, it will be used to print out the data.
+
+It takes also a I<vsep>, which defaults to a command and a I<hsep> which defaults to a new line.
+
+It returns the current object.
+
+=head2 ignore
+
+This takes no argument and this will modify the queries of type C<alter>, C<insert>, C<update> to add the keyword C<IGNORE>
+
+    $sth->ignore;
+    # produces INSERT IGNORE....
+
+If called in void context, this will execute the prepare statement handler immediately.
+
+It returns the newly created statement handler.
+
+See L<MySQL documentation for more information|https://dev.mysql.com/doc/refman/5.7/en/insert.html>
+
+=head2 only
+
+This returns an error as C<SELECT FROM ONLY> is not supported by MySQL.
+
+=head2 priority
+
+Provided with a priority integer that can be 0 or 1 with 0 being C<LOW_PRIORITY> and 1 being C<HIGH_PRIORITY> and this will adjust the query formatted to add the priority. This works only on Mysql drive though.
+
+If used on queries other than C<DELETE>, C<INSERT>, C<REPLACE>, C<SELECT>, C<UPDATE> an error will be returned.
+
+If called in void context, this will execute the newly create statement handler immediately.
+
+It returns the newly create statement handler.
+
+=head2 wait
+
+    $sth->wait || die( $sth->error );
+
+This takes no parameter and only works on queries of type C<INSERT> or C<UPDATE>. It will modify the previously prepared query to add the keyword C<DELAYED>
+
+If called in void context, this will execute the prepare statement handler immediately.
+
+It returns the newly created statement handler.
+
+See L<MySQL documentation for more information|https://dev.mysql.com/doc/refman/5.6/en/insert-delayed.html>
+
+=head1 SEE ALSO
+
+L<perl>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2019-2021 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut
 

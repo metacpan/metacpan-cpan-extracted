@@ -28,8 +28,6 @@ my $localspec_re = qr/^(?:
 		|
 			synth\.nogrant
 		|
-			version\.$property(?:_[a-z0-9]+)+
-		|
 			(?:lang\.$lang)?
 		|
 			(?:old|path|legal|iri|format|misc)\.$attribute
@@ -45,9 +43,6 @@ my $localspec_re = qr/^(?:
 			scope\.(?:line|sentence|paragraph|multiparagraph|section|multisection|all)
 		|
 			(?:lang\.$lang)?
-		|
-			# TODO: drop
-			version\.none
 		|
 			(?:target|part|type|synth|misc)\.$attribute
 		))+)?

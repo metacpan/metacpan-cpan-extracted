@@ -146,21 +146,26 @@ PIECES AND PIECE TYPES
     actual syntax is parsed automatically by this module, according to the
     specification given by the pieces or piece1 field. The result of that
     parsing step is placed into the args or arg0 parameter to the invoked
-    function, using a union type consisting of the following fields:
+    function, using a struct type consisting of the following fields:
 
-       typedef union {
-          OP *op;
-          CV *cv;
-          SV *sv;
-          int i;
-          struct {
-             SV *name;
-             SV *value;
-          } attr;
-          PADOFFSET padix;
+       typedef struct
+          union {
+             OP *op;
+             CV *cv;
+             SV *sv;
+             int i;
+             struct {
+                SV *name;
+                SV *value;
+             } attr;
+             PADOFFSET padix;
+          };
+          int line;
        } XSParseKeywordPiece;
 
-    Which field is set depends on the type of the piece.
+    Which field of the anonymous is set depends on the type of the piece.
+    The line field contains the line number of the source file where
+    parsing of that piece began.
 
     Some piece types are "atomic", whose definition is self-contained.
     Others are structural, defined in terms of inner pieces. Together these
@@ -261,21 +266,27 @@ PIECES AND PIECE TYPES
 
     Variant of XPK_LISTEXPR which puts the expression in list context.
 
- XPK_IDENT
+ XPK_IDENT, XPK_IDENT_OPT
 
-    atomic, emits sv.
+    atomic, can probe, emits sv.
 
     A bareword identifier name is expected, and passed as an SV containing
     a PV in the sv field. An identifier is not permitted to contain a
     double colon (::).
 
- XPK_PACKAGENAME
+    The _OPT-suffixed version is optional; if no identifier is found then
+    sv is set to NULL.
 
-    atomic, emits sv.
+ XPK_PACKAGENAME, XPK_PACKAGENAME_OPT
+
+    atomic, can probe, emits sv.
 
     A bareword package name is expected, and passed as an SV containing a
     PV in the sv field. A package name is similar to an identifier, except
     it permits double colons in the middle.
+
+    The _OPT-suffixed version is optional; if no package name is found then
+    sv is set to NULL.
 
  XPK_LEXVARNAME
 
@@ -312,17 +323,15 @@ PIECES AND PIECE TYPES
     It is not an error for there to be no attributes present, or for the
     optional colon to be missing. In this case i will be set to zero.
 
- XPK_VSTRING
+ XPK_VSTRING, XPK_VSTRING_OPT
 
     atomic, can probe, emits sv.
 
     A version string is expected, of the form v1.234 including the leading
     v character. It is passed as a version SV object in the sv field.
 
- XPK_VSTRING_OPT
-
-    Identical to XPK_VSTRING except it is optional; if no version string is
-    found then sv is set to NULL.
+    The _OPT-suffixed version is optional; if no version string is found
+    then sv is set to NULL.
 
  XPK_LEXVAR_MY
 
@@ -440,7 +449,9 @@ PIECES AND PIECE TYPES
 
  XPK_COMMALIST
 
-    structural, emits i.
+    structural, might support probe, emits i.
+
+       XPK_COMMALIST(pieces ...)
 
     A structural type which expects to find one or more repeats of its
     contained pieces, separated by literal comma (,) characters. This is
@@ -448,6 +459,9 @@ PIECES AND PIECE TYPES
     copy, needs commas between its items, but does not require that the
     first contained piece support probe (the comma itself is sufficient to
     indicate a repeat).
+
+    An XPK_COMMALIST supports probe if its first contained piece does; i.e.
+    is transparent to probing.
 
  XPK_PARENSCOPE
 

@@ -18,6 +18,6 @@ my $ok = !eval { local @ARGV = (1); File::Rename::Options::GetOptions(); 1 };
 ok($ok, 'not imported File::Rename::Options::GetOptions' );
 
 # eval will fail if rename is CORE::rename
-my $ok = eval q{ rename [1], 1, 1; 1; };
+my $eval = eval q{ rename [1], 1, 1; 1; };
 # require File::Rename does not import rename
-ok(!$ok, 'not imported rename()');
+ok(!$eval, 'not imported rename()');

@@ -17,7 +17,7 @@ ok($ok, 'File::Rename::Options::GetOptions' );
 
 ok(	
     $File::Rename::Options::VERSION <= 
-    do { require File::Rename; $File::Rename::VERSION },
+    do { require File::Rename; eval $File::Rename::VERSION },
     'File::Rename::Option version not ahead of distribution version'
 )
 

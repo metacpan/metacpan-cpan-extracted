@@ -1,12 +1,12 @@
 package Acme::CPANModules;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-20'; # DATE
+our $DATE = '2021-03-23'; # DATE
 our $DIST = 'Acme-CPANModules'; # DIST
-our $VERSION = '0.1.8'; # VERSION
+our $VERSION = '0.1.9'; # VERSION
 
 1;
-# ABSTRACT: CPAN modules
+# ABSTRACT: Categorizing CPAN modules
 
 __END__
 
@@ -16,7 +16,7 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules - CPAN modules
+Acme::CPANModules - Categorizing CPAN modules
 
 =head1 SPECIFICATION VERSION
 
@@ -24,7 +24,7 @@ Acme::CPANModules - CPAN modules
 
 =head1 VERSION
 
-This document describes version 0.1.8 of Acme::CPANModules (from Perl distribution Acme-CPANModules), released on 2021-02-20.
+This document describes version 0.1.9 of Acme::CPANModules (from Perl distribution Acme-CPANModules), released on 2021-03-23.
 
 =head1 DESCRIPTION
 

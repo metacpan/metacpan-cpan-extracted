@@ -176,6 +176,7 @@ sub deserialize_record {
     # Sanitize input for the Perl API
     for my $field (sort keys %$data) {
         next if $field eq 'CustomFields';
+        next if $field eq 'CustomRoles';
 
         my $value = $data->{$field};
         next unless ref $value;
@@ -284,7 +285,7 @@ sub update_custom_fields {
         my $val = $data->{$cfid};
 
         my $cf = $record->LoadCustomFieldByIdentifier($cfid);
-        next unless $cf->ObjectTypeFromLookupType($cf->__Value('LookupType'))->isa(ref $record);
+        next unless $cf->Id && $cf->ObjectTypeFromLookupType($cf->__Value('LookupType'))->isa(ref $record);
 
         if ($cf->SingleValue) {
             my %args;

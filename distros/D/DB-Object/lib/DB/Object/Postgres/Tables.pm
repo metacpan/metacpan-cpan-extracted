@@ -33,9 +33,8 @@ sub init
     return( shift->DB::Object::Tables::init( @_ ) );
 }
 
-##----{ End of generic routines }----##
-## Inherited from DB::Object::Tables
-## sub alter
+# Inherited from DB::Object::Tables
+# sub alter
 
 sub create
 {
@@ -131,10 +130,10 @@ sub create_info
     my $self    = shift( @_ );
     my $table   = $self->{table};
     $self->structure();
-    my $struct  = $self->{ 'structure' };
-    my $fields  = $self->{ 'fields' };
-    my $default = $self->{ 'default' };
-    my $primary = $self->{ 'primary' };
+    my $struct  = $self->{structure};
+    my $fields  = $self->{fields};
+    my $default = $self->{default};
+    my $primary = $self->{primary};
     my @output = ();
     foreach my $field ( sort{ $fields->{ $a } <=> $fields->{ $b } } keys( %$fields ) )
     {
@@ -156,26 +155,26 @@ sub create_info
     return( @output ? $str : undef() );
 }
 
-## Inherited from DB::Object::Tables
-## sub default
+# Inherited from DB::Object::Tables
+# sub default
 
 sub drop
 {
     my $self  = shift( @_ );
     my $table = $self->{table} || 
     return( $self->error( "No table was provided to drop." ) );
-    my $opts  = @_ == 1 ? shift( @_ ) : { @_ };
-    my $query = "DROP TABLE";
-    $query   .= " IF EXISTS" if( $opts->{ 'if-exists' } );
+    my $opts  = $self->_get_args_as_hash( @_ );
+    my $query = 'DROP TABLE';
+    $query   .= ' IF EXISTS' if( $opts->{ 'if-exists' } || $opts->{if_exists} );
     $query   .= " $table";
-    if( $opts->{ 'cascade' } )
+    if( $opts->{cascade} )
     {
-        $query .= " CASCADE";
+        $query .= ' CASCADE';
     }
     ## Default Postgres behavior
     elsif( $opts->{restrict} )
     {
-        $query .= " RESTRICT";
+        $query .= ' RESTRICT';
     }
     my $sth = $self->database_object->prepare( $query ) ||
     return( $self->error( "Error while preparing query to drop table '$table':\n$query", $self->database_object->errstr() ) );
@@ -192,8 +191,8 @@ sub exists
     return( shift->table_exists( shift( @_ ) ) );
 }
 
-## Inherited from DB::Object::Tables
-## sub fields
+# Inherited from DB::Object::Tables
+# sub fields
 
 sub lock
 {
@@ -217,14 +216,16 @@ sub lock
     return( $sth );
 }
 
-## Inherited from DB::Object::Tables
-## sub name
+# Inherited from DB::Object::Tables
+# sub name
 
-## Inherited from DB::Object::Tables
-## sub null
+# Inherited from DB::Object::Tables
+# sub null
 
-## Inherited from DB::Object::Tables
-## sub primary
+# Inherited from DB::Object::Tables
+# sub primary
+
+sub optimize { return( shift->error( "optimize() is not implemented PostgreSQL." ) ); }
 
 sub qualified_name
 {
@@ -258,15 +259,15 @@ sub rename
     return( $sth );
 }
 
+sub repair { return( shift->error( "repair() is not implemented PostgreSQL." ) ); }
+
+sub stat { return( shift->error( "stat() is not implemented PostgreSQL." ) ); }
+
 sub structure
 {
     my $self  = shift( @_ );
-    my $table = shift( @_ ) || $self->{ 'table' } ||
-    do
-    {
-        $self->error( "No table provided to get its structure." );
-        return( wantarray() ? () : undef() );
-    };
+    my $table = shift( @_ ) || $self->{table} ||
+        return( $self->error( "No table provided to get its structure." ) );
     ## $self->message( 3, "Getting table $table structure." );
     ## $self->_reset_query();
     ## delete( $self->{ 'query_reset' } );
@@ -276,6 +277,7 @@ sub structure
     my $default = $self->{default};
     my $null    = $self->{null};
     my $types   = $self->{types};
+    # If we have a cache, use it instead of reprocessing it.
     if( !%$fields || !%$struct || !%$default )
     {
         $self->message( 3, "No structure, field, default values, null or types set yet for this table '$table' object. Populating." );
@@ -362,46 +364,46 @@ EOT
         my $type_convert =
         {
         'character varying' => 'varchar',
-        'character'            => 'char',
+        'character'         => 'char',
         };
         ## Mysql: field, type, null, key, default, extra
         ## Postgres: tablename, field, field_num, type, len, comment, is_nullable, key, foreign_key, default 
         while( $ref = $sth->fetchrow_hashref() )
         {
-            $self->{ 'type' } = $ref->{ 'table_type' } if( !$self->{ 'type' } );
-            $self->{ 'schema' } = $ref->{ 'schema_name' } if( !$self->{ 'schema' } );
+            $self->{type} = $ref->{table_type} if( !$self->{type} );
+            $self->{schema} = $ref->{schema_name} if( !$self->{schema} );
             my %data = map{ lc( $_ ) => $ref->{ $_ } } keys( %$ref );
-            if( exists( $type_convert->{ $data{ 'type' } } ) )
+            if( exists( $type_convert->{ $data{type} } ) )
             {
-                $data{ 'type' } = $type_convert->{ $data{ 'type' } };
+                $data{type} = $type_convert->{ $data{type} };
             }
-            $data{ 'default' } = '' if( !defined( $data{ 'default' } ) );
+            $data{default} = '' if( !defined( $data{default} ) );
             ## push( @order, $data{ 'field' } );
-            $fields->{ $data{ 'field' } }  = ++$c;
-            $types->{ $data{ 'field' } } = $data{ 'type' };
-            $default->{ $data{ 'field' } } = '';
+            $fields->{ $data{field} }  = ++$c;
+            $types->{ $data{field} } = $data{type};
+            $default->{ $data{field} } = '';
             if( CORE::length( $data{default} ) )
             {
-                $default->{ $data{ 'field' } } = $data{ 'default' } if( $data{ 'default' } ne '' && !$data{ 'is_nullable' } );
+                $default->{ $data{field} } = $data{default} if( $data{default} ne '' && !$data{is_nullable} );
             }
-            $null->{ $data{ 'field' } } = $data{ 'is_nullable' } ? 1 : 0;
-            my @define = ( $data{ 'type' } );
-            push( @define, "DEFAULT '$data{ 'default' }'" ) if( $data{ 'default' } ne '' || !$data{ 'is_nullable' } );
-            push( @define, "NOT NULL" ) if( !$data{ 'is_nullable' } );
-            push( @primary, $data{ 'field' } ) if( $data{ 'key' } );
-            $struct->{ $data{ 'field' } } = CORE::join( ' ', @define );
+            $null->{ $data{field} } = $data{is_nullable} ? 1 : 0;
+            my @define = ( $data{type} );
+            push( @define, "DEFAULT '$data{default}'" ) if( $data{default} ne '' || !$data{is_nullable} );
+            push( @define, "NOT NULL" ) if( !$data{is_nullable} );
+            push( @primary, $data{field} ) if( $data{key} );
+            $struct->{ $data{field} } = CORE::join( ' ', @define );
         }
         $sth->finish();
         if( @primary )
         {
             ## $struct->{ '_primary' } = \@primary;
-            $self->{ 'primary' } = \@primary;
+            $self->{primary} = \@primary;
         }
         ## $self->{ '_structure_real' } = $struct;
-        $self->{ 'default' }   = $default;
-        $self->{ 'fields' }    = $fields;
-        $self->{ 'structure' } = $struct;
-        $self->{ 'types' }       = $types;
+        $self->{default}   = $default;
+        $self->{fields}    = $fields;
+        $self->{structure} = $struct;
+        $self->{types}     = $types;
         ## $self->message( 3, "Fields found: ", sub{ $self->dumper( $fields ) } );
     }
     ## $self->messagef( 3, "struct ($struct) has %d keys:\n%s", scalar( keys( %$struct ) ), $self->printer( $struct ) );
@@ -437,5 +439,247 @@ DESTROY
 
 1;
 
+# XXX POD
+
 __END__
 
+=encoding utf-8
+
+=head1 NAME
+
+DB::Object::Postgres::Tables - PostgreSQL Table Object
+
+=head1 SYNOPSIS
+
+    use DB::Object::Postgres::Tables;
+    my $this = DB::Object::Postgres::Tables->new || die( DB::Object::Postgres::Tables->error, "\n" );
+
+=head1 VERSION
+
+    v0.4.1
+
+=head1 DESCRIPTION
+
+This is a PostgreSQL table object class.
+
+=head1 METHODS
+
+=head2 create
+
+This creates a table.
+
+It takes some array reference data containing the columns definitions, some optional parameters and a statement handler.
+
+If a statement handler is provided, then no need to provide an array reference of columns definition. The columns definition will be taken from the statement handler. However, at least either one of them needs to be provided to set the columns definition.
+
+Possible parameters are:
+
+=over 4
+
+=item I<comment>
+
+=item I<inherits>
+
+Takes the name of another table to inherit from
+
+=item I<on commit>
+
+=item I<tablespace>
+
+=item I<temporary>
+
+If provided, this will create a temporary table.
+
+=item I<with oids>
+
+If true, this will enable table oid
+
+=item I<without oids>
+
+If true, this will disable table oid
+
+=back
+
+This will return an error if the table already exists, so best to check beforehand with L</exists>.
+
+Upon success, it will return the new statement to create the table. However, if L</create> is called in void context, then the statement is executed right away and returned.
+
+=head2 create_info
+
+This returns the create info for the current table object as a string representing the sql script necessary to recreate the table.
+
+=head2 drop
+
+This will prepare a drop statement to drop the current table.
+
+If it is called in void context, then the statement is executed immediately and returned, otherwise it is just returned.
+
+It takes the following options:
+
+=over 4
+
+=item I<cascade>
+
+If true, C<CASCADE> will be added to the C<DROP> query.
+
+=item I<if_exists>
+
+If true, this will add a C<IF EXISTS> to the C<DROP> query.
+
+You can also use I<if-exists>
+
+=item I<restrict>
+
+If true, C<RESTRICT> will be added to the C<DROP> query.
+
+=back
+
+See L<PostgreSQL documentation for more information|https://www.postgresql.org/docs/9.5/sql-droptable.html>
+
+=head2 exists
+
+Returns true if the current table exists, or false otherwise.
+
+=head2 lock
+
+This will prepare a query to lock the table and return the statement handler. If it is called in void context, the statement handler returned is executed immediately.
+
+It takes an optional lock type and an optional C<NOWAIT> parameter.
+
+Supported lock types are:
+
+=over 4
+
+=item C<ACCESS SHARE>
+
+=item C<ROW SHARE>
+
+=item C<ROW EXCLUSIVE>
+
+=item C<SHARE UPDATE EXCLUSIVE>
+
+=item C<SHARE>
+
+=item C<SHARE ROW EXCLUSIVE>
+
+=item C<EXCLUSIVE>
+
+=item C<ACCESS EXCLUSIVE>
+
+=back
+
+See L<PostgreSQL documentation for more information|https://www.postgresql.org/docs/9.5/explicit-locking.html>
+
+=head2 optimize
+
+Not implemented in PostgreSQL.
+
+=head2 qualified_name
+
+This return a fully qualified name to be used as a prefix to columns in queries.
+
+If L<DB::Object::Tables/prefixed> is greater than 2, the database name will be added.
+
+If there is a schema defined and the L<DB::Object::Tables/prefixed> is greater than 1, the schema will be added.
+
+At minimum, the table name is added.
+
+    $tbl->prefixed(2);
+    $tbl->qualified_name;
+    # Would return something like: mydb.my_schema.my_table
+
+    $tbl->prefixed(1);
+    $tbl->qualified_name;
+    # Would return only: my_table
+
+=head2 rename
+
+Provided with a new table name, and this will prepare the necessary query to rename the table and return the statement handler.
+
+If it is called in void context, the statement handler is executed immediately.
+
+    # Get the prefs table object
+    my $tbl = $dbh->pref;
+    $tbl->rename( 'prefs' );
+    # Would issue a statement handler for the query: ALTER TABLE pref RENAME TO prefs
+
+See L<PostgreSQL documentation for more information|https://www.postgresql.org/docs/9.5/sql-altertable.html>
+
+=head2 repair
+
+Not implemented in PostgreSQL.
+
+=head2 stat
+
+Not implemented in PostgreSQL.
+
+=head2 structure
+
+This returns in list context an hash and in scalar context an hash reference of the table structure.
+
+The hash, or hash reference returned contains the column name and its definition.
+
+This method will also set the following object properties:
+
+=over 4
+
+=item L<DB::Object::Tables/type>
+
+The table type.
+
+=item L<DB::Object::Tables/schema>
+
+The table schema.
+
+=item I<default>
+
+A column name to default value hash reference
+
+=item I<fields>
+
+A column name to field position (integer) hash reference
+
+=item I<null>
+
+A column name to a boolean representing whether the column is nullable or not.
+
+=item L<DB::Object::Tables/primary>
+
+An array reference of column names that are used as primary key for the table.
+
+=item I<structure>
+
+A column name to its sql definition
+
+=item I<types>
+
+A column name to column data type hash reference
+
+=back
+
+=head2 unlock
+
+This will unlock a previously locked table.
+
+If an argument is provided, this calls instead C<CORE::unlock> passing it whatever parameters provided.
+
+Otherwise, it will prepare a query C<UNLOCK TABLES> and returns the statement handler.
+
+If it is called in void context, this will execute the statement handler immediately.
+
+=head1 SEE ALSO
+
+L<perl>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2019-2021 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut

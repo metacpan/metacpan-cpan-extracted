@@ -1,9 +1,84 @@
 ==================================================
-Changes from 2019-07-31 00:00:00 +0000 to present.
+Changes from 2019-08-15 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 7.9 at 2021-07-30 18:19:19 +0000
+version 8.0 at 2021-08-14 22:16:33 +0000
+----------------------------------------
+
+  Change: 40dbb86b7b8d9b98f4572a9f362fdd94f4d57b40
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2021-08-14 15:15:28 +0000
+
+    Support OpenSearch 1.0.0
+
+    Add a check to the version lookup for opensearch. If opensearch is
+    discovered, set version to 7.10. 
+
+------------------------------------------
+version 7.9.2 at 2021-08-14 02:17:04 +0000
+------------------------------------------
+
+  Change: 8adedd9d89bdcaac26844547d36813bfc75f511f
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2021-08-13 19:17:04 +0000
+
+    Fix a warning in the 7.9.1 Release
+
+    I was unable to `Dist::Zilla` to let me tag a `7.10` release, so I went
+    with `7.9.1`. This caused a warning in `::Connection` for formatting the
+    version string. 
+
+  Change: 84dd4b08f113cadc0d8f71ac7bd5448536910f3f
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2021-08-13 19:07:49 +0000
+
+    Version number fixed in Markdown 
+
+------------------------------------------
+version 7.9.1 at 2021-08-14 01:48:01 +0000
+------------------------------------------
+
+  Change: 3eef2f64709f5b9643c91544b839a1727b7f32c0
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2021-08-13 18:48:01 +0000
+
+    Fix POD for xtests 
+
+  Change: bc51180e9f87730ee0d220e5c1c8b22e7e740253
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2021-08-13 18:38:33 +0000
+
+    Aggregations Updated
+
+    * Recursive aggregation parsing to flatten records into a row/column format
+    * Documentation updates for the
+    `App::ElasticSearch::Utilities::Aggregations` * Make `es-aggregate.pl` more
+    useful generally and move to `scripts/` * Fix alias handling for simple
+    terms aggs 
+
+  Change: d8c8be912a60156290cb68c046e3b3c8fafbc2ae
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2021-08-04 17:26:42 +0000
+
+    Tests started to the aggregations parser 
+
+  Change: 25e3fc64e388b3a84002d594e68516602970eb89
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2021-08-04 17:13:23 +0000
+
+    Suss out the es_expand_aggregate syntax
+
+    Now looks like:
+
+    ``` [ALIAS=]AGG:FIELD[:PARAMS]
+
+    PARAMS := [k=v,k1=v1,v1a] ```
+
+    Add a few additional aggregations to the supported list. 
+
+----------------------------------------
+version 7.9 at 2021-07-30 18:19:09 +0000
 ----------------------------------------
 
   Change: f386e7003a442a0419fc62aa30d576312afa9efa
@@ -444,38 +519,6 @@ version 7.2 at 2019-08-28 22:38:01 +0000
     only see that base in via `--bases`. This ensures users can see all of the
     indices available. 
 
-----------------------------------------
-version 7.1 at 2019-08-01 19:25:21 +0000
-----------------------------------------
-
-  Change: eaf5f3ca17bfa2abd653715cc69de098283a2ffc
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-08-01 12:25:21 +0000
-
-    Fixes to allow index aliases to inform the maintenance scripts 
-
-  Change: 3c04257f11032df5e0b10694b77da17d4bd02ab0
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-07-31 20:27:52 +0000
-
-    Fixes to allow tagging indexes with special aliases
-
-    These aliases can be used to inform other processes, or simply as ways to
-    indicate they have special value.
-
-    * `es-alias-manager.pl` now ignores any alias applied to an index that
-
-    starts with an '_' or '.' and allows a user to specify an ignored
-
-    alias using a YAML null element: `ignored_alias: ~` *
-    `es-daily-index-maintenance.pl` now allows `--skip-alias pickle` to
-
-    skip any index aliased `pickle` from it's activities. Additionally,
-
-    any indexes tagged with `_hold` or `_do_not_erase` (in honor of every
-
-    whiteboard in the world) will be spared from maintenance. 
-
 =================================================
-Plus 77 releases after 2019-07-31 00:00:00 +0000.
+Plus 78 releases after 2019-08-15 00:00:00 +0000.
 =================================================

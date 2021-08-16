@@ -89,12 +89,12 @@ sub draw {
 	|| $::config->{diagrams}->{show} eq "user";
     $pr->text( $name, $x + ($w - $pr->strwidth($name))/2, $y - font_bl($font) );
     $y -= $font->{size} * 1.2 + $dot/2 + $lw;
-
-    if ( $info->{base} > 1 ) {
+    if ( $info->{base} + $info->{baselabeloffset} > 1 ) {
 	# my $i = @Roman[$info->{base}] . "  ";
-	my $i = sprintf("%d  ", $info->{base});
+	my $i = sprintf("%d  ", $info->{base} + $info->{baselabeloffset});
 	$pr->setfont( $ps->{fonts}->{diagram_base}, $gh );
-	$pr->text( $i, $x-$pr->strwidth($i), $y-0.85*$gh,
+	$pr->text( $i, $x-$pr->strwidth($i),
+		   $y-($info->{baselabeloffset}*$gh)-0.85*$gh,
 		   $ps->{fonts}->{diagram_base}, 1.2*$gh );
     }
 
@@ -105,9 +105,16 @@ sub draw {
     my $xo = $self->grid_xo($ps);
     $pr->{pdfgfx}->formimage( $xo, $x, $y-$v*$gh, 1 );
 
+    # The numbercolor property of the chordfingers is used for the
+    # background of the underlying dot (the numbers are transparent).
+    my $fcf = $ps->{fonts}->{chordfingers};
+    my $fbg = $pr->_bgcolor($fcf->{numbercolor});
+    # However, if none we should really use white.
+    $fbg = "white" if $fbg eq "none";
+
     # Bar detection.
     my $bar;
-    if ( $info->{fingers} ) {
+    if ( $info->{fingers} && $fbg ne $ps->{theme}->{foreground} ) {
 	my %h;
 	my $str = 0;
 	my $got = 0;
@@ -141,6 +148,8 @@ sub draw {
 
     # Process the strings and fingers.
     $x -= $gw/2;
+    my $oflo;			# to detect out of range frets
+
     for my $sx ( 0 .. @{ $info->{frets} }-1 ) {
 	my $fret = $info->{frets}->[$sx];
 	my $fing;
@@ -153,18 +162,22 @@ sub draw {
 	}
 
 	if ( $fret > 0 ) {
-	    if ( $fing && $fing > 0 ) {
-		# The dingbat glyphs are open, so we need a white
+	    if ( $fret > $v && !$oflo++ ) {
+		warn("Diagram $info->{name}: ",
+		     "Fret position $fret exceeds diagram size $v\n");
+	    }
+	    if ( $fing && $fing > 0 && $fbg ne $ps->{theme}->{foreground} ) {
+		# The dingbat glyphs are open, so we need am explicit
 		# background circle.
 		$pr->circle( $x+$gw/2, $y-$fret*$gh+$gh/2, $dot/2, 1,
-			     $ps->{theme}->{background}, $ps->{theme}->{foreground} );
+			     $fbg, $ps->{theme}->{foreground} );
 		my $dot = $dot/0.7;
 		my $glyph = pack( "C", 0xca + $fing - 1 );
-		$pr->setfont( $ps->{fonts}->{chordfingers}, $dot );
+		$pr->setfont( $fcf, $dot );
 		$pr->text( $glyph,
 			   $x+$gw/2-$pr->strwidth($glyph)/2,
 			   $y-$fret*$gh+$gh/2-$pr->strwidth($glyph)/2+$lw/2,
-			   $ps->{fonts}->{chordfingers}, $dot );
+			   $fcf, $dot );
 	    }
 	    else {
 		$pr->circle( $x+$gw/2, $y-$fret*$gh+$gh/2, $dot/2, 1,

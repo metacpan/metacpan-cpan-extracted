@@ -1,7 +1,7 @@
 use v5.10.0;
 use warnings;
 
-package JMAP::Tester::WebSocket::Response 0.002;
+package JMAP::Tester::WebSocket::Response 0.003;
 # ABSTRACT: what you get in reply to a succesful JMAP request
 
 use Moo;
@@ -87,7 +87,7 @@ JMAP::Tester::WebSocket::Response - what you get in reply to a succesful JMAP re
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 OVERVIEW
 

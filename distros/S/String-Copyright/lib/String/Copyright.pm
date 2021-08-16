@@ -14,11 +14,11 @@ String::Copyright - Representation of text-based copyright statements
 
 =head1 VERSION
 
-Version 0.003006
+Version 0.003007
 
 =cut
 
-our $VERSION = '0.003006';
+our $VERSION = '0.003007';
 
 # Dependencies
 use parent 'Exporter::Tiny';
@@ -77,7 +77,7 @@ By default unset: All lines are parsed.
 
 =head2 format( \&sub )
 
-    use String::Copyright { format => \&NGU_style } };
+    use String::Copyright { format => \&GNU_style } };
 
     sub GNU_style {
         my ( $years, $owners ) = @_;
@@ -94,22 +94,20 @@ see the L<Exporter::Tiny> documentation for details.
 
 =cut
 
-my $blank_re          = qr/[ \t]/;
-my $blank_or_break_re = qr/$blank_re*\n?$blank_re*/;
-my $sign_re = qr/copyright(?:-holders?)?|copr\.|[©⒞Ⓒⓒ🄒🄫🅒]/i;
-my $pseudo_sign_re = qr/\(c\)/i;
-my $broken_sign_re = qr/\?$blank_re*/;
+# OR'ed strings have regular variable name and are already grouped
+# AND'ed strings have name ending in underscore: must be grouped if repeated
+my $blank           = '[ \t]';
+my $blank_or_break_ = "$blank*\\n?$blank*";
+my $sign = '(?i:copyright(?:-holders?)?|copr\.|[©⒞Ⓒⓒ🄒🄫🅒])';
+my $pseudo_sign_ = '[({][Cc][})]';
+my $broken_sign_ = "\\?$blank*";
 
-my $year_re = qr/\b[0-9]{4}\b/;
-my $comma_re
-	= qr/$blank_re*,$blank_or_break_re|$blank_or_break_re,?$blank_re*/;
-my $dash_re
-	= qr/$blank_re*[-˗‐‑‒–—―⁃−﹣－]$blank_or_break_re*/;
-my $owner_intro_re   = qr/\bby$blank_or_break_re/;
-my $owner_prefix_re  = qr/[(*<@[{]/;
-my $owner_initial_re = qr/[^\s!\"#$%&'()*+,.\/:;<=>?@[\\\]^_`{|}~]/;
-my $boilerplate_re
-	= qr/${comma_re}All$blank_re+Rights$blank_re+Reserved[.!]?/i;
+my $year_ = '\b[0-9]{4}\b';
+my $comma = "(?:$blank*,$blank_or_break_|$blank_or_break_,?$blank*)";
+my $dash_ = "$blank*[-˗‐‑‒–—―⁃−﹣－](?:$blank_or_break_)*";
+my $owner_intro_  = "\\bby$blank_or_break_";
+my $owner_prefix  = '[(*<@\[{]';
+my $owner_initial = '[^\s!"#$%&\'()*+,./:;<=>?@[\\\\\]^_`{|}~]';
 
 # this should cause *no* false positives, and stop-chars therefore
 # exclude e.g. email address building blocks; tested against the code
@@ -118,25 +116,28 @@ my $boilerplate_re
 # (?i)copyright (?:(?:claim|holder|info|information|notice|owner|ownership|statement|string)s?|in|is|to)@\w
 # (?i)copyright (?:(?:claim|holder|info|information|notice|owner|ownership|statement|string)s?|in|is|to)@\b[-_@]
 # (?im)copyright (?:(?:claim|holder|info|information|notice|owner|ownership|statement|string)s?|in|is|to)[^ $]
-my $chatter_copyright_re
-	= qr/(?:assigned|claim|holder|info|information|law|notice|owner|ownership|statement|string)s?|and|eq|generated|in|is|on|to/i;
-my $the_notname_re
-	= qr/concrete|fault|first|immediately|least|min\/max|one|outer|previous|ratio|sum|user/i;
-my $the_sentence_re
-	= qr/(?:\w+$blank_re+){1,10}(?:are|can(?:not)?|in|is|must|was)/i;
-my $chatter_pseudosign_re
-	= qr/(?:the$blank_re+(?:$the_notname_re|$the_sentence_re)|there)\b/;
-my $chatter_re
-	= qr/copyright$blank_or_break_re$chatter_copyright_re(?:$|@\W|[^a-zA-Z0-9@_-])|$blank_re*$pseudo_sign_re$blank_or_break_re+$chatter_pseudosign_re/im;
+my $chatter_copyright
+	= '(?i:(?:assigned|claim|holder|info|information|law|notice|owner|ownership|statement|string)s?|and|eq|generated|in|is|on|to)';
+my $the_notname
+	= '(?i:concrete|fault|first|immediately|least|min\/max|one|outer|previous|ratio|sum|user)';
+my $the_sentence_
+	= "(?:\\w+$blank+){1,10}(?i:are|can(?:not)?|in|is|must|was)";
+my $chatter_pseudosign_
+	= "(?:the$blank+(?:$the_notname|$the_sentence_)|there)\\b";
+my $chatter
+	= "(?im:copyright$blank_or_break_$chatter_copyright(?:$|@\\W|[^a-zA-Z0-9@_-])|$blank*$pseudo_sign_(?:$blank_or_break_)+$chatter_pseudosign_)";
 
-my $signs_re
-	= qr/(?:$sign_re|(?:^|$blank_re)$pseudo_sign_re)(?:$blank_re+(?:$sign_re|$pseudo_sign_re))*/m;
-my $yearspan_re = qr/$year_re(?:$dash_re$year_re)?/;
-my $years_re    = qr/$yearspan_re(?:$comma_re$yearspan_re)*/;
-my $owners_re   = qr/$owner_prefix_re*$owner_initial_re\S*(?:$blank_re*\S+)*/;
+my $signs
+	= "(?m:(?:$sign|(?:^|$blank)$pseudo_sign_)(?:$blank+(?:$sign|$pseudo_sign_))*)";
+my $yearspan_ = "$year_(?:$dash_$year_)?";
+my $years_    = qr/$yearspan_(?:$comma$yearspan_)*/;
+my $owners_   = "$owner_prefix*$owner_initial\\S*(?:$blank*\\S+)*";
 
+my $dash_re          = qr/$dash_/;
+my $owner_intro_A_re = qr/^$owner_intro_/;
+my $boilerplate_X_re = qr/(?i)${comma}All$blank+Rights$blank+Reserved[.!]?.*/;
 my $signs_and_more_re
-	= qr/(?:$chatter_re.*|$signs_re(?::$blank_or_break_re|$comma_re)$broken_sign_re?($years_re?$comma_re?$owner_intro_re?$owners_re?)|(?:\n|\z))/;
+	= qr/$chatter.*|$signs(?::$blank_or_break_|$comma)(?:$broken_sign_)?($years_?$comma?(?:$owner_intro_)?(?:$owners_)?)|(?:\n|\z)/;
 
 sub _generate_copyright
 {
@@ -181,27 +182,37 @@ sub _generate_copyright
 			next if ( !length $owners );
 			$skipped = 0;
 
-			my @span = $owners =~ /\G($yearspan_re)(?:$comma_re|\Z)/gm;
+			my $years;
+			my @span = $owners =~ /\G($yearspan_)(?:$comma|\Z)/gm;
 			if (@span) {
 				$owners = substr( $owners, $+[0] );
-			}
-			my $years;
 
-			# normalize
-			if (@span) {
-				## no critic (ProhibitMutatingListFunctions)
-				my $range
-					= Number::Range->new( map { s/$dash_re/../; $_ } @span );
-				## use critic
+				# deduplicate
+				my %range;
+				for (@span) {
+					my ( $y1, $y2 ) = split /$dash_re/;
+					if ( !$y2 ) {
+						$range{$y1} = undef;
+					}
+					elsif ( $y1 > $y2 ) {
+						@range{ $y2 .. $y1 } = undef;
+					}
+					else {
+						@range{ $y1 .. $y2 } = undef;
+					}
+				}
+
+				# normalize
+				my $range = Number::Range->new( keys %range );
 				$years = $range->range;
 				$years =~ s/,/, /g;
 				$years =~ s/\.\./-/g;
 			}
 			if ($owners) {
-				$owners =~ s/^$owner_intro_re//g;
+				$owners =~ s/$owner_intro_A_re//g;
 				$owners =~ s/\s{2,}/ /g;
-				$owners =~ s/^$owner_intro_re//g;
-				$owners =~ s/$boilerplate_re.*//g;
+				$owners =~ s/$owner_intro_A_re//g;
+				$owners =~ s/$boilerplate_X_re//g;
 			}
 
 # split owner into owner_id and owner
@@ -218,7 +229,7 @@ sub _generate_copyright
 			: sub { join ' ', '©', $_->[0] || (), $_->[1] || () };
 
 		bless [ $copyright, \@block, $format ], __PACKAGE__;
-		}
+	}
 }
 
 sub new

@@ -1,5 +1,5 @@
 package Getopt::EX::Colormap;
-use version; our $VERSION = version->declare("v1.24.1");
+use version; our $VERSION = version->declare("v1.24.2");
 
 use v5.14;
 use warnings;

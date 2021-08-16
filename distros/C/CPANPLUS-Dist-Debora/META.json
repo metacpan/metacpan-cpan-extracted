@@ -1,0 +1,96 @@
+{
+   "abstract" : "Create Debian or RPM packages from Perl modules",
+   "author" : [
+      "Andreas V\u00f6gele <voegelas@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CPANPLUS-Dist-Debora",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "0",
+            "Dist::Zilla::Plugin::CopyFilesFromBuild" : "0",
+            "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0",
+            "Dist::Zilla::Plugin::Test::Kwalitee" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "conflicts" : {
+            "Module::Build" : "< 0.36"
+         },
+         "requires" : {
+            "Archive::Tar" : "0",
+            "CPAN::Meta" : "0",
+            "CPANPLUS" : "0.9166",
+            "CPANPLUS::Dist::Build" : "0",
+            "Carp" : "0",
+            "Config" : "0",
+            "Cwd" : "0",
+            "Encode" : "0",
+            "English" : "0",
+            "Exporter" : "0",
+            "File::Basename" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IPC::Cmd" : "0",
+            "Module::CoreList" : "2.32",
+            "Module::Pluggable" : "2.4",
+            "Net::Domain" : "0",
+            "POSIX" : "0",
+            "Pod::Simple" : "0",
+            "Scalar::Util" : "0",
+            "Software::License" : "0.103014",
+            "Text::Template" : "1.22",
+            "Text::Wrap" : "0",
+            "parent" : "0",
+            "perl" : "5.016",
+            "utf8" : "0",
+            "version" : "0.77",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::MockObject" : "1.07",
+            "Test::More" : "0.96",
+            "lib" : "0",
+            "open" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://gitlab.com/voegelas/cpanplus-dist-debora/-/issues"
+      },
+      "homepage" : "https://gitlab.com/voegelas/cpanplus-dist-debora",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://gitlab.com/voegelas/cpanplus-dist-debora.git",
+         "web" : "https://gitlab.com/voegelas/cpanplus-dist-debora/-/tree/main"
+      }
+   },
+   "version" : "0.001",
+   "x_generated_by_perl" : "v5.32.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

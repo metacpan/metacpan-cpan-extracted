@@ -20,6 +20,12 @@ static int build_constbool(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
   return KEYWORD_PLUGIN_EXPR;
 }
 
+static int build_repeatcount(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata)
+{
+  *out = newSVOP(OP_CONST, 0, newSViv(args[0]->i ? args[1]->i : 0));
+  return KEYWORD_PLUGIN_EXPR;
+}
+
 static const struct XSParseKeywordHooks hooks_colon = {
   .permit_hintkey = hintkey,
 
@@ -45,6 +51,26 @@ static const struct XSParseKeywordHooks hooks_block = {
 
   .pieces = (const struct XSParseKeywordPieceType []){
     XPK_OPTIONAL( XPK_BLOCK ),
+    {0}
+  },
+  .build = &build_constbool,
+};
+
+static const struct XSParseKeywordHooks hooks_ident = {
+  .permit_hintkey = hintkey,
+
+  .pieces = (const struct XSParseKeywordPieceType []){
+    XPK_OPTIONAL( XPK_IDENT ),
+    {0}
+  },
+  .build = &build_constbool,
+};
+
+static const struct XSParseKeywordHooks hooks_packagename = {
+  .permit_hintkey = hintkey,
+
+  .pieces = (const struct XSParseKeywordPieceType []){
+    XPK_OPTIONAL( XPK_PACKAGENAME ),
     {0}
   },
   .build = &build_constbool,
@@ -84,6 +110,16 @@ static const struct XSParseKeywordHooks hooks_taggedchoice = {
     {0}
   },
   .build = &build_constbool,
+};
+
+static const struct XSParseKeywordHooks hooks_commalist = {
+  .permit_hintkey = hintkey,
+
+  .pieces = (const struct XSParseKeywordPieceType []) {
+    XPK_OPTIONAL( XPK_COMMALIST( XPK_IDENT ) ),
+    {0},
+  },
+  .build = &build_repeatcount,
 };
 
 static const struct XSParseKeywordHooks hooks_parens = {
@@ -135,10 +171,14 @@ BOOT:
   register_xs_parse_keyword("probeliteral", &hooks_literal, NULL);
 
   register_xs_parse_keyword("probeblock", &hooks_block, NULL);
+  register_xs_parse_keyword("probeident", &hooks_ident, NULL);
+  register_xs_parse_keyword("probepackagename", &hooks_packagename, NULL);
   register_xs_parse_keyword("probevstring", &hooks_vstring, NULL);
 
   register_xs_parse_keyword("probechoice", &hooks_choice, NULL);
   register_xs_parse_keyword("probetaggedchoice", &hooks_taggedchoice, NULL);
+
+  register_xs_parse_keyword("probecommalist", &hooks_commalist, NULL);
 
   register_xs_parse_keyword("probeparens", &hooks_parens, NULL);
   register_xs_parse_keyword("probebrackets", &hooks_brackets, NULL);

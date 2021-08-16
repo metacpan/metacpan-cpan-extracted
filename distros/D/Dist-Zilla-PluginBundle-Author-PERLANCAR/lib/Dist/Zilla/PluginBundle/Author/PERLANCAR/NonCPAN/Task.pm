@@ -4,9 +4,9 @@ use Moose;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-09'; # DATE
+our $DATE = '2021-08-15'; # DATE
 our $DIST = 'Dist-Zilla-PluginBundle-Author-PERLANCAR'; # DIST
-our $VERSION = '0.605'; # VERSION
+our $VERSION = '0.606'; # VERSION
 
 use Dist::Zilla::PluginBundle::Filter;
 
@@ -36,7 +36,7 @@ Dist::Zilla::PluginBundle::Author::PERLANCAR::NonCPAN::Task - Dist::Zilla like P
 
 =head1 VERSION
 
-This document describes version 0.605 of Dist::Zilla::PluginBundle::Author::PERLANCAR::NonCPAN::Task (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2021-08-09.
+This document describes version 0.606 of Dist::Zilla::PluginBundle::Author::PERLANCAR::NonCPAN::Task (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2021-08-15.
 
 =head1 SYNOPSIS
 
@@ -74,6 +74,23 @@ feature.
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,3 +1,4 @@
+Changes
 lib/PDL/Graphics/Simple.pm
 lib/PDL/Graphics/Simple/Gnuplot.pm
 lib/PDL/Graphics/Simple/PGPLOT.pm

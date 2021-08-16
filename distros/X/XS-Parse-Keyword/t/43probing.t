@@ -28,6 +28,18 @@ BEGIN { $^H{"t::probing/permit"} = 1; }
    ok( probeblock {}, 'block present' );
 }
 
+# ident
+{
+   ok( !probeident, 'ident absent' );
+   ok( probeident foo, 'ident present' );
+}
+
+# packagename
+{
+   ok( !probepackagename, 'packagename absent' );
+   ok( probepackagename Pkg::Name, 'packagename present' );
+}
+
 # vstring
 {
    ok( !probevstring, 'vstring absent' );
@@ -46,6 +58,13 @@ BEGIN { $^H{"t::probing/permit"} = 1; }
    ok( !probetaggedchoice, 'tagged choice absent' );
    ok( probetaggedchoice x, '1st tagged choice present' );
    ok( probetaggedchoice z, '2nd tagged choice present' );
+}
+
+# comma list
+{
+   ok( !probecommalist, 'comma list absent' );
+   is( ( probecommalist a ), 1, 'comma list present x 1' );
+   is( ( probecommalist a, b ), 2, 'comma list present x 2' );
 }
 
 # paren scope

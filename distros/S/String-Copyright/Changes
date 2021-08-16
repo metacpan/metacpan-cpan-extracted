@@ -2,10 +2,30 @@ String-Copyright
 ================
 
 Created:      2016-07-21
-Home page:    <https://metacpan.org/release/String-Copyright>
 Home page:    <https://metacpan.org/pod/String::Copyright>
+Home page:    <https://metacpan.org/release/String-Copyright>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=libstring-copyright-perl>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
+
+0.003007	2021-08-16
+
+ [ Bug Fixes ]
+ - silence warning at duplicate year or single-year range
+
+ [ Documentation ]
+ - fix typo in example code
+
+ [ Test Suite ]
+ - test identifiers
+ - test skipped initial owner characters
+ - tighten TODO test succeeding since v0.003005
+
+ [ Other ]
+ - detect {c} (i.e. braces-wrapped c, supplementing parens-wrapped c) as
+   identifier
+ - skip dollar or percentage sign as initial owner character
+ - slightly simplify regexp variable signs_and_more_re
+ - stop precompile intermediate regexp variables
 
 0.003006	2018-09-27
 
@@ -124,7 +144,7 @@ Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
  [ Bug Fixes ]
  - Use Test::Script to ensure correct perl invokes script in tests.
-   SREZIC++
+   Slaven Rezic++
 
  [ Test Suite ]
  - Add a few tests for year-like owner field.

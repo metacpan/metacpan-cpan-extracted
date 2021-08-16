@@ -199,7 +199,7 @@ es-alias-manager.pl - Allow easy alias management for daily indexes
 
 =head1 VERSION
 
-version 7.9
+version 8.0
 
 =head1 SYNOPSIS
 

@@ -145,20 +145,19 @@ The return value is a string that can be accessed as an object of L<Module::Gene
 
 The SQL fragment as a string. The return value is a string that can be accessed as an object of L<Module::Generic::Scalar>
 
+=head1 SEE ALSO
+
+L<DB::Object::Query>, L<DB::Object::Mysql::Query>, L<DB::Object::Postgres::Query>, L<DB::Object::SQLite::Query>
+
 =head1 AUTHOR
 
 Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
-=head1 SEE ALSO
-
-L<DB::Object::Query>
-
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2021 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.
 
 =cut
-

@@ -1,7 +1,7 @@
 package Data::ModeMerge::Mode::Base;
 
-our $DATE = '2016-07-22'; # DATE
-our $VERSION = '0.35'; # VERSION
+our $DATE = '2021-08-15'; # DATE
+our $VERSION = '0.360'; # VERSION
 
 use 5.010;
 use strict;
@@ -290,10 +290,10 @@ sub _merge_gen {
                          ($hr->{$k} && $mh->can("merge_right_only")))) {
                     # there's only left-side or right-side
                     my $meth = $hl->{$k} ? "merge_left_only" : "merge_right_only";
-                    my ($subnewkey, $v, $subbackup, $is_circular, $newmode) = $mh->$meth($k, $o[$i][1]); # XXX handle circular?
+                    my ($subnewkey, $v1, $subbackup, $is_circular, $newmode) = $mh->$meth($k, $o[$i][1]); # XXX handle circular?
                     next K unless defined($subnewkey);
                     $final_mode = $newmode;
-                    $v = $res;
+                    $v = $v1;
                 } else {
                     $final_mode = $o[$i][0];
                     $v = $o[$i][1];
@@ -586,7 +586,7 @@ Data::ModeMerge::Mode::Base - Base class for Data::ModeMerge mode handler
 
 =head1 VERSION
 
-This document describes version 0.35 of Data::ModeMerge::Mode::Base (from Perl distribution Data-ModeMerge), released on 2016-07-22.
+This document describes version 0.360 of Data::ModeMerge::Mode::Base (from Perl distribution Data-ModeMerge), released on 2021-08-15.
 
 =head1 SYNOPSIS
 
@@ -665,7 +665,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2016, 2015, 2013, 2012, 2011, 2010 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

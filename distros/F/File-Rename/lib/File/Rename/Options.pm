@@ -6,59 +6,70 @@ BEGIN { eval { require warnings; warnings->import } }
 use Getopt::Long ();
 
 use vars qw($VERSION);
-$VERSION = '1.10';	
+$VERSION = '1.10';
 
 eval{ Getopt::Long::Configure qw(
-	posix_default
-	no_ignore_case
-	no_require_order
-); 1 } or do { require Carp; Carp::carp($@) };
+      posix_default
+      no_ignore_case
+      no_require_order
+    ); 1 } or do { require Carp; Carp::carp($@) };
 
 sub GetOptions {
     my ($no_code) = @_;
     my @expression;
     my $fullpath = 1;
     Getopt::Long::GetOptions(
-	'-v|verbose'	=> \my $verbose,
-	'-0|null'	=> \my $null,
-	'-n|nono'	=> \my $nono,
-	'-f|force'	=> \my $force,
-	'-h|?|help'	=> \my $help,
-	'-m|man'	=> \my $man,
-	'-V|version'	=> \my $version,
-	'-d|filename'	=> sub { undef $fullpath },
-	'-path|fullpath!' => \$fullpath,
-	'-e=s'		=> \@expression,
-	'-E=s'		=>
-	    sub {
-		my(undef, $e) = @_;
-		$e .= ';'; 
-		push @expression, $e; 
-	    },
-    ) or return;
+        '-v|verbose'    => \my $verbose,
+        '-0|null'       => \my $null,
+        '-n|nono'       => \my $nono,
+        '-f|force'      => \my $force,
+        '-h|?|help'     => \my $help,
+        '-m|man'        => \my $man,
+        '-V|version'    => \my $version,
+        '-d|filename'   => sub { undef $fullpath },
+        '-path|fullpath!' => \$fullpath,
+        '-e=s'          => \@expression,
+        '-E=s' =>
+            sub {
+                my(undef, $e) = @_;
+                $e .= ';';
+                push @expression, $e;
+            },
+        '-u|unicode:s'  => \my $unicode,
+      ) or return;
 
     my $options = {
-	verbose 	=> $verbose,
-	input_null	=> $null,
-	no_action	=> $nono,
-	over_write	=> $force,
-	filename_only	=> !$fullpath,
-	show_help	=> $help,
-	show_manual	=> $man,
-	show_version	=> $version,
+        verbose         => $verbose,
+        input_null      => $null,
+        no_action       => $nono,
+        over_write      => $force,
+        filename_only   => !$fullpath,
+        show_help       => $help,
+        show_manual     => $man,
+        show_version    => $version,
+        unicode_strings => defined $unicode,
+        encoding        => $unicode,
     };
     return $options if $no_code;
     return $options if $help or $man or $version;
-	 
+
     if( @expression ) {
-	$options->{_code} = join "\n", @expression;
+        $options->{_code} = join "\n", @expression;
     }
-    else { 
-	return unless @ARGV;
-	$options->{_code} = shift @ARGV;
-    } 
+    else {
+        return unless @ARGV;
+        $options->{_code} = shift @ARGV;
+    }
     return $options;
 }
+
+sub bad_encoding {
+    my $options = shift;
+    my $encoding = $options->{encoding};
+    return unless $encoding;
+    return unless $encoding =~ /[^\s\w.-]/;
+    return 1
+} 
 
 1;
 __END__
@@ -81,6 +92,10 @@ File::Rename::Options - Option processing for File::Rename
 
 Call C<Getopt::Long::GetOptions()> with options for rename script,
 returning a HASH of options.
+
+=item C<bad_encoding($options)>
+
+Test if I<encoding> does not look like an encoding
 
 =back
 

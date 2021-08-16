@@ -5,7 +5,7 @@ package App::ElasticSearch::Utilities::Connection;
 use strict;
 use warnings;
 
-our $VERSION = '7.9'; # VERSION
+our $VERSION = '8.0'; # VERSION
 
 use App::ElasticSearch::Utilities::HTTPRequest;
 use CLI::Helpers qw(:output);
@@ -74,7 +74,7 @@ sub _build_ua {
     ## use critic
     my $ua = LWP::UserAgent->new(
         keep_alive        => 3,
-        agent             => sprintf("%s/%0.1f (Perl %s)", __PACKAGE__, $local_version, $^V),
+        agent             => sprintf("%s/%s (Perl %s)", __PACKAGE__, $local_version, $^V),
         protocols_allowed => [qw(http https)],
         timeout           => $self->timeout,
     );
@@ -226,7 +226,7 @@ App::ElasticSearch::Utilities::Connection - Abstract the connection element
 
 =head1 VERSION
 
-version 7.9
+version 8.0
 
 =head1 SYNOPSIS
 

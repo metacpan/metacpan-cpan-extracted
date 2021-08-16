@@ -1,5 +1,5 @@
 {
-   "abstract" : "CPAN modules",
+   "abstract" : "Categorizing CPAN modules",
    "author" : [
       "perlancar <perlancar@cpan.org>"
    ],
@@ -51,7 +51,7 @@
          "web" : "https://github.com/perlancar/perl-Acme-CPANModules"
       }
    },
-   "version" : "0.1.8",
+   "version" : "0.1.9",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

@@ -206,6 +206,7 @@ like(
 		field 'The PostgreSQL Licence' => 'PostgreSQL';
 		field 'The PostgreSQL License' => 'PostgreSQL';    # list
 		field 'Python License'         => 'Python-2.0';
+		field 'overall Python license' => 'Python-2.0';
 		field 'The CNRI portion of the multi-part Python License' =>
 			'CNRI-Python';
 		field 'CNRI portion of Python License' => 'CNRI-Python';   # shortname

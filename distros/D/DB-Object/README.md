@@ -1,165 +1,204 @@
-# NAME
+SYNOPSIS
+========
 
-DB::Object - SQL API
+        use DB::Object;
 
-# SYNOPSIS
+        my $dbh = DB::Object->connect({
+        driver => 'Pg',
+        conf_file => 'db-settings.json',
+        database => 'webstore',
+        host => 'localhost',
+        login => 'store-admin',
+        schema => 'auth',
+        debug => 3,
+        }) || bailout( "Unable to connect to sql server on host localhost: ", DB::Object->error );
 
-    use DB::Object;
+        # Legacy regular query
+        my $sth = $dbh->prepare( "SELECT login,name FROM login WHERE login='jack'" ) ||
+        die( $dbh->errstr() );
+        $sth->execute() || die( $sth->errstr() );
+        my $ref = $sth->fetchrow_hashref();
+        $sth->finish();
 
-    my $dbh = DB::Object->connect({
-    driver => 'Pg',
-    conf_file => 'db-settings.json',
-    database => 'webstore',
-    host => 'localhost',
-    login => 'store-admin',
-    schema => 'auth',
-    debug => 3,
-    }) || bailout( "Unable to connect to sql server on host localhost: ", DB::Object->error );
-    
-    # Legacy regular query
-    my $sth = $dbh->prepare( "SELECT login,name FROM login WHERE login='jack'" ) ||
-    die( $dbh->errstr() );
-    $sth->execute() || die( $sth->errstr() );
-    my $ref = $sth->fetchrow_hashref();
-    $sth->finish();
-    
-    # Get a list of databases;
-    my @databases = $dbh->databases;
-    # Doesn't exist? Create it:
-    my $dbh2 = $dbh->create_db( 'webstore' );
-    # Load some sql into it
-    my $rv = $dbh2->do( $sql ) || die( $dbh->error );
-    
-    # Check a table exists
-    $dbh->table_exists( 'customers' ) || die( "Cannot find the customers table!\n" );
-    
-    # Get list of tables, as array reference:
-    my $tables = $dbh->tables;
-    
-    my $cust = $dbh->customers || die( "Cannot get customers object." );
-    $cust->where( email => 'john@example.org' );
-    my $str = $cust->delete->as_string;
-    # Becomes: DELETE FROM customers WHERE email='john\@example.org'
-    
-    # Do some insert with transaction
-    $dbh->begin_work;
-    # Making some other inserts and updates here...
-    my $cust_sth_ins = $cust->insert(
-        first_name => 'Paul',
-        last_name => 'Goldman',
-        email => 'paul@example.org',
-        active => 0,
-    ) || do
-    {
-        # Rollback everything since the begin_work
-        $dbh->rollback;
-        die( "Error while create query to add data to table customers: " . $cust->error );
-    };
-    $result = $cust_sth_ins->as_string;
-    # INSERT INTO customers (first_name, last_name, email, active) VALUES('Paul', 'Goldman', 'paul\@example.org', '0')
-    $dbh->commit;
-    ## Get the last used insert id
-    my $id = $dbh->last_insert_id();
-    
-    $cust->where( email => 'john@example.org' );
-    $cust->order( 'last_name' );
-    $cust->having( email => qr/\@example/ );
-    $cust->limit( 10 );
-    my $cust_sth_sel = $cust->select || die( "An error occurred while creating a query to select data frm table customers: " . $cust->error );
-    # Becomes:
-    # SELECT id, first_name, last_name, email, created, modified, active, created::ABSTIME::INTEGER AS created_unixtime, modified::ABSTIME::INTEGER AS modified_unixtime, CONCAT(first_name, ' ', last_name) AS name FROM customers WHERE email='john\@example.org' HAVING email ~ '\@example' ORDER BY last_name LIMIT 10
-    
-    $cust->reset;
-    $cust->where( email => 'john@example.org' );
-    my $cust_sth_upd = $cust->update( active => 0 )
-    # Would become:
-    # UPDATE ONLY customers SET active='0' WHERE email='john\@example.org'
-    
-    ## Lets' dump the result of our query
-    ## First to STDERR
-    $login->where( "login='jack'" );
-    $login->select->dump();
-    ## Now dump the result to a file
-    $login->select->dump( "my_file.txt" );
-    
+        # Get a list of databases;
+        my @databases = $dbh->databases;
+        # Doesn't exist? Create it:
+        my $dbh2 = $dbh->create_db( 'webstore' );
+        # Load some sql into it
+        my $rv = $dbh2->do( $sql ) || die( $dbh->error );
 
-# VERSION
+        # Check a table exists
+        $dbh->table_exists( 'customers' ) || die( "Cannot find the customers table!\n" );
 
-    v0.9.7
+        # Get list of tables, as array reference:
+        my $tables = $dbh->tables;
 
-# DESCRIPTION
+        my $cust = $dbh->customers || die( "Cannot get customers object." );
+        $cust->where( email => 'john@example.org' );
+        my $str = $cust->delete->as_string;
+        # Becomes: DELETE FROM customers WHERE email='john\@example.org'
 
-[DB::Object](https://metacpan.org/pod/DB%3A%3AObject) is a SQL API much alike `DBI`.
-So why use a private module instead of using that great `DBI` package?
+        # Do some insert with transaction
+        $dbh->begin_work;
+        # Making some other inserts and updates here...
+        my $cust_sth_ins = $cust->insert(
+            first_name => 'Paul',
+            last_name => 'Goldman',
+            email => 'paul@example.org',
+            active => 0,
+        ) || do
+        {
+            # Rollback everything since the begin_work
+            $dbh->rollback;
+            die( "Error while create query to add data to table customers: " . $cust->error );
+        };
+        $result = $cust_sth_ins->as_string;
+        # INSERT INTO customers (first_name, last_name, email, active) VALUES('Paul', 'Goldman', 'paul\@example.org', '0')
+        $dbh->commit;
+        ## Get the last used insert id
+        my $id = $dbh->last_insert_id();
 
-At first, I started to inherit from `DBI` to conform to `perlmod` perl 
-manual page and to general perl coding guidlines. It became very quickly a 
-real hassle. Barely impossible to inherit, difficulty to handle error, too 
-much dependent from an API that change its behaviour with new versions.
-In short, I wanted a better, more accurate control over the SQL connection.
+        $cust->where( email => 'john@example.org' );
+        $cust->order( 'last_name' );
+        $cust->having( email => qr/\@example/ );
+        $cust->limit( 10 );
+        my $cust_sth_sel = $cust->select || die( "An error occurred while creating a query to select data frm table customers: " . $cust->error );
+        # Becomes:
+        # SELECT id, first_name, last_name, email, created, modified, active, created::ABSTIME::INTEGER AS created_unixtime, modified::ABSTIME::INTEGER AS modified_unixtime, CONCAT(first_name, ' ', last_name) AS name FROM customers WHERE email='john\@example.org' HAVING email ~ '\@example' ORDER BY last_name LIMIT 10
 
-So, [DB::Object](https://metacpan.org/pod/DB%3A%3AObject) acts as a convenient, modifiable wrapper that provide the
-programmer with an intuitive, user-friendly and hassle free interface.
+        $cust->reset;
+        $cust->where( email => 'john@example.org' );
+        my $cust_sth_upd = $cust->update( active => 0 )
+        # Would become:
+        # UPDATE ONLY customers SET active='0' WHERE email='john\@example.org'
 
-# CONSTRUCTOR
+        ## Lets' dump the result of our query
+        ## First to STDERR
+        $login->where( "login='jack'" );
+        $login->select->dump();
+        ## Now dump the result to a file
+        $login->select->dump( "my_file.txt" );
 
-- **new**()
+Doing some left join
 
-    Create a new instance of [DB::Object](https://metacpan.org/pod/DB%3A%3AObject). Nothing much to say.
+    my $geo_tbl = $dbh->geoip || return( $self->error( "Unable to get the database object \"geoip\"." ) );
+    my $name_tbl = $dbh->geoname || return( $self->error( "Unable to get the database object \"geoname\"." ) );
+    $geo_tbl->as( 'i' );
+    $name_tbl->as( 'l' );
+    $geo_tbl->where( "INET '?'" << $geo_tbl->fo->network );
+    $geo_tbl->alias( id => 'ip_id' );
+    $name_tbl->alias( country_iso_code => 'code' );
+    my $sth = $geo_tbl->select->join( $name_tbl, $geo_tbl->fo->geoname_id == $name_tbl->fo->geoname_id );
+    # SELECT
+    #     -- tables fields
+    # FROM
+    #     geoip AS i
+    #     LEFT JOIN geoname AS l ON i.geoname_id = l.geoname_id
+    # WHERE
+    #     INET '?' << i.network
 
-- **connect**( \[ DATABASE, LOGIN, PASSWORD, SERVER\[:PORT\], DRIVER, SCHEMA \] | %PARAMETERS | \\%PARAMETERS )
+VERSION
+=======
 
-    Create a new instance of [DB::Object](https://metacpan.org/pod/DB%3A%3AObject), but also attempts a conection
-    to SQL server.
+        v0.9.13
 
-    It can take either an array of value in the order database name, login, password, host, driver and optionally schema, or it can take a has or hash reference. The hash or hash reference attributes are as follow:
+DESCRIPTION
+===========
 
-    - _database_ or _DB\_NAME_
+[DB::Object](https://metacpan.org/pod/DB::Object){.perl-module} is a SQL
+API much alike `DBI`. So why use a private module instead of using that
+great `DBI` package?
 
-        The database name you wish to connect to
+At first, I started to inherit from `DBI` to conform to `perlmod` perl
+manual page and to general perl coding guidlines. It became very quickly
+a real hassle. Barely impossible to inherit, difficulty to handle error,
+too much dependent from an API that change its behaviour with new
+versions. In short, I wanted a better, more accurate control over the
+SQL connection.
 
-    - _login_ or _DB\_LOGIN_
+So, [DB::Object](https://metacpan.org/pod/DB::Object){.perl-module} acts
+as a convenient, modifiable wrapper that provide the programmer with an
+intuitive, user-friendly and hassle free interface.
 
-        The login used to access that database
+CONSTRUCTOR
+===========
 
-    - _passwd_ or _DB\_PASSWD_
+new
+---
 
-        The password that goes along
+Create a new instance of
+[DB::Object](https://metacpan.org/pod/DB::Object){.perl-module}. Nothing
+much to say.
 
-    - _host_ or _DB\_HOST_
+connect
+-------
 
-        The server, that is hostname of the machine serving a SQL server.
+Provided with a `database`, `login`, `password`, `server`:\[`port`\],
+`driver`, `schema`, and optional hash or hash reference of parameters
+and this will issue a database connection and return the resulting
+database handler.
 
-    - _port_ or _DB\_PORT_
+Create a new instance of
+[DB::Object](https://metacpan.org/pod/DB::Object){.perl-module}, but
+also attempts a connection to SQL server.
 
-        The port to connect to
+It can take either an array of value in the order database name, login,
+password, host, driver and optionally schema, or it can take a has or
+hash reference. The hash or hash reference attributes are as follow:
 
-    - _driver_ or _DB\_DRIVER_
+*database* or *DB\_NAME*
 
-        The driver you want to use. It needs to be of the same type than the server
-        you want to connect to. If you are connecting to a MySQL server, you would use
-        `mysql`, if you would connecto to an Oracle server, you would use `oracle`.
+:   The database name you wish to connect to
 
-        You need to make sure that those driver are properly installed in the system 
-        before attempting to connect.
+*login* or *DB\_LOGIN*
 
-        To install the required driver, you could start with the command line:
+:   The login used to access that database
+
+*passwd* or *DB\_PASSWD*
+
+:   The password that goes along
+
+*host* or *DB\_HOST*
+
+:   The server, that is hostname of the machine serving a SQL server.
+
+*port* or *DB\_PORT*
+
+:   The port to connect to
+
+*driver* or *DB\_DRIVER*
+
+:   The driver you want to use. It needs to be of the same type than the
+    server you want to connect to. If you are connecting to a MySQL
+    server, you would use `mysql`, if you would connecto to an Oracle
+    server, you would use `oracle`.
+
+    You need to make sure that those driver are properly installed in
+    the system before attempting to connect.
+
+    To install the required driver, you could start with the command
+    line:
 
             perl -MCPAN -e shell
 
-        which will provide you a special shell to install modules in a convenient way.
+    which will provide you a special shell to install modules in a
+    convenient way.
 
-    - _schema_ or _DB\_SCHEMA_
+*schema* or *DB\_SCHEMA*
 
-        The schema to use to access the tables. Currently only used by PostgreSQL
+:   The schema to use to access the tables. Currently only used by
+    PostgreSQL
 
-    - _opt_
+*opt*
 
-        This takes a hash reference and contains the standard `DBI` options such as _PrintError_, _RaiseError_, _AutoCommit_, etc
+:   This takes a hash reference and contains the standard `DBI` options
+    such as *PrintError*, *RaiseError*, *AutoCommit*, etc
 
-    - _conf\_file_ or _DB\_CON\_FILE_
+*conf\_file* or *DB\_CON\_FILE*
 
-        This is used to specify a json connection configuration file. It can also provided via the environment variable _DB\_CON\_FILE_. It has the following structure:
+:   This is used to specify a json connection configuration file. It can
+    also provided via the environment variable *DB\_CON\_FILE*. It has
+    the following structure:
 
             {
             "database": "some_database",
@@ -176,7 +215,8 @@ programmer with an intuitive, user-friendly and hassle free interface.
                 }
             }
 
-        Alternatively, it can contain connections parameters for multiple databases and drivers, such as:
+    Alternatively, it can contain connections parameters for multiple
+    databases and drivers, such as:
 
             {
                 "databases": [
@@ -209,639 +249,1344 @@ programmer with an intuitive, user-friendly and hassle free interface.
                 ]
             }
 
-    - _uri_ or _DB\_CON\_URI_
+*uri* or *DB\_CON\_URI*
 
-        This is used to specify an uri to contain all the connection parameters for one database connection. It can also provided via the environment variable _DB\_CON\_URI_. For example:
+:   This is used to specify an uri to contain all the connection
+    parameters for one database connection. It can also provided via the
+    environment variable *DB\_CON\_URI*. For example:
 
-            http://db.example.com:5432?database=some_database&login=sql_joe&passwd=some%020password&driver=Pg&schema=warehouse&&opt=%7B%22RaiseError%22%3A+false%2C+%22PrintError%22%3Atrue%2C+%22AutoCommit%22%3Atrue%7D
-            
+        http://db.example.com:5432?database=some_database&login=sql_joe&passwd=some%020password&driver=Pg&schema=warehouse&&opt=%7B%22RaiseError%22%3A+false%2C+%22PrintError%22%3Atrue%2C+%22AutoCommit%22%3Atrue%7D
 
-        Here the _opt_ parameter is passed as a json string, for example:
+    Here the *opt* parameter is passed as a json string, for example:
 
             {"RaiseError": false, "PrintError":true, "AutoCommit":true}
 
-# METHODS
+METHODS
+=======
 
-- **clear**()
+alias
+-----
 
-    Reset error message.
+This is a convenient wrapper around [\"alias\" in
+DB::Object::Query](https://metacpan.org/pod/DB::Object::Query#alias){.perl-module}
 
-- **debug**( \[ 0 | 1 \] )
+It takes a column name to alias hash and sets those aliases for the
+following query.
 
-    Toggle debug mode on/off
+Get/set alias for table fields in SELECT queries. The hash provided thus
+contain a list of field =\> alias pairs.
 
-- **error**( \[ $string \] )
+allow\_bulk\_delete
+-------------------
 
-    Get set error message.
-    If an error message is provided, **error** will pass it to **warn**.
+Sets/gets the boolean value for whether to allow unsafe bulk delete.
+This means query without any `where` clause.
 
-- **get**( $parameter )
+allow\_bulk\_update
+-------------------
 
-    Get object parameter.
+Sets/gets the boolean value for whether to allow unsafe bulk update.
+This means query without any `where` clause.
 
-- **message**( $string )
+AND
+---
 
-    Provided a multi line string, **message** will display it on the STDERR if either _verbose_ or _debug_ mode is on.
+Takes any arguments and wrap them into a `AND` clause.
 
-- **verbose**()
+        $tbl->where( $dbh->AND( $tbl->fo->id == ?, $tbl->fo->frequency >= .30 ) );
 
-    Toggle verbose mode on/off
+auto\_convert\_datetime\_to\_object
+-----------------------------------
 
-- **alias**( %parameters )
+Sets or gets the boolean value. If true, then this api will
+automatically transcode datetime value into their equivalent
+[DateTime](https://metacpan.org/pod/DateTime){.perl-module} object.
 
-    Get/set alias for table fields in SELECT queries. The hash provided thus contain a list of field => alias pairs.
+auto\_decode\_json
+------------------
 
-- **as\_string**()
+Sets or gets the boolean value. If true, then this api will
+automatically transcode json data into perl hash reference.
 
-    Return the sql query as a string.
+as\_string
+----------
 
-- **avoid**( \[ @fields | \\@fields \] )
+Return the sql query as a string.
 
-    Set the provided list of table fields to avoid when returning the query result.
-    The list of fields can be provided either as an array of a reference to an array.
+avoid
+-----
 
-- **attribute**( $name | %names )
+Takes a list of array reference of column to avoid in the next query.
 
-    Sets or get the value of database connection parameters.
+This is a convenient wrapper around [\"avoid\" in
+DB::Object::Query](https://metacpan.org/pod/DB::Object::Query#avoid){.perl-module}
 
-    If only one argument is provided, returns its value.
-    If multiple arguments in a form of pair => value are provided, it sets the corresponding database parameters.
+attribute
+---------
 
-    The authorised parameters are:
+Sets or get the value of database connection parameters.
 
-    - _Warn_
+If only one argument is provided, returns its value. If multiple
+arguments in a form of pair =\> value are provided, it sets the
+corresponding database parameters.
 
-        Can be overridden.
+The authorised parameters are:
 
-    - _Active_
+*Active*
 
-        Read-only.
+:   Is read-only.
 
-    - _Kids_
+*ActiveKids*
 
-        Read-only.
+:   Is read-only.
 
-    - _ActiveKids_
+*AutoCommit*
 
-        Read-only.
+:   Can be changed.
 
-    - _CachedKids_
+*AutoInactiveDestroy*
 
-        Read-only.
+:   Can be changed.
 
-    - _InactiveDestroy_
+*CachedKids*
 
-        Can be overridden.
+:   Is read-only.
 
-    - _PrintError_
+*Callbacks*
 
-        Can be overridden.
+:   Can be changed.
 
-    - _RaiseError_
+*ChildHandles*
 
-        Can be overridden.
+:   Is read-only.
 
-    - _ChopBlanks_
+*ChopBlanks*
 
-        Can be overridden.
+:   Can be changed.
 
-    - _LongReadLen_
+*CompatMode*
 
-        Can be overridden.
+:   Can be changed.
 
-    - _LongTruncOk_
+*CursorName*
 
-        Can be overridden.
+:   Is read-only.
 
-    - _AutoCommit_
+*ErrCount*
 
-        Can be overridden.
+:   Is read-only.
 
-    - _Name_
+*Executed*
 
-        Read-only.
+:   Is read-only.
 
-    - _RowCacheSize_
+*FetchHashKeyName*
 
-        Read-only.
+:   Is read-only.
 
-    - _NUM\_OF\_FIELDS_
+*HandleError*
 
-        Read-only.
+:   Can be changed.
 
-    - _NUM\_OF\_PARAMS_
+*HandleSetErr*
 
-        Read-only.
+:   Can be changed.
 
-    - _NAME_
+*InactiveDestroy*
 
-        Read-only.
+:   Can be changed.
 
-    - _TYPE_
+*Kids*
 
-        Read-only.
+:   Is read-only.
 
-    - _PRECISION_
+*LongReadLen*
 
-        Read-only.
+:   Can be changed.
 
-    - _SCALE_
+*LongTruncOk*
 
-        Read-only.
+:   Can be changed.
 
-    - _NULLABLE_
+*NAME*
 
-        Read-only.
+:   Is read-only.
 
-    - _CursorName_
+*NULLABLE*
 
-        Read-only.
+:   Is read-only.
 
-    - _Statement_
+*NUM\_OF\_FIELDS*
 
-        Read-only.
+:   Is read-only.
 
-    - _RowsInCache_
+*NUM\_OF\_PARAMS*
 
-        Read-only.
+:   Is read-only.
 
-- **available\_drivers**()
+*Name*
 
-    Return the list of available drivers.
+:   Is read-only.
 
-- **bind**( \[ @values \] )
+*PRECISION*
 
-    If no values to bind to the underlying query is provided, **bind** simply activate the bind value feature.
+:   Is read-only.
 
-    If values are provided, they are allocated to the statement object and will be applied when the query will be executed.
+*PrintError*
 
-    Example:
+:   Can be changed.
+
+*PrintWarn*
+
+:   Can be changed.
+
+*Profile*
+
+:   Is read-only.
+
+*RaiseError*
+
+:   Can be changed.
+
+*ReadOnly*
+
+:   Can be changed.
+
+*RowCacheSize*
+
+:   Is read-only.
+
+*RowsInCache*
+
+:   Is read-only.
+
+*SCALE*
+
+:   Is read-only.
+
+*ShowErrorStatement*
+
+:   Can be changed.
+
+*Statement*
+
+:   Is read-only.
+
+*TYPE*
+
+:   Is read-only.
+
+*Taint*
+
+:   Can be changed.
+
+*TaintIn*
+
+:   Can be changed.
+
+*TaintOut*
+
+:   Can be changed.
+
+*TraceLevel*
+
+:   Can be changed.
+
+*Type*
+
+:   Is read-only.
+
+*Warn*
+
+:   Can be changed.
+
+available\_drivers
+------------------
+
+Return the list of available drivers.
+
+base\_class
+-----------
+
+Returns the base class.
+
+bind
+----
+
+If no values to bind to the underlying query is provided,
+[\"bind\"](#bind){.perl-module} simply activate the bind value feature.
+
+If values are provided, they are allocated to the statement object and
+will be applied when the query will be executed.
+
+Example:
 
         $dbh->bind()
-        ## or
+        # or
         $dbh->bind->where( "something" )
-        ## or
+        # or
         $dbh->bind->select->fetchrow_hashref()
-        ## and then later
+        # and then later
         $dbh->bind( 'thingy' )->select->fetchrow_hashref()
 
-- **cache**()
+cache
+-----
 
-    Activate caching.
+Activate caching.
 
         $tbl->cache->select->fetchrow_hashref();
 
-- **check\_driver**()
+cache\_connections
+------------------
 
-    Check that the driver set in _$SQL\_DRIVER_ in ~/etc/common.cfg is indeed available.
+Sets/get the cached database connection.
 
-    It does this by calling **available\_drivers**.
+cache\_dir
+----------
 
-- **copy**( \[ \\%values | %values )
+Sets or gets the directory on the file system used for caching data.
 
-    Provided with either a reference to an hash or an hash of key => value pairs, **copy** will first execute a select statement on the table object, then fetch the row of data, then replace the key-value pair in the result by the ones provided, and finally will perform an insert.
+cache\_tables
+-------------
 
-    Return false if no data to copy were provided, otherwise it always returns true.
+Sets or gets the
+[DB::Object::Cache::Tables](https://metacpan.org/pod/DB::Object::Cache::Tables){.perl-module}
+object.
 
-- **create\_table**( @parameters )
+check\_driver
+-------------
 
-    The idea is to create a table with the givern parameters.
+Check that the driver set in *\$SQL\_DRIVER* in \~/etc/common.cfg is
+indeed available.
 
-    This is currently heavily designed to work for PoPList. It needs to be rewritten.
+It does this by calling
+[\"available\_drivers\"](#available_drivers){.perl-module}.
 
-- **data\_sources**( \[ %options \] )
+connect
+-------
 
-    Given an optional list of options, this return the data source of the database handler.
+This will attempt a database server connection.
 
-- **data\_type**( \[ \\@types | @types \] )
+It called
+[\"\_connection\_params2hash\"](#connection_params2hash){.perl-module}
+to get the necessary connection parameters, which is superseded in each
+driver package.
 
-    Given a reference to an array or an array of data type, **data\_type** will check their availability in the database driver.
+Then, it will call
+[\"\_check\_connect\_param\"](#check_connect_param){.perl-module} to get
+the right parameters for connection.
 
-    If nothing found, it return an empty list in list context, or undef in scalar context.
+It will also call
+[\"\_check\_default\_option\"](#check_default_option){.perl-module} to
+get some driver specific default options unless the previous call to
+\_check\_connect\_param returned an has with a property *opt*.
 
-    If something was found, it returns a hash in list context or a reference to a hash in list context.
+It will then set the following current object properties:
+[\"database\"](#database){.perl-module},
+[\"host\"](#host){.perl-module}, [\"port\"](#port){.perl-module},
+[\"login\"](#login){.perl-module}, [\"passwd\"](#passwd){.perl-module},
+[\"driver\"](#driver){.perl-module}, [\"cache\"](#cache){.perl-module},
+[\"bind\"](#bind){.perl-module}, [\"opt\"](#opt){.perl-module}
 
-- **database**()
+Unless specified in the connection options retrieved with
+[\"\_check\_default\_option\"](#check_default_option){.perl-module}, it
+sets some basic default value:
 
-    Return the name of the current database.
+*AutoCommit* 1
 
-- **delete**()
+:   
 
-    **delete** will format a delete query based on previously set parameters, such as **where**.
+*PrintError* 0
 
-    **delete** will refuse to execute a query without a where condition. To achieve this, one must prepare the delete query on his/her own by using the **do** method and passing the sql query directly.
+:   
 
-        $tbl->where( "login" => "jack" );
-        $tbl->limit( 1 );
+*RaiseError* 0
+
+:   
+
+Finally it tries to connect by calling the, possibly superseded, method
+[\"\_dbi\_connect\"](#dbi_connect){.perl-module}
+
+It instantiate a
+[DB::Object::Cache::Tables](https://metacpan.org/pod/DB::Object::Cache::Tables){.perl-module}
+object to cache database tables and return the current object.
+
+constant\_queries\_cache
+------------------------
+
+Returns the global value for `$CONSTANT_QUERIES_CACHE`
+
+constant\_queries\_cache\_get
+-----------------------------
+
+Provided with some hash reference with properties `pack`, `file` and
+`line` that are together used as a key in the cache and this will use an
+existing entry in the cache if available.
+
+constant\_queries\_cache\_set
+-----------------------------
+
+Provided with some hash reference with properties `pack`, `file` and
+`line` that are together used as a key in the cache and `query_object`
+and this will set an entry in the cache. it returns the hash reference
+initially provided.
+
+copy
+----
+
+Provided with either a reference to an hash or an hash of key =\> value
+pairs, [\"copy\"](#copy){.perl-module} will first execute a select
+statement on the table object, then fetch the row of data, then replace
+the key-value pair in the result by the ones provided, and finally will
+perform an insert.
+
+Return false if no data to copy were provided, otherwise it always
+returns true.
+
+create\_db
+----------
+
+This is a method that must be implemented by the driver package.
+
+create\_table
+-------------
+
+This is a method that must be implemented by the driver package.
+
+data\_sources
+-------------
+
+Given an optional list of options as hash, this return the data source
+of the database handler.
+
+data\_type
+----------
+
+Given a reference to an array or an array of data type,
+[\"data\_type\"](#data_type){.perl-module} will check their availability
+in the database driver.
+
+If nothing found, it return an empty list in list context, or undef in
+scalar context.
+
+If something was found, it returns a hash in list context or a reference
+to a hash in list context.
+
+database
+--------
+
+Return the name of the current database.
+
+databases
+---------
+
+This returns the list of available databases.
+
+This is a method that must be implemented by the driver package.
+
+delete
+------
+
+[\"delete\"](#delete){.perl-module} will format a delete query based on
+previously set parameters, such as [\"where\"](#where){.perl-module}.
+
+[\"delete\"](#delete){.perl-module} will refuse to execute a query
+without a where condition. To achieve this, one must prepare the delete
+query on his/her own by using the [\"do\"](#do){.perl-module} method and
+passing the sql query directly.
+
+        $tbl->where( login => 'jack' );
+        $tbl->limit(1);
         my $rows_affected = $tbl->delete();
-        ## or passing the where condition directly to delete
-        my $sth = $tbl->delete( "login" => "jack" );
+        # or passing the where condition directly to delete
+        my $sth = $tbl->delete( login => 'jack' );
 
-- **disconnect**()
+disconnect
+----------
 
-    Disconnect from database. Returns the return code.
+Disconnect from database. Returns the return code.
 
         my $rc = $dbh->disconnect;
 
-- **do**( $sql\_query, \[ \\%attributes, \\@bind\_values \] )
+do
+--
 
-    Execute a sql query directly passed with possible attributes and values to bind.
+Provided with a string representing a sql query, some hash reference of
+attributes and some optional values to bind and this will execute the
+query and return the statement handler.
 
-    The attributes list will be used to **prepare** the query and the bind values will be used when executing the query.
+The attributes list will be used to **prepare** the query and the bind
+values will be used when executing the query.
 
-    It returns the statement handler or the number of rows affected.
-
-    Example:
+Example:
 
         $rc = $dbh->do( $statement ) || die( $dbh->errstr );
         $rc = $dbh->do( $statement, \%attr ) || die( $dbh->errstr );
         $rv = $dbh->do( $statement, \%attr, @bind_values ) || die( $dbh->errstr );
         my $rows_deleted = $dbh->do(
         q{
-             DELETE FROM table WHERE status = ?
+           DELETE FROM table WHERE status = ?
         }, undef(), 'DONE' ) || die( $dbh->errstr );
 
-- **enhance**( \[ @value \] )
+driver
+------
 
-    Toggle the enhance mode on/off.
+Return the name of the driver for the current object.
 
-    When on, the functions _from\_unixtime_ and _unix\_timestamp_ will be used on date/time field to translate from and to unix time seamlessly.
+enhance
+-------
 
-- **err**()
+Toggle the enhance mode on/off.
 
-    Get the currently set error.
+When on, the functions
+[\"from\_unixtime\"](#from_unixtime){.perl-module} and
+[\"unix\_timestamp\"](#unix_timestamp){.perl-module} will be used on
+date/time field to translate from and to unix time seamlessly.
 
-- **errno**()
+err
+---
 
-    Is just an alias for **err**.
+Get the currently set error.
 
-- **errmesg**()
+errno
+-----
 
-    Is just an alias for **errstr**.
+Is just an alias for [\"err\"](#err){.perl-module}.
 
-- **errstr**()
+errmesg
+-------
 
-    Get the currently set error string.
+Is just an alias for [\"errstr\"](#errstr){.perl-module}.
 
-- **fatal**( \[ 1 | 0 \] )
+errstr
+------
 
-    Toggles fatal mode on/off.
+Get the currently set error string.
 
-- **from\_unixtime**( \[ @fields | \\@fields \] )
+FALSE
+-----
 
-    Set the list of fields that are to be treated as unix time and converted accordingly after the sql query is executed.
+This return the keyword `FALSE` to be used in queries.
 
-    It returns the list of fields in list context or a reference to an array in scalar context.
+fatal
+-----
 
-- **format\_statement**( \[ \\@data, \\@order, $table \] )
+Provided a boolean value and this toggles fatal mode on/off.
 
-    Format the sql statement.
+from\_unixtime
+--------------
 
-    In list context, it returns 2 strings: one comma-separated list of fields and one comma-separated list of values. In scalar context, it only returns a comma-separated string of fields.
+Provided with an array or array reference of table columns and this will
+set the list of fields that are to be treated as unix time and converted
+accordingly after the sql query is executed.
 
-- **format\_update**( \\@data | \\%data | %data | @data )
+It returns the list of fields in list context or a reference to an array
+in scalar context.
 
-    Formats update query based on the following arguments provided:
+format\_statement
+-----------------
 
-    - _data_
+This is a convenient wrapper around [\"format\_statement\" in
+DB::Object::Query](https://metacpan.org/pod/DB::Object::Query#format_statement){.perl-module}
 
-        An array of key-value pairs to be used in the update query. This array can be provided as the prime argument as a reference to an array, an array, or as the _data_ element of a hash or a reference to a hash provided.
+Format the sql statement for queries of types `select`, `delete` and
+`insert`
 
-        Why an array if eventually we build a list of key-value pair? Because the order of the fields may be important, and if the key-value pair list is provided, **format\_update** honors the order in which the fields are provided.
+In list context, it returns 2 strings: one comma-separated list of
+fields and one comma-separated list of values. In scalar context, it
+only returns a comma-separated string of fields.
 
-    **format\_update** will then iterate through each field-value pair, and perform some work:
+format\_update
+--------------
 
-    If the field being reviewed was provided to **from\_unixtime**, then **format\_update** will enclose it in the function FROM\_UNIXTIME() as in:
+This is a convenient wrapper around [\"format\_update\" in
+DB::Object::Query](https://metacpan.org/pod/DB::Object::Query#format_update){.perl-module}
 
-        FROM_UNIXTIME(field_name)
-        
+Formats update query based on the following arguments provided:
 
-    If the the given value is a reference to a scalar, it will be used as-is, ie. it will not be enclosed in quotes or anything. This is useful if you want to control which function to use around that field.
+*data*
 
-    If the given value is another field or looks like a function having parenthesis, or if the value is a question mark, the value will be used as-is.
+:   An array of key-value pairs to be used in the update query. This
+    array can be provided as the prime argument as a reference to an
+    array, an array, or as the *data* element of a hash or a reference
+    to a hash provided.
 
-    If **bind** is off, the value will be escaped and the pair field='value' created.
+    Why an array if eventually we build a list of key-value pair?
+    Because the order of the fields may be important, and if the
+    key-value pair list is provided,
+    [\"format\_update\"](#format_update){.perl-module} honors the order
+    in which the fields are provided.
 
-    If the field is a SET data type and the value is a number, the value will be used as-is without surrounding single quote.
+[\"format\_update\"](#format_update){.perl-module} will then iterate
+through each field-value pair, and perform some work:
 
-    If **bind** is enabled, a question mark will be used as the value and the original value will be saved as value to bind upon executing the query.
+If the field being reviewed was provided to **from\_unixtime**, then
+[\"format\_update\"](#format_update){.perl-module} will enclose it in
+the function FROM\_UNIXTIME() as in:
 
-    Finally, otherwise the value is escaped and surrounded by single quotes.
+      FROM_UNIXTIME(field_name)
 
-    **format\_update** returns a string representing the comma-separated list of fields that will be used.
+If the the given value is a reference to a scalar, it will be used
+as-is, ie. it will not be enclosed in quotes or anything. This is useful
+if you want to control which function to use around that field.
 
-- **getdefault**( %default\_values )
+If the given value is another field or looks like a function having
+parenthesis, or if the value is a question mark, the value will be used
+as-is.
 
-    Does some preparation work such as :
+If **bind** is off, the value will be escaped and the pair
+field=\'value\' created.
 
-    1. the date/time field to use the FROM\_UNIXTIME and UNIX\_TIMESTAMP functions
-    2. removing from the query the fields to avoid, ie the ones set with the **avoid** method.
-    3. set the fields alias based on the information provided with the **alias** method.
-    4. if a field last\_name and first\_name exist, it will also create an alias _name_ based on the concatenation of the 2.
-    5. it will set the default values provided. This is used for UPDATE queries.
+If the field is a SET data type and the value is a number, the value
+will be used as-is without surrounding single quote.
 
-    It returns a new [DB::Object::Tables](https://metacpan.org/pod/DB%3A%3AObject%3A%3ATables) object with all the data prepared within.
+If [\"bind\"](#bind){.perl-module} is enabled, a question mark will be
+used as the value and the original value will be saved as value to bind
+upon executing the query.
 
-- **group**( @fields | \\@fields )
+Finally, otherwise the value is escaped and surrounded by single quotes.
 
-    Format the group by portion of the query.
+[\"format\_update\"](#format_update){.perl-module} returns a string
+representing the comma-separated list of fields that will be used.
 
-    It returns an empty list in list context of undef in scalar context if no group by clause was build.
-    Otherwise, it returns the value of the group by clause as a string in list context and the full group by clause in scalar context.
+group
+-----
 
-    In list context, it returns: $group\_by
+This is a convenient wrapper around [\"group\" in
+DB::Object::Query](https://metacpan.org/pod/DB::Object::Query#group){.perl-module}
 
-    In scalar context, it returns: GROUP BY $group\_by
+host
+----
 
-- **insert**( [DB::Object::Statement](https://metacpan.org/pod/DB%3A%3AObject%3A%3AStatement) SELECT object, \\%key\_value | %key\_value )
+Sets or gets the `host` property for this database object.
 
-    Prepares an INSERT query using the field-value pairs provided.
+insert
+------
 
-    If a [DB::Object::Statement](https://metacpan.org/pod/DB%3A%3AObject%3A%3AStatement) object is provided as first argument, it will considered as a SELECT query to be used in the INSERT query, as in: INSERT INTO my table SELECT FROM another\_table
+This is a convenient wrapper around [\"insert\" in
+DB::Object::Query](https://metacpan.org/pod/DB::Object::Query#insert){.perl-module}
 
-    Otherwise, **insert** will build the query based on the fields provided.
+last\_insert\_id
+----------------
 
-    In scalar context, it returns the result of **execute** and in list context, it returns the statement object.
+Get the id of the primary key from the last insert.
 
-- **last\_insert\_id**()
+limit
+-----
 
-    Get the id of the primary key from the last insert.
+This is a convenient wrapper around [\"limit\" in
+DB::Object::Query](https://metacpan.org/pod/DB::Object::Query#limit){.perl-module}
 
-- **limit**( \[ END, \[ START, END \] \] )
+local
+-----
 
-    Set or get the limit for the future statement.
+This is a convenient wrapper around [\"local\" in
+DB::Object::Query](https://metacpan.org/pod/DB::Object::Query#local){.perl-module}
 
-    If only one argument is provided, it is assumed to be the end limit. If 2 are provided, they wil be the start and end.
+lock
+----
 
-    It returns a list of the start and end limit in list context, and the string of the LIMIT in scalar context, such as: LIMIT 1, 10
+This method must be implemented by the driver package.
 
-- **local**( %params | \\%params )
+login
+-----
 
-    Not sure what it does. I forgot.
+Sets or gets the `login` property for this database object.
 
-- **lock**( $lock\_id, \[ $timeout \] )
+no\_bind
+--------
 
-    Set a lock using a lock identifier and a timeout.
-    By default the timeout is 2 seconds.
+When invoked, [\"no\_bind\"](#no_bind){.perl-module} will change any
+preparation made so far for caching the query with bind parameters, and
+instead substitute the value in lieu of the question mark placeholder.
 
-    If the lock failed (NULL), it returns undef(), otherwise, it returns the return value.
+no\_cache
+---------
 
-- **no\_bind**()
+Disable caching of queries.
 
-    When invoked, **no\_bind** will change any preparation made so far for caching the query with bind parameters, and instead substitute the value in lieu of the question mark placeholder.
+NOT
+---
 
-- **no\_cache**()
+Returns a new
+[DB::Object::NOT](https://metacpan.org/pod/DB::Object::NOT){.perl-module}
+object, passing it whatever arguments were provided.
 
-    Disable caching of queries.
+NULL
+----
 
-- **order**()
+Returns a `NULL` string to be used in queries.
 
-    Prepares the ORDER BY clause and returns the value of the clause in list context or the ORDER BY clause in full in scalar context, ie. "ORDER BY $clause"
+on\_conflict
+------------
 
-- **param**( $param | %params )
+The SQL `ON CONFLICT` clause needs to be implemented by the driver and
+is currently supported only by and
+[DB::Object::Postgres](https://metacpan.org/pod/DB::Object::Postgres){.perl-module}
+and
+[DB::Object::SQLite](https://metacpan.org/pod/DB::Object::SQLite){.perl-module}.
 
-    If only a single parameter is provided, its value is return. If a list of parameters is provided they are set accordingly using the `SET` sql command.
+OR
+--
 
-    Supported parameters are:
+Returns a new
+[DB::Object::OR](https://metacpan.org/pod/DB::Object::OR){.perl-module}
+object, passing it whatever arguments were provided.
 
-    - SQL\_AUTO\_IS\_NULL
-    - AUTOCOMMIT
-    - SQL\_BIG\_TABLES
-    - SQL\_BIG\_SELECTS
-    - SQL\_BUFFER\_RESULT
-    - SQL\_LOW\_PRIORITY\_UPDATES
-    - SQL\_MAX\_JOIN\_SIZE 
-    - SQL\_SAFE\_MODE
-    - SQL\_SELECT\_LIMIT
-    - SQL\_LOG\_OFF
-    - SQL\_LOG\_UPDATE 
-    - TIMESTAMP
-    - INSERT\_ID
-    - LAST\_INSERT\_ID
+order
+-----
 
-    If unsupported parameters are provided, they are considered to be private and not passed to the database handler.
+This is a convenient wrapper around [\"order\" in
+DB::Object::Query](https://metacpan.org/pod/DB::Object::Query#order){.perl-module}
 
-    It then execute the query and return undef() in case of error.
+Prepares the `ORDER BY` clause and returns the value of the clause in
+list context or the `ORDER BY` clause in full in scalar context, ie.
+\"ORDER BY \$clause\"
 
-    Otherwise, it returns the object used to call the method.
+param
+-----
 
-- **ping**()
+If only a single parameter is provided, its value is return. If a list
+of parameters is provided they are set accordingly using the `SET` sql
+command.
 
-    Evals a SELECT 1 statement and returns 0 if errors occurred or the return value.
+Supported parameters are:
 
-- **prepare**( $query, \\%options )
+AUTOCOMMIT
 
-    Prepares the query using the options provided. The options are the same as the one in [DBI](https://metacpan.org/pod/DBI) **prepare** method.
+:   
 
-    It returns a [DB::Object::Statement](https://metacpan.org/pod/DB%3A%3AObject%3A%3AStatement) object upon success or undef if an error occurred. The error can then be retrieved using **errstr** or **error**.
+INSERT\_ID
 
-- **prepare\_cached**( $query, \\%options )
+:   
 
-    Same as **prepare** except the query is cached.
+LAST\_INSERT\_ID
 
-- **query**( $query, \\%options )
+:   
 
-    It prepares and executes the given SQL query with the options provided and return undef() upon error or the statement handler upon success.
+SQL\_AUTO\_IS\_NULL
 
-- **replace**( [DB::Object::Statement](https://metacpan.org/pod/DB%3A%3AObject%3A%3AStatement) object, \[ %data \] )
+:   
 
-    Just like for the INSERT query, **replace** takes one optional argument representing a [DB::Object::Statement](https://metacpan.org/pod/DB%3A%3AObject%3A%3AStatement) SELECT object or a list of field-value pairs.
+SQL\_BIG\_SELECTS
 
-    If a SELECT statement is provided, it will be used to construct a query of the type of REPLACE INTO mytable SELECT FROM other\_table
+:   
 
-    Otherwise the query will be REPLACE INTO mytable (fields) VALUES(values)
+SQL\_BIG\_TABLES
 
-    In scalar context, it execute the query and in list context it simply returns the statement handler.
+:   
 
-- **reset**()
+SQL\_BUFFER\_RESULT
 
-    This is used to reset a prepared query to its default values. If a field is a date/time type, its default value will be set to NOW()
+:   
 
-    It execute an update with the reseted value and return the number of affected rows.
+SQL\_LOG\_OFF
 
-- **reverse**( \[ true \])
+:   
 
-    Get or set the reverse mode.
+SQL\_LOW\_PRIORITY\_UPDATES
 
-- **select**( \[ \\$field, \\@fields, @fields \] )
+:   
 
-    Given an optional list of fields to fetch, **select** prepares a SELECT query.
+SQL\_MAX\_JOIN\_SIZE
 
-    If no field was provided, **select** will use default value where appropriate like the NOW() for date/time fields.
+:   
 
-    **select** calls upon **tie**, **where**, **group**, **order**, **limit** and **local** to build the query.
+SQL\_SAFE\_MODE
 
-    In scalar context, it execute the query and return it. In list context, it just returns the statement handler.
+:   
 
-- **set**( $var )
+SQL\_SELECT\_LIMIT
 
-    Issues a query to `SET` the given SQL variable.
+:   
 
-    If any error occurred, undef will be returned and an error set, otherwise it returns true.
+SQL\_LOG\_UPDATE
 
-- **sort**()
+:   
 
-    It toggles sort mode on and consequently disable reverse mode.
+TIMESTAMP
 
-- **stat**( \[ $type \] )
+:   
 
-    Issue a SHOW STATUS query and if a particular $type is provided, it will returns its value if it exists, otherwise it will return undef.
+If unsupported parameters are provided, they are considered to be
+private and not passed to the database handler.
 
-    In absence of particular $type provided, it returns the hash list of values returns or a reference to the hash list in scalar context.
+It then execute the query and return [\"undef\" in
+perlfunc](https://metacpan.org/pod/perlfunc#undef){.perl-module} in case
+of error.
 
-- **state**()
+Otherwise, it returns the current object used to call the method.
 
-    Queries the DBI state and return its value.
+passwd
+------
 
-- **table**( $table\_name )
+Sets or gets the `passwd` property for this database object.
 
-    Given a table name, **table** will return a [DB::Object::Tables](https://metacpan.org/pod/DB%3A%3AObject%3A%3ATables) object. The object is cached for re-use.
+ping
+----
 
-- **table\_push**( $table\_name )
+Evals a SELECT 1 statement and returns 0 if errors occurred or the
+return value.
 
-    Add the given table name to the stack of cached table names.
+ping\_select
+------------
 
-- **tables**( \[ $database \] )
+Will prepare and execute a simple `SELECT 1` and return 0 upon failure
+or return the value returned from calling [\"execute\" in
+DBI](https://metacpan.org/pod/DBI#execute){.perl-module}.
 
-    Connects to the database and finds out the list of all available tables.
+port
+----
 
-    Returns undef or empty list in scalar or list context respectively if no table found.
+Sets or gets the `port` property for this database object.
 
-    Otherwise, it returns the list of table in list context or a reference of it in scalar context.
+prepare
+-------
 
-- **tables\_refresh**( \[ $database \] )
+Provided with a sql query and some hash reference of options and this
+will prepare the query using the options provided. The options are the
+same as the one in [\"prepare\" in
+DBI](https://metacpan.org/pod/DBI#prepare){.perl-module} method.
 
-    Rebuild the list of available database table.
+It returns a
+[DB::Object::Statement](https://metacpan.org/pod/DB::Object::Statement){.perl-module}
+object upon success or undef if an error occurred. The error can then be
+retrieved using [\"errstr\"](#errstr){.perl-module} or
+[\"error\"](#error){.perl-module}.
 
-    Returns the list of table in list context or a reference of it in scalar context.
+prepare\_cached
+---------------
 
-- **tie**( \[ %fields \] )
+Same as [\"prepare\"](#prepare){.perl-module} except the query is
+cached.
 
-    If provided a hash or a hash ref, it sets the list of fields and their corresponding perl variable to bind their values to.
+query
+-----
 
-    In list context, it returns the list of those field-variable pair, or a reference to it in scalar context.
+It prepares and executes the given SQL query with the options provided
+and return [\"undef\" in
+perlfunc](https://metacpan.org/pod/perlfunc#undef){.perl-module} upon
+error or the statement handler upon success.
 
-- **unix\_timestamp**( \[ \\@fields | @fields \] )
+quote
+-----
 
-    Provided a list of fields or a reference to it, this sets the fields to be treated for seamless conversion from and to unix time.
+This is used to properly format data by surrounding them with quotes or
+not.
 
-- **unlock**( $lock\_id )
+Calls [\"quote\" in
+DBI](https://metacpan.org/pod/DBI#quote){.perl-module} and pass it
+whatever argument was provided.
 
-    Given a lock identifier, **unlock** releases the lock previously set with **lock**. It executes the underlying sql command and returns undef() if the result is NULL or the value returned otherwise.
+replace
+-------
 
-- **update**( %data | \\%data )
+Just like for the `INSERT` query, [\"replace\"](#replace){.perl-module}
+takes one optional argument representing a
+[DB::Object::Statement](https://metacpan.org/pod/DB::Object::Statement){.perl-module}
+`SELECT` object or a list of field-value pairs.
 
-    Given a list of field-value pairs, **update** prepares a sql update query.
+If a `SELECT` statement is provided, it will be used to construct a
+query of the type of `REPLACE INTO mytable SELECT FROM other_table`
 
-    It calls upon **where** and **limit** as previously set.
+Otherwise the query will be
+`REPLACE INTO mytable (fields) VALUES(values)`
 
-    It returns undef and sets an error if it failed to prepare the update statement. In scalar context, it execute the query. In list context, it simply return the statement handler.
+In scalar context, it execute the query and in list context it simply
+returns the statement handler.
 
-- **use**( $database )
+reset
+-----
 
-    Given a database, it switch to it, but before it checks that the database exists.
-    If the database is different than the current one, it sets the _multi\_db_ parameter, which will have the fields in the queries be prefixed by their respective database name.
+This is used to reset a prepared query to its default values. If a field
+is a date/time type, its default value will be set to NOW()
 
-    It returns the database handler.
+It execute an update with the reseted value and return the number of
+affected rows.
 
-- **use\_cache**( \[ 0 | 1 \] )
+returning
+---------
 
-    Sets or get the _use\_cache_ parameter.
+The SQL `RETURNING` clause needs to be implemented by the driver and is
+currently supported only by and
+[DB::Object::Postgres](https://metacpan.org/pod/DB::Object::Postgres){.perl-module}
+and
+[DB::Object::SQLite](https://metacpan.org/pod/DB::Object::SQLite){.perl-module}.
 
-- **use\_bind**( \[ 0 | 1 \] )
+reverse
+-------
 
-    Sets or get the _use\_cache_ parameter.
+Get or set the reverse mode.
 
-- **variables**( \[ $type \] )
+select
+------
 
-    Query the SQL variable $type
+Given an optional list of fields to fetch,
+[\"select\"](#select){.perl-module} prepares a `SELECT` query.
 
-    It returns a blank string if nothing was found, or the value found.
+If no field was provided, [\"select\"](#select){.perl-module} will use
+default value where appropriate like the `NOW()` for date/time fields.
 
-- **where**( %args )
+[\"select\"](#select){.perl-module} calls upon
+[\"tie\"](#tie){.perl-module}, [\"where\"](#where){.perl-module},
+[\"group\"](#group){.perl-module}, [\"order\"](#order){.perl-module},
+[\"limit\"](#limit){.perl-module} and [\"local\"](#local){.perl-module}
+to build the query.
 
-    Build the where clause based on the field-value hash provided.
+In scalar context, it execute the query and return it. In list context,
+it just returns the statement handler.
 
-    It returns the where clause in list context or the full where clause in scalar context, ie "WHERE $clause"
+set
+---
 
-- **\_cache\_this**( $query )
+Provided with variable and this will issue a query to `SET` the given
+SQL variable.
 
-    Provided with a query, this will cache it for future re-use.
+If any error occurred, undef will be returned and an error set,
+otherwise it returns true.
 
-    It does some check and maintenance job to ensure the cache does not get too big whenever it exceed the value of $CACHE\_SIZE set in the main config file.
+sort
+----
 
-    It returns the cached statement as an [DB::Object::Statement](https://metacpan.org/pod/DB%3A%3AObject%3A%3AStatement) object.
+It toggles sort mode on and consequently disable reverse mode.
 
-- **\_clean\_statement**( \\$query | $query )
+stat
+----
 
-    Given a query string or a reference to it, it cleans the statement by removing leading and trailing space before and after line breaks.
+Issue a `SHOW STATUS` query and if a particular `$type` is provided, it
+will return its value if it exists, otherwise it will return [\"undef\"
+in perlfunc](https://metacpan.org/pod/perlfunc#undef){.perl-module}.
 
-- **\_cleanup**()
+In absence of particular \$type provided, it returns the hash list of
+values returns or a reference to the hash list in scalar context.
 
-    Removes object attributes, namely where, selected\_fields, group\_by, order\_by, limit, alias, avoid, local, and as\_string
+state
+-----
 
-- **\_make\_sth**( $package, $hashref )
+Queries the DBI state and return its value.
 
-    Given a package name and a hashref, this build a statement object with all the necessary parameters.
+supported\_class
+----------------
 
-    It also sets the query time to the current time with the parameter _query\_time_
+Returns the list of driver packages such as
+[DB::Object::Postgres](https://metacpan.org/pod/DB::Object::Postgres){.perl-module}
 
-    It returns an object of the given $package.
+supported\_drivers
+------------------
 
-- **\_reset\_query**()
+Returns the list of driver name such as
+[Pg](https://metacpan.org/pod/Pg){.perl-module}
 
-    Being called using a statement handler, this reset the object by removing all the parameters set by various subroutine calls, such as **where**, **group**, **order**, **avoid**, **limit**, etc.
+table
+-----
 
-- **\_save\_bind**( $query\_type )
+Given a table name, [\"table\"](#table){.perl-module} will return a
+[DB::Object::Tables](https://metacpan.org/pod/DB::Object::Tables){.perl-module}
+object. The object is cached for re-use.
 
-    This saves/cache the bin query and return the object used to call it.
+table\_exists
+-------------
 
-- **\_value2bind**( $query, $ref )
+Provided with a table name and this returns true if the table exist or
+false otherwise.
 
-    Given a sql query and a array reference, **\_value2bind** parse the query and interpolate values for placeholder (?).
+table\_info
+-----------
 
-    It returns true.
+This is a method that must be implemented by the driver package.
 
-# OPERATORS
+table\_push
+-----------
 
-## AND( VALUES )
+Add the given table name to the stack of cached table names.
 
-Given a value, this returns a [DB::Object::AND](https://metacpan.org/pod/DB%3A%3AObject%3A%3AAND) object. You can retrieve the value with **value**
+tables
+------
 
-This is used by **where**
+Connects to the database and finds out the list of all available tables.
+If cache is available, it will use it instead of querying the database
+server.
 
-    my $op = $dbh->AND( login => 'joe', status => 'active' );
-    ## will produce:
-    WHERE login = 'joe' AND status = 'active'
+Returns undef or empty list in scalar or list context respectively if no
+table found.
 
-## NOT( VALUES )
+Otherwise, it returns the list of table in list context or a reference
+of it in scalar context.
 
-Given a value, this returns a [DB::Object::NOT](https://metacpan.org/pod/DB%3A%3AObject%3A%3ANOT) object. You can retrieve the value with **value**
+tables\_cache
+-------------
 
-This is used by **where**
+Returns the table cache object
 
-    my $op = $dbh->AND( login => 'joe', status => $dbh->NOT( 'active' ) );
-    ## will produce:
-    WHERE login = 'joe' AND status != 'active'
+tables\_info
+------------
 
-## OR( VALUES )
+This is a method that must be implemented by the driver package.
 
-Given a value, this returns a [DB::Object::OR](https://metacpan.org/pod/DB%3A%3AObject%3A%3AOR) object. You can retrieve the value with **value**
+tables\_refresh
+---------------
 
-This is used by **where**
+Rebuild the list of available database table.
 
-    my $op = $dbh->OR( login => 'joe', login => 'john' );
-    ## will produce:
-    WHERE login = 'joe' OR login = 'john'
+Returns the list of table in list context or a reference of it in scalar
+context.
 
-# COPYRIGHT
+tie
+---
 
-Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
+This is a convenient wrapper around [\"tie\" in
+DB::Object::Query](https://metacpan.org/pod/DB::Object::Query#tie){.perl-module}
 
-# CREDITS
+TRUE
+----
 
-Jacques Deguest <`jack@deguest.jp`>
+Returns `TRUE` to be used in queries.
 
-# SEE ALSO
+unix\_timestamp
+---------------
 
-[DBI](https://metacpan.org/pod/DBI), [Apache::DBI](https://metacpan.org/pod/Apache%3A%3ADBI)
+This is a convenient wrapper around [\"unix\_timestamp\" in
+DB::Object::Query](https://metacpan.org/pod/DB::Object::Query#unix_timestamp){.perl-module}
+
+unlock
+------
+
+This is a convenient wrapper around [\"unlock\" in
+DB::Object::Query](https://metacpan.org/pod/DB::Object::Query#unlock){.perl-module}
+
+update
+------
+
+Given a list of field-value pairs, **update** prepares a sql update
+query.
+
+It calls upon **where** and **limit** as previously set.
+
+It returns undef and sets an error if it failed to prepare the update
+statement. In scalar context, it execute the query. In list context, it
+simply return the statement handler.
+
+use
+---
+
+Given a database, it switch to it, but before it checks that the
+database exists. If the database is different than the current one, it
+sets the *multi\_db* parameter, which will have the fields in the
+queries be prefixed by their respective database name.
+
+It returns the database handler.
+
+use\_cache
+----------
+
+Provided with a boolean value and this sets or get the *use\_cache*
+parameter.
+
+use\_bind
+---------
+
+Provided with a boolean value and this sets or get the *use\_cache*
+parameter.
+
+variables
+---------
+
+Query the SQL variable \$type
+
+It returns a blank string if nothing was found, or the value found.
+
+version
+-------
+
+This is a method that must be implemented by the driver package.
+
+where
+-----
+
+This is a convenient wrapper around [\"where\" in
+DB::Object::Query](https://metacpan.org/pod/DB::Object::Query#where){.perl-module}
+
+\_cache\_this
+-------------
+
+Provided with a query, this will cache it for future re-use.
+
+It does some check and maintenance job to ensure the cache does not get
+too big whenever it exceed the value of \$CACHE\_SIZE set in the main
+config file.
+
+It returns the cached statement as an
+[DB::Object::Statement](https://metacpan.org/pod/DB::Object::Statement){.perl-module}
+object.
+
+\_check\_connect\_param
+-----------------------
+
+Provided with an hash reference of connection parameters, this will get
+the valid parameters by calling
+[\"\_connection\_parameters\"](#connection_parameters){.perl-module} and
+the connection default options by calling
+[\"\_connection\_options\"](#connection_options){.perl-module}
+
+It returns the connection parameters hash reference.
+
+\_check\_default\_option
+------------------------
+
+Provided with an hash reference of options, and it actually returns it,
+so this does not do much, because this method is supposed to be
+supereded by the driver package.
+
+\_connection\_options
+---------------------
+
+Provided with an hash reference of connection parameters and this will
+returns an hash reference of options whose keys match the regular
+expression `/^[A-Z][a-zA-Z]+/`
+
+So this does not do much, because this method is supposed to be
+superseded by the driver package.
+
+\_connection\_parameters
+------------------------
+
+Returns an array reference containing the following keys: db login
+passwd host port driver database server opt uri debug
+
+\_connection\_params2hash
+-------------------------
+
+Provided with an hash reference of connection parameters and this will
+check if the following environment variables exists and if so use them:
+`DB_NAME`, `DB_LOGIN`, `DB_PASSWD`, `DB_HOST`, `DB_PORT`, `DB_DRIVER`,
+`DB_SCHEMA`
+
+If the parameter property *uri* was provided of if the environment
+variable `DB_CON_URI` is set, it will use this connection uri to get the
+necessary connection parameters values.
+
+An [URI](https://metacpan.org/pod/URI){.perl-module} could be
+`http://localhost:5432?database=somedb` or
+`file:/foo/bar?opt={"RaiseError":true}`
+
+Alternatively, if the connection parameter *conf\_file* is provided then
+its json content will be read and decoded into an hash reference.
+
+The following keys can be used in the json data in the *conf\_file*:
+`database`, `login`, `passwd`, `host`, `port`, `driver`, `schema`, `opt`
+
+The port can be specified in the *host* parameter by separating it with
+a semicolon such as `localhost:5432`
+
+The *opt* parameter can Alternatively be provided through the
+environment variable `DB_OPT`
+
+It returns the hash reference of connection parameters.
+
+\_clean\_statement
+------------------
+
+Given a query string or a reference to it, it cleans the statement by
+removing leading and trailing space before and after line breaks.
+
+It returns the cleaned up query as a string if the original query was
+provided as a scalar reference.
+
+\_convert\_datetime2object
+--------------------------
+
+Provided with an hash or hash reference of options and this will simply
+return the *data* property.
+
+This does not do anything meaningful, because it is supposed to be
+superseded by the diver package.
+
+\_convert\_json2hash
+--------------------
+
+Provided with an hash or hash reference of options and this will simply
+return the *data* property.
+
+This does not do anything meaningful, because it is supposed to be
+superseded by the diver package.
+
+\_dbi\_connect
+--------------
+
+This will call [\"\_dsn\"](#dsn){.perl-module} which must exist in the
+driver package, and based on the `dsn` received, this will initiate a
+[\"connect\_cache\" in
+DBI](https://metacpan.org/pod/DBI#connect_cache){.perl-module} if the
+object property
+[\"cache\_connections\"](#cache_connections){.perl-module} has a true
+value, or simply a [\"connect\" in
+DBI](https://metacpan.org/pod/DBI#connect){.perl-module} otherwise.
+
+It returns the database handler.
+
+\_decode\_json
+--------------
+
+Provided with some json data and this will decode it using
+[JSON](https://metacpan.org/pod/JSON){.perl-module} and return the
+associated hash reference or [\"undef\" in
+perlfunc](https://metacpan.org/pod/perlfunc#undef){.perl-module} if an
+error occurred.
+
+\_dsn
+-----
+
+This will die complaining the driver has not implemented this method,
+unless the driver did implement it.
+
+\_encode\_json
+--------------
+
+Provided with an hash reference and this will encode it into a json
+string and return it.
+
+\_make\_sth
+-----------
+
+Given a package name and a hash reference, this builds a statement
+object with all the necessary parameters.
+
+It also sets the query time to the current time with the parameter
+*query\_time*
+
+It returns an object of the given \$package.
+
+\_param2hash
+------------
+
+Provided with some hash reference parameters and this will simply return
+it, so it does not do anything meaningful.
+
+This is supposed to be superseded by the driver package.
+
+\_process\_limit
+----------------
+
+A convenient wrapper around the [\"\_process\_limit\" in
+DB::Object::Query](https://metacpan.org/pod/DB::Object::Query#_process_limit){.perl-module}
+
+\_query\_object\_add
+--------------------
+
+Provided with a
+[DB::Object::Query](https://metacpan.org/pod/DB::Object::Query){.perl-module}
+and this will add it to the current object property *query\_object* and
+return it.
+
+\_query\_object\_create
+-----------------------
+
+This is supposed to be called from a
+[DB::Object::Tables](https://metacpan.org/pod/DB::Object::Tables){.perl-module}
+
+Create a new
+[DB::Object::Query](https://metacpan.org/pod/DB::Object::Query){.perl-module}
+object, sets the *debug* and *verbose* values and sets its property
+[\"table\_object\" in
+DB::Object::Query](https://metacpan.org/pod/DB::Object::Query#table_object){.perl-module}
+to the value of the current object.
+
+\_query\_object\_current
+------------------------
+
+Returns the current *query\_object*
+
+\_query\_object\_get\_or\_create
+--------------------------------
+
+Check to see if the [\"query\_object\"](#query_object){.perl-module} is
+already set and then return its value, otherwise create a new object by
+calling
+[\"\_query\_object\_create\"](#query_object_create){.perl-module} and
+return it.
+
+\_query\_object\_remove
+-----------------------
+
+Provided with a
+[DB::Object::Query](https://metacpan.org/pod/DB::Object::Query){.perl-module}
+and this will remove it from the current object property
+*query\_object*.
+
+It returns the object removed.
+
+\_reset\_query
+--------------
+
+If this has not already been reset, this will mark the current query
+object as reset and calls
+[\"\_query\_object\_remove\"](#query_object_remove){.perl-module} and
+return the value for
+[\"\_query\_object\_get\_or\_create\"](#query_object_get_or_create){.perl-module}
+
+If it has been already reset, this will return the value for
+[\"\_query\_object\_current\"](#query_object_current){.perl-module}
+
+OPERATORS
+=========
+
+AND( VALUES )
+-------------
+
+Given a value, this returns a
+[DB::Object::AND](https://metacpan.org/pod/DB::Object::AND){.perl-module}
+object. You can retrieve the value with [\"value\" in
+DB::Object::AND](https://metacpan.org/pod/DB::Object::AND#value){.perl-module}
+
+This is used by [\"where\"](#where){.perl-module}
+
+        my $op = $dbh->AND( login => 'joe', status => 'active' );
+        # will produce:
+        WHERE login = 'joe' AND status = 'active'
+
+NOT( VALUES )
+-------------
+
+Given a value, this returns a
+[DB::Object::NOT](https://metacpan.org/pod/DB::Object::NOT){.perl-module}
+object. You can retrieve the value with [\"value\" in
+DB::Object::NOT](https://metacpan.org/pod/DB::Object::NOT#value){.perl-module}
+
+This is used by [\"where\"](#where){.perl-module}
+
+        my $op = $dbh->AND( login => 'joe', status => $dbh->NOT( 'active' ) );
+        # will produce:
+        WHERE login = 'joe' AND status != 'active'
+
+OR( VALUES )
+------------
+
+Given a value, this returns a
+[DB::Object::OR](https://metacpan.org/pod/DB::Object::OR){.perl-module}
+object. You can retrieve the value with [\"value\" in
+DB::Object::OR](https://metacpan.org/pod/DB::Object::OR#value){.perl-module}
+
+This is used by [\"where\"](#where){.perl-module}
+
+        my $op = $dbh->OR( login => 'joe', login => 'john' );
+        # will produce:
+        WHERE login = 'joe' OR login = 'john'
+
+SEE ALSO
+========
+
+[DBI](https://metacpan.org/pod/DBI){.perl-module},
+[Apache::DBI](https://metacpan.org/pod/Apache::DBI){.perl-module}
+
+AUTHOR
+======
+
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x5607fd163850)"}\>
+
+COPYRIGHT & LICENSE
+===================
+
+Copyright (c) 2019-2021 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.

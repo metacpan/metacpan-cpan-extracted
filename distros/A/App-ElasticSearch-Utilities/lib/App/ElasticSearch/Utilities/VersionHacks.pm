@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION = '7.9'; # VERSION
+our $VERSION = '8.0'; # VERSION
 
 use Const::Fast;
 use CLI::Helpers qw(:all);
@@ -183,7 +183,7 @@ App::ElasticSearch::Utilities::VersionHacks - Fix version issues to support all 
 
 =head1 VERSION
 
-version 7.9
+version 8.0
 
 =head1 AUTHOR
 

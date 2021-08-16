@@ -10,7 +10,6 @@ Options:
   * Extend pattern named captures to include suffixes:
     + canonical - for the variation of a (sub)pattern preferred upstream
     + popular - skip obscure variations
-  * Add pattern no-compile option, when compiling later e.g. with re::engine::RE2.
   * Add pattern parno option
     to support PARNO syntax:
     <https://metacpan.org/pod/perlre#(?PARNO)-(?-PARNO)-(?+PARNO)-(?R)-(?0)>
@@ -23,20 +22,19 @@ Patterns:
     '(?P<version_number>\d(?:(?:\.0)?\.[1-9])*)(?:\.0)*'
   * relax trait object license_label to match 'license": "'
   * Cover license directories:
+    + SPDX (later than 3.0)
     + FSF: https://directory.fsf.org/wiki/Category:License
-    + CC (retired): https://creativecommons.org/retiredlicenses/
     + CC (redirected): https://github.com/creativecommons/sre-salt-prime/blob/HEAD/states/apache2/files/ccengine.conf#L74
     + GNU: https://www.gnu.org/licenses/license-list.html
-    + Fedora: https://fedoraproject.org/wiki/Licensing#SoftwareLicenses
     + SUSE: https://github.com/openSUSE/spec-cleaner
     + Microsoft (non-free): https://en.wikipedia.org/wiki/Shared_source
     + Wikipedia: https://en.wikipedia.org/wiki/Category:Copyright_licenses
     + Debian (website): https://www.debian.org/legal/licenses/
     + Debian (wiki): https://wiki.debian.org/DFSGLicenses
     + W3C: https://www.w3.org/Consortium/Legal/2002/ipr-notice-20021231
-    + PyPA/PyPI trove classifiers: https://pypi.org/classifiers/
-    + http://www.linfo.org/main_index.html
-    + https://github.com/LeChasseur/ifrOSS/blob/master/Lizenzcenter.md
+    + linfo: http://www.linfo.org/main_index.html
+    + ifross: https://github.com/LeChasseur/ifrOSS/blob/master/Lizenzcenter.md
+    * copyfree: http://copyfree.org/standard/licenses
   * Cover traits:
     + Comment styles (most possible):
       https://en.wikipedia.org/wiki/Comparison_of_programming_languages_(syntax)#Comments
@@ -61,21 +59,17 @@ Metadata:
     * https://wiki.creativecommons.org/wiki/Parametric_license
   * Maybe link (where appropriate) to kemitchell:
     * https://writing.kemitchell.com/
-  * Limit metadata name to shortnames usable in grant statements:
-    + Move wikidata keys to new metadata field
-    + Move elaborate wikipedia captions to summary
-    + Synthesize tldr directly from caption
   * Relax tag "versioned" to any (even unknown) version
 
 Testsuite:
   * Add author test checking validity of URLs.
-    + Expand iri.alt.archive.FOO=BAR to https://web.archive.org/web/FOO/BAR
-  * Add author test checking coverage of URL directories.
+    + Prepend alt.archive properties with https://web.archive.org/web/
+  * Add author test checking coverage of URL directories
   * Test static patterns directly (i.e. not using Regexp::Pattern::re)
   * Distinguish between TODO (pending) and SKIP (irrelevant)
 
 Misc.
-  * Cover a need of debian-policy to count popularity of licenses:
+  * Implement resolving popularity scores, as needed by debian-policy team:
     * https://sources.debian.org/src/debian-policy/4.1.3.0/tools/license-count/?hl=63#L63
   * Synthesize type:versioned iri from singleversion:$STEM as iri.alt.version.[/^$STEM_/]
   * Speedup synthesizing by processing simplest first
@@ -83,7 +77,6 @@ Misc.
     + Expand to also cover lowercased names/captions
     + Expand to replace leading "Creative Commons" with "CC"
     + Expand to make leading "Creative Commons" (or "CC") optional
-    + Reduce to skip duplicate names/captions (by mapping into a hash?)
   * Improve iri synthesizing:
     + Expand protocol https → http
     + Expand to alternate websites with same identifier
@@ -92,8 +85,6 @@ Misc.
     + Maybe use Regexp::Assemble at build-time (but then optionally disable to support deterministic builds)
     + Install as YAML (and JSON?) below /usr/share/misc, for reuse by non-Perl tools.
   * Turn most possible into seed patterns.
-  * Reference origin of MIT:
-    <https://ieeexplore.ieee.org/document/9263265>
 
 Document new features:
   * Add SYNOPSIS

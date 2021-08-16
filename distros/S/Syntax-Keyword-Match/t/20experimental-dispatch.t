@@ -57,4 +57,17 @@ sub match_case
    is( greedy_is_ten, "NO", 'Greedy is not 10 when unset' );
 }
 
+# mixed dispsatch + var
+{
+   my $four = 4;
+
+   match( 2 : == ) {
+      case(1)     { fail("No"); }
+      case(2)     { pass("Mixed dispatch"); }
+      case(3)     { fail("No"); }
+      case($four) { fail("No"); }
+      case(5)     { fail("No"); }
+   }
+}
+
 done_testing;

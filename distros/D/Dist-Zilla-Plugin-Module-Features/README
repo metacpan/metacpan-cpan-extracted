@@ -1,0 +1,59 @@
+NAME
+    Dist::Zilla::Plugin::Module::Features - Plugin to use when building
+    Module::Features::* distribution
+
+VERSION
+    This document describes version 0.002 of
+    Dist::Zilla::Plugin::Module::Features (from Perl distribution
+    Dist-Zilla-Plugin-Module-Features), released on 2021-02-26.
+
+SYNOPSIS
+    In dist.ini:
+
+     [Module::Features]
+
+DESCRIPTION
+    This plugin is to be used when building "Module::Features::*"
+    distribution as well as distribution that has a module that declares
+    features. It currently does the following:
+
+    *   Create "xt/release/module-features.t" test file which uses
+        Test::Module::Features to test your features declarations or feature
+        set specifications
+
+    *   Make sure that Module::Features is added as a (phase=develop,
+        rel=x_spec) prerequisite
+
+        This is a way to express that the module *follows the specification*
+        specified in Module::Features.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-Plugin-Module-Features>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-Module-Features>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-Module-Features/iss
+    ues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Module::Features
+
+    Pod::Weaver::Plugin::Module::Features
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,7 +1,7 @@
 package Data::ModeMerge::Mode::DELETE;
 
-our $DATE = '2016-07-22'; # DATE
-our $VERSION = '0.35'; # VERSION
+our $DATE = '2021-08-15'; # DATE
+our $VERSION = '0.360'; # VERSION
 
 use 5.010;
 use strict;
@@ -88,7 +88,7 @@ Data::ModeMerge::Mode::DELETE - Handler for Data::ModeMerge DELETE merge mode
 
 =head1 VERSION
 
-This document describes version 0.35 of Data::ModeMerge::Mode::DELETE (from Perl distribution Data-ModeMerge), released on 2016-07-22.
+This document describes version 0.360 of Data::ModeMerge::Mode::DELETE (from Perl distribution Data-ModeMerge), released on 2021-08-15.
 
 =head1 SYNOPSIS
 
@@ -122,7 +122,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2016, 2015, 2013, 2012, 2011, 2010 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

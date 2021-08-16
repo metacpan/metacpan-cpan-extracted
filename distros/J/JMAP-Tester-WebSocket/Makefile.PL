@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Data::Dumper" => 0,
     "IO::Async::Loop" => 0,
-    "JMAP::Tester" => 0,
+    "JMAP::Tester" => "0.101",
     "JMAP::Tester::Response::Paragraph" => 0,
     "JMAP::Tester::Response::Sentence" => 0,
     "JMAP::Tester::Role::Result" => 0,
@@ -43,7 +43,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "strict" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -55,7 +55,7 @@ my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "IO::Async::Loop" => 0,
-  "JMAP::Tester" => 0,
+  "JMAP::Tester" => "0.101",
   "JMAP::Tester::Response::Paragraph" => 0,
   "JMAP::Tester::Response::Sentence" => 0,
   "JMAP::Tester::Role::Result" => 0,

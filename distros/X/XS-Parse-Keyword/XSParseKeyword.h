@@ -88,8 +88,10 @@ enum {
 #define XPK_LISTEXPR              XPK_LISTEXPR_flags(0)
 #define XPK_LISTEXPR_LISTCTX      XPK_LISTEXPR_flags(XPK_TYPEFLAG_G_LIST)
 
-#define XPK_IDENT    {.type = XS_PARSE_KEYWORD_IDENT}
-#define XPK_PACKAGENAME {.type = XS_PARSE_KEYWORD_PACKAGENAME}
+#define XPK_IDENT           {.type = XS_PARSE_KEYWORD_IDENT                       }
+#define XPK_IDENT_OPT       {.type = XS_PARSE_KEYWORD_IDENT      |XPK_TYPEFLAG_OPT}
+#define XPK_PACKAGENAME     {.type = XS_PARSE_KEYWORD_PACKAGENAME                 }
+#define XPK_PACKAGENAME_OPT {.type = XS_PARSE_KEYWORD_PACKAGENAME|XPK_TYPEFLAG_OPT}
 
 #define XPK_LEXVARNAME(kind) {.type = XS_PARSE_KEYWORD_LEXVARNAME, .u.c = kind}
 
@@ -149,9 +151,6 @@ enum {
   {.type = XS_PARSE_KEYWORD_CHEVRONSCOPE|XPK_TYPEFLAG_OPT, .u.pieces = (const struct XSParseKeywordPieceType []){ __VA_ARGS__, {0} }}
 
 typedef struct {
-  /* struct containing a single anonymous union for now
-   * this gives us room to add things like line numbers later on
-   */
   union {
     OP *op;
     CV *cv;
@@ -160,6 +159,7 @@ typedef struct {
     struct { SV *name; SV *value; } attr;
     PADOFFSET padix;
   };
+  int line;
 } XSParseKeywordPiece;
 
 struct XSParseKeywordHooks {

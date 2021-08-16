@@ -1,3 +1,7 @@
+2.019 2021-08-16
+- end_multi only calls close if not a display
+- when Qt and multiplot, need to send extra command to make window close
+
 2.018 2021-08-11
 - Fix for pdfcairo terminal not writing to file - thanks @zmughal
 

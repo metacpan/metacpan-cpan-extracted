@@ -43,8 +43,8 @@ my %WriteMakefileArgs = (
         'Test::Pod'			=> '1.52',
     },
     LICENSE				=> 'perl_5',
-    MIN_PERL_VERSION	=> 5.6.0,
-    ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? () : ( META_MERGE => {
+    MIN_PERL_VERSION	=> 'v5.16.0',
+    ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( META_MERGE => {
         'meta-spec' => { version => 2 },
         dynamic_config => 1,
         resources => {
@@ -55,10 +55,10 @@ my %WriteMakefileArgs = (
                 type        => 'git',
             },
             bugtracker => {
-                web         => 'https://rt.cpan.org/NoAuth/Bugs.html?Dist=DB-Object',
+                web         => 'https://git.deguest.jp/jack/DB-Object/issues',
             },
         },
-    })),
+    }) : ()),
 );
 
 WriteMakefile(%WriteMakefileArgs);

@@ -1,10 +1,9 @@
 NAME
-    App::MineralUtils - Utilities related to minerals (and mineral
-    supplements)
+    App::MineralUtils - Utilities related to mineral supplements
 
 VERSION
-    This document describes version 0.003 of App::MineralUtils (from Perl
-    distribution App-MineralUtils), released on 2021-08-12.
+    This document describes version 0.005 of App::MineralUtils (from Perl
+    distribution App-MineralUtils), released on 2021-08-15.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -23,7 +22,7 @@ FUNCTIONS
 
     *   Show all possible conversions:
 
-         convert_magnesium_unit(quantity => "mg");
+         convert_magnesium_unit();
 
         Result:
 
@@ -31,28 +30,108 @@ FUNCTIONS
            200,
            "OK",
            [
-             { amount => 1, unit => "mg" },
-             { amount => 1, unit => "mg-magnesium-elemental" },
-             { amount => 8.90471950133571, unit => "mg-magnesium-citrate" },
-             { amount => 7.09219858156028, unit => "mg-magnesium-glycinate" },
-             { amount => 7.09219858156028, unit => "mg-magnesium-bisglycinate" },
-             { amount => 13.8888888888889, unit => "mg-magnesium-l-threonate" },
-             { amount => 1.65837479270315, unit => "mg-magnesium-oxide" },
+             {
+               amount  => 1,
+               unit    => "mg-mg-elem",
+               summary => "Elemental magnesium, in milligrams",
+             },
+             {
+               amount  => 8.84955752212389,
+               unit    => "mg-mg-citrate",
+               summary => "Magnesium citrate (C6H6MgO7), in milligrams",
+             },
+             {
+               amount  => 6.28930817610063,
+               unit    => "mg-mg-citrate-ah",
+               summary => "Magnesium citrate anhydrous (C6H5Mg3O7), in milligrams",
+             },
+             {
+               amount  => 6.89655172413793,
+               unit    => "mg-mg-citrate-ah-nowfoods",
+               summary => "Magnesium citrate in NOW Foods supplement (anhydrous, C6H5Mg3O7, 90.9% pure, contains citric acid etc), in milligrams",
+             },
+             {
+               amount  => 7.09219858156028,
+               unit    => "mg-mg-glycinate",
+               summary => "Magnesium glycinate/bisglycinate (C4H8MgN2O4), in milligrams",
+             },
+             {
+               amount  => 7.09219858156028,
+               unit    => "mg-mg-bisglycinate",
+               summary => "Magnesium glycinate/bisglycinate (C4H8MgN2O4), in milligrams",
+             },
+             {
+               amount  => 10,
+               unit    => "mg-mg-bisglycinate-nowfoods",
+               summary => "Magnesium bisglycinate in NOW Foods supplement (C4H8MgN2O4, 70.5% pure, contains citric acid etc), in milligrams",
+             },
+             {
+               amount  => 13.5135135135135,
+               unit    => "mg-mg-ascorbate",
+               summary => "Magnesium ascorbate/pidolate (C11H13MgNO9), in milligrams",
+             },
+             {
+               amount  => 13.5135135135135,
+               unit    => "mg-mg-pidolate",
+               summary => "Magnesium ascorbate/pidolate (C11H13MgNO9), in milligrams",
+             },
+             {
+               amount  => 12.0481927710843,
+               unit    => "mg-mg-l-threonate",
+               summary => "Magnesium L-threonate (C8H14MgO10), in milligrams",
+             },
+             {
+               amount  => 1.65837479270315,
+               unit    => "mg-mg-oxide",
+               summary => "Magnesium oxide (MgO), in milligrams",
+             },
            ],
-           {},
+           {
+             "table.field_aligns"  => ["number", "left", "left"],
+             "table.field_formats" => [
+                                        ["number", { precision => 3, thousands_sep => "" }],
+                                        undef,
+                                        undef,
+                                      ],
+             "table.fields"        => ["amount", "unit", "summary"],
+           },
          ]
 
-    *   Find out how many mg of elemental magnesium is in 1000mg of
-        magnesium l-threonate:
+    *   Find out how many milligrams of elemental magnesium is in 1000mg of
+        pure magnesium l-threonate (but note that a supplement product might
+        not contain 100%-pure compound):
+
+         convert_magnesium_unit(quantity => "1000 mg-mg-l-threonate", to_unit => "mg-mg-elem");
+
+        Result:
+
+         [200, "OK", 83, {}]
+
+    *   Find out how many milligrams of elemental magnesium is in 3g (1
+        recommended serving) of NOW Foods magnesium citrate powder
+        (magnesium content is as advertised on the label):
 
          convert_magnesium_unit(
-           quantity => "1000 mg-magnesium-l-threonate",
-           to_unit  => "mg-magnesium-elemental"
+           quantity => "3000 mg-mg-citrate-ah-nowfoods",
+           to_unit  => "mg-mg-elem"
          );
 
         Result:
 
-         [200, "OK", 72, {}]
+         [200, "OK", 435, {}]
+
+    *   Find out how many milligrams of elemental magnesium is in 2.5g (1
+        recommended serving) of NOW Foods magnesium bisglycinate powder
+        (magnesium content is as advertised on the label):
+
+         convert_magnesium_unit(
+           quantity => "2500 mg-mg-bisglycinate-nowfoods",
+           to_unit  => "mg-mg-elem"
+         );
+
+        Result:
+
+         [200, "OK", 250, {}]
 
     If target unit is not specified, will show all known conversions.
 
@@ -60,7 +139,7 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   quantity* => *str*
+    *   quantity => *str* (default: "1 mg")
 
     *   to_unit => *str*
 
@@ -97,11 +176,6 @@ SEE ALSO
     App::VitaminUtils
 
     Physics::Unit
-
-    Online vitamin converters:
-    <https://www.rfaregulatoryaffairs.com/vitamin-converter>,
-    <https://avsnutrition.com.au/wp-content/themes/avs-nutrition/vitamin-con
-    verter.html>.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

@@ -23,6 +23,7 @@ my @files = (
     'lib/App/ElasticSearch/Utilities/QueryString/Underscored.pm',
     'lib/App/ElasticSearch/Utilities/VersionHacks.pm',
     'lib/Types/ElasticSearch.pm',
+    'scripts/es-aggregate.pl',
     'scripts/es-alias-manager.pl',
     'scripts/es-apply-settings.pl',
     'scripts/es-copy-index.pl',
@@ -38,7 +39,8 @@ my @files = (
     't/00-compile.t',
     't/01-querystring.t',
     't/02-index-data.t',
-    't/03-hash-flattening.t'
+    't/03-hash-flattening.t',
+    't/04-aggregate.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

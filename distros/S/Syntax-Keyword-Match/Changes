@@ -1,5 +1,19 @@
 Revision history for Syntax-Keyword-Match
 
+0.06    2021-08-16
+        [CHANGES]
+         * Permit multiple case labels for a single block (RT135133)
+         * Updated for XS::Parse::Keyword 0.12
+
+        [BUGFIXES]
+         * Preserve context of blocks (RT135138)
+
+0.05    2021-05-31
+        [CHANGES]
+         * Need to configure_requires XPK:Builder 0.04
+         * Remove op_scope() around case blocks thus ensuring context
+           propagation (RT135138)
+
 0.04    2021-05-24
         [CHANGES]
          * Updated for XS::Parse::Keyword 0.04 API change

@@ -1,21 +1,38 @@
-#!/usr/bin/perl
-
-# t/001_load.t - check module loading and create testing directory
-
-use Test::More tests => 8;
+# -*- perl -*-
+BEGIN
+{
+    use strict;
+    use lib './lib';
+    use Test::More qw( no_plan );
+#     use File::Find;
+#     our @modules;
+#     File::Find::find(sub
+#     {
+#         next unless( /\.pm$/ );
+#         print( "Checking file '$_' ($File::Find::name)\n" );
+#         $_ = $File::Find::name;
+#         s,^./lib/,,;
+#         s,\.pm$,,;
+#         s,/,::,g;
+#         push( @modules, $_ );
+#     }, qw( ./lib ) );
+};
 
 BEGIN
 {
-	use_ok( 'DB::Object' );
-	use_ok( 'DB::Object::Tables' );
-	use_ok( 'DB::Object::Statement' );
-	use_ok( 'DB::Object::Query' );
-	use_ok( 'DB::Object::Fields' );
-	use_ok( 'DB::Object::Fields::Field' );
-	use_ok( 'DB::Object::Cache::Tables' );
-}
+#     for( @modules )
+#     {
+#         diag( "Checking module $_" );
+#         use_ok( $_ );
+#     }
+    use_ok( "DB::Object" );
+    use_ok( "DB::Object::Cache::Tables" );
+    use_ok( "DB::Object::Fields" );
+    use_ok( "DB::Object::Fields::Field" );
+    use_ok( "DB::Object::Query" );
+    use_ok( "DB::Object::Statement" );
+    use_ok( "DB::Object::Tables" );
+};
 
-my $object = DB::Object->new();
-isa_ok( $object, 'DB::Object' );
-
+done_testing();
 

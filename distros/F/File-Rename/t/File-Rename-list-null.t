@@ -42,7 +42,7 @@ my $s = sub { s/\W// };
 	  	"Reading filenames from file handle" );
 }
 ok( $found, "rename_list");
-diag_rename;
+diag_rename();
 
 s/\W// for @target;
 is_deeply( [ sort(listdir('.')) ],

@@ -31,8 +31,8 @@ requires:
   Time::HiRes: '0'
   perl: '5.006'
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=PDL-Graphics-Gnuplot
-  homepage: http://github.com/drzowie/PDL-Graphics-Gnuplot
-  repository: git://github.com/drzowie/PDL-Graphics-Gnuplot.git
-version: '2.018'
+  bugtracker: http://github.com/PDLPorters/PDL-Graphics-Gnuplot/issues
+  homepage: http://github.com/PDLPorters/PDL-Graphics-Gnuplot
+  repository: git://github.com/PDLPorters/PDL-Graphics-Gnuplot.git
+version: '2.019'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -14,6 +14,7 @@ use Encode qw( encode_utf8 );
 use App::Packager;
 use File::Temp ();
 use Storable qw(dclone);
+use List::Util qw(any);
 
 use App::Music::ChordPro::Output::Common
   qw( roman prep_outlines fmt_subst demarkup );
@@ -45,7 +46,6 @@ sub generate_songbook {
 
     return [] unless $sb->{songs}->[0]->{body}; # no songs
     $verbose ||= $options->{verbose};
-    $debug_spacing ||= $options->{debug};
     my $ps = $config->{pdf};
     my $pr = (__PACKAGE__."::Writer")->new( $ps, $pdfapi );
     $pr->info( Title => $sb->{songs}->[0]->{meta}->{title}->[0],
@@ -57,32 +57,44 @@ sub generate_songbook {
 
     # The book consists of 4 parts:
     # 1. The front matter.
-    my $book_front_matter_page = 1;
     # 2. The table of contents.
-    my $book_toc_page = 1;
-    # 1. The songs.
-    my $book_start_page = 1;
-    # 1. The back matter.
-    my $book_back_matter_page = 1;
+    # 3. The songs.
+    # 4. The back matter.
+    my ( %start_of, %pages_of );
+    for ( qw( front toc songbook back ) ) {
+	$start_of{$_} = 1;
+	$pages_of{$_} = 0;
+    }
 
     # The songbook...
     my @book;
-    my $page = $options->{"start-page-number"} || 1;
+    my $page = $options->{"start-page-number"} ||= 1;
+
+    if ( $ps->{'even-odd-pages'} && !($page % 2) ) {
+	warn("Warning: Specifying an even start page when pdf.odd-even-pages is in effect may yield surprising results.\n");
+    }
+
+    my $first_song_aligned;
     foreach my $song ( @{$sb->{songs}} ) {
 
 	# Align.
-	$pr->newpage($ps, $page+1), $page++
-	  if $ps->{'pagealign-songs'} && !($page % 2);
+	if ( $ps->{'pagealign-songs'} && !($page % 2) ) {
+	    $pr->newpage($ps, $page+1);
+	    $page++;
+	    $first_song_aligned //= 1;
+	}
+	$first_song_aligned //= 0;
 
 	$song->{meta}->{tocpage} = $page;
 	push( @book, [ $song->{meta}->{title}->[0], $song ] );
 
 	$page += $song->{meta}->{pages} =
 	  generate_song( $song, { pr => $pr, startpage => $page } );
+	# Easy access to toc page.
+	$song->{meta}->{page} = $song->{meta}->{tocpage};
     }
-    $book_back_matter_page = $page;
-
-    #warn("F=$book_front_matter_page, T=$book_toc_page, S=$book_start_page, B=$book_back_matter_page\n");
+    $pages_of{songbook} = $page - 1;
+    $start_of{back} = $page;
 
     $::config->{contents} //=
       [ { $::config->{toc}->{order} eq "alpha"
@@ -100,7 +112,7 @@ sub generate_songbook {
 	# Create a pseudo-song for the table of contents.
 	my $t = $ctl->{label};
 	my $l = $ctl->{line};
-	my $start = $book_start_page - 1;
+	my $start = $start_of{songbook} - $options->{"start-page-number"};
 	my $pgtpl = $ctl->{pageno};
 	my $song =
 	  { title     => $t,
@@ -121,15 +133,17 @@ sub generate_songbook {
 			       { pr => $pr, prepend => 1, roman => 1,
 				 startpage => 1,
 			       } );
+	$pages_of{toc} += $page;
+	$pages_of{toc}++ if $first_song_aligned;
 
 	# Align.
-	$pr->newpage($ps, $page+1), $page++
-	  if $ps->{'even-odd-pages'} && $page % 2;
-	$book_start_page       += $page;
-	$book_back_matter_page += $page;
+	if ( $ps->{'even-odd-pages'} && $page % 2 && !$first_song_aligned ) {
+	    $pr->newpage($ps, $page+1);
+	    $page++;
+	}
+	$start_of{songbook} += $page;
+	$start_of{back}     += $page;
     }
-
-    #warn("F=$book_front_matter_page, T=$book_toc_page, S=$book_start_page, B=$book_back_matter_page\n");
 
     if ( $options->{'front-matter'} ) {
 	$page = 1;
@@ -139,37 +153,45 @@ sub generate_songbook {
 	    $pr->{pdf}->importpage( $matter, $_, $_ );
 	    $page++;
 	}
-	$pr->newpage( $ps, 1+$matter->pages ), $page++
-	  if $ps->{'even-odd-pages'} && !($page % 2);
-	$book_toc_page         += $page - 1;
-	$book_start_page       += $page - 1;
-	$book_back_matter_page += $page - 1;
-    }
+	$pages_of{front} = $matter->pages;
 
-    #warn("F=$book_front_matter_page, T=$book_toc_page, S=$book_start_page, B=$book_back_matter_page\n");
+	# Align to ODD page. Frontmatter starts on a right page but
+	# songs on a left page.
+	$pr->newpage( $ps, 1+$matter->pages ), $page++
+	  if $ps->{'even-odd-pages'} && ($page % 2);
+
+	$start_of{toc}      += $page - 1;
+	$start_of{songbook} += $page - 1;
+	$start_of{back}     += $page - 1;
+    }
 
     if ( $options->{'back-matter'} ) {
 	my $matter = $pdfapi->open( $options->{'back-matter'} );
 	die("Missing back matter: ", $options->{'back-matter'}, "\n") unless $matter;
-	$page = $book_back_matter_page;
-	$pr->newpage($ps), $page++, $book_back_matter_page++
-	  if $ps->{'even-odd-pages'} && !($page % 2);
+	$page = $start_of{back};
+	$pr->newpage($ps), $page++, $start_of{back}++
+	  if $ps->{'even-odd-pages'} && ($page % 2);
 	for ( 1 .. $matter->pages ) {
 	    $pr->{pdf}->importpage( $matter, $_, $page );
 	    $page++;
 	}
+	$pages_of{back} = $matter->pages;
     }
-    #warn("F=$book_front_matter_page, T=$book_toc_page, S=$book_start_page, B=$book_back_matter_page\n");
-    $pr->pagelabel( $book_front_matter_page, 'arabic', 'front-' )
-      if $book_toc_page > $book_front_matter_page;
-    $pr->pagelabel( $book_toc_page,          'roman'            )
-      if $book_start_page > $book_toc_page;
-    $pr->pagelabel( $book_start_page,        'arabic'           );
-    $pr->pagelabel( $book_back_matter_page,  'arabic', 'back-'  )
-      if $page > $book_back_matter_page;
+    # warn ::dump(\%start_of) =~ s/\s+/ /gsr, "\n";
+    # warn ::dump(\%pages_of) =~ s/\s+/ /gsr, "\n";
+
+    # Note that the page indices run from zero.
+    $pr->pagelabel( $start_of{front}-1,    'arabic', 'front-' )
+      if $pages_of{front};
+    $pr->pagelabel( $start_of{toc}-1,      'roman'            )
+      if $pages_of{toc};
+    $pr->pagelabel( $start_of{songbook}-1, 'arabic'           )
+      if $pages_of{songbook};
+    $pr->pagelabel( $start_of{back}-1,     'arabic', 'back-'  )
+      if $pages_of{back};
 
     # Add the outlines.
-    $pr->make_outlines( [ map { $_->[1] } @book ], $book_start_page );
+    $pr->make_outlines( [ map { $_->[1] } @book ], $start_of{songbook} );
 
     $pr->finish( $options->{output} || "__new__.pdf" );
 
@@ -183,6 +205,16 @@ sub generate_songbook {
 	    $v =~ s/"/""/g;
 	    return '"' . $v . '"';
 	};
+	my $pages = sub {
+	    my ( $pages, $page ) = @_;
+	    if ( @_ == 1 ) {
+		$pages = $pages_of{$_[0]};
+		$page  = $start_of{$_[0]};
+	    }
+	    $pages > 1
+	      ? ( $page ."-". ($page+$pages-1) )
+	      : $page,
+	};
 
 	my @cols1 = qw( title pages );
 	my @cols2 = qw( sorttitle artist composer collection key year );
@@ -192,9 +224,26 @@ sub generate_songbook {
 	open( my $fd, '>:utf8', encode_utf8($csv) )
 	  or die( encode_utf8($csv), ": $!\n" );
 	print $fd ( join(";", @cols1, map{ $_."s" } @cols2), "\n" );
+
+	unless ( $ps->{csv}->{songsonly} ) {
+	    print $fd ( join(';','__front_matter__',
+			     $pages->("front"),
+			     'Front Matter',
+			     'ChordPro'),
+			";" x (@cols2-2), "\n" )
+	      if $pages_of{front};
+	    print $fd ( join(';','__table_of_contents__',
+			     $pages->("toc"),
+			     'Table of Contents',
+			     'ChordPro'),
+			";" x (@cols2-2), "\n" )
+	      if $pages_of{toc};
+	}
+
 	for ( my $p = 0; $p < @book-1; $p++ ) {
 	    my ( $title, $song ) = @{$book[$p]};
-	    my $page = $book_start_page + $song->{meta}->{tocpage} - 1;
+	    my $page = $start_of{songbook} + $song->{meta}->{tocpage}
+	      - ($options->{"start-page-number"} || 1);
 	    my $pages = $song->{meta}->{pages};
 	    print $fd ( join(';',
 			     $rfc4180->([$title]),
@@ -204,6 +253,15 @@ sub generate_songbook {
 			     map { $rfc4180->($song->{meta}->{$_}) } @cols2
 			    ),
 			"\n" );
+	}
+
+	unless ( $ps->{csv}->{songsonly} ) {
+	    print $fd ( join(':','__back_matter__',
+			     $pages->("back"),
+			     'Back Matter',
+			     'ChordPro'),
+			";" x (@cols2-2), "\n" )
+	      if $pages_of{back};
 	}
 	close($fd);
     }
@@ -239,6 +297,7 @@ sub generate_song {
     $suppress_empty_lyricsline = $::config->{settings}->{'suppress-empty-lyrics'};
     $inlinechords = $::config->{settings}->{'inline-chords'};
     $chordsunder  = $::config->{settings}->{'chords-under'};
+    $debug_spacing ||= $config->{debug}->{spacing} || $options->{debug};
     my $ps = $::config->clone->{pdf};
     my $pr = $opts->{pr};
     $ps->{pr} = $pr;
@@ -394,7 +453,12 @@ sub generate_song {
     my $col;
 
     my $col_adjust = sub {
-	return if $ps->{columns} <= 1;
+	if ( $ps->{columns} <= 1 ) {
+	    warn("L=", $ps->{__leftmargin},
+	     ", R=", $ps->{__rightmargin},
+	     "\n") if $debug_spacing;
+	    return;
+	}
 	$x = $ps->{_leftmargin} + $ps->{columnoffsets}->[$col];
 	$ps->{__leftmargin} = $x;
 	$ps->{__rightmargin} =
@@ -556,8 +620,10 @@ sub generate_song {
 	    my $hsp = $dd->hsp(undef,$ps);
 	    my $x = $x + $column - $ps->{_indent};
 	    $ps->{_rightmargin} = $ps->{papersize}->[0] - $x + $ps->{columnspace};
+	    $ps->{__rightmargin} = $x - $ps->{columnspace};
 	    set_columns( $ps,
 			 $s->{settings}->{columns} || $::config->{settings}->{columns} );
+	    $col_adjust->();
 	    my $y = $y;
 	    while ( @chords ) {
 
@@ -973,13 +1039,19 @@ sub generate_song {
 				  type => "set",
 				  name => "label",
 				  value => $elt->{chorus}->[0]->{value},
-				 } );
+				} );
+		if ( $ps->{chorus}->{recall}->{choruslike} ) {
+		    $elts[0]->{context} = $elts[1]->{context} = "chorus";
+		}
 	    }
 	    elsif ( $t->{tag} && $t->{type} =~ /^comment(?:_(?:box|italic))?/ ) {
 		unshift( @elts, { %$elt,
 				  type => $t->{type},
 				  text => $t->{tag},
 				 } );
+		if ( $ps->{chorus}->{recall}->{choruslike} ) {
+		    $elts[0]->{context} = "chorus";
+		}
 	    }
 	    redo;
 	}
@@ -1115,7 +1187,11 @@ sub generate_song {
 	$chorddiagrams->( undef, "below");
     }
 
-    return $thispage - $startpage + 1;
+    my $pages = $thispage - $startpage + 1;
+    $newpage->(), $pages++,
+      if $ps->{'pagealign-songs'} > 1 && $pages % 2;
+
+    return $pages;
 }
 
 sub font_bl {
@@ -1975,6 +2051,7 @@ sub showlayout {
     my $pr = $ps->{pr};
     my $col = "red";
     my $lw = 0.5;
+    my $font = $ps->{fonts}->{grid};
 
     my $mr = $ps->{_rightmargin};
     my $ml = $ps->{_leftmargin};
@@ -1985,13 +2062,42 @@ sub showlayout {
 		 $ps->{papersize}->[1]-$ps->{margintop},
 		 $lw, undef, $col);
 
+    my $fsz = 7;
+    my $ptop = $ps->{papersize}->[1]-$ps->{margintop}+$fsz-3;
+    $pr->setfont($font,$fsz);
+    $pr->text( "<span color='red'>$ml</span>",
+	       $ml, $ptop, $font, $fsz );
+    my $t = $ps->{papersize}->[0]-$mr;
+    $pr->text( "<span color='red'>$t</span>",
+	       $ps->{papersize}->[0]-$mr-$pr->strwidth("$mr"),
+	       $ptop, $font, $fsz );
+    $t = $ps->{papersize}->[1]-$ps->{margintop};
+    $pr->text( "<span color='red'>$t  </span>",
+	       $ml-$pr->strwidth("$t  "),
+	       $ps->{papersize}->[1]-$ps->{margintop}-2,
+	       $font, $fsz );
+    $t = $ps->{marginbottom};
+    $pr->text( "<span color='red'>$t  </span>",
+	       $ml-$pr->strwidth("$t  "),
+	       $ps->{marginbottom}-2,
+	       $font, $fsz );
     my @a = ( $ml,
 	      $ps->{papersize}->[1]-$ps->{margintop}+$ps->{headspace},
 	      $ps->{papersize}->[0]-$ml-$mr,
 	      $lw, $col );
     $pr->hline(@a);
+    $t = $a[1];
+    $pr->text( "<span color='red'>$t  </span>",
+	       $ml-$pr->strwidth("$t  "),
+	       $a[1]-2,
+	       $font, $fsz );
     $a[1] = $ps->{marginbottom}-$ps->{footspace};
     $pr->hline(@a);
+    $t = $a[1];
+    $pr->text( "<span color='red'>$t  </span>",
+	       $ml-$pr->strwidth("$t  "),
+	       $a[1]-2,
+	       $font, $fsz );
 
     my @off = @{ $ps->{columnoffsets} };
     pop(@off);
@@ -2003,8 +2109,12 @@ sub showlayout {
     foreach my $i ( 0 .. @off-1 ) {
 	next unless $off[$i];
 	$a[0] = $ml + $off[$i];
+	$pr->text( "<span color='red'>$a[0]</span>",
+		   $a[0] - $pr->strwidth($a[0])/2, $ptop, $font, $fsz );
 	$pr->vline(@a);
 	$a[0] = $ml + $off[$i] - $ps->{columnspace};
+	$pr->text( "<span color='red'>$a[0]</span>",
+		   $a[0] - $pr->strwidth($a[0])/2, $ptop, $font, $fsz );
 	$pr->vline(@a);
 	if ( $ps->{_indent} ) {
 	    $a[0] = $ml + $off[$i] + $ps->{_indent};
@@ -2184,11 +2294,13 @@ sub wrap {
     my @rchords;
     my @rphrases;
     my $m = $pr->{ps}->{__rightmargin};
+    #warn("WRAP x=$x rm=$m w=", $m - $x, "\n");
 
     while ( @chords ) {
 	my $chord  = shift(@chords);
 	my $phrase = shift(@phrases) // "";
 	my $ex = "";
+	#warn("wrap x=$x rm=$m w=", $m - $x, " ch=$chord, ph=$phrase\n");
 
 	if ( @rchords ) {
 	    # Does the chord fit?
@@ -2229,9 +2341,9 @@ sub wrap {
 	    }
 	    unshift( @chords, $chord );
 	    unshift( @phrases, $ex );
-	    $x = $_[2];
 	    push( @$res,
 		  { %$elt, chords => [@rchords], phrases => [@rphrases] } );
+	    $x = $_[2] + $pr->strwidth("x");
 	    $res->[-1]->{indent} = $pr->strwidth("x") if @$res > 1;
 	    @rchords = ();
 	    @rphrases = ();
@@ -2251,7 +2363,7 @@ sub wrapsimple {
     $pr->wrap( $text, $pr->{ps}->{__rightmargin} - $x );
 }
 
-use constant ABCDEBUG => 0;
+sub ABCDEBUG() { $config->{debug}->{abc} }
 
 use feature 'state';
 
@@ -2278,28 +2390,15 @@ sub abc2image {
 	print $fd '%%'.$_." ".$elt->{opts}->{$_}."\n";
 	warn('%%'.$_." ".$elt->{opts}->{$_}."\n") if ABCDEBUG;
     }
-    print $fd "X:1\n";
-    if ( $s->{meta}->{key} ) {
-	print $fd "K:", $s->{meta}->{_orig_key}->[0], "\n";
-	warn("K:", $s->{meta}->{_orig_key}->[0], "\n") if ABCDEBUG;
+
+    # Add mandatory field.
+    unless ( any { /^X:/ } @{$elt->{data}} ) {
+	print $fd ("X:1\n");
+	warn("X:1\n") if ABCDEBUG;
     }
-    if ( $s->{meta}->{time} ) {
-	print $fd "M:", $s->{meta}->{time}->[0], "\n";
-	warn("M:", $s->{meta}->{time}->[0], "\n") if ABCDEBUG;
-    }
-    if ( $s->{meta}->{tempo} ) {
-	print $fd "Q:", $s->{meta}->{tempo}->[0], "\n";
-	warn("Q:", $s->{meta}->{tempo}->[0], "\n") if ABCDEBUG;
-    }
+
+    # Copy rest. We assume the user knows how to write ABC.
     for ( @{$elt->{data}} ) {
-	# Ignore most information fields.
-	# We only need (accept) K (key), L (unit note lenght),
-	# P (parts), Q (tempo) and M (meter).
-	# From the directives, only pass %%transpose.
-	if ( /^[ABCDEFGHIJNORSTUVWXYZ+]:/i
-	     || /^%%(?!transpose)/ ) {
-	    next;
-	}
 	print $fd $_, "\n";
 	warn($_, "\n") if ABCDEBUG;
     }
@@ -2329,6 +2428,9 @@ sub abc2image {
 
     my $svg0 = File::Spec->catfile( $td, "tmp${imgcnt}.svg" );
     my $svg1 = File::Spec->catfile( $td, "tmp${imgcnt}001.svg" );
+    warn( join(" ", $abcm2ps, qw(-g -q -m0cm),
+	       "-w" . $pw . "pt",
+	       "-O", $svg0, $src, "\n" ) ) if ABCDEBUG;
     if ( sys( $abcm2ps, qw(-g -q -m0cm),
 	      "-w" . $pw . "pt",
 	      "-O", $svg0, $src ) ) {
@@ -2397,6 +2499,8 @@ sub abc2image {
 =cut
 
 }
+
+sub LYDEBUG() { $config->{debug}->{ly} }
 
 sub ly2image {
     my ( $s, $pr, $elt ) = @_;

@@ -19,7 +19,7 @@ name: JMAP-Tester-WebSocket
 requires:
   Data::Dumper: '0'
   IO::Async::Loop: '0'
-  JMAP::Tester: '0'
+  JMAP::Tester: '0.101'
   JMAP::Tester::Response::Paragraph: '0'
   JMAP::Tester::Response::Sentence: '0'
   JMAP::Tester::Role::Result: '0'
@@ -41,7 +41,7 @@ resources:
   bugtracker: https://github.com/wolfsage/JMAP-Tester-WebSocket/issues
   homepage: https://github.com/wolfsage/JMAP-Tester-WebSocket
   repository: https://github.com/wolfsage/JMAP-Tester-WebSocket.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.024002'
@@ -341,7 +341,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.002'
+          tag: '0.003'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -374,6 +374,14 @@ x_Dist_Zilla:
           paths: []
       name: '@RJBS/Git::Contributors'
       version: '0.030'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: '6.023'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

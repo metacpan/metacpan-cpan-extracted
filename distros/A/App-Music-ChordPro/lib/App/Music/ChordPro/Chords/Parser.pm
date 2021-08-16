@@ -128,8 +128,10 @@ sub get_parser {
 	  App::Music::ChordPro::Chords::Parser::Roman->new;
     }
     elsif ( $system ) {
-	return $parsers->{$system} //=
-	  App::Music::ChordPro::Chords::Parser::Common->new;
+	return $parsers->{$system} if $parsers->{$system};
+	my $p = App::Music::ChordPro::Chords::Parser::Common->new;
+	$p->{system} = $system;
+	return $parsers->{$system} = $p;
     }
     elsif ( $nofallback ) {
 	return;
@@ -744,7 +746,7 @@ sub transpose {
     if ( $self->{bass} && $self->{bass} ne "" ) {
 	$info->{bass_ord} = ( $self->{bass_ord} + $xpose ) % $p->intervals;
 	$info->{bass_canon} = $info->{bass} =
-	  $p->root_canon($info->{bass_ord},$xpose > 0);
+	  $p->root_canon( $info->{bass_ord}, $xpose > 0 );
 	$info->{bass_mod} = $xpose <=> 0;
     }
     $info->{root_mod} = $xpose <=> 0;
@@ -756,11 +758,12 @@ sub transcode {
     my ( $self, $xcode ) = @_;
     return $self unless $xcode;
     return $self if $self->{system} eq $xcode;
-    my $info = $self->clone;
+    my $info = $self->dclone;
+#warn("_>_XCODE = $xcode, CHORD = $info->{name}");
     $info->{system} = $xcode;
     my $p = $self->{parser}->get_parser($xcode);
+    die("OOPS ", $p->{system}, " $xcode") unless $p->{system} eq $xcode;
     $info->{parser} = $p;
-    die unless $p->{system} eq $xcode;
     $info->{root_canon} = $info->{root} =
       $p->root_canon( $info->{root_ord},
 		      $info->{root_mod} >= 0,
@@ -771,9 +774,12 @@ sub transcode {
     }
     if ( $self->{bass} && $self->{bass} ne "" ) {
 	$info->{bass_canon} = $info->{bass} =
-	  $p->root_canon($info->{bass_ord},$info->{bass_mod});
+	  $p->root_canon( $info->{bass_ord}, $info->{bass_mod} >= 0 );
     }
     bless $info => $p->{target};
+#    ::dump($info);
+#warn("_<_XCODE = $xcode, CHORD = ", $info->show);
+    return $info;
 }
 
 ################ Chord objects: Nashville ################

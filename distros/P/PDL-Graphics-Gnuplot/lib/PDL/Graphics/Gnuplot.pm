@@ -1205,15 +1205,15 @@ of color tables, and have better support for scientific images.
 
 C<pseudocolor> (synonym C<pc>) gives access to the color tables built
 in to the C<PDL::Transform::Color> package, if that package is
-available.  It takes either a color table name or a list ref which 
-is a collection of arguments that get sent to the 
+available.  It takes either a color table name or a list ref which
+is a collection of arguments that get sent to the
 C<PDL::Transform::Color::t_pc> transform definition method. Sending
 the empty string or undef will generate a list of allowable color
-table names.  Many of the color tables are "photometric" and 
+table names.  Many of the color tables are "photometric" and
 will render photometric data correctly without gamma correction.
 
-C<perceptual> (synonym C<pcp>) gives the same access to 
-C<PDL::Transform::Color> as does C<pseudocolor>, but the 
+C<perceptual> (synonym C<pcp>) gives the same access to
+C<PDL::Transform::Color> as does C<pseudocolor>, but the
 "equal-perceptual-difference" scaling is used -- i.e. input
 values are gamma-corrected by the module so that uniform
 shifts in numeric value yield approximately uniform perceptual
@@ -1610,10 +1610,10 @@ default set of linetypes for your current output terminal.
 
 =item dashtype (abbrev 'dt')
 
-This is can be either a numeric type selector (0 for no dashes) or 
+This is can be either a numeric type selector (0 for no dashes) or
 an ARRAY ref containing a list of up to 5 pairs of (dash length,
-space length).  The C<dashtype> curve option is only supported for 
-Gnuplot versions 5.0 and above.  
+space length).  The C<dashtype> curve option is only supported for
+Gnuplot versions 5.0 and above.
 
 If you don't specify a C<dashtype> curve option, the default behavior
 matches the behavior of earlier gnuplots: many terminals support a
@@ -1623,7 +1623,7 @@ dashed by default.  To make a single curve solid, specify C<dt=>0> as
 a curve option for it; or to make all curves solid, use the constructor
 or the C<output> method to set the terminal option C<dashed=>0>.
 
-If your gnuplot is older than v5.0, the dashtype curve option is 
+If your gnuplot is older than v5.0, the dashtype curve option is
 ignored (and causes a warning to be emitted).
 
 =item linestyle (abbrev 'ls')
@@ -2019,7 +2019,7 @@ our $echo_eating = 0;                             # Older versions of gnuplot on
 our $debug_echo = 0;                              # If set, mock up Losedows half-duplex pipes
 
 
-our $VERSION = '2.018';
+our $VERSION = '2.019';
 $VERSION = eval $VERSION;
 
 our $gp_version = undef;    # eventually gets the extracted gnuplot(1) version number.
@@ -2366,7 +2366,7 @@ FOO
 
 	    ### Deal with anti-aliasing scaling factors
 	    if( defined $termOptions->{aa}) {
-		$this->{aa}   = $termOptions->{aa}                     
+		$this->{aa}   = $termOptions->{aa}
 	    } else {
 		$this->{aa} = 1;
 	    }
@@ -2385,7 +2385,7 @@ FOO
 		delete($this->{image_format});
 	    }
 
-									      
+
 	    delete $termOptions->{output};
 
 	    ## Emit the terminal options line for this terminal.
@@ -2479,7 +2479,7 @@ Called with no arguments, C<restart> applies to the global plot object.
 
 =cut
 
-# reset - tops and restarts the underlying gnuplot process for an object
+# reset - stops and restarts the underlying gnuplot process for an object
 *grestart = \&restart;
 sub restart {
     my $this = _obj_or_global(\@_);
@@ -2538,7 +2538,7 @@ sub reset {
     if($check_syntax) {
 	# Send multiple newlines to avoid bugs in certain gnuplots, which
 	# appear to lose a character after reset.
-	_printGnuplotPipe( $this, "syntax", "reset\n\n\n"); 
+	_printGnuplotPipe( $this, "syntax", "reset\n\n\n");
 	$checkpointMessage = _checkpoint($this,"syntax");
     }
     _printGnuplotPipe($this, "main", "reset\n\n\n");
@@ -2652,7 +2652,7 @@ sub plot
     my $this = _obj_or_global(\@_);
 
     delete $this->{last_dashtype}; # implement dashtype state function for gnuplot>=5.0
-    
+
     ##############################
     # Parse optional plot options - must be an array or hash ref, if present.
     # Cheesy but hopefully effective method (from Dima): parse as plot options
@@ -3455,7 +3455,7 @@ POS
     if($this->{aa} && $this->{aa} != 1) {
 	$this->{aa_ready} = 1;
     }
-    
+
     # read and report any warnings that happened during the plot
     return $plotWarnings;
 
@@ -3527,7 +3527,7 @@ POS
 		    );
 		### As of Gnuplot 5.0, some curve options (dashtype) require a default value to maintain legacy
 		### behavior in the default case.  This is the place where curve options are parsed, so we
-		### hand-tweak a couple of default values here.  
+		### hand-tweak a couple of default values here.
 
 		# dashtype doesn't have to have a defined value it only has to exist in the curve options hash,
 		# to trigger emission of a dashtype.
@@ -3535,11 +3535,11 @@ POS
 
 		## Even worse -- some plot types (notably "with labels") barf in newer gnuplots
 		## if you feed them a "dt".  So don't send a dashtype to those.
-		my $with = ( 
-		    ( ref($chunk{options}{'with'}) =~ m/ARRAY/ ) ? 
-		    $chunk{options}{'with'}->[0] : 
+		my $with = (
+		    ( ref($chunk{options}{'with'}) =~ m/ARRAY/ ) ?
+		    $chunk{options}{'with'}->[0] :
 		    $chunk{options}{'with'}
-		    ) // 
+		    ) //
 		    $this->{options}->{'globalwith'} //
 		    "";
 		if($with =~ m/^label/) {
@@ -4354,7 +4354,6 @@ sub multiplot {
 
 sub end_multi {
     my $this = _obj_or_global(\@_);
-
     unless($this->{options}->{multiplot}) {
 	barf("end_multi: you can't, you're not in multiplot mode\n");
     }
@@ -4366,7 +4365,6 @@ sub end_multi {
 	    barf("Gnuplot error: unset multiplot failed on syntax check!\n$checkpointMessage");
 	}
     }
-
     _printGnuplotPipe($this, "main", "unset multiplot\n");
     $checkpointMessage = _checkpoint($this, "main");
     if($checkpointMessage) {
@@ -4377,10 +4375,8 @@ sub end_multi {
 	}
     }
     $this->{options}->{multiplot} = 0;
-    $this->close;
+    $this->close if !$termTab->{$this->{terminal}}{disp};
 }
-
-
 
 ######################################################################
 ##
@@ -4996,7 +4992,7 @@ our $pOptionsTable =
 			  my $rgb = $grey->apply($t);
 
 			  {
-			      no warnings;			      
+			      no warnings;
 			      my @s = map {
 				  sprintf(" %d '#%2.2X%2.2X%2.2X'", $_, $rgb->slice('x',[$_,,0])->list);
 			      } (0..$grey->dim(0)-1);
@@ -5045,7 +5041,7 @@ our $pOptionsTable =
 			  my @s = ();
 			  for(0..$grey->dim(0)-1) {
 # Turn off warnings to prevent "redundant argument" warnings on certain sprintfs
-no warnings;				  
+no warnings;
 			      my $this_str = sprintf("'#%2.2X%2.2X%2.2X'",$rgb->slice('x',[$_,,0])->list);
 use warnings;
 			      if($_ == $grey->dim(0)-1   or   $this_str ne $last_str) {
@@ -5059,8 +5055,8 @@ use warnings;
 		    },
 		    ['clut'],undef,
 		    '[pseudo] Use PDL::Transform::Color photometric palette: "pseudocolor=>\'heat\'"' ],
-			  
-    
+
+
     'clut'      => [sub { my($old, $new, $this) = @_;
 			  $new = ($new ? lc $new : "default");
 			  if($palettesTab->{$new}) {
@@ -6202,7 +6198,7 @@ our $_OptionEmitters = {
     #### This differs from cq alone in that it parses font size,
     #### scaling it for anti-aliasing as necessary.
     #### the 'aa' parameter is passed in $h since this is called
-    #### by the term option emitter in output().	
+    #### by the term option emitter in output().
     'cqf' => sub { my($k,$v,$h) = @_;
 		   return "" unless(defined($v));
 		   if($h->{aa} && $v =~ m/(.*)\,(.*)/) {
@@ -6242,7 +6238,7 @@ our $_OptionEmitters = {
 		   }
 		   return " $k $v ";
     },
-	
+
 
 	#### The dashtype curve option
 	#### Supports an INVALID value for "with" types that have to suppress dt emission.
@@ -6922,11 +6918,11 @@ our $termTabSource = {
     'aqua'     => { unit=>'pt', desc=> 'Aqua terminal program on MacOS X (MacOS default device)', int=>1, ok=>1, disp=>1,
 		  opt=>[ qw/ output_ title size font enhanced / ]},
     'be'       => "BeOS/X11 (Ah, Be, how we miss thee)    [NS: ancient]",
-    'cairolatex'=> { unit=>'in', desc=>'Cairo support for .eps or .pdf output with LaTeX text rendering', 
+    'cairolatex'=> { unit=>'in', desc=>'Cairo support for .eps or .pdf output with LaTeX text rendering',
 		     opt=> [
 			 ['mode', 's', 'cv', 'terminal mode: set to "eps" or "pdf"'],
 			 ['textmode', 's', 'cv', 'text mode: set to "black" or "color"'],
-			 ['header', 's', sub { $_[1] ? " header '$_[1]' " : " noheader " }, 
+			 ['header', 's', sub { $_[1] ? " header '$_[1]' " : " noheader " },
 			  "LaTeX source for header text"
 			 ],
 			 "color",
@@ -7172,7 +7168,7 @@ our $termTabSource = {
     'tikz'    =>"TikZ package via Lua                   [NS: obsolete]",
     'tkcanvas'=>"Tcl/Tk canvas widget design            [NS: weird]",
     'tpic'    =>"Latex picture (use 'latex' or 'eepic') [NS: obsolete]",
-    'unknown' =>"Unknown term (gnuplot final default)   [NS: not a terminal]",		 
+    'unknown' =>"Unknown term (gnuplot final default)   [NS: not a terminal]",
     'unixpc'  =>"AT&T 3b1 and AT&T 7300 UNIX PC display [NS: ancient]",
     'unixplot'=>"UNIX plot(1) language (non-GNU version)[NS: obsolete]",
     'vgagl'   =>"Output to a VGA screen under linux     [NS: obsolete]",
@@ -7211,35 +7207,35 @@ our $termTabSource = {
 $termTab = {};
 
 for my $k(keys %$termTabSource) {
-    next unless(ref($termTabSource->{$k}));   # names aren't supported -- eliminate
+    next unless(ref(my $v = $termTabSource->{$k}));   # names aren't supported -- eliminate
     my $terminalOpt = {};   #this will hold the _parseOptHash control structure we generate
     my $i = 1;              #this is a sort order counter
 
-    for my $n(@{$termTabSource->{$k}->{opt}}) {
+    for my $n(@{$v->{opt}}) {
 	my $name = $n;
 	my $line;
 	if(ref $name) {
 	    $name = $n->[0];
-	    $line = [@{$n}[1..3]];
+	    $line = [@$n[1..3]];
 	} else {
 	    $line = $termTab_types->{$name}
 	       or die "Bug in parse table build! ('$name' inside terminal '$k')";
 	}
-	$terminalOpt->{$name} = [ $line->[0], $line->[1], undef, $i++, $line->[2]];
+	$terminalOpt->{$name} = [ @$line[0, 1], undef, $i++, $line->[2]];
     }
     $terminalOpt->{"wait"} = [ 's' , sub { return "" }, undef, $i++, "wait time before throwing an error (default 5s)" ];
-    my $desc = $termTabSource->{$k}->{desc};
-    $desc =~ s/\%u/$termTabSource->{$k}->{unit}/;
+    my $desc = $v->{desc};
+    $desc =~ s/\%u/$v->{unit}/;
     $termTab->{$k} = { desc => $desc,
-		       unit => $termTabSource->{$k}->{unit},
-		       mouse => _def( $termTabSource->{$k}->{mouse}, 0),
-		       disp  => _def( $termTabSource->{$k}->{disp},  0),
-		       int   => _def( $termTabSource->{$k}->{int},   0),
+		       unit => $v->{unit},
+		       mouse => _def( $v->{mouse}, 0),
+		       disp  => _def( $v->{disp},  0),
+		       int   => _def( $v->{int},   0),
 		       opt  => [ $terminalOpt,
 				 undef, # This gets filled in on first use in the constructor.
 				 "$k terminal options"
 			   ],
-		       default_output=> $termTabSource->{$k} ->{default_output}
+		       default_output=> $v->{default_output}
                      };
 }
 
@@ -7579,7 +7575,7 @@ which still doesn\'t match.  Proceed with caution!
 EOM
 		}
 	    }
-            
+
             # On windows, gnuplot versions 4.6.5 and older echo back commands.
             if ( $gp_numversion <= '4.006' && $gp_pl <= 5 ) {
                 $echo_eating = 1;
@@ -7651,6 +7647,7 @@ sub _killGnuplot {
 	    $z = waitpid($goner,0);
 
 	} else {
+	    _printGnuplotPipe($this,$suffix,"set term qt 0 close\n") if $this->{terminal} eq 'qt';
 	    _printGnuplotPipe($this,$suffix,"exit\n");
 
 	    # Give it 2 seconds to quit, then interrupt it again.
@@ -8249,7 +8246,7 @@ sub _with_fits_prefrobnicator {
     ##
     # Debugging Gnuplot's horrible indexing problem
     # $PDL::Graphics::Gnuplot::prefrobnicated = [$ndc->mv(0,-1)->dog, $d2];
-    
+
     if($d2->ndims == 2) {
 	$with->[0] = 'image';
 	$chunk->{options}->{with} = [@$with];
@@ -8288,7 +8285,7 @@ sub quote_escape {
     $s =~ s/\013/\\r/g;
     return $s;
 }
-    
+
 
 =head1 COMPATIBILITY
 

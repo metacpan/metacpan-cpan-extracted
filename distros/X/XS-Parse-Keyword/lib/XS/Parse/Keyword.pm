@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Keyword 0.11;
+package XS::Parse::Keyword 0.12;
 
 use v5.14;
 use warnings;
@@ -28,6 +28,8 @@ This module is also currently experimental, and the design is still evolving
 and subject to change. Later versions may break ABI compatibility, requiring
 changes or at least a rebuild of any module that depends on it.
 
+=cut
+
 =head1 XS FUNCTIONS
 
 =head2 boot_xs_parse_keyword
@@ -50,6 +52,8 @@ requirement; e.g.
 This function installs a set of parsing hooks to be associated with the given
 keyword. Such a keyword will then be handled automatically by a keyword parser
 installed by C<XS::Parse::Keyword> itself.
+
+=cut
 
 =head1 PARSE HOOKS
 
@@ -151,27 +155,34 @@ If neither C<parse> nor C<build> are present, this is called as a simpler
 variant of C<build> when only a single argument is required. It takes its type
 from the C<piece1> field instead.
 
+=cut
+
 =head1 PIECES AND PIECE TYPES
 
 When using the C<build> or C<build1> alternatives for the C<parse> phase, the
 actual syntax is parsed automatically by this module, according to the
 specification given by the I<pieces> or I<piece1> field. The result of that
 parsing step is placed into the I<args> or I<arg0> parameter to the invoked
-function, using a C<union> type consisting of the following fields:
+function, using a C<struct> type consisting of the following fields:
 
-   typedef union {
-      OP *op;
-      CV *cv;
-      SV *sv;
-      int i;
-      struct {
-         SV *name;
-         SV *value;
-      } attr;
-      PADOFFSET padix;
+   typedef struct
+      union {
+         OP *op;
+         CV *cv;
+         SV *sv;
+         int i;
+         struct {
+            SV *name;
+            SV *value;
+         } attr;
+         PADOFFSET padix;
+      };
+      int line;
    } XSParseKeywordPiece;
 
-Which field is set depends on the type of the piece.
+Which field of the anonymous is set depends on the type of the piece. The
+I<line> field contains the line number of the source file where parsing of
+that piece began.
 
 Some piece types are "atomic", whose definition is self-contained. Others are
 structural, defined in terms of inner pieces. Together these form an entire
@@ -268,21 +279,27 @@ an optree in the I<op> field.
 
 Variant of C<XPK_LISTEXPR> which puts the expression in list context.
 
-=head2 XPK_IDENT
+=head2 XPK_IDENT, XPK_IDENT_OPT
 
-I<atomic, emits sv.>
+I<atomic, can probe, emits sv.>
 
 A bareword identifier name is expected, and passed as an SV containing a PV
 in the I<sv> field. An identifier is not permitted to contain a double colon
 (C<::>).
 
-=head2 XPK_PACKAGENAME
+The C<_OPT>-suffixed version is optional; if no identifier is found then I<sv>
+is set to C<NULL>.
 
-I<atomic, emits sv.>
+=head2 XPK_PACKAGENAME, XPK_PACKAGENAME_OPT
+
+I<atomic, can probe, emits sv.>
 
 A bareword package name is expected, and passed as an SV containing a PV in
 the I<sv> field. A package name is similar to an identifier, except it permits
 double colons in the middle.
+
+The C<_OPT>-suffixed version is optional; if no package name is found then
+I<sv> is set to C<NULL>.
 
 =head2 XPK_LEXVARNAME
 
@@ -319,17 +336,15 @@ I<attr.name> and I<attr.value> fields. This number may be zero.
 It is not an error for there to be no attributes present, or for the optional
 colon to be missing. In this case I<i> will be set to zero.
 
-=head2 XPK_VSTRING
+=head2 XPK_VSTRING, XPK_VSTRING_OPT
 
 I<atomic, can probe, emits sv.>
 
 A version string is expected, of the form C<v1.234> including the leading C<v>
 character. It is passed as a L<version> SV object in the I<sv> field.
 
-=head2 XPK_VSTRING_OPT
-
-Identical to C<XPK_VSTRING> except it is optional; if no version string is
-found then I<sv> is set to C<NULL>.
+The C<_OPT>-suffixed version is optional; if no version string is found then
+I<sv> is set to C<NULL>.
 
 =head2 XPK_LEXVAR_MY
 
@@ -442,13 +457,18 @@ considered as a single alternative.
 
 =head2 XPK_COMMALIST
 
-I<structural, emits i.>
+I<structural, might support probe, emits i.>
+
+   XPK_COMMALIST(pieces ...)
 
 A structural type which expects to find one or more repeats of its contained
 pieces, separated by literal comma (C<,>) characters. This is somewhat similar
 to C<XPK_REPEATED>, except that it needs at least one copy, needs commas
 between its items, but does not require that the first contained piece support
 probe (the comma itself is sufficient to indicate a repeat).
+
+An C<XPK_COMMALIST> supports probe if its first contained piece does; i.e.
+is transparent to probing.
 
 =head2 XPK_PARENSCOPE
 

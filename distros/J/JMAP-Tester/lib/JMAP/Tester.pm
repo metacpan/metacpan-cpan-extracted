@@ -1,7 +1,7 @@
 use v5.10.0;
 use warnings;
 
-package JMAP::Tester 0.100;
+package JMAP::Tester 0.101;
 # ABSTRACT: a JMAP client made for testing JMAP servers
 
 use Moo;
@@ -987,7 +987,7 @@ JMAP::Tester - a JMAP client made for testing JMAP servers
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 OVERVIEW
 
@@ -1263,6 +1263,10 @@ Michael McClimon <michael@mcclimon.org>
 =item *
 
 Ricardo Signes <rjbs@semiotic.systems>
+
+=item *
+
+Ricardo Signes <rjbs@users.noreply.github.com>
 
 =back
 

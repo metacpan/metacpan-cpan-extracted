@@ -252,6 +252,7 @@ t/grant/Apache_and_more/test_run.py
 t/grant/CC-BY-SA_and_more/WMLA
 t/grant/CC-BY-SA_and_more/cewl.rb
 t/grant/CC-BY-SA_and_more/utilities.scad
+t/grant/EPL_and_more/Activator.java
 t/grant/EPL_and_more/Base64Coder.java
 t/grant/LGPL/Model.pm
 t/grant/LGPL/PKG-INFO

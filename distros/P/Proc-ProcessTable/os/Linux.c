@@ -328,7 +328,11 @@ static bool get_proc_stat(char *pid, char *format_str, struct procstat* prs,
     /* scan in pid, and the command, in linux the command is a max of 15 chars
      * plus a terminating NULL byte; prs->comm will be NULL terminated since
      * that area of memory is all zerored out when prs is allocated */
-    if (sscanf(stat_text, "%d (%15c", &prs->pid, prs->comm) != 2)
+    /* Apparently %15c means 'exactly 15' but a glibc bug allows matching
+     * regardles. musl won't match it.
+     * See: https://www.openwall.com/lists/musl/2013/11/15/5
+     * and: https://sourceware.org/bugzilla/show_bug.cgi?id=12701 */
+    if (sscanf(stat_text, "%d (%c", &prs->pid, prs->comm) != 2)
       /* we might get an empty command name, so check for it:
        * do the open and close parenteses lie next to each other?
        * proceed if yes, finish otherwise
@@ -393,7 +397,8 @@ static void eval_link(char *pid, char *link_rel, enum field field, char **ptr,
      * for the cwd symlink, since on linux the links we care about will never
      * be relative links (cwd, exec)
      * Doing this because readlink works on static buffers */
-    link = canonicalize_file_name(link_file);
+    /* canonicalize_file_name is no good for musl, use realpath instead */
+    link = realpath(link_file, NULL);
 
     /* we no longer need need the path to the link file */
     obstack_free(mem_pool, link_file);
@@ -537,6 +542,7 @@ static void fixup_stat_values(char *format_str, struct procstat* prs)
             prs->state = get_string(UWAIT);
             break;
         case 'T':
+        case 'H': /* GNU Hurd HALTED state */
             prs->state = get_string(STOP);
             break;
         case 'x':

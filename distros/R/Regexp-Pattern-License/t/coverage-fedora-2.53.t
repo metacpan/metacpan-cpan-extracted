@@ -202,7 +202,7 @@ like(
 
 #		field 'dvipdfm License'                       => 'dvipdfm';
 
-		field 'Eclipse Distribution License 1.0' => 'BSD-3-Clause';
+		field 'Eclipse Distribution License 1.0' => 'EDL-1.0';
 
 		field 'Eclipse Public License 1.0' => 'EPL-1.0';
 		field 'Eclipse Public License 2.0' => 'EPL-2.0';
@@ -889,15 +889,15 @@ like(
 		field 'MIT-style license, Standard ML of New Jersey Variant' =>
 			'SMLNJ';
 
-		field 'MIT-style license, WordNet Variant' => 'wordnet_3';
-		field 'WordNet 3.0 license' => 'wordnet_3';    # default caption
+		field 'MIT-style license, WordNet Variant' => 'WordNet';
+		field 'WordNet License' => 'WordNet';    # default caption
 
 #		field 'MIT-style license, Modern Style with sublicense' => '';
 #		field 'MIT-style license, Modern Style without sublicense (Unicode)' => '';
 # variant		field 'MIT-style license, Modern Variants' => '';
 
 		field 'MIT-style license, Modern style (ICU Variant)' => 'ICU';
-		field 'ICU License' => 'ICU';                  # default caption
+		field 'ICU License' => 'ICU';            # default caption
 
 		field 'MIT-style license, feh variant' => 'MIT-feh';
 

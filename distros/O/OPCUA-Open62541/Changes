@@ -1,5 +1,14 @@
 Revision history for Perl extension OPCUA::Open62541.
 
+0.029 2021-08-13
+    - Cleanup monitored item delete callback, newer open62541 behaves
+      differently.  Cover both cases.
+    - Fix memory leak when creating monitored items.
+    - Introduce MonitoredItemArrays to handle callback memory
+      in UA_Client_MonitoredItems_createDataChanges() and
+      UA_Client_MonitoredItems_createDataChange().  This should
+      plug all memory leaks and use after free with these callbacks.
+
 0.028 2021-08-09
     - Use specific structs to store subscription context and monitored
       item context.

@@ -1,21 +1,24 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/SQLite.pm
-## Version v0.400.3
+## Version v0.400.4
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2020/05/28
+## Modified 2021/08/16
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
-## This is the subclassable module for driver specific ones.
+# This is the subclassable module for driver specific ones.
 package DB::Object::SQLite;
 BEGIN
 {
     require 5.6.0;
     use strict;
     use DBI qw( :sql_types );
-    ## use DBD::SQLite;
+    # use DBD::SQLite;
     eval
     {
         require DBD::SQLite;
@@ -30,11 +33,12 @@ BEGIN
     use DateTime;
     use DateTime::TimeZone;
     use DateTime::Format::Strptime;
+    use Module::Generic::File qw( sys_tmpdir );
     use Number::Format;
     use Nice::Try;
     our( $VERSION, $DB_ERRSTR, $ERROR, $DEBUG, $CONNECT_VIA, $CACHE_QUERIES, $CACHE_SIZE );
     our( $CACHE_TABLE, $USE_BIND, $USE_CACHE, $MOD_PERL, @DBH );
-    $VERSION     = 'v0.400.3';
+    $VERSION     = 'v0.400.4';
     use Devel::Confess;
 };
 
@@ -43,8 +47,8 @@ BEGIN
     $DEBUG         = 0;
     $CACHE_QUERIES = [];
     $CACHE_SIZE    = 10;
-    ## The purpose of this cache is to store table object and avoid the penalty of reloading the structure of a table for every object generated.
-    ## Thus CACHE_TABLE is in no way an exhaustive list of existing table, but existing table object.
+    # The purpose of this cache is to store table object and avoid the penalty of reloading the structure of a table for every object generated.
+    # Thus CACHE_TABLE is in no way an exhaustive list of existing table, but existing table object.
     $CACHE_TABLE   = {};
     $USE_BIND      = 0;
     $USE_CACHE     = 0;
@@ -59,149 +63,157 @@ BEGIN
     
     our $PRIVATE_FUNCTIONS =
     {
-        'ceiling'            =>[1, \&_ceiling],
-        'concat'            =>[-1, \&_concat],
-        'curdate'            =>[0, \&_curdate],
-        'curtime'            =>[0, \&_curtime],
-        'dayname'            =>[1, \&_dayname],
-        'dayofmonth'        =>[1, \&_dayofmonth],
-        'dayofweek'            =>[1, \&_dayofweek],
-        'dayofyear'            =>[1, \&_dayofyear],
-        'distance_miles'    =>[4, \&_distance_miles],
-        # 'from_days'            =>[-1, \&_from_days],
-        'from_unixtime'        =>[1, \&_from_unixtime],
-        'hour'                =>[1, \&_hour],
-        'lcase'                =>[1, \&_lcase],
-        'left'                =>[2, \&_left],
-        'locate'            =>[2, \&_locate],
-        'log10'                =>[1, \&_log10],
-        'minute'            =>[1, \&_minute],
-        'month'                =>[1, \&_month],
-        'monthname'            =>[1, \&_monthname],
-        'number_format'        =>[4, \&_number_format],
-        'power'                =>[2, \&_power],
-        'quarter'            =>[1, \&_quarter],
-        'rand'                =>[0, \&_rand],
-        'regexp'            =>[2, \&_regexp],
-        'replace'            =>[3, \&_replace],
-        'right'                =>[2, \&_right],
-        'second'            =>[1, \&_second],
-        'space'                =>[1, \&_space],
-        'sprintf'            =>[-1, \&_sprintf],
-        'to_days'            =>[1, \&_to_days],
-        # 'truncate'            =>[-1, \&_truncate],
-        'ucase'                =>[1, \&_ucase],
-        'unix_timestamp'    =>[1, \&_unix_timestamp],
-        'week'                =>[1, \&_week],
-        'weekday'            =>[1, \&_weekday],
-        'year'                =>[1, \&_year],
+        ceiling         =>[1, \&_ceiling],
+        concat          =>[-1, \&_concat],
+        curdate         =>[0, \&_curdate],
+        curtime         =>[0, \&_curtime],
+        dayname         =>[1, \&_dayname],
+        dayofmonth      =>[1, \&_dayofmonth],
+        dayofweek       =>[1, \&_dayofweek],
+        dayofyear       =>[1, \&_dayofyear],
+        distance_miles  =>[4, \&_distance_miles],
+        # from_days     =>[-1, \&_from_days],
+        from_unixtime   =>[1, \&_from_unixtime],
+        hour            =>[1, \&_hour],
+        lcase           =>[1, \&_lcase],
+        left            =>[2, \&_left],
+        locate          =>[2, \&_locate],
+        log10           =>[1, \&_log10],
+        minute          =>[1, \&_minute],
+        month           =>[1, \&_month],
+        monthname       =>[1, \&_monthname],
+        number_format   =>[4, \&_number_format],
+        power           =>[2, \&_power],
+        quarter         =>[1, \&_quarter],
+        rand            =>[0, \&_rand],
+        regexp          =>[2, \&_regexp],
+        replace         =>[3, \&_replace],
+        right           =>[2, \&_right],
+        second          =>[1, \&_second],
+        space           =>[1, \&_space],
+        sprintf         =>[-1, \&_sprintf],
+        to_days         =>[1, \&_to_days],
+        # truncate      =>[-1, \&_truncate],
+        ucase           =>[1, \&_ucase],
+        unix_timestamp  =>[1, \&_unix_timestamp],
+        week            =>[1, \&_week],
+        weekday         =>[1, \&_weekday],
+        year            =>[1, \&_year],
     };
-    ## See compile_options method
-    ## This is very useful to know which features can be used
+    # See compile_options method
+    # This is very useful to know which features can be used
     our $COMPILE_OPTIONS = [];
 }
 
-## Get/set alias
-## sub alias
+sub init
+{
+    my $self = shift( @_ );
+    $self->SUPER::init( @_ );
+    $self->{driver} = 'SQLite';
+    $self->{_func} = {};
+    return( $self );
+}
 
-## sub as_string
+# Get/set alias
+# sub alias
 
-## sub avoid
+# sub as_string
+
+# sub avoid
 
 sub attribute($;$@)
 {
     my $self = shift( @_ );
-    ## $h->{AttributeName} = ...;    # set/write
-    ## ... = $h->{AttributeName};    # get/read
-    ## 1 means that the attribute may be modified
-    ## 0 mneas that the attribute may only be read
+    # $h->{AttributeName} = ...;    # set/write
+    # ... = $h->{AttributeName};    # get/read
+    # 1 means that the attribute may be modified
+    # 0 mneas that the attribute may only be read
     my $name  = shift( @_ ) if( @_ == 1 );
     my %arg   = ( @_ );
-    my %attr  = 
+    my %attr =
     (
-    'InactiveDestroy'        => 1, 
-    'AutoInactiveDestroy'    => 1,
-    'RaiseError'            => 1, 
-    'PrintError'            => 1, 
-    'ShowErrorStatement'    => 1,
-    'Warn'                    => 1, 
-    'Executed'                => 0,
-    'TraceLevel'            => 1,
-    'Kids'                    => 0,
-    'ActiveKids'            => 0, 
-    'CachedKids'            => 0,
-    'ChildHandles'            => 0,
-    'PrintWarn'                => 1,
-    'HandleError'            => 1,
-    'HandleSetErr'            => 1,
-    'ErrCount'                => 1,
-    'FetchHashKeyName'        => 1,
-    'ChopBlanks'            => 1,
-    'Taint'                    => 1,
-    'TaintIn'                => 1,
-    'TaintOut'                => 1,
-    'Profile'                => 1,
-    'Type'                    => 1,
-    ## Not used
-    ## 'LongReadLen'            => 1,
-    ## 'LongTruncOk'            => 1,
-    ## 'CompatMode'            => 1,
-    'AutoCommit'            => 1, 
-    'Name'                    => 0, 
-    'RowCacheSize'            => 0, 
-    'NUM_OF_FIELDS'            => 0, 
-    'NUM_OF_PARAMS'            => 0, 
-    'NAME'                    => 0, 
-    'TYPE'                    => 0, 
-    'PRECISION'                => 0, 
-    'SCALE'                    => 0, 
-    'NULLABLE'                => 0, 
-    'CursorName'            => 0, 
-    'Statement'                => 0, 
-    'RowsInCache'            => 0, 
-    ## Current database name
-    'Name'                    => 0,
-    'Username'                => 0,
-    'Driver'                => 0,
-    'sqlite_version'        => 0,
-    'sqlite_unicode'        => 1,
-    ## If you set this to true, "do" method will process multiple statements at one go.
-    ## This may be handy, but with performance penalty. See above for details.
-    'sqlite_allow_multiple_statements' => 1,
-    ## If you set this to true, DBD::SQLite tries to issue a "begin immediate transaction"
-    ## (instead of "begin transaction") when necessary.
-    'sqlite_use_immediate_transaction' => 1,
-    ## If you set this to true, DBD::SQLite tries to see if the bind values are number or
-    ## not, and does not quote if they are numbers.
-    'sqlite_see_if_its_a_number' => 1,
-    ## Returns an unprepared part of the statement you pass to "prepare".  Typically this
-    ## contains nothing but white spaces after a semicolon. 
-    'sqlite_unprepared_statements' => 0,
+        ActiveKids                       => 0,
+        AutoCommit                       => 1,
+        AutoInactiveDestroy              => 1,
+        CachedKids                       => 0,
+        ChildHandles                     => 0,
+        ChopBlanks                       => 1,
+        CursorName                       => 0,
+        Driver                           => 0,
+        ErrCount                         => 1,
+        Executed                         => 0,
+        FetchHashKeyName                 => 1,
+        HandleError                      => 1,
+        HandleSetErr                     => 1,
+        InactiveDestroy                  => 1,
+        Kids                             => 0,
+        NAME                             => 0,
+        NULLABLE                         => 0,
+        NUM_OF_FIELDS                    => 0,
+        NUM_OF_PARAMS                    => 0,
+        # Current database name
+        Name                             => 0,
+        PRECISION                        => 0,
+        PrintError                       => 1,
+        PrintWarn                        => 1,
+        Profile                          => 1,
+        RaiseError                       => 1,
+        RowCacheSize                     => 0,
+        RowsInCache                      => 0,
+        SCALE                            => 0,
+        ShowErrorStatement               => 1,
+        Statement                        => 0,
+        TYPE                             => 0,
+        Taint                            => 1,
+        TaintIn                          => 1,
+        TaintOut                         => 1,
+        TraceLevel                       => 1,
+        Type                             => 1,
+        Username                         => 0,
+        Warn                             => 1,
+        # Not used
+        # LongReadLen                   => 1,
+        # LongTruncOk                   => 1,
+        # CompatMode                    => 1,
+        # If you set this to true, "do" method will process multiple statements at one go.
+        # This may be handy, but with performance penalty. See above for details.
+        sqlite_allow_multiple_statements => 1,
+        # If you set this to true, DBD::SQLite tries to see if the bind values are number or
+        # not, and does not quote if they are numbers.
+        sqlite_see_if_its_a_number       => 1,
+        sqlite_unicode                   => 1,
+        # Returns an unprepared part of the statement you pass to "prepare".  Typically this
+        # contains nothing but white spaces after a semicolon. 
+        sqlite_unprepared_statements     => 0,
+        # If you set this to true, DBD::SQLite tries to issue a "begin immediate transaction"
+        # (instead of "begin transaction") when necessary.
+        sqlite_use_immediate_transaction => 1,
+        sqlite_version                   => 0,
     );
-    ## Only those attribute exist
-    ## Using an a non existing attribute produce an exception, so we better avoid
+    # Only those attribute exist
+    # Using an a non existing attribute produce an exception, so we better avoid
     if( $name )
     {
-        return( $self->{ 'dbh' }->{ $name } ) if( exists( $attr{ $name } ) );
+        return( $self->{dbh}->{ $name } ) if( exists( $attr{ $name } ) );
     }
     else
     {
         my $value;
         while( ( $name, $value ) = each( %arg ) )
         {
-            ## We intend to modifiy the value of an attribute
-            ## we are allowed to modify this value if it is true
+            # We intend to modifiy the value of an attribute
+            # we are allowed to modify this value if it is true
             if( exists( $attr{ $name } ) && 
                 defined( $value ) && 
                 $attr{ $name } )
             {
-                $self->{ 'dbh' }->{ $name } = $value;
+                $self->{dbh}->{ $name } = $value;
             }
         }
     }
 }
 
-## sub available_drivers(@)
+# sub available_drivers(@)
 
 sub begin_work($;$@)
 {
@@ -210,14 +222,14 @@ sub begin_work($;$@)
     return( $self->{dbh}->begin_work( @_ ) );
 }
 
-## This method is common to DB::Object and DB::Object::Statement
-## sub bind
+# This method is common to DB::Object and DB::Object::Statement
+# sub bind
 
-## sub cache
+# sub cache
 
 sub can_update_delete_limit { return( shift->has_compile_option( 'ENABLE_UPDATE_DELETE_LIMIT' ) ); }
 
-## sub check_driver(@;$@)
+# sub check_driver(@;$@)
 
 sub commit($;$@)
 {
@@ -230,37 +242,40 @@ sub compile_options
 {
     my $self = shift( @_ );
     return( [ @$COMPILE_OPTIONS ] ) if( scalar( @$COMPILE_OPTIONS ) );
-    my $tmpdir = File::Spec->tmpdir();
-    my $compile_options_cache_file  = File::Spec->catfile( $tmpdir, 'sql_sqlite_compile_options.cfg' );
+    my $system_tmpdir = sys_tmpdir();
+    my $compile_options_cache_file = $system_tmpdir->join( 'sql_sqlite_compile_options.cfg' );
     my @options = ();
-    if( -e( $compile_options_cache_file ) && !-z( $compile_options_cache_file ) )
+    # if( -e( $compile_options_cache_file ) && !-z( $compile_options_cache_file ) )
+    if( $compile_options_cache_file->exists && !$compile_options_cache_file->is_empty )
     {
-        my $fh = IO::File->new( "<$compile_options_cache_file" ) || return( $self->error( "Unable to read the sqlite compile options cache file \"$compile_options_cache_file\": $!" ) );
+        # my $fh = IO::File->new( "<$compile_options_cache_file" ) || return( $self->error( "Unable to read the sqlite compile options cache file \"$compile_options_cache_file\": $!" ) );
+        my $fh = $compile_options_cache_file->open( '<' ) || return( $self->error( "Unable to read the sqlite compile options cache file \"$compile_options_cache_file\": ", $compile_options_cache_file->error ) );
         my @all = $fh->getlines;
-        ## Remove any comments
+        # Remove any comments
         @options = grep( !/^#/, @all );
         $fh->close;
         if( scalar( @options ) )
         {
             $COMPILE_OPTIONS = \@options;
-            ## Return a copy only to be safe
+            # Return a copy only to be safe
             return( [ @options ] );
         }
     }
-    ## If the cache file does not yet exists or there is no options, we do the query
+    # If the cache file does not yet exists or there is no options, we do the query
     my $dbh = $self->{dbh} || return( $self->error( "No active database handler available. You can only call this method once a database connection has been made." ) );
     my $all = $self->do( "PRAGMA compile_options" )->fetchall_arrayref;
     @options = map( $_->[0], @$all );
-    my $fh = IO::File->new( ">$compile_options_cache_file" ) || return( $self->error( "Unable to write to sqlite compile options cache file \"$compile_options_cache_file\": $!" ) );
-    $fh->autoflush( 1 );
+    # my $fh = IO::File->new( ">$compile_options_cache_file" ) || return( $self->error( "Unable to write to sqlite compile options cache file \"$compile_options_cache_file\": $!" ) );
+    my $fh = $compile_options_cache_file->open( '>' ) || return( $self->error( "Unable to write to sqlite compile options cache file \"$compile_options_cache_file\": ", $compile_options_cache_file->error ) );
+    $fh->autoflush(1);
     $fh->print( join( "\n", @options ), "\n" ) || return( $self->error( "Unable to write to the sqlite compile options cache file \"$compile_options_cache_file\": $!" ) );
     $fh->close;
     $COMPILE_OPTIONS = \@options;
     return( \@options );
 }
 
-## Inherited by DB::Object, however, DB::Object::connect() will call our subroutine 
-## _dbi_connect which format in a particular way the dsn.
+# Inherited by DB::Object, however, DB::Object::connect() will call our subroutine 
+# _dbi_connect which format in a particular way the dsn.
 sub connect
 {
     my $that  = shift( @_ );
@@ -270,16 +285,16 @@ sub connect
     return( $that->SUPER::connect( $param ) );
 }
 
-## sub copy
+# sub copy
 
-## sub create_table($;%)
+# sub create_table($;%)
 
-## See DB::Object
-## sub data_sources($;\%)
+# See DB::Object
+# sub data_sources($;\%)
 
-## sub data_type
+# sub data_type
 
-## sub database
+# sub database
 
 sub database_file
 {
@@ -289,10 +304,10 @@ sub database_file
 sub databases
 {
     my $self = shift( @_ );
-    ## return( $self->error( "Not connected to PostgreSQL server yet. Issue $dbh->connect first." ) ) if( !$self->{ 'dbh' } );
+    # return( $self->error( "Not connected to PostgreSQL server yet. Issue $dbh->connect first." ) ) if( !$self->{dbh} );
     my $dbh;
-    ## If there is no connection yet, then create one using the postgres login.
-    ## There should not be a live user and database just to check what databases there are.
+    # If there is no connection yet, then create one using the postgres login.
+    # There should not be a live user and database just to check what databases there are.
     if( !$self->{dbh} )
     {
         try
@@ -310,7 +325,7 @@ sub databases
         $self->message( 3, "Already have a connection database handler '$self->{dbh}'" );
         $dbh = $self;
     }
-    my $temp = $dbh->do( "PRAGMA database_list" )->fetchall_arrayref( {} );
+    my $temp = $dbh->do( 'PRAGMA database_list' )->fetchall_arrayref( {} );
     my @dbases = map( $_->{name}, @$temp );
     return( @dbases );
 }
@@ -319,18 +334,18 @@ sub func
 {
     my $self      = shift( @_ );
     my $table     = shift( @_ );
-    ## e.g. table_attributes to get the detail information on table columns
+    # e.g. table_attributes to get the detail information on table columns
     my $func_name = shift( @_ );
-    ## Returns:
-    ## NAME        attribute name
-    ## TYPE        attribute type
-    ## SIZE        attribute size (-1 for variable size)
-    ## NULLABLE    flag nullable
-    ## DEFAULT     default value
-    ## CONSTRAINT  constraint
-    ## PRIMARY_KEY flag is_primary_key
-    ## REMARKS     attribute description
-    return( $self->{ 'dbh' }->func( $table, $func_name ) );
+    # Returns:
+    # NAME        attribute name
+    # TYPE        attribute type
+    # SIZE        attribute size (-1 for variable size)
+    # NULLABLE    flag nullable
+    # DEFAULT     default value
+    # CONSTRAINT  constraint
+    # PRIMARY_KEY flag is_primary_key
+    # REMARKS     attribute description
+    return( $self->{dbh}->func( $table, $func_name ) );
 }
 
 sub having
@@ -340,7 +355,7 @@ sub having
     return( $q->having( @_ ) );
 }
 
-## https://www.sqlite.org/compile.html
+# https://www.sqlite.org/compile.html
 sub has_compile_option
 {
     my $self = shift( @_ );
@@ -352,47 +367,54 @@ sub has_compile_option
     return( '' );
 }
 
-sub init
-{
-    my $self = shift( @_ );
-    $self->SUPER::init( @_ );
-    $self->{driver} = 'SQLite';
-    $self->{_func} = {};
-    return( $self );
-}
-
 sub last_insert_id
 {
     my $self  = shift( @_ );
-    my $table = shift( @_ ) || $self->{ 'table' };
-    return( $self->{ 'dbh' }->last_insert_id( undef, undef, $table, undef ) );
+    my $table = shift( @_ ) || $self->{table};
+    return( $self->{dbh}->last_insert_id( undef, undef, $table, undef ) );
 }
 
-## http://www.postgresql.org/docs/current/static/sql-lock.html
 sub lock { return( shift->error( "Table lock is unsupported in SQLite." ) ); }
+
+sub on_conflict
+{
+    my $self = shift( @_ );
+    my $q = $self->_reset_query;
+    return( $q->on_conflict( @_ ) ) if( !defined( wantarray() ) );
+    if( wantarray() )
+    {
+        my( @val ) = $q->on_conflict( @_ ) || return( $self->pass_error( $q->error ) );
+        return( @val );
+    }
+    else
+    {
+        my $val = $q->on_conflict( @_ ) || return( $self->pass_error( $q->error ) );
+        return( $val );
+    }
+}
 
 sub pragma
 {
     my $self = shfit( @_ );
     my $key2val =
     {
-    'foreign_keys'    => [ qw( ON OFF ) ],
-    'journal_mode'    => [ qw( DELETE TRUNCATE ) ],
-    'legacy_file_format'    => [ qw( ON OFF ) ],
-    'reverse_unordered_selects'    => [ qw( ON OFF ) ],
-    'synchronous'    => [ qw( ON OFF ) ],
-    ## To avoid corruption after BEGIN starts, DBD uses BEGIN IMMEDIATE. Default is TRUE
-    'sqlite_use_immediate_transaction' => [ qw( 1 0 ) ],
-    'cache_size' => qr/^\d+$/
+    foreign_keys                      => [ qw( ON OFF ) ],
+    journal_mode                      => [ qw( DELETE TRUNCATE ) ],
+    legacy_file_format                => [ qw( ON OFF ) ],
+    reverse_unordered_selects         => [ qw( ON OFF ) ],
+    synchronous                       => [ qw( ON OFF ) ],
+    # To avoid corruption after BEGIN starts, DBD uses BEGIN IMMEDIATE. Default is TRUE
+    sqlite_use_immediate_transaction  => [ qw( 1 0 ) ],
+    cache_size                        => qr/^\d+$/
     };
 }
 
 sub query_object { return( shift->_set_get_object( 'query_object', 'DB::Object::SQLite::Query', @_ ) ); }
 
-## https://www.sqlite.org/lang_replace.html
-## https://www.sqlite.org/lang_conflict.html
-## REPLACE is an alias for INSERT OR REPLACE
-## https://www.sqlite.org/lang_insert.html
+# https://www.sqlite.org/lang_replace.html
+# https://www.sqlite.org/lang_conflict.html
+# REPLACE is an alias for INSERT OR REPLACE
+# https://www.sqlite.org/lang_insert.html
 sub replace
 {
     my $self = shift( @_ );
@@ -409,15 +431,15 @@ sub replace
         $select = $data->as_string();
     }
     %arg = @arg if( @arg );
-    my $table   = $self->{ 'table' } ||
+    my $table   = $self->{table} ||
     return( $self->error( "No table was provided to replace data." ) );
     my $structure = $self->structure();
     my $null      = $self->null();
     my @avoid     = ();
     foreach my $field ( keys( %$structure ) )
     {
-        ## It is useless to insert a blank data in a field whose default value is NULL.
-        ## Especially since a test on a NULL field may be made specifically.
+        # It is useless to insert a blank data in a field whose default value is NULL.
+        # Especially since a test on a NULL field may be made specifically.
         push( @avoid, $field ) if( !CORE::exists( $arg{ $field } ) && $null->{ $field } );
     }
     my $db_data = $self->getdefault({
@@ -427,16 +449,16 @@ sub replace
     });
     my( $fields, $values ) = $db_data->format_statement();
     $self->_reset_query();
-    delete( $self->{ 'query_reset' } );
-    $self->{ 'binded_values' } = $db_data->{ 'binded_values' };
-    my $query = $self->{ 'query' } = $select ? "REPLACE INTO $table $select" : "REPLACE INTO $table ($fields) VALUES($values)";
-    ## Everything meaningfull lies within the object
-    ## If no bind should be done _save_bind does nothing
+    delete( $self->{query_reset} );
+    $self->{binded_values} = $db_data->{binded_values};
+    my $query = $self->{query} = $select ? "REPLACE INTO $table $select" : "REPLACE INTO $table ($fields) VALUES($values)";
+    # Everything meaningfull lies within the object
+    # If no bind should be done _save_bind does nothing
     $self->_save_bind();
-    ## Query string should lie within the object
-    ## _cache_this sends back an object no matter what or unde() if an error occurs
+    # Query string should lie within the object
+    # _cache_this sends back an object no matter what or unde() if an error occurs
     my $sth = $self->_cache_this();
-    ## STOP! No need to go further
+    # STOP! No need to go further
     if( !defined( $sth ) )
     {
         return( $self->error( "Error while preparing query to replace data into table '$table':\n$query", $self->errstr() ) );
@@ -477,6 +499,13 @@ sub remove_function
     return( CORE::delete( $funcs->{ $name } ) );
 }
 
+sub returning
+{
+    my $self  = shift( @_ );
+    my $q = $self->_reset_query;
+    return( $q->returning( @_ ) );
+}
+
 sub rollback
 {
     return( shift->{dbh}->rollback() );
@@ -503,12 +532,11 @@ sub sql_function_register
     $opts->{_registered_on} = time();
 }
 
-## http://www.sqlite.org/c3ref/c_status_malloc_count.html
+# http://www.sqlite.org/c3ref/c_status_malloc_count.html
 sub stat
 {
     my $self = shift( @_ );
-    my $opt  = {};
-    $opt     = shift( @_ ) if( $self->_is_hash( $_[0] ) );
+    my $opt  = $self->_get_args_as_hash( @_ );
     my $ref  = $opt->{reset} ? DBD::SQLite::sqlite_status( 0 ) : DBD::SQLite::sqlite_status();
     if( $opt->{type} )
     {
@@ -537,10 +565,10 @@ sub stat
 #     {
 #         return( 1 ) if( $ref->{name} eq $table );
 #     }
-#     ## We did not find it, so let's try by checking directly the database
-#     my $def = $self->table_info( $table ) || return( undef() );
-#     return( 0 ) if( !scalar( @$def ) );
-#     return( 1 );
+#     # We did not find it, so let's try by checking directly the database
+#     my $def = $self->table_info( $table ) || return;
+#     return(0) if( !scalar( @$def ) );
+#     return(1);
 # }
 
 sub table_info
@@ -568,7 +596,7 @@ EOT
 sub tables
 {
     my $self = shift( @_ );
-    my $db   = shift( @_ ) || $self->{ 'database' };
+    my $db   = shift( @_ ) || $self->{database};
     my $all  = $self->tables_info || return;
     my @tables = map( $_->{name}, @$all );
 #     return( wantarray() ? () : undef() ) if( !@tables );
@@ -579,12 +607,12 @@ sub tables
 sub tables_info
 {
     my $self = shift( @_ );
-    my $db   = shift( @_ ) || $self->{ 'database' };
-    ## Parameters are: ?, schema, table, and type
-    ## my $sth  =  $self->{ 'dbh' }->table_info( undef, undef, $table, "TABLE,VIEW" );
-    ## The original query was fetched by connecting to Postgres with psql -E and executing the command \z
-    ## This revised query will fetch only tables, views, materialised view and foreign tables, but will avoid the mysterious view called sequence_setvals
-    ## https://stackoverflow.com/questions/82875/how-to-list-the-tables-in-a-sqlite-database-file-that-was-opened-with-attach
+    my $db   = shift( @_ ) || $self->{database};
+    # Parameters are: ?, schema, table, and type
+    # my $sth  =  $self->{dbh}->table_info( undef, undef, $table, "TABLE,VIEW" );
+    # The original query was fetched by connecting to Postgres with psql -E and executing the command \z
+    # This revised query will fetch only tables, views, materialised view and foreign tables, but will avoid the mysterious view called sequence_setvals
+    # https://stackoverflow.com/questions/82875/how-to-list-the-tables-in-a-sqlite-database-file-that-was-opened-with-attach
     my $query = <<SQL;
 SELECT name FROM sqlite_master
   WHERE type IN ('table','view') AND name NOT LIKE 'sqlite_%'
@@ -609,18 +637,18 @@ sub variables
     return( shift->error( "variables is currently unsupported in Postgres" ) );
 }
 
-## https://www.sqlite.org/versionnumbers.html
+# https://www.sqlite.org/versionnumbers.html
 sub version
 {
     my $self  = shift( @_ );
-    ## If we already have the information, let's use our cache instead of making a query
-    return( $self->{ '_db_version' } ) if( length( $self->{ '_db_version' } ) );
+    # If we already have the information, let's use our cache instead of making a query
+    return( $self->{_db_version} ) if( length( $self->{_db_version} ) );
     my $sql = 'SELECT sqlite_version()';
     my $sth = $self->do( $sql ) || return( $self->error( "Unable to issue the sql statement '$sql' to get the server version: ", $self->errstr ) );
     my $ver = $sth->fetchrow;
     $sth->finish;
-    ## We cache it
-    $self->{ '_db_version' } = $ver;
+    # We cache it
+    $self->{_db_version} = version->parse( $ver );
     return( $ver );
 }
 
@@ -634,18 +662,18 @@ sub _check_connect_param
         my $uri = CORE::exists( $param->{uri} ) ? $param->{uri} : '';
         my $db = $param->{database} ? $param->{database} : ( $uri->path_segments )[-1];
         $path = $uri ? $uri->path : $db;
-        ## $db = Cwd::abs_path( $uri ? $uri->path : $db );
+        # $db = Cwd::abs_path( $uri ? $uri->path : $db );
         $db = File::Spec->rel2abs( $path );
-        ## If we cannot find the file and it does not end with .sqlite, let's add the extension
-        ## So the user can provide the database parameter just like database => 'test' or database => './test'
+        # If we cannot find the file and it does not end with .sqlite, let's add the extension
+        # So the user can provide the database parameter just like database => 'test' or database => './test'
         $db = "$db.sqlite" if( !-e( $db ) && $db !~ /\.sqlite$/i );
         ( $filename, $path, $ext ) = File::Basename::fileparse( $db, qr/\.[^\.]+$/ );
         $self->message( 3, "Database file path is '$path', file name '$filename' and extension '$ext'." );
         $param->{database} = $filename;
         $param->{database_file} = $self->{database_file} = $db;
     }
-    $param->{ 'host' } = 'localhost' if( !length( $param->{ 'host' } ) );
-    $param->{ 'port' } = 0 if( !length( $param->{ 'port' } ) );
+    $param->{host} = 'localhost' if( !length( $param->{host} ) );
+    $param->{port} = 0 if( !length( $param->{port} ) );
     $self->message( 3, "Returning parameters: ", sub{ $self->dumper( $param ) } );
     return( $param );
 }
@@ -653,8 +681,7 @@ sub _check_connect_param
 sub _check_default_option
 {
     my $self = shift( @_ );
-    my $opts = {};
-    $opts = shift( @_ ) if( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
     return( $self->error( "Provided option is not a hash reference." ) ) if( !$self->_is_hash( $opts ) );
     $opts->{sqlite_unicode} = 1 if( !CORE::exists( $opts->{sqlite_unicode} ) );
     return( $opts );
@@ -666,7 +693,7 @@ sub _connection_options
     my $param = shift( @_ );
     my @sqlite_params = grep( /^sqlite_/, keys( %$param ) );
     my $opt = $self->SUPER::_connection_options( $param );
-    ## $self->message( 3, "Inherited options are: ", sub{ $self->dumper( $opt ) } );
+    # $self->message( 3, "Inherited options are: ", sub{ $self->dumper( $opt ) } );
     @$opt{ @sqlite_params } = @$param{ @sqlite_params };
     return( $opt );
 }
@@ -675,12 +702,12 @@ sub _connection_parameters
 {
     my $self  = shift( @_ );
     my $param = shift( @_ );
-    ## Even though login, password, server, host are not used, I was hesitating, but decided to leave them as ok, and ignore them
-    ## Or maybe should I issue an error when they are provided?
+    # Even though login, password, server, host are not used, I was hesitating, but decided to leave them as ok, and ignore them
+    # Or maybe should I issue an error when they are provided?
     my $core = [qw( db login passwd host port driver database server opt uri debug )];
     my @sqlite_params = grep( /^sqlite_/, keys( %$param ) );
-    ## See DBD::SQLite for the list of valid parameters
-    ## E.g.: sqlite_open_flags sqlite_busy_timeout sqlite_use_immediate_transaction sqlite_see_if_its_a_number sqlite_allow_multiple_statements sqlite_unprepared_statements sqlite_unicode sqlite_allow_multiple_statements sqlite_use_immediate_transaction
+    # See DBD::SQLite for the list of valid parameters
+    # E.g.: sqlite_open_flags sqlite_busy_timeout sqlite_use_immediate_transaction sqlite_see_if_its_a_number sqlite_allow_multiple_statements sqlite_unprepared_statements sqlite_unicode sqlite_allow_multiple_statements sqlite_use_immediate_transaction
     push( @$core, @sqlite_params );
     return( $core );
 }
@@ -690,16 +717,16 @@ sub _dbi_connect
     my $self = shift( @_ );
     my $dbh  = $self->{dbh} = $self->SUPER::_dbi_connect( @_ );
     $self->message( 3, "Database handler returned from dbi_connect is '$dbh'" );
-    ## my $func = $self->{_func};
+    # my $func = $self->{_func};
     my $func = $self->{ '_func' };
     foreach my $k ( sort( keys( %$PRIVATE_FUNCTIONS ) ) )
     {
         my $this = $PRIVATE_FUNCTIONS->{ $k };
         my $ref =
         {
-        'name' => $k,
-        'argc' => $this->[0],
-        'code' => $this->[1],
+        name => $k,
+        argc => $this->[0],
+        code => $this->[1],
         };
         $func->{ $k } = $ref;
     }
@@ -707,13 +734,13 @@ sub _dbi_connect
     foreach my $name ( sort( keys( %$func ) ) )
     {
         my $ref = $func->{ $name };
-        if( $ref->{ '_registered_on' } )
+        if( $ref->{_registered_on} )
         {
-            $self->message( 3, "Function $ref->{name} already added on ", scalar( localtime( $ref->{ '_registered_on' } ) ) );
+            $self->message( 3, "Function $ref->{name} already added on ", scalar( localtime( $ref->{_registered_on} ) ) );
             next;
         }
         $self->sql_function_register( $ref );
-        $ref->{ '_registered_on' } = time();
+        $ref->{_registered_on} = time();
     }
     return( $dbh );
 }
@@ -733,21 +760,21 @@ sub _parse_timestamp
 {
     my $self = shift( @_ );
     my $str  = shift( @_ );
-    ## No value was actually provided
+    # No value was actually provided
     return if( !length( $str ) );
     my $tz = DateTime::TimeZone->new( name => 'local' );
     my $error = 0;
     my $opt = 
     {
-    pattern   => '%Y-%m-%d %T',
-    locale    => 'en_GB',
-    time_zone => $tz->name,
-    on_error => sub{ $error++ },
+    pattern     => '%Y-%m-%d %T',
+    locale      => 'en_GB',
+    time_zone   => $tz->name,
+    on_error    => sub{ $error++ },
     };
     $self->message( 3, "Checking timestamp string '$str' for appropriate pattern" );
-    ## 2019-06-19 23:23:57.000000000+0900
-    ## From PostgreSQL: 2019-06-20 11:02:36.306917+09
-    ## ISO 8601: 2019-06-20T11:08:27
+    # 2019-06-19 23:23:57.000000000+0900
+    # From PostgreSQL: 2019-06-20 11:02:36.306917+09
+    # ISO 8601: 2019-06-20T11:08:27
     if( $str =~ /(\d{4})[-|\/](\d{1,2})[-|\/](\d{1,2})(?:[[:blank:]]+|T)(\d{1,2}:\d{1,2}:\d{1,2})(?:\.\d+)?((?:\+|\-)\d{2,4})?/ )
     {
         my( $date, $time, $zone ) = ( "$1-$2-$3", $4, $5 );
@@ -755,9 +782,9 @@ sub _parse_timestamp
         {
             my $dt = DateTime->now( time_zone => $tz );
             my $offset = $dt->offset;
-            ## e.g. 9 or possibly 9.5
+            # e.g. 9 or possibly 9.5
             my $offset_hour = ( $offset / 3600 );
-            ## e.g. 9.5 => 0.5 * 60 = 30
+            # e.g. 9.5 => 0.5 * 60 = 30
             my $offset_min  = ( $offset_hour - CORE::int( $offset_hour ) ) * 60;
             $zone  = sprintf( '%+03d%02d', $offset_hour, $offset_min );
         }
@@ -768,17 +795,17 @@ sub _parse_timestamp
         $self->message( 3, "\tChanging string to '$str'" );
         $opt->{pattern} = '%Y-%m-%d %T%z';
     }
-    ## From SQLite: 2019-06-20 02:03:14
-    ## From MySQL: 2019-06-20 11:04:01
+    # From SQLite: 2019-06-20 02:03:14
+    # From MySQL: 2019-06-20 11:04:01
     elsif( $str =~ /(\d{4})[-|\/](\d{1,2})[-|\/](\d{1,2})(?:[[:blank:]]+|T)(\d{1,2}:\d{1,2}:\d{1,2})/ )
     {
         my( $date, $time ) = ( "$1-$2-$3", $4 );
         $self->message( 3, "\tMatched pattern #2 with date '$date', time '$time' and without time zone." );
         my $dt = DateTime->now( time_zone => $tz );
         my $offset = $dt->offset;
-        ## e.g. 9 or possibly 9.5
+        # e.g. 9 or possibly 9.5
         my $offset_hour = ( $offset / 3600 );
-        ## e.g. 9.5 => 0.5 * 60 = 30
+        # e.g. 9.5 => 0.5 * 60 = 30
         my $offset_min  = ( $offset_hour - CORE::int( $offset_hour ) ) * 60;
         my $offset_str  = sprintf( '%+03d%02d', $offset_hour, $offset_min );
         $date =~ tr/\//-/;
@@ -797,7 +824,7 @@ sub _parse_timestamp
     return( $dt );
 }
 
-## Private function
+# Private function
 sub _ceiling
 {
     my $self = shift( @_ );
@@ -817,8 +844,8 @@ sub _curdate
 {
     my $self = shift( @_ );
     my @args = @_;
-    my $tz = DateTime::TimeZone->new( 'name' => 'local' );
-    my $d = DateTime->from_epoch( 'epoch' => time(), 'time_zone' => $tz->name );
+    my $tz = DateTime::TimeZone->new( name => 'local' );
+    my $d = DateTime->from_epoch( epoch => time(), time_zone => $tz->name );
     return( $d->ymd( '-' ) );
 }
 
@@ -831,7 +858,7 @@ sub _curtime
     return( $d->hms( ':' ) );
 }
 
-## e.g. Monday
+# e.g. Monday
 sub _dayname
 {
     my $self = shift( @_ );
@@ -840,7 +867,7 @@ sub _dayname
     return( $dt->day_name );
 }
 
-## E.g.: 17
+# E.g.: 17
 sub _dayofmonth
 {
     my $self = shift( @_ );
@@ -849,7 +876,7 @@ sub _dayofmonth
     return( $dt->day );
 }
 
-## timestamp, [integer] 1 to 7
+# timestamp, [integer] 1 to 7
 sub _dayofweek
 {
     my $self = shift( @_ );
@@ -858,7 +885,7 @@ sub _dayofweek
     return( $dt->day_of_week );
 }
 
-## E.g.: 170
+# E.g.: 170
 sub _dayofyear
 {
     my $self = shift( @_ );
@@ -867,7 +894,7 @@ sub _dayofyear
     return( $dt->day_of_year );
 }
 
-## http://stackoverflow.com/questions/10034636/postgres-longitude-longitude-query
+# http://stackoverflow.com/questions/10034636/postgres-longitude-longitude-query
 sub _distance_miles
 {
     my $self = shift( @_ );
@@ -894,7 +921,7 @@ sub _from_days
         time_zone => $tz->name,
     );
     my $epoch = DateTime->from_epoch( epoch => 0, time_zone => $tz->name );
-    ## https://stackoverflow.com/questions/821423/how-can-i-calculate-the-number-of-days-between-two-dates-in-perl#7111718
+    # https://stackoverflow.com/questions/821423/how-can-i-calculate-the-number-of-days-between-two-dates-in-perl#7111718
     my $epoch_days = $epoch->delta_days( $origin )->delta_days();
     my $days_since_epoch = $from_days - int( $epoch_days );
     my $dt = DateTime->from_epoch( epoch => ( $days_since_epoch * 86400 ), time_zone => $tz->name );
@@ -906,7 +933,7 @@ sub _from_unixtime
     my $self = shift( @_ );
     my @args = @_;
     return if( $args[0] !~ /^\d+$/ );
-    my $dt = DateTime->from_epoch( 'epoch' => $args[0], time_zone => 'local' );
+    my $dt = DateTime->from_epoch( epoch => $args[0], time_zone => 'local' );
     return( $dt->strftime( '%Y-%m-%d %T%z' ) );
 }
 
@@ -982,11 +1009,11 @@ sub _number_format
         -decimal_point    => $dec,
         -decimal_digits    => $prec,
     );
-    ## 1 means with trailing zeros
+    # 1 means with trailing zeros
     return( $fmt->format_number( $num, $prec, 1 ) );
 }
 
-## 1000 produces 001,000
+# 1000 produces 001,000
 sub _number_format_v1_not_working
 {
     my $self = shift( @_ );
@@ -997,20 +1024,20 @@ sub _number_format_v1_not_working
     my $mul  = ( 10 ** $prec );
     my $res  = abs( $num );
     $res     = ( int( ( $res * $mul ) + .5000001 ) / $mul );
-    ## $num     = -$res if( $sign < 0 );
+    # $num     = -$res if( $sign < 0 );
     $res     = -$res if( $sign < 0 );
     $num     = $res;
     my $int  = int( $num );
     my $decimal;
     $decimal  = substr( $num, length( $int ) + 1 ) if( length( $int ) < length( $num ) );
     $decimal  = '' unless( defined( $decimal ) );
-    ## $decimal .= ''0'' x ( $prec - length( $decimal ) ) if( $prec > length( $decimal ) );
+    # $decimal .= ''0'' x ( $prec - length( $decimal ) ) if( $prec > length( $decimal ) );
     $int      = '0' x ( 3 - ( length( $int ) % 3 ) ) . $int;
     $int      = join( $tho, grep{ $_ ne '' } split( /(...)/, $int ) );
     $int      =~ s/^0+\\Q$tho\\E?//;dd
     $int      = '0' if( $int eq '' );
     $res      = ( ( defined( $decimal ) && length( $decimal ) ) ? join( $dec, $int, $decimal ) : $int );
-    ## $res      =~ s/^-//;
+    # $res      =~ s/^-//;
     return( ( $sign < 0 ) ? "-$res" : $res );
 }
 
@@ -1088,7 +1115,7 @@ sub _sprintf
     $self->message( 3, "\t evaluating with '$eval'." );
     my $res = eval( $eval );
     $self->message( 3, "\t returning '$res'." );
-    ## return( CORE::sprintf( @args ) );
+    # return( CORE::sprintf( @args ) );
     return( $res );
 }
 
@@ -1107,7 +1134,7 @@ sub _to_days
         second     => 0,
         time_zone => $tz->name,
     );
-    ## https://stackoverflow.com/questions/821423/how-can-i-calculate-the-number-of-days-between-two-dates-in-perl#7111718
+    # https://stackoverflow.com/questions/821423/how-can-i-calculate-the-number-of-days-between-two-dates-in-perl#7111718
     my $days = $dt->delta_days( $origin )->delta_days();
     return( $days );
 }
@@ -1163,25 +1190,25 @@ DESTROY
 {
     my $self  = shift( @_ );
     my $class = ref( $self ) || $self;
-    if( $self->{ 'sth' } )
+    if( $self->{sth} )
     {
-        ## $self->message( "DETROY(): Terminating sth '$self' for query:\n$self->{ 'query' }\n" );
-        print( STDERR "DESTROY(): Terminating sth '$self' for query:\n$self->{ 'query' }\n" ) if( $DEBUG );
-        $self->{ 'sth' }->finish();
+        # $self->message( "DETROY(): Terminating sth '$self' for query:\n$self->{ 'query' }\n" );
+        # print( STDERR "DESTROY(): Terminating sth '$self' for query:\n$self->{ 'query' }\n" ) if( $DEBUG );
+        $self->{sth}->finish();
     }
-    elsif( $self->{ 'dbh' } && $class =~ /^AI\:\:DB\:\:Postgres$/ )
+    elsif( $self->{dbh} && $class =~ /^AI\:\:DB\:\:Postgres$/ )
     {
-        local( $SIG{ '__WARN__' } ) = sub { };
-        ## $self->{ 'dbh' }->disconnect();
-        if( $DEBUG )
-        {
-            my( $pack, $file, $line, $sub ) = ( caller( 0 ) )[ 0, 1, 2, 3 ];
-            my( $pack2, $file2, $line2, $sub2 ) = ( caller( 1 ) ) [ 0, 1, 2, 3 ];
-            print( STDERR "DESTROY database handle ($self) [$self->{ 'query' }]\ncalled within sub '$sub' ($sub2) from package '$pack' ($pack2) in file '$file' ($file2) at line '$line' ($line2).\n" );
-        }
+        local( $SIG{__WARN__} ) = sub { };
+        # $self->{dbh}->disconnect();
+#         if( $DEBUG )
+#         {
+#             my( $pack, $file, $line, $sub ) = ( caller( 0 ) )[ 0, 1, 2, 3 ];
+#             my( $pack2, $file2, $line2, $sub2 ) = ( caller( 1 ) ) [ 0, 1, 2, 3 ];
+#             print( STDERR "DESTROY database handle ($self) [$self->{ 'query' }]\ncalled within sub '$sub' ($sub2) from package '$pack' ($pack2) in file '$file' ($file2) at line '$line' ($line2).\n" );
+#         }
         $self->disconnect();
     }
-    my $locks = $self->{ '_locks' };
+    my $locks = $self->{_locks};
     if( $locks && $self->_is_array( $locks ) )
     {
         foreach my $name ( @$locks )
@@ -1193,33 +1220,34 @@ DESTROY
 
 END
 {
-    ## foreach my $dbh ( @DBH )
-    ## {
-    ##     $dbh->disconnect();
-    ## }
+    # foreach my $dbh ( @DBH )
+    # {
+    #     $dbh->disconnect();
+    # }
 };
 
 1;
 
 __END__
+
 =encoding utf8
 
 =head1 NAME
 
-DB::Object::Postgres - SQL API
+DB::Object::SQLite - DB Object SQLite Driver
 
 =head1 SYNOPSIS
 
     use DB::Object;
 
     my $dbh = DB::Object->connect({
-    driver => 'SQLite',
-    conf_file => 'db-settings.json',
-    database => 'webstore',
-    host => 'localhost',
-    login => 'store-admin',
-    schema => 'auth',
-    debug => 3,
+        driver => 'SQLite',
+        conf_file => 'db-settings.json',
+        database => 'webstore',
+        host => 'localhost',
+        login => 'store-admin',
+        schema => 'auth',
+        debug => 3,
     }) || bailout( "Unable to connect to sql server on host localhost: ", DB::Object->error );
     
     # Legacy regular query
@@ -1264,7 +1292,7 @@ DB::Object::Postgres - SQL API
     $result = $cust_sth_ins->as_string;
     # INSERT INTO customers (first_name, last_name, email, active) VALUES('Paul', 'Goldman', 'paul\@example.org', '0')
     $dbh->commit;
-    ## Get the last used insert id
+    # Get the last used insert id
     my $id = $dbh->last_insert_id();
     
     $cust->where( email => 'john@example.org' );
@@ -1281,17 +1309,19 @@ DB::Object::Postgres - SQL API
     # Would become:
     # UPDATE ONLY customers SET active='0' WHERE email='john\@example.org'
     
-    ## Lets' dump the result of our query
-    ## First to STDERR
+    # Lets' dump the result of our query
+    # First to STDERR
     $login->where( "login='jack'" );
     $login->select->dump();
-    ## Now dump the result to a file
+    # Now dump the result to a file
     $login->select->dump( "my_file.txt" );
     
 =head1 DESCRIPTION
 
-L<DB::Object::Postgres> is a SQL API much alike L<DBD::Pg>.
-So why use a private module instead of using that great L<DBD::Pg> package?
+This package inherits from L<DB::Object>, so any method not here, but there you can use.
+
+L<DB::Object::SQLite> is a SQL API much alike L<DBD::SQLite>.
+So why use a private module instead of using that great L<DBD::SQLite> package?
 
 At first, I started to inherit from C<DBI> to conform to C<perlmod> perl 
 manual page and to general perl coding guidlines. It became very quickly a 
@@ -1299,104 +1329,36 @@ real hassle. Barely impossible to inherit, difficulty to handle error, too
 much dependent from an API that change its behaviour with new versions.
 In short, I wanted a better, more accurate control over the SQL connection.
 
-So, L<DB::Object::Postgres> acts as a convenient, modifiable wrapper that provide the
+So, L<DB::Object::SQLite> acts as a convenient, modifiable wrapper that provide the
 programmer with an intuitive, user-friendly and hassle free interface.
 
 =head1 CONSTRUCTOR
 
-=over 4
+=head2 new
 
-=item B<new>()
+Create a new instance of L<DB::Object::SQLite>. Nothing much to say.
 
-Create a new instance of L<DB::Object::Postgres>. Nothing much to say.
+=head2 connect
 
-=item B<connect>( DATABASE, LOGIN, PASSWORD, SERVER, DRIVER )
+Same as L<DB::Object/connect>, only specific to SQLite.
 
-Create a new instance of L<DB::Object::Postgres>, but also attempts a conection
-to SQL server.
-
-You can specify the following arguments:
-
-=over 8
-
-=item I<DATABASE>
-
-The database name you wish to connect to
-
-=item I<LOGIN>
-
-The login used to access that database
-
-=item I<PASSWORD>
-
-The password that goes along
-
-=item I<SERVER>
-
-The server, that is hostname of the machine serving a SQL server.
-
-=item I<DRIVER>
-
-The driver you want to use. It needs to be of the same type than the server
-you want to connect to. If you are connecting to a MySQL server, you would use
-C<mysql>, if you would connecto to an Oracle server, you would use C<oracle>.
-
-You need to make sure that those driver are properly installed in the system 
-before attempting to connect.
-
-To install the required driver, you could start with the command line:
-
-    perl -MCPAN -e shell
-
-which will provide you a special shell to install modules in a convenient way.
-
-=back
-
-=back
+See L</_connection_params2hash>
 
 =head1 METHODS
 
-=over 4
+=head2 alias
 
-=item B<clear>()
+This is inherited from L<DB::Object/alias>
 
-Reset error message.
+=head2 as_string
 
-=item B<debug>( [ 0 | 1 ] )
+This is inherited from L<DB::Object/as_string>
 
-Toggle debug mode on/off
+=head2 avoid
 
-=item B<error>( [ $string ] )
+This is inherited from L<DB::Object/avoid>
 
-Get set error message.
-If an error message is provided, B<error> will pass it to B<warn>.
-
-=item B<get>( $parameter )
-
-Get object parameter.
-
-=item B<message>( $string )
-
-Provided a multi line string, B<message> will display it on the STDERR if either I<verbose> or I<debug> mode is on.
-
-=item B<verbose>()
-
-Toggle verbose mode on/off
-
-=item B<alias>( %parameters )
-
-Get/set alias for table fields in SELECT queries. The hash provided thus contain a list of field => alias pairs.
-
-=item B<as_string>()
-
-Return the sql query as a string.
-
-=item B<avoid>( [ @fields | \@fields ] )
-
-Set the provided list of table fields to avoid when returning the query result.
-The list of fields can be provided either as an array of a reference to an array.
-
-=item B<attribute>( $name | %names )
+=head2 attribute
 
 Sets or get the value of database connection parameters.
 
@@ -1405,426 +1367,311 @@ If multiple arguments in a form of pair => value are provided, it sets the corre
 
 The authorised parameters are:
 
-=over 8
-
-=item I<Warn>
-
-Can be overridden.
-
-=item I<Active>
-
-Read-only.
-
-=item I<Kids>
-
-Read-only.
+=over 4
 
 =item I<ActiveKids>
 
-Read-only.
-
-=item I<CachedKids>
-
-Read-only.
-
-=item I<InactiveDestroy>
-
-Can be overridden.
-
-=item I<PrintError>
-
-Can be overridden.
-
-=item I<RaiseError>
-
-Can be overridden.
-
-=item I<ChopBlanks>
-
-Can be overridden.
-
-=item I<LongReadLen>
-
-Can be overridden.
-
-=item I<LongTruncOk>
-
-Can be overridden.
+Is read-only.
 
 =item I<AutoCommit>
 
-Can be overridden.
+Can be changed.
 
-=item I<Name>
+=item I<AutoInactiveDestroy>
 
-Read-only.
+Can be changed.
 
-=item I<RowCacheSize>
+=item I<CachedKids>
 
-Read-only.
+Is read-only.
 
-=item I<NUM_OF_FIELDS>
+=item I<ChildHandles>
 
-Read-only.
+Is read-only.
 
-=item I<NUM_OF_PARAMS>
+=item I<ChopBlanks>
 
-Read-only.
-
-=item I<NAME>
-
-Read-only.
-
-=item I<TYPE>
-
-Read-only.
-
-=item I<PRECISION>
-
-Read-only.
-
-=item I<SCALE>
-
-Read-only.
-
-=item I<NULLABLE>
-
-Read-only.
+Can be changed.
 
 =item I<CursorName>
 
-Read-only.
+Is read-only.
 
-=item I<Statement>
+=item I<Driver>
 
-Read-only.
+Is read-only.
+
+=item I<ErrCount>
+
+Can be changed.
+
+=item I<Executed>
+
+Is read-only.
+
+=item I<FetchHashKeyName>
+
+Can be changed.
+
+=item I<HandleError>
+
+Can be changed.
+
+=item I<HandleSetErr>
+
+Can be changed.
+
+=item I<InactiveDestroy>
+
+Can be changed.
+
+=item I<Kids>
+
+Is read-only.
+
+=item I<NAME>
+
+Is read-only.
+
+=item I<NULLABLE>
+
+Is read-only.
+
+=item I<NUM_OF_FIELDS>
+
+Is read-only.
+
+=item I<NUM_OF_PARAMS>
+
+Is read-only.
+
+=item I<Name>
+
+Is read-only.
+
+=item I<PRECISION>
+
+Is read-only.
+
+=item I<PrintError>
+
+Can be changed.
+
+=item I<PrintWarn>
+
+Can be changed.
+
+=item I<Profile>
+
+Can be changed.
+
+=item I<RaiseError>
+
+Can be changed.
+
+=item I<RowCacheSize>
+
+Is read-only.
 
 =item I<RowsInCache>
 
-Read-only.
+Is read-only.
+
+=item I<SCALE>
+
+Is read-only.
+
+=item I<ShowErrorStatement>
+
+Can be changed.
+
+=item I<Statement>
+
+Is read-only.
+
+=item I<TYPE>
+
+Is read-only.
+
+=item I<Taint>
+
+Can be changed.
+
+=item I<TaintIn>
+
+Can be changed.
+
+=item I<TaintOut>
+
+Can be changed.
+
+=item I<TraceLevel>
+
+Can be changed.
+
+=item I<Type>
+
+Can be changed.
+
+=item I<Username>
+
+Is read-only.
+
+=item I<Warn>
+
+Can be changed.
+
+=item I<sqlite_allow_multiple_statements>
+
+Can be changed.
+
+=item I<sqlite_see_if_its_a_number>
+
+Can be changed.
+
+=item I<sqlite_unicode>
+
+Can be changed.
+
+=item I<sqlite_unprepared_statements>
+
+Is read-only.
+
+=item I<sqlite_use_immediate_transaction>
+
+Can be changed.
+
+=item I<sqlite_version>
+
+Is read-only.
 
 =back
 
-=item B<available_drivers>()
+=head2 available_drivers
 
 Return the list of available drivers.
 
-=item B<bind>( [ @values ] )
+This is an inherited method from L<DB::Object/available_drivers>
 
-If no values to bind to the underlying query is provided, B<bind> simply activate the bind value feature.
+=head2 begin_work
 
-If values are provided, they are allocated to the statement object and will be applied when the query will be executed.
+Mark the beginning of a transaction.
 
-Example:
+Any arguments provided are passed along to L<DBD::SQLite/begin_work>
 
-  $dbh->bind()
-  ## or
-  $dbh->bind->where( "something" )
-  ## or
-  $dbh->bind->select->fetchrow_hashref()
-  ## and then later
-  $dbh->bind( 'thingy' )->select->fetchrow_hashref()
+=head2 bind
 
-=item B<cache>()
+This is an inherited method from L<DB::Object/bind>
 
-Activate caching.
+=head2 cache
 
-  $tbl->cache->select->fetchrow_hashref();
+This is an inherited method from L<DB::Object/cache>
 
-=item B<check_driver>()
+=head2 can_update_delete_limit
 
-Check that the driver set in I<$SQL_DRIVER> in ~/etc/common.cfg is indeed available.
+Returns the boolean value for the SQLite compiled option C<ENABLE_UPDATE_DELETE_LIMIT> by calling L</has_compile_option>
 
-It does this by calling B<available_drivers>.
+=head2 check_driver
 
-=item B<copy>( [ \%values | %values )
+This is an inherited method from L<DB::Object/check_driver>
 
-Provided with either a reference to an hash or an hash of key => value pairs, B<copy> will first execute a select statement on the table object, then fetch the row of data, then replace the key-value pair in the result by the ones provided, and finally will perform an insert.
+=head2 commit
 
-Return false if no data to copy were provided, otherwise it always returns true.
+Make any change to the database irreversible.
 
-=item B<create_table>( @parameters )
+This must be used only after having called L</begin_work>
 
-The idea is to create a table with the givern parameters.
+Any arguments provided are passed along to L<DBD::SQLite/commit>
 
-This is currently heavily designed to work for PoPList. It needs to be rewritten.
+=head2 compile_options
 
-=item B<data_sources>( [ %options ] )
+Returns the cached list of SQLite compiled options. The cached file is in the file C<sql_sqlite_compile_options.cfg> in the sytem directory.
 
-Given an optional list of options, this return the data source of the database handler.
+=head2 connect
 
-=item B<data_type>( [ \@types | @types ] )
+Same as L<DB::Object/connect>, only specific to SQLite.
 
-Given a reference to an array or an array of data type, B<data_type> will check their availability in the database driver.
+It sets C<sqlite_unicode> to a true value in the connection parameters returned by L</_connection_params2hash>
 
-If nothing found, it return an empty list in list context, or undef in scalar context.
+See L</_connection_params2hash>
 
-If something was found, it returns a hash in list context or a reference to a hash in list context.
+=head2 copy
 
-=item B<database>()
+This is an inherited method from L<DB::Object/copy>
 
-Return the name of the current database.
+=head2 create_table
 
-=item B<delete>()
+This is an inherited method from L<DB::Object/create_table>
 
-B<delete> will format a delete query based on previously set parameters, such as B<where>.
+=head2 data_sources
 
-B<delete> will refuse to execute a query without a where condition. To achieve this, one must prepare the delete query on his/her own by using the B<do> method and passing the sql query directly.
+This is an inherited method from L<DB::Object/data_sources>
 
-  $tbl->where( "login" => "jack" );
-  $tbl->limit( 1 );
-  my $rows_affected = $tbl->delete();
-  ## or passing the where condition directly to delete
-  my( $sth ) = $tbl->delete( "login" => "jack" );
+=head2 data_type
 
-=item B<disconnect>()
+This is an inherited method from L<DB::Object/data_type>
 
-Disconnect from database. Returns the return code.
+=head2 database
 
-  my $rc = $dbh->disconnect;
+This is an inherited method from L<DB::Object/database>
 
-=item B<do>( $sql_query, [ \%attributes, \@bind_values ] )
+=head2 database_file
 
-Execute a sql query directly passed with possible attributes and values to bind.
+Returns the file path to the database file.
 
-The attributes list will be used to B<prepare> the query and the bind values will be used when executing the query.
+=head2 databases
 
-It returns the statement handler or the number of rows affected.
+Returns a list of databases, which in SQLite, means a list of opened sqlite database files.
 
-Example:
+=head2 delete
 
-  $rc  = $dbh->do( $statement ) || die( $dbh->errstr );
-  $rc  = $dbh->do( $statement, \%attr ) || die( $dbh->errstr );
-  $rv  = $dbh->do( $statement, \%attr, @bind_values ) || die( $dbh->errstr );
-  my( $rows_deleted ) = $dbh->do(
-  q{
-       DELETE FROM table WHERE status = ?
-  }, undef(), 'DONE' ) || die( $dbh->errstr );
+This is an inherited method from L<DB::Object/database>
 
-=item B<enhance>( [ @value ] )
+=head2 disconnect
 
-Toggle the enhance mode on/off.
+This is an inherited method from L<DB::Object/disconnect>
 
-When on, the functions I<from_unixtime> and I<unix_timestamp> will be used on date/time field to translate from and to unix time seamlessly.
+=head2 do
 
-=item B<err>()
+This is an inherited method from L<DB::Object/do>
 
-Get the currently set error.
+=head2 enhance
 
-=item B<errno>()
+This is an inherited method from L<DB::Object/enhance>
 
-Is just an alias for B<err>.
+=head2 func
 
-=item B<errmesg>()
+Provided with a table name and a function name and this will call L<DB::SQLite> passing it the table name and the function name.
 
-Is just an alias for B<errstr>.
+It returns the value received from the function call.
 
-=item B<errstr>()
+=head2 having
 
-Get the currently set error string.
+A convenient wrapper to L<DB::Object::SQLite::Query/having>
 
-=item B<fatal>( [ 1 | 0 ] )
+=head2 has_compile_option
 
-Toggles fatal mode on/off.
+Provided with a compile option (the character case is irrelevant) and this will check if it exists or not.
 
-=item B<from_unixtime>( [ @fields | \@fields ] )
+=head2 last_insert_id
 
-Set the list of fields that are to be treated as unix time and converted accordingly after the sql query is executed.
+=head2 lock
 
-It returns the list of fields in list context or a reference to an array in scalar context.
+This is an unsupported feature in SQLIte
 
-=item B<format_statement>( [ \@data, \@order, $table ] )
+=head2 on_conflict
 
-Format the sql statement.
+A convenient wrapper to L<DB::Object::Postgres::Query/on_conflict>
 
-In list context, it returns 2 strings: one comma-separated list of fields and one comma-separated list of values. In scalar context, it only returns a comma-separated string of fields.
+This feature is available in SQLite since version 3.35.0 released on 2021-03-12. If your version of SQLIte is anterior, this will return an error.
 
-=item B<format_update>( \@data | \%data | %data | @data )
+=head2 pragma
 
-Formats update query based on the following arguments provided:
+This is still a work in progress.
 
-=over 8
+=head2 replace
 
-=item I<data>
-
-An array of key-value pairs to be used in the update query. This array can be provided as the prime argument as a reference to an array, an array, or as the I<data> element of a hash or a reference to a hash provided.
-
-Why an array if eventually we build a list of key-value pair? Because the order of the fields may be important, and if the key-value pair list is provided, B<format_update> honors the order in which the fields are provided.
-
-=back
-
-B<format_update> will then iterate through each field-value pair, and perform some work:
-
-If the field being reviewed was provided to B<from_unixtime>, then B<format_update> will enclose it in the function FROM_UNIXTIME() as in:
-
-  FROM_UNIXTIME(field_name)
-  
-If the the given value is a reference to a scalar, it will be used as-is, ie. it will not be enclosed in quotes or anything. This is useful if you want to control which function to use around that field.
-
-
-If the given value is another field or looks like a function having parenthesis, or if the value is a question mark, the value will be used as-is.
-
-If B<bind> is off, the value will be escaped and the pair field='value' created.
-
-If the field is a SET data type and the value is a number, the value will be used as-is without surrounding single quote.
-
-If B<bind> is enabled, a question mark will be used as the value and the original value will be saved as value to bind upon executing the query.
-
-Finally, otherwise the value is escaped and surrounded by single quotes.
-
-B<format_update> returns a string representing the comma-separated list of fields that will be used.
-
-=item B<getdefault>( %default_values )
-
-Does some preparation work such as :
-
-=over 8
-
-=item 1
-
-the date/time field to use the FROM_UNIXTIME and UNIX_TIMESTAMP functions
-
-=item 2
-
-removing from the query the fields to avoid, ie the ones set with the B<avoid> method.
-
-=item 3
-
-set the fields alias based on the information provided with the B<alias> method.
-
-=item 4
-
-if a field last_name and first_name exist, it will also create an alias I<name> based on the concatenation of the 2.
-
-=item 5
-
-it will set the default values provided. This is used for UPDATE queries.
-
-=back
-
-It returns a new L<DB::Object::Postgres::Tables> object with all the data prepared within.
-
-=item B<group>( @fields | \@fields )
-
-Format the group by portion of the query.
-
-It returns an empty list in list context of undef in scalar context if no group by clause was build.
-Otherwise, it returns the value of the group by clause as a string in list context and the full group by clause in scalar context.
-
-In list context, it returns: $group_by
-
-In scalar context, it returns: GROUP BY $group_by
-
-=item B<insert>( L<DB::Object::Postgres::Statement> SELECT object, \%key_value | %key_value )
-
-Prepares an INSERT query using the field-value pairs provided.
-
-If a L<DB::Object::Postgres::Statement> object is provided as first argument, it will considered as a SELECT query to be used in the INSERT query, as in: INSERT INTO my table SELECT FROM another_table
-
-Otherwise, B<insert> will build the query based on the fields provided.
-
-In scalar context, it returns the result of B<execute> and in list context, it returns the statement object.
-
-=item B<last_insert_id>()
-
-Get the id of the primary key from the last insert.
-
-=item B<limit>( [ END, [ START, END ] ] )
-
-Set or get the limit for the future statement.
-
-If only one argument is provided, it is assumed to be the end limit. If 2 are provided, they wil be the start and end.
-
-It returns a list of the start and end limit in list context, and the string of the LIMIT in scalar context, such as: LIMIT 1, 10
-
-=item B<local>( %params | \%params )
-
-Not sure what it does. I forgot.
-
-=item B<lock>( $lock_id, [ $timeout ] )
-
-Set a lock using a lock identifier and a timeout.
-By default the timeout is 2 seconds.
-
-If the lock failed (NULL), it returns undef(), otherwise, it returns the return value.
-
-=item B<no_bind>()
-
-When invoked, B<no_bind> will change any preparation made so far for caching the query with bind parameters, and instead substitute the value in lieu of the question mark placeholder.
-
-=item B<no_cache>()
-
-Disable caching of queries.
-
-=item B<order>()
-
-Prepares the ORDER BY clause and returns the value of the clause in list context or the ORDER BY clause in full in scalar context, ie. "ORDER BY $clause"
-
-=item B<param>( $param | %params )
-
-If only a single parameter is provided, its value is return. If a list of parameters is provided they are set accordingly using the C<SET> sql command.
-
-Supported parameters are:
-
-=over 8
-
-=item SQL_AUTO_IS_NULL
-
-=item AUTOCOMMIT
-
-=item SQL_BIG_TABLES
-
-=item SQL_BIG_SELECTS
-
-=item SQL_BUFFER_RESULT
-
-=item SQL_LOW_PRIORITY_UPDATES
-
-=item SQL_MAX_JOIN_SIZE 
-
-=item SQL_SAFE_MODE
-
-=item SQL_SELECT_LIMIT
-
-=item SQL_LOG_OFF
-
-=item SQL_LOG_UPDATE 
-
-=item TIMESTAMP
-
-=item INSERT_ID
-
-=item LAST_INSERT_ID
-
-=back
-
-If unsupported parameters are provided, they are considered to be private and not passed to the database handler.
-
-It then execute the query and return undef() in case of error.
-
-Otherwise, it returns the object used to call the method.
-
-=item B<ping>()
-
-Evals a SELECT 1 statement and returns 0 if errors occurred or the return value.
-
-=item B<prepare>( $query, \%options )
-
-Prepares the query using the options provided. The options are the same as the one in L<DBI> B<prepare> method.
-
-It returns a L<DB::Object::Postgres::Statement> object upon success or undef if an error occurred. The error can then be retrieved using B<errstr> or B<error>.
-
-=item B<prepare_cached>( $query, \%options )
-
-Same as B<prepare> except the query is cached.
-
-=item B<query>( $query, \%options )
-
-It prepares and executes the given SQL query with the options provided and return undef() upon error or the statement handler upon success.
-
-=item B<replace>( L>DB::Object::Postgres::Statement> object, [ %data ] )
-
-Just like for the INSERT query, B<replace> takes one optional argument representing a L<DB::Object::Postgres::Statement> SELECT object or a list of field-value pairs.
+Just like for the INSERT query, L</replace> takes one optional argument representing a L<DB::Object::SQLite::Statement> SELECT object or a list of field-value pairs.
 
 If a SELECT statement is provided, it will be used to construct a query of the type of REPLACE INTO mytable SELECT FROM other_table
 
@@ -1832,55 +1679,85 @@ Otherwise the query will be REPLACE INTO mytable (fields) VALUES(values)
 
 In scalar context, it execute the query and in list context it simply returns the statement handler.
 
-=item B<reset>()
+=head2 register_function
 
-This is used to reset a prepared query to its default values. If a field is a date/time type, its default value will be set to NOW()
+This takes an hash reference of parameters and will register a new function by calling L<DBD::SQLite/sql_function_register>
 
-It execute an update with the reseted value and return the number of affected rows.
+Possible options are:
 
-=item B<reverse>( [ true ])
+=over 4
 
-Get or set the reverse mode.
+=item I<code>
 
-=item B<select>( [ \$field, \@fields, @fields ] )
+Anonymous code to be executed when the function is called.
 
-Given an optional list of fields to fetch, B<select> prepares a SELECT query.
+=item I<func>
 
-If no field was provided, B<select> will use default value where appropriate like the NOW() for date/time fields.
+This is an hash reference representing registry of functions. The value for each key is the option hash reference.
 
-B<select> calls upon B<tie>, B<where>, B<group>, B<order>, B<limit> and B<local> to build the query.
+=item I<flags>
 
-In scalar context, it execute the query and return it. In list context, it just returns the statement handler.
+An array reference of flags
 
-=item B<set>( $var )
+=item I<name>
 
-Issues a query to C<SET> the given SQL variable.
+The function name
 
-If any error occurred, undef will be returned and an error set, otherwise it returns true.
+=back
 
-=item B<sort>()
+=head2 remove_function
 
-It toggles sort mode on and consequently disable reverse mode.
+Provided with a function name and this will remove it.
 
-=item B<stat>( [ $type ] )
+It returns false if there is no function, or returns the options hash reference originally set for the function removed.
 
-Issue a SHOW STATUS query and if a particular $type is provided, it will returns its value if it exists, otherwise it will return undef.
+=head2 returning
 
-In absence of particular $type provided, it returns the hash list of values returns or a reference to the hash list in scalar context.
+A convenient wrapper to L<DB::Object::Postgres::Query/returning>
 
-=item B<state>()
+=head2 rollback
 
-Queries the DBI state and return its value.
+Will roll back any changes made to the database since the last transaction point marked with L</begin_work>
 
-=item B<table>( $table_name )
+=head2 sql_function_register
 
-Given a table name, B<table> will return a L<DB::Object::Postgres::Tables> object. The object is cached for re-use.
+Provided with an hash reference of options and this will register a sql function by calling L<DBD::SQLite/sqlite_create_function>
 
-=item B<table_push>( $table_name )
+Possible options are:
 
-Add the given table name to the stack of cached table names.
+=over 4
 
-=item B<tables>( [ $database ] )
+=item I<argc>
+
+The function arguments
+
+=item I<code>
+
+Anonymous perl code to be executed when the function is called
+
+=item I<flags>
+
+An array reference of flags. Those flags are joined with C<|> and L<perlfunc/eval>'ed
+
+=item I<name>
+
+The function name
+
+=back
+
+=head2 stat
+
+Provided with an hash or hash reference of parameters and this will call L<DBD::SQLite/sqlite_status> and get the hash reference of values returned.
+
+If the option I<reset> is set, then this will call L<DBD::SQLite/sqlite_status> passing it 0 to reset it instead.
+
+If the option I<type> is specified, this will return the equivalent property from the stat hash reference returned by L<DBD::SQLite/sqlite_status>, otherwise, it will return the hash in list context and the hash reference of stat properties in scalar context.
+
+=head2 table_info
+
+This is the SQLite specific implementation to get the given table information.
+
+=head2 tables
 
 Connects to the database and finds out the list of all available tables.
 
@@ -1888,111 +1765,247 @@ Returns undef or empty list in scalar or list context respectively if no table f
 
 Otherwise, it returns the list of table in list context or a reference of it in scalar context.
 
-=item B<tables_refresh>( [ $database ] )
+=head2 tables_info
 
-Rebuild the list of available database table.
+Provided with a database or using by default the current database and this will issue a query to get an array reference of all tables.
 
-Returns the list of table in list context or a reference of it in scalar context.
+It returns the array reference.
 
-=item B<tie>( [ %fields ] )
+=head2 trace
 
-If provided a hash or a hash ref, it sets the list of fields and their corresponding perl variable to bind their values to.
+Trace is unsupported on SQLite.
 
-In list context, it returns the list of those field-variable pair, or a reference to it in scalar context.
+=head2 unlock
 
-=item B<unix_timestamp>( [ \@fields | @fields ] )
+Unlock is unsupported on SQLite.
 
-Provided a list of fields or a reference to it, this sets the fields to be treated for seamless conversion from and to unix time.
+=head2 variables
 
-=item B<unlock>( $lock_id )
+Variables are unsupported on SQLite.
 
-Given a lock identifier, B<unlock> releases the lock previously set with B<lock>. It executes the underlying sql command and returns undef() if the result is NULL or the value returned otherwise.
+=head2 version
 
-=item B<update>( %data | \%data )
+This returns the, possibly cached, SQLite server version as a L<version> object.
 
-Given a list of field-value pairs, B<update> prepares a sql update query.
+=head2 _check_connect_param
 
-It calls upon B<where> and B<limit> as previously set.
+This returns an hash reference of connection parameters.
 
-It returns undef and sets an error if it failed to prepare the update statement. In scalar context, it execute the query. In list context, it simply return the statement handler.
+If there is no L</database_file> currently set, it will use the property I<uri>.
 
-=item B<use>( $database )
+The database is taken from the property I<database>, or derived from the last path segment of the I<uri>.
 
-Given a database, it switch to it, but before it checks that the database exists.
-If the database is different than the current one, it sets the I<multi_db> parameter, which will have the fields in the queries be prefixed by their respective database name.
+The database file is made absolute and is et as the I<database_file> property
 
-It returns the database handler.
+The database is name, if not set, is derived from the base path of the I<database_file>
 
-=item B<use_cache>( [ on | off ] )
+The I<host> property is set to C<localhost> and I<port> property to C<0>
 
-Sets or get the I<use_cache> parameter.
+It returns the hash reference of parameters thus processed.
 
-=item B<use_bind>( [ on | off ] )
+=head2 _check_default_option
 
-Sets or get the I<use_cache> parameter.
+Provided with an hash or hash reference of options and this will check it and set some default value.
 
-=item B<variables>( [ $type ] )
+The only default property this sets is C<sqlite_unicode> to true.
 
-Query the SQL variable $type
+It returns the hash reference of options.
 
-It returns a blank string if nothing was found, or the value found.
+=head2 _connection_options
 
-=item B<where>( %args )
+Provided with an hash reference of parameters and this will check them and returns an hash reference of options who name start with C<sqlite_>
 
-Build the where clause based on the field-value hash provided.
+=head2 _connection_parameters
 
-It returns the where clause in list context or the full where clause in scalar context, ie "WHERE $clause"
+Provided with an hash or hash reference of connection parameters and this will extra all the properties that start with C<sqlite_/> and add them to an array of core properties: db login passwd host port driver database server opt uri debug
 
-=item B<_cache_this>( $query )
+It returns those properties as an array reference.
 
-Provided with a query, this will cache it for future re-use.
+=head2 _dbi_connect
 
-It does some check and maintenance job to ensure the cache does not get too big whenever it exceed the value of $CACHE_SIZE set in the main config file.
+This calls L<DB::Connect/_dbi_connect> and do more driver specific processing.
 
-It returns the cached statement as an L<DB::Object::Postgres::Statement> object.
+It will register all the functions set in the global hash reference C<$PRIVATE_FUNCTIONS> which is a function name to code reference pairs. For each of those function, they will be added by calling L</sql_function_register>
 
-=item B<_clean_statement>( \$query | $query )
+It returns the database handler object (L<DBD::Object::SQLite>)
 
-Given a query string or a reference to it, it cleans the statement by removing leading and trailing space before and after line breaks.
+=head2 _dsn
 
-=item B<_cleanup>()
+Using the L</database_file> set and this will issue a connection to the SQLite database file.
 
-Removes object attributes, namely where, selected_fields, group_by, order_by, limit, alias, avoid, local, and as_string
+If the file does not exist or is not writable, this will return an error, otherwise this will return the string representing the dsn, which are connection parameters separated by C<;>
 
-=item B<_make_sth>( $package, $hashref )
+=head2 _parse_timestamp
 
-Given a package name and a hashref, this build a statement object with all the necessary parameters.
+Provided a string and this will parse it to return a L<DateTime> object.
 
-It also sets the query time to the current time with the parameter I<query_time>
+=head1 SQLITE FUNCTIONS AVAILABLE
 
-It returns an object of the given $package.
+=head2 ceiling
 
-=item B<_reset_query>()
+This is a sql function to be registered automatically upon connection to the SQLite database file.
 
-Being called using a statement handler, this reset the object by removing all the parameters set by various subroutine calls, such as B<where>, B<group>, B<order>, B<avoid>, B<limit>, etc.
+It leverages L<POSIX/ceil>
 
-=item B<_save_bind>( $query_type )
+=head2 concat
 
-This saves/cache the bin query and return the object used to call it.
+This returns the arguments provided concatenated as a string.
 
-=item B<_value2bind>( $query, $ref )
+=head2 curdate
 
-Given a sql query and a array reference, B<_value2bind> parse the query and interpolate values for placeholder (?).
+Returns a string representing the year, month and date separated by a C<->
 
-It returns true.
+This is computed using L<DateTime>
 
-=back
+=head2 curtime
 
-=head1 COPYRIGHT
+Returns a string representing the hours, minutes and seconds separated by a C<:>
 
-Copyright (c) 2000-2014 DEGUEST Pte. Ltd.
+This is computed using L<DateTime>
 
-=head1 CREDITS
+=head2 dayname
 
-Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+Based on a datetime that is parsed using L</_parse_timestamp>, this returns the day name of the week, such as C<Monday>
+
+=head2 dayofmonth
+
+Based on a datetime that is parsed using L</_parse_timestamp>, this returns the day of the month, such as 17.
+
+=head2 dayofweek
+
+Based on a datetime that is parsed using L</_parse_timestamp>, this returns the day of the week as a number from 1 to 7 with 1 being Monday
+
+=head2 dayofyear
+
+Based on a datetime that is parsed using L</_parse_timestamp>, this returns the day of the year, such as a number from 1 to 365, or possibly 366 depending on the year.
+
+=head2 distance_miles
+
+Provided with an original latitude, longitude and a target latitude and longitude and this will calculate the distance between the 2.
+
+See the source L<StackOverflow post on which this function is based|http://stackoverflow.com/questions/10034636/postgres-longitude-longitude-query>.
+
+=head2 from_days
+
+Calculate the number of days since January 1st of year 0 and returns a L<DateTime> object.
+
+=head2 from_unixtime
+
+Provided with a unix timestamp, and this will return a datetime string such as C<YYYY-mm-dd HH:MM:SS>
+
+=head2 hour
+
+Provided with a date time, and this will parse it and return the hour.
+
+=head2 lcase
+
+Provided with a string and this returns its lower case value.
+
+=head2 left
+
+Provided with a string and an integer C<n> and this will return a substring capturing the nth first characters.
+
+=head2 locate
+
+This essentially does the same as L<perlfunc/index>
+
+=head2 log10
+
+Provided with a number and this returns its logarithm base 10.
+
+=head2 minute
+
+Provided with a date time, and this will parse it and return the minutes.
+
+=head2 month
+
+Provided with a date time, and this will parse it and return the month.
+
+=head2 monthname
+
+Provided with a date time, and this will parse it and return the month name.
+
+=head2 number_format
+
+Provided with a number, a thousand separator, a decimal separator and a decimal precision and this will format the number accordingly and return it as a string.
+
+=head2 power
+
+Provided with a number and a power, and this will return the number powered
+
+=head2 quarter
+
+Provided with a date time, and this will parse it and return the quarter.
+
+=head2 query_object
+
+Set or gets the SQLite query object (L<DB::Object::SQLite::Query>) used to process and format queries.
+
+=head2 rand
+
+This takes no argument and simply returns a random number using L<perlfunc/rand>
+
+=head2 regexp
+
+Provided with a regular expression and the string to test, and this will test the regular expression and return true if it matches or false otherwise.
+
+=head2 replace
+
+Provided with a string, some term to replace and a replacement string and this will do a perl substitution and return the resulting string.
+
+=head2 right
+
+Provided with a string and an integer n and this will return the nth right most characters.
+
+=head2 second
+
+Provided with a date time, and this will parse it and return the seconds.
+
+=head2 space
+
+Provided with an integer and this will return as much spaces.
+
+=head2 sprintf
+
+This behaves like L<perlfunc/sprintf> and provided with a template and some arguments, it will return a formatted string.
+
+=head2 to_days
+
+Provided with a date time, and this will return the number of days since January 1st of year 0.
+
+=head2 ucase
+
+This returns the string provided with all its characters in upper case.
+
+=head2 unix_timestamp
+
+Provided with a date time and this will returns its unix timestamp representation.
+
+=head2 week
+
+Provided with a date time, and this will parse it and return the week.
+
+=head2 weekday
+
+Provided with a date time, and this will parse it and return the day of the week.
+
+=head2 year
+
+Provided with a date time, and this will parse it and return the day of the year.
 
 =head1 SEE ALSO
 
 L<DBI>, L<Apache::DBI>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2019-2021 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
 
 =cut

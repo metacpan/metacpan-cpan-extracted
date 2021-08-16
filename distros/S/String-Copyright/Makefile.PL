@@ -29,14 +29,14 @@ my $meta = {
                           test => { requires => { "Test::More" => 0, "utf8" => 0 } },
                         },
   "provides"         => {
-                          "String::Copyright" => { file => "lib/String/Copyright.pm", version => 0.003006 },
+                          "String::Copyright" => { file => "lib/String/Copyright.pm", version => 0.003007 },
                         },
   "release_status"   => "stable",
   "resources"        => {
                           bugtracker   => {
                                             web => "https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=libstring-copyright-perl",
                                           },
-                          homepage     => "https://metacpan.org/release/String-Copyright",
+                          homepage     => "https://metacpan.org/pod/String::Copyright",
                           license      => ["http://www.gnu.org/licenses/gpl-3.0.txt"],
                           repository   => {
                                             type => "git",
@@ -44,7 +44,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/String-Copyright/project",
                         },
-  "version"          => 0.003006,
+  "version"          => 0.003007,
   "x_help_wanted"    => ["documenter", "tester"],
   "x_static_install" => 1,
 };
@@ -120,28 +120,8 @@ else
 	}
 }
 
-sub FixMakefile
-{
-	return unless -d 'inc';
-	my $file = shift;
-	
-	local *MAKEFILE;
-	open MAKEFILE, "< $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	my $makefile = do { local $/; <MAKEFILE> };
-	close MAKEFILE or die $!;
-	
-	$makefile =~ s/\b(test_harness\(\$\(TEST_VERBOSE\), )/$1'inc', /;
-	$makefile =~ s/( -I\$\(INST_ARCHLIB\))/ -Iinc$1/g;
-	$makefile =~ s/( "-I\$\(INST_LIB\)")/ "-Iinc"$1/g;
-	$makefile =~ s/^(FULLPERL = .*)/$1 "-Iinc"/m;
-	$makefile =~ s/^(PERL = .*)/$1 "-Iinc"/m;
-	
-	open  MAKEFILE, "> $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	print MAKEFILE $makefile or die $!;
-	close MAKEFILE or die $!;
-}
 
 my $mm = WriteMakefile(%WriteMakefileArgs);
-FixMakefile($mm->{FIRST_MAKEFILE} || 'Makefile');
+
 exit(0);
 

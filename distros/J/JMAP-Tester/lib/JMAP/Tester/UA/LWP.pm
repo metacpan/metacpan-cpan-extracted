@@ -1,7 +1,7 @@
 use v5.10.0;
 use warnings;
 
-package JMAP::Tester::UA::LWP 0.100;
+package JMAP::Tester::UA::LWP 0.101;
 
 use Moo;
 with 'JMAP::Tester::Role::UA';
@@ -113,7 +113,7 @@ JMAP::Tester::UA::LWP
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 AUTHOR
 

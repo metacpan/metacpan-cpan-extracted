@@ -1,4 +1,4 @@
-package JMAP::Tester::Role::SentenceCollection 0.100;
+package JMAP::Tester::Role::SentenceCollection 0.101;
 
 use Moo::Role;
 
@@ -346,7 +346,7 @@ JMAP::Tester::Role::SentenceCollection
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 METHODS
 

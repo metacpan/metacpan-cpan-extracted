@@ -1,0 +1,50 @@
+{
+   "abstract" : "Solving simple cryptarithm.",
+   "author" : [
+      "e78783 <e78783@tqgtyn10aqxuxoi0mkfbldi5vh.jx.internal.cloudapp.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Math-Cryptarithm",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Algorithm::Permute" : "0.16"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.00"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/E7-87-83/Math-Cryptarithm"
+   },
+   "version" : "v0.20.2",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

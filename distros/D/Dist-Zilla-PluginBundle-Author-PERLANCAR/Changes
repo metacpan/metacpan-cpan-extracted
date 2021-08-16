@@ -1,3 +1,9 @@
+0.606   2021-08-15  Released-By: PERLANCAR; Urgency: medium
+
+	- Pull in Pod::Weaver::PluginBundle::Author::PERLANCAR for
+	  convenience.
+
+
 0.605   2021-08-09  Released-By: PERLANCAR; Urgency: medium
 
 	- Add plugin [MetaProvides::Package] (suggested by paultcochrane in

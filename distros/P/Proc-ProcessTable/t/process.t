@@ -84,5 +84,6 @@ else
 { 
   # child, fork returned 0
   # child process will be killed soon
-  sleep 10000;
+  # 10000 seconds may not be soon enough
+  sleep 10;
 }

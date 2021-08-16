@@ -46,6 +46,14 @@ sub main {
     my $options = File::Rename::Options::GetOptions()
         or pod2usage;
 
+    pod2usage(  -verbose => 0, 
+                -exitval => 'NOEXIT', 
+                -message => <<'MESSAGE', 
+-u|--unicode argument does not look like an encoding:
+    either give an encoding or put -e as next option
+MESSAGE
+    ) if File::Rename::Options::bad_encoding($options);
+
     mod_version() if $options->{show_version};
     pod2usage( -verbose => 2 ) if $options->{show_manual};
     pod2usage( -exitval => 1 ) if $options->{show_help};
@@ -59,7 +67,8 @@ sub mod_version {
     print __FILE__;
     print ' using File::Rename version '.  $File::Rename::VERSION;
     print ', File::Rename::Options version '. $File::Rename::Options::VERSION
-    	if (eval $File::Rename::Options::VERSION) < (eval $File::Rename::VERSION);
+        if (eval $File::Rename::Options::VERSION) < (eval $File::Rename::VERSION);
+    # ignore $File::Rename::Unicode::VERSION
     print "\n\n";
     exit 0
 }   
@@ -81,6 +90,7 @@ S<[ B<-0> ]>
 S<[ B<-n> ]>
 S<[ B<-f> ]>
 S<[ B<-d> ]>
+S<[ B<-u> [I<enc>]]>
 S<[ B<-e>|B<-E> I<perlexpr>]*|I<perlexpr>>
 S<[ I<files> ]>
 
@@ -158,6 +168,17 @@ Manual: print manual page.
 =item B<-V>, B<--version>
 
 Version: show version number.
+
+=item B<-u>, B<--unicode> [I<encoding>]
+
+Treat filenames as perl (unicode) strings when
+running the user-supplied code.
+
+Decode/encode filenames using I<encoding>, if
+present.
+
+I<encoding> is optional: if omitted, the next argument
+should be an option starting with '-', for instance B<-e>.
 
 =item B<-e>
 

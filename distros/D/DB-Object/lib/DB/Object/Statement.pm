@@ -1,12 +1,15 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Statement.pm
-## Version v0.3.5
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Version v0.3.7
+## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2020/05/22
+## Modified 2021/08/12
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 ## This package's purpose is to automatically terminate the statement object and
 ## separate them from the connection object (DB::Object).
@@ -19,10 +22,10 @@ BEGIN
     use strict;
     use parent qw( DB::Object );
     use Class::Struct qw( struct );
-    use IO::File;
     use DateTime;
+    use Want;
     our( $VERSION, $VERBOSE, $DEBUG );
-    $VERSION    = 'v0.3.5';
+    $VERSION    = 'v0.3.7';
     $VERBOSE    = 0;
     $DEBUG      = 0;
     use Devel::Confess;
@@ -36,7 +39,7 @@ sub as_string
     $self->{as_string}++;
     if( my $qo = $self->query_object )
     {
-        $qo->final( 1 );
+        $qo->final(1);
     }
     ## return( $self->{ 'sth' }->{ 'Statement' } );
     ## Same:
@@ -48,22 +51,23 @@ sub bind_param
 {
     my $self = shift( @_ );
     my( $pack, $file, $line ) = caller();
-    my $sub = ( caller( 1 ) )[ 3 ];
-    $self->{ 'pack' } = $pack;
-    $self->{ 'file' } = $file;
-    $self->{ 'line' } = $line;
-    $self->{ 'sub' }  = $sub;
+    my $sub = ( caller(1) )[3];
+    $self->{pack} = $pack;
+    $self->{file} = $file;
+    $self->{line} = $line;
+    $self->{sub}  = $sub;
     my $rc = 
     eval
     {
-        $self->{ 'sth' }->bind_param( @_ );
+        $self->{sth}->bind_param( @_ );
     };
     if( $@ )
     {
         my $err = $self->errstr();
         $err =~ s/ at line \d+.*$//;
-        printf( STDERR "%s in %s at line %d within sub '%s'.\n", $err, $self->{ 'file' }, $self->{ 'line' }, $self->{ 'sub' } );
-        exit( 1 );
+        # printf( STDERR "%s in %s at line %d within sub '%s'.\n", $err, $self->{file}, $self->{line}, $self->{sub} );
+        # exit(1);
+        return( $self->error( $err ) );
     }
     elsif( $rc )
     {
@@ -71,7 +75,7 @@ sub bind_param
     }
     else
     {
-        my $err = $@ = $self->{ 'sth' }->errstr() || "Unknown error while binding parameters to query.";
+        my $err = $@ = $self->{sth}->errstr() || "Unknown error while binding parameters to query.";
         return( $self->error( $err ) );
     }
 }
@@ -79,11 +83,10 @@ sub bind_param
 sub commit
 {
     my $self = shift( @_ );
-    if( $self->{ 'sth' } && $self->param( 'autocommit' ) )
+    if( $self->{sth} && $self->param( 'autocommit' ) )
     {
-        my $sth = $self->prepare( "COMMIT" ) ||
-        return();
-        $sth->execute();
+        my $sth = $self->prepare( 'COMMIT' ) || return( $self->pass_error );
+        $sth->execute() || return( $self->error( "An error occurred while executing query: ", $sth->error ) );
         $sth->finish();
     }
     return( $self );
@@ -94,10 +97,10 @@ sub database_object { return( shift->_set_get_object( 'dbo', 'DB::Object', @_ ) 
 sub distinct
 {
     my $self = shift( @_ );
-    my $query = $self->{ 'query' } ||
-    return( $self->error( "No query to set as to be ignored." ) );
+    my $query = $self->{query} ||
+        return( $self->error( "No query to set as to be ignored." ) );
     
-    my $type = uc( ( $query =~ /^\s*(\S+)\s+/ )[ 0 ] );
+    my $type = uc( ( $query =~ /^\s*(\S+)\s+/ )[0] );
     ## ALTER for table alteration statements (DB::Object::Tables
     my @allowed = qw( SELECT );
     my $allowed = CORE::join( '|', @allowed );
@@ -135,27 +138,29 @@ sub dump
         ## return( $self->error( "Error while preparing query to dump result on select:\n$query" ) );
         ## $sth->execute() ||
         ## return( $self->error( "Error while executing query to dump result on select:\n$query" ) );
-        my $fields = $self->{ '_fields' };
+        my $fields = $self->{_fields};
         my @header = sort{ $fields->{ $a } <=> $fields->{ $b } } keys( %$fields );
-        my $io = IO::File->new( ">$file" ) ||
-        return( $self->error( "Unable to open file '$file' in write mode: $!" ) );
+        # new_file is inherited from Module::Generic
+        $file = $self->new_file( $file );
+        my $io = $file->open( '>', { binmode => 'utf8' }) ||
+            return( $self->error( "Unable to open file '$file' in write mode: ", $file->error ) );
         my $date = DateTime->now;
-        my $table = $self->{ 'table' };
-        printf( $io "## Generated on %s for table $table\n", $date->strftime( '%c' ) );
-        print( $io "## ", CORE::join( "\t", @header ), "\n" );
+        my $table = $self->{table};
+        $io->printf( "## Generated on %s for table $table\n", $date->strftime( '%c' ) );
+        $io->print( "## ", CORE::join( "\t", @header ), "\n" );
         my @data = ();
         while( @data = $self->fetchrow() )
         {
             print( $io CORE::join( "\t", @data ), "\n" );
         }
-        close( $io );
-        $self->finish();
+        $io->close;
+        $self->finish;
         return( $self );
     }
-    elsif( exists( $self->{ 'sth' } ) )
+    elsif( exists( $self->{sth} ) )
     {
         ## my $fields = $self->{ '_fields' };
-        my @fields = @{ $self->{ 'sth' }->FETCH( 'NAME' ) };
+        my @fields = @{ $self->{sth}->FETCH( 'NAME' ) };
         my $max    = 0;
         ## foreach my $field ( keys( %$fields ) )
         foreach my $field ( @fields )
@@ -174,7 +179,7 @@ sub dump
         {
             printf( STDERR $template, @data );
         }
-        $self->finish();
+        $self->finish;
         return( $self );
     }
     else
@@ -183,13 +188,11 @@ sub dump
     }
 }
 
-*exec = \&execute;
+sub exec { return( shift->execute( @_ ) ); }
 
 sub execute
 {
     my $self = shift( @_ );
-    ## XXX
-    ## print( STDERR "Debug value for class '", ref( $self ), "' is $self->{debug}\n" );
     my( $pack, $file, $line ) = caller();
     my $sub = ( caller(1) )[3];
     ## What we want is to get the point from where we were originatly called
@@ -212,10 +215,20 @@ sub execute
     $q->final( 1 ) if( $q );
     my @binded = ();
     my @binded_types = ();
-    if( $q && $self->{bind} )
+    if( $q && $q->binded_types_as_param->length )
     {
+        $self->messagef( 3, "Query object has %d binded types params and %d binded types.", $q->binded_types_as_param->length, $q->binded_types->length );
         my $types = $q->binded_types_as_param;
         @binded_types = @$types;
+    }
+    
+#     if( $q && ( $self->{bind} || 
+#         ( 
+#             ( $q->_query_type eq 'insert' || $q->_query_type eq 'update' ) && 
+#             $q->binded_types->length ) 
+#         ) )
+    if( $q && $self->{bind} )
+    {
         if( @_ && ( $self->_is_hash( $_[0] ) ) )
         {
             my $vals = {};
@@ -254,22 +267,46 @@ sub execute
         }
     }
     
-    @binded    = @_ if( ( !@binded && @_ ) || @_ );
-    @binded    = () if( !@binded );
-    if( scalar( @binded ) != scalar( @binded_types ) )
+    @binded = @_ if( ( !@binded && @_ ) || @_ );
+    @binded = () if( !@binded );
+    if( $q && $q->is_upsert )
     {
-        $self->messagef( 3, "Warning: the total binded values (%d) does not match the total binded types (%d)! Check the code...", scalar( @binded ), scalar( @binded_types ) );
+        $self->message( 3, "This statement is an upsert, so let's take the placeholders arguments, if any and double them." );
+        if( scalar( @binded_types ) > scalar( @binded ) )
+        {
+            $self->messagef( 3, "Pushing %d binded elements to the stack of binded elements.", scalar( @binded ) );
+            CORE::push( @binded, @binded );
+        }
+    }
+    $self->messagef( 3, "Found %d bound values for %d binded column types.", scalar( @binded ), scalar( @binded_types ) );
+    if( $q && scalar( @binded ) != scalar( @binded_types ) )
+    {
+        warn( sprintf( "Warning: the total binded values (%d) does not match the total binded types (%d)! Check the code...\n", scalar( @binded ), scalar( @binded_types ) ) );
         ## Cancel it, because it will create problems
         @binded_types = ();
     }
+    
+    # If there are any array object of some sort provided, make sure they are transformed into a regular array so DBD::Ph can then transform it into a Postgres array.
+    for( @binded )
+    {
+        if( $self->_is_array( $_ ) && ref( $_ ) ne 'ARRAY' )
+        {
+            $_ = [ @$_ ];
+        }
+        elsif( $self->_is_object( $_ ) && overload::Overloaded( $_ ) && overload::Method( $_, '""' ) )
+        {
+            $_ = "$_";
+        }
+    }
+    
     $self->message( 3, "Binding '", CORE::join( ', ', @binded ), "' parameters for query: '$self->{query}'." );
     ## debugh( 'binded', $binded ) if( $self->{ 'query' } =~ /^\s*SELECT/ );
     my $rv = 
     eval
     {
-        local( $SIG{ '__DIE__' } )  = sub{ };
-        local( $SIG{ '__WARN__' } ) = sub{ };
-        local( $SIG{ 'ALRM' } )     = sub{ die( "Timeout while processing query $self->{sth}->{Statement}\n" ) };
+        local( $SIG{__DIE__} )  = sub{ };
+        local( $SIG{__WARN__} ) = sub{ };
+        local( $SIG{ALRM} )     = sub{ die( "Timeout while processing query $self->{sth}->{Statement}\n" ) };
         ## print( STDERR ref( $self ) . "::execute(): binding parameters '", join( ', ', @$binded ), "' to query:\n$self->{ 'query' }\n" );
         $self->message( 3, "Executing query '$self->{sth}->{Statement}' with handler '$self->{sth}'." );
         $self->message( 3, "Is database handler active? ", ( $self->ping ? 'Yes' : 'No' ) );
@@ -290,6 +327,8 @@ sub execute
         }
         $self->{sth}->execute();
     };
+    my $error = $@;
+    $self->message( 3, "execute() returned value '$rv' and \$\@ is '$error'." );
     if( $q )
     {
         if( $q->join_tables->length > 0 )
@@ -305,7 +344,7 @@ sub execute
     }
     my $tie = $self->{tie} || {};
     ## Maybe it is time to bind SQL result to possible provided perl variables?
-    if( !$@ && %$tie )
+    if( !$error && %$tie )
     {
         my $order = $self->{tie_order};
         my $sth   = $self->{sth};
@@ -319,34 +358,41 @@ sub execute
             }
         }
     }
-    if( $@ )
+    if( $error )
     {
-        my $err = $@;
-        $err =~ s/ at (\S+\s)?line \d+.*$//s;
+        $self->message( 3, "Got an error: $error" );
+        $error =~ s/ at (\S+\s)?line \d+.*$//s;
         ## $err .= ":\n\"$self->{ 'query' }\"";
-        $err .= ":\n\"$self->{sth}->{Statement}\"";
-        $err = "Error while trying to execute query $self->{sth}->{Statement}: $err";
+        $error .= ":\n\"$self->{sth}->{Statement}\"";
+        $error = "Error while trying to execute query $self->{sth}->{Statement}: $error";
         if( $self->fatal() )
         {
-            die( "$err in $self->{file} at line $self->{line} within sub $self->{sub}\n" );
+            die( "$error in $self->{file} at line $self->{line} within sub $self->{sub}\n" );
         }
         else
         {
             ## return( $self->error( "$err in $self->{ 'file' } at line $self->{ 'line' } within sub $self->{ 'sub' }" ) );
-            return( $self->error( $err ) );
+            return( $self->error( $error ) );
         }
-    }
-    elsif( $rv )
-    {
-        return( $rv );
     }
     elsif( $self->{sth}->errstr() )
     {
         return( $self->error( $self->{sth}->errstr() ) );
     }
+    ## User wants an object for chaining like:
+    ## $sth->exec( 'some value' )->fetchrow;
+    elsif( want( 'OBJECT' ) )
+    {
+        return( $self );
+    }
+    elsif( $rv )
+    {
+        return( $rv );
+    }
+    ## For void context too
     else
     {
-        return( 1 );
+        return(1);
     }
 }
 
@@ -374,7 +420,7 @@ sub fetchall_arrayref($@)
     my $row;
     if( $mode eq 'ARRAY' )
     {
-        if( @{ $slice } )
+        if( @$slice )
         {
             push( @rows, [ @{ $row }[ @{ $slice } ] ] ) while( $row = $self->{sth}->fetch() );
         }
@@ -385,7 +431,7 @@ sub fetchall_arrayref($@)
     }
     elsif( $mode eq 'HASH' )
     {
-        my @o_keys = keys( %{ $slice } );
+        my @o_keys = keys( %$slice );
         if( @o_keys )
         {
             my %i_names = map{  ( lc( $_ ) => $_ ) } @{ $self->{sth}->FETCH( 'NAME' ) };
@@ -423,14 +469,14 @@ sub fetchcol($;$)
     my $col_num = shift( @_ );
     if( !$self->executed() )
     {
-        $self->execute() || return;
+        $self->execute() || return( $self->pass_error );
     }
     ## $self->_cleanup();
     ## return( $h->fetchcol( $COL_NUM ) );
     my @col;
     ## $self->dataseek( 0 );
     my $ref;
-    while( $ref = $self->{ 'sth' }->fetchrow_arrayref() )
+    while( $ref = $self->{sth}->fetchrow_arrayref() )
     {
         push( @col, $ref->[ $col_num ] );
     }
@@ -442,12 +488,12 @@ sub fetchhash(@)
     my $self = shift( @_ );
     if( !$self->executed() )
     {
-        $self->execute() || return;
+        $self->execute() || return( $self->pass_error );
     }
     ## $self->_cleanup();
     ## %hash = $sth->fetchhash;
     ## return( $h->fetchhash );
-    my $ref = $self->{ 'sth' }->fetchrow_hashref();
+    my $ref = $self->{sth}->fetchrow_hashref();
     if( $ref ) 
     {
         return( %$ref );
@@ -463,18 +509,18 @@ sub fetchrow(@)
     my $self = shift( @_ );
     if( !$self->executed() )
     {
-        $self->execute() || return;
+        $self->execute() || return( $self->pass_error );
     }
     ## $self->_cleanup();
     ## @arr = $sth->fetchrow;        # Array context
     ## $firstcol = $sth->fetchrow;   # Scalar context
     ## return( $h->fetchrow );
     ## my $ref = $self->fetchrow_arrayref();
-    my $ref = $self->{ 'sth' }->fetchrow_arrayref();
-    ## my $ref = $self->{ 'sth' }->fetch();
+    my $ref = $self->{sth}->fetchrow_arrayref();
+    ## my $ref = $self->{sth}->fetch();
     if( $ref ) 
     {
-        return( wantarray ? @$ref : $ref->[ 0 ] );
+        return( wantarray ? @$ref : $ref->[0] );
     }
     else
     {
@@ -493,7 +539,7 @@ sub fetchrow_hashref
     my $sth = $self->{sth};
     if( !$self->executed() )
     {
-        $self->execute() || return;
+        $self->execute() || return( $self->pass_error );
     }
     return( $sth->fetchrow_hashref ) if( !$dbo->auto_decode_json && !$dbo->auto_convert_datetime_to_object );
     my $ref = $sth->fetchrow_hashref;
@@ -513,12 +559,12 @@ sub fetchrow_object
     my $basePack = ( ref( $self ) =~ /^DB::Object::([^\:]+)/ )[0];
     if( !$self->executed() )
     {
-        $self->execute() || return;
+        $self->execute() || return( $self->pass_error );
     }
     ## $self->_cleanup();
-    my $rows = $self->{ 'sth' }->rows;
+    my $rows = $self->{sth}->rows;
     $self->message( 3, "$rows found" );
-    my $ref = $self->{ 'sth' }->fetchrow_hashref();
+    my $ref = $self->{sth}->fetchrow_hashref();
     $self->message( 3, "Found result data : ", sub{ $self->dumper( $ref ) } );
     if( $ref && scalar( keys( %$ref ) ) ) 
     {
@@ -542,10 +588,10 @@ sub fetchrow_object
 sub finish
 {
     my $self = shift( @_ );
-    my $rc   = $self->{ 'sth' }->finish();
+    my $rc   = $self->{sth}->finish();
     if( !$rc )
     {
-        return( $self->error( $self->{ 'sth' }->errstr() ) );
+        return( $self->error( $self->{sth}->errstr() ) );
     }
     else
     {
@@ -556,10 +602,10 @@ sub finish
 sub ignore
 {
     my $self = shift( @_ );
-    my $query = $self->{ 'query' } ||
+    my $query = $self->{query} ||
     return( $self->error( "No query to set as to be ignored." ) );
     
-    my $type = uc( ( $query =~ /^\s*(\S+)\s+/ )[ 0 ] );
+    my $type = uc( ( $query =~ /^\s*(\S+)\s+/ )[0] );
     ## ALTER for table alteration statements (DB::Object::Tables
     my @allowed = qw( INSERT UPDATE ALTER );
     my $allowed = CORE::join( '|', @allowed );
@@ -589,8 +635,12 @@ sub join
 {
     my $self = shift( @_ );
     my $data = shift( @_ );
-    my $on   = ( scalar( @_ ) == 1 && ref( $_[0] ) ) ? shift( @_ ) : [ @_ ];
-    my $q    = $self->query_object || return( $self->error( "No query formatter object was set" ) );
+    my $on;
+    if( @_ )
+    {
+        $on = ( scalar( @_ ) == 1 && ref( $_[0] ) ) ? shift( @_ ) : [ @_ ];
+    }
+    my $q = $self->query_object || return( $self->error( "No query formatter object was set" ) );
     my $tbl_o = $q->table_object || return( $self->error( "No table object is set in query object." ) );
     my $query = $q->query ||
     return( $self->error( "No query prepared for join with another table." ) );
@@ -606,30 +656,23 @@ sub join
     }
     my $table      = $tbl_o->table;
     my $db         = $tbl_o->database();
-    ## my $multi_db   = $tbl_o->param( 'multi_db' );
     my $multi_db   = $tbl_o->prefix_database;
+    my $alias      = $tbl_o->as;
     # $self->message( 3, "Table object is '$tbl_o', original table is '$table' and database '$db'." ); exit;
     my $new_fields = '';
     my $new_table  = '';
     my $new_db     = '';
     my $class      = ref( $self );
     my $q2 = $q->clone;
-    ## $self->message( 3, "Clone main object is: '$q2'." );
+    # $self->message( 3, "Clone main object is: '$q2'." );
     my $q1;
     $q2->join_tables( $tbl_o ) if( !$q2->join_tables->length );
-    ## $data is a DB::Object::Postgres::Statement object - we get all its parameter and merge them with ours
+    # $data is a DB::Object::Postgres::Statement object - we get all its parameter and merge them with ours
     if( ref( $data ) && ref( $data ) eq $class )
     {
-        ## $new_fields = $data->format_statement();
         $q1 = $data->query_object;
-#         $new_fields = $q1->selected_fields;
-#         $new_table  = $q1->table_object->name;
-#         $new_db     = $q1->database_object->database;
-    
-        ## We need to protect the previous WHERE clause that may contain complex condition, so we use parenthesis.
-        ## $q2->_set_get( where => \( join( ' AND ', ( $q->where(), "( " . ${$q1->where} . " )" ) ) ) ) if( $q1->where );
     }
-    ## $data is the table name
+    # $data is the table name
     else
     {
         my $join_tbl;
@@ -654,15 +697,20 @@ sub join
         $self->message( 3, "Got the table object, and group by is? ", $q1->group );
         $join_tbl->reset;
         
-        $new_table  = $data;
-        ## We assume this table is part of our same database
+        $join_tbl->prefixed( $db ne $join_tbl->database_object->database ? 3 : 1 );
+        # XXX $new_table  = $data;
+        $new_table = $join_tbl->prefix;
+        # We assume this table is part of our same database
         $new_db     = $db;
-        ## my $db_data = $self->getdefault( $new_table );
-        ## $new_fields = $db_data->format_statement();
+        # my $db_data = $self->getdefault( $new_table );
+        # $new_fields = $db_data->format_statement();
         $new_fields = '';
     }
+    # XXX
+    # $q1->table_object->prefixed( $db ne $q1->database_object->database ? 3 : 1 );
     $new_fields = $q1->selected_fields;
     $new_table  = $q1->table_object->name;
+    # $new_table  = $q1->table_object->prefix;
     $new_db     = $q1->database_object->database;
     $q2->join_tables->push( $q1->table_object );
     if( CORE::length( $q->where ) )
@@ -676,14 +724,14 @@ sub join
     }
 #     $self->message( 3, "Where clause is no: ", $q2->where );
 #     $self->message( 3, "Group clause is: ", $q2->group, "\n and with \$q1 maybe? ", $q1->group );
-    ## $self->{ 'group_by' } = \( join( ', ', ( $q->group(), $q1->group() ) ) );
+    # $self->{ 'group_by' } = \( join( ', ', ( $q->group(), $q1->group() ) ) );
     $q2->group( $q->group, $q1->group ) if( $q1->group->value->length );
-    ## $self->{ 'order_by' } = \( join( ', ', ( $q->order(), $q1->order() ) ) );
+    # $self->{ 'order_by' } = \( join( ', ', ( $q->order(), $q1->order() ) ) );
     $q2->order( $q->order, $q1->order ) if( $q1->order->value->length );
-    ## push( @{ $self->{ 'binded_where' } }, @{$q1->binded_where} );
-    ## push( @{ $self->{ 'binded_group' } }, @{$q1->binded_group} );
-    ## push( @{ $self->{ 'binded_order' } }, @{$q1->binded_order} );
-    ## push( @{ $self->{ 'binded' } }, @{ $data->{ 'binded' } } );
+    # push( @{ $self->{ 'binded_where' } }, @{$q1->binded_where} );
+    # push( @{ $self->{ 'binded_group' } }, @{$q1->binded_group} );
+    # push( @{ $self->{ 'binded_order' } }, @{$q1->binded_order} );
+    # push( @{ $self->{ 'binded' } }, @{ $data->{ 'binded' } } );
     $q2->binded_where->push( @{$q1->binded_where} );
     $q2->binded_group->push( @{$q1->binded_group} );
     $q2->binded_order->push( @{$q1->binded_order} );
@@ -694,20 +742,25 @@ sub join
         $q2->binded_limit( $q1->binded_limit );
     }
     my $prev_fields = length( $q->join_fields ) ? $q->join_fields : $q->selected_fields;
-    ## Regular express to prepend previous fields by their table name if that's not the case already
-    ## my $prev_prefix = $new_db ? "$db.$table" : $table;
-    my $prev_prefix = $tbl_o->prefixed( $db ne $new_db ? 3 : 1 )->prefix;
+    # Regular express to prepend previous fields by their table name if that's not the case already
+    # my $prev_prefix = $new_db ? "$db.$table" : $table;
+    my $prev_prefix = $tbl_o->query_object->table_alias ? $tbl_o->query_object->table_alias : $tbl_o->prefixed( $db ne $new_db ? 3 : 1 )->prefix;
     my $prev_fields_hash = $q->table_object->fields;
     my $prev_fields_list = CORE::join( '|', sort( keys( %$prev_fields_hash ) ) );
-    # my $re = qr/(?<!\.)\b($prev_fields_list)\b/;
-    # $self->message( 3, "Executing regular expression: $re on $prev_fields" );
+    my $re = qr/(?<!\.)\b($prev_fields_list)\b/;
+    $self->message( 3, "Executing regular expression: $re on $prev_fields" );
     $prev_fields =~ s/(?<!\.)\b($prev_fields_list)\b/${prev_prefix}.$1/gs;
 #     $self->message( 3, "Fields now are: '$prev_fields'." );
-    my $fields      = $new_fields ? CORE::join( ', ', $prev_fields, $new_fields ) : $prev_fields;
+    my $fields = $new_fields ? CORE::join( ', ', $prev_fields, $new_fields ) : $prev_fields;
     $q2->join_fields( $fields );
     #my $from_table = $q2->from_table;
     #$from_table = $multi_db ? [ "$db.$table" ] : [ $table ] if( !scalar( @$from_table ) );
-    $q2->from_table( $multi_db ? "$db.$table" : $table ) if( !$q2->from_table->length );
+    # $q2->from_table( $multi_db ? "$db.$table" : $table ) if( !$q2->from_table->length );
+    $q2->from_table->push(
+        $q2->table_alias
+            ? sprintf( '%s AS %s', $q2->table_object->name, $q2->table_alias )
+            : ( $q2->table_object->prefixed ? $q2->table_object->prefix : $q2->table_object->name )
+    ) if( !$q2->from_table->length );
     # $q2->left_join( {} ) if( !$q2->left_join );
     my $left_join = '';
     my $condition = '';
@@ -723,7 +776,7 @@ sub join
         {
             if( $self->_is_object( $vals->[0] ) && $vals->[0]->isa( 'DB::Object::Operator' ) )
             {
-#                 $self->message( 3, "Next value is another operator object, drilling down." );
+                # $self->message( 3, "Next value is another operator object (", $sub_obj->operator, "), drilling down." );
                 my $sub_obj = shift( @$vals );
                 my $sub_op = $sub_obj->operator;
                 my( @sub_vals ) = $sub_obj->value;
@@ -735,8 +788,18 @@ sub join
             }
             else
             {
+                if( $self->_is_object( $vals->[0] ) && $vals->[0]->isa( 'DB::Object::Fields::Field::Overloaded' ) )
+                {
+                    my $f1 = shift( @$vals );
+                    $self->message( 3, "Got an overloaded field object '$f1'" );
+                    $f1->field->prefixed( $multi_db ? 3 : 1 );
+                    CORE::push( @res, "$f1" );
+                    $fields_tables->{ $f1->field->table }++ if( !$fields_tables->{ $f1->field->table } );
+                    next;
+                }
+                
                 my( $f1, $f2 ) = ( shift( @$vals ), shift( @$vals ) );
-#                 $self->message( 3, "Value 1 is '$f1' and value 2 is '$f2'." );
+                # $self->message( 3, "Value 1 is '$f1' and value 2 is '$f2'." );
                 my $i_am_negative = 0;
                 if( $self->_is_object( $f2 ) && $f2->isa( 'DB::Object::NOT' ) )
                 {
@@ -755,7 +818,7 @@ sub join
                 {
                     $field1 = $multi_db ? "$new_db.$new_table.$f1" : "$new_table.$f1";
                 }
-                if( $self->_is_object( $f1 ) && $f1->isa( 'DB::Object::Fields::Field' ) )
+                if( $self->_is_object( $f2 ) && $f2->isa( 'DB::Object::Fields::Field' ) )
                 {
                     $f2->prefixed( $multi_db ? 3 : 1 );
                     $field2 = $f2->name;
@@ -774,75 +837,110 @@ sub join
             fields_tables => $fields_tables,
         });
     };
-    ## $on is either a $dbh->AND, or $dbh->OR
-    if( $on && $self->_is_object( $on ) && $on->isa( 'DB::Object::Operator' ) )
+    
+    $self->message( 3, "\$on is '$on' and of type '", ref( $on ), "'." );
+    # $on is either a $dbh->AND, or $dbh->OR
+    if( defined( $on ) )
     {
-#         $self->message( 3, "The join condition is defined by a DB::Object::Operator" );
-        my $op = $on->operator;
-#         $self->message( 3, "Operator is '$op'." );
-        my( @vals ) = $on->value;
-        my $ret = $format_condition->( \@vals, $op );
-        $left_join = "LEFT JOIN $new_table ON $ret->{clause}";
-#         $self->message( 3, "\$left_join is: '$left_join'." );
-    }
-    elsif( $self->_is_array( $on ) )
-    {
-        my $ret = $format_condition->( $on, 'AND' );
-        $left_join = "LEFT JOIN $new_table ON $ret->{clause}";
-#         $self->message( 3, "\$left_join is: '$left_join'." );
-    }
-    ## There is a second parameter - if so this is the condition of the 'LEFT JOIN'
-    elsif( defined( $on ) && $self->_is_hash( $on ) )
-    {
-#         $self->message( 3, "Join condition is made from an hash reference." );
-        ## Previous join
-        my $join_ref = $q2->left_join;
-        ## Add the current one
-        if( $multi_db )
+        if( $self->_is_object( $on ) && $on->isa( 'DB::Object::Operator' ) )
         {
-            $join_ref->{ "$new_db.$new_table" } = $on;
+            $self->message( 3, "The join condition is defined by a DB::Object::Operator" );
+            my $op = $on->operator;
+    #         $self->message( 3, "Operator is '$op'." );
+            my( @vals ) = $on->value;
+            my $ret = $format_condition->( \@vals, $op );
+            my $as = $q1->table_alias ? sprintf( ' AS %s', $q1->table_alias ) : '';
+            $left_join = "LEFT JOIN ${new_table}${as} ON $ret->{clause}";
+    #         $self->message( 3, "\$left_join is: '$left_join'." );
+        }
+        elsif( $self->_is_object( $on ) && $on->isa( 'DB::Object::Fields::Field::Overloaded' ) )
+        {
+            my $as = $q1->table_alias ? sprintf( ' AS %s', $q1->table_alias ) : '';
+            $left_join = "LEFT JOIN ${new_table}${as} ON ${on}";
+        }
+        elsif( $self->_is_array( $on ) )
+        {
+            my $ret = $format_condition->( $on, 'AND' );
+            my $as = $q1->table_alias ? sprintf( ' AS %s', $q1->table_alias ) : '';
+            $left_join = "LEFT JOIN ${new_table}${as} ON $ret->{clause}";
+    #         $self->message( 3, "\$left_join is: '$left_join'." );
+        }
+        # There is a second parameter - if so this is the condition of the 'LEFT JOIN'
+        elsif( $self->_is_hash( $on ) )
+        {
+    #         $self->message( 3, "Join condition is made from an hash reference." );
+            # Previous join
+            my $join_ref = $q2->left_join;
+            my $def = { on => $on, table_object => $q1->table_object, query_object => $q1 };
+            ## Add the current one
+            if( $multi_db )
+            {
+                $join_ref->{ "$new_db.$new_table" } = $def;
+            }
+            else
+            {
+                $join_ref->{ $new_table } = $def;
+            }
+            # (Re)build the LEFT JOIN ... ON ... definition
+            my @join_data = ();
+            foreach my $joined ( keys( %$join_ref ) )
+            {
+                my $condition = $join_ref->{ $joined }->{on};
+                my $to = $join_ref->{ $joined }->{table_object};
+                my $qo = $join_ref->{ $joined }->{query_object};
+                $self->message( 3, "Processing condition for left join table '", $to->name, "' with alias '", $qo->table_alias, "'." );
+                my $join_table_name = $to->prefix;
+                my $join_table_alias = '';
+                if( length( $join_table_alias = $qo->table_alias ) )
+                {
+                    $join_table_alias = " AS $join_table_alias";
+                }
+                # $self->message( 3, "Processing condition: ", sub{ $self->SUPER::dump( $condition )} );
+                push( @join_data, "LEFT JOIN ${join_table_name}${join_table_alias} ON " . CORE::join( ' AND ', map{ "$_=$condition->{ $_ }" } keys( %$condition ) ) );
+            }
+            $left_join = CORE::join( ' ', @join_data );
         }
         else
         {
-            $join_ref->{ $new_table } = $on;
+            warn( "Warning: I have no clue what to do with '$on' (", overload::StrVal( $on ), ") in this join for table \"", $q->table_object->name, "\"\n" );
         }
-        ## (Re)build the LEFT JOIN ... ON ... definition
-        my @join_data = ();
-        foreach my $joined ( keys( %$join_ref ) )
-        {
-            ## push( @join_data, "LEFT JOIN $joined ON " . CORE::join( ' AND ', map{ "$_=$on->{ $_ }" } keys( %$on ) ) );
-            my $condition = $join_ref->{ $joined };
-            push( @join_data, "LEFT JOIN $joined ON " . CORE::join( ' AND ', map{ "$_=$condition->{ $_ }" } keys( %$condition ) ) );
-        }
-        $left_join = CORE::join( ' ', @join_data );
     }
-    ## Otherwise, this is a straight JOIN
+    # Otherwise, this is a straight JOIN
     else
     {
-#         $self->message( 3, "Dealing with a straight join." );
-        ## push( @$from_table, $multi_db ? "$new_db.$new_table" : $new_table );
-        $q2->from_table->push( $multi_db ? "$new_db.$new_table" : $new_table );
+        # $self->message( 3, "Dealing with a straight join." );
+        # $q2->from_table->push( $multi_db ? "$new_db.$new_table" : $new_table );
+        $q2->from_table->push(
+            $q1->table_alias
+                ? sprintf( '%s AS %s', $q1->table_object->name, $q1->table_alias )
+                : ( $q1->table_object->prefixed ? $q1->table_object->prefix : $q1->table_object->name )
+        );
     }
 #     $self->message( 3, "Left join formatted is: '$left_join'." );
-    ## $from = CORE::join( ',', @$from_table );
-    $from = $q2->from_table->join( ',' );
-    ## $q2->from_table( $from_table );
+    $from = $q2->from_table->join( ', ' );
+    # $q2->from_table( $from_table );
     my $clause = $q2->_query_components( 'select' );
-    ## You may not sort if there is no order clause
-    my @query = ( "SELECT $fields FROM $from $left_join" );
+    # You may not sort if there is no order clause
+#     my $table_alias = '';
+#     if( length( $table_alias = $q2->table_alias ) )
+#     {
+#         $table_alias = " AS ${table_alias}";
+#     }
+    # my @query = ( "SELECT ${fields} FROM ${from}${table_alias} ${left_join}" );
+    my @query = ( "SELECT ${fields} FROM ${from} ${left_join}" );
     push( @query, @$clause ) if( @$clause );
     my $statement = CORE::join( ' ', @query );
     $q2->query( $statement );
 #     $self->messagef( 3, "Join tables are %d: %s.", $q2->join_tables->length, CORE::join( "', '", map( $_->name, @{$q2->join_tables} ) ) );
-    ## my $sth = $self->prepare( $self->{ 'query' } ) ||
+    # my $sth = $self->prepare( $self->{ 'query' } ) ||
     my $sth = $tbl_o->_cache_this( $q2 ) ||
     return( $self->error( "Error while preparing query to select:\n", $q2->as_string(), $tbl_o->error ) );
-    ## Routines such as as_string() expect an array on pupose so we do not have to commit the action
-    ## but rather get the statement string. At the end, we write:
-    ## $obj->select() to really select
-    ## $obj->select->as_string() to ONLY get the formatted statement
-    ## wantarray() returns the undefined value in void context, which is typical use of a real select command
-    ## i.e. $obj->select();
+    # Routines such as as_string() expect an array on pupose so we do not have to commit the action
+    # but rather get the statement string. At the end, we write:
+    # $obj->select() to really select
+    # $obj->select->as_string() to ONLY get the formatted statement
+    # wantarray() returns the undefined value in void context, which is typical use of a real select command
+    # i.e. $obj->select();
     if( !defined( wantarray() ) )
     {
         $sth->execute() ||
@@ -854,12 +952,15 @@ sub join
 sub object
 {
     my $self = shift( @_ );
-    ## This is intended for statement to fetched their object:
-    ## my $obj = $table->select( '*' )->object();
-    ## my $obj = $table->select( '*' )
-    ## would merly execute the statement before returning its object, but there are conditions
-    ## such like using a SELECT to create a table where we do not want the statement to be executed already
-    return( $self->{ 'sth' } ? $self->{ 'sth' } : undef() );
+    # This is intended for statement to fetched their object:
+    # my $obj = $table->select( '*' )->object();
+    # my $obj = $table->select( '*' )
+    # would merly execute the statement before returning its object, but there are conditions
+    # such like using a SELECT to create a table where we do not want the statement to be executed already
+    return( $self->{sth} ) if( $self->{sth} );
+    # More sensible approach will return a special Module::Generic::Null object to avoid perl complaining of 'called on undef value' if this is used in chaining
+    return( Module::Generic::Null->new ) if( want( 'OBJECT' ) );
+    return;
 }
 
 sub priority
@@ -874,7 +975,7 @@ sub priority
     ## Bad argument. Do not bother
     return( $self ) if( !exists( $map->{ $prio } ) );
     
-    my $query = $self->{ 'query' } ||
+    my $query = $self->{query} ||
     return( $self->error( "No query to set priority for was provided." ) );
     my $type = uc( ( $query =~ /^\s*(\S+)\s+/ )[ 0 ] );
     my @allowed = qw( DELETE INSERT REPLACE SELECT UPDATE );
@@ -906,18 +1007,17 @@ sub priority
 
 sub query { return( shift->_set_get_scalar( 'query', @_ ) ); }
 
-sub query_object { return( shift->_set_get( 'query_object', @_ ) ); }
+sub query_object { return( shift->_set_get_object( 'query_object', 'DB::Object::Query', @_ ) ); }
 
 sub query_time { return( shift->_set_get_datetime( 'query_time', @_ ) ); }
 
 sub rollback
 {
     my $self = shift( @_ );
-    if( $self->{ 'sth' } && $self->param( 'autocommit' ) )
+    if( $self->{sth} && $self->param( 'autocommit' ) )
     {
-        my $sth = $self->prepare( "ROLLBACK" ) ||
-        return();
-        $sth->execute();
+        my $sth = $self->prepare( "ROLLBACK" ) || return( $self->error( "An error occurred while preparing query to rollback: ", $self->error ) );
+        $sth->execute() || return( $self->error( "Error occurred while executing query to rollback: ", $sth->error ) );
         $sth->finish();
     }
     return( $self );
@@ -928,7 +1028,7 @@ sub rows(@)
     my $self = shift( @_ );
     if( !$self->executed() )
     {
-        $self->execute() || return;
+        $self->execute() || return( $self->pass_error );
     }
     ## $self->_cleanup();
     ## $rv = $sth->rows;
@@ -938,14 +1038,14 @@ sub rows(@)
     }
     else
     {
-        return( $self->{ 'sth' }->rows() );
+        return( $self->{sth}->rows() );
     }
 }
 
 ## A DBI::sth object. This should rather be a _set_get_object helper method, but I am not 100% sure if this is really a DBI::sth
 sub sth { return( shift->_set_get_scalar( 'sth', @_ ) ); }
 
-sub table { return( shift->{ 'table' } ); }
+sub table { return( shift->{table} ); }
 
 sub table_object { return( shift->_set_get_object( 'table_object', 'DB::Object::Tables', @_ ) ); }
 
@@ -962,11 +1062,276 @@ sub _convert_json2hash { return( shift->database_object->_convert_json2hash( @_ 
 
 DESTROY
 {
-    ## Do nothing but existing so it is handled by this package
-    ## print( STDERR "DESTROY'ing statement $self ($self->{ 'query' })\n" );
+    # Do nothing but existing so it is handled by this package
+    # print( STDERR "DESTROY'ing statement $self ($self->{ 'query' })\n" );
 };
 
 1;
 
 __END__
 
+=encoding utf-8
+
+=head1 NAME
+
+DB::Object::Statement - Statement Object
+
+=head1 SYNOPSIS
+
+=head1 VERSION
+
+v0.3.7
+
+=head1 DESCRIPTION
+
+This is the statement object package from which other driver specific packages inherit from.
+
+=head1 METHODS
+
+=head2 as_string
+
+Returns the current statement object as a string.
+
+=head2 bind_param
+
+Provided with a list of arguments and they will be passed to L<DBI/bind_param>
+
+If an error occurred, an error is returned, otherwise the return value of calling C<bind_param> is returned.
+
+=head2 commit
+
+If the statement parameter I<autocommit> is true, a C<COMMIT> statement will be prepared and executed.
+
+The current object is returned.
+
+=head2 database_object
+
+Sets or gets the current database object.
+
+=head2 distinct
+
+Assuming a I<query> object property has already been set previously, this will add the C<DISTINCT> keyword to it if not already set.
+
+If L</distinct> is called in void context, the query is executed immediately.
+
+The query statement is returned.
+
+=head2 dump
+
+Provided with a file and this will print on STDOUT the columns used, separated by a tab and then will process each rows fetched with L<DBI::fetchrow> and will join the column valus with a tab before printing it out to STDOUT.
+
+It returns the current object for chaining.
+
+=head2 exec
+
+This is an alias for L</execute>
+
+=head2 execute
+
+If binded values have been prepared, they are applied here before executing the query.
+
+If the total number of binded values does not match the total number of binded type, this will trigger a warning.
+
+L<DBI/execute> will be called with the binded values and if this method was called in an object context, the current object is returned, otherwise the returned value from L<DBI/execute> is returned.
+
+=head2 executed
+
+Returns true if this statement has already been executed, and false otherwise.
+
+=head2 fetchall_arrayref
+
+Similar to L<DBI/fetchall_arrayref>, this will execute the query and return an array reference of data.
+
+=head2 fetchcol
+
+Provided with an integer that represents a column number, starting from 0, and this will get each row of results and add the value for the column at the given offset.
+
+it returns a list of those column value fetched.
+
+=head2 fetchhash
+
+This will retrieve an hash reference for the given row and return it as a regular hash.
+
+=head2 fetchrow
+
+This will retrieve the data from database using L</fetchrow_arrayref> and return the list of data as array in list context, or the first entry of the array in scalar context.
+
+=head2 fetchrow_hashref
+
+This will retrieve the data from the database as an hash reference.
+
+It will convert any data from json to hash reference if L<DB::Object/auto_decode_json> is set to true.
+
+it will also convert any datetime data into a L<DateTime> object if L<DB::Object/auto_convert_datetime_to_object> is true.
+
+It returns the hash reference retrieved.
+
+=head2 fetchrow_object
+
+This will create dynamically a package named C<DB::Object::Postgres::Result::SomeTable> for example and load the hash reference retrieved from the database into this dynamically created packackage.
+
+It returns the object thus created.
+
+=head2 finish
+
+Calls L<DBI/finish> and return the returned value, or an error if an error occurred.
+
+=head2 ignore
+
+This will change the query prepared and add the keyword C<IGNORE>.
+
+If called in void context, this will execute the resulting statement handler immediately.
+
+=head2 join
+
+Provided with a target and an hash reference, or list or array reference of condition for the join and this will prepare the join statement.
+
+If the original query is not of type C<select>, this will trigger an error.
+
+The target mentioned above can be either a L<DB::Object::Statement> object, or a table object (L<DB::Object::Tables>), or even just a string representing the name of a table.
+
+    $tbl->select->join( $sth );
+    $tbl->select->join( $other_tbl );
+    $tbl->select->join( 'table_name' );
+
+The condition mentioned above can be a L<DB::Object::Operator> (C<AND>, C<OR> or C<NOT>), in which case the actual condition will be taken from that operator embedded value.
+
+The condition can also be a L<DB::Object::Fields::Field::Overloaded> object, which implies a table field with some operator and some value.
+
+    $tbl->select->join( $other_tbl, $other_tbl->fo->id == 2 );
+
+Here C<$other_tbl->fo->id == 2> will become a L<DB::Object::Fields::Field::Overloaded> object.
+
+The condition can also be an array reference or array object of conditions and implicitly the array entry will be joined with C<AND>:
+
+    $tbl->select->join( $other_tbl, ["user = 'joe'", $other_tbl->fo->id == 2] );
+
+The condition can also be an hash reference with each key being a table name to join and each value an hash reference of condition for that particular join with each key being a column name and each value the value of the join for that column.
+
+    my $tbl = $dbh->first_table;
+    $tbl->select->join({
+        other_table =>
+        {
+            id => 'first_table.id',
+            user => 'first_table.user',
+        },
+        yet_another_table =>
+        {
+            id => 'other_table.id',
+        },
+    });
+
+would become something like:
+
+    SELECT *
+    FROM first_table
+    LEFT JOIN other_table ON
+        first_table.id = id AND
+        first_table.user = user
+    LEFT JOIN yet_another_table ON
+        other_table.id = id
+
+Each condition will be formatted assuming an C<AND> expression, so this is less flexible than using operator objects and table field objects.
+
+If no condition is provided, this is taken to be a straight join.
+
+    $tbl->where( $tbl->fo->id == 2 );
+    $other_tbl->where( $other_tbl->fo->user 'john' );
+    $tbl->select->join( $other_tbl );
+
+Would become something like:
+
+    SELECT *
+    FROM first_table, other_table
+    WHERE id = 2 AND user = 'john'
+
+If called in void context, this will execute the resulting statement handler immediately.
+
+It returns the resulting statement handler.
+
+It returns the statement handler.
+
+=head2 object
+
+Returns the statement object explicitly.
+
+    my $sth = $tbl->select->object;
+
+which is really equivalent to:
+
+    my $sth = $tbl->select;
+
+=head2 priority
+
+Provided with a priority integer that can be 0 or 1 with 0 being C<LOW_PRIORITY> and 1 being C<HIGH_PRIORITY> and this will adjust the query formatted to add the priority. This works only on Mysql drive though.
+
+If used on queries other than C<DELETE>, C<INSERT>, C<REPLACE>, C<SELECT>, C<UPDATE> an error will be returned.
+
+If called in void context, this will execute the newly create statement handler immediately.
+
+It returns the newly create statement handler.
+
+=head2 query
+
+Sets or gets the previously formatted query as a regular string.
+
+=head2 query_object
+
+Sets or gets the query object used in this query.
+
+=head2 query_time
+
+Sets or gets the query time as a L<DateTime> object.
+
+=head2 rollback
+
+If there is a statement handler and the database parameter C<autocommit> is set to true, this will prepare a C<ROLLBACK> query and execute it.
+
+=head2 rows
+
+Returns the number of rows affected by the last query.
+
+=head2 sth
+
+Sets or gets the L<DBI> statement handler.
+
+=head2 table
+
+Sets or gets the table object (L<DB::Object::Tables>) for this query.
+
+=head2 table_object
+
+Sets or get the table object (L<DB::Object::Tables>)
+
+=head2 undo
+
+This is an alias for L</rollback>
+
+=head2 wait
+
+The implementation is driver dependent, and in this case, this is implemented only in L<DB::Object::Mysql>
+
+=head2 _convert_datetime2object
+
+A convenient short to enable or disable L<DB::Object/_convert_datetime2object>
+
+=head2 _convert_json2hash
+
+A convenient short to enable or disable L<DB::Object/_convert_json2hash>
+
+=head1 SEE ALSO
+
+L<DB::Object::Query>, L<DB::Object::Mysql::Query>, L<DB::Object::Postgres::Query>, L<DB::Object::SQLite::Query>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2019-2021 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut

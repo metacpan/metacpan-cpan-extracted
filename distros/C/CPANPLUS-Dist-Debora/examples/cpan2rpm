@@ -1,0 +1,3 @@
+#!/bin/sh
+
+cpan2dist --format CPANPLUS::Dist::Debora "$@"

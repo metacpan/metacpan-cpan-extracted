@@ -180,22 +180,6 @@ sub configurator {
     }
     $cfg = hmerge( $cfg, $ccfg );
 
-    if ( $cfg->{settings}->{transcode} ||= $options->{transcode} ) {
-	my $xc = $cfg->{settings}->{transcode};
-	# Load the appropriate notes config, but retain the current parser.
-	unless ( App::Music::ChordPro::Chords::Parser->have_parser($xc) ) {
-	    my $file = getresource("notes/$xc.json");
-	    my $new = hmerge( $cfg, get_config($file) );
-	    local $::config = $new;
-	    App::Music::ChordPro::Chords::Parser->new($new);
-	}
-	unless ( App::Music::ChordPro::Chords::Parser->have_parser($xc) ) {
-	    die("No transcoder for ", $xc, "\n");
-	}
-	warn("Got transcoder for $xc\n") if $::options->{vebose};
-	#warn("Parsers: ", ::dump(App::Music::ChordPro::Chords::Parser::parsers()));
-    }
-
     # Sanitize added extra entries.
     for ( qw(title subtitle footer) ) {
 	delete($cfg->{pdf}->{formats}->{first}->{$_})
@@ -258,18 +242,14 @@ sub configurator {
 	$cfg->{diagrams}->{show} =
 	  $options->{'chord-grids'} ? "all" : 0;
     }
+
+    for ( qw( transpose transcode decapo lyrics-only ) ) {
+	next unless defined $options->{$_};
+	$cfg->{settings}->{$_} = $options->{$_};
+    }
+
     if ( defined $options->{'chord-grids-sorted'} ) {
 	$cfg->{diagrams}->{sorted} = $options->{'chord-grids-sorted'};
-    }
-    if ( $options->{'lyrics-only'} ) {
-	$cfg->{settings}->{'lyrics-only'} = $options->{'lyrics-only'};
-    }
-    if ( $options->{transcode} ) {
-	# Already handled.
-	# $cfg->{settings}->{transcode} = $options->{transcode};
-    }
-    if ( $options->{decapo} ) {
-	$cfg->{settings}->{decapo} = $options->{decapo};
     }
 
     # For convenience...
@@ -520,6 +500,7 @@ sub _augment {
 	warn("Config error: unknown item $path$key\n")
 	  unless exists $self->{$key}
 	    || $path eq "pdf.fontconfig."
+	    || $path =~ "^meta\."
 	    || $key =~ /^_/;
 
 	# Hash -> Hash.
@@ -757,6 +738,7 @@ sub hmerge($$;$) {
 	warn("Config error: unknown item $path$key\n")
 	  unless exists $res{$key}
 	    || $path eq "pdf.fontconfig."
+	    || $path =~ /^meta\./
 	    || $key =~ /^_/;
 
 	if ( ref($right->{$key}) eq 'HASH'
@@ -940,6 +922,8 @@ sub default_config() {
       "inline-chords" : false,
       // Chords under the lyrics.
       "chords-under" : false,
+      // Transposing.
+      "transpose" : 0,
       // Transcoding.
       "transcode" : "",
       // Always decapoize.
@@ -971,7 +955,7 @@ sub default_config() {
     "meta" : {
     },
 
-    // Dates.
+    // Dates. Format is a strftime template.
     "dates" : {
         "today" : {
             "format" : "%A, %B %e, %Y"
@@ -1063,21 +1047,21 @@ sub default_config() {
 	{ "fields"   : [ "songindex" ],
 	  "label"    : "Table of Contents",
 	  "line"     : "%{title}",
-          "pageno"   : "%{pageno}",
+          "pageno"   : "%{page}",
 	  "fold"     : false,
 	  "omit"     : false,
 	},
 	{ "fields"   : [ "sorttitle", "artist" ],
 	  "label"    : "Contents by Title",
 	  "line"     : "%{title}%{artist| - %{}}",
-          "pageno"   : "%{pageno}",
+          "pageno"   : "%{page}",
 	  "fold"     : false,
 	  "omit"     : false,
 	},
 	{ "fields"   : [ "artist", "sorttitle" ],
 	  "label"    : "Contents by Artist",
 	  "line"     : "%{artist|%{} - }%{title}",
-          "pageno"   : "%{pageno}",
+          "pageno"   : "%{page}",
 	  "fold"     : false,
 	  "omit"     : true,
 	},
@@ -1165,6 +1149,7 @@ sub default_config() {
 	  // Recall style: Print the tag using the type.
 	  // Alternatively quote the lines of the preceding chorus.
 	  "recall" : {
+	      "choruslike" : false,
 	      "tag"   : "Chorus",
 	      "type"  : "comment",
 	      "quote" : false,
@@ -1237,7 +1222,7 @@ sub default_config() {
 
       // Even/odd pages. A value of -1 denotes odd/even pages.
       "even-odd-pages" : 1,
-      // Align songs to even/odd pages.
+      // Align songs to even/odd pages. When greater than 1, force alignment.
       "pagealign-songs" : 1,
 
       // Formats.
@@ -1355,7 +1340,8 @@ sub default_config() {
 	  },
 	  "chordfingers" : {
 	      "name" : "ZapfDingbats",
-	      "size" : 10
+	      "size" : 10,
+	      "numbercolor" : "background",
 	  },
 	  "comment" : {
 	      "name" : "Helvetica",
@@ -1427,6 +1413,12 @@ sub default_config() {
 
       // This will show the page layout if non-zero.
       "showlayout" : false,
+
+      // CSV generation.
+      "csv" : {
+	  // Restrict CSV to song pages only (do not include matter pages).
+	  "songsonly" : true
+      }
     },
 
     // Settings for ChordPro backend.
@@ -1474,6 +1466,8 @@ sub default_config() {
 	"preprocess" : {
 	    // All lines.
 	    "all" : [],
+	    // Directives.
+	    "directive" : [],
 	    // Song lines (lyrics) only.
             "songline" : [],
 	},
@@ -1481,7 +1475,10 @@ sub default_config() {
 
     // For (debugging (internal use only)).
     "debug" : {
+        "spacing" : 0,
         "song" : 0,
+  	"abc" : 0,
+  	"ly" : 0,
     },
 
 }

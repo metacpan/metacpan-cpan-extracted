@@ -31,7 +31,7 @@ optional_features: {}
 provides:
   App::Licensecheck:
     file: lib/App/Licensecheck.pm
-    version: v3.2.6
+    version: v3.2.9
 requires:
   Array::IntSpan: '0'
   Encode: '0'
@@ -49,7 +49,6 @@ requires:
   Pod::Usage: '0'
   Regexp::Pattern: v0.2.12
   Regexp::Pattern::License: v3.4.0
-  Sort::Key::Multi: '1.25'
   String::Copyright: '0.003'
   String::Escape: '0'
   Try::Tiny: '0'
@@ -64,12 +63,12 @@ resources:
   homepage: https://metacpan.org/pod/App::Licensecheck
   license: http://www.gnu.org/licenses/agpl-3.0.txt
   repository: https://salsa.debian.org/build-common-team/licensecheck.git
-version: v3.2.6
+version: v3.2.9
 x_contributors:
   - 'Paul Wise <pabs@debian.org>'
 x_help_wanted:
-  - documenter
   - tester
+  - documenter
 x_provides_scripts:
   licensecheck:
     file: bin/licensecheck

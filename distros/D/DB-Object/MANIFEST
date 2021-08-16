@@ -1,4 +1,5 @@
 Changes
+CONTRIBUTING.md
 lib/DB/Object.pm
 lib/DB/Object/Cache/Tables.pm
 lib/DB/Object/Fields.pm
@@ -29,7 +30,9 @@ t/001_load.t
 t/002_postgres.t
 t/003_sqlite.t
 t/004_mysql.t
-t/005_pod.t
+t/005.field.t
+t/900_pod.t
+t/999.kwalitee.t
 t/mysql.sql
 t/pgsql.sql
 t/sqlite.sql

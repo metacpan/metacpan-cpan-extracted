@@ -1,33 +1,44 @@
+#! perl
+
+# Ease the life of the CPAN testers.
+use v5.10.1;
+
 use strict;
 use warnings;
-use ExtUtils::MakeMaker;
 
-WriteMakefile(
-    NAME                => 'File::LoadLines',
-    AUTHOR              => 'Johan Vromans <jv@cpan.org>',
-#    VERSION_FROM        => 'lib/File/LoadLines.pm',
-    VERSION             => '1.020.2',
-    ABSTRACT_FROM       => 'lib/File/LoadLines.pm',
-    LICENSE		=> 'perl_5',
-    PL_FILES            => {},
-    MIN_PERL_VERSION	=> '5.010001',
-    PREREQ_PM => {
-        'ExtUtils::MakeMaker' => 6.46,
-        'Test::More'          => 1.30,
-        'Test::Exception'     => 0.43,
+# Need EU::MM that understands *_REQUIRES.
+use ExtUtils::MakeMaker 6.76;
+
+WriteMakefile
+(
+  NAME				=> 'File::LoadLines',
+  AUTHOR			=> 'Johan Vromans <jv@cpan.org>',
+  VERSION_FROM			=> 'lib/File/LoadLines.pm',
+  ABSTRACT_FROM			=> 'lib/File/LoadLines.pm',
+  LICENSE			=> 'perl_5',
+  PL_FILES			=> {},
+  MIN_PERL_VERSION		=> v5.10.1,
+
+  CONFIGURE_REQUIRES => {
+    'ExtUtils::MakeMaker'	=> 6.76,
+  },
+
+#  BUILD_REQUIRES => { 
+#  },
+
+  TEST_REQUIRES  => {
+    'Test::More'		=> 0,
+    'Test::Exception'		=> 0,
+  },
+
+  META_MERGE => {
+    resources    => {
+      repository => 'https://github.com/sciurius/perl-File-LoadLines',
+      bugtracker => "https://github.com/sciurius/perl-File-LoadLines/issues",
     },
-    META_MERGE => {
-      resources    => {
-        repository => {
-          type => 'git',
-	   web  => 'https://github.com/sciurius/perl-File-LoadLines',
-	   url  => 'https://github.com/sciurius/perl-File-LoadLines.git',
-	 },
-	 bugtracker => "https://github.com/sciurius/perl-File-LoadLines/issues",
-	},
-	'meta-spec' => {
-	  version => '2',
-	  url     => 'https://metacpan.org/pod/CPAN::Meta::Spec',
-	},
-    }
+    'meta-spec' => {
+      version => '2',
+	url     => 'https://metacpan.org/pod/CPAN::Meta::Spec',
+    },
+  }
 );

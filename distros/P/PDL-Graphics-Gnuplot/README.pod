@@ -2,7 +2,7 @@
 
 This is a Gnuplot-based plotter for PDL. This repository stores the history for
 the PDL::Graphics::Gnuplot module on CPAN. Install the module via CPAN. CPAN
-page at L<http://search.cpan.org/~zowie/PDL-Graphics-Gnuplot/lib/PDL/Graphics/Gnuplot.pm>.
+page at L<http://metacpan.org/pod/PDL::Graphics::Gnuplot>.
 
 =cut
 
@@ -1142,15 +1142,15 @@ of color tables, and have better support for scientific images.
 
 C<pseudocolor> (synonym C<pc>) gives access to the color tables built
 in to the C<PDL::Transform::Color> package, if that package is
-available.  It takes either a color table name or a list ref which 
-is a collection of arguments that get sent to the 
+available.  It takes either a color table name or a list ref which
+is a collection of arguments that get sent to the
 C<PDL::Transform::Color::t_pc> transform definition method. Sending
 the empty string or undef will generate a list of allowable color
-table names.  Many of the color tables are "photometric" and 
+table names.  Many of the color tables are "photometric" and
 will render photometric data correctly without gamma correction.
 
-C<perceptual> (synonym C<pcp>) gives the same access to 
-C<PDL::Transform::Color> as does C<pseudocolor>, but the 
+C<perceptual> (synonym C<pcp>) gives the same access to
+C<PDL::Transform::Color> as does C<pseudocolor>, but the
 "equal-perceptual-difference" scaling is used -- i.e. input
 values are gamma-corrected by the module so that uniform
 shifts in numeric value yield approximately uniform perceptual
@@ -1547,10 +1547,10 @@ default set of linetypes for your current output terminal.
 
 =item dashtype (abbrev 'dt')
 
-This is can be either a numeric type selector (0 for no dashes) or 
+This is can be either a numeric type selector (0 for no dashes) or
 an ARRAY ref containing a list of up to 5 pairs of (dash length,
-space length).  The C<dashtype> curve option is only supported for 
-Gnuplot versions 5.0 and above.  
+space length).  The C<dashtype> curve option is only supported for
+Gnuplot versions 5.0 and above.
 
 If you don't specify a C<dashtype> curve option, the default behavior
 matches the behavior of earlier gnuplots: many terminals support a
@@ -1560,7 +1560,7 @@ dashed by default.  To make a single curve solid, specify C<dt=>0> as
 a curve option for it; or to make all curves solid, use the constructor
 or the C<output> method to set the terminal option C<dashed=>0>.
 
-If your gnuplot is older than v5.0, the dashtype curve option is 
+If your gnuplot is older than v5.0, the dashtype curve option is
 ignored (and causes a warning to be emitted).
 
 =item linestyle (abbrev 'ls')

@@ -18,7 +18,7 @@ require DynaLoader;
 @EXPORT = qw(
     
 );
-$VERSION = '0.59';
+$VERSION = '0.60';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -152,9 +152,10 @@ sub _get_tty_list
 {
   my ($self) = @_;
   undef %Proc::ProcessTable::TTYDEVS;
+  return unless -d "/dev";
   find({ wanted => 
        sub{
-     $File::Find::prune = 1 if -d $_ && ! -x $_;
+     $File::Find::prune = 1 if -d $_ && ( ! -x $_ || $_ eq "/dev/.lxc");
      my($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
         $atime,$mtime,$ctime,$blksize,$blocks) = stat($File::Find::name);
      $Proc::ProcessTable::TTYDEVS{$rdev} = $File::Find::name

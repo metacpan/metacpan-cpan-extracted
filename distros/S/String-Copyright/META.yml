@@ -28,7 +28,7 @@ optional_features: {}
 provides:
   String::Copyright:
     file: lib/String/Copyright.pm
-    version: '0.003006'
+    version: '0.003007'
 requires:
   Exporter::Tiny: '0'
   Number::Range: '0.04'
@@ -37,10 +37,10 @@ requires:
 resources:
   Identifier: http://purl.org/NET/cpan-uri/dist/String-Copyright/project
   bugtracker: https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=libstring-copyright-perl
-  homepage: https://metacpan.org/release/String-Copyright
+  homepage: https://metacpan.org/pod/String::Copyright
   license: http://www.gnu.org/licenses/gpl-3.0.txt
   repository: https://anonscm.debian.org/cgit/build-common/string-copyright.git
-version: '0.003006'
+version: '0.003007'
 x_help_wanted:
   - documenter
   - tester

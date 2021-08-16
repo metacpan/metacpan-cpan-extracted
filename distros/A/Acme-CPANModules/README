@@ -1,12 +1,12 @@
 NAME
-    Acme::CPANModules - CPAN modules
+    Acme::CPANModules - Categorizing CPAN modules
 
 SPECIFICATION VERSION
     0.1
 
 VERSION
-    This document describes version 0.1.8 of Acme::CPANModules (from Perl
-    distribution Acme-CPANModules), released on 2021-02-20.
+    This document describes version 0.1.9 of Acme::CPANModules (from Perl
+    distribution Acme-CPANModules), released on 2021-03-23.
 
 DESCRIPTION
     With the multitude of modules that are available on CPAN, it is

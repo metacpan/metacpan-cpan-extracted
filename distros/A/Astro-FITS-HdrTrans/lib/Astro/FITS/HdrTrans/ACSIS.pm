@@ -36,7 +36,7 @@ use constant CLIGHT => 2.99792458e5;
 
 use vars qw/ $VERSION /;
 
-$VERSION = "1.63";
+$VERSION = "1.64";
 
 # Cache UTC definition
 our $UTC = DateTime::TimeZone->new( name => 'UTC' );
@@ -138,8 +138,9 @@ these are many-to-many)
 
 =item B<to_DR_RECIPE>
 
-Usually simply copies the "RECIPE" header. If the observation type is
-skydip and the RECIPE header is "REDUCE_SCIENCE" we actually use
+Usually simply copies the RECIPE header. If the header is undefined,
+initially set the recipe to REDUCE_SCIENCE. If the observation type
+is skydip and the RECIPE header is "REDUCE_SCIENCE", actually use
 REDUCE_SKYDIP. If a skydip is not being done and the STANDARD header
 is true, then the recipe is set to REDUCE_STANDARD. If the INBEAM
 header is "POL", the recipe name has "_POL" appended if it is a
@@ -153,6 +154,11 @@ sub to_DR_RECIPE {
   my $FITS_headers = shift;
 
   my $dr = $FITS_headers->{RECIPE};
+  if ( defined( $dr ) ) {
+     $dr = uc( $dr );
+  } else {
+     $dr = 'REDUCE_SCIENCE';
+  }
 
   my $obstype = lc( $class->to_OBSERVATION_TYPE( $FITS_headers ) );
   my $pol = $class->to_POLARIMETER( $FITS_headers );
@@ -176,8 +182,8 @@ sub to_DR_RECIPE {
   if ( $utdate > 20081115 && $pol && $is_sci ) {
     $dr .= "_POL" unless $dr =~ /_POL$/;
   }
-  $dr = uc($dr);
-  if( $dr eq 'REDUCE_SCIENCE' ) {
+
+  if ( $dr eq 'REDUCE_SCIENCE' ) {
     $dr .= '_' . ($freq_sw ? 'FSW' : 'GRADIENT');
   }
 

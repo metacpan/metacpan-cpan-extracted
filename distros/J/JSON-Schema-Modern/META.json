@@ -43,7 +43,7 @@
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007"
          },
          "requires" : {
-            "Email::Address::XS" : "1.01",
+            "Email::Address::XS" : "1.04",
             "Encode" : "0",
             "File::Spec" : "0",
             "IO::Handle" : "0",
@@ -103,7 +103,7 @@
          "suggests" : {
             "Class::XSAccessor" : "0",
             "Cpanel::JSON::XS" : "0",
-            "Email::Address::XS" : "1.01",
+            "Email::Address::XS" : "1.04",
             "Ref::Util::XS" : "0",
             "Type::Tiny::XS" : "0"
          }
@@ -214,63 +214,63 @@
    "provides" : {
       "JSON::Schema::Modern" : {
          "file" : "lib/JSON/Schema/Modern.pm",
-         "version" : "0.515"
+         "version" : "0.516"
       },
       "JSON::Schema::Modern::Annotation" : {
          "file" : "lib/JSON/Schema/Modern/Annotation.pm",
-         "version" : "0.515"
+         "version" : "0.516"
       },
       "JSON::Schema::Modern::Document" : {
          "file" : "lib/JSON/Schema/Modern/Document.pm",
-         "version" : "0.515"
+         "version" : "0.516"
       },
       "JSON::Schema::Modern::Error" : {
          "file" : "lib/JSON/Schema/Modern/Error.pm",
-         "version" : "0.515"
+         "version" : "0.516"
       },
       "JSON::Schema::Modern::Result" : {
          "file" : "lib/JSON/Schema/Modern/Result.pm",
-         "version" : "0.515"
+         "version" : "0.516"
       },
       "JSON::Schema::Modern::Utilities" : {
          "file" : "lib/JSON/Schema/Modern/Utilities.pm",
-         "version" : "0.515"
+         "version" : "0.516"
       },
       "JSON::Schema::Modern::Vocabulary" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary.pm",
-         "version" : "0.515"
+         "version" : "0.516"
       },
       "JSON::Schema::Modern::Vocabulary::Applicator" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Applicator.pm",
-         "version" : "0.515"
+         "version" : "0.516"
       },
       "JSON::Schema::Modern::Vocabulary::Content" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Content.pm",
-         "version" : "0.515"
+         "version" : "0.516"
       },
       "JSON::Schema::Modern::Vocabulary::Core" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Core.pm",
-         "version" : "0.515"
+         "version" : "0.516"
       },
       "JSON::Schema::Modern::Vocabulary::FormatAnnotation" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/FormatAnnotation.pm",
-         "version" : "0.515"
+         "version" : "0.516"
       },
       "JSON::Schema::Modern::Vocabulary::FormatAssertion" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/FormatAssertion.pm",
-         "version" : "0.515"
+         "version" : "0.516"
       },
       "JSON::Schema::Modern::Vocabulary::MetaData" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/MetaData.pm",
-         "version" : "0.515"
+         "version" : "0.516"
       },
       "JSON::Schema::Modern::Vocabulary::Unevaluated" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Unevaluated.pm",
-         "version" : "0.515"
+         "version" : "0.516"
       },
       "JSON::Schema::Modern::Vocabulary::Validation" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/Validation.pm",
-         "version" : "0.515"
+         "version" : "0.516"
       }
    },
    "release_status" : "stable",
@@ -285,7 +285,7 @@
          "web" : "https://github.com/karenetheridge/JSON-Schema-Modern"
       }
    },
-   "version" : "0.515",
+   "version" : "0.516",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.035002"
@@ -1202,7 +1202,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.515",
+                  "tag" : "v0.516",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

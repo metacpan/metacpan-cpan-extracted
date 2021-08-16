@@ -1,27 +1,33 @@
 {
    "abstract" : "Add modbus TCP or RTU functions for your program.",
    "author" : [
-      "Loic Lefebvre <lle@cpan.org>"
+      "Lefebvre Loic <lle@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "MBclient",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
@@ -30,20 +36,14 @@
          }
       }
    },
-   "provides" : {
-      "MBclient" : {
-         "file" : "lib/MBclient.pm",
-         "version" : "1.57"
-      }
-   },
    "release_status" : "stable",
    "resources" : {
-      "license" : [
-         "http://www.opensource.org/licenses/mit-license.php"
-      ],
       "repository" : {
-         "url" : "https://github.com/sourceperl/MBclient"
+         "type" : "git",
+         "url" : "https://github.com/sourceperl/MBclient.git",
+         "web" : "https://github.com/sourceperl/MBclient"
       }
    },
-   "version" : "1.57"
+   "version" : "1.58",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

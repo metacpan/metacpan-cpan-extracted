@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::QueryString::FileExpansion;
 use strict;
 use warnings;
 
-our $VERSION = '7.9'; # VERSION
+our $VERSION = '8.0'; # VERSION
 
 use CLI::Helpers qw(:output);
 use File::Slurp::Tiny qw(read_lines);
@@ -146,7 +146,7 @@ App::ElasticSearch::Utilities::QueryString::FileExpansion - Build a terms query 
 
 =head1 VERSION
 
-version 7.9
+version 8.0
 
 =head1 SYNOPSIS
 

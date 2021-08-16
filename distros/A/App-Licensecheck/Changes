@@ -7,6 +7,43 @@ Home page:    <https://metacpan.org/release/App-Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.2.9	2021-08-16
+
+ [ Packaging ]
+ - stop use Sort::Key::Multi
+
+ [ Other ]
+ - strip xml tag <ref ...>, and extend to strip html tags <p> <br> with
+   attributes (not only bare tags)
+
+v3.2.8	2021-08-15
+
+ - fix tests and silence warnings with Regexp::Pattern::License less than
+   v3.8.1
+
+v3.2.7	2021-08-14
+
+ [ Bug Fixes ]
+ - extend local lgpl dual-license pattern to not assume name patterns
+   include trait published_by, required since Regexp::Pattern::License
+   v3.9.0
+ - stop treat : or :// as cruft
+ - strip simple closing (not only opening) html tags as cruft
+
+ [ Test Suite ]
+ - add test for (not yet detected) BSD-3-clause~Refractions
+ - simplify tests
+ - stop skip author test apparently succeding nowadays
+ - test-recommend Regexp::Pattern::License 3.9.0
+ - update author tests to cover Regexp::Pattern::License v3.9.0
+
+ [ Other ]
+ - avoid hardcoding names of specific prefix traits
+ - detect python_2 and (additional, standalone) cnri_python in same file
+ - force atomic scan for mit_new, to avoid misdetecting ambiguous MIT X11
+   grant as only x11
+ - optimize: compile only patterns actually used
+
 v3.2.6	2021-08-07
 
  [ Documentation ]

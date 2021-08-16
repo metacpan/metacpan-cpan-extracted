@@ -13,7 +13,7 @@ do { my $x = {
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
-                                      'Email::Address::XS' => '1.01',
+                                      'Email::Address::XS' => '1.04',
                                       'Encode' => '0',
                                       'File::Spec' => '0',
                                       'IO::Handle' => '0',
@@ -73,7 +73,7 @@ do { my $x = {
                       'suggests' => {
                                       'Class::XSAccessor' => '0',
                                       'Cpanel::JSON::XS' => '0',
-                                      'Email::Address::XS' => '1.01',
+                                      'Email::Address::XS' => '1.04',
                                       'Ref::Util::XS' => '0',
                                       'Type::Tiny::XS' => '0'
                                     }

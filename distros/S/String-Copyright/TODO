@@ -16,3 +16,5 @@
     + Emit warning when author id's refer to varying full strings.
   * Implement alias option:
     + Hash of arrays of id's to be merged with id used as key.
+  * Fix "Complex regular subexpression recursion limit (32766) exceeded at /usr/share/perl5/String/Copyright.pm line 162."
+    seen with twitter-bootstrap3 3.4.1+dfsg-1.

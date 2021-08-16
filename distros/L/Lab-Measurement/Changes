@@ -4,6 +4,10 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.770 2021-08-15
+  * Port the TMRC2 driver to Moose
+  * Documentation improvements
+
 3.762 2021-07-07
   * Fix Yokogawa 7651 source driver
 

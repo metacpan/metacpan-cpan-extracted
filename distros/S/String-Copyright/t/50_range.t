@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use utf8;
 
-use Test::More tests => 22;
+use Test::More tests => 25;
 
 use String::Copyright {
 	format => sub { join ':', $_->[0] || '', $_->[1] || '' }
@@ -64,6 +64,12 @@ is copyright("© , 1999, 2000"), '1999-2000:', 'initial comma';
 is copyright("© -1999, 2000"),
 	':-1999, 2000',
 	'not-treated-as-year starting with dash';
+
+is copyright("© 2001, 2001"), '2001:', 'duplicate year';
+
+is copyright("© 2001-2001"), '2001:', 'single-year range';
+
+is copyright("© 2002-2000"), '2000-2002:', 'backwards range';
 
 TODO: {
 	local $TODO = 'not yet handled';

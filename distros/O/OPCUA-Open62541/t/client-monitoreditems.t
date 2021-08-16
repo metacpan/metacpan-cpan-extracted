@@ -100,8 +100,16 @@ is($response->{MonitoredItemCreateResult_statusCode},
    "BadSubscriptionIdInvalid",
    "monitored items create fail response statuscode");
 
-ok($deleted,
-   "subscription deleted callback");
+ok(my $buildinfo = $server->{config}->getBuildInfo());
+note explain $buildinfo;
+# the semantics whether the callback is called in case of error has changed
+if ($buildinfo->{BuildInfo_softwareVersion} =~ /^1\.0\./) {
+    ok($deleted,
+       "subscription deleted callback");
+} else {
+    is($deleted, undef,
+       "subscription deleted callback");
+}
 
 my $expected_response = {
     MonitoredItemCreateResult_filterResult => ignore(),
@@ -241,6 +249,7 @@ no_leaks_ok {
 } "MonitoredItemCreateRequest_default leak";
 
 no_leaks_ok {
+    $i = 0;
     $response = $client->{client}->MonitoredItems_createDataChange(
 	$subid,
 	TIMESTAMPSTORETURN_BOTH,
@@ -249,11 +258,10 @@ no_leaks_ok {
 	undef,
 	undef,
     );
+    # iterate until all delete callbacks have been called
+    $client->iterate(sub {sleep 1; ++$i > 10 &&
+	$response->{MonitoredItemCreateResult_statusCode} eq 'Good'});
 } "MonitoredItems_createDataChange leak";
-
-is($response->{MonitoredItemCreateResult_statusCode},
-   "Good",
-   "monitored items create response statuscode");
 
 no_leaks_ok {
     $response = $client->{client}->MonitoredItems_createDataChange(

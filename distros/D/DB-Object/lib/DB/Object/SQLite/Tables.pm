@@ -1,19 +1,19 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## DB/Object/SQLite/Tables.pm
-## Version 0.3
-## Copyright(c) 2019 Jacques Deguest
-## Author: Jacques Deguest <jack@deguest.jp>
-## Created 2017/07/19
-## Modified 2019/06/18
-## All rights reserved.
-## 
-## This program is free software; you can redistribute it and/or modify it 
-## under the same terms as Perl itself.
+# DB/Object/SQLite/Tables.pm
+# Version 0.3
+# Copyright(c) 2019 Jacques Deguest
+# Author: Jacques Deguest <jack@deguest.jp>
+# Created 2017/07/19
+# Modified 2019/06/18
+# All rights reserved.
+# 
+# This program is free software; you can redistribute it and/or modify it 
+# under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
-## This package's purpose is to separate the object of the tables from the main
-## DB::Object package so that when they get DESTROY'ed, it does not interrupt
-## the SQL connection
+# This package's purpose is to separate the object of the tables from the main
+# DB::Object package so that when they get DESTROY'ed, it does not interrupt
+# the SQL connection
 ##----------------------------------------------------------------------------
 package DB::Object::SQLite::Tables;
 BEGIN
@@ -22,10 +22,9 @@ BEGIN
     use strict;
     our( $VERSION, $VERBOSE, $DEBUG );
     use parent qw( DB::Object::SQLite DB::Object::Tables );
-    $VERSION    = '0.3';
+    $VERSION    = 'v0.300.0';
     $VERBOSE    = 0;
     $DEBUG      = 0;
-    use Devel::Confess;
 };
 
 sub init
@@ -33,40 +32,39 @@ sub init
     return( shift->DB::Object::Tables::init( @_ ) );
 }
 
-##----{ End of generic routines }----##
-## Inherited from DB::Object::Tables
-## sub alter
+# Inherited from DB::Object::Tables
+# sub alter
 
 sub create
 {
     my $self  = shift( @_ );
-    ## $tbl->create( [ 'ROW 1', 'ROW 2'... ], { 'temporary' => 1, 'TYPE' => ISAM }, $obj );
+    # $tbl->create( [ 'ROW 1', 'ROW 2'... ], { 'temporary' => 1, 'TYPE' => ISAM }, $obj );
     my $data  = shift( @_ ) || [];
     my $opt   = shift( @_ ) || {};
     my $sth   = shift( @_ );
-    my $table = $self->{ 'table' };
-    ## Set temporary in the object, so we can use it to recreate the table creation info as string:
-    ## $table->create( [ ... ], { ... }, $obj )->as_string();
-    my $temp  = $self->{ 'temporary' } = delete( $opt->{ 'temporary' } );
-    ## Check possible options
+    my $table = $self->{table};
+    # Set temporary in the object, so we can use it to recreate the table creation info as string:
+    # $table->create( [ ... ], { ... }, $obj )->as_string();
+    my $temp  = $self->{temporary} = delete( $opt->{temporary} );
+    # Check possible options
     my $allowed = 
     {
-    'type'                => qr/^(ISAM|MYISAM|HEAP)$/i,
-    'auto_increment'    => qr/^(1|0)$/,
-    'avg_row_length'    => qr/^\d+$/,
-    'checksum'            => qr/^(1|0)$/,
-    'comment'            => qr//,
-    'max_rows'            => qr/^\d+$/,
-    'min_rows'            => qr/^\d+$/,
-    'pack_keys'            => qr/^(1|0)$/,
-    'password'            => qr//,
-    'delay_key_write'    => qr/^\d+$/,
-    'row_format'        => qr/^(default|dynamic|static|compressed)$/i,
-    'raid_type'            => qr/^(?:1|STRIPED|RAID0|RAID_CHUNKS\s*=\s*\d+|RAID_CHUNKSIZE\s*=\s*\d+)$/,
+    type            => qr/^(ISAM|MYISAM|HEAP)$/i,
+    auto_increment  => qr/^(1|0)$/,
+    avg_row_length  => qr/^\d+$/,
+    checksum        => qr/^(1|0)$/,
+    comment         => qr//,
+    max_rows        => qr/^\d+$/,
+    min_rows        => qr/^\d+$/,
+    pack_keys       => qr/^(1|0)$/,
+    password        => qr//,
+    delay_key_write => qr/^\d+$/,
+    row_format      => qr/^(default|dynamic|static|compressed)$/i,
+    raid_type       => qr/^(?:1|STRIPED|RAID0|RAID_CHUNKS\s*=\s*\d+|RAID_CHUNKSIZE\s*=\s*\d+)$/,
     };
     my @options = ();
     my @errors  = ();
-    ## Avoid working for nothing, make this condition
+    # Avoid working for nothing, make this condition
     if( %$opt )
     {
         my %lc_opt  = map{ lc( $_ ) => $opt->{ $_ } } keys( %$opt );
@@ -90,9 +88,9 @@ sub create
     {
         warn( "The options '", join( ', ', @errors ), "' were either not recognized or malformed and thus were ignored.\n" );
     }
-    ## Check statement
+    # Check statement
     my $select = '';
-    if( $sth && ref( $sth ) && ( $sth->isa( "DB::Object::Statement" ) || $sth->can( 'as_string' ) ) )
+    if( $sth && ref( $sth ) && ( $sth->isa( 'DB::Object::Statement' ) || $sth->can( 'as_string' ) ) )
     {
         $select = $sth->as_string();
         if( $select !~ /^\s*(?:IGNORE|REPLACE)*\s*\bSELECT\s+/ )
@@ -103,9 +101,9 @@ sub create
     if( $self->exists() == 0 )
     {
         my $query = 'CREATE ' . ( $temp ? 'TEMPORARY ' : '' ) . "TABLE $table ";
-        ## Structure of table if any - 
-        ## structure may very well be provided using a select statement, such as:
-        ## CREATE TEMPORARY TABLE ploppy TYPE=HEAP COMMENT='this is kewl' MAX_ROWS=10 SELECT * FROM some_table LIMIT 0,0
+        # Structure of table if any - 
+        # structure may very well be provided using a select statement, such as:
+        # CREATE TEMPORARY TABLE ploppy TYPE=HEAP COMMENT='this is kewl' MAX_ROWS=10 SELECT * FROM some_table LIMIT 0,0
         my $def    = "(\n" . CORE::join( ",\n", @$data ) . "\n)" if( $data && ref( $data ) && @$data );
         my $tdef   = CORE::join( ' ', map{ "\U$_\E = $opt->{ $_ }" } @options );
         if( !$def && !$select )
@@ -115,7 +113,7 @@ sub create
         $query .= join( ' ', $def, $tdef, $select );
         my $new = $self->prepare( $query ) ||
         return( $self->error( "Error while preparing query to create table '$table':\n$query", $self->errstr() ) );
-        ## Trick so other method may follow, such as as_string(), fetchrow(), rows()
+        # Trick so other method may follow, such as as_string(), fetchrow(), rows()
         if( !defined( wantarray() ) )
         {
             $self->message( "wantarray in void context" );
@@ -161,11 +159,11 @@ sub create_info
     return( @output ? $str : undef() );
 }
 
-## Inherited from DB::Object::Tables
-## sub default
+# Inherited from DB::Object::Tables
+# sub default
 
-## Inherited from DB::Object::Tables
-## sub drop
+# Inherited from DB::Object::Tables
+# sub drop
 
 sub exists
 {
@@ -174,14 +172,14 @@ sub exists
 
 sub lock { return( shift->error( "There is no table locking in SQLite." ) ); }
 
-## Inherited from DB::Object::Tables
-## sub name
+# Inherited from DB::Object::Tables
+# sub name
 
-## Inherited from DB::Object::Tables
-## sub null
+# Inherited from DB::Object::Tables
+# sub null
 
-## Inherited from DB::Object::Tables
-## sub primary
+# Inherited from DB::Object::Tables
+# sub primary
 
 sub rename
 {
@@ -190,7 +188,7 @@ sub rename
     return( $self->error( 'No table was provided to rename' ) );
     my $new   = shift( @_ ) ||
     return( $self->error( "No new table name was provided to rename table '$table'." ) );
-    if( $new !~ /^[\w\_]+$/ )
+    if( $new !~ /^[a-zA-Z][\w\_]+$/ )
     {
         return( $self->error( "Bad new table name '$new'." ) );
     }
@@ -205,7 +203,7 @@ sub rename
     return( $sth );
 }
 
-## https://www.sqlite.org/pragma.html#pragma_table_info
+# https://www.sqlite.org/pragma.html#pragma_table_info
 sub structure
 {
     my $self  = shift( @_ );
@@ -220,11 +218,11 @@ sub structure
     $sth1->execute( $table ) || return( $self->error( "An erro occured while executing the sql query to get the details of table \"$table\": ", $sth1->errstr() ) );
     my $def = $sth1->fetchrow_hashref;
     $sth1->finish;
-    ## table or view
+    # table or view
     $self->{type} = $def->{type};
-    ## $self->_reset_query();
-    ## delete( $self->{ 'query_reset' } );
-    ## my $struct  = $self->{ '_structure_real' } || $self->{ 'struct' }->{ $table };
+    # $self->_reset_query();
+    # delete( $self->{ 'query_reset' } );
+    # my $struct  = $self->{ '_structure_real' } || $self->{ 'struct' }->{ $table };
     my $struct  = $self->{structure};
     my $fields  = $self->{fields};
     my $default = $self->{default};
@@ -233,12 +231,12 @@ sub structure
     if( !%$fields || !%$struct || !%$default )
     {
         $self->message( 3, "No structure, field, default values, null or types set yet for this table '$table' object. Populating." );
-        ## my $query = "SELECT * FROM information_schema.columns WHERE table_name = ?";
+        # my $query = "SELECT * FROM information_schema.columns WHERE table_name = ?";
         my $query = <<EOT;
 PRAGMA table_info(${table})
 EOT
-        ## http://www.postgresql.org/docs/9.3/interactive/infoschema-columns.html
-        ## select * from information_schema.columns where table_name = 'address'
+        # http://www.postgresql.org/docs/9.3/interactive/infoschema-columns.html
+        # select * from information_schema.columns where table_name = 'address'
         my $sth = $self->prepare_cached( $query ) ||
         return( $self->error( "Error while preparing query to get table '$table' columns specification: ", $self->errstr() ) );
         $sth->execute ||
@@ -250,9 +248,9 @@ EOT
         {
         'int' => 'integer',
         };
-        ## Mysql: field, type, null, key, default, extra
-        ## Postgres: tablename, field, field_num, type, len, comment, is_nullable, key, foreign_key, default 
-        ## SQLite: cid, name, type, notnull, dflt_value, pk
+        # Mysql: field, type, null, key, default, extra
+        # Postgres: tablename, field, field_num, type, len, comment, is_nullable, key, foreign_key, default 
+        # SQLite: cid, name, type, notnull, dflt_value, pk
         while( $ref = $sth->fetchrow_hashref() )
         {
             my %data = map{ lc( $_ ) => $ref->{ $_ } } keys( %$ref );
@@ -264,7 +262,7 @@ EOT
                 $data{type} = $type_convert->{ $data{type} };
             }
             $data{default} = '' if( !defined( $data{default} ) );
-            ## push( @order, $data{ 'field' } );
+            # push( @order, $data{ 'field' } );
             $fields->{ $data{field} }  = ++$c;
             $types->{ $data{field} } = $data{ 'type' };
             $default->{ $data{field} } = '';
@@ -279,14 +277,14 @@ EOT
         $sth->finish();
         if( @primary )
         {
-            ## $struct->{ '_primary' } = \@primary;
+            # $struct->{ '_primary' } = \@primary;
             $self->{primary} = \@primary;
         }
-        ## $self->{ '_structure_real' } = $struct;
+        # $self->{ '_structure_real' } = $struct;
         $self->{default}   = $default;
         $self->{fields}    = $fields;
         $self->{structure} = $struct;
-        $self->{types}       = $types;
+        $self->{types}     = $types;
         $self->message( 3, "Fields found: ", sub{ $self->dumper( $fields ) } );
     }
 #    $self->message( sprintf( "struct has %d keys", scalar( keys( %$struct ) ) ) );
@@ -296,18 +294,150 @@ EOT
 
 sub unlock { return( shift->error( "Locking and unlocking of tables is unsupportde in SQLite." ) ); }
 
-## Inherited from DB::Object
-## sub _simple_exist
+# Inherited from DB::Object
+# sub _simple_exist
 
 DESTROY
 {
-    ## Do nothing
-    ## DB::Object::Tables are never destroyed.
-    ## They are just gateway to tables, and they are cached by DB::Object::table()
-    ## print( STDERR "DESTROY'ing table $self ($self->{ 'table' })\n" );
+    # Do nothing
+    # DB::Object::Tables are never destroyed.
+    # They are just gateway to tables, and they are cached by DB::Object::table()
+    # print( STDERR "DESTROY'ing table $self ($self->{ 'table' })\n" );
 };
 
 1;
 
 __END__
 
+=encoding utf-8
+
+=head1 NAME
+
+DB::Object::SQLite::Tables - SQLite Table Object
+
+=head1 SYNOPSIS
+
+    use DB::Object::SQLite::Tables;
+    my $this = DB::Object::SQLite::Tables->new || die( DB::Object::SQLite::Tables->error, "\n" );
+
+=head1 VERSION
+
+    v0.300.0
+
+=head1 DESCRIPTION
+
+This is a SQLite table object class.
+
+=head1 METHODS
+
+=head2 create
+
+This creates a table.
+
+It takes some array reference data containing the columns definitions, some optional parameters and a statement handler.
+
+If a statement handler is provided, then no need to provide an array reference of columns definition. The columns definition will be taken from the statement handler. However, at least either one of them needs to be provided to set the columns definition.
+
+Possible parameters are:
+
+=over 4
+
+=item I<comment>
+
+=item I<password>
+
+=item I<temporary>
+
+If provided, this will create a temporary table.
+
+=back
+
+This will return an error if the table already exists, so best to check beforehand with L</exists>.
+
+Upon success, it will return the new statement to create the table. However, if L</create> is called in void context, then the statement is executed right away and returned.
+
+=head2 create_info
+
+This returns the create info for the current table object as a string representing the sql script necessary to recreate the table.
+
+=head2 exists
+
+Returns true if the current table exists, or false otherwise.
+
+=head2 lock
+
+Table lock is unsupported in SQLite and this will return an error.
+
+=head2 rename
+
+Provided with a new table name, and this will prepare the necessary query to rename the table and return the statement handler.
+
+If it is called in void context, the statement handler is executed immediately.
+
+    # Get the prefs table object
+    my $tbl = $dbh->pref;
+    $tbl->rename( 'prefs' );
+    # Would issue a statement handler for the query: ALTER TABLE pref RENAME TO prefs
+
+See L<SQLite documentation for more information|https://www.sqlite.org/lang_altertable.html>
+
+=head2 structure
+
+This returns in list context an hash and in scalar context an hash reference of the table structure.
+
+The hash, or hash reference returned contains the column name and its definition.
+
+This method will also set the following object properties:
+
+=over 4
+
+=item L<DB::Object::Tables/type>
+
+The table type.
+
+=item I<default>
+
+A column name to default value hash reference
+
+=item I<fields>
+
+A column name to field position (integer) hash reference
+
+=item I<null>
+
+A column name to a boolean representing whether the column is nullable or not.
+
+=item L<DB::Object::Tables/primary>
+
+An array reference of column names that are used as primary key for the table.
+
+=item I<structure>
+
+A column name to its sql definition
+
+=item I<types>
+
+A column name to column data type hash reference
+
+=back
+
+=head2 unlock
+
+This returns an error as C<unlock> is unsupported in SQLite
+
+=head1 SEE ALSO
+
+L<perl>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2019-2021 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut

@@ -4,9 +4,9 @@ package App::ElasticSearch::Utilities::Query;
 use strict;
 use warnings;
 
-our $VERSION = '7.9'; # VERSION
+our $VERSION = '8.0'; # VERSION
 
-use App::ElasticSearch::Utilities qw(es_request);
+use App::ElasticSearch::Utilities qw(es_request es_indices);
 use App::ElasticSearch::Utilities::Aggregations;
 use CLI::Helpers qw(:output);
 use Clone qw(clone);
@@ -122,6 +122,9 @@ sub as_search {
 
 sub execute {
     my($self,$indexes) = @_;
+
+    # Default to context based indexes
+    $indexes ||= es_indices();
 
     my $result = es_request( $self->as_search($indexes) );
 
@@ -385,7 +388,7 @@ App::ElasticSearch::Utilities::Query - Object representing ES Queries
 
 =head1 VERSION
 
-version 7.9
+version 8.0
 
 =head1 ATTRIBUTES
 

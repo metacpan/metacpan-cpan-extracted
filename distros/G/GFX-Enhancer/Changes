@@ -1,0 +1,16 @@
+Revision history for Perl extension GFX::Enhancer.
+
+0.1.14
+	added Stream things
+
+0.1.13
+	added Evo-EA dependency
+
+0.1.10  Wed Feb  3 12:12:20 2021
+	- a single line filter for a RL scanned image should be in
+	- parsed all files
+
+0.1.1  Mon Feb  1 11:27:35 2021
+	- original version; created by h2xs 1.23 with options
+		-X -n GFX::Enhancer
+	- start of algorithm code

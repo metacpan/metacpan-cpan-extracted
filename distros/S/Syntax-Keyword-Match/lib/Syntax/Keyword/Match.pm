@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Match 0.04;
+package Syntax::Keyword::Match 0.06;
 
 use v5.14;
 use warnings;
@@ -28,6 +28,8 @@ C<Syntax::Keyword::Match> - a C<match/case> syntax for perl
       case(1) { say "It's one" }
       case(2) { say "It's two" }
       case(3) { say "It's three" }
+      case(4), case(5)
+              { say "It's four or five" }
       default { say "It's something else" }
    }
 
@@ -144,10 +146,15 @@ will never match.
 
    case(VAL) { STATEMENTS... }
 
+   case(VAL), case(VAL), ... { STATEMENTS... }
+
 A C<case> statement must only appear inside the braces of a C<match>. It
 provides a block of code to run if the controlling expression's value matches
 the value given in the C<case> statement, according to the comparison
 operator.
+
+Multiple C<case> statements are permitted for a single block. A value matching
+any of them will run the code inside the block.
 
 If the value is a non-constant expression, such as a variable or function
 call, it will be evaluated as part of performing the comparison every time the

@@ -34,6 +34,8 @@
       "inline-chords" : false,
       // Chords under the lyrics.
       "chords-under" : false,
+      // Transposing.
+      "transpose" : 0,
       // Transcoding.
       "transcode" : "",
       // Always decapoize.
@@ -65,7 +67,7 @@
     "meta" : {
     },
 
-    // Dates.
+    // Dates. Format is a strftime template.
     "dates" : {
         "today" : {
             "format" : "%A, %B %e, %Y"
@@ -157,21 +159,21 @@
 	{ "fields"   : [ "songindex" ],
 	  "label"    : "Table of Contents",
 	  "line"     : "%{title}",
-          "pageno"   : "%{pageno}",
+          "pageno"   : "%{page}",
 	  "fold"     : false,
 	  "omit"     : false,
 	},
 	{ "fields"   : [ "sorttitle", "artist" ],
 	  "label"    : "Contents by Title",
 	  "line"     : "%{title}%{artist| - %{}}",
-          "pageno"   : "%{pageno}",
+          "pageno"   : "%{page}",
 	  "fold"     : false,
 	  "omit"     : false,
 	},
 	{ "fields"   : [ "artist", "sorttitle" ],
 	  "label"    : "Contents by Artist",
 	  "line"     : "%{artist|%{} - }%{title}",
-          "pageno"   : "%{pageno}",
+          "pageno"   : "%{page}",
 	  "fold"     : false,
 	  "omit"     : true,
 	},
@@ -259,6 +261,7 @@
 	  // Recall style: Print the tag using the type.
 	  // Alternatively quote the lines of the preceding chorus.
 	  "recall" : {
+	      "choruslike" : false,
 	      "tag"   : "Chorus",
 	      "type"  : "comment",
 	      "quote" : false,
@@ -331,7 +334,7 @@
 
       // Even/odd pages. A value of -1 denotes odd/even pages.
       "even-odd-pages" : 1,
-      // Align songs to even/odd pages.
+      // Align songs to even/odd pages. When greater than 1, force alignment.
       "pagealign-songs" : 1,
 
       // Formats.
@@ -449,7 +452,8 @@
 	  },
 	  "chordfingers" : {
 	      "name" : "ZapfDingbats",
-	      "size" : 10
+	      "size" : 10,
+	      "numbercolor" : "background",
 	  },
 	  "comment" : {
 	      "name" : "Helvetica",
@@ -521,6 +525,12 @@
 
       // This will show the page layout if non-zero.
       "showlayout" : false,
+
+      // CSV generation.
+      "csv" : {
+	  // Restrict CSV to song pages only (do not include matter pages).
+	  "songsonly" : true
+      }
     },
 
     // Settings for ChordPro backend.
@@ -568,6 +578,8 @@
 	"preprocess" : {
 	    // All lines.
 	    "all" : [],
+	    // Directives.
+	    "directive" : [],
 	    // Song lines (lyrics) only.
             "songline" : [],
 	},
@@ -575,7 +587,10 @@
 
     // For (debugging (internal use only)).
     "debug" : {
+        "spacing" : 0,
         "song" : 0,
+  	"abc" : 0,
+  	"ly" : 0,
     },
 
 }

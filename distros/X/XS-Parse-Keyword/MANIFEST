@@ -30,9 +30,11 @@ t/41structures.t
 t/42scopes.t
 t/43probing.t
 t/50flags-autosemi.t
+t/60line.t
 t/99pod.t
 t/build.xs
 t/flags.xs
+t/line.xs
 t/pieces.xs
 t/probing.xs
 t/stages.xs

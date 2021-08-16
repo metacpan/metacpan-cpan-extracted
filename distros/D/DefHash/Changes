@@ -1,3 +1,11 @@
+2.0.0   2021-08-14  Released-By: PERLANCAR; Urgency: medium
+
+        - No changes from 1.0.13.
+
+        - Properly bump version number from 1.x to 2.x due to backward
+          incompatible changes (defhash_v 1->2).
+
+
 1.0.13  2021-07-21  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
         [INCOMPATIBLE CHANGES]

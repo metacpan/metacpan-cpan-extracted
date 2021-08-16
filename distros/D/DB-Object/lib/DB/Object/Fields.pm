@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Fields.pm
-## Version 0.1
+## Version v0.100.0
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/01/01
-## Modified 2020/01/02
+## Modified 2021/03/21
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,14 +18,15 @@ BEGIN
     use DB::Object::Fields::Field;
     use parent qw( Module::Generic );
     use Devel::Confess;
-    our( $VERSION ) = '0.1';
+    our( $VERSION ) = 'v0.100.0';
 };
 
 sub init
 {
     my $self = shift( @_ );
-    $self->{table_object} = '';
     $self->{prefixed} = 0;
+    $self->{query_object} = '';
+    $self->{table_object} = '';
     ## $self->{fatal} = 1;
     $self->SUPER::init( @_ );
     return( $self->error( "No table object was provided" ) ) if( !$self->{table_object} );
@@ -56,6 +57,8 @@ sub prefixed
     return( $self );
 }
 
+sub query_object { return( shift->_set_get_object( 'query_object', 'DB::Object::Query', @_ ) ); }
+
 sub table_object { return( shift->_set_get_object( 'table_object', 'DB::Object::Tables', @_ ) ); }
 
 sub _initiate_field_object
@@ -63,25 +66,52 @@ sub _initiate_field_object
     my $self = shift( @_ );
     my $field = shift( @_ ) || return( $self->error( "No field was provided to get its object." ) );
     my $class = ref( $self ) || $self;
+    $self->message( 3, "Instantiating table '", $self->table_object->name, "' field '$field' object using class '$class'." );
     my $fields = $self->table_object->fields;
+    $self->message( 3, "Table ", $self->table_object->name, " has no such field \"$field\"." ) if( !CORE::exists( $fields->{ $field } ) );
     return( $self->error( "Table ", $self->table_object->name, " has no such field \"$field\"." ) ) if( !CORE::exists( $fields->{ $field } ) );
-    eval( "sub ${class}::${field} { return( shift->_set_get_object( '$field', 'DB::Object::Fields::Field', \@_ ) ); }" );
-    die( $@ ) if( $@ );
+    # $self->message( 3, "Evaluating -> package ${class}; sub ${field} { return( shift->_set_get_object( '$field', 'DB::Object::Fields::Field', \@_ ) ); }" );
+    # eval( "package ${class}; sub ${field} { return( shift->_set_get_object( '$field', 'DB::Object::Fields::Field', \@_ ) ); }" );
     my $def    = $self->table_object->default;
     my $types  = $self->table_object->types;
     my $hash =
     {
-    debug => $self->debug,
+    debug => ( $self->debug || 0 ),
     name => $field,
     type => $types->{ $field },
     default => $def->{ $field },
     pos => $fields->{ $field },
     prefixed => $self->{prefixed},
+    query_object => $self->query_object,
     table_object => $self->table_object,
     };
-#     $self->message( 3, "Initiating field '$field' with hash data: ", sub{ $self->dump( $hash ) } );
+    my $perl = <<EOT;
+sub ${class}::${field}
+{
+    unless( \$self->{$field} )
+    {
+        \$self->{$field} = DB::Object::Fields::Field->new(
+            debug => $hash->{debug},
+            name => '$field',
+            type => '$hash->{type}',
+            default => '$hash->{default}',
+            pos => $hash->{pos},
+            prefixed => \$self->{prefixed},
+            query_object => \$self->query_object,
+            table_object => \$self->table_object,
+        );
+    }
+    return( \$self->{$field} );
+}
+EOT
+    $self->message( 3, "Evaluating -> $perl" );
+    eval( $perl );
+    die( $@ ) if( $@ );
     my $o = DB::Object::Fields::Field->new( $hash );
-    $self->$field( $o ) || return;
+    # $self->message( 3, "Calling $self->$field( $o )" );
+    # $self->$field( $o ) || return( $self->error( "Unable to set field '$field' object to '$o': ", $self->error ) );
+    # $self->message( 3, "$self->$field returns '", overload::StrVal( $self->$field ), "'." );
+    $self->message( 3, "Retuning field object '$o' (", overload::StrVal( $o ), ")" );
     return( $o );
 }
 
@@ -92,6 +122,8 @@ AUTOLOAD
     no overloading;
     my $self = shift( @_ );
     my $fields = $self->table_object->fields;
+    # $self->debug(3);
+    $self->message( 3, "Called for method '$method'. Fields for table '", $self->table_object->name, "' are: ", sub{ $self->dump( $fields ) } );
     if( $code = $self->can( $method ) )
     {
         return( $code->( @_ ) );
@@ -99,6 +131,7 @@ AUTOLOAD
     ## elsif( CORE::exists( $self->{ $method } ) )
     elsif( exists( $fields->{ $method } ) )
     {
+        $self->message( 3, "Instantiating object for field '$method'." );
         return( $self->_initiate_field_object( $method ) );
     }
     else
@@ -121,14 +154,20 @@ DB::Object::Fields - Tables Fields Object Accessor
 =head1 SYNOPSIS
 
     my $dbh = DB::Object->connect({
-    driver => 'Pg',
-    conf_file => $conf,
-    database => 'my_shop',
-    host => 'localhost',
-    login => 'super_admin',
-    schema => 'auth',
-    # debug => 3,
+        driver => 'Pg',
+        conf_file => $conf,
+        database => 'my_shop',
+        host => 'localhost',
+        login => 'super_admin',
+        schema => 'auth',
+        # debug => 3,
     }) || bailout( "Unable to connect to sql server on host localhost: ", DB::Object->error );
+    
+    my $tbl = $dbh->some_table || die( "No table \"some_table\" could be found: ", $dbh->error, "\n" );
+    my $fo = $tbl->fields_object || die( $tbl->error );
+    my $expr = $fo->id == 2;
+    print "Expression is: $expr\n"; # Expression is: id = 2
+
     my $tbl_object = $dbh->customers || die( "Unable to get the customers table object: ", $dbh->error, "\n" );
     my $fields = $tbl_object->fields;
     print( "Fields for table \"", $tbl_object->name, "\": ", Dumper( $fields ), "\n" );
@@ -152,16 +191,20 @@ DB::Object::Fields - Tables Fields Object Accessor
     ## would print currency
     print( "First element is: ", $c->first, "\n" );
     print( "Last element is: ", $c->last, "\n" );
+    # Works also with the operators +, -, *, /, %, <, <=, >, >=, !=, <<, >>, &, |, ^, ==
+    my $table = $dbh->dummy;
+    $table->select( $c + 10 ); # SELECT currency + 10 FROM dummy;
+    $c == 'NULL' # currency IS NULL
 
 =head1 VERSION
 
-    0.1
+    v0.100.0
 
 =head1 DESCRIPTION
 
 The purpose of this module is to enable access to the table fields as L<DB::Object::Fields::Field> objects.
 
-The way this works is by having L<DB::Object::Tables> B<fields_object> or B<fo> for short, dynamically create a class based on the database name and table name. For example if the database driver were C<PostgreSQL>, the database were C<my_shop> and the table C<customers>, the dynamically created package would become L<DB::Object::Postgres::Tables::MyShop::Customers>. This class would inherit from this package L<DB::Object::Fields>.
+The way this works is by having L<DB::Object::Tables/fields_object> or L<DB::Object::Tables/fo> for short, dynamically create a class based on the database name and table name. For example if the database driver were C<PostgreSQL>, the database were C<my_shop> and the table C<customers>, the dynamically created package would become C<DB::Object::Postgres::Tables::MyShop::Customers>. This class would inherit from this package L<DB::Object::Fields>.
 
 Field objects can than be dynamically instantiated by accessing them, such as (assuming the table object C<$tbl_object> here represent the table C<customers>) C<$tbl_object->fo->last_name>. This will return a L<DB::Object::Fields::Field> object.
 
@@ -171,14 +214,11 @@ A note on the design: there had to be a separate this separate package L<DB::Obj
 
 =head1 CONSTRUCTOR
 
+=head2 new
+
+Creates a new L<DB::Object::Fields> objects. It may also take an hash like arguments, that also are method of the same name.
+
 =over 4
-
-=item B<new>( %arg )
-
-Creates a new L<DB::Object::Fields> objects.
-It may also take an hash like arguments, that also are method of the same name.
-
-=over 8
 
 =item I<debug>
 
@@ -186,38 +226,53 @@ Toggles debug mode on/off
 
 =back
 
-=back
-
 =head1 METHODS
 
-=over 4
+=head2 database_object
 
-=item B<_initiate_field_object>()
+The database object, which is a L<DB::Object> object or one of its descendant.
 
-=item B<database_object>()
+=head2 prefixed
 
-=item B<init>()
+This si the prefix level, from 0 to 2.
 
-=item B<prefixed>()
+2 or higher including the database, higher than 1 includes the schema name and above 0 includes the table name. 0 includes nothing.
 
-=item B<table_object>()
+When this value is changed, it is propagated to all the fields objects.
 
-=back
+=head2 query_object
 
-=head1 AUTHOR
+The query object, which is a L<DB::Object::Query> object or one of its descendant.
 
-Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+=head2 table_object
+
+The query object, which is a L<DB::Object::Tables> object or one of its descendant.
+
+=head2 _initiate_field_object
+
+This method is called from C<AUTOLOAD>
+
+Provided with a table column name and this will create a new L<DB::Object::Fields::Field> object and add dynamically the associated method for this column in the current package so that next time, it returns the cached object without using C<AUTOLOAD>
+
+=head1 AUTOLOAD
+
+Called with a column name and this will check if the given column name actually exists in this table. If it does, it will call L</_initiate_field_object> to instantiate a new field object and returns it.
+
+If the column does not exist, it returns an error.
 
 =head1 SEE ALSO
 
 L<perl>
 
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2020 DEGUEST Pte. Ltd.
+Copyright (c) 2020-2021 DEGUEST Pte. Ltd.
 
-All rights reserved
-
-This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
 
 =cut

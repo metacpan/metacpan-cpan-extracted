@@ -1,5 +1,9 @@
 Revision history for JMAP-Tester
 
+0.101     2021-08-13 11:02:38-04:00 America/New_York
+        - work around bugs in older Role::Tiny; this is what you want if you
+          saw: Can't use string ("-1") as a symbol ref
+
 0.100     2021-08-10 12:11:55-04:00 America/New_York
         - [ THIS UPDATE MIGHT BREAK YOUR CODE ]
         - The $jtester->ua object is now a "UA" object, not just an

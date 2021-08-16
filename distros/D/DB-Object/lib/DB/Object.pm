@@ -1,12 +1,15 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object.pm
-## Version v0.9.9
-## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Version v0.9.13
+## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2020/06/09
+## Modified 2021/08/12
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 ## This is the subclassable module for driver specific ones.
 package DB::Object;
@@ -17,6 +20,7 @@ BEGIN
     use parent qw( Module::Generic DBI );
     use IO::File;
     use File::Spec;
+    use Regexp::Common;
     use Scalar::Util qw( blessed );
     require DB::Object::Statement;
     require DB::Object::Tables;
@@ -29,7 +33,7 @@ BEGIN
     our( $VERSION, $DB_ERRSTR, $ERROR, $DEBUG, $CONNECT_VIA, $CACHE_QUERIES, $CACHE_SIZE );
     our( $CACHE_TABLE, $USE_BIND, $USE_CACHE, $MOD_PERL, @DBH, $CACHE_DIR );
     our( $CONSTANT_QUERIES_CACHE );
-    $VERSION     = 'v0.9.9';
+    $VERSION     = 'v0.9.13';
     use Devel::Confess;
 };
 
@@ -46,16 +50,16 @@ BEGIN
     $CACHE_DIR       = '';
     $CONSTANT_QUERIES_CACHE = {};
     if( $INC{ 'Apache/DBI.pm' } && 
-        substr( $ENV{ 'GATEWAY_INTERFACE' }|| '', 0, 8 ) eq 'CGI-Perl' )
+        substr( $ENV{GATEWAY_INTERFACE}|| '', 0, 8 ) eq 'CGI-Perl' )
     {
         $CONNECT_VIA = "Apache::DBI::connect";
         $MOD_PERL++;
     }
     our $DRIVER2PACK = 
     {
-    'mysql'        => 'DB::Object::Mysql',
-    'Pg'        => 'DB::Object::Postgres',
-    'SQLite'    => 'DB::Object::SQLite',
+    mysql  => 'DB::Object::Mysql',
+    Pg     => 'DB::Object::Postgres',
+    SQLite => 'DB::Object::SQLite',
     };
 }
 
@@ -71,26 +75,25 @@ sub new
 sub init
 {
     my $self = shift( @_ );
-    $self->{ 'cache_connections' } = 1;
-    $self->{ 'cache_dir' } = File::Spec->tmpdir();
-    $self->{ 'driver' } = '';
+    $self->{cache_connections} = 1;
+    $self->{cache_dir} = File::Spec->tmpdir();
+    $self->{driver} = '';
     ## Auto-decode json data into perl hash
-    $self->{ 'auto_decode_json' } = 1;
-    $self->{ 'auto_convert_datetime_to_object' } = 0;
-    $self->{ 'allow_bulk_delete' } = 0;
-    $self->{ 'allow_bulk_update' } = 0;
+    $self->{auto_decode_json} = 1;
+    $self->{auto_convert_datetime_to_object} = 0;
+    $self->{allow_bulk_delete} = 0;
+    $self->{allow_bulk_update} = 0;
     $self->Module::Generic::init( @_ );
-    # $self->{ 'constant_queries_cache' } = $DB::Object::CONSTANT_QUERIES_CACHE;
+    # $self->{constant_queries_cache} = $DB::Object::CONSTANT_QUERIES_CACHE;
     return( $self );
 }
 
-##----{ End of generic routines }----##
+## End of generic routines
 
-##----{ ROUTINES PROPRIETAIRE }----##
 ## Get/set alias
 sub alias
 {
-    my $self  = shift( @_ );
+    my $self = shift( @_ );
     my $q = $self->_reset_query;
     return( $q->alias( @_ ) );
 }
@@ -128,75 +131,75 @@ sub avoid
 sub attribute($;$@)
 {
     my $self = shift( @_ );
-    ## $h->{AttributeName} = ...;    # set/write
-    ## ... = $h->{AttributeName};    # get/read
-    ## 1 means that the attribute may be modified
-    ## 0 mneas that the attribute may only be read
+    # $h->{AttributeName} = ...;    # set/write
+    # ... = $h->{AttributeName};    # get/read
+    # 1 means that the attribute may be modified
+    # 0 mneas that the attribute may only be read
     my $name  = shift( @_ ) if( @_ == 1 );
     my %arg   = ( @_ );
-    my %attr  = 
+    my %attr =
     (
-    'Warn'                    => 1, 
-    'Active'                => 0, 
-    'Executed'                => 0,
-    'Kids'                    => 0, 
-    'ActiveKids'            => 0, 
-    'CachedKids'            => 0,
-    'Type'                    => 0,
-    'ChildHandles'            => 0,
-    'CompatMode'            => 1,
-    'InactiveDestroy'        => 1, 
-    'AutoInactiveDestroy'    => 1,
-    'PrintWarn'                => 1,
-    'PrintError'            => 1,
-    'RaiseError'            => 1, 
-    'HandleError'            => 1,
-    'HandleSetErr'            => 1,
-    'ErrCount'                => 0,
-    'ShowErrorStatement'    => 1,
-    'TraceLevel'            => 1,
-    'FetchHashKeyName'        => 0,
-    'ChopBlanks'            => 1, 
-    'LongReadLen'            => 1, 
-    'LongTruncOk'            => 1, 
-    'TaintIn'                => 1,
-    'TaintOut'                => 1,
-    'Taint'                    => 1,
-    'Profile'                => 0,
-    'ReadOnly'                => 1,
-    'Callbacks'                => 1,
-    'AutoCommit'            => 1, 
-    'Name'                    => 0, 
-    'RowCacheSize'            => 0, 
-    'NUM_OF_FIELDS'            => 0, 
-    'NUM_OF_PARAMS'            => 0, 
-    'NAME'                    => 0, 
-    'TYPE'                    => 0, 
-    'PRECISION'                => 0, 
-    'SCALE'                    => 0, 
-    'NULLABLE'                => 0, 
-    'CursorName'            => 0, 
-    'Statement'                => 0, 
-    'RowsInCache'            => 0 
+        Active              => 0,
+        ActiveKids          => 0,
+        AutoCommit          => 1,
+        AutoInactiveDestroy => 1,
+        CachedKids          => 0,
+        Callbacks           => 1,
+        ChildHandles        => 0,
+        ChopBlanks          => 1,
+        CompatMode          => 1,
+        CursorName          => 0,
+        ErrCount            => 0,
+        Executed            => 0,
+        FetchHashKeyName    => 0,
+        HandleError         => 1,
+        HandleSetErr        => 1,
+        InactiveDestroy     => 1,
+        Kids                => 0,
+        LongReadLen         => 1,
+        LongTruncOk         => 1,
+        NAME                => 0,
+        NULLABLE            => 0,
+        NUM_OF_FIELDS       => 0,
+        NUM_OF_PARAMS       => 0,
+        Name                => 0,
+        PRECISION           => 0,
+        PrintError          => 1,
+        PrintWarn           => 1,
+        Profile             => 0,
+        RaiseError          => 1,
+        ReadOnly            => 1,
+        RowCacheSize        => 0,
+        RowsInCache         => 0,
+        SCALE               => 0,
+        ShowErrorStatement  => 1,
+        Statement           => 0,
+        TYPE                => 0,
+        Taint               => 1,
+        TaintIn             => 1,
+        TaintOut            => 1,
+        TraceLevel          => 1,
+        Type                => 0,
+        Warn                => 1,
     );
-    ## Only those attribute exist
-    ## Using an a non existing attribute produce an exception, so we better avoid
+    # Only those attribute exist
+    # Using an a non existing attribute produce an exception, so we better avoid
     if( $name )
     {
-        return( $self->{ 'dbh' }->{ $name } ) if( exists( $attr{ $name } ) );
+        return( $self->{dbh}->{ $name } ) if( exists( $attr{ $name } ) );
     }
     else
     {
         my $value;
         while( ( $name, $value ) = each( %arg ) )
         {
-            ## We intend to modifiy the value of an attribute
-            ## we are allowed to modify this value if it is true
+            # We intend to modifiy the value of an attribute
+            # we are allowed to modify this value if it is true
             if( exists( $attr{ $name } ) && 
                 defined( $value ) && 
                 $attr{ $name } )
             {
-                $self->{ 'dbh' }->{ $name } = $value;
+                $self->{dbh}->{ $name } = $value;
             }
         }
     }
@@ -283,8 +286,8 @@ sub cache
 sub cache_connections
 {
     my $self = shift( @_ );
-    $self->{ '_cache_connections' } = shift( @_ ) if( @_ );
-    return( $self->{ '_cache_connections' } );
+    $self->{_cache_connections} = shift( @_ ) if( @_ );
+    return( $self->{_cache_connections} );
 }
 
 sub cache_dir { return( shift->_set_get_scalar( 'cache_dir', @_ ) ); }
@@ -294,7 +297,7 @@ sub cache_tables { return( shift->_set_get_object( 'cache_tables', 'DB::Object::
 sub check_driver()
 {
     my $self   = shift( @_ );
-    ##----{ $SQL_DRIVER provient de 'common.cfg'
+    # $SQL_DRIVER provient de 'common.cfg'
     my $driver = shift( @_ ) || $SQL_DRIVER;
     my $ok     = undef();
     local $_;
@@ -315,17 +318,17 @@ sub connect
 {
     my $this  = shift( @_ );
     my $class = ref( $this ) || $this;
-    ## We pass the arguments so that debug and other init parameters can be set early
+    # We pass the arguments so that debug and other init parameters can be set early
     my $that  = ref( $this ) ? $this : $this->Module::Generic::new( @_ );
-    ## my $this  = { @_ };
-    ## print( STDERR "${class}::connect() DEBUG is $DEBUG\n" );
+    # my $this  = { @_ };
+    # print( STDERR "${class}::connect() DEBUG is $DEBUG\n" );
     my $param = $that->_connection_params2hash( @_ ) || return( $self->error( "No valid connection parameters found" ) );
     ## print( STDERR $class, "::connect(): \$param is: ", $that->dumper( $param ), "\n" );
     my $driver2pack = 
     {
-    'mysql'        => 'DB::Object::Mysql',
-    'Pg'        => 'DB::Object::Postgres',
-    'SQLite'    => 'DB::Object::SQLite',
+    mysql  => 'DB::Object::Mysql',
+    Pg     => 'DB::Object::Postgres',
+    SQLite => 'DB::Object::SQLite',
     };
     return( $that->error( "No driver was provided." ) ) if( !exists( $param->{ 'driver' } ) );
     if( !exists( $driver2pack->{ $param->{driver} } ) )
@@ -339,7 +342,7 @@ sub connect
     $that->message( 3, "Loading database handler class $driver_class" );
     $driver_module =~ s|::|/|g;
     $driver_module .= '.pm';
-    ## print( STDERR "${class}::connect() Requiring class '$driver_class' ($driver_module)\n" );
+    # print( STDERR "${class}::connect() Requiring class '$driver_class' ($driver_module)\n" );
     eval
     {
 #         local $SIG{ '__DIE__' } = sub{ };
@@ -488,18 +491,13 @@ sub constant_queries_cache_set
 sub copy
 {
     my $self = shift( @_ );
-    my $data = shift( @_ ) if( @_ == 1 && ref( $_[ 0 ] ) );
-    my %arg  = ( @_ );
-    if( !%arg && %$data )
-    {
-        %arg = %$data;
-    }
+    my $opts = $self->_get_args_as_hash( @_ );
     my $ref = $self->select->fetchrow_hashref();
-    my %data = %$ref;
-    map{ $data{ $_ } = $arg{ $_ } } keys( %arg );
-    return( 0 ) if( !%data );
-    $self->insert( \%data );
-    return( 1 );
+    my $keys = keys( %$opts );
+    @$ref{ @$keys } = @$opts{ @$keys };
+    return(0) if( !scalar( keys( %$ref ) ) );
+    $self->insert( $ref );
+    return(1);
 }
 
 sub create_db { return( shift->error( "THe driver has not implemented the create database method create_db." ) ); }
@@ -510,8 +508,9 @@ sub data_sources($;\%)
 {
     my $self  = shift( @_ );
     my $class = ref( $self ) || $self;
-    my $opt = shift( @_ ) || undef();
-    my $driver = $self->{ 'driver' } || $SQL_DRIVER;
+    my $opt;
+    $opt = shift( @_ ) if( @_ );
+    my $driver = $self->{driver} || $SQL_DRIVER;
     return( $class->SUPER::data_sources( $driver, $opt ) );
 }
 
@@ -521,15 +520,15 @@ sub data_type
     my $type = @_ == 1 ? shift( @_ ) : [ @_ ] if( @_ );
     my $ref  = eval
     {
-        local $SIG{ '__DIE__' }  = sub{ };
-        local $SIG{ '__WARN__' } = sub{ };
-        $self->{ 'dbh' }->type_info_all();
+        local $SIG{__DIE__}  = sub{ };
+        local $SIG{__WARN__} = sub{ };
+        $self->{dbh}->type_info_all();
     };
     return( $self->error( "type_info_all() is unsupported by vendor '$self->{ 'driver' }'." ) ) if( $@ );
     ## First item is a reference to hash containing the order of the header
     my $header   = shift( @$ref );
     my $hash     = {};
-    my $name_idx = $header->{ 'TYPE_NAME' };
+    my $name_idx = $header->{TYPE_NAME};
     my @found = ();
     if( $type )
     {
@@ -573,7 +572,7 @@ sub delete
     my $q = $self->_reset_query;
     ## If the user wants to execute this, then we reset the query, 
     ## but if the user wants to call other methods chained like as_string we don't do anything
-    CORE::delete( $self->{ 'query_reset' } ) if( !defined( wantarray() ) );
+    CORE::delete( $self->{query_reset} ) if( !defined( wantarray() ) );
     # return( $q->delete( @_ ) );
     return( $q->delete( @_ ) ) if( !defined( wantarray() ) );
     if( wantarray() )
@@ -595,7 +594,7 @@ sub disconnect($)
     my $self = shift( @_ );
     ## my( $pack, $file, $line ) = caller();
     ## print( STDERR "disconnect() called from package '$pack' in file '$file' at line '$line'.\n" );
-    my $rc = $self->{ 'dbh' }->disconnect( @_ );
+    my $rc = $self->{dbh}->disconnect( @_ );
     return( $rc );
 }
 
@@ -682,6 +681,8 @@ sub errstr(@)
     }
 }
 
+sub FALSE { return( 'FALSE' ); }
+
 sub fatal
 {
     my $self = shift( @_ );
@@ -728,7 +729,7 @@ sub insert
     my $q = $self->_reset_query;
     ## If the user wants to execute this, then we reset the query, 
     ## but if the user wants to call other methods chained like as_string we don't do anything
-    CORE::delete( $self->{ 'query_reset' } ) if( !defined( wantarray() ) );
+    CORE::delete( $self->{query_reset} ) if( !defined( wantarray() ) );
     return( $q->insert( @_ ) ) if( !defined( wantarray() ) );
     if( wantarray() )
     {
@@ -777,8 +778,8 @@ sub no_bind
 {
     my $self = shift( @_ );
     ## Done, already
-    return( $self ) if( !$self->{ 'bind' } );
-    $self->{ 'bind' } = 0;
+    return( $self ) if( !$self->{bind} );
+    $self->{bind} = 0;
     my $q = $self->_reset_query;
     my $where = $q->where();
     my $group = $q->group();
@@ -817,13 +818,15 @@ sub no_bind
 sub no_cache
 {
     my $self = shift( @_ );
-    $self->{ 'cache' } = 0;
+    $self->{cache} = 0;
     return( $self );
 }
 
 sub NOT { shift( @_ ); return( DB::Object::NOT->new( @_ ) ); }
 
 sub NULL { return( 'NULL' ); }
+
+sub on_conflict { return( shift->error( "The on conflict clause is not supported by this driver." ) ); }
 
 sub OR { shift( @_ ); return( DB::Object::OR->new( @_ ) ); }
 
@@ -837,7 +840,7 @@ sub order
 sub param
 {
     my $self = shift( @_ );
-    return() if( !@_ );
+    return if( !@_ );
     my @supported = 
     qw( 
     SQL_AUTO_IS_NULL AUTOCOMMIT SQL_BIG_TABLES SQL_BIG_SELECTS
@@ -845,7 +848,7 @@ sub param
     SQL_SAFE_MODE SQL_SELECT_LIMIT SQL_LOG_OFF SQL_LOG_UPDATE 
     TIMESTAMP INSERT_ID LAST_INSERT_ID 
     );
-    my $params = $self->{ 'params' } ||= {};
+    my $params = $self->{params} ||= {};
     if( @_ == 1 )
     {
         my $type = shift( @_ );
@@ -866,9 +869,9 @@ sub param
                 $type     = uc( $type );
                 $value    = 0 if( !defined( $value ) || $value eq '' );
                 $params->{ $type } = $value;
-                if( $type eq 'AUTOCOMMIT' && $self->{ 'dbh' } && $value =~ /^(?:1|0)$/ )
+                if( $type eq 'AUTOCOMMIT' && $self->{dbh} && $value =~ /^(?:1|0)$/ )
                 {
-                    $self->{ 'dbh' }->{ 'AutoCommit' } = $value;
+                    $self->{dbh}->{AutoCommit} = $value;
                 }
                 push( @query, "$type = $value" );
             }
@@ -896,20 +899,20 @@ sub ping(@)
     #return( shift->{ 'dbh' }->ping );
     my $self = shift( @_ );
     ## $self->message( 3, "Our object contains: ", sub{ $self->dumper( $self ) } );
-    return( $self->{ 'dbh' }->ping );
+    return( $self->{dbh}->ping );
 }
 
 sub ping_select(@)
 {
     my $self = shift( @_ );
-    ## $rc = $dbh->ping;
-    ##----{ Some new ping method replacement.... See Apache::DBI
-    ## my( $dbh ) = @_;
+    # $rc = $dbh->ping;
+    # Some new ping method replacement.... See Apache::DBI
+    # my( $dbh ) = @_;
     my $ret = 0;
     eval 
     {
-        local( $SIG{ '__DIE__' }  ) = sub{ return( 0 ); };
-        local( $SIG{ '__WARN__' } ) = sub{ return( 0 ); };
+        local( $SIG{__DIE__}  ) = sub{ return( 0 ); };
+        local( $SIG{__WARN__} ) = sub{ return( 0 ); };
         ## adapt the select statement to your database:
         my $sth = $self->prepare( "SELECT 1" );
         $ret = $sth && ( $sth->execute() );
@@ -920,7 +923,7 @@ sub ping_select(@)
 
 sub port { return( shift->_set_get_number( 'port', @_ ) ); }
 
-## Gateway to DB::Object::Statement
+# Gateway to DB::Object::Statement
 sub prepare($;$)
 {
     my $self    = shift( @_ );
@@ -936,18 +939,18 @@ sub prepare($;$)
     }
     $self->_clean_statement( \$query );
     ## Wether we are called from DB::Object or DB::Object::Tables object
-    my $dbo = $self->{ 'dbo' } || $self;
+    my $dbo = $self->{dbo} || $self;
     $self->message( 3, "Is database handler active? ", ( $dbo->ping ? 'Yes' : 'No' ) );
     if( !$dbo->ping )
     {
         my $dbh = $dbo->_dbi_connect || return;
-        $self->{ 'dbh' } = $dbo->{ 'dbh' } = $dbh;
+        $self->{dbh} = $dbo->{dbh} = $dbh;
     }
     my $sth = eval
     {
-        local( $SIG{ '__DIE__' } )  = sub{ };
-        local( $SIG{ '__WARN__' } ) = sub{ };
-        $dbo->{ 'dbh' }->prepare( $query, $opt_ref );
+        local( $SIG{__DIE__} )  = sub{ };
+        local( $SIG{__WARN__} ) = sub{ };
+        $dbo->{dbh}->prepare( $query, $opt_ref );
     };
     if( $sth )
     {
@@ -984,7 +987,7 @@ sub prepare_cached
         $query = $q->as_string;
     }
     $self->_clean_statement( \$query );
-    ## Wether we are called from DB::Object or DB::Object::Tables object
+    # Wether we are called from DB::Object or DB::Object::Tables object
     my $dbo = $self->{dbo} || $self;
     $self->message( 3, "Is database handler active? ", ( $dbo->ping ? 'Yes' : 'No' ) );
     if( !$dbo->ping )
@@ -994,31 +997,31 @@ sub prepare_cached
     }
     my $sth = eval
     {
-        local( $SIG{ '__DIE__' } )  = sub{ };
-        local( $SIG{ '__WARN__' } ) = sub{ };
+        local( $SIG{__DIE__} )  = sub{ };
+        local( $SIG{__WARN__} ) = sub{ };
         $dbo->{dbh}->prepare_cached( $query, $opt_ref );
     };
     if( $sth )
     {
-        ## my $data = { %$self, 'sth' => $sth, 'query' => $query };
-        ## my $data = { 'sth' => $sth, 'query' => $query };
+        # my $data = { %$self, 'sth' => $sth, 'query' => $query };
+        # my $data = { 'sth' => $sth, 'query' => $query };
         my $data = 
         {
-        sth                => $sth,
-        query            => $query,
+        sth             => $sth,
+        query           => $query,
         query_values    => $self->{query_values},
         selected_fields => $self->{selected_fields},
         query_object    => $q,
         };
-        ## CORE::delete( $data->{ 'executed' } );
-        ## This is an inner package
-        ## bless( $data, "DB::Object::Statement" );
-        ## return( $data );
+        # CORE::delete( $data->{ 'executed' } );
+        # This is an inner package
+        # bless( $data, "DB::Object::Statement" );
+        # return( $data );
         return( $self->_make_sth( "${base_class}::Statement", $data ) );
     }
     else
     {
-        my $err = $@ || $self->{ 'dbh' }->errstr() || 'Unknown error while cache preparing query.';
+        my $err = $@ || $self->{dbh}->errstr() || 'Unknown error while cache preparing query.';
         $self->{query} = $query;
         return( $self->error( $err ) );
     }
@@ -1035,7 +1038,7 @@ sub query($$)
     }
     else
     {
-        ## bless( $sth, ref( $self ) );
+        # bless( $sth, ref( $self ) );
         return( $sth );
     }
 }
@@ -1043,7 +1046,24 @@ sub query($$)
 sub quote
 {
     my $self = shift( @_ );
-    my $dbh = $self->{dbh} || return( $self->error( "No database handler was set." ) );
+    # my $dbh = $self->{dbh} || return( $self->error( "No database handler was set." ) );
+    my $dbh;
+    unless( $dbh = $self->{dbh} )
+    {
+        # This is a fallback in case we need to use quote, but do not have a database connection yet.
+        my $str = shift( @_ );
+        # print( STDERR ref( $self ), "::quote -> \$str is '$str' (without surrounding quote\n" );
+        return( $self->NULL ) if( !defined( $str ) || uc( $str ) eq 'NULL' );
+        if( $str =~ /^$RE{num}{real}$/ )
+        {
+            return( $str );
+        }
+        else
+        {
+            $str =~ s/'/''/g; # iso SQL 2
+            return( "'$str'" );
+        }
+    }
     return( $dbh->quote( @_ ) );
 }
 
@@ -1051,9 +1071,9 @@ sub replace
 {
     my $self = shift( @_ );
     my $q = $self->_reset_query;
-    ## If the user wants to execute this, then we reset the query, 
-    ## but if the user wants to call other methods chained like as_string we don't do anything
-    CORE::delete( $self->{ 'query_reset' } ) if( !defined( wantarray() ) );
+    # If the user wants to execute this, then we reset the query, 
+    # but if the user wants to call other methods chained like as_string we don't do anything
+    CORE::delete( $self->{query_reset} ) if( !defined( wantarray() ) );
     # return( $q->replace( @_ ) );
     return( $q->replace( @_ ) ) if( !defined( wantarray() ) );
     if( wantarray() )
@@ -1078,32 +1098,41 @@ sub reset
     return( $self );
 }
 
+# Modelled after PostgreSQL and available since 3.35.0 released 2021-03-12
+# <https://www.sqlite.org/lang_returning.html>
+sub returning
+{
+    my $self  = shift( @_ );
+    my $q = $self->_reset_query;
+    return( $q->returning( @_ ) );
+}
+
 sub reverse
 {
     my $self = shift( @_ );
     if( @_ )
     {
         my $q = $self->_reset_query;
-        $self->{ 'reverse' }++;
-        $q->reverse( $self->{ 'reverse' } );
+        $self->{reverse}++;
+        $q->reverse( $self->{reverse} );
     }
-    return( $self->{ 'reverse' } );
+    return( $self->{reverse} );
 }
 
 sub select
 {
     my $self = shift( @_ );
     my $q = $self->_reset_query;
-    ## If the user wants to execute this, then we reset the query, 
-    ## but if the user wants to call other methods chained like as_string we don't do anything
-    ## CORE::delete( $self->{query_reset} ) if( !defined( wantarray() ) );
+    # If the user wants to execute this, then we reset the query, 
+    # but if the user wants to call other methods chained like as_string we don't do anything
+    # CORE::delete( $self->{query_reset} ) if( !defined( wantarray() ) );
     CORE::delete( $self->{query_reset} ) if( Want::want('VOID') || Want::want('OBJECT') );
     # return( $q->select( @_ ) );
     return( $q->select( @_ ) ) if( !defined( wantarray() ) );
     if( wantarray() )
     {
         my( @val ) = $q->select( @_ ) || return( $self->pass_error( $q->error ) );
-        ## a statement handler is returned and we reset the query so that other calls would not use the previous DB::Object::Query object
+        # a statement handler is returned and we reset the query so that other calls would not use the previous DB::Object::Query object
         $self->reset;
         return( @val );
     }
@@ -1121,16 +1150,15 @@ sub set
     my $vars = '';
     $vars    = shift( @_ );
     $vars  ||= $self->local();
-    ## Are there any variable declaration?
+    # Are there any variable declaration?
     if( $vars )
     {
-        ## print( STDERR "Got here for query: '", $self->{ 'query' }, "'\n" );
         my $query = "SET $vars";
         eval
         {
-            local( $SIG{ '__DIE__' } )  = sub{ };
-            local( $SIG{ '__WARN__' } ) = sub{ };
-            local( $SIG{ 'ALRM' } )     = sub{ die( "Timeout while processing query to set variables:\n$query\n" ) };
+            local( $SIG{__DIE__} )  = sub{ };
+            local( $SIG{__WARN__} ) = sub{ };
+            local( $SIG{ALRM} )     = sub{ die( "Timeout while processing query to set variables:\n$query\n" ) };
             $self->do( $query );
         };
         if( $@ )
@@ -1155,14 +1183,14 @@ sub sort
     if( @_ )
     {
         my $q = $self->_reset_query;
-        $self->{ 'reverse' } = 0;
-        $q->sort( $self->{ 'reverse' } );
+        $self->{reverse} = 0;
+        $q->sort( $self->{reverse} );
     }
-    return( $self->{ 'reverse' } );
+    return( $self->{reverse} );
 }
 
-## To also consider:
-## $sth = $dbh->statistics_info( undef, $schema, $table, $unique_only, $quick );
+# To also consider:
+# $sth = $dbh->statistics_info( undef, $schema, $table, $unique_only, $quick );
 sub stat
 {
     my $self = shift( @_ );
@@ -1190,7 +1218,7 @@ sub stat
 sub state(@)
 {
     my $self = shift( @_ );
-    ## $str = $h->state;
+    # $str = $h->state;
     if( !ref( $self ) )
     {
         return( $DBI::state );
@@ -1224,8 +1252,8 @@ sub table
     my $table  = shift( @_ ) || 
     return( $self->error( "You must provide a table name to access the table methods." ) );
     my $table_class = "${base_class}::Tables";
-    my $host   = $self->{ 'server' };
-    my $db     = $self->{ 'database' };
+    my $host   = $self->{server};
+    my $db     = $self->{database};
     my $cache_table = ${"$base_class\::CACHE_TABLE"};
     return( $self->error( "CACHE_TABLE is not set in base class $base_class" ) ) if( !$self->_is_hash( $cache_table ) );
     my $tables = $cache_table->{ "${host}:${db}" } ||= {};
@@ -1233,30 +1261,30 @@ sub table
     my $tbl    = $tables->{ $table };
     if( !$tbl )
     {
-        ## Prepare what we want to share with DB::Object::Tables *before* creating the object
-        ## Because, during DB::Object::Tables object initialization, 'dbh' is required
+        # Prepare what we want to share with DB::Object::Tables *before* creating the object
+        # Because, during DB::Object::Tables object initialization, 'dbh' is required
         my $hash = {};
-        ## map{ $hash->{ $_ } = $self->{ $_ } } qw( dbh drh server login passwd database driver tables verbose debug bind cache params );
-        ## The database handler must be shared here because during the initiation process
+        # map{ $hash->{ $_ } = $self->{ $_ } } qw( dbh drh server login passwd database driver tables verbose debug bind cache params );
+        # The database handler must be shared here because during the initiation process
         $self->message( 3, "Initiating $table_class object for table $table" );
         my @new_keys = qw( dbh tables verbose debug bind cache params );
         @$hash{ @new_keys } = @$self{ @new_keys };
         $hash->{dbo} = $self;
         $tbl = $table_class->new( $table, %$hash ) || return( $self->pass_error( $table_class->error ) );
-        ## $tbl->{ 'table' }   = $table;
-        ## Activate auto binding. With cache, this speeds up a lot this API.
-        ## $tbl->{ 'bind' }    = $USE_BIND;
-        ## $tables->{ $table } = $tbl unless( $table =~ /^email_/ );
+        # $tbl->{ 'table' }   = $table;
+        # Activate auto binding. With cache, this speeds up a lot this API.
+        # $tbl->{ 'bind' }    = $USE_BIND;
+        # $tables->{ $table } = $tbl unless( $table =~ /^email_/ );
     }
-    $tbl->{ 'dbo' } = $self;
-    ## $tbl->{ 'drh' } = $self->{ 'drh' };
-    ## We set debug and verbose again here in case it changed since the table object was instantiated
-    $tbl->{ 'debug' } = $self->{ 'debug' };
-    $tbl->{ 'verbose' } = $self->{ 'verbose' };
-    $tbl->{ 'bind' }  = $self->use_bind();
-    $tbl->{ 'cache' } = $self->use_cache();
-    $tbl->{ 'enhance' } = 1;
-    ## $self->message( 3, "\$dbo object inherited is: $tbl->{dbo}" );
+    $tbl->{dbo} = $self;
+    # $tbl->{drh} = $self->{drh};
+    # We set debug and verbose again here in case it changed since the table object was instantiated
+    $tbl->{debug} = $self->{debug};
+    $tbl->{verbose} = $self->{verbose};
+    $tbl->{bind}  = $self->use_bind();
+    $tbl->{cache} = $self->use_cache();
+    $tbl->{enhance} = 1;
+    # $self->message( 3, "\$dbo object inherited is: $tbl->{dbo}" );
     return( $tbl );
 }
 
@@ -1277,7 +1305,7 @@ sub table_exists
     {
         return( 1 ) if( $ref->{name} eq $table );
     }
-    ## We did not find it, so let's try by checking directly the database
+    # We did not find it, so let's try by checking directly the database
     my $def = $self->table_info( $table ) || return;
     return( 0 ) if( !scalar( @$def ) );
     return( 1 );
@@ -1372,11 +1400,11 @@ sub tables_refresh
     my $tables = $self->tables_info || return;
     my $hash =
     {
-    host => $self->host,
-    driver => $self->driver,
-    port => $self->port,
+    host     => $self->host,
+    driver   => $self->driver,
+    port     => $self->port,
     database => $self->database,
-    tables => $def,
+    tables   => $def,
     };
     my $cache_tables = $self->cache_tables;
     if( !defined( $cache_tables->set( $hash ) ) )
@@ -1392,6 +1420,8 @@ sub tie
     my $q = $self->_reset_query;
     return( $q->tie( @_ ) );
 }
+
+sub TRUE { return( 'TRUE' ); }
 
 sub unix_timestamp
 {
@@ -1410,9 +1440,9 @@ sub update
 {
     my $self = shift( @_ );
     my $q = $self->_reset_query;
-    ## If the user wants to execute this, then we reset the query, 
-    ## but if the user wants to call other methods chained like as_string we don't do anything
-    CORE::delete( $self->{ 'query_reset' } ) if( !defined( wantarray() ) );
+    # If the user wants to execute this, then we reset the query, 
+    # but if the user wants to call other methods chained like as_string we don't do anything
+    CORE::delete( $self->{query_reset} ) if( !defined( wantarray() ) );
     # return( $q->update( @_ ) );
     return( $q->update( @_ ) ) if( !defined( wantarray() ) );
     if( wantarray() )
@@ -1435,7 +1465,7 @@ sub use
     my $base_class = $self->base_class;
     return( $self->error( "You must use the the database object to switch database." ) ) if( ref( $self ) ne $base_class );
     my $db   = shift( @_ );
-    ## No need to go further
+    # No need to go further
     return( $self ) if( $db eq $self->{database} );
     if( !@AVAILABLE_DATABASES )
     {
@@ -1462,7 +1492,7 @@ sub variables
     my $self = shift( @_ );
     my $type = shift( @_ );
     $self->error( "Variable '$type' is a read-only value." ) if( @_ );
-    my $vars = $self->{ 'variables' } ||= {};
+    my $vars = $self->{variables} ||= {};
     if( !%$vars )
     {
         my $sth = $self->prepare( "SHOW VARIABLES" ) ||
@@ -1493,15 +1523,15 @@ sub where
 sub _cache_this
 {
     my $self    = shift( @_ );
-    ## When this method is accessed by method from package DB::Object::Statement, they CAN NOT
-    ## implicitly passed the statement string or they would risk to modify the previous stored
-    ## query object they represent.
-    ## For instance:
-    ## $obj->select->join( 'some_table', { 'parameter', 'list' } )->fetchrow_hashref()
-    ## here the first query is prepared and cached and its resulting object is passed on to join
-    ## here join will rebuild the query, but will search first if there was one already cached
-    ## if join passes implictly the statement string, this means it will modify the cached query select()
-    ## has just previously stored... This is why method such as join must pass explicitly the query string
+    # When this method is accessed by method from package DB::Object::Statement, they CAN NOT
+    # implicitly passed the statement string or they would risk to modify the previous stored
+    # query object they represent.
+    # For instance:
+    # $obj->select->join( 'some_table', { 'parameter', 'list' } )->fetchrow_hashref()
+    # here the first query is prepared and cached and its resulting object is passed on to join
+    # here join will rebuild the query, but will search first if there was one already cached
+    # if join passes implictly the statement string, this means it will modify the cached query select()
+    # has just previously stored... This is why method such as join must pass explicitly the query string
     my $q       = shift( @_ );
     my $query   = ( ref( $q ) && $q->isa( 'DB::Object::Query' ) ) ? $q->as_string : $q;
     my $base_class = $self->base_class;
@@ -1513,8 +1543,8 @@ sub _cache_this
     return( $self->error( "CACHE_QUERIES is not set in class $base_class" ) ) if( !$self->_is_array( $cachedb ) );
     my $cache_size = scalar( @$cachedb );
     my $cached_sth = '';
-    ## If database object exists, this means this is a DB::Object::Tables object, otherwise a DB::Object object
-    ## my $dbo = $self->{ 'dbo' } || $self;
+    # If database object exists, this means this is a DB::Object::Tables object, otherwise a DB::Object object
+    # my $dbo = $self->{ 'dbo' } || $self;
     $self->message( 3, "Checking cache for query '$query'." );
     if( $cache )
     {
@@ -1526,7 +1556,7 @@ sub _cache_this
         }
         foreach my $obj ( @$cachedb )
         {
-            ## print( STDERR ref( $self ) . "::_cache_this(): Is query:\n\t'$query'\nthe same than:\n\t'$obj->{ 'query' }'\n" );
+            # print( STDERR ref( $self ) . "::_cache_this(): Is query:\n\t'$query'\nthe same than:\n\t'$obj->{ 'query' }'\n" );
             if( $query && $obj->{query} && $obj->{query} eq $query )
             {
                 $cached_sth = $obj;
@@ -1535,46 +1565,48 @@ sub _cache_this
         }
     }
     my $sth = '';
-    ## We found a previous query exactly the same
+    # We found a previous query exactly the same
     if( $cached_sth )
     {
         $self->message( 3, "\tFound cached query, re-using it." );
         ## $self->message( "select(): Found a previously prepared query ($obj):\n$query" );
-        my $data = { 'sth' => $cached_sth->{sth}, 'query' => $cached_sth->{query} };
+        my $data = { sth => $cached_sth->{sth}, query => $cached_sth->{query} };
         ## This is an inner package
         $sth = $self->_make_sth( "${base_class}::Statement", $data );
     }
     else
     {
         $self->message( 3, "\tQuery does not yet exist in cache, preparing it." );
-        ## Maybe we ought to write:
-        ## $prepare = $cache ? \&prepare_cached : \prepare;
-        ## $sth = $prepare->( $self, $self->{ 'query' } ) ||
+        # Maybe we ought to write:
+        # $prepare = $cache ? \&prepare_cached : \prepare;
+        # $sth = $prepare->( $self, $self->{ 'query' } ) ||
     
-        ## $sth = $self->prepare_cached( $query ) ||
+        # $sth = $self->prepare_cached( $query ) ||
         $sth = $self->prepare( $query ) || do
         {
             $self->message( 3, "An error occured while preparing the query '$query': ", $self->error );
             return;
         };
-        ## $sth = $self->prepare( $self->{ 'query' } ) ||
-        ## return( $self->error( "Error while preparing the query on table '$self->{ 'table' }':\n$self->{ 'query' }\n", $self->errstr() ) );
-        ## Let the proper method set its error text
-        ## If caching of queries is turned on, cache the request
+        # $sth = $self->prepare( $self->{ 'query' } ) ||
+        # return( $self->error( "Error while preparing the query on table '$self->{ 'table' }':\n$self->{ 'query' }\n", $self->errstr() ) );
+        # Let the proper method set its error text
+        # If caching of queries is turned on, cache the request
         if( $cache )
         {
             unshift( @$cachedb, $sth );
         }
-        ## If caching is off, but the query is a binded parameters' one,
-        ## make the current object hold the statement object
+        # If caching is off, but the query is a binded parameters' one,
+        # make the current object hold the statement object
         elsif( $bind )
         {
             $self->{sth} = $sth;
         }
     }
     # $self->message( 3, "Returning statement handler" );
-    $sth->{query_object} = ( ref( $q ) && $q->isa( 'DB::Object::Query' ) ) ? $q : '';
-    ## print( STDERR ref( $self ) . "::_cache_this(): prepared statement was ", $cached_sth ? 'cached' : 'not cached.', "\n" );
+    #$sth->{query_object} = ( ref( $q ) && $q->isa( 'DB::Object::Query' ) ) ? $q : '';
+    $self->message( 3, "Saving query object '$q' in the statement handler." );
+    $sth->{query_object} = $q;
+    # print( STDERR ref( $self ) . "::_cache_this(): prepared statement was ", $cached_sth ? 'cached' : 'not cached.', "\n" );
     ## Caching the query as a constant
     if( $q && $self->_is_object( $q ) && $q->isa( 'DB::Object::Query' ) )
     {
@@ -1588,7 +1620,7 @@ sub _cache_this
             }
             $constant->{query_object} = $q;
             # $self->messagef( 3, "Caching constant for package '%s' in file '%s' at line '%d' with query: %s", @$constant{qw( pack file line )}, $q->as_string );
-            ## $self->messagef( 3, "Query object ($q) join tables contains %d elements: '%s'", $q->join_tables->length, $q->join_tables->join( "', '" ) );
+            # $self->messagef( 3, "Query object ($q) join tables contains %d elements: '%s'", $q->join_tables->length, $q->join_tables->join( "', '" ) );
             $self->constant_queries_cache_set( $constant );
         }
     }
@@ -1600,7 +1632,7 @@ sub _check_connect_param
     my $self  = shift( @_ );
     my $param = shift( @_ );
     $self->message( 3, "\$param is: ", sub{ $self->dumper( $param ) } );
-    ## my @valid = qw( db login passwd host driver database server debug );
+    # my @valid = qw( db login passwd host driver database server debug );
     my $valid = $self->_connection_parameters( $param );
     my $opts = $self->_connection_options( $param );
     $self->message( 3, "Options returned are: ", sub{ $self->dumper( $opts ) } );
@@ -1623,10 +1655,9 @@ sub _check_connect_param
 sub _check_default_option
 {
     my $self = shift( @_ );
-    my $opts = {};
-    $opts = shift( @_ ) if( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
     return( $self->error( "Provided option is not a hash reference." ) ) if( !$self->_is_hash( $opts ) );
-    ## This method should be superseded by an inherited class
+    # This method should be superseded by an inherited class
     return( $opts );
 }
 
@@ -1673,39 +1704,39 @@ sub _connection_params2hash
     my $equi =
     {
     database => 'DB_NAME',
-    login => 'DB_LOGIN',
-    passwd => 'DB_PASSWD',
-    host => 'DB_HOST',
-    port => 'DB_PORT',
-    driver => 'DB_DRIVER',
-    schema => 'DB_SCHEMA',
+    login    => 'DB_LOGIN',
+    passwd   => 'DB_PASSWD',
+    host     => 'DB_HOST',
+    port     => 'DB_PORT',
+    driver   => 'DB_DRIVER',
+    schema   => 'DB_SCHEMA',
     };
     foreach my $prop ( keys( %$equi ) )
     {
         $param->{ $prop } = $ENV{ $equi->{ $prop } } if( $ENV{ $equi->{ $prop } } && !length( $param->{ $prop } ) );
     }
     
-    ## A simple json file
-    ## An URI coul be http://localhost:5432?database=somedb etc...
-    ## or it could also be file:/foo/bar?opt={"RaiseError":true}
-    if( $param->{uri} || $ENV{ 'DB_CON_URI' } )
+    # A simple json file
+    # An URI coul be http://localhost:5432?database=somedb etc...
+    # or it could also be file:/foo/bar?opt={"RaiseError":true}
+    if( $param->{uri} || $ENV{DB_CON_URI} )
     {
         my $uri;
         eval
         {
             require URI;
-            $uri = URI->new( $param->{uri} || $ENV{ 'DB_CON_URI' } );
+            $uri = URI->new( $param->{uri} || $ENV{DB_CON_URI} );
         };
         if( !$@ && $uri )
         {
-            ## Make sure our parameter is a valid URI object
+            # Make sure our parameter is a valid URI object
             $param->{uri} = $uri;
             if( $uri->can( 'port' ) )
             {
                 $param->{host} = $uri->host;
                 $param->{port} = $uri->port if( $uri->port );
             }
-            ## file:/
+            # file:/
             elsif( length( $uri->path ) )
             {
                 $param->{database} = ( $uri->path_segments )[-1];
@@ -1741,9 +1772,9 @@ sub _connection_params2hash
         }
     }
     
-    if( $param->{conf_file} || $param->{config_file} || $ENV{ 'DB_CON_FILE' } )
+    if( $param->{conf_file} || $param->{config_file} || $ENV{DB_CON_FILE} )
     {
-        my $db_con_file = CORE::delete( $param->{conf_file} ) || CORE::delete( $param->{config_file} ) || $ENV{ 'DB_CON_FILE' };
+        my $db_con_file = CORE::delete( $param->{conf_file} ) || CORE::delete( $param->{config_file} ) || $ENV{DB_CON_FILE};
         my $db_con_file_ok = 0;
         if( !-e( $db_con_file ) )
         {
@@ -1827,7 +1858,7 @@ sub _connection_params2hash
         @$param{ qw( host port ) } = split( /:/, $param->{host}, 2 );
     }
     
-    if( !$param->{ 'opt' } && $ENV{ 'DB_OPT' } )
+    if( !$param->{opt} && $ENV{DB_OPT} )
     {
         my $jdata = {};
         eval
@@ -1836,7 +1867,7 @@ sub _connection_params2hash
             if( defined( *{ "JSON::" } ) )
             {
                 my $j = JSON->new->allow_nonref;
-                $jdata = $j->decode( $ENV{ 'DB_OPT' } );
+                $jdata = $j->decode( $ENV{DB_OPT} );
             }
         };
         if( $@ )
@@ -1860,19 +1891,17 @@ sub _clean_statement
 sub _convert_datetime2object
 {
     my $self = shift( @_ );
-    my $opts = {};
-    $opts = shift( @_ ) if( @_ && $self->_is_hash( $_[0] ) );
+    my $opts = $self->_get_args_as_hash( @_ );
     return( $opts->{data} );
 }
 
-## Does nothing by default
-## Must be superseded by the subclasses because we use the data types like PG_JSON, PG_JSONB
-## and we don't have them at this top level
+# Does nothing by default
+# Must be superseded by the subclasses because we use the data types like PG_JSON, PG_JSONB
+# and we don't have them at this top level
 sub _convert_json2hash 
 {
     my $self = shift( @_ );
-    my $opts = {};
-    $opts = shift( @_ ) if( @_ && $self->_is_hash( $_[0] ) );
+    my $opts = $self->_get_args_as_hash( @_ );
     return( $opts->{data} );
 }
 
@@ -1882,31 +1911,31 @@ sub _dbi_connect
     my $dbh;
     my $dsn = $self->_dsn;
     # print( STDERR ref( $self ) . "::_dbi_connect() Options are: ", $self->dumper( $self->{opt} ), "\n" );
-    if( $self->{ 'cache_connections' } )
+    if( $self->{cache_connections} )
     {
-        $self->messagef( 3, "Using DBI->connect_cached to connect with dsn '$dsn', login '$self->{login}', password of %d bytes long, and options: %s", CORE::length( $self->{passwd} ), $self->dumper( $self->{opt} ) );
+        ## $self->messagef( 3, "Using DBI->connect_cached to connect with dsn '$dsn', login '$self->{login}', password of %d bytes long, and options: %s", CORE::length( $self->{passwd} ), $self->dump( $self->{opt} ) );
         $dbh = DBI->connect_cached(
             $dsn,
-            $self->{ 'login' },
-            $self->{ 'passwd' }, 
-            $self->{ 'opt' },
+            $self->{login},
+            $self->{passwd}, 
+            $self->{opt},
             undef(),
             $CONNECT_VIA,
         );
     }
     else
     {
-        $self->messagef( 3, "Using DBI->connect to connect with dsn '$dsn', login '$self->{login}', password of %d bytes long, and options: %s", CORE::length( $self->{passwd} ), $self->dumper( $self->{opt} ) );
+        ## $self->messagef( 3, "Using DBI->connect to connect with dsn '$dsn', login '$self->{login}', password of %d bytes long, and options: %s", CORE::length( $self->{passwd} ), $self->dumper( $self->{opt} ) );
         $dbh = DBI->connect(
             $dsn,
-            $self->{ 'login' },
-            $self->{ 'passwd' }, 
-            $self->{ 'opt' },
+            $self->{login},
+            $self->{passwd}, 
+            $self->{opt},
             undef(),
             $CONNECT_VIA,
         );
     }
-    $self->message( 3, "Database handler is '$dbh'." );
+    ## $self->message( 3, "Database handler is '$dbh'." );
     return( $self->error( $DBI::errstr ) ) if( !$dbh );
     return( $dbh );
 }
@@ -1916,7 +1945,7 @@ sub _decode_json
     my $self = shift( @_ );
     my $json = shift( @_ );
     return if( !CORE::length( $json ) );
-    ## $self->message( 3, "Decoding json '$json'." );
+    # $self->message( 3, "Decoding json '$json'." );
     my $j = JSON->new->allow_nonref;
     my $hash = eval
     {
@@ -1954,7 +1983,7 @@ sub _make_sth
     my $pkg  = shift( @_ );
     my $data = shift( @_ ) || {};
     my $base_class = $self->base_class;
-    ## $self->message( 3, "Debug is '$self->{debug}' and verbose is '$self->{verbose}'" );
+    # $self->message( 3, "Debug is '$self->{debug}' and verbose is '$self->{verbose}'" );
 #     map{ $data->{ $_ } = $self->{ $_ } } 
 #     qw( 
 #     dbh drh server login passwd database driver 
@@ -1969,11 +1998,11 @@ sub _make_sth
     $data->{dbh} = $self->{dbh};
     # $self->message( 3, "\$dbo value is '$self->{dbo}'." );
     $data->{dbo} = $self->{dbo} ? $self->{dbo} : ref( $self ) eq $self->base_class ? $self : '';
-    ## $data->{ 'binded' } = $self->{ 'binded' } if( $self->{ 'binded' } && ref( $self ) ne $base_class );
-    ## In any case suppress the binded parameter from our parent object to avoid polluting the next queries
-    ## If needed, the binded parameter will be rebuilt using the data stored in 'where', 'group', 'order' and 'limit'
-    ## CORE::delete( $self->{ 'binded' } );
-    ## Binded parameters are now either in the DB::Object::Query package or one of its descendant OR passed as arguments to execute
+    # $data->{ 'binded' } = $self->{ 'binded' } if( $self->{ 'binded' } && ref( $self ) ne $base_class );
+    # In any case suppress the binded parameter from our parent object to avoid polluting the next queries
+    # If needed, the binded parameter will be rebuilt using the data stored in 'where', 'group', 'order' and 'limit'
+    # CORE::delete( $self->{ 'binded' } );
+    # Binded parameters are now either in the DB::Object::Query package or one of its descendant OR passed as arguments to execute
     $data->{errstr} = '';
     CORE::delete( $data->{executed} );
     $data->{query_time} = time();
@@ -2013,28 +2042,6 @@ sub _process_limit
     return( $q->_process_limit( @_ ) );
 }
 
-sub _query_components_old
-{
-    my $self = shift( @_ );
-    my $type = lc( shift( @_ ) ) || $self->_query_type() || return( $self->error( "You must specify a query type: select, insert, update or delete" ) );
-    my( $where, $group, $sort, $order, $limit );
-    $where  = $self->where();
-    if( $type eq "select" )
-    {
-        $group  = $self->group();
-        $sort  = $self->reverse() ? 'DESC' : $self->sort() ? 'ASC' : '';
-        $order  = $self->order();
-    }
-    $limit  = $self->limit();
-    my @query = ();
-    push( @query, $where ) if( $where );
-    push( @query, $group ) if( $group );
-    push( @query, $order ) if( $order );
-    push( @query, $sort ) if( $sort && $order );
-    push( @query, $limit ) if( $limit );
-    return( \@query );
-}
-
 sub _query_object_add
 {
     my $self = shift( @_ );
@@ -2064,7 +2071,7 @@ sub _query_object_create
 
 sub _query_object_current { return( shift->{ 'query_object' } ); }
 
-## If the stack is empty, we create an object, add it and resend it
+# If the stack is empty, we create an object, add it and resend it
 sub _query_object_get_or_create
 {
     my $self = shift( @_ );
@@ -2072,11 +2079,11 @@ sub _query_object_get_or_create
     if( !$obj )
     {
         $obj = $self->_query_object_create;
-        require Devel::StackTrace;
+        #require Devel::StackTrace;
 #         my $trace = Devel::StackTrace->new;
 #         $self->message( 3, "Query object created with stack trace: ", $trace->as_string );
         $self->{query_object} = $obj;
-        my $s = Devel::StackTrace->new;
+        #my $s = Devel::StackTrace->new;
         ## $self->message( 3, "Returning new query object '$obj' for table '", $self->name, "'. Stack trace: ", $s->as_string );
     }
     return( $obj );
@@ -2087,7 +2094,7 @@ sub _query_object_remove
     my $self = shift( @_ );
     my $obj  = shift( @_ ) || return( $self->error( "No query object was provided" ) );
     my $base = $self->base_class;
-    ## return( $self->error( "Object provided is not a query object class" ) ) if( ref( $obj ) !~ /^${base}\::Query$/ );
+    # return( $self->error( "Object provided is not a query object class" ) ) if( ref( $obj ) !~ /^${base}\::Query$/ );
     return( $self->error( "Object provided is not a query object class" ) ) if( !$obj->isa( "DB::Object::Query" ) );
     $self->{query_object} = '';
     return( $obj );
@@ -2098,7 +2105,7 @@ sub _query_type_old
     my $self = shift( @_ );
     if( $self->{query} && length( $self->{query} ) )
     {
-        return( lc( ( $self->{ 'query' } =~ /^[[:blank:]]*(ALTER|CREATE|DROP|GRANT|LISTEN|NOTIFY|INSERT|UPDATE|DELETE|SELECT|TRUNCATE)\b/i )[0] ) )
+        return( lc( ( $self->{query} =~ /^[[:blank:]]*(ALTER|CREATE|DROP|GRANT|LISTEN|NOTIFY|INSERT|UPDATE|DELETE|SELECT|TRUNCATE)\b/i )[0] ) )
     }
     return;
 }
@@ -2106,14 +2113,15 @@ sub _query_type_old
 sub _reset_query
 {
     my $self  = shift( @_ );
+    # $self->message( 3, "Called to reset query for table $self->{table} with 'query_reset' value '$self->{query_reset}'." );
     if( !$self->{query_reset} )
     {
         $self->{query_reset}++;
         $self->{enhance} = 1;
         my $obj = $self->{query_object};
-        ## $self->message( 3, "Removing existing query object '$obj'" );
+        # $self->message( 3, "Removing existing query object '$obj'" );
         $self->_query_object_remove( $obj ) if( $obj );
-        ## $self->messagef( 3, "Query object ($obj) has %d joint table(s).", ( $obj ? $obj->join_tables->length : 'not defined' ) );
+        # $self->messagef( 3, "Query object ($obj) has %d joint table(s).", ( $obj ? $obj->join_tables->length : 'not defined' ) );
         if( $obj && $obj->join_tables->length > 0 )
         {
             $obj->join_tables->foreach(sub{
@@ -2128,7 +2136,7 @@ sub _reset_query
                 return( $tbl->_query_object_get_or_create );
             });
         }
-        ## $self->message( 3, "Query object for this table object is now \"$self->{query_object}\"." );
+        # $self->message( 3, "Query object for this table object is now \"$self->{query_object}\"." );
         $self->{bind} = 0 unless( $self->{bind} > 1 );
         $self->{cache} = 0 unless( $self->{cache} > 1 );
         return( $self->_query_object_get_or_create );
@@ -2159,15 +2167,15 @@ AUTOLOAD
     my( $call_pack, $call_file, $call_line, @other ) = caller;
     my $call_sub = ( caller( 1 ) )[3];
     $self->message( 3, "Called for method '$meth' with class '$class' and base class '$base_class' and arguments '", join( "', '", @_ ), "' from subroutine \"$call_sub\" in class \"$call_pack\" in file \"$call_file\" at line $call_line." );
-    ## print( STDERR "${class}::AUTOLOAD() [$AUTOLOAD]: Searching for routine '$meth' from package '$class' with \$self being '$self'.\n" ) if( $DEBUG );
-    ## my( $pkg, $file, $line, $sub ) = caller( 1 );
-    ## print( STDERR ref( $self ), ": method $meth() called with parameters: '", join( ', ', @_ ), "' within sub '$sub' at line '$line' in file '$file'.\n" );
+    # print( STDERR "${class}::AUTOLOAD() [$AUTOLOAD]: Searching for routine '$meth' from package '$class' with \$self being '$self'.\n" ) if( $DEBUG );
+    # my( $pkg, $file, $line, $sub ) = caller( 1 );
+    # print( STDERR ref( $self ), ": method $meth() called with parameters: '", join( ', ', @_ ), "' within sub '$sub' at line '$line' in file '$file'.\n" );
     
-    ## Is it a table object that is being requested?
+    # Is it a table object that is being requested?
     # if( $self && scalar( grep{ /^$meth$/ } @$tables ) )
-    ## Getting table object take NO argument.
-    ## If the user wants to access a method, and somehow the table name is identical to one of our methods, 
-    ## it is likely it will take an argument
+    # Getting table object take NO argument.
+    # If the user wants to access a method, and somehow the table name is identical to one of our methods, 
+    # it is likely it will take an argument
     if( $class eq $base_class && !scalar( @_ ) && $self->table_exists( $meth ) )
     {
         return( $self->table( $meth ) );
@@ -2176,7 +2184,7 @@ AUTOLOAD
     {
         return( $self->$meth( @_ ) );
     }
-    ## For imported subs
+    # For imported subs
     elsif( defined( &$meth ) )
     {
         no strict 'refs';
@@ -2189,7 +2197,7 @@ AUTOLOAD
 #         print( STDERR "Calling method $meth with arguments: '", join( "', '", @_ ), "'\n" ) if( $DEBUG );
         return( &$meth( @_ ) );
     }
-    ## Taken from AutoLoader.pm
+    # Taken from AutoLoader.pm
     elsif( $class =~ /^(?:$ok_classes)$/ )
     {
         my $filename;
@@ -2218,8 +2226,8 @@ AUTOLOAD
         my $save = $@;
         eval
         {
-            local $SIG{ '__DIE__' }  = sub{ };
-            local $SIG{ '__WARN__' } = sub{ };
+            local $SIG{__DIE__}  = sub{ };
+            local $SIG{__WARN__} = sub{ };
             require $filename;
         };
         if( $@ )
@@ -2239,8 +2247,8 @@ AUTOLOAD
                 {
                     eval
                     {
-                        local $SIG{ '__DIE__' }  = sub{ };
-                        local $SIG{ '__WARN__' } = sub{ };
+                        local $SIG{__DIE__}  = sub{ };
+                        local $SIG{__WARN__} = sub{ };
                         require $filename
                     };
                 }
@@ -2255,33 +2263,33 @@ AUTOLOAD
         $@ = $save;
     }
     
-    if( $self && exists( $self->{ 'sth' } ) )
+    if( $self && exists( $self->{sth} ) )
     {
-        ## e.g. $sth->pg_server_prepare => $self->{sth}->{pg_server_prepare}
+        # e.g. $sth->pg_server_prepare => $self->{sth}->{pg_server_prepare}
         if( CORE::exists( $self->{sth}->{ $meth } ) )
         {
             $self->{sth}->{ $meth } = shift( @_ ) if( scalar( @_ ) );
             return( $self->{sth}->{ $meth } );
         }
-        ## $self->message( "AUTOLOAD(): dynamic method $meth() called with argument '", join( ', ', @_ ), "'" );
-        ## $self->message( "AUTOLOAD(): '$self->{ 'sth' }' is ", $self->{ 'executed' } ? '' : 'not ', "executed" );
-        ## $self->message( "AUTOLOAD(): (counter checking) '$self->{ 'sth' }' is ", $self->executed() ? '' : 'not ', "executed" );
+        # $self->message( "AUTOLOAD(): dynamic method $meth() called with argument '", join( ', ', @_ ), "'" );
+        # $self->message( "AUTOLOAD(): '$self->{sth}' is ", $self->{executed} ? '' : 'not ', "executed" );
+        # $self->message( "AUTOLOAD(): (counter checking) '$self->{sth}' is ", $self->executed() ? '' : 'not ', "executed" );
         if( !$self->executed() )
         {
-            $self->message( "AUTOLOAD(): executing statement '$self->{ 'sth' }':\n$self->{ 'query' }\n" );
-            $self->execute() || return( $self->error( $self->{ 'sth' }->errstr() ) );
+            $self->message( "AUTOLOAD(): executing statement '$self->{sth}':\n$self->{query}\n" );
+            $self->execute() || return( $self->error( $self->{sth}->errstr() ) );
         }
-        ## $self->_cleanup();
-        ## print( STDERR "Calling DBI method $meth with sth '$self->{sth}' arguments: '", join( "', '", @_ ), "'\n" ) if( $DEBUG );
+        # $self->_cleanup();
+        # print( STDERR "Calling DBI method $meth with sth '$self->{sth}' arguments: '", join( "', '", @_ ), "'\n" ) if( $DEBUG );
         # *{ "${class}\::$meth" } = sub{ return( shift->{ 'sth' }->$meth( @_ ) ); };
-        return( $self->{ 'sth' }->$meth( @_ ) );
+        return( $self->{sth}->$meth( @_ ) );
     }
-    ## e.g. $dbh->pg_notifies
-    elsif( $self && ( ( $self->{ 'dbh' } && $self->{ 'dbh' }->can( $meth ) ) || defined( &{ "DBI::db::" . $meth } ) ) )
+    # e.g. $dbh->pg_notifies
+    elsif( $self && ( ( $self->{dbh} && $self->{dbh}->can( $meth ) ) || defined( &{ "DBI::db::" . $meth } ) ) )
     {
-        return( $self->{ 'dbh' }->$meth( @_ ) );
+        return( $self->{dbh}->$meth( @_ ) );
     }
-    ## e.g. $dbh->pg_enable_utf8 becomes $self->{dbh}->{pg_enable_utf8]
+    # e.g. $dbh->pg_enable_utf8 becomes $self->{dbh}->{pg_enable_utf8]
     elsif( $self && $self->{dbh} && CORE::exists( $self->{dbh}->{ $meth } ) )
     {
         $self->{dbh}->{ $meth } = shift( @_ ) if( scalar( @_ ) );
@@ -2314,16 +2322,16 @@ DESTROY
 {
     my $self  = shift( @_ );
     my $class = ref( $self ) || $self;
-    if( $self->{ 'sth' } )
+    if( $self->{sth} )
     {
-        ## $self->message( "DETROY(): Terminating sth '$self' for query:\n$self->{ 'query' }\n" );
-        print( STDERR "DESTROY(): Terminating sth '$self' for query:\n$self->{ 'query' }\n" ) if( $DEBUG );
-        $self->{ 'sth' }->finish();
+        # $self->message( "DETROY(): Terminating sth '$self' for query:\n$self->{ 'query' }\n" );
+        print( STDERR "DESTROY(): Terminating sth '$self' for query:\n$self->{query}\n" ) if( $DEBUG );
+        $self->{sth}->finish();
     }
-    elsif( $self->{ 'dbh' } && $class =~ /^AI\:\:DB(?:\:\:(?:Postgres|Mysql|SQLite))?$/ )
+    elsif( $self->{dbh} && $class =~ /^AI\:\:DB(?:\:\:(?:Postgres|Mysql|SQLite))?$/ )
     {
-        local( $SIG{ '__WARN__' } ) = sub { };
-        ## $self->{ 'dbh' }->disconnect();
+        local( $SIG{__WARN__} ) = sub { };
+        # $self->{ 'dbh' }->disconnect();
         if( $DEBUG )
         {
             my( $pack, $file, $line, $sub ) = ( caller( 0 ) )[ 0, 1, 2, 3 ];
@@ -2332,7 +2340,7 @@ DESTROY
         }
         $self->disconnect();
     }
-    my $locks = $self->{ '_locks' };
+    my $locks = $self->{_locks};
     if( $locks && $self->_is_array( $locks ) )
     {
         foreach my $name ( @$locks )
@@ -2350,6 +2358,7 @@ END
     ## }
 };
 
+# XXX package DB::Object::Operator
 package DB::Object::Operator;
 BEGIN
 {
@@ -2367,6 +2376,7 @@ sub operator { return( '' ); }
 
 sub value { return( wantarray() ? @{$_[0]->{value}} : $_[0]->{value} ); }
 
+# XXX package DB::Object::AND
 package DB::Object::AND;
 BEGIN
 {
@@ -2376,6 +2386,7 @@ BEGIN
 
 sub operator { return( 'AND' ); }
 
+# XXX package DB::Object::NOT
 package DB::Object::NOT;
 BEGIN
 {
@@ -2385,6 +2396,7 @@ BEGIN
 
 sub operator { return( 'NOT' ); }
 
+# XXX package DB::Object::OR
 package DB::Object::OR;
 BEGIN
 {
@@ -2395,6 +2407,8 @@ BEGIN
 sub operator { return( 'OR' ); }
 
 1;
+
+# XXX POD
 
 __END__
 
@@ -2409,40 +2423,40 @@ DB::Object - SQL API
     use DB::Object;
 
     my $dbh = DB::Object->connect({
-    driver => 'Pg',
-    conf_file => 'db-settings.json',
-    database => 'webstore',
-    host => 'localhost',
-    login => 'store-admin',
-    schema => 'auth',
-    debug => 3,
+        driver => 'Pg',
+        conf_file => 'db-settings.json',
+        database => 'webstore',
+        host => 'localhost',
+        login => 'store-admin',
+        schema => 'auth',
+        debug => 3,
     }) || bailout( "Unable to connect to sql server on host localhost: ", DB::Object->error );
-    
+
     # Legacy regular query
     my $sth = $dbh->prepare( "SELECT login,name FROM login WHERE login='jack'" ) ||
     die( $dbh->errstr() );
     $sth->execute() || die( $sth->errstr() );
     my $ref = $sth->fetchrow_hashref();
     $sth->finish();
-    
+
     # Get a list of databases;
     my @databases = $dbh->databases;
     # Doesn't exist? Create it:
     my $dbh2 = $dbh->create_db( 'webstore' );
     # Load some sql into it
     my $rv = $dbh2->do( $sql ) || die( $dbh->error );
-    
+
     # Check a table exists
     $dbh->table_exists( 'customers' ) || die( "Cannot find the customers table!\n" );
-    
+
     # Get list of tables, as array reference:
     my $tables = $dbh->tables;
-    
+
     my $cust = $dbh->customers || die( "Cannot get customers object." );
     $cust->where( email => 'john@example.org' );
     my $str = $cust->delete->as_string;
     # Becomes: DELETE FROM customers WHERE email='john\@example.org'
-    
+
     # Do some insert with transaction
     $dbh->begin_work;
     # Making some other inserts and updates here...
@@ -2462,7 +2476,7 @@ DB::Object - SQL API
     $dbh->commit;
     ## Get the last used insert id
     my $id = $dbh->last_insert_id();
-    
+
     $cust->where( email => 'john@example.org' );
     $cust->order( 'last_name' );
     $cust->having( email => qr/\@example/ );
@@ -2470,54 +2484,72 @@ DB::Object - SQL API
     my $cust_sth_sel = $cust->select || die( "An error occurred while creating a query to select data frm table customers: " . $cust->error );
     # Becomes:
     # SELECT id, first_name, last_name, email, created, modified, active, created::ABSTIME::INTEGER AS created_unixtime, modified::ABSTIME::INTEGER AS modified_unixtime, CONCAT(first_name, ' ', last_name) AS name FROM customers WHERE email='john\@example.org' HAVING email ~ '\@example' ORDER BY last_name LIMIT 10
-    
+
     $cust->reset;
     $cust->where( email => 'john@example.org' );
     my $cust_sth_upd = $cust->update( active => 0 )
     # Would become:
     # UPDATE ONLY customers SET active='0' WHERE email='john\@example.org'
-    
+
     ## Lets' dump the result of our query
     ## First to STDERR
     $login->where( "login='jack'" );
     $login->select->dump();
     ## Now dump the result to a file
     $login->select->dump( "my_file.txt" );
+
+Using fields objects
+
+    $cust->where( $dbh->OR( $cust->fo->email == 'john@example.org', $cust->fo->id == 2 ) );
+    my $ref = $cust->select->fetchrow_hashref;
+
+Doing some left join
+
+    my $geo_tbl = $dbh->geoip || return( $self->error( "Unable to get the database object \"geoip\"." ) );
+    my $name_tbl = $dbh->geoname || return( $self->error( "Unable to get the database object \"geoname\"." ) );
+    $geo_tbl->as( 'i' );
+    $name_tbl->as( 'l' );
+    $geo_tbl->where( "INET '?'" << $geo_tbl->fo->network );
+    $geo_tbl->alias( id => 'ip_id' );
+    $name_tbl->alias( country_iso_code => 'code' );
+    my $sth = $geo_tbl->select->join( $name_tbl, $geo_tbl->fo->geoname_id == $name_tbl->fo->geoname_id );
+    # SELECT
+    #     -- tables fields
+    # FROM
+    #     geoip AS i
+    #     LEFT JOIN geoname AS l ON i.geoname_id = l.geoname_id
+    # WHERE
+    #     INET '?' << i.network
     
 =head1 VERSION
 
-    v0.9.9
+    v0.9.13
 
 =head1 DESCRIPTION
 
 L<DB::Object> is a SQL API much alike C<DBI>.
 So why use a private module instead of using that great C<DBI> package?
 
-At first, I started to inherit from C<DBI> to conform to C<perlmod> perl 
-manual page and to general perl coding guidlines. It became very quickly a 
-real hassle. Barely impossible to inherit, difficulty to handle error, too 
-much dependent from an API that change its behaviour with new versions.
-In short, I wanted a better, more accurate control over the SQL connection.
+At first, I started to inherit from C<DBI> to conform to C<perlmod> perl manual page and to general perl coding guidlines. It became very quickly a real hassle. Barely impossible to inherit, difficulty to handle error, too much dependent from an API that changes its behaviour with new versions.
+In short, I wanted a better, more accurate control over the SQL connection and an easy way to format sql statement using an object oriented approach.
 
-So, L<DB::Object> acts as a convenient, modifiable wrapper that provide the
-programmer with an intuitive, user-friendly and hassle free interface.
+So, L<DB::Object> acts as a convenient, modifiable wrapper that provides the programmer with an intuitive, user-friendly, object oriented and hassle free interface.
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>()
+=head2 new
 
 Create a new instance of L<DB::Object>. Nothing much to say.
 
-=item B<connect>( [ DATABASE, LOGIN, PASSWORD, SERVER[:PORT], DRIVER, SCHEMA ] | %PARAMETERS | \%PARAMETERS )
+=head2 connect
 
-Create a new instance of L<DB::Object>, but also attempts a conection
-to SQL server.
+Provided with a C<database>, C<login>, C<password>, C<server>:[C<port>], C<driver>, C<schema>, and optional hash or hash reference of parameters and this will issue a database connection and return the resulting database handler.
+
+Create a new instance of L<DB::Object>, but also attempts a connection to SQL server.
 
 It can take either an array of value in the order database name, login, password, host, driver and optionally schema, or it can take a has or hash reference. The hash or hash reference attributes are as follow:
 
-=over 8
+=over 4
 
 =item I<database> or I<DB_NAME>
 
@@ -2541,12 +2573,9 @@ The port to connect to
 
 =item I<driver> or I<DB_DRIVER>
 
-The driver you want to use. It needs to be of the same type than the server
-you want to connect to. If you are connecting to a MySQL server, you would use
-C<mysql>, if you would connecto to an Oracle server, you would use C<oracle>.
+The driver you want to use. It needs to be of the same type than the server you want to connect to. If you are connecting to a MySQL server, you would use C<mysql>, if you would connecto to an Oracle server, you would use C<oracle>.
 
-You need to make sure that those driver are properly installed in the system 
-before attempting to connect.
+You need to make sure that those driver are properly installed in the system before attempting to connect.
 
 To install the required driver, you could start with the command line:
 
@@ -2626,51 +2655,49 @@ Here the I<opt> parameter is passed as a json string, for example:
 
 =back
 
-=back
-
 =head1 METHODS
 
-=over 4
+=head2 alias
 
-=item B<clear>()
+This is a convenient wrapper around L<DB::Object::Query/alias>
 
-Reset error message.
-
-=item B<debug>( [ 0 | 1 ] )
-
-Toggle debug mode on/off
-
-=item B<error>( [ $string ] )
-
-Get set error message.
-If an error message is provided, B<error> will pass it to B<warn>.
-
-=item B<get>( $parameter )
-
-Get object parameter.
-
-=item B<message>( $string )
-
-Provided a multi line string, B<message> will display it on the STDERR if either I<verbose> or I<debug> mode is on.
-
-=item B<verbose>()
-
-Toggle verbose mode on/off
-
-=item B<alias>( %parameters )
+It takes a column name to alias hash and sets those aliases for the following query.
 
 Get/set alias for table fields in SELECT queries. The hash provided thus contain a list of field => alias pairs.
 
-=item B<as_string>()
+=head2 allow_bulk_delete
+
+Sets/gets the boolean value for whether to allow unsafe bulk delete. This means query without any C<where> clause.
+
+=head2 allow_bulk_update
+
+Sets/gets the boolean value for whether to allow unsafe bulk update. This means query without any C<where> clause.
+
+=head2 AND
+
+Takes any arguments and wrap them into a C<AND> clause.
+
+    $tbl->where( $dbh->AND( $tbl->fo->id == ?, $tbl->fo->frequency >= .30 ) );
+
+=head2 auto_convert_datetime_to_object
+
+Sets or gets the boolean value. If true, then this api will automatically transcode datetime value into their equivalent L<DateTime> object.
+
+=head2 auto_decode_json
+
+Sets or gets the boolean value. If true, then this api will automatically transcode json data into perl hash reference.
+
+=head2 as_string
 
 Return the sql query as a string.
 
-=item B<avoid>( [ @fields | \@fields ] )
+=head2 avoid
 
-Set the provided list of table fields to avoid when returning the query result.
-The list of fields can be provided either as an array of a reference to an array.
+Takes a list of array reference of column to avoid in the next query.
 
-=item B<attribute>( $name | %names )
+This is a convenient wrapper around L<DB::Object::Query/avoid>
+
+=head2 attribute
 
 Sets or get the value of database connection parameters.
 
@@ -2679,262 +2706,407 @@ If multiple arguments in a form of pair => value are provided, it sets the corre
 
 The authorised parameters are:
 
-=over 8
-
-=item I<Warn>
-
-Can be overridden.
+=over 4
 
 =item I<Active>
 
-Read-only.
-
-=item I<Kids>
-
-Read-only.
+Is read-only.
 
 =item I<ActiveKids>
 
-Read-only.
-
-=item I<CachedKids>
-
-Read-only.
-
-=item I<InactiveDestroy>
-
-Can be overridden.
-
-=item I<PrintError>
-
-Can be overridden.
-
-=item I<RaiseError>
-
-Can be overridden.
-
-=item I<ChopBlanks>
-
-Can be overridden.
-
-=item I<LongReadLen>
-
-Can be overridden.
-
-=item I<LongTruncOk>
-
-Can be overridden.
+Is read-only.
 
 =item I<AutoCommit>
 
-Can be overridden.
+Can be changed.
 
-=item I<Name>
+=item I<AutoInactiveDestroy>
 
-Read-only.
+Can be changed.
 
-=item I<RowCacheSize>
+=item I<CachedKids>
 
-Read-only.
+Is read-only.
 
-=item I<NUM_OF_FIELDS>
+=item I<Callbacks>
 
-Read-only.
+Can be changed.
 
-=item I<NUM_OF_PARAMS>
+=item I<ChildHandles>
 
-Read-only.
+Is read-only.
 
-=item I<NAME>
+=item I<ChopBlanks>
 
-Read-only.
+Can be changed.
 
-=item I<TYPE>
+=item I<CompatMode>
 
-Read-only.
-
-=item I<PRECISION>
-
-Read-only.
-
-=item I<SCALE>
-
-Read-only.
-
-=item I<NULLABLE>
-
-Read-only.
+Can be changed.
 
 =item I<CursorName>
 
-Read-only.
+Is read-only.
 
-=item I<Statement>
+=item I<ErrCount>
 
-Read-only.
+Is read-only.
+
+=item I<Executed>
+
+Is read-only.
+
+=item I<FetchHashKeyName>
+
+Is read-only.
+
+=item I<HandleError>
+
+Can be changed.
+
+=item I<HandleSetErr>
+
+Can be changed.
+
+=item I<InactiveDestroy>
+
+Can be changed.
+
+=item I<Kids>
+
+Is read-only.
+
+=item I<LongReadLen>
+
+Can be changed.
+
+=item I<LongTruncOk>
+
+Can be changed.
+
+=item I<NAME>
+
+Is read-only.
+
+=item I<NULLABLE>
+
+Is read-only.
+
+=item I<NUM_OF_FIELDS>
+
+Is read-only.
+
+=item I<NUM_OF_PARAMS>
+
+Is read-only.
+
+=item I<Name>
+
+Is read-only.
+
+=item I<PRECISION>
+
+Is read-only.
+
+=item I<PrintError>
+
+Can be changed.
+
+=item I<PrintWarn>
+
+Can be changed.
+
+=item I<Profile>
+
+Is read-only.
+
+=item I<RaiseError>
+
+Can be changed.
+
+=item I<ReadOnly>
+
+Can be changed.
+
+=item I<RowCacheSize>
+
+Is read-only.
 
 =item I<RowsInCache>
 
-Read-only.
+Is read-only.
+
+=item I<SCALE>
+
+Is read-only.
+
+=item I<ShowErrorStatement>
+
+Can be changed.
+
+=item I<Statement>
+
+Is read-only.
+
+=item I<TYPE>
+
+Is read-only.
+
+=item I<Taint>
+
+Can be changed.
+
+=item I<TaintIn>
+
+Can be changed.
+
+=item I<TaintOut>
+
+Can be changed.
+
+=item I<TraceLevel>
+
+Can be changed.
+
+=item I<Type>
+
+Is read-only.
+
+=item I<Warn>
+
+Can be changed.
 
 =back
 
-=item B<available_drivers>()
+=head2 available_drivers
 
 Return the list of available drivers.
 
-=item B<bind>( [ @values ] )
+=head2 base_class
 
-If no values to bind to the underlying query is provided, B<bind> simply activate the bind value feature.
+Returns the base class.
+
+=head2 bind
+
+If no values to bind to the underlying query is provided, L</bind> simply activate the bind value feature.
 
 If values are provided, they are allocated to the statement object and will be applied when the query will be executed.
 
 Example:
 
-  $dbh->bind()
-  ## or
-  $dbh->bind->where( "something" )
-  ## or
-  $dbh->bind->select->fetchrow_hashref()
-  ## and then later
-  $dbh->bind( 'thingy' )->select->fetchrow_hashref()
+    $dbh->bind()
+    # or
+    $dbh->bind->where( "something" )
+    # or
+    $dbh->bind->select->fetchrow_hashref()
+    # and then later
+    $dbh->bind( 'thingy' )->select->fetchrow_hashref()
 
-=item B<cache>()
+=head2 cache
 
 Activate caching.
 
-  $tbl->cache->select->fetchrow_hashref();
+    $tbl->cache->select->fetchrow_hashref();
 
-=item B<check_driver>()
+=head2 cache_connections
+
+Sets/get the cached database connection.
+
+=head2 cache_dir
+
+Sets or gets the directory on the file system used for caching data.
+
+=head2 cache_tables
+
+Sets or gets the L<DB::Object::Cache::Tables> object.
+
+=head2 check_driver
 
 Check that the driver set in I<$SQL_DRIVER> in ~/etc/common.cfg is indeed available.
 
-It does this by calling B<available_drivers>.
+It does this by calling L</available_drivers>.
 
-=item B<copy>( [ \%values | %values )
+=head2 connect
 
-Provided with either a reference to an hash or an hash of key => value pairs, B<copy> will first execute a select statement on the table object, then fetch the row of data, then replace the key-value pair in the result by the ones provided, and finally will perform an insert.
+This will attempt a database server connection. 
+
+It called L</_connection_params2hash> to get the necessary connection parameters, which is superseded in each driver package.
+
+Then, it will call L</_check_connect_param> to get the right parameters for connection.
+
+It will also call L</_check_default_option> to get some driver specific default options unless the previous call to _check_connect_param returned an has with a property I<opt>.
+
+It will then set the following current object properties: L</database>, L</host>, L</port>, L</login>, L</passwd>, L</driver>, L</cache>, L</bind>, L</opt>
+
+Unless specified in the connection options retrieved with L</_check_default_option>, it sets some basic default value:
+
+=over 4
+
+=item I<AutoCommit> 1
+
+=item I<PrintError> 0
+
+=item I<RaiseError> 0
+
+=back
+
+Finally it tries to connect by calling the, possibly superseded, method L</_dbi_connect>
+
+It instantiate a L<DB::Object::Cache::Tables> object to cache database tables and return the current object.
+
+=head2 constant_queries_cache
+
+Returns the global value for C<$CONSTANT_QUERIES_CACHE>
+
+=head2 constant_queries_cache_get
+
+Provided with some hash reference with properties C<pack>, C<file> and C<line> that are together used as a key in the cache and this will use an existing entry in the cache if available.
+
+=head2 constant_queries_cache_set
+
+Provided with some hash reference with properties C<pack>, C<file> and C<line> that are together used as a key in the cache and C<query_object> and this will set an entry in the cache. it returns the hash reference initially provided.
+
+=head2 copy
+
+Provided with either a reference to an hash or an hash of key => value pairs, L</copy> will first execute a select statement on the table object, then fetch the row of data, then replace the key-value pair in the result by the ones provided, and finally will perform an insert.
 
 Return false if no data to copy were provided, otherwise it always returns true.
 
-=item B<create_table>( @parameters )
+=head2 create_db
 
-The idea is to create a table with the givern parameters.
+This is a method that must be implemented by the driver package.
 
-This is currently heavily designed to work for PoPList. It needs to be rewritten.
+=head2 create_table
 
-=item B<data_sources>( [ %options ] )
+This is a method that must be implemented by the driver package.
 
-Given an optional list of options, this return the data source of the database handler.
+=head2 data_sources
 
-=item B<data_type>( [ \@types | @types ] )
+Given an optional list of options as hash, this return the data source of the database handler.
 
-Given a reference to an array or an array of data type, B<data_type> will check their availability in the database driver.
+=head2 data_type
+
+Given a reference to an array or an array of data type, L</data_type> will check their availability in the database driver.
 
 If nothing found, it return an empty list in list context, or undef in scalar context.
 
 If something was found, it returns a hash in list context or a reference to a hash in list context.
 
-=item B<database>()
+=head2 database
 
 Return the name of the current database.
 
-=item B<delete>()
+=head2 databases
 
-B<delete> will format a delete query based on previously set parameters, such as B<where>.
+This returns the list of available databases.
 
-B<delete> will refuse to execute a query without a where condition. To achieve this, one must prepare the delete query on his/her own by using the B<do> method and passing the sql query directly.
+This is a method that must be implemented by the driver package.
 
-  $tbl->where( "login" => "jack" );
-  $tbl->limit( 1 );
-  my $rows_affected = $tbl->delete();
-  ## or passing the where condition directly to delete
-  my $sth = $tbl->delete( "login" => "jack" );
+=head2 delete
 
-=item B<disconnect>()
+L</delete> will format a delete query based on previously set parameters, such as L</where>.
+
+L</delete> will refuse to execute a query without a where condition. To achieve this, one must prepare the delete query on his/her own by using the L</do> method and passing the sql query directly.
+
+    $tbl->where( login => 'jack' );
+    $tbl->limit(1);
+    my $rows_affected = $tbl->delete();
+    # or passing the where condition directly to delete
+    my $sth = $tbl->delete( login => 'jack' );
+
+=head2 disconnect
 
 Disconnect from database. Returns the return code.
 
-  my $rc = $dbh->disconnect;
+    my $rc = $dbh->disconnect;
 
-=item B<do>( $sql_query, [ \%attributes, \@bind_values ] )
+=head2 do
 
-Execute a sql query directly passed with possible attributes and values to bind.
+Provided with a string representing a sql query, some hash reference of attributes and some optional values to bind and this will execute the query and return the statement handler.
 
 The attributes list will be used to B<prepare> the query and the bind values will be used when executing the query.
 
-It returns the statement handler or the number of rows affected.
-
 Example:
 
-  $rc = $dbh->do( $statement ) || die( $dbh->errstr );
-  $rc = $dbh->do( $statement, \%attr ) || die( $dbh->errstr );
-  $rv = $dbh->do( $statement, \%attr, @bind_values ) || die( $dbh->errstr );
-  my $rows_deleted = $dbh->do(
-  q{
+    $rc = $dbh->do( $statement ) || die( $dbh->errstr );
+    $rc = $dbh->do( $statement, \%attr ) || die( $dbh->errstr );
+    $rv = $dbh->do( $statement, \%attr, @bind_values ) || die( $dbh->errstr );
+    my $rows_deleted = $dbh->do(
+    q{
        DELETE FROM table WHERE status = ?
-  }, undef(), 'DONE' ) || die( $dbh->errstr );
+    }, undef(), 'DONE' ) || die( $dbh->errstr );
 
-=item B<enhance>( [ @value ] )
+=head2 driver
+
+Return the name of the driver for the current object.
+
+=head2 enhance
 
 Toggle the enhance mode on/off.
 
-When on, the functions I<from_unixtime> and I<unix_timestamp> will be used on date/time field to translate from and to unix time seamlessly.
+When on, the functions L</from_unixtime> and L</unix_timestamp> will be used on date/time field to translate from and to unix time seamlessly.
 
-=item B<err>()
+=head2 err
 
 Get the currently set error.
 
-=item B<errno>()
+=head2 errno
 
-Is just an alias for B<err>.
+Is just an alias for L</err>.
 
-=item B<errmesg>()
+=head2 errmesg
 
-Is just an alias for B<errstr>.
+Is just an alias for L</errstr>.
 
-=item B<errstr>()
+=head2 errstr
 
 Get the currently set error string.
 
-=item B<fatal>( [ 1 | 0 ] )
+=head2 FALSE
 
-Toggles fatal mode on/off.
+This return the keyword C<FALSE> to be used in queries.
 
-=item B<from_unixtime>( [ @fields | \@fields ] )
+=head2 fatal
 
-Set the list of fields that are to be treated as unix time and converted accordingly after the sql query is executed.
+Provided a boolean value and this toggles fatal mode on/off.
+
+=head2 from_unixtime
+
+Provided with an array or array reference of table columns and this will set the list of fields that are to be treated as unix time and converted accordingly after the sql query is executed.
 
 It returns the list of fields in list context or a reference to an array in scalar context.
 
-=item B<format_statement>( [ \@data, \@order, $table ] )
+=head2 format_statement
 
-Format the sql statement.
+This is a convenient wrapper around L<DB::Object::Query/format_statement>
+
+Format the sql statement for queries of types C<select>, C<delete> and C<insert>
 
 In list context, it returns 2 strings: one comma-separated list of fields and one comma-separated list of values. In scalar context, it only returns a comma-separated string of fields.
 
-=item B<format_update>( \@data | \%data | %data | @data )
+=head2 format_update
+
+This is a convenient wrapper around L<DB::Object::Query/format_update>
 
 Formats update query based on the following arguments provided:
 
-=over 8
+=over 4
 
 =item I<data>
 
 An array of key-value pairs to be used in the update query. This array can be provided as the prime argument as a reference to an array, an array, or as the I<data> element of a hash or a reference to a hash provided.
 
-Why an array if eventually we build a list of key-value pair? Because the order of the fields may be important, and if the key-value pair list is provided, B<format_update> honors the order in which the fields are provided.
+Why an array if eventually we build a list of key-value pair? Because the order of the fields may be important, and if the key-value pair list is provided, L</format_update> honors the order in which the fields are provided.
 
 =back
 
-B<format_update> will then iterate through each field-value pair, and perform some work:
+L</format_update> will then iterate through each field-value pair, and perform some work:
 
-If the field being reviewed was provided to B<from_unixtime>, then B<format_update> will enclose it in the function FROM_UNIXTIME() as in:
+If the field being reviewed was provided to B<from_unixtime>, then L</format_update> will enclose it in the function FROM_UNIXTIME() as in:
 
-  FROM_UNIXTIME(field_name)
+    FROM_UNIXTIME(field_name)
   
 If the the given value is a reference to a scalar, it will be used as-is, ie. it will not be enclosed in quotes or anything. This is useful if you want to control which function to use around that field.
-
 
 If the given value is another field or looks like a function having parenthesis, or if the value is a question mark, the value will be used as-is.
 
@@ -2942,115 +3114,97 @@ If B<bind> is off, the value will be escaped and the pair field='value' created.
 
 If the field is a SET data type and the value is a number, the value will be used as-is without surrounding single quote.
 
-If B<bind> is enabled, a question mark will be used as the value and the original value will be saved as value to bind upon executing the query.
+If L</bind> is enabled, a question mark will be used as the value and the original value will be saved as value to bind upon executing the query.
 
 Finally, otherwise the value is escaped and surrounded by single quotes.
 
-B<format_update> returns a string representing the comma-separated list of fields that will be used.
+L</format_update> returns a string representing the comma-separated list of fields that will be used.
 
-=item B<getdefault>( %default_values )
+=head2 group
 
-Does some preparation work such as :
+This is a convenient wrapper around L<DB::Object::Query/group>
 
-=over 8
+=head2 host
 
-=item 1
+Sets or gets the C<host> property for this database object.
 
-the date/time field to use the FROM_UNIXTIME and UNIX_TIMESTAMP functions
+=head2 insert
 
-=item 2
+This is a convenient wrapper around L<DB::Object::Query/insert>
 
-removing from the query the fields to avoid, ie the ones set with the B<avoid> method.
-
-=item 3
-
-set the fields alias based on the information provided with the B<alias> method.
-
-=item 4
-
-if a field last_name and first_name exist, it will also create an alias I<name> based on the concatenation of the 2.
-
-=item 5
-
-it will set the default values provided. This is used for UPDATE queries.
-
-=back
-
-It returns a new L<DB::Object::Tables> object with all the data prepared within.
-
-=item B<group>( @fields | \@fields )
-
-Format the group by portion of the query.
-
-It returns an empty list in list context of undef in scalar context if no group by clause was build.
-Otherwise, it returns the value of the group by clause as a string in list context and the full group by clause in scalar context.
-
-In list context, it returns: $group_by
-
-In scalar context, it returns: GROUP BY $group_by
-
-=item B<insert>( L<DB::Object::Statement> SELECT object, \%key_value | %key_value )
-
-Prepares an INSERT query using the field-value pairs provided.
-
-If a L<DB::Object::Statement> object is provided as first argument, it will considered as a SELECT query to be used in the INSERT query, as in: INSERT INTO my table SELECT FROM another_table
-
-Otherwise, B<insert> will build the query based on the fields provided.
-
-In scalar context, it returns the result of B<execute> and in list context, it returns the statement object.
-
-=item B<last_insert_id>()
+=head2 last_insert_id
 
 Get the id of the primary key from the last insert.
 
-=item B<limit>( [ END, [ START, END ] ] )
+=head2 limit
 
-Set or get the limit for the future statement.
+This is a convenient wrapper around L<DB::Object::Query/limit>
 
-If only one argument is provided, it is assumed to be the end limit. If 2 are provided, they wil be the start and end.
+=head2 local
 
-It returns a list of the start and end limit in list context, and the string of the LIMIT in scalar context, such as: LIMIT 1, 10
+This is a convenient wrapper around L<DB::Object::Query/local>
 
-=item B<local>( %params | \%params )
+=head2 lock
 
-Not sure what it does. I forgot.
+This method must be implemented by the driver package.
 
-=item B<lock>( $lock_id, [ $timeout ] )
+=head2 login
 
-Set a lock using a lock identifier and a timeout.
-By default the timeout is 2 seconds.
+Sets or gets the C<login> property for this database object.
 
-If the lock failed (NULL), it returns undef(), otherwise, it returns the return value.
+=head2 no_bind
 
-=item B<no_bind>()
+When invoked, L</no_bind> will change any preparation made so far for caching the query with bind parameters, and instead substitute the value in lieu of the question mark placeholder.
 
-When invoked, B<no_bind> will change any preparation made so far for caching the query with bind parameters, and instead substitute the value in lieu of the question mark placeholder.
-
-=item B<no_cache>()
+=head2 no_cache
 
 Disable caching of queries.
 
-=item B<order>()
+=head2 NOT
 
-Prepares the ORDER BY clause and returns the value of the clause in list context or the ORDER BY clause in full in scalar context, ie. "ORDER BY $clause"
+Returns a new L<DB::Object::NOT> object, passing it whatever arguments were provided.
 
-=item B<param>( $param | %params )
+=head2 NULL
+
+Returns a C<NULL> string to be used in queries.
+
+=head2 on_conflict
+
+The SQL C<ON CONFLICT> clause needs to be implemented by the driver and is currently supported only by and L<DB::Object::Postgres> and L<DB::Object::SQLite>.
+
+=head2 OR
+
+Returns a new L<DB::Object::OR> object, passing it whatever arguments were provided.
+
+=head2 order
+
+This is a convenient wrapper around L<DB::Object::Query/order>
+
+Prepares the C<ORDER BY> clause and returns the value of the clause in list context or the C<ORDER BY> clause in full in scalar context, ie. "ORDER BY $clause"
+
+=head2 param
 
 If only a single parameter is provided, its value is return. If a list of parameters is provided they are set accordingly using the C<SET> sql command.
 
 Supported parameters are:
 
-=over 8
-
-=item SQL_AUTO_IS_NULL
+=over 4
 
 =item AUTOCOMMIT
 
-=item SQL_BIG_TABLES
+=item INSERT_ID
+
+=item LAST_INSERT_ID
+
+=item SQL_AUTO_IS_NULL
 
 =item SQL_BIG_SELECTS
 
+=item SQL_BIG_TABLES
+
 =item SQL_BUFFER_RESULT
+
+=item SQL_LOG_OFF
 
 =item SQL_LOW_PRIORITY_UPDATES
 
@@ -3060,129 +3214,171 @@ Supported parameters are:
 
 =item SQL_SELECT_LIMIT
 
-=item SQL_LOG_OFF
-
 =item SQL_LOG_UPDATE 
 
 =item TIMESTAMP
-
-=item INSERT_ID
-
-=item LAST_INSERT_ID
 
 =back
 
 If unsupported parameters are provided, they are considered to be private and not passed to the database handler.
 
-It then execute the query and return undef() in case of error.
+It then execute the query and return L<perlfunc/undef> in case of error.
 
-Otherwise, it returns the object used to call the method.
+Otherwise, it returns the current object used to call the method.
 
-=item B<ping>()
+=head2 passwd
+
+Sets or gets the C<passwd> property for this database object.
+
+=head2 ping
 
 Evals a SELECT 1 statement and returns 0 if errors occurred or the return value.
 
-=item B<prepare>( $query, \%options )
+=head2 ping_select
 
-Prepares the query using the options provided. The options are the same as the one in L<DBI> B<prepare> method.
+Will prepare and execute a simple C<SELECT 1> and return 0 upon failure or return the value returned from calling L<DBI/execute>.
 
-It returns a L<DB::Object::Statement> object upon success or undef if an error occurred. The error can then be retrieved using B<errstr> or B<error>.
+=head2 port
 
-=item B<prepare_cached>( $query, \%options )
+Sets or gets the C<port> property for this database object.
 
-Same as B<prepare> except the query is cached.
+=head2 prepare
 
-=item B<query>( $query, \%options )
+Provided with a sql query and some hash reference of options and this will prepare the query using the options provided. The options are the same as the one in L<DBI/prepare> method.
 
-It prepares and executes the given SQL query with the options provided and return undef() upon error or the statement handler upon success.
+It returns a L<DB::Object::Statement> object upon success or undef if an error occurred. The error can then be retrieved using L</errstr> or L</error>.
 
-=item B<replace>( L<DB::Object::Statement> object, [ %data ] )
+=head2 prepare_cached
 
-Just like for the INSERT query, B<replace> takes one optional argument representing a L<DB::Object::Statement> SELECT object or a list of field-value pairs.
+Same as L</prepare> except the query is cached.
 
-If a SELECT statement is provided, it will be used to construct a query of the type of REPLACE INTO mytable SELECT FROM other_table
+=head2 query
 
-Otherwise the query will be REPLACE INTO mytable (fields) VALUES(values)
+It prepares and executes the given SQL query with the options provided and return L<perlfunc/undef> upon error or the statement handler upon success.
+
+=head2 quote
+
+This is used to properly format data by surrounding them with quotes or not.
+
+Calls L<DBI/quote> and pass it whatever argument was provided.
+
+=head2 replace
+
+Just like for the C<INSERT> query, L</replace> takes one optional argument representing a L<DB::Object::Statement> C<SELECT> object or a list of field-value pairs.
+
+If a C<SELECT> statement is provided, it will be used to construct a query of the type of C<REPLACE INTO mytable SELECT FROM other_table>
+
+Otherwise the query will be C<REPLACE INTO mytable (fields) VALUES(values)>
 
 In scalar context, it execute the query and in list context it simply returns the statement handler.
 
-=item B<reset>()
+=head2 reset
 
 This is used to reset a prepared query to its default values. If a field is a date/time type, its default value will be set to NOW()
 
 It execute an update with the reseted value and return the number of affected rows.
 
-=item B<reverse>( [ true ])
+=head2 returning
+
+The SQL C<RETURNING> clause needs to be implemented by the driver and is currently supported only by and L<DB::Object::Postgres> and L<DB::Object::SQLite>.
+
+=head2 reverse
 
 Get or set the reverse mode.
 
-=item B<select>( [ \$field, \@fields, @fields ] )
+=head2 select
 
-Given an optional list of fields to fetch, B<select> prepares a SELECT query.
+Given an optional list of fields to fetch, L</select> prepares a C<SELECT> query.
 
-If no field was provided, B<select> will use default value where appropriate like the NOW() for date/time fields.
+If no field was provided, L</select> will use default value where appropriate like the C<NOW()> for date/time fields.
 
-B<select> calls upon B<tie>, B<where>, B<group>, B<order>, B<limit> and B<local> to build the query.
+L</select> calls upon L</tie>, L</where>, L</group>, L</order>, L</limit> and L</local> to build the query.
 
 In scalar context, it execute the query and return it. In list context, it just returns the statement handler.
 
-=item B<set>( $var )
+=head2 set
 
-Issues a query to C<SET> the given SQL variable.
+Provided with variable and this will issue a query to C<SET> the given SQL variable.
 
 If any error occurred, undef will be returned and an error set, otherwise it returns true.
 
-=item B<sort>()
+=head2 sort
 
 It toggles sort mode on and consequently disable reverse mode.
 
-=item B<stat>( [ $type ] )
+=head2 stat
 
-Issue a SHOW STATUS query and if a particular $type is provided, it will returns its value if it exists, otherwise it will return undef.
+Issue a C<SHOW STATUS> query and if a particular C<$type> is provided, it will return its value if it exists, otherwise it will return L<perlfunc/undef>.
 
 In absence of particular $type provided, it returns the hash list of values returns or a reference to the hash list in scalar context.
 
-=item B<state>()
+=head2 state
 
 Queries the DBI state and return its value.
 
-=item B<table>( $table_name )
+=head2 supported_class
 
-Given a table name, B<table> will return a L<DB::Object::Tables> object. The object is cached for re-use.
+Returns the list of driver packages such as L<DB::Object::Postgres>
 
-=item B<table_push>( $table_name )
+=head2 supported_drivers
+
+Returns the list of driver name such as L<Pg>
+
+=head2 table
+
+Given a table name, L</table> will return a L<DB::Object::Tables> object. The object is cached for re-use.
+
+=head2 table_exists
+
+Provided with a table name and this returns true if the table exist or false otherwise.
+
+=head2 table_info
+
+This is a method that must be implemented by the driver package.
+
+=head2 table_push
 
 Add the given table name to the stack of cached table names.
 
-=item B<tables>( [ $database ] )
+=head2 tables
 
-Connects to the database and finds out the list of all available tables.
+Connects to the database and finds out the list of all available tables. If cache is available, it will use it instead of querying the database server.
 
 Returns undef or empty list in scalar or list context respectively if no table found.
 
 Otherwise, it returns the list of table in list context or a reference of it in scalar context.
 
-=item B<tables_refresh>( [ $database ] )
+=head2 tables_cache
+
+Returns the table cache object
+
+=head2 tables_info
+
+This is a method that must be implemented by the driver package.
+
+=head2 tables_refresh
 
 Rebuild the list of available database table.
 
 Returns the list of table in list context or a reference of it in scalar context.
 
-=item B<tie>( [ %fields ] )
+=head2 tie
 
-If provided a hash or a hash ref, it sets the list of fields and their corresponding perl variable to bind their values to.
+This is a convenient wrapper around L<DB::Object::Query/tie>
 
-In list context, it returns the list of those field-variable pair, or a reference to it in scalar context.
+=head2 TRUE
 
-=item B<unix_timestamp>( [ \@fields | @fields ] )
+Returns C<TRUE> to be used in queries.
 
-Provided a list of fields or a reference to it, this sets the fields to be treated for seamless conversion from and to unix time.
+=head2 unix_timestamp
 
-=item B<unlock>( $lock_id )
+This is a convenient wrapper around L<DB::Object::Query/unix_timestamp>
 
-Given a lock identifier, B<unlock> releases the lock previously set with B<lock>. It executes the underlying sql command and returns undef() if the result is NULL or the value returned otherwise.
+=head2 unlock
 
-=item B<update>( %data | \%data )
+This is a convenient wrapper around L<DB::Object::Query/unlock>
+
+=head2 update
 
 Given a list of field-value pairs, B<update> prepares a sql update query.
 
@@ -3190,34 +3386,36 @@ It calls upon B<where> and B<limit> as previously set.
 
 It returns undef and sets an error if it failed to prepare the update statement. In scalar context, it execute the query. In list context, it simply return the statement handler.
 
-=item B<use>( $database )
+=head2 use
 
 Given a database, it switch to it, but before it checks that the database exists.
 If the database is different than the current one, it sets the I<multi_db> parameter, which will have the fields in the queries be prefixed by their respective database name.
 
 It returns the database handler.
 
-=item B<use_cache>( [ 0 | 1 ] )
+=head2 use_cache
 
-Sets or get the I<use_cache> parameter.
+Provided with a boolean value and this sets or get the I<use_cache> parameter.
 
-=item B<use_bind>( [ 0 | 1 ] )
+=head2 use_bind
 
-Sets or get the I<use_cache> parameter.
+Provided with a boolean value and this sets or get the I<use_cache> parameter.
 
-=item B<variables>( [ $type ] )
+=head2 variables
 
 Query the SQL variable $type
 
 It returns a blank string if nothing was found, or the value found.
 
-=item B<where>( %args )
+=head2 version
 
-Build the where clause based on the field-value hash provided.
+This is a method that must be implemented by the driver package.
 
-It returns the where clause in list context or the full where clause in scalar context, ie "WHERE $clause"
+=head2 where
 
-=item B<_cache_this>( $query )
+This is a convenient wrapper around L<DB::Object::Query/where>
+
+=head2 _cache_this
 
 Provided with a query, this will cache it for future re-use.
 
@@ -3225,80 +3423,173 @@ It does some check and maintenance job to ensure the cache does not get too big 
 
 It returns the cached statement as an L<DB::Object::Statement> object.
 
-=item B<_clean_statement>( \$query | $query )
+=head2 _check_connect_param
+
+Provided with an hash reference of connection parameters, this will get the valid parameters by calling L</_connection_parameters> and the connection default options by calling L</_connection_options>
+
+It returns the connection parameters hash reference.
+
+=head2 _check_default_option
+
+Provided with an hash reference of options, and it actually returns it, so this does not do much, because this method is supposed to be supereded by the driver package.
+
+=head2 _connection_options
+
+Provided with an hash reference of connection parameters and this will returns an hash reference of options whose keys match the regular expression C</^[A-Z][a-zA-Z]+/>
+
+So this does not do much, because this method is supposed to be superseded by the driver package.
+
+=head2 _connection_parameters
+
+Returns an array reference containing the following keys: db login passwd host port driver database server opt uri debug
+
+=head2 _connection_params2hash
+
+Provided with an hash reference of connection parameters and this will check if the following environment variables exists and if so use them: C<DB_NAME>, C<DB_LOGIN>, C<DB_PASSWD>, C<DB_HOST>, C<DB_PORT>, C<DB_DRIVER>, C<DB_SCHEMA>
+
+If the parameter property I<uri> was provided of if the environment variable C<DB_CON_URI> is set, it will use this connection uri to get the necessary connection parameters values.
+
+An L<URI> could be C<http://localhost:5432?database=somedb> or C<file:/foo/bar?opt={"RaiseError":true}>
+
+Alternatively, if the connection parameter I<conf_file> is provided then its json content will be read and decoded into an hash reference.
+
+The following keys can be used in the json data in the I<conf_file>: C<database>, C<login>, C<passwd>, C<host>, C<port>, C<driver>, C<schema>, C<opt>
+
+The port can be specified in the I<host> parameter by separating it with a semicolon such as C<localhost:5432>
+
+The I<opt> parameter can Alternatively be provided through the environment variable C<DB_OPT>
+
+It returns the hash reference of connection parameters.
+
+=head2 _clean_statement
 
 Given a query string or a reference to it, it cleans the statement by removing leading and trailing space before and after line breaks.
 
-=item B<_cleanup>()
+It returns the cleaned up query as a string if the original query was provided as a scalar reference.
 
-Removes object attributes, namely where, selected_fields, group_by, order_by, limit, alias, avoid, local, and as_string
+=head2 _convert_datetime2object
 
-=item B<_make_sth>( $package, $hashref )
+Provided with an hash or hash reference of options and this will simply return the I<data> property.
 
-Given a package name and a hashref, this build a statement object with all the necessary parameters.
+This does not do anything meaningful, because it is supposed to be superseded by the diver package.
+
+=head2 _convert_json2hash
+
+Provided with an hash or hash reference of options and this will simply return the I<data> property.
+
+This does not do anything meaningful, because it is supposed to be superseded by the diver package.
+
+=head2 _dbi_connect
+
+This will call L</_dsn> which must exist in the driver package, and based on the C<dsn> received, this will initiate a L<DBI/connect_cache> if the object property L</cache_connections> has a true value, or simply a L<DBI/connect> otherwise.
+
+It returns the database handler.
+
+=head2 _decode_json
+
+Provided with some json data and this will decode it using L<JSON> and return the associated hash reference or L<perlfunc/undef> if an error occurred.
+
+=head2 _dsn
+
+This will die complaining the driver has not implemented this method, unless the driver did implement it.
+
+=head2 _encode_json
+
+Provided with an hash reference and this will encode it into a json string and return it.
+
+=head2 _make_sth
+
+Given a package name and a hash reference, this builds a statement object with all the necessary parameters.
 
 It also sets the query time to the current time with the parameter I<query_time>
 
 It returns an object of the given $package.
 
-=item B<_reset_query>()
+=head2 _param2hash
 
-Being called using a statement handler, this reset the object by removing all the parameters set by various subroutine calls, such as B<where>, B<group>, B<order>, B<avoid>, B<limit>, etc.
+Provided with some hash reference parameters and this will simply return it, so it does not do anything meaningful.
 
-=item B<_save_bind>( $query_type )
+This is supposed to be superseded by the driver package.
 
-This saves/cache the bin query and return the object used to call it.
+=head2 _process_limit
 
-=item B<_value2bind>( $query, $ref )
+A convenient wrapper around the L<DB::Object::Query/_process_limit>
 
-Given a sql query and a array reference, B<_value2bind> parse the query and interpolate values for placeholder (?).
+=head2 _query_object_add
 
-It returns true.
+Provided with a L<DB::Object::Query> and this will add it to the current object property I<query_object> and return it.
 
-=back
+=head2 _query_object_create
+
+This is supposed to be called from a L<DB::Object::Tables>
+
+Create a new L<DB::Object::Query> object, sets the I<debug> and I<verbose> values and sets its property L<DB::Object::Query/table_object> to the value of the current object.
+
+=head2 _query_object_current
+
+Returns the current I<query_object>
+
+=head2 _query_object_get_or_create
+
+Check to see if the L</query_object> is already set and then return its value, otherwise create a new object by calling L</_query_object_create> and return it.
+
+=head2 _query_object_remove
+
+Provided with a L<DB::Object::Query> and this will remove it from the current object property I<query_object>.
+
+It returns the object removed.
+
+=head2 _reset_query
+
+If this has not already been reset, this will mark the current query object as reset and calls L</_query_object_remove> and return the value for L</_query_object_get_or_create>
+
+If it has been already reset, this will return the value for L</_query_object_current>
 
 =head1 OPERATORS
 
 =head2 AND( VALUES )
 
-Given a value, this returns a L<DB::Object::AND> object. You can retrieve the value with B<value>
+Given a value, this returns a L<DB::Object::AND> object. You can retrieve the value with L<DB::Object::AND/value>
 
-This is used by B<where>
+This is used by L</where>
 
     my $op = $dbh->AND( login => 'joe', status => 'active' );
-    ## will produce:
+    # will produce:
     WHERE login = 'joe' AND status = 'active'
 
 =head2 NOT( VALUES )
 
-Given a value, this returns a L<DB::Object::NOT> object. You can retrieve the value with B<value>
+Given a value, this returns a L<DB::Object::NOT> object. You can retrieve the value with L<DB::Object::NOT/value>
 
-This is used by B<where>
+This is used by L</where>
 
     my $op = $dbh->AND( login => 'joe', status => $dbh->NOT( 'active' ) );
-    ## will produce:
+    # will produce:
     WHERE login = 'joe' AND status != 'active'
 
 =head2 OR( VALUES )
 
-Given a value, this returns a L<DB::Object::OR> object. You can retrieve the value with B<value>
+Given a value, this returns a L<DB::Object::OR> object. You can retrieve the value with L<DB::Object::OR/value>
 
-This is used by B<where>
+This is used by L</where>
 
     my $op = $dbh->OR( login => 'joe', login => 'john' );
-    ## will produce:
+    # will produce:
     WHERE login = 'joe' OR login = 'john'
-
-=head1 COPYRIGHT
-
-Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
-
-=head1 CREDITS
-
-Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
 L<DBI>, L<Apache::DBI>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2019-2021 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
 
 =cut

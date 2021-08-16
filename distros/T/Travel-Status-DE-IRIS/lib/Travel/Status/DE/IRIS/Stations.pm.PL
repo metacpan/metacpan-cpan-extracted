@@ -35,7 +35,7 @@ use Text::LevenshteinXS qw(distance);
 
 # TODO switch to Text::Levenshtein::XS once AUR/Debian packages become available
 
-our $VERSION = '1.58';
+our $VERSION = '1.59';
 
 # Automatically generated, see share/stations.json
 my @stations = (
@@ -79,6 +79,10 @@ sub normalize {
 
 sub get_station {
 	my ($name) = @_;
+
+	if (not $name) {
+		return;
+	}
 
 	my $ds100_match = firstval { $name eq $_->[0] } @stations;
 
@@ -124,6 +128,10 @@ sub get_station_by_location {
 
 sub get_station_by_name {
 	my ($name) = @_;
+
+	if (not $name) {
+		return;
+	}
 
 	my $nname        = lc($name);
 	my $actual_match = firstval { $nname eq lc( $_->[1] ) } @stations;
@@ -183,7 +191,7 @@ Travel::Status::DE::IRIS::Stations - Station name to station code mapping
 
 =head1 VERSION
 
-version 1.58
+version 1.59
 
 =head1 DESCRIPTION
 

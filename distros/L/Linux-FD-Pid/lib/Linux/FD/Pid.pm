@@ -1,5 +1,5 @@
 package Linux::FD::Pid;
-$Linux::FD::Pid::VERSION = '0.002';
+$Linux::FD::Pid::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -23,13 +23,13 @@ Linux::FD::Pid - PID file descriptors
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
  use Linux::FD::Pid
  
- my $fh = Linux::FD::Pid($pid)
+ my $fh = Linux::FD::Pid->new($pid)
 
 =head1 METHODS
 

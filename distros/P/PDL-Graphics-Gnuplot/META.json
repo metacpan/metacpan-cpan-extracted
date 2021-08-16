@@ -54,14 +54,14 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=PDL-Graphics-Gnuplot"
+         "web" : "http://github.com/PDLPorters/PDL-Graphics-Gnuplot/issues"
       },
-      "homepage" : "http://github.com/drzowie/PDL-Graphics-Gnuplot",
+      "homepage" : "http://github.com/PDLPorters/PDL-Graphics-Gnuplot",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/drzowie/PDL-Graphics-Gnuplot.git"
+         "url" : "git://github.com/PDLPorters/PDL-Graphics-Gnuplot.git"
       }
    },
-   "version" : "2.018",
+   "version" : "2.019",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

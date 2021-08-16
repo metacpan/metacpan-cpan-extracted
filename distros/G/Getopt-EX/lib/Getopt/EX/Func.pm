@@ -1,5 +1,5 @@
 package Getopt::EX::Func;
-use version; our $VERSION = version->declare("v1.24.1");
+use version; our $VERSION = version->declare("v1.24.2");
 
 use v5.14;
 use warnings;
@@ -62,11 +62,12 @@ sub parse_func {
     my $noinline = $opt->{noinline};
     my $pointer = $opt->{pointer};
     my $caller = caller;
+    my $pkg = $opt->{PACKAGE} || $caller;
 
     my @func;
 
     if (not $noinline and /^sub\s*{/) {
-	my $sub = eval $_;
+	my $sub = eval "package $pkg; $_";
 	if ($@) {
 	    warn "Error in function -- $_ --.\n";
 	    die $@;
@@ -78,7 +79,6 @@ sub parse_func {
 	my $name = $+{name};
 	my $arg = $+{arg} // '';
 	$arg =~ s/^ (?| \( (.*) \) | = (.*) ) $/$1/x;
-	my $pkg = $opt->{PACKAGE} || $caller;
 	$name =~ s/^/$pkg\::/ unless $name =~ /::/;
 	@func = ($name, arg2kvlist($arg));
     }

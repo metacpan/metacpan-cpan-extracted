@@ -13,8 +13,10 @@ t/01match-isa.t
 t/01match-numeq.t
 t/01match-regexp.t
 t/01match-streq.t
+t/02cases.t
 t/10context.t
 t/11ordering.t
 t/20experimental-dispatch.t
 t/21experimental-dispatch-isa.t
+t/95benchmark.t
 t/99pod.t

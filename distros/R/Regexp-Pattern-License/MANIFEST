@@ -37,5 +37,7 @@ t/coverage-spdx-2.5.t
 t/coverage-spdx-2.6.t
 t/coverage-spdx-3.0.t
 t/coverage-tldr.t
+t/coverage-trove.t
+t/coverage-wikidata.t
 t/lib/MyTest.pm
 t/lib/Test2/Regexp/Pattern/License.pm

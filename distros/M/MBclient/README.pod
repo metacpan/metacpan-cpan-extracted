@@ -114,6 +114,14 @@ define modbus mode.
 
 Example: C<$m-E<gt>mode(MODBUS_RTU);>
 
+=item timeout(TIMEOUT)
+
+Use to set modbus read timeout : 30 default value.
+
+Timeout defines how long will read wait until it exits and aborts communication.
+
+Example: C<$m-E<gt>timeout(5);>
+
 =item host(hostname)
 
 Use to set server IPv4 like "192.168.0.1" or URL name like "plc1.domain.net".

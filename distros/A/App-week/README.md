@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/kaz-utashiro/App-week.svg?branch=master)](https://travis-ci.com/kaz-utashiro/App-week) [![MetaCPAN Release](https://badge.fury.io/pl/App-week.svg)](https://metacpan.org/release/App-week)
+[![Actions Status](https://github.com/kaz-utashiro/App-week/workflows/test/badge.svg)](https://github.com/kaz-utashiro/App-week/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-week.svg)](https://metacpan.org/release/App-week)
 # NAME
 
 week - colorful calendar command
@@ -9,14 +9,16 @@ week - colorful calendar command
 
 Options:
 
-    -n      Display n months surronding today (default 3).
-    -A n    Display n months after current month.
-    -B n    Display n months before current month (default 1).
-    -C[n]   Display n months before and after current month (default 4).
-    -y      Display year calendar.
-    -Y[n]   Display n years of calendar
-    -c n    Display calendar in n column (default 3).
-    -l      Display I18N options (See below)
+    -#,-m#  # months surronding today (default 3)
+    -A #    after current month
+    -B #    before current month
+    -C[#]   before and after current month (default 4)
+    -y      year calendar
+    -Y[#]   # years of calendar
+    -c #    number of columns (default 3)
+    -p #    print year on month-# (default current, 0 for none)
+    -P      print year on all months
+    -l      I18N options (See below)
 
     --theme theme
             Apply color theme
@@ -35,21 +37,24 @@ I18N options:
 Color modules:
 
     -Mcolors
-    -Mteams
+    -Mnpb
     -Molympic
 
 # VERSION
 
-Version 0.13
+Version 1.0101
 
 # DESCRIPTION
 
 By default, **week** command display the previous, current and next
-month surrounding today, just like **-3** option of **cal** command.
+month surrounding today, just like **-3** option of [cal(1)](http://man.he.net/man1/cal) command.
 
-Number of month can be given with dash.
+Number of month can be given with dash, or **-m** option which can be
+mixed up with other parameters.  **-c** option specifies number of
+columns.
 
     $ week -12
+    $ week -m21c7
 
 Before and after months can be specified with **-B** and **-A** option,
 and **-C** for both.
@@ -62,6 +67,15 @@ Date can given like:
     $ week 2019/9/23
     $ week 9/23        # 9/23 of current year
     $ week 23          # 23rd of current month
+
+And also in Japanese format and era:
+
+    $ week 2019年9月23日
+    $ week 平成31年9月23日
+    $ week H31.9.23
+    $ week 平成31
+    $ week 平31
+    $ week H31
 
 Greater number is handled as year.  Next command displays the calendar of
 the year 1752.
@@ -77,6 +91,8 @@ specified by the **-Y** option, which will implicitly set the **-y** option.
 
     $ week -Y 1752     # display 1752 years of calendar (takes long)
 
+# INTERNATIONAL SUPPORT
+
 It is possible display calendar in various language by setting `LANG`
 environment.
 
@@ -85,11 +101,19 @@ environment.
 This command is come with **-Mi18n** module which provides easy way to
 specify language by command option.  Option **-l** displays option list
 provided by **-Mi18n** module and option **--i18n** and **--i18n-v**
-enables them.
+enables them.  See [Getopt::EX::i18n](https://metacpan.org/pod/Getopt::EX::i18n).
+
+    $ week --i18n-v --et
+
+# JAPANESE ERA
+
+By default, year is shown on current month and every January.  When
+used in Japanese locale environment, right side year is displayed in
+Japanese era (wareki: 和暦) format.
 
 # COLORMAP
 
-Each field is labled by names.
+Each field is labeled by names.
 
     FRAME       Enclosing frame
     MONTH       Month name
@@ -156,7 +180,7 @@ load appropriate module automatically in default start up module
         --green
         --pastel
 
-- **-Mteams**
+- **-Mnpb** (Nippon Professional Baseball Organization)
 
         --tigers, --tigers-rev
         --giants, --giants-rev
@@ -165,6 +189,7 @@ load appropriate module automatically in default start up module
 - **-Molympic**
 
         --tokyo2020, --tokyo2020-rev
+        --tokyo2020-gold, --tokyo2020-gold-rev
 
 - **--theme**
 
@@ -190,10 +215,13 @@ site.
 
 # SEE ALSO
 
+[App::week](https://metacpan.org/pod/App::week),
 [https://github.com/kaz-utashiro/App-week](https://github.com/kaz-utashiro/App-week)
 
+[Getopt::EX::termcolor](https://metacpan.org/pod/Getopt::EX::termcolor),
 [https://github.com/kaz-utashiro/Getopt-EX-termcolor](https://github.com/kaz-utashiro/Getopt-EX-termcolor)
 
+[Getopt::EX::i18n](https://metacpan.org/pod/Getopt::EX::i18n),
 [https://github.com/kaz-utashiro/Getopt-EX-i18n](https://github.com/kaz-utashiro/Getopt-EX-i18n)
 
 [Getopt::EX::Colormap](https://metacpan.org/pod/Getopt::EX::Colormap)
@@ -219,4 +247,4 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2018- Kazumasa Utashiro
+Copyright 2018-2021 Kazumasa Utashiro

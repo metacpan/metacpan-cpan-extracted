@@ -12,11 +12,11 @@ my $build = Module::Build->new(
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
-      'XS::Parse::Keyword::Builder' => 0,
+      'XS::Parse::Keyword::Builder' => '0.12',
    },
    requires => {
       'perl' => '5.016', # Perl_do_ncmp(), pad_add_name_pvs()
-      'XS::Parse::Keyword' => '0.04',
+      'XS::Parse::Keyword' => '0.12',
    },
    license => 'perl',
    create_license => 1,

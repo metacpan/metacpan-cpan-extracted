@@ -18,6 +18,7 @@ t/sep.t
 t/sep2.t
 t/Tabs-ElCid.t
 t/tabs.t
+t/undef.t
 t/Wrap-JLB.t
 t/wrap.t
 t/wrap_separator2.t
