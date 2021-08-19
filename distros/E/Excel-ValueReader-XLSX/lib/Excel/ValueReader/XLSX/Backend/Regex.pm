@@ -4,7 +4,7 @@ use 5.10.1;
 use Moose;
 extends 'Excel::ValueReader::XLSX::Backend';
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 #======================================================================
 # LAZY ATTRIBUTE CONSTRUCTORS
@@ -185,17 +185,17 @@ sub values {
 
 
 sub _decode_xml_entities {
-  state %xml_entities   = ( amp  => '&',
+  state $xml_entities   = { amp  => '&',
                             lt   => '<',
                             gt   => '>',
                             quot => '"',
                             apos => "'",
-                           );
-  state $entity_names   = join '|', keys %xml_entities;
+                           };
+  state $entity_names   = join '|', keys %$xml_entities;
   state $regex_entities = qr/&($entity_names);/;
 
   # substitute in-place
-  $_[0] =~ s/$regex_entities/$xml_entities{$1}/eg;
+  $_[0] =~ s/$regex_entities/$xml_entities->{$1}/eg;
 }
 
 

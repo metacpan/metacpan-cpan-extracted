@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Carp qw(croak);
 use Config;
@@ -964,24 +964,25 @@ sub _get_docfiles {
        COPYING(?:[.](?:LESSER|LIB))?
        | COPYRIGHT
        | LICEN[CS]E
-       ) \z
+       ) (?:[.](?:md|mkdn|pod|txt))? \z
     }xmsi;
 
     my $CHANGELOG = qr{ \A (?:
-        Change(?:s|Log)(?:[.]md)?
-        ) \z
+        Change(?:s|Log)
+        ) (?:[.](?:md|mkdn|pod|txt))? \z
     }xmsi;
 
     my $DOC = qr{ \A (?:
         AUTHORS
         | BUGS
+        | CONTRIBUTING
         | CREDITS
         | FAQ
         | NEWS
-        | README(?:[.](?:md|pod))?
+        | README
         | THANKS
         | TODO
-        ) \z
+        ) (?:[.](?:md|mkdn|pod|txt))? \z
     }xmsi;
 
     my %regex_for = (
@@ -1171,7 +1172,7 @@ CPANPLUS::Dist::Debora::Package - Base class for package formats
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

@@ -22,7 +22,7 @@ use strict ;
 
 package uHTML::request ;
 
-use version ; our $VERSION = "1.81" ;
+use version ; our $VERSION = "1.83" ;
 
 require uHTML ;
 use LWP::MediaTypes ;
@@ -361,10 +361,11 @@ sub Cookie
   }
   return( defined $self->{'RecvCookie'} ? $self->{'RecvCookie'}->{$Name} : undef ) unless defined $Value ;
 
-  my $expire = shift ;                      # expiration in seconds, hours, days, months, or years (suffix none or s, h, d, m, y), 0 deletes
-  my $path   = shift ;                      # cookie path ('/' if not defined)
-  my $host   = shift ;                      # host ($ENV{'SERVER_NAME'} if not defined)
-  my $JS     = shift ;                      # if true, then the cookie is available via JavaScript
+  my $expire   = shift ;              # expiration in seconds, hours, days, months, or years (suffix none or s, h, d, m, y), 0 deletes the cookie
+  my $path     = shift ;              # cookie path ('/' if not defined)
+  my $host     = shift ;              # host ($ENV{'SERVER_NAME'} if not defined)
+  my $JS       = shift ;              # if true, then the cookie is available via JavaScript
+  my $SameSite = shift or 'strict' ;  # Google's Same Site Policy":  Strict, Lax or None
 
   $path = '/' unless defined $path ;
   $host = $self->{'ENV'}->{'SERVER_NAME'} unless defined $host ;
@@ -387,6 +388,7 @@ sub Cookie
   }
   $self->{'SendCookie'}->{$Name} .= " Path=$path;" if $path ;
   $self->{'SendCookie'}->{$Name} .= " Domain=$host;" ;
+  $self->{'SendCookie'}->{$Name} .= " sameSite=$SameSite;" ;
   $self->{'SendCookie'}->{$Name} .= " HttpOnly" unless $JS ;
   return $self->{'RecvCookie'}->{$Name} ;
 }
@@ -405,7 +407,7 @@ sub ContentType
   elsif( $self->File() =~ /\.u?xml$/i )                     { return( $self->{'contentType'} = 'text/xml' ) }
   elsif( $self->File() =~ /\.u?rss$/i )                     { return( $self->{'contentType'} = 'application/rss+xml' ) }
 
-  return( $self->{'contentType'} = guess_media_type( $self->File() ) ) ;
+  return( $self->{'contentType'} = guess_media_type( $self->File() ) || 'text/html' ) ;
 }
 
 sub Headers

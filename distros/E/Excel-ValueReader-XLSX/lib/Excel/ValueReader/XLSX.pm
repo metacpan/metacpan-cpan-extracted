@@ -6,7 +6,7 @@ use Date::Calc            qw/Add_Delta_Days/;
 use POSIX                 qw/strftime/;
 use feature 'state';
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 #======================================================================
 # ATTRIBUTES

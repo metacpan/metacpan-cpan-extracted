@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use parent qw(CPANPLUS::Dist::Debora::Package);
 
@@ -29,11 +29,12 @@ my %OBSOLETES_FOR = (
     'ack'                 => [qw(perl-App-Ack)],
     'App-Licensecheck'    => [qw(perl-App-Licensecheck)],
     'App-perlbrew'        => [qw(perl-App-perlbrew)],
+    'Mojolicious'         => [qw(perl-Test-Mojo)],
     'perl-ldap'           => [qw(perl-LDAP)],
     'Perl-Tidy'           => [qw(perltidy)],
     'TermReadKey'         => [qw(perl-TermReadKey)],
     'Razor2-Client-Agent' =>
-        [qw{perl-Razor-Agent perl-razor-agents razor-agents}],
+        [qw(perl-Razor-Agent perl-razor-agents razor-agents)],
 );
 
 # Add additional capabilities to some packages.
@@ -530,7 +531,7 @@ CPANPLUS::Dist::Debora::Package::RPM - Create binary RPM packages
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

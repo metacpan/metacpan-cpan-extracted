@@ -65,6 +65,10 @@ use vars qw(@test);
 #
 );
 
+if ($] < 5.008_001) {
+    @test = (sub {1}) x scalar(@test);
+}
+
 $|=1; print "1..",scalar(@test),"\n"; my $testno=1; sub ok { print $_[0]?'ok ':'not ok ',$testno++,$_[1]?" - $_[1]\n":"\n" } ok($_->()) for @test;
 
 __END__

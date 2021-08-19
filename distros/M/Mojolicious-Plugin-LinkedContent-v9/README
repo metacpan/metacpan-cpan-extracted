@@ -1,0 +1,121 @@
+NAME
+    Mojolicious::Plugin::LinkedContent::v9 - manage linked css and js
+
+VERSION
+    version 0.09
+
+AUTHOR
+    Emiliano Bruni <info@ebruni.it>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by Emiliano Bruni.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+SYNOPSIS
+        use base 'Mojolicious';
+        sub statup {
+            my $self = shift;
+            $self->plugin( 'Mojolicious::Plugin::LinkedContent::v9' );
+        }
+
+    Somewhere in template:
+
+        % require_css 'mypage.css';
+        % require_js 'myscript.js';
+        % require_reg 'bootstrap';
+
+    And in <HEAD> of your layout:
+
+        %== include_css;
+        %== include_js;
+
+DESCRIPTION
+    An updated version of Mojolicious::Plugin::LinkedContent which woks with
+    Mojolicious > 8.23 and add support to "registered" javascript and css
+    files with dependencies similar to requirejs
+
+INTERFACE
+HELPERS
+    require_js
+        Add one or more js files to load queue.
+
+    require_css
+        Add one or more css files to load queue.
+
+    require_reg
+        Add a library and its dependences based on reg_config file
+
+    register
+        Render the plugin. Internal
+
+    include_js =item include_css
+        Render queue to template
+
+  ITEMS
+    store_items
+        Internal method
+
+CONFIGURATION AND ENVIRONMENT
+    Mojolicious::Plugin::LinkedContent can recieve parameters when loaded
+    from Mojolicious like this:
+
+        $self->plugin(
+            'linked_content',
+            'js_base'  => '/jsdir',
+            'css_base' => '/cssdir'
+            'reg_config' => '/linked_content.cfg',
+        );
+
+    If no basedirs provided, '/js' and '/css' used by default. If no
+    reg_config is provided a cloud example file is used. Default reg_config
+    URL:
+    https://raw.githubusercontent.com/EmilianoBruni/MPLConfig/main/linked_co
+    ntent.cfg
+
+Notes about original Mojolicious::Plugin::LinkedContent
+    This module is a complete replacement for
+    Mojolicious::Plugin::LinkedContent and shares with it most of its code.
+    But original module doesn't work with MOjolicious > 8.23
+
+    There is a issue for in github for this problem
+
+    <https://github.com/yko/mojolicious-plugin-linkedcontent/issues/5>
+
+    ignored by 2019 and my pull request for patch and other implementations
+    included in this module here
+
+    <https://github.com/yko/mojolicious-plugin-linkedcontent/pull/4>
+
+    When original author wake up I can consider to made this module
+    obsolete.
+
+BUGS/CONTRIBUTING
+    Please report any bugs through the web interface at
+    <https://github.com/EmilianoBruni/mojolicious-plugin-linkedcontent-v9/is
+    sues> If you want to contribute changes or otherwise involve yourself in
+    development, feel free to fork the Git repository from
+    <https://github.com/EmilianoBruni/mojolicious-plugin-linkedcontent-v9/>.
+
+SUPPORT
+    You can find this documentation with the perldoc command too.
+
+        perldoc Mojolicious::Plugin::LinkedContent-V9
+
+AUTHOR
+    Yaroslav Korshak "<ykorshak@gmail.com>", Emiliano Bruni
+    "<info@ebruni.it"
+
+CREDITS
+      Oliver Günther
+
+LICENCE AND COPYRIGHT
+    Copyright (C) 2010 - 2013, Yaroslav Korshak Copyright (C) 2019 - 2021,
+    Emiliano Bruni
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+
+    1;
+

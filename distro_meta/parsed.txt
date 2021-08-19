@@ -74470,3 +74470,9 @@ P/PE/PEVANS/Tickit-Widget-Term-0.004.tar.gz
 P/PR/PRBRENAN/Unisyn-Parse-20210818.tar.gz
 J/JD/JDEGUEST/URI-tel-v0.801.1.tar.gz
 K/KN/KNI/XML-Perl-1.00.tar.gz
+V/VO/VOEGELAS/CPANPLUS-Dist-Debora-0.002.tar.gz
+D/DA/DAMI/Excel-ValueReader-XLSX-1.03.tar.gz
+I/IN/INA/mb/Encode/mb-Encode-0.02.tar.gz
+E/EB/EBRUNI/Mojolicious-Plugin-LinkedContent-v9-0.09.tar.gz
+I/IN/INA/Perl7/Handy/Perl7-Handy-0.07.tar.gz
+O/OK/OKELLO/uHTML-1.06.tar.gz

@@ -1,5 +1,9 @@
 Revision history for this software.
 
-0.01  2020-06-27 00:00:00
+0.02  2021-08-19 00:00:00
+  - support Perl 5.00503 using jacode.pl
+  - created by INABA Hitoshi
+
+0.01  2021-06-27 00:00:00
   - original version
   - created by INABA Hitoshi

@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use parent qw(Exporter);
 
@@ -159,6 +159,7 @@ sub filetype {
         '3pm'   => 'text',
         'bat'   => 'script',
         'dll'   => 'executable',
+        'dylib' => 'executable',
         'exe'   => 'executable',
         'pl'    => 'script',
         'pm'    => 'text',
@@ -168,6 +169,10 @@ sub filetype {
 
     my @magic = (
         [0, 4, '7F454C46', 'executable'],    # ELF
+        [0, 4, 'FEEDFACE', 'executable'],    # Mach-O
+        [0, 4, 'CEFAEDFE', 'executable'],    # Mach-O
+        [0, 4, 'FEEDFACF', 'executable'],    # Mach-O
+        [0, 4, 'CFFAEDFE', 'executable'],    # Mach-O
         [0, 2, '4D5A',     'executable'],    # PE
         [0, 2, '2321',     'script'],        # Shebang
     );
@@ -291,7 +296,7 @@ CPANPLUS::Dist::Debora::Util - Utility functions
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

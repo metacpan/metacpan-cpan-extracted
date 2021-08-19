@@ -7,7 +7,7 @@ WriteMakefile(
   NAME             => 'uHTML',
   ABSTRACT         => 'User specific extension of HTML code',
 #   ABSTRACT_FROM    => 'uHTML.pm',
-  VERSION          => '1.04',
+  VERSION          => '1.06',
 #   VERSION_FROM     => 'uHTML.pm',
   AUTHOR           => [ 'Roland Mosler', 'uHTML@Place.Ug' ] ,
   LICENSE          => 'lgpl_3_0',

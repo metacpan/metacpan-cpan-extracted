@@ -22,7 +22,7 @@ use strict ;
 
 package uHTML::std ;
 
-use version ; our $VERSION = "2.26" ;
+use version ; our $VERSION = "2.28" ;
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -215,7 +215,7 @@ sub Include( $ )
           uHTML::fileStart( $FN ) ;
           read $FH,$FT,-s $FH ;
           $HT = uHTML::recodedList( $FT,$env ) ;
-          push @Text,@{$HT} ;
+          push @Text,@{$HT} if $HT ;
 
 
           uHTML::fileEnd() ;
@@ -261,7 +261,7 @@ sub VarInclude()
           uHTML::fileStart( $FN ) ;
           read $FH,$FT,-s $FH ;
           $HT = uHTML::recodedList( $FT,$env ) ;
-          push @Text,@{$HT} ;
+          push @Text,@{$HT} if $HT ;
           uHTML::fileEnd() ;
         }
       }
@@ -451,30 +451,26 @@ sub _DoMacro( $ )
   return unless my $M = _checkMacro( $env,$Name ) ;
   print STDERR "Execute Macro '$Name'\n" if $DEBUG > 0 ;
 
-    $Node->map( '','' ) if $env->{'uHTML.MacroBody'}->{$Name} ;   # needed only if MacroBody is present
-    $Macro = $M->copy() ;
+  $Macro = $M->copy() ;
 
-    foreach( keys %{$env->{'uHTML.MacroVal'}->{$Name}} ) { $Node->setAttr( $_,$env->{'uHTML.MacroVal'}->{$Name}->{$_} ) unless $Node->testAttr( $_ ) }
-    $Node->deleteAttr( 'createonly','replace' ) ;
-    print STDERR "Execute macro $Name(${\(join ',',map \"$_='${\($Node->attr($_))}'\",keys %{$Node->attributes()})})\n" if $DEBUG > 0 ;
-    Define( $Node ) ;
-    $Macro->map( '','' ) ;
-    ClearDef( $Node ) ;
-
-
-
-#   else
+  $Node->attr( $_ ) or $Node->deleteAttr( $_ ) foreach qw( createonly replace ) ;
+  $Node->testAttr( $_ ) or $Node->setAttr( $_,$env->{'uHTML.MacroVal'}->{$Name}->{$_} ) foreach @{$env->{'uHTML.MacroAttr'}->{$Name}} ;
+  print STDERR "Execute macro $Name(${\(join ',',map \"$_='${\($Node->attr($_))}'\",keys %{$Node->attributes()})})\n" if $DEBUG > 0 ;
+  Define( $Node ) ;
+  $Macro->map( '','' ) ;
+  ClearDef( $Node ) ;
 
   if( $env->{'uHTML.MacroBody'}->{$Name} )
   {
     my( $H,$T ) = split m/<MacroBody>/s,$Macro->HTML(),2 ;
     $T =~ s/<MacroBody>//sg ;
-    $Node->HTML( $H . $Node->HTML() . $T ) ;
+    $Node->map( '','' ) ;
+    unshift @{$Node->{HTML}},$H ;
+    push    @{$Node->{HTML}},$T ;
   }
   else
   {
-    $Node->HTML( $Macro->HTML() ) ;
-#     $Node->HTML( $Macro->HTML() . $Node->HTML() ) ;  # Orig Version !!!!!
+    $Node->{HTML} = $Macro->{HTML} ;
   }
 }
 
@@ -507,22 +503,14 @@ sub Macro( $ )
   $env->{'uHTML.MacroBody'}->{$Name} = _findMacroBody( $env->{'uHTML.Macros'}->{$Name} = $Node ) ;
   if( $Node->testAttr( 'attributes' ) )
   {
-    my( $a,$b,$t,$v,@A ) ;
-    my @AT = split $SO,$Node->attr( 'attributes' ) ;
-    while( @AT )
+    my( @AT,@A ) ;
+
+    if( @AT = ($Node->attr( 'attributes' ) =~ m/([^,'"=\s]+)(?:\s*\=\s*((?:\\,|[^'",])(?:\\,|[^,\s])*|'(?:\\'|[^'])*'|"(?:\\"|[^"])*")?)?\s*,?/sg) )
     {
-      $b = '' ;
-      $v = shift @AT ;
-      ( $a,$b ) = ($v =~ m/([^\=\s]+)(?:\s*\=\s*(\S.*))?/) ;
-      if( $b and $b =~ s/^(["'])// )
-      {
-        $t = $1 ;
-        $b .= shift @AT unless $b =~ s/$t$// or not @AT ;
-      }
-      $env->{'uHTML.MacroVal'}->{$Name}->{$a} = $b ;
-      push @A,$a ;
+      $_ & 1 ? $AT[$_] =~ m/^["']/ && $AT[$_] =~ s/^["']|["']$//g : push @A,$AT[$_] foreach 0 .. $#AT ;
+      %{$env->{'uHTML.MacroVal'}->{$Name}} = ( @AT ) ;
+      $env->{'uHTML.MacroAttr'}->{$Name} = \@A ;
     }
-    $env->{'uHTML.MacroAttr'}->{$Name} = \@A ;
   }
   return if $Replace ;
   uHTML::registerTag( $Name,\&_DoMacro,1 ) ;

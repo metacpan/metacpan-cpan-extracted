@@ -3,15 +3,15 @@ package mb::Encode;
 #
 # mb::Encode - provides MBCS encoder and decoder
 #
-# https://metacpan.org/release/mb-Encode
+# https://metacpan.org/dist/mb-Encode
 #
 # Copyright (c) 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-# use 5.00503; # Universal Consensus 1998 for primetools
-use 5.008001;  # Lancaster Consensus 2013 for toolchains
+use 5.00503;    # Universal Consensus 1998 for primetools
+# use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.01';
+$VERSION = '0.02';
 $VERSION = $VERSION;
 
 require Exporter;
@@ -31,14 +31,24 @@ require Exporter;
 );
 
 use strict;
-use warnings;
-use Encode qw();
+BEGIN {
+    if ($] >= 5.008_001) {
+        eval q{
+            use warnings;
+            use Encode; qw();
+        };
+    }
+    else {
+        eval q{
+use Jacode;
+        };
+    }
+}
 
 #-------------------------------------------------------------------------------------
 # return octets to any encoding
 sub to_big5      ($) { Encode::from_to(my $oct=$_[0], 'utf8', 'big5',      ); $oct }
 sub to_big5hkscs ($) { Encode::from_to(my $oct=$_[0], 'utf8', 'big5-hkscs',); $oct }
-sub to_cp932     ($) { Encode::from_to(my $oct=$_[0], 'utf8', 'cp932',     ); $oct }
 sub to_cp936     ($) { Encode::from_to(my $oct=$_[0], 'utf8', 'cp936',     ); $oct }
 sub to_cp949     ($) { Encode::from_to(my $oct=$_[0], 'utf8', 'cp949',     ); $oct }
 sub to_cp950     ($) { Encode::from_to(my $oct=$_[0], 'utf8', 'cp950',     ); $oct }
@@ -46,12 +56,21 @@ sub to_eucjp     ($) { Encode::from_to(my $oct=$_[0], 'utf8', 'euc-jp',    ); $o
 sub to_gbk       ($) { Encode::from_to(my $oct=$_[0], 'utf8', 'gbk',       ); $oct }
 sub to_sjis      ($) { Encode::from_to(my $oct=$_[0], 'utf8', 'sjis',      ); $oct }
 sub to_uhc       ($) { Encode::from_to(my $oct=$_[0], 'utf8', 'uhc',       ); $oct }
+sub to_cp932     ($) {
+    my $oct = $_[0];
+    if ($] >= 5.008_001) {
+        Encode::from_to($oct, 'utf8', 'cp932');
+    }
+    else {
+        Jacode::convert(\$oct, 'sjis', 'utf8');
+    }
+    return $oct;
+}
 
 #-------------------------------------------------------------------------------------
-# shorthand of mb::to_XXXX
+# shorthand of mb::Encode::to_XXXX
 sub big5         ($) { Encode::from_to(my $oct=$_[0], 'utf8', 'big5',      ); $oct }
 sub big5hkscs    ($) { Encode::from_to(my $oct=$_[0], 'utf8', 'big5-hkscs',); $oct }
-sub cp932        ($) { Encode::from_to(my $oct=$_[0], 'utf8', 'cp932',     ); $oct }
 sub cp936        ($) { Encode::from_to(my $oct=$_[0], 'utf8', 'cp936',     ); $oct }
 sub cp949        ($) { Encode::from_to(my $oct=$_[0], 'utf8', 'cp949',     ); $oct }
 sub cp950        ($) { Encode::from_to(my $oct=$_[0], 'utf8', 'cp950',     ); $oct }
@@ -59,12 +78,21 @@ sub eucjp        ($) { Encode::from_to(my $oct=$_[0], 'utf8', 'euc-jp',    ); $o
 sub gbk          ($) { Encode::from_to(my $oct=$_[0], 'utf8', 'gbk',       ); $oct }
 sub sjis         ($) { Encode::from_to(my $oct=$_[0], 'utf8', 'sjis',      ); $oct }
 sub uhc          ($) { Encode::from_to(my $oct=$_[0], 'utf8', 'uhc',       ); $oct }
+sub cp932        ($) {
+    my $oct = $_[0];
+    if ($] >= 5.008_001) {
+        Encode::from_to($oct, 'utf8', 'cp932');
+    }
+    else {
+        Jacode::convert(\$oct, 'sjis', 'utf8');
+    }
+    return $oct;
+}
 
 #-------------------------------------------------------------------------------------
 # return octets from any encoding
 sub by_big5      ($) { Encode::from_to(my $oct=$_[0], 'big5',       'utf8',); $oct }
 sub by_big5hkscs ($) { Encode::from_to(my $oct=$_[0], 'big5-hkscs', 'utf8',); $oct }
-sub by_cp932     ($) { Encode::from_to(my $oct=$_[0], 'cp932',      'utf8',); $oct }
 sub by_cp936     ($) { Encode::from_to(my $oct=$_[0], 'cp936',      'utf8',); $oct }
 sub by_cp949     ($) { Encode::from_to(my $oct=$_[0], 'cp949',      'utf8',); $oct }
 sub by_cp950     ($) { Encode::from_to(my $oct=$_[0], 'cp950',      'utf8',); $oct }
@@ -72,6 +100,17 @@ sub by_eucjp     ($) { Encode::from_to(my $oct=$_[0], 'euc-jp',     'utf8',); $o
 sub by_gbk       ($) { Encode::from_to(my $oct=$_[0], 'gbk',        'utf8',); $oct }
 sub by_sjis      ($) { Encode::from_to(my $oct=$_[0], 'sjis',       'utf8',); $oct }
 sub by_uhc       ($) { Encode::from_to(my $oct=$_[0], 'uhc',        'utf8',); $oct }
+sub by_cp932     ($) { Encode::from_to(my $oct=$_[0], 'cp932',      'utf8',); $oct }
+sub by_cp932     ($) {
+    my $oct = $_[0];
+    if ($] >= 5.008_001) {
+        Encode::from_to($oct, 'cp932', 'utf8');
+    }
+    else {
+        Jacode::convert(\$oct, 'utf8', 'sjis');
+    }
+    return $oct;
+}
 
 1;
 
@@ -141,25 +180,34 @@ mb::Encode - provides MBCS encoder and decoder
 
  Encode - character encodings in Perl
  https://metacpan.org/dist/Encode
-
+ 
+ Jacode - Perl program for Japanese character code conversion
+ https://metacpan.org/dist/Jacode
+ 
+ Jacode4e - jacode.pl-like program for enterprise
+ https://metacpan.org/dist/Jacode4e
+ 
+ Jacode4e::RoundTrip - Jacode4e for round-trip conversion in JIS X 0213
+ https://metacpan.org/dist/Jacode4e-RoundTrip
+ 
  mb - run Perl script in MBCS encoding (not only CJK ;-)
  https://metacpan.org/dist/mb
-
+ 
  UTF8::R2 - makes UTF-8 scripting easy for enterprise use or LTS
  https://metacpan.org/dist/UTF8-R2
-
+ 
  IOas::CP932IBM - provides CP932IBM I/O subroutines for UTF-8 script
  https://metacpan.org/dist/IOas-CP932IBM
-
+ 
  IOas::CP932NEC - provides CP932NEC I/O subroutines for UTF-8 script
  https://metacpan.org/dist/IOas-CP932NEC
-
+ 
  IOas::CP932 - provides CP932 I/O subroutines for UTF-8 script
  https://metacpan.org/dist/IOas-CP932
-
+ 
  IOas::SJIS2004 - provides SJIS2004 I/O subroutines for UTF-8 script
  https://metacpan.org/dist/IOas-SJIS2004
-
+ 
  IOas::CP932X - provides CP932X I/O subroutines for UTF-8 script
  https://metacpan.org/dist/IOas-CP932X
 

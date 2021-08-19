@@ -28,7 +28,7 @@ if (tainted($ENV{PWD})) {
     plan skip_all => 'taint mode enabled';
 }
 else {
-    plan tests => 10;
+    plan tests => 9;
 }
 
 my $tempdir = tempdir(CLEANUP => 1);
@@ -45,9 +45,7 @@ is slurp_utf8($filename), 'Motörhead', 'can read text from UTF-8 encoded file';
 SKIP:
 {
     my $perl = can_run('perl');
-    skip 'perl interpreter not found', 4 if !$perl;
-
-    like filetype($perl), qr{executable|script}xms, 'perl is an executable';
+    skip 'perl interpreter not found', 3 if !$perl;
 
     my $output = q{};
     ok run(command => [$perl, '-v'], dir => $tempdir, buffer => \$output),

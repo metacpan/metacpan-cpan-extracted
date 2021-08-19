@@ -14,6 +14,8 @@ my $builder = Module::Build->new(
       'Archive::Zip'              => 0,
       'Module::Load'              => 0,
       'Moose'                     => 0,
+      'Date::Calc'                => 0,
+      'POSIX'                     => 0,
      },
     recommends => {
       'XML::LibXML::Reader'       => 0,

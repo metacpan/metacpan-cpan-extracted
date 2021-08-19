@@ -10,4 +10,6 @@ LICENSE
 CONTRIBUTING
 t/1001_fullname.t
 t/1002_shortname.t
+t/2001_fullname.t
+t/2002_shortname.t
 t/9001_podtest.t

@@ -3,7 +3,7 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: Perl7-Handy
-version: 0.06
+version: 0.07
 abstract: Handy Perl7 scripting environment on Perl5
 author:
   - ina <ina@cpan.org>

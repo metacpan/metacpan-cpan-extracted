@@ -1,6 +1,11 @@
 Revision history for CPANPLUS-Dist-Debora
 
+0.002  2021-08-19 14:48:39 CEST
+
+  - Add Mach-O magic
+  - Add CONTRIBUTING.md
+
 0.001  2021-07-18 23:05:26 CEST
 
-  - First version, released on an unsuspecting world.
+  - First version, released on an unsuspecting world
 

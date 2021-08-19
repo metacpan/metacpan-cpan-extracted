@@ -1,5 +1,8 @@
 Revision history for Excel-ValueReader-XLSX
 
+1.03 19.08.2021
+  - fix failures from cpantesters
+
 1.02 18.08.2021
   - added support for decoding dates
 

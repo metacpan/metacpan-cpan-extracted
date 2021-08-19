@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use parent qw(CPANPLUS::Dist::Debora::Package);
 
@@ -257,7 +257,7 @@ CPANPLUS::Dist::Debora::Package::Tar - Create tar archives
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

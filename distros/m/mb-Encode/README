@@ -58,7 +58,7 @@ SYNOPSIS
 
 SUPPORTED PERL VERSIONS
 
-  perl version 5.008001 to newest perl
+  perl version 5.00503 to newest perl
 
 SEE ALSO
 
@@ -67,22 +67,4 @@ SEE ALSO
 
   mb - run Perl script in MBCS encoding (not only CJK ;-)
   https://metacpan.org/dist/mb
-
-  UTF8::R2 - makes UTF-8 scripting easy for enterprise use or LTS
-  https://metacpan.org/dist/UTF8-R2
-
-  IOas::CP932IBM - provides CP932IBM I/O subroutines for UTF-8 script
-  https://metacpan.org/dist/IOas-CP932IBM
-
-  IOas::CP932NEC - provides CP932NEC I/O subroutines for UTF-8 script
-  https://metacpan.org/dist/IOas-CP932NEC
-
-  IOas::CP932 - provides CP932 I/O subroutines for UTF-8 script
-  https://metacpan.org/dist/IOas-CP932
-
-  IOas::SJIS2004 - provides SJIS2004 I/O subroutines for UTF-8 script
-  https://metacpan.org/dist/IOas-SJIS2004
-
-  IOas::CP932X - provides CP932X I/O subroutines for UTF-8 script
-  https://metacpan.org/dist/IOas-CP932X
 
