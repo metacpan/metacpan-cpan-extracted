@@ -4,53 +4,85 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"         => "regular expressions for legal licenses",
-  "author"           => ["Jonas Smedegaard (JONASS) <jonass\@cpan.org>"],
-  "dynamic_config"   => 0,
-  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
-  "keywords"         => ["Licensing", "Sourcecode"],
-  "license"          => ["gpl_3"],
-  "meta-spec"        => {
-                          url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-                          version => 2,
+  "abstract"       => "regular expressions for legal licenses",
+  "author"         => ["Jonas Smedegaard (JONASS) <jonass\@cpan.org>"],
+  "dynamic_config" => 0,
+  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+  "keywords"       => ["Licensing", "Sourcecode"],
+  "license"        => ["gpl_3"],
+  "meta-spec"      => {
+                        url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+                        version => 2,
+                      },
+  "name"           => "Regexp-Pattern-License",
+  "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
+  "prereqs"        => {
+                        configure => {
+                          recommends => { "CPAN::Meta::Requirements" => "2.000" },
+                          requires   => { "ExtUtils::MakeMaker" => 6.17 },
                         },
-  "name"             => "Regexp-Pattern-License",
-  "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
-  "prereqs"          => {
-                          configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                          runtime => { requires => { "perl" => 5, "re::engine::RE2" => 0 } },
-                          test => {
-                            requires => {
-                              "Regexp::Pattern"       => 0,
-                              "Test2::V0"             => 0,
-                              "Test::Builder::Module" => 0,
-                              "Test::More"            => 0.98,
-                              "Test::Regexp::Pattern" => 0.003,
-                              "Try::Tiny"             => 0,
-                            },
+                        runtime => {
+                          conflicts  => { "App::Licensecheck" => "<= v3.2.6" },
+                          recommends => { "re::engine::RE2" => 0 },
+                          requires   => { perl => 5 },
+                        },
+                        test => {
+                          requires => {
+                            "Regexp::Pattern" => 0,
+                            "Test2::V0" => 0,
+                            "Test::Builder::Module" => 0,
+                            "Test::More" => 0.98,
+                            "Test::Regexp::Pattern" => 0.003,
+                            "Test::Without::Module" => 0,
+                            "Try::Tiny" => 0,
                           },
                         },
-  "provides"         => {
-                          "Regexp::Pattern::License"        => { file => "lib/Regexp/Pattern/License.pm", version => "v3.9.1" },
-                          "Regexp::Pattern::License::Parts" => { file => "lib/Regexp/Pattern/License/Parts.pm", version => "v3.9.1" },
-                        },
-  "release_status"   => "stable",
-  "resources"        => {
-                          bugtracker   => { web => "https://bugs.debian.org/libregexp-pattern-license-perl" },
-                          homepage     => "https://metacpan.org/pod/Regexp::Pattern::License",
-                          license      => ["http://www.gnu.org/licenses/gpl-3.0.txt"],
-                          repository   => {
-                                            type => "git",
-                                            web  => "https://salsa.debian.org/build-common-team/regexp-pattern-license.git",
-                                          },
-                          x_identifier => "http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/project",
-                        },
-  "version"          => "v3.9.1",
-  "x_help_wanted"    => ["tester", "documenter"],
-  "x_static_install" => 1,
+                      },
+  "provides"       => {
+                        "Regexp::Pattern::License"        => { file => "lib/Regexp/Pattern/License.pm", version => "v3.9.3" },
+                        "Regexp::Pattern::License::Parts" => { file => "lib/Regexp/Pattern/License/Parts.pm", version => "v3.9.3" },
+                      },
+  "release_status" => "stable",
+  "resources"      => {
+                        bugtracker   => { web => "https://bugs.debian.org/libregexp-pattern-license-perl" },
+                        homepage     => "https://metacpan.org/pod/Regexp::Pattern::License",
+                        license      => ["http://www.gnu.org/licenses/gpl-3.0.txt"],
+                        repository   => {
+                                          type => "git",
+                                          web  => "https://salsa.debian.org/build-common-team/regexp-pattern-license.git",
+                                        },
+                        x_identifier => "http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/project",
+                      },
+  "version"        => "v3.9.3",
+  "x_breaks"       => { "App::Licensecheck" => "<= v3.2.6" },
+  "x_help_wanted"  => ["tester", "documenter"],
 };
 
 my %dynamic_config;
+for my $stage (keys %{$meta->{prereqs}})
+{
+	my $conflicts = $meta->{prereqs}{$stage}{conflicts} or next;
+	eval { require CPAN::Meta::Requirements } or last;
+	$conflicts = 'CPAN::Meta::Requirements'->from_string_hash($conflicts);
+	
+	for my $module ($conflicts->required_modules)
+	{
+		eval "require $module" or next;
+		my $installed = eval(sprintf('$%s::VERSION', $module));
+		$conflicts->accepts_module($module, $installed) or next;
+		
+		my $message = "\n".
+			"** This version of $meta->{name} conflicts with the version of\n".
+			"** module $module ($installed) you have installed.\n";
+		die($message . "\n" . "Bailing out")
+			if $stage eq 'build' || $stage eq 'configure';
+		
+		$message .= "**\n".
+			"** It's strongly recommended that you update it after\n".
+			"** installing this version of $meta->{name}.\n";
+		warn("$message\n");
+	}
+}
 
 my %WriteMakefileArgs = (
 	ABSTRACT   => $meta->{abstract},

@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
 
-package Tickit::Test;
+package Tickit::Test 0.72;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.71';
 
 use Carp;
 
@@ -31,6 +29,7 @@ our @EXPORT = qw(
    is_termlog
    is_display
    is_cursorpos
+   is_termctl
 
    TEXT
    BLANK
@@ -630,6 +629,26 @@ sub is_cursorpos
    $tb->diag( "Expected to be on column $col, actually on column $at_col" ) if $col != $at_col;
 
    return $ok;
+}
+
+=head2 is_termctl
+
+   is_termctl( $ctl, $value, $name )
+
+Asserts that the mock terminal has the given value for the given terminal
+control. C<$ctl> should be a value from the C<Tickit::Term::TERMPROP_*>
+constants.
+
+=cut
+
+sub is_termctl
+{
+   my ( $ctl, $value, $name ) = @_;
+
+   my $tb = Test::Builder->new;
+
+   # currently all the supported ctls are numeric anyway
+   return $tb->is_num( my $got = $term->getctl( $ctl ), $value, $name );
 }
 
 sub TEXT

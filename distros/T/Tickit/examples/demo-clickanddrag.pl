@@ -3,7 +3,7 @@
 package ClickAndDragWidget;
 use base 'Tickit::Widget';
 
-use strict;
+use v5.14;
 use warnings;
 
 use Tickit;

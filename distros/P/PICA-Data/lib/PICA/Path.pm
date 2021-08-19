@@ -2,7 +2,7 @@ package PICA::Path;
 use v5.14.1;
 use utf8;
 
-our $VERSION = '1.29';
+our $VERSION = '1.30';
 
 use Carp qw(confess);
 use Scalar::Util qw(reftype);
@@ -11,7 +11,7 @@ use overload '""' => \&stringify;
 
 sub new {
     my $class = shift;
-    my $self  = parse(@_) or confess "invalid pica path";
+    my $self = parse(@_) or confess "invalid pica path";
     bless $self, $class;
 }
 
@@ -690,11 +690,6 @@ Force array as return value. Default: 0.
 
 Check whether a given PICA field matches the field and occurrence of this path.
 Returns the C<$field> on success.
-
-=head2 filter_record_fields( $record )
-
-Returns an array reference with fields of a L<PICA::Data> that match the path.
-Subfield codes are ignored.
 
 =head2 match_subfields( $field )
 

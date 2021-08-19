@@ -6,7 +6,7 @@ use warnings;
 use File::Temp;
 use Getopt::Long qw(GetOptionsFromArray :config posix_default bundling);
 use Test::NoWarnings;
-use Test::More tests => 4*103 + 1;
+use Test::More tests => 4*104 + 1;
 
 use OSPF::LSDB::YAML;
 use OSPF::LSDB::View;

@@ -21,7 +21,10 @@ my $builder = Module::Build->new(
     test_requires => {
       'Test::More'                => 0,
       'List::Util'                => 0,
+      'List::MoreUtils'           => 0,
+      'Scalar::Util'              => 0,
       'Module::Load::Conditional' => 0,
+      'Clone'                     => 0,
     },
 
     add_to_cleanup      => [ 'Excel-ValueReader-XLSX-*' ],

@@ -23,7 +23,7 @@ WriteMakefile(
       ? ('LICENSE'=> 'perl')
       : ()),
     PREREQ_PM => {
-        'PDL'  => '2.038', # has PDL::GSL::CDF
+        'PDL'  => '2.057', # ->sum etc return ndarray not Perl scalar
     },
     CONFIGURE_REQUIRES => {
         'PDL::Core'  => 2.008,

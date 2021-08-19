@@ -15,8 +15,8 @@
 package DB::Object::SQLite::Statement;
 BEGIN
 {
-    require 5.6.0;
     use strict;
+    use warnings;
     use DB::Object::SQLite;
     use DB::Object::Statement;
     use parent qw( DB::Object::SQLite DB::Object::Statement );

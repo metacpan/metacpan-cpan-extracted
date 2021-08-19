@@ -15,8 +15,8 @@
 package DB::Object::SQLite;
 BEGIN
 {
-    require 5.6.0;
     use strict;
+    use warnings;
     use DBI qw( :sql_types );
     # use DBD::SQLite;
     eval

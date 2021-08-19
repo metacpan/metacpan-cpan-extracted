@@ -1,9 +1,9 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2011-2019 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
  */
-
+#define PERL_NO_GET_CONTEXT
 
 #include "EXTERN.h"
 #include "perl.h"
@@ -24,14 +24,46 @@
 #  define mPUSHs(sv)  PUSHs(sv_2mortal(sv))
 #endif
 
-static SV *newSVivpv(int iv, const char *pv)
+#ifndef newSVivpv
+#  define newSVivpv(i,p)  S_newSVivpv(aTHX_ i, p)
+static SV *S_newSVivpv(pTHX_ int iv, const char *pv)
 {
   SV *sv = newSViv(iv);
-  if(pv) { sv_setpv(sv, pv); SvPOK_on(sv); }
+  if(pv) { sv_setpv(sv, pv); SvIOK_on(sv); }
   return sv;
 }
+#endif
 
-static SV *tickit_focusevtype2sv(TickitFocusEventType type)
+// A handy helper for setting PL_curcop
+#define SET_PL_curcop                          \
+  do {                                         \
+    static COP *cop;                           \
+    if(!cop) {                                 \
+      SAVEVPTR(PL_parser);                     \
+      Newxz(PL_parser, 1, yy_parser);          \
+      SAVEFREEPV(PL_parser);                   \
+                                               \
+      cop = (COP *)newSTATEOP(0, NULL, NULL);  \
+      CopFILE_set(cop, __FILE__);              \
+      CopLINE_set(cop, __LINE__);              \
+    }                                          \
+    PL_curcop = cop;                           \
+  } while(0)
+
+#define cv_from_sv(sv, name)  S_cv_from_sv(aTHX_ sv, name)
+static CV *S_cv_from_sv(pTHX_ SV *sv, const char *name)
+{
+  HV *hv;
+  GV *gvp;
+  SvGETMAGIC(sv);
+  CV *cv = sv_2cv(sv, &hv, &gvp, 0);
+  if(!cv)
+    croak("Expected CODE reference for %s", name);
+  return cv;
+}
+
+#define tickit_focusevtype2sv(type)  S_tickit_focusevtype2sv(aTHX_ type)
+static SV *S_tickit_focusevtype2sv(pTHX_ TickitFocusEventType type)
 {
   const char *name = NULL;
   switch(type) {
@@ -41,7 +73,8 @@ static SV *tickit_focusevtype2sv(TickitFocusEventType type)
   return newSVivpv(type, name);
 }
 
-static TickitFocusEventType tickit_name2focusev(const char *name)
+#define tickit_name2focusev(name)  S_tickit_name2focusev(aTHX_ name)
+static TickitFocusEventType S_tickit_name2focusev(pTHX_ const char *name)
 {
   switch(name[0]) {
     case 'i':
@@ -54,7 +87,8 @@ static TickitFocusEventType tickit_name2focusev(const char *name)
   return -1;
 }
 
-static SV *tickit_keyevtype2sv(int type)
+#define tickit_keyevtype2sv(type)  S_tickit_keyevtype2sv(aTHX_ type)
+static SV *S_tickit_keyevtype2sv(pTHX_ int type)
 {
   const char *name = NULL;
   switch(type) {
@@ -64,7 +98,8 @@ static SV *tickit_keyevtype2sv(int type)
   return newSVivpv(type, name);
 }
 
-static TickitKeyEventType tickit_name2keyev(const char *name)
+#define tickit_name2keyev(name)  S_tickit_name2keyev(aTHX_ name)
+static TickitKeyEventType S_tickit_name2keyev(pTHX_ const char *name)
 {
   switch(name[0]) {
     case 'k':
@@ -77,7 +112,8 @@ static TickitKeyEventType tickit_name2keyev(const char *name)
   return -1;
 }
 
-static SV *tickit_mouseevtype2sv(int type)
+#define tickit_mouseevtype2sv(type)  S_tickit_mouseevtype2sv(aTHX_ type)
+static SV *S_tickit_mouseevtype2sv(pTHX_ int type)
 {
   const char *name = NULL;
   switch(type) {
@@ -94,7 +130,8 @@ static SV *tickit_mouseevtype2sv(int type)
   return newSVivpv(type, name);
 }
 
-static TickitMouseEventType tickit_name2mouseev(const char *name)
+#define tickit_name2mouseev(name)  S_tickit_name2mouseev(aTHX_ name)
+static TickitMouseEventType S_tickit_name2mouseev(pTHX_ const char *name)
 {
   switch(name[0]) {
     case 'd':
@@ -117,7 +154,8 @@ static TickitMouseEventType tickit_name2mouseev(const char *name)
   return -1;
 }
 
-static SV *tickit_mouseevbutton2sv(int type, int button)
+#define tickit_mouseevbutton2sv(type, button)  S_tickit_mouseevbutton2sv(aTHX_ type, button)
+static SV *S_tickit_mouseevbutton2sv(pTHX_ int type, int button)
 {
   const char *name = NULL;
   if(type == TICKIT_MOUSEEV_WHEEL)
@@ -128,7 +166,8 @@ static SV *tickit_mouseevbutton2sv(int type, int button)
   return newSVivpv(button, name);
 }
 
-static int tickit_name2mousewheel(const char *name)
+#define tickit_name2mousewheel(name)  S_tickit_name2mousewheel(aTHX_ name)
+static int S_tickit_name2mousewheel(pTHX_ const char *name)
 {
   switch(name[0]) {
     case 'd':
@@ -143,11 +182,29 @@ static int tickit_name2mousewheel(const char *name)
 
 struct GenericEventData
 {
+#ifdef tTHX
+  tTHX myperl;
+#endif
   int ev;
   SV *self;  // only for window bindings; unused for term
   CV *code;
   SV *data;
 };
+
+#define new_eventdata(ev, data, code)       S_new_eventdata(aTHX_ ev, data, code)
+#define new_eventdata_codeonly(code)        S_new_eventdata(aTHX_ 0,  NULL, code)
+static struct GenericEventData *S_new_eventdata(pTHX_ int ev, SV *data, CV *code)
+{
+  struct GenericEventData *ret;
+  Newx(ret, 1, struct GenericEventData);
+#ifdef tTHX
+  ret->myperl = aTHX;
+#endif
+  ret->ev   = ev;
+  ret->data = data;
+  ret->code = code ? (CV *)SvREFCNT_inc(code) : NULL;
+  return ret;
+}
 
 typedef TickitKeyEventInfo   *Tickit__Event__Key;
 typedef TickitMouseEventInfo *Tickit__Event__Mouse;
@@ -158,7 +215,8 @@ typedef TickitMouseEventInfo *Tickit__Event__Mouse;
 
 typedef TickitPen *Tickit__Pen;
 
-static SV *newSVpen_noinc(TickitPen *pen, char *package)
+#define newSVpen_noinc(pen, package)  S_newSVpen_noinc(aTHX_ pen, package)
+static SV *S_newSVpen_noinc(pTHX_ TickitPen *pen, char *package)
 {
   SV *sv = newSV(0);
   sv_setref_pv(sv, package ? package : "Tickit::Pen::Immutable", pen);
@@ -166,10 +224,7 @@ static SV *newSVpen_noinc(TickitPen *pen, char *package)
   return sv;
 }
 
-static SV *newSVpen(TickitPen *pen, char *package)
-{
-  return newSVpen_noinc(tickit_pen_ref(pen), package);
-}
+#define newSVpen(pen, package)  S_newSVpen_noinc(aTHX_ tickit_pen_ref(pen), package)
 
 enum {
   TICKIT_PEN_FG_RGB8 = 0x100 | TICKIT_PEN_FG,
@@ -198,7 +253,8 @@ static int pen_parse_attrname(const char *name)
   }
 }
 
-static SV *pen_get_attr(TickitPen *pen, int attr)
+#define pen_get_attr(pen, attr)  S_pen_get_attr(aTHX_ pen, attr)
+static SV *S_pen_get_attr(pTHX_ TickitPen *pen, int attr)
 {
   switch(attr) {
     case TICKIT_PEN_FG_RGB8:
@@ -222,7 +278,8 @@ static SV *pen_get_attr(TickitPen *pen, int attr)
   croak("Unreachable: unknown pen type");
 }
 
-static void pen_set_attr(TickitPen *pen, int attr, SV *val)
+#define pen_set_attr(pen, attr, val)  S_pen_set_attr(aTHX_ pen, attr, val)
+static void S_pen_set_attr(pTHX_ TickitPen *pen, int attr, SV *val)
 {
   switch(attr) {
     case TICKIT_PEN_FG_RGB8:
@@ -254,7 +311,8 @@ static void pen_set_attr(TickitPen *pen, int attr, SV *val)
   }
 }
 
-static TickitPen *pen_from_args(SV **args, int argcount)
+#define pen_from_args(args, argcount)  S_pen_from_args(aTHX_ args, argcount)
+static TickitPen *S_pen_from_args(pTHX_ SV **args, int argcount)
 {
   int i;
   TickitPen *pen = tickit_pen_new();
@@ -271,7 +329,8 @@ static TickitPen *pen_from_args(SV **args, int argcount)
   return pen;
 }
 
-static void pen_set_attrs(TickitPen *pen, HV *attrs)
+#define pen_set_attrs(pen, attrs)  S_pen_set_attrs(aTHX_ pen, attrs)
+static void S_pen_set_attrs(pTHX_ TickitPen *pen, HV *attrs)
 {
   TickitPenAttr a;
   SV *val;
@@ -311,7 +370,8 @@ static void pen_set_attrs(TickitPen *pen, HV *attrs)
 typedef TickitRect *Tickit__Rect, *Tickit__Rect_MAYBE;
 
 /* Really cheating and treading on Perl's namespace but hopefully it will be OK */
-static SV *newSVrect(TickitRect *rect)
+#define newSVrect(rect)  S_newSVrect(aTHX_ rect)
+static SV *S_newSVrect(pTHX_ TickitRect *rect)
 {
   TickitRect *self;
   Newx(self, 1, TickitRect);
@@ -332,7 +392,8 @@ typedef TickitRectSet *Tickit__RectSet;
 
 typedef TickitRenderBuffer *Tickit__RenderBuffer;
 
-static SV *newSVrb_noinc(TickitRenderBuffer *rb)
+#define newSVrb_noinc(rb)  S_newSVrb_noinc(aTHX_ rb)
+static SV *S_newSVrb_noinc(pTHX_ TickitRenderBuffer *rb)
 {
   SV *sv = newSV(0);
   sv_setref_pv(sv, "Tickit::RenderBuffer", rb);
@@ -340,10 +401,7 @@ static SV *newSVrb_noinc(TickitRenderBuffer *rb)
   return sv;
 }
 
-static SV *newSVrb(TickitRenderBuffer *rb)
-{
-  return newSVrb_noinc(tickit_renderbuffer_ref(rb));
-}
+#define newSVrb(rb)  S_newSVrb_noinc(aTHX_ tickit_renderbuffer_ref(rb))
 
 /****************
  * Tickit::Term *
@@ -351,7 +409,8 @@ static SV *newSVrb(TickitRenderBuffer *rb)
 
 typedef TickitTerm *Tickit__Term, *Tickit__Term_MAYBE;
 
-static SV *newSVterm_noinc(TickitTerm *tt, char *package)
+#define newSVterm_noinc(tt, package)  S_newSVterm_noinc(aTHX_ tt, package)
+static SV *S_newSVterm_noinc(pTHX_ TickitTerm *tt, char *package)
 {
   SV *sv = newSV(0);
   sv_setref_pv(sv, package, tt);
@@ -359,14 +418,14 @@ static SV *newSVterm_noinc(TickitTerm *tt, char *package)
   return sv;
 }
 
-static SV *newSVterm(TickitTerm *tt, char *package)
-{
-  return newSVterm_noinc(tickit_term_ref(tt), package);
-}
+#define newSVterm(tt, package)  S_newSVterm_noinc(aTHX_ tickit_term_ref(tt), package)
 
 static int term_userevent_fn(TickitTerm *tt, TickitEventFlags flags, void *_info, void *user)
 {
   struct GenericEventData *data = user;
+  dTHXa(data->myperl);
+
+  SET_PL_curcop;
 
   int ret = 0;
 
@@ -425,6 +484,7 @@ static int term_userevent_fn(TickitTerm *tt, TickitEventFlags flags, void *_info
 
     call_sv((SV*)(data->code), G_SCALAR);
 
+    CopLINE_set(PL_curcop, __LINE__);
     SPAGAIN;
 
     ret = POPi;
@@ -447,10 +507,12 @@ static int term_userevent_fn(TickitTerm *tt, TickitEventFlags flags, void *_info
 
 static void term_outputwriter_fn(TickitTerm *tt, const char *bytes, size_t len, void *user)
 {
-  SV *writer = user;
+  struct GenericEventData *data = user;
+  dTHXa(data->myperl);
 
   if(!len) {
-    SvREFCNT_dec(writer);
+    SvREFCNT_dec(data->data);
+    Safefree(data);
     return;
   }
 
@@ -460,7 +522,7 @@ static void term_outputwriter_fn(TickitTerm *tt, const char *bytes, size_t len, 
 
   PUSHMARK(SP);
   EXTEND(SP, 2);
-  PUSHs(writer);
+  PUSHs(data->data);
   mPUSHp(bytes, len);
   PUTBACK;
 
@@ -476,7 +538,8 @@ static void term_outputwriter_fn(TickitTerm *tt, const char *bytes, size_t len, 
 
 typedef TickitStringPos *Tickit__StringPos;
 
-static Tickit__StringPos new_stringpos(SV **svp)
+#define new_stringpos(svp)  S_new_stringpos(aTHX_ svp)
+static Tickit__StringPos S_new_stringpos(pTHX_ SV **svp)
 {
   TickitStringPos *pos;
 
@@ -506,14 +569,20 @@ static HV *sv_for_window;
 
 static int window_destroyed(TickitWindow *win, TickitEventFlags flags, void *info, void *user)
 {
+  struct GenericEventData *data = user;
+  dTHXa(data->myperl);
+
   SV *key = newSViv(PTR2UV(win));
   hv_delete_ent(sv_for_window, key, G_DISCARD, 0);
   SvREFCNT_dec(key);
 
+  Safefree(data);
+
   return 0;
 }
 
-static SV *newSVwin_noinc(TickitWindow *win)
+#define newSVwin_noinc(win)  S_newSVwin_noinc(aTHX_ win)
+static SV *S_newSVwin_noinc(pTHX_ TickitWindow *win)
 {
   if(!sv_for_window)
     sv_for_window = newHV();
@@ -532,7 +601,7 @@ static SV *newSVwin_noinc(TickitWindow *win)
   self->win = win;
   self->tickit = NULL;
 
-  tickit_window_bind_event(win, TICKIT_WINDOW_ON_DESTROY, 0, &window_destroyed, NULL);
+  tickit_window_bind_event(win, TICKIT_WINDOW_ON_DESTROY, 0, &window_destroyed, new_eventdata(0, NULL, NULL));
 
   SV *ret = newSVsv(HeVAL(he));
   sv_rvweaken(HeVAL(he));
@@ -540,14 +609,14 @@ static SV *newSVwin_noinc(TickitWindow *win)
   return ret;
 }
 
-static SV *newSVwin(TickitWindow *win)
-{
-  return newSVwin_noinc(tickit_window_ref(win));
-}
+#define newSVwin(win)  S_newSVwin_noinc(aTHX_ tickit_window_ref(win))
 
 static int window_userevent_fn(TickitWindow *win, TickitEventFlags flags, void *_info, void *user)
 {
   struct GenericEventData *data = user;
+  dTHXa(data->myperl);
+
+  SET_PL_curcop;
 
   int ret = 0;
 
@@ -624,6 +693,7 @@ static int window_userevent_fn(TickitWindow *win, TickitEventFlags flags, void *
 
     call_sv((SV*)(data->code), G_SCALAR);
 
+    CopLINE_set(PL_curcop, __LINE__);
     SPAGAIN;
 
     SV *retsv = POPs;
@@ -664,8 +734,12 @@ typedef struct {
   CV *cb_cancel_io;
   CV *cb_timer;
   CV *cb_cancel_timer;
-  CV *cb_idle;
-  CV *cb_cancel_idle;
+  CV *cb_later;
+  CV *cb_cancel_later;
+  CV *cb_signal;
+  CV *cb_cancel_signal;
+  CV *cb_process;
+  CV *cb_cancel_process;
 } EventLoopData;
 
 #define newSVio_rdonly(fd)  S_newSVio_rdonly(aTHX_ fd)
@@ -724,6 +798,27 @@ static SV *S_newSVcallback_tickit_invokeio(pTHX_ TickitWatch *watch)
   return newRV_noinc((SV *)cv);
 }
 
+static XS(invoke_processwatch);
+static XS(invoke_processwatch)
+{
+  dXSARGS;
+  TickitWatch *watch = XSANY.any_ptr;
+
+  int wstatus = POPi;
+
+  tickit_evloop_invoke_processwatch(watch, TICKIT_EV_FIRE, wstatus);
+
+  XSRETURN(0);
+}
+
+#define newSVcallback_tickit_invokeprocess(watch)  S_newSVcallback_tickit_invokeprocess(aTHX_ watch)
+static SV *S_newSVcallback_tickit_invokeprocess(pTHX_ TickitWatch *watch)
+{
+  CV *cv = newXS(NULL, invoke_processwatch, __FILE__);
+  CvXSUBANY(cv).any_ptr = watch;
+  return newRV_noinc((SV *)cv);
+}
+
 static XS(invoke_sigwinch);
 static XS(invoke_sigwinch)
 {
@@ -735,6 +830,7 @@ static void *evloop_init(Tickit *t, void *initdata)
 {
   EventLoopData *evdata = initdata;
   dTHXa(evdata->myperl);
+  SET_PL_curcop;
 
   CV *invoke_sigwinch_cv = newXS(NULL, invoke_sigwinch, __FILE__);
   CvXSUBANY(invoke_sigwinch_cv).any_ptr = t;
@@ -768,14 +864,19 @@ static void evloop_destroy(void *data)
   SvREFCNT_dec(evdata->cb_cancel_io);
   SvREFCNT_dec(evdata->cb_timer);
   SvREFCNT_dec(evdata->cb_cancel_timer);
-  SvREFCNT_dec(evdata->cb_idle);
-  SvREFCNT_dec(evdata->cb_cancel_idle);
+  SvREFCNT_dec(evdata->cb_later);
+  SvREFCNT_dec(evdata->cb_cancel_later);
+  SvREFCNT_dec(evdata->cb_signal);
+  SvREFCNT_dec(evdata->cb_cancel_signal);
+  SvREFCNT_dec(evdata->cb_process);
+  SvREFCNT_dec(evdata->cb_cancel_process);
 }
 
 static void evloop_run(void *data, TickitRunFlags flags)
 {
   EventLoopData *evdata = data;
   dTHXa(evdata->myperl);
+  SET_PL_curcop;
 
   dSP;
   SAVETMPS;
@@ -792,6 +893,7 @@ static void evloop_stop(void *data)
 {
   EventLoopData *evdata = data;
   dTHXa(evdata->myperl);
+  SET_PL_curcop;
 
   dSP;
   SAVETMPS;
@@ -808,6 +910,7 @@ static bool evloop_io(void *data, int fd, TickitIOCondition cond, TickitBindFlag
 {
   EventLoopData *evdata = data;
   dTHXa(evdata->myperl);
+  SET_PL_curcop;
 
   SV *fh = newSVio_rdonly(fd);
 
@@ -835,6 +938,7 @@ static void evloop_cancel_io(void *data, TickitWatch *watch)
 {
   EventLoopData *evdata = data;
   dTHXa(evdata->myperl);
+  SET_PL_curcop;
 
   SV *fh = tickit_evloop_get_watch_data(watch);
 
@@ -865,6 +969,7 @@ static bool evloop_timer(void *data, const struct timeval *at, TickitBindFlags f
 {
   EventLoopData *evdata = data;
   dTHXa(evdata->myperl);
+  SET_PL_curcop;
 
   NV at_time = at->tv_sec + ((NV)at->tv_usec / 1E6);
 
@@ -882,11 +987,11 @@ static bool evloop_timer(void *data, const struct timeval *at, TickitBindFlags f
 
   SPAGAIN;
 
-  SV *timerid = SvREFCNT_inc(POPs);
+  SV *id = SvREFCNT_inc(POPs);
 
   FREETMPS;
 
-  tickit_evloop_set_watch_data(watch, timerid);
+  tickit_evloop_set_watch_data(watch, id);
 
   return true;
 }
@@ -895,8 +1000,9 @@ static void evloop_cancel_timer(void *data, TickitWatch *watch)
 {
   EventLoopData *evdata = data;
   dTHXa(evdata->myperl);
+  SET_PL_curcop;
 
-  SV *timerid = tickit_evloop_get_watch_data(watch);
+  SV *id = tickit_evloop_get_watch_data(watch);
 
   /* Don't bother during global destruction, as the perl object we're about to
    * call methods on might not be in a good state any more
@@ -910,14 +1016,14 @@ static void evloop_cancel_timer(void *data, TickitWatch *watch)
   EXTEND(SP, 1);
   PUSHMARK(SP);
 
-  PUSHs(timerid);
+  PUSHs(id);
   PUTBACK;
 
   call_sv((SV *)evdata->cb_cancel_timer, G_VOID);
 
   FREETMPS;
 
-  SvREFCNT_dec(timerid);
+  SvREFCNT_dec(id);
   tickit_evloop_set_watch_data(watch, NULL);
 }
 
@@ -925,6 +1031,7 @@ static bool evloop_later(void *data, TickitBindFlags flags, TickitWatch *watch)
 {
   EventLoopData *evdata = data;
   dTHXa(evdata->myperl);
+  SET_PL_curcop;
 
   dSP;
   SAVETMPS;
@@ -935,7 +1042,7 @@ static bool evloop_later(void *data, TickitBindFlags flags, TickitWatch *watch)
   mPUSHs(newSVcallback_tickit_invoke(watch));
   PUTBACK;
 
-  call_sv((SV *)evdata->cb_idle, G_VOID);
+  call_sv((SV *)evdata->cb_later, G_VOID);
 
   FREETMPS;
 
@@ -944,6 +1051,10 @@ static bool evloop_later(void *data, TickitBindFlags flags, TickitWatch *watch)
 
 static void evloop_cancel_later(void *data, TickitWatch *watch)
 {
+  EventLoopData *evdata = data;
+  dTHXa(evdata->myperl);
+  SET_PL_curcop;
+
   /* Don't bother during global destruction, as the perl object we're about to
    * call methods on might not be in a good state any more
    */
@@ -953,10 +1064,145 @@ static void evloop_cancel_later(void *data, TickitWatch *watch)
   fprintf(stderr, "Should cancel later here\n");
 }
 
+static bool evloop_signal(void *data, int signum, TickitBindFlags flags, TickitWatch *watch)
+{
+  EventLoopData *evdata = data;
+  dTHXa(evdata->myperl);
+  SET_PL_curcop;
+
+  if(!evdata->cb_signal)
+    return false;
+
+  dSP;
+  SAVETMPS;
+
+  EXTEND(SP, 2);
+  PUSHMARK(SP);
+
+  mPUSHi(signum);
+  mPUSHs(newSVcallback_tickit_invoke(watch));
+  PUTBACK;
+
+  call_sv((SV *)evdata->cb_signal, G_SCALAR);
+
+  SPAGAIN;
+
+  SV *id = SvREFCNT_inc(POPs);
+
+  FREETMPS;
+
+  tickit_evloop_set_watch_data(watch, id);
+
+  return true;
+}
+
+static void evloop_cancel_signal(void *data, TickitWatch *watch)
+{
+  EventLoopData *evdata = data;
+  dTHXa(evdata->myperl);
+  SET_PL_curcop;
+
+  if(!evdata->cb_cancel_signal)
+    return;
+
+  SV *id = tickit_evloop_get_watch_data(watch);
+
+  /* Don't bother during global destruction, as the perl object we're about to
+   * call methods on might not be in a good state any more
+   */
+  if(PL_phase == PERL_PHASE_DESTRUCT)
+    return;
+
+  dSP;
+  SAVETMPS;
+
+  EXTEND(SP, 1);
+  PUSHMARK(SP);
+
+  PUSHs(id);
+  PUTBACK;
+
+  call_sv((SV *)evdata->cb_cancel_signal, G_VOID);
+
+  FREETMPS;
+
+  SvREFCNT_dec(id);
+  tickit_evloop_set_watch_data(watch, NULL);
+}
+
+static bool evloop_process(void *data, pid_t pid, TickitBindFlags flags, TickitWatch *watch)
+{
+  EventLoopData *evdata = data;
+  dTHXa(evdata->myperl);
+  SET_PL_curcop;
+
+  if(!evdata->cb_process)
+    return false;
+
+  dSP;
+  SAVETMPS;
+
+  EXTEND(SP, 2);
+  PUSHMARK(SP);
+
+  mPUSHi(pid);
+  mPUSHs(newSVcallback_tickit_invokeprocess(watch));
+  PUTBACK;
+
+  call_sv((SV *)evdata->cb_process, G_SCALAR);
+
+  SPAGAIN;
+
+  SV *processid = SvREFCNT_inc(POPs);
+
+  FREETMPS;
+
+  tickit_evloop_set_watch_data(watch, processid);
+
+  return true;
+}
+
+static void evloop_cancel_process(void *data, TickitWatch *watch)
+{
+  EventLoopData *evdata = data;
+  dTHXa(evdata->myperl);
+  SET_PL_curcop;
+
+  if(!evdata->cb_cancel_process)
+    return;
+
+  SV *id = tickit_evloop_get_watch_data(watch);
+
+  /* Don't bother during global destruction, as the perl object we're about to
+   * call methods on might not be in a good state any more
+   */
+  if(PL_phase == PERL_PHASE_DESTRUCT)
+    return;
+
+  dSP;
+  SAVETMPS;
+
+  EXTEND(SP, 1);
+  PUSHMARK(SP);
+
+  PUSHs(id);
+  PUTBACK;
+
+  call_sv((SV *)evdata->cb_cancel_process, G_VOID);
+
+  FREETMPS;
+
+  SvREFCNT_dec(id);
+  tickit_evloop_set_watch_data(watch, NULL);
+}
+
 static int invoke_callback(Tickit *t, TickitEventFlags flags, void *info, void *user)
 {
+  struct GenericEventData *data = user;
+  dTHXa(data->myperl);
   dSP;
-  CV *code = user;
+
+  SET_PL_curcop;
 
   if(flags & TICKIT_EV_FIRE) {
     ENTER;
@@ -966,20 +1212,25 @@ static int invoke_callback(Tickit *t, TickitEventFlags flags, void *info, void *
     PUSHMARK(SP);
     PUTBACK;
 
-    call_sv((SV*)code, G_VOID);
+    call_sv((SV*)data->code, G_VOID);
 
     FREETMPS;
     LEAVE;
   }
 
-  if(flags & TICKIT_EV_UNBIND)
-    SvREFCNT_dec((SV*)code);
+  if(flags & TICKIT_EV_UNBIND) {
+    SvREFCNT_dec((SV*)data->code);
+    Safefree(data);
+  }
 }
 
 static int invoke_iocallback(Tickit *t, TickitEventFlags flags, void *_info, void *user)
 {
+  struct GenericEventData *data = user;
+  dTHXa(data->myperl);
   dSP;
-  CV *code = user;
+
+  SET_PL_curcop;
 
   if(flags & TICKIT_EV_FIRE) {
     SV *info_sv = newSV(0);
@@ -996,31 +1247,73 @@ static int invoke_iocallback(Tickit *t, TickitEventFlags flags, void *_info, voi
     mPUSHs(info_sv);
     PUTBACK;
 
-    call_sv((SV*)code, G_VOID);
+    call_sv((SV*)data->code, G_VOID);
 
     FREETMPS;
     LEAVE;
   }
 
-  if(flags & TICKIT_EV_UNBIND)
-    SvREFCNT_dec((SV*)code);
+  if(flags & TICKIT_EV_UNBIND) {
+    SvREFCNT_dec((SV*)data->code);
+    Safefree(data);
+  }
+}
+
+static int invoke_processcallback(Tickit *t, TickitEventFlags flags, void *_info, void *user)
+{
+  struct GenericEventData *data = user;
+  dTHXa(data->myperl);
+  dSP;
+
+  SET_PL_curcop;
+
+  if(flags & TICKIT_EV_FIRE) {
+    SV *info_sv = newSV(0);
+    TickitProcessWatchInfo *info;
+    Newx(info, 1, TickitProcessWatchInfo);
+    *info = *(TickitProcessWatchInfo *)(_info);
+    sv_setref_pv(info_sv, "Tickit::Event::ProcessWatch", info);
+
+    ENTER;
+    SAVETMPS;
+
+    EXTEND(SP, 1);
+    PUSHMARK(SP);
+    mPUSHs(info_sv);
+    PUTBACK;
+
+    call_sv((SV *)data->code, G_VOID);
+
+    FREETMPS;
+    LEAVE;
+  }
+
+  if(flags & TICKIT_EV_UNBIND) {
+    SvREFCNT_dec((SV *)data->code);
+    Safefree(data);
+  }
+
+  return 0;
 }
 
 static TickitEventHooks evhooks = {
-  .init         = evloop_init,
-  .destroy      = evloop_destroy,
-  .run          = evloop_run,
-  .stop         = evloop_stop,
-  .io           = evloop_io,
-  .cancel_io    = evloop_cancel_io,
-  .timer        = evloop_timer,
-  .cancel_timer = evloop_cancel_timer,
-  .later        = evloop_later,
-  .cancel_later = evloop_cancel_later,
-
+  .init           = evloop_init,
+  .destroy        = evloop_destroy,
+  .run            = evloop_run,
+  .stop           = evloop_stop,
+  .io             = evloop_io,
+  .cancel_io      = evloop_cancel_io,
+  .timer          = evloop_timer,
+  .cancel_timer   = evloop_cancel_timer,
+  .later          = evloop_later,
+  .cancel_later   = evloop_cancel_later,
+  .signal         = evloop_signal,
+  .cancel_signal  = evloop_cancel_signal,
+  .process        = evloop_process,
+  .cancel_process = evloop_cancel_process,
 };
 
-static void setup_constants(void)
+static void S_setup_constants(pTHX)
 {
   HV *stash;
   AV *export;
@@ -1047,6 +1340,24 @@ static void setup_constants(void)
   DO_CONSTANT(TICKIT_IO_HUP)
   DO_CONSTANT(TICKIT_IO_ERR)
   DO_CONSTANT(TICKIT_IO_INVAL)
+
+  DO_CONSTANT(TICKIT_FOCUSEV_IN);
+  DO_CONSTANT(TICKIT_FOCUSEV_OUT);
+
+  DO_CONSTANT(TICKIT_KEYEV_KEY);
+  DO_CONSTANT(TICKIT_KEYEV_TEXT);
+
+  DO_CONSTANT(TICKIT_MOUSEEV_PRESS);
+  DO_CONSTANT(TICKIT_MOUSEEV_DRAG);
+  DO_CONSTANT(TICKIT_MOUSEEV_RELEASE);
+  DO_CONSTANT(TICKIT_MOUSEEV_WHEEL);
+  DO_CONSTANT(TICKIT_MOUSEEV_DRAG_START);
+  DO_CONSTANT(TICKIT_MOUSEEV_DRAG_DROP);
+  DO_CONSTANT(TICKIT_MOUSEEV_DRAG_STOP);
+  DO_CONSTANT(TICKIT_MOUSEEV_DRAG_OUTSIDE);
+
+  DO_CONSTANT(TICKIT_MOUSEWHEEL_UP);
+  DO_CONSTANT(TICKIT_MOUSEWHEEL_DOWN);
 
   stash = gv_stashpvn("Tickit::Term", 12, TRUE);
   export = get_av("Tickit::Term::EXPORT_OK", TRUE);
@@ -1229,6 +1540,33 @@ fd(self)
     switch(ix) {
       case 0: RETVAL = newSVuv(info->fd); break;
       case 1: RETVAL = newSVuv(info->cond); break;
+      default: croak("Unreachable");
+    }
+  OUTPUT:
+    RETVAL
+
+MODULE = Tickit             PACKAGE = Tickit::Event::ProcessWatch
+
+void
+DESTROY(self)
+  SV *self
+  INIT:
+    TickitProcessWatchInfo *info = INT2PTR(TickitProcessWatchInfo *, SvIV((SV*)SvRV(self)));
+  CODE:
+    Safefree(info);
+
+SV *
+pid(self)
+  SV *self
+  ALIAS:
+    pid     = 0
+    wstatus = 1
+  INIT:
+    TickitProcessWatchInfo *info = INT2PTR(TickitProcessWatchInfo *, SvIV((SV*)SvRV(self)));
+  CODE:
+    switch(ix) {
+      case 0: RETVAL = newSVuv(info->pid); break;
+      case 1: RETVAL = newSVuv(info->wstatus); break;
       default: croak("Unreachable");
     }
   OUTPUT:
@@ -2322,7 +2660,7 @@ _new(package,termtype,input_handle,output_handle,writer,utf8)
       builder.output_fd = PerlIO_fileno(IoOFP(sv_2io(output_handle)));
     if(SvOK(writer)) {
       builder.output_func      = term_outputwriter_fn;
-      builder.output_func_user = SvREFCNT_inc(writer);
+      builder.output_func_user = new_eventdata(0, SvREFCNT_inc(writer), NULL);
     }
 
     tt = tickit_term_build(&builder);
@@ -2403,6 +2741,12 @@ resume(self)
     tickit_term_resume(self);
 
 void
+teardown(self)
+  Tickit::Term  self
+  CODE:
+    tickit_term_teardown(self);
+
+void
 flush(self)
   Tickit::Term  self
   CODE:
@@ -2469,10 +2813,7 @@ _bind_event(self,ev,flags,code,data = &PL_sv_undef)
     if(_ev == -1)
       croak("Unrecognised event name '%s'", ev);
 
-    Newx(user, 1, struct GenericEventData);
-    user->ev = _ev;
-    user->code = (CV*)SvREFCNT_inc(code);
-    user->data = newSVsv(data);
+    user = new_eventdata(_ev, newSVsv(data), code);
 
     RETVAL = tickit_term_bind_event(self, _ev, flags|TICKIT_EV_UNBIND, term_userevent_fn, user);
   OUTPUT:
@@ -3310,11 +3651,8 @@ _bind_event(self,ev,flags,code,data = &PL_sv_undef)
     if(_ev == -1)
       croak("Unrecognised event name '%s'", ev);
 
-    Newx(user, 1, struct GenericEventData);
-    user->ev = _ev;
+    user = new_eventdata(_ev, newSVsv(data), code);
     user->self = newSVsv(ST(0));
-    user->code = (CV*)SvREFCNT_inc(code);
-    user->data = newSVsv(data);
 
     sv_rvweaken(user->self);
 
@@ -3568,19 +3906,9 @@ new(package,term)
     RETVAL
 
 SV *
-_new_with_evloop(package, term, init, destroy, run, stop, io, cancel_io, timer, cancel_timer, idle, cancel_idle)
+_new_with_evloop(package, term, ...)
   char *package
   SV   *term
-  CV   *init
-  CV   *destroy
-  CV   *run
-  CV   *stop
-  CV   *io
-  CV   *cancel_io
-  CV   *timer
-  CV   *cancel_timer
-  CV   *idle
-  CV   *cancel_idle
   INIT:
     TickitTerm *tt = NULL;
     struct TickitBuilder builder = { 0 };
@@ -3604,19 +3932,79 @@ _new_with_evloop(package, term, init, destroy, run, stop, io, cancel_io, timer, 
       builder.term_builder.open = TICKIT_OPEN_STDIO;
 
     Newx(evdata, 1, EventLoopData);
+    Zero(evdata, 1, EventLoopData);
 #ifdef tTHX
     evdata->myperl = aTHX;
 #endif
-    evdata->cb_init         = (CV *)SvREFCNT_inc((SV *)init);
-    evdata->cb_destroy      = (CV *)SvREFCNT_inc((SV *)destroy);
-    evdata->cb_run          = (CV *)SvREFCNT_inc((SV *)run);
-    evdata->cb_stop         = (CV *)SvREFCNT_inc((SV *)stop);
-    evdata->cb_io           = (CV *)SvREFCNT_inc((SV *)io);
-    evdata->cb_cancel_io    = (CV *)SvREFCNT_inc((SV *)cancel_io);
-    evdata->cb_timer        = (CV *)SvREFCNT_inc((SV *)timer);
-    evdata->cb_cancel_timer = (CV *)SvREFCNT_inc((SV *)cancel_timer);
-    evdata->cb_idle         = (CV *)SvREFCNT_inc((SV *)idle);
-    evdata->cb_cancel_idle  = (CV *)SvREFCNT_inc((SV *)cancel_idle);
+    if(!SvROK(ST(2))) {
+      U32 idx = 2;
+      while(idx < items) {
+        SV *namesv = ST(idx++);
+        const char *name = SvPVbyte_nolen(namesv);
+        CV *code = (CV *)SvREFCNT_inc((SV *)cv_from_sv(ST(idx++), name));
+
+        if(strEQ(name, "init"))
+          evdata->cb_init = code;
+        else if(strEQ(name, "destroy"))
+          evdata->cb_destroy = code;
+        else if(strEQ(name, "run"))
+          evdata->cb_run = code;
+        else if(strEQ(name, "stop"))
+          evdata->cb_stop = code;
+        else if(strEQ(name, "io"))
+          evdata->cb_io = code;
+        else if(strEQ(name, "cancel_io"))
+          evdata->cb_cancel_io = code;
+        else if(strEQ(name, "timer"))
+          evdata->cb_timer = code;
+        else if(strEQ(name, "cancel_timer"))
+          evdata->cb_cancel_timer = code;
+        else if(strEQ(name, "later"))
+          evdata->cb_later = code;
+        else if(strEQ(name, "cancel_later"))
+          evdata->cb_cancel_later = code;
+        else if(strEQ(name, "signal"))
+          evdata->cb_signal = code;
+        else if(strEQ(name, "cancel_signal"))
+          evdata->cb_cancel_signal = code;
+        else if(strEQ(name, "process"))
+          evdata->cb_process = code;
+        else if(strEQ(name, "cancel_process"))
+          evdata->cb_cancel_process = code;
+        else
+          croak("Unrecognised evloop callback name %s", name);
+      }
+
+      /* The first 6 are required */
+      if(!evdata->cb_init)
+        croak("Required evloop callback 'init' is missing");
+      if(!evdata->cb_destroy)
+        croak("Required evloop callback 'destroy' is missing");
+      if(!evdata->cb_run)
+        croak("Required evloop callback 'run' is missing");
+      if(!evdata->cb_stop)
+        croak("Required evloop callback 'stop' is missing");
+      if(!evdata->cb_io)
+        croak("Required evloop callback 'io' is missing");
+      if(!evdata->cb_cancel_io)
+        croak("Required evloop callback 'cancel_io' is missing");
+      /* The rest are optional */
+    }
+    else {
+      U32 idx = 2;
+
+      /* likely a CODE ref; we'll do this old-style positional */
+      evdata->cb_init         = (CV *)SvREFCNT_inc((SV *)cv_from_sv(ST(idx++), "init"));
+      evdata->cb_destroy      = (CV *)SvREFCNT_inc((SV *)cv_from_sv(ST(idx++), "destroy"));
+      evdata->cb_run          = (CV *)SvREFCNT_inc((SV *)cv_from_sv(ST(idx++), "run"));
+      evdata->cb_stop         = (CV *)SvREFCNT_inc((SV *)cv_from_sv(ST(idx++), "stop"));
+      evdata->cb_io           = (CV *)SvREFCNT_inc((SV *)cv_from_sv(ST(idx++), "io"));
+      evdata->cb_cancel_io    = (CV *)SvREFCNT_inc((SV *)cv_from_sv(ST(idx++), "cancel_io"));
+      evdata->cb_timer        = (CV *)SvREFCNT_inc((SV *)cv_from_sv(ST(idx++), "timer"));
+      evdata->cb_cancel_timer = (CV *)SvREFCNT_inc((SV *)cv_from_sv(ST(idx++), "cancel_timer"));
+      evdata->cb_later        = (CV *)SvREFCNT_inc((SV *)cv_from_sv(ST(idx++), "later"));
+      evdata->cb_cancel_later = (CV *)SvREFCNT_inc((SV *)cv_from_sv(ST(idx++), "cancel_later"));
+    }
 
     /* Uses the not-technically-documented evhooks / evinitdata TickitBuilder fields */
     builder.evhooks = &evhooks;
@@ -3699,7 +4087,8 @@ watch_io(self, fd, cond, code)
   UV               cond
   CV              *code
   CODE:
-    RETVAL = PTR2UV(tickit_watch_io(self, fd, cond, TICKIT_BIND_UNBIND, invoke_iocallback, SvREFCNT_inc(code)));
+    RETVAL = PTR2UV(tickit_watch_io(self, fd, cond, TICKIT_BIND_UNBIND, invoke_iocallback,
+      new_eventdata_codeonly(code)));
   OUTPUT:
     RETVAL
 
@@ -3717,7 +4106,8 @@ watch_timer_after(self, delay, code)
     after.tv_sec = (long)delay;
     after.tv_usec = (delay - after.tv_sec) * 1000000;
 
-    RETVAL = PTR2UV(tickit_watch_timer_after_tv(self, &after, TICKIT_BIND_UNBIND, invoke_callback, SvREFCNT_inc(code)));
+    RETVAL = PTR2UV(tickit_watch_timer_after_tv(self, &after, TICKIT_BIND_UNBIND, invoke_callback,
+      new_eventdata_codeonly(code)));
   OUTPUT:
     RETVAL
 
@@ -3735,7 +4125,30 @@ watch_timer_at(self, epoch, code)
     at.tv_sec = (long)epoch;
     at.tv_usec = (epoch - at.tv_sec) * 1000000;
 
-    RETVAL = PTR2UV(tickit_watch_timer_at_tv(self, &at, TICKIT_BIND_UNBIND, invoke_callback, SvREFCNT_inc(code)));
+    RETVAL = PTR2UV(tickit_watch_timer_at_tv(self, &at, TICKIT_BIND_UNBIND, invoke_callback,
+      new_eventdata_codeonly(code)));
+  OUTPUT:
+    RETVAL
+
+UV
+watch_signal(self, signum, code)
+  Tickit::_Tickit  self
+  int              signum
+  CV              *code
+  CODE:
+    RETVAL = PTR2UV(tickit_watch_signal(self, signum, TICKIT_BIND_UNBIND, invoke_callback,
+      new_eventdata_codeonly(code)));
+  OUTPUT:
+    RETVAL
+
+UV
+watch_process(self, pid, code)
+  Tickit::_Tickit  self
+  IV               pid
+  CV              *code
+  CODE:
+    RETVAL = PTR2UV(tickit_watch_process(self, pid, TICKIT_BIND_UNBIND, invoke_processcallback,
+      new_eventdata_codeonly(code)));
   OUTPUT:
     RETVAL
 
@@ -3751,7 +4164,8 @@ watch_later(self, code)
   Tickit::_Tickit  self
   CV              *code
   CODE:
-    RETVAL = PTR2UV(tickit_watch_later(self, TICKIT_BIND_UNBIND, invoke_callback, SvREFCNT_inc(code)));
+    RETVAL = PTR2UV(tickit_watch_later(self, TICKIT_BIND_UNBIND, invoke_callback,
+      new_eventdata_codeonly(code)));
   OUTPUT:
     RETVAL
 
@@ -3801,4 +4215,4 @@ BOOT:
       tickit_version_major(), tickit_version_minor(), tickit_version_patch());
   }
 
-  setup_constants();
+  S_setup_constants(aTHX);

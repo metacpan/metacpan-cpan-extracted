@@ -207,7 +207,7 @@ Replaces values with deviations from the mean. Can be done inplace.
 =for bad
 
 dev_m processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -240,7 +240,7 @@ Standardize ie replace values with z_scores based on sample standard deviation f
 =for bad
 
 stddz processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -274,7 +274,7 @@ Sum of squared errors between actual and predicted values.
 =for bad
 
 sse processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -308,7 +308,7 @@ Mean of squared errors between actual and predicted values, ie variance around p
 =for bad
 
 mse processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -342,7 +342,7 @@ Root mean squared error, ie stdv around predicted value.
 =for bad
 
 rmse processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -382,7 +382,7 @@ Calculates predicted prob value for logistic regression.
 =for bad
 
 pred_logistic processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -419,7 +419,7 @@ Null deviance for logistic regression.
 =for bad
 
 d0 processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -459,7 +459,7 @@ Model deviance for logistic regression.
 =for bad
 
 dm processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -493,7 +493,7 @@ Deviance residual for logistic regression.
 =for bad
 
 dvrs processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut

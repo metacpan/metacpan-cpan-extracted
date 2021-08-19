@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes Template::Perlish version 1.54.
+    This document describes Template::Perlish version 1.56.
 
 SYNOPSIS
 
@@ -235,6 +235,11 @@ DESCRIPTION
 
        my $compiled = $tp->compile($template, no_check => 1);
 
+    By default, the stuff is assumed to be utf-8 compliant, which is
+    reflected by option utf8 defaulting to true in "new". This default is
+    inhibited by setting utf8 to a false value, or binmode to any defined
+    value.
+
 INTERFACE
 
  One Shot Templates
@@ -269,6 +274,11 @@ INTERFACE
 
       constructor, does exactly what you think. You can provide any
       parameter, but only the following will make sense:
+
+      binmode
+
+	string to set binmode on the output filehandle. A defined value
+	disables the default to utf8.
 
       method_over_keys
 
@@ -318,6 +328,12 @@ INTERFACE
 	boolean flag used for traversal, see "traverse".
 
 	Defaults to false;
+
+      utf8
+
+	sets the handling to utf8.
+
+	Defaults to true, unless binmode option is set to a defined value.
 
       variables
 

@@ -8,9 +8,12 @@ build_requires:
   Test::Builder::Module: '0'
   Test::More: '0.98'
   Test::Regexp::Pattern: '0.003'
+  Test::Without::Module: '0'
   Try::Tiny: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
+conflicts:
+  App::Licensecheck: '<= v3.2.6'
 dynamic_config: 0
 generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
 keywords:
@@ -32,22 +35,24 @@ optional_features: {}
 provides:
   Regexp::Pattern::License:
     file: lib/Regexp/Pattern/License.pm
-    version: v3.9.1
+    version: v3.9.3
   Regexp::Pattern::License::Parts:
     file: lib/Regexp/Pattern/License/Parts.pm
-    version: v3.9.1
+    version: v3.9.3
+recommends:
+  re::engine::RE2: '0'
 requires:
   perl: '5'
-  re::engine::RE2: '0'
 resources:
   Identifier: http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/project
   bugtracker: https://bugs.debian.org/libregexp-pattern-license-perl
   homepage: https://metacpan.org/pod/Regexp::Pattern::License
   license: http://www.gnu.org/licenses/gpl-3.0.txt
   repository: https://salsa.debian.org/build-common-team/regexp-pattern-license.git
-version: v3.9.1
+version: v3.9.3
+x_breaks:
+  App::Licensecheck: '<= v3.2.6'
 x_help_wanted:
   - tester
   - documenter
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
-x_static_install: 1

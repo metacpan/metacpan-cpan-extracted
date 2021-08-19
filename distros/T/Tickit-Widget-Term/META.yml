@@ -1,40 +1,33 @@
 ---
-abstract: 'terminal emulation for Tickit'
+abstract: 'a widget containing a virtual terminal'
 author:
-  - 'Tom Molesworth <TEAM@cpan.org>'
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
-  File::Spec: '0'
-  IO::Handle: '0'
-  IPC::Open3: '0'
-  Test::CheckDeps: '0.010'
-  Test::Fatal: '0.010'
-  Test::More: '0.98'
-  Test::Refcount: '0.07'
-  perl: '5.014000'
+  Test::More: '0.88'
 configure_requires:
-  ExtUtils::MakeMaker: '6.48'
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Tickit-Widget-Term
+provides:
+  Tickit::Widget::Term:
+    file: lib/Tickit/Widget/Term.pm
+    version: '0.004'
 requires:
-  Future: '0.35'
-  IO::Async: '0.71'
-  IO::Pty: '0'
-  IO::Termios: '0'
-  IO::Tty: '0'
-  List::UtilsBy: '0'
-  Log::Any: '0'
-  Tickit: '0.62'
-  Variable::Disposition: '0.004'
-  curry: '0'
-  parent: '0'
+  Convert::Color::RGB8: '0'
+  Convert::Color::XTerm: '0'
+  List::Util: '0'
+  Object::Pad: '0.51'
+  Syntax::Keyword::Match: '0'
+  Term::VTerm: '0.06'
+  Tickit::Widget: '0.32'
+  perl: '5.026'
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Tickit-Widget-Term
-  homepage: http://search.cpan.org/dist/Tickit-Widget-Term/
-version: '0.003'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+  IRC: irc://irc.freenode.net/#tickit
+  license: http://dev.perl.org/licenses/
+version: '0.004'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

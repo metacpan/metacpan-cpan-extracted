@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Open::This;
 
-our $VERSION = '0.000024';
+our $VERSION = '0.000025';
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(
@@ -12,16 +12,15 @@ our @EXPORT_OK = qw(
     to_editor_args
 );
 
-use Module::Util;
-
 use Module::Runtime qw(
     is_module_name
     module_notional_filename
     require_module
 );
+use Module::Util ();
 use Path::Tiny qw( path );
-use Try::Tiny qw( try );
-use URI qw();
+use Try::Tiny ();
+use URI       ();
 
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
 
@@ -338,7 +337,7 @@ Open::This - Try to Do the Right Thing when opening files
 
 =head1 VERSION
 
-version 0.000024
+version 0.000025
 
 =head1 DESCRIPTION
 

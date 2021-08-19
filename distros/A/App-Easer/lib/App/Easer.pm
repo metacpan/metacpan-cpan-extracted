@@ -3,7 +3,7 @@ use v5.24;
 use warnings;
 use experimental qw< signatures >;
 no warnings qw< experimental::signatures >;
-{ our $VERSION = '0.002' }
+{ our $VERSION = '0.004' }
 
 use Exporter 'import';
 our @EXPORT_OK = qw< d run >;
@@ -184,25 +184,27 @@ sub execute ($self, $args) {
 } ## end sub execute
 
 sub fetch_subcommand ($self, $spec, $args) {
-   my @children = get_children($self, $spec) or return;
-   my ($candidate, $candidate_from_args);
+   return unless has_children($self, $spec);
+   my ($child, $candidate, $candidate_from_args);
    if ($args->@*) {
       $candidate           = $args->[0];
       $candidate_from_args = 1;
    }
    elsif (exists $spec->{'default-child'}) {
-      $candidate = $spec->{'default-child'};
-      return unless defined $candidate && length $candidate;
+      $candidate = $child = $spec->{'default-child'};
+      return unless defined $child && length $child;
    }
    elsif (exists $self->{application}{configuration}{'default-child'}) {
-      $candidate = $self->{application}{configuration}{'default-child'};
+      $candidate = $child
+         = $self->{application}{configuration}{'default-child'};
+      return unless defined $child && length $child;
    }
    else {
       $candidate = 'help';
    }
-   if (my $child = get_child($self, $spec, $candidate)) {
+   if ($child //= get_child($self, $spec, $candidate)) {
       shift $args->@* if $candidate_from_args;
-      return ($child, $candidate);
+      return ($child, $candidate // $child);
    }
    my @names = map { $_->[1] } $self->{trail}->@*;
    shift @names;    # remove first one
@@ -270,6 +272,8 @@ sub get_descendant ($self, $start, $list) {
 
    return $target;
 } ## end sub get_descendant
+
+sub has_children ($self, $spec) { get_children($self, $spec) ? 1 : 0 }
 
 sub hash_merge {
    return {map { $_->%* } reverse @_};

@@ -1,23 +1,24 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-# Database Object Interface - ~/lib/DB/Object/SQLite/Query.pm
-# Version 0.3.7
-# Copyright(c) 2019- DEGUEST Pte. Ltd.
-# Author: Jacques Deguest <jack@deguest.jp>
-# Created 2019/06/16
-# Modified 2019/11/27
-# All rights reserved
-# 
-# This program is free software; you can redistribute  it  and/or  modify  it
-# under the same terms as Perl itself.
+## Database Object Interface - ~/lib/DB/Object/SQLite/Query.pm
+## Version v0.3.8
+## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
+## Created 2019/06/16
+## Modified 2021/08/18
+## All rights reserved
+## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package DB::Object::SQLite::Query;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( DB::Object::Query );
     our( $VERSION, $DEBUG, $VERBOSE );
-    $VERSION = 'v0.3.7';
+    $VERSION = 'v0.3.8';
     $DEBUG = 0;
     $VERBOSE = 0;
 };
@@ -351,7 +352,17 @@ sub _query_components
     push( @query, "ORDER BY $order" ) if( $order );
     push( @query, $sort ) if( $sort && $order);
     push( @query, $limit ) if( $limit );
-    push( @query, $on_conflict ) if( $on_conflict && $type eq 'insert' );
+    if( $on_conflict )
+    {
+        if( $type eq 'insert' )
+        {
+            push( @query, $on_conflict );
+        }
+        else
+        {
+            warn( "The SQLite ON CONFLICT clause is only supported for INSERT queries. Your query was of type \"$type\".\n" );
+        }
+    }
     # Supported as of 3.35.0 (2021-03-12)
     push( @query, "RETURNING $returning" ) if( $returning && ( $type eq 'insert' || $type eq 'update' || $type eq 'delete' ) );
     return( \@query );
@@ -373,7 +384,7 @@ DB::Object::SQLite::Query - SQLite Query Object
 
 =head1 VERSION
 
-    v0.3.7
+    v0.3.8
 
 =head1 DESCRIPTION
 

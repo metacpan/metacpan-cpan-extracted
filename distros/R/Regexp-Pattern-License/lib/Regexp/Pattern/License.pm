@@ -4,6 +4,13 @@ use utf8;
 use strict;
 use warnings;
 
+my $CAN_RE2;
+
+BEGIN {
+	eval { require re::engine::RE2 };
+	$CAN_RE2 = $@ ? '' : 1;
+}
+
 use Regexp::Pattern::License::Parts;
 
 =head1 NAME
@@ -12,21 +19,20 @@ Regexp::Pattern::License - Regular expressions for legal licenses
 
 =head1 VERSION
 
-Version v3.9.1
+Version v3.9.3
 
 =cut
 
-our $VERSION = version->declare("v3.9.1");
+our $VERSION = version->declare("v3.9.3");
 
 =head1 SYNOPSIS
 
     use Regexp::Pattern::License;
     use Regexp::Pattern;
 
-    my $re     = re( 'License::gpl_3' );
     my $string = 'GNU General Public License version 3 or later';
 
-    $string =~ /$re/; # => success
+    print "Found!\n" if $string =~ re( 'License::gpl_3' );  # prints "Found!"
 
 =head1 DESCRIPTION
 
@@ -4011,8 +4017,10 @@ $RE{bsd_4_clause} = {
 	],
 
 	'pat.alt.subject.license.scope.sentence' => $P{ad_mat_ack_this},
-	'pat.alt.subject.license.scope.multisection.part.head' =>
-		$P{repro_copr_cond_discl} . '[.][  ]' . '[*)]?' . $P{ad_mat_ack_this},
+
+# TODO: enable when possible to skip based on dependency graph
+#	'pat.alt.subject.license.scope.multisection.part.head' =>
+#		$P{repro_copr_cond_discl} . '[.][  ]' . '[*)]?' . $P{ad_mat_ack_this},
 	'pat.alt.subject.license.scope.multisection.part.tail' => '[*)]?'
 		. $P{ad_mat_ack_this}
 		. '[word][ word]{0,14}'
@@ -15387,11 +15395,20 @@ for my $id (@_OBJECTS) {
 		}
 
 		if ( $args{engine} ) {
-			if ( $args{engine} eq 'RE2' ) {
 
-				# TODO: make RE2 optional, with greedy pure-perl too
-				use re::engine::RE2 -longest_match => 1, -strict => 1,
-					-max_mem => 8 << 21;
+			# TODO: support modern Perl with greedy patterns
+
+			if ( $args{engine} eq 'RE2' ) {
+				die
+					'cannot use regexp engine "RE2": Module "re::engine::RE2" is not installed'
+					unless $CAN_RE2;
+
+				BEGIN {
+					re::engine::RE2->import(
+						-strict  => 1,
+						-max_mem => 8 << 21,
+					);
+				}
 				return qr/$pat/;
 			}
 			elsif ( $args{engine} eq 'none' ) {

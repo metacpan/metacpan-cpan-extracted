@@ -22,8 +22,8 @@ recommends:
   PDL::Graphics::PGPLOT: '0'
   PDL::Slatec: '0'
 requires:
-  PDL: '2.038'
+  PDL: '2.057'
 resources:
   repository: git://github.com/PDLPorters/PDL-Stats
-version: '0.78'
+version: '0.79'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

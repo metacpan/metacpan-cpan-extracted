@@ -1,3 +1,10 @@
+v2.0.0    2021-08-17 14:05:38 EDT
+  - Support "trace" log level with Mojolicious 9.20 or newer.
+    - An attached Log::Dispatch logger will log "trace" messages at the "debug" level.
+    - An attached Log::Dispatchouli logger will log "trace" messages with "log_debug".
+    - You may need to enable the "trace" level in other types of attached loggers.
+    - Mojolicious::Plugin::Log::Any now sets the log level to "trace" if available.
+
 v1.0.3    2021-06-24 19:29:25 EDT
   - Add message_separator option to attach_logger and plugin to allow changing
     the separator used to join messages (#5, robrwo)

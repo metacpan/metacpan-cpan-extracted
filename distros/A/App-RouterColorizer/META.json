@@ -1,0 +1,92 @@
+{
+   "abstract" : "Colorize router CLI output",
+   "author" : [
+      "Joelle Maslak <jmaslak@antelope.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-RouterColorizer",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::UseAllModules" : "0.17"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::TrailingSpace" : "0.0203",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "English" : "0",
+            "Import::Into" : "0",
+            "List::Util" : "1.56",
+            "Moose" : "0",
+            "Regexp::Common" : "0",
+            "feature" : "0",
+            "perl" : "v5.22.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ByLine" : "1.192590",
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "List::Util" : "1.56",
+            "Test2::V0" : "0.000111",
+            "Test::More" : "0",
+            "Test::UseAllModules" : "0.17"
+         }
+      }
+   },
+   "provides" : {
+      "App::RouterColorizer" : {
+         "file" : "lib/App/RouterColorizer.pm",
+         "version" : "1.212302"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jmaslak/App-RouterColorizer/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jmaslak/App-RouterColorizer.git",
+         "web" : "https://github.com/jmaslak/App-RouterColorizer"
+      }
+   },
+   "version" : "1.212302",
+   "x_contributor_covenant" : {
+      "version" : 0.02
+   },
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

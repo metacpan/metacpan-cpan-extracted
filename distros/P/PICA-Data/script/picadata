@@ -24,7 +24,11 @@ Convert, analyze and validate PICA+ data from the command line.
 
 Convert between PICA+ serialization formats (the default command).
 
-=head2 split
+=head2 get
+
+Print subfield values.
+
+=head2 levels
 
 Split records into multiple records for each level. Implies C<-o>.
 
@@ -92,8 +96,8 @@ as C</3-7> are read as occurrence ranges.
 
 =head2 --schema, -s
 
-L<Avram Schema|http://format.gbv.de/schema/avram/specification> to validate
-against. Can be a file or an URL.
+L<Avram Schema|http://format.gbv.de/schema/avram/specification> given by
+file or URL. Default set via environment variable C<PICA_SCHEMA>.
 
 =head2 --unknown, -u
 

@@ -1,25 +1,25 @@
 # -*- perl -*-
-##----------------------------------------------------------------------------
-## DB/Object/Mysql/Statement.pm
-## Version 0.3
-## Copyright(c) 2019 Jacques Deguest
-## Author: Jacques Deguest <jack@deguest.jp>
-## Created 2017/07/19
-## Modified 2019/06/17
-## All rights reserved.
-## 
-## This program is free software; you can redistribute it and/or modify it 
-## under the same terms as Perl itself.
-##----------------------------------------------------------------------------
-## This package's purpose is to automatically terminate the statement object and
-## separate them from the connection object (DB::Object).
-## Connection object last longer than statement objects
-##----------------------------------------------------------------------------
+#----------------------------------------------------------------------------
+# DB/Object/Mysql/Statement.pm
+# Version 0.3
+# Copyright(c) 2019 Jacques Deguest
+# Author: Jacques Deguest <jack@deguest.jp>
+# Created 2017/07/19
+# Modified 2019/06/17
+# All rights reserved.
+# 
+# This program is free software; you can redistribute it and/or modify it 
+# under the same terms as Perl itself.
+#----------------------------------------------------------------------------
+# This package's purpose is to automatically terminate the statement object and
+# separate them from the connection object (DB::Object).
+# Connection object last longer than statement objects
+#----------------------------------------------------------------------------
 package DB::Object::Mysql::Statement;
 BEGIN
 {
-    require 5.6.0;
     use strict;
+    use warnings;
     use DB::Object::Mysql;
     use DB::Object::Statement;
     use DateTime;
@@ -32,12 +32,12 @@ BEGIN
     use Devel::Confess;
 };
 
-## Inherited from DB::Object::Statement
-## sub bind_param
+# Inherited from DB::Object::Statement
+# sub bind_param
 
-## sub commit is called by dbh, so it is in DB::Object::Postgres
+# sub commit is called by dbh, so it is in DB::Object::Postgres
 
-## Customised for MySQL
+# Customised for MySQL
 sub distinct
 {
     my $self = shift( @_ );
@@ -45,14 +45,14 @@ sub distinct
     return( $self->error( "No query to set as to be ignored." ) );
     
     my $type = uc( ( $query =~ /^\s*(\S+)\s+/ )[ 0 ] );
-    ## ALTER for table alteration statements (DB::Object::Tables
+    # ALTER for table alteration statements (DB::Object::Tables
     my @allowed = qw( SELECT );
     my $allowed = CORE::join( '|', @allowed );
     if( !scalar( grep{ /^$type$/i } @allowed ) )
     {
         return( $self->error( "You may not flag statement of type \U$type\E to be distinct:\n$query" ) );
     }
-    ## Incompatible. Do not bother going further
+    # Incompatible. Do not bother going further
     return( $self ) if( $query =~ /^[[:blank:]]*(?:$allowed)[[:blank:]]+(?:DISTINCT|DISTINCTROW|ALL)[[:blank:]]+/i );
     
     $query =~ s/^([[:blank:]]*)($allowed)([[:blank:]]+)/$1$2 DISTINCT /;
@@ -66,7 +66,7 @@ sub distinct
     return( $sth );
 }
 
-## Customised for MySQL
+# Customised for MySQL
 sub dump
 {
     my $self  = shift( @_ );
@@ -89,8 +89,8 @@ sub dump
         my @header = sort{ $fields->{ $a } <=> $fields->{ $b } } keys( %$fields );
         my $date = DateTime->now;
         my $table = $self->{table};
-        $fh->printf( "## Generated on %s for table $table\n", $date->strftime( '%c' ) );
-        $fh->print( "## ", CORE::join( "\t", @header ), "\n" );
+        $fh->printf( "# Generated on %s for table $table\n", $date->strftime( '%c' ) );
+        $fh->print( "# ", CORE::join( "\t", @header ), "\n" );
         my @data = ();
         while( @data = $self->fetchrow() )
         {
@@ -109,13 +109,13 @@ sub dump
         $fh = IO::File->new_from_fd( $args->{fh}, 'w' ) || return( $self->error( $! ) );
     }
     my $max    = 0;
-    ## foreach my $field ( keys( %$fields ) )
+    # foreach my $field ( keys( %$fields ) )
     foreach my $field ( @fields )
     {
         $max = length( $field ) if( length( $field ) > $max );
     }
     my $template = '';
-    ## foreach my $field ( sort{ $fields->{ $a } <=> $fields->{ $b } } keys( %$fields ) )
+    # foreach my $field ( sort{ $fields->{ $a } <=> $fields->{ $b } } keys( %$fields ) )
     foreach my $field ( @fields )
     {
         $template .= "$field" . ( '.' x ( $max - length( $field ) ) ) . ": %s\n";
@@ -158,14 +158,14 @@ sub ignore
     return( $self->error( "No query to set as to be ignored." ) );
     
     my $type = uc( ( $query =~ /^[[:blank:]]*(\S+)[[:blank:]]+/ )[ 0 ] );
-    ## ALTER for table alteration statements (DB::Object::Tables
+    # ALTER for table alteration statements (DB::Object::Tables
     my @allowed = qw( INSERT UPDATE ALTER );
     my $allowed = CORE::join( '|', @allowed );
     if( !scalar( grep{ /^$type$/i } @allowed ) )
     {
         return( $self->error( "You may not flag statement of type \U$type\E to be ignored:\n$query" ) );
     }
-    ## Incompatible. Do not bother going further
+    # Incompatible. Do not bother going further
     return( $self ) if( $query =~ /^[[:blank:]]*(?:$allowed)[[:blank:]]+(?:DELAYED|LOW_PRIORITY|HIGH_PRIORITY)[[:blank:]]+/i );
     return( $self ) if( $type eq 'ALTER' && $query !~ /^[[:blank:]]*$type[[:blank:]]+TABLE[[:blank:]]+/i );
     
@@ -200,7 +200,7 @@ sub priority
     0    => 'LOW_PRIORITY',
     1    => 'HIGH_PRIORITY',
     };
-    ## Bad argument. Do not bother
+    # Bad argument. Do not bother
     return( $self ) if( !exists( $map->{ $prio } ) );
     
     my $query = $self->{query} ||
@@ -208,15 +208,15 @@ sub priority
     my $type = uc( ( $query =~ /^[[:blank:]]*(\S+)[[:blank:]]+/ )[ 0 ] );
     my @allowed = qw( DELETE INSERT REPLACE SELECT UPDATE );
     my $allowed = CORE::join( '|', @allowed );
-    ## Ignore if not allowed
+    # Ignore if not allowed
     if( !scalar( grep{ /^$type$/i } @allowed ) )
     {
         $self->error( "You may not set priority on statement of type \U$type\E:\n$query" );
         return( $self );
     }
-    ## Incompatible. Do not bother going further
+    # Incompatible. Do not bother going further
     return( $self ) if( $query =~ /^\s*(?:$allowed)\s+(?:DELAYED|LOW_PRIORITY|HIGH_PRIORITY)\s+/i );
-    ## SELECT with something else than HIGH_PRIORITY is incompatible, so do not bother to go further
+    # SELECT with something else than HIGH_PRIORITY is incompatible, so do not bother to go further
     return( $self ) if( $prio != 1 && $type =~ /^(?:SELECT)$/i );
     return( $self ) if( $prio != 0 && $type =~ /^(?:DELETE|INSERT|REPLACE|UPDATE)$/i );
     
@@ -247,13 +247,13 @@ sub wait
     my $type = ( $query =~ /^[[:blank:]]*(\S+)[[:blank:]]+/ )[ 0 ];
     my @allowed = qw( INSERT REPLACE );
     my $allowed = CORE::join( '|', @allowed );
-    ## Ignore if not allowed
+    # Ignore if not allowed
     if( !scalar( grep{ /^$type$/i } @allowed ) )
     {
         $self->error( "You may not use wait (delayed query) on statement of type \U$type\E:\n$query" );
         return( $self );
     }
-    ## Incompatible. Do not bother going further
+    # Incompatible. Do not bother going further
     return( $self ) if( $query =~ /^[[:blank:]]*(?:$allowed)[[:blank:]]+(?:DELAYED|LOW_PRIORITY|HIGH_PRIORITY)[[:blank:]]+/i );
     $query =~ s/^([[:blank:]]*)($allowed)([[:blank:]]+)/$1$2 DELAYED /i;
     my $sth = $self->_cache_this( $query ) ||

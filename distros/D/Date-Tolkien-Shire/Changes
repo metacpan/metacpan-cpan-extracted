@@ -1,3 +1,16 @@
+1.905		2021-08-17	T. R. Wyant
+    Correct generation of 'provides' metadata.  Thanks to Favio Poletti
+    for blogging
+    https://github.polettix.it/ETOOBUSY/2021/06/15/the-real-pause-workaround/,
+    and ultimately to Joel Berger for the pointer to
+    https://metacpan.org/pod/CPAN::Meta::Spec#no_index
+
+commit 5c684e9bdd06d4ecddf71b5e22086d2dc3d23fff
+Author: Tom Wyant <wyant@cpan.org>
+Date:   Fri Jun 25 18:59:21 2021 -0400
+
+    Correct POD links.
+
 1.904		2021-03-16	T. R. Wyant
     Add rt.cpan.org back to bug reporting methods. Long live RT!
 

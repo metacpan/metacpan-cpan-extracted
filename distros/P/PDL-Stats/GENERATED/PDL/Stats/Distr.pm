@@ -117,7 +117,7 @@ beta distribution. pdf: f(x; a,b) = 1/B(a,b) x^(a-1) (1-x)^(b-1)
 =for bad
 
 mme_beta processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -151,7 +151,7 @@ probability density function for beta distribution. x defined on [0,1].
 =for bad
 
 pdf_beta processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -189,7 +189,7 @@ binomial distribution. pmf: f(k; n,p) = (n k) p^k (1-p)^(n-k) for k = 0,1,2..n
 =for bad
 
 mme_binomial processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -223,7 +223,7 @@ probability mass function for binomial distribution.
 =for bad
 
 pmf_binomial processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -261,7 +261,7 @@ exponential distribution. mle same as method of moments estimate.
 =for bad
 
 mle_exp processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -295,7 +295,7 @@ probability density function for exponential distribution.
 =for bad
 
 pdf_exp processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -333,7 +333,7 @@ two-parameter gamma distribution
 =for bad
 
 mme_gamma processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -367,7 +367,7 @@ probability density function for two-parameter gamma distribution.
 =for bad
 
 pdf_gamma processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -405,7 +405,7 @@ gaussian aka normal distribution. same results as $data->average and $data->var.
 =for bad
 
 mle_gaussian processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -439,7 +439,7 @@ probability density function for gaussian distribution.
 =for bad
 
 pdf_gaussian processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -473,7 +473,7 @@ geometric distribution. mle same as method of moments estimate.
 =for bad
 
 mle_geo processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -507,7 +507,7 @@ probability mass function for geometric distribution. x >= 0.
 =for bad
 
 pmf_geo processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -541,7 +541,7 @@ shifted geometric distribution. mle same as method of moments estimate.
 =for bad
 
 mle_geosh processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -575,7 +575,7 @@ probability mass function for shifted geometric distribution. x >= 1.
 =for bad
 
 pmf_geosh processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -613,7 +613,7 @@ lognormal distribution. maximum likelihood estimation.
 =for bad
 
 mle_lognormal processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -651,7 +651,7 @@ lognormal distribution. method of moments estimation.
 =for bad
 
 mme_lognormal processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -685,7 +685,7 @@ probability density function for lognormal distribution. x > 0. v > 0.
 =for bad
 
 pdf_lognormal processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -723,7 +723,7 @@ negative binomial distribution. pmf: f(x; r,p) = (x+r-1  r-1) p^r (1-p)^x for x=
 =for bad
 
 mme_nbd processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -757,7 +757,7 @@ probability mass function for negative binomial distribution.
 =for bad
 
 pmf_nbd processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -795,7 +795,7 @@ pareto distribution. pdf: f(x; k,xm) = k xm^k / x^(k+1) for x >= xm > 0.
 =for bad
 
 mme_pareto processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -829,7 +829,7 @@ probability density function for pareto distribution. x >= xm > 0.
 =for bad
 
 pdf_pareto processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -867,7 +867,7 @@ poisson distribution. pmf: f(x;l) = e^(-l) * l^x / x!
 =for bad
 
 mle_poisson processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -901,7 +901,7 @@ Probability mass function for poisson distribution. Uses Stirling's formula for 
 =for bad
 
 pmf_poisson processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -935,7 +935,7 @@ Probability mass function for poisson distribution. Uses Stirling's formula for 
 =for bad
 
 pmf_poisson_stirling processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut

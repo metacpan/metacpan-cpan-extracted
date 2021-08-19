@@ -15,8 +15,8 @@
 package DB::Object::Postgres;
 BEGIN
 {
-    require 5.6.0;
     use strict;
+    use warnings;
     use parent qw( DB::Object );
     use version;
     use DBI;

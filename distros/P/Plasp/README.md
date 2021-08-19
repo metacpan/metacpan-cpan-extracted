@@ -4,7 +4,7 @@ Plasp - PerlScript/ASP
 
 # VERSION
 
-version 1.08
+version 1.09
 
 # SYNOPSIS
 

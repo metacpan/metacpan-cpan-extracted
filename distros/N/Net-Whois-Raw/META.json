@@ -19,6 +19,11 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Test::Spelling" : "0.12"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
@@ -59,7 +64,13 @@
          "web" : "https://github.com/regru/Net-Whois-Raw"
       }
    },
-   "version" : "2.99031",
+   "version" : "2.99032",
+   "x_contributors" : [
+      "Ariel Brosh <schop@cpan.org>",
+      "Gabor Szabo <szabgab@cpan.org>",
+      "Corris Randall <corris@cpan.org>",
+      "Walery Studennikov <despair@cpan.org>"
+   ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
 }
 

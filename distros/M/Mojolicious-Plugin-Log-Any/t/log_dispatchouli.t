@@ -2,11 +2,13 @@ use strict;
 use warnings;
 use Test::Needs 'Log::Dispatchouli';
 
+use Mojolicious ();
 use Mojo::Log;
 use Mojo::Util 'dumper';
 use Test::More;
 
 my @levels = qw(debug info warn error fatal);
+unshift @levels, 'trace' if eval { Mojolicious->VERSION('9.20'); 1 };
 
 my $debug_log = Log::Dispatchouli->new_tester({debug => 1});
 my $log = Mojo::Log->with_roles('Mojo::Log::Role::AttachLogger')->new

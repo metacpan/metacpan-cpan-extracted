@@ -1,14 +1,12 @@
 use strict;
 use warnings;
-
-local($|) = 1;
-
-my $tests_per_engine = 17;
-my @engines = qw/gnuplot pgplot plplot prima/;
+use PDL::Graphics::Simple;
 use Test::More;
 use File::Temp q/tempfile/;
 use PDL;
 
+my $tests_per_engine = 17;
+my @engines = qw/gnuplot pgplot plplot prima/;
 my $smoker = ($ENV{'PERL_MM_USE_DEFAULT'} or $ENV{'AUTOMATED_TESTING'});
 $ENV{PGPLOT_DEV} ||= '/NULL' if $smoker;
 
@@ -21,14 +19,23 @@ sub ask_yn {
 }
 
 ##############################
-# Module loads properly
-eval "use PDL::Graphics::Simple;";
-is($@, '');
+# Try the simple engine and convenience interfaces...
+
+eval q: $a = xvals(50); lines $a sin($a/3) :;
+plan skip_all => 'No plotting engines installed' if $@ =~ /Sorry, all known/;
+is($@, '', "simple lines plot succeeded");
+ok( defined($PDL::Graphics::Simple::global_object), "Global convenience object got spontaneously set" );
+ask_yn q{  test>  $a = xvals(50); lines $a sin($a/3);
+You should see a sine wave...}, "convenience plot OK";
+
+eval q: erase :;
+is($@, '', 'erase worked');
+ok(!defined($PDL::Graphics::Simple::global_object), 'erase erased the global object');
 
 eval "PDL::Graphics::Simple::show();";
 is($@, '');
 
-my $mods = $PDL::Graphics::Simple::mods;
+my $mods = do { no warnings 'once'; $PDL::Graphics::Simple::mods };
 ok( (  defined($mods) and ref $mods eq 'HASH'  ) ,
     "module registration hash exists");
 
@@ -145,27 +152,7 @@ panels should have colorbar wedges to the right of the image.}, "multiplot OK";
 }
 
 
-##############################
-# Try the simple engine and convenience interfaces...
-
-print STDERR<<'FOO';
-
-##############################
-Convenience interface tests...
-FOO
-
-ok( !defined($PDL::Graphics::Simple::global_object), "Global convenience object not defined" );
-
-eval q: $a = xvals(50); lines $a sin($a/3) :;
-is($@, '', "simple lines plot succeeded");
-ok( defined($PDL::Graphics::Simple::global_object), "Global convenience object got spontaneously set" );
-ask_yn q{  test>  $a = xvals(50); lines $a sin($a/3);
-You should see a sine wave...}, "convenience plot OK";
-
-eval q: erase :;
-is($@, '', 'erase worked');
-ok(!defined($PDL::Graphics::Simple::global_object), 'erase erased the global object');
-
+# Continue the simple engine and convenience interfaces
 ##############################
 # Test imag
 my $im = 1000 * sin(rvals(100,100)/3) / (rvals(100,100)+30);

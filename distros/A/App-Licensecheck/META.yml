@@ -8,6 +8,7 @@ build_requires:
   File::Basename: '0'
   Test2::V0: '0.000060'
   Test::Command::Simple: '0'
+  Test::Without::Module: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
 dynamic_config: 0
@@ -31,7 +32,9 @@ optional_features: {}
 provides:
   App::Licensecheck:
     file: lib/App/Licensecheck.pm
-    version: v3.2.9
+    version: v3.2.11
+recommends:
+  re::engine::RE2: '0'
 requires:
   Array::IntSpan: '0'
   Encode: '0'
@@ -56,19 +59,18 @@ requires:
   experimental: '0'
   namespace::clean: '0'
   perl: '5.014000'
-  re::engine::RE2: '0'
 resources:
   Identifier: http://purl.org/NET/cpan-uri/dist/App-Licensecheck/project
   bugtracker: https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck
   homepage: https://metacpan.org/pod/App::Licensecheck
   license: http://www.gnu.org/licenses/agpl-3.0.txt
   repository: https://salsa.debian.org/build-common-team/licensecheck.git
-version: v3.2.9
+version: v3.2.11
 x_contributors:
   - 'Paul Wise <pabs@debian.org>'
 x_help_wanted:
-  - tester
   - documenter
+  - tester
 x_provides_scripts:
   licensecheck:
     file: bin/licensecheck

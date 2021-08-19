@@ -523,6 +523,8 @@ sub CookiesHeaders {
         my %hash = ( '-name' => $name );
 
         my $cookie = $cookies->{$name};
+        next unless defined $cookie;
+
         if ( ref $cookie eq 'HASH' ) {
             for my $key ( keys %$cookie ) {
 

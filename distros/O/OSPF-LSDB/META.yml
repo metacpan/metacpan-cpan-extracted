@@ -1,13 +1,18 @@
 ---
-abstract: unknown
+abstract: 'class containing OSPF link state database'
 author:
   - 'BLUHM <bluhm@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::EOL: '0'
+  Test::NoWarnings: '0'
+  Test::Pod: '0'
+  Test::Requires: '0'
+  Test::Strict: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,13 +30,10 @@ requires:
   List::MoreUtils: '0'
   Regexp::Common: '0'
   Regexp::IPv6: '0'
-  Test::NoWarnings: '0'
-  Test::Pod: '0'
-  Test::Strict: '0'
   YAML::Syck: '0'
   perl: '5.010000'
 resources:
   homepage: https://sourceforge.net/projects/ospfview/
   repository: git://git.code.sf.net/p/ospfview/code
-version: '1.11'
+version: '1.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

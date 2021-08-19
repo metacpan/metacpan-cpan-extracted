@@ -2,16 +2,15 @@ NAME
     Regexp::Pattern::License - Regular expressions for legal licenses
 
 VERSION
-    Version v3.9.1
+    Version v3.9.3
 
 SYNOPSIS
         use Regexp::Pattern::License;
         use Regexp::Pattern;
 
-        my $re     = re( 'License::gpl_3' );
         my $string = 'GNU General Public License version 3 or later';
 
-        $string =~ /$re/; # => success
+        print "Found!\n" if $string =~ re( 'License::gpl_3' );  # prints "Found!"
 
 DESCRIPTION
     Regexp::Pattern::License provides a hash of regular expression patterns

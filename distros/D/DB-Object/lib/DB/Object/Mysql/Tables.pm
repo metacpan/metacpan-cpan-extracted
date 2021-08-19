@@ -15,8 +15,8 @@
 package DB::Object::Mysql::Tables;
 BEGIN
 {
-    require 5.6.0;
     use strict;
+    use warnings;
     our( $VERSION, $VERBOSE, $DEBUG );
     use parent qw( DB::Object::Mysql DB::Object::Tables );
     $VERSION    = 'v0.300.1';

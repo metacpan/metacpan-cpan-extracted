@@ -2,11 +2,13 @@ benchmark.pl
 Build.PL
 Changes
 lib/Excel/ValueReader/XLSX.pm
-lib/Excel/ValueReader/XLSX/LibXML.pm
-lib/Excel/ValueReader/XLSX/Regex.pm
+lib/Excel/ValueReader/XLSX/Backend.pm
+lib/Excel/ValueReader/XLSX/Backend/LibXML.pm
+lib/Excel/ValueReader/XLSX/Backend/Regex.pm
 MANIFEST			This list of files
 META.json
 META.yml
 README.md
 t/valuereader.t
 t/valuereader.xlsx
+t/valuereader1904.xlsx

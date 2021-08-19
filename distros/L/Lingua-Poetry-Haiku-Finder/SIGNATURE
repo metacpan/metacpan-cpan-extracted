@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 7b347c679008a2707e28f7f577319ce17ae0814d22d28a769823fa005b706e2c COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 26d3e9475b463e90a95763ac5e22f666f85f74c31e772da8d08bfcf3445383f2 Changes
+SHA256 41701524587216187ddef391220662ebb9627d04f5eca7ff8f952b2a018e4511 INSTALL
+SHA256 34427749499bd6d6e5d206089bc03d76c647a1350f8b5f95ea628d2b6ff56e4c LICENSE
+SHA256 edc1fc2fd847fb8e91ea3698ce72b64f13992ad770ee3eb418de270f509f5f10 MANIFEST
+SHA256 f343ea69857a6dd2a8a4a5f1ee29940320769c48087ba81f89a53b6d64161376 META.json
+SHA256 d73a0bdacc29f4a8f2afa2add5ad871639162cf97d4a46e7d6c515e29911be9f META.yml
+SHA256 4c5d2df4579053429394cbb6a92bd9730a479623562ae4c61bf53af2887a627c Makefile.PL
+SHA256 0c0260f738b8a496de0ac46b27af7687a8495536d6a6f7bb85ada7f6b5f90641 README
+SHA256 50e477663d48a91a8d0909914494d7771944b5d24c9bd7e47b0ea50606061622 dist.ini
+SHA256 f0ccfc93d1343cdd1d9fdd7a375d799e1b5f80aa66f5ca1c1f8a38d76c5078fa doap.ttl
+SHA256 a11113299f96dc0ddec8b1cb6a5050105b2ec24df771626291e74f2930c0bb57 lib/Lingua/Poetry/Haiku/Finder.pm
+SHA256 65752262f5b7b0864a165132b107cd7f9c5a335d48b3e4eae762dbcf5dc8dfd3 lib/Lingua/Poetry/Haiku/Finder/NonWord.pm
+SHA256 1d9daa4653e8e4a916fb791fb3cbd9d06be380305ae2b1872b08f0d11cce36d2 lib/Lingua/Poetry/Haiku/Finder/Sentence.pm
+SHA256 cdd20c7734e80386538830485220df6ac61ca31f31ca7945e5a6c69db046f101 lib/Lingua/Poetry/Haiku/Finder/SentencePart.pm
+SHA256 5721b0ce2c95b287e1608beddaa0ab9d7766caca2f0211a661fee91a4ffffb44 lib/Lingua/Poetry/Haiku/Finder/Word.pm
+SHA256 31675092c069e9988637e9446a6868ffa6d04b138c2bddbb6c22640ac4c63601 t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCYRuhhQAKCRDOv4Eoaip9
+OQS+AJ9MySC8QBG5WdeBEuJuSh0WdY+wxwCfVHPiLsAgKMJw9/JZPmCbTm2xC0A=
+=KgyL
+-----END PGP SIGNATURE-----

@@ -1,0 +1,57 @@
+NAME
+    Lingua::Poetry::Haiku::Finder - find poetry in the least poetic places
+
+SYNOPSIS
+      use Lingua::Poetry::Haiku::Finder;
+  
+      my $finder = 'Lingua::Poetry::Haiku::Finder'->from_filename(
+        '/usr/share/common-licenses/GPL-2'
+      );
+  
+      for my $poem ( @{ $finder->haikus } ) {
+        print "$poem\n\n";
+      }
+
+DESCRIPTION
+    This module will scan a string (which may be read from a file) for
+    consecutive sentences which sound like haikus.
+
+    It uses Lingua::EN::Syllable, which provides imperfect syllable counts, so
+    they may not always work. It will also occasionally split lines as 6/7/4
+    or similar, to avoid hyphenating a word and splitting it onto multiple
+    lines.
+
+  Constructors
+    `from_text( $string )`
+    `from_filehandle( $ref )`
+    `from_filename( $string )`
+
+  Methods
+    `haikus`
+        Returns an arrayref of strings, each string being one haiku. Lines of
+        each haiku are joined using "\n".
+
+    There are other methods and helper classes, but you probably don't need to
+    know about them.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Lingua-Poetry-Haiku-Finder>.
+
+SEE ALSO
+    <https://en.wikipedia.org/wiki/Black_Perl>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2021 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

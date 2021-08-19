@@ -1,5 +1,13 @@
 Revision history for Alien-libtickit
 
+0.12    2021-08-18
+        [CHANGES]
+         * Use libtickit 0.4.2a
+
+0.11    2021-08-18
+        [CHANGES]
+         * Use libtickit 0.4.2
+
 0.10    2020-10-01
         [CHANGES]
          * Use libtickit 0.4.1

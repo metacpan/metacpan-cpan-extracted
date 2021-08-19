@@ -1601,7 +1601,7 @@ sub _group_by_single_factor {
 
     # get number of n's in each group, find the biggest, fit output pdl to this
     my $uniq_ns = pdl \@uniq_ns;
-	my $max = pdl(\@uniq_ns)->max;
+	my $max = pdl(\@uniq_ns)->max->sclr;
 
     my $badvalue = int($p->max + 1);
     my $p_tmp = ones($max, @p_threaddims, $uniq->nelem) * $badvalue;

@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2013-2017 -- leonerd@leonerd.org.uk
 
-package Tickit::RenderBuffer;
+package Tickit::RenderBuffer 0.72;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.71';
 
 use Carp;
 use Scalar::Util qw( refaddr );

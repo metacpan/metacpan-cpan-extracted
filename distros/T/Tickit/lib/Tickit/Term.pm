@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2009-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Term;
+package Tickit::Term 0.72;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.71';
 
 use Carp;
 
@@ -212,6 +210,15 @@ around a C<SIGSTOP>.
       $term->resume;
       $rootwin->expose;
    }
+
+=cut
+
+=head2 teardown
+
+   $term->teardown
+
+Shuts down operation of the terminal entirely, in preparation for terminating
+the process.
 
 =cut
 

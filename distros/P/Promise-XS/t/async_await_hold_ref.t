@@ -6,6 +6,10 @@ use warnings;
 use Test::More;
 use Test::FailWarnings;
 
+if ($^V ge v5.16.0 && $^V le v5.25.0) {
+    plan skip_all => "Future::AsyncAwait breaks on this perl ($^V). See https://rt.cpan.org/Public/Bug/Display.html?id=137723.";
+}
+
 BEGIN {
     for my $req ( qw( Future::AsyncAwait  AnyEvent ) ) {
         eval "require $req" or plan skip_all => 'No Future::AsyncAwait';

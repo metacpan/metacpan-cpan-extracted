@@ -6,11 +6,11 @@ create_cloginrc - create cloginrc files for RANCID
 
 =head1 VERSION
 
-Version v0.2.0
+Version v0.3.0
 
 =cut
 
-our $VERSION = 'v0.2.0';
+our $VERSION = 'v0.3.0';
 
 =head1 SYNOPSIS
 
@@ -36,6 +36,13 @@ Print a brief help message and exit.
 
 Print the manual page and exit.
 
+=item B<< --columns col1[,col2[,...]] >>
+
+If the CSV file does not contain the column names in the first line,
+you can provide them with this option,
+separated with comma and in the same order
+as the columns in the CSV file.
+
 =item B<< --templatefile filename >>
 
 Use file I<< filename >> to specify the templates to use
@@ -48,6 +55,7 @@ instead of the builtin templates.
 my $opts = {};
 my @optdefs = qw(
 	help|? manual
+	columns=s
 	templatefile=s
 );
 GetOptions($opts, @optdefs)
@@ -60,6 +68,9 @@ if (exists $opts->{templatefile}) {
 		read_templates($handle);
 		close($handle);
 	}
+}
+if (exists $opts->{columns}) {
+	set_columns($opts->{columns});
 }
 
 tt_run;
@@ -77,7 +88,9 @@ as long as there is a column named I<< type >>,
 which is used to switch between different templates,
 and a column for every variable used in the templates.
 
-The column names should be given in the first line of the CSV file.
+The column names should either be given in the first line of the CSV file
+or with the command line options C<< --columns >>
+separated by comma and in the same order as the columns of the CSV file.
 
 If the output of some template variables needs escape sequences
 as for instances the .cloginrc file for RANCID
@@ -101,12 +114,17 @@ Take a look at the following template:
  cisco:add method [% name %] {ssh}
  cisco:add user [% name %] {[% user %]}
  cisco:add password [% name %] {[% password %]} {[% enablepw %]}
+ *:%%% [% name %] uses type [% type %] for which no template is defined.
 
 This template would be selected
 if the I<< type >> column had the value "cisco".
 The CSV file would need to contain at least the columns
 type, name, user, password and enablepw
 to expand the template properly.
+
+The special type C<< * >> in the last line of the example
+is a catch all that matches any type
+without an explicit definition in the templates.
 
 =cut
 

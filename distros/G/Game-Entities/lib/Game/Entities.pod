@@ -206,10 +206,11 @@ trace from the previous state.
 
 =head2 sort
 
-    $ECS->sort( $component_name => $parent_name      );
+    $ECS->sort( $component_name => $parent_name );
     $ECS->sort( $component_name => sub { $a ... $b } );
+    $ECS->sort( $component_name => sub ($$) { $_[0] ... $_[1] } );
 
-I<Since version 0.006.>
+I<Since version 0.006, with support for prototypes since 0.011>
 
 Under normal circumstances, the order in which a particular set of components
 is stored is not guaranteed, and will depend entirely on the additions and
@@ -223,9 +224,10 @@ This function accommodates this use case.
 
 Given a single component name, and a code reference to a comparator function,
 the specified component will be sorted accordingly. The comparator function
-can use the global C<$a> and C<$b> variables as with regular
-L<sort|https://perldoc.perl.org/functions/sort>, which will be assigned to
-the two components being sorted.
+behaves just like the one used for the regular
+L<sort|https://perldoc.perl.org/functions/sort>, accessing the two components
+being compared via the C<$a> and C<$b> variables, or as the first two values
+in C<@_> if the comparator has the a prototype equal to C<$$>.
 
 Alternatively, if given the name of another component (C<B>) instead of a
 comparator function, the order of the first component (C<A>) will follow that

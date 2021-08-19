@@ -35,7 +35,7 @@ no_index:
 provides:
   Plasp:
     file: lib/Plasp.pm
-    version: '1.08'
+    version: '1.09'
   Plasp::App:
     file: lib/Plasp/App.pm
   Plasp::Application:
@@ -105,7 +105,7 @@ resources:
   bugtracker: https://github.com/stvleung/Plasp/issues
   homepage: https://github.com/stvleung/Plasp
   repository: git://github.com/stvleung/Plasp.git
-version: '1.08'
+version: '1.09'
 x_contributors:
   - 'Steven Leung <sleung@turnitin.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

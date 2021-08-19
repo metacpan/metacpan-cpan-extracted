@@ -6,7 +6,7 @@ use warnings;
 use Carp qw(croak);
 use IPC::Shareable;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub import {
     my ($class, $glue, $warn) = @_;
@@ -41,12 +41,15 @@ Script::Singleton - Ensure only a single instance of a script can run
 Using shared memory, this distribution ensures only a single instance of any
 script can be running at any one time.
 
-There are no functions or methods. All the work is performed in the B<use>
-line. C<LOCK> is the glue that identifies the shared memory segment. If a
-second parameter with a true value is sent in, we'll output a warning if the
-same script is run at the same time and it exits:
+    use Script::Singleton 'UNIQUE LOCK STRING', 1;
 
-    use Script::Singleton 'LOCK', 1;
+There are no functions or methods. All the work is performed in the B<use>
+line. C<UNIQUE LOCK STRING> is the glue that identifies the shared memory segment.
+If a second parameter with a true value is sent in, we'll output a warning if
+the same script is run at the same time and it exits:
+
+This software uses L<IPC::Shareable> for the shared memory management,
+specifically its B<singleton()> method.
 
 =head1 AUTHOR
 

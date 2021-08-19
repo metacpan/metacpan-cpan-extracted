@@ -1,18 +1,16 @@
-use strict;
-use warnings;
-use utf8;
+use Test2::V0;
 
-use Test::More tests => 42;
+plan 42;
 
 use String::Copyright {
 	format => sub { join ':', $_->[0] || '', $_->[1] || '' }
 };
 
-is_deeply copyright("© 1999 12345 Steps"),
+is copyright("© 1999 12345 Steps"),
 	'1999:12345 Steps',
 	'year-like owner';
 
-is_deeply copyright("© 1999 1234 Steps"),
+is copyright("© 1999 1234 Steps"),
 	'1234, 1999:Steps',
 	'too-year-like owner';
 
@@ -71,9 +69,9 @@ is copyright('© Foo, all rights reserved.'), ':Foo', 'boilerplate';
 is copyright('© Foo, all rights reserved. Bar'), ':Foo',
 	'boilerplate, then noise';
 
-TODO: {
-	local $TODO = 'not yet handled';
+my $todo = todo 'not yet handled';
 
-	is copyright('© Foo, all rights reserved. © Bar'), ":Foo\n:Bar",
-		'boilerplate, then another copyright';
-}
+is copyright('© Foo, all rights reserved. © Bar'), ":Foo\n:Bar",
+	'boilerplate, then another copyright';
+
+done_testing;

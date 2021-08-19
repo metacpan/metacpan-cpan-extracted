@@ -5,7 +5,7 @@ Getopt::EX::Hashed - Hash store object automation
 
 # VERSION
 
-Version 0.9912
+Version 0.9913
 
 # SYNOPSIS
 
@@ -15,9 +15,10 @@ Version 0.9912
     package App::foo;
 
     use Getopt::EX::Hashed;
-    has start => ( spec => "=i s begin", default => 1 );
-    has end   => ( spec => "=i e" );
-    has file  => ( spec => "=s", is => 'rw' );
+    has start  => ( spec => "=i s begin", default => 1 );
+    has end    => ( spec => "=i e" );
+    has file   => ( spec => "=s", is => 'rw' );
+    has answer => ( spec => '=i', must => sub { $_[1] == 42 } );
     no  Getopt::EX::Hashed;
 
     sub run {
@@ -128,17 +129,17 @@ Following parameters are available.
     in the hash object and the code works almost same.  But the hash value
     can not be used for option storage.
 
-    Because **action** function intercept the option assignment, it can be
-    used to verify the parameter.
+- **must** => _coderef_
 
-        has age =>
+    Parameter **must** takes a code reference to validate option values.
+    It takes same arguments as **action** and returns boolean.  With next
+    example, option **--answer** takes only 42 as a valid value.
+
+        has answer =>
             spec => '=i',
-            action => sub {
-                my($name, $i) = @_;
-                (0 <= $i and $i <= 150) or
-                    die "$name: have to be in 0 to 150 range.\n";
-                $_->{$name} = $i;
-            };
+            must => sub { $_[1] == 42 };
+
+    Can be used with **action** parameter.
 
 # METHOD
 

@@ -8,6 +8,7 @@ requires 'Log::Any', '>= 1.708';
 requires 'Ryu', '>= 2.006';
 requires 'Future', '>= 0.47';
 requires 'IO::Async', '>= 0.77';
+requires 'Future::AsyncAwait', 0;
 requires 'IO::Socket::IP', '>= 0.41';
 
 requires 'Syntax::Keyword::Try';

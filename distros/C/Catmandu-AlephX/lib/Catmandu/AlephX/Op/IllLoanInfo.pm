@@ -3,7 +3,7 @@ use Catmandu::Sane;
 use Catmandu::Util qw(:check :is);
 use Moo;
 
-our $VERSION = "1.072";
+our $VERSION = "1.073";
 
 with('Catmandu::AlephX::Response');
 
@@ -35,6 +35,11 @@ sub parse {
     z36 => $z36,
     content_ref => $str_ref
   );
+}
+
+sub parse_errors {
+  my($self,$xpath)=@_;
+  [map { $_->to_literal; } $xpath->find("/ill-LOAN-INFO/error|/ill-loan-info/error")->get_nodelist()];
 }
 
 1;

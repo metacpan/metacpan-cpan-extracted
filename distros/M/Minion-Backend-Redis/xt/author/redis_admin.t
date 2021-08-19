@@ -6,7 +6,7 @@ use Test::More;
 use Mojo::Redis;
 
 plan skip_all => 'Cannot test on Win32' if $^O eq 'MSWin32';
-plan skip_all => $@ unless eval { Mojo::Redis->new };
+plan skip_all => $@ unless eval { Mojo::Redis->new->db->ping };
 
 use Mojolicious::Lite;
 use Test::Mojo;
@@ -117,8 +117,6 @@ subtest 'Bundled static files' => sub {
       ->content_type_is('text/css');
     $t->get_ok('/minion/fontawesome/fontawesome.css')->status_is(200)
       ->content_type_is('text/css');
-    $t->get_ok('/minion/popper/popper.js')->status_is(200)
-      ->content_type_is('application/javascript');
     $t->get_ok('/minion/webfonts/fa-brands-400.eot')->status_is(200);
     $t->get_ok('/minion/webfonts/fa-brands-400.svg')->status_is(200);
     $t->get_ok('/minion/webfonts/fa-brands-400.ttf')->status_is(200);

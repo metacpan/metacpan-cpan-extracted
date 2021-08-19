@@ -3,6 +3,7 @@ abstract: 'Hash store object automation'
 author:
   - 'Kazumasa Utashiro'
 build_requires:
+  Getopt::Long: '0'
   Test::More: '0.98'
 configure_requires:
   Module::Build::Tiny: '0.035'
@@ -26,7 +27,7 @@ no_index:
 provides:
   Getopt::EX::Hashed:
     file: lib/Getopt/EX/Hashed.pm
-    version: '0.9912'
+    version: '0.9913'
 requires:
   List::Util: '0'
   perl: v5.14.0
@@ -34,7 +35,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/Getopt-EX-Hashed/issues
   homepage: https://github.com/kaz-utashiro/Getopt-EX-Hashed
   repository: git://github.com/kaz-utashiro/Getopt-EX-Hashed.git
-version: '0.9912'
+version: '0.9913'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

@@ -12,8 +12,8 @@
 package DB::Object::Mysql;
 BEGIN
 {
-    require 5.6.0;
     use strict;
+    use warnings;
     use IO::File;
     use parent qw( DB::Object );
     require DB::Object::Mysql::Statement;

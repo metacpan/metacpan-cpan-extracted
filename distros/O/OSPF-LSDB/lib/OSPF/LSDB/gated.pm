@@ -1,5 +1,5 @@
 ##########################################################################
-# Copyright (c) 2010-2012 Alexander Bluhm <alexander.bluhm@gmx.net>
+# Copyright (c) 2010-2021 Alexander Bluhm <alexander.bluhm@gmx.net>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -21,22 +21,22 @@ use warnings;
 
 =head1 NAME
 
-B<OSPF::LSDB::gated> - parse B<gated> OSPF link state database
+OSPF::LSDB::gated - parse B<gated> OSPF link state database
 
 =head1 SYNOPSIS
 
 use OSPF::LSDB::gated;
 
-my $gated = OSPF::LSDB::gated-E<gt>L<new>();
+my $gated = OSPF::LSDB::gated-E<gt>new();
 
-my $gated = OSPF::LSDB::gated-E<gt>L<new>(ssh => "user@host");
+my $gated = OSPF::LSDB::gated-E<gt>new(ssh => "user@host");
 
-$gated-E<gt>L<parse>(%todo);
+$gated-E<gt>parse(%todo);
 
 =head1 DESCRIPTION
 
-The B<OSPF::LSDB::gated> module parses the OSPF part of a B<gated>
-dump file and fills the B<OSPF::LSDB> base object.
+The OSPF::LSDB::gated module parses the OSPF part of a B<gated>
+dump file and fills the L<OSPF::LSDB> base object.
 An existing F<gated_dump> file can be given or it can be created
 dynammically.
 In the latter case B<sudo> is invoked if permissions are not
@@ -442,7 +442,7 @@ sub parse_ospf {
 
 =over 4
 
-=item $self-E<gt>L<parse>(%todo)
+=item $self-E<gt>parse(%todo)
 
 This function takes a hash describing how the OSPF LSDB can be
 obtained.

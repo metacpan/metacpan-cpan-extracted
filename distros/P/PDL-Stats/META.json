@@ -41,7 +41,7 @@
             "PDL::Slatec" : "0"
          },
          "requires" : {
-            "PDL" : "2.038"
+            "PDL" : "2.057"
          }
       },
       "test" : {
@@ -59,6 +59,6 @@
          "web" : "https://github.com/PDLPorters/PDL-Stats"
       }
    },
-   "version" : "0.78",
+   "version" : "0.79",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

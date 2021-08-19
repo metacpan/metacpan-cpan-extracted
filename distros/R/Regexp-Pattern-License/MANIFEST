@@ -16,6 +16,8 @@ lib/Regexp/Pattern/License.pm
 lib/Regexp/Pattern/License/Parts.pm
 t/01-basic.t
 t/02-regexp-pattern.t
+t/02-regexp-pattern_RE2.t
+t/02-regexp-pattern_RE2_missing.t
 t/02-structure.t
 t/03-match-normalized.t
 t/coverage-cc-deprecated.t

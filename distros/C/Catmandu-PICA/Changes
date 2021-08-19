@@ -1,5 +1,9 @@
 Changelog for Catmandu-PICA
 
+1.06 2021-08-17T10:28:19Z
+  - Fix broken SRU importer with PICA::Data >= 1.27
+  - Fix pica_add and pica_set by refactoring
+
 1.05  2021-06-24 12:21:35 CEST
   - Update PICA::Data dependency to fix failing test
   - Bump requirement to perl 5.14 at least

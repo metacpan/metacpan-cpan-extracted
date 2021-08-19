@@ -1,6 +1,10 @@
+use strict;
+use warnings;
+
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
+    ABSTRACT_FROM	=> 'lib/OSPF/LSDB.pm',
     AUTHOR		=> 'BLUHM <bluhm@cpan.org>',
     EXE_FILES		=> [qw(
 	script/ospf2dot
@@ -11,7 +15,7 @@ WriteMakefile(
 	script/ospfview
 	script/ospfview.cgi
     )],
-    LICENSE	=> 'bsd',
+    LICENSE		=> 'bsd',
     MAN1PODS		=> {
 	'doc/ospf2dot.pod'	=> 'blib/man1/ospf2dot.1',
 	'doc/ospfd2yaml.pod'	=> 'blib/man1/ospfd2yaml.1',
@@ -22,7 +26,7 @@ WriteMakefile(
 	'doc/ospfview.cgi.pod'	=> 'blib/man1/ospfview.cgi.1',
     },
     META_MERGE	=> {
-	"meta-spec"	=> { version => 2 },
+	'meta-spec'	=> { version => 2 },
 	resources => {
 	    homepage	=> 'https://sourceforge.net/projects/ospfview/',
 	    repository	=> {
@@ -41,11 +45,15 @@ WriteMakefile(
 	"List::MoreUtils"		=> 0,
 	"Regexp::Common"		=> 0,
 	"Regexp::IPv6"			=> 0,
-	"Test::NoWarnings"		=> 0,  # for test
-	"Test::Pod"			=> 0,  # for test
-	"Test::Strict"			=> 0,  # for test
 	"YAML::Syck"			=> 0,
     },
     SIGN		=> 1,
+    TEST_REQUIRES	=> {
+	"Test::EOL"			=> 0,
+	"Test::NoWarnings"		=> 0,
+	"Test::Pod"			=> 0,
+	"Test::Requires"		=> 0,
+	"Test::Strict"			=> 0,
+    },
     VERSION_FROM	=> 'lib/OSPF/LSDB.pm',
 );

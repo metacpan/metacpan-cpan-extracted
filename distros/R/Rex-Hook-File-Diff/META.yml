@@ -3,7 +3,7 @@ abstract: 'show diff of changes for files managed by Rex'
 author:
   - 'Ferenc Erki <erkiferenc@gmail.com>'
 build_requires:
-  File::Basename: '0'
+  English: '0'
   File::Temp: '0'
   File::Touch: '0.08'
   Rex::Commands::File: '1.012'
@@ -15,7 +15,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,23 +24,22 @@ name: Rex-Hook-File-Diff
 provides:
   Rex::Hook::File::Diff:
     file: lib/Rex/Hook/File/Diff.pm
-    version: v0.3.0
+    version: v0.4.0
 requires:
-  English: '0'
-  Rex: '1.012'
+  File::Basename: '0'
+  Rex: '1.013004'
   Rex::Helper::Run: '0'
   Rex::Hook: '0'
   Text::Diff: '1.44'
   perl: '5.014'
-  strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/ferki/Rex-Hook-File-Diff/issues
   homepage: http://metacpan.org/release/Rex-Hook-File-Diff/
   repository: git://github.com/ferki/Rex-Hook-File-Diff.git
-version: v0.3.0
+version: v0.4.0
 x_contributors:
   - 'Peter Jankovics <dr.jankovics.peter@gmail.com>'
-x_generated_by_perl: v5.32.0
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

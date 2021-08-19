@@ -1,6 +1,6 @@
 # Proc::ProcessTable
 
-[![Build Status](https://travis-ci.org/jwbargsten/perl-proc-processtable.svg?branch=master)](https://travis-ci.org/jwbargsten/perl-proc-processtable) [![Coverage Status](https://coveralls.io/repos/github/jwbargsten/perl-proc-processtable/badge.svg?branch=master)](https://coveralls.io/github/jwbargsten/perl-proc-processtable?branch=master)
+[![CircleCI](https://circleci.com/gh/jwbargsten/perl-proc-processtable/tree/master.svg?style=svg)](https://circleci.com/gh/jwbargsten/perl-proc-processtable/tree/master)
 
 Please use github or [rt.cpan.org](https://rt.cpan.org/Public/Dist/Display.html?Name=Proc-ProcessTable) to submit bugs and patches.
 

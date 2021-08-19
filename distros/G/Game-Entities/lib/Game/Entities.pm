@@ -12,7 +12,7 @@ use Sub::Util    ();
 
 use experimental 'signatures';
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 # The main entity registry, inspired by https://github.com/skypjack/entt
 
@@ -298,8 +298,6 @@ sub sort ( $self, $name, $comparator ) {
 
         my $j = 0;
         for my $i ( 0 .. $#{ $other->[DENSE] } ) {
-            last if $i > $#{ $dense };
-
             my $this = $dense->[$j]        // die "Undefined in set";
             my $that = $other->[DENSE][$i] // die 'Undefined in other';
 
@@ -313,8 +311,16 @@ sub sort ( $self, $name, $comparator ) {
     }
 
     # See https://skypjack.github.io/2019-09-25-ecs-baf-part-5/
-    my $caller = caller;
-    {
+    if ( ( prototype($comparator) // '' ) eq '$$' ) {
+        @$dense = sort {
+            $comparator->(
+                $comps->[ $sparse->[ $a ] ],
+                $comps->[ $sparse->[ $b ] ],
+            );
+        } @$dense;
+    }
+    else {
+        my $caller = caller;
         no strict 'refs';
         @$dense = sort {
             local ${ $caller . '::a' } = $comps->[ $sparse->[ $a ] ];

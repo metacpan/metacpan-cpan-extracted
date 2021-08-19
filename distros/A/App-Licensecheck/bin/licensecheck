@@ -40,11 +40,11 @@ licensecheck - simple license checker for source files
 
 =head1 VERSION
 
-Version v3.2.9
+Version v3.2.11
 
 =cut
 
-our $VERSION = version->declare('v3.2.9');
+our $VERSION = version->declare('v3.2.11');
 
 my $progname = path($0)->basename;
 
@@ -53,11 +53,11 @@ my @OPT = ();
 
 =head1 SYNOPSIS
 
-B<licensecheck> B<--help>|B<--version>
+    licensecheck [ --help | --version ]
 
-B<licensecheck> B<--list-licenses>|B<--list-naming-schemes>
+    licensecheck [ --list-licenses | --list-naming-schemes ]
 
-B<licensecheck> [B<options>...] I<F<PATH> [F<PATH>...]>
+    licensecheck [OPTION...] PATH [PATH...]
 
 =head1 DESCRIPTION
 
@@ -234,7 +234,7 @@ I<Since v3.0.18.>
 
 printf-string used between multiple plain list items
 in Debian copyright file
-S<(default value: I<'\n '> (NEWLINE SPACE))
+S<(default value: I<'\n '> (NEWLINE SPACE))>
 
 =item B<--rfc822-delimiter>=I<PRINTF>
 
@@ -242,7 +242,7 @@ I<Since v3.0.18.>
 
 printf-string used between multiple RFC822-style items
 in Debian copyright file
-S<(default value: I<'\n  '> (NEWLINE SPACE SPACE))
+S<(default value: I<'\n  '> (NEWLINE SPACE SPACE))>
 
 =item B<--copyright-delimiter>=I<PRINTF>
 
@@ -250,7 +250,7 @@ I<Since v3.0.19.>
 
 printf-string used between years and owners
 in Debian copyright file
-S<(default value: I<', '> (COMMA SPACE))
+S<(default value: I<', '> (COMMA SPACE))>
 
 =item B<--[no-]merge-licenses>
 

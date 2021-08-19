@@ -1,7 +1,7 @@
 package PICA::Parser::JSON;
 use v5.14.1;
 
-our $VERSION = '1.29';
+our $VERSION = '1.30';
 
 use JSON::PP;
 our $JSON = JSON::PP->new;
@@ -12,7 +12,10 @@ sub _next_record {
     my ($self) = @_;
 
     if (my $line = $self->{reader}->getline) {
-        return $JSON->decode($line);
+        my $record = $JSON->decode($line);
+        $record = $record->{record} if ref $record eq 'HASH';
+
+        return $record;
 
         # TODO: cleanup occurrence and annotation
     }
@@ -30,6 +33,8 @@ PICA::Parser::JSON - PICA JSON parser
 This parser parses L<PICA JSON|http://format.gbv.de/pica/json> format. The
 current implementation expects records to be on a line each (newline delimited
 JSON), this may be extended to full JSON in a later version.
+
+Records may also be given as object with field C<record>.
 
 See L<PICA::Parser::Base> for synopsis and basic configuration.
 

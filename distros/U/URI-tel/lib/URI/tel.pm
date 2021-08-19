@@ -1,102 +1,106 @@
 ##----------------------------------------------------------------------------
 ## URI::tel - ~/lib/URI/tel.pm
-## Version v0.800.1
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Version v0.801.1
+## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2016/02/12
-## Modified 2019/08/30
+## Modified 2021/08/18
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package URI::tel;
 BEGIN
 {
-	use strict;
-	use parent 'URI';
+    use strict;
+    use parent 'URI';
     our( $VERSION, $VERBOSE, $DEBUG, $ERROR );
     our( $RESERVED, $MARK, $UNRESERVED, $PCT_ENCODED, $URIC, $ALPHA, $DIGIT, $ALPHANUM, $HEXDIG );
-    our( $PARAM_UNRESERVED, $VISUAL_SEPARATOR, $PHONEDIGIT, $GLOBAL_NUMBER_DIGITS, $PARAMCHAR, $DOMAINLABEL, $TOPLABEL, $DOMAINNAME, $DESCRIPTOR, $PNAME, $PVALUE, $PARAMETER, $EXTENSION, $ISDN_SUBADDRESS, $CONTEXT, $PAR, $PHONEDIGIT_HEX, $GLOBAL_NUMBER, $LOCAL_NUMBER, $OTHER, $TEL_SUBSCRIBER, $TEL_URI );
+    our( $PARAM_UNRESERVED, $VISUAL_SEPARATOR, $PHONEDIGIT, $GLOBAL_NUMBER_DIGITS, $PARAMCHAR, $DOMAINLABEL, $TOPLABEL, $DOMAINNAME, $DESCRIPTOR, $PNAME, $PVALUE, $PARAMETER, $EXTENSION, $ISDN_SUBADDRESS, $CONTEXT, $PAR, $PHONEDIGIT_HEX, $GLOBAL_NUMBER, $LOCAL_NUMBER, $OTHER, $TEL_SUBSCRIBER, $TEL_URI, $VANITY, $VANITY_LOCAL );
     our( $COUNTRIES, $IDD_RE );
-    $VERSION     = 'v0.800.1';
-	use overload ('""'     => 'as_string',
-				  '=='     => sub { _obj_eq(@_) },
-				  '!='     => sub { !_obj_eq(@_) },
-				  fallback => 1,
-				 );
+    $VERSION     = 'v0.801.1';
+    use overload ('""'     => 'as_string',
+                  '=='     => sub { _obj_eq(@_) },
+                  '!='     => sub { !_obj_eq(@_) },
+                  fallback => 1,
+                 );
 };
 
 {
-	#$RESERVED   			= qr{[\[\;\/\?\:\@\&\=\+\$\,\[\]]+};
-	$RESERVED   			= q{[;/?:@&=+$,[]+};
-	$MARK       			= q{-_.!~*'()};                                    #'; emacs
-	$UNRESERVED 			= qq{A-Za-z0-9\Q$MARK\E};
-	## "%" HEXDIG HEXDIG
-	$PCT_ENCODED			= qr{\%[0-9A-Fa-f]{2}};
-	#$URIC       = quotemeta( $RESERVED ) . $UNRESERVED . "%";
-	$URIC					= qr{(?:[\Q$RESERVED\E]+|[$UNRESERVED]+|(?:$PCT_ENCODED)+)};
-# 	$ALPHA 	    			= qr{A-Za-z};
-# 	$DIGIT					= qr{\d};
-	$ALPHA 	    			= qr{A-Za-z};
-	$DIGIT					= qq{0-9};
-# 	$ALPHANUM   			= qr{A-Za-z\d};
-	$ALPHANUM   			= qq{A-Za-z0-9};
-# 	$HEXDIG	    			= qr{\dA-F};
-	$HEXDIG	    			= qr{\dA-F};
-# 	$PARAM_UNRESERVED 		= qr{[\[\]\/\:\&\+\$]+};
-	$PARAM_UNRESERVED 		= q{[]/:&+$};
-	$VISUAL_SEPARATOR 		= q(-.());
-	## DIGIT / [ visual-separator ]
-# 	$PHONEDIGIT		  		= qr{$DIGIT\Q$VISUAL_SEPARATOR\E};
-	$PHONEDIGIT		  		= qq{$DIGIT\Q$VISUAL_SEPARATOR\E};
-	## "+" *phonedigit DIGIT *phonedigit
-	$GLOBAL_NUMBER_DIGITS	= qr{\+[$PHONEDIGIT]*[$DIGIT]+[$PHONEDIGIT]*};
-	## param-unreserved / unreserved / pct-encoded
-	$PARAMCHAR				= qr{(?:[\Q$PARAM_UNRESERVED\E]+|[$UNRESERVED]+|(?:$PCT_ENCODED)+)};
-	## alphanum / alphanum *( alphanum / "-" ) alphanum
-	$DOMAINLABEL			= qr{(?:[$ALPHANUM]+|[$ALPHANUM]+(?:[$ALPHANUM\-]+)*[$ALPHANUM]+)};
-	## ALPHA / ALPHA *( alphanum / "-" ) alphanum
-	$TOPLABEL				= qr{(?:[$ALPHA]+|[$ALPHA]+[$ALPHANUM\-]*[$ALPHANUM]+)};
-	## *( domainlabel "." ) toplabel [ "." ]
-	$DOMAINNAME				= qr{(?:$DOMAINLABEL\.)*(?:$TOPLABEL\.?)+};
-	## domainname / global-number-digits
-	$DESCRIPTOR				= qr{(?:$DOMAINNAME|$GLOBAL_NUMBER_DIGITS)};
-	## 1*( alphanum / "-" )
-	$PNAME					= qr{[$ALPHANUM\-]+};
-	## 1*paramchar
-	$PVALUE					= qr{(?:$PARAMCHAR)};
-	## ";" pname ["=" pvalue ]
-	$PARAMETER				= qr{\;$PNAME=$PVALUE};
-	## ";ext=" 1*phonedigit
-	##$EXTENSION				= qr{\;ext=[$PHONEDIGIT]+}msxi;
-	## Tweaking the rfc regular expression to add often used extension format
-	## See: https://discussions.apple.com/thread/1635858?start=0&tstart=0
-	## or
-	## http://stackoverflow.com/questions/2403767/string-format-phone-numbers-with-extension
-	$EXTENSION				= qr{(?:[\;\,]?ext[\=\.]?|x)[$PHONEDIGIT]+}msxi;
-	## ";isub=" 1*uric
-	$ISDN_SUBADDRESS		= qr{\;isub=$URIC}msxi;
-	## ";phone-context=" descriptor
-	$CONTEXT				= qr{\;phone-context=$DESCRIPTOR}msxi;
-	## parameter / extension / isdn-subaddress
-	$PAR					= qr{(?:(?:($PARAMETER)|($EXTENSION)|($ISDN_SUBADDRESS)))+};
-	## HEXDIG / "*" / "#" / [ visual-separator ]
-	$PHONEDIGIT_HEX			= qr{[$HEXDIG\*\#$VISUAL_SEPARATOR]+};
-	## *phonedigit-hex (HEXDIG / "*" / "#")*phonedigit-hex
-	$LOCAL_NUMBER_DIGITS	= qr{(?:$PHONEDIGIT_HEX)?[$HEXDIG\*\#]+(?:$PHONEDIGIT_HEX)?};
-	## global-number-digits *par => "+" *phonedigit DIGIT *phonedigit
-	$GLOBAL_NUMBER	  = qr{($GLOBAL_NUMBER_DIGITS)($PAR)*};
-	## local-number-digits *par context *par
-	$LOCAL_NUMBER	  = qr{($LOCAL_NUMBER_DIGITS)($PAR)*($CONTEXT)($PAR)*};
-	## This is a non-rfc standard requirement, but a necessity to catch local number with no context
-	## such as 03-1234-5678 plain and simple
-	$OTHER					= qr{(\+?[$PHONEDIGIT]*[$DIGIT]+[$PHONEDIGIT]*)($PAR)*};
-	## Like +1-800-LAWYR-UP => +1-800-52997-87
-	$VANITY					= qr{(\+?[$PHONEDIGIT]*[A-Z0-9\Q$VISUAL_SEPARATOR\E]+[$PHONEDIGIT]*)};
-	$TEL_SUBSCRIBER	  		= qr{(?:$VANITY|$GLOBAL_NUMBER|$LOCAL_NUMBER|$OTHER)}xs;
-	##$TEL_SUBSCRIBER	  = qr{(?:$GLOBAL_NUMBER)};
-	$TEL_URI		  		= qr{(?:tel\:)?$TEL_SUBSCRIBER};
-	# https://tools.ietf.org/search/rfc3966#section-3
-	
-	$COUNTRIES = {};
+    #$RESERVED              = qr{[\[\;\/\?\:\@\&\=\+\$\,\[\]]+};
+    $RESERVED               = q{[;/?:@&=+$,[]+};
+    $MARK                   = q{-_.!~*'()};                                    #'; emacs
+    $UNRESERVED             = qq{A-Za-z0-9\Q$MARK\E};
+    ## "%" HEXDIG HEXDIG
+    $PCT_ENCODED            = qr{\%[0-9A-Fa-f]{2}};
+    #$URIC       = quotemeta( $RESERVED ) . $UNRESERVED . "%";
+    $URIC                   = qr{(?:[\Q$RESERVED\E]+|[$UNRESERVED]+|(?:$PCT_ENCODED)+)};
+#   $ALPHA                  = qr{A-Za-z};
+#   $DIGIT                  = qr{\d};
+    $ALPHA                  = qr{A-Za-z};
+    $DIGIT                  = qq{0-9};
+#   $ALPHANUM               = qr{A-Za-z\d};
+    $ALPHANUM               = qq{A-Za-z0-9};
+#   $HEXDIG                 = qr{\dA-F};
+    $HEXDIG                 = qr{\dA-F};
+#   $PARAM_UNRESERVED       = qr{[\[\]\/\:\&\+\$]+};
+    $PARAM_UNRESERVED       = q{[]/:&+$};
+    $VISUAL_SEPARATOR       = q(-.());
+    ## DIGIT / [ visual-separator ]
+#   $PHONEDIGIT             = qr{$DIGIT\Q$VISUAL_SEPARATOR\E};
+    $PHONEDIGIT             = qq{$DIGIT\Q$VISUAL_SEPARATOR\E};
+    ## "+" *phonedigit DIGIT *phonedigit
+    $GLOBAL_NUMBER_DIGITS   = qr{\+[$PHONEDIGIT]*[$DIGIT]+[$PHONEDIGIT]*};
+    ## param-unreserved / unreserved / pct-encoded
+    $PARAMCHAR              = qr{(?:[\Q$PARAM_UNRESERVED\E]+|[$UNRESERVED]+|(?:$PCT_ENCODED)+)};
+    ## alphanum / alphanum *( alphanum / "-" ) alphanum
+    $DOMAINLABEL            = qr{(?:[$ALPHANUM]+|[$ALPHANUM]+(?:[$ALPHANUM\-]+)*[$ALPHANUM]+)};
+    ## ALPHA / ALPHA *( alphanum / "-" ) alphanum
+    $TOPLABEL               = qr{(?:[$ALPHA]+|[$ALPHA]+[$ALPHANUM\-]*[$ALPHANUM]+)};
+    ## *( domainlabel "." ) toplabel [ "." ]
+    $DOMAINNAME             = qr{(?:$DOMAINLABEL\.)*(?:$TOPLABEL\.?)+};
+    ## domainname / global-number-digits
+    $DESCRIPTOR             = qr{(?:$DOMAINNAME|$GLOBAL_NUMBER_DIGITS)};
+    ## 1*( alphanum / "-" )
+    $PNAME                  = qr{[$ALPHANUM\-]+};
+    ## 1*paramchar
+    $PVALUE                 = qr{(?:$PARAMCHAR)};
+    ## ";" pname ["=" pvalue ]
+    $PARAMETER              = qr{\;$PNAME=$PVALUE};
+    ## ";ext=" 1*phonedigit
+    ##$EXTENSION                = qr{\;ext=[$PHONEDIGIT]+}msxi;
+    ## Tweaking the rfc regular expression to add often used extension format
+    ## See: https://discussions.apple.com/thread/1635858?start=0&tstart=0
+    ## or
+    ## http://stackoverflow.com/questions/2403767/string-format-phone-numbers-with-extension
+    $EXTENSION              = qr{(?:[\;\,]?ext[\=\.]?|x)[$PHONEDIGIT]+}msxi;
+    ## ";isub=" 1*uric
+    $ISDN_SUBADDRESS        = qr{\;isub=$URIC}msxi;
+    ## ";phone-context=" descriptor
+    $CONTEXT                = qr{\;phone-context=$DESCRIPTOR}msxi;
+    ## parameter / extension / isdn-subaddress
+    $PAR                    = qr{(?:(?:($PARAMETER)|($EXTENSION)|($ISDN_SUBADDRESS)))+};
+    ## HEXDIG / "*" / "#" / [ visual-separator ]
+    $PHONEDIGIT_HEX         = qr{[$HEXDIG\*\#$VISUAL_SEPARATOR]+};
+    ## *phonedigit-hex (HEXDIG / "*" / "#")*phonedigit-hex
+    $LOCAL_NUMBER_DIGITS    = qr{(?:$PHONEDIGIT_HEX)?[$HEXDIG\*\#]+(?:$PHONEDIGIT_HEX)?};
+    ## global-number-digits *par => "+" *phonedigit DIGIT *phonedigit
+    $GLOBAL_NUMBER          = qr{($GLOBAL_NUMBER_DIGITS)($PAR)*};
+    ## local-number-digits *par context *par
+    $LOCAL_NUMBER           = qr{($LOCAL_NUMBER_DIGITS)($PAR)*($CONTEXT)($PAR)*};
+    ## This is a non-rfc standard requirement, but a necessity to catch local number with no context
+    ## such as 03-1234-5678 plain and simple
+    $OTHER                  = qr{(\+?[$PHONEDIGIT]*[$DIGIT]+[$PHONEDIGIT]*)($PAR)*};
+    ## Like +1-800-LAWYR-UP => +1-800-52997-87
+    $VANITY_LOCAL           = qr{[A-Z0-9\Q$VISUAL_SEPARATOR\E]+[$PHONEDIGIT]*};
+    $VANITY                 = qr{(\+?[$PHONEDIGIT]*$VANITY_LOCAL)};
+    $TEL_SUBSCRIBER         = qr{(?:$VANITY|$GLOBAL_NUMBER|$LOCAL_NUMBER|$OTHER)}xs;
+    ##$TEL_SUBSCRIBER     = qr{(?:$GLOBAL_NUMBER)};
+    $TEL_URI                = qr{(?:tel\:)?$TEL_SUBSCRIBER};
+    # https://tools.ietf.org/search/rfc3966#section-3
+    
+    $COUNTRIES = {};
 }
 
 sub _init
@@ -107,284 +111,292 @@ sub _init
     $str = $class->_uric_escape( $str );
     $str = "$scheme:$str" unless $str =~ /^[a-zA-Z][a-zA-Z0-9.+\-]*:/o ||
                                  $class->_no_scheme_ok;
-    #my $self = bless \$str, $class;
-    #$self;
     return( $class->new( $str ) );
 }
 
 sub new
 {
-	my $this = shift( @_ );
-	my $str  = shift( @_ );
-	my $class = ref( $this ) || $this;
-	my $orig  = $str;
-	$str      =~ s/[[:blank:]]+//gs;
-	my $temp  = {};
-	my @matches = ();
-	my @names = ();
-	if( @matches = $str =~ /^((?:tel\:)?$GLOBAL_NUMBER)$/ )
-	{
-		@names = qw( all subscriber params last_param );
-		$temp->{ 'type' } = 'global';
-	}
-	elsif( @matches = $str =~ /^((?:tel\:)?$LOCAL_NUMBER)$/ )
-	{
-		$temp->{ 'type' } = 'local';
-		@names = qw( all subscriber params1 last_param1 ignore5 ignore6 context params2 last_param2 ignore10 ignore11 );
-		$temp->{ '_has_context_param' } = 1 if( length( $matches[6] ) );
-		$temp->{ 'local_number' } = $str;
-		$temp->{ 'local_number' } =~ s/^tel\://;
-	}
-	## e.g. 911, 110 or just ordinary local phones like 03-1234-5678
-	elsif( @matches = $str =~ /^((?:tel\:)?$OTHER)$/ )
-	{
-		$temp->{ 'type' } = 'other';
-		@names = qw( all subscriber params ignore4 last_param );
-	}
-	## e.g. +1-800-LAWYR-UP
-	elsif( @matches = $str =~ /^((?:tel\:)?$VANITY)$/ )
-	{
-		$temp->{ 'type' } = 'vanity';
-		@names = qw( all subscriber );
-	}
-	else
-	{
-		$ERROR = "Unknown telephone number '$str'.";
-		warn( $ERROR );
-	}
-	
-	## The component name for each match
-	@$temp{ @names } = @matches;
-	
-	$temp->{ 'params' } = $temp->{ 'params1' } ? $temp->{ 'params1' } : $temp->{ 'params2' } if( !length( $temp->{ 'params' } ) );
-	$temp->{ 'context' } =~ s/;[^=]+=(.*?)$/$1/gs;
-	
-	if( $str =~ /^(?:tel\:)?\+/ )
-	{
-		$temp->{ 'intl_code' } = $this->_extract_intl_code( $str );
-	}
-	elsif( $temp->{ 'context' } && 
-		$temp->{ 'context' } !~ /^[a-zA-Z]/ &&
-		substr( $temp->{ 'context' }, 0, 1 ) eq '+' )
-	{
-		$temp->{ 'intl_code' } = $this->_extract_intl_code( $temp->{ 'context' } );
-		## We flag it as extracted from context, because we do not want to prepend the subscriber number with it.
-		## It's just too dangerous as we cannot tell the subscriber number is actually a proper number that can be dialed from outside e.g. 911 or 110 are emergency number who may heva a context with international code
-		## However, if the international code was provided by the user then that's his responsibility
-		## If the user wants to just provide some context, then better to use context() instead.
-		## Knowing the international code helps getting some other useful information, but it should not necessarily affect the format of the number
-		$temp->{ '_intl_code_from_context' } = 1;
-	}
-	$temp->{ 'context' } = '+' . $temp->{ 'intl_code' } if( !length( $temp->{ 'context' } ) && length( $temp->{ 'intl_code' } ) );
-	
-	if( $temp->{ 'type' } eq 'global' && $temp->{ 'intl_code' } )
-	{
-		$temp->{ 'local_number' } = $this->_extract_local_number( $temp->{ 'intl_code' }, $temp->{ 'subscriber' } );
-	}
-	
-	my $hash  = {
-	'original'		=> ( $orig ne $str ) ? $orig : $temp->{ 'all' },
-	'is_global'		=> $temp->{ 'type' } eq 'global' ? 1 : 0,
-	'is_local'		=> ( $temp->{ 'type' } eq 'local' or $temp->{ 'type' } eq 'other' ) ? 1 : 0,
-	'is_other'		=> $temp->{ 'type' } eq 'other' ? 1 : 0,
-	'is_vanity'		=> $temp->{ 'type' } eq 'vanity' ? 1 : 0,
-	'subscriber'	=> $temp->{ 'subscriber' },
-	'params'		=> $temp->{ 'params' },
-	'last_param'	=> $temp->{ 'last_param' } ? $temp->{ 'last_param' } : $temp->{ 'last_param1' } ? $temp->{ 'last_param1' } : $temp->{ 'last_param2' },
-	'context'		=> $temp->{ 'context' },
-	'intl_code'		=> $temp->{ 'intl_code' },
-	'_intl_code_from_context' => $temp->{ '_intl_code_from_context' },
-	'local_number'	=> $temp->{ 'local_number' },
-	};
-	my $self  = bless( $hash, $class );
-	my $prams = [];
-	if( length( $temp->{ 'params' } ) )
-	{
-		my $pram_str = $temp->{ 'params' };
-		$pram_str    =~ s/^[\.\,\#\;]//;
-		$prams    = [ $self->split_str( $pram_str ) ];
-	}
-	## Private parameters
-	my $priv  = {};
-	foreach my $this ( @$prams )
-	{
-		$this =~ s/^(x|ext)\.?(\d+)$/ext=$2/i;
-		my( $p, $v ) = split( /=/, $this, 2 );
-		$p =~ s/\-/\_/gs;
-		if( lc( $p ) =~ /^(ext|isdn_subaddress)$/ )
-		{
-			$hash->{ lc( $p ) } = $v;
-		}
-		elsif( lc( $p ) eq 'phone_context' )
-		{
-			$hash->{ 'context' } = $v;
-			$temp->{ '_has_context_param' } = 1;
-		}
-		else
-		{
-			$priv->{ lc( $p ) } = $v;
-		}
-	}
-	$self->{ 'private' } = $priv;
-	$self->{ 'ext' } = $temp->{ 'ext' } if( !length( $hash->{ 'ext' } ) && !$self->{ 'is_vanity' } );
-	$self->{ 'ext' } =~ s/\D//gs;
-	## Because a context may be +81 or it could be a domain name example.com
-	## if we had it as a parameter at instantiation, we remember it and honour it when we stringify
-	$self->{ '_prepend_context' } = $temp->{ '_has_context_param' } ? 0 : 1;
-	return( $self );
+    my $this = shift( @_ );
+    my $str  = shift( @_ );
+    my $class = ref( $this ) || $this;
+    my $orig  = $str;
+    $str      =~ s/[[:blank:]]+//gs;
+    my $temp  = {};
+    my @matches = ();
+    my @names = ();
+    if( @matches = $str =~ /^((?:tel\:)?$GLOBAL_NUMBER)$/ )
+    {
+        @names = qw( all subscriber params last_param );
+        $temp->{type} = 'global';
+    }
+    elsif( @matches = $str =~ /^((?:tel\:)?$LOCAL_NUMBER)$/ )
+    {
+        $temp->{type} = 'local';
+        @names = qw( all subscriber params1 last_param1 ignore5 ignore6 context params2 last_param2 ignore10 ignore11 );
+        $temp->{_has_context_param} = 1 if( length( $matches[6] ) );
+        $temp->{local_number} = $str;
+        $temp->{local_number} =~ s/^tel\://;
+    }
+    ## e.g. 911, 110 or just ordinary local phones like 03-1234-5678
+    elsif( @matches = $str =~ /^((?:tel\:)?$OTHER)$/ )
+    {
+        $temp->{type} = 'other';
+        @names = qw( all subscriber params ignore4 last_param );
+        $temp->{local_number} = $matches[1];
+    }
+    ## e.g. +1-800-LAWYR-UP
+    elsif( @matches = $str =~ /^((?:tel\:)?$VANITY)$/ )
+    {
+        $temp->{type} = 'vanity';
+        @names = qw( all subscriber );
+        my $prefix = $this->_extract_intl_code( $matches[0] );
+        if( $prefix )
+        {
+            $temp->{local_number} = $this->_extract_local_number( "\+$prefix", $matches[1] );
+        }
+        else
+        {
+            $temp->{local_number} = $matches[1];
+        }
+    }
+    else
+    {
+        $ERROR = "Unknown telephone number '$str'.";
+        warn( $ERROR );
+    }
+    
+    ## The component name for each match
+    @$temp{ @names } = @matches;
+    
+    $temp->{params} = $temp->{params1} ? $temp->{params1} : $temp->{params2} if( !length( $temp->{params} ) );
+    $temp->{context} =~ s/;[^=]+=(.*?)$/$1/gs;
+    
+    if( $str =~ /^(?:tel\:)?\+/ )
+    {
+        $temp->{intl_code} = $this->_extract_intl_code( $str );
+    }
+    elsif( $temp->{context} && 
+        $temp->{context} !~ /^[a-zA-Z]/ &&
+        substr( $temp->{context}, 0, 1 ) eq '+' )
+    {
+        $temp->{intl_code} = $this->_extract_intl_code( $temp->{context} );
+        ## We flag it as extracted from context, because we do not want to prepend the subscriber number with it.
+        ## It's just too dangerous as we cannot tell the subscriber number is actually a proper number that can be dialed from outside e.g. 911 or 110 are emergency number who may heva a context with international code
+        ## However, if the international code was provided by the user then that's his responsibility
+        ## If the user wants to just provide some context, then better to use context() instead.
+        ## Knowing the international code helps getting some other useful information, but it should not necessarily affect the format of the number
+        $temp->{_intl_code_from_context} = 1;
+    }
+    $temp->{context} = '+' . $temp->{intl_code} if( !length( $temp->{context} ) && length( $temp->{intl_code} ) );
+    
+    if( $temp->{type} eq 'global' && $temp->{intl_code} )
+    {
+        $temp->{local_number} = $this->_extract_local_number( $temp->{intl_code}, $temp->{subscriber} );
+    }
+    
+    my $hash  = {
+    'original'      => ( $orig ne $str ) ? $orig : $temp->{all},
+    'is_global'     => $temp->{type} eq 'global' ? 1 : 0,
+    'is_local'      => ( $temp->{type} eq 'local' or $temp->{type} eq 'other' ) ? 1 : 0,
+    'is_other'      => $temp->{type} eq 'other' ? 1 : 0,
+    'is_vanity'     => $temp->{type} eq 'vanity' ? 1 : 0,
+    'subscriber'    => $temp->{subscriber},
+    'params'        => $temp->{params},
+    'last_param'    => $temp->{last_param} ? $temp->{last_param} : $temp->{last_param1} ? $temp->{last_param1} : $temp->{last_param2},
+    'context'       => $temp->{context},
+    'intl_code'     => $temp->{intl_code},
+    '_intl_code_from_context' => $temp->{_intl_code_from_context},
+    'local_number'  => $temp->{local_number},
+    };
+    my $self  = bless( $hash, $class );
+    my $prams = [];
+    if( length( $temp->{params} ) )
+    {
+        my $pram_str = $temp->{params};
+        $pram_str    =~ s/^[\.\,\#\;]//;
+        $prams    = [ $self->split_str( $pram_str ) ];
+    }
+    ## Private parameters
+    my $priv  = {};
+    foreach my $this ( @$prams )
+    {
+        $this =~ s/^(x|ext)\.?(\d+)$/ext=$2/i;
+        my( $p, $v ) = split( /=/, $this, 2 );
+        $p =~ s/\-/\_/gs;
+        if( lc( $p ) =~ /^(ext|isdn_subaddress)$/ )
+        {
+            $hash->{ lc( $p ) } = $v;
+        }
+        elsif( lc( $p ) eq 'phone_context' )
+        {
+            $hash->{context} = $v;
+            $temp->{_has_context_param} = 1;
+        }
+        else
+        {
+            $priv->{ lc( $p ) } = $v;
+        }
+    }
+    $self->{private} = $priv;
+    $self->{ext} = $temp->{ext} if( !length( $hash->{ext} ) && !$self->{is_vanity} );
+    $self->{ext} =~ s/\D//gs;
+    ## Because a context may be +81 or it could be a domain name example.com
+    ## if we had it as a parameter at instantiation, we remember it and honour it when we stringify
+    $self->{_prepend_context} = $temp->{_has_context_param} ? 0 : 1;
+    return( $self );
 }
 
 sub as_string
 {
-	my $self = shift( @_ );
-	return( $self->{ 'cache' } ) if( length( $self->{ 'cache' } ) );
-	my @uri = ( 'tel:' . $self->{ 'subscriber' } ) if( length( $self->{ 'subscriber' } ) );
-	my @params = ();
-	push( @params, sprintf( "ext=%s", $self->{ 'ext' } ) ) if( length( $self->{ 'ext' } ) );
-	push( @params, sprintf( "isub=%s", $self->{ 'isdn_subaddress' } ) ) if( length( $self->{ 'isdn_subaddress' } ) );
-	if( length( $self->{ 'context' } ) )
-	{
-		if( !$self->{ '_prepend_context' } )
-		{
-			push( @params, sprintf( "phone-context=%s", $self->{ 'context' } ) );
-		}
-		## Context is not some domain name
-		elsif( $self->{ 'subscriber' } !~ /^\+\d+/ && $self->{ 'context' } !~ /[a-zA-Z]+/ )
-		{
-			@uri = ( 'tel:' . $self->{ 'context' } . '-' . $self->{ 'subscriber' } );
-		}
-	}
-	if( length( $self->{ 'intl_code' } ) && !$self->{ '_intl_code_from_context' } )
-	{
-		if( $self->{ 'subscriber' } !~ /^\+\d+/ && $uri[0] !~ /^tel\:\+/ )
-		{
-			@uri = ( 'tel:' . '+' . $self->{ 'intl_code' } . '-' . $self->{ 'subscriber' } );
-		}
-	}
-	my $priv = $self->{ 'private' };
-	foreach my $k ( sort( keys( %$priv ) ) )
-	{
-		push( @params, sprintf( "$k=%s", $priv->{ $k } ) ) if( length( $priv->{ $k } ) );
-	}
-	push( @uri, join( ';', @params ) ) if( scalar( @params ) );
-	$self->{ 'cache' } = join( ';', @uri );
-	return( $self->{ 'cache' } );
+    my $self = shift( @_ );
+    return( $self->{cache} ) if( length( $self->{cache} ) );
+    my @uri = ( 'tel:' . $self->{subscriber} ) if( length( $self->{subscriber} ) );
+    my @params = ();
+    push( @params, sprintf( "ext=%s", $self->{ext} ) ) if( length( $self->{ext} ) );
+    push( @params, sprintf( "isub=%s", $self->{isdn_subaddress} ) ) if( length( $self->{isdn_subaddress} ) );
+    if( length( $self->{context} ) )
+    {
+        if( !$self->{_prepend_context} )
+        {
+            push( @params, sprintf( "phone-context=%s", $self->{context} ) );
+        }
+        ## Context is not some domain name
+        elsif( $self->{subscriber} !~ /^\+\d+/ && $self->{context} !~ /[a-zA-Z]+/ )
+        {
+            @uri = ( 'tel:' . $self->{context} . '-' . $self->{subscriber} );
+        }
+    }
+    if( length( $self->{intl_code} ) && !$self->{_intl_code_from_context} )
+    {
+        if( $self->{subscriber} !~ /^\+\d+/ && $uri[0] !~ /^tel\:\+/ )
+        {
+            @uri = ( 'tel:' . '+' . $self->{intl_code} . '-' . $self->{subscriber} );
+        }
+    }
+    my $priv = $self->{private};
+    foreach my $k ( sort( keys( %$priv ) ) )
+    {
+        push( @params, sprintf( "$k=%s", $priv->{ $k } ) ) if( length( $priv->{ $k } ) );
+    }
+    push( @uri, join( ';', @params ) ) if( scalar( @params ) );
+    $self->{cache} = join( ';', @uri );
+    return( $self->{cache} );
 }
 
-*letters2digits = \&aton;
+sub letters2digits { return( shift->aton( @_ ) ); }
 
 sub aton
 {
-	my $self = shift( @_ );
-	my $str  = shift( @_ ) || $self->{ 'subscriber' };
-	my $letters = 'abcdefghijklmnopqrstuvwxyz';
-	my $digits  = '22233344455566677778889999';
-	return( $str ) if( $str !~ /[a-zA-Z]+/ || !$self->is_vanity );
-	$str = lc( $str );
-	my $res = '';
-	for( my $i = 0; $i < length( $str ); $i++ )
-	{
-		my $c = substr( $str, $i, 1 );
-		my $p = index( $letters, $c );
-		$res .= $p != -1 ? substr( $digits, $p, 1 ) : $c;
-	}
-	return( $res );
+    my $self = shift( @_ );
+    my $str  = shift( @_ ) || $self->{subscriber};
+    my $letters = 'abcdefghijklmnopqrstuvwxyz';
+    my $digits  = '22233344455566677778889999';
+    return( $str ) if( $str !~ /[a-zA-Z]+/ || !$self->is_vanity );
+    $str = lc( $str );
+    my $res = '';
+    for( my $i = 0; $i < length( $str ); $i++ )
+    {
+        my $c = substr( $str, $i, 1 );
+        my $p = index( $letters, $c );
+        $res .= $p != -1 ? substr( $digits, $p, 1 ) : $c;
+    }
+    return( $res );
 }
 
 sub canonical
 {
-	my $self = shift( @_ );
-	my $tel  = $self->aton;
-	$tel     =~ s/[\Q$VISUAL_SEPARATOR\E]+//gs;
-	my $uri  = $self->new( "tel:$tel" );
-	$uri->ext( $self->{ 'ext' } ) if( length( $self->{ 'ext' } ) );
-	$uri->isub( $self->{ 'isdn_subaddress' } ) if( length( $self->{ 'isdn_subaddress' } ) );
-	$uri->context( $self->{ 'context' } ) if( length( $self->{ 'context' } ) );
-	$uri->international_code( $self->{ 'intl_code' } ) if( length( $self->{ 'intl_code' } ) );
-	$uri->{ '_has_context_param' } = $self->{ '_has_context_param' };
-	$uri->{ '_prepend_context' } = $self->{ '_prepend_context' };
-	$uri->{ '_intl_code_from_context' } = $self->{ '_intl_code_from_context' };
-	$uri->{ 'local_number' } = $self->{ 'local_number' };
-	my $priv = $self->{ 'private' };
-	%{$uri->{ 'private' }} = %$priv;
-	return( $uri );
+    my $self = shift( @_ );
+    my $tel  = $self->aton;
+    $tel     =~ s/[\Q$VISUAL_SEPARATOR\E]+//gs;
+    my $uri  = $self->new( "tel:$tel" );
+    $uri->ext( $self->{ext} ) if( length( $self->{ext} ) );
+    $uri->isub( $self->{isdn_subaddress} ) if( length( $self->{isdn_subaddress} ) );
+    $uri->context( $self->{context} ) if( length( $self->{context} ) );
+    $uri->international_code( $self->{intl_code} ) if( length( $self->{intl_code} ) );
+    $uri->{_has_context_param} = $self->{_has_context_param};
+    $uri->{_prepend_context} = $self->{_prepend_context};
+    $uri->{_intl_code_from_context} = $self->{_intl_code_from_context};
+    $uri->{local_number} = $self->{local_number};
+    my $priv = $self->{private};
+    %{$uri->{private}} = %$priv;
+    return( $uri );
 }
 
 sub cc2context
 {
-	my $self = shift( @_ );
-	my $cc   = uc( shift( @_ ) );
-	return( $self->error( "No country code provided." ) ) if( !length( $cc ) );
-	$self->_load_countries;
-	my $hash = $COUNTRIES;
-	foreach my $k ( sort( keys( %$hash ) ) )
-	{
-		## array ref
-		my $ref = $hash->{ $k };
-		foreach my $this ( @$ref )
-		{
-			if( $this->{ 'cc' } eq $cc )
-			{
-				return( '+' . $k );
-			}
-		}
-	}
-	## Nothing found
-	return( '' );
+    my $self = shift( @_ );
+    my $cc   = uc( shift( @_ ) );
+    return( $self->error( "No country code provided." ) ) if( !length( $cc ) );
+    $self->_load_countries;
+    my $hash = $COUNTRIES;
+    foreach my $k ( sort( keys( %$hash ) ) )
+    {
+        ## array ref
+        my $ref = $hash->{ $k };
+        foreach my $this ( @$ref )
+        {
+            if( $this->{cc} eq $cc )
+            {
+                return( '+' . $k );
+            }
+        }
+    }
+    ## Nothing found
+    return( '' );
 }
 
 sub clone
 {
-	my $self  = shift( @_ );
-	my $class = ref( $self );
-	my $hash  = {};
-	my @keys  = keys( %$self );
-	@$hash{ @keys } = @$self{ @keys };
-	delete( $hash->{ 'cache' } );
-	return( bless( $hash, $class ) );
+    my $self  = shift( @_ );
+    my $class = ref( $self );
+    my $hash  = {};
+    my @keys  = keys( %$self );
+    @$hash{ @keys } = @$self{ @keys };
+    delete( $hash->{cache} );
+    return( bless( $hash, $class ) );
 }
 
 sub context
 {
-	my $self = shift( @_ );
-	if( @_ )
-	{
-		my $str  = shift( @_ );
-		if( $str !~ /^$DESCRIPTOR$/ )
-		{
-			warn( "'$str' is not a valid context\n" );
-			return( undef() );
-		}
-		delete( $self->{ 'cache' } );
-		$self->{ '_has_context_param' } = 1;
-		$self->{ '_prepend_context' } = 0;
-		$self->{ 'context' } = $str;
-		## We found an international country code in the prefix provided, so let's set it
-		if( !length( $self->{ 'intl_code' } ) && ( my $code = $self->_extract_intl_code( $str ) ) )
-		{
-			$self->{ '_intl_code_from_context' } = 1;
-			$self->{ 'intl_code' } = $code;
-		}
-	}
-	return( $self->{ 'context' } );
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        my $str  = shift( @_ );
+        if( $str !~ /^$DESCRIPTOR$/ )
+        {
+            warn( "'$str' is not a valid context\n" );
+            return( undef() );
+        }
+        delete( $self->{cache} );
+        $self->{_has_context_param} = 1;
+        $self->{_prepend_context} = 0;
+        $self->{context} = $str;
+        ## We found an international country code in the prefix provided, so let's set it
+        if( !length( $self->{intl_code} ) && ( my $code = $self->_extract_intl_code( $str ) ) )
+        {
+            $self->{_intl_code_from_context} = 1;
+            $self->{intl_code} = $code;
+        }
+    }
+    return( $self->{context} );
 }
 
 sub country
 {
-	my $self = shift( @_ );
-	no overloading;
-	$self->_load_countries;
-	my $hash = $COUNTRIES;
-	my $code = $self->international_code;
-	return( wantarray() ? () : [] ) if( !length( $code ) );
-	$code =~ s/[\Q$VISUAL_SEPARATOR\E]+//g;
-	if( $code =~ /^\+($IDD_RE)/ )
-	{
-		$code = $1;
-	}
-	return( wantarray() ? () : [] ) if( !exists( $hash->{ $code } ) );
-	my $ref = $hash->{ $code };
-	return( wantarray() ? @$ref : \@$ref );
+    my $self = shift( @_ );
+    no overloading;
+    $self->_load_countries;
+    my $hash = $COUNTRIES;
+    my $code = $self->international_code;
+    return( wantarray() ? () : [] ) if( !length( $code ) );
+    $code =~ s/[\Q$VISUAL_SEPARATOR\E]+//g;
+    if( $code =~ /^\+($IDD_RE)/ )
+    {
+        $code = $1;
+    }
+    return( wantarray() ? () : [] ) if( !exists( $hash->{ $code } ) );
+    my $ref = $hash->{ $code };
+    return( wantarray() ? @$ref : \@$ref );
 }
 
 sub country_code
@@ -438,226 +450,268 @@ sub error
         }
         my( $pack, $file, $line ) = caller( $frame );
         $err =~ s/\n$//gs;
-        $self->{ 'error' } = ${ $class . '::ERROR' } = $err;
+        $self->{error} = ${ $class . '::ERROR' } = $err;
         return( undef() );
     }
-    return( $self->{ 'error' } || $ERROR );
+    return( $self->{error} || $ERROR );
 }
 
-*extension = \&ext;
+sub extension { return( shift->ext( @_ ) ); }
 
 sub ext
 {
-	my $self = shift( @_ );
-	if( @_ )
-	{
-		my $val = shift( @_ );
-		if( length( $val ) && $val !~ /^[$PHONEDIGIT]+$/ )
-		{
-			warn( "'$val' is not a valid extension ([$PHONEDIGIT]+)\n" );
-			return( undef() );
-		}
-		delete( $self->{ 'cache' } );
-		$self->{ 'ext' } = $val;
-	}
-	return( $self->{ 'ext' } );
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        my $val = shift( @_ );
+        if( length( $val ) && $val !~ /^[$PHONEDIGIT]+$/ )
+        {
+            warn( "'$val' is not a valid extension ([$PHONEDIGIT]+)\n" );
+            return( undef() );
+        }
+        delete( $self->{cache} );
+        $self->{ext} = $val;
+    }
+    return( $self->{ext} );
 }
 
 sub international_code
 {
-	my $self = shift( @_ );
-	if( @_ )
-	{
-		my $val = shift( @_ );
-		if( length( $val ) && $val !~ /^[$PHONEDIGIT]+$/ )
-		{
-			warn( "'$val' is not a valid international code.\n" );
-			return( undef() );
-		}
-		delete( $self->{ 'cache' } );
-		## The international code was provided by the user as opposed to using the context() method,
-		## so we flag it properly so it can be used in stringification of the phone number
-		$self->{ '_intl_code_from_context' } = 0;
-		$self->{ 'is_global' } = 1;
-		$self->{ 'intl_code' } = $val;
-	}
-	return( $self->{ 'intl_code' } );
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        my $val = shift( @_ );
+        if( length( $val ) && $val !~ /^[$PHONEDIGIT]+$/ )
+        {
+            warn( "'$val' is not a valid international code.\n" );
+            return;
+        }
+        delete( $self->{cache} );
+        ## The international code was provided by the user as opposed to using the context() method,
+        ## so we flag it properly so it can be used in stringification of the phone number
+        $self->{_intl_code_from_context} = 0;
+        $self->{is_global} = 1;
+        $self->{intl_code} = $val;
+    }
+    return( $self->{intl_code} );
 }
 
 sub is_global
 {
-	return( shift->{ 'is_global' } );
+    return( shift->{is_global} );
 }
 
 sub is_local
 {
-	return( shift->{ 'is_local' } );
+    return( shift->{is_local} );
 }
 
 sub is_other
 {
-	return( shift->{ 'is_other' } );
+    return( shift->{is_other} );
 }
 
 sub is_vanity
 {
-	return( shift->{ 'is_vanity' } );
+    return( shift->{is_vanity} );
 }
 
-*isdn_subaddress = \&isub;
+sub isdn_subaddress { return( shift->isub( @_ ) ); }
+
 sub isub
 {
-	my $self = shift( @_ );
-	if( @_ )
-	{
-		my $val  = shift( @_ );
-		if( length( $val ) && $val !~ /^$URIC$/ )
-		{
-			warn( "'$val' is not a isdn subaddress\n" );
-			return( undef() );
-		}
-		delete( $self->{ 'cache' } );
-		$self->{ 'isub' } = $val;
-	}
-	return( $self->{ 'isub' } );
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        my $val  = shift( @_ );
+        if( length( $val ) && $val !~ /^$URIC$/ )
+        {
+            warn( "'$val' is not a isdn subaddress\n" );
+            return( undef() );
+        }
+        delete( $self->{cache} );
+        $self->{isub} = $val;
+    }
+    return( $self->{isub} );
+}
+
+sub local_number
+{
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        my $val = shift( @_ );
+        $self->{local_number} = $val;
+        if( length( $val ) )
+        {
+            my @matches = ();
+            if( @matches = $val !~ /^((?:tel\:)?$LOCAL_NUMBER)$/ )
+            {
+                $val =~ s/^tel\://;
+                @names = qw( all subscriber params1 last_param1 ignore5 ignore6 context params2 last_param2 ignore10 ignore11 );
+                my $ref = {};
+                @$ref{ @names } = @matches;
+                if( length( $ref->{context} ) )
+                {
+                    $ref->{context} =~ s/;[^=]+=(.*?)$/$1/gs;
+                    $self->{context} = $ref->{context};
+                    $self->{_has_context_param} = 1;
+                    
+                    if( $ref->{context} !~ /^[a-zA-Z]/ &&
+                        substr( $ref->{context}, 0, 1 ) eq '+' )
+                    {
+                        $self->{intl_code} = $self->_extract_intl_code( $ref->{context} );
+                        ## We flag it as extracted from context, because we do not want to prepend the subscriber number with it.
+                        ## It's just too dangerous as we cannot tell the subscriber number is actually a proper number that can be dialed from outside e.g. 911 or 110 are emergency number who may heva a context with international code
+                        ## However, if the international code was provided by the user then that's his responsibility
+                        ## If the user wants to just provide some context, then better to use context() instead.
+                        ## Knowing the international code helps getting some other useful information, but it should not necessarily affect the format of the number
+                        $self->{_intl_code_from_context} = 1;
+                    }
+                }
+            }
+            else
+            {
+                warn( "'$val' is not a valid local number.\n" );
+                return;
+            }
+        }
+    }
+    return( $self->{local_number} );
 }
 
 sub original
 {
-	return( shift->{ 'original' } );
+    return( shift->{original} );
 }
 
 sub prepend_context
 {
-	my $self = shift( @_ );
-	if( @_ )
-	{
-		$self->{ '_prepend_context' } = shift( @_ );
-		delete( $self->{ 'cache' } );
-	}
-	return( $self->{ '_prepend_context' } );
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        $self->{_prepend_context} = shift( @_ );
+        delete( $self->{cache} );
+    }
+    return( $self->{_prepend_context} );
 }
 
 sub private
 {
-	my $self = shift( @_ );
-	my( $name, $val ) = @_;
-	if( length( $name ) )
-	{
-		## The value could be blank and if so, we would remove the parameter
-		if( defined( $val ) )
-		{
-			if( $name !~ /^$PNAME$/ )
-			{
-				warn( "'$name' is not a valid parameter name.\n" );
-				return( undef() );
-			}
-			if( length( $val ) )
-			{
-				if( $val !~ /^$PVALUE$/ )
-				{
-					warn( "'$val' is not a valid parameter value.\n" );
-					return( undef() );
-				}
-				delete( $self->{ 'cache' } );
-				$self->{ 'private' }->{ $name } = $val;
-				return( $self->{ 'private' }->{ $name } );
-			}
-			else
-			{
-				return( delete( $self->{ 'private' }->{ $name } ) );
-			}
-		}
-		else
-		{
-			return( wantarray() ? %${$self->{ 'private' }->{ $name }} : \%${$self->{ 'private' }->{ $name }} );
-		}
-	}
-	return( wantarray() ? %{$self->{ 'private' }} : \%{$self->{ 'private' }} );
+    my $self = shift( @_ );
+    my( $name, $val ) = @_;
+    if( length( $name ) )
+    {
+        ## The value could be blank and if so, we would remove the parameter
+        if( defined( $val ) )
+        {
+            if( $name !~ /^$PNAME$/ )
+            {
+                warn( "'$name' is not a valid parameter name.\n" );
+                return( undef() );
+            }
+            if( length( $val ) )
+            {
+                if( $val !~ /^$PVALUE$/ )
+                {
+                    warn( "'$val' is not a valid parameter value.\n" );
+                    return( undef() );
+                }
+                delete( $self->{cache} );
+                $self->{private}->{ $name } = $val;
+                return( $self->{private}->{ $name } );
+            }
+            else
+            {
+                return( delete( $self->{private}->{ $name } ) );
+            }
+        }
+        else
+        {
+            return( wantarray() ? %${$self->{private}->{ $name }} : \%${$self->{private}->{ $name }} );
+        }
+    }
+    return( wantarray() ? %{$self->{private}} : \%{$self->{private}} );
 }
 
 sub subscriber
 {
-	my $self = shift( @_ );
-	if( @_ )
-	{
-		my $val = shift( @_ );
-		if( length( $val ) && $val !~ /^$TEL_SUBSCRIBER$/ )
-		{
-			warn( "'$val' is not a valid subscriber value.\n" );
-			return( undef() );
-		}
-		delete( $self->{ 'cache' } );
-		$self->{ 'subscriber' } = $val;
-	}
-	return( $self->{ 'subscriber' } );
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        my $val = shift( @_ );
+        if( length( $val ) && $val !~ /^$TEL_SUBSCRIBER$/ )
+        {
+            warn( "'$val' is not a valid subscriber value.\n" );
+            return( undef() );
+        }
+        delete( $self->{cache} );
+        $self->{subscriber} = $val;
+    }
+    return( $self->{subscriber} );
 }
 
 sub type
 {
-	return( shift->{ 'type' } );
+    return( shift->{type} );
 }
 
 sub _extract_intl_code
 {
-	my $self = shift( @_ );
-	my $str  = shift( @_ ) || return( '' );
-	#print( STDERR "Trying to find international code from '$str'\n" );
-	my $code;
-	## Extract the global idd
-	$self->_load_countries;
-	( my $str2 = $str ) =~ s/[\Q$VISUAL_SEPARATOR\E]+//g;
-	$str2 =~ s/^tel\://;
-	if( $str2 =~ /^\+($IDD_RE)/ )
-	{
-		my $idd = $1;
-		#print( STDERR "\tIDD is '$idd'\n" );
-		if( CORE::exists( $COUNTRIES->{ $idd } ) )
-		{
-			my $idds = $COUNTRIES->{ $idd }->[0]->{ 'idd' };
-			#print( STDERR "\tFound entry.\n" );
-			foreach my $thisIdd ( @$idds )
-			{
-				my $check = $thisIdd;
-				$check =~ s/\D//g;
-				if( $check eq $idd )
-				{
-					#$temp->{ 'context' } = '+' . $thisIdd;
-					$code = $thisIdd;
-					last;
-				}
-			}
-		}
-	}
-	#print( STDERR "\tReturning '$code'\n" );
-	return( $code );
+    my $self = shift( @_ );
+    my $str  = shift( @_ ) || return( '' );
+    my $code;
+    ## Extract the global idd
+    $self->_load_countries;
+    ( my $str2 = $str ) =~ s/[\Q$VISUAL_SEPARATOR\E]+//g;
+    $str2 =~ s/^tel\://;
+    if( $str2 =~ /^\+($IDD_RE)/ )
+    {
+        my $idd = $1;
+        if( CORE::exists( $COUNTRIES->{ $idd } ) )
+        {
+            my $idds = $COUNTRIES->{ $idd }->[0]->{idd};
+            foreach my $thisIdd ( @$idds )
+            {
+                my $check = $thisIdd;
+                $check =~ s/\D//g;
+                if( $check eq $idd )
+                {
+                    #$temp->{context} = '+' . $thisIdd;
+                    $code = $thisIdd;
+                    last;
+                }
+            }
+        }
+    }
+    return( $code );
 }
 
 sub _extract_local_number
 {
-	my $self = shift( @_ );
-	my( $intl_code, $subscriber ) = @_;
-	my $j = 0;
-	for( my $i = 0; $i < length( $intl_code ); $i++ )
-	{
-		# Skip until we are on a number
-		next if( substr( $intl_code, $i, 1 ) !~ /^\d$/ );
-		# and here too so we can compare number to number
-		while( substr( $subscriber, $j, 1 ) !~ /^\d$/ )
-		{
-			$j++;
-		}
-		# Our international code does not seem to match the prefix of our subscriber! This should not happen.
-		if( substr( $subscriber, $j, 1 ) ne substr( $intl_code, $i, 1 ) )
-		{
-			# printf( STDERR "Mismatch... %s at position %d vs %s at position %d\n", substr( $intl_code, $i, 1 ), $i, substr( $subscriber, $j, 1 ), $j );
-			#last;
-			return( '' );
-		}
-		$j++;
-	}
-	$j++ while( substr( $subscriber, $j, 1 ) !~ /^\d$/ );
-	return( substr( $subscriber, $j ) );
+    my $self = shift( @_ );
+    my( $intl_code, $subscriber ) = @_;
+    my $j = 0;
+    for( my $i = 0; $i < length( $intl_code ); $i++ )
+    {
+        # Skip until we are on a number
+        next if( substr( $intl_code, $i, 1 ) !~ /^\d$/ );
+        # and here too so we can compare number to number
+        while( substr( $subscriber, $j, 1 ) !~ /^\d$/ )
+        {
+            $j++;
+        }
+        # Our international code does not seem to match the prefix of our subscriber! This should not happen.
+        if( substr( $subscriber, $j, 1 ) ne substr( $intl_code, $i, 1 ) )
+        {
+            # printf( STDERR "Mismatch... %s at position %d vs %s at position %d\n", substr( $intl_code, $i, 1 ), $i, substr( $subscriber, $j, 1 ), $j );
+            #last;
+            return( '' );
+        }
+        $j++;
+    }
+    $j++ while( $j <= length( $subscriber ) && substr( $subscriber, $j ) !~ /^[()]?\d+($LOCAL_NUMBER|$OTHER|$VANITY_LOCAL)$/ );
+    return( substr( $subscriber, $j ) );
 }
 
 # Check if two objects are the same object
@@ -684,13 +738,13 @@ sub _obj_eq
     my $priv2 = $other->private;
     foreach my $k ( keys( %$priv ) )
     {
-    	return( 0 ) if( !exists( $priv2->{ $k } ) );
-    	return( 0 ) if( $priv->{ $k } ne $priv2->{ $k } );
+        return( 0 ) if( !exists( $priv2->{ $k } ) );
+        return( 0 ) if( $priv->{ $k } ne $priv2->{ $k } );
     }
     foreach my $k ( keys( %$priv2 ) )
     {
-    	return( 0 ) if( !exists( $priv->{ $k } ) );
-    	return( 0 ) if( $priv2->{ $k } ne $priv->{ $k } );
+        return( 0 ) if( !exists( $priv->{ $k } ) );
+        return( 0 ) if( $priv2->{ $k } ne $priv->{ $k } );
     }
     use overloading;
     return( 1 );
@@ -702,56 +756,56 @@ sub _obj_eq
 ## But this would be split: something\\;here resulting in something\ and here after unescaping
 sub split_str
 {
-	my $self = shift( @_ );
-	my $s    = shift( @_ );
-	my $sep  = @_ ? shift( @_ ) : ';';
-	my @parts = ();
-	my $i = 0;
-	foreach( split( /(\\.)|$sep/, $s ) ) 
-	{
-		defined( $_ ) ? do{ $parts[$i] .= $_ } : do{ $i++ };
-	}
-	return( @parts );
+    my $self = shift( @_ );
+    my $s    = shift( @_ );
+    my $sep  = @_ ? shift( @_ ) : ';';
+    my @parts = ();
+    my $i = 0;
+    foreach( split( /(\\.)|$sep/, $s ) ) 
+    {
+        defined( $_ ) ? do{ $parts[$i] .= $_ } : do{ $i++ };
+    }
+    return( @parts );
 }
 
 sub _load_countries
 {
-	my $self = shift( @_ );
-	if( !%$COUNTRIES )
-	{
-		my $in = 0;
-		my $hash = {};
-		my @data = <DATA>;
-		foreach ( @data )
-		{
-			chomp;
-			next unless( $in || /^\#{2} BEGIN DATA/ );
-			last if( /^\#{2} END DATA/ );
-			$in++;
-			next if( /^\#{2} BEGIN DATA/ );
-			my( $cc, $cc3, $name, $idd ) = split( /[[:blank:]]*\;[[:blank:]]*/, $_ );
-			my $keys = index( $idd, ',' ) != -1 ? [ split( /[[:blank:]]*\,[[:blank:]]*/, $idd ) ] : [ $idd ];
-			my $info = 
-			{
-			'cc' => $cc,
-			'cc3' => $cc3,
-			'name' => $name,
-			'idd' => $idd,
-			};
-			$info->{ 'idd' } = $keys;
-			foreach my $k ( @$keys )
-			{
-				my $k2 = $k;
-				$k2 =~ s/-//gs;
-				$hash->{ $k2 } = [] if( !exists( $hash->{ $k2 } ) );
-				push( @{$hash->{ $k2 }}, $info );
-			}
-		}
-		$COUNTRIES = $hash;
-		my @list = sort{ $b <=> $a } keys( %$hash );
-		my $re_list = join( '|', @list );
-		$IDD_RE = qr{(?:$re_list)};
-	}
+    my $self = shift( @_ );
+    if( !%$COUNTRIES )
+    {
+        my $in = 0;
+        my $hash = {};
+        my @data = <DATA>;
+        foreach ( @data )
+        {
+            chomp;
+            next unless( $in || /^\#{2} BEGIN DATA/ );
+            last if( /^\#{2} END DATA/ );
+            $in++;
+            next if( /^\#{2} BEGIN DATA/ );
+            my( $cc, $cc3, $name, $idd ) = split( /[[:blank:]]*\;[[:blank:]]*/, $_ );
+            my $keys = index( $idd, ',' ) != -1 ? [ split( /[[:blank:]]*\,[[:blank:]]*/, $idd ) ] : [ $idd ];
+            my $info = 
+            {
+            'cc' => $cc,
+            'cc3' => $cc3,
+            'name' => $name,
+            'idd' => $idd,
+            };
+            $info->{idd} = $keys;
+            foreach my $k ( @$keys )
+            {
+                my $k2 = $k;
+                $k2 =~ s/-//gs;
+                $hash->{ $k2 } = [] if( !exists( $hash->{ $k2 } ) );
+                push( @{$hash->{ $k2 }}, $info );
+            }
+        }
+        $COUNTRIES = $hash;
+        my @list = sort{ $b <=> $a } keys( %$hash );
+        my $re_list = join( '|', @list );
+        $IDD_RE = qr{(?:$re_list)};
+    }
 }
 
 1;
@@ -821,34 +875,32 @@ or
 
 =head1 METHODS
 
-=over 4
+=head2 new( tel URI )
 
-=item B<new>( tel URI )
+L</new> is provided with a tel URI and return an instance of this package.
 
-B<new>() is provided with a tel URI and return an instance of this package.
-
-=item B<as_string>()
+=head2 as_string
 
 Returns a string representation of the tel uri. This package is overloaded, so one can get the same result by doing
 
     my $str = $tel->as_string;
 
-=item B<aton>( [ telephone ] )
+=head2 aton( [ telephone ] )
 
 If no phone number is given as argument, it will use the I<subscriber> value of the object used to call this method.
 It returns the phone number with the letters replaced by their digit counterparts.
 
 For example a subscriber such as C<tel:+1-800-LAWYERS> would return C<tel:+1-800-5299377>
 
-=item B<canonical>
+=head2 canonical
 
 Return the tel uri in a canonical form, ie without any visualisation characters, ie no C<hyphen>, C<comma>, C<dot>, etc
 
-=item B<clone>()
+=head2 clone
 
 Returns an exact copy of the current object.
 
-=item B<context>( [ CONTEXT ] )
+=head2 context( [ CONTEXT ] )
 
 Given a telephone context, sets the value accordingly.
 It returns the current existing value.
@@ -861,7 +913,7 @@ Thus, when called upon as a string, the object would return:
 
     03-1234-5678;phone-context=+81
 
-=item B<country>()
+=head2 country
 
 If the current telephone uri is as global number, this method will try to find out to which country it belongs.
 It returns an array in list context and an array reference in scalar context.
@@ -872,7 +924,7 @@ This is typically true for countries like Canada and the United States who both 
 One could then do something like the following:
 
     my $ref = $tel->country;
-    print( "Country: ", @$ref > 1 ? join( ' or ', map( $_->{ 'name' }, @$ref ) ) : @$ref ? $ref->[0]->{ 'name' } : 'not found', "\n" );
+    print( "Country: ", @$ref > 1 ? join( ' or ', map( $_->{name}, @$ref ) ) : @$ref ? $ref->[0]->{name} : 'not found', "\n" );
 
 which would produce:
 
@@ -880,7 +932,7 @@ which would produce:
 
 Each array entry is a reference to an associative array, which contains the following fields:
 
-=over 8
+=over 4
 
 =item I<cc> for the iso 3166 2-letters code
 
@@ -892,7 +944,7 @@ Each array entry is a reference to an associative array, which contains the foll
 
 =back
 
-=item B<international_code>( [ PHONE DIGITS ] )
+=head2 international_code( [ PHONE DIGITS ] )
 
 This returns the international code, if any. The international code is the international country code unique to each country or territory. It may be found as a prefix to the subscriber number or as a context to the phone number. For example:
 
@@ -900,22 +952,22 @@ This returns the international code, if any. The international code is the inter
     tel:656-9254;ext=102;phone-context=+1-212
     tel:911;phone-context=+1
 
-If an international country code is provided, it will be used to get information such as country name and iso 3166 country codes and also it will be used in formatting the phone number by prefixing the subscriber number with the international country code provided. If, instead you want to just set a context, then use the B<context> method instead. For example with a subscriber number such as I<911>, you may want to give it some context by adding +1 such as :
+If an international country code is provided, it will be used to get information such as country name and iso 3166 country codes and also it will be used in formatting the phone number by prefixing the subscriber number with the international country code provided. If, instead you want to just set a context, then use the L</context> method instead. For example with a subscriber number such as I<911>, you may want to give it some context by adding +1 such as :
 
-	my $tel = URI::tel->new( "911" );
-	$tel->context( '+1' );
-	print( "$tel\n" ); # will produce 911;phone-context=+1
+    my $tel = URI::tel->new( "911" );
+    $tel->context( '+1' );
+    print( "$tel\n" ); # will produce 911;phone-context=+1
 
-	# But don't do this!
-	$tel->international_code( 1 );
-	# print will now trigger a bad phone number
-	print( "$tel\n" ); " will produce +1-911
+    # But don't do this!
+    $tel->international_code( 1 );
+    # print will now trigger a bad phone number
+    print( "$tel\n" ); " will produce +1-911
 
-=item B<is_global>()
+=head2 is_global
 
 Returns true or false depending on whether the phone number is a global one, ie starting with C<+>.
 
-=item B<is_local>()
+=head2 is_local
 
 Returns true or false depending on whether the phone number is a local one, ie a number without the C<+> prefix.
 This can happen of course with numbers such as C<03-1234-5678>, but also for emergency number, such as C<110> (police in Japan) or
@@ -928,33 +980,37 @@ One could set a prefix to clarify, such as:
     ## which would produce:
     ## 110;phone-context=+81
 
-=item B<is_other>()
+=head2 is_other
 
-Normally, as per rfc 3966, a non global number must have a context, but in everyday life this is rarely the case, so B<is_other> flags those numbers who are local but lack a context.
+Normally, as per rfc 3966, a non global number must have a context, but in everyday life this is rarely the case, so L</is_other> flags those numbers who are local but lack a context.
 
 It returns true or false.
 
-=item B<is_vanity>()
+=head2 is_vanity
 
 Returns true or false whether the telephone number is a vanity number, such as C<+1-800-LAWYERS>.
 
-=item B<isub>( [ ISDN SUBADDRESS ] )
+=head2 isub( [ ISDN SUBADDRESS ] )
 
 Optionally sets the isdn subaddress if a value is provided.
 It returns the current value set.
 
     $tel->isub( 1420 );
 
-=item B<original>()
+=head2 local_number
+
+Returns the local phone number. For example for a number such as C<+81-090-1234-5678>, this would return C<090-1234-5678>
+
+=head2 original
 
 Returns the original telephone number provided, before any possible changes were brought.
 
-=item B<private>( [ NAME, [ VALUE ] ] )
+=head2 private( [ NAME, [ VALUE ] ] )
 
-Given a I<NAME>, B<private> returns the value entry for that parameter. If a I<VALUE> is provided, it will set this value for the given name.
-if no I<NAME>, and no I<VALUE> was provided, B<private> returns a list of all the name-value pair currently set, or a reference to that associative array in scalar context.
+Given a I<NAME>, L</private> returns the value entry for that parameter. If a I<VALUE> is provided, it will set this value for the given name.
+if no I<NAME>, and no I<VALUE> was provided, L</private> returns a list of all the name-value pair currently set, or a reference to that associative array in scalar context.
 
-=item B<subscriber>( [ PHONE ] )
+=head2 subscriber( [ PHONE ] )
 
 Returns the current telephone number set for this telephone uri. For example:
 
@@ -963,11 +1019,9 @@ Returns the current telephone number set for this telephone uri. For example:
 
 will return: C<+1-418-656-9254>
 
-=item B<type>()
+=head2 type
 
 This is a read-only method. It returns the type of the telephone number. The type can be one of the following values: global, local, other, vanity
-
-=back
 
 =head1 SEE ALSO
 

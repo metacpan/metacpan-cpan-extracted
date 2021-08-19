@@ -100,6 +100,10 @@ PICA+ records and [PICA::Schema](https://metacpan.org/pod/PICA::Schema) can be u
 The following functions can be exported on request (use export tag `:all` to
 get all of them):
 
+## pica\_data( \[ $data \] )
+
+Return a new PICA::Data object from any guessable serialization form (or die).
+
 ## pica\_parser( $type \[, @options\] )
 
 Create a PICA parsers object (see [PICA::Parser::Base](https://metacpan.org/pod/PICA::Parser::Base)). Case of the type is
@@ -177,8 +181,6 @@ specified by PICA path expressions. The following are virtually equivalent:
 
 Returns a [Hash::MultiValue](https://metacpan.org/pod/Hash::MultiValue) of all subfields of fields optionally specified
 by PICA path expressions. Also available as accessor `subfields`.
-
-## pica\_
 
 ## pica\_title( $record )
 

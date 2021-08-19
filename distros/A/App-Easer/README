@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes App::Easer version 0.002.
+    This document describes App::Easer version 0.004.
 
 SYNOPSIS
 
@@ -402,6 +402,9 @@ DESCRIPTION
       last sub-command name. By default it is help, but this can be
       overridden. Setting this to a false value disables looking for a
       sub-command, so it allows addressing the command itself directly.
+
+      This must be the key associated to a child in the commands mapping,
+      i.e. the same name that is put in the children array.
 
     no-auto
 

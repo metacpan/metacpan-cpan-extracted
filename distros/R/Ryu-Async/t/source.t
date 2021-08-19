@@ -22,6 +22,8 @@ $loop->loop_once;
 cmp_deeply(\@out, [qw(x y)], 'iteration yields expected item');
 $loop->loop_once;
 cmp_deeply(\@out, [qw(x y z)], 'iteration yields expected item');
+# We don't check the next item until the loop has had a chance to tick over
+$loop->loop_once;
 ok($src->completed->is_ready, 'source is marked as finished');
 
 done_testing;

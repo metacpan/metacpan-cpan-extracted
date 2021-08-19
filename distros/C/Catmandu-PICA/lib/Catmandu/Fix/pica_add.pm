@@ -1,84 +1,84 @@
 package Catmandu::Fix::pica_add;
 
-our $VERSION = '1.05';
-
 use Catmandu::Sane;
+
+our $VERSION = '1.06';
+
 use Moo;
+use Catmandu::Util::Path qw(as_path);
 use Catmandu::Fix::Has;
 use PICA::Path;
 
-has path      => ( fix_arg => 1 );
-has pica_path => ( fix_arg => 1 );
+has path => ( fix_arg => 1 );
+has pica_path => (
+    fix_arg => 1,
+    coerce  => sub { PICA::Path->new( $_[0] ) }
+);
 has record    => ( fix_opt => 1 );
 has force_new => ( fix_opt => 1 );
 
-with 'Catmandu::Fix::SimpleGetValue';
+with 'Catmandu::Fix::Builder';
 
-sub emit_value {
-    my ( $self, $add_value, $fixer ) = @_;
+sub _build_fixer {
+    my ($self) = @_;
 
-    my $record_key  = $fixer->emit_string( $self->record // 'record' );
-    my $pica_path   = PICA::Path->new($self->pica_path);
+    my $value_getter  = as_path( $self->path )->getter;
+    my $record_getter = as_path( $self->record // 'record' )->getter;
+    my $pica_path     = $self->pica_path;
+    my $force_new     = $self->force_new;
 
-    my ($field, $occurrence, $subfield) = map {
-        defined $_ ? do {
-            s/^\(\?[^:]*:(.*)\)$/$1/;
-            $_ } : undef
-        } ($pica_path->[0], $pica_path->[1], $pica_path->[2]);
+    return sub { }
+      unless defined $pica_path->fields && defined $pica_path->subfields;
 
-    my ($field_regex, $occurrence_regex) = @$pica_path;
+    my @fixed_field;
+    @fixed_field = ( $pica_path->fields, $pica_path->occurrences )
+      if ( $pica_path->fields =~ qr{^[0-9A-Z@]{4}$}
+        && ( $pica_path->occurrences // '' ) =~ qr{^[0-9]*$} );
 
-    $subfield   = $fixer->emit_string( $subfield );
-    $field      = $fixer->emit_string( $field );
-    $occurrence = $fixer->emit_string( $occurrence // '' );
+    my $subfields = $pica_path->subfields;
 
-    my $subfields = $fixer->generate_var;
-    my $sf_data   =  $fixer->generate_var;
-    my $i         =  $fixer->generate_var;
-    my $value     =  $fixer->generate_var;
+    sub {
+        my ($data) = @_;
+        my @values =
+          map { ref $_ eq 'ARRAY' ? @$_ : $_ } @{ $value_getter->($data) };
+        return $data unless @values;
 
-    my $perl = $fixer->emit_declare_vars( $value ) .
-        "if ( defined ${add_value} && ${subfield} ne '[_A-Za-z0-9]') { ".
-        "${value} = ${add_value};" .
-        "if ( is_string(${value}) || ${value} eq '' ) { ${value} = [ ${value} ] }; " .
-        "if (ref(${value}) eq 'ARRAY') { " .
-        $fixer->emit_declare_vars( $i, 0 ) .
-        $fixer->emit_declare_vars( $subfields ) .
-        $fixer->emit_declare_vars( $sf_data ) .
-        "\@${subfields} = split //, substr(${subfield}, 1, length(${subfield}) -2);" .
-        "\@${sf_data} = map { defined ${value}->[${i}] ? " .
-        "(\$_ => ${value}->[${i}++]) : () } \@${subfields};";
+        for my $record ( @{ $record_getter->($data) } ) {
 
-    my $field_regex_var    = $fixer->generate_var;
-    $perl .= $fixer->emit_declare_vars( $field_regex_var, "qr{$field_regex}" );
+            my $fields =
+              [ $force_new ? () : grep { $pica_path->match_field($_) }
+                  @$record ];
 
-    my $occurrence_regex_var;
-    if (defined $occurrence_regex) {
-        $occurrence_regex_var = $fixer->generate_var;
-        $perl .= $fixer->emit_declare_vars( $occurrence_regex_var, "qr{$occurrence_regex}" );
-    }
+            if (@$fields) {
+                my @sf_codes = split '', $subfields;
+                my @sf_values = @values;
 
-    my $data  = $fixer->var;
-    my $added = $fixer->generate_var;
+                foreach my $f (@$fields) {
+                    my $annotation = @$f % 2 ? pop @$f : undef;
 
-    $perl .= $fixer->emit_declare_vars($added);
+                    for ( my $i = 0 ; $i < @sf_codes && $i < @sf_values ; $i++ )
+                    {
+                        push @$f, $sf_codes[$i], $sf_values[$i];
+                    }
 
-    unless ($self->force_new) {
-        $perl .= $fixer->emit_foreach(
-            "${data}->{${record_key}}",
-            sub {
-                my $var  = shift;
-                my $perl = "next if ${var}->[0] !~ ${field_regex_var};";
-                if (defined $occurrence_regex) {
-                    $perl .= "next if (!defined ${var}->[1] || ${var}->[1] !~ ${occurrence_regex_var});";
+                    push @$f, $annotation if defined $annotation;
                 }
-                $perl .= "push \@{${var}}, \@${sf_data}; ${added} = 1;";
             }
-        );
-    }
+            elsif (@fixed_field) {
+                my $field = [@fixed_field];
 
-    $perl .= "push(\@{ ${data}->{${record_key}} }, " .
-        "[${field}, ${occurrence}, \@${sf_data} ]) unless defined ${added} } };";
+                my $i = 0;
+                foreach ( split '', $subfields ) {
+                    push @$field, $_, $values[ $i++ ];
+                    last if $i >= @values;
+                }
+
+                push @$record, $field;
+            }
+        }
+
+        $data;
+      }
 }
 
 1;

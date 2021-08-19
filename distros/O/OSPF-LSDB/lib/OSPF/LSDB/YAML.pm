@@ -1,5 +1,5 @@
 ##########################################################################
-# Copyright (c) 2010 Alexander Bluhm <alexander.bluhm@gmx.net>
+# Copyright (c) 2010-2021 Alexander Bluhm <alexander.bluhm@gmx.net>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -21,7 +21,7 @@ use warnings;
 
 =head1 NAME
 
-B<OSPF::LSDB::YAML> - load or dump OSPF link state database as YAML
+OSPF::LSDB::YAML - load or dump OSPF link state database as YAML
 
 =head1 SYNOPSIS
 
@@ -29,21 +29,21 @@ use OSPF::LSDB;
 
 use OSPF::LSDB::YAML;
 
-my $ospf = OSPF::LSDB-E<gt>L<new>();
+my $ospf = OSPF::LSDB-E<gt>new();
 
-my $yaml = OSPF::LSDB::YAML-E<gt>L<new>($ospf);
+my $yaml = OSPF::LSDB::YAML-E<gt>new($ospf);
 
-$string = $yaml-E<gt>L<Dump>();
+$string = $yaml-E<gt>Dump();
 
-$yaml-E<gt>L<DumpFile>($filename);
+$yaml-E<gt>DumpFile($filename);
 
-$yaml-E<gt>L<Load>($string);
+$yaml-E<gt>Load($string);
 
-$yaml-E<gt>L<LoadFile>($filename);
+$yaml-E<gt>LoadFile($filename);
 
 =head1 DESCRIPTION
 
-The B<OSPF::LSDB::YAML> module allows to load or dump a B<OSPF::LSDB>
+The OSPF::LSDB::YAML module allows to load or dump a L<OSPF::LSDB>
 instance in YAML format.
 
 =cut
@@ -56,9 +56,9 @@ use YAML::Syck qw();
 
 =over 4
 
-=item $self-E<gt>L<Dump>()
+=item $self-E<gt>Dump()
 
-Return the B<OSPF::LSDB> content as YAML string.
+Return the L<OSPF::LSDB> content as YAML string.
 
 =cut
 
@@ -69,9 +69,9 @@ sub Dump {
 
 =pod
 
-=item $self-E<gt>L<DumpFile>($filepath)
+=item $self-E<gt>DumpFile($filepath)
 
-Write the B<OSPF::LSDB> content as YAML into a file.
+Write the L<OSPF::LSDB> content as YAML into a file.
 
 =cut
 
@@ -83,9 +83,9 @@ sub DumpFile {
 
 =pod
 
-=item $self-E<gt>L<Load>($string)
+=item $self-E<gt>Load($string)
 
-Set the B<OSPF::LSDB> base object to the given YAML string.
+Set the L<OSPF::LSDB> base object to the given YAML string.
 The content is converted to the current version and is validated.
 
 =cut
@@ -100,9 +100,9 @@ sub Load {
 
 =pod
 
-=item $self-E<gt>L<LoadFile>($filepath)
+=item $self-E<gt>LoadFile($filepath)
 
-Set the B<OSPF::LSDB> base object to the given YAML file.
+Set the L<OSPF::LSDB> base object to the given YAML file.
 The content is converted to the current version and is validated.
 
 =back

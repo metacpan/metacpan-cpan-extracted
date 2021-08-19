@@ -1,0 +1,2008 @@
+Last login: Tue Aug 17 12:05:09 2021 from 192.0.2.12
+[5nkswXX#\swXX#bogusinput
+% Invalid input
+kswXX#\swXX#show ip bgp neighswXX#show ip bgp neighbors 
+[?1h=BGP neighbor is 192.0.2.12, remote AS 65000, internal link
+  BGP version 4, remote router ID 0.0.0.0, VRF default
+  Last read never, last write never
+  Hold time is 0, keepalive interval is 0 seconds
+  Configured hold time is 180, keepalive interval is 60 seconds
+  Hold timer is inactive
+  Keepalive timer is inactive
+  Connect timer is active, time left: 00:00:21
+  Connection interval is 20 seconds
+  Failed connection attempts is 88804
+  Idle-restart timer is inactive
+  BGP state is Connect
+  Number of transitions to established: 0
+  Last state was Active
+  Last event was ConnectRetry
+  Last sent socket-error:Connect (Network is unreachable), Last time 23d14h, First time 202d21 h, Repeats 8
+  Types of communities advertised: none
+  Neighbor Capabilities:
+  Restart timer is inactive
+  End of rib timer is inactive
+  AIGP attribute send and receive for IPv4 Unicast are enabled
+  AIGP attribute send and receive for IPv6 Unicast are enabled
+  Message Statistics:
+                         Sent      Rcvd
+    Opens:                  0         0
+    Notifications:          0         0
+    Updates:                0         0
+    Keepalives:             0         0
+    Route Refresh:          0         0
+    Total messages:         0         0
+  Prefix Statistics:
+                                   Sent      Rcvd     Best Paths     Best ECMP Paths
+    IPv4 Unicast:                     0         0              0                   0
+    IPv6 Unicast:                     0         0              0                   0
+  Configured maximum total number of routes is 12000
+  Inbound updates dropped by reason:
+    AS path loop detection: 0
+    Enforced First AS: 0
+    Malformed MPBGP routes: 0
+    Originator ID matches local router ID: 0
+    Nexthop matches local IP address: 0
+    Unexpected IPv6 nexthop for IPv4 routes: 0
+  Inbound updates with attribute errors:
+    Resulting in removal of all paths in update (treat as withdraw): 0
+    Resulting in AFI/SAFI disable: 0
+    Resulting in attribute ignore: 0
+    Disabled AFI/SAFIs: None
+  Inbound paths dropped by reason:
+    IPv4 labeled-unicast NLRIs dropped due to excessive labels: 0
+    IPv6 labeled-unicast NLRIs dropped due to excessive labels: 0
+    VPN-IPv4 NLRIs dropped due to route import match failure: 0
+    VPN-IPv6 NLRIs dropped due to route import match failure: 0
+    L2VPN EVPN NLRIs dropped due to route import match failure: 0
+  Outbound paths dropped by reason:
+    IPv4 local address not available: 0
+    IPv6 local address not available: 0
+Local AS is 65000, local router ID 192.0.2.24
+TTL is 255
+Remote TCP address is 192.0.2.12, remote port is 179
+! Sending extended community not configured, updates will be sent without extended communities  or route targets
+TCP Socket Information:
+  TCP state is SYN-SENT
+  Recv-Q: 0/87380
+  Send-Q: 0/16384
+  Outgoing Maximum Segment Size (MSS): 524
+  Total Number of TCP retransmissions: 0
+  Options:
+    Timestamps enabled: no
+    Selective Acknowledgments enabled: no
+    Window Scale enabled: no
+    Explicit Congestion Notification (ECN) enabled: no
+[3m --More-- [23m[K[K  Socket Statistics:
+    Window Scale (wscale): 0,0
+    Retransmission Timeout (rto): 1000.0ms
+    Round-trip Time (rtt/rtvar): 0.0ms/250.0ms
+    Delayed Ack Timeout (ato): 0.0ms
+    Congestion Window (cwnd): 10
+
+BGP neighbor is 192.0.2.1, remote AS 65000, internal link
+ Description: "Raku BGP Test Session"
+  BGP version 4, remote router ID 0.0.0.0, VRF default
+  Last read never, last write never
+  Hold time is 0, keepalive interval is 0 seconds
+  Configured hold time is 180, keepalive interval is 60 seconds
+  Hold timer is inactive
+  Keepalive timer is inactive
+  Connect timer is active, time left: 00:00:04
+  Connection interval is 20 seconds
+  Failed connection attempts is 88813
+  Idle-restart timer is inactive
+  BGP state is Connect
+  Number of transitions to established: 0
+  Last state was Active
+  Last event was ConnectRetry
+  Last sent socket-error:Connect (Network is unreachable), Last time 23d14h, First time 202d21 h, Repeats 7
+  Types of communities advertised: none
+  Neighbor is a route reflector client
+  Neighbor Capabilities:
+  Restart timer is inactive
+  End of rib timer is inactive
+  AIGP attribute send and receive for IPv4 Unicast are enabled
+  AIGP attribute send and receive for IPv6 Unicast are enabled
+  Message Statistics:
+                         Sent      Rcvd
+    Opens:                  0         0
+    Notifications:          0         0
+    Updates:                0         0
+    Keepalives:             0         0
+    Route Refresh:          0         0
+    Total messages:         0         0
+  Prefix Statistics:
+                                   Sent      Rcvd     Best Paths     Best ECMP Paths
+    IPv4 Unicast:                     0         0              0                   0
+    IPv6 Unicast:                     0         0              0                   0
+  Configured maximum total number of routes is 12000
+  Inbound updates dropped by reason:
+    AS path loop detection: 0
+    Enforced First AS: 0
+    Malformed MPBGP routes: 0
+    Originator ID matches local router ID: 0
+    Nexthop matches local IP address: 0
+    Unexpected IPv6 nexthop for IPv4 routes: 0
+  Inbound updates with attribute errors:
+    Resulting in removal of all paths in update (treat as withdraw): 0
+    Resulting in AFI/SAFI disable: 0
+    Resulting in attribute ignore: 0
+    Disabled AFI/SAFIs: None
+  Inbound paths dropped by reason:
+    IPv4 labeled-unicast NLRIs dropped due to excessive labels: 0
+    IPv6 labeled-unicast NLRIs dropped due to excessive labels: 0
+    VPN-IPv4 NLRIs dropped due to route import match failure: 0
+    VPN-IPv6 NLRIs dropped due to route import match failure: 0
+    L2VPN EVPN NLRIs dropped due to route import match failure: 0
+  Outbound paths dropped by reason:
+    IPv4 local address not available: 0
+    IPv6 local address not available: 0
+Local AS is 65000, local router ID 192.0.2.24
+TTL is 255
+Local TCP address is 192.0.2.24
+Remote TCP address is 192.0.2.1, remote port is 1180
+Configured remote port is 1180
+! Sending extended community not configured, updates will be sent without extended communities  or route targets
+[3m --More-- [23m[K[KTCP Socket Information:
+  TCP state is SYN-SENT
+  Recv-Q: 0/87380
+  Send-Q: 0/16384
+  Outgoing Maximum Segment Size (MSS): 524
+  Total Number of TCP retransmissions: 4
+  Options:
+    Timestamps enabled: no
+    Selective Acknowledgments enabled: no
+    Window Scale enabled: no
+    Explicit Congestion Notification (ECN) enabled: no
+  Socket Statistics:
+    Window Scale (wscale): 0,0
+    Retransmission Timeout (rto): 16000.0ms
+    Round-trip Time (rtt/rtvar): 0.0ms/250.0ms
+    Delayed Ack Timeout (ato): 0.0ms
+    Congestion Window (cwnd): 1
+    Slow-start Threshold (ssthresh): 7
+
+BGP neighbor is 192.0.2.3, remote AS 65000, internal link
+  BGP version 4, remote router ID 192.0.2.3, VRF default
+  Last read 00:00:20, last write 00:00:46
+  Hold time is 180, keepalive interval is 60 seconds
+  Configured hold time is 180, keepalive interval is 60 seconds
+  Hold timer is active, time left: 00:01:39
+  Keepalive timer is active, time left: 00:00:06
+  Connect timer is inactive
+  Idle-restart timer is inactive
+  BGP state is Established, up for 52d04h
+  Number of transitions to established: 5
+  Last state was OpenConfirm
+  Last event was RecvKeepAlive
+  Last sent notification:Hold Timer Expired Error/None, Last time 52d04h, First time 197d21h,  Repeats 3
+  Last sent socket-error:Connect (Network is unreachable), Last time 202d21h, First time 202d2 1h, Repeats 2
+  Types of communities advertised: standard
+  Neighbor Capabilities:
+    Multiprotocol IPv4 Unicast: advertised and received and negotiated
+    Four Octet ASN: advertised and received and negotiated
+    Route Refresh: advertised and received and negotiated
+    Enhanced route refresh: advertised
+    Send End-of-RIB messages: advertised
+    Additional-paths recv capability:
+      IPv4 Unicast: advertised
+    Additional-paths send capability:
+  Restart timer is inactive
+  End of rib timer is inactive
+    IPv4 Unicast End-of-RIB received: No
+  AIGP attribute send and receive for IPv4 Unicast are enabled
+  AIGP attribute send and receive for IPv6 Unicast are enabled
+  Message Statistics:
+                         Sent      Rcvd
+    Opens:                  5         5
+    Notifications:          4         0
+    Updates:                0       576
+    Keepalives:        343072    333888
+    Route Refresh:          0         0
+    Total messages:    343081    334469
+  Prefix Statistics:
+                                   Sent      Rcvd     Best Paths     Best ECMP Paths
+    IPv4 Unicast:                     0         2              2                   0
+    IPv6 Unicast:                     0         0              0                   0
+  Configured maximum total number of routes is 12000
+  Inbound updates dropped by reason:
+    AS path loop detection: 0
+    Enforced First AS: 0
+    Malformed MPBGP routes: 0
+    Originator ID matches local router ID: 0
+    Nexthop matches local IP address: 0
+    Unexpected IPv6 nexthop for IPv4 routes: 0
+  Inbound updates with attribute errors:
+    Resulting in removal of all paths in update (treat as withdraw): 0
+[3m --More-- [23m[K[K    Resulting in AFI/SAFI disable: 0
+    Resulting in attribute ignore: 0
+    Disabled AFI/SAFIs: None
+  Inbound paths dropped by reason:
+    IPv4 labeled-unicast NLRIs dropped due to excessive labels: 0
+    IPv6 labeled-unicast NLRIs dropped due to excessive labels: 0
+    VPN-IPv4 NLRIs dropped due to route import match failure: 0
+    VPN-IPv6 NLRIs dropped due to route import match failure: 0
+    L2VPN EVPN NLRIs dropped due to route import match failure: 0
+  Outbound paths dropped by reason:
+    IPv4 local address not available: 0
+    IPv6 local address not available: 0
+  Inbound route map is IN-FOO
+  Outbound route map is OUT-FOO
+Local AS is 65000, local router ID 192.0.2.24
+TTL is 255
+Local TCP address is 192.0.2.24, local port is 43489
+Remote TCP address is 192.0.2.3, remote port is 179
+! Sending extended community not configured, updates will be sent without extended communities  or route targets
+TCP Socket Information:
+  TCP state is ESTABLISHED
+  Recv-Q: 0/32768
+  Send-Q: 0/32768
+  Outgoing Maximum Segment Size (MSS): 1448
+  Total Number of TCP retransmissions: 4
+  Options:
+    Timestamps enabled: yes
+    Selective Acknowledgments enabled: yes
+    Window Scale enabled: yes
+    Explicit Congestion Notification (ECN) enabled: no
+  Socket Statistics:
+    Window Scale (wscale): 5,7
+    Retransmission Timeout (rto): 204.0ms
+    Round-trip Time (rtt/rtvar): 0.3ms/0.0ms
+    Delayed Ack Timeout (ato): 40.0ms
+    Congestion Window (cwnd): 2
+    TCP Throughput: 74.26 Mbps
+    Recv Round-trip Time (rcv_rtt): 288093.8ms
+    Advertised Recv Window (rcv_space): 29381
+
+BGP neighbor is 192.0.2.17, remote AS 65000, internal link
+  BGP version 4, remote router ID 192.0.2.17, VRF default
+  Last read 00:00:02, last write 00:00:15
+  Hold time is 180, keepalive interval is 60 seconds
+  Configured hold time is 180, keepalive interval is 60 seconds
+  Hold timer is active, time left: 00:01:04
+  Keepalive timer is active, time left: 00:00:40
+  Connect timer is inactive
+  Idle-restart timer is inactive
+  BGP state is Established, up for 23d14h
+  Number of transitions to established: 4
+  Last state was OpenConfirm
+  Last event was RecvKeepAlive
+  Last sent socket-error:Connect (Network is unreachable), Last time 23d14h, First time 113d20 h, Repeats 5
+  Last rcvd socket-error:Connection closed by peer, Last time 23d14h, First time 201d23h, Repe ats 2
+  Types of communities advertised: none
+  Neighbor Capabilities:
+    Multiprotocol IPv4 Unicast: advertised and received and negotiated
+    Four Octet ASN: advertised and received and negotiated
+    Route Refresh: advertised and received and negotiated
+    Enhanced route refresh: advertised
+    Send End-of-RIB messages: advertised
+    Additional-paths recv capability:
+      IPv4 Unicast: advertised
+    Additional-paths send capability:
+  Restart timer is inactive
+  End of rib timer is inactive
+    IPv4 Unicast End-of-RIB received: No
+  AIGP attribute send and receive for IPv4 Unicast are enabled
+  AIGP attribute send and receive for IPv6 Unicast are enabled
+[3m --More-- [23m[K[K  Message Statistics:
+                         Sent      Rcvd
+    Opens:                  4         4
+    Notifications:          0         0
+    Updates:                0      1300
+    Keepalives:        343161    333862
+    Route Refresh:          0         0
+    Total messages:    343165    335166
+  Prefix Statistics:
+                                   Sent      Rcvd     Best Paths     Best ECMP Paths
+    IPv4 Unicast:                     0        13             11                   0
+    IPv6 Unicast:                     0         0              0                   0
+  Configured maximum total number of routes is 12000
+  Inbound updates dropped by reason:
+    AS path loop detection: 0
+    Enforced First AS: 0
+    Malformed MPBGP routes: 0
+    Originator ID matches local router ID: 0
+    Nexthop matches local IP address: 0
+    Unexpected IPv6 nexthop for IPv4 routes: 0
+  Inbound updates with attribute errors:
+    Resulting in removal of all paths in update (treat as withdraw): 0
+    Resulting in AFI/SAFI disable: 0
+    Resulting in attribute ignore: 0
+    Disabled AFI/SAFIs: None
+  Inbound paths dropped by reason:
+    IPv4 labeled-unicast NLRIs dropped due to excessive labels: 0
+    IPv6 labeled-unicast NLRIs dropped due to excessive labels: 0
+    VPN-IPv4 NLRIs dropped due to route import match failure: 0
+    VPN-IPv6 NLRIs dropped due to route import match failure: 0
+    L2VPN EVPN NLRIs dropped due to route import match failure: 0
+  Outbound paths dropped by reason:
+    IPv4 local address not available: 0
+    IPv6 local address not available: 0
+Local AS is 65000, local router ID 192.0.2.24
+TTL is 255
+Local TCP address is 192.0.2.24, local port is 37533
+Remote TCP address is 192.0.2.17, remote port is 179
+BFD is enabled and state is Down
+! Sending extended community not configured, updates will be sent without extended communities  or route targets
+TCP Socket Information:
+  TCP state is ESTABLISHED
+  Recv-Q: 0/32768
+  Send-Q: 0/32768
+  Outgoing Maximum Segment Size (MSS): 1448
+  Total Number of TCP retransmissions: 2
+  Options:
+    Timestamps enabled: yes
+    Selective Acknowledgments enabled: yes
+    Window Scale enabled: yes
+    Explicit Congestion Notification (ECN) enabled: no
+  Socket Statistics:
+    Window Scale (wscale): 7,7
+    Retransmission Timeout (rto): 204.0ms
+    Round-trip Time (rtt/rtvar): 0.1ms/0.0ms
+    Delayed Ack Timeout (ato): 40.0ms
+    Congestion Window (cwnd): 2
+    TCP Throughput: 193.07 Mbps
+    Recv Round-trip Time (rcv_rtt): 115982.8ms
+    Advertised Recv Window (rcv_space): 29364
+
+[K[?1l>kswXX#\swXX# 
+kswXX#\swXX#show int
+[?1h=Ethernet1 is up, line protocol is up (connected)
+  Hardware is Ethernet, address is 012d.456e.7114 (bia 012d.456e.7114)
+  Description: sw05 port 1
+  Member of Port-Channel3
+  Ethernet MTU 9214 bytes, BW 1000000 kbit
+  Full-duplex, 1Gb/s, auto negotiation: on, uni-link: n/a
+  Up 52 days, 4 hours, 49 minutes, 2 seconds
+  Loopback Mode : None
+  12 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 11.0 kbps (0.0% with framing overhead), 2 packets/sec
+  30 seconds output rate 8.59 kbps (0.0% with framing overhead), 10 packets/sec
+     326534045 packets input, 100765403175 bytes
+     Received 2207059 broadcasts, 6646890 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     1206673156 packets output, 1297024675317 bytes
+     Sent 49950350 broadcasts, 153223150 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 3387 output discards
+     0 PAUSE output
+Ethernet2 is up, line protocol is up (connected)
+  Hardware is Ethernet, address is 012d.456e.7115 (bia 012d.456e.7115)
+  Description: Closet AP
+  Ethernet MTU 9214 bytes, BW 1000000 kbit
+  Full-duplex, 1Gb/s, auto negotiation: on, uni-link: n/a
+  Up 36 days, 4 hours, 32 minutes, 12 seconds
+  Loopback Mode : None
+  8 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 4.89 kbps (0.0% with framing overhead), 1 packets/sec
+  30 seconds output rate 4.96 kbps (0.0% with framing overhead), 5 packets/sec
+     64840552 packets input, 32847766107 bytes
+     Received 768449 broadcasts, 1852434 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     240518110 packets output, 100963277935 bytes
+     Sent 16004268 broadcasts, 146902458 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet3 is down, line protocol is down (notconnect)
+  Hardware is Ethernet, address is 012d.456e.7116 (bia 012d.456e.7116)
+  Description: sw05 unusued
+  Member of Port-Channel3
+  Ethernet MTU 9214 bytes
+  Auto-duplex, Auto-speed, auto negotiation: on, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (- with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet4 is up, line protocol is up (connected)
+  Hardware is Ethernet, address is 012d.456e.7117 (bia 012d.456e.7117)
+  Description: Closet Camera
+  Ethernet MTU 9214 bytes, BW 100000 kbit
+  Full-duplex, 100Mb/s, auto negotiation: on, uni-link: n/a
+  Up 110 days, 23 hours, 30 minutes, 36 seconds
+  Loopback Mode : None
+  6 link status changes since last clear
+[3m --More-- [23m[K[K  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 20 bps (0.0% with framing overhead), 0 packets/sec
+  30 seconds output rate 2.72 kbps (0.0% with framing overhead), 4 packets/sec
+     886740 packets input, 102944176 bytes
+     Received 140 broadcasts, 6 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     55874003 packets output, 4966991115 bytes
+     Sent 35472243 broadcasts, 19519652 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet5 is up, line protocol is up (connected)
+  Hardware is Ethernet, address is 012d.456e.7118 (bia 012d.456e.7118)
+  Description: Another Office PC
+  Ethernet MTU 9214 bytes, BW 100000 kbit
+  Full-duplex, 100Mb/s, auto negotiation: on, uni-link: n/a
+  Up 202 days, 21 hours, 26 minutes, 52 seconds
+  Loopback Mode : None
+  4 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (0.0% with framing overhead), 0 packets/sec
+  30 seconds output rate 1.98 kbps (0.0% with framing overhead), 2 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     132157550 packets output, 26279912687 bytes
+     Sent 8521657 broadcasts, 117543505 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 1068440 output discards
+     0 PAUSE output
+Ethernet6 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.7119 (bia 012d.456e.7119)
+  Ethernet MTU 9214 bytes
+  Auto-duplex, Auto-speed, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (- with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet7 is up, line protocol is up (connected)
+  Hardware is Ethernet, address is 012d.456e.711a (bia 012d.456e.711a)
+  Description: Another Office Printer
+  Ethernet MTU 9214 bytes, BW 100000 kbit
+  Full-duplex, 100Mb/s, auto negotiation: on, uni-link: n/a
+  Up 47 days, 12 hours, 25 minutes, 56 seconds
+  Loopback Mode : None
+  24 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 1.42 kbps (0.0% with framing overhead), 0 packets/sec
+  30 seconds output rate 1.96 kbps (0.0% with framing overhead), 2 packets/sec
+     5792625 packets input, 2083131916 bytes
+     Received 25634 broadcasts, 5719090 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     132194771 packets output, 26291074651 bytes
+     Sent 8495734 broadcasts, 117537694 multicast
+     0 output errors, 0 collisions
+[3m --More-- [23m[K[K     0 late collision, 0 deferred, 1068438 output discards
+     0 PAUSE output
+Ethernet8 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.711b (bia 012d.456e.711b)
+  Ethernet MTU 9214 bytes
+  Auto-duplex, Auto-speed, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (- with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet9 is up, line protocol is up (connected)
+  Hardware is Ethernet, address is 012d.456e.711c (bia 012d.456e.711c)
+  Description: Another Router
+  Ethernet MTU 9214 bytes, BW 1000000 kbit
+  Full-duplex, 1Gb/s, auto negotiation: on, uni-link: n/a
+  Up 3 days, 9 hours, 32 minutes, 8 seconds
+  Loopback Mode : None
+  74 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 200 kbps (0.0% with framing overhead), 94 packets/sec
+  30 seconds output rate 200 kbps (0.0% with framing overhead), 88 packets/sec
+     5539065763 packets input, 5949466897492 bytes
+     Received 37771526 broadcasts, 9546553 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     2938956281 packets output, 1080691123900 bytes
+     Sent 292668 broadcasts, 18108224 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet10 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.711d (bia 012d.456e.711d)
+  Ethernet MTU 9214 bytes
+  Auto-duplex, Auto-speed, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (- with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet11 is up, line protocol is up (connected)
+  Hardware is Ethernet, address is 012d.456e.711e (bia 012d.456e.711e)
+  Description: Uplink to switch ge-something
+  Member of Port-Channel5
+  Ethernet MTU 9214 bytes, BW 1000000 kbit
+  Full-duplex, 1Gb/s, auto negotiation: on, uni-link: n/a
+  Up 202 days, 21 hours, 26 minutes, 52 seconds
+  Loopback Mode : None
+  4 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+[3m --More-- [23m[K[K  30 seconds input rate 8.18 kbps (0.0% with framing overhead), 6 packets/sec
+  30 seconds output rate 23.4 kbps (0.0% with framing overhead), 27 packets/sec
+     238445156 packets input, 62665879836 bytes
+     Received 26000526 broadcasts, 110527480 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     587786767 packets output, 103468127523 bytes
+     Sent 95468273 broadcasts, 293298481 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 179 output discards
+     0 PAUSE output
+Ethernet12 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.711f (bia 012d.456e.711f)
+  Ethernet MTU 9214 bytes
+  Auto-duplex, Auto-speed, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (- with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet13 is up, line protocol is up (connected)
+  Hardware is Ethernet, address is 012d.456e.7120 (bia 012d.456e.7120)
+  Description: Router Eth1 DSL
+  Ethernet MTU 9214 bytes, BW 1000000 kbit
+  Full-duplex, 1Gb/s, auto negotiation: on, uni-link: n/a
+  Up 23 days, 14 hours, 40 minutes, 7 seconds
+  Loopback Mode : None
+  8 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 2.21 kbps (0.0% with framing overhead), 2 packets/sec
+  30 seconds output rate 3.29 kbps (0.0% with framing overhead), 4 packets/sec
+     47781091 packets input, 8419882792 bytes
+     Received 371686 broadcasts, 645420 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     97437201 packets output, 31516099509 bytes
+     Sent 21231919 broadcasts, 18756743 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet14 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.7121 (bia 012d.456e.7121)
+  Ethernet MTU 9214 bytes
+  Auto-duplex, Auto-speed, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (- with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+[3m --More-- [23m[K[KEthernet15 is up, line protocol is up (connected)
+  Hardware is Ethernet, address is 012d.456e.7122 (bia 012d.456e.7122)
+  Description: Router Et2 Unused
+  Ethernet MTU 9214 bytes, BW 1000000 kbit
+  Full-duplex, 1Gb/s, auto negotiation: on, uni-link: n/a
+  Up 23 days, 14 hours, 40 minutes, 7 seconds
+  Loopback Mode : None
+  8 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 137 bps (0.0% with framing overhead), 0 packets/sec
+  30 seconds output rate 1.23 kbps (0.0% with framing overhead), 1 packets/sec
+     910512 packets input, 120635786 bytes
+     Received 292167 broadcasts, 618345 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     22279957 packets output, 2283101815 bytes
+     Sent 1459073 broadcasts, 20820884 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet16 is up, line protocol is up (connected)
+  Hardware is Ethernet, address is 012d.456e.7123 (bia 012d.456e.7123)
+  Description: Router
+  Ethernet MTU 9214 bytes, BW 1000000 kbit
+  Full-duplex, 1Gb/s, auto negotiation: on, uni-link: n/a
+  Up 23 days, 14 hours, 40 minutes, 1 second
+  Loopback Mode : None
+  8 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 349 kbps (0.0% with framing overhead), 171 packets/sec
+  30 seconds output rate 369 kbps (0.0% with framing overhead), 188 packets/sec
+     7280124668 packets input, 5724852052602 bytes
+     Received 2656584 broadcasts, 8797546 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     7498385311 packets output, 5852624293311 bytes
+     Sent 117482104 broadcasts, 256424034 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 616 output discards
+     0 PAUSE output
+Ethernet17 is up, line protocol is up (connected)
+  Hardware is Ethernet, address is 012d.456e.7124 (bia 012d.456e.7124)
+  Description: Router Et3 Unused
+  Ethernet MTU 9214 bytes, BW 1000000 kbit
+  Full-duplex, 1Gb/s, auto negotiation: on, uni-link: n/a
+  Up 23 days, 14 hours, 40 minutes, 7 seconds
+  Loopback Mode : None
+  8 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 137 bps (0.0% with framing overhead), 0 packets/sec
+  30 seconds output rate 1.23 kbps (0.0% with framing overhead), 1 packets/sec
+     910511 packets input, 120635672 bytes
+     Received 292167 broadcasts, 618344 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     22279958 packets output, 2283101883 bytes
+     Sent 1459073 broadcasts, 20820885 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet18 is up, line protocol is up (connected)
+  Hardware is Ethernet, address is 012d.456e.7125 (bia 012d.456e.7125)
+  Description: Router Et4 Unusued
+  Ethernet MTU 9214 bytes, BW 1000000 kbit
+  Full-duplex, 1Gb/s, auto negotiation: on, uni-link: n/a
+  Up 23 days, 14 hours, 40 minutes, 7 seconds
+  Loopback Mode : None
+  8 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 137 bps (0.0% with framing overhead), 0 packets/sec
+[3m --More-- [23m[K[K  30 seconds output rate 1.23 kbps (0.0% with framing overhead), 1 packets/sec
+     910510 packets input, 120635590 bytes
+     Received 292167 broadcasts, 618343 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     22279959 packets output, 2283686342 bytes
+     Sent 1459073 broadcasts, 20820886 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet19 is up, line protocol is up (connected)
+  Hardware is Ethernet, address is 012d.456e.7126 (bia 012d.456e.7126)
+  Description: pc1.site1.example.com
+  Ethernet MTU 9214 bytes, BW 1000000 kbit
+  Full-duplex, 1Gb/s, auto negotiation: on, uni-link: n/a
+  Up 202 days, 21 hours, 26 minutes, 52 seconds
+  Loopback Mode : None
+  4 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (0.0% with framing overhead), 0 packets/sec
+  30 seconds output rate 2.70 kbps (0.0% with framing overhead), 4 packets/sec
+     6200 packets input, 514676 bytes
+     Received 1034 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     55002677 packets output, 4898698677 bytes
+     Sent 35471392 broadcasts, 19519665 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet20 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.7127 (bia 012d.456e.7127)
+  Ethernet MTU 9214 bytes
+  Auto-duplex, Auto-speed, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (- with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet21 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.7128 (bia 012d.456e.7128)
+  Ethernet MTU 9214 bytes
+  Auto-duplex, Auto-speed, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (- with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet22 is administratively down, line protocol is down (disabled)
+[3m --More-- [23m[K[K  Hardware is Ethernet, address is 012d.456e.7129 (bia 012d.456e.7129)
+  Ethernet MTU 9214 bytes
+  Auto-duplex, Auto-speed, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (- with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet23 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.712a (bia 012d.456e.712a)
+  Ethernet MTU 9214 bytes
+  Auto-duplex, Auto-speed, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (- with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet24 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.712b (bia 012d.456e.712b)
+  Ethernet MTU 9214 bytes
+  Auto-duplex, Auto-speed, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (- with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet25 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.712c (bia 012d.456e.712c)
+  Ethernet MTU 9214 bytes
+  Auto-duplex, Auto-speed, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (- with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+[3m --More-- [23m[K[K     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet26 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.712d (bia 012d.456e.712d)
+  Ethernet MTU 9214 bytes
+  Auto-duplex, Auto-speed, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (- with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet27 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.712e (bia 012d.456e.712e)
+  Ethernet MTU 9214 bytes
+  Auto-duplex, Auto-speed, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (- with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet28 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.712f (bia 012d.456e.712f)
+  Ethernet MTU 9214 bytes
+  Auto-duplex, Auto-speed, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (- with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet29 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.7130 (bia 012d.456e.7130)
+  Ethernet MTU 9214 bytes
+  Auto-duplex, Auto-speed, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+[3m --More-- [23m[K[K  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (- with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet30 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.7131 (bia 012d.456e.7131)
+  Ethernet MTU 9214 bytes
+  Auto-duplex, Auto-speed, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (- with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet31 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.7132 (bia 012d.456e.7132)
+  Ethernet MTU 9214 bytes
+  Auto-duplex, Auto-speed, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (- with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet32 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.7133 (bia 012d.456e.7133)
+  Ethernet MTU 9214 bytes
+  Auto-duplex, Auto-speed, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (- with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+[3m --More-- [23m[K[KEthernet33 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.7134 (bia 012d.456e.7134)
+  Ethernet MTU 9214 bytes
+  Auto-duplex, Auto-speed, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (- with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet34 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.7135 (bia 012d.456e.7135)
+  Ethernet MTU 9214 bytes
+  Auto-duplex, Auto-speed, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (- with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet35 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.7136 (bia 012d.456e.7136)
+  Ethernet MTU 9214 bytes
+  Auto-duplex, Auto-speed, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (- with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet36 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.7137 (bia 012d.456e.7137)
+  Ethernet MTU 9214 bytes
+  Auto-duplex, Auto-speed, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (- with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+[3m --More-- [23m[K[K     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet37 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.7138 (bia 012d.456e.7138)
+  Ethernet MTU 9214 bytes
+  Auto-duplex, Auto-speed, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (- with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet38 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.7139 (bia 012d.456e.7139)
+  Ethernet MTU 9214 bytes
+  Auto-duplex, Auto-speed, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (- with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet39 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.713a (bia 012d.456e.713a)
+  Ethernet MTU 9214 bytes
+  Auto-duplex, Auto-speed, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (- with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet40 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.713b (bia 012d.456e.713b)
+  Ethernet MTU 9214 bytes
+  Auto-duplex, Auto-speed, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+[3m --More-- [23m[K[K  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (- with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet41 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.713c (bia 012d.456e.713c)
+  Ethernet MTU 9214 bytes
+  Auto-duplex, Auto-speed, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (- with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet42 is up, line protocol is up (connected)
+  Hardware is Ethernet, address is 012d.456e.713d (bia 012d.456e.713d)
+  Description: pc1.site1.example.com vmnic8
+  Member of Port-Channel6
+  Ethernet MTU 9214 bytes, BW 10000000 kbit
+  Full-duplex, 10Gb/s, auto negotiation: on, uni-link: n/a
+  Up 197 days, 20 hours, 46 minutes, 32 seconds
+  Loopback Mode : None
+  14 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 176 kbps (0.0% with framing overhead), 68 packets/sec
+  30 seconds output rate 161 kbps (0.0% with framing overhead), 89 packets/sec
+     5792943562 packets input, 5351174744441 bytes
+     Received 5450605 broadcasts, 1623918 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     82862 PAUSE input
+     4425005633 packets output, 3516346952756 bytes
+     Sent 65722632 broadcasts, 62160305 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet43 is up, line protocol is up (connected)
+  Hardware is Ethernet, address is 012d.456e.713e (bia 012d.456e.713e)
+  Description: pc1.site1.example.com vmnic9
+  Member of Port-Channel6
+  Ethernet MTU 9214 bytes, BW 10000000 kbit
+  Full-duplex, 10Gb/s, auto negotiation: on, uni-link: n/a
+  Up 92 days, 23 hours, 49 minutes, 58 seconds
+  Loopback Mode : None
+  10 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 147 kbps (0.0% with framing overhead), 104 packets/sec
+  30 seconds output rate 165 kbps (0.0% with framing overhead), 98 packets/sec
+     3674241090 packets input, 2469107547236 bytes
+     Received 14770643 broadcasts, 8581413 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     94498 PAUSE input
+[3m --More-- [23m[K[K     4939750625 packets output, 3862974458372 bytes
+     Sent 36688049 broadcasts, 187947435 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet44 is up, line protocol is up (connected)
+  Hardware is Ethernet, address is 012d.456e.713f (bia 012d.456e.713f)
+  Description: Foo Another Connection
+  Member of Port-Channel1
+  Ethernet MTU 9214 bytes, BW 10000000 kbit
+  Full-duplex, 10Gb/s, auto negotiation: on, uni-link: n/a
+  Up 52 days, 4 hours, 45 minutes, 56 seconds
+  Loopback Mode : None
+  8 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 16.7 kbps (0.0% with framing overhead), 17 packets/sec
+  30 seconds output rate 14.6 kbps (0.0% with framing overhead), 15 packets/sec
+     305616494 packets input, 91796979574 bytes
+     Received 15470930 broadcasts, 157304341 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     415323465 packets output, 75827269896 bytes
+     Sent 105983663 broadcasts, 234601581 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet45 is up, line protocol is up (connected)
+  Hardware is Ethernet, address is 012d.456e.7140 (bia 012d.456e.7140)
+  Description: Mid-span POE Injector Management
+  Ethernet MTU 9214 bytes, BW 100000 kbit
+  Full-duplex, 100Mb/s, auto negotiation: on, uni-link: n/a
+  Up 202 days, 21 hours, 26 minutes, 52 seconds
+  Loopback Mode : None
+  4 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (0.0% with framing overhead), 0 packets/sec
+  30 seconds output rate 2.70 kbps (0.0% with framing overhead), 4 packets/sec
+     19081 packets input, 1221184 bytes
+     Received 18270 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     54981307 packets output, 4900860153 bytes
+     Sent 35454156 broadcasts, 19519665 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet46 is up, line protocol is up (connected)
+  Hardware is Ethernet, address is 012d.456e.7141 (bia 012d.456e.7141)
+  Description: Closet UPS Management
+  Ethernet MTU 9214 bytes, BW 100000 kbit
+  Full-duplex, 100Mb/s, auto negotiation: on, uni-link: n/a
+  Up 85 days, 19 hours, 38 minutes, 38 seconds
+  Loopback Mode : None
+  6 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (0.0% with framing overhead), 0 packets/sec
+  30 seconds output rate 2.69 kbps (0.0% with framing overhead), 4 packets/sec
+     69447 packets input, 13024770 bytes
+     Received 235 broadcasts, 0 multicast
+     1 runts, 0 giants
+     1 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     55070282 packets output, 4905354059 bytes
+     Sent 35472185 broadcasts, 19519660 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet47 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.7142 (bia 012d.456e.7142)
+  Ethernet MTU 9214 bytes
+  Auto-duplex, Auto-speed, auto negotiation: off, uni-link: n/a
+[3m --More-- [23m[K[K  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (- with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet48 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.7143 (bia 012d.456e.7143)
+  Ethernet MTU 9214 bytes
+  Auto-duplex, Auto-speed, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (- with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet49/1 is up, line protocol is up (connected)
+  Hardware is Ethernet, address is 012d.456e.7144 (bia 012d.456e.7144)
+  Description: Uplink to sw07 te1/0/2
+  Member of Port-Channel2
+  Ethernet MTU 9214 bytes, BW 10000000 kbit
+  Full-duplex, 10Gb/s, auto negotiation: off, uni-link: n/a
+  Up 4 days, 3 hours, 8 minutes, 1 second
+  Loopback Mode : None
+  54 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 4.19 kbps (0.0% with framing overhead), 4 packets/sec
+  30 seconds output rate 51.5 kbps (0.0% with framing overhead), 40 packets/sec
+     1394311201 packets input, 1032995665389 bytes
+     Received 574980 broadcasts, 102316507 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     1750876083 packets output, 1378429811763 bytes
+     Sent 58363972 broadcasts, 95208539 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet49/2 is up, line protocol is up (connected)
+  Hardware is Ethernet, address is 012d.456e.7145 (bia 012d.456e.7145)
+  Description: pc2.site1.example.com
+  Ethernet MTU 9214 bytes, BW 10000000 kbit
+  Full-duplex, 10Gb/s, auto negotiation: off, uni-link: n/a
+  Up 26 days, 15 hours, 12 minutes, 50 seconds
+  Loopback Mode : None
+  12 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 180 kbps (0.0% with framing overhead), 31 packets/sec
+  30 seconds output rate 63.1 kbps (0.0% with framing overhead), 27 packets/sec
+     762902786 packets input, 583574319202 bytes
+     Received 74670 broadcasts, 381222 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+[3m --More-- [23m[K[K     0 PAUSE input
+     1214749373 packets output, 1317761562749 bytes
+     Sent 43917381 broadcasts, 127333741 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet49/3 is up, line protocol is up (connected)
+  Hardware is Ethernet, address is 012d.456e.7146 (bia 012d.456e.7146)
+  Description: Baz Desktop
+  Ethernet MTU 9214 bytes, BW 10000000 kbit
+  Full-duplex, 10Gb/s, auto negotiation: off, uni-link: n/a
+  Up 10 days, 16 hours, 36 minutes, 47 seconds
+  Loopback Mode : None
+  396 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 26.7 kbps (0.0% with framing overhead), 20 packets/sec
+  30 seconds output rate 38.8 kbps (0.0% with framing overhead), 23 packets/sec
+     822366401 packets input, 344130875729 bytes
+     Received 141643 broadcasts, 1189109 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     122958 PAUSE input
+     1505666096 packets output, 1336890941198 bytes
+     Sent 8265038 broadcasts, 116547544 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 1 output discards
+     0 PAUSE output
+Ethernet49/4 is up, line protocol is up (connected)
+  Hardware is Ethernet, address is 012d.456e.7147 (bia 012d.456e.7147)
+  Description: Uplink to sw01 sfp-sfpplus1
+  Member of Port-Channel4
+  Ethernet MTU 9214 bytes, BW 10000000 kbit
+  Full-duplex, 10Gb/s, auto negotiation: off, uni-link: n/a
+  Up 198 days, 15 hours, 5 minutes, 28 seconds
+  Loopback Mode : None
+  2 link status changes since last clear
+  Last clearing of "show interface" counters 201 days, 16:25:30 ago
+  30 seconds input rate 1.21 kbps (0.0% with framing overhead), 1 packets/sec
+  30 seconds output rate 8.79 kbps (0.0% with framing overhead), 12 packets/sec
+     18992519 packets input, 2570850150 bytes
+     Received 576446 broadcasts, 18010448 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     1 PAUSE input
+     227328923 packets output, 28608854675 bytes
+     Sent 71290078 broadcasts, 147803600 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet49/5 is up, line protocol is up (connected)
+  Hardware is Ethernet, address is 012d.456e.7148 (bia 012d.456e.7148)
+  Description: Uplink to sw07 te1/0/1
+  Member of Port-Channel2
+  Ethernet MTU 9214 bytes, BW 10000000 kbit
+  Full-duplex, 10Gb/s, auto negotiation: off, uni-link: n/a
+  Up 4 days, 3 hours, 19 minutes, 54 seconds
+  Loopback Mode : None
+  28 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 95.7 kbps (0.0% with framing overhead), 68 packets/sec
+  30 seconds output rate 58.5 kbps (0.0% with framing overhead), 50 packets/sec
+     826531455 packets input, 173570474670 bytes
+     Received 13653368 broadcasts, 24148169 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     1574982237 packets output, 1250495448101 bytes
+     Sent 48838713 broadcasts, 209286697 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet49/6 is up, line protocol is up (connected)
+  Hardware is Ethernet, address is 012d.456e.7149 (bia 012d.456e.7149)
+[3m --More-- [23m[K[K  Description: Uplink to sw01 sfp-sfpplus2
+  Member of Port-Channel4
+  Ethernet MTU 9214 bytes, BW 10000000 kbit
+  Full-duplex, 10Gb/s, auto negotiation: off, uni-link: n/a
+  Up 198 days, 15 hours, 5 minutes, 25 seconds
+  Loopback Mode : None
+  8 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 1.15 kbps (0.0% with framing overhead), 1 packets/sec
+  30 seconds output rate 9.27 kbps (0.0% with framing overhead), 13 packets/sec
+     20887954 packets input, 2753236478 bytes
+     Received 295546 broadcasts, 18578946 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     1 PAUSE input
+     297104438 packets output, 42675282792 bytes
+     Sent 48541781 broadcasts, 240526209 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet49/7 is up, line protocol is up (connected)
+  Hardware is Ethernet, address is 012d.456e.714a (bia 012d.456e.714a)
+  Description: pc2.example.com
+  Member of Port-Channel7
+  Ethernet MTU 9214 bytes, BW 10000000 kbit
+  Full-duplex, 10Gb/s, auto negotiation: off, uni-link: n/a
+  Up 99 days, 23 hours, 1 minute, 52 seconds
+  Loopback Mode : None
+  12 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 19.0 kbps (0.0% with framing overhead), 9 packets/sec
+  30 seconds output rate 153 kbps (0.0% with framing overhead), 23 packets/sec
+     737466954 packets input, 674653057102 bytes
+     Received 66775 broadcasts, 9318677 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     4 PAUSE input
+     1203357982 packets output, 1328659477640 bytes
+     Sent 17869107 broadcasts, 18864636 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet49/8 is down, line protocol is down (notconnect)
+  Hardware is Ethernet, address is 012d.456e.7113
+  IP MTU 1500 bytes (default), BW 10000000 kbit
+  Full-duplex, 10Gb/s, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (0.0% with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (0.0% with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet49/9 is down, line protocol is down (notconnect)
+  Hardware is Ethernet, address is 012d.456e.7113
+  IP MTU 1500 bytes (default), BW 10000000 kbit
+  Full-duplex, 10Gb/s, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (0.0% with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (0.0% with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+[3m --More-- [23m[K[K     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet49/10 is down, line protocol is down (notconnect)
+  Hardware is Ethernet, address is 012d.456e.7113
+  IP MTU 1500 bytes (default), BW 10000000 kbit
+  Full-duplex, 10Gb/s, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (0.0% with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (0.0% with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet49/11 is down, line protocol is down (notconnect)
+  Hardware is Ethernet, address is 012d.456e.7113
+  IP MTU 1500 bytes (default), BW 10000000 kbit
+  Full-duplex, 10Gb/s, auto negotiation: off, uni-link: n/a
+  Down 187 days, 22 hours, 24 minutes, 38 seconds
+  Loopback Mode : None
+  5 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (0.0% with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (0.0% with framing overhead), 0 packets/sec
+     1979 packets input, 387884 bytes
+     Received 0 broadcasts, 1979 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     1979 packets output, 387884 bytes
+     Sent 0 broadcasts, 1979 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet49/12 is up, line protocol is up (connected)
+  Hardware is Ethernet, address is 012d.456e.7113
+  IP MTU 1500 bytes (default), BW 10000000 kbit
+  Full-duplex, 10Gb/s, auto negotiation: off, uni-link: n/a
+  Up 186 days, 1 hour, 12 minutes, 16 seconds
+  Loopback Mode : None
+  4 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 75 bps (0.0% with framing overhead), 0 packets/sec
+  30 seconds output rate 75 bps (0.0% with framing overhead), 0 packets/sec
+     535828 packets input, 105022288 bytes
+     Received 0 broadcasts, 535828 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     535828 packets output, 105022288 bytes
+     Sent 0 broadcasts, 535828 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet50/1 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.7150 (bia 012d.456e.7150)
+  Ethernet MTU 9214 bytes, BW 40000000 kbit
+  Full-duplex, 40Gb/s, auto negotiation: off, uni-link: n/a
+[3m --More-- [23m[K[K  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (0.0% with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (0.0% with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet50/5 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.7154 (bia 012d.456e.7154)
+  Ethernet MTU 9214 bytes, BW 40000000 kbit
+  Full-duplex, 40Gb/s, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (0.0% with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (0.0% with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Ethernet50/9 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.7158 (bia 012d.456e.7158)
+  Ethernet MTU 9214 bytes, BW 40000000 kbit
+  Full-duplex, 40Gb/s, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 27 minutes, 1 second
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  30 seconds input rate 0 bps (0.0% with framing overhead), 0 packets/sec
+  30 seconds output rate 0 bps (0.0% with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Loopback0 is up, line protocol is up (connected)
+  Hardware is Loopback
+  Internet address is 192.0.2.24/32
+  Broadcast address is 255.255.255.255
+  IP MTU 65535 bytes (default)
+  Up 202 days, 21 hours, 28 minutes, 14 seconds
+Management1 is administratively down, line protocol is down (disabled)
+  Hardware is Ethernet, address is 012d.456e.7112 (bia 012d.456e.7112)
+  IP MTU 1500 bytes (default)
+  Auto-duplex, Auto-speed, auto negotiation: off, uni-link: n/a
+  Down 202 days, 21 hours, 28 minutes, 11 seconds
+  Loopback Mode : None
+  3 link status changes since last clear
+  Last clearing of "show interface" counters 202 days, 21:32:06 ago
+  5 minutes input rate 0 bps (- with framing overhead), 0 packets/sec
+  5 minutes output rate 0 bps (- with framing overhead), 0 packets/sec
+     0 packets input, 0 bytes
+[3m --More-- [23m[K[K     Received 0 broadcasts, 0 multicast
+     0 runts, 0 giants
+     0 input errors, 0 CRC, 0 alignment, 0 symbol, 0 input discards
+     0 PAUSE input
+     0 packets output, 0 bytes
+     Sent 0 broadcasts, 0 multicast
+     0 output errors, 0 collisions
+     0 late collision, 0 deferred, 0 output discards
+     0 PAUSE output
+Port-Channel1 is up, line protocol is up (connected)
+  Hardware is Port-Channel, address is 012d.456e.713f
+  Description: To Foo
+  Ethernet MTU 9214 bytes, BW 10000000 kbit
+  Full-duplex, 10Gb/s 
+  Active members in this channel: 1
+  ... Ethernet44 , Full-duplex, 10Gb/s
+  Fallback mode is: off
+  Up 52 days, 4 hours, 45 minutes, 52 seconds
+  8 link status changes since last clear
+  Last clearing of "show interface" counters never
+  30 seconds input rate 16.9 kbps (0.0% with framing overhead), 17 packets/sec
+  30 seconds output rate 14.7 kbps (0.0% with framing overhead), 15 packets/sec
+     305616454 packets input, 91796975592 bytes
+     Received 15470925 broadcasts, 157304316 multicast
+     0 input errors, 0 input discards
+     415323433 packets output, 75827265887 bytes
+     Sent 105983652 broadcasts, 234601567 multicast
+     0 output errors, 0 output discards
+Port-Channel2 is up, line protocol is up (connected)
+  Hardware is Port-Channel, address is 012d.456e.7144
+  Description: sw07 po1
+  Ethernet MTU 9214 bytes, BW 20000000 kbit
+  Full-duplex, 20Gb/s 
+  Active members in this channel: 2
+  ... Ethernet49/1 , Full-duplex, 10Gb/s
+  ... Ethernet49/5 , Full-duplex, 10Gb/s
+  Fallback mode is: off
+  Up 202 days, 21 hours, 26 minutes, 43 seconds
+  2 link status changes since last clear
+  Last clearing of "show interface" counters never
+  30 seconds input rate 101 kbps (0.0% with framing overhead), 72 packets/sec
+  30 seconds output rate 111 kbps (0.0% with framing overhead), 91 packets/sec
+     2220840484 packets input, 1206565823281 bytes
+     Received 14228312 broadcasts, 126464335 multicast
+     0 input errors, 0 input discards
+     3325851994 packets output, 2628919877046 bytes
+     Sent 107202416 broadcasts, 304494737 multicast
+     0 output errors, 0 output discards
+Port-Channel3 is up, line protocol is up (connected)
+  Hardware is Port-Channel, address is 012d.456e.7114
+  Description: To sw05 (A Room)
+  Ethernet MTU 9214 bytes, BW 1000000 kbit
+  Full-duplex, 1Gb/s 
+  Active members in this channel: 1
+  ... Ethernet1 , Full-duplex, 1Gb/s
+  Fallback mode is: off
+  Up 52 days, 4 hours, 49 minutes, 2 seconds
+  18 link status changes since last clear
+  Last clearing of "show interface" counters never
+  30 seconds input rate 11.0 kbps (0.0% with framing overhead), 2 packets/sec
+  30 seconds output rate 8.59 kbps (0.0% with framing overhead), 10 packets/sec
+     326586616 packets input, 100827235595 bytes
+     Received 2207332 broadcasts, 6646667 multicast
+     0 input errors, 0 input discards
+     1206707417 packets output, 1297030169953 bytes
+     Sent 49951461 broadcasts, 153224296 multicast
+     0 output errors, 3387 output discards
+Port-Channel4 is up, line protocol is up (connected)
+  Hardware is Port-Channel, address is 012d.456e.7147
+  Description: sw01 bond1
+  Ethernet MTU 9214 bytes, BW 20000000 kbit
+  Full-duplex, 20Gb/s 
+  Active members in this channel: 2
+[3m --More-- [23m[K[K  ... Ethernet49/4 , Full-duplex, 10Gb/s
+  ... Ethernet49/6 , Full-duplex, 10Gb/s
+  Fallback mode is: off
+  Up 198 days, 15 hours, 5 minutes, 25 seconds
+  10 link status changes since last clear
+  Last clearing of "show interface" counters never
+  30 seconds input rate 2.38 kbps (0.0% with framing overhead), 2 packets/sec
+  30 seconds output rate 18.1 kbps (0.0% with framing overhead), 25 packets/sec
+     39994018 packets input, 5339164168 bytes
+     Received 874756 broadcasts, 36698615 multicast
+     0 input errors, 0 input discards
+     529456562 packets output, 74860537183 bytes
+     Sent 120592171 broadcasts, 389967746 multicast
+     0 output errors, 0 output discards
+Port-Channel5 is up, line protocol is up (connected)
+  Hardware is Port-Channel, address is 012d.456e.711e
+  Description: LAG to sw02
+  Ethernet MTU 9214 bytes, BW 1000000 kbit
+  Full-duplex, 1Gb/s 
+  Active members in this channel: 1
+  ... Ethernet11 , Full-duplex, 1Gb/s
+  Fallback mode is: off
+  Up 202 days, 21 hours, 26 minutes, 50 seconds
+  2 link status changes since last clear
+  Last clearing of "show interface" counters never
+  30 seconds input rate 8.18 kbps (0.0% with framing overhead), 6 packets/sec
+  30 seconds output rate 23.4 kbps (0.0% with framing overhead), 27 packets/sec
+     238445156 packets input, 62665879836 bytes
+     Received 26000526 broadcasts, 110527480 multicast
+     0 input errors, 0 input discards
+     587786767 packets output, 103468127523 bytes
+     Sent 95468273 broadcasts, 293298481 multicast
+     0 output errors, 179 output discards
+Port-Channel6 is up, line protocol is up (connected)
+  Hardware is Port-Channel, address is 012d.456e.713d
+  Description: LAG to pc1.site1.example.com vswitch0
+  Ethernet MTU 9214 bytes, BW 20000000 kbit
+  Full-duplex, 20Gb/s 
+  Active members in this channel: 2
+  ... Ethernet42 , Full-duplex, 10Gb/s
+  ... Ethernet43 , Full-duplex, 10Gb/s
+  Fallback mode is: off
+  Up 197 days, 21 hours, 35 minutes, 9 seconds
+  2 link status changes since last clear
+  Last clearing of "show interface" counters never
+  30 seconds input rate 324 kbps (0.0% with framing overhead), 173 packets/sec
+  30 seconds output rate 329 kbps (0.0% with framing overhead), 188 packets/sec
+     9069003623 packets input, 7434087051084 bytes
+     Received 19841247 broadcasts, 9882817 multicast
+     0 input errors, 0 input discards
+     8991830681 packets output, 7041523055794 bytes
+     Sent 96875465 broadcasts, 241968213 multicast
+     0 output errors, 0 output discards
+Port-Channel7 is up, line protocol is up (connected)
+  Hardware is Port-Channel, address is 012d.456e.714a
+  Description: LAG to pc2.example.com
+  Ethernet MTU 9214 bytes, BW 10000000 kbit
+  Full-duplex, 10Gb/s 
+  Active members in this channel: 1
+  ... Ethernet49/7 , Full-duplex, 10Gb/s
+  Fallback mode is: off
+  Up 99 days, 23 hours, 1 minute, 49 seconds
+  5 link status changes since last clear
+  Last clearing of "show interface" counters never
+  30 seconds input rate 19.0 kbps (0.0% with framing overhead), 9 packets/sec
+  30 seconds output rate 153 kbps (0.0% with framing overhead), 23 packets/sec
+     737465819 packets input, 674652816790 bytes
+     Received 66406 broadcasts, 9317925 multicast
+     0 input errors, 0 input discards
+     1203357717 packets output, 1328659438127 bytes
+     Sent 17869092 broadcasts, 18864414 multicast
+     0 output errors, 0 output discards
+Vlan102 is up, line protocol is up (connected)
+[3m --More-- [23m[K[K  Hardware is Vlan, address is 012d.456e.7113 (bia 012d.456e.7113)
+  Internet address is 192.0.2.61/28
+  Broadcast address is 255.255.255.255
+  IP MTU 1500 bytes (default)
+  Up 202 days, 21 hours, 26 minutes, 52 seconds
+Vlan210 is up, line protocol is up (connected)
+  Hardware is Vlan, address is 012d.456e.7113 (bia 012d.456e.7113)
+  Internet address is 192.0.2.3/24
+  Broadcast address is 255.255.255.255
+  IP MTU 1500 bytes (default)
+  Up 197 days, 20 hours, 55 minutes, 48 seconds
+[K[?1l>kswXX#\swXX#   
+kswXX#\swXX#
+kswXX#\swXX#show int status
+[?1h=Port       Name                                    Status       Vlan     Duplex Speed  Type           Flags Encapsulation
+Et1        sw05 port 1                             connected    in Po3   a-full a-1G   10GBASE -T                        
+Et2        Closet AP                               connected    trunk    a-full a-1G   10GBASE -T                        
+Et3        sw05 unusued                            notconnect   in Po3   auto   auto   10GBASE -T                        
+Et4        Closet Camera                           connected    1        a-full a-100M 10GBASE -T                        
+Et5        Another Office PC                       connected    210      a-full a-100M 10GBASE -T                        
+Et6                                                disabled     1        auto   auto   10GBASE -T                        
+Et7        Another Office Printer                  connected    210      a-full a-100M 10GBASE -T                        
+Et8                                                disabled     1        auto   auto   10GBASE -T                        
+Et9        Another Router                          connected    209      a-full a-1G   10GBASE -T                        
+Et10                                               disabled     1        auto   auto   10GBASE -T                        
+Et11       Uplink to switch ge-something           connected    in Po5   a-full a-1G   10GBASE -T                        
+Et12                                               disabled     1        auto   auto   10GBASE -T                        
+Et13       Router Eth1 DSL                         connected    199      a-full a-1G   10GBASE -T                        
+Et14                                               disabled     1        auto   auto   10GBASE -T                        
+Et15       Router Et2 Unused                       connected    666      a-full a-1G   10GBASE -T                        
+Et16       Router                                  connected    trunk    a-full a-1G   10GBASE -T                        
+Et17       Router Et3 Unused                       connected    666      a-full a-1G   10GBASE -T                        
+Et18       Router Et4 Unusued                      connected    666      a-full a-1G   10GBASE -T                        
+Et19       pc1.site1.example.com                   connected    1        a-full a-1G   10GBASE -T                        
+Et20                                               disabled     1        auto   auto   10GBASE -T                        
+Et21                                               disabled     1        auto   auto   10GBASE -T                        
+Et22                                               disabled     1        auto   auto   10GBASE -T                        
+Et23                                               disabled     1        auto   auto   10GBASE -T                        
+Et24                                               disabled     1        auto   auto   10GBASE -T                        
+Et25                                               disabled     1        auto   auto   10GBASE -T                        
+Et26                                               disabled     1        auto   auto   10GBASE -T                        
+Et27                                               disabled     1        auto   auto   10GBASE -T                        
+Et28                                               disabled     1        auto   auto   10GBASE -T                        
+Et29                                               disabled     1        auto   auto   10GBASE -T                        
+Et30                                               disabled     1        auto   auto   10GBASE -T                        
+Et31                                               disabled     1        auto   auto   10GBASE -T                        
+Et32                                               disabled     1        auto   auto   10GBASE -T                        
+Et33                                               disabled     1        auto   auto   10GBASE -T                        
+Et34                                               disabled     1        auto   auto   10GBASE -T                        
+Et35                                               disabled     1        auto   auto   10GBASE -T                        
+Et36                                               disabled     1        auto   auto   10GBASE [3m --More-- [23m[K[K-T                        
+Et37                                               disabled     1        auto   auto   10GBASE -T                        
+Et38                                               disabled     1        auto   auto   10GBASE -T                        
+Et39                                               disabled     1        auto   auto   10GBASE -T                        
+Et40                                               disabled     1        auto   auto   10GBASE -T                        
+Et41                                               disabled     1        auto   auto   10GBASE -T                        
+Et42       pc1.site1.example.com vmnic8            connected    in Po6   a-full a-10G  10GBASE -T                        
+Et43       pc1.site1.example.com vmnic9            connected    in Po6   a-full a-10G  10GBASE -T                        
+Et44       Foo Another Connection                  connected    in Po1   a-full a-10G  10GBASE -T                        
+Et45       Mid-span POE Injector Management        connected    1        a-full a-100M 10GBASE -T                        
+Et46       Closet UPS Management                   connected    1        a-full a-100M 10GBASE -T                        
+Et47                                               disabled     1        auto   auto   10GBASE -T                        
+Et48                                               disabled     1        auto   auto   10GBASE -T                        
+Et49/1     Uplink to sw07 te1/0/2                  connected    in Po2   full   10G    100GBAS E-SR10                    
+Et49/2     pc2.site1.example.com                   connected    trunk    full   10G    100GBAS E-SR10                    
+Et49/3     Baz Desktop                             connected    210      full   10G    100GBAS E-SR10                    
+Et49/4     Uplink to sw01 sfp-sfpplus1             connected    in Po4   full   10G    100GBAS E-SR10                    
+Et49/5     Uplink to sw07 te1/0/1                  connected    in Po2   full   10G    100GBAS E-SR10                    
+Et49/6     Uplink to sw01 sfp-sfpplus2             connected    in Po4   full   10G    100GBAS E-SR10                    
+Et49/7     pc2.example.com                         connected    in Po7   full   10G    100GBAS E-SR10                    
+Et49/8                                             notconnect   routed   full   10G    100GBAS E-SR10                    
+Et49/9                                             notconnect   routed   full   10G    100GBAS E-SR10                    
+Et49/10                                            notconnect   routed   full   10G    100GBAS E-SR10                    
+Et49/11                                            notconnect   routed   full   10G    100GBAS E-SR10                    
+Et49/12                                            connected    routed   full   10G    100GBAS E-SR10                    
+Et50/1                                             disabled     1        full   40G    100GBAS E-SR10                    
+Et50/5                                             disabled     1        full   40G    100GBAS E-SR10                    
+Et50/9                                             disabled     1        full   40G    100GBAS E-SR10                    
+Ma1                                                disabled     routed   auto   auto   10/100/ 1000                      
+Po1        To Foo                                  connected    trunk    full   10G    N/A                               
+Po2        sw07 po1                                connected    trunk    full   20G    N/A                               
+Po3        To sw05 (A Room)                        connected    trunk    full   1G     N/A                               
+Po4        sw01 bond1                              connected    trunk    full   20G    N/A                               
+Po5        LAG to sw02                             connected    trunk    full   1G     N/A                               
+Po6        LAG to pc1.site1.example.com vswitch0 connected    trunk    full   20G    N/A                               
+Po7        LAG to pc2.example.com              connected    1        full   10G    N/A                               
+
+[K[?1l>kswXX#\swXX# 
+kswXX#\swXX#show int t[KdescswXX#show int description 
+[?1h=Interface                      Status         Protocol           Description
+Et1                            up             up                 sw05 port 1
+Et2                            up             up                 Closet AP
+Et3                            down           down               sw05 unusued
+Et4                            up             up                 Closet Camera
+Et5                            up             up                 Another Office PC
+Et6                            admin down     down               
+Et7                            up             up                 Another Office Printer
+Et8                            admin down     down               
+Et9                            up             up                 Another Router
+Et10                           admin down     down               
+Et11                           up             up                 Uplink to switch ge-something
+Et12                           admin down     down               
+Et13                           up             up                 Router Eth1 DSL
+Et14                           admin down     down               
+Et15                           up             up                 Router Et2 Unused
+Et16                           up             up                 Router
+Et17                           up             up                 Router Et3 Unused
+Et18                           up             up                 Router Et4 Unusued
+Et19                           up             up                 pc1.site1.example.com
+Et20                           admin down     down               
+Et21                           admin down     down               
+Et22                           admin down     down               
+Et23                           admin down     down               
+Et24                           admin down     down               
+Et25                           admin down     down               
+Et26                           admin down     down               
+Et27                           admin down     down               
+Et28                           admin down     down               
+Et29                           admin down     down               
+Et30                           admin down     down               
+Et31                           admin down     down               
+Et32                           admin down     down               
+Et33                           admin down     down               
+Et34                           admin down     down               
+Et35                           admin down     down               
+Et36                           admin down     down               
+Et37                           admin down     down               
+Et38                           admin down     down               
+Et39                           admin down     down               
+Et40                           admin down     down               
+Et41                           admin down     down               
+Et42                           up             up                 pc1.site1.example.com vmnic 8
+Et43                           up             up                 pc1.site1.example.com vmnic 9
+Et44                           up             up                 Foo Another Connection
+Et45                           up             up                 Mid-span POE Injector Managem ent
+Et46                           up             up                 Closet UPS Management
+Et47                           admin down     down               
+Et48                           admin down     down               
+Et49/1                         up             up                 Uplink to sw07 te1/0/2
+Et49/2                         up             up                 pc2.site1.example.com
+Et49/3                         up             up                 Baz Desktop
+Et49/4                         up             up                 Uplink to sw01 sfp-sfpplus1
+Et49/5                         up             up                 Uplink to sw07 te1/0/1
+Et49/6                         up             up                 Uplink to sw01 sfp-sfpplus2
+Et49/7                         up             up                 pc2.example.com
+Et49/8                         down           down               
+Et49/9                         down           down               
+Et49/10                        down           down               
+Et49/11                        down           down               
+Et49/12                        up             up                 
+Et50/1                         admin down     down               
+Et50/5                         admin down     down               
+Et50/9                         admin down     down               
+Lo0                            up             up                 
+Ma1                            admin down     down               
+Po1                            up             up                 To Foo
+Po2                            up             up                 sw07 po1
+Po3                            up             up                 To sw05 (A Room)
+Po4                            up             up                 sw01 bond1
+[3m --More-- [23m[K[KPo5                            up             up                 LAG to sw02
+Po6                            up             up                 LAG to pc1.site1.example.co m vswitch0
+Po7                            up             up                 LAG to pc2.example.com
+Vl102                          up             up                 
+Vl210                          up             up                 
+[K[?1l>kswXX#\swXX#  
+kswXX#\swXX#show int transswXX#show int transceiver 
+[?1h=If device is externally calibrated, only calibrated values are printed.
+N/A: not applicable, Tx: transmit, Rx: receive.
+mA: milliamperes, dBm: decibels (milliwatts).
+                               Bias      Optical   Optical                
+          Temp       Voltage   Current   Tx Power  Rx Power               
+Port      (Celsius)  (Volts)   (mA)      (dBm)     (dBm)     Last Update  
+-----     ---------  --------  --------  --------  --------  -------------------
+Et49/1     45.55      3.29      5.62     0.81      -4.46     0:00:03 ago
+Et49/2     45.55      3.29      5.60     0.52      -3.87     0:00:03 ago
+Et49/3     45.55      3.29      5.51     0.81      -2.46     0:00:03 ago
+Et49/4     45.55      3.29      5.62     0.68      -5.77     0:00:03 ago
+Et49/5     45.55      3.29      5.87     0.61      -4.86     0:00:03 ago
+Et49/6     45.55      3.29      5.49     1.19      -4.55     0:00:03 ago
+Et49/7     45.55      3.29      5.39     0.93      -4.59     0:00:03 ago
+Et49/8     45.55      3.29      6.15     1.02      -30.00    0:00:03 ago
+Et49/9     45.55      3.29      5.74     1.00      -30.00    0:00:03 ago
+Et49/10    45.55      3.29      5.63     0.71      -30.00    0:00:03 ago
+Et49/11    45.55      3.29      5.48     0.96      -30.00    0:00:03 ago
+Et49/12    45.55      3.29      5.39     0.62      -0.98     0:00:03 ago
+Et50/1     37.88      3.30      0.00     -30.00    -30.00    0:00:00 ago
+Et50/2     37.88      3.30      0.00     -30.00    -30.00    0:00:00 ago
+Et50/3     37.88      3.30      0.00     -30.00    -30.00    0:00:00 ago
+Et50/4     37.88      3.30      0.00     -30.00    -30.00    0:00:00 ago
+Et50/5     37.88      3.30      0.00     -30.00    -30.00    0:00:00 ago
+Et50/6     37.88      3.30      0.00     -30.00    -30.00    0:00:00 ago
+Et50/7     37.88      3.30      0.00     -30.00    -30.00    0:00:00 ago
+Et50/8     37.88      3.30      0.00     -30.00    -30.00    0:00:00 ago
+Et50/9     37.88      3.30      0.00     -30.00    -30.00    0:00:00 ago
+Et50/10    37.88      3.30      0.00     -30.00    -30.00    0:00:00 ago
+Et50/11    37.88      3.30      0.00     -30.00    -30.00    0:00:00 ago
+Et50/12    37.88      3.30      0.00     -30.00    -30.00    0:00:00 ago
+[K[?1l>kswXX#\swXX#exit

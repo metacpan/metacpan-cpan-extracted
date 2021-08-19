@@ -2,7 +2,7 @@
 ##----------------------------------------------------------------------------
 # Database Object Interface - ~/lib/DB/Object/Postgres/Statement.pm
 # Version v0.300.1
-# Copyright(c) 2019 DEGUEST Pte. Ltd.
+# Copyright(c) 2019-2021 DEGUEST Pte. Ltd.
 # Author: Jacques Deguest <jack@deguest.jp>
 # Created 2017/07/19
 # Modified 2020/12/07
@@ -18,8 +18,8 @@
 package DB::Object::Postgres::Statement;
 BEGIN
 {
-    require 5.6.0;
     use strict;
+    use warnings;
     use DB::Object::Postgres;
     use DB::Object::Statement;
     use DateTime;

@@ -20,7 +20,7 @@ use namespace::clean;
 
 with 'Plasp::Compiler', 'Plasp::Parser', 'Plasp::State';
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 =head1 NAME
 
@@ -28,7 +28,7 @@ Plasp - PerlScript/ASP
 
 =head1 VERSION
 
-version 1.08
+version 1.09
 
 =head1 SYNOPSIS
 
@@ -722,7 +722,9 @@ sub cleanup {
 
 # Clear remaining global objects in order
 sub DEMOLISH {
-    my ( $self ) = @_;
+    my ( $self, $is_global_destruction ) = @_;
+
+    return if $is_global_destruction;
 
     $self->cleanup;
 

@@ -1,5 +1,8 @@
 Revision history for Perl extension XML::Perl.
 
+1.00
+	- new xpath
+
 0.10
 	- warnings
 

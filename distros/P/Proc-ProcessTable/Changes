@@ -345,3 +345,5 @@ Revision history for Perl extension Proc::ProcessTable.
   * compiles on musl
   * Skip LXC hidden dir in /dev when looking for TTYs
   * Fix test on OpenBSD
+0.61 2021-08-18
+  * fixed regression: on linux only 1st char of the command names was parsed

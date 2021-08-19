@@ -3,43 +3,44 @@ BEGIN
 {
 	use strict;
 	use URI::tel;
-	use Test::More tests => 199;
+	use Test::More tests => 220;
 };
 
 {
 	## Test to implement rfc3966 https://tools.ietf.org/search/rfc3966
 	my @tests = (
-	{ tel => "tel:+1-201-555-0123", global => 1, subscriber => '+1-201-555-0123', ext => undef(), context => '+1', isdn => '', params => {}, country => [qw( CA US )], uri => 'tel:+1-201-555-0123', canon => 'tel:+12015550123' },
-	{ tel => "tel:+1(800)555-1212", global => 1, subscriber => '+1(800)555-1212', ext => undef(), context => '+1', isdn => '', params => {}, country => [qw( CA US )], uri => 'tel:+1(800)555-1212', canon => 'tel:+18005551212' },
-	{ tel => "tel:+338005551212", global => 1, subscriber => '+338005551212', ext => undef(), context => '+33', isdn => '', params => {}, country => [qw( FR )], uri => 'tel:+338005551212', canon => 'tel:+338005551212' },
-	{ tel => "+18005553434;ext=123", global => 1, subscriber => '+18005553434', ext => 123, context => '+1', isdn => '', params => {}, country => [qw( CA US )], uri => 'tel:+18005553434;ext=123', canon => 'tel:+18005553434;ext=123' },
-	{ tel => "tel:+1-418-656-9254;ext=102", global => 1, subscriber => '+1-418-656-9254', ext => 102, context => '+1', isdn => '', params => {}, country => [qw( CA US )], uri => 'tel:+1-418-656-9254;ext=102', canon => 'tel:+14186569254;ext=102' },
-	{ tel => "tel:911;phone-context=+1", global => 0, subscriber => '911', ext => undef(), context => '+1', isdn => '', params => {}, country => [qw( CA US )], uri => 'tel:911;phone-context=+1', canon => 'tel:911;phone-context=+1' },
-	{ tel => "tel:7042;phone-context=example.com", global => 0, subscriber => 7042, ext => undef(), context => 'example.com', isdn => '', params => {}, country => [], uri => 'tel:7042;phone-context=example.com', canon => 'tel:7042;phone-context=example.com' },
-	{ tel => "tel:863-1234;phone-context=+1-914-555", global => 0, subscriber => '863-1234', ext => undef(), context => '+1-914-555', isdn => '', params => {}, country => [qw( CA US )], uri => 'tel:863-1234;phone-context=+1-914-555', canon => 'tel:8631234;phone-context=+1-914-555' },
-	{ tel => "tel:7042;ext=42;setup=20160509;phone-context=example.com", global => 0, subscriber => 7042, ext => 42, context => 'example.com', isdn => '', params => { setup => 20160509 }, country => [], uri => 'tel:7042;ext=42;phone-context=example.com;setup=20160509', canon => 'tel:7042;ext=42;phone-context=example.com;setup=20160509' },
-	{ tel => "tel:7042;phone-context=example.com;ext=42;setup=20160509;loc=NY", global => 0, subscriber => '7042', ext => 42, context => 'example.com', isdn => '', params => { loc => 'NY', setup => '20160509' }, country => [], uri => 'tel:7042;ext=42;phone-context=example.com;loc=NY;setup=20160509', canon => 'tel:7042;ext=42;phone-context=example.com;loc=NY;setup=20160509' },
-	{ tel => "tel:+1-418-656-9254;ext=102;phone-context=example.com", global => 1, subscriber => '+1-418-656-9254', ext => 102, context => 'example.com', isdn => '', params => {}, country => [qw( CA US )], uri => 'tel:+1-418-656-9254;ext=102;phone-context=example.com', canon => 'tel:+14186569254;ext=102;phone-context=example.com' },
-	{ tel => "tel:+1-418-656-9254;ext=102;phone-context=example.com;setup=20160509", global => 1, subscriber => '+1-418-656-9254', ext => '102', context => 'example.com', isdn => '', params => {setup => 20160509}, country => [qw( CA US )], uri => 'tel:+1-418-656-9254;ext=102;phone-context=example.com;setup=20160509', canon => 'tel:+14186569254;ext=102;phone-context=example.com;setup=20160509' },
-	{ tel => "03-1234-5678", global => 0, subscriber => '03-1234-5678', ext => undef(), context => undef(), isdn => '', params => {}, country => [], uri => 'tel:03-1234-5678', canon => 'tel:0312345678' },
-	{ tel => "03-1234-5678x42", global => 0, subscriber => '03-1234-5678', ext => 42, context => undef(), isdn => '', params => {}, country => [], uri => 'tel:03-1234-5678;ext=42', canon => 'tel:0312345678;ext=42' },
-	{ tel => "432.555.1334", global => 0, subscriber => '432.555.1334', ext => undef(), context => undef(), isdn => '', params => {}, country => [], uri => 'tel:432.555.1334', canon => 'tel:4325551334' },
-	{ tel => "(800)ABCDEFG", global => 0, subscriber => '(800)ABCDEFG', ext => undef(), context => undef(), isdn => '', params => {}, country => [], uri => 'tel:(800)ABCDEFG', canon => 'tel:8002223334' },
-	{ tel => "+1-800-LAWYERS", global => 0, subscriber => '+1-800-LAWYERS', ext => undef(), context => '+1', isdn => '', params => {}, country => [qw( CA US )], uri => 'tel:+1-800-LAWYERS', canon => 'tel:+18005299377' },
-	{ tel => "(999) 555-4455 ext123", global => 0, subscriber => '(999)555-4455', ext => 123, context => undef(), isdn => '', params => {}, country => [], uri => 'tel:(999)555-4455;ext=123', canon => 'tel:9995554455;ext=123' },
-	{ tel => "555-555-5555, Ext. 505", global => 0, subscriber => '555-555-5555', ext => 505, context => undef(), isdn => '', params => {}, country => [], uri => 'tel:555-555-5555;ext=505', canon => 'tel:5555555555;ext=505' },
-	{ tel => "416.619.0322 ext.262", global => 0, subscriber => '416.619.0322', ext => '262', context => undef(), isdn => '', params => {}, country => [], uri => 'tel:416.619.0322;ext=262', canon => 'tel:4166190322;ext=262' },
-	{ tel => "notwork", global => 0, subscriber => undef(), ext => undef(), context => undef(), isdn => '', params => {}, country => [], uri => '', canon => '', has_error =~ qr/Unknown telephone number/ },
+	{ tel => "tel:+1-201-555-0123", global => 1, subscriber => '+1-201-555-0123', ext => undef(), context => '+1', isdn => '', params => {}, country => [qw( CA US )], uri => 'tel:+1-201-555-0123', canon => 'tel:+12015550123', local_number => '201-555-0123' },
+	{ tel => "tel:+1(800)555-1212", global => 1, subscriber => '+1(800)555-1212', ext => undef(), context => '+1', isdn => '', params => {}, country => [qw( CA US )], uri => 'tel:+1(800)555-1212', canon => 'tel:+18005551212', local_number => '(800)555-1212' },
+	{ tel => "tel:+338005551212", global => 1, subscriber => '+338005551212', ext => undef(), context => '+33', isdn => '', params => {}, country => [qw( FR )], uri => 'tel:+338005551212', canon => 'tel:+338005551212', local_number => '8005551212' },
+	{ tel => "+18005553434;ext=123", global => 1, subscriber => '+18005553434', ext => 123, context => '+1', isdn => '', params => {}, country => [qw( CA US )], uri => 'tel:+18005553434;ext=123', canon => 'tel:+18005553434;ext=123', local_number => '8005553434' },
+	{ tel => "tel:+1-418-656-9254;ext=102", global => 1, subscriber => '+1-418-656-9254', ext => 102, context => '+1', isdn => '', params => {}, country => [qw( CA US )], uri => 'tel:+1-418-656-9254;ext=102', canon => 'tel:+14186569254;ext=102', local_number => '418-656-9254' },
+	{ tel => "tel:911;phone-context=+1", global => 0, subscriber => '911', ext => undef(), context => '+1', isdn => '', params => {}, country => [qw( CA US )], uri => 'tel:911;phone-context=+1', canon => 'tel:911;phone-context=+1', local_number => '911;phone-context=+1' },
+	{ tel => "tel:7042;phone-context=example.com", global => 0, subscriber => 7042, ext => undef(), context => 'example.com', isdn => '', params => {}, country => [], uri => 'tel:7042;phone-context=example.com', canon => 'tel:7042;phone-context=example.com', local_number => '7042;phone-context=example.com' },
+	{ tel => "tel:863-1234;phone-context=+1-914-555", global => 0, subscriber => '863-1234', ext => undef(), context => '+1-914-555', isdn => '', params => {}, country => [qw( CA US )], uri => 'tel:863-1234;phone-context=+1-914-555', canon => 'tel:8631234;phone-context=+1-914-555', local_number => '863-1234;phone-context=+1-914-555' },
+	{ tel => "tel:7042;ext=42;setup=20160509;phone-context=example.com", global => 0, subscriber => 7042, ext => 42, context => 'example.com', isdn => '', params => { setup => 20160509 }, country => [], uri => 'tel:7042;ext=42;phone-context=example.com;setup=20160509', canon => 'tel:7042;ext=42;phone-context=example.com;setup=20160509', local_number => '7042;ext=42;setup=20160509;phone-context=example.com' },
+	{ tel => "tel:7042;phone-context=example.com;ext=42;setup=20160509;loc=NY", global => 0, subscriber => '7042', ext => 42, context => 'example.com', isdn => '', params => { loc => 'NY', setup => '20160509' }, country => [], uri => 'tel:7042;ext=42;phone-context=example.com;loc=NY;setup=20160509', canon => 'tel:7042;ext=42;phone-context=example.com;loc=NY;setup=20160509', local_number => '7042;phone-context=example.com;ext=42;setup=20160509;loc=NY' },
+	{ tel => "tel:+1-418-656-9254;ext=102;phone-context=example.com", global => 1, subscriber => '+1-418-656-9254', ext => 102, context => 'example.com', isdn => '', params => {}, country => [qw( CA US )], uri => 'tel:+1-418-656-9254;ext=102;phone-context=example.com', canon => 'tel:+14186569254;ext=102;phone-context=example.com', local_number => '418-656-9254' },
+	{ tel => "tel:+1-418-656-9254;ext=102;phone-context=example.com;setup=20160509", global => 1, subscriber => '+1-418-656-9254', ext => '102', context => 'example.com', isdn => '', params => {setup => 20160509}, country => [qw( CA US )], uri => 'tel:+1-418-656-9254;ext=102;phone-context=example.com;setup=20160509', canon => 'tel:+14186569254;ext=102;phone-context=example.com;setup=20160509', local_number => '418-656-9254' },
+	{ tel => "03-1234-5678", global => 0, subscriber => '03-1234-5678', ext => undef(), context => undef(), isdn => '', params => {}, country => [], uri => 'tel:03-1234-5678', canon => 'tel:0312345678', local_number => '03-1234-5678' },
+	{ tel => "03-1234-5678x42", global => 0, subscriber => '03-1234-5678', ext => 42, context => undef(), isdn => '', params => {}, country => [], uri => 'tel:03-1234-5678;ext=42', canon => 'tel:0312345678;ext=42', local_number => '03-1234-5678' },
+	{ tel => "432.555.1334", global => 0, subscriber => '432.555.1334', ext => undef(), context => undef(), isdn => '', params => {}, country => [], uri => 'tel:432.555.1334', canon => 'tel:4325551334', local_number => '432.555.1334' },
+	{ tel => "(800)ABCDEFG", global => 0, subscriber => '(800)ABCDEFG', ext => undef(), context => undef(), isdn => '', params => {}, country => [], uri => 'tel:(800)ABCDEFG', canon => 'tel:8002223334', local_number => '(800)ABCDEFG' },
+	{ tel => "+1-800-LAWYERS", global => 0, subscriber => '+1-800-LAWYERS', ext => undef(), context => '+1', isdn => '', params => {}, country => [qw( CA US )], uri => 'tel:+1-800-LAWYERS', canon => 'tel:+18005299377', local_number => '800-LAWYERS' },
+	{ tel => "(999) 555-4455 ext123", global => 0, subscriber => '(999)555-4455', ext => 123, context => undef(), isdn => '', params => {}, country => [], uri => 'tel:(999)555-4455;ext=123', canon => 'tel:9995554455;ext=123', local_number => '(999)555-4455' },
+	{ tel => "555-555-5555, Ext. 505", global => 0, subscriber => '555-555-5555', ext => 505, context => undef(), isdn => '', params => {}, country => [], uri => 'tel:555-555-5555;ext=505', canon => 'tel:5555555555;ext=505', local_number => '555-555-5555' },
+	{ tel => "416.619.0322 ext.262", global => 0, subscriber => '416.619.0322', ext => '262', context => undef(), isdn => '', params => {}, country => [], uri => 'tel:416.619.0322;ext=262', canon => 'tel:4166190322;ext=262', local_number => '416.619.0322' },
+	{ tel => "notwork", global => 0, subscriber => undef(), ext => undef(), context => undef(), isdn => '', params => {}, country => [], uri => '', canon => '', has_error =~ qr/Unknown telephone number/, local_number => undef() },
 	);
 	foreach my $ref ( @tests )
 	{
 		my $tel = URI::tel->new( $ref->{tel} );
 		is( defined( $tel ), 1, $ref->{tel} );
-		is( $tel->is_global, $ref->{global}, "Is global for $ref->{tel}"  );
-		is( $tel->subscriber, $ref->{subscriber}, "Subscriber for $ref->{tel}" );
-		is( $tel->ext, $ref->{ext}, "Extension for $ref->{tel}" );
-		is( $tel->context, $ref->{context}, "Context for $ref->{tel}" );
-		is( $tel->isub, $ref->{isub}, "Isub for $ref->{tel}" );
+		is( $tel->is_global, $ref->{global}, "Is global for $ref->{tel} -> $ref->{global}"  );
+		is( $tel->subscriber, $ref->{subscriber}, "Subscriber for $ref->{tel} -> $ref->{subscriber}" );
+		is( $tel->ext, $ref->{ext}, "Extension for $ref->{tel} -> $ref->{ext}" );
+		is( $tel->context, $ref->{context}, "Context for $ref->{tel} -> $ref->{context}" );
+		is( $tel->isub, $ref->{isub}, "Isub for $ref->{tel} -> $ref->{isub}" );
+		is( $tel->local_number, $ref->{local_number}, "Local number for $ref->{tel} -> $ref->{local_number}" );
 		if( scalar( keys( %{$ref->{params}} ) ) > 0 )
 		{
 			my $ok = 1;
@@ -50,7 +51,7 @@ BEGIN
 			$ok = 0 unless( join( ',', @{$ref->{params}}{ @keys1 } ) eq join( ',', @$hash{ @keys2 } ) );
 			is( $ok, 1 );
 		}
-		is( $tel->canonical, $ref->{canon} );
+		is( $tel->canonical, $ref->{canon}, "canonical for $ref->{tel} -> $ref->{canon}" );
 		my $countries = $tel->country;
 		if( join( ',', map( $_->{ 'cc' }, @$countries ) ) eq '' && scalar( @{$ref->{country}} ) )
 		{

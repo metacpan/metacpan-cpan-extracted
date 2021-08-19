@@ -3,7 +3,7 @@ use Catmandu::Sane;
 use Catmandu::Util qw(:check :is);
 use Moo;
 
-our $VERSION = "1.072";
+our $VERSION = "1.073";
 
 with('Catmandu::AlephX::Response');
 

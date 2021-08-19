@@ -1,0 +1,45 @@
+---
+abstract: 'Colorize router CLI output'
+author:
+  - 'Joelle Maslak <jmaslak@antelope.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ByLine: '1.192590'
+  File::Spec: '0'
+  FindBin: '0'
+  List::Util: '1.56'
+  Test2::V0: '0.000111'
+  Test::More: '0'
+  Test::UseAllModules: '0.17'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-RouterColorizer
+provides:
+  App::RouterColorizer:
+    file: lib/App/RouterColorizer.pm
+    version: '1.212302'
+requires:
+  English: '0'
+  Import::Into: '0'
+  List::Util: '1.56'
+  Moose: '0'
+  Regexp::Common: '0'
+  feature: '0'
+  perl: v5.22.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/jmaslak/App-RouterColorizer/issues
+  repository: git://github.com/jmaslak/App-RouterColorizer.git
+version: '1.212302'
+x_contributor_covenant:
+  version: 0.02
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

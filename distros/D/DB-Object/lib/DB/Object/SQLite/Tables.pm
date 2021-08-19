@@ -18,8 +18,8 @@
 package DB::Object::SQLite::Tables;
 BEGIN
 {
-    require 5.6.0;
     use strict;
+    use warnings;
     our( $VERSION, $VERBOSE, $DEBUG );
     use parent qw( DB::Object::SQLite DB::Object::Tables );
     $VERSION    = 'v0.300.0';

@@ -168,6 +168,38 @@ METHODS
     Returns an opaque integer value that may be passed to "cancel_timer".
     This value is safe to ignore if not required.
 
+ watch_signal
+
+       $id = $tickit->watch_signal( $signum, $code )
+
+    Since version 0.72.
+
+    Runs the given CODE reference whenever the given POSIX signal is
+    received. Signals are given by number, not name.
+
+    Returns an opaque integer value that may be passed to "watch_cancel".
+    This value is safe to ignore if not required.
+
+ watch_process
+
+       $id = $tickit->watch_process( $pid, $code )
+
+    Since version 0.72.
+
+    Runs the given CODE reference when the given child process terminates.
+
+    Returns an opaque integer value that may be passed to "watch_cancel".
+    This value is safe to ignore if not required.
+
+    When invoked, the callback will receive an event parameter which will
+    be an instance of a type with a field called wstatus. This will contain
+    the exit status of the terminated child process.
+
+       $code->( $info )
+    
+       $pid    = $info->pid;
+       $status = $info->wstatus;
+
  watch_cancel
 
        $tickit->watch_cancel( $id )

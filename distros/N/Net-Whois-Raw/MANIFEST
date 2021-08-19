@@ -21,6 +21,7 @@ t/02-www_parse_tj_cgi_whois.t
 t/03-read_write_cache.t
 t/04-qrycache.t
 t/all_tlds.pl
+t/author-pod-spell.t
 t/coro-domains.pl
 t/example-domains-load-balancing.pl
 t/internet.pl

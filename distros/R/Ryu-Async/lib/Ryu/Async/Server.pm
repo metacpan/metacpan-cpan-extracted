@@ -3,7 +3,7 @@ package Ryu::Async::Server;
 use strict;
 use warnings;
 
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 sub new { bless { @_[1..$#_] }, $_[0] }

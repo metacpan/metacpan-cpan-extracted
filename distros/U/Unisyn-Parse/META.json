@@ -35,7 +35,7 @@
    "provides" : {
       "Unisyn::Parse" : {
          "file" : "lib/Unisyn/Parse.pm",
-         "version" : "20210810"
+         "version" : "20210818"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,6 @@
          "url" : "https://github.com/philiprbrenan/UnisynParse"
       }
    },
-   "version" : "20210810",
+   "version" : "20210818",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

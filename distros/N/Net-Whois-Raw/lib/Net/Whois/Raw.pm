@@ -1,5 +1,5 @@
 package Net::Whois::Raw;
-$Net::Whois::Raw::VERSION = '2.99031';
+$Net::Whois::Raw::VERSION = '2.99032';
 # ABSTRACT: Get Whois information of domains and IP addresses.
 
 require 5.008_001;
@@ -480,7 +480,7 @@ Net::Whois::Raw - Get Whois information of domains and IP addresses.
 
 =head1 VERSION
 
-version 2.99031
+version 2.99032
 
 =head1 SYNOPSIS
 
@@ -584,7 +584,7 @@ C<WHICH_WHOIS> argument is used to access a results if recursive queries;
 possible values:
 
 C<'QRY_FIRST'> -
-    returns results of the first query. Non't make recursive queries.
+    returns results of the first query. Does not make recursive queries.
     In scalar context returns just whois text.
     In list context returns two values: whois text and whois server
     which was used to make query).
@@ -718,7 +718,7 @@ Alexander Nalobin <alexander@nalobin.ru>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2002-2020 by Alexander Nalobin.
+This software is copyright (c) 2002-2021 by Alexander Nalobin.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

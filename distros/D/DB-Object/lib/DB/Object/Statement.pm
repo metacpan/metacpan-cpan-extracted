@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Statement.pm
-## Version v0.3.7
+## Version v0.3.8
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2021/08/12
+## Modified 2021/08/18
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,14 +18,14 @@
 package DB::Object::Statement;
 BEGIN
 {
-    require 5.6.0;
     use strict;
+    use warnings;
     use parent qw( DB::Object );
     use Class::Struct qw( struct );
     use DateTime;
     use Want;
     our( $VERSION, $VERBOSE, $DEBUG );
-    $VERSION    = 'v0.3.7';
+    $VERSION    = 'v0.3.8';
     $VERBOSE    = 0;
     $DEBUG      = 0;
     use Devel::Confess;
@@ -212,7 +212,7 @@ sub execute
     $self->{sub}  = $sub;
     $self->{executed}++;
     my $q = $self->query_object;
-    $q->final( 1 ) if( $q );
+    $q->final(1) if( $q );
     my @binded = ();
     my @binded_types = ();
     if( $q && $q->binded_types_as_param->length )
@@ -314,6 +314,15 @@ sub execute
         ## $self->{ 'sth' }->execute( @binded );
         for( my $i = 0; $i < scalar( @binded ); $i++ )
         {
+            # Stringify the binded value if it is a stringifyable object.
+            if( ref( $binded[$i] ) && 
+                $self->_is_object( $binded[$i] ) &&
+                overload::Overloaded( $binded[$i] ) &&
+                overload::method( $binded[$i], '""' ) )
+            {
+                $binded[$i] .= '';
+            }
+            
             my $data_type = $binded_types[ $i ];
             if( CORE::length( $data_type ) && $self->_is_hash( $data_type ) )
             {
@@ -1080,7 +1089,7 @@ DB::Object::Statement - Statement Object
 
 =head1 VERSION
 
-v0.3.7
+v0.3.8
 
 =head1 DESCRIPTION
 

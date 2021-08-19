@@ -608,7 +608,7 @@ Module::Generic::DateTime - A DateTime wrapper for enhanced features
     use Module::Generic::DateTime;
     my $dt = DateTime->new;
     my $gdt = Module::Generic::DateTime->new( $dt );
-    # No you can do operations that are not normally possible with DateTime
+    # Now you can do operations that are not normally possible with DateTime
     # Compare a dt object with a unix timestamp
     if( $gdt > time() )
     {
@@ -653,7 +653,6 @@ Module::Generic::DateTime - A DateTime wrapper for enhanced features
     v0.1.0
 
 =head1 DESCRIPTION
-
 
 =encoding utf-8
 

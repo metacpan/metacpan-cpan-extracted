@@ -65,6 +65,7 @@ t/dot-tests.pl
 t/dot.t
 t/dot6-tests.pl
 t/dot6.t
+t/eol.t
 t/example-cisco.t
 t/example-gated.t
 t/example-ospf6d.t
@@ -89,6 +90,7 @@ t/script-ospf2dot.t
 t/script-ospfconvert.t
 t/script-ospfd2yaml.t
 t/script-usage.t
+t/strict.t
 t/syntax-cgi.t
 t/syntax-lib.t
 t/syntax-pod.t

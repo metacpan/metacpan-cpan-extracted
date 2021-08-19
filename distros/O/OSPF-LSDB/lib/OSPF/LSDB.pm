@@ -1,5 +1,5 @@
 #########################################################################
-# Copyright (c) 2010-2012 Alexander Bluhm <alexander.bluhm@gmx.net>
+# Copyright (c) 2010-2021 Alexander Bluhm <alexander.bluhm@gmx.net>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -21,22 +21,22 @@ use warnings;
 
 =head1 NAME
 
-B<OSPF::LSDB> - class containing OSPF link state database
+OSPF::LSDB - class containing OSPF link state database
 
 =head1 SYNOPSIS
 
 use OSPF::LSDB;
 
-my $ospf = OSPF::LSDB-E<gt>L<new>();
+my $ospf = OSPF::LSDB-E<gt>new();
 
 =head1 DESCRIPTION
 
-The B<OSPF::LSDB> module serves as base class for all the other
-B<OSPF::LSDB::...> modules.
+The OSPF::LSDB module serves as base class for all the other
+OSPF::LSDB::... modules.
 It contains the link state database, can do versioning and validation.
 To parse, load, store or display the LSDB, convert it into instances
 of more specific classes.
-The B<new()> method implements a copy constructor to share LSDB
+The new() method implements a copy constructor to share LSDB
 references with minimal overhead.
 
 Most names of the database fields are named after RFC 2328 - OSPF
@@ -56,22 +56,22 @@ use fields qw(ospf errors ssh);
 
 =item $OSPF::LSDB::VERSION
 
-The version number of the B<OSPF::LSDB> modules.
+The version number of the OSPF::LSDB modules.
 It is also stored in the database dump and thus can be used to
 upgrade the file.
 
 =cut
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 =pod
 
-=item OSPF::LSDB-E<gt>L<new>($other)
+=item OSPF::LSDB-E<gt>new($other)
 
-Construct a B<OSPF::LSDB> object.
-If another B<OSPF::LSDB> object is passed as argument, the new object
+Construct a OSPF::LSDB object.
+If another OSPF::LSDB object is passed as argument, the new object
 is contructed with the other's objects database as reference.
-This can be used to convert between different B<OSPF::LSDB::...>
+This can be used to convert between different OSPF::LSDB::...
 instances and use their specific features.
 
 =cut
@@ -96,7 +96,7 @@ sub error {
 
 =pod
 
-=item $self-E<gt>L<get_errors>()
+=item $self-E<gt>get_errors()
 
 Returns a list with all errors occured so far.
 The internal error array gets reset.
@@ -112,7 +112,7 @@ sub get_errors {
 
 =pod
 
-=item $self-E<gt>L<ipv6>()
+=item $self-E<gt>ipv6()
 
 Returns true if the ospf database is version 3 for ipv6.
 
@@ -184,7 +184,7 @@ my %CONVERTER = (
 
 =pod
 
-=item $self-E<gt>L<convert>()
+=item $self-E<gt>convert()
 
 While the version of the current database is less than the module
 version, apply the conversion functions step by step.
@@ -364,7 +364,7 @@ my $VALIDATOR6 = {
 
 =pod
 
-=item $self-E<gt>L<validate>()
+=item $self-E<gt>validate()
 
 Ensure that the internal data structure has the correct version and
 is valid.

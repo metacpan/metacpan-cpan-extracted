@@ -1,0 +1,53 @@
+do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'Test::UseAllModules' => '0.17'
+                                  }
+                  },
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::Kwalitee' => '1.21',
+                                      'Test::More' => '0.88',
+                                      'Test::NoTabs' => '0',
+                                      'Test::Perl::Critic' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::TrailingSpace' => '0.0203',
+                                      'Test::Version' => '1'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'English' => '0',
+                                      'Import::Into' => '0',
+                                      'List::Util' => '1.56',
+                                      'Moose' => '0',
+                                      'Regexp::Common' => '0',
+                                      'feature' => '0',
+                                      'perl' => 'v5.22.0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::ByLine' => '1.192590',
+                                   'File::Spec' => '0',
+                                   'FindBin' => '0',
+                                   'List::Util' => '1.56',
+                                   'Test2::V0' => '0.000111',
+                                   'Test::More' => '0',
+                                   'Test::UseAllModules' => '0.17'
+                                 }
+                 }
+     };
+  $x;
+ }

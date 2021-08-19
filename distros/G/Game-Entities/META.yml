@@ -28,14 +28,14 @@ no_index:
 provides:
   Game::Entities:
     file: lib/Game/Entities.pm
-    version: '0.010'
+    version: '0.011'
 requires:
   Sub::Util: '1.40'
   perl: v5.20.0
 resources:
   bugtracker: https://gitlab.com/jjatria/perl-game-entities/issues
   repository: git://gitlab.com/jjatria/perl-game-entities.git
-version: '0.010'
+version: '0.011'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -223,7 +223,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.010'
+          tag: '0.011'
           tag_format: '%v'
           tag_message: ''
         Dist::Zilla::Role::Git::Repo:

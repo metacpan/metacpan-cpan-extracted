@@ -60,7 +60,7 @@
    "provides" : {
       "Game::Entities" : {
          "file" : "lib/Game/Entities.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       }
    },
    "release_status" : "stable",
@@ -74,7 +74,7 @@
          "web" : "https://gitlab.com/jjatria/perl-game-entities"
       }
    },
-   "version" : "0.010",
+   "version" : "0.011",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -319,7 +319,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.010",
+                  "tag" : "0.011",
                   "tag_format" : "%v",
                   "tag_message" : ""
                },

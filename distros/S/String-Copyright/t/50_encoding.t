@@ -1,10 +1,10 @@
-use strict;
-use warnings;
-use utf8;
+use Test2::V0;
 
-use Test::More skip_all => "FIXME: not yet written";
+skip_all "FIXME: not yet written";
 
 use String::Copyright;
+
+done_testing;
 
 __END__
 

@@ -1,10 +1,31 @@
 use v5.10.0;
 use warnings;
 
-package JMAP::Tester::WebSocket::Response 0.003;
+package JMAP::Tester::WebSocket::Response 0.004;
 # ABSTRACT: what you get in reply to a succesful JMAP request
 
 use Moo;
+
+# We can't use 'sub sentencebroker;' as a stub here as it conflicts
+# with older Role::Tiny versions (2.000006, 2.000008, and others).
+# With the stub, we'd see this error during compilation:
+#
+# Can't use string ("-1") as a symbol ref while "strict refs" in use at
+# /usr/share/perl5/Role/Tiny.pm line 382
+#
+# We could pin a newer Role::Tiny version but this fix is easy enough
+
+has sentence_broker => (
+  is    => 'ro',
+  lazy  => 1,
+  init_arg => undef,
+  default  => sub {
+    my ($self) = @_;
+    JMAP::Tester::SentenceBroker->new({ response => $self });
+  },
+);
+
+
 with 'JMAP::Tester::Role::SentenceCollection', 'JMAP::Tester::WebSocket::Role::WebSocketResult';
 
 use JMAP::Tester::Response::Sentence;
@@ -62,17 +83,6 @@ sub dump_diagnostic {
   $self->_diagnostic_dumper->($value);
 }
 
-sub sentence_broker;
-has sentence_broker => (
-  is    => 'ro',
-  lazy  => 1,
-  init_arg => undef,
-  default  => sub {
-    my ($self) = @_;
-    JMAP::Tester::SentenceBroker->new({ response => $self });
-  },
-);
-
 1;
 
 __END__
@@ -87,7 +97,7 @@ JMAP::Tester::WebSocket::Response - what you get in reply to a succesful JMAP re
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 OVERVIEW
 

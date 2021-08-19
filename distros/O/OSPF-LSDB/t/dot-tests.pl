@@ -1,3 +1,6 @@
+use strict;
+use warnings;
+
 {
 id => "network.0",
 text => "Multiple networks, no error.",
@@ -5457,10 +5460,8 @@ EOF
 {
 id => "point.1",
 text => "Routers with duplicate point-to-point link.",
-errors => [
-"Point-to-point link at router 0.1.0.0 to router 0.2.0.0 has multiple entries in area 1.0.0.0.",
-],
-colors => { yellow => 2, },
+errors => [],
+colors => {},
 clusters => {},
 options => "",
 yaml => <<EOF,
@@ -5937,6 +5938,52 @@ database:
         E: 0
         V: 1
       links:
+      routerid: 0.2.0.0
+self:
+  areas:
+    - 1.0.0.0
+  routerid: 0.1.0.0
+EOF
+},
+
+{
+id => "virtul.5",
+text => "Routers with duplicate virtual link.",
+errors => [
+"Virtual link at router 0.1.0.0 to router 0.2.0.0 has multiple entries in area 1.0.0.0.",
+],
+colors => { yellow => 2, },
+clusters => {},
+options => "",
+yaml => <<EOF,
+---
+database:
+  routers:
+    - area: 1.0.0.0
+      bits:
+        B: 1
+        E: 0
+        V: 0
+      links:
+        - interface: 0.0.1.1
+          metric: 1
+          routerid: 0.2.0.0
+          type: virtual
+        - interface: 0.0.1.3
+          metric: 1
+          routerid: 0.2.0.0
+          type: virtual
+      routerid: 0.1.0.0
+    - area: 1.0.0.0
+      bits:
+        B: 1
+        E: 0
+        V: 0
+      links:
+        - interface: 0.0.1.2
+          metric: 1
+          routerid: 0.1.0.0
+          type: virtual
       routerid: 0.2.0.0
 self:
   areas:

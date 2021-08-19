@@ -20,11 +20,12 @@ no_index:
   directory:
     - inc
     - t
+    - tools
     - xt
 provides:
   Date::Tolkien::Shire::Data:
     file: lib/Date/Tolkien/Shire/Data.pm
-    version: '0.008'
+    version: '0.009'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -39,5 +40,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Tolkien-Shire-Data
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Date-Tolkien-Shire-Data.git
-version: '0.008'
+version: '0.009'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,10 +1,12 @@
 use strict;
 use warnings;
+use Mojolicious ();
 use Mojo::Log;
 use Mojo::Util 'dumper';
 use Test::More;
 
 my @levels = qw(debug info warn error fatal);
+unshift @levels, 'trace' if eval { Mojolicious->VERSION('9.20'); 1 };
 
 my @log;
 my $inner_log = Mojo::Log->new;

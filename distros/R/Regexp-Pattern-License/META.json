@@ -29,14 +29,22 @@
    "optional_features" : {},
    "prereqs" : {
       "configure" : {
+         "recommends" : {
+            "CPAN::Meta::Requirements" : "2.000"
+         },
          "requires" : {
             "ExtUtils::MakeMaker" : "6.17"
          }
       },
       "runtime" : {
-         "requires" : {
-            "perl" : "5",
+         "conflicts" : {
+            "App::Licensecheck" : "<= v3.2.6"
+         },
+         "recommends" : {
             "re::engine::RE2" : "0"
+         },
+         "requires" : {
+            "perl" : "5"
          }
       },
       "test" : {
@@ -46,6 +54,7 @@
             "Test::Builder::Module" : "0",
             "Test::More" : "0.98",
             "Test::Regexp::Pattern" : "0.003",
+            "Test::Without::Module" : "0",
             "Try::Tiny" : "0"
          }
       }
@@ -53,11 +62,11 @@
    "provides" : {
       "Regexp::Pattern::License" : {
          "file" : "lib/Regexp/Pattern/License.pm",
-         "version" : "v3.9.1"
+         "version" : "v3.9.3"
       },
       "Regexp::Pattern::License::Parts" : {
          "file" : "lib/Regexp/Pattern/License/Parts.pm",
-         "version" : "v3.9.1"
+         "version" : "v3.9.3"
       }
    },
    "release_status" : "stable",
@@ -75,11 +84,13 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/project"
    },
-   "version" : "v3.9.1",
+   "version" : "v3.9.3",
+   "x_breaks" : {
+      "App::Licensecheck" : "<= v3.2.6"
+   },
    "x_help_wanted" : [
       "tester",
       "documenter"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.04",
-   "x_static_install" : 1
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

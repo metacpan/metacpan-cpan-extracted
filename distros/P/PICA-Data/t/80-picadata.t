@@ -19,7 +19,7 @@ test_args( [qw(-3 foo.xml)], { number => 3, input => ['foo.xml'], to => 'XML' },
 test_args( [qw(003@ 123A|012X -p 200X)],
     { path => [qw(200X 003@ 123A 012X)], to => 'Plain' }, 'multiple path expressions');
 test_args( [qw(003@$0 123A$x)],
-    { path => [qw(003@$0 123A$x)], command => 'select' }, 'select subfield values');
+    { path => [qw(003@$0 123A$x)], command => 'get' }, 'get subfield values');
 
 # command options for backwards compatibility
 test_args( [qw(-V)], { command => 'version' });

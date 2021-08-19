@@ -7,6 +7,29 @@ Home page:    <https://metacpan.org/release/Regexp-Pattern-License>
 Bug tracker:  <https://bugs.debian.org/libregexp-pattern-license-perl>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.9.3	2021-08-18
+
+ [ Packaging ]
+ - declare that we break App::Licensecheck before v3.2.7 (exception
+   opbjects were wrongly tagged until Regexp::Pattern::License v3.9.0)
+
+v3.9.2	2021-08-17
+
+ [ Documentation ]
+ - improve SYNOPSIS
+
+ [ Test Suite ]
+ - improve regexp tests
+
+ [ Packaging ]
+ - relax to recommend (not depend on) module re::engine::RE2
+ - test-require Test::Without::Module
+
+ [ Other ]
+ - stop enable RE2 option -longest_match, to match equally as without RE2
+   engine
+ - tighten license pattern for bsd_4_clause, to shadow bsd
+
 v3.9.1	2021-08-16
 
  - permit RE2 engine to consume up to 16MiB (default 8MiB is insufficient

@@ -41,8 +41,8 @@ SKIP:
     # ok( !$shem->exists, 'exists' );
     ok( defined( $exists ) && !$exists, 'exists' );
     my $s = $shem->open;
+    skip( "Failed to create shared memory object. Your system does not seem to support shared memory: $!", 21 ) if( !defined( $s ) );
     ok( defined( $s ), 'Shared memory object' );
-    BAIL_OUT( "Failed to create shared memory object: $!" ) if( !defined( $s ) );
 
     isa_ok( $s, 'Module::Generic::SharedMem' );
     my $id = $s->id;

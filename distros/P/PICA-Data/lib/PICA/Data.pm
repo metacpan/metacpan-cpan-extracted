@@ -1,10 +1,11 @@
 package PICA::Data;
 use v5.14.1;
 
-our $VERSION = '1.29';
+our $VERSION = '1.30';
 
 use Exporter 'import';
-our @EXPORT_OK = qw(pica_parser pica_writer pica_path pica_xml_struct
+our @EXPORT_OK
+    = qw(pica_data pica_parser pica_writer pica_path pica_xml_struct
     pica_match pica_values pica_value pica_fields pica_subfields
     pica_title pica_holdings pica_items
     pica_split pica_annotation pica_sort pica_guess clean_pica pica_string pica_id
@@ -23,6 +24,23 @@ use PICA::Path;
 use Hash::MultiValue;
 
 use sort 'stable';
+
+sub new {
+    my ($class, $data) = @_;
+
+    if (defined $data) {
+        my $parser = pica_guess($data)
+            or croak "Could not guess PICA serialization format";
+        return $parser->new(\$data)->next;
+    }
+    else {
+        return bless {record => []}, 'PICA::Data';
+    }
+}
+
+sub pica_data {
+    PICA::Data->new(@_);
+}
 
 sub pica_match {
     my ($record, $path, %args) = @_;
@@ -222,7 +240,7 @@ sub pica_string {
     $type ||= 'plain';
     $options{fh} = \$string;
     $options{start} //= 0;
-    pica_writer($type => %options)->write($pica);
+    pica_writer($type => %options)->write($pica)->end;
     return decode('UTF-8', $string);
 }
 
@@ -310,14 +328,21 @@ sub pica_guess {
     my %count  = (
         ''       => 0,
         'Plain'  => ($pica =~ tr/$//),
-        'Plus'   => ($pica =~ tr/\x{0A}//),
-        'Binary' => ($pica =~ tr/\x{1D}//),
+        'Binary' => ($pica =~ tr/\x{1F}//),
         'XML'    => ($pica =~ tr/<//),
         'JSON'   => ($pica =~ tr/[{[]//),
+        'NL'     => ($pica =~ tr/[\r\n]//),
+        'IS3'    => ($pica =~ tr/\x{1D}//),
     );
-    $count{$_} > $count{$format} and $format = $_ for grep {$_} keys %count;
+    $count{$_} > $count{$format} and $format = $_
+        for qw(Plain Binary XML JSON);
 
-    $format = 'PPXML' if $format eq 'XML' and $pica =~ qr{xmlns/ppxml-1\.0};
+    if ($format eq 'Binary') {
+        $format = 'Plus' if $count{NL} > $count{IS3};
+    }
+    elsif ($format eq 'XML') {
+        $format = 'PPXML' if $pica =~ qr{xmlns/ppxml-1\.0};
+    }
 
     $format ? "PICA::Parser::$format" : undef;
 }
@@ -490,6 +515,10 @@ L<Avram Schemas|https://format.gbv.de/schema/avram/specification>.
 The following functions can be exported on request (use export tag C<:all> to
 get all of them):
 
+=head2 pica_data( [ $data ] )
+
+Return a new PICA::Data object from any guessable serialization form (or die).
+
 =head2 pica_parser( $type [, @options] )
 
 Create a PICA parsers object (see L<PICA::Parser::Base>). Case of the type is
@@ -612,8 +641,6 @@ specified by PICA path expressions. The following are virtually equivalent:
 
 Returns a L<Hash::MultiValue> of all subfields of fields optionally specified
 by PICA path expressions. Also available as accessor C<subfields>.
-
-=head2 pica_
 
 =head2 pica_title( $record )
 

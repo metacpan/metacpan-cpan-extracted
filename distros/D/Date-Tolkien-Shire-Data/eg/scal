@@ -10,7 +10,7 @@ use Getopt::Long 2.25;
 use Pod::Usage;
 use Term::ANSIColor qw{ colored };
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 my %opt = (
     color	=> -t STDOUT,

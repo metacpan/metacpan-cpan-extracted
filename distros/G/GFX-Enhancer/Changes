@@ -1,5 +1,15 @@
 Revision history for Perl extension GFX::Enhancer.
 
+0.1.17
+	. added array function stubs for image sharpen and recognize objects
+
+0.1.16
+	. added SystemOnEnergyFilters.pm, a main API class
+	. also added image repr to above API
+
+0.1.15
+	added SystemOnEnergy.pm
+
 0.1.14
 	added Stream things
 

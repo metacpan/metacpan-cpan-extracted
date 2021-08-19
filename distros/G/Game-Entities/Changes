@@ -1,5 +1,13 @@
 Revision history for Game-Entities
 
+0.011     2021-08-17 21:33:36+01:00 Europe/London
+
+    New:
+        - Add support for sorting functions with `$$` prototypes.
+    Fixes:
+        - Fixed an issue with sorting components according to
+          supersets.
+
 0.010     2021-07-20 20:57:09+01:00 Europe/London
 
     Fixes:

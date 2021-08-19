@@ -1,6 +1,6 @@
 use Test2::V0;
-use Test2::Require::Module 'Software::LicenseUtils'   => '0.103014';
 use Test2::Require::Module 'Regexp::Pattern::License' => '3.9.0';
+use Test2::Require::Module 'Software::LicenseUtils'   => '0.103014';
 
 use Test::Command::Simple;
 

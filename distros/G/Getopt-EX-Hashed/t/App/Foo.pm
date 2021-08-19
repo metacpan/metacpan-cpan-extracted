@@ -14,6 +14,13 @@ if (our $ACCESSOR_DEFAULT_RW) {
     Getopt::EX::Hashed->configure(DEFAULT => [ is => 'rw' ]);
 }
 
+if (defined our $REPLACE_UNDERSCORE) {
+    Getopt::EX::Hashed->configure(REPLACE_UNDERSCORE => $REPLACE_UNDERSCORE);
+}
+if (defined our $REMOVE_UNDERSCORE) {
+    Getopt::EX::Hashed->configure(REMOVE_UNDERSCORE => $REMOVE_UNDERSCORE);
+}
+
 has string   => ( spec => '=s' );
 has say      => ( spec => '=s', default => "Hello" );
 has number   => ( spec => '=i' );

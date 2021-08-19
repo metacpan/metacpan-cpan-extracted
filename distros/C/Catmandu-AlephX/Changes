@@ -1,4 +1,5 @@
-Revision history for Catmandu::AlephX
+1.073  2021-08-18 16:05:03 CEST
+   - fix empty response giving an exception for hold-req and read-item on error
 
 1.072  2020-10-30 09:24:45 CET
    - _validate_web_response checks for content_type (http status codes always wrong??)

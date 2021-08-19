@@ -18,6 +18,8 @@
 #define DEFERRED_CLASS "Promise::XS::Deferred"
 #define DEFERRED_CLASS_TYPE Promise__XS__Deferred
 
+#define CONVERTER_CR_NAME "_convert_to_our_promise"
+
 #ifdef PL_phase
 #define PXS_IS_GLOBAL_DESTRUCTION PL_phase == PERL_PHASE_DESTRUCT
 #else
@@ -163,7 +165,6 @@ typedef struct {
 #ifdef USE_ITHREADS
     tTHX owner;
 #endif
-    SV* conversion_helper;
     SV* pxs_flush_cr;
     HV* pxs_base_stash;
     HV* pxs_promise_stash;
@@ -836,9 +837,14 @@ xspr_promise_t* xspr_promise_from_sv(pTHX_ SV* input)
     /* Maybe we got another type of promise. Let's convert it */
     GV* method_gv = gv_fetchmethod_autoload(SvSTASH(SvRV(input)), "then", FALSE);
     if (method_gv != NULL && isGV(method_gv) && GvCV(method_gv) != NULL) {
-        dMY_CXT;
 
-        xspr_result_t* new_result = xspr_invoke_perl(aTHX_ MY_CXT.conversion_helper, &input, 1);
+        CV* converter_cv = get_cv(BASE_CLASS "::" CONVERTER_CR_NAME, 0);
+        if (!converter_cv) croak("Need " CONVERTER_CR_NAME "!");
+
+        SV* converter_svcv = newRV_inc((SV*) converter_cv);
+        sv_2mortal(converter_svcv);
+
+        xspr_result_t* new_result = xspr_invoke_perl(aTHX_ converter_svcv, &input, 1);
         if (new_result->state == XSPR_RESULT_RESOLVED &&
             new_result->results != NULL &&
             new_result->count == 1 &&
@@ -1047,7 +1053,6 @@ BOOT:
     MY_CXT.queue_tail = NULL;
     MY_CXT.in_flush = 0;
     MY_CXT.backend_scheduled = 0;
-    MY_CXT.conversion_helper = NULL;
     MY_CXT.callback_depth = 0;
 
     MY_CXT.pxs_base_stash = gv_stashpv(BASE_CLASS, FALSE);
@@ -1070,7 +1075,6 @@ void
 CLONE(...)
     PPCODE:
 
-        SV* conversion_helper = NULL;
         SV* pxs_flush_cr = NULL;
         SV* deferral_cr = NULL;
         SV* deferral_arg = NULL;
@@ -1079,10 +1083,6 @@ CLONE(...)
             dMY_CXT;
 
             CLONE_PARAMS params = {NULL, 0, MY_CXT.owner};
-
-            if ( MY_CXT.conversion_helper ) {
-                conversion_helper = sv_dup_inc( MY_CXT.conversion_helper, &params );
-            }
 
             if ( MY_CXT.pxs_flush_cr ) {
                 pxs_flush_cr = sv_dup_inc( MY_CXT.pxs_flush_cr, &params );
@@ -1102,7 +1102,6 @@ CLONE(...)
             MY_CXT.owner = aTHX;
 
             // Clone SVs
-            MY_CXT.conversion_helper = conversion_helper;
             MY_CXT.pxs_flush_cr = pxs_flush_cr;
             MY_CXT.deferral_cr = deferral_cr;
             MY_CXT.deferral_arg = deferral_arg;
@@ -1182,15 +1181,6 @@ ___flush(...)
     CODE:
         UNUSED(items);
         xspr_queue_flush(aTHX);
-
-void
-___set_conversion_helper(helper)
-        SV* helper
-    CODE:
-        dMY_CXT;
-        if (MY_CXT.conversion_helper != NULL)
-            croak("Refusing to set a conversion helper twice");
-        MY_CXT.conversion_helper = newSVsv(helper);
 
 SV*
 promise(SV* self_sv)

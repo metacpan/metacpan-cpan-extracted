@@ -17,6 +17,7 @@
       "directory" : [
          "inc",
          "t",
+         "tools",
          "xt"
       ]
    },
@@ -51,7 +52,7 @@
    "provides" : {
       "Date::Tolkien::Shire::Data" : {
          "file" : "lib/Date/Tolkien/Shire/Data.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       }
    },
    "release_status" : "stable",
@@ -69,6 +70,6 @@
          "web" : "https://github.com/trwyant/perl-Date-Tolkien-Shire-Data"
       }
    },
-   "version" : "0.008",
+   "version" : "0.009",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

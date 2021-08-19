@@ -1,5 +1,8 @@
 Revision history for Perl module Net::Whois::Raw.
 
+2.99032  Aug 17 2021 Alexander Nalobin
+    - Fix whois server for .mx
+
 2.99031  Sep 1 2020 Alexander Tsoy
     - Fix whois server for .mx
 

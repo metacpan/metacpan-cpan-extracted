@@ -6,7 +6,7 @@ use Import::Into ();
 use Module::Runtime ();
 use Scalar::Util ();
 
-our $VERSION = 'v1.0.3';
+our $VERSION = 'v2.0.0';
 
 our @CARP_NOT = 'Mojolicious::Plugin::Log::Any';
 
@@ -40,6 +40,7 @@ sub attach_logger {
         my $msg = @msg > 1 ? join($separator, @msg) : $msg[0];
         $msg = "[$level] $msg" if $prepend;
         $level = 'critical' if $level eq 'fatal';
+        $level = 'debug' if $level eq 'trace';
         $logger->log(level => $level, message => $msg);
       };
     } elsif ($logger->isa('Log::Dispatchouli') or $logger->isa('Log::Dispatchouli::Proxy')) {
@@ -47,7 +48,7 @@ sub attach_logger {
         my ($self, $level, @msg) = @_;
         my $msg = @msg > 1 ? join($separator, @msg) : $msg[0];
         $msg = "[$level] $msg" if $prepend;
-        return $logger->log_debug($msg) if $level eq 'debug';
+        return $logger->log_debug($msg) if $level eq 'trace' or $level eq 'debug';
         # hacky but we don't want to use log_fatal because it throws an
         # exception, we want to allow real exceptions to propagate, and we
         # can't localize a call to set_muted
@@ -83,7 +84,7 @@ sub attach_logger {
   } elsif ($logger eq 'Log::Contextual' or "$logger"->isa('Log::Contextual')) {
     Module::Runtime::require_module("$logger");
     Log::Contextual->VERSION('0.008001');
-    my %functions = map { ($_ => "slog_$_") } qw(debug info warn error fatal);
+    my %functions = map { ($_ => "slog_$_") } qw(trace debug info warn error fatal);
     "$logger"->import::into(ref($self), values %functions);
     $do_log = sub {
       my ($self, $level, @msg) = @_;
@@ -158,6 +159,9 @@ Since L<Mojolicious> 8.06, the L<Mojo::Log/"message"> event will not be sent
 for messages below the log level set in the L<Mojo::Log> object, so the
 attached logger will only receive log messages exceeding the configured level.
 
+Since L<Mojolicious> 9.20, the C<trace> log level is supported though it may be
+mapped to C<debug> on some loggers.
+
 L<Mojolicious::Plugin::Log::Any> can be used to attach a logger to the
 L<Mojolicious> application logger and suppress the default message event
 handler.
@@ -200,13 +204,16 @@ nature of the dispatch cycle.
 =item Log::Dispatch
 
 A L<Log::Dispatch> object can be passed to be used for logging. The C<fatal>
-log level will be mapped to C<critical>.
+log level will be mapped to C<critical>, and the C<trace> and C<debug> log
+levels will both be mapped to C<debug>.
 
 =item Log::Dispatchouli
 
 A L<Log::Dispatchouli> object can be passed to be used for logging. The
 C<fatal> log level will log messages even if the object is C<muted>, but an
 exception will not be thrown as L<Log::Dispatchouli/"log_fatal"> normally does.
+The C<trace> and C<debug> log levels will be logged with
+L<Log::Dispatchouli/"log_debug">.
 
 =item Log::Log4perl
 

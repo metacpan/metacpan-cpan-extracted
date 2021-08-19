@@ -3,7 +3,7 @@ package Ryu::Async;
 use strict;
 use warnings;
 
-our $VERSION = '0.019';
+our $VERSION = '0.020';
 
 use utf8;
 
@@ -46,6 +46,7 @@ This is an L<IO::Async::Notifier> subclass for interacting with L<Ryu>.
 
 use parent qw(IO::Async::Notifier);
 
+use Future::AsyncAwait;
 use IO::Async::Handle;
 use IO::Async::Listener;
 use IO::Async::Process;
@@ -134,20 +135,35 @@ sub from {
     my $src = $self->source(label => 'from');
     if(my $ref = ref $_[0]) {
         if($ref eq 'ARRAY') {
-            my @pending = @{$_[0]};
+            # We'll run a background loop that emits one item from the arrayref
+            # every I/O loop iteration - the arrayref is used as-is, allowing for
+            # dynamic population over time
+            my $pending = $_[0];
             weaken(my $weak_src = $src);
-            my $code;
-            $code = sub {
-                my $src = $weak_src;
-                $src->emit(shift @pending) if @pending and $src;
-                if(@pending) {
-                    $self->loop->later($code);
-                } else {
-                    $src->finish;
-                    weaken $_ for $self, $code;
+            my $loop = $self->loop;
+
+            (async sub {
+                # Acquire instance on each iteration - this allows us to
+                # give up if nothing cares about the source any more.
+                ITEM:
+                while(my $src = $weak_src) {
+                    await Future->wait_all(
+                        $loop->later,
+                        $src->unblocked
+                    );
+                    last ITEM unless $pending->@*;
+                    $src->emit(shift $pending->@*);
                 }
-            };
-            $self->loop->later($code);
+
+                # Probably overkill, but given stack-not-refcounted issues
+                # then let's not risk $src going through destruction partway
+                # through the ->finish handling
+                (my $src = $weak_src)->finish if $weak_src;
+
+                # We only needed this for ->later
+                weaken $loop;
+                return;
+            })->()->retain;
             return $src;
         } else {
             die "Unknown type $ref"
@@ -367,18 +383,7 @@ Returns a new L<Ryu::Source> instance.
 
 sub source {
     my ($self, %args) = @_;
-    my $label = delete($args{label}) // do {
-        my $label = (caller 1)[0];
-        for($label) {
-            s/^Net::Async::/Na/g;
-            s/^IO::Async::/Ia/g;
-            s/^Web::Async::/Wa/g;
-            s/^Tickit::Async::/Ta/g;
-            s/^Tickit::Widget::/TW/g;
-            s/::([^:]*)$/->$1/;
-        }
-        $label
-    };
+    my $label = delete($args{label}) // $self->label;
     Ryu::Source->new(
         new_future    => $self->loop->curry::weak::new_future,
         apply_timeout => $self->curry::timeout,
@@ -619,25 +624,26 @@ your own label if you need consistency.
 
 sub sink {
     my ($self, %args) = @_;
-    my $label = delete($args{label}) // do {
-        my $label = (caller 1)[3];
-        for($label) {
-            s/^Database::Async::/Da/g;
-            s/^Net::Async::/Na/g;
-            s/^IO::Async::/Ia/g;
-            s/^Web::Async::/Wa/g;
-            s/^Job::Async::/Ja/g;
-            s/^Tickit::Async::/Ta/g;
-            s/^Tickit::Widget::/TW/g;
-            s/::([^:]*)$/->$1/;
-        }
-        $label
-    };
+    my $label = delete($args{label}) // $self->label;
     Ryu::Sink->new(
         new_future => $self->loop->curry::weak::new_future,
         label      => $label,
         %args,
     )
+}
+
+sub label {
+    my ($self) = @_;
+    my $label = (caller 2)[0];
+    for($label // ()) {
+        s/^Net::Async::/Na/g;
+        s/^IO::Async::/Ia/g;
+        s/^Web::Async::/Wa/g;
+        s/^Tickit::Async::/Ta/g;
+        s/^Tickit::Widget::/TW/g;
+        s/::([^:]*)$/->$1/;
+    }
+    return $label // 'unknown';
 }
 
 1;

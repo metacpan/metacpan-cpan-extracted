@@ -5,14 +5,59 @@ SYNOPSIS
         BEGIN
         {
             use strict;
-            use Module::Generic;
-            our( @ISA ) = qw( Module::Generic );
+            use warnings;
+            use parent qw( Module::Generic );
         };
+
+        sub init
+        {
+            my $self = shift( @_ );
+            # Requires parameters provided to have their equivalent method
+            $self->{_init_strict_use_sub} = 1;
+            # Smartly accepts key-value pairs as list or hash reference
+            $self->SUPER::init( @_ );
+            # This won't be affected by parameters provided during instantiation
+            $self->{_private_param} = 'some value';
+            return( $self );
+        }
+        
+        sub active { return( shift->_set_get_boolean( 'active', @_ ) ); }
+        sub address { return( shift->_set_get_object( 'address', 'My::Address', @_ ) ); }
+        sub age { return( shift->_set_get_number( 'age', @_ ) ); }
+        sub name { return( shift->_set_get_scalar( 'name', @_ ) ); }
+        sub discount
+        {
+            return( shift->_set_get_class_array( 'discount',
+            {
+            amount      => { type => 'number' },
+            discount    => { type => 'object', class => 'My::Discount' },
+            }, @_ ) );
+        }
+        sub settings 
+        {
+            return( shift->_set_get_class( 'settings',
+            {
+            # Will create a Module::Generic::Array array object of objects of class MY::Item
+            items => { type => 'object_array_object', class => 'My::Item' },
+            notify => { type => 'boolean' },
+            resumes_at => { type => 'datetime' },
+            timeout => { type => 'integer' },
+            customer => {
+                    definition => {
+                        billing_address => { package => "My::Address", type => "object" },
+                        email => { type => "scalar" },
+                        name => { type => "scalar" },
+                        shipping_address => { package => "My::Address", type => "object" },
+                    },
+                    type => "class",
+                },
+            }, @_ ) );
+        }
 
 VERSION
 =======
 
-        v0.14.0
+        v0.15.6
 
 DESCRIPTION
 ===========
@@ -21,15 +66,12 @@ DESCRIPTION
 as its name says it all, is a generic module to inherit from. It is
 designed to provide a useful framework and speed up coding and
 debugging. It contains standard and support methods that may be
-superseded by your the module using
-[Module::Generic](https://metacpan.org/pod/Module::Generic){.perl-module}.
+superseded by your module.
 
-As an added benefit, it also contains a powerfull AUTOLOAD transforming
-any hash object key into dynamic methods and also recognize the dynamic
-routine a la AutoLoader from which I have shamelessly copied in the
-AUTOLOAD code. The reason is that while `AutoLoader` provides the user
-with a convenient AUTOLOAD, I wanted a way to also keep the
-functionnality of
+It also contains an AUTOLOAD transforming any hash object key into
+dynamic methods and also recognize the dynamic routine a la AutoLoader.
+The reason is that while `AutoLoader` provides the user with a
+convenient AUTOLOAD, I wanted a way to also keep the functionnality of
 [Module::Generic](https://metacpan.org/pod/Module::Generic){.perl-module}
 AUTOLOAD that were not included in `AutoLoader`. So the only solution
 was a merger.
@@ -80,6 +122,11 @@ If the method returned value is an object, it will call its
 
 It returns the hash reference built
 
+clear
+-----
+
+Alias for [\"clear\_error\"](#clear_error){.perl-module}
+
 clear\_error
 ------------
 
@@ -111,6 +158,14 @@ Clone the current object if it is of type hash or array reference. It
 returns an error if the type is neither.
 
 It returns the clone.
+
+colour\_close
+-------------
+
+The marker to be used to set the closing of a command line colour
+sequence.
+
+Defaults to \"\>\"
 
 colour\_closest
 ---------------
@@ -159,6 +214,14 @@ Parameters are:
 :   The possible values are: *bold*, *italic*, *underline*, *blink*,
     *reverse*, *conceal*, *strike*
 
+colour\_open
+------------
+
+The marker to be used to set the opening of a command line colour
+sequence.
+
+Defaults to \"\<\"
+
 colour\_parse
 -------------
 
@@ -187,6 +250,12 @@ color
 
 The idea for this syntax, not the code, is taken from
 [Term::ANSIColor](https://metacpan.org/pod/Term::ANSIColor){.perl-module}
+
+colour\_to\_rgb
+---------------
+
+Convert a human colour keyword like `red`, `green` into a rgb
+equivalent.
 
 coloured
 --------
@@ -251,6 +320,11 @@ This sets
 be terse, to indent, to use `qq` and optionally to not exceed a maximum
 *depth* if it is provided in the argument hash reference.
 
+dumpto
+------
+
+Alias for [\"dumpto\_dumper\"](#dumpto_dumper){.perl-module}
+
 printer
 -------
 
@@ -270,6 +344,11 @@ dumpto\_dumper
 Same as [\"dumpto\_printer\"](#dumpto_printer){.perl-module} above, but
 using
 [Data::Dumper](https://metacpan.org/pod/Data::Dumper){.perl-module}
+
+errno
+-----
+
+Sets or gets an error number.
 
 error
 -----
@@ -349,6 +428,12 @@ error when requested to. For example :
 
 Assuming this method here `get_customer` returns an error, the chaining
 will continue, but produce nothing and ultimately returns undef.
+
+error\_handler
+--------------
+
+Sets or gets a code reference that will be called to handle errors that
+have been triggered when calling [\"error\"](#error){.perl-module}
 
 errors
 ------
@@ -482,7 +567,7 @@ message
 **message**() is used to display verbose/debug output. It will display
 something to the extend that either *verbose* or *debug* are toggled on.
 
-If so, all debugging message will be prepended by `## ` by default or
+If so, all debugging message will be prepended by ` ## ` by default or
 the prefix string specified with the *prefix* option, to highlight the
 fact that this is a debugging message.
 
@@ -566,6 +651,11 @@ Provided with a list of arguments, this method will check if the first
 argument is an integer and find out if a debug message should be printed
 out or not. It returns the list of arguments as an array reference.
 
+message\_color
+--------------
+
+Alias for [\"message\_colour\"](#message_colour){.perl-module}
+
 message\_colour
 ---------------
 
@@ -580,6 +670,12 @@ as **message\_color**
 
 See also [\"colour\_format\"](#colour_format){.perl-module} and
 [\"colour\_parse\"](#colour_parse){.perl-module}
+
+message\_frame
+--------------
+
+Return the optional hash reference of parameters, if any, that can be
+provided as the last argument to [\"message\"](#message){.perl-module}
 
 messagef
 --------
@@ -637,6 +733,15 @@ object. If any arguments are provided, it will pass it to [\"new\" in
 Module::Generic::Array](https://metacpan.org/pod/Module::Generic::Array#new){.perl-module}
 and return the object.
 
+new\_file
+---------
+
+Instantiate a new
+[Module::Generic::File](https://metacpan.org/pod/Module::Generic::File){.perl-module}
+object. If any arguments are provided, it will pass it to [\"new\" in
+Module::Generic::File](https://metacpan.org/pod/Module::Generic::File#new){.perl-module}
+and return the object.
+
 new\_hash
 ---------
 
@@ -645,6 +750,99 @@ Instantiate a new
 object. If any arguments are provided, it will pass it to [\"new\" in
 Module::Generic::Hash](https://metacpan.org/pod/Module::Generic::Hash#new){.perl-module}
 and return the object.
+
+new\_null
+---------
+
+Returns a null value based on the expectations of the caller and thus
+without breaking the caller\'s call flow.
+
+If the caller wants an hash reference, it returns an empty hash
+reference.
+
+If the caller wants an array reference, it returns an empty array
+reference.
+
+If the caller wants a code reference, it returns an anonymous subroutine
+that returns `undef` or an empty list.
+
+If the caller is calling another method right after, this means this is
+an object context and [\"new\_null\"](#new_null){.perl-module} will
+instantiate a new
+[Module::Generic::Null](https://metacpan.org/pod/Module::Generic::Null){.perl-module}
+object. If any arguments were provided to
+[\"new\_null\"](#new_null){.perl-module}, they will be passed along to
+[\"new\" in
+Module::Generic::Null](https://metacpan.org/pod/Module::Generic::Null#new){.perl-module}
+and the new object will be returned.
+
+In any other context, `undef` is returned or an empty list.
+
+Without using [\"new\_null\"](#new_null){.perl-module}, if you return
+simply undef, like:
+
+        my $val = $object->return_false->[0];
+        
+        sub return_false{ return }
+
+The above would trigger an error that the value returned by
+`return_false` is not an array reference. Instead of checking on the
+recipient end what kind of returned value was returned, the caller only
+need to check if it is defined or not, no matter the context in which it
+is called.
+
+For example:
+
+        my $this = My::Object->new;
+        my $val  = $this->call1;
+        # return undef)
+        
+        # object context
+        $val = $this->call1->call_again;
+        # $val is undefined
+        
+        # hash reference context
+        $val = $this->call1->fake->{name};
+        # $val is undefined
+        
+        # array reference context
+        $val = $this->call1->fake->[0];
+        # $val is undefined
+
+        # code reference context
+        $val = $this->call1->fake->();
+        # $val is undefined
+
+        # scalar reference context
+        $val = ${$this->call1->fake};
+        # $val is undefined
+
+        # simple scalar
+        $val = $this->call1->fake;
+        # $val is undefined
+
+        package My::Object;
+        use parent qw( Module::Generic );
+
+        sub call1
+        {
+            return( shift->call2 );
+        }
+
+        sub call2 { return( shift->new_null ); }
+
+        sub call_again
+        {
+            my $self = shift( @_ );
+            print( "Got here in call_again\n" );
+            return( $self );
+        }
+
+This technique is also used by [\"error\"](#error){.perl-module} to set
+an error object and return undef but still allow chaining beyond the
+error. See [\"error\"](#error){.perl-module} and
+[Module::Generic::Exception](https://metacpan.org/pod/Module::Generic::Exception){.perl-module}
+for more information.
 
 new\_number
 -----------
@@ -663,6 +861,18 @@ Instantiate a new
 object. If any arguments are provided, it will pass it to [\"new\" in
 Module::Generic::Scalar](https://metacpan.org/pod/Module::Generic::Scalar#new){.perl-module}
 and return the object.
+
+new\_tempdir
+------------
+
+Returns a new temporary directory by calling [\"tempdir\" in
+Module::Generic::File](https://metacpan.org/pod/Module::Generic::File#tempdir){.perl-module}
+
+new\_tempfile
+-------------
+
+Returns a new temporary directory by calling [\"tempfile\" in
+Module::Generic::File](https://metacpan.org/pod/Module::Generic::File#tempfile){.perl-module}
 
 noexec
 ------
@@ -850,6 +1060,22 @@ purpose is for this method to be potentially superseded in your own
 module. In your own module, you would call
 [\"\_\_instantiate\_object\"](#instantiate_object){.perl-module}
 
+\_get\_args\_as\_array
+----------------------
+
+Provided with arguments and this support method will return the
+arguments provided as an array reference irrespective of whether they
+were initially provided as array reference or a simple array.
+
+For example:
+
+        my $array = $self->_get_args_as_array(qw( those are arguments ));
+        # returns an array reference containing: 'those', 'are', 'arguments'
+        my $array = $self->_get_args_as_array( [qw( those are arguments )] );
+        # same result as previous example
+        my $array = $self->_get_args_as_array(); # no args provided
+        # returns an empty array reference
+
 \_get\_args\_as\_hash
 ---------------------
 
@@ -862,7 +1088,7 @@ For example:
         my $ref = $self->_get_args_as_hash( first => 'John', last => 'Doe' );
         # returns hash reference { first => 'John', last => 'Doe' }
         my $ref = $self->_get_args_as_hash({ first => 'John', last => 'Doe' });
-        # same as above
+        # same result as previous example
         my $res = $self->_get_args_as_hash(); # no args provided
         # returns an empty hash reference
 
@@ -897,6 +1123,16 @@ can directly do:
         {
             # Do something
         }
+
+\_is\_class\_loadable
+---------------------
+
+Takes a module name and an optional version number and this will check
+if the module exist and can be loaded by looking at the `@INC` and using
+[version](https://metacpan.org/pod/version){.perl-module} to compare
+required version and existing version.
+
+It returns true if the module can be loaded or false otherwise.
 
 \_is\_class\_loaded
 -------------------
@@ -1262,6 +1498,20 @@ method produced by
 [Module::Generic::Null](https://metacpan.org/pod/Module::Generic::Null){.perl-module}.
 The return value of a method should always be checked.
 
+\_set\_get\_file
+----------------
+
+Provided with an object property name and a file and this will store the
+given file as a
+[Module::Generic::File](https://metacpan.org/pod/Module::Generic::File){.perl-module}
+object.
+
+It returns under and set an error if the provided value is not a proper
+file.
+
+Note that the files does not need to exist and it can also be a
+directory or a symbolic link or any other file on the system.
+
 \_set\_get\_hash
 ----------------
 
@@ -1407,6 +1657,13 @@ error and return undef.
 
 It returns the object currently set, if any.
 
+\_set\_get\_object\_without\_init
+---------------------------------
+
+Sets or gets an object, but countrary to
+[\"\_set\_get\_object\"](#set_get_object){.perl-module} this method will
+not try to instantiate the object.
+
 \_set\_get\_object\_array2
 --------------------------
 
@@ -1522,6 +1779,11 @@ object of those data.
         my $array = $self->_to_array_object( qw( Hello world ) ); # Becomes an array object of 'Hello' and 'world'
         my $array = $self->_to_array_object( [qw( Hello world )] ); # Becomes an array object of 'Hello' and 'world'
 
+\_warnings\_is\_enabled
+-----------------------
+
+Returns true of warnings are enabled, false otherwise.
+
 \_\_dbh
 -------
 
@@ -1559,7 +1821,11 @@ SEE ALSO
 [Module::Generic::Null](https://metacpan.org/pod/Module::Generic::Null){.perl-module},
 [Module::Generic::Dynamic](https://metacpan.org/pod/Module::Generic::Dynamic){.perl-module}
 and
-[Module::Generic::Tie](https://metacpan.org/pod/Module::Generic::Tie){.perl-module}
+[Module::Generic::Tie](https://metacpan.org/pod/Module::Generic::Tie){.perl-module},
+[Module::Generic::File](https://metacpan.org/pod/Module::Generic::File){.perl-module},
+[Module::Generic::Finfo](https://metacpan.org/pod/Module::Generic::Finfo){.perl-module},
+[Module::Generic::SharedMem](https://metacpan.org/pod/Module::Generic::SharedMem){.perl-module},
+[Module::Generic::Scalar::IO](https://metacpan.org/pod/Module::Generic::Scalar::IO){.perl-module}
 
 [Number::Format](https://metacpan.org/pod/Number::Format){.perl-module},
 [Class::Load](https://metacpan.org/pod/Class::Load){.perl-module},
@@ -1568,7 +1834,7 @@ and
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x55c78dec53f8)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x562499c18470)"}\>
 
 COPYRIGHT & LICENSE
 ===================

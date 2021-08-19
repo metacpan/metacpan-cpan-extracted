@@ -60,132 +60,161 @@ DESCRIPTION
     ;phone-context=+([0-9]+[\-\.\(\)]*)?[0-9]+([0-9]+[\-\.\(\)]*)?
 
 METHODS
-    new( tel URI )
-        new() is provided with a tel URI and return an instance of this
-        package.
+  new( tel URI )
+    "new" is provided with a tel URI and return an instance of this package.
 
-    as_string()
-        Returns a string representation of the tel uri. This package is
-        overloaded, so one can get the same result by doing
+  as_string
+    Returns a string representation of the tel uri. This package is
+    overloaded, so one can get the same result by doing
 
-            my $str = $tel->as_string;
+        my $str = $tel->as_string;
 
-    aton( [ telephone ] )
-        If no phone number is given as argument, it will use the
-        *subscriber* value of the object used to call this method. It
-        returns the phone number with the letters replaced by their digit
-        counterparts.
+  aton( [ telephone ] )
+    If no phone number is given as argument, it will use the *subscriber*
+    value of the object used to call this method. It returns the phone
+    number with the letters replaced by their digit counterparts.
 
-        For example a subscriber such as "tel:+1-800-LAWYERS" would return
-        "tel:+1-800-5299377"
+    For example a subscriber such as "tel:+1-800-LAWYERS" would return
+    "tel:+1-800-5299377"
 
-    canonical
-        Return the tel uri in a canonical form, ie without any visualisation
-        characters, ie no "hyphen", "comma", "dot", etc
+  canonical
+    Return the tel uri in a canonical form, ie without any visualisation
+    characters, ie no "hyphen", "comma", "dot", etc
 
-    clone()
-        Returns an exact copy of the current object.
+  clone
+    Returns an exact copy of the current object.
 
-    context( [ CONTEXT ] )
-        Given a telephone context, sets the value accordingly. It returns
-        the current existing value.
+  context( [ CONTEXT ] )
+    Given a telephone context, sets the value accordingly. It returns the
+    current existing value.
 
-        For example, with a phone number of 03-1234-5678, this is a local
-        number, and one could set some context, such as
+    For example, with a phone number of 03-1234-5678, this is a local
+    number, and one could set some context, such as
 
-            $tel->context( '+81' )
+        $tel->context( '+81' )
 
-        Thus, when called upon as a string, the object would return:
+    Thus, when called upon as a string, the object would return:
 
-            03-1234-5678;phone-context=+81
+        03-1234-5678;phone-context=+81
 
-    country()
-        If the current telephone uri is as global number, this method will
-        try to find out to which country it belongs. It returns an array in
-        list context and an array reference in scalar context.
+  country
+    If the current telephone uri is as global number, this method will try
+    to find out to which country it belongs. It returns an array in list
+    context and an array reference in scalar context.
 
-        If there are more than one country using the same international
-        dialling code, it will return multiple entry in the array. This is
-        typically true for countries like Canada and the United States who
-        both uses the same +1 international dialling code.
+    If there are more than one country using the same international dialling
+    code, it will return multiple entry in the array. This is typically true
+    for countries like Canada and the United States who both uses the same
+    +1 international dialling code.
 
-        One could then do something like the following:
+    One could then do something like the following:
 
-            my $ref = $tel->country;
-            print( "Country: ", @$ref > 1 ? join( ' or ', map( $_->{ 'name' }, @$ref ) ) : @$ref ? $ref->[0]->{ 'name' } : 'not found', "\n" );
+        my $ref = $tel->country;
+        print( "Country: ", @$ref > 1 ? join( ' or ', map( $_->{name}, @$ref ) ) : @$ref ? $ref->[0]->{name} : 'not found', "\n" );
 
-        which would produce:
+    which would produce:
 
-            Country: Canada or United States
+        Country: Canada or United States
 
-        Each array entry is a reference to an associative array, which
-        contains the following fields:
+    Each array entry is a reference to an associative array, which contains
+    the following fields:
 
-        *cc* for the iso 3166 2-letters code
-        *cc3* for the iso 3166 3-letters code
-        *name* for the country name
-        *idd* for the international dialling code. *idd* is an array
-        reference which may contains one or more entries, as there may be
-        multiple international dialling code per country.
+    *cc* for the iso 3166 2-letters code
+    *cc3* for the iso 3166 3-letters code
+    *name* for the country name
+    *idd* for the international dialling code. *idd* is an array reference
+    which may contains one or more entries, as there may be multiple
+    international dialling code per country.
 
-    is_global()
-        Returns true or false depending on whether the phone number is a
-        global one, ie starting with "+".
+  international_code( [ PHONE DIGITS ] )
+    This returns the international code, if any. The international code is
+    the international country code unique to each country or territory. It
+    may be found as a prefix to the subscriber number or as a context to the
+    phone number. For example:
 
-    is_local()
-        Returns true or false depending on whether the phone number is a
-        local one, ie a number without the "+" prefix. This can happen of
-        course with numbers such as "03-1234-5678", but also for emergency
-        number, such as 110 (police in Japan) or 911 (police in the U.S.).
+        +1-418-656-9254;ext=102;phone-context=example.com
+        tel:656-9254;ext=102;phone-context=+1-212
+        tel:911;phone-context=+1
 
-        One could set a prefix to clarify, such as:
+    If an international country code is provided, it will be used to get
+    information such as country name and iso 3166 country codes and also it
+    will be used in formatting the phone number by prefixing the subscriber
+    number with the international country code provided. If, instead you
+    want to just set a context, then use the "context" method instead. For
+    example with a subscriber number such as *911*, you may want to give it
+    some context by adding +1 such as :
 
-            my $tel = URI::tel->new( '110' );
-            $tel->context( '+81' );
-            ## which would produce:
-            ## 110;phone-context=+81
+        my $tel = URI::tel->new( "911" );
+        $tel->context( '+1' );
+        print( "$tel\n" ); # will produce 911;phone-context=+1
 
-    is_other()
-        Normally, as per rfc 3966, a non global number must have a context,
-        but in everyday life this is rarely the case, so is_other flags
-        those numbers who are local but lack a context.
+        # But don't do this!
+        $tel->international_code( 1 );
+        # print will now trigger a bad phone number
+        print( "$tel\n" ); " will produce +1-911
 
-        It returns true or false.
+  is_global
+    Returns true or false depending on whether the phone number is a global
+    one, ie starting with "+".
 
-    is_vanity()
-        Returns true or false whether the telephone number is a vanity
-        number, such as "+1-800-LAWYERS".
+  is_local
+    Returns true or false depending on whether the phone number is a local
+    one, ie a number without the "+" prefix. This can happen of course with
+    numbers such as "03-1234-5678", but also for emergency number, such as
+    110 (police in Japan) or 911 (police in the U.S.).
 
-    isub( [ ISDN SUBADDRESS ] )
-        Optionally sets the isdn subaddress if a value is provided. It
-        returns the current value set.
+    One could set a prefix to clarify, such as:
 
-            $tel->isub( 1420 );
+        my $tel = URI::tel->new( '110' );
+        $tel->context( '+81' );
+        ## which would produce:
+        ## 110;phone-context=+81
 
-    original()
-        Returns the original telephone number provided, before any possible
-        changes were brought.
+  is_other
+    Normally, as per rfc 3966, a non global number must have a context, but
+    in everyday life this is rarely the case, so "is_other" flags those
+    numbers who are local but lack a context.
 
-    private( [ NAME, [ VALUE ] ] )
-        Given a *NAME*, private returns the value entry for that parameter.
-        If a *VALUE* is provided, it will set this value for the given name.
-        if no *NAME*, and no *VALUE* was provided, private returns a list of
-        all the name-value pair currently set, or a reference to that
-        associative array in scalar context.
+    It returns true or false.
 
-    subscriber( [ PHONE ] )
-        Returns the current telephone number set for this telephone uri. For
-        example:
+  is_vanity
+    Returns true or false whether the telephone number is a vanity number,
+    such as "+1-800-LAWYERS".
 
-            my $tel = URI::tel->new( 'tel:+1-418-656-9254;ext=102' );
-            my $subscriber = $tel->subscriber;
+  isub( [ ISDN SUBADDRESS ] )
+    Optionally sets the isdn subaddress if a value is provided. It returns
+    the current value set.
 
-        will return: "+1-418-656-9254"
+        $tel->isub( 1420 );
 
-    type()
-        This is a read-only method. It returns the type of the telephone
-        number. The type can be one of the following values: global, local,
-        other, vanity
+  local_number
+    Returns the local phone number. For example for a number such as
+    "+81-090-1234-5678", this would return "090-1234-5678"
+
+  original
+    Returns the original telephone number provided, before any possible
+    changes were brought.
+
+  private( [ NAME, [ VALUE ] ] )
+    Given a *NAME*, "private" returns the value entry for that parameter. If
+    a *VALUE* is provided, it will set this value for the given name. if no
+    *NAME*, and no *VALUE* was provided, "private" returns a list of all the
+    name-value pair currently set, or a reference to that associative array
+    in scalar context.
+
+  subscriber( [ PHONE ] )
+    Returns the current telephone number set for this telephone uri. For
+    example:
+
+        my $tel = URI::tel->new( 'tel:+1-418-656-9254;ext=102' );
+        my $subscriber = $tel->subscriber;
+
+    will return: "+1-418-656-9254"
+
+  type
+    This is a read-only method. It returns the type of the telephone number.
+    The type can be one of the following values: global, local, other,
+    vanity
 
 SEE ALSO
     List of country calling codes:

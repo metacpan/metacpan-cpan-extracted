@@ -21,6 +21,7 @@ t/10-stock_factory.t
 t/20-app-load.t
 t/30-custom-collect.t
 t/31-custom-sources.t
+t/60-children-naming.t
 t/Helpers.pm
 t/LocalTester.pm
 t/Other.pm

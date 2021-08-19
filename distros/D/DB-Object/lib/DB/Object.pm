@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object.pm
-## Version v0.9.13
+## Version v0.9.14
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2021/08/12
+## Modified 2021/08/18
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -15,8 +15,9 @@
 package DB::Object;
 BEGIN
 {
-    require 5.6.0;
+    require 5.16.0;
     use strict;
+    use warnings;
     use parent qw( Module::Generic DBI );
     use IO::File;
     use File::Spec;
@@ -33,7 +34,7 @@ BEGIN
     our( $VERSION, $DB_ERRSTR, $ERROR, $DEBUG, $CONNECT_VIA, $CACHE_QUERIES, $CACHE_SIZE );
     our( $CACHE_TABLE, $USE_BIND, $USE_CACHE, $MOD_PERL, @DBH, $CACHE_DIR );
     our( $CONSTANT_QUERIES_CACHE );
-    $VERSION     = 'v0.9.13';
+    $VERSION     = 'v0.9.14';
     use Devel::Confess;
 };
 
@@ -875,7 +876,7 @@ sub param
                 }
                 push( @query, "$type = $value" );
             }
-            ## Private parameter - May be anything
+            # Private parameter - May be anything
             else
             {
                 $params->{ $type } = $value;
@@ -2523,7 +2524,7 @@ Doing some left join
     
 =head1 VERSION
 
-    v0.9.13
+    v0.9.14
 
 =head1 DESCRIPTION
 
@@ -3110,7 +3111,7 @@ If the the given value is a reference to a scalar, it will be used as-is, ie. it
 
 If the given value is another field or looks like a function having parenthesis, or if the value is a question mark, the value will be used as-is.
 
-If B<bind> is off, the value will be escaped and the pair field='value' created.
+If L</bind> is off, the value will be escaped and the pair field='value' created.
 
 If the field is a SET data type and the value is a number, the value will be used as-is without surrounding single quote.
 
@@ -3170,7 +3171,7 @@ Returns a C<NULL> string to be used in queries.
 
 =head2 on_conflict
 
-The SQL C<ON CONFLICT> clause needs to be implemented by the driver and is currently supported only by and L<DB::Object::Postgres> and L<DB::Object::SQLite>.
+The SQL C<ON CONFLICT> clause needs to be implemented by the driver and is currently supported only by L<DB::Object::Postgres> and L<DB::Object::SQLite>.
 
 =head2 OR
 

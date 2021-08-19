@@ -132,6 +132,8 @@ t/SPDX/Zlib.txt
 t/SPDX/curl.txt
 t/SPDX/zlib-acknowledgement.txt
 t/Software-License.t
+t/basic-lib-no-RE2.t
+t/basic-script-no-RE2.t
 t/devscripts.t
 t/devscripts/academic.h
 t/devscripts/artistic-2-0-modules.pm

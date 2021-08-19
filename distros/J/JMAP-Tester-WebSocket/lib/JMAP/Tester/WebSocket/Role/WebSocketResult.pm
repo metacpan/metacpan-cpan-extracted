@@ -1,7 +1,7 @@
 use v5.10.0;
 use warnings;
 
-package JMAP::Tester::WebSocket::Role::WebSocketResult 0.003;
+package JMAP::Tester::WebSocket::Role::WebSocketResult 0.004;
 # ABSTRACT: the kind of thing that you get back for a WebSocket request
 
 use Moo::Role;
@@ -46,7 +46,7 @@ JMAP::Tester::WebSocket::Role::WebSocketResult - the kind of thing that you get 
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 OVERVIEW
 

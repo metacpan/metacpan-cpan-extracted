@@ -7,6 +7,25 @@ Home page:    <https://metacpan.org/release/String-Copyright>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=libstring-copyright-perl>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+0.003008	2021-08-18
+
+ [ Packaging ]
+ - require Test2::V1 (not Test::More)
+
+ [ Other ]
+ - detect identifier 'copyright: (C)'
+ - require word boundary after literal copyright as identifier
+ - rewrite tests to use Test2::V1
+ - skip non-identifier '_copyright'
+ - skip non-identifier 'copyright applies'
+ - skip non-identifier 'copyright at'
+ - skip non-identifier 'copyright block'
+ - skip non-identifier 'copyright or'
+ - skip non-identifier 'copyright tag'
+ - skip non-identifier 'copyright transfer'
+ - skip non-identifier 'copyright-' (other than 'copyright-holder')
+ - skip non-identifier 'no copyright'
+
 0.003007	2021-08-16
 
  [ Bug Fixes ]

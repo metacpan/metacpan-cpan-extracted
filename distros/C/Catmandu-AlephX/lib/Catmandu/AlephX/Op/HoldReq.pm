@@ -3,7 +3,7 @@ use Catmandu::Sane;
 use Catmandu::Util qw(:check :is);
 use Moo;
 
-our $VERSION = "1.072";
+our $VERSION = "1.073";
 
 with('Catmandu::AlephX::Response');
 
@@ -11,7 +11,7 @@ has reply => (
   is => 'ro',
   required => 1,
   isa => sub{
-    check_string($_[0]);
+    check_maybe_string($_[0]);
   }
 );
 
@@ -27,6 +27,7 @@ sub parse {
     my $key = $_;
     $key =~ s/-/_/go;
     $args{$key} = $xpath->findvalue("/$op/$_");
+    $args{$key} = is_string($args{$key}) ? $args{$key} : undef;
   }
 
   $args{errors} = $class->parse_errors($xpath);

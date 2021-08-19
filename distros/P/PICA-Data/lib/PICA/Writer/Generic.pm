@@ -1,7 +1,7 @@
 package PICA::Writer::Generic;
 use v5.14.1;
 
-our $VERSION = '1.29';
+our $VERSION = '1.30';
 
 use charnames qw(:full);
 

@@ -1,9 +1,12 @@
-package Tickit::Test::MockTerm;
+#  You may distribute under the terms of either the GNU General Public License
+#  or the Artistic License (the same terms as Perl itself)
+#
+#  (C) Paul Evans, 2009-2021 -- leonerd@leonerd.org.uk
 
-use strict;
+package Tickit::Test::MockTerm 0.72;
+
+use v5.14;
 use warnings;
-
-our $VERSION = '0.71';
 
 use base qw( Tickit::Term );
 

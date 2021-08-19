@@ -842,7 +842,7 @@ sub PDL::season_m {
   }
 
   my $n_season = ($self->dim(0) + $opt{START_POSITION}) / $d;
-  $n_season = pdl($n_season)->ceil->sum;
+  $n_season = pdl($n_season)->ceil->sum->sclr;
 
   my @dims = $self->dims;
   $dims[0] = $n_season * $d;

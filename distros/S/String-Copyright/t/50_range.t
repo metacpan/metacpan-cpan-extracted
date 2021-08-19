@@ -1,8 +1,6 @@
-use strict;
-use warnings;
-use utf8;
+use Test2::V0;
 
-use Test::More tests => 25;
+plan 25;
 
 use String::Copyright {
 	format => sub { join ':', $_->[0] || '', $_->[1] || '' }
@@ -36,21 +34,23 @@ is copyright("© 1999\n, 2003 Foo"),
 is copyright("© 1999-2000 -2004-2005 Foo"),
 	'1999-2000:-2004-2005 Foo',
 	'broken range - bogus multi-range';
-TODO: {
-	local $TODO = 'not yet handled';
-	is copyright("© 1999-2000-2004-2005 Foo"),
-		':1999-2000-2004-2005 Foo',
-		'broken range - bogus multi-nonspace-range';
-	is copyright("© 1999-2000-2005-2004 Foo"),
-		'1999-2000-2005-2004:Foo',
-		'broken range - bogus multi-range wrong order';
-	is copyright("© 1999,2000 \n - 2000 ,2002, 2003 \nFoo"),
-		'1999-2000, 2002-2003:Foo',
-		'broken range - same year';
-	is copyright("© 1999,2000 \n - 1999 ,2002, 2003 \nFoo"),
-		'1999, 2000:- 1999, 2002-2003 Foo',
-		'broken range - earlier year';
-}
+
+my $todo = todo 'not yet handled';
+is copyright("© 1999-2000-2004-2005 Foo"),
+	':1999-2000-2004-2005 Foo',
+	'broken range - bogus multi-nonspace-range';
+is copyright("© 1999-2000-2005-2004 Foo"),
+	'1999-2000-2005-2004:Foo',
+	'broken range - bogus multi-range wrong order';
+is copyright("© 1999,2000 \n - 2000 ,2002, 2003 \nFoo"),
+	'1999-2000, 2002-2003:Foo',
+	'broken range - same year';
+is copyright("© 1999,2000 \n - 1999 ,2002, 2003 \nFoo"),
+	'1999, 2000:- 1999, 2002-2003 Foo',
+	'broken range - earlier year';
+
+$todo = undef;
+
 is copyright("© 1999,2000  , 2001 ,200\n2, 2003 Foo"),
 	'1999-2001:200',
 	'broken range - newline in year';
@@ -71,16 +71,16 @@ is copyright("© 2001-2001"), '2001:', 'single-year range';
 
 is copyright("© 2002-2000"), '2000-2002:', 'backwards range';
 
-TODO: {
-	local $TODO = 'not yet handled';
+$todo = todo 'not yet handled';
 
-	is copyright("© 2000-03"), '2000-2003:', 'sloppy range-end, 2 digits';
+is copyright("© 2000-03"), '2000-2003:', 'sloppy range-end, 2 digits';
 
-	is copyright("© 2005-7"), '2005-2007:', 'sloppy range-end, 1 digit';
+is copyright("© 2005-7"), '2005-2007:', 'sloppy range-end, 1 digit';
 
-	is copyright("Copyright (c) Foo, 2000"), '2000:Foo', 'year at end';
+is copyright("Copyright (c) Foo, 2000"), '2000:Foo', 'year at end';
 
-	is copyright("Copyright (c) Foo, 2000,\n 2001"),
-		'2000-2001:Foo',
-		'year at end and next line';
-}
+is copyright("Copyright (c) Foo, 2000,\n 2001"),
+	'2000-2001:Foo',
+	'year at end and next line';
+
+done_testing;

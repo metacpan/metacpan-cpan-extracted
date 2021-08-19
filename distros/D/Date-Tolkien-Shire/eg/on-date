@@ -10,7 +10,7 @@ use Getopt::Long 2.33 qw{ :config auto_version };
 use Pod::Usage;
 use Time::Local;
 
-our $VERSION = '1.904';
+our $VERSION = '1.905';
 
 my %opt = (
     format	=> '%Ex%n%En%Ed',

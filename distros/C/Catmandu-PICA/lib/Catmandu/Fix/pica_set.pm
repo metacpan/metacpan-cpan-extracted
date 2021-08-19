@@ -1,64 +1,46 @@
 package Catmandu::Fix::pica_set;
 
-our $VERSION = '1.05';
-
 use Catmandu::Sane;
+
+our $VERSION = '1.06';
+
 use Moo;
+use Catmandu::Util::Path qw(as_path);
 use Catmandu::Fix::Has;
 use PICA::Path;
 
-has path      => ( fix_arg => 1 );
-has pica_path => ( fix_arg => 1 );
-has record    => ( fix_opt => 1 );
+has path => ( fix_arg => 1 );
+has pica_path => (
+    fix_arg => 1,
+    coerce  => sub { PICA::Path->new( $_[0] ) }
+);
+has record => ( fix_opt => 1 );
 
-with 'Catmandu::Fix::SimpleGetValue';
+with 'Catmandu::Fix::Builder';
 
-sub emit_value {
-    my ( $self, $set_value, $fixer ) = @_;
+sub _build_fixer {
+    my ($self) = @_;
 
-    my $record_key  = $fixer->emit_string( $self->record // 'record' );
-    my $pica_path   = PICA::Path->new($self->pica_path);
+    my $value_getter  = as_path( $self->path )->getter;
+    my $record_getter = as_path( $self->record // 'record' )->getter;
+    my $pica_path     = $self->pica_path;
+    my $subfields     = '[' . ( $pica_path->subfields // '_A-Za-z0-9' ) . ']';
+    $subfields = qr{$subfields};
 
-    my ($field_regex, $occurrence_regex, $subfield_regex) = @$pica_path;
-
-    my $perl = "if (is_string(${set_value})) {";
-
-    my $field_regex_var    = $fixer->generate_var;
-    $perl .= $fixer->emit_declare_vars( $field_regex_var, "qr{$field_regex}" );
-
-    my $subfield_regex_var    = $fixer->generate_var;
-    $perl .= $fixer->emit_declare_vars( $subfield_regex_var, "qr{$subfield_regex}" );
-
-    my $occurrence_regex_var;
-    if (defined $occurrence_regex) {
-
-        $occurrence_regex_var = $fixer->generate_var;
-        $perl .= $fixer->emit_declare_vars( $occurrence_regex_var, "qr{$occurrence_regex}" );
-    }
-
-    my $data  = $fixer->var;
-    my $added = $fixer->generate_var;
-
-    $perl .= $fixer->emit_declare_vars($added);
-    $perl .= $fixer->emit_foreach(
-        "${data}->{${record_key}}",
-        sub {
-            my $var  = shift;
-            my $perl = "next if ${var}->[0] !~ ${field_regex_var};";
-            if (defined $occurrence_regex) {
-                $perl .= "next if (!defined ${var}->[1] || ${var}->[1] !~ ${occurrence_regex_var});";
+    sub {
+        my ($data) = @_;
+        my $value = $value_getter->($data)->[0];
+        for my $record ( @{ $record_getter->($data) } ) {
+            for my $field (@$record) {
+                next unless $pica_path->match_field($field);
+                for ( my $i = 3 ; $i < @$field ; $i += 2 ) {
+                    next unless $field->[ $i - 1 ] =~ $subfields;
+                    $field->[$i] = $value;
+                }
             }
-            my $i  = $fixer->generate_var;
-            $perl .= $fixer->emit_declare_vars($i) .
-            "for (${i} = 2; ${i} < \@{${var}}; ${i} += 2) {".
-                "if (${var}->[${i}] =~ ${subfield_regex_var}) {".
-                    "${var}->[${i} + 1] = ${set_value};".
-                "}".
-            "}";
-            $perl;
         }
-    );
-    $perl .= "}";
+        $data;
+      }
 }
 
 1;
@@ -71,10 +53,10 @@ Catmandu::Fix::pica_set - sets a new value to an existing subfield
 =head1 SYNOPSIS
 
     # Set value of dc.identifier as new value for subfield 0 in PICA field 003A
-    pica_set('dc.identifier', '003A0');
+    pica_set('dc.identifier', '003A$0');
     
     # same as above, but use another record path ('pica')
-    pica_set('dc.identifier', '003A0', record:'pica');
+    pica_set('dc.identifier', '003A$0', record:'pica');
 
 =head1 DESCRIPTION
 

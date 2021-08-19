@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -100,5 +100,14 @@ $term->goto( 0, 3 );
 $term->erasech( 5, undef );
 is_display( [ "ABC     IJ", "ABCDEFGHIJ", "ABCDEFGHIJ" ],
             'Display after ->erasech' );
+
+# mockterm-emulated termctls
+{
+   $term->setctl_int( Tickit::Term::TERMCTL_CURSORVIS, 0 );
+   is( $term->getctl_int( Tickit::Term::TERMCTL_CURSORVIS ), 0, '$term->setctl_int TERMCTL_CURSORVIS' );
+
+   $term->setctl_int( Tickit::Term::TERMCTL_CURSORSHAPE, 2 );
+   is( $term->getctl_int( Tickit::Term::TERMCTL_CURSORSHAPE ), 2, '$term->setctl_int TERMCTL_CURSORSHAPE' );
+}
 
 done_testing;

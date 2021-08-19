@@ -1,5 +1,5 @@
 package Net::Whois::Raw::Data;
-$Net::Whois::Raw::Data::VERSION = '2.99031';
+$Net::Whois::Raw::Data::VERSION = '2.99032';
 # ABSTRACT: Config for Net::Whois::Raw.
 
 use utf8;
@@ -765,9 +765,9 @@ our %servers = qw(
     ORG.MA      whois.iam.net.ma
     PRESS.MA    whois.iam.net.ma
 
-    COM.MX      whois.nic.mx
-    GOB.MX      whois.nic.mx
-    NET.MX      whois.nic.mx
+    COM.MX      whois.mx
+    GOB.MX      whois.mx
+    NET.MX      whois.mx
 
     COM.MT      whois.nic.mt
     ORG.MT      whois.nic.mt
@@ -2254,7 +2254,7 @@ our %notfound = (
     'whois.nic.ms'            => 'No Object Found',
     'whois.nic.mt'            => 'Domain is not registered',
     'whois.nic.mu'            => 'No Object Found',
-    'whois.nic.mx'            => 'Object_Not_Found',
+    'whois.mx'            => 'Object_Not_Found',
     'whois.mynic.my'          => '^Domain Name \S+ does not',
     'whois.na-nic.com.na'     => 'No Object Found',
     'whois.nic.nf'            => 'No Object Found',
@@ -3765,7 +3765,7 @@ our %strip = (
         'Internet Direct Ltd, All rights reserved',
         '^Domain Information$',
     ],
-    'whois.nic.mx' => [
+    'whois.mx' => [
         '^La informacion que ha',
         '^relacionados con la delegacion',
         '^administrado por NIC Mexico',
@@ -4528,7 +4528,7 @@ Net::Whois::Raw::Data - Config for Net::Whois::Raw.
 
 =head1 VERSION
 
-version 2.99031
+version 2.99032
 
 =head1 AUTHOR
 
@@ -4536,7 +4536,7 @@ Alexander Nalobin <alexander@nalobin.ru>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2002-2020 by Alexander Nalobin.
+This software is copyright (c) 2002-2021 by Alexander Nalobin.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

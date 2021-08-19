@@ -8,7 +8,7 @@ use strict;
 use Carp;
 use English qw( -no_match_vars );
 use constant ERROR_CONTEXT => 3;
-{ our $VERSION = '1.54'; }
+{ our $VERSION = '1.56'; }
 use Scalar::Util qw< blessed reftype >;
 
 # Function-oriented interface
@@ -41,7 +41,7 @@ sub render {
 
 # Object-oriented interface
 {
-   my %preset_for;
+   my (%preset_for, %inhibits_defaults);
    BEGIN {
       %preset_for = (
          'default' => {
@@ -59,14 +59,19 @@ sub render {
             traverse_methods => 1,
          },
       );
+
+      # some defaults are inhibited by the presence of certain input
+      # parameters. These parameters can still be put externally, though.
+      %inhibits_defaults = (
+         binmode => [qw< utf8 >],
+      );
    }
    sub new {
       my $package = shift;
-      my $self = bless {%{$preset_for{'default'}}, variables => {}},
-        $package;
 
+      my %external;
       if (@_ == 1) {
-         %{$self} = (%{$self}, %{$_[0]});
+         %external = %{$_[0]};
       }
       elsif (scalar(@_) % 2 == 0) {
          while (@_) {
@@ -74,17 +79,25 @@ sub render {
             if ($key eq '-preset') {
                croak "invalid preset $value in new()"
                  unless exists $preset_for{$value};
-               %{$self} = (%{$self}, %{$preset_for{$value}});
+               %external = (%external, %{$preset_for{$value}});
             }
             else {
-               $self->{$key} = $value;
+               $external{$key} = $value;
             }
          }
       }
       else {
          croak 'invalid number of input arguments for constructor';
       }
-      return $self;
+
+      # compute defaults, removing inhibitions
+      my %defaults =(%{$preset_for{'default'}}, variables => {});
+      for my $inhibitor (keys %inhibits_defaults) {
+         next unless exists $external{$inhibitor};
+         delete $defaults{$_} for @{$inhibits_defaults{$inhibitor}};
+      }
+
+      return bless {%defaults, %external}, $package;
    } ## end sub new
 }
 
@@ -357,6 +370,8 @@ END_OF_CODE
 
       push @code, "binmode $handle, ':encoding(utf8)';\n"
          if $utf8;
+      push @code, "binmode $handle, '$self->{binmode}';\n"
+         if defined $self->{binmode};
 
       push @code, <<'END_OF_CODE';
 

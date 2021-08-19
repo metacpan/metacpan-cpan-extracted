@@ -177,7 +177,7 @@ Differencing. DX(t) = X(t) - X(t-1), DX(0) = X(0). Can be done inplace.
 =for bad
 
 diff does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -209,7 +209,7 @@ Integration. Opposite of differencing. IX(t) = X(t) + X(t-1), IX(0) = X(0). Can 
 =for bad
 
 inte does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -242,7 +242,7 @@ Deseasonalize data using moving average filter the size of period d.
 =for bad
 
 dseason processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -317,7 +317,7 @@ Filter, exponential smoothing. xf(t) = a * x(t) + (1-a) * xf(t-1)
 =for bad
 
 filter_exp does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -350,7 +350,7 @@ Filter, moving average. xf(t) = sum(x(t-q .. t+q)) / (2q + 1)
 =for bad
 
 filter_ma does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -389,7 +389,7 @@ Usage:
 =for bad
 
 mae processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -428,7 +428,7 @@ Usage:
 =for bad
 
 mape processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -467,7 +467,7 @@ Usage:
 =for bad
 
 wmape processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -518,7 +518,7 @@ Usage:
 =for bad
 
 portmanteau does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -641,7 +641,7 @@ sub PDL::season_m {
   }
 
   my $n_season = ($self->dim(0) + $opt{START_POSITION}) / $d;
-  $n_season = pdl($n_season)->ceil->sum;
+  $n_season = pdl($n_season)->ceil->sum->sclr;
 
   my @dims = $self->dims;
   $dims[0] = $n_season * $d;

@@ -17,7 +17,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,19 +33,19 @@ no_index:
 provides:
   Ryu::Async:
     file: lib/Ryu/Async.pm
-    version: '0.019'
+    version: '0.020'
   Ryu::Async::Client:
     file: lib/Ryu/Async/Client.pm
-    version: '0.019'
+    version: '0.020'
   Ryu::Async::Packet:
     file: lib/Ryu/Async/Packet.pm
-    version: '0.019'
+    version: '0.020'
   Ryu::Async::Process:
     file: lib/Ryu/Async/Process.pm
-    version: '0.019'
+    version: '0.020'
   Ryu::Async::Server:
     file: lib/Ryu/Async/Server.pm
-    version: '0.019'
+    version: '0.020'
 recommends:
   Heap: '0'
   IO::Async::SSL: '0.19'
@@ -53,6 +53,7 @@ recommends:
   IO::AsyncX::System: '0.003'
 requires:
   Future: '0.47'
+  Future::AsyncAwait: '0'
   IO::Async: '0.77'
   IO::Socket::IP: '0.41'
   Log::Any: '1.708'
@@ -67,10 +68,10 @@ resources:
   bugtracker: https://github.com/team-at-cpan/Ryu-Async/issues
   homepage: https://github.com/team-at-cpan/Ryu-Async
   repository: https://github.com/team-at-cpan/Ryu-Async.git
-version: '0.019'
+version: '0.020'
 x_authority: cpan:TEAM
 x_contributors:
   - 'Eyad Arnabeh <eyadof@gmail.com>'
-x_generated_by_perl: v5.32.0
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

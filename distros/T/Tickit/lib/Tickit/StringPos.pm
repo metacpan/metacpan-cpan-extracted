@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2012-2016 -- leonerd@leonerd.org.uk
 
-package Tickit::StringPos;
+package Tickit::StringPos 0.72;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.71';
 
 # XS code comes from Tickit itself
 require Tickit;

@@ -14,11 +14,11 @@ String::Copyright - Representation of text-based copyright statements
 
 =head1 VERSION
 
-Version 0.003007
+Version 0.003008
 
 =cut
 
-our $VERSION = '0.003007';
+our $VERSION = '0.003008';
 
 # Dependencies
 use parent 'Exporter::Tiny';
@@ -98,9 +98,10 @@ see the L<Exporter::Tiny> documentation for details.
 # AND'ed strings have name ending in underscore: must be grouped if repeated
 my $blank           = '[ \t]';
 my $blank_or_break_ = "$blank*\\n?$blank*";
-my $sign = '(?i:copyright(?:-holders?)?|copr\.|[©⒞Ⓒⓒ🄒🄫🅒])';
+my $sign = '(?i:copyright(?:-holders?)?\b|copr\.|[©⒞Ⓒⓒ🄒🄫🅒])';
 my $pseudo_sign_ = '[({][Cc][})]';
 my $broken_sign_ = "\\?$blank*";
+my $nonsign      = "(?:no |_)copyright|copyright-[^h]";
 
 my $year_ = '\b[0-9]{4}\b';
 my $comma = "(?:$blank*,$blank_or_break_|$blank_or_break_,?$blank*)";
@@ -117,7 +118,7 @@ my $owner_initial = '[^\s!"#$%&\'()*+,./:;<=>?@[\\\\\]^_`{|}~]';
 # (?i)copyright (?:(?:claim|holder|info|information|notice|owner|ownership|statement|string)s?|in|is|to)@\b[-_@]
 # (?im)copyright (?:(?:claim|holder|info|information|notice|owner|ownership|statement|string)s?|in|is|to)[^ $]
 my $chatter_copyright
-	= '(?i:(?:assigned|claim|holder|info|information|law|notice|owner|ownership|statement|string)s?|and|eq|generated|in|is|on|to)';
+	= '(?i:assigned|transfer(?:red)?|(?:block|claim|holder|info|information|law|notice|owner|ownership|statement|string|tag)s?|and|appl(?:y|ie[ds])|at|eq|generated|in|is|on|or|to)';
 my $the_notname
 	= '(?i:concrete|fault|first|immediately|least|min\/max|one|outer|previous|ratio|sum|user)';
 my $the_sentence_
@@ -125,10 +126,10 @@ my $the_sentence_
 my $chatter_pseudosign_
 	= "(?:the$blank+(?:$the_notname|$the_sentence_)|there)\\b";
 my $chatter
-	= "(?im:copyright$blank_or_break_$chatter_copyright(?:$|@\\W|[^a-zA-Z0-9@_-])|$blank*$pseudo_sign_(?:$blank_or_break_)+$chatter_pseudosign_)";
+	= "(?im:$nonsign|copyright$blank_or_break_$chatter_copyright(?:$|@\\W|[^a-zA-Z0-9@_-])|$blank*$pseudo_sign_(?:$blank_or_break_)+$chatter_pseudosign_)";
 
 my $signs
-	= "(?m:(?:$sign|(?:^|$blank)$pseudo_sign_)(?:$blank+(?:$sign|$pseudo_sign_))*)";
+	= "(?m:(?:$sign|(?:^|$blank)$pseudo_sign_):?(?:$blank*(?:$sign|$pseudo_sign_))*)";
 my $yearspan_ = "$year_(?:$dash_$year_)?";
 my $years_    = qr/$yearspan_(?:$comma$yearspan_)*/;
 my $owners_   = "$owner_prefix*$owner_initial\\S*(?:$blank*\\S+)*";

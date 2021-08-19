@@ -93,7 +93,7 @@
    "provides" : {
       "Plasp" : {
          "file" : "lib/Plasp.pm",
-         "version" : "1.08"
+         "version" : "1.09"
       },
       "Plasp::App" : {
          "file" : "lib/Plasp/App.pm"
@@ -161,7 +161,7 @@
          "web" : "https://github.com/stvleung/Plasp"
       }
    },
-   "version" : "1.08",
+   "version" : "1.09",
    "x_contributors" : [
       "Steven Leung <sleung@turnitin.com>"
    ],

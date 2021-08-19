@@ -32,6 +32,7 @@ do { my $x = {
                                       },
                       'requires' => {
                                       'Future' => '0.47',
+                                      'Future::AsyncAwait' => '0',
                                       'IO::Async' => '0.77',
                                       'IO::Socket::IP' => '0.41',
                                       'Log::Any' => '1.708',

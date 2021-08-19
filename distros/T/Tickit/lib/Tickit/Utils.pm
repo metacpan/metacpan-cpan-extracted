@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2011-2016 -- leonerd@leonerd.org.uk
 
-package Tickit::Utils;
+package Tickit::Utils 0.72;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.71';
 
 use Carp;
 

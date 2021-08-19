@@ -20,3 +20,4 @@ develop:
     Log::Dispatch: 0
     Log::Dispatchouli: 0
     Log::Log4perl: 0
+    Mojolicious: '9.20'

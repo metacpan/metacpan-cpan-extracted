@@ -72,6 +72,10 @@ Example:
 
 Creates a clone of the current array object and returns it.
 
+=head2 contains
+
+This is a convenient alias for L</exists>
+
 =head2 delete
 
 Provided with an offset value and an optional length, and this will remove data from the array at the given offset and for the given length.

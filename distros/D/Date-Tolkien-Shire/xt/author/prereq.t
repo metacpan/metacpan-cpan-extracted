@@ -11,7 +11,9 @@ eval {
 } or plan skip_all => 'Test::Prereq::Meta not available';
 
 my $tpm = Test::Prereq::Meta->new(
-    accept	=> [ qw{ Module::Metadata Test::MockTime } ],
+    accept	=> [ qw{
+	CPAN::Meta ExtUtils::Manifest Module::Metadata Test::MockTime
+	} ],
 );
 
 $tpm->all_prereq_ok();

@@ -3,29 +3,26 @@ package Rex::Hook::File::Diff;
 # ABSTRACT: show diff of changes for files managed by Rex
 
 use 5.012;
-use strict;
 use warnings;
 
-our $VERSION = 'v0.3.0';
-
-use English qw( -no_match_vars );
-use Rex 1.012 -base;
+use File::Basename;
+use Rex 1.013004 -base;
 use Rex::Helper::Run;
 use Rex::Hook;
 use Text::Diff 1.44;
+
+our $VERSION = 'v0.4.0';
 
 register_function_hooks { before_change => { file => \&show_diff, }, };
 
 sub show_diff {
     my ( $original_file, @opts ) = @_;
 
-    my ( $diff, $diff_command );
+    my $diff;
+    my $diff_command = can_run('diff');
+    state $managing_windows = is_windows();
 
-    if ( $OSNAME ne 'MSWin32' ) {
-        $diff_command = can_run('diff');
-    }
-
-    if ($diff_command) {
+    if ( !$managing_windows && $diff_command ) {
         my $command = join q( ), $diff_command, '-u', involved_files($original_file);
 
         if ( $diff = i_run $command, fail_ok => TRUE ) {
@@ -68,7 +65,7 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Ferenc Erki CPAN
+=for :stopwords Ferenc Erki backend CPAN sed
 
 =head1 NAME
 
@@ -76,7 +73,7 @@ Rex::Hook::File::Diff - show diff of changes for files managed by Rex
 
 =head1 VERSION
 
-version v0.3.0
+version v0.4.0
 
 =head1 SYNOPSIS
 
@@ -100,9 +97,9 @@ This module allows L<Rex> to show a diff of changes for the files managed via it
 
 =item L<sed|https://metacpan.org/pod/Rex::Commands::File#sed>
 
-On non-Windows systems, it uses the C<diff> utility if available.
-
 =back
+
+It prefers to use the C<diff> utility on non-Windows managed endpoints, if available.
 
 =head1 DIAGNOSTICS
 
@@ -134,7 +131,7 @@ Ferenc Erki <erkiferenc@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Ferenc Erki.
+This software is copyright (c) 2020,2021 by Ferenc Erki.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

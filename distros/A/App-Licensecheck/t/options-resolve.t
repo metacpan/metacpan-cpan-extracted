@@ -1,5 +1,4 @@
 use Test2::V0;
-
 use Test2::Require::Module 'Regexp::Pattern::License' => '3.7.0';
 
 use Test::Command::Simple;
@@ -15,16 +14,16 @@ path($CMD)->chmod('a+x') if ( $CMD eq 'bin/licensecheck' );
 
 subtest '--help, ignoring earlier --list-licenses' => sub {
 	run_ok 1, $CMD, qw(--list-licenses --help);
-	like stdout,   qr/\Q[options...\E/, 'stdout contains [options...]';
-	unlike stdout, qr/^WTFPL-1\.0$/m,   'stdout does not contain WTFPL-1.0';
-	is stderr,     '',                  'No stderr';
+	like stdout,   qr/\Q[OPTION...\E/, 'stdout contains [options...]';
+	unlike stdout, qr/^WTFPL-1\.0$/m,  'stdout does not contain WTFPL-1.0';
+	is stderr,     '',                 'No stderr';
 };
 
 subtest '--help, ignoring later --list-licenses' => sub {
 	run_ok 1, $CMD, qw(--help --list-licenses);
-	like stdout,   qr/\Q[options...\E/, 'stdout contains [options...]';
-	unlike stdout, qr/^WTFPL-1\.0$/m,   'stdout does not contain WTFPL-1.0';
-	is stderr,     '',                  'No stderr';
+	like stdout,   qr/\Q[OPTION...\E/, 'stdout contains [options...]';
+	unlike stdout, qr/^WTFPL-1\.0$/m,  'stdout does not contain WTFPL-1.0';
+	is stderr,     '',                 'No stderr';
 };
 
 subtest '--list-licenses' => sub {

@@ -1,5 +1,12 @@
 Revision history for PICA::Data
 
+1.30 2021-08-17T16:46:36Z
+    - picadata: Fix UTF-8 output of schema labels
+    - picadata: allow to explain full Avram schema
+    - picadata: add command 'get'
+    - picadata: rename command 'split' to 'levels'
+    - Add method pica_data and fix pica_guess
+
 1.29 2021-07-22T08:51:03Z
     - picadata: Fix detection of terminal
 

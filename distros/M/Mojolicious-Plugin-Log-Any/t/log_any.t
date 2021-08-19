@@ -3,6 +3,7 @@ use warnings;
 use Test::Needs {'Log::Any' => '1.00'};
 
 use Log::Any::Test;
+use Mojolicious ();
 use Mojo::Log;
 use Test::More;
 
@@ -13,6 +14,7 @@ use Test::More;
 }
 
 my @levels = qw(debug info warn error fatal);
+unshift @levels, 'trace' if eval { Mojolicious->VERSION('9.20'); 1 };
 
 my $log = Mojo::Log->with_roles('Mojo::Log::Role::AttachLogger')->new
   ->unsubscribe('message')->attach_logger('Log::Any', {category => 'Test::Category', prepend_level => 0, message_separator => ' '});

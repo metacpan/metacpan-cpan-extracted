@@ -6,7 +6,7 @@ Template::Perlish - Yet Another Templating system for Perl
 
 =head1 VERSION
 
-This document describes Template::Perlish version 1.54.
+This document describes Template::Perlish version 1.56.
 
 
 =head1 SYNOPSIS
@@ -270,6 +270,11 @@ compilation, pass the C<no_check> option to L</compile>:
 
    my $compiled = $tp->compile($template, no_check => 1);
 
+By default, the stuff is assumed to be utf-8 compliant, which is
+reflected by option C<utf8> defaulting to I<true> in L<< /B<new> >>.
+This default is inhibited by setting C<utf8> to a false value, or
+C<binmode> to any defined value.
+
 =head1 INTERFACE 
 
 =head2 One Shot Templates
@@ -311,6 +316,11 @@ constructor, does exactly what you think. You can provide any parameter,
 but only the following will make sense:
 
 =over
+
+=item I<binmode>
+
+string to set C<binmode> on the output filehandle. A defined value
+disables the default to C<utf8>.
 
 =item I<method_over_keys>
 
@@ -358,6 +368,12 @@ Defaults to I<false>;
 boolean flag used for traversal, see L</traverse>.
 
 Defaults to I<false>;
+
+=item I<utf8>
+
+sets the handling to utf8.
+
+Defaults to I<true>, unless C<binmode> option is set to a defined value.
 
 =item I<variables>
 

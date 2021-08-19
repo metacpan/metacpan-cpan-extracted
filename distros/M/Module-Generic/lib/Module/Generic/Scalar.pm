@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Scalar.pm
-## Version v1.0.1
+## Version v1.0.2
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2021/04/21
+## Modified 2021/08/18
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -78,7 +78,7 @@ BEGIN
         },
         fallback => 1,
     );
-    our( $VERSION ) = 'v1.0.1';
+    our( $VERSION ) = 'v1.0.2';
 };
 
 ## sub new { return( shift->_new( @_ ) ); }

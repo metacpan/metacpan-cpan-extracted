@@ -5,7 +5,7 @@ use Open::This qw( parse_text to_editor_args );
 use Path::Tiny qw( path );
 use Test::More;
 use Test::Differences qw( eq_or_diff );
-use Test::Warnings;
+use Test::Warnings ();
 
 # This gets really noisy on Travis if $ENV{EDITOR} is not set
 local $ENV{EDITOR} = 'vim';
@@ -41,7 +41,7 @@ local $ENV{EDITOR} = 'vim';
 {
     my $text        = 'lib/Open/This.pm-17-';
     my $line_number = Open::This::_maybe_extract_line_number( \$text );
-    is( $line_number, 17, 'git-grep context line_number' );
+    is( $line_number, 17,          'git-grep context line_number' );
     is( $text, 'lib/Open/This.pm', 'git-grep context line number stripped' );
 }
 

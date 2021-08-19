@@ -1,5 +1,5 @@
 ##########################################################################
-# Copyright (c) 2010-2012 Alexander Bluhm <alexander.bluhm@gmx.net>
+# Copyright (c) 2010-2021 Alexander Bluhm <alexander.bluhm@gmx.net>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -21,22 +21,22 @@ use warnings;
 
 =head1 NAME
 
-B<OSPF::LSDB::Cisco> - parse Cisco OSPF link state database
+OSPF::LSDB::Cisco - parse Cisco OSPF link state database
 
 =head1 SYNOPSIS
 
 use OSPF::LSDB::Cisco;
 
-my $cisco = OSPF::LSDB::Cisco-E<gt>L<new>();
+my $cisco = OSPF::LSDB::Cisco-E<gt>new();
 
-my $cisco = OSPF::LSDB::Cisco-E<gt>L<new>(ssh => "user@host");
+my $cisco = OSPF::LSDB::Cisco-E<gt>new(ssh => "user@host");
 
-$cisco-E<gt>L<parse>(%files);
+$cisco-E<gt>parse(%files);
 
 =head1 DESCRIPTION
 
-The B<OSPF::LSDB::Cisco> module parses the output of the Cisco OSPF
-IOS and fills the B<OSPF::LSDB> base object.
+The OSPF::LSDB::Cisco module parses the output of the Cisco OSPF
+IOS and fills the L<OSPF::LSDB> base object.
 The output of
 C<show ip ospf>,
 C<show ip ospf database router>,
@@ -438,7 +438,7 @@ sub parse_lsdb {
 
 =over 4
 
-=item $self-E<gt>L<parse>(%files)
+=item $self-E<gt>parse(%files)
 
 This function takes a hash with file names as value containing the
 Cisco C<show ip ospf> output data.

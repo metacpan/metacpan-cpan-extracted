@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.1.3
+## Version v0.1.5
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2021/06/29
+## Modified 2021/08/08
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -39,7 +39,7 @@ BEGIN
         bool     => sub () { 1 },
         fallback => 1,
     );
-    our $VERSION = 'v0.1.3';
+    our $VERSION = 'v0.1.5';
     ## https://en.wikipedia.org/wiki/Path_(computing)
     ## perlport
     our $OS2SEP  =
@@ -189,6 +189,8 @@ sub abs
     my $new = File::Spec->file_name_is_absolute( $path ) ? $path : URI::file->new( $path )->abs( $file )->file( $^O );
     return( $self->new( $new ) );
 }
+
+sub absolute { return( shift->abs( @_ ) ); }
 
 # $obj->append( $string );
 # $obj->append( $string, $open_options );
@@ -1392,6 +1394,8 @@ sub lock
 sub locked { return( shift->_set_get_scalar( 'locked', @_ ) ); }
 
 sub max_recursion { return( shift->_set_get_number( 'max_recursion', @_ ) ); }
+
+sub makepath { return( shift->mkpath( @_ ) ); }
 
 sub mkpath
 {
@@ -2754,7 +2758,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.1.3
+    v0.1.5
 
 =head1 DESCRIPTION
 
@@ -2814,6 +2818,10 @@ The type of file this is. Either a file or a directory.
 If no argument is provided, this return the current object, since the underlying file is already changed into absolute file path.
 
 If a file path is provided, then it will change it into an absolute one and return a new L<Module::Generic::File> object.
+
+=head2 absolute
+
+This is a convenient alias to L</abs>
 
 =head2 append
 
@@ -3244,6 +3252,10 @@ This returns the current object upon success or undef and set an exception objec
 =head2 locked
 
 Returns true if the file is locked. More specifically, this returns the value of the flags originally used to lock the file.
+
+=head2 makepath
+
+This is an alias to L</mkpath>
 
 =head2 max_recursion
 

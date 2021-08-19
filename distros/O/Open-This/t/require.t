@@ -3,7 +3,7 @@ use warnings;
 
 use Open::This qw( parse_text );
 use Test::More;
-use Test::Warnings;
+use Test::Warnings ();
 
 # Simulate an installed, non-local module
 local $ENV{OPEN_THIS_LIBS} = '';

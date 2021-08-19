@@ -1,5 +1,5 @@
 ##########################################################################
-# Copyright (c) 2010-2019 Alexander Bluhm <alexander.bluhm@gmx.net>
+# Copyright (c) 2010-2021 Alexander Bluhm <alexander.bluhm@gmx.net>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -21,22 +21,22 @@ use warnings;
 
 =head1 NAME
 
-B<OSPF::LSDB::ospfd> - parse OpenBSD B<ospfd> link state database
+OSPF::LSDB::ospfd - parse OpenBSD B<ospfd> link state database
 
 =head1 SYNOPSIS
 
 use OSPF::LSDB::ospfd;
 
-my $ospfd = OSPF::LSDB::ospfd-E<gt>L<new>();
+my $ospfd = OSPF::LSDB::ospfd-E<gt>new();
 
-my $ospfd = OSPF::LSDB::ospfd-E<gt>L<new>(ssh => "user@host");
+my $ospfd = OSPF::LSDB::ospfd-E<gt>new(ssh => "user@host");
 
-$ospfd-E<gt>L<parse>(%files);
+$ospfd-E<gt>parse(%files);
 
 =head1 DESCRIPTION
 
-The B<OSPF::LSDB::ospfd> module parses the output of OpenBSD B<ospfctl>
-and fills the B<OSPF::LSDB> base object.
+The OSPF::LSDB::ospfd module parses the output of OpenBSD B<ospfctl>
+and fills the L<OSPF::LSDB> base object.
 The output of
 C<show summary>,
 C<show database router>,
@@ -420,7 +420,7 @@ sub parse_lsdb {
 
 =over 4
 
-=item $self-E<gt>L<parse>(%files)
+=item $self-E<gt>parse(%files)
 
 This function takes a hash with file names as value containing the
 B<ospfctl> output data.

@@ -1,5 +1,9 @@
 Revision history for App-TypecastTemplates
 
+v0.3.0    Tue Aug 17 18:41:02 CEST 2021
+	- Added option --columns to specify CSV columns
+	- Added tests for --columns and default template type '*'
+
 v0.2.0    Tue Aug 10 11:54:04 CEST 2021
 	- Added option --templatefile to specify other templates
 	- Added default template type '*'

@@ -14,6 +14,7 @@ package DB::Object::Fields::Field;
 BEGIN
 {
     use strict;
+    use warnings;
     use common::sense;
     use parent qw( Module::Generic );
     use Devel::Confess;

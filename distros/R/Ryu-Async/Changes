@@ -1,5 +1,13 @@
 Revision history for Ryu-Async
 
+0.020     2021-08-17 09:12:48+08:00 Asia/Kuala_Lumpur
+    [New features]
+
+    - ->from when used with an arrayref now respects pause/resume, and will
+    use the original arrayref as the data source (allowing extra elements to
+    be added/removed, source still finishes once the arrayref runs out)
+    - now uses Future::AsyncAwait
+
 0.019     2021-01-19 06:18:09+08:00 Asia/Kuala_Lumpur
     No new features.
 

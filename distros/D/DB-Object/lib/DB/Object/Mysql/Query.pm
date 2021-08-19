@@ -15,6 +15,7 @@ package DB::Object::Mysql::Query;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( DB::Object::Query );
     use Devel::Confess;
     our( $VERSION, $DEBUG, $VERBOSE );

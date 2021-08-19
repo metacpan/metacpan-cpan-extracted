@@ -1,3 +1,8 @@
+1.12 2021-08-18
+    - Allow duplicate point-to-point links between routers.
+    - Reformat pod documentation.
+    - Add global tests for eol, pod, strict in all files.
+
 1.11 2019-06-05
     - Better error message if ospfd control socket is missing.
     - Since OpenBSD 6.4 control socket for ospfd is per routing

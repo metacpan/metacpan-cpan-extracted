@@ -15,8 +15,8 @@
 package DB::Object::Postgres::Lo;
 BEGIN
 {
-    require 5.6.0;
     use strict;
+    use warnings;
     # use parent qw( DB::Object::Postgres );
     use parent qw( Module::Generic );
     our $VERSION = 'v0.300.0';

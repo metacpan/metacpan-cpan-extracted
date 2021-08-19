@@ -3,13 +3,10 @@
 #
 #  (C) Paul Evans, 2009-2019 -- leonerd@leonerd.org.uk
 
-package Tickit::Window;
+package Tickit::Window 0.72;
 
-use strict;
+use v5.14;
 use warnings;
-use 5.010; # //
-
-our $VERSION = '0.71';
 
 use Carp;
 

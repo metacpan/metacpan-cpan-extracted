@@ -51,10 +51,10 @@ sub get_byte_interval {
 	return ($self->{bytes} >> $j*4 - $self->{bytes} >> $i*4);	
 }
 
-sub cast_to_stream {
+sub cast_to_imagebytestream {
 	my ($self, $stream) = @_;
 
-	$stream = GFX::Enhancer::Stream->new($self->{length}, $self->{bytes});
+	${$stream} = GFX::Enhancer::Stream->new($self->{length}, $self->{bytes});
 	
 	return $stream;
 }

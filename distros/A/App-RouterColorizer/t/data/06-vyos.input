@@ -1,0 +1,67 @@
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Tue Aug 17 19:07:08 2021 from sandbox.antelope.net
+user@vyo.s123:~$ show ip bgp neighbors 192.0.2.174
+[?1h=BGP neighbor is 192.0.2.174, remote AS 65000, local AS 65001, external link[m
+ Member of peer-group FOOBAR for session parameters[m
+  BGP version 4, remote router ID 192.0.2.17, local router ID 192.0.2.30[m
+  BGP state = Established, up for 3d10h02m[m
+  Last read 00:00:06, Last write 00:00:42[m
+  Hold time is 180, keepalive interval is 60 seconds[m
+  Neighbor capabilities:[m
+    4 Byte AS: advertised and received[m
+    AddPath:[m
+      IPv4 Unicast: RX advertised IPv4 Unicast[m
+    Dynamic: advertised[m
+    Route refresh: advertised and received(new)[m
+    Address Family IPv4 Unicast: advertised and received[m
+    Hostname Capability: advertised (name: vyo.s123,domain name: n/a) not received[m
+    Graceful Restart Capabilty: advertised[m
+  Message statistics:[m
+    Inq depth is 0[m
+    Outq depth is 0[m
+                         Sent       Rcvd[m
+    Opens:               5080       4517[m
+    Notifications:          8         32[m
+    Updates:             2341       2507[m
+    Keepalives:        478391     546145[m
+    Route Refresh:          0          0[m
+    Capability:             0          0[m
+    Total:             485820     553201[m
+  Minimum time between advertisement runs is 0 seconds[m
+  Update source is 192.0.2.173[m
+[m
+ For address family: IPv4 Unicast[m
+  FOOBAR peer-group member[m
+  Update group 9620, subgroup 9639[m
+  Packet Queue length 0[m
+  Inbound soft reconfiguration allowed[m
+  Community attribute sent to this neighbor(all)[m
+  Inbound path policy configured[m
+  Outbound path policy configured[m
+  Route map for incoming advertisements is *IN-LIST-FOO[m
+  Route map for outgoing advertisements is *OUT-LIST-FOO[m
+  12 accepted prefixes[m
+[m
+  Connections established 4516; dropped 4515[m
+  Last reset 3d10h04m,  No AFI/SAFI activated for peer[m
+Local host: 192.0.2.173, Local port: 179[m
+Foreign host: 192.0.2.174, Foreign port: 34351[m
+Nexthop: 192.0.2.173[m
+Nexthop global: f00:ba7::1:1[m
+Nexthop local: ::[m
+BGP connection: shared network[m
+BGP Connect Retry Timer in Seconds: 120[m
+Estimated round trip time: 7289 ms[m
+Read thread: on  Write thread: on  FD used: 33[m
+[m
+  BFD: Type: single hop[m
+    Detect Multiplier: 3, Min Rx interval: 300, Min Tx interval: 300[m
+    Status: Up, Last update: 3:10:02:43[m
+[m
+[K[?1l>user@vyo.s123:~$ logout

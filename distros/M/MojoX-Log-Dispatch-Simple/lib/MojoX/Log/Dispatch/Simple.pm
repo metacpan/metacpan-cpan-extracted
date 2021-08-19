@@ -8,7 +8,7 @@ use warnings;
 use Mojo::Base 'Mojo::EventEmitter';
 use Mojo::Util 'encode';
 
-our $VERSION = '1.08'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 has history          => sub { [] };
 has level            => 'debug';
@@ -16,7 +16,14 @@ has max_history_size => 10;
 has dispatch         => undef;
 has format_cb        => undef;
 has parent           => undef;
-has context          => undef;
+
+has 'path';
+has color  => sub { $ENV{MOJO_LOG_COLOR} };
+has short  => sub { $ENV{MOJO_LOG_SHORT} };
+has handle => sub {
+    return \*STDERR unless my $path = shift->path;
+    return Mojo::File->new($path)->open('>>');
+};
 
 sub new {
     my $self = shift->SUPER::new(@_);
@@ -118,6 +125,9 @@ sub is_emerg     { shift->_active_level('emergency') }
 sub is_err  { shift->_active_level('err')  }
 sub is_crit { shift->_active_level('crit') }
 
+sub trace    { shift->_log( 'debug', @_ ) }
+sub is_level { shift->_active_level(pop)  }
+
 1;
 
 =pod
@@ -130,7 +140,7 @@ MojoX::Log::Dispatch::Simple - Simple Log::Dispatch replacement of Mojo::Log
 
 =head1 VERSION
 
-version 1.08
+version 1.09
 
 =for markdown [![test](https://github.com/gryphonshafer/MojoX-Log-Dispatch-Simple/workflows/test/badge.svg)](https://github.com/gryphonshafer/MojoX-Log-Dispatch-Simple/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/MojoX-Log-Dispatch-Simple/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/MojoX-Log-Dispatch-Simple)
@@ -417,7 +427,7 @@ L<CPAN Testers|http://www.cpantesters.org/distro/M/MojoX-Log-Dispatch-Simple.htm
 
 =back
 
-=for Pod::Coverage alert crit critical debug emerg emergency err fatal format info is_alert is_crit is_critical is_debug is_emerg is_emergency is_err is_error is_fatal is_info is_notice is_warn is_warning notice warn warning
+=for Pod::Coverage alert crit critical debug emerg emergency err fatal format info is_alert is_crit is_critical is_debug is_emerg is_emergency is_err is_error is_fatal is_info is_notice is_warn is_warning notice warn warning context is_level trace
 
 =head1 GRATITUDE
 

@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 
-use Open::This qw( parse_text to_editor_args );
+use Open::This qw( to_editor_args );
 use Test::Differences qw( eq_or_diff );
 use Test::More;
-use Test::Warnings;
+use Test::Warnings ();
 
 # This gets really noisy on Travis if $ENV{EDITOR} is not set
 local $ENV{EDITOR} = 'vim';

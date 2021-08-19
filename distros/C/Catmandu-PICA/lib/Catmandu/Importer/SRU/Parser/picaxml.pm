@@ -1,6 +1,6 @@
 package Catmandu::Importer::SRU::Parser::picaxml;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 use Moo;
 use PICA::Parser::XML;
@@ -8,10 +8,11 @@ use PICA::Parser::XML;
 sub parse {
     my ( $self, $record ) = @_;
 
-    my $xml = $record->{recordData}->toString();
-    my $parser = PICA::Parser::XML->new( $xml ); 
+    my $xml    = $record->{recordData}->toString();
+    my $parser = PICA::Parser::XML->new($xml);
 
-    return $parser->next;
+    my $next = $parser->next;
+    return $next ? {%$next} : undef;
 }
 
 1;

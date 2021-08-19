@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.15.5
+## Version v0.15.6
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2021/07/26
+## Modified 2021/08/18
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -67,7 +67,7 @@ BEGIN
     @EXPORT      = qw( );
     @EXPORT_OK   = qw( subclasses );
     %EXPORT_TAGS = ();
-    $VERSION     = 'v0.15.5';
+    $VERSION     = 'v0.15.6';
     $VERBOSE     = 0;
     $DEBUG       = 0;
     $SILENT_AUTOLOAD      = 1;
@@ -2537,6 +2537,7 @@ sub _parse_timestamp
         {
             package
                 DateTime::Format::RomanDDXXXYYYY;
+            our $ROMAN2REGULAR = $roman2regular;
             sub new
             {
                 my $this = shift( @_ );
@@ -2556,11 +2557,11 @@ sub _parse_timestamp
                 my $d = $dt->day;
                 my $m = $dt->month;
                 my $y = $dt->year;
-                foreach my $k ( keys( %$roman2regular ) )
+                foreach my $k ( keys( %$ROMAN2REGULAR ) )
                 {
                     # Skip lowercase ones
                     next if( $k =~ /^[a-z]+$/ );
-                    if( $roman2regular->{ $k } == $m )
+                    if( $ROMAN2REGULAR->{ $k } == $m )
                     {
                         $m = $k;
                         last;
@@ -3289,6 +3290,11 @@ sub _set_get_number : lvalue
         if( CORE::length( $data->{ $field } ) && !ref( $data->{ $field } ) )
         {
             $data->{ $field } = Module::Generic::Number->new( $data->{ $field } );
+        }
+        elsif( !CORE::length( $data->{ $field } ) && want( 'OBJECT' ) )
+        {
+            my $null = Module::Generic::Null->new( '', { debug => $this->{debug} });
+            rreturn( $null );
         }
         return( $data->{ $field } ) if( want( 'LVALUE' ) );
         rreturn( $data->{ $field } );
@@ -4147,7 +4153,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.15.5
+    v0.15.6
 
 =head1 DESCRIPTION
 

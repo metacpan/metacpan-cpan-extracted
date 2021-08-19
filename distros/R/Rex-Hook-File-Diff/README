@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version v0.3.0
+    version v0.4.0
 
 SYNOPSIS
 
@@ -34,7 +34,8 @@ DESCRIPTION
 
     sed <https://metacpan.org/pod/Rex::Commands::File#sed>
 
-      On non-Windows systems, it uses the diff utility if available.
+    It prefers to use the diff utility on non-Windows managed endpoints, if
+    available.
 
 DIAGNOSTICS
 
@@ -71,7 +72,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2020 by Ferenc Erki.
+    This software is copyright (c) 2020,2021 by Ferenc Erki.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

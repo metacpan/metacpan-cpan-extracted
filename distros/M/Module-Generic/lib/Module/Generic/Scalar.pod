@@ -12,7 +12,7 @@ Module::Generic::Scalar - String Manipulation Object Class
 
 =head1 VERSION
 
-    v1.0.1
+    v1.0.2
 
 =head1 DESCRIPTION
 
@@ -195,11 +195,11 @@ It returns the newly formed string as a new L<Module::Generic::Scalar> object.
 
 =head2 lc
 
-Given a string, this return a new L<Module::Generic::Scalar> object with the string all in lower case.
+Takes the current string object and returns a new L<Module::Generic::Scalar> object with the string all in lower case.
 
 =head2 lcfirst
 
-Given a string, this return a new L<Module::Generic::Scalar> object with the first character of the string in lower case.
+Takes the current string object and returns a new L<Module::Generic::Scalar> object with the first character of the string in lower case.
 
 =head2 left
 
@@ -365,11 +365,11 @@ Provided with a target string or a regular expression, and this will remove any 
 
 =head2 uc
 
-Given a string, this return a new L<Module::Generic::Scalar> object with the string all in upper case.
+Takes the current string object and returns a new L<Module::Generic::Scalar> object with the string all in upper case.
 
 =head2 ucfirst
 
-Given a string, this return a new L<Module::Generic::Scalar> object with the first character of the string in upper case.
+Takes the current string object and returns a new L<Module::Generic::Scalar> object with the first character of the string in upper case.
 
 =head2 undef
 

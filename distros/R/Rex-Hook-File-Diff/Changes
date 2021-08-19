@@ -1,5 +1,35 @@
 Revision history for Rex-Hook-File-Diff
 
+v0.4.0 2021-08-18T18:16:37Z
+ - No code changes since v0.3.0.4 trial release
+
+v0.3.0.4 2021-08-02T17:45:44Z (TRIAL RELEASE)
+ [BUG FIXES]
+ - Fix leading message in expected output on Solaris
+
+ [DOCUMENTATION]
+ - Fix license typos
+
+v0.3.0.3 2021-08-01T10:23:33Z (TRIAL RELEASE)
+ [BUG FIXES]
+ - Fix new line in expected output on Solaris
+
+v0.3.0.2 2021-07-31T19:28:19Z (TRIAL RELEASE)
+ [BUG FIXES]
+ - Fix optional timestamps in headers
+ - Fix expected hunk headers on Solaris
+ - Fix expected output for identical files on Solaris
+
+v0.3.0.1 2021-07-29T16:56:12Z (TRIAL RELEASE)
+ [BUG FIXES]
+ - Fix parallel tests
+ - Detect managed OS instead of running OS
+
+ [ENHANCEMENTS]
+ - Test on Mac OS X with Travis CI
+ - Test with GitHub Actions instead of Travis CI
+ - Support file command with source option
+
 v0.3.0 2020-08-28T19:04:55Z
  - No code changes since v0.2.0.1 trial release
 

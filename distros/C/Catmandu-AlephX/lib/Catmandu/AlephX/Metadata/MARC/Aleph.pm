@@ -3,7 +3,7 @@ use Catmandu::Sane;
 use Catmandu::Util qw(:array);
 use Moo;
 
-our $VERSION = "1.072";
+our $VERSION = "1.073";
 
 extends qw(Catmandu::AlephX::Metadata);
 

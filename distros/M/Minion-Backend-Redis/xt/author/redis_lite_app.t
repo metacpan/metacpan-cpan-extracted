@@ -6,7 +6,7 @@ use Test::More;
 use Mojo::Redis;
 
 plan skip_all => 'Cannot test on Win32' if $^O eq 'MSWin32';
-plan skip_all => $@ unless eval { Mojo::Redis->new };
+plan skip_all => $@ unless eval { Mojo::Redis->new->db->ping };
 
 use Mojo::IOLoop;
 use Mojolicious::Lite;

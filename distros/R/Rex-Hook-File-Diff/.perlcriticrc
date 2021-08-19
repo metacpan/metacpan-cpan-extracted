@@ -1,4 +1,5 @@
 severity = brutal
+theme = -freenode
 
 [Documentation::RequirePodSections]
 lib_sections = SYNOPSIS | DESCRIPTION | DIAGNOSTICS | CONFIGURATION AND ENVIRONMENT | DEPENDENCIES | INCOMPATIBILITIES | BUGS AND LIMITATIONS
@@ -10,3 +11,9 @@ script_sections = USAGE | DESCRIPTION | REQUIRED ARGUMENTS | OPTIONS | DIAGNOSTI
 skip_when_using = Moo::Role
 
 [-TooMuchCode::ProhibitDuplicateLiteral]
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Test2::V0
+
+[Community::StrictWarnings]
+extra_importers = Test2::V0

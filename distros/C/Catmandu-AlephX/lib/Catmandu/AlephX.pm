@@ -4,7 +4,7 @@ use Carp qw(confess);
 use Moo;
 use Catmandu::Util qw(:check :is);
 
-our $VERSION = "1.072";
+our $VERSION = "1.073";
 
 has url => (
   is => 'ro',

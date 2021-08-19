@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2012-2016 -- leonerd@leonerd.org.uk
 
-package Tickit::RectSet;
+package Tickit::RectSet 0.72;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.71';
 
 use List::Util qw( min max );
 

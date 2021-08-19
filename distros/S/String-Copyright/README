@@ -2,7 +2,7 @@ NAME
     String::Copyright - Representation of text-based copyright statements
 
 VERSION
-    Version 0.003007
+    Version 0.003008
 
 SYNOPSIS
         use String::Copyright;

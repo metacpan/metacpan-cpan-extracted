@@ -12,6 +12,10 @@ cpanfile
 lib/Rex/Hook/File/Diff.pm
 t/diff.t
 t/files.t
+t/files/add_line
+t/files/create_file
+t/files/modify_line
+t/files/remove_line
 weaver.ini
 xt/author/00-compile.t
 xt/author/critic.t

@@ -90,7 +90,7 @@ Sample standard deviation.
 =for bad
 
 stdv processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -124,7 +124,7 @@ Unbiased estimate of population standard deviation.
 =for bad
 
 stdv_unbiased processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -158,7 +158,7 @@ Sample variance.
 =for bad
 
 var processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -192,7 +192,7 @@ Unbiased estimate of population variance.
 =for bad
 
 var_unbiased processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -233,7 +233,7 @@ Standard error of the mean. Useful for calculating confidence intervals.
 =for bad
 
 se processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -267,7 +267,7 @@ Sum of squared deviations from the mean.
 =for bad
 
 ss processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -301,7 +301,7 @@ Sample skewness, measure of asymmetry in data. skewness == 0 for normal distribu
 =for bad
 
 skew processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -335,7 +335,7 @@ Unbiased estimate of population skewness. This is the number in GNumeric Descrip
 =for bad
 
 skew_unbiased processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -369,7 +369,7 @@ Sample kurtosis, measure of "peakedness" of data. kurtosis == 0 for normal distr
 =for bad
 
 kurt processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -403,7 +403,7 @@ Unbiased estimate of population kurtosis. This is the number in GNumeric Descrip
 =for bad
 
 kurt_unbiased processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -437,7 +437,7 @@ Sample covariance. see B<corr> for ways to call
 =for bad
 
 cov processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -503,7 +503,7 @@ for the same cov matrix table using B<cov>,
 =for bad
 
 cov_table processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -559,7 +559,7 @@ but it is easier and faster to use B<corr_table>.
 =for bad
 
 corr processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -621,7 +621,7 @@ This is also how to use B<t_corr> and B<n_pair> with such a table.
 =for bad
 
 corr_table processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -665,7 +665,7 @@ t significance test for Pearson correlations.
 =for bad
 
 t_corr processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -699,7 +699,7 @@ Returns the number of good pairs between 2 lists. Useful with B<corr> (esp. when
 =for bad
 
 n_pair processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -737,7 +737,7 @@ Calculates correlations from B<dev_m> vals. Seems faster than doing B<corr> from
 =for bad
 
 corr_dev processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -779,7 +779,7 @@ Independent sample t-test, assuming equal var.
 =for bad
 
 t_test processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -817,7 +817,7 @@ Independent sample t-test, NOT assuming equal var. ie Welch two sample t test. D
 =for bad
 
 t_test_nev processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -851,7 +851,7 @@ Paired sample t-test.
 =for bad
 
 t_test_paired processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1213,7 +1213,7 @@ sub _group_by_single_factor {
 
     # get number of n's in each group, find the biggest, fit output pdl to this
     my $uniq_ns = pdl \@uniq_ns;
-	my $max = pdl(\@uniq_ns)->max;
+	my $max = pdl(\@uniq_ns)->max->sclr;
 
     my $badvalue = int($p->max + 1);
     my $p_tmp = ones($max, @p_threaddims, $uniq->nelem) * $badvalue;

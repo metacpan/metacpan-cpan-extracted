@@ -7,7 +7,7 @@ use Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(perl2xml xmlformat xml2perlbase perlbase2xml xpath);
 
-our $VERSION = '0.10';
+our $VERSION = '1.00';
 
 use HTML::Parser;
 
@@ -233,6 +233,7 @@ sub xpath {
 	}
 }
 
+
 sub _xpath {
 	my ($tree, $path, @path) = @_;
 	my ($k, $i) = $path =~ m/^(.+?)(?:\[(\d+)\])?$/;
@@ -243,8 +244,24 @@ sub _xpath {
 		} else {
 			push @sub_tree, @{$$tree{$k}};
 		}
-		my @r = map { __xpath($_, @path) } @sub_tree;
-		return wantarray ? @r : $r[0];
+		if (@path) {
+			my @r = ();
+			my %r = ();
+			foreach (map { __xpath($_, @path) } @sub_tree) {
+				if (ref $_ eq "HASH") {
+					foreach my $k (keys %$_) {
+						my $v = $$_{$k};
+						push @{$r{$k}}, @$v;
+					}
+				} else {
+					push @r, $_;
+				}
+			}
+			push @r, \%r, if keys %r;
+			return @r;
+		} else {
+			return ({ $k => \@sub_tree });
+		}
 	} else {
 		return;
 	}
@@ -378,6 +395,12 @@ Examples:
  xpath($t, '/a[2]/b');
  xpath($t, '/a/b[2]/@a');
  xpath($t, 'a/b');
+
+=head1 ATTENTION
+
+The xpath function is incompatible between versions 1.x and 0.x.
+New xpath returns nodes. Old xpath returns values.
+To use old behavior see to_old function from t/4_xpath.t.
 
 =head1 AUTHOR
 

@@ -18,8 +18,8 @@
 package DB::Object::Tables;
 BEGIN
 {
-    require 5.6.0;
     use strict;
+    use warnings;
     use parent qw( DB::Object );
     use DB::Object::Fields;
     our( $VERSION, $VERBOSE, $DEBUG );

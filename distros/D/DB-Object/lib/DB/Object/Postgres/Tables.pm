@@ -18,8 +18,8 @@
 package DB::Object::Postgres::Tables;
 BEGIN
 {
-    require 5.6.0;
     use strict;
+    use warnings;
     our( $VERSION, $VERBOSE, $DEBUG );
     use parent qw( DB::Object::Tables DB::Object::Postgres );
     $VERSION    = '0.4.1';

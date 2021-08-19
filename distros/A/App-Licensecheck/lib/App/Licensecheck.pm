@@ -119,11 +119,11 @@ App::Licensecheck - functions for a simple license checker for source files
 
 =head1 VERSION
 
-Version v3.2.9
+Version v3.2.11
 
 =cut
 
-our $VERSION = version->declare('v3.2.9');
+our $VERSION = version->declare('v3.2.11');
 
 =head1 SYNOPSIS
 
@@ -142,6 +142,10 @@ to check for licenses of source files.
 See the script for casual usage.
 
 =cut
+
+# try enable RE2 engine
+eval { require re::engine::RE2 };
+my @OPT_RE2 = $@ ? () : ( engine => 'RE2' );
 
 my $default_check_regex = q!
 	/[\w-]+$ # executable scripts or README like file
@@ -621,14 +625,14 @@ sub init_licensepatterns
 	Regexp::Pattern->import(
 		're',
 		'License::*' => (
-			engine              => 'RE2',
+			@OPT_RE2,
 			subject             => 'trait',
 			-prefix             => 'EXCEPTION_',
 			-has_tag_matching   => '^type:trait:exception(?:\z|:)',
 			-lacks_tag_matching => '^type:trait:exception:prefix(?:\z|:)',
 		),
 		'License::*' => (
-			engine              => 'RE2',
+			@OPT_RE2,
 			capture             => 'named',
 			subject             => 'trait',
 			-prefix             => 'TRAIT_',
@@ -636,14 +640,14 @@ sub init_licensepatterns
 			-lacks_tag_matching => '^type:trait:exception(?!:prefix)(?:\z|:)',
 		),
 		'License::version' => (
-			engine     => 'RE2',
+			@OPT_RE2,
 			capture    => 'named',
 			subject    => 'trait',
 			anchorleft => 1,
 			-prefix    => 'ANCHORLEFT_NAMED_',
 		),
 		'License::version_later' => (
-			engine     => 'RE2',
+			@OPT_RE2,
 			capture    => 'named',
 			subject    => 'trait',
 			anchorleft => 1,
@@ -700,20 +704,20 @@ sub init_licensepatterns
 			-prefix => 'LOCAL_NAME_',
 		),
 		'License::*' => (
-			engine              => 'RE2',
+			@OPT_RE2,
 			subject             => 'name',
 			-prefix             => 'NAME_',
 			anchorleft          => 1,
 			-lacks_tag_matching => '^type:trait(?:\z|:)',
 		),
 		'License::*' => (
-			engine              => 'RE2',
+			@OPT_RE2,
 			subject             => 'grant',
 			-prefix             => 'GRANT_',
 			-lacks_tag_matching => '^type:trait(?:\z|:)',
 		),
 		'License::*' => (
-			engine              => 'RE2',
+			@OPT_RE2,
 			subject             => 'license',
 			-prefix             => 'LICENSE_',
 			-lacks_tag_matching => '^type:trait(?:\z|:)',

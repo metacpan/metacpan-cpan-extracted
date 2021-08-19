@@ -11,6 +11,8 @@ Files: Changes
  lib/Regexp/Pattern/License/Parts.pm
  t/01-basic.t
  t/02-regexp-pattern.t
+ t/02-regexp-pattern_RE2.t
+ t/02-regexp-pattern_RE2_missing.t
  t/02-structure.t
  t/03-match-normalized.t
  t/coverage-cc-deprecated.t
@@ -52,13 +54,13 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: dist.ini
-Copyright: Copyright 2017 Jonas Smedegaard.
-License: GPL-3.0
-
 Files: Makefile.PL
 Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
+
+Files: dist.ini
+Copyright: Copyright 2017 Jonas Smedegaard.
+License: GPL-3.0
 
 License: GPL-3.0
  This software is Copyright (c) 2021 by Jonas Smedegaard.

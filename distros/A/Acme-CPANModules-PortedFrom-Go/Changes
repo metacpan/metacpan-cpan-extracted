@@ -1,3 +1,11 @@
+0.002   2021-03-15  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention some other Acme::CPANModules::PortedFrom::*
+	  modules.
+
+
 0.001   2020-02-07  Released-By: PERLANCAR
 
         - First release.

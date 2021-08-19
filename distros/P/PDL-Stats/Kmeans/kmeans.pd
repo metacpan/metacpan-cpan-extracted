@@ -625,7 +625,7 @@ sub PDL::kmeans {
     $opt{NCLUS} = $opt{CNTRD}->dim(0);
   }
   else {
-    $opt{NSEED} = pdl($self->dim(0), $opt{NSEED})->min;
+    $opt{NSEED} = pdl($self->dim(0), $opt{NSEED})->min->sclr;
   }
   $opt{V} and print STDERR "$_\t=> $opt{$_}\n" for (sort keys %opt);
  

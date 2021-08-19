@@ -8,7 +8,9 @@ Files: Changes
  META.yml
  doap.ttl
  lib/String/Copyright.pm
+ t/20_parse.t
  t/50_context.t
+ t/50_encoding.t
  t/50_identifier.t
  t/50_owner.t
  t/50_range.t
@@ -29,8 +31,6 @@ Copyright: None
 License: public-domain
 
 Files: dist.ini
- t/20_parse.t
- t/50_encoding.t
 Copyright: Copyright 2018 Jonas Smedegaard.
 License: GPL-3.0
 

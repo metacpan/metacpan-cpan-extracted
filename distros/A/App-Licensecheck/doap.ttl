@@ -816,17 +816,18 @@
 	a                    doap:Project;
 	cpan-uri:x_help_wanted <http://usefulinc.com/ns/doap#documenter>, <http://usefulinc.com/ns/doap#tester>;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/jonass>;
-	doap-deps:runtime-requirement [ doap-deps:on "Array::IntSpan"^^doap-deps:CpanId ], [ doap-deps:on "autodie"^^doap-deps:CpanId ], [ doap-deps:on "Moo 1.001000"^^doap-deps:CpanId ], [ doap-deps:on "MooX::Struct"^^doap-deps:CpanId ], [ doap-deps:on "namespace::clean"^^doap-deps:CpanId ], [ doap-deps:on "Path::Tiny 0.062"^^doap-deps:CpanId ], [
+	doap-deps:runtime-recommendation [ doap-deps:on "re::engine::RE2"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "Array::IntSpan"^^doap-deps:CpanId ], [
+		doap-deps:on "Log::Any::Adapter::Screen"^^doap-deps:CpanId;
+	], [ doap-deps:on "Moo 1.001000"^^doap-deps:CpanId ], [ doap-deps:on "MooX::Struct"^^doap-deps:CpanId ], [ doap-deps:on "namespace::clean"^^doap-deps:CpanId ], [ doap-deps:on "Path::Tiny 0.062"^^doap-deps:CpanId ], [
 		doap-deps:on "Path::Iterator::Rule"^^doap-deps:CpanId;
-	], [ doap-deps:on "Pod::Constants"^^doap-deps:CpanId ], [ doap-deps:on "Pod::Usage"^^doap-deps:CpanId ], [ doap-deps:on "re::engine::RE2"^^doap-deps:CpanId ], [
+	], [ doap-deps:on "Pod::Constants"^^doap-deps:CpanId ], [ doap-deps:on "Pod::Usage"^^doap-deps:CpanId ], [
 		doap-deps:on "Regexp::Pattern 0.2.12"^^doap-deps:CpanId;
 	], [
 		doap-deps:on "Regexp::Pattern::License 3.4.0"^^doap-deps:CpanId;
-	], [ doap-deps:on "Encode"^^doap-deps:CpanId ], [
+	], [ doap-deps:on "autodie"^^doap-deps:CpanId ], [
 		doap-deps:on "String::Copyright 0.003"^^doap-deps:CpanId;
-	], [ doap-deps:on "String::Escape"^^doap-deps:CpanId ], [ doap-deps:on "Try::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "perl 5.014000"^^doap-deps:CpanId ], [ doap-deps:on "experimental"^^doap-deps:CpanId ], [ doap-deps:on "Fcntl"^^doap-deps:CpanId ], [ doap-deps:on "Getopt::Long 2.24"^^doap-deps:CpanId ], [ doap-deps:on "IO::Interactive"^^doap-deps:CpanId ], [ doap-deps:on "List::SomeUtils"^^doap-deps:CpanId ], [ doap-deps:on "Log::Any"^^doap-deps:CpanId ], [
-		doap-deps:on "Log::Any::Adapter::Screen"^^doap-deps:CpanId;
-	];
+	], [ doap-deps:on "String::Escape"^^doap-deps:CpanId ], [ doap-deps:on "Try::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "perl 5.014000"^^doap-deps:CpanId ], [ doap-deps:on "Encode"^^doap-deps:CpanId ], [ doap-deps:on "experimental"^^doap-deps:CpanId ], [ doap-deps:on "Fcntl"^^doap-deps:CpanId ], [ doap-deps:on "Getopt::Long 2.24"^^doap-deps:CpanId ], [ doap-deps:on "IO::Interactive"^^doap-deps:CpanId ], [ doap-deps:on "List::SomeUtils"^^doap-deps:CpanId ], [ doap-deps:on "Log::Any"^^doap-deps:CpanId ];
 	doap-deps:test-recommendation [ doap-deps:on "File::BaseDir"^^doap-deps:CpanId ], [
 		doap-deps:on "Regexp::Pattern::License 3.9.0"^^doap-deps:CpanId;
 	], [
@@ -834,6 +835,8 @@
 	], [ doap-deps:on "YAML::XS"^^doap-deps:CpanId ];
 	doap-deps:test-requirement [ doap-deps:on "Encode"^^doap-deps:CpanId ], [ doap-deps:on "Encode::Locale"^^doap-deps:CpanId ], [ doap-deps:on "File::Basename"^^doap-deps:CpanId ], [
 		doap-deps:on "Test::Command::Simple"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Test::Without::Module"^^doap-deps:CpanId;
 	], [ doap-deps:on "Test2::V0 0.000060"^^doap-deps:CpanId ];
 	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=App-Licensecheck>, <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>;
 	doap:category        [ rdfs:label "Sourcecode" ], [ rdfs:label "Licensing" ];
@@ -845,7 +848,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/jonass>;
 	doap:name            "App-Licensecheck";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-0>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-1>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-10>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-11>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-12>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-13>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-14>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-15>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-16>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-17>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-18>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-19>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-2>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-20>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-21>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-22>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-23>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-24>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-25>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-26>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-27>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-28>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-29>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-3>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-30>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-31>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-32>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-33>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-34>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-35>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-36>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-37>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-38>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-39>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-4>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-40>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-41>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-42>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-43>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-44>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-45>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-46>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-47>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-5>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-6>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-7>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-8>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-9>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-1-0>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-1-1>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-2-0>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-2-1>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-2-2>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-2-3>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-2-4>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-2-5>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-2-6>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-2-7>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-2-8>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-2-9>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-0>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-1>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-10>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-11>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-12>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-13>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-14>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-15>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-16>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-17>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-18>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-19>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-2>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-20>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-21>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-22>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-23>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-24>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-25>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-26>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-27>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-28>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-29>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-3>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-30>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-31>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-32>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-33>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-34>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-35>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-36>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-37>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-38>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-39>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-4>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-40>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-41>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-42>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-43>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-44>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-45>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-46>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-47>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-5>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-6>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-7>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-8>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-0-9>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-1-0>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-1-1>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-2-0>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-2-1>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-2-10>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-2-11>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-2-2>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-2-3>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-2-4>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-2-5>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-2-6>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-2-7>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-2-8>, <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-2-9>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://salsa.debian.org/build-common-team/licensecheck.git>;
@@ -2757,6 +2760,43 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/App-Licensecheck-v3.2.0.tar.gz>;
 	doap:revision        "v3.2.0"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-2-10>
+	a                    doap:Version;
+	dc:identifier        "App-Licensecheck-v3.2.10"^^xsd:string;
+	dc:issued            "2021-08-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "improve POD markup of SYNOPSIS and a few code strings";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "relax to recommend (not depend on) module re::engine::RE2";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "improve tests";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "test-require Test::Without::Module";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/App-Licensecheck-v3.2.10.tar.gz>;
+	doap:revision        "v3.2.10"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-2-11>
+	a                    doap:Version;
+	dc:identifier        "App-Licensecheck-v3.2.11"^^xsd:string;
+	dc:issued            "2021-08-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "skip *-no-RE2 tests unless installed Regexp::Pattern::License is recent enough to support it";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/App-Licensecheck-v3.2.11.tar.gz>;
+	doap:revision        "v3.2.11"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/dist/App-Licensecheck/v_v3-2-1>
 	a                    doap:Version;

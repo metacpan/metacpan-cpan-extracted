@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -26,9 +27,9 @@ my $build = Module::Build::Using::PkgConfig->new(
 );
 
 $build->use_pkgconfig( "tickit",
-   atleast_version => "0.4.0",
+   atleast_version => "0.4.2",
    alien         => "Alien::libtickit",
-   alien_version => "0.09",
+   alien_version => "0.12",  # includes 0.4.2a bugfix
 );
 
 $build->create_build_script;

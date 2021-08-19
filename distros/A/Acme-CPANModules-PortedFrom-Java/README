@@ -3,16 +3,14 @@ NAME
     ported from (or inspired by) Java
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.003 of
     Acme::CPANModules::PortedFrom::Java (from Perl distribution
-    Acme-CPANModules-PortedFrom-Java), released on 2020-02-07.
+    Acme-CPANModules-PortedFrom-Java), released on 2021-03-15.
 
 DESCRIPTION
-    Modules/applications that are ported from (or inspired by) Java.
-
     If you know of others, please drop me a message.
 
-INCLUDED MODULES
+ACME::MODULES ENTRIES
     *   Log::Log4perl - Log4j
 
     *   Test::Unit - jUnit
@@ -20,9 +18,16 @@ INCLUDED MODULES
     *   Getopt::ApacheCommonsCLI - Apache Commons CLI
 
 FAQ
-  What are ways to use this module?
-    Aside from reading it, you can install all the listed modules using
-    cpanmodules:
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanmodules CLI
+    (from App::cpanmodules distribution):
 
         % cpanmodules ls-entries PortedFrom::Java | cpanm -n
 
@@ -30,9 +35,13 @@ FAQ
 
         % perl -MAcme::CM::Get=PortedFrom::Java -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
 
-    This module also helps lcpan produce a more meaningful result for "lcpan
-    related-mods" when it comes to finding related modules for the modules
-    listed in this Acme::CPANModules module.
+    or directly:
+
+        % perl -MAcme::CPANModules::PortedFrom::Java -E'say $_->{module} for @{ $Acme::CPANModules::PortedFrom::Java::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -44,13 +53,20 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Port
-    edFrom-Java>
+    <https://github.com/perlancar/perl-Acme-CPANModules-PortedFrom-Java/issu
+    es>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    More on the same theme of modules ported from other languages:
+    Acme::CPANModules::PortedFrom::Clojure,
+    Acme::CPANModules::PortedFrom::Go, Acme::CPANModules::PortedFrom::NPM,
+    Acme::CPANModules::PortedFrom::PHP,
+    Acme::CPANModules::PortedFrom::Python,
+    Acme::CPANModules::PortedFrom::Ruby.
+
     Acme::CPANModules - about the Acme::CPANModules namespace
 
     cpanmodules - CLI tool to let you browse/view the lists
@@ -59,7 +75,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

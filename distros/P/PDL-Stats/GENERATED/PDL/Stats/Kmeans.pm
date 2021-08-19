@@ -165,7 +165,7 @@ Usage:
 =for bad
 
 which_cluster processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -225,7 +225,7 @@ Takes data pdl dim [obs x var] and centroid pdl dim [cluster x var] and returns 
 =for bad
 
 assign processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -294,7 +294,7 @@ Takes data dim [obs x var] and mask dim [obs x cluster], returns mean and ss (ms
 =for bad
 
 centroid processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -480,7 +480,7 @@ sub PDL::kmeans {
     $opt{NCLUS} = $opt{CNTRD}->dim(0);
   }
   else {
-    $opt{NSEED} = pdl($self->dim(0), $opt{NSEED})->min;
+    $opt{NSEED} = pdl($self->dim(0), $opt{NSEED})->min->sclr;
   }
   $opt{V} and print STDERR "$_\t=> $opt{$_}\n" for (sort keys %opt);
  

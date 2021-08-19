@@ -12,6 +12,7 @@ package DB::Object::Query;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( DB::Object );
     use Scalar::Util ();
     use Devel::Confess;

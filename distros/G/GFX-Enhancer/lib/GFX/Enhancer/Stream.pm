@@ -1,5 +1,8 @@
 package GFX::Enhancer::Stream;
 
+### for a PNG file (attribute bytes is a number which gets shifted,
+### it is not an array (see the FloatStream class for that)
+
 sub new {
 	my ($class, $length, $bytes) = @_;
 

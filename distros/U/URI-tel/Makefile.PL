@@ -24,21 +24,21 @@ my %WriteMakefileArgs = (
     },
     LICENSE				=> 'perl_5',
     MIN_PERL_VERSION	=> 5.6.0,
-    ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? () : ( META_MERGE => {
+    ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( META_MERGE => {
         'meta-spec' => { version => 2 },
         dynamic_config => 1,
         resources => {
         #    homepage    => undef,
             repository  => {
-                url         => 'git@github.com:jackdeguest/URI-tel.git',
-                web         => 'https://github.com/jackdeguest/URI-tel',
+                url         => 'git@git.deguest.jp:jack/URI-tel.git',
+                web         => 'https://git.deguest.jp/jack/URI-tel',
                 type        => 'git',
             },
             bugtracker => {
-                web         => 'https://rt.cpan.org/NoAuth/Bugs.html?Dist=URI-tel',
+                web         => 'https://git.deguest.jp/jack/URI-tel/issues',
             },
         },
-    })),
+    }) : ()),
 );
 
 WriteMakefile(%WriteMakefileArgs);

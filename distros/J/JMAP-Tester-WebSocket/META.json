@@ -74,7 +74,7 @@
          "web" : "https://github.com/wolfsage/JMAP-Tester-WebSocket"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024002"
@@ -459,7 +459,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.003",
+                  "tag" : "0.004",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },

@@ -85,6 +85,8 @@ sub chomp
 
 sub clone { CORE::return( $_[0]->new( [ @{$_[0]} ] ) ); }
 
+sub contains { return( shift->exists( @_ ) ); }
+
 sub delete
 {
     my $self = CORE::shift( @_ );

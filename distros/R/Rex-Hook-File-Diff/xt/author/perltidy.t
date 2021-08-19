@@ -4,11 +4,11 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '9999';
-
 use File::Find;
 use Test::More;
 use Test::PerlTidy;
+
+our $VERSION = '9999';
 
 if ( !$ENV{AUTHOR_TESTING} ) {
     plan skip_all => 'these tests are for testing by the author';

@@ -1,7 +1,7 @@
 package App::picadata;
 use v5.14.1;
 
-our $VERSION = '1.29';
+our $VERSION = '1.30';
 
 use Getopt::Long qw(GetOptionsFromArray :config bundling);
 use Pod::Usage;
@@ -39,7 +39,8 @@ my %COLORS
 sub new {
     my ($class, @argv) = @_;
 
-    my $command = (!@argv && -t *STDIN) ? 'help' : '';    ## no critic
+    my $terminal = -t *STDIN;                            ## no critic
+    my $command = (!@argv && $terminal) ? 'help' : '';
 
     my $number = 0;
     if (my ($i) = grep {$argv[$_] =~ /^-(\d+)$/} (0 .. @argv - 1)) {
@@ -60,7 +61,7 @@ sub new {
     };
 
     my %cmd = abbrev
-        qw(convert count split fields subfields sf explain validate build diff patch help version);
+        qw(convert get count levels fields subfields sf explain validate build diff patch help version);
     if ($cmd{$argv[0]}) {
         $command = $cmd{shift @argv};
         $command =~ s/^sf$/subfields/;
@@ -86,24 +87,13 @@ sub new {
         push @path, shift @argv;
     }
 
-    if (@path) {
-        @path = map {
-            my $p = parse_path($_);
-            $p || die "invalid PICA Path: $_\n";
-        } grep {$_ ne ""} map {split /\s*\|\s*/, $_} @path;
-
-        if ($command ne 'explain') {
-            if (all {$_->subfields ne ""} @path) {
-                $command = 'select' unless $command;
-            }
-            elsif (any {$_->subfields ne ""} @path) {
-                $opt->{error}
-                    = "PICA Path must either all select fields or all select subfields!";
-            }
-        }
+    @path = map {parse_path($_)}
+        grep {$_ ne ""} map {split /\s*[\|,]\s*/, $_} @path;
+    if (@path && all {$_->subfields ne ""} @path) {
+        $command = 'get' unless $command;
     }
 
-    $opt->{order} = 1 if $command =~ /(diff|patch|split)/;
+    $opt->{order} = 1 if $command =~ /(diff|patch|levels)/;
 
     unless ($command) {
         if ($opt->{schema} && !$opt->{annotate}) {
@@ -133,7 +123,23 @@ sub new {
     if ($opt->{schema}) {
         $opt->{schema} = load_schema($opt->{schema});
         $opt->{schema}{ignore_unknown} = $opt->{unknown};
+
+        if ($command eq 'explain' && !@path && !@argv && $terminal) {
+            while (my ($id, $field) = each %{$opt->{schema}{fields} || {}}) {
+                push @path, parse_path($id);
+
+                # see <https://github.com/gbv/k10plus-avram-api/issues/12>
+                my $sf
+                    = ref $field->{subfields} eq 'HASH'
+                    ? $field->{subfields}
+                    : {};
+                push @path, map {parse_path("$id\$$_")} keys %$sf;
+            }
+        }
     }
+
+    # all path expressions have been initialized as PICA::Path objects
+    $opt->{path} = \@path;
 
     if ($command =~ qr{diff|patch}) {
         unshift @argv, '-' if @argv == 1;
@@ -155,7 +161,7 @@ sub new {
 
     # default output format
     unless ($opt->{to}) {
-        if ($command =~ /(convert|split|diff|patch)/) {
+        if ($command =~ /(convert|levels|diff|patch)/) {
             $opt->{to} = $opt->{from};
             $opt->{to} ||= $TYPES{lc $1}
                 if $opt->{input}->[0] =~ /\.([a-z]+)$/;
@@ -207,14 +213,14 @@ sub load_schema {
             or die "Failed to open schema file: $schema\n";
         $json = join "\n", <$fh>;
     }
-    return PICA::Schema->new(decode_json($json));
+    return PICA::Schema->new(JSON::PP->new->decode($json));
 }
 
 sub run {
-    my ($self) = @_;
+    my ($self)  = @_;
     my $command = $self->{command};
+    my $schema  = $self->{schema};
     my @pathes = @{$self->{path} || []};
-    my $schema = $self->{schema};
 
     # commands that don't parse any input data
     if ($self->{error}) {
@@ -234,8 +240,16 @@ sub run {
         $self->explain($schema, $_) for @pathes;
         unless (@pathes) {
             while (<STDIN>) {
-                $self->explain($schema, $2)
-                    if $_ =~ /^([^0-9a-z]\s+)?([^ ]+)/;
+                if ($_ =~ /^([^0-9a-z]\s+)?([^ ]+)/) {
+                    my $path = eval {parse_path($_)};
+                    if ($path) {
+                        $self->explain($schema, $path);
+                    }
+                    else {
+                        warn "invalid PICA Path: $_\n";
+                    }
+
+                }
             }
         }
         exit;
@@ -263,16 +277,21 @@ sub run {
     my $stats   = {records => 0, holdings => 0, items => 0, fields => 0};
     my $invalid = 0;
 
+    my @getFields    = grep {$_->subfields eq ""} @pathes;
+    my @getSubfields = grep {$_->subfields ne ""} @pathes;
+
     my $process = sub {
         my $record = shift;
 
-        if ($command eq 'select') {
-            say $_ for map {@{$record->match($_, split => 1) // []}} @pathes;
+        if ($command eq 'get' && @getSubfields) {
+            say $_
+                for map {@{$record->match($_, split => 1) // []}}
+                @getSubfields;
         }
 
         $record = $record->sort if $self->{order};
 
-        $record->{record} = $record->fields(@pathes) if @pathes;
+        $record->{record} = $record->fields(@getFields) if @getFields;
         return if $record->empty;
 
         # TODO: also validate on other commands?
@@ -342,7 +361,7 @@ sub run {
     RECORD: foreach my $in (@{$self->{input}}) {
             my $parser = $self->parser_from_input($in);
             while (my $next = $parser->next) {
-                for ($command eq 'split' ? $next->split : $next) {
+                for ($command eq 'levels' ? $next->split : $next) {
                     $process->($_);
                     last RECORD if $number and $stats->{records} >= $number;
                 }
@@ -382,19 +401,14 @@ sub run {
 }
 
 sub parse_path {
-    eval {PICA::Path->new($_[0], position_as_occurrence => 1)};
+    eval {PICA::Path->new($_[0], position_as_occurrence => 1)}
+        || die "invalid PICA Path: $_[0]\n";
 }
 
 sub explain {
-    my $self   = shift;
-    my $schema = shift;
-    my $path   = parse_path($_[0]);
+    my ($self, $schema, $path) = @_;
 
-    if (!$path) {
-        warn "invalid PICA Path: $_[0]\n";
-        return;
-    }
-    elsif ($path->stringify =~ /[.]/) {
+    if ($path->stringify =~ /[.]/) {
         warn "Fields with wildcards cannot be explained yet!\n";
         return;
     }
@@ -427,7 +441,7 @@ sub document {
             $status = $def->{repeatable} ? '*' : 'o';
         }
         my $doc = "$id\t$status\t" . $def->{label} // '';
-        say $doc =~ s/[\r\n]+/ /mgr;
+        say $doc =~ s/[\s\r\n]+/ /mgr;
     }
     elsif (!$self->{unknown}) {
         if ($warn) {

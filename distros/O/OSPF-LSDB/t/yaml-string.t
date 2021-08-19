@@ -15,8 +15,8 @@ my %tmpargs = (
 );
 
 my $string = <<EOF;
---- 
-database: 
+---
+database:
   boundarys: []
 
   externals: []
@@ -27,35 +27,35 @@ database:
 
   links: []
 
-  networks: 
-    - 
+  networks:
+    -
       address: 0.0.1.1
       area: 1.0.0.0
-      attachments: 
-        - 
+      attachments:
+        -
           routerid: 0.1.0.0
       netmask: 255.255.255.0
       routerid: 0.1.0.0
-    - 
+    -
       address: 0.0.1.2
       area: 1.0.0.0
-      attachments: 
-        - 
+      attachments:
+        -
           routerid: 0.1.0.0
       netmask: 255.255.255.128
       routerid: 0.1.0.0
-    - 
+    -
       address: 0.0.2.1
       area: 2.0.0.0
-      attachments: 
-        - 
+      attachments:
+        -
           routerid: 0.1.0.0
       netmask: 255.255.255.0
       routerid: 0.1.0.0
-  routers: 
-    - 
+  routers:
+    -
       area: 1.0.0.0
-      bits: 
+      bits:
         B: 1
         E: 1
         V: 0
@@ -69,9 +69,9 @@ database:
 
       virtuals: []
 
-    - 
+    -
       area: 2.0.0.0
-      bits: 
+      bits:
         B: 1
         E: 1
         V: 0
@@ -88,8 +88,8 @@ database:
   summarys: []
 
 ipv6: 0
-self: 
-  areas: 
+self:
+  areas:
     - 1.0.0.0
     - 2.0.0.0
   routerid: 0.1.0.0
@@ -99,6 +99,7 @@ EOF
 my $yaml = OSPF::LSDB::YAML->new();
 $yaml->Load($string);
 my $dump = $yaml->Dump();
+$dump =~ s/ $//gm;
 is($dump, $string, "load string and dump string must be identical") or do {
     my $s = File::Temp->new(%tmpargs);
     print $s $string;

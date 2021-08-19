@@ -1,16 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2021 -- leonerd@leonerd.org.uk
 
-package Tickit;
+package Tickit 0.72;
 
-use strict;
+use v5.14;
 use warnings;
-
-BEGIN {
-   our $VERSION = '0.71';
-}
 
 use Carp;
 
@@ -327,6 +323,58 @@ sub timer
    croak "Mode should be 'at' or 'after'";
 }
 
+=head2 watch_signal
+
+   $id = $tickit->watch_signal( $signum, $code )
+
+I<Since version 0.72.>
+
+Runs the given CODE reference whenever the given POSIX signal is received.
+Signals are given by number, not name.
+
+Returns an opaque integer value that may be passed to L</watch_cancel>. This
+value is safe to ignore if not required.
+
+=cut
+
+sub watch_signal
+{
+   my $self = shift;
+   my ( $signum, $code ) = @_;
+
+   return $self->_tickit->watch_signal( $signum, $code );
+}
+
+=head2 watch_process
+
+   $id = $tickit->watch_process( $pid, $code )
+
+I<Since version 0.72.>
+
+Runs the given CODE reference when the given child process terminates.
+
+Returns an opaque integer value that may be passed to L</watch_cancel>. This
+value is safe to ignore if not required.
+
+When invoked, the callback will receive an event parameter which will be an
+instance of a type with a field called C<wstatus>. This will contain the exit
+status of the terminated child process.
+
+   $code->( $info )
+
+   $pid    = $info->pid;
+   $status = $info->wstatus;
+
+=cut
+
+sub watch_process
+{
+   my $self = shift;
+   my ( $pid, $code ) = @_;
+
+   return $self->_tickit->watch_process( $pid, $code );
+}
+
 =head2 watch_cancel
 
    $tickit->watch_cancel( $id )
@@ -516,7 +564,15 @@ sub run
       $widget->set_window( $self->rootwin );
    }
 
-   # TODO: $SIG{__DIE__} wrapping
+   my $term = $self->_tickit->term;
+   $SIG{__DIE__} = sub {
+      return if $^S;
+      my ( $err ) = @_;
+
+      # Teardown before application exit so the message appears properly
+      $term->teardown;
+      die $err;
+   };
 
    $self->_tickit->run;
 

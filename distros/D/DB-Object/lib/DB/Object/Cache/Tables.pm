@@ -12,6 +12,7 @@ package DB::Object::Cache::Tables;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Module::Generic );
     use JSON;
     use File::Spec;
@@ -216,18 +217,18 @@ DB::Object::Cache::Tables - Table Cache
     {
         warn( "Unable to write to tables cache: ", $cache->error, "\n" );
     }
-	
-	# Returning an array reference of tables hash reference definition
-	$all = $cache_tables->get({
-		host => $self->host,
-		driver => $self->driver,
-		port => $self->port,
-		database => $db,
-	}) || do
+    
+    # Returning an array reference of tables hash reference definition
+    $all = $cache_tables->get({
+        host => $self->host,
+        driver => $self->driver,
+        port => $self->port,
+        database => $db,
+    }) || do
     
 =head1 VERSION
 
-This is version v0.100.2
+    v0.100.2
 
 =head1 DESCRIPTION
 
@@ -243,7 +244,7 @@ Possible parameters:
 
 =item I<cache_dir>
 
-An absolute path to a directory that will contain the json cache file. Beware that if you run your script from the eb, this directory must be writable by the http server user.
+An absolute path to a directory that will contain the json cache file. Beware that if you run your script from the web, this directory must be writable by the http server user.
 
 =item I<cache_file>
 

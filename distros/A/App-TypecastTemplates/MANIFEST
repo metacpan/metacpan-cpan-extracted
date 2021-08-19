@@ -8,12 +8,16 @@ META.json
 META.yml
 README
 t/00-load.t
+t/csv/catch-all.csv
 t/csv/escape.csv
 t/csv/fix.csv
+t/csv/without-columns.csv
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
 t/script-create_loginrc.t
+t/template/catch-all.tmpl
 t/template/escape.tmpl
 t/template/fix.tmpl
+t/template/name-text.tmpl
 xt/boilerplate.t

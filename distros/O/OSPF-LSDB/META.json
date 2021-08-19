@@ -1,10 +1,10 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "class containing OSPF link state database",
    "author" : [
       "BLUHM <bluhm@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "bsd"
    ],
@@ -39,11 +39,17 @@
             "List::MoreUtils" : "0",
             "Regexp::Common" : "0",
             "Regexp::IPv6" : "0",
-            "Test::NoWarnings" : "0",
-            "Test::Pod" : "0",
-            "Test::Strict" : "0",
             "YAML::Syck" : "0",
             "perl" : "5.010000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::EOL" : "0",
+            "Test::NoWarnings" : "0",
+            "Test::Pod" : "0",
+            "Test::Requires" : "0",
+            "Test::Strict" : "0"
          }
       }
    },
@@ -55,6 +61,6 @@
          "url" : "git://git.code.sf.net/p/ospfview/code"
       }
    },
-   "version" : "1.11",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "1.12",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

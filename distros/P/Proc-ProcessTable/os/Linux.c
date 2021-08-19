@@ -304,7 +304,7 @@ static void get_user_info(char *pid, char *format_str, struct procstat* prs,
 static bool get_proc_stat(char *pid, char *format_str, struct procstat* prs,
     struct obstack *mem_pool)
 {
-    char    *stat_text, *stat_cont, *paren;
+    char    *stat_text, *stat_cont, *close_paren, *open_paren;
     int     result;
     off_t   stat_len;
     long    dummy_l;
@@ -312,38 +312,45 @@ static bool get_proc_stat(char *pid, char *format_str, struct procstat* prs,
 
     bool    read_ok = true;
 
-    if ((stat_text = read_file(pid, "stat", &stat_len, mem_pool)) == NULL)
+    if ((stat_text = read_file(pid, "stat", &stat_len, mem_pool)) == NULL) {
         return false;
+    }
+
+    if (sscanf(stat_text, "%d (", &prs->pid) != 1) {
+      goto done;
+    }
 
     /* replace the first ')' with a '\0', the contents look like this:
      *    pid (program_name) state ...
      * if we don't find ')' then it's incorrectly formated */
-    if ((paren = strrchr(stat_text, ')')) == NULL) {
+    if ((close_paren = strrchr(stat_text, ')')) == NULL) {
+        read_ok = false;
+        goto done;
+    }
+    *close_paren = '\0';
+
+    if ((open_paren = strchr(stat_text, '(')) == NULL) {
         read_ok = false;
         goto done;
     }
 
-    *paren = '\0';
 
-    /* scan in pid, and the command, in linux the command is a max of 15 chars
-     * plus a terminating NULL byte; prs->comm will be NULL terminated since
-     * that area of memory is all zerored out when prs is allocated */
-    /* Apparently %15c means 'exactly 15' but a glibc bug allows matching
-     * regardles. musl won't match it.
-     * See: https://www.openwall.com/lists/musl/2013/11/15/5
-     * and: https://sourceware.org/bugzilla/show_bug.cgi?id=12701 */
-    if (sscanf(stat_text, "%d (%c", &prs->pid, prs->comm) != 2)
-      /* we might get an empty command name, so check for it:
-       * do the open and close parenteses lie next to each other?
-       * proceed if yes, finish otherwise
-       */
-      if((strchr(stat_text,'(') + 1) != paren)
-        goto done;
+    int comm_esize = sizeof(prs->comm) - 1;
+    int comm_len = close_paren - open_paren - 1;
+    if(comm_len > comm_esize) {
+      comm_len = comm_esize;
+    }
+    if(comm_len == 0) {
+      goto done;
+    }
+
+    strncpy(prs->comm, open_paren + 1, comm_esize);
+    prs->comm[comm_esize] = '\0';
 
     /* address at which we pickup again, after the ')'
      * NOTE: we don't bother checking bounds since strchr didn't return NULL
-     * thus the NULL terminator will be at least paren+1, which is ok */
-    stat_cont = paren + 1;
+     * thus the NULL terminator will be at least close_paren+1, which is ok */
+    stat_cont = close_paren + 1;
 
     /* scape the remaining values */
     result = sscanf(stat_cont, " %c %d %d %d %d %d %u %lu %lu %lu %lu %llu"

@@ -7,6 +7,24 @@ Home page:    <https://metacpan.org/release/App-Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.2.11	2021-08-18
+
+ [ Test Suite ]
+ - skip *-no-RE2 tests unless installed Regexp::Pattern::License is recent
+   enough to support it
+
+v3.2.10	2021-08-18
+
+ [ Documentation ]
+ - improve POD markup of SYNOPSIS and a few code strings
+
+ [ Test Suite ]
+ - improve tests
+ - test-require Test::Without::Module
+
+ [ Packaging ]
+ - relax to recommend (not depend on) module re::engine::RE2
+
 v3.2.9	2021-08-16
 
  [ Packaging ]

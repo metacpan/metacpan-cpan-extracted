@@ -1,5 +1,5 @@
 ##########################################################################
-# Copyright (c) 2010-2012,2018 Alexander Bluhm <alexander.bluhm@gmx.net>
+# Copyright (c) 2010-2021 Alexander Bluhm <alexander.bluhm@gmx.net>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -21,7 +21,7 @@ use warnings;
 
 =head1 NAME
 
-B<OSPF::LSDB::View> - display OSPF database as graphviz dot
+OSPF::LSDB::View - display OSPF database as graphviz dot
 
 =head1 SYNOPSIS
 
@@ -29,15 +29,15 @@ use OSPF::LSDB;
 
 use OSPF::LSDB::View;
 
-my $ospf = OSPF::LSDB-E<gt>L<new>();
+my $ospf = OSPF::LSDB-E<gt>new();
 
-my $view = OSPF::LSDB::View-E<gt>L<new>($ospf);
+my $view = OSPF::LSDB::View-E<gt>new($ospf);
 
-my $dot = view-E<gt>L<graph>();
+my $dot = view-E<gt>graph();
 
 =head1 DESCRIPTION
 
-The B<OSPF::LSDB::View> module converts the content of a B<OSPF::LSDB>
+The OSPF::LSDB::View module converts the content of a L<OSPF::LSDB>
 instance into a graphviz dot string.
 Routers and Networks become nodes, the links between them are
 directed edges.
@@ -45,7 +45,7 @@ The different OSPF vertices are displayed with drawing styles that
 are documented in the legend.
 
 During conversion the link state database is checked.
-Each inconsistency is reported as B<OSPF::LSDB> error and the color
+Each inconsistency is reported as L<OSPF::LSDB> error and the color
 of the object changes.
 The colors are prioritized by severity.
 
@@ -101,7 +101,7 @@ Missing node.
 
 =back
 
-Normally the B<OSPF::LSDB> copy constructor creates the object.
+Normally the L<OSPF::LSDB> copy constructor creates the object.
 The public methods are:
 
 =cut
@@ -495,7 +495,7 @@ sub router2edges {
 		my $src = $routehash->{$rid}{graph}{N};
 		my $dst = $routehash->{$dstrid}{graph}{N};
 		my @hashes = @{$rv->{hashes}};
-		if (@hashes > 1) {
+		if ($type ne "pointtopoint" && @hashes > 1) {
 		    $self->error($colors{yellow} =
 		      "$name link at router $rid to router $dstrid ".
 		      "has multiple entries in area $area.");
@@ -2313,7 +2313,7 @@ sub graph_default {
 
 =over
 
-=item $self-E<gt>L<graph>(%todo)
+=item $self-E<gt>graph(%todo)
 
 Convert the internal database into graphviz dot format.
 The output for the dot program is returned as string.
@@ -2689,7 +2689,7 @@ sub legend_default {
 
 =pod
 
-=item OSPF::LSDB::View-E<gt>L<legend>()
+=item OSPF::LSDB::View-E<gt>legend()
 
 Return a string of a dot graphic containing drawing and description
 of possible nodes and edges.
@@ -2722,7 +2722,7 @@ The methods die if any error occures.
 Inconsistencies within the OSPF link state database are visualized
 with different colors.
 The error message may be printed into the graph as warnings.
-All warnings may be optained with the L<get_errors> method.
+All warnings may be optained with the get_errors() method.
 
 =head1 SEE ALSO
 

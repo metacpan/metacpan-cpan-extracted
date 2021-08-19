@@ -3,14 +3,12 @@
 #
 #  (C) Paul Evans, 2011-2016 -- leonerd@leonerd.org.uk
 
-package Tickit::Rect;
+package Tickit::Rect 0.72;
 
-use strict;
+use v5.14;
 use warnings;
 
 use Carp;
-
-our $VERSION = '0.71';
 
 # Load the XS code
 require Tickit;

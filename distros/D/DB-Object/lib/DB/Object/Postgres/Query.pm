@@ -1,24 +1,25 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-# Database Object Interface - ~/lib/DB/Object/Postgres/Query.pm
-# Version v0.1.4
-# Copyright(c) 2021 DEGUEST Pte. Ltd.
-# Author: Jacques Deguest <jack@deguest.jp>
-# Created 2017/07/19
-# Modified 2021/08/12
-# All rights reserved
-# 
-# This program is free software; you can redistribute  it  and/or  modify  it
-# under the same terms as Perl itself.
+## Database Object Interface - ~/lib/DB/Object/Postgres/Query.pm
+## Version v0.1.5
+## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
+## Created 2017/07/19
+## Modified 2021/08/18
+## All rights reserved
+## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package DB::Object::Postgres::Query;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( DB::Object::Query );
     use Devel::Confess;
     our( $VERSION, $DEBUG, $VERBOSE );
-    $VERSION = 'v0.1.4';
+    $VERSION = 'v0.1.5';
 };
 
 {
@@ -591,7 +592,17 @@ sub _query_components
             $self->binded_types->push( $limit->bind->types->list );
         }
     }
-    push( @query, $on_conflict ) if( $on_conflict && $type eq 'insert' );
+    if( $on_conflict )
+    {
+        if( $type eq 'insert' )
+        {
+            push( @query, $on_conflict );
+        }
+        else
+        {
+            warn( "The PostgreSQL ON CONFLICT clause is only supported for INSERT queries. Your query was of type \"$type\".\n" );
+        }
+    }
     push( @query, "RETURNING $returning" ) if( $returning && ( $type eq 'insert' || $type eq 'update' || $type eq 'delete' ) );
 #     $self->message( 3, "Query components are:" );
 #     foreach my $this ( @query )
@@ -621,7 +632,7 @@ DB::Object::Postgres::Query - Query Object for PostgreSQL
 
 =head1 VERSION
 
-    v0.1.4
+    v0.1.5
 
 =head1 DESCRIPTION
 

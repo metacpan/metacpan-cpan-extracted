@@ -3,7 +3,7 @@ package PDL::Stats;
 use strict;
 use warnings;
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 $PDL::onlinedoc->scan(__FILE__) if $PDL::onlinedoc;
 
@@ -59,7 +59,7 @@ Enjoy PDL::Stats without having to dive into PDL, just wet your feet a little. T
 
 =head2 pdl
 
-The magic word that puts PDL::Stats at your disposal. pdl creates a PDL numeric data object (a pdl, pronounced "piddle" :/ ) from perl array or array ref. All PDL::Stats methods, unless meant for regular perl array, can then be called from the data object.
+The magic word that puts PDL::Stats at your disposal. pdl creates a PDL numeric data object (a pdl, or ndarray) from perl array or array ref. All PDL::Stats methods, unless meant for regular perl array, can then be called from the data object.
 
     my @y = 0..5;
 

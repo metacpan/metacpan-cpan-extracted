@@ -1,5 +1,10 @@
 Revision history for Perl extension Getopt-EX-Hashed
 
+0.9913 2021-08-18T08:49:22Z
+
+    - Add REMOVE_UNDERSCORE config parameter.
+    - Introduce new "must" parameter.
+
 0.9912 2021-08-13T00:45:25Z
 
     - Fix default config access bug.

@@ -1,5 +1,18 @@
 Revision history for Changes
 
+0.72    2021-08-18
+        [CHANGES]
+         * Use libtickit 0.4.2
+         * Wrap tickit_term_teardown()
+         * Wrap tickit_watch_signal() and tickit_watch_process()
+         * Added Tickit::Test::is_termctl()
+         * Improved API shape for tickit_new_with_evloop()
+         * Improved performance by setting PERL_NO_GET_CONTEXT
+
+        [BUGFIXES]
+         * Use $SIG{__DIE__} to teardown the terminal before reporting fatal
+           exception messages
+
 0.71    2020-05-25
         [CHANGES]
          * Use libtickit 0.4.0

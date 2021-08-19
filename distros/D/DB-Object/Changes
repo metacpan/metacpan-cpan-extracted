@@ -1,5 +1,10 @@
 Revision history for Perl module DB::Object
 
+v0.9.14 2021-08-17T06:39:36+0900
+    - Added use warnings to all modules
+    - Updated DB::Object::Statement::execute to make sure stringifyable objects are stringified before they are passed as binded values to DBI's bind_param
+    - Update DB::Object::Postgres::Query and DB::Object::SQLite::Query to warn when ON CONFLICT clause was used for queries other than INSERT
+
 v0.9.13 2021-08-12T19:44:26+0900
     - Updated DB::Object::Postgres::Query::format_statement to properly handle placeholders set during insert or update and updated DB::Object::Statement to recognise the use of those placeholders without necessarily reverting to enabling use_bind
     - Major overhaul of the documentation for all modules

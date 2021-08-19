@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -28,6 +28,8 @@ my $bind_id_key = $win->bind_event( key => sub {
    presskey( text => "A" );
 
    is_deeply( \@key_events, [ [ text => "A" ] ], 'on_key A' );
+   cmp_ok( $key_events[0][0], '==', Tickit::KEYEV_TEXT, 'event type numerically ==' );
+   cmp_ok( $key_events[0][0], 'eq', "text",             'event type stringily eq' );
 
    ok( !$keyev->mod_is_shift, 'A key is not shift' );
    ok( !$keyev->mod_is_ctrl,  'A key is not ctrl' );

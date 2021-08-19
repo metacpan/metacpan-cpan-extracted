@@ -1,5 +1,5 @@
 ##########################################################################
-# Copyright (c) 2010-2012,2018 Alexander Bluhm <alexander.bluhm@gmx.net>
+# Copyright (c) 2010-2021 Alexander Bluhm <alexander.bluhm@gmx.net>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -21,7 +21,7 @@ use warnings;
 
 =head1 NAME
 
-B<OSPF::LSDB::View6> - display OSPF for IPv6 database as graphviz dot
+OSPF::LSDB::View6 - display OSPF for IPv6 database as graphviz dot
 
 =head1 SYNOPSIS
 
@@ -29,18 +29,18 @@ use OSPF::LSDB;
 
 use OSPF::LSDB::View6;
 
-my $ospf = OSPF::LSDB-E<gt>L<new>();
+my $ospf = OSPF::LSDB-E<gt>new();
 
-my $view = OSPF::LSDB::View6-E<gt>L<new>($ospf);
+my $view = OSPF::LSDB::View6-E<gt>new($ospf);
 
-my $dot = view-E<gt>L<graph>();
+my $dot = view-E<gt>graph();
 
 =head1 DESCRIPTION
 
-The B<OSPF::LSDB::View6> module converts the IPv6 content of a
-B<OSPF::LSDB> instance into a graphviz dot string.
+The OSPF::LSDB::View6 module converts the IPv6 content of a
+L<OSPF::LSDB> instance into a graphviz dot string.
 
-Most of B<OSPF::LSDB::View6> is derived from B<OSPF::LSDB::View>.
+Most of OSPF::LSDB::View6 is derived from L<OSPF::LSDB::View>.
 Only differences between the v2 and v3 protocoll are implemented
 and documented by this module.
 
@@ -256,7 +256,7 @@ sub router2edges {
 		my $src = $routehash->{$rid}{graph}{N};
 		my $dst = $routehash->{$dstrid}{graph}{N};
 		my @hashes = @{$rv->{hashes}};
-		if (@hashes > 1) {
+		if ($type ne "pointtopoint" && @hashes > 1) {
 		    $self->error($colors{yellow} =
 		      "$name link at router $rid to router $dstrid ".
 		      "has multiple entries in area $area.");

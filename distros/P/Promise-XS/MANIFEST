@@ -28,6 +28,7 @@ t/ioasync.t
 t/mojo.t
 t/multi_return.t
 t/no_leak_stashed_ref.t
+t/oserror.t
 t/promise_all_race.t
 t/reject_undef.t
 t/subclass.t

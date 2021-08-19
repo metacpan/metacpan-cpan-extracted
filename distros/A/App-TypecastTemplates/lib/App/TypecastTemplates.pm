@@ -13,11 +13,11 @@ App::TypecastTemplates - Format records with different templates.
 
 =head1 VERSION
 
-Version v0.2.0
+Version v0.3.0
 
 =cut
 
-our $VERSION = 'v0.2.0';
+our $VERSION = 'v0.3.0';
 
 =head1 SYNOPSIS
 
@@ -39,13 +39,25 @@ This module exports the function C<< run >>, that does the formatting.
 
 =cut
 
-our @EXPORT = qw( tt_run read_templates );
+our @EXPORT = qw( tt_run read_templates set_columns);
 use Exporter;
 our @ISA = qw( Exporter );
 
 my $templates = {};
+my $columns = "";
 
 =head1 SUBROUTINES/METHODS
+
+=head2 set_columns
+
+Set the column names for a CSV file
+that doesn't provide them in the first line.
+
+=cut
+
+sub set_columns {
+	$columns = shift;
+} # set_columns()
 
 =head2 tt_file
 
@@ -89,8 +101,13 @@ sub tt_run {
 	}
 	open(my $handle, '<' . $fn)
 		or die "can't open credentials file '$fn'";
-	my @cols = $csv->getline( $handle );
-	$csv->column_names( @cols );
+	if ($columns) {
+		$csv->column_names( split(/,/,$columns) );
+	}
+	else {
+		my @cols = $csv->getline( $handle );
+		$csv->column_names( @cols );
+	}
 	while (my $r = $csv->getline_hr( $handle )) {
 		if (exists $templates->{$r->{type}}) {
 			my $template = $templates->{$r->{type}};
