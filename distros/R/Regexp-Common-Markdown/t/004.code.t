@@ -2,13 +2,16 @@
 
 use Test::More qw( no_plan );
 
-BEGIN { use_ok( 'Regexp::Common::Markdown' ) || BAIL_OUT( "Unable to load Regexp::Common::Markdown" ); }
+BEGIN
+{
+    use_ok( 'Regexp::Common::Markdown' ) || BAIL_OUT( "Unable to load Regexp::Common::Markdown" );
+};
 
 use lib './lib';
 use Regexp::Common qw( Markdown );
 require( "./t/functions.pl" ) || BAIL_OUT( "Unable to find library \"functions.pl\"." );
 
-## https://regex101.com/r/toEboU/2/tests
+## https://regex101.com/r/toEboU/3
 my $tests_line = 
 [
     {
@@ -62,14 +65,13 @@ EOT
     },
 ];
 
-## https://regex101.com/r/M6W99K/1
+## https://regex101.com/r/M6W99K/7
 my $tests_block =
 [
     {
         code_all => "```\nSome text\n\n\tIndented code block sample code\n```\n",
         code_content => "Some text\n\n\tIndented code block sample code",
         code_start => "```",
-        code_trailing_new_line => "\n",
         test => <<EOT,
 
 ```
@@ -84,7 +86,6 @@ EOT
         code_all => "```\n<Fenced>\n```\n",
         code_content => "<Fenced>",
         code_start => "```",
-        code_trailing_new_line => "\n",
         test => <<EOT,
 ```
 <Fenced>
@@ -96,9 +97,9 @@ EOT
         code_all => "```\n\n\n<Fenced>\n\n\n```\n",
         code_content => "<Fenced>",
         code_start => "```",
-        code_trailing_new_line => "\n",
         test => <<EOT,
 Code block starting and ending with empty lines:
+
 ```
 
 
@@ -113,7 +114,6 @@ EOT
         code_all => "```\nSome text\n\n\tIndented code block sample code\n```\n",
         code_content => "Some text\n\n\tIndented code block sample code",
         code_start => "```",
-        code_trailing_new_line => "\n",
         test => <<EOT,
 ```
 Some text
@@ -127,7 +127,6 @@ EOT
         code_all => "``````````````````\nFenced\n``````````````````\n",
         code_content => "Fenced",
         code_start => "``````````````````",
-        code_trailing_new_line => "\n",
         test => <<EOT,
 Fenced code block with long markers:
 
@@ -141,7 +140,6 @@ EOT
         code_all => "````\nIn code block\n```\nStill in code block\n`````\nStill in code block\n````\n",
         code_content => "In code block\n```\nStill in code block\n`````\nStill in code block",
         code_start => "````",
-        code_trailing_new_line => "\n",
         test => <<EOT,
 Fenced code block with fenced code block markers of different length in it:
 
@@ -159,7 +157,6 @@ EOT
         code_all => "```\n[example]: http://example.com/\n\n[^1]: Footnote def\n\n*[HTML]: HyperText Markup Language\n```\n",
         code_content => "[example]: http://example.com/\n\n[^1]: Footnote def\n\n*[HTML]: HyperText Markup Language",
         code_start => "```",
-        code_trailing_new_line => "",
         test => <<EOT,
 Fenced code block with link definitions, footnote definition and
 abbreviation definitions:

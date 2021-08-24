@@ -1,24 +1,20 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
-use strict;
-use warnings;
-
-# use Carp::Always;
 use FindBin;
 use lib "$FindBin::RealBin/../../lib";
 use lib "$FindBin::RealBin/../../../lib";
 
-use YAML::Any qw(Dump);
-use Utils qw(:all);
+use Test::Tutorial::Setup;
 
-init_logger();
+# init_logger($DEBUG);
 
 my $name = "Sheet1";
 my $spreadsheet_name = spreadsheet_name();
-my $sheets = sheets_api(post_process => \&show_api);
+my $sheets_api = sheets_api();
+$sheets_api->rest_api()->api_callback(\&show_api);
 
 start("Now we will open the spreadsheet and worksheet.");
-my $ss = $sheets->open_spreadsheet(name => $spreadsheet_name);
+my $ss = $sheets_api->open_spreadsheet(name => $spreadsheet_name);
 my $uri = $ss->spreadsheet_uri();
 my $ws0 = $ss->open_worksheet(id => 0);
 end_go("Worksheet is now open, uri: $uri.");

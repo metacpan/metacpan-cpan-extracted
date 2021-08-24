@@ -1,13 +1,30 @@
 package Test::Google::RestApi::SheetsApi4::Range::Base;
 
+use Test::Unit::Setup;
+
+use aliased 'Google::RestApi::SheetsApi4::Worksheet';
+
+use parent 'Test::Unit::TestBase';
+
 use Scalar::Util qw(looks_like_number);
 
-use parent 'Test::Google::RestApi::SheetsApi4::Base';
-
-sub startup {
+sub setup : Tests(setup) {
   my $self = shift;
-  $self->SUPER::startup(@_);
+  $self->SUPER::setup(@_);
+
   $self->{err} = qr/Unable to translate/;
+
+  $self->_fake_http_auth();
+  $self->_fake_http_no_retries();
+
+  $self->_uri_responses(qw(
+    get_spreadsheet_named_ranges
+    get_worksheet_properties_title_sheetid
+    get_worksheet_values_col
+    get_worksheet_values_row
+    get_worksheet_values_cell
+  ));
+
   return;
 }
 
@@ -19,9 +36,14 @@ sub _to_str {
   return "'$x'";
 }
 
-sub new_range {
+sub _new_range {
   my $self = shift;
-  return $self->class()->new(worksheet => $self->worksheet(), range => shift);
+  return $self->class()->new(worksheet => fake_worksheet(), range => shift);
+}
+
+sub _new_config_range {
+  my $self = shift;
+  return $self->class()->new(worksheet => fake_config_worksheet(), range => shift);
 }
 
 1;

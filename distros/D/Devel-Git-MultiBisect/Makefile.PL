@@ -1,4 +1,4 @@
-use v5.10.0;
+use v5.14.0;
 use Devel::CheckBin;
 check_bin('git');
 if ($^O =~ m/mswin32/i) {
@@ -13,6 +13,7 @@ my %WriteMakefileArgs = (
     VERSION_FROM => 'lib/Devel/Git/MultiBisect.pm', # finds \$VERSION
     AUTHOR       => 'James E Keenan (jkeenan@cpan.org)',
     ABSTRACT     => 'Study test output over a range of git commits',
+    MIN_PERL_VERSION => '5.14.0',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
         'Devel::CheckBin' => 0,

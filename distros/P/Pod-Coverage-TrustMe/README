@@ -31,15 +31,22 @@ CONSTRUCTOR OPTIONS
         An array ref of items to add to the private list. Makes it easy to
         augment the default list.
 
-    trustme
+    trust_methods
         An array ref of subs to consider documented even if no pod can be
         found. Has a similar effect to "private", but will include the subs
         in the list of covered subs, rather than excluding them from the
         list entirely.
 
-    nonwhitespace
+        "trustme" is an alias to this option, provided for compatibility
+        with Pod::Coverage.
+
+    require_content
         Requires that the pod section for the sub have some non-whitespace
-        characters in it to be counted as covering the sub.
+        characters in it to be counted as covering the sub. Defaults to
+        false.
+
+        "nonwhitespace" is an alias to this option, provided for
+        compatibility with Pod::Coverage.
 
     trust_parents
         Includes Pod from parent classes in list of covered subs. Like
@@ -50,9 +57,15 @@ CONSTRUCTOR OPTIONS
         Pod::Coverage::CountParents, but checking "does" or "DOES". Defaults
         to true.
 
+    trust_packages
+        Includes Pod from an array ref of packages in the list of covered
+        subs.
+
     trust_pod
         Trusts subs or regexes listed in "Pod::Coverage" blocks in Pod. Like
         Pod::Coverage::TrustPod. Defaults to true.
+
+        The regexes must match the entire method name.
 
         A section like:
 
@@ -61,13 +74,16 @@ CONSTRUCTOR OPTIONS
         will allow the subs "sub1", "sub2", and any sub that is all upper
         case to exist without being documented.
 
+        The special token "*EVERYTHING*" can be used to trust every method.
+
     require_link
         Requires a link in the Pod to parent classes or roles to include
         them in the coverage. If the documentation for subs is in different
-        files, they should be linked to in some way.
+        files, they should be linked to in some way. Defaults to false.
 
     export_only
         Only requires subs listed in @EXPORT and @EXPORT_OK to be covered.
+        Defaults to false.
 
     ignore_imported
         Ignore subs that were imported from other packages. If set to false,
@@ -117,14 +133,16 @@ METHODS FOR SUBCLASSES
     _private_check($symbol)
         Returns true if the given symbol should be considered private.
 
-    _trustme_check($symbol)
+    _trust_method_check($symbol)
         Returns true if the given symbol should be treated as covered even
         without any documentation found.
 
 CONSTANTS
     DEFAULT_PRIVATE
         An array reference of the default list of private regular
-        expressions.
+        expressions. This includes methods beginning with underscores,
+        methods called by perl for language features, and methods called
+        internally by Moo and Moose.
 
 TESTING
     See Test::Pod::Coverage::TrustMe for using this module in tests.

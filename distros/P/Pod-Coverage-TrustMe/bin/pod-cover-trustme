@@ -7,12 +7,25 @@ use Getopt::Long qw(:config gnu_getopt);
 use Pod::Coverage::TrustMe ();
 use Cwd ();
 use File::Find ();
+use Pod::Usage;
 
+my %options;
 GetOptions(
-  my %options,
-  'parents!',
-  'roles!',
+  'parents!'          => \$options{trust_parents},
+  'roles!'            => \$options{trust_roles},
+  'pod!'              => \$options{trust_pod},
+  'export!'           => \$options{export_only},
+  'ignore-imported!'  => \$options{ignore_imported},
+  'trust=s@'          => \$options{trust_methods},
+  'private=s@'        => \$options{also_private},
+  'default-private!'  => sub {
+    $options{private} = $_[1] ? undef : [];
+  },
+  'help'              => sub { pod2usage(-verbose => 2, -exitval => 0) },
 ) or pod2usage("Invalid options!");
+
+delete $options{$_}
+  for grep !defined $options{$_}, keys %options;
 
 my $package_declare_re = qr{
   \A\s*
@@ -127,3 +140,49 @@ print "  subroutines uncovered : $uncovered\n";
 print "  total coverage        : $average%\n\n";
 
 __END__
+
+=head1 NAME
+
+pod-cover-trustme - Report Pod coverage for modules
+
+=head1 SYNOPSIS
+
+  $ pod-cover-trustme lib/My/Module.pm
+
+=head1 OPTIONS
+
+=head2 --no-parents
+
+Disable considering parent class's pod.
+
+=head2 --no-roles
+
+Disable considering composed roles' pod.
+
+=head2 --no-pod
+
+Disable trusting '=for Pod::Coverage' annotations in pod.
+
+=head2 --export
+
+Require documentation only for exported subs.
+
+=head2 --no-ignore-imported
+
+Disable considering imported subs private.
+
+=head2 --trust=<method>
+
+Consider the given method as trusted and not needing documentation.
+
+=head2 --private=<sub>
+
+Consider the given sub name private, and not needing documentation.
+
+=head2 --no-default-private
+
+Disable the default list of private subs.
+
+=head2 --help
+
+Display documentation for the pod-cover-trustme program.

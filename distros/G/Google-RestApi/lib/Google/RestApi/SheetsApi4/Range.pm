@@ -5,7 +5,7 @@ package Google::RestApi::SheetsApi4::Range;
 # RangeGroup calls are commented thusly:
 # "private range routine called here!"
 
-our $VERSION = '0.7';
+our $VERSION = '0.8';
 
 use Google::RestApi::Setup;
 
@@ -16,7 +16,7 @@ use Scalar::Util qw(blessed looks_like_number);
 
 use aliased 'Google::RestApi::SheetsApi4::Range::Iterator';
 
-use parent "Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range";
+use parent 'Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range';
 
 # should be SCALAR|ARRAYREF|HASHREF but types::standard doesn't currently support AnyOf.
 # TODO: Keep an eye on https://rt.cpan.org/Public/Bug/Display.html?id=121841 and alter
@@ -29,8 +29,8 @@ use parent "Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range"
 use constant {
   Range     => Defined,
   Col       => Value,
-  Row       => Int->where('$_ > 0'),
-  Index     => Int->where('$_ > -1'),
+  Row       => PositiveInt,
+  Index     => PositiveOrZeroInt,
   Dim       => StrMatch[qr/^(col|row)/i],
   Dims      => StrMatch[qr/^(col|row)/i],
   DimsAll   => StrMatch[qr/^(col|row|all)/i],
@@ -89,7 +89,7 @@ sub _send_values {
   my $self = shift;
 
   state $check = compile_named(
-    values  => ArrayRef, { optional => 1 }, # ArrayRef->plus_coercions(Str, sub { [ $_ ] } ),
+    values  => ArrayRef[ArrayRef[Str]], { optional => 1 }, # ArrayRef->plus_coercions(Str, sub { [ $_ ] } ),
     params  => HashRef, { default => {} },
     content => HashRef, { default => {} },
     _extra_ => slurpy Any,
@@ -104,13 +104,13 @@ sub _send_values {
   # response will replace the cache again.
   $self->_cache_range_values(
     range          => $range,
-    majorDimension => $self->{dim},
+    majorDimension => $self->dimension(),
     values         => $p->{values},
   );
 
   $p->{content}->{range} = $range;
   $p->{content}->{values} = delete $p->{values};
-  $p->{content}->{majorDimension} = $self->{dim};
+  $p->{content}->{majorDimension} = $self->dimension();
   $p->{params}->{valueInputOption} //= 'USER_ENTERED';
   # $p->{params}->{includeValuesInResponse} = 1;
   $p->{uri} = "/values/$range";
@@ -130,7 +130,7 @@ sub _send_values {
 # updatedColumns: 3
 # updatedRange: Sheet1!B3:D4
 # updatedRows: 2
-# if invludeValuesInResponse was requested, the values are stashed
+# if includeValuesInResponse was requested, the values are stashed
 # from the updatedData response key.
 # spreadsheet object will call this on a batch update response.
 sub values_response_from_api {
@@ -187,10 +187,20 @@ sub _cache_range_values {
     );
     my $p = $check->(@_);
 
-    my ($worksheet_name) = $p->{range} =~ /(.+)!/;
-    $worksheet_name =~ s/'//g;
-    LOGDIE "Setting range data to worksheet name '$worksheet_name' that doesn't belong to this range: ", $self->worksheet_name()
+    # remove all quotes for comparison.
+    my $self_range = $self->range();
+    $self_range =~ s/'//g;
+    my $range = $p->{range};
+    $range =~ s/'//g;
+    my ($worksheet_name) = $range =~ /^(.+)!/;
+
+    LOGDIE "Setting range data to worksheet name '$worksheet_name' that doesn't belong to this range: " . $self->worksheet_name()
       if $worksheet_name ne $self->worksheet_name();
+    #LOGDIE "Setting range data to '$range' which is not this range: " . $self_range
+    #  if $range ne $self_range;
+    LOGDIE "Setting major dimention to '$p->{majorDimension}' that doesn't belong to this range: " . $self->dimention()
+      if $p->{majorDimension} ne $self->dimension();
+
     delete $p->{range};  # we only cache the values and dimensions.
     $self->{cache_range_values} = $p;
   }
@@ -226,7 +236,7 @@ sub _cache_range_values {
 
   # no values are found for this range, go get them from the api immediately.
   $p{uri} = sprintf("/values/%s", $self->range());
-  $p{params}->{majorDimension} = $self->{dim};
+  $p{params}->{majorDimension} = $self->dimension();
   $self->{cache_range_values} = $self->api(%p);
 
   $self->{cache_range_values}->{values} //= [];  # in case there's nothing set in the ss.
@@ -250,7 +260,7 @@ sub batch_values {
     # response will replace the cache again.
     $self->_cache_range_values(
         range          => $self->range(),
-        majorDimension => $self->{dim},
+        majorDimension => $self->dimension(),
         values         => $p->{values},
     );
   }
@@ -273,8 +283,7 @@ sub submit_values {
 
 sub submit_requests {
   my $self = shift;
-  my @api = $self->spreadsheet()->submit_requests(ranges => [ $self ], @_);
-  return wantarray ? @api : $api[0];
+  return $self->spreadsheet()->submit_requests(ranges => [ $self ], @_);
 }
 
 sub append {
@@ -291,7 +300,7 @@ sub append {
   my $range = $self->range();
   $p->{content}->{range} = $range;
   $p->{content}->{values} = delete $p->{values};
-  $p->{content}->{majorDimension} = $self->{dim};
+  $p->{content}->{majorDimension} = $self->dimension();
   $p->{params}->{valueInputOption} //= 'USER_ENTERED';
   $p->{uri} = "/values/$range:append";
   $p->{method} = 'post';
@@ -411,6 +420,9 @@ sub range {
 
   return $self->{normalized_range} if $self->{normalized_range};
 
+  TRACE("Range external caller: " . $self->_caller_external()); 
+  TRACE("Range internal caller: " . $self->_caller_internal()); 
+
   $self->normalize_named();
 
   my $range = $self->{range};
@@ -451,6 +463,26 @@ sub range {
   $self->{normalized_range} = $range;
 
   return $range;
+}
+
+sub _caller_internal {
+  my ($package, $subroutine, $line, $i) = ('', '', 0);
+  do {
+    ($package, undef, $line, $subroutine) = caller(++$i);
+  } while($subroutine =~ m|range$|);
+  # not usually going to happen, but during testing we call
+  # range directly, so have to backtrack.
+  ($package, undef, $line, $subroutine) = caller(--$i)
+    if !$package;
+  return "$package:$line => $subroutine";
+}
+
+sub _caller_external {
+  my ($package, $subroutine, $line, $i) = ('', '', 0);
+  do {
+    ($package, undef, $line, $subroutine) = caller(++$i);
+  } while($package && $package =~ m[^(Google::RestApi)]);
+  return "$package:$line => $subroutine";
 }
 
 # these are just used for debug message just above
@@ -529,12 +561,14 @@ sub _col_to_a1 {
   return $col if looks_like_number($col) && $col < 1;  # allow this to fail above.
   return $self->_col_i2a($col) if looks_like_number($col);
 
-  my $config = $self->config('cols');
+  my $config = $self->worksheet_config('cols');
   if ($config) {
     my $config_col = $config->{$col};
     return $self->_col_i2a($config_col)
       if $config_col && looks_like_number($config_col);
-    $col = $config_col if $config_col;
+    if ($config_col) {
+      $col = $config_col;
+    }
   }
 
   my $headers = $self->worksheet()->header_row();
@@ -556,7 +590,7 @@ sub _row_to_a1 {
 
   return $row if is_rowA1($row);
 
-  my $config = $self->config('rows');
+  my $config = $self->worksheet_config('rows');
   if ($config) {
     my $config_row = $config->{$row};
     return $config_row
@@ -798,7 +832,8 @@ sub worksheet_name { shift->worksheet()->worksheet_name(@_); }
 sub worksheet_id { shift->worksheet()->worksheet_id(@_); }
 sub spreadsheet { shift->worksheet()->spreadsheet(@_); }
 sub spreadsheet_id { shift->spreadsheet()->spreadsheet_id(@_); }
-sub config { shift->worksheet()->config(@_); }
+sub worksheet_config { shift->worksheet()->worksheet_config(@_); }
+sub transaction { shift->spreadsheet()->transaction(); }
 
 1;
 
@@ -812,7 +847,7 @@ Google::RestApi::SheetsApi4::Range - Represents a range in a Worksheet.
 
 A Range object that represents a range in a remote spreadsheet. These are
 normally short-lived objects used to set up and execute a remote action.
-Keep in mind that the remote spreadsheet can be potentially updated by
+Keep in mind that the remote spreadsheet can be concurrently updated by
 many people, so a compromise must always be reached between holding a copy
 of the local cell values and the number of network calls to the Google
 API to keep the values current.

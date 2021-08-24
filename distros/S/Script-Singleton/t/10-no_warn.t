@@ -3,7 +3,7 @@ use strict;
 
 use Test::More;
 
-use Script::Singleton 'TEST';
+use Script::Singleton glue => 'TEST';
 
 {
     my $w;

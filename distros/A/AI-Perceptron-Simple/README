@@ -1,0 +1,42 @@
+AI-Perceptron-Simple (v1.01)
+
+This module provides methods to build, train, validate and test a perceptron. It can also save the data of the perceptron for future use for any actual AI programs.
+
+This module is also aimed to help newbies grasp hold of the concept of perceptron, training, validation and testing as much as possible. Hence, all the methods and subroutines in this module are decoupled as much as possible so that the actual scripts can be written as simple complete programs.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc AI::Perceptron::Simple
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=AI-Perceptron-Simple
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/AI-Perceptron-Simple
+
+    Search CPAN
+        https://metacpan.org/release/AI-Perceptron-Simple
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2021 by Raphael Jong Jun Jie.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

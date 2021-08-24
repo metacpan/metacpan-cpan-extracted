@@ -5,7 +5,7 @@ use strict;
 use Exporter 'import';
 use base qw(Exporter);
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.13';
 
 our %EXPORT_TAGS = ( 'all' => [qw($simpleHashKeys $doubleHashKeys $specialNodeKeys $casAppMetaDataNodeKeys $casSrvMetaDataNodeKeys $oidcOPMetaDataNodeKeys $oidcRPMetaDataNodeKeys $samlIDPMetaDataNodeKeys $samlSPMetaDataNodeKeys $virtualHostKeys $specialNodeHash $authParameters $issuerParameters $samlServiceParameters $oidcServiceParameters $casServiceParameters)] );
 our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );

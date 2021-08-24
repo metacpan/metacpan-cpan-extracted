@@ -17,7 +17,7 @@
         <div class="input-group-prepend">
           <span class="input-group-text"><label for="urlfield" class="mb-0"><i class="fa fa-link"></i></label></span>
         </div>
-        <input id="urlfield" name="url" type="text" class="form-control" value="<TMPL_VAR NAME="URL">" trplaceholder="URL / DNS" aria-required="true"/>
+        <input id="urlfield" name="url" type="text" class="form-control" value="<TMPL_VAR NAME="URL">" trplaceholder="URL / DNS" aria-required="true" autocomplete="url" />
       </div>
       <button type="submit" class="btn btn-success">
         <span class="fa fa-search"></span>

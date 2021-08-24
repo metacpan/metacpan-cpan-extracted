@@ -23,21 +23,21 @@
       <div class="input-group-prepend">
         <span class="input-group-text"><label for="firstnamefield" class="mb-0"><i class="fa fa-user"></i></label></span>
       </div>
-      <input id="firstnamefield" name="firstname" type="text" value="<TMPL_VAR NAME="FIRSTNAME">" class="form-control" trplaceholder="firstName" required aria-required="true"/>
+      <input id="firstnamefield" name="firstname" type="text" value="<TMPL_VAR NAME="FIRSTNAME">" class="form-control" trplaceholder="firstName" required aria-required="true" autocomplete="given-name" />
     </div>
 
     <div class="input-group mb-3">
       <div class="input-group-prepend">
         <span class="input-group-text"><label for="lastnamefield" class="mb-0"><i class="fa fa-user"></i></label></span>
       </div>
-      <input id="lastnamefield" name="lastname" type="text" value="<TMPL_VAR NAME="LASTNAME">" class="form-control" trplaceholder="lastName" required aria-required="true"/>
+      <input id="lastnamefield" name="lastname" type="text" value="<TMPL_VAR NAME="LASTNAME">" class="form-control" autocomplete="family-name" trplaceholder="lastName" required aria-required="true"/>
     </div>
 
     <div class="input-group mb-3">
       <div class="input-group-prepend">
         <span class="input-group-text"><label for="mailfield" class="mb-0"><i class="fa fa-envelope"></i></label></span>
       </div>
-      <input id="mailfield" name="mail" type="text" value="<TMPL_VAR NAME="MAIL">" class="form-control" trplaceholder="mail" required aria-required="true"/>
+      <input id="mailfield" name="mail" type="text" value="<TMPL_VAR NAME="MAIL">" class="form-control" trplaceholder="mail" required aria-required="true" autocomplete="email" />
     </div>
 
     <TMPL_IF NAME=CAPTCHA_SRC>

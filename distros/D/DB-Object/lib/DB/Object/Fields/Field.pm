@@ -45,18 +45,21 @@ BEGIN
 sub init
 {
     my $self = shift( @_ );
-    $self->{default} = '';
-    $self->{name} = '';
-    $self->{pos} = '';
-    $self->{prefixed} = 0;
-    $self->{query_object} = '';
-    $self->{table_object} = '';
-    $self->{type} = '';
+    $self->{default}        = '';
+    $self->{name}           = '';
+    $self->{pos}            = '';
+    $self->{prefixed}       = 0;
+    $self->{query_object}    = '';
+    $self->{table_object}   = '';
+    $self->{type}           = '';
+    $self->{_init_params_order}   = [qw( table_object query_object default pos type prefixed name )];
+    $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ );
     return( $self->error( "No table object was provided." ) ) if( !$self->{table_object} );
     return( $self->error( "Table object provided is not an object." ) ) if( !$self->_is_object( $self->{table_object} ) );
     return( $self->error( "Table object provided is not a DB::Object::Tables object." ) ) if( !$self->{table_object}->isa( 'DB::Object::Tables' ) );
     return( $self->error( "No name was provided for this field." ) ) if( !$self->{name} );
+    $self->{trace} = $self->_get_stack_trace;
     return( $self );
 }
 
@@ -87,10 +90,13 @@ sub name
         $self->{name} = shift( @_ );
     }
     my $name = $self->{name};
+    my $trace = $self->_get_stack_trace;
+    my $alias = $self->query_object->table_alias;
+    $self->message( 3, "prefixed is set to '$self->{prefixed}' for field name '$name' of table '", $self->table_object->name, "' possibly aliased to '$alias'. Stack trace: ", $trace->as_string );
     if( $self->{prefixed} )
     {
         my @prefix = ();
-        if( length( my $alias = $self->query_object->table_alias ) )
+        if( length( $alias ) )
         {
             CORE::push( @prefix, $alias );
         }
@@ -200,11 +206,13 @@ sub _op_overload
     };
     $op = $map->{ $op } if( exists( $map->{ $op } ) );
     $op = 'IS' if( $op eq '=' and $val eq 'NULL' );
-    unless( $val eq '?' )
+    unless( $val eq '?' || ( $self->_is_object( $val ) && $val->isa( 'DB::Object::Fields::Field' ) ) )
     {
         $val = $self->database_object->quote( $val ) if( $self->database_object );
     }
-    # print( STDERR ref( $self ), "::_op_overload: swap -> '$swap', value = '$val': ", ( $swap ? "${val} ${op} ${field}" : "${field} ${op} ${val}" ), "\n" );
+    # XXX Comment out once debugged !
+#     return( DB::Object::Fields::Field::Overloaded->new( $swap ? "${val} ${op} ${field}" : "${field} ${op} ${val}", $self, ( $val eq '?' ? ( binded => 1 ) : () ) ) );
+    # $self->message( 3, "swap -> '$swap', value = '$val': ", ( $swap ? "${val} ${op} ${field}" : "${field} ${op} ${val}" ), "\nThis field object for table name '", $self->table_object->name, "' (", $self->table_object, ") was initially instantiated from: ", $self->{trace}->as_string, "\n" );
     return( DB::Object::Fields::Field::Overloaded->new( $swap ? "${val} ${op} ${field}" : "${field} ${op} ${val}", $self, ( $val eq '?' ? ( binded => 1 ) : () ) ) );
 }
 

@@ -3,9 +3,8 @@ package Test::Compile;
 use warnings;
 use strict;
 
-use version; our $VERSION = qv("v2.4.2");
+use version; our $VERSION = qv("v3.0.1");
 use parent 'Exporter';
-use UNIVERSAL::require;
 use Test::Compile::Internal;
 
 my $Test = Test::Compile::Internal->new();
@@ -225,20 +224,6 @@ sub pl_file_ok {
     my ($file, $name) = @_;
 
     $name ||= "Compile test for $file";
-
-    # don't "use Devel::CheckOS" because Test::Compile is included by
-    # Module::Install::StandardTests, and we don't want to have to ship
-    # Devel::CheckOS with M::I::T as well.
-    if (Devel::CheckOS->require) {
-
-        # Exclude VMS because $^X doesn't work. In general perl is a symlink to
-        # perlx.y.z but VMS stores symlinks differently...
-        unless (Devel::CheckOS::os_is('OSFeatures::POSIXShellRedirection')
-            and Devel::CheckOS::os_isnt('VMS')) {
-            $Test->skip('Test not compatible with your OS');
-            return;
-        }
-    }
 
     my $ok = $Test->pl_file_compiles($file);
 

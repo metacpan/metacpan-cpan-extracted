@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4::Request;
 
-our $VERSION = '0.7';
+our $VERSION = '0.8';
 
 use Google::RestApi::Setup;
 

@@ -199,6 +199,7 @@ gendata/gen-tcyr	# preparating Unicode::Collate::Locale
 gendata/gen-vi		# preparating Unicode::Collate::Locale
 gendata/gen-zh		# preparating Unicode::Collate::Locale
 gendata/gen-zh2		# preparating Unicode::Collate::Locale
+gendata/rwt_head	# rewriting test headers in t/*.t.
 Makefile.PL
 MANIFEST	MANIFEST for NoXSUB (pure perl)
 MANIFEST.X	# MANIFEST for XSUB

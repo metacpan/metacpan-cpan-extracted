@@ -1,9 +1,9 @@
 package Pod::Weaver::Plugin::Acme::CPANModules;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-13'; # DATE
+our $DATE = '2021-08-21'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-Acme-CPANModules'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -238,7 +238,7 @@ Pod::Weaver::Plugin::Acme::CPANModules - Plugin to use when building Acme::CPANM
 
 =head1 VERSION
 
-This document describes version 0.011 of Pod::Weaver::Plugin::Acme::CPANModules (from Perl distribution Pod-Weaver-Plugin-Acme-CPANModules), released on 2021-08-13.
+This document describes version 0.012 of Pod::Weaver::Plugin::Acme::CPANModules (from Perl distribution Pod-Weaver-Plugin-Acme-CPANModules), released on 2021-08-21.
 
 =head1 SYNOPSIS
 
@@ -264,7 +264,9 @@ For F<Acme/CPANModules/*.pm> files:
 
 =over
 
-=item * Create "MODULES INCLUDED IN THIS ACME::CPANMODULES MODULE" POD section from the list
+=item * Create "ACME::CPANMODULES ENTRIES" POD section from the list
+
+=item * Create "ACME::CPANMODULES FEATURE COMPARISON MATRIX" POD section from the list
 
 =item * Mention some modules in See Also section
 

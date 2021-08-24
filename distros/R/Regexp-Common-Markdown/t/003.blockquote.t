@@ -13,9 +13,9 @@ require( "./t/functions.pl" ) || BAIL_OUT( "Unable to find library \"functions.p
 my $tests = 
 [
     {
-    bquote_all => "> foo\n>\n> > bar\n>\n> foo\n",
-    bquote_other => "> foo\n",
-    test => <<EOT,
+        bquote_all      => "> foo\n>\n> > bar\n>\n> foo\n",
+        bquote_other    => "> foo\n",
+        test            => <<EOT,
 > foo
 >
 > > bar
@@ -25,14 +25,23 @@ EOT
     },
 
     {
-    bquote_all => "> A list within a blockquote:\n> \n> *\tasterisk 1\n> *\tasterisk 2\n> *\tasterisk 3\n",
-    bquote_other => "> *\tasterisk 3\n",
-    test => <<EOT,
+        bquote_all      => "> A list within a blockquote:\n> \n> *\tasterisk 1\n> *\tasterisk 2\n> *\tasterisk 3\n",
+        bquote_other    => "> *\tasterisk 3\n",
+        test            => <<EOT,
 > A list within a blockquote:
 > 
 > *	asterisk 1
 > *	asterisk 2
 > *	asterisk 3
+EOT
+    },
+    
+    {
+        bquote_all  => "> Blockquoted: <http://example.com/>\n\n",
+        test        => <<EOT,
+
+> Blockquoted: <http://example.com/>
+
 EOT
     },
 ];

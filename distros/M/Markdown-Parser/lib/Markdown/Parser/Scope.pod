@@ -1,0 +1,81 @@
+=encoding utf8
+
+=head1 NAME
+
+Markdown::Parser::Scope - Markdown Parser Scope Object Class
+
+=head1 SYNOPSIS
+
+    my $scope = Markdown::Parser::Scope->new( [qw( all extended )] );
+    if( $scope->has( 'paragraph' ) )
+    {
+        # then do something
+    }
+
+=head1 VERSION
+
+    v0.1.0
+
+=head1 DESCRIPTION
+
+This is the Scope object class used by the parser L<Markdown::Parser> to determine what to parse and what to skip. It inherits from L<Module::Generic>
+
+=head1 METHODS
+
+=head2 all
+
+Sets or gets the property to all.
+
+=head2 as_string
+
+Returns a string representation of the scope.
+
+=head2 condition
+
+Sets or gets the condition when checking for scope. Valid value is either C<any> or C<all>. By default, it is set to C<any>. For example:
+
+If condition is set to any, then this:
+
+    [qw( code extended )]
+
+means that it would match any markdown formatting that are either a code or an extended formatting. But if the condition is set to C<all> instead, then the same value will have the scope apply only to extended version of code formatting.
+
+=head2 extended
+
+Sets or gets whether the scope includes extended markdown attributes, ie. any other formatting that is not part of the standard markdown.
+
+=head2 extended_only
+
+Sets or gets whether the scope applies only to extended markdown formattings.
+
+=head2 has
+
+Provided with a scope check and this will check whether it is in scope or not based on the parameters set for this scope object.
+
+=head2 scope
+
+Sets or gets the scope object, which is a L<Module::Generic::Hash> object.
+
+=head1 PRIVATE METHOD
+
+=head2 _set_get_prop
+
+Given a property name, and optional value, and this will set or get this value for this property in the L</scope> hash object.
+
+=head1 SEE ALSO
+
+Markdown original author reference on emphasis: L<https://daringfireball.net/projects/markdown/syntax#em>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2020 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut
+

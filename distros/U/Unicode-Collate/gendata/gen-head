@@ -26,7 +26,7 @@ sub testcount ($$;$) {
 }
 
 sub testhead ($$) {
-    my $loc = shift;
+    my $loc = shift; # no Unicode::Collate::Locale->new() if $loc is false
     my $ok  = shift;
     my $lc = lc $loc;
     my $uc = uc $loc;
@@ -34,14 +34,6 @@ sub testhead ($$) {
 
     my $head = <<'HEADER';
 BEGIN {
-    unless ('A' eq pack('U', 0x41)) {
-	print "1..0 # Unicode::Collate cannot pack a Unicode code point\n";
-	exit 0;
-    }
-    unless (0x41 == unpack('U', 'A')) {
-	print "1..0 # Unicode::Collate cannot get a Unicode code point\n";
-	exit 0;
-    }
     if ($ENV{PERL_CORE}) {
 	chdir('t') if -d 't';
 	@INC = $^O eq 'MacOS' ? qw(::lib) : qw(../lib);
@@ -63,13 +55,21 @@ sub ok (\$;\$) {
     print \$p ? "ok" : "not ok", ' ', ++\$count, "\\n";
 }
 
-use Unicode::Collate::Locale;
+use Unicode::Collate;
 
 ok(1);
 
+sub _pack_U   { Unicode::Collate::pack_U(\@_) }
+sub _unpack_U { Unicode::Collate::unpack_U(\@_) }
+
 #########################
 LOCALE
-    return "\n$head\n$locale\n".testnew($uf, $uc);
+
+    $locale =~ s/(use Unicode::Collate)/${1}::Locale/ if $loc;
+
+    my $retval = "\n$head\n$locale";
+    $retval .= "\n".testnew($uf, $uc) if $loc;
+    return $retval;
 }
 
 sub testnew ($$) {

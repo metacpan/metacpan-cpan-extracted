@@ -1,7 +1,6 @@
 package main;
 
-my $mail;
-my $mail_envelope;
+my ($mail, $mail_envelope, $mail_subject);
 
 sub mail {
     return $mail;
@@ -9,6 +8,11 @@ sub mail {
 
 sub envelope {
     return $mail_envelope;
+}
+
+sub subject {
+    my $subject = ($mail_subject =~ /=\?utf-8\?B\?(.+?)\?=/)[0];
+    return decode_base64($subject);
 }
 
 package Email::Sender::Transport::LLNG::Test;
@@ -22,6 +26,7 @@ extends 'Email::Sender::Transport';
 sub send_email {
     my ( $self, $email, $envelope ) = @_;
     $mail          = $email->get_body;
+    $mail_subject  = $email->get_header("Subject");
     $mail_envelope = $envelope;
     return $self->success;
 }

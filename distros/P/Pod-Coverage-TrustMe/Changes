@@ -1,5 +1,22 @@
 Revision history for Pod-Coverage-TrustMe
 
+0.002000 - 2021-08-20
+  - add BUILDARGS, FOREIGNBUILDARGS, and VERSION to list of private methods
+  - add documentation on what DEFAULT_PRIVATE contains
+  - only check for roles using DOES if it has been overridden
+  - fix trust_pod option
+  - allow =for Pod::Coverage::TrustMe and =for Pod::Coverage::TrustPod to mark
+    trusted methods
+  - improve debug output of tests
+  - renamed trustme option to trust_methods, keeping the old name as an alias
+  - renamed nonwhitespace option to require_content, keeping the old name as
+    an alias
+  - add trust_packages option to list specific packages to trust
+  - improve documentation of defaults
+  - add additional options to pod-cover-trustme script
+  - add tests for interaction with Moo roles
+  - stop using parent.pm in tests to avoid extra prereq
+
 0.001002 - 2021-08-01
   - release as stable
   - remove unused _CvGV method which was explicitly documented as not existing

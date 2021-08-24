@@ -1,3 +1,6 @@
+1.07 2021-08-20
+ - Align rows for RT 5
+
 1.06 2020-07-17
  - Show "Gantt Chart" menu for ticket searches only
  - Fix query stored in session for RT 5

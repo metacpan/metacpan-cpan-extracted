@@ -17,7 +17,7 @@
 
 package Lemonldap::NG::Manager::Build::Tree;
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.13';
 
 # TODO: Missing:
 #  * activeTimer
@@ -64,10 +64,10 @@ sub tree {
                                     form  => 'simpleInputContainer',
                                     nodes => [
                                         'portalCheckLogins',
-                                        'portalDisplayResetPassword',
-                                        'passwordResetAllowedRetries',
                                         'portalDisplayRegister',
-                                        'portalDisplayCertificateResetByMail'
+                                        'portalDisplayCertificateResetByMail',
+                                        'portalDisplayResetPassword',
+                                        'passwordResetAllowedRetries'
                                     ]
                                 },
                                 {
@@ -752,7 +752,9 @@ sub tree {
                                 'registerUrl',
                                 'registerTimeout',
                                 'registerConfirmSubject',
-                                'registerDoneSubject'
+                                'registerConfirmBody',
+                                'registerDoneSubject',
+                                'registerDoneBody'
                             ]
                         },
                         {

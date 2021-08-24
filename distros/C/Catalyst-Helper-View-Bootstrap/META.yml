@@ -1,5 +1,5 @@
 ---
-abstract: 'Helper for Twitter Bootstrap and TT view which builds a skeleton web site'
+abstract: 'Helper for Twitter Bootstrap 5 and TT view which builds a skeleton web site'
 author:
   - 'Ferruccio Zamuner <nonsolosoft@diff.org>'
 build_requires:
@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
+generated_by: 'Module::Install version 1.19'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,4 +31,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ferz/Catalyst--Helper--View--Bootstrap
-version: '0.0013'
+version: '0.0051'

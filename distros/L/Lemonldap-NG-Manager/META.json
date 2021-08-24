@@ -22,6 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Email::Sender" : "0",
             "IO::String" : "0",
             "Regexp::Common" : "0",
             "Test::Pod" : "1"
@@ -40,8 +41,8 @@
             "Convert::PEM" : "0",
             "Crypt::OpenSSL::RSA" : "0",
             "LWP::UserAgent" : "0",
-            "Lemonldap::NG::Common" : "v2.0.12",
-            "Lemonldap::NG::Handler" : "v2.0.12"
+            "Lemonldap::NG::Common" : "v2.0.13",
+            "Lemonldap::NG::Handler" : "v2.0.13"
          }
       }
    },
@@ -57,6 +58,6 @@
       ],
       "x_MailingList" : "mailto:lemonldap-ng-dev@ow2.org"
    },
-   "version" : "v2.0.12",
+   "version" : "v2.0.13",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -6,7 +6,7 @@
 # change 'tests => 1' to 'tests => last_test_to_print';
 
 use strict;
-use Test::More tests => 20;
+use Test::More tests => 22;
 require 't/test.pm';
 BEGIN { use_ok('Lemonldap::NG::Handler::Main::Jail') }
 
@@ -60,7 +60,7 @@ ok(
 ok( $res = &$code, "Function works" );
 ok( $res == 1, 'Get good result' );
 
-$sub  = "sub { return(checkDate('20000101000000+0100','21000101000000+0100')) }";
+$sub = "sub { return(checkDate('20000101000000+0100','21000101000000+0100')) }";
 $code = $jail->jail_reval($sub);
 ok(
     ( defined($code) and ref($code) eq 'CODE' ),
@@ -105,3 +105,11 @@ is(
     "Function works"
 );
 
+$sub  = "sub { return(";
+$code = $jail->jail_reval($sub);
+ok( ( not defined($code) ), 'Syntax error yields undef result' );
+like(
+    $jail->error,
+    qr/Missing right curly or square bracket/,
+    'Found correct error message'
+);

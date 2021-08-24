@@ -1,14 +1,17 @@
 =head1 NAME
 
-B<ospfconvert> - convert OSPF LSDB file to current version
+ospfconvert - convert OSPF LSDB file to current version
 
 =head1 SYNOPSIS
 
-B<ospfconvert> [B<-h>] [F<oldospf.yaml>] [F<ospf.yaml>]
+ospfconvert
+[-h]
+[F<oldospf.yaml>]
+[F<ospf.yaml>]
 
 =head1 DESCRIPTION
 
-B<ospfconvert> takes an OSPF link state database in YAML format and
+ospfconvert takes an OSPF link state database in YAML format and
 converts it to the current L<OSPF::LSDB> version.
 
 Optionally one input and one output file can be given on command
@@ -18,7 +21,7 @@ The options are as follows:
 
 =over 4
 
-=item B<-h>
+=item -h
 
 Show help message and exit.
 

@@ -11,10 +11,13 @@ for my $file (glob('t/corpus/*.pm')) {
   $package =~ s{\.pm\z}{};
   $package =~ s{/|\\}{::}g;
 
-  my $cover = Pod::Coverage::TrustMe->new(package => $package, require_link => 1);
+  my $cover = Pod::Coverage::TrustMe->new(
+    package => $package,
+    require_link => 1,
+  );
 
-  is $cover->coverage, 1,
-    "$file is covered";
+  is $cover->coverage, 1, "$file is covered"
+    or diag $cover->report;
 }
 
 done_testing;

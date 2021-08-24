@@ -1,0 +1,9 @@
+POST:
+  https://www.googleapis.com/drive/v3/files/fake_spreadsheet_id1/copy:
+    response: |
+      {
+        "kind": "drive#file",
+        "id": "fake_spreadsheet_id1",
+        "name": "fake_spreadsheet_id1_copy",
+        "mimeType": "application/vnd.google-apps.spreadsheet"
+      }

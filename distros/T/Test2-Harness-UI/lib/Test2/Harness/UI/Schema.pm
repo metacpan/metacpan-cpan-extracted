@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp qw/confess/;
 
-our $VERSION = '0.000075';
+our $VERSION = '0.000077';
 
 use base 'DBIx::Class::Schema';
 
@@ -26,11 +26,13 @@ require Test2::Harness::UI::Schema::Result::Email;
 require Test2::Harness::UI::Schema::Result::EmailVerificationCode;
 require Test2::Harness::UI::Schema::Result::Event;
 require Test2::Harness::UI::Schema::Result::Job;
+require Test2::Harness::UI::Schema::Result::JobField;
 require Test2::Harness::UI::Schema::Result::LogFile;
 require Test2::Harness::UI::Schema::Result::Permission;
 require Test2::Harness::UI::Schema::Result::PrimaryEmail;
 require Test2::Harness::UI::Schema::Result::Project;
 require Test2::Harness::UI::Schema::Result::Run;
+require Test2::Harness::UI::Schema::Result::RunField;
 require Test2::Harness::UI::Schema::Result::SessionHost;
 require Test2::Harness::UI::Schema::Result::Session;
 require Test2::Harness::UI::Schema::Result::User;

@@ -1,5 +1,9 @@
 Revision history for Tickit-Async
 
+0.25    2021-08-19
+        [CHANGES]
+         * Also wrap the new signal and process watches from Tickit 0.72
+
 0.24    2020-06-06
         [CHANGES]
          * Updated for Tickit 0.71 / libtickit 0.4

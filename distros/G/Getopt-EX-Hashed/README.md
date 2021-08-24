@@ -5,7 +5,7 @@ Getopt::EX::Hashed - Hash store object automation
 
 # VERSION
 
-Version 0.9913
+Version 0.9916
 
 # SYNOPSIS
 
@@ -17,7 +17,8 @@ Version 0.9913
     use Getopt::EX::Hashed;
     has start  => ( spec => "=i s begin", default => 1 );
     has end    => ( spec => "=i e" );
-    has file   => ( spec => "=s", is => 'rw' );
+    has file   => ( spec => "=s", is => 'rw', re => qr/^(?!\.)/ );
+    has score  => ( spec => '=i', min => 0, max => 100 );
     has answer => ( spec => '=i', must => sub { $_[1] == 42 } );
     no  Getopt::EX::Hashed;
 
@@ -40,7 +41,7 @@ In the current implementation, using **Getopt::Long**, or compatible
 module such as **Getopt::EX::Long** is assumed.  It is configurable,
 but no other module is supported now.
 
-Accessor methods are automatically generated when appropiate parameter
+Accessor methods are automatically generated when appropriate parameter
 is given.
 
 # FUNCTION
@@ -62,10 +63,15 @@ current value.
 
 Following parameters are available.
 
-- **is** => _ro_ | _rw_
+- **is** => `ro` | `rw`
 
-    If an **is** parameter is given, accessor method for the member,
-    read-only for _ro_ and read-write for _rw_, is generated.
+    To produce accessor method, `is` parameter is necessary.  Set the
+    value `ro` for read-only, `rw` for read-write.
+
+    If you want to make accessor for all following members, use
+    `configure` and set `DEFAULT` parameter.
+
+        Getopt::EX::Hashed->configure( DEFAULT => is => 'rw' );
 
 - **spec** => _string_
 
@@ -100,7 +106,7 @@ Following parameters are available.
 - **alias** => _string_
 
     Additional alias names can be specified by **alias** parameter too.
-    There is no difference with ones in **spec** parameter.
+    There is no difference with ones in `spec` parameter.
 
 - **default** => _value_
 
@@ -109,8 +115,8 @@ Following parameters are available.
 
 - **action** => _coderef_
 
-    Parameter **action** takes code reference which is called to process
-    the option.  When called, hash object is passed through `$_`.
+    Parameter `action` takes code reference which is called to process
+    the option.  When called, hash object is passed as `$_`.
 
         has [ qw(left right both) ] => spec => '=i';
         has "+both" => action => sub {
@@ -125,21 +131,32 @@ Following parameters are available.
             push @{$_->{ARGV}}, $_[0];
         };
 
-    In fact, **default** parameter takes code reference too.  It is stored
+    In fact, `default` parameter takes code reference too.  It is stored
     in the hash object and the code works almost same.  But the hash value
     can not be used for option storage.
 
+Following parameters are all for data validation.  First `must` is a
+generic validator and can implement anything.  Others are shorthand
+for common rules.
+
 - **must** => _coderef_
 
-    Parameter **must** takes a code reference to validate option values.
-    It takes same arguments as **action** and returns boolean.  With next
+    Parameter `must` takes a code reference to validate option values.
+    It takes same arguments as `action` and returns boolean.  With next
     example, option **--answer** takes only 42 as a valid value.
 
         has answer =>
             spec => '=i',
             must => sub { $_[1] == 42 };
 
-    Can be used with **action** parameter.
+- **min** => _number_
+- **max** => _number_
+
+    Set the minimum and maximum limit for the argument.
+
+- **re** => qr/_pattern_/
+
+    Set the required regular expression pattern for the argument.
 
 # METHOD
 
@@ -147,9 +164,15 @@ Following parameters are available.
 
     Class method to get initialized hash object.
 
-- **configure**
+- **optspec**
 
-    There should be some configurable variables, but not fixed yet.
+    Return option specification list which can be given to `GetOptions`
+    function.
+
+        GetOptions($obj->optspec)
+
+    `GetOptions` has a capability of storing values in a hash, by giving
+    the hash reference as a first argument, but it is not necessary.
 
 - **getopt**
 
@@ -162,16 +185,10 @@ Following parameters are available.
 
         GetOptions($obj->optspec)
 
-- **optspec**
-
-    Return option specification list which can be given to `GetOptions`
-    function.  GetOptions has a capability of storing values in a hash, by
-    giving the hash reference as a first argument, but it is not expected.
-
 - **use\_keys**
 
     Because hash keys are protected by `Hash::Util::lock_keys`, accessing
-    non-existing member causes an error.  Use this function to declare new
+    non-existent member causes an error.  Use this function to declare new
     member key before use.
 
         $obj->use_keys( qw(foo bar) );
@@ -181,19 +198,51 @@ Following parameters are available.
         use Hash::Util 'unlock_keys';
         unlock_keys %{$obj};
 
+    You can change this behavior by `configure` with `LOCK_KEYS`
+    parameter.
+
+- **configure** **label** => _value_, ...
+
+    There are following configuration parameters.
+
+    - **LOCK\_KEYS** (default: 1)
+
+        Lock hash keys.  This avoids accidental access to non-existent hash
+        entry.
+
+    - **REPLACE\_UNDERSCORE** (default: 1)
+
+        Produce alias with underscores replaced by dash.
+
+    - **REMOVE\_UNDERSCORE** (default: 0)
+
+        Produce alias with underscores removed.
+
+    - **GETOPT** (default: 'GetOptions')
+
+        Set function name called from `getopt` method.
+
+    - **ACCESSOR\_PREFIX**
+
+        When specified, it is prepended to the member name to make accessor
+        method.  If `ACCESSOR_PREFIX` is defined as `opt_`, accessor for
+        member `file` will be `opt_file`.
+
+    - **DEFAULT**
+
+        Set default parameters.  At the call for `has`, DEFAULT parameters
+        are inserted before argument parameters.  So if both include same
+        parameter, later one in argument list has precedence.  Incremental
+        call with `+` is not affected.
+
+        Typical use of DEFAULT is `is` to prepare accessor method for all
+        following hash entries.  Declare `is => ''` to reset.
+
+            Getopt::EX::Hashed->configure(is => 'ro');
+
 - **reset**
 
-    Reset the class to original state.  Because the hash object keeps all
-    information, this does not effect to the existing object.  It returns
-    the object itself, so you can reset the class after creating a object
-    like this:
-
-        my $obj = Getopt::EX::Hashed->new->reset;
-
-    This is almost equivalent to the next code:
-
-        my $obj = Getopt::EX::Hashed->new;
-        Getopt::EX::Hashed->reset;
+    Reset the class to the original state.
 
 # SEE ALSO
 

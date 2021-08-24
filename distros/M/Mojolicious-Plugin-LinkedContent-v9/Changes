@@ -1,6 +1,10 @@
 Changelog for Mojolicious-Plugin-LinkedContent-v9
 
-0.09 2021-08-19T13:12:07
+0.10 2021-08-20T13:51:10
+ - Add prerequisites for download default linked_config.cfg via https
+ - [Minor] documentation revision
+
+0.09 2021-08-19T13:08:35
  - [Minor] Updated dependencies
  - First import
  - Initial commit

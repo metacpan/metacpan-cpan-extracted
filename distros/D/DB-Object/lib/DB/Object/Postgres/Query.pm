@@ -31,8 +31,10 @@ sub init
 {
     my $self = shift( @_ );
     $self->{having} = '';
+    $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ );
     $self->{binded_having} = [];
+    $self->{query_reset_keys} = [qw( alias binded binded_values binded_where binded_limit binded_group binded_having binded_order from_unixtime group_by limit local _on_conflict on_conflict order_by reverse sorted unix_timestamp where )];
     return( $self );
 }
 
@@ -114,7 +116,7 @@ sub format_statement
     my $fields = '';
     my $values = '';
     my $base_class = $self->base_class;
-    $self->message( 3, "Saved arguments (never mind the surrounding quotes) are: '", join( "', '", @$args ), "'." );
+    $self->message( 3, "Saved arguments (never mind the surrounding quotes) are: '", sub{ join( "', '", @$args ) }, "'." );
     $from_unix = $self->{_from_unix};
     if( !%$from_unix )
     {
@@ -155,7 +157,7 @@ sub format_statement
         }
     }
     @sorted = sort{ $order->{ $a } <=> $order->{ $b } } keys( %$order ) if( !@sorted );
-    # $self->message( 3, "Sorted fields are: '", join( "', '", @sorted ), "'." );
+    $self->message( 3, "Sorted fields are: '", sub{ join( "', '", @sorted ) }, "'." );
     # Used for insert or update so that execute can take a hash of key => value pair and we would bind the values in the right order
     # But or that we need to know the order of the fields.
     $self->{sorted} = \@sorted;
@@ -222,18 +224,18 @@ sub format_statement
             {
                 if( lc( $types->{ $_ } ) eq 'bytea' )
                 {
-                    push( @format_values, $tbl_o->quote( $value, DBD::Pg::PG_BYTEA ) );
+                    push( @format_values, $tbl_o->database_object->quote( $value, DBD::Pg::PG_BYTEA ) );
                 }
                 # Value is a hash and the data type is json, so we transform this value into a json data
                 elsif( $self->_is_hash( $value ) && ( lc( $types->{ $_ } ) eq 'jsonb' || lc( $types->{ $_ } ) eq 'json' ) )
                 {
                     my $this_json = $self->_encode_json( $value );
-                    push( @format_values, $tbl_o->quote( $this_json, ( lc( $types->{ $_ } ) eq 'jsonb' ? DBD::Pg::PG_JSONB : DBD::Pg::PG_JSON ) ) );
+                    push( @format_values, $tbl_o->database_object->quote( $this_json, ( lc( $types->{ $_ } ) eq 'jsonb' ? DBD::Pg::PG_JSONB : DBD::Pg::PG_JSON ) ) );
                 }
                 else
                 {
                     # push( @format_values, sprintf( "'%s'", quotemeta( $value ) ) );
-                    push( @format_values, sprintf( "%s", $tbl_o->quote( $value ) ) );
+                    push( @format_values, sprintf( "%s", $tbl_o->database_object->quote( $value ) ) );
                 }
             }
             # We do this before testing for param binding because DBI puts quotes around SET number :-(
@@ -267,11 +269,11 @@ sub format_statement
                 # push( @format_values, "'" . quotemeta( $value ) . "'" );
                 if( lc( $types->{ $_ } ) eq 'bytea' )
                 {
-                    push( @format_values, $tbl_o->quote( $value, DBD::Pg::PG_BYTEA ) );
+                    push( @format_values, $tbl_o->database_object->quote( $value, DBD::Pg::PG_BYTEA ) );
                 }
                 else
                 {
-                    push( @format_values, $tbl_o->quote( $value ) );
+                    push( @format_values, $tbl_o->database_object->quote( $value ) );
                 }
             }
         }
@@ -356,7 +358,8 @@ sub on_conflict
             return( $self->error( "PostgreSQL version is $ver, but version 9.5 or higher is required to use this on conflict clause." ) );
         }
         $opts = $self->_get_args_as_hash( @_ );
-#         $self->message( 3, "Option are: ", sub{ $self->dump( $opts ) } );
+        # XXX Comment out once debugged
+        # $self->message( 3, "Option are: ", sub{ $self->dump( $opts ) } );
         my $hash = {};
         my @comp = ( 'ON CONFLICT' );
         if( $opts->{target} )
@@ -397,6 +400,8 @@ sub on_conflict
         # action => update
         if( $opts->{action} )
         {
+            # XXX Comment out or remove once debugged
+            # $self->message( 3, "on conflict action is $opts->{action}." );
             if( $opts->{action} eq 'update' )
             {
                 $hash->{action} = $opts->{action};
@@ -404,6 +409,8 @@ sub on_conflict
                 # No fields provided, so we take it from the initial insert and build the update list instead
                 if( !$opts->{fields} )
                 {
+                    # XXX Comment out or remove once debugged
+                    # $self->message( 3, "No fields explicitly provided, re-using insert's parameters. Setting a callback code to that effect." );
                     # The insert will have triggered a getdefault() which stores the parameters into a _args object fields
 #                     my $f_ref = $self->{ '_args' };
 #                     $self->message( 3, "Re-using the insert query parameters: ", join( ', ', @$f_ref ) );
@@ -412,7 +419,7 @@ sub on_conflict
                     $self->{_on_conflict_callback} = sub
                     {
                         my $f_ref = $self->{_args};
-                        $self->message( 3, "Re-using the insert query parameters: ", join( ', ', @$f_ref ) );
+                        $self->message( 3, "Re-using the insert query parameters: ", sub{ join( ', ', @$f_ref ) } );
                         # Need to account for placeholders
                         # Let's check values only
                         # XXX The format_update call already does add the binded types
@@ -440,6 +447,8 @@ sub on_conflict
                         CORE::delete( $self->{_on_conflict_callback} );
                     };
                     # Return empty, not undef; undef is error
+                    # XXX Comment out or remove once debugged
+                    # $self->message( 3, "Returning empty string." );
                     return( '' );
                 }
                 return( $self->error( "Fields property to update for on conflict do update clause is not a hash reference nor an array of fields." ) ) if( !$self->_is_hash( $opts->{fields} ) && !$self->_is_array( $opts->{fields} ) && !$self->{_on_conflict_callback} );
@@ -471,7 +480,7 @@ sub on_conflict
             
                 foreach my $k ( sort( keys( %{$opts->{fields}} ) ) )
                 {
-                    push( @$q, sprintf( '%s = %s', $k, ref( $opts->{fields}->{ $k } ) eq 'SCALAR' ? ${$opts->{fields}->{ $k }} : $tbl_o->quote( $opts->{fields}->{ $k } ) ) );
+                    push( @$q, sprintf( '%s = %s', $k, ref( $opts->{fields}->{ $k } ) eq 'SCALAR' ? ${$opts->{fields}->{ $k }} : $tbl_o->database_object->quote( $opts->{fields}->{ $k } ) ) );
                 }
                 if( scalar( @$q ) )
                 {
@@ -480,7 +489,7 @@ sub on_conflict
                 }
                 else
                 {
-                    return( $self->error( "A on conflict do update clause was specified, but I could not get a list of fields to update." ) );
+                    return( $self->error( "An on conflict do update clause was specified, but I could not get a list of fields to update." ) );
                 }
             }
             elsif( $opts->{action} eq 'nothing' || $opts->{action} eq 'ignore' )
@@ -519,7 +528,7 @@ sub reset
     my $self = shift( @_ );
     if( !$self->{query_reset} )
     {
-        my $keys = [qw( alias local binded binded_values binded_where binded_limit binded_group binded_having binded_order where limit group_by on_conflict _on_conflict order_by reverse from_unixtime unix_timestamp sorted )];
+        my $keys = [qw( alias binded binded_values binded_where binded_limit binded_group binded_having binded_order  from_unixtime group_by limit local _on_conflict on_conflict order_by reverse sorted unix_timestamp where )];
         CORE::delete( @$self{ @$keys } );
         $self->{query_reset}++;
         $self->{enhance} = 1;
@@ -559,7 +568,17 @@ sub _query_components
 {
     my $self = shift( @_ );
     my $type = lc( shift( @_ ) ) || $self->_query_type() || return( $self->error( "You must specify a query type: select, insert, update or delete" ) );
+    my $opts = $self->_get_args_as_hash( @_ );
+    # ok options:
+    # no_bind_copy: because join for example does it already and this would duplicate the binded types, so we use this option to tell this method to set an exception. Kind of a hack that needs clean-up in the future from a design point of view.
+    $opts->{no_bind_copy} //= 0;
     my( $where, $group, $having, $sort, $order, $limit, $returning, $on_conflict );
+    if( $self->debug )
+    {
+        my $trace = $self->_get_stack_trace;
+        $self->message( 3, "Stack trace is: ", $trace->as_string );
+    }
+    
     $where  = $self->where();
     if( $type eq "select" )
     {
@@ -576,8 +595,8 @@ sub _query_components
     push( @query, "WHERE $where" ) if( $where && $type ne 'insert' );
     if( $where->bind->types->length )
     {
-        $self->messagef( 3, "Adding binded type from the where clause to the overall %d binded types.", $where->bind->types->length, $self->binded_types->length );
-        $self->binded_types->push( $where->bind->types->list );
+        $self->messagef( 3, "Adding %d binded type from the where clause ($where) from table '%s' to the overall %d binded types. no_bind_copy value is '$opts->{no_bind_copy}'", $where->bind->types->length, $where->query_object->table_object->name, $self->binded_types->length );
+        $self->binded_types->push( $where->bind->types->list ) unless( $opts->{no_bind_copy} );
     }
     push( @query, "GROUP BY $group" ) if( $group && $type eq 'select'  );
     push( @query, "HAVING $having" ) if( $having && $type eq 'select'  );
@@ -588,8 +607,8 @@ sub _query_components
         push( @query, "$limit" );
         if( $limit->bind->types->length )
         {
-            $self->messagef( 3, "Adding binded type from the limit clause to the overall %d binded types.", $limit->bind->types->length, $self->binded_types->length );
-            $self->binded_types->push( $limit->bind->types->list );
+            $self->messagef( 3, "Adding %d binded type from the limit clause to the overall %d binded types. no_bind_copy value is '$opts->{no_bind_copy}'", $limit->bind->types->length, $self->binded_types->length );
+            $self->binded_types->push( $limit->bind->types->list ) unless( $opts->{no_bind_copy} );
         }
     }
     if( $on_conflict )

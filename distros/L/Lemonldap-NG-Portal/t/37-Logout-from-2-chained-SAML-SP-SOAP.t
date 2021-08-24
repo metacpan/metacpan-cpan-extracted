@@ -6,11 +6,10 @@ use LWP::UserAgent;
 use LWP::Protocol::PSGI;
 use MIME::Base64;
 
-
 # ------------      -----------------------------     ----------------
 # | SAML SP  |  <-> |SAML IDP + SAML SP (proxy) | <-> | SAML IdP     |
 # ------------      -----------------------------     ----------------
-# 
+#
 # Use case:
 # - login from SP up to SAML IdP
 # - logout asked from SP, and propagated up to SAML IdP
@@ -30,7 +29,8 @@ my ( $sp, $proxy, $idp, $res );
 LWP::Protocol::PSGI->register(
     sub {
         my $req = Plack::Request->new(@_);
-        ok( $req->uri =~ m#http://auth.((?:sp|proxy|idp)).com(.*)#, ' REST request' );
+        ok( $req->uri =~ m#http://auth.((?:sp|proxy|idp)).com(.*)#,
+            ' REST request' );
         my $host = $1;
         my $url  = $2;
         my ( $res, $client );
@@ -74,15 +74,17 @@ LWP::Protocol::PSGI->register(
             );
         }
         ok( $res->[0] == 200, '  Response is 200' );
-        ok( getHeader( $res, 'Content-Type' ) =~ m#^(application/json|text/xml)#,
-            '  Content is JSON|XML' )
-          or explain( $res->[1], 'Content-Type => (application/json|text/xml)' );
+        ok(
+            getHeader( $res, 'Content-Type' ) =~
+              m#^(application/json|text/xml)#,
+            '  Content is JSON|XML'
+          )
+          or
+          explain( $res->[1], 'Content-Type => (application/json|text/xml)' );
         count(4);
         return $res;
     }
 );
-
-
 
 SKIP: {
     eval "use Lasso";
@@ -91,10 +93,9 @@ SKIP: {
     }
 
     # Initialization
-    $idp = register( 'idp', \&idp );
-    $sp = register( 'sp', \&sp );
+    $idp   = register( 'idp',   \&idp );
+    $sp    = register( 'sp',    \&sp );
     $proxy = register( 'proxy', \&proxy );
-
 
     # LOGIN PROCESS ############################################################
 
@@ -120,14 +121,16 @@ SKIP: {
 
     # Try to authenticate to IdP
     ok(
-        $res = $idp->_get( $urlidp, query => $queryidp, accept => 'text/html'),
-            "SAML Authentication on idp,        endpoint $urlidp" );
+        $res = $idp->_get( $urlidp, query => $queryidp, accept => 'text/html' ),
+        "SAML Authentication on idp,        endpoint $urlidp"
+    );
     my $pdataidp = expectCookie( $res, 'lemonldappdata' );
 
     my ( $host, $tmp );
+
     # expectForm (result, host, uri, @requiredfield)
     ( $host, $tmp, $query ) = expectForm( $res, '#', undef,
-                   ( 'url', 'timezone', 'skin', 'user', 'password' ) );
+        ( 'url', 'timezone', 'skin', 'user', 'password' ) );
     $query =~ s/user=/user=dwho/;
     $query =~ s/password=/password=dwho/;
 
@@ -166,18 +169,23 @@ SKIP: {
     $pdataproxy = expectCookie( $res, 'lemonldappdata' );
     my $cookieproxy = expectCookie( $res, 'lemonldap' );
 
-    ( $url, $query ) = expectRedirection( $res, qr#^http://auth.proxy.com(/saml)\?*(.*)$# );
+    ( $url, $query ) =
+      expectRedirection( $res, qr#^http://auth.proxy.com(/saml)\?*(.*)$# );
     ok(
-        $res = $proxy->_get( $url,
-                             query => $query,
-                             accept => 'text/html',
-                             cookie => "lemonldappdata=$pdataproxy; lemonldap=$cookieproxy" ),
-            "internal redirection to PROXY,        endpoint $url" );
+        $res = $proxy->_get(
+            $url,
+            query  => $query,
+            accept => 'text/html',
+            cookie => "lemonldappdata=$pdataproxy; lemonldap=$cookieproxy"
+        ),
+        "internal redirection to PROXY,        endpoint $url"
+    );
 
     ( $host, $url, $query ) =
-      expectForm( $res, 'auth.sp.com', '/saml/proxySingleSignOnPost', 'SAMLResponse' );
+      expectForm( $res, 'auth.sp.com', '/saml/proxySingleSignOnPost',
+        'SAMLResponse' );
 
-    my ($resp) = $query =~ qr/SAMLResponse=([^&]*)/;
+    ($resp) = $query =~ qr/SAMLResponse=([^&]*)/;
 
     # Post SAML response to PROXY
     switch ('sp');
@@ -192,48 +200,58 @@ SKIP: {
 
     my $cookiesp = expectCookie( $res, 'lemonldap' );
 
-
     # Authentication done on SP + PROXY + IDP
 
-
     # LOGOUT PROCESS ###########################################################
-    $url = '/';
+    $url   = '/';
     $query = 'logout=1';
-    ok( $res = $sp->_get( $url, query => $query,
-                                accept => 'text/html',
-                                cookie => "lemonldap=$cookiesp",
-                        ),
-        'Call logout from SP' );
+    ok(
+        $res = $sp->_get(
+            $url,
+            query  => $query,
+            accept => 'text/html',
+            cookie => "lemonldap=$cookiesp",
+        ),
+        'Call logout from SP'
+    );
 
     # lemonldap cookie set to "0"
     $cookiesp = expectCookie( $res, 'lemonldap' );
     ok( $cookiesp eq "0", 'Test empty cookie on SP' );
 
-    ok ( $res->[2]->[0] =~ /trmsg="47"/, 'Test disconnexion message on SP' );
-
+    ok( $res->[2]->[0] =~ /trmsg="47"/, 'Test disconnexion message on SP' );
 
     # test connexion on PROXY
-    switch('proxy');
-    ok( $res = $proxy->_get( '/', query => '',
-                                accept => 'text/html',
-                                cookie => "lemonldap=$cookieproxy",
-                        ),
-        'Test if still logged on PROXY' );
+    switch ('proxy');
+    ok(
+        $res = $proxy->_get(
+            '/',
+            query  => '',
+            accept => 'text/html',
+            cookie => "lemonldap=$cookieproxy",
+        ),
+        'Test if still logged on PROXY'
+    );
 
-    my ( $urlidp, $queryidp ) =
+    ( $urlidp, $queryidp ) =
       expectRedirection( $res,
         qr#http://auth.idp.com(/saml/singleSignOn)\?(.*)$# );
 
     # test connexion on IDP
-    switch('idp');
-    ok( $res = $idp->_get( '/', query => '',
-                                accept => 'text/html',
-                                cookie => "lemonldap=$cookieidp",
-                        ),
-        'Test if still logged on IDP' );
+    switch ('idp');
+    ok(
+        $res = $idp->_get(
+            '/',
+            query  => '',
+            accept => 'text/html',
+            cookie => "lemonldap=$cookieidp",
+        ),
+        'Test if still logged on IDP'
+    );
 
-    like( $res->[2]->[0], qr/userfield/,
-       'test presence of user field in form (prove successful logout)' );
+    like( $res->[2]->[0],
+        qr/userfield/,
+        'test presence of user field in form (prove successful logout)' );
 
 }
 
@@ -259,80 +277,83 @@ sub proxy {
                 samlServicePublicKeyEnc     => saml_key_proxy_public_enc,
                 samlServicePublicKeySig     => saml_key_proxy_public_sig,
                 samlIDPSSODescriptorWantAuthnRequestsSigned => 1,
-                samlSPSSODescriptorWantAssertionsSigned => 1,
-                samlIDPMetaDataXML           => {
+                samlSPSSODescriptorWantAssertionsSigned     => 1,
+                samlIDPMetaDataXML                          => {
                     'idp' => {
-                        samlIDPMetaDataXML => 
-                          samlIDPComplexMetaDataXML( 'idp', 'HTTP-Redirect', 'SOAP' )
+                        samlIDPMetaDataXML => samlIDPComplexMetaDataXML(
+                            'idp', 'HTTP-Redirect', 'SOAP'
+                        )
                     },
                 },
                 samlIDPMetaDataOptions => {
                     'idp' => {
-                        'samlIDPMetaDataOptionsAdaptSessionUtime' => 0,
-                        'samlIDPMetaDataOptionsAllowLoginFromIDP' => 0,
-                        'samlIDPMetaDataOptionsAllowProxiedAuthn' => 0,
-                        'samlIDPMetaDataOptionsCheckAudience' => 1,
+                        'samlIDPMetaDataOptionsAdaptSessionUtime'        => 0,
+                        'samlIDPMetaDataOptionsAllowLoginFromIDP'        => 0,
+                        'samlIDPMetaDataOptionsAllowProxiedAuthn'        => 0,
+                        'samlIDPMetaDataOptionsCheckAudience'            => 1,
                         'samlIDPMetaDataOptionsCheckSLOMessageSignature' => 1,
                         'samlIDPMetaDataOptionsCheckSSOMessageSignature' => 1,
-                        'samlIDPMetaDataOptionsCheckTime' => 1,
-                        'samlIDPMetaDataOptionsDisplayName' => 'idp',
-                        'samlIDPMetaDataOptionsEncryptionMode' => 'none',
-                        'samlIDPMetaDataOptionsForceAuthn' => 0,
-                        'samlIDPMetaDataOptionsForceUTF8' => 0,
-                        'samlIDPMetaDataOptionsIcon' => '',
-                        'samlIDPMetaDataOptionsIsPassive' => 0,
-                        'samlIDPMetaDataOptionsNameIDFormat' => '',
-                        'samlIDPMetaDataOptionsRelayStateURL' => 0,
+                        'samlIDPMetaDataOptionsCheckTime'                => 1,
+                        'samlIDPMetaDataOptionsDisplayName'           => 'idp',
+                        'samlIDPMetaDataOptionsEncryptionMode'        => 'none',
+                        'samlIDPMetaDataOptionsForceAuthn'            => 0,
+                        'samlIDPMetaDataOptionsForceUTF8'             => 0,
+                        'samlIDPMetaDataOptionsIcon'                  => '',
+                        'samlIDPMetaDataOptionsIsPassive'             => 0,
+                        'samlIDPMetaDataOptionsNameIDFormat'          => '',
+                        'samlIDPMetaDataOptionsRelayStateURL'         => 0,
                         'samlIDPMetaDataOptionsRequestedAuthnContext' => '',
-                        'samlIDPMetaDataOptionsResolutionRule' => '',
+                        'samlIDPMetaDataOptionsResolutionRule'        => '',
                         'samlIDPMetaDataOptionsSLOBinding' => 'http-soap',
                         'samlIDPMetaDataOptionsSSOBinding' => 'http-redirect',
-                        'samlIDPMetaDataOptionsSignSLOMessage' => 1,
-                        'samlIDPMetaDataOptionsSignSSOMessage' => 1,
+                        'samlIDPMetaDataOptionsSignSLOMessage'  => 1,
+                        'samlIDPMetaDataOptionsSignSSOMessage'  => 1,
                         'samlIDPMetaDataOptionsSignatureMethod' => '',
-                        'samlIDPMetaDataOptionsStoreSAMLToken' => 0
+                        'samlIDPMetaDataOptionsStoreSAMLToken'  => 0
                     }
                 },
                 samlIDPMetaDataExportedAttributes => {
-                        'idp' => {
-                           'cn' => '1;cn',
-                           'uid' => '1;uid',
-                           'mail' => '1;mail',
-                        }
+                    'idp' => {
+                        'cn'   => '1;cn',
+                        'uid'  => '1;uid',
+                        'mail' => '1;mail',
+                    }
                 },
 
-                issuerDBSAMLActivation            => 1,
-                restSessionServer                 => 1,
-                samlSPMetaDataOptions => {
+                issuerDBSAMLActivation => 1,
+                restSessionServer      => 1,
+                samlSPMetaDataOptions  => {
                     sp => {
                         'samlSPMetaDataOptionsCheckSLOMessageSignature' => 1,
                         'samlSPMetaDataOptionsCheckSSOMessageSignature' => 1,
-                        'samlSPMetaDataOptionsEnableIDPInitiatedURL' => 0,
-                        'samlSPMetaDataOptionsEncryptionMode' => 'none',
-                        'samlSPMetaDataOptionsForceUTF8' => 1,
-                        'samlSPMetaDataOptionsNameIDFormat' => '',
+                        'samlSPMetaDataOptionsEnableIDPInitiatedURL'    => 0,
+                        'samlSPMetaDataOptionsEncryptionMode'      => 'none',
+                        'samlSPMetaDataOptionsForceUTF8'           => 1,
+                        'samlSPMetaDataOptionsNameIDFormat'        => '',
                         'samlSPMetaDataOptionsNotOnOrAfterTimeout' => 72000,
-                        'samlSPMetaDataOptionsOneTimeUse' => 0,
-                        'samlSPMetaDataOptionsSessionNotOnOrAfterTimeout' => 72000,
-                        'samlSPMetaDataOptionsSignSLOMessage' => -1,
-                        'samlSPMetaDataOptionsSignSSOMessage' => 1,
+                        'samlSPMetaDataOptionsOneTimeUse'          => 0,
+                        'samlSPMetaDataOptionsSessionNotOnOrAfterTimeout' =>
+                          72000,
+                        'samlSPMetaDataOptionsSignSLOMessage'  => -1,
+                        'samlSPMetaDataOptionsSignSSOMessage'  => 1,
                         'samlSPMetaDataOptionsSignatureMethod' => ''
                     }
                 },
                 samlSPMetaDataXML => {
                     sp => {
-                        samlSPMetaDataXML =>
-                         samlSPComplexMetaDataXML( 'sp', 'HTTP-Redirect', 'SOAP' ),
-                        'samlSPSSODescriptorAuthnRequestsSigned' => 1,
+                        samlSPMetaDataXML => samlSPComplexMetaDataXML(
+                            'sp', 'HTTP-Redirect', 'SOAP'
+                        ),
+                        'samlSPSSODescriptorAuthnRequestsSigned'  => 1,
                         'samlSPSSODescriptorWantAssertionsSigned' => 1,
                     }
                 },
                 samlSPMetaDataExportedAttributes => {
-                        'sp' => {
-                           'cn' => '1;cn',
-                           'uid' => '1;uid',
-                           'mail' => '1;mail',
-                        }
+                    'sp' => {
+                        'cn'   => '1;cn',
+                        'uid'  => '1;uid',
+                        'mail' => '1;mail',
+                    }
                 },
                 samlSPSSODescriptorAuthnRequestsSigned => 1,
             },
@@ -349,54 +370,55 @@ sub sp {
                 authentication                  => 'SAML',
                 userDB                          => 'Same',
                 issuerDBOpenIDConnectActivation => "1",
-                samlOrganizationDisplayName => "SP",
-                samlOrganizationName        => "SP",
-                samlOrganizationURL         => "http://www.sp.com/",
-                samlServicePrivateKeyEnc    => saml_key_sp_private_enc,
-                samlServicePrivateKeySig    => saml_key_sp_private_sig,
-                samlServicePublicKeyEnc     => saml_key_sp_public_enc,
-                samlServicePublicKeySig     => saml_key_sp_public_sig,
+                samlOrganizationDisplayName     => "SP",
+                samlOrganizationName            => "SP",
+                samlOrganizationURL             => "http://www.sp.com/",
+                samlServicePrivateKeyEnc        => saml_key_sp_private_enc,
+                samlServicePrivateKeySig        => saml_key_sp_private_sig,
+                samlServicePublicKeyEnc         => saml_key_sp_public_enc,
+                samlServicePublicKeySig         => saml_key_sp_public_sig,
                 samlIDPSSODescriptorWantAuthnRequestsSigned => 1,
-                samlSPSSODescriptorWantAssertionsSigned => 1,
-                samlIDPMetaDataXML           => {
+                samlSPSSODescriptorWantAssertionsSigned     => 1,
+                samlIDPMetaDataXML                          => {
                     'proxy' => {
-                        samlIDPMetaDataXML =>
-                          samlProxyComplexMetaDataXML( 'proxy', 'HTTP-Redirect', 'SOAP' )
+                        samlIDPMetaDataXML => samlProxyComplexMetaDataXML(
+                            'proxy', 'HTTP-Redirect', 'SOAP'
+                        )
                     },
                 },
                 samlIDPMetaDataOptions => {
                     'proxy' => {
-                        'samlIDPMetaDataOptionsAdaptSessionUtime' => 0,
-                        'samlIDPMetaDataOptionsAllowLoginFromIDP' => 0,
-                        'samlIDPMetaDataOptionsAllowProxiedAuthn' => 0,
-                        'samlIDPMetaDataOptionsCheckAudience' => 1,
+                        'samlIDPMetaDataOptionsAdaptSessionUtime'        => 0,
+                        'samlIDPMetaDataOptionsAllowLoginFromIDP'        => 0,
+                        'samlIDPMetaDataOptionsAllowProxiedAuthn'        => 0,
+                        'samlIDPMetaDataOptionsCheckAudience'            => 1,
                         'samlIDPMetaDataOptionsCheckSLOMessageSignature' => 1,
                         'samlIDPMetaDataOptionsCheckSSOMessageSignature' => 1,
-                        'samlIDPMetaDataOptionsCheckTime' => 1,
-                        'samlIDPMetaDataOptionsDisplayName' => 'proxy',
+                        'samlIDPMetaDataOptionsCheckTime'                => 1,
+                        'samlIDPMetaDataOptionsDisplayName'    => 'proxy',
                         'samlIDPMetaDataOptionsEncryptionMode' => 'none',
-                        'samlIDPMetaDataOptionsForceAuthn' => 0,
-                        'samlIDPMetaDataOptionsForceUTF8' => 0,
-                        'samlIDPMetaDataOptionsIcon' => '',
-                        'samlIDPMetaDataOptionsIsPassive' => 0,
-                        'samlIDPMetaDataOptionsNameIDFormat' => '',
-                        'samlIDPMetaDataOptionsRelayStateURL' => 0,
+                        'samlIDPMetaDataOptionsForceAuthn'     => 0,
+                        'samlIDPMetaDataOptionsForceUTF8'      => 0,
+                        'samlIDPMetaDataOptionsIcon'           => '',
+                        'samlIDPMetaDataOptionsIsPassive'      => 0,
+                        'samlIDPMetaDataOptionsNameIDFormat'   => '',
+                        'samlIDPMetaDataOptionsRelayStateURL'  => 0,
                         'samlIDPMetaDataOptionsRequestedAuthnContext' => '',
-                        'samlIDPMetaDataOptionsResolutionRule' => '',
+                        'samlIDPMetaDataOptionsResolutionRule'        => '',
                         'samlIDPMetaDataOptionsSLOBinding' => 'http-soap',
                         'samlIDPMetaDataOptionsSSOBinding' => 'http-redirect',
-                        'samlIDPMetaDataOptionsSignSLOMessage' => 1,
-                        'samlIDPMetaDataOptionsSignSSOMessage' => 1,
+                        'samlIDPMetaDataOptionsSignSLOMessage'  => 1,
+                        'samlIDPMetaDataOptionsSignSSOMessage'  => 1,
                         'samlIDPMetaDataOptionsSignatureMethod' => '',
-                        'samlIDPMetaDataOptionsStoreSAMLToken' => 0
+                        'samlIDPMetaDataOptionsStoreSAMLToken'  => 0
                     }
                 },
                 samlIDPMetaDataExportedAttributes => {
-                        'proxy' => {
-                           'cn' => '1;cn',
-                           'uid' => '1;uid',
-                           'mail' => '1;mail',
-                        }
+                    'proxy' => {
+                        'cn'   => '1;cn',
+                        'uid'  => '1;uid',
+                        'mail' => '1;mail',
+                    }
                 },
             }
         }
@@ -406,43 +428,45 @@ sub sp {
 sub idp {
     return LLNG::Manager::Test->new( {
             ini => {
-                logLevel                          => $debug,
-                domain                            => 'idp.com',
-                portal                            => 'http://auth.idp.com',
-                authentication                    => 'Demo',
-                userDB                            => 'Same',
-                issuerDBSAMLActivation            => 1,
-                restSessionServer                 => 1,
-                samlSPMetaDataOptions => {
+                logLevel               => $debug,
+                domain                 => 'idp.com',
+                portal                 => 'http://auth.idp.com',
+                authentication         => 'Demo',
+                userDB                 => 'Same',
+                issuerDBSAMLActivation => 1,
+                restSessionServer      => 1,
+                samlSPMetaDataOptions  => {
                     proxy => {
                         'samlSPMetaDataOptionsCheckSLOMessageSignature' => 1,
                         'samlSPMetaDataOptionsCheckSSOMessageSignature' => 1,
-                        'samlSPMetaDataOptionsEnableIDPInitiatedURL' => 0,
-                        'samlSPMetaDataOptionsEncryptionMode' => 'none',
-                        'samlSPMetaDataOptionsForceUTF8' => 1,
-                        'samlSPMetaDataOptionsNameIDFormat' => '',
+                        'samlSPMetaDataOptionsEnableIDPInitiatedURL'    => 0,
+                        'samlSPMetaDataOptionsEncryptionMode'      => 'none',
+                        'samlSPMetaDataOptionsForceUTF8'           => 1,
+                        'samlSPMetaDataOptionsNameIDFormat'        => '',
                         'samlSPMetaDataOptionsNotOnOrAfterTimeout' => 72000,
-                        'samlSPMetaDataOptionsOneTimeUse' => 0,
-                        'samlSPMetaDataOptionsSessionNotOnOrAfterTimeout' => 72000,
-                        'samlSPMetaDataOptionsSignSLOMessage' => -1,
-                        'samlSPMetaDataOptionsSignSSOMessage' => 1,
+                        'samlSPMetaDataOptionsOneTimeUse'          => 0,
+                        'samlSPMetaDataOptionsSessionNotOnOrAfterTimeout' =>
+                          72000,
+                        'samlSPMetaDataOptionsSignSLOMessage'  => -1,
+                        'samlSPMetaDataOptionsSignSSOMessage'  => 1,
                         'samlSPMetaDataOptionsSignatureMethod' => ''
                     }
                 },
                 samlSPMetaDataXML => {
                     proxy => {
-                        samlSPMetaDataXML =>
-                         samlProxyComplexMetaDataXML( 'proxy', 'HTTP-Redirect', 'SOAP' ),
-                        'samlSPSSODescriptorAuthnRequestsSigned' => 1,
+                        samlSPMetaDataXML => samlProxyComplexMetaDataXML(
+                            'proxy', 'HTTP-Redirect', 'SOAP'
+                        ),
+                        'samlSPSSODescriptorAuthnRequestsSigned'  => 1,
                         'samlSPSSODescriptorWantAssertionsSigned' => 1,
                     }
                 },
                 samlSPMetaDataExportedAttributes => {
-                        'proxy' => {
-                           'cn' => '1;cn',
-                           'uid' => '1;uid',
-                           'mail' => '1;mail',
-                        }
+                    'proxy' => {
+                        'cn'   => '1;cn',
+                        'uid'  => '1;uid',
+                        'mail' => '1;mail',
+                    }
                 },
                 samlOrganizationDisplayName => "IDP",
                 samlOrganizationName        => "IDP",

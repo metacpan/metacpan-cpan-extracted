@@ -30,7 +30,8 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        'IPC::Shareable'    => 1.03,
+        'Cwd'               => 0,
+        'IPC::Shareable'    => 1.05,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Script-Singleton-*' },

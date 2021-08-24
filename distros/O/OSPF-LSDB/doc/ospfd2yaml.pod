@@ -1,23 +1,23 @@
 =head1 NAME
 
-B<ospfd2yaml> - convert OpenBSD B<ospfd> or B<ospf6d> LSDB to YAML file
+ospfd2yaml - convert OpenBSD B<ospfd> or B<ospf6d> LSDB to YAML file
 
 =head1 SYNOPSIS
 
-B<ospfd2yaml>
-[B<-B> F<boundary>]
-[B<-E> F<external>]
-[B<-h>]
-[B<-H> I<user@host>]
-[B<-I> F<selfid>]
-[B<-N> F<network>]
-[B<-R> F<router>]
-[B<-S> F<summary>]
+ospfd2yaml
+[-B F<boundary>]
+[-E F<external>]
+[-h]
+[-H user@host]
+[-I F<selfid>]
+[-N F<network>]
+[-R F<router>]
+[-S F<summary>]
 [F<ospf.yaml>]
 
 =head1 DESCRIPTION
 
-B<ospfd2yaml> takes the OSPF link state database of the OpenBSD
+ospfd2yaml takes the OSPF link state database of the OpenBSD
 B<ospfd> or B<ospf6d> and converts it into a YAML file.
 
 The several input files containing the LSDB can be passed via command
@@ -37,62 +37,62 @@ The options are as follows:
 
 =over 4
 
-=item B<-4>
+=item -4
 
 Use B<ospfd> and B<ospfctl> as input for the OSPF v2 database.
 This is the default.
 
-=item B<-6>
+=item -6
 
 Use B<ospf6d> and B<ospf6ctl> as input for the OSPF v3 database.
 
-=item B<-B> F<boundary>
+=item -B F<boundary>
 
 File describing the AS boundary routers summary-LSAs.
 It can be obtained with B<ospfctl show database asbr>.
 
-=item B<-E> F<external>
+=item -E F<external>
 
 File describing the AS-external-LSAs.
 It can be obtained with B<ospfctl show database external>.
 
-=item B<-h>
+=item -h
 
 Show help message and exit.
 
-=item B<-H> I<user@host>
+=item -H user@host
 
 The specified user and host are used for ssh login and run B<ospfctl>
 there.
 
-=item B<-I> F<selfid>
+=item -I F<selfid>
 
 File describing the router from witch the LSDB has been taken.
 It can be obtained with B<ospfctl show summary>.
 
-=item B<-L> F<link>
+=item -L F<link>
 
 File describing the Link-LSAs.
 It can be obtained with B<ospf6ctl show database link>.
-This option may only be used with B<-6>.
+This option may only be used with -6.
 
-=item B<-N> F<network>
+=item -N F<network>
 
 File describing the network-LSAs.
 It can be obtained with B<ospfctl show database network>.
 
-=item B<-P> F<intra>
+=item -P F<intra>
 
 File describing the Intra-Area-Prefix-LSAs.
 It can be obtained with B<ospf6ctl show database intra>.
-This option may only be used with B<-6>.
+This option may only be used with -6.
 
-=item B<-R> F<router>
+=item -R F<router>
 
 File describing the router-LSAs.
 It can be obtained with B<ospfctl show database router>.
 
-=item B<-S> F<summary>
+=item -S F<summary>
 
 File describing the network summary-LSAs.
 It can be obtained with B<ospfctl show database summary>.

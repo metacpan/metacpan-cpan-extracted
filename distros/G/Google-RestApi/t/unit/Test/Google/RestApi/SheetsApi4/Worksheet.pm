@@ -1,112 +1,199 @@
 package Test::Google::RestApi::SheetsApi4::Worksheet;
 
-use Test::Most;
-use YAML::Any qw(Dump);
+use Test::Unit::Setup;
 
-use Utils qw(:all);
+use parent 'Test::Unit::TestBase';
 
+use aliased 'Google::RestApi::SheetsApi4::Worksheet';
 use aliased 'Google::RestApi::SheetsApi4::Range::Col';
 use aliased 'Google::RestApi::SheetsApi4::Range::Row';
-use aliased 'Google::RestApi::SheetsApi4::Range::Cell';
 
-use parent qw(Test::Class Test::Google::RestApi::SheetsApi4::Base);
+# init_logger($TRACE);
 
-sub class { 'Google::RestApi::SheetsApi4::Worksheet' }
+sub class { Worksheet; }
 
-# sub constructor : Tests(4) { shift->SUPER::constructor(@_); }
-
-sub tie : Tests(1) {
+sub setup : Tests(setup) {
   my $self = shift;
+  $self->SUPER::setup(@_);
 
-  my $worksheet = $self->worksheet();
-
-  is_hash $worksheet->tie(), "Empty tie";
+  $self->_uri_responses(qw(
+    get_worksheet_properties_title_sheetid
+    get_worksheet_values_col
+    get_worksheet_values_cols
+    get_worksheet_values_row
+    get_worksheet_values_rows
+    post_worksheet_values_x_y_z
+    put_worksheet_values_col
+    put_worksheet_values_row
+  ));
+  $self->_fake_http_auth();
+  $self->_fake_http_no_retries();
 
   return;
 }
 
-sub tie_cells : Tests(16) {
+sub _constructor : Tests(8) {
   my $self = shift;
 
-  my $worksheet = $self->worksheet();
+  $self->_fake_http_response_by_uri();
+  my $class = $self->class();
 
-  my $cells;
-  is_hash $cells = $worksheet->tie_cells('A1', 'B2'), "Tying cells 'A1' and 'B2'";
-  tied(%$cells)->fetch_range(1);
-  isa_ok $cells->{A1}, Cell, "Key 'A1' should be a cell";
-  is $cells->{A1}->range(), "$self->{name}A1", "Cell 'A1' is range 'A1'";
-  isa_ok $cells->{B2}, Cell, "Key 'B2' should be a cell";
-  is $cells->{B2}->range(), "$self->{name}B2", "Cell 'B2' is range 'B2'";
+  use_ok $self->class();
 
-  isa_ok $cells->{C3} = "Charlie", Cell, "Auto-creating cell 'C3'";
-  isa_ok $cells->{C3}, Cell, "Key 'C3' should be a cell";
-  is $cells->{C3}->range(), "$self->{name}C3", "Cell 'C3' is range 'C3'";
+  ok my $ws0 = $self->_fake_worksheet(), 'Constructor should succeed';
+  isa_ok $ws0, $class, 'Constructor with "id" returns';
 
-  is_hash $cells = $worksheet->tie_cells({ fred => 'A1' }), "Tying cells 'fred => A1'";
-  tied(%$cells)->fetch_range(1);
-  isa_ok $cells->{fred}, Cell, "Key 'fred' should be a cell";
-  is $cells->{fred}->range(), "$self->{name}A1", "Cell 'fred => A1' is range 'A1'";
+  ok $ws0 = $self->_fake_worksheet(name => fake_worksheet_name()),
+    'Constructor with "name" should succeed';
+  isa_ok $ws0, $class, 'Constructor with "name" returns';
 
-  is_hash $cells = $worksheet->tie_cells({ fred => [1, 1] }), "Tying cells 'fred => [1, 1]'";
-  tied(%$cells)->fetch_range(1);
-  isa_ok $cells->{fred}, Cell, "Key 'fred' should be a cell";
-  is $cells->{fred}->range(), "$self->{name}A1", "Cell 'fred => [1, 1]' is 'A1'";
+  ok $ws0 = $self->_fake_worksheet(uri => fake_worksheet_uri()),
+    'Constructor with "uri`" should succeed';
+  isa_ok $ws0, $class, 'Constructor with "uri" returns';
 
-  is_hash $cells = $worksheet->tie_cells({ fred => [[1,1], [2,2]] }), "Tying a cell to a bad range";
-  tied(%$cells)->fetch_range(1);
-  throws_ok sub { $cells->{fred}->range(); }, qr/Unable to translate/, "Using a bad range should fail";
+  throws_ok sub { $ws0 = $class->new(spreadsheet => fake_spreadsheet()) },
+    qr/At least one of/i,
+    'Constructor with missing params should throw';
 
   return;
 }
 
-sub tie_cols : Tests(10) {
+sub worksheet_id : Tests() {
   my $self = shift;
-
-  my $worksheet = $self->worksheet();
-
-  my $cols;
-  is_hash $cols = $worksheet->tie_cols(1, 2), "Tying cols '1' and '2'";
-  tied(%$cols)->fetch_range(1);
-  isa_ok $cols->{1}, Col, "Key '1' should be a col";
-  is $cols->{1}->range(), "$self->{name}A:A", "Col '1' is range 'A:A'";
-  isa_ok $cols->{2}, Col, "Key '2' should be a col";
-  is $cols->{2}->range(), "$self->{name}B:B", "Col '2' is range 'B:B'";
-
-  is_hash $cols = $worksheet->tie_cols({ fred => '1' }), "Tying cols 'fred => 1'";
-  tied(%$cols)->fetch_range(1);
-  isa_ok $cols->{fred}, Col, "Key 'fred' should be a col";
-  is $cols->{fred}->range(), "$self->{name}A:A", "Col 'fred => 1' is range 'A:A'";
-
-  is_hash $cols = $worksheet->tie_cols({ fred => [[1,1], [2,2]] }), "Tying cols to a bad range";
-  tied(%$cols)->fetch_range(1);
-  throws_ok sub { $cols->{fred}->range(); }, qr/Unable to translate/, "Using a bad range should fail";
-
   return;
 }
 
-sub tie_rows : Tests(10) {
+sub worksheet_name : Tests() {
+  my $self = shift;
+  return;
+}
+
+sub worksheet_uri : Tests() {
+  my $self = shift;
+  return;
+}
+
+sub properties : Tests() {
+  my $self = shift;
+  return;
+}
+
+sub col : Tests(3) {
   my $self = shift;
 
-  my $worksheet = $self->worksheet();
-
-  my $rows;
-  is_hash $rows = $worksheet->tie_rows(1, 2), "Tying rows '1' and '2'";
-  tied(%$rows)->fetch_range(1);
-  isa_ok $rows->{1}, Row, "Key '1' should be a row";
-  is $rows->{1}->range(), "$self->{name}1:1", "Key '1' should be range '1:1'";
-  isa_ok $rows->{2}, Row, "Key '2' should be a row";
-  is $rows->{2}->range(), "$self->{name}2:2", "Key '2' should be range '2:2'";
-
-  is_hash $rows = $worksheet->tie_rows({ fred => '1' }), "Tying rows 'fred => 1'";
-  tied(%$rows)->fetch_range(1);
-  isa_ok $rows->{fred}, Row, "Key 'fred' should be a row";
-  is $rows->{fred}->range(), "$self->{name}1:1", "Row 'fred => 1' is range '1:1'";
-
-  is_hash $rows = $worksheet->tie_rows({ fred => [[1,1], [2,2]] }), "Tying rows to a bad range";
-  tied(%$rows)->fetch_range(1);
-  throws_ok sub { $rows->{fred}->range(); }, qr/Unable to translate/, "Using a bad range should fail";
-
+  $self->_fake_http_response_by_uri();
+  my $ws0 = $self->_fake_worksheet();
+  is $ws0->col('A'), undef, 'Col returns undef';
+  is_deeply $ws0->col('A', [qw(joe)]), [qw(joe)], 'Col returns the correct array of values';
+  # just do a basic test to make sure bad range args are not accepted. range tests will
+  # do more comprehensive negative tests. we are only testing worksheet::col here.
+  throws_ok sub { $ws0->col('A1:B2') }, qr/Unable to translate/i, 'Bad col throws';
+  
   return;
+}
+
+sub cols : Tests(3) {
+  my $self = shift;
+
+  $self->_fake_http_response_by_uri();
+  my $ws0 = $self->_fake_worksheet();
+  is_valid $ws0->cols(['A', 'B', 'C']), ArrayRef[Undef], 'Cols returns undef';
+  my $cols = [['joe'], ['fred'], ['charlie']];
+  is_deeply $ws0->cols(['A', 'B', 'C'], $cols), $cols, 'Cols returns the correct array of values';
+  throws_ok sub { $ws0->cols(['A1:B2']) }, qr/Unable to translate/i, 'Bad cols throws';
+  
+  return;
+}
+
+sub row : Tests(3) {
+  my $self = shift;
+
+  $self->_fake_http_response_by_uri();
+  my $ws0 = $self->_fake_worksheet();
+  is $ws0->row(1), undef, 'Row returns undef';
+  is_deeply $ws0->row(1, [qw(joe)]), [qw(joe)], 'Row returns an array of values';
+  throws_ok sub { $ws0->row('A1:B2') }, qr/Must be a positive integer/i, 'Bad row throws';
+  
+  return;
+}
+
+sub rows : Tests(3) {
+  my $self = shift;
+
+  $self->_fake_http_response_by_uri();
+  my $ws0 = $self->_fake_worksheet();
+  is_valid $ws0->rows([1, 2, 3]), ArrayRef[Undef], 'Rows returns undef';
+  my $rows = [['joe'], ['fred'], ['charlie']];
+  is_deeply $ws0->rows([1, 2, 3], $rows), $rows, 'Rows returns the correct array of values';
+  throws_ok sub { $ws0->rows(['A1:B2']) }, qr/did not pass type constraint/i, 'Bad rows throws';
+  
+  return;
+}
+
+sub cell : Tests() {
+  my $self = shift;
+}
+
+sub cells : Tests() {
+  my $self = shift;
+  return;
+}
+
+sub enable_header_col : Tests() {
+  my $self = shift;
+  return;
+}
+
+sub header_row : Tests() {
+  my $self = shift;
+  return;
+}
+
+sub name_value_pairs : Tests() {
+  my $self = shift;
+  return;
+}
+
+sub tie_ranges : Tests() {
+  my $self = shift;
+  return;
+}
+
+sub tie_cols : Tests() {
+  my $self = shift;
+  return;
+}
+
+sub tie_rows : Tests() {
+  my $self = shift;
+  return;
+}
+
+sub tie_cells : Tests() {
+  my $self = shift;
+  return;
+}
+
+sub tie : Tests() {
+  my $self = shift;
+  return;
+}
+
+sub submit_requests : Tests() {
+  my $self = shift;
+  return;
+}
+
+sub config : Tests() {
+  my $self = shift;
+  return;
+}
+
+sub _fake_worksheet {
+  my $self = shift;
+  my %p = @_;
+  $p{id} = fake_worksheet_id() if !%p;
+  return $self->class()->new(%p, spreadsheet => fake_spreadsheet());
 }
 
 1;

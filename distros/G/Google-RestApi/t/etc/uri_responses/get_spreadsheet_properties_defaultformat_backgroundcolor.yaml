@@ -1,0 +1,14 @@
+GET:
+  https://sheets.googleapis.com/v4/spreadsheets/fake_spreadsheet_id1?fields=properties.defaultFormat.backgroundColor:
+    response: |
+      {
+        "properties": {
+          "defaultFormat": {
+            "backgroundColor": {
+              "red": 1,
+              "green": 1,
+              "blue": 1
+            }
+          }
+        }
+      }

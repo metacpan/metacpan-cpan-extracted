@@ -1,6 +1,6 @@
 package Lab::Moose::Instrument::ABB_TRMC2;
 #ABSTRACT: ABB TRMC2 temperature controller
-$Lab::Moose::Instrument::ABB_TRMC2::VERSION = '3.770';
+$Lab::Moose::Instrument::ABB_TRMC2::VERSION = '3.771';
 use v5.20;
 
 use Moose;
@@ -48,8 +48,6 @@ has initialized => (
     isa     => 'Bool', 
     default => 0
 );
-
-    
 
 
 sub set_T {
@@ -391,7 +389,7 @@ Lab::Moose::Instrument::ABB_TRMC2 - ABB TRMC2 temperature controller
 
 =head1 VERSION
 
-version 3.770
+version 3.771
 
 =head1 SYNOPSIS
 
@@ -405,6 +403,8 @@ version 3.770
 
 Warning: Due to the rather unique (and silly) way of device communication, the 
 TRMC2 driver does not use the connection layer.
+
+=head1 External interface
 
 =head2 set_T
 
@@ -424,6 +424,8 @@ Possible values are in the range [min_setpoint, max_setpoint], by default
 This is a shortcut for reading out temperature channel 5, typically the mixing chamber temperature.
 
 TODO: Which channel is typically used for the control loop here?
+
+=head1 Internal / hardware-specific functions
 
 =head2 TRMC2init
 

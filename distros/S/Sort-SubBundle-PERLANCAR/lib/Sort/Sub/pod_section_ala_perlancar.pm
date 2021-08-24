@@ -1,9 +1,9 @@
 package Sort::Sub::pod_section_ala_perlancar;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-06'; # DATE
+our $DATE = '2021-08-22'; # DATE
 our $DIST = 'Sort-SubBundle-PERLANCAR'; # DIST
-our $VERSION = '0.089'; # VERSION
+our $VERSION = '0.090'; # VERSION
 
 use 5.010001;
 use strict;
@@ -46,6 +46,8 @@ our $SORT_SPEC = [
     'SUBCOMMANDS',
     'OPTIONS',
 
+    'IMPLEMENTATION NOTES', # from freebsd
+
     # other content (CLI)
     'COMPLETION',
 
@@ -59,6 +61,10 @@ our $SORT_SPEC = [
     'ENVIRONMENT',
     'ENVIRONMENT VARIABLES',
     'FILES',
+
+    'EXIT STATUS', # from freebsd
+
+    'EXAMPLES', # from freebsd
 
     # todos
     'TODO', 'ORIGINAL TODO',
@@ -123,7 +129,7 @@ Sort::Sub::pod_section_ala_perlancar - Sort POD sections (headings) PERLANCAR-st
 
 =head1 VERSION
 
-This document describes version 0.089 of Sort::Sub::pod_section_ala_perlancar (from Perl distribution Sort-SubBundle-PERLANCAR), released on 2021-08-06.
+This document describes version 0.090 of Sort::Sub::pod_section_ala_perlancar (from Perl distribution Sort-SubBundle-PERLANCAR), released on 2021-08-22.
 
 =head1 SYNOPSIS
 
@@ -196,7 +202,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

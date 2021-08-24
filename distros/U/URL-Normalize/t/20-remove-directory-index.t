@@ -13,27 +13,34 @@ BEGIN {
 {
     # Remove well-known directory indexes.
     my @indexes = qw(
-        index.html
-        index.htm
-        index.shtml
-        index.php
-        index.php5
-        index.php4
-        index.php3
-        index.cgi
-        default.html
         default.htm
-        home.html
-        home.htm
-        Index.html
-        Index.htm
-        Index.shtml
-        Index.php
-        Index.cgi
-        Default.html
         Default.htm
-        Home.html
+        default.html
+        Default.html
+        Default.html.asp
+        Default.html.aspx
+        home.htm
         Home.htm
+        home.html
+        Home.html
+        index.cgi
+        Index.cgi
+        index.htm
+        Index.htm
+        index.html
+        Index.html
+        Index.html.asp
+        Index.html.php
+        Index.jsp
+        index.php
+        Index.php
+        index.php3
+        index.php4
+        index.php5
+        index.shtml
+        Index.shtml
+        Welcome.htm
+        Welcome.html
     );
 
     my %urls = ();

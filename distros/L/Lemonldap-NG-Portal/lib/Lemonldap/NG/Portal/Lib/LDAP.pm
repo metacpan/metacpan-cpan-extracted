@@ -13,7 +13,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 
 extends 'Lemonldap::NG::Common::Module';
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.13';
 
 # PROPERTIES
 
@@ -76,8 +76,7 @@ has findUserFilter => (
     is      => 'ro',
     lazy    => 1,
     builder => sub {
-
-        # $_[0]->conf->{AuthLDAPFilter} ||
+        $_[0]->conf->{AuthLDAPFilter} ||
         $_[0]->conf->{LDAPFilter}
           || '(&(uid=$user)(objectClass=inetOrgPerson))';
     }
@@ -180,8 +179,10 @@ sub findUser {
     $self->validateLdap;
     return PE_LDAPCONNECTFAILED unless $self->ldap;
 
-    $self->findUserFilter =~ /\bobjectClass=(\w+)\b/;
-    my $filter   = "(&(objectClass=$1)";
+    my $filter =
+      $self->findUserFilter =~ /\bobjectClass=(\w+)\b/
+      ? "(&(objectClass=$1)"
+      : '(&';
     my $wildcard = $self->conf->{findUserWildcard};
     $self->logger->info("LDAP UserDB with wildcard ($wildcard)") if $wildcard;
     foreach (@$searching) {
@@ -199,11 +200,12 @@ sub findUser {
 
     $self->bind();
     my $mesg = $self->ldap->search(
-        base   => $self->conf->{ldapBase},
-        scope  => 'sub',
-        filter => $filter,
-        deref  => $self->conf->{ldapSearchDeref} || 'find',
-        attrs  => $self->attrs,
+        base      => $self->conf->{ldapBase},
+        scope     => 'sub',
+        filter    => $filter,
+        deref     => $self->conf->{ldapSearchDeref} || 'find',
+        attrs     => $self->attrs,
+        sizelimit => 50
     );
 
     if ( $mesg->code() != 0 ) {
@@ -218,9 +220,10 @@ sub findUser {
         my $rank = int( rand( $mesg->count() ) );
         $self->logger->debug("Demo UserDB random rank: $rank");
         my $entry =
-          ( $mesg->entry($rank)->dn() =~ /\b(?:uid|sAMAccountName)=(\w+?)\b/ )
-          [0];
-        $self->userLogger->info("FindUser: LDAP UserDB returns $entry");
+          ( $mesg->entry($rank)->dn() =~ /\b(?:uid|sAMAccountName)\x3d(.+?),/ )
+          [0] || '';
+        $self->userLogger->info("FindUser: LDAP UserDB returns $entry")
+          if $entry;
         $req->data->{findUser} = $entry;
         return PE_OK;
     }

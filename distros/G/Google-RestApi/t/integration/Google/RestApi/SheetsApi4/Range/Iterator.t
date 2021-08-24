@@ -1,15 +1,11 @@
-#!/usr/bin/perl
-
-use strict;
-use warnings;
+use Test::Integration::Setup;
 
 use Test::Most tests => 28;
 
 use aliased "Google::RestApi::SheetsApi4::Range::Cell";
 use aliased "Google::RestApi::SheetsApi4::Range::Iterator";
 
-use Utils qw(:all);
-init_logger();
+# init_logger($DEBUG);
 
 my $spreadsheet = spreadsheet();
 my $worksheet = $spreadsheet->open_worksheet(id => 0);
@@ -72,7 +68,7 @@ sub iterate_by_2 {
   is $cell = $i->next(), undef, "Last by 2 iteration should be undef";
 }
 
-delete_all_spreadsheets($spreadsheet->sheets());
+delete_all_spreadsheets($spreadsheet->sheets_api());
 
 # use YAML::Any qw(Dump);
 # warn Dump($spreadsheet->stats());

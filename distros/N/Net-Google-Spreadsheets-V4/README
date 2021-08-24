@@ -2,15 +2,6 @@ NAME
 
     Net::Google::Spreadsheets::V4 - Google Sheets API v4 client
 
-INSTALLATION
-
-    To install this module, run the following commands:
-
-        perl Build.PL
-        ./Build
-        ./Build test
-        ./Build install
-
 SYNOPSIS
 
         use Net::Google::Spreadsheets::V4;

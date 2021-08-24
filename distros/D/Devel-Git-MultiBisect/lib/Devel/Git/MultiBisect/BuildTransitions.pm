@@ -1,7 +1,7 @@
 package Devel::Git::MultiBisect::BuildTransitions;
 use strict;
 use warnings;
-use v5.10.0;
+use v5.14.0;
 use parent ( qw| Devel::Git::MultiBisect | );
 use Devel::Git::MultiBisect::Auxiliary qw(
     hexdigest_one_file
@@ -13,7 +13,7 @@ use File::Spec;
 use File::Temp qw( tempdir );
 use Data::Dump qw(dd pp);
 
-our $VERSION = '0.08';
+our $VERSION = '0.15';
 
 =head1 NAME
 

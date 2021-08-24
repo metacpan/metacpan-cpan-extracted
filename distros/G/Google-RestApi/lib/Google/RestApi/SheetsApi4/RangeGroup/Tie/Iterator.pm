@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator;
 
-our $VERSION = '0.7';
+our $VERSION = '0.8';
 
 use Google::RestApi::Setup;
 
@@ -37,7 +37,8 @@ sub iterate {
   my %ranges = map {
     $self->{keys}->[$_] => $ranges[$_];
   } (0..$#ranges);
-  return $self->spreadsheet()->tie(%ranges);
+  my $tied = tied( %{ $self->{tied} });
+  return $tied->default_worksheet()->tie(%ranges);
 }
 sub next { iterate(@_); }
 

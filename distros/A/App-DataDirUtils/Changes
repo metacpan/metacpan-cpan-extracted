@@ -1,0 +1,21 @@
+0.003   2021-08-23  Released-By: PERLANCAR; Urgency: medium
+
+        - Deprecate in favor of App-TaggedDirUtils.
+
+        - [doc] Mention App::TaggedDirUtils.
+
+	- Tweak/fix argument summary.
+
+
+0.002   2021-08-23  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+        - [doc] Fix Pod::Weaver plugin bundle to use.
+
+	- [doc] Add FAQ section.
+
+
+0.001   2021-08-22  Released-By: PERLANCAR
+
+        - First release.

@@ -70,7 +70,21 @@ ok($comment =~ /Victoria/smx, "\$timezone->comment('Australia/Melbourne') contai
 diag("Comment for 'Australia/Melbourne' is '$comment'");
 }
 my $tz = $timezone->timezone();
-diag(`zdump -v /usr/share/zoneinfo/$tz | head -n 10`);
+my $directory = $timezone->directory();
+if ($ENV{TZDIR}) {
+	if ($directory =~ /^(.*)$/) {
+		$directory = $1;
+	}
+}
+my $current_year = (localtime)[5] + 1900;
+my $start_year = $current_year - 3;
+my $end_year = $current_year + 2;
+if (($^O eq 'MSWin32') || ($^O eq 'cygwin')) {
+} elsif ($^O eq 'solaris') {
+	diag(`zdump -c $start_year,$end_year -v $tz | tail`);
+} else {
+	diag(`zdump -c $start_year,$end_year -v $directory/$tz | tail`);
+}
 my $todo;
 if ($^O eq 'MSWin32') {
 } elsif ($bsd_date) {

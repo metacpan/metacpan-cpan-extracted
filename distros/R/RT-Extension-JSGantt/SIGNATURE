@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.83.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,13 +12,13 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA256
+Hash: RIPEMD160
 
-SHA256 816631feb41fed23830a8da767ccc936383eed40a427c6c96817d08d36107243 Changes
+SHA256 0d2d9e19b032c7d5f6c053eaa10ad8a3483aab82cfe66521a4acb32b907f6d72 Changes
 SHA256 15feb2d4956f816e82545f6c985d4833b5ef83a680d31ec82a7ed5c39db9e05e MANIFEST
-SHA256 b848ab0f03c8dd7568a002689317e9fee6f8d234f36de1acc4c8499f2df51318 META.yml
+SHA256 1a7d3bc380ca7c9de01bd28568a6318c25ba18f30f64d21bb65bccac3da9d0ec META.yml
 SHA256 1236aa7737c375e1945c700b9951cf819bf7bd2e9e06d8b0a39814f97c530310 Makefile.PL
-SHA256 7ad1fc4de542110bfab1a71d17831a348228ee4651376eb137f18d46c746b160 README
+SHA256 c2cac874531b8ae7ff5d000fbe59e0841829c2c5c29164efb5b815163b8e8bea README
 SHA256 3884b140146a08daeb79efd19a829d1e81e2231c9e387705ad5886a5c151ae99 html/Callbacks/JSGantt/Elements/Header/Head
 SHA256 811405c8a0c7fa582a08121a023b561f536dc06fbb12203a2f80ab808f1d8904 html/Callbacks/JSGantt/Elements/Tabs/Privileged
 SHA256 a130d129af0f8b273b0bcc6b252b22878a87578fcba5527e6a1678655e74fa59 html/Callbacks/JSGantt/Search/Elements/ResultViews/AfterTools
@@ -38,16 +38,15 @@ SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Modu
 SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
 SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
 SHA256 3164c32202bf4604ab1f90b926a81e15493b191e0bc2f90ae42d8358f18259d6 inc/YAML/Tiny.pm
-SHA256 85f3047c2a8fa75fbad2d9a58f4a0a63d5c4dbe9f01dcf8ce7c381d7aa037e99 lib/RT/Extension/JSGantt.pm
-SHA256 69e2a41a1841f087b9516d243bdb6385e4af70b71e32956978db818b083b7de4 static/css/jsgantt.css
+SHA256 6e5c3a78716751f8d1c4ef536e87fc01412461caa6b92236ded5457fe3dc71af lib/RT/Extension/JSGantt.pm
+SHA256 005be3175b614623f9f8804d4dfc0339d5c74e0eab26c023231096e5a97586d2 static/css/jsgantt.css
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEExJs3Lyv4ShkBFmAnDfCig/6sgLIFAl8SYkAACgkQDfCig/6s
-gLLstQf8CRBQt8MikjPbfOdmdHb0uFukytV4LCoTy0+6ldSVLVfYZ+k7bqI1qU4S
-MRRrOK3KzYQerqfj7xsjNmNmP0Nq4JgbhYpMJmayulVJYhhPhycbfz0bpEDqSZq9
-sugCIp1qTl8HsGWKqPN2BEGkTnDhrkn5d3vfVMRXlSJqsWfR/jIW7Ehu2LyY1ytm
-ED/w6fP88T1C08GTNR2lpl/EZ0K9cca3/ni1yGLF+jZVDWXgg187gOlq52WMbret
-o8SImj+MZqiL4iC3Hnz5gCkIkibovot6ebcx1TMOhEKl5q2Dj7JjVDl79r4tLyEv
-2nguigSKNJp6+htLXNz+L+gMT6wiOQ==
-=hdTC
+iQEcBAEBAwAGBQJhICCmAAoJEA3wooP+rICypV0H/3s6AweplTrLakavNGi/O/QP
+fqdJW6ZMpXWCopx/lhz24bYlK8IKQOxWJ08Mo8CYcRe3YjcqckRe1h1aLfP20/51
+PS5OhSqpzy8AvzM8Vl3NnrFOjf/k6ebZ18YbuWHw45xxSh8Eishdc5sXcF/UBB8c
+EpyRCJxus/2jVcRzeBffuShGIqkIwP/huKuwi+13Dx6zThMBpZFZFiL3+BtMX4Tc
+yoVRrHYxfP/mkJoo4HrzmwKd1a9tNIcks9JIzSkH1ver6ks5Kw1c28xKI1aKu0wP
+TQIgGLPrgm2u+C17PLlCIjTCVuW/hJs9YUUQ6FTDqfN1XJdFMVrCkVGKLKNCEfE=
+=8FAH
 -----END PGP SIGNATURE-----

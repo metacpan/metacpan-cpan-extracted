@@ -7,7 +7,6 @@ BEGIN {
     require Test::Builder;
     require File::Spec;
     require IPC::Open3;
-    require UNIVERSAL::require;
     require version;
     @INC = grep { $_ eq 'blib/lib' } @INC;
 }

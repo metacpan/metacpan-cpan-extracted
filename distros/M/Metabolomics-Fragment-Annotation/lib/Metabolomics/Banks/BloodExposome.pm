@@ -47,10 +47,11 @@ Metabolomics::Banks::BloodExposome - Perl extension for BloodExposome bank
 =head1 VERSION
 
 Version 0.2 - Adding POD
+Version 0.3 - Completing object properties
 
 =cut
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 
 =head1 SYNOPSIS
@@ -83,6 +84,7 @@ use Metabolomics::Banks::BloodExposome qw( :all ) ;
 
 sub new {
     ## Variables
+    my ($class,$args) = @_;
     my $self={};
         
     $self = Metabolomics::Banks->new() ;
@@ -90,7 +92,10 @@ sub new {
     $self->{_DATABASE_NAME_} = 'Blood Exposome' ;
     $self->{_DATABASE_VERSION_} = '1.0' ;
     $self->{_DATABASE_ENTRIES_NB_} = 'database_entries_nb' ;
-    $self->{_DATABASE_URL_} = 'database_url' ;
+    $self->{_DATABASE_URL_} = 'http://bloodexposome.org/' ;
+    $self->{_DATABASE_URL_CARD_} = 'https://pubchem.ncbi.nlm.nih.gov/#query=' ; # BloodExposome is linked with pubchem CID
+    $self->{_DATABASE_TYPE_} = 'METABOLITE' ;
+    $self->{_POLARITY_} =  $args->{POLARITY} ;
     $self->{_DATABASE_DOI_} = 'database_doi' ;
     ## _DATABASE_ENTRIES_
     bless($self) ;
@@ -191,7 +196,7 @@ sub buildTheoPeakBankFromEntries {
     my $mode = undef ;
 
     my $entries = $self->_getEntries();
-    
+        
     my $entryNb = 0 ; 
 
     foreach my $entry (@{$entries}) {
@@ -256,7 +261,12 @@ sub buildTheoPeakBankFromEntries {
     		$oPeak->_setPeak_COMPUTED_MONOISOTOPIC_MASS ( $computedMz );
     	}
     	
+    	## set all others properties
 	    $oPeak->_setPeak_ANNOTATION_NAME ( $entry->_getEntry_COMPOUND_NAME() );
+	    $oPeak->_setPeak_ANNOTATION_FORMULA ( $entry->_getEntry_MOLECULAR_FORMULA() );
+	    $oPeak->_setPeak_ANNOTATION_SMILES ( $entry->_getEntry_CANONICAL_SMILES() );
+	    $oPeak->_setPeak_ANNOTATION_INCHIKEY ( $entry->_getEntry_INCHIKEY() );
+	    $oPeak->_setPeak_ANNOTATION_ID ( 'CID'.$entry->_getEntry_PUBCHEM_CID() );
 	    
 	    $self->_addPeakList('_THEO_PEAK_LIST_', $oPeak) ;
 	    
@@ -315,8 +325,8 @@ sub __refBloodExposomeEntry__ {
 
 	## Description : PRIVATE method _getEntry_EXACT_MASS on a refBloodExposomeEntry object
 	## Input : void
-	## Output : $EXACT_MASS
-	## Usage : my ( $EXACT_MASS ) = $entry->_getEntry_EXACT_MASS () ;
+	## Output : $VALUE
+	## Usage : my ( $VALUE ) = $entry->_getEntry_EXACT_MASS () ;
 
 =cut
 
@@ -325,12 +335,12 @@ sub _getEntry_EXACT_MASS {
     ## Retrieve Values
     my $self = shift ;
     
-    my $EXACT_MASS = undef ;
+    my $VALUE = undef ;
     
-    if ( (defined $self->{_EXACT_MASS_}) and ( $self->{_EXACT_MASS_} > 0 ) or $self->{_EXACT_MASS_} < 0  ) {	$EXACT_MASS = $self->{_EXACT_MASS_} ; }
-    else {	 $EXACT_MASS = 0 ; warn "[WARN] the method _getEntry_EXACT_MASS can't _get a undef or non numerical value\n" ; }
+    if ( (defined $self->{_EXACT_MASS_}) and ( $self->{_EXACT_MASS_} > 0 ) or $self->{_EXACT_MASS_} < 0  ) {	$VALUE = $self->{_EXACT_MASS_} ; }
+    else {	 $VALUE = 0 ; warn "[WARN] the method _getEntry_EXACT_MASS get a undef value\n" ; }
     
-    return ( $EXACT_MASS ) ;
+    return ( $VALUE ) ;
 }
 ### END of SUB
 
@@ -338,8 +348,8 @@ sub _getEntry_EXACT_MASS {
 
 	## Description : PRIVATE method _getEntry_CHARGE on a refBloodExposomeEntry object
 	## Input : void
-	## Output : $CHARGE
-	## Usage : my ( $CHARGE ) = $entry->_getEntry_CHARGE () ;
+	## Output : $VALUE
+	## Usage : my ( $VALUE ) = $entry->_getEntry_CHARGE () ;
 
 =cut
 
@@ -348,12 +358,12 @@ sub _getEntry_CHARGE {
     ## Retrieve Values
     my $self = shift ;
     
-    my $CHARGE = undef ;
+    my $VALUE = undef ;
     
-    if ( (defined $self->{_CHARGE_}) and ( $self->{_CHARGE_} > 0  or $self->{_CHARGE_} < 0 or $self->{_CHARGE_} == 0 )   ) {	$CHARGE = $self->{_CHARGE_} ; }
-    else {	 $CHARGE = 0 ; warn "[WARN] the method _getEntry_CHARGE can't _get a undef or non numerical value\n" ; }
+    if ( (defined $self->{_CHARGE_}) and ( $self->{_CHARGE_} > 0  or $self->{_CHARGE_} < 0 or $self->{_CHARGE_} == 0 )   ) {	$VALUE = $self->{_CHARGE_} ; }
+    else {	 $VALUE = 0 ; warn "[WARN] the method _getEntry_CHARGE get an undef value\n" ; }
     
-    return ( $CHARGE ) ;
+    return ( $VALUE ) ;
 }
 ### END of SUB
 
@@ -371,14 +381,107 @@ sub _getEntry_COMPOUND_NAME {
     ## Retrieve Values
     my $self = shift ;
     
-    my $COMPOUND_NAME = undef ;
+    my $VALUE = undef ;
     
-    if ( (defined $self->{_COMPOUND_NAME_}) and ( $self->{_COMPOUND_NAME_} ne '' ) ) {	$COMPOUND_NAME = $self->{_COMPOUND_NAME_} ; }
-    else {	 $COMPOUND_NAME = undef ; warn "[WARN] the method _getEntry_COMPOUND_NAME can't _get a undef or non numerical value\n" ; }
+    if ( (defined $self->{_COMPOUND_NAME_}) and ( $self->{_COMPOUND_NAME_} ne '' ) ) {	$VALUE = $self->{_COMPOUND_NAME_} ; }
+    else {	 $VALUE = undef ; warn "[WARN] the method _getEntry_COMPOUND_NAME get an undef value\n" ; }
     
-    return ( $COMPOUND_NAME ) ;
+    return ( $VALUE ) ;
 }
 ### END of SUB
+
+=item PRIVATE_ONLY _getEntry_MOLECULAR_FORMULA
+
+	## Description : PRIVATE method _getEntry_MOLECULAR_FORMULA on a refBloodExposomeEntry object
+	## Input : void
+	## Output : $VALUE
+	## Usage : my ( $VALUE ) = $entry->_getEntry_MOLECULAR_FORMULA () ;
+
+=cut
+
+## START of SUB
+sub _getEntry_MOLECULAR_FORMULA {
+    ## Retrieve Values
+    my $self = shift ;
+    
+    my $VALUE = undef ;
+    
+    if ( (defined $self->{_MOLECULAR_FORMULA_}) and ( $self->{_MOLECULAR_FORMULA_} ne '' ) ) {	$VALUE = $self->{_MOLECULAR_FORMULA_} ; }
+    else {	 $VALUE = undef ; warn "[WARN] the method _getEntry_MOLECULAR_FORMULA get an undef value\n" ; }
+    
+    return ( $VALUE ) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _getEntry_CANONICAL_SMILES
+
+	## Description : PRIVATE method _getEntry_CANONICAL_SMILES on a refBloodExposomeEntry object
+	## Input : void
+	## Output : $VALUE
+	## Usage : my ( $VALUE ) = $entry->_getEntry_CANONICAL_SMILES () ;
+
+=cut
+
+## START of SUB
+sub _getEntry_CANONICAL_SMILES {
+    ## Retrieve Values
+    my $self = shift ;
+    
+    my $VALUE = undef ;
+    
+    if ( (defined $self->{_CANONICAL_SMILES_}) and ( $self->{_CANONICAL_SMILES_} ne '' ) ) {	$VALUE = $self->{_CANONICAL_SMILES_} ; }
+    else {	 $VALUE = undef ; warn "[WARN] the method _getEntry_CANONICAL_SMILES get an undef value\n" ; }
+    
+    return ( $VALUE ) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _getEntry_INCHIKEY
+
+	## Description : PRIVATE method _getEntry_INCHIKEY on a refBloodExposomeEntry object
+	## Input : void
+	## Output : $VALUE
+	## Usage : my ( $VALUE ) = $entry->_getEntry_INCHIKEY () ;
+
+=cut
+
+## START of SUB
+sub _getEntry_INCHIKEY {
+    ## Retrieve Values
+    my $self = shift ;
+    
+    my $VALUE = undef ;
+    
+    if ( (defined $self->{_INCHIKEY_}) and ( $self->{_INCHIKEY_} ne '' ) ) {	$VALUE = $self->{_INCHIKEY_} ; }
+    else {	 $VALUE = undef ; warn "[WARN] the method _getEntry_INCHIKEY get an undef value\n" ; }
+    
+    return ( $VALUE ) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _getEntry_PUBCHEM_CID
+
+	## Description : PRIVATE method _getEntry_PUBCHEM_CID on a refBloodExposomeEntry object
+	## Input : void
+	## Output : $VALUE
+	## Usage : my ( $VALUE ) = $entry->_getEntry_PUBCHEM_CID () ;
+
+=cut
+
+## START of SUB
+sub _getEntry_PUBCHEM_CID {
+    ## Retrieve Values
+    my $self = shift ;
+    
+    my $VALUE = undef ;
+    
+    if ( (defined $self->{_PUBCHEM_CID_}) and ( $self->{_PUBCHEM_CID_} ne '' ) ) {	$VALUE = $self->{_PUBCHEM_CID_} ; }
+    else {	 $VALUE = undef ; warn "[WARN] the method _getEntry_PUBCHEM_CID get an undef value\n" ; }
+    
+    return ( $VALUE ) ;
+}
+### END of SUB
+
 
 __END__
 

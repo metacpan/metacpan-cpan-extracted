@@ -1,0 +1,2536 @@
+##----------------------------------------------------------------------------
+## Markdown Parser Only - ~/lib/Markdown/Parser.pm
+## Version v0.1.0
+## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
+## Created 2021/08/23
+## Modified 2021/08/23
+## All rights reserved
+## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
+##----------------------------------------------------------------------------
+package Markdown::Parser;
+BEGIN
+{
+    use strict;
+    use warnings;
+    use parent qw( Module::Generic );
+    use HTML::TreeBuilder;
+    use POSIX ();
+    use Regexp::Common qw( Markdown );
+    use Nice::Try;
+    use CSS::Object;
+    use Scalar::Util ();
+    use Devel::Confess;
+    our $VERSION = 'v0.1.0';
+    ## Including vertical space like new lines
+    our $ELEMENTS_DICTIONARY =
+    {
+    block => [qw( blockquote code_block code_line header html line list paragraph )],
+    inline => [qw( abbr bold code_span emphasis image link_auto line_break link )],
+    };
+    $ELEMENTS_DICTIONARY->{all} = [@{$ELEMENTS_DICTIONARY->{block}}, @{$ELEMENTS_DICTIONARY->{inline}}];
+    our $ELEMENTS_DICTIONARY_EXTENDED =
+    {
+    block => [qw( code_block header katex )],
+    inline => [qw( abbr checkbox footnote insert katex strikethrough superscript subscript )],
+    };
+    $ELEMENTS_DICTIONARY_EXTENDED->{all} = [@{$ELEMENTS_DICTIONARY_EXTENDED->{block}}, @{$ELEMENTS_DICTIONARY_EXTENDED->{inline}}];
+};
+
+sub init
+{
+    my $self = shift( @_ );
+    $self->{abbreviation_case_sensitive}    = 0;
+    $self->{charset}                        = 'utf8';
+    $self->{code_highlight}                 = 0;
+    $self->{css_grid}                       = 0;
+    ## See Markdown::Parser::Link
+    $self->{default_email}                  = '';
+    $self->{document}                       = '';
+    $self->{email_obfuscate_class}          = 'courriel';
+    $self->{email_obfuscate_data_host}      = 'host';
+    $self->{email_obfuscate_data_user}      = 'user';
+    $self->{encrypt_email}                  = 0;
+    $self->{footnote_ref_sequence}          = 0;
+    $self->{katex_delimiter}                = ['$$','$$','$','$','\[','\]','\(','\)'];
+    $self->{list_level}                     = 0;
+    $self->{mode}                           = 'all';
+    ## Top scope as specified by the user
+    $self->{scope}                          = '';
+    $self->{_init_strict_use_sub}           = 1;
+    use utf8;
+    $self->{colour_open}                    = '{';
+    $self->{colour_close}                   = '}';
+    $self->SUPER::init( @_ );
+    return( $self );
+}
+
+sub abbreviation_case_sensitive { return( shift->_set_get_scalar( 'abbreviation_case_sensitive', @_ ) ); }
+
+sub charset { return( shift->_set_get_scalar( 'charset', @_ ) ); }
+
+sub code_highlight { return( shift->_set_get_boolean( 'code_highlight', @_ ) ); }
+
+sub create_document
+{
+    my $self = shift( @_ );
+    my $class = ref( $self ) || $self;
+    $class .= '::Document';
+    $self->_load_class( $class ) || return;
+    return( $class->new( @_, debug => $self->debug ) );
+}
+
+sub css
+{
+    my $self = shift( @_ );
+    my $css = $self->_set_get_object( 'css', 'CSS::Object', @_ );
+    return( $css ) if( $css );
+    $css = CSS::Object->new;
+    $self->_set_get_object( 'css', 'CSS::Object', $css );
+    return( $css );
+}
+
+sub css_builder { return( shift->css->builder ); }
+
+sub css_grid { return( shift->_set_get_boolean( 'css_grid', @_ ) ); }
+
+sub default_email { return( shift->_set_get_scalar_as_object( 'default_email', @_ ) ); }
+
+sub document { return( shift->_set_get_object( 'document', 'Markdown::Parser::Document', @_ ) ); }
+
+sub email_obfuscate_class { return( shift->_set_get_scalar_as_object( 'email_obfuscate_class', @_ ) ); }
+
+sub email_obfuscate_data_host
+{
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        if( $_[0] =~ /^[a-zA-Z]\w+$/ )
+        {
+            return( $self->_set_get_scalar_as_object( 'email_obfuscate_data_host', @_ ) );
+        }
+        else
+        {
+            return( $self->error( "Invalid value \"$_[0]\" for the email obfuscation data-host attribute name." ) );
+        }
+    }
+    return( $self->_set_get_scalar_as_object( 'email_obfuscate_data_host' ) );
+}
+
+sub email_obfuscate_data_user
+{
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        if( $_[0] =~ /^[a-zA-Z]\w+$/ )
+        {
+            return( $self->_set_get_scalar_as_object( 'email_obfuscate_data_user', @_ ) );
+        }
+        else
+        {
+            return( $self->error( "Invalid value \"$_[0]\" for the email obfuscation data-user attribute name." ) );
+        }
+    }
+    return( $self->_set_get_scalar_as_object( 'email_obfuscate_data_user' ) );
+}
+
+sub encrypt_email { return( shift->_set_get_scalar_as_object( 'encrypt_email', @_ ) ); }
+
+sub footnote_ref_sequence : lvalue { return( shift->_set_get_lvalue( 'footnote_ref_sequence', @_ ) ); }
+
+sub katex_delimiter { return( shift->_set_get_array_as_object( 'katex_delimiter', @_ ) ); }
+
+## Nothing fancy, and used internally so no chaining or anything
+## We use it like $p->list_level++ or $p->list_level--;
+sub list_level : lvalue { return( shift->_set_get_lvalue( 'list_level', @_ ) ); }
+
+sub mode
+{
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        my $mode = shift( @_ );
+        my $curr = $self->_set_get_scalar( 'mode' );
+        if( substr( $mode, 0, 1 ) eq '+' )
+        {
+            if( length( $curr ) )
+            {
+                $curr .= ' ' . substr( $mode, 1 );
+            }
+            else
+            {
+                $curr = $mode;
+            }
+        }
+        $self->_set_get_scalar( 'mode', $curr );
+    }
+    return( $self->_set_get_scalar( 'mode' ) );
+}
+
+sub parse
+{
+    my $self = shift( @_ );
+    ## We accept empty data and we return empty elements array then
+    my $data = shift( @_ );
+    my $opts = {};
+    $opts = shift( @_ ) if( $self->_is_hash( $_[0] ) );
+    ## Standardise the new lines characters
+    ## $data =~ s/\cM/\n/gs;
+    ## $data =~ s/\c@//g;
+    $data =~ s/\r\n/\n/gs;
+    $data =~ s/\r/\n/gs;
+    ## Clean up the empty lines as they do not matter
+    $data =~ s/^[[:blank:]\h]+$//gm;
+    ## Detab
+    ## Cribbed from a post by Bart Lateur:
+    ## <http://www.nntp.perl.org/group/perl.macperl.anyperl/154>
+    my $tab_width = 4;
+    $data =~ s{(.*?)\t}{$1 . ( ' ' x ( $tab_width - length( $1 ) % $tab_width ) )}ge;
+    ## Make sure $text ends with a couple of newlines, unless this is sub parsing
+    $data .= "\n\n" unless( $opts->{element} );
+    pos( $data ) = 0;
+    ## all excludes extended markdowns
+    my $mode = $self->mode || 'all';
+    my $space_re = qr/[[:blank:]\h]{1,3}/;
+    my $PH_PREFIX = 'OBJ[';
+    my $PH_SUFFIX = ']';
+    my $top;
+    if( !( $top = $opts->{element} ) )
+    {
+        my $doc = $self->create_document(
+            abbreviation_case_sensitive => $self->abbreviation_case_sensitive,
+            default_email               => $self->default_email,
+            email_obfuscate_class       => $self->email_obfuscate_class,
+            email_obfuscate_data_host   => $self->email_obfuscate_data_host,
+            email_obfuscate_data_user   => $self->email_obfuscate_data_user,
+            css         => $self->css,
+            debug       => $self->debug,
+            tag_name    => 'top',
+        );
+        ## Sharing the parameter
+        $doc->katex_delimiter( $self->katex_delimiter );
+        $self->message( 3, "Setting doc object '$doc'" );
+        $self->document( $doc ) if( !$self->document );
+        $top = $doc;
+    };
+    $self->messagef_colour( 3, "%s %d bytes of data with mode set to '{green}%s{/}' with container being '{green}%s{/}'.", ( $opts->{element} ? "Sub-parsing" : "Parsing" ), length( $data ), $mode, $top->tag_name );
+    $self->message( 3, "Data to parse is now '$data'." );
+    
+    ## Previous element added. We store it here to keep track of context
+    my $context;
+    ## pos( $data ) = 0;
+    pos( $data ) = $opts->{pos} if( length( $opts->{pos} ) && $opts->{pos} =~ /^\d+$/ );
+    $opts->{scope_cond} = 'any';
+    if( !$self->_is_array( $opts->{scope} ) )
+    {
+        $opts->{scope} = length( $opts->{scope} ) ? [split( /\s+/, $opts->{scope} )] : [split( /\s+/, $mode )];
+    }
+    elsif( $self->_is_array( $opts->{scope} ) && !$self->_to_array_object( $opts->{scope} )->length )
+    {
+        $opts->{scope} = [$mode];
+    }
+    
+    if( length( $opts->{scope} ) && $self->_is_array( $opts->{scope} ) )
+    {
+        my $scopes = $self->new_array;
+        $self->_to_array_object( $opts->{scope} )->foreach(sub
+        {
+            if( s/\|{1,2}/ /g )
+            {
+                $scopes->push( split( /\s+/, $_ ) );
+                $opts->{scope_cond} = 'any';
+            }
+            elsif( s/(?:\&{1,2}|\+)/ /g )
+            {
+                $scopes->push( split( /\s+/, $_ ) );
+                $opts->{scope_cond} = 'all';
+            }
+            else
+            {
+                $scopes->push( $_ );
+            }
+        });
+        $opts->{scope} = $scopes;
+    }
+    
+    $self->message( 3, "Scope is '", $opts->{scope}->join( "', '" ), "' and scope condition is '$opts->{scope_cond}'." );
+    my $scope = Markdown::Parser::Scope->new( $opts->{scope}, debug => $self->debug, condition => $opts->{scope_cond} );
+    $self->scope( $scope ) if( $top->tag_name eq 'top' && !$self->scope );
+    
+    my $katex_re;
+    ## We check for link definitions, but only if we are in the top element, since sub elements would not hold any of them and it would thus be pointless to process them
+    ## Need to remove the link definition from the document
+    if( $top->tag_name eq 'top' )
+    {
+        ## Need to isolate html code blocks, because their indentation can be mistaken for code blocks.
+        ## Then, we parsing for code block, we re-instate the html block found and isolated.
+        if( $scope->has( [qw( html )]) )
+        {
+            $data =~ s{$RE{Markdown}{Html}}
+            {
+                my $re = { %- };
+                my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+                # my $html = $+{tag_all};
+                # We save exactly what we caught
+                my $html = substr( $data, $-[0], $+[0] - $-[0] );
+                $self->message( 3, $self->whereami( \$data, $pos, { text => "Found html block '$+{tag_all}' with capture: " . $self->dump( $re ), return => 1 } ) );
+                my $elem = $top->create_html({
+                    pos => $pos,
+                    raw => $html,
+                }) || die( $top->error );
+                my $id = $self->document->add_object( $elem ) || die( $top->error );
+                "!!HTML[$id]!!";
+            }xgems;
+        }
+        
+        ## Code blocks trumps everything else, so they come first
+        ## First, check the parts that are surrounded by backticks or equivalents
+        $self->message_colour( 3, "Does scope have '{green}extended code_block{/}' ? ", $scope->has( [qw( extended code_block )] ) ? '{green}yes{/}' : '{red}no{/}' );
+        if( $scope->has( [qw( extended code_block )] ) )
+        {
+            $data =~ s{$RE{Markdown}{ExtCodeBlock}}
+            {
+                my $re = { %- };
+                $re->{capture} = substr( $data, $-[0], $+[0] - $-[0] );
+                my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+                $self->message( 3, $self->whereami( \$data, $pos, { text => "Found an extended code block at pos '$pos' with code class '$+{code_class}' and code definition '$+{code_def}' and with capture: " . $self->dump( $re ), return => 1 } ) );
+                my $code_def = $+{code_attr};
+                my $code_class = $+{code_class};
+                my $raw = $+{code_all};
+                my $content = $+{code_content};
+                
+                ## Restore any html that got caught previously
+                $content =~ s{\!{2}HTML\[(?<obj_id>\d+)\]\!{2}}
+                {
+                    my $obj_id = $+{obj_id};
+                    $self->message( 3, "Found html placeholder to be restored" );
+                    my $obj = $self->document->objects->get( $obj_id );
+                    if( $obj )
+                    {
+                        $obj->raw->scalar;
+                    }
+                    else
+                    {
+                        $self->message( 3, "Could not find an object matching id '$obj_id'." );
+                        "!!HTML[${obj_id}]!!";
+                    }
+                }xgems;
+        
+                $code_def =~ s/^[[:blank:]\h]+|[[:blank:]\h]+$//gs;
+                $code_class =~ s/^[\.[:blank:]\h]+//gs;
+        
+                my $code = $top->create_code({
+                    class => [split( /\./, $code_class )],
+                    pos => $pos,
+                    raw => $raw,
+                });
+                $code->add_element( $top->create_text({
+                    text => $content,
+                    pos => $pos,
+                }) ) || return( $self->pass_error( $code->error ) );
+                $self->message( 3, "Adding exntended attribute for code: '$code_def'" ) if( length( $code_def ) );
+                $code->add_attributes( $code_def ) if( length( $code_def ) );
+                my $id = $top->add_object( $code );
+                "${PH_PREFIX}${id}${PH_SUFFIX}\n";
+            }xgems;
+        }
+        elsif( $self->message_colour( 3, "Does scope have '{green}code_block{/}' ? ", $scope->has( 'code_block' ) ? '{green}yes{/}' : '{red}no{/}' ) && $scope->has( 'code_block' ) )
+        {
+            $data =~ s{$RE{Markdown}{CodeBlock}}
+            {
+                my $re = { %- };
+                my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+                my $raw = $+{code_all};
+                my $content = $+{code_content};
+                ## my $new_lines = $+{code_trailing_new_line};
+                $self->message( 3, $self->whereami( \$data, $pos, { text => "Found a code block at pos '$pos' with capture: " . $self->dump( $re ), return => 1 } ) );
+                
+                ## Restore any html that got caught previously
+                $content =~ s{\!{2}HTML\[(?<obj_id>\d+)\]\!{2}}
+                {
+                    my $obj_id = $+{obj_id};
+                    $self->message( 3, "Found html placeholder to be restored" );
+                    my $obj = $self->document->objects->get( $obj_id );
+                    if( $obj )
+                    {
+                        $obj->raw->scalar;
+                    }
+                    else
+                    {
+                        $self->message( 3, "Could not find an object matching id '$obj_id'." );
+                        "!!HTML[${obj_id}]!!";
+                    }
+                }xgems;
+        
+                my $code = $top->create_code({
+                    pos => $pos,
+                    raw => $raw,
+                });
+                $code->add_element( $top->create_text({
+                    text => $content,
+                    pos => $pos,
+                }) ) || return( $self->pass_error( $code->error ) );
+                my $id = $top->add_object( $code );
+                "${PH_PREFIX}${id}${PH_SUFFIX}\n";
+            }xgems;
+        }
+    
+        $self->message_colour( 3, "Does scope have '{green}code_line{/}' ? ", $scope->has( 'code_line' ) ? '{green}yes{/}' : '{red}no{/}' );
+        # $self->message( 3, "Checking code line at pos '", pos( $data ), "' with:\n$RE{Markdown}{CodeLine}" );
+        ## Code single line. If it is a series of them treat them as a block
+        if( $scope->has( 'code_line' ) )
+        {
+            $data =~ s{$RE{Markdown}{CodeLine}}
+            {
+                my $re = { %- };
+                my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+                my $raw = $+{code_all};
+                my $content = $+{code_all};
+                $self->message( 3, $self->whereami( \$data, $pos, { text => "Found a code line at pos '$pos' with capture: " . $self->dump( $re ), return => 1 } ) );
+                
+                ## Restore any html that got caught previously
+                $content =~ s{\!{2}HTML\[(?<obj_id>\d+)\]\!{2}}
+                {
+                    my $obj_id = $+{obj_id};
+                    $self->message( 3, "Found html placeholder to be restored" );
+                    my $obj = $self->document->objects->get( $obj_id );
+                    if( $obj )
+                    {
+                        $obj->raw->scalar;
+                    }
+                    else
+                    {
+                        $self->message( 3, "Could not find an object matching id '$obj_id'." );
+                        "!!HTML[${obj_id}]!!";
+                    }
+                }xgems;
+        
+                ## trim leading newlines
+                $content =~ s/\A\n+//;
+                ## trim trailing whitespace
+                $content =~ s/\s+\z//;
+                my $trailing_nl = $self->_total_trailing_new_lines( $raw );
+                my $code = $top->create_code({
+                    ## Setting this to true will have the leading 4 spaces or tab removed
+                    fenced => 1,
+                    pos => $pos,
+                    raw => $+{code_all},
+                });
+                $code->add_element( $top->create_text({
+                    text => $content,
+                    pos => $pos,
+                }) ) || return( $self->pass_error( $code->error ) );
+                my $id = $top->add_object( $code );
+                ## Move back before the trailing new lines as they may be important for the next check
+                "${PH_PREFIX}${id}${PH_SUFFIX}\n";
+            }xgems;
+        }
+        
+        ## Restore any html blocks if any
+        $data =~ s{\!{2}HTML\[(?<obj_id>\d+)\]\!{2}}
+        {
+            my $obj_id = $+{obj_id};
+            $self->message( 3, "Found html placeholder to be restored" );
+            my $obj = $self->document->objects->get( $obj_id );
+            if( $obj )
+            {
+                $obj->raw->scalar;
+            }
+            else
+            {
+                $self->message( 3, "Could not find an object matching id '$obj_id'." );
+                "!!HTML[${obj_id}]!!";
+            }
+        }xgems;
+
+        
+        pos( $data ) = 0;
+        ## Inline code `some thing`
+        if( $scope->has( 'code_span' ) )
+        {
+            $data =~ s{$RE{Markdown}{CodeSpan}}
+            {
+                my $re = { %- };
+                my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+                my $raw = $+{code_all};
+                my $content = $+{code_content};
+                $self->message_colour( 3, $self->whereami( \$data, $pos, { text => "Found an inline code '$raw' at pos '$pos' with content:\n'{green}" . $content . "{/}' and with capture: " . $self->dump( $re ), return => 1 } ) );
+                ## leading whitespace
+                $content =~ s/^[ \t]*//g;
+                ## trailing whitespace
+                $content =~ s/[ \t]*$//g;
+                my $code = $top->create_code({
+                    inline => 1,
+                    pos => $pos,
+                    raw => $raw,
+                });
+                $code->add_element( $top->create_text({
+                    text => $content,
+                    pos => $pos,
+                }) );
+                my $id = $top->add_object( $code );
+                "${PH_PREFIX}${id}${PH_SUFFIX}";
+            }xgems;
+        }
+       
+        $self->messagef_colour( 3, "%d objects found so far.", $top->objects->length );
+        
+        $self->message_colour( 3, "Processing possible {green}link{/} definitions." );
+        $data =~ s{$RE{Markdown}{ExtLinkDefinition}}
+        {
+            my $id = $+{link_id};
+            my $url = $+{link_url};
+            my $title = $+{link_title};
+            my $link_def = $+{link_attr};
+            my $raw = $+{link_all};
+            my $end = pos( $data );
+            my $start = $end - length( $+{link_all} );
+            $self->message( 3, "Found link \"$+{link_all}\"." );
+            $self->message_colour( 3, $self->whereami( \$data, $pos, { text => "Found link definition with id '{green}" . $+{link_id} . "{/}', url '{green}" . $+{link_url} . "{/}', title '{green}" . $+{link_title} . "{/}', all '{green}" . $+{link_all} . "{/}' at position '" . $start . "' until position '" . $end . "'.", return => 1 } ) );
+            my $lnk = $top->create_link_definition({
+                link_id => $id,
+                pos => pos( $data ),
+                raw => $raw,
+                title => $title,
+                url => $url,
+            });
+            $link_def =~ s/^[[:blank:]\h]+|[[:blank:]\h]+$//gs;
+            $lnk->add_attributes( $link_def ) if( length( $link_def ) );
+            ## Just register the link definition, but do not add it to the document
+            $top->register_link_definition( $lnk );
+            $self->message( 3, "Registered link id is '", $lnk->id, "', title is '", $lnk->title, "' and url is '", $lnk->url, "'" );
+            '';
+        }gme;
+        
+        $data =~ s{$RE{Markdown}{LinkDefinition}}
+        {
+            my $id = $+{link_id};
+            my $url = $+{link_url};
+            my $title = $+{link_title};
+            my $raw = $+{link_all};
+            my $end = pos( $data );
+            my $start = $end - length( $+{link_all} );
+            $self->message( 3, "Found link \"$+{link_all}\"." );
+            $self->message_colour( 3, $self->whereami( \$data, $pos, { text => "Found link definition with id '{green}" . $+{link_id} . "{/}', url '{green}" . $+{link_url} . "{/}', title '{green}" . $+{link_title} . "{/}', all '{green}" . $+{link_all} . "{/}' at position '" . $start . "' until position '" . $end . "'.", return => 1 } ) );
+            my $lnk = $top->create_link_definition({
+                link_id => $id,
+                pos => pos( $data ),
+                raw => $raw,
+                title => $title,
+                url => $url,
+            });
+            ## Just register the link definition, but do not add it to the document
+            $top->register_link_definition( $lnk );
+            $self->message( 3, "Registered link id is '", $lnk->id, "', title is '", $lnk->title, "' and url is '", $lnk->url, "'" );
+            '';
+        }gme;
+        $self->messagef( 3, "%d link definitions registered.", $top->links->length );
+        
+        pos( $data ) = 0;
+        $self->message_colour( 3, "Does scope have '{green}abbr{/}' ? ", $scope->has( [qw( extended abbr )] ) ? '{green}yes{/}' : '{red}no{/}' );
+        if( $scope->has( [qw( extended abbr )] ) )
+        {
+            $data =~ s{^[[:blank:]\h]{0,3}$RE{Markdown}{ExtAbbr}}
+            {
+                my $re = { %- };
+                my $end = pos( $data );
+                my $start = $end - length( $+{abbr_all} );
+                $self->message_colour( 3, $self->whereami( \$data, $pos, { text => "Found abbreviation \"{green}" . $+{abbr_all} . "{/}\" with name '{green}" . $+{abbr_name} . "{/}' with capture: " . $self->dump( $re ), return => 1 } ) );
+                my $abbr = $top->create_abbreviation({
+                    name => $+{abbr_name},
+                    value => $+{abbr_value},
+                    parent => $top,
+                    pos => pos( $data ),
+                    raw => $+{abbr_all},
+                });
+                $top->register_abbreviation( $abbr, { case_sensitive => $self->abbreviation_case_sensitive } );
+                '';
+            }gme;
+            $self->messagef( 3, "%d abbreviations registered.", $top->dict->length );
+        }
+        
+        $self->message_colour( 3, "Does scope have '{green}footnote{/}' ? ", $scope->has( [qw( extended footnote )] ) ? '{green}yes{/}' : '{red}no{/}' );
+        if( $scope->has( [qw( extended footnote )] ) )
+        {
+            $data =~ s{$RE{Markdown}{ExtFootnote}}
+            {
+                my $re = { %- };
+                my $end = pos( $data );
+                my $start = $end - length( $+{footnote_all} );
+                $self->message_colour( 3, $self->whereami( \$data, $pos, { text => "Found footnote \"{green}" . $+{footnote_all} . "{/}\" with id '{green}" . $+{footnote_id} . "{/}' with capture: " . $self->dump( $re ), return => 1 } ) );
+                my $content = $+{footnote_text} . ' !!FN!!';
+                my $footnote = $top->create_footnote({
+                    id => $+{footnote_id},
+                    unparsed => $content,
+                    parent => $top,
+                    pos => pos( $data ),
+                    raw => $+{footnote_all},
+                }) || die( "Unable to create footnote object: ", $top->error, "\n" );
+                $top->register_footnote( $footnote );
+                '';
+            }gme;
+            $self->messagef( 3, "%d footnotes registered.", $top->footnotes->length );
+        }
+        
+        $self->message_colour( 3, "Does scope have '{green}footnote{/}' ? ", $scope->has( [qw( footnote extended )] ) ? '{green}yes{/}' : '{red}no{/}' );
+        if( $scope->has( [qw( footnote extended )] ) )
+        {
+            $data =~ s{$RE{Markdown}{ExtFootnoteReference}}
+            {
+                my $re = { %- };
+                my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+                $self->message( 3, $self->whereami( \$data, $pos, { text => "Found a footnote reference at pos '$pos' with capture: " . $self->dump( $re ), return => 1 } ) );
+                my $id = $+{footnote_id};
+                my $text = $+{footnote_text};
+                my $footnote;
+                ## Auto-generated id for inline footnote
+                ## Example:
+                ## I met Jack [^](Co-founder of Angels, Inc) at the meet-up.
+                ## Here is an inline note.^[Inlines notes are easier to write]
+                ## Inline footnote, i.e. text provided
+                ## We cannot just do if( !$id ) because a valid id could be '0'
+                my $object_id;
+                if( !length( $id ) )
+                {
+                    $id = $self->document->footnotes->length + 1;
+                    $self->message( 3, "Np footnote id was provided, auto-generating one: '$id'." );
+                }
+        
+                if( length( $text ) )
+                {
+                    $self->message( 3, "Footnote text was provided. Registering a footnote on the fly with id '$id' and text '$text'." );
+                    $footnote = $top->create_footnote({
+                        id => $id,
+                        text => $text,
+                        parent => $top,
+                        pos => $pos,
+                        raw => $+{footnote_all},
+                    });
+                    $top->register_footnote( $footnote );
+                }
+                ## Cannot find an id matching this footnote, so we just add this footnote reference as a text
+                elsif( !( $footnote = $self->document->get_footnote( $id ) ) )
+                {
+                    warn( "Unable to find a matching footnote with the footnote id \"$id\".\nAvailable footnotes ids are: '", $self->document->footnotes->map(sub{ $_->id })->join( "', '" ), "'." );
+                    $object_id = $self->document->add_object( $top->create_text(
+                    {
+                        text => $+{footnote_all},
+                        pos => $pos,
+                    }) );
+                }
+                
+                if( $footnote )
+                {
+                    $self->message( 3, "Found footnote with id '", $footnote->id, "'. Creating footnote reference" );
+                    ## Create a footnote reference and associate this footnote id with this reference
+                    ## The footnote reference id will be set by add_reference()
+                    my $ref = $top->create_footnote_ref({
+                        footnote => $footnote,
+                        raw => $+{footnote_all},
+                        sequence => ++$self->footnote_ref_sequence,
+                        pos => $pos,
+                    });
+                    ## add_reference will take care of setting the id used for backlink for this footnote reference
+                    $footnote->add_reference( $ref );
+                    $object_id = $self->document->add_object( $ref );
+                }
+                "${PH_PREFIX}${object_id}${PH_SUFFIX}";
+            }xgems;
+        }
+    
+        $self->message_colour( 3, "After processing {green}link{/} definition, {green}abbreviations{/} and {green}footnotes{/}, data is now '$data'." );
+    }
+    
+    if( $scope->has( [qw( extended katex )] ) )
+    {
+        if( $self->katex_delimiter->length > 0 )
+        {
+            $katex_re = $RE{Markdown}{ExtKatex}{-delimiter => $self->katex_delimiter->join( ',' )};
+        }
+        else
+        {
+            $katex_re = $RE{Markdown}{ExtKatex};
+        }
+    }
+    
+    my $abbr_re;
+    if( $self->document->dict->length > 0 )
+    {
+        $abbr_re = '(?' . ( $self->abbreviation_case_sensitive ? '' : 'i' ) . ':' . $self->document->dict->keys->join( '|' )->scalar . ')';
+        $abbr_re = qr/$abbr_re/;
+    }
+    pos( $data ) = 0;
+    
+    $self->messagef( 3, "Parsing %d bytes of data starting at '%d'", length( $data ), pos( $data ) );
+        
+    if( $top->tag_name ne 'top' )
+    {
+        $self->message_colour( 3, "Does scope have '{green}extended code_block{/}' ? ", $scope->has( [qw( extended code_block )] ) ? '{green}yes{/}' : '{red}no{/}' );
+        if( $scope->has( [qw( extended code_block )] ) )
+        {
+            $data =~ s{$RE{Markdown}{ExtCodeBlock}}
+            {
+                my $re = { %- };
+                $re->{capture} = substr( $data, $-[0], $+[0] - $-[0] );
+                my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+                $self->message( 3, $self->whereami( \$data, $pos, { text => "Found an extended code block at pos '$pos' with code class '$+{code_class}' and code definition '$+{code_def}' and with capture: " . $self->dump( $re ), return => 1 } ) );
+                my $code_def = $+{code_attr};
+                my $code_class = $+{code_class};
+                my $raw = $+{code_all};
+                my $content = $+{code_content};
+        
+                $code_def =~ s/^[[:blank:]\h]+|[[:blank:]\h]+$//gs;
+                $code_class =~ s/^[\.[:blank:]\h]+//gs;
+        
+                my $code = $top->create_code({
+                    class => [split( /\./, $code_class )],
+                    pos => $pos,
+                    raw => $raw,
+                });
+                $code->add_element( $top->create_text({
+                    text => $content,
+                    pos => $pos,
+                }) ) || return( $self->pass_error( $code->error ) );
+                $self->message( 3, "Adding exntended attribute for code: '$code_def'" ) if( length( $code_def ) );
+                $code->add_attributes( $code_def ) if( length( $code_def ) );
+                my $id = $self->document->add_object( $code );
+                "${PH_PREFIX}${id}${PH_SUFFIX}\n";
+            }xgems;
+        }
+    
+        $self->message_colour( 3, "Does scope have '{green}code_block{/}' ? ", $scope->has( 'code_block' ) ? '{green}yes{/}' : '{red}no{/}' );
+        # $self->message( 3, "Checking vanilla code block at pos '", pos( $data ), "' with:\n$RE{Markdown}{CodeBlock}" );
+        ## Code blocks trumps everything else, so they come first
+        if( $scope->has( 'code_block' ) )
+        {
+            $data =~ s{$RE{Markdown}{CodeBlock}}
+            {
+                my $re = { %- };
+                my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+                my $raw = $+{code_all};
+                my $content = $+{code_content};
+                ## my $new_lines = $+{code_trailing_new_line};
+                $self->message( 3, $self->whereami( \$data, $pos, { text => "Found a code block at pos '$pos' with capture: " . $self->dump( $re ), return => 1 } ) );
+                my $code = $top->create_code({
+                    pos => $pos,
+                    raw => $raw,
+                });
+                $code->add_element( $top->create_text({
+                    text => $content,
+                    pos => $pos,
+                }) ) || return( $self->pass_error( $code->error ) );
+                my $id = $self->document->add_object( $code );
+                "${PH_PREFIX}${id}${PH_SUFFIX}\n";
+            }xgems;
+        }
+    
+        $self->message_colour( 3, "Does scope have '{green}code_line{/}' ? ", $scope->has( 'code_line' ) ? '{green}yes{/}' : '{red}no{/}' );
+        # $self->message( 3, "Checking code line at pos '", pos( $data ), "' with:\n$RE{Markdown}{CodeLine}" );
+        ## Code single line. If it is a series of them treat them as a block
+        if( $scope->has( 'code_line' ) )
+        {
+            $data =~ s{$RE{Markdown}{CodeLine}}
+            {
+                my $re = { %- };
+                my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+                my $raw = $+{code_all};
+                my $content = $+{code_all};
+                $self->message( 3, $self->whereami( \$data, $pos, { text => "Found a code line at pos '$pos' with capture: " . $self->dump( $re ), return => 1 } ) );
+                ## trim leading newlines
+                $content =~ s/\A\n+//;
+                ## trim trailing whitespace
+                $content =~ s/\s+\z//;
+                my $trailing_nl = $self->_total_trailing_new_lines( $raw );
+                my $code = $top->create_code({
+                    ## Setting this to true will have the leading 4 spaces or tab removed
+                    fenced => 1,
+                    pos => $pos,
+                    raw => $+{code_all},
+                });
+                $code->add_element( $top->create_text({
+                    text => $content,
+                    pos => $pos,
+                }) ) || return( $self->pass_error( $code->error ) );
+                my $id = $self->document->add_object( $code );
+                ## Move back before the trailing new lines as they may be important for the next check
+                "${PH_PREFIX}${id}${PH_SUFFIX}\n";
+            }xgems;
+        }
+    }
+
+    $self->message_colour( 3, "Does scope have '{green}table extended{/}' ? ", $scope->has( [qw( table extended )] ) ? '{green}yes{/}' : '{red}no{/}' );
+    if( $scope->has( 'table extended' ) )
+    {
+        $data =~ s{$RE{Markdown}{ExtTable}}
+        {
+            my $re = { %- };
+            my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+            $self->message( 3, $self->whereami( \$data, $pos, { text => "Found a table at pos '$pos' with capture: " . $self->dump( $re ), return => 1 } ) );
+            my $tbl = $self->parse_table( $re, { doc => $top } );
+            my $id = $tbl->object_id;
+            ## pos( $data ) = $pos + length( $+{table} );
+            "${PH_PREFIX}${id}${PH_SUFFIX}\n";
+        }xgems;
+    }
+
+    $self->message_colour( 3, "Does scope have '{green}html{/}' ? ", $scope->has( 'html' ) ? '{green}yes{/}' : '{red}no{/}' );
+    # $self->message( 3, "Checking opening html at pos '", pos( $data ), "' with:\n$RE{Markdown}{HtmlOpen}" );
+    ## HTML blocks MUST be start and end on their own lines
+    if( $scope->has( 'html' ) )
+    {
+        $data =~ s{$RE{Markdown}{Html}}
+        {
+            my $re = { %- };
+            my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+            my $html = $+{tag_all};
+            $self->message( 3, $self->whereami( \$data, $pos, { text => "Found html block '$+{tag_all}' with capture: " . $self->dump( $re ), return => 1 } ) );
+            $self->message( 3, "Parsing html '$html' to check for div with markdown attribute" );
+            $html =~ s{$RE{Markdown}{ExtHtmlMarkdown}}
+            {
+                my $ct = $+{content};
+                my $open = $+{div_open};
+                my $close = $+{div_close};
+                my $tag_name = $+{tag_name};
+                my $leading_space = $+{leading_space};
+                ## Remove the markdown attribute
+                $open =~ s/[[:blank:]\h]+markdown[[:blank:]\h]*\=[[:blank:]\h]*(?<quote>["']?)1\g{quote}//;
+                $self->message( 3, "Found $tag_name markdown with content '$ct'" );
+                ## Need to remove indentation at begining of line
+                if( length( $leading_space ) )
+                {
+                    $ct =~ s/^$leading_space//gm;
+                }
+                my $p = $top->create_paragraph({
+                    parent => $top,
+                    pos => $pos,
+                });
+                $self->parse( $ct, { element => $p });
+                my $res = $p->children->map(sub{ $_->as_string })->join( '' )->scalar;
+                $self->message( 3, "Resulting string is '${open}${res}${close}'" );
+                "${open}${res}\n${close}\n";
+            }xgems;
+    
+            $self->message( 3, "Creating html element with '$html'" );
+            my $elem = $top->create_html({
+                pos => $pos,
+                raw => $html,
+            }) || die( $top->error );
+            my $id = $self->document->add_object( $elem ) || die( $top->error );
+            "${PH_PREFIX}${id}${PH_SUFFIX}\n";
+        }xgemsi;
+    }
+
+    $self->message_colour( 3, "Does scope have '{green}blockquote{/}' ? ", $scope->has( 'blockquote' ) ? '{green}yes{/}' : '{red}no{/}' );
+    ## Blockquote
+    if( $scope->has( 'blockquote' ) )
+    {
+        $data =~ s{$RE{Markdown}{Blockquote}}
+        {
+            my $re = { %- };
+            my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+            $self->message_colour( 3, $self->whereami( \$data, $pos, { text => "Found a blockquote '{green}" . $+{bquote_all} . "{/}' at pos '$pos' with capture: " . $self->dump( $re ), return => 1 } ) );
+            my $raw = $+{bquote_all};
+            my $bq = $raw;
+            $bq =~ s/^[ \t]*>[ \t]?//gm;    # trim one level of quoting
+            $bq =~ s/^[ \t]+$//mg;          # trim whitespace-only lines
+            my $block = $top->create_blockquote({
+                pos => $pos,
+                raw => $raw,
+            });
+            my $id = $self->document->add_object( $block );
+            $self->parse( $bq, { scope => $self->scope_block, element => $block } );
+            "${PH_PREFIX}${id}${PH_SUFFIX}\n";
+        }xgems;
+    }
+
+    ## Now, the line elements
+
+    # Setext-style headers:
+    #     Header 1 {.main .shine #the-site lang=fr}
+    #     ========
+    #  
+    #     Header 2 {.main .shine #the-site lang=fr}
+    #     --------
+    #
+    ## This is to be on a single line of its own
+    $self->message_colour( 3, "Does scope have '{green}header extended{/}' ? ", $scope->has( 'header extended' ) ? '{green}yes{/}' : '{red}no{/}' );
+    if( $scope->has( 'header extended' ) )
+    {
+        $data =~ s{$RE{Markdown}{ExtHeader}}
+        {
+            my $re = { %- };
+            my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+            $self->message_colour( 3, $self->whereami( \$data, $pos, { text => "Found an extended header '{green}" . $+{header_all} . "{/}' with header level '{green}" . length( $+{header_level} ) . "{/}' and attributes '{green}" . $+{header_attr} . "{/}' at pos '$pos' with capture: " . $self->dump( $re ), return => 1 } ) );
+            my $text = $+{header_content};
+            my $attr = $+{header_attr};
+            my $header = $top->create_header({
+                level => length( $+{header_level} ),
+                pos => $pos,
+                raw => $+{header_all},
+            });
+            ## Further process the text capture
+            ## If there are any elements, they will be placed inside the header element as children
+            $self->message( 3, "Sub parsing text '$text' for enclosing tag '", $header->as_string, "'." );
+            my $id = $self->document->add_object( $header );
+            $self->parse( $text, { scope => 'inline extended', element => $header } );
+            $self->message( 3, "Adding exntended attribute for header: '$attr'" );
+            $header->add_attributes( $attr );
+            "${PH_PREFIX}${id}${PH_SUFFIX}\n";
+        }xgem;
+    }
+
+    # $self->message( 3, "Checking header at pos '", pos( $data ), "' with:\n$RE{Markdown}{Header}" );
+    ## Checking for headers
+    # atx-style headers:
+    #   # Header 1
+    #   ## Header 2
+    #   ## Header 2 with closing hashes ##
+    #   ...
+    #   ###### Header 6
+    $self->message_colour( 3, "Does scope have '{green}header{/}' ? ", $scope->has( 'header' ) ? '{green}yes{/}' : '{red}no{/}' );
+    if( $scope->has( 'header' ) )
+    {
+        $data =~ s{$RE{Markdown}{Header}}
+        {
+            my $re = { %- };
+            my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+            $self->message_colour( 3, $self->whereami( \$data, $pos, { text => "Found a vanilla header '{green}" . $+{header_all} . "{/}' with header level '{green}" . length( $+{header_level} ) . "{/}' at pos '$pos' with capture: " . $self->dump( $re ), return => 1 } ) );
+            my $text = $+{header_content};
+            my $header = $top->create_header({
+                level => length( $+{header_level} ),
+                pos => $pos,
+                raw => $+{header_all},
+            });
+            ## Further process the text capture
+            ## If there are any elements, they will be placed inside the header element as children
+            $self->message( 3, "Sub parsing text '$text' for enclosing tag '", $header->as_string, "'." );
+            my $id = $self->document->add_object( $header );
+            $self->parse( $text, { scope => $self->scope_inline, element => $header } );
+            "${PH_PREFIX}${id}${PH_SUFFIX}\n";
+        }xgem;
+    }
+
+    ## List goes before header line because a list with a 2nd empty element could be confused as an header line.
+    ## For example:
+    # - HIJ
+    # -
+
+    # $self->message( 3, "Checking lists at pos '", pos( $data ), "' with:\n$RE{Markdown}{List}" );
+    ## List
+    my $list_re = $self->list_level ? $RE{Markdown}{ListNthLevel} : $RE{Markdown}{ListFirstLevel};
+    $self->message_colour( 3, "Does scope have '{bold green}list{/}' ? ", $scope->has( 'list' ) ? '{green}yes{/}' : '{red}no{/}', " for scope '", $opts->{scope}->as_string, "'." );
+    $self->message_colour( 3, "List level is '{green}", $self->list_level, "{/}'." );
+    ## If I do the following it does not work witht he regexp, but if I do substr( $data, $pos ) it works.
+    ## I am puzzled as to why, and I give up.
+    ## if( $scope->has( 'list' ) && $data =~ /\G$list_re/gmcs )
+    ## if( $scope->has( 'list' ) && substr( $data, $pos ) =~ /\G$list_re/gmcs )
+    if( $scope->has( 'list' ) )
+    {
+        $data =~ s{$list_re}
+        {
+            my $list = $+{list_all};
+            my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+            my $list_type = $+{list_type_ordered} ? 'ol' : 'ul';
+            my $re = { %- };
+            ## Corollary from using substr( $daata, $pos ). We ned to update the position in the string manually
+            ## pos( $data ) = $pos + length( substr( $data, $-[0], $+[0]-$-[0] ) );
+            ## XXX With this new way of processing list, I do not know the indent level anymore. Might want to look into that.
+            my $indent_level = 0;
+            ## Turn double returns into triple returns, so that we can make a
+            ## paragraph for the last item in a list, if necessary:
+            $self->message_colour( 3, $self->whereami( \$data, $pos, { text => "Found a list of type '" . $list_type . "' at pos '" . $pos . "':\n'{bold orange}" . $list . "{/}' with capture: " . $self->dump( $re ), return => 1 } ) );
+            my $new_list = $top->create_list({
+                indent => $indent_level,
+                pos => $pos,
+                raw => $list,
+                order => $list_type eq 'ol' ? 1 : 0,
+            });
+            my $id = $self->document->add_object( $new_list );
+            # $list =~ s/\n{2,}/\n\n\n/g;
+            $self->parse_list_item( $list, { doc => $new_list, pos => pos( $data ) } );
+            "${PH_PREFIX}${id}${PH_SUFFIX}\n";
+        }xgems;
+    }
+    
+    ## Ex: Some thing\n
+    ##     ==========\n
+    $self->message_colour( 3, "Does scope have '{green}header line extended{/}' ? ", $scope->has( 'header extended' ) ? '{green}yes{/}' : '{red}no{/}' );
+    if( $scope->has( 'header extended' ) )
+    {
+        $data =~ s{$RE{Markdown}{ExtHeaderLine}}
+        {
+            my $re = { %- };
+            my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+            $self->message_colour( 3, $self->whereami( \$data, $pos, { text => "Found an extended header line '{green}" . $+{header_all} . "{/}' with text '{green}" . $+{header_content} . "{/}' at pos '$pos' with capture: " . $self->dump( $re ), return => 1 } ) );
+            my $text = $+{header_content};
+            my $raw  = $+{header_all};
+            my $attr = $+{header_attr};
+            my $levels =
+            {
+            '=' => 1,
+            '-' => 2,
+            };
+            my $header = $top->create_header({
+                level => $levels->{ substr( $+{header_type}, 0, 1 ) },
+                parent => $top,
+                pos => $pos,
+                raw => $raw,
+            });
+            $self->message( 3, "Adding exntended attribute for header: '$attr'" );
+            $header->add_attributes( $attr );
+    
+            ## Further process the text capture
+            ## If there are any elements, they will be placed inside the header element as children
+            $self->message( 3, "Sub parsing text '$text' for enclosing tag '", $header->as_string, "'." );
+            my $id = $self->document->add_object( $header );
+            $self->parse( $text, { scope => 'inline extended', element => $header } );
+            "${PH_PREFIX}${id}${PH_SUFFIX}\n";
+        }xgems;
+    }
+
+    # $self->message( 3, "Checking header lines at pos '", pos( $data ), "' with:\n$RE{Markdown}{HeaderLine}" );
+    ## Ex: Some thing\n
+    ##     ==========\n
+    $self->message_colour( 3, "Does scope have '{green}header line{/}' ? ", $scope->has( 'header' ) ? '{green}yes{/}' : '{red}no{/}' );
+    if( $scope->has( 'header' ) )
+    {
+        $data =~ s{$RE{Markdown}{HeaderLine}}
+        {
+            my $re = { %- };
+            my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+            $self->message_colour( 3, $self->whereami( \$data, $pos, { text => "Found a vanilla header line '{green}" . $+{header_all} . "{/}' with text '{green}" . $+{header_content} . "{/}' at pos '$pos' with capture: " . $self->dump( $re ), return => 1 } ) );
+            my $text = $+{header_content};
+            my $raw  = $+{header_all};
+            my $levels =
+            {
+            '=' => 1,
+            '-' => 2,
+            };
+            my $header = $top->create_header({
+                level => $levels->{ substr( $+{header_type}, 0, 1 ) },
+                parent => $top,
+                pos => $pos,
+                raw => $raw,
+            });
+            ## Further process the text capture
+            ## If there are any elements, they will be placed inside the header element as children
+            $self->message( 3, "Sub parsing text '$text' for enclosing tag '", $header->as_string, "'." );
+            $self->parse( $text, { scope => $self->scope_inline, element => $header } );
+            my $id = $self->document->add_object( $header );
+            "${PH_PREFIX}${id}${PH_SUFFIX}\n";
+        }xgems;
+    }
+
+    # $self->message( 3, "Checking lines at pos '", pos( $data ), "' with:\n$RE{Markdown}{Line}" );
+    ## Horizontal lines
+    ## * * *
+    ## 
+    ## ***
+    ## 
+    ## *****
+    ## 
+    ## - - -
+    ## 
+    ## ---------------------------------------
+    $self->message_colour( 3, "Does scope have '{green}line{/}' ? ", $scope->has( 'line' ) ? '{green}yes{/}' : '{red}no{/}' );
+    if( $scope->has( 'line' ) )
+    {
+        $data =~ s{$RE{Markdown}{Line}}
+        {
+            my $re = { %- };
+            my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+            $self->message_colour( 3, $self->whereami( \$data, $pos, { text => "Found new horizontal line at pos '$pos': '{green}" . $+{line_all} . "'{/} with capture: " . $self->dump( $re ), return => 1 } ) );
+            my $id = $self->document->add_object( $top->create_line({
+                pos => $pos,
+                raw => $+{line_all},
+            }) );
+            "${PH_PREFIX}${id}${PH_SUFFIX}";
+        }xgem;
+    }
+
+    $self->message_colour( 3, "Does scope have '{green}paragraph{/}' ? ", $scope->has( 'paragraph' ) ? '{green}yes{/}' : '{red}no{/}' );
+    if( $scope->has( 'paragraph' ) )
+    {
+        $data =~ s{$RE{Markdown}{Paragraph}}
+        {
+            my $re = { %- };
+            my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+            $self->message( 3, $self->whereami( \$data, $pos, { text => "Found a paragraph at pos '$pos' with capture: " . $self->dump( $re ), return => 1 } ) );
+            my $text = $+{para_all};
+            my $raw  = $+{para_all};
+            my $trailing_nl = $self->_total_trailing_new_lines( $text );
+            $text =~ s/^\n+|\n+$//gs;
+            ## Replace new lines that are not preceded by 2 space or more with 1 space.
+            $text =~ s/(?<![ ]{2})\n/ /gs;
+            $self->message_colour( 3, "Found {green}", $trailing_nl, "{/} trailing new lines." );
+            my $p = $top->create_paragraph({
+                pos => $pos,
+                raw => $raw,
+            });
+            ## Position ourself before the trailing new lines
+            my $id = $self->document->add_object( $p );
+            $self->message_colour( 3, "Sub parsing paragraph content '{green}", $text, "{/}'" );
+            $self->parse( $text, { scope => $self->scope_inline, element => $p } );
+            "${PH_PREFIX}${id}${PH_SUFFIX}\n";
+        }xgems;
+    }
+    ## End of block elements parsing
+    
+    ## Now the inline elements
+    $self->message_colour( 3, "Does scope have '{green}link extended{/}' ? ", $scope->has( [qw( link extended )] ) ? '{green}yes{/}' : '{red}no{/}' );
+    if( $scope->has( [qw( link extended )] ) )
+    {
+        $data =~ s{$RE{Markdown}{ExtLink}}
+        {
+            my $re = { %- };
+            my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+            $self->message( 3, $self->whereami( \$data, $pos, { text => "Found an extended link '$+{link_all}' with url '$+{link_url}', with link title '$+{link_title}', with link id '$+{link_id}' and link name '$+{link_name}' at pos '$pos' with capture: " . $self->dump( $re ), return => 1 } ) );
+            my $raw = $+{link_all};
+            my $id  = $+{link_id};
+            my $name = $+{link_name};
+            my $title = $+{link_title};
+            my $url = $+{link_url};
+            my $def = $+{link_attr};
+            my $link = $top->create_link({
+                pos => $pos,
+                raw => $raw,
+            });
+            if( length( $def ) )
+            {
+                $def =~ s/^[[:blank:]\h]+|[[:blank:]\h]+$//gs;
+                $link->add_attributes( $def ) if( length( $def ) );
+            }
+            my $object_id = $self->document->add_object( $link );
+            ## An url has been provided, we sub-parse the link name for inline markdown, and especially abbreviations
+            if( $url )
+            {
+                $self->message( 3, "Found url '$url' in link attribute, using it." );
+                $link->url( $url );
+            }
+            ## as in [Example][] instead of [Example][site_id]
+            else
+            {
+                $id = $name if( !length( $id ) );
+                $link->link_id( $id );
+                my $link_def = $self->document->get_link_by_id( $id );
+                $self->message( 3, "No url found in link attributes, looking up url with link id '$id' => '$link_def'" );
+                if( $link_def )
+                {
+                    $self->message( 3, "Found link definition with url '", $link_def->url, "', id '", $link_def->id, "' title '", $link_def->title, "'" );
+                    $title = $link_def->title->scalar;
+                    $url = $link_def->url;
+                    $link->copy_from( $link_def );
+                }
+                else
+                {
+                    $self->message( 3, "No url found for link with id '$id' !" );
+                }
+                $link->url( $url );
+            }
+            $self->message( 3, "URL for this link is: '$url', and url object is: '", overload::StrVal( $link->url ), "'." );
+            $link->title( $title );
+            $self->parse( $name, { element => $link, scope => $self->scope_inline });
+            "${PH_PREFIX}${object_id}${PH_SUFFIX}";
+        }xgems;
+    }
+    
+    $self->message_colour( 3, "Does scope have '{green}link{/}' ? ", $scope->has( [qw( link )] ) ? '{green}yes{/}' : '{red}no{/}' );
+    if( $scope->has( 'link' ) )
+    {
+        $data =~ s{$RE{Markdown}{Link}}
+        {
+            my $re = { %- };
+            my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+            $self->message( 3, $self->whereami( \$data, $pos, { text => "Found a vanilla link '$+{link_all}' with url '$+{link_url}', with link title '$+{link_title}', with link id '$+{link_id}' and link name '$+{link_name}' at pos '$pos' with capture: " . $self->dump( $re ), return => 1 } ) );
+            my $raw = $+{link_all};
+            my $id  = $+{link_id};
+            my $name = $+{link_name};
+            my $title = $+{link_title};
+            my $url = $+{link_url};
+            my $link = $top->create_link({
+                pos => $pos,
+                raw => $raw,
+            });
+            my $object_id = $self->document->add_object( $link );
+            ## An url has been provided, we sub-parse the link name for inline markdown, and especially abbreviations
+            if( $url )
+            {
+                $self->message( 3, "Found url '$url' in link attribute, using it." );
+                $link->url( $url );
+            }
+            ## as in [Example][] instead of [Example][site_id]
+            else
+            {
+                $id = $name if( !length( $id ) );
+                $link->link_id( $id );
+                my $link_def = $self->document->get_link_by_id( $id );
+                $self->message( 3, "No url found in link attributes, looking up url with link id '$id' => '$link_def'" );
+                if( $link_def )
+                {
+                    $self->message( 3, "Found link definition with url '", $link_def->url, "', id '", $link_def->id, "' title '", $link_def->title, "'" );
+                    $title = $link_def->title;
+                    $url = $link_def->url;
+                    $link->copy_from( $link_def );
+                }
+                else
+                {
+                    $self->message( 3, "No url found for link with id '$id' !" );
+                }
+                $link->url( $url );
+            }
+            $self->message( 3, "URL for this link is: '$url', and url object is: '", overload::StrVal( $link->url ), "'." );
+            $link->title( $title );
+            $self->parse( $name, { element => $link, scope => $self->scope_inline });
+            "${PH_PREFIX}${object_id}${PH_SUFFIX}";
+        }xgems;
+    }
+
+    # $self->message( 3, "Checking auto links at pos '", pos( $data ), "' with:\n$RE{Markdown}{LinkAuto}" );
+    ## Automatic link like <https://example.com> or <news://news.example.com> or <mailto://john@example.com> or <john@example.com>, etc...
+    $self->message_colour( 3, "Does scope have '{green}auto-link{/}' ? ", $scope->has( [qw( link )] ) ? '{green}yes{/}' : '{red}no{/}' );
+    if( $scope->has( 'link' ) )
+    {
+        $data =~ s{$RE{Markdown}{LinkAuto}}
+        {
+            my $re = { %- };
+            my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+            $self->message( 3, $self->whereami( \$data, $pos, { text => "Found an auto link '$+{link_all}' with url '$+{link_url}' at pos '$pos' with capture: " . $self->dump( $re ), return => 1 } ) );
+            my $raw = $+{link_all};
+            my $url = $+{link_url};
+            ## Add the mailto: scheme if it's an e-mail address and the scheme is missing
+            substr( $url, 0, 0 ) = 'mailto:' if( length( $+{link_mailto} ) && substr( $+{link_mailto}, 0, 7 ) ne 'mailto:' );
+            my $link = $top->create_link({
+                encrypt => $self->encrypt_email,
+                ## We save the original as URI may alter it by url-encoding characters
+                original => $+{link_url},
+                pos => $pos,
+                raw => $raw,
+                url => $url,
+            });
+#                 $link->add_element( $link->create_text({
+#                     pos => $pos,
+#                     text => $+{link_url},
+#                 }) );
+            my $id = $self->document->add_object( $link );
+            "${PH_PREFIX}${id}${PH_SUFFIX}";
+        }xgems;
+    }
+
+    $self->message_colour( 3, "Does scope have '{green}image extended{/}' ? ", $scope->has( [qw( image extended )] ) ? '{green}yes{/}' : '{red}no{/}' );
+    if( $scope->has( [qw( image extended )] ) )
+    {
+        $data =~ s{$RE{Markdown}{ExtImage}}
+        {
+            my $re = { %- };
+            my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+            $self->message( 3, $self->whereami( \$data, $pos, { text => "Found a extended image '$+{img_all}' with url '$+{img_url}', with image title '$+{img_title}' and image alternative text '$+{img_alt}' at pos '$pos' ith capture: " . $self->dump( $re ), return => 1 } ) );
+            my $raw = $+{img_all};
+            my $url = $+{img_url};
+            my $id  = $+{img_id};
+            my $alt = $+{img_alt};
+            my $attr = $+{img_attr};
+            my $title = $+{img_title};
+            my $img = $top->create_image({
+                alt => $alt,
+                pos => $pos,
+                raw => $raw,
+            });
+            if( !$url )
+            {
+                $id = $alt if( !length( $id ) );
+                my $img_def = $self->document->get_link_by_id( $id );
+                if( $img_def )
+                {
+                    $title = $img_def->title;
+                    $url = $img_def->url;
+                    $img->copy_from( $img_def );
+                }
+            }
+            $img->url( $url );
+            $img->title( $title );
+            $img->link_id( $id ) if( length( $id ) );
+            $self->message( 3, "Adding exntended attribute for header: '$attr'" );
+            $img->add_attributes( $attr );
+            my $object_id = $self->document->add_object( $img );
+            "${PH_PREFIX}${object_id}${PH_SUFFIX}";
+        }xgems;
+    }
+
+    $self->message_colour( 3, "Does scope have '{green}image{/}' ? ", $scope->has( [qw( image )] ) ? '{green}yes{/}' : '{red}no{/}' );
+    if( $scope->has( 'image' ) )
+    {
+        $data =~ s{$RE{Markdown}{Image}}
+        {
+            my $re = { %- };
+            my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+            $self->message( 3, $self->whereami( \$data, $pos, { text => "Found a vanilla image '$+{img_all}' with url '$+{img_url}', with image title '$+{img_title}' and image alternative text '$+{img_alt}' at pos '$pos' ith capture: " . $self->dump( $re ), return => 1 } ) );
+            my $raw = $+{img_all};
+            my $url = $+{img_url};
+            my $id  = $+{img_id};
+            my $alt = $+{img_alt};
+            my $title = $+{img_title};
+            my $img = $top->create_image({
+                alt => $alt,
+                pos => $pos,
+                raw => $raw,
+            });
+            if( !$url )
+            {
+                $id = $alt if( !length( $id ) );
+                my $img_def = $self->document->get_link_by_id( $id );
+                if( $img_def )
+                {
+                    $title = $img_def->title;
+                    $url = $img_def->url;
+                    $img->copy_from( $img_def );
+                }
+            }
+            $img->url( $url );
+            $img->title( $title );
+            $img->link_id( $id ) if( length( $id ) );
+            my $object_id = $self->document->add_object( $img );
+            "${PH_PREFIX}${object_id}${PH_SUFFIX}";
+        }xgems;
+    }
+
+    ## Bold check comes before emphasis one
+    $self->message_colour( 3, "Does scope have '{green}bold{/}' ? ", $scope->has( 'bold' ) ? '{green}yes{/}' : '{red}no{/}' );
+    if( $scope->has( 'bold' ) )
+    {
+        $data =~ s{$RE{Markdown}{Bold}}
+        {
+            my $re = { %- };
+            my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+            my $content = $+{bold_text};
+            $self->message( 3, $self->whereami( \$data, $pos, { text => "Found a bold text '$+{bold_all}' of type '$+{bold_type}' with text '$+{bold_text}' at pos '$pos' with capture: " . $self->dump( $re ), return => 1 } ) );
+            my $bold = $top->create_bold({
+                pos => pos( $data ),
+                raw => $+{bold_all},
+                type => $+{bold_type},
+            });
+            $self->parse( $content, { element => $bold, scope => $self->scope_inline });
+            my $id = $self->document->add_object( $bold );
+            "${PH_PREFIX}${id}${PH_SUFFIX}";
+        }xgems;
+    }
+
+    $self->message_colour( 3, "Does scope have '{green}emphasis{/}' ? ", $scope->has( 'emphasis' ) ? '{green}yes{/}' : '{red}no{/}' );
+    if( $scope->has( 'emphasis' ) )
+    {
+        $data =~ s{$RE{Markdown}{Em}}
+        {
+            my $re = { %- };
+            my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+            $self->message( 3, $self->whereami( \$data, $pos, { text => "Found an emphasis '$+{em_all}' of type '$+{em_type}' with text '$+{em_text}' at pos '$pos' with capture: " . $self->dump( $re ), return => 1 } ) );
+            my $em = $top->create_em({
+                pos => $pos,
+                raw => $+{em_all},
+                type => $+{em_type},
+            });
+            my $content = $+{em_text};
+            $self->parse( $content, { element => $em, scope => $self->scope_inline });
+            my $id = $self->document->add_object( $em );
+            "${PH_PREFIX}${id}${PH_SUFFIX}";
+        }gexms;
+    }
+        
+    ## Inline code `some thing`
+    $self->message_colour( 3, "Does scope have '{green}code span{/}' ? ", $scope->has( [qw( code_span )] ) ? '{green}yes{/}' : '{red}no{/}' );
+    if( $scope->has( 'code_span' ) )
+    {
+        $data =~ s{$RE{Markdown}{CodeSpan}}
+        {
+            my $re = { %- };
+            my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+            my $raw = $+{code_all};
+            my $content = $+{code_content};
+            $self->message_colour( 3, $self->whereami( \$data, $pos, { text => "Found an inline code '$raw' at pos '$pos' with content:\n'{green}" . $content . "{/}' and with capture: " . $self->dump( $re ), return => 1 } ) );
+            ## leading whitespace
+            $content =~ s/^[ \t]*//g;
+            ## trailing whitespace
+            $content =~ s/[ \t]*$//g;
+            my $code = $top->create_code({
+                inline => 1,
+                pos => $pos,
+                raw => $raw,
+            });
+            $code->add_element( $top->create_text({
+                text => $content,
+                pos => $pos,
+            }) );
+            my $id = $top->add_object( $code );
+            "${PH_PREFIX}${id}${PH_SUFFIX}";
+        }xgems;
+    }
+    
+    $self->message_colour( 3, "Does scope have '{green}checkbox{/}' ? ", $scope->has( [qw( checkbox extended )] ) ? '{green}yes{/}' : '{red}no{/}' );
+    if( $scope->has( [qw( checkbox extended )] ) )
+    {
+        $data =~ s{$RE{Markdown}{ExtCheckbox}}
+        {
+            my $re = { %- };
+            my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+            $self->message( 3, $self->whereami( \$data, $pos, { text => "Found a checkbox at pos '$pos' with capture: " . $self->dump( $re ), return => 1 } ) );
+            my $check = $top->create_checkbox({
+                checked => lc( $+{check_content} ) eq 'x',
+                raw => $+{check_all},
+                pos => $pos,
+            });
+            my $id = $self->document->add_object( $check );
+            "${PH_PREFIX}${id}${PH_SUFFIX}";
+        }xgems;
+    }
+    
+    $self->message_colour( 3, "Does scope have '{green}katex{/}' ? ", ( $scope->has( [qw( katex extended )] ) ? '{green}yes{/}' : '{red}no{/}' ) );
+    if( length( $katex_re ) && $scope->has( [qw( katex extended )] ) )
+    {
+        $self->message( 3, "Checking for Katex math expression" );
+        $data =~ s{$katex_re}
+        {
+            my $re = { %- };
+            my $raw = $+{katex_all};
+            my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+            $self->message( 3, $self->whereami( \$data, $pos, { text => "Found a Katex math block: '$+{katex_all}' and capture: " . $self->dump( $re ), return => 1 } ) );
+            ## There is at least one new line, so this is a block, we use paragraph
+            my $id;
+            if( index( $raw, "\n" ) != -1 )
+            {
+                my $p = $top->create_paragraph({
+                    pos => $pos,
+                    raw => $raw,
+                });
+                $p->add_element( $p->create_text({
+                    pos => $pos,
+                    text => $+{katex_all},
+                }) );
+                $id = $self->document->add_object( $p );
+            }
+            ## Inline style
+            else
+            {
+                $id = $self->document->add_object( $top->create_text({
+                    pos => $pos,
+                    text => $+{katex_all},
+                }) );
+            }
+            $self->document->setup_katex;
+            "${PH_PREFIX}${id}${PH_SUFFIX}";
+        }xgems;
+    }
+    
+    $self->message_colour( 3, "Does scope have '{green}strikethrough{/}' ? ", $scope->has( [qw( strikethrough extended )] ) ? '{green}yes{/}' : '{red}no{/}' );
+    if( $scope->has( [qw( strikethrough extended )] ) )
+    {
+        $data =~ s{$RE{Markdown}{ExtStrikeThrough}}
+        {
+            my $re = { %- };
+            my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+            $self->message( 3, $self->whereami( \$data, $pos, { text => "Found a strikethrough at pos '$pos' with capture: " . $self->dump( $re ), return => 1 } ) );
+            my $text = $+{strike_content};
+            my $strike = $top->create_strikethrough({
+                raw => $+{strike_all},
+                pos => $pos,
+            });
+            $strike->add_element( $strike->create_text({
+                pos => $pos,
+                text => $text,
+            }) );
+            my $id = $self->document->add_object( $strike );
+            "${PH_PREFIX}${id}${PH_SUFFIX}";
+        }xgems;
+    }
+    
+    $self->message_colour( 3, "Does scope have '{green}insertion{/}' ? ", $scope->has( [qw( insertion extended )] ) ? '{green}yes{/}' : '{red}no{/}' );
+    if( $scope->has( [qw( insertion extended )] ) )
+    {
+        $data =~ s{$RE{Markdown}{ExtInsertion}}
+        {
+            my $re = { %- };
+            my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+            $self->message( 3, $self->whereami( \$data, $pos, { text => "Found an insertion at pos '$pos' with capture: " . $self->dump( $re ), return => 1 } ) );
+            my $text = $+{ins_content};
+            my $ins = $top->create_insertion({
+                raw => $+{ins_all},
+                pos => $pos,
+            });
+            $ins->add_element( $ins->create_text({
+                pos => $pos,
+                text => $text,
+            }) );
+            my $id = $self->document->add_element( $ins );
+            "${PH_PREFIX}${id}${PH_SUFFIX}";
+        }xgems;
+    }
+    
+    $self->message_colour( 3, "Does scope have '{green}subscript{/}' ? ", $scope->has( [qw( subscript extended )] ) ? '{green}yes{/}' : '{red}no{/}' );
+    if( $scope->has( [qw( subscript extended )] ) )
+    {
+        $data =~ s{$RE{Markdown}{ExtSubscript}}
+        {
+            my $re = { %- };
+            my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+            $self->message( 3, $self->whereami( \$data, $pos, { text => "Found a subscript at pos '$pos' with capture: " . $self->dump( $re ), return => 1 } ) );
+            my $text = $+{sub_text};
+            my $sub = $top->create_subscript({
+                raw => $+{sub_all},
+                pos => $pos,
+            });
+            $sub->add_element( $sub->create_text({
+                pos => $pos,
+                text => $text,
+            }) );
+            my $id = $self->document->add_object( $sub );
+            "${PH_PREFIX}${id}${PH_SUFFIX}";
+        }xgems;
+    }
+    
+    $self->message_colour( 3, "Does scope have '{green}superscript{/}' ? ", $scope->has( [qw( superscript extended )] ) ? '{green}yes{/}' : '{red}no{/}' );
+    if( $scope->has( [qw( superscript extended )] ) )
+    {
+        $data =~ s{$RE{Markdown}{ExtSuperscript}}
+        {
+            my $re = { %- };
+            my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+            $self->message( 3, $self->whereami( \$data, $pos, { text => "Found a superscript at pos '$pos' with capture: " . $self->dump( $re ), return => 1 } ) );
+            my $text = $+{sup_text};
+            my $sup = $top->create_superscript({
+                raw => $+{sup_all},
+                pos => $pos,
+            });
+            $sup->add_element( $sup->create_text({
+                pos => $pos,
+                text => $text,
+            }) );
+            my $id = $self->document->add_object( $sup );
+            "${PH_PREFIX}${id}${PH_SUFFIX}";
+        }xgems;
+    }
+    
+    $self->message_colour( 3, "Does scope have '{green}line break{/}' ? ", $scope->has( [qw( line_break )] ) ? '{green}yes{/}' : '{red}no{/}' );
+    if( $scope->has( 'line_break' ) )
+    {
+        $data =~ s{$RE{Markdown}{LineBreak}}
+        {
+            my $re = { %- };
+            my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+            $self->message_colour( 3, $self->whereami( \$data, $pos, { text => "Found a {green}line break{/} (end of line followed by 2 or more spaces) at pos '" . $pos . "' with capture: " . $self->dump( $re ), return => 1 } ) );
+            my $id = $self->document->add_object( $top->create_new_line({
+                break => 1,
+                pos => $pos,
+            }) );
+            "${PH_PREFIX}${id}${PH_SUFFIX}";
+        }xgems;
+    }
+    
+    ## This is a placeholder added at the end of the footnote text where we will insert a back reference link
+    $data =~ s{(?<fn_backref>[ ]+\!{2}FN\!{2})}
+    {
+        my $re = { %- };
+        my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+        $self->message( 3, $self->whereami( \$data, $pos, { text => "Found a placeholder for a footnote back reference link with capture: " . $self->dump( $re ), return => 1 } ) );
+        my $id = $self->document->add_object( $top->create_text({
+            pos => $pos,
+            text => $+{fn_backref},
+        }) );
+        "${PH_PREFIX}${id}${PH_SUFFIX}";
+    }xgems;
+    
+    $self->message_colour( 3, "Does scope have '{green}abbr{/}' ? ", $scope->has( [qw( extended abbr )] ) ? '{green}yes{/}' : '{red}no{/}' );
+    ## Now find and replace any match with its corresponding expanded name
+    if( length( $abbr_re ) && $scope->has( [qw( extended abbr )] ) )
+    {
+        $data =~ s{\b(?<abbr_name>$abbr_re)\b}
+        {
+            my $re = { %- };
+            my $pos = pos( $data ) - substr( $data, $-[0], $+[0] - $-[0] );
+            ## We save what we caught to put it back in case the abbreviation lookup failed
+            my $catch = substr( $data, $-[0], $+[0] - $-[0] );
+            $self->message( 3, $self->whereami( \$data, $pos, { text => "Found an abbreviation '$+{abbr_name}' to replace with its corresponding value with capture: " . $self->dump( $re ), return => 1 } ) );
+            if( defined( my $abbr = $self->document->get_abbreviation( $+{abbr_name} ) ) )
+            {
+                $self->message( 3, "Adding abbreviation with value '", $abbr->value, "'" );
+                my $id = $self->document->add_object( $abbr->clone );
+                "${PH_PREFIX}${id}${PH_SUFFIX}";
+            }
+            ## Failed somehow
+            else
+            {
+                $self->message( 3, "Could not find '$+{abbr_name}'" );
+                "$catch";
+            }
+        }xge;
+    }
+    
+    $self->message_colour( 3, "{orange}", ( $top->tag_name eq 'top' ? 'Parsing' : 'Sub-parsing' ), " done.{/}" );
+    
+    if( $top->tag_name eq 'top' )
+    {
+        ## We need to separate parsing of footnotes' text in a second step, so we do this here
+        $top->footnotes->foreach(sub
+        {
+            $_->parse( $self );
+        });
+    }
+    
+    ## ultra fast parsing
+    my $parts = [ split( m/\Q${PH_PREFIX}\E(?<object_id>\d+)\Q${PH_SUFFIX}\E\n?/, $data ) ];
+    $self->messagef( 3, "%d data parts found", scalar( @$parts ) );
+    $self->message( 3, "Parts are: '", join( "', '", @$parts ), "'." ); 
+    my $objects = $self->document->objects;
+    for( my $n = 0; $n <= scalar( @$parts ); $n++ )
+    {
+        ## When $n is an even number, it means this is a text, otherwise it is an object id
+        ## If this is a text, we create a text object and add it to the tree
+        if( $n % 2 )
+        {
+            my $id = $parts->[ $n ];
+            next if( !length( $id ) );
+            my $obj = $objects->get( $id );
+            if( ref( $obj ) )
+            {
+                $top->add_element( $obj );
+            }
+            else
+            {
+                $self->message_colour( 3, "{bold red}No object found for id \"", $id, "\"!{/}" );
+            }
+        }
+        else
+        {
+            $top->add_element( $top->create_text({
+                text => $parts->[ $n ],
+            }) );
+        }
+    }
+    return( $top );
+}
+
+sub parse_file
+{
+    my $self = shift( @_ );
+    my $file = shift( @_ ) || return( $self->error( "No file to parse was provided." ) );
+    return( $self->error( "Markdown file provided \"$file\" does not exist." ) ) if( !-e( $file ) );
+    return( $self->error( "Markdown file provided \"$file\" is actually a directory." ) ) if( -d( $file ) );
+    return( $self->error( "Markdown file provided \"$file\" is empty." ) ) if( -z( $file ) );
+    return( $self->error( "Markdown file provided \"$file\" does not have read permission." ) ) if( !-r( $file ) );
+    my $io = IO::File->new( "<$file" ) || return( $self->error( "Unable to open markdown file \"$file\": $!" ) );
+    my $charset = $self->charset;
+    $io->binmode( ":${charset}" ) if( length( $charset ) );
+    my $data = join( '', $io->getlines );
+    $io->close;
+    return( $self->parse( $data ) );
+}
+
+sub parse_list_item
+{
+    my $self = shift( @_ );
+    my $text = shift( @_ ) || '';
+    my $opts = {};
+    $opts    = shift( @_ ) if( $self->_is_hash( $opts ) );
+    my $top = $opts->{doc} || do
+    {
+        warn( "No element object provided as a container.\n" );
+        return( $self->error( "No element object provided as a container." ) );
+    };
+    $opts->{pos} = int( $opts->{pos} );
+    $self->message_colour( 3, "Parsing list item '{bold green}", $text, "{/}' with options: ", sub{ $self->dump( $opts, {
+        filter => sub
+        {
+            my( $ctx, $ref ) = @_;
+            if( $ctx->class eq 'Markdown::Parser::Document' )
+            {
+                return({ dump => overload::StrVal( $ref ) });
+            }
+            elsif( $ctx->is_blessed && $ref->isa( 'Markdown::Parser::Element' ) )
+            {
+                return({ dump => overload::StrVal( $ref ) });
+            }
+        }
+    }) } );
+    $text =~ s/\n{2,}\z/\n/;
+    $self->list_level++;
+    $text =~ s{$RE{Markdown}{ListItem}}
+    {
+        my $item = $+{li_content};
+        my $leading_line = $+{li_lead_line};
+        my $leading_space = $+{li_lead_space};
+        my $list_type = $+{list_type_any};
+        my $list_line = $+{li_all};
+    
+        my $indent = $leading_space;
+        $indent =~ s/\t/    /gs;
+        ## int() because length on undef produces undef
+        my $total_spaces = int( length( $indent ) );
+        my $indent_level = POSIX::ceil( $total_spaces / 4 );
+        $self->message_colour( 3, "Found a list item of type '{green}", $list_type, "{/}' with indent level '{green}", $indent_level, "{/}' (total spaces found = '", $total_spaces, "') and list item line '{green}", $+{list_line}, "{/}' list item '{green}", $item, "{/}'. List indentation is '", $indent, "'" );
+    
+        my $li = $top->create_list_item({
+            indent => ( $indent_level + 1 ),
+            pos => $opts->{pos} + pos( $text ),
+            raw => $list_line,
+            type => $list_type,
+            ## Alternatively
+            ## order => 1, # or 0
+        });
+        $top->add_element( $li );
+
+        if( $leading_line || ( $item =~ m/\n{2,}/) )
+        {
+            $item =~ s/^(\t|[ ]{1,4})//gm;
+            $self->message_colour( 3, "{white on blue}Processing list content: '$item'{/} with list level '", $self->list_level, "'" );
+            $self->parse( $item, { scope => $self->scope_block, element => $li } );
+        }
+        else
+        {
+            ## Recursion for sub-lists:
+            $item =~ s/^(\t|[ ]{1,4})//gm;
+            $self->message_colour( 3, "{white on orange}Processing sub list with content: '$item'{/} with list level '", $self->list_level, "'" );
+            $self->parse( $item, { scope => [qw( extended list||inline )], element => $li } );
+        }
+    }xgems;
+    $self->list_level++;
+    return( $self );
+}
+
+sub parse_table
+{
+    my $self = shift( @_ );
+    ## Hash reference of capture groups: %-
+    ## See perlvar for more information
+    my $re   = shift( @_ );
+    my $opts = {};
+    $opts    = shift( @_ ) if( $self->_is_hash( $opts ) );
+    my $top = $opts->{doc} || do
+    {
+        warn( "No element object provided as a container.\n" );
+        return( $self->error( "No element object provided as a container." ) );
+    };
+    my $tbl = $top->create_table(
+        use_css_grid => $self->css_grid,
+        ## shared css object
+        css => $self->css,
+    );
+    $self->document->add_object( $tbl );
+    my $info =
+    {
+    cols => {},
+    rows => {},
+    };
+    my $seps = $self->new_array;
+    my $headers = [split( /\n/, $re->{table_headers}->[0] )];
+    for my $i ( 0..$#$headers )
+    {
+        ## This is a separator, store our data to the array $headers
+        if( $headers->[$i] =~ /^[\|\-\+\: ]+$/ )
+        {
+            splice( @$headers, $i, 1 );
+            $i--;
+        }
+    }
+    $self->message( 3, "Headers are now: ", sub{ $self->dump( $headers ) } );
+    ## We check for leading space (up to 3), otherwise this would be code
+    ## and we use this leading space when parsing rows to factor in leading empty cells, i.e.
+    ## -------
+    ##        | # <- this is an empty cell, but
+    ##    ----
+    ##    | A | # <- the space before the leading pipe is not
+    my $leading_space = 0;
+    ## Check the space at the beginning of separator line as reference
+    if( $re->{table_header_sep}->[0] =~ /^([[:blank:]\h]+)/ )
+    {
+        $leading_space = length( $leading_space );
+    }
+    
+    ## Process the separator(s) in the header to find
+    for my $i ( 0..1 )
+    {
+        $seps->push( $re->{table_header_sep}->[$i] ) if( length( $re->{table_header_sep}->[$i] ) );
+    }
+    my $cell_align = $self->new_array;
+    $seps->for(sub
+    {
+        my( $n, $s ) = @_;
+        $s =~ s/^[\+\|\-][[:blank:]\h]+|[[:blank:]\h]+[\+\|\-]$//g;
+        return if( index( $s, ':' ) == -1 );
+        my $cells = $self->new_array( [split( /[\+\|]/, $s )] );
+        $cells->for(sub
+        {
+            my( $i, $c ) = @_;
+            $c =~ s/^[[:blank:]\h\v]+|[[:blank:]\h\v]+$//g;
+            return if( !length( $c ) );
+            my( $left, $right );
+            $left = 1 if( substr( $c, 0, 1 ) eq ':' );
+            $right = 1 if( substr( $c, -1, 1 ) eq ':' );
+            $self->message( 3, "R[$n] C[$i] Alignment with semi colon is left = '$left', right = '$right' for line '$c'." );
+            ## First row, so we just assign the value
+            if( $n == 0 )
+            {
+                $cell_align->push({ left => $left, right => $right });
+            }
+            else
+            {
+                my $prev = $cell_align->index( $i );
+                if( !defined( $prev ) )
+                {
+                    $cell_align->[ $i ] = { left => $left, right => $right };
+                }
+            }
+        });
+    });
+    
+    my $caption;
+    if( $re->{table_caption}->[0] || $re->{table_caption}->[1] )
+    {
+        $caption = $re->{table_caption}->[0] // $re->{table_caption}->[1];
+        $caption =~ s/^[[:blank:]\h]*\[|\][[:blank:]\h\v]*$//gs;
+        if( length( $caption ) )
+        {
+            my $cap = $tbl->create_table_caption;
+            $self->parse( $caption, { element => $cap, scope => 'inline' });
+            # $cap->add_element( $cap->create_text({ text => $caption }) );
+            $tbl->caption( $cap );
+            $cap->position( $re->{table_caption_bottom}->[0] ? 'bottom' : 'top' );
+            $self->message( 3, "Found caption position to be at ", $cap->position );
+        }
+    }
+    
+    $self->message( 3, "Parsing header." );
+    ## Getting an array ref of array ref containing row objects
+    my $hdrs_rows = $self->parse_table_row( $headers, { doc => $top, alignment => $cell_align, leading_space => $leading_space });
+    my $header = $top->create_table_header;
+    ## Possibly multiple rows in the header, but only one table header
+    foreach my $rows ( @$hdrs_rows )
+    {
+        $header->children->push( @$rows );
+    }
+    $tbl->header( $header );
+    
+    $self->message( 3, "Parsing body." );
+    my $body_rows = $self->parse_table_row( $re->{table_rows}->[0], { doc => $top, alignment => $cell_align });
+    ## Possibly multiple table body
+    foreach my $rows ( @$body_rows )
+    {
+        my $body = $top->create_table_body;
+        $body->children->push( @$rows );
+        $tbl->add_body( $body ) || return( $self->error( "Could not add body: ", $tbl->error ) );
+    }
+    
+    $self->message( 3, "Analysing collected data." );
+    foreach my $this ( $hdrs_rows, $body_rows )
+    {
+        $self->messagef( 3, "Checking %d sub arrays", scalar( @$this ) );
+        for my $i ( 0..$#$this )
+        {
+            $self->messagef( 3, "Found %d rows", scalar( @{$this->[$i]} ) );
+            $info->{rows}->{total} += scalar( @{$this->[$i]} );
+        }
+    }
+    $info->{cols}->{total} = scalar( keys( %{$info->{cols}} ) );
+    $tbl->stat( $info );
+    return( $tbl );
+}
+
+sub parse_table_row
+{
+    my $self = shift( @_ );
+    my $str  = shift( @_ );
+    my $opts = {};
+    $opts    = shift( @_ ) if( $self->_is_hash( $opts ) );
+    my $top = $opts->{doc} || do
+    {
+        warn( "No element object provided as a container.\n" );
+        return( $self->error( "No element object provided as a container." ) );
+    };
+    ## Leading space in length
+    my $lead_space = int( $opts->{leading_space} );
+    ## my $cols = [];
+    my $body = [];
+    my $rows = [];
+    ## A Module::Generic::Array object containing hash references with left and right keys
+    my $al = $opts->{alignment};
+    # Removing trailing new lines
+    $str =~ s/\n+$//gs;
+    my $row_n = 0;
+    my $lines = ref( $str ) eq 'ARRAY' ? $str : [split( /\n/, $str )];
+    foreach my $l ( @$lines )
+    {
+        ## Get rid of leading (up to 3) and trailing spaces
+        ## If there are remaining leading space to the pipe, we use it to determine this is an empty cell
+        $l =~ s/^[[:blank:]\h]{$lead_space}|[[:blank:]\h]+$//gs;
+        $self->message( 4, "Checking line '$l'" );
+        if( $l =~ /^[[:blank:]\h]*$/ )
+        {
+            $self->message( 4, "Empty line, create new table body." );
+            push( @$body, $rows );
+            $rows = [];
+            next;
+        }
+        
+        my $row = $top->create_table_row;
+        ## Make sure there is a leading and trailing | to standardise our parsing
+        substr( $l, 0, 0 ) = '|' if( $l !~ /^[\|\:]/ );
+        $l .= '|' if( $l !~ /[\|\:]$/ );
+        my $is_prev_row = substr( $l, 0, 1 ) eq ':' ? 1 : 0;
+        ## Skip the leading pipe
+        $l = substr( $l, 1 );
+        my $col_n = 0;
+        $self->message( 4, "Is this cell $col_n a continuity from previous row? ", $is_prev_row ? 'yes' : 'no' );
+        while( $l =~ s/^(?<col_content>[^\|\:]+)(?<sep>[\|\:]+)// )
+        {
+            my $re = { %+ };
+            my $cell = $top->create_table_cell;
+            # print( "Regexp: ", dump( $re ), "\n" );
+            $is_prev_row = 1 if( substr( $re->{sep}, 0, 1 ) eq ':' );
+            my $content = $re->{col_content};
+            ## If we do not have information about this column and this is not a colspan
+            ## then, store the column width
+            if( !length( $info->{cols}->{ $col_n + 1 } ) &&
+                length( $re->{sep} ) == 1 )
+            {
+                $info->{cols}->{ $col_n + 1 } = length( $content );
+            }
+            # In the cell width we include the additional pipes on the right, if any, that represent spawned columns
+            $cell->width( length( $content ) + ( length( $re->{sep} ) > 1 ? ( length( $re->{sep} ) - 1 ) : 0 ) );
+            $cell->colspan( length( $re->{sep} ) );
+            $content =~ s/^([[:blank:]\h]*)(.*?)([[:blank:]\h]*)$/$2/gs;
+            my $left = $+[1];
+            my $right = $+[3] - $-[3];
+            $self->message( 4, "R[$row_n] C[$col_n] Adding cell content '$content' (", length( $content ), ") with left '$left' and right '$right'" );
+            ## $cell->add_element( $cell->create_text( $content ) );
+            $self->parse( $content, { element => $cell });
+            my $al_def = $al->[ $col_n ];
+            ## Alignment was provided for this table using ":"
+            if(  $self->_is_hash( $al_def ) && 
+                ( length( $al_def->{left} ) || length( $al_def->{right} ) ) )
+            {
+                if( $al_def->{left} && $al_def->{right} )
+                {
+                    $cell->align( 'center' );
+                }
+                elsif( $al_def->{left} )
+                {
+                    $cell->align( 'left' );
+                }
+                elsif( $al_def->{right} )
+                {
+                    $cell->align( 'right' );
+                }
+            }
+            elsif( $left <= 1 )
+            {
+                $cell->align( 'left' );
+            }
+            elsif( $right <= 1 )
+            {
+                $cell->align( 'right' );
+            }
+            elsif( $left == $right ||
+                   ( $left && $right && 
+                     ( int( ( $left + $right ) / 2 ) == $left || int( ( $left + $right ) / 2 ) == $right ) 
+                   ) ||
+                   ( $left >= 2 && $right >= 2 )
+                 )
+            {
+                $cell->align( 'center' );
+            }
+            $self->message( 4, "Row $row_n, column $col_n has object: $cell" );
+            if( $is_prev_row )
+            {
+                if( length( $content ) )
+                {
+                    ## Check for the cell above
+                    my $prev_cell = $rows->[-1]->children->get( $col_n );
+                    if( $prev_cell )
+                    {
+                        $prev_cell->add_element( $cell->create_text({ text => $content }) );
+                        # $prev_cell->children->push( $cell->create_text( $content ) );
+                    }
+                    else
+                    {
+                        warn( "This cell $col_n at row $row_n is marked as continuity, but there is no record of previous upper cell.\n" );
+                    }
+                }
+                ## Empty cell and this row is a continuity from the previous row, so we skip
+                else
+                {
+                    next;
+                }
+            }
+            else
+            {
+                # push( @$cols, $cell );
+                $row->add_element( $cell );
+            }
+            $col_n++;
+        }
+        $self->messagef( 4, "Row now has %d children", $row->children->length );
+        
+        unless( $is_prev_row )
+        {
+            $row_n++;
+            push( @$rows, $row );
+        }
+    }
+    $self->messagef( 4, "Found %d rows", scalar( @$rows ) );
+    push( @$body, $rows ) if( scalar( @$rows ) );
+    ## Return body of rows set, which is an array of array reference containing row objects.
+    return( $body );
+}
+
+sub scope { return( shift->_set_get_object( 'scope', 'Markdown::Parser::Scope', @_ ) ); }
+
+sub scope_block
+{
+    my $self = shift( @_ );
+    my $opts = {};
+    if( scalar( @_ ) && $self->_is_array( $_[0] ) )
+    {
+        $opts = $self->new_array( shift( @_ ) )->as_hash({ start_from => 1 });
+    }
+    else
+    {
+        $opts = $self->new_hash;
+    }
+    my $res = $self->new_array( [qw( block )] );
+    if( !$opts->exists( '-extended' ) && $self->scope->has( 'extended' ) )
+    {
+        $res->push( 'extended' );
+    }
+    elsif( $opts->exists( '+extended' ) )
+    {
+        $res->push( 'extended' );
+    }
+    return( $res );
+}
+
+sub scope_inline
+{
+    my $self = shift( @_ );
+    my $opts = {};
+    if( scalar( @_ ) && $self->_is_array( $_[0] ) )
+    {
+        $opts = $self->new_array( shift( @_ ) )->as_hash({ start_from => 1 });
+    }
+    else
+    {
+        $opts = $self->new_hash;
+    }
+    my $res = $self->new_array( [qw( inline )] );
+    if( !$opts->exists( '-extended' ) && $self->scope->has( 'extended' ) )
+    {
+        $res->push( 'extended' );
+    }
+    elsif( $opts->exists( '+extended' ) )
+    {
+        $res->push( 'extended' );
+    }
+    return( $res );
+}
+
+## Used for debugging
+sub whereami
+{
+    my $self = shift( @_ );
+    my( $ref, $pos, $opts ) = @_;
+    return if( $self->debug < 4 );
+    my $text = $opts->{text} || "Cusrsor is now here at position '$pos':";
+    ## How far back should we look?
+    my $lookback = 10;
+    $lookback = $pos if( $pos < $lookback );
+    my $lookahed = 20;
+    my $start = $pos - $lookback;
+    my $first_line = substr( $$ref, $start, $lookback + $lookahed );
+    $lookback += () = substr( $$ref, $start, $lookback ) =~ /\n/gs;
+    $first_line =~ s/\n/\\n/gs;
+    my $sec_line = ( '.' x $lookback ) . '^' . ( '.' x $lookahed );
+    return( "$text\n$first_line\n$sec_line" ) if( $opts->{return} );
+    $self->message_colour( 3, "$text\n$first_line\n$sec_line" );
+}
+
+sub _total_trailing_new_lines
+{
+    my $self = shift( @_ );
+    my $text = shift( @_ );
+    my $trailing_nl = ( $text =~ /(\n+)$/ )[0];
+    return( length( $trailing_nl ) );
+}
+
+package Markdown::Parser::Scope;
+BEGIN
+{
+    use strict;
+    use warnings;
+    use parent qw( Module::Generic );
+    use Devel::Confess;
+    our $VERSION = 'v0.1.0';
+    our $ELEMENTS_DICTIONARY = $Markdown::Parser::ELEMENTS_DICTIONARY;
+    our $ELEMENTS_DICTIONARY_EXTENDED = $Markdown::Parser::ELEMENTS_DICTIONARY_EXTENDED;
+};
+
+sub init
+{
+    my $self  = shift( @_ );
+    my $scope = shift( @_ );
+    $self->{cache}      = {};
+    $self->{condition}  = 'any';
+    $self->{extended}   = 0;
+    $self->{scope}      = {};
+    $self->{_init_strict_use_sub} = 1;
+    $self->SUPER::init( @_ );
+    if( $self->_is_array( $scope ) )
+    {
+        $self->{scope} = $self->_to_array_object( $scope )->as_hash;
+    }
+    return( $self );
+}
+
+sub all { return( shift->_set_get_prop( 'all', @_ ) ); }
+
+sub as_string { return( shift->scope->as_string ); }
+
+sub cache { return( shift->_set_get_hash_as_mix_object( 'cache', @_ ) ); }
+
+sub condition { return( shift->_set_get_scalar_as_object( 'condition', @_ ) ); }
+
+sub extended { return( shift->_set_get_prop( 'extended', @_ ) ); }
+
+sub extended_only { return( shift->_set_get_prop( 'extended_only', @_ ) ); }
+
+sub has
+{
+    my $self  = shift( @_ );
+    my $check = shift( @_ ) || return;
+    ## We clone the object, because we might modify it for the purpose of our checks
+    my $scope = $self->scope->clone;
+    my $what  = $self->new_array( $self->_is_array( $check ) ? $check : [ $check ] );
+    my $cache = $self->cache;
+    my $scope_cond = $self->condition || 'any';
+    my $term_cond  = 'all';
+    my $new   = $self->new_array;
+    $what->foreach(sub
+    {
+        if( s/\|{1,2}/ /g )
+        {
+            $new->push( split( /\s+/, $_ ) );
+            $term_cond = 'any';
+        }
+        if( s/\+{1,2}/ /g )
+        {
+            $new->push( split( /\s+/, $_ ) );
+            $term_cond = 'all';
+        }
+        else
+        {
+            $new->push( $_ );
+        }
+    });
+    my $cache_key = join( ':', $scope_cond, $term_cond, $what->join( '|' )->scalar );
+    return( $cache->{ $cache_key } ) if( exists( $cache->{ $cache_key } ) );
+    $new->for(sub
+    {
+        my( $i, $val ) = @_;
+        if( substr( $val, 0, 4 ) eq 'ext_' )
+        {
+            $new->splice( $i, 1, substr( $val, 4 ) );
+            $new->push( 'extended' ) unless( $new->has( 'extended' ) );
+        }
+    });
+    $what = $new;
+    # $self->message( 3, "Scope condition is set to '$scope_cond'." );
+    ## Expected positive hits should be equal to the number of array elements for the scope terms being checked
+    ## Ex: [qw( header extended )] requires 2 hits, but
+    ## [qw( header||extended )] requires just 1 hit
+    my $expect = $what->length;
+    my $hits = 0;
+    my $is_ext = $what->has( 'extended' );
+    if( $scope_cond eq 'all' )
+    {
+        my $dict;
+        my $is_ext = 0;
+        if( $scope->has( 'extended' ) )
+        {
+            $dict = $ELEMENTS_DICTIONARY_EXTENDED;
+            $scope->delete( 'extended' );
+            $is_ext++;
+        }
+        else
+        {
+            $dict = $ELEMENTS_DICTIONARY;
+        }
+        # $self->message( 3, "Using dictionary: ", Data::Dump::dump( $dict ) );
+        
+        $scope->foreach(sub
+        {
+            my $scope_key = shift( @_ );
+            my $check_res = 0;
+            $what->foreach(sub
+            {
+                my $scope_check = shift( @_ );
+                # $self->message( 3, "Checking term '$scope_check' against scope '$scope_key'." );
+                if( $scope_key eq $scope_check ||
+                    (
+                        ( $scope_key eq 'all' || $scope_key eq 'block' || $scope_key eq 'inline' ) &&
+                        exists( $dict->{ $scope_key } ) &&
+                        ref( $dict->{ $scope_key } ) eq 'ARRAY' &&
+                        scalar( grep( /^$scope_check$/i, @{$dict->{ $scope_key }} ) )
+                    ) ||
+                    ( $scope_key eq 'all' && ( $scope_check eq 'block' || $scope_check eq 'inline' ) && exists( $dict->{ $scope_check } ) ) ||
+                    ( $is_ext && $scope_check eq 'extended' ) )
+                {
+                    $check_res++;
+                    #$self->message( 3, "It's a hit." );
+                }
+                else
+                {
+                    #$self->message( 3, "It failed." );
+                }
+            });
+            $hits++ if( $check_res == $what->length );
+        });
+        $cache->{ $cache_key } = $hits > 0 ? 1 : 0;
+        return( $hits > 0 ? 1 : 0 );
+    }
+    else
+    {
+        $what->foreach(sub
+        {
+            my $term = shift( @_ );
+            ## If the scope is explicitly included; or
+            ## if the scope is all, but excluding extended features and the query item is not an extended feature; or
+            ## if the scope is extended ONLY and the query item is an extended feature; or
+            ## if the scope is extended and it does not matter what the query item is
+            # $self->message( 3, "Scope has '$term' ? '", $scope->has( $term ), "'." );
+            # $self->message( 3, "Scope has 'block' ? '", $scope->has( 'block' ), "' and '$term' is pat of the ", scalar( @{$ELEMENTS_DICTIONARY->{block}} ), " block items? '", scalar( grep( /^$term$/i, @{$ELEMENTS_DICTIONARY->{block}} ) ), "'." );
+            # $self->message( 3, "Scope has 'inline' ? '", $scope->has( 'inline' ), "' and '$term' is pat of the ", scalar( @{$ELEMENTS_DICTIONARY->{inline}} ), " inline items? '", scalar( grep( /^$term$/i, @{$ELEMENTS_DICTIONARY->{inline}} ) ), "'." );
+            # $self->message( 3, "Scope has 'extended' ? '", $scope->has( 'extended' ), "' and '$term' is pat of the ", scalar( @{$ELEMENTS_DICTIONARY_EXTENDED->{all}} ), " extended items? '", scalar( grep( /^$term$/i, @{$ELEMENTS_DICTIONARY_EXTENDED->{all}} ) ), "'." );
+            # $self->message( 3, "Scope term is not extended ($term) and has all ? '", $scope->has( 'all' ), "'" );
+            ## $hits++ if( $scope->has( $term ) || ( $term ne 'extended' && $scope->has( 'all' ) ) );
+            if( $scope->has( $term ) ||
+                ( $scope->has( 'block' ) && scalar( grep( /^$term$/i, @{$ELEMENTS_DICTIONARY->{block}} ) ) ) ||
+                ( $scope->has( 'inline' ) && scalar( grep( /^$term$/i, @{$ELEMENTS_DICTIONARY->{inline}} ) ) ) ||
+                ( $scope->has( 'extended' ) && scalar( grep( /^$term$/i, @{$ELEMENTS_DICTIONARY_EXTENDED->{all}} ) ) ) ||
+                ( $term ne 'extended' && $scope->has( 'all' ) ) )
+            {
+                $hits++;
+            }
+        });
+        # $self->message( 3, "I expected $expect hits and got $hits hits. Condition is '$term_cond'" );
+        $cache->{ $cache_key } = ( $term_cond eq 'all' && $expect == $hits ) || ( $term_cond eq 'any' && $hits );
+        return( ( $term_cond eq 'all' && $expect == $hits ) || ( $term_cond eq 'any' && $hits ) );
+    }
+}
+
+sub scope { return( shift->_set_get_hash_as_mix_object( 'scope', @_ ) ); }
+
+sub _set_get_prop
+{
+    my $self = shift( @_ );
+    my $key  = shift( @_ );
+    my $scope = $self->scope;
+    $scope->{ $key } = shift( @_ ) if( @_ );
+    return( $scope->{ $key } );
+}
+
+1;
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+Markdown::Parser - Markdown Parser Only
+
+=head1 SYNOPSIS
+
+    use Markdown::Parser;
+
+=head1 VERSION
+
+    v0.1.0
+
+=head1 DESCRIPTION
+
+L<Markdown::Parser> is an object oriented L<Markdown parser|https://daringfireball.net/projects/markdown/syntax> and manipulation interface.
+
+It provides 2 modes: 1) strict and 2) extended
+
+In strict mode, it conform rigorously to the Markdown specification as set out by its original author John Gruber and the extended mode, it accept and recognises extended Markdown syntax as set out in L<PHP Markdown Extra|https://michelf.ca/projects/php-markdown/extra/> by L<Michel Fortin|https://michelf.ca/home/>
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+To instantiate a new L<Markdown::Parser> object, pass an hash reference of following parameters:
+
+=over 4
+
+=item abbreviation_case_sensitive
+
+Boolean value to determine if abbreviation, that are extended markdown, should be case sensitive or not.
+Default is false, i.e. they are not case sensitive, so an abbreviation declaration like:
+
+*[HTML4] Hypertext Markup Language Version 4
+
+would match either C<HTML4> or C<html4> or even C<hTmL4>
+
+=item css_grid
+
+A boolean value to set whether to return the tables as a L<css grid|https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Grid_Layout> rather than as an L<html table|https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Basics>.
+
+This boolean value is passed to the L<Markdown::Parser::Element/create_table> in the L</parse_table> method.
+
+L<CSS grids|https://medium.com/@js_tut/css-grid-tutorial-filling-in-the-gaps-c596c9534611> offer more flexibility and power than their conventional html counterparts.
+
+To achieve this, this module uses L<CSS::Object> and inserts necessary css rules to be added to an inline style in the head section of the html document.
+
+Once the parsing is complete, you can get the L<CSS::Object> object with L</css> method.
+
+=item I<debug>
+
+This is an integer. The bigger it is and the more verbose is the output.
+
+=item I<mode>
+
+This can be either I<strict> or I<extended>. By default it is set to I<strict>
+
+=back
+
+=head1 EXCEPTION HANDLING
+
+Whenever an error has occurred, L<Markdown::Parser> will set a L<Module::Generic::Exception> object containing the detail of the error and return undef.
+
+The error object can be retrieved with the inherited L<Module::Generic/error> method. For example:
+
+    my $p = Markdown::Parser->new( debug => 3 ) || die( Markdown::Parser->error );
+
+=head1 METHODS
+
+=head2 abbreviation_case_sensitive
+
+Boolean value that affects the way abbreviation are retrieved with L<Markdown::Parser::Document/get_abbreviation>
+
+=head2 charset
+
+Sets or gets the character set for the document. Typically something like C<utf-8>
+
+=head2 code_highlight
+
+Takes a boolean value.
+
+This is currently unused.
+
+=head2 create_document
+
+Creates and returns a L<Markdown::Parser::Document> object. This is a special object which is the top element.
+
+=head2 css
+
+Sets or get the L<CSS::Object> objects. If one is set already, it is returned, or else an object is instantiated.
+
+=head2 css_builder
+
+This is a shortcut for the L<CSS::Object/builder> method.
+
+=head2 css_grid
+
+A boolean value to set whether to return the tables as a L<css grid|https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Grid_Layout> rather than as an L<html table|https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Basics>.
+
+=head2 default_email
+
+Sets or gets the default email address to use, such as when setting up anti-spam measures.
+
+See L<Markdown::Parser::Link/as_string>
+
+=head2 document
+
+Contains the L<Markdown::Parser::Document> object. An L<Markdown::Parser::Document> object is created by L</parser> to contain all the parsed markdown elements.
+
+=head2 email_obfuscate_class
+
+The css class to use when obfuscating email address.
+
+See L<Markdown::Parser::Link/as_string>
+
+=head2 email_obfuscate_data_host
+
+The fake host to use when performing email obfuscation.
+
+See L<Markdown::Parser::Link/as_string>
+
+=head2 email_obfuscate_data_user
+
+The fake user to use when performing email obfuscation.
+
+See L<Markdown::Parser::Link/as_string>
+
+=head2 encrypt_email
+
+Boolean value to mark e-mail address found to be encrypted. See L<Markdown::Parser::Link> for more information.
+
+=head2 footnote_ref_sequence
+
+This is more an internal method used to keep track of the footnote reference found, i.e. something like:
+
+    Here's a simple footnote,[^1] and here's a longer one.[^bignote]
+
+So that the counter can be used to auto-generate number visible for those reference to footnotes.
+
+This is differente from the footnote reference id i.e. the link from footnote back to the point where they are linked. For example:
+
+    Here’s a simple footnote,1 and here’s a longer one.2
+
+        1. This is the first footnote. ↩ # <-- Backlink is here
+
+        2. Here’s one with multiple paragraphs and code. ↩ # <-- and here also
+
+Here C<1> and C<2> are provided thanks to the L</footnote_ref_sequence> and allocated to each L<Markdown::Parser::FootnoteReference>
+
+=head2 katex_delimiter
+
+Sets or gets an array reference.
+
+The delimiter to use with C<katex>
+
+Returns an array object (L<Module::Generic::Array>)
+
+=head2 list_level
+
+Sets or gets the list level. This takes an integer and is used during parsing of lists.
+
+This method can be accessed as a regular method, or as a lvalue method, such as:
+
+    $parser->list_level( 2 );
+    # or
+    $parser->list_level = 2;
+    # or even
+    $parser->list_level++;
+
+=head2 mode
+
+Sets or gets the mode for the parser. Possible value is C<strict> or C<extended>
+
+If set to C<extended>, the the scope of the parser will included non-standard markdown formattings.
+
+=head2 parse
+
+Provided with a string and some optional argument passed as an hash reference, and this will parse the string, create all the necessary object to represent the extent of the markdown document.
+
+It returns the L<Markdown::Parser::Document> object.
+
+Possible arguments are:
+
+=over 4
+
+=item I<element>
+
+A L<Markdown::Parser::Element> subclass object that is used to store all newly created object from the parsing of the string provided.
+
+L</parse> is called recursively, so this makes it possible to set sub element as the container element in parsing.
+
+=item I<scope>
+
+Can be a string or an array reference defining the extent of the scope within which the parser operates. For example, if it is set to C<strict>, it will only parse standard markdown formatting and ignore the rest.
+
+But, if we wanted to only parse paragraph and blockquotes and nothing else, its value would be:
+
+    [qw( paragraph blockquote )]
+
+=item I<scope_cond>
+
+Sets whether the scope item specified are to be understood as C<any one of them> or C<all of them> Thius possible value is C<any> or C<all>.
+
+=back
+
+=head2 parse_file
+
+Given a file path, and this will check if it can access the resource, and open the file and call L</parse> on the content retrieved.
+
+If for some reason, the file content could not be accessed, it returns undef and set an error using L<Module::Generic/error> that this package inherits.
+
+=head2 parse_list_item
+
+This method is called when the parser encounters a markdown list.
+
+It takes a string representing the entire list and an optional hash reference of options.
+
+Possible options are:
+
+=over
+
+=item I<doc>
+
+The L<Markdown::Parser::Element> object to be used as container of all the item found during parsing.
+
+=item I<pos>
+
+An integer representation the position at which the parsing should start.
+
+=back
+
+It returns a L<Markdown::Parser::Document> object.
+
+=head2 parse_list_item
+
+This method is called from within L</parse> when an ordered or unordered list is found. It recursively parse the list data.
+
+=head2 parse_table
+
+This method is called from within L</parse> when a table is found.
+
+It will create a L<Markdown::Parser::Table> and associated objects, such as L<Markdown::Parser::TableHeader>, L<Markdown::Parser::TableBody> and L<Markdown::Parser::Caption>
+
+There can be one to 2 lines of headers and multiple table bodies. Table headers and table bodies contain L<table rows|Markdown::Parser::TableRow>, who, in turn, contain L<Markdown::Parser::TableCell> objects.
+
+=head2 parse_table_row
+
+Provided with a string representing a table row, along with optional hash reference of options and this willparse the string and return an array reference of L<Markdown::Parser::TableRow> objects. Each L<Markdown::Parser::TableRow> object contains one or multiple instance of L<Markdown::Parser::TableCell> objects.
+
+=head2 scope
+
+Returns the L<Markdown::Parser::Scope> which is used during parsing to determine whether each element is part of the scope of not. During parsing, the scope may vary and may include only block element while sometime, the scope is limited to inline elements. For speed, the scope method L<Markdown::Parser::Scope/has> is cached.
+
+=head2 scope_block
+
+Get a new scope parameter, in the form of an array reference, that has a scope for block elements.
+
+=head2 scope_inline
+
+Get a new scope parameter, in the form of an array reference, that has a scope for inline elements.
+
+=head2 whereami
+
+Provided with a scalar, an integer representing a position in the scalar, and an optional hash reference of options, and this method will print out or return a formatted string to visually show where exactly is the cursor in the string.
+
+This is used solely for debugging and is resource intensive, so this along with the rest of the debugging method should not be used in live production.
+
+This is activated when the parser object debug value is greater or equal to 3.
+
+=head1 PRIVATE METHODS
+
+=head2 _total_trailing_new_lines
+
+Count how many trailing new lines there are in the given string and returns the number.
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 SEE ALSO
+
+L<Regexp::Common::Markdown> for the regular expressions used in this distribution.
+
+L<Text::Markdown::Discount> for a fast markdown to html converter using C code.
+
+L<Text::Markdown> for a version in pure perl.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2020 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut

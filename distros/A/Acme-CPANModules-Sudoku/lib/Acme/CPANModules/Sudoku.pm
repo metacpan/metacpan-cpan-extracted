@@ -1,9 +1,9 @@
 package Acme::CPANModules::Sudoku;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-16'; # DATE
+our $DATE = '2021-08-11'; # DATE
 our $DIST = 'Acme-CPANModules-Sudoku'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use strict;
 use Acme::CPANModulesUtil::Misc;
@@ -21,7 +21,8 @@ for playing. And between the two available modules for playing, I find that
 there's currently no good playable Sudoku game on CPAN. Sad but true. You'd be
 better off opening your browser and visiting <https://websudoku.com> or
 <https://sudoku.com>, or installing *ksudoku* or *gnome-sudoku* if you're using
-KDE/GNOME.
+KDE/GNOME, or *sudoku* (by Michael Kennett) or *nudoku* if you like playing on
+the terminal.
 
 (CPAN does still contain some playable games though. I did enjoy
 *Games::FrozenBubble* and still play *Games::2048* from time to time.)
@@ -88,7 +89,7 @@ Acme::CPANModules::Sudoku - Sudoku-related modules on CPAN
 
 =head1 VERSION
 
-This document describes version 0.005 of Acme::CPANModules::Sudoku (from Perl distribution Acme-CPANModules-Sudoku), released on 2021-01-16.
+This document describes version 0.006 of Acme::CPANModules::Sudoku (from Perl distribution Acme-CPANModules-Sudoku), released on 2021-08-11.
 
 =head1 DESCRIPTION
 
@@ -103,7 +104,8 @@ for playing. And between the two available modules for playing, I find that
 there's currently no good playable Sudoku game on CPAN. Sad but true. You'd be
 better off opening your browser and visiting L<https://websudoku.com> or
 L<https://sudoku.com>, or installing I<ksudoku> or I<gnome-sudoku> if you're using
-KDE/GNOME.
+KDE/GNOME, or I<sudoku> (by Michael Kennett) or I<nudoku> if you like playing on
+the terminal.
 
 (CPAN does still contain some playable games though. I did enjoy
 I<Games::FrozenBubble> and still play I<Games::2048> from time to time.)
@@ -183,8 +185,13 @@ document CPAN. See L<Acme::CPANModules> for more details.
 =head2 What are ways to use this Acme::CPANModules module?
 
 Aside from reading this Acme::CPANModules module's POD documentation, you can
-install all the listed modules (entries) using L<cpanmodules> CLI (from
-L<App::cpanmodules> distribution):
+install all the listed modules (entries) using L<cpanm-cpanmodules> script (from
+L<App::cpanm::cpanmodules> distribution):
+
+ % cpanm-cpanmodules -n Sudoku
+
+Alternatively you can use the L<cpanmodules> CLI (from L<App::cpanmodules>
+distribution):
 
     % cpanmodules ls-entries Sudoku | cpanm -n
 
@@ -210,7 +217,7 @@ Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-Sud
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Acme-CPANModules-Sudoku/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Sudoku>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -226,9 +233,26 @@ L<cpanmodules> - CLI tool to let you browse/view the lists
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

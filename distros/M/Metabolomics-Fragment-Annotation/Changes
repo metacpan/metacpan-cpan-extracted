@@ -1,5 +1,17 @@
 Revision history for Metabolomics-Fragment-Annotation
 
+0.6.4	2021-08-10
+	- POD Update
+	- multiAnnotation support in matching algo and writers
+	- PeakForest REST API integration (GC/MS)
+	- Compute scores for GC/MS
+	- supporting CSV and TSV as inputs (sniffer)
+	- generate html output format
+
+0.6.3	2020-11-25
+	- POD update
+	- PhytoHUB module
+
 0.6.2	2020-11-02
 	- POD update
 	- KnapSack and PhytoHUB database updates

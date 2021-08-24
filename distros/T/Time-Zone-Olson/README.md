@@ -4,7 +4,7 @@ Time::Zone::Olson - Provides an Olson timezone database interface
 
 # VERSION
 
-Version 0.38
+Version 0.40
 
 # SYNOPSIS
 

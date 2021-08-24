@@ -8,7 +8,7 @@ BEGIN {
   use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS);
   @ISA = qw(Exporter);
 
-  $VERSION = '0.002';
+  $VERSION = '0.004';
 
   @EXPORT_OK = qw(beet_info);
   %EXPORT_TAGS = [ qw() ];
@@ -25,13 +25,15 @@ sub beet_info {
   my $buffer;
   my %info;
 
+  my $quoted = quotemeta($file);
+
   if(scalar run(
-    command => "beet info '$file'",
-    verbose => 0,
+    command => "beet info $quoted",
+    verbose => $ENV{DEBUG} || 0,
     buffer  => \$buffer,
     timeout => 20,
   )) {
-    %info = $buffer =~ /\s+(\S+):\s(.+)/g;
+    %info = $buffer =~ /\s*(\S+):\s(.+)/g;
   }
   return \%info;
 }

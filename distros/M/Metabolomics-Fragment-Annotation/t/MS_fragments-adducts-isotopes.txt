@@ -1,36 +1,36 @@
 type	losses_or_gains	delta_mass	annotation_in_pos_mode	annotation_in_neg_mode
 pseudomolecular ion	+H	1.0072764	[M+H]+	
 pseudomolecular ion	-H	-1.0072764		[M-H]-
-adduct	-2H+Na+K	59.9378259		[(M-H+Na+K)-H]-
-adduct	-H+K	37.95588165	[M+K]+	
-adduct	-H+Na	21.98194425	[M+Na]+	
-adduct	-3H+3Na	65.94583274		[(M-2H+3Na)-H]-
-adduct	-4H+4K	151.8235266		[(M-3H+4K)-H]-
-adduct	-4H+4Na	87.92777699		[(M-3H+4Na)-H]-
-adduct	-3H+3K	113.8676449		[(M-2H+3K)-H]-
-adduct	-2H+2K	75.9117633		[(M-H+2K)-H]-
-adduct	-2H+2Na	43.9638885		[(M-H+2Na)-H]-
-adduct	Cl 	35.9767		[M+Cl]-
-adduct	-2H+Ca 	37.94694092		[(M-H+Ca)-H]-
-isotope	13C db 	0.501677419		
-isotope	13C	1.003354838	[M+H]+_13C	[M+H]-_13C
-isotope	15N	0.997034893	[M+H]+_15N	[M+H]-_15N
-isotope	18O	2.00424638	[M+H]+_18O	[M+H]-_18O
-isotope	34S	1.9957959	[M+H]+_34S	[M+H]-_34S
-isotope	41K	1.99811908	[M+H]+_41K	[M+H]-_41K
-isotope	37Cl	1.99704991	[M+H]+_37Cl	[M+H]-_37Cl
-isotope	13C2	2.006709676	[M+H]+_13C2	[M+H]-_13C2
-isotope	13C3	3.010064513	[M+H]+_13C3	[M+H]-_13C3
-isotope	13C+37Cl	3.000404748	[M+H]+_13C_37Cl	[M+H]-_13C_37Cl
-isotope	13C+18O	3.007601218	[M+H]+_13C_18O	[M+H]-_13C_18O
-isotope	13C+34S	2.999150738	[M+H]+_13C_34S	[M+H]-_13C_34S
-isotope	44Ca	3.99289082	[M+H]+_44Ca	[M+H]-_44Ca
-adduct	+(CH3OH)	32.02621475	[(M+H)+CH3OH]+	
-adduct	+(CH3CN)	41.0265491	[M+CH3CNH]+	[M+CH2CN]-
-adduct	+(H2O)	18.01056468	[M+H3O]+	[M+OH]-
-adduct	+2(H2O)	36.02112937	[(M+2H20)+H]+	[(M+2H20)-H]-
+adduct	Na+K	59.9378259	[(M-H+Na)+K]+	
+adduct	K	37.95588165	[M+K]+	
+adduct	Na	21.98194425	[M+Na]+	
+adduct	3Na	65.94583274	[(M-2H+2Na)+Na]+	
+adduct	4K	151.8235266	[(M-3H+3K)+K]+	
+adduct	4Na	87.92777699	[(M-3H+3Na)+Na]+	
+adduct	3K	113.8676449	[(M-2H+2K)+K]+	
+adduct	2K	75.9117633	[(M-H+K)+K]+	
+adduct	 2Na	43.9638885	[(M-H+Na)+Na]+	
+adduct	Cl 	34.96885268		[M+Cl]-
+adduct	Ca 	37.94694092	[M+Ca]+	
+isotope	13C db 	0.501677419	[M+H]++_13C	[M-H]--_13C
+isotope	13C	1.003354838	[M+H]+_13C	[M-H]-_13C
+isotope	15N	0.997034893	[M+H]+_15N	[M-H]-_15N
+isotope	18O	2.00424638	[M+H]+_18O	[M-H]-_18O
+isotope	34S	1.9957959	[M+H]+_34S	[M-H]-_34S
+isotope	41K	1.99811908	[M+H]+_41K	[M-H]-_41K
+isotope	37Cl	1.99704991	[M+H]+_37Cl	[M-H]-_37Cl
+isotope	13C2	2.006709676	[M+H]+_13C2	[M-H]-_13C2
+isotope	13C3	3.010064513	[M+H]+_13C3	[M-H]-_13C3
+isotope	13C+37Cl	3.000404748	[M+H]+_13C_37Cl	[M-H]-_13C_37Cl
+isotope	13C+18O	3.007601218	[M+H]+_13C_18O	[M-H]-_13C_18O
+isotope	13C+34S	2.999150738	[M+H]+_13C_34S	[M-H]-_13C_34S
+isotope	44Ca	3.99289082	[M+H]+_44Ca	[M-H]-_44Ca
+adduct	+(CH3OH)	32.02621475	[(M+H)+CH3OH]+	[(M-H)+CH3O]-
+adduct	+(CH3CN)	41.0265491	[(M+H)+CH3CN]+	[(M-H)+CH2CN]-
+adduct	+(H2O)	18.01056468	[(M+H)+H2O]+	[(M-H)+H2O]-
+adduct	+2(H2O)	36.02112937	[(M+H)+2H20]+	[(M-H)+2H20]-
 adduct	+(NaCl)	57.95862196		[(M-H+Na)+Cl]-
-adduct	+(HCOOH)	46.0054793		[M+HCO2]-
+adduct	+(HCOOH)	46.0054793		[(M-H)+HCOOH]-
 adduct	+(HCOOH)+(HCOOK)	129.9668403		
 adduct	+(HCOOH)+(HCOONa)	113.9929029		
 adduct	+(HCOOH)+2(HCOONa)	181.9803264		
@@ -48,20 +48,20 @@ fragment	-(C12H20O9)	-308.1107322	[(M+H)-C12H20O9]+	[(M-H)-C12H20O9]-
 fragment	-(C2H2O)	-42.01056468	[(M+H)-C2H2O]+	[(M-H)-C2H2O]-
 fragment	-(C2H3.)	-27.0229265		
 fragment	-(C2H3N)	-41.0265491	[(M+H)-C2H3N]+	[(M-H)-C2H3N]-
-fragment	-(C2H3NO3)	-89.01129296	[(M+H)-C3H3NO3]+	[(M-H)-C3H3NO3]-
+fragment	-(C2H3NO3)	-89.01129296	[(M+H)-C2H3NO3]+	[(M-H)-C2H3NO3]-
 fragment	-(C2H3O.)	-43.01784112		
 fragment	-(C2H4)	-28.03130013	[(M+H)-C2H4]+	[(M-H)-C2H4]-
 fragment	-(C2H4N.)	-42.03382553		
 fragment	-(C2H4O)	-44.02621475	[(M+H)-C2H4O]+	[(M-H)-C2H4O]-
 fragment	-(C2H5.)	-29.03857656		
 fragment	-(C2H5N)	-43.04219916	[(M+H)-C2H5N]+	[(M-H)-C2H5N]-
-fragment	-(C2H5NO2)	-75.0320284	[(M+H)-C2H6]+	[(M-H)-C2H5NO2]-
+fragment	-(C2H5NO2)	-75.0320284	[(M+H)-C2H5NO2]+	[(M-H)-C2H5NO2]-
 fragment	-(C2H5O.)	-45.03349118		
 fragment	-(C2H5O6P)	-155.9823745	[(M+H)-C2H5O6P]+	[(M-H)-C2H5O6P]-
 fragment	-(C2H6)	-30.04695019	[(M+H)-C2H6]+	[(M-H)-C2H6]-
 fragment	-(C2H7N)	-45.05784922	[(M+H)-C2H7N]+	[(M-H)-C2H7N]-
 fragment	-(C2HNO2)	-71.00072827	[(M+H)-C2HNO2]+	[(M-H)-C2HNO2]-
-fragment	-(C3H4O3)	-88.01604399	[(M+H)-C3H4NO3]+	[(M-H)-C3H4NO3]-
+fragment	-(C3H4O3)	-88.01604399	[(M+H)-C3H4O3]+	[(M-H)-C3H4O3]-
 fragment	-(C3H5.)	-41.03857656		
 fragment	-(C3H5NO2)	-87.0320284	[(M+H)-C3H5NO2]+	[(M-H)-C3H5NO2]-
 fragment	-(C3H5O2NS)-(NH3)	-136.0306485		
@@ -72,7 +72,7 @@ fragment	-(C3H7.)	-43.05422662
 fragment	-(C3H7O2N)	-89.04767846	[(M+H)-C3H7O2N]+	[(M-H)-C3H7O2N]-
 fragment	-(C3H7O2NS)	-121.0197495	[(M+H)-C3H7O2NS]+	[(M-H)-C3H7O2NS]-
 fragment	-(C3H7O6P)	-169.9980246	[(M+H)-C3H7O6P]+	[(M-H)-C3H7O6P]-
-fragment	-(C4H6)	-54.04695019	[(M+H)-C4H6P]+	[(M-H)-C4H6]-
+fragment	-(C4H6)	-54.04695019	[(M+H)-C4H6]+	[(M-H)-C4H6]-
 fragment	-(C4H6O2)	-86.03677943	[(M+H)-C4H6O2]+	[(M-H)-C4H6O2]-
 fragment	-(C4H6O4)	-118.0266087	[(M+H)-C4H6O4]+	[(M-H)-C4H6O4]-
 fragment	-(C4H7.)	-55.05422662		
@@ -85,7 +85,7 @@ fragment	-(C6H10O4)	-146.0579088	[(M+H)-C6H10O4]+	[(M-H)-C6H10O4]-
 fragment	-(C6H10O5)-(H2O)	-180.0633881	[(M+H)-C6H10O5-H2O]+	[(M-H)-C6H10O5-H2O]-
 fragment	-(C6H10O5)	-162.0528234	[(M+H)-C6H10O5]+	[(M-H)-C6H10O5]-
 fragment	-(C6H10O7)	-194.0426527	[(M+H)-C6H10O7]+	[(M-H)-C6H10O7]-
-fragment	-(C6H8O6)	-176.032088	[(M+H)-C6H8O7]+	[(M-H)-C6H8O7]-
+fragment	-(C6H8O6)	-176.032088	[(M+H)-C6H8O6]+	[(M-H)-C6H8O6]-
 fragment	-(CH2O)	-30.01056468	[(M+H)-CH2O]+	[(M-H)-CH2O]-
 fragment	-(CH2S)-(HCOOH)	-91.99320037	[(M+H)-(CH2S)-(HCOOH)]+	[(M-H)-(CH2S)-(HCOOH)]-
 fragment	-(CH2S)-(NH3)	-63.01427016	[(M+H)-(CH2S)-(NH3)]+	[(M-H)-(CH2S)-(NH3)]-
@@ -109,14 +109,14 @@ fragment	-(CO2)	-43.98982924	[(M+H)-CO2]+	[(M-H)-CO2]-
 fragment	-(H2)-(NH3)	-19.04219916	[(M+H)-(H2)-(NH3)]+	[(M-H)-(H2)-(NH3)]-
 fragment	-(H2)	-2.015650064	[(M+H)-H2]+	[(M-H)-H2]-
 fragment	-(H2O)-(CO2)	-62.00039392	[(M+H)-(H2O)-(CO2)]+	[(M-H)-(H2O)-(CO2)]-
-fragment	 -(H2O)-(HCOOH)	-64.01604399	[(M+H)-(H2O)-(CO2)]+	[(M-H)-(H2O)-(HCOOH)]-
+fragment	 -(H2O)-(HCOOH)	-64.01604399	[(M+H)-(HCOOH)]+	[(M-H)-(H2O)-(HCOOH)]-
 fragment	-(H2O)-(NH3)	-35.03711378	[(M+H)-(H2O)-(NH3)]+	[(M-H)-(H2O)-(NH3)]-
 fragment	-(H2O)	-18.01056468	[(M+H)-(H2O)]+	[(M-H)-(H2O)]-
-fragment	-(H2O)-2(CO2)	-105.9902232	[(M+H)-(H2O)-2(H2O)]+	[(M-H)-(H2O)-2(H2O)]-
+fragment	-(H2O)-2(CO2)	-105.9902232	[(M+H)-(H2O)-2(C2O)]+	[(M-H)-(H2O)-2(C2O)]-
 fragment	-(H2S)-(H2O)	-51.99828575	[(M+H)-(H2S)-(H2O)]+	[(M-H)-(H2S)-(H2O)]-
 fragment	-(H2S)	-33.98772106	[(M+H)-H2S]+	[(M-H)-H2S]-
-fragment	-(H2SO4)	-97.96737954	[(M+H)-H2SO4]+	[(M-H)-H2SO4]-
-fragment	-(H3PO4)	-97.97689521	[(M+H)-H3PO4]+	[(M-H)-H3PO4]-
+fragment	-(H2SO4)	-97.96737954	[(M+H)-H2SO4]+	
+fragment	-(H3PO4)	-97.97689521	[(M+H)-H3PO4]+	
 fragment	-(HCl)	-35.97667771	[(M+H)-HCl]+	[(M-H)-HCl]-
 fragment	-(HCN)	-27.01089903	[(M+H)-HCN]+	[(M-H)-HCN]-
 fragment	-(HCOOH)-(HCN)	-73.01637834	[(M+H)-(HCOOH)-(HCN)]+	[(M-H)-(HCOOH)-(HCN)]-
@@ -125,20 +125,20 @@ fragment	-(HS.)	-32.97934743
 fragment	-(NC3H9)-(CH3COOH)	-119.0946287	[(M+H)-(NC3H9)-(CH3COOH)]+	[(M-H)-(NC3H9)-(CH3COOH)]-
 fragment	-(NC3H9)-(H2O)	-77.08406397	[(M+H)-(NC3H9)-(H2O)]+	[(M-H)-(NC3H9)-(H2O)]-
 fragment	-(NC3H9)-(HCOOH)	-105.0789786	[(M+H)-(NC3H9)-(HCOOH)]+	[(M-H)-(NC3H9)-(HCOOH)]-
-fragment	-(NC3H9)	-59.07349929	[(M+H)-NC3H9]+	[(M-H)-NC3H9]-
+fragment	-(NC3H9)	-59.07349929	[(M+H)-N(CH3)3]+	[(M-H)-N(CH3)3]-
 fragment	-(NaCl)	-57.95862196	[(M+H-NaCl]+	[(M-H-NaCl]-
 fragment	-(NH2CO.)	-44.01309008		
 fragment	-(NH3)-(CO2)-(H2O)	-79.02694302	[(M+H)-(NH3)-(CO2)-(H2O)]+	[(M-H)-(NH3)-(CO2)-(H2O)]-
-fragment	-(NH3)-(CO2)	-61.01637834	[(M+H)-CO2]+	[(M-H)-CO2]-
-fragment	-(NH3)-(CONH)	-60.03236275	[(M+H)-CONH]+	[(M-H)-CONH]-
+fragment	-(NH3)-(CO2)	-61.01637834	[(M+H)-NH3-CO2]+	[(M-H)-NH3-CO2]-
+fragment	-(NH3)-(CONH)	-60.03236275	[(M+H)-NH3-CONH]+	[(M-H)-NH3-CONH]-
 fragment	-(NH3)-(HCOOH)	-63.0320284	[(M+H)-(NH3)-(HCOOH)]+	[(M-H)-(NH3)-(HCOOH)]-
 fragment	-(NH3)	-17.0265491	[(M+H)-NH3]+	[(M-H)-NH3]-
 fragment	-(NH3CO)	-45.02146372	[(M+H)-NH3CO]+	[(M-H)-NH3CO]-
 fragment	-(NHCO)	-43.00581365	[(M+H)-NHCO]+	[(M-H)-NHCO]-
 fragment	-(OH.)	-17.00219105		
-fragment	-(PO3)	-78.95850549	[(M+H)-PO3]+	[(M-H)-PO3]-
+fragment	-(PO3)	-78.95850549		[(M-H)-PO3]-
 fragment	-(SO2)	-63.96190024	[(M+H)-SO2]+	[(M-H)-SO2]-
-fragment	-(SO3)	-79.95681486	[(M+H)-SO3]+	[(M-H)-SO3]-
+fragment	-(SO3)	-79.95681486		[(M-H)-SO3]-
 fragment	-2(H2O)-(CO2)	-80.01095861	[(M+H)-2(H2O)-(CO2)]+	[(M-H)-2(H2O)-(CO2)]-
 fragment	-2(H2O)-(HCOOH)-(NH3)	-99.05315777	[(M+H)-2(H2O)-(HCOOH)-(NH3)]+	[(M-H)-2(H2O)-(HCOOH)-(NH3)]-
 fragment	-2(H2O)-(HCOOH)	-82.02660867	[(M+H)-2(H2O)-(HCOOH)]+	[(M-H)-2(H2O)-(HCOOH)]-
@@ -154,7 +154,7 @@ fragment	-(C10H11O3N5)	-249.0861892	[(M+H)-C10H11O3N5]+	[(M-H)-C10H11O3N5]-
 fragment	-(C10H13O4N5)	-267.0967539	[(M+H)-C10H13O4N5]+	[(M-H)-C10H13O4N5]-
 fragment	-(C10H14O7N5P)	-347.0630844	[(M+H)-C10H14O7N5P]+	[(M-H)-C10H14O7N5P]-
 fragment	-(C10H15O5N5)	-285.1073186	[(M+H)-C10H15O5N5]+	[(M-H)-C10H15O5N5]-
-fragment	-(C2H3NO2)	-73.01637834	[(M+H)-C10H15O5N5]+	[(M-H)-C10H15O5N5]-
+fragment	-(C2H3NO2)	-73.01637834	[(M+H)-C2H3NO2]+	[(M-H)-C2H3NO2]-
 fragment	-(C2H4O2)	-60.02112937	[(M+H)-C2H4O2]+	[(M-H)-C2H4O2]-
 fragment	-(C2H5NO3)	-91.02694302	[(M+H)-C2H5NO3]+	[(M-H)-C2H5NO3]-
 fragment	-(C2H6O2)	-62.03677943	[(M+H)-C2H6O2]+	[(M-H)-C2H6O2]-
@@ -177,7 +177,7 @@ fragment	-(C6H11O5N)	-177.0637225	[(M+H)-C6H11O5N]+	[(M-H)-C6H11O5N]-
 fragment	-(C6H13O5N)	-179.0793725	[(M+H)-C6H13O5N]+	[(M-H)-C6H13O5N]-
 fragment	-(C5H10O5)	-150.0528234	[(M+H)-C5H10O5]+	[(M-H)-C5H10O5]-
 fragment	-(C5H10O6)	-166.047738	[(M+H)-C5H10O6]+	[(M-H)-C5H10O6]-
-fragment	-(C5H12O2)	-104.0837296	[(M+H)-C5H12O6]+	[(M-H)-C5H12O6]-
+fragment	-(C5H12O2)	-104.0837296	[(M+H)-C5H12O2]+	[(M-H)-C5H12O2]-
 fragment	-(C5H12O2)-(H2O)	-122.0942943	[(M+H)-(C5H12O2)-(H2O)]+	[(M-H)-(C5H12O2)-(H2O)]-
 fragment	-(C5H5N5)	-135.0544952	[(M+H)-C5H5N5]+	[(M-H)-C5H5N5]-
 fragment	-(C5H5ON5)	-151.0494098	[(M+H)-C5H5ON5]+	[(M-H)-C5H5ON5]-
@@ -224,3 +224,11 @@ fragment	-(H3PO4)-(CHNO)	-140.9827089	[(M+H)-(H3PO4)-(CHNO)]+	[(M-H)-(H3PO4)-(CH
 fragment	-(H3PO4)-(H2O)	-115.9874599	[(M+H)-(H3PO4)-(H2O)]+	[(M-H)-(H3PO4)-(H2O)]-
 fragment	-(H3PO4)-(NH3)	-115.0034443	[(M+H)-(H3PO4)-(NH3)]+	[(M-H)-(H3PO4)-(NH3)]-
 fragment	-(HPO3)	-79.96633052	[(M+H)-HPO3]+	[(M-H)-HPO3]-
+adduct	Na+CH3CN	63.0085	[M+Na+CH3CN]+	
+adduct	NH3	17.0265	[M+NH4]+	
+adduct	Li	6.0082	[M+Li]+	
+adduct	CH3COOH	60.02112937		[M+CH3COO]-
+adduct	CF3CO2H	113.9929		[M+CF3COO]-
+adduct	2Li	12.0164	[(M-H+Li)+Li]+	
+adduct	2(NaCl)	79.9405		[(M-2H+2Na)+Cl]-
+fragment	(H2O-CO)	-46.0054793	[(M+H)-H2O-CO]+	[(M-H)-HCOOH]-

@@ -87,7 +87,7 @@ my $client = LLNG::Manager::Test->new( {
             impersonationRule => 1,
             useSafeJail       => 1,
             findUserSearchingAttributes =>
-              { uid => 'Login', guy => 'Kind', cn => 'Name' },
+              { 'uid##1' => 'Login', 'guy##1' => 'Kind', 'cn##1' => 'Name' },
             findUserExcludingAttributes =>
               { type => 'mutant', uid => 'rtyler' },
         }

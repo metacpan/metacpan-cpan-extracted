@@ -29,6 +29,7 @@ sub init
     $self->{query_object} = '';
     $self->{table_object} = '';
     ## $self->{fatal} = 1;
+    $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ );
     return( $self->error( "No table object was provided" ) ) if( !$self->{table_object} );
     return( $self );
@@ -67,7 +68,7 @@ sub _initiate_field_object
     my $self = shift( @_ );
     my $field = shift( @_ ) || return( $self->error( "No field was provided to get its object." ) );
     my $class = ref( $self ) || $self;
-    $self->message( 3, "Instantiating table '", $self->table_object->name, "' field '$field' object using class '$class'." );
+    $self->message( 3, "Instantiating table '", $self->table_object->name, "' field '$field' object using class '$class', prefixed '$self->{prefixed}', query_object '", $self->query_object, "' and table_object '", $self->table_object, "' with table alias '", $self->query_object->table_alias, "'." );
     my $fields = $self->table_object->fields;
     $self->message( 3, "Table ", $self->table_object->name, " has no such field \"$field\"." ) if( !CORE::exists( $fields->{ $field } ) );
     return( $self->error( "Table ", $self->table_object->name, " has no such field \"$field\"." ) ) if( !CORE::exists( $fields->{ $field } ) );
@@ -87,12 +88,15 @@ sub _initiate_field_object
     table_object => $self->table_object,
     };
     my $perl = <<EOT;
-sub ${class}::${field}
+package ${class};
+sub ${field}
 {
+    my \$self = shift( \@_ );
+    \$self->message( 3, "Does class '$class' already have a '$field' object? ", ( \$self->{$field} ? 'yes' : 'no' ) );
     unless( \$self->{$field} )
     {
         \$self->{$field} = DB::Object::Fields::Field->new(
-            debug => $hash->{debug},
+            debug => ( \$self->debug || 0 ),
             name => '$field',
             type => '$hash->{type}',
             default => '$hash->{default}',
@@ -102,17 +106,19 @@ sub ${class}::${field}
             table_object => \$self->table_object,
         );
     }
+    \$self->message( 3, "Returning field object '\$self->{$field}'" );
     return( \$self->{$field} );
 }
 EOT
-    $self->message( 3, "Evaluating -> $perl" );
+    # $self->message( 3, "Evaluating -> $perl" );
     eval( $perl );
     die( $@ ) if( $@ );
-    my $o = DB::Object::Fields::Field->new( $hash );
+    # my $o = DB::Object::Fields::Field->new( $hash );
+    my $o = $self->$field;
     # $self->message( 3, "Calling $self->$field( $o )" );
     # $self->$field( $o ) || return( $self->error( "Unable to set field '$field' object to '$o': ", $self->error ) );
     # $self->message( 3, "$self->$field returns '", overload::StrVal( $self->$field ), "'." );
-    $self->message( 3, "Retuning field object '$o' (", overload::StrVal( $o ), ")" );
+    $self->message( 3, "Returning field object '$o' (", overload::StrVal( $o ), ")" );
     return( $o );
 }
 
@@ -127,7 +133,8 @@ AUTOLOAD
     $self->message( 3, "Called for method '$method'. Fields for table '", $self->table_object->name, "' are: ", sub{ $self->dump( $fields ) } );
     if( $code = $self->can( $method ) )
     {
-        return( $code->( @_ ) );
+        $self->message( 3, "Method \"$method\" already exists in class '", ( ref( $self ) || $self ), "' ($self)." );
+        return( $code->( $self, @_ ) );
     }
     ## elsif( CORE::exists( $self->{ $method } ) )
     elsif( exists( $fields->{ $method } ) )
@@ -137,6 +144,7 @@ AUTOLOAD
     }
     else
     {
+        warn( "Table ", $self->table_object->name, " has no such field \"$method\".\n" );
         return( $self->error( "Table ", $self->table_object->name, " has no such field \"$method\"." ) );
         #die( "Table ", $self->table_object->name, " has no such field \"$method\".\n" );
     }

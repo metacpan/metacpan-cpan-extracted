@@ -28,8 +28,10 @@ sub init
 {
     my $self = shift( @_ );
     $self->{having} = '';
+    $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ );
     $self->{binded_having} = [];
+    $self->{query_reset_keys} = [qw( alias binded binded_values binded_where binded_limit binded_group binded_having binded_order from_unixtime group_by limit local order_by reverse sorted unix_timestamp where )];
     return( $self );
 }
 
@@ -141,7 +143,7 @@ sub reset
     my $self = shift( @_ );
     if( !$self->{query_reset} )
     {
-        my $keys = [qw( alias local binded binded_values binded_where binded_limit binded_group binded_having binded_order where limit group_by order_by reverse from_unixtime unix_timestamp sorted )];
+        my $keys = [qw( alias binded binded_values binded_where binded_limit binded_group binded_having binded_order from_unixtime group_by limit local order_by reverse sorted unix_timestamp where )];
         CORE::delete( @$self{ @$keys } );
         $self->{query_reset}++;
         $self->{enhance} = 1;
@@ -170,6 +172,7 @@ sub _query_components
 {
     my $self = shift( @_ );
     my $type = lc( shift( @_ ) ) || $self->_query_type() || return( $self->error( 'You must specify a query type: select, insert, update or delete' ) );
+    my $opts = $self->_get_args_as_hash( @_ );
     my( $where, $group, $having, $sort, $order, $limit );
     $where  = $self->where();
     if( $type eq 'select' )

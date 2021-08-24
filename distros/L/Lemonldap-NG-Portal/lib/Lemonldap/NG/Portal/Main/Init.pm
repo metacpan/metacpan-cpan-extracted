@@ -8,7 +8,7 @@
 #                  of lemonldap-ng.ini) and underlying handler configuration
 package Lemonldap::NG::Portal::Main::Init;
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.13';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -99,13 +99,12 @@ has cookieSameSite => ( is => 'rw' );
 sub init {
     my ( $self, $args ) = @_;
     $args ||= {};
-    $self->localConfig( {
-            %{ Lemonldap::NG::Common::Conf->new( $args->{configStorage} )
-                  ->getLocalConf('portal')
-            },
-            %$args
-        }
-    );
+    my $confAcc = Lemonldap::NG::Common::Conf->new( $args->{configStorage} );
+    unless ($confAcc) {
+        die( 'Could not read configuration: '
+              . $Lemonldap::NG::Common::Conf::msg );
+    }
+    $self->localConfig( { %{ $confAcc->getLocalConf('portal') }, %$args } );
 
     # Load override messages from lemonldap-ng.ini
     foreach my $k ( keys %{ $self->localConfig } ) {
@@ -531,13 +530,13 @@ sub findEP {
             }
         }
     }
-    $self->logger->debug("Plugin $plugin initializated");
+    $self->logger->debug("Plugin $plugin initialized");
 
     # Rules for menu
     if ( $obj->can('spRules') ) {
         foreach my $k ( keys %{ $obj->{spRules} } ) {
             $self->logger->info(
-"$k is defined more than one time, it can have some bad effect on Menu display"
+"$k is defined more than one time, it can have some bad effects on Menu display"
             ) if ( $self->spRules->{$k} );
             $self->spRules->{$k} = $obj->{spRules}->{$k};
         }

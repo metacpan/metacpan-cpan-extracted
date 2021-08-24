@@ -19,7 +19,7 @@ name: Pod-Weaver-Plugin-Acme-CPANModules
 provides:
   Pod::Weaver::Plugin::Acme::CPANModules:
     file: lib/Pod/Weaver/Plugin/Acme/CPANModules.pm
-    version: '0.011'
+    version: '0.012'
 requires:
   Markdown::To::POD: '0'
   Module::List: '0'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Acme-CPANModules
   homepage: https://metacpan.org/release/Pod-Weaver-Plugin-Acme-CPANModules
   repository: git://github.com/perlancar/perl-Pod-Weaver-Plugin-Acme-CPANModules.git
-version: '0.011'
+version: '0.012'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

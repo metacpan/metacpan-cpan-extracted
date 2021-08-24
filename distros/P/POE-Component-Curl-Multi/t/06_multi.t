@@ -57,7 +57,7 @@ sub client_got_response {
 my $curl = POE::Component::Curl::Multi->spawn(
   Alias   => 'weeble',
   Timeout => 60,
-  FollowRedirects => 5,
+  FollowRedirects => 0,
 );
 
 # Create a session that will make some requests.

@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
         'IO::Dir'			=> 0,
         'IO::File'			=> 0,
         'JSON'				=> '4.02',
-        'Module::Generic'   => 'v0.15.5',
+        'Module::Generic'   => 'v0.15.8',
         'Net::IP'			=> '1.26',
         'Nice::Try'			=> 'v1.1.2',
         'Number::Format'	=> '1.75',
@@ -42,6 +42,7 @@ my %WriteMakefileArgs = (
     {
         'Test::More'		=> '1.302162',
         'Test::Pod'			=> '1.52',
+        'version'           => 0,
     },
     LICENSE				=> 'perl_5',
     MIN_PERL_VERSION	=> 'v5.16.0',

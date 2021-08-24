@@ -1,14 +1,14 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## DB/Object/Postgres/Tables.pm
-## Version 0.4.1
-## Copyright(c) 2019 Jacques Deguest
+## Database Object Interface - ~/lib/DB/Object/Postgres/Tables.pm
+## Version v0.4.2
+## Copyright(c) 2019 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2019/09/11
-## All rights reserved.
+## Modified 2021/08/20
+## All rights reserved
 ## 
-## This program is free software; you can redistribute it and/or modify it 
+## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 ## This package's purpose is to separate the object of the tables from the main
@@ -22,7 +22,7 @@ BEGIN
     use warnings;
     our( $VERSION, $VERBOSE, $DEBUG );
     use parent qw( DB::Object::Tables DB::Object::Postgres );
-    $VERSION    = '0.4.1';
+    $VERSION    = 'v0.4.2';
     $VERBOSE    = 0;
     $DEBUG      = 0;
     use Devel::Confess;
@@ -111,7 +111,7 @@ sub create
         ## Trick so other method may follow, such as as_string(), fetchrow(), rows()
         if( !defined( wantarray() ) )
         {
-            $self->message( 3, "wantarray in void context" );
+            # $self->message( 3, "wantarray in void context" );
             # print( STDERR "create(): wantarrays in void context.\n" );
             $new->execute() ||
             return( $self->error( "Error while executing query to create table '$table':\n$query", $new->errstr() ) );
@@ -224,6 +224,24 @@ sub lock
 
 # Inherited from DB::Object::Tables
 # sub primary
+
+sub on_conflict
+{
+    my $self = shift( @_ );
+    my $q = $self->_reset_query;
+    return( $q->on_conflict( @_ ) ) if( !defined( wantarray() ) );
+    if( wantarray() )
+    {
+        my( @val ) = $q->on_conflict( @_ ) || return( $self->pass_error( $q->error ) );
+        return( @val );
+    }
+    else
+    {
+        my $val = $q->on_conflict( @_ );
+        return( $self->pass_error( $q->error ) ) if( !defined( $val ) );
+        return( $val );
+    }
+}
 
 sub optimize { return( shift->error( "optimize() is not implemented PostgreSQL." ) ); }
 
@@ -456,7 +474,7 @@ DB::Object::Postgres::Tables - PostgreSQL Table Object
 
 =head1 VERSION
 
-    v0.4.1
+    v0.4.2
 
 =head1 DESCRIPTION
 
@@ -569,6 +587,10 @@ Supported lock types are:
 =back
 
 See L<PostgreSQL documentation for more information|https://www.postgresql.org/docs/9.5/explicit-locking.html>
+
+=head2 on_conflict
+
+A convenient wrapper to L<DB::Object::Postgres::Query/on_conflict>
 
 =head2 optimize
 

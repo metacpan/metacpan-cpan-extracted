@@ -7,10 +7,14 @@ maint/Makefile.PL.include
 Makefile.PL
 MANIFEST			This list of files
 t/basic.t
+t/corpus/moo/BasicMoo.pm
+t/corpus/moo/BasicMooRole.pm
+t/corpus/moo/BasicMooWithRole.pm
 t/corpus/OtherFile.pm
 t/corpus/SomeFile.pm
 t/corpus/SomeRole.pm
 t/corpus/UsingRole.pm
+t/moo.t
 t/Pod-Coverage-TrustPod/basic.t
 t/Pod-Coverage-TrustPod/lib/BaseWithNoPod.pm
 t/Pod-Coverage-TrustPod/lib/ChildWithPod.pm

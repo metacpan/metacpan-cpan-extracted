@@ -1,3 +1,9 @@
+0.024   2021-08-22  Released-By: PERLANCAR; Urgency: medium
+
+	- Move generated examples from SYNOPSIS section to EXAMPLES
+	  section.
+
+
 0.023   2021-07-10  Released-By: PERLANCAR; Urgency: high
 
 	- Merge releases 0.022 and 0.022.1.

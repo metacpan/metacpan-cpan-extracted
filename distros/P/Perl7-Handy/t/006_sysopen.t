@@ -11,12 +11,19 @@ close(STDERR);
 
 my $rc = 0;
 
-eval { $rc = sysopen(FILE,$0,O_RDONLY); };
-ok($@, q{sysopen(FILE,$0,O_RDONLY)});
-if ($rc) {
-    local $_ = fileno(FILE);
-    close(FILE);
+eval q{ $rc = sysopen(FILE,$0,O_RDONLY); };
+if ($] < 5.008001) {
+    ok($@, q{sysopen(FILE,$0,O_RDONLY)});
 }
+else {
+    ok(1, q{PASS sysopen(FILE,$0,O_RDONLY)});
+}
+eval q{
+    if ($rc) {
+        local $_ = fileno(FILE);
+        close(FILE);
+    }
+};
 
 $rc = sysopen(my $fh,$0,O_RDONLY);
 ok($rc, q{sysopen(my $fh,$0,O_RDONLY)});

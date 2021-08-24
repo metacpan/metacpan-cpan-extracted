@@ -1,15 +1,15 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-# Database Object Interface - ~/lib/DB/Object/Postgres.pm
-# Version v0.4.9
-# Copyright(c) 2020 DEGUEST Pte. Ltd.
-# Author: Jacques Deguest <jack@deguest.jp>
-# Created 2017/07/19
-# Modified 2021/03/20
-# All rights reserved
-# 
-# This program is free software; you can redistribute  it  and/or  modify  it
-# under the same terms as Perl itself.
+## Database Object Interface - ~/lib/DB/Object/Postgres.pm
+## Version v0.4.10
+## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
+## Created 2017/07/19
+## Modified 2021/08/20
+## All rights reserved
+## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 # This is the subclassable module for driver specific ones.
 package DB::Object::Postgres;
@@ -36,7 +36,7 @@ BEGIN
     require DB::Object::Postgres::Lo;
     our( $VERSION, $DB_ERRSTR, $ERROR, $DEBUG, $CONNECT_VIA, $CACHE_QUERIES, $CACHE_SIZE );
     our( $CACHE_TABLE, $USE_BIND, $USE_CACHE, $MOD_PERL, @DBH );
-    $VERSION     = 'v0.4.9';
+    $VERSION     = 'v0.4.10';
     use Devel::Confess;
 };
 
@@ -650,23 +650,6 @@ SQL
 # See DB::Object
 # sub param
 
-sub on_conflict
-{
-    my $self = shift( @_ );
-    my $q = $self->_reset_query;
-    return( $q->on_conflict( @_ ) ) if( !defined( wantarray() ) );
-    if( wantarray() )
-    {
-        my( @val ) = $q->on_conflict( @_ ) || return( $self->pass_error( $q->error ) );
-        return( @val );
-    }
-    else
-    {
-        my $val = $q->on_conflict( @_ ) || return( $self->pass_error( $q->error ) );
-        return( $val );
-    }
-}
-
 sub pg_ping(@)
 {
     return( shift->{ 'dbh' }->pg_ping );
@@ -809,13 +792,13 @@ sub table_exists
                 ( !$schema || $opts->{anywhere} ) 
             ) )
         {
-            return( 1 );
+            return(1);
         }
     }
     # We did not find it, so let's try by checking directly the database
     my $def = $self->table_info( $table ) || return;
-    return( 1 ) if( scalar( @$def ) );
-    return( 0 );
+    return(1) if( scalar( @$def ) );
+    return(0);
 }
 
 sub table_info
@@ -978,7 +961,7 @@ sub _check_connect_param
     $param->{database} = 'postgres' if( !$param->{database} );
     # By default
     $param->{port} = 5432 if( !length( $param->{port} ) );
-    $self->message( 3, "Returning parameters: ", sub{ $self->dumper( $param ) } );
+    $self->message( 3, "Returning parameters: ", sub{ $self->dump( $param ) } );
     return( $param );
 }
 
@@ -1001,7 +984,7 @@ sub _connection_options
     my $param = shift( @_ );
     my @pg_params = grep( /^pg_/, keys( %$param ) );
     my $opt = $self->SUPER::_connection_options( $param );
-    $self->message( 3, "Inherited options are: ", sub{ $self->dumper( $opt ) } );
+    $self->message( 3, "Inherited options are: ", sub{ $self->dump( $opt ) } );
     @$opt{ @pg_params } = @$param{ @pg_params };
     return( $opt );
 }
@@ -1821,7 +1804,7 @@ In list context, it returns an array of schema lines, and in scalar context, it 
 
 =head2 on_conflict
 
-A convenient wrapper to L<DB::Object::Postgres::Query/on_conflict>
+See L<DB::Object::Postgres::Tables/on_conflict>
 
 =head2 pg_ping
 

@@ -11,12 +11,14 @@ close(STDERR);
 
 my $rc = 0;
 
-eval { $rc = socket(SOCKET,PF_INET,SOCK_STREAM,getprotobyname('tcp')); };
+eval q{ $rc = socket(SOCKET,PF_INET,SOCK_STREAM,getprotobyname('tcp')); };
 ok($@, q{socket(SOCKET,PF_INET,SOCK_STREAM,getprotobyname('tcp'))});
-if ($rc) {
-    local $_ = fileno(SOCKET);
-    close(SOCKET);
-}
+eval q{
+    if ($rc) {
+        local $_ = fileno(SOCKET);
+        close(SOCKET);
+    }
+};
 
 $rc = socket(my $socket,PF_INET,SOCK_STREAM,getprotobyname('tcp'));
 ok($rc, q{socket(my $socket,PF_INET,SOCK_STREAM,getprotobyname('tcp'))});

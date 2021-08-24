@@ -2,7 +2,7 @@
 #
 # COPYRIGHT:
 #
-# This software is Copyright (c) 1996-2014 Best Practical Solutions, LLC
+# This software is Copyright (c) 1996-2021 Best Practical Solutions, LLC
 #                                          <sales@bestpractical.com>
 #
 # (Except where explicitly superseded by other copyright notices)
@@ -118,7 +118,7 @@ or add C<RT::Extension::JSGantt> to your existing C<@Plugins> line.
         # if can't find both start and end dates, use this color
         NullDatesColor => 333,
 
-        # to caculate day length
+        # to calculate day length
         WorkingHoursPerDay => 8,
 
         # used to set start/end if one exists but the other does not
@@ -131,7 +131,7 @@ or add C<RT::Extension::JSGantt> to your existing C<@Plugins> line.
 
 package RT::Extension::JSGantt;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 use warnings;
 use strict;
@@ -567,7 +567,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2014-2020 by Best Practical Solutions
+This software is Copyright (c) 2014-2021 by Best Practical Solutions
 
 This is free software, licensed under:
 

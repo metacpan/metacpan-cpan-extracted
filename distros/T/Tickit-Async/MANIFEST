@@ -15,4 +15,6 @@ t/01basic.t
 t/02input.t
 t/03output.t
 t/04timer.t
+t/05signal.t
+t/06process.t
 t/99pod.t

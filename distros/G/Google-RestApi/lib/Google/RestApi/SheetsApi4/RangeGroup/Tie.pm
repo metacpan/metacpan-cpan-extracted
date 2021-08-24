@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4::RangeGroup::Tie;
 
-our $VERSION = '0.7';
+our $VERSION = '0.8';
 
 use Google::RestApi::Setup;
 
@@ -48,17 +48,29 @@ sub add_tied {
   my $self = shift;
   state $check = compile(HashRef);
   my ($tied) = $check->(@_);
+
+  my $fetch_range = tied(%$tied)->fetch_range();
   tied(%$tied)->fetch_range(1);
-  return $self->add_ranges(%$tied);
+  $self->add_ranges(%$tied);
+  tied(%$tied)->fetch_range($fetch_range);
+
+  return $tied;
 }
 
+# fetch_range(1) turns it on, fetch_range(0) turns it off.
+# fetch_range() returns current setting. return $self so it can be
+# chained with requests.
 sub fetch_range {
   my $self = shift;
-  if (shift) {
+  my $fetch_range = shift;
+  return $self->{fetch_range} if !defined $fetch_range;
+
+  if ($fetch_range) {
     $self->{fetch_range} = 1;
   } else {
     delete $self->{fetch_range};
   }
+
   return $self;
 }
 
@@ -70,11 +82,11 @@ sub range_group {
 sub default_worksheet {
   my $self = shift;
   state $check = compile(
-    HasMethods[qw(tie_ranges tie_cells)],
+    HasMethods[qw(tie_ranges tie_cells)], { optional => 1 },
   );
   my ($worksheet) = $check->(@_);
-  $self->{worksheet} = $worksheet;
-  return;
+  $self->{worksheet} = $worksheet if $worksheet;
+  return $self->{worksheet};
 }
 
 sub TIEHASH  {
@@ -133,9 +145,11 @@ sub STORE {
   return;
 }
 
+sub clear_cached_values { shift->range_group()->clear_cached_values(@_); }
 sub refresh_values { shift->range_group()->refresh_values(@_); }
 sub submit_values { shift->range_group()->submit_values(@_); }
 sub submit_requests { shift->range_group()->submit_requests(@_); }
+sub transaction { shift->range_group()->transaction(); }
 sub ranges { shift->{ranges}; }
 sub worksheet { shift->{worksheet}; }
 sub spreadsheet { shift->{spreadsheet}; }

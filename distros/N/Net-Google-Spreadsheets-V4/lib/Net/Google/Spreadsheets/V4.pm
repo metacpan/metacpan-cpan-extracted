@@ -5,7 +5,7 @@ use warnings;
 use 5.010_000;
 use utf8;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Class::Accessor::Lite (
     new => 0,
@@ -198,24 +198,47 @@ sub clear_sheet {
     );
 }
 
+# see:
 # https://developers.google.com/sheets/guides/concepts#a1_notation
-sub a1_notaion {
+# t/02_a1_notation.t
+sub a1_notation {
     state $rule =  Data::Validator->new(
-        sheet_title  => { isa => 'Str' },
-        start_column => { isa => 'Int', default => 1 },
-        end_column   => { isa => 'Int' },
-        start_row    => { isa => 'Int', default => 1 },
-        end_row      => { isa => 'Int' },
+        sheet_title  => { isa => 'Str', optional => 1 },
+        start_column => { isa => 'Int', optional => 1 },
+        end_column   => { isa => 'Int', optional => 1 },
+        start_row    => { isa => 'Int', optional => 1 },
+        end_row      => { isa => 'Int', optional => 1 },
     )->with('Method');
     my($self, $args) = $rule->validate(@_);
 
-    return sprintf('%s!%s%d:%s%d',
-                   $args->{sheet_title},
-                   $self->column_notation($args->{start_column}),
-                   $args->{start_row},
-                   $self->column_notation($args->{end_column}),
-                   $args->{end_row},
-               );
+    my($sheet_title, $start, $end) = ('', '', '');
+    if (exists $args->{sheet_title}) {
+        $sheet_title = $args->{sheet_title};
+        $sheet_title =~ s/'/''/g;
+        $sheet_title = sprintf(q{'%s'}, $sheet_title);
+    }
+
+    if (exists $args->{start_column}) {
+        $start .= $self->column_notation($args->{start_column});
+    }
+    if (exists $args->{start_row}) {
+        $start .= $args->{start_row};
+    }
+
+    if (exists $args->{end_column}) {
+        $end .= $self->column_notation($args->{end_column});
+    }
+    if (exists $args->{end_row}) {
+        $end .= $args->{end_row};
+    }
+
+    if (not $sheet_title) {
+        return join(':', $start, $end);
+    } elsif (not $start and not $end) {
+        return $sheet_title;
+    } else {
+        return sprintf('%s!%s', $sheet_title, join(':', $start, $end));
+    }
 }
 
 sub column_notation {

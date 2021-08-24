@@ -1,6 +1,7 @@
 package Lab::Instrument::SignalRecovery726x;
+$Lab::Instrument::SignalRecovery726x::VERSION = '3.771';
 #ABSTRACT: Signal Recovery 7260 / 7265 Lock-in Amplifier
-$Lab::Instrument::SignalRecovery726x::VERSION = '3.770';
+
 use v5.20;
 
 use strict;
@@ -524,7 +525,13 @@ sub get_refpha {    # basic setting
 
     my ($tail) = $self->_check_args( \@_ );
 
-    return $self->query("REFP.");
+    my $val = $self->query("REFP.");
+
+    # Trailing zero byte if phase is zero. Device bug??
+    $val =~ s/\0//;
+
+    return $val;
+
 }
 
 # ----------------- SIGNAL CHANNEL OUTPUT FILTERS ---------------
@@ -1225,7 +1232,7 @@ Lab::Instrument::SignalRecovery726x - Signal Recovery 7260 / 7265 Lock-in Amplif
 
 =head1 VERSION
 
-version 3.770
+version 3.771
 
 =head1 SYNOPSIS
 
@@ -1686,6 +1693,7 @@ This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
             2016       Simon Reinhardt
             2017       Andreas K. Huettel
             2020       Andreas K. Huettel
+            2021       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

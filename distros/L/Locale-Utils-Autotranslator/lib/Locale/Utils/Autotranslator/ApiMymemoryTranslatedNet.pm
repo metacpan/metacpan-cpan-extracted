@@ -11,7 +11,7 @@ use MooX::StrictConstructor;
 use URI;
 use namespace::autoclean;
 
-our $VERSION = '1.002';
+our $VERSION = '1.010';
 
 extends qw(
     Locale::Utils::Autotranslator
@@ -65,13 +65,9 @@ __END__
 
 Locale::Utils::Autotranslator::ApiMymemoryTranslatedNet - Interface for translated.net
 
-$Id: ApiMymemoryTranslatedNet.pm 649 2017-02-26 06:56:35Z steffenw $
-
-$HeadURL: $
-
 =head1 VERSION
 
-1.002
+1.010
 
 =head1 SYNOPSIS
 
@@ -164,7 +160,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2014 - 2017,
+Copyright (c) 2014 - 2021,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

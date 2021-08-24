@@ -1,3 +1,12 @@
+0.15     2021-08-21
+    - Reject domains with 254 or more characters. Domains are limited to 255
+      octets, but in practice this means they're actually limited to 253
+      characters. See
+      https://devblogs.microsoft.com/oldnewthing/20120412-00/?p=7873 for a
+      more detailed explanation of this. Implemented by Felipe Gaspar. Fixes
+      GitHub #5. PR #13.
+
+
 0.14     2016-08-21
     - Require Net::Domain::TLD 1.74. This fixes some failures seen on CPAN
       Testers, and if you're validating domains you really want the latest

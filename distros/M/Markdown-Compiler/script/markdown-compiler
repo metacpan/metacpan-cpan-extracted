@@ -1,0 +1,80 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+use oCLI::Command;
+use oCLI 'oCLI::Plugin::Validate';
+use Markdown::Compiler;
+use File::Slurper qw( read_text );
+use Data::Dumper;
+
+
+my $markdown_filespec = [ [ sub { -e $_[2] || die "$_[2]: $!\n"; $_[2] } ], { name => "File Name", desc => "Markdown file to compile" } ];
+
+define lexer => (
+    validate => [
+        0 => $markdown_filespec,
+    ],
+    code => sub {
+        my ( $self, $c ) = @_;
+
+        my $file = $c->req->args->[0];
+
+        $c->stash->{markdown} = Markdown::Compiler->new(source => read_text($file));
+
+        $c->stash->{text} = Dumper($c->stash->{markdown}->stream);
+    }
+);
+
+define parser => (
+    validate => [
+        0 => $markdown_filespec,
+    ],
+    code => sub {
+        my ( $self, $c ) = @_;
+
+        my $file = $c->req->args->[0];
+
+        $c->stash->{markdown} = Markdown::Compiler->new(source => read_text($file));
+
+        $c->stash->{text} = Dumper($c->stash->{markdown}->tree);
+    }
+);
+
+define compiler => (
+    validate => [
+        0      => $markdown_filespec,
+        target => [ [ qw( def=HTML ) ], { desc => "The name of the compiler target. Default: HTML" } ]
+    ],
+    code => sub {
+        my ( $self, $c ) = @_;
+
+        my $file = $c->req->args->[0];
+
+        $c->stash->{markdown} = Markdown::Compiler->new(source => read_text($file));
+
+        $c->stash->{text} = $c->stash->{markdown}->compiler_for($c->req->settings->{target})->html;
+    }
+);
+
+
+if ( ! @ARGV ) {
+    print "Usage:\n\n";
+    print "markdown-compiler <command> [filename] <--options>\n\n";
+    print "Commands:\n";
+    print "  compiler - turn a markdown file into the target document.\n";
+    print "             --target - The compiler to use (Default HTML)\n\n";
+    print "  parser   - Dump the parse tree of the markdown document.\n\n";
+    print "  lexer    - Dump the lexer token stream of the markdown document.\n\n";
+    print "Examples:\n";
+    print "  Use the M::C::Target::Custom target to render the contents of the file myfile.md\n";
+    print "    \$ markdown-compiler compiler myfile.md --target Custom\n\n";
+    print "  Use the default target, HTML to render the contents of myfile.md\n";
+    print "    \$ markdown-compiler compiler myfile.md\n\n";
+    print "  Show the stream of tokens for the file myfile.md\n";
+    print "    \$ markdown-compiler lexer myfile.md \n\n";
+    print "  Show the parse tree for the file myfile.md\n";
+    print "    \$ markdown-compiler parser myfile.md \n\n";
+    exit 0;
+}
+
+oCLI->new( root => 'main', render_root => 'oCLI' )->run( @ARGV );

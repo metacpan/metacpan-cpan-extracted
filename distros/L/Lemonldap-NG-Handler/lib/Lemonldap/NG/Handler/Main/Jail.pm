@@ -26,7 +26,7 @@ has multiValuesSeparator => ( is => 'rw', isa => 'Maybe[Str]' );
 has jail                 => ( is => 'rw' );
 has error                => ( is => 'rw' );
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.13';
 our @builtCustomFunctions;
 
 ## @imethod protected build_jail()
@@ -129,13 +129,7 @@ sub token {
 # Fake reval method if useSafeJail is off
 sub reval {
     my ( $self, $e ) = @_;
-
-    my $res = eval $e;
-    if ($@) {
-        $self->error($@);
-        return undef;
-    }
-    return $res;
+    return eval $e;
 }
 
 ## @method wrap_code_ref
@@ -180,11 +174,10 @@ sub share_from {
 sub jail_reval {
     my ( $self, $reval ) = @_;
 
-    # if nothing is returned by reval, add the return statement to
-    # the "no safe wrap" reval
+    # If nothing is returned by reval, add the return statement to
+    # the "no safe wrap" reval
 
-    my $res;
-    eval { $res = ( $self->jail->reval($reval) ) };
+    my $res = $self->jail->reval($reval);
     if ($@) {
         $self->error($@);
         return undef;

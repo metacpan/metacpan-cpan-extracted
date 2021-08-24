@@ -58,10 +58,10 @@ SKIP: {
                 findUserWildcard            => '#',
                 impersonationRule           => 1,
                 findUserSearchingAttributes => {
-                    uid  => 'Login',
-                    guy  => 'Kind',
-                    cn   => 'Name',
-                    room => 'Room'
+                    'uid##1'  => 'Login',
+                    'guy##1'  => 'Kind',
+                    'cn##1'   => 'Name',
+                    'room##1' => 'Room'
                 },
                 findUserExcludingAttributes =>
                   { type => 'mutant', uid => 'rtyler # davrosjr # ' },
@@ -91,7 +91,7 @@ SKIP: {
       expectForm( $res, '#', undef, 'uid', 'guy', 'cn', 'room' );
     ok(
         $res->[2]->[0] =~
-m%<input id="spoofIdfield" name="spoofId" type="text" class="form-control" value="" autocomplete="off"%,
+m%<input name="spoofId" type="text" class="form-control" value="" autocomplete="off"%,
         'value=""'
     ) or explain( $res->[2]->[0], 'value=""' );
 

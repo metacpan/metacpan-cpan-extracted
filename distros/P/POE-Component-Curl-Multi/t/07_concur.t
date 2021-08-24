@@ -50,7 +50,7 @@ sub client_got_response {
     warn "`", '-' x 78, "\n";
   };
 
-  is ($http_response->code, 200, 'Got OK response')
+  like ($http_response->code, qr/^[23]/, 'Got OK response')
     or diag( $http_response->as_string );
 
   $heap->{count}--;
@@ -61,7 +61,7 @@ sub client_got_response {
 my $curl = POE::Component::Curl::Multi->spawn(
   Alias   => 'weeble',
   Timeout => 60,
-  FollowRedirects => 5,
+  FollowRedirects => 0,
   Max_Concurrency => 10,
 );
 

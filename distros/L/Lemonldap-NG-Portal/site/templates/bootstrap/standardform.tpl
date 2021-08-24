@@ -59,7 +59,7 @@
         <span class="fa fa-refresh"></span>
         <span trspan="certificateReset">Reset my certificate</span>
      </a>
-   </TMPL_IF>
+  </TMPL_IF>
 
   <TMPL_IF NAME="DISPLAY_FINDUSER">
     <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#finduserModal">

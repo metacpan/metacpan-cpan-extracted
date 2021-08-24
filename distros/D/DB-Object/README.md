@@ -4,13 +4,13 @@ SYNOPSIS
         use DB::Object;
 
         my $dbh = DB::Object->connect({
-        driver => 'Pg',
-        conf_file => 'db-settings.json',
-        database => 'webstore',
-        host => 'localhost',
-        login => 'store-admin',
-        schema => 'auth',
-        debug => 3,
+            driver => 'Pg',
+            conf_file => 'db-settings.json',
+            database => 'webstore',
+            host => 'localhost',
+            login => 'store-admin',
+            schema => 'auth',
+            debug => 3,
         }) || bailout( "Unable to connect to sql server on host localhost: ", DB::Object->error );
 
         # Legacy regular query
@@ -79,6 +79,11 @@ SYNOPSIS
         ## Now dump the result to a file
         $login->select->dump( "my_file.txt" );
 
+Using fields objects
+
+        $cust->where( $dbh->OR( $cust->fo->email == 'john@example.org', $cust->fo->id == 2 ) );
+        my $ref = $cust->select->fetchrow_hashref;
+
 Doing some left join
 
     my $geo_tbl = $dbh->geoip || return( $self->error( "Unable to get the database object \"geoip\"." ) );
@@ -100,25 +105,46 @@ Doing some left join
 VERSION
 =======
 
-        v0.9.13
+        v0.9.15
 
 DESCRIPTION
 ===========
 
 [DB::Object](https://metacpan.org/pod/DB::Object){.perl-module} is a SQL
-API much alike `DBI`. So why use a private module instead of using that
-great `DBI` package?
+API much alike `DBI`, but with the added benefits that it formats
+queries in a simple object oriented, chaining way.
+
+So why use a private module instead of using that great `DBI` package?
 
 At first, I started to inherit from `DBI` to conform to `perlmod` perl
 manual page and to general perl coding guidlines. It became very quickly
 a real hassle. Barely impossible to inherit, difficulty to handle error,
-too much dependent from an API that change its behaviour with new
+too much dependent from an API that changes its behaviour with new
 versions. In short, I wanted a better, more accurate control over the
-SQL connection.
+SQL connection and an easy way to format sql statement using an object
+oriented approach.
 
 So, [DB::Object](https://metacpan.org/pod/DB::Object){.perl-module} acts
-as a convenient, modifiable wrapper that provide the programmer with an
-intuitive, user-friendly and hassle free interface.
+as a convenient, modifiable wrapper that provides the programmer with an
+intuitive, user-friendly, object oriented and hassle free interface.
+
+However, if you use the power of this interface to prepare queries
+conveniently, you should cache the resulting statement handler object,
+because there is an obvious real cost penalty in preparing queries and
+they absolutely do not need to be prepared each time. So you can do
+something like:
+
+        my $sth;
+        unless( $sth = $dbh->cache_query_get( 'some_arbitrary_identifier' ) )
+        {
+            # prepare the query
+            my $tbl = $dbh->some_table || die( $dbh->error );
+            $tbl->where( id => '?' );
+            $sth = $tbl->select || die( $tbl->error );
+            $dbh->cache_query_set( some_arbitrary_identifier => $sth );
+        }
+        $sth->exec(12) || die( $sth->error );
+        my $ref = $sth->fetchrow_hashref;
 
 CONSTRUCTOR
 ===========
@@ -267,14 +293,8 @@ METHODS
 alias
 -----
 
-This is a convenient wrapper around [\"alias\" in
-DB::Object::Query](https://metacpan.org/pod/DB::Object::Query#alias){.perl-module}
-
-It takes a column name to alias hash and sets those aliases for the
-following query.
-
-Get/set alias for table fields in SELECT queries. The hash provided thus
-contain a list of field =\> alias pairs.
+See [\"alias\" in
+DB::Object::Tables](https://metacpan.org/pod/DB::Object::Tables#alias){.perl-module}
 
 allow\_bulk\_delete
 -------------------
@@ -295,6 +315,12 @@ Takes any arguments and wrap them into a `AND` clause.
 
         $tbl->where( $dbh->AND( $tbl->fo->id == ?, $tbl->fo->frequency >= .30 ) );
 
+as\_string
+----------
+
+See [\"as\_string\" in
+DB::Object::Statement](https://metacpan.org/pod/DB::Object::Statement#as_string){.perl-module}
+
 auto\_convert\_datetime\_to\_object
 -----------------------------------
 
@@ -308,18 +334,11 @@ auto\_decode\_json
 Sets or gets the boolean value. If true, then this api will
 automatically transcode json data into perl hash reference.
 
-as\_string
-----------
-
-Return the sql query as a string.
-
 avoid
 -----
 
-Takes a list of array reference of column to avoid in the next query.
-
-This is a convenient wrapper around [\"avoid\" in
-DB::Object::Query](https://metacpan.org/pod/DB::Object::Query#avoid){.perl-module}
+See [\"avoid\" in
+DB::Object::Tables](https://metacpan.org/pod/DB::Object::Tables#avoid){.perl-module}
 
 attribute
 ---------
@@ -546,6 +565,48 @@ cache\_dir
 
 Sets or gets the directory on the file system used for caching data.
 
+cache\_query\_get
+-----------------
+
+        my $sth;
+        unless( $sth = $dbh->cache_query_get( 'some_arbitrary_identifier' ) )
+        {
+            # prepare the query
+            my $tbl = $dbh->some_table || die( $dbh->error );
+            $tbl->where( id => '?' );
+            $sth = $tbl->select || die( $tbl->error );
+            $dbh->cache_query_set( some_arbitrary_identifier => $sth );
+        }
+        $sth->exec(12) || die( $sth->error );
+        my $ref = $sth->fetchrow_hashref;
+
+Provided with a unique name, and this will return a cached statement
+object if it exists already, otherwise it will return undef
+
+cache\_query\_set
+-----------------
+
+        my $sth;
+        unless( $sth = $dbh->cache_query_get( 'some_arbitrary_identifier' ) )
+        {
+            # prepare the query
+            my $tbl = $dbh->some_table || die( $dbh->error );
+            $tbl->where( id => '?' );
+            $sth = $tbl->select || die( $tbl->error );
+            $dbh->cache_query_set( some_arbitrary_identifier => $sth );
+        }
+        $sth->exec(12) || die( $sth->error );
+        my $ref = $sth->fetchrow_hashref;
+
+Provided with a unique name and a statement object
+([DB::Object::Statement](https://metacpan.org/pod/DB::Object::Statement){.perl-module}),
+and this will cache it.
+
+What this does simply is store the statement object in a global
+`$QUERIES_CACHE` hash reference of identifier-statement object pairs.
+
+It returns the statement object cached.
+
 cache\_tables
 -------------
 
@@ -687,19 +748,8 @@ This is a method that must be implemented by the driver package.
 delete
 ------
 
-[\"delete\"](#delete){.perl-module} will format a delete query based on
-previously set parameters, such as [\"where\"](#where){.perl-module}.
-
-[\"delete\"](#delete){.perl-module} will refuse to execute a query
-without a where condition. To achieve this, one must prepare the delete
-query on his/her own by using the [\"do\"](#do){.perl-module} method and
-passing the sql query directly.
-
-        $tbl->where( login => 'jack' );
-        $tbl->limit(1);
-        my $rows_affected = $tbl->delete();
-        # or passing the where condition directly to delete
-        my $sth = $tbl->delete( login => 'jack' );
+See [\"delete\" in
+DB::Object::Tables](https://metacpan.org/pod/DB::Object::Tables#delete){.perl-module}
 
 disconnect
 ----------
@@ -773,87 +823,29 @@ fatal
 
 Provided a boolean value and this toggles fatal mode on/off.
 
-from\_unixtime
---------------
-
-Provided with an array or array reference of table columns and this will
-set the list of fields that are to be treated as unix time and converted
-accordingly after the sql query is executed.
-
-It returns the list of fields in list context or a reference to an array
-in scalar context.
-
 format\_statement
 -----------------
 
-This is a convenient wrapper around [\"format\_statement\" in
-DB::Object::Query](https://metacpan.org/pod/DB::Object::Query#format_statement){.perl-module}
-
-Format the sql statement for queries of types `select`, `delete` and
-`insert`
-
-In list context, it returns 2 strings: one comma-separated list of
-fields and one comma-separated list of values. In scalar context, it
-only returns a comma-separated string of fields.
+See [\"format\_statement\" in
+DB::Object::Tables](https://metacpan.org/pod/DB::Object::Tables#format_statement){.perl-module}
 
 format\_update
 --------------
 
-This is a convenient wrapper around [\"format\_update\" in
-DB::Object::Query](https://metacpan.org/pod/DB::Object::Query#format_update){.perl-module}
+See [\"format\_update\" in
+DB::Object::Tables](https://metacpan.org/pod/DB::Object::Tables#format_update){.perl-module}
 
-Formats update query based on the following arguments provided:
+from\_unixtime
+--------------
 
-*data*
-
-:   An array of key-value pairs to be used in the update query. This
-    array can be provided as the prime argument as a reference to an
-    array, an array, or as the *data* element of a hash or a reference
-    to a hash provided.
-
-    Why an array if eventually we build a list of key-value pair?
-    Because the order of the fields may be important, and if the
-    key-value pair list is provided,
-    [\"format\_update\"](#format_update){.perl-module} honors the order
-    in which the fields are provided.
-
-[\"format\_update\"](#format_update){.perl-module} will then iterate
-through each field-value pair, and perform some work:
-
-If the field being reviewed was provided to **from\_unixtime**, then
-[\"format\_update\"](#format_update){.perl-module} will enclose it in
-the function FROM\_UNIXTIME() as in:
-
-      FROM_UNIXTIME(field_name)
-
-If the the given value is a reference to a scalar, it will be used
-as-is, ie. it will not be enclosed in quotes or anything. This is useful
-if you want to control which function to use around that field.
-
-If the given value is another field or looks like a function having
-parenthesis, or if the value is a question mark, the value will be used
-as-is.
-
-If **bind** is off, the value will be escaped and the pair
-field=\'value\' created.
-
-If the field is a SET data type and the value is a number, the value
-will be used as-is without surrounding single quote.
-
-If [\"bind\"](#bind){.perl-module} is enabled, a question mark will be
-used as the value and the original value will be saved as value to bind
-upon executing the query.
-
-Finally, otherwise the value is escaped and surrounded by single quotes.
-
-[\"format\_update\"](#format_update){.perl-module} returns a string
-representing the comma-separated list of fields that will be used.
+See [\"from\_unixtime\" in
+DB::Object::Tables](https://metacpan.org/pod/DB::Object::Tables#from_unixtime){.perl-module}
 
 group
 -----
 
-This is a convenient wrapper around [\"group\" in
-DB::Object::Query](https://metacpan.org/pod/DB::Object::Query#group){.perl-module}
+See [\"group\" in
+DB::Object::Tables](https://metacpan.org/pod/DB::Object::Tables#group){.perl-module}
 
 host
 ----
@@ -863,8 +855,8 @@ Sets or gets the `host` property for this database object.
 insert
 ------
 
-This is a convenient wrapper around [\"insert\" in
-DB::Object::Query](https://metacpan.org/pod/DB::Object::Query#insert){.perl-module}
+See [\"insert\" in
+DB::Object::Tables](https://metacpan.org/pod/DB::Object::Tables#insert){.perl-module}
 
 last\_insert\_id
 ----------------
@@ -874,14 +866,14 @@ Get the id of the primary key from the last insert.
 limit
 -----
 
-This is a convenient wrapper around [\"limit\" in
-DB::Object::Query](https://metacpan.org/pod/DB::Object::Query#limit){.perl-module}
+See [\"limit\" in
+DB::Object::Tables](https://metacpan.org/pod/DB::Object::Tables#limit){.perl-module}
 
 local
 -----
 
-This is a convenient wrapper around [\"local\" in
-DB::Object::Query](https://metacpan.org/pod/DB::Object::Query#local){.perl-module}
+See [\"local\" in
+DB::Object::Tables](https://metacpan.org/pod/DB::Object::Tables#local){.perl-module}
 
 lock
 ----
@@ -920,11 +912,8 @@ Returns a `NULL` string to be used in queries.
 on\_conflict
 ------------
 
-The SQL `ON CONFLICT` clause needs to be implemented by the driver and
-is currently supported only by and
-[DB::Object::Postgres](https://metacpan.org/pod/DB::Object::Postgres){.perl-module}
-and
-[DB::Object::SQLite](https://metacpan.org/pod/DB::Object::SQLite){.perl-module}.
+See [\"on\_conflict\" in
+DB::Object::Tables](https://metacpan.org/pod/DB::Object::Tables#on_conflict){.perl-module}
 
 OR
 --
@@ -936,12 +925,8 @@ object, passing it whatever arguments were provided.
 order
 -----
 
-This is a convenient wrapper around [\"order\" in
-DB::Object::Query](https://metacpan.org/pod/DB::Object::Query#order){.perl-module}
-
-Prepares the `ORDER BY` clause and returns the value of the clause in
-list context or the `ORDER BY` clause in full in scalar context, ie.
-\"ORDER BY \$clause\"
+See [\"order\" in
+DB::Object::Tables](https://metacpan.org/pod/DB::Object::Tables#order){.perl-module}
 
 param
 -----
@@ -1081,60 +1066,32 @@ whatever argument was provided.
 replace
 -------
 
-Just like for the `INSERT` query, [\"replace\"](#replace){.perl-module}
-takes one optional argument representing a
-[DB::Object::Statement](https://metacpan.org/pod/DB::Object::Statement){.perl-module}
-`SELECT` object or a list of field-value pairs.
-
-If a `SELECT` statement is provided, it will be used to construct a
-query of the type of `REPLACE INTO mytable SELECT FROM other_table`
-
-Otherwise the query will be
-`REPLACE INTO mytable (fields) VALUES(values)`
-
-In scalar context, it execute the query and in list context it simply
-returns the statement handler.
+See [\"replace\" in
+DB::Object::Tables](https://metacpan.org/pod/DB::Object::Tables#replace){.perl-module}
 
 reset
 -----
 
-This is used to reset a prepared query to its default values. If a field
-is a date/time type, its default value will be set to NOW()
-
-It execute an update with the reseted value and return the number of
-affected rows.
+See [\"reset\" in
+DB::Object::Tables](https://metacpan.org/pod/DB::Object::Tables#reset){.perl-module}
 
 returning
 ---------
 
-The SQL `RETURNING` clause needs to be implemented by the driver and is
-currently supported only by and
-[DB::Object::Postgres](https://metacpan.org/pod/DB::Object::Postgres){.perl-module}
-and
-[DB::Object::SQLite](https://metacpan.org/pod/DB::Object::SQLite){.perl-module}.
+See [\"returning\" in
+DB::Object::Tables](https://metacpan.org/pod/DB::Object::Tables#returning){.perl-module}
 
 reverse
 -------
 
-Get or set the reverse mode.
+See [\"reverse\" in
+DB::Object::Tables](https://metacpan.org/pod/DB::Object::Tables#reverse){.perl-module}
 
 select
 ------
 
-Given an optional list of fields to fetch,
-[\"select\"](#select){.perl-module} prepares a `SELECT` query.
-
-If no field was provided, [\"select\"](#select){.perl-module} will use
-default value where appropriate like the `NOW()` for date/time fields.
-
-[\"select\"](#select){.perl-module} calls upon
-[\"tie\"](#tie){.perl-module}, [\"where\"](#where){.perl-module},
-[\"group\"](#group){.perl-module}, [\"order\"](#order){.perl-module},
-[\"limit\"](#limit){.perl-module} and [\"local\"](#local){.perl-module}
-to build the query.
-
-In scalar context, it execute the query and return it. In list context,
-it just returns the statement handler.
+See [\"select\" in
+DB::Object::Tables](https://metacpan.org/pod/DB::Object::Tables#select){.perl-module}
 
 set
 ---
@@ -1148,7 +1105,8 @@ otherwise it returns true.
 sort
 ----
 
-It toggles sort mode on and consequently disable reverse mode.
+See [\"sort\" in
+DB::Object::Tables](https://metacpan.org/pod/DB::Object::Tables#sort){.perl-module}
 
 stat
 ----
@@ -1183,6 +1141,11 @@ table
 Given a table name, [\"table\"](#table){.perl-module} will return a
 [DB::Object::Tables](https://metacpan.org/pod/DB::Object::Tables){.perl-module}
 object. The object is cached for re-use.
+
+When a cached table object is found, it is cloned and reset (using
+[\"reset\"](#reset){.perl-module}), before it is returned to avoid
+undesirable effets in following query that would have some table
+properties set such as table alias.
 
 table\_exists
 -------------
@@ -1234,8 +1197,8 @@ context.
 tie
 ---
 
-This is a convenient wrapper around [\"tie\" in
-DB::Object::Query](https://metacpan.org/pod/DB::Object::Query#tie){.perl-module}
+See [\"tie\" in
+DB::Object::Tables](https://metacpan.org/pod/DB::Object::Tables#tie){.perl-module}
 
 TRUE
 ----
@@ -1245,8 +1208,8 @@ Returns `TRUE` to be used in queries.
 unix\_timestamp
 ---------------
 
-This is a convenient wrapper around [\"unix\_timestamp\" in
-DB::Object::Query](https://metacpan.org/pod/DB::Object::Query#unix_timestamp){.perl-module}
+See [\"unix\_timestamp\" in
+DB::Object::Tables](https://metacpan.org/pod/DB::Object::Tables#unix_timestamp){.perl-module}
 
 unlock
 ------
@@ -1257,14 +1220,8 @@ DB::Object::Query](https://metacpan.org/pod/DB::Object::Query#unlock){.perl-modu
 update
 ------
 
-Given a list of field-value pairs, **update** prepares a sql update
-query.
-
-It calls upon **where** and **limit** as previously set.
-
-It returns undef and sets an error if it failed to prepare the update
-statement. In scalar context, it execute the query. In list context, it
-simply return the statement handler.
+See [\"update\" in
+DB::Object::Tables](https://metacpan.org/pod/DB::Object::Tables#update){.perl-module}
 
 use
 ---
@@ -1303,8 +1260,8 @@ This is a method that must be implemented by the driver package.
 where
 -----
 
-This is a convenient wrapper around [\"where\" in
-DB::Object::Query](https://metacpan.org/pod/DB::Object::Query#where){.perl-module}
+See [\"where\" in
+DB::Object::Tables](https://metacpan.org/pod/DB::Object::Tables#where){.perl-module}
 
 \_cache\_this
 -------------
@@ -1581,7 +1538,7 @@ SEE ALSO
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x5607fd163850)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x555ba776ec88)"}\>
 
 COPYRIGHT & LICENSE
 ===================

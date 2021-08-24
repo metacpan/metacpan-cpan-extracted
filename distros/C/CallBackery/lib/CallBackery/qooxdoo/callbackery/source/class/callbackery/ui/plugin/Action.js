@@ -35,14 +35,33 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                         document.location.reload(true);
                     }, 'logout');
                     break;
-                case 'dataSaved':
                 case 'showMessage':
-                    if (data.title && data.message){
-                        callbackery.ui.MsgBox.getInstance().info(
-                            this.xtr(data.title),
-                            this.xtr(data.message),
-                            data.html, data.icons, data.size
-                        );
+                    this.warn('Callbackery deprecation: action showMessage should not be used; use cancel|dataSaved|wait instead');
+                case 'cancel':
+                case 'dataSaved':
+                case 'wait':
+                    if (data.message) {
+                        let message = this.xtr(data.message);
+                        let title = '';
+                        if (data.title) {
+                            title = this.xtr(data.title);
+                        }
+                        if (data.htmlWithJS) {
+                            let box = new callbackery.ui.HtmlBox(message);
+                            let size = data.size;
+                            if (size.width) {
+                                box.setWidth(size.width);
+                            }
+                            if (size.height) {
+                                box.setHeight(size.height);
+                            }
+                            box.show();
+                        }
+                        else {
+                            callbackery.ui.MsgBox.getInstance().info(
+                                title, message, data.html, data.icons, data.size
+                            );
+                        }
                     }
                     break;
                 case 'print':
@@ -50,8 +69,6 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                     break;
                 case 'reloadStatus':
                 case 'reload':
-                case 'cancel':
-                case 'wait':
                     break;
                 default:
                     console.error('Unknown action:', data.action);
@@ -100,6 +117,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                         }
                         return;
                         break;
+                    case 'save':
                     case 'submitVerify':
                     case 'submit':
                     case 'popup':
@@ -168,7 +186,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                             var that = this;
                             autoTimerId = autoTimer.start(function(){
                                 var formData = getFormData();
-                                callbackery.data.Server.getInstance().callAsyncSmartBusy(function(ret){
+                                callbackery.data.Server.getInstance().callAsync(function(ret){
                                     that.fireDataEvent('actionResponse',ret || {});
                                 },'processPluginData',cfg.name,{ "key": key, "formData": formData });
                             }, btCfg.interval * 1000, this);
@@ -196,6 +214,13 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                         return;
                     }
                     switch (btCfg.action) {
+                        case 'save':
+                            var formData = getFormData();
+                            var key = btCfg.key;
+                            callbackery.data.Server.getInstance().callAsync(function(ret){
+                                that.fireDataEvent('actionResponse',ret || {});
+                            },'processPluginData',cfg.name,{ "key": key, "formData": formData });
+                            break;
                         case 'submitVerify':
                         case 'submit':
                             var formData = getFormData();

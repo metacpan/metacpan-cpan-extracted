@@ -32,13 +32,16 @@ SKIP: {
                     roomNumber  => 'roomNumber',
                     mail        => 'mail'
                 },
-                requireToken      => 0,
-                findUser          => 1,
-                impersonationRule => 1,
-                findUserWildcard  => '#',
-                findUserControl   => '^[\w#\s]+$',
-                findUserSearchingAttributes =>
-                  { uid => 'Login', roomNumber => 'Room', cn => 'Name' },
+                requireToken                => 0,
+                findUser                    => 1,
+                impersonationRule           => 1,
+                findUserWildcard            => '#',
+                findUserControl             => '^[\w#\s]+$',
+                findUserSearchingAttributes => {
+                    'uid##1'        => 'Login',
+                    'roomNumber##1' => 'Room',
+                    'cn##1'         => 'Name'
+                },
                 findUserExcludingAttributes =>
                   { mail => 'french@badwolf.org', uid => 'russian' },
             }
@@ -66,7 +69,7 @@ SKIP: {
       expectForm( $res, '#', undef, 'uid', 'roomNumber', 'cn' );
     ok(
         $res->[2]->[0] =~
-m%<input id="spoofIdfield" name="spoofId" type="text" class="form-control" value="" autocomplete="off"%,
+m%<input name="spoofId" type="text" class="form-control" value="" autocomplete="off"%,
         'value=""'
     ) or explain( $res->[2]->[0], 'value=""' );
 

@@ -1,1 +1,1 @@
-This module allowed Data::TableReader to find tables in HTML files.
+This module allows Data::TableReader to find tables in HTML files.

@@ -49,10 +49,12 @@ Metabolomics::Banks::AbInitioFragments - Perl extension for Ab Initio Fragments 
 =head1 VERSION
 
 Version 0.3 - Adding POD
+Version 0.4 - Updating Fragments/Adducts/isotopes listing
+Version 0.5 - Completing object properties
 
 =cut
 
-our $VERSION = '0.3';
+our $VERSION = '0.5';
 
 
 =head1 SYNOPSIS
@@ -86,11 +88,14 @@ use Metabolomics::Banks::AbInitioFragments qw( :all ) ;
 
 sub new {
     ## Variables
+    my ($class,$args) = @_;
     my $self={};
         
     $self = Metabolomics::Banks->new() ;
     
     $self->{_DATABASE_NAME_} = 'Ab Initio Fragments' ;
+    $self->{_DATABASE_TYPE_} = 'FRAGMENT' ;
+    $self->{_POLARITY_} =  $args->{POLARITY} ;
     $self->{_DATABASE_VERSION_} = '1.0' ;
     $self->{_DATABASE_ENTRIES_NB_} = 'database_entries_nb' ;
     $self->{_DATABASE_URL_} = 'database_url' ;
@@ -122,13 +127,29 @@ sub getFragmentsFromSource {
     my $entriesNb = 0 ;
     
     if (!defined $source) {
-
-    	$source = dist_file('Metabolomics-Fragment-Annotation', 'MS_fragments-adducts-isotopes.txt');
-    	if (-e $source) {
-    		print "loading $source...\n" ;
+    	
+    	
+    	if ($VERSION == 0.3) {
+    		## v1.0 file
+    		$source = dist_file('Metabolomics-Fragment-Annotation', 'MS_fragments-adducts-isotopes.txt');
+	    	if (-e $source) {
+	    		print "loading v1.0 $source...\n" ;
+	    	}
+	    	else {
+	    		croak "The v1.0 source file ('MS_fragments-adducts-isotopes.txt') does not exist at this path\n" ;
+	    	}
+    		
     	}
-    	else {
-    		croak "The source file ('MS_fragments-adducts-isotopes.txt') does not exist at this path\n" ;
+    	elsif ($VERSION == 0.4) {
+    		## v1.0 file
+    		$source = dist_file('Metabolomics-Fragment-Annotation', 'MS_fragments-adducts-isotopes__V1.1.txt');
+    		
+	    	if (-e $source) {
+	    		print "loading v1.1 $source...\n" ;
+	    	}
+	    	else {
+	    		croak "The v1.1 source file ('MS_fragments-adducts-isotopes__V1.1.txt') does not exist at this path\n" ;
+	    	}
     	}
     }
     
@@ -189,12 +210,17 @@ sub getFragmentsFromSource {
 sub buildTheoPeakBankFromFragments {
     ## Retrieve Values
     my $self = shift ;
-    my ( $mzParent, $mode, $stateMolecule ) = @_;
+    my ( $mzParent, $mode, $stateMolecule, $isotopicAddingStatus ) = @_;
 
     my $fragments = $self->_getFragments();
 
     foreach my $fragment (@{$fragments}) {
     	## Addition ion mz and theo fragment and filter negative obtained mz
+    	
+    	## Avoid to generate isotopic massif
+    	if ( (defined $isotopicAddingStatus) and ($isotopicAddingStatus eq 'FALSE') and ( $fragment->_getFragment_TYPE() eq 'isotope'  ) ) {
+    		next ;
+    	}
     	
     	my $fragMass = $fragment->_getFragment_DELTA_MASS() ;
     	

@@ -1,15 +1,15 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-# Database Object Interface - ~/lib/DB/Object/Tables.pm
-# Version 0.4.1
-# Copyright(c) 2020 DEGUEST Pte. Ltd.
-# Author: Jacques Deguest <jack@deguest.jp>
-# Created 2017/07/19
-# Modified 2020/01/19
-# All rights reserved
-# 
-# This program is free software; you can redistribute  it  and/or  modify  it
-# under the same terms as Perl itself.
+## Database Object Interface - ~/lib/DB/Object/Tables.pm
+## Version v0.4.2
+## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
+## Created 2017/07/19
+## Modified 2021/08/20
+## All rights reserved
+## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 # This package's purpose is to separate the object of the tables from the main
 # DB::Object package so that when they get DESTROY'ed, it does not interrupt
@@ -23,7 +23,7 @@ BEGIN
     use parent qw( DB::Object );
     use DB::Object::Fields;
     our( $VERSION, $VERBOSE, $DEBUG );
-    $VERSION    = '0.4.1';
+    $VERSION    = 'v0.4.2';
     $VERBOSE    = 0;
     $DEBUG      = 0;
     use Devel::Confess;
@@ -36,32 +36,53 @@ sub init
     my $table = '';
     $table    = shift( @_ ) if( @_ && @_ % 2 );
     my %arg   = ( @_ );
+    # Prioritise this, so we get debugging messages
+    $self->{debug} = CORE::delete( $arg{delete} );
     return( $self->error( "You must provide a table name to create a table object." ) ) if( !$table && !$arg{table} );
     $table ||= CORE::delete( $arg{table} );
-    foreach my $k ( keys( %arg ) )
-    {
-        $self->{ $k } = $arg{ $k };
-    }
-    $self->{avoid}       = [];
-    $self->{alias}       = {};
-    $self->{bind}        = '';
-    $self->{cache}       = '';
-    $self->{default}   ||= {};
-    $self->{enhance}     = '';
-    $self->{fields}    ||= {};
-    $self->{null}      ||= {};
+    $self->{avoid}          = [];
+    $self->{alias}          = {};
+#     $self->{bind}           = '';
+#     $self->{cache}          = '';
+    $self->{dbo}            = '';
+    $self->{default}        = {};
+    $self->{enhance}        = '';
+    $self->{fields}         = {};
+    # DB::Object::Fields
+    $self->{fields_object}  = '';
+    $self->{null}           = {};
+    $self->{prefixed}       = 0;
+    $self->{primary}        = [];
+    $self->{query_object}   = '';
+    $self->{query_reset}    = 0;
+    $self->{reverse}        = 0;
     # The schema name, if any
-    $self->{schema}      = '';
-    $self->{structure} ||= {};
-    $self->{table}       = $table if( $table );
-    $self->{types}       = {};
+    $self->{schema}         = '';
+    $self->{structure}      = {};
+    $self->{table}          = $table if( $table );
+    $self->{types}          = {};
     # The table type. It could be table or view
-    $self->{type}        = '';
+    $self->{type}           = '';
+    my $keys = [keys( %arg )];
+    $self->message( 3, "Applying keys: '", join( "', '", @$keys ), "'." );
+    @$self{ @$keys } = @arg{ @$keys };
+#     foreach my $k ( keys( %arg ) )
+#     {
+#         $self->{ $k } = $arg{ $k };
+#     }
     # Load table default, fields, structure informations
     # my $db = $self->database();
     my $ref = $self->structure();
     return( $self->error( "There is no table by the name of $table" ) ) if( !%$ref );
     return( $self );
+}
+
+## Get/set alias
+sub alias
+{
+    my $self = shift( @_ );
+    my $q = $self->_reset_query;
+    return( $q->alias( @_ ) );
 }
 
 sub alter
@@ -91,11 +112,18 @@ sub as
     my $q = $self->_reset_query;
     if( @_ )
     {
-        my( $p, $f, $l ) = caller;
-        $self->message( 3, "Setting table alias to '", $_[0], "'. Called from package $p in file $f at line $l" );
+        # my( $p, $f, $l ) = caller;
+        # $self->message( 3, "Setting table alias to '", $_[0], "'. Called from package $p in file $f at line $l" );
         $self->prefixed( length( $_[0] ) > 0 ? 1 : 0 );
     }
     return( $q->table_alias( @_ ) );
+}
+
+sub avoid
+{
+    my $self  = shift( @_ );
+    my $q = $self->_reset_query;
+    return( $q->avoid( @_ ) );
 }
 
 sub constant
@@ -162,6 +190,37 @@ sub default
     return( wantarray() ? %$default : \%$default );
 }
 
+sub delete
+{
+    my $self = shift( @_ );
+    my $q = $self->_reset_query;
+    # If the user wants to execute this, then we reset the query, 
+    # but if the user wants to call other methods chained like as_string we don't do anything
+    # CORE::delete( $self->{query_reset} ) if( !defined( wantarray() ) );
+    if( Want::want('VOID') || Want::want('OBJECT') )
+    {
+        CORE::delete( $self->{query_reset} ) if( Want::want('VOID') );
+        # return( $q->select( @_ ) );
+        # return( $q->select( @_ ) ) if( !defined( wantarray() ) );
+        return( $q->delete( @_ ) );
+    }
+    # CORE::delete( $self->{query_reset} ) if( !defined( wantarray() ) );
+    # return( $q->delete( @_ ) );
+    # return( $q->delete( @_ ) ) if( !defined( wantarray() ) );
+    if( wantarray() )
+    {
+        my( @val ) = $q->delete( @_ ) || return( $self->pass_error( $q->error ) );
+        $self->reset;
+        return( @val );
+    }
+    else
+    {
+        my $val = $q->delete( @_ ) || return( $self->pass_error( $q->error ) );
+        $self->reset;
+        return( $val );
+    }
+}
+
 sub drop
 {
     my $self  = shift( @_ );
@@ -198,8 +257,13 @@ sub fields_object
 {
     my $self = shift( @_ );
     my $o = $self->{fields_object};
-    $self->message( 3, "Do we already have a fields object? '$o'" );
-    return( $o ) if( $o && $self->_is_object( $o ) );
+    $self->message( 3, "Do we already have a fields object? '$o' for table '$self->{table}'" );
+    if( $o && $self->_is_object( $o ) )
+    {
+        $o->prefixed( $self->{prefixed} );
+        $o->query_object( $self->query_object );
+        return( $o );
+    }
     my $db_name = $self->database_object->database;
     $db_name =~ tr/-/_/;
     $db_name =~ s/\_{2,}/_/g;
@@ -210,9 +274,9 @@ sub fields_object
     $new_class =~ s/\_{2,}/_/g;
     $new_class = join( '', map( ucfirst( lc( $_ ) ), split( /\_/, $new_class ) ) );
     $class = ref( $self ) . "\::${db_name}\::${new_class}";
-    $self->message( 3, "Creating and loading class '$class'" );
-    unless( $self->_is_class_loaded( $class ) )
+    if( !$self->_is_class_loaded( $class ) )
     {
+        $self->message( 3, "Creating and loading class '$class'" );
         my $perl = <<EOT;
 package $class;
 BEGIN
@@ -230,13 +294,18 @@ EOT
         # print( STDERR __PACKAGE__, "::_set_get_hash_as_object(): Returned $rc\n" );
         die( "Unable to dynamically create module $class: $@" ) if( $@ );
     }
-    $self->message( 3, "Getting a new fields object for class '$class'." );
-    $o = $class->new({
-        table_object => $self,
+    else
+    {
+        $self->message( 3, "Class '$class' already exists and is loaded." );
+    }
+    $self->message( 3, "Getting a new fields object for class '$class' with prefixed set to '$self->{prefixed}'." );
+    $o = $class->new(
+        prefixed        => $self->{prefixed},
         # For table alias
-        query_object => $self->query_object,
-        debug => $self->debug,
-    });
+        query_object    => $self->query_object,
+        table_object    => $self,
+        debug           => $self->debug,
+    );
     $o->prefixed( $self->{prefixed} );
     $self->{fields_object} = $o;
     $self->message( 3, "Returning newly created fields object '$o' that has debug value '", $o->debug, "'." );
@@ -244,6 +313,78 @@ EOT
 }
 
 sub fo { return( shift->fields_object( @_ ) ); }
+
+sub format_statement($;\%\%@)
+{
+    my $self = shift( @_ );
+    my $q = $self->_reset_query;
+    return( $q->format_statement( @_ ) );
+}
+
+sub format_update($;%)
+{
+    my $self = shift( @_ );
+    my $q = $self->_reset_query;
+    return( $q->format_update( @_ ) );
+}
+
+sub from_unixtime
+{
+    my $self = shift( @_ );
+    my $q = $self->_reset_query;
+    return( $q->from_unixtime( @_ ) );
+}
+
+sub group
+{
+    my $self = shift( @_ );
+    my $q = $self->_reset_query;
+    return( $q->group( @_ ) );
+}
+
+sub insert
+{
+    my $self = shift( @_ );
+    my $q = $self->_reset_query;
+    # If the user wants to execute this, then we reset the query, 
+    # but if the user wants to call other methods chained like as_string we don't do anything
+    # CORE::delete( $self->{query_reset} ) if( !defined( wantarray() ) );
+    if( Want::want('VOID') || Want::want('OBJECT') )
+    {
+        CORE::delete( $self->{query_reset} ) if( Want::want('VOID') );
+        # return( $q->select( @_ ) );
+        # return( $q->select( @_ ) ) if( !defined( wantarray() ) );
+        return( $q->insert( @_ ) );
+    }
+    # CORE::delete( $self->{query_reset} ) if( !defined( wantarray() ) );
+    # return( $q->insert( @_ ) ) if( !defined( wantarray() ) );
+    if( wantarray() )
+    {
+        my( @val ) = $q->insert( @_ ) || return( $self->pass_error( $q->error ) );
+        $self->reset;
+        return( @val );
+    }
+    else
+    {
+        my $val = $q->insert( @_ ) || return( $self->pass_error( $q->error ) );
+        $self->reset;
+        return( $val );
+    }
+}
+
+sub limit
+{
+    my $self  = shift( @_ );
+    my $q = $self->_reset_query;
+    return( $q->limit( @_ ) );
+}
+
+sub local
+{
+    my $self = shift( @_ );
+    my $q = $self->_reset_query;
+    return( $q->local( @_ ) );
+}
 
 sub lock
 {
@@ -267,6 +408,8 @@ sub null
     return( wantarray() ? %$null : $null );
 }
 
+sub on_conflict { return( shift->error( "The on conflict clause is not supported by this driver." ) ); }
+
 sub optimize
 {
     my $self = shift( @_ );
@@ -274,10 +417,20 @@ sub optimize
     return( $self->error( "optimize() is not implemented by $class." ) );
 }
 
+sub order
+{
+    my $self = shift( @_ );
+    my $q = $self->_reset_query;
+    return( $q->order( @_ ) );
+}
+
 sub prefix
 {
     my $self = shift( @_ );
     my @val = ();
+    my $alias = $self->query_object->table_alias;
+    $self->message( 3, "\"prefixed\" set to '$self->{prefixed}'. Is table alias set for table '$self->{table}'? -> '$alias'." );
+    return( $alias ) if( $alias && $self->{prefixed} > 0 );
     CORE::push( @val, $self->database_object->database ) if( $self->{prefixed} > 2 );
     CORE::push( @val, $self->schema ) if( $self->{prefixed} > 1 && $self->schema );
     CORE::push( @val, $self->name ) if( $self->{prefixed} > 0 );
@@ -305,7 +458,8 @@ sub prefixed
     }
     my $fo = $self->{fields_object};
     $fo->prefixed( $self->{prefixed} ) if( $fo );
-    return( want( 'OBJECT' ) ? $self : $self->{prefixed} );
+    # return( want( 'OBJECT' ) ? $self : $self->{prefixed} );
+    return( $self->{prefixed} );
 }
 
 sub primary
@@ -320,7 +474,20 @@ sub primary
 # In PostgreSQL, Oracle, SQL server this would be schema_name.table_name
 sub qualified_name { return( shift->name ); }
 
-sub query_object { return( shift->_set_get_object( 'query_object', 'DB::Object::Query', @_ ) ); }
+sub query_object { return( shift->_set_get_object_without_init( 'query_object', 'DB::Object::Query', @_ ) ); }
+# XXX For debugging purpose, I am temporarily changing the query_object sub to find out who is calling
+# sub query_object
+# {
+#     my $self = shift( @_ );
+#     if( @_ )
+#     {
+#         my $v = $self->_set_get_object_without_init( 'query_object', 'DB::Object::Query', @_ );
+#         my $trace = $self->_get_stack_trace;
+#         $self->message( 3, "query_object set for table '$self->{table}' with value $v and trace: ", $trace->as_string );
+#         return( $v );
+#     }
+#     return( $self->_set_get_object_without_init( 'query_object', 'DB::Object::Query' ) );
+# }
 
 sub query_reset { return( shift->_set_get_scalar( 'query_reset', @_ ) ); }
 
@@ -338,7 +505,110 @@ sub repair
     return( $self->error( "repair() is not implemented by $class." ) );
 }
 
+sub replace
+{
+    my $self = shift( @_ );
+    my $q = $self->_reset_query;
+    # If the user wants to execute this, then we reset the query, 
+    # but if the user wants to call other methods chained like as_string we don't do anything
+    # CORE::delete( $self->{query_reset} ) if( !defined( wantarray() ) );
+    if( Want::want('VOID') || Want::want('OBJECT') )
+    {
+        CORE::delete( $self->{query_reset} ) if( Want::want('VOID') );
+        # return( $q->select( @_ ) );
+        # return( $q->select( @_ ) ) if( !defined( wantarray() ) );
+        return( $q->replace( @_ ) );
+    }
+    # CORE::delete( $self->{query_reset} ) if( !defined( wantarray() ) );
+    # return( $q->replace( @_ ) );
+    # return( $q->replace( @_ ) ) if( !defined( wantarray() ) );
+    if( wantarray() )
+    {
+        my( @val ) = $q->replace( @_ ) || return( $self->pass_error( $q->error ) );
+        return( @val );
+    }
+    else
+    {
+        my $val = $q->replace( @_ ) || return( $self->pass_error( $q->error ) );
+        return( $val );
+    }
+}
+
+sub reset 
+{
+    my $self = shift( @_ );
+    ## $self->message( 3, "Resetting query for table \"", $self->name, "\"." );
+    CORE::delete( $self->{query_reset} );
+    $self->_reset_query( @_ ) || return( $self->pass_error );
+    CORE::delete( $self->{fields_object} );
+    ## To allow chaining of commands
+    return( $self );
+}
+
+# Modelled after PostgreSQL and available since 3.35.0 released 2021-03-12
+# <https://www.sqlite.org/lang_returning.html>
+sub returning
+{
+    my $self  = shift( @_ );
+    my $q = $self->_reset_query;
+    return( $q->returning( @_ ) );
+}
+
+sub reverse
+{
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        my $q = $self->_reset_query;
+        $self->{reverse}++;
+        $q->reverse( $self->{reverse} );
+    }
+    return( $self->{reverse} );
+}
+
 sub schema { return( shift->_set_get_scalar( 'schema', @_ ) ); }
+
+sub select
+{
+    my $self = shift( @_ );
+    my $q = $self->_reset_query;
+    # If the user wants to execute this, then we reset the query, 
+    # but if the user wants to call other methods chained like as_string we don't do anything
+    # CORE::delete( $self->{query_reset} ) if( !defined( wantarray() ) );
+    if( Want::want('VOID') || Want::want('OBJECT') )
+    {
+        CORE::delete( $self->{query_reset} ) if( Want::want('VOID') );
+        # return( $q->select( @_ ) );
+        # return( $q->select( @_ ) ) if( !defined( wantarray() ) );
+        return( $q->select( @_ ) );
+    }
+    
+    if( wantarray() )
+    {
+        my( @val ) = $q->select( @_ ) || return( $self->pass_error( $q->error ) );
+        # a statement handler is returned and we reset the query so that other calls would not use the previous DB::Object::Query object
+        $self->reset;
+        return( @val );
+    }
+    else
+    {
+        my $val = $q->select( @_ ) || return( $self->pass_error( $q->error ) );
+        $self->reset;
+        return( $val );
+    }
+}
+
+sub sort
+{
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        my $q = $self->_reset_query;
+        $self->{reverse} = 0;
+        $q->sort( $self->{reverse} );
+    }
+    return( $self->{reverse} );
+}
 
 sub stat
 {
@@ -348,6 +618,13 @@ sub stat
 }
 
 sub table { return( shift->{table} ); }
+
+sub tie
+{
+    my $self = shift( @_ );
+    my $q = $self->_reset_query;
+    return( $q->tie( @_ ) );
+}
 
 sub type { return( shift->_set_get_scalar( 'type', @_ ) ); }
 
@@ -375,6 +652,72 @@ sub unlock
     return( $self->error( "unlock() is not implemented by $class." ) );
 }
 
+sub unix_timestamp
+{
+    my $self = shift( @_ );
+    my $q = $self->_reset_query;
+    return( $q->unix_timestamp( @_ ) );
+}
+
+sub update
+{
+    my $self = shift( @_ );
+    my $q = $self->_reset_query;
+    # If the user wants to execute this, then we reset the query, 
+    # but if the user wants to call other methods chained like as_string we don't do anything
+    # CORE::delete( $self->{query_reset} ) if( !defined( wantarray() ) );
+    if( Want::want('VOID') || Want::want('OBJECT') )
+    {
+        CORE::delete( $self->{query_reset} ) if( Want::want('VOID') );
+        # return( $q->select( @_ ) );
+        # return( $q->select( @_ ) ) if( !defined( wantarray() ) );
+        return( $q->update( @_ ) );
+    }
+    # CORE::delete( $self->{query_reset} ) if( !defined( wantarray() ) );
+    # return( $q->update( @_ ) );
+    # return( $q->update( @_ ) ) if( !defined( wantarray() ) );
+    if( wantarray() )
+    {
+        my( @val ) = $q->update( @_ ) || return( $self->pass_error( $q->error ) );
+        $self->reset;
+        return( @val );
+    }
+    else
+    {
+        my $val = $q->update( @_ ) || return( $self->pass_error( $q->error ) );
+        $self->reset;
+        return( $val );
+    }
+}
+
+sub where
+{
+    my $self = shift( @_ );
+    my $q = $self->_reset_query;
+    return( $q->where( @_ ) );
+}
+
+AUTOLOAD
+{
+    my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
+    no overloading;
+    my $self = shift( @_ );
+    my $fields = $self->fields;
+    # $self->message( 3, "Table object called for method '$method'. Fields for table '", $self->name, "' are: ", sub{ $self->dump( $fields ) } );
+    # User called a field on a table object, instead of using the method fields_object or its shortcut 'fo'
+    if( CORE::exists( $fields->{ $method } ) )
+    {
+        $self->message( 3, "User called a field name '$method' using a table object, let's issue a warning." );
+        warn( "You have called a field name '$method' using a table object. This practice is discouraged, although it works for now. Best to use something like: \$tbl->fo->$method rather than just \$tbl->$method\n" );
+        return( $self->fields_object->_initiate_field_object( $method ) );
+    }
+    else
+    {
+        warn( "You called table '", $self->name, "' object \$tbl->$method, but no such method exist.\n" );
+        return( $self->error( "You called table '", $self->name, "' object \$tbl->$method, but no such method exist." ) );
+    }
+};
+
 DESTROY
 {
     # Do nothing
@@ -385,6 +728,7 @@ DESTROY
 
 1;
 
+# XXX POD
 __END__
 
 =encoding utf8
@@ -397,7 +741,7 @@ DB::Object::Tables - Database Table Object
 
 =head1 VERSION
 
-    0.4.1
+    v0.4.2
 
 =head1 DESCRIPTION
 
@@ -429,6 +773,14 @@ Toggles debug mode on/off
 
 =head1 METHODS
 
+=head2 alias
+
+This is a convenient wrapper around L<DB::Object::Query/alias>
+
+It takes a column name to alias hash and sets those aliases for the following query.
+
+Get/set alias for table fields in SELECT queries. The hash provided thus contain a list of field => alias pairs.
+
 =head2 alter
 
 Provided with an array or array reference of specification for the alter and this will prepare the proper query.
@@ -442,6 +794,12 @@ This returns the resulting statement handler.
 =head2 as
 
 Provided with a table alias and this will call L<DB::Object::Query/table_alias> passing it whatever arguments were provided.
+
+=head2 avoid
+
+Takes a list of array reference of column to avoid in the next query.
+
+This is a convenient wrapper around L<DB::Object::Query/avoid>
 
 =head2 constant
 
@@ -474,6 +832,18 @@ This calls L</structure> which may return cached data.
 Returns an hash in list context and an hash reference in scalar representing column to its default values pairs.
 
 If nothing is found, it returns an empty list in list context and L<perlfunc/undef> in scalar context.
+
+=head2 delete
+
+L</delete> will format a delete query based on previously set parameters, such as L</where>.
+
+L</delete> will refuse to execute a query without a where condition. To achieve this, one must prepare the delete query on his/her own by using the L</do> method and passing the sql query directly.
+
+    $tbl->where( login => 'jack' );
+    $tbl->limit(1);
+    my $rows_affected = $tbl->delete();
+    # or passing the where condition directly to delete
+    my $sth = $tbl->delete( login => 'jack' );
 
 =head2 drop
 
@@ -520,6 +890,72 @@ This is a convenient shortcut for L</fields_object>
     # get the field object for "name"
     my $name = $tbl->fo->name
 
+=head2 format_statement
+
+This is a convenient wrapper around L<DB::Object::Query/format_statement>
+
+Format the sql statement for queries of types C<select>, C<delete> and C<insert>
+
+In list context, it returns 2 strings: one comma-separated list of fields and one comma-separated list of values. In scalar context, it only returns a comma-separated string of fields.
+
+=head2 format_update
+
+This is a convenient wrapper around L<DB::Object::Query/format_update>
+
+Formats update query based on the following arguments provided:
+
+=over 4
+
+=item I<data>
+
+An array of key-value pairs to be used in the update query. This array can be provided as the prime argument as a reference to an array, an array, or as the I<data> element of a hash or a reference to a hash provided.
+
+Why an array if eventually we build a list of key-value pair? Because the order of the fields may be important, and if the key-value pair list is provided, L</format_update> honors the order in which the fields are provided.
+
+=back
+
+L</format_update> will then iterate through each field-value pair, and perform some work:
+
+If the field being reviewed was provided to B<from_unixtime>, then L</format_update> will enclose it in the function FROM_UNIXTIME() as in:
+
+    FROM_UNIXTIME(field_name)
+  
+If the the given value is a reference to a scalar, it will be used as-is, ie. it will not be enclosed in quotes or anything. This is useful if you want to control which function to use around that field.
+
+If the given value is another field or looks like a function having parenthesis, or if the value is a question mark, the value will be used as-is.
+
+If L<DB::Object/bind> is off, the value will be escaped and the pair field='value' created.
+
+If the field is a SET data type and the value is a number, the value will be used as-is without surrounding single quote.
+
+If L<DB::Object/bind> is enabled, a question mark will be used as the value and the original value will be saved as value to bind upon executing the query.
+
+Finally, otherwise the value is escaped and surrounded by single quotes.
+
+L</format_update> returns a string representing the comma-separated list of fields that will be used.
+
+=head2 from_unixtime
+
+Provided with an array or array reference of table columns and this will set the list of fields that are to be treated as unix time and converted accordingly after the sql query is executed.
+
+It returns the list of fields in list context or a reference to an array in scalar context.
+
+=head2 group
+
+This is a convenient wrapper around L<DB::Object::Query/group>
+
+=head2 insert
+
+This is a convenient wrapper around L<DB::Object::Query/insert>
+
+=head2 limit
+
+This is a convenient wrapper around L<DB::Object::Query/limit>
+
+=head2 local
+
+This is a convenient wrapper around L<DB::Object::Query/local>
+
 =head2 lock
 
 This must be implemented by the driver package, so check L<DB::Object::Mysql::Tables/lock>, L<DB::Object::Postgres::Tables/lock> or L<DB::Object::SQLite::Tables/lock>
@@ -536,9 +972,19 @@ Returns an hash in list context and an hash reference in scalar representing col
 
 If nothing is found, it returns an empty list in list context and L<perlfunc/undef> in scalar context.
 
+=head2 on_conflict
+
+The SQL C<ON CONFLICT> clause needs to be implemented by the driver and is currently supported only by L<DB::Object::Postgres> and L<DB::Object::SQLite>.
+
 =head2 optimize
 
 This must be implemented by the driver package, so check L<DB::Object::Mysql::Tables/optimize>, L<DB::Object::Postgres::Tables/optimize> or L<DB::Object::SQLite::Tables/optimize>
+
+=head2 order
+
+This is a convenient wrapper around L<DB::Object::Query/order>
+
+Prepares the C<ORDER BY> clause and returns the value of the clause in list context or the C<ORDER BY> clause in full in scalar context, ie. "ORDER BY $clause"
 
 =head2 prefix
 
@@ -590,9 +1036,47 @@ This must be implemented by the driver package, so check L<DB::Object::Mysql::Ta
 
 This must be implemented by the driver package, so check L<DB::Object::Mysql::Tables/repair>, L<DB::Object::Postgres::Tables/repair> or L<DB::Object::SQLite::Tables/repair>
 
+=head2 replace
+
+Just like for the C<INSERT> query, L</replace> takes one optional argument representing a L<DB::Object::Statement> C<SELECT> object or a list of field-value pairs.
+
+If a C<SELECT> statement is provided, it will be used to construct a query of the type of C<REPLACE INTO mytable SELECT FROM other_table>
+
+Otherwise the query will be C<REPLACE INTO mytable (fields) VALUES(values)>
+
+In scalar context, it execute the query and in list context it simply returns the statement handler.
+
+=head2 reset
+
+This is used to reset a prepared query to its default values. If a field is a date/time type, its default value will be set to NOW()
+
+It execute an update with the reseted value and return the number of affected rows.
+
+=head2 returning
+
+The SQL C<RETURNING> clause needs to be implemented by the driver and is currently supported only by and L<DB::Object::Postgres> (see L<DB::Object::Postgres::Query/returning>) and L<DB::Object::SQLite> (see L<DB::Object::SQLite::Query/returning>).
+
+=head2 reverse
+
+Get or set the reverse mode.
+
 =head2 schema
 
 Returns the schema name, if any. For example, with PostgreSQL, the default schema name would be C<public>.
+
+=head2 select
+
+Given an optional list of fields to fetch, L</select> prepares a C<SELECT> query.
+
+If no field was provided, L</select> will use default value where appropriate like the C<NOW()> for date/time fields.
+
+L<DB::Object::Query/select> calls upon L<DB::Object::Query/tie>, L<DB::Object::Query/where>, L<DB::Object::Query/group>, L<DB::Object::Query/order>, L<DB::Object::Query/limit>, L<DB::Object::Query/local>, and possibly more depending on the driver implementation, to build the query.
+
+In scalar context, it execute the query and return it. In list context, it just returns the statement handler.
+
+=head2 sort
+
+It toggles sort mode on and consequently disable reverse mode.
 
 =head2 stat
 
@@ -601,6 +1085,10 @@ This must be implemented by the driver package, so check L<DB::Object::Mysql::Ta
 =head2 table
 
 Returns the table name. This is read-only.
+
+=head2 tie
+
+This is a convenient wrapper around L<DB::Object::Query/tie>
 
 =head2 type
 
@@ -620,9 +1108,25 @@ The implementation is driver specific.
 
 This must be implemented by the driver package, so check L<DB::Object::Mysql::Tables/structure>, L<DB::Object::Postgres::Tables/structure> or L<DB::Object::SQLite::Tables/structure>
 
+=head2 unix_timestamp
+
+This is a convenient wrapper around L<DB::Object::Query/unix_timestamp>
+
 =head2 unlock
 
 This must be implemented by the driver package, so check L<DB::Object::Mysql::Tables/unlock>, L<DB::Object::Postgres::Tables/unlock> or L<DB::Object::SQLite::Tables/unlock>
+
+=head2 update
+
+Given a list of field-value pairs, L</update> prepares a sql update query.
+
+It calls upon L<DB::Object::Query/where> and L<DB::Object::Query/limit> as previously set.
+
+It returns undef and sets an error if it failed to prepare the update statement. In scalar context, it execute the query. In list context, it simply return the statement handler.
+
+=head2 where
+
+This is a convenient wrapper around L<DB::Object::Query/where>
 
 =head1 AUTHOR
 

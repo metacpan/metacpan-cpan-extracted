@@ -224,7 +224,7 @@ sub exists
         else
         {
             # $self->message( 3, "Error getting a semaphore: $!" );
-            return( 0 ) if( $! =~ /\bNo[[:blank:]]+such[[:blank:]]+file\b/ );
+            return(0) if( $! =~ /\bNo[[:blank:]]+such[[:blank:]]+file\b/ );
             return;
         }
     }
@@ -232,7 +232,7 @@ sub exists
     {
         # $self->message( 3, "Trying to access shared memory triggered error: $e" );
         semctl( $semid, 0, IPC::SysV::IPC_RMID, 0 ) if( $semid );
-        return( 0 );
+        return(0);
     }
 }
 
@@ -964,3 +964,4 @@ END
 1;
 
 __END__
+

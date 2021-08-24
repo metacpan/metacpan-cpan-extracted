@@ -43,10 +43,11 @@ WriteMakefile(
     },
     META_MERGE => {
         'recommends' => {
-            'Apache::Session::Browseable' => 0,
+            'Apache::Session::Browseable' => '1.3.9',
             'Convert::Base32'             => 0,
             'Cookie::Baker::XS'           => 0,
             'Crypt::URandom'              => 0,
+            'Date::Parse'                 => 0,
             'String::Random'              => 0,
             'DBI'                         => 0,
             'Net::LDAP'                   => 0,
@@ -105,5 +106,6 @@ WriteMakefile(
         'scripts/convertSessions'       => 'blib/man1/convertSessions.1p',
         'scripts/lemonldap-ng-cli'      => 'blib/man1/lemonldap-ng-cli.1p',
         'scripts/lemonldap-ng-sessions' => 'blib/man1/lemonldap-ng-sessions.1p',
+        'scripts/importMetadata'        => 'blib/man1/importMetadata.1p',
     },
 );

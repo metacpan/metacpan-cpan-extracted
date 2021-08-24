@@ -10,59 +10,41 @@ close(STDERR);
 
 my $rc = 0;
 
-eval { $rc = open(FILE,"$0"); };
+eval q{ $rc = open(FILE,"$0"); };
 ok($@, q{open(FILE,"$0")});
-if ($rc) {
-    close(FILE);
-}
+eval q{ if ($rc) { close(FILE); } };
 
-eval { $rc = open(FILE,"< $0"); };
+eval q{ $rc = open(FILE,"< $0"); };
 ok($@, q{open(FILE,"< $0")});
-if ($rc) {
-    close(FILE);
-}
+eval q{ if ($rc) { close(FILE); } };
 
-eval { $rc = open(FILE,"> $0.wr"); };
+eval q{ $rc = open(FILE,"> $0.wr"); };
 ok($@, q{open(FILE,"> $0.wr")});
-if ($rc) {
-    close(FILE);
-}
+eval q{ if ($rc) { close(FILE); } };
 
-eval { $rc = open(FILE,">> $0.wr"); };
+eval q{ $rc = open(FILE,">> $0.wr"); };
 ok($@, q{open(FILE,">> $0.wr")});
-if ($rc) {
-    close(FILE);
-}
+eval q{ if ($rc) { close(FILE); } };
 
-eval { $rc = open(FILE,"+< $0.wr"); };
+eval q{ $rc = open(FILE,"+< $0.wr"); };
 ok($@, q{open(FILE,"+< $0.wr")});
-if ($rc) {
-    close(FILE);
-}
+eval q{ if ($rc) { close(FILE); } };
 
-eval { $rc = open(FILE,"+> $0.wr"); };
+eval q{ $rc = open(FILE,"+> $0.wr"); };
 ok($@, q{open(FILE,"+> $0.wr")});
-if ($rc) {
-    close(FILE);
-}
+eval q{ if ($rc) { close(FILE); } };
 
-eval { $rc = open(FILE,"+>> $0.wr"); };
+eval q{ $rc = open(FILE,"+>> $0.wr"); };
 ok($@, q{open(FILE,"+>> $0.wr")});
-if ($rc) {
-    close(FILE);
-}
+eval q{ if ($rc) { close(FILE); } };
 
-eval { $rc = open(FILE,qq{| $^X -e "1"}); };
+eval q{ $rc = open(FILE,qq{| $^X -e "1"}); };
 ok($@, q{open(FILE,qq{| $^X -e "1"}});
-if ($rc) {
-    close(FILE);
-}
+eval q{ if ($rc) { close(FILE); } };
 
-eval { $rc = open(FILE,qq{$^X -e "1" |}); };
+eval q{ $rc = open(FILE,qq{$^X -e "1" |}); };
 ok($@, q{open(FILE,qq{$^X -e "1" |}});
-if ($rc) {
-    close(FILE);
-}
+eval q{ if ($rc) { close(FILE); } };
 
 END {
     unlink("$0.wr");

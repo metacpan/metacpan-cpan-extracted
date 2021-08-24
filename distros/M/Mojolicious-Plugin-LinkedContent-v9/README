@@ -2,7 +2,7 @@ NAME
     Mojolicious::Plugin::LinkedContent::v9 - manage linked css and js
 
 VERSION
-    version 0.09
+    version 0.10
 
 AUTHOR
     Emiliano Bruni <info@ebruni.it>
@@ -77,9 +77,9 @@ CONFIGURATION AND ENVIRONMENT
 Notes about original Mojolicious::Plugin::LinkedContent
     This module is a complete replacement for
     Mojolicious::Plugin::LinkedContent and shares with it most of its code.
-    But original module doesn't work with MOjolicious > 8.23
+    But original module doesn't work with Mojolicious > 8.23
 
-    There is a issue for in github for this problem
+    There is a issue in github for this problem
 
     <https://github.com/yko/mojolicious-plugin-linkedcontent/issues/5>
 
@@ -94,28 +94,27 @@ Notes about original Mojolicious::Plugin::LinkedContent
 BUGS/CONTRIBUTING
     Please report any bugs through the web interface at
     <https://github.com/EmilianoBruni/mojolicious-plugin-linkedcontent-v9/is
-    sues> If you want to contribute changes or otherwise involve yourself in
+    sues>
+
+    If you want to contribute changes or otherwise involve yourself in
     development, feel free to fork the Git repository from
     <https://github.com/EmilianoBruni/mojolicious-plugin-linkedcontent-v9/>.
 
 SUPPORT
     You can find this documentation with the perldoc command too.
 
-        perldoc Mojolicious::Plugin::LinkedContent-V9
+        perldoc Mojolicious::Plugin::LinkedContent-v9
 
 AUTHOR
     Yaroslav Korshak "<ykorshak@gmail.com>", Emiliano Bruni
-    "<info@ebruni.it"
+    "<info@ebruni.it>"
 
 CREDITS
       Oliver Günther
 
 LICENCE AND COPYRIGHT
-    Copyright (C) 2010 - 2013, Yaroslav Korshak Copyright (C) 2019 - 2021,
-    Emiliano Bruni
+    Copyright (C) 2010 - 2013: Yaroslav Korshak, 2019 - 2021: Emiliano Bruni
 
     This module is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself. See perlartistic.
-
-    1;
 

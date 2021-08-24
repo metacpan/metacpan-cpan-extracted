@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?><!DOCTYPE html><html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content=""><meta name="author" content="INRA ARA"><title><TMPL_VAR NAME=DATABASE> report</title><link rel="stylesheet" type="text/css" href="https://cdn.rawgit.com/fgiacomoni/galaxy_utils/master/style/simplePagination.css"/>
+    <!-- JavaScript -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script src="https://cdn.rawgit.com/fgiacomoni/galaxy_utils/master/scripts/jquery.simplePagination.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/boost.js"></script>
+    <script src="http://code.highcharts.com/stock/highstock.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/data.js"></script>
+
+    <style type="text/css">body {padding-top: 70px}div.lm-table-warning {  font-size: 1.4em;  font-weight: bold;  padding-right: 25px;  color: #21536a;  margin-left: 3px;}tr.green td  {background-color: #eaf2d3; color: black;}tr.blank td {background-color: #9999CC; color: black;}table {font-family:'Trebuchet MS',Arial,Helvetica,sans-serif;width:100%;border-collapse:collapse;}table.detail, table.detail tr.parent, table.detail td, table.detail th, table.detail tr.category {border-collapse:collapse;border:1px solid #98bf21;}table.detail th {font-size: 1.0em;text-align: center;padding-top: 5px;padding-bottom: 10px;background-color: #a7c942;color: #ffffff;}td.ca {text-align:center;}footer {  margin: 50px 0;} .mtbls-keyword { font: 10px Verdana, sans-serif; } .scores {font-size: x-small;}
+    </style>
+    <script>function test(pageNumber){  var page="#page-id-"+pageNumber;  $('.select').hide() ; $(page).show()}</script>
+</head>
+<body>
+    <div class="lm-table-warning">Results of <TMPL_VAR NAME=DATABASE> queries - Pseudospectra number: <TMPL_VAR NAME=PSEUDOSPECTRA_NB> </div>
+	<div class="lm-table-warning">Parameters are: <TMPL_VAR NAME=PARAMS></div>
+    <p>
+    <p>
+    <div style="width: 100%; ">
+		<div style="float:left;width:50%;>
+            <div style="width: 700px; margin: 10 auto">
+			<!-- HeadRows-->
+    			<table style="margin-left: auto; margin-right: auto;" id="detail_table" class="detail">
+                    <col style="width:relative_length;"><!-- PC Groups -->
+                    <col style="width:relative_length;"><!-- Spectra_ID -->
+                    <col style="width:relative_length;"><!-- Instrument -->
+                    <col style="width:relative_length;"><!-- Cpd_ID -->
+                    <col style="width:relative_length;"><!-- Cpd_Name -->
+                    <col style="width:relative_length;"><!-- Derivative_Type -->
+                    <col style="width:relative_length;"><!-- Scores -->
+                    
+                    <thead>
+                        <th colspan="1">PC Groups </th>
+                        <th colspan="1">Spectra ID </th>
+                        <th colspan="1">Instrument </th>
+                        <th colspan="1">Cpd ID </th>
+                        <th colspan="1">Cpd Name </th>
+                        <th colspan="1">Derivative Type </th> 
+                        <th colspan="1">Score </th> 
+                    </thead>
+
+                    <TMPL_LOOP NAME=PCGROUP_COLUMNS>
+                        <tr class="">
+                            <td align="center" colspan="1" style="font-weight: bold;"><TMPL_VAR NAME=PCGROUP_ID></td>
+                        </tr>
+                        
+                            <TMPL_LOOP NAME=ANNOT_COLUMNS>
+                            <tr class="">
+                                <td align="center" colspan="1"></td>
+                                <td align="center"><button id="btn<TMPL_VAR NAME=BTID1>"><TMPL_VAR NAME=SPECTRA_ID></button></td>
+                                <td align="center"><TMPL_VAR NAME=INSTRUMENT></td>
+                                <td class="mtbls-keyword" align="center"><TMPL_VAR NAME=CPD_ID></td>
+                                <td align="center"><TMPL_VAR NAME=CPD_NAME></td>
+                                <td align="center"><TMPL_VAR NAME=DERIVATIVE_TYPE></td>
+                                <td class="scores" align="center"><TMPL_VAR NAME=SCORES></td>
+                            </tr>
+                            </TMPL_LOOP>
+                    </TMPL_LOOP>
+
+    		    </table>
+            </div>
+		  <div id="container" style="position: fixed; top: 20%; right: 50px; width:50%; min-width: 310px; height: 500px; max-width: 600px; margin: 10 auto"></div>
+        </div>
+	</div>
+    <div style="clear:both; font-size:1px;"></div>
+	<div class="container"><hr>
+		<footer>
+			<div>
+				<div><p>Copyright &copy; INRAE, C Mign&eacute;, F Giacomoni 2021 </p></div>
+			</div>
+            <div class="scores">
+                <div><p>Score 1: Proportion of query peaks with matches </p></div>
+                <div><p>Score 2: Proportion of librairy spectrum's peaks with matches </p></div>
+                <div><p>Score 3: Pearson correlation between intensities of paired peaks, where unmatched peaks are paired with zero-intensity "pseudo-peaks". </p> </div>
+            </div>
+		</footer>
+    </div>
+	<script language="javascript">
+$(function() {
+    $('#container').highcharts({
+    chart: {
+        type: 'spline',
+        inverted: false,
+        zoomType: 'x',
+    },
+
+    boost: {
+        useGPUTranslations: true
+    },
+    
+    title: {
+        text: 'Spectral matching: Exp. pseudospectra VS <TMPL_VAR NAME=DATABASE> theorical fragments'
+    },
+    subtitle: {
+        text: 'Please select a spectrum in table !'
+    },
+    yAxis: {
+        title: {
+            enabled: true,
+            text: 'Rel. Intensity'
+        },
+        labels: {
+            formatter: function() {
+                return Math.abs(this.value) 
+            }
+        },
+        maxPadding: 0.05,
+        showLastLabel: true,
+        gridLineWidth: 1,
+        min: -100,
+        max: 100,
+        lineColor: '#FF0000',
+        
+        plotLines: [{
+            color: '#FF0000',
+            width: 2,
+            value: 0
+        }]
+    },
+    xAxis: {
+        title: {
+            text: 'm/z'
+        },
+        labels: {
+            format: '{value}'
+        },
+        lineWidth: 0.2,
+        min: 0,
+        // max: 800,
+    },
+    legend: {
+        enabled: false
+    },
+    tooltip: {
+        // headerFormat: 'Annotation: <b>{series.name}</b><br/>',
+        // pointFormat: 'm/z: {point.x:.5f} / rel.int: {point.y:.2f}',
+        formatter: function() {
+                return 'Annotation: <b>' + this.series.name + '</b><br/>' + 'm/z: ' + parseFloat(this.x).toFixed(5) + ' / rel.int: ' + parseFloat(Math.abs(this.y)).toFixed(2) ;
+        }
+    },
+    plotOptions: {
+        spline: {
+            marker: {
+                enable: false
+            }
+        },
+        series: {
+            boostThreshold: 100
+        }
+    },
+    series: [
+             <TMPL_VAR NAME=PSEUDOSPECTRA_INIT_SPECTRA>
+            // Part dedicate to theorical fragments
+            <TMPL_VAR NAME=THEO_INIT_SPECTRA>
+    ]
+});
+
+<TMPL_LOOP NAME=PCGROUP_N_SERIES>
+$('#btn<TMPL_VAR NAME=BTID2>').click(function () {
+    var chart = $('#container').highcharts();
+    var new_serie = [
+        <TMPL_VAR NAME=PSEUDOSPECTRA_N_SPECTRA> 
+        // Part dedicate to theorical fragments (Y1, Y2, B1, B2, Immonium, ...)
+        <TMPL_VAR NAME=THEO_N_SPECTRA>
+    ]
+
+    chart.setTitle(null, { text: '<TMPL_VAR NAME=PSEUDOSPECTRA_CHART_TITLE> '});
+
+    //alert(new_serie); // returns objects
+    while(chart.series.length > 0) {
+        chart.series[0].remove(false);
+    }
+    chart.redraw();
+
+    for (var y = new_serie.length-1; y >= 0; y--) {
+        chart.addSeries(new_serie[y], false);
+    }
+    chart.redraw();
+});
+</TMPL_LOOP>
+
+    // change color of table
+    $('table tr').each(function(a,b){
+    $(b).click(function(){
+             $('table tr').css('background','#ffffff');
+             $(this).css('background','#ccc');  //red is #ff0000/ grey is #ccc 
+        });
+    });
+
+}); //End function
+	</script>
+</body>
+</html>

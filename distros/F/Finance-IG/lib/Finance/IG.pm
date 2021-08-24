@@ -24,11 +24,11 @@ You will need an API key to use this module, available free from IG Markets.
 
 =head1 VERSION
 
-Version 0.101
+Version 0.102
 
 =cut
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 
 =head1 SYNOPSIS
@@ -859,6 +859,7 @@ sub agg
   {
 
    my $json = JSON->new;
+   $position->{size}=-abs($position->{size}) if ($position->{direction} eq 'SELL'); 
 #   $position->{size}= -abs($position->{size}) if ($position->{direction}//'' ne 'BUY'); 
    $position->{profit}=($self->fetch($position,'bid')-$self->fetch($position,'level'))*$self->fetch($position,'size');
 
@@ -2064,7 +2065,7 @@ sub printpos
      #$"=":"; print "@$position\n"; 
   
 
-    $format=~s/[\x82\x83\xc3]//g;   # so we get some strange characters like ÃÂ occuring in pairs. Not sure why. This removes them.   
+    $format=~s/[\x82\x83\xc3]+//g;   # so we get some strange characters like ÃÂ occuring in pairs. Not sure why. This removes them.   
      #$format="%-41s %+7s %11s %-10s £%-10s %5s%% £%12s %-9s %-4s"; 
      #print "$format\n"; #exit; 
     print $out Bold if ($self->col and defined $INC{'Term/Chrome.pm'});
@@ -2099,7 +2100,7 @@ sub printpos
     #$format=~s/(%[-+0-9]+)\.[0-9]+/$1/g; 
     $format=~s/£//g;
     #die "format=$format titles=@titles"; 
-    $format=~s/[\x82\x83\xc3]//g;   # so we get some strange characters like ÃÂ occuring in pairs. Not sure why. This removes them.   
+    $format=~s/[\x82\x83\xc3]+//g;   # so we get some strange characters like ÃÂ occuring in pairs. Not sure why. This removes them.   
     print $out Bold  if ($self->col and defined $INC{'Term/Chrome.pm'});
     printf $out $format, @titles;
     print $out Reset if ($self->col and defined $INC{'Term/Chrome.pm'});
@@ -2199,7 +2200,7 @@ sub printpos
   $col=&$colsub($position)//'' if ($self->col and defined $INC{'Term/Chrome.pm'});
   $format=~s/##/%/g;
   $format=~s/£-/-£/g;
-  $format=~s/[\x82\x83\xc3]//g;   # so we get some strange characters like ÃÂ occuring in pairs. Not sure why. This removes them.   
+  $format=~s/[\x82\x83\xc3]+//g;   # so we get some strange characters like ÃÂ occuring in pairs. Not sure why. This removes them.   
   print $out $col, $format;
   if (ref($col) ne '')
   { print $out Reset;
@@ -2236,6 +2237,14 @@ sub sortrange
    return $dates[0] if (@dates==1); 
    return $dates[0] . "-".$dates[-1]; 
 } 
+
+
+
+=head2  Red Blue Bold Reset Underline Green color
+
+=head3 Description
+
+The above parameterless functions are provided if Term::Chrome is not available. They are "do nothing" subs provided to satisfy references only. 
 
 =head1 DEPENDENCIES
 

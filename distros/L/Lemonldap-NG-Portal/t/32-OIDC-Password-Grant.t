@@ -120,7 +120,7 @@ is( ref( $payload->{email} ),
 is( ref( $payload->{nickname} ),
     "ARRAY", "Multi valued attribute exposed as array" );
 
-my $query = "token=$access_token";
+$query = "token=$access_token";
 ok(
     $res = $op->_post(
         "/oauth2/introspect",

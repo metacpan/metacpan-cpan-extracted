@@ -57,7 +57,7 @@ CONFIGURATION
             # if can't find both start and end dates, use this color
             NullDatesColor => 333,
 
-            # to caculate day length
+            # to calculate day length
             WorkingHoursPerDay => 8,
 
             # used to set start/end if one exists but the other does not
@@ -105,7 +105,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-JSGantt>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2014-2020 by Best Practical Solutions
+    This software is Copyright (c) 2014-2021 by Best Practical Solutions
 
     This is free software, licensed under:
 

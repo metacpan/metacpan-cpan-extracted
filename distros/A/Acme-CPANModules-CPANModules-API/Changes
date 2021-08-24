@@ -1,3 +1,11 @@
-0.001   2020-02-076  Released-By: PERLANCAR
+0.002   2021-03-27  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with newer Pod::From::Acme::CPANModules (0.008) to
+          update POD heading names.
+
+
+0.001   2020-02-06  Released-By: PERLANCAR
 
         - First release.

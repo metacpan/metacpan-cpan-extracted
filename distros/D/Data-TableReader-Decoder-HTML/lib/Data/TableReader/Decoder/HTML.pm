@@ -1,5 +1,5 @@
 package Data::TableReader::Decoder::HTML;
-$Data::TableReader::Decoder::HTML::VERSION = '0.010';
+$Data::TableReader::Decoder::HTML::VERSION = '0.012';
 use Moo 2;
 use Try::Tiny;
 use Carp;
@@ -182,10 +182,6 @@ __END__
 
 Data::TableReader::Decoder::HTML - Access the tables of an HTML document
 
-=head1 VERSION
-
-version 0.010
-
 =head1 DESCRIPTION
 
 This decoder iterates the <TR> tags of the <TABLE>s of an HTML file.
@@ -213,15 +209,9 @@ arrayref.  The iterator supports C<< $i->next_dataset >> to move to the next tab
 
 Michael Conrad <mike@nrdvana.net>
 
-=head1 CONTRIBUTOR
-
-=for stopwords Christian Walde
-
-Christian Walde <walde.christian@gmail.com>
-
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Michael Conrad.
+This software is copyright (c) 2021 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,315 @@
+NAME
+    Markdown::Parser - Markdown Parser Only
+
+SYNOPSIS
+        use Markdown::Parser;
+
+VERSION
+        v0.1.0
+
+DESCRIPTION
+    Markdown::Parser is an object oriented Markdown parser
+    <https://daringfireball.net/projects/markdown/syntax> and manipulation
+    interface.
+
+    It provides 2 modes: 1) strict and 2) extended
+
+    In strict mode, it conform rigorously to the Markdown specification as
+    set out by its original author John Gruber and the extended mode, it
+    accept and recognises extended Markdown syntax as set out in PHP
+    Markdown Extra <https://michelf.ca/projects/php-markdown/extra/> by
+    Michel Fortin <https://michelf.ca/home/>
+
+CONSTRUCTOR
+  new
+    To instantiate a new Markdown::Parser object, pass an hash reference of
+    following parameters:
+
+    abbreviation_case_sensitive
+        Boolean value to determine if abbreviation, that are extended
+        markdown, should be case sensitive or not. Default is false, i.e.
+        they are not case sensitive, so an abbreviation declaration like:
+
+        *[HTML4] Hypertext Markup Language Version 4
+
+        would match either "HTML4" or "html4" or even "hTmL4"
+
+    css_grid
+        A boolean value to set whether to return the tables as a css grid
+        <https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Grid_Layout>
+        rather than as an html table
+        <https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Basics>.
+
+        This boolean value is passed to the "create_table" in
+        Markdown::Parser::Element in the "parse_table" method.
+
+        CSS grids
+        <https://medium.com/@js_tut/css-grid-tutorial-filling-in-the-gaps-c5
+        96c9534611> offer more flexibility and power than their conventional
+        html counterparts.
+
+        To achieve this, this module uses CSS::Object and inserts necessary
+        css rules to be added to an inline style in the head section of the
+        html document.
+
+        Once the parsing is complete, you can get the CSS::Object object
+        with "css" method.
+
+    *debug*
+        This is an integer. The bigger it is and the more verbose is the
+        output.
+
+    *mode*
+        This can be either *strict* or *extended*. By default it is set to
+        *strict*
+
+EXCEPTION HANDLING
+    Whenever an error has occurred, Markdown::Parser will set a
+    Module::Generic::Exception object containing the detail of the error and
+    return undef.
+
+    The error object can be retrieved with the inherited "error" in
+    Module::Generic method. For example:
+
+        my $p = Markdown::Parser->new( debug => 3 ) || die( Markdown::Parser->error );
+
+METHODS
+  abbreviation_case_sensitive
+    Boolean value that affects the way abbreviation are retrieved with
+    "get_abbreviation" in Markdown::Parser::Document
+
+  charset
+    Sets or gets the character set for the document. Typically something
+    like "utf-8"
+
+  code_highlight
+    Takes a boolean value.
+
+    This is currently unused.
+
+  create_document
+    Creates and returns a Markdown::Parser::Document object. This is a
+    special object which is the top element.
+
+  css
+    Sets or get the CSS::Object objects. If one is set already, it is
+    returned, or else an object is instantiated.
+
+  css_builder
+    This is a shortcut for the "builder" in CSS::Object method.
+
+  css_grid
+    A boolean value to set whether to return the tables as a css grid
+    <https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Grid_Layout>
+    rather than as an html table
+    <https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Basics>.
+
+  default_email
+    Sets or gets the default email address to use, such as when setting up
+    anti-spam measures.
+
+    See "as_string" in Markdown::Parser::Link
+
+  document
+    Contains the Markdown::Parser::Document object. An
+    Markdown::Parser::Document object is created by "parser" to contain all
+    the parsed markdown elements.
+
+  email_obfuscate_class
+    The css class to use when obfuscating email address.
+
+    See "as_string" in Markdown::Parser::Link
+
+  email_obfuscate_data_host
+    The fake host to use when performing email obfuscation.
+
+    See "as_string" in Markdown::Parser::Link
+
+  email_obfuscate_data_user
+    The fake user to use when performing email obfuscation.
+
+    See "as_string" in Markdown::Parser::Link
+
+  encrypt_email
+    Boolean value to mark e-mail address found to be encrypted. See
+    Markdown::Parser::Link for more information.
+
+  footnote_ref_sequence
+    This is more an internal method used to keep track of the footnote
+    reference found, i.e. something like:
+
+        Here's a simple footnote,[^1] and here's a longer one.[^bignote]
+
+    So that the counter can be used to auto-generate number visible for
+    those reference to footnotes.
+
+    This is differente from the footnote reference id i.e. the link from
+    footnote back to the point where they are linked. For example:
+
+        Here’s a simple footnote,1 and here’s a longer one.2
+
+            1. This is the first footnote. ↩ # <-- Backlink is here
+
+            2. Here’s one with multiple paragraphs and code. ↩ # <-- and here also
+
+    Here 1 and 2 are provided thanks to the "footnote_ref_sequence" and
+    allocated to each Markdown::Parser::FootnoteReference
+
+  katex_delimiter
+    Sets or gets an array reference.
+
+    The delimiter to use with "katex"
+
+    Returns an array object (Module::Generic::Array)
+
+  list_level
+    Sets or gets the list level. This takes an integer and is used during
+    parsing of lists.
+
+    This method can be accessed as a regular method, or as a lvalue method,
+    such as:
+
+        $parser->list_level( 2 );
+        # or
+        $parser->list_level = 2;
+        # or even
+        $parser->list_level++;
+
+  mode
+    Sets or gets the mode for the parser. Possible value is "strict" or
+    "extended"
+
+    If set to "extended", the the scope of the parser will included
+    non-standard markdown formattings.
+
+  parse
+    Provided with a string and some optional argument passed as an hash
+    reference, and this will parse the string, create all the necessary
+    object to represent the extent of the markdown document.
+
+    It returns the Markdown::Parser::Document object.
+
+    Possible arguments are:
+
+    *element*
+        A Markdown::Parser::Element subclass object that is used to store
+        all newly created object from the parsing of the string provided.
+
+        "parse" is called recursively, so this makes it possible to set sub
+        element as the container element in parsing.
+
+    *scope*
+        Can be a string or an array reference defining the extent of the
+        scope within which the parser operates. For example, if it is set to
+        "strict", it will only parse standard markdown formatting and ignore
+        the rest.
+
+        But, if we wanted to only parse paragraph and blockquotes and
+        nothing else, its value would be:
+
+            [qw( paragraph blockquote )]
+
+    *scope_cond*
+        Sets whether the scope item specified are to be understood as "any
+        one of them" or "all of them" Thius possible value is "any" or
+        "all".
+
+  parse_file
+    Given a file path, and this will check if it can access the resource,
+    and open the file and call "parse" on the content retrieved.
+
+    If for some reason, the file content could not be accessed, it returns
+    undef and set an error using "error" in Module::Generic that this
+    package inherits.
+
+  parse_list_item
+    This method is called when the parser encounters a markdown list.
+
+    It takes a string representing the entire list and an optional hash
+    reference of options.
+
+    Possible options are:
+
+    *doc*
+        The Markdown::Parser::Element object to be used as container of all
+        the item found during parsing.
+
+    *pos*
+        An integer representation the position at which the parsing should
+        start.
+
+    It returns a Markdown::Parser::Document object.
+
+  parse_list_item
+    This method is called from within "parse" when an ordered or unordered
+    list is found. It recursively parse the list data.
+
+  parse_table
+    This method is called from within "parse" when a table is found.
+
+    It will create a Markdown::Parser::Table and associated objects, such as
+    Markdown::Parser::TableHeader, Markdown::Parser::TableBody and
+    Markdown::Parser::Caption
+
+    There can be one to 2 lines of headers and multiple table bodies. Table
+    headers and table bodies contain table rows, who, in turn, contain
+    Markdown::Parser::TableCell objects.
+
+  parse_table_row
+    Provided with a string representing a table row, along with optional
+    hash reference of options and this willparse the string and return an
+    array reference of Markdown::Parser::TableRow objects. Each
+    Markdown::Parser::TableRow object contains one or multiple instance of
+    Markdown::Parser::TableCell objects.
+
+  scope
+    Returns the Markdown::Parser::Scope which is used during parsing to
+    determine whether each element is part of the scope of not. During
+    parsing, the scope may vary and may include only block element while
+    sometime, the scope is limited to inline elements. For speed, the scope
+    method "has" in Markdown::Parser::Scope is cached.
+
+  scope_block
+    Get a new scope parameter, in the form of an array reference, that has a
+    scope for block elements.
+
+  scope_inline
+    Get a new scope parameter, in the form of an array reference, that has a
+    scope for inline elements.
+
+  whereami
+    Provided with a scalar, an integer representing a position in the
+    scalar, and an optional hash reference of options, and this method will
+    print out or return a formatted string to visually show where exactly is
+    the cursor in the string.
+
+    This is used solely for debugging and is resource intensive, so this
+    along with the rest of the debugging method should not be used in live
+    production.
+
+    This is activated when the parser object debug value is greater or equal
+    to 3.
+
+PRIVATE METHODS
+  _total_trailing_new_lines
+    Count how many trailing new lines there are in the given string and
+    returns the number.
+
+AUTHOR
+    Jacques Deguest <jack@deguest.jp>
+
+SEE ALSO
+    Regexp::Common::Markdown for the regular expressions used in this
+    distribution.
+
+    Text::Markdown::Discount for a fast markdown to html converter using C
+    code.
+
+    Text::Markdown for a version in pure perl.
+
+COPYRIGHT & LICENSE
+    Copyright (c) 2020 DEGUEST Pte. Ltd.
+
+    You can use, copy, modify and redistribute this package and associated
+    files under the same terms as Perl itself.
+

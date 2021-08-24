@@ -1,7 +1,7 @@
 use utf8;
 use ExtUtils::testlib;
 use Test2::V0;
-use URI::Fast qw(uri);
+use URI::Fast qw(uri abs_uri);
 
 my $base = 'http://a/b/c/d;p?q';
 
@@ -41,6 +41,15 @@ subtest 'normal cases - https://www.rfc-editor.org/rfc/rfc3986.txt 5.4.1' => sub
         diag "base:   '$base'";
         diag "exp:    '$exp'";
         diag "actual: '$abs'";
+      };
+
+    my $abs_uri = abs_uri($rel, $base);
+    is $abs_uri, $exp, "abs_uri: $rel -> $exp"
+      or do{
+        diag "rel:    '$rel'";
+        diag "base:   '$base'";
+        diag "exp:    '$exp'";
+        diag "actual: '$abs_uri'";
       };
 
     my $new_abs = URI::Fast->new_abs($rel, $base);

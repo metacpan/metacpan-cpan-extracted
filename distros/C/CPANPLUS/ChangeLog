@@ -1,3 +1,7 @@
+0.9912      Sat Aug 21 12:22:49 BST 2021
+
+* Removed circular dependency in CPANPLUS::Internals::*
+
 0.9910      Sat Dec 19 10:41:41 GMT 2020
 
 * Change default mirror to www.cpan.org

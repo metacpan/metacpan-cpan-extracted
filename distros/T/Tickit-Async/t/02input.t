@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 # We need a UTF-8 locale to force libtermkey into UTF-8 handling, even if the

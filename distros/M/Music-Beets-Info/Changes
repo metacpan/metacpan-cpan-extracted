@@ -1,0 +1,6 @@
+0.004 2021-08-20
+  - Quote the filename using quotemeta to avoid shell escaping issues.
+  - Account for long(er) beet field names.
+
+0.002 2021-06-11
+  - Initial release.

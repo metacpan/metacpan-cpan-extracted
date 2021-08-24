@@ -4,6 +4,7 @@ author:
   - 'haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>'
 build_requires:
   Test::More: '0.88'
+  Test::Needs: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -29,6 +30,6 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Coverage-TrustMe
   license: http://dev.perl.org/licenses/
   repository: https://github.com/haarg/Pod-Coverage-TrustMe.git
-version: '0.001002'
+version: '0.002000'
 x_authority: cpan:HAARG
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

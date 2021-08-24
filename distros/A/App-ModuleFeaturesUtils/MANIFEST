@@ -11,6 +11,7 @@ lib/App/ModuleFeaturesUtils.pm
 script/check-feature-set-spec
 script/check-features-decl
 script/check-module-features
+script/compare-module-features
 script/get-feature-set-spec
 script/get-features-decl
 script/list-feature-set-features

@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.498
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-25'; # DATE
+our $DATE = '2021-04-02'; # DATE
 our $DIST = 'App-ModuleFeaturesUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,14 +38,15 @@ check-feature-set-spec - Check specification in %FEATURES_DEF in Modules::Featur
 
 =head1 VERSION
 
-This document describes version 0.003 of check-feature-set-spec (from Perl distribution App-ModuleFeaturesUtils), released on 2021-02-25.
+This document describes version 0.004 of check-feature-set-spec (from Perl distribution App-ModuleFeaturesUtils), released on 2021-04-02.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % check-feature-set-spec [--format=name] [--json] [--(no)naked-res]
-     [--page-result[=program]] [--view-result[=program]] <feature_set>
+ % check-feature-set-spec [--feature-set-data-json=s]
+     [--feature-set-data=s] [--format=name] [--json] [--(no)naked-res]
+     [--page-result[=program]] [--view-result[=program]] [feature_set_name]
 
 =head1 OPTIONS
 
@@ -55,7 +56,13 @@ C<*> marks required options.
 
 =over
 
-=item B<--feature-set>=I<s>*
+=item B<--feature-set-data-json>=I<s>
+
+See C<--feature-set-data>.
+
+=item B<--feature-set-data>=I<s>
+
+=item B<--feature-set-name>=I<s>
 
 =back
 

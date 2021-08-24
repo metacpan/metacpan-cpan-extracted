@@ -1,6 +1,6 @@
 package Lab::Bus::MODBUS_RS232;
 #ABSTRACT: RS232/RS485 MODBUS RTU protocol bus
-$Lab::Bus::MODBUS_RS232::VERSION = '3.770';
+$Lab::Bus::MODBUS_RS232::VERSION = '3.771';
 use v5.20;
 
 #
@@ -387,7 +387,7 @@ Lab::Bus::MODBUS_RS232 - RS232/RS485 MODBUS RTU protocol bus
 
 =head1 VERSION
 
-version 3.770
+version 3.771
 
 =head1 SYNOPSIS
 

@@ -6,7 +6,7 @@ use warnings;
 
 #our $VERSION = '3.002';
 
-our $VERSION = '3.001.005'; # VERSION
+our $VERSION = '3.001.006'; # VERSION
 
 use Moose;
 use Path::Tiny;
@@ -160,7 +160,7 @@ Dist::Zilla::Plugin::Test::Perl::Critic::Subset - Tests to check your code again
 
 =head1 VERSION
 
-version 3.001.005
+version 3.001.006
 
 =head1 SYNOPSIS
 
@@ -248,7 +248,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

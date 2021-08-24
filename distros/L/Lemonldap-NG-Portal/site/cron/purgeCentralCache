@@ -144,8 +144,7 @@ for my $options (@backends) {
     next if ( $options->{backend} eq "Apache::Session::Memcached" );
     my @t;
     if ( $options->{backend}->can('deleteIfLowerThan') ) {
-        next
-          if $options->{backend}->deleteIfLowerThan(
+        my ( $success, $rows ) = $options->{backend}->deleteIfLowerThan(
             $options,
             {
                 not => { '_session_kind' => 'Persistent' },
@@ -158,7 +157,14 @@ for my $options (@backends) {
                     )
                 }
             }
-          );
+        );
+
+        if ($success) {
+            if ($rows) {
+                $nb_purged += $rows;
+            }
+            next;
+        }
     }
 
     # Get all expired sessions

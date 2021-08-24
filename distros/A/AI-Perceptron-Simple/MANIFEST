@@ -1,0 +1,43 @@
+Changes
+docs/AI-Perceptron-Simple-1.01.html
+docs/book_list.csv
+docs/specifications.t
+lib/AI/Perceptron/Simple.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/00-manifest.t
+t/00-pod-coverage.t
+t/00-pod.t
+t/02-creation.t
+t/02-state_synonyms.t
+t/04-train.t
+t/04-train_synonyms_exercise.t
+t/04-train_synonyms_tame.t
+t/06-validate.t
+t/06-validate_synonyms_lab.t
+t/06-validate_synonyms_mock.t
+t/08-confusion_matrix.t
+t/08-confusion_matrix_synonyms.t
+t/10-test.t
+t/10-test_synonyms_exam.t
+t/10-test_synonyms_work.t
+t/book_list_test-filled-non-binary.csv
+t/book_list_test-filled.csv
+t/book_list_test.csv
+t/book_list_test_exam-filled.csv
+t/book_list_test_work-filled.csv
+t/book_list_train.csv
+t/book_list_validate-filled.csv
+t/book_list_validate.csv
+t/book_list_validate_lab-filled.csv
+t/book_list_validate_mock-filled.csv
+t/perceptron_1.nerve
+t/perceptron_exercise.nerve
+t/perceptron_state_synonyms.nerve
+t/perceptron_tame.nerve
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

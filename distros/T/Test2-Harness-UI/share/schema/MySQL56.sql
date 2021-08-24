@@ -106,11 +106,6 @@ CREATE TABLE permissions (
     UNIQUE(project_id, user_id)
 ) ROW_FORMAT=COMPRESSED;
 
-CREATE TABLE coverage (
-    coverage_id     CHAR(36)        NOT NULL PRIMARY KEY,
-    coverage        LONGTEXT        DEFAULT NULL
-);
-
 CREATE TABLE runs (
     run_id          CHAR(36)        NOT NULL PRIMARY KEY,
     user_id         CHAR(36)        NOT NULL,
@@ -138,12 +133,8 @@ CREATE TABLE runs (
     failed          INTEGER         DEFAULT NULL,
     retried         INTEGER         DEFAULT NULL,
     concurrency     INTEGER         DEFAULT NULL,
-    fields          LONGTEXT        DEFAULT NULL,
     parameters      LONGTEXT        DEFAULT NULL,
 
-    coverage_id     CHAR(36)        DEFAULT NULL,
-
-    FOREIGN KEY (coverage_id) REFERENCES coverage(coverage_id),
     FOREIGN KEY (user_id)     REFERENCES users(user_id),
     FOREIGN KEY (project_id)  REFERENCES projects(project_id),
     FOREIGN KEY (log_file_id) REFERENCES log_files(log_file_id),
@@ -152,6 +143,21 @@ CREATE TABLE runs (
 CREATE INDEX run_projects ON runs(project_id);
 CREATE INDEX run_status ON runs(status);
 CREATE INDEX run_user ON runs(user_id);
+
+CREATE TABLE run_fields (
+    run_field_id    CHAR(36)        NOT NULL PRIMARY KEY,
+    run_id          CHAR(36)        NOT NULL,
+    name            VARCHAR(255)    NOT NULL,
+    data            LONGTEXT        DEFAULT NULL,
+    details         TEXT            DEFAULT NULL,
+    raw             TEXT            DEFAULT NULL,
+    link            TEXT            DEFAULT NULL,
+
+    FOREIGN KEY (run_id) REFERENCES runs(run_id),
+
+    UNIQUE(run_id, name)
+) ROW_FORMAT=COMPRESSED;
+
 
 CREATE TABLE jobs (
     job_key         CHAR(36)    NOT NULL PRIMARY KEY,
@@ -196,10 +202,24 @@ CREATE INDEX job_runs ON jobs(run_id);
 CREATE INDEX job_fail ON jobs(fail);
 CREATE INDEX job_file ON jobs(file);
 
+CREATE TABLE job_fields (
+    job_field_id    CHAR(36)        NOT NULL PRIMARY KEY,
+    job_key         CHAR(36)        NOT NULL,
+    name            VARCHAR(255)    NOT NULL,
+    data            LONGTEXT        DEFAULT NULL,
+    details         TEXT            DEFAULT NULL,
+    raw             TEXT            DEFAULT NULL,
+    link            TEXT            DEFAULT NULL,
+
+    FOREIGN KEY (job_key) REFERENCES jobs(job_key),
+
+    UNIQUE(job_key, name)
+) ROW_FORMAT=COMPRESSED;
+
 CREATE TABLE events (
     event_id        CHAR(36)    NOT NULL PRIMARY KEY,
 
-    job_key         CHAR(36)    NOT NULL REFERENCES jobs(job_key),
+    job_key         CHAR(36)    NOT NULL,
 
     event_ord       BIGINT      NOT NULL,
     insert_ord      BIGINT      NOT NULL AUTO_INCREMENT,

@@ -47,10 +47,12 @@ Metabolomics::Banks::MaConDa - Perl extension for contaminants bank building
 =head1 VERSION
 
 Version 0.2 - Adding POD
+Version 0.3 - Completing object properties
 
 =cut
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
+
 
 
 =head1 SYNOPSIS
@@ -82,14 +84,18 @@ our $VERSION = '0.2';
 
 sub new {
     ## Variables
+    my ($class,$args) = @_;
     my $self={};
         
     $self = Metabolomics::Banks->new() ;
     
     $self->{_DATABASE_NAME_} = 'MaConDa' ;
     $self->{_DATABASE_VERSION_} = '1.0' ;
+    $self->{_DATABASE_TYPE_} = 'METABOLITE' ;
+    $self->{_POLARITY_} =  $args->{POLARITY} ;
     $self->{_DATABASE_ENTRIES_NB_} = 'database_entries_nb' ;
-    $self->{_DATABASE_URL_} = 'database_url' ;
+    $self->{_DATABASE_URL_} = 'https://maconda.bham.ac.uk/' ;
+    $self->{_DATABASE_URL_CARD_} = 'https://www.maconda.bham.ac.uk/contaminant.php?id=' ;
     $self->{_DATABASE_DOI_} = 'database_doi' ;
     $self->{_CONTAMINANTS_} = [] ;
     ## _DATABASE_ENTRIES_
@@ -560,7 +566,7 @@ sub filterContaminantIonMode {
     	}
     	else {
     		my $filter = undef ;
-    		$oFilteredBank = Metabolomics::Banks::MaConDa->new() ;
+    		$oFilteredBank = Metabolomics::Banks::MaConDa->new( {POLARITY => $ionMode} ) ;
     		
     		if   	( ( $ionMode eq 'POSITIVE' )  ) { $filter = 'POS' ; }
 	    	elsif   ( ( $ionMode eq 'NEGATIVE' )  ) { $filter = 'NEG' ; }

@@ -139,9 +139,9 @@ NAME
     Acme::CPANModules::* distribution
 
 VERSION
-    This document describes version 0.011 of
+    This document describes version 0.012 of
     Pod::Weaver::Plugin::Acme::CPANModules (from Perl distribution
-    Pod-Weaver-Plugin-Acme-CPANModules), released on 2021-08-13.
+    Pod-Weaver-Plugin-Acme-CPANModules), released on 2021-08-21.
 
 SYNOPSIS
     In your weaver.ini:
@@ -159,8 +159,10 @@ DESCRIPTION
 
     For Acme/CPANModules/*.pm files:
 
-    *   Create "MODULES INCLUDED IN THIS ACME::CPANMODULES MODULE" POD
-        section from the list
+    *   Create "ACME::CPANMODULES ENTRIES" POD section from the list
+
+    *   Create "ACME::CPANMODULES FEATURE COMPARISON MATRIX" POD section
+        from the list
 
     *   Mention some modules in See Also section
 

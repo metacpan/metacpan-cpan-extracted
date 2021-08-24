@@ -8,7 +8,7 @@ use lib './lib';
 use Regexp::Common qw( Markdown );
 require( "./t/functions.pl" ) || BAIL_OUT( "Unable to find library \"functions.pl\"." );
 
-## https://regex101.com/r/sGsOIv/4
+## https://regex101.com/r/sGsOIv/10
 my $tests = 
 [
     {
@@ -42,9 +42,11 @@ my $tests =
         test => q{[URL and title](/url/	"title preceded by a tab").},
     },
     {
-        link_all  => "[URL and title](/url/ \"title has spaces afterward\"  )",
+        link_all => "[URL and title](/url/ \"title has spaces afterward\"  )",
         link_name => "URL and title",
-        link_url  => "/url/ \"title has spaces afterward\"",
+        link_title => "title has spaces afterward",
+        link_title_container => "\"",
+        link_url => "/url/",
         test => q{[URL and title](/url/ "title has spaces afterward"  ).},
     },
     {
@@ -131,6 +133,16 @@ my $tests =
 This one has a [line
 break][].
 EOT
+    },
+    {
+        fail => 1,
+        name => q{Not matching image},
+        test => q{![Alt text](/path/to/img.jpg)},
+    },
+    {
+        fail => 1,
+        name => q{Not matching when escaped},
+        test => q{\[Alt text](/path/to/img.jpg)},
     },
 ];
 

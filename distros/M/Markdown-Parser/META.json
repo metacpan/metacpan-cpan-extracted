@@ -1,0 +1,68 @@
+{
+   "abstract" : "Markdown Parser Only",
+   "author" : [
+      "Jacques Deguest (jack@deguest.jp)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Markdown-Parser",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CSS::Object" : "v0.1.4",
+            "Devel::Confess" : "0.009004",
+            "HTML::TreeBuilder" : "5.07",
+            "Module::Generic" : "v0.15.8",
+            "Nice::Try" : "v1.1.2",
+            "POSIX" : "1.53_01",
+            "URI" : "0",
+            "parent" : "0",
+            "perl" : "5.026001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "Test::More" : "1.302162",
+            "Test::Pod" : "1.52"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://git.deguest.jp/jack/Markdown-Parser/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://git.deguest.jp/jack/Markdown-Parser"
+      }
+   },
+   "version" : "v0.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

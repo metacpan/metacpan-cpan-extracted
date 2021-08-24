@@ -4,7 +4,7 @@
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -61,7 +61,7 @@
          "web" : "https://github.com/jhthorsen/app-git-ship"
       }
    },
-   "version" : "0.36",
+   "version" : "0.37",
    "x_contributors" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>",
       "mohawk2 <mohawk2@users.noreply.github.com>",
@@ -69,5 +69,5 @@
       "Shoichi Kaji <skaji@cpan.org>",
       "__DATA__"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

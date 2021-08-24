@@ -1,3 +1,11 @@
+0.004   2021-04-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLI: compare-module-features.
+
+	- [ux] [cli check-features-decl] [cli check-feature-set-spec] Allow
+	  specifying declaration/spec from command-line option.
+
+
 0.003   2021-02-25  Released-By: PERLANCAR; Urgency: medium
 
 	- Add CLIs: get-feature-set-spec, get-features-decl.

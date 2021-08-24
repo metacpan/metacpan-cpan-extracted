@@ -35,5 +35,5 @@ requires:
 resources:
   homepage: https://sourceforge.net/projects/ospfview/
   repository: git://git.code.sf.net/p/ospfview/code
-version: '1.12'
+version: '1.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

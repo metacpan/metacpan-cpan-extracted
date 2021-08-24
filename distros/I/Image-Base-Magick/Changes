@@ -1,4 +1,4 @@
-Copyright 2011, 2012, 2017 Kevin Ryde
+Copyright 2011, 2012, 2017, 2021 Kevin Ryde
 
 This file is part of Image-Base-Magick.
 
@@ -15,6 +15,9 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License along
 with Image-Base-Magick.  If not, see <http://www.gnu.org/licenses/>.
 
+
+Version 6, August 2021
+    - allow for GetPixel() returning transparency
 
 Version 5, July 2017
     - tests allow for Image::Magick->VERSION = undef circa its 6.97

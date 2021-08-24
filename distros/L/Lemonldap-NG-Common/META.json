@@ -35,11 +35,12 @@
       },
       "runtime" : {
          "recommends" : {
-            "Apache::Session::Browseable" : "0",
+            "Apache::Session::Browseable" : "v1.3.9",
             "Convert::Base32" : "0",
             "Cookie::Baker::XS" : "0",
             "Crypt::URandom" : "0",
             "DBI" : "0",
+            "Date::Parse" : "0",
             "LWP::Protocol::https" : "0",
             "Net::LDAP" : "0",
             "SOAP::Lite" : "0",
@@ -77,6 +78,6 @@
       ],
       "x_MailingList" : "mailto:lemonldap-ng-dev@ow2.org"
    },
-   "version" : "v2.0.12",
+   "version" : "v2.0.13",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

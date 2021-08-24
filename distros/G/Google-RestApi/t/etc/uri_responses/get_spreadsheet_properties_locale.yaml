@@ -1,0 +1,8 @@
+GET:
+  https://sheets.googleapis.com/v4/spreadsheets/fake_spreadsheet_id1?fields=properties.locale:
+    response: |
+      {
+        "properties": {
+          "locale": "en_US"
+        }
+      }

@@ -1936,6 +1936,47 @@ void normalize(pTHX_ SV *uri_obj) {
   normalize_encoding(aTHX_ uri->frag,  URI_CHARS_FRAG,  uri->is_iri);
 }
 
+/*
+ * Returns a new copy of the uri string with tabs, line feeds, and carriage
+ * returns stripped, and backslashes replaced with forward slashes.
+ */
+SV* html_url(pTHX_ SV *uri, SV *base) {
+  size_t i = 0;
+  size_t len;
+  const char *in = SvPV_nomg_const(uri, len);
+  uri_str_t *out = str_new(aTHX_ len);
+
+  if (in[0] == '/' && in[1] == '/') {
+    if (base != NULL && (SvOK(base) || SvROK(base))) {
+      uri_t *base_uri = URI(base);
+      str_append(aTHX_ out, base_uri->scheme->string, base_uri->scheme->length);
+      str_append(aTHX_ out, ":", 1);
+    }
+  }
+
+  // Remove characters specified by the URL standard
+  for (i = 0; i < len + 1; ++i) {
+    switch (in[i]) {
+      // Strip tabs, line feeds, and carriage returns
+      case '\t':
+      case '\r':
+      case '\n':
+        break;
+
+      // Convert backslashes to forward slashes
+      case '\\':
+        str_append(aTHX_ out, "/", 1);
+        break;
+
+      default:
+        str_append(aTHX_ out, &in[i], 1);
+        break;
+    }
+  }
+
+  return URI_STR_2SV(out);
+}
+
 
 MODULE = URI::Fast  PACKAGE = URI::Fast
 
@@ -1974,8 +2015,13 @@ SV* decode(in)
 #-------------------------------------------------------------------------------
 # Constructors and destructors
 #-------------------------------------------------------------------------------
+void DESTROY(uri_obj)
+  SV *uri_obj
+  CODE:
+    DESTROY(aTHX_ uri_obj);
+
 SV* new(class, uri_str)
-  const char* class
+  const char *class
   SV* uri_str
   ALIAS:
     new_iri = 1
@@ -1988,37 +2034,10 @@ SV* new(class, uri_str)
   OUTPUT:
     RETVAL
 
-void DESTROY(uri_obj)
-  SV* uri_obj
-  CODE:
-    DESTROY(aTHX_ uri_obj);
-
-SV* uri(...)
-  ALIAS:
-    iri   = 1
-    clone = 2
-  PREINIT:
-    SV *str;
-  CODE:
-    if (items > 0) {
-      if (sv_isobject(ST(0)) && sv_derived_from(ST(0), "URI::Fast")) {
-        str = sv_2mortal(to_string(aTHX_ ST(0)));
-      } else {
-        str = ST(0);
-      }
-    }
-    else {
-      str = sv_2mortal(newSVpvn("", 0));
-    }
-
-    RETVAL = new(aTHX_ (ix == 1) ? "URI::Fast::IRI" : "URI::Fast", str, (ix == 1) ? 1 : 0);
-  OUTPUT:
-    RETVAL
-
 SV* new_abs(class, rel, base)
-  const char* class
-  SV* rel
-  SV* base
+  const char *class
+  SV *rel
+  SV *base
   PREINIT:
     SV *abs;
   CODE:
@@ -2031,13 +2050,112 @@ SV* new_abs(class, rel, base)
     }
 
     abs = new(aTHX_ class, sv_2mortal(newSVpvn("", 0)), 0);
-
     absolute(aTHX_ abs, rel, base);
-
     RETVAL = abs;
   OUTPUT:
     RETVAL
 
+SV* new_html_url(class, url, ...)
+  const char *class
+  SV *url
+  PREINIT:
+    SV *base = NULL;
+    SV *rel;
+    SV *abs;
+  CODE:
+    if (items > 2) {
+      if (!sv_isobject(ST(2)) || !sv_derived_from(ST(2), "URI::Fast")) {
+        base = sv_2mortal(new(aTHX_ "URI::Fast", ST(2), 0));
+      } else {
+        base = ST(2);
+      }
+
+      rel = new(aTHX_ "URI::Fast", sv_2mortal(html_url(aTHX_ url, base)), 0);
+      abs = new(aTHX_ "URI::Fast", sv_2mortal(newSVpvn("", 0)), 0);
+      absolute(aTHX_ abs, sv_2mortal(rel), base);
+      normalize(aTHX_ abs);
+      RETVAL = abs;
+    }
+    else {
+      rel = new(aTHX_ class, sv_2mortal(html_url(aTHX_ url, base)), 0);
+      normalize(aTHX_ rel);
+      RETVAL = rel;
+    }
+
+  OUTPUT:
+    RETVAL
+
+#-------------------------------------------------------------------------------
+# Short-hand constructors
+#-------------------------------------------------------------------------------
+SV* uri(...)
+  ALIAS:
+    iri   = 1
+    clone = 2
+  PREINIT:
+    SV *uri_str;
+  CODE:
+    if (items == 0) {
+      uri_str = sv_2mortal(newSVpvn("", 0));
+    } else {
+      uri_str = ST(0);
+    }
+
+    if (ix == 1) {
+      RETVAL = new(aTHX_ "URI::Fast::IRI", uri_str, 1);
+    } else {
+      RETVAL = new(aTHX_ "URI::Fast", uri_str, 0);
+    }
+  OUTPUT:
+    RETVAL
+
+SV* abs_uri(rel, base)
+  SV *rel
+  SV *base
+  PREINIT:
+    SV *abs;
+  CODE:
+    if (!sv_isobject(rel) || !sv_derived_from(rel, "URI::Fast")) {
+      rel = sv_2mortal(new(aTHX_ "URI::Fast", rel, 0));
+    }
+
+    if (!sv_isobject(base) || !sv_derived_from(base, "URI::Fast")) {
+      base = sv_2mortal(new(aTHX_ "URI::Fast", base, 0));
+    }
+
+    abs = new(aTHX_ "URI::Fast", sv_2mortal(newSVpvn("", 0)), 0);
+    absolute(aTHX_ abs, rel, base);
+    RETVAL = abs;
+  OUTPUT:
+    RETVAL
+
+SV* html_url(url, ...)
+  SV *url
+  PREINIT:
+    SV *base = NULL;
+    SV *abs;
+    SV *rel;
+  CODE:
+    if (items > 1) {
+      if (!sv_isobject(ST(1)) || !sv_derived_from(ST(1), "URI::Fast")) {
+        base = sv_2mortal(new(aTHX_ "URI::Fast", ST(1), 0));
+      } else {
+        base = ST(1);
+      }
+
+      rel = new(aTHX_ "URI::Fast", sv_2mortal(html_url(aTHX_ url, base)), 0);
+      abs = new(aTHX_ "URI::Fast", sv_2mortal(newSVpvn("", 0)), 0);
+      absolute(aTHX_ abs, sv_2mortal(rel), base);
+      normalize(aTHX_ abs);
+      RETVAL = abs;
+    }
+    else {
+      rel = new(aTHX_ "URI::Fast", sv_2mortal(html_url(aTHX_ url, base)), 0);
+      normalize(aTHX_ rel);
+      RETVAL = rel;
+    }
+  OUTPUT:
+    RETVAL
 
 #-------------------------------------------------------------------------------
 # Clearers

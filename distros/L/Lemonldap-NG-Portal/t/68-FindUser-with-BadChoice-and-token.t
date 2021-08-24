@@ -18,12 +18,12 @@ my $client = LLNG::Manager::Test->new( {
                 '2_ssl'  => 'SSL;Demo;Null',
             },
             authChoiceFindUser => '1_dem',
-            useSafeJail       => 1,
-            requireToken      => 1,
-            findUser          => 1,
-            impersonationRule => 1,
+            useSafeJail        => 1,
+            requireToken       => 1,
+            findUser           => 1,
+            impersonationRule  => 1,
             findUserSearchingAttributes =>
-              { uid => 'Login', guy => 'Kind', cn => 'Name' },
+              { 'uid##1' => 'Login', 'guy##1' => 'Kind', 'cn##1' => 'Name' },
             findUserExcludingAttributes =>
               { type => 'mutant', uid => 'rtyler' },
         }
@@ -53,12 +53,12 @@ ok(
     'Post FindUser request'
 );
 ok(
-        $res->[2]->[0] =~
-m%<input id="spoofIdfield" name="spoofId" type="text" class="form-control" value="" autocomplete="off"%,
-        'value=""'
-    ) or explain( $res->[2]->[0], 'value=""' );
+    $res->[2]->[0] =~
+m%<input name="spoofId" type="text" class="form-control" value="" autocomplete="off"%,
+    'value=""'
+) or explain( $res->[2]->[0], 'value=""' );
 ( $host, $url, $query ) =
-      expectForm( $res, '#', undef, 'uid', 'guy', 'cn', 'token' );
+  expectForm( $res, '#', undef, 'uid', 'guy', 'cn', 'token' );
 $query =~ s/user=/user=rtyler/;
 $query =~ s/password=/password=rtyler/;
 $query =~ s/2_ssl/1_demo/;

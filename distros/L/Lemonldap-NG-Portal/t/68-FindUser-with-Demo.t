@@ -22,9 +22,9 @@ my $client = LLNG::Manager::Test->new( {
             findUserControl             => '^[\w*\s]+$',
             findUserWildcard            => '*',
             findUserSearchingAttributes => {
-                uid         => undef,
-                guy         => 'Kind',
-                'cn#Name#1' => 'Bad Guy; Not a good person; BB; Bad Boy'
+                'uid#fdgd#1' => undef,
+                'guy##1'     => 'Kind',
+                'cn#Name#1'  => 'Bad Guy; Not a good person; BB; Bad Boy'
             },
             findUserExcludingAttributes =>
               { type => 'mutant', uid => 'rtyler' },
@@ -52,7 +52,7 @@ ok(
 ( $host, $url, $query ) = expectForm( $res, '#', undef, 'uid', 'guy' );
 ok(
     $res->[2]->[0] =~
-m%<input id="spoofIdfield" name="spoofId" type="text" class="form-control" value="" autocomplete="off"%,
+m%<input name="spoofId" type="text" class="form-control" value="" autocomplete="off"%,
     'value=""'
 ) or explain( $res->[2]->[0], 'value=""' );
 
@@ -84,11 +84,11 @@ m%<input id="findUser_uid" name="uid" type="text" autocomplete="off" class="form
 ) or explain( $res->[2]->[0], 'id="findUser_uid"' );
 ok(
     $res->[2]->[0] =~
-      m%<select class="form-control" id="findUser_cn" name="cn">%,
+      m%<select class="custom-select" id="findUser_cn" name="cn">%,
     'id="findUser_cn"'
 ) or explain( $res->[2]->[0], 'id="findUser_cn"' );
-ok( $res->[2]->[0] =~ m%<label for="cn">Name</label>%, 'label for="cn"' )
-  or explain( $res->[2]->[0], 'label for="cn"' );
+ok( $res->[2]->[0] =~ m%<option selected>Name...</option>%, 'Name...' )
+  or explain( $res->[2]->[0], 'Name...' );
 ok( $res->[2]->[0] =~ m%<option value=""></option>%, 'Empty option' )
   or explain( $res->[2]->[0], 'Empty option' );
 ok( $res->[2]->[0] =~ m%<option value="BB">Bad Boy</option>%, 'BB option' )

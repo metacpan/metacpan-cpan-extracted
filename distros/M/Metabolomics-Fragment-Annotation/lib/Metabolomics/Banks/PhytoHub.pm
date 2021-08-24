@@ -49,10 +49,11 @@ Metabolomics::Banks::PhytoHub - Perl extension for PhytoHub bank
 =head1 VERSION
 
 Version 0.1 - init
+Version 0.2 - Completing object properties
 
 =cut
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 =head1 SYNOPSIS
 
@@ -83,6 +84,7 @@ our $VERSION = '0.1';
 
 sub new {
     ## Variables
+    my ($class,$args) = @_;
     my $self={};
     
     $self = Metabolomics::Banks->new() ;
@@ -91,6 +93,9 @@ sub new {
     $self->{_DATABASE_VERSION_} = '1.4_Beta' ;
     $self->{_DATABASE_ENTRIES_NB_} = 1757 ;
     $self->{_DATABASE_URL_} = 'http://phytohub.eu/' ;
+    $self->{_DATABASE_URL_CARD_} = 'https://phytohub.eu/entries/' ;
+    $self->{_DATABASE_TYPE_} = 'METABOLITE' ;
+    $self->{_POLARITY_} =  $args->{POLARITY} ;
     $self->{_DATABASE_DOI_} = 'NA' ;
     ## _DATABASE_ENTRIES_
     bless($self) ;

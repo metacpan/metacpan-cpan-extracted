@@ -593,9 +593,10 @@ $(window).on 'load', () ->
 
 	#$('#formpass').on 'submit', changePwd
 
-	$('#resetfinduserform').on 'click', () ->
-		console.log 'Reset form'
-		$('#finduserForm').trigger('reset')
+	$('.clear-finduser-field').on 'click', () ->
+		$(this).parent().find(':input').each ->
+			console.log 'Clear search field ->', $(this).attr 'name'
+			$(this).val ''
 
 	$('#closefinduserform').on 'click', () ->
 		console.log 'Clear modal'
@@ -616,7 +617,8 @@ $(window).on 'load', () ->
 				document.body.style.cursor = 'default'
 				user = data.user
 				console.log 'Suggested spoofId=', user
-				$('#spoofIdfield').attr 'value', user
+				$("input[name=spoofId]").each ->
+					$(this).attr 'value', user
 				$('#captcha').attr 'src', data.captcha if data.captcha
 				if data.token
 					$('#finduserToken').attr 'value', data.token 

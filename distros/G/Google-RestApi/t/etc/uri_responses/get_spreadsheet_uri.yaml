@@ -1,0 +1,6 @@
+GET:
+  https://sheets.googleapis.com/v4/spreadsheets/fake_spreadsheet_id1?fields=spreadsheetUrl:
+    response: |
+      {
+        "spreadsheetUrl": "https://docs.google.com/spreadsheets/d/fake_spreadsheet_id1/edit"
+      }

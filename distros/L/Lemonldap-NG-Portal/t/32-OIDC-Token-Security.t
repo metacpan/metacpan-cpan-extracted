@@ -150,6 +150,10 @@ count(1);
 # Expect an invalid request
 expectReject( $res, 400, "invalid_grant" );
 
+is( getHeader( $res, "Access-Control-Allow-Origin" ),
+    "*", "CORS header present on Token error response" );
+count(1);
+
 # Get new code for RP1
 $query =
 "response_type=code&scope=openid%20profile%20email&client_id=rpid&state=af0ifjsldkj&redirect_uri=http%3A%2F%2Frp.com%2F";
@@ -202,10 +206,36 @@ ok(
     "Post auth code on correct RP"
 );
 count(1);
+
+is( getHeader( $res, "Access-Control-Allow-Origin" ),
+    "*", "CORS header present on Token response" );
+count(1);
+
 $res = expectJSON($res);
 my $token = $res->{access_token};
 ok( $token, 'Access token present' );
 count(1);
+
+ok(
+    $res = $op->_post(
+        "/oauth2/userinfo",
+        IO::String->new(""),
+        accept => 'text/html',
+        length => 0,
+        custom => {
+            HTTP_AUTHORIZATION => "Bearer " . $token,
+        },
+    ),
+    "post to userinfo",
+);
+count(1);
+ok( $res->[0] == 200, "Userinfo successful" );
+count(1);
+
+is( getHeader( $res, "Access-Control-Allow-Origin" ),
+    "*", "CORS header present on userinfo response" );
+count(1);
+
 Time::Fake->offset("+2h");
 
 ok(
@@ -222,6 +252,10 @@ ok(
 );
 count(1);
 ok( $res->[0] == 401, "Access denied with expired token" );
+count(1);
+
+is( getHeader( $res, "Access-Control-Allow-Origin" ),
+    "*", "CORS header present on userinfo error response" );
 count(1);
 
 clean_sessions();

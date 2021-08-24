@@ -35,16 +35,19 @@
       "runtime" : {
          "requires" : {
             "Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modname" : "0",
+            "Data::Sah::Compiler::perl::TH::array" : "0",
             "Data::Sah::Compiler::perl::TH::bool" : "0",
+            "Data::Sah::Compiler::perl::TH::hash" : "0",
             "Data::Sah::Compiler::perl::TH::str" : "0",
             "Data::Sah::Util::Type" : "0.45",
-            "Module::FeaturesUtil::Check" : "0.002",
-            "Module::FeaturesUtil::Get" : "0.002",
+            "Log::ger" : "0.038",
+            "Module::FeaturesUtil::Check" : "0.005",
+            "Module::FeaturesUtil::Get" : "0.004",
             "Module::List::Tiny" : "0",
             "Perinci::CmdLine::Any" : "0",
             "Perinci::CmdLine::Lite" : "1.827",
             "Perinci::Sub::Args::Common::CLI" : "0",
-            "Sah::Schema::perl::modname" : "0",
+            "Sah::Schema::perl::modname" : "0.035",
             "Sah::Schema::perl::modulefeatures::modname" : "0",
             "perl" : "5.010001",
             "strict" : "0",
@@ -72,12 +75,17 @@
          "web" : "https://github.com/perlancar/perl-App-ModuleFeaturesUtils"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript compare-module-feature",
+            "version" : "0.423"
+         },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript get-feature-set-spec",

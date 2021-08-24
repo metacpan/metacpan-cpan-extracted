@@ -2,7 +2,7 @@ package Pod::Coverage::TrustMe;
 use strict;
 use warnings;
 
-our $VERSION = '0.001002';
+our $VERSION = '0.002000';
 $VERSION =~ tr/_//d;
 
 use Pod::Coverage::TrustMe::Parser;
@@ -21,6 +21,7 @@ use constant DEFAULT_PRIVATE => do {
     (map qr{\A\Q$_\E\z}, grep !$s{$_}++, qw(
       import
       unimport
+      VERSION
 
       can
       isa
@@ -35,6 +36,8 @@ use constant DEFAULT_PRIVATE => do {
 
       BUILD
       BUILDALL
+      BUILDARGS
+      FOREIGNBUILDARGS
       DEMOLISH
       DEMOLISHALL
 
@@ -78,6 +81,11 @@ our $PACKAGE_RE = qr{
 }x;
 &Internals::SvREADONLY(\$PACKAGE_RE, 1);
 
+my %ALIASES = (
+  nonwhitespace => 'require_content',
+  trustme       => 'trust_methods',
+);
+
 my %DEFAULTS = (
   trust_roles     => 1,
   trust_parents   => 1,
@@ -85,8 +93,9 @@ my %DEFAULTS = (
   require_link    => 0,
   export_only     => 0,
   ignore_imported => 1,
-  nonwhitespace   => 0,
-  trustme         => [],
+  require_content => 0,
+  trust_methods   => [],
+  trust_packages  => [],
   private         => DEFAULT_PRIVATE,
   pod_from        => undef,
   package         => undef,
@@ -96,6 +105,16 @@ sub new {
   my ($class, %args) = @_;
   $class = ref $class
     if ref $class;
+
+  for my $alias (sort keys %ALIASES) {
+    if (exists $args{$alias}) {
+      my $to = $ALIASES{$alias};
+      if (exists $args{$to}) {
+        croak "$alias is an alias to $to, they can't both be specified!";
+      }
+      $args{$to} = delete $args{$alias};
+    }
+  }
 
   my $new = {
     map +($_ => exists $args{$_} ? $args{$_} : $DEFAULTS{$_}), keys %DEFAULTS,
@@ -135,7 +154,7 @@ sub symbols {
 
     my %pods    = map +( $_ => 1 ), @{ $self->_get_pods($package) };
     my %symbols = map +(
-      $_ => ($pods{$_} || $self->_trustme_check($_) || 0),
+      $_ => ($pods{$_} || $self->_trust_method_check($_) || 0),
     ), $self->_get_syms($package);
 
     if (!grep $_, values %symbols) {
@@ -258,7 +277,10 @@ sub _get_roles {
   my $does
     = $package->can('does') ? 'does'
     : $package->can('DOES') ? 'DOES'
-                            : return;
+                            : undef;
+  if (!$does || $package->can($does) == \&UNIVERSAL::DOES) {
+    return;
+  }
   return grep $_ ne $package && $package->$does($_), $self->_search_packages;
 }
 
@@ -300,15 +322,14 @@ sub _pod_for {
 sub trusted_packages {
   my $self = shift;
 
-  my %to_parse = (
-    $self->package => 1,
-  );
-  @to_parse{$self->_get_roles} = ()
-    if $self->{trust_roles};
-  @to_parse{$self->_get_parents} = ()
-    if $self->{trust_parents};
+  my %seen;
+  my @trusted = sort grep !$seen{$_}++,
+    $self->package,
+    @{ $self->{trust_packages} },
+    ($self->{trust_roles} ? $self->_get_roles : ()),
+    ($self->{trust_parents} ? $self->_get_parents : ()),
+  ;
 
-  my @trusted = sort keys %to_parse;
   return @trusted;
 }
 
@@ -317,7 +338,7 @@ sub _new_pod_parser {
   my $self = shift;
 
   my $parser = $self->_pod_parser_class->new(@_);
-  if ($self->{nonwhitespace}) {
+  if ($self->{require_content}) {
     $parser->ignore_empty(1);
   }
   return $parser;
@@ -427,13 +448,20 @@ sub _private_check {
   return scalar grep $sym =~ /$_/, @{ $self->{private} };
 }
 
+# providing _trustme_check and make overriding it work for compatibility with
+# Pod::Coverage
+sub _trust_method_check {
+  my $self = shift;
+  $self->_trustme_check(@_);
+}
+
 sub _trustme_check {
   my $self = shift;
   my ($sym) = @_;
 
   return scalar grep $sym =~ /$_/,
-    @{ $self->{trustme} },
-    @{ $self->_trusted_from_pod };
+    @{ $self->{trust_methods} },
+    ($self->{trust_pod} ? @{ $self->_trusted_from_pod } : ());
 }
 
 sub _imported_check {
@@ -484,24 +512,29 @@ pod file existing in the same directory, if it exists.
 
 An array ref of regular expressions for subs to consider private and not needing
 to be documented. If non-regular expressions are included in the list, they will
-be taken as literal sub names.
-Defaults to L</DEFAULT_PRIVATE>.
+be taken as literal sub names. Defaults to L</DEFAULT_PRIVATE>.
 
 =item also_private
 
 An array ref of items to add to the private list. Makes it easy to augment the
 default list.
 
-=item trustme
+=item trust_methods
 
 An array ref of subs to consider documented even if no pod can be found. Has a
 similar effect to L</private>, but will include the subs in the list of covered
 subs, rather than excluding them from the list entirely.
 
-=item nonwhitespace
+C<trustme> is an alias to this option, provided for compatibility with
+L<Pod::Coverage>.
+
+=item require_content
 
 Requires that the pod section for the sub have some non-whitespace characters in
-it to be counted as covering the sub.
+it to be counted as covering the sub. Defaults to false.
+
+C<nonwhitespace> is an alias to this option, provided for compatibility with
+L<Pod::Coverage>.
 
 =item trust_parents
 
@@ -514,10 +547,16 @@ Includes Pod from consumed roles in list of covered subs. Like
 L<Pod::Coverage::CountParents>, but checking C<does> or C<DOES>. Defaults to
 true.
 
+=item trust_packages
+
+Includes Pod from an array ref of packages in the list of covered subs.
+
 =item trust_pod
 
 Trusts subs or regexes listed in C<Pod::Coverage> blocks in Pod. Like
 L<Pod::Coverage::TrustPod>. Defaults to true.
+
+The regexes must match the entire method name.
 
 A section like:
 
@@ -526,15 +565,18 @@ A section like:
 will allow the subs C<sub1>, C<sub2>, and any sub that is all upper case to
 exist without being documented.
 
+The special token C<*EVERYTHING*> can be used to trust every method.
+
 =item require_link
 
 Requires a link in the Pod to parent classes or roles to include them in the
 coverage. If the documentation for subs is in different files, they should be
-linked to in some way.
+linked to in some way. Defaults to false.
 
 =item export_only
 
 Only requires subs listed in C<@EXPORT> and C<@EXPORT_OK> to be covered.
+Defaults to false.
 
 =item ignore_imported
 
@@ -607,7 +649,7 @@ Returns an array ref of all of the covered items in the pod.
 
 Returns true if the given symbol should be considered private.
 
-=item _trustme_check($symbol)
+=item _trust_method_check($symbol)
 
 Returns true if the given symbol should be treated as covered even without any
 documentation found.
@@ -620,7 +662,9 @@ documentation found.
 
 =item DEFAULT_PRIVATE
 
-An array reference of the default list of private regular expressions.
+An array reference of the default list of private regular expressions. This
+includes methods beginning with underscores, methods called by perl for
+language features, and methods called internally by Moo and Moose.
 
 =back
 

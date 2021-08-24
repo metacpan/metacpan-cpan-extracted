@@ -1,9 +1,9 @@
 package Perinci::CmdLine::POD;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-10'; # DATE
+our $DATE = '2021-08-22'; # DATE
 our $DIST = 'Perinci-CmdLine-POD'; # DIST
-our $VERSION = '0.023'; # VERSION
+our $VERSION = '0.024'; # VERSION
 
 use 5.010001;
 use strict;
@@ -430,99 +430,6 @@ sub gen_pod_for_pericmd_script {
             my $usage = $clidocdata{''}->{'usage_line.alt.fmt.pod'};
             $usage =~ s/\[\[prog\]\]/$program_name/;
             push @sectpod, "% $usage\n\n";
-        }
-
-        my @examples;
-        for my $sc_name (sort keys %clidocdata) {
-            if ($cli->{subcommands}) {
-                next unless length $sc_name;
-                if (defined $gen_sc) { next unless $sc_name eq $gen_sc }
-            }
-            my $i = 1;
-            for my $eg (@{ $clidocdata{$sc_name}{examples} }) {
-                # add pointer to subcommand, we need it later to show result
-                $eg->{_sc_name} = $sc_name;
-                $eg->{_i} = $i;
-                push @examples, $eg;
-                $i++;
-            }
-        }
-        if (@examples) {
-            push @sectpod, "Examples:\n\n";
-            for my $eg (@examples) {
-                my $url = $urls{ $eg->{_sc_name} };
-                my $meta = $metas{ $eg->{_sc_name} };
-                push @sectpod, "$eg->{summary}:\n\n" if $eg->{summary};
-                my $cmdline = $eg->{cmdline};
-                $cmdline =~ s/\[\[prog\]\]/$cli->{subcommands} ? "$program_name $eg->{_sc_name}" : $program_name/e;
-                push @sectpod, " % $cmdline\n";
-
-                my $show_result;
-              SHOW_RESULT:
-                {
-                    my $fres;
-                    last unless $eg->{example_spec}{'x.doc.show_result'} // 1;
-
-                    if ($eg->{example_spec}{src}) {
-                        if ($eg->{example_spec}{src_plang} =~ /\A(bash)\z/) {
-                            # execute script and get its output
-                            if (defined $args{script}) {
-                                my $cmdline = $eg->{cmdline};
-                                $cmdline =~ s/\[\[prog\]\]/shell_quote($^X, (map {"-I$_"} @{ $args{libs} || [] }), $args{script}, ($cli->{subcommands} ? ($eg->{_sc_name}) : ()))/e;
-                                system(
-                                    {log=>1, shell => 0, capture_stdout => \$fres},
-                                    "bash", "-c", $cmdline);
-                                if ($?) {
-                                    die sprintf("Example #%d (subcommand %s): cmdline %s: failed: %s", $eg->{_i}, $eg->{_sc_name}, $cmdline, explain_child_error());
-                                }
-                            }
-                            #$self->log_debug(["fres: %s", $fres]);
-                        } else {
-                            warn sprintf("Example #%d (subcommand %s) has src with unsupported src_plang ($eg->{srg_plang}), skipped showing result", $eg->{_i}, $eg->{_sc_name});
-                            last SHOW_RESULT;
-                        }
-                    } else {
-                        my $res;
-                        if (exists $eg->{example_spec}{result}) {
-                            $res = $eg->{example_spec}{result};
-                            $res = [200, "OK", $res] if $meta->{_orig_result_naked};
-                        } else {
-                            my %extra;
-                            if ($eg->{example_spec}{argv}) {
-                                $extra{argv} = $eg->{example_spec}{argv};
-                            } elsif ($eg->{example_spec}{args}) {
-                                $extra{args} = $eg->{example_spec}{args};
-                            } else {
-                                #$self->log_debug(["Example #%d (subcommand %s) doesn't provide args/argv, skipped showing result", $eg->{_i}, $eg->{_sc_name}]);
-                                last SHOW_RESULT;
-                            }
-                            $res = $pa->request(call => $url, \%extra);
-                        }
-                        my $format = $res->[3]{'cmdline.default_format'} // $cli->{default_format} // 'text-pretty';
-                        require Perinci::Result::Format::Lite;
-                        $fres = Perinci::Result::Format::Lite::format($res, $format);
-                    }
-
-                    if (my $max_lines = $eg->{example_spec}{'x.doc.max_result_lines'}) {
-                        my @lines = split /^/, $fres;
-                        if (@lines > $max_lines) {
-                            my $n = int($max_lines/2);
-                            my $num_remove = @lines - $max_lines + 1;
-                            splice @lines, $n, $num_remove, "... ".($num_remove > 1 ? "$num_remove more lines" : "1 more line")." ...\n";
-                            $fres = join("", @lines);
-                        }
-                    }
-
-                    $fres =~ s/^/ /gm;
-                    push @sectpod, $fres;
-                    push @sectpod, "\n";
-                    $show_result = 1;
-                } # SHOW_RESULT
-
-                unless ($show_result) {
-                    push @sectpod, "\n";
-                }
-            }
         }
 
         push @{ $resmeta->{'func.sections'} }, {name=>'SYNOPSIS', content=>join("", @sectpod), ignore=>1};
@@ -962,6 +869,107 @@ _
         push @pod, "=head1 ENVIRONMENT\n\n", @sectpod;
     }
 
+    # section: EXAMPLES
+    {
+        my @sectpod;
+
+        my @examples;
+        for my $sc_name (sort keys %clidocdata) {
+            if ($cli->{subcommands}) {
+                next unless length $sc_name;
+                if (defined $gen_sc) { next unless $sc_name eq $gen_sc }
+            }
+            my $i = 1;
+            for my $eg (@{ $clidocdata{$sc_name}{examples} }) {
+                # add pointer to subcommand, we need it later to show result
+                $eg->{_sc_name} = $sc_name;
+                $eg->{_i} = $i;
+                push @examples, $eg;
+                $i++;
+            }
+        }
+        if (@examples) {
+            push @sectpod, "Examples:\n\n";
+            for my $eg (@examples) {
+                my $url = $urls{ $eg->{_sc_name} };
+                my $meta = $metas{ $eg->{_sc_name} };
+                push @sectpod, "$eg->{summary}:\n\n" if $eg->{summary};
+                my $cmdline = $eg->{cmdline};
+                $cmdline =~ s/\[\[prog\]\]/$cli->{subcommands} ? "$program_name $eg->{_sc_name}" : $program_name/e;
+                push @sectpod, " % $cmdline\n";
+
+                my $show_result;
+              SHOW_RESULT:
+                {
+                    my $fres;
+                    last unless $eg->{example_spec}{'x.doc.show_result'} // 1;
+
+                    if ($eg->{example_spec}{src}) {
+                        if ($eg->{example_spec}{src_plang} =~ /\A(bash)\z/) {
+                            # execute script and get its output
+                            if (defined $args{script}) {
+                                my $cmdline = $eg->{cmdline};
+                                $cmdline =~ s/\[\[prog\]\]/shell_quote($^X, (map {"-I$_"} @{ $args{libs} || [] }), $args{script}, ($cli->{subcommands} ? ($eg->{_sc_name}) : ()))/e;
+                                system(
+                                    {log=>1, shell => 0, capture_stdout => \$fres},
+                                    "bash", "-c", $cmdline);
+                                if ($?) {
+                                    die sprintf("Example #%d (subcommand %s): cmdline %s: failed: %s", $eg->{_i}, $eg->{_sc_name}, $cmdline, explain_child_error());
+                                }
+                            }
+                            #$self->log_debug(["fres: %s", $fres]);
+                        } else {
+                            warn sprintf("Example #%d (subcommand %s) has src with unsupported src_plang ($eg->{srg_plang}), skipped showing result", $eg->{_i}, $eg->{_sc_name});
+                            last SHOW_RESULT;
+                        }
+                    } else {
+                        my $res;
+                        if (exists $eg->{example_spec}{result}) {
+                            $res = $eg->{example_spec}{result};
+                            $res = [200, "OK", $res] if $meta->{_orig_result_naked};
+                        } else {
+                            my %extra;
+                            if ($eg->{example_spec}{argv}) {
+                                $extra{argv} = $eg->{example_spec}{argv};
+                            } elsif ($eg->{example_spec}{args}) {
+                                $extra{args} = $eg->{example_spec}{args};
+                            } else {
+                                #$self->log_debug(["Example #%d (subcommand %s) doesn't provide args/argv, skipped showing result", $eg->{_i}, $eg->{_sc_name}]);
+                                last SHOW_RESULT;
+                            }
+                            $res = $pa->request(call => $url, \%extra);
+                        }
+                        my $format = $res->[3]{'cmdline.default_format'} // $cli->{default_format} // 'text-pretty';
+                        require Perinci::Result::Format::Lite;
+                        $fres = Perinci::Result::Format::Lite::format($res, $format);
+                    }
+
+                    if (my $max_lines = $eg->{example_spec}{'x.doc.max_result_lines'}) {
+                        my @lines = split /^/, $fres;
+                        if (@lines > $max_lines) {
+                            my $n = int($max_lines/2);
+                            my $num_remove = @lines - $max_lines + 1;
+                            splice @lines, $n, $num_remove, "... ".($num_remove > 1 ? "$num_remove more lines" : "1 more line")." ...\n";
+                            $fres = join("", @lines);
+                        }
+                    }
+
+                    $fres =~ s/^/ /gm;
+                    push @sectpod, $fres;
+                    push @sectpod, "\n";
+                    $show_result = 1;
+                } # SHOW_RESULT
+
+                unless ($show_result) {
+                    push @sectpod, "\n";
+                }
+            } # for example
+        } # if @examples
+
+        push @{ $resmeta->{'func.sections'} }, {name=>'EXAMPLES', content=>join("", @sectpod), ignore=>1};
+        push @pod, "=head1 EXAMPLES\n\n", @sectpod;
+    } # section: EXAMPLES
+
     # section: SEE ALSO
     {
         my @sectpod;
@@ -1015,7 +1023,7 @@ Perinci::CmdLine::POD - Generate POD for Perinci::CmdLine-based CLI script
 
 =head1 VERSION
 
-This document describes version 0.023 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2021-07-10.
+This document describes version 0.024 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2021-08-22.
 
 =head1 SYNOPSIS
 
@@ -1169,7 +1177,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2017 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

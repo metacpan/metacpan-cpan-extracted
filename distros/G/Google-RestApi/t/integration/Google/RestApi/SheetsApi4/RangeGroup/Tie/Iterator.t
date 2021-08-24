@@ -1,7 +1,4 @@
-#!/usr/bin/perl
-
-use strict;
-use warnings;
+use Test::Integration::Setup;
 
 use Test::Most tests => 32;
 
@@ -9,8 +6,7 @@ use aliased "Google::RestApi::SheetsApi4::Range::Cell";
 use aliased "Google::RestApi::SheetsApi4::Range::Row";
 use aliased "Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator";
 
-use Utils qw(:all);
-init_logger();
+# init_logger($DEBUG);
 
 my $spreadsheet = spreadsheet();
 my $worksheet = $spreadsheet->open_worksheet(id => 0);
@@ -102,7 +98,7 @@ sub rows_write {
   return;
 }
 
-delete_all_spreadsheets($spreadsheet->sheets());
+delete_all_spreadsheets($spreadsheet->sheets_api());
 
 # use YAML::Any qw(Dump);
 # warn Dump($spreadsheet->stats());

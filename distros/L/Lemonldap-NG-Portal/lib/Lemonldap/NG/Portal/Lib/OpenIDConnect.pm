@@ -22,7 +22,7 @@ use Mouse;
 
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_REDIRECT);
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.13';
 
 # OpenID Connect standard claims
 use constant PROFILE => [
@@ -1358,8 +1358,7 @@ sub sendOIDCError {
 sub returnBearerError {
     my ( $self, $error_code, $error_message ) = @_;
 
-    # TODO: verify this
-    return [
+    my $res = [
         401,
         [
             'WWW-Authenticate' =>
@@ -1367,6 +1366,10 @@ sub returnBearerError {
         ],
         []
     ];
+
+    $self->p->setCorsHeaderFromConfig($res);
+
+    return $res;
 }
 
 sub checkEndPointAuthenticationCredentials {
@@ -2280,7 +2283,7 @@ L<https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues>
 =head1 DOWNLOAD
 
 Lemonldap::NG is available at
-L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
+L<https://lemonldap-ng.org/download>
 
 =head1 COPYRIGHT AND LICENSE
 

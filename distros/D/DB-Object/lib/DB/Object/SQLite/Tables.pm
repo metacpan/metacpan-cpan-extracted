@@ -181,6 +181,23 @@ sub lock { return( shift->error( "There is no table locking in SQLite." ) ); }
 # Inherited from DB::Object::Tables
 # sub primary
 
+sub on_conflict
+{
+    my $self = shift( @_ );
+    my $q = $self->_reset_query;
+    return( $q->on_conflict( @_ ) ) if( !defined( wantarray() ) );
+    if( wantarray() )
+    {
+        my( @val ) = $q->on_conflict( @_ ) || return( $self->pass_error( $q->error ) );
+        return( @val );
+    }
+    else
+    {
+        my $val = $q->on_conflict( @_ ) || return( $self->pass_error( $q->error ) );
+        return( $val );
+    }
+}
+
 sub rename
 {
     my $self  = shift( @_ );
@@ -285,7 +302,7 @@ EOT
         $self->{fields}    = $fields;
         $self->{structure} = $struct;
         $self->{types}     = $types;
-        $self->message( 3, "Fields found: ", sub{ $self->dumper( $fields ) } );
+        $self->message( 3, "Fields found: ", sub{ $self->dump( $fields ) } );
     }
 #    $self->message( sprintf( "struct has %d keys", scalar( keys( %$struct ) ) ) );
     return( wantarray() ? () : undef() ) if( !scalar( keys( %$struct ) ) );
@@ -307,6 +324,7 @@ DESTROY
 
 1;
 
+# XXX POD
 __END__
 
 =encoding utf-8
@@ -367,6 +385,12 @@ Returns true if the current table exists, or false otherwise.
 =head2 lock
 
 Table lock is unsupported in SQLite and this will return an error.
+
+=head2 on_conflict
+
+A convenient wrapper to L<DB::Object::Postgres::Query/on_conflict>
+
+This feature is available in SQLite since version 3.35.0 released on 2021-03-12. If your version of SQLIte is anterior, this will return an error.
 
 =head2 rename
 

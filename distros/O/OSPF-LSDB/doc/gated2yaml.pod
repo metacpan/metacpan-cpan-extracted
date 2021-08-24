@@ -1,19 +1,19 @@
 =head1 NAME
 
-B<gated2yaml> - convert B<gated> OSPF LSDB to YAML file
+gated2yaml - convert B<gated> OSPF LSDB to YAML file
 
 =head1 SYNOPSIS
 
-B<gated2yaml>
-[B<-D> F<dump>]
-[B<-h>]
-[B<-H> I<user@host>]
-[B<-S> I<skip>]
+gated2yaml
+[-D F<dump>]
+[-h]
+[-H user@host]
+[-S skip]
 [F<ospf.yaml>]
 
 =head1 DESCRIPTION
 
-B<gated2yaml> takes the OSPF link state database of the gated routing
+gated2yaml takes the OSPF link state database of the gated routing
 daemon and converts it into a YAML file.
 
 The F<gated_dump> file containing the LSDB can be passed via command
@@ -30,7 +30,7 @@ The options are as follows:
 
 =over 4
 
-=item B<-D> F<dump>
+=item -D F<dump>
 
 File describing the internal state of the B<gated> process including
 the OSPF link state database.
@@ -39,16 +39,16 @@ If the file path is not given, B<gdc dump> is called automatically
 and it is assumed that B<gated> writes its dump file to
 F</var/tmp/gated_dump>.
 
-=item B<-h>
+=item -h
 
 Show help message and exit.
 
-=item B<-H> I<user@host>
+=item -H user@host
 
 The specified user and host are used for ssh login and run B<gdc
 dump> there.
 
-=item B<-S> I<skip>
+=item -S skip
 
 The F<gated_dump> file may contain several state snapshots separated
 each starting with a form feed.

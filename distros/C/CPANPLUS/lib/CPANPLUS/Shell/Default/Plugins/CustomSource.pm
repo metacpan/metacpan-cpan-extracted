@@ -8,7 +8,7 @@ use Data::Dumper;
 use Locale::Maketext::Simple        Class => 'CPANPLUS', Style => 'gettext';
 
 use vars qw[$VERSION];
-$VERSION = "0.9910";
+$VERSION = "0.9912";
 
 =head1 NAME
 

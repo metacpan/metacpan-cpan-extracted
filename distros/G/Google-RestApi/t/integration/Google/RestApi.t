@@ -1,20 +1,13 @@
-#!/usr/bin/perl
+use Test::Integration::Setup;
 
-use strict;
-use warnings;
-
-use YAML::Any qw(Dump);
 use Test::Most tests => 3;
 
 use aliased "Google::RestApi";
 
-use Utils qw(:all);
-init_logger();
-
-my $config_file = rest_api_config();
+# init_logger($DEBUG);
 
 my $api;
-$api = RestApi->new(config_file => $config_file);
+$api = RestApi->new(config_file => config_file());
 isa_ok $api, "Google::RestApi", "New api";
 
 my $about;

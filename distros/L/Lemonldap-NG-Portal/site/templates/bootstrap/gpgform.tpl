@@ -5,7 +5,7 @@
     <div class="input-group-prepend">
       <span class="input-group-text"><label for="userfield" class="mb-0"><i class="fa fa-user"></i></label></span>
     </div>
-    <input id="userfield" name="user" type="text" class="form-control" value="<TMPL_VAR NAME="LOGIN">" trplaceholder="mail" required aria-required="true"/>
+    <input id="userfield" name="user" type="text" class="form-control" value="<TMPL_VAR NAME="LOGIN">" trplaceholder="mail" required aria-required="true" />
   </div>
 
   <div class="input-group mb-3">
@@ -37,10 +37,24 @@
   </a>
   </TMPL_IF>
 
+  <TMPL_IF NAME="DISPLAY_UPDATECERTIF">
+     <a class="btn btn-secondary" href="<TMPL_VAR NAME="MAILCERTIF_URL">?skin=<TMPL_VAR NAME="SKIN"><TMPL_IF NAME="key">&<TMPL_VAR NAME="CHOICE_PARAM">=<TMPL_VAR NAME="key"></TMPL_IF><TMPL_IF NAME="AUTH_URL">&url=<TMPL_VAR NAME="AUTH_URL"></TMPL_IF>">
+        <span class="fa fa-refresh"></span>
+        <span trspan="certificateReset">Reset my certificate</span>
+     </a>
+  </TMPL_IF>
+
+  <TMPL_IF NAME="DISPLAY_FINDUSER">
+    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#finduserModal">
+      <span class="fa fa-search"></span>
+      <span trspan="searchAccount">Search for an account</span>
+    </button>
+  </TMPL_IF>
+
   <TMPL_IF NAME="DISPLAY_REGISTER">
-  <a class="btn btn-secondary" href="<TMPL_VAR NAME="REGISTER_URL">?skin=<TMPL_VAR NAME="SKIN"><TMPL_IF NAME="key">&<TMPL_VAR NAME="CHOICE_PARAM">=<TMPL_VAR NAME="key"></TMPL_IF><TMPL_IF NAME="AUTH_URL">&url=<TMPL_VAR NAME="AUTH_URL"></TMPL_IF>">
-    <span class="fa fa-plus-circle"></span>
-    <span trspan="createAccount">Create an account</span>
-  </a>
+    <a class="btn btn-secondary" href="<TMPL_VAR NAME="REGISTER_URL">?skin=<TMPL_VAR NAME="SKIN"><TMPL_IF NAME="key">&<TMPL_VAR NAME="CHOICE_PARAM">=<TMPL_VAR NAME="key"></TMPL_IF><TMPL_IF NAME="AUTH_URL">&url=<TMPL_VAR NAME="AUTH_URL"></TMPL_IF>">
+      <span class="fa fa-plus-circle"></span>
+      <span trspan="createAccount">Create an account</span>
+    </a>
   </TMPL_IF>
 </div>

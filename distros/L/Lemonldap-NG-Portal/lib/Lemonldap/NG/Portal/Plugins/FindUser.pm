@@ -9,7 +9,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_TOKENEXPIRED
 );
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.13';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -32,8 +32,10 @@ sub init {
     my ($self) = @_;
     ( my $imp = grep /::Plugins::Impersonation$/, $self->p->enabledPlugins )
       ? $self->addUnauthRoute( finduser => 'provideUser', ['POST'] )
-      ->addAuthRoute( finduser => 'provideUser',
-        ['POST'] )    # Allow findUser with reAuth
+      ->addAuthRoute(
+        finduser => 'provideUser',
+        ['POST']
+      )    # Allow findUser with reAuth
       : $self->logger->warn('FindUser plugin enabled without Impersonation');
     $self->logger->warn('FindUser plugin enabled without searching attribute')
       unless keys %{ $self->conf->{findUserSearchingAttributes} };
@@ -87,19 +89,22 @@ sub retreiveFindUserParams {
         my $regex   = '^(?:' . join( '|', keys %values ) . ')$';
         my $checked =
             $select
-          ? $param =~ /$regex/o
-          : $param =~ /$self->{conf}->{findUserControl}/o;
-        push @required, $key if $select && !$null;
+          ? $param =~ /$regex/
+          : $param =~ /$self->{conf}->{findUserControl}/;
+        push @required, $key unless $null;
 
         # For <select>, accept only set values or empty if allowed
         if ( $defined && $checked ) {
-            $self->logger->debug("Append searching parameter: $key =>  $param");
+            $self->logger->debug("Append searching parameter: $key => $param");
             { key => $key, value => $param };
         }
         else {
-            $self->logger->warn(
-                "Parameter $key has been rejected by findUserControl")
-              if $defined;
+            if ($defined) {
+                my $warn =
+                  "Parameter $key has been rejected by findUserControl: ";
+                $warn .= $select ? $regex : $self->conf->{findUserControl};
+                $self->logger->warn($warn);
+            }
             ();
         }
     } sort keys %{ $self->conf->{findUserSearchingAttributes} };

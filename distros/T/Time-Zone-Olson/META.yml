@@ -43,5 +43,5 @@ requires:
 resources:
   bugtracker: https://github.com/david-dick/time-zone-olson/issues
   repository: https://github.com/david-dick/time-zone-olson
-version: '0.38'
+version: '0.40'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

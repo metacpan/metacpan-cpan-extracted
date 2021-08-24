@@ -3,7 +3,7 @@ package Lemonldap::NG::Handler;
 # Use the appropriate handler
 # For Apache, use Lemonldap::NG::Handler::ApacheMP2
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.13';
 
 1;
 
@@ -42,7 +42,7 @@ L<https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues>
 =head1 DOWNLOAD
 
 Lemonldap::NG is available at
-L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
+L<https://lemonldap-ng.org/download>
 
 =head1 COPYRIGHT AND LICENSE
 

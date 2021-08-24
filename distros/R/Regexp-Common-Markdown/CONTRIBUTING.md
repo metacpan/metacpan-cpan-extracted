@@ -43,7 +43,7 @@ Issues are currently reported using CPAN [bug tracker](https://rt.cpan.org/Publi
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/Regexp-Common-Markdown-v0.1.3/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/Regexp-Common-Markdown-v0.1.5/README.md)
 
 ## Author
 

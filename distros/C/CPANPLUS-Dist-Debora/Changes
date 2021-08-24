@@ -1,5 +1,9 @@
 Revision history for CPANPLUS-Dist-Debora
 
+0.003  2021-08-20 08:36:54 CEST
+
+  - Skip some tests unless RELEASE_TESTING is set
+
 0.002  2021-08-19 14:48:39 CEST
 
   - Add Mach-O magic

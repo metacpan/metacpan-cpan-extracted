@@ -5,13 +5,14 @@ package Google::RestApi::SheetsApi4::RangeGroup;
 # called are commented thusly:
 # "private range routine called here!"
 
-our $VERSION = '0.7';
+our $VERSION = '0.8';
 
 use Google::RestApi::Setup;
 
 use Carp qw(cluck confess);
 use List::Util qw(first);
 use Scalar::Util qw(looks_like_number);
+use Storable qw(dclone);
 
 use aliased 'Google::RestApi::SheetsApi4::RangeGroup::Iterator';
 
@@ -37,7 +38,7 @@ sub push_ranges {
 sub clear {
   my $self = shift;
 
-  $_->clear_cached_values() foreach $self->ranges();
+  $self->clear_cached_values();
 
   my @ranges = map { $_->range(); } $self->ranges();
   my %p = (
@@ -46,6 +47,18 @@ sub clear {
     method  => "post",
   );
   return $self->api(%p);
+}
+
+sub clear_cached_values {
+  my $self = shift;
+  $_->clear_cached_values() foreach $self->ranges();
+  return;
+}
+
+sub refresh_values {
+  my $self = shift;
+  $self->clear_cached_values();
+  return $self->values();
 }
 
 sub values {
@@ -71,8 +84,8 @@ sub values {
     if ($_->dimension() =~ /^col/i) { push(@cols, $_); }
     else { push(@rows, $_); }
   }
-  $self->_batch_get('col', $p, \@cols);
-  $self->_batch_get('row', $p, \@rows);
+  $self->_batch_get('col', dclone($p), \@cols);
+  $self->_batch_get('row', dclone($p), \@rows);
 
   my @values = map { $_->values(); } @ranges;
   return \@values;
@@ -93,6 +106,7 @@ sub _batch_get {
 
   my $value_ranges = $response->{valueRanges};
   # private range routine called here!
+  my @ranges2 = map { $_->range(); } @$ranges;
   $ranges->[$_]->_cache_range_values(%{ $value_ranges->[$_] })
     foreach (0..$#$ranges);
 
@@ -186,8 +200,11 @@ sub AUTOLOAD {
 }
 
 sub ranges { @{ shift->{ranges} }; }
-sub api { shift->spreadsheet()->api(@_); }
 sub spreadsheet { shift->{spreadsheet}; }
+sub api { shift->spreadsheet()->api(@_); }
+sub sheets_api { shift->spreadsheet()->sheets_api(); }
+sub rest_api { shift->sheets_api()->rest_api(); }
+sub transaction { shift->rest_api()->transaction(); }
 
 1;
 

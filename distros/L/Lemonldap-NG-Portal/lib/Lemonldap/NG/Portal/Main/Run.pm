@@ -9,7 +9,7 @@
 #
 package Lemonldap::NG::Portal::Main::Run;
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.13';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -576,14 +576,14 @@ sub updateSession {
     if ($id) {
 
         # Update sessionInfo data
-        ## sessionInfo updated if $id defined : quite strange !!
+        ## sessionInfo updated if $id defined : quite strange!!
         ## See https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues/430
         $self->logger->debug("Update session $id");
         foreach ( keys %$infos ) {
             $self->logger->debug("Update sessionInfo $_");
             $self->_dump( $infos->{$_} );
             $req->{sessionInfo}->{$_} = $infos->{$_};
-            if ( $id eq $self->HANDLER->data->{_session_id} ) {
+            if ( $self->HANDLER->data->{_session_id} && $id eq $self->HANDLER->data->{_session_id} ) {
                 $self->HANDLER->data->{$_} = $infos->{$_};
             }
         }
@@ -877,12 +877,7 @@ sub sendHtml {
       'Pragma'        => 'no-cache',                               # HTTP 1.0
       'Expires'       => '0';                                      # Proxies
 
-    if ( $self->conf->{corsEnabled} ) {
-        my @cors = split /;/, $self->cors;
-        push @{ $res->[1] }, @cors;
-        $self->logger->debug('Apply following CORS policy :');
-        $self->logger->debug(" $_") for @cors;
-    }
+    $self->setCorsHeaderFromConfig($res);
 
     # Set authorized URL for POST
     my $csp = $self->csp . "form-action " . $self->conf->{cspFormAction};
@@ -1088,7 +1083,7 @@ sub registerLogin {
     }
 
     my $history = $req->sessionInfo->{_loginHistory} ||= {};
-    my $type    = ( $req->authResult > 0 ? 'failed' : 'success' ) . 'Login';
+    my $type = ( $req->authResult > 0 ? 'failed' : 'success' ) . 'Login';
     $history->{$type} ||= [];
     $self->logger->debug("Current login saved into $type");
 
@@ -1131,13 +1126,11 @@ sub _sumUpSession {
 sub corsPreflight {
     my ( $self, $req ) = @_;
     my @headers;
-    if ( $self->conf->{corsEnabled} ) {
-        my @cors = split /;/, $self->cors;
-        push @headers, @cors;
-        $self->logger->debug('Apply following CORS policy :');
-        $self->logger->debug(" $_") for @cors;
-    }
-    return [ 204, \@headers, [] ];
+    my $res = [ 204, \@headers, [] ];
+
+    $self->setCorsHeaderFromConfig($res);
+
+    return $res;
 }
 
 sub sendJSONresponse {
@@ -1166,11 +1159,8 @@ sub sendJSONresponse {
           "Access-Control-Allow-Credentials" => "true";
 
     }
-    elsif ( $self->conf->{corsEnabled} ) {
-        my @cors = split /;/, $self->cors;
-        push @{ $res->[1] }, @cors;
-        $self->logger->debug('Apply following CORS policy :');
-        $self->logger->debug(" $_") for @cors;
+    else {
+        $self->setCorsHeaderFromConfig($res);
     }
     return $res;
 }
@@ -1178,13 +1168,21 @@ sub sendJSONresponse {
 sub sendRawHtml {
     my ($self) = $_[0];
     my $res = Lemonldap::NG::Common::PSGI::sendRawHtml(@_);
+
+    $self->setCorsHeaderFromConfig($res);
+
+    return $res;
+}
+
+sub setCorsHeaderFromConfig {
+    my ( $self, $response ) = @_;
+
     if ( $self->conf->{corsEnabled} ) {
         my @cors = split /;/, $self->cors;
-        push @{ $res->[1] }, @cors;
+        push @{ $response->[1] }, @cors;
         $self->logger->debug('Apply following CORS policy :');
         $self->logger->debug(" $_") for @cors;
     }
-    return $res;
 }
 
 # Temlate loader

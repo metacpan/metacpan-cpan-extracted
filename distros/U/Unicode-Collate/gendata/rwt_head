@@ -1,0 +1,88 @@
+#!perl
+# rwt_head : rewrite the header part of test files in ../t
+#
+# The header terminator should be a line of '#'x25.
+
+use strict;
+use warnings;
+require './gen-head'; # for testhead()
+
+my $testdirname = '../t';
+opendir TESTDIR, $testdirname;
+my @testfile = grep /\.t$/, readdir TESTDIR;
+closedir TESTDIR;
+
+# to keep the current test count and its comment
+my $re_test_count = qr/print "1\.\.([0-9]+)\\n"; \}/;
+
+my $req_perl = <<'REQPERL';
+    unless (5.008 <= $]) {
+	print "1..0 # skipped: Perl 5.8.0 or later needed for this test\n";
+	print $@;
+	exit;
+    }
+REQPERL
+
+my $req_norm = <<'REQNORM';
+BEGIN {
+    eval { require Unicode::Normalize; };
+    if ($@) {
+	print "1..0 # skipped: Unicode::Normalize needed for this test\n";
+	print $@;
+	exit;
+    }
+}
+REQNORM
+
+my $count_changed = 0;
+
+for my $filename (@testfile) {
+    open my $origfh, "<$testdirname/$filename";
+
+    my $orig_header = '';
+    my $content = '';
+    my $found_separator;
+
+    for my $line (<$origfh>) {
+	if ($found_separator) {
+	    $content .= $line;
+	} else {
+	    $orig_header .= $line;
+	    $found_separator = 1 if $line =~ /^\#{25}$/;
+	}
+    }
+    close $origfh;
+
+    # keep the current test count and its comment
+    my $current_okcount = 0;
+    my $current_comment = '';
+    if ($orig_header =~ /$re_test_count( #.*|)/o) {
+	$current_okcount = $1;
+	$current_comment = $2;
+    }
+
+    my $new_header = testhead("", $current_okcount);
+    $new_header =~ s/($re_test_count)/$1$current_comment/o;
+
+    # some changes for some test files
+    if ($filename =~ /illegal[^p]|nonchar/) {
+	$new_header =~ s/( *if \(\$ENV{PERL_CORE}\))/$req_perl$1/;
+    } elsif ($filename =~ /loc/) {
+	$new_header =~ s/(use Unicode::Collate)/${1}::Locale/;
+    } elsif ($filename =~ /normal/) {
+	$new_header =~ s/(use strict;)/$req_norm\n$1/;
+    } # no else
+
+    # nothing to do if no change
+    next if $orig_header eq $new_header;
+
+    # rewrite new files
+    open my $newfh, ">$testdirname/$filename";
+    binmode $newfh;
+    print $newfh "$new_header$content";
+    close $newfh;
+
+    ++my $count_changed;
+}
+
+warn $count_changed ? "changed $count_changed files" : "no change";

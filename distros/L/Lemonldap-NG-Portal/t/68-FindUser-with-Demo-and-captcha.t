@@ -17,15 +17,18 @@ SKIP: {
     }
     my $client = LLNG::Manager::Test->new( {
             ini => {
-                logLevel              => 'error',
-                authentication        => 'Demo',
-                userDB                => 'Same',
-                useSafeJail           => 1,
-                captcha_login_enabled => 1,
-                findUser              => 1,
-                impersonationRule     => 1,
-                findUserSearchingAttributes =>
-                  { uid => 'Login', guy => 'Kind', cn => 'Name' }
+                logLevel                    => 'error',
+                authentication              => 'Demo',
+                userDB                      => 'Same',
+                useSafeJail                 => 1,
+                captcha_login_enabled       => 1,
+                findUser                    => 1,
+                impersonationRule           => 1,
+                findUserSearchingAttributes => {
+                    'uid##1' => 'Login',
+                    'guy##1' => 'Kind',
+                    'cn##1'  => 'Name'
+                }
             }
         }
     );
@@ -48,7 +51,7 @@ SKIP: {
         ' Captcha image inserted' );
     ok(
         $res->[2]->[0] =~
-m#<img class="renewcaptchaclick" src="/static/common/icons/arrow_refresh.png" alt="Renew Captcha" title="Renew Captcha" class="img-thumbnail mb-3" />#,
+m#<img class="renewcaptchaclick" src="/static/common/icons/arrow_refresh.png"#,
         ' Renew Captcha button found'
     ) or explain( $res->[2]->[0], 'Renew captcha button not found' );
     ok( $res->[2]->[0] =~ /captcha\.(?:min\.)?js/, 'Get captcha javascript' );

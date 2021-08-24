@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SR830;
-$Lab::Moose::Instrument::SR830::VERSION = '3.770';
+$Lab::Moose::Instrument::SR830::VERSION = '3.771';
 #ABSTRACT: Stanford Research SR830 Lock-In Amplifier
 
 use v5.20;
@@ -441,6 +441,18 @@ sub calculate_settling_time {
 }
 
 
+
+sub get_auxin {
+    my ( $self, %args ) = validated_getter( 
+      \@_, 
+      channel => { isa => 'Int' },
+    );
+    my $channel = $args{channel};
+    return $self->query( command => "OAUX? $channel", %args );
+}
+
+
+
 __PACKAGE__->meta()->make_immutable();
 
 1;
@@ -457,7 +469,7 @@ Lab::Moose::Instrument::SR830 - Stanford Research SR830 Lock-In Amplifier
 
 =head1 VERSION
 
-version 3.770
+version 3.771
 
 =head1 SYNOPSIS
 
@@ -779,6 +791,12 @@ values:
 
 =back
 
+=head2 get_auxin
+
+ my $v = $lia->get_auxin();
+
+Measure voltage on one of the four auxiliary input ports 1..4.
+
 =head2 Consumed Roles
 
 This driver consumes the following roles:
@@ -796,8 +814,7 @@ This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
             2018       Simon Reinhardt
-            2020       Andreas K. Huettel, Simon Reinhardt
-            2021       Simon Reinhardt
+            2020-2021  Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

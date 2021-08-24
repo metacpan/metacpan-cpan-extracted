@@ -1,17 +1,17 @@
 =head1 NAME
 
-B<ospfview> - periodically display OSPF LSDB as Graphviz dot xlib
+ospfview - periodically display OSPF LSDB as Graphviz dot xlib
 
 =head1 SYNOPSIS
 
-B<ospfview>
-[B<-46bBcdDeEhlpPsSwWv>]
-[B<-H> I<user@host>]
+ospfview
+[-46bBcdDeEhlpPsSwWv]
+[-H user@host]
 [-I interval]
 
 =head1 DESCRIPTION
 
-B<ospfview> periodically polls the OSPF link-state database from a
+ospfview periodically polls the OSPF link-state database from a
 routing daemon and displays it on X11.
 
 Per default only networks, router and links are displayed.
@@ -32,101 +32,101 @@ The options are as follows:
 
 =over 4
 
-=item B<-4>
+=item -4
 
 Use OpenBSD ospfd as database input source.
 This is the default.
 
-=item B<-6>
+=item -6
 
 Use OpenBSD ospf6d as database input source.
 Display an OSPF for IPv6 graph.
 
-=item B<-b>
+=item -b
 
 Display AS boundary router summary LSAs.
 
-=item B<-B>
+=item -B
 
 Display AS boundary router summary LSAs aggregated.
 A single node contains all boundary routers advertised from the
 same router.
 
-=item B<-c>
+=item -c
 
 Identical networks are clustered into a subgraph.
 This visualizes duplicate networks.
 
-=item B<-d>
+=item -d
 
 Show the OSPF database diff between updates if something has changed.
 
-=item B<-D>
+=item -D
 
 Dump the OSPF database after updates as YAML to stdout if something
 has changed.
 
-=item B<-e>
+=item -e
 
 Display AS extrnal LSAs.
 
-=item B<-E>
+=item -E
 
 Display AS extrnal LSAs aggregated.
 A single node contains all external networks advertised from the
 same router.
 
-=item B<-h>
+=item -h
 
 Show help message and exit.
 
-=item B<-H> I<user@host>
+=item -H user@host
 
 The specified user and host are used for ssh login and run B<ospfctl>
 there.
 
-=item B<-I interval>
+=item -I interval
 
 This is the interval in seconds the OSPF daemon is queried.
 Default is 5.
 
-=item B<-l>
+=item -l
 
 Generate legend as dot graph which contains all kinds of nodes and
 edges.
 The corresponding OSPF object is explained.
-Use B<-4> or B<-6> to choose the address family.
+Use -4 or -6 to choose the address family.
 Unimplemented features are displayed in red.
 
-=item B<-p>
+=item -p
 
 Display IPv6 link and intra-area-prefix LSAs.
 
-=item B<-P>
+=item -P
 
 Display IPv6 intra-area-prefix LSAs.
 They are constructed from the link LSAs by the designated router.
 
-=item B<-s>
+=item -s
 
 Display IP network summary LSAs.
 
-=item B<-S>
+=item -S
 
 Display IP network summary LSAs aggregated.
 A single node contains all networks advertised from the same router.
 
-=item B<-w>
+=item -w
 
 Show the most serious warning as in the dot graph.
 That warning also accounts for the color.
 If there is no warning, the area is displayed.
 
-=item B<-W>
+=item -W
 
 Show the all areas and warnings in the dot graph.
 
-=item B<-v>
+=item -v
 
 Be verbose and print all warnings to stderr.
 

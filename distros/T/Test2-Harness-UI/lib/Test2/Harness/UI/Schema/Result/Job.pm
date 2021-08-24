@@ -9,19 +9,12 @@ use Carp qw/confess/;
 confess "You must first load a Test2::Harness::UI::Schema::NAME module"
     unless $Test2::Harness::UI::Schema::LOADED;
 
-our $VERSION = '0.000075';
+our $VERSION = '0.000077';
 
 __PACKAGE__->inflate_column(
     parameters => {
         inflate => DBIx::Class::InflateColumn::Serializer::JSON->get_unfreezer('parameters', {}),
         deflate => DBIx::Class::InflateColumn::Serializer::JSON->get_freezer('parameters', {}),
-    },
-);
-
-__PACKAGE__->inflate_column(
-    fields => {
-        inflate => DBIx::Class::InflateColumn::Serializer::JSON->get_unfreezer('fields', {}),
-        deflate => DBIx::Class::InflateColumn::Serializer::JSON->get_freezer('fields', {}),
     },
 );
 
@@ -50,7 +43,8 @@ sub sig {
 
     return join ";" => (
         (map {$self->$_ // ''} qw/status pass_count fail_count name file fail/),
-        (map {length($self->$_ // '')} qw/fields parameters/),
+        (map {length($self->$_ // '')} qw/parameters/),
+        ($self->job_fields->count),
     );
 }
 
@@ -63,7 +57,8 @@ sub TO_JSON {
 
     # Inflate
     $cols{parameters} = $self->parameters;
-    $cols{fields}     = $self->fields;
+
+    $cols{fields} = [ map { my $d = $_->TO_JSON; $d->{data} = $d->{data} ? \"1" : \"0" ; $d } $self->job_fields->all ];
 
     return \%cols;
 }
@@ -80,10 +75,7 @@ sub glance_data {
     $data{short_file}    = $self->short_file;
     $data{shortest_file} = $self->shortest_file;
 
-    # Inflate
-    if ($data{fields} = $self->fields) {
-        $_->{data} = !!$_->{data} for @{$data{fields}};
-    }
+    $data{fields} = [ map { my $d = $_->TO_JSON; $d->{data} = $d->{data} ? \"1" : \"0" ; $d } $self->job_fields->all ];
 
     return \%data;
 }

@@ -39,7 +39,8 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Test::More" : "0.88",
+            "Test::Needs" : "0"
          }
       }
    },
@@ -58,7 +59,7 @@
          "web" : "https://github.com/haarg/Pod-Coverage-TrustMe"
       }
    },
-   "version" : "0.001002",
+   "version" : "0.002000",
    "x_authority" : "cpan:HAARG",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

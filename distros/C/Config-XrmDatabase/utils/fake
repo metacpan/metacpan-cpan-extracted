@@ -1,0 +1,131 @@
+#! /usr/env/perl
+
+use v5.10;
+
+use strict;
+use warnings;
+
+use FindBin '$Bin';
+
+use blib "$Bin/../../X11-Xlib";
+use lib "$Bin/../lib";
+
+use X11::Xlib::XrmDatabase;
+use Config::XrmDatabase;
+use JSON::PP;
+use Archive::Tar;
+
+srand 1;
+
+my $configs  = 1000;
+my $nrecords = 750;
+
+my $nwords = 8;
+
+my $tar = Archive::Tar->new;
+
+my @lc_alphabet = map { chr($_ + ord('a') ) } 0..25;
+my @uc_alphabet = map { chr($_ + ord('A') ) } 0..25;
+
+for my $config_idx ( 0 .. $configs ) {
+
+    my @name = @{lc_alphabet}[0..$nwords-1];
+    my $name = join( '.', @name );
+
+    my @class = @{uc_alphabet}[0..$nwords-1];
+    my $class = join( '.', @class );
+
+    # create a resource specification
+
+    # iterate through the name.  at each component (except the last) we
+    # can choose to:
+
+    # 1. retain the name component
+
+    # 2. use the class component
+
+    # 3. use a single wildcard, '?'
+
+    # 4. skip components.
+
+
+    my $value = 'value000';
+
+    my %config;
+    my @config;
+
+    my %records;
+
+    my @record_idx = ( 0 .. $nrecords - 1 );
+
+    while ( defined( my $record_idx = shift @record_idx ) ) {
+
+        my $max_skip   = $nwords - 1;
+        my $words_left = $nwords - 1;
+
+        my @idx = ( 0 .. $nwords - 2 );
+        my @record;
+
+        while ( defined( my $idx = shift @idx ) ) {
+
+            my @prob = sort { $a <=> $b } map { rand } 1 .. 3;
+
+            my $choice = rand;
+
+            if ( $choice < $prob[0] / 100 ) {
+                push @record, $name[$idx];
+            }
+            elsif ( $choice < $prob[1] ) {
+                push @record, $class[$idx];
+            }
+            elsif ( $choice < $prob[2] ) {
+                push @record, '?';
+            }
+            else {
+                my $skip = int( rand( $nwords - $idx - 1 ) );
+                push @record, '*';
+                splice( @idx, 0, $skip );
+            }
+        }
+
+        my $key = join(
+            '.',
+            Config::XrmDatabase::_parse_resource_name(
+                join( '.', @record, $name[-1] )
+            )->@*,
+        );
+
+        $key =~ s/[.]?\*[.]?/*/g;
+        # $key =~ s/[.]?\?[.]?/?/g;
+
+        if ( $records{$key}++ ) {
+            unshift @record_idx, $record_idx;
+            next;
+        }
+
+        my $record = sprintf( "%s : %s", $key, ++$value );
+        push @config, $record;
+        $config{$value} = $record;
+    }
+
+    @config = sort @config;
+    my $config = join( "\n", @config, '' );
+
+    my $db = X11::Xlib::XrmDatabase->GetStringDatabase( $config );
+    my $file = sprintf( "config%03d", $config_idx );
+    my $meta = "${file}.json";
+    $db->PutFileDatabase( $file  );
+    $tar->add_files( $file );
+    unlink $file;
+
+    my %res;
+    @res{ 'status', 'type', 'value' } = $db->GetResource( $name, $class );
+
+    $tar->add_data( $meta, encode_json( { class => $class,
+                                       name => $name,
+                                       match => $config{$res{value}},
+                                       res => \%res } ) );
+    say "Wrote $file";
+}
+
+$tar->write( 't/configs.tgz', 9, );

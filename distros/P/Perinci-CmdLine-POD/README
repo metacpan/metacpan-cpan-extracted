@@ -3,8 +3,8 @@ NAME
     script
 
 VERSION
-    This document describes version 0.023 of Perinci::CmdLine::POD (from
-    Perl distribution Perinci-CmdLine-POD), released on 2021-07-10.
+    This document describes version 0.024 of Perinci::CmdLine::POD (from
+    Perl distribution Perinci-CmdLine-POD), released on 2021-08-22.
 
 SYNOPSIS
     Please see the included CLI script gen-pod-for-pericmd-script.
@@ -146,8 +146,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2019, 2017 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2019, 2017 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

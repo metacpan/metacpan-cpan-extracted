@@ -4,6 +4,7 @@ example/13_translate_any_msgid_utf-8.pl
 'example/LocaleData/untranslated de_utf-8.po'
 lib/Locale/Utils/Autotranslator.pm
 lib/Locale/Utils/Autotranslator/ApiMymemoryTranslatedNet.pm
+lib/Locale/Utils/Autotranslator/Interactive.pm
 MANIFEST			This list of files
 README
 t/01_autotranslation_utf-8.t
@@ -14,8 +15,11 @@ t/11_with_paragraphs_utf-8.t
 t/12_with_lines_utf-8.t
 t/13_translate_any_msgid.t
 t/21_api_mymemory_translated_net_utf-8.t
+t/22_interactive_utf-8.t
 t/31_test_examples_utf-8.t
 t/chars.t
+t/LocaleData/STDIN.interactive.txt
+t/LocaleData/STDIN.interactive_end.txt
 't/LocaleData/untranslated de_utf-8.po'
 t/perl_critic.t
 t/pod.t

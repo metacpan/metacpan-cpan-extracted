@@ -1,24 +1,18 @@
-#!/usr/bin/perl
+use Test::Integration::Setup;
 
-use strict;
-use warnings;
-
-
-use Test::Most tests => 6;
-use YAML::Any qw(Dump);
+use Test::Most tests => 8;
 
 use aliased "Google::RestApi::SheetsApi4::RangeGroup";
 
-use Utils qw(:all);
-init_logger();
+# init_logger($DEBUG);
 
 my $spreadsheet = spreadsheet();
 my $worksheet = $spreadsheet->open_worksheet(id => 0);
 
 my @values_in = (
-  [1,  2, 3],
-  [4,  5, 6],
-      99,
+  [1,  2, 3],  # column b
+  [4,  5, 6],  # row 2
+      99,      # the middle bit
 );
 my @values_out = (
   [1, 99, 3],
@@ -32,10 +26,16 @@ my $cell = $worksheet->range_cell([2,2]);
 my $range_group = $spreadsheet->range_group($col, $row, $cell);
 
 isa_ok $range_group->batch_values(values => \@values_in), RangeGroup, "Setting up mixed batch values";
-is_array $range_group->submit_values(), "Submitting mixed values";
-isa_ok $range_group->refresh_values(), RangeGroup, "Refresh values on range group";
+is_array my $values = $range_group->submit_values(), "Submitting mixed values";
+# at this point, each transaction for each range ran independently, so values will look like original values.
+is_deeply $values, \@values_in, "Range group submit values should be correct";
+
+is_array $values = $range_group->refresh_values(), "Refresh values";
+# because the ranges in the group overlap, a refresh will now show the overlapped values.
+is_deeply $values, \@values_out, "Range group refresh values should be correct";
 is_deeply $range_group->values(), \@values_out, "Range group values should be correct";
+
 is_hash $range_group->clear(), "Range group clear";
 is_deeply $range_group->values(), [undef, undef, undef], "Range group values after clear should be empty";
 
-delete_all_spreadsheets($spreadsheet->sheets());
+delete_all_spreadsheets($spreadsheet->sheets_api());

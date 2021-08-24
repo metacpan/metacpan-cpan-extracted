@@ -2,7 +2,10 @@
 
 use Test::More qw( no_plan );
 
-BEGIN { use_ok( 'Regexp::Common::Markdown' ) || BAIL_OUT( "Unable to load Regexp::Common::Markdown" ); }
+BEGIN
+{
+    use_ok( 'Regexp::Common::Markdown' ) || BAIL_OUT( "Unable to load Regexp::Common::Markdown" );
+};
 
 use lib './lib';
 use Regexp::Common qw( Markdown );
@@ -258,13 +261,14 @@ my $tests =
     },
 
     {
-        bold_all => "**. **Test**",
-        bold_text => ". **Test",
+        bold_all => "**Test**",
+        bold_text => "Test",
         bold_type => "**",
         test => "E**. **Test** TestTestTest",
     },
 
     {
+        name => "Long underscore",
         bold_all => "____________",
         bold_text => "________",
         bold_type => "__",

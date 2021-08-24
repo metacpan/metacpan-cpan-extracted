@@ -1,6 +1,6 @@
 =head1 NAME
 
-B<ospfview.cgi> - publish the OSPF LSDB graph on a web server
+ospfview.cgi - publish the OSPF LSDB graph on a web server
 
 =head1 SYNOPSIS
 
@@ -8,7 +8,7 @@ http://127.0.0.1/cgi-bin/ospfview.cgi?ipv6=0&external=2
 
 =head1 DESCRIPTION
 
-The cgi script B<ospfview.cgi> allows to publish the link-state
+The cgi script ospfview.cgi allows to publish the link-state
 database of an OSPF router on a web server running there.
 
 The router must run the OpenBSD B<ospfd> or B<ospf6d> routing daemon.
@@ -29,7 +29,7 @@ feature and is the default.
 =item format
 
 Specify the file format of the generated image.
-The value is passed to the B<dot> B<-T> option.
+The value is passed to the B<dot> -T option.
 Available choices are C<dot>, C<fig>, C<gif>, C<pdf>, C<png>, C<ps>,
 C<ps2>, C<svg>, C<svgz>.
 Default is C<svg>.

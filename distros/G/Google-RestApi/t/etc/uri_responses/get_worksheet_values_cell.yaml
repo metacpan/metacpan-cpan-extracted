@@ -1,0 +1,17 @@
+GET:
+  "https://sheets.googleapis.com/v4/spreadsheets/fake_spreadsheet_id1/values/'Sheet1'!A1?majorDimension=ROWS":
+    response: |
+      {
+        "range": "Sheet1!A1",
+        "majorDimension": "ROWS"
+      }
+    tweaks:
+    - get_value
+  "https://sheets.googleapis.com/v4/spreadsheets/fake_spreadsheet_id1/values/'Customer%20Addresses'!A1?majorDimension=ROWS":
+    response: |
+      {
+        "range": "Sheet1!A1",
+        "majorDimension": "ROWS"
+      }
+    tweaks:
+    - get_value

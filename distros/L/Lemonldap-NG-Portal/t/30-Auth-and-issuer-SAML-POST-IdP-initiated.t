@@ -91,7 +91,7 @@ SKIP: {
         ),
         'Query IdP to access to SP'
     );
-    my ( $host, $url, $query ) =
+    ( $host, $url, $query ) =
       expectAutoPost( $res, 'auth.sp.com', '/saml/proxySingleSignOnPost',
         'SAMLResponse' );
 

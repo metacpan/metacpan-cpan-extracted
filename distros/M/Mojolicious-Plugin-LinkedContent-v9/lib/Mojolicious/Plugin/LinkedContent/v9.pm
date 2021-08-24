@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Mojolicious::Plugin::LinkedContent::v9;
-$Mojolicious::Plugin::LinkedContent::v9::VERSION = '0.09';
+$Mojolicious::Plugin::LinkedContent::v9::VERSION = '0.10';
 use warnings;
 use strict;
 require Mojo::URL;
@@ -228,7 +228,7 @@ Mojolicious::Plugin::LinkedContent::v9 - manage linked css and js
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 AUTHOR
 
@@ -351,9 +351,9 @@ Default reg_config URL: https://raw.githubusercontent.com/EmilianoBruni/MPLConfi
 =head1 Notes about original Mojolicious::Plugin::LinkedContent
 
 This module is a complete replacement for L<Mojolicious::Plugin::LinkedContent>
-and shares with it most of its code. But original module doesn't work with MOjolicious > 8.23
+and shares with it most of its code. But original module doesn't work with Mojolicious > 8.23
 
-There is a issue for in github for this problem
+There is a issue in github for this problem
 
 L<https://github.com/yko/mojolicious-plugin-linkedcontent/issues/5>
 
@@ -367,6 +367,7 @@ When original author wake up I can consider to made this module obsolete.
 =head1 BUGS/CONTRIBUTING
 
 Please report any bugs through the web interface at L<https://github.com/EmilianoBruni/mojolicious-plugin-linkedcontent-v9/issues>
+
 If you want to contribute changes or otherwise involve yourself in development, feel free to fork the Git repository from
 L<https://github.com/EmilianoBruni/mojolicious-plugin-linkedcontent-v9/>.
 
@@ -374,12 +375,12 @@ L<https://github.com/EmilianoBruni/mojolicious-plugin-linkedcontent-v9/>.
 
 You can find this documentation with the perldoc command too.
 
-    perldoc Mojolicious::Plugin::LinkedContent-V9
+    perldoc Mojolicious::Plugin::LinkedContent-v9
 
 =head1 AUTHOR
 
 Yaroslav Korshak  C<< <ykorshak@gmail.com> >>,
-Emiliano Bruni C<< <info@ebruni.it >>
+Emiliano Bruni C<< <info@ebruni.it> >>
 
 =head1 CREDITS
 
@@ -391,10 +392,8 @@ Oliver Günther
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (C) 2010 - 2013, Yaroslav Korshak
-Copyright (C) 2019 - 2021, Emiliano Bruni
+Copyright (C) 2010 - 2013: Yaroslav Korshak,
+2019 - 2021: Emiliano Bruni
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.
-
-1;

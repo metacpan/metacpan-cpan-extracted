@@ -34,13 +34,25 @@ SKIP:
 
 
     ok( $shem->create == 0, 'create default value' );
-    $shem->create( 1 );
+    $shem->create(1);
     ok( $shem->create == 1, 'create updated value' );
     my $exists = $shem->exists;
     # ok( defined( $exists ), 'exists return defined value' );
     # ok( !$shem->exists, 'exists' );
+    # Some previous test did not cleanup
+    if( defined( $exists ) && $exists )
+    {
+        diag( "Cleaning up previous tests that left the shared memory." ) if( $DEBUG );
+        $shem->open->remove;
+    }
     ok( defined( $exists ) && !$exists, 'exists' );
     my $s = $shem->open;
+    local $SIG{__DIE__} = sub
+    {
+        diag( "Got error: ", join( '', @_ ), ". Cleaning up shared memory." ) if( $DEBUG );
+        $s->unlock;
+        $s->remove;
+    };
     skip( "Failed to create shared memory object. Your system does not seem to support shared memory: $!", 21 ) if( !defined( $s ) );
     ok( defined( $s ), 'Shared memory object' );
 

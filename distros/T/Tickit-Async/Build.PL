@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -10,7 +11,7 @@ my $build = Module::Build->new(
       'IO::Async::Notifier' => '0.43',
       'IO::Async::Stream' => '0.34',
       'IO::Async::Test' => 0,
-      'Tickit' => '0.71', # Full `watch_io` callback
+      'Tickit' => '0.72',
    },
    test_requires => {
       'Test::HexString' => 0,

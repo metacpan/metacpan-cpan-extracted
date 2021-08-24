@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Coverage;
 use strict;
 use warnings;
 
-our $VERSION = '0.000075';
+our $VERSION = '0.000077';
 
 use Data::GUID;
 use List::Util qw/max/;
@@ -34,11 +34,11 @@ sub handle {
         $username = undef;
     }
 
-    my $cover;
+    my $field;
     if (my $project = $schema->resultset('Project')->find({name => $source})) {
-        $cover = $project->coverage(user => $username);
+        $field = $project->coverage(user => $username);
     }
-    elsif ($cover = $schema->resultset('Coverage')->find({coverage_id => $source})) {
+    elsif ($field = $schema->resultset('RunField')->find({name => 'coverage', run_field_id => $source})) {
     }
     else {
         die error(405);
@@ -46,17 +46,17 @@ sub handle {
 
     my $data;
 
-    if ($delete && $cover) {
-        $cover->runs->first->update({coverage_id => undef});
-        $cover->delete;
-        $data = {};
-    }
-    elsif ($cover) {
-        $data = $cover ? $cover->coverage : {};
+    if ($field) {
+        if ($delete) {
+            $field->delete;
+        }
+        else {
+            $data = $field->data;
+        }
     }
 
     $res->content_type('application/json');
-    $res->raw_body($data);
+    $res->raw_body($data ||= {});
 
     return $res;
 }

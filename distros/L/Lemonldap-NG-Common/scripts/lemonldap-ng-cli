@@ -4,13 +4,14 @@ use warnings;
 use strict;
 use POSIX;
 use Getopt::Long qw(:config pass_through);
+use Pod::Usage;
 
 our $opt_user  = '__APACHEUSER__';
 our $opt_group = '__APACHEGROUP__';
 GetOptions(
     "user=s"  => \$opt_user,
     "group=s" => \$opt_group
-) or die("Error in command line arguments\n");
+) or pod2usage("Error in command line arguments");
 
 my $action;
 
@@ -28,7 +29,7 @@ for ( my $i = 0 ; $i < @ARGV ; $i++ ) {
     last;
 }
 
-$action ||= "help";
+$action ||= "usage";
 
 if ( $action =~
     /^(?:[gs]et|del|(?:add|del)Key|(?:add|del)PostVars|save|restore|rollback)$/
@@ -44,45 +45,10 @@ elsif ( $action =~ /^(?:info|update-cache|test-email)$/ ) {
     Lemonldap::NG::Common::Cli->run(@ARGV);
 }
 else {
-    help();
+    pod2usage(1) if $action eq "help";
+    pod2usage(2) if $action eq "usage";
 }
 
-sub help {
-    print STDERR qq{Usage: $0 <options> action <parameters>
-
-Available actions:
- - help                                      : print this
- - info                                      : get currentconfiguration info
- - update-cache                              : force configuration cache to be updated
- - test-email <destination>                  : send a test email
- - get <key>                                 : get values of parameters
- - set <key> <value>                         : set parameter(s) value(s)
- - del <key>                                 : delete parameters
- - addKey <key> <subkey> <value>             : add or set a subkey in a parameter
- - delKey <key> <subkey>                     : delete subkey of a parameter
- - addPostVars <host> <uri> <key> <value>    : add post vars for form replay
- - delPostVars <host> <uri> <key>            : delete post vars for form replay
- - save                                      : export configuration to STDOUT
- - restore -                                 : import configuration from STDIN
- - restore <file>                            : import configuration from file
- - rollback                                  : restore previous configuration
-
-Options:
- - yes <0|1>                     : accept confirmation prompt automatically
- - log <msg>                     : set configuration log message
- - safe <0|1>                    : fail in case the requested configuration is invalid
- - force <0|1>                   : allow overwrite of existing config number
- - cfgNum <num>                  : set new configuration number (requires -force 1)
- - sep <char>                    : separator of hierarchical values (by default: /)
- - iniFile <file>                : path to an alternate lemonldap-ng.ini file
-
-Additional options:
- - --user=<user>    : change user running the script
- - --group=<group>  : change group running the script
-
-See Lemonldap::NG::Manager::Cli(3) for more
-};
-}
 __END__
 
 =head1 NAME
@@ -91,7 +57,50 @@ __END__
 
 lemonldap-ng-cli - Command-line manager for Lemonldap::NG web-SSO system.
 
+=head1 DESCRIPTION
+
+lemonldap-ng-cli is a command line interface to interact with Lemonldap::NG
+configuration. It can be used to read or update configuration variables
+programmatically, or perform global operations on the configuration.
+
 =head1 SYNOPSIS
+
+Usage: lemonldap-ng-cli [options] ACTION [parameters ...]
+
+Available actions:
+
+ help                            : print the full documentation
+ info                            : get currentconfiguration info
+ update-cache                    : force configuration cache to be updated
+ test-email DESTINATION          : send a test email
+ get KEY                         : get values of parameters
+ set KEY VALUE                   : set parameter(s) value(s)
+ del KEY                         : delete parameters
+ addKey KEY SUBKEY VALUE         : add or set a subkey in a parameter
+ delKey KEY SUBKEY               : delete subkey of a parameter
+ addPostVars HOST URI KEY VALUE  : add post vars for form replay
+ delPostVars HOST URI KEY        : delete post vars for form replay
+ save                            : export configuration to STDOUT
+ restore -                       : import configuration from STDIN
+ restore FILE                    : import configuration from file
+ rollback                        : restore previous configuration
+
+Options:
+
+ -yes 0|1                     : accept confirmation prompt automatically
+ -log msg                     : set configuration log message
+ -safe 0|1                    : fail in case the requested configuration is invalid
+ -force 0|1                   : allow overwrite of existing config number
+ -cfgNum NUM                  : set new configuration number (requires -force 1)
+ -sep CHAR                    : separator of hierarchical values (by default: /)
+ -iniFile FILE                : path to an alternate lemonldap-ng.ini file
+
+Additional options:
+
+ --user=USER    : change user running the script
+ --group=GROUP  : change group running the script
+
+=head1 EXAMPLES
 
 Get information about current configuration
 
@@ -136,67 +145,129 @@ Set some values
   # without asking for confirmation
   $ lemonldap-ng-cli -yes 1 set portal http://auth.e.com/ domain e.com
 
-=head1 DESCRIPTION
 
-lemonldap-ng-cli is a command line interface to interact with Lemonldap::NG
-configuration. Commands are described in L<Lemonldap::NG::Manager::Cli>
-and L<Lemonldap::NG::Common::Cli>
-
-=head2 Available commands
+=head1 ARGUMENTS
 
 =over
 
-=item info
+=item B<info>
 
-=item update-cache
+Print configuration metadata, such as number, author, date and log
 
-=item test-email
+=item B<update-cache>
 
-=item save
+Update the local configuration cache, this command only affects the server on which it is run
 
-=item restore
+=item B<test-email I<DESTINATION>>
 
-=item get
+Sends a test email to the specified I<DESTINATION>, this lets you check your SMTP settings
 
-=item set
+=item B<get I<KEY> [ I<KEY> ... ]>
 
-=item addKey
+Print the specified I<KEY> from configuration. Multiple keys may be given
 
-=item delKey
+=item B<set I<KEY> I<VALUE> [I<KEY> I<VALUE> ...]>
+
+Set the specified I<KEY> to the specified I<VALUE>. Multiple key-value pairs may be given.
+
+The configuration number is increased once all given key-value pairs have been processesed.
+
+=item B<delete I<KEY> [ I<KEY> ... ]>
+
+Delete the specified I<KEY> from configuration. Multiple keys can be given.
+
+The configuration number is increased once all keys have been deleted.
+
+=item B<addKey I<KEY> I<SUBKEY> I<VALUE> [I<KEY> I<SUBKEY> I<VALUE> ...]>
+
+This action can be used to set a sub-key inside a composite configuration key
+(such as globalStorageOptions, locationRules, etc.)
+
+Multiple key-subkey-value triplets may be given.
+
+The configuration number is increased once all given triplets have been processesed.
+
+=item B<delKey I<KEY> I<SUBKEY> [I<KEY> I<SUBKEY> ...]>
+
+This action can be used to delete a sub-key from a composite configuration key
+(such as globalStorageOptions, locationRules, etc.)
+
+Multiple key-subkey pairs may be given.
+
+The configuration number is increased once all given pairs have been processesed.
+
+=item B<addPostVars I<HOST> I<URI> I<KEY> I<VALUE>>
+
+This action lets you add a new POST var in a form replay configuration.
+
+=item B<delPostVars I<HOST> I<URI> I<KEY>>
+
+This action lets you delete a new POST var in a form replay configuration.
+
+=item B<save>
+
+Dump the entire LemonLDAP::NG configuration to standard output, in JSON format.
+
+The resulting dump can be imported into the manager's interface, or restored
+with the B<restore> command.
+
+=item B<restore I<FILE>>
+
+Replace the existing configuration with the content of the provided
+JSON-formatted I<FILE>. If I<FILE> is the I<-> string, configuration will be
+read from standard input.
+
+=item B<rollback>
+
+This command can be used to cancel the latest configuration change. The
+previous configuration is fetched from configuration history and saved under a
+new configuration number.
+
+This action is meant to be a convenient wrapper around B<save> and B<restore>,
+and does not handle rolling back to an arbitrary version. Rolling back to an
+arbitrary version can be done manually with B<save> and B<restore>
 
 =back
 
-=head2 Available options
+=head1 OPTIONS
 
 =over
 
-=item -yes
+=item B<-yes I<0|1>>
 
-Confirm modification automatically (default: 0)
+Skip confirmation prompt (default: 0)
 
-=item -log
+=item B<-log I<MESSAGE>>
 
 Allows you to set the log message that will be displayed in the manager
 
-=item -safe
+=item B<-safe I<0|1>>
 
 The configuration change will be aborted if it contains errors (default: 0)
 
-=item -force
+=item B<-force I<0|1>>
 
-Allows you to force overwriting an existing configuration (default: 0)
+Allows you to force overwriting an existing configuration number (default: 0)
 
-=item -cfgNum
+=item B<-cfgNum I<NUMBER>>
 
 Choose a particular configuration number (default: latest)
 
-=item -sep 
+=item B<-sep I<CHARACTER>>
 
 Allows you to define hierarchical separator
 
-=item -iniFile
+=item B<-iniFile I<FILE>>
 
 Allows you to set an alternative ini file
+
+=item B<-u I<USER>, --user=I<USER>>
+
+Run the script under the I<USER> system user identity
+
+=item B<-g I<GROUP>, --group=I<GROUP>>
+
+Run the script under the I<GROUP> system group identity
 
 =back
 

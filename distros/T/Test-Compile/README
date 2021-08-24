@@ -6,7 +6,6 @@ DESCRIPTION
 
 DEPENDENCIES
     Requires perl v5.10.0, plus
-    * UNIVERSAL::require
     * version
     * parent
     * Exporter

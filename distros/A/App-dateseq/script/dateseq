@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/dateseq/dateseq
-# and generated automatically using Perinci::CmdLine::Gen version 0.497
+# and generated automatically using Perinci::CmdLine::Gen version 0.499
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-13'; # DATE
+our $DATE = '2021-08-22'; # DATE
 our $DIST = 'App-dateseq'; # DIST
-our $VERSION = '0.102'; # VERSION
+our $VERSION = '0.103'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,199 +38,13 @@ dateseq - Generate a sequence of dates
 
 =head1 VERSION
 
-This document describes version 0.102 of dateseq (from Perl distribution App-dateseq), released on 2021-01-13.
+This document describes version 0.103 of dateseq (from Perl distribution App-dateseq), released on 2021-08-22.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % dateseq [--business] [--business6] [--exclude-dow-json=s]
-     [--exclude-dow=s+] [--exclude-month-json=s] [--exclude-month=s+]
-     [-f=s] [--format-class-attrs-json=s] [--format-class-attrs=s]
-     [--format-class=s] [--format=name] [--header=s] [--include-dow-json=s]
-     [--include-dow=s+] [--include-month-json=s] [--include-month=s+]
-     [--json] [--limit-monthly=s] [--limit-yearly=s] [--limit=s] [-n=s]
-     [--(no)naked-res] [--no-business] [--no-business6] [--nobusiness]
-     [--nobusiness6] [--page-result[=program]] [-r] [--reverse]
-     [--strftime=s] [--view-result[=program]] [from] [to] [increment]
-
-Examples:
-
-Generate "infinite" dates from today:
-
- % dateseq
-
-Generate dates from 2015-01-01 to 2015-01-31:
-
- % dateseq 2015-01-01 2015-01-31
- 2015-01-01
- 2015-01-02
- ... 27 more lines ...
- 2015-01-30
- 2015-01-31
-
-Generate dates from yesterday to 2 weeks from now:
-
- % dateseq yesterday "2 weeks from now"
- 2021-01-12T00:00:00
- 2021-01-13T00:00:00
- ... 12 more lines ...
- 2021-01-26T00:00:00
- 2021-01-27T00:00:00
-
-Generate dates from 2015-01-31 to 2015-01-01 (reverse):
-
- % dateseq 2015-01-31 2015-01-01 -r
- 2015-01-31
- 2015-01-30
- ... 27 more lines ...
- 2015-01-02
- 2015-01-01
-
-Generate "infinite" dates from 2015-01-01 (reverse):
-
- % dateseq 2015-01-01 -r
-
-Generate 10 dates from 2015-01-01:
-
- % dateseq 2015-01-01 -n 10
- 2015-01-01
- 2015-01-02
- ... 6 more lines ...
- 2015-01-09
- 2015-01-10
-
-Generate dates with increment of 3 days:
-
- % dateseq 2015-01-01 2015-01-31 -i P3D
- 2015-01-01
- 2015-01-04
- ... 7 more lines ...
- 2015-01-28
- 2015-01-31
-
-Generate first 20 business days (Mon-Fri) after 2015-01-01:
-
- % dateseq 2015-01-01 --business -n 20 -f "%Y-%m-%d(%a)"
- 2015-01-01(Thu)
- 2015-01-02(Fri)
- 2015-01-05(Mon)
- 2015-01-06(Tue)
- 2015-01-07(Wed)
- ... 11 more lines ...
- 2015-01-23(Fri)
- 2015-01-26(Mon)
- 2015-01-27(Tue)
- 2015-01-28(Wed)
-
-Generate first 5 non-business days (Sat-Sun) after 2015-01-01:
-
- % dateseq 2015-01-01 --no-business -n 5
- 2015-01-03
- 2015-01-04
- 2015-01-10
- 2015-01-11
- 2015-01-17
-
-Show the first business day (Mon-Fri) of each month in 2021:
-
- % dateseq 2021-01-01 2021-12-13 --business --limit-monthly 1 -f "%Y-%m-%d(%a)"
- 2021-01-01(Fri)
- 2021-02-01(Mon)
- 2021-03-01(Mon)
- 2021-04-01(Thu)
- 2021-05-03(Mon)
- ... 3 more lines ...
- 2021-09-01(Wed)
- 2021-10-01(Fri)
- 2021-11-01(Mon)
- 2021-12-01(Wed)
-
-Show the last business day (Mon-Fri) of each month in 2021:
-
- % dateseq 2021-12-31 2021-01-01 -r --business --limit-monthly 1 -f "%Y-%m-%d(%a)"
- 2021-12-31(Fri)
- 2021-11-30(Tue)
- 2021-10-29(Fri)
- 2021-09-30(Thu)
- 2021-08-31(Tue)
- ... 3 more lines ...
- 2021-04-30(Fri)
- 2021-03-31(Wed)
- 2021-02-26(Fri)
- 2021-01-29(Fri)
-
-Show Mondays, Wednesdays, and Fridays between 2015-01-01 and 2015-02-28:
-
- % dateseq 2015-01-01 2015-02-28 --include-dow Mo,We,Fr -f "%Y-%m-%d(%a)"
-
-Show dates (except Mondays) after 2015-01-01 and 2015-02-28:
-
- % dateseq 2015-01-01 2015-02-28 --exclude-dow Mo -f "%Y-%m-%d(%a)"
-
-Generate a CSV data:
-
- % dateseq 2010-01-01 2015-01-31 -f "%Y,%m,%d" --header "year,month,day"
- year,month,day
- 2010,01,01
- ... 1854 more lines ...
- 2015,01,30
- 2015,01,31
-
-Generate periods (YYYY-MM):
-
- % dateseq 2010-01-01 2015-12-31 -i P1M -f "%Y-%m"
- 2010-01
- 2010-02
- ... 68 more lines ...
- 2015-11
- 2015-12
-
-List non-holidays in 2015 (using Indonesian holidays):
-
- % setop --diff <(dateseq 2015-01-01 2015-12-31) <(list-id-holidays --year 2015)
- 2015-01-02
- 2015-01-04
- 2015-01-05
- 2015-01-06
- 2015-01-07
- ... 336 more lines ...
- 2015-12-28
- 2015-12-29
- 2015-12-30
- 2015-12-31
-
-List non-holidays business days in 2015 (using Indonesian holidays):
-
- % setop --diff <(dateseq 2015-01-01 2015-12-31 --business) <(list-id-holidays --year 2015)
- 2015-01-02
- 2015-01-05
- 2015-01-06
- 2015-01-07
- 2015-01-08
- ... 236 more lines ...
- 2015-12-28
- 2015-12-29
- 2015-12-30
- 2015-12-31
-
-Use with fsql:
-
- % dateseq 2010-01-01 2015-12-01 -f "%Y,%m" -i P1M --header "year,month" | fsql --add-csv - --add-csv data.csv -F YEAR -F MONTH 'SELECT year, month, data1 FROM stdin WHERE YEAR(data.date)=year AND MONTH(data.date)=month'
-
-Use %q (see DateTimeX::strftimeq):
-
- % dateseq 2020-12-24 2021-01-15 -f '%Y-%m-%d%( $_->day_of_week == 7 ? "su" : "" )q'
- 2020-12-24
- 2020-12-25
- 2020-12-26
- 2020-12-27su
- 2020-12-28
- ... 14 more lines ...
- 2021-01-12
- 2021-01-13
- 2021-01-14
- 2021-01-15
+% B<dateseq> [B<--business>|B<--no-business>|B<--nobusiness>] [B<--business6>|B<--no-business6>|B<--nobusiness6>] [(B<--exclude-dow>=I<date::dow_nums>)+] [(B<--exclude-month>=I<date::month_nums>)+] [B<--format-class-attrs>=I<s>] [B<--format-class>=I<perl::modname>] [B<--format>=I<name>|B<--json>] [B<--header>=I<str>] [(B<--include-dow>=I<date::dow_nums>)+] [(B<--include-month>=I<date::month_nums>)+] [B<--limit-monthly>=I<posint>] [B<--limit-yearly>=I<posint>] [B<--limit>=I<posint>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--reverse>|B<-r>] [B<--strftime>=I<str>] [B<--exclude-dow-json>=I<json>] [B<--exclude-month-json>=I<json>] [B<--format-class-attrs-json>=I<json>] [B<--include-dow-json>=I<json>] [B<--include-month-json>=I<json>] [B<-f>=I<str>] [B<-n>=I<posint>] -- [I<from>] [I<to>] [I<increment>]
 
 =head1 DESCRIPTION
 
@@ -249,11 +63,15 @@ C<*> marks required options.
 
 Starting date.
 
+Can also be specified as the 1st command-line argument.
+
 =item B<--header>=I<s>
 
 Add a header row.
 
 =item B<--increment>=I<s>, B<-i>
+
+Can also be specified as the 3rd command-line argument.
 
 =item B<--limit-monthly>=I<s>
 
@@ -274,6 +92,8 @@ Decrement instead of increment.
 =item B<--to>=I<s>
 
 End date, if not specified will generate an infinite* stream of dates.
+
+Can also be specified as the 2nd command-line argument.
 
 =back
 
@@ -481,6 +301,186 @@ It is also recommended to install L<shcompgen> (see above).
 
 For fish and zsh, install L<shcompgen> as described above.
 
+=head1 EXAMPLES
+
+Examples:
+
+Generate "infinite" dates from today:
+
+ % dateseq
+
+Generate dates from 2015-01-01 to 2015-01-31:
+
+ % dateseq 2015-01-01 2015-01-31
+ 2015-01-01
+ 2015-01-02
+ ... 27 more lines ...
+ 2015-01-30
+ 2015-01-31
+
+Generate dates from yesterday to 2 weeks from now:
+
+ % dateseq yesterday "2 weeks from now"
+ 2021-08-21T00:00:00
+ 2021-08-22T00:00:00
+ ... 12 more lines ...
+ 2021-09-04T00:00:00
+ 2021-09-05T00:00:00
+
+Generate dates from 2015-01-31 to 2015-01-01 (reverse):
+
+ % dateseq 2015-01-31 2015-01-01 -r
+ 2015-01-31
+ 2015-01-30
+ ... 27 more lines ...
+ 2015-01-02
+ 2015-01-01
+
+Generate "infinite" dates from 2015-01-01 (reverse):
+
+ % dateseq 2015-01-01 -r
+
+Generate 10 dates from 2015-01-01:
+
+ % dateseq 2015-01-01 -n 10
+ 2015-01-01
+ 2015-01-02
+ ... 6 more lines ...
+ 2015-01-09
+ 2015-01-10
+
+Generate dates with increment of 3 days:
+
+ % dateseq 2015-01-01 2015-01-31 -i P3D
+ 2015-01-01
+ 2015-01-04
+ ... 7 more lines ...
+ 2015-01-28
+ 2015-01-31
+
+Generate first 20 business days (Mon-Fri) after 2015-01-01:
+
+ % dateseq 2015-01-01 --business -n 20 -f "%Y-%m-%d(%a)"
+ 2015-01-01(Thu)
+ 2015-01-02(Fri)
+ 2015-01-05(Mon)
+ 2015-01-06(Tue)
+ 2015-01-07(Wed)
+ ... 11 more lines ...
+ 2015-01-23(Fri)
+ 2015-01-26(Mon)
+ 2015-01-27(Tue)
+ 2015-01-28(Wed)
+
+Generate first 5 non-business days (Sat-Sun) after 2015-01-01:
+
+ % dateseq 2015-01-01 --no-business -n 5
+ 2015-01-03
+ 2015-01-04
+ 2015-01-10
+ 2015-01-11
+ 2015-01-17
+
+Show the first business day (Mon-Fri) of each month in 2021:
+
+ % dateseq 2021-01-01 2021-12-13 --business --limit-monthly 1 -f "%Y-%m-%d(%a)"
+ 2021-01-01(Fri)
+ 2021-02-01(Mon)
+ 2021-03-01(Mon)
+ 2021-04-01(Thu)
+ 2021-05-03(Mon)
+ ... 3 more lines ...
+ 2021-09-01(Wed)
+ 2021-10-01(Fri)
+ 2021-11-01(Mon)
+ 2021-12-01(Wed)
+
+Show the last business day (Mon-Fri) of each month in 2021:
+
+ % dateseq 2021-12-31 2021-01-01 -r --business --limit-monthly 1 -f "%Y-%m-%d(%a)"
+ 2021-12-31(Fri)
+ 2021-11-30(Tue)
+ 2021-10-29(Fri)
+ 2021-09-30(Thu)
+ 2021-08-31(Tue)
+ ... 3 more lines ...
+ 2021-04-30(Fri)
+ 2021-03-31(Wed)
+ 2021-02-26(Fri)
+ 2021-01-29(Fri)
+
+Show Mondays, Wednesdays, and Fridays between 2015-01-01 and 2015-02-28:
+
+ % dateseq 2015-01-01 2015-02-28 --include-dow Mo,We,Fr -f "%Y-%m-%d(%a)"
+
+Show dates (except Mondays) after 2015-01-01 and 2015-02-28:
+
+ % dateseq 2015-01-01 2015-02-28 --exclude-dow Mo -f "%Y-%m-%d(%a)"
+
+Generate a CSV data:
+
+ % dateseq 2010-01-01 2015-01-31 -f "%Y,%m,%d" --header "year,month,day"
+ year,month,day
+ 2010,01,01
+ ... 1854 more lines ...
+ 2015,01,30
+ 2015,01,31
+
+Generate periods (YYYY-MM):
+
+ % dateseq 2010-01-01 2015-12-31 -i P1M -f "%Y-%m"
+ 2010-01
+ 2010-02
+ ... 68 more lines ...
+ 2015-11
+ 2015-12
+
+List non-holidays in 2015 (using Indonesian holidays):
+
+ % setop --diff <(dateseq 2015-01-01 2015-12-31) <(list-idn-holidays --year 2015)
+ 2015-01-02
+ 2015-01-04
+ 2015-01-05
+ 2015-01-06
+ 2015-01-07
+ ... 336 more lines ...
+ 2015-12-28
+ 2015-12-29
+ 2015-12-30
+ 2015-12-31
+
+List non-holidays business days in 2015 (using Indonesian holidays):
+
+ % setop --diff <(dateseq 2015-01-01 2015-12-31 --business) <(list-idn-holidays --year 2015)
+ 2015-01-02
+ 2015-01-05
+ 2015-01-06
+ 2015-01-07
+ 2015-01-08
+ ... 236 more lines ...
+ 2015-12-28
+ 2015-12-29
+ 2015-12-30
+ 2015-12-31
+
+Use with fsql:
+
+ % dateseq 2010-01-01 2015-12-01 -f "%Y,%m" -i P1M --header "year,month" | fsql --add-csv - --add-csv data.csv -F YEAR -F MONTH 'SELECT year, month, data1 FROM stdin WHERE YEAR(data.date)=year AND MONTH(data.date)=month'
+
+Use %q (see DateTimeX::strftimeq):
+
+ % dateseq 2020-12-24 2021-01-15 -f '%Y-%m-%d%( $_->day_of_week == 7 ? "su" : "" )q'
+ 2020-12-24
+ 2020-12-25
+ 2020-12-26
+ 2020-12-27su
+ 2020-12-28
+ ... 14 more lines ...
+ 2021-01-12
+ 2021-01-13
+ 2021-01-14
+ 2021-01-15
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-dateseq>.
@@ -491,7 +491,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-dateseq>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-dateseq/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-dateseq>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -513,7 +513,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

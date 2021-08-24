@@ -21,10 +21,19 @@ ok($timezone, "Time::Zone::Olson->new() generates an object");
 
 if ($timezone->location()) {
 	$ENV{TZ} = $timezone->area() . '/' . $timezone->location();
-} else {
+} elsif ($timezone->area()) {
 	$ENV{TZ} = $timezone->area();
 }
-diag("Determined timezone is $ENV{TZ}");
+if (defined $ENV{TZ}) {
+	diag("Determined timezone is $ENV{TZ}");
+} else {
+	diag("Timezone did not parse into area/location:" . $timezone->timezone());
+}
+if (defined $ENV{TZDIR}) {
+	diag("TZDIR has been set to $ENV{TZDIR}");
+} else {
+	diag("TZDIR has not been set");
+}
 
 my $perl_date = 0;
 my $bsd_date = 0;
@@ -64,6 +73,7 @@ if (!$timezone->timezone()) {
 	$timezone->timezone('UTC');
 	diag("$^O does not have a default timezone, setting to " . $timezone->timezone());
 }
+diag("Local timezone has been determined to be " . $timezone->timezone() );
 ok($timezone->timezone() =~ /^\w+(?:\/[\w\-\/]+)?$/, "\$timezone->timezone() parses correctly");
 if ($timezone->location()) {
 	ok($timezone->area() . '/' . $timezone->location() eq $timezone->timezone(), "\$timezone->area() and \$timezone->location() contain the area and location of the current timezone");
@@ -86,8 +96,6 @@ foreach my $index (0 .. (( scalar @correct_localtime )- 1)) {
 	if ($correct_localtime[$index] eq $test_localtime[$index]) {
 	} else {
 		diag("Missed wantarray location (1) test for $^O on index $index ('$correct_localtime[$index]' eq '$test_localtime[$index]')");
-		diag("Time::Zone::Olson produces:" . join ', ', @test_localtime);
-		diag("perl localtime produces   :" . join ', ', @correct_localtime);
 		$matched = 0;
 	}
 }
@@ -95,15 +103,20 @@ foreach my $index (0 .. (( scalar @test_localtime )- 1)) {
 	if ($correct_localtime[$index] eq $test_localtime[$index]) {
 	} else {
 		diag("Missed wantarray location (2) test for $^O on index $index ('$correct_localtime[$index]' eq '$test_localtime[$index]')");
-		diag("Time::Zone::Olson produces:" . join ', ', @test_localtime);
-		diag("perl localtime produces   :" . join ', ', @correct_localtime);
 		$matched = 0;
 	}
 }
 
-TODO: {
-	local $TODO = $^O eq 'solaris' ? "perl may have issues with localtime on solaris" : undef;
-	ok($matched, "Matched wantarray localtime");
+ok($matched, "Matched wantarray localtime");
+if (!$matched) {
+	diag("Seconds since UNIX epoch is:$now");
+	diag("Time::Zone::Olson produces:" . join ', ', @test_localtime);
+	diag("perl localtime produces   :" . join ', ', @correct_localtime);
+	diag(`ls -la /etc/localtime`);
+	my $current_timezone = $timezone->timezone();
+	my $directory = $timezone->directory();
+	diag("Permissions of $directory/$current_timezone is " . `ls -la $directory/$current_timezone`);
+	diag("Content of $directory/$current_timezone is " . `cat $directory/$current_timezone | base64`);
 }
 
 my $melbourne_offset;
@@ -159,6 +172,14 @@ if (($^O eq 'linux') || ($^O =~ /bsd/)) {
 	ok(!$timezone->equiv("Australia/Perth"), "Successfully compared Melbourne to Perth timezones");
 	if ($timezone->equiv("Australia/Hobart", 0)) {
 		diag("$^O does not agree that Melbourne and Hobart time have NOT been the same since the UNIX epoch");
+	}
+}
+if (!$matched) {
+	my @test_localtime = $timezone->local_time($now);
+	diag("Time::Zone::Olson produces for " . $timezone->timezone() . ":" . join ', ', @test_localtime);
+	if ($^O eq 'MSWin32') {
+	} elsif ($^O eq 'solaris') {
+		diag("date returns " . `date`);
 	}
 }
 Test::More::done_testing();

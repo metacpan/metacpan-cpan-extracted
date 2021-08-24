@@ -70,4 +70,25 @@ sub match_case
    }
 }
 
+# Various cornercases of our copy-pasted do_neq() function
+{
+   match(1 : ==) {
+      case(1) { pass("IV == IV"); }
+      default { fail("IV == IV"); }
+   }
+
+   match(2.2 : ==) {
+      case(2.0) { fail("NV == NV first"); }
+      case(2.2) { pass("NV == NV"); }
+      default   { fail("NV == NV second"); }
+   }
+
+   match(~3 : ==) {
+      case(3)  { fail("UV == UV a"); }
+      case(~4) { fail("UV == UV b"); }
+      case(~3) { pass("UV == UV"); }
+      default  { fail("UV == UV c"); }
+   }
+}
+
 done_testing;

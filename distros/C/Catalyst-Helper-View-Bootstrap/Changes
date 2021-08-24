@@ -22,3 +22,6 @@ This file documents the revision history for Perl extension Bootstrap.
 
 0.0013  2017-05-04
         - updated to Twitter Bootstrap 3.3.7 
+
+0.0041  2021-08-23
+        - updated to Twitter Bootstrap 5 

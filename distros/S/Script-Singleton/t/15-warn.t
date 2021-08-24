@@ -8,7 +8,7 @@ my $second_proc;
 BEGIN {
 
 #    $SIG{__WARN__} = sub { $w = shift; };
-    use Script::Singleton 'TEST', 1;
+    use Script::Singleton glue => 'TEST', warn => 1;
     $second_proc = `$^X t/15-warn.t 2>&1`;
 }
 

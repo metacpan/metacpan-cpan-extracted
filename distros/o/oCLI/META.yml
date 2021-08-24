@@ -1,0 +1,31 @@
+---
+abstract: 'Opinionated Command Line Interface'
+author:
+  - 'Kaitlyn Parkhurst <symkat@symkat.com>'
+build_requires:
+  File::Find: '0'
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: oCLI
+requires:
+  Data::Dumper: '0'
+  Import::Into: '0'
+  Module::Runtime: '0'
+  Moo: '0'
+  Package::Stash: '0'
+  Scalar::Util: '0'
+  Storable: '0'
+  Try::Tiny: '0'
+version: '0.001'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

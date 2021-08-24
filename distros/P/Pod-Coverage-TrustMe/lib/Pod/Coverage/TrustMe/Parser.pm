@@ -2,7 +2,7 @@ package Pod::Coverage::TrustMe::Parser;
 use strict;
 use warnings;
 
-our $VERSION = '0.001002';
+our $VERSION = '0.002000';
 $VERSION =~ tr/_//d;
 
 use Pod::Simple ();
@@ -104,7 +104,7 @@ sub _handle_text {
   my $me = $self->{+__PACKAGE__};
   my ($text) = @_;
   my $in = $me->{in};
-  if ($in && @$in && $in->[-1]{target} eq 'Pod::Coverage') {
+  if ($in && @$in && $in->[-1]{target} =~ /\APod::Coverage(?:::Trust(?:Me|Pod))?\z/) {
     my @trusted;
     for my $token ($text =~ /(\S+)/g) {
       if ($token eq '*EVERYTHING*') {

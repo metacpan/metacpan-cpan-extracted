@@ -1,5 +1,12 @@
 Revision history for Time-Zone-Olson
 
+0.40  Fri Aug 20 16:44:00 2021
+       Fix indexing
+
+0.39  Fri Aug 20 10:48:00 2021
+       Improving Win32 TZ mappings
+       Sorting transition times for solaris 10
+
 0.38   Mon Aug 09 20:55:00 2021
        Checking for solaris oddness in CPAN Testers
 

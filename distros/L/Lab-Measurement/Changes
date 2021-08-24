@@ -4,6 +4,10 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.771 2021-08-23
+  * SR830: Add support for aux-in ports
+  * SignalRecovery726x: Fix for device bug (spurious zero bytes)
+
 3.770 2021-08-15
   * Port the TMRC2 driver to Moose
   * Documentation improvements

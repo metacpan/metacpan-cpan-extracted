@@ -1,5 +1,19 @@
 Revision history for this software.
 
+0.10  2021-08-24 00:00:00
+  - remove checking $_[1] of accept()
+  - remove 009_accept.t
+  - created by INABA Hitoshi
+
+0.09  2021-08-23 00:00:00
+  - quote tests by eval q{ ... }
+  - created by INABA Hitoshi
+
+0.08  2021-08-21 00:00:00
+  - use bareword::filehandles module when Perl 5.008001 or later
+  - use multidimensional module when Perl 5.008001 or later
+  - created by INABA Hitoshi
+
 0.07  2021-08-19 00:00:00
   - gives caller package "no feature qw(indirect);"
   - add SEE ALSO of POD

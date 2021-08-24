@@ -1,0 +1,128 @@
+Config::XrmDatabase
+
+This is a Pure Perl implementation of the X Window Resource Manager
+Database (XrmDB). It allows creation and manipulation of Xrm compliant
+databases.
+
+  Why another configuration database?
+
+The XrmDB differs from typical key-value stores by allowing stored keys
+to be either fully or partially qualified. For example, the partially
+qualified key
+
+    *.c.d
+
+will match a query for the keys "a.c.d", "a.b.c.d". Keys are composed of
+multiple components separated by the "." character. If the component is
+"?" it will match any single component; a component of "*" matches any
+number (including none).
+
+  Matching
+
+Matching a search key against the database is a component by component
+operation, starting with the leftmost component. The component in the
+search key is checked against the same level component in the database
+keys. First the keys with non-wildcard components are compared; if there
+is an exact match, the search moves on to the next component in the
+matching database key.
+
+At this point, XrmDB adds another dimension to the search. Keys belong
+to a *class*, which has the same number of components as the key. When
+an exact match against the search key component is not found, the
+database is searched for an exact match for the same level component in
+the class.
+
+Only after that fails does the algorithm switch to database keys with
+wildcard components. The same order of comparison is performed; first
+against the component in the search key, and if that fails, to the
+component in the class.
+
+For example, given a search key of
+
+ xmh.toc.messagefunctions.incorporate.activeForeground'
+
+with a class of
+
+ Xmh.Paned.Box.Command.Foreground
+
+the database is first searched for keys which begin with "xmh". If that
+fails, the database is searched for keys which begin with "Xmh". If that
+fails, keys which start with a "?" wildcard are searched, and then those
+which start with "*". The "*" components can match an arbitrary number
+of components in the search key and class.
+
+If a match is found, the search moves on to the next unmatched component
+and the algorithm is repeated.
+
+  Classes
+
+Why the extra "class"?
+
+Assigning keys to a class provides an ability to distinguish between two
+similarly structured keys. It essentially creates namespaces for keys so
+that values can be created based on which namespace a key belongs to,
+rather than the content of the key.
+
+Let's say that you have a bunch of keys which end in "Foreground":
+
+  a.b.c.Foreground
+  d.e.f.Foreground
+  x.y.z.Foreground
+
+and you want to set a value for any keys which end in "Foreground":
+
+  *.Foreground : 'yellow'
+
+To specify a separate value for each one could set
+
+  a.b.c.Foreground : 'red'
+  d.e.f.Foreground : 'blue'
+  x.y.z.Foreground : 'green'
+
+Let's say that "a.b.c.Foreground" and "d.e.f.Foreground" are in the same
+class, "U.V.W.Foreground", and all keys in that class should have the
+same value:
+
+  U.V.W.Foreground : 'red'
+  x.y.z.Foreground : 'green'
+
+At some point, a new hierarchy of keys that begin with "g" is added to
+that class, but they should has a different value:
+
+  g.V.W.Foreground : 'magenta'
+
+You could try this:
+
+  g.?.?.Foreground : 'magenta'
+
+But that would affect *all* keys that begin with "g" but aren't in that
+class.
+
+Classes help bring some order, but this system can become very confusing
+if some discipline isn't maintained.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2021 by Smithsonian Astrophysical
+Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007

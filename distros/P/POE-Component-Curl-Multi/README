@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.18
+    version 0.22
 
 SYNOPSIS
 
@@ -297,7 +297,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2020 by Chris Williams, Michael S.
+    This software is copyright (c) 2021 by Chris Williams, Michael S.
     Fischer, Rocco Caputo, Rob Bloodgood and Martijn van Beers.
 
     This is free software; you can redistribute it and/or modify it under

@@ -49,10 +49,11 @@ Metabolomics::Banks::Knapsack - Perl extension for Knapsack bank
 =head1 VERSION
 
 Version 0.2 - Adding POD
+Version 0.3 - Completing object properties
 
 =cut
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 =head1 SYNOPSIS
 
@@ -83,6 +84,7 @@ our $VERSION = '0.2';
 
 sub new {
     ## Variables
+    my ($class,$args) = @_;
     my $self={};
     
     $self = Metabolomics::Banks->new() ;
@@ -91,6 +93,9 @@ sub new {
     $self->{_DATABASE_VERSION_} = '1.1' ;
     $self->{_DATABASE_ENTRIES_NB_} = 51187 ;
     $self->{_DATABASE_URL_} = 'http://www.knapsackfamily.com/KNApSAcK_Family/' ;
+    $self->{_DATABASE_URL_CARD_} = 'http://www.knapsackfamily.com/knapsack_core/information.php?word=' ;
+    $self->{_DATABASE_TYPE_} = 'METABOLITE' ;
+    $self->{_POLARITY_} =  $args->{POLARITY} ;
     $self->{_DATABASE_DOI_} = '10.1093/pcp/pct176' ;
     ## _DATABASE_ENTRIES_
     bless($self) ;
@@ -189,6 +194,7 @@ sub buildTheoPeakBankFromKnapsack {
     my $mode = undef ;
 
     my $entries = $self->_getEntries();
+#    print Dumper $entries ;
     
     my $entryNb = 0 ; 
 
@@ -221,12 +227,14 @@ sub buildTheoPeakBankFromKnapsack {
 	    	
 	    if ( (defined $mode) and ( $mode eq 'POS' ) ) {
 	    	$computedMz = Metabolomics::Banks->computeNeutralCpdMz_To_PositiveIonMz($entryMass) ;
-	    	$oPeak->_setPeak_ANNOTATION_TYPE('[M+H]+')
+	    	$oPeak->_setPeak_ANNOTATION_IN_POS_MODE('[M+H]+') ;
+	    	$oPeak->_setPeak_ANNOTATION_TYPE('pseudomolecular ion') ;
 	    }
 	    
 	    elsif ( (defined $mode) and ( $mode eq 'NEG' ) ) {
 	    	$computedMz = Metabolomics::Banks->computeNeutralCpdMz_To_NegativeIonMz($entryMass) ;
-	    	$oPeak->_setPeak_ANNOTATION_TYPE('[M-H]-')
+	    	$oPeak->_setPeak_ANNOTATION_IN_NEG_MODE('[M-H]-') ;
+	    	$oPeak->_setPeak_ANNOTATION_TYPE('pseudomolecular ion') ;
 	    }
     	#_MZ_
     	$oPeak->_setPeak_COMPUTED_MONOISOTOPIC_MASS ( $computedMz );
@@ -236,6 +244,8 @@ sub buildTheoPeakBankFromKnapsack {
 	    $oPeak->_setPeak_ANNOTATION_ID ( $entry->_getEntry_KNAPSACK_ID() );
 	    #_MOLECULAR_FORMULA_
 	    $oPeak->_setPeak_ANNOTATION_FORMULA ( $entry->_getEntry_MOLECULAR_FORMULA() );
+	    #_INCHIKEY_
+	    $oPeak->_setPeak_ANNOTATION_INCHIKEY ( $entry->_getEntry_INCHIKEY() );
 	    
 	    $self->_addPeakList('_THEO_PEAK_LIST_', $oPeak) ;
 	    
@@ -289,8 +299,8 @@ sub __refKnapsackEntry__ {
 
 	## Description : PRIVATE method _getEntry_INCHIKEY on a refKnapsackEntry object
 	## Input : void
-	## Output : $INCHIKEY
-	## Usage : my ( $INCHIKEY ) = $entry->_getEntry_INCHIKEY () ;
+	## Output : $VALUE
+	## Usage : my ( $VALUE ) = $entry->_getEntry_INCHIKEY () ;
 
 =cut
 
@@ -299,12 +309,12 @@ sub _getEntry_INCHIKEY {
     ## Retrieve Values
     my $self = shift ;
     
-    my $INCHIKEY = undef ;
+    my $VALUE = undef ;
+
+    if ( ( defined $self->{_INCHIKEY_} ) and ( $self->{_INCHIKEY_} ne '' )   ) {	$VALUE = $self->{_INCHIKEY_} ; }
+    else {	 $VALUE = undef ; warn "[WARN] the method _getEntry_INCHIKEY get an undef value\n" ; }
     
-    if ( (defined $self->{_INCHIKEY_}) and ( $self->{_INCHIKEY_} > 0 ) or $self->{_INCHIKEY_} < 0  ) {	$INCHIKEY = $self->{_INCHIKEY_} ; }
-    else {	 $INCHIKEY = 0 ; warn "[WARN] the method _getEntry_INCHIKEY can't _get a undef or non numerical value\n" ; }
-    
-    return ( $INCHIKEY ) ;
+    return ( $VALUE ) ;
 }
 ### END of SUB
 
@@ -312,8 +322,8 @@ sub _getEntry_INCHIKEY {
 
 	## Description : PRIVATE method _getEntry_EXACT_MASS on a refKnapsackEntry object
 	## Input : void
-	## Output : $EXACT_MASS
-	## Usage : my ( $EXACT_MASS ) = $entry->_getEntry_EXACT_MASS () ;
+	## Output : $VALUE
+	## Usage : my ( $VALUE ) = $entry->_getEntry_EXACT_MASS () ;
 
 =cut
 
@@ -322,12 +332,12 @@ sub _getEntry_EXACT_MASS {
     ## Retrieve Values
     my $self = shift ;
     
-    my $EXACT_MASS = undef ;
+    my $VALUE = undef ;
     
-    if ( (defined $self->{_EXACT_MASS_}) and ( $self->{_EXACT_MASS_} > 0 ) or $self->{_EXACT_MASS_} < 0  ) {	$EXACT_MASS = $self->{_EXACT_MASS_} ; }
-    else {	 $EXACT_MASS = 0 ; warn "[WARN] the method _getEntry_EXACT_MASS can't _get a undef or non numerical value\n" ; }
+    if ( (defined $self->{_EXACT_MASS_}) and ( $self->{_EXACT_MASS_} > 0 ) or $self->{_EXACT_MASS_} < 0  ) {	$VALUE = $self->{_EXACT_MASS_} ; }
+    else {	 $VALUE = undef ; warn "[WARN] the method _getEntry_EXACT_MASS get an undef value\n" ; }
     
-    return ( $EXACT_MASS ) ;
+    return ( $VALUE ) ;
 }
 ### END of SUB
 
@@ -335,8 +345,8 @@ sub _getEntry_EXACT_MASS {
 
 	## Description : PRIVATE method _getEntry_CAS on a refKnapsackEntry object
 	## Input : void
-	## Output : $KNAPSACK_ID
-	## Usage : my ( $KNAPSACK_ID ) = $entry->_getEntry_KNAPSACK_ID () ;
+	## Output : $VALUE
+	## Usage : my ( $VALUE ) = $entry->_getEntry_KNAPSACK_ID () ;
 
 =cut
 
@@ -345,12 +355,12 @@ sub _getEntry_KNAPSACK_ID {
     ## Retrieve Values
     my $self = shift ;
     
-    my $KNAPSACK_ID = undef ;
+    my $VALUE = undef ;
     
-    if ( ( defined $self->{_KNAPSACK_ID_} ) and ( $self->{_KNAPSACK_ID_} ne '' )   ) {	$KNAPSACK_ID = $self->{_KNAPSACK_ID_} ; }
-    else {	 $KNAPSACK_ID = 0 ; warn "[WARN] the method _getEntry_KNAPSACK_ID can't _get a undef or non numerical value\n" ; }
+    if ( ( defined $self->{_KNAPSACK_ID_} ) and ( $self->{_KNAPSACK_ID_} ne '' )   ) {	$VALUE = $self->{_KNAPSACK_ID_} ; }
+    else {	 $VALUE = undef ; warn "[WARN] the method _getEntry_KNAPSACK_ID get an undef value\n" ; }
     
-    return ( $KNAPSACK_ID ) ;
+    return ( $VALUE ) ;
 }
 ### END of SUB
 
@@ -358,8 +368,8 @@ sub _getEntry_KNAPSACK_ID {
 
 	## Description : PRIVATE method _getEntry_CAS on a refKnapsackEntry object
 	## Input : void
-	## Output : $CAS
-	## Usage : my ( $CAS ) = $entry->_getEntry_CAS () ;
+	## Output : $VALUE
+	## Usage : my ( $VALUE ) = $entry->_getEntry_CAS () ;
 
 =cut
 
@@ -368,12 +378,12 @@ sub _getEntry_CAS {
     ## Retrieve Values
     my $self = shift ;
     
-    my $CAS = undef ;
+    my $VALUE = undef ;
     
-    if ( (defined $self->{_CAS_}) and ( $self->{_CAS_} > 0  or $self->{_CAS_} < 0 or $self->{_CAS_} == 0 )   ) {	$CAS = $self->{_CAS_} ; }
-    else {	 $CAS = 0 ; warn "[WARN] the method _getEntry_CAS can't _get a undef or non numerical value\n" ; }
+    if ( ( defined $self->{_CAS_} ) and ( $self->{_CAS_} ne '' )   ) {	$VALUE = $self->{_CAS_} ; }
+    else {	 $VALUE = undef ; warn "[WARN] the method _getEntry_CAS get an undef value\n" ; }
     
-    return ( $CAS ) ;
+    return ( $VALUE ) ;
 }
 ### END of SUB
 
@@ -381,8 +391,8 @@ sub _getEntry_CAS {
 
 	## Description : PRIVATE method _getEntry_MOLECULAR_FORMULA on a refKnapsackEntry object
 	## Input : void
-	## Output : $COMPOUND_FORMULA
-	## Usage : my ( $COMPOUND_FORMULA ) = $entry->_getEntry_MOLECULAR_FORMULA () ;
+	## Output : $VALUE
+	## Usage : my ( $VALUE ) = $entry->_getEntry_MOLECULAR_FORMULA () ;
 
 =cut
 
@@ -391,12 +401,12 @@ sub _getEntry_MOLECULAR_FORMULA {
     ## Retrieve Values
     my $self = shift ;
     
-    my $COMPOUND_FORMULA = undef ;
+    my $VALUE = undef ;
     
-    if ( (defined $self->{_MOLECULAR_FORMULA_}) and ( $self->{_MOLECULAR_FORMULA_} ne '' ) ) {	$COMPOUND_FORMULA = $self->{_MOLECULAR_FORMULA_} ; }
-    else {	 $COMPOUND_FORMULA = undef ; warn "[WARN] the method _getEntry_COMPOUND_NAME can't _get a undef or non numerical value\n" ; }
+    if ( (defined $self->{_MOLECULAR_FORMULA_}) and ( $self->{_MOLECULAR_FORMULA_} ne '' ) ) {	$VALUE = $self->{_MOLECULAR_FORMULA_} ; }
+    else {	 $VALUE = undef ; warn "[WARN] the method _getEntry_MOLECULAR_FORMULA get an undef value\n" ; }
     
-    return ( $COMPOUND_FORMULA ) ;
+    return ( $VALUE ) ;
 }
 ### END of SUB
 
@@ -404,8 +414,8 @@ sub _getEntry_MOLECULAR_FORMULA {
 
 	## Description : PRIVATE method _getEntry_COMPOUND_NAME on a refKnapsackEntry object
 	## Input : void
-	## Output : $COMPOUND_NAME
-	## Usage : my ( $COMPOUND_NAME ) = $entry->_getEntry_COMPOUND_NAME () ;
+	## Output : $VALUE
+	## Usage : my ( $VALUE ) = $entry->_getEntry_COMPOUND_NAME () ;
 
 =cut
 
@@ -414,12 +424,12 @@ sub _getEntry_COMPOUND_NAME {
     ## Retrieve Values
     my $self = shift ;
     
-    my $COMPOUND_NAME = undef ;
+    my $VALUE = undef ;
     
-    if ( (defined $self->{_COMPOUND_NAME_}) and ( $self->{_COMPOUND_NAME_} ne '' ) ) {	$COMPOUND_NAME = $self->{_COMPOUND_NAME_} ; }
-    else {	 $COMPOUND_NAME = undef ; warn "[WARN] the method _getEntry_COMPOUND_NAME can't _get a undef or non numerical value\n" ; }
+    if ( (defined $self->{_COMPOUND_NAME_}) and ( $self->{_COMPOUND_NAME_} ne '' ) ) {	$VALUE = $self->{_COMPOUND_NAME_} ; }
+    else {	 $VALUE = undef ; warn "[WARN] the method _getEntry_COMPOUND_NAME get an undef value\n" ; }
     
-    return ( $COMPOUND_NAME ) ;
+    return ( $VALUE ) ;
 }
 ### END of SUB
 

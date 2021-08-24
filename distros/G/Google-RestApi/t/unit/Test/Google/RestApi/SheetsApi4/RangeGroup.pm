@@ -1,41 +1,61 @@
 package Test::Google::RestApi::SheetsApi4::RangeGroup;
 
-use YAML::Any qw(Dump);
-use Test::Most;
+use Test::Unit::Setup;
+
+use parent 'Test::Unit::TestBase';
 
 use aliased 'Google::RestApi::SheetsApi4::RangeGroup';
 
-use parent qw(Test::Class Test::Google::RestApi::SheetsApi4::Base);
+sub class { RangeGroup; }
 
-sub class { 'Google::RestApi::SheetsApi4::RangeGroup' }
-
-sub constructor : Tests(4) {
+sub setup : Tests(setup) {
   my $self = shift;
-  my @ranges = $self->new_ranges("A1", "B2");
-  $self->SUPER::constructor(
-    spreadsheet => $self->spreadsheet(),
-    ranges      => \@ranges,
-  );
-  can_ok $self, 'ranges';
+  $self->SUPER::setup(@_);
+
+  $self->_fake_http_auth();
+  $self->_fake_http_no_retries();
+
+  $self->_uri_responses(qw(
+    get_worksheet_properties_title_sheetid
+  ));
+
   return;
 }
 
-sub spreadsheet { shift->worksheet()->spreadsheet(); }
+sub _constructor : Tests(2) {
+  my $self = shift;
+
+  $self->_fake_http_response_by_uri();
+
+  my $class = class();
+
+  my @ranges = $self->new_ranges("A1", "B2");
+  my $range_group = $class->new(
+    spreadsheet => fake_spreadsheet(),
+    ranges      => \@ranges,
+  );
+  isa_ok $range_group, $class, 'Constructor returns';
+  can_ok $range_group, 'ranges';
+
+  return;
+}
 
 sub new_ranges {
   my $self = shift;
-  my @ranges = map { $self->worksheet()->range($_); } @_;
+  my @ranges = map { fake_worksheet()->range($_); } @_;
   return @ranges;
 }
 
 sub new_range_group {
   my $self = shift;
   my @ranges = $self->new_ranges(@_);
-  return $self->class()->new(spreadsheet => $self->spreadsheet(), ranges => \@ranges);
+  return $self->class()->new(spreadsheet => fake_spreadsheet(), ranges => \@ranges);
 }
 
 sub ranges : Tests(1) {
   my $self = shift;
+
+  $self->_fake_http_response_by_uri();
 
   my $range_group = $self->new_range_group("A1", "B2");
   isa_ok $range_group->bold()->red(0.1), RangeGroup, "Setting bold and red";

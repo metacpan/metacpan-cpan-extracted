@@ -1,5 +1,4 @@
-#!/usr/local/bin/perl
-
+#!perl
 use Test::More qw( no_plan );
 select(($|=1,select(STDERR),$|=1)[1]);
 BEGIN
@@ -10,6 +9,8 @@ BEGIN
 	use IO::Dir;
 	use File::Spec;
 	use JSON;
+	use version;
+	our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? 1 : 0;
 };
 
 # BEGIN { use_ok( 'DB::Object::Postgres' ); };
@@ -117,6 +118,14 @@ SKIP:
 	}
 
 	my $result;
+	if( $dbh->version >= version->declare('9.5') )
+	{
+	    
+        $cust->on_conflict(
+            target  => 'on constraint idx_customers',
+            action  => 'update',
+        );
+	}
 	my $cust_sth_ins = $cust->insert(
 		first_name => 'Paul',
 		last_name => 'Goldman',
@@ -125,10 +134,23 @@ SKIP:
 	) || fail( "Error while create query to add data to table customers: " . $cust->error );
 	pass( "Customer insert query object" );
 	$result = $cust_sth_ins->as_string;
-
-	my $expected = <<SQL;
+    
+    my $expected;
+    if( $dbh->version >= version->declare( '9.5' ) )
+    {
+        diag( "Testing INSERT with ON CONFLICT clause since database version is higher or equal to 9.5" ) if( $DEBUG );
+        # <https://www.postgresql.org/docs/9.5/sql-insert.html>
+        $expected = <<SQL;
+INSERT INTO customers (first_name, last_name, email, active) VALUES('Paul', 'Goldman', 'paul\@example.org', '0') ON CONFLICT ON CONSTRAINT idx_customers DO UPDATE SET first_name='Paul', last_name='Goldman', email='paul\@example.org', active='0'
+SQL
+    }
+    else
+    {
+        diag( "Testing INSERT withour ON CONFLICT clause since database version is lower than to 9.5" ) if( $DEBUG );
+        $expected = <<SQL;
 INSERT INTO customers (first_name, last_name, email, active) VALUES('Paul', 'Goldman', 'paul\@example.org', '0')
 SQL
+    }
 	chomp( $expected );
 	is( $result, $expected, "Checking INSERT statement" );
 	$cust->reset;

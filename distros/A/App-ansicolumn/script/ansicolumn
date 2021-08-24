@@ -15,10 +15,6 @@ __END__
 
 ansicolumn - ANSI terminal sequence aware column command
 
-=head1 VERSION
-
-Version 1.11
-
 =head1 SYNOPSIS
 
 ansicolumn [options] [file ...]
@@ -56,6 +52,10 @@ ansicolumn [options] [file ...]
     --tabspace=#         tab-space width
     --tabstyle=#         tab style
     --ambiguous=#        ambiguous character width (narrow|wide)
+
+=head1 VERSION
+
+Version 1.12
 
 =head1 DESCRIPTION
 
@@ -172,21 +172,22 @@ Set page height and page mode on.  See L</CALCULATION> section.
 Each columns are placed at the unit of 8 by default.  This option
 changes the number of the unit.
 
-=item B<--linestyle>=I<none>|I<truncate>|I<wrap>|I<wordwrap>, B<--ls>=I<...>
+=item B<--linestyle>=C<none>|C<truncate>|C<wrap>|C<wordwrap>, B<--ls>=C<...>
 
 Set the style of treatment for longer lines.
-Default is I<none>.
+Default is C<none>.
 
 B<--linestyle=wordrap> is equivalent to B<--linestyle=wrap>
 B<--boundary=word>.
 
-=item B<--boundary>=I<word>
+=item B<--boundary>=C<none>|C<word>|C<space>
 
-Set text wrap boundary.  If this option set to B<word>, text is
-wrapped at word boundary.  Option B<--document> set this automatically.
-Use something like `--boundary=none' to disable it.
+Set text wrap boundary.  If set as C<word> or C<space>, text is not
+wrapped in the middle of alphanumeric word or non-space sequence.
+Option B<--document> set this as C<word>.  See L<Text::ANSI::Fold> for
+detail.
 
-=item B<--linebreak>=I<none|all|runin|runout>, B<--lb>=...
+=item B<--linebreak>=C<none>|C<all>|C<runin>|C<runout>, B<--lb>=...
 
 Set the linebreak mode.
 
@@ -210,7 +211,7 @@ Border style is specified by B<--border-style> option.
 
 =item B<--border-style>=I<style>, B<--bs>=...
 
-Set the border style.  Current default style is B<vbar>, which is
+Set the border style.  Current default style is C<vbar>, which is
 light vertical line filling the page height.
 
 Sample styles:
@@ -258,7 +259,7 @@ Allow the first line of a paragraph (continuous non-space lines) is
 placed at the bottom of a pane.  Default true.  If false, move it to
 the top of next pane.  Negated by B<--document> option.
 
-=item B<--fillup>[=I<pane|page|none>]
+=item B<--fillup>[=C<pane>|C<page>|C<none>]
 
 Fill up final pane or page by empty lines.  Parameter is optional and
 considered as 'pane' by default.  Set by B<--page> option

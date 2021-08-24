@@ -3,23 +3,25 @@ abstract: 'Normalize/optimize URLs.'
 author:
   - 'Tore Aursand <toreau@gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: '7.34'
-  Test::More: '1.302136'
+  ExtUtils::MakeMaker: '7.62'
+  Test::More: '1.302186'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: URL-Normalize
 requires:
-  Moose: '2.2011'
-  URI: '1.74'
-  namespace::autoclean: '0.28'
+  Moose: '2.2015'
+  URI: '5.09'
+  namespace::autoclean: '0.29'
 resources:
   bugtracker: https://github.com/toreau/URL-Normalize/issues
   repository: https://github.com/toreau/URL-Normalize
-version: '0.39'
+version: '0.43'
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: MIT

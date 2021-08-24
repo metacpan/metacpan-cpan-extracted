@@ -3,7 +3,7 @@ package Perl7::Handy;
 #
 # Perl7::Handy - Handy Perl7 scripting environment on Perl5
 #
-# https://metacpan.org/release/Perl7-Handy
+# https://metacpan.org/dist/Perl7-Handy
 #
 # Copyright (c) 2020, 2021 INABA Hitoshi <ina@cpan.org>
 ######################################################################
@@ -11,14 +11,25 @@ package Perl7::Handy;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.07';
+$VERSION = '0.10';
 $VERSION = $VERSION;
 
 BEGIN { pop @INC if $INC[-1] eq '.' } # CVE-2016-1238: Important unsafe module load path flaw
 use strict;
 BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 } use warnings; local $^W=1;
 BEGIN { $INC{'feature.pm'}  = '' if $] < 5.010 } use feature ();
-
+BEGIN {
+    if ($] >= 5.008001) {
+        eval q{
+use bareword::filehandles; # pmake.bat catches /^use .../
+use multidimensional;      # pmake.bat catches /^use .../
+        };
+    }
+    else {
+        $INC{'bareword/filehandles.pm'} = '';
+        $INC{'multidimensional.pm'}     = '';
+    }
+}
 use Fcntl;
 
 #---------------------------------------------------------------------
@@ -41,7 +52,7 @@ sub Perl7::Handy::open (*$;$) {
     my $handle;
 
     if (defined $_[0]) {
-        Perl7::Handy::confess "Bare handle no longer supported";
+        Perl7::Handy::confess "Use of bareword handle in open";
     }
     else {
         $handle = $_[0] = \do { local *_ };
@@ -112,7 +123,7 @@ sub Perl7::Handy::opendir (*$) {
     my $handle;
 
     if (defined $_[0]) {
-        Perl7::Handy::confess "Bare handle no longer supported";
+        Perl7::Handy::confess "Use of bareword handle in opendir";
     }
     else {
         $handle = $_[0] = \do { local *_ };
@@ -139,7 +150,7 @@ sub Perl7::Handy::sysopen (*$$;$) {
     my $handle;
 
     if (defined $_[0]) {
-        Perl7::Handy::confess "Bare handle no longer supported";
+        Perl7::Handy::confess "Use of bareword handle in sysopen";
     }
     else {
         $handle = $_[0] = \do { local *_ };
@@ -177,14 +188,14 @@ sub Perl7::Handy::pipe (**) {
     my($handle0,$handle1);
 
     if (defined $_[0]) {
-        Perl7::Handy::confess "Bare handle no longer supported";
+        Perl7::Handy::confess "Use of bareword handle (\$_[0]) in pipe";
     }
     else {
         $handle0 = $_[0] = \do { local *_ };
     }
 
     if (defined $_[1]) {
-        Perl7::Handy::confess "Bare handle no longer supported";
+        Perl7::Handy::confess "Use of bareword handle (\$_[1]) in pipe";
     }
     else {
         $handle1 = $_[1] = \do { local *_ };
@@ -205,7 +216,7 @@ sub Perl7::Handy::socket (*$$$) {
     my $handle;
 
     if (defined $_[0]) {
-        Perl7::Handy::confess "Bare handle no longer supported";
+        Perl7::Handy::confess "Use of bareword handle in socket";
     }
     else {
         $handle = $_[0] = \do { local *_ };
@@ -221,14 +232,10 @@ sub Perl7::Handy::accept (**) {
     my($handle0,$handle1);
 
     if (defined $_[0]) {
-        Perl7::Handy::confess "Bare handle no longer supported";
+        Perl7::Handy::confess "Use of bareword handle (\$_[0]) in accept";
     }
     else {
         $handle0 = $_[0] = \do { local *_ };
-    }
-
-    if (defined $_[1]) {
-        Perl7::Handy::confess "Bare handle no longer supported";
     }
 
     my $return = CORE::accept($handle0,$handle1);
@@ -251,13 +258,13 @@ sub TIESCALAR {
 #---------------------------------------------------------------------
 # FETCH to disable $; (internal use to "no multidimensional")
 sub FETCH {
-    Perl7::Handy::confess "Can't use Perl4-style multidimensional arrays";
+    Perl7::Handy::confess "Use of multidimensional array emulation";
 }
 
 #---------------------------------------------------------------------
 # STORE to disable $; (internal use to "no multidimensional")
 sub STORE {
-    Perl7::Handy::confess "Can't use Perl4-style multidimensional arrays"
+    Perl7::Handy::confess "Use of multidimensional array emulation"
 }
 
 #---------------------------------------------------------------------
@@ -290,23 +297,36 @@ sub import {
         }
     }
 
-    # gives caller package "no bareword::filehandles;"
+    # new Perl called "Modern Perl"
+    if ($] >= 5.008001) {
 
-    # avoid: Can't use string ("main::open") as a symbol ref while "strict refs" in use
-    no strict 'refs';
-    {
-        # avoid: Prototype mismatch: sub main::open (*;$) vs (*$;$)
-        local $SIG{__WARN__} = sub {};
-        *{caller() . '::open'} = \&Perl7::Handy::open;
+        # gives caller package "no bareword::filehandles;"
+        bareword::filehandles->unimport;
+
+        # gives caller package "no multidimensional;"
+        multidimensional->unimport;
     }
-    *{caller() . '::opendir'}  = \&Perl7::Handy::opendir;
-    *{caller() . '::sysopen'}  = \&Perl7::Handy::sysopen;
-    *{caller() . '::pipe'}     = \&Perl7::Handy::pipe;
-    *{caller() . '::socket'}   = \&Perl7::Handy::socket;
-    *{caller() . '::accept'}   = \&Perl7::Handy::accept;
 
-    # gives caller package "no multidimensional;"
-    tie $;, __PACKAGE__;
+    # support older Perl that we love :)
+    else {
+
+        # gives caller package "no bareword::filehandles;"
+        # avoid: Can't use string ("main::open") as a symbol ref while "strict refs" in use
+        no strict 'refs';
+        {
+            # avoid: Prototype mismatch: sub main::open (*;$) vs (*$;$)
+            local $SIG{__WARN__} = sub {};
+            *{caller() . '::open'} = \&Perl7::Handy::open;
+        }
+        *{caller() . '::opendir'}  = \&Perl7::Handy::opendir;
+        *{caller() . '::sysopen'}  = \&Perl7::Handy::sysopen;
+        *{caller() . '::pipe'}     = \&Perl7::Handy::pipe;
+        *{caller() . '::socket'}   = \&Perl7::Handy::socket;
+        *{caller() . '::accept'}   = \&Perl7::Handy::accept;
+
+        # gives caller package "no multidimensional;"
+        tie $;, __PACKAGE__;
+    }
 }
 
 1;
@@ -404,6 +424,9 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  A vision for Perl 7 and beyond
  https://web.archive.org/web/20200927044106/https://xdg.me/archive/2020-a-vision-for-perl-7-and-beyond/
  
+ SC Notes 2020 07 14 Perl/perl5 Wiki GitHub
+ https://github-wiki-see.page/m/Perl/perl5/wiki/SC-Notes-2020-07-14
+
  Import pragmas like strict and warnings into callers lexical scope
  https://www.perlmonks.org/?node_id=887663
  
@@ -418,6 +441,12 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  
  perl - open my $fh, "comand (pipe)"; # isn't modern
  http://blog.livedoor.jp/dankogai/archives/51176081.html
+ 
+ bareword::filehandles - disables bareword filehandles
+ https://metacpan.org/dist/bareword-filehandles
+ 
+ multidimensional - disables multidimensional array emulation
+ https://metacpan.org/dist/multidimensional
  
  13.15. Creating Magic Variables with tie - Perl Cookbook
  https://docstore.mik.ua/orelly/perl3/cookbook/ch13_16.htm

@@ -1,12 +1,14 @@
 package Google::RestApi::Auth::OAuth2Client;
 
-our $VERSION = '0.7';
+our $VERSION = '0.8';
 
 use Google::RestApi::Setup;
 
-# this was taken from Net::Google::DataAPI::Auth::OAuth2 and had
-# a moose-ectomy. this will get rid of warnings about switching
-# to Moo instead of Moose::Any.
+# this was taken from Net::Google::DataAPI::Auth::OAuth2 and had a moose-ectomy. this will
+# get rid of warnings about switching to Moo instead of Moose::Any.
+#
+# NOTE NOTE NOTE: to generate a config file and token file for use by this module, see:
+# bin/google_restapi_oauth_token_creator in this package.
 
 use Net::OAuth2::Client;
 use Net::OAuth2::Profile::WebServer;
@@ -18,20 +20,25 @@ use parent 'Google::RestApi::Auth';
 sub new {
   my $class = shift;
 
-  my $self = config_file(@_);
+  my %p = @_;
+  # order is important, resolve the overall config file first.
+  resolve_config_file_path(\%p, 'config_file');
+  resolve_config_file_path(\%p, 'token_file');
+
+  my $self = merge_config_file(%p);
   state $check = compile_named(
-    config_file        => Str, { optional => 1 },
-    parent_config_file => Str, { optional => 1 },
-    client_id          => Str,
-    client_secret      => Str,
-    token_file         => Str, { optional => 1 },
-    scope              => ArrayRef[Str], { optional => 1 },
-    state              => Str, { default => '' },
-    redirect_uri       => Str, { default => 'urn:ietf:wg:oauth:2.0:oob' },
-    site               => Str, { default => 'https://accounts.google.com' },
-    authorize_path     => Str, { default => '/o/oauth2/auth' },
-    access_token_path  => Str, { default => '/o/oauth2/token' },
-    userinfo_url       => Str, { default => 'https://www.googleapis.com/oauth2/v1/userinfo' },
+    config_dir        => ReadableDir, { optional => 1 },
+    config_file       => ReadableFile, { optional => 1 },
+    token_file        => ReadableFile, { optional => 1 },
+    client_id         => Str,
+    client_secret     => Str,
+    scope             => ArrayRef[Str], { optional => 1 },
+    state             => Str, { default => '' },
+    redirect_uri      => Str, { default => 'urn:ietf:wg:oauth:2.0:oob' },
+    site              => Str, { default => 'https://accounts.google.com' },
+    authorize_path    => Str, { default => '/o/oauth2/auth' },
+    access_token_path => Str, { default => '/o/oauth2/token' },
+    userinfo_url      => Str, { default => 'https://www.googleapis.com/oauth2/v1/userinfo' },
   );
   $self = $check->(%$self);
 
@@ -48,7 +55,7 @@ sub headers {
   return $self->{headers} if $self->{headers};
 
   $self->access_token(
-    refresh_token => retrieve($self->token_file())->{refresh_token},
+    refresh_token => retrieve($self->{token_file})->{refresh_token},
     auto_refresh  => 1,
   );
   $self->refresh_token();
@@ -128,13 +135,6 @@ sub oauth2_webserver {
   return $self->{oauth2_webserver};
 }
 
-sub token_file {
-  my $self = shift;
-  $self->{_token_file} = resolve_config_file('token_file', $self)
-    if !$self->{_token_file};
-  return $self->{_token_file};
-}
-
 # not currently used
 sub userinfo {
   my $self = shift;
@@ -177,11 +177,14 @@ Google::RestApi::Auth::OAuth2Client - OAuth2 support for Google Rest APIs
 
   # generate an access token from the code returned from Google:
   my $token = $oauth2->access_token($code);
-
+  
 =head1 DESCRIPTION
 
 Google::RestApi::Auth::OAuth2Client interacts with google OAuth 2.0 service
 and creates the 'Authorization' header for use in Furl or LWP::UserAgent.
+
+To generate a config file and token file for use by this moudle, see:
+bin/google_restapi_oauth_token_creator in this pacakage.
 
 This was copied from Net::Google::DataAPI::Auth::OAuth2 and modified
 to fit this framework. The other framework was dated and produced
@@ -196,12 +199,12 @@ didn't use Moose anywhere else in this framework.
 
  config_file: Optional YAML configuration file that can specify any
    or all of the following args:
- client_id: The OAuth2 client id you got from Google.
- client_secret: The OAuth2 client secret you got from Google.
+ client_id: The OAuth2 client id supplied by Google.
+ client_secret: The OAuth2 client secret supplied by Google.
  token_file: The file path to the previously saved token (see OAUTH2
    SETUP below). If a config_file is passed, the dirname of the config
-   file is tried to find the token_file (same directory) if only the
-   token file name is passed.
+   file is tried to resolve the token_file (same directory) if the
+   directory portion is omitted.
 
 You can specify any of the arguments in the optional YAML config file.
 Any passed in arguments will override what is in the config file.
@@ -231,7 +234,7 @@ See L<https://developers.google.com/accounts/docs/OAuth2> for details.
 
 This class depends on first creating an OAuth2 token session file
 that you point to via the 'token_file' config param passed via 'new'.
-See bin/google_restapi_session_creator and follow the instructions to
+See bin/google_restapi_oauth_token_creator and follow the instructions to
 save your token file.
 
 =head1 AUTHOR

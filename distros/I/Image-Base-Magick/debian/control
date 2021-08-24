@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2017 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2017, 2018, 2021 Kevin Ryde
 #
 # This file is part of Image-Base-Magick.
 #
@@ -19,10 +19,10 @@ Source: libimage-base-magick-perl
 Section: perl
 Priority: optional
 Build-Depends: cdbs, debhelper (>= 5)
-Maintainer: Kevin Ryde <user42@zip.com.au>
-Standards-Version: 3.9.8
+Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
+Standards-Version: 4.2.1
 Homepage: http://user42.tuxfamily.org/image-base-magick/index.html
-Bugs: mailto:user42@zip.com.au
+Bugs: mailto:user42_kevin@yahoo.com.au
 
 Package: libimage-base-magick-perl
 Architecture: all

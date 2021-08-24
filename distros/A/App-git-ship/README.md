@@ -4,7 +4,7 @@ App::git::ship - Git command for shipping your project
 
 # VERSION
 
-0.36
+0.37
 
 # SYNOPSIS
 

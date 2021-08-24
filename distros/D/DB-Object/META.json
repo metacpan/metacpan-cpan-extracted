@@ -44,7 +44,7 @@
             "IO::Dir" : "0",
             "IO::File" : "0",
             "JSON" : "4.02",
-            "Module::Generic" : "v0.15.5",
+            "Module::Generic" : "v0.15.8",
             "Net::IP" : "1.26",
             "Nice::Try" : "v1.1.2",
             "Number::Format" : "1.75",
@@ -63,7 +63,8 @@
       "test" : {
          "requires" : {
             "Test::More" : "1.302162",
-            "Test::Pod" : "1.52"
+            "Test::Pod" : "1.52",
+            "version" : "0"
          }
       }
    },
@@ -77,6 +78,6 @@
          "web" : "https://git.deguest.jp/jack/DB-Object"
       }
    },
-   "version" : "v0.9.14",
+   "version" : "v0.9.15",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

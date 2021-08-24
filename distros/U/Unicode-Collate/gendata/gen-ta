@@ -20,7 +20,7 @@ my $text2 = '';
 my $testf = 'loc_ta.t';
 my $test1 = << 'TEST';
     no warnings 'utf8';
-    my $t = $h ? pack('U', 0xFFFF) : "";
+    my $t = $h ? _pack_U(0xFFFF) : "";
     $objTa->change(highestFFFF => 1) if $h;
 
     ok($objTa->lt("\x{B94}$t",   "\x{B82}"));

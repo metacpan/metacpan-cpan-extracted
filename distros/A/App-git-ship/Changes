@@ -1,5 +1,9 @@
 Revision history for perl distribution App-git-ship
 
+0.37 2021-08-21T06:13:03+0200
+  - Add recommends prereqs to meta merge
+    Contributor: Roy Storey
+
 0.36 2020-03-23T11:56:56+0900
  - Fix reading main_module_path from the config file
    Contributor: Roy Storey

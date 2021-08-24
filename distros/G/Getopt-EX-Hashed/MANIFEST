@@ -15,6 +15,7 @@ t/05_getter.t
 t/06_DEFAULT.t
 t/07_main_getopt.t
 t/08_must.t
+t/09_validate.t
 t/App/Foo.pm
 META.yml
 MANIFEST

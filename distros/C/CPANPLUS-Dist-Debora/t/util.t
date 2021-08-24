@@ -28,7 +28,7 @@ if (tainted($ENV{PWD})) {
     plan skip_all => 'taint mode enabled';
 }
 else {
-    plan tests => 9;
+    plan tests => 10;
 }
 
 my $tempdir = tempdir(CLEANUP => 1);
@@ -42,10 +42,17 @@ my $filename = catfile($tempdir, 'motorhead.txt');
 ok spew_utf8($filename, 'Motörhead'), 'can write text to UTF-8 encoded file';
 is slurp_utf8($filename), 'Motörhead', 'can read text from UTF-8 encoded file';
 
+is filetype("Makefile.PL"), 'script', 'Makefile.PL is a script';
+
 SKIP:
 {
+    skip 'these tests are for release candidate testing', 5
+        if !$ENV{RELEASE_TESTING};
+
     my $perl = can_run('perl');
-    skip 'perl interpreter not found', 3 if !$perl;
+    skip 'perl interpreter not found', 5 if !$perl;
+
+    like filetype($perl), qr{executable|script}xms, 'perl is an executable';
 
     my $output = q{};
     ok run(command => [$perl, '-v'], dir => $tempdir, buffer => \$output),
@@ -55,7 +62,6 @@ SKIP:
     my $has_failed = 0;
     run(command => [$perl, '-e', 'die'], on_error => sub { $has_failed = 1 });
     ok $has_failed, 'on_error is called';
-}
 
-like unix_path($ENV{PWD}), qr{/}xms, 'path has forward slashes';
-is filetype("Makefile.PL"), 'script', 'Makefile.PL is a script';
+    like unix_path($ENV{PWD}), qr{/}xms, 'path has forward slashes';
+}

@@ -6,6 +6,7 @@ BEGIN
     use warnings;
     use lib './lib';
     use Module::Generic;
+    our $DEBUG = exists( $ENV{AUTHOR_TESTING} );
 };
 
 my $o = Module::Generic->new;
@@ -15,6 +16,13 @@ $a = $o->_get_args_as_array(qw( Hello there ));
 ok( ( scalar( @$a ) == 2 and "@$a" eq 'Hello there' ), '_get_args_as_array' );
 $a = $o->_get_args_as_array([qw( Hello there )]);
 ok( ( scalar( @$a ) == 2 and "@$a" eq 'Hello there' ), '_get_args_as_array' );
+
+my $stack = &get_frames_stack( $o );
+diag( "Frames stack is: ", $stack->as_string ) if( $DEBUG );
+isa_ok( $stack, 'Devel::StackTrace', '_get_stack_trace returned object is Devel::StackTrace' );
+my $frame = $stack->frame(0);
+isa_ok( $frame, 'Devel::StackTrace::Frame' );
+is( $frame->filename, __FILE__, 'last frame filename' );
 
 ok( $o->_is_class_loadable( 'lib' ), '_is_class_loadable' );
 # $o->debug(3);
@@ -118,6 +126,12 @@ for( my $i = 0; $i < scalar( @$dates ); $i++ )
     diag( "Failed to get the datetime object -> ", $o->error ) if( !defined( $dt ) );
     isa_ok( $dt, 'DateTime', "DateTime object for $def->{test}" );
     is( "$dt", $def->{expect}, "stringification for $def->{test}" );
+}
+
+sub get_frames_stack
+{
+    my $obj = shift( @_ );
+    return( $obj->_get_stack_trace );
 }
 
 done_testing();

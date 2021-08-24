@@ -9,6 +9,7 @@ Makefile.PL
 README
 README.md
 TODO
+chart.js.LICENSE
 cpanfile
 dist.ini
 json-formatter.LICENSE
@@ -26,8 +27,11 @@ lib/Test2/Harness/UI/Controller/Durations.pm
 lib/Test2/Harness/UI/Controller/Events.pm
 lib/Test2/Harness/UI/Controller/Failed.pm
 lib/Test2/Harness/UI/Controller/Job.pm
+lib/Test2/Harness/UI/Controller/JobField.pm
+lib/Test2/Harness/UI/Controller/Project.pm
 lib/Test2/Harness/UI/Controller/Query.pm
 lib/Test2/Harness/UI/Controller/Run.pm
+lib/Test2/Harness/UI/Controller/RunField.pm
 lib/Test2/Harness/UI/Controller/Stream.pm
 lib/Test2/Harness/UI/Controller/Sweeper.pm
 lib/Test2/Harness/UI/Controller/Upload.pm
@@ -48,11 +52,13 @@ lib/Test2/Harness/UI/Schema/Result/Email.pm
 lib/Test2/Harness/UI/Schema/Result/EmailVerificationCode.pm
 lib/Test2/Harness/UI/Schema/Result/Event.pm
 lib/Test2/Harness/UI/Schema/Result/Job.pm
+lib/Test2/Harness/UI/Schema/Result/JobField.pm
 lib/Test2/Harness/UI/Schema/Result/LogFile.pm
 lib/Test2/Harness/UI/Schema/Result/Permission.pm
 lib/Test2/Harness/UI/Schema/Result/PrimaryEmail.pm
 lib/Test2/Harness/UI/Schema/Result/Project.pm
 lib/Test2/Harness/UI/Schema/Result/Run.pm
+lib/Test2/Harness/UI/Schema/Result/RunField.pm
 lib/Test2/Harness/UI/Schema/Result/Session.pm
 lib/Test2/Harness/UI/Schema/Result/SessionHost.pm
 lib/Test2/Harness/UI/Schema/Result/User.pm
@@ -69,6 +75,7 @@ share/css/fieldtable.css
 share/css/job.css
 share/css/json-formatter.css
 share/css/main.css
+share/css/project.css
 share/css/theme.css
 share/css/upload.css
 share/css/user.css
@@ -78,6 +85,7 @@ share/img/close_red.png
 share/img/coverage.png
 share/img/coveragedel.png
 share/img/data.png
+share/img/delete.png
 share/img/dotdotdot.png
 share/img/download.png
 share/img/error.png
@@ -86,7 +94,9 @@ share/img/goto.png
 share/img/link.png
 share/img/locked.png
 share/img/orphan.png
+share/img/stats.png
 share/img/unlocked.png
+share/js/chart.min.js
 share/js/datatables.min.js
 share/js/eventtable.js
 share/js/fieldtable.js
@@ -96,6 +106,7 @@ share/js/jquery-ui.min.js
 share/js/jquery.js
 share/js/json-formatter.umd.js
 share/js/main.js
+share/js/project.js
 share/js/runtable.js
 share/js/upload.js
 share/js/view.js
@@ -104,6 +115,7 @@ share/schema/MySQL56.sql
 share/schema/PostgreSQL.sql
 share/templates/login.tx
 share/templates/main.tx
+share/templates/project.tx
 share/templates/upload.tx
 share/templates/user.tx
 share/templates/view.tx

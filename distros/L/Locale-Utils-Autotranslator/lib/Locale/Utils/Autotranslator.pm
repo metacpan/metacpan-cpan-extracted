@@ -13,7 +13,7 @@ use MooX::Types::MooseLike::Numeric qw(PositiveInt);
 use Try::Tiny;
 use namespace::autoclean;
 
-our $VERSION = '1.008';
+our $VERSION = '1.011';
 
 # plural_ref e.g. ru
 # The key is the plural form 0, 1 or 2.
@@ -766,13 +766,9 @@ __END__
 
 Locale::Utils::Autotranslator - Base class to translate automaticly
 
-$Id: Autotranslator.pm 671 2017-07-16 19:22:17Z steffenw $
-
-$HeadURL: $
-
 =head1 VERSION
 
-1.008
+1.011
 
 =head1 SYNOPSIS
 
@@ -799,8 +795,11 @@ $HeadURL: $
         return $translation;
     }
 
-How to use see also
+How to use, see also
 L<Locale::Utils::Autotranslator::ApiMymemoryTranslatedNet|Locale::Utils::Autotranslator::ApiMymemoryTranslatedNet>.
+
+For interactive translation at the console, see also
+L<Locale::Utils::Autotranslator::Interactive|Locale::Utils::Autotranslator::Interactive>.
 
 =head2 Translate po files
 
@@ -1015,7 +1014,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2014 - 2017,
+Copyright (c) 2014 - 2021,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

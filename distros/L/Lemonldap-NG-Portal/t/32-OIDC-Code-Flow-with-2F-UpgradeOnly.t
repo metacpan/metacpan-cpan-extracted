@@ -156,7 +156,7 @@ $pdata = expectCookie( $res, 'lemonldappdata' );
 
 ok(
     $res->[2]->[0] =~
-qr%<input name="code" value="" type="text" class="form-control" id="extcode" trplaceholder="code" autocomplete="off" />%,
+qr%<input name="code" value="" type="text" class="form-control" id="extcode" trplaceholder="code" autocomplete="one-time-code" />%,
     'Found EXTCODE input'
 ) or print STDERR Dumper( $res->[2]->[0] );
 count(1);
@@ -261,7 +261,7 @@ $pdata = expectCookie( $res, 'lemonldappdata' );
 
 ok(
     $res->[2]->[0] =~
-qr%<input name="code" value="" type="text" class="form-control" id="extcode" trplaceholder="code" autocomplete="off" />%,
+qr%<input name="code" value="" type="text" class="form-control" id="extcode" trplaceholder="code" autocomplete="one-time-code" />%,
     'Found EXTCODE input'
 ) or print STDERR Dumper( $res->[2]->[0] );
 count(1);

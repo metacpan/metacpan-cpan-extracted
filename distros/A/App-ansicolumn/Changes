@@ -1,5 +1,9 @@
 Revision history for Perl extension App-ansicolumn
 
+1.12 2021-08-23T05:43:30Z
+
+    - Improve option validation.
+
 1.11 2021-08-11T14:22:43Z
 
     - Update to use Getopt::EX::Hashed accessor method.

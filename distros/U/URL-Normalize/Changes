@@ -1,5 +1,20 @@
 Revision history for URL::Normalize
 
+0.43    2021-08-23
+        - Added missing documentation/Changes information. This is what happens
+          when it's years between each CPAN release. :(
+
+0.42    2021-08-23
+
+0.41    2021-08-23
+        - Fixed wrong release date in previous release.
+
+0.40    2021-08-23
+        - Added more default directory index regular epxressions.
+        - Removed handling of social query parameters; it was always too
+          specific/limited, and shouldn't be in a module like this one.
+        - Minor fixes/improvements to the documentation.
+
 0.39    2018-06-12
         - Remove unneeded test script, which should fix some failing tests.
 

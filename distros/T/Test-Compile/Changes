@@ -1,5 +1,13 @@
 Revision history for Perl extension Test-Compile
 
+v3.0.1	  2021-08-22
+    - (waterkip) Really remove UNIVERSAL::require (CPAN-RT 138934)
+
+v3.0.0	  2021-08-21
+    - Stop tring to detect the OS
+    - Stop doing strange things for non posix systems (not backwards compatible)
+    - Don't depend on UNIVERSAL::require
+
 v2.4.2	  2021-06-16
     - (dboehmer) make 'all_files_ok()' more consistent
     - (dboehmer) Fix typo

@@ -10,12 +10,14 @@ close(STDERR);
 
 my $rc = 0;
 
-eval { $rc = opendir(DIR,'.'); };
+eval q{ $rc = opendir(DIR,'.'); };
 ok($@, q{opendir(DIR,'.')});
-if ($rc) {
-    local $_ = fileno(DIR);
-    closedir(DIR);
-}
+eval q{
+    if ($rc) {
+        local $_ = fileno(DIR);
+        closedir(DIR);
+    }
+};
 
 $rc = opendir(my $dir,'.');
 ok($rc, q{opendir(my $dir,'.')});

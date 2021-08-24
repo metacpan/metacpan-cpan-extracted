@@ -11,11 +11,11 @@ URL::Normalize - Normalize/optimize URLs.
 
 =head1 VERSION
 
-Version 0.39
+Version 0.43
 
 =cut
 
-our $VERSION = '0.39';
+our $VERSION = '0.43';
 
 =head1 SYNOPSIS
 
@@ -23,11 +23,12 @@ our $VERSION = '0.39';
 
     my $normalizer = URL::Normalize->new( 'http://www.example.com/display?lang=en&article=fred' );
 
-    # Normalize the URL.
-    $normalizer->remove_social_query_params;
+    # Normalize the URL
     $normalizer->make_canonical;
+    $normalizer->remove_directory_index;
+    $normalizer->remove_empty_query;
 
-    # Get the normalized version back.
+    # Get the normalized version back
     my $url = $normalizer->url;
 
 =cut
@@ -35,11 +36,13 @@ our $VERSION = '0.39';
 =head1 DESCRIPTION
 
 When writing a web crawler, for example, it's always very costly to check if a
-URL has been fetched/seen when you have millions or billions of URLs in a sort
-of database. This module can help you create a unique "ID", which you then can
-use as a key in a key/value-store; the key is the normalized URL, whereas all
-the URLs that converts to the normalized URL are part of the value (normally an
-array or hash);
+URL has been fetched/seen when you have millions or billions of URLs in a
+database.
+
+This module can help you create a unique "ID" of a URL, which you can use as a
+key in a key/value-store; the key is the normalized URL, whereas all the URLs
+that refers to the normalized URL are part of the value (normally an array or
+hash);
 
     'http://www.example.com/' = {
         'http://www.example.com:80/'        => 1,
@@ -60,11 +63,13 @@ methods:
 
 =back
 
-This is NOT a perfect solution. If you normalize a URL using all the methods in
-this module, there is a high probability that the URL will stop "working." This
-is merely a helper module for those of you who wants to either normalize a URL
-using only a few of the safer methods, and/or for those of you who wants to
-generate a unique "ID" from any given URL.
+This is NOT a perfect solution.
+
+If you normalize a URL using all the methods in this module, there is a high
+probability that the URL will stop "working." This is merely a helper module
+for those of you who wants to either normalize a URL using only a few of the
+safer methods, and/or for those of you who wants to generate a possibly unique
+"ID" from any given URL.
 
 =head1 CONSTRUCTORS
 
@@ -123,32 +128,18 @@ has 'dir_index_regexps' => (
     default => sub {
         [
             '/default\.aspx?',
+            '/default\.html\.aspx?',
             '/default\.s?html?',
             '/home\.s?html?',
             '/index\.cgi',
+            '/index\.html\.aspx?',
+            '/index\.html\.php',
+            '/index\.jsp',
             '/index\.php\d?',
             '/index\.pl',
             '/index\.s?html?',
+            '/welcome\.s?html?',
         ];
-    },
-);
-
-has 'social_query_params' => (
-    traits  => [ 'Array' ],
-    isa     => 'ArrayRef[Str]',
-    is      => 'rw',
-    handles => {
-        'add_social_query_param' => 'push',
-    },
-    default => sub {
-        [
-            'ncid',
-            'utm_campaign',
-            'utm_content',
-            'utm_medium',
-            'utm_source',
-            'utm_term',
-        ],
     },
 );
 
@@ -158,21 +149,24 @@ Returns a L<URI> representation of the current URL.
 
 =cut
 
-sub URI {
-    my $self = shift;
+has 'URI' => (
+    isa => 'URI',
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
 
-    my $URI = undef;
+        my $URI = eval {
+            URI->new( $self->url )->canonical;
+        };
 
-    eval {
-        $URI = URI->new( $self->url )->canonical;
-    };
+        if ( $@ ) {
+            Carp::carp( "Failed to create a URI object from URL '" . $self->url . "'" );
+        }
 
-    if ( $@ ) {
-        Carp::carp( "Failed to create a URI object from URL '" . $self->url . "'" );
-    }
-
-    return $URI;
-}
+        return $URI;
+    },
+);
 
 =head2 make_canonical
 
@@ -272,6 +266,7 @@ sub remove_dot_segments {
 =head2 remove_directory_index
 
 Removes well-known directory indexes, eg. C<index.html>, C<default.asp> etc.
+This method is case-insensitive.
 
 Example:
 
@@ -287,19 +282,29 @@ The default regular expressions for matching a directory index are:
 
 =over 4
 
-=item * C</default\.aspx?>
+=item * C<default\.aspx?>
 
-=item * C</default\.s?html?>
+=item * C<default\.html\.aspx?>
 
-=item * C</home\.s?html?>
+=item * C<default\.s?html?>
 
-=item * C</index\.cgi>
+=item * C<home\.s?html?>
 
-=item * C</index\.php\d?>
+=item * C<index\.cgi>
 
-=item * C</index\.pl>
+=item * C<index\.html\.aspx?>
 
-=item * C</index\.s?html?>
+=item * C<index\.html\.php>
+
+=item * C<index\.jsp>
+
+=item * C<index\.php\d?>
+
+=item * C<index\.pl>
+
+=item * C<index\.s?html?>
+
+=item * C<welcome\.s?html?>
 
 =back
 
@@ -323,9 +328,6 @@ object has been created:
 
     $normalizer->add_directory_index_regexp( 'MyDirIndex\.html' );
 
-Keep in mind that the regular expression ARE case-sensitive, so the
-default C</default\.aspx?> expression WILL ALSO match C</Default\.aspx?>.
-
 =cut
 
 sub remove_directory_index {
@@ -348,9 +350,9 @@ sub remove_directory_index {
 
 Sorts the URL's query parameters alphabetically.
 
-Uppercased parameters will be lowercased DURING sorting, but the parameters will
-of course be in the original case after sorting. If there are multiple values
-for a parameter, the key/value-pairs will be sorted as well.
+Uppercased parameters will be lowercased DURING sorting, but the parameters
+will be in the original case AFTER sorting. If there are multiple values for
+one parameter, the key/value-pairs will be sorted as well.
 
 Example:
 
@@ -530,22 +532,6 @@ Example:
 
     print $normalizer->url; # http://www.example.com/bar.html
 
-You should probably use this with caution, as most web frameworks today allows
-fragments for logic, for example:
-
-=over 4
-
-=item * C<http://www.example.com/players#all>
-
-=item * C<http://www.example.com/players#banned>
-
-=item * C<http://www.example.com/players#top>
-
-=back
-
-...can all result in very different results, despite their "unfragmented" URL
-being the same.
-
 =cut
 
 sub remove_fragment {
@@ -560,19 +546,7 @@ sub remove_fragment {
 
 =head2 remove_fragments
 
-Removes EVERYTHING after a C<#>. As with C<remove_fragment>, you should use this
-with caution, because a lot of web applications these days returns different
-output in response to what the fragment is, for example:
-
-=over 4
-
-=item * C<http://www.example.com/users#list>
-
-=item * C<http://www.example.com/users#edit>
-
-=back
-
-...etc.
+Like C<remove_fragment>, but removes EVERYTHING after a C<#>.
 
 =cut
 
@@ -616,70 +590,11 @@ sub remove_duplicate_slashes {
     }
 }
 
-=head2 remove_social_query_parameters
-
-Removes query parameters that are used for "social tracking."
-
-For example, a lot of newspapers posts links to their articles on Twitter,
-and adds a lot of (for us) "noise" in the URL so that they are able to
-track the number of users clicking on that specific URL. This method
-attempts to remove those query parameters.
-
-Example:
-
-    my $normalizer = URL::Normalize->new(
-        url => 'http://www.example.com/?utm_campaign=SomeCampaignId',
-    );
-
-    print $normalize->url; # 'http://www.example.com/'
-
-Default social query parameters are:
-
-=over 4
-
-=item * C<ncid>
-
-=item * C<utm_campaign>
-
-=item * C<utm_content>
-
-=item * C<utm_medium>
-
-=item * C<utm_source>
-
-=item * C<utm_term>
-
-=back
-
-You can override these default values when creating the URL::Normalize
-object:
-
-    my $normalizer = URL::Normalize->new(
-        url                 => 'http://www.example.com/',
-        social_query_params => [ 'your', 'list' ],
-    );
-
-You can also choose to add parameters after the URL::Normalize object
-has been created:
-
-    my $normalizer = URL::Normalize->new(
-        url => 'http://www.example.com/',
-    );
-
-    $normalizer->add_social_query_param( 'QueryParam' );
-
-=cut
-
-sub remove_social_query_parameters {
-    my $self = shift;
-
-    return $self->remove_query_parameters( $self->social_query_params );
-}
-
 =head2 remove_query_parameter
 
-Convenience method for removing a parameter from the URL. If the parameter is
-mentioned multiple times (?a=1&a=2), all occurences will be removed.
+Convenience method for removing a specific parameter from the URL. If
+the parameter is mentioned multiple times (?a=1&a=2), all occurences
+will be removed.
 
 =cut
 
@@ -765,7 +680,7 @@ L<http://search.cpan.org/dist/URL-Normalize/>
 
 The MIT License (MIT)
 
-Copyright (c) 2012-2018 Tore Aursand
+Copyright (c) 2012-2021 Tore Aursand
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

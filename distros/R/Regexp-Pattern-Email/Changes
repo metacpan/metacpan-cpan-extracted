@@ -1,3 +1,11 @@
+0.002   2021-08-23  Released-By: PERLANCAR; Urgency: medium
+
+	- [dist] Re-pass perlcritic test with default settings.
+
+	- Bump minimum perl prereq to 5.14 due to use of (?^...) regex
+	  construct (CT).
+
+
 0.001   2021-08-01  Released-By: PERLANCAR
 
         - First release.

@@ -11,7 +11,7 @@ Google::RestApi - API to Google Drive API V3 and Sheets API V4.
 >       auth          => <object|hashref>,
 >       timeout       => <int>,
 >       throttle      => <int>,
->       post_process  => <coderef>,
+>       api_callback  => <coderef>,
 >     );
 >
 >     # you can call the raw api directly, but usually Drive and Sheets will take care of forming the correct API calls for you.
@@ -100,7 +100,7 @@ Google::RestApi is a framework for interfacing with Google products, currently D
 
 The biggest hurdle to using this library is actually setting up the authorization to access your Drive and Sheets account via a script.
 The Google development web space is huge and complex. All that's required here is an OAuth2 token to authorize your script that uses this
-library to access your Drive and Sheets. See bin/google_restapi_session_creator for instructions on how to do so. Once you've done it
+library to access your Drive and Sheets. See bin/google_restapi_oauth_token_creator for instructions on how to do so. Once you've done it
 a couple of times it's straight forward.
 
 The synopsis above is a quick reference. For more detailed information, most of the good stuff is in the following pods:

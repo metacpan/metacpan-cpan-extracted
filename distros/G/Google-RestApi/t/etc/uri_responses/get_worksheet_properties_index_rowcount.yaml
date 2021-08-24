@@ -1,0 +1,15 @@
+GET:
+  https://sheets.googleapis.com/v4/spreadsheets/fake_spreadsheet_id1?fields=sheets.properties(index%2CgridProperties.rowCount):
+    response: |
+      {
+        "sheets": [
+          {
+            "properties": {
+              "index": 0,
+              "gridProperties": {
+                "rowCount": 1000
+              }
+            }
+          }
+        ]
+      }

@@ -1,0 +1,54 @@
+#! perl
+
+use Test2::V0;
+
+use Config::XrmDatabase;
+use Config::XrmDatabase::Constants ':constants';
+
+{
+    my $db = Config::XrmDatabase->new;
+
+    $db->insert( '*b.d', 'v1' );
+
+    is(
+        $db->TO_HASH,
+        hash {
+            field '*' => hash {
+                field 'b' => hash {
+                    field 'd' => hash {
+                        field VALUE()     => 'v1';
+                        field MATCH_COUNT() => 0;
+                        end;
+                    };
+                    end;
+                };
+                end;
+            };
+        },
+    );
+
+    $db->insert( '*b', 'v1' );
+
+    is(
+        $db->TO_HASH,
+        hash {
+            field '*' => hash {
+                field 'b' => hash {
+                    field VALUE()     => 'v1';
+                    field MATCH_COUNT() => 0;
+                    field 'd'         => hash {
+                        field VALUE()     => 'v1';
+                        field MATCH_COUNT() => 0;
+                        end;
+                    };
+                    end;
+                };
+                end;
+            }
+        },
+    );
+
+
+}
+
+done_testing;

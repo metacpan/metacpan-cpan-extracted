@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?><!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content=""><meta name="author" content="INRAE - MetaboHUB">
+	<title><TMPL_VAR NAME=DATABASE> queries - All results (<TMPL_VAR NAME=CONDITIONS>)</title>
+		
+	<!-- JavaScript -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	<script src="https://cdn.rawgit.com/fgiacomoni/galaxy_utils/master/scripts/jquery.simplePagination.js"></script>
+	<script language="javascript">function test(pageNumber){  var page="#page-id-"+pageNumber;  $('.select').hide() ; $(page).show()}</script>
+	<script language="javascript">$(function() {$('#choose').pagination({items: <TMPL_VAR NAME=PAGES_NB>,itemsOnPage: 1,currentPage: 1,onInit: function () { test(1); },cssStyle: 'light-theme',onPageClick: function(pageNumber){test(pageNumber)}}).pagination('redraw');});</script>
+	<!-- CSS -->
+	<link rel="stylesheet" type="text/css" href="css.php" media="all">
+	<link rel="stylesheet" type="text/css" href="https://cdn.rawgit.com/fgiacomoni/galaxy_utils/master/style/simplePagination.css"/>
+	<style type="text/css">body {padding-top: 70px}div.lm-table-warning {  font-size: 1.4em;  font-weight: bold;  padding-right: 25px;  color: #21536a;  margin-left: 3px;}tr.green td  {background-color: #eaf2d3; color: black;}tr.blank td {background-color: #9999CC; color: black;}table {font-family:'Trebuchet MS',Arial,Helvetica,sans-serif;width:100%;border-collapse:collapse;}table.detail, table.detail tr.parent, table.detail td, table.detail th, table.detail tr.category {border-collapse:collapse;border:1px solid #98bf21;}table.detail th {font-size: 1.2em;text-align: center;padding-top: 5px;padding-bottom: 10px;background-color: #a7c942;color: #ffffff;}td.ca {text-align:center;}footer {  margin: 50px 0;}</style>
+</head>
+<body>
+	<div class="container">
+		<div class="lm-table-warning">Results of <TMPL_VAR NAME=DATABASE> queries - <TMPL_VAR NAME=CONDITIONS></div>
+		<div id="detail_table_source" style="display:none"></div><p>
+		<div id="choose"></div><p>
+		<div id="ms_search_0" class="ms-search-table"></div>
+
+
+	<!-- HeadRows--><table id="detail_table" class="detail">
+	<col style="width:30px;"><!-- Ids (m/z)-->
+	<col style="width:30px;"><!-- Mass (m/z)-->
+	<col style="width:120px;"><!-- Met name-->
+	<col style="width:50px;"><!-- Cpd ID-->
+	<col style="width:40px;"><!-- formula-->
+	<col style="width:60px;"><!-- cpd mw-->
+	<col style="width:50px;"><!-- adduct -->
+	<col style="width:20px;"><!-- adduct type-->
+	<col style="width:60px;"><!-- adduct mw-->
+	<col style="width:50px;"><!-- delta-->
+	<col style="width:120px;"><!-- INCHI-->
+	<col style="width:20;"><!-- logP-->
+		<thead>
+			<th>ID from input</th>
+			<th>Mass (m/z)</th>
+			<th>Metabolite_Name</th>
+			<th>Compound_ID</th>
+			<th>Formula</th>
+			<th>Compound MW (Da)</th>
+			<th>Adduct</th><th>Adduct type</th>
+			<th>Adduct MW (Da)</th>
+			<th>Delta (ppm)</th>
+			<th>InChI Identifier</th>
+			<th>Predicted LogP (ALOGPS)</th>
+		</thead>
+		<TMPL_LOOP NAME=PAGES>
+			<tbody class="select" id="page-id-<TMPL_VAR NAME=PAGE_NB>">
+				<TMPL_LOOP NAME=MASSES><tr class="<TMPL_VAR NAME=MZ_COLOR>">
+					<td class="ca" ><TMPL_VAR NAME=MASSES_ID_QUERY></td>
+					<td id="<TMPL_VAR NAME=MASSES_NB>" class="ca" ><TMPL_VAR NAME=MASSES_MZ_QUERY></td>
+					<td class="ca" colspan="10"></td></tr>
+					<TMPL_LOOP NAME=ENTRIES><tr class="<TMPL_VAR NAME=ENTRY_COLOR>">
+						<td class="ca" colspan="2"></td>
+						<td class="ca"><TMPL_VAR NAME=ENTRY_ENTRY_NAME></td>
+						<td class="ca"><a href="http://www.hmdb.ca/metabolites/<TMPL_VAR NAME=ENTRY_ENTRY_ID2>" target="_blank" class="btn"><TMPL_VAR NAME=ENTRY_ENTRY_ID></a></td>
+						<td class="ca"><TMPL_VAR NAME=ENTRY_FORMULA></td>
+						<td class="ca"><TMPL_VAR NAME=ENTRY_CPD_MZ></td>
+						<td class="ca"><TMPL_VAR NAME=ENTRY_ADDUCT></td>
+						<td class="ca"><TMPL_VAR NAME=ENTRY_ADDUCT_TYPE></td>
+						<td class="ca"><TMPL_VAR NAME=ENTRY_ADDUCT_MZ></td>
+						<td class="ca"><TMPL_VAR NAME=ENTRY_DELTA></td>
+						<td class="ca"><TMPL_VAR NAME=ENTRY_ENTRY_INCHI></td>
+						<td class="ca"><TMPL_VAR NAME=ENTRY_ENTRY_LOGP></td></tr>
+					</TMPL_LOOP>
+				</TMPL_LOOP>
+			</tbody>
+		</TMPL_LOOP>
+	</table></div>
+	<div class="container"><hr>
+		<footer>
+			<div class="row">
+				<div class="col-lg-12"><p>Copyright &copy; INRAE, F Giacomoni 2021 </p></div>
+			</div>
+		</footer>
+	</div>
+</body>
+</html>

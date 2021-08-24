@@ -2,8 +2,8 @@ NAME
     App::ModuleFeaturesUtils - CLI Utilities related to Module::Features
 
 VERSION
-    This document describes version 0.003 of App::ModuleFeaturesUtils (from
-    Perl distribution App-ModuleFeaturesUtils), released on 2021-02-25.
+    This document describes version 0.004 of App::ModuleFeaturesUtils (from
+    Perl distribution App-ModuleFeaturesUtils), released on 2021-04-02.
 
 DESCRIPTION
     This distribution includes the following utilities:
@@ -13,6 +13,8 @@ DESCRIPTION
     *   check-features-decl
 
     *   check-module-features
+
+    *   compare-module-features
 
     *   get-feature-set-spec
 
@@ -34,7 +36,9 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   feature_set* => *perl::modulefeatures::modname*
+    *   feature_set_data => *hash*
+
+    *   feature_set_name => *perl::modulefeatures::modname*
 
     Returns an enveloped result (an array).
 
@@ -52,13 +56,15 @@ FUNCTIONS
 
      check_features_decl(%args) -> [status, msg, payload, meta]
 
-    Check %FEATURES in a module.
+    Check %FEATURES in a module (or given in argument).
 
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
 
-    *   module* => *perl::modname*
+    *   features_decl_data => *hash*
+
+    *   module => *perl::modname*
 
     Returns an enveloped result (an array).
 
@@ -106,6 +112,30 @@ FUNCTIONS
 
     Return value: (any)
 
+  compare_module_features
+    Usage:
+
+     compare_module_features(%args) -> [status, msg, payload, meta]
+
+    Return a table data comparing features from several modules.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   modules* => *array[perl::modname]*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   get_feature_set_spec
     Usage:
 
@@ -117,7 +147,7 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   feature_set* => *perl::modulefeatures::modname*
+    *   feature_set_name* => *perl::modulefeatures::modname*
 
     Returns an enveloped result (an array).
 
@@ -169,7 +199,7 @@ FUNCTIONS
 
         Return detailed record for each result item.
 
-    *   feature_set* => *perl::modulefeatures::modname*
+    *   feature_set_name* => *perl::modulefeatures::modname*
 
     Returns an enveloped result (an array).
 

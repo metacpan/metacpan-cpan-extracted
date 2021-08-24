@@ -1,6 +1,6 @@
 package Google::RestApi::DriveApi3;
 
-our $VERSION = '0.7';
+our $VERSION = '0.8';
 
 use Google::RestApi::Setup;
 
@@ -8,14 +8,15 @@ use aliased 'Google::RestApi::DriveApi3::File';
 
 # TODO: switch to ReadOnly
 use constant {
-  Drive_File_Id => "[a-zA-Z0-9-_]+",
+  Drive_Endpoint => "https://www.googleapis.com/drive/v3",
+  Drive_File_Id  => "[a-zA-Z0-9-_]+",
 };
 
 sub new {
   my $class = shift;
   state $check = compile_named(
     api      => HasMethods['api'],
-    endpoint => Str, { default => 'https://www.googleapis.com/drive/v3' },
+    endpoint => Str, { default => Drive_Endpoint },
   );
   return bless $check->(@_), $class;
 }

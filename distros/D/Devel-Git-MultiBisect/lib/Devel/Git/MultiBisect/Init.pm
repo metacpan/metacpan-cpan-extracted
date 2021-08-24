@@ -1,14 +1,14 @@
 package Devel::Git::MultiBisect::Init;
 use strict;
 use warnings;
-use v5.10.0;
+use v5.14.0;
 use Carp;
 use Cwd;
 use File::Spec;
 use File::Temp;
 #our @EXPORT_OK = qw( init );
 
-our $VERSION = '0.08';
+our $VERSION = '0.15';
 
 =head1 NAME
 

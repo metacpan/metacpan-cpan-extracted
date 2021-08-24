@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Array.pm
-## Version v1.0.1
+## Version v1.0.2
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2021/04/24
+## Modified 2021/08/21
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -35,7 +35,7 @@ BEGIN
         fallback => 1,
     );
     our $RETURN = {};
-    our( $VERSION ) = 'v1.0.1';
+    our( $VERSION ) = 'v1.0.2';
 };
 
 sub new
@@ -625,6 +625,8 @@ sub splice
         }
     }
 }
+
+sub split { return( CORE::shift->_scalar( CORE::shift( @_ ) )->split( @_ ) ); }
 
 sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
 

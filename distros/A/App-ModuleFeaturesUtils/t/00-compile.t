@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/ModuleFeaturesUtils.pm'
@@ -16,6 +16,7 @@ my @scripts = (
     'script/check-feature-set-spec',
     'script/check-features-decl',
     'script/check-module-features',
+    'script/compare-module-features',
     'script/get-feature-set-spec',
     'script/get-features-decl',
     'script/list-feature-set-features',

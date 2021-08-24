@@ -1,5 +1,5 @@
 package POE::Component::Curl::Multi;
-$POE::Component::Curl::Multi::VERSION = '0.18';
+$POE::Component::Curl::Multi::VERSION = '0.22';
 #ABSTRACT: a fast HTTP POE component
 
 use strict;
@@ -33,6 +33,7 @@ sub spawn {
   $self->{agent} = [ $self->{agent} ] unless ref $self->{agent};
   delete $self->{agent} unless ref $self->{agent} eq 'ARRAY';
   $self->{multi} = Net::Curl::Multi->new();
+  $self->{multi}->setopt( CURLMOPT_SOCKETFUNCTION, sub { return 1 });
   $self->{session_id} = POE::Session->create(
         object_states => [
            $self => { shutdown => '_shutdown', request => '_request', cancel => '_cancel', pending_requests_count => '_req_count' },
@@ -372,7 +373,7 @@ POE::Component::Curl::Multi - a fast HTTP POE component
 
 =head1 VERSION
 
-version 0.18
+version 0.22
 
 =head1 SYNOPSIS
 
@@ -675,7 +676,7 @@ Chris Williams
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Chris Williams, Michael S. Fischer, Rocco Caputo, Rob Bloodgood and Martijn van Beers.
+This software is copyright (c) 2021 by Chris Williams, Michael S. Fischer, Rocco Caputo, Rob Bloodgood and Martijn van Beers.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

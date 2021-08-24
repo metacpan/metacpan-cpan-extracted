@@ -1,0 +1,9 @@
+POST:
+  https://sheets.googleapis.com/v4/spreadsheets/fake_spreadsheet_id1:batchUpdate:
+    response: |
+      {
+         "replies" : [
+            {}
+         ],
+         "spreadsheetId" : "fake_spreadsheet_id1"
+      }

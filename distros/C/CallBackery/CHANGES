@@ -1,3 +1,13 @@
+0.39.0 2021-08-24 11:57:57 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - Add HtmlBox with JavaScript enabled. @zaucker
+ - Add save action @zaucker
+ - Use "silent" callAsync for actions other than submit @zaucker
+
+0.38.19 2021-08-20 15:58:49 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - if log_file is configured but not writable, complain but don't dies
+
 0.38.18 2021-08-06 11:09:43 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - it seems that await can clear @_ so better save it away before

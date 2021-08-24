@@ -57,7 +57,7 @@ SYNOPSIS
 VERSION
 =======
 
-        v0.15.6
+        v0.15.8
 
 DESCRIPTION
 ===========
@@ -479,8 +479,8 @@ parameter provided in a hash like fashion:
 
         my $obj My::Module->new( 'verbose' => 1, 'debug' => 0 );
 
-You may want to superseed [\"init\"](#init){.perl-module} to have suit
-your needs.
+You may want to superseed [\"init\"](#init){.perl-module} to have it
+suit your needs.
 
 [\"init\"](#init){.perl-module} needs to returns the object it received
 in the first place or an error if something went wrong, such as:
@@ -512,11 +512,19 @@ When provided with an hash reference, and when object property
 *\_init\_strict\_use\_sub* is set to true,
 [\"init\"](#init){.perl-module} will call each method corresponding to
 the key name and pass it the key value and it will set an error and skip
-it if the corresponding method does not exist. Otherwise if the object
-property *\_init\_strict* is set to true, it will check the object
-property matching the hash key for the default value type and set an
-error and return undef if it does not match. Foe example,
-[\"init\"](#init){.perl-module} in your module could be like this:
+it if the corresponding method does not exist. Otherwise, it calls each
+corresponding method and pass it whatever value was provided and check
+for that method return value. If the return value is [\"undef\" in
+perlfunc](https://metacpan.org/pod/perlfunc#undef){.perl-module} and the
+value provided is **not** itself `undef`, then it issues a warning and
+return the [\"error\"](#error){.perl-module} that is assumed having
+being set by that method.
+
+Otherwise if the object property *\_init\_strict* is set to true, it
+will check the object property matching the hash key for the default
+value type and set an error and return undef if it does not match. Foe
+example, [\"init\"](#init){.perl-module} in your module could be like
+this:
 
         sub init
         {
@@ -1098,6 +1106,22 @@ However, this will return empty:
 
 This returns an empty hash reference, because although the first
 parameter is an hash reference, there is more than on parameter.
+
+\_get\_stack\_trace
+-------------------
+
+This will return a
+[Devel::StackTrace](https://metacpan.org/pod/Devel::StackTrace){.perl-module}
+object initiated with the following options set:
+
+*indent* 1
+
+:   This will set an initial indent tab
+
+*skip\_frames* 1
+
+:   This is set to 1 so this very method is not included in the frames
+    stack
 
 \_is\_a
 -------
@@ -1834,7 +1858,7 @@ and
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x562499c18470)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x5640c90ecf38)"}\>
 
 COPYRIGHT & LICENSE
 ===================

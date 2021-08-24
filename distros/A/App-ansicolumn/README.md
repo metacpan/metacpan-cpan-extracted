@@ -3,10 +3,6 @@
 
 ansicolumn - ANSI terminal sequence aware column command
 
-# VERSION
-
-Version 1.11
-
 # SYNOPSIS
 
 ansicolumn \[options\] \[file ...\]
@@ -44,6 +40,10 @@ ansicolumn \[options\] \[file ...\]
     --tabspace=#         tab-space width
     --tabstyle=#         tab style
     --ambiguous=#        ambiguous character width (narrow|wide)
+
+# VERSION
+
+Version 1.12
 
 # DESCRIPTION
 
@@ -154,21 +154,22 @@ default, from the standard input.
     Each columns are placed at the unit of 8 by default.  This option
     changes the number of the unit.
 
-- **--linestyle**=_none_|_truncate_|_wrap_|_wordwrap_, **--ls**=_..._
+- **--linestyle**=`none`|`truncate`|`wrap`|`wordwrap`, **--ls**=`...`
 
     Set the style of treatment for longer lines.
-    Default is _none_.
+    Default is `none`.
 
     **--linestyle=wordrap** is equivalent to **--linestyle=wrap**
     **--boundary=word**.
 
-- **--boundary**=_word_
+- **--boundary**=`none`|`word`|`space`
 
-    Set text wrap boundary.  If this option set to **word**, text is
-    wrapped at word boundary.  Option **--document** set this automatically.
-    Use something like \`--boundary=none' to disable it.
+    Set text wrap boundary.  If set as `word` or `space`, text is not
+    wrapped in the middle of alphanumeric word or non-space sequence.
+    Option **--document** set this as `word`.  See [Text::ANSI::Fold](https://metacpan.org/pod/Text::ANSI::Fold) for
+    detail.
 
-- **--linebreak**=_none|all|runin|runout_, **--lb**=...
+- **--linebreak**=`none`|`all`|`runin`|`runout`, **--lb**=...
 
     Set the linebreak mode.
 
@@ -192,7 +193,7 @@ default, from the standard input.
 
 - **--border-style**=_style_, **--bs**=...
 
-    Set the border style.  Current default style is **vbar**, which is
+    Set the border style.  Current default style is `vbar`, which is
     light vertical line filling the page height.
 
     Sample styles:
@@ -240,7 +241,7 @@ default, from the standard input.
     placed at the bottom of a pane.  Default true.  If false, move it to
     the top of next pane.  Negated by **--document** option.
 
-- **--fillup**\[=_pane|page|none_\]
+- **--fillup**\[=`pane`|`page`|`none`\]
 
     Fill up final pane or page by empty lines.  Parameter is optional and
     considered as 'pane' by default.  Set by **--page** option

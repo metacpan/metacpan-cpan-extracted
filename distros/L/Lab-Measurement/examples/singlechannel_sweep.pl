@@ -95,7 +95,7 @@ singlechannel_sweep.pl - Use Rigol_DG5000 with KeysightDSOS604A
 
 =head1 VERSION
 
-version 3.770
+version 3.771
 
 =head1 COPYRIGHT AND LICENSE
 

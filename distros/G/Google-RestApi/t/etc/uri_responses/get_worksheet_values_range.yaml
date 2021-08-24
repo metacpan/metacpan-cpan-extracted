@@ -1,0 +1,10 @@
+GET:
+  "https://sheets.googleapis.com/v4/spreadsheets/fake_spreadsheet_id1/values/'Sheet1'!D4:E5?majorDimension=ROWS":
+    response: |
+      {
+         "majorDimension" : "ROWS",
+         "range" : "Sheet1!D4:E5"
+      }
+    tweaks:
+    # - dump_values
+    - get_value

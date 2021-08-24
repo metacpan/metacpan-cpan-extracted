@@ -1,6 +1,6 @@
 package Google::RestApi::Auth::ServiceAccount;
 
-our $VERSION = '0.7';
+our $VERSION = '0.8';
 
 use Google::RestApi::Setup;
 
@@ -10,18 +10,23 @@ use parent 'Google::RestApi::Auth';
 sub new {
   my $class = shift;
 
-  my $self = config_file(@_);
+  my %p = @_;
+  # order is important, resolve the overall config file first.
+  resolve_config_file_path(\%p, 'config_file');
+  resolve_config_file_path(\%p, 'account_file');
+  
+  my $self = config_file(%p);
   state $check = compile_named(
-    config_file        => Str, { optional => 1 },
-    parent_config_file => Str, { optional => 1 },  # only used internally
-    account_file       => Str,
-    scope              => ArrayRef[Str],
+    config_dir   => ReadableDir, { optional => 1 },
+    config_file  => ReadableFile, { optional => 1 },
+    account_file => ReadableFile,
+    scope        => ArrayRef[Str],
   );
   $self = $check->(%$self);
   $self = bless $self, $class;
 
   my $auth = WWW::Google::Cloud::Auth::ServiceAccount->new(
-    credentials_path => $self->account_file(),
+    credentials_path => $self->{account_file},
     # undocumented feature of WWW::Google::Cloud::Auth::ServiceAccount
     scope            => join(' ', @{ $self->{scope} }),
   );
@@ -42,13 +47,6 @@ sub access_token {
   $self->{access_token} = $self->{auth}->get_token()
     or LOGDIE "Service Account Auth failed";
   return $self->{access_token};
-}
-
-sub account_file {
-  my $self = shift;
-  $self->{_account_file} = resolve_config_file('account_file', $self)
-    if !$self->{_account_file};
-  return $self->{_account_file};
 }
 
 1;

@@ -4,7 +4,7 @@
       "Franck Giacomoni <franck.giacomoni@inrae.fr>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -34,6 +34,7 @@
       "runtime" : {
          "requires" : {
             "File::Share" : "0.25",
+            "JSON" : "2.90",
             "Text::CSV" : "2.0",
             "Text::CSV_XS" : "1.39",
             "XML::Twig" : "3.48",
@@ -48,6 +49,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.6.3",
+   "version" : "v0.6.4",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

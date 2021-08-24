@@ -25,7 +25,6 @@ t/200-import-check.t
 t/200-all-files-ok.t
 t/200-all-pm-files-ok.t
 t/200-all-pl-files-ok.t
-t/200-pl-file-ok-vms.t
 t/200-px-file-ok.t
 t/200-taint.t
 t/999-has-version.t

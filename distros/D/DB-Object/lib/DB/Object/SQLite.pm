@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/SQLite.pm
-## Version v0.400.4
-## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## Version v0.400.5
+## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2021/08/16
+## Modified 2021/08/20
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -38,7 +38,7 @@ BEGIN
     use Nice::Try;
     our( $VERSION, $DB_ERRSTR, $ERROR, $DEBUG, $CONNECT_VIA, $CACHE_QUERIES, $CACHE_SIZE );
     our( $CACHE_TABLE, $USE_BIND, $USE_CACHE, $MOD_PERL, @DBH );
-    $VERSION     = 'v0.400.4';
+    $VERSION     = 'v0.400.5';
     use Devel::Confess;
 };
 
@@ -376,23 +376,6 @@ sub last_insert_id
 
 sub lock { return( shift->error( "Table lock is unsupported in SQLite." ) ); }
 
-sub on_conflict
-{
-    my $self = shift( @_ );
-    my $q = $self->_reset_query;
-    return( $q->on_conflict( @_ ) ) if( !defined( wantarray() ) );
-    if( wantarray() )
-    {
-        my( @val ) = $q->on_conflict( @_ ) || return( $self->pass_error( $q->error ) );
-        return( @val );
-    }
-    else
-    {
-        my $val = $q->on_conflict( @_ ) || return( $self->pass_error( $q->error ) );
-        return( $val );
-    }
-}
-
 sub pragma
 {
     my $self = shfit( @_ );
@@ -674,7 +657,7 @@ sub _check_connect_param
     }
     $param->{host} = 'localhost' if( !length( $param->{host} ) );
     $param->{port} = 0 if( !length( $param->{port} ) );
-    $self->message( 3, "Returning parameters: ", sub{ $self->dumper( $param ) } );
+    $self->message( 3, "Returning parameters: ", sub{ $self->dump( $param ) } );
     return( $param );
 }
 
@@ -829,7 +812,7 @@ sub _ceiling
 {
     my $self = shift( @_ );
     my @args = @_;
-    $self->message( 3, "Getting ceil for ", join( ', ', @args ) );
+    $self->message( 3, "Getting ceil for ", sub{ join( ', ', @args ) } );
     return( POSIX::ceil( $args[0] ) );
 }
 
@@ -1106,15 +1089,15 @@ sub _sprintf
 {
     my $self = shift( @_ );
     my @args = @_;
-    $self->message( 3, "sprintf formatting with parameters: '", join( "', '", @args ), "'" );
+    $self->message( 3, "sprintf formatting with parameters: '", sub{ join( "', '", @args ) }, "'" );
     for( my $i = 0; $i < scalar( @args ); $i++ )
     {
         $args[$i] =~ s/'/\\'/g;
     }
     my $eval = "CORE::sprintf( '" . join( "', '", @args ) . "' )";
-    $self->message( 3, "\t evaluating with '$eval'." );
+    # $self->message( 3, "\t evaluating with '$eval'." );
     my $res = eval( $eval );
-    $self->message( 3, "\t returning '$res'." );
+    # $self->message( 3, "\t returning '$res'." );
     # return( CORE::sprintf( @args ) );
     return( $res );
 }
@@ -1228,6 +1211,7 @@ END
 
 1;
 
+# XXX POD
 __END__
 
 =encoding utf8
@@ -1661,9 +1645,7 @@ This is an unsupported feature in SQLIte
 
 =head2 on_conflict
 
-A convenient wrapper to L<DB::Object::Postgres::Query/on_conflict>
-
-This feature is available in SQLite since version 3.35.0 released on 2021-03-12. If your version of SQLIte is anterior, this will return an error.
+See L<DB::Object::SQLite::Tables/on_conflict>
 
 =head2 pragma
 

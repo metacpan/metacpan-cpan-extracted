@@ -4,20 +4,20 @@ NAME
 
 SYNOPSIS
 
-     use IO::Async;
-     use Tickit::Async;
+       use IO::Async;
+       use Tickit::Async;
     
-     my $tickit = Tickit::Async->new;
+       my $tickit = Tickit::Async->new;
     
-     # Create some widgets
-     # ...
+       # Create some widgets
+       # ...
     
-     $tickit->set_root_widget( $rootwidget );
+       $tickit->set_root_widget( $rootwidget );
     
-     my $loop = IO::Async::Loop->new;
-     $loop->add( $tickit );
+       my $loop = IO::Async::Loop->new;
+       $loop->add( $tickit );
     
-     $tickit->run;
+       $tickit->run;
 
 DESCRIPTION
 

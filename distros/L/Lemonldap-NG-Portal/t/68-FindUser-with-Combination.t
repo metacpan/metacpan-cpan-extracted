@@ -27,10 +27,11 @@ SKIP: {
                     'LDAP' => { 'for' => 0, 'type' => 'LDAP' },
                     'Demo' => { 'for' => 0, 'type' => 'Demo' }
                 },
-                combination                 => '[Demo, Demo] or [LDAP, LDAP]',
-                findUser                    => 1,
-                impersonationRule           => 1,
-                findUserSearchingAttributes => { uid => 'Login', cn => 'Name' },
+                combination       => '[Demo, Demo] or [LDAP, LDAP]',
+                findUser          => 1,
+                impersonationRule => 1,
+                findUserSearchingAttributes =>
+                  { 'uid##1' => 'Login', 'cn##1' => 'Name' },
                 findUserExcludingAttributes => { uid => 'rtyler' },
             }
         }
@@ -56,7 +57,7 @@ SKIP: {
     ( $host, $url, $query ) = expectForm( $res, '#', undef, 'uid', 'cn' );
     ok(
         $res->[2]->[0] =~
-m%<input id="spoofIdfield" name="spoofId" type="text" class="form-control" value="" autocomplete="off"%,
+m%<input name="spoofId" type="text" class="form-control" value="" autocomplete="off" trplaceholder="spoofId" aria-required="false"%,
         'value=""'
     ) or explain( $res->[2]->[0], 'value=""' );
 

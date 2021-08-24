@@ -1,0 +1,7 @@
+#!/usr/bin/env perl
+use lib '/home/symkat/Code/oCLI/lib';
+use lib '/home/symkat/Code/oCLI/examples/package/lib';
+use Example;
+
+
+Example->new(root => 'Example')->run(@ARGV);

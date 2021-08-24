@@ -1,5 +1,8 @@
 Revision history for Slack-Notify
 
+0.004     2021-08-22 12:39:04+10:00 Australia/Melbourne
+- fix direct use of JSON::XS (thanks ether!)
+
 0.003     2021-01-04 13:18:43+11:00 Australia/Melbourne
 - avoid mojibake (thanks rjbs!)
 

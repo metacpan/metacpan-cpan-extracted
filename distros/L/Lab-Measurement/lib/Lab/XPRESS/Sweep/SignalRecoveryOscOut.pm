@@ -1,5 +1,5 @@
 package Lab::XPRESS::Sweep::SignalRecoveryOscOut;
-$Lab::XPRESS::Sweep::SignalRecoveryOscOut::VERSION = '3.770';
+$Lab::XPRESS::Sweep::SignalRecoveryOscOut::VERSION = '3.771';
 #ABSTRACT: Signal recovery lock in oscillator output sweep
 
 use v5.20;
@@ -95,7 +95,7 @@ Lab::XPRESS::Sweep::SignalRecoveryOscOut - Signal recovery lock in oscillator ou
 
 =head1 VERSION
 
-version 3.770
+version 3.771
 
 =head1 DESCRIPTION
 

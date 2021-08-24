@@ -31,10 +31,12 @@ use Time::Date;
 
 my $mpd = Audio::MPD->new;
 
+my $music_dir = "$ENV{XDG_MUSIC_DIR}/" . $mpd->current->file;
+
 my $data = beet_info("$ENV{XDG_MUSIC_DIR}/" . $mpd->current->file);
 #print Dumper $data;
 
-$data->{bitrate} = sprintf("%d", $data->{bitrate} / 1000);
+$data->{bitrate} = $data->{bitrate} ? sprintf("%d", $data->{bitrate} / 1000) : 0;
 
 if($data->{original_date}) {
   my $t = Time::Date->new($data->{original_date});

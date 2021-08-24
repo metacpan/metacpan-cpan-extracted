@@ -39,7 +39,7 @@ WriteMakefile(
         },
     },
     PREREQ_PM => {
-        'Lemonldap::NG::Common' => '2.0.12',
+        'Lemonldap::NG::Common' => '2.0.13',
         'LWP::UserAgent'        => 0,
         'Mouse'                 => 0,
         'URI'                   => 0,

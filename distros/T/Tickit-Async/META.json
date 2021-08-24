@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -30,7 +30,7 @@
             "IO::Async::Notifier" : "0.43",
             "IO::Async::Stream" : "0.34",
             "IO::Async::Test" : "0",
-            "Tickit" : "0.71"
+            "Tickit" : "0.72"
          }
       },
       "test" : {
@@ -44,7 +44,7 @@
    "provides" : {
       "Tickit::Async" : {
          "file" : "lib/Tickit/Async.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.24",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.25",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

@@ -10,14 +10,16 @@ close(STDERR);
 
 my $rc = 0;
 
-eval { $rc = pipe(README,WRITEME); };
+eval q{ $rc = pipe(README,WRITEME); };
 ok($@, q{pipe(README,WRITEME)});
-if ($rc) {
-    local $_ = fileno(README);
-    close(README);
-    local $_ = fileno(WRITEME);
-    close(WRITEME);
-}
+eval q{
+    if ($rc) {
+        local $_ = fileno(README);
+        close(README);
+        local $_ = fileno(WRITEME);
+        close(WRITEME);
+    }
+};
 
 $rc = pipe(my $readme,my $writeme);
 ok($rc, q{pipe(my $readme,my $writeme)});

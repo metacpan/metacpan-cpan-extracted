@@ -1,7 +1,7 @@
-Locale::Utils::Autotranslator version 1.008
+Locale::Utils::Autotranslator version 1.011
 ===========================================
 
-Utils to expand placeholders in named style.
+Connection to translation API's or simple terminal.
 
 INSTALLATION
 
@@ -33,7 +33,7 @@ This module requires these other modules and libraries:
 
 COPYRIGHT AND LICENCE
 
-Copyright (c) 2014 - 2018,
+Copyright (c) 2014 - 2021,
 Steffen Winkler
 steffenw at cpan.org.
 All rights reserved.

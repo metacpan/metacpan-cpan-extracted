@@ -1,11 +1,30 @@
 Revision history for Perl module Regexp::Common::Markdown
 
+0.1.5 2020-08-17T22:18:23+0900
+    - Added suport for Katex math expression
+    - Improved Emphasis regular expression <https://regex101.com/r/eDb6RN/4>
+    - Improved bold regular expression to refine what non-space character means <https://regex101.com/r/Jp2Kos/3>
+    - Updated link, link definition and their extended version to avoid confusion with footnotes
+    - Added support for checkbox <https://regex101.com/r/ezMwsv/2/>
+    - Updated dashed header, including extended ones. See <https://regex101.com/r/9uQwBk/4> and <https://regex101.com/r/GyzbR2/2>
+    - Added support for strikethrough extension. See <https://regex101.com/r/4Z3h4F/1>
+    - Added test units for subscript and superscript
+    - Improved paragraph regular expression <https://regex101.com/r/0B3gR4/4>
+    - Improved image regular expression <https://regex101.com/r/z0yH2F/10>
+    - Improved image extended regular expression <https://regex101.com/r/xetHV1/4>
+    - Added suppot for insertion (++). See here for more information <https://regex101.com/r/IZw4YU/1/>
+    - Updated table regular expression to work better. See here for more information <https://regex101.com/r/01XCqB/13>
+    - Improved regular expression for code block and its extended version to avoid capturing any leading new lines and ensuring they are standalone. See respectively <https://regex101.com/r/M6W99K/5> and <https://regex101.com/r/Y9lPAz/6>
+    - Updated the header and extended header regular expressions to make them less greedy on the trailing new lines. See here <https://regex101.com/r/9uQwBk/5>, and here <https://regex101.com/r/sQLEqz/3> and here fore extended regexp: <https://regex101.com/r/GyzbR2/3> and <https://regex101.com/r/berfAR/3>
+    - Change extended code block regular expression to become a combined version with the non-extended one. See here <https://regex101.com/r/Y9lPAz/10>
+    - Updated link to avoid catching image. See <https://regex101.com/r/sGsOIv/7>
+
 0.1.4 2020-08-16T12:45:26+0900
     - Updated the paragrah regular expression to be more accurate to make distinction between unordered list (*) and bold (**) or emphasis (*)
     - Corrected function.pl to remove dependency
 
 0.1.3 2020-08-15T16:38:53+0900
-    - Updated the regular expression for the extended code block. See https://regex101.com/r/Y9lPAz/2
+    - Updated the regular expression for the extended code block. See <https://regex101.com/r/Y9lPAz/2>
 
 0.1.2 2020-08-14T21:16:06+0900
     - Added missing dependency for Regexp::Common::Email::Address and Regexp::Common::URI

@@ -1,0 +1,50 @@
+Revision history for AI-Perceptron-Simple
+
+The specifications and offline documentation can be found in the "docs" directory
+
+Version 1.01    24 AUGUST 2021
+* Fixed some technical issues
+    * fixed test scripts not run in correct sequence
+        * must be creation -> train -> validate/test
+    * local::lib issue should be fixed by now
+
+Version 1.00    23 AUGUST 2021
+* The following features were implemented over the course of time (see also My::Perceptron v0.04 on github):
+    * create perceptron
+    * process data: &train method
+        * read csv - for training stage
+    * save and load the perceptron
+
+    * output algorithm for train
+        * read and calculate data line by line
+    * validate method
+        * read csv bulk
+        * write predicted values into original file
+        * write predicted values into new file
+    * test method
+        * read csv bulk
+        * write predicted values into original file
+        * write predicted values into new file
+
+    * confusion matrix
+        * read only expected and predicted columns, line by line
+        * return a hash of data
+            * TP, TN, FP, FN
+            * total entries
+            * accuracy
+            * sensitivity
+    * display confusion matrix data to console
+        * use Text:Matrix
+
+    * synonyms
+        * synonyms MUST call actual subroutines and not copy pasting!
+        * train: tame, exercise
+        * validate: take_mock_exam, take_lab_test
+        * test:  take_real_exam, work_in_real_world
+        * generate_confusion_matrix: get_exam_results
+        * display_confusion_matrix: display_exam_results
+        * save_perceptron: preserve
+        * load_perceptron: revive
+
+
+

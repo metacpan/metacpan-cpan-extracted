@@ -4,13 +4,13 @@
       "Kevin Ryde <user42_kevin@yahoo.com.au>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Image-Base-Magick",
    "no_index" : {
@@ -24,8 +24,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Test" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -39,6 +38,11 @@
             "Image::Magick" : "0",
             "perl" : "5.001"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test" : "0"
+         }
       }
    },
    "release_status" : "stable",
@@ -48,6 +52,6 @@
          "http://www.gnu.org/licenses/gpl.html"
       ]
    },
-   "version" : "5",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : 6,
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

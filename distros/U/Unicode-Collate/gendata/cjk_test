@@ -60,7 +60,7 @@ sub testdata ($$) {
 	for my $c (@c) {
 	    ++$done;
 	    $c =~ s/:.*//; # format change, Korean 1.13
-	    my $u = pack 'U*', map hex, split '-', $c;
+	    my $u = pack('U*', map hex, split '-', $c);
 	    if ($korean) {
 		$col->change(level => 1);
 		if (@c != 1 || $c[0] !~ /^[A-D]/) { # not Hangul

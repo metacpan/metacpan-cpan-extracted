@@ -17,6 +17,7 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'File::Temp' => '0',
+                                      'LWP::Protocol::https' => '0',
                                       'LWP::Simple' => '0',
                                       'Mojolicious' => '8.23',
                                       'base' => '0',

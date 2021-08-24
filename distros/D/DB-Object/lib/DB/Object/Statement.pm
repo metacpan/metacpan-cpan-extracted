@@ -278,10 +278,10 @@ sub execute
             CORE::push( @binded, @binded );
         }
     }
-    $self->messagef( 3, "Found %d bound values for %d binded column types.", scalar( @binded ), scalar( @binded_types ) );
+    $self->messagef( 3, "Found %d bound values for %d binded column types (%s).", scalar( @binded ), scalar( @binded_types ), join( ',', @binded_types ) );
     if( $q && scalar( @binded ) != scalar( @binded_types ) )
     {
-        warn( sprintf( "Warning: the total binded values (%d) does not match the total binded types (%d)! Check the code...\n", scalar( @binded ), scalar( @binded_types ) ) );
+        warn( sprintf( "Warning: total %d bound values does not match the total %d bound types ('%s')! Check the code for query $self->{sth}->{Statement}...\n", scalar( @binded ), scalar( @binded_types ), join( "','", @binded_types ) ) );
         ## Cancel it, because it will create problems
         @binded_types = ();
     }
@@ -309,8 +309,8 @@ sub execute
         local( $SIG{ALRM} )     = sub{ die( "Timeout while processing query $self->{sth}->{Statement}\n" ) };
         ## print( STDERR ref( $self ) . "::execute(): binding parameters '", join( ', ', @$binded ), "' to query:\n$self->{ 'query' }\n" );
         $self->message( 3, "Executing query '$self->{sth}->{Statement}' with handler '$self->{sth}'." );
-        $self->message( 3, "Is database handler active? ", ( $self->ping ? 'Yes' : 'No' ) );
-        $self->message( 3, "Statement handler contains the following data: ", $self->dumper( $self->{ 'sth' } ) );
+        # $self->message( 3, "Is database handler active? ", ( $self->ping ? 'Yes' : 'No' ) );
+        $self->message( 3, "Statement handler contains the following data: ", $self->dump( $self->{sth} ) );
         ## $self->{ 'sth' }->execute( @binded );
         for( my $i = 0; $i < scalar( @binded ); $i++ )
         {
@@ -326,7 +326,7 @@ sub execute
             my $data_type = $binded_types[ $i ];
             if( CORE::length( $data_type ) && $self->_is_hash( $data_type ) )
             {
-                $self->message( 3, "Found binded param for binded value No $i (starting from 0): ", sub{ $self->dumper( $data_type ) } );
+                $self->message( 3, "Found binded param for binded value No $i (starting from 0): ", sub{ $self->dump( $data_type ) } );
                 $self->{sth}->bind_param( $i + 1, $binded[ $i ], $data_type );
             }
             else
@@ -386,10 +386,10 @@ sub execute
     }
     elsif( $self->{sth}->errstr() )
     {
-        return( $self->error( $self->{sth}->errstr() ) );
+        return( $self->error( "Error while trying to execute query $self->{sth}->{Statement}: ", $self->{sth}->errstr ) );
     }
-    ## User wants an object for chaining like:
-    ## $sth->exec( 'some value' )->fetchrow;
+    # User wants an object for chaining like:
+    # $sth->exec( 'some value' )->fetchrow;
     elsif( want( 'OBJECT' ) )
     {
         return( $self );
@@ -398,7 +398,7 @@ sub execute
     {
         return( $rv );
     }
-    ## For void context too
+    # For void context too
     else
     {
         return(1);
@@ -570,17 +570,17 @@ sub fetchrow_object
     {
         $self->execute() || return( $self->pass_error );
     }
-    ## $self->_cleanup();
+    # $self->_cleanup();
     my $rows = $self->{sth}->rows;
-    $self->message( 3, "$rows found" );
+    # $self->message( 3, "$rows found" );
     my $ref = $self->{sth}->fetchrow_hashref();
-    $self->message( 3, "Found result data : ", sub{ $self->dumper( $ref ) } );
+    # $self->message( 3, "Found result data : ", sub{ $self->dump( $ref ) } );
     if( $ref && scalar( keys( %$ref ) ) ) 
     {
         my $struct = { map{ $_ => '$' } keys( %$ref ) };
         my $table  = $self->table;
         my $class  = "DB::Object::${basePack}::Result::${table}";
-        $self->message( 3, "Building class '$class' with '", scalar( keys( %$ref ) ), "' keys." );
+        # $self->message( 3, "Building class '$class' with '", scalar( keys( %$ref ) ), "' keys." );
         if( !defined( &{ $class . '::new' } ) )
         {
             struct $class => $struct;
@@ -649,6 +649,7 @@ sub join
     {
         $on = ( scalar( @_ ) == 1 && ref( $_[0] ) ) ? shift( @_ ) : [ @_ ];
     }
+    $self->message( 3, "join condition (\$on) is: $on" );
     my $q = $self->query_object || return( $self->error( "No query formatter object was set" ) );
     my $tbl_o = $q->table_object || return( $self->error( "No table object is set in query object." ) );
     my $query = $q->query ||
@@ -657,6 +658,7 @@ sub join
     {
         return( $self->error( "You may not perform a join on a query other than select." ) );
     }
+    # $self->message( 3, "Table '", $q->table_object->name, "' alias so far is: '", $q->table_alias, "'." );
     my $constant = $q->constant;
     ## Constant is set and query object marked as final, which means this statement has already been processed as a join and so we skip all further processing.
     if( scalar( keys( %$constant ) ) && $q->final )
@@ -673,11 +675,14 @@ sub join
     my $new_db     = '';
     my $class      = ref( $self );
     my $q2 = $q->clone;
+    # $self->message( 3, "Creating a clone of \$q ($q) into \$q2 ($q2)" );
+    $self->messagef( 3, "For starter \$q2 has %d binded types.", $q2->binded_types->length );
     # $self->message( 3, "Clone main object is: '$q2'." );
     my $q1;
     $q2->join_tables( $tbl_o ) if( !$q2->join_tables->length );
     # $data is a DB::Object::Postgres::Statement object - we get all its parameter and merge them with ours
-    if( ref( $data ) && ref( $data ) eq $class )
+    # if( ref( $data ) && ref( $data ) eq $class )
+    if( ref( $data ) && $self->_is_a( $data, $class ) )
     {
         $q1 = $data->query_object;
     }
@@ -688,6 +693,7 @@ sub join
         if( $self->_is_object( $data ) && $data->isa( 'DB::Object::Tables' ) )
         {
             $join_tbl = $data;
+            # $self->message( 3, "Joined table '", $data->name, "' alias is '", $data->query_object->table_alias, "' and prefixed property is '", $data->prefixed, "'." );
         }
         elsif( $self->_is_object( $data ) )
         {
@@ -699,16 +705,19 @@ sub join
             $join_tbl = $self->database_object->table( $data );
             return( $self->error( "Could not get a table object from \"$data\"." ) ) if( !$join_tbl );
         }
-        my $sth_tmp = $join_tbl->prefixed( $db ne $join_tbl->database_object->database ? 3 : 1 )->select || return( $self->pass_error( $join_tbl->error ) );
+        $join_tbl->prefixed( $db ne $join_tbl->database_object->database ? 3 : 1 );
+        my $sth_tmp = $join_tbl->select || return( $self->pass_error( $join_tbl->error ) );
         $self->message( 3, "sql query is: ", $sth_tmp->as_string );
         $q1 = $sth_tmp->query_object || return( $self->error( "Could not get a query object out of the dummy select query I made from table \"$data\"." ) );
         $new_fields = $q1->selected_fields;
-        $self->message( 3, "Got the table object, and group by is? ", $q1->group );
-        $join_tbl->reset;
+        # $self->message( 3, "Got the table object, and group by is? '", $q1->group, "'" );
+        # XXX NOTE: 2021-08-22: If we reset it here, we lose the table aliasing
+        # $join_tbl->reset;
         
-        $join_tbl->prefixed( $db ne $join_tbl->database_object->database ? 3 : 1 );
+        # $join_tbl->prefixed( $db ne $join_tbl->database_object->database ? 3 : 1 ) unless( $join_tbl->prefixed );
         # XXX $new_table  = $data;
         $new_table = $join_tbl->prefix;
+        $join_tbl->reset;
         # We assume this table is part of our same database
         $new_db     = $db;
         # my $db_data = $self->getdefault( $new_table );
@@ -733,14 +742,9 @@ sub join
     }
 #     $self->message( 3, "Where clause is no: ", $q2->where );
 #     $self->message( 3, "Group clause is: ", $q2->group, "\n and with \$q1 maybe? ", $q1->group );
-    # $self->{ 'group_by' } = \( join( ', ', ( $q->group(), $q1->group() ) ) );
+    $self->message( 3, "Merging group, order, and binded where, group and order, and overall binded." );
     $q2->group( $q->group, $q1->group ) if( $q1->group->value->length );
-    # $self->{ 'order_by' } = \( join( ', ', ( $q->order(), $q1->order() ) ) );
     $q2->order( $q->order, $q1->order ) if( $q1->order->value->length );
-    # push( @{ $self->{ 'binded_where' } }, @{$q1->binded_where} );
-    # push( @{ $self->{ 'binded_group' } }, @{$q1->binded_group} );
-    # push( @{ $self->{ 'binded_order' } }, @{$q1->binded_order} );
-    # push( @{ $self->{ 'binded' } }, @{ $data->{ 'binded' } } );
     $q2->binded_where->push( @{$q1->binded_where} );
     $q2->binded_group->push( @{$q1->binded_group} );
     $q2->binded_order->push( @{$q1->binded_order} );
@@ -750,10 +754,18 @@ sub join
         $q2->_limit( $q1->_limit );
         $q2->binded_limit( $q1->binded_limit );
     }
+    $self->messagef( 3, "After merging with clauses from \$q1 ($q1 from table %s) \$q2 has %d binded types.", $q1->table_object->name, $q2->binded_types->length );
     my $prev_fields = length( $q->join_fields ) ? $q->join_fields : $q->selected_fields;
     # Regular express to prepend previous fields by their table name if that's not the case already
     # my $prev_prefix = $new_db ? "$db.$table" : $table;
-    my $prev_prefix = $tbl_o->query_object->table_alias ? $tbl_o->query_object->table_alias : $tbl_o->prefixed( $db ne $new_db ? 3 : 1 )->prefix;
+    # my $prev_prefix = $tbl_o->query_object->table_alias ? $tbl_o->query_object->table_alias : $tbl_o->prefixed( $db ne $new_db ? 3 : 1 )->prefix;
+#     unless( $tbl_o->query_object->table_alias )
+#     {
+#         $tbl_o->prefixed( $db ne $new_db ? 3 : 1 )
+#     }
+    $tbl_o->prefixed( $db ne $new_db ? 3 : 1 );
+    # Prefix for previous fields list
+    my $prev_prefix = $tbl_o->prefix;
     my $prev_fields_hash = $q->table_object->fields;
     my $prev_fields_list = CORE::join( '|', sort( keys( %$prev_fields_hash ) ) );
     my $re = qr/(?<!\.)\b($prev_fields_list)\b/;
@@ -927,8 +939,10 @@ sub join
     }
 #     $self->message( 3, "Left join formatted is: '$left_join'." );
     $from = $q2->from_table->join( ', ' );
+    # $self->messagef( 3, "Finally, before calling _query_components, \$q2 has %d binded types.", $q2->binded_types->length );
     # $q2->from_table( $from_table );
-    my $clause = $q2->_query_components( 'select' );
+    my $clause = $q2->_query_components( 'select', { no_bind_copy => 1 } );
+    # $self->messagef( 3, "Ultimately, after calling _query_components, \$q2 has %d binded types.", $q2->binded_types->length );
     # You may not sort if there is no order clause
 #     my $table_alias = '';
 #     if( length( $table_alias = $q2->table_alias ) )
@@ -1077,6 +1091,7 @@ DESTROY
 
 1;
 
+# XXX POD
 __END__
 
 =encoding utf-8

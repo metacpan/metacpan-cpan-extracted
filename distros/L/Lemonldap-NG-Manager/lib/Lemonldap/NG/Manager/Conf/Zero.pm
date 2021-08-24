@@ -2,10 +2,12 @@ package Lemonldap::NG::Manager::Conf::Zero;
 
 use strict;
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.13';
 
 sub zeroConf {
-    my ( $domain, $sessionDir, $persistentSessionDir, $notificationDir, $cacheDir ) = @_;
+    my ( $domain, $sessionDir, $persistentSessionDir, $notificationDir,
+        $cacheDir )
+      = @_;
     $domain               ||= 'example.com';
     $sessionDir           ||= '/var/lib/lemonldap-ng/sessions';
     $persistentSessionDir ||= '/var/lib/lemonldap-ng/psessions';
@@ -179,6 +181,7 @@ sub zeroConf {
         'securedCookie' => 0,
         'cookieName'    => 'lemonldap',
         'cfgAuthor'     => 'The LemonLDAP::NG team',
+        'cfgDate'       => '1627287638',
         'cfgVersion'    => $VERSION,
         'exportedVars'  => {},
         'portalSkin'    => 'bootstrap',

@@ -140,7 +140,7 @@ sub run {
 
     # Try to recover cookie and user session
     $id = $class->fetchId($req);
-    $class->data( {} ) unless($id);
+    $class->data( {} ) unless ($id);
     if (    $id
         and $session = $class->retrieveSession( $req, $id ) )
     {
@@ -321,7 +321,7 @@ sub getLevel {
         $i++
       )
     {
-        if ( $uri =~ $class->tsv->{locationRegexp}->{$vhost}->[$i] ) {
+        if ( $uri && $uri =~ $class->tsv->{locationRegexp}->{$vhost}->[$i] ) {
             $level = $class->tsv->{locationAuthnLevel}->{$vhost}->[$i];
             last;
         }

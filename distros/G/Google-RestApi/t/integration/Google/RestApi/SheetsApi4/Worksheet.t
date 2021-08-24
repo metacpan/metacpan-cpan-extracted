@@ -1,20 +1,15 @@
-#!/usr/bin/perl
+use Test::Integration::Setup;
 
-use strict;
-use warnings;
-
-use YAML::Any qw(Dump);
 use Test::Most tests => 39;
 
 use aliased 'Google::RestApi::SheetsApi4';
 use aliased 'Google::RestApi::SheetsApi4::Worksheet';
 
-use Utils qw(:all);
-init_logger();
+# init_logger($DEBUG);
 
 my $name = "Sheet1";
-my $sheets = sheets_api();
-my $spreadsheet = $sheets->create_spreadsheet(title => spreadsheet_name());
+my $sheets_api = sheets_api();
+my $spreadsheet = $sheets_api->create_spreadsheet(title => spreadsheet_name());
 my $worksheet;
 my $qr_id = SheetsApi4->Worksheet_Id;
 my $qr_uri = SheetsApi4->Worksheet_Uri;
@@ -138,4 +133,4 @@ sub nvp_header {
   return;
 }
 
-$spreadsheet->sheets()->delete_all_spreadsheets(spreadsheet_name());
+delete_all_spreadsheets(sheets_api);

@@ -24,7 +24,7 @@ my $client = LLNG::Manager::Test->new( {
             findUser           => 1,
             impersonationRule  => 1,
             findUserSearchingAttributes =>
-              { uid => 'Login', guy => 'Kind', cn => 'Name' },
+              { 'uid##1' => 'Login', 'guy##1' => 'Kind', 'cn##1' => 'Name' },
             findUserExcludingAttributes =>
               { type => 'mutant', uid => 'rtyler' },
         }
@@ -57,7 +57,7 @@ ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
   or print STDERR "$@\n" . Dumper($res);
 ok( $json->{user} eq 'dwho', ' Good user' )
   or explain( $json, 'user => dwho' );
-ok( $token = $json->{token},  'Found token' );
+ok( $token = $json->{token}, 'Found token' );
 count(4);
 
 ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Portal', );
@@ -79,7 +79,7 @@ ok( $json->{error} == 82, ' Token expired' )
   or explain( $json, 'Token expired' );
 ok( $json->{result} == 0, ' result => 0' )
   or explain( $json, 'Result => 0' );
-ok( $token = $json->{token},  'Found token' );
+ok( $token = $json->{token}, 'Found token' );
 count(6);
 
 clean_sessions();

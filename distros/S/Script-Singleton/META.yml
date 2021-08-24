@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,10 +19,11 @@ no_index:
     - t
     - inc
 requires:
-  IPC::Shareable: '1.03'
+  Cwd: '0'
+  IPC::Shareable: '1.05'
   perl: '5.006'
 resources:
   bugtracker: https://github.com/stevieb9/script-singleton/issues
   repository: https://github.com/stevieb9/script-singleton.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

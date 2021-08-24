@@ -1,0 +1,269 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/DataDirUtils/list_datadirs
+# and generated automatically using Perinci::CmdLine::Gen version 0.499
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-08-23'; # DATE
+our $DIST = 'App-DataDirUtils'; # DIST
+our $VERSION = '0.003'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/DataDirUtils/list_datadirs",
+    program_name => "list-datadirs",
+    log => 1,
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Search datadirs recursively in a list of directory names
+# PODNAME: list-datadirs
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+list-datadirs - Search datadirs recursively in a list of directory names
+
+=head1 VERSION
+
+This document describes version 0.003 of list-datadirs (from Perl distribution App-DataDirUtils), released on 2021-08-23.
+
+=head1 SYNOPSIS
+
+Usage:
+
+% B<list-datadirs> [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--detail>|B<-l>|B<--no-detail>|B<--nodetail>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--skip-git>|B<--no-skip-git>|B<--noskip-git>] -- E<lt>I<prefixes>E<gt> ...
+
+=head1 DESCRIPTION
+
+Note: when a datadir is found, its contents are no longer recursed to search for
+other datadirs.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--detail>, B<-l>
+
+=item B<--no-skip-git>
+
+=item B<--prefixes-json>=I<s>
+
+Locations to find datadirs (JSON-encoded).
+
+See C<--prefixes>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--prefixes>=I<s@>*
+
+Locations to find datadirs.
+
+Directory name(s) to search for "datadirs", i.e. directories which have
+`.tag-datadir` file in its root.
+
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C list-datadirs list-datadirs
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete list-datadirs 'p/*/`list-datadirs`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 EXAMPLES
+
+How many datadirs are here?:
+
+ % list-datadirs . | wc -l
+
+List all datadirs in all my external drives (show name as well as path):
+
+ % list-datadirs /media/budi /media/ujang -l
+
+Backup all my datadirs to Google Drive:
+
+ % list-datadirs /media/budi /media/ujang -l | td map '"rclone copy -v -v $_->{abs_path} mygdrive:/backup/$_->{name}"' | bash
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-DataDirUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-DataDirUtils>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-DataDirUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

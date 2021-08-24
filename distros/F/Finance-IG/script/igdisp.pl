@@ -40,6 +40,7 @@ for my $i (0..$#ARGV)
    } 
 } 
 @ARGV=grep { defined $_ } @ARGV; 
+die "-n requires an argument, not provided" if (0<grep { !defined $_  } @{$opt{n}}) ; 
 $opt{n}=join('|',@{$opt{n}}); 
 $opt{n} or delete $opt{n}; 
 $opt{a}=1; 
@@ -270,7 +271,10 @@ my @format=(
            "%-9.2fbid £%-8.2fprofit %5.1fprofitpc%% £%10.2fatrisk\n", 
 
            #5 
-           "%-41sinstrumentName %6sheld %-6.1fdailyp %+4.2fsize %-9.2flevel  %-41sinstrumentName %screatedDateUTC %+6.2fsize %-9.2flevel\n", 
+           #"%-41sinstrumentName %6sheld %-6.1fdailyp %+4.2fsize %-9.2flevel  %-41sinstrumentName %screatedDateUTC %+6.2fsize %-9.2flevel\n", 
+           "%-41sinstrumentName %6sheld %-6.1fdailyp %+4.2fsize %-9.2flevel  %-41sinstrumentName %screatedDateUTC ".
+           "£%-7.2fprofit %8.1fprofitpc%%  £%9.2fatrisk\n", 
+           , 
      
           ); 
 my $format; 

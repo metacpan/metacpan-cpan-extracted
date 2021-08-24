@@ -1,0 +1,197 @@
+POST:
+  https://sheets.googleapis.com/v4/spreadsheets/fake_spreadsheet_id1/values:batchUpdate:
+  - content: |
+      {
+         "data" : [
+            [
+               {
+                  "majorDimension" : "ROWS",
+                  "range" : "'Sheet1'!A1",
+                  "values" : [
+                     [
+                     ]
+                  ]
+               },
+               {
+                  "majorDimension" : "ROWS",
+                  "range" : "'Sheet1'!B1",
+                  "values" : [
+                     [
+                     ]
+                  ]
+               },
+               {
+                  "majorDimension" : "ROWS",
+                  "range" : "'Sheet1'!C1",
+                  "values" : [
+                     [
+                     ]
+                  ]
+               }
+            ]
+         ],
+         "valueInputOption" : "USER_ENTERED"
+      }
+    response: |
+      {
+        "responses": [
+          {
+            "spreadsheetId": "fake_spreadsheet_id1",
+            "updatedRange": "Sheet1!A1",
+            "updatedCells": 1,
+            "updatedColumns": 1,
+            "updatedRows": 1
+          },
+          {
+            "spreadsheetId": "fake_spreadsheet_id1",
+            "updatedRange": "Sheet1!B1",
+            "updatedRows": 1,
+            "updatedColumns": 1,
+            "updatedCells": 1
+          },
+          {
+            "spreadsheetId": "fake_spreadsheet_id1",
+            "updatedRange": "Sheet1!C1",
+            "updatedRows": 1,
+            "updatedColumns": 1,
+            "updatedCells": 1
+          }
+        ],
+        "spreadsheetId": "fake_spreadsheet_id1",
+        "totalUpdatedCells": 3,
+        "totalUpdatedColumns": 3,
+        "totalUpdatedRows": 1,
+        "totalUpdatedSheets": 1
+      }
+    tweaks:
+    - batch_update_values
+  - content: |
+      {
+         "data" : [
+            [
+               {
+                  "majorDimension" : "COLUMNS",
+                  "range" : "'Sheet1'!A:A",
+                  "values" : [
+                     [
+                     ]
+                  ]
+               },
+               {
+                  "majorDimension" : "COLUMNS",
+                  "range" : "'Sheet1'!B:B",
+                  "values" : [
+                     [
+                     ]
+                  ]
+               },
+               {
+                  "majorDimension" : "COLUMNS",
+                  "range" : "'Sheet1'!C:C",
+                  "values" : [
+                     [
+                     ]
+                  ]
+               }
+            ]
+         ],
+         "valueInputOption" : "USER_ENTERED"
+      }
+    response: |
+      {
+         "responses" : [
+            {
+               "spreadsheetId" : "fake_spreadsheet_id1",
+               "updatedCells" : 1,
+               "updatedColumns" : 1,
+               "updatedRange" : "Sheet1!A1",
+               "updatedRows" : 1
+            },
+            {
+               "spreadsheetId" : "fake_spreadsheet_id1",
+               "updatedCells" : 1,
+               "updatedColumns" : 1,
+               "updatedRange" : "Sheet1!B1",
+               "updatedRows" : 1
+            },
+            {
+               "spreadsheetId" : "fake_spreadsheet_id1",
+               "updatedCells" : 1,
+               "updatedColumns" : 1,
+               "updatedRange" : "Sheet1!C1",
+               "updatedRows" : 1
+            }
+         ],
+         "spreadsheetId" : "fake_spreadsheet_id1",
+         "totalUpdatedCells" : 3,
+         "totalUpdatedColumns" : 3,
+         "totalUpdatedRows" : 1,
+         "totalUpdatedSheets" : 1
+      }
+    tweaks:
+    - batch_update_values
+  - content: |
+      {
+         "data" : [
+            [
+               {
+                  "majorDimension" : "ROWS",
+                  "range" : "'Sheet1'!1:1",
+                  "values" : [
+                     [
+                     ]
+                  ]
+               },
+               {
+                  "majorDimension" : "ROWS",
+                  "range" : "'Sheet1'!2:2",
+                  "values" : [
+                     [
+                     ]
+                  ]
+               },
+               {
+                  "majorDimension" : "ROWS",
+                  "range" : "'Sheet1'!3:3",
+                  "values" : [
+                     [
+                     ]
+                  ]
+               }
+            ]
+         ],
+         "valueInputOption" : "USER_ENTERED"
+      }
+    response: |
+      {
+         "responses" : [
+            {
+               "spreadsheetId" : "fake_spreadsheet_id1",
+               "updatedCells" : 1,
+               "updatedColumns" : 1,
+               "updatedRange" : "Sheet1!A1",
+               "updatedRows" : 1
+            },
+            {
+               "spreadsheetId" : "fake_spreadsheet_id1",
+               "updatedCells" : 1,
+               "updatedColumns" : 1,
+               "updatedRange" : "Sheet1!A2",
+               "updatedRows" : 1
+            },
+            {
+               "spreadsheetId" : "fake_spreadsheet_id1",
+               "updatedCells" : 1,
+               "updatedColumns" : 1,
+               "updatedRange" : "Sheet1!A3",
+               "updatedRows" : 1
+            }
+         ],
+         "spreadsheetId" : "fake_spreadsheet_id1",
+         "totalUpdatedCells" : 3,
+         "totalUpdatedColumns" : 3,
+         "totalUpdatedRows" : 1,
+         "totalUpdatedSheets" : 1
+      }
+    tweaks:
+    - batch_update_values

@@ -1,5 +1,10 @@
 Revision history for Syntax-Keyword-Match
 
+0.07    2021-08-20
+        [BUGFIXES]
+         * Reïmplement Perl_do_ncmp() internally, because it isn't exposed
+           as a real API function
+
 0.06    2021-08-16
         [CHANGES]
          * Permit multiple case labels for a single block (RT135133)

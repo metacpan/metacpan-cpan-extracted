@@ -2,7 +2,7 @@ package Test2::Harness::UI::RunProcessor;
 use strict;
 use warnings;
 
-our $VERSION = '0.000075';
+our $VERSION = '0.000077';
 
 use DateTime;
 use Data::GUID;
@@ -18,8 +18,6 @@ use Test2::Util::Facets2Legacy qw/causes_fail/;
 use Test2::Harness::Util::UUID qw/gen_uuid/;
 use Test2::Harness::Util::JSON qw/encode_json decode_json/;
 use JSON::PP();
-
-use Test2::Harness::Log::CoverageAggregator;
 
 use Test2::Harness::UI::Util::ImportModes qw{
     %MODES
@@ -170,28 +168,17 @@ sub flush {
     return $flush;
 }
 
-sub add_coverage {
-    my $self = shift;
-    my ($test, $data) = @_;
-
-    my $ca = $self->{+COVERAGE} //= Test2::Harness::Log::CoverageAggregator->new();
-
-    $ca->add_coverage($test, $data);
-
-    return;
-}
-
 sub flush_coverage {
     my $self = shift;
 
-    my $ca = $self->{+COVERAGE} or return;
-    my $run = $self->run;
+    my $c    = $self->{+COVERAGE} or return;
+    my $run  = $self->run;
     my $uuid = gen_uuid();
 
     eval {
         $self->schema->resultset('Coverage')->create({
             coverage_id => $uuid,
-            coverage    => encode_json($ca->coverage),
+            coverage    => encode_json($c),
         });
 
         $run->update({coverage_id => $uuid});
@@ -490,9 +477,8 @@ sub _process_event {
         $e->{orphan_line} = $params{line} if $params{line};
     }
     else {
-        # Handle coverage
-        if (my $coverage = $f->{coverage}) {
-            $self->add_coverage($job->{result}->file, $coverage);
+        if (my $fields = $f->{run_fields}) {
+            $self->add_run_fields($fields);
         }
 
         if ($f->{parent} && $f->{parent}->{children}) {
@@ -517,6 +503,68 @@ sub _process_event {
     }
 
     return $e;
+}
+
+sub add_run_fields {
+    my $self = shift;
+    my ($fields) = @_;
+
+    my $run    = $self->{+RUN};
+    my $run_id = $run->run_id;
+
+    return $self->_add_fields(
+        fields    => $fields,
+        type      => 'RunField',
+        key_field => 'run_field_id',
+        attrs     => {run_id => $run_id},
+    );
+}
+
+sub add_job_fields {
+    my $self = shift;
+    my ($job, $fields) = @_;
+
+    my $job_key = $job->job_key;
+
+    return $self->_add_fields(
+        fields    => $fields,
+        type      => 'JobField',
+        key_field => 'job_field_id',
+        attrs     => {job_key => $job_key},
+    );
+}
+
+sub _add_fields {
+    my $self = shift;
+    my %params = @_;
+
+    my $fields    = $params{fields};
+    my $type      = $params{type};
+    my $key_field = $params{key_field};
+    my $attrs     = $params{attrs} // {};
+
+    my @add;
+    for my $field (@$fields) {
+        my $id  = gen_uuid;
+        my $new = {%$attrs, $key_field => $id};
+
+        $new->{name}    = $field->{name}    || 'unknown';
+        $new->{details} = $field->{details} || $new->{name};
+        $new->{raw}     = $field->{raw}               if $field->{raw};
+        $new->{link}    = $field->{link}              if $field->{link};
+        $new->{data}    = encode_json($field->{data}) if $field->{data};
+
+        if ($new->{name} eq 'coverage' && !$new->{link} && $type eq 'RunField') {
+            $new->{link} = "/coverage/$id";
+        }
+
+        push @add => $new;
+
+        # Replace the item in the $fields array with the id
+        $field = $id;
+    }
+
+    $self->schema->resultset($type)->populate(\@add);
 }
 
 sub clean_output {
@@ -565,19 +613,6 @@ sub clean_array {
     return 0;
 }
 
-sub merge_fields {
-    my $self = shift;
-    my ($existing, $new) = @_;
-
-    $existing = decode_json($existing) if $existing && !ref($existing);
-    $new      = decode_json($new)      if $new      && !ref($new);
-
-    my @merged;
-    push @merged => @$existing if $existing && @$existing;
-    push @merged => @$new if $new && @$new;
-    return encode_json(\@merged);
-}
-
 sub update_other {
     my $self = shift;
     my ($job, $f) = @_;
@@ -595,9 +630,7 @@ sub update_other {
         $run->parameters($run_data);
 
         if (my $fields = $run_data->{harness_run_fields} // $run_data->{fields}) {
-            my $run_id = $run->run_id;
-            my @new = map { { %{$_}, run_id => $run_id } } @$fields;
-            $self->{+RUN}->fields($self->merge_fields($run->fields, \@new));
+            $self->add_run_fields($fields);
         }
     }
 
@@ -655,8 +688,7 @@ sub update_other {
         }
     }
     if (my $job_fields = $f->{harness_job_fields}) {
-        my @new = map { {%{$_}} } @$job_fields;
-        $cols{fields} = $self->merge_fields($cols{fields}, \@new)
+        $self->add_job_fields($job_result, $job_fields);
     }
 
     $job_result->set_columns(\%cols);

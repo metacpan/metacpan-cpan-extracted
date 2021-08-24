@@ -35,20 +35,24 @@
             "Cache::Memory::Simple" : "0",
             "Carp" : "0",
             "Exporter" : "0",
+            "File::Slurp" : "0",
             "Furl" : "0",
             "Hash::Merge" : "0",
-            "JSON" : "0",
+            "JSON::MaybeXS" : "0",
+            "LWP::Protocol::https" : "0",
             "List::MoreUtils" : "0",
             "List::Util" : "0",
             "Log::Log4perl" : "0",
+            "Module::Load" : "0",
             "Net::OAuth2::Client" : "0",
             "Net::OAuth2::Profile::WebServer" : "0",
+            "Retry::Backoff" : "0",
             "Scalar::Util" : "0",
             "Storable" : "0",
-            "Sub::Retry" : "0",
             "Tie::Hash" : "0",
             "Time::Out" : "0",
             "ToolSet" : "0",
+            "Try::Tiny" : "0",
             "Type::Params" : "1.004004",
             "Types::Standard" : "0",
             "URI" : "0",
@@ -63,9 +67,12 @@
       },
       "test" : {
          "requires" : {
+            "Capture::Tiny" : "0",
+            "Mock::MonkeyPatch" : "0",
+            "Test::Class" : "0",
             "Test::Class::Load" : "0",
-            "Test::MockObject::Extends" : "0",
-            "Test::Most" : "0"
+            "Test::Most" : "0",
+            "Text::Levenshtein::Flexible" : "0"
          }
       }
    },
@@ -77,6 +84,6 @@
          "web" : "https://github.com/mvsjes2/p5-google-restapi"
       }
    },
-   "version" : "0.7",
+   "version" : "0.8",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

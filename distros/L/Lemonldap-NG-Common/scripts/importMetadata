@@ -2,6 +2,7 @@
 
 use strict;
 use Getopt::Long;
+use Pod::Usage;
 use Lemonldap::NG::Common::Conf;
 use LWP::UserAgent;
 use MIME::Base64;
@@ -30,31 +31,8 @@ my $result = GetOptions(
     'dry-run|n'
 );
 
-#==============================================================================
-# Help
-#==============================================================================
-if ( $opts{help} or !$opts{metadata} ) {
-    print STDERR
-"\nScript to import SAML metadata bundle file into LL::NG configuration\n\n";
-    print STDERR "Usage: $0 -m <metadata file URL>\n\n";
-    print STDERR "Options:\n";
-    print STDERR
-      "\t-i (--idpconfprefix): Prefix used to set IDP configuration key\n";
-    print STDERR "\t-h (--help): print this message\n";
-    print STDERR "\t-m (--metadata): URL of metadata document\n";
-    print STDERR
-      "\t-s (--spconfprefix): Prefix used to set SP configuration key\n";
-    print STDERR
-"\t--ignore-sp: ignore SP maching this entityID (can be specified multiple times)\n";
-    print STDERR
-"\t--ignore-idp: ignore IdP matching this entityID (can be specified multiple times)\n";
-    print STDERR "\t-a (--nagios) : output statistics in Nagios format\n";
-    print STDERR "\t-n (--dry-run): print statistics but do not apply changes\n";
-    print STDERR "\t-v (--verbose): increase verbosity of output\n";
-    print STDERR
-"\t-r (--remove): remove provider from LemonLDAP::NG if it does not appear in metadata\n";
-    exit 1;
-}
+pod2usage(1) if $opts{help};
+pod2usage( -message => "Missing metadata URL (-m)", -exitval => 2) if !$opts{metadata};
 
 #==============================================================================
 # Default values
@@ -558,3 +536,105 @@ else {
 
 exit $exitCode;
 
+__END__
+Script to import SAML metadata bundle file into LL::NG configuration\n\n";
+Usage: $0 -m <metadata file URL>\n\n";
+Options:\n";
+
+=encoding UTF-8
+
+=head1 NAME
+
+importMetadata - Script to import SAML federation metadata into LL::NG configuration
+
+=head1 SYNOPSIS
+
+importMetadata -m <metadata URL> [options]
+
+Options:
+
+    -m, --metadata          URL of metadata document
+    -i, --idpconfprefix     Prefix used to set IDP configuration key
+    -s, --spconfprefix      Prefix used to set SP configuration key
+    --ignore-sp             ignore SP maching this entityID (can be specified multiple times)
+    --ignore-idp            ignore IdP matching this entityID (can be specified multiple times)
+    -a, --nagios            output statistics in Nagios format
+    -r, --remove            remove provider from LemonLDAP::NG if it does not appear in metadata
+    -n, --dry-run           print statistics but do not apply changes
+    -v, --verbose           increase verbosity of output
+    -h, --help              print full documentation
+
+=head1 OPTIONS
+
+=over
+
+=item B<-m I<URL>>, B<--metadata=I<URL>>
+
+Specifies the <URL> of the metadata document to import
+
+=item B<-i I<PREFIX>>, B<--idpconfprefix=I<PREFIX>>
+
+Prefix each IDP found the metadata document with the <PREFIX> when registring
+them into LemonLDAP::NG
+
+=item B<-s I<PREFIX>>, B<--spconfprefix=I<PREFIX>>
+
+Prefix each SP found the metadata document with the <PREFIX> when registring
+them into LemonLDAP::NG
+
+=item B<--ignore-sp=I<ENTITYID>>
+
+Ignore the specified Service Provider <ENTITYID>. It will not be added, updated
+or deleted from LemonLDAP::NG configuration
+
+=item B<--ignore-idp=I<ENTITYID>>
+
+Ignore the specified Identity Provider <ENTITYID>. It will not be added,
+updated or deleted from LemonLDAP::NG configuration
+
+=item B<-a>, B<--nagios>
+
+After each run, print statistics about added/modified/deleted items in Nagios
+format
+
+=item B<-r>, B<--remove>
+
+If this option is used, after a successful import, existing SP/IDPs who match
+the configuration prefix will be removed from LemonLDAP::NG if they were not
+present in the imported metadata
+
+=item B<-n>, B<--dry-run>
+
+This option prevents the modified configuration from being saved. It can be used for testing.
+
+=item B<-v>, B<--verbose>
+
+Increase verbosity during script execution
+
+=item B<-h>, B<--help>
+
+Displays the script's documentation
+
+=back
+
+=head1 SEE ALSO
+
+L<http://lemonldap-ng.org/>
+
+=head1 AUTHORS
+
+=over
+
+=item Clement Oudot, E<lt>clement@oodo.netE<gt>
+
+=back
+
+=head1 BUG REPORT
+
+Use OW2 system to report bug or ask for features:
+L<https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues>
+
+=head1 DOWNLOAD
+
+Lemonldap::NG is available at
+L<https://lemonldap-ng.org/download>

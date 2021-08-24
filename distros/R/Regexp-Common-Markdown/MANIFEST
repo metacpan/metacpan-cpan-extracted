@@ -19,12 +19,20 @@ t/011.link.t
 t/012.list.t
 t/013.paragraph.t
 t/100.abbreviation.t
-t/101.code_block.t
-t/102.footnote.t
-t/103.header.t
-t/104.image.t
-t/105.link.t
-t/106.table.t
+t/101.checkbox.t
+t/102.code_block.t
+t/103.footnote.t
+t/104.header.t
+t/105.html_markdown.t
+t/106.image.t
+t/107.insertion.t
+t/108.katex.t
+t/109.link.t
+t/110.strikethrough.t
+t/111.subscript.t
+t/112.superscript.t
+t/113.table.t
+t/998.kwalitee.t
 t/999.pod.t
 t/functions.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)

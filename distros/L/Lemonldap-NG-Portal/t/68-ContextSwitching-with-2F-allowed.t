@@ -383,7 +383,7 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
     ok( $code = Lemonldap::NG::Common::TOTP::_code( undef, $key, 0, 30, 6 ),
         'Code' );
     ok( $code =~ /^\d{6}$/, 'Code contains 6 digits' );
-    my $s     = "code=$code&token=$token&TOTPName=myTOTP";
+    $s     = "code=$code&token=$token&TOTPName=myTOTP";
     my $epoch = time();
     ok(
         $res = $client->_post(
@@ -411,7 +411,6 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
     ok( $res->[2]->[0] =~ /<span id="msg" trspan="choose2f">/,
         'Found choose 2F' )
       or print STDERR Dumper( $res->[2]->[0] );
-    my $devices;
     ok(
         $devices = $res->[2]->[0] =~ s%<span device=\'TOTP\' epoch=\'\d{10}\'%%g,
         '2F device found'

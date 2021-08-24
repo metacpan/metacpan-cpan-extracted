@@ -1,7 +1,8 @@
 package SomeFile;
 use strict;
 use warnings;
-use parent 'OtherFile';
+use OtherFile ();
+BEGIN { our @ISA = qw(OtherFile) }
 
 sub foo {
 }

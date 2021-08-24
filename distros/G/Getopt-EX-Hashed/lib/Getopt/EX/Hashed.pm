@@ -1,6 +1,6 @@
 package Getopt::EX::Hashed;
 
-our $VERSION = '0.9913';
+our $VERSION = '0.9916';
 
 =head1 NAME
 
@@ -8,7 +8,7 @@ Getopt::EX::Hashed - Hash store object automation
 
 =head1 VERSION
 
-Version 0.9913
+Version 0.9916
 
 =head1 SYNOPSIS
 
@@ -20,7 +20,8 @@ Version 0.9913
   use Getopt::EX::Hashed;
   has start  => ( spec => "=i s begin", default => 1 );
   has end    => ( spec => "=i e" );
-  has file   => ( spec => "=s", is => 'rw' );
+  has file   => ( spec => "=s", is => 'rw', re => qr/^(?!\.)/ );
+  has score  => ( spec => '=i', min => 0, max => 100 );
   has answer => ( spec => '=i', must => sub { $_[1] == 42 } );
   no  Getopt::EX::Hashed;
 
@@ -57,10 +58,10 @@ my %DefaultConfig = (
     LOCK_KEYS          => 1,
     REPLACE_UNDERSCORE => 1,
     REMOVE_UNDERSCORE  => 0,
-    RESET_AFTER_NEW    => 0,
     GETOPT             => 'GetOptions',
     ACCESSOR_PREFIX    => '',
     DEFAULT            => undef,
+    INVALID_MSG        => \&_invalid_msg,
     );
 lock_keys %DefaultConfig;
 
@@ -71,19 +72,19 @@ sub import {
     no strict 'refs';
     push @{"$caller\::ISA"}, __PACKAGE__;
     *{"$caller\::$_"} = \&$_ for @EXPORT;
-    my $C = __Config__($caller);
-    unless (%$C) {
-	%$C = %DefaultConfig or die "something wrong!";
-	lock_keys %$C;
+    my $config = __Config__($caller);
+    unless (%$config) {
+	%$config = %DefaultConfig or die "something wrong!";
+	lock_keys %$config;
     }
 }
 
 sub configure {
     my $class = shift;
     my $ctx = $class ne __PACKAGE__ ? $class : caller;
-    my $C = __Config__($ctx);
+    my $config = __Config__($ctx);
     while (my($key, $value) = splice @_, 0, 2) {
-	$C->{$key} = $value;
+	$config->{$key} = $value;
     }
     return $class;
 }
@@ -91,12 +92,15 @@ sub configure {
 sub unimport {
     no strict 'refs';
     my $caller = caller;
-    delete ${"$caller\::"}{has};
+    delete ${"$caller\::"}{$_} for @EXPORT;
 }
 
 sub reset {
-    my $M = __Member__(caller);
-    @$M = ();
+    my $caller = caller;
+    my $member = __Member__($caller);
+    my $config = __Config__($caller);
+    @$member = ();
+    %$config = %DefaultConfig;
     return $_[0];
 }
 
@@ -104,22 +108,22 @@ sub has {
     my($key, @param) = @_;
     my @name = ref $key eq 'ARRAY' ? @$key : $key;
     my $caller = caller;
-    my $M = __Member__($caller);
-    my $C = __Config__($caller);
+    my $member = __Member__($caller);
+    my $config = __Config__($caller);
     for my $name (@name) {
 	my $append = $name =~ s/^\+//;
-	my $i = first { $M->[$_]->[0] eq $name } 0 .. $#{$M};
+	my $i = first { $member->[$_]->[0] eq $name } 0 .. $#{$member};
 	if ($append) {
 	    defined $i or die "$name: Not found\n";
-	    push @{$M->[$i]}, @param;
+	    push @{$member->[$i]}, @param;
 	} else {
 	    defined $i and die "$name: Duplicated\n";
-	    if (my $default = $C->{DEFAULT}) {
+	    if (my $default = $config->{DEFAULT}) {
 		if (ref $default eq 'ARRAY') {
 		    unshift @param, @$default;
 		}
 	    }
-	    push @$M, [ $name, @param ];
+	    push @$member, [ $name, @param ];
 	}
     }
 }
@@ -128,27 +132,33 @@ sub new {
     my $class = shift;
     my $obj = bless {}, $class;
     my $ctx = $class ne __PACKAGE__ ? $class : caller;
-    my $M = __Member__($ctx);
-    my $C = __Config__($ctx);
-    my $member = $obj->{__Hash__} = {
-	map {
-	    my($key, %param) = @$_;
-	    $key => \%param;
-	} @$M
-    };
-    my $order = $obj->{__Order__} = [ map $_->[0], @$M ];
-    for my $key (@$order) {
-	my $m = $member->{$key};
-	$obj->{$key} = $m->{default};
-	if (my $is = $m->{is}) {
+    my $member = __Member__($ctx);
+    my $config = $obj->{__Config__} = __Config__($ctx);
+    my $order  = $obj->{__Order__} = [];
+    my $hash   = $obj->{__Hash__} = {};
+    for my $m (@$member) {
+	my($name, %param) = @$m;
+	if (my $is = $param{is}) {
 	    no strict 'refs';
-	    my $access = $C->{ACCESSOR_PREFIX} . $key;
-	    *{"$class\::$access"} = _accessor($is, $key);
+	    my $access = $config->{ACCESSOR_PREFIX} . $name;
+	    *{"$class\::$access"} = _accessor($is, $name);
 	}
+	$obj->{$name} = $param{default};
+	push @$order, $name;
+	$hash->{$name} = \%param;
     }
-    lock_keys %$obj if $C->{LOCK_KEYS};
-    __PACKAGE__->reset if $C->{RESET_AFTER_NEW};
+    lock_keys %$obj if $config->{LOCK_KEYS};
     $obj;
+}
+
+sub _conf {
+    my $obj = shift;
+    my $config = $obj->{__Config__} or die;
+    if (@_) {
+	$config->{+shift};
+    } else {
+	$config;
+    }
 }
 
 sub _accessor {
@@ -167,14 +177,6 @@ sub _accessor {
 
 sub optspec {
     my $obj = shift;
-    my $ref = ref $obj;
-    my $ctx = $ref ne __PACKAGE__ ? $ref : caller;
-    _optspec($obj, $ctx, @_);
-}
-
-sub _optspec {
-    my $obj = shift;
-    my $ctx = shift;
     my $member = $obj->{__Hash__};
     my @spec = do {
 	# spec .= alias
@@ -195,19 +197,17 @@ sub _optspec {
     };
     my @optlist = map {
 	my($name, $spec) = @$_;
-	my $compiled = _compile($ctx, $name, $spec);
+	my $compiled = $obj->_compile($name, $spec);
 	my $m = $member->{$name};
 	my $action = $m->{action};
 	$action and ref $action ne 'CODE'
 	    and die "$name->action: not a coderef.\n";
 	my $dest = do {
-	    if (my $must = $m->{must}) {
-		ref $must ne 'CODE'
-		    and die "$name->must: not a coderef.\n";
+	    if (my $is_valid = _validator($m)) {
 		$action ||= \&_generic_setter;
 		sub {
 		    local $_ = $obj;
-		    &$must or die "@_: invalid value.\n";
+		    &$is_valid or die &{$obj->_conf->{INVALID_MSG}};
 		    &$action;
 		};
 	    }
@@ -226,6 +226,39 @@ sub _optspec {
     } @spec;
 }
 
+sub _invalid_msg {
+    my $opt = do {
+	if (@_ <= 2) {
+	    '--' . join '=', @_;
+	} else {
+	    sprintf "--%s %s=%s", @_[0..2];
+	}
+    };
+    "$opt: option validation error\n";
+}
+
+my %tester = (
+    min  => sub { $_[-1] >= $_->{min} },
+    max  => sub { $_[-1] <= $_->{max} },
+    re   => sub { $_[-1] =~ $_->{re} },
+    must => sub { &{$_->{must}} },
+    );
+
+sub _tester {
+    my $m = shift;
+    map { $tester{$_} } grep { defined $m->{$_} } keys %tester;
+}
+
+sub _validator {
+    my $m = shift;
+    my @test = _tester($m) or return undef;
+    sub {
+	local $_ = $m;
+	for my $test (@test) { &$test or return 0 }
+	return 1;
+    }
+}
+
 sub _generic_setter {
     my $dest = $_->{$_[0]};
     (ref $dest eq 'ARRAY') ? do { push @$dest, $_[1] } :
@@ -236,7 +269,7 @@ sub _generic_setter {
 my $spec_re = qr/[!+=:]/;
 
 sub _compile {
-    my $ctx = shift;
+    my $obj = shift;
     my($name, $args) = @_;
 
     return $name if $name eq '<>';
@@ -250,10 +283,9 @@ sub _compile {
     };
     my @alias = grep !/$spec_re/, @args;
     my @names = ($name, @alias);
-    my $C = __Config__($ctx);
     for ($name, @alias) {
-	push @names, tr[_][-]r if /_/ && $C->{REPLACE_UNDERSCORE};
-	push @names, tr[_][]dr if /_/ && $C->{REMOVE_UNDERSCORE};
+	push @names, tr[_][-]r if /_/ && $obj->_conf->{REPLACE_UNDERSCORE};
+	push @names, tr[_][]dr if /_/ && $obj->_conf->{REMOVE_UNDERSCORE};
     }
     push @names, '' if @names and $spec !~ /^($spec_re|$)/;
     join('|', @names) . $spec;
@@ -261,12 +293,9 @@ sub _compile {
 
 sub getopt {
     my $obj = shift;
-    my $ref = ref $obj;
-    my $ctx = $ref ne __PACKAGE__ ? $ref : caller;
-    my $C = __Config__($ctx);
-    my $getopt = caller . "::" . $C->{GETOPT};
+    my $getopt = caller . "::" . $obj->_conf('GETOPT');
     no strict 'refs';
-    $getopt->(_optspec($obj, $ctx));
+    $getopt->($obj->optspec());
 }
 
 sub use_keys {
@@ -291,7 +320,7 @@ In the current implementation, using B<Getopt::Long>, or compatible
 module such as B<Getopt::EX::Long> is assumed.  It is configurable,
 but no other module is supported now.
 
-Accessor methods are automatically generated when appropiate parameter
+Accessor methods are automatically generated when appropriate parameter
 is given.
 
 =head1 FUNCTION
@@ -315,10 +344,15 @@ Following parameters are available.
 
 =over 7
 
-=item B<is> => I<ro> | I<rw>
+=item B<is> => C<ro> | C<rw>
 
-If an B<is> parameter is given, accessor method for the member,
-read-only for I<ro> and read-write for I<rw>, is generated.
+To produce accessor method, C<is> parameter is necessary.  Set the
+value C<ro> for read-only, C<rw> for read-write.
+
+If you want to make accessor for all following members, use
+C<configure> and set C<DEFAULT> parameter.
+
+    Getopt::EX::Hashed->configure( DEFAULT => is => 'rw' );
 
 =item B<spec> => I<string>
 
@@ -353,7 +387,7 @@ string as a value.  Otherwise, it is not considered as an option.
 =item B<alias> => I<string>
 
 Additional alias names can be specified by B<alias> parameter too.
-There is no difference with ones in B<spec> parameter.
+There is no difference with ones in C<spec> parameter.
 
 =item B<default> => I<value>
 
@@ -362,8 +396,8 @@ as C<undef>.
 
 =item B<action> => I<coderef>
 
-Parameter B<action> takes code reference which is called to process
-the option.  When called, hash object is passed through C<$_>.
+Parameter C<action> takes code reference which is called to process
+the option.  When called, hash object is passed as C<$_>.
 
     has [ qw(left right both) ] => spec => '=i';
     has "+both" => action => sub {
@@ -378,21 +412,37 @@ spec parameter does not matter and not required.
         push @{$_->{ARGV}}, $_[0];
     };
 
-In fact, B<default> parameter takes code reference too.  It is stored
+In fact, C<default> parameter takes code reference too.  It is stored
 in the hash object and the code works almost same.  But the hash value
 can not be used for option storage.
 
+=back
+
+Following parameters are all for data validation.  First C<must> is a
+generic validator and can implement anything.  Others are shorthand
+for common rules.
+
+=over 7
+
 =item B<must> => I<coderef>
 
-Parameter B<must> takes a code reference to validate option values.
-It takes same arguments as B<action> and returns boolean.  With next
+Parameter C<must> takes a code reference to validate option values.
+It takes same arguments as C<action> and returns boolean.  With next
 example, option B<--answer> takes only 42 as a valid value.
 
     has answer =>
         spec => '=i',
         must => sub { $_[1] == 42 };
 
-Can be used with B<action> parameter.
+=item B<min> => I<number>
+
+=item B<max> => I<number>
+
+Set the minimum and maximum limit for the argument.
+
+=item B<re> => qr/I<pattern>/
+
+Set the required regular expression pattern for the argument.
 
 =back
 
@@ -404,9 +454,15 @@ Can be used with B<action> parameter.
 
 Class method to get initialized hash object.
 
-=item B<configure>
+=item B<optspec>
 
-There should be some configurable variables, but not fixed yet.
+Return option specification list which can be given to C<GetOptions>
+function.
+
+    GetOptions($obj->optspec)
+
+C<GetOptions> has a capability of storing values in a hash, by giving
+the hash reference as a first argument, but it is not necessary.
 
 =item B<getopt>
 
@@ -419,16 +475,10 @@ is just a shortcut for:
 
     GetOptions($obj->optspec)
 
-=item B<optspec>
-
-Return option specification list which can be given to C<GetOptions>
-function.  GetOptions has a capability of storing values in a hash, by
-giving the hash reference as a first argument, but it is not expected.
-
 =item B<use_keys>
 
 Because hash keys are protected by C<Hash::Util::lock_keys>, accessing
-non-existing member causes an error.  Use this function to declare new
+non-existent member causes an error.  Use this function to declare new
 member key before use.
 
     $obj->use_keys( qw(foo bar) );
@@ -438,19 +488,55 @@ If you want to access arbitrary keys, unlock the object.
     use Hash::Util 'unlock_keys';
     unlock_keys %{$obj};
 
+You can change this behavior by C<configure> with C<LOCK_KEYS>
+parameter.
+
+=item B<configure> B<label> => I<value>, ...
+
+There are following configuration parameters.
+
+=over 7
+
+=item B<LOCK_KEYS> (default: 1)
+
+Lock hash keys.  This avoids accidental access to non-existent hash
+entry.
+
+=item B<REPLACE_UNDERSCORE> (default: 1)
+
+Produce alias with underscores replaced by dash.
+
+=item B<REMOVE_UNDERSCORE> (default: 0)
+
+Produce alias with underscores removed.
+
+=item B<GETOPT> (default: 'GetOptions')
+
+Set function name called from C<getopt> method.
+
+=item B<ACCESSOR_PREFIX>
+
+When specified, it is prepended to the member name to make accessor
+method.  If C<ACCESSOR_PREFIX> is defined as C<opt_>, accessor for
+member C<file> will be C<opt_file>.
+
+=item B<DEFAULT>
+
+Set default parameters.  At the call for C<has>, DEFAULT parameters
+are inserted before argument parameters.  So if both include same
+parameter, later one in argument list has precedence.  Incremental
+call with C<+> is not affected.
+
+Typical use of DEFAULT is C<is> to prepare accessor method for all
+following hash entries.  Declare C<< is => '' >> to reset.
+
+    Getopt::EX::Hashed->configure(is => 'ro');
+
+=back
+
 =item B<reset>
 
-Reset the class to original state.  Because the hash object keeps all
-information, this does not effect to the existing object.  It returns
-the object itself, so you can reset the class after creating a object
-like this:
-
-    my $obj = Getopt::EX::Hashed->new->reset;
-
-This is almost equivalent to the next code:
-
-    my $obj = Getopt::EX::Hashed->new;
-    Getopt::EX::Hashed->reset;
+Reset the class to the original state.
 
 =back
 
@@ -478,3 +564,7 @@ This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
+
+#  LocalWords:  Accessor param ro rw accessor undef coderef qw ARGV
+#  LocalWords:  validator qr GETOPT GetOptions getopt obj optspec foo
+#  LocalWords:  Kazumasa Utashiro min

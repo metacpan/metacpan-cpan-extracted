@@ -8,12 +8,174 @@ Module::Generic::Array - An Array Manipulation Object Class
 
     my $ar = Module::Generic::Array->new( [qw( Joe John Mary )] );
     printf( "There are %d people\n", $ar->length );
+    my $object = $ar->as_array; # returns the array object
+    my $str = $ar->as_string; # Joe John Mary
+    my $hash = $ar->as_hash; # Joe => 0, John => 1, Mary => 2
+    my $hash = $ar->as_hash( start_from => 2 ); # Joe => 2, John => 3, Mary => 4
+    my $lines = Module::Generic::Array->new( \@lines );
+    $lines->chomp; # Now @lines does not contain any \n at the end
+    my $ar2 = $ar->clone;
+    $ar->contains( 'Joe' ); # true
+    # Same as splice:
+    my $removed = $ar->delete( 'John', 1 ); # 'John' is returned
+    $removed->length; # 1
+    my @removed = $ar->delete( 'John', 1 );
+    $ar->each(sub
+    {
+        print( "I got $_\n" );
+        # could also write:
+        # print( "I got $_[1] at offset $_[0]\n" );
+        return; # stop looping
+    });
+    $ar->empty; # $ar is now empty
+    # Same as contains:
+    $ar->exists( 'Mary' ); # true
+    my $even = $ar->even; # Joe Mary
+    $ar->first; # Joe
+    $ar->for(sub
+    {
+        my( $i, $val ) = @_;
+        # do something
+    });
+    $ar->foreach(sub
+    {
+        my $val = shift( @_ );
+        # do something
+    });
+    $ar->get(2); # Mary
+    my $elements = $ar->grep(sub{ $_ eq 'John' });
+    $elements->length; # 1
+    my @elements = $ar->grep(sub{ $_ eq 'John' });
+    my $elements = $ar->grep(qr/^Jo/);
+    $elements->length; # 2
+    my @elements = $ar->grep(qr/^Jo/);
+    # Same as exists:
+    $ar->has( 'Mary' ); # true
+    # Get 'Mary' in object context
+    print $ar->index(2)->substr( 0, 2 ); # Ma
+    my $name = $ar->index(2);
+    print "Name is: $name\n"; " Name is: Mary
+    my $it = $ar->iterator;
+    print $it->next; # Joe
+    print "Names are: ", $ar->join( ', ' ), "\n"; # Names are: Joe, John, Mary
+    print $ar->keys->as_string, "\n"; # 0 1 2
+    print $ar->last->substr( 0, 2 ); # Ma
+    $ar->length; # 3 (because there are 3 elements in the array object)
+    my @people = $a->list; # @people now is ( "Joe", "John", "Mary" )
+    print( $a->map(sub{ $_->value })->join( "\n" ), "\n" );
+    my $a = Module::Generic::Array->new( [qw( Jack John Peter )] );
+    my $b = Module::Generic::Array->new( [qw( Gabriel Raphael Emmanuel )] );
+    $a->merge( $b );
+    print( $a->join( ' ' ), "\n" ); # Jack John Peter Gabriel Raphael Emmanuel
+
+    my $a = Module::Generic::Array->new( [qw( 1 2 3 4 5 6 7 8 9 10 )] ); my
+    $odd = $a->odd; say "@$odd"; # 2 4 6 8 10
+
+    my $a = $m->new_array( [qw( Jack John Peter Gabriel Raphael Emmanuel )] );
+    print( $a->offset( 2, 3 )->join( ' ' ), "\n" ); # John Peter Gabriel
+
+    my $a = Module::Generic::Array->new( [qw( Hello world )] );
+    # called in object context
+    say $a->pop->length; # 5 (returns a Module::Generic::Scalar in object context)
+    # but
+    say $a->pop; # returns "world" as a regular string
+
+    my $a = Module::Generic::Array->new( [qw( John Jack Peter )] );
+    my $offset = $a->pos( 'Jack' ); # returns 1
+    $a->pos( 'Bob' ); # Returns undef
+    my $hash = { first_name => 'John', last_name => 'Doe' };
+    $a->push( $hash );
+    $a->pos( $hash ); # Returns 3
+
+    my $a = Module::Generic::Array->new( [qw( John Jack Peter )] );
+    my $b = Module::Generic::Array->new( [qw( Gabriel Raphael Emmanuel )] );
+    $a->push( $b ); # or you can do $a->push( $b->list );
+    # Now $a contains something like: John Jack Peter Module::Generic::Array=ARRAY(0x557d2c2983e8)
+    # Equally
+    $a->merge( $b ); # $a now is: John Jack Peter Gabriel Raphael Emmanuel
+
+    my $ar = Module::Generic::Array->new( [qw( John Joe Mary )]);
+    $ar->push_arrayref( [qw( Jack Peter )] );
+    print( $ar->join( "," ), "\n" );
+    # Now prints: John, Joe, Mary, Jack, Peter
+
+    my $dummy = { class => 'Hello' };
+    my $a = Module::Generic::Array->new( ['Jack', 'John', $dummy, 'Paul', 'Peter', 'Gabriel', 'Raphael', 'Emmanuel'] );
+    $a->remove( $dummy, qw( John Paul Peter Emmanuel ) );
+    say( "@$a" ); # Jack Gabriel Raphael
+
+    $ar->reset; # No the array object is empty
+
+    $ar->for(sub
+    {
+        my( $i, $n ) = @_;
+        $pos = $n;
+        $b->for(sub
+        {
+            my( $j, $v ) = @_;
+            # Tell loop for array $a to stop
+            $a->return( undef() ) if( $n == 7 && $v == 27 );
+        });
+        # some more stuff here....
+    });
+
+    my $a = Module::Generic::Array->new( [qw( Jack John Peter Paul Gabriel Raphael Emmanuel )] );
+    $a->for(sub
+    {
+        my( $i, $n ) = @_;
+        # tell it to skip Peter
+        $a->return( +1 ) if( $n eq 'John' );
+        return( 1 );
+    });
+
+    $ar->reverse; # Mary John Joe
+
+    $ar->scalar; # 3 (returns the size of the array object)
+
+    $a->set( qw( John Jack Peter ) ); # Using an array of elements
+    $a->set( [qw( John Jack Peter )] ); # Using an array reference of elements
+    $a->set( $a2 ); # Using another array object, whatever its class may be
+
+    my $a = Module::Generic::Array->new( [qw( Hello world )] );
+    say $a->shift->length; # 5
+    # but
+    say $a->shift; # returns "Hello" as a regular string
+
+    $ar->size; 2 (size of the array object starting from 0)
+
+    $ar->sort; Joe John Mary
+
+    my $a = Module::Generic::Array->new( [qw( I disapprove of what you say, but I will defend to the death your right to say it )] );
+    say $a->splice( 7, 3 ); # returns a list containing "I", "will", "defend"
+    say $a->splice( 7 ); # returns a list containing "I", "will", "defend", "to", "the", "death", "your", "right", "to", "say", "it"
+
+    say a->splice( 7, 3 )->length; # returns 3 obviously
+    say a->splice( 7 )->length; # returns 11
+
+    my $a = $ar->split( qr/[[:blank:]\h]+/, "I disapprove of what you say, but I will defend to the death your right to say it" );
+    $a->length; # 18
+    # or in list context and using the method as a class method
+    my @words = Module::Generic::Array->split( qr/[[:blank:]\h]+/, "I disapprove of what you say, but I will defend to the death your right to say it" );
+
+    $ar->undef; # same as reset. Now the array object is empty
+
+    my $dummy = { class => 'Hello' };
+    my $a = Module::Generic::Array->new( ['Jack', 'John', $dummy, 'Paul', 'Peter', 'Gabriel', $dummy, 'Peter', 'Raphael', 'Emmanuel'] );
+    my $b = $a->unique;
+    # $b now contains: 'Jack', 'John', $dummy, 'Paul', 'Peter', 'Gabriel', 'Raphael', 'Emmanuel'
+    # or to update $a directly (in place):
+    $a->unique(1);
+
+    $ar->unshift( qw( Peter Gabriel ) ); # Now array is Peter Gabriel Joe John Mary
+
+    $ar->values; # Peter Gabriel Joe John Mary
+
     # Adding one more
     $ar->push( "Jack" );
 
 =head1 VERSION
 
-    v1.0.1
+    v1.0.2
 
 =head1 DESCRIPTION
 
@@ -296,11 +458,14 @@ This returns a new iterator to cycle through all the array items using iterator'
 
 =head2 join
 
-Provided with a string, or expression just as documented in L<perlfunc/"join"> and this will return a string as an L<<Module::Generic::Scalar> object.
+Provided with a string, or expression just as documented in L<perlfunc/"join"> and this will return a string as an L<Module::Generic::Scalar> object.
 
 =head2 keys
 
-This works as documented in L<perlfunc/"keys"> and returns a list of offset values for each entry in the array.
+    my $ar = Module::Generic::Array->new( [qw( Joe John Mary )] );
+    print $ar->keys->as_string, "\n"; # 0 1 2
+
+This works as documented in L<perlfunc/"keys"> and returns a new L<Module::Generic::Array> object of offset values for each entry in the array.
 
 =head2 last
 
@@ -575,6 +740,14 @@ Here we use the method "length" but any L<Module::Generic::Array> method workds
 Just like the normal L<perlfunct/"split"> function, it takes a string or expression and split the data provided into a list of elements.
 
 It returns the list in list context, and returns a new L<Module::Generic::Array> object in scalar context.
+
+It achieves this by creating a new L<Module::Generic::Scalar> object out of the string given and then calling L<Module::Generic::Scalar/split>
+
+    # Using an existing array object
+    my $a = $ar->split( qr/[[:blank:]\h]+/, "I disapprove of what you say, but I will defend to the death your right to say it" );
+    $a->length; # 18
+    # or in list context and using the method as a class method
+    my @words = Module::Generic::Array->split( qr/[[:blank:]\h]+/, "I disapprove of what you say, but I will defend to the death your right to say it" );
 
 =head2 undef
 

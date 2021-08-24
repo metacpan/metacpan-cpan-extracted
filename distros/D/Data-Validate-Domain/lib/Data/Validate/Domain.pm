@@ -3,7 +3,7 @@ package Data::Validate::Domain;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Net::Domain::TLD 1.74 qw(tld_exists);
 
@@ -82,10 +82,20 @@ sub _domain_labels {
 
     return unless defined($value);
 
-    my $length = length($value);
-    return if $length < 0 || $length > 255;
+    # FYI: DNS limits names to 255 octets, encoded to RDATA. Each label
+    # includes a length-octet prefix; those length octets count against the
+    # 255-octet maximum. The number of labels exceeds the number of dots by 1
+    # (assuming no trailing dot), and the number of length octets exceeds
+    # number of labels by 1 (since there’s always a trailing NUL octet). The
+    # effective limit is thus 255 - 1 - 1, or 253. See
+    # https://devblogs.microsoft.com/oldnewthing/20120412-00/?p=7873 for a
+    # more detailed explanation of this.
 
     my $trailing_dot = $value =~ s/\.\z// ? q{.} : q{};
+
+    my $encoded_length = ( $trailing_dot ? 1 : 2 ) + length($value);
+
+    return if $encoded_length > 255;
 
     my @bits;
     foreach my $label ( split /\./, $value, -1 ) {
@@ -160,7 +170,7 @@ Data::Validate::Domain - Domain and host name validation
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -196,8 +206,8 @@ C<is_domain_label('0')> will return a defined but false value.
 
 The value to test is always the first (and often only) argument.
 
-Note that none of these functions test whether a domain or hostname is
-actually resolvable or reachable.
+Note that none of these functions test whether a domain or hostname is actually
+resolvable or reachable.
 
 =head2 Data::Validate::Domain->new()
 
@@ -208,17 +218,17 @@ This method constructs a validation object. It accepts the following arguments:
 =item * domain_allow_underscore
 
 According to RFC underscores are forbidden in hostnames but not domain names.
-By default C<is_domain()>, C<is_domain_label()>, and C<is_hostname()> will
-fail if the value to be checked includes underscores. Setting this to a true
-value with allow the use of underscores in all functions.
+By default C<is_domain()>, C<is_domain_label()>, and C<is_hostname()> will fail
+if the value to be checked includes underscores. Setting this to a true value
+will allow the use of underscores in all functions.
 
 =item * domain_allow_single_label
 
 By default C<is_domain()> will fail if you ask it to verify a domain that only
 has a single label i.e. "neely.cx" is good, but "com" would fail. If you set
-this option to a true value then C<is_domain()> will allow single label
-domains through. This is most likely to be useful in combination with
-the C<domain_private_tld> argument.
+this option to a true value then C<is_domain()> will allow single label domains
+through. This is most likely to be useful in combination with the
+C<domain_private_tld> argument.
 
 =item * domain_disable_tld_validation
 
@@ -228,15 +238,15 @@ L<Net::Domain::TLD>.
 
 =item * domain_private_tld
 
-By default C<is_domain()> requires all domains to have a valid public TLD
-(i.e. com, net, org, uk, etc). This is verified using the L<Net::Domain::TLD>
-module. This behavior can be extended in two different ways. You can provide
-either a hash reference where additional TLDs are keys or you can supply a
-regular expression.
+By default C<is_domain()> requires all domains to have a valid public TLD (i.e.
+com, net, org, uk, etc). This is verified using the L<Net::Domain::TLD> module.
+This behavior can be extended in two different ways. You can provide either a
+hash reference where additional TLDs are keys or you can supply a regular
+expression.
 
 NOTE: The TLD is normalized to the lower case form prior to the check being
-done. This is done only for the TLD check, and does not alter the output in
-any way.
+done. This is done only for the TLD check, and does not alter the output in any
+way.
 
 Hashref example:
 
@@ -254,19 +264,19 @@ Regular expression example:
 =head2 is_domain($domain, \%options)
 
 This can be called as either a subroutine or a method. If called as a sub, you
-can pass any of the arguments accepted by the constructor as options. If
-called as a method, any additional options are ignored.
+can pass any of the arguments accepted by the constructor as options. If called
+as a method, any additional options are ignored.
 
 This returns the untainted domain name if the given C<$domain> is a valid
 domain.
 
-A dotted quad (such as 127.0.0.1) is not considered a domain and will return false.
-See L<Data::Validate::IP> for IP Validation.
+A dotted quad (such as 127.0.0.1) is not considered a domain and will return
+false. See L<Data::Validate::IP> for IP Validation.
 
-Per RFC 1035, this sub does accept a value ending in a single period
-(i.e. "domain.com.") to be a valid domain. This is called an absolute domain
-name, and should be properly resolved by any DNS tool (tested with C<dig>,
-C<ssh>, and L<Net::DNS>).
+Per RFC 1035, this sub does accept a value ending in a single period (i.e.
+"domain.com.") to be a valid domain. This is called an absolute domain name,
+and should be properly resolved by any DNS tool (tested with C<dig>, C<ssh>,
+and L<Net::DNS>).
 
 =over 4
 
@@ -308,8 +318,8 @@ C<ssh>, and L<Net::DNS>).
 =head2 is_hostname($hostname, \%options)
 
 This can be called as either a subroutine or a method. If called as a sub, you
-can pass any of the arguments accepted by the constructor as options. If
-called as a method, any additional options are ignored.
+can pass any of the arguments accepted by the constructor as options. If called
+as a method, any additional options are ignored.
 
 This returns the untainted hostname if the given C<$hostname> is a valid
 hostname.
@@ -319,11 +329,10 @@ Hostnames are not required to end in a valid TLD.
 =head2 is_domain_label($label, \%options)
 
 This can be called as either a subroutine or a method. If called as a sub, you
-can pass any of the arguments accepted by the constructor as options. If
-called as a method, any additional options are ignored.
+can pass any of the arguments accepted by the constructor as options. If called
+as a method, any additional options are ignored.
 
-This returns the untainted label if the given C<$label> is a valid
-label.
+This returns the untainted label if the given C<$label> is a valid label.
 
 A domain label is simply a single piece of a domain or hostname. For example,
 the "www.foo.com" hostname contains the labels "www", "foo", and "com".
@@ -342,16 +351,21 @@ B<[RFC 1034] [RFC 1035] [RFC 2181] [RFC 1123]>
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Richard Sonnen <F<sonnen@richardsonnen.com>> for writing the Data::Validate module.
+Thanks to Richard Sonnen <F<sonnen@richardsonnen.com>> for writing the
+Data::Validate module.
 
-Thanks to Len Reed <F<lreed@levanta.com>> for helping develop the options mechanism for Data::Validate modules.
+Thanks to Len Reed <F<lreed@levanta.com>> for helping develop the options
+mechanism for Data::Validate modules.
 
 =head1 SUPPORT
 
-Bugs may be submitted through L<the RT bug tracker|http://rt.cpan.org/Public/Dist/Display.html?Name=Data-Validate-Domain>
-(or L<bug-data-validate-domain@rt.cpan.org|mailto:bug-data-validate-domain@rt.cpan.org>).
+Bugs may be submitted at L<https://github.com/houseabsolute/Data-Validate-Domain/issues>.
 
-I am also usually active on IRC as 'drolsky' on C<irc://irc.perl.org>.
+I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for Data-Validate-Domain can be found at L<https://github.com/houseabsolute/Data-Validate-Domain>.
 
 =head1 AUTHORS
 
@@ -369,13 +383,21 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords David Steinbrunner Gregory Oschwald
+=for stopwords Anirvan Chatterjee David Steinbrunner Felipe Gasper Gregory Oschwald
 
 =over 4
 
 =item *
 
+Anirvan Chatterjee <anirvan@users.noreply.github.com>
+
+=item *
+
 David Steinbrunner <dsteinbrunner@pobox.com>
+
+=item *
+
+Felipe Gasper <felipe@felipegasper.com>
 
 =item *
 
@@ -385,9 +407,12 @@ Gregory Oschwald <goschwald@maxmind.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Neil Neely.
+This software is copyright (c) 2021 by Neil Neely.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

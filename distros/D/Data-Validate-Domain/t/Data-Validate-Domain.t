@@ -53,6 +53,12 @@ use Data::Validate::Domain;
         rebecca.blackfriday
     );
 
+    my $label63 = 'x' x 63;
+
+    push @good, (
+        "$label63.$label63.$label63." . ( 'x' x 57 ) . '.com',
+    );
+
     for my $d (@good) {
         my $disp = _display($d);
         is( is_domain($d), $d, qq{$disp is a valid domain} );
@@ -82,8 +88,10 @@ use Data::Validate::Domain;
             net
             uk
             neely
-            ),
+        ),
         "bengali-\x{09ea}.com",
+        "$label63.$label63.$label63." . ( 'x' x 59 ) . '.com',
+        "$label63.$label63.$label63." . ( 'x' x 58 ) . '.com',
     );
 
     for my $d (@bad) {
@@ -270,7 +278,7 @@ sub _display {
     my $v = shift;
 
     return '<undef>' unless defined $v;
-    return q{""} unless length $v;
+    return q{""}     unless length $v;
 
     if ( length $v > 30 ) {
         return

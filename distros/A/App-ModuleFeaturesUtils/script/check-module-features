@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.498
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-25'; # DATE
+our $DATE = '2021-04-02'; # DATE
 our $DIST = 'App-ModuleFeaturesUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,7 +38,7 @@ check-module-features - Check %FEATURES in a module and return the value of spec
 
 =head1 VERSION
 
-This document describes version 0.003 of check-module-features (from Perl distribution App-ModuleFeaturesUtils), released on 2021-02-25.
+This document describes version 0.004 of check-module-features (from Perl distribution App-ModuleFeaturesUtils), released on 2021-04-02.
 
 =head1 SYNOPSIS
 

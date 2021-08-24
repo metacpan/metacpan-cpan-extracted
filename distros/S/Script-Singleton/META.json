@@ -4,13 +4,13 @@
       "Steve Bertrand <steveb@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Script-Singleton",
    "no_index" : {
@@ -32,7 +32,8 @@
       },
       "runtime" : {
          "requires" : {
-            "IPC::Shareable" : "1.03",
+            "Cwd" : "0",
+            "IPC::Shareable" : "1.05",
             "perl" : "5.006"
          }
       },
@@ -53,6 +54,6 @@
          "web" : "https://github.com/stevieb9/script-singleton"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

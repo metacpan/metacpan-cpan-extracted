@@ -1,5 +1,15 @@
 Revision history for Perl module DB::Object
 
+v0.9.15 2021-08-20T02:40:51+0900
+    - Moved on_conflict from DB::Object to DB::Object::Tables, and DB::Object::Postgres to DB::Object::Postgres::Table and DB::Object::SQLite to DB::Object::SQLite::Tables where it belongs
+    - Moved alias as_string avoid insert limit local order replace reset returning reverse select sort tie unix_timestamp update where to L<DB::Object::Query>
+    - Updated the pod documentation with links for all of the above
+    - Corrected a small bug in DB::Object::Postgres::Tables->on_conflict whereby an error was assumed when the turn value from DB::Object::Postgres::Query->on_conflict was false, but the latter returned a legitimate empty string that was mis-construed as an error
+    - In DB::Object->table, which is used to instantiate DB::Object::Tables object, since it uses a cache to increase speed, here if a cached table object, it is cloned before it is returned to avoid undesirable effect like some table alias previously set and disturbing potential new queries.
+    - Added some typical typo-catching warnings in where clause in DB::Object::Query->_where_having when a field object (DB::Object::Fields::Field) is provided without assignment.
+    - Added coding typo catching in DB::Object::Tables::AUTOLOAD for when the user called a table field on a table object instead of using the table fields object method 'fields_object'
+    - Corrected bug where chained method like select->join lead to loss of properties which disrupted the join condition
+
 v0.9.14 2021-08-17T06:39:36+0900
     - Added use warnings to all modules
     - Updated DB::Object::Statement::execute to make sure stringifyable objects are stringified before they are passed as binded values to DBI's bind_param

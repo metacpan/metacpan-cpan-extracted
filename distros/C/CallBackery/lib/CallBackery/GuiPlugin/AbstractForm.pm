@@ -83,7 +83,7 @@ has actionCfgMap => sub {
     my $self = shift;
     my %map;
     for my $row (@{$self->actionCfg}){
-        next unless $row->{action} =~ /^(submit|upload|download|autoSubmit)/;
+        next unless $row->{action} =~ /^(submit|upload|download|autoSubmit|save)/;
         next unless $row->{key};
         $map{$row->{key}} = $row;
     }

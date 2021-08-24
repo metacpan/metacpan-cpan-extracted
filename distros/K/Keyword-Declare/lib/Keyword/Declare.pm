@@ -1,5 +1,5 @@
 package Keyword::Declare;
-our $VERSION = '0.001017';
+our $VERSION = '0.001018';
 
 use 5.012;     # required for pluggable keywords plus /.../r
 use warnings;
@@ -1150,7 +1150,7 @@ Keyword::Declare - Declare new Perl keywords...via a keyword...named C<keyword>
 
 =head1 VERSION
 
-This document describes Keyword::Declare version 0.001017
+This document describes Keyword::Declare version 0.001018
 
 
 =head1 STATUS

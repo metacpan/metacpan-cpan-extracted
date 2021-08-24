@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2021 Kevin Ryde
 
 # This file is part of Image-Base-Magick.
 #
@@ -30,6 +30,29 @@ use MyTestImageBase;
 
 
 {
+  # flat ellipse
+  require Image::Base::Magick;
+  my $image = Image::Base::Magick->new (-width => 50, -height => 20,
+                                        -file_format => 'xpm');
+  $image->rectangle (0,0, 49,29, 'black',1);
+  my $m = $image->get('-imagemagick');
+  $m->Set(antialias => 0);
+  # print "strokewidth ", $m->Get('strokewidth'), "\n";
+
+  # $image->ellipse (10,20, 40,20, 'white', 1);
+  # $image->line (10,10, 40,10, 'white');
+  # $image->xy (500000,500000, 'white');
+  # $image->line (5,5, 5,5, 'white');
+  # my $err = $m->set ("pixel[-100000,-100000]", 'white');
+  $image->rectangle (10,10, 40,10, 'white', 0);
+  $image->rectangle (5,5, 5,5, 'white', 0);
+  $image->line (10,5, 15,5, 'white', 0);
+  $image->line (10,7, 10,7, 'white', 0);
+
+  $image->save('/dev/stdout');
+  exit 0;
+}
+{
   # rectangle off-screen
   require Image::Base::Magick;
   my $image = Image::Base::Magick->new (-width => 50, -height => 20,
@@ -37,7 +60,7 @@ use MyTestImageBase;
   $image->rectangle (0,0, 49,29, 'black',1);
   $image->get('-imagemagick')->Set(antialias => 0);
 
-  $image->rectangle (-10,-10,6,6, 'white',1);
+  $image->ellipse (-10,-10,16,16, 'white',0);
 
   $image->save('/dev/stdout');
   exit 0;

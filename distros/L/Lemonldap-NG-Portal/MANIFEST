@@ -631,6 +631,7 @@ t/41-Captcha.t
 t/41-Token-with-global-storage.t
 t/41-Token.t
 t/42-Register-Demo-with-captcha.t
+t/42-Register-Demo-with-CustomBody.t
 t/42-Register-Demo-with-token.t
 t/42-Register-Demo.t
 t/42-Register-LDAP.t
@@ -709,7 +710,7 @@ t/68-FindUser-with-Choice-and-token.t
 t/68-FindUser-with-Combination.t
 t/68-FindUser-with-DBI.t
 t/68-FindUser-with-Demo-and-captcha.t
-t/68-FindUser-with-Demo-and-required-select.t
+t/68-FindUser-with-Demo-and-required-params.t
 t/68-FindUser-with-Demo-and-token.t
 t/68-FindUser-with-Demo.t
 t/68-FindUser-with-LDAP.t
@@ -759,7 +760,7 @@ t/78-2F-UpgradeOnly.t
 t/79-2F-Yubikey-from-Session.t
 t/79-2F-Yubikey.t
 t/90-Translations.t
-t/91-handler-cache-cleaned.t
+t/91-Handler-cache-cleaned.t
 t/91-Memory-Leak.t
 t/99-Dont-load-Dumper.t
 t/99-pod.t

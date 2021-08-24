@@ -1,0 +1,127 @@
+#!/usr/bin/env perl
+use Applify;
+
+use List::Util ();
+use Term::ANSIColor qw(colored);
+use Term::ReadKey ();
+use Time::HiRes qw(sleep);
+
+$ENV{ACHART_BAR_CHAR} ||= '∎';
+$ENV{ACHART_COLORS} ||= join ',', qw(green yellow magenta cyan red),
+  qw(black-on_green black-on_yellow black-on_magenta black-on_cyan black-on_red);
+
+option bool => time     => 'Use --no-time to avoid time coloumn', 1;
+option bool => total    => 'Print total as well',                 0;
+option str  => program  => 'Run a program that print stats to STDOUT';
+option int  => interval => 'Run the program every $interval seconds', 1;
+option int  => max      => 'Max expected value';
+
+documentation 'App::achart';
+version 'App::achart';
+
+# Attributes
+sub colors {
+  $_[0]->{colors} //= [map { [split /-/, uc] } split /[,\s]+/, $ENV{ACHART_COLORS}];
+}
+
+sub n_colors { $_[0]->{n_colors} //= @{$_[0]->colors} }
+sub out_fh   { $_[0]->{out_fh}   //= \*STDOUT }
+sub height   { $_[0]->{height} ||= $ENV{ROWS}    || 40 }
+sub width    { $_[0]->{width}  ||= $ENV{COLUMNS} || 80 }
+
+sub calculate_col_width {
+  my ($self, $stats) = @_;
+  my %cols = (label => 0, time => 0, value => 0);
+
+  my $adjusted;
+  for my $label (keys %$stats) {
+    my $l = length $label;
+    $cols{label} = $l if $l > $cols{label};
+
+    $l = length $stats->{$label};
+    $cols{value} = $l if $l > $cols{value};
+
+    if ($stats->{$label} > ($self->max // 0)) {
+      $self->{max} = $self->total ? 1.5 * $stats->{$label} : 2 * $stats->{$label};
+      $adjusted++;
+    }
+  }
+
+  my $l = length $self->max;
+  $cols{value} = $l if $l > $cols{value};
+  $cols{time}  = 9  if $self->time;
+
+  warn "! Adjusting --max to $self->{max}\n" if $adjusted and $self->{initialized};
+
+  return \%cols;
+}
+
+# Methods
+sub print_stats {
+  my ($self, $stats) = @_;
+  $stats->{total} = List::Util::sum(values %$stats) if $self->total;
+
+  my $cols         = $self->calculate_col_width($stats);
+  my $time         = $self->time ? sprintf '%02s:%02s:%02s', (localtime)[2, 1, 0] : '';
+  my $bar_width    = $self->width - $cols->{label} - $cols->{value} - 6;
+  my $gutter_width = $cols->{time} + $cols->{label} + 1 + $cols->{value} + 1;
+  my $n_lines      = 0;
+
+  my @sorted_labels = grep { !$self->total || $_ ne 'total' } sort keys %$stats;
+  push @sorted_labels, 'total' if $self->total;
+
+  for my $label (@sorted_labels) {
+    my $bar_len = int($bar_width * $stats->{$label} / $self->max);
+    $bar_len = $bar_width if $bar_width < $bar_len;
+
+    # "10+1       2+1 21                   13           "
+    # "some_label  42 ∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎             "
+    my $line = sprintf "%-$cols->{time}s%-$cols->{label}s %$cols->{value}s %s%s", $time, $label,
+      $stats->{$label}, ($ENV{ACHART_BAR_CHAR} x $bar_len),
+      (' ' x ($self->width - $gutter_width - $bar_len));
+
+    my $color = $self->colors->[$n_lines++ % $self->n_colors];
+    print {$self->out_fh} colored("$line", @$color), "\n";
+  }
+
+  $self->{initialized}++;
+}
+
+sub read_from_program {
+  my $self = shift;
+
+  while (1) {
+    my %stats;
+    open my $PRG, '-|', $self->program or die qq(Can't run "@{[$self->program]}": $!\n);
+    $self->text_to_stats($_, \%stats) while <$PRG>;
+    $self->print_stats(\%stats) if %stats;
+    sleep($self->interval);
+  }
+}
+
+sub read_from_stdin {
+  my ($self, $line) = @_;
+  $self->text_to_stats($line, \my %stats);
+  $self->print_stats(\%stats) if %stats;
+}
+
+sub text_to_stats {
+  my ($self, $line, $stats) = @_;
+  $stats->{$1} = $2 while m!([A-Za-z_-]+)\W*(\d\.?\d*)!g;
+  $stats->{''} = $1 if !%$stats and m!^\W*(\d\.?\d*)!;
+}
+
+app {
+  my ($self) = @_;
+  @$self{qw(width height)} = Term::ReadKey::GetTerminalSize($self->out_fh);
+  $self->{initialized} = 1 if defined $self->max;
+
+  if ($self->program) {
+    $self->read_from_program;
+  }
+  else {
+    $self->read_from_stdin($_) while <>;
+  }
+
+  return 0;
+};

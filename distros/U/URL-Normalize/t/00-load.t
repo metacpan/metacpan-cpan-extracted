@@ -10,6 +10,6 @@ BEGIN {
     use_ok( 'URL::Normalize' ) || print "Bail out!\n";
 }
 
-diag( "Testing URL::Normalize $URL::Normalize::VERSION, Perl $], $^X" );
+diag( "Testing URL::Normalize $URL::Normalize::VERSION on Perl $]; $^X" );
 
 done_testing;

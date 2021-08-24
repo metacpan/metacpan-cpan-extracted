@@ -1,7 +1,11 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
+
+# to turn on debugging for a particular test, add:
+# init_logger($DEBUG);
+# at the top of the test file.
 
 # use Carp::Always;
 use FindBin;
@@ -9,7 +13,22 @@ use lib "$FindBin::RealBin/../lib";
 use lib "$FindBin::RealBin/lib";
 use lib "$FindBin::RealBin/unit";
 
+use Test::Unit::Setup;
+# init_logger($TRACE);
+
 # add the ones you want to test here...
-use Test::Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator;
+#use Test::Google::RestApi::Utils;
+#use Test::Google::RestApi;
+#use Test::Google::RestApi::SheetsApi4;
+#use Test::Google::RestApi::SheetsApi4::Spreadsheet;
+#use Test::Google::RestApi::SheetsApi4::Worksheet;
+#use Test::Google::RestApi::SheetsApi4::Range;
+#use Test::Google::RestApi::SheetsApi4::Range::Col;
+#use Test::Google::RestApi::SheetsApi4::Range::Row;
+#use Test::Google::RestApi::SheetsApi4::RangeGroup;
+#use Test::Google::RestApi::SheetsApi4::RangeGroup::Tie;
+#use Test::Google::RestApi::SheetsApi4::RangeGroup::Tie::Iterator;
+#use Test::Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet;
+use Test::Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range;
 
 Test::Class->runtests();

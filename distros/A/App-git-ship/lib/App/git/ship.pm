@@ -12,10 +12,10 @@ use Mojo::Util qw(decode encode);
 use constant DEBUG  => $ENV{GIT_SHIP_DEBUG}  || 0;
 use constant SILENT => $ENV{GIT_SHIP_SILENT} || 0;
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 # Need to be overridden in subclass
-sub build { $_[0]->abort('build() is not available for %s', ref $_[0]) }
+sub build              { $_[0]->abort('build() is not available for %s',              ref $_[0]) }
 sub can_handle_project { $_[0]->abort('can_handle_project() is not available for %s', ref $_[0]) }
 
 sub abort {
@@ -62,7 +62,7 @@ sub detect {
     eval "require $class;1" or next;
     next unless $class->can('can_handle_project');
     warn "[ship::detect] $class->can_handle_project($file)\n" if DEBUG;
-    return $class if $class->can_handle_project($file);
+    return $class                                             if $class->can_handle_project($file);
   }
 
   $self->abort("Could not figure out what kind of project this is from '$file'");
@@ -112,9 +112,9 @@ sub run_hook {
 }
 
 sub ship {
-  my $self     = shift;
+  my $self = shift;
   my ($branch) = qx(git branch --no-color) =~ /\* (.+)$/m;
-  my ($remote) = qx(git remote -v) =~ /^origin\s+(.+)\s+\(push\)$/m;
+  my ($remote) = qx(git remote -v)         =~ /^origin\s+(.+)\s+\(push\)$/m;
 
   $self->abort("Cannot ship without a current branch") unless $branch;
   $self->abort("Cannot ship without a version number") unless $self->config('next_version');
@@ -260,7 +260,7 @@ App::git::ship - Git command for shipping your project
 
 =head1 VERSION
 
-0.36
+0.37
 
 =head1 SYNOPSIS
 

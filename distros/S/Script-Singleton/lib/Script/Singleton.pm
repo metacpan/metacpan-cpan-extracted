@@ -3,19 +3,17 @@ package Script::Singleton;
 use strict;
 use warnings;
 
-use Carp qw(croak);
+use Cwd qw(abs_path);
 use IPC::Shareable;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub import {
-    my ($class, $glue, $warn) = @_;
+    my ($class, %params) = @_;
 
-    if (! defined $glue) {
-        croak "Usage: use Script::Singleton GLUE;";
-    }
+    $params{glue} = abs_path((caller())[1]) if ! exists $params{glue};
 
-    IPC::Shareable->singleton($glue, $warn);
+    IPC::Shareable->singleton($params{glue}, $params{warn});
 }
 
 sub __placeholder {}
@@ -34,22 +32,44 @@ Script::Singleton - Ensure only a single instance of a script can run
 
 =head1 SYNOPSIS
 
-    use Script::Singleton 'LOCK';
+    use Script::Singleton; # Yep, that's it!
 
 =head1 DESCRIPTION
 
 Using shared memory, this distribution ensures only a single instance of any
 script can be running at any one time.
 
-    use Script::Singleton 'UNIQUE LOCK STRING', 1;
-
 There are no functions or methods. All the work is performed in the B<use>
-line. C<UNIQUE LOCK STRING> is the glue that identifies the shared memory segment.
-If a second parameter with a true value is sent in, we'll output a warning if
-the same script is run at the same time and it exits:
+line.
 
 This software uses L<IPC::Shareable> for the shared memory management,
 specifically its B<singleton()> method.
+
+=head1 EXAMPLES
+
+=head2 Basic
+
+    use Script::Singleton;
+
+Using it in the default, basic fashion, we'll create an IPC identifier (glue)
+using the full path and name of the calling script. We also won't output any
+warnings if a second instance of the script attempts to run before the initial
+run has completed and released the lock.
+
+=head2 Custom glue
+
+    use Script::Singleton glue => 'UNIQUE GLUE STRING';
+
+That will use B<UNIQUE GLUE STRING> as the IPC glue. The B<glue> parameter can
+be used in conjunction with the B<warn> parameter.
+
+=head2 Warnings
+
+    use Script::Singleton warn => 1;
+
+If the C<warn> parameter is sent in with a true value, we'll emit a warning
+if a second instance of the script is run. The B<warn> parameter can be used
+in conjunction with the B<glue> parameter.
 
 =head1 AUTHOR
 

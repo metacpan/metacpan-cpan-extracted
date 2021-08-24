@@ -156,7 +156,7 @@ sub create
         ## Trick so other method may follow, such as as_string(), fetchrow(), rows()
         if( !defined( wantarray() ) )
         {
-            $self->message( 3, "create(): wantarray in void context" );
+            # $self->message( 3, "create(): wantarray in void context" );
             # print( STDERR "create(): wantarrays in void context.\n" );
             $new->execute() ||
             return( $self->error( "Error while executing query to create table '$table':\n$query", $new->errstr() ) );

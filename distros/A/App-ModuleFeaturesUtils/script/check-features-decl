@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.498
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-25'; # DATE
+our $DATE = '2021-04-02'; # DATE
 our $DIST = 'App-ModuleFeaturesUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -23,7 +23,7 @@ my $cmdline = Perinci::CmdLine::Any->new(
 
 $cmdline->run;
 
-# ABSTRACT: Check %FEATURES in a module
+# ABSTRACT: Check %FEATURES in a module (or given in argument)
 # PODNAME: check-features-decl
 
 __END__
@@ -34,18 +34,19 @@ __END__
 
 =head1 NAME
 
-check-features-decl - Check %FEATURES in a module
+check-features-decl - Check %FEATURES in a module (or given in argument)
 
 =head1 VERSION
 
-This document describes version 0.003 of check-features-decl (from Perl distribution App-ModuleFeaturesUtils), released on 2021-02-25.
+This document describes version 0.004 of check-features-decl (from Perl distribution App-ModuleFeaturesUtils), released on 2021-04-02.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % check-features-decl [--format=name] [--json] [--(no)naked-res]
-     [--page-result[=program]] [--view-result[=program]] <module>
+ % check-features-decl [--features-decl-data-json=s]
+     [--features-decl-data=s] [--format=name] [--json] [--(no)naked-res]
+     [--page-result[=program]] [--view-result[=program]] [module]
 
 =head1 OPTIONS
 
@@ -55,7 +56,13 @@ C<*> marks required options.
 
 =over
 
-=item B<--module>=I<s>*
+=item B<--features-decl-data-json>=I<s>
+
+See C<--features-decl-data>.
+
+=item B<--features-decl-data>=I<s>
+
+=item B<--module>=I<s>
 
 =back
 

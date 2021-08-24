@@ -1,0 +1,12 @@
+GET:
+  https://sheets.googleapis.com/v4/spreadsheets/fake_spreadsheet_id1?fields=sheets.properties.index:
+    response: |
+      {
+        "sheets": [
+          {
+            "properties": {
+              "index": 0
+            }
+          }
+        ]
+      }

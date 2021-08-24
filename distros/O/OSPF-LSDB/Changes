@@ -1,3 +1,8 @@
+1.13 2021-08-21
+    - Rework term and child signal handling in ospfview.
+    - Fix strict test for cpan testers, skip ospfview.cgi.
+    - Remove bloated pod formating from script documentation.
+
 1.12 2021-08-18
     - Allow duplicate point-to-point links between routers.
     - Reformat pod documentation.

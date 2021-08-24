@@ -25,7 +25,7 @@ our
     ($VERSION, %FUNCS, %GLOBALS, %MIBS, %MUNGE, $AUTOLOAD, $INIT, $DEBUG, %SPEED_MAP,
      $NOSUCH, $BIGINT, $REPEATERS);
 
-$VERSION = '3.73';
+$VERSION = '3.74';
 
 =head1 NAME
 
@@ -33,7 +33,7 @@ SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 =head1 VERSION
 
-SNMP::Info - Version 3.73
+SNMP::Info - Version 3.74
 
 =head1 AUTHOR
 
@@ -747,6 +747,12 @@ Subclass for Aruba wireless switches.
 
 See documentation in L<SNMP::Info::Layer3::Aruba> for details.
 
+=item SNMP::Info::Layer3::ArubaCX
+
+SNMP Interface to L3 Devices running ArubaOS-CX
+
+See documentation in L<SNMP::Info::Layer3::ArubaCX> for details.
+
 =item SNMP::Info::Layer3::BayRS
 
 Subclass for Avaya/Nortel/Bay Multiprotocol/BayRS routers.  This includes
@@ -1067,6 +1073,12 @@ See documentation in L<SNMP::Info::Layer3::VyOS> for details.
 Subclass for VMware ESXi hosts.
 
 See documentation in L<SNMP::Info::Layer3::VMware> for details.
+
+=item SNMP::Info::Layer3::Whiterabbit
+
+Subclass for whiterabbit devices.
+
+See documentation in L<SNMP::Info::Layer3::Whiterabbit> for details.
 
 =back
 
@@ -1681,6 +1693,7 @@ sub device_type {
         42    => 'SNMP::Info::Layer3::Sun',
         43    => 'SNMP::Info::Layer2::3Com',
         45    => 'SNMP::Info::Layer2::Baystack',
+        96    => 'SNMP::Info::Layer3::Whiterabbit',
         171   => 'SNMP::Info::Layer3::DLink',
         244   => 'SNMP::Info::Layer3::Lantronix',
         311   => 'SNMP::Info::Layer3::Microsoft',
@@ -1744,6 +1757,7 @@ sub device_type {
         11    => 'SNMP::Info::Layer2::HP',
         43    => 'SNMP::Info::Layer2::3Com',
         45    => 'SNMP::Info::Layer2::Baystack',
+        96    => 'SNMP::Info::Layer3::Whiterabbit',
         171   => 'SNMP::Info::Layer3::DLink',
         207   => 'SNMP::Info::Layer2::Allied',
         266   => 'SNMP::Info::Layer2::Nexans',
@@ -1947,6 +1961,10 @@ sub device_type {
         $objtype = 'SNMP::Info::Layer3::Teltonika'
             if (
             $desc =~ /\bTeltonika.*RUT9\d{2}\b/);
+
+	# Whiterabbit Timing
+        $objtype = 'SNMP::Info::Layer3::Whiterabbit'
+	    if ( $soid =~ /\.1\.3\.6\.1\.4\.1\.96\.100\.1000/i );
 
         # Generic device classification based upon sysObjectID
         if (    ( $objtype eq 'SNMP::Info::Layer3' )
@@ -2157,6 +2175,10 @@ sub device_type {
         # it would flip/flop between those
         $objtype = 'SNMP::Info::Layer3::Scalance'
 	    if ( $soid =~ /\.1\.3\.6\.1\.4\.1\.4329\.6\.1\.2/i );
+	    
+	# Whiterabbit Timing
+        $objtype = 'SNMP::Info::Layer3::Whiterabbit'
+	    if ( $soid =~ /\.1\.3\.6\.1\.4\.1\.96\.100\.1000/i );
 
         # Teltonika RUT9xx Series
         $objtype = 'SNMP::Info::Layer3::Teltonika'
@@ -5035,7 +5057,7 @@ sub can {
     # We could add load_/orig_/_raw alternatives to symbol table here on
     # first call of any type for a global or func since they all use the same
     # destination code, but they aren't used heavily in main code base so
-    # we’ll just create if/when they are called rather than pollute the
+    # we'll just create if/when they are called rather than pollute the
     # symbol table with entries that never get called.
 
     # Between 2012-2020 we actually added the methods generated below to the

@@ -11,7 +11,8 @@ BEGIN {
     require 't/saml-lib.pm';
 }
 
-my $debug = 'error';
+my $debug     = 'error';
+my $maintests = 132;
 my ( $issuer, $sp, $res );
 
 # Redefine LWP methods for tests
@@ -19,7 +20,6 @@ LWP::Protocol::PSGI->register(
     sub {
         my $req = Plack::Request->new(@_);
         fail('POST should not launch SOAP requests');
-        count(1);
         return [ 500, [], [] ];
     }
 );
@@ -41,7 +41,6 @@ sub runTest {
         ),
         'Unauth SP request'
     );
-    count(1);
 
     expectOK($res);
     my ( $host, $url, $s ) =
@@ -64,7 +63,6 @@ sub runTest {
         ),
         'Post SAML request to IdP'
     );
-    count(1);
     expectOK($res);
     my $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
 
@@ -80,20 +78,18 @@ sub runTest {
         ),
         'Post authentication'
     );
-    count(1);
     my $idpId = expectCookie($res);
 
     # Expect pdata to be cleared
     $pdata = expectCookie( $res, 'lemonldappdata' );
     ok( $pdata !~ 'issuerRequestsaml', 'SAML request cleared from pdata' )
       or explain( $pdata, 'not issuerRequestsaml' );
-    count(1);
 
     ( $host, $url, $s ) =
       expectAutoPost( $res, 'auth.sp.com', '/saml/proxySingleSignOnPost',
         'SAMLResponse' );
 
-    my ($sr) = expectSamlResponse($s);
+    $sr = expectSamlResponse($s);
     expectXPath(
         $sr, '/samlp:Response/saml:Assertion/saml:Subject/saml:NameID/@Format',
         $expect_res_nif, 'Found expected NameID Format in response',
@@ -114,7 +110,7 @@ sub runTest {
 SKIP: {
     eval "use Lasso";
     if ($@) {
-        skip 'Lasso not found';
+        skip( 'Lasso not found', $maintests );
     }
 
     # Default settings use the email NIF
@@ -221,9 +217,9 @@ SKIP: {
     );
 
 }
-
+count($maintests);
 clean_sessions();
-done_testing();
+done_testing( count() );
 
 sub issuer {
     my ( $res_nif, $force_attr ) = @_;

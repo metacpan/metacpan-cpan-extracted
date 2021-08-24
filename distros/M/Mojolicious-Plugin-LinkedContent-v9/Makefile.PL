@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Mojolicious::Plugin::LinkedContent::v9",
   "PREREQ_PM" => {
     "File::Temp" => 0,
+    "LWP::Protocol::https" => 0,
     "LWP::Simple" => 0,
     "Mojolicious" => "8.23",
     "base" => 0,
@@ -29,7 +30,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.09",
+  "VERSION" => "0.10",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,6 +41,7 @@ my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "File::Temp" => 0,
+  "LWP::Protocol::https" => 0,
   "LWP::Simple" => 0,
   "Mojolicious" => "8.23",
   "Test::More" => 0,

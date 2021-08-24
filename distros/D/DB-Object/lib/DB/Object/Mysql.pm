@@ -420,7 +420,7 @@ sub _connection_options
     $param->{mysql_enable_utf8} = 1 if( !CORE::exists( $param->{mysql_enable_utf8} ) );
     my @mysql_params = grep( /^mysql_/, keys( %$param ) );
     my $opt = $self->SUPER::_connection_options( $param );
-    $self->message( 3, "Inherited options are: ", sub{ $self->dumper( $opt ) } );
+    $self->message( 3, "Inherited options are: ", sub{ $self->dump( $opt ) } );
     @$opt{ @mysql_params } = @$param{ @mysql_params };
     return( $opt );
 }
@@ -474,7 +474,7 @@ DESTROY
     if( $self->{ 'sth' } )
     {
         # $self->message( "DETROY(): Terminating sth '$self' for query:\n$self->{ 'query' }\n" );
-        print( STDERR "DESTROY(): Terminating sth '$self' for query:\n$self->{ 'query' }\n" ) if( $DEBUG );
+        print( STDERR "DESTROY(): Terminating sth '$self' for query:\n$self->{query}\n" ) if( $DEBUG );
         $self->{ 'sth' }->finish();
     }
     elsif( $self->{ 'dbh' } && $class eq 'DB::Object' )

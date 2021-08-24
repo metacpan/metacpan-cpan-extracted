@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 ##########################################################################
-# Copyright (c) 2012 Alexander Bluhm <alexander.bluhm@gmx.net>
+# Copyright (c) 2012-2021 Alexander Bluhm <alexander.bluhm@gmx.net>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -103,20 +103,28 @@ sub main() {
 	$todo{link}{generate} = 1 if $todo{prefix}{generate};
     }
 
-    my($pid, $fh, $gone);
+    my @cmd = qw(dot -Txlib);
+    my($pid, $fh, $gone, $term);
+    $term = 0;
     $SIG{INT} = sub {
+	local $!;
 	kill SIGTERM, $pid if $pid;
 	$SIG{'INT'}  = 'DEFAULT';
+	$term = 1;
 	kill SIGINT, $$;
     };
     $SIG{CHLD} = sub {
-	if ($pid && ! kill(0, $pid)) {
-	    $gone = 1;
-	}
+	return unless $pid;
+	local ($!, $?);
+	$? = 0;
+	waitpid($pid, POSIX::WNOHANG);
+	die "'@cmd' failed: $?" if $? &&
+	    ((WIFEXITED($?) && WEXITSTATUS($?) != 0) ||
+	    (WIFSIGNALED($?) && WTERMSIG($?) != SIGTERM));
+	$gone = 1 if kill(0, $pid) == 0;
     };
 
     my $class = $ipv6 ? 'OSPF::LSDB::View6' : 'OSPF::LSDB::View';
-    my @cmd = qw(dot -Txlib);
     if ($legend) {
 	my $dot = $class->legend();
 	$gone = 0;
@@ -141,11 +149,10 @@ sub main() {
 	if ($oldtime) {
 	    my $sleeptime = $interval - ($time - $oldtime);
 	    if ($sleeptime > 0) {
-		sleep($sleeptime);
-		$time += $sleeptime;
+		select(undef, undef, undef, $sleeptime);
 	    }
 	}
-	$oldtime = $time;
+	$oldtime = time();
 
 	my $ospfclass = $ipv6 ? 'OSPF::LSDB::ospf6d' : 'OSPF::LSDB::ospfd';
 	my $ospf = $ospfclass->new(ssh => $ssh);
@@ -169,7 +176,7 @@ sub main() {
 	}
 	my $yaml = $yamlospf->Dump();
 	$yaml =~ s/^\s+(age|sequence): .*$//mg;
-	next if $oldyaml && $oldyaml eq $yaml && ! $gone;
+	next if ($oldyaml && $oldyaml eq $yaml && ! $gone) || $term;
 	if ($dump) {
 	    print $yaml;
 	}
@@ -197,9 +204,11 @@ sub main() {
 
 	if ($pid) {
 	    kill SIGTERM, $pid;
+	    $? = 0;
 	    unless (close($fh)) {
-		die "'@cmd' failed: $?" if WIFSIGNALED($?) &&
-		    WTERMSIG($?) != SIGTERM;
+		die "'@cmd' failed: $?" if $? &&
+		    ((WIFEXITED($?) && WEXITSTATUS($?) != 0) ||
+		    (WIFSIGNALED($?) && WTERMSIG($?) != SIGTERM));
 	    }
 	    undef $pid;
 	}

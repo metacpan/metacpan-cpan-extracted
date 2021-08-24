@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4::Worksheet;
 
-our $VERSION = '0.7';
+our $VERSION = '0.8';
 
 use Google::RestApi::Setup;
 
@@ -20,7 +20,7 @@ sub new {
 
   my $qr_worksheet_uri = SheetsApi4->Worksheet_Uri;
   state $check = compile_named(
-    spreadsheet => HasMethods[qw(api config sheets worksheet_properties)],  # if it's got these basics, it must be a duck.
+    spreadsheet => HasMethods[qw(api sheets_api worksheets_config worksheet_properties)],  # if it's got these basics, it must be a duck.
     id          => Str, { optional => 1 },
     name        => Str, { optional => 1 },
     uri         => StrMatch[qr|$qr_worksheet_uri|], { optional => 1 },
@@ -29,13 +29,12 @@ sub new {
   my $self = $check->(@_);
   $self = bless $self, $class;
 
-  if ($self->{config_id}) {
-    my $config = $self->spreadsheet_config($self->{config_id})
-      or LOGDIE "Config '$self->{config_id}' is missing";
+  if ($self->config_id()) {
+    my $config = $self->worksheet_config()
+      or LOGDIE "Worksheet config id '" . $self->config_id() . "' is missing";
     foreach (qw(id name uri)) {
       $self->{$_} = $config->{$_} if defined $config->{$_};
     }
-    $self->{config} = $config;
   }
   defined $self->{id} || defined $self->{name} || $self->{uri}
     or LOGDIE "At least one of id, name, or uri must be specified";
@@ -104,7 +103,7 @@ sub cols {
 
   my @cols = map { $self->range_col($_); } @$cols;
   my $range_group = $self->spreadsheet()->range_group(@cols);
-  return $range_group->values(params => { majorDimension => 'COLUMNS' }) if !$values;
+  return $range_group->values() if !$values;
 
   my @ranges = $range_group->ranges();
   foreach my $i (0..$#ranges) {
@@ -172,14 +171,39 @@ sub cell {
   return $range->values(defined $value ? (values => $value) : ());
 }
 
+sub cells {
+  my $self = shift;
+
+  state $check = compile(ArrayRef, ArrayRef[Str], { optional => 1 });
+  my ($cells, $values) = $check->(@_);
+
+  my @cells = map { $self->range_cell($_); } @$cells;
+  my $range_group = $self->spreadsheet()->range_group(@cells);
+  return $range_group->values() if !$values;
+
+  my @ranges = $range_group->ranges();
+  foreach my $i (0..$#ranges) {
+    $ranges[$i]->batch_values(
+      values => $values->[$i],
+    );
+  }
+
+  return $range_group->submit_values();
+}
+
 # call this before calling tie_rows or header_col. it's an
 # "are you sure you want to do this?" check.
+# () or (1) turns it on, (0) turns it off.
+# this is because you may have a worksheet with thousands
+# of rows that end up being 'headers'. this is less of an
+# issue with header row.
 sub enable_header_col {
   my $self = shift;
-  if (shift) {
+  my $enable = shift // 1;
+  if ($enable) {
     $self->{header_col_enabled} = 1;
   } else {
-    delete @{ %$self }{qw(header_col header_col_enabled)};
+    delete @{$self}{qw(header_col header_col_enabled)};
   }
   return 1;
 }
@@ -188,6 +212,7 @@ sub header_col {
   my $self = shift;
 
   if (!$self->{header_col_enabled}) {
+    DEBUG("Header column is not enabled, call 'enable_header_col' first.");
     delete $self->{header_col};
     return [];
   }
@@ -248,7 +273,7 @@ sub _tie {
   my ($which, $ranges) = $check->(@_);
 
   if (!@$ranges) {
-    my $config = $self->config($which) || {};
+    my $config = $self->worksheet_config($which) || {};
     $ranges = [ keys %$config ];
   }
 
@@ -281,28 +306,29 @@ sub tie {
 
 sub submit_requests {
   my $self = shift;
-  my @api = $self->spreadsheet()->submit_requests(requests => [ $self ], @_);
-  return wantarray ? @api : $api[0];
+  return $self->spreadsheet()->submit_requests(ranges => [ $self ], @_);
 }
 
-sub config {
+sub worksheet_config {
   my $self = shift;
-  my $config = $self->{config} or return;
-  state $check = compile(Maybe[Str]);
-  my ($key) = $check->(@_);
+  my $key = shift;
+  my $config_id = $self->config_id() or return;
+  my $config = $self->spreadsheet()->worksheets_config()->{$config_id} or return;
   return defined $key ? $config->{$key} : $config;
 }
 
+sub config_id { shift->{config_id}; }
 sub range { Range->new(worksheet => shift, range => shift); }
 sub range_col { Col->new(worksheet => shift, range => shift); }
 sub range_row { Row->new(worksheet => shift, range => shift); }
 sub range_cell { Cell->new(worksheet => shift, range => shift); }
 sub range_all { All->new(worksheet => shift); }
 sub api { shift->spreadsheet()->api(@_); }
-sub sheets { shift->spreadsheet()->sheets(@_); }
+sub sheets_api { shift->spreadsheet()->sheets_api(@_); }
+sub rest_api { shift->spreadsheet()->rest_api(@_); }
 sub spreadsheet { shift->{spreadsheet}; }
 sub spreadsheet_id { shift->spreadsheet()->spreadsheet_id(); }
-sub spreadsheet_config { shift->spreadsheet()->config(shift); }
+sub transaction { shift->spreadsheet()->transaction(); }
 
 1;
 
@@ -493,11 +519,6 @@ Submits any outstanding requests (API batchRequests) for this worksheet.
 %args are any args to be passed to the RestApi's 'api' routine (content,
 params etc).
 
-=item config(key<string>)
-
-Returns the custom configuration item with the given key, or the entire
-configuration for this worksheet if no key is specified.
-
 =item range(range<range>);
 
 Returns a Range object representing the passed range string, array, or hash.
@@ -522,7 +543,7 @@ Returns a Range::All object that represents the whole worksheet.
 
 A passthrough to the parent Spreadsheet object's 'api' routine.
 
-=item sheets();
+=item sheets_api();
 
 Returns the SheetsApi4 object.
 
@@ -534,9 +555,9 @@ Returns the parent Spreadsheet object.
 
 Returns the parent Spreadsheet id.
 
-=item spreadsheet_config();
+=item worksheet_config();
 
-Returns the parent Spreadsheet config.
+Returns the parent Spreadsheet's worksheet config.
 
 =back
 

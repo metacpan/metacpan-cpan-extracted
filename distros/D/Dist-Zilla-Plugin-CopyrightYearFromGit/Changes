@@ -1,3 +1,24 @@
+0.009   2021-08-24  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Fix typos.
+
+
+0.008   2021-08-24  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc][ux] Show configuration examples in Synopsis.
+
+
+0.007   2021-08-24  Released-By: PERLANCAR; Urgency: medium
+
+	- Add configurations: include_year, exclude_year, continuous_year.
+
+	- [doc] Tweak wording for documentation on min_year.
+
+
 0.006   2019-10-24  Released-By: PERLANCAR; Urgency: medium
 
 	- [Deprecation] Rename configuration option: regex -> release_tag_regex.

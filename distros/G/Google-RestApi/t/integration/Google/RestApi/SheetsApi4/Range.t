@@ -1,13 +1,8 @@
-#!/usr/bin/perl
-
-use strict;
-use warnings;
+use Test::Integration::Setup;
 
 use Test::Most tests => 34;
-use YAML::Any qw(Dump);
 
-use Utils qw(:all);
-init_logger();
+# init_logger($DEBUG);
 
 use aliased 'Google::RestApi::SheetsApi4::Range';
 use aliased 'Google::RestApi::SheetsApi4::Range::Col';
@@ -55,14 +50,14 @@ sub named {
   $range = $worksheet->range($col);
   is_hash sub { $range->add_named(name => "col_named_range")->submit_requests() }, "Adding col named range";
   isa_ok $range = $worksheet->range_col("col_named_range"), Col, "Creating col named range as a col";
-  $spreadsheet->cache(5);
+  $spreadsheet->cache_seconds(5);
   like $worksheet->range("col_named_range")->range(), qr/$col$/, "Normalized range should be $col";
 
   my $row = "A1:J10";
   $range = $worksheet->range($row);
   is_hash sub { $range->add_named(name => "row_named_range")->submit_requests() }, "Adding row named range";
   isa_ok $range = $worksheet->range_row("row_named_range"), Row, "Creating row named range as a row";
-  $spreadsheet->cache(5);
+  $spreadsheet->cache_seconds(5);
   like $worksheet->range("row_named_range")->range(), qr/$row$/, "Normalized range should be $row";
 
   my $named = $spreadsheet->range_group(
@@ -135,4 +130,4 @@ sub requests {
   is scalar @$requests_response, 3, "There should be three responses in the response array";
 }
 
-delete_all_spreadsheets($spreadsheet->sheets());
+delete_all_spreadsheets($spreadsheet->sheets_api());

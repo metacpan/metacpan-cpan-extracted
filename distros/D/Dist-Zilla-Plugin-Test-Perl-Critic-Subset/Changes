@@ -1,3 +1,8 @@
+3.001.006  2021-08-23  Released-By: PERLANCAR; Urgency: medium
+
+	   - Make test an author test due to test failures in CT.
+
+
 3.001.005  2020-04-03  Released-By: PERLANCAR; Urgency: medium
 
 	   - By default also skip t/ because we often have generated test

@@ -479,7 +479,6 @@ sub display {
                 MSG                   => $req->info(),
                 LOCKTIME              => $req->lockTime(),
             );
-
         }
 
         # Display authentication form
@@ -517,9 +516,8 @@ sub display {
                 );
             }
 
-            # Choose what form to display if not in a loop
+            # Choose which form to display if not in a loop
             else {
-
                 my $displayType =
                   eval { $self->_authentication->getDisplayType($req) }
                   || 'logo';

@@ -8,6 +8,8 @@ use Exporter qw(import);
 
 use Data::Dumper ;
 use Text::CSV ;
+use Math::BigFloat;
+use List::Util qw( min max );
 use XML::Twig ;
 use File::Share ':all'; 
 use Carp qw (cluck croak carp) ;
@@ -24,14 +26,14 @@ use Carp qw (cluck croak carp) ;
 # If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
 # will save memory.
 our %EXPORT_TAGS = ( 'all' => [ qw( 
-	__refPeak__
+	__refPeak__ getMinAndMaxMass
 	
 ) ] );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw( 
-	__refPeak__
+	__refPeak__ getMinAndMaxMass parsingMsFragmentsByCluster
 	
 );
 
@@ -45,11 +47,12 @@ Metabolomics::Banks - Perl extension to build metabolite banks for metabolomics
 
 =head1 VERSION
 
-Version 0.2 - Adding POD
+Version 0.3 - Object integration for multi-annotation
+Version 0.4 - Completing object properties and add cluster support
 
 =cut
 
-our $VERSION = '0.2';
+our $VERSION = '0.4';
 
 
 =head1 SYNOPSIS
@@ -88,14 +91,20 @@ sub new {
 	bless($self) ;
     
     $self->{_DATABASE_NAME_} = undef ; ## STRING, name of the current db
+    $self->{_DATABASE_TYPE_} = undef ; ## STRING, name of the current db
     $self->{_DATABASE_VERSION_} = '1.0' ; ## FLOAT, version number e.g. 1.0
     $self->{_DATABASE_ENTRIES_NB_} = 'database_entries_nb' ; ## INT, number of DB entries - - 
     $self->{_DATABASE_URL_} = 'database_url' ; ## STRING, url to the resource - - mandatory
+    $self->{_DATABASE_URL_CARD_} = 'database_url_card' ; ## STRING, url to the resource card part - - optionnal
     $self->{_DATABASE_DOI_} = 'database_doi' ; ## STRING, DOI to the scientific publication
     $self->{_DATABASE_ENTRIES_} = [] ; ## ARRAYS, All entries with metadata
+    $self->{_DATABASE_SPECTRA_} = {} ; ## HASH, All spectra entries with metadata { SPECTRA_ID => oSpectrum }
     $self->{_THEO_PEAK_LIST_} = [] ; ## ARRAYS, All theo peaks metadata
     $self->{_EXP_PEAK_LIST_} = [] ; ## ARRAYS, All exp peaks metadata
-    
+    $self->{_EXP_PEAK_LIST_ALL_ANNOTATIONS_} = [] ; ## ARRAYS, All exp annotated (or not) peaks + metadata
+    $self->{_EXP_PSEUDOSPECTRA_LIST_} = {} ;  ## HASH of ARRAYs { PseudoSp_ID => [sorted Exp. oPeaks] }
+    $self->{_PSEUDOSPECTRA_SPECTRA_INDEX_} = {} ; ## HASH of ARRAY {PseudoSp_ID => [SPECTRA_ID, ...] }
+        
     return ($self) ;
 }
 ### END of SUB
@@ -162,6 +171,42 @@ sub computeNeutralCpdMz_To_NegativeIonMz {
 }
 ### END of SUB
 
+=item getMinAndMaxMass
+
+	## Description : retrieve the min/max mz of a __PEAK_LIST_
+	## Input : N/A
+	## Output : $minMs, $maxMs
+	## Usage : my ( $minMs, $maxMs ) = getMinAndMaxMass() ;
+
+=cut
+
+## START of SUB
+sub getMinAndMaxMass {
+    ## Retrieve Values
+    my $self = shift ;
+#    my (  ) = @_;
+    my ( $minMs, $maxMs ) = ( 0, 0 ) ;
+    
+    my @mzs = () ;
+    
+    my $peakList = $self->_getPeakList('_EXP_PEAK_LIST_') ;
+    
+    foreach my $peak ( @{$peakList} ) {
+    	if ( $peak->_getPeak_MESURED_MONOISOTOPIC_MASS() ) {
+    		push ( @mzs, $peak->_getPeak_MESURED_MONOISOTOPIC_MASS() ) ;	
+    	}
+    }
+    
+    $minMs = min @mzs ;
+	$maxMs = max @mzs ;
+#
+#	my ( $min_delta, undef ) = $opfws->mz_delta_conversion(\$min, \$mz_delta_type, \$mz_delta) ;
+#	my ( undef, $max_delta ) = $opfws->mz_delta_conversion(\$max, \$mz_delta_type, \$mz_delta) ;
+    
+    return ($minMs, $maxMs) ;
+}
+### END of SUB
+
 =item parsingMsFragments
 
 	## Description : get a list of Ms fragment from a experimental mesureament.
@@ -182,13 +227,24 @@ sub parsingMsFragments {
     	@fragmentsList = (178.9942, 156.0351, 118.9587, 118.9756, 108.0666) ;
     }
     
-    my $csv = Text::CSV->new ( { 'sep_char' => "\t", binary => 1, auto_diag => 1, eol => "\n" } )  # should set binary attribute.
-    or die "Cannot use CSV: ".Text::CSV->error_diag ();
+    ## Check file extension (tsv, csv, tabular...) and adapt csv object constructor
+    my $csv = undef ;
+    
+    if ($Xfile =~/\.(csv|CSV)$/) {
+    	print "Parsing a CSV file...\n" ;
+    	$csv = Text::CSV->new ( { 'sep_char' => ",", binary => 1, auto_diag => 1, eol => "\n" } )  # should set binary attribute.
+    	or die "Cannot use CSV: ".Text::CSV->error_diag ();	
+    }
+    elsif ($Xfile =~/\.(tsv|TSV|TABULAR|tabular)$/) {
+    	print "Parsing a tabular file...\n" ;
+    	$csv = Text::CSV->new ( { 'sep_char' => "\t", binary => 1, auto_diag => 1, eol => "\n" } )  # should set binary attribute.
+    	or die "Cannot use CSV: ".Text::CSV->error_diag ();	
+    }
     
     ## Adapte the number of the colunm : (nb of column to position in array)
 	$column = $column - 1 ;
     
-    open (CSV, "<", $Xfile) or die $! ;
+    open (CSV, '<:crlf', $Xfile) or die $! ;
 	my $line = 0 ;
 	
 	while (<CSV>) {
@@ -223,6 +279,106 @@ sub parsingMsFragments {
     
 }
 ### END of SUB
+
+
+=item parsingMsFragments
+
+	## Description : get a list of Ms fragment from a experimental mesureament.
+	## Input : $oBank, $Xfile, $is_header, $column
+	## Output : $msFragBank
+	## Usage : $oBank->parsingMsFragments ( $Xfile, $is_header, $column ) ;
+
+=cut
+
+## START of SUB
+sub parsingMsFragmentsByCluster {
+    ## Retrieve Values
+    my ( $oBank, $Xfile, $is_header, $col_Mzs, $col_Ints, $col_ClusterIds ) = @_;
+    
+    my $mzs = undef ;
+    my $into = undef ;
+    my $clusters = undef ;
+    
+    ## Check file extension (tsv, csv, tabular...) and adapt csv object constructor
+    my $csv = undef ;
+    
+    if ($Xfile =~/\.(csv|CSV)$/) {
+    	print "Parsing a CSV file...\n" ;
+    	$csv = Text::CSV->new ( { 'sep_char' => ",", binary => 1, auto_diag => 1, eol => "\n" } )  # should set binary attribute.
+    	or die "Cannot use CSV: ".Text::CSV->error_diag ();	
+    }
+    elsif ($Xfile =~/\.(tsv|TSV|TABULAR|tabular)$/) {
+    	print "Parsing a tabular file...\n" ;
+    	$csv = Text::CSV->new ( { 'sep_char' => "\t", binary => 1, auto_diag => 1, eol => "\n" } )  # should set binary attribute.
+    	or die "Cannot use CSV: ".Text::CSV->error_diag ();	
+    }
+    
+    open (CSV, '<:crlf', $Xfile) or die $! ;
+	my $line = 0 ;
+	
+	while (<CSV>) {
+		$line++ ;
+	    chomp $_ ;
+		# file has a header
+		if ( defined $is_header ) { if ($line == 1) { next ; } }
+		# parsing the targeted column
+	    if ( $csv->parse($_) ) {
+	        my @columns = $csv->fields();
+	        push ( @{$mzs}, $columns[$col_Mzs - 1] ) 				if (defined $col_Mzs);
+	        push ( @{$into}, $columns[$col_Ints - 1] ) 				if (defined $col_Ints);
+	        push ( @{$clusters}, sprintf( "%04s", $columns[$col_ClusterIds - 1] )  ) 	if (defined $col_ClusterIds); # Make Clusters sortable by id
+	    }
+	    else {
+	        my $err = $csv->error_input;
+	        die "Failed to parse line: $err";
+	    }
+	}
+	close CSV;
+	
+	## manage input file with no into colunm / init into with a default value of 10
+	if ( !defined $col_Ints ) {
+		my $nb_mzs = scalar(@{$mzs}) ;
+		my @intos = map {10} (0..$nb_mzs-1) ;
+		my $nb_intos = scalar(@intos) ;
+		if ($nb_intos == $nb_mzs) { $into = \@intos ;	}
+		else { carp "A difference exists between intensity and mz values\n" }
+	}
+	
+	## Transform int in relative intensity
+	if (defined $into) {
+		my $oUtils = Metabolomics::Utils->new() ;
+		$into = $oUtils->validFloat($into) ;
+		$into = $oUtils->trackZeroIntensity($into) ;
+		$mzs = $oUtils->validFloat($mzs) ;
+	}
+	
+	my $num_pcs = scalar(@{$clusters}) ;
+    my $num_mzs = scalar(@{$mzs}) ;
+    my $num_ints = scalar(@{$into}) ;
+    my $num_peaks = 0 ;
+    
+    ## Create a PeakList
+    foreach my $mz (@{$mzs}) {
+    	
+    	my $oPeak = Metabolomics::Banks->__refPeak__() ;
+	    $oPeak->_setPeak_MESURED_MONOISOTOPIC_MASS ( $mz );
+	    $oPeak->_setPeak_INTENSITY ( $into->[$num_peaks] );
+	    $oPeak->_setPeak_CLUSTER_ID ( $clusters->[$num_peaks]  );
+	    
+    	$oBank->_addPeakList('_EXP_PEAK_LIST_', $oPeak) ;
+    	$oBank->_addPeakList('_EXP_PSEUDOSPECTRA_LIST_', $oPeak, $clusters->[$num_peaks] ) ;
+    	$num_peaks++ ;
+    }
+    
+#    print Dumper $mzs ;
+#    print Dumper $into ;
+#    print Dumper $clusters ;
+
+    return ($num_mzs, $num_ints, $num_pcs) ;
+    
+}
+### END of SUB
+
 
 =back
 
@@ -275,6 +431,94 @@ sub _addEntry {
 
 ### END of SUB
 
+=item PRIVATE_ONLY _addSpectra
+
+	## Description : _addSpectra
+	## Input : $self, $Entry, $Index ;
+	## Ouput :  NA
+	## Usage : _addSpectra($Entry, $Index);
+
+=cut
+
+### START of SUB
+
+sub _addSpectra {
+    my ($self, $Entry, $Index) = @_;
+    
+    if ( (defined $Entry) and (!defined $Index) ) {
+    	my $Index = time ;
+    	$self->{_DATABASE_SPECTRA_}{$Index} = $Entry ;
+    }
+    elsif ( (defined $Entry) and (defined $Index) ) {
+    	$self->{_DATABASE_SPECTRA_}{$Index} = $Entry ;
+    }
+}
+
+=item PRIVATE_ONLY _indexSpectraByCluster
+
+	## Description : _indexSpectraByCluster
+	## Input : $self, $clusterID, $spectralID ;
+	## Ouput :  NA
+	## Usage : $self->_indexSpectraByCluster($clusterID, $spectralID);
+
+=cut
+
+### START of SUB
+
+sub _indexSpectraByCluster {
+    my ($self, $clusterID, $spectralID) = @_;
+    
+    if ( (defined $clusterID) and (defined $spectralID) ) {
+    	    	
+    	push (@{$self->{_PSEUDOSPECTRA_SPECTRA_INDEX_}{$clusterID}}, $spectralID) ;
+    	
+#    	if ($self->{_PSEUDOSPECTRA_SPECTRA_INDEX_}{$clusterID}) {
+#    		
+#    	}
+#    	else {
+#    		$self->{_PSEUDOSPECTRA_SPECTRA_INDEX_}{$clusterID} = [] ;
+#    		push (@{$self->{_PSEUDOSPECTRA_SPECTRA_INDEX_}{$clusterID}}, $spectralID) ;
+#		}
+    	
+    }
+    else {
+    	croak "[ERROR] Impossible to index any spectra by its cluster (pseudospectra id)\n" ;
+    }
+}
+
+=item PRIVATE_ONLY _detectSpectraDuplicate
+
+	## Description : _detectSpectraDuplicate
+	## Input : $self, $spectralID ;
+	## Ouput :  TRUE/FALSE
+	## Usage : $self->_detectSpectraDuplicate($spectralID);
+
+=cut
+
+### START of SUB
+
+sub _detectSpectraDuplicate {
+    my ($self, $spectralID) = @_;
+    
+    my $SpectraStatus = undef ;
+    
+    if ( (defined $spectralID) ) {
+    	
+    	if ($self->{_DATABASE_SPECTRA_}{$spectralID}) {
+    		$SpectraStatus = 'TRUE' ;
+    	}
+    	else {
+    		$SpectraStatus = 'FALSE' ;
+    	}
+    }
+    else {
+    	croak "[ERROR] Impossible to search in the index without spectra id\n" ;
+    }
+}
+
+
+
+### END of SUB
 
 =item PRIVATE_ONLY _addFragment
 
@@ -363,6 +607,27 @@ sub _getEntries {
 }
 ### END of SUB
 
+=item PRIVATE_ONLY _getSpectra
+
+	## Description : get the list of entries from the bank object
+	## Input : $self
+	## Output : $Entries
+	## Usage : my ( $Entries ) = $obank->_getSpectra () ;
+
+=cut
+
+## START of SUB
+sub _getSpectra {
+    ## Retrieve Values
+    my $self = shift ;
+    my ( $Entries ) = ( () ) ;
+    
+    $Entries = $self->{_DATABASE_SPECTRA_} ;
+    
+    return ($Entries) ;
+}
+### END of SUB
+
 =item PRIVATE_ONLY _getFragments
 
 	## Description : get the list of fragments from the bank object
@@ -422,20 +687,27 @@ sub __refPeak__ {
 
     bless($self) ;
     $self->{_ID_} = undef ; # identifiant (for theo peak)
+    $self->{_SPECTRA_ID_} = undef ; # spectra identifiant (for theo peak) - best hit
     $self->{_MESURED_MONOISOTOPIC_MASS_} = 0 ; # mesured accurate mass (for exp peak)
-    $self->{_COMPUTED_MONOISOTOPIC_MASS_} = 0 ; # computed accurate mass (for theo peak)
-    $self->{_PPM_ERROR_} = 0 ; # FLOAT
-    $self->{_MMU_ERROR_} = 0 ; # FLOAT
-    $self->{_ANNOTATION_IN_NEG_MODE_} = undef ; # STRING as [M-H]-
-    $self->{_ANNOTATION_IN_POS_MODE_} = undef ; # STRING as [M+H]+
-    $self->{_ANNOTATION_ONLY_IN_} = undef ; # STRING as [undef|NEG|POS], undef is default
-    $self->{_ANNOTATION_TYPE_} = undef ; # STRING as adducts, fragment or isotope
-    $self->{_ANNOTATION_NAME_} = undef ; # STRING for metabolite common name
-    $self->{_ANNOTATION_FORMULA_} = undef ; # STRING for metabolite molecular formula
-    $self->{_ANNOTATION_INCHIKEY_} = undef ; # STRING for metabolite inchikey representation
-    $self->{_ANNOTATION_SMILES_} = undef ; # STRING for metabolite smiles representation
-    $self->{_ANNOTATION_IS_A_METABOLITE_} = undef ; # STRING for metabolite status
-    $self->{_ANNOTATION_IS_A_PRECURSOR_} = undef ; # STRING for metabolite status
+    $self->{_CLUSTER_ID_} = undef ; 	# PC_GROUP or PSEUDOSPECTRA / CLUSTER ID of the peak
+    $self->{_INTENSITY_} = undef ; 	# Absolute intensity
+    $self->{_RELATIVE_INTENSITY_100_} = undef ; 	# Relative intensity in base 100
+    $self->{_RELATIVE_INTENSITY_999_} = undef ; 	# Relative intensity in base 999
+    $self->{_COMPUTED_MONOISOTOPIC_MASS_} = 0 ; # computed accurate mass (for theo peak) - best hit
+    $self->{_PPM_ERROR_} = 0 ; # FLOAT - best hit
+    $self->{_MMU_ERROR_} = 0 ; # FLOAT - best hit
+    $self->{_ANNOTATION_IN_NEG_MODE_} = undef ; # STRING as [M-H]- - best hit
+    $self->{_ANNOTATION_IN_POS_MODE_} = undef ; # STRING as [M+H]+ - best hit
+    $self->{_ANNOTATION_ONLY_IN_} = undef ; # STRING as [undef|NEG|POS], undef is default - best hit
+    $self->{_ANNOTATION_TYPE_} = undef ; # STRING as adducts, fragment or isotope - best hit
+    $self->{_ANNOTATION_NAME_} = undef ; # STRING for metabolite common name - best hit
+    $self->{_ANNOTATION_FORMULA_} = undef ; # STRING for metabolite molecular formula - best hit
+    $self->{_ANNOTATION_INCHIKEY_} = undef ; # STRING for metabolite inchikey representation - best hit
+    $self->{_ANNOTATION_SMILES_} = undef ; # STRING for metabolite smiles representation - best hit
+    $self->{_ANNOTATION_IS_A_METABOLITE_} = undef ; # STRING for metabolite status - best hit
+    $self->{_ANNOTATION_IS_A_PRECURSOR_} = undef ; # STRING for metabolite status - best hit
+    $self->{_ANNOTATIONS_} = [] ; # ARRAY for metabolite annotations
+    $self->{_ANNOTATION_SPECTRAL_IDS_} = [] ; # ARRAY of ids from matched spectra
 
     return $self ;
 }
@@ -453,14 +725,18 @@ sub __refPeak__ {
 ### START of SUB
 
 sub _addPeakList {
-    my ($self, $type, $peakList) = @_;
+    my ($self, $type, $peakList, $index) = @_;
     
-    ## type should be _THEO_PEAK_LIST_ or _EXP_PEAK_LIST_
-	if ( (defined $type) and (defined $peakList) ) {
+    ## type should be _THEO_PEAK_LIST_ or _EXP_PEAK_LIST_ or _EXP_PSEUDOSPECTRA_LIST_
+	if ( (defined $type) and (defined $peakList) and (!defined $index) ) {
 		push (@{$self->{$type}}, $peakList);
 	}
+	# Manage indew in case of pseudo spectra
+	elsif ( (defined $type) and (defined $peakList) and (defined $index) ) {
+		push (@{$self->{$type}{$index}}, $peakList);
+	}
 	else{
-		croak "type peaklist should be _THEO_PEAK_LIST_ or _EXP_PEAK_LIST_ \n" ;
+		croak "type peaklist should be _THEO_PEAK_LIST_ or _EXP_PEAK_LIST_ or _EXP_PSEUDOSPECTRA_LIST_ \n" ;
 	}
 }
 ### END of SUB
@@ -489,6 +765,9 @@ sub _getPeakList {
     }
     elsif ( (defined $type) and ($type eq '_THEO_PEAK_LIST_') ) {
     	$peakList = $self->{_THEO_PEAK_LIST_} ;
+    }
+    elsif ( (defined $type) and ($type eq '_EXP_PSEUDOSPECTRA_LIST_') ) {
+    	$peakList = $self->{_EXP_PSEUDOSPECTRA_LIST_} ;
     }
     else {
     	croak "[ERROR] No type is undefined or does not correspond to _THEO_PEAK_LIST_ or _EXP_PEAK_LIST_ \n" ;
@@ -563,7 +842,10 @@ sub _setPeak_MESURED_MONOISOTOPIC_MASS {
     my $self = shift ;
     my ( $MESURED_MONOISOTOPIC_MASS ) = @_;
     
-    if ( (defined $MESURED_MONOISOTOPIC_MASS) and ( ($MESURED_MONOISOTOPIC_MASS > 0) or ($MESURED_MONOISOTOPIC_MASS < 0) )  ) {	$self->{_MESURED_MONOISOTOPIC_MASS_} = $MESURED_MONOISOTOPIC_MASS ; }
+    if ( (defined $MESURED_MONOISOTOPIC_MASS) and ( ($MESURED_MONOISOTOPIC_MASS > 0) or ($MESURED_MONOISOTOPIC_MASS < 0) )  ) {
+    	$MESURED_MONOISOTOPIC_MASS =~ s/\s//g ;
+    	$self->{_MESURED_MONOISOTOPIC_MASS_} = $MESURED_MONOISOTOPIC_MASS ; 
+    }
     else {	carp "[ERROR] the method _setPeakMESURED_MONOISOTOPIC_MASS can't set any undef or non numerical value\n" ; }
     
     return (0) ;
@@ -593,6 +875,220 @@ sub _getPeak_MESURED_MONOISOTOPIC_MASS {
 }
 ### END of SUB
 
+=item PRIVATE_ONLY _setPeak_CLUSTER_ID
+
+	## Description : _setPeak_CLUSTER_ID
+	## Input : $VALUE
+	## Output : TRUE
+	## Usage : _setPeak_CLUSTER_ID ( $VALUE ) ;
+
+=cut
+
+## START of SUB
+sub _setPeak_CLUSTER_ID {
+    ## Retrieve Values
+    my $self = shift ;
+    my ( $VALUE ) = @_;
+    
+    if ( (defined $VALUE) and ( ($VALUE > 0) or ($VALUE < 0) )  ) {
+    	$VALUE =~ s/\s//g ;
+    	$self->{_CLUSTER_ID_} = $VALUE ; 
+    }
+    else {	carp "[ERROR] the method _setPeak_CLUSTER_ID can't set any undef or non numerical value\n" ; }
+    
+    return (0) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _getPeak_CLUSTER_ID
+
+	## Description : _getPeak_CLUSTER_ID
+	## Input : void
+	## Output : $MESURED_MONOISOTOPIC_MASS
+	## Usage : my ( $MESURED_MONOISOTOPIC_MASS ) = _getPeak_CLUSTER_ID () ;
+
+=cut
+
+## START of SUB
+sub _getPeak_CLUSTER_ID {
+    ## Retrieve Values
+    my $self = shift ;
+    
+    my $VALUE = undef ;
+    
+    if ( (defined $self->{_CLUSTER_ID_}) and ( $self->{_CLUSTER_ID_} > 0 ) or $self->{_CLUSTER_ID_} < 0  ) {	$VALUE = $self->{_CLUSTER_ID_} ; }
+    else {	 $VALUE = 0 ; warn "[WARN] the method _getPeak_CLUSTER_ID can't _getPeak a undef or non numerical value\n" ; }
+    
+    return ( $VALUE ) ;
+}
+### END of SUB
+
+
+
+=item PRIVATE_ONLY _setPeak_RELATIVE_INTENSITY_100
+
+	## Description : _setPeak_RELATIVE_INTENSITY_100
+	## Input : $VALUE
+	## Output : TRUE
+	## Usage : _setPeak_RELATIVE_INTENSITY_100 ( $VALUE ) ;
+
+=cut
+
+## START of SUB
+sub _setPeak_RELATIVE_INTENSITY_100 {
+    ## Retrieve Values
+    my $self = shift ;
+    my ( $VALUE ) = @_;
+    
+    if ( (defined $VALUE) and ( ($VALUE > 0) )  ) {
+    	$VALUE =~ s/\s//g ;
+    	$self->{_RELATIVE_INTENSITY_100_} = $VALUE ; 
+    }
+    else {	
+#    	warn "[WARN] the method _setPeak_RELATIVE_INTENSITY_100 set an undef value\n" ; 
+    }
+    
+    return (0) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _getPeak_RELATIVE_INTENSITY_100
+
+	## Description : _getPeak_RELATIVE_INTENSITY_100
+	## Input : void
+	## Output : $MESURED_MONOISOTOPIC_MASS
+	## Usage : my ( $MESURED_MONOISOTOPIC_MASS ) = _getPeak_RELATIVE_INTENSITY_100 () ;
+
+=cut
+
+## START of SUB
+sub _getPeak_RELATIVE_INTENSITY_100 {
+    ## Retrieve Values
+    my $self = shift ;
+    
+    my $VALUE = undef ;
+    
+    if ( $self->{_RELATIVE_INTENSITY_100_} ) {
+    	 $VALUE = $self->{_RELATIVE_INTENSITY_100_} if ( (defined $self->{_RELATIVE_INTENSITY_100_}) and ( $self->{_RELATIVE_INTENSITY_100_} > 0 ) ) ;
+    }
+    else {	 
+    	$VALUE = undef ; 
+#    	warn "[WARN] the method _getPeak_RELATIVE_INTENSITY_100 get an undef value\n" ; 
+    }
+    
+    return ( $VALUE ) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _setPeak_RELATIVE_INTENSITY_999
+
+	## Description : _setPeak_RELATIVE_INTENSITY_999
+	## Input : $VALUE
+	## Output : TRUE
+	## Usage : _setPeak_RELATIVE_INTENSITY_999 ( $VALUE ) ;
+
+=cut
+
+## START of SUB
+sub _setPeak_RELATIVE_INTENSITY_999 {
+    ## Retrieve Values
+    my $self = shift ;
+    my ( $VALUE ) = @_;
+    
+    if ( (defined $VALUE) and ( ($VALUE > 0) )  ) {
+    	$VALUE =~ s/\s//g ;
+    	$self->{_RELATIVE_INTENSITY_999_} = $VALUE ; 
+    }
+    else {	
+#    	warn "[WARN] the method _setPeak_RELATIVE_INTENSITY_999 set an undef value\n" ; 
+    }
+    
+    return (0) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _getPeak_RELATIVE_INTENSITY_999
+
+	## Description : _getPeak_RELATIVE_INTENSITY_999
+	## Input : void
+	## Output : $MESURED_MONOISOTOPIC_MASS
+	## Usage : my ( $MESURED_MONOISOTOPIC_MASS ) = _getPeak_RELATIVE_INTENSITY_999 () ;
+
+=cut
+
+## START of SUB
+sub _getPeak_RELATIVE_INTENSITY_999 {
+    ## Retrieve Values
+    my $self = shift ;
+    
+    my $VALUE = undef ;
+    
+    if ( $self->{_RELATIVE_INTENSITY_999_} ) {
+    	 $VALUE = $self->{_RELATIVE_INTENSITY_999_} if ( (defined $self->{_RELATIVE_INTENSITY_999_}) and ( $self->{_RELATIVE_INTENSITY_999_} > 0 ) ) ;
+    }
+    else {	 
+    	$VALUE = undef ; 
+#    	warn "[WARN] the method _getPeak_RELATIVE_INTENSITY_999 get an undef value\n" ; 
+    }
+    
+    return ( $VALUE ) ;
+}
+### END of SUB
+
+
+=item PRIVATE_ONLY _setPeak_INTENSITY
+
+	## Description : _setPeak_INTENSITY
+	## Input : $INTENSITY
+	## Output : TRUE
+	## Usage : _setPeak_INTENSITY ( $INTENSITY ) ;
+
+=cut
+
+## START of SUB
+sub _setPeak_INTENSITY {
+    ## Retrieve Values
+    my $self = shift ;
+    my ( $INTENSITY ) = @_;
+    
+    if ( (defined $INTENSITY) and ( ($INTENSITY > 0) )  ) {
+    	$INTENSITY =~ s/\s//g ;
+    	$self->{_INTENSITY_} = $INTENSITY ; 
+    }
+    else {	
+#    	warn "[WARN] the method _setPeak_INTENSITY set an undef value\n" ; 
+    }
+    
+    return (0) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _getPeak_INTENSITY
+
+	## Description : _getPeak_INTENSITY
+	## Input : void
+	## Output : $MESURED_MONOISOTOPIC_MASS
+	## Usage : my ( $MESURED_MONOISOTOPIC_MASS ) = _getPeak_INTENSITY () ;
+
+=cut
+
+## START of SUB
+sub _getPeak_INTENSITY {
+    ## Retrieve Values
+    my $self = shift ;
+    
+    my $INTENSITY = undef ;
+    
+    if ( $self->{_INTENSITY_} ) {
+    	 $INTENSITY = $self->{_INTENSITY_} if ( (defined $self->{_INTENSITY_}) and ( $self->{_INTENSITY_} > 0 ) ) ;
+    }
+    else {	 
+    	$INTENSITY = undef ; 
+#    	warn "[WARN] the method _getPeak_INTENSITY get an undef value\n" ; 
+    }
+    return ( $INTENSITY ) ;
+}
+### END of SUB
 
 =item PRIVATE_ONLY _setANNOTATION_IN_NEG_MODE
 
@@ -610,7 +1106,10 @@ sub _setPeak_ANNOTATION_IN_NEG_MODE {
     my ( $ANNOTATION_IN_NEG_MODE ) = @_;
     
     if ( (defined $ANNOTATION_IN_NEG_MODE) and ($ANNOTATION_IN_NEG_MODE ne '')  ) {	$self->{_ANNOTATION_IN_NEG_MODE_} = $ANNOTATION_IN_NEG_MODE ; }
-    else {	carp "[ERROR] the method _setCOMPUTED_MONOISOTOPIC_MASS can't set any undef or non numerical value\n" ; }
+    else {
+    	$self->{_ANNOTATION_IN_NEG_MODE_} = undef ;
+#    	warn "[WARN] the method _setCOMPUTED_MONOISOTOPIC_MASS can't set any undef or non numerical value\n" ; 
+	}
     
     return (0) ;
 }
@@ -655,7 +1154,10 @@ sub _setPeak_ANNOTATION_DA_ERROR {
     my ( $MMU_ERROR ) = @_;
     
     if ( (defined $MMU_ERROR) and ($MMU_ERROR ne '')  ) {	$self->{_MMU_ERROR_} = $MMU_ERROR ; }
-    else {	carp "[ERROR] the method _setANNOTATION_DA_ERROR can't set any undef or non numerical value\n" ; }
+    else {
+    	$self->{_MMU_ERROR_} = 0 ;
+#    	warn "[WARN] the method _setANNOTATION_DA_ERROR can't set any undef or non numerical value\n" ; 
+    }
     
     return (0) ;
 }
@@ -677,7 +1179,10 @@ sub _setPeak_ANNOTATION_PPM_ERROR {
     my ( $PPM_ERROR ) = @_;
     
     if ( (defined $PPM_ERROR) and ($PPM_ERROR ne '')  ) {	$self->{_PPM_ERROR_} = $PPM_ERROR ; }
-    else {	carp "[ERROR] the method _setANNOTATION_PPM_ERROR can't set any undef or non numerical value\n" ; }
+    else {	
+    	$self->{_PPM_ERROR_} = undef ;
+#    	warn "[WARN] the method _setANNOTATION_PPM_ERROR is set with undef value\n" ; 
+	}
     
     return (0) ;
 }
@@ -699,7 +1204,10 @@ sub _setPeak_ANNOTATION_IN_POS_MODE {
     my ( $ANNOTATION_IN_POS_MODE ) = @_;
     
     if ( (defined $ANNOTATION_IN_POS_MODE) and ($ANNOTATION_IN_POS_MODE ne '')  ) {	$self->{_ANNOTATION_IN_POS_MODE_} = $ANNOTATION_IN_POS_MODE ; }
-    else {	carp "[ERROR] the method _setANNOTATION_IN_POS_MODE can't set any undef or non numerical value\n" ; }
+    else {	
+    	$self->{_ANNOTATION_IN_POS_MODE_} = undef ;
+#    	warn "[WARN] the method _setANNOTATION_IN_POS_MODE can't set any undef or non numerical value\n" ; 
+	}
     
     return (0) ;
 }
@@ -744,11 +1252,40 @@ sub _setPeak_ANNOTATION_TYPE {
     my ( $ANNOTATION_TYPE ) = @_;
     
     if ( (defined $ANNOTATION_TYPE) and ($ANNOTATION_TYPE ne '')  ) {	$self->{_ANNOTATION_TYPE_} = $ANNOTATION_TYPE ; }
-    else {	carp "[ERROR] the method _setPeak_ANNOTATION_TYPE can't set any undef or non numerical value\n" ; }
+    else {	
+    	$self->{_ANNOTATION_TYPE_} = undef ;
+#    	warn "[WARN] the method _setPeak_ANNOTATION_TYPE is set with undef value\n" ; 
+	}
     
     return (0) ;
 }
 ### END of SUB
+
+=item PRIVATE_ONLY _setPeak_ANNOTATIONS
+
+	## Description : _setPeak_ANNOTATIONS
+	## Input : $ANNOTATIONS
+	## Output : TRUE
+	## Usage : _setPeak_ANNOTATIONS ( $ANNOTATIONS ) ;
+
+=cut
+
+## START of SUB
+sub _setPeak_ANNOTATIONS {
+    ## Retrieve Values
+    my $self = shift ;
+    my ( $ANNOTATIONS ) = @_;
+    
+    if ( ( $ANNOTATIONS ) and ( scalar ( @{$ANNOTATIONS} ) > 0 )  ) {	$self->{_ANNOTATIONS_} = $ANNOTATIONS ; }
+    else {	
+#    	warn "[WARN] the method _setPeak_ANNOTATIONS can't set any undef or empty list value\n" ; 
+    	$self->{_ANNOTATIONS_} = [] ;
+    }
+    
+    return (0) ;
+}
+### END of SUB
+
 
 =item PRIVATE_ONLY _getPeak_ANNOTATION_TYPE
 
@@ -786,10 +1323,13 @@ sub _getPeak_ANNOTATION_TYPE {
 sub _setPeak_ANNOTATION_NAME {
     ## Retrieve Values
     my $self = shift ;
-    my ( $ANNOTATION_NAME ) = @_;
+    my ( $VALUE ) = @_;
     
-    if ( (defined $ANNOTATION_NAME) and ($ANNOTATION_NAME ne '')  ) {	$self->{_ANNOTATION_NAME_} = $ANNOTATION_NAME ; }
-    else {	carp "[ERROR] the method _setPeak_ANNOTATION_NAME can't set any undef or non numerical value\n" ; }
+    if ( (defined $VALUE) and ($VALUE ne '')  ) {	$self->{_ANNOTATION_NAME_} = $VALUE ; }
+    else {
+    	$self->{_ANNOTATION_NAME_} = undef ;
+#    	warn "[WARN] the method _setPeak_ANNOTATION_NAME is set with undef value\n" ; 
+	}
     
     return (0) ;
 }
@@ -843,12 +1383,87 @@ sub _getPeak_ANNOTATION_ID {
 }
 ### END of SUB
 
-=item PRIVATE_ONLY _setANNOTATION_ID
+=item PRIVATE_ONLY _getPeak_ANNOTATION_DA_ERROR
 
-	## Description : _setANNOTATION_ID
+	## Description : _getPeak_ANNOTATION_DA_ERROR
+	## Input : void
+	## Output : $ANNOTATION_DA_ERROR
+	## Usage : my ( $ANNOTATION_DA_ERROR ) = _getPeak_ANNOTATION_DA_ERROR () ;
+
+=cut
+
+## START of SUB
+sub _getPeak_ANNOTATION_DA_ERROR {
+    ## Retrieve Values
+    my $self = shift ;
+    
+    my $ANNOTATION_DA_ERROR = undef ;
+    
+    if ( (defined $self->{_DA_ERROR_}) and ( $self->{_DA_ERROR_} ne '' ) ) {	$ANNOTATION_DA_ERROR = $self->{_DA_ERROR_} ; }
+    else {	 $ANNOTATION_DA_ERROR = 0 ; 
+    	#warn "[WARN] the method _getPeak_ANNOTATION_DA_ERROR can't _getPeak a undef or non numerical value\n" ; 
+	}
+    
+    return ( $ANNOTATION_DA_ERROR ) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _getPeak_ANNOTATION_PPM_ERROR
+
+	## Description : _getPeak_ANNOTATION_PPM_ERROR
+	## Input : void
+	## Output : $ANNOTATION_ID
+	## Usage : my ( $ANNOTATION_ID ) = _getPeak_ANNOTATION_PPM_ERROR () ;
+
+=cut
+
+## START of SUB
+sub _getPeak_ANNOTATION_PPM_ERROR {
+    ## Retrieve Values
+    my $self = shift ;
+    
+    my $ANNOTATION_PPM_ERROR = undef ;
+    
+    if ( (defined $self->{_PPM_ERROR_}) and ( $self->{_PPM_ERROR_} ne '' ) ) {	$ANNOTATION_PPM_ERROR = $self->{_PPM_ERROR_} ; }
+    else {	 $ANNOTATION_PPM_ERROR = 0 ; 
+    	#warn "[WARN] the method _getPeak_ANNOTATION_PPM_ERROR can't _getPeak a undef or non numerical value\n" ; 
+	}
+    
+    return ( $ANNOTATION_PPM_ERROR ) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _getPeak_ANNOTATION_SPECTRA_ID
+
+	## Description : _getPeak_ANNOTATION_SPECTRA_ID
+	## Input : void
+	## Output : $ANNOTATION_ID
+	## Usage : my ( $ANNOTATION_ID ) = _getPeak_ANNOTATION_SPECTRA_ID () ;
+
+=cut
+
+## START of SUB
+sub _getPeak_ANNOTATION_SPECTRA_ID {
+    ## Retrieve Values
+    my $self = shift ;
+    
+    my $ANNOTATION_ID = undef ;
+    
+    if ( (defined $self->{_SPECTRA_ID_}) and ( $self->{_SPECTRA_ID_} ne '' ) ) {	$ANNOTATION_ID = $self->{_SPECTRA_ID_} ; }
+    else {	 $ANNOTATION_ID = undef ; 
+    	#warn "[WARN] the method _getPeak_ANNOTATION_SPECTRA_ID can't _getPeak a undef or non numerical value\n" ; 
+	}
+    
+    return ( $ANNOTATION_ID ) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _setPeak_ANNOTATION_ID
+
+	## Description : _setPeak_ANNOTATION_ID
 	## Input : $ANNOTATION_ID
 	## Output : TRUE
-	## Usage : _setANNOTATION_ID ( $ANNOTATION_ID ) ;
+	## Usage : _setPeak_ANNOTATION_ID ( $ANNOTATION_ID ) ;
 
 =cut
 
@@ -859,7 +1474,35 @@ sub _setPeak_ANNOTATION_ID {
     my ( $ANNOTATION_ID ) = @_;
     
     if ( (defined $ANNOTATION_ID) and ($ANNOTATION_ID ne '')  ) {	$self->{_ID_} = $ANNOTATION_ID ; }
-    else {	carp "[ERROR] the method _setPeak_ANNOTATION_ID can't set any undef or non numerical value\n" ; }
+    else {
+    	$self->{_ID_} = undef ;
+#    	warn "[WARN] the method _setPeak_ANNOTATION_ID is set with undef value\n" ; 
+    }
+    
+    return (0) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _setPeak_ANNOTATION_SPECTRA_ID
+
+	## Description : _setPeak_ANNOTATION_SPECTRA_ID
+	## Input : $ANNOTATION_ID
+	## Output : TRUE
+	## Usage : _setPeak_ANNOTATION_SPECTRA_ID ( $ANNOTATION_ID ) ;
+
+=cut
+
+## START of SUB
+sub _setPeak_ANNOTATION_SPECTRA_ID {
+    ## Retrieve Values
+    my $self = shift ;
+    my ( $ANNOTATION_ID ) = @_;
+    
+    if ( (defined $ANNOTATION_ID) and ($ANNOTATION_ID ne '')  ) {	$self->{_SPECTRA_ID_} = $ANNOTATION_ID ; }
+    else {	
+    	$self->{_SPECTRA_ID_} = undef ;
+#    	warn "[WARN] the method _setPeak_ANNOTATION_SPECTRA_ID is set with undef value\n" ; 
+    }
     
     return (0) ;
 }
@@ -903,10 +1546,13 @@ sub _getPeak_ANNOTATION_FORMULA {
 sub _setPeak_ANNOTATION_FORMULA {
     ## Retrieve Values
     my $self = shift ;
-    my ( $ANNOTATION_FORMULA ) = @_;
+    my ( $VALUE ) = @_;
     
-    if ( (defined $ANNOTATION_FORMULA) and ($ANNOTATION_FORMULA ne '')  ) {	$self->{_ANNOTATION_FORMULA_} = $ANNOTATION_FORMULA ; }
-    else {	carp "[ERROR] the method _setANNOTATION_FORMULA can't set any undef or non numerical value\n" ; }
+    if ( (defined $VALUE) and ($VALUE ne '')  ) {	$self->{_ANNOTATION_FORMULA_} = $VALUE ; }
+    else {	
+    	$self->{_ANNOTATION_FORMULA_} = undef ;
+#    	warn "[WARN] the method _setANNOTATION_FORMULA is set with undef value\n" ; 
+    }
     
     return (0) ;
 }
@@ -928,7 +1574,10 @@ sub _setPeak_ANNOTATION_ONLY_IN {
     my ( $ANNOTATION_ONLY_IN ) = @_;
     
     if ( (defined $ANNOTATION_ONLY_IN) and ( ($ANNOTATION_ONLY_IN eq 'POS' ) or ($ANNOTATION_ONLY_IN eq 'NEG') )  ) {	$self->{_ANNOTATION_ONLY_IN_} = $ANNOTATION_ONLY_IN ; }
-    else {	carp "[ERROR] the method _setPeak_ANNOTATION_ONLY_IN can't set any undef or value diff from POS or NEG\n" ; }
+    else {	
+    	$self->{_ANNOTATION_ONLY_IN_} = undef ;
+#    	warn "[WARN] the method _setPeak_ANNOTATION_ONLY_IN is set with undef value\n" ; 
+	}
     
     return (0) ;
 }
@@ -975,7 +1624,10 @@ sub _setPeak_ANNOTATION_SMILES {
     my ( $VALUE ) = @_;
     
     if ( (defined $VALUE) and ($VALUE ne '')  ) {	$self->{_ANNOTATION_SMILES_} = $VALUE ; }
-    else {	carp "[ERROR] the method _setPeak_ANNOTATION_SMILES can't set any undef or non numerical value\n" ; }
+    else {	
+    	$self->{_ANNOTATION_SMILES_} = undef ;
+#    	warn "[WARN] the method _setPeak_ANNOTATION_SMILES is set with undef value\n" ; 
+	}
     
     return (0) ;
 }
@@ -997,12 +1649,96 @@ sub _getPeak_ANNOTATION_INCHIKEY {
     
     my $VALUE = undef ;
     
-    if ( (defined $self->{_ANNOTATION_INCHIKEY_}) and ( $self->{_ANNOTATION_INCHIKEY_} ne '' ) ) {	$VALUE = $self->{_INCHIKEY_} ; }
+    if ( (defined $self->{_ANNOTATION_INCHIKEY_}) and ( $self->{_ANNOTATION_INCHIKEY_} ne '' ) ) {	$VALUE = $self->{_ANNOTATION_INCHIKEY_} ; }
     else {	 $VALUE = undef ; 
     	#warn "[WARN] the method _getPeak_ANNOTATION_INCHIKEY can't _getPeak a undef or non numerical value\n" ; 
 	}
     
     return ( $VALUE ) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _getPeak_ANNOTATIONS
+
+	## Description : _getPeak_ANNOTATIONS
+	## Input : void
+	## Output : $VALUE
+	## Usage : my ( $VALUE ) = _getPeak_ANNOTATIONS () ;
+
+=cut
+
+## START of SUB
+sub _getPeak_ANNOTATIONS {
+    ## Retrieve Values
+    my $self = shift ;
+    
+    my $VALUES = undef ;
+    
+    if ( ( $self->{_ANNOTATIONS_} ) and ( scalar ($self->{_ANNOTATIONS_}) > 0 ) ) {	$VALUES = $self->{_ANNOTATIONS_} ; }
+    else {	 $VALUES = [] ; 
+    	#warn "[WARN] the method _getPeak_ANNOTATION_SMILES can't _getPeak a undef or non numerical value\n" ; 
+	}
+    
+    return ( $VALUES ) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _getPeak_ANNOTATION_SPECTRAL_IDS
+
+	## Description : _getPeak_ANNOTATION_SPECTRAL_IDS
+	## Input : void
+	## Output : $VALUE
+	## Usage : my ( $VALUE ) = _getPeak_ANNOTATION_SPECTRAL_IDS () ;
+
+=cut
+
+## START of SUB
+sub _getPeak_ANNOTATION_SPECTRAL_IDS {
+    ## Retrieve Values
+    my $self = shift ;
+    
+    my $VALUES = undef ;
+    
+    if ( ( $self->{_ANNOTATION_SPECTRAL_IDS_} ) ) {	
+    	if ( ( scalar ($self->{_ANNOTATION_SPECTRAL_IDS_}) > 0 ) ) {
+    		$VALUES = $self->{_ANNOTATION_SPECTRAL_IDS_} ;
+    	}
+    	else {
+    		warn "[WARN]  _ANNOTATION_SPECTRAL_IDS_ returns a void list\n";
+    	}
+    }
+    else {	 $VALUES = [] ; 
+    	#warn "[WARN] the method _getPeak_ANNOTATION_SPECTRAL_IDS can't _getPeak a undef or non numerical value\n" ; 
+	}
+    
+    return ( $VALUES ) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _setPeak_ANNOTATION_SPECTRAL_IDS
+
+	## Description : _setPeak_ANNOTATION_SPECTRAL_IDS
+	## Input : $VALUE
+	## Output : TRUE
+	## Usage : _setPeak_ANNOTATION_SPECTRAL_IDS ( $VALUE ) ;
+
+=cut
+
+## START of SUB
+sub _setPeak_ANNOTATION_SPECTRAL_IDS {
+    ## Retrieve Values
+    my $self = shift ;
+    my ( $VALUE ) = @_;
+    
+    if ( (defined $VALUE) and ($VALUE ne '')  ) {
+    	push (@{$self->{_ANNOTATION_SPECTRAL_IDS_}}, $VALUE) ;	
+    } 
+    else {
+    	$self->{_ANNOTATION_SPECTRAL_IDS_} = [] ;
+#    	warn "[WARN] the method _setPeak_ANNOTATION_SPECTRAL_IDS is set with empty array\n" ; 
+	}
+    
+    return (0) ;
 }
 ### END of SUB
 
@@ -1022,7 +1758,10 @@ sub _setPeak_ANNOTATION_INCHIKEY {
     my ( $VALUE ) = @_;
     
     if ( (defined $VALUE) and ($VALUE ne '')  ) {	$self->{_ANNOTATION_INCHIKEY_} = $VALUE ; }
-    else {	carp "[ERROR] the method _setPeak_ANNOTATION_INCHIKEY can't set any undef or non numerical value\n" ; }
+    else {
+    	$self->{_ANNOTATION_INCHIKEY_} = undef ;
+#    	warn "[WARN] the method _setPeak_ANNOTATION_INCHIKEY is set with undef value\n" ; 
+	}
     
     return (0) ;
 }
@@ -1069,7 +1808,10 @@ sub _setPeak_ANNOTATION_IS_A_PRECURSOR {
     my ( $VALUE ) = @_;
     
     if ( (defined $VALUE) and ($VALUE ne '')  ) {	$self->{_ANNOTATION_IS_A_PRECURSOR_} = $VALUE ; }
-    else {	carp "[ERROR] the method _setPeak_ANNOTATION_IS_A_PRECURSOR can't set any undef or non numerical value\n" ; }
+    else {
+    	$self->{_ANNOTATION_IS_A_PRECURSOR_} = undef ;
+#    	warn "[WARN] the method _setPeak_ANNOTATION_IS_A_PRECURSOR is set with undef value\n" ; 
+	}
     
     return (0) ;
 }
@@ -1116,7 +1858,10 @@ sub _setPeak_ANNOTATION_IS_A_METABOLITE {
     my ( $VALUE ) = @_;
     
     if ( (defined $VALUE) and ($VALUE ne '')  ) {	$self->{_ANNOTATION_IS_A_METABOLITE_} = $VALUE ; }
-    else {	carp "[ERROR] the method _setPeak_ANNOTATION_IS_A_METABOLITE can't set any undef or non numerical value\n" ; }
+    else {
+    	$self->{_ANNOTATION_IS_A_METABOLITE_} = undef ;
+#    	warn "[WARN] the method _setPeak_ANNOTATION_IS_A_METABOLITE  is set with undef value\n" ; 
+	}
     
     return (0) ;
 }

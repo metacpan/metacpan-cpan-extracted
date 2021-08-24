@@ -1,17 +1,22 @@
 package Google::RestApi::SheetsApi4;
 
-our $VERSION = '0.7';
+our $VERSION = '0.8';
 
 use Google::RestApi::Setup;
+
+use Module::Load qw(load);
+use Try::Tiny;
+use YAML::Any qw(LoadFile);
 
 use aliased 'Google::RestApi::DriveApi3';
 use aliased 'Google::RestApi::SheetsApi4::Spreadsheet';
 
 # TODO: switch to ReadOnly
 use constant {
+  Sheets_Endpoint    => "https://sheets.googleapis.com/v4/spreadsheets",
   Spreadsheet_Filter => "mimeType='application/vnd.google-apps.spreadsheet'",
   Spreadsheet_Id     => DriveApi3->Drive_File_Id,
-  Spreadsheet_Uri    => "^https://docs.google.com/spreadsheets/d",
+  Spreadsheet_Uri    => "https://docs.google.com/spreadsheets/d",
   Worksheet_Id       => "[0-9]+",
   Worksheet_Uri      => "[#&]gid=([0-9]+)",
 };
@@ -20,10 +25,10 @@ sub new {
   my $class = shift;
 
   state $check = compile_named(
-    api      => HasMethods[qw(api)],
-    drive    => HasMethods[qw(filter_files)], { optional => 1 },
-    endpoint => Str, { default => 'https://sheets.googleapis.com/v4/spreadsheets' },
-    config   => HashRef, { optional => 1 },
+    api           => HasMethods[qw(api)],
+    drive         => HasMethods[qw(filter_files)], { optional => 1 },
+    endpoint      => Str, { default => Sheets_Endpoint },
+    sheets_config => ReadableFile|HashRef, { optional => 1 },
   );
   my $self = $check->(@_);
 
@@ -57,9 +62,7 @@ sub create_spreadsheet {
 
   my $result = $self->api(
     method  => 'post',
-    content => {
-      properties => $p,
-    },
+    content => { properties => $p },
   );
   for (qw(spreadsheetId spreadsheetUrl properties)) {
     $result->{$_} or LOGDIE "No '$_' returned from creating spreadsheet";
@@ -97,8 +100,7 @@ sub delete_all_spreadsheets {
   my $self = shift;
   state $check = compile(Str);
   my ($name) = $check->(@_);
-  my $spreadsheets = $self->spreadsheets();
-  my @spreadsheets = grep { $_->{name} eq $name; } @{ $spreadsheets->{files} };
+  my @spreadsheets = grep { $_->{name} eq $name; } $self->spreadsheets();
   DEBUG(sprintf("Deleting %d spreadsheets for name '$name'", scalar @spreadsheets));
   $self->delete_spreadsheet($_->{id}) foreach (@spreadsheets);
   return scalar @spreadsheets;
@@ -107,26 +109,40 @@ sub delete_all_spreadsheets {
 sub spreadsheets {
   my $self = shift;
   my $drive = $self->drive();
-  return $drive->filter_files(Spreadsheet_Filter);
+  my $spreadsheets = $drive->filter_files(Spreadsheet_Filter);
+  my @spreadsheets = map { { id => $_->{id}, name => $_->{name} }; } @{ $spreadsheets->{files} };
+  return @spreadsheets;
 }
 
 sub drive {
   my $self = shift;
   if (!$self->{drive}) {
-    require Google::RestApi::DriveApi3;  # doesn't support 'aliased'
+    load DriveApi3;
     $self->{drive} = DriveApi3->new(api => $self->rest_api());
   }
   return $self->{drive};
 }
 
-sub config {
+sub sheets_config {
   my $self = shift;
-  my $config = $self->{config} or return;
+  my $config = $self->{sheets_config} or return;
+
+  if (!ref($config)) {
+    try {
+      $config = LoadFile($config);
+    } catch {
+      my $err = $_;
+      LOGDIE("Unable to load sheets config file '$config': $err");
+    };
+    $self->{sheets_config} = $config;
+  }
+
   my $key = shift;
   return defined $key ? $config->{$key} : $config;
 }
 
-sub open_spreadsheet { Spreadsheet->new(sheets => shift, @_); }
+sub open_spreadsheet { Spreadsheet->new(sheets_api => shift, @_); }
+sub transaction { shift->rest_api()->transaction(); }
 sub stats { shift->rest_api()->stats(); }
 sub rest_api { shift->{api}; }
 
@@ -145,8 +161,8 @@ Google::RestApi::SheetsApi4 - API to Google Sheets API V4.
  use aliased Google::RestApi;
  use aliased Google::RestApi::SheetsApi4;
 
- $rest = RestApi->new(%config);
- $sheets = SheetsApi4->new(api => $rest);
+ $rest_api = RestApi->new(%config);
+ $sheets_api = SheetsApi4->new(api => $rest_api);
  $sheet = $sheets->create_spreadsheet(title => 'my_name');
  $ws0 = $sheet->open_worksheet(id => 0);
 
@@ -184,7 +200,7 @@ Google::RestApi::SheetsApi4 - API to Google Sheets API V4.
  $row = $ws0->range_row("C1:1");
  $row = $ws0->range_row([<false>, 1]);
  $row = $ws0->range_row({row => 1});
- $row = $ws0->range_row([col => 3, row => 1 }, {row => 1}]);
+ $row = $ws0->range_row([{col => 3, row => 1 }, {row => 1}]);
 
  # add a header:
  $row = $ws0->range_row(1);
@@ -232,7 +248,7 @@ Google::RestApi::SheetsApi4 - API to Google Sheets API V4.
  $rows->{Id}->bold()->center();
  $rows->{Name}->red();
  # turn off fetch range and submit the formatting:
- tied(%$rows)->fetch_range()->submit_requests();
+ tied(%$rows)->fetch_range(0)->submit_requests();
 
  # iterators can be used to step through ranges:
  # a basic iterator on a column:

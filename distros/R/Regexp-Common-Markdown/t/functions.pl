@@ -7,6 +7,7 @@ BEGIN
 sub run_tests
 {
     my $tests = shift( @_ );
+    no warnings qw( experimental::vlb );
     my $opts  = {};
     $opts = shift( @_ ) if( ref( $_[0] ) eq 'HASH' );
     for( my $i = 0; $i < scalar( @$tests ); $i++ )
@@ -72,7 +73,7 @@ sub dump_tests
         }
         else
         {
-            print( "Test ", $i + 1, ( length( $name ) ? " ($name)" : '' ), " failed: '$test'\n\n" );
+            print( "Test ", $i + 1, ( length( $name ) ? " ($name)" : '' ), " failed (", $expect->{fail} ? 'expected' : 'unexpected', "): '$test'\n\n" );
         }
     }
 }

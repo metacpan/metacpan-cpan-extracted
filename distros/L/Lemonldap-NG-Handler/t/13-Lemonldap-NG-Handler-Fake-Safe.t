@@ -5,7 +5,7 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-use Test::More tests => 14;
+use Test::More tests => 16;
 require 't/test.pm';
 BEGIN { use_ok('Lemonldap::NG::Handler::Main::Jail') }
 
@@ -43,8 +43,9 @@ my $checkDate = $jail->jail_reval($sub3);
 ok( &$checkDate == "1",
     'checkDate extended function working without Safe Jail' );
 
-my $sub4      = "sub { return(checkDate('20000101000000+0100','21000101000000+0100')) }";
-my $checkDate = $jail->jail_reval($sub4);
+my $sub4 =
+  "sub { return(checkDate('20000101000000+0100','21000101000000+0100')) }";
+$checkDate = $jail->jail_reval($sub4);
 ok( &$checkDate == "1",
     'checkDate extended function working without Safe Jail' );
 
@@ -95,4 +96,13 @@ is(
     ),
     0,
     "Function works"
+);
+
+$sub  = "sub { return(";
+$code = $jail->jail_reval($sub);
+ok( ( not defined($code) ), 'Syntax error yields undef result' );
+like(
+    $jail->error,
+    qr/Missing right curly or square bracket/,
+    'Found correct error message'
 );

@@ -23,7 +23,7 @@ my $client = LLNG::Manager::Test->new( {
             findUserControl             => '^[\w*\s]+$',
             findUserWildcard            => '*',
             findUserSearchingAttributes => {
-                uid => 'User',
+                'uid##1' => 'User',
             },
             authChoiceModules => {
                 strong => 'Apache;Demo;Null;;;{}',
@@ -63,7 +63,7 @@ ok(
 ( $host, $url, $query ) = expectForm( $res, '#', undef, 'uid' );
 ok(
     $res->[2]->[0] =~
-m%<input id="spoofIdfield" name="spoofId" type="text" class="form-control" value="" autocomplete="off"%,
+m%<input name="spoofId" type="text" class="form-control" value="" autocomplete="off"%,
     'value=""'
 ) or explain( $res->[2]->[0], 'value=""' );
 ok(

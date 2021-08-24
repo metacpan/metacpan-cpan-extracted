@@ -406,7 +406,9 @@ sub tests {
         },
 
         samlSignatureOverrideNeedsCertificate => sub {
-            return 1 if $conf->{samlServicePublicKeySig} =~ /CERTIFICATE/;
+            return 1
+              if $conf->{samlServicePublicKeySig}
+              && $conf->{samlServicePublicKeySig} =~ /CERTIFICATE/;
 
             my @offenders;
             for my $idp ( keys %{ $conf->{samlIDPMetaDataOptions} } ) {
@@ -693,7 +695,7 @@ sub tests {
                 abs $_;
               }
               grep { /\d+/ }
-              split /\s*,\s*/, $conf->{bruteForceProtectionLockTimes};
+              split /\s*,\s*/, $conf->{bruteForceProtectionLockTimes} || '';
             $conf->{bruteForceProtectionLockTimes} = join ', ', @lockTimes
               if scalar @lockTimes;
             return 1 unless ( $conf->{bruteForceProtection} );

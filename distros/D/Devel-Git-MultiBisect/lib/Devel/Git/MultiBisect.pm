@@ -1,7 +1,7 @@
 package Devel::Git::MultiBisect;
 use strict;
 use warnings;
-use v5.10.0;
+use v5.14.0;
 use Devel::Git::MultiBisect::Init;
 use Devel::Git::MultiBisect::Auxiliary qw(
     clean_outputfile
@@ -14,7 +14,7 @@ use File::Spec;
 use File::Temp;
 use List::Util qw(sum);
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 =head1 NAME
 

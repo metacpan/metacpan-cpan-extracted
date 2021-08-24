@@ -297,6 +297,7 @@ sub _render_makefile_pl {
   $args->{BUILD_REQUIRES} = $r;
   $r                      = $prereqs->requirements_for(qw(test requires))->as_string_hash;
   $args->{TEST_REQUIRES}  = $r;
+  $args->{RECOMMENDS}     = $prereqs->requirements_for(qw(runtime recommends))->as_string_hash;
   $args->{CONTRIBUTORS}   = [split /,\s*/, $self->config('contributors')];
 
   $self->render_template('Makefile.PL', $args);
@@ -724,6 +725,12 @@ my %WriteMakefileArgs = (
   META_MERGE     => {
     'dynamic_config' => 0,
     'meta-spec'      => {version => 2},
+% if (%{$RECOMMENDS //{}}) {
+    'prereqs'        => {
+      'runtime' =>
+        {'recommends' => <%= $ship->dump($RECOMMENDS) %>}
+    },
+% }
     'resources'      => {
       bugtracker => {web => '<%= $ship->config('bugtracker') %>'},
       homepage   => '<%= $ship->config('homepage') %>',

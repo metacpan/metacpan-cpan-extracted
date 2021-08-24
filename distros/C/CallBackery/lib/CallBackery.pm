@@ -34,7 +34,7 @@ use CallBackery::Plugin::Doc;
 use CallBackery::Database;
 use CallBackery::User;
 
-our $VERSION = '0.38.18';
+our $VERSION = '0.39.0';
 use Mojo::Base 'Mojolicious';
 
 =head2 config
@@ -129,8 +129,12 @@ sub startup {
     $app->config->postProcessCfg();
     my $gcfg = $app->config->cfgHash->{BACKEND};
     if ($gcfg->{log_file}){
-        open my $file, '>>', $gcfg->{log_file} or die "opening logfile $gcfg->{log_file}: $!\n";
-        $app->log->handle($file);
+        if (open my $file, '>>', $gcfg->{log_file}){
+           $app->log->handle($file);
+        }
+        else {
+           $app->log->debug("Opening $gcfg->{log_file}: $!");
+        }
     }
 
     unshift @{$app->static->paths}, 

@@ -17,7 +17,7 @@ use JSON;
 use Lemonldap::NG::Common::Conf::Constants;
 use Lemonldap::NG::Common::PSGI::Constants;
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.13';
 
 extends qw(
   Lemonldap::NG::Handler::PSGI::Router
@@ -369,7 +369,7 @@ see L<Lemonldap::NG::Manager::Conf::Parser> before.
 =head1 DOWNLOAD
 
 Lemonldap::NG is available at
-L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
+L<https://lemonldap-ng.org/download>
 
 =head1 COPYRIGHT AND LICENSE
 

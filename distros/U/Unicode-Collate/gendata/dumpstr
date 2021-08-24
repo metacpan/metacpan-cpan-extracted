@@ -19,7 +19,7 @@ sub element ($) {
     return $u;
 }
 
-# return a string such as '"a\x{301}"', q|pack('U', 0xFF)|, etc
+# return a string such as '"a\x{301}"', q|_pack_U(0xFF)|, etc
 sub string ($) {
     my $s = shift;
     my @u = unpack 'U*', $s;
@@ -30,9 +30,8 @@ sub string ($) {
 	    $ret .= "\\" if $c !~ /^[0-9A-Za-z_]\z/;
 	    $ret .= $c;
 	} elsif (0x80 <= $u && $u <= 0xFF) {
-	    my $temp = @u == 1 ? "'U'" : "'U*'";
 	    my $hexa = join ', ', map sprintf("0x%X", $_), @u;
-	    return "pack($temp, $hexa)";
+	    return "_pack_U($hexa)";
 	} else {
 	    $ret .= sprintf '\x{%X}', $u;
 	}
@@ -71,8 +70,8 @@ sub test_dumpstr () {
     push @not_ok, 5 if element($b) ne '00FF';
     push @not_ok, 6 if element($c) ne '3042 00FF';
     push @not_ok, 7 if string ($a) ne '"a\x{301}"';
-    push @not_ok, 8 if string ($b) ne q|pack('U', 0xFF)|;
-    push @not_ok, 9 if string ($c) ne q|pack('U*', 0x3042, 0xFF)|;
+    push @not_ok, 8 if string ($b) ne q|_pack_U(0xFF)|;
+    push @not_ok, 9 if string ($c) ne q|_pack_U(0x3042, 0xFF)|;
     print @not_ok ? "not ok\n@not_ok" : "all ok\n";
 }
 

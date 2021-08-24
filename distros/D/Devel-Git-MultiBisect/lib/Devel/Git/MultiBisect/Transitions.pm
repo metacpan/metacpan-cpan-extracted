@@ -1,7 +1,7 @@
 package Devel::Git::MultiBisect::Transitions;
 use strict;
 use warnings;
-use v5.10.0;
+use v5.14.0;
 use parent ( qw| Devel::Git::MultiBisect | );
 use Devel::Git::MultiBisect::Opts qw( process_options );
 use Devel::Git::MultiBisect::Auxiliary qw(
@@ -14,7 +14,7 @@ use Cwd;
 use File::Temp;
 use List::Util qw(first sum);
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 =head1 NAME
 

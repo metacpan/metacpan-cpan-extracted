@@ -1411,7 +1411,7 @@ ticket.
 =head1 DOWNLOAD
 
 Lemonldap::NG is available at
-L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
+L<https://lemonldap-ng.org/download>
 
 =head1 COPYRIGHT AND LICENSE
 

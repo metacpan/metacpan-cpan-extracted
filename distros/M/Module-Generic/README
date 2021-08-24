@@ -56,7 +56,7 @@ SYNOPSIS
         }
 
 VERSION
-        v0.15.6
+        v0.15.8
 
 DESCRIPTION
     Module::Generic as its name says it all, is a generic module to inherit
@@ -392,7 +392,7 @@ METHODS
 
         my $obj My::Module->new( 'verbose' => 1, 'debug' => 0 );
 
-    You may want to superseed "init" to have suit your needs.
+    You may want to superseed "init" to have it suit your needs.
 
     "init" needs to returns the object it received in the first place or an
     error if something went wrong, such as:
@@ -423,6 +423,12 @@ METHODS
     *_init_strict_use_sub* is set to true, "init" will call each method
     corresponding to the key name and pass it the key value and it will set
     an error and skip it if the corresponding method does not exist.
+    Otherwise, it calls each corresponding method and pass it whatever value
+    was provided and check for that method return value. If the return value
+    is "undef" in perlfunc and the value provided is not itself "undef",
+    then it issues a warning and return the "error" that is assumed having
+    being set by that method.
+
     Otherwise if the object property *_init_strict* is set to true, it will
     check the object property matching the hash key for the default value
     type and set an error and return undef if it does not match. Foe
@@ -898,6 +904,17 @@ SPECIAL METHODS
 
     This returns an empty hash reference, because although the first
     parameter is an hash reference, there is more than on parameter.
+
+  _get_stack_trace
+    This will return a Devel::StackTrace object initiated with the following
+    options set:
+
+    *indent* 1
+        This will set an initial indent tab
+
+    *skip_frames* 1
+        This is set to 1 so this very method is not included in the frames
+        stack
 
   _is_a
     Provided with an object and a package name and this will return true if

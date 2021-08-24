@@ -1,0 +1,22 @@
+Revision history for Config-XrmDatabase
+
+0.02      2021-08-20 14:54:32-04:00 America/New_York
+
+  [BUILD]
+
+   * don't run tests matching against the Xresources code results if AUTOMATED_TESTING is set.
+
+  [ENHANCEMENTS]
+
+   * database entries keep track of how many times they've been
+     matched.
+
+   * new to_kv() method which returns the DB has a hash.
+
+   * to_kv() can return the number of times a key was successfully
+     matched by queries against the database
+
+
+0.01      2021-08-19 15:09:41-04:00 America/New_York
+
+* First release upon an unsuspecting world.

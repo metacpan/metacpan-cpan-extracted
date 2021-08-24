@@ -27,8 +27,10 @@ sub init
 {
     my $self = shift( @_ );
     $self->{having} = '';
+    $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ );
     $self->{binded_having} = [];
+    $self->{query_reset_keys} = [qw( alias binded binded_values binded_where binded_limit binded_group binded_having binded_order from_unixtime group_by limit local _on_conflict on_conflict order_by reverse sorted unix_timestamp where )];
     return( $self );
 }
 
@@ -172,21 +174,8 @@ sub on_conflict
                     $self->{_on_conflict_callback} = sub
                     {
                         my $f_ref = $self->{_args};
-                        $self->message( 3, "Re-using the insert query parameters: ", join( ', ', @$f_ref ) );
-                        # Need to account for placeholders
-                        # Let's check values only
-                        # XXX The format_update call already does add the binded types
-#                         my $binded_types = [];
-#                         for( my $i = 1; $i < scalar( @$f_ref ); $i += 2 )
-#                         {
-#                             if( $f_ref->[$i] eq '?' )
-#                             {
-#                                 # Setting a blank will force the DB::Object::Statement to figure out the type
-#                                 CORE::push( @$binded_types, '' );
-#                             }
-#                         }
-#                         $self->binded_types->push( @$binded_types ) if( scalar( @$binded_types ) );
-                        $self->messagef( 3, "So far, there are %d binded types.", $self->binded_types->length );
+                        # $self->message( 3, "Re-using the insert query parameters: ", join( ', ', @$f_ref ) );
+                        # $self->messagef( 3, "So far, there are %d binded types.", $self->binded_types->length );
                         $self->is_upsert(1);
                         my $inherited_fields = $self->format_update( $f_ref );
                         $self->message( 3, "Update query fields are: ", $inherited_fields );
@@ -231,7 +220,7 @@ sub on_conflict
             
                 foreach my $k ( sort( keys( %{$opts->{fields}} ) ) )
                 {
-                    push( @$q, sprintf( '%s = %s', $k, ref( $opts->{fields}->{ $k } ) eq 'SCALAR' ? ${$opts->{fields}->{ $k }} : $tbl_o->quote( $opts->{fields}->{ $k } ) ) );
+                    push( @$q, sprintf( '%s = %s', $k, ref( $opts->{fields}->{ $k } ) eq 'SCALAR' ? ${$opts->{fields}->{ $k }} : $tbl_o->database_object->quote( $opts->{fields}->{ $k } ) ) );
                 }
                 if( scalar( @$q ) )
                 {
@@ -279,7 +268,7 @@ sub reset
     my $self = shift( @_ );
     if( !$self->{query_reset} )
     {
-        my $keys = [qw( alias local binded binded_values binded_where binded_limit binded_group binded_having binded_order where limit group_by on_conflict _on_conflict order_by reverse from_unixtime unix_timestamp sorted )];
+        my $keys = [qw( alias binded binded_values binded_where binded_limit binded_group binded_having binded_order from_unixtime group_by limit local _on_conflict on_conflict order_by reverse sorted unix_timestamp where )];
         CORE::delete( @$self{ @$keys } );
         $self->{query_reset}++;
         $self->{enhance} = 1;
@@ -324,6 +313,7 @@ sub _query_components
 {
     my $self = shift( @_ );
     my $type = lc( shift( @_ ) ) || $self->_query_type() || return( $self->error( "You must specify a query type: select, insert, update or delete" ) );
+    my $opts = $self->_get_args_as_hash( @_ );
     my $tbl_o = $self->{table_object} || return( $self->error( "No table object is set." ) );
     my( $where, $group, $having, $sort, $order, $limit, $returning, $on_conflict );
     $where  = $self->where();

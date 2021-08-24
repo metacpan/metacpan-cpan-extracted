@@ -1,20 +1,28 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
 
-package Tickit::Async;
+package Tickit::Async 0.25;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Tickit IO::Async::Notifier );
-Tickit->VERSION( '0.71' ); # Full `watch_io` callback
+Tickit->VERSION( '0.72' ); # ->_new_with_evloop with signal/process
 IO::Async::Notifier->VERSION( '0.43' ); # Need support for being a nonprinciple mixin
-
-our $VERSION = '0.24';
 
 use IO::Async::Loop 0.47; # ->run and ->stop methods
 use IO::Async::Stream;
+
+# TODO: It'd be lovely if IO::Async::OS provided this
+{
+   require Config;
+   my @signames = split ' ', $Config::Config{sig_name};
+   my @signums  = split ' ', $Config::Config{sig_num};
+
+   my %signum2name; @signum2name{@signums} = @signames;
+   sub signum2name { return $signum2name{ +shift } };
+}
 
 =head1 NAME
 
@@ -22,20 +30,20 @@ C<Tickit::Async> - use C<Tickit> with C<IO::Async>
 
 =head1 SYNOPSIS
 
- use IO::Async;
- use Tickit::Async;
+   use IO::Async;
+   use Tickit::Async;
 
- my $tickit = Tickit::Async->new;
+   my $tickit = Tickit::Async->new;
 
- # Create some widgets
- # ...
+   # Create some widgets
+   # ...
 
- $tickit->set_root_widget( $rootwidget );
+   $tickit->set_root_widget( $rootwidget );
 
- my $loop = IO::Async::Loop->new;
- $loop->add( $tickit );
+   my $loop = IO::Async::Loop->new;
+   $loop->add( $tickit );
 
- $tickit->run;
+   $tickit->run;
 
 =head1 DESCRIPTION
 
@@ -96,17 +104,17 @@ sub _make_tickit
    my $signalid;
 
    return Tickit::_Tickit->_new_with_evloop( $term,
-      sub { # init
+      init => sub {
          $signalid = $loop->attach_signal( WINCH => $_[0] );
       },
-      sub { # destroy
+      destroy => sub {
          warn "TODO: destroy\n";
       },
 
-      sub { $loop->run },
-      sub { $loop->stop },
+      run  => sub { $loop->run },
+      stop => sub { $loop->stop },
 
-      sub {
+      io => sub {
          my ( $fh, $cond, $iowatch ) = @_;
          $loop->watch_io(
             handle => $fh,
@@ -115,19 +123,42 @@ sub _make_tickit
             ( $cond & Tickit::IO_HUP ) ? ( on_hangup      => sub { $iowatch->( Tickit::IO_HUP ) } ) : (),
          );
       },
-      sub { $loop->unwatch_io( handle => $_[0], on_read_ready => 1     ) },
+      cancel_io => sub { $loop->unwatch_io( handle => $_[0], on_read_ready => 1     ) },
 
-      sub {
+      timer =>  sub {
          my ( $time, $watch ) = @_;
          return $loop->watch_time( at => $time, code => $watch );
       },
-      sub { $loop->unwatch_time( $_[0] ) },
+      cancel_timer => sub { $loop->unwatch_time( $_[0] ) },
 
-      sub {
+      later => sub {
          my ( $watch ) = @_;
          $loop->watch_idle( when => "later", code => $watch );
       },
-      sub { warn "TODO: cancel idle" },
+      cancel_later => sub { warn "TODO: cancel idle" },
+
+      signal => sub {
+         my ( $signum, $watch ) = @_;
+         my $signame = signum2name( $signum );
+         return [ $signame => $loop->attach_signal( $signame => $watch ) ];
+      },
+      cancel_signal => sub {
+         my ( $signame, $id ) = @{ +shift };
+         $loop->detach_signal( $signame => $id );
+      },
+
+      process => sub {
+         my ( $pid, $watch ) = @_;
+         $loop->watch_process( $pid => sub {
+            my ( $pid, $wstatus ) = @_;
+            $watch->( $wstatus );
+         });
+         return $pid;
+      },
+      cancel_process => sub {
+         my ( $pid ) = @_;
+         $loop->unwatch_process( $pid );
+      },
    );
 }
 

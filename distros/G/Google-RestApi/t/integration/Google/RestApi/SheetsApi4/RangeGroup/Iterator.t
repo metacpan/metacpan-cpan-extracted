@@ -1,16 +1,11 @@
-#!/usr/bin/perl
+use Test::Integration::Setup;
 
-use strict;
-use warnings;
-
-use YAML::Any qw(Dump);
 use Test::Most tests => 21;
 
 use aliased "Google::RestApi::SheetsApi4::RangeGroup";
 use aliased "Google::RestApi::SheetsApi4::RangeGroup::Iterator";
 
-use Utils qw(:all);
-init_logger();
+# init_logger($DEBUG);
 
 my $spreadsheet = spreadsheet();
 my $worksheet = $spreadsheet->open_worksheet(id => 0);
@@ -78,7 +73,7 @@ sub to {
   return;
 }
 
-delete_all_spreadsheets($spreadsheet->sheets());
+delete_all_spreadsheets($spreadsheet->sheets_api());
 
 # use YAML::Any qw(Dump);
 # warn Dump($spreadsheet->stats());

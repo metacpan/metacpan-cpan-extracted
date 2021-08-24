@@ -43,6 +43,6 @@
          "web" : "https://github.com/trapd00r/Music-Beets-Info"
       }
    },
-   "version" : "0.002",
+   "version" : "0.004",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

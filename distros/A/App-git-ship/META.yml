@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,7 +33,7 @@ resources:
   bugtracker: https://github.com/jhthorsen/app-git-ship/issues
   homepage: https://github.com/jhthorsen/app-git-ship
   repository: https://github.com/jhthorsen/app-git-ship.git
-version: '0.36'
+version: '0.37'
 x_contributors:
   - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
   - 'mohawk2 <mohawk2@users.noreply.github.com>'

@@ -13,38 +13,7 @@ To install this module type the following:
 
 DEPENDENCIES
 
-This module requires these other modules and libraries:
-
-  aliased
-  autodie
-  autovivification
-  constant
-  Cache::Memory::Simple
-  Carp
-  Exporter
-  Furl
-  Hash::Merge
-  JSON
-  Log::Log4perl
-  List::MoreUtils
-  List::Util
-  Net::OAuth2::Client
-  Net::OAuth2::Profile::WebServer
-  Scalar::Util
-  Storable
-  Sub::Retry
-  Tie::Hash
-  Time::Out
-  ToolSet
-  Type::Params
-  Types::Standard
-  URI
-  URI::QueryParam
-  WWW::Google::Cloud::Auth::ServiceAccount
-  YAML::Any
-  Test::Class::Load
-  Test::MockObject::Extends
-  Test::Most
+See Makefile.PL for a current list of dependencies.
 
 COPYRIGHT AND LICENCE
 

@@ -1,0 +1,6 @@
+number,random_num,book_name,brand,predicted,glossy_cover,has_plastic_layer_on_cover,male_present,female_present,total_people_1,total_people_2,total_people_3,total_people_4,total_people_5_n_above,has_flowers,flower_coverage_more_than_half,has_leaves,leaves_coverage_more_than_half,has_trees,trees_coverage_more_than_half,has_other_living_things,has_fancy_stuff,has_obvious_inanimate_objects,red_shades,blue_shades,yellow_shades,orange_shades,green_shades,purple_shades,brown_shades,black_shades,overall_red_dominant,overall_green_dominant,overall_yellow_dominant,overall_pink_dominant,overall_purple_dominant,overall_orange_dominant,overall_blue_dominant,overall_brown_dominant,overall_black_dominant,overall_white_dominant
+1,0.38530014464677,蔷薇少女馆 5,1,1,0,1,0,1,0,1,0,0,0,1,0,1,0,0,0,0,1,1,1,0,1,1,1,1,1,1,0,0,0,1,0,0,0,0,0,0
+2,0.88386784655411,恰好你在我身边,5,0,1,1,1,1,0,1,0,0,0,0,0,1,1,0,0,0,1,1,0,1,1,1,1,0,1,0,0,1,0,0,0,0,0,0,0,0
+3,0.482162411665931,蝴蝶飞过旧时光,1,1,0,1,0,1,1,0,0,0,0,1,0,0,0,0,0,1,1,1,1,0,1,1,1,0,0,0,0,1,0,0,0,0,0,0,0,0
+4,0.234902885736616,花之小镇1 新月卷耳,1,1,0,1,0,1,1,0,0,0,0,1,1,1,0,0,0,0,0,0,0,1,1,0,1,1,1,0,0,0,0,0,1,0,0,0,0,0
+5,0.183325343579563,冬天该多好，你若尚在场,0,9,0,0,1,1,0,1,0,0,0,1,0,0,0,1,0,0,0,1,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,0

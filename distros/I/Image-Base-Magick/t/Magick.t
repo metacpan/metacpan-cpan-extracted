@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2017 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2017, 2021 Kevin Ryde
 
 # This file is part of Image-Base-Magick.
 #
@@ -53,7 +53,7 @@ if ($have_image_magick) {
   }
 
   # Demand 6.6 or higher for bug fixes.  But not Image::Magick->VERSION(6.6)
-  # as that provokes badness when non-numeric $VERSION='6.6.0'.
+  # since that provokes badness when non-numeric $VERSION='6.6.0'.
   if (defined $im_version && $im_version =~ /([0-9]*(\.[0-9]*)?)/) {
     my $im_two_version = $1;
     if ($im_two_version < 6.6) {
@@ -75,7 +75,7 @@ require Image::Base::Magick;
 #------------------------------------------------------------------------------
 # VERSION
 
-my $want_version = 5;
+my $want_version = 6;
 ok ($Image::Base::Magick::VERSION,
     $want_version,
     'VERSION variable');
@@ -145,8 +145,8 @@ END {
 }
 {
   my $image = Image::Base::Magick->new (-width => 20,
-                                                        -height => 10,
-                                                        -file_format => 'png');
+                                        -height => 10,
+                                        -file_format => 'png');
   $image->save ($percent_filename);
   ok (-e $percent_filename, 1,
       "save() to $percent_filename, -e exists");
@@ -169,8 +169,8 @@ END {
 }
 {
   my $image = Image::Base::Magick->new (-width => 5,
-                                                        -height => 6,
-                                                        -file_format => 'png');
+                                        -height => 6,
+                                        -file_format => 'png');
   $image->save ($num_filename);
   ok (-e $num_filename, 1,
       "save() to $num_filename, -e exists");

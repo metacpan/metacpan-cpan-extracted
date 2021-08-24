@@ -28,6 +28,7 @@ WriteMakefile(
     META_MERGE   => {
         no_index => {
             directory => [qw/demo dlib/],
+            package   => 'Keyword::Simple',
         },
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

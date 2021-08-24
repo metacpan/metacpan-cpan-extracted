@@ -1,6 +1,6 @@
 package Catalyst::Helper::View::Bootstrap;
 
-our $VERSION = '0.0013';
+our $VERSION = '0.0051';
 $VERSION = eval $VERSION;
 
 use strict;
@@ -8,6 +8,10 @@ use warnings;
 use File::Spec;
 use Path::Class qw/dir file/;
 use File::ShareDir qw/dist_dir/;
+
+my @template_files = ();
+my @javascript_files = ();
+my @image_files = ();
 
 sub get_sharedir_file {
     my ($self, @filename) = @_;
@@ -145,7 +149,7 @@ sub _mk_images {
 
 =head1 NAME
 
-Catalyst::Helper::View::Bootstrap - Helper for Twitter Bootstrap and TT view which builds a skeleton web site
+Catalyst::Helper::View::Bootstrap - Helper for Twitter Bootstrap 5 and TT view which builds a skeleton web site
 
 =head1 SYNOPSIS
 
@@ -176,7 +180,7 @@ Catalyst::Helper::View::Bootstrap - Helper for Twitter Bootstrap and TT view whi
 This helper module creates a TT View module.  It goes further than
 Catalyst::Helper::View::TT in that it additionally creates a simple
 set of templates to get you started with your web site presentation
-using Twitter Bootstrap3 from a CDN (Content Delivery Network).
+using Bootstrap 5 from a CDN (Content Delivery Network).
 
 It creates the templates in F<root/> directory underneath your
 main project directory.  In here two further subdirectories are
@@ -188,9 +192,6 @@ The view module that the helper creates is automatically configured
 to locate these templates.
 
 It sets character encoding to utf-8 and it delivers HTML5 pages.
-
-Now you can set BOOTSTRAP_THEME in stash and it will load also bootstrap-theme.css
-
 
 =head2 Default Rendering
 
@@ -243,6 +244,7 @@ Generates the templates.
 
 L<Catalyst>, L<Catalyst::View::TT>, L<Catalyst::Helper>,
 L<Catalyst::Helper::View::TT>
+L<Bootstrap|https://getbootstrap.com/> 
 
 =head1 AUTHORS
 
@@ -276,12 +278,13 @@ __PACKAGE__->config({
     WRAPPER      => 'site/wrapper',
     ERROR        => 'error.tt2',
     TIMER        => 0,
+    ENCODING     => 'utf8',
     render_die   => 1,
 });
 
 =head1 NAME
 
-[% class %] - Catalyst TT Twitter Bootstrap View
+[% class %] - Catalyst TT Twitter Bootstrap 5 View
 
 =head1 SYNOPSIS
 
@@ -360,38 +363,35 @@ __site_html__
 <!DOCTYPE HTML>
 <html>
  <head>
+  <meta charset="utf-8">
   <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>[% template.title or site.title %]</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
 
 [% IF Catalyst.debug; %]
-  <!-- Latest compiled and minified JavaScript -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <!-- Latest compiled and mininied JavaScript -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.css">
 [% ELSE; %]
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
 [% END; %]
-
-[% IF BOOTSTRAP_THEME %]
-  <!-- Optional theme -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-[% END %]
 
   <style type="text/css">
 [% PROCESS ttsite.css %]
+[% bootstrap.page_css %]
   </style>
  </head>
  <body>
 [% content %]
 
 [% IF Catalyst.debug; %]
- <script src="//code.jquery.com/jquery-1.11.3.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.js" crossorigin="anonymous">
 [% ELSE %]
- <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
 [% END %]
+
+<script>
+[% bootstrap.page_js %]
+</script>
  </body>
 </html>
 __site_layout__
@@ -426,7 +426,6 @@ __site_header__
         </div><!--/.navbar-collapse -->
       </div>
     </div>
-
 <!-- END site/header -->
 __site_footer__
 [%~ TAGS star -%]
@@ -459,21 +458,19 @@ You can use the power of <a href="http://www.template-toolkit.org/">Template Too
           <p><a class="btn btn-default" href="http://www.template-toolkit.org/" role="button">View details &raquo;</a></p>
         </div>
         <div class="col-md-4">
-          <h2>Bootstrap 3</h2>
+          <h2>Bootstrap 5</h2>
           <p>Sleek, intuitive, and powerful mobile first front-end framework for faster and easier web development.<br>
              Global CSS settings, fundamental HTML elements styled and enhanced with extensible classes, and an advanced grid system. </p>
           <p><a class="btn btn-default" href="http://getbootstrap.com/" role="button">View details &raquo;</a></p>
        </div>
         <div class="col-md-4">
-          <h2>jQuery or Dojo</h2>
-          <p>jQuery is common, but DojoToolkit is powerful and clean, stable and asynchronous. I would like to substitute jQuery with Dojo 2.0 as soon as it'll be released in 2014.</p>
-          <p><a class="btn btn-default" href="http://dojotoolkit.org/" role="button">View details &raquo;</a></p>
+          <h2>9 years for this simple module</h2>
+          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
         </div>
       </div>
     <hr>
-
-    [% PROCESS site/footer %]
 </div>[%# end of jumbotron %]
+[% PROCESS site/footer %]
 <!-- END of welcome -->
 __message.tt2__
 [%~ TAGS star -%]
@@ -508,22 +505,97 @@ __error.tt2__
 __signin.tt2__
 [% TAGS star -%]
 [% META title = 'Login' %]
-[% # From: http://getbootstrap.com/examples/signin/ %]
-    <div class="container">
-      <div class="row">
+[% # From:  %]
 
-        <form class="form-signin col-md-3 col-md-offset-4" role="form">
-          <h2 class="form-signin-heading">Please sign in</h2>
-          <input type="email" class="form-control" placeholder="Email address" required autofocus>
-          <input type="password" class="form-control" placeholder="Password" required>
-          <label class="checkbox">
-            <input type="checkbox" value="remember-me"> Remember me
-          </label>
-          <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-        </form>
+[% getbootstrap.page_css = BLOCK %]
+    body {
+      background-color: #DADADA;
+    }
+    body > .grid {
+      height: 100%;
+    }
+    .image {
+      margin-top: -100px;
+    }
+    .column {
+      max-width: 450px;
+    }
+[% END %]
 
+[% bootstrap.page_js = BLOCK %]
+$(document)
+    .ready(function() {
+      $('.ui.form')
+        .form({
+          fields: {
+            email: {
+              identifier  : 'email',
+              rules: [
+                {
+                  type   : 'empty',
+                  prompt : 'Please enter your e-mail'
+                },
+                {
+                  type   : 'email',
+                  prompt : 'Please enter a valid e-mail'
+                }
+              ]
+            },
+            password: {
+              identifier  : 'password',
+              rules: [
+                {
+                  type   : 'empty',
+                  prompt : 'Please enter your password'
+                },
+                {
+                  type   : 'length[6]',
+                  prompt : 'Your password must be at least 6 characters'
+                }
+              ]
+            }
+          }
+        })
+      ;
+    })
+  ;
+[% END %]
+
+<div class="ui middle aligned center aligned grid">
+  <div class="column">
+    <h2 class="ui teal image header">
+      <img src="assets/images/logo.png" class="image">
+      <div class="content">
+        Log-in to your account
       </div>
+    </h2>
+    <form class="ui large form">
+      <div class="ui stacked segment">
+        <div class="field">
+          <div class="ui left icon input">
+            <i class="user icon"></i>
+            <input type="text" name="email" placeholder="E-mail address">
+          </div>
+        </div>
+        <div class="field">
+          <div class="ui left icon input">
+            <i class="lock icon"></i>
+            <input type="password" name="password" placeholder="Password">
+          </div>
+        </div>
+        <div class="ui fluid large teal submit button">Login</div>
+      </div>
+
+      <div class="ui error message"></div>
+
+    </form>
+
+    <div class="ui message">
+      New to us? <a href="#">Sign Up</a>
     </div>
+  </div>
+</div>
+
 __ttsite.css__
 [% TAGS star %]
 body {
