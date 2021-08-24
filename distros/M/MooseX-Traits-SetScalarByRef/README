@@ -1,31 +1,30 @@
-MooseX-Traits-SetScalarByRef version 0.01
-=========================================
+MooseX-Traits-SetScalarByRef
+============================
 
 This module provides a method to hold a variable reference as value
 of a Moose Attribute.
 
+You can read a nicely formatted version of the documentation for
+this module online:
+
+    https://metacpan.org/pod/MooseX::Traits::SetScalarByRef
+
 INSTALLATION
 
-To install this module type the following:
+You should be able to install this using your usual method for installing
+modules from CPAN. If you don't have one, have a look at:
 
-   perl Makefile.PL
-   make
-   make test
-   make install
+    http://www.cpan.org/modules/INSTALL.html
 
 DEPENDENCIES
 
-This module requires these other modules and libraries:
+This module requires some other modules and libraries.
+See Makefile.PL for a detailed list. If you are going to install
+via cpan shell or PPM, you don't have to care about.
 
-  Moose v2.0604
-  Moose::Util::TypeConstraints v2.0604
-  ExtUtils::MakeMaker v6.6302
-  Test::More v0.98
-  Scalar::Util v1.27
+COPYRIGHT AND LICENSE
 
-=head1 COPYRIGHT AND LICENSE
-
-Copyright (C) 2014 by Alex Becker
+Copyright (C) 2014-2021 by Alexander Becker
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.16.3 or,

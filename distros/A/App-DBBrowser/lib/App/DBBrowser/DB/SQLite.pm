@@ -38,25 +38,17 @@ sub get_db_driver {
 
 sub set_attributes {
     my ( $sf ) = @_;
-    if ( DBD::SQLite->VERSION >= 1.68 ) {
-        my $values = [
-            DBD_SQLITE_STRING_MODE_PV               . ' DBD_SQLITE_STRING_MODE_PV',
-            DBD_SQLITE_STRING_MODE_BYTES            . ' DBD_SQLITE_STRING_MODE_BYTES',
-            DBD_SQLITE_STRING_MODE_UNICODE_NAIVE    . ' DBD_SQLITE_STRING_MODE_UNICODE_NAIVE',
-            DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK . ' DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK',
-            DBD_SQLITE_STRING_MODE_UNICODE_STRICT   . ' DBD_SQLITE_STRING_MODE_UNICODE_STRICT',
-        ];
-        return [
-            { name => 'sqlite_string_mode',         default => 3, values => $values },
-            { name => 'sqlite_see_if_its_a_number', default => 1, values => [ 0, 1 ] },
-        ];
-    }
-    else {
-        return [
-            { name => 'sqlite_unicode',             default => 1, values => [ 0, 1 ] },
-            { name => 'sqlite_see_if_its_a_number', default => 1, values => [ 0, 1 ] },
-        ];
-    }
+    my $values = [
+        DBD_SQLITE_STRING_MODE_PV               . ' DBD_SQLITE_STRING_MODE_PV',
+        DBD_SQLITE_STRING_MODE_BYTES            . ' DBD_SQLITE_STRING_MODE_BYTES',
+        DBD_SQLITE_STRING_MODE_UNICODE_NAIVE    . ' DBD_SQLITE_STRING_MODE_UNICODE_NAIVE',
+        DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK . ' DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK',
+        DBD_SQLITE_STRING_MODE_UNICODE_STRICT   . ' DBD_SQLITE_STRING_MODE_UNICODE_STRICT',
+    ];
+    return [
+        { name => 'sqlite_string_mode',         default => 3, values => $values },
+        { name => 'sqlite_see_if_its_a_number', default => 1, values => [ 0, 1 ] },
+    ];
 }
 
 

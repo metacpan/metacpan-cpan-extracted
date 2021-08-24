@@ -73,7 +73,7 @@ sub commit_sql {
             my $tp = Term::TablePrint->new( $sf->{o}{table} );
             $tp->print_table(
                 $all_arrayref,
-                { info => $info, prompt => $prompt, max_rows => 0, table_name => "     '" . $sf->{d}{table} . "'     " }
+                { info => $info, prompt => $prompt, max_rows => 0, footer => "     '" . $sf->{d}{table} . "'     " }
             );
         }
         $ax->print_sql_info( $info, $waiting );

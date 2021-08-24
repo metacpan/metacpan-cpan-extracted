@@ -1,0 +1,110 @@
+NAME
+
+    Net::SNMP::Mixin::ArubaCX::Dot1qFdb - mixin class for ArubaCX switch
+    forwarding databases
+
+SYNOPSIS
+
+      use Net::SNMP;
+      use Net::SNMP::Mixin;
+    
+      my $session = Net::SNMP->session( -hostname => 'foo.bar.com' );
+      $session->mixer('Net::SNMP::Mixin::ArubaCX::Dot1qFdb');
+      $session->init_mixins();
+      snmp_dispatcher()   if $session->nonblocking;
+      $session->init_ok();
+      die $session->errors if $session->errors;
+    
+      foreach my $fdb_entry ( $session->get_dot1q_fdb_entries() ) {
+        my $mac     = $fdb_entry->{MacAddress};
+        my $vlan_id = $fdb_entry->{vlanId};
+        my $port    = $fdb_entry->{dot1dBasePort};
+        my $status  = $fdb_entry->{fdbStatus};
+    
+        print "$mac, $vlan_id, $port, $status\n";
+      }
+
+DESCRIPTION
+
+    A Net::SNMP mixin class for forwarding database info of ArubaCX 802.1-Q
+    limited MIBs.
+
+MIXIN METHODS
+
+ @fdb = OBJ->get_dot1q_fdb_entries()
+
+    Returns a list of fdb entries. Every list element is a reference to a
+    hash with the following fields and values:
+
+        {
+          MacAddress      => 'XX:XX:XX:XX:XX:XX',
+          dot1dBasePort   => Integer,
+          vlanId          => Integer,
+          fdbStatus       => Integer,
+          fdbStatusString => String,
+        }
+
+    MacAddress
+
+      MacAddress received, in normalized IEEE form XX:XX:XX:XX:XX:XX.
+
+    dot1dBasePort
+
+      The receiving bride-port for the MAC address.
+
+    vlanId
+
+      Every MacAdress is related to a distinct vlanId.
+
+    fdbStatus
+
+      The status of this entry. The meanings of the values are:
+
+          1 = other
+          2 = invalid
+          3 = learned
+          4 = self
+          5 = mgmt
+
+      For more information please see the corresponding Q-BRIDGE-MIB.
+
+    fdbStatusString
+
+      The status of this entry in string form, see above.
+
+INITIALIZATION
+
+ OBJ->_init($reload)
+
+    Fetch the fdb related snmp values from the host. Don't call this method
+    direct!
+
+PRIVATE METHODS
+
+    Only for developers or maintainers.
+
+ _fetch_dot1q_tp_fdb_table()
+
+    Fetch the forwarding databases from the dot1qTpFdbTable once during
+    object initialization.
+
+SEE ALSO
+
+    Net::SNMP::Mixin::Dot1dBase for a mapping between ifIndexes and
+    bridgePorts.
+
+REQUIREMENTS
+
+    Net::SNMP, Net::SNMP::Mixin
+
+AUTHOR
+
+    Karl Gaissmaier <karl.gaissmaier at uni-ulm.de>
+
+COPYRIGHT & LICENSE
+
+    Copyright 2021 Karl Gaissmaier, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

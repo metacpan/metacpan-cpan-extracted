@@ -88,7 +88,7 @@ sub __drop {
         my $tp = Term::TablePrint->new( $sf->{o}{table} );
         $tp->print_table(
             $all_arrayref,
-            { prompt => $prompt_pt, max_rows => 0, table_name => "     '" . $table . "'     " }
+            { prompt => $prompt_pt, max_rows => 0, footer => "     '" . $table . "'     " }
         );
         1; }
     ) {

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.735';
+our $VERSION = '1.736';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -60,9 +60,9 @@ sub _valid_options {
         order               => '[ 0 1 ]',
         alignment           => '[ 0 1 2 ]',
         color               => '[ 0 1 2 ]',
-        f3                  => '[ 0 1 2 ]',
         include_highlighted => '[ 0 1 2 ]',
         page                => '[ 0 1 2 ]',
+        search              => '[ 0 1 2 ]',
         layout              => '[ 0 1 2 3 ]',
         keep                => '[ 1-9 ][ 0-9 ]*', ## 0 ?
         ll                  => '[ 1-9 ][ 0-9 ]*',
@@ -96,7 +96,6 @@ sub _defaults {
         color               => 0,
         #default            => undef,
         empty               => '<empty>',
-        f3                  => 1,
         #footer             => undef,
         hide_cursor         => 1,
         include_highlighted => 0,
@@ -116,6 +115,7 @@ sub _defaults {
         pad                 => 2,
         page                => 1,
         #prompt             => undef,
+        search              => 1,
         #skip_items         => undef,
         #tabs_info          => undef,
         #tabs_prompt        => undef,
@@ -407,7 +407,7 @@ sub __choose {
                 }
             }
         }
-        elsif ( $key == KEY_TAB || $key == CONTROL_I ) {
+        elsif ( $key == KEY_TAB || $key == CONTROL_I ) { # KEY_TAB == CONTROL_I
             if (    $self->{pos}[ROW] == $#{$self->{rc2idx}}
                  && $self->{pos}[COL] == $#{$self->{rc2idx}[$self->{pos}[ROW]]}
             ) {
@@ -436,7 +436,7 @@ sub __choose {
                 }
             }
         }
-        elsif ( $key == KEY_BSPACE || $key == CONTROL_H || $key == KEY_BTAB ) {
+        elsif ( $key == KEY_BSPACE || $key == KEY_BTAB || $key == CONTROL_H ) { # KEY_BTAB == CONTROL_H
             if ( $self->{pos}[COL] == 0 && $self->{pos}[ROW] == 0 ) {
                 $self->__beep();
             }
@@ -483,7 +483,7 @@ sub __choose {
                 $self->__wr_cell( $self->{pos}[ROW], $self->{pos}[COL] );
             }
         }
-        elsif ( $key == VK_PAGE_UP || $key == CONTROL_B ) {
+        elsif ( $key == VK_PAGE_UP || $key == CONTROL_P ) {
             if ( $self->{first_page_row} <= 0 ) {
                 $self->__beep();
             }
@@ -501,7 +501,7 @@ sub __choose {
                 $self->__wr_screen();
             }
         }
-        elsif ( $key == VK_PAGE_DOWN || $key == CONTROL_F ) {
+        elsif ( $key == VK_PAGE_DOWN || $key == CONTROL_N ) {
             if ( $self->{last_page_row} >= $#{$self->{rc2idx}} ) {
                 $self->__beep();
             }
@@ -583,8 +583,8 @@ sub __choose {
             print STDERR "^C\n";
             exit 1;
         }
-        elsif ( $key == LINE_FEED || $key == CARRIAGE_RETURN ) { # ENTER key
-            if ( $self->{search} ) {
+        elsif ( $key == LINE_FEED || $key == CARRIAGE_RETURN ) { # LINE_FEED == CONTROL_J, CARRIAGE_RETURN == CONTROL_M      # ENTER key
+            if ( length $self->{search_info} ) {
                 require Term::Choose::Opt::Search;
                 $self->Term::Choose::Opt::Search::__search_end();
                 next GET_KEY;
@@ -670,14 +670,14 @@ sub __choose {
                 $self->__beep();
             }
         }
-        elsif ( $key == VK_F3 && $self->{f3} ) {
+        elsif ( $key == CONTROL_F && $self->{search} ) {
             require Term::Choose::Opt::Search;
             if ( $self->{ll} ) {
-                $ENV{TC_POS_AT_F3} = $self->{rc2idx}[$self->{pos}[ROW]][$self->{pos}[COL]];
+                $ENV{TC_POS_AT_SEARCH} = $self->{rc2idx}[$self->{pos}[ROW]][$self->{pos}[COL]];
                 $self->__reset_term( 0 );
                 return -13;
             }
-            if ( $self->{search} ) {
+            if ( length $self->{search_info} ) {
                 $self->Term::Choose::Opt::Search::__search_end();
             }
             $self->Term::Choose::Opt::Search::__search_begin();
@@ -697,7 +697,7 @@ sub __beep {
 }
 
 
-sub __prepare_prompt_lines {
+sub __prepare_info_and_prompt_lines {
     my ( $self ) = @_;
     my $info_w = $self->{term_width};
     if ( $^O ne 'MSWin32' && $^O ne 'cygwin' ) {
@@ -731,6 +731,9 @@ sub __prepare_prompt_lines {
         $self->{count_prompt_lines} = 0;
         return;
     }
+    if ( length $self->{search_info} ) {
+        $prompt .= "\n" . $self->{search_info} . ':';
+    }
     $self->{prompt_copy} = $prompt;
     $self->{prompt_copy} .= "\n\r";
     # s/\n/\n\r/g; -> stty 'raw' mode and Term::Readkey 'ultra-raw' mode
@@ -741,14 +744,19 @@ sub __prepare_prompt_lines {
 
 sub __prepare_footer_line {
     my ( $self ) = @_;
+    if ( exists $self->{footer_fmt} ) {
+        delete $self->{footer_fmt};
+    }
     my $pp_total = int( $#{$self->{rc2idx}} / $self->{avail_height} ) + 1;
-    if ( $self->{page} == 1 && $pp_total == 1 ) {
-        $self->{pp_row} = 0;
+    if ( $self->{page} == 0 ) {
+        # nothing to do
+    }
+    elsif ( $self->{page} == 1 && $pp_total == 1 ) {
         $self->{avail_height}++;
     }
-    if ( $self->{pp_row} ) {
+    else {
         my $pp_total_width = length $pp_total;
-        $self->{footer_fmt} = '--- %0' . $pp_total_width . 'd/' . $pp_total . ' ---';
+        $self->{footer_fmt} = '--- %0' . $pp_total_width . 'd/' . $pp_total . ' --- ';
         if ( defined $self->{footer} ) {
             $self->{footer_fmt} .= $self->{footer};
         }
@@ -820,8 +828,8 @@ sub __wr_screen {
     my ( $self ) = @_;
     $self->__goto( 0, 0 );
     print "\r" . clear_to_end_of_screen();
-    if ( $self->{pp_row} ) {
-        $self->__goto( $self->{avail_height_idx} + $self->{pp_row}, 0 );
+    if ( defined $self->{footer_fmt} ) {
+        $self->__goto( $self->{avail_height_idx} + 1, 0 );
         my $pp_line = sprintf $self->{footer_fmt}, int( $self->{first_page_row} / $self->{avail_height} ) + 1;
         print $pp_line;
         $self->{i_col} += print_columns( $pp_line );
@@ -1001,16 +1009,12 @@ sub __avail_screen_size {
     if ( $self->{avail_width} < 1 ) {
         $self->{avail_width} = 1;
     }
-    $self->__prepare_prompt_lines();
+    $self->__prepare_info_and_prompt_lines();
     if ( $self->{count_prompt_lines} ) {
         $self->{avail_height} -= $self->{count_prompt_lines};
     }
     if ( $self->{page} ) {
-        $self->{pp_row} = 1;
         $self->{avail_height}--;
-    }
-    else {
-        $self->{pp_row} = 0;
     }
     if ( $self->{avail_height} < $self->{keep} ) {
         $self->{avail_height} = $self->{term_height} >= $self->{keep} ? $self->{keep} : $self->{term_height};
@@ -1209,7 +1213,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.735
+Version 1.736
 
 =cut
 
@@ -1350,10 +1354,10 @@ C<choose> returns C<undef> or an empty list in list context if the C<q> key (or 
 If the I<mouse> mode is enabled, an item can be chosen with the left mouse key, in list context the right mouse key can
 be used instead the C<SpaceBar> key.
 
-Pressing the C<F3> allows one to enter a regular expression so that only the items that match the regular expression
+Pressing the C<Ctrl-F> allows one to enter a regular expression so that only the items that match the regular expression
 are displayed. When going back to the unfiltered menu (C<Enter>) the item highlighted in the filtered menu keeps the
 highlighting. Also (in I<list context>) marked items retain there markings. The Perl function C<readline> is used to
-read the regular expression if L<Term::Form> is not available. See option I<f3>.
+read the regular expression if L<Term::Form> is not available. See option I<search>.
 
 =head2 Keys to move around
 
@@ -1369,7 +1373,7 @@ the C<Tab> key (or C<Ctrl-I>) to move forward, the C<BackSpace> key (or C<Ctrl-H
 
 =item *
 
-the C<PageUp> key (or C<Ctrl-B>) to go back one page, the C<PageDown> key (or C<Ctrl-F>) to go forward one page,
+the C<PageUp> key (or C<Ctrl-P>) to go to the previous page, the C<PageDown> key (or C<Ctrl-N>) to go to the next page,
 
 =item *
 
@@ -1495,6 +1499,10 @@ Sets the string displayed on the screen instead an empty string.
 
 (default: "<empty>")
 
+=head3 f3 RENAMED and REMOVED
+
+This option is now called I<search>.
+
 =head3 footer
 
 Add a string in the bottom line.
@@ -1502,16 +1510,6 @@ Add a string in the bottom line.
 If a footer string is passed with this option, the option I<page> is automatically set to C<2>.
 
 (default: undefined)
-
-=head3 f3
-
-Set the behavior of the C<F3> key.
-
-0 - off
-
-1 - case-insensitive search (default)
-
-2 - case-sensitive search
 
 =head3 hide_cursor
 
@@ -1705,6 +1703,16 @@ If the I<prompt> value is an empty string ("") no prompt-line will be shown.
 default in list and scalar context: C<Your choice:>
 
 default in void context: C<Close with ENTER>
+
+=head3 search
+
+Set the behavior of C<Ctrl-F>.
+
+0 - off
+
+1 - case-insensitive search (default)
+
+2 - case-sensitive search
 
 =head3 skip_items
 

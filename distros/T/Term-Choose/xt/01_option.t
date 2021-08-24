@@ -39,7 +39,7 @@ my $int = {
     page                => [ 0, 1 ],
     alignment           => [ 0, 1, 2 ],
     color               => [ 0, 1, 2 ],
-    f3                  => [ 0, 1, 2 ],
+    search              => [ 0, 1, 2 ],
     include_highlighted => [ 0, 1, 2 ],
     layout              => [ 0, 1, 2, 3 ],
 };

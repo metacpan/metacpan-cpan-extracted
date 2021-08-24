@@ -1,4 +1,5 @@
 Revision history for Net-Magallanes
 
-0.01  2021-07-14 14:11:42 -04
+0.02  2021-08-24 10:39:04 -04
+        - Added timestamp of measurements in address and rcodes.
         - Initial release

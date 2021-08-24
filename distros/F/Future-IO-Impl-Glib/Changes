@@ -1,4 +1,9 @@
 Revision history for Future-IO-Impl-Glib
 
+0.02    2021-08-24
+        [CHANGES]
+         * Implement the ->waitpid method
+         * Use the shared Test::Future::IO::Impl tests
+
 0.01    2020-05-10
         First version, released on an unsuspecting world.

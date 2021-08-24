@@ -189,7 +189,7 @@ Net::Z3950::FOLIO::Config - configuration file for the FOLIO Z39.50 gateway
     },
     "queryFilter": "source=marc",
     "graphqlQuery": "instances.graphql-query",
-    "chunkSize": 5
+    "chunkSize": 5,
     "marcHoldings": {
       "restrictToItem": 0,
       "field": "952",

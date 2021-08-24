@@ -1,6 +1,11 @@
 Revision history for Term::TablePrint
 
 
+0.142   2021-08-24
+        - Renamed the option 'f3' to 'search'.
+        - 'Ctrl-F' instead of 'F3' to open the search prompt.
+        - PageUP/PageDown: 'Ctrl-P'/'Ctrl-N' instead of 'Ctrl-B'/'Ctrl-F'.
+
 0.141   2021-07-22
         - Update error handlng search function.
 

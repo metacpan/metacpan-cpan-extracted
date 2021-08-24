@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.141';
+our $VERSION = '0.142';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -50,17 +50,20 @@ sub new {
 
 sub _valid_options {
     return {
+        choose_columns    => '[ 0 1 ]',   # removed 04.06.2021
+        keep_header       => '[ 0 1 ]',   # removed 04.06.2021
+        f3                => '[ 0 1 2 ]', # renamed 20.08.2021
+        grid              => '[ 0 1 2 ]', # removed 04.06.2021
+        table_name        => 'Str',       # renamed 24.06.2021
+
         binary_filter     => '[ 0 1 ]',
-        choose_columns    => '[ 0 1 ]', # removed 04.06.2021
         codepage_mapping  => '[ 0 1 ]',
         hide_cursor       => '[ 0 1 ]', # documentation
-        keep_header       => '[ 0 1 ]', # removed 04.06.2021
         mouse             => '[ 0 1 ]',
         squash_spaces     => '[ 0 1 ]',
         color             => '[ 0 1 2 ]',
-        f3                => '[ 0 1 2 ]',
         page              => '[ 0 1 2 ]', # undocumented
-        grid              => '[ 0 1 2 ]', # removed 04.06.2021
+        search            => '[ 0 1 2 ]', #
         table_expand      => '[ 0 1 2 ]', # '[ 0 1 ]',  04.06.2021
         keep              => '[ 1-9 ][ 0-9 ]*', # undocumented
         max_rows          => '[ 0-9 ]+',
@@ -72,7 +75,6 @@ sub _valid_options {
         footer            => 'Str',
         info              => 'Str',
         prompt            => 'Str',
-        table_name        => 'Str',
         undef             => 'Str',
         #thsd_sep         => 'Str',
     };
@@ -87,7 +89,6 @@ sub _defaults {
         codepage_mapping  => 0,
         color             => 0,
         decimal_separator => '.',
-        f3                => 1,
         footer            => undef,
         grid              => 1, # removed 04.06.2021
         hide_cursor       => 1,
@@ -100,6 +101,7 @@ sub _defaults {
         page              => 2, ##
         progress_bar      => 40000,
         prompt            => '',
+        search            => 1,
         squash_spaces     => 0,
         tab_width         => 2,
         table_expand      => 1,
@@ -144,20 +146,26 @@ sub print_table {
     croak "print_table: requires an ARRAY reference as its first argument."            if ref $tbl_orig  ne 'ARRAY';
     if ( defined $opt ) {
         croak "print_table: the (optional) second argument is not a HASH reference."   if ref $opt ne 'HASH';
-        #######################################################################################################################################
-        if ( exists $opt->{choose_columns} ) { # removed 04.06.2021
-            choose( [ 'Continue with ENTER' ], { prompt => "The option 'choose_columns' has been removed.", layout => 0, clear_screen => 1 } );
-            delete $opt->{choose_columns};
+        ###############################################################################################
+        my @removed = qw( choose_columns f3 keep_header grid table_name );
+        my @message;
+        for my $r ( @removed ) {
+            if ( exists $opt->{$r} ) {
+                push @message, "The option '$r' has been removed or renamed.";
+                delete $opt->{$r};
+            }
         }
-        if ( exists $opt->{keep_header} ) { # removed 04.06.2021
-            choose( [ 'Continue with ENTER' ], { prompt => "The option 'keep_header' has been removed.", layout => 0, clear_screen => 1 } );
-            delete $opt->{keep_header};
+        if ( @message ) {
+            unshift @message, "'print_table':";
+            push @message, "Upgrade 'App::DBBrowser' to the latest version.";
+            my $prompt = join "\n", @message;
+            choose(
+                [ 'Continue with ENTER' ],
+                { prompt => $prompt, layout => 0, clear_screen => 1 }
+            );
+            print hide_cursor;
         }
-        if ( exists $opt->{grid} ) { # removed 04.06.2021
-            choose( [ 'Continue with ENTER' ], { prompt => "The option 'grid' has been removed.", layout => 0, clear_screen => 1 } );
-            delete $opt->{grid};
-        }
-        ########################################################################################################################################
+        ###############################################################################################
         validate_options( _valid_options(), $opt );
         for my $key ( keys %$opt ) {
             $self->{$key} = $opt->{$key} if defined $opt->{$key};
@@ -174,9 +182,6 @@ sub print_table {
         print "\n";
         exit;
     };
-    if ( defined $self->{table_name} && ! defined $self->{footer} ) { # 24.06.2021
-        $self->{footer} = $self->{table_name};
-    }
     if ( print_columns( $self->{decimal_separator} ) != 1 ) {
         $self->{decimal_separator} = '.';
     }
@@ -187,6 +192,7 @@ sub print_table {
         print hide_cursor();
     }
     if ( ! @$tbl_orig ) {
+        # Choose
         choose(
             [ 'Close with ENTER' ],
             { prompt => "'print_table': empty table without header row!", hide_cursor => 0 }
@@ -230,7 +236,7 @@ sub print_table {
         table_w     => 0,
         w_cols_calc => [],
     };
-    my $vs = {  # The values change when F3 is pressed
+    my $vs = {  # The values change when Ctrl-F is pressed
         filter => '',
         map_indexes => [],
     };
@@ -330,7 +336,7 @@ sub __write_table {
             $footer .= '/' . $vs->{filter} . '/';
         }
     }
-    my $old_row = exists $ENV{TC_POS_AT_F3} && ! $vs->{filter} ? delete( $ENV{TC_POS_AT_F3} ) : 0;
+    my $old_row = exists $ENV{TC_POS_AT_SEARCH} && ! $vs->{filter} ? delete( $ENV{TC_POS_AT_SEARCH} ) : 0;
     my $auto_jumped_to_first_row = 2;
     my $row_is_expanded = 0;
 
@@ -342,11 +348,13 @@ sub __write_table {
             push @{$vw->{tbl_print}}, ''; # so that going back requires always the same amount of keystrokes
         }
         $ENV{TC_RESET_AUTO_UP} = 0;
+        # Choose
         my $row = choose(
-            @idxs_tbl_print ? [ @{$vw->{tbl_print}}[@idxs_tbl_print] ] : $vw->{tbl_print},
+            @idxs_tbl_print ? [ @{$vw->{tbl_print}}[@idxs_tbl_print] ]
+                            :     $vw->{tbl_print},
             { info => $self->{info}, prompt => $prompt, index => 1, default => $old_row, ll => $vw->{table_w},
               layout => 3, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0, footer => $footer,
-              color => $self->{color}, codepage_mapping => $self->{codepage_mapping}, f3 => $self->{f3},
+              color => $self->{color}, codepage_mapping => $self->{codepage_mapping}, search => $self->{search},
               keep => $self->{keep}, page => $self->{page} }
         );
         if ( ! defined $row ) {
@@ -356,7 +364,7 @@ sub __write_table {
             if ( $row == -1 ) { # with option `ll` set and changed window width `choose` returns -1;
                 return $mr->{window_width_changed};
             }
-            elsif ( $row == -13 ) { # `choose` returns -13 if `F3` was pressed
+            elsif ( $row == -13 ) { # with option `ll` set `choose` returns -13 if `Ctrl-F` was pressed
                 if ( $vs->{filter} ) {
                     $self->__reset_search( $vs );
                 }
@@ -398,6 +406,7 @@ sub __write_table {
             $old_row = $row;
             $row_is_expanded = 1;
             if ( $cc->{info_row} && $row == $#{$vw->{tbl_print}} ) {
+                # Choose
                 choose(
                     [ 'Close' ],
                     { prompt => $cc->{info_row}, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0 }
@@ -706,17 +715,18 @@ sub __print_single_row {
         }
     }
     my $regex = qr/^\Q$separator_row\E\z/;
+    # Choose
     choose(
         $row_data,
-        { prompt => '', layout => 3, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0, f3 => $self->{f3},
-          skip_items => $regex, footer => $footer, page => $self->{page} }
+        { prompt => '', layout => 3, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0,
+          search => $self->{search}, skip_items => $regex, footer => $footer, page => $self->{page} }
     );
 }
 
 
 sub __search {
     my ( $self, $tbl_orig, $cc, $vs ) = @_;
-    if ( ! $self->{f3} ) {
+    if ( ! $self->{search} ) {
         return;
     }
     require Term::Form;
@@ -737,7 +747,7 @@ sub __search {
         }
         print "\r${prompt}${string}";
         if ( ! eval {
-            $vs->{filter} = $self->{f3} == 1 ? qr/$string/i : qr/$string/;
+            $vs->{filter} = $self->{search} == 1 ? qr/$string/i : qr/$string/;
             'Teststring' =~ $vs->{filter};
             1
         } ) {
@@ -761,7 +771,11 @@ sub __search {
     }
     if ( ! @{$vs->{map_indexes}} ) {
         my $message = '/' . $vs->{filter} . '/: No matches found.';
-        choose( [ 'Continue with ENTER' ], { prompt => $message, layout => 0, clear_screen => 1 } );
+        # Choose
+        choose(
+            [ 'Continue with ENTER' ],
+            { prompt => $message, layout => 0, clear_screen => 1 }
+        );
         $vs->{filter} = '';
         return;
     }
@@ -802,14 +816,16 @@ sub _handle_reference {
 sub __print_term_not_wide_enough_message {
     my ( $self, $tbl_copy ) = @_;
     my $prompt_1 = 'To many columns - terminal window is not wide enough.';
+    # Choose
     choose(
         [ 'Press ENTER to show the column names.' ],
         { prompt => $prompt_1, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0 }
     );
     my $prompt_2 = 'Column names (close with ENTER).';
+    # Choose
     choose(
         $tbl_copy->[0],
-        { prompt => $prompt_2, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0, f3 => $self->{f3} }
+        { prompt => $prompt_2, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0, search => $self->{search} }
     );
 }
 
@@ -841,7 +857,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.141
+Version 0.142
 
 =cut
 
@@ -875,8 +891,8 @@ cursor reaches the topmost line, the previous page is shown automatically if it 
 
 If the terminal is too narrow to print the table, the columns are adjusted to the available width automatically.
 
-If the option L</table_expand> is enabled and a row is selected with C<Return>, each column of that row is output in its own
-line preceded by the column name. This might be useful if the columns were cut due to the too low terminal width.
+If the option L</table_expand> is enabled and a row is selected with C<Return>, each column of that row is output in its
+own line preceded by the column name. This might be useful if the columns were cut due to the too low terminal width.
 
 The following modifications are made (at a copy of the original data) to the table elements before the output.
 
@@ -936,7 +952,7 @@ the C<ArrowDown> key (or the C<j> key) to move down and  the C<ArrowUp> key (or 
 
 =item *
 
-the C<PageUp> key (or C<Ctrl-B>) to go back one page, the C<PageDown> key (or C<Ctrl-F>) to go forward one page.
+the C<PageUp> key (or C<Ctrl-P>) to go to the previous page, the C<PageDown> key (or C<Ctrl-N>) to go to the next page.
 
 =item *
 
@@ -973,8 +989,8 @@ selected twice in succession, the pointer jumps to the first row.
 
 If the size of the window has changed, the screen is rewritten as soon as the user presses a key.
 
-The C<F3> key opens a prompt. A regular expression is expected as input. This enables one to only display rows where at
-least one column matches the entered pattern. See option L</f3>.
+C<Ctrl-F> opens a prompt. A regular expression is expected as input. This enables one to only display rows where at
+least one column matches the entered pattern. See option L</search>.
 
 =head2 OPTIONS
 
@@ -1020,20 +1036,6 @@ Allowed values: a character with a print width of C<1>. If an invalid values is 
 to the default value.
 
 Default: . (dot)
-
-=head3 f3
-
-Set the behavior of the C<F3> key.
-
-0 - off
-
-1 - case-insensitive search
-
-2 - case-sensitive search
-
-When C<F3> is pressed and a regexp is entered, the regexp is appended to the end of the footer.
-
-Default: 1
 
 =head3 footer
 
@@ -1084,6 +1086,20 @@ Default: 40_000
 =head3 prompt
 
 String displayed above the table.
+
+=head3 search
+
+Set the behavior of C<Ctrl-F> key.
+
+0 - off
+
+1 - case-insensitive search
+
+2 - case-sensitive search
+
+When C<Ctrl-F> is pressed and a regexp is entered, the regexp is appended to the end of the footer.
+
+Default: 1
 
 =head3 squash_spaces
 

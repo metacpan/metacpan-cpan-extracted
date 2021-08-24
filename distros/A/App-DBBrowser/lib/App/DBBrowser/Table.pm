@@ -57,7 +57,7 @@ sub browse_the_table {
         my $tp = Term::TablePrint->new( $sf->{o}{table} );
         $tp->print_table(
             $all_arrayref,
-            { table_name => "     '" . $sf->{d}{table} . "'     " }
+            { footer => "     '" . $sf->{d}{table} . "'     " }
         );
 
         delete $sf->{o}{table}{max_rows}   if exists $sf->{o}{table}{max_rows};

@@ -4,14 +4,14 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.735';
+our $VERSION = '1.736';
 
 use Exporter qw( import );
 
 our @EXPORT_OK = qw(
     NEXT_get_key
     CONTROL_SPACE LINE_FEED CARRIAGE_RETURN CONTROL_A CONTROL_B CONTROL_C CONTROL_D CONTROL_E CONTROL_F CONTROL_H
-    CONTROL_I CONTROL_K CONTROL_Q CONTROL_U CONTROL_X
+    CONTROL_I CONTROL_K CONTROL_N CONTROL_P CONTROL_Q CONTROL_R CONTROL_S CONTROL_U CONTROL_X
     KEY_BTAB KEY_TAB KEY_ESC KEY_SPACE KEY_h KEY_j KEY_k KEY_l KEY_q KEY_Tilde KEY_BSPACE
     VK_PAGE_UP VK_PAGE_DOWN VK_END VK_HOME VK_LEFT VK_UP VK_RIGHT VK_DOWN VK_INSERT VK_DELETE VK_F1 VK_F2 VK_F3 VK_F4
     ROW COL
@@ -43,16 +43,30 @@ use constant {
     CONTROL_D       => 0x04,
     CONTROL_E       => 0x05,
     CONTROL_F       => 0x06,
+#   CONTROL_G       => 0x07,
     CONTROL_H       => 0x08,
     KEY_BTAB        => 0x08,
     CONTROL_I       => 0x09,
     KEY_TAB         => 0x09,
+#   CONTROL_J       => 0x0a,
     LINE_FEED       => 0x0a,
     CONTROL_K       => 0x0b,
+#   CONTROL_L       => 0x0c,
+#   CONTROL_M       => 0x0d,
     CARRIAGE_RETURN => 0x0d,
+    CONTROL_N       => 0x0e,
+#   CONTROL_O       => 0x0f,
+    CONTROL_P       => 0x10,
     CONTROL_Q       => 0x11,
+    CONTROL_R       => 0x12,
+    CONTROL_S       => 0x13,
+#   CONTROL_T       => 0x14,
     CONTROL_U       => 0x15,
+#   CONTROL_V       => 0x16,
+#   CONTROL_W       => 0x17,
     CONTROL_X       => 0x18,
+#   CONTROL_Y       => 0x19,
+#   CONTROL_Z       => 0x1a,
     KEY_ESC         => 0x1b,
     KEY_SPACE       => 0x20,
     KEY_h           => 0x68,

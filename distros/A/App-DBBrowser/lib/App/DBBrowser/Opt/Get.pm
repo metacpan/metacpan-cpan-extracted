@@ -77,10 +77,10 @@ sub defaults {
             page              => 2, # not an option, always 2
             color             => 0,
             decimal_separator => '.',
-            f3                => 1,
             min_col_width     => 30,
             mouse             => 0,
             progress_bar      => 40_000,
+            search            => 1,
             squash_spaces     => 0,
             tab_width         => 2,
             table_expand      => 1,
@@ -164,6 +164,10 @@ sub read_config_files {
     }
     if ( $o->{insert}{data_source_Insert} == 3 ) {
         $o->{insert}{data_source_Insert} = 2;
+        $m++
+    }
+    if ( $o->{table}{table_expand} == 2 ) {
+        $o->{table}{table_expand} = 1;
         $m++
     }
     if ( $m ) {

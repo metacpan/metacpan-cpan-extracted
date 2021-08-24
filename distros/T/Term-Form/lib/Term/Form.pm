@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.537';
+our $VERSION = '0.538';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form read_line );
 
@@ -277,6 +277,7 @@ sub __before_readline {
     $self->{i}{pre_text_row_count} = scalar @pre_text_array;
 }
 
+
 sub __get_prompt {
     my ( $self ) = @_;
     my $prompt = $self->{i}{prompt};
@@ -526,14 +527,10 @@ sub readline {
         # reset $m->{avail_w} to default:
         $m->{avail_w} = $self->{i}{avail_w};
         $self->__calculate_threshold( $m );
-        if    ( $char == NEXT_get_key ) { next CHAR }
-        elsif ( $char == KEY_TAB      ) { next CHAR }
-        elsif ( $char == VK_UP   ) {
-            for ( 1 .. $big_step ) { last if $m->{pos} == 0; $self->__left( $m  ) }
-        }
-        elsif ( $char == VK_DOWN ) {
-            for ( 1 .. $big_step ) { last if $m->{pos} == @{$m->{str}}; $self->__right( $m ) }
-        }
+        if    ( $char == NEXT_get_key                     ) { next CHAR }
+        elsif ( $char == KEY_TAB                          ) { next CHAR }
+        elsif ( $char == VK_UP      || $char == CONTROL_R ) { for ( 1 .. $big_step ) { last if $m->{pos} == 0; $self->__left( $m  ) } }
+        elsif ( $char == VK_DOWN    || $char == CONTROL_S ) { for ( 1 .. $big_step ) { last if $m->{pos} == @{$m->{str}}; $self->__right( $m ) } }
         elsif ( $char == CONTROL_U                        ) { $self->__ctrl_u( $m ) }
         elsif ( $char == CONTROL_K                        ) { $self->__ctrl_k( $m ) }
         elsif ( $char == VK_RIGHT   || $char == CONTROL_F ) { $self->__right(  $m ) }
@@ -919,9 +916,9 @@ sub __prepare_hight {
         if ( $^O ne 'MSWin32' && $^O ne 'cygwin' ) {
             $info_w += WIDTH_CURSOR;
         }
-        $self->{i}{pre_text} = line_fold( $self->{i}{pre_text}, $info_w, { color => $self->{color}, join => 1 } );
-        $self->{i}{pre_text_row_count} = $self->{i}{pre_text} =~ tr/\n//;
-        $self->{i}{pre_text_row_count} += 1;
+        my @pre_text = line_fold( $self->{i}{pre_text}, $info_w, { color => $self->{color}, join => 0 } );
+        $self->{i}{pre_text_row_count} = @pre_text;
+        $self->{i}{pre_text} = join "\n", @pre_text;
         $self->{i}{avail_h} -= $self->{i}{pre_text_row_count};
         my $min_avail_h = $self->{keep};
         if (  $term_h < $min_avail_h ) {
@@ -1041,14 +1038,19 @@ sub __write_screen {
     }
     print join "\n", @rows;
     $self->{i}{curr_page} = int( $self->{i}{end_row} / $self->{i}{avail_h} ) + 1;
+    my $up = 0;
     if ( $self->{i}{print_footer} ) {
-        if ( $self->{i}{avail_h} - ( $self->{i}{end_row} + 1 - $self->{i}{begin_row} ) ) {
-            print "\n" x ( $self->{i}{avail_h} - ( $self->{i}{end_row} - $self->{i}{begin_row} ) - 1 );
+        my $trailing_empty_page_rows = $self->{i}{avail_h} - ( $self->{i}{end_row} - $self->{i}{begin_row} );
+        if ( $trailing_empty_page_rows > 1 ) {
+            print "\n" x ( $trailing_empty_page_rows - 1 );
         }
         print "\n", sprintf $self->{i}{footer_fmt}, $self->{i}{curr_page};
+        $up += $trailing_empty_page_rows;
     }
-    my $up = $self->{i}{avail_h} - ( $self->{i}{curr_row} - $self->{i}{begin_row} );
-    print up( $up ) if $up;
+    $up += $self->{i}{end_row} - $self->{i}{curr_row};
+    if ( $up ) {
+        print up( $up );
+    }
 }
 
 
@@ -1101,7 +1103,7 @@ sub __write_first_screen {
         print hide_cursor();
     }
     if ( length $self->{i}{pre_text} ) {
-        print $self->{i}{pre_text} . "\n";
+        print $self->{i}{pre_text} . "\n"; #
     }
     $self->__write_screen( $list );
 }
@@ -1334,23 +1336,23 @@ sub fill_form {
             $k = 1;
             $self->__delete( $m );
         }
-        elsif ( $char == VK_RIGHT ) {
+        elsif ( $char == VK_RIGHT || $char == CONTROL_F ) {
             $k = 1;
             $self->__right( $m );
         }
-        elsif ( $char == VK_LEFT ) {
+        elsif ( $char == VK_LEFT || $char == CONTROL_B ) {
             $k = 1;
             $self->__left( $m );
         }
-        elsif ( $char == VK_END   || $char == CONTROL_E ) {
+        elsif ( $char == VK_END || $char == CONTROL_E ) {
             $k = 1;
             $self->__end( $m );
         }
-        elsif ( $char == VK_HOME  || $char == CONTROL_A ) {
+        elsif ( $char == VK_HOME || $char == CONTROL_A ) {
             $k = 1;
             $self->__home( $m );
         }
-        elsif ( $char == VK_UP ) {
+        elsif ( $char == VK_UP || $char == CONTROL_R ) {
             $k = 1;
             if ( $self->{i}{curr_row} == 0 ) {
                 $self->{i}{beep} = 1;
@@ -1367,7 +1369,7 @@ sub fill_form {
                 }
             }
         }
-        elsif ( $char == VK_DOWN ) {
+        elsif ( $char == VK_DOWN || $char == CONTROL_S ) {
             $k = 1;
             if ( $self->{i}{curr_row} == $#$list ) {
                 $self->{i}{beep} = 1;
@@ -1385,7 +1387,7 @@ sub fill_form {
                 }
             }
         }
-        elsif ( $char == VK_PAGE_UP || $char == CONTROL_B ) {
+        elsif ( $char == VK_PAGE_UP || $char == CONTROL_P ) {
             $k = 1;
             if ( $self->{i}{curr_page} == 1 ) {
                 if ( $self->{i}{curr_row} == 0 ) {
@@ -1406,7 +1408,7 @@ sub fill_form {
                 $self->__print_previous_page( $list );
             }
         }
-        elsif ( $char == VK_PAGE_DOWN || $char == CONTROL_F ) {
+        elsif ( $char == VK_PAGE_DOWN || $char == CONTROL_N ) {
             $k = 1;
             if ( $self->{i}{curr_page} == $self->{i}{page_count} ) {
                 if ( $self->{i}{curr_row} == $#$list ) {
@@ -1574,7 +1576,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.537
+Version 0.538
 
 =cut
 
@@ -1626,25 +1628,25 @@ C<Ctrl-U>: Delete the text backward from the cursor to the beginning of the line
 
 C<Ctrl-K>: Delete the text from the cursor to the end of the line.
 
-C<Right-Arrow>: Move forward a character.
+C<Right-Arrow> or C<Ctrl-F>: Move forward a character.
 
-C<Left-Arrow>: Move back a character.
+C<Left-Arrow> or C<Ctrl-B>: Move back a character.
 
 C<Home> or C<Ctrl-A>: Move to the start of the line.
 
 C<End> or C<Ctrl-E>: Move to the end of the line.
 
-C<Up-Arrow>: in C<fill_form> move up one row, in C<readline> move back 10 characters.
+C<Up-Arrow> or C<Ctrl-R>: in C<fill_form> move up one row, in C<readline> move back 10 characters.
 
-C<Down-Arrow>: in C<fill_form> move down one row, in C<readline> move forward 10 characters.
+C<Down-Arrow> or C<Ctrl-S>: in C<fill_form> move down one row, in C<readline> move forward 10 characters.
 
 C<Ctrl-X>: If the input puffer is not empty, the input puffer is cleared, else C<Ctrl-X> returns nothing (undef).
 
 Only in C<fill_form>:
 
-C<Page-Up> or C<Ctrl-B>: Move back one page.
+C<Page-Up> or C<Ctrl-P>: Move to the previous page.
 
-C<Page-Down> or C<Ctrl-F>: Move forward one page.
+C<Page-Down> or C<Ctrl-N>: Move to the next page.
 
 =head1 METHODS
 

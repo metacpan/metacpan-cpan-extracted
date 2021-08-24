@@ -34,8 +34,8 @@ The procedure therefore consists of the following steps:
 * Update the version number `our $VERSION` in [`lib/Net/Z3950/FOLIO.pm`](../lib/Net/Z3950/FOLIO.pm)
 * Ensure that the version number in [the module descriptor](../ModuleDescriptor.json) matches the new version.
 * Update the "IN PROGRESS" entry at the top of the change-log to include the present date-stamp, the output of `date`.
-* Commit `FOLIO.pm`, `ModuleDescriptor.json` and `Changes.md` all together with the commit comment "Release vX.Y", for appropriate _X_ and _Y_ matching the `$VERSION` in `FOLIO.pm`.
-* Tag the source with `git tag vX.Y` and push the tag with `git push origin tag vX.Y`.
+* Commit `FOLIO.pm`, `ModuleDescriptor.json` and `Changes.md` all together with the commit comment "Release vX.Y.Z", for appropriate _X_ and _Y_ matching the `$VERSION` in `FOLIO.pm`.
+* Tag the source with `git tag vX.Y.Z` and push the tag with `git push origin tag vX.Y.Z`.
 * Find the new tag on [the Jenkins page](https://jenkins-aws.indexdata.com/job/folio-org/job/Net-Z3950-FOLIO/view/tags/), and check that it builds correctly. (If not, make the necessary changes, then re-issue and re-push the tag.)
 * Tell GitHub about the release: find the new tag at [the releases page](https://github.com/folio-org/Net-Z3950-FOLIO/releases), click on it, then click on **Edit tag**. Set the release title to the same value as the tag, and paste the change-log entry into the description area. Click on **Publish release**.
 * Make the distribution tarball: `perl Makefile.PL; make dist`.

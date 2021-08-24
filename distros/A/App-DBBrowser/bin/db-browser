@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.279';
+our $VERSION = '2.280';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -53,7 +53,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.279
+Version 2.280
 
 =head1 SYNOPSIS
 
@@ -99,7 +99,7 @@ the C<Arrow> keys (or C<h,j,k,l>) to move up and down and to move to the right a
 
 =item *
 
-the C<PageUp> key (or C<Ctrl-B>) to go back one page, the C<PageDown> key (or C<Ctrl-F>) to go forward one page.
+the C<PageUp> key (or C<Ctrl-P>) to go to the previous page, the C<PageDown> key (or C<Ctrl-N>) to go to the next page.
 
 =item *
 
@@ -163,8 +163,8 @@ Control characters, code points of the surrogate ranges and non-characters are r
 
 See also the option group L</Output>.
 
-The C<F3> key opens a prompt. A regular expression is expected as input. This enables one to only display rows where at
-least one column matches the entered pattern. See option L<F3 filter>.
+C<Ctrl-F> opens a prompt. A regular expression is expected as input. This enables one to only display rows where at
+least one column matches the entered pattern. See option L<Search>.
 
 =head1 MENUS
 
@@ -639,10 +639,6 @@ to the database.
 
 For the meaning of these driver specific attributes check the appropriate driver documentation.
 
-C<SQLite> unicode handling: if the C<DBD::SQLite> version is equal or greater then C<1.68>, the C<sqlite_string_mode>
-attribute is used, else the deprecated C<sqlite_unicode> attribute. Read in the C<SQLite>
-L<documentation|https://metacpan.org/pod/DBD::SQLite#sqlite_string_mode> how these two attributes are used.
-
 =item Reset DB
 
 Reset database specific parameter to the global I<DB Settings>.
@@ -674,9 +670,9 @@ don't expand table rows.
 
 =back
 
-=head3 F3 filter
+=head3 Search
 
-Set the behavior of the C<F3> key.
+Set the search behavior (C<Ctrl-F>).
 
 =over
 

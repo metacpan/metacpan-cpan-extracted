@@ -1,6 +1,13 @@
 Revision history for App-DBBrowser
 
 
+2.280    2021-08-24
+        - DBD::SQLite 1.68 or greater is required.
+        - print_table: table_name -> footer.
+        - Renamed the option 'f3' to 'search'.
+        - 'Ctrl-F' instead of 'F3' to open the search prompt.
+        - PageUP/PageDown: 'Ctrl-P'/'Ctrl-N' instead of 'Ctrl-B'/'Ctrl-F'.
+
 2.279    2021-07-29
         - Bugfix in functions Epoch_to_Date/Epoch_to_DateTime: use driver specific regex statement.
 

@@ -6,7 +6,7 @@ use warnings;
 use Moose::Role;
 use Moose::Util::TypeConstraints qw(find_type_constraint);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 # Supply a default for "is"
 around _process_is_option => sub {
@@ -168,7 +168,7 @@ L<Moose>, L<Moose::Util::TypeConstraints>
 
 =head1 AUTHORS
 
-Alex Becker, E<lt>c a p f a n a-t g m x do_t d eE<gt>
+Alex Becker, E<lt>asb@cpan.orgE<gt>
 
 =head1 CONTRIBUTORS
 
@@ -180,7 +180,7 @@ Thanks to Matt S Trout for the motivation of creating this module: I<Sufficientl
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014 by Alex Becker
+Copyright (C) 2014-2021 by Alex Becker
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.16.3 or,

@@ -28,10 +28,12 @@ DESCRIPTION
     If the override_impl method is not invoked, a default implementation of
     these operations is provided. This implementation allows a single queue
     of sysread or syswrite calls on a single filehandle only, combined with
-    sleep calls. It is provided for the simple cases where modules only
-    need one filehandle (most likely a single network socket or hardware
-    device handle), allowing such modules to work without needing a better
-    event system.
+    sleep calls. It does not support waitpid.
+
+    It is provided for the simple cases where modules only need one
+    filehandle (most likely a single network socket or hardware device
+    handle), allowing such modules to work without needing a better event
+    system.
 
     If there are both read/write and sleep futures pending, the
     implementation will use select() to wait for either. This may be
@@ -40,7 +42,14 @@ DESCRIPTION
 
     For cases where multiple filehandles are required, or for doing more
     involved IO operations, a real implementation based on an actual event
-    loop should be provided.
+    loop should be provided. The following are known to exist; CPAN may
+    provide others:
+
+      * Future::IO::Impl::Glib
+
+      * Future::IO::Impl::IOAsync
+
+      * Future::IO::Impl::UV
 
  Unit Testing
 
@@ -48,6 +57,8 @@ DESCRIPTION
     scripts. If the implementation is set to an instance of some sort of
     test fixture or mocking object, a unit test can check that the
     appropriate IO operations happen as part of the test.
+
+    A testing module which does this is provided by Test::Future::IO.
 
 METHODS
 
@@ -71,6 +82,7 @@ METHODS
  sysread
 
        $f = Future::IO->sysread( $fh, $length )
+    
           $bytes = $f->get
 
     Returns a Future that will become done when at least one byte can be
@@ -85,6 +97,7 @@ METHODS
  sysread_exactly
 
        $f = Future::IO->sysread_exactly( $fh, $length )
+    
           $bytes = $f->get
 
     Since version 0.03.
@@ -102,6 +115,7 @@ METHODS
  syswrite
 
        $f = Future::IO->syswrite( $fh, $bytes )
+    
           $written_len = $f->get
 
     Since version 0.04.
@@ -117,7 +131,8 @@ METHODS
  syswrite_exactly
 
        $f = Future::IO->syswrite_exactly( $fh, $bytes )
-          $written_len = $f->get;
+    
+          $written_len = $f->get
 
     Since version 0.04.
 
@@ -127,6 +142,26 @@ METHODS
     suitable error message.
 
     This may make more than one syswrite() call.
+
+ waitpid
+
+       $f = Future::IO->waitpid( $pid )
+    
+          $wstatus = $f->get
+
+    Since version 0.09.
+
+    Returns a Future that will become done when the given child process
+    terminates. The future will yield the wait status of the child process.
+    This can be inspected by the usual bitshifting operations as per $?:
+
+       if( my $termsig = ($wstatus & 0x7f) ) {
+          say "Terminated with signal $termsig";
+       }
+       else {
+          my $exitcode = ($wstatus >> 8);
+          say "Terminated with exit code $exitcode";
+       }
 
  override_impl
 
@@ -192,6 +227,11 @@ THE $IMPL VARIABLE
        }
     
        sub syswrite
+       {
+          ...
+       }
+    
+       sub waitpid
        {
           ...
        }

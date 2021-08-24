@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use 5.010;  # //
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Carp;
 
@@ -50,9 +50,11 @@ these operations.
 If the C<override_impl> method is not invoked, a default implementation of
 these operations is provided. This implementation allows a single queue of
 C<sysread> or C<syswrite> calls on a single filehandle only, combined with
-C<sleep> calls. It is provided for the simple cases where modules only need
-one filehandle (most likely a single network socket or hardware device
-handle), allowing such modules to work without needing a better event system.
+C<sleep> calls. It does not support C<waitpid>.
+
+It is provided for the simple cases where modules only need one filehandle
+(most likely a single network socket or hardware device handle), allowing such
+modules to work without needing a better event system.
 
 If there are both read/write and C<sleep> futures pending, the implementation
 will use C<select()> to wait for either. This may be problematic on MSWin32,
@@ -60,7 +62,23 @@ depending on what type of filehandle is involved.
 
 For cases where multiple filehandles are required, or for doing more involved
 IO operations, a real implementation based on an actual event loop should be
-provided.
+provided. The following are known to exist; CPAN may provide others:
+
+=over 4
+
+=item *
+
+L<Future::IO::Impl::Glib>
+
+=item *
+
+L<Future::IO::Impl::IOAsync>
+
+=item *
+
+L<Future::IO::Impl::UV>
+
+=back
 
 =head2 Unit Testing
 
@@ -68,6 +86,8 @@ The replaceable implementation is also useful for writing unit test scripts.
 If the implementation is set to an instance of some sort of test fixture or
 mocking object, a unit test can check that the appropriate IO operations
 happen as part of the test.
+
+A testing module which does this is provided by L<Test::Future::IO>.
 
 =cut
 
@@ -122,6 +142,7 @@ sub sleep
 =head2 sysread
 
    $f = Future::IO->sysread( $fh, $length )
+
       $bytes = $f->get
 
 Returns a L<Future> that will become done when at least one byte can be read
@@ -146,6 +167,7 @@ sub sysread
 =head2 sysread_exactly
 
    $f = Future::IO->sysread_exactly( $fh, $length )
+
       $bytes = $f->get
 
 I<Since version 0.03.>
@@ -193,6 +215,7 @@ sub _sysread_into_buffer
 =head2 syswrite
 
    $f = Future::IO->syswrite( $fh, $bytes )
+
       $written_len = $f->get
 
 I<Since version 0.04.>
@@ -218,7 +241,8 @@ sub syswrite
 =head2 syswrite_exactly
 
    $f = Future::IO->syswrite_exactly( $fh, $bytes )
-      $written_len = $f->get;
+
+      $written_len = $f->get
 
 I<Since version 0.04.>
 
@@ -256,6 +280,36 @@ sub _syswrite_from_buffer
       return Future->done( $len ) if !length $bytes;
       return _syswrite_from_buffer( $IMPL, $fh, $bytes, $len );
    });
+}
+
+=head2 waitpid
+
+   $f = Future::IO->waitpid( $pid )
+
+      $wstatus = $f->get
+
+I<Since version 0.09.>
+
+Returns a L<Future> that will become done when the given child process
+terminates. The future will yield the wait status of the child process.
+This can be inspected by the usual bitshifting operations as per C<$?>:
+
+   if( my $termsig = ($wstatus & 0x7f) ) {
+      say "Terminated with signal $termsig";
+   }
+   else {
+      my $exitcode = ($wstatus >> 8);
+      say "Terminated with exit code $exitcode";
+   }
+
+=cut
+
+sub waitpid
+{
+   shift;
+   my ( $pid ) = @_;
+
+   return ( $IMPL //= "Future::IO::_DefaultImpl" )->waitpid( $pid );
 }
 
 =head2 override_impl
@@ -360,6 +414,11 @@ sub syswrite
    });
 
    return $self;
+}
+
+sub waitpid
+{
+   croak "This implementation cannot handle waitpid";
 }
 
 sub _done_at
@@ -521,6 +580,11 @@ For example, something like the following code arrangement is recommended.
    }
 
    sub syswrite
+   {
+      ...
+   }
+
+   sub waitpid
    {
       ...
    }

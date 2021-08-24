@@ -1,10 +1,16 @@
 Revision history for Perl extension MooseX::Traits::SetScalarByRef.
 
-0.02  Mon July 14 21:54:42 2014
+0.03  2021-08-24
+	- no functional changes / cosmetic changes only
+    - fix example script
+    - increased EUMM required version
+    - add GitHub repository
+
+0.02  2014-07-14
 	- documentation update
 	- lowered Perl requirement to Perl 5.10 to enable PPMs from ActiveState
 
-0.01  Mon May  5 19:36:16 2014
+0.01  2014-05-05
 	- original version; created by h2xs 1.23 with options
 		-b 5.16.3 -XA -n MooseX::Traits::SetScalarByRef
 

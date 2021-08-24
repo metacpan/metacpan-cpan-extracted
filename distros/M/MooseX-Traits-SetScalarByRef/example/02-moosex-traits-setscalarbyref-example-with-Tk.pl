@@ -63,5 +63,5 @@ to glue Tk's bindvariable to Moose attributes.
 }
 
 my $eg = Local::Example->new;
-$eg->run;e
+$eg->run;
 exit(0);

@@ -1,3 +1,6 @@
+1.20 Tue 2021-08-24
+- Remove temp files during unit tests.
+
 1.19 Tue 2020-10-13
 - Merge blead change: Remove . from @INC when loading optional modules.
 

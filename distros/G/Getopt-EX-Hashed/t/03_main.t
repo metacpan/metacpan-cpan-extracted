@@ -22,11 +22,15 @@ has the_fish  => ( spec => '' );
     --thefish
     );
 
-Getopt::EX::Hashed->configure(REMOVE_UNDERSCORE => 1);
-
 use Getopt::Long;
 my $app = Getopt::EX::Hashed->new() or die;
+if (our $IMPROPER_USE) {
+    Getopt::EX::Hashed->configure(REMOVE_UNDERSCORE => 1);
+} else {
+    $app->configure(REMOVE_UNDERSCORE => 1);
+}
 GetOptions($app->optspec) or die;
+
 
 is($app->{string},    "Alice", "String");
 is($app->{say},       "Hello", "String (default)");

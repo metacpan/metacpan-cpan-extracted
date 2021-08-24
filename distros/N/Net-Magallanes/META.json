@@ -53,7 +53,18 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/huguei/p5-Net-Magallanes/issues"
+      },
+      "homepage" : "https://github.com/huguei/p5-Net-Magallanes",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/huguei/p5-Net-Magallanes.git",
+         "web" : "https://github.com/huguei/p5-Net-Magallanes"
+      }
+   },
+   "version" : "0.02",
    "x_generated_by_perl" : "v5.32.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",

@@ -68,7 +68,7 @@ sub _options {
         group_behavior => [
             { name => '_menu_memory',  text => "- Menu memory",       section => 'G'     },
             { name => '_table_expand', text => "- Expand table",      section => 'table' },
-            { name => '_f3',           text => "- F3 filter",         section => 'table' },
+            { name => '_search',       text => "- Search",            section => 'table' },
             { name => '_mouse',        text => "- Mouse mode",        section => 'table' },
         ],
         group_enable => [
@@ -464,10 +464,10 @@ sub set_options {
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
-            elsif ( $opt eq '_f3' ) {
+            elsif ( $opt eq '_search' ) {
                 my $prompt = 'Choose: ';
                 my $sub_menu = [
-                    [ 'f3', "- Row filter", [ 'disabled', 'case insensitive', 'case sensitive' ] ]
+                    [ 'search', "- Row filter", [ 'disabled', 'case insensitive', 'case sensitive' ] ]
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }

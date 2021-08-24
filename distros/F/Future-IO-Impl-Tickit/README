@@ -1,0 +1,38 @@
+NAME
+
+    Future::IO::Impl::Tickit - implement Future::IO with Tickit
+
+SYNOPSIS
+
+       use Future::IO;
+       use Future::IO::Impl::Tickit;
+    
+       use Tickit;
+    
+       my $tickit = Tickit->new;
+       Future::IO::Impl::Tickit->set_tickit( $tickit );
+    
+       ...
+
+DESCRIPTION
+
+    This module provides an implementation for Future::IO which uses
+    Tickit.
+
+    Because this module will need a valid toplevel Tickit instance object
+    in order to work, you will need to call the "set_tickit" method before
+    any of the Future::IO interface will work.
+
+METHODS
+
+ set_tickit
+
+       Future::IO::Impl::Tickit->set_tickit( $tickit )
+
+    Sets the toplevel Tickit instance to use for the event watching used to
+    implement this module.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

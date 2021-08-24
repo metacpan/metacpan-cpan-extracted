@@ -1,0 +1,29 @@
+---
+abstract: 'L<Alien> wrapping for F<libvterm>'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  File::Basename: '0'
+  File::Path: '2.07'
+  File::Spec: '0'
+configure_requires:
+  File::Basename: '0'
+  File::Path: '2.07'
+  File::Spec: '0'
+  Module::Build: '0'
+  perl: '5.010'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-libvterm
+provides:
+  Alien::libvterm:
+    file: lib/Alien/libvterm.pm
+    version: '0.01'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

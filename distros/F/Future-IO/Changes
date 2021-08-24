@@ -1,5 +1,12 @@
 Revision history for Future-IO
 
+0.09    2021-08-24
+        [CHANGES]
+         * Added ->waitpid that real event loop implementations can provide
+           (though built-in default implementation does not provide it)
+         * Extracted impl tests to shareable Test::Future::IO::Impl module
+         * Add links to existing CPAN implementations and test modules
+
 0.08    2020-12-31
         [CHANGES]
          * Added Future::IO->alarm

@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2021 -- leonerd@leonerd.org.uk
 
 package Future::IO::ImplBase;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Errno qw( EAGAIN EWOULDBLOCK );
 
@@ -119,19 +119,19 @@ sub syswrite
    my $self = shift;
    my ( $fh, $data ) = @_;
 
-   my $len = $fh->syswrite( $data );
-   if( defined $len ) {
-      return Future->done( $len );
-   }
-   elsif( $! == EAGAIN or $! == EWOULDBLOCK ) {
-      # Try again
-      return $self->ready_for_write( $fh )->then( sub {
-         $self->syswrite( $fh, $data );
-      });
-   }
-   else {
-      return Future->fail( "syswrite: $!\n", syswrite => $fh, $! );
-   }
+   return $self->ready_for_write( $fh )->then( sub {
+      my $len = $fh->syswrite( $data );
+      if( defined $len ) {
+         return Future->done( $len );
+      }
+      elsif( $! == EAGAIN or $! == EWOULDBLOCK ) {
+         # Try again
+         return $self->syswrite( $fh, $data );
+      }
+      else {
+         return Future->fail( "syswrite: $!\n", syswrite => $fh, $! );
+      }
+   });
 }
 
 =head1 AUTHOR

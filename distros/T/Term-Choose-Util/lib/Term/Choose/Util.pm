@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.129';
+our $VERSION = '0.130';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf );
@@ -94,7 +94,6 @@ sub _valid_options {
         all_by_default      => '[ 0 1 ]',
         clear_screen        => '[ 0 1 ]',
         decoded             => '[ 0 1 ]',
-        enchanted           => '[ 0 1 ]',
         hide_cursor         => '[ 0 1 ]',
         index               => '[ 0 1 ]',
         keep_chosen         => '[ 0 1 ]',
@@ -140,67 +139,66 @@ sub _valid_options {
 
 sub _defaults {
     return {
-        alignment      => 0,
-        all_by_default => 0,
-        #busy_string   => undef,
-        clear_screen   => 0,
-        color          => 0,
-        decoded        => 1,
-        #default_number => undef,
-        enchanted      => 1,
-        hide_cursor    => 1,
-        index          => 0,
-        #info          => undef,
-        #init_dir      => undef,
-        #filter        => undef,
-        #footer        => undef,
-        #keep          => undef,
-        keep_chosen    => 0,
-        layout         => 1,
-        #tabs_info     => undef,
-        #tabs_prompt   => undef,
-        back           => 'BACK',
-        confirm        => 'CONFIRM',
-        #mark          => undef,
-        mouse          => 0,
-        order          => 1,
-        #page          => undef,
-        prefix         => '',
-        #prompt        => undef,
-        show_hidden    => 1,
-        small_first    => 0,
-        #solo          => undef,    # experimental
-        cs_begin       => '',
-        cs_end         => '',
-        #cs_label      => undef,
-        cs_separator   => ', ',
+        alignment           => 0,
+        all_by_default      => 0,
+        #busy_string        => undef,
+        clear_screen        => 0,
+        color               => 0,
+        decoded             => 1,
+        #default_number     => undef,
+        hide_cursor         => 1,
+        index               => 0,
+        #info               => undef,
+        #init_dir           => undef,
+        #filter             => undef,
+        #footer             => undef,
+        #keep               => undef,
+        keep_chosen         => 0,
+        layout              => 1,
+        #tabs_info          => undef,
+        #tabs_prompt        => undef,
+        back                => 'BACK',
+        confirm             => 'CONFIRM',
+        #mark               => undef,
+        mouse               => 0,
+        order               => 1,
+        #page               => undef,
+        prefix              => '',
+        #prompt             => undef,
+        show_hidden         => 1,
+        small_first         => 0,
+        #solo               => undef,    # experimental
+        cs_begin            => '',
+        cs_end              => '',
+        #cs_label           => undef,
+        cs_separator        => ', ',
         thousands_separator => ',',
 
         ## intern:
-        parent_dir     => '..',
-        reset          => 'reset',
+        parent_dir => '..',
+        reset      => 'reset',
     };
 };
 
 
 sub _routine_options {
     my ( $caller ) = @_;
-    my @every = ( qw( info prompt clear_screen mouse hide_cursor confirm back color tabs_info tabs_prompt page footer keep ) ); # sort
+    my @every = ( qw( info prompt clear_screen mouse hide_cursor confirm back color tabs_info tabs_prompt page footer keep ) );
     my $options;
     if ( $caller eq 'choose_directories' ) {
-        $options = [ @every, qw( init_dir layout order alignment enchanted show_hidden decoded ) ];
+        $options = [ @every, qw( init_dir layout order alignment show_hidden decoded ) ];
     }
     elsif ( $caller eq 'choose_a_directory' ) {
-        $options = [ @every, qw( init_dir layout order alignment enchanted show_hidden decoded cs_label ) ];
+        $options = [ @every, qw( init_dir layout order alignment show_hidden decoded cs_label ) ];
     }
     elsif ( $caller eq 'choose_a_file' ) {
-        $options = [ @every, qw( init_dir layout order alignment enchanted show_hidden decoded filter ) ];
+        $options = [ @every, qw( init_dir layout order alignment show_hidden decoded filter ) ];
     }
     elsif ( $caller eq 'choose_a_number' ) {
         $options = [ @every, qw( small_first reset thousands_separator default_number cs_label ) ];
     }
     elsif ( $caller eq 'choose_a_subset' ) {
-        $options = [ @every, qw( layout order alignment enchanted keep_chosen index prefix all_by_default cs_label cs_begin cs_end cs_separator mark busy_string solo ) ];
+        $options = [ @every, qw( layout order alignment keep_chosen index prefix all_by_default cs_label cs_begin cs_end cs_separator mark busy_string solo ) ];
     }
     elsif ( $caller eq 'settings_menu' ) {
         $options = [ @every, qw( cs_label cs_begin cs_end cs_separator ) ];
@@ -254,8 +252,7 @@ sub __available_dirs {
             { prompt => '', hide_cursor => $self->{hide_cursor}, mouse => $self->{mouse}, page => $self->{page},
               footer => $self->{footer}, keep => $self->{keep} }
         );
-        $dir_fs = dirname $dir_fs;
-        next;
+        return;
     }
     my @dirs;
     while ( my $file_fs = readdir $dh ) {
@@ -281,7 +278,6 @@ sub choose_directories {
     my $dir = $self->__prepare_path();
     my $chosen_dirs = [];
     my ( $confirm, $change_path, $add_dirs ) = ( '  ' . $self->{confirm}, '- Change Location', '- Add Directories' );
-    my $mode = $change_path;
     my @bu;
 
     CHOOSE_MODE: while ( 1 ) {
@@ -289,10 +285,10 @@ sub choose_directories {
         my @tmp_prompt;
         my $key_dirs = 'Chosen Dirs: ';
         my $dirs_chosen = $key_dirs . ( @$chosen_dirs ? join( ', ', @$chosen_dirs ) : '---' );
-        push @tmp_prompt, line_fold( $dirs_chosen, $term_w, { subseq_tab => length( $key_dirs ), join => 0 } );
+        push @tmp_prompt, line_fold( $dirs_chosen, $term_w, { subseq_tab => ' ' x length( $key_dirs ), join => 0 } );
         my $key_path = 'Location: ';
         my $path = $key_path . $dir;
-        push @tmp_prompt, line_fold( $path, $term_w, { subseq_tab => length( $key_path ), join => 0 } );
+        push @tmp_prompt, line_fold( $path, $term_w, { subseq_tab => ' ' x length( $key_path ), join => 0 } );
         my $prompt = join( "\n", @tmp_prompt );
         # Choose
         my $choice = choose(
@@ -306,6 +302,7 @@ sub choose_directories {
                 ( $dir, $chosen_dirs ) = @{pop @bu};
                 next CHOOSE_MODE;
             }
+            $self->__restore_defaults(); #
             return;
         }
         elsif ( $choice eq $confirm ) {
@@ -322,7 +319,10 @@ sub choose_directories {
         }
         elsif ( $choice eq $add_dirs ) {
             my $avail_dirs = $self->__available_dirs( $dir );
-            my $prompt = $path . "\n" . length $self->{prompt} ? $self->{prompt} : 'Choose:';
+            if ( ! defined $avail_dirs ) {
+                next CHOOSE_MODE;
+            }
+            my $prompt = $path . "\n" . ( length $self->{prompt} ? $self->{prompt} : 'Choose:' );
             my %bu_opt;
             my $options = _routine_options( 'choose_directories' );
             for my $o ( @$options ) {
@@ -332,7 +332,7 @@ sub choose_directories {
             if ( length $self->{info} ) {
                 push @tmp_info, $self->{info};
             }
-            push @tmp_info, line_fold( $dirs_chosen, $term_w, { subseq_tab => length( $key_dirs ), join => 0 } );
+            push @tmp_info, line_fold( $dirs_chosen, $term_w, { subseq_tab => ' ' x length( $key_dirs ), join => 0 } );
             my $info = join "\n", @tmp_info;
             # choose_a_subset
             my $idxs = $self->choose_a_subset(
@@ -367,6 +367,7 @@ sub choose_a_file {
         my $prompt_fmt = "File-Directory: %s\n" . ( length $self->{prompt} ? $self->{prompt} : 'Choose:' );
         my $chosen_dir = $self->__choose_a_path( $init_dir, $prompt_fmt, '<<', 'OK' );
         if ( ! defined $chosen_dir ) {
+            $self->__restore_defaults(); #
             return;
         }
         my $chosen_file = $self->__a_file( $chosen_dir );
@@ -388,7 +389,7 @@ sub choose_a_directory {
     }
     my ( $self, $opt ) = @_;
     if ( ! defined $opt->{cs_label} ) {
-        $opt->{cs_label} = 'Dir: ';
+        $opt->{cs_label} = 'Directory: ';
     }
     $self->__prepare_opt( $opt );
     my $init_dir = $self->__prepare_path();
@@ -405,8 +406,6 @@ sub choose_a_directory {
 
 sub __choose_a_path {
     my ( $self, $dir, $prompt_fmt, $back, $confirm ) = @_;
-    my $enchanted_idx = 2;
-    my $default_idx = $self->{enchanted} ? $enchanted_idx : 0;
     my $prev_dir = $dir;
 
     while ( 1 ) {
@@ -440,7 +439,7 @@ sub __choose_a_path {
         # Choose
         my $choice = choose(
             [ @pre, sort( @dirs ) ],
-            { info => $self->{info}, prompt => $prompt, default => $default_idx, alignment => $self->{alignment},
+            { info => $self->{info}, prompt => $prompt, alignment => $self->{alignment},
               layout => $self->{layout}, order => $self->{order}, mouse => $self->{mouse},
               clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor},
               color => $self->{color}, tabs_info => $self->{tabs_info}, tabs_prompt => $self->{tabs_prompt},
@@ -457,12 +456,6 @@ sub __choose_a_path {
         }
         else {
             $dir = catdir $dir, $choice;
-        }
-        if ( $prev_dir eq $dir ) {
-            $default_idx = 0;
-        }
-        else {
-            $default_idx = $self->{enchanted} ? $enchanted_idx : 0;
         }
         $prev_dir = $dir;
     }
@@ -506,7 +499,7 @@ sub __a_file {
         }
         my @tmp_prompt;
         push @tmp_prompt, 'File-Directory: ' . $dir;
-        push @tmp_prompt, 'File: ' . ( length $prev_dir ? $prev_dir : ' ? ' );
+        push @tmp_prompt, 'File: ' . ( length $prev_dir ? $prev_dir : '' );
         push @tmp_prompt, length $self->{prompt} ? $self->{prompt} : 'Choose:';
         my $prompt = join( "\n", @tmp_prompt );
         if ( ! @files ) {
@@ -997,15 +990,17 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.129
+Version 0.130
 
 =cut
 
 =head1 Backward incompatible changes
 
-=head2 choose_directories
+=head3 choose_directories
 
 =over
+
+=item Option I<enchanted> removed.
 
 =item Options I<add_dirs>, I<parent_dir> and I<cs_label> removed.
 
@@ -1013,9 +1008,11 @@ Version 0.129
 
 =back
 
-=head2 choose_a_file
+=head3 choose_a_file
 
 =over
+
+=item Option I<enchanted> removed.
 
 =item Options I<show_files>, I<parent_dir> and I<cs_label> removed.
 
@@ -1023,9 +1020,11 @@ Version 0.129
 
 =back
 
-=head2 choose_a_directory
+=head3 choose_a_directory
 
 =over
+
+=item Option I<enchanted> removed.
 
 =item Option I<parent_dir> removed.
 
@@ -1196,17 +1195,6 @@ Values: 0,[1].
 
 =item
 
-enchanted
-
-If set to C<1>, the default cursor position is on the parent-directory menu entry (C<..>). If the directory name remains
-the same after an user input, the default cursor position changes to "I<back>".
-
-If set to C<0>, the default cursor position is on the "I<back>" menu entry.
-
-Values: 0,[1].
-
-=item
-
 init_dir
 
 Set the starting point directory. Defaults to the home directory.
@@ -1245,8 +1233,8 @@ Values: 0,[1].
 
     $chosen_file = choose_a_file( { show_hidden => 0, ... } )
 
-Browse the directory tree the same way as described for C<choose_a_directory>. Select the "I<show_files>" menu entry to get the
-files of the current directory. To return the chosen file select the "I<confirm>" menu entry.
+Choose the file directory and then choose a file from the chosen directory. To return the chosen file select the
+"I<confirm>" menu entry.
 
 Options:
 
@@ -1266,17 +1254,6 @@ Values: [0],1,2.
 decoded
 
 If enabled, the directory name is returned decoded with C<locale_fs> form L<Encode::Locale>.
-
-Values: 0,[1].
-
-=item
-
-enchanted
-
-If set to C<1>, the default cursor position is on the parent-directory menu entry (C<..>). If the directory name remains
-the same after an user input, the default cursor position changes to "I<back>".
-
-If set to C<0>, the default cursor position is on the "I<back>" menu entry.
 
 Values: 0,[1].
 
@@ -1328,14 +1305,6 @@ Values: 0,[1].
 
 C<choose_directories> is similar to C<choose_a_directory> but it is possible to return multiple directories.
 
-Selecting the  "I<add_dirs>" menu entry opens the add-directories sub menu: one can add there directories from the
-current working directory to the list of chosen directories.
-
-To return the list of chosen directories (as an array reference) select the "I<confirm>" entry in main menu.
-
-The "I<back>" menu entry removes the last added directories. If the list of chosen directories is empty, "I<back>" causes
-C<choose_directories> to return nothing.
-
 Options:
 
 =over
@@ -1354,17 +1323,6 @@ Values: [0],1,2.
 decoded
 
 If enabled, the directory name is returned decoded with C<locale_fs> form L<Encode::Locale>.
-
-Values: 0,[1].
-
-=item
-
-enchanted
-
-If set to C<1>, the default cursor position is on the parent-directory menu entry (C<..>). If the directory name remains
-the same after an user input, the default cursor position changes to "I<back>".
-
-If set to C<0>, the default cursor position is on the "I<back>" menu entry.
 
 Values: 0,[1].
 

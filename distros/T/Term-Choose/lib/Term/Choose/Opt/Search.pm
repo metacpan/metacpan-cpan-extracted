@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.735';
+our $VERSION = '1.736';
 
 use Term::Choose::Constants qw( ROW COL );
 use Term::Choose::Screen    qw( up clear_to_end_of_screen );
@@ -35,15 +35,16 @@ sub __user_input {
 
 sub __search_begin {
     my ( $self ) = @_;
-    $self->{search} = 1;
     $self->{map_search_list_index} = [];
     my $search_str = $self->Term::Choose::Opt::Search::__user_input( '> search-pattern: ' );
     if ( ! length $search_str ) {
         $self->Term::Choose::Opt::Search::__search_end();
         return;
     }
-    if ( $self->{f3} == 1 ) {
+    $self->{search_info} = 'm/' . $search_str . '/';
+    if ( $self->{search} == 1 ) {
         $search_str = '(?i)' . $search_str;
+        $self->{search_info} .= 'i';
     }
     my $filtered_list = [];
     for my $i ( 0 .. $#{$self->{list}} ) {
@@ -85,6 +86,7 @@ sub __search_begin {
 
 sub __search_end {
     my ( $self ) = @_;
+    $self->{search_info} = '';
     if ( @{$self->{map_search_list_index}||[]} ) {
         my $curr_idx = $self->{rc2idx}[ $self->{pos}[ROW] ][ $self->{pos}[COL] ];
         $self->{default} = $self->{map_search_list_index}[$curr_idx];
@@ -103,7 +105,6 @@ sub __search_end {
         $self->{$key} = $self->{$key_backup} if defined $self->{$key_backup};
         delete $self->{$key_backup};
     }
-    $self->{search} = 0;
     my $up = $self->{i_row} + $self->{count_prompt_lines};
     print up( $up ) if $up;
     print "\r" . clear_to_end_of_screen();

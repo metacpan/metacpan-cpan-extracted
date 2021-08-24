@@ -1,6 +1,6 @@
 package Getopt::EX::Hashed;
 
-our $VERSION = '0.9916';
+our $VERSION = '0.9917';
 
 =head1 NAME
 
@@ -8,7 +8,7 @@ Getopt::EX::Hashed - Hash store object automation
 
 =head1 VERSION
 
-Version 0.9916
+Version 0.9917
 
 =head1 SYNOPSIS
 
@@ -81,8 +81,14 @@ sub import {
 
 sub configure {
     my $class = shift;
-    my $ctx = $class ne __PACKAGE__ ? $class : caller;
-    my $config = __Config__($ctx);
+    my $config = do {
+	if (ref $class) {
+	    $class->_conf;
+	} else {
+	    my $ctx = $class ne __PACKAGE__ ? $class : caller;
+	    __Config__($ctx);
+	}
+    };
     while (my($key, $value) = splice @_, 0, 2) {
 	$config->{$key} = $value;
     }
@@ -132,34 +138,44 @@ sub new {
     my $class = shift;
     my $obj = bless {}, $class;
     my $ctx = $class ne __PACKAGE__ ? $class : caller;
-    my $member = __Member__($ctx);
-    my $config = $obj->{__Config__} = __Config__($ctx);
-    my $order  = $obj->{__Order__} = [];
-    my $hash   = $obj->{__Hash__} = {};
-    for my $m (@$member) {
+    my $master = __Member__($ctx);
+    my $member = $obj->{__Member__} = [];
+    my $config = $obj->{__Config__} = { %{__Config__($ctx)} }; # make copy
+    for my $m (@$master) {
 	my($name, %param) = @$m;
+	push @$member, [ $name => \%param ];
 	if (my $is = $param{is}) {
 	    no strict 'refs';
 	    my $access = $config->{ACCESSOR_PREFIX} . $name;
 	    *{"$class\::$access"} = _accessor($is, $name);
 	}
 	$obj->{$name} = $param{default};
-	push @$order, $name;
-	$hash->{$name} = \%param;
     }
     lock_keys %$obj if $config->{LOCK_KEYS};
     $obj;
 }
 
-sub _conf {
+sub optspec {
     my $obj = shift;
-    my $config = $obj->{__Config__} or die;
-    if (@_) {
-	$config->{+shift};
-    } else {
-	$config;
-    }
+    map $obj->_opt_pair($_), @{$obj->_member};
 }
+
+sub getopt {
+    my $obj = shift;
+    my $getopt = caller . "::" . $obj->_conf->{GETOPT};
+    no strict 'refs';
+    $getopt->($obj->optspec());
+}
+
+sub use_keys {
+    my $obj = shift;
+    unlock_keys %{$obj};
+    lock_keys_plus %{$obj}, @_;
+}
+
+sub _conf   { $_[0]->{__Config__} }
+
+sub _member { $_[0]->{__Member__} }
 
 sub _accessor {
     my($is, $name) = @_;
@@ -175,67 +191,70 @@ sub _accessor {
     }->{$is} or die "$name has invalid 'is' parameter.\n";
 }
 
-sub optspec {
+sub _opt_pair {
     my $obj = shift;
-    my $member = $obj->{__Hash__};
-    my @spec = do {
-	# spec .= alias
-	map  {
-	    if (my $alias = $member->{$_->[0]}->{alias}) {
-		$_->[1] .= " $alias";
-	    }
-	    $_;
-	}
-	# spec = '' if $name eq = '<>'
-	grep {
-	    $_->[0] eq '<>' and $_->[1] //= '';
-	    defined $_->[1];
-	}
-	# get spec
-	map  { [ $_ => $member->{$_}->{spec} ] }
-	@{$obj->{__Order__}};
-    };
-    my @optlist = map {
-	my($name, $spec) = @$_;
-	my $compiled = $obj->_compile($name, $spec);
-	my $m = $member->{$name};
-	my $action = $m->{action};
-	$action and ref $action ne 'CODE'
-	    and die "$name->action: not a coderef.\n";
-	my $dest = do {
-	    if (my $is_valid = _validator($m)) {
-		$action ||= \&_generic_setter;
-		sub {
-		    local $_ = $obj;
-		    &$is_valid or die &{$obj->_conf->{INVALID_MSG}};
-		    &$action;
-		};
-	    }
-	    elsif ($action) {
-		sub { &$action for $obj };
-	    }
-	    else {
-		if (ref $obj->{$name} eq 'CODE') {
-		    sub { &{$obj->{$name}} for $obj };
-		} else {
-		    \$obj->{$name};
-		}
-	    }
-	};
-	$compiled => $dest;
-    } @spec;
+    my $member = shift;
+    my $spec_str = $obj->_opt_str($member) // return ();
+    ( $spec_str => $obj->_opt_dest($member) );
 }
 
-sub _invalid_msg {
-    my $opt = do {
-	if (@_ <= 2) {
-	    '--' . join '=', @_;
-	} else {
-	    sprintf "--%s %s=%s", @_[0..2];
-	}
-    };
-    "$opt: option validation error\n";
+sub _opt_str {
+    my $obj = shift;
+    my($name, $m) = @{+shift};
+
+    $name eq '<>' and return $name;
+    my $spec = $m->{spec} // return undef;
+    if (my $alias = $m->{alias}) {
+	$spec .= " $alias";
+    }
+    $obj->_compile($name, $spec);
 }
+
+sub _compile {
+    my $obj = shift;
+    my($name, $args) = @_;
+    my @args  = split ' ', $args;
+    my $spec_re = qr/[!+=:]/;
+    my @spec  = grep  /$spec_re/, @args;
+    my @alias = grep !/$spec_re/, @args;
+    my $spec = do {
+	if    (@spec == 0) { '' }
+	elsif (@spec == 1) { $spec[0] }
+	else               { die }
+    };
+    my @names = ($name, @alias);
+    for ($name, @alias) {
+	push @names, tr[_][-]r if /_/ && $obj->_conf->{REPLACE_UNDERSCORE};
+	push @names, tr[_][]dr if /_/ && $obj->_conf->{REMOVE_UNDERSCORE};
+    }
+    push @names, '' if @names and $spec !~ /^($spec_re|$)/;
+    join('|', @names) . $spec;
+}
+
+sub _opt_dest {
+    my $obj = shift;
+    my($name, $m) = @{+shift};
+
+    my $action = $m->{action};
+    if (my $is_valid = _validator($m)) {
+	$action ||= \&_generic_setter;
+	sub {
+	    local $_ = $obj;
+	    &$is_valid or die &{$obj->_conf->{INVALID_MSG}};
+	    &$action;
+	};
+    }
+    elsif ($action) {
+	sub { &$action for $obj };
+    }
+    else {
+	if (ref $obj->{$name} eq 'CODE') {
+	    sub { &{$obj->{$name}} for $obj };
+	} else {
+	    \$obj->{$name};
+	}
+    }
+} 
 
 my %tester = (
     min  => sub { $_[-1] >= $_->{min} },
@@ -246,7 +265,7 @@ my %tester = (
 
 sub _tester {
     my $m = shift;
-    map { $tester{$_} } grep { defined $m->{$_} } keys %tester;
+    map $tester{$_}, grep { defined $m->{$_} } keys %tester;
 }
 
 sub _validator {
@@ -254,7 +273,9 @@ sub _validator {
     my @test = _tester($m) or return undef;
     sub {
 	local $_ = $m;
-	for my $test (@test) { &$test or return 0 }
+	for my $test (@test) {
+	    &$test or return 0;
+	}
 	return 1;
     }
 }
@@ -266,42 +287,16 @@ sub _generic_setter {
                            : do { $_->{$_[0]} = $_[1] };
 }
 
-my $spec_re = qr/[!+=:]/;
-
-sub _compile {
-    my $obj = shift;
-    my($name, $args) = @_;
-
-    return $name if $name eq '<>';
-
-    my @args = split ' ', $args;
-    my @spec = grep /$spec_re/, @args;
-    my $spec = do {
-	if    (@spec == 0) { '' }
-	elsif (@spec == 1) { $spec[0] }
-	else               { die }
+sub _invalid_msg {
+    my $opt = do {
+	$_[0] = $_[0] =~ tr[_][-]r;
+	if (@_ <= 2) {
+	    '--' . join '=', @_;
+	} else {
+	    sprintf "--%s %s=%s", @_[0..2];
+	}
     };
-    my @alias = grep !/$spec_re/, @args;
-    my @names = ($name, @alias);
-    for ($name, @alias) {
-	push @names, tr[_][-]r if /_/ && $obj->_conf->{REPLACE_UNDERSCORE};
-	push @names, tr[_][]dr if /_/ && $obj->_conf->{REMOVE_UNDERSCORE};
-    }
-    push @names, '' if @names and $spec !~ /^($spec_re|$)/;
-    join('|', @names) . $spec;
-}
-
-sub getopt {
-    my $obj = shift;
-    my $getopt = caller . "::" . $obj->_conf('GETOPT');
-    no strict 'refs';
-    $getopt->($obj->optspec());
-}
-
-sub use_keys {
-    my $obj = shift;
-    unlock_keys %{$obj};
-    lock_keys_plus %{$obj}, @_;
+    "$opt: option validation error\n";
 }
 
 1;
@@ -492,6 +487,12 @@ You can change this behavior by C<configure> with C<LOCK_KEYS>
 parameter.
 
 =item B<configure> B<label> => I<value>, ...
+
+Use class method C<< Getopt::EX::Hashed->configure() >> before
+creating an object; this information is stored in the area unique for
+calling package.  After calling C<new()>, package unique configuration
+is copied in the object, and it is used for further operation.  Use
+C<< $obj->configure() >> to update object unique configuration.
 
 There are following configuration parameters.
 

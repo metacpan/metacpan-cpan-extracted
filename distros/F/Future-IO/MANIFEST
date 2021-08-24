@@ -2,6 +2,7 @@ Build.PL
 Changes
 lib/Future/IO.pm
 lib/Future/IO/ImplBase.pm
+lib/Test/Future/IO/Impl.pm
 LICENSE
 MANIFEST			This list of files
 META.json

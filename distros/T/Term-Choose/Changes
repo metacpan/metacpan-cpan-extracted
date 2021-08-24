@@ -1,6 +1,13 @@
 Revision history for Term::Choose
 
 
+1.736   2021-08-24
+    - renamed the option 'f3' to 'search'.
+    - 'Ctrl-F' instead of 'F3' to open the search prompt.
+    - PageUP/PageDown: 'Ctrl-P'/'Ctrl-N' instead of 'Ctrl-B'/'Ctrl-F'.
+    - search: print filter-string.
+    - Refactoring page/footer row.
+
 1.735   2021-07-12
     - prepare_promptline gets its own term_w.
 

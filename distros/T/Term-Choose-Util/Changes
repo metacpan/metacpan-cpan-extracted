@@ -1,6 +1,11 @@
 Revision history for Term::Choose::Util
 
 
+0.130   2021-08-24
+        - The option 'enchanted' has been removed.
+        - Bugfix line_fold 'subseq_tab'.
+        - Bugfix in __available_dirs: next -> return.
+
 0.129   2021-07-28
         - Refactored 'choose_directories' and 'choose_a_file'.
         - Backward incompatible changes.

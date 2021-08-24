@@ -1,5 +1,9 @@
 # Revision history for Perl extension Net::Z3950::FOLIO.
 
+## [2.4.0](https://github.com/folio-org/Net-Z3950-FOLIO/tree/v2.4.0) (Tue Aug 24 15:33:57 BST 2021)
+
+* Upgrade `source-storage-source-records` interface dependency to v3.0. (This is what is used in Juniper, so the Z-server would not build against that release.) Fixes ZF-53.
+
 ## [2.3.0](https://github.com/folio-org/Net-Z3950-FOLIO/tree/v2.3.0) (Mon Jul 19 17:15:33 BST 2021)
 
 * Insert SRS MARC records are into the result set in the right order, corresponding with the appropriate FOLIO inventory record. This ensures that MARC records have the correct holdings associated with them. Fixes ZF-52.

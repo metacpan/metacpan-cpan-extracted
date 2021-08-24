@@ -1,15 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
 
-package Future::IO::Impl::Glib;
+package Future::IO::Impl::Glib 0.02;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Future::IO::ImplBase );
-
-our $VERSION = '0.01';
 
 use Glib;
 
@@ -52,29 +50,29 @@ sub sleep
    return $f;
 }
 
-my %watching_read_by_fileno; # {fileno} => [@futures]
+my %read_futures_by_fileno; # {fileno} => [@futures]
 
 sub ready_for_read
 {
    shift;
    my ( $fh ) = @_;
 
-   my $watching = $watching_read_by_fileno{ $fh->fileno } //= [];
+   my $futures = $read_futures_by_fileno{ $fh->fileno } //= [];
 
    my $f = Future::IO::Impl::Glib::_Future->new;
 
-   my $was = scalar @$watching;
-   push @$watching, $f;
+   my $was = scalar @$futures;
+   push @$futures, $f;
 
    return $f if $was;
 
    Glib::IO->add_watch( $fh->fileno,
       ['in', 'hup', 'err'],
       sub {
-         $watching->[0]->done;
-         shift @$watching;
+         $futures->[0]->done;
+         shift @$futures;
 
-         return 1 if scalar @$watching;
+         return 1 if scalar @$futures;
          return 0;
       }
    );
@@ -82,32 +80,48 @@ sub ready_for_read
    return $f;
 }
 
-my %watching_write_by_fileno;
+my %write_futures_by_fileno;
 
 sub ready_for_write
 {
    shift;
    my ( $fh ) = @_;
 
-   my $watching = $watching_write_by_fileno{ $fh->fileno } //= [];
+   my $futures = $write_futures_by_fileno{ $fh->fileno } //= [];
 
    my $f = Future::IO::Impl::Glib::_Future->new;
 
-   my $was = scalar @$watching;
-   push @$watching, $f;
+   my $was = scalar @$futures;
+   push @$futures, $f;
 
    return $f if $was;
 
    Glib::IO->add_watch( $fh->fileno,
       ['out', 'hup', 'err'],
       sub {
-         $watching->[0]->done;
-         shift @$watching;
+         $futures->[0]->done;
+         shift @$futures;
 
-         return 1 if scalar @$watching;
+         return 1 if scalar @$futures;
          return 0;
       }
    );
+
+   return $f;
+}
+
+sub waitpid
+{
+   shift;
+   my ( $pid ) = @_;
+
+   my $f = Future::IO::Impl::Glib::_Future->new;
+
+   my $id = Glib::Child->watch_add( $pid, sub {
+      $f->done( $_[1] );
+      return 0;
+   } );
+   $f->on_cancel( sub { Glib::Source->remove( $id ) } );
 
    return $f;
 }

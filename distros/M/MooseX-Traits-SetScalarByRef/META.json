@@ -1,16 +1,16 @@
 {
    "abstract" : "Wrap a ScalarRef attribute's accessors to re-use a reference",
    "author" : [
-      "Alex Becker <c a p f a n at g m x write_Adot-here d e>"
+      "Alexander Becker <asb@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "MooseX-Traits-SetScalarByRef",
    "no_index" : {
@@ -32,15 +32,24 @@
       },
       "runtime" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.6302",
+            "ExtUtils::MakeMaker" : "6.64",
             "Moose" : "2.0604",
             "Moose::Util::TypeConstraints" : "2.0604",
             "Scalar::Util" : "1.27",
             "Test::More" : "0.98",
-            "perl" : "5.01"
+            "perl" : "5.010"
          }
+      },
+      "test" : {
+         "requires" : {}
       }
    },
    "release_status" : "stable",
-   "version" : "0.02"
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/asb-capfan/MooseX-Traits-SetScalarByRef"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

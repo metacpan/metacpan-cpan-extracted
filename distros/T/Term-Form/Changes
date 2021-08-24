@@ -1,6 +1,10 @@
 Revision history for Term::Form
 
 
+0.538   2021-08-24
+        - Update move-around keys.
+        - __write_screen: bugfix cursor position.
+
 0.537   2021-07-12
         - The info-lines get their own term_w.
 

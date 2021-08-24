@@ -2,7 +2,7 @@ package Net::Magallanes;
 
 use strict;
 use 5.008_005;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use LWP::UserAgent;
 use JSON;
@@ -100,14 +100,19 @@ sub json {
 sub answers {
     my $self   = shift;
     my $msm_id = shift;
-    my $type = shift;
+    my $args   = shift;
 
-    $type = 'A' unless $type;
+    my %args;
+    %args = %{$args} if defined $args;
+
+    my $type   = (defined($args{'TYPE'}) ? $args{'TYPE'} : 'A');
+    my $istime = (defined($args{'TIMESTAMP'}) ? $args{'TIMESTAMP'} : 0);
 
     my $result = results($self, $msm_id);
 
     my @sal;
     foreach my $resdo (@{$result}) {
+        my $timestamp = $resdo->{'timestamp'};
         if ($resdo->{'type'} eq 'dns') {
             my $res_set = $resdo->{'resultset'};
             if ($#{$res_set} < 0) {
@@ -132,7 +137,15 @@ sub answers {
                         else {
                             $res_ip = $ans->string;
                         }
-                        push @sal, $res_ip if $res_ip;
+                        if ($res_ip) {
+                            if ($istime) {
+                                my @val = ($timestamp, $res_ip);
+                                push @sal, \@val;
+                            }
+                            else {
+                                push @sal, $res_ip;
+                            }
+                        }
                     }
                 }
             }
@@ -175,11 +188,18 @@ sub nsids {
 sub rcodes {
     my $self   = shift;
     my $msm_id = shift;
+    my $args   = shift;
+
+    my %args;
+    %args = %{$args} if defined $args;
+
+    my $istime = (defined($args{'TIMESTAMP'}) ? $args{'TIMESTAMP'} : 0);
 
     my $result = results($self, $msm_id);
 
     my @sal;
     foreach my $resdo (@{$result}) {
+        my $timestamp = $resdo->{'timestamp'};
         if ($resdo->{'type'} eq 'dns') {
             my $res_set = $resdo->{'resultset'};
             if ($#{$res_set} < 0) {
@@ -192,7 +212,13 @@ sub rcodes {
                 if(defined $abuf && defined $dec_buff) {
                     my ($dns_pack)= new Net::DNS::Packet(\$dec_buff);
                     my $header = $dns_pack->header;
-                    push @sal, $header->rcode;
+                    if ($istime) {
+                        my @val = ($timestamp, $header->rcode);
+                        push @sal, \@val;
+                    }
+                    else {
+                        push @sal, $header->rcode;
+                    }
                 }
             }
         }
@@ -344,16 +370,19 @@ If you want to use an existing JSON file with a previous measurement,
 instead of downloading one from Atlas API site. You can use more than
 one file, comma separated.
 
-=head2 answers(<MSM-id> [, <qtype>])
+=head2 answers(<MSM-id> [, { TYPE => <qtype>, TIMESTAMP => 1 }])
 
 Get an array of answers from the previous measurement with id MSM-id.
 The "answers" are the records from the ANSWER section of a DNS
 measurement.
 
-If you specify a qtype 'A' (default) or 'AAAA', you'll get an array of
-addresses from the corresponding answer. With other types you'll get an
-array with a printable representation of each answer.
+You can specify a qtype 'A' (default) or 'AAAA', and you'll get an array
+of addresses from the corresponding answer. With other types you'll get
+an array with a printable representation of each answer.
 
+If you ask for TIMESTAMP, then you'll have also the time when each
+measurement was done, as epoch seconds. The output will be an array of
+pairs (time, answer).
 
 =head2 nsids(<MSM-id>)
 
@@ -363,10 +392,14 @@ MSM-id.
 If there's no NSID for a result, you'll get a 'NULL' string.
 
 
-=head2 rcodes
+=head2 rcodes((<MSM-id> [, { TIMESTAMP => 1 }])
 
 Get an array of RCODE texts from the results of a previous measurement
 MSM-id.
+
+If you ask for TIMESTAMP, then you'll have also the time when each
+measurement was done, as epoch seconds. The output will be an array of
+pairs (time, answer).
 
 
 =head2 dns( name => '<QNAME>' [, type => '<QTYPE>'] [, num_prb => '<NUM_PROBES'> ])
