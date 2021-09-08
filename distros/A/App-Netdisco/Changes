@@ -1,3 +1,23 @@
+2.049004 - 2021-09-03
+
+  [BUG FIXES]
+
+  * Allow port_control_reasons setting to actually work
+  * Swap error and info return status from Jobs to avoid info() on error
+
+2.049003 - 2021-09-03
+
+  [ENHANCEMENTS]
+
+  * Hide portctl features in Device Ports where ACLs would not permit the action
+
+2.049002 - 2021-09-03
+
+  [NEW FEATURES]
+
+  * ACLs portctl_no and portctl_only for limiting port control targets
+  * Config setting portctl_nowaps to prevent port control on WAP ports
+
 2.049001 - 2021-08-22
 
   [ENHANCEMENTS]

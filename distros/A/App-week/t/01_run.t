@@ -28,7 +28,7 @@ END
 
 '175209_re' => qr{(?x:\A
 )                          $
-        September         $
+(?x: \s+ Sep(tember)? \s+ )$
 (?x:
 (?-x:   Su Mo Tu We Th Fr Sa   ) |
 (?-x:    S  M Tu  W Th  F  S   ) )$
@@ -62,6 +62,9 @@ SKIP: {
     } else {
 	s/((?=.)[\000-\037])/sprintf("^%c", ord($1)+0100)/ge;
 	warn $_;
+	$_ = `cal 1752`;
+	s/((?=.)[\000-\037])/sprintf("^%c", ord($1)+0100)/ge;
+	warn $_;
     }
 
     my @default = qw(--cm *= -C0p0 1752/9/2);
@@ -76,6 +79,14 @@ SKIP: {
     my $crashspace =
 	Script->new([qw(--config crashspace=1), @default])->run;
     compare $crashspace->result, $result{"175209_re"}, "crashspace emulation";
+
+    my $tabify =
+	Script->new([qw(--config tabify=1), @default])->run;
+    compare $tabify->result, $result{"175209_re"}, "solaris tabify emulation";
+
+    my $sm =
+    	Script->new([qw(--config shortmonth=1), @default])->run;
+    compare $sm->result, $result{"175209_re"}, "solaris short month emulation";
 }
 
 done_testing;

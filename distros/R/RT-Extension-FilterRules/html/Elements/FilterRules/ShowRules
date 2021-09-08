@@ -1,0 +1,84 @@
+<%doc>
+Display the given list of filter rules, possibly allowing them to be edited
+and moved.
+
+  FilterRuleGroup - RT::FilterRuleGroup object containing the rules
+  Edit - which type of rules to list - "GroupRequirements" or "FilterRules"
+  PageLink - URL of page this element is on, for links
+
+Assumes that $PageLink needs to be passed an "id" parameter of
+$FilterRuleGroup->id and a "Rule" parameter of the filter rule ID, to view
+or edit a filter rule.
+</%doc>
+\
+<%ARGS>
+$FilterRuleGroup => undef
+$Edit            => 'GroupRequirements'
+$PageLink        => undef
+</%ARGS>
+\
+<%INIT>
+return if ( not $FilterRuleGroup );
+
+my $CanSee    = $FilterRuleGroup->CurrentUserHasRight('SeeFilterRule');
+my $CanModify = $FilterRuleGroup->CurrentUserHasRight('ModifyFilterRule');
+
+$CanSee = $CanModify = 1
+    if ( $session{'CurrentUser'}
+    ->HasRight( Right => 'SuperUser', Object => RT->System ) );
+
+my $Collection
+    = $Edit eq 'GroupRequirements'
+    ? $FilterRuleGroup->GroupRequirements
+    : $FilterRuleGroup->FilterRules;
+
+my $Format
+    = "'<a href=\"$PageLink?id="
+    . $FilterRuleGroup->id
+    . "&amp;Rule=__id__\">__id__</a>/TITLE:#',"
+    . "'<a href=\"$PageLink?id="
+    . $FilterRuleGroup->id
+    . "&amp;Rule=__id__\">__Name__</a>',"
+    . "'__TriggerType__'";
+
+$Format .= ",'__StopIfMatched__'"
+    if ( $Edit eq 'FilterRules' );
+
+$Format .= ",'__Conflicts__',"
+    . "'__Requirements__'";
+
+$Format .= ",'__Actions__'"
+    if ( $Edit eq 'FilterRules' );
+
+$Format .= ",'__MatchCounts__','__Disabled__'";
+
+$Format .= ",'__MoveFilterRule__'" if ($CanModify);
+</%INIT>
+\
+% if (not ($CanSee || $CanModify)) {
+<& /Elements/ListActions, actions => [ loc('Permission denied') ] &>
+% } elsif (not $Collection->CountAll) {
+%     if ($Edit eq 'GroupRequirements') {
+<p><em><&|/l&>No requirement rules found.</&></em></p>
+%     } else {
+<p><em><&|/l&>No filter rules found.</&></em></p>
+%     }
+% } else {
+%     if ($FilterRuleGroup->Disabled) {
+<& /Elements/ListActions, actions => 
+    [
+    loc('This filter rule group is currently disabled.'),
+    loc('None of the rules below will be active until the filter rule group is enabled.'),
+    ] &>
+%     }
+<& /Elements/CollectionList,
+    %ARGS,
+    OrderBy => 'SortOrder',
+    Order => 'ASC',
+    Rows  => undef,
+    Format => $Format,
+    Collection => $Collection,
+    AllowSorting => 0,
+    PassArguments => ['id'],
+&>
+% }

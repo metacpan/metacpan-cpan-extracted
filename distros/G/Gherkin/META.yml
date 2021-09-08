@@ -7,29 +7,101 @@ author:
   - 'Gaspar Nagy'
 build_requires:
   Path::Class: '0'
-  Test::Differences: '0'
-  Test::Exception: '0'
+  Test2::Tools::ClassicCompare: '0'
+  Test2::V0: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.023, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Gherkin
+provides:
+  App::gherkin:
+    file: lib/App/gherkin.pm
+    version: v21.0.0
+  Gherkin:
+    file: lib/Gherkin.pm
+    version: v21.0.0
+  Gherkin::AstBuilder:
+    file: lib/Gherkin/AstBuilder.pm
+    version: v21.0.0
+  Gherkin::AstNode:
+    file: lib/Gherkin/AstNode.pm
+    version: v21.0.0
+  Gherkin::Dialect:
+    file: lib/Gherkin/Dialect.pm
+    version: v21.0.0
+  Gherkin::Exceptions:
+    file: lib/Gherkin/Exceptions.pm
+    version: v21.0.0
+  Gherkin::Exceptions::AstBuilder:
+    file: lib/Gherkin/Exceptions.pm
+    version: v21.0.0
+  Gherkin::Exceptions::CompositeParser:
+    file: lib/Gherkin/Exceptions.pm
+    version: v21.0.0
+  Gherkin::Exceptions::NoSuchLanguage:
+    file: lib/Gherkin/Exceptions.pm
+    version: v21.0.0
+  Gherkin::Exceptions::Parser:
+    file: lib/Gherkin/Exceptions.pm
+    version: v21.0.0
+  Gherkin::Exceptions::SingleParser:
+    file: lib/Gherkin/Exceptions.pm
+    version: v21.0.0
+  Gherkin::Exceptions::UnexpectedEOF:
+    file: lib/Gherkin/Exceptions.pm
+    version: v21.0.0
+  Gherkin::Exceptions::UnexpectedToken:
+    file: lib/Gherkin/Exceptions.pm
+    version: v21.0.0
+  Gherkin::Generated::Languages:
+    file: lib/Gherkin/Generated/Languages.pm
+    version: v21.0.0
+  Gherkin::Generated::Parser:
+    file: lib/Gherkin/Generated/Parser.pm
+    version: v21.0.0
+  Gherkin::Line:
+    file: lib/Gherkin/Line.pm
+    version: v21.0.0
+  Gherkin::Parser:
+    file: lib/Gherkin/Parser.pm
+    version: v21.0.0
+  Gherkin::ParserBase:
+    file: lib/Gherkin/ParserBase.pm
+    version: v21.0.0
+  Gherkin::ParserContext:
+    file: lib/Gherkin/ParserContext.pm
+    version: v21.0.0
+  Gherkin::Pickles::Compiler:
+    file: lib/Gherkin/Pickles/Compiler.pm
+    version: v21.0.0
+  Gherkin::Token:
+    file: lib/Gherkin/Token.pm
+    version: v21.0.0
+  Gherkin::TokenFormatterBuilder:
+    file: lib/Gherkin/TokenFormatterBuilder.pm
+    version: v21.0.0
+  Gherkin::TokenMatcher:
+    file: lib/Gherkin/TokenMatcher.pm
+    version: v21.0.0
+  Gherkin::TokenScanner:
+    file: lib/Gherkin/TokenScanner.pm
+    version: v21.0.0
 requires:
   Class::XSAccessor: '0'
   Cpanel::JSON::XS: '0'
   Data::UUID: '0'
   Getopt::Long: '2.36'
-  IO::Scalar: '0'
-  perl: v5.10.1
+  perl: v5.12.0
 resources:
   bugtracker: https://github.com/cucumber/cucumber/issues
   repository: https://github.com/cucumber/gherkin-perl.git
-version: 20.0.1
+version: 21.0.0
 x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: MIT

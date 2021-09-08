@@ -1,3 +1,13 @@
+0.54 2021-09-03
+-feature: added fragment() as alias of frag() (thanks markov2)
+-bugfix: fixes several utf8 encoding bugs in html_url, normalize (thanks markov2)
+
+0.53 2021-08-31
+-bugfix: html_url w/ empty relative url crashes w/ floating point error (thanks markov2)
+-bugfix: html_url w/ fragment appends null char to uri (thanks markov2)
+-bugfix: html_url segfaults when both rel and base start with "//" (thanks markov2)
+-bugfix: normalized URIs with an authority section and an empty path must have a trailing slash (thanks markov2)
+
 0.52 2021-08-20
 -feature: html_url now implemented in XS
 -feature: html_url has OO ctor equivalent, new_html_url

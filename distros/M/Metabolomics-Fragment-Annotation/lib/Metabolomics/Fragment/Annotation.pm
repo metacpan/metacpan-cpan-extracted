@@ -29,8 +29,12 @@ our @ISA = qw(Exporter);
 our %EXPORT_TAGS = ( 'all' => [ qw( 
 	writeFullTabularWithPeakBankObject 
 	writeTabularWithPeakBankObject
+	writeHtmlWithPeakBankObject
 	writeHtmlWithSpectralBankObject
 	compareExpMzToTheoMzList
+	compareExpMzToTheoMzListAllMatches
+	computeHrGcmsMatchingScores
+	filterAnalysisSpectralAnnotationByScores
 	
 ) ] );
 
@@ -39,8 +43,12 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw( 
 	writeFullTabularWithPeakBankObject 
 	writeTabularWithPeakBankObject
+	writeHtmlWithPeakBankObject
 	writeHtmlWithSpectralBankObject 
 	compareExpMzToTheoMzList
+	compareExpMzToTheoMzListAllMatches
+	computeHrGcmsMatchingScores
+	filterAnalysisSpectralAnnotationByScores
 	
 );
 
@@ -55,11 +63,11 @@ Metabolomics::Fragment::Annotation - Perl extension for fragment annotation in m
 =head1 VERSION
 
 Version 0.6.4 - POD Update, multiAnnotation support in matching algo and writers, PeakForest REST API integration, supporting CSV and TSV as inputs (sniffer), HTML outputs
-
+Version 0.6.5 - Package architecture modification (PeakForest Part), POD improvement, Annotation results filtering based on scores
 
 =cut
 
-our $VERSION = '0.6.4';
+our $VERSION = '0.6.5';
 
 
 =head1 SYNOPSIS
@@ -98,15 +106,37 @@ Note that this documentation is intended as a reference to the module.
 		
 		
 	When resources are built, Metabolomics::Fragment::Annotation drives the annotation process:
-		$oBank->parsingMsFragments($inputFile, $asHeader, $mzCol) ;			# get exprimental mz listing to annotate
+
 		my $oAnalysis = Metabolomics::Fragment::Annotation->new($oBank) ;			# init analysis object
 		$oAnalysis->compareExpMzToTheoMzList('PPM', $ppmError) ;			# compare theorical bank vs experimental bank (Best hit only)
 		$oAnalysis->compareExpMzToTheoMzListAllMatches('PPM', $delta) ; 	# compare theorical bank vs experimental bank (supporting multi annotation)
 		
 		$oAnalysis->writeFullTabularWithPeakBankObject($expFile, $template, $tabular) ; # Write TSV enriched output with integrated input data
 		$oAnalysis->writeTabularWithPeakBankObject($template, $tabular) ; 				# Write TSV enriched output
+		$oAnalysis->writeHtmlWithPeakBankObject($templateHTML, $htmlFile, $bestHitOnly ) ; # Write Html enriched output
+		
+	For spectral Annotation, Package allows to compute scores (ONLY GCMS scores for current package version) and filter results by threshold based on these scores
+	
+		my $oAnalysis = Metabolomics::Fragment::Annotation->new($oBank) ;			# init analysis object
+		$oAnalysis->compareExpMzToTheoMzListAllMatches('MMU', $delta) ; 	# compare theorical bank vs experimental bank (supporting multi annotation)
+		
+		my $scores = $oAnalysis->computeHrGcmsMatchingScores() ; # Compute _SCORE_PEARSON_CORR_ , _SCORE_Q_ and _SCORE_LIB_
+		
+		$oAnalysis->filterAnalysisSpectralAnnotationByScores($scores, '_SCORE_PEARSON_CORR_', 0.5) ;	
+		
+		$oAnalysis->writeFullTabularWithPeakBankObject($expFile, $template, $tabular) ; # Write TSV enriched output with integrated input data
+		$oAnalysis->writeTabularWithPeakBankObject($template, $tabular) ; 				# Write TSV enriched output
 		$oAnalysis->writeHtmlWithSpectralBankObject($templateHTML, $htmlFile, $scores ) ; # Write Html enriched output
+		
+	Possible scores are:
+		# For GC/MS Spectral annotation
+		_SCORE_LIB_: Proportion of library spectrum's peaks with matches.
+		_SCORE_Q_: Proposition of query peaks with matches.
+		_SCORE_PEARSON_CORR_: Pearson correlation between intensities of paired peaks, where unmatched peaks are paired with zero-intensity "pseudo-peaks"
 
+		# For LC/MS spectral annotation
+		Work is in progress for version 0.6.6 of Metabolomics::Fragment::Annotation
+		
 =encoding utf8
 
 =head1 DESCRIPTION
@@ -190,9 +220,61 @@ When resources are built, Metabolomics::Fragment::Annotation drives the annotati
 	
 	# Compare theorical bank vs experimental bank with a delta on mz (Da or PPM are both supported)
 	
-	$oAnalysis->compareExpMzToTheoMzList('PPM', $ppmError) ;
+	$oAnalysis->compareExpMzToTheoMzList('PPM', $ppmError) ; # Keep best hit only
 
 Intensity and retention time variables are not used in this annotation because the reference bank does not store such features.
+
+=head2 Using PhytoHUB database
+
+PhytoHub is a freely available electronic database containing detailed information about dietary phytochemicals and their human and animal metabolites. 
+Around 1,200 polyphenols, terpenoids, alkaloids and other plant secondary metabolites present in commonly consumed foods (>350) are included, with >560 of their human or animal metabolites. 
+For every phytochemical, the following is or will be soon available: 
+	1) the chemical structure and identifyers 
+	2) physico-chemical data such as solubility and physiological charge 
+	3) the main dietary sources (extracted from the literature by a team of invited experts and from online databases such as FooDB and Phenol-Explorer) 
+	4) known human metabolites (also manually extracted from the literature and from online databases by the curators), 
+	5) in silico predicted metabolites, generated by Biotransformer (developed by Univ of Alberta) based on machine learning and expert knowledge of host and microbial metabolism, 
+	6) monoisotopic mass and spectral data (collated from libraries of spectra such as MassBank and ReSpect (RIKEN MSn spectral database for phytochemicals), as well as from the literature and from our mass spectrometry/metabolomics laboratory and collaborating groups) 
+	7) hyperlinks to other online databases.
+	
+PhytoHUB is a key resource in European JPI Projects FOODBALL (https://foodmetabolome.org/) and FOODPHYT (2019-2022).
+
+This resource is very useful for foodmetabolome studies, trying to identify metabolites in samples analysed by LC-MS
+
+# init the bank object
+	
+	my $oBank = Metabolomics::Banks::PhytoHub->new( { POLARITY => $IonMode, } ) ;
+	
+	# get theorical metabolites from last database version (crawled by metabolomics::references package)			
+	
+	$oBank->getMetabolitesFromSource($source) ;
+	
+	# build potential candidates depending of your acquisition mode used on LC-MS instrument and produce the new theorical bank
+	# Only POSITIVE or NEGATIVE is today supported - - "BOTH" does not work
+	
+	$oBank->buildTheoPeakBankFromPhytoHub($IonMode) ;
+
+When resources are built, Metabolomics::Fragment::Annotation drives the annotation process:
+
+	# Don't forget to parse your tabular or CSV input peak list
+	
+	$oBank->parsingMsFragments($expFile, 'asheader', $col) ; # get mz in colunm $col
+
+	# init analysis object based on a PhytoHUB bank object
+	
+	my $oAnalysis = Metabolomics::Fragment::Annotation->new($oBank) ;
+
+	# Compare theorical bank vs experimental bank with a delta on mz (Da or PPM are both supported)
+	
+	my $Annot = $oAnalysis->compareExpMzToTheoMzListAllMatches('PPM', $delta) ; ## multi annotation method
+
+	# Write different outputs adapted for different view of results
+	
+	my $tabularFullfile = $oAnalysis->writeFullTabularWithPeakBankObject($expFile, $template, $tabular, 'FALSE') ; ## add result columns at the end of your inputfile 
+		
+		my $tabularfile = $oAnalysis->writeTabularWithPeakBankObject($template, $tabular.'.SIMPLE', 'FALSE') ; ## foreach mz from your peak list, give annotation results (can be several lines by mz)
+		
+		my $HtmlOuput = $oAnalysis->writeHtmlWithPeakBankObject($templateHTML, $htmlFile ) ; A html results view + hyperlinks to database
 
 
 =head1 PUBLIC METHODS 
@@ -224,6 +306,7 @@ sub new {
     $self->{_ANNOTATION_DB_SOURCE_URL_} = $args->{_DATABASE_URL_} ;
     $self->{_ANNOTATION_DB_SOURCE_URL_CARD_} = $args->{_DATABASE_URL_CARD_} ;
     $self->{_ANNOTATION_DB_SPECTRA_INDEX_} = $args->{_DATABASE_SPECTRA_} ;
+#    $self->{_ANNOTATION_SCORES_} = undef ; # A hash
     $self->{_ANNOTATION_PARAMS_DELTA_} = undef ;
     $self->{_ANNOTATION_PARAMS_DELTA_TYPE_} = undef ; ## should be PPM | MMU
     $self->{_ANNOTATION_PARAMS_INSTRUMENTS_} = [] ;
@@ -238,214 +321,6 @@ sub new {
 	bless($self) ;
 
     return $self ;
-}
-### END of SUB
-
-=item PRIVATE_ONLY _getANNOTATION_PARAMS_DELTA
-
-	## Description : _getANNOTATION_PARAMS_DELTA
-	## Input : void
-	## Output : $VALUE
-	## Usage : my ( $VALUE ) = _getANNOTATION_PARAMS_DELTA () ;
-
-=cut
-
-## START of SUB
-sub _getANNOTATION_PARAMS_DELTA {
-    ## Retrieve Values
-    my $self = shift ;
-    
-    my $VALUE = undef ;
-    
-    if ( (defined $self->{_ANNOTATION_PARAMS_DELTA_}) and ( $self->{_ANNOTATION_PARAMS_DELTA_} ne '' ) ) {	$VALUE = $self->{_ANNOTATION_PARAMS_DELTA_} ; }
-    else {	 $VALUE = undef ; warn "[WARN] the method _getANNOTATION_PARAMS_DELTA getPeak an undef value\n" ; }
-    
-    return ( $VALUE ) ;
-}
-### END of SUB
-
-=item PRIVATE_ONLY _setANNOTATION_PARAMS_DELTA
-
-	## Description : _setANNOTATION_PARAMS_DELTA
-	## Input : $VALUE
-	## Output : TRUE
-	## Usage : _setANNOTATION_PARAMS_DELTA ( $VALUE ) ;
-
-=cut
-
-## START of SUB
-sub _setANNOTATION_PARAMS_DELTA {
-    ## Retrieve Values
-    my $self = shift ;
-    my ( $VALUE ) = @_;
-    
-    if ( (defined $VALUE) and ($VALUE ne '')  ) {	$self->{_ANNOTATION_PARAMS_DELTA_} = $VALUE ; }
-    else {
-    	$self->{_ANNOTATION_PARAMS_DELTA_} = undef ;
-    	warn "[WARN] the method _setANNOTATION_PARAMS_DELTA is set with undef value\n" ; 
-	}
-    
-    return (0) ;
-}
-### END of SUB
-
-=item PRIVATE_ONLY _getANNOTATION_PARAMS_DELTA_TYPE
-
-	## Description : _getANNOTATION_PARAMS_DELTA_TYPE
-	## Input : void
-	## Output : $VALUE
-	## Usage : my ( $VALUE ) = _getANNOTATION_PARAMS_DELTA_TYPE () ;
-
-=cut
-
-## START of SUB
-sub _getANNOTATION_PARAMS_DELTA_TYPE {
-    ## Retrieve Values
-    my $self = shift ;
-    
-    my $VALUE = undef ;
-    
-    if ( (defined $self->{_ANNOTATION_PARAMS_DELTA_TYPE_}) and ( $self->{_ANNOTATION_PARAMS_DELTA_TYPE_} ne '' ) ) {	$VALUE = $self->{_ANNOTATION_PARAMS_DELTA_TYPE_} ; }
-    else {	 $VALUE = undef ; warn "[WARN] the method _getANNOTATION_PARAMS_DELTA_TYPE getPeak an undef value\n" ; }
-    
-    return ( $VALUE ) ;
-}
-### END of SUB
-
-=item PRIVATE_ONLY _setANNOTATION_PARAMS_DELTA_TYPE
-
-	## Description : _setANNOTATION_PARAMS_DELTA_TYPE
-	## Input : $VALUE
-	## Output : TRUE
-	## Usage : _setANNOTATION_PARAMS_DELTA_TYPE ( $VALUE ) ;
-
-=cut
-
-## START of SUB
-sub _setANNOTATION_PARAMS_DELTA_TYPE {
-    ## Retrieve Values
-    my $self = shift ;
-    my ( $VALUE ) = @_;
-    
-    if ( (defined $VALUE) and ($VALUE ne '')  ) {	$self->{_ANNOTATION_PARAMS_DELTA_TYPE_} = $VALUE ; }
-    else {
-    	$self->{_ANNOTATION_PARAMS_DELTA_TYPE_} = undef ;
-    	warn "[WARN] the method _setANNOTATION_PARAMS_DELTA_TYPE is set with undef value\n" ; 
-	}
-    
-    return (0) ;
-}
-### END of SUB
-
-=item PRIVATE_ONLY _getANNOTATION_DB_SOURCE
-
-	## Description : _getANNOTATION_DB_SOURCE
-	## Input : void
-	## Output : $VALUE
-	## Usage : my ( $VALUE ) = _getANNOTATION_DB_SOURCE () ;
-
-=cut
-
-## START of SUB
-sub _getANNOTATION_DB_SOURCE {
-    ## Retrieve Values
-    my $self = shift ;
-    
-    my $VALUE = undef ;
-    
-    if ( (defined $self->{_ANNOTATION_DB_SOURCE_}) and ( $self->{_ANNOTATION_DB_SOURCE_} ne '' ) ) {	$VALUE = $self->{_ANNOTATION_DB_SOURCE_} ; }
-    else {	 $VALUE = undef ; warn "[WARN] the method _getANNOTATION_DB_SOURCE getPeak an undef value\n" ; }
-    
-    return ( $VALUE ) ;
-}
-### END of SUB
-
-=item PRIVATE_ONLY _setANNOTATION_DB_SOURCE
-
-	## Description : _setANNOTATION_DB_SOURCE
-	## Input : $VALUE
-	## Output : TRUE
-	## Usage : _setANNOTATION_DB_SOURCE ( $VALUE ) ;
-
-=cut
-
-## START of SUB
-sub _setANNOTATION_DB_SOURCE {
-    ## Retrieve Values
-    my $self = shift ;
-    my ( $VALUE ) = @_;
-    
-    if ( (defined $VALUE) and ($VALUE ne '')  ) {	$self->{_ANNOTATION_DB_SOURCE_} = $VALUE ; }
-    else {
-    	$self->{_ANNOTATION_DB_SOURCE_} = undef ;
-    	warn "[WARN] the method _setANNOTATION_DB_SOURCE is set with undef value\n" ; 
-	}
-    
-    return (0) ;
-}
-### END of SUB
-
-
-#=item PRIVATE_ONLY __refAnnotatedPeak__
-#
-#	## Description : set a new theorical peak
-#	## Input : NA	
-#	## Output : refPeak
-#	## Usage : my ( refPeak ) = __refPeak__() ;
-#
-#=cut
-#
-### START of SUB
-#sub __refAnnotatedPeak__ {
-#    ## Variables
-#    my ($class,$args) = @_;
-#    my $self={};
-#
-#    bless($self) ;
-#    $self->{_ID_} = undef ; # identifiant (for theo peak)
-#    $self->{_SPECTRA_ID_} = undef ; # spectra identifiant (for theo peak) - best hit
-#    $self->{_MESURED_MONOISOTOPIC_MASS_} = 0 ; # mesured accurate mass (for exp peak)
-#    $self->{_COMPUTED_MONOISOTOPIC_MASS_} = 0 ; # computed accurate mass (for theo peak) - best hit
-#    $self->{_PPM_ERROR_} = 0 ; # FLOAT - best hit
-#    $self->{_MMU_ERROR_} = 0 ; # FLOAT - best hit
-#    $self->{_ANNOTATION_IN_NEG_MODE_} = undef ; # STRING as [M-H]- - best hit
-#    $self->{_ANNOTATION_IN_POS_MODE_} = undef ; # STRING as [M+H]+ - best hit
-#    $self->{_ANNOTATION_ONLY_IN_} = undef ; # STRING as [undef|NEG|POS], undef is default - best hit
-#    $self->{_ANNOTATION_TYPE_} = undef ; # STRING as adducts, fragment or isotope - best hit
-#    $self->{_ANNOTATION_NAME_} = undef ; # STRING for metabolite common name - best hit
-#    $self->{_ANNOTATION_FORMULA_} = undef ; # STRING for metabolite molecular formula - best hit
-#    $self->{_ANNOTATION_INCHIKEY_} = undef ; # STRING for metabolite inchikey representation - best hit
-#    $self->{_ANNOTATION_SMILES_} = undef ; # STRING for metabolite smiles representation - best hit
-#    $self->{_ANNOTATION_IS_A_METABOLITE_} = undef ; # STRING for metabolite status - best hit
-#    $self->{_ANNOTATION_IS_A_PRECURSOR_} = undef ; # STRING for metabolite status - best hit
-#    $self->{_ANNOTATIONS_} = () ; # ARRAY for metabolite annotations
-#
-#    return $self ;
-#}
-#### END of SUB
-
-
-=item PRIVATE_ONLY _addAnnotatedPeakList
-
-	## Description : _addAnnotatedPeakList
-	## Input : $self, $type, $peakList ;
-	## Ouput : NA;
-	## Usage : _addAnnotatedPeakList($type, $peakList);
-
-=cut
-
-### START of SUB
-
-sub _addAnnotatedPeakList {
-    my ($self, $type, $peakList) = @_;
-    
-    ## type should be _EXP_PEAK_LIST_ALL_ANNOTATIONS_
-	if ( (defined $type) and (defined $peakList) ) {
-		push (@{$self->{$type}}, $peakList);
-	}
-	else{
-		croak "type peaklist should be _EXP_PEAK_LIST_ALL_ANNOTATIONS_ \n" ;
-	}
 }
 ### END of SUB
 
@@ -645,7 +520,7 @@ sub compareExpMzToTheoMzListAllMatches {
     		my ( $annotInNegMode, $annotInPosMode, $annotFormula, $annotSmiles) = ( undef, undef, undef, undef ) ;
     		my ( $annotInchikey, $annotIsAMetabolite, $annotIsAPrecursor) = ( undef, undef, undef ) ;
     		my ( $annotInt, $annotInt100, $annotInt999) = ( undef, undef, undef ) ;
-    		my ( $annotSpectralId ) = (undef) ;
+    		my ( $annotSpectralId, $annotClusterId ) = ( undef, undef ) ;
     		
     		my $Matches = 'FALSE' ;
     		my @matches = () ;
@@ -673,6 +548,8 @@ sub compareExpMzToTheoMzListAllMatches {
     				$annotInt100 = $theoFrag->_getPeak_RELATIVE_INTENSITY_100() if $theoFrag->_getPeak_RELATIVE_INTENSITY_100()  ;
     				$annotInt999 = $theoFrag->_getPeak_RELATIVE_INTENSITY_999() if $theoFrag->_getPeak_RELATIVE_INTENSITY_999()  ;
     				$annotSpectralId = $theoFrag->_getPeak_ANNOTATION_SPECTRA_ID() if $theoFrag->_getPeak_ANNOTATION_SPECTRA_ID()  ;
+    				# Get Cluster if exists in exp peak
+    				$annotClusterId = $expFrag->_getPeak_CLUSTER_ID() if $expFrag->_getPeak_CLUSTER_ID()  ;
 #    				warn "\tMATCH! -> with $annotID\n " ;
     				# compute error 
     				$deltaErrorMmu = _computeMzDeltaInMmu($fragMz, $motifMz) ;
@@ -697,6 +574,7 @@ sub compareExpMzToTheoMzListAllMatches {
 	    			$oPeak->_setPeak_RELATIVE_INTENSITY_999($annotInt999) ;
 	    			$oPeak->_setPeak_INTENSITY($annotInt) ;    			
 	    			$oPeak->_setPeak_ANNOTATION_SPECTRAL_IDS($annotSpectralId) ;
+	    			$oPeak->_setPeak_CLUSTER_ID($annotClusterId) if (defined $annotClusterId) ;
 
 					$self->_addAnnotatedPeakList('_EXP_PEAK_LIST_ALL_ANNOTATIONS_', $oPeak) ;
 					
@@ -726,6 +604,7 @@ sub compareExpMzToTheoMzListAllMatches {
 	    		$oNoMatchedPeak->_setPeak_ANNOTATION_IS_A_METABOLITE( undef ) ;
 	    		$oNoMatchedPeak->_setPeak_ANNOTATION_IS_A_PRECURSOR( undef ) ;
 	    		$oNoMatchedPeak->_setPeak_ANNOTATIONS(undef) ;
+	    		$oNoMatchedPeak->_setPeak_CLUSTER_ID(undef) ;
 	    		
 	    		## TODO - No match intensities    
 	    		
@@ -734,7 +613,7 @@ sub compareExpMzToTheoMzListAllMatches {
     		}
     		else {
     			## Set best hit as exp peak annotation
-    			my @sortedMatches = () ; 
+    			my @sortedMatches = () ;
     			@sortedMatches = sort {$$a{"_PPM_ERROR_"} <=> $$b{"_PPM_ERROR_"} } @matches;
     			@matches = () ; ## flush Array
 #    			print Dumper @sortedMatches ;
@@ -765,7 +644,16 @@ sub compareExpMzToTheoMzListAllMatches {
     	} ## END foreach exp peak
     }
     else {
-    	croak "[ERROR]: One of peak list is empty or object is undef...\n" ;
+    	 if (  ( scalar (@{$expFragments}) == 0 ) and  ( scalar (@{$theoFragments}) == 0 ) ) {
+    	 	croak "[ERROR]: Both peak lists (EXP / THEO) are empty or object is undef...\n" ;
+    	 }
+    	 elsif (  ( scalar (@{$expFragments}) == 0 ) ) {
+    	 	croak "[ERROR]: Experimental peak lists is empty ...\n" ;
+    	 }
+    	 elsif (  ( scalar (@{$theoFragments}) > 0 ) ) {
+    	 	warn "[WARN]: Theorical peak lists is empty (No results?)...\n" ;
+    	 }
+    	
     }
 #    print Dumper @AnnotatedPeaks ;
 #    return (\@AnnotatedPeaks) ;
@@ -798,19 +686,22 @@ sub computeHrGcmsMatchingScores {
 #    	print "Cluster -- $pcId\n" ;
     	
     	# structure [ [intE_x, intT_y], ... ]
-    	
+#    	my $i = 0 ;
+#    	my $annot = 0 ;
     	foreach my $oPeak (@{$expPseudoSpectra->{$pcId}}) {
-    		
+#    		$i++ ;
     		my $RIexp = $oPeak->_getPeak_RELATIVE_INTENSITY_100() ;
     		my $RIsp = undef ;
     		my $spectralIDs = undef ;
 #    		
     		my $matchedPeaksRelatedToSpectra = $oPeak->_getPeak_ANNOTATIONS() ;
     		
-    		## Some matched exits
+    		## Some matched exists
     		if ($matchedPeaksRelatedToSpectra > 0 ) {
-    			
+#    			my $j = 0 ;
     			foreach my $oMatchedPeak (@{$matchedPeaksRelatedToSpectra}) {
+#    				$j ++ ;
+#    				$annot ++ ;
 #	    			print Dumper $oMatchedPeak ;
 	    			$spectralIDs = $oMatchedPeak->_getPeak_ANNOTATION_SPECTRAL_IDS() ;
 #	    			print Dumper $spectralIDs ;
@@ -819,6 +710,7 @@ sub computeHrGcmsMatchingScores {
 	    			my $scoreIndex = $spectralIDs->[0].'-'.$pcId ;
 	    			
 	    			push (@{ $MatchingSyntesis{$scoreIndex}{'INT_MATCHING'} }, [$RIexp, $RIsp ] ) ;
+#	    			print "$scoreIndex -- expPeak $i / annot $j (total $annot) -> [ $RIexp, $RIsp ]\n" ;
 	    			
     			## add cluster id information
 	    			$MatchingSyntesis{$scoreIndex}{'CLUSTER_ID'} = $pcId if (! $MatchingSyntesis{$scoreIndex}{'CLUSTER_ID'} ) ;
@@ -866,7 +758,6 @@ sub computeHrGcmsMatchingScores {
     		if ( $machingStatus eq 'FALSE' ) {
     			push ( @{ $MatchingSyntesis{$spectralId_pcId}{'INT_MATCHING'} }, [ 0, $libPeakRelInt] )
     		}
-    		
     	}
     	
 #    	print Dumper %MatchingSyntesis ;
@@ -900,6 +791,84 @@ sub computeHrGcmsMatchingScores {
     return (\%spectraScores) ;
 }
 ### END of SUB
+
+=item filterAnalysisSpectralAnnotationByScores
+
+	## Description : filter a analysis object (after spectral annotation) by score
+	## Input : $oAnalysis, $scoreType, $scoreFilterValue
+	## Output : $oAnalysis
+	## Usage : my ( $oAnalysis ) = $oAnalysis->filterAnalysisSpectralAnnotationByScores ( $oAnalysis, $scoreType, $scoreFilterValue ) ;
+
+=cut
+
+## START of SUB
+sub filterAnalysisSpectralAnnotationByScores {
+    ## Retrieve Values
+    my $self = shift ;
+    
+    my ( $SCORES, $scoreType, $scoreFilterValue ) = @_;
+    
+    if ( scalar ( keys %{$SCORES} ) > 0  ) {
+    	
+    	## Demo with cluster 1505
+    	my $PSEUDOSPECTRALIST = $self->_getPeaksToAnnotated('_EXP_PSEUDOSPECTRA_LIST_') ; # HASH
+    	my $EXPPEAKLISTALLANNOTATIONS = $self->_getPeaksToAnnotated('_EXP_PEAK_LIST_ALL_ANNOTATIONS_') ; # ARRAY
+    	my $EXPPEAKLIST = $self->_getPeaksToAnnotated('_EXP_PEAK_LIST_') ; # ARRAY
+    	
+    	foreach my $groupId ( keys %{ $SCORES } ) {
+    		
+    		foreach my $spectralId ( keys %{ $SCORES->{$groupId} } ) {
+    			
+    			if ( $SCORES->{$groupId}{$spectralId}{$scoreType} ) {
+    				
+    				my $currentScore = $SCORES->{$groupId}{$spectralId}{$scoreType} ;
+    				
+    				if ( $currentScore < $scoreFilterValue) {
+    					
+    					foreach my $expPeakAllAnnot (@{$EXPPEAKLISTALLANNOTATIONS}) {
+    						
+    						if ( (defined $expPeakAllAnnot->_getPeak_CLUSTER_ID() ) and ($expPeakAllAnnot->_getPeak_CLUSTER_ID() eq $groupId ) ) {
+    							
+    							if ( scalar ($expPeakAllAnnot->_getPeak_ANNOTATION_SPECTRAL_IDS()) > 0 ) {
+    								
+    								foreach my $AnnotSpectralId (@{ $expPeakAllAnnot->_getPeak_ANNOTATION_SPECTRAL_IDS() }) {
+    									
+    									if ($spectralId eq $AnnotSpectralId) {
+    										$expPeakAllAnnot->_setPeakFilterPass('FALSE') ;
+    									}
+    								}
+    							}
+    						}
+    					}
+    				}
+    			}
+    		}
+    	}
+    	
+		## For test only    	
+#    	foreach my $expPeak (@{$EXPPEAKLIST}) {
+#    		if ( (defined $expPeak->_getPeak_CLUSTER_ID() ) and ($expPeak->_getPeak_CLUSTER_ID() eq '1505' || '0666' ) ) {
+#    			print "----------------------> ExpPEAK:\n" ;
+#    			print Dumper $expPeak ;
+#    		}
+#    	}
+#    	
+#    	foreach my $expPeakAllAnnot (@{$EXPPEAKLISTALLANNOTATIONS}) {
+#    		if ( (defined $expPeakAllAnnot->_getPeak_CLUSTER_ID() ) and ($expPeakAllAnnot->_getPeak_CLUSTER_ID() eq '1505' || '0666' ) ) {
+#    			print "----------------------> ExpPEAKALLANNOT:\n" ;
+#    			print Dumper $expPeakAllAnnot ;
+#    		}
+#    	}
+    } ## END IF SCORES keys > 0
+    else {
+    	warn "[WARN] No computed scores detected - - No filter applied on analysis object\n" ;
+    }
+    
+    return () ;
+}
+### END of SUB
+
+
 
 =item writeHtmlWithPeakBankObject
 
@@ -1180,6 +1149,174 @@ sub writeFullTabularWithPeakBankObject {
 
 =over 4
 
+=item PRIVATE_ONLY _addAnnotatedPeakList
+
+	## Description : _addAnnotatedPeakList
+	## Input : $self, $type, $peakList ;
+	## Ouput : NA;
+	## Usage : _addAnnotatedPeakList($type, $peakList);
+
+=cut
+
+### START of SUB
+
+sub _addAnnotatedPeakList {
+    my ($self, $type, $peakList) = @_;
+    
+    ## type should be _EXP_PEAK_LIST_ALL_ANNOTATIONS_
+	if ( (defined $type) and (defined $peakList) ) {
+		push (@{$self->{$type}}, $peakList);
+	}
+	else{
+		croak "type peaklist should be _EXP_PEAK_LIST_ALL_ANNOTATIONS_ \n" ;
+	}
+}
+### END of SUB
+
+=item PRIVATE_ONLY _getANNOTATION_PARAMS_DELTA
+
+	## Description : _getANNOTATION_PARAMS_DELTA
+	## Input : void
+	## Output : $VALUE
+	## Usage : my ( $VALUE ) = _getANNOTATION_PARAMS_DELTA () ;
+
+=cut
+
+## START of SUB
+sub _getANNOTATION_PARAMS_DELTA {
+    ## Retrieve Values
+    my $self = shift ;
+    
+    my $VALUE = undef ;
+    
+    if ( (defined $self->{_ANNOTATION_PARAMS_DELTA_}) and ( $self->{_ANNOTATION_PARAMS_DELTA_} ne '' ) ) {	$VALUE = $self->{_ANNOTATION_PARAMS_DELTA_} ; }
+    else {	 $VALUE = undef ; warn "[WARN] the method _getANNOTATION_PARAMS_DELTA getPeak an undef value\n" ; }
+    
+    return ( $VALUE ) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _setANNOTATION_PARAMS_DELTA
+
+	## Description : _setANNOTATION_PARAMS_DELTA
+	## Input : $VALUE
+	## Output : TRUE
+	## Usage : _setANNOTATION_PARAMS_DELTA ( $VALUE ) ;
+
+=cut
+
+## START of SUB
+sub _setANNOTATION_PARAMS_DELTA {
+    ## Retrieve Values
+    my $self = shift ;
+    my ( $VALUE ) = @_;
+    
+    if ( (defined $VALUE) and ($VALUE ne '')  ) {	$self->{_ANNOTATION_PARAMS_DELTA_} = $VALUE ; }
+    else {
+    	$self->{_ANNOTATION_PARAMS_DELTA_} = undef ;
+    	warn "[WARN] the method _setANNOTATION_PARAMS_DELTA is set with undef value\n" ; 
+	}
+    
+    return (0) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _getANNOTATION_PARAMS_DELTA_TYPE
+
+	## Description : _getANNOTATION_PARAMS_DELTA_TYPE
+	## Input : void
+	## Output : $VALUE
+	## Usage : my ( $VALUE ) = _getANNOTATION_PARAMS_DELTA_TYPE () ;
+
+=cut
+
+## START of SUB
+sub _getANNOTATION_PARAMS_DELTA_TYPE {
+    ## Retrieve Values
+    my $self = shift ;
+    
+    my $VALUE = undef ;
+    
+    if ( (defined $self->{_ANNOTATION_PARAMS_DELTA_TYPE_}) and ( $self->{_ANNOTATION_PARAMS_DELTA_TYPE_} ne '' ) ) {	$VALUE = $self->{_ANNOTATION_PARAMS_DELTA_TYPE_} ; }
+    else {	 $VALUE = undef ; warn "[WARN] the method _getANNOTATION_PARAMS_DELTA_TYPE getPeak an undef value\n" ; }
+    
+    return ( $VALUE ) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _setANNOTATION_PARAMS_DELTA_TYPE
+
+	## Description : _setANNOTATION_PARAMS_DELTA_TYPE
+	## Input : $VALUE
+	## Output : TRUE
+	## Usage : _setANNOTATION_PARAMS_DELTA_TYPE ( $VALUE ) ;
+
+=cut
+
+## START of SUB
+sub _setANNOTATION_PARAMS_DELTA_TYPE {
+    ## Retrieve Values
+    my $self = shift ;
+    my ( $VALUE ) = @_;
+    
+    if ( (defined $VALUE) and ($VALUE ne '')  ) {	$self->{_ANNOTATION_PARAMS_DELTA_TYPE_} = $VALUE ; }
+    else {
+    	$self->{_ANNOTATION_PARAMS_DELTA_TYPE_} = undef ;
+    	warn "[WARN] the method _setANNOTATION_PARAMS_DELTA_TYPE is set with undef value\n" ; 
+	}
+    
+    return (0) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _getANNOTATION_DB_SOURCE
+
+	## Description : _getANNOTATION_DB_SOURCE
+	## Input : void
+	## Output : $VALUE
+	## Usage : my ( $VALUE ) = _getANNOTATION_DB_SOURCE () ;
+
+=cut
+
+## START of SUB
+sub _getANNOTATION_DB_SOURCE {
+    ## Retrieve Values
+    my $self = shift ;
+    
+    my $VALUE = undef ;
+    
+    if ( (defined $self->{_ANNOTATION_DB_SOURCE_}) and ( $self->{_ANNOTATION_DB_SOURCE_} ne '' ) ) {	$VALUE = $self->{_ANNOTATION_DB_SOURCE_} ; }
+    else {	 $VALUE = undef ; warn "[WARN] the method _getANNOTATION_DB_SOURCE getPeak an undef value\n" ; }
+    
+    return ( $VALUE ) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _setANNOTATION_DB_SOURCE
+
+	## Description : _setANNOTATION_DB_SOURCE
+	## Input : $VALUE
+	## Output : TRUE
+	## Usage : _setANNOTATION_DB_SOURCE ( $VALUE ) ;
+
+=cut
+
+## START of SUB
+sub _setANNOTATION_DB_SOURCE {
+    ## Retrieve Values
+    my $self = shift ;
+    my ( $VALUE ) = @_;
+    
+    if ( (defined $VALUE) and ($VALUE ne '')  ) {	$self->{_ANNOTATION_DB_SOURCE_} = $VALUE ; }
+    else {
+    	$self->{_ANNOTATION_DB_SOURCE_} = undef ;
+    	warn "[WARN] the method _setANNOTATION_DB_SOURCE is set with undef value\n" ; 
+	}
+    
+    return (0) ;
+}
+### END of SUB
+
 =item PRIVATE_ONLY _getPeaksToAnnotated
 
 	## Description : get a specific list of peaks from the Annotation analysis object
@@ -1266,10 +1403,17 @@ sub _setSpectraHtmlTboby {
 #    			print Dumper $matchedPeaks ;
     			
     			foreach my $annotedPeak (@{ $matchedPeaks }) {
-    				my $ids = $annotedPeak->_getPeak_ANNOTATION_SPECTRAL_IDS() ;
-#    				print Dumper $ids ;
-    				foreach (@{$ids}) {
-    					$uniqSpIds{$_} = 1 ;
+    				
+    				if ( ( $annotedPeak->_getPeakFilterPass() ) and ( $annotedPeak->_getPeakFilterPass() eq 'FALSE' ) ) {
+#    					print "Remove peaks badly annotated where score does not reach given threshold\n" ;
+    					next ;
+    				}
+    				else {
+    					my $ids = $annotedPeak->_getPeak_ANNOTATION_SPECTRAL_IDS() ;
+	#    				print Dumper $ids ;
+	    				foreach (@{$ids}) {
+	    					$uniqSpIds{$_} = 1 ;
+	    				}
     				}
     			}
     		} ## END FOREACH
@@ -1630,7 +1774,7 @@ sub _mapPeakListWithTemplateFields {
 
     my ( $fields, $peakList ) = @_;
     my ( @rows ) = ( () ) ;
-    
+
     foreach my $peak (@{$peakList}) {
     	my %tmp = () ;
     	
@@ -1682,7 +1826,6 @@ sub _mergeAnnotationsAsString {
     				elsif ($peakListSize == $j) {
     					$annotationString .= $annotation->{_MMU_ERROR_}." ".$annotation->{_COMPUTED_MONOISOTOPIC_MASS_}." ".$annotation->{_ANNOTATION_NAME_} ;
     				}
-    				
     				$j ++ ;
     			}
     			$row->{'_ANNOTATIONS_'} = $annotationString ;
@@ -1722,7 +1865,7 @@ sub _mz_delta_conversion {
     my ( $computedDeltaMz, $min, $max ) = ( 0, undef, undef ) ;
     
     if 		($$delta_type eq 'PPM')		{	$computedDeltaMz = ($$mz_delta * 10**-6 * $$mass); }
-	elsif 	($$delta_type eq 'DA')		{	$computedDeltaMz = $$mz_delta ; }
+	elsif 	($$delta_type eq 'MMU')		{	$computedDeltaMz = $$mz_delta ; }
 	else {	croak "The masses delta type '$$delta_type' isn't a valid type !\n" ;	}
     
     

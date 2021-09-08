@@ -3,9 +3,9 @@
 #
 #  (C) Paul Evans, 2009-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.32;
+use Object::Pad 0.52;  # ADJUSTPARAMS superclass bugfix
 
-package Tickit::Widget 0.54;
+package Tickit::Widget 0.55;
 class Tickit::Widget :repr(HASH);
 
 use Carp;
@@ -73,6 +73,10 @@ order.
 
 =cut
 
+style_definition base =>
+   '<Tab>'   => "focus_next_after",
+   '<S-Tab>' => "focus_next_before";
+
 =head1 CONSTRUCTOR
 
 =cut
@@ -118,22 +122,30 @@ has @_style_classes;
 has $_style_direct;
 has %_style_tag;
 
-BUILD
+ADJUST
 {
-   my %args = @_;
-
    my $class = ref $self;
    foreach my $method (qw( lines cols render_to_rb )) {
       $class->can( $method ) or
          croak "$class cannot ->$method - do you subclass and implement it?";
    }
+}
 
-   @_style_classes = @{ delete $args{classes} // [ delete $args{class} ] };
+ADJUSTPARAMS
+{
+   my ( $params ) = @_;
+
+   @_style_classes = @{ delete $params->{classes} // [ delete $params->{class} ] };
 
    # Legacy direct-applied-style argument support
-   $args{$_} and $args{style}{$_} = delete $args{$_} for @Tickit::Pen::ALL_ATTRS;
+   foreach my $attr ( @Tickit::Pen::ALL_ATTRS ) {
+      next unless defined( my $val = delete $params->{$attr} );
 
-   if( my $style = delete $args{style} ) {
+      carp "Applying legacy direct pen attribute '$attr' for ${\ref $self}";
+      $params->{style}{$attr} = $val;
+   }
+
+   if( my $style = delete $params->{style} ) {
       my $tagset = $_style_direct = Tickit::Style::_Tagset->new;
       foreach my $key ( keys %$style ) {
          $tagset->add( $key, $style->{$key} );
@@ -564,8 +576,6 @@ method window_gained
 
             my $action;
             $action = $self->get_style_values( "<$keystr>" ) if $self->KEYPRESSES_FROM_STYLE;
-            $action //= "focus_next_after"  if $keystr eq "Tab";
-            $action //= "focus_next_before" if $keystr eq "S-Tab";
 
             last unless $action;
 

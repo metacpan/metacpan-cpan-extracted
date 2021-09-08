@@ -1,10 +1,39 @@
 Revision history for AnyEvent-SOCKS-Client
 
-TODO:
-* SOCKS4 support
+0.051	2.09.2021
 
-0.01    08.03.2018
-        First version, released on an unsuspecting world.
+	Guard must not trigger c_cb.
+	Guard is returned in any non-void context instead of scalar only.
+
+0.05	2.09.2021
+
+	Bugs 139048, 139162, 139160:
+	Destruction performed manually before successful c_cb call because of global destructor called only after c_cb termination (may be long-running).
+	Useful guard returned - because we may want to cancel connection.
+
+	Proxy input validation and some code re-arrangements.
+
+0.04	28.08.2021
+
+	SOCKS4/4a support
+
+0.03	28.08.2021
+
+	Bug 139048:
+	Destructor is properly called now. Removed unnecessary undefs. Likely fixed.
+
+	Bug 139050:
+	Added sq. brackets trimming to _parse_uri, likely fixed.
+
+	Feature request 139049:
+	Added timeout for initial connection to proxy server.
+	Timeout is only used when no prepare_cb passed to proxied function, so you can fine-tune initial connection.
+
+	TYPE_IP4 and TYPE_IP6 in connect_cmd because IP6 doesn't work as FQDN.
+	It's only used when host is already valid IP4 or IP6 address (no local DNS resolution).
 
 0.02    10.08.2021
 	Bugs 131658 and 129330 fixed.
+
+0.01    08.03.2018
+        First version, released on an unsuspecting world.

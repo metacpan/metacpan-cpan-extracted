@@ -1,5 +1,8 @@
 Revision history for Perl extension Acme::Cow.
 
+0.2  Thu Sep  2 16:30:53 UTC 2021
+	- re-releasing on CPAN.
+
 0.1  Fri Mar 22 17:39:06 PST 2002
 	- Object-oriented cows.
 

@@ -7,10 +7,12 @@ use Test::Command::Simple;
 use Software::LicenseUtils;
 use Path::Tiny 0.053;
 
-my $CMD = $ENV{'LICENSECHECK'} || 'bin/licensecheck';
-
-# ensure local script is executable
-path($CMD)->chmod('a+x') if ( $CMD eq 'bin/licensecheck' );
+my @CMD
+	= ( $ENV{'LICENSECHECK'} )
+	|| path('blib')->exists
+	? ('blib/script/licensecheck')
+	: ( $^X, 'bin/licensecheck' );
+diag "executable: @CMD";
 
 my %LICENSES = (
 	'AGPL-3.0'     => 'AGPL-3',
@@ -67,7 +69,7 @@ foreach ( keys %LICENSES ) {
 }
 plan 4 + keys %LICENSES;
 
-run_ok $CMD, qw(--recursive -m --deb-fmt -c .+), $workdir;
+run_ok @CMD, qw(--recursive -m --deb-fmt -c .+), $workdir;
 is stderr, '', 'No stderr';
 foreach ( split /\v+/, stdout ) {
 	if (m{^$workdir/([\S ]+)\t(.+)$}) {

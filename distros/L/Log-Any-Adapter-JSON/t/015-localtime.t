@@ -22,7 +22,8 @@ sub last_line {
 ##
 subtest 'message timezone offset may not be Z' => sub {
     $log->debug('where am I?');
-    like last_line()->{time}, qr/(?:[+-]\d\d:\d\d|Z)$/, 'timezone added';
+
+    like last_line()->{timestamp}, qr/(?:[+-]\d\d:\d\d|Z)$/, 'timezone added';
 };
 
 ##

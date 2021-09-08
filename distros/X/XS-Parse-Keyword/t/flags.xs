@@ -12,9 +12,9 @@
 
 static const char hintkey[] = "t::flags/permit";
 
-static int build_ident(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hookdata)
+static int build_ident(pTHX_ OP **out, XSParseKeywordPiece *arg0, void *hookdata)
 {
-  *out = newSVOP(OP_CONST, 0, arg0.sv);
+  *out = newSVOP(OP_CONST, 0, arg0->sv);
   return KEYWORD_PLUGIN_STMT;
 }
 

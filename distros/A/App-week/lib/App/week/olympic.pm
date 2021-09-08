@@ -13,16 +13,19 @@ __DATA__
 define 白 #fff
 define 黒 #000
 
+# 五輪
 define リング青　#0081c8
 define リング黄　#fcb131
 define リング黒　#000000
 define リング緑　#00a651
 define リング赤　#ee334e
 
-define ロゴ赤　#aa272f
-define ロゴ青　#00549f
-define ロゴ緑　#008542
+# パラリンピック
+define パラ赤　#aa272f
+define パラ青　#00549f
+define パラ緑　#008542
 
+# tokyo 2020
 define エンブレム青　#002063
 define エンブレム赤　#ee334e
 
@@ -64,13 +67,15 @@ define 1964赤 #cc0000
 define 1964金 #a57b56
 
 option --olympic-dow \
-	--cm DOW_SU=白/リング赤 \
+	--cm DOW_SU=白/エンブレム赤 \
 	--cm DOW_MO=白/リング青 \
 	--cm DOW_TU=白/リング黄 \
 	--cm DOW_WE=白/リング黒 \
 	--cm DOW_TH=白/リング緑 \
 	--cm DOW_FR=白/リング赤 \
-	--cm DOW_SA=白/リング赤
+	--cm DOW_SA=白/エンブレム青
+
+option --paralympic-dow --olympic-dow
 
 option --olympic-dow-rev \
 	--olympic-dow \
@@ -96,3 +101,13 @@ option --gold-frame --cm FRAME=/2020金
 
 option --tokyo2020-gold     --tokyo2020     --gold-frame
 option --tokyo2020-gold-rev --tokyo2020-rev --gold-frame
+
+option --para2020 \
+	--paralympic-dow \
+	--cm FRAME=白/パラ青 \
+	--cm DAYS=WEEK=パラ緑/白 \
+	--cm *MONTH=黒/白 \
+	--cm THIS*=白/パラ赤,THISDAY=+DS \
+	--cm *DAYS=+I
+
+option --para2020-rev --para2020

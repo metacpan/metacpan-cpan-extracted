@@ -24,9 +24,15 @@ sub new_sftp
 		my $cwd;
 		eval { $cwd = $xftp->{xftp}->do_realpath('.') };
 		$xftp->{cwd} = $cwd  if ($cwd);
+		$xftp->{protocol} = 'Net::SFTP';
 		return $xftp;
 	}
 	return undef;
+}
+
+sub protocol
+{
+	return shift->{protocol};
 }
 
 {

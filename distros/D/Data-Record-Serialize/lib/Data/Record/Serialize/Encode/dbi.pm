@@ -13,7 +13,7 @@ use Data::Record::Serialize::Error { errors =>
         sqlite_backend
    )] }, -all;
 
-our $VERSION = '0.28';
+our $VERSION = '0.30';
 
 use Data::Record::Serialize::Types -types;
 
@@ -74,6 +74,7 @@ has table => (
     isa      => Str,
     required => 1,
 );
+
 
 
 
@@ -157,9 +158,17 @@ has _sth => (
 );
 
 has _dbh => (
-    is       => 'rwp',
-    init_arg => undef,
+    is        => 'rwp',
+    init_arg  => undef,
+    clearer   => 1,
+    predicate => 1,
 );
+
+
+
+
+
+
 
 has column_defs => (
     is       => 'rwp',
@@ -307,10 +316,11 @@ has _producer => (
 
 
 
+
 sub setup {
     my $self = shift;
 
-    return if $self->_dbh;
+    return if $self->_has_dbh;
 
     my %attr = (
         AutoCommit               => !$self->batch,
@@ -448,6 +458,8 @@ sub setup {
 sub flush {
     my $self = shift;
 
+    return 1 unless $self->_has_dbh;
+
     my $queue = $self->queue;
 
     if ( @{ $queue } ) {
@@ -539,11 +551,11 @@ after '_trigger_output_types' => sub {
 sub close {
     my $self = shift;
 
-    $self->flush
-      if $self->batch;
+    return 1 unless $self->_has_dbh;
 
-    $self->_dbh->disconnect
-      if defined $self->_dbh;
+    $self->flush if $self->batch;
+    $self->_dbh->disconnect;
+    $self->_clear_dbh;
 
     1;
 }
@@ -566,7 +578,8 @@ sub DEMOLISH {
         if @{ $self->queue };
 
     $self->_dbh->disconnect
-      if defined $self->_dbh;
+      if  $self->_has_dbh;
+
 }
 
 
@@ -606,7 +619,7 @@ Data::Record::Serialize::Encode::dbi - store a record in a database
 
 =head1 VERSION
 
-version 0.28
+version 0.30
 
 =head1 SYNOPSIS
 
@@ -811,6 +824,9 @@ A warning is emitted if the record queue is not empty; turn off the
 C<Data::Record::Serialize::Encode::dbi::queue> warning to silence it.
 
 =for Pod::Coverage has_schema
+
+=for Pod::Coverage _has_dbh
+  _clear_dbh
 
 =for Pod::Coverage setup
 

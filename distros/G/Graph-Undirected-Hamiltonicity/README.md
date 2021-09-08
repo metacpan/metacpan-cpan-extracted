@@ -6,7 +6,7 @@ Graph::Undirected::Hamiltonicity - determine the Hamiltonicity of a given undire
 
 # VERSION
 
-version 0.01
+version 0.012
 
 # SYNOPSIS
 
@@ -52,7 +52,16 @@ The modules in this distribution are:
 
 ## INSTALLATION
 
-### To install the core module:
+
+
+### To install from CPAN:
+If you just want to use the module, choose this method.
+Install [Graph::Undirected::Hamiltonicity](https://metacpan.org/pod/Graph::Undirected::Hamiltonicity) from cpan.
+
+    cpan Graph::Undirected::Hamiltonicity
+
+### To install the code repositories:
+If you want to tinker with the module and/or contribute bugfixes and enhancements, choose this method.
 
 If you need to get `cpanm`:
 
@@ -60,6 +69,7 @@ If you need to get `cpanm`:
 
 then:
 
+    perl ./Build.PL
     ./Build
 
 If all goes well, you will see output like this:
@@ -79,7 +89,7 @@ If all is well, then proceed to install the module:
 
 If you run into trouble installing `Net::SSLeay` as part of `Dist::Zilla`, try the following.
 
-On Red Hat / CentOS / Fedora:
+On Fedora / Red Hat / CentOS / Rocky Linux:
 
     sudo yum install openssl-devel
 
@@ -98,7 +108,7 @@ On macOS:
 
     sudo cp cgi-bin/hc.cgi /Library/WebServer/CGI-Executables/
 
-On Red Hat / CentOS / Fedora Linux:
+On Fedora / Red Hat / CentOS / Rocky Linux:
 
     sudo cp cgi-bin/hc.cgi /var/www/cgi-bin/
 

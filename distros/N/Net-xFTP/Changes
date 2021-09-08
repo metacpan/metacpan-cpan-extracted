@@ -75,7 +75,7 @@ Revision history for Net-xFTP
 	  This addresses and closes Bug#68833.
 .52    Resave all source files in "Unix" format (LF) instead of DOS (CR,LF) to 
 	  remove CR from generated *META* files to address bug#103081.
-1.00   Foreign: Added "Port" option along with the ability to handle 
+1.00  Foreign: Added "Port" option along with the ability to handle 
 	  some other options when connecting in both Foreign and SSH2.
 	  SSH2: Fixed call to auth_* on connect (new() - create connection) - 
 	  new() was not always calling the right auth_* with proper arguments.
@@ -87,5 +87,15 @@ Revision history for Net-xFTP
 	  OpenSSH: Replace obsolete "defined(@hash) and defined(@array) with 
 	  proper "@hash" and "@array" respectively, checked that this was not in 
 	  any other modules.
-1.01	  Fix xFTP_LOCAL to handle subdirectories with spaces in name in *nix
+1.01	 Fix xFTP_LOCAL to handle subdirectories with spaces in name in *nix
 	  Fix haveModule([Net::]module) function to actually work (it didn't)!
+1.02  Fix $ftp->protocol() to actually work (return the name of the protocol 
+	  module actually in use, ie. "Net::FTP" for Net::FTP, etc, or empty 
+	  string for Local (Net::LOCAL).
+	  Net::OpenSSH:  Allow specifying "passphrase => '*'" in the options hash 
+	  to use the value specified in the "password" option instead as the 
+	  passphrase for using passphrase-protected public-key access.  Also 
+	  allow a third argument for get() and put() functions for specifying a 
+	  hash of OpenSSH-specific options (See Net::OpenSSH docs).
+	  Also, for get() and put() calls with filehandles, they return the number 
+	  of bytes processed instead of 1 if successful.

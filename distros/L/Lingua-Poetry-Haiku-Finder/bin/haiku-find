@@ -1,0 +1,54 @@
+#!perl
+
+use strict;
+use warnings;
+use Lingua::Poetry::Haiku::Finder;
+
+my $finder = @ARGV
+	? Lingua::Poetry::Haiku::Finder->from_filename( shift )
+	: Lingua::Poetry::Haiku::Finder->from_filehandle( \*STDIN );
+
+for my $poem ( @{ $finder->haikus } ) {
+	print "$poem\n\n";
+}
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+haiku-find - read text from a file, output haikus to STDOUT
+
+=head1 USAGE
+
+  haiku-finder /usr/share/common-licenses/GPL-2 
+
+=head1 DESCRIPTION
+
+This module will scan a file for haikus and print them to STDOUT. If no
+file is given, will read from STDIN. (It waits until the end of file
+before starting to search for haikus.)
+
+=head1 SEE ALSO
+
+L<Lingua::Poetry::Haiku::Finder>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2021 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.

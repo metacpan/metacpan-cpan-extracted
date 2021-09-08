@@ -150,8 +150,8 @@ if ( $graph_text =~ /\d/ ) {
 }
 
 say get_textarea($g);
-say qq{</form>};;
-say "<br/><br/>";
+say qq{</form>};
+say qq{<br/><br/>};
 
 if ( $graph_text =~ /\d/ ) {
 

@@ -1,0 +1,63 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 5b21e877b5d7af10cfaba795d1202203a18ba8f1355188eedb62b86b1184a7d0 .perltidyrc
+SHA256 9ee73a3bdddcb70e08a6e6f95d61594d0a71aece251ddd039bbd4fc2439a9230 Changes
+SHA256 8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643 LICENSE
+SHA256 a0013209aad06c6ef9988c4eb364c027a9b2c1d332c7d8e7d226c1ab5164bdf2 MANIFEST
+SHA256 07e816287a01ae568923944adb6183b809ab6733e5845a6c112dfec4ac830c3b META.yml
+SHA256 774205f1cbc59adf1c205bdaf2662838dc76597f8b1a87a54a60e965a1f89018 Makefile.PL
+SHA256 9e3e3ca66a03831d330abb5e7412a101124969bf90440db2fd8dabe2ed8d0e2e README
+SHA256 2c4136f0a8f5cab67f667e9b67890bbc4f9be8b76381e7fb836bff24a5fa567c README.md
+SHA256 965f833427ba362c959475fd6c33a529d9e56ea79f1fc4b4755cb8d43fcf5ae0 etc/schema-mysql.sql
+SHA256 1479114452132a578693a3826135c1d801ff6f55595b5e31ffbd35b0b3bd7f2c etc/schema-postgresql.sql
+SHA256 00712c13fe6b22a10bfe4dbba8b21c449930fd0ae7e84e313c4b4a1491f4e515 gitignore
+SHA256 80d07ef944a257ad039205b7664e712a76422a423dd27af692003d330a2c1a3c html/Admin/FilterRules/Filters.html
+SHA256 00948e58607e0faaa052f9a3c27fac7b2958f009aa12ad8902f851f0a5b78c2f html/Admin/FilterRules/GroupRights.html
+SHA256 3898e78ad38a26d562c8ab513635ea65ce0d9f06310b2551a51b1140f9855af8 html/Admin/FilterRules/History.html
+SHA256 66c33d954a33c18527685503a03250bfd9f32348da17b115979685165da21ac8 html/Admin/FilterRules/Modify.html
+SHA256 e809d4759ff7da7e8b973599e395cda49e313a50921b074248a3a6c8889fe6e2 html/Admin/FilterRules/Requirements.html
+SHA256 a7695fb0706fd0caf5174c56ab3a82d58503364cae5e29e8fff0d12af86898fe html/Admin/FilterRules/Test.html
+SHA256 ca19efda32fe0e89d729963c8b10a3e906655d211f2d087d847395cc75c7f133 html/Admin/FilterRules/UserRights.html
+SHA256 f528d0d3f563e993b6be6519e1dc3ac26124096c9962e5ab72f17c05296741af html/Admin/FilterRules/index.html
+SHA256 a72f71309f1d3dff697aef16fb3a7fa402a74faaccaef818c2b06ae18eb26165 html/Callbacks/FilterRules/Elements/Tabs/Privileged
+SHA256 093fdffef5bd73a05d1e1a57f8e079645e596009211cbd9d778461dd3964d1c9 html/Elements/FilterRules/EditRule
+SHA256 2c605ab59fa5c63870deafd986195639523222522db2d82a4ff51d763b5130c3 html/Elements/FilterRules/ShowRules
+SHA256 64e9c2b602fe116099809a28f5066210da3bd8e38965a81cabbe33e74de8f679 html/Elements/FilterRules/Test
+SHA256 da34bee0112c6732d647347bd8133e0b3790727d41516cd07fb2d14ac5b063fa html/Elements/RT__FilterRule/ColumnMap
+SHA256 560dd3dcf80cabc5feb54d7a574d95e1466193a1b77079ae539d9f846df7f7c0 html/Elements/RT__FilterRuleGroup/ColumnMap
+SHA256 0eb913fd79d411c76cefb046132463c4d5200af745ce703bfd5ce997901652b4 html/Tools/FilterRules.html
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a97bf661b739643c3adee064addf7a85f22e25e1bbffc137974cd8754ffa5c66 inc/Module/Install/Include.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 2c89fa442659e76a8ee28643923c3a928c39ed013ad08fe67049d1df7d4c9fd6 inc/Module/Install/RTx.pm
+SHA256 a7c5323f81fc052097b0470bd3e6e7e2de2ac9d90c59646948d89c4c7e46cfe6 inc/Module/Install/RTx/Runtime.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 21064201b9abc1e8dd864426c5c2eab6ef22203cff89e0b25afbaa9cfd6f55a5 inc/YAML/Tiny.pm
+SHA256 27c712fd4d393a19b9fda05feca75f6080dbd635efd4350b19bddcdb07014da8 lib/RT/Extension/FilterRules.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.14 (GNU/Linux)
+
+iEYEAREDAAYFAmEzPz4ACgkQwVlroz/Fb1FeLACfa8DNvS0oZDXonDvOz970mEGO
+qiEAnRScW9TwQdQsPn7l37HOJ79Nf5QG
+=XYfw
+-----END PGP SIGNATURE-----

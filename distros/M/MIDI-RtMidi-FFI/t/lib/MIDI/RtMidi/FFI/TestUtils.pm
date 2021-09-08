@@ -4,7 +4,9 @@ package MIDI::RtMidi::FFI::TestUtils;
 use base qw/ Exporter /;
 
 use MIDI::RtMidi::FFI::Device;
+use MIDI::RtMidi::FFI ':all';
 use MIDI::Event;
+use Proc::Find qw/ proc_exists /;
 
 use Time::HiRes qw/ usleep /;
 
@@ -20,7 +22,6 @@ sub newdevice {
         ignore_sysex => 0,
         ignore_timing => 0,
         ignore_sensing => 0,
-        _skip_free => 1
     );
 }
 
@@ -49,10 +50,33 @@ sub drain_msgs {
     return @msgs;
 }
 
+sub no_virtual {
+    my $api = rtmidi_get_compiled_api( 1 )->[0];
+    return 1 if
+        ( $api == RTMIDI_API_WINDOWS_MM ||
+          $api == RTMIDI_API_RTMIDI_DUMMY );
+    0;
+}
+
+sub sanity_check {
+    # TODO: Extend this for other platforms
+    my $api = rtmidi_get_compiled_api( 1 )->[0];
+    if ( $api == RTMIDI_API_LINUX_ALSA ) {
+        return 0 unless -w '/dev/snd/seq';
+    }
+    if ( $api == RTMIDI_API_UNIX_JACK ) {
+        no warnings qw/ uninitialized /;
+        return 0 unless proc_exists( name => 'jackd' );
+    }
+    1;
+}
+
 our @EXPORT = (qw/
     newdevice
     connect_devices
     msg2hex
     msgs2hex
     drain_msgs
+    no_virtual
+    sanity_check
 /);

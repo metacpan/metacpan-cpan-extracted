@@ -14,7 +14,7 @@ use Exporter;
 use Errno;
 
 our @ISA = qw(IO::Socket);
-our $VERSION = "1.45";
+our $VERSION = "1.48";
 
 my $EINVAL = exists(&Errno::EINVAL) ? Errno::EINVAL() : 1;
 
@@ -401,7 +401,7 @@ Examples:
    $sock = IO::Socket::INET->new(
                            PeerPort  => 9999,
                            PeerAddr  => inet_ntoa(INADDR_BROADCAST),
-                           Proto     => udp,    
+                           Proto     => 'udp',
                            LocalAddr => 'localhost',
                            Broadcast => 1 ) 
                        or die "Can't bind : $IO::Socket::errstr\n";

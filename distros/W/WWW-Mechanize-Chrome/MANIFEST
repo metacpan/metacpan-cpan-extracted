@@ -64,6 +64,7 @@ t/50-form-with-fields.t
 t/50-form2.html
 t/50-form2.t
 t/50-form3.html
+t/50-gh63-encode-response-content.t
 t/50-mech-autoclose.t
 t/50-mech-content-nonhtml.t
 t/50-mech-content.t
@@ -84,6 +85,7 @@ t/50-popup.t
 t/50-tick.html
 t/50-tick.t
 t/51-click-intrapage.t
+t/51-mech-find-all-links.t
 t/51-mech-form-with-fields.t
 t/51-mech-links-base.html
 t/51-mech-links-nobase.html
@@ -131,6 +133,7 @@ t/77-reload-fragment.t
 t/78-memleak.t
 t/78-two-instances.t
 t/99-interactive-single-window.t
+t/blank.jpg
 t/CookiesOld
 t/helper.pm
 t/html5.html

@@ -2,7 +2,7 @@ package Mojolicious::Plugin::XRD;
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Util qw/quote deprecated/;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 # Todo: Support
 #  $self->reply->xrd( $xrd => {
@@ -39,7 +39,9 @@ sub register {
 
     # Define xrd or jrd
     unless ($c->stash('format')) {
-      $c->stash('format' => scalar $c->param('format'));
+      $c->stash('format' => (
+        scalar $c->param('_format') || scalar $c->param('format')
+      ));
     };
 
     # Add CORS header

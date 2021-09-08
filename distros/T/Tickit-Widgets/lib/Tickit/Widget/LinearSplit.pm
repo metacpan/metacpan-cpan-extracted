@@ -5,7 +5,7 @@
 
 use Object::Pad 0.09;
 
-package Tickit::Widget::LinearSplit 0.32;
+package Tickit::Widget::LinearSplit 0.33;
 class Tickit::Widget::LinearSplit
    extends Tickit::ContainerWidget;
 

@@ -3,14 +3,12 @@
 use strict;
 use warnings;
 
-use lib './t/lib';
-
 use Test::Builder::Tester tests => 10;
 
 use File::Path qw( rmtree );
 
-use File::Find::Object::TreeCreate ();
-use Test::TrailingSpace            ();
+use File::TreeCreate    ();
+use Test::TrailingSpace ();
 
 {
     my $test_id  = "no-trailing-space-1";
@@ -42,7 +40,7 @@ use Test::TrailingSpace            ();
         ],
     };
 
-    my $t = File::Find::Object::TreeCreate->new();
+    my $t = File::TreeCreate->new();
     $t->create_tree( "./t/sample-data/", $tree );
 
     my $finder = Test::TrailingSpace->new(
@@ -89,7 +87,7 @@ use Test::TrailingSpace            ();
         ],
     };
 
-    my $t = File::Find::Object::TreeCreate->new();
+    my $t = File::TreeCreate->new();
     $t->create_tree( "./t/sample-data/", $tree );
 
     my $finder = Test::TrailingSpace->new(
@@ -145,7 +143,7 @@ use Test::TrailingSpace            ();
         ],
     };
 
-    my $t = File::Find::Object::TreeCreate->new();
+    my $t = File::TreeCreate->new();
     $t->create_tree( "./t/sample-data/", $tree );
 
     my $finder = Test::TrailingSpace->new(
@@ -201,7 +199,7 @@ use Test::TrailingSpace            ();
         ],
     };
 
-    my $t = File::Find::Object::TreeCreate->new();
+    my $t = File::TreeCreate->new();
     $t->create_tree( "./t/sample-data/", $tree );
 
     my $finder = Test::TrailingSpace->new(
@@ -266,7 +264,7 @@ use Test::TrailingSpace            ();
         ],
     };
 
-    my $t = File::Find::Object::TreeCreate->new();
+    my $t = File::TreeCreate->new();
     $t->create_tree( "./t/sample-data/", $tree );
 
     my $finder = Test::TrailingSpace->new(
@@ -332,7 +330,7 @@ use Test::TrailingSpace            ();
         ],
     };
 
-    my $t = File::Find::Object::TreeCreate->new();
+    my $t = File::TreeCreate->new();
     $t->create_tree( "./t/sample-data/", $tree );
 
     my $finder = Test::TrailingSpace->new(
@@ -402,7 +400,7 @@ use Test::TrailingSpace            ();
         ],
     };
 
-    my $t = File::Find::Object::TreeCreate->new();
+    my $t = File::TreeCreate->new();
     $t->create_tree( "./t/sample-data/", $tree );
 
     my $finder = Test::TrailingSpace->new(
@@ -462,7 +460,7 @@ use Test::TrailingSpace            ();
         ],
     };
 
-    my $t = File::Find::Object::TreeCreate->new();
+    my $t = File::TreeCreate->new();
     $t->create_tree( "./t/sample-data/", $tree );
 
     my $finder = Test::TrailingSpace->new(
@@ -512,7 +510,7 @@ use Test::TrailingSpace            ();
         ],
     };
 
-    my $t = File::Find::Object::TreeCreate->new();
+    my $t = File::TreeCreate->new();
     $t->create_tree( "./t/sample-data/", $tree );
 
     my $finder = Test::TrailingSpace->new(
@@ -565,7 +563,7 @@ use Test::TrailingSpace            ();
         ],
     };
 
-    my $t = File::Find::Object::TreeCreate->new();
+    my $t = File::TreeCreate->new();
     $t->create_tree( "./t/sample-data/", $tree );
 
     my $finder = Test::TrailingSpace->new(

@@ -1,0 +1,59 @@
+{
+   "abstract" : "Wrap Redis inside OpenTracing",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Redis-OpenTracing",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker::CPANfile" : "0.09"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "0",
+            "OpenTracing::AutoScope" : "v0.107.3",
+            "Redis" : "0",
+            "Scalar::Util" : "0",
+            "Syntax::Feature::Maybe" : "0",
+            "Types::Standard" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "OpenTracing::Implementation" : "v0.31.0",
+            "Test::Builder" : "0",
+            "Test::Deep" : "0",
+            "Test::Mock::Redis" : "0",
+            "Test::MockObject" : "0",
+            "Test::Most" : "0",
+            "Test::OpenTracing::Integration" : "v0.102.1",
+            "Test::RedisServer" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.0.4",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

@@ -7,6 +7,7 @@
 #include <openssl/engine.h>
 
 Variation variation;
+string root_vdir = "tests/var";
 
 SslContext get_ssl_ctx() {
     static SslContext ctx = nullptr;

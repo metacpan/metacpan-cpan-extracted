@@ -1,0 +1,53 @@
+=encoding utf-8
+
+=head1 NAME
+
+SDL2::AssertData - SDL Assertion Structure
+
+=head1 SYNOPSIS
+
+    use SDL2 qw[:assert];
+
+=head1 DESCRIPTION
+
+SDL2::AssertData represents an assertion.
+
+=head1 Fields
+
+=over
+
+=item C<always_ignore>
+
+=item C<trigger_count>
+
+=item C<condition>
+
+=item C<filename>
+
+=item C<linenum>
+
+=item C<function>
+
+=item C<next>
+
+=back
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under
+the terms found in the Artistic License 2. Other copyrights, terms, and
+conditions may apply to data transmitted through this module.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=begin stopwords
+
+structs xx
+
+=end stopwords
+
+=cut

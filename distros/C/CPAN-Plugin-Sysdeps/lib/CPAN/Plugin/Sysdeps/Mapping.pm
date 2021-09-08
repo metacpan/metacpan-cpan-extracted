@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.68';
+our $VERSION = '0.69';
 
 # shortcuts
 #  os and distros
@@ -1286,6 +1286,8 @@ sub mapping {
      ],
 
      [cpanmod => 'Glib',
+      [like_debian,
+       [package => 'libglib2.0-dev']],
       [like_fedora,
        [linuxdistro => 'centos', linuxdistroversion => {'<', 7},
 	[package => []]],
@@ -2022,10 +2024,10 @@ sub mapping {
        [package => 'v8']],
       [like_debian,
        [before_debian_buster,
-	[package => 'libv8-dev']], # but not anymore in buster, see https://tracker.debian.org/news/876959/libv8-314-removed-from-testing/
-       [package => 'libnode-dev']], # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=934734 (but perl module does not pick v8.h from the installed location)
+	[package => [qw(libv8-3.14.5 libv8-3.14-dev)]]], # but still does not work, libplatform/libplatform.h missing
+       [package => 'libnode-dev']], # # libv8* not anymore in buster, see https://tracker.debian.org/news/876959/libv8-314-removed-from-testing/; https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=934734 (but perl module does not pick v8.h from the installed location)
       [like_fedora,
-       [package => 'v8-devel']], # but problems with Devel-CheckLib and compilation errors
+       [package => 'v8-devel']], # but problems with Devel-CheckLib (centos7) and compilation errors (fedora), both with JavaScript-V8-0.10
       [os_darwin,
        [package => 'v8']], # but compilation errors (v8-5.0.71.33 <-> JavaScript-V8-0.07)
      ],
@@ -2783,6 +2785,19 @@ sub mapping {
        [package => 'libgnome-keyring-devel']],
      ],
 
+     [cpanmod => 'PDL::IO::Matlab',
+      [os_freebsd,
+       [package => 'matio']],
+      [like_debian,
+       [before_ubuntu_trusty,
+	[package => []]],
+       [package => 'libmatio-dev']],
+      [like_fedora,
+       [linuxdistro => 'centos', linuxdistroversion => {'<', 7},
+	[package => []]],
+       [package => 'matio-devel']],
+     ],
+
      [cpanmod => 'PDL::NetCDF',
       [os_freebsd,
        [package => 'netcdf']],
@@ -3110,6 +3125,13 @@ sub mapping {
        [package => ['tk8.6-dev | tk8.5-dev', 'tcllib']]],
       [like_fedora,
        [package => ['tk', 'tcllib']]],
+     ],
+
+     [cpanmod => 'TCOD', # currently (with 0.009) does not work
+      [like_debian,
+       [before_debian_stretch,
+	[package => []]], # not available
+       [package => 'libtcod-dev']],
      ],
 
      [cpanmod => 'Template::Plugin::React',

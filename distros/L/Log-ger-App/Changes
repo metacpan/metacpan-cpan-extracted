@@ -1,3 +1,18 @@
+0.021   2021-08-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Use new convention for some known log categories (access -> _access).
+
+
+0.020   2021-08-24  Released-By: PERLANCAR; Urgency: medium
+
+	- Observe LOG_ADD_STACK_TRACE.
+
+
+0.019   2021-08-24  Released-By: PERLANCAR; Urgency: medium
+
+	- Observe environment variable LOG_ADD_LOCATION.
+
+
 0.018   2020-11-11  Released-By: PERLANCAR; Urgency: medium
 
 	- Add import argument: extra_conf.

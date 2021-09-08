@@ -1,11 +1,17 @@
-0.093   2018-07-01 (PERLANCAR)
+0.094   2021-08-31  Released-By: PERLANCAR; Urgency: medium
+
+	- Update to newer Locale::ID::Locality & Locale::ID::Province
+	  (renamed functions).
+
+
+0.093   2018-07-01  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Add example with sample result.
 
 
-0.092   2018-04-08 (PERLANCAR)
+0.092   2018-04-08  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -14,14 +20,14 @@
 	- [doc] Mention Business::ID::NKK.
 
 
-0.091   2018-04-08 (PERLANCAR)
+0.091   2018-04-08  Released-By: PERLANCAR
 
         - No functional changes.
 
 	- [doc] Mention Business::ID::NKK.
 
 
-0.090   2018-02-07 (PERLANCAR)
+0.090   2018-02-07  Released-By: PERLANCAR
 
 	- [Incompatible change] parse_nik() no longer exported by default.
 
@@ -30,7 +36,7 @@
 	  interoperable.
 
 
-0.08    2015-09-03 (PERLANCAR)
+0.08    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -39,25 +45,25 @@
 	  requirement.
 
 
-0.07    2015-07-10 (PERLANCAR)
+0.07    2015-07-10  Released-By: PERLANCAR
 
 	- Split pericmd CLI scripts to App-IndonesianNumberUtils to reduce
 	  dependencies on our dist.
 
 
-0.06    2015-07-01 (PERLANCAR)
+0.06    2015-07-01  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Fix Rinci metadata.
 
 
-0.05     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+0.05     2014-08-16  Released-By: SHARYANTO; Note: Happy 19th CPAN Day!
 
          - Add CLI script(s).
 
 
-0.04    2013-09-09 (SHARYANTO)
+0.04    2013-09-09  Released-By: SHARYANTO
 
         [INCOMPATIBLE CHANGES]
 
@@ -74,16 +80,17 @@
           Locale::ID::Province and Locale::ID::Locality.
 
 
-0.03    2011-02-10 (SHARYANTO)
+0.03    2011-02-10  Released-By: SHARYANTO
 
         - Fixes to dzil files, 'use parent' in ::KTP alias package.
 
 
-0.02    2010-02-26 (SHARYANTO)
+0.02    2010-02-26  Released-By: SHARYANTO
 
         - Generate META.yml (using Dist::Zilla)
 
 
-0.01    2009-10-06 (SHARYANTO)
+0.01    2009-10-06  Released-By: SHARYANTO
 
         - First version, released on an unsuspecting world.
+

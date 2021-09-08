@@ -1,0 +1,549 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/dev-wakaba>
+	a                    foaf:Person;
+	foaf:name            "Wakaba";
+	foaf:page            <http://suika.fam.cx/>.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/project>
+	a                    doap:Project;
+	doap-bugs:issue      <http://purl.org/NET/cpan-uri/rt/ticket/55845>, <http://purl.org/NET/cpan-uri/rt/ticket/65517>, <http://purl.org/NET/cpan-uri/rt/ticket/75809>, <http://purl.org/NET/cpan-uri/rt/ticket/79019>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008001"^^doap-deps:CpanId ], [ doap-deps:on "Try::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "IO::HTML"^^doap-deps:CpanId ], [
+		doap-deps:on "HTML::HTML5::Entities 0.002"^^doap-deps:CpanId;
+	], [ doap-deps:on "HTTP::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "XML::LibXML 1.94"^^doap-deps:CpanId ], [ doap-deps:on "XML::LibXML::Devel"^^doap-deps:CpanId ], [ doap-deps:on "Scalar::Util"^^doap-deps:CpanId ], [ doap-deps:on "URI::file"^^doap-deps:CpanId ];
+	doap-deps:test-recommendation [ doap-deps:on "LWP::UserAgent"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::Requires"^^doap-deps:CpanId ], [ doap-deps:on "FindBin"^^doap-deps:CpanId ], [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
+	doap:bug-database    <https://github.com/tobyink/p5-html-html5-parser/issues>;
+	doap:category        [ rdfs:label "Web"@en ], [ rdfs:label "HTML"@en ], [ rdfs:label "HTML5"@en ];
+	doap:created         "2009-11-26"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/dev-wakaba>, <http://tobyinkster.co.uk/#i>;
+	doap:documenter      <http://tobyinkster.co.uk/#i>;
+	doap:download-page   <https://metacpan.org/release/HTML-HTML5-Parser>;
+	doap:homepage        <https://metacpan.org/release/HTML-HTML5-Parser>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://tobyinkster.co.uk/#i>;
+	doap:name            "HTML-HTML5-Parser";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-00_01>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-01>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-02>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-03>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-04>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-100>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-101>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-102>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-103>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-104>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-105>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-106>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-107>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-108>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-109>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-110>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-200>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-202>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-204>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-206>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-208>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-300>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-301>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-991>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-992>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-html-html5-parser>;
+	];
+	doap:shortdesc       "parse HTML reliably"@en;
+	doap:tester          <http://tobyinkster.co.uk/#i>.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-00_01>
+	a                    doap:Version;
+	rdfs:label           "Developer preview"@en;
+	dc:issued            "2009-12-01"^^xsd:date;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Parser-0.00_01.tar.gz>;
+	doap:revision        "0.00_01"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-01>
+	a                    doap:Version;
+	rdfs:label           "Original version"@en;
+	dc:issued            "2009-12-03"^^xsd:date;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Parser-0.01.tar.gz>;
+	doap:revision        "0.01"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-02>
+	a                    doap:Version;
+	dc:issued            "2009-12-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Replace Inline::Python encoding detection with weaker, but native Perl HTML::Encoding package."@en;
+		], [
+			a doap-changeset:Addition, doap-changeset:Packaging;
+			rdfs:label "Bundle the html2xhtml tool."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-01>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Parser-0.02.tar.gz>;
+	doap:revision        "0.02"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-03>
+	a                    doap:Version;
+	dc:issued            "2010-01-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Module didn't use URI::file properly."@en;
+			doap-changeset:blame [ foaf:nick "shellac" ];
+		], [
+			a doap-changeset:Packaging, doap-changeset:Update;
+			rdfs:label "Upgrade distribution to my new packaging regime (auto-generated changelogs, etc)"@en;
+		], [
+			a doap-changeset:Documentation, doap-changeset:Update;
+			rdfs:label "Copyright 2010."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-02>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Parser-0.03.tar.gz>;
+	doap:revision        "0.03"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-04>
+	a                    doap:Version;
+	dc:issued            "2010-04-21"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Catch up to revision cf2c0df8a6dfb50fee923dfb21b14c83f282ccdc (2010-02-28) upstream."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-03>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Parser-0.04.tar.gz>;
+	doap:revision        "0.04"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-100>
+	a                    doap:Version;
+	dc:issued            "2010-06-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Minor bugfixes."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-04>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Parser-0.100.tar.gz>;
+	doap:revision        "0.100"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-101>
+	a                    doap:Version;
+	dc:issued            "2010-06-30"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "UTF-8 fix."@en;
+			doap-changeset:fixes [
+				rdfs:label "Wide characters in DOM tree."@en;
+				doap-bugs:reporter <http://purl.org/NET/cpan-uri/person/gwilliams>;
+			];
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-100>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Parser-0.101.tar.gz>;
+	doap:revision        "0.101"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-102>
+	a                    doap:Version;
+	dc:issued            "2011-01-19"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix source_line method."@en;
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Catch up to revision f2c921a886ab0b3dfb8d21b82525e98a4a921ad4 (2010-10-11) upstream."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Allow <object> element to appear in <head> if document has an HTML4 doctype. This is a willful violation of the HTML5 parsing algorithm. (The <object> may have <param> elements as children, as well as any children that would normally be allowed in the <head> of the document, such as <meta>; any other content is treated as the beginning of the <body>, and thus closes <object> and <head>. That's slightly looser than the HTML 4 spec which says only <param> should be used, but stricter than the HTML 4 DTD which allows pretty much anything in there!)"@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Support <figcaption> element."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Support <summary> element."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-101>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Parser-0.102.tar.gz>;
+	doap:revision        "0.102"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-103>
+	a                    doap:Version;
+	dc:issued            "2011-02-09"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation, doap-changeset:Update;
+			rdfs:label "Copyright 2011."@en;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "TagSoupParser.pm called a method that is renamed between this distribution and upstream using its upstream name."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-101>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Parser-0.103.tar.gz>;
+	doap:revision        "0.103"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-104>
+	a                    doap:Version;
+	dc:issued            "2011-09-22"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Catch up to revision d81fcb920a1a3c351149cd66a64bf1b8ae14a172 (2011-08-21) upstream."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Support <track> element."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Some error handling stuff."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-103>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Parser-0.104.tar.gz>;
+	doap:revision        "0.104"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-105>
+	a                    doap:Version;
+	dc:issued            "2011-10-07"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "HTML::HTML5::Parser::Error overloads stringification."@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Module::Package::RDF."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Bundle 'html5debug' script."@en;
+		], [ rdfs:label "use HTML::HTML5::Entities"@en ];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-104>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Parser-0.105.tar.gz>;
+	doap:revision        "0.105"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-106>
+	a                    doap:Version;
+	dc:issued            "2011-10-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Tokenizer.pm was still trying to require NamedEntityList.pm."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-105>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Parser-0.106.tar.gz>;
+	doap:revision        "0.106"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-107>
+	a                    doap:Version;
+	dc:issued            "2011-10-20"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "parse_file wasn't accepting relative file names"@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "html2xhtml now reads from STDIN by default."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "html2xhtml can output to a file."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-106>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Parser-0.107.tar.gz>;
+	doap:revision        "0.107"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-108>
+	a                    doap:Version;
+	dc:issued            "2012-01-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Crashed when generating an error message about some missing closing tags."@en;
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/audreyt>;
+		], [
+			a doap-changeset:Documentation, doap-changeset:Update;
+			rdfs:label "Copyright 2012."@en;
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Provide load_xml and load_html methods for compatibility with XML::LibXML 1.70 and newer."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-107>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Parser-0.108.tar.gz>;
+	doap:revision        "0.108"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-109>
+	a                    doap:Version;
+	rdfs:label           "Yes, they are come, but they are not past."@en;
+	dc:issued            "2012-03-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Use correct case for MathML's definitionURL attribute."@en;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix several fatal errors on infrequently used code paths in TagSoupParser.pm."@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Bundle test cases from html5lib."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Provide parse_balanced_chunk to parse HTML fragments."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Provide dtd_element method to get more information about the DTD."@en;
+		], [
+			rdfs:label "Make source_line method work more reliably. This requires XML::LibXML::Devel, and thus a fairly recent version of XML-LibXML."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Nodes now have an implictness flag (returned by source_line called in a list context)."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-108>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Parser-0.109.tar.gz>;
+	doap:revision        "0.109"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-110>
+	a                    doap:Version;
+	dc:issued            "2012-03-20"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Removed a use of smart match which was breaking Perl 5.8.x compatibility."@en;
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/75809>;
+		], [
+			rdfs:label "use XML::LibXML::Devel::SetLineNumber if it is available.";
+		], [
+			rdfs:label "Text nodes should keep line numbers and column numbers too.";
+		], [
+			rdfs:label "Comment nodes should now keep their line numbers and column numbers.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-109>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Parser-0.110.tar.gz>;
+	doap:revision        "0.110"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-200>
+	a                    doap:Version;
+	dc:issued            "2012-06-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Suppress warnings about invalid Unicode code points.";
+		], [
+			rdfs:label "Drop dependency on Error.pm; use Try::Tiny instead.";
+		], [
+			rdfs:label "Drop dependency on HTML::Encoding; use IO::HTML instead.";
+		], [
+			rdfs:label "Passing a couple more of the html5lib test suite files.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-109>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Parser-0.200.tar.gz>;
+	doap:revision        "0.200"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-202>
+	a                    doap:Version;
+	dc:issued            "2012-06-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Drop dependency on LWP::UserAgent in favour of HTTP::Tiny which is part of core since 5.14.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-200>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Parser-0.202.tar.gz>;
+	doap:revision        "0.202"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-204>
+	a                    doap:Version;
+	dc:issued            "2012-06-29"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Stop using defined-or operator in HTML::HTML5::Parser::UA, as it doesn't work in Perl 5.8.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-202>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Parser-0.204.tar.gz>;
+	doap:revision        "0.204"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-206>
+	a                    doap:Version;
+	dc:issued            "2012-06-30"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Remove 'use 5.010' from t/07ua.t.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Disable t/07ua.t and t/08ua-lwp.t on Windows because Test::HTTP::Server doesn't work on that platform.";
+			rdfs:seeAlso <https://rt.cpan.org/Ticket/Display.html?id=78118>;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-204>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Parser-0.206.tar.gz>;
+	doap:revision        "0.206"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-208>
+	a                    doap:Version;
+	dc:issued            "2012-12-06"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Minor fix re LWP-independence.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "If two <html> tags were in the same file, attributes on the second <html> element could cause crashes."@en;
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/79019>;
+			doap-changeset:thanks [ foaf:name "Luben Karavelov" ];
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-206>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Parser-0.208.tar.gz>;
+	doap:revision        "0.208"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-300>
+	a                    doap:Version;
+	dc:issued            "2013-07-06"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix many major memory leaks.";
+			doap-changeset:blame [
+				foaf:name "Dorian Taylor";
+				foaf:nick "DORIAN";
+			];
+			doap-changeset:fixes <tdb:2013:https://github.com/tobyink/p5-html-html5-parser/pull/1>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Memory leak fix necessitated some API changes; in particular some methods which were available as class methods are now object methods only."@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "t/99html5lib.t now uses Moo instead of Mo."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-208>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Parser-0.300.tar.gz>;
+	doap:revision        "0.300"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-301>
+	a                    doap:Version;
+	dc:issued            "2013-07-08"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix t/99html5lib.t still using Mo in one place."@en;
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/86774>;
+			doap-changeset:thanks [
+				foaf:mbox <mailto:fitz.elliott@gmail.com>;
+				foaf:name "Fitz Elliott";
+			];
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-300>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Parser-0.301.tar.gz>;
+	doap:revision        "0.301"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-991>
+	a                    doap:Version;
+	dc:issued            "2021-09-08"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Don't install a global __WARN__ handler in BEGIN."@en;
+			doap-changeset:blame [ foaf:name "Alex Vandiver" ];
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Modernize packaging in general."@en;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Don't assume @INC contains ."@en;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Better regexp for differentiating between filenames and URIs."@en;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix encoding issues."@en;
+			doap-changeset:blame [ foaf:name "Gregory Williams" ], [ foaf:name "Kjetil Kjernsmo" ];
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/96399>;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-301>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Parser-0.991.tar.gz>;
+	doap:revision        "0.991"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-992>
+	a                    doap:Version;
+	dc:issued            "2021-09-08"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Point repo at Github."@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Point issue tracker at Github."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/v_0-991>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Parser-0.992.tar.gz>;
+	doap:revision        "0.992"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/audreyt>
+	foaf:nick            "audreyt".
+
+<http://purl.org/NET/cpan-uri/rt/ticket/55845>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Warning produced when run under perl -w";
+	dc:created           "2010-03-23T16:50:39"^^xsd:dateTime;
+	dc:modified          "2010-04-23T13:00:02"^^xsd:dateTime;
+	doap-bugs:assignee   _:B1;
+	doap-bugs:id         "55845"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=55845>;
+	doap-bugs:reporter   _:B2;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/65517>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Please don't require Module::Signature";
+	dc:created           "2011-02-07T07:25:30"^^xsd:dateTime;
+	dc:modified          "2012-01-18T13:14:13"^^xsd:dateTime;
+	doap-bugs:assignee   _:B1;
+	doap-bugs:id         "65517"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=65517>;
+	doap-bugs:reporter   _:B2;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/75809>
+	a                    doap-bugs:Issue;
+	rdfs:label           "LibXML version check uses smart match";
+	dc:created           "2012-03-16T10:30:03"^^xsd:dateTime;
+	dc:modified          "2012-03-19T09:12:28"^^xsd:dateTime;
+	doap-bugs:assignee   _:B1;
+	doap-bugs:id         "75809"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=75809>;
+	doap-bugs:reporter   [
+		a foaf:Agent;
+		foaf:mbox <mailto:mail@tobyinkster.co.uk>;
+	];
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/79019>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Failure mode of TagSoupParser";
+	dc:created           "2012-08-16T15:47:33"^^xsd:dateTime;
+	dc:modified          "2012-08-18T15:56:56"^^xsd:dateTime;
+	doap-bugs:assignee   _:B1;
+	doap-bugs:id         "79019"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=79019>;
+	doap-bugs:reporter   [
+		a foaf:Agent;
+		foaf:mbox <mailto:karavelov@mail.bg>;
+	];
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/open>.
+
+<http://tobyinkster.co.uk/#i>
+	a                    foaf:Person;
+	foaf:homepage        <http://tobyinkster.co.uk/>;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:page            <https://metacpan.org/author/TOBYINK>;
+	owl:sameAs           <http://purl.org/NET/cpan-uri/person/tobyink>.
+
+_:B2
+	a                    foaf:Agent;
+	foaf:mbox            <mailto:DOUGDUDE@cpan.org>.
+
+_:B1
+	a                    foaf:Agent;
+	foaf:nick            "TOBYINK".
+

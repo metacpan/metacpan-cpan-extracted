@@ -1,5 +1,5 @@
 package App::gimpgitbuild::Command::cleanbuild;
-$App::gimpgitbuild::Command::cleanbuild::VERSION = '0.26.1';
+$App::gimpgitbuild::Command::cleanbuild::VERSION = '0.28.1';
 use strict;
 use warnings;
 use autodie;
@@ -53,7 +53,7 @@ __END__
 
 =head1 VERSION
 
-version 0.26.1
+version 0.28.1
 
 =begin foo return (
         [ "output|o=s", "Output path" ],

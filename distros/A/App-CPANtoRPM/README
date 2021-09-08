@@ -20,7 +20,7 @@ DESCRIPTION
     Build the package
     Generate a spec file
     Create the RPM packages
-    Sign the RPM packages
+    Sign the RPM packages (optional)
     Install the RPM (optional)
     Store the RPM in a local yum repository (optional)
 
@@ -258,6 +258,10 @@ OPTIONS
         Makefile.PL' command used to configure the module and create a Build
         script or a Makefile. This option can be passed in any number of
         times, but only a single option should be included in each STRING.
+        STRING is passed in as a command line argument:
+
+           perl Makefile.PL STRING
+           perl Build.PL STRING
 
         Since the arguments passed in differ when using a Makefile.PL and a
         Build.PL procedure, for safety, you should always include the
@@ -267,6 +271,28 @@ OPTIONS
         Similar to the --config option except this passes strings which are
         passed to either the './Build' or 'make' command used to actually
         build the module. This option can be passed in any number of times.
+
+    --config-input STRING
+        Sometimes, the configure step prompts for input that cannot be set
+        using an environment variable. In this case, this option may be used
+        to pass in a single line of input to the 'perl Build.PL' or 'perl
+        Makefile.PL' command used to configure the module and create a Build
+        script or a Makefile. This option can be passed in any number of
+        times, but each value should include a single line of input. This
+        will result in the following:
+
+           echo STRING | perl Makefile.PL
+           echo STRING | perl Build.PL
+
+        Since the arguments passed in differ when using a Makefile.PL and a
+        Build.PL procedure, for safety, you should always include the
+        --build-type option when using this option.
+
+    --build-input STRING
+        Similar to the --config-input option except this passes strings
+        which are passed to either the './Build' or 'make' command used to
+        actually build the module. This option can be passed in any number
+        of times.
 
     -T/--install-type TYPE
     -i/--install-base DIR

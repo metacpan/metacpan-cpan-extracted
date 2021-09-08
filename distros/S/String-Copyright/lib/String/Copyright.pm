@@ -4,6 +4,13 @@ use warnings;
 use utf8;
 use re (qw/eval/);
 
+my $CAN_RE2;
+
+BEGIN {
+	eval { require re::engine::RE2 };
+	$CAN_RE2 = $@ ? '' : 1;
+}
+
 package String::Copyright;
 
 =encoding UTF-8
@@ -14,11 +21,11 @@ String::Copyright - Representation of text-based copyright statements
 
 =head1 VERSION
 
-Version 0.003008
+Version 0.003011
 
 =cut
 
-our $VERSION = '0.003008';
+our $VERSION = '0.003011';
 
 # Dependencies
 use parent 'Exporter::Tiny';
@@ -98,17 +105,15 @@ see the L<Exporter::Tiny> documentation for details.
 # AND'ed strings have name ending in underscore: must be grouped if repeated
 my $blank           = '[ \t]';
 my $blank_or_break_ = "$blank*\\n?$blank*";
-my $sign = '(?i:copyright(?:-holders?)?\b|copr\.|[©⒞Ⓒⓒ🄒🄫🅒])';
-my $pseudo_sign_ = '[({][Cc][})]';
-my $broken_sign_ = "\\?$blank*";
-my $nonsign      = "(?:no |_)copyright|copyright-[^h]";
-
-my $year_ = '\b[0-9]{4}\b';
-my $comma = "(?:$blank*,$blank_or_break_|$blank_or_break_,?$blank*)";
-my $dash_ = "$blank*[-˗‐‑‒–—―⁃−﹣－](?:$blank_or_break_)*";
-my $owner_intro_  = "\\bby$blank_or_break_";
-my $owner_prefix  = '[(*<@\[{]';
-my $owner_initial = '[^\s!"#$%&\'()*+,./:;<=>?@[\\\\\]^_`{|}~]';
+my $colons_         = "$blank?:{1,2}";
+my $label           = '(?i:copyright(?:-holders?)?\b|copr\.)';
+my $sign            = '[©⒞Ⓒⓒ🄒🄫🅒]';
+my $nroff_sign_     = '\\\\[(]co';
+my $pseudo_sign_    = '[({][Cc][})]';
+my $vague_sign_     = '-[Cc]-';
+my $broken_sign_    = "\\?$blank*";
+my $nonidentifier_
+	= "(?:no |_)copyright|copyright-[^h]|(?:Digital Millennium|U.S.|US|United States) Copyright Act|\\b(?:for|we) copyright\\b";
 
 # this should cause *no* false positives, and stop-chars therefore
 # exclude e.g. email address building blocks; tested against the code
@@ -117,28 +122,54 @@ my $owner_initial = '[^\s!"#$%&\'()*+,./:;<=>?@[\\\\\]^_`{|}~]';
 # (?i)copyright (?:(?:claim|holder|info|information|notice|owner|ownership|statement|string)s?|in|is|to)@\w
 # (?i)copyright (?:(?:claim|holder|info|information|notice|owner|ownership|statement|string)s?|in|is|to)@\b[-_@]
 # (?im)copyright (?:(?:claim|holder|info|information|notice|owner|ownership|statement|string)s?|in|is|to)[^ $]
-my $chatter_copyright
-	= '(?i:assigned|transfer(?:red)?|(?:block|claim|holder|info|information|law|notice|owner|ownership|statement|string|tag)s?|and|appl(?:y|ie[ds])|at|eq|generated|in|is|on|or|to)';
+my $identifier_action
+	= '(?i:apply|applied|applies|assigned|generated|transfer|transferred)';
+my $identifier_thing_
+	= '(?i:block|claim|date|disclaimer|holder|info|information|interest|law|notice|owner|ownership|permission|sign|statement|string|symbol|tag|text)s?';
+my $identifier_misc
+	= "(?i:and|are|at|eq|for|if|in|is|of|on|or|this|to|the (?:library|software),|treaty)";
+my $identifier_chatter
+	= "(?:$identifier_action|$identifier_thing_|$identifier_misc)";
 my $the_notname
 	= '(?i:concrete|fault|first|immediately|least|min\/max|one|outer|previous|ratio|sum|user)';
 my $the_sentence_
 	= "(?:\\w+$blank+){1,10}(?i:are|can(?:not)?|in|is|must|was)";
-my $chatter_pseudosign_
-	= "(?:the$blank+(?:$the_notname|$the_sentence_)|there)\\b";
+my $pseudosign_chatter_
+	= "(?:(?:the$blank+(?:$the_notname|$the_sentence_)|all begin|there|you must)\\b|,? \\(?\\w\\))";
 my $chatter
-	= "(?im:$nonsign|copyright$blank_or_break_$chatter_copyright(?:$|@\\W|[^a-zA-Z0-9@_-])|$blank*$pseudo_sign_(?:$blank_or_break_)+$chatter_pseudosign_)";
+	= "(?im:$nonidentifier_|copyright$blank_or_break_$identifier_chatter(?:$|@\\W|[^a-zA-Z0-9@_-])|$blank*$pseudo_sign_(?:$blank_or_break_)+$pseudosign_chatter_)";
+my $nonyears = '(?:<?year>?|19xx|19yy|yyyy)';
+
+my $year_       = '\b[0-9]{4}\b';
+my $comma_spacy = "(?:$blank*,$blank_or_break_|$blank_or_break_,?$blank*)";
+my $dash        = '[-˗‐‑‒–—―⁃−﹣－]';
+my $dash_spacy_ = "$blank*$dash(?:$blank_or_break_)*";
+
+my $vague_year_   = "(?:$dash$blank?)?[0-9]{1,5}";
+my $owner_intro_  = "(?:$pseudo_sign_$blank?|\\bby$blank_or_break_)";
+my $owner_prefix  = '[(*<@\[{]';
+my $owner_initial = '[^\s!"#$%&\'()*+,./:;<=>?@[\\\\\]^_`{|}~-]';
 
 my $signs
-	= "(?m:(?:$sign|(?:^|$blank)$pseudo_sign_):?(?:$blank*(?:$sign|$pseudo_sign_))*)";
-my $yearspan_ = "$year_(?:$dash_$year_)?";
-my $years_    = qr/$yearspan_(?:$comma$yearspan_)*/;
-my $owners_   = "$owner_prefix*$owner_initial\\S*(?:$blank*\\S+)*";
+	= "(?m:(?:$label|$sign|$nroff_sign_|(?:^|$blank)$pseudo_sign_)(?:$colons_)?(?:$blank*(?:$label|$sign|$pseudo_sign_))*)";
+my $yearspan_ = "$year_(?:$dash_spacy_$year_)?";
+my $years_    = "$yearspan_(?:$comma_spacy$yearspan_)*";
+my $owners_
+	= "(?:$vague_year_|$owner_prefix*$owner_initial\\S*)(?:$blank*\\S+)*";
 
-my $dash_re          = qr/$dash_/;
-my $owner_intro_A_re = qr/^$owner_intro_/;
-my $boilerplate_X_re = qr/(?i)${comma}All$blank+Rights$blank+Reserved[.!]?.*/;
-my $signs_and_more_re
-	= qr/$chatter.*|$signs(?::$blank_or_break_|$comma)(?:$broken_sign_)?($years_?$comma?(?:$owner_intro_)?(?:$owners_)?)|(?:\n|\z)/;
+# compile regexps in isolation to limit use of RE2 engine
+my ($dash_spacy_re, $owner_intro_A_re, $boilerplate_X_re,
+	$signs_and_more_re
+);
+{
+	BEGIN { re::engine::RE2->import( -strict => 1 ) if ($CAN_RE2) }
+	$dash_spacy_re    = qr/$dash_spacy_/;
+	$owner_intro_A_re = qr/^$owner_intro_/;
+	$boilerplate_X_re
+		= qr/(?i)${comma_spacy}All$blank+Rights$blank+Reserved[.!]?.*/;
+	$signs_and_more_re
+		= qr/$chatter|$signs(?:$blank$vague_sign_)?(?:$colons_$blank_or_break_|$blank$dash{1,2}$blank|$comma_spacy)(?:$broken_sign_)?(?:$nonyears|((?:$years_$comma_spacy?)?(?:(?:$owner_intro_)?$owners_)?))|\n/;
+}
 
 sub _generate_copyright
 {
@@ -184,14 +215,14 @@ sub _generate_copyright
 			$skipped = 0;
 
 			my $years;
-			my @span = $owners =~ /\G($yearspan_)(?:$comma|\Z)/gm;
+			my @span = $owners =~ /\G($yearspan_)(?:$comma_spacy|\Z)/gm;
 			if (@span) {
 				$owners = substr( $owners, $+[0] );
 
 				# deduplicate
 				my %range;
 				for (@span) {
-					my ( $y1, $y2 ) = split /$dash_re/;
+					my ( $y1, $y2 ) = split /$dash_spacy_re/;
 					if ( !$y2 ) {
 						$range{$y1} = undef;
 					}
@@ -210,9 +241,9 @@ sub _generate_copyright
 				$years =~ s/\.\./-/g;
 			}
 			if ($owners) {
-				$owners =~ s/$owner_intro_A_re//g;
+				$owners =~ s/$owner_intro_A_re//;
 				$owners =~ s/\s{2,}/ /g;
-				$owners =~ s/$owner_intro_A_re//g;
+				$owners =~ s/$owner_intro_A_re//;
 				$owners =~ s/$boilerplate_X_re//g;
 			}
 
@@ -294,27 +325,30 @@ Jonas Smedegaard C<< <dr@jones.dk> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Derived from L<App::Licensecheck> originally part of the KDE SDK,
-originally introduced by Stefan Westerfeld C<< <stefan@space.twc.de> >>;
-and on the script licensecheck2dep5 part of Debian CDBS tool,
-written by Jonas Smedegaard.
+This program is based on the script "licensecheck" from the KDE SDK,
+originally introduced by Stefan Westerfeld C<< <stefan@space.twc.de> >>.
 
   Copyright © 2007, 2008 Adam D. Barratt
 
-  Copyright © 2005-2012, 2016 Jonas Smedegaard
+  Copyright © 2005-2012, 2016, 2018, 2020-2021 Jonas Smedegaard
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 3, or (at your option) any
-later version.
+  Copyright © 2018, 2020-2021 Purism SPC
 
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-General Public License for more details.
+This program is free software:
+you can redistribute it and/or modify it
+under the terms of the GNU Affero General Public License
+as published by the Free Software Foundation,
+either version 3, or (at your option) any later version.
 
-You should have received a copy of the GNU General Public License along
-with this program. If not, see <https://www.gnu.org/licenses/>.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY;
+without even the implied warranty
+of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU Affero General Public License for more details.
+
+You should have received a copy
+of the GNU Affero General Public License along with this program.
+If not, see <https://www.gnu.org/licenses/>.
 
 =cut
 

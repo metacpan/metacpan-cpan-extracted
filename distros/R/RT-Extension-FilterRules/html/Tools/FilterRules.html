@@ -1,0 +1,254 @@
+<%doc>
+Page to manage the filter rules that the current user has access to.
+</%doc>
+\
+<%ARGS>
+$id     => undef
+$Rule   => undef
+$Create => undef
+$Test   => undef
+</%ARGS>
+\
+<%INIT>
+if ($Test) {
+    $m->comp( 'FilterRules.html:Test', %ARGS );
+} elsif ($id) {
+    $m->comp( 'FilterRules.html:ShowRules', %ARGS );
+} elsif ( not $id ) {
+    $m->comp( 'FilterRules.html:ListRuleGroups', %ARGS );
+}
+</%INIT>
+\
+<%method Test>
+<%doc>
+Show the testing form.
+</%doc>
+\
+<%ARGS>
+$id => undef
+</%ARGS>
+\
+<%INIT>
+my $Collection = RT::FilterRuleGroups->new( $session{'CurrentUser'} );
+$m->comp( 'FilterRules.html:GetFilterRuleGroups',
+    'Collection' => $Collection );
+my $Title = loc('Test filter rules');
+</%INIT>
+\
+<& /Elements/Header, Title => $Title &>
+<& /Elements/Tabs &>
+\
+<p></p>
+\
+<form action="FilterRules.html" method="get">
+% if ($id) {
+<input type="hidden" name="id" value="<% $id %>" />
+% }
+<p><input type="submit" value="&larr; <&|/l&>Back</&>" /></p>
+</form>
+\
+% if ($Collection->Count == 0) {
+<p>
+<em><&|/l&>You do not have access to any filter rule groups.</&></em>
+</p>
+% } else {
+<& /Elements/FilterRules/Test,
+    %ARGS,
+    FilterRuleGroups => $Collection,
+    PageLink => RT->Config->Get('WebPath') . '/Tools/FilterRules.html',
+&>
+% }
+</%method>
+\
+<%method GetFilterRuleGroups>
+<%doc>
+Given an RT::FilterRuleGroups collection object, update it to limit to just
+the filter rule groups the current user can see.
+</%doc>
+\
+<%ARGS>
+$Collection => undef
+$IncludeDisabled => 0
+</%ARGS>
+\
+<%INIT>
+return if ( not $Collection );
+
+$Collection->UnLimit;
+$Collection->Limit(
+    'FIELD'    => 'Disabled',
+    'VALUE'    => 0,
+    'OPERATOR' => '='
+) if (not $IncludeDisabled);
+
+my $IsSuperUser = $session{'CurrentUser'}
+    ->HasRight( Object => $RT::System, Right => 'SuperUser' );
+
+my @idlist = ();
+while ( my $Item = $Collection->Next ) {
+    next
+        if (
+        not( $IsSuperUser || $Item->CurrentUserHasRight('SeeFilterRule') ) );
+    push @idlist, $Item->id;
+}
+
+$Collection = RT::FilterRuleGroups->new( $session{'CurrentUser'} );
+$Collection->UnLimit;
+$Collection->Limit(
+    'FIELD'           => 'id',
+    'VALUE'           => $_,
+    'OPERATOR'        => '=',
+    'ENTRYAGGREGATOR' => 'OR'
+) foreach (@idlist);
+$Collection->Limit(
+    'FIELD'    => 'id',
+    'VALUE'    => 0,
+    'OPERATOR' => '='
+) if ( scalar @idlist < 1 );
+
+return;
+</%INIT>
+</%method>
+\
+<%method ListRuleGroups>
+<%doc>
+List the filter rule groups visible to the current user.
+</%doc>
+\
+<%INIT>
+my $Title   = loc('Filter rule groups');
+my @Results = ();
+
+my $Collection = RT::FilterRuleGroups->new( $session{'CurrentUser'} );
+$m->comp( 'FilterRules.html:GetFilterRuleGroups',
+    'Collection' => $Collection );
+
+# Show the rules in the only group, if there is only one.
+if ( $Collection->Count() == 1 ) {
+    $m->comp( 'FilterRules.html:ShowRules', %ARGS,
+        'id' => $Collection->Next->id );
+    return;
+}
+
+my $Format
+    = "'<a href=\"__WebPath__/Tools/FilterRules.html?id=__id__\">__id__</a>/TITLE:#',"
+    . "'<a href=\"__WebPath__/Tools/FilterRules.html?id=__id__\">__Name__</a>',"
+    . "'__FilterRulesCount__'";
+</%INIT>
+\
+<& /Elements/Header, Title => $Title &>
+<& /Elements/Tabs &>
+<& /Elements/ListActions, actions => \@Results &>
+\
+<p></p>
+\
+% if ($Collection->Count == 0) {
+<p>
+<em><&|/l&>You do not have access to any filter rule groups.</&></em>
+</p>
+% } else {
+<& /Elements/CollectionList,
+    OrderBy => 'SortOrder',
+    Order => 'ASC',
+    %ARGS,
+    Rows  => undef,
+    Format => $Format,
+    Collection => $Collection,
+    AllowSorting => 0,
+    PassArguments => [qw(
+        FindDisabled SearchString SearchOp Rows Page
+    )],
+&>
+% }
+</%method>
+\
+<%method ShowRules>
+<%doc>
+List or edit the filter rules in a specific filter rule group.
+</%doc>
+\
+<%ARGS>
+$id => undef
+</%ARGS>
+\
+<%INIT>
+my $FilterRuleGroup = RT::FilterRuleGroup->new( $session{'CurrentUser'} );
+$FilterRuleGroup->Load($id) || Abort("Couldn't load filter rule group '$id'");
+
+my $Title = loc( 'Filter rule group #[_1]: [_2]: Filter rules',
+    $FilterRuleGroup->id, $FilterRuleGroup->Name );
+
+my @Results = ();
+
+if (   $ARGS{'Rule'}
+    || $ARGS{'Create'}
+    || $ARGS{'MoveUp'}
+    || $ARGS{'MoveDown'} )
+{
+    $m->comp(
+        '/Elements/FilterRules/EditRule:Post',
+        'ARGSRef'         => \%ARGS,
+        'FilterRuleGroup' => $FilterRuleGroup,
+        'Edit'            => 'FilterRules',
+        'Results'         => \@Results
+    );
+}
+
+my $FilterRule = undef;
+if ( $ARGS{'Rule'} && not $ARGS{'Create'} ) {
+    $FilterRule = RT::FilterRule->new( $session{'CurrentUser'} );
+    $FilterRule->Load( $ARGS{'Rule'} )
+        || Abort("Couldn't load filter rule '$ARGS{'Rule'}'");
+    if ( $FilterRule->FilterRuleGroupObj->id != $id ) {
+        Abort(
+            "Filter rule '$ARGS{'Rule'}' is not part of filter rule group '$id'"
+        );
+    }
+    if ( $FilterRule->IsGroupRequirement ) {
+        Abort(
+            "Filter rule '$ARGS{'Rule'}' is not a filter rule of filter rule group '$id'"
+        );
+    }
+    $Title = loc(
+        'Filter rule group #[_1]: [_2]: Filter rule #[_3]: [_4]',
+        $FilterRuleGroup->id, $FilterRuleGroup->Name,
+        $FilterRule->id,      $FilterRule->Name
+    );
+} elsif ( $ARGS{'Create'} ) {
+    $Title = loc( 'Filter rule group #[_1]: [_2]: Add new filter rule',
+        $FilterRuleGroup->id, $FilterRuleGroup->Name );
+}
+</%INIT>
+\
+<& /Elements/Header, Title => $Title  &>
+<& /Elements/Tabs &>
+<& /Elements/ListActions, actions => \@Results &>
+\
+<p></p>
+
+% if ($ARGS{'Rule'} || $ARGS{'Create'}) {
+<& /Elements/FilterRules/EditRule,
+    %ARGS,
+    FilterRuleGroup => $FilterRuleGroup,
+    FilterRule => $FilterRule,
+    Edit => 'FilterRules',
+    PageLink => RT->Config->Get('WebPath') . '/Tools/FilterRules.html',
+&>
+% } else {
+%     if ($FilterRuleGroup->CurrentUserHasRight('CreateFilterRule')) {
+<form action="FilterRules.html" method="post">
+<input type="hidden" name="id" value="<%$id%>" />
+<input type="hidden" name="Create" value="1" />
+<p>
+<input type="submit" value="<&|/l&>Create new filter rule</&>" />
+</p>
+</form>
+%     }
+<& /Elements/FilterRules/ShowRules,
+    %ARGS,
+    FilterRuleGroup => $FilterRuleGroup,
+    Edit => 'FilterRules',
+    PageLink => RT->Config->Get('WebPath') . '/Tools/FilterRules.html',
+&>
+% }
+</%method>

@@ -3,9 +3,9 @@
 #
 #  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.41;  # :param
+use Object::Pad 0.51;
 
-package Tickit::Widget::Frame 0.34;
+package Tickit::Widget::Frame 0.35;
 class Tickit::Widget::Frame
    extends Tickit::SingleChildWidget;
 
@@ -134,16 +134,18 @@ For more details see the accessors below.
 has $_title    :reader :param = undef;
 has %_has_edge;
 
-BUILD
+ADJUSTPARAMS
 {
-   my %args = @_;
+   my ( $params ) = @_;
 
-   $self->set_title_align( $args{title_align} || 0 );
+   $self->set_title_align( delete $params->{title_align} || 0 );
 
    # Prepopulate has_* caches
    $self->on_style_changed_values;
 
-   $self->set_child( $args{child} ) if $args{child};
+   if( exists $params->{child} ) {
+      croak "The 'child' constructor argument to ${\ref $self} is no longer recognised; use ->add_child instead";
+   }
 }
 
 =head1 ACCESSORS

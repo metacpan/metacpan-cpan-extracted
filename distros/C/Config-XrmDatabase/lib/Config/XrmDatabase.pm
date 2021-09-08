@@ -2,33 +2,58 @@ package Config::XrmDatabase;
 
 # ABSTRACT: Pure Perl X Resource Manager Database
 
-use v5.20;
-
-use strict;
+use v5.26;
 use warnings;
 
-use experimental qw( signatures postderef );
+our $VERSION = '0.04';
 
 use Feature::Compat::Try;
 
-our $VERSION = '0.02';
-
 use Config::XrmDatabase::Failure ':all';
-use Config::XrmDatabase::Constants  ':all';
+use Config::XrmDatabase::Util ':all';
+use Config::XrmDatabase::Types -all;
+use Types::Standard qw( Object Str Optional HashRef );
+use Type::Params qw( compile_named );
+use Ref::Util;
 
-my %META = (
-    VALUE()      => 'value',
-    MATCH_COUNT()  => 'match_count'
-);
-my %RMETA = (
-    fc( 'value' ) => VALUE,
-    fc( 'match_count' ) => MATCH_COUNT,
-);
-my $META_QR = qr/@{[ join '|', map { quotemeta } keys %META ]}/;
-
+use Moo;
 
 use namespace::clean;
 
+use MooX::StrictConstructor;
+
+use experimental qw( signatures postderef declared_refs refaliasing );
+
+has _db => (
+    is       => 'rwp',
+    init_arg => undef,
+    default  => sub { {} },
+);
+
+has _query_return_value => (
+    is       => 'ro',
+    isa      => QueryReturnValue,
+    init_arg => 'query_return_value',
+    coerce   => 1,
+    default  => 'value',
+);
+
+has _query_on_failure => (
+    is       => 'ro',
+    isa      => OnQueryFailure,
+    init_arg => 'query_on_failure',
+    coerce   => 1,
+    default  => 'undef',
+);
+
+# fake attribute so we can use MooX::StrictConstructor
+has _insert => (
+    is        => 'ro',
+    isa       => HashRef,
+    init_arg  => 'insert',
+    predicate => 1,
+    clearer   => 1,
+);
 
 
 
@@ -37,66 +62,40 @@ use namespace::clean;
 
 
 
-sub new ( $class ) { bless {}, $class }
 
-sub _normalize_key( $key ) {
-    $key =~ s/[$TIGHT]?[$LOOSE][$TIGHT]?/$LOOSE/g;
-    return $key;
-}
 
-sub _name_arr_to_name ( $name_arr ) {
 
-    # name_arr might have undef's at the end, as it could have grown
-    # and shrunk
-    return _normalize_key( join( +TIGHT, grep { defined } @$name_arr ) );
-}
 
-sub _parse_resource_name ( $name ) {
 
-    {
-        my $last = substr( $name, -1 );
-        key_failure->throw(
-            "last component of name may not be a binding operator: $name" )
-          if $last eq TIGHT || $last eq SINGLE || $last eq LOOSE;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub BUILD ( $self, $ ) {
+    if ( $self->_has_insert ) {
+        my $kv = $self->_insert;
+        $self->insert( $_, $kv->{$_} ) for keys %$kv;
+        $self->_clear_insert;
     }
-
-    # all consecutive '.' characters are replaced with a single one.
-    $name =~ s/[$TIGHT]+/$TIGHT/g;
-
-    # any combination of '.' and '*' is replaced with a '*'
-    $name =~ s/[${TIGHT}${LOOSE}]{2,}/$LOOSE/g;
-
-    # toss out fields:
-    #   - the tight binding operator; that is the default.
-    #   - empty fields correspond to two sequential binding operators
-    #     or a leading binding operator
-
-    return [
-        grep { $_ ne TIGHT && $_ ne '' }
-          split( /([${TIGHT}${SINGLE}${LOOSE}])/, $name ) ];
-}
-
-sub _parse_fq_resource_name ( $name ) {
-
-    key_failure->throw(
-        "cannot have '$LOOSE' or '$SINGLE' binding operators in a fully qualified name: $name"
-      )
-      if index( $name, SINGLE ) != -1
-      or index( $name, LOOSE ) != -1;
-
-    key_failure->throw(
-        "cannot have multiple sequential '$TIGHT' binding operators in a fully qualified name: $name"
-    ) if $name =~ /[$TIGHT]{2,}/;
-
-    key_failure->throw(
-        "last component of a fully qualified name must not be a binding operator: $name"
-    ) if substr( $name, -1 ) eq TIGHT;
-
-    key_failure->throw(
-        "first component of a fully qualified name must not be a binding operator: $name"
-    ) if substr( $name, 0, 1 ) eq TIGHT;
-
-    return [ split( /[$TIGHT]/, $name ) ];
 }
 
 
@@ -111,13 +110,10 @@ sub _parse_fq_resource_name ( $name ) {
 
 sub insert ( $self, $name, $value ) {
 
-    $name = _parse_resource_name( $name );
-    my $db = $self;
-    # use Data::Dump; dd $self;
+    $name = parse_resource_name( $name );
+    my $db = $self->_db;
     $db = $db->{$_} //= {} for $name->@*;
-    $DB::single = ! ref $db;
-
-    $db->{ +VALUE }     = $value;
+    $db->{ +VALUE }       = $value;
     $db->{ +MATCH_COUNT } = 0;
 }
 
@@ -133,63 +129,190 @@ sub insert ( $self, $name, $value ) {
 
 
 
-sub query ( $self, $class, $name ) {
 
-    ( $class, $name ) = map { _parse_fq_resource_name( $_ ) } $class, $name;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+no namespace::clean;
+use constant {
+    QUERY_RETURN_VALUE     => 'value',
+    QUERY_RETURN_REFERENCE => 'reference',
+    QUERY_RETURN_ALL       => 'all',
+    QUERY_ON_FAILURE_THROW => 'throw',
+    QUERY_ON_FAILURE_UNDEF => 'undef',
+};
+use namespace::clean;
+
+sub query ( $self, $class, $name, %iopt ) {
+
+    state $check = compile_named(
+        { head => [ Str, Str ] },
+        return_value => Optional[QueryReturnValue],
+        on_failure => Optional[OnQueryFailure],
+    );
+
+    ( $class, $name, my \%opt ) = $check->( $class, $name, %iopt );
+
+    $opt{on_failure} //= $self->_query_on_failure;
+    $opt{return_value} //= $self->_query_return_value;
+
+    ( $class, $name ) = map { parse_fq_resource_name( $_ ) } $class, $name;
 
     components_failure->throw(
         "class and name must have the same number of components" )
       if @$class != @$name;
 
-    return $self->_query( $class, $name );
+    my $return_all = $opt{return_value} eq QUERY_RETURN_ALL;
+
+    my $match = [];
+    my @qargs = ( $class, $name, $return_all, $match );
+    my $retval = $self->_query( $self->_db, 0, \@qargs );
+
+    if ( ! defined $retval ) {
+        return $opt{on_failure}->( $name, $class )
+          if Ref::Util::is_coderef( $opt{on_failure} );
+
+        query_failure->throw(
+            "unable to match name: '$name'; class : '$class'" )
+          if $opt{on_failure} eq QUERY_ON_FAILURE_THROW;
+
+        return undef;
+    }
+
+    return $opt{return_value} eq QUERY_RETURN_VALUE ? $$retval : $retval;
 }
 
-sub _query ( $self, $class, $name, $idx = 0, $match = [] ) {
+sub _query ( $self, $db, $idx, $args ) {
+
+    my ( \$class, \$name, \$return_all, \$match ) = map { \$_ } $args->@*;
+
+    my $_query = __SUB__;
 
     # things are simple if we're looking for the last component; it must
-    # match exactly
+    # match exactly.  this might be able to be inlined in the exact match
+    # checks below to avoid a recursive call, but this is clearer.
     if ( $idx + 1 == @$name ) {
         for my $component ( $name->[$idx], $class->[$idx] ) {
-            if (   exists $self->{$component}
-                && exists $self->{$component}{ +VALUE } )
+            if (   exists $db->{$component}
+                && exists $db->{$component}{ +VALUE } )
             {
-                $match->[$idx] = $component;
-                my $entry = $self->{$component};
+                push $match->@*, $component;
+                my $entry = $db->{$component};
                 ++$entry->{ +MATCH_COUNT };
-                return {
-                    value => $self->{$component}{ +VALUE },
-                    match => _name_arr_to_name( $match ),
-                };
+                my $value = $entry->{ +VALUE };
+                return $return_all
+                  ? {
+                    value       => $value,
+                    match_count => $entry->{ +MATCH_COUNT },
+                    key         => $match,
+                  }
+                  : \$value;
             }
         }
         return undef;
     }
 
-    # otherwise need to possible check lower level components
+    # otherwise need to possibly check lower level components
 
     # exactly named components
     for my $component ( $name->[$idx], $class->[$idx] ) {
-        if ( my $subdb = $self->{$component} ) {
-            $match->[$idx] = $component;
-            my $res = __SUB__->( $subdb, $class, $name, $idx + 1, $match );
+        if ( my $subdb = $db->{$component} ) {
+            push $match->@*, $component;
+            my $res = $self->$_query( $subdb, $idx + 1, $args );
             return $res if defined $res;
+            pop $match->@*;
         }
     }
 
     # single wildcard
-    if ( my $subdb = $self->{ +SINGLE } ) {
-        $match->[$idx] = SINGLE;
-        my $res = __SUB__->( $subdb, $class, $name, $idx + 1, $match );
+    if ( my $subdb = $db->{ +SINGLE } ) {
+        push $match->@*, SINGLE;
+        my $res = $self->$_query( $subdb, $idx + 1, $args );
         return $res if defined $res;
+        pop $match->@*;
     }
 
-    if ( my $subdb = $self->{ +LOOSE } ) {
+    if ( my $subdb = $db->{ +LOOSE } ) {
         my $max = @$name;
-        $match->[$idx] = LOOSE;
+        push $match->@*, LOOSE;
         for ( my $idx = $idx ; $idx < $max ; ++$idx ) {
-            my $res = __SUB__->( $subdb, $class, $name, $idx, $match );
+            my $res = $self->$_query( $subdb, $idx, $args );
             return $res if defined $res;
         }
+        pop $match->@*;
     }
 
     return undef;
@@ -208,9 +331,11 @@ sub _query ( $self, $class, $name, $idx = 0, $match = [] ) {
 
 
 
-sub read_file ( $class, $file ) {
 
-    my $self = $class->new;
+
+sub read_file ( $class, $file, %opts ) {
+
+    my $self = $class->new( %opts );
 
     require File::Slurper;
 
@@ -283,7 +408,7 @@ sub merge ( $self, $other ) {
     require Hash::Merge;
     my $merger = Hash::Merge->new( 'RIGHT_PRECEDENT' );
 
-    $self->%* = $merger->merge( $self->TO_HASH, $other->T_HASH )->%*;
+    $self->_db->%* = $merger->merge( $self->TO_HASH->{db}, $other->TO_HASH->{db} )->%*;
 
     return $self;
 }
@@ -299,8 +424,11 @@ sub merge ( $self, $other ) {
 
 sub clone ( $self ) {
     require Scalar::Util;
-    my $clone = Scalar::Util::blessed( $self )->new;
-    %$clone = $self->TO_HASH;
+
+    my \%args = $self->TO_HASH;
+    my $db = delete $args{db}; # this isn't a constructor argument.
+    my $clone = Scalar::Util::blessed( $self )->new( \%args );
+    $clone->_set__db( $db );
     return $clone;
 }
 
@@ -332,15 +460,73 @@ sub clone ( $self ) {
 
 
 
-sub to_kv ( $self, $meta = 'value' ) {
 
-    state $fc_all = fc( 'all' );
 
-    my $folded  = $self->_folded;
-    my $fc_meta = fc( $meta );
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+my %KV_CONSTANTS;
+BEGIN {
+    %KV_CONSTANTS = ( map { uc( "KV_$_" ) => $_ }
+          qw( all string array value match_count ) );
+
+}
+use constant \%KV_CONSTANTS;
+
+
+sub _to_kv_xx ( $self, %iopt ) {
+    %iopt = ( key => KV_STRING, value => KV_VALUE, %iopt );
+
+    state $match = {
+        value =>
+          qr/^(?<match> @{[ join '|', KV_VALUE, KV_MATCH_COUNT, KV_ALL ]} )$/xi,
+        key => qr/^(?<match> @{[ join '|', KV_STRING, KV_ARRAY ]} )$/xi,
+    };
+
+    my %opt = map {
+        parameter_failure->throw( "illegal value for '$_' option: $iopt{$_}" )
+          unless $iopt{$_} =~ $match->{$_};
+        $_ => $+{match};
+    } qw( key value );
+
+    parameter_failure->throw( "illegal option: $_" )
+      for grep !defined $opt{$_}, keys %iopt;
+
+    # don't clean out excess TIGHT characters if we'll need to later
+    # split it into components.  otherwise we'd have to run
+    # parse_resource_name all over again.
+    my $normalize_keys = $opt{key} eq KV_STRING;
+    my $folded         = $self->_folded( $normalize_keys );
+
+    # first get values
     # return single requested value
-    if ( my $component = $RMETA{$fc_meta} ) {
+    if ( my $component = $RMETA{ $opt{value} } ) {
 
         for my $key ( keys $folded->%* ) {
             if ( $key =~ /^(?<key>.*)[.](?<component>${META_QR})$/ ) {
@@ -352,7 +538,7 @@ sub to_kv ( $self, $meta = 'value' ) {
         }
     }
 
-    elsif ( $fc_meta eq $fc_all ) {
+    elsif ( $opt{value} eq KV_ALL ) {
 
         for my $key ( keys $folded->%* ) {
             if ( $key =~ /^(?<key>.*)[.](?<component>${META_QR})$/ ) {
@@ -362,13 +548,114 @@ sub to_kv ( $self, $meta = 'value' ) {
         }
     }
 
+    # shouldn't get here
     else {
-        parameter_failure->throw( "illegal value for \$meta: $meta" );
+        internal_failure->throw( "internal error: unexpected value for 'value': $iopt{value}" );
     }
 
-    return $folded;
+    return $folded
+      if $opt{key} eq KV_STRING;
+
+    return [ map { [ [ split( /[.]/, $_ ) ], $folded->{$_} ] } keys $folded->%* ]
+      if $opt{key} eq KV_ARRAY;
+
+    internal_failure->throw( "internal error: unexpected value for 'key': $iopt{key}" );
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub to_kv ( $self, %opt ) {
+    $self->_to_kv_xx( %opt, key => 'string' );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub to_kv_arr ( $self, %opt ) {
+    $self->_to_kv_xx( %opt, key => 'array' );
+}
 
 
 
@@ -383,8 +670,11 @@ sub to_kv ( $self, $meta = 'value' ) {
 sub TO_HASH ( $self ) {
     require Storable;
 
-    # remove the blessedness of $self so dclone creates a plain hash
-    return Storable::dclone( {%$self} );
+    {
+        query_return_value => $self->_query_return_value,
+        query_on_failure   => $self->_query_on_failure,
+        db                 => Storable::dclone( $self->_db ),
+    }
 }
 
 
@@ -395,18 +685,22 @@ sub TO_HASH ( $self ) {
 
 
 
-sub _folded( $self ) {
+sub _folded ( $self, $normalize_names = 1 ) {
 
+    # Hash::Fold is overkill
     require Hash::Fold;
-    my $folded = Hash::Fold->new( delimiter => '.' )->fold( $self->TO_HASH );
+    my $folded = Hash::Fold->new( delimiter => '.' )->fold( $self->TO_HASH->{db} );
+
+    return $folded unless $normalize_names;
 
     for my $key ( keys %$folded ) {
-        my $nkey = _normalize_key( $key );
-        $folded->{$nkey} = delete $folded->{$key}
+        my $nkey = normalize_key( $key );
+        $folded->{$nkey} = delete $folded->{$key};
     }
 
     return $folded;
 }
+
 
 
 
@@ -436,7 +730,7 @@ Config::XrmDatabase - Pure Perl X Resource Manager Database
 
 =head1 VERSION
 
-version 0.02
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -448,6 +742,12 @@ version 0.02
 
 This is a Pure Perl implementation of the X Window Resource Manager
 Database (XrmDB).  It allows creation and manipulation of Xrm compliant databases.
+
+B<Warning!> The XrmDB refers to names and resources.  These days they
+are more typically called keys and values.  The terminology used below
+(and sometimes in the names of subroutines and methods) mixes these
+two approaches, sometimes a bit too liberally.  Subroutine and method
+names will probably change to make things more consistent.
 
 =head2 Why another configuration database?
 
@@ -548,13 +848,37 @@ confusing if some discipline isn't maintained.
 
 =head2 new
 
-  $db = Config::XrmDatabase->new;
+  $db = Config::XrmDatabase->new( \%args );
 
-Construct an empty database.
+The class constructor; it constructs an empty database.
+
+The available constructor arguments are:
+
+=over
+
+=item C<query_return_value>
+
+This option sets the default value for the L</query> method's
+C<return_value> parameter.
+It defaults to the string C<value>.
+See L</query> for more details.
+
+=item C<query_on_failure>
+
+This option sets the default value for the L</query> method's
+C<on_failure> parameter.
+It defaults to the string C<undef>.
+See L</query> for more details.
+
+=item C<insert> I<hash>
+
+Populate the database with the supplied data.
+
+=back
 
 =head2 read_file
 
-  $db = read_file( $class, $file );
+  $db = read_file( $class, $file, %opts );
 
 Create a database from a simplified version of the  X Resource Manager database file. Each
 record is a single line of the form
@@ -562,6 +886,8 @@ record is a single line of the form
   key : value
 
 Multiline values are not parsed.
+
+C<%opts> is passed to the class constructor.
 
 =head1 METHODS
 
@@ -575,13 +901,90 @@ C<$match> may be  partially or fully qualified (see L</Match Keys> );
 
 =head2 query
 
-  $db->query( $class, $name );
+  $value = $db->query( $class, $name, %options );
 
-Query the C<$key>, C<$name> pair.
+Query the C<$class>, C<$name> pair. C<$class> and C<$name> must be
+fully qualified (see L</Matching> ).  If no match was found,
+C<undef> is returned.  To disambiguate an actual value of C<undef>,
+use the C<< value => 'all' >> option.
 
-C<$class> and C<$name> must be fully qualified (see L</Matching> ).
+Default values for some options can be set when the database object is
+constructed. See L</new>. The following options are recognized:
 
-An exception object in class C<Config::XrmDatabase::Failure::illegal::resource::name>
+=over
+
+=item C<return_value>
+
+This option determines what is returned.  The following string values are accepted.
+
+=over
+
+=item C<value>
+
+The value stored in the DB.  This is the default.
+
+=item C<reference>
+
+A reference to the value.  This allows disambiguation between an C<undef> returned
+as a value and an C<undef> returned to indicate there was no match, e.g.,
+
+   $db->insert( 'key', undef );
+   $value = $db->query('foo', return_value => 'reference' );
+   die( "no match unless defined $value" );
+   $value = $$value;
+   say "defined = ", defined $value ? 'yes' : 'no';
+
+=item C<all>
+
+A hash containing all of the data associated with the database entry.
+Currently this includes
+
+=over
+
+=item C<value>
+
+The value stored in the DB.
+
+=item C<key>
+
+An internal representation of the key which matched.  Use
+L<Config::XrmDatabase::Util::name_arr_to_str> to convert it to a
+normalized string.
+
+=item C<match_count>
+
+The number of times this key was matched.
+
+=back
+
+=back
+
+=item C<on_failure>
+
+The action to be taken if the query fails.  The following values are
+accepted:
+
+=over
+
+=item The string C<'throw'>
+
+An exception of class B<Config::XrmDatabase::Failure::query> is thrown.
+
+=item The string C<'undef'>
+
+The undefined value is returned.
+
+=item A reference to a subroutine
+
+The reference will be called as
+
+   return $subref->( $name, $class );
+
+Note that the subroutine's return value will be returned by L<query>.
+
+=back
+
+=back
 
 =head2 write_file
 
@@ -610,16 +1013,27 @@ Return a detached clone.
 
 =head2 to_kv
 
-  $hash = $db=>to_kv( ?$meta };
+  \%hash = $db->to_kv( \%opt );
 
-Return a copy of the db in C<key>, C<value> form.  The optional C<$meta> parameter
-determines what values are returned in C<$hash>.
+Return a copy of the db as a hash.
+
+The optional C<%opt> hash determines the content of the returned
+values.  Keys are returned as normalized strings, equivalent to the form
+accepted by L</insert>.
+
+It takes the following entries:
 
 =over
 
 =item C<value>
 
-The value stored when the DB entry was created..  This is the default.
+This option determines the form and content of the returned values.
+
+=over
+
+=item C<value>
+
+The value stored when the DB entry was created.  This is the default.
 
 =item C<match_count>
 
@@ -629,7 +1043,52 @@ against the database.
 =item C<all>
 
 A hash containing all of the data associated with the key.  Currently
-this includes C<value>, and C<match_count>
+this includes C<value> and C<match_count>
+
+=back
+
+=back
+
+=head2 to_kv_arr
+
+  \@array = $db->to_kv_arr( value => $VALUE );
+
+Return a copy of the db as a list of key, value pairs.
+The pairs are stored in an array, e.g.
+
+  @array = ( [ $key, $value ], [ $key, $value ], ... );
+
+Keys are returned as array references whose elements are the
+individual components (including wildcards), e.g.
+
+  @array = ( [ [ 'a', '*', 'c' ], $value ], ... );
+
+The optional C<%opt> hash determines the content of the returned values.
+It takes the following entries:
+
+=over
+
+=item C<value>
+
+This option determines the form and content of the returned values.
+
+=over
+
+=item C<value>
+
+The value stored when the DB entry was created.  This is the default.
+
+=item C<match_count>
+
+The number of times the key was successfully matched by queries
+against the database.
+
+=item C<all>
+
+A hash containing all of the data associated with the key.  Currently
+this includes C<value> and C<match_count>
+
+=back
 
 =back
 
@@ -637,9 +1096,67 @@ this includes C<value>, and C<match_count>
 
   $db->TO_HASH;
 
-Convert the DB into a hash.  This replicates the internal DB structure. Useful? Who knows?
+Convert the DB object into a hash.  Useful? Who knows?
 
 See L</to_kv> for a perhaps more useful output.
+
+=for Pod::Coverage BUILD
+
+=begin internals
+
+=method _to_kv_xx
+
+  \@array_of_array_of_pairs = $db->_to_kv_xx( key => 'array', value => $VALUE );
+  \%hash = $db->_to_kv_xx( key => 'string', value => $VALUE );
+
+Return a copy of the db as either an array of key-value pairs or as a
+hash.  C<%options> determines the form and content of the keys and
+values. It takes the following entries:
+=over
+
+=item C<key>
+
+This specifies the form of the returned keys.
+
+=over
+
+=item C<string>
+
+Keys are returned as a stringified versions, equivalent to the form
+accepted by L</insert>.  This is the default.
+
+=item C<array>
+
+Keys are returned as array references whose elements are the
+individual components (including wildcards).
+
+=back
+
+=item C<value>
+
+This option determines the form and content of the returned keys.
+
+=over
+
+=item C<value>
+
+The value stored when the DB entry was created.  This is the default.
+
+=item C<match_count>
+
+The number of times the key was successfully matched by queries
+against the database.
+
+=item C<all>
+
+A hash containing all of the data associated with the key.  Currently
+this includes C<value> and C<match_count>
+
+=back
+
+=back
+
+=end internals
 
 =begin internals
 
@@ -659,10 +1176,6 @@ They stringify to a detailed message, which is also available via the C<msg> met
 
 =over
 
-=item key
-
-An illegal key was specified.
-
 =item components
 
 There is a mismatch in components between a key and its class.
@@ -671,21 +1184,43 @@ There is a mismatch in components between a key and its class.
 
 There was an error in reading or writing a file.
 
+=item internal
+
+Something went wrong that shouldn't have
+
+=item key
+
+An illegal key was specified.
+
+=item parameter
+
+Something was wrong with a passed in parameter
+
 =back
 
 =head1 INCOMPATIBILITIES
 
 =over
 
-* This module does B<not> interface with the X Window system.
+=item *
 
-* This module has a different API.
+This module does B<not> interface with the X Window system.
 
-* This module doesn't assign a locale to a database.
+=item *
 
-* This module doesn't associate types with values.
+This module has a different API.
 
-* This module can't read or write config files with multi-line values
+=item *
+
+This module doesn't assign a locale to a database.
+
+=item *
+
+This module doesn't associate types with values.
+
+=item *
+
+This module can't read or write config files with multi-line values
 
 =back
 

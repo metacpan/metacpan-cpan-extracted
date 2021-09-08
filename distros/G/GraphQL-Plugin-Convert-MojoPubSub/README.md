@@ -20,30 +20,30 @@ GraphQL::Plugin::Convert::MojoPubSub - convert a Mojo PubSub server to GraphQL s
         username => $String->non_null,
         message => $String->non_null,
       },
-      $pg->pubsub,
+      $pg,
     );
     print $converted->{schema}->to_doc;
 
 # DESCRIPTION
 
-This module implements the [GraphQL::Plugin::Convert](https://metacpan.org/pod/GraphQL::Plugin::Convert) API to convert
-a Mojo pub-sub server (currently either [Mojo::Pg::PubSub](https://metacpan.org/pod/Mojo::Pg::PubSub) or
-[Mojo::Redis::PubSub](https://metacpan.org/pod/Mojo::Redis::PubSub)) to [GraphQL::Schema](https://metacpan.org/pod/GraphQL::Schema) with publish/subscribe
+This module implements the [GraphQL::Plugin::Convert](https://metacpan.org/pod/GraphQL%3A%3APlugin%3A%3AConvert) API to convert
+a Mojo pub-sub server (currently either [Mojo::Pg::PubSub](https://metacpan.org/pod/Mojo%3A%3APg%3A%3APubSub) or
+[Mojo::Redis::PubSub](https://metacpan.org/pod/Mojo%3A%3ARedis%3A%3APubSub)) to [GraphQL::Schema](https://metacpan.org/pod/GraphQL%3A%3ASchema) with publish/subscribe
 functionality.
 
 # ARGUMENTS
 
 To the `to_graphql` method:
 
-- a hash-ref of field-names to [GraphQL::Type](https://metacpan.org/pod/GraphQL::Type) objects. These must be
+- a hash-ref of field-names to [GraphQL::Type](https://metacpan.org/pod/GraphQL%3A%3AType) objects. These must be
 both input and output types, so only scalars or enums. This allows you
 to pass in programmatically-created scalars or enums.
 
     This will be used to construct the `fields` arguments for the
-    [GraphQL::Type::InputObject](https://metacpan.org/pod/GraphQL::Type::InputObject) and [GraphQL::Type::Object](https://metacpan.org/pod/GraphQL::Type::Object) which are
+    [GraphQL::Type::InputObject](https://metacpan.org/pod/GraphQL%3A%3AType%3A%3AInputObject) and [GraphQL::Type::Object](https://metacpan.org/pod/GraphQL%3A%3AType%3A%3AObject) which are
     the input and output of the mutation and subscription respectively.
 
-- an object compatible with [Mojo::Redis](https://metacpan.org/pod/Mojo::Redis), with a `pubsub` attribute.
+- an object compatible with [Mojo::Redis](https://metacpan.org/pod/Mojo%3A%3ARedis), with a `pubsub` attribute.
 
 Note the output type will have a `dateTime` field added to it with type
 non-null `DateTime`. Both input and output types will have a non-null

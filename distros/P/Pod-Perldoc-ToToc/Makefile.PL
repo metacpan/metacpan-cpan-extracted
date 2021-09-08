@@ -64,14 +64,13 @@ my %WriteMakefile = (
 		},
 
 	'TEST_REQUIRES' => {
-		'Test::More' => '0.94',
+		'Test::More' => '1',
 		},
 
 	'PREREQ_PM'     => {
 		'Pod::Perldoc'         => '0',
 		'Pod::Perldoc::BaseTo' => '0',
 		'Pod::Simple'          => '0',
-		'Pod::Toc'             => '0',
 		'parent'               => '0',
 		},
 

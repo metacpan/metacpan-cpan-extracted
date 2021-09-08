@@ -1,0 +1,8 @@
+#!/usr/bin/env perlcritic
+
+severity        = 5
+verbose         = [%p] %m at line %l, column %c. (%e) (Severity: %s)\n
+theme           = core
+criticism-fatal = 1
+color           = 1
+allow-unsafe    = 1

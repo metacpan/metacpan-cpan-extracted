@@ -1,0 +1,18 @@
+use alienfile;
+
+my $RTMIDI_VERSION = '4.0.0';
+
+plugin 'Gather::IsolateDynamic';
+plugin 'PkgConfig' => (
+    pkg_name => 'rtmidi',
+    atleast_version => $RTMIDI_VERSION
+);
+
+share {
+    plugin 'Download' => (
+        url => "http://www.music.mcgill.ca/~gary/rtmidi/release/rtmidi-$RTMIDI_VERSION.tar.gz"
+    );
+    plugin 'Extract' => 'tar.gz';
+    plugin 'Build::Autoconf';
+    build [ '%{configure} --enable-static', '%{make}', '%{make} install', ];
+};

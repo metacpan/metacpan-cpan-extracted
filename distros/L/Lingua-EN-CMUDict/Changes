@@ -13,3 +13,5 @@ Revision history for Perl extension Lingua::EN::CMUDict.
 	- once again fixed those tests.
 0.6   Tue Apr 30 20:00:00 2019
       	- added inc sub directory to fix a bug
+0.7   Fri Sep 3 20:00:00 2021
+	- updated the cmu db file to fix berkeley db incompatibility

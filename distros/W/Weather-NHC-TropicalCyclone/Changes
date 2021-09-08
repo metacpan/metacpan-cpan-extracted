@@ -1,7 +1,12 @@
 Change Log
 ^^^^^^^^^^
 
-Verzion 0.20
+Version 0.31
+
+Introduced Util::H2O to generate accessors for the NHC .json file,
+only used internally for now
+
+Version 0.20
 
 POD fix
 

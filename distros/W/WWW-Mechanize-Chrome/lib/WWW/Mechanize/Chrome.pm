@@ -25,8 +25,9 @@ use HTTP::Cookies::ChromeDevTools;
 use POSIX ':sys_wait_h';
 #use Future::IO;
 use Time::HiRes ();
+use Encode 'encode';
 
-our $VERSION = '0.67';
+our $VERSION = '0.68';
 our @CARP_NOT;
 
 # add Browser.setPermission , .grantPermission for
@@ -480,11 +481,12 @@ sub build_command_line {
         push @{ $options->{ launch_arg }}, "--mute-audio";
     };
 
-    if( ! exists $options->{no_zygote} || $options->{no_sandbox}) {
+    my $no_sandbox = $options->{no_sandbox} || ! (exists $options->{no_zygote});
+    if( ! $no_sandbox) {
         push @{ $options->{ launch_arg }}, "--no-zygote";
     };
 
-    if( ! exists $options->{no_zygote} || $options->{no_sandbox}) {
+    if( $no_sandbox) {
         push @{ $options->{ launch_arg }}, "--no-sandbox";
     };
 
@@ -794,7 +796,7 @@ sub read_devtools_url( $self, $fh, $lines = 10 ) {
         my $line = <$fh>;
         last unless defined $line;
         $line =~ s!\s+$!!;
-        #$self->log('trace', "[[$line]]");
+        $self->log('trace', "[[$line]]");
         if( $line =~ m!^DevTools listening on (ws:\S+)$!) {
             $devtools_url = $1;
             $self->log('trace', "Found ws endpoint from child output as '$devtools_url'");
@@ -1027,6 +1029,14 @@ sub _spawn_new_chrome_instance( $self, $options ) {
             # class to asynchronously wait on a filehandle?!
             $options->{ endpoint } = $self->read_devtools_url( $chrome_stdout );
             close $chrome_stdout;
+
+            if( ! $options->{endpoint} ) {
+                die join ' ',
+                   "Could not read websocket endpoint from Chrome output.",
+                   "Do you maybe have a non-debug instance of Chrome",
+                   "already running?"
+                   ;
+            };
 
             # set up host/port here so it can be used later by other instances
             my $ws = URI->new( $options->{endpoint});
@@ -2506,6 +2516,20 @@ sub httpResponseFromChromeResponse( $self, $res ) {
         weaken $s;
         $full_response_future = $self->getResponseBody( $requestId )->then( sub( $body ) {
             $s->log('debug', "Response body arrived");
+
+            # We need to encode the body back to the appropriate bytes:
+            my $ct = $response->content_type;
+
+            $ct ||= 'text/plain';
+
+            if( $ct =~ m!^text/(\w+); charset=(.*?)! ) {
+                warn "Re-encoding back to $2";
+                $body = encode( "$2", $body );
+            } else {
+                # assume Latin-1 (actually, strip the encoding information from the Perl string)
+                $body = encode( 'Latin-1', $body );
+            };
+
             $response->content( $body );
             #undef $full_response_future;
             Future->done($body)

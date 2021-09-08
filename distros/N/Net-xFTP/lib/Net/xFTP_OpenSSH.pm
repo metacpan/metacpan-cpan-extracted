@@ -27,8 +27,16 @@ sub new_openssh
 	}
 	if (defined $args{'password'})
 	{
-		$host =~ s/\:[^\@]*//o;
-		$host =~ s/\@/\:$args{'password'}\@/;
+		if (defined($args{'passphrase'}) && $args{'passphrase'} =~ /\*/)
+		{
+			#FOR "passphrase => '*'":  USE USER-ENTERED PASSWORD FIELD AS THE PASSPHRASE INSTEAD!:
+			$args{'passphrase'} = $args{'password'};
+		}
+		else
+		{
+			$host =~ s/\:[^\@]*//o;
+			$host =~ s/\@/\:$args{'password'}\@/;
+		}
 		delete($args{'password'});
 	}
 	my $saveEnvHome = $ENV{HOME};
@@ -55,10 +63,16 @@ sub new_openssh
 		}
 		chomp $cwd;
 		$xftp->{cwd} = $cwd;
+		$xftp->{protocol} = 'Net::OpenSSH';
 
 		return $xftp;
 	}
 	return undef;
+}
+
+sub protocol
+{
+	return shift->{protocol};
 }
 
 {
@@ -242,16 +256,18 @@ sub pwd  #GET AND RETURN THE "CURRENT" DIRECTORY.
 	return $self->{cwd} || $self->{xftp}->capture('pwd');
 }
 
-sub get    #(Remote, => Local)
+sub get    #(Remote, => Local [, opts])
 {
 	my $self = shift;
 
 	return undef  unless (@_ >= 1);
 	my @args = @_;
+	my $getops = undef;
 #	$args[0] = $self->{cwd} . '/' . $args[0]  unless ($args[0] =~ m#^(?:[a-zA-Z]\:|\/)#o);
-	if (@args >= 2)
+	if (scalar(@args) >= 2)
 	{
 		$args[1] = \$_[1]  if (ref(\$args[1]) =~ /GLOB/io);
+		$getops = pop(@args)  if (scalar(@args) > 2);
 	}
 	else
 	{
@@ -273,13 +289,14 @@ sub get    #(Remote, => Local)
 		($remoteHandle, $pid) = $self->{xftp}->pipe_out("cat $args[0]");
 		if (defined($remoteHandle) && $remoteHandle)
 		{
+			binary $remoteHandle;
 			while ($buff = <$remoteHandle>)   #NEVER SEEMS TO READ ANYTHING, THOUGH THIS IS HOW THE DOCS SAY TO DO IT?!
 			{
 				print $unsubscriptedFH $buff;
 				$offset += length($buff);
 			}
 			close $remoteHandle;
-			return 1;
+			return $offset;  #FOR FILE-HANDLES, LET'S RETURN THE LENGTH READ (ZERO IS STILL FALSE!)
 		}
 		else
 		{
@@ -289,16 +306,29 @@ sub get    #(Remote, => Local)
 	}
 	else
 	{
-		my $ok = $self->{xftp}->scp_get(@args);
+		my $ok = (defined $getops) ? $self->{xftp}->scp_get($getops, @args)
+				: $self->{xftp}->scp_get(@args);
+		if ($ok)
+		{
+			return $ok  if (-f $args[1]);
+			#RETURNED OK, BUT LOCAL FILE NOT CREATED?!:
+			$self->{xftp_lastmsg} = 'xFTP:get() returned "Ok" but local file not created? ('
+					. $! . ') (' . $xftp->{xftp}->error . ')!';
+			return undef;
+		}
 		my $bang = $!;
 		my $err = $self->{xftp}->error;
-		if (!$ok || $err || $bang)
+		if ($err || $bang)
 		{
 			$self->{xftp_lastmsg} = $err || $bang || "xFTP:get() failed - unknown reason!";
 			if ($SIG{CHLD} eq 'IGNORE' && $err eq 'scp failed: child exited with code 1')
 			{
 				$self->{xftp_lastmsg} = $bang;
-				return 1;
+				if (-f $args[1]) {
+					return 1;
+				} else {
+					return undef;
+				}
 			}
 			return $ok ? 1 : undef;
 		}
@@ -306,15 +336,17 @@ sub get    #(Remote, => Local)
 	return $ok ? 1 : undef;
 }
 
-sub put    #(LOCAL => REMOTE) SFTP returns OK=1 on SUCCESS.
+sub put    #(LOCAL, => REMOTE [, opts]) SFTP returns OK=1 on SUCCESS.
 {
 	my $self = shift;
 
 	return undef  unless (@_ >= 1);
 	my @args = @_;
-	if (@args >= 2)
+	my $putops = undef;
+	if (scalar(@args) >= 2)
 	{
 		$args[0] = \$_[0]  if (ref(\$args[0]) =~ /GLOB/io);
+		$putops = pop(@args)  if (scalar(@args) > 2);
 	}
 	else
 	{
@@ -336,15 +368,16 @@ sub put    #(LOCAL => REMOTE) SFTP returns OK=1 on SUCCESS.
 		my $buff;
 		my $unsubscriptedFH = $_[0];
 		($remoteHandle, $pid) = $self->{xftp}->pipe_out(" cat >\"$args[1]\"");
-		if ($remoteHandle)
+		if (defined($remoteHandle) && $remoteHandle)
 		{
-			my $t;
+			binary $remoteHandle;
 			while ($buff = <$unsubscriptedFH>)
 			{
 				print $remoteHandle $buff;
+				$offset += length($buff);
 			}
 			close $remoteHandle;
-			return 1;
+			return $offset;  #FOR FILE-HANDLES, LET'S RETURN THE LENGTH WRITTEN (ZERO IS STILL FALSE!)
 		}
 		else
 		{
@@ -354,7 +387,8 @@ sub put    #(LOCAL => REMOTE) SFTP returns OK=1 on SUCCESS.
 	}
 	else
 	{
-		my $ok = $self->{xftp}->scp_put(@args);
+		my $ok = (defined $putops) ? $self->{xftp}->scp_put($putops, @args)
+				: $self->{xftp}->scp_put(@args);
 		my $bang = $!;
 		my $err = $self->{xftp}->error;
 		if (!$ok || $err || $bang)

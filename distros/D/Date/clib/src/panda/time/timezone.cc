@@ -153,7 +153,7 @@ bool tzparse      (const string_view&, Timezone*);
 bool tzparse_rule (const string_view&, Timezone::Rule*);
 
 static string get_localzone_name () {
-    char tmp[TZNAME_MAX+1];
+    char tmp[TZNAME_MAXLEN+1];
     if (tz_from_env(tmp, "TZ") || get_os_localzone_name(tmp)) return string(tmp, strlen(tmp));
     return string(GMT_FALLBACK);
 }
@@ -171,7 +171,7 @@ static TimezoneSP _tzget (const string_view& zname) {
         assert(zonename.length());
     }
     
-    if (zonename.length() > TZNAME_MAX) {
+    if (zonename.length() > TZNAME_MAXLEN) {
         //fprintf(stderr, "ptime: tzrule too long\n");
         _virtual_fallback(zone);
         return ret;

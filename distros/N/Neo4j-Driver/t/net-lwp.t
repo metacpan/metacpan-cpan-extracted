@@ -27,12 +27,12 @@ my $qcontrol = qtakeover( 'LWP::UserAgent',
 my ($m, $ua, $rq);
 
 my $base = URI->new('http://net.test/');
-my $auth = { scheme => 'basic', principal => 'user%name', credentials => 'pass:@/word' };
-my $userinfo = 'user%25name:pass%3A%40%2Fword';
+my $auth = { scheme => 'basic', principal => 'user%name', credentials => "pass:\@/word\x{100}" };
+my $userinfo = 'user%25name:pass%3A%40%2Fword%C4%80';
 my $uri = 'http://'.$userinfo.'@net.test/';
 my $driver;
 
-$driver = { uri => $base, auth => $auth };
+$driver = Neo4j_Test::DriverConfig->new({ uri => $base, auth => $auth });
 lives_ok { $m = Neo4j::Driver::Net::HTTP::LWP->new($driver) } 'new';
 
 
@@ -148,16 +148,30 @@ subtest 'response jolt' => sub {
 
 
 subtest 'auth variations' => sub {
-	plan tests => 5;
+	plan tests => 9;
 	my $clone = $base->clone;
 	$clone->userinfo($userinfo);
-	$driver = { uri => $clone };
+	my $config;
+	$config = { uri => $clone };
+	$driver = Neo4j_Test::DriverConfig->new($config);
 	lives_ok { $m = Neo4j::Driver::Net::HTTP::LWP->new($driver) } 'new with userinfo';
 	lives_and { like $m->uri(), qr/\Q$uri\E/i } 'uri with userinfo';
-	$driver = { uri => $base };
+	# ^ Since 0.2602, the "uri with userinfo" case can no longer occur
+	#   because such URIs are tidied in Neo4j::Driver::_check_uri().
+	$config = { uri => $base, auth => { scheme => 'basic', principal => "\xc4\x80" } };
+	$driver = Neo4j_Test::DriverConfig->new($config);
+	lives_ok { $m = Neo4j::Driver::Net::HTTP::LWP->new($driver) } 'new with latin1 userid';
+	lives_and { like $m->uri(), qr|//%C4%80:@|i } 'uri with latin1 userid';
+	$config = { uri => $base, auth => { scheme => 'basic', credentials => "\x{100}" } };
+	$driver = Neo4j_Test::DriverConfig->new($config);
+	lives_ok { $m = Neo4j::Driver::Net::HTTP::LWP->new($driver) } 'new with utf8 passwd';
+	lives_and { like $m->uri(), qr|//:%C4%80@|i } 'uri with utf8 passwd';
+	$config = { uri => $base };
+	$driver = Neo4j_Test::DriverConfig->new($config);
 	lives_ok { $m = Neo4j::Driver::Net::HTTP::LWP->new($driver) } 'new no auth';
 	lives_and { is $m->uri(), 'http://net.test/' } 'uri no auth';
-	$driver = { uri => $base, auth => { scheme => 'blackmagic' } };
+	$config = { uri => $base, auth => { scheme => 'blackmagic' } };
+	$driver = Neo4j_Test::DriverConfig->new($config);
 	throws_ok { Neo4j::Driver::Net::HTTP::LWP->new($driver) } qr/\bBasic Auth/i, 'new custom auth croaks';
 };
 
@@ -165,13 +179,16 @@ subtest 'auth variations' => sub {
 subtest 'tls' => sub {
 	plan skip_all => "(LWP::Protocol::https unavailable)" unless eval 'require LWP::Protocol::https; 1';
 	plan tests => 8;
+	my $config;
 	lives_ok {
-		$driver = { uri => URI->new('https://e.net.test/'), tls => 1 };
+		$config = { uri => URI->new('https://e.net.test/'), tls => 1 };
+		$driver = Neo4j_Test::DriverConfig->new($config);
 		$m = Neo4j::Driver::Net::HTTP::LWP->new($driver);
 	} 'encrypted https';
 	lives_and { like $m->uri(), qr|^https://e|i } 'encrypted https uri';
 	lives_ok {
-		$driver = { uri => URI->new('https://d.net.test/'), tls => undef };
+		$config = { uri => URI->new('https://d.net.test/'), tls => undef };
+		$driver = Neo4j_Test::DriverConfig->new($config);
 		$m = Neo4j::Driver::Net::HTTP::LWP->new($driver);
 	} 'https';
 	lives_and { like $m->uri(), qr|^https://d|i } 'https uri';
@@ -179,7 +196,8 @@ subtest 'tls' => sub {
 	SKIP: {
 		skip "(Mozilla::CA unavailable)", 4 unless $ca_file;
 		lives_ok {
-			$driver = { uri => URI->new('https://c.net.test/'), tls_ca => $ca_file };
+			$config = { uri => URI->new('https://c.net.test/'), tls_ca => $ca_file };
+			$driver = Neo4j_Test::DriverConfig->new($config);
 			$m = Neo4j::Driver::Net::HTTP::LWP->new($driver);
 		} 'https ca_file lives';
 		lives_and { like $m->uri(), qr|^https://c|i } 'https ca_file uri';
@@ -191,14 +209,17 @@ subtest 'tls' => sub {
 
 subtest 'tls config errors' => sub {
 	plan tests => 2;
+	my $config;
 	throws_ok {
-		$driver = { uri => $base, tls => 1 };
+		$config = { uri => $base, tls => 1 };
+		$driver = Neo4j_Test::DriverConfig->new($config);
 		Neo4j::Driver::Net::HTTP::LWP->new($driver);
 	} qr/\bHTTP does not support encrypted communication\b/i, 'no encrypted http';
 	SKIP: {
 		skip "(LWP::Protocol::https unavailable)", 1 unless eval 'require LWP::Protocol::https; 1';
 		throws_ok {
-			$driver = { uri => URI->new('https://net.test/'), tls => 0 };
+			$config = { uri => URI->new('https://net.test/'), tls => 0 };
+			$driver = Neo4j_Test::DriverConfig->new($config);
 			Neo4j::Driver::Net::HTTP::LWP->new($driver);
 		} qr/\bHTTPS does not support unencrypted communication\b/i, 'no unencrypted https';
 	}
@@ -206,3 +227,22 @@ subtest 'tls config errors' => sub {
 
 
 done_testing;
+
+
+package Neo4j_Test::DriverConfig;
+
+sub config {
+	my ($driver, $option) = @_;
+	my %aliases = (
+		encrypted => 'tls',
+		timeout => 'http_timeout',
+		trust_ca => 'tls_ca',
+	);
+	return $driver->{$aliases{$option}} if $aliases{$option};
+	return $driver->{$option};
+}
+
+sub new {
+	my ($class, $config) = @_;
+	return bless $config, $class;
+}

@@ -160,7 +160,7 @@ sub import_cmake_properites {
     my $link_opts = _get_prop($source, 'INTERFACE_LINK_OPTIONS');
     my $locations = _get_prop($source, 'LOCATIONS');
 
-    push ( @$link_opts, map({($_ =~ /-/) ? $_ : "-l$_"} @$libs), @$locations );
+    push ( @$link_opts, map({($_ =~ /^-/) ? $_ : "-l$_"} @$libs), @$locations );
     $result->{"LIBS"} = $link_opts;
 
     $result->{"DEFINE"} = [map {"-D$_"} @{_get_prop($source, 'INTERFACE_COMPILE_DEFINITIONS')}];

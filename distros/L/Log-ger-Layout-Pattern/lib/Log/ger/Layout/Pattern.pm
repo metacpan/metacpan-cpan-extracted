@@ -1,10 +1,5 @@
 package Log::ger::Layout::Pattern;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-19'; # DATE
-our $DIST = 'Log-ger-Layout-Pattern'; # DIST
-our $VERSION = '0.007'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -12,6 +7,11 @@ use warnings;
 use Devel::Caller::Util;
 use Log::ger ();
 use Time::HiRes qw(time);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-08-24'; # DATE
+our $DIST = 'Log-ger-Layout-Pattern'; # DIST
+our $VERSION = '0.008'; # VERSION
 
 our $time_start = time();
 our $time_now   = $time_start;
@@ -69,7 +69,7 @@ our %format_for = (
     '_{vmsize}' => sub {
         unless ($cache{pid_stat_time} &&
                 $cache{pid_stat_time} >= $time_now-1) {
-            open my $fh, "/proc/$$/stat" or die;
+            open my $fh, "<", "/proc/$$/stat" or die;
             $cache{pid_stat} = [split /\s+/, scalar(<$fh>)];
             $cache{pid_stat_time} = $time_now;
             close $fh;
@@ -131,11 +131,7 @@ sub get_hooks {
     my %plugin_conf = @_;
 
     $plugin_conf{format} or die "Please specify format";
-    $plugin_conf{packages_to_ignore} //= [
-        "Log::ger",
-        "Log::ger::Layout::Pattern",
-        "Try::Tiny",
-    ];
+    $plugin_conf{packages_to_ignore} //= qr/\A(?:Try::Tiny|Log::ger(?:::.+)?)\z/;
 
     return {
         create_layouter => [
@@ -166,7 +162,7 @@ Log::ger::Layout::Pattern - Pattern layout
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -234,7 +230,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2017 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

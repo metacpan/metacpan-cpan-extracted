@@ -732,7 +732,7 @@ es-search.pl - Provides a CLI for quick searches of data in ElasticSearch daily 
 
 =head1 VERSION
 
-version 8.0
+version 8.1
 
 =head1 SYNOPSIS
 

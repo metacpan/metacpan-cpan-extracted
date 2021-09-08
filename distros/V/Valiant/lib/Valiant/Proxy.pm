@@ -14,8 +14,6 @@ has '_validations' => (
   required => 1,
   default => sub { [] });
 
-sub ancestors { }
-
 sub BUILD {
   my $self = shift;
   my @rules = @{$self->_validations};

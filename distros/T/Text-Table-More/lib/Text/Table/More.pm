@@ -1,21 +1,35 @@
 package Text::Table::More;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-09'; # DATE
-our $DIST = 'Text-Table-More'; # DIST
-our $VERSION = '0.016'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 #use utf8;
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-08-28'; # DATE
+our $DIST = 'Text-Table-More'; # DIST
+our $VERSION = '0.020'; # VERSION
+
+# see Module::Features for more details on this
 our %FEATURES = (
     set_v => {
         TextTable => 1,
     },
 
     features => {
+        PerlTrove => {
+            "Development Status" => "4 - Beta",
+            "Environment" => "Console",
+            # Framework
+            "Intended Audience" => ["Developers"],
+            "License" => "OSI Approved :: Artistic License",
+            # Natural Language
+            # Operating System
+            "Programming Language" => "Perl",
+            "Topic" => ["Software Development :: Libraries :: Perl Modules", "Utilities"],
+            # Typing
+        },
+
         TextTable => {
             can_align_cell_containing_wide_character => 1,
             can_align_cell_containing_color_code     => 1,
@@ -607,7 +621,7 @@ Text::Table::More - Generate text table with simple interface and many options
 
 =head1 VERSION
 
-This document describes version 0.016 of Text::Table::More (from Perl distribution Text-Table-More), released on 2021-08-09.
+This document describes version 0.020 of Text::Table::More (from Perl distribution Text-Table-More), released on 2021-08-28.
 
 =head1 SYNOPSIS
 
@@ -753,6 +767,38 @@ Keywords: rowspan, colspan.
 =head1 DECLARED FEATURES
 
 Features declared by this module:
+
+=head2 From feature set PerlTrove
+
+Features from feature set L<PerlTrove|Module::Features::PerlTrove> declared by this module:
+
+=over
+
+=item * Development Status
+
+Value: "4 - Beta".
+
+=item * Environment
+
+Value: "Console".
+
+=item * Intended Audience
+
+Value: ["Developers"].
+
+=item * License
+
+Value: "OSI Approved :: Artistic License".
+
+=item * Programming Language
+
+Value: "Perl".
+
+=item * Topic
+
+Value: ["Software Development :: Libraries :: Perl Modules","Utilities"].
+
+=back
 
 =head2 From feature set TextTable
 
@@ -1015,7 +1061,7 @@ Arguments:
 
 Array of arrayrefs (of strings or hashrefs). Required. Each array element is a
 row of cells. A cell can be a string like C<"foo"> specifying only the text
-(equivalent to C<<{ text=>"foo" >>) or a hashref which allows you to specify a
+(equivalent to C<< {text=>"foo"} >>) or a hashref which allows you to specify a
 cell's text (C<text>) as well as attributes like C<rowspan> (int, >= 1),
 C<colspan> (int, >= 1), etc. See L</PER-CELL ATTRIBUTES> for the list of known
 per-cell attributes.
@@ -1100,14 +1146,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Text-Table
 
 Source repository is at L<https://github.com/perlancar/perl-Text-Table-More>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Table-More>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Text::ANSITable> also offers lots of formatting options, but currently lacks
@@ -1127,11 +1165,36 @@ L<https://www.w3.org/html/wiki/Elements/table>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Table-More>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

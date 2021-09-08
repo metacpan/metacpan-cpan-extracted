@@ -1,0 +1,1 @@
+%= link_to 'Preferences', '/preferences', rel => 'pref'

@@ -21,6 +21,23 @@ EOPERL
       'message from failure of use strict' );
 }
 
+{
+   my $warnings = "";
+   local $SIG{__WARN__} = sub {
+      $warnings .= join "", @_;
+   };
+
+   ok( defined eval <<'EOPERL',
+      no warnings;
+      class TestWarnings {
+         my $str = undef . "boo";
+      }
+EOPERL
+      'class scope compiles for warnings test' );
+   like( $warnings, qr/^Use of uninitialized value in concatenation \(\.\) or string at /,
+      'warning from uninitialized value test' );
+}
+
 SKIP: {
    # TODO: Work out why and fix it
    skip "'no indirect' doesn't appear to work on this perl", 2 if $] < 5.020;

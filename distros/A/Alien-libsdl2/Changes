@@ -1,5 +1,9 @@
 Revision history for Alien::libsdl2
 
+1.07
+
+	- 1.06 but for real this time on Win32
+
 1.06
 
 	- Force share install (we need headers for SDL2::FFI & fixes ffi bundle on Win32)

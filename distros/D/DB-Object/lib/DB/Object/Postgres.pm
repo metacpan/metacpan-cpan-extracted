@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres.pm
-## Version v0.4.10
+## Version v0.4.11
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2021/08/20
+## Modified 2021/08/24
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -36,7 +36,7 @@ BEGIN
     require DB::Object::Postgres::Lo;
     our( $VERSION, $DB_ERRSTR, $ERROR, $DEBUG, $CONNECT_VIA, $CACHE_QUERIES, $CACHE_SIZE );
     our( $CACHE_TABLE, $USE_BIND, $USE_CACHE, $MOD_PERL, @DBH );
-    $VERSION     = 'v0.4.10';
+    $VERSION     = 'v0.4.11';
     use Devel::Confess;
 };
 
@@ -380,6 +380,16 @@ sub func
 # sub getdefault($;%)
 
 # sub group
+
+sub get_sql_type
+{
+    my $self = shift( @_ );
+    my $type = shift( @_ ) || return( $self->error( "No sql type was provided to get its constant." ) );
+    $self->message( 3, "Trying constant for '$type' using 'DBD::Pg::PG_\U${type}\E'" );
+    my $const = $self->{dbh}->can( "DBD::Pg::PG_\U${type}\E" );
+    return( '' ) if( !defined( $const ) );
+    return( $const->() );
+}
 
 # Specific to Postgres
 sub having
@@ -1776,6 +1786,17 @@ Returns a list of all available databases.
 
 Provided with a table name and a function name and this will call L<DBD::Pg/func> and returns the result.
 
+=head2 get_sql_type
+
+    my $const $dbh->get_sql_type( 'bytea' );
+    # returns 17
+    my $const $dbh->get_sql_type( 'json' );
+    # returns 114
+    my $const $dbh->get_sql_type( 'jsonb' );
+    # returns 3802
+
+Provided with a sql type, irrespective of the character case, and this will return the equivalent constant value.
+
 =head2 having
 
 A convenient wrapper to L<DB::Object::Postgres::Query/having>
@@ -1851,6 +1872,12 @@ If a search path is provided, this will issue the query to set it using C<SET se
 If no arguments is provided, this will issue the query C<SHOW search_path> to retrieve the current search path.
 
 It returns an array object (L<Module::Generic::Array>) containing the search paths found.
+
+=head2 set
+
+This is inherited from L<DB::Object>
+
+Please see L<PostgreSQL documentation for the variables that can be set|https://www.postgresql.org/docs/10/runtime-config-client.html>.
 
 =head2 socket
 

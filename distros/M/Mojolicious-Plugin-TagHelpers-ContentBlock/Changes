@@ -1,0 +1,39 @@
+0.11 2021-09-07
+        - Fix tests on text method to accept
+          undef for Mojo >= 9.21.
+
+0.10 2021-02-10
+        - Replace sojolicio.us with sojolicious.example.
+
+0.09 2021-02-08
+        - Move bugtracker to GitHub.
+
+0.08 2018-05-27
+        - Merge parameters of configuration
+          files instead of overwriting.
+
+0.07 2018-05-25
+        - Introduced separator.
+
+0.06 2018-05-25
+        - Deprecated array parameter use
+          in favor of hash parameter use.
+
+0.05 2018-05-23
+        - Fixed POD.
+        - Introduced configuration
+          based content blocks.
+
+0.04 2017-06-13
+        - Made access rights Kwalitee compliant.
+        - Improved string handling without return values.
+
+0.03 2016-04-16
+        - Added content_block_ok.
+
+0.02 2016-03-25
+        - Improved documentation.
+
+0.01 2015-11-12
+        - Initial submission to GitHub.
+        - Add position and template support.

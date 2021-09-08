@@ -1,12 +1,14 @@
 package App::PMUtils;
 
-our $DATE = '2020-06-12'; # DATE
-our $VERSION = '0.734'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-08-27'; # DATE
+our $DIST = 'App-PMUtils'; # DIST
+our $VERSION = '0.736'; # VERSION
 
 our %SPEC;
 
@@ -231,6 +233,31 @@ sub pmunlink {
      {'cmdline.exit_code' => $num_fail ? 1:0}];
 }
 
+$SPEC{pmabstract} = {
+    v => 1.1,
+    summary => 'Extract the abstract of locally installed Perl module(s)',
+    args => {
+        module => $App::PMUtils::arg_module_multiple,
+    },
+};
+sub pmabstract {
+    require Module::Abstract;
+
+    my %args = @_;
+    my @rows;
+    for my $mod (@{ $args{module} }) {
+        push @rows, {
+            module => $mod,
+            abstract => Module::Abstract::module_abstract($mod),
+        };
+    }
+
+    if (@rows > 1) {
+        return [200, "OK", \@rows, {'table.fields'=>[qw/module abstract/]}];
+    } else {
+        return [200, "OK", $rows[0]{abstract}];
+    }
+}
 
 1;
 # ABSTRACT: Command-line utilities related to Perl modules
@@ -247,7 +274,7 @@ App::PMUtils - Command-line utilities related to Perl modules
 
 =head1 VERSION
 
-This document describes version 0.734 of App::PMUtils (from Perl distribution App-PMUtils), released on 2020-06-12.
+This document describes version 0.736 of App::PMUtils (from Perl distribution App-PMUtils), released on 2021-08-27.
 
 =head1 SYNOPSIS
 
@@ -257,6 +284,8 @@ modules:
 =over
 
 =item * L<module-dir>
+
+=item * L<pmabstract>
 
 =item * L<pmbin>
 
@@ -319,11 +348,43 @@ The main purpose of these utilities is tab completion.
 =head1 FUNCTIONS
 
 
+=head2 pmabstract
+
+Usage:
+
+ pmabstract(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Extract the abstract of locally installed Perl module(s).
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<module>* => I<array[perl::modname]>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
 =head2 pmdir
 
 Usage:
 
- pmdir(%args) -> [status, msg, payload, meta]
+ pmdir(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Get directory of locally installed Perl moduleE<sol>prefix.
 
@@ -357,12 +418,12 @@ Absolutify each path.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -372,7 +433,7 @@ Return value:  (any)
 
 Usage:
 
- pmpath(%args) -> [status, msg, payload, meta]
+ pmpath(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Get path to locally installed Perl module.
 
@@ -416,12 +477,12 @@ and it won't change directory if the module doesn't exist.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -431,7 +492,7 @@ Return value:  (any)
 
 Usage:
 
- pmunlink(%args) -> [status, msg, payload, meta]
+ pmunlink(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Unlink (remove) locally installed Perl module.
 
@@ -471,12 +532,12 @@ Pass -dry_run=E<gt>1 to enable simulation mode.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -526,14 +587,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-PMUtil
 
 Source repository is at L<https://github.com/perlancar/perl-App-PMUtils>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-PMUtils>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 =for BEGIN_BLOCK: see_also
@@ -551,6 +604,8 @@ L<App::IODUtils>, utilities related to L<IOD> configuration files.
 
 L<App::LedgerUtils>, utilities related to Ledger CLI files.
 
+L<App::PerlReleaseUtils>, utilities related to Perl distribution releases.
+
 L<App::PlUtils>, utilities related to Perl scripts.
 
 L<App::PMUtils>, utilities related to Perl modules.
@@ -565,11 +620,42 @@ L<App::WeaverUtils>, utilities related to L<Pod::Weaver>.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto (on PC, Bandung)
+
+Steven Haryanto (on PC, Bandung) <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-PMUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

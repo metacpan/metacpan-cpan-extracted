@@ -29,8 +29,8 @@
             "Export::XS" : "v3.0.5",
             "Net::SockAddr" : "v1.1.1",
             "Test::Catch" : "v1.0.16",
-            "XS::Framework" : "v1.5.0",
-            "XS::Install" : "v1.3.3",
+            "XS::Framework" : "v1.5.1",
+            "XS::Install" : "v1.3.4",
             "XS::libcares" : "v1.17.1.2",
             "XS::libcatch" : "v2.13.4.2",
             "XS::libpanda" : "v1.5.4",
@@ -42,8 +42,8 @@
          "requires" : {
             "Export::XS" : "v3.0.5",
             "Net::SockAddr" : "v1.1.1",
-            "XS::Framework" : "v1.5.0",
-            "XS::Install" : "v1.3.3",
+            "XS::Framework" : "v1.5.1",
+            "XS::Install" : "v1.3.4",
             "XS::libcares" : "v1.17.1.2",
             "XS::libpanda" : "v1.5.4",
             "XS::libuv" : "v1.41.0.0",
@@ -60,7 +60,7 @@
             "Test::Exception" : "0",
             "Test::More" : "0",
             "Test::Simple" : "0.96",
-            "XS::Framework" : "v1.5.0",
+            "XS::Framework" : "v1.5.1",
             "XS::libcares" : "v1.17.1.2",
             "XS::libcatch" : "v2.13.4.2",
             "XS::libpanda" : "v1.5.4",
@@ -70,6 +70,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.2.5",
+   "version" : "v1.2.6",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

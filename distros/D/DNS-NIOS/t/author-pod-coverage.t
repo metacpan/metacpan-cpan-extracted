@@ -10,9 +10,9 @@
 #
 
 BEGIN {
-  unless ($ENV{AUTHOR_TESTING}) {
+  unless ( $ENV{AUTHOR_TESTING} ) {
     print qq{1..0 # SKIP these tests are for testing by the author\n};
-    exit
+    exit;
   }
 }
 
@@ -21,4 +21,4 @@ BEGIN {
 use Test::Pod::Coverage 1.08;
 use Pod::Coverage::TrustPod;
 
-all_pod_coverage_ok({ coverage_class => 'Pod::Coverage::TrustPod' });
+all_pod_coverage_ok( { coverage_class => 'Pod::Coverage::TrustPod' } );

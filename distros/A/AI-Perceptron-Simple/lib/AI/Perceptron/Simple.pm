@@ -1,6 +1,6 @@
 package AI::Perceptron::Simple;
 
-use 5.006;
+use 5.008001;
 use strict;
 use warnings;
 use Carp "croak";
@@ -20,11 +20,11 @@ A Newbie Friendly Module to Create, Train, Validate and Test Perceptrons / Neuro
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =cut
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 # default values
 use constant LEARNING_RATE => 0.05;
@@ -36,17 +36,19 @@ use constant TUNE_DOWN => 0;
 
     #!/usr/bin/perl
 
-    use AI::Perceptron::Simple;
+    use AI::Perceptron::Simple qw(...);
 
     # create a new nerve / neuron / perceptron
     $perceptron = AI::Perceptron::Simple->new( {
         initial_value => $any_value_that_makes_sense, # size of each dendrite :)
         learning_rate => 0.3, # optional
         threshold => 0.85, # optional
-        attribs => \@attributes, # dendrites: array ref of header names in csv file to train
+        attribs => \@attributes, # dendrites
     } );
 
-    # training
+    # train
+    $perceptron->tame( ... );
+    $perceptron->exercise( ... );
     $perceptron->train( $training_data_csv, $expected_column_name, $save_nerve_to );
     # or
     $perceptron->train(
@@ -54,7 +56,10 @@ use constant TUNE_DOWN => 0;
         $show_progress, $identifier); # these two parameters must go together
 
 
-    # validating
+    # validate
+    $perceptron->take_lab_test( ... );
+    $perceptron->take_mock_exam( ... );
+
     # fill results to original file
     $perceptron->validate( { 
         stimuli_validate => $validation_data_csv, 
@@ -69,18 +74,10 @@ use constant TUNE_DOWN => 0;
     } );
 
 
-    # testing, parameters same as validate
-    $perceptron->test( { 
-        stimuli_validate => $testing_data_csv, 
-        predicted_column_index => 4,
-     } );
-    # or        
-    # fill results to a new file
-    $perceptron->test( {
-        stimuli_validate => $testing_data_csv,
-        predicted_column_index => 4,
-        results_write_to => $new_csv
-    } );
+    # test - see "validate" method, same usage
+    $perceptron->take_real_exam( ... );
+    $perceptron->work_in_real_world( ... );
+    $perceptron->test( ... );
 
 
     # confusion matrix
@@ -104,12 +101,59 @@ use constant TUNE_DOWN => 0;
     } );
 
 
-    # save data of the trained perceptron
+    # saving and loading data of perceptron locally
+    # NOTE: nerve data is automatically saved after each trainning process
+    use AI::Perceptron::Simple ":local_data";
+
     my $nerve_file = "apples.nerve";
-    AI::Perceptron::Simple::save_perceptron( $perceptron, $nerve_file );
+    preserve( ... );
+    save_perceptron( $perceptron, $nerve_file );
 
     # load data of percpetron for use in actual program
-    my $apple_nerve = AI::Perceptron::Simple::load_perceptron( $nerve_file ); # :)
+    my $apple_nerve = revive( ... );
+    my $apple_nerve = load_perceptron( $nerve_file );
+
+
+    # for portability of nerve data
+    use AI::Perceptron::Simple ":portable_data";
+
+    my $yaml_nerve_file = "pearls.yaml";
+    preserve_as_yaml ( ... );
+    save_perceptron_yaml ( $perceptron, $yaml_nerve_file );
+
+    # load nerve data on the other computer
+    my $pearl_nerve = revive_from_yaml ( ... );
+    my $pearl_nerve = load_perceptron_yaml ( $yaml_nerve_file );
+
+=head1 EXPORT
+
+None by default.
+
+All the subroutines from C<NERVE DATA RELATED SUBROUTINES> and C<NERVE PORTABILITY RELATED SUBROUTINES> sections are exportable.
+
+Export tags include the following:
+
+=over 4
+
+=item C<:local_data> - subroutines under C<NERVE DATA RELATED SUBROUTINES> section.
+
+=item C<:portable_data> - subroutines under C<NERVE PORTABILITY RELATED SUBROUTINES> section.
+
+=back
+
+Most of the stuff are OO.
+
+=cut
+
+use Exporter qw( import );
+our @EXPORT_OK = qw( 
+    preserve save_perceptron revive load_perceptron
+    preserve_as_yaml save_perceptron_yaml revive_from_yaml load_perceptron_yaml
+);
+our %EXPORT_TAGS = ( 
+    local_data => [ qw( preserve save_perceptron revive load_perceptron ) ],
+    portable_data => [ qw( preserve_as_yaml save_perceptron_yaml revive_from_yaml load_perceptron_yaml ) ],
+);
 
 =head1 DESCRIPTION
 
@@ -117,41 +161,32 @@ This module provides methods to build, train, validate and test a perceptron. It
 
 This module is also aimed to help newbies grasp hold of the concept of perceptron, training, validation and testing as much as possible. Hence, all the methods and subroutines in this module are decoupled as much as possible so that the actual scripts can be written as simple complete programs.
 
-The implementation here is super basic as it only takes in input of the dendrites and calculate the output. If the output is 
-higher than the threshold, the final result (category) will be 1 aka perceptron is activated. If not, then the 
-result will be 0 (not activated).
+The implementation here is super basic as it only takes in input of the dendrites and calculate the output. If the output is higher than the threshold, the final result (category) will 
+be 1 aka perceptron is activated. If not, then the result will be 0 (not activated).
 
-Depending on how you view or categorize the final result, the perceptron will fine tune itself (aka train) based on 
-the learning rate until the desired result is met. Everything from here on is all mathematics and numbers which only makes sense to the computer and not humans anymore.
+Depending on how you view or categorize the final result, the perceptron will fine tune itself (aka train) based on the learning rate until the desired result is met. Everything from 
+here on is all mathematics and numbers which only makes sense to the computer and not humans anymore.
 
-Whenever the perceptron fine tunes itself, it will increase/decrease all the dendrites that is significant (attributes  
-labelled 1) for each input. This means that even when the perceptron successfully fine tunes itself to suite all 
-the data in your file for the first round, the perceptron might still get some of the things wrong for the next 
-round of training. Therefore, the perceptron should be trained for as many rounds as possible. The more "confusion" 
-the perceptron is able to correctly handle, the more "mature" the perceptron is. No one defines how "mature" it is 
-except the programmer himself/herself :)
-
-=head1 EXPORT
-
-None.
-
-Almost everything is OO with some exceptions of course :)
+Whenever the perceptron fine tunes itself, it will increase/decrease all the dendrites that is significant (attributes labelled 1) for each input. This means that even when the 
+perceptron successfully fine tunes itself to suite all the data in your file for the first round, the perceptron might still get some of the things wrong for the next round of training. 
+Therefore, the perceptron should be trained for as many rounds as possible. The more "confusion" the perceptron is able to correctly handle, the more "mature" the perceptron is. 
+No one defines how "mature" it is except the programmer himself/herself :)
 
 =head1 CONVENTIONS USED
 
 Please take note that not all subroutines/method must be used to make things work. All the subroutines and methods are listed out for the sake of writing the documentation. 
 
-Private methods/subroutines are prefixed with C<_> or C<&_> and they aren't meant to be called directly. You can if you want to.
+Private methods/subroutines are prefixed with C<_> or C<&_> and they aren't meant to be called directly. You can if you want to. There are quite a number of them to be honest, just ignore them if you happen to see them :)
 
-"Synonyms" are placed before the actual subroutines/methods with the actual/technical terminologies. You will see C<...> as the parameters if they are synonyms. So move to the next subroutine/method until you find something like C<\%options> as the parameter or anything that isn't C<...>
+Synonyms are placed before the actual ie. technical subroutines/methods. You will see C<...> as the parameters if they are synonyms. Move to the next subroutine/method until you find something like C<\%options> as the parameter or anything that isn't C<...> for the description.
 
 =head1 DATASET STRUCTURE
 
-Any field ie columns that will be used for processing must be binary ie. either 0 or 1 only. Your dataset can contain other columns with non-binary data as long as they are not use for the calculation.
-
-Since there isn't any tutorial written for this module yet, you might need to go and find the data (CSV) files in the C<t> directory. The original dataset can also be found in C<docs/book_list.csv>.
-
 I<This module can only process CSV files.>
+
+Any field ie columns that will be used for processing must be binary ie. C<0> or C<1> only. Your dataset can contain other columns with non-binary data as long as they are not one of the dendrites.
+
+There are soem sample dataset which can be found in the C<t> directory. The original dataset can also be found in C<docs/book_list.csv>. The files can also be found L<here|https://github.com/Ellednera/AI-Perceptron-Simple>.
 
 =head1 PERCEPTRON DATA
 
@@ -163,7 +198,7 @@ See C<Portability of Nerve Data> section below for more info on some known issue
 
 =head2 new ( \%options )
 
-Creates a brand new perceptron and initializes the value of each ATTRIBUTE or "thickness" of the dendrites :)
+Creates a brand new perceptron and initializes the value of each attribute / densrite aka. weight. Think of it as the thickness or plasticity of the dendrites.
 
 For C<%options>, the followings are needed unless mentioned:
 
@@ -171,29 +206,29 @@ For C<%options>, the followings are needed unless mentioned:
 
 =item initial_value => $decimal
 
-The value or thickness :) of ALL the dendrites when a new perceptron is created.
+The value or thickness of ALL the dendrites when a new perceptron is created.
 
 Generally speaking, this value is usually between 0 and 1. However, it all depend on your combination of numbers for the other options.
 
 =item attribs => $array_ref
 
-An array reference containing all the attributes the perceptron should have.
+An array reference containing all the attributes / dendrites names. Yes, give them some names :)
 
 =item learning_rate => $decimal
 
 Optional. The default is C<0.05>.
 
-The learning rate or the "rest duration" of the perceptron for the fine-tuning process (between 0 and 1). 
+The learning rate of the perceptron for the fine-tuning process.
 
-Generally speaking, the smaller the value the better. This value is usually between 0 and 1. However, it all depend on your combination of numbers for the other options.
+This value is usually between 0 and 1. However, it all depends on your combination of numbers for the other options.
 
 =item threshold => $decimal
 
 Optional. The default is C<0.5>
 
-This is the passing rate to determine the neuron output (0 or 1).
+This is the passing rate to determine the neuron output (C<0> or C<1>).
 
-Generally speaking, this value is usually between 0 and 1. However, it all depend on your combination of numbers for the other options.
+Generally speaking, this value is usually between C<0> and C<1>. However, it all depend on your combination of numbers for the other options.
 
 =back
 
@@ -209,6 +244,7 @@ sub new {
     $data{ learning_rate } = LEARNING_RATE if not exists $data{ learning_rate };
     $data{ threshold } = THRESHOLD if not exists $data{ threshold };
     
+    #####
     # don't pack this key checking process into a subroutine for now
     # this is also used in &_real_validate_or_test
     my @missing_keys;
@@ -217,6 +253,7 @@ sub new {
     }
     
     croak "Missing keys: @missing_keys" if @missing_keys;
+    #####
     
     # continue to process the rest of the data
     my %attributes;
@@ -228,7 +265,6 @@ sub new {
         learning_rate => $data{ learning_rate },
         threshold => $data{ threshold },
         attributes_hash_ref => \%attributes,
-        #attribs_name => $data{ attribs }, # just take the keys of %'attributes_hash'
     );
     
     bless \%processed_data, $class;
@@ -251,8 +287,6 @@ sub get_attributes {
 
 If C<$value> is given, sets the learning rate to C<$value>. If not, then it returns the learning rate.
 
-The C<$value> should be between C<0> and C<1>. Default is C<0.05>
-
 =cut
 
 sub learning_rate {
@@ -269,8 +303,6 @@ sub learning_rate {
 =head2 threshold
 
 If C<$value> is given, sets the threshold / passing rate to C<$value>. If not, then it returns the passing rate.
-
-The C<$value> should be between C<0> and C<1>. Default is C<0.5>
 
 =cut
 
@@ -309,11 +341,11 @@ C<$display_stats> is B<optional> and the default is 0. It will display more outp
 
 =item tuning status
 
-Indicates the nerve was tuned up or down
+Indicates the nerve was tuned up, down or no tuning needed
 
 =item old sum
 
-The original sum of all C<weightage * input>
+The original sum of all C<weightage * input> or C<dendrite_size * binary_input>
 
 =item threshold
 
@@ -325,13 +357,11 @@ The new sum of all C<weightage * input> after fine-tuning the nerve
 
 =back
 
-If C<$display_stats> is set to C<1>, then you must specify the C<$identifier>. This is the column / header name that is used to identify a specific row of data in C<$stimuli_train_csv>.
+If C<$display_stats> is specified ie. set to C<1>, then you B<MUST> specify the C<$identifier>. C<$identifier> is the column / header name that is used to identify a specific row of data in C<$stimuli_train_csv>.
 
 =cut
 
 sub tame {
-    #my $self = shift;
-    #$self->train( @_ );
     train( @_ );
 }
 
@@ -354,9 +384,7 @@ sub train {
     
     my $csv = Text::CSV->new( {auto_diag => 1, binary => 1} );
     
-    # tested up till here, here onwards, manual checking
     my $attrib = $csv->getline($data_fh);
-    #use Data::Dumper;    #print Dumper($attrib);    #print $attrib;    #no Data::Dumper;
     $csv->column_names( $attrib );
 
     # individual row
@@ -365,7 +393,6 @@ sub train {
         # print $row->{$expected_output_header} ? "意林\n" : "魅丽优品\n";
 
         # calculate the output and fine tune parameters if necessary
-        # THIS PART IS STILL INCOMPLETE
         while (1) {
             my $output = _calculate_output( $self, $row );
             
@@ -384,7 +411,6 @@ sub train {
             if ( ($output >= $self->threshold) and ( $row->{$expected_output_header} eq 0 ) ) {
                 _tune( $self, $row, TUNE_DOWN );
 
-                # debugging purpose
                 if ( $display_stats ) {
                     print $row->{$identifier}, "\n";
                     print "   -> TUNED DOWN";
@@ -393,11 +419,9 @@ sub train {
                     print "   New Sum = ", _calculate_output( $self, $row ), "\n";                
                 }
                 
-                #last; # break out during tests for the moment
             } elsif ( ($output < $self->threshold) and ( $row->{$expected_output_header} eq 1 ) ) {
                 _tune( $self, $row, TUNE_UP );
                 
-                # debugging purpose
                 if ( $display_stats ) {
                     print $row->{$identifier}, "\n";
                     print "   -> TUNED UP";
@@ -405,7 +429,7 @@ sub train {
                     print "   Threshold = ", $self->threshold;
                     print "   New Sum = ", _calculate_output( $self, $row ), "\n";
                 }
-               # last;
+
             } elsif ( ($output < $self->threshold) and ( $row->{$expected_output_header} eq 0 ) ) {
             
                 if ( $display_stats ) {
@@ -439,11 +463,11 @@ sub train {
 
 =head2 &_calculate_output( $self, \%stimuli_hash )
 
-Calculates and returns the C<sum(weightage*input)> for each individual row of data. For the coding part, it justs add up all the existing weight since C<input> is always 1 for now :)
+Calculates and returns the C<sum(weightage*input)> for each individual row of data. Actually, it justs add up all the existing weight since the C<input> is always 1 for now :)
 
 C<%stimuli_hash> is the actual data to be used for training. It might contain useless columns.
 
-This will get all the avaible dendrites through the C<get_attributes> method and then use all the keys ie. headers to access the corresponding values.
+This will get all the avaible dendrites using the C<get_attributes> method and then use all the keys ie. headers to access the corresponding values.
 
 This subroutine should be called in the procedural way for now.
 
@@ -464,8 +488,8 @@ sub _calculate_output {
             $sum += $dendrites{ $_ };
         }
     }
+    
     $sum;
-    #1; #0.01;
 }
 
 =head2 &_tune( $self, \%stimuli_hash, $tune_up_or_down )
@@ -476,7 +500,7 @@ The C<%stimuli_hash> here is the same as the one in the C<_calculate_output> met
 
 C<%stimuli_hash> will be used to determine which dendrite in C<$self> needs to be fine-tuned. As long as the value of any key in C<%stimuli_hash> returns true (1) then that dendrite in C<$self> will be tuned.
 
-Tuning up or down depends on C<$tune_up_or_down> specifed by the C<&_calculate_output> subroutine. The following constants can be used for C<$tune_up_or_down>:
+Tuning up or down depends on C<$tune_up_or_down> specifed by the C<train> method. The following constants can be used for C<$tune_up_or_down>:
 
 =over 4
 
@@ -506,10 +530,10 @@ sub _tune {
             if ( $stimuli_hash_ref->{ $_ } ) { # must check this one, it must be 1 before we can alter the actual dendrite size in the nerve :)
                 $self->{ attributes_hash_ref }{ $_ } -= $self->learning_rate;
             }
-            
             #print $_, ": ", $self->{ attributes_hash_ref }{ $_ }, "\n";
             
         } elsif ( $tuning_status == TUNE_UP ) {
+            
             if ( $stimuli_hash_ref->{ $_ } ) {
                 $self->{ attributes_hash_ref }{ $_ } += $self->learning_rate;
             }
@@ -518,8 +542,6 @@ sub _tune {
         }
     }
 
-    #print "_tune returned 1\n";
-    #1; #last; # calling last here will give warnings
 }
 
 =head1 VALIDATION RELATED METHODS
@@ -550,17 +572,17 @@ This is the CSV file containing the validation data, make sure that it contains 
 
 This is the index of the column that contains the predicted output values. C<$index> starts from C<0>.
 
-This part will be filled and saved to C<results_write_to>.
+This column will be filled with binary numbers and the full new data will be saved to the file specified in the C<results_write_to> key.
 
 =item results_write_to => $new_csv_file
 
 Optional.
 
-The default behaviour will write the predicted output into C<stimuli_validate> ie the original data while maintaining the original sequence.
+The default behaviour will write the predicted output back into C<stimuli_validate> ie the original data. The sequence of the data will be maintained.
 
 =back
 
-I<*This method will call &_real_validate_or_test to do the actual work.>
+I<*This method will call C<_real_validate_or_test> to do the actual work.>
 
 =cut
 
@@ -589,7 +611,8 @@ All the testing methods here have the same parameters as the actual C<test> meth
 
 =head2 test ( \%options )
 
-This method is used to put the trained nerve to the test. You can think of it as deploying the nerve for the actual work.
+This method is used to put the trained nerve to the test. You can think of it as deploying the nerve for the actual work or maybe putting the nerve into an empty brain and see how 
+well the brain survives :)
 
 This method works and behaves the same way as the C<validate> method. See C<validate> for the details.
 
@@ -627,13 +650,14 @@ sub _real_validate_or_test {
 
     my $self = shift;   my $data_hash_ref = shift;
     
-    # don't pack this into a subroutine
+    #####
     my @missing_keys;
     for ( qw( stimuli_validate predicted_column_index ) ) {
         push @missing_keys, $_ unless exists $data_hash_ref->{ $_ };
     }
     
     croak "Missing keys: @missing_keys" if @missing_keys;
+    #####
     
     my $stimuli_validate = $data_hash_ref->{ stimuli_validate };
     my $predicted_index = $data_hash_ref->{ predicted_column_index };
@@ -645,7 +669,7 @@ sub _real_validate_or_test {
     
     # open for writing results
     my $aoa = csv (in => $stimuli_validate, encoding => ":encoding(utf-8)");
-    #die ref $aoa;
+    
     my $attrib_array_ref = shift @$aoa; # 'remove' the header, it's annoying :)
 
     $aoa = _fill_predicted_values( $self, $stimuli_validate, $predicted_index, $aoa );
@@ -677,7 +701,7 @@ sub _fill_predicted_values {
     my $csv = Text::CSV->new( {auto_diag => 1, binary => 1} );
     
     my $attrib = $csv->getline($data_fh);
-    #use Data::Dumper;    #print Dumper($attrib);    #print $attrib;    #no Data::Dumper;
+    
     $csv->column_names( $attrib );
 
     # individual row
@@ -743,12 +767,14 @@ The binary values are treated as follows:
 =cut
 
 sub get_exam_results {
+
     my ( $self, $info ) = @_;
     
     $self->get_confusion_matrix( $info );
 }
 
 sub get_confusion_matrix {
+
     my ( $self, $info ) = @_;
 
     my %c_matrix = _collect_stats( $info ); # processes total_entries, accuracy, sensitivity etc
@@ -786,12 +812,9 @@ sub _collect_stats {
     $csv->column_names( $attrib );
 
     # individual row
-    #use Data::Dumper;
-    
     while ( my $row = $csv->getline_hr($data_fh) ) {
-        #print Dumper( $row ), "\n";
-        #print "Actual: ", $row->{$actual_header}, " Predicted: ", $row->{$predicted_header}, "\n";
         
+        # don't pack this part into another subroutine, number of rows can be very big
         if ( $row->{ $actual_header } == 1 and $row->{ $predicted_header } == 1 ) {
 
             # true positive
@@ -821,7 +844,6 @@ sub _collect_stats {
     }
     
     close $data_fh;
-    # no Data::Dumper;
 
     _calculate_total_entries( \%c_matrix );
 
@@ -893,7 +915,7 @@ Display the confusion matrix.
 
 C<%confusion_matrix> is the same confusion matrix returned by the C<get_confusion_matrix> method.
 
-Surely C<0>'s and C<1>'s don't make much sense for the output. Therefore, for C<%labels>, the following keys must be specified:
+For C<%labels>, since C<0>'s and C<1>'s won't make much sense as the output in most cases, therefore, the following keys must be specified:
 
 =over 4
 
@@ -903,15 +925,15 @@ Surely C<0>'s and C<1>'s don't make much sense for the output. Therefore, for C<
 
 =back
 
-Please take note that non-ascii characters ie. non-English alphabets will cause the output to go off :)
+Please take note that non-ascii characters ie. non-English alphabets B<might> cause the output to go off :)
 
-For the C<%labels>, there is no need to enter "actual X", "predicted X" etc. It will be indicated with C<A: > for actual and C<P: > for the predicted values.
+For the C<%labels>, there is no need to enter "actual X", "predicted X" etc. It will be prefixed with C<A: > for actual and C<P: > for the predicted values by default.
 
 =cut
 
 sub display_exam_results {
-    my $self = shift;
-    my ( $c_matrix, $labels ) = @_;
+
+    my ( $self, $c_matrix, $labels ) = @_;
     
     $self->display_confusion_matrix( $c_matrix, $labels );
 }
@@ -919,29 +941,67 @@ sub display_exam_results {
 sub display_confusion_matrix {
     my ( $self, $c_matrix, $labels ) = @_;
     
+    #####
     my @missing_keys;
     for ( qw( zero_as one_as ) ) {
         push @missing_keys, $_ unless exists $labels->{ $_ };
     }
     
     croak "Missing keys: @missing_keys" if @missing_keys;
+    #####
     
+    _print_extended_matrix ( _build_matrix( $c_matrix, $labels ) );
+
+}
+
+=head2 &_build_matrix ( $c_matrix, $labels )
+
+Builds the matrix using C<Text::Matrix> module.
+
+C<$c_matrix> and C<$labels> are the same as the ones passed to C<display_exam_results> and C<>display_confusion_matrix.
+
+Returns a list C<( $matrix, $c_matrix )> which can directly be passed to C<_print_extended_matrix>.
+
+=cut
+
+sub _build_matrix {
+
+    my ( $c_matrix, $labels ) = @_;
+
     my $predicted_columns = [ "P: ".$labels->{ zero_as }, "P: ".$labels->{ one_as } ];
     my $actual_rows = [ "A: ".$labels->{ zero_as }, "A: ".$labels->{ one_as }];
     
     my $data = [ 
         [ $c_matrix->{ true_negative },  $c_matrix->{ false_positive } ],
         [ $c_matrix->{ false_negative }, $c_matrix->{ true_positive } ]
-     ];
+    ];
     my $matrix = Text::Matrix->new(
         rows => $actual_rows,
         columns => $predicted_columns,
         data => $data,
     );
+    
+    $matrix, $c_matrix;
+}
+
+=head2 &_print_extended_matrix ( $matrix, $c_matrix )
+
+Extends and outputs the matrix on the screen.
+
+C<$matrix> and C<$c_matrix> are the same as returned by C<&_build_matrix>.
+
+=cut
+
+sub _print_extended_matrix {
+
+    my ( $matrix, $c_matrix ) = @_;
+    
     print "~~" x24, "\n";
     print "CONFUSION MATRIX (A:actual  P:predicted)\n";
     print "~~" x24, "\n";
+
     print $matrix->matrix();
+
     print "~~" x24, "\n";
     print "Total of ", $c_matrix->{ total_entries } , " entries\n";
     print "  Accuracy: $c_matrix->{ accuracy } %\n";
@@ -951,11 +1011,13 @@ sub display_confusion_matrix {
 
 =head1 NERVE DATA RELATED SUBROUTINES
 
-This part is about saving the state of the nerve.
+This part is about saving the data of the nerve. These subroutines can be exported using the C<:local_data> tag.
 
 B<The subroutines are to be called in the procedural way>. No checking is done currently.
 
 The subroutines here are not exported in any way whatsoever.
+
+See C<PERCEPTRON DATA> and C<KNOWN ISSUES> sections for more details on the subroutines in this section.
 
 =head2 preserve ( ... )
 
@@ -963,8 +1025,8 @@ The parameters and usage are the same as C<save_perceptron>. See the next subrou
 
 =head2 save_perceptron ( $nerve_file )
 
-Saves the C<AI::Perceptron::Simple> object into a C<Storable> file. There shouldn't be a need to call this method manually since after every 
-training process this will be called automatically.
+Saves the C<AI::Perceptron::Simple> object into a C<Storable> file. There shouldn't be a need to call this method manually since after every training 
+process this will be called automatically.
 
 =cut
 
@@ -1003,21 +1065,74 @@ sub load_perceptron {
     $loaded_nerve;
 }
 
+=head1 NERVE PORTABILITY RELATED SUBROUTINES
+
+These subroutines can be exported using the C<:portable_data> tag.
+
+The file type currently supported is YAML. Please be careful with the data as you won't want the nerve data accidentally modified.
+
+=head2 preserve_as_yaml ( ... )
+
+The parameters and usage are the same as C<save_perceptron_yaml>. See the next subroutine.
+
+=head2 save_perceptron_yaml ( $nerve_file )
+
+Saves the C<AI::Perceptron::Simple> object into a C<YAML> file.
+
+=cut
+
+sub preserve_as_yaml {
+    save_perceptron_yaml( @_ );
+}
+
+sub save_perceptron_yaml {
+    my $self = shift;
+    my $nerve_file = shift;
+    use YAML;
+    YAML::DumpFile( $nerve_file, $self );
+    no YAML;
+}
+
+=head2 revive_from_yaml (...)
+
+The parameters and usage are the same as C<load_perceptron>. See the next subroutine.
+
+=head2 load_perceptron_yaml ( $yaml_nerve_file )
+
+Loads the YAML data and turns it into a C<AI::Perceptron::Simple> object as the return value.
+
+=cut
+
+sub revive_from_yaml {
+    load_perceptron_yaml( @_ );
+}
+
+sub load_perceptron_yaml {
+    my $nerve_file_to_load = shift;
+    use YAML;
+    my $loaded_nerve = YAML::LoadFile( $nerve_file_to_load );
+    no YAML;
+    
+    $loaded_nerve;
+}
+
 =head1 TO DO
 
 These are the to-do's that B<MIGHT> be done in the future. Don't put too much hope in them please :)
 
 =over 4
 
-=item Clean up source codes
+=item * Clean up and refactor source codes
 
-=item Implement shuffling data feature
+=item * Add more useful data for confusion matrix
 
-=item Implement fast/smart training feature
+=item * Implement shuffling data feature
 
-=item Write a tutorial or something for this module
+=item * Implement fast/smart training feature
 
-=item and something yet to be known...
+=item * Write a tutorial or something for this module
+
+=item * and something yet to be known...
 
 =back
 
@@ -1027,29 +1142,15 @@ These are the to-do's that B<MIGHT> be done in the future. Don't put too much ho
 
 Take note that the C<Storable> nerve data is not compatible across different versions. See C<Storable>'s documentation for more information.
 
-If you really need to send the nerve data to different computers with different versions of C<Storable> module, do the following:
+If you really need to send the nerve data to different computers with different versions of C<Storable> module, see the docs of the following subroutines: 
 
 =over 4
 
-=item Step 1
+=item * C<&preserve_as_yaml> or C<&save_perceptron_yaml> for storing data.
 
-After the training process is done, use some other modules like C<YAML>, C<JSON>, C<Data::Serialzer>, C<Data::Dumper> etc. to store the nerve data ie serialize it.
-
-=item Step 2
-
-Send the non-C<Storable> nerve data to another computer.
-
-=item Step 3
-
-On the other computer, load ie. deserialize the nerve data into a Perl data structure. Eg. If you used C<YAML> module to store the nerve data in Step 1, then use it to load the nerve data.
-
-=item Step 4
-
-Use the C<Storable> module to save the nerve data. Done :)
+=item * C<&revive_from_yaml> or C<&load_perceptron_yaml> for retrieving the data.
 
 =back
-
-Another subroutine might be written to make this easier, probably in the next version :)
 
 =head1 AUTHOR
 
@@ -1060,9 +1161,6 @@ Raphael Jong Jun Jie, C<< <ellednera at cpan.org> >>
 Please report any bugs or feature requests to C<bug-ai-perceptron-simple at rt.cpan.org>, or through
 the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=AI-Perceptron-Simple>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
-
-
-
 
 =head1 SUPPORT
 

@@ -4,7 +4,7 @@
       "John Barrett <john@jbrt.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -18,13 +18,15 @@
          "examples",
          "t",
          "xt"
+      ],
+      "package" : [
+         "RtMidiWrapper"
       ]
    },
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "FFI::CheckLib" : "0.11"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
@@ -37,8 +39,8 @@
       },
       "runtime" : {
          "requires" : {
-            "FFI::CheckLib" : "0",
-            "FFI::Platypus" : "0",
+            "Alien::RtMidi" : "0",
+            "FFI::Platypus" : "1.00",
             "FFI::Platypus::Buffer" : "0",
             "FFI::Platypus::Memory" : "0",
             "FFI::Platypus::Record" : "0",
@@ -47,10 +49,11 @@
       },
       "test" : {
          "requires" : {
-            "FindBin" : "0",
-            "Test::More" : "0.88",
+            "Proc::Find" : "0",
+            "Test2::V0" : "0",
+            "Test::Lib" : "0",
             "Time::HiRes" : "0",
-            "lib" : "0"
+            "ok" : "0"
          }
       }
    },
@@ -66,8 +69,9 @@
          "web" : "https://github.com/jbarrett/MIDI-RtMidi-FFI"
       }
    },
-   "version" : "0.01",
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
+   "version" : "0.03",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

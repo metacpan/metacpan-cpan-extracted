@@ -28,11 +28,11 @@ subtest 'plain string' => sub {
     cmp_deeply(
         last_line(),
         {
-            message  => 'hello, world',
-            category => 'main',
-            context  => 'here & now',
-            level    => 'debug',
-            time     => re('^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{0,6}Z$'),
+            message   => 'hello, world',
+            category  => 'main',
+            context   => 'here & now',
+            level     => 'debug',
+            timestamp => re('^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{0,6}Z$'),
         },
         'plain string logged as-is',
     );
@@ -53,9 +53,8 @@ subtest 'structured data' => sub {
         foo       => 'bar',
         level     => 'debug',
         message   => 'Some message',
-        time      => re('^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{0,6}Z$'),
+        timestamp => re('^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{0,6}Z$'),
     };
-explain last_line();
 
     cmp_deeply( last_line(), $wanted, 'Structured data logged correctly');
 };

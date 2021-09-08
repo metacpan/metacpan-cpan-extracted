@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Net::HTTP::LWP;
 # ABSTRACT: HTTP agent adapter for libwww-perl
-$Neo4j::Driver::Net::HTTP::LWP::VERSION = '0.26';
+$Neo4j::Driver::Net::HTTP::LWP::VERSION = '0.27';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(Neo4j::Driver::Net::HTTP);
@@ -24,13 +24,17 @@ sub new {
 		json_coder => JSON::MaybeXS->new(utf8 => 1, allow_nonref => 0),
 	}, $class;
 	
-	my $uri = $driver->{uri};
-	if ($driver->{auth}) {
-		croak "Only HTTP Basic Authentication is supported" if $driver->{auth}->{scheme} ne 'basic';
-		my $userid = URI::Escape::uri_escape_utf8 $driver->{auth}->{principal};
-		my $passwd = URI::Escape::uri_escape_utf8 $driver->{auth}->{credentials};
+	my $uri = $driver->config('uri');
+	if (my $auth = $driver->config('auth')) {
+		croak "Only HTTP Basic Authentication is supported" if $auth->{scheme} ne 'basic';
+		my $userid = $auth->{principal}   // '';
+		my $passwd = $auth->{credentials} // '';
+		my $userinfo = join ':', map {
+			utf8::encode $_ if utf8::is_utf8 $_;  # uri_escape doesn't handle wide characters
+			URI::Escape::uri_escape $_;
+		} $userid, $passwd;
 		$uri = $uri->clone;
-		$uri->userinfo("$userid:$passwd");
+		$uri->userinfo($userinfo);
 	}
 	$self->{uri_base} = $uri;
 	
@@ -38,20 +42,21 @@ sub new {
 	my $agent = $self->{agent} = LWP::UserAgent->new(
 		# User-Agent: Neo4j-Driver/0.21 libwww-perl/6.52
 		agent => sprintf("Neo4j-Driver%s ", $version ? "/$version" : ""),
-		timeout => $driver->{http_timeout},
+		timeout => $driver->config('timeout'),
 	);
 	$agent->default_headers->header( 'X-Stream' => 'true' );
 	
 	if ($uri->scheme eq 'https') {
-		croak "HTTPS does not support unencrypted communication; use HTTP" if defined $driver->{tls} && ! $driver->{tls};
+		my $unencrypted = defined $driver->config('encrypted') && ! $driver->config('encrypted');
+		croak "HTTPS does not support unencrypted communication; use HTTP" if $unencrypted;
 		$agent->ssl_opts( verify_hostname => 1 );
-		if (defined( my $tls_ca = $driver->{tls_ca} )) {
-			croak "tls_ca file '$driver->{tls_ca}' can't be used: $!" if ! open(my $fh, '<', $tls_ca);
-			$agent->ssl_opts( SSL_ca_file => $tls_ca );
+		if (defined( my $trust_ca = $driver->config('trust_ca') )) {
+			croak "tls_ca file '$trust_ca' can't be used: $!" if ! open(my $fh, '<', $trust_ca);
+			$agent->ssl_opts( SSL_ca_file => $trust_ca );
 		}
 	}
 	else {
-		croak "HTTP does not support encrypted communication; use HTTPS" if $driver->{tls};
+		croak "HTTP does not support encrypted communication; use HTTPS" if $driver->config('encrypted');
 	}
 	
 	return $self;
@@ -135,7 +140,7 @@ Neo4j::Driver::Net::HTTP::LWP - HTTP agent adapter for libwww-perl
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 SYNOPSIS
 

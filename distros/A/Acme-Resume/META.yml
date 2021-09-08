@@ -28,16 +28,16 @@ no_index:
 provides:
   Acme::Resume:
     file: lib/Acme/Resume.pm
-    version: '0.0103'
+    version: '0.0104'
   Acme::Resume::Internal:
     file: lib/Acme/Resume/Internal.pm
-    version: '0.0103'
+    version: '0.0104'
   Acme::Resume::MoopsParserTrait:
     file: lib/Acme/Resume/MoopsParserTrait.pm
-    version: '0.0103'
+    version: '0.0104'
   Acme::Resume::Moose:
     file: lib/Acme/Resume/Moose.pm
-    version: '0.0103'
+    version: '0.0104'
 requires:
   Module::Runtime: '0'
   Moo::Role: '0'
@@ -56,7 +56,7 @@ resources:
   bugtracker: https://github.com/Csson/p5-Acme-Resume/issues
   homepage: https://metacpan.org/release/Acme-Resume
   repository: https://github.com/Csson/p5-Acme-Resume.git
-version: '0.0103'
+version: '0.0104'
 x_Dist_Zilla:
   perl:
     version: '5.020001'

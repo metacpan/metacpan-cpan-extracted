@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver;
 # ABSTRACT: Neo4j community graph database driver for Bolt and HTTP
-$Neo4j::Driver::VERSION = '0.26';
+$Neo4j::Driver::VERSION = '0.27';
 
 use Carp qw(croak);
 
@@ -26,15 +26,19 @@ my %NEO4J_DEFAULT_PORT = (
 );
 
 my %OPTIONS = (
+	auth => 'auth',
 	ca_file => 'tls_ca',
 	cypher_filter => 'cypher_filter',
 	cypher_params => 'cypher_params_v2',
 	cypher_types => 'cypher_types',
+	encrypted => 'tls',
 	jolt => 'jolt',
 	net_module => 'net_module',
 	timeout => 'http_timeout',
 	tls => 'tls',
 	tls_ca => 'tls_ca',
+	trust_ca => 'tls_ca',
+	uri => 'uri',
 );
 
 my %DEFAULTS = (
@@ -50,7 +54,20 @@ my %DEFAULTS = (
 
 
 sub new {
-	my ($class, $uri) = @_;
+	my ($class, $config, @extra) = @_;
+	
+	my $self = bless { %DEFAULTS }, $class;
+	
+	croak __PACKAGE__ . "->new() with multiple arguments unsupported" if @extra;
+	$config = { uri => $config } if ref $config ne 'HASH';
+	return $self->config($config);
+}
+
+
+sub _check_uri {
+	my ($self) = @_;
+	
+	my $uri = $self->{uri};
 	
 	if ($uri) {
 		$uri =~ s|^|http://| if $uri !~ m{:|/};
@@ -61,6 +78,12 @@ sub new {
 			croak sprintf "URI scheme '%s' unsupported; use 'http' or 'bolt'", $uri->scheme // "";
 		}
 		
+		if (my $userinfo = $uri->userinfo(undef)) {
+			my @userinfo = $userinfo =~ m/^([^:]*):?(.*)/;
+			@userinfo = map { URI::Escape::uri_unescape $_ } @userinfo;
+			utf8::decode $_ for @userinfo;
+			$self->basic_auth(@userinfo);
+		}
 		$uri->host('localhost') unless $uri->host;
 		$uri->path('') if $uri->path_query eq '/';
 		$uri->fragment(undef);
@@ -70,7 +93,7 @@ sub new {
 	}
 	$uri->port( $NEO4J_DEFAULT_PORT{ $uri->scheme } ) if ! $uri->_port;
 	
-	return bless { uri => $uri, %DEFAULTS }, $class;
+	$self->{uri} = $uri;
 }
 
 
@@ -92,9 +115,12 @@ sub basic_auth {
 sub config {
 	my ($self, @options) = @_;
 	
+	@options = %{$options[0]} if @options == 1 && ref $options[0] eq 'HASH';
+	croak "config() without options unsupported" unless @options;
+	
 	if (@options < 2) {
 		# get config option
-		my $key = $options[0] // '';
+		my $key = $options[0];
 		croak "Unsupported config option: $key" unless grep m/^$key$/, keys %OPTIONS;
 		return $self->{$OPTIONS{$key}};
 	}
@@ -103,8 +129,10 @@ sub config {
 	my %options = $self->_parse_options('config', [keys %OPTIONS], @options);
 	
 	# set config option
-	foreach my $key (keys %options) {
+	my @keys = reverse sort keys %options;  # auth should take precedence over uri
+	foreach my $key (@keys) {
 		$self->{$OPTIONS{$key}} = $options{$key};
+		$self->_check_uri if $OPTIONS{$key} eq 'uri';
 	}
 	return $self;
 }
@@ -114,6 +142,8 @@ sub session {
 	my ($self, @options) = @_;
 	
 	warnings::warnif deprecated => __PACKAGE__ . "->{die_on_error} is deprecated" unless $self->{die_on_error};
+	
+	@options = %{$options[0]} if @options == 1 && ref $options[0] eq 'HASH';
 	my %options = $self->_parse_options('session', ['database'], @options);
 	
 	$self->{session} = 1;
@@ -179,7 +209,7 @@ Neo4j::Driver - Neo4j community graph database driver for Bolt and HTTP
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 SYNOPSIS
 
@@ -225,7 +255,7 @@ L<"Configure connectors" in the Neo4j Operations Manual|https://neo4j.com/docs/o
 Bolt is a Neo4j proprietary, binary protocol, available with
 S<Neo4j 3.0> and newer. Bolt communication may be encrypted or
 unencrypted. Because Bolt is faster than HTTP, it is generally
-the recommended protocol. However, support for it may be
+the recommended protocol. However, Perl support for it may be
 lagging after major updates to Neo4j.
 
 This driver supports Bolt, but doesn't bundle the necessary XS
@@ -246,7 +276,7 @@ install L<LWP::Protocol::https> separately to enable HTTPS.
 =back
 
 The protocol is automatically chosen based on the URI scheme.
-See L</"new"> for details.
+See L</"uri"> for details.
 
 B<As of version 0.13, the interface of this software may be
 considered stable.>
@@ -278,49 +308,41 @@ chaining is possible.
 
 =head2 config
 
- $driver->config( option1 => 'foo', option2 => 'bar' );
+ $driver->config({ option1 => 'foo', option2 => 'bar' });
 
-Sets the specified configuration option or options on a
-L<Neo4j::Driver> object. The options are given in hash syntax.
+Sets the specified configuration options on a L<Neo4j::Driver>
+object. The options may be given as a hash or as a hash reference.
 This method returns the modified object, so that method chaining
 is possible.
 
  $session = $driver->config(timeout => 60)->session;
 
-See below for an explanation of
-L<all supported configuration options|/"CONFIGURATION OPTIONS">.
+See L</"CONFIGURATION OPTIONS"> for a list of supported options.
 Setting configuration options on a driver is only allowed before
 creating the driver's first session.
 
-Calling this method with just a single parameter will return the
-current value of the config option named by the parameter.
+Calling this method with just a single string parameter will return
+the current value of the config option named by the parameter.
 
  $timeout = $driver->config('timeout');
 
 =head2 new
 
- $driver = Neo4j::Driver->new('http://localhost');
+ $driver = Neo4j::Driver->new({ uri => 'http://localhost' });
 
 Construct a new L<Neo4j::Driver> object. This object holds the
 details required to establish connections with a Neo4j database,
 including server URIs, credentials and other configuration.
 
-The URI passed to this method determines the type of driver created. 
-The C<http>, C<https>, and C<bolt> URI schemes are supported.
-Use of C<bolt> URIs requires L<Neo4j::Bolt> to be installed; use
-of C<https> URIs requires L<LWP::Protocol::https> to be installed.
+The C<new()> method accepts one or more configuration options given
+as a hash reference. See L</"CONFIGURATION OPTIONS"> below for a
+list of supported options. Alternatively, instead of the hash
+reference, the Neo4j server URI may be given as a scalar string.
 
-If a part of the URI or even the entire URI is missing, suitable
-default values will be substituted. In particular, the host name
-C<localhost> and the protocol C<http> will be used as defaults;
-if no port is specified, the protocol's default port will be used.
-
- # all of these are semantically equal
- $driver = Neo4j::Driver->new;
- $driver = Neo4j::Driver->new('http:');
- $driver = Neo4j::Driver->new('localhost');
  $driver = Neo4j::Driver->new('http://localhost');
- $driver = Neo4j::Driver->new('http://localhost:7474');
+
+If C<new()> is called with no arguments, a default configuration
+will be used for the driver.
 
 =head2 session
 
@@ -330,7 +352,8 @@ Creates and returns a new L<Session|Neo4j::Driver::Session>,
 initiating a network connection with the Neo4j server.
 
 Each session connects to a single database, which may be specified
-using the C<database> option. If no defined value is given for this
+using the C<database> option in a hash or hash reference passed
+to this method. If no defined value is given for this
 option, the driver will select the default database configured
 in F<neo4j.conf>.
 
@@ -411,6 +434,54 @@ option is currently experimental because the API is still evolving.
 
 L<Neo4j::Driver> implements the following configuration options.
 
+=head2 auth
+
+ $driver->config(auth => {
+   scheme      => 'basic',
+   principal   => 'neo4j',   # user id
+   credentials => $password,
+ });
+
+Specifies the authentication details for the Neo4j server.
+The authentication details are provided as a Perl reference
+that is made available to the networking module. Typically,
+this is an unblessed hash reference with the authentication
+scheme declared in the hash entry C<scheme>.
+
+The Neo4j server uses the auth scheme C<'basic'> by default,
+which must be configured with a user id in the hash entry
+C<principal> and a password in the entry C<credentials>,
+as shown above. Alternatively, the method L</"basic_auth">
+can be used as a shortcut, or the basic auth details can be
+specified as userinfo in the URI.
+
+The C<auth> config option defaults to the value C<undef>,
+which disables authentication.
+
+=head2 encrypted
+
+ $driver->config(encrypted => 1);
+
+Specifies whether to use secure communication using TLS. This
+L<implies|IO::Socket::SSL/"Essential Information About SSL/TLS">
+not just encryption, but also verification of the server's identity.
+
+By default, the local system's trust store will be used to verify
+the server's identity. This will fail unless your Neo4j installation
+uses a key pair that is trusted and verifiable through the global
+CA infrastructure. If that's not the case, you may need to
+additionally use the C<trust_ca> option.
+
+This option defaults to C<0> (no encryption). This is generally what
+you want if you connect to a server on C<localhost>.
+
+This option is only useful for Bolt connections. For HTTP
+connections, the use of TLS encryption is governed by the chosen
+URI scheme (C<http> / C<https>).
+
+Before version 0.27, this option was named C<tls>. Use of the
+former name is now discouraged.
+
 =head2 timeout
 
  $driver->config(timeout => 60);  # seconds
@@ -426,30 +497,9 @@ The old C<< $driver->{http_timeout} >> syntax remains supported
 for the time being in order to ensure backwards compatibility,
 but its use is discouraged and it may be deprecated in future.
 
-=head2 tls
+=head2 trust_ca
 
- $driver->config(tls => 1);
-
-Specifies whether to use secure communication using TLS. This
-L<implies|IO::Socket::SSL/"Essential Information About SSL/TLS">
-not just encryption, but also verification of the server's identity.
-
-By default, the local system's trust store will be used to verify
-the server's identity. This will fail unless your Neo4j installation
-uses a key pair that is trusted and verifiable through the global
-CA infrastructure. If that's not the case, you may need to
-additionally use the C<tls_ca> option.
-
-This option defaults to C<0> (no encryption). This is generally what
-you want if you connect to a server on C<localhost>.
-
-This option is only useful for Bolt connections. For HTTP
-connections, the use of TLS encryption is governed by the chosen
-URI scheme (C<http> / C<https>).
-
-=head2 tls_ca
-
- $driver->config(tls_ca => 'neo4j/certificates/neo4j.cert');
+ $driver->config(trust_ca => 'neo4j/certificates/neo4j.cert');
 
 Specifies the path to a file containing one or more trusted TLS
 certificates. When this option is given, encrypted connections will
@@ -463,6 +513,31 @@ the certificates in this file (or by an intermediary).
 
 Self-signed certificates (such as those automatically provided by
 some Neo4j versions) should also work if their S<"CA bit"> is set.
+
+Before version 0.27, this option was named C<tls_ca>. Use of the
+former name is now discouraged.
+
+=head2 uri
+
+ $driver->config(uri => 'http://localhost:7474');
+
+Specifies the Neo4j server connection URI. The URI scheme determines
+the type of driver created. Supported schemes are C<bolt>, C<http>,
+and C<https>.
+Use of C<bolt> URIs requires L<Neo4j::Bolt> to be installed; use
+of C<https> URIs requires L<LWP::Protocol::https> to be installed.
+
+If a part of the URI or even the entire URI is missing, suitable
+default values will be substituted. In particular, the host name
+C<localhost> and the protocol C<http> will be used as defaults;
+if no port is specified, the protocol's default port will be used.
+
+ # all of these are semantically equal
+ $driver->config(uri =>  undef );
+ $driver->config(uri => 'http:');
+ $driver->config(uri => 'localhost');
+ $driver->config(uri => 'http://localhost');
+ $driver->config(uri => 'http://localhost:7474/');
 
 =head1 ENVIRONMENT
 

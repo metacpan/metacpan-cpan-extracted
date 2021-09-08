@@ -5,9 +5,8 @@ use warnings;
 use Perl::Critic::Utils;
 use parent 'Perl::Critic::Policy';
 
-# Part of Perl-Critic distribution
-use Perl::Critic::Policy::Variables::ProhibitUnusedVariables;
 use Perl::Critic::TooMuchCode;
+use Perl::Critic::Policy::Variables::ProhibitUnusedVariables;
 
 sub default_themes       { return qw( maintenance )     }
 sub applies_to           { return 'PPI::Document' }
@@ -70,13 +69,7 @@ sub violates {
         $used{"$el_word"}++;
     }
 
-    ## Look for the signature of misparsed ternary operator.
-    ## https://github.com/adamkennedy/PPI/issues/62
-    ## Once PPI is fixed, this workaround can be eliminated.
-    Perl::Critic::TooMuchCode::__get_terop_usage(\%used, $doc);
-
-    Perl::Critic::Policy::Variables::ProhibitUnusedVariables::_get_symbol_usage(\%used, $doc);
-    Perl::Critic::Policy::Variables::ProhibitUnusedVariables::_get_regexp_symbol_usage(\%used, $doc);
+    __get_symbol_usage(\%used, $doc);
 
     my @violations;
     my @to_report = grep { !$used{$_} } (keys %imported);
@@ -128,6 +121,38 @@ sub gather_imports_generic {
     }
 }
 
+sub __get_symbol_usage {
+    my ($usage, $doc) = @_;
+
+    ## Look for the signature of misparsed ternary operator.
+    ## https://github.com/adamkennedy/PPI/issues/62
+    ## Once PPI is fixed, this workaround can be eliminated.
+    Perl::Critic::TooMuchCode::__get_terop_usage($usage, $doc);
+
+    Perl::Critic::Policy::Variables::ProhibitUnusedVariables::_get_regexp_symbol_usage($usage, $doc);
+
+    for my $e (@{ $doc->find('PPI::Token::Symbol') || [] }) {
+        $usage->{ $e->symbol() }++;
+    }
+
+    for my $class (qw{
+        PPI::Token::Quote::Double
+        PPI::Token::Quote::Interpolate
+        PPI::Token::QuoteLike::Backtick
+        PPI::Token::QuoteLike::Command
+        PPI::Token::QuoteLike::Readline
+        PPI::Token::HereDoc
+     }) {
+        for my $e (@{ $doc->find( $class ) || [] }) {
+            my $str = PPIx::QuoteLike->new( $e ) or next;
+            for my $var ( $str->variables() ) {
+                $usage->{ $var }++;
+            }
+        }
+    }
+
+    return;
+}
 
 1;
 

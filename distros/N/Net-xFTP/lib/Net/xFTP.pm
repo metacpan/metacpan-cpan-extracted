@@ -23,6 +23,7 @@ $haveit{'local'} = 1;  #JWT:ADDED 20150123 - WE *ALWAYS* HAVE "local", SINCE NO 
 
 my $bummer = ($^O =~ /Win/o) ? 1 : 0;
 
+eval 'use Net::LOCAL; $haveit{"local"} = 1; 1';
 eval 'use Net::FTP; $haveit{"ftp"} = 1; 1';
 eval 'use Net::SFTP; $haveit{"sftp"} = 1; 1';
 eval 'use Net::SFTP::Constants qw(SSH2_FXF_WRITE SSH2_FXF_CREAT SSH2_FXF_TRUNC); $haveSFTPConstants = 1; 1';
@@ -32,7 +33,7 @@ eval 'use Net::OpenSSH; use IO::Pty; $haveit{"openssh"} = 1; 1';
 eval 'use Net::FSP; $haveit{"fsp"} = 1; 1';
 eval 'use Net::FTPSSL; $haveit{"ftpssl"} = 1; 1';
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 sub new
 {
@@ -306,14 +307,7 @@ sub haveModules
 	return { 'Net::FTP' => $haveit{'ftp'}, 'Net::SFTP' => $haveit{'sftp'},
 			'Net::SSH2' => $haveit{'ssh2'}, 'Net::SFTP::Foreign' => $haveit{'foreign'},
 			'Net::OpenSSH' => $haveit{'openssh'}, 'Net::FSP' => $haveit{'fsp'}, 
-			'Net::FTPSSL' => $haveit{'ftpssl'}};
-}
-
-sub protocol
-{
-	my $self = shift;
-
-	return $self->{pkg};
+			'Net::FTPSSL' => $haveit{'ftpssl'}, 'Net::LOCAL' => $haveit{'local'}};
 }
 
 1
@@ -331,7 +325,7 @@ Jim Turner, C<< <mailto:turnerjw784@yahoo.com> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2005-2015 Jim Turner <mailto:turnerjw784@yahoo.com>.  
+Copyright (c) 2005-2021 Jim Turner <mailto:turnerjw784@yahoo.com>.  
 All rights reserved.  
 
 This program is free software; you can redistribute 
@@ -359,20 +353,20 @@ Many thanks go to these gentlemen whose work made this module possible.
 
 	#Example 2:  Establish a "local" (simulated connection) to self.
 	$ftp = Net::xFTP->new();  # -OR-
-	$ftp = Net::xFTP->new('Local');
+	$ftp = Net::xFTP->new('LOCAL');
 
 	#Change the current working directory on the remote host.
-	$ftp->cwd('/pub')  or die 
+	$ftp->cwd('/tmp')  or die 
 		"Cannot change working directory ", $ftp->message();
 
 	#Get the current working directory on the remote host.
 	my $current_remote_path = $ftp->pwd();
 
-	#Get a list of files and subdirectories in "/pub".
-	my @filesAndSubfolders = $ftp->ls('/pub');
+	#Get a list of files and subdirectories in "/tmp".
+	my @filesAndSubfolders = $ftp->ls('/tmp');
 
 	#Get a detailed (ls -l) list of files and subdirectories.
-	my @ls_l_details = $ftp->dir('/pub');
+	my @ls_l_details = $ftp->dir('/tmp');
 
 	#Create a new subdirectory.
 	$ftp->mkdir('myownfolder')
@@ -383,30 +377,30 @@ Many thanks go to these gentlemen whose work made this module possible.
 		or die "Cannot remove subdirectory ", $ftp->message();
 
 	#Get the contents of a file on the remote server.
-	$ftp->get('remote.file', 'local.file')
+	$ftp->get('remote_filename', 'local_filename')
 		or die "get failed ", $ftp->message();
 
 	#Get the contents of a remote file and write to an open filehandle.
 	open FHANDLE, ">local.file" or die "Could not open local file ($!)";
 	print FHANDLE "A Header Line!\n";
 	flush FHANDLE;
-	$ftp->get('remote.file', *FHANDLE)
+	$ftp->get('remote_filename', *FHANDLE)
 		or die "get failed ", $ftp->message();
 	print FHANDLE "A Footer Line!\n";
 	close FHANDLE;
 
 	#Put a local file onto the remote server.
-	$ftp->put('local.file', 'remote.file')
+	$ftp->put('local_filename', 'remote_filename')
 		or die "put failed ", $ftp->message();
 
 	#Read from a file handle putting the content in a remote file.
 	open FHANDLE "<local.file" or die "Could not open local file ($!)";
-	$ftp->put(*FHANDLE, 'remote.file')
+	$ftp->put(*FHANDLE, 'remote_filename')
 		or die "put failed ", $ftp->message();
 	close FHANDLE;
 
 	#Delete a remote file.
-	$ftp->delete('some.file')
+	$ftp->delete('remote_filename')
 		or die "Cannot delete file ", $ftp->message();
 
 	#Rename a remote file.
@@ -414,21 +408,21 @@ Many thanks go to these gentlemen whose work made this module possible.
 		or die "Cannot delete file ", $ftp->message();
 
 	#Change permissions of a remote file.
-	$ftp->chmod(755, 'some.file.or.dir')
+	$ftp->chmod(755, 'some_file_or_dir')
 		or die "Cannot change permissions ", $ftp->message();
 
 	#Fetch the size of a remote file.
-	print "remote.file has ".$ftp->size('remote.file')." bytes.\n";
+	print "remote file has ".$ftp->size('remote_filename')." bytes.\n";
 
 	#Fetch the modification time of a remote file.
-	print "remote.file has ".$ftp->mdtm('remote.file')." bytes.\n";
+	print "remote file has ".$ftp->mdtm('remote_filename')." (Perl) time last mod.\n";
 
 	#Copy a remote file to a new remote location.
-	$ftp->copy('remote.fileA','remote.fileB')
+	$ftp->copy('remote_fileA','remote_fileB')
 		or die "Cannot copy the file ", $ftp->message();
 
 	#Move a remote file to a new remote location.
-	$ftp->move('old/path/old.filename', 'new/path/new.filename')
+	$ftp->move('/old/path/old_filename', '/new/path/new_filename')
 		or die "Cannot move the file ", $ftp->message();
 
 	#Call a protocol-specific method.
@@ -440,13 +434,14 @@ Many thanks go to these gentlemen whose work made this module possible.
 =head1 PREREQUISITES
 
 Even though Net::xFTP will work in a connection-simulating "I<local>" mode, 
-to be truly useful, one needs either C<Net::FTP>, C<Net::SFTP>, or 
+to be truly useful, one needs either C<Net::FTP>, C<Net::SFTP>, and / or 
 one or more of the other supported Net::* protocol modules.
 
 C<Net::SFTP::Attributes> is also needed, if using Net::SFTP.
 
 C<Net::SFTP::Constants> is also needed for using the I<copy>, 
-I<move> functions, or using the I<put> function with a filehandle.
+I<move> functions, or using the I<put> function with a filehandle if using 
+Net::SFTP.
 
 =head1 DESCRIPTION
 
@@ -456,7 +451,10 @@ Net::SFTP::Foreign into a single set of functions allowing one to switch
 seemlessly between the two without having to make non-trivial code changes.  
 Only functionality common to all protocols has been implemented here with 
 the intent and invitation to add more functions and features and other 
-*FTP-ish modules in the future, as discovered or requested.
+*FTP-ish modules in the future, as discovered or requested. It also 
+provides a localized submodule (NET::xFTP::LOCAL) that provides a virtual 
+"Net::LOCAL" module which uses the same function API to perform similar 
+operations on a local file-system.  
 
 =head1 PURPOSE
 
@@ -468,9 +466,9 @@ some reason Net::FTP and Net::SFTP use slightly different methods and
 conventions).  I decided instead to simply create a common module that 
 would use the same method calls to do the same things and allow me to 
 specify the protocol in a single place.  I also am the author of I<ptkftp>, 
-a Perl/Tk graphical user-interface to Net::FTP and Net::SFTP.  I now 
-intend to rewrite it to use Net::xFTP and greatly reduce and simplify 
-the code for that application.
+a Perl/Tk graphical filemanager called JFM5, which uses Net::xFTP to 
+handle user-connections to remote filesystems requiring any of the 
+different supported FTPish submodules.
 
 Hopelfully others will find this module useful.  Patches adding needed 
 functionality are welcome.  
@@ -481,7 +479,7 @@ functionality are welcome.
 
 =item new ( PROTOCOL, HOST [, OPTIONS ])
 
-This is the constructor for a new Net::FTP object.  The first two 
+This is the constructor for a new Net::xFTP object.  The first two 
 arguments are required and are positional.  Sebsequent arguments (OPTIONS) 
 are in the form "name => value".  It returns a Net::xFTP handle object, 
 or I<undef> on failure.  If it fails, the reason will be in $@.
@@ -506,7 +504,10 @@ B<user> is the user-name or login-id to log in with.  For FTP, if not
 specified, then 'anonymous' is used.
 
 B<password> is the password, if required, for connecting.  For FTP, if 
-not specified, then 'anonymous@' is used.
+not specified, then 'anonymous@' is used.  NOTE (currently only for 
+Net::OpenSSH"):  If the option:  "I<passphrase> => '*'" is specified, 
+the value specified by the I<password> option will be instead used as the 
+public-key passphrase.
 
 B<BlockSize> specifies the buffer size to use for buffered data transfers.  
 Default is 10240.  
@@ -522,9 +523,12 @@ $ENV{HOME}.  This option is useful for web CGI scripts which run often
 under a user with no "home" directory.  The format is: 
 "/some/path/that/the/user/can/write/to".
 
-To specify protocol-specific args Not to be passed if the other protocol 
-is used, append "protocol_" to the option, ie. "sftp_ssh_args" to specify 
-the SFTP option "ssh_args".  
+NOTE:  Many other options are protocol-specific or have different 
+meanings to different protocol submodules.  If you need to pass a protocol-
+specific option only to a specific protocol without passing it to others, 
+you can prepend the protocol in lower-case to the option name to specify 
+protocol-specific options not to be passed to other protocol submodules, 
+ie. "sftp_ssh_args" to specify the Net::SFTP option "ssh_args".  
 
 =back
 
@@ -603,7 +607,7 @@ is omitted if C<DIR> is "/".
 
 Returns I<undef> on failure.
 
-=item get ( REMOTE_FILE [, LOCAL_FILE ] )
+=item get ( REMOTE_FILE [, LOCAL_FILE [, OPTIONS ] ] )
 
 Get C<REMOTE_FILE> from the server and store locally.  If C<LOCAL_FILE>
 is not specified, then a file with the same name as C<REMOTE_FILE> sans 
@@ -611,7 +615,9 @@ the path information will be created on the current working directory of
 the machine the program is running on.  C<LOCAL_FILE> can also be an open 
 file-handle (see example in the C<SYNOPSIS> section).  If so, it must be 
 passed as a typeglob.  For I<local> protocol, simply copys C<REMOTE_FILE> 
-to C<LOCAL_FILE>.
+to C<LOCAL_FILE>.  NOTE:  Some submodules can return the number of bytes 
+(length) of the file instead of 1, so simply check for a I<true> value 
+for success.
 
 Returns 1 if successful, I<undef> if fails.
 
@@ -684,7 +690,7 @@ Expects the name of one of the supported FTP modules (currently:  'Net::FTP', 'N
 
 Returns either 1, if the module is installed or 0 if not.
 
-=item new ( PROTOCOL, HOST [, OPTIONS ])
+=item Net::xFTP->new ( PROTOCOL, HOST [, OPTIONS ])
 
 This is the constructor.  It returns either a Net::xFTP object or I<undef> 
 on failure.  For details, see the "CONSTRUCTOR" section above.  For FTP, 
@@ -695,10 +701,11 @@ the reason will be in $@.
 
 =item protocol ()
 
-Returns either C<Net::FTP> or C<Net::SFTP>, depending on which underlying 
-module is being used.  Returns an empty string is C<local> is used.
+Returns the protocol string passed to Net::xFTP->new(), ie. "Net::FTP", 
+depending on which underlying module is being used.  
+NOTE:  Returns an empty string is C<local> is used.
 
-=item put ( LOCAL_FILE [, REMOTE_FILE ] )
+=item put ( LOCAL_FILE [, REMOTE_FILE [, OPTIONS ] ] )
 
 Put a file on the remote server. C<LOCAL_FILE> and C<REMOTE_FILE> are 
 specified as strings representing the absolute or relative path and file 
@@ -709,7 +716,9 @@ an open file-handle (see example in the C<SYNOPSIS> section).  If so, it
 must be passed as a typeglob and C<REMOTE_FILE> must be specified.  For 
 I<local> protocol, simply copies C<LOCAL_FILE> to C<REMOTE_FILE>.
 
-Returns 1 if successful, I<undef> if fails.
+Returns 1 if successful, I<undef> if fails.  NOTE:  Some submodules can 
+return the number of bytes (length) of the file instead of 1, so simply 
+check for a I<true> value for success.
 
 B<NOTE>: If for some reason the transfer does not complete and an error is
 returned then the contents that had been transfered will not be remove
@@ -763,7 +772,7 @@ $ftp->method ( args )
 
 Example:
 
- print "-FTP size of file = ".$ftp->method('size', '/pub/myfile').".\n"
+ print "-FTP size of file = ".$ftp->method('size', '/tmp/myfile').".\n"
 		if ($ftp->protocol() eq 'Net::FTP');
 
 =item sftpWarnings

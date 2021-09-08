@@ -1,7 +1,7 @@
 package App::lcpan::CmdBundle::deps;
 
-our $DATE = '2021-06-01'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2021-06-03'; # DATE
+our $VERSION = '0.011'; # VERSION
 
 1;
 # ABSTRACT: More lcpan subcommands related to dependencies
@@ -18,7 +18,7 @@ App::lcpan::CmdBundle::deps - More lcpan subcommands related to dependencies
 
 =head1 VERSION
 
-This document describes version 0.010 of App::lcpan::CmdBundle::deps (from Perl distribution App-lcpan-CmdBundle-deps), released on 2021-06-01.
+This document describes version 0.011 of App::lcpan::CmdBundle::deps (from Perl distribution App-lcpan-CmdBundle-deps), released on 2021-06-03.
 
 =head1 SYNOPSIS
 

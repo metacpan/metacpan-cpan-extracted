@@ -1,15 +1,17 @@
 use strict;
 use DB_File;
 
+my $file = shift;
+
 my %myhash;
 
 tie %myhash, "DB_File", glob("cmusyldict.db"), O_CREAT|O_RDWR, 0666, $DB_HASH || die "Can't tie:  ",$!;
-open(IF,"cmudict.0.6d.syl") || die "cmudict.0.6d.syl : ",$!;
+open(IF,$file) || die $file," : ",$!;
 while (<IF>) {
 	chop;
 	next if (/^\#/);
 	my ($wd,$syls) = split(/\s+/,$_,2);
-	$myhash{$wd} = $syls;
+	$myhash{uc($wd)} = $syls;
 }
 close(IF);
 untie %myhash;

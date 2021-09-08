@@ -1,5 +1,9 @@
 Revision history for Acme-CoC-Dice
 
+0.03  2021-08-29 21:58:29 JST
+        - Added acceptable command like 'ccb [1-9][0-9]*'.
+        - Applying Smart::Args.
+        - Added key "result" when giving target value to role_skill as parameter. 
 0.02  2021-05-19 01:33:43 JST
         - Fixed document
 

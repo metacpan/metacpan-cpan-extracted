@@ -11,7 +11,7 @@ my $MIN_PERL = '5.014'; # PL_keyword_plugin
 #   https://rt.cpan.org/Ticket/Display.html?id=136577
 $MIN_PERL = '5.022' if $^O eq "MSWin32";
 
-my $cc = ExtUtils::CChecker->new;
+my $cc = ExtUtils::CChecker->new( quiet => 1 );
 
 $cc->try_find_cflags_for(
    cflags => [
@@ -28,6 +28,33 @@ struct Named {
 int main(void) { struct Named n; n.a = 0; return n.a; }
 EOF
 ) or die "OS unsupported - C compiler does not support anonymous inner unions\n";
+
+{
+   print "Checking for PL_infix_plugin...\n";
+
+   my $have_pl_infix_plugin = 0;
+
+   # No released version of perl (yet) has PL_infix_plugin. This commandline
+   # argument allows it to build if patched correctly.
+   $have_pl_infix_plugin = 1 if grep { $_ eq "--have-pl_infix_plugin" } @ARGV;
+
+   $have_pl_infix_plugin ||= $cc->try_compile_run(
+      source => <<'EOF'
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+
+int main(void) { struct Perl_custom_infix def; return 0; }
+EOF
+   ) if $] >= 5.035;
+
+   if( $have_pl_infix_plugin ) {
+      print "Including support for core perl PL_infix_plugin\n";
+      # ->define isn't currently documented but it will be in next version; it
+      # has been present since v0.04, basically forever
+      $cc->define( "HAVE_PL_INFIX_PLUGIN" )
+   }
+}
 
 my $build = Module::Build::with::XSTests->new(
    module_name => 'XS::Parse::Keyword',
@@ -46,6 +73,7 @@ my $build = Module::Build::with::XSTests->new(
    create_readme  => 1,
 
    extra_compiler_flags => [qw( -I. -Ihax )],
+   c_source => [ "src/" ],
 );
 
 $cc->extend_module_build( $build );

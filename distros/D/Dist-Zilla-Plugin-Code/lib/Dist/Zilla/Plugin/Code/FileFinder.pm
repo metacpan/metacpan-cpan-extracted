@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use Moose;
 use namespace::autoclean;
@@ -44,7 +44,7 @@ Dist::Zilla::Plugin::Code::FileFinder - something that finds files within the di
 
 =head1 VERSION
 
-Version 0.006
+Version 0.007
 
 =head1 SYNOPSIS
 

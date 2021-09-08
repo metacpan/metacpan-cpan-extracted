@@ -1,0 +1,10 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+override_dh_installchangelogs:
+	dh_installchangelogs Changes
+
+override_dh_compress:
+	dh_compress -XLICENSE

@@ -1,25 +1,34 @@
 package Tie::TextDir;
 
 use strict;
+use warnings;
+
 use File::Spec;
 use File::Temp;
+use File::Path;
+use File::Find::Iterator;
+use File::Basename;
+
 use Symbol;
 use Fcntl qw(:DEFAULT);
 use Carp;
-use constant HAVE_56 => $] >= 5.006;
-use vars qw($VERSION);
 
-$VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub TIEHASH {
-  croak "usage: tie(%hash, 'Tie::TextDir', \$path, [mode], [perms])"
-    unless 2 <= @_ and @_ <= 4;
+  croak "usage: tie(%hash, 'Tie::TextDir', \$path, [mode], [perms], [levels])"
+    unless 2 <= @_ and @_ <= 5;
   
-  my ($package, $path, $mode, $perms) = @_;
+  my ($package, $path, $mode, $perms, $levels) = @_;
   $mode ||= 'ro';
   $perms ||= 0775;
+  $levels ||= 0;
+  $levels = 0 if $levels < 0;
   my $self = bless {}, $package;
   
+  # Save levels
+  $self->{LEVELS} = $levels;
+
   # Can we make changes to the database?
   if ($mode eq 'rw') {
     $self->{MODE} = O_CREAT | O_RDWR;
@@ -39,9 +48,9 @@ sub TIEHASH {
   }
   $self->{PATH} = $path;
   
-  # Get a filehandle and open the directory:
-  $self->{HANDLE} = HAVE_56 ? undef : gensym();
-  opendir($self->{HANDLE}, $path) or croak("can't opendir $path: $!");		
+  # Get an iterator over the directory
+  $self->{FIND} = File::Find::Iterator->create(dir => [$self->{PATH}],
+					       filter => sub { -f });
   
   return $self;
 }
@@ -53,7 +62,7 @@ sub FETCH {
     return;
   }
 
-  my $file = File::Spec->catfile($self->{PATH}, $key);
+  my $file = File::Spec->catfile($self->{PATH}, $self->_key_to_path($key));
   return unless -e $file;
 
   local *FH;
@@ -70,7 +79,7 @@ sub FETCH {
 
 sub STORE {
   my ($self, $key) = (shift, shift);
-  my $file = File::Spec->catfile($self->{PATH}, $key);
+  my $file = File::Spec->catfile($self->{PATH}, $self->_key_to_path($key));
   croak "No write access for '$file'" unless $self->{MODE} & O_RDWR;
 
   if ( !$self->_key_okay($key) ) {
@@ -88,7 +97,7 @@ sub STORE {
 
 sub DELETE {
   my ($self, $key) = @_;
-  my $file = File::Spec->catfile($self->{PATH}, $key);
+  my $file = File::Spec->catfile($self->{PATH}, $self->_key_to_path($key));
   croak "No write access for '$file'" unless $self->{MODE} & O_RDWR;
   
   if ( !$self->_key_okay($key) ) {
@@ -102,6 +111,15 @@ sub DELETE {
   $return = $self->FETCH($key) if defined wantarray;  # Don't bother in void context
   
   unlink $file or croak "Couldn't delete $file: $!";
+
+  if ($self->{LEVELS}) {
+    my $path = $file;
+    for (1..$self->{LEVELS}) {
+      $path = dirname($path);
+      rmdir $path;
+    }
+  }
+  
   return $return;
 }
 
@@ -109,12 +127,19 @@ sub CLEAR {
   my $self = shift;
   croak "No write access for '$self->{PATH}'" unless $self->{MODE} & O_RDWR;
   
-  rewinddir($self->{HANDLE});
+  $self->{FIND}->first;
+
   my $entry;
-  while (defined ($entry = readdir($self->{HANDLE}))) {
-    next if $entry eq '.' or $entry eq '..';
-    my $file = File::Spec->catfile($self->{PATH}, $entry);
-    unlink $file or croak "can't remove $file: $!";
+  while (defined ($entry = $self->{FIND}->next)) {
+    unlink $entry or croak "can't remove $entry: $!";
+
+    if ($self->{LEVELS}) {
+      my $path = $entry;
+      for (1..$self->{LEVELS}) {
+	$path = dirname($path);
+	rmdir $path;
+      }
+    }
   }
 }
 
@@ -124,34 +149,52 @@ sub EXISTS {
     carp "Bad key '$key'" if $^W;
     return;
   }
-  return -e File::Spec->catfile($self->{PATH}, $key);
-}
-
-
-sub DESTROY {
-  closedir shift()->{HANDLE};  # Probably not necessary
+  return -e File::Spec->catfile($self->{PATH}, $self->_key_to_path($key));
 }
 
 
 sub FIRSTKEY {
   my $self = shift;
-  
-  rewinddir $self->{HANDLE};
-  my $entry;
-  while (defined ($entry = readdir($self->{HANDLE}))) {
-    return $entry unless ($entry eq '.' or $entry eq '..');
-  }
-  return;
+
+  $self->{FIND}->first;
+  my $entry = $self->{FIND}->next;
+  $entry = _path_to_key($entry) if $entry;
+  return $entry;
 }
 
 
 sub NEXTKEY {
-  return readdir shift()->{HANDLE};
+  my $entry = shift()->{FIND}->next;
+  $entry = _path_to_key($entry) if $entry;
+  return $entry;
 }
 
 sub _key_okay {
   return 0 if $_[1] =~ /^\.{0,2}$/;
   return 1;
+}
+
+sub _path_to_key {
+  return fileparse($_[0]);
+}
+
+sub _key_to_path {
+  my ($self, $key) = @_;
+  my $levels = $self->{LEVELS};
+  
+  # try to bail out as soon as we can if no levels is needed
+  return $key unless $levels;
+  
+  # Create the tree structure
+  my @key = split //, $key;
+  $levels = scalar(@key) if scalar(@key) < $levels;
+  my $prefix = File::Spec->catfile(map { join("", @key[0..$_]) } (0..$levels-1));
+  
+  # make sure the path exists, so we can create the file.
+  my $dir = File::Spec->catfile($self->{PATH}, $prefix);
+  mkpath($dir) unless -d $dir;
+  
+  return File::Spec->catfile($prefix, $key);
 }
 
 1;
@@ -175,6 +218,9 @@ Tie::TextDir - interface to directory of files
  
  # Specify directory permissions explicitly
  tie %hash, 'Tie::TextDir', '/some_directory', 'rw', 0775;
+
+ # Specify how many levels of subdirectories should be created
+ tie %hash, 'Tie::TextDir', '/some_directory', 'rw', 0775, 2;
 
 =head1 DESCRIPTION
 
@@ -206,6 +252,11 @@ any effect at this point on the permissions of the files inside the
 directory, though.  If the directory already exists, the permissions
 setting will have no effect.  The default permissions setting is
 C<0775>.
+
+The optional fifth parameter specifies how many levels of subdirectories
+should be created. For instance, if you specify two levels of
+subdirectories the key C<key> will be placed under C<k/ke/key>, and the
+key C<module> under C<m/mo/module>.
 
 =head1 ERROR CONDITIONS
 
@@ -240,10 +291,19 @@ haven't thought of.
 
 Strange characters can cause problems when used as the keys in a hash.
 For instance, if you accidentally store C<../../f> as a key, you'll
-probably mess something up.  If you knew what you were doing, you're
-probably okay.  I'd like to add an optional (by default on) "safe"
-mode that URL-encodes keys or something similar (I've lost the name of
-the person who suggested this, but thanks!), but I haven't done it yet.
+probably mess something up. If you knew what you were doing, you're
+probably okay. I'd like to add an optional (by default on) "safe" mode
+that URL-encodes keys or something similar (I've lost the name of the
+person who suggested this, but thanks!), but I haven't done it yet.
+
+When working with levels keep in mind that you should be aware of the
+system case sensitiveness (if you use the keys C<Foo> and C<foo> on a
+case sensitive system, the files will be placed on two different
+directories). Also, keep in mind that if you use a key whose length is
+smaller than the number of levels you might have conflicts. For
+instance, using two levels, and keys C<b> and C<bar> will result on a
+file C<b> on the root directory that will prevent C<b/ba/bar> from
+being created.
 
 =head1 AUTHOR
 

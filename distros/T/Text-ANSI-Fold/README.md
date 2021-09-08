@@ -1,10 +1,11 @@
+[![Actions Status](https://github.com/kaz-utashiro/Text-ANSI-Fold/workflows/test/badge.svg)](https://github.com/kaz-utashiro/Text-ANSI-Fold/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Text-ANSI-Fold.svg)](https://metacpan.org/release/Text-ANSI-Fold)
 # NAME
 
 Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and Asian wide characters with prohibition character handling.
 
 # VERSION
 
-Version 2.0903
+Version 2.1101
 
 # SYNOPSIS
 
@@ -76,6 +77,9 @@ Because second argument is always taken as width, use _undef_ when
 using default width with additional parameter:
 
     ($folded, $remain) = ansi_fold($text, undef, padding => 1);
+
+Some other easy-to-use interfaces are provided by sister module
+[Text::ANSI::Fold::Util](https://metacpan.org/pod/Text::ANSI::Fold::Util).
 
 # OBJECT INTERFACE
 
@@ -161,15 +165,18 @@ function as well as **new** and **configure** method.
     Array reference can be specified but works only with **chops** method,
     and retunrs empty string for zero width.
 
-- **boundary** => "word"
+- **boundary** => _word_ or _space_
 
-    **boundary** option currently takes only "word" as a valid value.  In
-    this case, text is folded on word boundary.  This occurs only when
-    enough space will be provided to hold the word on next call with same
-    width.
+    Option **boundary** takes _word_ and _space_ as a valid value.  These
+    prohibit to fold a line in the middle of ASCII/Latin sequence.  Value
+    _word_ means a sequence of alpha-numeric characters, and _space_
+    means simply non-space printables.
+
+    This operation takes place only when enough space will be provided to
+    hold the word on next call with same width.
 
     If the color of text is altered within a word, that position is also
-    treated as an boundary.
+    taken as an boundary.
 
 - **padding** => _bool_
 
@@ -245,12 +252,42 @@ function as well as **new** and **configure** method.
 - **tabstyle** => _style_
 
     Set tab expansion style.  This parameter set both **tabhead** and
-    **tabspace** at once according to the given style name.  Currently
-    these names are available.
+    **tabspace** at once according to the given style name.  Each style has
+    two values for tabhead and tabspace.
 
+    If two style names are combined, like `symbol,space`, use
+    `symbols`'s tabhead and `space`'s tabspace.
+
+    Currently these names are available.
+
+        space  => [ ' ', ' ' ],
         dot    => [ '.', '.' ],
-        symbol => [ "\N{SYMBOL FOR HORIZONTAL TABULATION}", ' ' ],
-        shade  => [ "\N{MEDIUM SHADE}", "\N{LIGHT SHADE}" ],
+        symbol => [ "\N{SYMBOL FOR HORIZONTAL TABULATION}",
+                    "\N{SYMBOL FOR SPACE}" ],
+        shade  => [ "\N{MEDIUM SHADE}",
+                    "\N{LIGHT SHADE}" ],
+        block  => [ "\N{LOWER ONE QUARTER BLOCK}",
+                    "\N{LOWER ONE EIGHTH BLOCK}" ],
+        bar    => [ "\N{BOX DRAWINGS HEAVY RIGHT}",
+                    "\N{BOX DRAWINGS LIGHT HORIZONTAL}" ],
+        dash   => [ "\N{BOX DRAWINGS HEAVY RIGHT}",
+                    "\N{BOX DRAWINGS LIGHT DOUBLE DASH HORIZONTAL}" ],
+
+    Below are styles providing same character for both tabhead and
+    tabspace.
+
+        arrow        => "\N{RIGHTWARDS ARROW}",
+        double-arrow => "\N{RIGHTWARDS DOUBLE ARROW}",
+        triple-arrow => "\N{RIGHTWARDS TRIPLE ARROW}",
+        white-arrow  => "\N{RIGHTWARDS WHITE ARROW}",
+        wave-arrow   => "\N{RIGHTWARDS WAVE ARROW}",
+        circle-arrow => "\N{CIRCLED HEAVY WHITE RIGHTWARDS ARROW}",
+        curved-arrow => "\N{HEAVY BLACK CURVED DOWNWARDS AND RIGHTWARDS ARROW}",
+        shadow-arrow => "\N{HEAVY UPPER RIGHT-SHADOWED WHITE RIGHTWARDS ARROW}",
+        squat-arrow  => "\N{SQUAT BLACK RIGHTWARDS ARROW}",
+        squiggle     => "\N{RIGHTWARDS SQUIGGLE ARROW}",
+        harpoon      => "\N{RIGHTWARDS HARPOON WITH BARB UPWARDS}",
+        cuneiform    => "\N{CUNEIFORM SIGN TAB}",
 
 # EXAMPLE
 
@@ -317,9 +354,9 @@ characters with prohibited character handling.
     Requirements for Japanese Text Layout,
     W3C Working Group Note 11 August 2020
 
-- [http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-048.pdf](http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-048.pdf)
+- [ECMA-48](https://www.ecma-international.org/wp-content/uploads/ECMA-48_5th_edition_june_1991.pdf)
 
-    Control Functions for Coded Character Sets
+    ECMA-48: Control Functions for Coded Character Sets
 
 # AUTHOR
 

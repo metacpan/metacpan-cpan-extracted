@@ -6,13 +6,12 @@ use warnings;
 
 use Test::More tests => 42;
 
+use File::TreeCreate ();
+use File::Path qw( rmtree );
+
 use lib './t/lib';
 
-use File::Find::Object::TreeCreate;
-
-use File::Path;
-
-my $tree_creator = File::Find::Object::TreeCreate->new();
+my $tree_creator = File::TreeCreate->new();
 
 {
     my $tree = {
@@ -29,7 +28,7 @@ my $tree_creator = File::Find::Object::TreeCreate->new();
                     "./t/sample-data/to-copy-from/findorule.txt"),
             },
             {
-                'name' => "foobar",
+                'name'     => "foobar",
                 'contents' =>
                     $tree_creator->cat("./t/sample-data/to-copy-from/foobar"),
 
@@ -102,7 +101,7 @@ my @ateam_path =
     lib/File/Find/Object/Rule
     lib/File/Find/Object/Rule/Test
     lib/File/Find/Object/Rule/Test/ATeam.pm
-);
+    );
 
 my $ATeam_pm_fn = $ateam_path[-1];
 
@@ -262,7 +261,7 @@ is_deeply(
 $f = find(
     or => [
         find(
-            directory => name => qr/(\.svn|CVS)/,
+            directory => name    => qr/(\.svn|CVS)/,
             prune     => discard =>
         ),
         find( file => )
@@ -345,7 +344,7 @@ is_deeply( [ find( maxdepth => 0, in => $copy_fn ) ],
 my $rule = find(
     or => [
         find(
-            name => qr/(\.svn|CVS)/,
+            name    => qr/(\.svn|CVS)/,
             discard =>
         ),
         find(),
@@ -406,7 +405,7 @@ is_deeply(
         sort +find(
             or => [
                 find(
-                    name => qr/(\.svn|CVS)/,
+                    name    => qr/(\.svn|CVS)/,
                     discard =>
                 ),
                 find(),

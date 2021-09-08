@@ -3,9 +3,9 @@ NAME
     module
 
 VERSION
-    This document describes version 0.002 of Module::Features::PythonTrove
+    This document describes version 0.003 of Module::Features::PythonTrove
     (from Perl distribution Module-Features-PythonTrove), released on
-    2021-03-26.
+    2021-04-02.
 
 SYNOPSIS
     To add Python trove classifiers in your module, just define %FEATURES

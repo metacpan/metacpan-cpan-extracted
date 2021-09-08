@@ -16,12 +16,10 @@ name: Data-MoneyCurrency
 provides:
   Data::MoneyCurrency:
     file: lib/Data/MoneyCurrency.pm
-    version: '0.18'
+    version: '0.22'
 requires:
-  Code::TidyAll: '0.78'
   Cpanel::JSON::XS: '0'
   File::ShareDir: '0'
-  Perl::Tidy: '20210111'
   Pod::Coverage: '0'
   Test::Exception: '0'
   Test::More: '0.88'
@@ -33,7 +31,7 @@ requires:
 resources:
   homepage: https://github.com/OpenCageData/perl5-Data-MoneyCurrency
   repository: https://github.com/OpenCageData/perl5-Data-MoneyCurrency.git
-version: '0.18'
+version: '0.22'
 x_generated_by_perl: v5.26.3
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

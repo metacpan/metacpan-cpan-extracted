@@ -4,10 +4,10 @@
 #  (C) Paul Evans, 2019-2021 -- leonerd@leonerd.org.uk
 
 use v5.20;
-use Object::Pad 0.45;
+use Object::Pad 0.51;
 
-package Device::AVR::UPDI 0.09;
-class Device::AVR::UPDI :repr(HASH);
+package Device::AVR::UPDI 0.10;
+class Device::AVR::UPDI :strict(params);
 
 use Carp;
 
@@ -142,26 +142,27 @@ has $_partinfo :reader;
 
 has $_nvm_version :writer(_set_nvm_version);
 
-BUILD
+ADJUSTPARAMS
 {
-   my %args = @_;
+   my ( $params ) = @_;
 
-   $_fh = $args{fh} // do {
+   $_fh = delete $params->{fh} // do {
       require IO::Termios;
-      IO::Termios->open( $args{dev} ) or
-         die "Unable to open $args{dev} - $!\n";
+      my $dev = delete $params->{dev};
+      IO::Termios->open( $dev ) or
+         die "Unable to open $dev - $!\n";
    };
 
    $_fh->cfmakeraw();
 
-   my $baud = $args{baud} // 115200;
+   my $baud = delete $params->{baud} // 115200;
    # 8bits, Even parity, 2 stop
    $_fh->set_mode( "$baud,8,e,2" );
    $_fh->setflag_clocal( 1 );
 
    $_fh->autoflush;
 
-   my $part = $args{part} or croak "Require 'part'";
+   my $part = delete $params->{part} or croak "Require 'part'";
    $_partinfo = $partinfos{lc $part} //
       croak "Unrecognised part name $part";
 }
@@ -345,8 +346,8 @@ method _pack_op_addr
    my ( $op, $addr ) = @_;
 
    return $_nvm_version >= 2
-      ? pack( "C CCC", $op|OP_ADDR24<<2, $addr, $addr >> 8, $addr >> 16 )
-      : pack( "C CC",  $op|OP_ADDR16<<2, $addr, $addr >> 8 );
+      ? pack( "C S<C", $op|OP_ADDR24<<2, $addr & 0xFFFF, $addr >> 16 )
+      : pack( "C S<",  $op|OP_ADDR16<<2, $addr );
 }
 
 async method _op_write_expecting_ack
@@ -368,8 +369,8 @@ async method stptr
    my ( $addr ) = @_;
 
    my $cmd = $_nvm_version >= 2
-      ? pack( "C CCC", OP_ST|OP_PTRREG|OP_ADDR24, $addr, $addr >> 8, $addr >> 16 )
-      : pack( "C CC",  OP_ST|OP_PTRREG|OP_ADDR16, $addr, $addr >> 8 );
+      ? pack( "C S<C", OP_ST|OP_PTRREG|OP_ADDR24, $addr & 0xFFFF, $addr >> 16 )
+      : pack( "C S<",  OP_ST|OP_PTRREG|OP_ADDR16, $addr );
 
    await $self->_op_write_expecting_ack( "ST PTR" => SYNC . $cmd );
 }

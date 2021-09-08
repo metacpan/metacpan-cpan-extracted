@@ -1,345 +1,656 @@
 package Number::MuPhone;
-use 5.012;
-use Number::MuPhone::Parser;
-use Number::MuPhone::Data;
-use Number::MuPhone::Config;
+use strict;
+use warnings;
+use v5.020;
+use Moo;
+use Types::Standard qw( Maybe Str );
 
-our $VERSION = '0.07';
+$Number::MuPhone::VERSION = '1.02';
 
-# need this non-Moo encapsulation to allow backwards compatability with Number::Phone
+our $MUPHONE_BASE_DIR = $ENV{MUPHONE_BASE_DIR} || $ENV{HOME}.'/.muphone';
+our $EXTENSION_REGEX  = qr/(?:\*|extension|ext|x)/;
+our $DIAL_PAUSE       = ',,,';
 
-# Bad parsers are seamlessly dropped - turn on debug to see them
-# (useful when amending parsers, to keep an eye out for issues)
-# Only really used when checking tweaks to the Parser modules
-# bad syntax silently dies otherwise and it can be confusing while developing
-our $DEBUG=0;
-
-
-sub new {
-  my ($class,@args) = @_;
-
-  my ($country,$number,$is_number_phone)=('','',0);
-  # normal instantiation
-  if ( ref $args[0] eq 'HASH' ) {
-    $country = $args[0]->{country};
-    $number  = $args[0]->{number};
-  }
-  # Number::Phone style
-  else {
-    $number  = pop @args;
-    $country = pop @args;
-    $is_number_phone=1;
-  }
-  $number||='';
-
-  # only number supplied - let's look up the country or use default (if set)
-  if (!$country) {
-    $country = _phone2country($number)
-               || $Number::MuPhone::Config::config->{default_country}
-               || '';
-  }
-
-  $country = uc($country);
-
-  # at this point we have enough valid data to instantiate a parser
-  my $parser_obj;
-  if ($country) {
-    my $parser_module = "Number::MuPhone::Parser::$country";
-    eval {
-      eval "use $parser_module";
-      $parser_obj = $parser_module->new({
-        number  => $number,
-      });
-    };
-    if ($@) {
-      $DEBUG && warn "Couldn't load module ($parser_module): $@\n";
-      $country ||= 'NO COUNTRY';
-      $parser_obj = Number::MuPhone::Parser->new({
-        number  => $number,
-      });
-      $parser_obj->error("Invalid country ($country)");
-    }
-  }
-
-  # if load fails, default back to base class and set an error
-  # (missing or bad parser module)
-  if (!$parser_obj) {
-    $parser_obj = Number::MuPhone::Parser->new({
-      number  => $number,
-    });
-  }
-
-  # Improve error message for some strings
-  # starts with a + but not a valid international country?
-  if ( $parser_obj->error && !$country && $number =~ /^\s*\+(.)/ ) {
-    my $first_digit = $1;
-    if ( $first_digit eq '0' ) {
-      $parser_obj ->error('Invalid country code - no country code begins with a zero');
-    }
-    else {
-      $parser_obj ->error('Invalid country code - could not determine country');
-    }
-  }
-
-
-  # duplicate Number::Phone behavior
-  if ( $number && $parser_obj->error && $is_number_phone ) {
-    $DEBUG && warn "ERROR: ".$parser_obj->error;
-    return undef;
-  }
-  return $parser_obj;
+# if custom data module exists, load it, else use distribution default
+# (which will most likely be out of date)
+our $MUPHONE_DATA;
+my $data_module_path = "$MUPHONE_BASE_DIR/lib/NumberMuPhoneData.pm";
+if (-f $data_module_path) {
+  require $data_module_path;
 }
-
-# rewritten version of code used in Number::Phone
-sub _phone2country {
-  my $num = shift || '';
-
-  # if number doesn't begins with + we can't determine the country
-  # if you need a default country, set 'default_country' in a config file, set it in a config file
-  $num =~ /^\s*\+/ or return '';
-
-  # strip out non-digits
-  $num =~ s/[^0-9]//g;
-
-  # deal with NANP insanity
-  if( $num =~ m/^1(\d{3})\d{7}/ ) {
-    my $area = $1;
-    if (my $country = $Number::MuPhone::Data::NANP_areas{$area}) {
-      return $country;
-    }
-    else {
-      return 'NANP';
-    }
-  } else {
-    my @prefixes = map { substr($num, 0, $_) } reverse 1..7;
-    foreach my $idd (@prefixes) {
-      if( my $country = $Number::MuPhone::Data::idd_codes{$idd} ) {
-        return $country;
-      }
-    }
-  }
-  return '';
+else {
+  require Number::MuPhone::Data;
 }
+# Let's import the var shortcut to save typing
+Number::MuPhone::Data->import('$MUPHONE_DATA');
 
-1;
-
-__END__
-
-=pod
-
-=encoding UTF-8
+################################################################################
 
 =head1 NAME
 
-Number::MuPhone - phone number parsing and display
+Number::MuPhone - parsing and displaying phone numbers in pure Perl
 
-=head1 VERSION
-
-version 0,01
-
-=head1 SYNOPSIS
-
-  use strict;
-  use warnings;
-  use Number::MuPhone;
-
-  my $num_us = Number::MuPhone->new({number => '+12035031111'});
-  my $num_uk = Number::MuPhone->new({number => '+441929552618'});
-
-  # shortcut for displaying the relevant national dial / display numbers from from
-  # within this number's country
-  my $dial    = $num_us->dial;        # alias for $num->dial_from($num);
-  my $display = $num_us->display;     # alias for $num->display_from($num);
-
-  # show how to dial this number from the number/country supplied.
-  $dial = $num_uk->dial_from('US');
-  $dial = $num_uk->dial_from($num_us);
-  $dial = $num_uk->dial_from('+12035031111');
-
-  # show formatted display number from the number/country supplied.
-  $display = $num_uk->display_from('US');
-  $display = $num_uk->display_from($num_us);
-  $display = $num_uk->display_from('+12035031111');
+NOTE: this is a full rewrite and is not backwards compatible with earlier
+versions of this module.
 
 =head1 DESCRIPTION
 
-Number::MuPhone is a simplified rewrite of Number::Phone with the internal 
-caching removed, and with the ability to parse extensions added
+Parse, validate (loosely in some cases) and display phone numbers as expected.
 
-One sentence summary:
+This has stripped down functionality compared to libphonenumber, but it is
+also Pure Perl (TM), is simpler to use, and contains the core functionality
+needed by common use cases.
 
-"Parse and display phone numbers from/to multiple formats"
+If you have functionality requests, please let me know: L<mailto:clive.holloway@gmail.com>
 
-This module came about when I was trying to write a parser to run a batch
-job for several million numbers. Number::Phone looked like it fit the bill, but
-it contains an undocumented cache that caused issues with such large data
-sets. I initially looked at patching Number::Phone, but soon realised that
-would be a lot more work than I anticipated. Couple that in with extra 
-parsing capabilities (mainly for extensions and 'fuzzy' numbers) that I was
-looking to add and I made the decision to start from scratch.
+All number regexes are derived from the XML file supplied by:
 
-=head1 USAGE
+L<https://github.com/google/libphonenumber/>
 
-=head2 Instantiation
 
-Two arguments are needed to instantiate - a number and a country.
+=head1 BASIC USAGE
 
-The number must be supplied, but the country can be determined through:
+Instantiate an instance using one of the following syntaxes
 
-  * supplying a number in E.164/E.123 format;
-  * explicitly supplying a country.
-  * setting a default_country attribute in your config file
+    # single arg: E.123 formatted number, scalar shortcut
+    my $num = Number::MuPhone->new('+1 203 503 1199');
 
-All of these will get parsed as valid US numbers
+    # single arg: E.123 formatted number, hashref format
+    my $num = Number::MuPhone->new({
+                number => '+1 203 503 1199'
+              });
 
-  my $num = Number::MuPhone->new({ number => '+12035031234' });
-  my $num = Number::MuPhone->new({ number => '+1 203 503 1234' });
-  my $num = Number::MuPhone->new({ number => '+1 203 503 1234 ext 1234' });
+    # double arg, number and country - number can be in local or E.123 format, scalar args
+    my $num = Number::MuPhone->new('+1 203 503 1199','US");
+    my $num = Number::MuPhone->new('(203) 503-1199','US');
 
-as will this
+    # double arg, number and country - number can be in local or E.123 format, hashref args
+    my $num = Number::MuPhone->new({
+                number  => '+1 203 503 1199'
+                country => 'US',
+              });
+    my $num = Number::MuPhone->new({
+                number  => '(203) 503-1199'
+                country => 'US',
+              });
 
-  my $num = Number::MuPhone->new({ number => '203 503 1198', country => 'US' });
+    # after instantiation, check all is well before using the object
+    if ($num->error) {
+      # process the error
+    }
 
-If you have set default_country in a config file (see below), then this
-will try to parse the number using the home country's parser
 
-  my $num = Number::MuPhone->new({ number => '203 503 1198' });
-
-  # Two other methods of instantiation are available for users familiar
-  # with Number::Phone 
-  my $num = Number::MuPhone->new('+12035031234');
-  my $num = Number::MuPhone->new('US','2035031234');
-
-=head2 Handling Errors
-
-If used, a bad configuration file will cause your code to die at run time.
-
-Otherwise, when instantiating the object, if an error is encountered it is
-accessable through the error() method, eg:
-
-  my $num = number::Phone->new({ number => '203 230 320', country => 'US' });
-
-  if ( my $err = $num->error ) {
-    die "Invalid phone number: $err";
-  }
-
-=head2 Object Accessors
-
-$num->number
-  Original number string (including extension, if relevant) supplied at instantiation
-
-$num->country
-  Two char country code, either supplied at instantiation or derived from the number
-
-$num->country_name
-  Country name (Currently in English only)
-
-$num->country_code
-  International country code for number.
-  See: https://en.wikipedia.org/wiki/List_of_country_calling_codes
-
-$num->extension
-  If supplied in the initial number, the number's extension (digits only)
-
-$num->error
-  If not a valid number, error is stored here
-
-$num->storage_formatted_number
-  A concise, readable string for storing a number, with optional extension in (say)
-  a database field. eg,
-
-  my $num = Number::MuPhone->new({ number => '203 503 1111 extension 1234', country => 'US' });
-  $num->storage_formatted_number -> '+1 2035031111 x1234'  
-
-$num->E123
-  Number in E.123 format for display
-
-$num->international_display
-  Display number in standard +COUNTRY_CODE NUMBER format 
-  Alias of $num->E123
-
-$num->dial_from( $obj || num || '2 char country code');
-$num->display_from( $obj || num || '2 char country code');
-
-  These methods work the same way - single arg is either:
-
-  * another Number::MuPhone object;
-  * a raw phone number that will parse correctly to a valid Number::MuPhone object; or
-  * a two character country code
-
-  $num->dial    => alias for $num->dial_from($num);
-  $num->display => alias for $num->display_from($snum);
-
-  my $num_uk = Number::MuPhone->new('+442012341234');
-  my $num_us = Number::MuPhone->new('+12035031111');
-
-  $num_uk->dial                                 # 02012341234
-  $num_uk->dial_from('UK')                      # 02012341234
-  $num_uk->dial_from('US')                      # 011442012341234
-  $num_uk->dial_from('+12035031111')            # 011442012341234
-  $num_uk->dial_from($num_us)                   # 011442012341234
-  
-  $num_uk->display                              # 020 1234 1234
-  $num_uk->display_from('UK')                   # 020 1234 1234
-  $num_uk->display_from('US')                   # 011 44 20 1234 1234
-  $num_uk->display_from('+12035031111')         # 011 44 20 1234 1234
-  $num_uk->display_from($num_us)                # 011 44 20 1234 1234
-  
-$num->E164
-  Number in E.164 format - see https://en.wikipedia.org/wiki/E.164
-  Note: this drops the extension as this format does not appear to
-  support them
-
-$num->international_dial
-  Full number to dial, including extension
-  $num->E164 + dialer pause + $num->extension
-
-$num->E123
-  Number in E.123 format - see https://en.wikipedia.org/wiki/E.123
-  Includes extension
-
-=head2 Configuration file
-
-If you want to set a default_country or dialer options, create a configuration file
-An example file is included in the distribution in the ./t/data directory.
-
-Currently, only two attributes are recognized (more coming soon!):
-
-* default_country - if set and instantiating a number with no country set, the parser
-  will assume the number is in the default_country unless it determines the country
-  from an E.164/E.123 supplied number. Default value is undefined.
-
-* dialer => pause - the pause character to use in dialer numbers. Default is a comma
-
-There are two ways you can indicate that a conf file should be loaded:
-
-* by setting the path to the config file in the ENV variable MUPHONE_CONF_FILEPATH;
-* by creating a .muphone_conf.yaml file in your $HOME directory
-
-Example conf files are available in the ./t/data directory of this distribution
-
-=head1 ACKNOWLEDGEMENTS
-
-With thanks to Tye McQueen and John Binns for code and philosophical input, and
-to my employer, ZipRecruiter, for encouraging employees to release the code we use
-as Open Source where possible.
-
-=head1 BUGS/CAVEATS
-
-Email bugs/comments to me.
-
-Software is provided as is. No guarantees are made as to its usefulness 
-or reliability :D
-
-=head1 AUTHOR
-
-Clive Holloway <clive.holloway@gmail.com>
-
-Copyright (c) 2017 Clive Holloway
-
-=head1 SEE ALSO
-
-Number::Phone was the inspiration for this module, and it contains different
-functionality. Check it out.
+=head1 ATTRIBUTES
 
 =cut
+
+around BUILDARGS => sub {
+  my ( $orig, $class, @args ) = @_;
+
+  # args are probably a hashref - { number => $number, country => 'US' }
+  # but can use a shortcut, if preferred
+  # ($number, 'US')
+
+  if (ref $args[0] ne 'HASH' and @args>2) {
+    die "Bad args - must be a hashref of name args or (\$num,\$country_code)";
+  }
+
+  if (!ref $args[0]) {
+    $args[0] = { number => $args[0] };
+
+    $args[0]->{country} = pop @args
+      if $args[1];
+  }
+
+  return $class->$orig(@args);
+};
+
+sub BUILD {
+  my ($self,$arg) = @_;
+
+  # extract number and extension, determine countrycode from number,
+  # strip off possible national/international dial prefix
+  # and store attributes as needed
+  $self->_process_raw_number;
+
+}
+
+=head2 number
+
+The raw number sent in at instantiation - not needed (outside of logging, maybe)
+
+=cut
+
+has number => (
+  isa      => Str,
+  is       => 'ro',
+  required => 1,
+);
+
+=head2 extension
+
+Extenstion number (digits only)
+
+=cut
+
+has extension => (
+  is => 'rw',
+  default => ''
+);
+
+=head2 country
+
+The 2 character country code sent in instantiation, or inferred from an E.123 number
+
+=cut
+
+# 2 char country code - either explicitly sent, to inferred from the number / config
+has country => (
+  isa  => Maybe[Str],
+  is   => 'rw',
+  lazy => 1,
+);
+
+=head2 error
+
+If the args don't lead to a valid number at instantiation, this error will be set
+
+=cut
+
+has error => (
+  isa      => Str,
+  is       => 'rw',
+  default  => '',
+);
+
+=head2 country_name
+
+Full text name of country (may be inaccurate for single arg instantiation - see below)
+
+=cut
+
+has country_name => (
+  is => 'lazy',
+);
+sub _build_country_name {
+  my $self = shift;
+  return $MUPHONE_DATA->{territories}->{ $self->country }->{TerritoryName};
+}
+
+=head2 country_code
+
+1-3 digit country code
+
+=cut
+
+has country_code => (
+  is => 'lazy',
+);
+sub _build_country_code {
+  my $self = shift;
+  return $MUPHONE_DATA->{territories}->{ $self->country }->{countryCode};
+}
+
+=head2 national_dial
+
+How you would dial this number within the country (including national dial code)
+
+=cut
+
+has national_dial => (
+  is => 'lazy',
+);
+sub _build_national_dial {
+  my $self = shift;
+  my $dial_prefix = $self->_national_prefix_optional_when_formatting
+                      ? ''
+                      : $self->_national_dial_prefix;
+
+  return $dial_prefix.$self->_cleaned_number.$self->_extension_dial;
+}
+
+=head2 national_display
+
+Display this number in the national number format
+
+=cut
+
+# How do you display the number when you're in the country?
+# this default should work for most countries
+has national_display => (
+  is      => 'ro',
+  lazy    => 1,
+  default => sub {
+    my $self = shift;
+    my $dial_prefix = $self->_national_prefix_optional_when_formatting
+                      ? ''
+                      : $self->_national_dial_prefix;
+
+    return $dial_prefix.$self->_formatted_number.$self->_extension_display;
+  }
+);
+
+=head2 international_display
+
+Display this number in the international number format (E.123)
+
+=cut
+
+has international_display => (
+  is      => 'ro',
+  lazy    => 1,
+  default => sub {
+    my $self = shift;
+    return '+'.$self->country_code.' '.$self->_formatted_number.$self->_extension_display;
+  }
+);
+
+=head2 e164
+
+The number in E.164 format (+$COUNTRY_CODE$NUMBER[;ext=$EXTENSION])
+
+=cut
+
+has e164 => (
+  is => 'lazy',
+);
+sub _build_e164 {
+  my $self = shift;
+  my $ext = $self->extension
+            ? ";ext=".$self->extension
+            : '';
+  return $self->e164_no_ext.$ext;
+}
+
+=head2 e164_no_ext
+
+The number in E.164 format, but with no extension  (+$COUNTRY_CODE$NUMBER)
+
+=cut
+
+has e164_no_ext => (
+  is => 'lazy',
+);
+sub _build_e164_no_ext {
+  my $self = shift;
+  return '+'.$self->country_code.$self->_cleaned_number;
+}
+
+# number with international and national dial codes, and all non digits removed
+has _cleaned_number => (
+  is      => 'rw',
+  default => '',
+);
+
+# basic validation of a number via this regex
+has _national_number_regex => (
+  is => 'lazy',
+);
+sub _build__national_number_regex {
+  my $self = shift;
+  my $regex_string = $MUPHONE_DATA->{territories}->{ $self->country }->{generalDesc}->{nationalNumberPattern};
+  return qr/^$regex_string$/;
+}
+
+# Display number without international or nation dial prefixes
+# built by _process_raw_number
+has _formatted_number => (
+  is => 'rw',
+);
+
+# Boolean used to help determine how to display a number
+# built in sub _process_raw_number
+has _national_prefix_optional_when_formatting => (
+  is      => 'rw',
+);
+
+# add pause to extension to create dial
+has _extension_dial => (
+  is => 'lazy',
+);
+sub _build__extension_dial {
+  my $self = shift;
+  return $self->extension
+         ? $DIAL_PAUSE.$self->extension
+         : '';
+}
+
+# prefix you dial when dialing the _cleaned_number within the country
+has _national_dial_prefix => (
+  is => 'lazy',
+);
+sub _build__national_dial_prefix {
+  my $self = shift;
+  $MUPHONE_DATA->{territories}->{ $self->country }->{nationalPrefix};
+}
+
+# how to display the extension text + number (currently only in English)
+has _extension_display => (
+  is => 'lazy',
+);
+sub _build__extension_display {
+  my $self = shift;
+  my $ext =
+  return $self->extension
+         ? ' '.$self->_extension_text.' '.$self->extension
+         : '';
+}
+
+# text to display befor an extension
+has _extension_text => (
+  is => 'ro',
+  default => 'ext',
+);
+
+# helper method to get the country for a number, country, or object
+sub _get_country_from {
+  my ($self,$str_or_obj) = @_;
+
+  # $str_or_arg should be
+  # - Number::MuPhone instance
+  # - E.123 formatted number
+  # - 2 char country code
+
+  # muphone num
+  if (ref $str_or_obj eq 'Number::MuPhone') {
+    return $str_or_obj->country;
+  }
+  # E.123
+  elsif ($str_or_obj =~ /^\s\+/) {
+    my $num = Number::MuPhone->new($str_or_obj);
+    return $num->country;
+  }
+  # it should be a country
+  elsif ( $str_or_obj =~ /^[A-Z]{2}$/ ) {
+    return $str_or_obj;
+  }
+  else {
+    die "Not a country, E.123 num, or MuPhone object: $str_or_obj";
+  }
+}
+
+=head1 METHODS
+
+=head2 dial_from
+
+How to dial the number from the number/country sent in as an arg. eg
+
+    my $uk_num1 = Number::MuPhone->new({ country => 'GB', number => '01929 552699' });
+    my $uk_num2 = Number::MuPhone->new({ country => 'GB', number => '01929 552698' });
+    my $us_num  = Number::MuPhone->new({ country => 'US', number => '203 503 1234' });
+
+    # these all have the same output (01929552699)
+    my $dial_from_uk = $uk_num1->dial_from($uk_num2);
+    my $dial_from_uk = $uk_num1->dial_from('GB');
+    my $dial_from_uk = $uk_num1->dial_from('+441929 552698');
+
+    # similarly, dialling the number from the US (011441929552699)
+    my $dial_from_us = $uk_num1->dial_from($us_num);
+    my $dial_from_us = $uk_num1->dial_from('US');
+    my $dial_from_us = $uk_num1->dial_from('+1 203 503 1234');
+
+=cut
+
+sub dial_from {
+  my ($self,$str_or_obj) = @_;
+  $str_or_obj||=$self;
+  my $from_country = $self->_get_country_from($str_or_obj);
+  if ( $from_country eq $self->country ) {
+    return $self->national_dial;
+  }
+  else {
+    return $MUPHONE_DATA->{territories}->{ $from_country }->{internationalPrefix}
+      .$self->country_code
+      .$self->_cleaned_number;
+  }
+}
+
+=head2 display_from
+
+How to display the number for the number/country sent in as an arg. eg
+
+    my $uk_num1 = Number::MuPhone->new({ country => 'GB', number => '01929 552699' });
+    my $uk_num2 = Number::MuPhone->new({ country => 'GB', number => '01929 552698' });
+    my $us_num  = Number::MuPhone->new({ country => 'US', number => '203 503 1234' });
+
+    # these all have the same output (01929 552699)
+    my $display_from_uk = $uk_num1->display_from($uk_num2);
+    my $display_from_uk = $uk_num1->display_from('GB');
+    my $display_from_uk = $uk_num1->display_from('+441929 552698');
+
+    # similarly, dialling the number from the US (01144 1929 552699)
+    my $display_from_us = $uk_num1->display_from($us_num);
+    my $display_from_us = $uk_num1->display_from('US');
+    my $display_from_us = $uk_num1->display_from('+1 203 503 1234');
+
+=cut
+
+sub display_from {
+  my ($self,$str_or_obj) = @_;
+  $str_or_obj||=$self;
+  my $from_country = $self->_get_country_from($str_or_obj);
+  if ( $from_country eq $self->country ) {
+    return $self->national_display;
+  }
+  else {
+    # (DIAL PREFIX) (COUNTRY CODE) (FORMATTED NUMBER) [ (EXTENSION) ]
+    return $MUPHONE_DATA->{territories}->{ $from_country }->{internationalPrefix}
+          .$self->country_code.' '
+          .$self->_formatted_number.$self->_extension_display;
+  }
+}
+
+
+# PRIVATE METHODS
+
+# splits off optional extension, and cleans both up for storage
+# only place where we set error
+sub _process_raw_number {
+  my $self = shift;
+
+  my ($raw_num,$ext) = split $EXTENSION_REGEX, $self->number;
+  $ext||='';
+  $ext =~ s/\D//g;
+  $self->extension($ext);
+
+  # if number begins with a '+' we can determine country from E.123 number
+  if ($raw_num =~ /^\s*\+/) {
+    $self->_process_from_e123($raw_num);
+  }
+  # if we have a country set, clean up raw number (ie, strip national dial code, if set)
+  elsif (my $country = $self->country) {
+    $raw_num =~ s/\D//g;
+    my $national_prefix = $MUPHONE_DATA->{territories}->{ $country }->{nationalPrefix};
+    if ( defined $national_prefix ) {
+      $raw_num =~ s/^$national_prefix//;
+    }
+    $self->_cleaned_number( $raw_num );
+  }
+
+  # if no country set by the time we get here, we need to set error and bail
+  my $country = $self->country;
+  unless ( $country ) {
+    $self->error("Country not supplied, and I can't determine it from the number");
+    return;
+  }
+
+  # Number must match the national number pattern, if exists
+  my $cleaned_num = $self->_cleaned_number;
+  if ( $MUPHONE_DATA->{territories}->{ $country }->{generalDesc}
+       && $MUPHONE_DATA->{territories}->{ $country }->{generalDesc}->{nationalNumberPattern} ) {
+
+      my $regex = qr/^(?:$MUPHONE_DATA->{territories}->{ $country }->{generalDesc}->{nationalNumberPattern})$/;
+    unless ( $cleaned_num =~ $regex ) {
+      $self->error("Number ($cleaned_num) is not valid for country ($country)");
+      return;
+    }
+  }
+
+  # confirm cleaned number is a valid number for the country
+  unless ( $self->_cleaned_number =~ $self->_national_number_regex ) {
+    $self->error("Number $raw_num is not valid for country ".$self->country);
+  }
+
+  # don't create formatted number if we have an error
+  $self->error and return;
+
+  # if no number formats, just set to the cleaned number
+  my $number_formats = $MUPHONE_DATA->{territories}->{ $self->country }->{availableFormats}->{numberFormat};
+
+  my $num = $self->_cleaned_number;
+  my $national_prefix_optional=0;
+
+  # iterate through the available formats until you get a match
+  # (if not set, we default to cleaned number
+  FORMAT: foreach my $format_hash (@$number_formats) {
+    # not all countries have leading digit mappings
+    if (my $leading_digits = $format_hash->{leadingDigits}) {
+      next FORMAT unless ( $num =~ /^(?:$leading_digits)/ );
+    }
+
+    my $pattern = qr/^$format_hash->{pattern}$/;
+    next FORMAT unless ( $num =~ $pattern );
+
+    my $format = $format_hash->{format};
+
+    my $regex_statement = "\$num =~ s/$pattern/$format/;";
+    ## no critic
+    eval $regex_statement;
+    ## use  critic
+    if ($@) {
+      $self->error("Can't format number($num) with regex($regex_statement): $@");
+      last FORMAT;
+    }
+
+    $national_prefix_optional = $format_hash->{nationalPrefixOptionalWhenFormatting}
+                                ? 1 : 0;
+    last FORMAT;
+  }
+
+  $self->_formatted_number($num);
+  $self->_national_prefix_optional_when_formatting($national_prefix_optional);
+
+}
+
+# number starts with a + ? Great, we should be able to work it out.
+sub _process_from_e123 {
+  my ($self,$num) = @_;
+
+  $num =~ s/\D//g;
+
+  my $countries = [];
+
+  # grab from country lookup - country code is 1-3 digits long
+  my @prefixes = map { substr($num, 0, $_) } 1..3;
+  PREFIX: foreach my $idd (@prefixes) {
+    # we found a match
+    if ($countries = $MUPHONE_DATA->{idd_codes}->{$idd}) {
+      # so strip off the IDD from the number
+      $num =~ s/^$idd//;
+      last PREFIX;
+    }
+  }
+
+  # now find out which country the number matches
+  # (for IDD codes with multiple countries, this may not be correct, but should be
+  # good enough for this use case - just don't rely on the country
+  # TODO - maybe iterate through all regexes by number type to confirm validity?
+  # generalDesc regex is too loose for (eg) US/CA
+  # to implement this, we'd need to keep the various number type regexes around
+  # Suggest look at adding in next update
+  my $country;
+  COUNTRY: foreach my $country (@$countries) {
+    my $national_number_format_regex  = $MUPHONE_DATA->{territories}->{$country}->{generalDesc} && $MUPHONE_DATA->{territories}->{$country}->{generalDesc}->{nationalNumberPattern}
+                                        ? qr/^$MUPHONE_DATA->{territories}->{$country}->{generalDesc}->{nationalNumberPattern}$/
+                                        : '';
+    $national_number_format_regex
+      or next COUNTRY;
+
+    $num =~ $national_number_format_regex
+      or next COUNTRY;
+
+    $self->country($country);
+    $self->_cleaned_number($num);
+  }
+
+}
+
+=head1 A WARNING ABOUT INFERRED COUNTRIES
+
+If you instantiate an object with an E.123 formatted number, the inferred country will be
+the 'main' country for that number. This is because Number::MuPhone is currently using the
+loosest regex available to validate a number for a country (this may change soon). This
+affects these country codes:
+
+    Code       Main Country
+    ====       ============
+    1          US
+    44         GB
+    212        EH
+    61         CC
+    590        MF
+    7          KZ
+    599        BQ
+    47         SJ
+    262        YT
+
+As far as functionality is concerned, you should see no difference, unless you want to use
+the country() attribute. To avoid this, instantiate with both number and country.
+
+=head1 KEEPING UP TO DATE WITH CHANGES IN THE SOURCE XML FILE
+
+The data used to validate and format the phone numbers comes from Google's libphonenumber:
+
+L<https://github.com/google/libphonenumber/releases/latest>
+
+This distribution should come with a reasonably recent copy of the libphonenumber source XML,
+but you can also set up a cron to update your source data weekly, to ensure you don't have
+problems with new area codes as they get added (this happens probably more often than you think).
+
+By default, C<Number::MuPhone>'s update script (perl-muphone-build-data) stores this data in the
+~/.muphone directory, but you can overload this by setting the C<MUPHONE_BASE_DIR> environment
+variable. Wherever you choose, it must be writeable by the user, and remember to expose the same
+C<ENV> var to any scripts using C<Number::MuPhone> (if needed).
+
+When run, the following files are created in the C<~/.muphone> or C<$ENV{MUPHONE_BASE_DIR}> dirs as appropriate
+
+    ./etc/PhoneNumberMetadata.xml     # the libphonenumber source XML file
+    ./lib/NumberMuPhoneData.pm        # the generated Number::MuPhone::Data
+    ./t/check_data_module.t           # a little sanity script that runs after creating the data file
+
+Currently, the extractor script only grabs the data we need, and removes spacing, to keep the size down.
+
+If you want to examine all available data, set C<$DEBUG=1> (add in padding, switch commas to =>) and set
+C<$STRIP_SUPERFLUOUS_DATA=0> in the script and run it again. then look at the generated C<NumberMuPhoneData.pm>
+
+=head2 Initial run
+
+Optionally, set the C<MUPHONE_BASE_DIR> environment variable to point to your config directory (must be writeable).
+Otherwise, C<~/.muphone> will get used (default).
+
+As the appropriate user, run:
+
+    perl-muphone-build-data
+
+Confirm the tests pass and the files are created (if no error output, tests passed, and all should be good).
+
+=head2 Set up the cron to run weekly to update the data
+
+    # using default data dir (~/.muphone)
+    0 5 * * 1 /usr/local/bin/perl-muphone-build-data
+
+    # using user specific data dir
+    0 5 * * 1 MUPHONE_BASE_DIR=/path/to/config /usr/local/bin/perl-muphone-build-data
+
+=head2 Dockerfile config
+
+Similarly, add the C<perl-muphone-build-data> script to your Dockerfile, as appropriate. If you're using
+Kubernetes, this might be enough, but for longer running Docker instances, you might want to
+consider setting up the cronjob within the image too.
+
+If anyone has best practice recommendations for this, let me know and I'll update the POD :D
+
+=cut
+
+
+1;

@@ -16,6 +16,9 @@ You should have received a copy of the GNU General Public License along
 with Image-Base-Magick.  If not, see <http://www.gnu.org/licenses/>.
 
 
+Version 7, September 2021
+    - oops, need 1x1 rectangles to dispatch to single-point
+
 Version 6, August 2021
     - allow for GetPixel() returning transparency
 

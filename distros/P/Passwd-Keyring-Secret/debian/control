@@ -1,0 +1,26 @@
+Source: libpasswd-keyring-secret-perl
+Section: perl
+Priority: optional
+Maintainer: Thomas Uhle <uhle@cpan.org>
+Build-Depends: debhelper (>= 12),
+ gir1.2-secret-1,
+ gnome-keyring,
+ libglib-object-introspection-perl,
+ libmodule-build-perl (>= 0.400400),
+ libpod-markdown-perl (>= 2.000000),
+ libpod-readme-perl (>= 1.1.2),
+ perl:any
+Rules-Requires-Root: no
+Standards-Version: 4.6.0
+Vcs-Browser: https://gitlab.com/uhle/Passwd-Keyring-Secret
+Vcs-Git: https://gitlab.com/uhle/Passwd-Keyring-Secret.git
+
+Package: libpasswd-keyring-secret-perl
+Architecture: all
+Depends: default-dbus-session-bus | dbus-session-bus, gir1.2-secret-1, libglib-object-introspection-perl, ${perl:Depends}
+Recommends: gnome-keyring
+Enhances: libpasswd-keyring-all-perl
+Description: Password storage implementation using the GObject-based Secret library
+ Passwd::Keyring compliant implementation that is using the GObject-based
+ Secret library to provide secure storage for passwords and similar
+ sensitive data.

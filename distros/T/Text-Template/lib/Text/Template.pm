@@ -10,7 +10,7 @@
 #
 
 package Text::Template;
-$Text::Template::VERSION = '1.59';
+$Text::Template::VERSION = '1.60';
 # ABSTRACT: Expand template text with embedded Perl
 
 use strict;
@@ -611,7 +611,7 @@ Text::Template - Expand template text with embedded Perl
 
 =head1 VERSION
 
-version 1.59
+version 1.60
 
 =head1 SYNOPSIS
 
@@ -988,7 +988,7 @@ for help with this feature.
 =item C<PREPEND>
 
 This option is passed along to the C<fill_in> call unless it is
-overridden in the arguments to C<fill_in>.  See L<C<PREPEND> feature
+overridden in the arguments to C<fill_in>.  See L<C<PREPEND>> feature
 and using C<strict> in templates> below.
 
 =item C<BROKEN>

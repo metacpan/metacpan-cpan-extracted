@@ -1,10 +1,6 @@
 #!/usr/bin/env perl
-use strict;
-use warnings;
-use Test::More;
-use Test::Exception;
+use Test2::V0;
 use Time::Verbal;
-use utf8;
 
 my $now = time;
 

@@ -2,10 +2,11 @@ package HTML::HTML5::Parser::UA;
 
 use 5.008001;
 use strict;
+use warnings;
 
 BEGIN {
 	$HTML::HTML5::Parser::UA::AUTHORITY = 'cpan:TOBYINK';
-	$HTML::HTML5::Parser::UA::VERSION   = '0.301';
+	$HTML::HTML5::Parser::UA::VERSION   = '0.992';
 }
 
 use Encode qw(decode);

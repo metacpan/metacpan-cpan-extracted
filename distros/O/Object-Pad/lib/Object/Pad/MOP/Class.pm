@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Class 0.51;
+package Object::Pad::MOP::Class 0.52;
 
 use v5.14;
 use warnings;
@@ -167,7 +167,7 @@ Returns an instance of L<Object::Pad::MOP::Method> to represent it.
 
    $metamethod = $metaclass->get_own_method( $name )
 
-Returns an instance of L<Object::Pad::MOP::Slot> to represent the method of
+Returns an instance of L<Object::Pad::MOP::Method> to represent the method of
 the given name, if one exists. If not an exception is thrown.
 
 This can only see directly-applied methods; that is, methods created by the

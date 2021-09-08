@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Run;
 use strict;
 use warnings;
 
-our $VERSION = '0.000077';
+our $VERSION = '0.000083';
 
 use Data::GUID;
 use List::Util qw/max/;
@@ -49,9 +49,11 @@ sub handle {
 
             while (my $job = $jobs->next()) {
                 $job->events->delete;
+                $job->job_fields->delete;
                 $job->delete;
             }
 
+            $run->run_fields->delete;
             $run->delete;
         }
     }

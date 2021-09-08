@@ -1,0 +1,29 @@
+---
+abstract: 'add word-completion logic to a L<Tickit::Widget::Entry>'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test::More: '0.88'
+  Tickit::Test: '0'
+  Tickit::Widget: '0.55'
+  Tickit::Widget::Entry: '0.33'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tickit-Widget-Entry-Plugin-Completion
+provides:
+  Tickit::Widget::Entry::Plugin::Completion:
+    file: lib/Tickit/Widget/Entry/Plugin/Completion.pm
+    version: '0.01'
+requires:
+  Object::Pad: '0.51'
+  perl: '5.026'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

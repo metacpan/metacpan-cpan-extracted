@@ -1,4 +1,6 @@
-1.2.5     xx.xx.2021
+1.2.6     xx.xx.2021
+           - protection from recursive loop run
+1.2.5     13.07.2021
            - fix typo in logs, internal stuff
 1.2.4     02.07.2021
            - Makefile.PL cosmetics

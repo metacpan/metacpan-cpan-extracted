@@ -106,51 +106,86 @@ if(Math::MPFR::MPFR_3_1_6_OR_LATER) {
 
   for my $v (1 .. 1290) {
 
-   my $exp =  $v < 900 ? int(rand(25))
-                     : int(rand($rand_max));
+    my $exp =  $v < 900 ? int(rand(25))
+                        : int(rand($rand_max));
 
-   $exp = -$exp if $v % 3;
-   my $x = 1 + int(rand(99000));
-   my $z = 5 - length($x);
-   my $s1 = '0.' . ('0' x $z) . "${x}e${exp}";
-   my $s2 = int(rand(500)) . "." . ('0' x $z) . "${x}e${exp}";
-   my $s3 = '1' . ('0' x $z) . "${x}e${exp}";
+    $exp = -$exp if $v % 3;
+    my $x = 1 + int(rand(99000));
+    my $z = 5 - length($x);
+    my $s1 = '0.' . ('0' x $z) . "${x}e${exp}";
+    my $s2 = int(rand(500)) . "." . ('0' x $z) . "${x}e${exp}";
+    my $s3 = '1' . ('0' x $z) . "${x}e${exp}";
 
-   unless($v % 5) {
-     for my $string($s1, $s2, $s3) { $string = '-' . $string }
-   }
+    unless($v % 5) {
+      for my $string($s1, $s2, $s3) { $string = '-' . $string }
+    }
 
-   my $prec;
-   $prec = $v < 10 ? $v
-                   : 1 + int(rand(200));
+    my $prec;
+    $prec = $v < 10 ? $v
+                    : 1 + int(rand(200));
 
-   eval {Rmpfr_set_default_prec($prec);};
+    eval {Rmpfr_set_default_prec($prec);};
 
-   if($prec_correction && $prec == 1 && 262144 > MPFR_VERSION) {
-     like( $@, qr/^Precision must be set to at least 2/, "precision of 1 is forbidden" );
-     next;
-   }
+    if($prec_correction && $prec == 1 && 262144 > MPFR_VERSION) {
+      like( $@, qr/^Precision must be set to at least 2/, "precision of 1 is forbidden" );
+      next;
+    }
 
-   my $op1 = Math::MPFR->new($s1);
-   my $op2 = Math::MPFR->new($s2);
-   my $op3 = Math::MPFR->new($s3);
+    my $op1 = Math::MPFR->new($s1);
+    my $op2 = Math::MPFR->new($s2);
+    my $op3 = Math::MPFR->new($s3);
 
-   my $str1;
-   eval{ $str1 = decimalize($op1); };
+    my $str1;
+    eval{ $str1 = decimalize($op1); };
 
-   if($prec_correction && $prec == 1 && 262146 > MPFR_VERSION) {
-     like( $@, qr/^Precision of 1 not allowed/, "precision of 1 is forbidden" );
-     next;
-   }
+    if($prec_correction && $prec == 1 && 262146 > MPFR_VERSION) {
+      like( $@, qr/^Precision of 1 not allowed/, "precision of 1 is forbidden" );
+      next;
+    }
 
-   my $str2 = decimalize($op2);
-   my $str3 = decimalize($op3);
+    my $str2 = decimalize($op2);
+    my $str3 = decimalize($op3);
 
-   cmp_ok(check_exact_decimal($str1, $op1), '==', 1, "'$s1', at precision $prec, decimalized as expected");
-   cmp_ok(check_exact_decimal($str2, $op2), '==', 1, "'$s2', at precision $prec, decimalized as expected");
-   cmp_ok(check_exact_decimal($str3, $op3), '==', 1, "'$s3', at precision $prec, decimalized as expected");
+    cmp_ok(check_exact_decimal($str1, $op1), '==', 1, "'$s1', at precision $prec, decimalized as expected");
+    cmp_ok(check_exact_decimal($str2, $op2), '==', 1, "'$s2', at precision $prec, decimalized as expected");
+    cmp_ok(check_exact_decimal($str3, $op3), '==', 1, "'$s3', at precision $prec, decimalized as expected");
+
+    my $len1 =   significand_length($str1);
+    my $len1_c = decimalize($op1, undef); # return length as calculated inside decimalize()
+
+    cmp_ok($len1_c, '>=', $len1, "$str1: calculated length >= no. of significant digits");
+    cmp_ok($len1_c - $len1, '<=', 1, "$str1: calculated length - no. of significant digits <= 1");
+
+    my $len2 =   significand_length($str2);
+    my $len2_c = decimalize($op2, undef); # return length as calculated inside decimalize()
+
+    cmp_ok($len2_c, '>=', $len2, "$str2: calculated length >= no. of significant digits");
+    cmp_ok($len2_c - $len2, '<=', 1, "$str2: calculated length - no. of significant digits <= 1");
+
+    my $len3 =   significand_length($str3);
+    my $len3_c = decimalize($op3, undef); # return length as calculated inside decimalize()
+
+    cmp_ok($len3_c, '>=', $len3, "$str3: calculated length >= no. of significant digits");
+    cmp_ok($len3_c - $len3, '<=', 1, "$str3: calculated length - no. of significant digits <= 1");
 
   }
+
+  cmp_ok(decimalize(Math::MPFR->new(0), undef), '==', 0, "Zero has 0 significand digits");
+
+  my $irregular = Math::MPFR->new();
+  cmp_ok(decimalize($irregular, undef), '==', 0, "NaN has 0 significand digits");
+
+  Rmpfr_set_inf($irregular, 1);
+  cmp_ok(decimalize($irregular, undef), '==', 0, "Inf has 0 significand digits");
+
+  Rmpfr_set_inf($irregular, -1);
+  cmp_ok(decimalize($irregular, undef), '==', 0, "-Inf has 0 significand digits");
+
+  Rmpfr_set_zero($irregular, 1);
+  cmp_ok(decimalize($irregular, undef), '==', 0, "Zero has 0 significand digits");
+
+  Rmpfr_set_zero($irregular, -1);
+  cmp_ok(decimalize($irregular, undef), '==', 0, "-0 has 0 significand digits");
 }
 
 else {
@@ -166,3 +201,12 @@ else {
 }
 
 done_testing();
+
+sub significand_length {
+  my $s = shift;
+  $s =~ s/^\-//; # remove leading '-'
+  $s =~ s/\.// ; # remove radix point
+  $s =~ s/^0+//; # remove leading zeroes
+
+  return length( (split /e/i, $s)[0] );
+}

@@ -11,6 +11,9 @@ SCRIPTS
   findinc
     list all files in @INC. With LS_COLORS!
 
+  find_module
+    find where a module is residing
+
   func
     list all functions defined in **/*.p[lm]
 

@@ -1,3 +1,8 @@
+1.1.1:
+- Released at 2021-09-08T10:22:24+0900
+- Minor documentation updates
+- Minor CPAN META updates
+
 1.1.0:
 - Fix an edge case when 2 timestaps are exactly 86400s away from each other.
   See: https://rt.cpan.org/Ticket/Display.html?id=121553

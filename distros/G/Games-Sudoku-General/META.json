@@ -15,6 +15,7 @@
    "name" : "Games-Sudoku-General",
    "no_index" : {
       "directory" : [
+         "eg",
          "inc",
          "t",
          "xt"
@@ -54,7 +55,7 @@
    "provides" : {
       "Games::Sudoku::General" : {
          "file" : "lib/Games/Sudoku/General.pm",
-         "version" : "0.025"
+         "version" : "0.026"
       }
    },
    "release_status" : "stable",
@@ -72,6 +73,6 @@
          "web" : "https://github.com/trwyant/perl-Games-Sudoku-General"
       }
    },
-   "version" : "0.025",
+   "version" : "0.026",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

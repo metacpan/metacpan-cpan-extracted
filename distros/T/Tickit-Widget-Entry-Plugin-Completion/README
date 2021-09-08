@@ -1,0 +1,92 @@
+NAME
+
+    Tickit::Widget::Entry::Plugin::Completion - add word-completion logic
+    to a Tickit::Widget::Entry
+
+SYNOPSIS
+
+       use Tickit::Widget::Entry;
+       use Tickit::Widget::Entry::Plugin::Completion;
+    
+       my $entry = Tickit::Widget::Entry->new( ... );
+       Tickit::Widget::Entry::Plugin::Completion->apply( $entry,
+          words => [ make_words() ],
+       );
+    
+       ...
+
+DESCRIPTION
+
+    This package applies code to a Tickit::Widget::Entry instance to
+    implement word-completion logic while editing. This logic is activated
+    by pressing the <Tab> key.
+
+    If the word currently being edited has a unique match in the list of
+    words, then the word is completed entirely, followed by a space.
+
+    If there are multiple words that could complete from the word at the
+    cursor, then a popup menu is presented showing the next available
+    characters or matches. The user can continue typing more characters to
+    narrow down the choice until a unique match is found.
+
+METHODS
+
+ apply
+
+       Tickit::Widget::Entry::Plugin::Completion->apply( $entry, %params )
+
+    Applies the plugin code to the given Tickit::Widget::Entry instance.
+
+    The following named parameters are recognised
+
+    gen_words => CODE
+
+         @words = $gen_words->( %args )
+
+      A CODE reference to a subroutine used to generate the list of words
+      at the current position. It is passed the following name/value pairs
+      to assist it:
+
+      word => STRING
+
+	The partial word currently being completed.
+
+      wordpos => INT
+
+	The position of the beginning of the word, within the line. Will be
+	0 for the initial word of the line.
+
+      entry => Tickit::Widget::Entry
+
+	The underlying entry widget instance.
+
+    words => ARRAY
+
+      A shortcut to providing gen_words; a reference to an array containing
+      all the possible words, in no particular order, that are offered for
+      completion.
+
+    use_popup => BOOL
+
+      Optional. If false, do not display a popup menu. Defaults to true.
+
+      When this is disabled, the completion logic will apply longest-prefix
+      matching on the set of available words, but will not otherwise
+      display or offer any interactive UI on the list of matches.
+
+    ignore_case => BOOL
+
+      Optional. If true, word matching will be performed ignoring case, by
+      using the /i regexp flag. Defaults to false. When the completion
+      logic has selected a word to insert, it may change the case of the
+      text already in the buffer to match the completion word.
+
+    append_after_word => STRING
+
+      Optional. If set, append this string after a successful unique match.
+      Defaults to a single space.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

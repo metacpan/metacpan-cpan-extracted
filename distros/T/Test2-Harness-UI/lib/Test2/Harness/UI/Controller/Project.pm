@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Project;
 use strict;
 use warnings;
 
-our $VERSION = '0.000077';
+our $VERSION = '0.000083';
 
 use Time::Elapsed qw/elapsed/;
 use List::Util qw/sum/;
@@ -408,8 +408,8 @@ sub _build_stat_uncovered {
         unless $field;
 
     my $untested = $field->data->{untested};
-    my $files = $untested->{files};
-    my $subs  = $untested->{subs};
+    my $files = $untested->{files} // [];
+    my $subs  = $untested->{subs}  // {};
 
     my $data = {};
     for my $file (sort @$files, keys %$subs) {

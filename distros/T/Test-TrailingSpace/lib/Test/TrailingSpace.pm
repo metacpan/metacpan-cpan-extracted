@@ -1,5 +1,5 @@
 package Test::TrailingSpace;
-$Test::TrailingSpace::VERSION = '0.0600';
+$Test::TrailingSpace::VERSION = '0.0601';
 use 5.014;
 use strict;
 use warnings;
@@ -149,7 +149,7 @@ Test::TrailingSpace - test for trailing space in source files.
 
 =head1 VERSION
 
-version 0.0600
+version 0.0601
 
 =head1 SYNOPSIS
 

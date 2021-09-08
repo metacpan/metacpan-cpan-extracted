@@ -1,6 +1,9 @@
 Revision history for Term::TablePrint
 
 
+0.143   2021-08-29
+        - Adapt the code to the updated Term::Choose.
+
 0.142   2021-08-24
         - Renamed the option 'f3' to 'search'.
         - 'Ctrl-F' instead of 'F3' to open the search prompt.

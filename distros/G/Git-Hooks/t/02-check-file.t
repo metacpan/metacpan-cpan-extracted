@@ -1,11 +1,11 @@
-# -*- cperl -*-
+#!/usr/bin/env perl
 
-use 5.016;
+use v5.16.0;
 use warnings;
 use lib qw/t lib/;
 use Git::Hooks::Test ':all';
 use Path::Tiny;
-use Test::More tests => 34;
+use Test::More tests => 36;
 use Test::Requires::Git;
 
 my ($repo, $clone, $T);
@@ -15,6 +15,7 @@ sub setup_repos {
 
     install_hooks($repo, undef, qw/pre-commit/);
     install_hooks($clone, undef, qw/update pre-receive/);
+    return;
 }
 
 sub modify_file {
@@ -57,6 +58,7 @@ sub check_can_commit {
     my ($testname, $file, $action, $data) = @_;
     modify_file($testname, $file, $action, $data);
     test_ok($testname, $repo, 'commit', '-m', $testname);
+    return;
 }
 
 sub check_cannot_commit {
@@ -74,6 +76,7 @@ sub check_can_push {
     modify_file($testname, $file, $action, $data);
     $repo->run(commit => '-m', $testname);
     test_ok($testname, $repo, 'push', $clone->git_dir(), 'master');
+    return;
 }
 
 sub check_cannot_push {
@@ -83,6 +86,7 @@ sub check_cannot_push {
     $repo->run(commit => '-m', $testname);
     test_nok_match($testname, $regex, $repo, 'push', $clone->git_dir(), 'master');
     $repo->run(qw/reset --hard/, $head);
+    return;
 }
 
 
@@ -205,6 +209,17 @@ $wc->child('doc.txt')->touch()->chmod(0644);
 
 check_can_commit('not-executable succeed', 'doc.txt');
 
+# Deal with filenames containing unusual characters
+
+$repo->run(qw/config --remove-section githooks.checkfile/);
+
+$repo->run(qw/config githooks.checkfile.sizelimit 4/);
+
+check_can_commit('filename with unusual characteres OK', '$al\v@ção', 'truncate', '12');
+
+check_cannot_commit('filename with unusual characteres NOK', qr/the current limit is/,
+                    '$al\v@ção', 'truncate', '12345');
+
 # ACLs
 
 $repo->run(qw/config --remove-section githooks.checkfile/);
@@ -279,3 +294,5 @@ check_cannot_push('Deny push if match FIXME',
               );
 
 $clone->run(qw/config --remove-section githooks.checkfile/);
+
+1;

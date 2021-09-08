@@ -1,0 +1,15 @@
+Build.PL
+Changes
+examples/completion.pl
+lib/Tickit/Widget/Entry/Plugin/Completion.pm
+MANIFEST			This list of files
+t/00use.t
+t/01words.t
+t/02gen_words.t
+t/03ignore_case.t
+t/10popup.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

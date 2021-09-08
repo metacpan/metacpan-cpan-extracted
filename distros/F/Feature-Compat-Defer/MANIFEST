@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Feature/Compat/Defer.pm
+MANIFEST			This list of files
+t/00use.t
+t/01defer.t
+t/02die.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

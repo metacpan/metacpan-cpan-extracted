@@ -6,33 +6,26 @@ use String::CamelCase 'camelize';
 use Scalar::Util 'blessed';
 use Valiant::Util 'throw_exception', 'debug';
 use namespace::autoclean -also => ['throw_exception', 'debug'];
-
-requires 'ancestors';
+use Valiant::Filters ();
 
 has _instance_filters => (is=>'rw', init_arg=>undef);
 
-my @_filters;
 sub _filters {
   my ($class_or_self, $arg) = @_;
   my $class = ref($class_or_self) ? ref($class_or_self) : $class_or_self;
-  my $varname = "${class}::_filters";
 
-  no strict "refs";
-
+  my @existing = ();
   if(defined($arg)) {
     if(ref($class_or_self)) { # its $self
       my @existing = @{ $class_or_self->_instance_filters||[] };
       $class_or_self->_instance_filters([$arg, @existing]);
     } else {
-      push @$varname, $arg;
+      Valiant::Filters::_add_metadata($class_or_self, 'filters', $arg);
     }
   }
-
-  return @{ ref($class_or_self) ? $class_or_self->_instance_filters||[] : [] },
-    @$varname,
-    map { $_->_filters } 
-    grep { $_->can('validations') }
-      $class->ancestors;
+  @existing = @{ $class_or_self->_instance_filters||[] } if ref $class_or_self;
+  my @filters = $class_or_self->filters_metadata if $class_or_self->can('filters_metadata');
+  return @filters, @existing;
 }
 
 sub default_filter_namepart { 'Filter' }
@@ -219,8 +212,7 @@ Valiant::Filters - Role that adds class and instance methods supporting field fi
 
     use Moo;
 
-    with 'Valiant::Util::Ancestors',
-      'Valiant::Filterable';
+    with 'Valiant::Filterable';
 
     has 'name' => (is=>'ro', required=>1);
     has 'last' => (is=>'ro', required=>1);

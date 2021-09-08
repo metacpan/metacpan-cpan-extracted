@@ -1,5 +1,8 @@
 Revision history for Excel-ValueReader-XLSX
 
+1.04 25.08.2021
+  - hack to avoid floating-point imprecisions in computing time values
+
 1.03 19.08.2021
   - fix failures from cpantesters
 

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Match 0.07;
+package Syntax::Keyword::Match 0.08;
 
 use v5.14;
 use warnings;
@@ -141,6 +141,10 @@ will never match.
          # This case will never match as the one above will always happen first
       }
    }
+
+I<Since version 0.08> the operator syntax is parsed using L<XS::Parse::Infix>,
+meaning that custom infix operators can be recognised, even on versions of
+perl that do not support the full C<PL_infix_plugin> mechanism.
 
 =head2 case
 

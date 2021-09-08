@@ -1,3 +1,9 @@
+0.656   2021-08-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Update to WWW::PAUSE::Simple 0.452 (change log access category
+	  from 'access' to '_access').
+
+
 0.655   2020-09-18  Released-By: PERLANCAR: Urgency: high
 
         - Derp, forgot to rebuild the CLI.

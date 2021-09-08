@@ -8,7 +8,7 @@ use utf8;
 
 use Object::Pad;
 
-package App::sdview 0.03;
+package App::sdview 0.04;
 class App::sdview :strict(params);
 
 use List::Keywords qw( first );
@@ -91,7 +91,7 @@ method run ( $file, %opts )
 
 =item *
 
-Add more formats. nroff and ReST at least. Perhaps others.
+Add more formats. man and ReST at least. Perhaps others.
 
 =item *
 
@@ -99,9 +99,9 @@ Improved Markdown parser. Currently the parser is very simple.
 
 =item *
 
-Other outputs. Consider a L<Tickit>-based frontend. Also some structured file
-writers - allowing cross-conversion between POD, Markdown, ReST, nroff and
-maybe also HTML output.
+Other outputs. Consider a L<Tickit>-based frontend.
+
+Also more structured file writers - ReST, man and maybe also HTML output.
 
 =back
 

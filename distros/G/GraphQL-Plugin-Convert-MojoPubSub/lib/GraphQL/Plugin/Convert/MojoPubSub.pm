@@ -2,6 +2,7 @@ package GraphQL::Plugin::Convert::MojoPubSub;
 use strict;
 use warnings;
 use GraphQL::Schema;
+use GraphQL::Plugin::Type::DateTime;
 use GraphQL::Debug qw(_debug);
 use DateTime;
 use GraphQL::Type::Scalar qw($Boolean $String);
@@ -9,7 +10,7 @@ use GraphQL::Type::Object;
 use GraphQL::Type::InputObject;
 use GraphQL::AsyncIterator;
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 use constant DEBUG => $ENV{GRAPHQL_DEBUG};
 use constant FIREHOSE => '_firehose';
 
@@ -68,7 +69,7 @@ sub subscribe_resolver {
 }
 
 sub to_graphql {
-  my ($class, $fieldspec, $pubsub) = @_;
+  my ($class, $fieldspec, $root_value) = @_;
   $fieldspec = { map +($_ => { type => $fieldspec->{$_} }), keys %$fieldspec };
   my $input_fields = {
     channel => { type => $String->non_null },
@@ -109,7 +110,7 @@ sub to_graphql {
   );
   +{
     schema => $schema,
-    root_value => $pubsub,
+    root_value => $root_value,
     resolver => \&field_resolver,
     subscribe_resolver => \&subscribe_resolver,
   };
@@ -143,7 +144,7 @@ GraphQL::Plugin::Convert::MojoPubSub - convert a Mojo PubSub server to GraphQL s
       username => $String->non_null,
       message => $String->non_null,
     },
-    $pg->pubsub,
+    $pg,
   );
   print $converted->{schema}->to_doc;
 

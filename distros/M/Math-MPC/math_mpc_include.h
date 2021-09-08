@@ -156,8 +156,17 @@ typedef __float128 float128;
 #define SIN_COS_AVAILABLE 1
 #endif
 
+#define SV_IS_IOK(x) \
+     SvIOK(x)
+
+#define SV_IS_POK(x) \
+     SvPOK(x)
+
+#define SV_IS_NOK(x) \
+     SvNOK(x)
+
 #define NOK_POK_DUALVAR_CHECK \
-        if(SvNOK(b)) { \
+        if(SV_IS_NOK(b)) { \
          nok_pok++; \
          if(SvIV(get_sv("Math::MPC::NOK_POK", 0))) \
            warn("Scalar passed to %s is both NV and PV. Using PV (string) value"

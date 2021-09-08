@@ -1,3 +1,7 @@
+0.000079    2021-09-16
+            * Teach XS to translate ArrayBuffer & TypedArray to Perl.
+            * Fix character-encoding oddities, add documentation.
+
 0.000078    2019-08-14
             * Add possibility to retrieve Duktape version information.
 

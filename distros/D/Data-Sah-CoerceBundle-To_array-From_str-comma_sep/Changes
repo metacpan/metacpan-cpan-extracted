@@ -1,3 +1,11 @@
+0.013   2021-04-08  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention
+	  Data::Sah::Coerce::perl::To_array::From_str::{csv,tsv}_row.
+
+
 0.012   2020-05-21  Released-By: PERLANCAR; Urgency: medium
 
 	- Add argument: separator.

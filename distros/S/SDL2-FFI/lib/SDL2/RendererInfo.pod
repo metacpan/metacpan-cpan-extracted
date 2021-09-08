@@ -1,0 +1,57 @@
+=encoding utf-8
+
+=head1 NAME
+
+SDL2::RendererInfo - Information on the Capabilities of a Render Driver or
+Context
+
+=head1 SYNOPSIS
+
+    use SDL2 qw[:renderer];
+    # TODO
+    warn $renderer->name;
+
+=head1 DESCRIPTION
+
+SDL2::RendererInfo exposes render driver information.
+
+=head1 Fields
+
+=over
+
+=item C<name> - the name of the renderer
+
+=item C<flags> - Supported L<< C<SDL_RendererFlags>|SDL2::FFI/C<:rendererFlags> >>
+
+=item C<num_texture_formats> - the number of available texture format
+
+=item C<texture_formats> - the available texture formats
+
+=item C<max_texture_width> - the maximum texture width
+
+=item C<max_texture_height> - the maximum texture height
+
+=back
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under
+the terms found in the Artistic License 2. Other copyrights, terms, and
+conditions may apply to data transmitted through this module.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=begin stopwords
+
+
+
+=end stopwords
+
+=cut
+
+};
+1;

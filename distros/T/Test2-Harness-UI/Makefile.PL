@@ -32,6 +32,7 @@ my %WriteMakefileArgs = (
     "Clone" => 0,
     "Crypt::Eksblowfish::Bcrypt" => 0,
     "DBI" => 0,
+    "DBIx::Class::Helper::ResultSet::RemoveColumns" => 0,
     "DBIx::Class::InflateColumn::DateTime" => 0,
     "DBIx::Class::InflateColumn::Serializer" => 0,
     "DBIx::Class::InflateColumn::Serializer::JSON" => 0,
@@ -83,7 +84,7 @@ my %WriteMakefileArgs = (
     "constant" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.000077",
+  "VERSION" => "0.000083",
   "test" => {
     "TESTS" => "t/*.t t/UI/*.t"
   }
@@ -95,6 +96,7 @@ my %FallbackPrereqs = (
   "Clone" => 0,
   "Crypt::Eksblowfish::Bcrypt" => 0,
   "DBI" => 0,
+  "DBIx::Class::Helper::ResultSet::RemoveColumns" => 0,
   "DBIx::Class::InflateColumn::DateTime" => 0,
   "DBIx::Class::InflateColumn::Serializer" => 0,
   "DBIx::Class::InflateColumn::Serializer::JSON" => 0,

@@ -72,6 +72,27 @@ local $Data::Dumper::Sortkeys = 1;
 }
 
 {
+    my $got      = get_currency(currency => 'btc');
+    my $expected = {
+          'alternate_symbols' => [],
+          'decimal_mark' => '.',
+          'html_entity' => '&#x20bf;',
+          'iso_code' => 'BTC',
+          'iso_numeric' => '',
+          'name' => 'Bitcoin',
+          'priority' => 100,
+          'smallest_denomination' => 1,
+          'subunit' => 'Satoshi',
+          'subunit_to_unit' => 100000000,
+          'symbol' => "\x{20bf}",
+          'symbol_first' => 1,
+          'thousands_separator' => ','
+    };
+    is_deeply($got, $expected, "get_currency 'btc' which is non ISO")
+        or diag(Data::Dumper->Dump([$got, $expected], ['got', 'expected']));
+}
+
+{
     my $got = get_currency(currency => "blablabla");
     is($got, undef, "get_currency(currency => 'blablabla') returns undef");
 }

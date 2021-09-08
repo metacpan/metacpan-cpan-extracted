@@ -37,3 +37,23 @@ use strict;
 use Moose;
 use strict;
 print 42;
+
+## name strict and Test2::V0
+## failures 1
+## cut
+use strict;
+use Test2::V0;
+
+## name perl 5.10 and strict
+## failures 0
+## cut
+use 5.010;
+use strict;
+print 42;
+
+## name perl 5.11 and strict
+## failures 1
+## cut
+use 5.011;
+use strict;
+print 42;

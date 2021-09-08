@@ -5,7 +5,7 @@ package Signer::AWSv4;
   use Digest::SHA qw//;
   use URI::Escape qw//;
 
-  our $VERSION = '0.05';
+  our $VERSION = '0.06';
 
   has access_key => (is => 'ro', isa => Str, required => 1);
   has secret_key => (is => 'ro', isa => Str, required => 1);
@@ -300,6 +300,8 @@ L<https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html>
 =head1 CONTRIBUTIONS
 
 manwar: specify missing prereqs
+
+mschout: add version support to S3
 
 =head1 BUGS and SOURCE
 

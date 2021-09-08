@@ -101,6 +101,7 @@ Rmpfr_can_round Rmpfr_cbrt Rmpfr_ceil Rmpfr_check_range Rmpfr_clear Rmpfr_clears
 Rmpfr_clear_erangeflag Rmpfr_clear_flags Rmpfr_clear_inexflag Rmpfr_clear_nanflag
 Rmpfr_clear_overflow Rmpfr_clear_underflow Rmpfr_cmp Rmpfr_cmp_d Rmpfr_cmp_f
 Rmpfr_cmp_ld Rmpfr_cmp_q Rmpfr_cmp_si Rmpfr_cmp_si_2exp Rmpfr_cmp_ui
+Rmpfr_cmp_sj Rmpfr_cmp_uj Rmpfr_cmp_IV Rmpfr_cmp_UV
 Rmpfr_cmp_ui_2exp Rmpfr_cmp_z Rmpfr_cmpabs Rmpfr_cmpabs_ui Rmpfr_total_order_p
 Rmpfr_const_catalan Rmpfr_const_euler
 Rmpfr_const_log2 Rmpfr_const_pi Rmpfr_cos Rmpfr_cosh Rmpfr_cot Rmpfr_coth
@@ -134,14 +135,15 @@ Rmpfr_init_set_q_nobless Rmpfr_init_set_si Rmpfr_init_set_si_nobless
 Rmpfr_init_set_str Rmpfr_init_set_str_nobless Rmpfr_init_set_ui
 Rmpfr_init_set_ui_nobless Rmpfr_init_set_z Rmpfr_init_set_z_nobless Rmpfr_inp_str
 TRmpfr_inp_str
-Rmpfr_integer_p Rmpfr_integer_string
+Rmpfr_integer_p Rmpfr_overflow_p Rmpfr_integer_string
 Rmpfr_less_p Rmpfr_lessequal_p Rmpfr_lessgreater_p Rmpfr_lngamma
 Rmpfr_log Rmpfr_log10 Rmpfr_log1p Rmpfr_log2 Rmpfr_max Rmpfr_min
 Rmpfr_min_prec Rmpfr_mul Rmpfr_mul_2exp Rmpfr_mul_2si Rmpfr_mul_2ui Rmpfr_mul_q
 Rmpfr_mul_si Rmpfr_mul_ui Rmpfr_mul_z Rmpfr_nan_p Rmpfr_nanflag_p Rmpfr_neg
 Rmpfr_nextabove Rmpfr_nextbelow Rmpfr_nexttoward Rmpfr_number_p Rmpfr_out_str
-TRmpfr_out_str
-Rmpfr_overflow_p Rmpfr_pow Rmpfr_pow_si Rmpfr_pow_ui Rmpfr_pow_z Rmpfr_prec_round
+TRmpfr_out_str Rmpfr_prec_round
+Rmpfr_pow Rmpfr_pow_si Rmpfr_pow_ui Rmpfr_pow_z Rmpfr_powr Rmpfr_pown Rmpfr_pow_uj
+Rmpfr_pow_UV Rmpfr_pow_IV
 Rmpfr_print_rnd_mode
 Rmpfr_random2 Rmpfr_reldiff Rmpfr_rint Rmpfr_rint_ceil
 Rmpfr_rint_floor Rmpfr_rint_round Rmpfr_rint_trunc Rmpfr_root Rmpfr_rootn_ui Rmpfr_round
@@ -158,7 +160,9 @@ Rmpfr_set_FLOAT128 Rmpfr_get_FLOAT128 Rmpfr_set_DECIMAL128 Rmpfr_get_DECIMAL128
 decimalize check_exact_decimal
 Rmpfr_set_underflow Rmpfr_set_z Rmpfr_sgn Rmpfr_si_div Rmpfr_si_sub Rmpfr_sin
 Rmpfr_sin_cos Rmpfr_sinu Rmpfr_cosu Rmpfr_tanu Rmpfr_sinpi Rmpfr_cospi Rmpfr_tanpi
-Rmpfr_sinh_cosh
+Rmpfr_sinh_cosh Rmpfr_acosu Rmpfr_acospi Rmpfr_asinu Rmpfr_asinpi Rmpfr_atanu
+Rmpfr_atanpi Rmpfr_atan2u Rmpfr_atan2pi
+Rmpfr_pow_sj Rmpfr_log2p1 Rmpfr_log10p1 Rmpfr_compound_si Rmpfr_exp2m1 Rmpfr_exp10m1
 Rmpfr_sinh Rmpfr_sqr Rmpfr_sqrt Rmpfr_sqrt_ui Rmpfr_strtofr Rmpfr_sub
 Rmpfr_sub_q Rmpfr_sub_si Rmpfr_sub_ui Rmpfr_sub_z Rmpfr_subnormalize
 Rmpfr_sum Rmpfr_swap
@@ -182,10 +186,12 @@ Rmpfr_fmodquo Rmpfr_fpif_export Rmpfr_fpif_import Rmpfr_flags_clear Rmpfr_flags_
 Rmpfr_flags_test Rmpfr_flags_save Rmpfr_flags_restore Rmpfr_rint_roundeven Rmpfr_roundeven
 Rmpfr_nrandom Rmpfr_erandom Rmpfr_fmma Rmpfr_fmms Rmpfr_log_ui Rmpfr_gamma_inc Rmpfr_beta
 Rmpfr_round_nearest_away rndna
-atonv nvtoa atodouble doubletoa numtoa atonum Rmpfr_dot Rmpfr_get_str_ndigits Rmpfr_get_str_ndigits_alt
+atonv nvtoa atodouble doubletoa numtoa atonum mpfrtoa anytoa Rmpfr_dot
+Rmpfr_get_str_ndigits Rmpfr_get_str_ndigits_alt
+q_add_fr q_sub_fr q_mul_fr q_div_fr q_cmp_fr fr_cmp_q_rounded
 );
 
-    our $VERSION = '4.16';
+    our $VERSION = '4.17';
     #$VERSION = eval $VERSION;
 
     Math::MPFR->DynaLoader::bootstrap($VERSION);
@@ -209,6 +215,7 @@ Rmpfr_can_round Rmpfr_cbrt Rmpfr_ceil Rmpfr_check_range Rmpfr_clear Rmpfr_clears
 Rmpfr_clear_erangeflag Rmpfr_clear_flags Rmpfr_clear_inexflag Rmpfr_clear_nanflag
 Rmpfr_clear_overflow Rmpfr_clear_underflow Rmpfr_cmp Rmpfr_cmp_d Rmpfr_cmp_f
 Rmpfr_cmp_ld Rmpfr_cmp_q Rmpfr_cmp_si Rmpfr_cmp_si_2exp Rmpfr_cmp_ui
+Rmpfr_cmp_sj Rmpfr_cmp_uj Rmpfr_cmp_IV Rmpfr_cmp_UV
 Rmpfr_cmp_ui_2exp Rmpfr_cmp_z Rmpfr_cmpabs Rmpfr_cmpabs_ui Rmpfr_total_order_p
 Rmpfr_const_catalan Rmpfr_const_euler
 Rmpfr_const_log2 Rmpfr_const_pi Rmpfr_cos Rmpfr_cosh Rmpfr_cot Rmpfr_coth
@@ -242,14 +249,15 @@ Rmpfr_init_set_q_nobless Rmpfr_init_set_si Rmpfr_init_set_si_nobless
 Rmpfr_init_set_str Rmpfr_init_set_str_nobless Rmpfr_init_set_ui
 Rmpfr_init_set_ui_nobless Rmpfr_init_set_z Rmpfr_init_set_z_nobless Rmpfr_inp_str
 TRmpfr_inp_str
-Rmpfr_integer_p Rmpfr_integer_string
+Rmpfr_integer_p Rmpfr_overflow_p Rmpfr_integer_string
 Rmpfr_less_p Rmpfr_lessequal_p Rmpfr_lessgreater_p Rmpfr_lngamma
 Rmpfr_log Rmpfr_log10 Rmpfr_log1p Rmpfr_log2 Rmpfr_max Rmpfr_min
 Rmpfr_min_prec Rmpfr_mul Rmpfr_mul_2exp Rmpfr_mul_2si Rmpfr_mul_2ui Rmpfr_mul_q
 Rmpfr_mul_si Rmpfr_mul_ui Rmpfr_mul_z Rmpfr_nan_p Rmpfr_nanflag_p Rmpfr_neg
 Rmpfr_nextabove Rmpfr_nextbelow Rmpfr_nexttoward Rmpfr_number_p Rmpfr_out_str
-TRmpfr_out_str
-Rmpfr_overflow_p Rmpfr_pow Rmpfr_pow_si Rmpfr_pow_ui Rmpfr_pow_z Rmpfr_prec_round
+TRmpfr_out_str Rmpfr_prec_round
+Rmpfr_pow Rmpfr_pow_si Rmpfr_pow_ui Rmpfr_pow_z Rmpfr_powr Rmpfr_pown Rmpfr_pow_uj
+Rmpfr_pow_UV Rmpfr_pow_IV
 Rmpfr_print_rnd_mode
 Rmpfr_random2 Rmpfr_reldiff Rmpfr_rint Rmpfr_rint_ceil
 Rmpfr_rint_floor Rmpfr_rint_round Rmpfr_rint_trunc Rmpfr_root Rmpfr_rootn_ui Rmpfr_round
@@ -266,7 +274,9 @@ Rmpfr_set_FLOAT128 Rmpfr_get_FLOAT128 Rmpfr_set_DECIMAL128 Rmpfr_get_DECIMAL128
 decimalize check_exact_decimal
 Rmpfr_set_underflow Rmpfr_set_z Rmpfr_sgn Rmpfr_si_div Rmpfr_si_sub Rmpfr_sin
 Rmpfr_sin_cos Rmpfr_sinu Rmpfr_cosu Rmpfr_tanu Rmpfr_sinpi Rmpfr_cospi Rmpfr_tanpi
-Rmpfr_sinh_cosh
+Rmpfr_sinh_cosh Rmpfr_acosu Rmpfr_acospi Rmpfr_asinu Rmpfr_asinpi Rmpfr_atanu
+Rmpfr_atanpi Rmpfr_atan2u Rmpfr_atan2pi
+Rmpfr_pow_sj Rmpfr_log2p1 Rmpfr_log10p1 Rmpfr_compound_si Rmpfr_exp2m1 Rmpfr_exp10m1
 Rmpfr_sinh Rmpfr_sqr Rmpfr_sqrt Rmpfr_sqrt_ui Rmpfr_strtofr Rmpfr_sub
 Rmpfr_sub_q Rmpfr_sub_si Rmpfr_sub_ui Rmpfr_sub_z Rmpfr_subnormalize
 Rmpfr_sum Rmpfr_swap
@@ -290,7 +300,9 @@ Rmpfr_fmodquo Rmpfr_fpif_export Rmpfr_fpif_import Rmpfr_flags_clear Rmpfr_flags_
 Rmpfr_flags_test Rmpfr_flags_save Rmpfr_flags_restore Rmpfr_rint_roundeven Rmpfr_roundeven
 Rmpfr_nrandom Rmpfr_erandom Rmpfr_fmma Rmpfr_fmms Rmpfr_log_ui Rmpfr_gamma_inc Rmpfr_beta
 Rmpfr_round_nearest_away rndna
-atonv nvtoa atodouble doubletoa numtoa atonum Rmpfr_dot Rmpfr_get_str_ndigits Rmpfr_get_str_ndigits_alt
+atonv nvtoa atodouble doubletoa numtoa atonum mpfrtoa anytoa Rmpfr_dot
+Rmpfr_get_str_ndigits Rmpfr_get_str_ndigits_alt
+q_add_fr q_sub_fr q_mul_fr q_div_fr q_cmp_fr fr_cmp_q_rounded
 )]);
 
 
@@ -723,6 +735,11 @@ sub _bases_are_power_of_same_integer {
 sub bytes {
   my($val, $bits, $ret) = (shift, shift);
   my $itsa = _itsa($val);
+
+  # $itsa == 4 implies that $val's POK flag is set && IOK flag is unset.
+  # $itsa == 5 implies that $val is a Math::MPFR::object.
+  # We now croak if neither of those cases is satisfied.
+
   die "1st arg to Math::MPFR::bytes must be either a string or a Math::MPFR object"
     if($itsa != 4 && $itsa != 5);
 
@@ -890,6 +907,132 @@ sub _get_NV_properties {
 
 sub perl_set_fallback_flag {
   $Math::MPFR::doubletoa_fallback++;
+}
+
+sub anytoa {
+
+  die "1st argument given to anytoa() must be a Math::MPFR object"
+    unless Math::MPFR::_itsa($_[0]) == 5;
+
+  die "2nd argument given to anytoa() must be 53 or 64 or 113 or 2098"
+    unless ($_[1] == 53 || $_[1] == 64 || $_[1] == 113 || $_[1] == 2098);
+
+  my $emax = Rmpfr_get_emax();                # Save original value
+  my $emin = Rmpfr_get_emin();                # Save original value
+
+  my ($v, $bits) = (shift, shift);
+
+  my $f_init = Rmpfr_init2($bits);
+
+  my %emax_emin = (53   => [1024,  -1073,  -1022 ],
+                   64   => [16384, -16444, -16382],
+                   2098 => [1024,  -1073,  -1022 ],
+                   113  => [16384, -16493, -16382],
+                  );
+
+  Rmpfr_set_emax($emax_emin{$bits}->[0]);
+  Rmpfr_set_emin($emax_emin{$bits}->[1]);
+
+  # DoubleDouble
+  if($bits == 2098) {
+
+    Rmpfr_strtofr($f_init, "$v", 0, MPFR_RNDN);
+
+    if(!Rmpfr_regular_p($f_init)) {
+      Rmpfr_set_emax($emax);                  # Revert to original value
+      Rmpfr_set_emin($emin);                  # Revert to original value
+      return mpfrtoa($f_init);
+    }
+
+    # Obtain the pair of doubles pertinent to $f_init.
+    # $msd is the "more siginificant double" and $lsd
+    # is the "less significant double".
+
+    my($msd, $lsd) = _mpfr2dd($f_init);
+    if($lsd == 0 ) {
+      my $f = Rmpfr_init2(53);
+      Rmpfr_set_d($f, $msd, MPFR_RNDN);
+      Rmpfr_set_emax($emax);                  # Revert to original value
+      Rmpfr_set_emin($emin);                  # Revert to original value
+      return anytoa($f, 53);
+    }
+
+    # Determine the no. of implied (intermediate)
+    # bits that lie between the end of $msd and
+    # and the start of $lsd
+
+    my $intermediates = _intermediate_bits($msd, $lsd);
+
+    my $f_final = Rmpfr_init2(106 + $intermediates);
+    Rmpfr_set_d($f_final, $msd, MPFR_RNDN);
+    Rmpfr_add_d($f_final, $f_final, $lsd, MPFR_RNDN);
+
+    Rmpfr_set_emax($emax);                    # Revert to original value
+    Rmpfr_set_emin($emin);                    # Revert to original value
+    return mpfrtoa($f_final);
+
+  } # End DoubleDouble
+
+  # The next 4 lines cater for the possibility that
+  # the value is either subnormal or infinite or
+  # zero for the floating point type specified by
+  # the value of $bits.
+
+  my $inex = Rmpfr_strtofr($f_init, "$v", 0, MPFR_RNDN);
+
+  if(Rmpfr_regular_p($f_init) && Rmpfr_get_exp($f_init) < $emax_emin{$bits}->[2]) {
+    # The value is subnormal, and therefore requires further treatment.
+
+    Rmpfr_subnormalize($f_init, $inex, MPFR_RNDN);
+    my ($significand, $exponent) = Rmpfr_deref2($f_init, 2, 0, MPFR_RNDN);
+
+    my $f_final = Rmpfr_init2(1 + $exponent - $emax_emin{$bits}->[1]);
+
+    if($significand =~ s/^\-/-0./) {          # The value is -ve.
+      Rmpfr_strtofr($f_final, "${significand}p$exponent", 2, MPFR_RNDN);
+    }
+    else {                                    # The value is positive
+      Rmpfr_strtofr($f_final, "0.${significand}p$exponent", 2, MPFR_RNDN);
+    }
+    Rmpfr_set_emax($emax);                    # Revert to original value
+    Rmpfr_set_emin($emin);                    # Revert to original value
+    return mpfrtoa($f_final);
+  }
+
+  Rmpfr_set_emax($emax);                      # Revert to original value
+  Rmpfr_set_emin($emin);                      # Revert to original value
+  return mpfrtoa($f_init);
+}
+
+sub _mpfr2dd {
+  # Can be called from anytoa()
+  my $obj = shift;
+  my $msd = Rmpfr_get_d($obj, MPFR_RNDN);
+  $obj -= $msd;
+  return ($msd, Rmpfr_get_d($obj, MPFR_RNDN));
+}
+
+sub _intermediate_bits {
+  # Can be called from anytoa()
+  my($exp1, $exp2) = (_get_exp(shift), _get_exp(shift));
+  return $exp1 - 53 - $exp2;
+}
+
+sub _get_exp {
+  # Can be called from anytoa(), via _intermediate_bits().
+  # For as long as we support perl-5.8, we cannot use
+  # the "d<" and "d>" templates.
+  my $hex;
+  if(LITTLE_ENDIAN) {
+    $hex = scalar reverse unpack "h*", pack "d", $_[0];
+  }
+  else {
+    $hex = unpack "H*", pack "d", $_[0];
+  }
+  my $exp = hex(substr($hex, 0, 3));
+  $exp -= 2048 if $exp > 2047; # Remove sign bit
+  $exp++ unless $exp; # increment if 0
+  return ($exp - 1023);
 }
 
 *Rmpfr_get_z_exp             = \&Rmpfr_get_z_2exp;

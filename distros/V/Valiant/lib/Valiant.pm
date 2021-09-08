@@ -1,6 +1,6 @@
 package Valiant;
 
-our $VERSION = '0.001006';
+our $VERSION = '0.001007';
 $VERSION = eval $VERSION;
 
 1;
@@ -291,7 +291,7 @@ We can rewrite the last class as follows:
     }
 
     sub check_age_lower_limit {
-      my ($self, $opts) = @_;
+      my ($self, $attribute, $value, $opts) = @_;
       $self->errors->add($attribute => "can't be lower than $opts->{min}", $opts) if $value < $opts->{min};
     }
 
@@ -1171,7 +1171,7 @@ Internationalization for L<Valiant> will concern our ability to create tags that
 human readable strings for different languages.  Generally we will create tags, which are
 abstract labels representing a message, and then map those lables to various human languages
 which we wish to support.  In using L<Valiant::I18N> with L<Valiant> there are generally
-three things that we will internationalize
+three things that we will internationalize:
 
 =over 4
 
@@ -1183,16 +1183,170 @@ three things that we will internationalize
 
 =back
 
+L<Valiant> when looking up tags for translations will follow a precedence order which allows 
+you to set base translations for your models, errors and attributes but then override them.
+For example lets say you have a class defined as so:
+
+    package Retiree;
+
+    use Moo;
+    use Valiant::Validations;
+    use Valiant::I18N;
+
+    extends 'Person'
+
+    has 'name' => (is=>'ro');
+
+    validates 'name', sub {
+      my ($self, $attribute, $value, $opts) = @_;
+      $self->errors->add($attribute => _t('too_long'), +{%$opts, count=>36}) if length($value||'') > 36;
+    };
+
+This defines a class with one attribute that has a single validation which makes sure the 'name'
+is less than 36 characters.  Let's see how translations are resolved:
+
+    my $p = Retiree->new(name=>'x'x100);
+    $p->invalid;
+
+    warn $p->model_name->human; # returns "Retiree"
+
+When resolving a translated version of the Model name we check the following tags:
+
+    valiant.models.retiree
+    valiant.models.person
+
+Basically we check each model in the @ISA list, which lets you create a base set of translations
+that you can override.  If none of the tags are defined as translations then we just use the
+humanized version of the package name.  We follow a similar process for translating attributes:
+
+    warn $p->human_attribute_name('name'); " returns "Name"
+
+We check the following tags in order:
+
+    valiant.attributes.retiree.name
+    valiant.attributes.person.name
+    attributes.name
+
+And again if we fail we just use the humanized version of the attribute name ("Name"). Errors
+are similar:
+
+    warn $p->errors->messages_for('name'); "is too long (maximum is 36 characters)"
+
+We follow these tags:
+
+    valiant.errors.models.retiree.attributes.name.too_long
+    valiant.errors.models.retiree.too_long
+    valiant.errors.models.person.attributes.name.too_long
+    valiant.errors.models.person.too_long
+    valiant.errors.messages.too_long
+    errors.attributes.name.too_long
+    errors.messages.too_long
+
+In this case there is no default so if the tag isn't found we just generate an error.
+
+=head2 Substitution Parameters and Pluralization
+
 In the case of error messages there is an additional complication in that often we need to
 customize the message base on the value of the attributes.  For example when the attribute
 represents a number of items often the message for zero items will be different than for
 many (think "You have 3 items in you bag, the minimum is 5" versus "You have no items in
 your bag, the minimum is 5").  The rules for this can be complex depending on the language.
 Therefore in the case of error messages you will need the ability to return a different
-string for those cases.
+string for those cases.   We can see this example in the last error message example above
+which specified a maximum of 36 characters.   The way this works with errors is that when
+adding a error message the final argument hashref is passed to the translator:
 
-For now please see L<Valiant::I18N> for more, and the test suite.  This will need more
-documentation (volunteers welcomed).
+    $self->errors->add($attribute => _t('too_long'), +{%$opts, count=>36}) if length($value||'') > 36;
+
+And the translation tag for this looks like:
+
+    {
+      en => {
+        errors => {
+          messages => {
+            too_long => {
+              one => 'is too long (maximum is 1 character)',
+              other => 'is too long (maximum is {{count}} characters)',
+            },
+          }
+        }
+      }
+    }
+
+Here you can see that when 'count' is 1 we use one translation but when its more than one we
+have a slightly different tag.   Any keys passed to $opts can be used as a subsitution parameter
+but the 'count' parameter is special since its also used for pluralization.   In the case when
+'count' is 0, 1 or more than one we match subkeys as in the example give (when count is 0 we match
+'zero'; when its 1 we match 'one' and if something else we match 'other'.
+
+Please be careful what you pass as options to substitution placeholders since you can open up
+injection style attackes on your code.
+
+=head2 How roles impact translation tag lookups
+
+Since we can't count on role application order we don't by default use roles as translation
+tag namespace lookups in the same way as inherited classes.  However since it can be useful
+to set translation tags at the role level we allow you to indicate that a role should be used
+in the lookup.  Roles so added will be checked after an base classes.   You mark a role for
+lookup via the 'push_to_i18n_lookup' keyword:
+
+    package TestRole;
+
+    use Moo::Role;
+    use Valiant::Validations;
+    use Valiant::I18N;
+
+    validates_with sub {
+      my ($self) = @_;
+      $self->errors->add(undef, 'Failed TestRole');
+      $self->errors->add('name');
+      $self->errors->add(name => _t 'bad', +{ all=>1 } );
+    };
+
+    push_to_i18n_lookup;
+
+Then we'd use 'test_role' as an extra lookup key.   For example if we composed "TestRole" into
+the 'Retiree" class above and then checked the model name we'd use this lookup:
+
+    valiant.models.retiree
+    valiant.models.person
+    valiant.models.role_name
+
+for the 'name' attribute:
+
+We check the following tags in order:
+
+    valiant.attributes.retiree.name
+    valiant.attributes.person.name
+    valiant.attributes.role_name.name
+    attributes.name
+
+And finally for the 'too_long' error tag:
+
+    valiant.errors.models.retiree.attributes.name.too_long
+    valiant.errors.models.retiree.too_long
+    valiant.errors.models.person.attributes.name.too_long
+    valiant.errors.models.person.too_long
+    valiant.errors.models.role_name.attributes.name.too_long
+    valiant.errors.models.role_name.too_long
+    valiant.errors.messages.too_long
+    errors.attributes.name.too_long
+    errors.messages.too_long
+
+=head2 full_messages* version messages*
+
+When getting the text of error messages you can use either the 'full_messages*' or 'messages'
+methods (see L<Valiant::Errors>, L<Valiant::Error>).  The only difference between the 'full' and
+non full messages is that the 'full' versions combine the attribute name with the translated text
+of the error.   The default pattern for this is: "{{attribute}} {{message}}" but you can override
+this as usual following a pattern similar to error lookups.
+
+    valiant.errors.models.person.attributes.name.format
+    valiant.errors.models.person.format
+    errors.format.attributes.name
+    errors.format
+    
+As before we'd also check base classes and roles as indicated.
 
 =head1 FILTERING
 

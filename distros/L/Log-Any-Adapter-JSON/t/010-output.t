@@ -26,10 +26,10 @@ subtest 'plain string' => sub {
     cmp_deeply(
         last_line(),
         {
-            message  => 'hello, world',
-            category => 'main',
-            level    => 'debug',
-            time     => re('^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{0,6}Z$'),
+            message   => 'hello, world',
+            category  => 'main',
+            level     => 'debug',
+            timestamp => re('^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{0,6}Z$'),
         },
         'plain string logged as-is',
     );
@@ -39,10 +39,10 @@ subtest 'plain string' => sub {
     cmp_deeply(
         last_line(),
         {
-            message => 'こんにちは世界',
-            category => 'main',
-            level    => 'debug',
-            time     => re('^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{0,6}Z$'),
+            message   => 'こんにちは世界',
+            category  => 'main',
+            level     => 'debug',
+            timestamp => re('^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{0,6}Z$'),
         },
         'plain high-bit utf8 string logged as-is',
     );
@@ -102,7 +102,7 @@ subtest 'structured data' => sub {
         level               => 'debug',
         list_data           => [['bar', 'foo'], ['qux', '💩']],
         message             => 'Green Eggs and Ham',
-        time                => re('^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{0,6}Z$'),
+        timestamp           => re('^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{0,6}Z$'),
     };
 
     cmp_deeply( last_line(), $wanted, 'Structured data logged correctly');

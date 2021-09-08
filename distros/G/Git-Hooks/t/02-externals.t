@@ -1,6 +1,6 @@
-# -*- cperl -*-
+#!/usr/bin/env perl
 
-use 5.016;
+use v5.16.0;
 use warnings;
 use lib qw/t lib/;
 use Config;
@@ -22,6 +22,7 @@ sub check_can_commit {
     $file->append($testname);
     $repo->run(add => $file);
     test_ok($testname, $repo, 'commit', '-m', $testname);
+    return;
 }
 
 sub check_cannot_commit {
@@ -33,13 +34,14 @@ sub check_cannot_commit {
     } else {
         test_nok($testname, $repo, 'commit', '-m', $testname);
     }
+    return;
 }
 
 # install a hook that succeeds
 my $hooksd = path($repo->git_dir())->child('hooks.d');
-mkdir $hooksd or die "Can't mkdir $hooksd: $!";
+mkdir $hooksd or die "Can't mkdir $hooksd: $!\n";
 my $hookd  = $hooksd->child('pre-commit');
-mkdir $hookd or die "Can't mkdir $hookd: $!";
+mkdir $hookd or die "Can't mkdir $hookd: $!\n";
 my $hook   = $hookd->child('script.pl');
 my $mark   = $hooksd->child('mark');
 
@@ -76,3 +78,5 @@ check_cannot_commit('execute a hook that fails', qr/external hook failure/);
 $repo->run(qw/config githooks.externals 0/);
 
 check_can_commit('do not execute disabled hooks');
+
+1;

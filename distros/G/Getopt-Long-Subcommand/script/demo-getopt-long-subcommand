@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-02-27'; # DATE
-our $VERSION = '0.103'; # VERSION
+our $DATE = '2021-05-30'; # DATE
+our $VERSION = '0.104'; # VERSION
 
 use 5.010;
 use strict;
@@ -139,7 +139,7 @@ demo-getopt-long-subcommand - Script to demonstrate Getopt::Long::Subcommand
 
 =head1 VERSION
 
-This document describes version 0.103 of demo-getopt-long-subcommand (from Perl distribution Getopt-Long-Subcommand), released on 2019-02-27.
+This document describes version 0.104 of demo-getopt-long-subcommand (from Perl distribution Getopt-Long-Subcommand), released on 2021-05-30.
 
 =head1 SYNOPSIS
 
@@ -215,7 +215,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

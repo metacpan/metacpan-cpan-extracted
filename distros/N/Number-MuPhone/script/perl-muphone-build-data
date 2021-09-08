@@ -1,0 +1,270 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use XML::Simple;
+use File::Fetch;
+use LWP::Simple;
+use Data::Dumper 'Dumper';
+
+=head1 NAME
+
+perl-muphone-build-data - ensure phone number regexes stay up to date for Number::MuPhone
+
+=head1 DESCRIPTION
+
+This script keeps a local copy of the Number::MuPhone::Data regexes up to date. For full
+instructions, please see:
+
+    perldoc Number::MuPhone
+
+=cut
+
+# where should the custom data be stored
+my $MUPHONE_BASE_DIR = $ENV{MUPHONE_BASE_DIR} || $ENV{HOME}.'/.muphone';
+
+# where are we getting the libphonenumber release info and source XML from?
+my $LIBPHONENUMBER_RELEASE_URL = 'https://github.com/google/libphonenumber/releases/latest';
+my $LIBPHONENUMBER_XML_URI     = 'https://raw.githubusercontent.com/google/libphonenumber/master/resources/PhoneNumberMetadata.xml';
+
+# enable to make the data module human readable (and bigger)
+my $DEBUG = 1;
+
+# by default, we strip out what we don't (currently) use. If you're curious,
+# turn on $DEBUG (to make readable) and turn off this flag to see everything
+# that's in the XML (that we don't currently use)
+my $STRIP_SUPERFLUOUS_DATA = 1;
+
+# keep track of new release. If updating, don't update release file if not successful
+my $NEW_RELEASE_VERSION = '';
+
+check_environment();
+
+build_data_module();
+
+run_tests();
+
+update_release_file();
+
+exit(0);
+
+# check env, and try to build it out if it's missing
+sub check_environment {
+
+  print "Number::MuPhone custom data is in $MUPHONE_BASE_DIR\n";
+
+  print "Checking/fixing environment\n";
+  unless (-d $MUPHONE_BASE_DIR) {
+    die "Can't create base dir: $!" unless mkdir($MUPHONE_BASE_DIR);
+  }
+
+  unless (-d "$MUPHONE_BASE_DIR/etc") {
+    die "Can't create etc dir: $!" unless mkdir("$MUPHONE_BASE_DIR/etc");
+  }
+
+  unless (-d "$MUPHONE_BASE_DIR/lib") {
+    die "Can't create lib dir: $!" unless mkdir("$MUPHONE_BASE_DIR/lib");
+  }
+
+  unless (-d "$MUPHONE_BASE_DIR/t") {
+    die "Can't create t dir: $!" unless mkdir("$MUPHONE_BASE_DIR/t");
+  }
+
+  -w "$MUPHONE_BASE_DIR/etc"
+    or die "MuPhone config dir isn't writeable";
+
+  -w "$MUPHONE_BASE_DIR/lib"
+    or die "MuPhone lib dir is not writeable";
+
+  -w "$MUPHONE_BASE_DIR/t"
+    or die "MuPhone t dir is not writeable";
+
+  # drop the test in place
+  {
+    open (my $fh, '>', "$MUPHONE_BASE_DIR/t/check_data_module.t") || die $!;
+    print $fh join '',(<DATA>);
+    close($fh);
+  }
+
+  # download new XML file, if needed, else exit here because nothing. To force build, delete
+  # ./etc/release first
+  my $old_release_version = '';
+  if ( open( my $in_fh, '<', "$MUPHONE_BASE_DIR/etc/release" ) ) {
+    $old_release_version = <$in_fh>;
+    close($in_fh);
+  }
+
+  print "Retrieving info on latest release of libphonenumber from $LIBPHONENUMBER_RELEASE_URL\n";
+  my $res = head($LIBPHONENUMBER_RELEASE_URL)
+              or die "Couldn't retreive libphonenumber release info from $LIBPHONENUMBER_RELEASE_URL - try agin in a minute or so? (probably network error)";
+  ($NEW_RELEASE_VERSION) = $res->request->uri =~ m|/([^/]+)$|;
+  if ($old_release_version eq $NEW_RELEASE_VERSION) {
+    print "No new release - nothing to do\n";
+    exit(0);
+  }
+  else {
+    print "Retrieving updated metadata from $LIBPHONENUMBER_XML_URI\n";
+    # get the XML file
+    my $ff = File::Fetch->new( uri => $LIBPHONENUMBER_XML_URI );
+    $ff->fetch( to => "$MUPHONE_BASE_DIR/etc/" )
+      or die $ff->error;
+  }
+}
+
+sub build_data_module {
+
+  print "Building out the data module\n";
+
+  my $src_xml_path = "$MUPHONE_BASE_DIR/etc/PhoneNumberMetadata.xml";
+
+  my $module_data = {};
+  # first we grab the raw XML data, as the Country names are only available in comments
+  {
+    local $/;
+    open(my $in, '<', $src_xml_path) || die $!;
+    my $raw_xml_data = <$in>;
+    close($in);
+
+    # Have to get country names from source XML - they're only in the comments!
+    my $countries = { reverse $raw_xml_data =~ /<!-- ([^>]*) \((\w{2})\) -->\s*(?:<!--[^>]+-->\s*){0,}\S*<territory/gs };
+    $module_data->{countries} = $countries;
+  }
+
+  # read in XML file to build out country specific data
+  my $territories;
+  {
+    no warnings;
+    my $xml_data = XMLin($src_xml_path);
+    $territories = $xml_data->{territories}->{territory};
+    # the libphonenumber XML file throws id warnings because of special cases (id 001)
+    # we don't cater for these special numbers
+    delete $territories->{'001'};
+  }
+
+  # clean up the territory data that we need
+  my $international_dial_codes;
+  foreach my $territory ( keys %$territories ) {
+    my $data = $territories->{$territory};
+    $data->{TerritoryName} = $module_data->{countries}->{$territory}
+      or die "Bad territory: $territory";
+
+    my $country_code = $data->{countryCode};
+
+    push @{ $international_dial_codes->{$country_code} }, $territory;
+
+    # clean up number pattern regexes
+    foreach my $key (keys %$data) {
+      ref $data->{$key} eq 'HASH'
+        and $data->{$key}->{nationalNumberPattern}
+        and $data->{$key}->{nationalNumberPattern} =~ s/\s//g;
+    }
+
+    # clean up number format regexes
+    # coming from XML, multiple numberFormats are an arrayref of hashes,
+    # but if there's only one numberFormat, it will be a hash that needs
+    # to be coerced into an arrayref
+    $data->{availableFormats}->{numberFormat} ||= [];
+    if (ref $data->{availableFormats}->{numberFormat} eq 'HASH') {
+      $data->{availableFormats}->{numberFormat} = [ $data->{availableFormats}->{numberFormat} ];
+    }
+
+    # strip out any formats where intlFormat is 'NA' - these are local number formats and we don't support them
+    $data->{availableFormats}->{numberFormat} = [
+      grep { !defined $_->{intlFormat} or $_->{intlFormat} ne 'NA' } @{$data->{availableFormats}->{numberFormat} }
+    ];
+
+    foreach my $format ( @{ $data->{availableFormats}->{numberFormat} } ) {
+      # we don't care about leadingDigits except for last entry
+      # (can't think of a Perl use case for this that wouldn't be easier in Javascript)
+      if ( ref $format->{leadingDigits} eq 'ARRAY' ) {
+        $format->{leadingDigits} = $format->{leadingDigits}->[-1];
+      }
+      # clean it up if it's a regex
+      $format->{leadingDigits} ||= '';
+      $format->{leadingDigits} =~ s/\s//g;
+    }
+
+    $data->{CountryCode} = $territory;
+
+    # strip out the attributes we don't currently use
+    if ($STRIP_SUPERFLUOUS_DATA) {
+      delete $data->{$_}
+        for ( qw(fixedLine mobile personalNumber tollFree premiumRate references noInternationalDialling pager
+                 voip mobileNumberPortableRegion uan sharedCost voicemail\
+                 carrierCodeFormattingRule nationalPrefixForParsing carrierCodeFormattingRule
+                 nationalPrefixTransformRule) );
+    }
+
+    $module_data->{territories}->{$territory} = $data;
+  }
+
+  # sort the IDD codes so that the default country is first in the arrayref as a default. Keeping the others
+  # there right now because I'll probably tighten up the regexes later
+  IDD: foreach my $idd (keys %$international_dial_codes) {
+    foreach my $country (@{ $international_dial_codes->{$idd} } ) {
+      $international_dial_codes->{$idd} = [
+        sort {
+          my $is_a_main = $module_data->{territories}->{$a}->{mainCountryForCode} ? 1 : 0;
+          my $is_b_main = $module_data->{territories}->{$b}->{mainCountryForCode} ? 1 : 0;
+          $is_a_main <=> $is_b_main;
+        } @{ $international_dial_codes->{$idd} }
+      ];
+    }
+  }
+
+  $module_data->{idd_codes} = $international_dial_codes;
+
+  # now we have the data built out, let's dump it into the data module:
+  $Data::Dumper::Indent   = $DEBUG ? 1 : 0;
+  $Data::Dumper::Purity   = 1;
+  $Data::Dumper::Terse    = 1;
+  $Data::Dumper::Pair     = $DEBUG ? '=>':',';
+  $Data::Dumper::Deepcopy = 1;
+
+  my $out_file = "$MUPHONE_BASE_DIR/lib/NumberMuPhoneData.pm";
+  open (my $fh, '>', $out_file)
+    or die "Can't write data module ($out_file) - $!";
+
+  print $fh
+    "package Number::MuPhone::Data;\nuse Exporter;\nour \@ISA='Exporter';\nour \@EXPORT_OK=qw(\$MUPHONE_DATA);\nour \$MUPHONE_DATA = ",
+    Data::Dumper::Dumper($module_data),
+    ";\n\n1;";
+
+  close($fh);
+
+
+}
+
+sub run_tests {
+  my $result = `prove -v $MUPHONE_BASE_DIR/t/check_data_module.t`;
+  $result =~ /All tests successful/
+    or die "Something went wrong - see test output:\n$result";
+  print "Tests passed\n";
+}
+
+sub update_release_file {
+  open (my $out_fh, '>', "$MUPHONE_BASE_DIR/etc/release" ) || die "Can't update release file: $!";
+  print $out_fh $NEW_RELEASE_VERSION;
+  close($out_fh);
+}
+
+1;
+
+
+# Here's the basic sanity test script - gets dumped in the custom dir
+__DATA__
+#!/usr/bin/env perl
+use v5.020;
+use Test::More;
+use Data::Dumper 'Dumper';
+my $MUPHONE_BASE_DIR = $ENV{MUPHONE_BASE_DIR} || $ENV{HOME}.'/.muphone';
+
+require_ok "$MUPHONE_BASE_DIR/lib/NumberMuPhoneData.pm";
+
+my $data = $Number::MuPhone::Data::MUPHONE_DATA;
+
+ok( $data->{countries},      "Country lookup" );
+ok( $data->{territories},    "Territory Data" );
+ok( $data->{idd_codes},      "International Dial Codes" );
+
+done_testing();
+

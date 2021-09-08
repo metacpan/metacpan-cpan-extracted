@@ -92,7 +92,7 @@ describe Money, "formatting" do
         I18n.locale = :de
         I18n.backend.store_translations(
             :de,
-            number: { currency: { format: { delimiter: ".", separator: ",", delimiter_pattern: /(\d)(?=\d)/ } } }
+            number: { currency: { format: { delimiter: ".", separator: "," } } }
         )
       end
 
@@ -104,10 +104,6 @@ describe Money, "formatting" do
 
       it "should use ',' as the decimal mark" do
         expect(money.decimal_mark).to eq ','
-      end
-
-      it "should use delimiter pattern" do
-        expect(Money.new(1_456_00, "EUR").format).to eq "€1.4.5.6,00"
       end
     end
 
@@ -452,12 +448,17 @@ describe Money, "formatting" do
     describe ":thousands_separator option" do
       specify "(thousands_separator: a thousands_separator string) works as documented" do
         expect(Money.us_dollar(100000).format(thousands_separator: ".")).to eq "$1.000.00"
+        expect(Money.us_dollar(100000).format(thousands_separator: ".")).to eq "$1.000.00"
         expect(Money.us_dollar(200000).format(thousands_separator: "")).to eq "$2000.00"
       end
 
       specify "(thousands_separator: false or nil) works as documented" do
         expect(Money.us_dollar(100000).format(thousands_separator: false)).to eq "$1000.00"
         expect(Money.us_dollar(200000).format(thousands_separator: nil)).to eq "$2000.00"
+      end
+
+      specify "(thousands_separator: true) works as documented" do
+        expect(Money.us_dollar(100000).format(thousands_separator: true)).to eq "$1,000.00"
       end
 
       specify "(delimiter: a delimiter string) works as documented" do
@@ -468,6 +469,10 @@ describe Money, "formatting" do
       specify "(delimiter: false or nil) works as documented" do
         expect(Money.us_dollar(100000).format(delimiter: false)).to eq "$1000.00"
         expect(Money.us_dollar(200000).format(delimiter: nil)).to eq "$2000.00"
+      end
+
+      specify "(delimiter: true) works as documented" do
+        expect(Money.us_dollar(100000).format(delimiter: true)).to eq "$1,000.00"
       end
 
       it "defaults to ',' if currency isn't recognized" do
@@ -717,6 +722,12 @@ describe Money, "formatting" do
         expect(money.format(format: '%n%u', sign_before_symbol: false)).to eq('-99.99$')
         expect(money.format(format: '%u%n', sign_before_symbol: false)).to eq('$-99.99')
         expect(money.format(format: '%u%n', sign_before_symbol: true)).to eq('-$99.99')
+      end
+    end
+
+    describe ':delimiter_pattern option' do
+      it "should use delimiter pattern" do
+        expect(Money.new(1_456_00, "EUR").format(delimiter_pattern: /(\d)(?=\d)/)).to eq "€1.4.5.6,00"
       end
     end
 

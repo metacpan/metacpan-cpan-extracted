@@ -1,14 +1,28 @@
 # -*- perl -*-
 # t/004-set-targets-t
-use strict;
+use 5.14.0;
 use warnings;
 use Devel::Git::MultiBisect::AllCommits;
 use Devel::Git::MultiBisect::Opts qw( process_options );
-use Test::More tests => 20;
+use Test::More;
+unless (
+    $ENV{PERL_LIST_COMPARE_GIT_CHECKOUT_DIR}
+        and
+    (-d $ENV{PERL_LIST_COMPARE_GIT_CHECKOUT_DIR})
+) {
+    plan skip_all => "No git checkout of List-Compare found";
+}
+else {
+    plan tests => 24;
+}
+use Carp;
 use Cwd;
 use File::Spec;
+use File::Temp qw( tempdir );
 
-my $cwd = cwd();
+my $startdir = cwd();
+chdir $ENV{PERL_LIST_COMPARE_GIT_CHECKOUT_DIR}
+    or croak "Unable to change to List-Compare checkout directory";
 
 my (%args, $params, $self);
 my ($good_gitdir, $good_last_before, $good_last);
@@ -17,7 +31,7 @@ my $bad_target_args;
 
 note("Test use of 'last_before' option");
 
-$good_gitdir = File::Spec->catdir($cwd, qw| t lib list-compare |);
+$good_gitdir = cwd();
 $good_last_before = '2614b2c2f1e4c10fe297acbbea60cf30e457e7af';
 $good_last = 'd304a207329e6bd7e62354df4f561d9a7ce1c8c2';
 %args = (
@@ -25,11 +39,16 @@ $good_last = 'd304a207329e6bd7e62354df4f561d9a7ce1c8c2';
     #    targets => [ @good_targets ],
     last_before => $good_last_before,
     last => $good_last,
+    outputdir => tempdir( CLEANUP => 1 ),
 );
 $params = process_options(%args);
 $self = Devel::Git::MultiBisect::AllCommits->new($params);
 ok($self, "new() returned true value");
 isa_ok($self, 'Devel::Git::MultiBisect::AllCommits');
+for my $d (qw| gitdir outputdir |) {
+    ok(defined $self->{$d}, "'$d' has been defined");
+    ok(-d $self->{$d}, "'$d' exists: $self->{$d}");
+}
 
 $target_args = [
     File::Spec->catdir( qw| t 44_func_hashes_mult_unsorted.t |),
@@ -106,13 +125,14 @@ note("targets provided via new()");
     #    targets => [ @good_targets ],
     last_before => $good_last_before,
     last => $good_last,
+    outputdir => tempdir( CLEANUP => 1 ),
 );
 $params = process_options(%args);
 $self = Devel::Git::MultiBisect::AllCommits->new($params);
 ok($self, "new() returned true value");
 isa_ok($self, 'Devel::Git::MultiBisect::AllCommits');
 
-$good_gitdir = File::Spec->catdir($cwd, qw| t lib list-compare |);
+$good_gitdir = cwd();
 $good_last_before = '2614b2c2f1e4c10fe297acbbea60cf30e457e7af';
 $good_last = 'd304a207329e6bd7e62354df4f561d9a7ce1c8c2';
 %args = (
@@ -120,6 +140,7 @@ $good_last = 'd304a207329e6bd7e62354df4f561d9a7ce1c8c2';
     #    targets => [ @good_targets ],
     last_before => $good_last_before,
     last => $good_last,
+    outputdir => tempdir( CLEANUP => 1 ),
 );
 $params = process_options(%args);
 $target_args = [
@@ -142,5 +163,6 @@ is_deeply(
     "Got expected full paths to target files for testing",
 );
 
+chdir $startdir or croak "Unable to return to $startdir";
 
 __END__

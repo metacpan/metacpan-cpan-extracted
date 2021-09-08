@@ -152,7 +152,7 @@ unsigned char* get_message_digest(SV* text_SV, int hash_method)
     }
 }
 
-SV* bn2sv(const BIGNUM* p_bn)
+SV* cor_bn2sv(const BIGNUM* p_bn)
 {
     return p_bn != NULL
         ? sv_2mortal(newSViv((IV) BN_dup(p_bn)))
@@ -467,14 +467,14 @@ PPCODE:
     RSA_get0_factors(rsa, &p, &q);
     RSA_get0_crt_params(rsa, &dmp1, &dmq1, &iqmp);
 #endif
-    XPUSHs(bn2sv(n));
-    XPUSHs(bn2sv(e));
-    XPUSHs(bn2sv(d));
-    XPUSHs(bn2sv(p));
-    XPUSHs(bn2sv(q));
-    XPUSHs(bn2sv(dmp1));
-    XPUSHs(bn2sv(dmq1));
-    XPUSHs(bn2sv(iqmp));
+    XPUSHs(cor_bn2sv(n));
+    XPUSHs(cor_bn2sv(e));
+    XPUSHs(cor_bn2sv(d));
+    XPUSHs(cor_bn2sv(p));
+    XPUSHs(cor_bn2sv(q));
+    XPUSHs(cor_bn2sv(dmp1));
+    XPUSHs(cor_bn2sv(dmq1));
+    XPUSHs(cor_bn2sv(iqmp));
 }
 
 SV*
@@ -706,7 +706,7 @@ PPCODE:
                       p_rsa->rsa))
     {
         case 0:
-            CHECK_OPEN_SSL(ERR_peek_error());
+            ERR_clear_error();
             XSRETURN_NO;
             break;
         case 1:

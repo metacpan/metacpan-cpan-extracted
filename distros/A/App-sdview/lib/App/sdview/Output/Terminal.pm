@@ -7,7 +7,7 @@ use v5.26;
 
 use Object::Pad;
 
-package App::sdview::Output::Terminal 0.03;
+package App::sdview::Output::Terminal 0.04;
 class App::sdview::Output::Terminal :strict(params);
 
 use constant format => "terminal";
@@ -32,8 +32,18 @@ my %PARASTYLES = (
    # TODO head4
    plain    => { indent => 6, blank_after => 1 },
    verbatim => { indent => 8, blank_after => 1, $FORMATSTYLES{C}->%* },
+   list     => { indent => 6 },
 );
 $PARASTYLES{item} = $PARASTYLES{plain};
+
+sub _convert_str ( $s )
+{
+   return $s->clone(
+      convert_tags => {
+         ( map { $_ => do { my $k = $_; sub { $FORMATSTYLES{$k}->%* } } } keys %FORMATSTYLES ),
+      },
+   );
+}
 
 method output ( @paragraphs )
 {
@@ -51,13 +61,15 @@ method output ( @paragraphs )
    while ( @paragraphs ) {
       my $para = shift @paragraphs;
 
-      my $margin;
+      my $margin = 0;
       my $leader;
       my %typestyle;
+      my $indent;
 
       if( ref $para eq "HASH" ) {
          $margin = $para->{margin};
-         $leader = sprintf "%-*s", $margin, $para->{leader};
+         $leader = $para->{leader};
+         $indent = $para->{indent};
 
          %typestyle = ( $para->%* );
 
@@ -69,21 +81,25 @@ method output ( @paragraphs )
 
          my $n = 1;
 
+         my $indent = $PARASTYLES{list}{indent} // 0;
+
          unshift @paragraphs, map {
             my $item = $_;
+            my $leader;
             if( $item->type ne "item" ) {
                # non-items just stand as they are + indent
-               { para => $item, margin => $margin + $para->indent }
             }
             elsif( $listtype eq "bullet" ) {
-               { para => $item, margin => $margin + $para->indent, leader => "*" }
+               $leader = String::Tagged->new( "*" );
             }
             elsif( $listtype eq "number" ) {
-               { para => $item, margin => $margin + $para->indent, leader => sprintf "%d.", $n++ }
+               $leader = String::Tagged->sprintf( "%d.", $n++ );
             }
             elsif( $listtype eq "text" ) {
-               { para => $item, margin => $margin, blank_after => 0 }
+               $leader = _convert_str( $item->term );
             }
+
+            { para => $item, margin => $margin + $indent, indent => $para->indent, leader => $leader }
          } $para->items;
          next;
       }
@@ -92,11 +108,7 @@ method output ( @paragraphs )
 
       %typestyle = ( $PARASTYLES{ $para->type }->%*, %typestyle );
 
-      my $s = $para->text->clone(
-         convert_tags => {
-            ( map { $_ => do { my $k = $_; sub { $FORMATSTYLES{$k}->%* } } } keys %FORMATSTYLES ),
-         },
-      );
+      my $s = _convert_str( $para->text );
 
       $typestyle{$_} and $s->apply_tag( 0, -1, $_ => $typestyle{$_} )
          for qw( fg bg bold under italic monospace );
@@ -104,19 +116,20 @@ method output ( @paragraphs )
       $nextblank = !!$typestyle{blank_after};
 
       my @lines = $s->split( qr/\n/ );
+      @lines or @lines = ( String::Tagged->new ) if defined $leader;
 
-      my $indent = $typestyle{indent} // 0;
-      $indent += $margin;
+      $indent //= $typestyle{indent};
+      $indent //= 0;
 
       foreach my $line ( @lines ) {
-         length $line or
+         length $line or defined $leader or
             ( print "\n" ), next;
 
          $s = String::Tagged::Terminal->new_from_formatting( $line );
 
-         my $width = $TERMWIDTH - $indent - length($leader // "");
+         my $width = $TERMWIDTH - $margin - $indent;
 
-         while( length $s ) {
+         while( length $s or defined $leader ) {
             my $part;
             if( length($s) > $width ) {
                if( substr($s, 0, $width) =~ m/(\s+)\S*$/ ) {
@@ -135,11 +148,27 @@ method output ( @paragraphs )
                $s = "";
             }
 
-            print " "x($indent - length($leader // ""));
-            print $leader if defined $leader;
-            print $part->build_terminal . "\n";
+            if( defined $leader ) {
+               $leader = String::Tagged::Terminal->new_from_formatting( $leader );
 
-            undef $leader;
+               if( length $leader <= $indent ) {
+                  # If the leader will fit on the same line
+                  print " "x$margin, $leader->build_terminal, " "x($indent - length $leader);
+               }
+               else {
+                  # Spill the leader onto its own line
+                  print " "x$margin, $leader->build_terminal;
+
+                  print "\n", " "x$margin, " "x$indent if length $part;
+               }
+
+               undef $leader;
+            }
+            else {
+               print " "x$margin, " "x$indent;
+            }
+
+            print $part->build_terminal . "\n";
          }
       }
    }

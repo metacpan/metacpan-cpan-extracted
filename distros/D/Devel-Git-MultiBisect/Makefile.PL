@@ -12,8 +12,9 @@ my %WriteMakefileArgs = (
     NAME         => 'Devel::Git::MultiBisect',
     VERSION_FROM => 'lib/Devel/Git/MultiBisect.pm', # finds \$VERSION
     AUTHOR       => 'James E Keenan (jkeenan@cpan.org)',
-    ABSTRACT     => 'Study test output over a range of git commits',
+    ABSTRACT     => 'Study build or test output over a range of git commits',
     MIN_PERL_VERSION => '5.14.0',
+    LICENSE      => 'perl_5',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
         'Devel::CheckBin' => 0,
@@ -35,7 +36,7 @@ my %WriteMakefileArgs = (
     TEST_REQUIRES => {
         'Test::Simple' => 0.44,
         'Capture::Tiny' => 0,
-        'IO::CaptureOutput' => 0,
+        'Data::Dump' => 0,
     },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( META_MERGE => {
       'meta-spec' => { version => 2 },

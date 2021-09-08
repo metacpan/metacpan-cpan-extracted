@@ -1,5 +1,10 @@
 Revision history for Perl extension Text-Conceal
 
+0.9901 2021-08-30T03:08:19Z
+
+    - Add test code.
+    - May fix error on buggy perl v5.18.[01].
+
 0.99 2020-11-19T00:34:03Z
 
     - CPAN release.

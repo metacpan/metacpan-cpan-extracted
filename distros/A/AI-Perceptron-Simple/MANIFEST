@@ -1,5 +1,5 @@
 Changes
-docs/AI-Perceptron-Simple-1.01.html
+docs/AI-Perceptron-Simple-1.02.html
 docs/book_list.csv
 docs/specifications.t
 lib/AI/Perceptron/Simple.pm
@@ -12,6 +12,7 @@ t/00-manifest.t
 t/00-pod-coverage.t
 t/00-pod.t
 t/02-creation.t
+t/02-state_portable.t
 t/02-state_synonyms.t
 t/04-train.t
 t/04-train_synonyms_exercise.t
@@ -38,6 +39,8 @@ t/perceptron_1.nerve
 t/perceptron_exercise.nerve
 t/perceptron_state_synonyms.nerve
 t/perceptron_tame.nerve
+t/portable.nerve
+t/portable_nerve.yaml
 xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -120,7 +120,7 @@ static SV* get_##member(pTHX_ SV *uri) { \
     str->chunk, \
     str->allocated, \
     str->length, \
-    str->length, \
+    (int)str->length, \
     str->string \
   )); \
 
@@ -850,6 +850,18 @@ void uri_scan(pTHX_ uri_t *uri, const char *src, size_t len) {
       str_set(aTHX_ uri->frag, &src[idx], brk);
     }
   }
+}
+
+/*
+ * Helper function that returns true if any part of the authority section is
+ * set.
+ */
+static inline
+int has_authority(pTHX_ uri_t *uri) {
+  return uri->host->length > 0
+      || uri->usr->length > 0
+      || uri->pwd->length > 0
+      || uri->port->length > 0;
 }
 
 /*------------------------------------------------------------------------------
@@ -1780,9 +1792,9 @@ void remove_dot_segments(pTHX_ uri_str_t *out, const char *path, size_t len) {
  *----------------------------------------------------------------------------*/
 static
 void absolute(pTHX_ SV *sv_target, SV *sv_uri, SV *sv_base) {
+  uri_t *target = URI(sv_target);
   uri_t *rel    = URI(sv_uri);
   uri_t *base   = URI(sv_base);
-  uri_t *target = URI(sv_target);
 
   const char *class = class_name(aTHX_ sv_target);
 
@@ -1844,7 +1856,7 @@ void absolute(pTHX_ SV *sv_target, SV *sv_uri, SV *sv_base) {
             str_append(aTHX_ merged, rel->path->string, rel->path->length);
           }
           else {
-            if (strstr(base->path->string, "/") != NULL) {
+            if (base->path->length > 0 && strstr(base->path->string, "/") != NULL) {
               // truncate base path at right-most /, inclusive
               str_append(aTHX_ merged, base->path->string, base->path->length);
               str_rtrim(aTHX_ merged, '/');
@@ -1920,7 +1932,7 @@ void normalize(pTHX_ SV *uri_obj) {
   if (uri->path->length > 0
    && strchr(uri->path->string, '.') != NULL)
   {
-    uri_str_t *tmp = str_new(aTHX_ uri->path->length);
+    uri_str_t *tmp = str_new(aTHX_ URI_SIZE_path);
     remove_dot_segments(aTHX_ tmp, uri->path->string, uri->path->length);
     str_free(aTHX_ uri->path);
     uri->path = tmp;
@@ -1934,6 +1946,11 @@ void normalize(pTHX_ SV *uri_obj) {
   normalize_encoding(aTHX_ uri->path,  URI_CHARS_PATH,  uri->is_iri);
   normalize_encoding(aTHX_ uri->query, URI_CHARS_QUERY, uri->is_iri);
   normalize_encoding(aTHX_ uri->frag,  URI_CHARS_FRAG,  uri->is_iri);
+
+  // (6.2.3) empty path should be represented as "/" when authority is present
+  if (uri->path->length == 0 && has_authority(aTHX_ uri)) {
+    str_set(aTHX_ uri->path, "/", 1);
+  }
 }
 
 /*
@@ -1941,21 +1958,24 @@ void normalize(pTHX_ SV *uri_obj) {
  * returns stripped, and backslashes replaced with forward slashes.
  */
 SV* html_url(pTHX_ SV *uri, SV *base) {
+  SV *rv;
   size_t i = 0;
   size_t len;
-  const char *in = SvPV_nomg_const(uri, len);
-  uri_str_t *out = str_new(aTHX_ len);
+  const char *in = SvPV_const(uri, len);
+  uri_str_t *out = str_new(aTHX_ 32);
 
   if (in[0] == '/' && in[1] == '/') {
     if (base != NULL && (SvOK(base) || SvROK(base))) {
       uri_t *base_uri = URI(base);
-      str_append(aTHX_ out, base_uri->scheme->string, base_uri->scheme->length);
-      str_append(aTHX_ out, ":", 1);
+      if (base_uri->scheme->length > 0) {
+        str_append(aTHX_ out, base_uri->scheme->string, base_uri->scheme->length);
+        str_append(aTHX_ out, ":", 1);
+      }
     }
   }
 
   // Remove characters specified by the URL standard
-  for (i = 0; i < len + 1; ++i) {
+  for (i = 0; i < len; ++i) {
     switch (in[i]) {
       // Strip tabs, line feeds, and carriage returns
       case '\t':
@@ -1974,7 +1994,16 @@ SV* html_url(pTHX_ SV *uri, SV *base) {
     }
   }
 
-  return URI_STR_2SV(out);
+  rv = URI_STR_2SV(out);
+  str_free(aTHX_ out);
+
+  // If the source uri was utf8, ensure that the flag is flipped for the output
+  // buffer as well.
+  if (DO_UTF8(uri)) {
+    sv_utf8_decode(rv);
+  }
+
+  return rv;
 }
 
 
@@ -2416,6 +2445,8 @@ SV* port(self, ...)
 
 SV* frag(self, ...)
   SV *self
+  ALIAS:
+    fragment = 1
   CODE:
     if (items > 1) set_frag(aTHX_ self, ST(1));
     RETVAL = get_frag(aTHX_ self);

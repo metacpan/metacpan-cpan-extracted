@@ -2,6 +2,19 @@ Revision history for AI-Perceptron-Simple
 
 The specifications and offline documentation can be found in the "docs" directory
 
+Version 1.02    26 AUGUST 2021
+    * minimum perl version changed to 5.8.1 due to YAML
+    * fix test for display_confusion_matrix
+        * modifier "n" ( >= perl 5.22 ) changed to primitive '?:', 5.22 is too high
+        * fixed inaccurate test for output
+    * YAML (nerve file) for portability supported
+        * make subroutines exportable, the names are too long
+           * :local_data
+           * :portable_data
+    * cleaned & refactored codes
+        * &display_confusion_matrix
+    * improved the documentation
+
 Version 1.01    24 AUGUST 2021
 * Fixed some technical issues
     * fixed test scripts not run in correct sequence

@@ -8,13 +8,14 @@ BEGIN {
   use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS);
   @ISA = qw(Exporter);
 
-  $VERSION = '0.004';
+  $VERSION = '0.006';
 
   @EXPORT_OK = qw(beet_info);
   %EXPORT_TAGS = [ qw() ];
 }
 
 use Carp qw(croak);
+use Encode;
 
 use IPC::Cmd qw(run);
 
@@ -33,7 +34,7 @@ sub beet_info {
     buffer  => \$buffer,
     timeout => 20,
   )) {
-    %info = $buffer =~ /\s*(\S+):\s(.+)/g;
+    %info = map { decode_utf8($_) } ($buffer =~ /\s*(\S+):\s(.+)/g);
   }
   return \%info;
 }

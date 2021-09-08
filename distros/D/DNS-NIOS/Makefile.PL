@@ -15,7 +15,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.008008;
 use ExtUtils::MakeMaker;
 
 BEGIN {
@@ -87,40 +87,54 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "DNS-NIOS",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.006",
+  "MIN_PERL_VERSION" => "5.008008",
   "NAME" => "DNS::NIOS",
   "PL_FILES" => {},
   "PREREQ_PM" => {
+    "Class::Method::Modifiers" => 0,
     "Class::Tiny" => 0,
     "JSON" => 0,
     "LWP::UserAgent" => 0,
     "MIME::Base64" => 0,
+    "Role::Tiny" => 0,
+    "Try::Tiny" => 0,
     "URI" => 0,
     "URI::QueryParam" => 0,
-    "strictures" => 0
+    "namespace::clean" => 0,
+    "strictures" => "2.000006"
   },
   "TEST_REQUIRES" => {
+    "Class::Method::Modifiers" => 0,
+    "Class::Tiny" => 0,
     "Data::GUID" => 0,
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "JSON" => 0,
+    "LWP::UserAgent" => 0,
     "List::Util" => "1.33",
+    "MIME::Base64" => 0,
     "Mojolicious" => 0,
     "Mojolicious::Plugin::BasicAuth" => 0,
     "Net::EmptyPort" => 0,
+    "Role::Tiny" => 0,
     "Test::Deep::NoTest" => 0,
     "Test::Fatal" => 0,
     "Test::More" => "0.98",
-    "strictures" => 0
+    "Try::Tiny" => 0,
+    "URI" => 0,
+    "URI::QueryParam" => 0,
+    "namespace::clean" => 0,
+    "strictures" => "2.000006"
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
 my %FallbackPrereqs = (
+  "Class::Method::Modifiers" => 0,
   "Class::Tiny" => 0,
   "Data::GUID" => 0,
   "File::Spec" => 0,
@@ -133,12 +147,15 @@ my %FallbackPrereqs = (
   "Mojolicious" => 0,
   "Mojolicious::Plugin::BasicAuth" => 0,
   "Net::EmptyPort" => 0,
+  "Role::Tiny" => 0,
   "Test::Deep::NoTest" => 0,
   "Test::Fatal" => 0,
   "Test::More" => "0.98",
+  "Try::Tiny" => 0,
   "URI" => 0,
   "URI::QueryParam" => 0,
-  "strictures" => 0
+  "namespace::clean" => 0,
+  "strictures" => "2.000006"
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION('6.63_03') } ) {

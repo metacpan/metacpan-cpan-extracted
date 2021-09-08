@@ -6,7 +6,7 @@ use Catmandu::Sane;
 use PICA::Data qw(pica_writer);
 use Moo;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 with 'Catmandu::Exporter';
 

@@ -1,5 +1,8 @@
 Revision history for Net-SNMP-Mixin-ArubaCX-Dot1qFdb
 
+0.02    Wed, 25 Aug 2021 21:23:27 +0200
+        fixed POD typos in examples
+
 0.01    Tue, 24 Aug 2021 17:22:19 +0200
         First developer release.
 

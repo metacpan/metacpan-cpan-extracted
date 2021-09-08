@@ -26,7 +26,7 @@ where the only valid option at the moment is
 
 EOD
 
-our $VERSION = '0.025';
+our $VERSION = '0.026';
 
 my $rdln = Term::ReadLine->new ('Solve Sudoku and other set-allocation puzzles');
 my $OUT = $rdln->OUT || \*STDOUT;
@@ -117,7 +117,7 @@ sub get {
 sub help {
     if (my $cmd = $parm{webcmd}) {
 	system {$cmd} $cmd,
-	    'https://metacpan.org/release/Games-Sudoku-General';
+	    'https://metacpan.org/dist/Games-Sudoku-General';
     } else {
 	my $os_specific = "_help_$^O";
 	__PACKAGE__->can ($os_specific) ? __PACKAGE__->$os_specific :
@@ -692,7 +692,7 @@ This setting does not correspond to any attribute of the underlying
 L<Games::Sudoku::General> object. It is the name of the command to be
 used to launch a web browser. If this is set to a value which is true
 in the Perl sense, it will be used by the help command to launch a web
-browser and open L<https://metacpan.org/release/Games-Sudoku-General>.
+browser and open L<https://metacpan.org/dist/Games-Sudoku-General>.
 
 Mac OS X users will find C<'open'> a useful value; Windows users will
 find C<'start'> useful. All others should probably use the name of your

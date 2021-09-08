@@ -30,6 +30,7 @@ sub new_ftpssl
 		{
 			my $cwd = $xftp->{xftp}->pwd();
 			$xftp->{cwd} = $cwd  if ($cwd);
+			$xftp->{protocol} = 'Net::FTPSSL';
 			return $xftp;
 		}
 	}
@@ -39,6 +40,11 @@ sub new_ftpssl
 	}
 	$@ ||= 'Invalid Password?';
 	return undef;
+}
+
+sub protocol
+{
+	return shift->{protocol};
 }
 
 {

@@ -1,20 +1,69 @@
 Revision history for Config-XrmDatabase
 
+0.04      2021-08-24 15:51:23-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * constructor can bulk load entries
+
+0.03      2021-08-24 15:51:23-04:00 America/New_York
+
+  [API BREAKAGE]
+
+    * The to_kv method now takes an option hash, not a single value.
+
+    * The query routine didn't document its return value (?!?) and
+      what it returned has changed. So is this really an API break?
+
+    * minimum Perl is now 5.26.
+
+
+  [BUG FIX]
+
+    * query(): the name of the matched key was incorrectly generated.
+
+    * merge() was totally broken.
+
+  [ENHANCEMENTS]
+
+    * new method to_kv_arr, similar to to_kv, but the resource names
+      are returned as arrays of components.
+
+    * query() return value
+
+        * by default returns the value on match or undef on failure.
+
+        * may alternatively return a reference to the value so the
+          user can distinguish between an undef value and a failed
+          match
+
+        * may alternatively return a hash of all of the data
+          associated with the db entry that matched
+
+    * query() failure action may now be specified
+
+        * returns undef (default)
+
+        * throws exception
+
+        * caller can provide callback
+
+
 0.02      2021-08-20 14:54:32-04:00 America/New_York
 
   [BUILD]
 
-   * don't run tests matching against the Xresources code results if AUTOMATED_TESTING is set.
+    * don't run tests matching against the Xresources code results if AUTOMATED_TESTING is set.
 
   [ENHANCEMENTS]
 
-   * database entries keep track of how many times they've been
-     matched.
+    * database entries keep track of how many times they've been
+      matched.
 
-   * new to_kv() method which returns the DB has a hash.
+    * new to_kv() method which returns the DB has a hash.
 
-   * to_kv() can return the number of times a key was successfully
-     matched by queries against the database
+    * to_kv() can return the number of times a key was successfully
+      matched by queries against the database
 
 
 0.01      2021-08-19 15:09:41-04:00 America/New_York

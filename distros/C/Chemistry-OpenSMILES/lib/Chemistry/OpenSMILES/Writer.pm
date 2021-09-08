@@ -3,12 +3,12 @@ package Chemistry::OpenSMILES::Writer;
 use strict;
 use warnings;
 
-use Chemistry::OpenSMILES qw(is_aromatic);
+use Chemistry::OpenSMILES qw( is_aromatic is_chiral );
 use Chemistry::OpenSMILES::Parser;
 use Graph::Traversal::DFS;
 
 # ABSTRACT: OpenSMILES format writer
-our $VERSION = '0.4.6'; # VERSION
+our $VERSION = '0.5.1'; # VERSION
 
 require Exporter;
 our @ISA = qw( Exporter );
@@ -54,11 +54,7 @@ sub write_SMILES
                                         _depict_bond( @sorted, $graph ); },
 
             pre  => sub { my( $vertex, $dfs ) = @_;
-                          if( $vertex->{chirality} &&
-                              $vertex->{chirality} =~ /^@@?$/ &&
-                              $dfs->graph->degree( $vertex ) == 4 ) {
-                              push @chiral, $vertex;
-                          }
+                          push @chiral, $vertex if is_chiral( $vertex );
                           push @symbols,
                           _pre_vertex( { map { $_ => $vertex->{$_} }
                                          grep { $_ ne 'chirality' }
@@ -66,6 +62,7 @@ sub write_SMILES
                           $vertex_symbols{$vertex} = $#symbols },
 
             post => sub { push @symbols, ')' },
+            next_root => undef,
         };
 
         if( $order_sub ) {
@@ -78,15 +75,24 @@ sub write_SMILES
         my $traversal = Graph::Traversal::DFS->new( $graph, %$operations );
         $traversal->dfs;
 
+        if( scalar keys %vertex_symbols != scalar $graph->vertices ) {
+            warn scalar( $graph->vertices ) - scalar( keys %vertex_symbols ) .
+                 ' unreachable atom(s) detected in moiety' . "\n";
+        }
+
         next unless @symbols;
         pop @symbols;
 
         # Dealing with chirality
         for my $atom (@chiral) {
+            next unless $atom->{chirality} =~ /^@@?/;
+
             my @neighbours = map { $_->{number} }
                              sort { $vertex_symbols{$a} <=>
                                     $vertex_symbols{$b} }
                              $graph->neighbours($atom);
+            next unless scalar @neighbours == 4;
+
             my $chirality_now = _tetrahedral_chirality( $atom->{chirality},
                                                         @neighbours );
             my $parser = Chemistry::OpenSMILES::Parser->new;
@@ -160,7 +166,7 @@ sub _pre_vertex
         $is_simple = 0;
     }
 
-    if( exists $vertex->{chirality} ) {
+    if( is_chiral( $vertex ) ) {
         $atom .= $vertex->{chirality};
         $is_simple = 0;
     }

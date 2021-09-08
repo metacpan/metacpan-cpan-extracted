@@ -20,7 +20,7 @@ requires:
   Data::Dmp: '0.240'
   Data::Sah::Util::Type: '0.45'
   Markdown::To::POD: '0'
-  Module::FeaturesUtil::Get: '0.003'
+  Module::FeaturesUtil::Get: '0.004'
   Moose: '0'
   Pod::Weaver::Role::AddTextToSection: '0.06'
   Pod::Weaver::Role::Section: '0'
@@ -31,7 +31,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Pod-Weaver-Plugin-Module-Features/issues
   homepage: https://metacpan.org/release/Pod-Weaver-Plugin-Module-Features
   repository: git://github.com/perlancar/perl-Pod-Weaver-Plugin-Module-Features.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

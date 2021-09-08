@@ -1,3 +1,7 @@
+1.07 2021-08-26
+        - support _format parameters in tests.
+        - Fix tests on text method to accept undef for Mojo >= 9.21.
+
 1.06 2021-02-08
         - Move bugtracker to GitHub.
 

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package App::Whiff 0.006;
+package App::Whiff 0.007;
 # ABSTRACT: find the first executable of a series of alternatives
 
 use File::Which ();
@@ -62,17 +62,17 @@ App::Whiff - find the first executable of a series of alternatives
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 DESCRIPTION
 
 This module implements logic used by the F<whiff> command, which takes a number
 of command names and returns the first one that exists and is executable.
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has a long-term perl support period.  That means it will not
-require a version of perl released fewer than five years ago.
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
@@ -96,6 +96,22 @@ This method is called by the F<whiff> program to ... well, run.
 =head1 AUTHOR
 
 Ricardo SIGNES <rjbs@semiotic.systems>
+
+=head1 CONTRIBUTORS
+
+=for stopwords Florian Schlichting Ricardo Signes
+
+=over 4
+
+=item *
+
+Florian Schlichting <fsfs@debian.org>
+
+=item *
+
+Ricardo Signes <rjbs@users.noreply.github.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -31,6 +31,38 @@
 
 #include "lexer-additions.c.inc"
 
+/* XSParseSublikeHooks v3 did not have permit_hintkey */
+struct XSParseSublikeHooks_v3 {
+  U16  flags;
+  U8   require_parts;
+  U8   skip_parts;
+  bool (*permit)         (pTHX_ void *hookdata);
+  void (*pre_subparse)   (pTHX_ struct XSParseSublikeContext *ctx, void *hookdata);
+  void (*post_blockstart)(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata);
+  void (*pre_blockend)   (pTHX_ struct XSParseSublikeContext *ctx, void *hookdata);
+  void (*post_newcv)     (pTHX_ struct XSParseSublikeContext *ctx, void *hookdata);
+
+  /* if flags & XS_PARSE_SUBLIKE_FLAG_FILTERATTRS */
+  bool (*filter_attr)    (pTHX_ struct XSParseSublikeContext *ctx, SV *attr, SV *val, void *hookdata);
+};
+
+static void hooks_from_v3(struct XSParseSublikeHooks *hooks, const struct XSParseSublikeHooks_v3 *hooks_v3)
+{
+  hooks->flags           = hooks_v3->flags;
+  hooks->require_parts   = hooks_v3->require_parts;
+  hooks->skip_parts      = hooks_v3->skip_parts;
+  hooks->permit_hintkey  = NULL;
+  hooks->permit          = hooks_v3->permit;
+  hooks->pre_subparse    = hooks_v3->pre_subparse;
+  hooks->post_blockstart = hooks_v3->post_blockstart;
+  hooks->pre_blockend    = hooks_v3->pre_blockend;
+  hooks->post_newcv      = hooks_v3->post_newcv;
+  if(hooks_v3->flags & XS_PARSE_SUBLIKE_FLAG_FILTERATTRS)
+    hooks->filter_attr = hooks_v3->filter_attr;
+  else
+    hooks->filter_attr = NULL;
+}
+
 /* Support two sets of hooks so we can handle xs_parse_sublike_any() with one
  * set which then finds a custom keyword which provides a second
  * Either or both may be NULL
@@ -283,13 +315,27 @@ static int IMPL_xs_parse_sublike(pTHX_ const struct XSParseSublikeHooks *hooks, 
   return parse2(aTHX_ hooks, hookdata, NULL, NULL, op_ptr);
 }
 
+static int IMPL_xs_parse_sublike_v3(pTHX_ const struct XSParseSublikeHooks_v3 *hooks_v3, void *hookdata, OP **op_ptr)
+{
+  struct XSParseSublikeHooks hooks;
+  hooks_from_v3(&hooks, hooks_v3);
+
+  return IMPL_xs_parse_sublike(aTHX_ &hooks, hookdata, op_ptr);
+}
+
 struct Registration;
 struct Registration {
+  int ver;
   struct Registration *next;
   const char *kw;
   STRLEN      kwlen;
-  const struct XSParseSublikeHooks *hooks;
+  union {
+    const struct XSParseSublikeHooks *hooks;
+    const struct XSParseSublikeHooks_v3 *hooks_v3;
+  };
   void       *hookdata;
+
+  STRLEN permit_hintkey_len;
 };
 
 #define REGISTRATIONS_LOCK   OP_CHECK_MUTEX_LOCK
@@ -297,15 +343,24 @@ struct Registration {
 
 static struct Registration *registrations;
 
-static void IMPL_register_xs_parse_sublike(pTHX_ const char *kw, const struct XSParseSublikeHooks *hooks, void *hookdata)
+static void register_sublike(pTHX_ const char *kw, const void *hooks, void *hookdata, int ver)
 {
   struct Registration *reg;
   Newx(reg, 1, struct Registration);
 
   reg->kw = savepv(kw);
   reg->kwlen = strlen(kw);
-  reg->hooks = hooks;
+  reg->ver = ver;
+  if(ver == 3)
+    reg->hooks_v3 = hooks;
+  else
+    reg->hooks = hooks;
   reg->hookdata = hookdata;
+
+  if(reg->ver >= 4 && reg->hooks->permit_hintkey)
+    reg->permit_hintkey_len = strlen(reg->hooks->permit_hintkey);
+  else
+    reg->permit_hintkey_len = 0;
 
   REGISTRATIONS_LOCK;
   {
@@ -315,16 +370,40 @@ static void IMPL_register_xs_parse_sublike(pTHX_ const char *kw, const struct XS
   REGISTRATIONS_UNLOCK;
 }
 
+static void IMPL_register_xs_parse_sublike(pTHX_ const char *kw, const struct XSParseSublikeHooks *hooks, void *hookdata)
+{
+  register_sublike(aTHX_ kw, hooks, hookdata, 4);
+}
+
+static void IMPL_register_xs_parse_sublike_v3(pTHX_ const char *kw, const struct XSParseSublikeHooks_v3 *hooks_v3, void *hookdata)
+{
+  register_sublike(aTHX_ kw, hooks_v3, hookdata, 3);
+}
+
 static const struct Registration *find_permitted(pTHX_ const char *kw, STRLEN kwlen)
 {
   const struct Registration *reg;
+
+  HV *hints = GvHV(PL_hintgv);
+
   for(reg = registrations; reg; reg = reg->next) {
     if(reg->kwlen != kwlen || !strEQ(reg->kw, kw))
       continue;
 
-    if(reg->hooks->permit &&
-       !(*reg->hooks->permit)(aTHX_ reg->hookdata))
-       continue;
+    if(reg->ver >= 4) {
+      if(reg->hooks->permit_hintkey &&
+        (!hints || !hv_fetch(hints, reg->hooks->permit_hintkey, reg->permit_hintkey_len, 0)))
+        continue;
+
+      if(reg->hooks->permit &&
+        !(*reg->hooks->permit)(aTHX_ reg->hookdata))
+        continue;
+    }
+    else {
+      if(reg->hooks_v3->permit &&
+        !(*reg->hooks_v3->permit)(aTHX_ reg->hookdata))
+        continue;
+    }
 
     return reg;
   }
@@ -354,9 +433,24 @@ static int IMPL_xs_parse_sublike_any(pTHX_ const struct XSParseSublikeHooks *hoo
 
   SvREFCNT_dec(kwsv);
 
-  return parse2(aTHX_ hooksA, hookdataA,
-    reg ? reg->hooks : NULL, reg ? reg->hookdata : NULL,
-    op_ptr);
+  if(!reg)
+    return parse2(aTHX_ hooksA, hookdataA, NULL, NULL, op_ptr);
+
+  if(reg->ver >= 4)
+    return parse2(aTHX_ hooksA, hookdataA, reg->hooks, reg->hookdata, op_ptr);
+
+  struct XSParseSublikeHooks hooks;
+  hooks_from_v3(&hooks, reg->hooks_v3);
+
+  return parse2(aTHX_ hooksA, hookdataA, &hooks, reg->hookdata, op_ptr);
+}
+
+static int IMPL_xs_parse_sublike_any_v3(pTHX_ const struct XSParseSublikeHooks_v3 *hooksA_v3, void *hookdataA, OP **op_ptr)
+{
+  struct XSParseSublikeHooks hooksA;
+  hooks_from_v3(&hooksA, hooksA_v3);
+
+  return IMPL_xs_parse_sublike_any(aTHX_ &hooksA, hookdataA, op_ptr);
 }
 
 static int (*next_keyword_plugin)(pTHX_ char *, STRLEN, OP **);
@@ -370,15 +464,29 @@ static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op_ptr)
 
   lex_read_space(0);
 
-  return parse2(aTHX_ NULL, NULL, reg->hooks, reg->hookdata, op_ptr);
+  if(reg->ver >= 4)
+    return parse2(aTHX_ NULL, NULL, reg->hooks, reg->hookdata, op_ptr);
+
+  struct XSParseSublikeHooks hooks;
+  hooks_from_v3(&hooks, reg->hooks_v3);
+
+  return parse2(aTHX_ NULL, NULL, &hooks, reg->hookdata, op_ptr);
 }
 
 MODULE = XS::Parse::Sublike    PACKAGE = XS::Parse::Sublike
 
 BOOT:
-  sv_setiv(get_sv("XS::Parse::Sublike::ABIVERSION", GV_ADDMULTI), XSPARSESUBLIKE_ABI_VERSION);
-  sv_setuv(get_sv("XS::Parse::Sublike::PARSE",      GV_ADDMULTI), PTR2UV(&IMPL_xs_parse_sublike));
-  sv_setuv(get_sv("XS::Parse::Sublike::REGISTER",   GV_ADDMULTI), PTR2UV(&IMPL_register_xs_parse_sublike));
-  sv_setuv(get_sv("XS::Parse::Sublike::PARSEANY",   GV_ADDMULTI), PTR2UV(&IMPL_xs_parse_sublike_any));
+  /* Legacy lookup mechanism using perl symbol table */
+  sv_setiv(get_sv("XS::Parse::Sublike::ABIVERSION", GV_ADDMULTI), 3);
+  sv_setuv(get_sv("XS::Parse::Sublike::PARSE",      GV_ADDMULTI), PTR2UV(&IMPL_xs_parse_sublike_v3));
+  sv_setuv(get_sv("XS::Parse::Sublike::REGISTER",   GV_ADDMULTI), PTR2UV(&IMPL_register_xs_parse_sublike_v3));
+  sv_setuv(get_sv("XS::Parse::Sublike::PARSEANY",   GV_ADDMULTI), PTR2UV(&IMPL_xs_parse_sublike_any_v3));
+
+  /* Newer mechanism */
+  sv_setiv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/ABIVERSION_MIN", 1), 3);
+  sv_setiv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/ABIVERSION_MAX", 1), XSPARSESUBLIKE_ABI_VERSION);
+  sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/parse()@4",    1), PTR2UV(&IMPL_xs_parse_sublike));
+  sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/register()@4", 1), PTR2UV(&IMPL_register_xs_parse_sublike));
+  sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/parseany()@4", 1), PTR2UV(&IMPL_xs_parse_sublike_any));
 
   wrap_keyword_plugin(&my_keyword_plugin, &next_keyword_plugin);

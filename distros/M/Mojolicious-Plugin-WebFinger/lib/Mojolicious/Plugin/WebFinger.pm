@@ -16,7 +16,7 @@ use Mojo::URL;
 #     }
 #   };
 
-our $VERSION = "0.11";
+our $VERSION = '0.12';
 
 
 my $WK_PATH = '/.well-known/webfinger';
@@ -89,7 +89,7 @@ sub register {
       };
 
       # Set standard format
-      unless ($c->stash('format') || scalar $c->param('format')) {
+      unless ($c->stash('format') || scalar $c->param('_format') || scalar $c->param('format')) {
         $c->stash(format => 'jrd');
       };
 
@@ -785,8 +785,6 @@ L<Mojolicious::Plugin::HostMeta>.
 =head1 AVAILABILITY
 
   https://github.com/Akron/Mojolicious-Plugin-WebFinger
-
-This plugin is part of the L<Sojolicious|http://sojolicio.us> project.
 
 
 =head1 COPYRIGHT AND LICENSE

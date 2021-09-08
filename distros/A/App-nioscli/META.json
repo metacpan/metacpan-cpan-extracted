@@ -1,0 +1,79 @@
+{
+   "abstract" : "CLI for NIOS",
+   "author" : [
+      "Christian Segundo <ssmn@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-nioscli",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28",
+            "perl" : "5.004"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Slurp" : "0",
+            "Perl::Critic" : "0",
+            "Perl::Stripper" : "0",
+            "Perl::Tidy" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Perl::Critic" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Any" : "0",
+            "DNS::NIOS" : "0.004",
+            "Devel::OverloadInfo" : "0",
+            "IO::Interactive" : "0",
+            "MooseX::App" : "0",
+            "MooseX::App::Command" : "0",
+            "MooseX::App::Role" : "0",
+            "YAML" : "0",
+            "perl" : "5.006",
+            "strictures" : "2.000006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/someone-stole-my-name/perl-app-nioscli/issues"
+      },
+      "homepage" : "https://github.com/someone-stole-my-name/perl-app-nioscli",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/someone-stole-my-name/perl-app-nioscli.git",
+         "web" : "https://github.com/someone-stole-my-name/perl-app-nioscli"
+      }
+   },
+   "version" : "0.001",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_spdx_expression" : "Artistic-2.0"
+}
+

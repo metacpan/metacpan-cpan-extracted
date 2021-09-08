@@ -1,3 +1,28 @@
+0.014   2021-09-07  Released-By: PERLANCAR; Urgency: high
+
+	- [bugfix] Fix setting time zone.
+
+
+0.013   2021-09-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Add coercion rule: From_str::natural_jakarta.
+
+	- Remove the use of Data::Dmp.
+
+
+0.012   2021-09-06  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention some related modules.
+
+
+0.011   2021-09-06  Released-By: PERLANCAR; Urgency: medium
+
+	- Add
+	  Data::Sah::Coerce::perl::To_date::From_str::natural_{local,utc}.
+
+
 0.010   2019-11-29  Released-By: PERLANCAR; Urgency: medium
 
 	- Rename coerce rule modules again, revert to using lower_case

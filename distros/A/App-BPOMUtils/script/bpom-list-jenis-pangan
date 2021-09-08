@@ -1,0 +1,454 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/BPOMUtils/bpom_list_jenis_pangan
+# and generated automatically using Perinci::CmdLine::Gen version 0.500
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-08-28'; # DATE
+our $DIST = 'App-BPOMUtils'; # DIST
+our $VERSION = '0.002'; # VERSION
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/BPOMUtils/bpom_list_jenis_pangan",
+    program_name => "bpom-list-jenis-pangan",
+    log => 1,
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: List food types in BPOM processed food division
+# PODNAME: bpom-list-jenis-pangan
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+bpom-list-jenis-pangan - List food types in BPOM processed food division
+
+=head1 VERSION
+
+This document describes version 0.002 of bpom-list-jenis-pangan (from Perl distribution App-BPOMUtils), released on 2021-08-28.
+
+=head1 SYNOPSIS
+
+Usage:
+
+% B<bpom-list-jenis-pangan> [B<--code-contains>=I<str>] [(B<--code-in>=I<str>)+] [B<--code-is>=I<str>] [B<--code-isnt>=I<str>] [B<--code-max>=I<str>] [B<--code-min>=I<str>] [B<--code-not-contains>=I<str>] [(B<--code-not-in>=I<str>)+] [B<--code-xmax>=I<str>] [B<--code-xmin>=I<str>] [B<--code>=I<str>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--detail>|B<-l>|B<--no-detail>|B<--nodetail>] [(B<--exclude-field>=I<str>)+] [(B<--field>=I<str>)+] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--random>|B<--no-random>|B<--norandom>] [B<--result-limit>=I<int>] [B<--result-start>=I<int>] [(B<--sort>=I<str>)+] [B<--summary-contains>=I<str>] [(B<--summary-in>=I<str>)+] [B<--summary-is>=I<str>] [B<--summary-isnt>=I<str>] [B<--summary-max>=I<str>] [B<--summary-min>=I<str>] [B<--summary-not-contains>=I<str>] [(B<--summary-not-in>=I<str>)+] [B<--summary-xmax>=I<str>] [B<--summary-xmin>=I<str>] [B<--summary>=I<str>] [B<--with-field-names>|B<--without-field-names>] [B<--code-in-json>=I<json>] [B<--code-not-in-json>=I<json>] [B<--exclude-fields-json>=I<json>] [B<--fields-json>=I<json>] [B<--sort-json>=I<json>] [B<--summary-in-json>=I<json>] [B<--summary-not-in-json>=I<json>] -- [I<query>]
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Field selection options
+
+=over
+
+=item B<--detail>, B<-l>
+
+Return array of full records instead of just ID fields.
+
+By default, only the key (ID) field is returned per result entry.
+
+
+=item B<--exclude-field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--exclude-fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--exclude-field>.
+
+=item B<--field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--field>.
+
+=item B<--with-field-names>
+
+Return field names in each record (as hash/associative array).
+
+When enabled, function will return each record as hash/associative array
+(field name => value pairs). Otherwise, function will return each record
+as list/array (field value, field value, ...).
+
+
+=back
+
+=head2 Filtering for code options
+
+=over
+
+=item B<--code-contains>=I<s>
+
+Only return records where the 'code' field contains specified text.
+
+=item B<--code-in-json>=I<s>
+
+Only return records where the 'code' field is in the specified values (JSON-encoded).
+
+See C<--code-in>.
+
+=item B<--code-in>=I<s@>
+
+Only return records where the 'code' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--code-is>=I<s>
+
+Only return records where the 'code' field equals specified value.
+
+=item B<--code-isnt>=I<s>
+
+Only return records where the 'code' field does not equal specified value.
+
+=item B<--code-max>=I<s>
+
+Only return records where the 'code' field is less than or equal to specified value.
+
+=item B<--code-min>=I<s>
+
+Only return records where the 'code' field is greater than or equal to specified value.
+
+=item B<--code-not-contains>=I<s>
+
+Only return records where the 'code' field does not contain specified text.
+
+=item B<--code-not-in-json>=I<s>
+
+Only return records where the 'code' field is not in the specified values (JSON-encoded).
+
+See C<--code-not-in>.
+
+=item B<--code-not-in>=I<s@>
+
+Only return records where the 'code' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--code-xmax>=I<s>
+
+Only return records where the 'code' field is less than specified value.
+
+=item B<--code-xmin>=I<s>
+
+Only return records where the 'code' field is greater than specified value.
+
+=item B<--code>=I<s>
+
+Only return records where the 'code' field equals specified value.
+
+=back
+
+=head2 Filtering for summary options
+
+=over
+
+=item B<--summary-contains>=I<s>
+
+Only return records where the 'summary' field contains specified text.
+
+=item B<--summary-in-json>=I<s>
+
+Only return records where the 'summary' field is in the specified values (JSON-encoded).
+
+See C<--summary-in>.
+
+=item B<--summary-in>=I<s@>
+
+Only return records where the 'summary' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--summary-is>=I<s>
+
+Only return records where the 'summary' field equals specified value.
+
+=item B<--summary-isnt>=I<s>
+
+Only return records where the 'summary' field does not equal specified value.
+
+=item B<--summary-max>=I<s>
+
+Only return records where the 'summary' field is less than or equal to specified value.
+
+=item B<--summary-min>=I<s>
+
+Only return records where the 'summary' field is greater than or equal to specified value.
+
+=item B<--summary-not-contains>=I<s>
+
+Only return records where the 'summary' field does not contain specified text.
+
+=item B<--summary-not-in-json>=I<s>
+
+Only return records where the 'summary' field is not in the specified values (JSON-encoded).
+
+See C<--summary-not-in>.
+
+=item B<--summary-not-in>=I<s@>
+
+Only return records where the 'summary' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--summary-xmax>=I<s>
+
+Only return records where the 'summary' field is less than specified value.
+
+=item B<--summary-xmin>=I<s>
+
+Only return records where the 'summary' field is greater than specified value.
+
+=item B<--summary>=I<s>
+
+Only return records where the 'summary' field equals specified value.
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--query>=I<s>, B<-q>
+
+Search.
+
+Can also be specified as the 1st command-line argument.
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Ordering options
+
+=over
+
+=item B<--random>
+
+Return records in random order.
+
+=item B<--sort-json>=I<s>
+
+Order records according to certain field(s) (JSON-encoded).
+
+See C<--sort>.
+
+=item B<--sort>=I<s@>
+
+Order records according to certain field(s).
+
+A list of field names separated by comma. Each field can be prefixed with '-' to
+specify descending order instead of the default ascending.
+
+
+Can be specified multiple times.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
+
+=back
+
+=head2 Paging options
+
+=over
+
+=item B<--result-limit>=I<s>
+
+Only return a certain number of records.
+
+=item B<--result-start>=I<s>
+
+Only return starting from the n'th record.
+
+Default value:
+
+ 1
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C bpom-list-jenis-pangan bpom-list-jenis-pangan
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete bpom-list-jenis-pangan 'p/*/`bpom-list-jenis-pangan`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-BPOMUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-BPOMUtils>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-BPOMUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

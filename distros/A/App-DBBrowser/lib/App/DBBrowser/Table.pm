@@ -286,7 +286,7 @@ sub __get_filename_fs {
             # Choose
             my $choice = $tc->choose(
                 [ $hidden, undef, $yes, $no ],
-                { info => $info, prompt => '', default => 1, layout => 3, undef => '  <<' }
+                { info => $info, prompt => '', default => 1, layout => 2, undef => '  <<' }
             );
             $ax->print_sql_info( $info );
             if ( ! defined $choice ) {

@@ -14,6 +14,7 @@ t/command-remote.t
 t/command.t
 t/default-base-url.t
 t/json-request.t
+t/path-templating.t
 t/spec.json
 t/spec/dummy.json
 t/spec/with-external-ref.json

@@ -4,7 +4,7 @@ use strict;
 use warnings;
  
 use Module::Runtime;
-use Sub::Exporter 'build_exporter';
+use Moo::_Utils;
 
 our @DEFAULT_EXPORTS = qw( throw_exception debug DEBUG_FLAG );
 
@@ -14,21 +14,11 @@ sub import {
   my $class = shift;
   my $target = caller;
   my @exports = $class->default_exports;
-  my $exporter = build_exporter({
-    into_level => 1,
-    groups  => { all => \@exports },
-    exports => [
-      map {
-        my $method = $_;
-        $method => sub {
-          #my ($class, $name, $arg) = @_;
-          sub { $class->$method($target, @_) }
-        };
-      } @exports,
-    ],
-  });
 
-  $class->$exporter(@exports);
+  foreach my $exported_method (@exports) {
+    my $sub = sub { $class->$exported_method($target, @_) };
+    Moo::_Utils::_install_tracked($target, $exported_method, $sub);
+  }
 }
 
 sub throw_exception {

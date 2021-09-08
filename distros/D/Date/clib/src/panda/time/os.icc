@@ -1,7 +1,7 @@
 
 namespace panda { namespace time {
 
-static constexpr const size_t TZNAME_MAX = 255; // max length of timezone name or POSIX rule (Europe/Moscow, ...)
+static constexpr const size_t TZNAME_MAXLEN = 255; // max length of timezone name or POSIX rule (Europe/Moscow, ...)
 
 static bool                get_os_localzone_name (char*);
 static std::vector<string> scan_files_recursive  (string);
@@ -10,7 +10,7 @@ static bool tz_from_env (char* lzname, const char* envar) {
     const char* val = getenv(envar);
     if (val == NULL) return false;
     size_t len = std::strlen(val);
-    if (len < 1 || len > TZNAME_MAX) return false;
+    if (len < 1 || len > TZNAME_MAXLEN) return false;
     std::strcpy(lzname, val);
     return true;
 }

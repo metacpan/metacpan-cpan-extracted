@@ -4,7 +4,7 @@ package Data::Record::Serialize::Role::Base;
 
 use Moo::Role;
 
-our $VERSION = '0.28';
+our $VERSION = '0.30';
 
 use Data::Record::Serialize::Error { errors => [ 'fields', 'types' ] }, -all;
 
@@ -706,7 +706,7 @@ Data::Record::Serialize::Role::Base - Base Role for Data::Record::Serialize
 
 =head1 VERSION
 
-version 0.28
+version 0.30
 
 =head1 DESCRIPTION
 

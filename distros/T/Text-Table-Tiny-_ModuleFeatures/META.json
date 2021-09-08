@@ -54,7 +54,7 @@
          "web" : "https://github.com/perlancar/perl-Text-Table-Tiny-_ModuleFeatures"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -380,6 +380,11 @@
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
                         "name" : "@Author::PERLANCAR/PERLANCAR::SortSections",
                         "version" : "0.082"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::Module::Features",
+                        "name" : "-Module::Features",
+                        "version" : "0.002"
                      }
                   ]
                }

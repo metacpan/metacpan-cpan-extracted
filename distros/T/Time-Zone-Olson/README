@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    Version 0.40
+    Version 0.41
 
 SYNOPSIS
 
@@ -201,7 +201,7 @@ DIAGNOSTICS
 
       The designated file is shorter than expected
 
-    %s is not an time zone in the existing Olson database
+    %s is not a time zone in the existing Olson database
 
       The designated time zone could not be found on the file system. The
       time zone is expected to be in the designated directory + the time
@@ -211,6 +211,12 @@ DIAGNOSTICS
 
       The designated time zone name could not be matched by the regular
       expression for a time zone in Time::Zone::Olson
+
+    There are two transition times for %s in %s, which cannot be coped with
+    at the moment. Please file a bug with Time::Zone::Olson
+
+      The transition times are sorted to handle unsorted (on disk)
+      transition times which has been found on solaris. Please file a bug.
 
     Failed to close %s:%s
 

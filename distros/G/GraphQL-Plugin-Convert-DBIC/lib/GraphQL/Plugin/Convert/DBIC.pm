@@ -2,11 +2,12 @@ package GraphQL::Plugin::Convert::DBIC;
 use strict;
 use warnings;
 use GraphQL::Schema;
+use GraphQL::Plugin::Type::DateTime;
 use GraphQL::Debug qw(_debug);
 use Lingua::EN::Inflect::Number qw(to_S to_PL);
 use Carp qw(confess);
 
-our $VERSION = "0.17";
+our $VERSION = "0.19";
 use constant DEBUG => $ENV{GRAPHQL_DEBUG};
 
 my %GRAPHQL_TYPE2SQLS = (
@@ -482,8 +483,8 @@ GraphQL::Plugin::Convert::DBIC - convert DBIx::Class schema to GraphQL schema
 =head1 SYNOPSIS
 
   use GraphQL::Plugin::Convert::DBIC;
-  use Schema;
-  my $converted = GraphQL::Plugin::Convert::DBIC->to_graphql(Schema->connect);
+  use My::Local::Schema;
+  my $converted = GraphQL::Plugin::Convert::DBIC->to_graphql(My::Local::Schema->connect);
   print $converted->{schema}->to_doc;
 
 =head1 DESCRIPTION

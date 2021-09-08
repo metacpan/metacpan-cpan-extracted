@@ -15,8 +15,8 @@ BEGIN
     use warnings;
     use parent qw( Module::Generic );
     use JSON;
-    use File::Spec;
     use Fcntl qw( :flock );
+    use Module::Generic::File qw( sys_tmpdir );
     use Devel::Confess;
     our $VERSION = 'v0.100.2';
 };
@@ -25,7 +25,7 @@ sub init
 {
     my $self = shift( @_ );
     $self->{cache} = {};
-    $self->{cache_dir} = File::Spec->tmpdir();
+    $self->{cache_dir} = sys_tmpdir();
     $self->{cache_file} = "$self->{cache_dir}/sql_tables.json";
     $self->{timeout} = 86400;
     $self->SUPER::init( @_ );
@@ -92,17 +92,17 @@ sub read
 {
     my $self = shift( @_ );
     my $tables_cache_file = shift( @_ ) || $self->cache_file || return( {} );
+    $tables_cache_file = $self->new_file( $tables_cache_file );
     my $hash = {};
     my $j = JSON->new->relaxed;
-    if( -e( $tables_cache_file ) &&
-        !-z( $tables_cache_file ) )
+    if( $tables_cache_file->exists && !$tables_cache_file->is_empty )
     {
-        if( my $fh = IO::File->new( "<$tables_cache_file" ) )
+        if( my $fh = $tables_cache_file->open_utf8 )
         {
-            $fh->binmode( ':utf8' );
-            $fh->autoflush( 1 );
-            my $data = join( '', $fh->getlines );
-            $fh->close;
+            $fh->autoflush(1);
+            # my $data = join( '', $fh->getlines );
+            # $fh->close;
+            my $data = $tables_cache_file->load;
             eval
             {
                 $cache = $j->decode( $data );
@@ -157,23 +157,22 @@ sub write
     my $self = shift( @_ );
     my $hash = shift( @_ ) || return( $self->error( "No table cache data was provided to write to cache file \"", $self->cache_file, "\"." ) );
     my $tables_cache_file = shift( @_ ) || $self->cache_file || return( $self->error( "No cache file was set to write data to it." ) );
+    $tables_cache_file = $self->new_file( $tables_cache_file );
     return( $self->error( "Tables cache data provided is not an hash reference." ) ) if( ref( $hash ) ne 'HASH' );
     my $j = JSON->new->allow_nonref;
-    if( my $fh = IO::File->new( ">$tables_cache_file" ) )
+    if( my $fh = $tables_cache_file->open_utf8( '>' ) )
     {
-        $fh->binmode( ':utf8' );
-        $fh->autoflush( 1 );
+        $fh->autoflush(1);
         eval
         {
-            flock( $fh, LOCK_EX );
+            $tables_cache_file->lock( LOCK_EX );
         };
         $fh->print( $j->encode( $hash ) ) || return( $self->error( "Unable to write data to tables cache file \"$tables_cache_file\": $!" ) );
         eval
         {
-            flock( $fh, LOCK_UN );
+            $tables_cache_file->lock( LOCK_UN );
         };
-        $fh->close;
-        $self->updated( ( stat( $tables_cache_file ) )[9] );
+        $self->updated( $tables_cache_file->finfo->mtime );
         return( -s( $tables_cache_file ) );
     }
     elsif( -e( $tables_cache_file ) && !-w( $tables_cache_file ) )

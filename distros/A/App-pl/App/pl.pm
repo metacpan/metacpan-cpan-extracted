@@ -1,5 +1,9 @@
 package App::pl;
 
-warn "This is a just dummy package to own the namespace.  Please run the script 'pl' directly!\n";
+use strict;
+use warnings;
+use version '5.10';
 
-1;
+warn "This is a just dummy package for CPAN.  Please run the script 'pl' directly!\n";
+
+our $VERSION = "v0.61.0";

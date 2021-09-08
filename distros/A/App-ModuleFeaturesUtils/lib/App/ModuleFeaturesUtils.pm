@@ -3,7 +3,7 @@ package App::ModuleFeaturesUtils;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-04-02'; # DATE
 our $DIST = 'App-ModuleFeaturesUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -332,7 +332,7 @@ sub compare_module_features {
     my @rows;
     for my $fsetname (@fsetnames) {
         my $fset0 = $features_decls{ $modules[0] }{features}{ $fsetname };
-        for my $fname (keys %$fset0) {
+        for my $fname (sort keys %$fset0) {
             push @rows, {
                 # XXX what if a module is named this?
                 feature_set => $fsetname,
@@ -347,7 +347,7 @@ sub compare_module_features {
         }
     }
 
-    [200, "OK", \@rows, {'table.fields'=>[qw/feature_set feature/]}];
+    [200, "OK", \@rows, {'table.fields'=>[qw/feature_set feature/, @modules]}];
 }
 
 1;
@@ -365,7 +365,7 @@ App::ModuleFeaturesUtils - CLI Utilities related to Module::Features
 
 =head1 VERSION
 
-This document describes version 0.004 of App::ModuleFeaturesUtils (from Perl distribution App-ModuleFeaturesUtils), released on 2021-04-02.
+This document describes version 0.005 of App::ModuleFeaturesUtils (from Perl distribution App-ModuleFeaturesUtils), released on 2021-04-02.
 
 =head1 DESCRIPTION
 

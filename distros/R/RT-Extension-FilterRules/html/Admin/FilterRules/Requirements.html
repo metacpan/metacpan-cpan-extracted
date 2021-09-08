@@ -1,0 +1,92 @@
+<%doc>
+Allow the requirement rules of a filter rule group to be modified.
+</%doc>
+\
+<%ARGS>
+$id => undef
+</%ARGS>
+\
+<%INIT>
+unless ( $session{'CurrentUser'}
+    ->HasRight( Object => $RT::System, Right => 'SuperUser' ) )
+{
+    Abort( loc('This feature is only available to system administrators.') );
+}
+
+my $FilterRuleGroup = RT::FilterRuleGroup->new( $session{'CurrentUser'} );
+$FilterRuleGroup->Load($id) || Abort("Couldn't load filter rule group '$id'");
+
+my $Title = loc( 'Filter rule group #[_1]: [_2]: Requirement rules',
+    $FilterRuleGroup->id, $FilterRuleGroup->Name );
+
+my @Results = ();
+
+if (   $ARGS{'Rule'}
+    || $ARGS{'Create'}
+    || $ARGS{'MoveUp'}
+    || $ARGS{'MoveDown'} )
+{
+    $m->comp(
+        '/Elements/FilterRules/EditRule:Post',
+        'ARGSRef'         => \%ARGS,
+        'FilterRuleGroup' => $FilterRuleGroup,
+        'Edit'            => 'GroupRequirements',
+        'Results'         => \@Results
+    );
+}
+
+my $FilterRule = undef;
+if ( $ARGS{'Rule'} && not $ARGS{'Create'} ) {
+    $FilterRule = RT::FilterRule->new( $session{'CurrentUser'} );
+    $FilterRule->Load( $ARGS{'Rule'} )
+        || Abort("Couldn't load filter rule '$ARGS{'Rule'}'");
+    if ( $FilterRule->FilterRuleGroupObj->id != $id ) {
+        Abort(
+            "Filter rule '$ARGS{'Rule'}' is not part of filter rule group '$id'"
+        );
+    }
+    if ( not $FilterRule->IsGroupRequirement ) {
+        Abort(
+            "Filter rule '$ARGS{'Rule'}' is not a requirement rule of filter rule group '$id'"
+        );
+    }
+    $Title = loc(
+        'Filter rule group #[_1]: [_2]: Requirement rule #[_3]: [_4]',
+        $FilterRuleGroup->id, $FilterRuleGroup->Name,
+        $FilterRule->id,      $FilterRule->Name
+    );
+} elsif ( $ARGS{'Create'} ) {
+    $Title = loc( 'Filter rule group #[_1]: [_2]: Add new requirement rule',
+        $FilterRuleGroup->id, $FilterRuleGroup->Name );
+}
+</%INIT>
+\
+<& /Admin/Elements/Header, Title => $Title  &>
+<& /Elements/Tabs &>
+<& /Elements/ListActions, actions => \@Results &>
+
+<p></p>
+
+% if ($ARGS{'Rule'} || $ARGS{'Create'}) {
+<& /Elements/FilterRules/EditRule,
+    %ARGS,
+    FilterRuleGroup => $FilterRuleGroup,
+    FilterRule => $FilterRule,
+    Edit => 'GroupRequirements',
+    PageLink => RT->Config->Get('WebPath') . '/Admin/FilterRules/Requirements.html',
+&>
+% } else {
+<form action="Requirements.html" method="post">
+<input type="hidden" name="id" value="<%$id%>" />
+<input type="hidden" name="Create" value="1" />
+<p>
+<input type="submit" value="<&|/l&>Create new requirement rule</&>" />
+</p>
+</form>
+<& /Elements/FilterRules/ShowRules,
+    %ARGS,
+    FilterRuleGroup => $FilterRuleGroup,
+    Edit => 'GroupRequirements',
+    PageLink => RT->Config->Get('WebPath') . '/Admin/FilterRules/Requirements.html',
+&>
+% }

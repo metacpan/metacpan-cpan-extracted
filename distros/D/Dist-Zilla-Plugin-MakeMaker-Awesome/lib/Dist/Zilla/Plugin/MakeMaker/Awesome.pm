@@ -1,12 +1,12 @@
-package Dist::Zilla::Plugin::MakeMaker::Awesome; # git description: v0.47-10-gbdb5d98
+package Dist::Zilla::Plugin::MakeMaker::Awesome; # git description: v0.48-6-gcbadafd
 # ABSTRACT: A more awesome MakeMaker plugin for L<Dist::Zilla>
 # KEYWORDS: plugin installer MakeMaker Makefile.PL toolchain customize override
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 use Moose;
-use MooseX::Types::Moose qw< Str ArrayRef HashRef >;
-use MooseX::Types::Stringlike 'Stringlike';
+use Types::Standard qw(Str ArrayRef HashRef);
+use Types::TypeTiny 'StringLike';
 use namespace::autoclean;
 use CPAN::Meta::Requirements 2.121; # requirements_for_module
 use List::Util 1.29 qw(first pairs pairgrep);
@@ -33,8 +33,7 @@ sub mvp_aliases {
 
 has MakeFile_PL_template => (
     is            => 'ro',
-    isa           => Stringlike,
-    coerce        => 1,
+    isa           => StringLike,
     lazy          => 1,
     builder       => '_build_MakeFile_PL_template',
     documentation => "The Text::Template used to construct the ExtUtils::MakeMaker Makefile.PL",
@@ -249,8 +248,7 @@ sub _build_min_perl_version
 
 has WriteMakefile_dump => (
     is            => 'ro',
-    isa           => Stringlike,
-    coerce        => 1,
+    isa           => StringLike,
     lazy          => 1,
     builder       => '_build_WriteMakefile_dump',
     documentation => "A Data::Dumper Str for using WriteMakefile_args used by MakeFile_PL_template"
@@ -445,6 +443,25 @@ sub gather_files
     return;
 }
 
+sub template_arguments {
+    my $self = shift;
+
+    my $perl_prereq = $self->WriteMakefile_arg('MIN_PERL_VERSION');
+
+    return +{
+        dist              => \($self->zilla),
+        plugin            => \$self,
+        eumm_version      => \($self->eumm_version),
+        perl_prereq       => \$perl_prereq,
+        share_dir_block   => [ $self->share_dir_block ],
+        fallback_prereqs  => \($self->fallback_prereq_pm),
+        WriteMakefileArgs => \($self->WriteMakefile_dump),
+        extra_args        => \($self->WriteMakefile_arg_strs),
+        header            => \$self->header,
+        footer            => \$self->footer,
+    };
+}
+
 sub setup_installer
 {
     my $self = shift;
@@ -452,8 +469,6 @@ sub setup_installer
     ## Sanity checks
     $self->log_fatal("can't install files with whitespace in their names")
         if grep /\s/, @{$self->exe_files};
-
-    my $perl_prereq = $self->WriteMakefile_arg('MIN_PERL_VERSION');
 
     # file was already created; find it and fill in the content
     my $file = first { $_->name eq 'Makefile.PL' } @{$self->zilla->files};
@@ -463,21 +478,7 @@ sub setup_installer
             . "\n" . '(instead, try [GatherDir] exclude_filename = Makefile.PL)')
         if not $file;
 
-    my $content = $self->fill_in_string(
-        $file->content,
-        {
-            dist              => \($self->zilla),
-            plugin            => \$self,
-            eumm_version      => \($self->eumm_version),
-            perl_prereq       => \$perl_prereq,
-            share_dir_block   => [ $self->share_dir_block ],
-            fallback_prereqs  => \($self->fallback_prereq_pm),
-            WriteMakefileArgs => \($self->WriteMakefile_dump),
-            extra_args        => \($self->WriteMakefile_arg_strs),
-            header            => \$self->header,
-            footer            => \$self->footer,
-        },
-    );
+    my $content = $self->fill_in_string($file->content, $self->template_arguments);
 
     $content =~ s/\n{3,}/\n\n/g;
     $content =~ s/\n+\z/\n/;
@@ -522,7 +523,7 @@ Dist::Zilla::Plugin::MakeMaker::Awesome - A more awesome MakeMaker plugin for L<
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 SYNOPSIS
 
@@ -531,7 +532,7 @@ In your F<dist.ini>:
     [MakeMaker::Awesome]
     WriteMakefile_arg = CCFLAGS => `pkg-config --cflags libpng`
     WriteMakefile_arg = LIBS => [ `pkg-config --libs libpng` ]
-    header = die 'Unsupported OS' if $^O eq 'MSWin32';
+    header = die "Unsupported OS\n" if $^O eq 'MSWin32';
     delimiter = |
     footer = |package MY;
     footer = |sub postamble {
@@ -731,7 +732,7 @@ L</"_build_MakeFile_PL_template">.
 
 =for stopwords overridable
 
-=head2 OVERRIDABLE METHODS
+=head1 OVERRIDABLE METHODS
 
 These are the methods you can currently C<override> or method-modify in your
 custom F<inc/> module. The work that this module does is entirely done in
@@ -740,7 +741,7 @@ some of the highlights:
 
 =for Pod::Coverage mvp_multivalue_args mvp_aliases before_build
 
-=head3 _build_MakeFile_PL_template
+=head2 _build_MakeFile_PL_template
 
 Returns a L<Text::Template> string used to construct the F<Makefile.PL>.
 
@@ -761,55 +762,61 @@ C<around> method modifier, something like this:
         return substr($string, 0, pos($string)) . $NEW_CONTENT . substr($string, pos($string));
     };
 
-=head3 _build_WriteMakefile_args
+=head2 _build_WriteMakefile_args
 
 A C<HashRef> of arguments that will be passed to
 L<ExtUtils::MakeMaker>'s C<WriteMakefile> function.
 
-=head3 _build_WriteMakefile_dump
+=head2 _build_WriteMakefile_dump
 
 Takes the return value of L</"_build_WriteMakefile_args"> and
 constructs a L<Str> that will be included in the F<Makefile.PL> by
 L</"_build_MakeFile_PL_template">.
 
-=head3 _build_header
+=head2 _build_header
 
 A C<Str> of code that will be included near the top of F<Makefile.PL>.
 
-=head3 _build_footer
+=head2 _build_footer
 
 A C<Str> of code that will be included at the bottom of F<Makefile.PL>.
 
-=head3 _build_test_files
+=head2 _build_test_files
 
 The glob paths given to the C<< test => { TESTS => ... } >> parameter for
 L<ExtUtils::MakeMaker/WriteMakefile>.  Defaults to F<.t> files under F<t/>.
 B<NOT> directories, despite the name.
 
-=head3 _build_exe_files
+=head2 _build_exe_files
 
 The files given to the C<EXE_FILES> parameter for
 L<ExtUtils::MakeMaker/WriteMakefile>.
 Defaults to using data from C<:ExecDir> plugins.
 
-=head3 _build_min_perl_version
+=head2 _build_min_perl_version
 
 Extracts from the distribution prerequisite object the minimum version of perl
 required; used for the C<MIN_PERL_VERSION> parameter for
 L<ExtUtils::MakeMaker/WriteMakefile>.
 
-=head3 register_prereqs
+=head2 template_arguments
 
-=head3 gather_files
+Returns a hashref of arguments to be used by the template returned by L</Makefile_PL_template>.
+Normally you would C<around> (see L<Moose::Manual::Method::Modifiers/Around modifiers>) this method
+to add on any additional template variables you need.
 
-=head3 setup_installer
+=head2 register_prereqs
+
+=head2 gather_files
+
+=head2 setup_installer
 
 =for stopwords dirs
 
 The test/bin/share dirs and exe_files. These will all be passed to
 F</"_build_WriteMakefile_args"> later.
 
-=head3 _build_share_dir_block
+=head2 _build_share_dir_block
 
 =for stopwords sharedir
 
@@ -822,7 +829,7 @@ C<package MY> section to install it. Deep magic.
 
 The main entry point is C<setup_installer> via the
 L<Dist::Zilla::Role::InstallTool> role. There are also other magic
-Dist::Zilla roles, check the source for more info.
+Dist::Zilla roles; check the source for more info.
 
 =head1 DIAGNOSTICS
 

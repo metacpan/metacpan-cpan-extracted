@@ -482,7 +482,7 @@ perlimports - A command line utility for cleaning up imports in your Perl code
 
 =head1 VERSION
 
-version 0.000017
+version 0.000018
 
 =head1 SYNOPSIS
 
@@ -501,7 +501,7 @@ Redirect output to a new file:
 
 Process all test files:
 
-    find t -type f | grep .t$ | xargs -L 1 perlimports --libs lib,t/lib -i --ignore-modules Test::More --log-level notice -f
+    find t -type f | grep .t$ | xargs -L 1 perlimports --libs lib,t/lib -i --ignore-modules Test::More --no-preserve-unused --no-preserve-duplicates --log-level notice -f
 
 The above command finds all test files in C<./t> and pipes them to
 C<perlimports>. C<lib> and C<t/lib> have been added to C<@INC>. The files are
@@ -510,7 +510,7 @@ module is ignored.
 
 Process all lib files:
 
-    find lib -type f | grep .pm$ | xargs -n 1 perlimports -i --libs lib -f
+    find lib -type f | grep .pm$ | xargs -n 1 perlimports -i --libs lib --no-preserve-unused --no-preserve-duplicates -f
 
 The above command finds all C<.pm> files in C<./t> and pipes them to
 C<perlimports>. C<lib> has been added to C<@INC>. The files are edited in place
@@ -547,7 +547,7 @@ A regular expression to match module names which should be ignored by this
 script. Any modules matched by this regular expression remain unchanged after
 processing.
 
-    --ignore-modules '^(Foo|Foo::Bar)'
+    --ignore-modules-pattern '^(Foo|Foo::Bar)'
 
 =head2 --ignore-modules-pattern-filename
 

@@ -1,8 +1,5 @@
 {
   en => {
-    attributes => {
-      retirement_date => 'Retires On',
-    },
     errors => {
       messages => {
         # numericality

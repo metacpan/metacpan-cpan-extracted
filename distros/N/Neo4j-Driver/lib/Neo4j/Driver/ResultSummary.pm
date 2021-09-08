@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::ResultSummary;
 # ABSTRACT: Details about the result of running a statement
-$Neo4j::Driver::ResultSummary::VERSION = '0.26';
+$Neo4j::Driver::ResultSummary::VERSION = '0.27';
 
 use Carp qw(croak);
 
@@ -89,7 +89,7 @@ Neo4j::Driver::ResultSummary - Details about the result of running a statement
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 SYNOPSIS
 
@@ -157,10 +157,10 @@ This driver only supports execution plans over HTTP.
 =head2 server
 
  $address = $summary->server->address;
- $version = $summary->server->version;
+ $version = $summary->server->agent;
 
 The L<ServerInfo|Neo4j::Driver::ServerInfo>, consisting of
-the host, port and Neo4j version.
+the host, port, protocol and Neo4j version.
 
 =head2 statement
 

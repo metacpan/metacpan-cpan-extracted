@@ -1,6 +1,6 @@
 package GitHub::Actions;
 
-use Exporter 'import';
+use Exporter 'import'; # needed to use @EXPORT
 use warnings;
 use strict;
 use Carp;
@@ -10,7 +10,7 @@ use v5.14;
 # Module implementation here
 our %github;
 
-our @EXPORT = qw( %github set_output set_env debug error set_failed);
+our @EXPORT = qw( %github set_output set_env debug error warning set_failed command_on_file error_on_file warning_on_file start_group end_group);
 
 BEGIN {
   for my $k ( keys(%ENV) ) {
@@ -20,7 +20,8 @@ BEGIN {
     }
   }
 }
-use version; our $VERSION = qv('0.0.6');
+
+use version; our $VERSION = qv('0.1.0');
 
 sub set_output {
   carp "Need name and value" unless @_;
@@ -46,19 +47,39 @@ sub error {
   say "::error::$error_message"
 }
 
+sub warning {
+  my $warning = shift;
+  say "::warning::$warning"
+}
+
 sub error_on_file {
-  my $error_message = shift;
+  command_on_file( "::error", @_ );
+}
+
+sub warning_on_file {
+  command_on_file( "::warning", @_ );
+}
+
+sub command_on_file {
+  my $command = shift;
+  my $message = shift;
   my ($file, $line, $col ) = @_;
-  my $message = "::error";
-  say "Message so far $message";
   if ( $file ) {
     my @data;
-    push( @data, "file=$file") if $file;
+    push( @data, "file=$file");
     push( @data, "line=$line") if $line;
     push( @data, "col=$col") if $col;
-    $message .= " ".join(",", @data );
+    $command .= " ".join(",", @data );
   }
-  say "$message::$error_message"
+  say $command."::$message"
+}
+
+sub start_group {
+  say "::group::" . shift;
+}
+
+sub end_group {
+  say "::endgroup::";
 }
 
 sub set_failed {
@@ -142,14 +163,33 @@ Equivalent to L<C<debug>|https://docs.github.com/en/free-pro-team@latest/actions
 
 Equivalent to L<C<error>|https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#setting-an-error-message>, prints an error message.
 
+=head2 warning( $warning_message )
+
+Equivalent to L<C<warning>|https://docs.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-a-warning-message>, simply prints a warning.
+
+=head2 command_on_file( $error_message, $file, $line, $col )
+
+Common code for L<error_on_file> and L<warning_on_file>. Can be used for any future commands.
+
 =head2 error_on_file( $error_message, $file, $line, $col )
 
 Equivalent to L<C<error>|https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#setting-an-error-message>, prints an error message with file and line info
+
+=head2 warning_on_file( $warning_message, $file, $line, $col )
+
+Equivalent to L<C<warning>|https://docs.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-a-warning-message>, prints an warning with file and line info.
 
 =head2 set_failed( $error_message )
 
 Exits with an error status of 1 after setting the error message.
 
+=head2 start_group( $group_name )
+
+Starts a group in the logs, grouping the following messages. Corresponds to L<C<group>|https://docs.github.com/en/actions/reference/workflow-commands-for-github-actions#grouping-log-lines>.
+
+=head2 end_group
+
+Ends current log grouping.
 
 =head1 CONFIGURATION AND ENVIRONMENT
 

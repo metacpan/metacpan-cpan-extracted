@@ -34,7 +34,6 @@ use Test::Most;
     return $attribute;
   }
 
-  sub ancestors { }
 }
 
 ok my $user1 = Local::Object::User->new;

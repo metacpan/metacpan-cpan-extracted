@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
     "Data::Dmp" => "0.240",
     "Data::Sah::Util::Type" => "0.45",
     "Markdown::To::POD" => 0,
-    "Module::FeaturesUtil::Get" => "0.003",
+    "Module::FeaturesUtil::Get" => "0.004",
     "Moose" => 0,
     "Pod::Weaver::Role::AddTextToSection" => "0.06",
     "Pod::Weaver::Role::Section" => 0,
@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,7 +47,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Markdown::To::POD" => 0,
-  "Module::FeaturesUtil::Get" => "0.003",
+  "Module::FeaturesUtil::Get" => "0.004",
   "Moose" => 0,
   "Pod::Weaver::Role::AddTextToSection" => "0.06",
   "Pod::Weaver::Role::Section" => 0,

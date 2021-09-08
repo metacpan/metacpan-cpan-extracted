@@ -1,5 +1,5 @@
 package Mojo::Leds;
-$Mojo::Leds::VERSION = '1.07';
+$Mojo::Leds::VERSION = '1.08';
 use Mojo::Base 'Mojolicious';
 use Mojo::Log;
 use Mojo::File 'path';
@@ -60,11 +60,17 @@ sub startup() {
 
 Mojo::Leds - Leds aka Light Environment (emi) for Development System based on Mojolicious
 
-=for html <p><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/EmilianoBruni/Mojo-Leds?style=plastic"> <a href="https://travis-ci.com/EmilianoBruni/Mojo-Leds"><img alt="Travis tests" src="https://img.shields.io/travis/com/EmilianoBruni/Mojo-Leds?label=Travis%20tests&style=plastic"></a></p>
+=for html <p>
+    <img alt="Top language: " src="https://img.shields.io/github/languages/top/emilianobruni/mojo-leds?style=plastic">
+    <img alt="github last commit" src="https://img.shields.io/github/last-commit/emilianobruni/mojo-leds?style=plastic">
+    <a href="https://github.com/emilianobruni/mojo-leds/actions/workflows/test.yml">
+        <img alt="github workflow tests" src="https://github.com/emilianobruni/mojo-leds/actions/workflows/test.yml/badge.svg">
+    </a>
+</p>
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 SYNOPSIS
 

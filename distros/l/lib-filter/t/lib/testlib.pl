@@ -20,7 +20,7 @@ sub _test_lib {
                 "-e",
                 "use $ent->{module}",
             );
-            note "system: ", explain @system_args;
+            note "system: " . join(" ", @system_args);
             system(@system_args);
             my $child_err = $?;
             if ($ent->{ok}) {

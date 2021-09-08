@@ -1,5 +1,9 @@
 Revision history for Future-AsyncAwait
 
+0.53    2021-08-26
+        [CHANGES]
+         * Updated for XS::Parse::Keyword 0.13
+
 0.52    2021-07-13
         [BUGFIXES]
          * Account for changed error message from XS::Parse::Keyword 0.09

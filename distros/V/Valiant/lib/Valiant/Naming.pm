@@ -11,18 +11,12 @@ use Valiant::I18N ();
 has class => (is=>'ro', required=>1);
 has namespace => (is=>'ro', required=>0, predicate=>'has_namespace');
 
-# All these are generated at runtime
-
-#around BUILDARGS => sub {
-#  my ($orig, $class, @args) = @_;
-#  my $args = $class->$orig(@args);
-#  if(my $ns = $args->{namespace}) {
-#    my $class = $args->{class};
-#    $class =~s/^${ns}:://;
-#    $arg->{unnamespaced} = $class;
-#  }
-#  return $args;
-#};
+# Ok so when you have a namespace that means we want to localize the naming to under
+# the namespace.   For example if you model is package MyApp::Model::Person you might
+# like to have the namespace set to 'MyApp::Model'.  Right this code just uses it for
+# determining the 'param_key' which is what we look for in a request to find this models
+# data but we might need it for other stuff later.  Rails uses it for tons of stuff due
+# to their 'convention over configuration' thing. 
 
 has 'unnamespaced' => (
   is => 'ro',
@@ -94,6 +88,11 @@ has _human => (
   },
 );
 
+# This is the translation tag used to lookup a translated version of the model
+# name.  This is only used via ->human if the consuming class does 'i18n_scope'. 
+# For example if the i18n_scope is 'valiant' and class package is AbcDef::Ghi then
+# the i18n_key is 'abc_def/ghi'.
+ 
 has i18n_key => (
   is => 'ro',
   init_arg => undef,
@@ -127,14 +126,18 @@ has param_key => (
 
 sub human {
   my ($self, %options) = @_;
-  return $self->_human unless $self->class->can('i18n_scope');
+
+  return $self->_human unless $self->class->can('i18n_scope'); # Don't waste time if there's no lookup scope
 
   my @defaults = map {
     $_->model_name->i18n_key;
-  } $self->class->ancestors if $self->class->can('ancestors');
+  } $self->class->i18n_lookup if $self->class->can('i18n_lookup');
 
+  return $self->_human unless @defaults; # If $self doesn't do i18n_lookup then there's no tags to attempt translations
+  
   push @defaults, delete $options{default} if exists $options{default};
-  push @defaults, $self->_human;
+  push @defaults, $self->_human; # The guessed named used by looking at the package name is the ultimate default
+
 
   %options = (
     scope => [$self->class->i18n_scope, 'models'],
@@ -143,7 +146,7 @@ sub human {
     %options,
   );
 
-  $self->i18n->translate($defaults[0], %options);
+  $self->i18n->translate(shift(@defaults), %options);
 }
 
 package Valiant::Naming;

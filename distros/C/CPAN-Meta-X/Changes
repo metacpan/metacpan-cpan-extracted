@@ -1,3 +1,20 @@
+0.006   2021-08-27  Released-By: PERLANCAR; Urgency: medium
+
+	- Add x_features_from relationship.
+
+
+0.005   2021-08-27  Released-By: PERLANCAR; Urgency: medium
+
+	- Move x_spec phase to CPAN::Meta::X::Old.
+
+
+0.004   2021-07-31  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Tweak Abstract & POD sections (remove unneeded words).
+
+
 0.003   2021-04-15  Released-By: PERLANCAR; Urgency: low
 
 	- No notable changes.

@@ -445,7 +445,7 @@ sub __history {
             my $idxs = $tu->choose_a_subset(
                 $list,
                 { prefix => '- ', info => $info, cs_label => 'Chosen items:' . "\n  ", cs_separator => "\n  ", cs_end => "\n",
-                  layout => 3, all_by_default => 0, index => 1, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back},
+                  layout => 2, all_by_default => 0, index => 1, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back},
                   clear_screen => 1, prompt => 'Choose items to remove:' }
             );
             if ( ! defined $idxs ) {

@@ -56,23 +56,23 @@
    "provides" : {
       "Lingua::Poetry::Haiku::Finder" : {
          "file" : "lib/Lingua/Poetry/Haiku/Finder.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Lingua::Poetry::Haiku::Finder::NonWord" : {
          "file" : "lib/Lingua/Poetry/Haiku/Finder/NonWord.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Lingua::Poetry::Haiku::Finder::Sentence" : {
          "file" : "lib/Lingua/Poetry/Haiku/Finder/Sentence.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Lingua::Poetry::Haiku::Finder::SentencePart" : {
          "file" : "lib/Lingua/Poetry/Haiku/Finder/SentencePart.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Lingua::Poetry::Haiku::Finder::Word" : {
          "file" : "lib/Lingua/Poetry/Haiku/Finder/Word.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -91,7 +91,11 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Lingua-Poetry-Haiku-Finder/project"
    },
-   "version" : "0.001",
-   "x_serialization_backend" : "JSON::PP version 4.06",
-   "x_static_install" : 1
+   "version" : "0.002",
+   "x_provides_scripts" : {
+      "haiku-find" : {
+         "file" : "bin/haiku-find"
+      }
+   },
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

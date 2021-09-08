@@ -1,7 +1,8 @@
 package HTML::HTML5::Parser::Charset::Info;
 ## skip Test::Tabs
 use strict;
-our $VERSION='0.301';
+use warnings;
+our $VERSION='0.992';
 
 ## TODO: Certain encodings MUST NOT be implemented [HTML5].
 

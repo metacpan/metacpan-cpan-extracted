@@ -82,4 +82,22 @@ Third
 =back
 EOPOD
 
+dotest "Definition lists", <<"EOPOD";
+=over 4
+
+=item First
+
+The first item
+
+=item Second
+
+The second item
+
+=item Third
+
+The third item
+
+=back
+EOPOD
+
 done_testing;

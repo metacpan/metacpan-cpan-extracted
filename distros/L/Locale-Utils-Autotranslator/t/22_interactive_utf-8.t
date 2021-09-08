@@ -60,8 +60,8 @@ my $content = path($output_filename)->slurp_utf8;
 unlink $output_filename;
 
 eq_or_diff
-    [ split qr{ \r? \n }xms, $content ],
-    [ split qr{ \n }xms, <<"EOT" ],
+    [ split m{ \r? \n }xms, $content ],
+    [ split m{ \r? \n }xms, <<"EOT" ],
 msgid ""
 msgstr ""
 "Project-Id-Version: \\n"

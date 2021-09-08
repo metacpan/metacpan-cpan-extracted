@@ -1,518 +1,755 @@
 package Minion::Backend::MongoDB;
-$Minion::Backend::MongoDB::VERSION = '1.06';
+$Minion::Backend::MongoDB::VERSION = '1.09';
 # ABSTRACT: MongoDB backend for Minion
+
+use 5.016;    # Minion requires this so we require this.
 
 use Mojo::Base 'Minion::Backend';
 
 use boolean;
 use BSON::OID;
-use BSON::Types ':all';
+use BSON::Types qw(:all);
 use DateTime;
 use DateTime::Set;
 use DateTime::Span;
 use Mojo::IOLoop;
+use Mojo::Promise;
 use Mojo::URL;
 use MongoDB;
-use Sys::Hostname 'hostname';
+use Sys::Hostname qw(hostname);
 use Tie::IxHash;
-use Time::HiRes 'time';
+use Time::HiRes qw(time);
 
 has 'dbclient';
 has 'mongodb';
-has jobs          => sub { $_[0]->mongodb->coll($_[0]->prefix . '.jobs') };
-has notifications => sub { $_[0]->mongodb->coll($_[0]->prefix . '.notifications') };
-has prefix        => 'minion';
-has workers       => sub { $_[0]->mongodb->coll($_[0]->prefix . '.workers') };
-has locks         => sub { $_[0]->mongodb->coll($_[0]->prefix . '.locks') };
-has admin         => sub { $_[0]->dbclient->db('admin') };
+has jobs          => sub { $_[0]->mongodb->coll( $_[0]->prefix . '.jobs' ) };
+has notifications =>
+  sub { $_[0]->mongodb->coll( $_[0]->prefix . '.notifications' ) };
+has prefix  => 'minion';
+has workers => sub { $_[0]->mongodb->coll( $_[0]->prefix . '.workers' ) };
+has locks   => sub { $_[0]->mongodb->coll( $_[0]->prefix . '.locks' ) };
+has admin   => sub { $_[0]->dbclient->db('admin') };
 
 sub broadcast {
-  my ($s, $command, $args, $ids) = (shift, shift, shift || [], shift || []);
+    my ( $s, $command, $args, $ids ) =
+      ( shift, shift, shift || [], shift || [] );
 
-  my $match = {};
+    my $match = {};
+    my @ids   = map $s->_oid($_), @$ids;
+    $match->{_id} = { '$in' => \@ids } if ( scalar(@ids) );
+    my $res = $s->workers->update_many( $match,
+        { '$push' => { inbox => [ $command, @$args ] } } );
 
-  my @ids = map $s->_oid($_), @$ids;
-
-  $match->{_id} = {'$in' => \@ids} if (scalar(@ids));
-
-  my $res = $s->workers->update_many(
-    $match, {'$push' => {inbox => [$command, @$args]}}
-  );
-
-  return !!$res->matched_count;
+    return !!$res->matched_count;
 }
 
 sub dequeue {
-  my ($self, $id, $wait, $options) = @_;
+    my ( $self, $id, $wait, $options ) = @_;
 
-  if ((my $job = $self->_try($id, $options))) { return $job }
-  return undef if Mojo::IOLoop->is_running;
+    if ( ( my $job = $self->_try( $id, $options ) ) ) { return $job }
+    return undef if Mojo::IOLoop->is_running;
 
-  # Capped collection for notifications
-  $self->_notifications;
+    my $timer = Mojo::IOLoop->timer( $wait => sub { Mojo::IOLoop->stop } );
+    Mojo::Promise->new->resolve->then(
+        sub() {
+            Mojo::IOLoop->stop if ( $self->_await );
+        }
+    )->wait;
+    Mojo::IOLoop->remove($timer);
 
-  my $timer = Mojo::IOLoop->timer($wait => sub { Mojo::IOLoop->stop });
-  Mojo::IOLoop->delay(sub {
-      Mojo::IOLoop->stop if ($self->_await)
-  })->wait;
-  Mojo::IOLoop->remove($timer);
-
-  return $self->_try($id, $options);
+    return $self->_try( $id, $options );
 
 }
 
 sub enqueue {
-  my ($self, $task) = (shift, shift);
-  my $args    = shift // [];
-  my $options = shift // {};
+    my ( $self, $task, $args, $options ) =
+      ( shift, shift, shift || [], shift || {} );
 
-  # Capped collection for notifications
-  $self->_notifications;
+    my $id;
 
-  @{$options->{parents}} = map $self->_oid($_), @{$options->{parents}}
-    if (exists $options->{parents});
+    if ( my $seq = $options->{sequence} ) {
+        my $prev = $self->jobs->find_one( { sequence => $seq, next => undef },
+            { _id => 1 } );
+        unshift @{ $options->{parents} }, $prev->{_id} if $prev;
+        $id = $self->_enqueue( $task, $args, $options );
+        $self->jobs->update_one( { _id => $prev->{_id} },
+            { '$set' => { next => $id } } );
+    }
+    else {
+        $id = $self->_enqueue( $task, $args, $options );
+    }
 
-  my $doc = {
-    args    => $args,
-    created => DateTime->from_epoch(epoch => time),
-    delayed  => DateTime->now()->add(seconds => $options->{delay} // 0),
-    priority => $options->{priority} // 0,
-    state    => 'inactive',
-    task     => $task,
-    retries  => 0,
-    attempts => $options->{attempts} // 1,
-    notes    => $options->{notes} || {},
-    parents  => $options->{parents} || [],
-    queue    => $options->{queue} // 'default',
-  };
-
-  my $res = $self->jobs->insert_one($doc);
-  my $id = $res->inserted_id->hex;
-  $self->notifications->insert_one({c => 'created'});
-  return $id;
+    $self->notifications->insert_one( { c => 'created' } );
+    return $id->hex;
 }
 
-sub fail_job { shift->_update(1, @_) }
+sub fail_job { shift->_update( 1, @_ ) }
 
-sub finish_job { shift->_update(0, @_) }
+sub finish_job { shift->_update( 0, @_ ) }
 
 sub history {
-  my $self = shift;
+    my $self = shift;
 
-  my $dt_stop     = DateTime->now;
-  my $dt_start    = $dt_stop->clone->add(days => -1);
-  my $dt_span     = DateTime::Span->from_datetimes(
-    start => $dt_start,
-    end => $dt_stop
-  );
-  my $dt_set      = DateTime::Set->from_recurrence(
-    recurrence => sub { return $_[0]->truncate(to => 'hour')->add(hours => 1) }
-  );
-  my @dt_set      = $dt_set->as_list(span => $dt_span);
-  my %acc = (map {&_dtkey($_) => {
-      epoch    => $_->epoch(),
-      failed_jobs   => 0,
-      finished_jobs => 0
-  }} @dt_set);
-
-  my $match  = {'$match' => { finished => {'$gt' => $dt_start} } };
-  my $group  = {'$group' => {
-    '_id'  => {
-        hour    => {'$hour' => {date => '$finished'}},
-        day     => {'$dayOfYear' => {date => '$finished'}},
-        year    => {'$year' => {date => '$finished'}}
-    },
-    finished_jobs => {'$sum' => {
-        '$cond' => {if => {'$eq' => ['$state', 'finished']}, then => 1, else => 0}
-    }},
-    failed_jobs => {'$sum' => {
-        '$cond' => {if => {'$eq' => ['$state', 'failed']}, then => 1, else => 0}
-    }}
-  }};
-
-  my $cursor = $self->jobs->aggregate([$match, $group]);
-
-  while (my $doc = $cursor->next) {
-    my $dt_finished = DateTime->new(
-        year => $doc->{_id}->{year},
-        month => 1,
-        day => 1,
-        hour => $doc->{_id}->{hour},
+    my $dt_stop  = DateTime->now;
+    my $dt_start = $dt_stop->clone->add( days => -1 );
+    my $dt_span  = DateTime::Span->from_datetimes(
+        start => $dt_start,
+        end   => $dt_stop
     );
-    $dt_finished->add(days => $doc->{_id}->{day}-1);
-    my $key = &_dtkey($dt_finished);
-    $acc{$key}->{$_} += $doc->{$_} for(qw(finished_jobs failed_jobs));
-  }
+    my $dt_set = DateTime::Set->from_recurrence( recurrence =>
+          sub { return $_[0]->truncate( to => 'hour' )->add( hours => 1 ) } );
+    my @dt_set = $dt_set->as_list( span => $dt_span );
+    my %acc    = (
+        map {
+            &_dtkey($_) => {
+                epoch         => $_->epoch(),
+                failed_jobs   => 0,
+                finished_jobs => 0
+            }
+        } @dt_set
+    );
 
-  return {daily => [@acc{(sort keys(%acc))}]};
-}
+    my $match = { '$match' => { finished => { '$gt' => $dt_start } } };
+    my $group = {
+        '$group' => {
+            '_id' => {
+                hour => { '$hour'      => { date => '$finished' } },
+                day  => { '$dayOfYear' => { date => '$finished' } },
+                year => { '$year'      => { date => '$finished' } }
+            },
+            finished_jobs => {
+                '$sum' => {
+                    '$cond' => {
+                        if   => { '$eq' => [ '$state', 'finished' ] },
+                        then => 1,
+                        else => 0
+                    }
+                }
+            },
+            failed_jobs => {
+                '$sum' => {
+                    '$cond' => {
+                        if   => { '$eq' => [ '$state', 'failed' ] },
+                        then => 1,
+                        else => 0
+                    }
+                }
+            }
+        }
+    };
 
-sub _dtkey {
-    return substr($_[0]->datetime, 0, -6);
+    my $cursor = $self->jobs->aggregate( [ $match, $group ] );
+
+    while ( my $doc = $cursor->next ) {
+        my $dt_finished = DateTime->new(
+            year  => $doc->{_id}->{year},
+            month => 1,
+            day   => 1,
+            hour  => $doc->{_id}->{hour},
+        );
+        $dt_finished->add( days => $doc->{_id}->{day} - 1 );
+        my $key = &_dtkey($dt_finished);
+        $acc{$key}->{$_} += $doc->{$_} for (qw(finished_jobs failed_jobs));
+    }
+
+    return { daily => [ @acc{ ( sort keys(%acc) ) } ] };
 }
 
 sub list_jobs {
-  my ($self, $lskip, $llimit, $options) = @_;
+    my ( $self, $lskip, $llimit, $options ) = @_;
 
-  my $imatch    = {};
-  $options->{'_ids'} = [map($self->_oid($_), @{$options->{ids}})]
-    if $options->{ids};
-  foreach (qw(_id state task queue)) {
-      $imatch->{$_} = {'$in' => $options->{$_ . 's'}} if $options->{$_ . 's'};
-  }
-  if ($options->{notes}) {
-      foreach (@{$options->{notes}}) {
-          $imatch->{"notes.$_"} = {'$exists' => 1}
-      }
-  }
+    my $imatch = {};
+    $options->{'_ids'} = [ map( $self->_oid($_), @{ $options->{ids} } ) ]
+      if $options->{ids};
+    foreach (qw(_id state task queue sequence)) {
+        $imatch->{$_} = { '$in' => $options->{ $_ . 's' } }
+          if $options->{ $_ . 's' };
+    }
+    $imatch->{_id} = { '$lt' => $options->{before} }
+      if ( exists $options->{before} );
+    if ( $options->{notes} ) {
+        foreach ( @{ $options->{notes} } ) {
+            $imatch->{"notes.$_"} = { '$exists' => 1 };
+        }
+    }
+    $imatch->{'$or'} = [
+        { state   => { '$ne' => 'inactive' } },
+        { expires => undef },
+        { expires => { '$gt' => DateTime->now } }
+    ];
 
-  my $match     = { '$match' => $imatch };
-  my $lookup    = {'$lookup' => {
-      from          => $self->prefix . '.jobs',
-      localField    => '_id',
-      foreignField  => 'parents',
-      as            => 'children'
-  }};
-  my $skip      = { '$skip'     => 0 + $lskip },
-  my $limit     = { '$limit'    => 0 + $llimit },
-  my $sort      = { '$sort'     => { _id => -1 } };
-  my $iproject  = {};
-  foreach (qw(_id args attempts children notes priority queue result
-    retries state task worker)) {
+    my $match  = { '$match' => $imatch };
+    my $lookup = {
+        '$lookup' => {
+            from         => $self->prefix . '.jobs',
+            localField   => '_id',
+            foreignField => 'parents',
+            as           => 'children'
+        }
+    };
+
+# (select id from minion_jobs where sequence = j.sequence and next = j.id) as previous,
+    my $l_previous = {
+        '$lookup' => {
+            from     => $self->prefix . '.jobs',
+            let      => { sequence => '$sequence', next => '$_id' },
+            pipeline => [
+                {
+                    '$match' => {
+                        '$expr' => {
+                            '$and' => [
+                                { '$eq' => [ '$sequence', '$$sequence' ] },
+                                { '$eq' => [ '$next',     '$$next' ] },
+                            ]
+                        }
+                    }
+                },
+                { '$project' => { _id => 1 } },
+            ],
+            as => 'previous'
+        }
+    };
+    my $u_previous = {
+        '$unwind' => {
+            path                       => '$previous',
+            preserveNullAndEmptyArrays => true
+        }
+    };
+    my $skip = { '$skip' => 0 + $lskip },
+      my $limit = { '$limit' => 0 + $llimit },
+      my $sort = { '$sort' => { _id => -1 } };
+    my $iproject = {};
+    foreach (
+        qw(_id args attempts children notes priority queue result
+        retries state task worker sequence next previous expires lax)
+      )
+    {
         $iproject->{$_} = 1;
-  }
-  foreach (qw(parents)) {
-        $iproject->{$_} = { '$ifNull' =>  ['$' . $_ , [] ]};
-  }
-  foreach (qw(created delayed finished retried started)) {
-        $iproject->{$_} = {'$toLong' => {'$multiply' => [{
-            '$convert' => { 'input' => '$'. $_, to => 'long'}}, 0.001]}};
-  }
-  $iproject->{total} = { '$size' => '$children'};
-  my $project   = { '$project' => $iproject};
+    }
+    foreach (qw(parents)) {
+        $iproject->{$_} = { '$ifNull' => [ '$' . $_, [] ] };
+    }
+    foreach (qw(previous)) {
+        $iproject->{$_} = { '$ifNull' => [ '$' . $_ . '._id', undef ] };
+    }
+    foreach (qw(created delayed finished retried started expires)) {
+        $iproject->{$_} = {
+            '$toLong' => {
+                '$multiply' => [
+                    {
+                        '$convert' => { 'input' => '$' . $_, to => 'long' }
+                    },
+                    0.001
+                ]
+            }
+        };
+    }
+    $iproject->{total} = { '$size' => '$children' };
+    my $project = { '$project' => $iproject };
 
-  my $aggregate = [$match, $lookup, $sort, $skip, $limit, $project];
+    my $aggregate = [
+        $match, $lookup, $l_previous, $u_previous,
+        $sort,  $skip,   $limit,      $project
+    ];
+    my $cursor = $self->jobs->aggregate($aggregate);
+    my $total  = $self->jobs->count_documents($imatch);
 
-  my $cursor    = $self->jobs->aggregate($aggregate);
-  my $total     = $self->jobs->count_documents($imatch);
+    my $jobs = [ map $self->_job_info($_), $cursor->all ];
 
-  my $jobs = [map $self->_job_info($_), $cursor->all];
-  return _total('jobs', $jobs, $total);
+    return _total( 'jobs', $jobs, $total );
 }
 
 sub list_locks {
-  my ($self, $offset, $limit, $options) = @_;
+    my ( $self, $offset, $limit, $options ) = @_;
 
-  my %aggregate;
+    my %aggregate;
 
-  my $imatch    = {};
-  $imatch->{expires} = {'$gt' => bson_time()};
-  $imatch->{name} = {'$in' => $options->{'names'} } if $options->{'names'};
+    my $imatch = {};
+    $imatch->{expires} = { '$gt' => bson_time() };
+    $imatch->{name} = { '$in' => $options->{'names'} } if $options->{'names'};
 
-  $aggregate{match}     = { '$match'    => $imatch };
-  $aggregate{unwind}    = { '$unwind'   => '$expires' };
-  $aggregate{skip}      = { '$skip'     => $offset // 0 },
-  $aggregate{limit}     = { '$limit'    => $limit } if ($limit);
+    $aggregate{match}  = { '$match'  => $imatch };
+    $aggregate{unwind} = { '$unwind' => '$expires' };
+    $aggregate{skip}   = { '$skip'   => $offset // 0 },
+      $aggregate{limit} = { '$limit' => $limit }
+      if ($limit);
 
-  my $iproject  = {};
-  foreach (qw(expires)) {
-        $iproject->{$_} = {'$toLong' => {'$multiply' => [{
-            '$convert' => { 'input' => '$'. $_, to => 'long'}}, 0.001]}};
-  }
-  $iproject->{_id} = 0;
-  $iproject->{name} = 1;
+    my $iproject = {};
+    foreach (qw(expires)) {
+        $iproject->{$_} = {
+            '$toLong' => {
+                '$multiply' => [
+                    {
+                        '$convert' => { 'input' => '$' . $_, to => 'long' }
+                    },
+                    0.001
+                ]
+            }
+        };
+    }
+    $iproject->{_id}  = 0;
+    $iproject->{name} = 1;
 
-  $aggregate{project}   = { '$project' => $iproject};
-  $aggregate{sort}      = { '$sort'     => { expires => -1 } };
+    $aggregate{project} = { '$project' => $iproject };
+    $aggregate{sort}    = { '$sort'    => { expires => -1 } };
 
+    my @aggregate = grep defined,
+      map { $aggregate{$_} } qw(match unwind sort skip limit project);
 
-  my @aggregate = grep defined, map {$aggregate{$_}}
-   qw(match unwind sort skip limit project);
+    my $cursor = $self->locks->aggregate( \@aggregate );
+    my $total  = $self->_locks_count($imatch);
 
-  my $cursor    = $self->locks->aggregate(\@aggregate);
-  my $total     = $self->_locks_count($imatch);
+    my $locks = [ $cursor->all ];
 
-  my $locks = [$cursor->all];
-
-  return _total('locks', $locks, $total);
+    return _total( 'locks', $locks, $total );
 }
 
 sub list_workers {
-  my ($self, $offset, $limit, $options) = @_;
+    my ( $self, $offset, $limit, $options ) = @_;
 
-  my $match    = {};
-  $options->{'_ids'} = [map($self->_oid($_), @{$options->{ids}})]
-    if $options->{ids};
-  foreach (qw(_id)) {
-      $match->{$_} = {'$in' => $options->{$_ . 's'}} if $options->{$_ . 's'};
-  }
+    my $match = {};
+    $options->{'_ids'} = [ map( $self->_oid($_), @{ $options->{ids} } ) ]
+      if $options->{ids};
+    foreach (qw(_id)) {
+        $match->{$_} = { '$in' => $options->{ $_ . 's' } }
+          if $options->{ $_ . 's' };
+    }
+    $match->{_id} = { '$lt' => $options->{before} }
+      if ( exists $options->{before} );
 
-  my $cursor = $self->workers->find($match);
-  my $total = scalar($cursor->all);
-  $cursor->reset;
-  $cursor->sort({_id => -1})->skip($offset)->limit($limit);
-  my $workers =  [map { $self->_worker_info($_) } $cursor->all];
-  return _total('workers', $workers, $total);
+    my $cursor = $self->workers->find($match);
+    my $total  = scalar( $cursor->all );
+    $cursor->reset;
+    $cursor->sort( { _id => -1 } )->skip($offset)->limit($limit);
+    my $workers = [ map { $self->_worker_info($_) } $cursor->all ];
+    return _total( 'workers', $workers, $total );
 }
 
 sub lock {
-  my ($s, $name, $duration, $options) = (shift, shift, shift, shift // {});
-  return $s->_lock($name, $duration, $options->{limit} || 1);
+    my ( $s, $name, $duration, $options ) =
+      ( shift, shift, shift, shift // {} );
+    return $s->_lock( $name, $duration, $options->{limit} || 1 );
+}
+
+sub minion {
+    my $s      = shift;
+    my $minion = shift;
+    return $s->{minion} unless $minion;
+    $s->{minion} = $minion;
+    $s->_reconnect_db;
+    return $s;
 }
 
 sub new {
-  my ($class, $url) = (shift, shift);
-  my $client = MongoDB->connect($url, @_);
-  my $db = $client->db($client->db_name);
+    my ( $class, $url ) = ( shift, shift );
+    my $client = MongoDB->connect( $url, @_ );
+    my $db     = $client->db( $client->db_name );
 
-  my $self = $class->SUPER::new(dbclient => $client, mongodb => $db);
-  Mojo::IOLoop->singleton->on(reset => sub {
-      $self->mongodb->client->reconnect();
-  });
-
-  return $self;
+    my $self = $class->SUPER::new( dbclient => $client, mongodb => $db );
+    Mojo::IOLoop->singleton->on(
+        reset => sub {
+            $self->mongodb->client->reconnect();
+        }
+    );
+    return $self;
 }
 
 sub note {
-  my ($self, $id, $merge) = @_;
-  return 0 if (!keys %$merge);
-  my $set = {};
-  my $unset = {};
-  while (my ($k, $v) = each %$merge) {
-      (defined $v ? $set : $unset)->{"notes.$k"} = $v;
-  };
-  my @update = ( {_id => $self->_oid($id)} );
-  my %set_unset;
-  $set_unset{'$set'}    = $set if (keys %$set);
-  $set_unset{'$unset'}  = $unset if (keys %$unset);
-  push @update, \%set_unset;
-  push @update, {
-      upsert    => 0,
-      returnDocument => 'after',
-  };
-  return $self->jobs->find_one_and_update(@update) ? 1 : 0;
+    my ( $self, $id, $merge ) = @_;
+    return 0 if ( !keys %$merge );
+    my $set   = {};
+    my $unset = {};
+    while ( my ( $k, $v ) = each %$merge ) {
+        ( defined $v ? $set : $unset )->{"notes.$k"} = $v;
+    }
+    my @update = ( { _id => $self->_oid($id) } );
+    my %set_unset;
+    $set_unset{'$set'}   = $set   if ( keys %$set );
+    $set_unset{'$unset'} = $unset if ( keys %$unset );
+    push @update, \%set_unset;
+    push @update,
+      {
+        upsert         => 0,
+        returnDocument => 'after',
+      };
+    return $self->jobs->find_one_and_update(@update) ? 1 : 0;
 }
 
 sub purge {
-    my ($s, $opts) = @_;
+    my ( $s, $opts ) = @_;
 
     # options keys: queues, states, older, tasks
     # defaults
-    $opts->{older} //= $s->minion->remove_after;
+    $opts->{older}       //= $s->minion->remove_after;
     $opts->{older_field} //= 'finished';
 
     my %match;
-    $match{$opts->{older_field}} = {'$lt' => DateTime->now->add(seconds =>
-        -$opts->{older})};
+    $match{ $opts->{older_field} } =
+      { '$lt' => DateTime->now->add( seconds => -$opts->{older} ) };
     foreach (qw/queue state task/) {
-        $match{$_}   = {'$in' => $opts->{$_.'s'}} if ($opts->{$_.'s'});
+        $match{$_} = { '$in' => $opts->{ $_ . 's' } }
+          if ( $opts->{ $_ . 's' } );
     }
 
-    $s->jobs->delete_many(\%match);
+    $s->jobs->delete_many( \%match );
 }
 
 sub receive {
-  my ($self, $id) = @_;
-  my $oldrec = $self->workers->find_one_and_update(
-    {_id => $self->_oid($id), inbox => { '$exists' => 1, '$ne' => [] } },
-    {'$set' => {inbox => [] }},
-    {
-        upsert    => 0,
-        returnDocument => 'before',
-    }
-  );
+    my ( $self, $id ) = @_;
+    my $oldrec = $self->workers->find_one_and_update(
+        { _id => $self->_oid($id), inbox => { '$exists' => 1, '$ne' => [] } },
+        { '$set' => { inbox => [] } },
+        {
+            upsert         => 0,
+            returnDocument => 'before',
+        }
+    );
 
-  return $oldrec ? $oldrec->{inbox} // [] : [];
+    return $oldrec ? $oldrec->{inbox} // [] : [];
 }
 
 sub register_worker {
-  my ($self, $id, $options) = @_;
+    my ( $self, $id, $options ) = @_;
 
-  return $id
-    if $id
-    && $self->workers->find_one_and_update(
-    {_id => $self->_oid($id)}, {'$set' => {
-        notified => DateTime->from_epoch(epoch => time),
-        status => $options->{status} // {}
-    }});
+    $self->_init_db;
 
-  # indexes for jobs
-  $self->jobs->indexes->create_one(Tie::IxHash->new(state => 1, delayed => 1, task => 1, queue => 1));
-  $self->jobs->indexes->create_one(Tie::IxHash->new(finished => 1));
-  # indexes for locks
-  $self->locks->indexes->create_one(Tie::IxHash->new(name => 1), {unique => 1});
-  $self->locks->indexes->create_one(Tie::IxHash->new(expires => 1));
-  my $res = $self->workers->insert_one(
-    { host     => hostname,
-      pid      => $$,
-      started  => DateTime->from_epoch(epoch => time),
-      notified => DateTime->from_epoch(epoch => time),
-      status => $options->{status} // {},
-      inbox => [],
-    }
-  );
-  return $res->inserted_id->hex;
+    return $id
+      if $id
+      && $self->workers->find_one_and_update(
+        { _id => $self->_oid($id) },
+        {
+            '$set' => {
+                notified => DateTime->from_epoch( epoch => time ),
+                status   => $options->{status} // {}
+            }
+        }
+      );
+
+    my $res = $self->workers->insert_one(
+        {
+            host     => hostname,
+            pid      => $$,
+            started  => DateTime->from_epoch( epoch => time ),
+            notified => DateTime->from_epoch( epoch => time ),
+            status   => $options->{status} // {},
+            inbox    => [],
+        }
+    );
+
+    return $res->inserted_id->hex;
 }
 
 sub remove_job {
-  my ($self, $id) = @_;
-  my $doc = {_id => $self->_oid($id), state => {'$in' => [qw(failed finished inactive)]}};
-  return !!$self->jobs->delete_one($doc)->deleted_count;
+    my ( $self, $id ) = @_;
+    my $doc = {
+        _id   => $self->_oid($id),
+        state => { '$in' => [qw(failed finished inactive)] }
+    };
+    return !!$self->jobs->delete_one($doc)->deleted_count;
 }
 
 sub repair {
-  my $self   = shift;
-  my $minion = $self->minion;
+    my $self   = shift;
+    my $minion = $self->minion;
 
-  # Check worker registry
-  my $workers = $self->workers;
+    my $now = DateTime->now;
 
-  $workers->delete_many({notified => {
-      '$lt' => DateTime->from_epoch(epoch => time - $minion->missing_after)}});
+    # Workers without heartbeat
+    $self->workers->delete_many(
+        {
+            notified => {
+                '$lt' =>
+                  $now->clone->subtract( seconds => $minion->missing_after )
+            }
+        }
+    );
 
-  # Abandoned jobs
-  my $jobs = $self->jobs;
-  my $cursor = $jobs->find({
-      state => 'active',
-      queue => {'$ne' => 'minion_foreground'}
-  });
-  while (my $job = $cursor->next) {
-    $self->fail_job(@$job{qw(_id retries)}, 'Worker went away')
-        unless $workers->count_documents({_id => $job->{worker}});
-  }
+    my $jobs = $self->jobs;
 
-  # Old jobs with no unresolved dependencies
-  $cursor = $jobs->find(
-    {state => 'finished', finished => {
-        '$lt' => DateTime->from_epoch(epoch => time - $minion->remove_after)}}
-  );
+    # Old jobs with no unresolved dependencies and expired jobs
 
-  while (my $job = $cursor->next) {
-    $jobs->delete_one({_id => $job->{_id}})
-        unless ($self->jobs->count_documents({
-            parents => $job->{_id},
-            state => {'$ne' => 'finished'}
-        }));
-  }
+# find: select 1 from minion_jobs where parents @> ARRAY[j.id] and state != 'finished'
+    my $docs = $jobs->aggregate(
+        [
+            {
+                '$match' => {
+                    state    => 'finished',
+                    finished => {
+                        '$lte' => $now->clone->subtract(
+                            seconds => $minion->remove_after
+                        )
+                    }
+                }
+            },
+            {
+                '$lookup' => {
+                    from     => $self->prefix . '.jobs',
+                    let      => { parent => '$_id' },
+                    pipeline => [
+                        {
+                            '$match' => {
+                                '$expr' => {
+                                    '$and' => [
+                                        { '$in' => [ '$$parent', '$parents' ] },
+                                        { '$ne' => [ '$state',   'finished' ] },
+                                    ],
+                                }
+                            },
+                        },
+                    ],
+                    as => 'parents'
+                }
+            },
+        ]
+    );
+    my @ids_to_delete;
+    while ( my $doc = $docs->next ) {
+        push @ids_to_delete, $doc->{_id}
+          unless ( scalar( @{$doc->{parents}} ) );
+    }
+    $jobs->delete_many( { _id => { '$in' => \@ids_to_delete } } );
+
+    # or (expires <= now() and state = 'inactive')
+    $jobs->delete_many(
+        { expires => { '$lte' => $now }, state => 'inactive' } );
+
+    # Jobs with missing worker (can be retried)
+    my $cursor = $jobs->find(
+        {
+            state => 'active',
+            queue => { '$ne' => 'minion_foreground' }
+        }
+    );
+    while ( my $job = $cursor->next ) {
+        $self->fail_job( @$job{qw(_id retries)}, 'Worker went away' )
+          unless $self->workers->count_documents( { _id => $job->{worker} } );
+    }
+
+    # Jobs in queue without workers or not enough workers
+    # (cannot be retried and requires admin attention)
+    $jobs->update_many(
+        {
+            state   => 'inactive',
+            delayed => {
+                '$lt' =>
+                  $now->clone->subtract( seconds => $minion->stuck_after )
+            },
+        },
+        {
+            '$set' =>
+              { state => 'failed', result => 'Job appears stuck in queue' }
+        }
+    );
+
 }
 
 sub reset {
-    my ($s, $options) = (shift, shift // {});
-    if ($options->{all}) {
-        $_->drop for $s->workers, $s->jobs, $s->locks
-    } elsif ($options->{locks}) {
+    my ( $s, $options ) = ( shift, shift // {} );
+    $s->_init_db;
+    if ( $options->{all} ) {
+        $_->drop for $s->workers, $s->jobs, $s->locks;
+    }
+    elsif ( $options->{locks} ) {
         $_->drop for $s->{locks};
-    } else {
+    }
+    else {
         warn "Starting to v10.0 you must explicit what you want to reset";
     }
 }
 
 sub retry_job {
-  my ($self, $id, $retries, $options) = (shift, shift, shift, shift || {});
-  $options->{delay} //= 0;
+    my ( $self, $id, $retries, $options ) =
+      ( shift, shift, shift, shift || {} );
+    $options->{delay} //= 0;
 
-  my $dt_now = DateTime->now();
+    my $dt_now = DateTime->now();
 
-  my $query = {_id => $self->_oid($id), retries => $retries};
-  my $update = {
-    '$inc' => {retries => 1},
-    '$set' => {
-      retried => $dt_now,
-      state   => 'inactive',
-      delayed => $dt_now->clone->add(seconds => $options->{delay})
-    },
-  };
+    my $query  = { _id => $self->_oid($id), retries => $retries };
+    my $update = {
+        '$inc' => { retries => 1 },
+        '$set' => {
+            retried => $dt_now,
+            state   => 'inactive',
+            delayed => $dt_now->clone->add( seconds => $options->{delay} || 0 ),
+        },
+    };
 
-  foreach(qw(attempts parents priority queue)) {
-      $update->{'$set'}->{$_} = $options->{$_} if (defined $options->{$_});
-  }
+    $update->{'$set'}->{expires} =
+      $dt_now->clone->add( seconds => $options->{expire} )
+      if exists $options->{expire};
 
-  my $res = $self->jobs->update_one($query, $update);
-  $self->notifications->insert_one({c => 'update_retries'});
-  return !!$res->matched_count;
+    foreach (qw(attempts parents priority queue lax)) {
+        $update->{'$set'}->{$_} = $options->{$_} if ( defined $options->{$_} );
+    }
+
+    my $res = $self->jobs->update_one( $query, $update );
+    $self->notifications->insert_one( { c => 'update_retries' } );
+    return !!$res->matched_count;
 }
 
 sub stats {
-  my $self = shift;
+    my $self = shift;
 
-  my $jobs = $self->jobs;
-  my $active =
-    @{$self->mongodb->run_command([distinct => $jobs->name, key => 'worker', query => {state => 'active'}])
-      ->{values}};
-  my $all = $self->workers->count_documents({});
-  my $stats = {active_workers => $active, inactive_workers => $all - $active};
-  $stats->{"${_}_jobs"} = $jobs->count_documents({state => $_}) for qw(active failed finished inactive);
-  $stats->{active_locks} = $self->list_locks->{total};
-  $stats->{delayed_jobs} = $self->jobs->count_documents({
-      state => 'inactive',
-      delayed => {'$gt' => bson_time}
-  });
-  # I don't know if this value is correct as calculated. PG use the incremental
-  # sequence id
-  $stats->{enqueued_jobs} += $stats->{"${_}_jobs"} for qw(active failed finished inactive);
-  eval {
-      $stats->{uptime} = $self->admin->run_command(Tie::IxHash->new('serverStatus' => 1))->{uptime};
-  };
-  # User doesn't have admin authorization. Server uptime missing
-  $stats->{uptime} = -1 if ($@);
-  return $stats;
+    my $jobs   = $self->jobs;
+    my $active = @{
+        $self->mongodb->run_command(
+            [
+                distinct => $jobs->name,
+                key      => 'worker',
+                query    => { state => 'active' }
+            ]
+        )->{values}
+    };
+    my $all = $self->workers->count_documents( {} );
+    my $stats =
+      { active_workers => $active, inactive_workers => $all - $active };
+    $stats->{inactive_jobs} = $jobs->count_documents(
+        {
+            state => 'inactive',
+            '$or' => [
+                { expires => undef },
+                { expires => { '$gt' => DateTime->now } },
+            ]
+        }
+    );
+    $stats->{"${_}_jobs"} = $jobs->count_documents( { state => $_ } )
+      for qw(active failed finished);
+    $stats->{active_locks} = $self->list_locks->{total};
+    $stats->{delayed_jobs} = $self->jobs->count_documents(
+        {
+            state   => 'inactive',
+            delayed => { '$gt' => bson_time }
+        }
+    );
+
+   # I don't know if this value is correct as calculated. PG use the incremental
+   # sequence id
+    $stats->{enqueued_jobs} += $stats->{"${_}_jobs"}
+      for qw(active failed finished inactive);
+    eval {
+        $stats->{uptime} =
+          $self->admin->run_command( Tie::IxHash->new( 'serverStatus' => 1 ) )
+          ->{uptime};
+    };
+
+    # User doesn't have admin authorization. Server uptime missing
+    $stats->{uptime} = -1 if ($@);
+    return $stats;
 }
 
 sub unlock {
-    my ($s, $name) = @_;
+    my ( $s, $name ) = @_;
 
     # remove the first (more proximum to expiration) lock
-    my $doc = $s->locks->find_one_and_update(
-        {name => $name},
-        {'$pop' => {expires => -1}}
-    );
+    my $doc = $s->locks->find_one_and_update( { name => $name },
+        { '$pop' => { expires => -1 } } );
 
     # delete lock record if expires is empty
-    $s->locks->delete_one({name => $name, expires => {'$size' => 0}}) if ($doc);
+    $s->locks->delete_one( { name => $name, expires => { '$size' => 0 } } )
+      if ($doc);
 
-    return defined $doc ;
+    return defined $doc;
 }
-sub unregister_worker { $_[0]->workers->delete_one({_id => $_[0]->_oid($_[1])}) }
 
-sub worker_info { $_[0]->_worker_info($_[0]->workers->find_one({_id => $_[1]})) }
+sub unregister_worker {
+    $_[0]->workers->delete_one( { _id => $_[0]->_oid( $_[1] ) } );
+}
+
+sub worker_info {
+    $_[0]->_worker_info( $_[0]->workers->find_one( { _id => $_[1] } ) );
+}
 
 sub _await {
-  my $self = shift;
+    my $self = shift;
 
-  my $last = $self->{last} //= BSON::OID->new;
-  my $cursor = $self->notifications->find({
-    _id => {'$gt' => $last},
-    '$or' =>  [
-        { c => 'created'},
-        { c => 'update_retries'}
-    ]
-  })->tailable_await(1);
-  return undef unless my @doc = $cursor->all;
-  $self->{last} = $doc[-1]->{_id};
-  return 1;
+    my $last   = $self->{last} //= BSON::OID->new;
+    my $cursor = $self->notifications->find(
+        {
+            _id   => { '$gt' => $last },
+            '$or' => [ { c => 'created' }, { c => 'update_retries' } ]
+        }
+    )->tailable_await(1);
+    return undef unless my @doc = $cursor->all;
+    $self->{last} = $doc[-1]->{_id};
+    return 1;
+}
+
+sub _dtkey {
+    return substr( $_[0]->datetime, 0, -6 );
+}
+
+sub _enqueue {
+    my ( $self, $task, $args, $options ) = @_;
+    @{ $options->{parents} } = map $self->_oid($_), @{ $options->{parents} }
+      if ( exists $options->{parents} );
+
+    my $now = DateTime->now();
+    my $doc = {
+        args    => $args,
+        created => $now,
+        delayed => $options->{delay}
+        ? $now->clone->add( seconds => $options->{delay} )
+        : $now,
+        priority => $options->{priority} // 0,
+        state    => 'inactive',
+        task     => $task,
+        retries  => 0,
+        attempts => $options->{attempts} // 1,
+        notes    => $options->{notes}   || {},
+        parents  => $options->{parents} || [],
+        queue    => $options->{queue} // 'default',
+        sequence => $options->{sequence},
+        expires  => $options->{expire} ? $now->clone->add(
+            seconds => $options->{expire}
+        ) : undef,
+        lax => $options->{lax} ? 1 : 0,
+    };
+
+    my $res = $self->jobs->insert_one($doc);
+    my $id  = $res->inserted_id;
+    return $id;
+}
+
+sub _init_db {
+    my $s = shift;
+
+    # indexes for jobs
+    $s->jobs->indexes->create_one(
+        Tie::IxHash->new( state => 1, delayed => 1, task => 1, queue => 1 ) );
+    $s->jobs->indexes->create_one( Tie::IxHash->new( finished => 1 ) );
+    $s->jobs->indexes->create_one(
+        Tie::IxHash->new( sequence => 1, next => 1 ) );
+    $s->jobs->indexes->create_one( Tie::IxHash->new( expires => 1 ) );
+
+    # indexes for locks
+    $s->locks->indexes->create_one( Tie::IxHash->new( name => 1 ),
+        { unique => 1 } );
+    $s->locks->indexes->create_one( Tie::IxHash->new( expires => 1 ) );
+
+    # Capped collection for notifications
+    $s->_notifications;
 }
 
 sub _job_info {
-  my $self = shift;
+    my $self = shift;
 
-  return undef unless my $job = shift;
+    return undef unless my $job = shift;
 
-  $job->{id}        = $job->{_id}->hex;
-  $job->{retries} //= 0;
-  $job->{children}  = [map $_->{_id}->hex, @{$job->{children}}];
-  $job->{time}      = DateTime->now->epoch; # server time
+    $job->{id} = $job->{_id}->hex;
+    $job->{retries} //= 0;
+    $job->{children} = [ map $_->{_id}->hex, @{ $job->{children} } ];
+    $job->{time}     = DateTime->now->epoch;    # server time
 
-  return $job;
+    return $job;
 }
 
 sub _lock {
-    my ($s, $name, $duration, $count) = @_;
+    my ( $s, $name, $duration, $count ) = @_;
 
     my $dt_now = DateTime->now;
-    my $dt_exp = $dt_now->clone->add(seconds => $duration);
+    my $dt_exp = $dt_now->clone->add( seconds => $duration );
 
-
-    my $match = {name => $name};
+    my $match = { name => $name };
 
     # expires count (I know, this is not atomic, I didn't find any alternative)
     return 0 if $s->_locks_count($match) >= $count;
@@ -532,140 +769,216 @@ sub _lock {
     );
 
     # remove expired locks
-    my $del = $s->locks->update_many({}, {'$pull' => {expires => {'$lte' => $dt_now}}});
+    my $del = $s->locks->update_many( {},
+        { '$pull' => { expires => { '$lte' => $dt_now } } } );
+
     # delete lock record if expires is empty
-    $s->locks->delete_one({name => $name, expires => {'$size' => 0}})
-        if ($del->{modified_count});
+    $s->locks->delete_one( { name => $name, expires => { '$size' => 0 } } )
+      if ( $del->{modified_count} );
 
     return 1;
 }
 
 sub _locks_count {
-    my $s = shift;
+    my $s     = shift;
     my $match = shift;
 
     my @aggregate = (
-        { '$group' => {
-            _id         => undef,
-            locks_count => { '$sum' =>  { '$size' => '$expires' } }
-        } },
+        {
+            '$group' => {
+                _id         => undef,
+                locks_count => { '$sum' => { '$size' => '$expires' } }
+            }
+        },
         { '$project' => { _id => 0 } }
     );
 
-    unshift @aggregate, {'$match' => $match} if $match;
+    unshift @aggregate, { '$match' => $match } if $match;
 
-    my $rec = $s->locks->aggregate(\@aggregate)->next;
+    my $rec = $s->locks->aggregate( \@aggregate )->next;
 
     return $rec ? $rec->{locks_count} : 0;
 }
 
 sub _notifications {
-  my $self = shift;
+    my $self = shift;
 
-  # We can only await data if there's a document in the collection
-  $self->{capped} ? return : $self->{capped}++;
-  my $notifications = $self->notifications;
-  return if grep { $_ eq $notifications->name } $self->mongodb->collection_names;
+    # We can only await data if there's a document in the collection
+    $self->{capped} ? return : $self->{capped}++;
+    my $notifications = $self->notifications;
+    return
+      if grep { $_ eq $notifications->name } $self->mongodb->collection_names;
 
-  $self->mongodb->run_command([create => $notifications->name, capped => 1, size => 1048576, max => 128]);
-  $notifications->insert_one({});
+    $self->mongodb->run_command(
+        [
+            create => $notifications->name,
+            capped => true,
+            size   => 10240,
+            max    => 128
+        ]
+    );
+    $notifications->insert_one( {} );
 }
 
 sub _oid {
-	return defined $_[1] ? BSON::OID->new(oid => pack("H*", $_[1])) : undef;
+    return defined $_[1] ? BSON::OID->new( oid => pack( "H*", $_[1] ) ) : undef;
+}
+
+sub _reconnect_db {
+    my $s = shift;
+    $s->minion->on(
+        worker => sub {
+            $_[1]->on(
+                dequeue => sub {
+                    $_[1]->on(
+                        start => sub {
+                            $s->minion->backend->mongodb->client->reconnect();
+                        }
+                    );
+                }
+            );
+        }
+    );
 }
 
 sub _total {
-    my ($name, $res, $tot) = @_;
-    return { total => $tot, $name => $res};
+    my ( $name, $res, $tot ) = @_;
+    return { total => $tot, $name => $res };
 }
 
 sub _try {
-  my ($self, $id, $options) = @_;
+    my ( $self, $id, $options ) = @_;
 
-  my $match = Tie::IxHash->new(
-    delayed   => {'$lt' => DateTime->from_epoch(epoch => time)},
-    state     => 'inactive',
-    task      => {'$in' => [keys %{$self->minion->tasks}]},
-    queue     => {'$in' => $options->{queues} // ['default']}
-  );
-  $match->Push('_id' => $self->_oid($options->{id})) if defined $options->{id};
+    my $now = DateTime->now;
 
-  my $docs = $self->jobs->find($match)->sort({priority => -1, id => 1});
+    my $match = Tie::IxHash->new(
+        delayed => { '$lte' => $now },
+        state   => 'inactive',
+        task    => { '$in' => [ keys %{ $self->minion->tasks } ] },
+        queue   => { '$in' => $options->{queues} // ['default'] },
+        '$or'   => [ { expires => undef }, { expires => { '$gt' => $now } } ],
+    );
+    $match->Push( '_id' => $self->_oid( $options->{id} ) )
+      if defined $options->{id};
+    $match->Push( 'priority' => { '$gte' => $options->{min_priority} } )
+      if exists $options->{min_priority};
 
-  my $find = 0;
-  my $doc_matched;
-  while ((my $doc = $docs->next) && !$find) {
-    # parents not exits or
-    # exists but are not in inactive, active, failed states
-    $find = !scalar @{$doc->{parents}} ||
-        !$self->jobs->count_documents({
-            _id => {'$in' => $doc->{parents}},
-            state => {'$in' => ['inactive', 'active', 'failed']}
-    });
-    $doc_matched = $doc if $find;
-  }
+    my $docs =
+      $self->jobs->find( $match, { sort => [ 'priority', -1, '_id', 1 ] } );
 
-  return undef unless $doc_matched;
+    my $find = 0;
+    my $doc_matched;
+    while ( ( my $doc = $docs->next ) && !$find ) {
 
-  my $doc = [
-    {_id => $doc_matched->{_id}, state => 'inactive'},
-    {'$set' => {
-        started => DateTime->from_epoch(epoch => time),
-        state => 'active',
-        worker => $self->_oid($id)
-    }},
-    {
-        projection      => {args => 1, retries => 1, task => 1},
-        upsert          => 0,
-        returnDocument  => 'after',
+        $find =
+
+          # parents = '{}'
+          !scalar @{ $doc->{parents} } ||
+
+          # not exist ... where
+          !$self->jobs->count_documents(
+            {
+                '$and' => [
+                    { _id => { '$in' => $doc->{parents} } }
+                    ,    # (id = any parents) and
+                    {
+                        '$or' => [
+                            { state => 'active' },
+                            {
+                                '$and' => [
+                                    { state => 'failed' },
+                                    { _id => { '$exists' => !$doc->{lax} }
+                                    }    # a bad way to say "not doc.lax"
+                                ]
+                            },
+                            {
+                                '$and' => [
+                                    { state => 'inactive' },
+                                    {
+                                        '$or' => [
+                                            { expires => undef },
+                                            {
+                                                expires =>
+                                                  { '$gt' => DateTime->now }
+                                            }
+                                        ]
+                                    },
+                                ]
+                            },
+                        ]
+                    },
+                ]
+            }
+          );
+        $doc_matched = $doc if $find;
     }
-  ];
+    return undef unless $doc_matched;
 
-  my $job = $self->jobs->find_one_and_update(@$doc);
-  return undef unless ($job->{_id});
-  $job->{id} = $job->{_id}->hex;
-  return $job;
+    my $doc = [
+        { _id => $doc_matched->{_id}, state => 'inactive' },
+        {
+            '$set' => {
+                started => DateTime->from_epoch( epoch => time ),
+                state   => 'active',
+                worker  => $self->_oid($id)
+            }
+        },
+        {
+            projection     => { args => 1, retries => 1, task => 1 },
+            upsert         => 0,
+            returnDocument => 'after',
+        }
+    ];
+
+    my $job = $self->jobs->find_one_and_update(@$doc);
+    return undef unless ( $job->{_id} );
+    $job->{id} = $job->{_id}->hex;
+    return $job;
 }
 
 sub _update {
-  my ($self, $fail, $id, $retries, $result) = @_;
+    my ( $self, $fail, $id, $retries, $result ) = @_;
 
-  my $update = {
-      finished => DateTime->now,
-      state => $fail ? 'failed' : 'finished',
-      result => $fail ?  $result . '' : $result ,
-  };
-  my $query = {_id => $self->_oid($id), state => 'active', retries => $retries};
-  my $doc = $self->jobs->find_one_and_update($query, {'$set' => $update},
-    {returnDocument => 'after'});
+    my $update = {
+        finished => DateTime->now,
+        state    => $fail ? 'failed'     : 'finished',
+        result   => $fail ? $result . '' : $result,
+    };
+    my $query =
+      { _id => $self->_oid($id), state => 'active', retries => $retries };
+    my $doc = $self->jobs->find_one_and_update(
+        $query,
+        { '$set'         => $update },
+        { returnDocument => 'after' }
+    );
 
-  return undef unless ($doc->{attempts});
+    return undef unless ( $doc->{attempts} );
 
-  return 1 if !$fail || (my $attempts = $doc->{attempts}) == 1;
-  return 1 if $retries >= ($attempts - 1);
-  my $delay = $self->minion->backoff->($retries);
-  return $self->retry_job($id, $retries, {delay => $delay});
+    # return 1 if !$fail || (my $attempts = $doc->{attempts}) == 1;
+    # return 1 if $retries >= ($attempts - 1);
+    # my $delay = $self->minion->backoff->($retries);
+    return $fail ? $self->auto_retry_job( $id, $retries, $doc->{attempts} ) : 1;
 }
 
 sub _worker_info {
-  my $self = shift;
+    my $self = shift;
 
-  return undef unless my $worker = shift;
+    return undef unless my $worker = shift;
 
-  # lookup jobs
-  my $cursor = $self->jobs->find({state => 'active', worker => $worker->{_id}});
+    # lookup jobs
+    my $cursor =
+      $self->jobs->find( { state => 'active', worker => $worker->{_id} } );
 
-  return {
-    host     => $worker->{host},
-    id       => $worker->{_id}->hex,
-    jobs     => [map { $_->{_id}->hex } $cursor->all],
-    pid      => $worker->{pid},
-    started  => $worker->{started}->epoch,
-    notified => $worker->{notified}->epoch,
-    inbox    => $worker->{inbox},
-    status   => $worker->{status},
-  };
+    return {
+        host     => $worker->{host},
+        id       => $worker->{_id}->hex,
+        jobs     => [ map { $_->{_id}->hex } $cursor->all ],
+        pid      => $worker->{pid},
+        started  => $worker->{started}->epoch,
+        notified => $worker->{notified}->epoch,
+        inbox    => $worker->{inbox},
+        status   => $worker->{status},
+    };
 }
 
 1;
@@ -674,15 +987,21 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 Minion::Backend::MongoDB - MongoDB backend for Minion
 
+=for html <p>
+    <a href="https://github.com/avkhozov/Minion-Backend-MongoDB/actions/workflows/test.yml">
+        <img alt="github workflow tests" src="https://github.com/avkhozov/Minion-Backend-MongoDB/actions/workflows/test.yml/badge.svg">
+    </a>
+    <img alt="Top language: " src="https://img.shields.io/github/languages/top/avkhozov/Minion-Backend-MongoDB">
+    <img alt="github last commit" src="https://img.shields.io/github/last-commit/avkhozov/Minion-Backend-MongoDB">
+</p>
+
 =head1 VERSION
 
-version 1.06
+version 1.09
 
 =head1 SYNOPSIS
 
@@ -692,8 +1011,12 @@ version 1.06
 
 =head1 DESCRIPTION
 
-This is a L<MongoDB> backend for L<Minion> v10.01 (2019-12-16) derived from
-L<MongoDB::Minion::Pg> and which supports all its features.
+This is a L<MongoDB> backend for L<Minion> derived from
+L<Minion::Backend::Pg> and supports for all its features.
+L<Mojolicious> 9.0 compatibility and synced with L<Minion::Backend::Pg> v.10.22
+features.
+
+=encoding UTF-8
 
 =head1 ATTRIBUTES
 
@@ -750,9 +1073,64 @@ Broadcast remote control command to one or more workers.
 =head2 dequeue
 
   my $info = $backend->dequeue($worker_id, 0.5);
+  my $job_info = $backend->dequeue($worker_id, 0.5, {queues => ['important']});
 
-Wait for job, dequeue it and transition from C<inactive> to C<active> state or
-return C<undef> if queue was empty.
+Wait a given amount of time in seconds for a job, dequeue it and transition from C<inactive> to C<active> state, or
+return C<undef> if queues were empty.
+
+These options are currently available:
+
+=over 2
+
+=item id
+
+  id => '10023'
+
+Dequeue a specific job.
+
+=item min_priority
+
+  min_priority => 3
+
+Do not dequeue jobs with a lower priority.
+
+=item queues
+
+  queues => ['important']
+
+One or more queues to dequeue jobs from, defaults to C<default>.
+
+=back
+
+These fields are currently available:
+
+=over 2
+
+=item args
+
+  args => ['foo', 'bar']
+
+Job arguments.
+
+=item id
+
+  id => '10023'
+
+Job ID.
+
+=item retries
+
+  retries => 3
+
+Number of times job has been retried.
+
+=item task
+
+  task => 'foo'
+
+Task name.
+
+=back
 
 =head2 enqueue
 
@@ -760,21 +1138,71 @@ return C<undef> if queue was empty.
   my $job_id = $backend->enqueue(foo => [@args]);
   my $job_id = $backend->enqueue(foo => [@args] => {priority => 1});
 
-Enqueue a new job with C<inactive> state. These options are currently available:
+Enqueue a new job with C<inactive> state.
+
+These options are currently available:
 
 =over 2
+
+=item attempts
+
+  attempts => 25
+
+Number of times performing this job will be attempted, with a delay based on L<Minion/"backoff"> after the first
+attempt, defaults to C<1>.
 
 =item delay
 
   delay => 10
 
-Delay job for this many seconds from now.
+Delay job for this many seconds (from now), defaults to C<0>.
+
+=item expire
+
+  expire => 300
+
+Job is valid for this many seconds (from now) before it expires. Note that this option is B<EXPERIMENTAL> and might
+change without warning!
+
+=item lax
+
+  lax => 1
+
+Existing jobs this job depends on may also have transitioned to the C<failed> state to allow for it to be processed,
+defaults to C<false>. Note that this option is B<EXPERIMENTAL> and might change without warning!
+
+=item notes
+
+  notes => {foo => 'bar', baz => [1, 2, 3]}
+
+Hash reference with arbitrary metadata for this job.
+
+=item parents
+
+  parents => [$id1, $id2, $id3]
+
+One or more existing jobs this job depends on, and that need to have transitioned to the state C<finished> before it
+can be processed.
 
 =item priority
 
   priority => 5
 
-Job priority, defaults to C<0>.
+Job priority, defaults to C<0>. Jobs with a higher priority get performed first. Priorities can be positive or negative,
+but should be in the range between C<100> and C<-100>.
+
+=item queue
+
+  queue => 'important'
+
+Queue to put job in, defaults to C<default>.
+
+=item sequence
+
+  sequence => 'host:mojolicious.org'
+
+Sequence this job belongs to. The previous job from the sequence will be automatically added as a parent to continue the
+sequence. Note that this option is B<EXPERIMENTAL> and might change without warning!
 
 =back
 
@@ -804,9 +1232,24 @@ Get information about a job or return C<undef> if job does not exist.
 
 Returns the same information as L</"job_info"> but in batches.
 
+  # Get the total number of results (without limit)
+  my $num = $backend->list_jobs(0, 100, {queues => ['important']})->{total};
+  # Check job state
+  my $results = $backend->list_jobs(0, 1, {ids => [$job_id]});
+  my $state = $results->{jobs}[0]{state};
+  # Get job result
+  my $results = $backend->list_jobs(0, 1, {ids => [$job_id]});
+  my $result = $results->{jobs}[0]{result};
+
 These options are currently available:
 
 =over 2
+
+=item before
+
+  before => 23
+
+List only jobs before this id.
 
 =item ids
 
@@ -826,6 +1269,12 @@ and might change without warning!
   queues => ['important', 'unimportant']
 
 List only jobs in these queues.
+
+=item sequences
+
+  sequences => ['host:localhost', 'host:mojolicious.org']
+
+List only jobs from these sequences. Note that this option is B<EXPERIMENTAL> and might change without warning!
 
 =item state
 
@@ -887,11 +1336,23 @@ Epoch time job was finished.
 
 Job id.
 
+=item next
+
+  next => 10024
+
+Next job in sequence.
+
 =item notes
 
   notes => {foo => 'bar', baz => [1, 2, 3]}
 
 Hash reference with arbitrary metadata for this job.
+
+=item previous
+
+  previous => 10022
+
+Previous job in sequence.
 
 =item parents
 
@@ -928,6 +1389,12 @@ Epoch time job has been retried.
   retries => 3
 
 Number of times job has been retried.
+
+=item sequence
+
+  sequence => 'host:mojolicious.org'
+
+Sequence name.
 
 =item started
 
@@ -1022,6 +1489,12 @@ Returns information about workers in batches.
 These options are currently available:
 
 =over 2
+
+=item before
+
+  before => 23
+
+List only workers before this id.
 
 =item ids
 
@@ -1281,9 +1754,22 @@ User must have this roles
                 }
         ]
 
+=head1 BUGS/CONTRIBUTING
+
+Please report any bugs through the web interface at L<https://github.com/avkhozov/Minion-Backend-MongoDB/issues>
+If you want to contribute changes or otherwise involve yourself in development, feel free to fork the Git repository from
+L<https://github.com/avkhozov/Minion-Backend-MongoDB/>.
+
+=head1 SUPPORT
+
+You can find this documentation with the perldoc command too.
+
+    perldoc Minion::Backend::MongoDB
+
 =head1 SEE ALSO
 
-L<Minion>, L<MongoDB>, L<http://mojolicio.us>.
+L<Minion>, L<MongoDB>, L<Minion::Guide>, L<https://minion.pm>,
+L<Mojolicious::Guides>, L<https://mojolicious.org>.
 
 =head1 AUTHOR
 
@@ -1291,7 +1777,7 @@ Emiliano Bruni <info@ebruni.it>, Andrey Khozov <avkhozov@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2020 by Emiliano Bruni, Andrey Khozov.
+This software is Copyright (c) 2019-2021 by Emiliano Bruni, Andrey Khozov.
 
 This is free software, licensed under:
 

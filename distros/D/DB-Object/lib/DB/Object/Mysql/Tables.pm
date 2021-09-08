@@ -23,6 +23,7 @@ BEGIN
     $VERBOSE    = 0;
     $DEBUG      = 0;
     use Devel::Confess;
+    # <https://dev.mysql.com/doc/refman/8.0/en/data-types.html>
 };
 
 sub init

@@ -1,0 +1,50 @@
+=encoding utf-8
+
+=head1 NAME
+
+SDL2::ControllerSensorEvent - Game controller touchpad event structure
+
+=head1 SYNOPSIS
+
+    use SDL2 qw[:all];
+    # TODO: I need to whip up a quick example
+
+=head1 DESCRIPTION
+
+
+
+=head1 Fields
+
+=over
+
+=item C<type> - C<SDL_CONTROLLERSENSORUPDATE>
+
+=item C<timestamp> - In milliseconds, populated using L<< C<SDL_GetTicks( )>|SDL2::FFI/C<SDL_GetTicks( )> >>
+
+=item C<which> - The joystick instance id
+
+=item C<sensor> - The type of the sensor, one of the values of C<SDL_SensorType>
+
+=item C<data> - Up to 2 values from the sensor, as defined in C<SDL_sensor.h>
+
+=back
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under
+the terms found in the Artistic License 2. Other copyrights, terms, and
+conditions may apply to data transmitted through this module.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=begin stopwords
+
+touchpad
+
+=end stopwords
+
+=cut

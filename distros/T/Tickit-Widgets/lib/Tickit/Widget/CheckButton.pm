@@ -5,7 +5,7 @@
 
 use Object::Pad 0.41;  # :param
 
-package Tickit::Widget::CheckButton 0.32;
+package Tickit::Widget::CheckButton 0.33;
 class Tickit::Widget::CheckButton
    extends Tickit::Widget;
 

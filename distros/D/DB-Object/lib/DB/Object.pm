@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object.pm
-## Version v0.9.15
+## Version v0.10.1
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2021/08/20
+## Modified 2021/08/29
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,8 +19,6 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic DBI );
-    use IO::File;
-    use File::Spec;
     use Regexp::Common;
     use Scalar::Util qw( blessed );
     use DB::Object::Statement;
@@ -28,13 +26,14 @@ BEGIN
     use DB::Object::Cache::Tables;
     use DBI;
     use JSON;
+    use Module::Generic::File qw( sys_tmpdir );
     use POSIX ();
     use Want;
     ## DBI->trace( 5 );
     our( $VERSION, $DB_ERRSTR, $ERROR, $DEBUG, $CONNECT_VIA, $CACHE_QUERIES, $CACHE_SIZE );
     our( $CACHE_TABLE, $USE_BIND, $USE_CACHE, $MOD_PERL, @DBH, $CACHE_DIR );
     our( $CONSTANT_QUERIES_CACHE, $QUERIES_CACHE );
-    $VERSION     = 'v0.9.15';
+    $VERSION     = 'v0.10.1';
     use Devel::Confess;
 };
 
@@ -80,7 +79,7 @@ sub init
 {
     my $self = shift( @_ );
     $self->{cache_connections} = 1;
-    $self->{cache_dir} = File::Spec->tmpdir();
+    $self->{cache_dir} = sys_tmpdir();
     $self->{driver} = '';
     ## Auto-decode json data into perl hash
     $self->{auto_decode_json} = 1;
@@ -675,6 +674,8 @@ sub fatal
     return( $self->{fatal} );
 }
 
+sub get_sql_type { return( shift->error( "The driver has not provided support for this method get_sql_type()" ) ); }
+
 sub host { return( shift->_set_get_scalar( 'host', @_ ) ); }
 
 ## $rv = $dbh->last_insert_id($catalog, $schema, $table, $field, \%attr);
@@ -998,7 +999,7 @@ sub set
             my $err = '*** ' . join( "\n*** ", split( /\n/, $@ ) );
             if( $self->fatal() )
             {
-                die( "Error occured while setting SQL variables before executing query:\n$self->{ 'sth' }->{ 'Statement' }\n$err\n" );
+                die( "Error occured while setting SQL variables before executing query:\n$self->{sth}->{Statement}\n$err\n" );
             }
             else
             {
@@ -1006,7 +1007,7 @@ sub set
             }
         }
     }
-    return( 1 );
+    return(1);
 }
 
 # To also consider:
@@ -1408,7 +1409,7 @@ sub _cache_this
     # $self->message( 3, "Returning statement handler" );
     #$sth->{query_object} = ( ref( $q ) && $q->isa( 'DB::Object::Query' ) ) ? $q : '';
     # $self->message( 3, "Saving query object '$q' in the statement handler." );
-    $sth->query_object( $q );
+    $sth->query_object( $q ) if( $self->_is_a( $q, 'DB::Object::Query' ) );
     # $self->message( 3, "So far, the table alias set for '", $q->table_object->name, "' is '", $q->table_alias, "'." );
     # print( STDERR ref( $self ) . "::_cache_this(): prepared statement was ", $cached_sth ? 'cached' : 'not cached.', "\n" );
     ## Caching the query as a constant
@@ -1578,17 +1579,17 @@ sub _connection_params2hash
     
     if( $param->{conf_file} || $param->{config_file} || $ENV{DB_CON_FILE} )
     {
-        my $db_con_file = CORE::delete( $param->{conf_file} ) || CORE::delete( $param->{config_file} ) || $ENV{DB_CON_FILE};
+        my $db_con_file = $self->new_file( CORE::delete( $param->{conf_file} ) || CORE::delete( $param->{config_file} ) || $ENV{DB_CON_FILE} );
         my $db_con_file_ok = 0;
-        if( !-e( $db_con_file ) )
+        if( !$db_con_file->exists )
         {
             warn( "Database connection parameter file \"$db_con_file\" was provided but does not exist.\n" );
         }
-        elsif( -z( $db_con_file ) )
+        elsif( $db_con_file->is_empty )
         {
             warn( "Database connection parameter file \"$db_con_file\" was provided but the file is empty.\n" );
         }
-        elsif( !-r( $db_con_file ) )
+        elsif( !$db_con_file->can_read )
         {
             warn( "Database connection parameter file \"$db_con_file\" was provided but the file lacks privileges to be read.\n" );
         }
@@ -1604,11 +1605,9 @@ sub _connection_params2hash
             if( defined( *{ "JSON::" } ) )
             {
                 my $j = JSON->new->allow_nonref;
-                if( my $io = IO::File->new( "<$db_con_file" ) )
+                if( my $io = $db_con_file->open_utf8( '<' ) )
                 {
-                    $io->binmode( ':utf8' );
-                    my $data = join( '', $io->getlines );
-                    $io->close;
+                    my $data = $db_con_file->load;
                     $json = $j->decode( $data );
                 }
                 else
@@ -2332,10 +2331,26 @@ Doing some left join
     #     LEFT JOIN geoname AS l ON i.geoname_id = l.geoname_id
     # WHERE
     #     INET '?' << i.network
-    
+
+Using a promise (L<Promise::Me>) to execute an asynchronous query:
+
+    my $sth = $dbh->prepare( "SELECT some_slow_function(?)" ) || die( $dbh->error );
+    my $p = $sth->promise(10)->then(sub
+    {
+        my $st = shift( @_ );
+        my $ref = $st->fetchrow_hashref;
+        my $obj = My::Module->new( %$ref );
+    })->catch(sub
+    {
+        $log->warn( "Failed to execute query: ", @_ );
+    });
+    # Do other regular processing here
+    # Get the My::Module object
+    my( $obj ) = await( $p );
+
 =head1 VERSION
 
-    v0.9.15
+    v0.10.1
 
 =head1 DESCRIPTION
 
@@ -2361,6 +2376,8 @@ However, if you use the power of this interface to prepare queries conveniently,
     }
     $sth->exec(12) || die( $sth->error );
     my $ref = $sth->fetchrow_hashref;
+
+This will provide you with the convenience and power of L<DB::Object> while keeping execution fast.
 
 =head1 CONSTRUCTOR
 
@@ -2930,6 +2947,10 @@ See L<DB::Object::Tables/format_update>
 =head2 from_unixtime
 
 See L<DB::Object::Tables/from_unixtime>
+
+=head2 get_sql_type
+
+Provided with a sql type, irrespective of the character case, and this will return the driver equivalent constant value.
 
 =head2 group
 

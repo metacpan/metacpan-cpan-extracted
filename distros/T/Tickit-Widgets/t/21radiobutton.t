@@ -92,8 +92,7 @@ is_display( [ [TEXT("( )",fg=>15,b=>1), BLANK(2), TEXT("First radio")],
 {
    my $button = Tickit::Widget::RadioButton->new(
       label => "label",
-      fg => 3,
-      u  => 1,
+      style => { fg => 3, u => 1 },
    );
 
    is_deeply( { $button->pen->getattrs },

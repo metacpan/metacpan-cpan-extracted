@@ -3,8 +3,7 @@
   * My extended documentation: <http://perl.overmeer.net/CPAN/>
   * Development via GitHub: <https://github.com/markov2/perl5-XML-Compile-WSDL11>
   * Download from CPAN: <ftp://ftp.cpan.org/pub/CPAN/authors/id/M/MA/MARKOV/>
-  * Indexed from CPAN: <http://search.cpan.org/~markov/XML-Compile-WSDL11/>
-    and <https://metacpan.org/release/XML-Compile-WSDL11>
+  * Indexed from CPAN: <https://metacpan.org/release/XML-Compile-WSDL11>
 
 The XML-Compile suite is a large set of modules for various XML related
 standards.  This optional component implements the 1.1 specification of

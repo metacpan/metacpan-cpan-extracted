@@ -62,7 +62,7 @@ sub _new {
 	    die "UUID must be either 16 unsigned bytes, or 32/36 hex characters long";
 	}
     } elsif (exists $params{xml}) {
-	$self = Sys::Virt::Secret::_define_xml($con,  $params{xml});
+	$self = Sys::Virt::Secret::_define_xml($con,  $params{xml}, $params{flags});
     } else {
 	die "usageID, xml or uuid parameters are required";
     }
@@ -186,6 +186,19 @@ Include any secrets marked as private
 =item Sys::Virt::Secret::LIST_NO_PRIVATE
 
 Include any secrets not marked as private
+
+=back
+
+=head2 SECRET DEFINE
+
+The following constants can be used to control the behaviour
+of secret define operations
+
+=over 4
+
+=item Sys::Virt::Secret::DEFINE_VALIDATE
+
+Validate the XML document against the XML schema
 
 =back
 

@@ -20,24 +20,16 @@ sub new_ssh2
 		$xftp->{BlockSize} = $args{BlockSize} || 10240;
 		delete($args{BlockSize});
 	}	
-	my $saveEnvHome = $ENV{HOME};
-#		$ENV{HOME} = $xftp_args{home}  if ($xftp_args{home});
 	$xftp->{xftp} = Net::SSH2->new();
-	unless (defined $xftp->{xftp})
-	{
-		$xftp->{xftp_lastmsg} = $@;
-		return;
-	}
-#		$ENV{HOME} = $saveEnvHome || '';
+	return undef  unless (defined $xftp->{xftp});
 	if ($xftp->{xftp})
 	{
 		my $ok;
 		$args{user} ||= 'anonymous';
-		if (defined($args{port}) || defined($args{login_timeout}) || defined($args{compress}))
+		if (defined($args{port}) || defined($args{connect_timeout}) || defined($args{compress}))
 		{
 			$args{port} ||= 22;
-			my @loginargs;
-			@loginargs = ($host, $args{port});
+			my @loginargs = ($host, $args{port});
 			push (@loginargs, 'Timeout', $args{connect_timeout})  if (defined $args{connect_timeout});
 			push (@loginargs, 'Compress', $args{compress})  if (defined $args{compress});
 			$ok = $xftp->{xftp}->connect(@loginargs);
@@ -49,18 +41,19 @@ sub new_ssh2
 		}
 		unless (defined($ok) && $ok)
 		{
-			$xftp->{xftp_lastmsg} = "new:connect($host):Could not connect to host("
+			$@ = "new:connect($host):Could not connect to host("
 					.join(' ', $xftp->{xftp}->error()).")!";
-			return;
+			return undef;
 		}
+		my $authTimeout = $args{'login_timeout'} || 0;
 		if (defined $args{timeout})
 		{
 			$xftp->{xftp}->timeout($args{timeout});
+			$authTimeout ||= $args{timeout};
 			delete($args{timeout});
 		}
 		my $authRank;
 		my $auth;
-		my $authTimeout = $args{'login_timeout'} || 0;
 		if (defined $args{rank})
 		{
 			$authRank = ref($args{rank}) ? $args{rank} : [$args{rank}];
@@ -78,74 +71,78 @@ sub new_ssh2
 				$auth = $xftp->{xftp}->auth(rank => $authRank, %args);
 			};
 			my $at = $@;
-			$xftp->{xftp_lastmsg} = $at  if ($at);
 			alarm(0);
 			$@ = $at;
-			return  if ($at =~ /timeout/io);
+			return undef  if ($at =~ /timeout/io);
 			if ($auth)
 			{
 				$xftp->{sshsftp} = $xftp->{xftp}->sftp();					
 				unless ($xftp->{sshsftp})					
 				{
-					$xftp->{xftp_lastmsg} = 'sftp:auth_password:Could not authenticate, bad password('
-							.join(' ', $xftp->{xftp}->error()).')?';
-					$@ = $xftp->{xftp_lastmsg};
-					return;						
+					$@ = 'sftp:auth_password:Could not authenticate, bad password('
+							.join(' ', $xftp->{xftp}->error()).')? (' . $at . ')';
+					return undef;
 				}
 				my $cwd = $xftp->{sshsftp}->realpath('.');
 				$xftp->{cwd} = $cwd  if ($cwd);					
+				$xftp->{protocol} = 'Net::SFTP';
 				return $xftp;
 			}
 			else
 			{
 				$@ ||= join(' ', $xftp->{xftp}->error());
-				return;
+				return undef;
 			}
 		}
 		else
 		{
+			my $at;
 			$args{password} ||= 'anonymous@'  if ($args{user} eq 'anonymous');
 			my @loginargs = ($args{user}, $args{password});
-			push (@loginargs, $args{account})  if (defined $args{account});
+			push (@loginargs, $args{callback})  if (defined $args{callback});
 			$SIG{ALRM} = sub { die "timeout" };
 			eval
 			{
 				alarm($authTimeout)  if ($authTimeout);
 				$auth = $xftp->{xftp}->auth_password(@loginargs);
 			};
-			my $at = $@;
-			$xftp->{xftp_lastmsg} = $at  if ($at);
+			$at = $@;
 			alarm(0);
 			$@ = $at;
-			return  if ($at =~ /timeout/io);
+			return undef  if ($at =~ /timeout/io);
 			if ($auth)
 			{
 				$xftp->{sshsftp} = $xftp->{xftp}->sftp();					
 				unless ($xftp->{sshsftp})					
 				{
-					$xftp->{xftp_lastmsg} = 'sftp:auth_password:Could not authenticate, bad password('
-							.join(' ', $xftp->{xftp}->error()).')?';
-					$@ = $xftp->{xftp_lastmsg};
-					return;						
+					$@ = 'sftp:auth_password:Could not authenticate, bad password('
+							.join(' ', $xftp->{xftp}->error()).')? (' . $at . ')';
+					return undef;
 				}
 				my $cwd = $xftp->{sshsftp}->realpath('.');
 				$xftp->{cwd} = $cwd  if ($cwd);					
+				$xftp->{protocol} = 'Net::SFTP';
 				return $xftp;
 			}
 			else
 			{
 				$@ ||= join(' ', $xftp->{xftp}->error());
-				return;
+				return undef;
 			}
 		}
 		$@ ||= 'Invalid Password?';
-		return;
+		return undef;
 	}
 	else
 	{
 		$@ ||= 'Could not create Net::SSH2(::new) object?!';
-		return;
+		return undef;
 	}
+}
+
+sub protocol
+{
+	return shift->{protocol};
 }
 
 {

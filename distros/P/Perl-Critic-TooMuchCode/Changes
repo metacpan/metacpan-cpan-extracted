@@ -1,3 +1,9 @@
+0.16
+	- Released at 2021-08-31T08:48:07+0900
+	- ProhibitUnusedImport: Fix a case of false positive: Imported vars that are interpolated in strings should not be violations. Github Issue #19
+	- ProhibitExtraStricture: Match the list of strict-equivalent modules in Perl::Critic. Github PR #21
+	- ProhibitExtraStricture: Recognize the strictures implied by `use VERSION`. Github PR #23
+
 0.15
 	- Released at 2021-03-15T08:11:11+0900
 	- New policy: ProhibitExtraStricture

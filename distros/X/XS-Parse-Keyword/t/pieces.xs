@@ -9,16 +9,17 @@
 #include "XSUB.h"
 
 #include "XSParseKeyword.h"
+#include "XSParseInfix.h"
 
 #include "perl-backcompat.c.inc"
 
 static const char hintkey[] = "t::pieces/permit";
 
-static int build_expr(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hookdata)
+static int build_expr(pTHX_ OP **out, XSParseKeywordPiece *arg0, void *hookdata)
 {
   /* wrap the result in "("...")" parens so we can unit-test how it parsed */
   *out = newBINOP(OP_CONCAT, 0,
-    newBINOP(OP_CONCAT, 0, newSVOP(OP_CONST, 0, newSVpvs("(")), op_scope(arg0.op)),
+    newBINOP(OP_CONCAT, 0, newSVOP(OP_CONST, 0, newSVpvs("(")), op_scope(arg0->op)),
     newSVOP(OP_CONST, 0, newSVpvs(")")));
   return KEYWORD_PLUGIN_EXPR;
 }
@@ -39,15 +40,15 @@ static int build_prefixedblock(pTHX_ OP **out, XSParseKeywordPiece *args[], size
   return KEYWORD_PLUGIN_EXPR;
 }
 
-static int build_anonsub(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hookdata)
+static int build_anonsub(pTHX_ OP **out, XSParseKeywordPiece *arg0, void *hookdata)
 {
-  *out = newSVOP(OP_CONST, 0, newRV_noinc((SV *)cv_clone(arg0.cv)));
+  *out = newSVOP(OP_CONST, 0, newRV_noinc((SV *)cv_clone(arg0->cv)));
   return KEYWORD_PLUGIN_EXPR;
 }
 
-static int build_list(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hookdata)
+static int build_list(pTHX_ OP **out, XSParseKeywordPiece *arg0, void *hookdata)
 {
-  OP *list = arg0.op;
+  OP *list = arg0->op;
 
   /* TODO: Consider always doing this? */
   if(list->op_type != OP_LIST)
@@ -69,28 +70,28 @@ static int build_list(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hookdata)
   return KEYWORD_PLUGIN_EXPR;
 }
 
-static int build_constsv(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hookdata)
+static int build_constsv(pTHX_ OP **out, XSParseKeywordPiece *arg0, void *hookdata)
 {
-  *out = newSVOP(OP_CONST, 0, arg0.sv);
+  *out = newSVOP(OP_CONST, 0, arg0->sv);
   return KEYWORD_PLUGIN_EXPR;
 }
 
-static int build_constsv_or_undef(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hookdata)
+static int build_constsv_or_undef(pTHX_ OP **out, XSParseKeywordPiece *arg0, void *hookdata)
 {
-  if(arg0.sv)
-    *out = newSVOP(OP_CONST, 0, arg0.sv);
+  if(arg0->sv)
+    *out = newSVOP(OP_CONST, 0, arg0->sv);
   else
     *out = newOP(OP_UNDEF, OPf_WANT_SCALAR);
   return KEYWORD_PLUGIN_EXPR;
 }
 
-static int build_constpadix(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hookdata)
+static int build_constpadix(pTHX_ OP **out, XSParseKeywordPiece *arg0, void *hookdata)
 {
-  *out = newSVOP(OP_CONST, 0, newSVuv(arg0.padix));
+  *out = newSVOP(OP_CONST, 0, newSVuv(arg0->padix));
   return KEYWORD_PLUGIN_EXPR;
 }
 
-static int build_literal(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hookdata)
+static int build_literal(pTHX_ OP **out, XSParseKeywordPiece *arg0, void *hookdata)
 {
   /* ignore arg0 */
 
@@ -113,6 +114,13 @@ static int build_attrs(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs
       SvPOK(args[argi+1]->attr.value) ? SvPV_nolen(args[argi+1]->attr.value) : "");
 
   *out = newSVOP(OP_CONST, 0, retsv);
+  return KEYWORD_PLUGIN_EXPR;
+}
+
+static int build_infix_opname(pTHX_ OP **out, XSParseKeywordPiece *arg0, void *hookdata)
+{
+  const char *opname = PL_op_name[arg0->infix->opcode];
+  *out = newSVOP(OP_CONST, 0, newSVpvn(opname, strlen(opname)));
   return KEYWORD_PLUGIN_EXPR;
 }
 
@@ -225,6 +233,20 @@ static const struct XSParseKeywordHooks hooks_vstring_opt = {
   .build1 = &build_constsv_or_undef,
 };
 
+static const struct XSParseKeywordHooks hooks_infix_relation = {
+  .permit_hintkey = hintkey,
+
+  .piece1 = XPK_INFIX_RELATION,
+  .build1 = &build_infix_opname,
+};
+
+static const struct XSParseKeywordHooks hooks_infix_equality = {
+  .permit_hintkey = hintkey,
+
+  .piece1 = XPK_INFIX_EQUALITY,
+  .build1 = &build_infix_opname,
+};
+
 static const struct XSParseKeywordHooks hooks_colon = {
   .permit_hintkey = hintkey,
 
@@ -265,6 +287,9 @@ BOOT:
 
   register_xs_parse_keyword("piecevstring",     &hooks_vstring,     NULL);
   register_xs_parse_keyword("piecevstring_opt", &hooks_vstring_opt, NULL);
+
+  register_xs_parse_keyword("pieceinfix",   &hooks_infix_relation, NULL);
+  register_xs_parse_keyword("pieceinfixeq", &hooks_infix_equality, NULL);
 
   register_xs_parse_keyword("piececolon", &hooks_colon, newSVpvs("colon"));
 

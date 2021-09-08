@@ -10,7 +10,6 @@ my @files = (
     'lib/Test/TrailingSpace.pm',
     't/00-compile.t',
     't/dogfood.t',
-    't/lib/File/Find/Object/TreeCreate.pm',
     't/object-test.t',
     't/sample-data/PLACEHOLDER'
 );

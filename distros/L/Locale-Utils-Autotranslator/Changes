@@ -1,5 +1,12 @@
 Revision history for Perl extension Locale::Utils::Autotranslator.
 
+1.013  Mon Aug 31 11:54:38 2021
+- fixed different \n in test
+
+1.012  Mon Aug 30 12:31:12 2021
+- fixed different \n in test
+  https://rt.cpan.org/Ticket/Display.html?id=139138
+
 1.011  Fri Aug 23 12:57:48 2021
 - fixed different \n in test
 

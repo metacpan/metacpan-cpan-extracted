@@ -1,5 +1,20 @@
 Revision history for Data-MoneyCurrency
 
+0.22    Wed Sep  8 09:44:59 CEST 2021
+        - back to File::ShareDir other way wasnt working
+        
+0.21    Wed Sep  8 09:24:59 CEST 2021
+        - remove Code::TidyAll and Perl::Tidy
+
+0.20    Wed Sep  8 00:47:29 CEST 2021
+        - add tests for BTC, read non-iso conf file
+        - use File::Basename
+        - get rid of perltidy test, too annoying
+
+0.19    Tue Sep  7 23:13:29 CEST 2021
+        El Salvador uses BTC
+        no longer use File::ShareDir
+
 0.18    Fri Mar 26 17:10:36 CET 2021
         Panama (PA) uses USD
 

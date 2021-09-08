@@ -1,6 +1,6 @@
 package Bitcoin::Crypto;
 
-our $VERSION = "0.997";
+our $VERSION = "1.000";
 
 use v5.10;
 use warnings;
@@ -11,37 +11,32 @@ our %EXPORT_TAGS = (all => [@EXPORT_OK]);
 
 sub btc_extprv
 {
-	my $package = "Bitcoin::Crypto::Key::ExtPrivate";
-	eval "require $package";
-	return $package;
+	require Bitcoin::Crypto::Key::ExtPrivate;
+	return "Bitcoin::Crypto::Key::ExtPrivate";
 }
 
 sub btc_prv
 {
-	my $package = "Bitcoin::Crypto::Key::Private";
-	eval "require $package";
-	return $package;
+	require Bitcoin::Crypto::Key::Private;
+	return "Bitcoin::Crypto::Key::Private";
 }
 
 sub btc_extpub
 {
-	my $package = "Bitcoin::Crypto::Key::ExtPublic";
-	eval "require $package";
-	return $package;
+	require Bitcoin::Crypto::Key::ExtPublic;
+	return "Bitcoin::Crypto::Key::ExtPublic";
 }
 
 sub btc_pub
 {
-	my $package = "Bitcoin::Crypto::Key::Public";
-	eval "require $package";
-	return $package;
+	require Bitcoin::Crypto::Key::Public;
+	return "Bitcoin::Crypto::Key::Public";
 }
 
 sub btc_script
 {
-	my $package = "Bitcoin::Crypto::Script";
-	eval "require $package";
-	return $package;
+	require Bitcoin::Crypto::Script;
+	return "Bitcoin::Crypto::Script";
 }
 
 __END__
@@ -146,11 +141,9 @@ See L<Bitcoin::Crypto::Base58> and L<Bitcoin::Crypto::Bech32>.
 
 =head1 HOW TO READ THE DOCUMENTATION?
 
-Most functions in this documentation have a code line starting with I<sig:>. These lines are there to inform you about the expected arguments on input.
+Most functions in this documentation have a code line showcasing the arguments used by the function.
 
-The first argument is usually an object instance (denoted as C<$self>) or just a class name (C<$class>). Optional arguments are followed by the equal sign and their default value, like C<$lang = "en">. Argument names are often mentioned in function's description with some additional info.
-
-Signature lines are not meant to be valid perl. They're there for you to understand what arguments the function expects.
+These lines are not meant to be valid perl. They're there for you to understand what arguments the function expects.
 
 Most packages in this module have the types of their thrown exceptions documented near the bottom of the document. The exceptions section may be useful to understand which types of exceptions can be thrown when using functions or methods from the package and what they mean. It is not meant to be a full list of exceptions a function can throw and unblessed errors may still be raised.
 
@@ -184,25 +177,9 @@ Loads L<Bitcoin::Crypto::Key::Public>
 
 Loads L<Bitcoin::Crypto::Script>
 
-=head1 BETA INFORMATION
-
-The module is currently consided to be in a beta phase.
-
-=over 2
-
-=item * beta will end with version 1.00, which will be released after enough live testing
-
-=item * current release is considered stable, but may have some rough edges
-
-=item * currently existing API will stay mostly the same (minor modifications are possible)
-
-=item * let me know if you are using the module so that I can guess the users to issues ratio
-
-=back
-
 =head1 DISCLAIMER
 
-Although the module was written with an extra care and appropriate tests are in place asserting compatibility with many Bitcoin standards, due to complexity of the subject some bugs may still be present. In the world of digital money, a single bug may lead to losing funds. I encourage anyone to test the module themselves, review the test cases and use the module with care, espetially in the beta phase. Suggestions for improvements and more edge cases to test will be gladly accepted, but there is no warranty on your funds being manipulated by this module.
+Although the module was written with an extra care and appropriate tests are in place asserting compatibility with many Bitcoin standards, due to complexity of the subject some bugs may still be present. In the world of digital money, a single bug may lead to losing funds. I encourage anyone to test the module themselves, review the test cases and use the module with care. Suggestions for improvements and more edge cases to test will be gladly accepted, but there is no warranty on your funds being manipulated by this module.
 
 =head1 SPEED
 
@@ -213,7 +190,7 @@ The module have a little bit of startup time because of Moo and Type::Tiny, meas
 
 =over 2
 
-=item * Live testing
+=item * Taproot compatibility
 
 =item * Better test coverage
 

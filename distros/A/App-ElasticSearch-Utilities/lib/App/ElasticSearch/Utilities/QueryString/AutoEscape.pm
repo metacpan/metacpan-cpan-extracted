@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::QueryString::AutoEscape;
 use strict;
 use warnings;
 
-our $VERSION = '8.0'; # VERSION
+our $VERSION = '8.1'; # VERSION
 
 use CLI::Helpers qw(:output);
 use Const::Fast;
@@ -41,7 +41,7 @@ App::ElasticSearch::Utilities::QueryString::AutoEscape - Provides a prefix of '=
 
 =head1 VERSION
 
-version 8.0
+version 8.1
 
 =head1 SYNOPSIS
 

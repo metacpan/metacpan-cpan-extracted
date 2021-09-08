@@ -4,6 +4,12 @@ This is a Pure Perl implementation of the X Window Resource Manager
 Database (XrmDB). It allows creation and manipulation of Xrm compliant
 databases.
 
+Warning! The XrmDB refers to names and resources. These days they are
+more typically called keys and values. The terminology used below (and
+sometimes in the names of subroutines and methods) mixes these two
+approaches, sometimes a bit too liberally. Subroutine and method names
+will probably change to make things more consistent.
+
   Why another configuration database?
 
 The XrmDB differs from typical key-value stores by allowing stored keys

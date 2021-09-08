@@ -62,6 +62,7 @@ lib/Test2/Harness/UI/Schema/Result/RunField.pm
 lib/Test2/Harness/UI/Schema/Result/Session.pm
 lib/Test2/Harness/UI/Schema/Result/SessionHost.pm
 lib/Test2/Harness/UI/Schema/Result/User.pm
+lib/Test2/Harness/UI/Schema/ResultSet.pm
 lib/Test2/Harness/UI/Sweeper.pm
 lib/Test2/Harness/UI/Util.pm
 lib/Test2/Harness/UI/Util/Errors.pm

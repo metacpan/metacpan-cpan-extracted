@@ -7,7 +7,7 @@ use v5.26;
 
 use Object::Pad 0.43;  # :strict(params), ADJUST
 
-package App::sdview::Parser::Pod 0.03;
+package App::sdview::Parser::Pod 0.04;
 class App::sdview::Parser::Pod
    isa Pod::Simple
    does App::sdview::Parser
@@ -76,6 +76,10 @@ method _handle_element_start ($type, $attrs)
       );
       %_curtags = ();
    }
+   elsif( $type eq "Para" and $_curpara and 
+      $_curpara->type eq "item" and $_curpara->listtype eq "text" and !length $_curpara->text ) {
+      %_curtags = ();
+   }
    elsif( my $class = $PARA_TYPES{$type} ) {
       push $_parastack[-1]->@*, $_curpara = $class->new(
          text => String::Tagged->new,
@@ -85,7 +89,9 @@ method _handle_element_start ($type, $attrs)
    elsif( $type eq "L" ) {
       my $target = $attrs->{to};
       # TODO: more customizable
-      $target = "https://metacpan.org/pod/$target" unless $target =~ m(^\w+://);
+      if( defined $target and $target !~ m(^\w+://) ) {
+         $target = "https://metacpan.org/pod/$target";
+      }
       $_curtags{L} = { target => $target };
    }
    elsif( any { $type eq $_ } @FORMAT_TYPES ) {
@@ -99,8 +105,16 @@ method _handle_element_start ($type, $attrs)
       push @_parastack, [];
       undef $_curpara;
    }
+   elsif( $type eq "item-text" ) {
+      push $_parastack[-1]->@*, $_curpara = App::sdview::Para::ListItem->new(
+         listtype => "text",
+         term => String::Tagged->new,
+         text => String::Tagged->new,
+      );
+   }
    elsif( $type =~ m/^item-(.*)/ ) {
-      push @_parastack[-1]->@*, $_curpara = App::sdview::Para::ListItem->new(
+      push $_parastack[-1]->@*, $_curpara = App::sdview::Para::ListItem->new(
+         listtype => "$1",
          text => String::Tagged->new,
       );
    }
@@ -138,7 +152,13 @@ method _handle_element_end ($type, @)
 
 method _handle_text
 {
-   $_curpara->text->append_tagged( $_[0], %_curtags );
+   if( $_curpara->type eq "item" and
+         $_curpara->listtype eq "text" and !length $_curpara->term ) {
+      $_curpara->term->append_tagged( $_[0], %_curtags );
+   }
+   else {
+      $_curpara->text->append_tagged( $_[0], %_curtags );
+   }
 }
 
 method trim_leading_whitespace ( $para )

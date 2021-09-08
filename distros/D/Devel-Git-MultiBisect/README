@@ -46,12 +46,11 @@ DESCRIPTION
     for further discussion.
 
 PREREQUISITES
-    Perl 5.10 or higher.
+    Perl 5.14 or higher.
 
     CPAN module Devel::CheckBin needed for "perl Makefile.PL".
 
-    CPAN modules Capture::Tiny and IO::CaptureOutput needed for testing
-    only.
+    CPAN module Capture::Tiny needed for testing only.
 
     git.
 

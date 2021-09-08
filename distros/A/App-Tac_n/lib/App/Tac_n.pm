@@ -1,5 +1,5 @@
 package App::Tac_n;
-$App::Tac_n::VERSION = '0.0.1';
+$App::Tac_n::VERSION = '0.0.3';
 use strict;
 use warnings;
 use 5.014;
@@ -14,6 +14,8 @@ sub run
     {
         printf "%10d  %s", ( --$p ), $v;
     }
+
+    return;
 }
 
 1;
@@ -26,15 +28,23 @@ __END__
 
 =head1 NAME
 
-App::Tac_n - tac with line numbers
+App::Tac_n - cat with descending line numbers
 
 =head1 VERSION
 
-version 0.0.1
+version 0.0.3
 
 =head1 SYNOPSIS
 
-    ~/progs/perl/cpan/App/Tac_n/App-Tac_n/ seq 1 5 | perl -Ilib bin/tac-n
+    $ cat t/data/cat/three-lines.txt
+    First
+    Middle
+    Last
+    $ perl -Ilib bin/tac-n t/data/cat/three-lines.txt
+             3  First
+             2  Middle
+             1  Last
+    $ seq 1 5 | perl -Ilib bin/tac-n
              5  1
              4  2
              3  3
@@ -51,7 +61,10 @@ Same as C<< tac | cat -n | tac >>.
 
 Runs the CLI app.
 
-=head2
+=head1 THANKS
+
+Some of the code and data for tests are based on earlier ones written by
+me for L<PerlPowerTools|https://metacpan.org/dist/PerlPowerTools> .
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

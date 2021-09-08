@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-ANSI-Fold-Util
 
+0.06 2021-09-03T13:01:26Z
+
+    - Spin-off Text::ANSI::Tabs.
+
 0.05 2020-12-19T03:49:14Z
 
     - Update to use Text::ANSI::Fold 2.08 to support new tab expansion.

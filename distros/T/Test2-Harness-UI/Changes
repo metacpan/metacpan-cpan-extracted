@@ -1,3 +1,28 @@
+0.000083  2021-08-27 14:31:56-07:00 America/Los_Angeles
+
+    - Fix big in 'failed' controller from new fields schema
+
+0.000082  2021-08-26 10:57:54-07:00 America/Los_Angeles
+
+    - Fix minor css bug
+
+0.000081  2021-08-26 10:52:03-07:00 America/Los_Angeles
+
+    - Fix SQL error when getting coverage for a specific user
+    - Make it possible to view runs from a specific user
+
+0.000080  2021-08-26 08:15:59-07:00 America/Los_Angeles
+
+    - Fix ISE in stats when data is not availavble
+
+0.000079  2021-08-25 14:18:25-07:00 America/Los_Angeles
+
+    - Fix job delete icon
+
+0.000078  2021-08-25 13:50:30-07:00 America/Los_Angeles
+
+    - Fix performance issue rendering pages with lots of field data
+
 0.000077  2021-08-20 14:07:36-07:00 America/Los_Angeles
 
     - Fix MySQL problems

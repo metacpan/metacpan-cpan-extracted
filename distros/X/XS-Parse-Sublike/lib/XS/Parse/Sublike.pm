@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Sublike 0.12;
+package XS::Parse::Sublike 0.13;
 
 use v5.14;
 use warnings;
@@ -177,13 +177,25 @@ effect, and only on supporting perl versions.
 
 =head2 The C<permit> Stage
 
+   const char *permit_hintkey
    bool (*permit)(pTHX_ void *hookdata)
 
 Called by the installed keyword parser hook which is used to handle keywords
-registered by L</register_xs_parse_sublike>. This hook stage should inspect
-whether the keyword is permitted at this time (typically by inspecting the
-hints hash C<GvHV(PL_hintgv)> for some imported key) and return true only if
-the keyword is permitted.
+registered by L</register_xs_parse_sublike>.
+
+As a shortcut for the common case, the C<permit_hintkey> may point to a string
+to look up from the hints hash. If the given key name is not found in the
+hints hash then the keyword is not permitted. If the key is present then the
+C<permit> function is invoked as normal.
+
+If not rejected by a hint key that was not found in the hints hash, the
+function part of the stage is called next and should inspect whether the
+keyword is permitted at this time perhaps by inspecting other lexical clues,
+and return true only if the keyword is permitted.
+
+Both the string and the function are optional. Either or both may be present.
+If neither is present then the keyword is always permitted - which is likely
+not what you wanted to do.
 
 =head2 Parse Name
 

@@ -23,9 +23,10 @@ requires:
   XML::Compile: '1.48'
   XML::Compile::Cache: '1.03'
   XML::Compile::SOAP11: '3.23'
+  XML::Compile::Tester: '0'
 resources:
   homepage: http://perl.overmeer.net/CPAN/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/markov2/perl5-XML-Compile-WSDL11.git
-version: '3.07'
+version: '3.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

@@ -48,7 +48,7 @@ WriteMakefile(
         'File::HomeDir'          => 0,
         'File::Spec::Functions'  => 0,
         'List::Util'             => '1.33',
-        'Term::Choose'           => '1.736',
+        'Term::Choose'           => '1.737',
         %prereqs_os_specific,
     },
     dist  => {

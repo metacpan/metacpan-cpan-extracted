@@ -3,9 +3,203 @@ NAME
     Text::Table::Tiny
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Text::Table::Tiny::_ModuleFeatures (from Perl distribution
-    Text-Table-Tiny-_ModuleFeatures), released on 2021-02-28.
+    Text-Table-Tiny-_ModuleFeatures), released on 2021-04-06.
+
+DECLARED FEATURES
+    Features declared by this module (actually declared for
+    Text::Table::Tiny):
+
+  From feature set TextTable
+    Features from feature set TextTable declared by this module:
+
+    *   can_align_cell_containing_color_code
+
+        Value: yes.
+
+    *   can_align_cell_containing_newline
+
+        Value: no.
+
+    *   can_align_cell_containing_wide_character
+
+        Value: no.
+
+    *   can_color
+
+        Can produce colored table.
+
+        Value: no.
+
+    *   can_color_theme
+
+        Allow choosing colors from a named set of palettes.
+
+        Value: no.
+
+    *   can_colspan
+
+        Value: no.
+
+    *   can_customize_border
+
+        Let user customize border character in some way, e.g. selecting from
+        several available borders, disable border.
+
+        Value: yes.
+
+    *   can_halign
+
+        Provide a way for user to specify horizontal alignment
+        (left/middle/right) of cells.
+
+        Value: yes.
+
+    *   can_halign_individual_cell
+
+        Provide a way for user to specify different horizontal alignment
+        (left/middle/right) for individual cells.
+
+        Value: no.
+
+    *   can_halign_individual_column
+
+        Provide a way for user to specify different horizontal alignment
+        (left/middle/right) for individual columns.
+
+        Value: yes.
+
+    *   can_halign_individual_row
+
+        Provide a way for user to specify different horizontal alignment
+        (left/middle/right) for individual rows.
+
+        Value: no.
+
+    *   can_hpad
+
+        Provide a way for user to specify horizontal padding of cells.
+
+        Value: no.
+
+    *   can_hpad_individual_cell
+
+        Provide a way for user to specify different horizontal padding of
+        individual cells.
+
+        Value: no.
+
+    *   can_hpad_individual_column
+
+        Provide a way for user to specify different horizontal padding of
+        individual columns.
+
+        Value: no.
+
+    *   can_hpad_individual_row
+
+        Provide a way for user to specify different horizontal padding of
+        individual rows.
+
+        Value: no.
+
+    *   can_rowspan
+
+        Value: no.
+
+    *   can_set_cell_height
+
+        Allow setting height of rows.
+
+        Value: no.
+
+    *   can_set_cell_height_of_individual_row
+
+        Allow setting height of individual rows.
+
+        Value: no.
+
+    *   can_set_cell_width
+
+        Allow setting height of rows.
+
+        Value: no.
+
+    *   can_set_cell_width_of_individual_column
+
+        Allow setting height of individual rows.
+
+        Value: no.
+
+    *   can_use_box_character
+
+        Can use terminal box-drawing character when drawing border.
+
+        Value: no.
+
+    *   can_valign
+
+        Provide a way for user to specify vertical alignment
+        (top/middle/bottom) of cells.
+
+        Value: no.
+
+    *   can_valign_individual_cell
+
+        Provide a way for user to specify different vertical alignment
+        (top/middle/bottom) for individual cells.
+
+        Value: no.
+
+    *   can_valign_individual_column
+
+        Provide a way for user to specify different vertical alignment
+        (top/middle/bottom) for individual columns.
+
+        Value: no.
+
+    *   can_valign_individual_row
+
+        Provide a way for user to specify different vertical alignment
+        (top/middle/bottom) for individual rows.
+
+        Value: no.
+
+    *   can_vpad
+
+        Provide a way for user to specify vertical padding of cells.
+
+        Value: no.
+
+    *   can_vpad_individual_cell
+
+        Provide a way for user to specify different vertical padding of
+        individual cells.
+
+        Value: no.
+
+    *   can_vpad_individual_column
+
+        Provide a way for user to specify different vertical padding of
+        individual columns.
+
+        Value: no.
+
+    *   can_vpad_individual_row
+
+        Provide a way for user to specify different vertical padding of
+        individual rows.
+
+        Value: no.
+
+    *   speed
+
+        Subjective speed rating, relative to other text table modules.
+
+        Value: "medium".
+
+    For more details on module features, see Module::Features.
 
 HOMEPAGE
     Please visit the project's homepage at

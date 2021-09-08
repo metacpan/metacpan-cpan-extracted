@@ -206,6 +206,12 @@ EOF
    is_deeply( \%style_changed_values,
               { fg => [ 10, 9 ] },
               'on_style_changed_values after direct style tagged key deleted' );
+
+   $widget->set_style( fg => 0 );
+
+   is_deeply( { $widget->get_style_pen->getattrs },
+              { fg => 0, u => 1, bg => 2 },
+              'style pen for widget after direct style sets zero' );
 }
 
 # WIDGET_PEN_FROM_STYLE
@@ -222,12 +228,18 @@ EOF
    is( $pen_widget->pen->getattr( "bg" ), 2, 'widget pen attr after ->set_style' );
    is( $pen_widget->get_style_pen->getattr( "bg" ), 2, 'style pen attr after ->set_style' );
 
+   my $warnings = "";
+   local $SIG{__WARN__} = sub { $warnings .= $_[0] };
+
    $pen_widget = StyledWidget->new(
       af => 4,
    );
 
    is( $pen_widget->pen->getattr( "af" ), 4, 'widget pen attr from args' );
    is( $pen_widget->get_style_pen->getattr( "af" ), 4, 'style pen attr from args' );
+
+   like( $warnings, qr/^Applying legacy direct pen attribute 'af' for StyledWidget at /,
+      'Legacy direct pen attribute produces a warning' );
 }
 
 # style_reshape_keys

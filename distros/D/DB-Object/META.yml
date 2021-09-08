@@ -28,16 +28,13 @@ requires:
   DateTime::TimeZone: '2.36'
   Devel::Confess: '0.009004'
   Fcntl: '0'
-  File::Basename: '2.85'
-  File::Spec: '3.75'
-  IO::Dir: '0'
-  IO::File: '0'
   JSON: '4.02'
-  Module::Generic: v0.15.8
+  Module::Generic: v0.15.9
   Net::IP: '1.26'
   Nice::Try: v1.1.2
   Number::Format: '1.75'
   POSIX: 1.53_01
+  Promise::Me: v0.1.1
   Regexp::Common: '2017060201'
   Scalar::Util: '1.54'
   URI: '1.76'
@@ -50,5 +47,5 @@ requires:
 resources:
   bugtracker: https://git.deguest.jp/jack/DB-Object/issues
   repository: https://git.deguest.jp/jack/DB-Object
-version: v0.9.15
+version: v0.10.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

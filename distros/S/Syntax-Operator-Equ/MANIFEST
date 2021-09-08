@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/Syntax/Operator/Equ.pm
+lib/Syntax/Operator/Equ.xs
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00use.t
+t/01equ-stringy.t
+t/02equ-numeric.t
+t/10getmagic.t
+t/11func.t
+t/80match-equ.t
+t/99pod.t

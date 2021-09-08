@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes App::Easer version 0.004.
+    This document describes App::Easer version 0.006.
 
 SYNOPSIS
 
@@ -124,23 +124,23 @@ DESCRIPTION
     application managed by App::Easer:
 
        factory:
-          create: «executable»
-          prefixes: «hash or array of hashes»
+          create: Â«executableÂ»
+          prefixes: Â«hash or array of hashesÂ»
        configuration:
-          collect:  «executable»
-          merge:    «executable»
-          validate: «executable»
-          sources:  «array»
-          'auto-children':  «false or array»
-          'help-on-stderr': «boolean»
-          'auto-leaves':    «boolean»
+          collect:  Â«executableÂ»
+          merge:    Â«executableÂ»
+          validate: Â«executableÂ»
+          sources:  Â«arrayÂ»
+          'auto-children':  Â«false or arrayÂ»
+          'help-on-stderr': Â«booleanÂ»
+          'auto-leaves':    Â«booleanÂ»
        commands:
           cmd-1:
-             «command definition»
+             Â«command definitionÂ»
           cmd-2:
-             «command definition»
+             Â«command definitionÂ»
           MAIN:
-             «command definition»
+             Â«command definitionÂ»
 
     Strictly speaking, only the commands section is needed in defining an
     application; all other parts only deal with customizing the behaviour
@@ -168,10 +168,10 @@ DESCRIPTION
  Factory and Executables
 
        factory:
-          create: «executable»
-          prefixes: «hash or array of hashes»
+          create: Â«executableÂ»
+          prefixes: Â«hash or array of hashesÂ»
 
-    Many customization options appear as «executable».
+    Many customization options appear as Â«executableÂ».
 
     At the basic level, these can be just simple references to a sub. In
     this case, it is used directly.
@@ -183,7 +183,7 @@ DESCRIPTION
     should cover most of the needs. It is possible to override it by
     setting the value for key create inside factory; the default function
     is used to generate this new factory, which is then installed to parse
-    all other «executable» values in the definition.
+    all other Â«executableÂ» values in the definition.
 
     The default factory manages the following representations:
 
@@ -192,7 +192,7 @@ DESCRIPTION
       * strings are first filtered according to the mapping/mappings
       provided by the field prefixes in factory, then parsed to get the
       name of a package and optionally the name of a sub in that package
-      (each field that carries an «executable» is associated to a default
+      (each field that carries an Â«executableÂ» is associated to a default
       sub name).
 
     The prefixes can be either a hash reference, or an array of hashes. The
@@ -218,13 +218,13 @@ DESCRIPTION
  Configuration Parsing Customization
 
        configuration:
-          collect:  «executable»
-          merge:    «executable»
-          validate: «executable»
-          sources:  «array»
-          'auto-children': «false or array»
-          'help-on-stderr': «boolean»
-          'auto-leaves':    «boolean»
+          collect:  Â«executableÂ»
+          merge:    Â«executableÂ»
+          validate: Â«executableÂ»
+          sources:  Â«arrayÂ»
+          'auto-children': Â«false or arrayÂ»
+          'help-on-stderr': Â«booleanÂ»
+          'auto-leaves':    Â«booleanÂ»
 
     One of the central services provided by App::Easer is the automatic
     gathering of options values from several sources (command line,
@@ -292,17 +292,17 @@ DESCRIPTION
            getopt: 'whip|w=s'
            environment: FOO_WHIP
            default: gargle
-       execute: «executable»
+       execute: Â«executableÂ»
        children: ['foo.bar', 'baz']
        leaf: 0
        allow-residual-options: 0
-       collect:  «executable»
-       merge: «merge»
-       validate: ... «executable» or data structure...
+       collect:  Â«executableÂ»
+       merge: Â«mergeÂ»
+       validate: ... Â«executableÂ» or data structure...
        sources: ['+CmdLine', '+Environment', '+Parent', '+Default']
        default-child: 'foo.bar'
        no-auto: 1
-       commit: «executable»
+       commit: Â«executableÂ»
 
     The following keys are supported:
 

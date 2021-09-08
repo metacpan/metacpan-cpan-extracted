@@ -1,12 +1,14 @@
 package lib::filter;
 
-our $DATE = '2016-08-24'; # DATE
-our $VERSION = '0.27'; # VERSION
-
-# no need to avoid strict & warnings, because Config uses them
-use strict;
+#use 5.008009;  # the first version where Module::CoreList becomes core
+use strict 'subs', 'vars'; # no need to avoid strict & warnings, because Config uses them
 use warnings;
 use Config;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-08-29'; # DATE
+our $DIST = 'lib-filter'; # DIST
+our $VERSION = '0.281'; # VERSION
 
 # BEGIN snippet from Module::Path::More, with mods/simplification
 my $SEPARATOR;
@@ -39,8 +41,11 @@ sub _open_handle {
     $fh;
 }
 
+my $handler;
 my $hook;
 my ($orig_inc, $orig_inc_sorted_by_len);
+
+sub lib::filter::INC { goto $handler }
 
 sub import {
     my ($class, %opts) = @_;
@@ -60,12 +65,14 @@ sub import {
                     )\z/x;
     }
 
+    $opts{debug} = $ENV{PERL_LIB_FILTER_DEBUG} unless defined($opts{debug});
+
     $opts{allow_core}    = 1 if !defined($opts{allow_core});
     $opts{allow_noncore} = 1 if !defined($opts{allow_noncore});
 
     if ($opts{filter} && !ref($opts{filter})) {
         # convenience, for when filter is specified from command-line (-M)
-        $opts{filter} = eval $opts{filter};
+        $opts{filter} = eval $opts{filter}; ## no critic: BuiltinFunctions::ProhibitStringyEval
         die "Error in filter code: $@" if $@;
     }
 
@@ -115,7 +122,7 @@ sub import {
         }
     }
 
-    $hook = sub {
+    $handler = sub {
         my ($self, $file) = @_;
 
         my @caller = caller(0);
@@ -200,6 +207,7 @@ sub import {
         $INC{$file} = $path;
         return _open_handle($path);
     };
+    $hook = bless(sub{"dummy"}, __PACKAGE__);
 
     @INC = (
         $hook,
@@ -240,7 +248,7 @@ lib::filter - Allow/disallow loading modules
 
 =head1 VERSION
 
-This document describes version 0.27 of lib::filter (from Perl distribution lib-filter), released on 2016-08-24.
+This document describes version 0.281 of lib::filter (from Perl distribution lib-filter), released on 2021-08-29.
 
 =head1 SYNOPSIS
 
@@ -261,7 +269,14 @@ module exist, so I'll be presenting those in the examples below.
 
  % perl -Mlib::filter=allow_core,0,allow_noncore,0 yourscript.pl
 
-You can also use L<lib::none> for this, or simply empty C<@INC>.
+You can also use L<lib::none> for this, or simply empty C<@INC> yourself, e.g.:
+
+ {
+     local @INC = ();
+     ...
+ }
+
+To no-op instead of disallowing, see L<lib::noop::all>.
 
 =item * To allow only core modules:
 
@@ -269,18 +284,20 @@ For example for testing a fatpacked script (see L<App::FatPacker>):
 
  % perl -Mlib::filter=allow_noncore,0 yourscript.pl
 
-You can also use L<lib::core::only> for this, which comes with the App-FatPacker
-distribution.
+You can also use L<lib::core::only> for this, which comes with the
+L<App::FatPacker> distribution.
 
 =item * To only allow a specific set of modules:
 
  % perl -Mlib::filter=allow_core,0,allow_noncore,0,allow,'XSLoader;List::Util' yourscript.pl
 
+To no-op instead of disallowing, see L<lib::noop::except>.
+
 =item * To allow core modules plus some additional modules:
 
 For example to test a fatpacked script that might still require some XS modules:
 
-# allow additional modules by pattern
+ # allow additional modules by pattern
  % perl -Mlib::filter=allow_noncore,0,allow_re,'^DateTime::.*' yourscript.pl
 
  # allow additional modules listed in a file
@@ -318,6 +335,8 @@ optional prereq):
 L<Devel::Hide> is another module which you can you for exactly this purpose:
 
  % perl -MDevel::Hide=YAML::XS,JSON::XS yourscript.pl
+
+To no-op instead of disallowing, see L<lib::noop>.
 
 =item * Do custom filtering
 
@@ -418,6 +437,12 @@ when C<allow_noncore> is set to false, non-core directories are excluded.
 
 =back
 
+=head1 ENVIRONMENT
+
+=head2 PERL_LIB_FILTER_DEBUG
+
+Boolean. Sets the default for the C<debug> option.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/lib-filter>.
@@ -425,14 +450,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/lib-filter
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-lib-filter>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=lib-filter>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -442,15 +459,58 @@ L<Test::Without::Module>.
 To simulate the absence of certain programs in PATH, you can try
 L<File::Which::Patch::Hide>.
 
+To no-op instead of disallowing, see L<lib::noop>.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTORS
+
+=for stopwords A. Sinan Unur Olivier Mengué
+
+=over 4
+
+=item *
+
+A. Sinan Unur <nanis@cpan.org>
+
+=item *
+
+Olivier Mengué <dolmen@cpan.org>
+
+=back
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=lib-filter>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

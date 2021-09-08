@@ -3,120 +3,177 @@ HTML-HTML5-Parser
 
 Created:      2009-11-26
 Home page:    <https://metacpan.org/release/HTML-HTML5-Parser>
-Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-Parser>
-Maintainer:   Toby Inkster <mailto:tobyink@cpan.org>
+Bug tracker:  <https://github.com/tobyink/p5-html-html5-parser/issues>
+Maintainer:   Toby Inkster <tobyink@cpan.org>
 
-0.301  2013-07-08
+0.992	2021-09-08
 
- - (Bugfix) Fix t/99html5lib.t still using Mo in one place.
-   Fixes RT#86774
-   ++"Fitz Elliott"
+ [ Packaging ]
+ - Point issue tracker at Github.
+ - Point repo at Github.
 
-0.300  2013-07-06
+0.991	2021-09-08
 
- - (Bugfix) Fix many major memory leaks.
-   ++$DORIAN
- - (Packaging) t/99html5lib.t now uses Moo instead of Mo.
+ [ Bug Fixes ]
+ - Better regexp for differentiating between filenames and URIs.
+ - Don't assume @INC contains .
+ - Don't install a global __WARN__ handler in BEGIN.
+   Alex Vandiver++
+ - Fix encoding issues.
+   Gregory Williams++
+   Kjetil Kjernsmo++
+
+ [ Packaging ]
+ - Modernize packaging in general.
+
+0.301	2013-07-08
+
+ [ Bug Fixes ]
+ - Fix t/99html5lib.t still using Mo in one place.
+   Fitz Elliott++
+
+0.300	2013-07-06
+
+ [ Bug Fixes ]
+ - Fix many major memory leaks.
+   Dorian Taylor++
+
+ [ Packaging ]
+ - t/99html5lib.t now uses Moo instead of Mo.
+
+ [ Other ]
  - Memory leak fix necessitated some API changes; in particular some
    methods which were available as class methods are now object methods
    only.
 
-0.208  2012-12-06
+0.208	2012-12-06
 
- - (Bugfix) If two <html> tags were in the same file, attributes on the
-   second <html> element could cause crashes.
-   Fixes RT#79019
-   ++"Luben Karavelov"
- - (Bugfix) Minor fix re LWP-independence.
+ [ Bug Fixes ]
+ - If two <html> tags were in the same file, attributes on the second
+   <html> element could cause crashes.
+   Fixes RT#79019.
+   Luben Karavelov++
+   <https://rt.cpan.org/Ticket/Display.html?id=79019>
+ - Minor fix re LWP-independence.
 
-0.206  2012-06-30
+0.206	2012-06-30
 
- - (Bugfix) Disable t/07ua.t and t/08ua-lwp.t on Windows because
-   Test::HTTP::Server doesn't work on that platform.
- - (Bugfix) Remove 'use 5.010' from t/07ua.t.
+ [ Bug Fixes ]
+ - Disable t/07ua.t and t/08ua-lwp.t on Windows because Test::HTTP::Server
+   doesn't work on that platform.
+   <https://rt.cpan.org/Ticket/Display.html?id=78118>
+ - Remove 'use 5.010' from t/07ua.t.
 
-0.204  2012-06-29
+0.204	2012-06-29
 
- - (Bugfix) Stop using defined-or operator in HTML::HTML5::Parser::UA, as
-   it doesn't work in Perl 5.8.
+ [ Bug Fixes ]
+ - Stop using defined-or operator in HTML::HTML5::Parser::UA, as it doesn't
+   work in Perl 5.8.
 
-0.202  2012-06-27
+0.202	2012-06-27
 
  - Drop dependency on LWP::UserAgent in favour of HTTP::Tiny which is part
    of core since 5.14.
 
-0.200  2012-06-13
+0.200	2012-06-13
 
  - Drop dependency on Error.pm; use Try::Tiny instead.
  - Drop dependency on HTML::Encoding; use IO::HTML instead.
  - Passing a couple more of the html5lib test suite files.
  - Suppress warnings about invalid Unicode code points.
 
-0.110  2012-03-20
+0.110	2012-03-20
 
- - (Bugfix) Removed a use of smart match which was breaking Perl 5.8.x
+ [ Bug Fixes ]
+ - Removed a use of smart match which was breaking Perl 5.8.x
    compatibility.
-   Fixes RT#75809
+   Fixes RT#75809.
+   <https://rt.cpan.org/Ticket/Display.html?id=75809>
+
+ [ Other ]
  - Comment nodes should now keep their line numbers and column numbers.
  - Text nodes should keep line numbers and column numbers too.
  - use XML::LibXML::Devel::SetLineNumber if it is available.
 
-0.109  2012-03-15  # Yes, they are come, but they are not past.
+0.109	2012-03-15	Yes, they are come, but they are not past.
 
- - (Addition) Nodes now have an implictness flag (returned by source_line
-   called in a list context).
- - (Addition) Provide dtd_element method to get more information about the
-   DTD.
- - (Addition) Provide parse_balanced_chunk to parse HTML fragments.
- - (Bugfix) Fix several fatal errors on infrequently used code paths in
+ [ Bug Fixes ]
+ - Fix several fatal errors on infrequently used code paths in
    TagSoupParser.pm.
- - (Bugfix) Use correct case for MathML's definitionURL attribute.
- - (Packaging) Bundle test cases from html5lib.
+ - Use correct case for MathML's definitionURL attribute.
+
+ [ Packaging ]
+ - Bundle test cases from html5lib.
+
+ [ Other ]
+ - Added: Nodes now have an implictness flag (returned by source_line
+   called in a list context).
+ - Added: Provide dtd_element method to get more information about the DTD.
+ - Added: Provide parse_balanced_chunk to parse HTML fragments.
  - Make source_line method work more reliably. This requires
    XML::LibXML::Devel, and thus a fairly recent version of XML-LibXML.
 
-0.108  2012-01-18
+0.108	2012-01-18
 
- - (Bugfix) Crashed when generating an error message about some missing
-   closing tags.
-   ++$audreyt
- - (Documentation Update) Copyright 2012.
- - (Update) Provide load_xml and load_html methods for compatibility with
+ [ Bug Fixes ]
+ - Crashed when generating an error message about some missing closing
+   tags.
+   audreyt++
+
+ [ Documentation ]
+ - Copyright 2012.
+
+ [ Other ]
+ - Updated: Provide load_xml and load_html methods for compatibility with
    XML::LibXML 1.70 and newer.
 
-0.107  2011-10-20
+0.107	2011-10-20
 
- - (Addition) html2xhtml can output to a file.
- - (Addition) html2xhtml now reads from STDIN by default.
- - (Bugfix) parse_file wasn't accepting relative file names
+ [ Bug Fixes ]
+ - parse_file wasn't accepting relative file names
 
-0.106  2011-10-10
+ [ Other ]
+ - Added: html2xhtml can output to a file.
+ - Added: html2xhtml now reads from STDIN by default.
 
- - (Bugfix) Tokenizer.pm was still trying to require NamedEntityList.pm.
+0.106	2011-10-10
 
-0.105  2011-10-07
+ [ Bug Fixes ]
+ - Tokenizer.pm was still trying to require NamedEntityList.pm.
 
- - (Addition) Bundle 'html5debug' script.
- - (Packaging) Module::Package::RDF.
+0.105	2011-10-07
+
+ [ Packaging ]
+ - Module::Package::RDF.
+
+ [ Other ]
+ - Added: Bundle 'html5debug' script.
  - HTML::HTML5::Parser::Error overloads stringification.
  - use HTML::HTML5::Entities
 
-0.104  2011-09-22
+0.104	2011-09-22
 
- - (Addition) Some error handling stuff.
- - (Addition) Support <track> element.
- - (Update) Catch up to revision d81fcb920a1a3c351149cd66a64bf1b8ae14a172
+ - Added: Some error handling stuff.
+ - Added: Support <track> element.
+ - Updated: Catch up to revision d81fcb920a1a3c351149cd66a64bf1b8ae14a172
    (2011-08-21) upstream.
 
-0.103  2011-02-09
+0.103	2011-02-09
 
- - (Bugfix) TagSoupParser.pm called a method that is renamed between this
+ [ Bug Fixes ]
+ - TagSoupParser.pm called a method that is renamed between this
    distribution and upstream using its upstream name.
- - (Documentation Update) Copyright 2011.
 
-0.102  2011-01-19
+ [ Documentation ]
+ - Copyright 2011.
 
- - (Addition) Allow <object> element to appear in <head> if document has an
+0.102	2011-01-19
+
+ [ Bug Fixes ]
+ - Fix source_line method.
+
+ [ Other ]
+ - Added: Allow <object> element to appear in <head> if document has an
    HTML4 doctype. This is a willful violation of the HTML5 parsing
    algorithm. (The <object> may have <param> elements as children, as well
    as any children that would normally be allowed in the <head> of the
@@ -125,42 +182,48 @@ Maintainer:   Toby Inkster <mailto:tobyink@cpan.org>
    looser than the HTML 4 spec which says only <param> should be used, but
    stricter than the HTML 4 DTD which allows pretty much anything in
    there!)
- - (Addition) Support <figcaption> element.
- - (Addition) Support <summary> element.
- - (Bugfix) Fix source_line method.
- - (Update) Catch up to revision f2c921a886ab0b3dfb8d21b82525e98a4a921ad4
+ - Added: Support <figcaption> element.
+ - Added: Support <summary> element.
+ - Updated: Catch up to revision f2c921a886ab0b3dfb8d21b82525e98a4a921ad4
    (2010-10-11) upstream.
 
-0.101  2010-06-30
+0.101	2010-06-30
 
- - (Bugfix) UTF-8 fix.
+ [ Bug Fixes ]
+ - UTF-8 fix.
 
-0.100  2010-06-23
+0.100	2010-06-23
 
- - (Bugfix) Minor bugfixes.
+ [ Bug Fixes ]
+ - Minor bugfixes.
 
-0.04  2010-04-21
+0.04	2010-04-21
 
- - (Update) Catch up to revision cf2c0df8a6dfb50fee923dfb21b14c83f282ccdc
+ - Updated: Catch up to revision cf2c0df8a6dfb50fee923dfb21b14c83f282ccdc
    (2010-02-28) upstream.
 
-0.03  2010-01-15
+0.03	2010-01-15
 
- - (Bugfix) Module didn't use URI::file properly.
-   ++$shellac
- - (Documentation Update) Copyright 2010.
- - (Packaging Update) Upgrade distribution to my new packaging regime
-   (auto-generated changelogs, etc)
+ [ Bug Fixes ]
+ - Module didn't use URI::file properly.
+   shellac++
 
-0.02  2009-12-16
+ [ Documentation ]
+ - Copyright 2010.
 
- - (Addition Packaging) Bundle the html2xhtml tool.
+ [ Packaging ]
+ - Upgrade distribution to my new packaging regime (auto-generated
+   changelogs, etc)
+
+0.02	2009-12-16
+
+ [ Packaging ]
+ - Bundle the html2xhtml tool.
+
+ [ Other ]
  - Replace Inline::Python encoding detection with weaker, but native Perl
    HTML::Encoding package.
 
-0.01  2009-12-03  # Original version
+0.01	2009-12-03	Original version
 
-
-0.00_01  2009-12-01  # Developer preview
-
-
+0.00_01	2009-12-01	Developer preview

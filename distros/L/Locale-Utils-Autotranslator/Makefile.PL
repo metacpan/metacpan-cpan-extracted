@@ -3,34 +3,34 @@ require 5.008;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'NAME' => 'Locale::Utils::Autotranslator',
-  'PL_FILES' => {},
+  'INSTALLDIRS' => 'site',
   'PREREQ_PM' => {
+                   'Path::Tiny' => 0,
+                   'Moo' => '1.003001',
+                   'Test::More' => 0,
+                   'HTTP::Request::Common' => 0,
+                   'Locale::TextDomain::OO::Util' => 0,
+                   'MooX::Types::MooseLike' => 0,
+                   'HTML::Entities' => 0,
+                   'Test::NoWarnings' => 0,
+                   'Locale::TextDomain::OO::Util::ExtractHeader' => 0,
                    'URI' => 0,
+                   'Test::Exception' => 0,
+                   'Test::Differences' => '0.60',
+                   'Encode' => 0,
+                   'JSON' => 0,
                    'Carp' => 0,
                    'Locale::PO' => '0.27',
-                   'Test::Differences' => '0.60',
-                   'HTTP::Request::Common' => 0,
-                   'MooX::StrictConstructor' => 0,
-                   'Test::NoWarnings' => 0,
-                   'JSON' => 0,
-                   'MooX::Types::MooseLike::Numeric' => 0,
                    'Try::Tiny' => 0,
-                   'MooX::Types::MooseLike' => 0,
-                   'Test::More' => 0,
-                   'Test::Exception' => 0,
-                   'Moo' => '1.003001',
-                   'namespace::autoclean' => 0,
-                   'Locale::TextDomain::OO::Util' => 0,
+                   'MooX::Types::MooseLike::Numeric' => 0,
                    'MooX::Types::MooseLike::Base' => 0,
-                   'Path::Tiny' => 0,
-                   'Encode' => 0,
-                   'Locale::TextDomain::OO::Util::ExtractHeader' => 0,
+                   'MooX::StrictConstructor' => 0,
                    'LWP::UserAgent' => 0,
-                   'HTML::Entities' => 0
+                   'namespace::autoclean' => 0
                  },
   'EXE_FILES' => [],
-  'INSTALLDIRS' => 'site',
+  'NAME' => 'Locale::Utils::Autotranslator',
+  'PL_FILES' => {},
   'VERSION_FROM' => 'lib/Locale/Utils/Autotranslator.pm'
 )
 ;

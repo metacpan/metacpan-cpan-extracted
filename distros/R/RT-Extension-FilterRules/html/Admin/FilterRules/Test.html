@@ -1,0 +1,30 @@
+<%doc>
+Allow filter rules to be tested.
+</%doc>
+\
+<%INIT>
+unless ( $session{'CurrentUser'}
+    ->HasRight( Object => $RT::System, Right => 'SuperUser' ) )
+{
+    Abort( loc('This feature is only available to system administrators.') );
+}
+my $Collection = RT::FilterRuleGroups->new( $session{'CurrentUser'} );
+$Collection->UnLimit();
+$Collection->FindAllRows;
+my $Title = loc('Test filter rules');
+</%INIT>
+\
+<& /Admin/Elements/Header, Title => $Title  &>
+<& /Elements/Tabs &>
+
+% if ($Collection->Count == 0) {
+<p>
+<em><&|/l&>There are no filter rule groups to test.</&></em>
+</p>
+% } else {
+<& /Elements/FilterRules/Test,
+    %ARGS,
+    FilterRuleGroups => $Collection,
+    PageLink => RT->Config->Get('WebPath') . '/Admin/FilterRules/Test.html',
+&>
+% }

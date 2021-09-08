@@ -1,5 +1,10 @@
 Revision history for Future-IO
 
+0.10    2021-08-26
+        [BUGFIXES]
+         * Skip the unit test about filling pipes with ->syswrite on MSWin32
+           because the test just hangs there (RT138985)
+
 0.09    2021-08-24
         [CHANGES]
          * Added ->waitpid that real event loop implementations can provide

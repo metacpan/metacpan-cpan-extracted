@@ -41,6 +41,10 @@ The following functions are exported automatically:
 
 See B<code2name> in L<Locale::Codes>
 
+=item B<code2langexts(CODE [,CODESET])>
+
+See B<code2names> in L<Locale::Codes>
+
 =item B<langext2code(NAME [,CODESET] [,'retired'])>
 
 See B<name2code> in L<Locale::Codes>

@@ -10,6 +10,7 @@
 #include "XSUB.h"
 
 #include "XSParseKeyword.h"
+#include "XSParseInfix.h"
 
 #define HAVE_PERL_VERSION(R, V, S) \
     (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
@@ -157,7 +158,7 @@ static OP *pp_dispatch_isa(pTHX)
 }
 #endif
 
-static OP *build_cases_nondispatch(pTHX_ OPCODE matchtype, PADOFFSET padix, size_t n_cases, XSParseKeywordPiece *caseargs[], OP *block, OP *elseop)
+static OP *build_cases_nondispatch(pTHX_ XSParseInfixInfo *matchinfo, PADOFFSET padix, size_t n_cases, XSParseKeywordPiece *caseargs[], OP *block, OP *elseop)
 {
   assert(n_cases);
 
@@ -169,13 +170,13 @@ static OP *build_cases_nondispatch(pTHX_ OPCODE matchtype, PADOFFSET padix, size
 
     OP *thistestop;
 
-    switch(matchtype) {
+    switch(matchinfo->opcode) {
 #ifdef HAVE_OP_ISA
       case OP_ISA:
 #endif
       case OP_SEQ:
       case OP_EQ:
-        thistestop = newBINOP(matchtype, 0,
+        thistestop = newBINOP(matchinfo->opcode, 0,
           newPADSVOP(OP_PADSV, 0, padix), caseop);
         break;
 
@@ -189,6 +190,10 @@ static OP *build_cases_nondispatch(pTHX_ OPCODE matchtype, PADOFFSET padix, size
         cPMOPx(thistestop)->op_first = newPADSVOP(OP_PADSV, 0, padix);
         thistestop->op_flags |= OPf_KIDS|OPf_STACKED;
 #endif
+        break;
+      case OP_CUSTOM:
+        thistestop = xs_parse_infix_new_op(matchinfo, 0,
+          newPADSVOP(OP_PADSV, 0, padix), caseop);
         break;
     }
 
@@ -302,7 +307,7 @@ static int build_match(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs
   U32 argi = 0;
 
   OP *topic = args[argi++]->op;
-  OPCODE matchtype = args[argi++]->i;
+  XSParseInfixInfo *matchinfo = args[argi++]->infix;
   int n_blocks = args[argi++]->i;
 
   /* Since we're going to fold up the blocks into an optree in reverse order,
@@ -362,7 +367,7 @@ static int build_match(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs
       /* TODO: forbid the , operator in the case label */
       OP *caseop = args[argi]->op;
 
-      switch(matchtype) {
+      switch(matchinfo->opcode) {
 #ifdef HAVE_OP_ISA
         case OP_ISA:
           /* bareword class names are permitted */
@@ -377,6 +382,7 @@ static int build_match(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs
 
           /* FALLTHROUGH */
         case OP_MATCH:
+        case OP_CUSTOM:
           this_block_dispatch = false;
           break;
       }
@@ -390,17 +396,17 @@ static int build_match(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs
     }
 
     if(n_dispatch) {
-      o = build_cases_dispatch(aTHX_ matchtype, padix,
+      o = build_cases_dispatch(aTHX_ matchinfo->opcode, padix,
           n_dispatch, args + argi + n_cases + 3, o);
       n_dispatch = 0;
     }
 
-    o = build_cases_nondispatch(aTHX_ matchtype, padix,
+    o = build_cases_nondispatch(aTHX_ matchinfo, padix,
       n_cases, args + argi + 2, block_arg->op, o);
   }
 
   if(n_dispatch)
-    o = build_cases_dispatch(aTHX_ matchtype, padix,
+    o = build_cases_dispatch(aTHX_ matchinfo->opcode, padix,
         n_dispatch, args + argi + 1, o);
 
   *out = block_end(floor_ix, newLISTOP(OP_LINESEQ, 0, startop, o));
@@ -415,15 +421,7 @@ static const struct XSParseKeywordHooks hooks_match = {
     XPK_PARENSCOPE( /* ( EXPR : OP ) */
       XPK_TERMEXPR_SCALARCTX,
       XPK_COLON,
-      XPK_TAGGEDCHOICE(   /* TODO: relop ? */
-        XPK_LITERAL("eq"), XPK_TAG(OP_SEQ),
-        XPK_LITERAL("=="), XPK_TAG(OP_EQ),
-        XPK_LITERAL("=~"), XPK_TAG(OP_MATCH),
-#ifdef HAVE_OP_ISA
-        XPK_LITERAL("isa"), XPK_TAG(OP_ISA),
-#endif
-        XPK_FAILURE("Expected a comparison operator")
-      )
+      XPK_INFIX_MATCH_NOSMART
     ),
     XPK_BRACESCOPE( /* { blocks... } */
       XPK_REPEATED(     /* case (EXPR) {BLOCK} */
@@ -446,6 +444,7 @@ static const struct XSParseKeywordHooks hooks_match = {
 MODULE = Syntax::Keyword::Match    PACKAGE = Syntax::Keyword::Match
 
 BOOT:
-  boot_xs_parse_keyword(0.12);
+  boot_xs_parse_keyword(0.14);
+  boot_xs_parse_infix(0);
 
   register_xs_parse_keyword("match", &hooks_match, NULL);

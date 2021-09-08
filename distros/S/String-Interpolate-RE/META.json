@@ -4,7 +4,7 @@
       "Diab Jerius <djerius@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -26,26 +26,27 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build::Tiny" : "0.034"
          }
       },
       "develop" : {
          "requires" : {
             "Dist::Zilla" : "5",
-            "Dist::Zilla::Plugin::AutoMetaResources" : "0",
             "Dist::Zilla::Plugin::AutoPrereqs" : "0",
             "Dist::Zilla::Plugin::BumpVersionAfterRelease" : "0",
-            "Dist::Zilla::Plugin::CPANFile" : "0",
             "Dist::Zilla::Plugin::CheckMetaResources" : "0",
             "Dist::Zilla::Plugin::CopyFilesFromRelease" : "0",
             "Dist::Zilla::Plugin::EnsureChangesHasContent" : "0",
             "Dist::Zilla::Plugin::EnsurePrereqsInstalled" : "0",
             "Dist::Zilla::Plugin::GatherDir" : "0",
+            "Dist::Zilla::Plugin::GatherDir::Template" : "0",
             "Dist::Zilla::Plugin::InsertCopyright" : "0",
             "Dist::Zilla::Plugin::InsertExample" : "0",
             "Dist::Zilla::Plugin::MetaJSON" : "0",
             "Dist::Zilla::Plugin::MetaNoIndex" : "0",
             "Dist::Zilla::Plugin::MetaProvides::Package" : "0",
+            "Dist::Zilla::Plugin::MetaResources" : "0",
+            "Dist::Zilla::Plugin::ModuleBuildTiny" : "0",
             "Dist::Zilla::Plugin::NextRelease" : "0",
             "Dist::Zilla::Plugin::PodCoverageTests" : "0",
             "Dist::Zilla::Plugin::PodSyntaxTests" : "0",
@@ -59,8 +60,9 @@
             "Dist::Zilla::Plugin::RunExtraTests" : "0",
             "Dist::Zilla::Plugin::Test::CPAN::Changes" : "0",
             "Dist::Zilla::Plugin::Test::CPAN::Meta::JSON" : "0",
-            "Dist::Zilla::Plugin::Test::CheckManifest" : "0",
+            "Dist::Zilla::Plugin::Test::CleanNamespaces" : "0",
             "Dist::Zilla::Plugin::Test::Compile" : "0",
+            "Dist::Zilla::Plugin::Test::DistManifest" : "0",
             "Dist::Zilla::Plugin::Test::Fixme" : "0",
             "Dist::Zilla::Plugin::Test::NoBreakpoints" : "0",
             "Dist::Zilla::Plugin::Test::NoTabs" : "0",
@@ -73,13 +75,16 @@
             "Dist::Zilla::PluginBundle::Basic" : "0",
             "Dist::Zilla::PluginBundle::Filter" : "0",
             "Pod::Coverage::TrustPod" : "0",
-            "Pod::Weaver::Section::BugsAndLimitations" : "0",
+            "Pod::Weaver::Plugin::StopWords" : "0",
+            "Pod::Weaver::Section::Contributors" : "0",
+            "Pod::Weaver::Section::GenerateSection" : "0",
             "Pod::Weaver::Section::SeeAlso" : "0",
             "Pod::Wordlist" : "0",
             "Software::License::GPL_3" : "0",
             "Test::CPAN::Changes" : "0.19",
             "Test::CPAN::Meta::JSON" : "0.16",
-            "Test::CleanNamespaces" : "0",
+            "Test::CleanNamespaces" : "0.15",
+            "Test::DistManifest" : "0",
             "Test::Fixme" : "0",
             "Test::More" : "0.96",
             "Test::NoBreakpoints" : "0.15",
@@ -119,23 +124,24 @@
    "provides" : {
       "String::Interpolate::RE" : {
          "file" : "lib/String/Interpolate/RE.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-String-Interpolate-RE@rt.cpan.org",
+         "mailto" : "bug-string-interpolate-re@rt.cpan.org",
          "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=String-Interpolate-RE"
       },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/djerius/string-interpolate-re.git",
-         "web" : "https://github.com/djerius/string-interpolate-re"
+         "url" : "https://gitlab.com/djerius/string-interpolate-re.git",
+         "web" : "https://gitlab.com/djerius/string-interpolate-re"
       }
    },
-   "version" : "0.10",
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.04"
+   "version" : "0.11",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.17",
+   "x_spdx_expression" : "GPL-3.0-only"
 }
 

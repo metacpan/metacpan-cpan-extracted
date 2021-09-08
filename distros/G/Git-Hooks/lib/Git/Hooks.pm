@@ -2,8 +2,8 @@ use warnings;
 
 package Git::Hooks;
 # ABSTRACT: Framework for implementing Git (and Gerrit) hooks
-$Git::Hooks::VERSION = '3.1.0';
-use 5.016;
+$Git::Hooks::VERSION = '3.1.1';
+use v5.16.0;
 use utf8;
 use Carp;
 use Exporter qw/import/;
@@ -298,7 +298,7 @@ Git::Hooks - Framework for implementing Git (and Gerrit) hooks
 
 =head1 VERSION
 
-version 3.1.0
+version 3.1.1
 
 =head1 SYNOPSIS
 
@@ -326,7 +326,7 @@ options. (More on this later.)
 
         #!/usr/bin/env perl
 
-        use 5.016;
+        use v5.16.0;
         use warnings;
         use Git::Hooks;
 

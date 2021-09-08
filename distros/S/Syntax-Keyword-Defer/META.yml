@@ -1,5 +1,5 @@
 ---
-abstract: 'add C<defer> block syntax to perl'
+abstract: 'execute code when leaving a block'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
@@ -7,7 +7,7 @@ build_requires:
   Test::More: '0.88'
 configure_requires:
   Module::Build: '0.4004'
-  XS::Parse::Keyword::Builder: '0'
+  XS::Parse::Keyword::Builder: '0.13'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -18,15 +18,15 @@ name: Syntax-Keyword-Defer
 provides:
   Syntax::Keyword::Defer:
     file: lib/Syntax/Keyword/Defer.pm
-    version: '0.05'
+    version: '0.06'
   Syntax::Keyword::Finally:
     file: lib/Syntax/Keyword/Finally.pm
-    version: '0.05'
+    version: '0.06'
 requires:
-  XS::Parse::Keyword: '0'
+  XS::Parse::Keyword: '0.13'
   perl: '5.014'
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

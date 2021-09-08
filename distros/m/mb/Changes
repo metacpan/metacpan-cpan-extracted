@@ -1,5 +1,9 @@
 Revision history for this software.
 
+0.31  2021-08-26 00:00:00
+  - escape "@{^CAPTURE}" to "@{[mb::_CAPTURE()]}", not "@{[join $", mb::_CAPTURE()]}"
+  - created by INABA Hitoshi
+
 0.30  2021-06-28 00:00:00
   - fix POD
   - created by INABA Hitoshi

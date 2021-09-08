@@ -2,10 +2,10 @@ use warnings;
 
 package Git::Hooks::Test;
 # ABSTRACT: Git::Hooks testing utilities
-$Git::Hooks::Test::VERSION = '3.1.0';
+$Git::Hooks::Test::VERSION = '3.1.1';
 ## no critic (RequireExplicitPackage)
 ## no critic (ErrorHandling::RequireCarping)
-use 5.016;
+use v5.16.0;
 use utf8;
 use Carp;
 use Config;
@@ -321,7 +321,7 @@ Git::Hooks::Test - Git::Hooks testing utilities
 
 =head1 VERSION
 
-version 3.1.0
+version 3.1.1
 
 =for Pod::Coverage install_hooks new_commit new_repos newdir test_command test_nok test_nok_match test_ok test_ok_match
 

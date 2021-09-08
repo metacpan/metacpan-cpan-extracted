@@ -11,7 +11,7 @@ use warnings::register qw( Encode::dbi::queue );
 
 use Data::Record::Serialize::Error -all;
 
-our $VERSION = '0.28';
+our $VERSION = '0.30';
 
 use Package::Variant
   importing => [
@@ -317,7 +317,7 @@ Data::Record::Serialize - Flexible serialization of a record
 
 =head1 VERSION
 
-version 0.28
+version 0.30
 
 =head1 SYNOPSIS
 

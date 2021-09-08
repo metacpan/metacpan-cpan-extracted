@@ -1,0 +1,124 @@
+<%doc>
+Page to list the filter rule groups for management.
+</%doc>
+\
+<%ARGS>
+$FindDisabled => 1
+$SearchOp     => 'LIKE'
+$SearchString => ''
+$MoveUp       => undef
+$MoveDown     => undef
+</%ARGS>
+\
+<%INIT>
+unless ( $session{'CurrentUser'}
+    ->HasRight( Object => $RT::System, Right => 'SuperUser' ) )
+{
+    Abort( loc('This feature is only available to system administrators.') );
+}
+
+my $Title = loc('Admin filter rule groups');
+my @Results = ();
+
+if ($MoveUp) {
+    my $Object = RT::FilterRuleGroup->new( $session{'CurrentUser'} );
+    $Object->Load($MoveUp);
+    if ( $Object->id ) {
+        my ( $ok, $msg ) = $Object->MoveUp;
+        push @Results, $msg;
+    } else {
+        push @Results,
+            loc( "Couldn't load filter rule group '[_1]'", $MoveUp );
+    }
+}
+
+if ($MoveDown) {
+    my $Object = RT::FilterRuleGroup->new( $session{'CurrentUser'} );
+    $Object->Load($MoveDown);
+    if ( $Object->id ) {
+        my ( $ok, $msg ) = $Object->MoveDown;
+        push @Results, $msg;
+    } else {
+        push @Results,
+            loc( "Couldn't load filter rule group '[_1]'", $MoveDown );
+    }
+}
+
+my $Collection = RT::FilterRuleGroups->new( $session{'CurrentUser'} );
+$Collection->FindAllRows if ($FindDisabled);
+
+my ($Caption);
+if ( defined $SearchString && length $SearchString ) {
+    $Caption
+        = $FindDisabled
+        ? loc("All filter rule groups matching search criteria")
+        : loc("Enabled filter rule groups matching search criteria");
+    $Collection->Limit(
+        FIELD    => 'Name',
+        OPERATOR => $SearchOp,
+        VALUE    => $SearchString,
+    );
+    RT::Interface::Web::Redirect( RT->Config->Get('WebURL')
+            . "Admin/FilterRules/Modify.html?id="
+            . $Collection->First->id )
+        if $Collection->Count == 1;
+} else {
+    $Collection->UnLimit;
+    $Caption
+        = $FindDisabled
+        ? loc("All filter rule groups")
+        : loc("Enabled filter rule groups");
+}
+
+my $Rows = 50;
+
+my $Format
+    = "'<a href=\"__WebPath__/Admin/FilterRules/Modify.html?id=__id__\">__id__</a>/TITLE:#',"
+    . "'<a href=\"__WebPath__/Admin/FilterRules/Modify.html?id=__id__\">__Name__</a>',"
+    . "'__CanMatchQueues__',"
+    . "'__CanTransferQueues__',"
+    . "'__CanUseGroups__',"
+    . "'__RequirementsCount__',"
+    . "'__FilterRulesCount__',"
+    . "'__Disabled__',"
+    . "'__MoveFilterRuleGroup__'";
+</%INIT>
+\
+<& /Admin/Elements/Header, Title => $Title &>
+<& /Elements/Tabs &>
+<& /Elements/ListActions, actions => \@Results &>
+
+<h1><%$Caption%></h1>
+
+<form method="post" action="<% RT->Config->Get('WebPath') %>/Admin/FilterRules/index.html">
+% foreach my $Field ( qw(Rows Page) ) {
+%     next unless defined $ARGS{ $Field } && length $ARGS{ $Field };
+<input type="hidden" name="<% $Field %>" value="<% $ARGS{ $Field } %>" />
+% }
+<&|/l&>Name</&>
+<& /Elements/SelectMatch, Name => 'SearchOp', Default => $SearchOp &>
+<input size="8" name="SearchString" value="<% $SearchString %>" />
+<br />
+
+%#<input type="checkbox" class="checkbox" id="FindDisabled" name="FindDisabled" value="1" <% $FindDisabled? 'checked="checked"': '' |n%> />
+%# <label for="FindDisabled"><&|/l&>Include disabled filter rule groups in listing.</&></label>
+<div align="right"><input type="submit" class="button" value="<&|/l&>Go!</&>" /></div>
+</form>
+
+<p><&|/l&>Select a filter rule group</&>:</p>
+% unless ( $Collection->Count ) {
+<em><&|/l&>No filter rule groups matching search criteria found.</&></em>
+% } else {
+<& /Elements/CollectionList,
+    OrderBy => 'SortOrder',
+    Order => 'ASC',
+    Rows  => $Rows,
+    %ARGS,
+    Format => $Format,
+    Collection => $Collection,
+    AllowSorting => 0,
+    PassArguments => [qw(
+        FindDisabled SearchString SearchOp Rows Page
+    )],
+&>
+% }

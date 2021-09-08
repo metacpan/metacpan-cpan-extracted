@@ -28,8 +28,12 @@
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08"
          },
+         "x_features_from" : {
+            "Module::Features::PerlTrove" : "0",
+            "Module::Features::TextTable" : "0"
+         },
          "x_spec" : {
-            "Module::Features" : "v0.1.5"
+            "Module::Features" : "v0.1.7"
          }
       },
       "runtime" : {
@@ -61,6 +65,12 @@
          }
       }
    },
+   "provides" : {
+      "Text::Table::More" : {
+         "file" : "lib/Text/Table/More.pm",
+         "version" : "0.020"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
@@ -73,7 +83,7 @@
          "web" : "https://github.com/perlancar/perl-Text-Table-More"
       }
    },
-   "version" : "0.016",
+   "version" : "0.020",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -82,7 +92,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Module::Features",
             "name" : "Module::Features",
-            "version" : "0.002"
+            "version" : "0.004"
          },
          {
             "class" : "Dist::Zilla::Plugin::InsertExample",
@@ -188,7 +198,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.604"
+            "version" : "0.605"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -253,7 +263,7 @@
          {
             "class" : "Dist::Zilla::Plugin::CopyrightYearFromGit",
             "name" : "@Author::PERLANCAR/CopyrightYearFromGit",
-            "version" : "0.006"
+            "version" : "0.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
@@ -269,6 +279,33 @@
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@Author::PERLANCAR/MetaConfig",
             "version" : "6.017"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
+            "config" : {
+               "Dist::Zilla::Plugin::MetaProvides::Package" : {
+                  "finder_objects" : [
+                     {
+                        "class" : "Dist::Zilla::Plugin::FinderCode",
+                        "name" : "@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+                        "version" : "6.017"
+                     }
+                  ],
+                  "include_underscores" : 0
+               },
+               "Dist::Zilla::Role::MetaProvider::Provider" : {
+                  "$Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002004",
+                  "inherit_missing" : 1,
+                  "inherit_version" : 1,
+                  "meta_noindex" : 1
+               },
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000037",
+                  "version" : "0.006"
+               }
+            },
+            "name" : "@Author::PERLANCAR/MetaProvides::Package",
+            "version" : "2.004003"
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::Authority",
@@ -405,6 +442,11 @@
                         "version" : "0.009"
                      },
                      {
+                        "class" : "Pod::Weaver::Section::PERLANCAR::Contributing",
+                        "name" : "@Author::PERLANCAR/PERLANCAR/Contributing",
+                        "version" : "0.292"
+                     },
+                     {
                         "class" : "Pod::Weaver::Section::Legal",
                         "name" : "@Author::PERLANCAR/Legal",
                         "version" : "4.017"
@@ -510,7 +552,7 @@
                }
             },
             "name" : "@Author::PERLANCAR/Test::Perl::Critic::Subset",
-            "version" : "3.001.005"
+            "version" : "3.001.006"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Rinci",
@@ -645,6 +687,11 @@
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
+            "version" : "6.017"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : "@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
             "version" : "6.017"
          }
       ],

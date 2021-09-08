@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Failed;
 use strict;
 use warnings;
 
-our $VERSION = '0.000077';
+our $VERSION = '0.000083';
 
 use Data::GUID;
 use List::Util qw/max/;
@@ -76,7 +76,7 @@ sub handle {
         last_run_stamp => $run->added->epoch,
         run_id         => $run_id,
         run_uri        => $req->base . "view/" . $run->run_id,
-        fields         => $run->fields || [],
+        fields         => [$run->run_fields->search({name => {-not_in => ['coverage']}})->all],
         failures       => [],
     };
 
@@ -105,7 +105,7 @@ sub handle {
 
         my $row = {
             file     => $fail->file,
-            fields   => $fail->fields || [],
+            fields   => [$fail->job_fields],
             job_id   => $job_id,
             job_key  => $job_key,
             uri      => "$run_uri/$job_key",

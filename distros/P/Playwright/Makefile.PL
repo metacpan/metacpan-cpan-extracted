@@ -31,13 +31,13 @@ my %WriteMakefileArgs = (
     "JSON::MaybeXS" => 0,
     "LWP::UserAgent" => 0,
     "List::Util" => "1.33",
-    "Moo" => "1.005",
     "Net::EmptyPort" => 0,
     "POSIX" => 0,
     "Sereal::Decoder" => 0,
     "Sereal::Encoder" => 0,
     "Sub::Install" => 0,
     "feature" => 0,
+    "parent" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -49,7 +49,7 @@ my %WriteMakefileArgs = (
     "Test::MockFile" => 0,
     "Test::MockModule" => 0
   },
-  "VERSION" => "0.012",
+  "VERSION" => "0.013",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -68,7 +68,6 @@ my %FallbackPrereqs = (
   "JSON::MaybeXS" => 0,
   "LWP::UserAgent" => 0,
   "List::Util" => "1.33",
-  "Moo" => "1.005",
   "Net::EmptyPort" => 0,
   "POSIX" => 0,
   "Sereal::Decoder" => 0,
@@ -81,6 +80,7 @@ my %FallbackPrereqs = (
   "Test::MockFile" => 0,
   "Test::MockModule" => 0,
   "feature" => 0,
+  "parent" => 0,
   "strict" => 0,
   "warnings" => 0
 );

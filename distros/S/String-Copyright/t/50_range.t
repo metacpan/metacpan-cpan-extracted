@@ -1,6 +1,6 @@
 use Test2::V0;
 
-plan 25;
+plan 29;
 
 use String::Copyright {
 	format => sub { join ':', $_->[0] || '', $_->[1] || '' }
@@ -34,6 +34,15 @@ is copyright("© 1999\n, 2003 Foo"),
 is copyright("© 1999-2000 -2004-2005 Foo"),
 	'1999-2000:-2004-2005 Foo',
 	'broken range - bogus multi-range';
+
+is copyright("(c) <year> Foo"),
+	'', 'bogus dummy year "<year>"';
+is copyright("Copyright (C) 19xx name of author"),
+	'', 'bogus dummy year "19xx"';
+is copyright("(c) 19yy Foo"),
+	'', 'bogus dummy year "19yy"';
+is copyright("(c) yyyy Foo"),
+	'', 'bogus dummy year "yyyy"';
 
 my $todo = todo 'not yet handled';
 is copyright("© 1999-2000-2004-2005 Foo"),

@@ -1,6 +1,6 @@
 package Text::Conceal;
 
-our $VERSION = '0.99';
+our $VERSION = '0.9901';
 
 use v5.14;
 use warnings;
@@ -66,7 +66,7 @@ sub encode {
     my $match = $obj->{match} or die;
     my $test = $obj->{test};
     for my $arg (grep defined, @_) {
-	not $test or $test->($arg) or next;
+	$test->($arg) or next if $test;
 	$arg =~ s{$match}{
 	    if (my($replace, $regex, $len) = $conceal->(${^MATCH})) {
 		push @{$obj->{replace}}, [ $regex, ${^MATCH}, $len ];
@@ -134,18 +134,18 @@ sub concealer {
     };
     for my $i (@range) {
 	my $c = pack "C", $i;
-	push @a, $c unless /\Q$c/;
+	push @a, $c if index($_, $c) < 0;
 	last if $max && @a > $max;
     }
     return if @a < 2;
     my $lead = do { local $" = ''; qr/[^\Q@a\E]*+/ };
     my $b = shift @a;
     return sub {
-	my $len = $obj->{length}->(+shift =~ s/\X\cH+//gr);
+	my $len = $obj->{length}->($_[0] =~ s/\X\cH+//gr);
 	return if $len < 1;
 	my $a = $a[ (state $n)++ % @a ];
 	my $bl = $len - 1;
-	( $a . ($b x $bl), qr/\G${lead}\K\Q$a$b\E{0,$bl}(?!\Q$b\E)/, $len );
+	( $a . ($b x $bl), qr/\A${lead}\K\Q$a$b\E{0,$bl}(?!\Q$b\E)/, $len );
     };
 }
 
@@ -168,10 +168,6 @@ __END__
 
 Text::Conceal - conceal and recover interface for text processing
 
-=head1 VERSION
-
-Version 0.99
-
 =head1 SYNOPSIS
 
     use Text::Conceal;
@@ -182,6 +178,10 @@ Version 0.99
     $conceal->encode(@args);
     $_ = foo(@args);
     $conceal->decode($_);
+
+=head1 VERSION
+
+Version 0.9901
 
 =head1 DESCRIPTION
 
@@ -277,19 +277,19 @@ string which also to be taken care of.
 
 =over 4
 
-=item L<0>
+=item C<0>
 
 With default value 0, this module uses characters in the range:
 
     [0x01 => 0x07], [0x10 => 0x1f], [0x21 => 0x7e], [0x81 => 0xfe]
 
-=item L<1>
+=item C<1>
 
 Use printable characters first, then use non-printable characters.
 
     [0x21 => 0x7e], [0x01 => 0x07], [0x10 => 0x1f], [0x81 => 0xfe]
 
-=item L<2>
+=item C<2>
 
 Use only printable characters.
 
@@ -343,6 +343,8 @@ continuous missing is allowed.  Less characters, more confusion.
 This module is originally implemented as a part of
 L<Text::VisualPrintf> module.
 
+=item L<Text::ANSI::Printf>, L<https://github.com/kaz-utashiro/Text-ANSI-Printf>
+
 =back
 
 =head1 AUTHOR
@@ -351,7 +353,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2020 Kazumasa Utashiro.
+Copyright 2020-2021 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

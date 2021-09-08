@@ -1,5 +1,14 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.20.1 2021-09-07T02:29:49Z
+
+    - Introduce --runin/--runout works with --margin option.
+
+4.20.0 2021-09-01T12:42:57Z
+
+    - Make cdif to accept "-U-1" option.
+    - Add --unit=letter option not to include underscore.
+
 4.19.1 2021-04-11T03:10:55Z
 
     - Update behavior of --visible/--tabstyle.

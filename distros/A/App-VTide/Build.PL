@@ -9,6 +9,7 @@ my $builder = Module::Build->new(
     dist_version_from => 'lib/App/VTide.pm',
     requires          => {
         'perl'                => '5.014',
+        'Algorithm::Cron'     => '0.10',
         'Array::Utils'        => 0,
         'File::chdir'         => '0.1008',
         'File::Touch'         => '0.11',

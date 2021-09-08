@@ -109,4 +109,3 @@ my $fmt = String::Formatter->new({
     is($have, $want, "keyed_replace GOOD. fire BAD");
   }
 }
-

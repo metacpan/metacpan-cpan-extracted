@@ -1,3 +1,11 @@
+0.2.1 2021-09-06 08:36:03 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix documentation
+
+0.2.0 2021-09-06 08:32:36 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - support new trace log level
+
 0.1.0 2020-09-03 11:27:29 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - initial release

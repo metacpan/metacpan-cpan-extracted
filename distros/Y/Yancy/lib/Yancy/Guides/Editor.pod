@@ -11,7 +11,7 @@ Yancy::Guides::Editor - Configuring and Extending the Yancy Editor
 
 =head1 VERSION
 
-version 1.076
+version 1.077
 
 =head1 Authentication / Authorization
 

@@ -14,6 +14,8 @@ using ms  = std::chrono::milliseconds;
 using sec = std::chrono::seconds;
 using panda::net::SockAddr;
 
+extern string root_vdir;
+
 constexpr std::chrono::milliseconds operator""_ms (unsigned long long val) { return std::chrono::milliseconds(val); }
 constexpr std::chrono::seconds      operator""_s  (unsigned long long val) { return std::chrono::seconds(val); }
 
@@ -80,6 +82,12 @@ struct VariationReseter : Catch::TestEventListenerBase {
     void testCaseStarting(const Catch::TestCaseInfo&) override {
         variation = {};
     }
+
+    void testRunEnded(Catch::TestRunStats const&) override {
+        if (Fs::exists(root_vdir)) {
+            Fs::remove_all(root_vdir);
+        }
+    };
 };
 CATCH_REGISTER_LISTENER(VariationReseter)
 

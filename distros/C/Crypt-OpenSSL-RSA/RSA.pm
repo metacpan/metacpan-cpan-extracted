@@ -5,7 +5,7 @@ use warnings;
 
 use Carp;    # Removing carp will break the XS code.
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 our $AUTOLOAD;
 use AutoLoader 'AUTOLOAD';
@@ -14,8 +14,11 @@ use XSLoader;
 XSLoader::load 'Crypt::OpenSSL::RSA', $VERSION;
 
 BEGIN {
-    eval { require Crypt::OpenSSL::Bignum };
-}            ## no critic qw(RequireCheckingReturnValueOfEval);
+    eval {
+        local $SIG{__DIE__};    # prevent outer handlers from being called
+        require Crypt::OpenSSL::Bignum;
+    };
+}    ## no critic qw(RequireCheckingReturnValueOfEval);
 
 1;
 
@@ -321,8 +324,11 @@ terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<perl(1)>, L<Crypt::OpenSSL::Random(3)>, L<Crypt::OpenSSL::Bignum(3)>,
-L<rsa(3)>, L<RSA_new(3)>, L<RSA_public_encrypt(3)>, L<RSA_size(3)>,
-L<RSA_generate_key(3)>, L<RSA_check_key(3)>
+L<perl(1)>, L<Crypt::OpenSSL::Random>, L<Crypt::OpenSSL::Bignum>, 
+L<rsa(3)>, L<RSA_new(3)|http://man.he.net/?topic=RSA_new&section=3>, 
+L<RSA_public_encrypt(3)|http://man.he.net/?topic=RSA_public_encrypt&section=3>, 
+L<RSA_size(3)|http://man.he.net/?topic=RSA_size&section=3>,
+L<RSA_generate_key(3)|http://man.he.net/?topic=RSA_generate_key&section=3>, 
+L<RSA_check_key(3)|http://man.he.net/?topic=RSA_check_key&section=3>
 
 =cut

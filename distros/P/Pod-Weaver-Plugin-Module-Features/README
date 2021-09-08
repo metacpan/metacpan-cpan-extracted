@@ -3,9 +3,9 @@ NAME
     distribution that has feature definer or featurer declarer modules
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Pod::Weaver::Plugin::Module::Features (from Perl distribution
-    Pod-Weaver-Plugin-Module-Features), released on 2021-02-25.
+    Pod-Weaver-Plugin-Module-Features), released on 2021-04-06.
 
 SYNOPSIS
     In your weaver.ini:

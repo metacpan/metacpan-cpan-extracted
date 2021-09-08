@@ -8,6 +8,9 @@ my $VC    = $Win32                              && ( $Config{ccname} eq 'cl' ? 1
 my $x64   = $Config{archname} =~ /^MSWin32-x64/ && $Config{ptrsize} == 8;
 
 #
+$Win32 = 0;
+
+#
 
 probe sub {
     my ($build) = @_;    # $build is the Alien::Build instance.
@@ -61,8 +64,8 @@ share {
         plugin 'Build::Make' => 'gmake';
         build [
             '%{configure}',    # --prefix=%{.install.prefix}', # --enable-threads=no',
-            '%{gmake} -j 10',
-            '%{gmake} install',
+            '%{make}',
+            '%{make} install',
         ];
     }
 };

@@ -1,14 +1,14 @@
 ##----------------------------------------------------------------------------
-# Database Object Interface - ~/lib/DB/Object/Fields/Field.pm
-# Version v0.100.1
-# Copyright(c) 2020 DEGUEST Pte. Ltd.
-# Author: Jacques Deguest <jack@deguest.jp>
-# Created 2020/01/01
-# Modified 2021/03/21
-# All rights reserved
-# 
-# This program is free software; you can redistribute  it  and/or  modify  it
-# under the same terms as Perl itself.
+## Database Object Interface - ~/lib/DB/Object/Fields/Field.pm
+## Version v1.0.0
+## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
+## Created 2020/01/01
+## Modified 2021/08/25
+## All rights reserved
+## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package DB::Object::Fields::Field;
 BEGIN
@@ -39,7 +39,7 @@ BEGIN
         fallback => 1,
     );
     use Want;
-    our( $VERSION ) = 'v0.100.1';
+    our( $VERSION ) = 'v1.0.0';
 };
 
 sub init
@@ -64,6 +64,9 @@ sub init
 }
 
 sub as_string { return( shift->name ); }
+
+# A data type constant
+sub constant { return( shift->_set_get_hash_as_object( 'constant', @_ ) ); }
 
 sub database { return( shift->database_object->database ); }
 
@@ -206,9 +209,22 @@ sub _op_overload
     };
     $op = $map->{ $op } if( exists( $map->{ $op } ) );
     $op = 'IS' if( $op eq '=' and $val eq 'NULL' );
-    unless( $val eq '?' || ( $self->_is_object( $val ) && $val->isa( 'DB::Object::Fields::Field' ) ) )
+    # If the value specified in the operation is a placeholder, or a field object or a statement object, we do not want to quote process it
+    unless( $val eq '?' || 
+            ( $self->_is_object( $val ) && 
+              (
+                $val->isa( 'DB::Object::Fields::Field' ) ||
+                $val->isa( 'DB::Object::Statement' )
+              )
+            ) )
     {
         $val = $self->database_object->quote( $val ) if( $self->database_object );
+    }
+    
+    # If the value is a statement object, stringify it, surround it with parenthesis and use it
+    if( $self->_is_a( $val, 'DB::Object::Statement' ) )
+    {
+        $val = '(' . $val->as_string . ')';
     }
     # XXX Comment out once debugged !
 #     return( DB::Object::Fields::Field::Overloaded->new( $swap ? "${val} ${op} ${field}" : "${field} ${op} ${val}", $self, ( $val eq '?' ? ( binded => 1 ) : () ) ) );
@@ -294,9 +310,27 @@ DB::Object::Fields::Field - Table Field Object
     $table->select( $c + 10 ); # SELECT currency + 10 FROM dummy;
     $c == 'NULL' # currency IS NULL
 
+You can also use a L<DB::Object::Statement> as a value in the operation:
+
+    my $tbl = $dbh->services || die( "Unable to get the table object \"services\": ", $dbh->error );
+    my $userv_tbl = $dbh->user_services || die( "Unable to get the table object \"user_services\": ", $tbl->->error );
+    $tbl->where( $tbl->fo->name == '?' );
+    my $sub_sth = $tbl->select( 'id' ) || die( "Unable to prepare the sql query to get the service id: ", $tbl->error );
+    $userv_tbl->where(
+        $dbh->AND(
+            $tbl->fo->user_id == '?',
+            $tbl->fo->service_id == $sub_sth
+        )
+    );
+    my $query = $userv_tbl->delete->as_string || die( $tbl->error );
+
+This would yield:
+
+    DELETE FROM user_services WHERE user_id = ? AND name = (SELECT id FROM services WHERE name = ?)
+
 =head1 VERSION
 
-    v0.100.1
+    v1.0.0
 
 =head1 DESCRIPTION
 
@@ -355,6 +389,28 @@ This returns the name of the field, possibly prefixed
 This is also called to stringify the object
 
     print( "Field is: $field\n" );
+
+=head2 constant
+
+A data type constant set by L<DB::Object::Table/structure>. This helps determine how to deal with some fields.
+
+This is an hash object that contains 3 properties:
+
+=over 4
+
+=item I<constant>
+
+An integer set by the database driver to represent the constant
+
+=item I<name>
+
+The constant name, e.g. C<PG_JSONB>
+
+=item I<type>
+
+The data type, e.g. C<jsonb>
+
+=back
 
 =head2 database
 
@@ -430,6 +486,8 @@ Returns the table object which is a L<DB::Object::Tables> object.
 =head2 type
 
 Returns the field type such as C<jsonb>, Cjson>, C<varchar>, C<integer>, etc.
+
+See also L</constant> for an even more accurate data type, and the driver associated constant that is used for binding values to placeholders.
 
 =head2 _find_siblings
 

@@ -6,12 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Config/XrmDatabase.pm',
-    'Config/XrmDatabase/Constants.pm',
-    'Config/XrmDatabase/Failure.pm'
+    'Config/XrmDatabase/Failure.pm',
+    'Config/XrmDatabase/Types.pm',
+    'Config/XrmDatabase/Util.pm'
 );
 
 

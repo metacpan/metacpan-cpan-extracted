@@ -1,0 +1,37 @@
+<%doc>
+Edit the user rights on a filter rule group.
+</%doc>
+\
+<%ARGS>
+$id => undef
+</%ARGS>
+\
+<%INIT>
+unless ( $session{'CurrentUser'}
+    ->HasRight( Object => $RT::System, Right => 'SuperUser' ) )
+{
+    Abort( loc('This feature is only available to system administrators.') );
+}
+
+my @Results = ProcessACLs( \%ARGS );
+
+if ( not defined $id ) {
+    Abort( loc('No filter rule group defined') );
+}
+
+my $Object = RT::FilterRuleGroup->new( $session{'CurrentUser'} );
+$Object->Load($id)
+    || Abort( loc( "Couldn't load filter rule group [_1]", $id ) );
+
+my @Principals = GetPrincipalsMap( $Object, 'Users' );
+</%INIT>
+\
+<& /Admin/Elements/Header, Title => loc('Modify user rights for filter rule group [_1]', $Object->Name) &>
+<& /Elements/Tabs &>
+<& /Elements/ListActions, actions => \@Results &>
+
+<form method="post" action="UserRights.html" name="ModifyUserRights" id="ModifyUserRights">
+<input type="hidden" class="hidden" name="id" value="<% $Object->id %>" />
+<& /Admin/Elements/EditRights, Context => $Object, Principals => \@Principals &>
+<& /Elements/Submit, Label => loc('Save Changes') &>
+</form>

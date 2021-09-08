@@ -6,6 +6,9 @@ use Mojolicious::Lite -signatures;
 
 # Route with placeholder
 get '/:foo' => sub ($c) {
+  if ($c->log->can('trace')){
+    $c->log->trace("trace");
+  }
   $c->log->debug("debug");
   $c->log->info("info");
   $c->log->warn("warn");

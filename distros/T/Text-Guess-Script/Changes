@@ -1,5 +1,10 @@
 Revision history for Text::Guess::Script
 
+0.06  2021-08-27 22:17:33 CEST
+        - improved speed using Unicode::UCD
+        - new method guesses
+        - added tests
+
 0.05  2020-08-07 19:59:40 CEST
         - increase minimal Perl version to 5.16.1
 

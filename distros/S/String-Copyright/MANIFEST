@@ -14,6 +14,7 @@ dist.ini
 doap.ttl
 lib/String/Copyright.pm
 t/20_parse.t
+t/30_RE2_missing.t
 t/50_context.t
 t/50_encoding.t
 t/50_identifier.t

@@ -16,7 +16,7 @@ use Scalar::Util 'weaken', 'isweak';
 use Try::Tiny;
 use PerlX::Maybe;
 
-our $VERSION = '0.67';
+our $VERSION = '0.68';
 our @CARP_NOT;
 
 =head1 NAME
@@ -328,13 +328,14 @@ sub connect( $self, %args ) {
             $s->getTargets()
         })->then(sub( @tabs ) {
             my $res;
-            if( ! @tabs ) {
+            my @visible_tabs = grep { $_->{type} eq 'page' && $_->{targetId} } @tabs;
+            if( ! @visible_tabs ) {
                 $res = $s->createTarget(
                     url => $args{ start_url } || 'about:blank',
                 );
             } else {
-                $res = Future->done( $tabs[$args{ tab }] );
-             };
+                $res = Future->done( $visible_tabs[$args{ tab }] );
+            };
             $res = $res->then(sub($tab) {
                 $s->tab( $tab );
                 $s->attach( $s->tab->{targetId} );
@@ -355,7 +356,7 @@ sub connect( $self, %args ) {
         $done = $done->then(sub (@) {
             $s->getTargets()
         })->then(sub( @tabs ) {
-            (my $tab) = grep { $_->{targetId} } @tabs;
+            (my $tab) = grep { $_->{type} eq 'page' && $_->{targetId} } @tabs;
             $s->tab($tab);
             $s->attach( $tab->{targetId} )
         });

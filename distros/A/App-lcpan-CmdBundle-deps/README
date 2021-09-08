@@ -3,9 +3,9 @@ NAME
     dependencies
 
 VERSION
-    This document describes version 0.010 of App::lcpan::CmdBundle::deps
+    This document describes version 0.011 of App::lcpan::CmdBundle::deps
     (from Perl distribution App-lcpan-CmdBundle-deps), released on
-    2021-06-01.
+    2021-06-03.
 
 SYNOPSIS
 DESCRIPTION

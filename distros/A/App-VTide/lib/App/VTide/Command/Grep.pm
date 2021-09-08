@@ -14,7 +14,7 @@ use English qw/ -no_match_vars /;
 
 extends 'App::VTide::Command::Run';
 
-our $VERSION = version->new('0.1.15');
+our $VERSION = version->new('0.1.16');
 our $NAME    = 'grep';
 our $OPTIONS = [
     'test|T!',
@@ -92,7 +92,7 @@ App::VTide::Command::Grep - Run a grep command on vtide editor globs
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Grep version 0.1.15
+This documentation refers to App::VTide::Command::Grep version 0.1.16
 
 =head1 SYNOPSIS
 

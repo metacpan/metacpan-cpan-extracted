@@ -1,3 +1,7 @@
+0.39.1 2021-08-30 16:10:03 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - callbackery.ui.HtmlBox was missing from the release archive
+
 0.39.0 2021-08-24 11:57:57 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - Add HtmlBox with JavaScript enabled. @zaucker

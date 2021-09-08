@@ -1,22 +1,31 @@
 Revision history for Perl extension Tie::TextDir.
 
-0.06
+0.07 2021-09-04T17:52:26Z
 
- - Improved speed considerably by using Perl's open() instead of the
-   FileHandle module, and sysread() instead of <FH>. [patch by Perrin
-   Harkins]
 
- - Data is now written to a temporary file using File::Temp, and then
-   we rename() to the destination file, making the actual write an
-   atomic operation.  [patch by Perrin Harkins]
+0.07  Sat Sep  4 12:16:11 CDT 2021
+  - Support for hierarchical subdirectories when writing files, useful
+    when dealing with a bit amount of files. [patch by Alberto Simões]
 
- - When creating filehandles, we now use Symbol.pm if perl's version
-   is less than 5.6, and just auto-vivify them otherwise.
+  - Updated some build stuff.
+
+0.06  Tue Sep  9, 2003
+
+  - Improved speed considerably by using Perl's open() instead of the
+    FileHandle module, and sysread() instead of <FH>. [patch by Perrin
+    Harkins]
+
+  - Data is now written to a temporary file using File::Temp, and then
+    we rename() to the destination file, making the actual write an
+    atomic operation.  [patch by Perrin Harkins]
+
+  - When creating filehandles, we now use Symbol.pm if perl's version
+    is less than 5.6, and just auto-vivify them otherwise.
 
 0.05  Wed Jul  9 16:35:11 CDT 2003
 
- - Added a Build.PL script for installing via Module::Build if the
-   user wishes to.
+  - Added a Build.PL script for installing via Module::Build if the
+    user wishes to.
 
 0.04  Wed Oct 17 12:49:21 CDT 2001
    - Now accepts the opening-mode as 'rw', 'ro', or a bitmask like

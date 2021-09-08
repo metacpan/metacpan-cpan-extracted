@@ -108,7 +108,7 @@ for my $data (@data) {
     chdir $dir;
     #$result =~ tr{\\}{/};
     eq_or_diff
-        [ split qr{ \r? \n }xms, $result ],
-        [ split qr{ \n }xms, $data->{result} ],
+        [ split m{ \r? \n }xms, $result ],
+        [ split m{ \r? \n }xms, $data->{result} ],
         $data->{test};
 }

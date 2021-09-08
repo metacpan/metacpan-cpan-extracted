@@ -1,16 +1,40 @@
-0.21    2017-07-14 (PERLANCAR)
+0.222   2021-08-29  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [ux] In debug message, show caller package as well.
+
+
+0.221   2021-08-29  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] To be more helpful, in debug message, show where our hook is
+	  called from.
+
+	- [test] Add a minimal test suite.
+
+
+0.220   2021-08-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Make generated code (the @INC hook) observe
+	  PERL_DATAPACKER_DEBUG.
+
+	- Change @INC hook from coderef to an object, so we can be clearly
+	  marked when @INC is printed.
+
+
+0.21    2017-07-14  Released-By: PERLANCAR
 
         - Add option --put-hook-at-the-end like in Module::FatPack.
 
 
-0.20    2016-12-28 (PERLANCAR)
+0.20    2016-12-28  Released-By: PERLANCAR
 
 	- No functional changes.
 
         - [dist] Fix expressing follow-spec prereq relationship with x_spec.
 
 
-0.19    2016-12-27 (PERLANCAR)
+0.19    2016-12-27  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -18,14 +42,14 @@
 	  with _SPEC:: prefix.
 
 
-0.18    2016-12-11 (PERLANCAR)
+0.18    2016-12-11  Released-By: PERLANCAR
 
 	- Tweak Rinci metadata for nicer CLI.
 
 	- Fix module regex (subpackages are allowed to begin with a digit).
 
 
-0.17    2016-02-09 (PERLANCAR)
+0.17    2016-02-09  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -35,25 +59,25 @@
 	  parts).
 
 
-0.16    2015-11-27 (PERLANCAR)
+0.16    2015-11-27  Released-By: PERLANCAR
 
 	- [Experimental] Use '#' to prefix lines in included source code
 	  instead of ' ', to make things clearer and make the packed script
 	  easier to work with more naive source munger.
 
 
-0.15    2015-10-21 (PERLANCAR)
+0.15    2015-10-21  Released-By: PERLANCAR
 
 	- [Bugfix] fix line numbering 2nd attempt, still off by 1, derp.
 
 
-0.14    2015-10-21 (PERLANCAR)
+0.14    2015-10-21  Released-By: PERLANCAR
 
 	- [Bugfix] Fix line number reporting: didn't handle lines before
 	  DSS header (now allowed in Data::Section::Seekable 0.07).
 
 
-0.13    2015-10-21 (PERLANCAR)
+0.13    2015-10-21  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -61,14 +85,14 @@
           header line to not be the first line of data section.
 
 
-0.12    2015-10-11 (PERLANCAR)
+0.12    2015-10-11  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Fill in datapack overhead numbers.
 
 
-0.11    2015-10-03 (PERLANCAR)
+0.11    2015-10-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -76,7 +100,7 @@
 	  App::depak).
 
 
-0.10    2015-09-03 (PERLANCAR)
+0.10    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -85,42 +109,42 @@
 	  requirement.
 
 
-0.09    2015-08-01 (PERLANCAR)
+0.09    2015-08-01  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Show error detail in error loading a datapacked module.
 
 
-0.08    2015-07-08 (PERLANCAR)
+0.08    2015-07-08  Released-By: PERLANCAR
 
 	- [Bugfix] Fix off-by-one line numbering.
 
 
-0.07    2015-07-05 (PERLANCAR)
+0.07    2015-07-05  Released-By: PERLANCAR
 
 	- [Bugfix] Use binary encoding to avoid mangling.
 
 
-0.06    2015-07-04 (PERLANCAR)
+0.06    2015-07-04  Released-By: PERLANCAR
 
 	- Indent datapacked modules, like what App::FatPacker does, so packed
 	  script is easier to work with regex-based file mungers Dist::Zilla
 	  plugins like DZP:OurPkgVersion et al.
 
 
-0.05    2015-07-03 (PERLANCAR)
+0.05    2015-07-03  Released-By: PERLANCAR
 
 	- Accept Foo/Bar.pm or Foo::Bar syntax in module_names &
 	  module_srcs.
 
 
-0.04    2015-06-18 (PERLANCAR)
+0.04    2015-06-18  Released-By: PERLANCAR
 
 	- Adjust to Data::Section::Seekable::Writer 0.06.
 
 
-0.03    2015-06-17 (PERLANCAR)
+0.03    2015-06-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -128,13 +152,13 @@
 	  duplication.
 
 
-0.02     2015-06-17 (PERLANCAR)
+0.02     2015-06-17  Released-By: PERLANCAR
 
          - No functional changes.
 
          - [doc] Mention Data::Section::Seekable & datapack-modules script.
 
 
-0.01     2015-06-12 (PERLANCAR)
+0.01     2015-06-12  Released-By: PERLANCAR
 
          - First release.

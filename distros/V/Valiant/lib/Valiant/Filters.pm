@@ -1,13 +1,16 @@
 package Valiant::Filters;
 
-use Sub::Exporter 'build_exporter';
-use Class::Method::Modifiers qw(install_modifier);
+use Class::Method::Modifiers;
 use Valiant::Util 'debug';
+use Scalar::Util;
+use Moo::_Utils;
 
-require Role::Tiny;
+require Moo::Role;
+require Sub::Util;
 
-our @DEFAULT_ROLES = (qw(Valiant::Util::Ancestors Valiant::Filterable));
+our @DEFAULT_ROLES = (qw(Valiant::Filterable));
 our @DEFAULT_EXPORTS = (qw(filters filters_with));
+our %Meta_Data = ();
 
 sub default_roles { @DEFAULT_ROLES }
 sub default_exports { @DEFAULT_EXPORTS }
@@ -16,31 +19,41 @@ sub import {
   my $class = shift;
   my $target = caller;
 
+  unless (Moo::Role->is_role($target)) {
+    my $orig = $target->can('with');
+    Moo::_Utils::_install_tracked($target, 'with', sub {
+      unless ($target->can('filters_metadata')) {
+        $Meta_Data{$target}{'filters'} = \my @data;
+        my $method = Sub::Util::set_subname "${target}::filters_metadata" => sub { @data };
+        no strict 'refs';
+        *{"${target}::filters_metadata"} = $method;
+      }
+      &$orig;
+    });
+  } 
+
   foreach my $default_role ($class->default_roles) {
     next if Role::Tiny::does_role($target, $default_role);
     debug 1, "Applying role '$default_role' to '$target'";
-    Role::Tiny->apply_roles_to_package($target, $default_role);
+    Moo::Role->apply_roles_to_package($target, $default_role);
   }
 
   my %cb = map {
     $_ => $target->can($_);
   } $class->default_exports;
-  
-  my $exporter = build_exporter({
-    into_level => 1,
-    exports => [
-      map {
-        my $key = $_; 
-        $key => sub {
-          sub { return $cb{$key}->($target, @_) };
-        }
-      } keys %cb,
-    ],
-  });
 
-  $class->$exporter($class->default_exports);
+  foreach my $exported_method (keys %cb) {
+    my $sub = sub {
+      if(Scalar::Util::blessed($_[0])) {
+        return $cb{$exported_method}->(@_);
+      } else {
+        return $cb{$exported_method}->($target, @_);
+      }
+    };
+    Moo::_Utils::_install_tracked($target, $exported_method, $sub);
+  }
 
-  install_modifier $target, 'around', 'has', sub {
+  Class::Method::Modifiers::install_modifier $target, 'around', 'has', sub {
     my $orig = shift;
     my ($attr, %opts) = @_;
 
@@ -54,6 +67,27 @@ sub import {
     return $orig->($attr, %opts);
   } if $target->can('has');
 } 
+
+sub _add_metadata {
+  my ($target, $type, @add) = @_;
+  my $store = $Meta_Data{$target}{$type} ||= do {
+    my @data;
+    if (Moo::Role->is_role($target) or $target->can("${type}_metadata")) {
+      $target->can('around')->("${type}_metadata", sub {
+        my ($orig, $self) = (shift, shift);
+        ($self->$orig(@_), @data);
+      });
+    } else {
+      require Sub::Util;
+      my $method = Sub::Util::set_subname "${target}::${type}_metadata" => sub { @data };
+      no strict 'refs';
+      *{"${target}::${type}_metadata"} = $method;
+    }
+    \@data;
+  };
+  push @$store, @add;
+  return;
+}
 
 1;
 

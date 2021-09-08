@@ -1,9 +1,52 @@
 ==================================================
-Changes from 2019-08-15 00:00:00 +0000 to present.
+Changes from 2019-09-02 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 8.0 at 2021-08-14 22:16:33 +0000
+version 8.1 at 2021-09-01 00:43:37 +0000
+----------------------------------------
+
+  Change: dc6735a8f9fcb22c3bad773b759c47d4519dc2c1
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2021-08-31 17:43:28 +0000
+
+    Setting up the 8.1 release 
+
+  Change: cc2d07e3e2515d02d983dd8dd35fe3a061047a66
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2021-08-31 17:41:12 +0000
+
+    Add test for query and minimum_should_match for consistency 
+
+  Change: 5257a66d11394ea8ec140c9e5de0c3e7a8a1d50c
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2021-08-31 17:24:45 +0000
+
+    Fix tabs which errantly made it into the file 
+
+  Change: 94b47afe216d3361d821ef6585888fed4a6c958b
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2021-08-31 17:20:53 +0000
+
+    Fix minimum should match handling in the ::Query 
+
+  Change: 365a0a129d40b505bcb8ef3d72809f6e4c75ccfe
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2021-08-31 17:18:31 +0000
+
+    Update Aggregations documentation
+
+    * Adds documentation to `::Aggregations` * Adds more docs to
+    `es-aggregate.pl` 
+
+  Change: ce7787fe56b295dc83476f58f9082ade7f0e3661
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2021-08-16 21:02:18 +0000
+
+    Starting point for aggregation documentation 
+
+----------------------------------------
+version 8.0 at 2021-08-14 22:15:28 +0000
 ----------------------------------------
 
   Change: 40dbb86b7b8d9b98f4572a9f362fdd94f4d57b40
@@ -456,69 +499,6 @@ version 7.3 at 2019-09-08 18:32:53 +0000
     Now `add_bool()` supports adding multiple conditions at once. Allow users
     to set `search_type` and `track_scores`. 
 
-----------------------------------------
-version 7.2 at 2019-08-28 22:38:01 +0000
-----------------------------------------
-
-  Change: 1c04c77be9fd7c0366ce28e2b8abe694babe468f
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-08-28 15:38:01 +0000
-
-    Documentation update for 7.2 release 
-
-  Change: 7469f0aab1a9f93a2ebf4fbe8848a25689ff5cf5
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-08-28 15:35:07 +0000
-
-    Enhance es-apply-settings.pl
-
-    * New `es_flatten_hash()` function to perform compatible list flattening
-
-    to that found in Elastic's documentation. * Replace all instances of
-    `Hash::Flatten::flatten` with a call to
-
-    `es_flatten_hash()` for consistency * Use the `es_flatten_hash()` function
-    with `Test::Deep`'s
-
-    `cmp_details()` and `subhashof()` to check if an index requires a
-
-    settings change. * Configure `es-apply-settings.pl` to ignore indices with
-    protected
-
-    aliases. * Allow protected indices to have settings applied with
-    `--no-skip` * Skip checking the existing index settings with `--no-diff` 
-
-  Change: bc5ce3686a5d7542fea53d70352f618bd1676a15
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-08-23 15:04:28 +0000
-
-    Tweaks for working with ElasticSearch 6.x and 7.x
-
-    * Field metadata extraction works on both versions * Filter out invalid
-    parameters to `_search` when using an older ES
-
-    version * Set `es-search.pl` to use the new parameters to track the total
-    hits 
-
-  Change: 84142a2fa49ad8e819be1cc189b17a246783c762
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-08-05 11:40:16 +0000
-
-    Make skipped aliases in maintenance more visible.
-
-    Moving the skipped message from `verbose` to `output` to ensure proper
-    reporting of these indexes. 
-
-  Change: 75e684c51aa125e6d8590bf95c3a7c0e3c43933f
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-08-01 17:10:46 +0000
-
-    Adapt es-search.pl --bases to use _all
-
-    If the user sets a default base in their `~/.es-utils.yaml`, then they'd
-    only see that base in via `--bases`. This ensures users can see all of the
-    indices available. 
-
 =================================================
-Plus 78 releases after 2019-08-15 00:00:00 +0000.
+Plus 79 releases after 2019-09-02 00:00:00 +0000.
 =================================================

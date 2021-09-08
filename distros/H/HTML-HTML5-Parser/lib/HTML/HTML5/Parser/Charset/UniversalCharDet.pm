@@ -2,9 +2,10 @@ package HTML::HTML5::Parser::Charset::UniversalCharDet;
 
 ## skip Test::Tabs
 use strict;
+use warnings;
 use IO::HTML ();
 
-our $VERSION='0.301';
+our $VERSION='0.992';
 our $DEBUG;
 
 # this really shouldn't work, but for some reason it does...

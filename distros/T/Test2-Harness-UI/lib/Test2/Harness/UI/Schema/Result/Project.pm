@@ -9,7 +9,7 @@ use Carp qw/confess/;
 confess "You must first load a Test2::Harness::UI::Schema::NAME module"
     unless $Test2::Harness::UI::Schema::LOADED;
 
-our $VERSION = '0.000077';
+our $VERSION = '0.000083';
 
 sub coverage {
     my $self = shift;
@@ -29,7 +29,7 @@ sub coverage {
     my $schema = $self->result_source->schema;
     if (my $publisher = $params{user}) {
         my $user = $schema->resultset('User')->find({username => $publisher}) or confess "Invalid publisher '$publisher'.\n";
-        $query->{'runs.user_id'} = $user->user_id;
+        $query->{'run.user_id'} = $user->user_id;
     }
 
     my $field = $schema->resultset('RunField')->find($query, $attrs)

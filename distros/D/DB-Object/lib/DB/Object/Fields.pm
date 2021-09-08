@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Fields.pm
-## Version v0.100.0
-## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## Version v1.0.0
+## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/01/01
 ## Modified 2021/03/21
@@ -19,7 +19,7 @@ BEGIN
     use DB::Object::Fields::Field;
     use parent qw( Module::Generic );
     use Devel::Confess;
-    our( $VERSION ) = 'v0.100.0';
+    our( $VERSION ) = 'v1.0.0';
 };
 
 sub init
@@ -74,16 +74,18 @@ sub _initiate_field_object
     return( $self->error( "Table ", $self->table_object->name, " has no such field \"$field\"." ) ) if( !CORE::exists( $fields->{ $field } ) );
     # $self->message( 3, "Evaluating -> package ${class}; sub ${field} { return( shift->_set_get_object( '$field', 'DB::Object::Fields::Field', \@_ ) ); }" );
     # eval( "package ${class}; sub ${field} { return( shift->_set_get_object( '$field', 'DB::Object::Fields::Field', \@_ ) ); }" );
-    my $def    = $self->table_object->default;
-    my $types  = $self->table_object->types;
-    my $hash =
+    my $def   = $self->table_object->default;
+    my $types = $self->table_object->types;
+    my $const = $self->table_object->types_const;
+    my $hash  =
     {
-    debug => ( $self->debug || 0 ),
-    name => $field,
-    type => $types->{ $field },
-    default => $def->{ $field },
-    pos => $fields->{ $field },
-    prefixed => $self->{prefixed},
+    debug        => ( $self->debug || 0 ),
+    name         => $field,
+    type         => $types->{ $field },
+    default      => $def->{ $field },
+    pos          => $fields->{ $field },
+    const        => $const->{ $field },
+    prefixed     => $self->{prefixed},
     query_object => $self->query_object,
     table_object => $self->table_object,
     };
@@ -101,6 +103,7 @@ sub ${field}
             type => '$hash->{type}',
             default => '$hash->{default}',
             pos => $hash->{pos},
+            constant => { constant => $hash->{const}->{constant}, name => '$hash->{const}->{name}', type => '$hash->{const}->{type}' },
             prefixed => \$self->{prefixed},
             query_object => \$self->query_object,
             table_object => \$self->table_object,
@@ -207,7 +210,7 @@ DB::Object::Fields - Tables Fields Object Accessor
 
 =head1 VERSION
 
-    v0.100.0
+    v1.0.0
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Bio-Epithelium.t
+lib/Bio/Epithelium.pm

@@ -4,6 +4,7 @@ author:
   - 'Jonas Smedegaard (JONASS) <jonass@cpan.org>'
 build_requires:
   Test2::V0: '0'
+  Test::Without::Module: '0'
   utf8: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
@@ -12,7 +13,7 @@ generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter
 keywords:
   - Licensing
   - Sourcecode
-license: gpl
+license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -28,7 +29,9 @@ optional_features: {}
 provides:
   String::Copyright:
     file: lib/String/Copyright.pm
-    version: '0.003008'
+    version: '0.003011'
+recommends:
+  re::engine::RE2: '0'
 requires:
   Exporter::Tiny: '0'
   Number::Range: '0.04'
@@ -38,9 +41,9 @@ resources:
   Identifier: http://purl.org/NET/cpan-uri/dist/String-Copyright/project
   bugtracker: https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=libstring-copyright-perl
   homepage: https://metacpan.org/pod/String::Copyright
-  license: http://www.gnu.org/licenses/gpl-3.0.txt
+  license: http://www.gnu.org/licenses/agpl-3.0.txt
   repository: https://anonscm.debian.org/cgit/build-common/string-copyright.git
-version: '0.003008'
+version: '0.003011'
 x_help_wanted:
   - tester
   - documenter

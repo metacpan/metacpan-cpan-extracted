@@ -1,0 +1,14 @@
+Build.PL
+Changes
+hax/newOP_CUSTOM.c.inc
+lib/Syntax/Operator/Divides.pm
+lib/Syntax/Operator/Divides.xs
+MANIFEST			This list of files
+t/00use.t
+t/01divides.t
+t/80match-divides.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

@@ -15,7 +15,7 @@ use Path::Tiny;
 use YAML::Syck qw/ LoadFile /;
 use Hash::Merge::Simple qw/ merge /;
 
-our $VERSION = version->new('0.1.15');
+our $VERSION = version->new('0.1.16');
 
 has global_config => (
     is      => 'rw',
@@ -95,7 +95,7 @@ sub history {
     return if $command[0] eq 'run' || grep {$_ eq '--auto-complete'} @command;
 
     my $fh = $self->history_file->opena;
-    print {$fh} '[' . localtime .'] '. (join ' ', map {/[^\w-]/ ? "'$_'" : $_} @command), "\n";
+    print {$fh} '[' . localtime .'] '. (join ' ', map {/[^\w.\/-]/ ? "'$_'" : $_} @command), "\n";
     return;
 }
 
@@ -109,7 +109,7 @@ App::VTide::Config - Manage configuration for VTide
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Config version 0.1.15
+This documentation refers to App::VTide::Config version 0.1.16
 
 =head1 SYNOPSIS
 

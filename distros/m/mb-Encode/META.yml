@@ -3,13 +3,14 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: mb-Encode
-version: 0.02
+version: 0.03
 abstract: provides MBCS encoder and decoder
 author:
   - ina <ina@cpan.org>
 license: perl
 generated_by: pmake.bat
 requires:
+  Encode: 0
   ExtUtils::MakeMaker: 5.4302
   File::Basename: 2.6
   File::Copy: 2.02
@@ -21,6 +22,7 @@ requires:
   perl: 5.00503
   strict: 1.01
   vars: 0
+  warnings: 0
 build_requires:
   Test: 1.122
 resources:

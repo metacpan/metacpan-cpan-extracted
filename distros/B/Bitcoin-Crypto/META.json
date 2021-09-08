@@ -63,6 +63,6 @@
          "web" : "https://github.com/brtastic/perl-bitcoin-crypto"
       }
    },
-   "version" : "0.997",
+   "version" : "1.000",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

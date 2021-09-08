@@ -198,8 +198,9 @@ sub _Lexer
         $self->{USER}{CHARNO} = 0;
     }
 
-    $self->YYData->{INPUT} =~ s/^(\s+)//;
-    $self->{USER}{CHARNO} += length $1 if defined $1;
+    if( $self->YYData->{INPUT} =~ s/^(\s+)// ) {
+        $self->{USER}{CHARNO} += length $1;
+    }
 
     # Bracket atoms
     if( $self->YYData->{INPUT} =~ s/^\[ (?<isotope>[0-9]+)?

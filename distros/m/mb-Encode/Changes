@@ -1,7 +1,12 @@
 Revision history for this software.
 
+0.03  2021-08-26 00:00:00
+  - requires: warnings module in META.yml and META.json
+  - requires: Encode module in META.yml and META.json
+  - created by INABA Hitoshi
+
 0.02  2021-08-19 00:00:00
-  - support Perl 5.00503 using jacode.pl
+  - support Perl 5.00503 using Jacode module
   - created by INABA Hitoshi
 
 0.01  2021-06-27 00:00:00

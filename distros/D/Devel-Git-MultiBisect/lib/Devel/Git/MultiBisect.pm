@@ -1,7 +1,6 @@
 package Devel::Git::MultiBisect;
-use strict;
-use warnings;
 use v5.14.0;
+use warnings;
 use Devel::Git::MultiBisect::Init;
 use Devel::Git::MultiBisect::Auxiliary qw(
     clean_outputfile
@@ -14,7 +13,8 @@ use File::Spec;
 use File::Temp;
 use List::Util qw(sum);
 
-our $VERSION = '0.15';
+our $VERSION = '0.19';
+$VERSION = eval $VERSION;
 
 =head1 NAME
 
@@ -23,9 +23,10 @@ Devel::Git::MultiBisect - Study build and test output over a range of F<git> com
 =head1 SYNOPSIS
 
 You will typically construct an object of a class which is a child of
-F<Devel::Git::MultiBisect>, such as F<Devel::Git::MultiBisect::AllCommits> or
-F<Devel::Git::MultiBisect::Transitions>.  All methods documented in this
-parent package may be called from either child class.
+F<Devel::Git::MultiBisect>, such as F<Devel::Git::MultiBisect::AllCommits>,
+F<Devel::Git::MultiBisect::Transitions> or
+F<Devel::Git::MultiBisect::BuildTransitions>.  All methods documented in this
+parent package may be called from any of these child classes.
 
     use Devel::Git::MultiBisect::AllCommits;
     $self = Devel::Git::MultiBisect::AllCommits->new(\%parameters);
@@ -34,6 +35,11 @@ parent package may be called from either child class.
 
     use Devel::Git::MultiBisect::Transitions;
     $self = Devel::Git::MultiBisect::Transitions->new(\%parameters);
+
+... or
+
+    use Devel::Git::MultiBisect::BuildTransitions;
+    $self = Devel::Git::MultiBisect::BuildTransitions->new(\%parameters);
 
 ... and then:
 
@@ -69,6 +75,23 @@ child classes, F<Devel::Git::MultiBisect::AllCommits> and
 F<Devel::Git::MultiBisect::Transitions>, provide different flavors of that
 functionality for objectives (a) and (b), respectively.  Please refer to their
 documentation for further discussion.
+
+Child class F<Devel::Git::MultiBisect::BuildTransitions> focuses on failures
+during the B<build> process rather than during testing.  It can handle three
+different types of problems which arise when you run F<make> to build a Perl
+library or to build Perl itself:
+
+=over 4
+
+=item * Exceptions detected by the C-compiler
+
+=item * Warnings emitted by the C-compiler
+
+=item * Warnings emitted by F<perl> or other languages invoked during F<make>
+
+=back
+
+See the documentation for further details.
 
 =head2 GLOSSARY
 
@@ -118,13 +141,14 @@ A series of configure-build-test process sequences at those commits within the
 commit range which are selected by a bisection algorithm.
 
 Normally, when we bisect (via F<git bisect>, F<Porting/bisect.pl> or
-otherwise), we are seeking a single point where a Boolean result -- yes/no,
+otherwise), we are seeking a I<single> point where a Boolean result -- yes/no,
 true/false, pass/fail -- is returned.  What the test run outputs to STDOUT or
 STDERR is a lesser concern.
 
-In multisection we bisect repeatedly to determine all points where the output
-of the test command changes -- regardless of whether that change is a C<PASS>,
-C<FAIL> or whatever.  We capture the output for later human examination.
+B<In multisection we bisect repeatedly to determine I<all> points where the output
+of the test command changes> -- regardless of whether that change is a C<PASS>,
+C<FAIL> or whatever.  We capture the output for later human or programmatic
+examination.
 
 =back
 
@@ -146,11 +170,15 @@ or
 
     $self = Devel::Git::MultiBisect::Transitions->new(\%params);
 
+or
+
+    $self = Devel::Git::MultiBisect::BuildTransitions->new(\%params);
+
 Reference to a hash, typically the return value of
 C<Devel::Git::MultiBisect::Opts::process_options()>.
 
 The hashref passed as argument must contain key-value pairs for C<gitdir>,
-C<workdir> and C<outputdir>.  C<new()> tests for the existence of each of
+C<outputdir>.  C<new()> tests for the existence of each of
 these directories.
 
 =item * Return Value
@@ -597,7 +625,7 @@ or through the web interface at L<http://rt.cpan.org>.
 James E. Keenan (jkeenan at cpan dot org).  When sending correspondence, please
 include 'Devel::Git::MultiBisect' or 'Devel-Git-MultiBisect' in your subject line.
 
-Creation date:  October 12 2016. Last modification date:  December 06 2019.
+Creation date:  October 12 2016. Last modification date:  September 1 2021.
 
 Development repository: L<https://github.com/jkeenan/devel-git-multibisect>
 
@@ -617,13 +645,17 @@ For feedback during initial development.
 
 =item * Eily and Monk::Thomas
 
-For diagnosis of regex problems in http://perlmonks.org/?node_id=1175983.
+For diagnosis of regex problems in L<http://perlmonks.org/?node_id=1175983>.
+
+=item * Max Maischein
+
+For diagnosis of File::Temp problems in L<https://perlmonks.org/?node_id=11136181>.
 
 =back
 
 =head1 COPYRIGHT
 
-Copyright (c) 2016-2019 James E. Keenan.  United States.  All rights reserved.
+Copyright (c) 2016-2021 James E. Keenan.  United States.  All rights reserved.
 This is free software and may be distributed under the same terms as Perl
 itself.
 

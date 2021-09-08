@@ -16,16 +16,21 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: App-PerlCriticUtils
+provides:
+  App::PerlCriticUtils:
+    file: lib/App/PerlCriticUtils.pm
+    version: '0.005'
 requires:
   Complete::Module: '0.262'
-  Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modname: '0'
-  Data::Sah::Compiler::perl::TH::array: '0'
-  Data::Sah::Compiler::perl::TH::bool: '0'
-  Data::Sah::Compiler::perl::TH::str: '0'
+  Data::Sah::Compiler::perl::TH::array: '0.910'
+  Data::Sah::Compiler::perl::TH::bool: '0.910'
+  Data::Sah::Compiler::perl::TH::str: '0.910'
+  Data::Sah::Filter::perl::Perl::normalize_perl_modname: '0'
+  Module::Abstract: '0'
   Module::Path::More: '0.32'
   PERLANCAR::Module::List: '0.004004'
-  Perinci::CmdLine::Any: '0'
-  Perinci::CmdLine::Lite: '1.827'
+  Perinci::CmdLine::Any: '0.152'
+  Perinci::CmdLine::Lite: '1.905'
   Perinci::Sub::DepChecker: '0'
   Sah::Schema::perl::modname: '0.035'
   perl: '5.010001'
@@ -35,7 +40,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-PerlCriticUtils
   homepage: https://metacpan.org/release/App-PerlCriticUtils
   repository: git://github.com/perlancar/perl-App-PerlCriticUtils.git
-version: '0.003'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -143,7 +148,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.603'
+      version: '0.605'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -180,9 +185,20 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/CheckSelfDependency'
       version: '0.011'
     -
+      class: Dist::Zilla::Plugin::Git::Contributors
+      config:
+        Dist::Zilla::Plugin::Git::Contributors:
+          git_version: 2.25.1
+          include_authors: 0
+          include_releaser: 1
+          order_by: name
+          paths: []
+      name: '@Author::PERLANCAR/Git::Contributors'
+      version: '0.036'
+    -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
-      version: '0.006'
+      version: '0.009'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
@@ -195,6 +211,26 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::PERLANCAR/MetaConfig'
       version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: '@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+              version: '6.017'
+          include_underscores: 0
+        Dist::Zilla::Role::MetaProvider::Provider:
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
+          inherit_missing: '1'
+          inherit_version: '1'
+          meta_noindex: '1'
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
+      name: '@Author::PERLANCAR/MetaProvides::Package'
+      version: '2.004003'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::Authority
       name: '@Author::PERLANCAR/PERLANCAR::Authority'
@@ -300,6 +336,14 @@ x_Dist_Zilla:
               name: '@Author::PERLANCAR/Authors'
               version: '4.017'
             -
+              class: Pod::Weaver::Section::Contributors
+              name: '@Author::PERLANCAR/Contributors'
+              version: '0.009'
+            -
+              class: Pod::Weaver::Section::PERLANCAR::Contributing
+              name: '@Author::PERLANCAR/PERLANCAR/Contributing'
+              version: '0.292'
+            -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
               version: '4.017'
@@ -376,7 +420,7 @@ x_Dist_Zilla:
             - ':InstallModules'
             - ':TestFiles'
       name: '@Author::PERLANCAR/Test::Perl::Critic::Subset'
-      version: 3.001.005
+      version: 3.001.006
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
@@ -464,6 +508,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: '@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
       version: '6.017'
   zilla:
     class: Dist::Zilla::Dist::Builder

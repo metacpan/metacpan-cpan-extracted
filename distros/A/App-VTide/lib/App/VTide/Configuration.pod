@@ -4,7 +4,7 @@ App::VTide::Configuration - Description of the vtide configuration files
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Configuration version 0.1.15
+This documentation refers to App::VTide::Configuration version 0.1.16
 
 =head1 SYNOPSIS
 
@@ -103,6 +103,25 @@ List
 
 Specifies a list of files to watch for changes. When found the command is
 rerun.
+
+=head3 cron
+
+String
+
+A standard cron time setting
+
+e.g.
+
+  15 8-16 */2 * *
+
+Would run the C<comand> at 15 minutes past the hours 8am to 4pm every second day
+
+=head3 cron_verbose
+
+Truthy
+
+When set to a true value (e.g. C<1> C<true>) will show the time till the next
+cron run. This can be helpful for debugging C<cron> issues.
 
 =head3 command
 

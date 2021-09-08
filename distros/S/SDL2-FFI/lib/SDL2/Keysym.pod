@@ -1,0 +1,43 @@
+=encoding utf-8
+
+=head1 NAME
+
+SDL2::Keysym - SDL Keysym Structure Used in Key Events
+
+=head1 SYNOPSIS
+
+    use SDL2 qw[:all];
+    # TODO: I need to whip up a quick example
+
+=head1 DESCRIPTION
+
+The SDL keysym structure, used in key events.
+
+If you are looking for translated character input, see the C<SDL_TEXTINPUT>
+event.
+
+=head1 Fields
+
+=over
+
+=item C<scancode> - SDL physical key code - see SDL_Scancode for details
+
+=item C<sym> - SDL virtual key code - see SDL_Keycode for details
+
+=item C<mod> - Current key modifiers
+
+=item C<unused>
+
+=back
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=begin stopwords
+
+keysym
+
+=end stopwords
+
+=cut

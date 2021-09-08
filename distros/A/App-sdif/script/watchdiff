@@ -21,44 +21,48 @@ use List::Util qw(pairmap);
 use App::sdif;
 my $version = $App::sdif::VERSION;
 
-my $opt_d;
-my $opt_unit = '';
-my $opt_diff;
-my $opt_date = 1;
-my $opt_refresh = 1;
-my $opt_interval = 2;
-my $opt_count = 1000;
-my $opt_clear = 1;
-my $opt_silent = 0;
-my $opt_newline = 1;
-my $opt_mark = 0;
-my $opt_old = 0;
-my @opt_exec;
-my @opt_colormap;
+use Getopt::EX::Hashed 'has'; {
 
-my @optargs = (
-    "d" => \$opt_d,
-    "unit=s" => \$opt_unit,
-    "diff=s" => \$opt_diff,
-    "e|exec=s" => \@opt_exec,
-    "r|refresh:1" => \$opt_refresh,
-    "i|interval=i" => \$opt_interval,
-    "c|count=i" => \$opt_count,
-    "clear!" => \$opt_clear,
-    "s|silent!" => \$opt_silent,
-    "M|mark!" => \$opt_mark,
-    "O|old!" => \$opt_old,
-    "D|date!" => \$opt_date,
-    "N|newline!" => \$opt_newline,
-    "colormap|cm=s" => \@opt_colormap,
-    "p|plain" => sub { $opt_date = $opt_newline = 0 },
-    "h|help" => sub { usage() },
-    "H|man" => sub { pod2usage( {-verbose => 2} ) },
-    );
+    Getopt::EX::Hashed->configure(DEFAULT => [ is => 'ro' ]);
+
+    has help     => spec => ' h      ' ;
+    has version  => spec => ' v      ' ;
+    has debug    => spec => ' d      ' ;
+    has unit     => spec => '    =s  ' , default => '';
+    has diff     => spec => '    =s  ' ;
+    has exec     => spec => ' e  =s@ ' , default => [];
+    has refresh  => spec => '    :1  ' , default => 1;
+    has interval => spec => '    =i  ' , default => 2;
+    has count    => spec => '    =i  ' , default => 1000;
+    has clear    => spec => '    !   ' , default => 1;
+    has silent   => spec => ' s  !   ' , default => 0;
+    has mark     => spec => ' M  !   ' , default => 0;
+    has old      => spec => ' O  !   ' , default => 0;
+    has date     => spec => ' D  !   ' , default => 1;
+    has newline  => spec => ' N  !   ' , default => 1;
+    has colormap => spec => ' cm =s@ ' , default => [];
+    has plain    => spec => ' p      ' ,
+	action   => sub {
+	    $_->{date} = $_->{newline} = 0;
+	};
+
+    has '+help' => action => sub {
+	pod2usage
+	    -verbose  => 99,
+	    -sections => [ qw(SYNOPSIS VERSION) ];
+    };
+
+    has '+version' => action  => sub {
+	print "Version: $version\n";
+	exit;
+    };
+
+} no Getopt::EX::Hashed;
 
 use Getopt::EX::Long;
 Getopt::Long::Configure(qw(bundling require_order));
-GetOptions(@optargs) || usage({status => 1});
+my $opt = Getopt::EX::Hashed->new or die;
+$opt->getopt or usage({status => 1});
 
 my %colormap = qw(
     APPEND	K/544
@@ -72,7 +76,7 @@ my %colormap = qw(
 use Getopt::EX::Colormap;
 my $cm = Getopt::EX::Colormap
     ->new(HASH => \%colormap)
-    ->load_params(@opt_colormap);
+    ->load_params(@{$opt->colormap});
 
 my @default_diff = (
     qw(cdif --no-command --no-unknown -U100),
@@ -80,9 +84,9 @@ my @default_diff = (
     );
 
 if (@ARGV) {
-    push @opt_exec, [ @ARGV ];
+    push @{$opt->exec}, [ @ARGV ];
 } else {
-    @opt_exec or pod2usage();
+    @{$opt->exec} or pod2usage();
 }
 
 sub flush {
@@ -92,20 +96,20 @@ sub flush {
 }
 
 use App::cdif::Command;
-my $old = App::cdif::Command->new(@opt_exec);
-my $new = App::cdif::Command->new(@opt_exec);
+my $old = App::cdif::Command->new(@{$opt->exec});
+my $new = App::cdif::Command->new(@{$opt->exec});
 
 my @diffcmd = do {
-    if ($opt_diff) {
+    if ($opt->diff) {
 	use Text::ParseWords;
-	shellwords $opt_diff;
+	shellwords $opt->diff;
     } else {
 	( @default_diff,
 	  map  { $_->[1] }
 	  grep { $_->[0] }
-	  [ $opt_unit   => "--unit=$opt_unit" ],
-	  [ ! $opt_mark => '--no-mark' ],
-	  [ ! $opt_old  => '--no-old' ],
+	  [ $opt->unit   => "--unit=$opt->unit" ],
+	  [ ! $opt->mark => '--no-mark' ],
+	  [ ! $opt->old  => '--no-old' ],
 	);
     }
 };
@@ -135,7 +139,7 @@ sub run {
     ($? >> 8) == 3 ? undef : $result;
 }
 
-print $termcap{clear} if $opt_refresh;
+print $termcap{clear} if $opt->refresh;
 my $count = 0;
 my $refresh_count = 0;
 while (1) {
@@ -143,32 +147,32 @@ while (1) {
     $new->update;
     my $data = run(@diffcmd, $old->path, $new->path) // die "diff: $!\n";
     if ($data eq '') {
-	if ($opt_silent) {
+	if ($opt->silent) {
 	    flush $new->date, "\r";
 	    next;
 	}
 	$data = $new->data;
-	$data =~ s/^/ /mg if $opt_mark;
+	$data =~ s/^/ /mg if $opt->mark;
     }
-    $data .= "\n" if $opt_newline;
-    if ($opt_refresh) {
+    $data .= "\n" if $opt->newline;
+    if ($opt->refresh) {
 	$data =~ s/^/$termcap{el}/mg;
-	if ($refresh_count++ % $opt_refresh == 0) {
+	if ($refresh_count++ % $opt->refresh == 0) {
 	    print $termcap{clear};
 	}
     }
-    print $new->date, "\n\n" if $opt_date;
+    print $new->date, "\n\n" if $opt->date;
     print $data;
-    if ($opt_refresh and $opt_clear) {
+    if ($opt->refresh and $opt->clear) {
 	flush $termcap{ed};
     }
 } continue {
-    last if ++$count == $opt_count;
+    last if ++$count == $opt->count;
     ($old, $new) = ($new, $old);
-    sleep $opt_interval;
+    sleep $opt->interval;
 }
 
-flush $termcap{el} if $opt_refresh;
+flush $termcap{el} if $opt->refresh;
 
 exit;
 
@@ -182,7 +186,7 @@ watchdiff - repeat command and watch a difference
 
 =head1 VERSION
 
-Version 4.19.1
+Version 4.20.1
 
 =head1 SYNOPSIS
 

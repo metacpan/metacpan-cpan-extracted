@@ -26,7 +26,7 @@ with versions that work properly under L<DBIx::Class>.
 
 =head1 SEE ALSO
  
-See L<Valiant>.
+See L<Valiant>, L<DBIx::Class::Valiant>
 
 =head1 AUTHOR
 

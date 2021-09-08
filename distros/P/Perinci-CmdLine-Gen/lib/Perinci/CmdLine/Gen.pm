@@ -1,10 +1,5 @@
 package Perinci::CmdLine::Gen;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-23'; # DATE
-our $DIST = 'Perinci-CmdLine-Gen'; # DIST
-our $VERSION = '0.499'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -19,6 +14,11 @@ our @EXPORT_OK = qw(
                        gen_perinci_cmdline_script
                        gen_pericmd_script
                );
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-08-26'; # DATE
+our $DIST = 'Perinci-CmdLine-Gen'; # DIST
+our $VERSION = '0.500'; # VERSION
 
 our %SPEC;
 
@@ -478,11 +478,6 @@ sub gen_pericmd_script {
             "\n",
             $gen_sig,
             "\n",
-            "# AUTHORITY\n",
-            "# DATE\n",
-            "# DIST\n",
-            "# VERSION\n",
-            "\n",
             "use 5.010001;\n",
             "use strict;\n",
             "use warnings;\n",
@@ -499,6 +494,12 @@ sub gen_pericmd_script {
 
             ($args{ssl_verify_hostname} ?
                  "" : '$ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 0;' . "\n\n"),
+
+            "# AUTHORITY\n",
+            "# DATE\n",
+            "# DIST\n",
+            "# VERSION\n",
+            "\n",
 
             ($args{code_before_instantiate_cmdline} ? "# code_before_instantiate_cmdline\n" . $args{code_before_instantiate_cmdline} . "\n\n" : ""),
 
@@ -612,7 +613,7 @@ Perinci::CmdLine::Gen - Generate Perinci::CmdLine CLI script
 
 =head1 VERSION
 
-This document describes version 0.499 of Perinci::CmdLine::Gen (from Perl distribution Perinci-CmdLine-Gen), released on 2021-06-23.
+This document describes version 0.500 of Perinci::CmdLine::Gen (from Perl distribution Perinci-CmdLine-Gen), released on 2021-08-26.
 
 =head1 FUNCTIONS
 
@@ -1075,6 +1076,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Cm
 
 Source repository is at L<https://github.com/perlancar/perl-Perinci-CmdLine-Gen>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Gen>
@@ -1082,16 +1111,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

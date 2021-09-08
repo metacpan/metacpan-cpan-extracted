@@ -20,5 +20,5 @@ no_index:
 resources:
   bugtracker: https://github.com/trapd00r/Music-Beets-Info/issues
   repository: https://github.com/trapd00r/Music-Beets-Info.git
-version: '0.004'
+version: '0.006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

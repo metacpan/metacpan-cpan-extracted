@@ -8,7 +8,7 @@ use utf8;
 
 use Object::Pad 0.43;  # :strict(params)
 
-package App::sdview::Parser 0.03;
+package App::sdview::Parser 0.04;
 role App::sdview::Parser;
 
 use String::Tagged;
@@ -46,9 +46,10 @@ class App::sdview::Para::List :strict(params) {
 }
 
 class App::sdview::Para::ListItem :strict(params) {
+   has $listtype :param :reader;
+   has $term :param :reader = undef;
    has $text :param :reader;
 
-   # TODO: Do we remember the list's type?
    method type { "item" }
 }
 

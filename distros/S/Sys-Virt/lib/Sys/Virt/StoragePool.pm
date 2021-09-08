@@ -66,7 +66,7 @@ sub _new {
 	$self = Sys::Virt::StoragePool::_lookup_by_target_path($con,  $params{target_path});
     } elsif (exists $params{xml}) {
 	if ($params{nocreate}) {
-	    $self = Sys::Virt::StoragePool::_define_xml($con,  $params{xml});
+	    $self = Sys::Virt::StoragePool::_define_xml($con,  $params{xml}, $params{flags});
 	} else {
 	    $self = Sys::Virt::StoragePool::_create_xml($con,  $params{xml});
 	}
@@ -280,6 +280,19 @@ sub clone_volume {
 
 The following sets of constants may be useful in dealing with some of
 the methods in this package
+
+=head2 STORAGE POOL DEFINE
+
+The following constants can be used to control the behaviour
+of storage pool define operations
+
+=over 4
+
+=item Sys::Virt::StoragePool::DEFINE_VALIDATE
+
+Validate the XML document against the XML schema
+
+=back
 
 =head2 POOL STATES
 

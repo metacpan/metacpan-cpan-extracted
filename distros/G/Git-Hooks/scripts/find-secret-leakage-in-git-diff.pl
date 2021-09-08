@@ -3,7 +3,7 @@
 # ABSTRACT: find secrets leaking in a Git repository
 ## no critic (RequireCarping)
 
-use 5.016;
+use v5.16.0;
 use warnings;
 
 my %tokens = (
@@ -78,7 +78,7 @@ find-secret-leakage-in-git-diff.pl - find secrets leaking in a Git repository
 
 =head1 VERSION
 
-version 3.1.0
+version 3.1.1
 
 =head1 SYNOPSIS
 

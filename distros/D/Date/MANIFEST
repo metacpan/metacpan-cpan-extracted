@@ -3,6 +3,7 @@ clib/CMakeLists.txt
 clib/misc/test_dates_gen.plx
 clib/misc/win32_translist_gen.plx
 clib/panda-date-config.cmake
+clib/README.md
 clib/src/panda/date.h
 clib/src/panda/date/Date.cc
 clib/src/panda/date/Date.h

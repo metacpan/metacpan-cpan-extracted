@@ -3,7 +3,7 @@ package Log::Log4perl::Layout::JSON::Readable;
 use strict;
 use warnings;
 use parent 'Log::Log4perl::Layout::JSON';
-our $VERSION = '1.0.1'; # VERSION
+our $VERSION = '1.0.3'; # VERSION
 # ABSTRACT: JSON layout, but some fields always come first
 
 use Class::Tiny +{
@@ -57,7 +57,9 @@ sub render {
 
 sub _move_field_first {
     my ($json_ref, $key) = @_;
-    ${$json_ref} =~ s/^{(.+?),("$key":".+?")/\{$2,$1/;
+    # a JSON value starts with double quotes, and ends with a
+    # non-backslash-escaped double quotes
+    ${$json_ref} =~ s/^{(.+?),("$key":".*?(?<!\\)")/\{$2,$1/;
     return;
 }
 
@@ -75,7 +77,7 @@ Log::Log4perl::Layout::JSON::Readable - JSON layout, but some fields always come
 
 =head1 VERSION
 
-version 1.0.1
+version 1.0.3
 
 =head1 SYNOPSIS
 
@@ -128,7 +130,7 @@ Gianni Ceccarelli <gianni.ceccarelli@broadbean.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by BroadBean UK, a CareerBuilder Company.
+This software is copyright (c) 2021 by BroadBean UK, a CareerBuilder Company.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

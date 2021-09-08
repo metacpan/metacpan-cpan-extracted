@@ -1,5 +1,5 @@
 package App::gimpgitbuild::API::Worker;
-$App::gimpgitbuild::API::Worker::VERSION = '0.26.1';
+$App::gimpgitbuild::API::Worker::VERSION = '0.28.1';
 use strict;
 use warnings;
 use 5.014;
@@ -15,6 +15,7 @@ has '_api_obj' => (
     default => sub { return App::gimpgitbuild::API::GitBuild->new(); }
 );
 has '_mode'             => ( is => 'ro', required => 1, );
+has '_override_mode'    => ( is => 'rw', default  => "", );
 has '_process_executor' => ( is => 'ro', required => 1, );
 
 sub _do_system
@@ -68,6 +69,7 @@ sub _git_build
     my $orig_cwd             = cwd()->absolute();
     my $id                   = $args->{id};
     my $extra_configure_args = ( $args->{extra_configure_args} // [] );
+    my $extra_meson_args     = ( $args->{extra_meson_args}     // [] );
     my $SHELL_PREFIX         = "set -e -x";
 
     if ( defined($skip_builds_re) and $id =~ $skip_builds_re )
@@ -103,7 +105,9 @@ sub _git_build
     my $chdir_cmd = sub {
         return $shell_cmd->( qq#cd "# . shift(@_) . qq#"# );
     };
-    my $PERL_EXECUTE = ( $self->_process_executor() eq 'perl' );
+    my $clean_install = ( $self->_override_mode() eq "clean_install" );
+    my $PERL_EXECUTE =
+        ( $clean_install or $self->_process_executor() eq 'perl' );
     if ($PERL_EXECUTE)
     {
         $shell_cmd = sub {
@@ -124,12 +128,20 @@ sub _git_build
         };
     }
 
+    my $prefix = $args->{prefix};
+
+    if ($clean_install)
+    {
+        $shell_cmd->(qq#rm -fr "$prefix"#)->();
+        return;
+    }
+
     my $gen_meson_build_cmds = sub {
         return [
             $shell_cmd->(qq#mkdir -p "$BUILD_DIR"#),
             $chdir_cmd->($BUILD_DIR),
             $shell_cmd->(
-qq#meson --prefix="$args->{prefix}" $UBUNTU_MESON_LIBDIR_OVERRIDE ..#
+qq#meson --prefix="$prefix" $UBUNTU_MESON_LIBDIR_OVERRIDE @{$extra_meson_args} ..#
             ),
             $shell_cmd->(qq#ninja $PAR_JOBS#),
             $shell_cmd->(qq#ninja $PAR_JOBS test#),
@@ -142,8 +154,7 @@ qq#meson --prefix="$args->{prefix}" $UBUNTU_MESON_LIBDIR_OVERRIDE ..#
             $shell_cmd->(qq#mkdir -p "$BUILD_DIR"#),
             $chdir_cmd->($BUILD_DIR),
             $shell_cmd->(
-qq#../configure @{$extra_configure_args} --prefix="$args->{prefix}"#
-            ),
+                qq#../configure @{$extra_configure_args} --prefix="$prefix"#),
             $shell_cmd->(qq#make $PAR_JOBS#),
             $shell_cmd->(qq#@{[_check()]}#),
             $shell_cmd->(qq#make install#),
@@ -204,16 +215,23 @@ qq#../configure @{$extra_configure_args} --prefix="$args->{prefix}"#
     return;
 }
 
-sub _run_the_mode_on_all_repositories
+sub _get_gnome_git_url
 {
-    my ($worker)  = @_;
-    my $obj       = $worker->_api_obj();
+    my ( $self, $proj ) = @_;
     my $GNOME_GIT = 'https://gitlab.gnome.org/GNOME';
+
+    return "${GNOME_GIT}/${proj}.git/";
+}
+
+sub _run_all
+{
+    my ($worker) = @_;
+    my $obj = $worker->_api_obj();
     $worker->_git_build(
         {
             id                  => "babl",
             git_checkout_subdir => "babl/git/babl",
-            url                 => "$GNOME_GIT/babl",
+            url                 => $worker->_get_gnome_git_url("babl"),
             prefix              => $obj->babl_p,
             use_meson           => 1,
         }
@@ -222,7 +240,8 @@ sub _run_the_mode_on_all_repositories
         {
             id                  => "gegl",
             git_checkout_subdir => "gegl/git/gegl",
-            url                 => "$GNOME_GIT/gegl",
+            extra_meson_args    => [ qw# -Dlua=disabled #, ],
+            url                 => $worker->_get_gnome_git_url("gegl"),
             prefix              => $obj->gegl_p,
             use_meson           => 1,
         }
@@ -255,9 +274,10 @@ sub _run_the_mode_on_all_repositories
     $worker->_git_build(
         {
             id                   => "gimp",
-            extra_configure_args => [ qw# --enable-debug #, ],
+            extra_configure_args => [ qw# --enable-debug --with-lua=no #, ],
+            extra_meson_args     => [ qw# -Dlua=false #, ],
             git_checkout_subdir  => "git/gimp",
-            url                  => "$GNOME_GIT/gimp",
+            url                  => $worker->_get_gnome_git_url("gimp"),
             prefix               => $obj->gimp_p,
             use_meson            => $BUILD_GIMP_USING_MESON,
             on_failure           => sub {
@@ -280,6 +300,20 @@ EOF
             },
         }
     );
+    return;
+}
+
+sub _run_the_mode_on_all_repositories
+{
+    my ($worker) = @_;
+
+    if ( $worker->_mode() eq 'build' )
+    {
+        $worker->_override_mode("clean_install");
+        $worker->_run_all();
+    }
+    $worker->_override_mode("");
+    $worker->_run_all();
 
     return;
 }
@@ -298,7 +332,7 @@ App::gimpgitbuild::API::Worker - common API
 
 =head1 VERSION
 
-version 0.26.1
+version 0.28.1
 
 =head1 METHODS
 

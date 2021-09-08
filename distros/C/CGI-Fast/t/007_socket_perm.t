@@ -12,7 +12,7 @@ unless ($OS = $^O) {
 	$OS = $Config::Config{'osname'};
 }
 
-if ( $OS =~ /^MSWin/i ) {
+if ( $OS =~ /mswin|cygwin/i ) {
 	plan skip_all => "valid on unix-y servers only";
 }
 

@@ -1,3 +1,33 @@
+0.020   2021-08-28  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Fix POD formatting.
+
+
+0.019   2021-08-27  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build][dist] Rebuild to fix dependencies (phase=develop) to
+          Module::Features::*.
+
+
+0.018   2021-08-27  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [testing] Declares features from PerlTrove.
+
+
+0.017   2021-08-09  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build][dist] Rebuild to add dependencies (phase=develop,
+          rel=x_features_from) to Module::Features::*.
+
+
 0.016   2021-08-09  Released-By: PERLANCAR; Urgency: medium
 
         - No functional changes.

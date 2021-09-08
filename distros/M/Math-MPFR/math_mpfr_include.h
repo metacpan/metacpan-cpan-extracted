@@ -213,6 +213,17 @@ typedef _Decimal128 D128;
 #endif
 #endif
 
+/* Facilitate altering the numeric flags that we *
+ * look at (in case it becomes necessary)        */
+
+#define SV_IS_IOK(x) \
+     SvIOK(x)
+
+#define SV_IS_POK(x) \
+     SvPOK(x)
+
+#define SV_IS_NOK(x) \
+     SvNOK(x)
 
 #if (!defined(MPFR_VERSION) || MPFR_VERSION <= 196868) && LDBL_MANT_DIG == 64
 #define LD_SUBNORMAL_BUG 1
@@ -229,14 +240,14 @@ typedef _Decimal128 D128;
 #endif
 
 #define FAILS_CHECK_INPUT_BASE \
-     !SvIOK(base) || SvIVX(base) < 0 || SvIVX(base) > 62 || SvIVX(base) == 1
+     !SV_IS_IOK(base) || SvIVX(base) < 0 || SvIVX(base) > 62 || SvIVX(base) == 1
 
 #if MPFR_VERSION >= 262400 /* Allowable range of base has been expanded */
 #define FAILS_CHECK_OUTPUT_BASE \
-     !(SvIOK(base) && ((SvIVX(base) >= 2 && SvIVX(base) <= 62) || (SvIVX(base) >= -36 && SvIVX(base) <= -2)))
+     !(SV_IS_IOK(base) && ((SvIVX(base) >= 2 && SvIVX(base) <= 62) || (SvIVX(base) >= -36 && SvIVX(base) <= -2)))
 #else
 #define FAILS_CHECK_OUTPUT_BASE \
-     !(SvIOK(base) && SvIVX(base) >= 2 && SvIVX(base) <= 62)
+     !(SV_IS_IOK(base) && SvIVX(base) >= 2 && SvIVX(base) <= 62)
 #endif
 
 /* Don't use CHECK_ROUNDING_VALUE macro with Rmpfr_set_NV      *
@@ -252,7 +263,7 @@ typedef _Decimal128 D128;
 #endif
 
 #define NOK_POK_DUALVAR_CHECK \
-        if(SvNOK(b)) { \
+        if(SV_IS_NOK(b)) { \
          nok_pok++; \
          if(SvIV(get_sv("Math::MPFR::NOK_POK", 0))) \
            warn("Scalar passed to %s is both NV and PV. Using PV (string) value"

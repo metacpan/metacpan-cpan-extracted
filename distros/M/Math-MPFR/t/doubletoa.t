@@ -29,7 +29,7 @@ elsif(MPFR_VERSION() <= 196869) {
 
 else {
 
-  print "1..7\n";
+  print "1..9\n";
 
   my $ok = 1;
   my $fb = Math::MPFR::_fallback_notify();
@@ -50,6 +50,7 @@ else {
       my $s2 = nvtoa($v);
 
       if($s1 ne $s2) {
+        #print "$str $s1 $s2\n";
         $mismatch_count++;
         my $s1_alt = doubletoa($v);
 
@@ -74,7 +75,7 @@ else {
     }
   }
 
-  #print "Fallback: $Math::MPFR::doubletoa_fallback Mismatch: $mismatch_count\n";
+#  print "Fallback: $Math::MPFR::doubletoa_fallback Mismatch: $mismatch_count\n";
 
   if($ok) { print "ok 1\n" }
   else { print "not ok 1\n" }
@@ -127,5 +128,24 @@ else {
   else {
     warn "\nexpected: '8e+100'\ngot     : '", doubletoa(atodouble('8000000e+94')), "'\n";
     print "not ok 7\n";
+  }
+
+  # 1e+23 is one of the values that Grisu3 cannot handle.
+
+  my $d    = atodouble('1e+23');
+  my $dtoa = doubletoa($d); # fall back to dragon
+
+  if($dtoa eq '1e+23') { print "ok 8\n" }
+  else {
+    warn "\nexpected: '1e+23'\ngot     : '", $dtoa, "'\n";
+    print "not ok 8\n";
+  }
+
+  $dtoa = doubletoa($d, ''); # fall back to sprintf("%.17g", $d)
+
+  if($dtoa eq '9.9999999999999992e+22' || $dtoa eq '9.9999999999999992e+022') { print "ok 9\n" }
+  else {
+    warn "\nexpected: '9.9999999999999992e+22 or 9.9999999999999992e+022'\ngot     : '", $dtoa, "'\n";
+    print "not ok 9\n";
   }
 }

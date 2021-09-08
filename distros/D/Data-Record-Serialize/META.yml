@@ -21,7 +21,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.023, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.020, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -38,58 +38,58 @@ no_index:
 provides:
   Data::Record::Serialize:
     file: lib/Data/Record/Serialize.pm
-    version: '0.28'
+    version: '0.30'
   Data::Record::Serialize::Encode::dbi:
     file: lib/Data/Record/Serialize/Encode/dbi.pm
-    version: '0.28'
+    version: '0.30'
   Data::Record::Serialize::Encode::ddump:
     file: lib/Data/Record/Serialize/Encode/ddump.pm
-    version: '0.28'
+    version: '0.30'
   Data::Record::Serialize::Encode::json:
     file: lib/Data/Record/Serialize/Encode/json.pm
-    version: '0.28'
+    version: '0.30'
   Data::Record::Serialize::Encode::null:
     file: lib/Data/Record/Serialize/Encode/null.pm
-    version: '0.28'
+    version: '0.30'
   Data::Record::Serialize::Encode::rdb:
     file: lib/Data/Record/Serialize/Encode/rdb.pm
-    version: '0.28'
+    version: '0.30'
   Data::Record::Serialize::Encode::yaml:
     file: lib/Data/Record/Serialize/Encode/yaml.pm
-    version: '0.28'
+    version: '0.30'
   Data::Record::Serialize::Error:
     file: lib/Data/Record/Serialize/Error.pm
-    version: '0.28'
+    version: '0.30'
   Data::Record::Serialize::Role::Base:
     file: lib/Data/Record/Serialize/Role/Base.pm
-    version: '0.28'
+    version: '0.30'
   Data::Record::Serialize::Role::Default:
     file: lib/Data/Record/Serialize/Role/Default.pm
-    version: '0.28'
+    version: '0.30'
   Data::Record::Serialize::Role::Encode:
     file: lib/Data/Record/Serialize/Role/Encode.pm
-    version: '0.28'
+    version: '0.30'
   Data::Record::Serialize::Role::EncodeAndSink:
     file: lib/Data/Record/Serialize/Role/EncodeAndSink.pm
-    version: '0.28'
+    version: '0.30'
   Data::Record::Serialize::Role::Sink:
     file: lib/Data/Record/Serialize/Role/Sink.pm
-    version: '0.28'
+    version: '0.30'
   Data::Record::Serialize::Sink::array:
     file: lib/Data/Record/Serialize/Sink/array.pm
-    version: '0.28'
+    version: '0.30'
   Data::Record::Serialize::Sink::null:
     file: lib/Data/Record/Serialize/Sink/null.pm
-    version: '0.28'
+    version: '0.30'
   Data::Record::Serialize::Sink::stream:
     file: lib/Data/Record/Serialize/Sink/stream.pm
-    version: '0.28'
+    version: '0.30'
   Data::Record::Serialize::Types:
     file: lib/Data/Record/Serialize/Types.pm
-    version: '0.28'
+    version: '0.30'
   Data::Record::Serialize::Util:
     file: lib/Data/Record/Serialize/Util.pm
-    version: '0.28'
+    version: '0.30'
 recommends:
   Cpanel::JSON::XS: '3.0236'
   DBD::SQLite: '1.31'
@@ -110,7 +110,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize
   repository: https://gitlab.com/djerius/data-record-serialize.git
-version: '0.28'
-x_generated_by_perl: v5.30.0
+version: '0.30'
+x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: GPL-3.0-only

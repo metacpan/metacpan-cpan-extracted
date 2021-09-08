@@ -33,7 +33,7 @@
    "provides" : {
       "Tree::Term" : {
          "file" : "lib/Tree/Term.pm",
-         "version" : "20210810"
+         "version" : "20210827"
       }
    },
    "release_status" : "stable",
@@ -48,6 +48,6 @@
          "url" : "https://github.com/philiprbrenan/TreeTerm"
       }
    },
-   "version" : "20210810",
+   "version" : "20210827",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

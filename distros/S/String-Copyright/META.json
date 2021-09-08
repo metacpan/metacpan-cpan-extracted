@@ -10,7 +10,7 @@
       "Sourcecode"
    ],
    "license" : [
-      "gpl_3"
+      "agpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -34,6 +34,9 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "re::engine::RE2" : "0"
+         },
          "requires" : {
             "Exporter::Tiny" : "0",
             "Number::Range" : "0.04",
@@ -44,6 +47,7 @@
       "test" : {
          "requires" : {
             "Test2::V0" : "0",
+            "Test::Without::Module" : "0",
             "utf8" : "0"
          }
       }
@@ -51,7 +55,7 @@
    "provides" : {
       "String::Copyright" : {
          "file" : "lib/String/Copyright.pm",
-         "version" : "0.003008"
+         "version" : "0.003011"
       }
    },
    "release_status" : "stable",
@@ -61,7 +65,7 @@
       },
       "homepage" : "https://metacpan.org/pod/String::Copyright",
       "license" : [
-         "http://www.gnu.org/licenses/gpl-3.0.txt"
+         "http://www.gnu.org/licenses/agpl-3.0.txt"
       ],
       "repository" : {
          "type" : "git",
@@ -69,7 +73,7 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/String-Copyright/project"
    },
-   "version" : "0.003008",
+   "version" : "0.003011",
    "x_help_wanted" : [
       "tester",
       "documenter"

@@ -13,7 +13,7 @@ my $build = Module::Build->new(
       'Future::AsyncAwait' => 0,
       'Future::IO' => '0.03',
       'IO::Termios' => 0,
-      'Object::Pad' => '0.45',
+      'Object::Pad' => '0.51',
       'Struct::Dumb' => 0,
       'YAML' => 0,
 

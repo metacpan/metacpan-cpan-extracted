@@ -17,7 +17,7 @@ name: Net-SNMP-Mixin-ArubaCX-Dot1qFdb
 provides:
   Net::SNMP::Mixin::ArubaCX::Dot1qFdb:
     file: lib/Net/SNMP/Mixin/ArubaCX/Dot1qFdb.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Net::SNMP: '0'
   Net::SNMP::Mixin: '0.14'
@@ -25,5 +25,5 @@ requires:
   perl: v5.6.0
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

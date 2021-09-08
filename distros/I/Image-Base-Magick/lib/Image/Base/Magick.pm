@@ -30,7 +30,7 @@ use vars '$VERSION', '@ISA';
 use Image::Base;
 @ISA = ('Image::Base');
 
-$VERSION = 6;
+$VERSION = 7;
 
 # uncomment this to run the ### lines
 # use Smart::Comments '###';
@@ -395,6 +395,7 @@ sub xy {
   my $m = $self->{'-imagemagick'};
   my $err;
   if (@_ == 4) {
+    # Draw() primitive point avoids error on negative or large x,y
     $err = $m->Draw (primitive => 'point',
                      fill   => $colour,
                      points => "$x,$y");
@@ -436,12 +437,15 @@ sub line {
   }
 }
 
-# not sure if a single point should dispatch to xy(), maybe in the past
 sub rectangle {
   my ($self, $x1, $y1, $x2, $y2, $colour, $fill) = @_;
   ### Image-Base-Magick rectangle: @_
 
-  if (my $err = $self->{'-imagemagick'}
+  # some versions of ImageMagick seemed to draw nothing for a single point,
+  # so dispatch to line() for anything line-like
+  if ($x1==$x2 || $y1==$y2) {
+    $self->line($x1,$y1, $x2,$y2, $colour);
+  } elsif (my $err = $self->{'-imagemagick'}
            ->Draw (primitive => 'rectangle',
                    ($fill ? 'fill' : 'stroke'), $colour,
                    points => "$x1,$y1 $x2,$y2")) {

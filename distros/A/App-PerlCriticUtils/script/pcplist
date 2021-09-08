@@ -1,18 +1,18 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/PerlCriticUtils/pcplist
-# and generated automatically using Perinci::CmdLine::Gen version 0.498
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-25'; # DATE
-our $DIST = 'App-PerlCriticUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+# and generated automatically using Perinci::CmdLine::Gen version 0.500
 
 use 5.010001;
 use strict;
 use warnings;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-08-28'; # DATE
+our $DIST = 'App-PerlCriticUtils'; # DIST
+our $VERSION = '0.005'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/PerlCriticUtils/pcplist",
@@ -38,25 +38,13 @@ pcplist - List installed Perl::Critic policy modules
 
 =head1 VERSION
 
-This document describes version 0.003 of pcplist (from Perl distribution App-PerlCriticUtils), released on 2021-05-25.
+This document describes version 0.005 of pcplist (from Perl distribution App-PerlCriticUtils), released on 2021-08-28.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % pcplist [--detail] [--format=name] [--json] [-l] [--(no)naked-res]
-     [--no-detail] [--nodetail] [--page-result[=program]]
-     [--view-result[=program]]
-
-Examples:
-
-List installed policies:
-
- % pcplist
-
-List installed policies (show details):
-
- % pcplist -l
+% B<pcplist> [B<--detail>|B<-l>|B<--no-detail>|B<--nodetail>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]]
 
 =head1 OPTIONS
 
@@ -165,6 +153,312 @@ It is also recommended to install L<shcompgen> (see above).
 
 For fish and zsh, install L<shcompgen> as described above.
 
+=head1 EXAMPLES
+
+List installed policies:
+
+ % pcplist
+ BuiltinFunctions::GrepWithSimpleValue
+ BuiltinFunctions::ProhibitBooleanGrep
+ BuiltinFunctions::ProhibitComplexMappings
+ BuiltinFunctions::ProhibitLvalueSubstr
+ BuiltinFunctions::ProhibitReverseSortBlock
+ BuiltinFunctions::ProhibitShiftRef
+ BuiltinFunctions::ProhibitSleepViaSelect
+ BuiltinFunctions::ProhibitStringyEval
+ BuiltinFunctions::ProhibitStringySplit
+ BuiltinFunctions::ProhibitUniversalCan
+ BuiltinFunctions::ProhibitUniversalIsa
+ BuiltinFunctions::ProhibitUselessTopic
+ BuiltinFunctions::ProhibitVoidGrep
+ BuiltinFunctions::ProhibitVoidMap
+ BuiltinFunctions::RequireBlockGrep
+ BuiltinFunctions::RequireBlockMap
+ BuiltinFunctions::RequireGlobFunction
+ BuiltinFunctions::RequireSimpleSortBlock
+ ClassHierarchies::ProhibitAutoloading
+ ClassHierarchies::ProhibitExplicitISA
+ ClassHierarchies::ProhibitOneArgBless
+ CodeLayout::ProhibitHardTabs
+ CodeLayout::ProhibitParensWithBuiltins
+ CodeLayout::ProhibitQuotedWordLists
+ CodeLayout::ProhibitTrailingWhitespace
+ CodeLayout::RequireConsistentNewlines
+ CodeLayout::RequireTidyCode
+ CodeLayout::RequireTrailingCommas
+ ControlStructures::ProhibitCStyleForLoops
+ ControlStructures::ProhibitCascadingIfElse
+ ControlStructures::ProhibitDeepNests
+ ControlStructures::ProhibitLabelsWithSpecialBlockNames
+ ControlStructures::ProhibitMutatingListFunctions
+ ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions
+ ControlStructures::ProhibitPostfixControls
+ ControlStructures::ProhibitUnlessBlocks
+ ControlStructures::ProhibitUnreachableCode
+ ControlStructures::ProhibitUntilBlocks
+ ControlStructures::ProhibitYadaOperator
+ Documentation::PodSpelling
+ Documentation::RequirePackageMatchesPodName
+ Documentation::RequirePodAtEnd
+ Documentation::RequirePodSections
+ ErrorHandling::RequireCarping
+ ErrorHandling::RequireCheckingReturnValueOfEval
+ InputOutput::ProhibitBacktickOperators
+ InputOutput::ProhibitBarewordFileHandles
+ InputOutput::ProhibitExplicitStdin
+ InputOutput::ProhibitInteractiveTest
+ InputOutput::ProhibitJoinedReadline
+ InputOutput::ProhibitOneArgSelect
+ InputOutput::ProhibitReadlineInForLoop
+ InputOutput::ProhibitTwoArgOpen
+ InputOutput::RequireBracedFileHandleWithPrint
+ InputOutput::RequireBriefOpen
+ InputOutput::RequireCheckedClose
+ InputOutput::RequireCheckedOpen
+ InputOutput::RequireCheckedSyscalls
+ InputOutput::RequireEncodingWithUTF8Layer
+ Miscellanea::ProhibitFormats
+ Miscellanea::ProhibitTies
+ Miscellanea::ProhibitUnrestrictedNoCritic
+ Miscellanea::ProhibitUselessNoCritic
+ Modules::ProhibitAutomaticExportation
+ Modules::ProhibitConditionalUseStatements
+ Modules::ProhibitEvilModules
+ Modules::ProhibitExcessMainComplexity
+ Modules::ProhibitMultiplePackages
+ Modules::RequireBarewordIncludes
+ Modules::RequireEndWithOne
+ Modules::RequireExplicitPackage
+ Modules::RequireFilenameMatchesPackage
+ Modules::RequireNoMatchVarsWithUseEnglish
+ Modules::RequireVersionVar
+ NamingConventions::Capitalization
+ NamingConventions::ProhibitAmbiguousNames
+ Objects::ProhibitIndirectSyntax
+ References::ProhibitDoubleSigils
+ RegularExpressions::ProhibitCaptureWithoutTest
+ RegularExpressions::ProhibitComplexRegexes
+ RegularExpressions::ProhibitEnumeratedClasses
+ RegularExpressions::ProhibitEscapedMetacharacters
+ RegularExpressions::ProhibitFixedStringMatches
+ RegularExpressions::ProhibitSingleCharAlternation
+ RegularExpressions::ProhibitUnusedCapture
+ RegularExpressions::ProhibitUnusualDelimiters
+ RegularExpressions::ProhibitUselessTopic
+ RegularExpressions::RequireBracesForMultiline
+ RegularExpressions::RequireDotMatchAnything
+ RegularExpressions::RequireExtendedFormatting
+ RegularExpressions::RequireLineBoundaryMatching
+ Subroutines::ProhibitAmpersandSigils
+ Subroutines::ProhibitBuiltinHomonyms
+ Subroutines::ProhibitExcessComplexity
+ Subroutines::ProhibitExplicitReturnUndef
+ Subroutines::ProhibitManyArgs
+ Subroutines::ProhibitNestedSubs
+ Subroutines::ProhibitReturnSort
+ Subroutines::ProhibitSubroutinePrototypes
+ Subroutines::ProhibitUnusedPrivateSubroutines
+ Subroutines::ProtectPrivateSubs
+ Subroutines::RequireArgUnpacking
+ Subroutines::RequireFinalReturn
+ TestingAndDebugging::ProhibitNoStrict
+ TestingAndDebugging::ProhibitNoWarnings
+ TestingAndDebugging::ProhibitProlongedStrictureOverride
+ TestingAndDebugging::RequireTestLabels
+ TestingAndDebugging::RequireUseStrict
+ TestingAndDebugging::RequireUseWarnings
+ ValuesAndExpressions::ProhibitCommaSeparatedStatements
+ ValuesAndExpressions::ProhibitComplexVersion
+ ValuesAndExpressions::ProhibitConstantPragma
+ ValuesAndExpressions::ProhibitEmptyQuotes
+ ValuesAndExpressions::ProhibitEscapedCharacters
+ ValuesAndExpressions::ProhibitImplicitNewlines
+ ValuesAndExpressions::ProhibitInterpolationOfLiterals
+ ValuesAndExpressions::ProhibitLeadingZeros
+ ValuesAndExpressions::ProhibitLongChainsOfMethodCalls
+ ValuesAndExpressions::ProhibitMagicNumbers
+ ValuesAndExpressions::ProhibitMismatchedOperators
+ ValuesAndExpressions::ProhibitMixedBooleanOperators
+ ValuesAndExpressions::ProhibitNoisyQuotes
+ ValuesAndExpressions::ProhibitQuotesAsQuotelikeOperatorDelimiters
+ ValuesAndExpressions::ProhibitSpecialLiteralHeredocTerminator
+ ValuesAndExpressions::ProhibitVersionStrings
+ ValuesAndExpressions::RequireConstantVersion
+ ValuesAndExpressions::RequireInterpolationOfMetachars
+ ValuesAndExpressions::RequireNumberSeparators
+ ValuesAndExpressions::RequireQuotedHeredocTerminator
+ ValuesAndExpressions::RequireUpperCaseHeredocTerminator
+ Variables::ProhibitAugmentedAssignmentInDeclaration
+ Variables::ProhibitConditionalDeclarations
+ Variables::ProhibitEvilVariables
+ Variables::ProhibitFatCommaInDeclaration
+ Variables::ProhibitLocalVars
+ Variables::ProhibitMatchVars
+ Variables::ProhibitPackageVars
+ Variables::ProhibitPerl4PackageNames
+ Variables::ProhibitPunctuationVars
+ Variables::ProhibitReusedNames
+ Variables::ProhibitUnusedVariables
+ Variables::ProtectPrivateVars
+ Variables::RequireInitializationForLocalVars
+ Variables::RequireLexicalLoopIterators
+ Variables::RequireLocalizedPunctuationVars
+ Variables::RequireNegativeIndices
+
+List installed policies (show details):
+
+ % pcplist -l
+ +--------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------+
+ | name                                                                     | abstract                                                                                                   |
+ +--------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------+
+ | BuiltinFunctions::GrepWithSimpleValue                                    | Warn grep with simple value                                                                                |
+ | BuiltinFunctions::ProhibitBooleanGrep                                    | Use C<List::MoreUtils::any> instead of C<grep> in boolean context.                                         |
+ | BuiltinFunctions::ProhibitComplexMappings                                | Map blocks should have a single statement.                                                                 |
+ | BuiltinFunctions::ProhibitLvalueSubstr                                   | Use 4-argument C<substr> instead of writing C<substr($foo, 2, 6) = $bar>.                                  |
+ | BuiltinFunctions::ProhibitReverseSortBlock                               | Forbid $b before $a in sort blocks.                                                                        |
+ | BuiltinFunctions::ProhibitShiftRef                                       | Prohibit C<\shift> in code                                                                                 |
+ | BuiltinFunctions::ProhibitSleepViaSelect                                 | Use L<Time::HiRes|Time::HiRes> instead of something like C<select(undef, undef, undef, .05)>.              |
+ | BuiltinFunctions::ProhibitStringyEval                                    | Write C<eval { my $foo; bar($foo) }> instead of C<eval "my $foo; bar($foo);">.                             |
+ | BuiltinFunctions::ProhibitStringySplit                                   | Write C<split /-/, $string> instead of C<split '-', $string>.                                              |
+ | BuiltinFunctions::ProhibitUniversalCan                                   | Write C<< eval { $foo->can($name) } >> instead of C<UNIVERSAL::can($foo, $name)>.                          |
+ | BuiltinFunctions::ProhibitUniversalIsa                                   | Write C<< eval { $foo->isa($pkg) } >> instead of C<UNIVERSAL::isa($foo, $pkg)>.                            |
+ | BuiltinFunctions::ProhibitUselessTopic                                   | Don't pass $_ to built-in functions that assume it, or to most filetest operators.                         |
+ | BuiltinFunctions::ProhibitVoidGrep                                       | Don't use C<grep> in void contexts.                                                                        |
+ | BuiltinFunctions::ProhibitVoidMap                                        | Don't use C<map> in void contexts.                                                                         |
+ | BuiltinFunctions::RequireBlockGrep                                       | Write C<grep { /$pattern/ } @list> instead of C<grep /$pattern/, @list>.                                   |
+ | BuiltinFunctions::RequireBlockMap                                        | Write C<map { /$pattern/ } @list> instead of C<map /$pattern/, @list>.                                     |
+ | BuiltinFunctions::RequireGlobFunction                                    | Use C<glob q{*}> instead of <*>.                                                                           |
+ | BuiltinFunctions::RequireSimpleSortBlock                                 | Sort blocks should have a single statement.                                                                |
+ | ClassHierarchies::ProhibitAutoloading                                    | AUTOLOAD methods should be avoided.                                                                        |
+ | ClassHierarchies::ProhibitExplicitISA                                    | Employ C<use base> instead of C<@ISA>.                                                                     |
+ | ClassHierarchies::ProhibitOneArgBless                                    | Write C<bless {}, $class;> instead of just C<bless {};>.                                                   |
+ | CodeLayout::ProhibitHardTabs                                             | Use spaces instead of tabs.                                                                                |
+ | CodeLayout::ProhibitParensWithBuiltins                                   | Write C<open $handle, $path> instead of C<open($handle, $path)>.                                           |
+ | CodeLayout::ProhibitQuotedWordLists                                      | Write C<qw(foo bar baz)> instead of C<('foo', 'bar', 'baz')>.                                              |
+ | CodeLayout::ProhibitTrailingWhitespace                                   | Don't use whitespace at the end of lines.                                                                  |
+ | CodeLayout::RequireConsistentNewlines                                    | Use the same newline through the source.                                                                   |
+ | CodeLayout::RequireTidyCode                                              | Must run code through L<perltidy|perltidy>.                                                                |
+ | CodeLayout::RequireTrailingCommas                                        | Put a comma at the end of every multi-line list declaration, including the last one.                       |
+ | ControlStructures::ProhibitCStyleForLoops                                | Write C<for(0..20)> instead of C<for($i=0; $i<=20; $i++)>.                                                 |
+ | ControlStructures::ProhibitCascadingIfElse                               | Don't write long "if-elsif-elsif-elsif-elsif...else" chains.                                               |
+ | ControlStructures::ProhibitDeepNests                                     | Don't write deeply nested loops and conditionals.                                                          |
+ | ControlStructures::ProhibitLabelsWithSpecialBlockNames                   | Don't use labels that are the same as the special block names.                                             |
+ | ControlStructures::ProhibitMutatingListFunctions                         | Don't modify C<$_> in list functions.                                                                      |
+ | ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions | Don't use operators like C<not>, C<!~>, and C<le> within C<until> and C<unless>.                           |
+ | ControlStructures::ProhibitPostfixControls                               | Write C<if($condition){ do_something() }> instead of C<do_something() if $condition>.                      |
+ | ControlStructures::ProhibitUnlessBlocks                                  | Write C<if(! $condition)> instead of C<unless($condition)>.                                                |
+ | ControlStructures::ProhibitUnreachableCode                               | Don't write code after an unconditional C<die, exit, or next>.                                             |
+ | ControlStructures::ProhibitUntilBlocks                                   | Write C<while(! $condition)> instead of C<until($condition)>.                                              |
+ | ControlStructures::ProhibitYadaOperator                                  | Never use C<...> in production code.                                                                       |
+ | Documentation::PodSpelling                                               | Check your spelling.                                                                                       |
+ | Documentation::RequirePackageMatchesPodName                              | The C<=head1 NAME> section should match the package.                                                       |
+ | Documentation::RequirePodAtEnd                                           | All POD should be after C<__END__>.                                                                        |
+ | Documentation::RequirePodSections                                        | Organize your POD into the customary sections.                                                             |
+ | ErrorHandling::RequireCarping                                            | Use functions from L<Carp|Carp> instead of C<warn> or C<die>.                                              |
+ | ErrorHandling::RequireCheckingReturnValueOfEval                          | You can't depend upon the value of C<$@>/C<$EVAL_ERROR> to tell whether an C<eval> failed.                 |
+ | InputOutput::ProhibitBacktickOperators                                   | Discourage stuff like C<@files = `ls $directory`>.                                                         |
+ | InputOutput::ProhibitBarewordFileHandles                                 | Write C<open my $fh, q{<}, $filename;> instead of C<open FH, q{<}, $filename;>.                            |
+ | InputOutput::ProhibitExplicitStdin                                       | Use "<>" or "<ARGV>" or a prompting module instead of "<STDIN>".                                           |
+ | InputOutput::ProhibitInteractiveTest                                     | Use prompt() instead of -t.                                                                                |
+ | InputOutput::ProhibitJoinedReadline                                      | Use C<local $/ = undef> or L<Path::Tiny|Path::Tiny> instead of joined readline.                            |
+ | InputOutput::ProhibitOneArgSelect                                        | Never write C<select($fh)>.                                                                                |
+ | InputOutput::ProhibitReadlineInForLoop                                   | Write C<< while( $line = <> ){...} >> instead of C<< for(<>){...} >>.                                      |
+ | InputOutput::ProhibitTwoArgOpen                                          | Write C<< open $fh, q{<}, $filename; >> instead of C<< open $fh, "<$filename"; >>.                         |
+ | InputOutput::RequireBracedFileHandleWithPrint                            | Write C<print {$FH} $foo, $bar;> instead of C<print $FH $foo, $bar;>.                                      |
+ | InputOutput::RequireBriefOpen                                            | Close filehandles as soon as possible after opening them.                                                  |
+ | InputOutput::RequireCheckedClose                                         | Write C<< my $error = close $fh; >> instead of C<< close $fh; >>.                                          |
+ | InputOutput::RequireCheckedOpen                                          | Write C<< my $error = open $fh, $mode, $filename; >> instead of C<< open $fh, $mode, $filename; >>.        |
+ | InputOutput::RequireCheckedSyscalls                                      | Return value of flagged function ignored.                                                                  |
+ | InputOutput::RequireEncodingWithUTF8Layer                                | Write C<< open $fh, q{<:encoding(UTF-8)}, $filename; >> instead of C<< open $fh, q{<:utf8}, $filename; >>. |
+ | Miscellanea::ProhibitFormats                                             | Do not use C<format>.                                                                                      |
+ | Miscellanea::ProhibitTies                                                | Do not use C<tie>.                                                                                         |
+ | Miscellanea::ProhibitUnrestrictedNoCritic                                | Forbid a bare C<## no critic>                                                                              |
+ | Miscellanea::ProhibitUselessNoCritic                                     | Remove ineffective "## no critic" annotations.                                                             |
+ | Modules::ProhibitAutomaticExportation                                    | Export symbols via C<@EXPORT_OK> or C<%EXPORT_TAGS> instead of C<@EXPORT>.                                 |
+ | Modules::ProhibitConditionalUseStatements                                | Avoid putting conditional logic around compile-time includes.                                              |
+ | Modules::ProhibitEvilModules                                             | Ban modules that aren't blessed by your shop.                                                              |
+ | Modules::ProhibitExcessMainComplexity                                    | Minimize complexity in code that is B<outside> of subroutines.                                             |
+ | Modules::ProhibitMultiplePackages                                        | Put packages (especially subclasses) in separate files.                                                    |
+ | Modules::RequireBarewordIncludes                                         | Write C<require Module> instead of C<require 'Module.pm'>.                                                 |
+ | Modules::RequireEndWithOne                                               | End each module with an explicitly C<1;> instead of some funky expression.                                 |
+ | Modules::RequireExplicitPackage                                          | Always make the C<package> explicit.                                                                       |
+ | Modules::RequireFilenameMatchesPackage                                   | Package declaration must match filename.                                                                   |
+ | Modules::RequireNoMatchVarsWithUseEnglish                                | C<use English> must be passed a C<-no_match_vars> argument.                                                |
+ | Modules::RequireVersionVar                                               | Give every module a C<$VERSION> number.                                                                    |
+ | NamingConventions::Capitalization                                        | Distinguish different program components by case.                                                          |
+ | NamingConventions::ProhibitAmbiguousNames                                | Don't use vague variable or subroutine names like 'last' or 'record'.                                      |
+ | Objects::ProhibitIndirectSyntax                                          | Prohibit indirect object call syntax.                                                                      |
+ | References::ProhibitDoubleSigils                                         | Write C<@{ $array_ref }> instead of C<@$array_ref>.                                                        |
+ | RegularExpressions::ProhibitCaptureWithoutTest                           | Capture variable used outside conditional.                                                                 |
+ | RegularExpressions::ProhibitComplexRegexes                               | Split long regexps into smaller C<qr//> chunks.                                                            |
+ | RegularExpressions::ProhibitEnumeratedClasses                            | Use named character classes instead of explicit character lists.                                           |
+ | RegularExpressions::ProhibitEscapedMetacharacters                        | Use character classes for literal meta-characters instead of escapes.                                      |
+ | RegularExpressions::ProhibitFixedStringMatches                           | Use C<eq> or hash instead of fixed-pattern regexps.                                                        |
+ | RegularExpressions::ProhibitSingleCharAlternation                        | Use C<[abc]> instead of C<a|b|c>.                                                                          |
+ | RegularExpressions::ProhibitUnusedCapture                                | Only use a capturing group if you plan to use the captured value.                                          |
+ | RegularExpressions::ProhibitUnusualDelimiters                            | Use only C<//> or C<{}> to delimit regexps.                                                                |
+ | RegularExpressions::ProhibitUselessTopic                                 | Don't use $_ to match against regexes.                                                                     |
+ | RegularExpressions::RequireBracesForMultiline                            | Use C<{> and C<}> to delimit multi-line regexps.                                                           |
+ | RegularExpressions::RequireDotMatchAnything                              | Always use the C</s> modifier with regular expressions.                                                    |
+ | RegularExpressions::RequireExtendedFormatting                            | Always use the C</x> modifier with regular expressions.                                                    |
+ | RegularExpressions::RequireLineBoundaryMatching                          | Always use the C</m> modifier with regular expressions.                                                    |
+ | Subroutines::ProhibitAmpersandSigils                                     | Don't call functions with a leading ampersand sigil.                                                       |
+ | Subroutines::ProhibitBuiltinHomonyms                                     | Don't declare your own C<open> function.                                                                   |
+ | Subroutines::ProhibitExcessComplexity                                    | Minimize complexity by factoring code into smaller subroutines.                                            |
+ | Subroutines::ProhibitExplicitReturnUndef                                 | Return failure with bare C<return> instead of C<return undef>.                                             |
+ | Subroutines::ProhibitManyArgs                                            | Too many arguments.                                                                                        |
+ | Subroutines::ProhibitNestedSubs                                          | C<sub never { sub correct {} }>.                                                                           |
+ | Subroutines::ProhibitReturnSort                                          | Behavior of C<sort> is not defined if called in scalar context.                                            |
+ | Subroutines::ProhibitSubroutinePrototypes                                | Don't write C<sub my_function (@@) {}>.                                                                    |
+ | Subroutines::ProhibitUnusedPrivateSubroutines                            | Prevent unused private subroutines.                                                                        |
+ | Subroutines::ProtectPrivateSubs                                          | Prevent access to private subs in other packages.                                                          |
+ | Subroutines::RequireArgUnpacking                                         | Always unpack C<@_> first.                                                                                 |
+ | Subroutines::RequireFinalReturn                                          | End every path through a subroutine with an explicit C<return> statement.                                  |
+ | TestingAndDebugging::ProhibitNoStrict                                    | Prohibit various flavors of C<no strict>.                                                                  |
+ | TestingAndDebugging::ProhibitNoWarnings                                  | Prohibit various flavors of C<no warnings>.                                                                |
+ | TestingAndDebugging::ProhibitProlongedStrictureOverride                  | Don't turn off strict for large blocks of code.                                                            |
+ | TestingAndDebugging::RequireTestLabels                                   | Tests should all have labels.                                                                              |
+ | TestingAndDebugging::RequireUseStrict                                    | Always C<use strict>.                                                                                      |
+ | TestingAndDebugging::RequireUseWarnings                                  | Always C<use warnings>.                                                                                    |
+ | ValuesAndExpressions::ProhibitCommaSeparatedStatements                   | Don't use the comma operator as a statement separator.                                                     |
+ | ValuesAndExpressions::ProhibitComplexVersion                             | Prohibit version values from outside the module.                                                           |
+ | ValuesAndExpressions::ProhibitConstantPragma                             | Don't C<< use constant FOO => 15 >>.                                                                       |
+ | ValuesAndExpressions::ProhibitEmptyQuotes                                | Write C<q{}> instead of C<''>.                                                                             |
+ | ValuesAndExpressions::ProhibitEscapedCharacters                          | Write C<"\N{DELETE}"> instead of C<"\x7F">, etc.                                                           |
+ | ValuesAndExpressions::ProhibitImplicitNewlines                           | Use concatenation or HEREDOCs instead of literal line breaks in strings.                                   |
+ | ValuesAndExpressions::ProhibitInterpolationOfLiterals                    | Always use single quotes for literal strings.                                                              |
+ | ValuesAndExpressions::ProhibitLeadingZeros                               | Write C<oct(755)> instead of C<0755>.                                                                      |
+ | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls                    | Long chains of method calls indicate tightly coupled code.                                                 |
+ | ValuesAndExpressions::ProhibitMagicNumbers                               | Don't use values that don't explain themselves.                                                            |
+ | ValuesAndExpressions::ProhibitMismatchedOperators                        | Don't mix numeric operators with string operands, or vice-versa.                                           |
+ | ValuesAndExpressions::ProhibitMixedBooleanOperators                      | Write C< !$foo && $bar || $baz > instead of C< not $foo && $bar or $baz>.                                  |
+ | ValuesAndExpressions::ProhibitNoisyQuotes                                | Use C<q{}> or C<qq{}> instead of quotes for awkward-looking strings.                                       |
+ | ValuesAndExpressions::ProhibitQuotesAsQuotelikeOperatorDelimiters        | Don't use quotes (C<'>, C<">, C<`>) as delimiters for the quote-like operators.                            |
+ | ValuesAndExpressions::ProhibitSpecialLiteralHeredocTerminator            | Don't write C< print <<'__END__' >.                                                                        |
+ | ValuesAndExpressions::ProhibitVersionStrings                             | Don't use strings like C<v1.4> or C<1.4.5> when including other modules.                                   |
+ | ValuesAndExpressions::RequireConstantVersion                             | Require $VERSION to be a constant rather than a computed value.                                            |
+ | ValuesAndExpressions::RequireInterpolationOfMetachars                    | Warns that you might have used single quotes when you really wanted double-quotes.                         |
+ | ValuesAndExpressions::RequireNumberSeparators                            | Write C< 141_234_397.0145 > instead of C< 141234397.0145 >.                                                |
+ | ValuesAndExpressions::RequireQuotedHeredocTerminator                     | Write C< print <<'THE_END' > or C< print <<"THE_END" >.                                                    |
+ | ValuesAndExpressions::RequireUpperCaseHeredocTerminator                  | Write C< <<'THE_END'; > instead of C< <<'theEnd'; >.                                                       |
+ | Variables::ProhibitAugmentedAssignmentInDeclaration                      | Do not write C< my $foo .= 'bar'; >.                                                                       |
+ | Variables::ProhibitConditionalDeclarations                               | Do not write C< my $foo = $bar if $baz; >.                                                                 |
+ | Variables::ProhibitEvilVariables                                         | Ban variables that aren't blessed by your shop.                                                            |
+ | Variables::ProhibitFatCommaInDeclaration                                 | Prohibit fat comma in declaration                                                                          |
+ | Variables::ProhibitLocalVars                                             | Use C<my> instead of C<local>, except when you have to.                                                    |
+ | Variables::ProhibitMatchVars                                             | Avoid C<$`>, C<$&>, C<$'> and their English equivalents.                                                   |
+ | Variables::ProhibitPackageVars                                           | Eliminate globals declared with C<our> or C<use vars>.                                                     |
+ | Variables::ProhibitPerl4PackageNames                                     | Use double colon (::) to separate package name components instead of single quotes (').                    |
+ | Variables::ProhibitPunctuationVars                                       | Write C<$EVAL_ERROR> instead of C<$@>.                                                                     |
+ | Variables::ProhibitReusedNames                                           | Do not reuse a variable name in a lexical scope                                                            |
+ | Variables::ProhibitUnusedVariables                                       | Don't ask for storage you don't need.                                                                      |
+ | Variables::ProtectPrivateVars                                            | Prevent access to private vars in other packages.                                                          |
+ | Variables::RequireInitializationForLocalVars                             | Write C<local $foo = $bar;> instead of just C<local $foo;>.                                                |
+ | Variables::RequireLexicalLoopIterators                                   | Write C<for my $element (@list) {...}> instead of C<for $element (@list) {...}>.                           |
+ | Variables::RequireLocalizedPunctuationVars                               | Magic variables should be assigned as "local".                                                             |
+ | Variables::RequireNegativeIndices                                        | Negative array index should be used.                                                                       |
+ +--------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------+
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-PerlCriticUtils>.
@@ -173,6 +467,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-PerlCr
 
 Source repository is at L<https://github.com/perlancar/perl-App-PerlCriticUtils>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2018, 2017 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-PerlCriticUtils>
@@ -180,16 +502,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2018, 2017 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

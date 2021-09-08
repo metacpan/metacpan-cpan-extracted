@@ -24,8 +24,8 @@ my %WriteMakefileArgs = (
         'Test2::V0'    => '0'
     },
     PREREQ_PM => {
-        'File::Slurp' => '0',
-        'Test2::V0'   => '0'
+        'Path::Tiny' => '0',
+        'Test2::V0'  => '0'
     },
     META_MERGE => {
         "meta-spec" => { version => 2 },

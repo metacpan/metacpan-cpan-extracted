@@ -1,5 +1,5 @@
 package DBIx::Lite::Schema::Table;
-$DBIx::Lite::Schema::Table::VERSION = '0.32';
+$DBIx::Lite::Schema::Table::VERSION = '0.33';
 use strict;
 use warnings;
 
@@ -127,7 +127,7 @@ DBIx::Lite::Schema::Table
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 OVERVIEW
 
@@ -257,7 +257,7 @@ Alessandro Ranellucci <aar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Alessandro Ranellucci.
+This software is copyright (c) 2021 by Alessandro Ranellucci.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

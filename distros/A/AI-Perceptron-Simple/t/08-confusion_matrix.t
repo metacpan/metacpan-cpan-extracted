@@ -61,16 +61,18 @@ like ( $c_matrix{ accuracy }, qr/60/, "'illegal' calculation of sensitivity seem
     like ( $@, qr/Something\'s wrong\!/, "Croaked! Found non-binary values in file");
 }
 
-stdout_like {
+my $piece;
+my @pieces = ('A: ', 'P: ', 'actual', 'predicted', 'entries', 'Accuracy', 'Sensitivity', 'MP520', 'Yi Lin');
+
+for $piece ( @pieces ) {
+    stdout_like {
     
-    ok ( 
-        $perceptron->display_confusion_matrix( \%c_matrix, { 
-            zero_as => "MP520", one_as => "Yi Lin" 
-        } ),
-    "display_confusion_matrix is working");
-    
-} qr /(A\:)|(P\:)|(actua)|(predicted)|(entries)|(Accuracy)|(Sensitivity)|(MP520)|(Yi Lin)/n, 
-    "Correct stuff displayed";
+        ok ( $perceptron->display_exam_results( \%c_matrix, { zero_as => "MP520", one_as => "Yi Lin"  } ),
+            "display_exam_results is working");
+        
+    } qr /(?:$piece)/, "$piece displayed";
+
+}
 
 {
     local $@;

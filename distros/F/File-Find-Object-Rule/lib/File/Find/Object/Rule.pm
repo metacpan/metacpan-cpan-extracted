@@ -1,7 +1,7 @@
 #       $Id: /mirror/lab/perl/File-Find-Rule/lib/File/Find/Rule.pm 2102 2006-06-01T15:39:03.942922Z richardc  $
 
 package File::Find::Object::Rule;
-$File::Find::Object::Rule::VERSION = '0.0312';
+$File::Find::Object::Rule::VERSION = '0.0313';
 use strict;
 use warnings;
 
@@ -157,15 +157,15 @@ sub name
 
 use vars qw( %X_tests );
 %X_tests = (
-    -r => readable => -R => r_readable => -w => writeable => -W =>
-        r_writeable => -w => writable => -W => r_writable => -x =>
-        executable => -X => r_executable => -o => owned => -O => r_owned =>
+    -r              => readable => -R => r_readable => -w => writeable  => -W =>
+        r_writeable => -w       => writable => -W   => r_writable => -x =>
+        executable  => -X => r_executable   => -o   => owned => -O => r_owned =>
 
-        -e => exists => -f => file => -z => empty => -d => directory => -s =>
-        nonempty => -l => symlink => => -p => fifo  => -u => setuid => -S =>
-        socket   => -g => setgid  => -b    => block => -k => sticky => -c =>
-        character => => -t => tty => -M => modified => -A => accessed => -T =>
-        ascii => -C => changed => -B => binary =>
+        -e => exists    => -f => file => -z => empty => -d => directory => -s =>
+        nonempty  => -l => symlink => => -p => fifo   => -u => setuid   => -S =>
+        socket    => -g => setgid  => -b    => block  => -k => sticky   => -c =>
+        character => => -t => tty  => -M => modified  => -A => accessed => -T =>
+        ascii     => -C    => changed => -B => binary =>
 );
 
 for my $test ( keys %X_tests )
@@ -550,7 +550,7 @@ File::Find::Object::Rule - Alternative interface to File::Find::Object
 
 =head1 VERSION
 
-version 0.0312
+version 0.0313
 
 =head1 SYNOPSIS
 
@@ -1130,27 +1130,11 @@ L<https://metacpan.org/release/File-Find-Object-Rule>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/File-Find-Object-Rule>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=File-Find-Object-Rule>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/File-Find-Object-Rule>
 
 =item *
 
@@ -1227,7 +1211,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Richard Clamp.
+This software is copyright (c) 2021 by Richard Clamp.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

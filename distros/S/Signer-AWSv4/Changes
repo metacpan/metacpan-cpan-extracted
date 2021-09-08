@@ -1,3 +1,6 @@
+0.06 2021-09-03
+ - S3: enable version parameter for S3 objects (mschout)
+
 0.05 2019-09-04
  - S3: use correct hostname for buckets in us-east-1 (Issue #2). Thanks namotco
  - introduce a new SES signer for obtaining SES passwords

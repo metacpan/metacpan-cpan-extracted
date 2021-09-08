@@ -618,7 +618,7 @@ sub __choose_a_subset_wrap {
     my $list = $tu->choose_a_subset(
         $available,
         { prompt => $prompt, cs_label => $name, info => $info, prefix => '- ', keep_chosen => 0,
-          index => 0, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back}, layout => 3,
+          index => 0, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back}, layout => 2,
           clear_screen => 1 }
     );
     return if ! defined $list;

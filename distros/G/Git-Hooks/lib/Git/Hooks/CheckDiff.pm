@@ -2,8 +2,8 @@ use warnings;
 
 package Git::Hooks::CheckDiff;
 # ABSTRACT: Git::Hooks plugin to enforce commit policies
-$Git::Hooks::CheckDiff::VERSION = '3.1.0';
-use 5.016;
+$Git::Hooks::CheckDiff::VERSION = '3.1.1';
+use v5.16.0;
 use utf8;
 use Carp;
 use Log::Any '$log';
@@ -242,7 +242,7 @@ Git::Hooks::CheckDiff - Git::Hooks plugin to enforce commit policies
 
 =head1 VERSION
 
-version 3.1.0
+version 3.1.1
 
 =head1 SYNOPSIS
 

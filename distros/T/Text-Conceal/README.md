@@ -1,11 +1,7 @@
-[![Build Status](https://travis-ci.com/kaz-utashiro/Text-Conceal.svg?branch=master)](https://travis-ci.com/kaz-utashiro/Text-Conceal)
+[![Actions Status](https://github.com/kaz-utashiro/Text-Conceal/workflows/test/badge.svg)](https://github.com/kaz-utashiro/Text-Conceal/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Text-Conceal.svg)](https://metacpan.org/release/Text-Conceal)
 # NAME
 
 Text::Conceal - conceal and recover interface for text processing
-
-# VERSION
-
-Version 0.99
 
 # SYNOPSIS
 
@@ -17,6 +13,10 @@ Version 0.99
     $conceal->encode(@args);
     $_ = foo(@args);
     $conceal->decode($_);
+
+# VERSION
+
+Version 0.9901
 
 # DESCRIPTION
 
@@ -105,19 +105,19 @@ into single chunk if possible.
         string which also to be taken care of.
 
     - **visible** => _number_
-        - L<0>
+        - `0`
 
             With default value 0, this module uses characters in the range:
 
                 [0x01 => 0x07], [0x10 => 0x1f], [0x21 => 0x7e], [0x81 => 0xfe]
 
-        - [1](https://metacpan.org/pod/1)
+        - `1`
 
             Use printable characters first, then use non-printable characters.
 
                 [0x21 => 0x7e], [0x01 => 0x07], [0x10 => 0x1f], [0x81 => 0xfe]
 
-        - [2](https://metacpan.org/pod/2)
+        - `2`
 
             Use only printable characters.
 
@@ -154,13 +154,15 @@ continuous missing is allowed.  Less characters, more confusion.
     This module is originally implemented as a part of
     [Text::VisualPrintf](https://metacpan.org/pod/Text::VisualPrintf) module.
 
+- [Text::ANSI::Printf](https://metacpan.org/pod/Text::ANSI::Printf), [https://github.com/kaz-utashiro/Text-ANSI-Printf](https://github.com/kaz-utashiro/Text-ANSI-Printf)
+
 # AUTHOR
 
 Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2020 Kazumasa Utashiro.
+Copyright 2020-2021 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

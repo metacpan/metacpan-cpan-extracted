@@ -10,8 +10,9 @@ META.yml
 README
 dist.ini
 lib/Config/XrmDatabase.pm
-lib/Config/XrmDatabase/Constants.pm
 lib/Config/XrmDatabase/Failure.pm
+lib/Config/XrmDatabase/Types.pm
+lib/Config/XrmDatabase/Util.pm
 perlcritic.rc
 perltidy.rc
 t/00-compile.t
@@ -19,10 +20,12 @@ t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/configs.tgz
 t/configs/config001
-t/insert_resource.t
+t/constructor.t
+t/insert.t
 t/kv.t
+t/merge.t
 t/parse_name.t
-t/query_resource.t
+t/query.t
 t/read_file.t
 t/write_file.t
 templates/CONTRIBUTING.md

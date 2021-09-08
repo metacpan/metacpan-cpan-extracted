@@ -1,0 +1,48 @@
+---
+abstract: 'Install RtMidi'
+author:
+  - 'John Barrett <john@jbrt.org>'
+build_requires:
+  Alien::Build: '0.32'
+  Alien::Build::MM: '0.32'
+  ExtUtils::MakeMaker: '6.52'
+  Test2::V0: '0'
+  Test::Alien: '0'
+configure_requires:
+  Alien::Build: '0.32'
+  Alien::Build::MM: '0.32'
+  Alien::Build::Plugin::PkgConfig::Negotiate: '1.53'
+  ExtUtils::MakeMaker: '6.52'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-RtMidi
+no_index:
+  directory:
+    - examples
+    - t
+    - xt
+requires:
+  Alien::Base: '1.00'
+resources:
+  bugtracker: https://github.com/jbarrett/Alien-RtMidi/issues
+  homepage: https://github.com/jbarrett/Alien-RtMidi
+  repository: https://github.com/jbarrett/Alien-RtMidi.git
+version: '0.02'
+x_alienfile:
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
+  requires:
+    share:
+      Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
+      Archive::Tar: '0'
+      Config: '0'
+      HTTP::Tiny: '0.044'
+      IO::Zlib: '0'
+      URI: '0'
+    system: {}
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

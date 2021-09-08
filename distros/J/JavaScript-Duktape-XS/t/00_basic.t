@@ -66,6 +66,9 @@ sub test_eval {
         [ "'gonzo'" => 'gonzo' ],
         [ "3+4*5"   => 23 ],
         [ "null"    => undef ],
+        [ 'new ArrayBuffer()' => q<> ],
+        [ 'new ArrayBuffer(3)' => qq<\0\0\0> ],
+        [ 'new Uint8Array([0x21, 0x31])' => qq<\x21\x31> ],
         [ "print('Hello world from Javascript!');" => undef, 'Hello world from Javascript!' ],
         [ "print(2+3*4)" => undef, '14' ],
         [ q<print('this is a string', {this: 'object'})> => undef, q<this is a string [object Object]> ],
@@ -88,7 +91,7 @@ sub test_eval {
         stdout_like sub { $got = $vm->eval($js); },
                     qr/$expected_output/,
                     "got correct stdout from [$js]";
-        is_deeply($got, $expected_return, "eval return [$js]");
+        is_deeply($got, $expected_return, "eval return [$js]") or diag explain $got;
     }
 }
 

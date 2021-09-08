@@ -26,20 +26,24 @@ while (my $cl = <$fh>) {
     }
     my ($fname, $fval) = ($1, $2);
 
-    $FEATURES_DEF{features}{$fname} //= {
-        schema => ['any*', {
-            of=>[
-                ['str*', {in=>[]}],
-                ['array*', {min_len=>1, of=>['str*', {in=>[]}]}],
-            ],
-        }],
+    unless ($FEATURES_DEF{features}{$fname}) {
+        my $vals = [];
+        my $f = {
+            schema => ['any*', {
+                of=>[
+                    ['str*', {in=>$vals}],
+                    ['array*', {min_len=>1, of=>['str*', {in=>$vals}]}],
+                ],
+            }],
+        };
+        $FEATURES_DEF{features}{$fname} = $f;
     };
     push @{ $FEATURES_DEF{features}{$fname}{schema}[1]{of}[0][1]{in} }, $fval;
-    push @{ $FEATURES_DEF{features}{$fname}{schema}[1]{of}[1][1]{of}[1]{in} }, $fval;
+    #push @{ $FEATURES_DEF{features}{$fname}{schema}[1]{of}[1][1]{of}[1]{in} }, $fval;
 }
 
 $path = "$Bin/../lib/Module/Features/PythonTrove.pm";
 my $content = read_text($path);
-my $res = insert_fragment(text=>$content, id=>'def', payload=>'%FEATURES_DEF = %{ ' . Data::Dump::dump(\%FEATURES_DEF) . " };\n\n");
+my $res = insert_fragment(text=>$content, id=>'def', payload=>'%FEATURES_DEF = %{( ' . Data::Dump::dump(\%FEATURES_DEF) . " )};\n\n");
 die "Cannot insert fragment: $res->[0] - $res->[1]" unless $res->[0] == 200;
 write_text($path, $res->[2]{text});

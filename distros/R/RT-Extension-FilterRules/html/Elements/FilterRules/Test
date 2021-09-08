@@ -1,0 +1,334 @@
+<%doc>
+Allow the rules in one or all filter rule groups visible to the current user
+to be tested.
+</%doc>
+\
+<%ARGS>
+$id              => undef
+$PageLink        => undef
+$TicketId        => undef
+$TestRuleGroup   => undef
+$TriggerType     => 'Create'
+$InQueue         => 0
+$QueueFrom       => 0
+$QueueTo         => 0
+$IncludeDisabled => 0
+</%ARGS>
+\
+<%INIT>
+my $AvailableFilterRuleGroups
+    = RT::FilterRuleGroups->new( $session{'CurrentUser'} );
+$m->comp(
+    '/Tools/FilterRules.html:GetFilterRuleGroups',
+    'Collection'      => $AvailableFilterRuleGroups,
+    'IncludeDisabled' => $IncludeDisabled
+);
+$TestRuleGroup = $id || 0 if ( not defined $TestRuleGroup );
+
+my @Results = ();
+
+my $Ticket = undef;
+if ($TicketId) {
+    $TicketId =~ s/[^0-9]//sg;
+    $Ticket = RT::Ticket->new( $session{'CurrentUser'} );
+    if ( not $Ticket->Load($TicketId) ) {
+        push @Results, loc( 'Could not load ticket [_1]', $TicketId );
+        $TicketId = undef;
+    } elsif ( not $Ticket->CurrentUserHasRight('ShowTicket') ) {
+        push @Results, loc( 'No permission to view ticket [_1]', $TicketId );
+        $TicketId = undef;
+    }
+}
+
+if ( $AvailableFilterRuleGroups->Count == 0 ) {
+    push @Results, loc('You do not have access to any filter rule groups.');
+}
+</%INIT>
+\
+<& /Elements/ListActions, actions => \@Results &>
+\
+% return if ($AvailableFilterRuleGroups->Count == 0);
+\
+<form action="<%$PageLink%>" method="post">
+<input type="hidden" name="Test" value="1" />
+\
+<p>
+<&|/l&>This tool simulates an event on a ticket being passed through one or more filter rule groups.</&>
+</p>
+\
+<table>
+<tr>\
+<th style="text-align:right;"><&|/l&>Ticket</&>:</th>\
+<td><input type="text" name="TicketId" value="<% $TicketId %>" size="10" required data-autocomplete="Tickets" data-autocomplete-multiple="0" /></td>\
+</tr>
+\
+<tr>\
+<th style="text-align:right;"><&|/l&>Filter rule group</&>:</th>\
+<td><select name="TestRuleGroup"><option value="0"><&|/l&>All</&></option>\
+% $AvailableFilterRuleGroups->GotoFirstItem();
+% while (my $FilterRuleGroup = $AvailableFilterRuleGroups->Next) {
+<option value="<% $FilterRuleGroup->id %>"<% $FilterRuleGroup->id == $TestRuleGroup ? ' selected' : '' %>><% $FilterRuleGroup->Name %></option>\
+% }
+</select></td>\
+</tr>
+\
+<tr>\
+<th style="text-align:right;"><&|/l&>Trigger type</&>:</th>\
+<td><select name="TriggerType">\
+<option value="Create"<% $TriggerType eq 'Create'?' selected':'' %>><&|/l&>Ticket creation</&></option>\
+<option value="QueueMove"<% $TriggerType eq 'QueueMove'?' selected':'' %>><&|/l&>Ticket moving between queues</&></option>\
+</select></td>\
+</tr>
+\
+<tr class="OnTriggerType OnTriggerTypeCreate">\
+<th style="text-align:right;"><&|/l&>Simulate creation in queue</&>:</th>\
+<td><& /Elements/SelectObject, ObjectType => 'Queue', CheckRight => 'SeeQueue', ShowAll => 1, Name => 'InQueue', Default => $InQueue &></td>\
+</tr>
+\
+<tr class="OnTriggerType OnTriggerTypeQueueMove">\
+<th style="text-align:right;"><&|/l&>Simulate moving from queue</&>:</th>\
+<td><& /Elements/SelectObject, ObjectType => 'Queue', CheckRight => 'SeeQueue', ShowAll => 1, Name => 'QueueFrom', Default => $QueueFrom &></td>\
+</tr>
+\
+<tr class="OnTriggerType OnTriggerTypeQueueMove">\
+<th style="text-align:right;"><&|/l&>Simulate moving to queue</&>:</th>\
+<td><& /Elements/SelectObject, ObjectType => 'Queue', CheckRight => 'SeeQueue', ShowAll => 1, Name => 'QueueTo', Default => $QueueTo &></td>\
+</tr>
+\
+<tr>\
+<th style="text-align:right;"><&|/l&>Include disabled rules</&>:</th>\
+<td><select name="IncludeDisabled">\
+<option value="0"><&|/l&>Skip disabled rules as usual</&></option>\
+<option value="1"<% $IncludeDisabled ? ' selected' : '' %>><&|/l&>Include disabled rules</&></option>\
+</select></td>\
+</tr>
+\
+<tr><td></td><td><input type="submit" value="<&|/l&>Test</&>" /></td></tr>
+\
+</table>
+<script type="text/javascript">
+function onTriggerTypeChange () {
+    jQuery('.OnTriggerType').hide();
+    jQuery('.OnTriggerType.OnTriggerType'+jQuery('select[name=TriggerType]').val()).show();
+}
+jQuery(function () {
+    jQuery('select[name=TriggerType]').on('change', onTriggerTypeChange);
+    onTriggerTypeChange();
+});
+</script>
+</form>
+\
+% if ($TicketId) {
+\
+<style type="text/css">
+table.FilterRulesRuleChecks { margin: 1em; }
+table.FilterRulesRuleChecks thead { position: sticky; top: 0; }
+table.FilterRulesRuleChecks td { vertical-align: top; }
+</style>
+
+<&| /Widgets/TitleBox, title => loc('Results') &>
+%     $QueueFrom = $QueueTo = $InQueue if ($TriggerType eq 'Create');
+%     $AvailableFilterRuleGroups->GotoFirstItem();
+%     while (my $FilterRuleGroup = $AvailableFilterRuleGroups->Next) {
+%         next if ($TestRuleGroup && ($FilterRuleGroup->id != $TestRuleGroup));
+<h3><&|/l&>Filter rule group</&>: \
+%         if ($FilterRuleGroup->Disabled) {
+(<&|/l&>Disabled</&>) \
+%         }
+<% $FilterRuleGroup->Name %>\
+</h3>
+<%perl>
+	my ($RuleChecks, $Actions);
+        my ( $Matched, $Message, $EventValue, $TargetValue );
+
+	$RuleChecks = [];
+        ( $Matched, $Message, $EventValue, $TargetValue )
+            = $FilterRuleGroup->CheckGroupRequirements(
+            'RuleChecks'      => $RuleChecks,
+            'TriggerType'     => $TriggerType,
+            'From'            => $QueueFrom,
+            'To'              => $QueueTo,
+            'Ticket'          => $Ticket,
+            'RecordMatch'     => 0,
+            'DescribeAll'     => 1,
+            'IncludeDisabled' => $IncludeDisabled
+            );
+</%perl>
+\
+<h4><&|/l&>Requirement rules</&></h4>
+\
+<& Test:ShowRuleChecks, 'RuleChecks' => $RuleChecks &>
+\
+%         if ($Matched) {
+<p><&|/l&>Filter rule group requirements matched - the filter rules in this group would be processed.</&></p>
+%         } else {
+<p><&|/l&>Filter rule group requirements not matched - the filter rules in this group would not be processed.</&></p>
+%         }
+\
+%         next if ( not $Matched );
+\
+<%perl>
+	$RuleChecks = [];
+	$Actions = [];
+        ( $Matched, $Message, $EventValue, $TargetValue )
+            = $FilterRuleGroup->CheckFilterRules(
+            'RuleChecks'      => $RuleChecks,
+            'Actions'         => $Actions,
+            'TriggerType'     => $TriggerType,
+            'From'            => $QueueFrom,
+            'To'              => $QueueTo,
+            'Ticket'          => $Ticket,
+            'RecordMatch'     => 0,
+            'DescribeAll'     => 1,
+            'IncludeDisabled' => $IncludeDisabled
+            );
+</%perl>
+\
+<h4><&|/l&>Filter rules</&></h4>
+\
+<& Test:ShowRuleChecks, 'RuleChecks' => $RuleChecks &>
+\
+<h4><&|/l&>Actions</&></h4>
+\
+%         if (scalar @$Actions == 0) {
+<p><em><&|/l&>There would be no actions arising from this filter rule group.</&></em></p>
+%         } else {
+%             my %ActionFilterRuleIds = ();
+%             foreach (@$Actions) {
+%                 $ActionFilterRuleIds{$_->{'FilterRule'}->id} = $_->{'FilterRule'};
+%             }
+%             foreach (sort { $a->SortOrder <=> $b->SortOrder } values %ActionFilterRuleIds) {
+<% $_->DescribeActions() |n%>
+%             }
+%         }
+%     }
+</&>
+% }
+\
+<%method ShowRuleChecks>
+<%ARGS>
+$RuleChecks
+</%ARGS>
+\
+% if (scalar @$RuleChecks == 0) {
+<p><em><&|/l&>No rules were checked in this filter rule group.</&></em></p>
+%     return;
+% }
+\
+<table class="FilterRulesRuleChecks" border="1" cellspacing="0" cellpadding="4">
+<thead>
+<tr>\
+<th rowspan="2"><&|/l&>Rule</&></th>\
+<th rowspan="2"><&|/l&>Match type</&></th>\
+%# $RuleCheck's EventValue and TargetValue are currently always empty, so
+%# don't try to display them
+%#<th colspan="2"><&|/l&>Outcome of test</&></th>\
+<th colspan="2" rowspan="2"><&|/l&>Outcome of test</&></th>\
+<th rowspan="2">&nbsp;</th>\
+<th colspan="4"><&|/l&>Conflict conditions</&></th>\
+<th rowspan="2">&nbsp;</th>\
+<th colspan="4"><&|/l&>Requirement conditions</&></th>\
+</tr>
+<tr>\
+%# $RuleCheck's EventValue and TargetValue are currently always empty, so
+%# don't try to display them
+%#<th><&|/l&>Event value</&></th>\
+%#<th><&|/l&>Target value</&></th>\
+<th><&|/l&>Matched</&></th>\
+<th><&|/l&>Message</&></th>\
+<th><&|/l&>Event value</&></th>\
+<th><&|/l&>Target value</&></th>\
+<th><&|/l&>Matched</&></th>\
+<th><&|/l&>Message</&></th>\
+<th><&|/l&>Event value</&></th>\
+<th><&|/l&>Target value</&></th>\
+</tr>
+</thead>
+<tbody>
+% foreach my $RuleCheck (@$RuleChecks) {
+%     my $FilterRule = $RuleCheck->{'FilterRule'};
+%     my %ConditionRowsCount = ( 'Conflicts' => 0, 'Requirements' => 0 );
+%     my %IndividualDetail = ( 'Conflicts' => [], 'Requirements' => [] );
+%     foreach my $MatchType ( 'Conflicts', 'Requirements' ) {
+%         foreach (@{$RuleCheck->{$MatchType}}) {
+%             $ConditionRowsCount{$MatchType} ++;
+%             $ConditionRowsCount{$MatchType} += scalar @{$_->{'Checks'}};
+%             push @{$IndividualDetail{$MatchType}}, $_;
+%             push @{$IndividualDetail{$MatchType}}, @{$_->{'Checks'}};
+%         }
+%     }
+%     my $RowsNeeded = $ConditionRowsCount{'Conflicts'};
+%     $RowsNeeded = $ConditionRowsCount{'Requirements'} if ($ConditionRowsCount{'Requirements'} > $RowsNeeded);
+%     $RowsNeeded ++ if ($RowsNeeded < 2);
+<tr>\
+<td rowspan="<% $RowsNeeded %>">#<% $FilterRule->id %>: \
+%     if ($FilterRule->Disabled) {
+<em>(<&|/l&>Disabled</&>)</em> \
+%     }
+<% $FilterRule->Name %></td>\
+<td rowspan="<% $RowsNeeded %>">\
+%     if ($RuleCheck->{'MatchType'} eq 'Conflict') {
+<&|/l&>Conflict</&><br />\
+%     } elsif ($RuleCheck->{'MatchType'} eq 'Requirement') {
+<&|/l&>Requirement</&><br />\
+%     }
+%     if ($RuleCheck->{'Matched'}) {
+<b><&|/l&>Matched</&></b>\
+%     } else {
+<i><&|/l&>Not matched</&></i>\
+%     }
+</td>\
+%# $RuleCheck's EventValue and TargetValue are currently always empty, so
+%# don't try to display them
+%#<td colspan="2"><% $RuleCheck->{'Message'} %></td>\
+<td colspan="2" rowspan="<% $RowsNeeded %>"><% $RuleCheck->{'Message'} %></td>\
+\
+%     my %ClearCellWritten = ( 'Conflicts' => 0, 'Requirements' => 0 );
+%     for (my $RowNum = 1; $RowNum <= $RowsNeeded; $RowNum++) {
+%         if ($RowNum > 1) {
+<tr>\
+%         }
+%# $RuleCheck's EventValue and TargetValue are currently always empty, so
+%# don't try to display them
+%#%         if ($RowNum == 2) {
+%#<td><% $RuleCheck->{'EventValue'} %></td>\
+%#<td><% $RuleCheck->{'TargetValue'} %></td>\
+%#%         }
+%#%         if ($RowNum == 3) {
+%#<td colspan="2" rowspan="<% $RowsNeeded + 1 - $RowNum %>">&nbsp;</td>\
+%#%         }
+%         foreach my $MatchType ( 'Conflicts', 'Requirements' ) {
+%             my $Spec = shift @{$IndividualDetail{$MatchType}};
+%             if ($RowNum == 1) {
+<td rowspan="<% $RowsNeeded %>">&nbsp;</td>\
+%             }
+%             if ((not defined $Spec) && (not $ClearCellWritten{$MatchType})) {
+<td colspan="4" rowspan="<% $RowsNeeded + 1 - $RowNum %>">&nbsp;</td>\
+%                 $ClearCellWritten{$MatchType} = 1;
+%             } elsif (defined $Spec && defined $Spec->{'Condition'}) {
+<td colspan="4">\
+%                 if ($Spec->{'Matched'}) {
+<b><&|/l&>Matched</&></b>\
+%                 } else {
+<i><&|/l&>Not matched</&></i>\
+%                 }
+: <% $FilterRule->DescribeConditions('', $Spec->{'Condition'}) |n%></td>\
+%             } elsif (defined $Spec && defined $Spec->{'Message'}) {
+<td>\
+%                 if ($Spec->{'Matched'}) {
+<b><&|/l&>Yes</&></b>\
+%                 } else {
+<i><&|/l&>No</&></i>\
+%                 }
+</td>\
+<td><% $Spec->{'Message'} %></td>\
+<td><% $Spec->{'EventValue'} %></td>\
+<td><% $Spec->{'TargetValue'} %></td>\
+%             }
+%         }
+</tr>
+%     }
+% }
+</tbody>
+</table>
+</%method>

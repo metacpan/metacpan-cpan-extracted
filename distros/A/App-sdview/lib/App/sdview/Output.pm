@@ -7,7 +7,7 @@ use v5.26;
 
 use Object::Pad;
 
-package App::sdview::Output 0.03;
+package App::sdview::Output 0.04;
 role App::sdview::Output;
 
 has $_content;

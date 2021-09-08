@@ -86,26 +86,44 @@ Using fields objects
 
 Doing some left join
 
-    my $geo_tbl = $dbh->geoip || return( $self->error( "Unable to get the database object \"geoip\"." ) );
-    my $name_tbl = $dbh->geoname || return( $self->error( "Unable to get the database object \"geoname\"." ) );
-    $geo_tbl->as( 'i' );
-    $name_tbl->as( 'l' );
-    $geo_tbl->where( "INET '?'" << $geo_tbl->fo->network );
-    $geo_tbl->alias( id => 'ip_id' );
-    $name_tbl->alias( country_iso_code => 'code' );
-    my $sth = $geo_tbl->select->join( $name_tbl, $geo_tbl->fo->geoname_id == $name_tbl->fo->geoname_id );
-    # SELECT
-    #     -- tables fields
-    # FROM
-    #     geoip AS i
-    #     LEFT JOIN geoname AS l ON i.geoname_id = l.geoname_id
-    # WHERE
-    #     INET '?' << i.network
+        my $geo_tbl = $dbh->geoip || return( $self->error( "Unable to get the database object \"geoip\"." ) );
+        my $name_tbl = $dbh->geoname || return( $self->error( "Unable to get the database object \"geoname\"." ) );
+        $geo_tbl->as( 'i' );
+        $name_tbl->as( 'l' );
+        $geo_tbl->where( "INET '?'" << $geo_tbl->fo->network );
+        $geo_tbl->alias( id => 'ip_id' );
+        $name_tbl->alias( country_iso_code => 'code' );
+        my $sth = $geo_tbl->select->join( $name_tbl, $geo_tbl->fo->geoname_id == $name_tbl->fo->geoname_id );
+        # SELECT
+        #     -- tables fields
+        # FROM
+        #     geoip AS i
+        #     LEFT JOIN geoname AS l ON i.geoname_id = l.geoname_id
+        # WHERE
+        #     INET '?' << i.network
+
+Using a promise
+([Promise::Me](https://metacpan.org/pod/Promise::Me){.perl-module}) to
+execute an asynchronous query:
+
+        my $sth = $dbh->prepare( "SELECT some_slow_function(?)" ) || die( $dbh->error );
+        my $p = $sth->promise(10)->then(sub
+        {
+            my $st = shift( @_ );
+            my $ref = $st->fetchrow_hashref;
+            my $obj = My::Module->new( %$ref );
+        })->catch(sub
+        {
+            $log->warn( "Failed to execute query: ", @_ );
+        });
+        # Do other regular processing here
+        # Get the My::Module object
+        my( $obj ) = await( $p );
 
 VERSION
 =======
 
-        v0.9.15
+        v0.9.16
 
 DESCRIPTION
 ===========
@@ -145,6 +163,10 @@ something like:
         }
         $sth->exec(12) || die( $sth->error );
         my $ref = $sth->fetchrow_hashref;
+
+This will provide you with the convenience and power of
+[DB::Object](https://metacpan.org/pod/DB::Object){.perl-module} while
+keeping execution fast.
 
 CONSTRUCTOR
 ===========
@@ -840,6 +862,12 @@ from\_unixtime
 
 See [\"from\_unixtime\" in
 DB::Object::Tables](https://metacpan.org/pod/DB::Object::Tables#from_unixtime){.perl-module}
+
+get\_sql\_type
+--------------
+
+Provided with a sql type, irrespective of the character case, and this
+will return the driver equivalent constant value.
 
 group
 -----
@@ -1538,7 +1566,7 @@ SEE ALSO
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x555ba776ec88)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x5573a19393e8)"}\>
 
 COPYRIGHT & LICENSE
 ===================

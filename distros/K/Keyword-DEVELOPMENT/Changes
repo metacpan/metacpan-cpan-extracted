@@ -1,27 +1,31 @@
 Revision history for Keyword-DEVELOPMENT
 
+0.07    August 30, 2021
+        - Added -production switch
+        - Removed undocumented 'no Keyword::DEVELOPMENT' because it's apparently broken.
+
 0.06    February 16, 2021
-        Fix version in POD.
-        Fixed an error in the documentation. Thanks, Toby Inkster!
+        - Fix version in POD.
+        - Fixed an error in the documentation. Thanks, Toby Inkster!
 
 0.05    February 16, 2021
-        Added experimental support for only running DEVELOPMENT blocks in
-        packages matching a PERL_KEYWORD_DEVELOPMENT_MATCH regular expression.
+        - Added experimental support for only running DEVELOPMENT blocks in
+        - packages matching a PERL_KEYWORD_DEVELOPMENT_MATCH regular expression.
 
 0.04    December 4th, 2017
-		Switched from Keyword::Declare to Keyword::Simple to avoid postfix
-		dereferencing bug. 
-		See: https://rt.cpan.org/Public/Bug/Display.html?id=123817
+		- Switched from Keyword::Declare to Keyword::Simple to avoid postfix
+		  dereferencing bug.
+          See: https://rt.cpan.org/Public/Bug/Display.html?id=123817
 
 0.03    December 4th, 2017
-        Update docs to show how you can use constant-folding to replicate this
-        behavior, if desired.
+        - Update docs to show how you can use constant-folding to replicate this
+          behavior, if desired.
 
 0.02    December 3rd, 2017
-        Document a known limitation with Keyword::Declare's handling of postfix dereferencing.
-        https://rt.cpan.org/Public/Bug/Display.html?id=123817
+        - Document a known limitation with Keyword::Declare's handling of postfix dereferencing.
+          https://rt.cpan.org/Public/Bug/Display.html?id=123817
 
 0.01    December 3rd, 2017
-        Add DEVELOPMENT blocks that don't exist at compile-time in production
-        environments.
+        - Add DEVELOPMENT blocks that don't exist at compile-time in production
+          environments.
 

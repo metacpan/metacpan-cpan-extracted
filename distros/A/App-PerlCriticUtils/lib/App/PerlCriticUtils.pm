@@ -1,11 +1,13 @@
 package App::PerlCriticUtils;
 
-our $DATE = '2021-05-25'; # DATE
-our $VERSION = '0.003'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-08-28'; # DATE
+our $DIST = 'App-PerlCriticUtils'; # DIST
+our $VERSION = '0.005'; # VERSION
 
 our %SPEC;
 
@@ -56,13 +58,11 @@ $SPEC{pcplist} = {
             summary => 'List installed policies',
             argv => [],
             test => 0,
-            'x.doc.show_result' => 0,
         },
         {
             summary => 'List installed policies (show details)',
             argv => ['-l'],
             test => 0,
-            'x.doc.show_result' => 0,
         },
     ],
 };
@@ -78,14 +78,10 @@ sub pcplist {
     for my $mod (sort keys %$mods) {
         (my $name = $mod) =~ s/^Perl::Critic::Policy:://;
         if ($args{detail}) {
-            require Module::Path::More;
-            my $path = Module::Path::More::module_path(module => $mod);
-            open my $fh, "<", $path or die "Can't read $path: $!";
-            my $content = do { local $/; <$fh> };
-            $content =~ m{ =head1 \s+ Name \s* [\n] \s* $mod \s* [\-] \s* ([^\n]+) }imsx;
+            require Module::Abstract;
             push @rows, {
                 name => $name,
-                abstract => $1,
+                abstract => Module::Abstract::module_abstract($mod),
             };
         } else {
             push @rows, $name;
@@ -105,7 +101,6 @@ $SPEC{pcppath} = {
         {
             argv => ['Variables/ProhibitMatchVars'],
             test => 0,
-            'x.doc.show_result' => 0,
         },
     ],
 };
@@ -282,7 +277,7 @@ App::PerlCriticUtils - Command-line utilities related to Perl::Critic
 
 =head1 VERSION
 
-This document describes version 0.003 of App::PerlCriticUtils (from Perl distribution App-PerlCriticUtils), released on 2021-05-25.
+This document describes version 0.005 of App::PerlCriticUtils (from Perl distribution App-PerlCriticUtils), released on 2021-08-28.
 
 =head1 SYNOPSIS
 
@@ -322,7 +317,7 @@ Examples:
 
 =item * Example #1:
 
- pcpcat( policies => ["Variables/ProhibitMatchVars"]);
+ pcpcat(policies => ["Variables/ProhibitMatchVars"]);
 
 =back
 
@@ -339,12 +334,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element ($status_code) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-($reason) is a string containing error message, or "OK" if status is
-200. Third element ($payload) is optional, the actual result. Fourth
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
 element (%result_meta) is called result metadata and is optional, a hash
-that contains extra information.
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -364,7 +359,7 @@ Examples:
 
 =item * Example #1:
 
- pcpdoc( policy => "Variables/ProhibitMatchVars");
+ pcpdoc(policy => "Variables/ProhibitMatchVars");
 
 =back
 
@@ -381,12 +376,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element ($status_code) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-($reason) is a string containing error message, or "OK" if status is
-200. Third element ($payload) is optional, the actual result. Fourth
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
 element (%result_meta) is called result metadata and is optional, a hash
-that contains extra information.
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -406,7 +401,7 @@ Examples:
 
 =item * Example #1:
 
- pcpless( policy => "Variables/ProhibitMatchVars");
+ pcpless(policy => "Variables/ProhibitMatchVars");
 
 =back
 
@@ -423,12 +418,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element ($status_code) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-($reason) is a string containing error message, or "OK" if status is
-200. Third element ($payload) is optional, the actual result. Fourth
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
 element (%result_meta) is called result metadata and is optional, a hash
-that contains extra information.
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -450,9 +445,759 @@ Examples:
 
  pcplist();
 
+Result:
+
+ [
+   200,
+   "OK",
+   [
+     "BuiltinFunctions::GrepWithSimpleValue",
+     "BuiltinFunctions::ProhibitBooleanGrep",
+     "BuiltinFunctions::ProhibitComplexMappings",
+     "BuiltinFunctions::ProhibitLvalueSubstr",
+     "BuiltinFunctions::ProhibitReverseSortBlock",
+     "BuiltinFunctions::ProhibitShiftRef",
+     "BuiltinFunctions::ProhibitSleepViaSelect",
+     "BuiltinFunctions::ProhibitStringyEval",
+     "BuiltinFunctions::ProhibitStringySplit",
+     "BuiltinFunctions::ProhibitUniversalCan",
+     "BuiltinFunctions::ProhibitUniversalIsa",
+     "BuiltinFunctions::ProhibitUselessTopic",
+     "BuiltinFunctions::ProhibitVoidGrep",
+     "BuiltinFunctions::ProhibitVoidMap",
+     "BuiltinFunctions::RequireBlockGrep",
+     "BuiltinFunctions::RequireBlockMap",
+     "BuiltinFunctions::RequireGlobFunction",
+     "BuiltinFunctions::RequireSimpleSortBlock",
+     "ClassHierarchies::ProhibitAutoloading",
+     "ClassHierarchies::ProhibitExplicitISA",
+     "ClassHierarchies::ProhibitOneArgBless",
+     "CodeLayout::ProhibitHardTabs",
+     "CodeLayout::ProhibitParensWithBuiltins",
+     "CodeLayout::ProhibitQuotedWordLists",
+     "CodeLayout::ProhibitTrailingWhitespace",
+     "CodeLayout::RequireConsistentNewlines",
+     "CodeLayout::RequireTidyCode",
+     "CodeLayout::RequireTrailingCommas",
+     "ControlStructures::ProhibitCStyleForLoops",
+     "ControlStructures::ProhibitCascadingIfElse",
+     "ControlStructures::ProhibitDeepNests",
+     "ControlStructures::ProhibitLabelsWithSpecialBlockNames",
+     "ControlStructures::ProhibitMutatingListFunctions",
+     "ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions",
+     "ControlStructures::ProhibitPostfixControls",
+     "ControlStructures::ProhibitUnlessBlocks",
+     "ControlStructures::ProhibitUnreachableCode",
+     "ControlStructures::ProhibitUntilBlocks",
+     "ControlStructures::ProhibitYadaOperator",
+     "Documentation::PodSpelling",
+     "Documentation::RequirePackageMatchesPodName",
+     "Documentation::RequirePodAtEnd",
+     "Documentation::RequirePodSections",
+     "ErrorHandling::RequireCarping",
+     "ErrorHandling::RequireCheckingReturnValueOfEval",
+     "InputOutput::ProhibitBacktickOperators",
+     "InputOutput::ProhibitBarewordFileHandles",
+     "InputOutput::ProhibitExplicitStdin",
+     "InputOutput::ProhibitInteractiveTest",
+     "InputOutput::ProhibitJoinedReadline",
+     "InputOutput::ProhibitOneArgSelect",
+     "InputOutput::ProhibitReadlineInForLoop",
+     "InputOutput::ProhibitTwoArgOpen",
+     "InputOutput::RequireBracedFileHandleWithPrint",
+     "InputOutput::RequireBriefOpen",
+     "InputOutput::RequireCheckedClose",
+     "InputOutput::RequireCheckedOpen",
+     "InputOutput::RequireCheckedSyscalls",
+     "InputOutput::RequireEncodingWithUTF8Layer",
+     "Miscellanea::ProhibitFormats",
+     "Miscellanea::ProhibitTies",
+     "Miscellanea::ProhibitUnrestrictedNoCritic",
+     "Miscellanea::ProhibitUselessNoCritic",
+     "Modules::ProhibitAutomaticExportation",
+     "Modules::ProhibitConditionalUseStatements",
+     "Modules::ProhibitEvilModules",
+     "Modules::ProhibitExcessMainComplexity",
+     "Modules::ProhibitMultiplePackages",
+     "Modules::RequireBarewordIncludes",
+     "Modules::RequireEndWithOne",
+     "Modules::RequireExplicitPackage",
+     "Modules::RequireFilenameMatchesPackage",
+     "Modules::RequireNoMatchVarsWithUseEnglish",
+     "Modules::RequireVersionVar",
+     "NamingConventions::Capitalization",
+     "NamingConventions::ProhibitAmbiguousNames",
+     "Objects::ProhibitIndirectSyntax",
+     "References::ProhibitDoubleSigils",
+     "RegularExpressions::ProhibitCaptureWithoutTest",
+     "RegularExpressions::ProhibitComplexRegexes",
+     "RegularExpressions::ProhibitEnumeratedClasses",
+     "RegularExpressions::ProhibitEscapedMetacharacters",
+     "RegularExpressions::ProhibitFixedStringMatches",
+     "RegularExpressions::ProhibitSingleCharAlternation",
+     "RegularExpressions::ProhibitUnusedCapture",
+     "RegularExpressions::ProhibitUnusualDelimiters",
+     "RegularExpressions::ProhibitUselessTopic",
+     "RegularExpressions::RequireBracesForMultiline",
+     "RegularExpressions::RequireDotMatchAnything",
+     "RegularExpressions::RequireExtendedFormatting",
+     "RegularExpressions::RequireLineBoundaryMatching",
+     "Subroutines::ProhibitAmpersandSigils",
+     "Subroutines::ProhibitBuiltinHomonyms",
+     "Subroutines::ProhibitExcessComplexity",
+     "Subroutines::ProhibitExplicitReturnUndef",
+     "Subroutines::ProhibitManyArgs",
+     "Subroutines::ProhibitNestedSubs",
+     "Subroutines::ProhibitReturnSort",
+     "Subroutines::ProhibitSubroutinePrototypes",
+     "Subroutines::ProhibitUnusedPrivateSubroutines",
+     "Subroutines::ProtectPrivateSubs",
+     "Subroutines::RequireArgUnpacking",
+     "Subroutines::RequireFinalReturn",
+     "TestingAndDebugging::ProhibitNoStrict",
+     "TestingAndDebugging::ProhibitNoWarnings",
+     "TestingAndDebugging::ProhibitProlongedStrictureOverride",
+     "TestingAndDebugging::RequireTestLabels",
+     "TestingAndDebugging::RequireUseStrict",
+     "TestingAndDebugging::RequireUseWarnings",
+     "ValuesAndExpressions::ProhibitCommaSeparatedStatements",
+     "ValuesAndExpressions::ProhibitComplexVersion",
+     "ValuesAndExpressions::ProhibitConstantPragma",
+     "ValuesAndExpressions::ProhibitEmptyQuotes",
+     "ValuesAndExpressions::ProhibitEscapedCharacters",
+     "ValuesAndExpressions::ProhibitImplicitNewlines",
+     "ValuesAndExpressions::ProhibitInterpolationOfLiterals",
+     "ValuesAndExpressions::ProhibitLeadingZeros",
+     "ValuesAndExpressions::ProhibitLongChainsOfMethodCalls",
+     "ValuesAndExpressions::ProhibitMagicNumbers",
+     "ValuesAndExpressions::ProhibitMismatchedOperators",
+     "ValuesAndExpressions::ProhibitMixedBooleanOperators",
+     "ValuesAndExpressions::ProhibitNoisyQuotes",
+     "ValuesAndExpressions::ProhibitQuotesAsQuotelikeOperatorDelimiters",
+     "ValuesAndExpressions::ProhibitSpecialLiteralHeredocTerminator",
+     "ValuesAndExpressions::ProhibitVersionStrings",
+     "ValuesAndExpressions::RequireConstantVersion",
+     "ValuesAndExpressions::RequireInterpolationOfMetachars",
+     "ValuesAndExpressions::RequireNumberSeparators",
+     "ValuesAndExpressions::RequireQuotedHeredocTerminator",
+     "ValuesAndExpressions::RequireUpperCaseHeredocTerminator",
+     "Variables::ProhibitAugmentedAssignmentInDeclaration",
+     "Variables::ProhibitConditionalDeclarations",
+     "Variables::ProhibitEvilVariables",
+     "Variables::ProhibitFatCommaInDeclaration",
+     "Variables::ProhibitLocalVars",
+     "Variables::ProhibitMatchVars",
+     "Variables::ProhibitPackageVars",
+     "Variables::ProhibitPerl4PackageNames",
+     "Variables::ProhibitPunctuationVars",
+     "Variables::ProhibitReusedNames",
+     "Variables::ProhibitUnusedVariables",
+     "Variables::ProtectPrivateVars",
+     "Variables::RequireInitializationForLocalVars",
+     "Variables::RequireLexicalLoopIterators",
+     "Variables::RequireLocalizedPunctuationVars",
+     "Variables::RequireNegativeIndices",
+   ],
+   {},
+ ]
+
 =item * List installed policies (show details):
 
- pcplist( detail => 1);
+ pcplist(detail => 1);
+
+Result:
+
+ [
+   200,
+   "OK",
+   [
+     {
+       name => "BuiltinFunctions::GrepWithSimpleValue",
+       abstract => "Warn grep with simple value",
+     },
+     {
+       name => "BuiltinFunctions::ProhibitBooleanGrep",
+       abstract => "Use C<List::MoreUtils::any> instead of C<grep> in boolean context.",
+     },
+     {
+       name => "BuiltinFunctions::ProhibitComplexMappings",
+       abstract => "Map blocks should have a single statement.",
+     },
+     {
+       name => "BuiltinFunctions::ProhibitLvalueSubstr",
+       abstract => "Use 4-argument C<substr> instead of writing C<substr(\$foo, 2, 6) = \$bar>.",
+     },
+     {
+       name => "BuiltinFunctions::ProhibitReverseSortBlock",
+       abstract => "Forbid \$b before \$a in sort blocks.",
+     },
+     {
+       name => "BuiltinFunctions::ProhibitShiftRef",
+       abstract => "Prohibit C<\\shift> in code",
+     },
+     {
+       name => "BuiltinFunctions::ProhibitSleepViaSelect",
+       abstract => "Use L<Time::HiRes|Time::HiRes> instead of something like C<select(undef, undef, undef, .05)>.",
+     },
+     {
+       name => "BuiltinFunctions::ProhibitStringyEval",
+       abstract => "Write C<eval { my \$foo; bar(\$foo) }> instead of C<eval \"my \$foo; bar(\$foo);\">.",
+     },
+     {
+       name => "BuiltinFunctions::ProhibitStringySplit",
+       abstract => "Write C<split /-/, \$string> instead of C<split '-', \$string>.",
+     },
+     {
+       name => "BuiltinFunctions::ProhibitUniversalCan",
+       abstract => "Write C<< eval { \$foo->can(\$name) } >> instead of C<UNIVERSAL::can(\$foo, \$name)>.",
+     },
+     {
+       name => "BuiltinFunctions::ProhibitUniversalIsa",
+       abstract => "Write C<< eval { \$foo->isa(\$pkg) } >> instead of C<UNIVERSAL::isa(\$foo, \$pkg)>.",
+     },
+     {
+       name => "BuiltinFunctions::ProhibitUselessTopic",
+       abstract => "Don't pass \$_ to built-in functions that assume it, or to most filetest operators.",
+     },
+     {
+       name => "BuiltinFunctions::ProhibitVoidGrep",
+       abstract => "Don't use C<grep> in void contexts.",
+     },
+     {
+       name => "BuiltinFunctions::ProhibitVoidMap",
+       abstract => "Don't use C<map> in void contexts.",
+     },
+     {
+       name => "BuiltinFunctions::RequireBlockGrep",
+       abstract => "Write C<grep { /\$pattern/ } \@list> instead of C<grep /\$pattern/, \@list>.",
+     },
+     {
+       name => "BuiltinFunctions::RequireBlockMap",
+       abstract => "Write C<map { /\$pattern/ } \@list> instead of C<map /\$pattern/, \@list>.",
+     },
+     {
+       name => "BuiltinFunctions::RequireGlobFunction",
+       abstract => "Use C<glob q{*}> instead of <*>.",
+     },
+     {
+       name => "BuiltinFunctions::RequireSimpleSortBlock",
+       abstract => "Sort blocks should have a single statement.",
+     },
+     {
+       name => "ClassHierarchies::ProhibitAutoloading",
+       abstract => "AUTOLOAD methods should be avoided.",
+     },
+     {
+       name => "ClassHierarchies::ProhibitExplicitISA",
+       abstract => "Employ C<use base> instead of C<\@ISA>.",
+     },
+     {
+       name => "ClassHierarchies::ProhibitOneArgBless",
+       abstract => "Write C<bless {}, \$class;> instead of just C<bless {};>.",
+     },
+     {
+       name => "CodeLayout::ProhibitHardTabs",
+       abstract => "Use spaces instead of tabs.",
+     },
+     {
+       name => "CodeLayout::ProhibitParensWithBuiltins",
+       abstract => "Write C<open \$handle, \$path> instead of C<open(\$handle, \$path)>.",
+     },
+     {
+       name => "CodeLayout::ProhibitQuotedWordLists",
+       abstract => "Write C<qw(foo bar baz)> instead of C<('foo', 'bar', 'baz')>.",
+     },
+     {
+       name => "CodeLayout::ProhibitTrailingWhitespace",
+       abstract => "Don't use whitespace at the end of lines.",
+     },
+     {
+       name => "CodeLayout::RequireConsistentNewlines",
+       abstract => "Use the same newline through the source.",
+     },
+     {
+       name => "CodeLayout::RequireTidyCode",
+       abstract => "Must run code through L<perltidy|perltidy>.",
+     },
+     {
+       name => "CodeLayout::RequireTrailingCommas",
+       abstract => "Put a comma at the end of every multi-line list declaration, including the last one.",
+     },
+     {
+       name => "ControlStructures::ProhibitCStyleForLoops",
+       abstract => "Write C<for(0..20)> instead of C<for(\$i=0; \$i<=20; \$i++)>.",
+     },
+     {
+       name => "ControlStructures::ProhibitCascadingIfElse",
+       abstract => "Don't write long \"if-elsif-elsif-elsif-elsif...else\" chains.",
+     },
+     {
+       name => "ControlStructures::ProhibitDeepNests",
+       abstract => "Don't write deeply nested loops and conditionals.",
+     },
+     {
+       name => "ControlStructures::ProhibitLabelsWithSpecialBlockNames",
+       abstract => "Don't use labels that are the same as the special block names.",
+     },
+     {
+       name => "ControlStructures::ProhibitMutatingListFunctions",
+       abstract => "Don't modify C<\$_> in list functions.",
+     },
+     {
+       name => "ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions",
+       abstract => "Don't use operators like C<not>, C<!~>, and C<le> within C<until> and C<unless>.",
+     },
+     {
+       name => "ControlStructures::ProhibitPostfixControls",
+       abstract => "Write C<if(\$condition){ do_something() }> instead of C<do_something() if \$condition>.",
+     },
+     {
+       name => "ControlStructures::ProhibitUnlessBlocks",
+       abstract => "Write C<if(! \$condition)> instead of C<unless(\$condition)>.",
+     },
+     {
+       name => "ControlStructures::ProhibitUnreachableCode",
+       abstract => "Don't write code after an unconditional C<die, exit, or next>.",
+     },
+     {
+       name => "ControlStructures::ProhibitUntilBlocks",
+       abstract => "Write C<while(! \$condition)> instead of C<until(\$condition)>.",
+     },
+     {
+       name => "ControlStructures::ProhibitYadaOperator",
+       abstract => "Never use C<...> in production code.",
+     },
+     {
+       name => "Documentation::PodSpelling",
+       abstract => "Check your spelling.",
+     },
+     {
+       name => "Documentation::RequirePackageMatchesPodName",
+       abstract => "The C<=head1 NAME> section should match the package.",
+     },
+     {
+       name => "Documentation::RequirePodAtEnd",
+       abstract => "All POD should be after C<__END__>.",
+     },
+     {
+       name => "Documentation::RequirePodSections",
+       abstract => "Organize your POD into the customary sections.",
+     },
+     {
+       name => "ErrorHandling::RequireCarping",
+       abstract => "Use functions from L<Carp|Carp> instead of C<warn> or C<die>.",
+     },
+     {
+       name => "ErrorHandling::RequireCheckingReturnValueOfEval",
+       abstract => "You can't depend upon the value of C<\$\@>/C<\$EVAL_ERROR> to tell whether an C<eval> failed.",
+     },
+     {
+       name => "InputOutput::ProhibitBacktickOperators",
+       abstract => "Discourage stuff like C<\@files = `ls \$directory`>.",
+     },
+     {
+       name => "InputOutput::ProhibitBarewordFileHandles",
+       abstract => "Write C<open my \$fh, q{<}, \$filename;> instead of C<open FH, q{<}, \$filename;>.",
+     },
+     {
+       name => "InputOutput::ProhibitExplicitStdin",
+       abstract => "Use \"<>\" or \"<ARGV>\" or a prompting module instead of \"<STDIN>\".",
+     },
+     {
+       name => "InputOutput::ProhibitInteractiveTest",
+       abstract => "Use prompt() instead of -t.",
+     },
+     {
+       name => "InputOutput::ProhibitJoinedReadline",
+       abstract => "Use C<local \$/ = undef> or L<Path::Tiny|Path::Tiny> instead of joined readline.",
+     },
+     {
+       name => "InputOutput::ProhibitOneArgSelect",
+       abstract => "Never write C<select(\$fh)>.",
+     },
+     {
+       name => "InputOutput::ProhibitReadlineInForLoop",
+       abstract => "Write C<< while( \$line = <> ){...} >> instead of C<< for(<>){...} >>.",
+     },
+     {
+       name => "InputOutput::ProhibitTwoArgOpen",
+       abstract => "Write C<< open \$fh, q{<}, \$filename; >> instead of C<< open \$fh, \"<\$filename\"; >>.",
+     },
+     {
+       name => "InputOutput::RequireBracedFileHandleWithPrint",
+       abstract => "Write C<print {\$FH} \$foo, \$bar;> instead of C<print \$FH \$foo, \$bar;>.",
+     },
+     {
+       name => "InputOutput::RequireBriefOpen",
+       abstract => "Close filehandles as soon as possible after opening them.",
+     },
+     {
+       name => "InputOutput::RequireCheckedClose",
+       abstract => "Write C<< my \$error = close \$fh; >> instead of C<< close \$fh; >>.",
+     },
+     {
+       name => "InputOutput::RequireCheckedOpen",
+       abstract => "Write C<< my \$error = open \$fh, \$mode, \$filename; >> instead of C<< open \$fh, \$mode, \$filename; >>.",
+     },
+     {
+       name => "InputOutput::RequireCheckedSyscalls",
+       abstract => "Return value of flagged function ignored.",
+     },
+     {
+       name => "InputOutput::RequireEncodingWithUTF8Layer",
+       abstract => "Write C<< open \$fh, q{<:encoding(UTF-8)}, \$filename; >> instead of C<< open \$fh, q{<:utf8}, \$filename; >>.",
+     },
+     {
+       name => "Miscellanea::ProhibitFormats",
+       abstract => "Do not use C<format>.",
+     },
+     {
+       name => "Miscellanea::ProhibitTies",
+       abstract => "Do not use C<tie>.",
+     },
+     {
+       name => "Miscellanea::ProhibitUnrestrictedNoCritic",
+       abstract => "Forbid a bare C<## no critic>",
+     },
+     {
+       name => "Miscellanea::ProhibitUselessNoCritic",
+       abstract => "Remove ineffective \"## no critic\" annotations.",
+     },
+     {
+       name => "Modules::ProhibitAutomaticExportation",
+       abstract => "Export symbols via C<\@EXPORT_OK> or C<%EXPORT_TAGS> instead of C<\@EXPORT>.",
+     },
+     {
+       name => "Modules::ProhibitConditionalUseStatements",
+       abstract => "Avoid putting conditional logic around compile-time includes.",
+     },
+     {
+       name => "Modules::ProhibitEvilModules",
+       abstract => "Ban modules that aren't blessed by your shop.",
+     },
+     {
+       name => "Modules::ProhibitExcessMainComplexity",
+       abstract => "Minimize complexity in code that is B<outside> of subroutines.",
+     },
+     {
+       name => "Modules::ProhibitMultiplePackages",
+       abstract => "Put packages (especially subclasses) in separate files.",
+     },
+     {
+       name => "Modules::RequireBarewordIncludes",
+       abstract => "Write C<require Module> instead of C<require 'Module.pm'>.",
+     },
+     {
+       name => "Modules::RequireEndWithOne",
+       abstract => "End each module with an explicitly C<1;> instead of some funky expression.",
+     },
+     {
+       name => "Modules::RequireExplicitPackage",
+       abstract => "Always make the C<package> explicit.",
+     },
+     {
+       name => "Modules::RequireFilenameMatchesPackage",
+       abstract => "Package declaration must match filename.",
+     },
+     {
+       name => "Modules::RequireNoMatchVarsWithUseEnglish",
+       abstract => "C<use English> must be passed a C<-no_match_vars> argument.",
+     },
+     {
+       name => "Modules::RequireVersionVar",
+       abstract => "Give every module a C<\$VERSION> number.",
+     },
+     {
+       name => "NamingConventions::Capitalization",
+       abstract => "Distinguish different program components by case.",
+     },
+     {
+       name => "NamingConventions::ProhibitAmbiguousNames",
+       abstract => "Don't use vague variable or subroutine names like 'last' or 'record'.",
+     },
+     {
+       name => "Objects::ProhibitIndirectSyntax",
+       abstract => "Prohibit indirect object call syntax.",
+     },
+     {
+       name => "References::ProhibitDoubleSigils",
+       abstract => "Write C<\@{ \$array_ref }> instead of C<\@\$array_ref>.",
+     },
+     {
+       name => "RegularExpressions::ProhibitCaptureWithoutTest",
+       abstract => "Capture variable used outside conditional.",
+     },
+     {
+       name => "RegularExpressions::ProhibitComplexRegexes",
+       abstract => "Split long regexps into smaller C<qr//> chunks.",
+     },
+     {
+       name => "RegularExpressions::ProhibitEnumeratedClasses",
+       abstract => "Use named character classes instead of explicit character lists.",
+     },
+     {
+       name => "RegularExpressions::ProhibitEscapedMetacharacters",
+       abstract => "Use character classes for literal meta-characters instead of escapes.",
+     },
+     {
+       name => "RegularExpressions::ProhibitFixedStringMatches",
+       abstract => "Use C<eq> or hash instead of fixed-pattern regexps.",
+     },
+     {
+       name => "RegularExpressions::ProhibitSingleCharAlternation",
+       abstract => "Use C<[abc]> instead of C<a|b|c>.",
+     },
+     {
+       name => "RegularExpressions::ProhibitUnusedCapture",
+       abstract => "Only use a capturing group if you plan to use the captured value.",
+     },
+     {
+       name => "RegularExpressions::ProhibitUnusualDelimiters",
+       abstract => "Use only C<//> or C<{}> to delimit regexps.",
+     },
+     {
+       name => "RegularExpressions::ProhibitUselessTopic",
+       abstract => "Don't use \$_ to match against regexes.",
+     },
+     {
+       name => "RegularExpressions::RequireBracesForMultiline",
+       abstract => "Use C<{> and C<}> to delimit multi-line regexps.",
+     },
+     {
+       name => "RegularExpressions::RequireDotMatchAnything",
+       abstract => "Always use the C</s> modifier with regular expressions.",
+     },
+     {
+       name => "RegularExpressions::RequireExtendedFormatting",
+       abstract => "Always use the C</x> modifier with regular expressions.",
+     },
+     {
+       name => "RegularExpressions::RequireLineBoundaryMatching",
+       abstract => "Always use the C</m> modifier with regular expressions.",
+     },
+     {
+       name => "Subroutines::ProhibitAmpersandSigils",
+       abstract => "Don't call functions with a leading ampersand sigil.",
+     },
+     {
+       name => "Subroutines::ProhibitBuiltinHomonyms",
+       abstract => "Don't declare your own C<open> function.",
+     },
+     {
+       name => "Subroutines::ProhibitExcessComplexity",
+       abstract => "Minimize complexity by factoring code into smaller subroutines.",
+     },
+     {
+       name => "Subroutines::ProhibitExplicitReturnUndef",
+       abstract => "Return failure with bare C<return> instead of C<return undef>.",
+     },
+     {
+       name => "Subroutines::ProhibitManyArgs",
+       abstract => "Too many arguments.",
+     },
+     {
+       name => "Subroutines::ProhibitNestedSubs",
+       abstract => "C<sub never { sub correct {} }>.",
+     },
+     {
+       name => "Subroutines::ProhibitReturnSort",
+       abstract => "Behavior of C<sort> is not defined if called in scalar context.",
+     },
+     {
+       name => "Subroutines::ProhibitSubroutinePrototypes",
+       abstract => "Don't write C<sub my_function (\@\@) {}>.",
+     },
+     {
+       name => "Subroutines::ProhibitUnusedPrivateSubroutines",
+       abstract => "Prevent unused private subroutines.",
+     },
+     {
+       name => "Subroutines::ProtectPrivateSubs",
+       abstract => "Prevent access to private subs in other packages.",
+     },
+     {
+       name => "Subroutines::RequireArgUnpacking",
+       abstract => "Always unpack C<\@_> first.",
+     },
+     {
+       name => "Subroutines::RequireFinalReturn",
+       abstract => "End every path through a subroutine with an explicit C<return> statement.",
+     },
+     {
+       name => "TestingAndDebugging::ProhibitNoStrict",
+       abstract => "Prohibit various flavors of C<no strict>.",
+     },
+     {
+       name => "TestingAndDebugging::ProhibitNoWarnings",
+       abstract => "Prohibit various flavors of C<no warnings>.",
+     },
+     {
+       name => "TestingAndDebugging::ProhibitProlongedStrictureOverride",
+       abstract => "Don't turn off strict for large blocks of code.",
+     },
+     {
+       name => "TestingAndDebugging::RequireTestLabels",
+       abstract => "Tests should all have labels.",
+     },
+     {
+       name => "TestingAndDebugging::RequireUseStrict",
+       abstract => "Always C<use strict>.",
+     },
+     {
+       name => "TestingAndDebugging::RequireUseWarnings",
+       abstract => "Always C<use warnings>.",
+     },
+     {
+       name => "ValuesAndExpressions::ProhibitCommaSeparatedStatements",
+       abstract => "Don't use the comma operator as a statement separator.",
+     },
+     {
+       name => "ValuesAndExpressions::ProhibitComplexVersion",
+       abstract => "Prohibit version values from outside the module.",
+     },
+     {
+       name => "ValuesAndExpressions::ProhibitConstantPragma",
+       abstract => "Don't C<< use constant FOO => 15 >>.",
+     },
+     {
+       name => "ValuesAndExpressions::ProhibitEmptyQuotes",
+       abstract => "Write C<q{}> instead of C<''>.",
+     },
+     {
+       name => "ValuesAndExpressions::ProhibitEscapedCharacters",
+       abstract => "Write C<\"\\N{DELETE}\"> instead of C<\"\\x7F\">, etc.",
+     },
+     {
+       name => "ValuesAndExpressions::ProhibitImplicitNewlines",
+       abstract => "Use concatenation or HEREDOCs instead of literal line breaks in strings.",
+     },
+     {
+       name => "ValuesAndExpressions::ProhibitInterpolationOfLiterals",
+       abstract => "Always use single quotes for literal strings.",
+     },
+     {
+       name => "ValuesAndExpressions::ProhibitLeadingZeros",
+       abstract => "Write C<oct(755)> instead of C<0755>.",
+     },
+     {
+       name => "ValuesAndExpressions::ProhibitLongChainsOfMethodCalls",
+       abstract => "Long chains of method calls indicate tightly coupled code.",
+     },
+     {
+       name => "ValuesAndExpressions::ProhibitMagicNumbers",
+       abstract => "Don't use values that don't explain themselves.",
+     },
+     {
+       name => "ValuesAndExpressions::ProhibitMismatchedOperators",
+       abstract => "Don't mix numeric operators with string operands, or vice-versa.",
+     },
+     {
+       name => "ValuesAndExpressions::ProhibitMixedBooleanOperators",
+       abstract => "Write C< !\$foo && \$bar || \$baz > instead of C< not \$foo && \$bar or \$baz>.",
+     },
+     {
+       name => "ValuesAndExpressions::ProhibitNoisyQuotes",
+       abstract => "Use C<q{}> or C<qq{}> instead of quotes for awkward-looking strings.",
+     },
+     {
+       name => "ValuesAndExpressions::ProhibitQuotesAsQuotelikeOperatorDelimiters",
+       abstract => "Don't use quotes (C<'>, C<\">, C<`>) as delimiters for the quote-like operators.",
+     },
+     {
+       name => "ValuesAndExpressions::ProhibitSpecialLiteralHeredocTerminator",
+       abstract => "Don't write C< print <<'__END__' >.",
+     },
+     {
+       name => "ValuesAndExpressions::ProhibitVersionStrings",
+       abstract => "Don't use strings like C<v1.4> or C<1.4.5> when including other modules.",
+     },
+     {
+       name => "ValuesAndExpressions::RequireConstantVersion",
+       abstract => "Require \$VERSION to be a constant rather than a computed value.",
+     },
+     {
+       name => "ValuesAndExpressions::RequireInterpolationOfMetachars",
+       abstract => "Warns that you might have used single quotes when you really wanted double-quotes.",
+     },
+     {
+       name => "ValuesAndExpressions::RequireNumberSeparators",
+       abstract => "Write C< 141_234_397.0145 > instead of C< 141234397.0145 >.",
+     },
+     {
+       name => "ValuesAndExpressions::RequireQuotedHeredocTerminator",
+       abstract => "Write C< print <<'THE_END' > or C< print <<\"THE_END\" >.",
+     },
+     {
+       name => "ValuesAndExpressions::RequireUpperCaseHeredocTerminator",
+       abstract => "Write C< <<'THE_END'; > instead of C< <<'theEnd'; >.",
+     },
+     {
+       name => "Variables::ProhibitAugmentedAssignmentInDeclaration",
+       abstract => "Do not write C< my \$foo .= 'bar'; >.",
+     },
+     {
+       name => "Variables::ProhibitConditionalDeclarations",
+       abstract => "Do not write C< my \$foo = \$bar if \$baz; >.",
+     },
+     {
+       name => "Variables::ProhibitEvilVariables",
+       abstract => "Ban variables that aren't blessed by your shop.",
+     },
+     {
+       name => "Variables::ProhibitFatCommaInDeclaration",
+       abstract => "Prohibit fat comma in declaration",
+     },
+     {
+       name => "Variables::ProhibitLocalVars",
+       abstract => "Use C<my> instead of C<local>, except when you have to.",
+     },
+     {
+       name => "Variables::ProhibitMatchVars",
+       abstract => "Avoid C<\$`>, C<\$&>, C<\$'> and their English equivalents.",
+     },
+     {
+       name => "Variables::ProhibitPackageVars",
+       abstract => "Eliminate globals declared with C<our> or C<use vars>.",
+     },
+     {
+       name => "Variables::ProhibitPerl4PackageNames",
+       abstract => "Use double colon (::) to separate package name components instead of single quotes (').",
+     },
+     {
+       name => "Variables::ProhibitPunctuationVars",
+       abstract => "Write C<\$EVAL_ERROR> instead of C<\$\@>.",
+     },
+     {
+       name => "Variables::ProhibitReusedNames",
+       abstract => "Do not reuse a variable name in a lexical scope",
+     },
+     {
+       name => "Variables::ProhibitUnusedVariables",
+       abstract => "Don't ask for storage you don't need.",
+     },
+     {
+       name => "Variables::ProtectPrivateVars",
+       abstract => "Prevent access to private vars in other packages.",
+     },
+     {
+       name => "Variables::RequireInitializationForLocalVars",
+       abstract => "Write C<local \$foo = \$bar;> instead of just C<local \$foo;>.",
+     },
+     {
+       name => "Variables::RequireLexicalLoopIterators",
+       abstract => "Write C<for my \$element (\@list) {...}> instead of C<for \$element (\@list) {...}>.",
+     },
+     {
+       name => "Variables::RequireLocalizedPunctuationVars",
+       abstract => "Magic variables should be assigned as \"local\".",
+     },
+     {
+       name => "Variables::RequireNegativeIndices",
+       abstract => "Negative array index should be used.",
+     },
+   ],
+   { "table.fields" => ["name", "abstract"] },
+ ]
 
 =back
 
@@ -469,12 +1214,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element ($status_code) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-($reason) is a string containing error message, or "OK" if status is
-200. Third element ($payload) is optional, the actual result. Fourth
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
 element (%result_meta) is called result metadata and is optional, a hash
-that contains extra information.
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -494,7 +1239,7 @@ Examples:
 
 =item * Example #1:
 
- pcpman( policy => "Variables/ProhibitMatchVars");
+ pcpman(policy => "Variables/ProhibitMatchVars");
 
 =back
 
@@ -511,12 +1256,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element ($status_code) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-($reason) is a string containing error message, or "OK" if status is
-200. Third element ($payload) is optional, the actual result. Fourth
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
 element (%result_meta) is called result metadata and is optional, a hash
-that contains extra information.
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -536,7 +1281,18 @@ Examples:
 
 =item * Example #1:
 
- pcppath( policies => ["Variables/ProhibitMatchVars"]);
+ pcppath(policies => ["Variables/ProhibitMatchVars"]);
+
+Result:
+
+ [
+   200,
+   "OK",
+   [
+     "/home/u1/perl5/perlbrew/perls/perl-5.34.0/lib/site_perl/5.34.0/Perl/Critic/Policy/Variables/ProhibitMatchVars.pm",
+   ],
+   {},
+ ]
 
 =back
 
@@ -553,12 +1309,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element ($status_code) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-($reason) is a string containing error message, or "OK" if status is
-200. Third element ($payload) is optional, the actual result. Fourth
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
 element (%result_meta) is called result metadata and is optional, a hash
-that contains extra information.
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -570,6 +1326,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-PerlCr
 
 Source repository is at L<https://github.com/perlancar/perl-App-PerlCriticUtils>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2018, 2017 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-PerlCriticUtils>
@@ -577,16 +1361,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2018, 2017 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

@@ -1,9 +1,5 @@
+## no critic: Subroutines::ProhibitSubroutinePrototypes
 package HTTP::Headers::Patch::DontUseStorable;
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-03-08'; # DATE
-our $DIST = 'HTTP-Headers-Patch-DontUseStorable'; # DIST
-our $VERSION = '0.061'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,6 +7,11 @@ no warnings;
 
 use Module::Patch ();
 use base qw(Module::Patch);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-08-26'; # DATE
+our $DIST = 'HTTP-Headers-Patch-DontUseStorable'; # DIST
+our $VERSION = '0.062'; # VERSION
 
 our %config;
 
@@ -27,7 +28,7 @@ sub patch_data {
         patches => [
             {
                 action => 'replace',
-                mod_version => qr/^6\.[012].+/,
+                mod_version => qr/^6\./,
                 sub_name => 'clone',
                 code => \&_clone,
             },
@@ -50,7 +51,7 @@ HTTP::Headers::Patch::DontUseStorable - (DEPRECATED) Do not use Storable
 
 =head1 VERSION
 
-This document describes version 0.061 of HTTP::Headers::Patch::DontUseStorable (from Perl distribution HTTP-Headers-Patch-DontUseStorable), released on 2021-03-08.
+This document describes version 0.062 of HTTP::Headers::Patch::DontUseStorable (from Perl distribution HTTP-Headers-Patch-DontUseStorable), released on 2021-08-26.
 
 =head1 SYNOPSIS
 
@@ -96,6 +97,42 @@ Please visit the project's homepage at L<https://metacpan.org/release/HTTP-Heade
 
 Source repository is at L<https://github.com/perlancar/perl-HTTP-Headers-Patch-DontUseStorable>.
 
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto (on PC)
+
+Steven Haryanto (on PC) <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2020, 2017, 2015, 2012 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Headers-Patch-DontUseStorable>
@@ -103,18 +140,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 SEE ALSO
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020, 2017, 2015, 2012 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

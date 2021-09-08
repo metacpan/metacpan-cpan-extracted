@@ -27,7 +27,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-lcpan-CmdBundle-deps
   homepage: https://metacpan.org/release/App-lcpan-CmdBundle-deps
   repository: git://github.com/perlancar/perl-App-lcpan-CmdBundle-deps.git
-version: '0.010'
+version: '0.011'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

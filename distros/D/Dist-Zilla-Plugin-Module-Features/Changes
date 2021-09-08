@@ -1,3 +1,14 @@
+0.004   2021-08-27  Released-By: PERLANCAR; Urgency: high
+
+	- Derp, typo 'Module::Feature'.
+
+
+0.003   2021-08-27  Released-By: PERLANCAR; Urgency: medium
+
+	- Add dependency (phase=develop, rel=x_features_from) to
+	  Module::Features::* for feature declarer distributions.
+
+
 0.002   2021-02-26  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Wrong subroutine name in generated test file.

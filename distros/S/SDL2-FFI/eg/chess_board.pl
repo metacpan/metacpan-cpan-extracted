@@ -6,6 +6,7 @@ use SDL2::FFI qw[:all];
 # Taken from example found here: https://wiki.libsdl.org/SDL_CreateSoftwareRenderer
 # Globals
 my ( $window, $renderer, $done );
+my $id = SDL_AddTimer( 10000, sub {...} );
 
 sub DrawChessBoard {
     my ($renderer) = @_;

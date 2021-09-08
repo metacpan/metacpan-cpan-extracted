@@ -13,7 +13,7 @@ Neo4j::Driver::Net - Explains the design of the networking modules
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 OVERVIEW
 
@@ -55,7 +55,7 @@ See L</"USE OF INTERNAL APIS"> for more information on this topic.
  @results = $helper->_run($tx, @statements);
  
  # Parsing a JSON result
- die unless $helper->{http_agent}->http_headers->{success};
+ die unless $helper->{http_agent}->http_header->{success};
  $json_coder = $helper->{http_agent}->json_coder;
  $json_coder->decode( $helper->{http_agent}->fetch_all );
 
@@ -376,10 +376,6 @@ of L<JSON::MaybeXS>.
 Initialises the object. May or may not establish a network
 connection. May access C<$driver> config options using the
 method L<Neo4j::Driver/"config"> only.
-
-As of S<version 0.21>, not all aspects of the configuration of
-L<Neo4j::Driver> instances can be queried using C<config()>.
-This issue will be addressed soon.
 
 =item request
 

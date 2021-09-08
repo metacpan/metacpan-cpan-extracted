@@ -6,10 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 1 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'DNS/NIOS.pm'
+    'DNS/NIOS.pm',
+    'DNS/NIOS/Response.pm',
+    'DNS/NIOS/Traits/ApiMethods.pm',
+    'DNS/NIOS/Traits/AutoPager.pm'
 );
 
 

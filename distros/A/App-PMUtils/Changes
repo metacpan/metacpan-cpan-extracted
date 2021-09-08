@@ -1,3 +1,15 @@
+0.736   2021-08-27  Released-By: PERLANCAR; Urgency: medium
+
+	- Add utility: pmabstract.
+
+
+0.735   2021-07-27  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention App::PerlReleaseUtils.
+
+
 0.734   2020-06-12  Released-By: PERLANCAR; Urgency: medium
 
 	- pmgrep: Allow wildcards in module names by using Sah schema

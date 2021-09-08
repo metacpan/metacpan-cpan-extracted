@@ -1,142 +1,477 @@
-Net-xFTP
+NAME
+    Net::xFTP - Common wrapper functions for use with either Net::FTP,
+    Net::SFTP, Net::FSP, Net::FTPSSL, Net::OpenSSH, Net:SSH2, and
+    Net::SFTP::Foreign.
 
-Net::xFTP is a wrapper class to combine common functions of Net::FTP, 
-Net::SSH2, and Net::SFTP, and now Net::FTPSSL, Net::FSP, Net::SFTP::Foreign, 
-and Net::OpenSSH all into a single set of functions allowing one to 
-switch seemlessly between the two without having to make non-trivial 
-code changes.  Only functionality common to all protocols has been 
-implemented here with the intent and invitation to add more functions 
-and features and maybe other *FTP-ish modules in the future.  The module has 
-also been re-implemented into a modular fashion allowing for the easy 
-addition of other protocols in the future.  The methods have been tested 
-and seem to work properly for normal cases.  Two Perl/Tk GUI applications 
-currently exist as wrappers around Net::xFTP:  ptkftp (file-transfer gui) 
-and jfm3 (graphical file-manager).
+AUTHOR
+    Jim Turner, "<mailto:turnerjw784@yahoo.com>"
 
-PURPOSE
+COPYRIGHT
+    Copyright (c) 2005-2021 Jim Turner <mailto:turnerjw784@yahoo.com>. All
+    rights reserved.
 
-I created this module when I had developed several web application 
-programs which FTP'd data to and from a central server via Net::FTP.  
-The client changed to a new remote server that required Net::SFTP.  Faced 
-with rewriting these programs without changing functionality (since for 
-some reason Net::FTP and Net::SFTP use slightly different methods and 
-conventions).  I decided instead to simply create a common module that 
-would use the same method calls to do the same things and allow me to 
-specify the protocol in a single place.  I also am the author of I<ptkftp>, 
-a Perl/Tk graphical user-interface to Net::FTP and Net::SFTP.  I now 
-intend to rewrite it to use Net::xFTP and greatly reduce and simplify 
-the code for that application.
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
 
-Hopelfully others will find this module useful.  Patches adding needed 
-functionality are welcome.  See the manpage for more detailed and up-
-to-date information.  
+    This is a derived work from Net::FTP and Net::SFTP. Net::FTP is
+    copyrighted by Graham Barr and Net::SFTP is copyrighted by Benjamin
+    Trott and maintained by Dave Rolsky. Both are copyrighted under the same
+    terms as this module.
+
+    Many thanks go to these gentlemen whose work made this module possible.
 
 SYNOPSIS
+            use Net::xFTP;
 
-	use Net::xFTP;
+            #Test for needed protocol module.
+            die "..This server connection needs Net::SFTP!" 
+                    unless (Net::xFTP->haveModule('Net::SFTP'));
 
-	#Test for needed protocol module.
-	die "..This server connection needs Net::SFTP!" 
-		unless (Net::xFTP->haveModule('Net::SFTP'));
+            #Example 1:  Establish a new SFTP connection to a remote host.
+            $ftp = Net::xFTP->new('SFTP', "some.host.name", Debug => 0,
+                            user => 'userid', password => 'opensesme')
+                    or die "Cannot connect to some.host.name: $@";
 
-	#Example 1:  Establish a new SFTP connection to a remote host.
-	$ftp = Net::xFTP->new('SFTP', "some.host.name", Debug => 0,
-			user => 'userid', password => 'opensesme')
-		or die "Cannot connect to some.host.name: $@";
+            #Example 2:  Establish a "local" (simulated connection) to self.
+            $ftp = Net::xFTP->new();  # -OR-
+            $ftp = Net::xFTP->new('LOCAL');
 
-	#Example 2:  Establish a "local" (simulated connection) to self.
-	$ftp = Net::xFTP->new();  # -OR-
-	$ftp = Net::xFTP->new('Local');
+            #Change the current working directory on the remote host.
+            $ftp->cwd('/tmp')  or die 
+                    "Cannot change working directory ", $ftp->message();
 
-	#Change the current working directory on the remote host.
-	$ftp->cwd('/pub')  or die 
-		"Cannot change working directory ", $ftp->message();
+            #Get the current working directory on the remote host.
+            my $current_remote_path = $ftp->pwd();
 
-	#Get the current working directory on the remote host.
-	my $current_remote_path = $ftp->pwd();
+            #Get a list of files and subdirectories in "/tmp".
+            my @filesAndSubfolders = $ftp->ls('/tmp');
 
-	#Get a list of files and subdirectories in "/pub".
-	my @filesAndSubfolders = $ftp->ls('/pub');
+            #Get a detailed (ls -l) list of files and subdirectories.
+            my @ls_l_details = $ftp->dir('/tmp');
 
-	#Get a detailed (ls -l) list of files and subdirectories.
-	my @ls_l_details = $ftp->dir('/pub');
+            #Create a new subdirectory.
+            $ftp->mkdir('myownfolder')
+                    or die "Cannot make subdirectory ", $ftp->message();
 
-	#Create a new subdirectory.
-	$ftp->mkdir('myownfolder')
-		or die "Cannot make subdirectory ", $ftp->message();
+            #Remove an empty subdirectory.
+            $ftp->rmdir('myownfolder')
+                    or die "Cannot remove subdirectory ", $ftp->message();
 
-	#Remove an empty subdirectory.
-	$ftp->rmdir('myownfolder')
-		or die "Cannot remove subdirectory ", $ftp->message();
+            #Get the contents of a file on the remote server.
+            $ftp->get('remote_filename', 'local_filename')
+                    or die "get failed ", $ftp->message();
 
-	#Get the contents of a file on the remote server.
-	$ftp->get('remote.file', 'local.file')
-		or die "get failed ", $ftp->message();
+            #Get the contents of a remote file and write to an open filehandle.
+            open FHANDLE, ">local.file" or die "Could not open local file ($!)";
+            print FHANDLE "A Header Line!\n";
+            flush FHANDLE;
+            $ftp->get('remote_filename', *FHANDLE)
+                    or die "get failed ", $ftp->message();
+            print FHANDLE "A Footer Line!\n";
+            close FHANDLE;
 
-	#Get the contents of a remote file and write to an open filehandle.
-	open FHANDLE, ">local.file" or die "Could not open local file ($!)";
-	print FHANDLE "A Header Line!\n";
-	flush FHANDLE;
-	$ftp->get('remote.file', *FHANDLE)
-		or die "get failed ", $ftp->message();
-	print FHANDLE "A Footer Line!\n";
-	close FHANDLE;
+            #Put a local file onto the remote server.
+            $ftp->put('local_filename', 'remote_filename')
+                    or die "put failed ", $ftp->message();
 
-	#Put a local file onto the remote server.
-	$ftp->put('local.file', 'remote.file')
-		or die "put failed ", $ftp->message();
+            #Read from a file handle putting the content in a remote file.
+            open FHANDLE "<local.file" or die "Could not open local file ($!)";
+            $ftp->put(*FHANDLE, 'remote_filename')
+                    or die "put failed ", $ftp->message();
+            close FHANDLE;
 
-	#Read from a file handle putting the content in a remote file.
-	open FHANDLE "<local.file" or die "Could not open local file ($!)";
-	$ftp->put(*FHANDLE, 'remote.file')
-		or die "put failed ", $ftp->message();
-	close FHANDLE;
+            #Delete a remote file.
+            $ftp->delete('remote_filename')
+                    or die "Cannot delete file ", $ftp->message();
 
-	#Delete a remote file.
-	$ftp->delete('some.file')
-		or die "Cannot delete file ", $ftp->message();
+            #Rename a remote file.
+            $ftp->rename('oldfilename', 'newfilename')
+                    or die "Cannot delete file ", $ftp->message();
 
-	#Rename a remote file.
-	$ftp->rename('oldfilename', 'newfilename')
-		or die "Cannot delete file ", $ftp->message();
+            #Change permissions of a remote file.
+            $ftp->chmod(755, 'some_file_or_dir')
+                    or die "Cannot change permissions ", $ftp->message();
 
-	#Change permissions of a remote file.
-	$ftp->chmod(755, 'some.file.or.dir')
-		or die "Cannot change permissions ", $ftp->message();
+            #Fetch the size of a remote file.
+            print "remote file has ".$ftp->size('remote_filename')." bytes.\n";
 
-	#Fetch the size of a remote file.
-	print "remote.file has ".$ftp->size('remote.file')." bytes.\n";
+            #Fetch the modification time of a remote file.
+            print "remote file has ".$ftp->mdtm('remote_filename')." (Perl) time last mod.\n";
 
-	#Fetch the modification time of a remote file.
-	print "remote.file has ".$ftp->mdtm('remote.file')." bytes.\n";
+            #Copy a remote file to a new remote location.
+            $ftp->copy('remote_fileA','remote_fileB')
+                    or die "Cannot copy the file ", $ftp->message();
 
-	#Copy a remote file to a new remote location.
-	$ftp->copy('remote.fileA','remote.fileB')
-		or die "Cannot copy the file ", $ftp->message();
+            #Move a remote file to a new remote location.
+            $ftp->move('/old/path/old_filename', '/new/path/new_filename')
+                    or die "Cannot move the file ", $ftp->message();
 
-	#Move a remote file to a new remote location.
-	$ftp->move('old/path/old.filename', 'new/path/new.filename')
-		or die "Cannot move the file ", $ftp->message();
+            #Call a protocol-specific method.
+            $result = $ftp->method('timeout',100)
 
-	#Call a protocol-specific method.
-	$result = $ftp->method('timeout',100)
+            #Disconnect an existing connection.
+            $ftp->quit();
 
-	#Disconnect an existing connection.
-	$ftp->quit();
+PREREQUISITES
+    Even though Net::xFTP will work in a connection-simulating "*local*"
+    mode, to be truly useful, one needs either "Net::FTP", "Net::SFTP", and
+    / or one or more of the other supported Net::* protocol modules.
 
-INSTALLATION
+    "Net::SFTP::Attributes" is also needed, if using Net::SFTP.
 
-To install this module, run the following commands:
+    "Net::SFTP::Constants" is also needed for using the *copy*, *move*
+    functions, or using the *put* function with a filehandle if using
+    Net::SFTP.
 
-    perl Makefile.PL
-    make
-    make test
-    make install
+DESCRIPTION
+    "Net::xFTP" is a wrapper class to combine common functions of
+    (currently) Net::FTP, Net::SFTP, Net::FSP, Net::FTPSSL, Net::OpenSSH,
+    Net:SSH2, and Net::SFTP::Foreign into a single set of functions allowing
+    one to switch seemlessly between the two without having to make
+    non-trivial code changes. Only functionality common to all protocols has
+    been implemented here with the intent and invitation to add more
+    functions and features and other *FTP-ish modules in the future, as
+    discovered or requested. It also provides a localized submodule
+    (NET::xFTP::LOCAL) that provides a virtual "Net::LOCAL" module which
+    uses the same function API to perform similar operations on a local
+    file-system.
 
+PURPOSE
+    I created this module when I had developed several web application
+    programs which FTP'd data to and from a central server via Net::FTP. The
+    client changed to a new remote server that required Net::SFTP. Faced
+    with rewriting these programs without changing functionality (since for
+    some reason Net::FTP and Net::SFTP use slightly different methods and
+    conventions). I decided instead to simply create a common module that
+    would use the same method calls to do the same things and allow me to
+    specify the protocol in a single place. I also am the author of
+    *ptkftp*, a Perl/Tk graphical filemanager called JFM5, which uses
+    Net::xFTP to handle user-connections to remote filesystems requiring any
+    of the different supported FTPish submodules.
 
-COPYRIGHT AND LICENCE
+    Hopelfully others will find this module useful. Patches adding needed
+    functionality are welcome.
 
-Copyright (C) 2005 - 2015 Jim Turner
+CONSTRUCTOR
+    new ( PROTOCOL, HOST [, OPTIONS ])
+        This is the constructor for a new Net::xFTP object. The first two
+        arguments are required and are positional. Sebsequent arguments
+        (OPTIONS) are in the form "name => value". It returns a Net::xFTP
+        handle object, or *undef* on failure. If it fails, the reason will
+        be in $@.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+        "PROTOCOL" is the underling module or protocol name. Currently valid
+        values are: "FTP", "SFTP", "Net::FTP", and "Net::SFTP". There are
+        only two real options - one may either include or omit the "Net::"
+        part. A third option is to pass *"local"*, zero, an empty string, or
+        *undef* in which case the functions are mapped over the local
+        machine, accessable as if connected via ftp! For example, the *get*
+        and *put* methods simply copy files from one directory to another on
+        the user's local machine. If "PROTOCOL" is local, then the other
+        options, ie. "HOST" are optional. Default is *local* (no remote
+        connection).
+
+        "HOST" is the name of the remote host to which an FTP connection is
+        required (except with the *local* protocol.
+
+        "OPTIONS" are passed in a hash like fashion, using key and value
+        pairs. Possible options are:
+
+        user is the user-name or login-id to log in with. For FTP, if not
+        specified, then 'anonymous' is used.
+
+        password is the password, if required, for connecting. For FTP, if
+        not specified, then 'anonymous@' is used. NOTE (currently only for
+        Net::OpenSSH"): If the option: "*passphrase* => '*'" is specified,
+        the value specified by the *password* option will be instead used as
+        the public-key passphrase.
+
+        BlockSize specifies the buffer size to use for buffered data
+        transfers. Default is 10240.
+
+        Debug specifies the debug level for FTP and toggles it for SFTP.
+        Default is zero (*false*), which turns debug off for both. Set the
+        numeric level (non-zero) for FTP, and SFTP will accept it as *true*
+        and turn on debugging.
+
+        xftp_home specifies an alternate directory for SFTP to create the
+        ".ssh" subdirectory for keeping track of "known hosts". The default
+        is $ENV{HOME}. This option is useful for web CGI scripts which run
+        often under a user with no "home" directory. The format is:
+        "/some/path/that/the/user/can/write/to".
+
+        NOTE: Many other options are protocol-specific or have different
+        meanings to different protocol submodules. If you need to pass a
+        protocol- specific option only to a specific protocol without
+        passing it to others, you can prepend the protocol in lower-case to
+        the option name to specify protocol-specific options not to be
+        passed to other protocol submodules, ie. "sftp_ssh_args" to specify
+        the Net::SFTP option "ssh_args".
+
+METHODS
+    Unless otherwise stated all methods return either a *true* or *false*
+    value, with *true* meaning that the operation was a success. When a
+    method states that it returns a value, failure will be returned as
+    *undef* or an empty list.
+
+    ascii
+        Transfer file in ASCII, if using FTP. CRLF translation will be done
+        if required. This is a do-nothing method for SFTP and *local*.
+
+        Always returns *undef*.
+
+    binary
+        Transfer file in binary mode. No transformation will be done if
+        using FTP. This is a do-nothing method for SFTP and *local*.
+
+        Always returns *undef*.
+
+    chmod ( PERMISSIONS, PATH )
+        Sets the permissions on "PATH", which can be either a file or
+        subdirectory. "PERMISSIONS" is an octal number expressed as a
+        decimal. Common values are 777 (full access), 755 (rwxr-xr-x) and
+        644 (rw-r--r--).
+
+        Returns 1 if successful, *undef* if fails.
+
+    copy ( OLDFILE, NEWFILE )
+        Copies the file "OLDFILE" to "NEWFILE", creating or overwriting it
+        if necessary. "OLDFILE" and "NEWFILE" may be in different
+        directories.
+
+        Returns 1 if successful, *undef* if fails.
+
+    cwd ( [ DIR ] )
+        Attempt to change directory to the directory given in $dir. If $dir
+        is "..", the FTP "CDUP" command is used to attempt to move up one
+        directory. If no directory is given then an attempt is made to
+        change the directory to the root directory. For SFTP, the new
+        directory is saved and subsequent relative paths have this value
+        appended to them.
+
+        Returns 1 if successful, *undef* if fails.
+
+    delete ( FILENAME )
+        Send a request to the server to delete "FILENAME". Calls either the
+        FTP->delete method or SFTP->do_remove method. For local, calls
+        Perl's *unlink* function.
+
+        Returns 1 if successful, *undef* if fails.
+
+    dir ( [ DIR [, SHOWALL ]] )
+        Get a directory listing of "DIR", or the current directory in long
+        (ls -l) format. See also the "ls" method.
+
+        "DIR" specifies the absolute or relative path. Default is "."
+        (Current working directory). ".." is also valid.
+
+        "SHOWALL" - if *true*, all files and subdirectory names will be
+        listed. If *false*, "hidden" files and subdirectories (those whose
+        names begin with a ".") will be omitted. Default is *false*.
+
+        In an array context, returns a sorted list of lines returned from
+        the server. In a scalar context, returns a reference to the list.
+        Each line consists of either a file or subdirectory name or "." or
+        "..". ".." is omitted if "DIR" is "/".
+
+        Returns *undef* on failure.
+
+    get ( REMOTE_FILE [, LOCAL_FILE [, OPTIONS ] ] )
+        Get "REMOTE_FILE" from the server and store locally. If "LOCAL_FILE"
+        is not specified, then a file with the same name as "REMOTE_FILE"
+        sans the path information will be created on the current working
+        directory of the machine the program is running on. "LOCAL_FILE" can
+        also be an open file-handle (see example in the "SYNOPSIS" section).
+        If so, it must be passed as a typeglob. For *local* protocol, simply
+        copys "REMOTE_FILE" to "LOCAL_FILE". NOTE: Some submodules can
+        return the number of bytes (length) of the file instead of 1, so
+        simply check for a *true* value for success.
+
+        Returns 1 if successful, *undef* if fails.
+
+    isadir ( DIR )
+        Returns 1 (*true*) if "DIR" is a subdirectory, 0 (*false*)
+        otherwise.
+
+    ls ( [ DIR [, SHOWALL ]] )
+        Get a directory listing of "DIR", or the current directory. Just the
+        file and or subfolder names are returned. For a full listing (like
+        "ls -l"), see the "dir" method.
+
+        "DIR" specifies the absolute or relative path. Default is "."
+        (Current working directory). ".." is also valid.
+
+        "SHOWALL" - if *true*, all files and subdirectory names will be
+        listed. If *false*, "hidden" files and subdirectories (those whose
+        names begin with a ".") will be omitted. Default is *false*.
+
+        In an array context, returns a sorted list of lines returned from
+        the server. In a scalar context, returns a reference to the list.
+        Each line consists of either a file or subdirectory name or "." or
+        "..". ".." is omitted if "DIR" is "/".
+
+        Returns *undef* on failure.
+
+    message ()
+        Returns the last error message from the most recent method call. For
+        FTP, simply calles *$FTP-*message()>. For SFTP, we must eval / trap
+        the error from @_ and or use some method's call-back function
+        option.
+
+    mkdir ( DIR [, RECURSE ])
+        Create a new directory with the name "DIR". If "RECURSE" is *true*
+        then "mkdir" will attempt to create all the directories in the given
+        path.
+
+        Calls the "mkdir" method in FTP or "do_mkdir" method in SFTP.
+
+        Returns 1 if successful, *undef* if fails.
+
+    move ( OLDFILE, NEWFILE )
+        Moves the file "OLDFILE" to "NEWFILE", creating or overwriting it if
+        necessary. "OLDFILE" and "NEWFILE" may be in different directories,
+        unlike *rename*, which can only change the name (in the same path).
+        Essentially does a *copy*, followed by a *delete*, if successfully
+        copied.
+
+        Returns 1 if successful, *undef* if fails.
+
+    Net::xFTP->haveFTP ()
+        Returns 1 if Net::FTP is installed, 0 otherwise.
+
+    Net::xFTP->haveSFTP ()
+        Returns 1 if Net::SFTP is installed, 0 otherwise.
+
+    Net::xFTP->haveModules ()
+        Returns a reference to a hash in the form: { 'Net::FTP' => 1|0,
+        'Net::SFTP' => 1|0 }
+
+    Net::xFTP->haveModule ( MODULE_NAME )
+        Expects the name of one of the supported FTP modules (currently:
+        'Net::FTP', 'Net::SFTP', 'Net::SSH2', 'Net::SFTP::Foreign',
+        'Net::OpenSSH', 'Net::FSP', or 'Net::FTPSSL'.
+
+        Returns either 1, if the module is installed or 0 if not.
+
+    Net::xFTP->new ( PROTOCOL, HOST [, OPTIONS ])
+        This is the constructor. It returns either a Net::xFTP object or
+        *undef* on failure. For details, see the "CONSTRUCTOR" section
+        above. For FTP, this method also calls the "login" method to
+        connect.
+
+        Returns a Net::xFTP handle object, or *undef* on failure. If it
+        fails, the reason will be in $@.
+
+    protocol ()
+        Returns the protocol string passed to Net::xFTP->new(), ie.
+        "Net::FTP", depending on which underlying module is being used.
+        NOTE: Returns an empty string is "local" is used.
+
+    put ( LOCAL_FILE [, REMOTE_FILE [, OPTIONS ] ] )
+        Put a file on the remote server. "LOCAL_FILE" and "REMOTE_FILE" are
+        specified as strings representing the absolute or relative path and
+        file name. If "REMOTE_FILE" is not specified then the file will be
+        stored in the current working directory on the remote machine with
+        the same fname (sans directory information) as "LOCAL_FILE".
+        "LOCAL_FILE" can also be an open file-handle (see example in the
+        "SYNOPSIS" section). If so, it must be passed as a typeglob and
+        "REMOTE_FILE" must be specified. For *local* protocol, simply copies
+        "LOCAL_FILE" to "REMOTE_FILE".
+
+        Returns 1 if successful, *undef* if fails. NOTE: Some submodules can
+        return the number of bytes (length) of the file instead of 1, so
+        simply check for a *true* value for success.
+
+        NOTE: If for some reason the transfer does not complete and an error
+        is returned then the contents that had been transfered will not be
+        remove automatically.
+
+    pwd ()
+        Returns the full pathname of the current working directory.
+
+    quit ()
+        Calls FTP->quit() for FTP, For SFTP, which does not have a
+        terminating method, simply deletes the SFTP object.
+
+    rename ( OLDNAME, NEWNAME )
+        Rename a file on the remote FTP server from "OLDNAME" to "NEWNAME".
+        Calls the *rename* method for FTP and *do_rename* for SFTP. For
+        *local* protocol, simply renames the file.
+
+        Returns 1 if successful, *undef* if fails.
+
+    rmdir ( DIR )
+        Remove the directory with the name "DIR". The directory must first
+        be empty to remove. Calls the *rmdir* method for FTP and *do_rmdir*
+        for SFTP. For *local* protocol, simiply removes the directory.
+
+        Returns 1 if successful, *undef* if fails.
+
+    size ( FILE )
+        Returns the size in bytes of "FILE", or *undef* on failure. For FTP,
+        the *size* method is called, for SFTP: *do_stat*. For <local>,
+        perl's *stat* function.
+
+    mdtm ( FILE )
+        Returns the modification time in Perl "time" format of "FILE", or
+        *undef* on failure. For FTP, the *size* method is called, for SFTP:
+        *do_stat*. For <local>, perl's *stat* function.
+
+    method ( args )
+        Even though "Net::xFTP" is designed for commonality, it may
+        occassionally be necessary to call a method specific to a given
+        protocol. To do this, simply invoke the method as follows:
+
+        $ftp->{xftp}->method ( args ) #DEPRECIATED with v1.00, use:
+        $ftp->method ( args )
+
+        Example:
+
+         print "-FTP size of file = ".$ftp->method('size', '/tmp/myfile').".\n"
+                        if ($ftp->protocol() eq 'Net::FTP');
+
+    sftpWarnings
+        Internal module used to capture non-fatal warning messages from
+        Net::SFTP methods.
+
+TODO
+    Add a "stat" method when this is supported in Net::FTP. Add any
+    additional Net::*FTP-ish protocols as discovered or requested.
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-net-xftp@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-xFTP>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+ACKNOWLEDGEMENTS
+    This is a derived work from Net::FTP and Net::SFTP. Net::FTP is
+    copyrighted by Graham Barr and Net::SFTP is copyrighted by Benjamin
+    Trott and maintained by Dave Rolsky. Both are copyrighted under the same
+    terms as this module.
+
+    Many thanks go to these gentlemen whose work made this module possible.
+
+SEE ALSO
+    Net::FTP
+
+    Net::SFTP
+
+    Net::SFTP::Foreign
+
+    Net::FSP
+
+    Net::FTPSSL
+
+    Net::OpenSSH
+
+    Net::SSH2
+
+    Net::SFTP::Constants
+
+    Net::SFTP::Attributes
+
+KEYWORDS
+    ftp, sftp, xftp, Net::FTP, Net::SFTP
+

@@ -18,9 +18,6 @@ no_index:
     - t
     - inc
 requires:
-  Alt::Devel::CallParser::ButWorking: '0'
-  Kavorka: '0'
-  Mouse: '0'
   Regexp::Grammars: '0'
-version: '0.04'
+version: '0.19'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

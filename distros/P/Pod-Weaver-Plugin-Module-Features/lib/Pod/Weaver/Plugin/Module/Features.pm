@@ -1,9 +1,9 @@
 package Pod::Weaver::Plugin::Module::Features;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-25'; # DATE
+our $DATE = '2021-04-06'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-Module-Features'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -133,12 +133,20 @@ sub _process_module {
                 for my $fname (@fnames) {
                     my $fspec = $feature_set_spec->{features}{$fname};
                     push @pod, "=item * $fname\n\n";
+                    if (defined $fspec->{summary}) {
+                        require String::PodQuote;
+                        push @pod, String::PodQuote::pod_quote($fspec->{summary}), ".\n\n";
+                    }
+                    if ($fspec->{description}) {
+                        require Markdown::To::POD;
+                        push @pod, _md2pod($fspec->{description});
+                    }
                     my $type = Data::Sah::Util::Type::get_type($fspec->{schema} // 'bool');
                     my $fval = Module::FeaturesUtil::Get::get_feature_val($package, $fsetname, $fname);
                     if (!defined($fval)) {
                         $fval = "N/A (not defined)";
                     } elsif ($type eq 'bool') {
-                        $fval = $type ? "yes" : "no";
+                        $fval = $fval ? "yes" : "no";
                     } else {
                         $fval = Data::Dmp::dmp($fval);
                     }
@@ -195,7 +203,7 @@ Pod::Weaver::Plugin::Module::Features - Plugin to use when building distribution
 
 =head1 VERSION
 
-This document describes version 0.001 of Pod::Weaver::Plugin::Module::Features (from Perl distribution Pod-Weaver-Plugin-Module-Features), released on 2021-02-25.
+This document describes version 0.002 of Pod::Weaver::Plugin::Module::Features (from Perl distribution Pod-Weaver-Plugin-Module-Features), released on 2021-04-06.
 
 =head1 SYNOPSIS
 

@@ -5,7 +5,7 @@ use warnings;
 
 use File::Find;
 use File::Path;
-use File::Slurp;
+use Path::Tiny;
 
 use Test2::V0 'subtest';
 
@@ -26,11 +26,11 @@ Test2::Aggregate - Aggregate tests for increased speed
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 =head1 DESCRIPTION
 
@@ -82,7 +82,8 @@ have less issues with L<Test2::Suite> (see notes).
         test_warnings => 0,                   # optional
         allow_errors  => 0,                   # optional
         pre_eval      => $code_to_eval,       # optional
-        dry_run       => 0                    # optional
+        dry_run       => 0,                   # optional
+        slurp_param   => {binmode => $mode}   # optional
     );
 
 Runs the aggregate tests. Returns a hashref with stats like this:
@@ -198,6 +199,13 @@ old behaviour (version <= 0.12), before the module stopped allowing this.
 Instead of running the tests, will do C<ok($testname)> for each one. Otherwise,
 test order, stats files etc. will be produced (as if all tests passed).
 
+=item * C<slurp_param> (optional)
+
+If you are using list files, by default, C<Path::Tiny::slurp_utf8> will be used
+to read them.
+If you would like to use C<slurp> with your own parameters instead, like a UTF16
+binmode etc, you can pass them here.
+
 =item * C<pre_eval> (optional)
 
 String with code to run with eval before each test. You might be inclined to do
@@ -263,7 +271,7 @@ sub run_tests {
         foreach my $file (@{$args{lists}}) {
             push @dirs,
               map { /^\s*#/ ? () : $_ }
-              split( /\r?\n/, read_file("$root$file") );
+              split( /\r?\n/, _read_file("$root$file", $args{slurp_param}) );
         }
 
         find(
@@ -316,6 +324,13 @@ sub run_tests {
         if @$warnings;
 
     return $args{stats};
+}
+
+sub _read_file {
+    my $path  = shift;
+    my $param = shift;
+    my $file  = path($path);
+    return $param ? $file->slurp_utf8 : $file->slurp($param);
 }
 
 sub _process_run_order {

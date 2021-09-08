@@ -17,7 +17,13 @@ sub new_local
 	$@ = '';
 	$xftp->{cwd} = Cwd::cwd();  #JWT:NOTE 20150123: DOES NOT RETURN A TRAILING "/" UNLESS "/"!
 	$xftp->{xftp} = 1;
+	$xftp->{protocol} = '';  #EMPTY STRING FOR "Net::LOCAL"!
 	return $xftp;
+}
+
+sub protocol
+{
+	return shift->{protocol};
 }
 
 {

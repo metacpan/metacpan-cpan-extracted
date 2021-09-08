@@ -21,7 +21,7 @@ SKIP:
 	{
 		require DBD::Pg;
 	};
-	skip( "DBD::Pg is not installed", 24 ) if( $@ );
+	skip( "DBD::Pg is not installed", 25 ) if( $@ );
 	use_ok( 'DB::Object::Postgres' );
     use_ok( "DB::Object::Postgres::Query" );
     use_ok( "DB::Object::Postgres::Statement" );
@@ -180,6 +180,87 @@ UPDATE ONLY customers SET active='0' WHERE email='john\@example.org'
 SQL
 	chomp( $expected );
 	is( $result, $expected, "Checking UPDATE query on customers table using ONLY clause" );
+	
+	# Checking sub-query in field operation
+	my $orders_tbl = $dbh->orders || fail( 'Cantot get the orders table' );
+	$cust->reset;
+	$cust->where( $cust->fo->last_name == '?' );
+	my $sub_sth = $cust->select( 'id' );
+	$orders_tbl->where(
+	    $dbh->AND(
+	        $orders_tbl->fo->id == '?',
+	        $orders_tbl->fo->cust_id == $sub_sth
+	    )
+	);
+	my $order_sth_del = $orders_tbl->delete || fail( "An error has occurred while trying to create a delete query for table orders: " . $orders_tbl->error );
+	pass( "Orders delete query object" );
+	$result = $order_sth_del->as_string;
+	diag( "delete query with sub-query in field operation is: $result" ) if( $DEBUG );
+	$expected = <<SQL;
+DELETE FROM orders WHERE id = ? AND cust_id = (SELECT id FROM customers WHERE last_name = ?)
+SQL
+	chomp( $expected );
+	is( $result, $expected, "Checking DELETE query on orders table using sub-query" );
+
+    my $no_trigger_sth = $orders_tbl->disable_trigger || fail( "An error has occurred while trying to create a query to disable trigger: " . $orders_tbl->error );
+    pass( "Disable trigger query object" );
+	$result = $no_trigger_sth->as_string;
+	diag( "disable trigger query is: $result" ) if( $DEBUG );
+	$expected = <<SQL;
+ALTER TABLE orders DISABLE TRIGGER USER
+SQL
+	chomp( $expected );
+	is( $result, $expected, "Checking disable trigger query on orders table" );
+
+    my $no_triggers_sth = $orders_tbl->disable_trigger( all => 1 ) || fail( "An error has occurred while trying to create a query to disable all triggers: " . $orders_tbl->error );
+    pass( "Disable all triggers query object" );
+	$result = $no_triggers_sth->as_string;
+	diag( "disable all triggers query is: $result" ) if( $DEBUG );
+	$expected = <<SQL;
+ALTER TABLE orders DISABLE TRIGGER ALL
+SQL
+	chomp( $expected );
+	is( $result, $expected, "Checking disable all triggers query on orders table" );
+
+    my $no_trigger_name_sth = $orders_tbl->disable_trigger( name => 'my_trigger' ) || fail( "An error has occurred while trying to create a query to disable trigger by name: " . $orders_tbl->error );
+    pass( "Disable trigger by name query object" );
+	$result = $no_trigger_name_sth->as_string;
+	diag( "disable trigger by name query is: $result" ) if( $DEBUG );
+	$expected = <<SQL;
+ALTER TABLE orders DISABLE TRIGGER my_trigger
+SQL
+	chomp( $expected );
+	is( $result, $expected, "Checking disable trigger by name query on orders table" );
+	
+	my $temp_disable_trigger_sth = $order_sth_del->disable_trigger || fail( "An error has occurred while trying to update the query to temporarily disable triggers: " . $orders_tbl->error );
+    pass( "Temporarily disable trigger query object" );
+	$result = $temp_disable_trigger_sth->as_string;
+	diag( "Temporarily disable trigger query is: $result" ) if( $DEBUG );
+	$expected = <<SQL;
+ALTER TABLE orders DISABLE TRIGGER USER; DELETE FROM orders WHERE id = ? AND cust_id = (SELECT id FROM customers WHERE last_name = ?); ALTER TABLE orders ENABLE TRIGGER USER;
+SQL
+	chomp( $expected );
+	is( $result, $expected, "Checking temporarily disable trigger query on orders table" );
+	
+	diag( "Testing asynchronous query." ) if( $DEBUG );
+	subtest 'asynchronous query' => sub
+	{
+	    my $sth = $dbh->prepare( "SELECT pg_sleep(?)" ) || fail( "An error occurred while preparing a pg_sleep query: " . $dbh->error );
+	    pass( "Test pg_sleep query" );
+	    use Promise::Me;
+	    my @results = ();
+	    share( @results );
+	    my $p = $sth->promise(3)->then(sub
+	    {
+	        push( @results, 'A' );
+	    })->catch(sub
+	    {
+	        fail( "Error executing asynchronous query: " . join( '', @_ ) );
+	    });
+	    push( @results, 'B' );
+	    await( $p );
+	    is( "@results", 'B A', 'asynchronous query result' );
+	};
 
 	# diag( "Removing test database $test_db" );
 	my $dbh2;
@@ -193,6 +274,7 @@ SQL
 		my $rv = $dbh2->do( "DROP DATABASE $test_db" );
 		diag "Dropping leftover test database $test_db " . ( $rv ? 'succeeded' : 'failed' );
 	}
+	is( $dbh->get_sql_type( 'bytea' ), 17, 'get_sql_type' );
 }
 
 END

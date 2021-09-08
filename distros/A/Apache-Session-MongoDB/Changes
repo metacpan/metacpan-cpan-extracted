@@ -1,5 +1,11 @@
 Revision history for Perl extension Apache::Session::MongoDB.
 
+0.23  Thu Sep 02 14:25:12 2021
+    - Fix test regression introduced in 0.22
+
+0.22  Wed Sep 01 23:32:34 2021
+    - support deleteIfLowerThan (used by [Lemonldap::NG](https://lemonldap-ng.org)
+
 0.21  Thu Mar 25 16:53:32 2021
     - Die when session isn't found. Closes: #12
 

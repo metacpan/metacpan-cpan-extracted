@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.130';
+our $VERSION = '0.131';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf );
@@ -84,6 +84,17 @@ sub __prepare_opt {
                 $self->{$key} = $opt->{$key};
             }
         }
+        ###############################################################
+        if ( $self->{layout} == 3 ) {
+            $self->{layout} = 2;
+            my @message = ( $sub, 'Option "layout": \'3\' is no longer a valid value.' );
+            my $prompt = join "\n", @message;
+            choose(
+                [ 'Continue with ENTER' ],
+                { prompt => $prompt, layout => 0, clear_screen => 1 }
+            );
+        }
+        ###############################################################
     }
 }
 
@@ -293,7 +304,7 @@ sub choose_directories {
         # Choose
         my $choice = choose(
             [ undef, $confirm, $change_path, $add_dirs ],
-            { info => $self->{info}, prompt => $prompt, layout => 3, mouse => $self->{mouse},
+            { info => $self->{info}, prompt => $prompt, layout => 2, mouse => $self->{mouse},
               clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor}, page => $self->{page},
               footer => $self->{footer}, keep => $self->{keep}, undef => '  ' . $self->{back} }
         );
@@ -627,7 +638,7 @@ sub choose_a_number {
         # Choose
         my $range = choose(
             $self->{small_first} ? [ @pre, reverse @ranges ] : [ @pre, @ranges ],
-            { info => $self->{info}, prompt => $prompt, layout => 3, alignment => 1, mouse => $self->{mouse},
+            { info => $self->{info}, prompt => $prompt, layout => 2, alignment => 1, mouse => $self->{mouse},
               clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor}, color => $self->{color},
               tabs_info => $self->{tabs_info}, tabs_prompt => $self->{tabs_prompt}, page => $self->{page},
               footer => $self->{footer}, keep => $self->{keep}, undef => $back_tmp }
@@ -849,7 +860,7 @@ sub settings_menu {
         # Choose
         my $idx = choose(
             [ @pre, @print_keys ],
-            { info => $self->{info}, prompt => $prompt, index => 1, default => $default, layout => 3, alignment => 0,
+            { info => $self->{info}, prompt => $prompt, index => 1, default => $default, layout => 2, alignment => 0,
               mouse => $self->{mouse}, clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor},
               color => $self->{color}, tabs_info => $self->{tabs_info}, tabs_prompt => $self->{tabs_prompt},
               page => $self->{page}, footer => $self->{footer}, keep => $self->{keep}, undef => $self->{back} }
@@ -990,7 +1001,7 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.130
+Version 0.131
 
 =cut
 
@@ -1207,7 +1218,7 @@ layout
 
 See the option I<layout> in L<Term::Choose>
 
-Values: 0,[1],2,3.
+Values: 0,[1],2.
 
 =item
 
@@ -1215,7 +1226,7 @@ order
 
 If set to C<1>, the items are ordered vertically else they are ordered horizontally.
 
-This option has no meaning if I<layout> is set to C<3>.
+This option has no meaning if I<layout> is set to C<2>.
 
 Values: 0,[1].
 
@@ -1277,7 +1288,7 @@ layout
 
 See the option I<layout> in L<Term::Choose>
 
-Values: 0,[1],2,3.
+Values: 0,[1],2.
 
 =item
 
@@ -1285,7 +1296,7 @@ order
 
 If set to C<1>, the items are ordered vertically else they are ordered horizontally.
 
-This option has no meaning if I<layout> is set to C<3>.
+This option has no meaning if I<layout> is set to C<2>.
 
 Values: 0,[1].
 
@@ -1340,7 +1351,7 @@ layout
 
 See the option I<layout> in L<Term::Choose>
 
-Values: 0,[1],2,3.
+Values: 0,[1],2.
 
 =item
 
@@ -1348,7 +1359,7 @@ order
 
 If set to C<1>, the items are ordered vertically else they are ordered horizontally.
 
-This option has no meaning if I<layout> is set to C<3>.
+This option has no meaning if I<layout> is set to C<2>.
 
 Values: 0,[1].
 
@@ -1499,7 +1510,7 @@ layout
 
 See the option I<layout> in L<Term::Choose>.
 
-Values: 0,1,2,[3].
+Values: 0,1,[2].
 
 =item
 
@@ -1514,7 +1525,7 @@ order
 
 If set to C<1>, the items are ordered vertically else they are ordered horizontally.
 
-This option has no meaning if I<layout> is set to 3.
+This option has no meaning if I<layout> is set to 2.
 
 Values: 0,[1].
 

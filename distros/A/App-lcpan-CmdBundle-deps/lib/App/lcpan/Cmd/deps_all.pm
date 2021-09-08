@@ -1,9 +1,9 @@
 package App::lcpan::Cmd::deps_all;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-01'; # DATE
+our $DATE = '2021-06-03'; # DATE
 our $DIST = 'App-lcpan-CmdBundle-deps'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
@@ -151,7 +151,7 @@ App::lcpan::Cmd::deps_all - List all (indexed) dependencies
 
 =head1 VERSION
 
-This document describes version 0.010 of App::lcpan::Cmd::deps_all (from Perl distribution App-lcpan-CmdBundle-deps), released on 2021-06-01.
+This document describes version 0.011 of App::lcpan::Cmd::deps_all (from Perl distribution App-lcpan-CmdBundle-deps), released on 2021-06-03.
 
 =head1 DESCRIPTION
 

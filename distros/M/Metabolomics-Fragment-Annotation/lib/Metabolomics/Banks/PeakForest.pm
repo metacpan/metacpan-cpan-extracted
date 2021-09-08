@@ -5,9 +5,7 @@ use strict;
 use warnings;
 
 use FindBin;                 # locate this script
-use lib 'lib';
 use lib "$FindBin::Bin/../..";  # use the parent directory
-
 
 use Exporter qw(import);
 
@@ -85,10 +83,11 @@ Metabolomics::Banks::PeakForest - Perl extension for PeakForest bank
 
 Version 0.2 - supporting/integrating REST API V2 methods
 Version 0.3 - Completing object properties + GCMS bank generation
+Version 0.4 - Integration of deltaType
 
 =cut
 
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 
 =head1 SYNOPSIS
 
@@ -239,7 +238,7 @@ sub __refpeakforestspectra__ {
 sub buildSpectralBankFromPeakForest {
     ## Retrieve Values
     my $self = shift ;
-    my ( $COLUMN_CODE, $DELTA, $MIN_FRAGMENTS ) = @_;
+    my ( $COLUMN_CODE, $DELTATYPE, $DELTA, $MIN_FRAGMENTS ) = @_;
     
     my $nbMatchedSpectra = 0 ;
     my %MatchedCpds = () ;
@@ -310,10 +309,15 @@ sub buildSpectralBankFromPeakForest {
 			$MIN_FRAGMENTS = 10 ;
 		}
 		
+		## Block query with PPM value...
+		if ( (defined $DELTATYPE)  and ($DELTATYPE ne 'MMU') ) {
+			croak "Method buildSpectralBankFromPeakForest supports only mz delta in MMU" ;
+		}
+		
 		my $clusterSize = scalar @mzs_res ;
 		
 		if ($clusterSize >= $MIN_FRAGMENTS ) {
-			$list_ids = $self->_getGcmsSpectraByMatchingPeaks( $COLUMN_CODE, \@mzs_res, $DELTA) ; #colonne_code, mzs, delta
+			$list_ids = $self->_getGcmsSpectraByMatchingPeaks( $COLUMN_CODE, \@mzs_res, $DELTA) ; #colonne_code, mzs, delta in MMU
 			$nbIds = scalar @{$list_ids} ;
 			$nbMatchedSpectra += $nbIds ;
 			

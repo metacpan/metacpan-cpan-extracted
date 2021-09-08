@@ -1,0 +1,11 @@
+Revision history for Perl extension Text-ANSI-Tabs
+
+0.07 2021-09-04T08:00:32Z
+
+    - Use local $fold object and provide configure().
+    - Make expand() to work for tab in colored area.
+
+0.06 2021-09-03T10:19:49Z
+
+    - Spin-off from Text::ANSI::Fold::Util.
+

@@ -1,0 +1,98 @@
+=encoding utf-8
+
+=head1 NAME
+
+SDL2::Event - General event structure
+
+=head1 SYNOPSIS
+
+    use SDL2 qw[:all];
+    # TODO: I need to whip up a quick example
+
+=head1 DESCRIPTION
+
+SDL2::Event is a C union which generalizes all known SDL2 events.
+
+=head1 Fields
+
+As a union, this object main contain the following structures:
+
+=over
+
+=item C<type> - Event type, shared with all events
+
+=item C<common> - SDL2::CommonEvent
+
+=item C<display> - SDL2::DisplayEvent
+
+=item C<window> - SDL2::WindowEvent
+
+=item C<key> - SDL2::KeyboardEvent
+
+=item C<edit> - SDL2::TextEditingEvent
+
+=item C<text> - SDL2::TextInputEvent
+
+=item C<motion> - SDL2::MouseMotionEvent
+
+=item C<button> - SDL2::MouseButtonEvent
+
+=item C<wheel> - SDL2::MouseWheelEvent
+
+=item C<jaxis> - SDL2::JoyAxisEvent
+
+=item C<jball> - SDL2::JoyBallEvent
+
+=item C<jhat> - SDL2::JoyHatEvent
+
+=item C<jbutton> - SDL2::JoyButtonEvent
+
+=item C<jdevice> - SDL2::JoyDeviceEvent
+
+=item C<caxis> - SDL2::ControllerAxisEvent
+
+=item C<cbutton> - SDL2::ControllerButtonEvent
+
+=item C<cdevice> - SDL2::ControllerDeviceEvent
+
+=item C<adevice> - SDL2::AudioDeviceEvent
+
+=item C<sensor> - SDL2::SensorEvent
+
+=item C<quit> - SDL2::QuitEvent
+
+=item C<user> - SDL2::UserEvent
+
+=item C<syswm> - SDL2::SysWMEvent
+
+=item C<tfinger> - SDL2::TouchFingerEvent
+
+=item C<mgesture> - SDL2::MultiGestureEvent
+
+=item C<dgesture> - SDL2::DollarGestureEvent
+
+=item C<drop> - SDL2::DropEvent
+
+=item C<padding> - Raw data used internally to protect ABI compatibility between VC++ and GCC
+
+=back
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under
+the terms found in the Artistic License 2. Other copyrights, terms, and
+conditions may apply to data transmitted through this module.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=begin stopwords
+
+
+=end stopwords
+
+=cut
+

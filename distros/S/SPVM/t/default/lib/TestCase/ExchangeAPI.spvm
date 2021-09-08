@@ -12,12 +12,62 @@ package TestCase::ExchangeAPI {
   sub FLOAT_PRECICE : float () { return 16384.5f; }
   sub DOUBLE_PRECICE : double () { return 65536.5; }
 
-  sub return_undef : TestCase::Minimal () {
+  sub return_object : TestCase::Minimal () {
+    
+    my $minimal = TestCase::Minimal->new;
+    $minimal->set_x(1);
+    $minimal->set_y(2);
+    
+    return $minimal;
+  }
+
+  sub return_object_undef : TestCase::Minimal () {
     
     return undef;
   }
 
-  sub return_array : TestCase::Minimal[] () {
+  sub return_any_object : object () {
+    
+    my $minimal = TestCase::Minimal->new;
+    $minimal->set_x(1);
+    $minimal->set_y(2);
+    
+    return $minimal;
+  }
+
+  sub return_any_object_undef : object () {
+    
+    return undef;
+  }
+
+  sub return_void : void () {
+    
+    return;
+  }
+
+  sub return_string : string () {
+    
+    return "あいう";
+  }
+
+  sub return_string_undef : string () {
+    
+    return undef;
+  }
+
+  sub return_numeric_array : int[] () {
+    
+    my $nums = [1, 2, 3];
+
+    return $nums;
+  }
+
+  sub return_numeric_array_undef : int[] () {
+    
+    return undef;
+  }
+
+  sub return_object_array : TestCase::Minimal[] () {
     
     my $minimal = new TestCase::Minimal[2];
     $minimal->[0] = new TestCase::Minimal;
@@ -28,6 +78,11 @@ package TestCase::ExchangeAPI {
     $minimal->[1]->set_y(4);
     
     return $minimal;
+  }
+
+  sub return_object_array_undef : TestCase::Minimal[] () {
+    
+    return undef;
   }
 
   sub return_oarray : oarray () {
@@ -43,7 +98,26 @@ package TestCase::ExchangeAPI {
     return $minimal;
   }
 
-  sub return_byte_value : TestCase::Point_3b () {
+  sub return_oarray_undef : TestCase::Minimal[] () {
+    
+    return undef;
+  }
+
+  sub return_multi_numeric_array : TestCase::Point_3i[] () {
+    
+    my $nums = new TestCase::Point_3i[2];
+    $nums->[0]{x} = 1;
+    $nums->[1]{z} = 5;
+
+    return $nums;
+  }
+
+  sub return_multi_numeric_array_undef : TestCase::Point_3i[] () {
+    
+    return undef;
+  }
+
+  sub return_byte_multi_numeric : TestCase::Point_3b () {
     my $point : TestCase::Point_3b;
     $point->{x} = 1;
     $point->{y} = 2;
@@ -52,7 +126,7 @@ package TestCase::ExchangeAPI {
     return $point;
   }
   
-  sub return_short_value : TestCase::Point_3s () {
+  sub return_short_multi_numeric : TestCase::Point_3s () {
     my $point : TestCase::Point_3s;
     $point->{x} = 1;
     $point->{y} = 2;
@@ -61,7 +135,7 @@ package TestCase::ExchangeAPI {
     return $point;
   }
 
-  sub return_int_value : TestCase::Point_3i () {
+  sub return_int_multi_numeric : TestCase::Point_3i () {
     my $point : TestCase::Point_3i;
     $point->{x} = 1;
     $point->{y} = 2;
@@ -70,7 +144,7 @@ package TestCase::ExchangeAPI {
     return $point;
   }
 
-  sub return_long_value : TestCase::Point_3l () {
+  sub return_long_multi_numeric : TestCase::Point_3l () {
     my $point : TestCase::Point_3l;
     $point->{x} = 1;
     $point->{y} = 2;
@@ -79,7 +153,7 @@ package TestCase::ExchangeAPI {
     return $point;
   }
 
-  sub return_float_value : TestCase::Point_3f () {
+  sub return_float_multi_numeric : TestCase::Point_3f () {
     my $point : TestCase::Point_3f;
     $point->{x} = 1;
     $point->{y} = 2;
@@ -88,7 +162,7 @@ package TestCase::ExchangeAPI {
     return $point;
   }
 
-  sub return_double_value : TestCase::Point_3d () {
+  sub return_double_multi_numeric : TestCase::Point_3d () {
     my $point : TestCase::Point_3d;
     $point->{x} = 1;
     $point->{y} = 2;
@@ -397,6 +471,19 @@ package TestCase::ExchangeAPI {
     }
     
     return 0;
+  }
+
+  sub new_byte_array_from_string : int ($bytes : byte[]) {
+    
+    unless ($bytes isa byte[]) {
+      return 0;
+    }
+    
+    unless ((string)$bytes eq "あいう") {
+      return 0;
+    }
+    
+    return 1;
   }
 
   sub spvm_new_byte_array_binary_pack : int ($values : byte[]) {

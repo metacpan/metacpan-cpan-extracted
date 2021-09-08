@@ -52,7 +52,7 @@ sub _new {
     } elsif (exists $params{mac}) {
 	$self = Sys::Virt::Interface::_lookup_by_mac($con,  $params{mac});
     } elsif (exists $params{xml}) {
-	$self = Sys::Virt::Interface::_define_xml($con,  $params{xml});
+	$self = Sys::Virt::Interface::_define_xml($con,  $params{xml}, $params{flags});
     } else {
 	die "name, mac or xml parameters are required";
     }
@@ -120,6 +120,19 @@ Include interfaces that are active
 =item Sys::Virt::Interface::LIST_INACTIVE
 
 Include interfaces that are not active
+
+=back
+
+=head2 INTERFACE DEFINE
+
+The following constants can be used to control the behaviour
+of interface define operations
+
+=over 4
+
+=item Sys::Virt::Interface::DEFINE_VALIDATE
+
+Validate the XML document against the XML schema
 
 =back
 

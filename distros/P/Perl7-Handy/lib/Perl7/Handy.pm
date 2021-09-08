@@ -11,7 +11,7 @@ package Perl7::Handy;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.10';
+$VERSION = '0.11';
 $VERSION = $VERSION;
 
 BEGIN { pop @INC if $INC[-1] eq '.' } # CVE-2016-1238: Important unsafe module load path flaw
@@ -19,7 +19,7 @@ use strict;
 BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 } use warnings; local $^W=1;
 BEGIN { $INC{'feature.pm'}  = '' if $] < 5.010 } use feature ();
 BEGIN {
-    if ($] >= 5.008001) {
+    if ($] >= 5.010001) {
         eval q{
 use bareword::filehandles; # pmake.bat catches /^use .../
 use multidimensional;      # pmake.bat catches /^use .../
@@ -298,7 +298,7 @@ sub import {
     }
 
     # new Perl called "Modern Perl"
-    if ($] >= 5.008001) {
+    if ($] >= 5.010001) {
 
         # gives caller package "no bareword::filehandles;"
         bareword::filehandles->unimport;

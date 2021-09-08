@@ -7,6 +7,20 @@ This document is automatically generated from the document:
 and that document should be considered the canonical source of change
 related information.
 
+3.68  2021-09-02  sbeck
+  -  NEW CODE(s)
+         NOTE: no code changes on 2021-06-01 so no release made at that
+         time.
+
+  -  Added code2names
+         Also code2countrys, code2languages, etc. This allows you to see all
+         names and aliases that correspond to a code. My apologies for
+         making 'countrys' to be the plural of 'country', but because these
+         modules are all derived, I didn't want to put in an exception for
+         the strange pluralization.
+
+         Prompted by David Cantrell.
+
 3.67  2021-03-01  sbeck
   -  NEW CODE(s)
 

@@ -4,7 +4,7 @@ use Catmandu::Util qw(:io :is :check);
 use PICA::Schema;
 use Moo;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 with qw(Catmandu::Validator);
 

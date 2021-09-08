@@ -1,6 +1,6 @@
-name = "Text-ANSI-Fold"
-# badges = ["travis"]
-authority="cpan:UTASHIRO"
+name      = "Text-ANSI-Fold"
+badges    = [ 'github-actions/test', 'metacpan' ]
+authority = "cpan:UTASHIRO"
 
-module_maker="ModuleBuildTiny"
+module_maker = "ModuleBuildTiny"
 

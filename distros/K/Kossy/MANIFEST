@@ -27,5 +27,8 @@ t/05_cookie.t
 t/06_mount.t
 t/07_security_header.t
 t/MyApp.pm
+t/kossy-connection/halt.t
+t/kossy-connection/halt_no_content.t
+t/kossy-connection/halt_text.t
 META.yml
 MANIFEST

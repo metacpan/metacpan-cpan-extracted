@@ -20,13 +20,14 @@ DESCRIPTION
 
 TODO
 
-      * Add more formats. nroff and ReST at least. Perhaps others.
+      * Add more formats. man and ReST at least. Perhaps others.
 
       * Improved Markdown parser. Currently the parser is very simple.
 
-      * Other outputs. Consider a Tickit-based frontend. Also some
-      structured file writers - allowing cross-conversion between POD,
-      Markdown, ReST, nroff and maybe also HTML output.
+      * Other outputs. Consider a Tickit-based frontend.
+
+      Also more structured file writers - ReST, man and maybe also HTML
+      output.
 
 AUTHOR
 

@@ -1,0 +1,16 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Passwd-Keyring-Secret
+Upstream-Contact: Thomas Uhle <uhle@cpan.org>
+Source: https://metacpan.org/release/Passwd-Keyring-Secret
+
+Files: *
+Copyright: 2020-2021, Thomas Uhle <uhle@cpan.org>
+License: Artistic-2.0
+
+License: Artistic-2.0
+ This module is free software; you can redistribute it and/or modify it
+ under the terms of the Artistic License 2.0 as published by the Perl
+ Foundation.
+ .
+ The complete text of the Artistic License 2.0 can be found in
+ '/usr/share/doc/libpasswd-keyring-secret-perl/LICENSE'.

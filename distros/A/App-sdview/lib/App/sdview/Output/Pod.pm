@@ -7,7 +7,7 @@ use v5.26;
 
 use Object::Pad;
 
-package App::sdview::Output::Pod 0.03;
+package App::sdview::Output::Pod 0.04;
 class App::sdview::Output::Pod
    does App::sdview::Output
    :strict(params);
@@ -46,6 +46,7 @@ method output_verbatim ( $para )
 
 method output_list_bullet ( $para ) { $self->_output_list( $para ); }
 method output_list_number ( $para ) { $self->_output_list( $para ); }
+method output_list_text   ( $para ) { $self->_output_list( $para ); }
 
 method _output_list ( $para )
 {
@@ -63,6 +64,9 @@ method _output_list ( $para )
       }
       elsif( $para->listtype eq "number" ) {
          $self->say( sprintf "=item %d.", $idx + 1 );
+      }
+      elsif( $para->listtype eq "text" ) {
+         $self->say( sprintf "=item %s", $self->_convert_str( $item->term ) );
       }
       $self->say;
 

@@ -29,7 +29,7 @@ for my $file ( $tar->list_files ) {
         my $got      = $db->query( $expected->{class}, $expected->{name} );
 
         is(
-            $got->{value},
+            $got,
             $expected->{res}{value},
             "$file: @{[$expected->{match}]}"
           )

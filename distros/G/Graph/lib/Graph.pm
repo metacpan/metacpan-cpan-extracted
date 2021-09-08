@@ -14,7 +14,7 @@ BEGIN {
 
 use Graph::AdjacencyMap qw(:flags :fields);
 
-our $VERSION = '0.9722';
+our $VERSION = '0.9723';
 
 require 5.006; # Weak references are absolutely required.
 
@@ -133,37 +133,47 @@ sub _opt_unknown {
         @opt > 1 ? 's' : '';
 }
 
-sub new {
-    my ($class, @args) = @_;
-    my $gflags = 0;
-    my $vflags = 0;
-    my $eflags = 0;
-    my %opt = _get_options( \@args );
+sub _opt_from_existing {
+    my ($g) = @_;
+    my %existing;
+    $existing{$_}++ for grep $g->$_, @GRAPH_PROPS_COPIED;
+    $existing{unionfind}++ if $g->has_union_find;
+    %existing;
+}
 
-    if (ref $class && $class->isa('Graph')) {
-	my %existing;
-	no strict 'refs';
-	$existing{$_}++ for grep $class->$_, @GRAPH_PROPS_COPIED;
-	$existing{unionfind}++ if $class->has_union_find;
-	%opt = (%existing, %opt) if %existing; # allow overrides
-    }
-
-    $opt{undirected} = !delete $opt{directed} if exists $opt{directed};
-
-    _opt(\%opt, \$vflags,
+sub _opt_to_vflags {
+    my ($vflags, $opt) = (0, @_);
+    _opt($opt, \$vflags,
 	 countvertexed	=> _COUNT,
 	 multivertexed	=> _MULTI,
 	 refvertexed	=> _REF,
 	 refvertexed_stringified => _REFSTR ,
 	 __stringified => _STR,
 	);
+    $vflags;
+}
 
-    _opt(\%opt, \$eflags,
+sub _opt_to_eflags {
+    my ($eflags, $opt) = (0, @_);
+    $opt->{undirected} = !delete $opt->{directed} if exists $opt->{directed};
+    _opt($opt, \$eflags,
 	 countedged	=> _COUNT,
 	 multiedged	=> _MULTI,
 	 undirected	=> _UNORD,
 	);
-    my $is_hyper = delete $opt{hyperedged};
+    ($eflags, delete $opt->{hyperedged});
+}
+
+sub new {
+    my ($class, @args) = @_;
+    my $gflags = 0;
+    my %opt = _get_options( \@args );
+
+    %opt = (_opt_from_existing($class), %opt) # allow overrides
+	if ref $class && $class->isa('Graph');
+
+    my $vflags = _opt_to_vflags(\%opt);
+    my ($eflags, $is_hyper) = _opt_to_eflags(\%opt);
 
     _opt(\%opt, \$gflags,
 	 unionfind     => _UNIONFIND,
@@ -195,12 +205,8 @@ sub new {
 
     $g->[ _F ] = $gflags;
     $g->[ _G ] = 0;
-    $g->[ _V ] = $vflags ?
-	_am_heavy($vflags, 1) :
-	    _am_light($vflags, 1);
-    $g->[ _E ] = ($is_hyper or $eflags & ~_UNORD) ?
-	_am_heavy($eflags, $is_hyper ? 0 : 2) :
-	    _am_light($eflags, 2);
+    $g->[ _V ] = _make_v($vflags);
+    $g->[ _E ] = _make_e($is_hyper, $eflags);
 
     $g->add_vertices(@V) if @V;
 
@@ -212,6 +218,18 @@ sub new {
 	if $gflags & _UNIONFIND;
 
     return $g;
+}
+
+sub _make_v {
+    my ($vflags) = @_;
+    $vflags ? _am_heavy($vflags, 1) : _am_light($vflags, 1);
+}
+
+sub _make_e {
+    my ($is_hyper, $eflags) = @_;
+    ($is_hyper or $eflags & ~_UNORD) ?
+	_am_heavy($eflags, $is_hyper ? 0 : 2) :
+	    _am_light($eflags, 2);
 }
 
 sub _am_light {
@@ -1118,6 +1136,11 @@ sub copy {
 
 *copy_graph = \&copy;
 
+sub _deep_copy_best {
+    _can_deep_copy_Storable()
+        ? _deep_copy_Storable(@_) : _deep_copy_DataDumper(@_);
+}
+
 sub _deep_copy_Storable {
     my $g = shift;
     require Safe;   # For deep_copy().
@@ -1139,11 +1162,9 @@ sub _deep_copy_DataDumper {
 }
 
 sub deep_copy {
-    if (_can_deep_copy_Storable()) {
-	return _deep_copy_Storable(@_); # uncoverable statement
-    } else {
-	return _deep_copy_DataDumper(@_); # uncoverable statement
-    }
+    my $g2 = _deep_copy_best(@_);
+    $g2->[ _V ]->reindex if grep ref, &_vertices05;
+    $g2;
 }
 
 *deep_copy_graph = \&deep_copy;

@@ -6,10 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 1 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Data/Sah/Coerce/perl/To_date/From_str/natural.pm'
+    'Data/Sah/Coerce/perl/To_date/From_str/natural.pm',
+    'Data/Sah/Coerce/perl/To_date/From_str/natural_jakarta.pm',
+    'Data/Sah/Coerce/perl/To_date/From_str/natural_local.pm',
+    'Data/Sah/Coerce/perl/To_date/From_str/natural_utc.pm'
 );
 
 

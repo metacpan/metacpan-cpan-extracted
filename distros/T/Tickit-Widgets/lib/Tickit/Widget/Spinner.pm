@@ -3,9 +3,9 @@
 #
 #  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.41;  # :param
+use Object::Pad 0.51;
 
-package Tickit::Widget::Spinner 0.32;
+package Tickit::Widget::Spinner 0.33;
 class Tickit::Widget::Spinner
    extends Tickit::Widget;
 
@@ -75,11 +75,11 @@ has $_state = 0;
 has $_interval :param = 0.5;
 has $_cols;
 
-BUILD
+ADJUSTPARAMS
 {
-   my %params = @_;
+   my ( $params ) = @_;
 
-   @_chars = $params{chars} ? $params{chars}->@* : (qw( - \ | / ));
+   @_chars = $params->{chars} ? $params->{chars}->@* : (qw( - \ | / ));
 
    $_cols = max map { textwidth $_ } @_chars;
 }

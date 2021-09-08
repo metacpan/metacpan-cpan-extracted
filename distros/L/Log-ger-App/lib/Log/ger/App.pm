@@ -1,12 +1,12 @@
 package Log::ger::App;
 
-our $DATE = '2020-11-11'; # DATE
-our $VERSION = '0.018'; # VERSION
+use strict;
+use warnings;
 
-# IFUNBUILT
-# use strict;
-# use warnings;
-# END IFUNBUILT
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-08-26'; # DATE
+our $DIST = 'Log-ger-App'; # DIST
+our $VERSION = '0.021'; # VERSION
 
 our $DEBUG = defined($ENV{LOG_GER_APP_DEBUG}) ? $ENV{LOG_GER_APP_DEBUG} : 0;
 
@@ -116,6 +116,13 @@ sub import {
         %{ $extra_conf // {} },
     );
 
+    my %off_categories = (
+        # some known categories that are not normally logged to screen or
+        # (error) file log
+        #'_dumps'  => 'off', # e.g. in download-bca, download-mandiri
+        '_access' => 'off', # e.g. in WWW::PAUSE::Simple
+    );
+
     # add Screen
     {
         last if $is_daemon;
@@ -126,12 +133,15 @@ sub import {
         );
         last if $olevel eq 'off';
         my $fmt =
+            ($ENV{LOG_ADD_STACK_TRACE} ? '[stack %T] ': '').
+            ($ENV{LOG_ADD_LOCATION} ? '[location %l] ': '').
             ($ENV{LOG_ADD_TIMESTAMP} ? '[%d] ': '').
             ($ENV{LOG_ADD_MEMORY_INFO} ? '[vmsize %_{vmsize}K] ': '').
             '%m';
         $conf{outputs}{Screen} = {
             conf   => { formatter => sub { "$progname: $_[0]" } },
             level  => $olevel,
+            category_level => \%off_categories,
             layout => [Pattern => {format => $fmt}],
         };
     }
@@ -167,6 +177,7 @@ sub import {
         $conf{outputs}{File} = {
             conf   => { path => $file_path },
             level  => $olevel,
+            category_level => \%off_categories,
             layout => [Pattern => {format => $fmt}],
         };
     }
@@ -183,6 +194,7 @@ sub import {
         $conf{outputs}{Syslog} = {
             conf => { ident => $progname, facility => 'daemon' },
             level => $olevel,
+            category_level => \%off_categories,
         };
     }
 
@@ -222,7 +234,7 @@ Log::ger::App - An easy way to use Log::ger in applications
 
 =head1 VERSION
 
-version 0.018
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -406,6 +418,18 @@ purposes.
 
 Used to set the default for C<$DEBUG>.
 
+=head2 LOG_ADD_LOCATION
+
+Boolean. Default to false. If set to true, will add location to the log:
+
+ [file /some/path.pm:123]
+
+=head2 LOG_ADD_STACK_TRACE
+
+Boolean. Default to false. If set to true, will add stack trace to the log:
+
+ [stack ...]
+
 =head2 LOG_ADD_TIMESTAMP
 
 Boolean. Default to false. If set to true, will add timestamps to the screen
@@ -541,7 +565,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

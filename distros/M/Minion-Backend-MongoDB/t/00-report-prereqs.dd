@@ -1,0 +1,43 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'perl' => '5.016'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'DateTime' => '0',
+                                      'DateTime::Set' => '0',
+                                      'DateTime::Span' => '0',
+                                      'ExtUtils::MakeMaker' => '7.12',
+                                      'Minion' => '10.17',
+                                      'MongoDB' => '2.0',
+                                      'Sys::Hostname' => '0',
+                                      'perl' => '5.016'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '7.12',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0.98',
+                                   'Test::UseAllModules' => '0.15',
+                                   'perl' => '5.016'
+                                 }
+                 }
+     };
+  $x;
+ }

@@ -23,7 +23,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Text-Table-Tiny-_ModuleFeatures/issues
   homepage: https://metacpan.org/release/Text-Table-Tiny-_ModuleFeatures
   repository: git://github.com/perlancar/perl-Text-Table-Tiny-_ModuleFeatures.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -283,6 +283,10 @@ x_Dist_Zilla:
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
               version: '0.082'
+            -
+              class: Pod::Weaver::Plugin::Module::Features
+              name: -Module::Features
+              version: '0.002'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -

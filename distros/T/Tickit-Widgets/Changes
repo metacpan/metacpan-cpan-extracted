@@ -1,5 +1,15 @@
 Revision history for Tickit-Widgets
 
+0.33    2021-08-28
+        [CHANGES]
+         * Updates for Object::Pad 0.52
+            + Use ADJUSTPARAMS blocks in favour of BUILD blocks
+         * Use a regular Tickit::Style definition to set up the <Tab> and
+           <S-Tab> base key behaviour, so widgets can override it
+         * Added Tickit::Widget::Entry->make_popup_at_cursor
+         * Print deprecation warnings about `child` constructor args and
+           legacy direct applied pen attributes on Widgets
+
 0.32    2021-07-03
         [CHANGES]
          * Use Object::Pad to implement even the base Tickit::Widget class

@@ -1,0 +1,7 @@
+--ignore-side-comment-lengths
+--minimum-space-to-comment=1
+--no-outdent-long-comments
+--no-outdent-long-quotes
+--variable-maximum-line-length
+--character-encoding=utf8
+-i=2

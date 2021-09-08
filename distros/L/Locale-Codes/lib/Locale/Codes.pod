@@ -162,6 +162,16 @@ By default, only active codes will be used, but if the string
 'retired' is passed in as an argument, both active and retired
 codes will be examined.
 
+=item B<code2names ( CODE [,CODESET] )>
+
+   @name = $obj->code2names($code [,$codeset]);
+
+This functions take a code and returns a list of all names and aliases
+associated with that code.
+
+Only active codes may be used and only active names and aliases will
+be returned.
+
 =item B<name2code ( NAME [,CODESET] [,'retired'] )>
 
    $code = $obj->name2code($name [,$codeset] [,'retired']);

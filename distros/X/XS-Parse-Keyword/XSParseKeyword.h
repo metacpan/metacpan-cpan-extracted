@@ -1,7 +1,7 @@
 #ifndef __XS_PARSE_KEYWORD_H__
 #define __XS_PARSE_KEYWORD_H__
 
-#define XSPARSEKEYWORD_ABI_VERSION 1
+#define XSPARSEKEYWORD_ABI_VERSION 2
 
 struct XSParseKeywordPieceType;
 struct XSParseKeywordPieceType {
@@ -39,6 +39,8 @@ enum {
   XS_PARSE_KEYWORD_LEXVAR,            /* padix */
   XS_PARSE_KEYWORD_ATTRS,             /* i / {attr.name + attr.val} */
   XS_PARSE_KEYWORD_VSTRING,           /* sv */
+
+  XS_PARSE_KEYWORD_INFIX = 0x40,      /* infix */
 
   XS_PARSE_KEYWORD_SEQUENCE = 0x80,   /* contained */
   XS_PARSE_KEYWORD_REPEATED,          /* i, contained */
@@ -109,6 +111,12 @@ enum {
 #define XPK_LITERAL(s) {.type = XS_PARSE_KEYWORD_LITERALSTR, .u.str = (const char *)s}
 #define XPK_STRING(s)  XPK_LITERAL(s)
 
+#define XPK_INFIX(select) {.type = XS_PARSE_KEYWORD_INFIX, .u.c = select}
+#define XPK_INFIX_RELATION       XPK_INFIX(XPI_SELECT_RELATION)
+#define XPK_INFIX_EQUALITY       XPK_INFIX(XPI_SELECT_EQUALITY)
+#define XPK_INFIX_MATCH_NOSMART  XPK_INFIX(XPI_SELECT_MATCH_NOSMART)
+#define XPK_INFIX_MATCH_SMART    XPK_INFIX(XPI_SELECT_MATCH_SMART)
+
 #define XPK_SEQUENCE(...) \
   {.type = XS_PARSE_KEYWORD_SEQUENCE, .u.pieces = (const struct XSParseKeywordPieceType []){ __VA_ARGS__, {0} }}
 /* First piece of these must be something probe-able */
@@ -150,6 +158,9 @@ enum {
 #define XPK_CHEVRONSCOPE_OPT(...) \
   {.type = XS_PARSE_KEYWORD_CHEVRONSCOPE|XPK_TYPEFLAG_OPT, .u.pieces = (const struct XSParseKeywordPieceType []){ __VA_ARGS__, {0} }}
 
+/* This type defined in XSParseInfix.h */
+typedef struct XSParseInfixInfo XSParseInfixInfo;
+
 typedef struct {
   union {
     OP *op;
@@ -158,6 +169,7 @@ typedef struct {
     int i;
     struct { SV *name; SV *value; } attr;
     PADOFFSET padix;
+    XSParseInfixInfo *infix;
   };
   int line;
 } XSParseKeywordPiece;
@@ -179,7 +191,7 @@ struct XSParseKeywordHooks {
   /* These are alternatives; the first one defined is used */
   int (*parse)(pTHX_ OP **opp, void *hookdata);
   int (*build)(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata);
-  int (*build1)(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hookdata);
+  int (*build1)(pTHX_ OP **out, XSParseKeywordPiece *arg0, void *hookdata);
 };
 
 static void (*register_xs_parse_keyword_func)(pTHX_ const char *kwname, const struct XSParseKeywordHooks *hooks, void *hookdata);
@@ -203,19 +215,18 @@ static void S_boot_xs_parse_keyword(pTHX_ double ver) {
   if(!svp)
     croak("XS::Parse::Keyword ABI minimum version missing");
   int abi_ver = SvIV(*svp);
-
   if(abi_ver > XSPARSEKEYWORD_ABI_VERSION)
     croak("XS::Parse::Keyword ABI version mismatch - library supports >= %d, compiled for %d",
         abi_ver, XSPARSEKEYWORD_ABI_VERSION);
 
   svp = hv_fetchs(PL_modglobal, "XS::Parse::Keyword/ABIVERSION_MAX", 0);
   abi_ver = SvIV(*svp);
-  if(abi_ver < 1)
-    croak("XS::Parse::Keyword ABI version mismatch - runtime requires at least version 1, library only supports %d",
-        abi_ver);
+  if(abi_ver < XSPARSEKEYWORD_ABI_VERSION)
+    croak("XS::Parse::Keyword ABI version mismatch - library supports <= %d, compiled for %d",
+        abi_ver, XSPARSEKEYWORD_ABI_VERSION);
 
   register_xs_parse_keyword_func = INT2PTR(void (*)(pTHX_ const char *, const struct XSParseKeywordHooks *, void *),
-      SvUV(*hv_fetchs(PL_modglobal, "XS::Parse::Keyword/register()@1", 0)));
+      SvUV(*hv_fetchs(PL_modglobal, "XS::Parse::Keyword/register()@2", 0)));
 }
 
 #endif

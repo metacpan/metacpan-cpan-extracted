@@ -4,13 +4,13 @@
       "Perl 5 Porters"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Storable",
    "no_index" : {
@@ -22,32 +22,37 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.31"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.31"
          }
       },
       "runtime" : {
          "requires" : {
             "XSLoader" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.41"
+         }
       }
    },
    "provides" : {
       "Storable" : {
-         "file" : "__Storable__.pm",
-         "version" : "3.15"
+         "file" : "Storable.pm",
+         "version" : "3.25"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://rt.perl.org/perlbug/"
+         "web" : "https://github.com/Perl/perl5/issues"
       }
    },
-   "version" : "3.15",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "3.25",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

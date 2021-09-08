@@ -1,6 +1,7 @@
 package Duadua::Parser;
 use strict;
 use warnings;
+use Duadua::Util;
 
 my $BLANK_UA = {
     name => 'UNKNOWN',
@@ -20,11 +21,28 @@ sub parse {
         return $BLANK_UA;
     }
 
+    if ( my $browser = $class->_detect_general_browser($d) ) {
+        return $browser;
+    }
+
     if ( my $bot = $class->_detect_general_bot($d) ) {
         return $bot;
     }
 
     return $BLANK_UA;
+}
+
+sub _detect_general_browser {
+    my ($class, $d) = @_;
+
+    my %h = %{$BLANK_UA};
+
+    if ( index($d->ua, 'Mozilla/') == 0 && index($d->ua, 'rowser') > 0 ) {
+        if ( $d->ua =~ m![^a-zA-Z]([a-zA-Z]+[bB]rowser)/([\d.]+)! ) {
+            ($h{name}, $h{version}) = ($1, $2);
+            return Duadua::Util->set_os($d, \%h);
+        }
+    }
 }
 
 sub _detect_general_bot {

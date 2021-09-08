@@ -1,5 +1,18 @@
 Revision history for Perl extension Text-ANSI-Fold
 
+2.1101 2021-09-06T06:34:56Z
+
+    - Fix bug of leaving EL after RESET when run-in.
+
+2.11 2021-08-07T03:24:46Z
+
+    - Make boundary parameter to take 'space' value.
+
+2.10 2021-04-09T10:12:10Z
+
+    - Add some new tab styles.
+    - Accept multiple styles.
+
 2.0903 2021-03-13T14:12:27Z
 
     - Fix option processing order bug. (sigh...)

@@ -16,7 +16,7 @@ sdif - side-by-side diff viewer for ANSI terminal
 
 =head1 VERSION
 
-Version 4.19.1
+Version 4.20.1
 
 =head1 SYNOPSIS
 
@@ -38,6 +38,8 @@ diff ... | sdif
 
     --width=#, -W#	specify width of output (default 80)
     --margin=#          specify margin column number (default 0)
+    --runin=#           specify run-in column number (default --margin)
+    --runout=#          specify run-out column number (default --margin)
     --mark=position	mark position (right, left, center, side) or no
     --column=order	set column order (default ONM)
     --view, -v		viewer mode
@@ -57,6 +59,10 @@ diff ... | sdif
     --diffopts=s	set diff command options
 
     --[no]lenience      supress unexpected input warning (default on)
+    --visible xx=1	set visible chars
+    --tabhead=char	set tabhead char
+    --tabspace=char	set tabspace char
+    --tabstyle=style	set tabstyle (dot, symbol, shade, bar, dash...)
 
     --[no]cdif		use ``cdif'' as word context diff backend
     --unit=s		pass through to cdif (word, char, mecab)
@@ -102,7 +108,7 @@ my $opt_truncate = 0;
 my $opt_onword = 1;
 my $default_opt_cdif = 'cdif';
 my $opt_cdif = '';
-my @default_opt_cdifopts = qw(--no-cc --no-mc --no-tc --no-uc);
+my @default_opt_cdifopts = qw(--sdif);
 my @opt_cdifopts;
 my $opt_env = 1;
 my @opt_colormap;
@@ -114,6 +120,8 @@ my $opt_column;
 my $opt_view;
 my $opt_ambiguous = 'narrow';
 my $opt_margin = 0;
+my $opt_runin;
+my $opt_runout;
 my $opt_lenience = my $opt_lenience_default = 1;
 our $screen_width;
 
@@ -161,6 +169,8 @@ my @optargs = (
     "s" => \$opt_s,
     "width|W=i" => \$opt_W,
     "margin=i" => \$opt_margin,
+    "runin=i" => \$opt_runin,
+    "runout=i" => \$opt_runout,
     "view|v!" => \$opt_view,
     "ambiguous=s" => \$opt_ambiguous,
     "command!" => \$opt_command,
@@ -247,7 +257,9 @@ if ($opt_ambiguous =~ /^(?:wide|full)/) {
 if ($opt_margin > 0) {
     Text::ANSI::Fold->configure(
 	linebreak => LINEBREAK_ALL,
-	map { $_ => $opt_margin } qw(margin runin runout),
+	margin    => $opt_margin,
+	runin     => $opt_runin // $opt_margin,
+	runout    => $opt_runout // $opt_margin,
 	);
 }
 
@@ -1006,11 +1018,16 @@ if possible.
 
 =item B<--margin>=I<column>
 
-Set margin column number.  Margin columns are left blank at the end of
-each line.  This option implicitly declare line break control, which
-allows to run-in and run-out prohibited characters at the head-and-end
-of line.  Margin columns are used to run-in prohibited characters from
-the head of next line.  See `perldoc Text::ANSI::Fold` for detail.
+=item B<--runin>=I<column>
+
+=item B<--runout>=I<column>
+
+Set the number of margin column.  Margin columns are left blank at the
+end of each line.  This option implicitly declare line break control,
+which allows to run-in and run-out prohibited characters at the
+head-and-end of line.  Margin columns are used for run-in/run-out
+columns unless they are given explicitly.  See `perldoc
+Text::ANSI::Fold` for detail.
 
 =item B<-->[B<no->]B<number>, B<-n>
 
@@ -1061,14 +1078,14 @@ option accepts optional parameter as an actual B<cdif> command.
 
 Specify options for back-end B<cdif> command.
 
-=item B<--unit>=I<word>|I<char>|I<mecab>
+=item B<--unit>=C<word>|C<letter>|C<char>|C<mecab>
 
-=item B<--by>=I<word>|I<char>|I<mecab>
+=item B<--by>=C<word>|C<letter>|C<char>|C<mecab>
 
 =item B<--mecab>
 
 These options are simply sent to back-end B<cdif> command.  Default is
-B<--unit>=I<word> and I<char> and I<mecab> can be used.  Option
+B<--unit>=C<word> and C<char> and I<mecab> can be used.  Option
 B<--by> is an alias for B<--unit>.  Option B<--mecab> is same as
 B<--unit=mecab>.  Use B<--cdifopts> to set other options.
 
@@ -1187,7 +1204,7 @@ names.
 B<cdif> shows non-space control characters visible by default. See
 L<cdif/--visible>.
 
-=item B<--tabstyle>=I<space>|I<dot>|I<symbol>|I<shade>|I<bar>|I<dash>...
+=item B<--tabstyle>=C<space>|C<dot>|C<symbol>|C<shade>|C<bar>|C<dash>...
 
 Option B<--tabstyle> allow to set B<--tabhead> and B<--tabspace>
 characters at once according to the given style name.  Select from

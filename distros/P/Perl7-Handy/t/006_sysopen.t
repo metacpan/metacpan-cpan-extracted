@@ -12,7 +12,7 @@ close(STDERR);
 my $rc = 0;
 
 eval q{ $rc = sysopen(FILE,$0,O_RDONLY); };
-if ($] < 5.008001) {
+if ($] < 5.010001) {
     ok($@, q{sysopen(FILE,$0,O_RDONLY)});
 }
 else {

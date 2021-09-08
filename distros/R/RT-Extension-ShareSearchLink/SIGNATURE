@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 5b21e877b5d7af10cfaba795d1202203a18ba8f1355188eedb62b86b1184a7d0 .perltidyrc
+SHA256 bed6ce3a3cfc672bdd633d14448997cdb6c654740ed6e045104247428ba7374d Changes
+SHA256 40764eb626c9e94f70279dd9be17cdfe2c93871f0564a975f46e5ec1ec0ebf59 MANIFEST
+SHA256 dabc46d2819c6e79866896db50837ca7101637b274354a31f1664448e455fc25 META.yml
+SHA256 d03752be09336d6c480f87100edf2cbc61850615e014290f089e357d2237c5b8 Makefile.PL
+SHA256 d8b818d5e5da5d7606a23045aeb1e60f0d4f4587984ea4f008fd11dc7b0bb743 README
+SHA256 d355b466ded7e0c90f5fd2921c7e155e6b6e45e013148ac36b44eeca01299f80 README.md
+SHA256 5ee5b01a56a4360ef4d46b81f3479f280295b595bedb2bf6c2ce42eeb08eaf15 etc/schema-mysql.sql
+SHA256 dd6d11d8a6cef58acf47bf86fd648237b56088b9f4cd0614c77a65400d9288b7 etc/schema-postgresql.sql
+SHA256 62aea63cd6cb00400e573c5ecf8d52ff95d8a3d3096e8afc7e65634f4a50bf76 gitignore
+SHA256 addb1e8999523d3c5a17164bf6d4204638158d6adc19fb07e4556ed212226726 html/Callbacks/ShareSearchLinks/Elements/Tabs/Privileged
+SHA256 2b5a593269bb24536dd44ed3ed3223c0ffaa804a687496ea2dfaa861736f17dd html/Callbacks/ShareSearchLinks/Search/Results.html/AfterResults
+SHA256 6358a8f9969f74ad492edc3a7a52d1368f0929545bbf3d41b071c06b47ad5245 html/Helpers/ShareSearchLinks
+SHA256 3b0567e9d59af61b8ce1b65b7af6870effadd7498774b8d62f8d4d12f05d790a html/Search/ShareSearchLink.html
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a97bf661b739643c3adee064addf7a85f22e25e1bbffc137974cd8754ffa5c66 inc/Module/Install/Include.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 2c89fa442659e76a8ee28643923c3a928c39ed013ad08fe67049d1df7d4c9fd6 inc/Module/Install/RTx.pm
+SHA256 a7c5323f81fc052097b0470bd3e6e7e2de2ac9d90c59646948d89c4c7e46cfe6 inc/Module/Install/RTx/Runtime.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 21064201b9abc1e8dd864426c5c2eab6ef22203cff89e0b25afbaa9cfd6f55a5 inc/YAML/Tiny.pm
+SHA256 d1a3ba1fa2e8d2b2ba437da8aa2152d2e88b55a0de8187e602ec6e94b64def17 lib/RT/Extension/ShareSearchLink.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.14 (GNU/Linux)
+
+iEYEAREDAAYFAmEpIKAACgkQwVlroz/Fb1EKSQCgisLXj0S5/9Qm93llVzllmezA
+0ZIAn1QoOsTGtRv19xZu1Nnoa+V9TWw6
+=7T+X
+-----END PGP SIGNATURE-----

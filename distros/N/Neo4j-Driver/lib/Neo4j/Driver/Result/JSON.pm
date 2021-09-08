@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result::JSON;
 # ABSTRACT: JSON/REST result handler
-$Neo4j::Driver::Result::JSON::VERSION = '0.26';
+$Neo4j::Driver::Result::JSON::VERSION = '0.27';
 
 use parent 'Neo4j::Driver::Result';
 
@@ -270,7 +270,7 @@ Neo4j::Driver::Result::JSON - JSON/REST result handler
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 DESCRIPTION
 

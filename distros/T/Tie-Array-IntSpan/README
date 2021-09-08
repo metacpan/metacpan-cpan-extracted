@@ -1,0 +1,78 @@
+NAME
+    Tie::Array::IntSpan - Tied-array interface for Array::IntSpan
+
+VERSION
+    This document describes version 0.002 of Tie::Array::IntSpan (from Perl
+    distribution Tie-Array-IntSpan), released on 2021-08-29.
+
+SYNOPSIS
+     use Array::IntSpan;
+     use Tie::Array::IntSpan;
+
+     my $intspan = Array::IntSpan->new([0, 59, 'F'], [60, 69, 'D'], [80, 89, 'B']);
+     tie my @ary, 'Tie::Array::IntSpan', $intspan;
+
+     # use the array like a regular one
+     say for @ary;
+     print join("", @ary[81,65,0]); # => "DBF"
+     $ary[30] = 'C'; # breaks up the first range
+
+DESCRIPTION
+    This module provides tied-array interface for Array::IntSpan. It might
+    be convenient if you want to access an "Array::IntSpan" object like a
+    regular Perl array. But note that the tied-array interface does not
+    expose the full power of the "Array::IntSpan", e.g. you cannot create a
+    new range or directly modify whole ranges. That's why you pass the
+    "Array::IntSpan" object when you initialize the tied array, so you can
+    access the object directly to do things you can't do with the tie
+    interface.
+
+    Caveats:
+
+    *   Does not handle negative range (e.g. [-5, -1, 'foo']) well
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Tie-Array-IntSpan>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Tie-Array-IntSpan>.
+
+SEE ALSO
+    Array::IntSpan is the backend that provides the magic.
+
+    Other Tie::Array::* modules.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Tie-Array-IntSpan>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

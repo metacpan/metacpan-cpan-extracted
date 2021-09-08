@@ -7,7 +7,7 @@ package Locale::Currency;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'gen_mods' is run.
-#    Generated on: Mon Mar  1 14:12:01 EST 2021
+#    Generated on: Thu Sep  2 09:18:29 EDT 2021
 
 use strict;
 use warnings;
@@ -15,7 +15,7 @@ require 5.006;
 use Exporter qw(import);
 
 our($VERSION,@EXPORT);
-$VERSION   = '3.67';
+$VERSION   = '3.68';
 
 ################################################################################
 use if $] >= 5.027007, 'deprecate';
@@ -24,6 +24,7 @@ use Locale::Codes::Constants;
 
 @EXPORT    = qw(
                 code2currency
+                code2currencys
                 currency2code
                 all_currency_codes
                 all_currency_names
@@ -41,6 +42,10 @@ sub show_errors {
 
 sub code2currency {
    return $obj->code2name(@_);
+}
+
+sub code2currencys {
+   return $obj->code2names(@_);
 }
 
 sub currency2code {

@@ -1,12 +1,18 @@
 Revision history for Test::MockModule
 
+v0.177.0
+- 35f0d0b Update changelog - Geoff Franks
+- 1d5b485 Move test modules from build to test requires - Olaf Alders
+- 78afe10 Clean up changelog - Geoff Franks
+
+v0.277.0
+
+- Move test modules from build to test requires - Olaf Alders
+
 v0.176.0
 - 3ba8bc7 lexically scoped strictness - David Cantrell
 - e57fc5a Update ci with dockerhub auth - Geoff Franks
 - bfe1e63 Update GitHub workflow with deprecated add-path - Nicolas R
-
-vX.XXX.X
-- XXXXXXX 'strict' mode is now lexically scoped
 
 v0.175.0
 - 964aa2a Ignore CI files and whitesource - Nicolas R

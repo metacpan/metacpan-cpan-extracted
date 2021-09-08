@@ -1,6 +1,6 @@
 NAME
 
-    Syntax::Keyword::Defer - add defer block syntax to perl
+    Syntax::Keyword::Defer - execute code when leaving a block
 
 SYNOPSIS
 

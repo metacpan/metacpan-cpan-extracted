@@ -385,7 +385,7 @@ sub __row_groups {
     # Choose
     my $idxs = $tu->choose_a_subset(
         \@choices_groups,
-        { info => $info, prompt => $prompt, layout => 3, index => 1, confirm => $sf->{i}{ok},
+        { info => $info, prompt => $prompt, layout => 2, index => 1, confirm => $sf->{i}{ok},
           back => $sf->{i}{fi}{back}, all_by_default => 1, cs_label => "Chosen groups:\n", cs_separator => "\n",
           cs_end => "\n", busy_string => $sf->{i}{fi}{working}, keep => $sf->{i}{fi}{keep} }
     );
@@ -500,7 +500,7 @@ sub __fill_up_rows {
     # Choose
     my $ok = $tc->choose(
         $menu,
-        { info => $info, prompt => $prompt, index => 1, undef => '- NO', layout => 3, keep => $sf->{i}{fi}{keep} }
+        { info => $info, prompt => $prompt, index => 1, undef => '- NO', layout => 2, keep => $sf->{i}{fi}{keep} }
     );
     $sf->__print_busy_string();
     if ( ! $ok ) {
@@ -533,7 +533,7 @@ sub __append_col {
     # Choose
     my $ok = $tc->choose(
         $menu,
-        { info => $info, prompt => $prompt, index => 1, undef => '- NO', layout => 3, keep => $sf->{i}{fi}{keep} }
+        { info => $info, prompt => $prompt, index => 1, undef => '- NO', layout => 2, keep => $sf->{i}{fi}{keep} }
     );
     $sf->__print_busy_string();
     if ( $ok ) {
@@ -692,7 +692,7 @@ sub __merge_rows {
     # Choose
     my $chosen_idxs = $tu->choose_a_subset(
         $stringified_rows,
-        { cs_separator => "\n", cs_end => "\n", layout => 3, order => 0, all_by_default => 0, prompt => $prompt,
+        { cs_separator => "\n", cs_end => "\n", layout => 2, order => 0, all_by_default => 0, prompt => $prompt,
           index => 1, confirm => $sf->{i}{ok}, back => $sf->{i}{fi}{back}, info => $info, keep => $sf->{i}{fi}{keep},
           busy_string => $sf->{i}{fi}{working} }
     );
@@ -820,7 +820,7 @@ sub __transpose_rows_to_cols {
     my $info = $sf->__get_filter_info( $sql, $count_static_rows, undef, $menu, 1 ) . "\n" . $filter_str;
     my $ok = $tc->choose(
         $menu,
-        { info => $info, prompt => $prompt, index => 1, undef => '- NO', layout => 3, busy_string => $sf->{i}{fi}{working},
+        { info => $info, prompt => $prompt, index => 1, undef => '- NO', layout => 2, busy_string => $sf->{i}{fi}{working},
           keep => $sf->{i}{fi}{keep} }
     );
     $sf->__print_busy_string();
@@ -921,7 +921,7 @@ sub __choose_a_row_idx {
     # Choose
     my $row_idx = $tc->choose(
         [ @pre, @stringified_rows ],
-        { layout => 3, index => 1, undef => $back // '<<', info => $info, prompt => $prompt, keep => $sf->{i}{fi}{keep},
+        { layout => 2, index => 1, undef => $back // '<<', info => $info, prompt => $prompt, keep => $sf->{i}{fi}{keep},
           busy_string => $sf->{i}{fi}{working} }
     );
     $sf->__print_busy_string();

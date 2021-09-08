@@ -4,7 +4,7 @@ App::proxyforurl - An online proxy PAC file parser
 
 # VERSION
 
-0.08
+0.09
 
 # DESCRIPTION
 
@@ -17,7 +17,7 @@ a given net.
 
 ## Demo
 
-Check out [http://home.thorsen.pm/proxyforurl](http://home.thorsen.pm/proxyforurl) for a running example.
+Check out [https://app.thorsen.pm/proxyforurl](https://app.thorsen.pm/proxyforurl) for a running example.
 
 ## Missing features
 
@@ -31,7 +31,7 @@ intput is.
 
 # SEE ALSO
 
-- [http://findproxyforurl.com/](http://findproxyforurl.com/)
+- [https://findproxyforurl.com/](https://findproxyforurl.com/)
 - [https://github.com/pacparser/pacparser](https://github.com/pacparser/pacparser)
 
 # DISCLAIMER
@@ -45,7 +45,7 @@ this is software, there might be bugs.
 
 # COPYRIGHT AND LICENSE
 
-Copyright (C) 2014, Jan Henning Thorsen
+Copyright (C) Jan Henning Thorsen
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.

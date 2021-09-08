@@ -21,6 +21,7 @@ subtest 'simple' => sub{
   is [$uri->path], [], 'path';
   ok !$uri->query, 'query';
   ok !$uri->frag, 'frag';
+  ok !$uri->fragment, 'fragment';
 
   ok !$uri->usr, 'usr';
   ok !$uri->pwd, 'pwd';

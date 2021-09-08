@@ -1,0 +1,33 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 d6199226fa05a84c2887626f0e01a8cee92db383c132aa4b58428ca99e21036b Build.PL
+SHA256 4e381ca4ec1a71491abcad316a0d23d54f8de75995fe37e53b599e8e5c733c3b Changes
+SHA256 45802be937c0242c9be7281952ad54cf7c6500aa3c41f117aaf6646e8831148f MANIFEST
+SHA256 3e0b3c66324629fa6dcf690fcfbae775e0d24415bbd2513eee56b03b97383029 META.json
+SHA256 f680a6021f8a9ab367c9aa5a4ebfeb2c96d2d1dd0340443d207286b3c7860da2 META.yml
+SHA256 5efe4d9ddb467ba21d3d2f7ac66f9608f3c8f106265b9013e2561a740a40dbe7 Makefile.PL
+SHA256 f05eee92456cc57f3b01c00ad287dfa59f443379c2974c671b5323c23bcbf536 README
+SHA256 8a3f2254601aacd18f5fcbd320fae2252ed1098a4dfcb2b337d2aa77943df012 TextDir.pm
+SHA256 e6c4bb3f036aad215789df013d463fce3c98bfd45bf458950d65827508c55442 t/basic.t
+SHA256 bdad45ce41e31fea861adb89da47e1590a20e27e3ede44bc5f8e680196eb75f7 t/hierarchic.t
+-----BEGIN PGP SIGNATURE-----
+Comment: GPGTools - http://gpgtools.org
+
+iF0EAREDAB0WIQSty9sFtA6yoqVVVGKCu8wEt++UdgUCYTOyZQAKCRCCu8wEt++U
+dibTAKDWm8RrXFP50bJsvCm3pLtzpEWjmQCgu9lirkKZZ7bLgCRN6X+kpbQ9DkI=
+=yTKr
+-----END PGP SIGNATURE-----

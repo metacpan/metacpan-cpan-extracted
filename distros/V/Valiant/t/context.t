@@ -76,7 +76,7 @@ use Test::Most;
 
 {
   ok my $object = Local::Test::Numericality->new(age=>11);
-  ok $object->context(['centarion', 'voter'])->validate->invalid;
+  ok $object->context(['voter','centarion'])->validate->invalid;
   is_deeply +{ $object->errors->to_hash(full_messages=>1) },
     {
       age => [

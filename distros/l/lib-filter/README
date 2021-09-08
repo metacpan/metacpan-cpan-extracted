@@ -1,180 +1,247 @@
-SYNOPSIS
+NAME
+    lib::filter - Allow/disallow loading modules
 
+VERSION
+    This document describes version 0.281 of lib::filter (from Perl
+    distribution lib-filter), released on 2021-08-29.
+
+SYNOPSIS
      use lib::filter %opts;
 
 DESCRIPTION
+    lib::filter lets you allow/disallow loading modules using some rules. It
+    works by installing a coderef in @INC (and additionally by pruning some
+    entries in @INC). The main use-case for this pragma is for testing.
 
-    lib::filter lets you allow/disallow loading modules using some rules.
-    It works by installing a coderef in @INC (and additionally by pruning
-    some entries in @INC). The main use-case for this pragma is for
-    testing.
+    It has been pointed out to me that for some tasks, alternatives to using
+    this module exist, so I'll be presenting those in the examples below.
 
-    It has been pointed out to me that for some tasks, alternatives to
-    using this module exist, so I'll be presenting those in the examples
-    below.
+    *   To disallow loading any module:
 
-      * To disallow loading any module:
+         % perl -Mlib::filter=allow_core,0,allow_noncore,0 yourscript.pl
 
-       % perl -Mlib::filter=allow_core,0,allow_noncore,0 yourscript.pl
+        You can also use lib::none for this, or simply empty @INC yourself,
+        e.g.:
 
-      You can also use lib::none for this, or simply empty @INC.
+         {
+             local @INC = ();
+             ...
+         }
 
-      * To allow only core modules:
+        To no-op instead of disallowing, see lib::noop::all.
 
-      For example for testing a fatpacked script (see App::FatPacker):
+    *   To allow only core modules:
 
-       % perl -Mlib::filter=allow_noncore,0 yourscript.pl
+        For example for testing a fatpacked script (see App::FatPacker):
 
-      You can also use lib::core::only for this, which comes with the
-      App-FatPacker distribution.
+         % perl -Mlib::filter=allow_noncore,0 yourscript.pl
 
-      * To only allow a specific set of modules:
+        You can also use lib::core::only for this, which comes with the
+        App::FatPacker distribution.
 
-       % perl -Mlib::filter=allow_core,0,allow_noncore,0,allow,'XSLoader;List::Util' yourscript.pl
+    *   To only allow a specific set of modules:
 
-      * To allow core modules plus some additional modules:
+         % perl -Mlib::filter=allow_core,0,allow_noncore,0,allow,'XSLoader;List::Util' yourscript.pl
 
-      For example to test a fatpacked script that might still require some
-      XS modules:
+        To no-op instead of disallowing, see lib::noop::except.
 
-      # allow additional modules by pattern % perl
-      -Mlib::filter=allow_noncore,0,allow_re,'^DateTime::.*' yourscript.pl
+    *   To allow core modules plus some additional modules:
 
-       # allow additional modules listed in a file
-       % perl -Mlib::filter=allow_noncore,0,allow_list,'/tmp/allow.txt' yourscript.pl
-      
-       # allow core modules plus additional modules found in some dirs
-       % perl -Mlib::filter=allow_noncore,0,extra_inc,'.:proj/lib' yourscript.pl
-      
-       # allow some non-core XS modules
-       % perl -MModule::CoreList -Mlib::filter=filter,'sub{ return 1 if Module::CoreList->is_core($_); return 1 if m!Clone|Acme/Damn!; 0' yourscript.pl
-       % perl -Mlib::coreplus=Clone,Acme::Damn yourscript.pl
+        For example to test a fatpacked script that might still require some
+        XS modules:
 
-      Alternatively, you can also test by preloading the additional modules
-      before using lib::core::only:
+         # allow additional modules by pattern
+         % perl -Mlib::filter=allow_noncore,0,allow_re,'^DateTime::.*' yourscript.pl
 
-       % perl -mClone -mAcme::Damn -Mlib::core::only yourscript.pl
+         # allow additional modules listed in a file
+         % perl -Mlib::filter=allow_noncore,0,allow_list,'/tmp/allow.txt' yourscript.pl
 
-      * To allow a module and recursively all other modules that the module
-      requires
+         # allow core modules plus additional modules found in some dirs
+         % perl -Mlib::filter=allow_noncore,0,extra_inc,'.:proj/lib' yourscript.pl
 
-      This is convenient when we want to allow a non-trivial module which
-      itself uses some other modules, e.g. Moo or Moose:
+         # allow some non-core XS modules
+         % perl -MModule::CoreList -Mlib::filter=filter,'sub{ return 1 if Module::CoreList->is_core($_); return 1 if m!Clone|Acme/Damn!; 0' yourscript.pl
+         % perl -Mlib::coreplus=Clone,Acme::Damn yourscript.pl
 
-       % perl -Mlib::filter=allow_noncore,0,allow,Moo,allow_is_recursive=0
+        Alternatively, you can also test by preloading the additional
+        modules before using lib::core::only:
 
-      * To disallow some modules:
+         % perl -mClone -mAcme::Damn -Mlib::core::only yourscript.pl
 
-      For example to test that a script can still run without a module
-      (e.g. an optional prereq):
+    *   To allow a module and recursively all other modules that the module
+        requires
 
-       % perl -Mlib::filter=disallow,'YAML::XS;JSON::XS' yourscript.pl
-      
-       # idem, but the list of disallowed modules are retrieved from a file
-       % perl -Mlib::filter=disallow_list,/tmp/disallow.txt yourscript.pl
+        This is convenient when we want to allow a non-trivial module which
+        itself uses some other modules, e.g. Moo or Moose:
 
-      Devel::Hide is another module which you can you for exactly this
-      purpose:
+         % perl -Mlib::filter=allow_noncore,0,allow,Moo,allow_is_recursive=0
 
-       % perl -MDevel::Hide=YAML::XS,JSON::XS yourscript.pl
+    *   To disallow some modules:
 
-      * Do custom filtering
+        For example to test that a script can still run without a module
+        (e.g. an optional prereq):
 
-       % perl -Mlib::filter=filter,sub{not/^Foo::/} yourscript.pl
+         % perl -Mlib::filter=disallow,'YAML::XS;JSON::XS' yourscript.pl
+
+         # idem, but the list of disallowed modules are retrieved from a file
+         % perl -Mlib::filter=disallow_list,/tmp/disallow.txt yourscript.pl
+
+        Devel::Hide is another module which you can you for exactly this
+        purpose:
+
+         % perl -MDevel::Hide=YAML::XS,JSON::XS yourscript.pl
+
+        To no-op instead of disallowing, see lib::noop.
+
+    *   Do custom filtering
+
+         % perl -Mlib::filter=filter,sub{not/^Foo::/} yourscript.pl
 
 OPTIONS
-
     Known options:
 
-      * debug => bool
+    *   debug => bool
 
-      If set to true, print diagnostics when filtering.
+        If set to true, print diagnostics when filtering.
 
-      * disallow => str
+    *   disallow => str
 
-      Add a semicolon-separated list of modules to disallow.
+        Add a semicolon-separated list of modules to disallow.
 
-      * disallow_re => str
+    *   disallow_re => str
 
-      Add modules matching regex pattern to disallow.
+        Add modules matching regex pattern to disallow.
 
-      * disallow_list => filename
+    *   disallow_list => filename
 
-      Read a file containing list of modules to disallow (one module per
-      line).
+        Read a file containing list of modules to disallow (one module per
+        line).
 
-      * allow => str
+    *   allow => str
 
-      Add a semicolon-separated list of module names to allow.
+        Add a semicolon-separated list of module names to allow.
 
-      * allow_re => str
+    *   allow_re => str
 
-      Allow modules matching regex pattern.
+        Allow modules matching regex pattern.
 
-      * allow_list => filename
+    *   allow_list => filename
 
-      Read a file containing list of modules to allow (one module per
-      line).
+        Read a file containing list of modules to allow (one module per
+        line).
 
-      * allow_is_recursive => bool (default: 0)
+    *   allow_is_recursive => bool (default: 0)
 
-      If set to 1, then will also allow modules that are required by the
-      allowed modules (and modules that are allowed by those modules, and
-      so on). This is convenient if you want to allow a non-trivial module,
-      say, Moo or Moose which will require other modules too. Without this
-      option, you will need to explicitly allow each of those modules
-      yourself.
+        If set to 1, then will also allow modules that are required by the
+        allowed modules (and modules that are allowed by *those* modules,
+        and so on). This is convenient if you want to allow a non-trivial
+        module, say, Moo or Moose which will require other modules too.
+        Without this option, you will need to explicitly allow each of those
+        modules yourself.
 
-      * allow_core => bool (default: 1)
+    *   allow_core => bool (default: 1)
 
-      Allow core modules.
+        Allow core modules.
 
-      * allow_noncore => bool (default: 1)
+    *   allow_noncore => bool (default: 1)
 
-      Allow non-core modules.
+        Allow non-core modules.
 
-      * extra_inc => str
+    *   extra_inc => str
 
-      Add additional path to search modules in. String must be
-      colon-separated paths.
+        Add additional path to search modules in. String must be
+        colon-separated paths.
 
-      * filter => code
+    *   filter => code
 
-      Do custom filtering. Code will receive module name (e.g. Foo/Bar.pm)
-      as its argument ($_ is also localized to contained the module name,
-      for convenience) and should return 1 if the module should be allowed.
+        Do custom filtering. Code will receive module name (e.g.
+        "Foo/Bar.pm") as its argument ($_ is also localized to contained the
+        module name, for convenience) and should return 1 if the module
+        should be allowed.
 
     How a module is filtered:
 
-      * First it's checked against filter, if that option is defined
+    *   First it's checked against "filter", if that option is defined
 
-      * then, it is checked against the disallow/disallow_re/disallow_list.
+    *   then, it is checked against the
+        "disallow"/"disallow_re"/"disallow_list".
 
-      If it matches one of those options then the module is disallowed.
+        If it matches one of those options then the module is disallowed.
 
-      * Otherwise it is checked against the allow/allow_re/allow_list.
+    *   Otherwise it is checked against the "allow"/"allow_re"/"allow_list".
 
-      If it matches one of those options and the module's path is found in
-      the directories in @INC, then the module is allowed.
+        If it matches one of those options and the module's path is found in
+        the directories in @INC, then the module is allowed.
 
-      * If allow_is_recursive is true, check the requirer.
+    *   If "allow_is_recursive" is true, check the requirer.
 
-      If the calling package is already in %INC, we allow that. For
-      example, if we allow Moo and Moo calls Moo::_strictures and
-      Module::Runtime, we will also allow them. Later if Moo::_strictures
-      tries to load strictures, we also allow it, and so on.
+        If the calling package is already in %INC, we allow that. For
+        example, if we allow "Moo" and "Moo" calls Moo::_strictures and
+        Module::Runtime, we will also allow them. Later if
+        "Moo::_strictures" tries to load strictures, we also allow it, and
+        so on.
 
-      * Finally, allow_core/allow_noncore is checked.
+    *   Finally, allow_core/allow_noncore is checked.
 
-      When allow_core is set to false, core directories are excluded.
-      Likewise, when allow_noncore is set to false, non-core directories
-      are excluded.
+        When "allow_core" is set to false, core directories are excluded.
+        Likewise, when "allow_noncore" is set to false, non-core directories
+        are excluded.
+
+ENVIRONMENT
+  PERL_LIB_FILTER_DEBUG
+    Boolean. Sets the default for the "debug" option.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/lib-filter>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-lib-filter>.
 
 SEE ALSO
-
     Related/similar modules: lib::none, lib::core::only, Devel::Hide,
     Test::Without::Module.
 
     To simulate the absence of certain programs in PATH, you can try
     File::Which::Patch::Hide.
+
+    To no-op instead of disallowing, see lib::noop.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTORS
+    *   A. Sinan Unur <nanis@cpan.org>
+
+    *   Olivier Mengué <dolmen@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2016, 2015 by perlancar
+    <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=lib-filter>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

@@ -1,4 +1,6 @@
-1.5.0  xx.xx.2021
+1.5.1  xx.xx.2021
+           - fix https://rt.cpan.org/Ticket/Display.html?id=139149 (defined @array %hash)
+1.5.0  13.07.2021
            - scalar's as_string/as_number now doesn't require SV to be Simple. It will stringify it anyway.
            - add Scalar::auto_number()
 1.4.3  02.07.2021

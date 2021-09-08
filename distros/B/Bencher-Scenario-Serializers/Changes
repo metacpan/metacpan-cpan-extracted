@@ -1,3 +1,8 @@
+0.161   2021-09-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Add participant: JSON::Parser::Regexp.
+
+
 0.160   2021-07-31  Released-By: PERLANCAR
 
         - Update MarpaX::ESLIF::ECMA404 participant: no longer needs new(), now

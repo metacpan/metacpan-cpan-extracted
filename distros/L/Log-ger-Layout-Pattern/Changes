@@ -1,3 +1,8 @@
+0.008   2021-08-24  Released-By: PERLANCAR; Urgency: medium
+
+	- Fix stack trace/location for %F, %L, %l, %C.
+
+
 0.007   2020-04-19  Released-By: PERLANCAR; Urgency: medium
 
 	- Add pattern: %_{vmsize}.

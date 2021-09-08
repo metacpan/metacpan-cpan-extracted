@@ -1,3 +1,8 @@
+0.062   2021-08-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Relax version requirement from 6.[012] to 6.
+
+
 0.061   2021-03-08  Released-By: PERLANCAR; Urgency: medium
 
 	- Allow HTTP::Headers 6.2x to be patched.

@@ -1,0 +1,10 @@
+Revision history for Pod-Reader
+
+1.020
+  - Versioning problem... forgot to update the version here and there.
+
+1.010
+  - Fix a small typo in bin/podreader.
+
+1.000
+  - First release!

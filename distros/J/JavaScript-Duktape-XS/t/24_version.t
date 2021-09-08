@@ -16,11 +16,12 @@ my %field_info = (
         rx => qr/^[0-9]+$/,
     },
     patch => {
+        optional => $CLASS =~ m/V8/ ? 1 : 0,
         name => 'number',
         rx => qr/^[0-9]+$/,
     },
     build => {
-        optional => 1,
+        optional => $CLASS =~ m/Duktape/ ? 1 : 0,
         name => 'number',
         rx => qr/^[0-9]+$/,
     },

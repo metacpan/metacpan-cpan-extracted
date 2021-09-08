@@ -37,7 +37,9 @@ use Test::More;
 #
 # All perl's whose nvtype is __float128 (except those running on Cygwin) assign correctly and
 # $reliable is set to true for them, irrespective of the value of $] ... except that on MS
-# Windows, assignment of subnormal values (within a specific range) is unreliable.
+# Windows and (apparently) at least one instance of i686 linux (see
+# http://www.cpantesters.org/cpan/report/11de736c-0cd6-11ec-aef5-c3a30c210c3d), assignment of
+# subnormal values (within a specific range) is unreliable.
 #
 # For all other builds of perl, $reliable will be set to true if and only if:
 # 1) $] >= 5.03 && $Config{nvtype} eq 'double' && defined($Config{d_strtod})
@@ -82,8 +84,17 @@ else                                           { $MAX_DIG = 34;   # NV is Double
 
 my $reliable = 0;
 
-my $win_subnormal_issue = 0;
-$win_subnormal_issue = 1 if ($^O =~/MSWin/ && $Config{nvtype} eq '__float128');
+my $subnormal_issue = 0;
+
+if($Config{nvtype} eq '__float128') {
+ $subnormal_issue = 1 if $^O =~/MSWin/;
+
+ # If 803e-4944 is mis-assigned to the value given below,
+ # then, until evidence to the contrary is provided, we assume
+ # that we are facing the bug with subnormals described at:
+ # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=94756
+ $subnormal_issue = 1 if sprintf('%a', 803e-4944) eq '0x1.069b16b796df96f69cf7p-16414';
+}
 
 if(
    $^O !~/cygwin/i
@@ -96,7 +107,7 @@ if(
       )
   ) {
 
-  if( $win_subnormal_issue ) {
+  if( $subnormal_issue ) {
     warn "\n Using perl for string to NV assignment ... unless the NV's\n",
          " absolute value is in the range:\n",
          "  0x1p-16414 .. 0x1.ffffffffffffffffffffp-16414\n",
@@ -124,7 +135,7 @@ while(1) {
   my $exponent = int(rand($MAX_POW));
 
   # Skew the exponent towards the more usual values that are typically used.
-  # nvtoa() calculations are quite expensive on long double and __float128
+  # nvtoa() calculations are relatively expensive on long double and __float128
   # builds for NVs whose exponents are a long way from zero.
   $exponent = int(rand(10)) if ($exponent > 50 && $exponent < $MAX_POW / 1.5);
   $exponent = '-' . $exponent if ($count & 1);
@@ -137,7 +148,7 @@ while(1) {
   my $str = $mantissa_sign . $mantissa . 'e' . $exponent;
   my $s_copy = $mantissa_sign . $mantissa . 'e' . $exponent;
   my $float128_subnormal_issue = 0;
-  if($win_subnormal_issue) {
+  if($subnormal_issue) {
     $float128_subnormal_issue = float128_subnormal_problem($s_copy * 1.0);
   }
   my $nv;

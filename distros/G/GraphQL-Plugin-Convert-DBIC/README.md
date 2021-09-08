@@ -13,17 +13,17 @@ GraphQL::Plugin::Convert::DBIC - convert DBIx::Class schema to GraphQL schema
 # SYNOPSIS
 
     use GraphQL::Plugin::Convert::DBIC;
-    use Schema;
-    my $converted = GraphQL::Plugin::Convert::DBIC->to_graphql(Schema->connect);
+    use My::Local::Schema;
+    my $converted = GraphQL::Plugin::Convert::DBIC->to_graphql(My::Local::Schema->connect);
     print $converted->{schema}->to_doc;
 
 # DESCRIPTION
 
-This module implements the [GraphQL::Plugin::Convert](https://metacpan.org/pod/GraphQL::Plugin::Convert) API to convert
-a [DBIx::Class::Schema](https://metacpan.org/pod/DBIx::Class::Schema) to [GraphQL::Schema](https://metacpan.org/pod/GraphQL::Schema) etc.
+This module implements the [GraphQL::Plugin::Convert](https://metacpan.org/pod/GraphQL%3A%3APlugin%3A%3AConvert) API to convert
+a [DBIx::Class::Schema](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3ASchema) to [GraphQL::Schema](https://metacpan.org/pod/GraphQL%3A%3ASchema) etc.
 
 Its `Query` type represents a guess at what fields are suitable, based
-on providing a lookup for each type (a [DBIx::Class::ResultSource](https://metacpan.org/pod/DBIx::Class::ResultSource)).
+on providing a lookup for each type (a [DBIx::Class::ResultSource](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AResultSource)).
 
 ## Example
 
@@ -42,7 +42,7 @@ Consider this minimal data model:
 
 ## Generated Output Types
 
-These [GraphQL::Type::Object](https://metacpan.org/pod/GraphQL::Type::Object) types will be generated:
+These [GraphQL::Type::Object](https://metacpan.org/pod/GraphQL%3A%3AType%3A%3AObject) types will be generated:
 
     type Blog {
       id: Int!
@@ -146,7 +146,7 @@ and Mutation) are created:
 
 # ARGUMENTS
 
-To the `to_graphql` method: a  [DBIx::Class::Schema](https://metacpan.org/pod/DBIx::Class::Schema) object.
+To the `to_graphql` method: a  [DBIx::Class::Schema](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3ASchema) object.
 
 # PACKAGE FUNCTIONS
 

@@ -7,7 +7,7 @@ use v5.26;
 
 use Object::Pad 0.43;  # :strict(params)
 
-package App::sdview::Parser::Markdown 0.03;
+package App::sdview::Parser::Markdown 0.04;
 class App::sdview::Parser::Markdown
    does App::sdview::Parser
    :strict(params);
@@ -115,6 +115,7 @@ method parse_string ( $str )
             }
 
             $list->push_item( App::sdview::Para::ListItem->new(
+                  listtype => "bullet",
                   text => $self->_handle_spans( $raw )
             ) );
 
@@ -138,6 +139,7 @@ method parse_string ( $str )
             }
 
             $list->push_item( App::sdview::Para::ListItem->new(
+                  listtype => "number",
                   text => $self->_handle_spans( $raw )
             ) );
 
@@ -162,6 +164,7 @@ method _handle_spans ( $s )
 
    my %tags;
 
+   pos($s) = 0;
    while( pos $s < length $s ) {
       if( $s =~ m/\G\\(.)/gc ) {
          $ret->append_tagged( $1, %tags );

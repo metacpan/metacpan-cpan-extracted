@@ -1,5 +1,13 @@
 Revision history for App-VTide
 
+0.1.16   2021-09-05
+        Updating for release of version 0.1.16
+        Future note (Ivan Wills)
+        Fixing the tmux title (Ivan Wills)
+        Better quoting (Ivan Wills)
+        Adding documentation for new cron config (Ivan Wills)
+        Adding new cron helper that will run the terminal's command via a cron config (Ivan Wills)
+
 0.1.15   2021-03-20
         Updating for release of version 0.1.15
         Fixing issue with undefined value (Ivan Wills)

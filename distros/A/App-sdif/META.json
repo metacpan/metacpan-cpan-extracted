@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.11",
+   "generated_by" : "Minilla/v3.1.12",
    "license" : [
       "perl_5"
    ],
@@ -42,11 +42,12 @@
       },
       "runtime" : {
          "requires" : {
-            "Getopt::EX" : "v1.21.1",
+            "Getopt::EX" : "v1.24.2",
+            "Getopt::EX::Hashed" : "0.9917",
             "Getopt::EX::termcolor" : "1.07",
             "List::Util" : "1.45",
             "Term::ReadKey" : "0",
-            "Text::ANSI::Fold" : "2.10",
+            "Text::ANSI::Fold" : "2.1101",
             "Text::VisualWidth::PP" : "0.05",
             "Unicode::EastAsianWidth::Detect" : "0",
             "perl" : "v5.14.0"
@@ -82,7 +83,7 @@
       },
       "App::sdif" : {
          "file" : "lib/App/sdif.pm",
-         "version" : "v4.19.1"
+         "version" : "v4.20.1"
       },
       "App::sdif::Divert" : {
          "file" : "lib/App/sdif/Divert.pm"
@@ -114,7 +115,7 @@
          "web" : "https://github.com/kaz-utashiro/sdif-tools"
       }
    },
-   "version" : "4.19.1",
+   "version" : "4.20.1",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>",

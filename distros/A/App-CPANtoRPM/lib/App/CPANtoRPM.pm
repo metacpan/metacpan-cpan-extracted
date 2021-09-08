@@ -1,5 +1,5 @@
 package App::CPANtoRPM;
-# Copyright (c) 2012-2019 Sullivan Beck. All rights reserved.
+# Copyright (c) 2012-2021 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -11,7 +11,7 @@ use POSIX;
 use IO::File;
 
 our($VERSION);
-$VERSION = "1.09";
+$VERSION = "1.10";
 
 $| = 1;
 
@@ -52,10 +52,12 @@ sub _new {
                'add_require'  => [],
                'author'       => [],
                'build'        => [],
+               'build_input'  => [],
                'build_rec'    => 0,
                'build_type'   => '',
                'clean_macros' => 0,
                'config'       => [],
+               'config_input' => [],
                'cpan'         => 'cpanplus',
                'debug'        => 0,
                'description'  => '',
@@ -391,6 +393,13 @@ sub _usage {
                          command.  This can be passed in any number of times.
       --build STRING   : Pass STRING to the './Build' or 'make' command.
                          This can be passed in any number of times.
+      --config-input STRING
+                       : A line to pass as STDIN to 'perl Build.PL' or
+                         'perl Makefile.PL' command.  This can be passed in any
+                         number of times.
+      --build-input STRING
+                       : A line to pass as STDIN to './Build' or 'make'
+                         command.  This can be passed in any number of times.
       -i/--install-base DIR:
                          The base directory to install the module.
       -T/--install-type TYPE:
@@ -486,6 +495,10 @@ sub _parse_args {
       $$self{'group'} = shift(@a),             next  if ($_ eq '--group');
       push(@{ $$self{'config'} }, shift(@a)),  next  if ($_ eq '--config');
       push(@{ $$self{'build'} }, shift(@a)),   next  if ($_ eq '--build');
+      push(@{ $$self{'config_input'} }, shift(@a)),
+                                               next  if ($_ eq '--config-input');
+      push(@{ $$self{'build_input'} }, shift(@a)),
+                                               next  if ($_ eq '--build-input');
       $$self{'release'} = shift(@a),           next  if ($_ eq '--release');
       $$self{'disttag'} = shift(@a),           next  if ($_ eq '--disttag');
       $$self{'epoch'} = shift(@a),             next  if ($_ eq '--epoch');
@@ -831,7 +844,7 @@ sub _multiple_methods {
          if (system($cmd) != 0) {
             $self->_log_indent(+1);
             push(@print,
-                 $self->_log_message('INFO',"Failed system command: $command"));
+                 $self->_log_message('INFO',"Failed system command: $cmd"));
             $self->_log_indent(-1);
             next METHOD;
          }
@@ -1410,6 +1423,9 @@ sub _build_rpm {
 
    $package{'rpmfile'} = "$package{topdir}/RPMS/$package{arch_val}/$package{rpmname}-$package{version}-$package{release}$disttag.$package{arch_val}.rpm";
    $package{'srpmfile'} = "$package{topdir}/SRPMS/$package{rpmname}-$package{version}-$package{release}$disttag.src.rpm";
+
+   $self->_log_message('INFO',"RPM:  " . $package{'rpmfile'});
+   $self->_log_message('INFO',"SRPM: " . $package{'srpmfile'});
 }
 
 ############################################################################
@@ -1471,7 +1487,8 @@ sub _make_spec {
    #
 
    $self->_check_rpm_build();
-   $self->_log_message('INFO',"SPEC file: $package{topdir}/SPECS/$package{specname}");
+   $self->_log_message('INFO',
+                       "SPEC file: $package{topdir}/SPECS/$package{specname}");
 
    #
    # Every package needs a packager.
@@ -1512,6 +1529,8 @@ sub _make_spec {
    # Start spec file creation...
    #
 
+   $self->_log_message('INFO',
+                       "Spec file: $package{topdir}/SPECS/$package{specname}");
    my $out = new IO::File;
    $out->open("> $package{topdir}/SPECS/$package{specname}")  ||
      $self->_log_message('ERR',
@@ -2818,23 +2837,34 @@ sub _provides {
       my @files  = sort keys %{ $package{'instfiles'}{'pm'} };
       my @prov;
 
+      my $tmp      = `rpm --eval '%_rpmconfigdir'`;
+      chomp($tmp);
+      my @extradir = ('/usr/lib/rpm',$tmp,$DIR);
+
       if (@files) {
-         my $bin    = $self->_find_exe('rpmdeps','/usr/lib/rpm');
-         @prov      = `$cd; $bin --provides @files`  if ($bin);
+         my $bin    = $self->_find_exe('rpmdeps',@extradir);
+         if ($bin) {
+            # In at least one case (observed on AIX), rpmdeps gives output
+            # that isn't helpful.
+            @prov   = `$cd; $bin --provides @files`;
+            chomp(@prov);
+            my @tmp = grep(/^Finding\s+(Requires|Provides)/,@prov);
+            @prov   = ()  if (@tmp);
+         }
 
-         $bin       = $self->_find_exe('find-provides','/usr/lib/rpm');
+         $bin       = $self->_find_exe('find-provides',@extradir);
          @prov      = `$cd; echo @files | $bin`      if (! @prov  &&  $bin);
 
-         $bin       = $self->_find_exe('find-provides.perl','/usr/lib/rpm');
+         $bin       = $self->_find_exe('find-provides.perl',@extradir);
          @prov      = `$cd; echo @files | $bin`      if (! @prov  &&  $bin);
 
-         $bin       = $self->_find_exe('perl.prov','/usr/lib/rpm');
+         $bin       = $self->_find_exe('perl.prov',@extradir);
          @prov      = `$cd; $bin @files`             if (! @prov  &&  $bin);
 
-         $bin       = $self->_find_exe('cpantorpm-depreq',$DIR);
+         $bin       = $self->_find_exe('cpantorpm-depreq',@extradir);
          @prov      = `$cd; $bin -p @files`          if (! @prov  &&  $bin);
 
-         $bin       = $self->_find_exe('perldeps.pl','/usr/lib/rpm');
+         $bin       = $self->_find_exe('perldeps.pl',@extradir);
          @prov      = `$cd; $bin --provides @files`  if (! @prov  &&  $bin);
       }
 
@@ -2965,20 +2995,34 @@ sub __requires {
 
    my @req;
 
-   my $bin    = $self->_find_exe('rpmdeps','/usr/lib/rpm');
-   @req       = `$bin --requires @files`                    if ($bin);
+   my $tmp      = `rpm --eval '%_rpmconfigdir'`;
+   chomp($tmp);
+   my @extradir = ('/usr/lib/rpm',$tmp,$DIR);
 
-   $bin       = $self->_find_exe('find-requires','/usr/lib/rpm');
+   my $bin      = $self->_find_exe('rpmdeps',@extradir);
+   if ($bin) {
+      # In at least one case (observed on AIX), rpmdeps gives output
+      # that isn't helpful.
+      @req      = `$bin --requires @files`                    if ($bin);
+      chomp(@req);
+      my @tmp   = grep(/^Finding\s+(Requires|Provides)/,@req);
+      @req      = ()  if (@tmp);
+   }
+
+   $bin       = $self->_find_exe('find-requires',@extradir);
    @req       = `echo @files | $bin`                        if (! @req  &&  $bin);
 
-   $bin       = $self->_find_exe('find-requires.perl','/usr/lib/rpm');
+   $bin       = $self->_find_exe('find-requires.perl',@extradir);
    @req       = `echo @files | $bin`                        if (! @req  &&  $bin);
 
-   $bin       = $self->_find_exe('cpantorpm-depreq',$DIR);
+   $bin       = $self->_find_exe('cpantorpm-depreq',@extradir);
    @req       = `$bin -r @files`                            if (! @req  &&  $bin);
 
-   $bin       = $self->_find_exe('perldeps.pl','/usr/lib/rpm');
+   $bin       = $self->_find_exe('perldeps.pl',@extradir);
    @req       = `$bin --requires @files`                    if (! @req  &&  $bin);
+
+   $bin       = $self->_find_exe('perl.req',@extradir);
+   @req       = `$bin @files`                               if (! @req  &&  $bin);
 
    if (@req) {
       chomp(@req);
@@ -3067,8 +3111,7 @@ sub _build {
 
    $self->_commands('',0);
 
-   my $status = $self->_run_command("$TMPDIR/config",
-                                    @{ $package{'config_cmd_l'} });
+   my $status = $self->_run_command("$TMPDIR/config",$package{'config_cmd'});
    if ($status eq 'WAITING') {
       my @err = `cat "$TMPDIR/config.out"`;
       chomp(@err);
@@ -3087,8 +3130,7 @@ sub _build {
                           @err);
    }
 
-   $status = $self->_run_command("$TMPDIR/config",
-                                 @{ $package{'build_cmd_l'} });
+   $status = $self->_run_command("$TMPDIR/config",$package{'build_cmd'});
    if ($status eq 'WAITING') {
       my @err = `cat "$TMPDIR/config.out"`;
       chomp(@err);
@@ -3215,7 +3257,7 @@ sub _build {
 sub _commands {
    my($self,$dir,$for_spec) = @_;
 
-   my $type = $package{'build_type'};
+   my $type     = $package{'build_type'};
    my $insttype = $$self{'inst_type'};
 
    my(@config_cmd,@build_cmd,@test_cmd,@install_cmd,@clean_cmd);
@@ -3422,6 +3464,17 @@ sub _commands {
    $package{'test_cmd_l'}    = [@test_cmd];
    $package{'install_cmd_l'} = [@install_cmd];
    $package{'clean_cmd_l'}   = [@clean_cmd];
+
+   my @tmp = @{ $$self{'config_input'} };
+   if (@tmp) {
+      my $pre = '(' . join(';', map { "echo \"$_\"" } @tmp ) . ')';
+      $package{'config_cmd'} = "$pre | " . $package{'config_cmd'};
+   }
+   @tmp = @{ $$self{'build_input'} };
+   if (@tmp) {
+      my $pre = '(' . join(';', map { "echo \"$_\"" } @tmp ) . ')';
+      $package{'build_cmd'} = "$pre | " . $package{'build_cmd'};
+   }
 }
 
 # Some Makefile.PL and Build.PL scripts are interactive!  That really sucks.

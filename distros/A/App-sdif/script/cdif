@@ -132,6 +132,7 @@ my @optargs = (
 	$opt_commandcolor = 0;
 	$opt_markcolor    = 0;
 	$opt_textcolor    = 0;
+	$opt_unknowncolor = 0;
     },
     "colormap|cm=s" => \@opt_colormap,
     "colordump" => \$opt_colordump,
@@ -157,10 +158,10 @@ my @optargs = (
     "b|ignore-space-change" => \$opt_b,
     "w|ignore-all-space" => \$opt_w,
     "t|expand-tabs" => \$opt_t,
-    "c|context" => sub { push(@diffopts, "-c") },
-    "u|unified" => sub { push(@diffopts, "-u") },
-    "C=i" => sub { push(@diffopts, "-C" . ($_[1] > 0 ? $_[1] : '')) },
-    "U=i" => sub { push(@diffopts, "-U" . ($_[1] > 0 ? $_[1] : '')) },
+    "c|context" => sub { push @diffopts, "-c" },
+    "u|unified" => sub { push @diffopts, "-u" },
+    "C=i" => sub { push @diffopts, "-C" . $_[1] },
+    "U=i" => sub { push @diffopts, "-U" . $_[1] },
 
     "rcs" => \$rcs,
     "r=s" => sub { push @rcsopt, "-r$_[1]" },
@@ -283,15 +284,16 @@ my $w_pattern = do {
     if ($opt_unit =~ /^char/) {
 	qr/\X/s;
     } else {
+	my $w = $opt_unit eq 'letter' ? '' : '_';
 	qr{
 	    \p{Han} | \p{InHiragana}+ | \p{InKatakana}+ |
-	    \p{Hang}+     |
-	    \p{Cyrillic}+ |
-	    \p{Arabic}+   |
-	    \p{Thai}+     |
+	    [$w\p{Latin}]+    |
+	    [$w\p{Hang}]+     |
+	    [$w\p{Cyrillic}]+ |
+	    [$w\p{Arabic}]+   |
+	    [$w\p{Thai}]+     |
 	    \d+ |
-	    \p{Punct}+ |
-	    \p{Latin}+ |
+	    \p{Punct} |
 	    [\ \t\r\f]*\n | \s+ | (.)\g{-1}*
 	}x;
     }
@@ -927,7 +929,7 @@ cdif - word context diff
 
 =head1 VERSION
 
-Version 4.19.1
+Version 4.20.1
 
 =head1 SYNOPSIS
 
@@ -948,7 +950,7 @@ Options:
 	--subdiff=command   specify backend diff command
 	--stat              show statistical information
 	--colormap=s        specify color map
-	--unit=s            word, char or mecab     (default word)
+	--sdif              sdif friendly option
 	--[no]color         color or not            (default true)
 	--[no]256           ANSI 256 color mode     (default true)
 	--[no]commandcolor  color for command line  (default true)
@@ -961,9 +963,10 @@ Options:
 	--[no]unknown	    print unknown line      (default true)
 	--[no]mark	    print mark or not       (default true)
 	--[no]prefix	    read git --graph output (default true)
+	--unit=s            word, char or mecab     (default word)
+	--[no]mecab	    use mecab tokenizer     (default false)
 	--prefix-pattern    prefix pattern
 	--visible char=?    set visible attributes
-	--[no]mecab	    use mecab tokenizer     (default false)
 	--[no]lenience      suppress unexpected input warning (default true)
 
 
@@ -1050,15 +1053,16 @@ when B<-r>I<rev> is supplied.
 
 =end deprecated
 
-=item B<-->B<unit>=I<word>|I<char>|I<mecab>
+=item B<-->B<unit>=C<word>|C<letter>|C<char>|C<mecab>
 
-=item B<-->B<by>=I<word>|I<char>|I<mecab>
+=item B<-->B<by>=C<word>|C<letter>|C<char>|C<mecab>
 
 Specify the comparing unit.  Default is I<word> and compare each line
-word-by-word.  Specify I<char> if you want to compare them
-character-by-character.
+word-by-word.  Specify C<char> if you want to compare them
+character-by-character.  Unit C<letter> is almost same as C<word> but
+does not include underscore.
 
-When I<mecab> is given as an unit, B<mecab> command is called as a
+When C<mecab> is given as an unit, B<mecab> command is called as a
 tokenizer for non-ASCII text.  ASCII text is compared word-by-word.
 External B<mecab> command has to been installed.
 
@@ -1204,7 +1208,8 @@ Enable/Disable using color for the corresponding field.
 =item B<--sdif>
 
 Disable options appropriate to use for B<sdif>'s input:
-B<--commandcolor>, B<--markcolor> and B<--textcolor>.
+B<--commandcolor>, B<--markcolor>, B<--textcolor> and
+B<--unknowncolor>.
 
 =item B<-->[B<no->]B<old>, B<-->[B<no->]B<new>
 

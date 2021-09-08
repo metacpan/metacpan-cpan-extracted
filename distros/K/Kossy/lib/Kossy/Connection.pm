@@ -9,7 +9,7 @@ use Class::Accessor::Lite (
 use JSON qw//;
 use Kossy::Exception;
 
-our $VERSION = '0.40';
+our $VERSION = '0.50';
 my $_JSON = JSON->new()->allow_blessed(1)->convert_blessed(1)->ascii(1);
 
 # for IE7 JSON venularity.
@@ -46,6 +46,20 @@ sub halt {
     die Kossy::Exception->new(@_);
 }
 
+sub halt_text {
+    my ($self, $code, $message) = @_;
+    $self->res->content_type('text/plain');
+    $self->res->body($message);
+    die Kossy::Exception->new($code, response => $self->res);
+}
+
+sub halt_no_content {
+    my ($self, $code) = @_;
+    $self->res->headers->remove_content_headers;
+    $self->res->content_length(0);
+    die Kossy::Exception->new($code, response => $self->res);
+}
+
 sub redirect {
     my $self = shift;
     $self->res->redirect(@_);
@@ -75,7 +89,7 @@ sub render_json {
 
     # defense from JSON hijacking
     # Copy from Amon2::Plugin::Web::JSON
-    if ( exists $self->req->env->{'HTTP_X_REQUESTED_WITH'} && 
+    if ( exists $self->req->env->{'HTTP_X_REQUESTED_WITH'} &&
          ($self->req->env->{'HTTP_USER_AGENT'}||'') =~ /android/i &&
          exists $self->req->env->{'HTTP_COOKIE'} &&
          ($self->req->method||'GET') eq 'GET'
@@ -86,15 +100,11 @@ sub render_json {
     my $body = $_JSON->encode($obj);
     $body = $self->escape_json($body);
 
-    if ( ( $self->req->env->{'HTTP_USER_AGENT'} || '' ) =~ m/Safari/ ) {
-        $body = "\xEF\xBB\xBF" . $body;
-    }
-
     $self->res->status( 200 );
     $self->res->content_type('application/json; charset=UTF-8');
     $self->res->header( 'X-Content-Type-Options' => 'nosniff' ); # defense from XSS
     $self->res->body( $body );
-    $self->res;    
+    $self->res;
 }
 
 

@@ -10,11 +10,8 @@ README
 README.md
 SECURITY.md
 dist.ini
-git/hooks/pre-commit
-git/setup.sh
 lib/Data/MoneyCurrency.pm
 opencage_logo_300_150.png
-perltidy.ini
 ruby-money/AUTHORS
 ruby-money/CHANGELOG.md
 ruby-money/CONTRIBUTING.md
@@ -72,5 +69,3 @@ t/get_currency.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
-t/tidyall.t
-tidyall.ini

@@ -369,6 +369,7 @@ void ObjectPad_mop_class_compose_role(pTHX_ ClassMeta *classmeta, ClassMeta *rol
   embedding->offset      = -1;
 
   av_push(classmeta->roles, (SV *)embedding);
+  hv_store_ent(rolemeta->role.applied_classes, classmeta->name, (SV *)embedding, 0);
 
   U32 nbuilds = rolemeta->buildblocks ? av_count(rolemeta->buildblocks) : 0;
   for(i = 0; i < nbuilds; i++) {
@@ -807,6 +808,8 @@ XS_INTERNAL(injected_constructor)
   SV *class = ST(0);
   SV *self = NULL;
 
+  assert(meta->type == METATYPE_CLASS);
+
   COP *prevcop = PL_curcop;
   PL_curcop = meta->tmpcop;
   CopLINE_set(PL_curcop, __LINE__);
@@ -852,7 +855,7 @@ XS_INTERNAL(injected_constructor)
 
   bool need_initslots = true;
 
-  if(!meta->foreign_new) {
+  if(!meta->cls.foreign_new) {
     HV *stash = gv_stashsv(class, 0);
     if(!stash)
       croak("Unable to find stash for class %" SVf, class);
@@ -898,8 +901,8 @@ XS_INTERNAL(injected_constructor)
         PUSHs(*svp);
       PUTBACK;
 
-      assert(meta->foreign_new);
-      call_sv((SV *)meta->foreign_new, G_SCALAR);
+      assert(meta->cls.foreign_new);
+      call_sv((SV *)meta->cls.foreign_new, G_SCALAR);
       SPAGAIN;
 
       self = SvREFCNT_inc(POPs);
@@ -1180,8 +1183,8 @@ XS_INTERNAL(injected_DOES)
     AV *roles = meta->roles;
     I32 nroles = av_count(roles);
 
-    if(!cv_does && meta->foreign_does)
-      cv_does = meta->foreign_does;
+    if(!cv_does && meta->cls.foreign_does)
+      cv_does = meta->cls.foreign_does;
 
     if(sv_eq(meta->name, wantrole)) {
       XSRETURN_YES;
@@ -1237,6 +1240,11 @@ XS_INTERNAL(injected_DOES)
 
 ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *superclassname)
 {
+  assert(
+      type == METATYPE_CLASS ||
+      (type == METATYPE_ROLE && !superclassname)
+  );
+
   ClassMeta *meta;
   Newx(meta, 1, ClassMeta);
 
@@ -1257,8 +1265,6 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *su
   meta->requireslots = NULL;
   meta->requiremethods = newAV();
   meta->repr   = REPR_AUTOSELECT;
-  meta->foreign_new = NULL;
-  meta->foreign_does = NULL;
   meta->supermeta = NULL;
   meta->pending_submeta = NULL;
   meta->roles = newAV();
@@ -1268,6 +1274,17 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *su
 
   meta->slothooks_postslots = NULL;
   meta->slothooks_construct = NULL;
+
+  switch(type) {
+    case METATYPE_CLASS:
+      meta->cls.foreign_new = NULL;
+      meta->cls.foreign_does = NULL;
+      break;
+
+    case METATYPE_ROLE:
+      meta->role.applied_classes = newHV();
+      break;
+  }
 
   if(!PL_parser) {
     /* We need to generate just enough of a PL_parser to keep newSTATEOP()
@@ -1297,6 +1314,8 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *su
   }
 
   if(superclassname && SvOK(superclassname)) {
+    assert(type == METATYPE_CLASS);
+
     av_push(isa, SvREFCNT_inc(superclassname));
 
     ClassMeta *supermeta = NULL;
@@ -1313,7 +1332,7 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *su
 
       meta->start_slotix = supermeta->next_slotix;
       meta->repr = supermeta->repr;
-      meta->foreign_new = supermeta->foreign_new;
+      meta->cls.foreign_new = supermeta->cls.foreign_new;
 
       if(supermeta->buildblocks) {
         AV *superbuildblocks = supermeta->buildblocks;
@@ -1356,14 +1375,29 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *su
             hv_store(new, HeKEY(iter), klen, HeVAL(iter), HeHASH(iter));
         }
       }
+
+      if(supermeta->has_adjustparams)
+        meta->has_adjustparams = true;
+
+      /* Mark that this class is applied to every role our supermetas have */
+      for(ClassMeta *c = supermeta; c; c = c->supermeta) {
+        AV *roles = c->roles;
+        U32 nroles = av_count(roles);
+        for(U32 i = 0; i < nroles; i++) {
+          RoleEmbedding *embedding = (RoleEmbedding *)AvARRAY(roles)[i];
+          ClassMeta *rolemeta = embedding->rolemeta;
+
+          hv_store_ent(rolemeta->role.applied_classes, meta->name, (SV *)embedding, 0);
+        }
+      }
     }
     else {
       /* A subclass of a foreign class */
-      meta->foreign_new = fetch_superclass_method_pv(meta->stash, "new", 3, -1);
-      if(!meta->foreign_new)
+      meta->cls.foreign_new = fetch_superclass_method_pv(meta->stash, "new", 3, -1);
+      if(!meta->cls.foreign_new)
         croak("Unable to find SUPER::new for %" SVf, superclassname);
 
-      meta->foreign_does = fetch_superclass_method_pv(meta->stash, "DOES", 4, -1);
+      meta->cls.foreign_does = fetch_superclass_method_pv(meta->stash, "DOES", 4, -1);
 
       av_push(isa, newSVpvs("Object::Pad::UNIVERSAL"));
     }
@@ -1375,7 +1409,7 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *su
     av_push(isa, newSVpvs("Object::Pad::UNIVERSAL"));
   }
 
-  if(meta->repr == REPR_AUTOSELECT && !meta->foreign_new)
+  if(meta->repr == REPR_AUTOSELECT && !meta->cls.foreign_new)
     meta->repr = REPR_NATIVE;
 
   meta->next_slotix = meta->start_slotix;
@@ -1422,14 +1456,14 @@ static bool classhook_repr_apply(pTHX_ ClassMeta *classmeta, SV *value, SV **hoo
   char *val = SvPV_nolen(value); /* all comparisons are ASCII */
 
   if(strEQ(val, "native")) {
-    if(classmeta->foreign_new)
+    if(classmeta->type == METATYPE_CLASS && classmeta->cls.foreign_new)
       croak("Cannot switch a subclass of a foreign superclass type to :repr(native)");
     classmeta->repr = REPR_NATIVE;
   }
   else if(strEQ(val, "HASH"))
     classmeta->repr = REPR_HASH;
   else if(strEQ(val, "magic")) {
-    if(!classmeta->foreign_new)
+    if(classmeta->type != METATYPE_CLASS || !classmeta->cls.foreign_new)
       croak("Cannot switch to :repr(magic) without a foreign superclass");
     classmeta->repr = REPR_MAGIC;
   }

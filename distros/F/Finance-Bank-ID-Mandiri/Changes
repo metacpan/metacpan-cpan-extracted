@@ -1,14 +1,19 @@
-0.382   2019-05-13 (PERLANCAR)
+0.383   2021-08-26  Released-By: PERLANCAR; Urgency: medium
+
+	- No longer use HTTP::Headers::Patch::DontUseStorable.
+
+
+0.382   2019-05-13  Released-By: PERLANCAR
 
 	- Handle 3-digit transaction code (found in a mcm-v201901 report).
 
 
-0.381   2019-01-29 (PERLANCAR)
+0.381   2019-01-29  Released-By: PERLANCAR
 
 	- [bug][test] Forgot to add tests, and fix date conversion.
 
 
-0.380   2019-01-29 (PERLANCAR)
+0.380   2019-01-29  Released-By: PERLANCAR
 
 	- UPDATE: This release was broken, sorry.
 
@@ -16,32 +21,32 @@
 	  site.
 
 
-0.37    2017-07-20 (PERLANCAR)
+0.37    2017-07-20  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Reduce startup overhead for CLI.
 
 
-0.36    2017-07-14 (PERLANCAR)
+0.36    2017-07-14  Released-By: PERLANCAR
 
 	- [Bugfix] Use debug() logger method instead of debugf() to be
 	  compatible with Log::ger.
 
 
-0.35    2017-07-03 (PERLANCAR)
+0.35    2017-07-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Update doc about now using Log::ger.
 
 
-0.34    2017-05-31 (PERLANCAR)
+0.34    2017-05-31  Released-By: PERLANCAR
 
 	- Update regexes to allow semicolon in description.
 
 
-0.33    2016-01-07 (PERLANCAR)
+0.33    2016-01-07  Released-By: PERLANCAR
 
 	- Handle when statement page is empty ('tidak ditemukan catatan'),
 	  currently untested because I got a timeout then can't try again
@@ -52,7 +57,7 @@
 	- Tweak example code.
 
 
-0.32    2015-04-28 (PERLANCAR)
+0.32    2015-04-28  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -60,14 +65,14 @@
 	  deps.
 
 
-0.31    2015-02-06 (PERLANCAR)
+0.31    2015-02-06  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Adjust to Perinci::CmdLine -> Perinci::CmdLine::Classic.
 
 
-0.30     2014-10-15 (PERLANCAR)
+0.30     2014-10-15  Released-By: PERLANCAR
 
          - No functional changes.
 
@@ -75,7 +80,7 @@
            IO::Socket::SSL.
 
 
-0.29     2014-08-26 (SHARYANTO)
+0.29     2014-08-26  Released-By: SHARYANTO
 
          - Remove the usage of LWP::Protocol::Net::Curl (doesn't seem to be
            needed anymore).
@@ -89,24 +94,24 @@
          - [Incompat] bin/download-mandiri: --profile is now --config-profile.
 
 
-0.28    2014-05-17 (SHARYANTO)
+0.28    2014-05-17  Released-By: SHARYANTO
 
         - No functional changes.
 
         - Replace File::Slurp with File::Slurp::Tiny.
 
 
-0.27    2013-11-03 (SHARYANTO)
+0.27    2013-11-03  Released-By: SHARYANTO
 
         - Add simulation mode and save dir (like in Finance-Bank-ID-BCA).
 
 
-0.26    2013-07-17 (SHARYANTO)
+0.26    2013-07-17  Released-By: SHARYANTO
 
         - No functional changes. Add pointer for casual new users.
 
 
-0.25    2013-03-08 (SHARYANTO)
+0.25    2013-03-08  Released-By: SHARYANTO
 
         - get_statement(): Get error message from statement form (so instead of
           'failed getting statement' generic error, you can get e.g. 'Jangka
@@ -117,7 +122,7 @@
           be the bank's limit.
 
 
-0.24    2012-11-17 (SHARYANTO)
+0.24    2012-11-17  Released-By: SHARYANTO
 
         [UPDATES AND WORKAROUNDS]
 
@@ -132,13 +137,13 @@
           cloning Regexp object.
 
 
-0.23    2012-11-16 (SHARYANTO)
+0.23    2012-11-16  Released-By: SHARYANTO
 
         - (personal) Sometimes transaction history page is titled 'MUTASI
           REKENING' instead of 'HISTORI TRANSAKSI'.
 
 
-0.22    2012-02-08 (SHARYANTO)
+0.22    2012-02-08  Released-By: SHARYANTO
 
         - Synchronize to Finance::Bank::ID::Base 0.22. Add script
           bin/parse-mandiri-statement. Add return_datetime_obj option in
@@ -146,33 +151,33 @@
           deprecated (except for new MCM format for now).
 
 
-0.21    2011-07-15 (SHARYANTO)
+0.21    2011-07-15  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
         - Support old MCM format (v201103) as well as new one (v201107).
 
 
-0.20    2011-07-13 (SHARYANTO)
+0.20    2011-07-13  Released-By: SHARYANTO
 
         [FIXES]
 
         - (build) Fix dzil's dist.ini.
 
 
-0.19    2011-07-13 (SHARYANTO)
+0.19    2011-07-13  Released-By: SHARYANTO
 
         [UPDATES]
 
         - Parse new MCM format (July 2011).
 
 
-0.18    2011-06-15 (SHARYANTO)
+0.18    2011-06-15  Released-By: SHARYANTO
 
         - No functional changes. Fixed missing dependencies [CT].
 
 
-0.17    2011-06-10 (SHARYANTO)
+0.17    2011-06-10  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -183,12 +188,12 @@
         - Some POD fixes.
 
 
-0.16    2011-06-10 (SHARYANTO)
+0.16    2011-06-10  Released-By: SHARYANTO
 
         - No functional changes. Moved script from examples/ to bin/.
 
 
-0.15    2011-03-08 (SHARYANTO)
+0.15    2011-03-08  Released-By: SHARYANTO
 
         - switch from Mouse to Moo
 
@@ -197,16 +202,16 @@
           to see)
 
 
-0.14    2010-12-03 (SHARYANTO)
+0.14    2010-12-03  Released-By: SHARYANTO
 
         - change example script to use Log::Any::App
 
 
-0.13    2010-09-24 (SHARYANTO)
+0.13    2010-09-24  Released-By: SHARYANTO
 
         - make semicolon format parsing stricter, stricter is better
 
-0.12    2010-09-23 (SHARYANTO)
+0.12    2010-09-23  Released-By: SHARYANTO
 
         - enable verify_https in example script
 
@@ -214,52 +219,52 @@
           semicolon format
 
 
-0.11    2010-09-23 (SHARYANTO)
+0.11    2010-09-23  Released-By: SHARYANTO
 
         - forgot to set https_host
 
 
-0.10    2010-09-23 (SHARYANTO)
+0.10    2010-09-23  Released-By: SHARYANTO
 
-        - uses Finance::Bank::ID::Base v0.10 (new verify_https option)
+        - uses Finance::Bank::ID::Base v0.10  Released-By: new verify_https option
 
 
-0.09    2010-06-17 (SHARYANTO)
+0.09    2010-06-17  Released-By: SHARYANTO
 
         - build fixes
 
         - synchronize version number with Finance::Bank::ID::BCA
 
 
-0.06    2010-06-11 (SHARYANTO)
+0.06    2010-06-11  Released-By: SHARYANTO
 
         - INCOMPATIBLE CHANGE: parse_statement now always returns 3-element
           arrayref instead of depending on list/scalar context. Sorry for this,
           I'm trying make all my HTTP-style interface consistent.
 
 
-0.05    2010-02-17 (SHARYANTO)
+0.05    2010-02-17  Released-By: SHARYANTO
 
         - switch from Moose to Any::Moose (+Mouse as dependency)
 
 
-0.04    2010-01-13 (SHARYANTO)
+0.04    2010-01-13  Released-By: SHARYANTO
 
         - remove "use Log::Log4perl" in test script
 
 
-0.03    2010-01-07 (SHARYANTO)
+0.03    2010-01-07  Released-By: SHARYANTO
 
         - switch from Log::Log4perl to Log::Any
 
         - switch from MakeMaker to Module::Builder
 
 
-0.02    2009-10-20 (SHARYANTO)
+0.02    2009-10-20  Released-By: SHARYANTO
 
         - Minor fixes.
 
 
-0.01    2009-10-15 (SHARYANTO)
+0.01    2009-10-15  Released-By: SHARYANTO
 
         - First release.

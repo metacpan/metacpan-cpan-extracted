@@ -108,13 +108,17 @@ $t->get_ok('/bar')
   ;
 
 
-$t->get_ok('/bar')
+my $err = $t->get_ok('/bar')
   ->status_is(200)
   ->content_type_is('text/plain;charset=UTF-8')
-  ->text_is('#error','')
   ->content_is('Should expire after 3 minutes')
   ->header_is('X-Cache-CHI', 1)
+  ->tx->res->dom->at('#error')
   ;
+
+if ($err) {
+  is($err->text, '');
+};
 
 my $c = $t->app->build_controller;
 my $diff = $c->chi('xyz')->get_expires_at('bar') - time;
@@ -143,25 +147,36 @@ get('/ownkey')->requires('chi' => {
   }
 );
 
-$t->get_ok('/ownkey' => { random => 'okay'})
+$err = $t->get_ok('/ownkey' => { random => 'okay'})
   ->status_is(200)
-  ->text_is('#error','')
   ->content_is('Has the name "okay"')
+  ->tx->res->dom->at('#error')
   ;
+
+if ($err) {
+  is($err->text, '');
+};
+
 
 my $value = $c->chi('xyz')->get('okay')->{body};
 is($value, 'Has the name "okay"');
 
 # Check with ETag
-my $etag = $t->get_ok('/cool')
+my $tx_res = $t->get_ok('/cool')
   ->status_is(200)
   ->content_type_is('text/plain;charset=UTF-8')
-  ->text_is('#error','')
   ->content_is('works: cool: 1')
   ->header_is('X-Cache-CHI', 1)
   ->header_like('ETag',qr!^W/\"[^"]+?\"$!)
-  ->tx->res->headers->header('ETag');
+  ->tx->res
   ;
+
+my $etag = $tx_res->headers->header('ETag');
+$err = $tx_res->dom->at('#error');
+
+if ($err) {
+  is($err->text, '');
+};
 
 $t->get_ok('/cool' => { 'If-None-Match' => $etag })
   ->status_is(304)
@@ -169,15 +184,22 @@ $t->get_ok('/cool' => { 'If-None-Match' => $etag })
   ;
 
 # Check with Last-Modified
-my $lmod = $t->get_ok('/cool')
+$tx_res = $t->get_ok('/cool')
   ->status_is(200)
   ->content_type_is('text/plain;charset=UTF-8')
-  ->text_is('#error','')
   ->content_is('works: cool: 1')
   ->header_is('X-Cache-CHI', 1)
   ->header_like('Last-Modified', qr!^.{3},!)
-  ->tx->res->headers->header('Last-Modified');
+  ->tx->res
   ;
+
+my $lmod = $tx_res->headers->header('Last-Modified');
+$err = $tx_res->dom->at('#error');
+
+if ($err) {
+  is($err->text, '');
+};
+
 
 $t->get_ok('/cool' => { 'If-Modified-Since' => $lmod })
   ->status_is(304)

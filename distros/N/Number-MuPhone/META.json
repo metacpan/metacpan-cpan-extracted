@@ -1,16 +1,16 @@
 {
-   "abstract" : "phone number parsing and display",
+   "abstract" : "parsing and displaying phone numbers in pure Perl",
    "author" : [
       "Clive Holloway <clive.holloway@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Number-MuPhone",
    "no_index" : {
@@ -32,13 +32,17 @@
       },
       "runtime" : {
          "requires" : {
+            "Data::Dumper" : "2.0",
+            "File::Fetch" : "0.5",
+            "LWP::Simple" : "6.0",
             "Moo" : "2.000000",
-            "YAML::XS" : "0.21",
+            "Types::Standard" : "1.0",
+            "XML::Simple" : "2.0",
             "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.07",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "1.02",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

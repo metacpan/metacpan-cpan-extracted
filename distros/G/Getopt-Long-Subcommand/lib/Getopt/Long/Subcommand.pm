@@ -1,7 +1,9 @@
 package Getopt::Long::Subcommand;
 
-our $DATE = '2019-02-27'; # DATE
-our $VERSION = '0.103'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-05-30'; # DATE
+our $DIST = 'Getopt-Long-Subcommand'; # DIST
+our $VERSION = '0.104'; # VERSION
 
 use 5.010001;
 use strict;
@@ -133,8 +135,10 @@ sub _GetOptions {
     if ($has_subcommands) {
         # for doing completion of subcommand names
         if ($is_completion) {
-            $res->{comp_subcommand_names}[$stash->{level}] =
+            my $scnames = $res->{comp_subcommand_names}[$stash->{level}] =
                 [sort keys %{$cmdspec->{subcommands}}];
+            $res->{comp_subcommand_summaries}[$stash->{level}] =
+                [map {$cmdspec->{subcommands}{$_}{summary}} @$scnames];
         }
 
         $res->{subcommand} //= [];
@@ -253,8 +257,9 @@ sub GetOptions {
                         $args{argpos} < @{$res->{comp_subcommand_names}//[]}) {
                     require Complete::Util;
                     return Complete::Util::complete_array_elem(
-                        array => $res->{comp_subcommand_names}[$args{argpos}],
-                        word  => $res->{comp_subcommand_name}[$args{argpos}],
+                        word      => $res->{comp_subcommand_name}[$args{argpos}],
+                        array     => $res->{comp_subcommand_names}[$args{argpos}],
+                        summaries => $res->{comp_subcommand_summaries}[$args{argpos}]
                     );
                 }
 
@@ -294,7 +299,7 @@ Getopt::Long::Subcommand - Process command-line options, with subcommands and co
 
 =head1 VERSION
 
-This document describes version 0.103 of Getopt::Long::Subcommand (from Perl distribution Getopt-Long-Subcommand), released on 2019-02-27.
+This document describes version 0.104 of Getopt::Long::Subcommand (from Perl distribution Getopt-Long-Subcommand), released on 2021-05-30.
 
 =head1 SYNOPSIS
 
@@ -403,18 +408,6 @@ tcsh) is first checked. If it exists, we are in completion mode and C<@ARGV> is
 parsed/formed from it. We then perform parsing to get subcommand names. Finally
 we hand it off to L<Complete::Getopt::Long>.
 
-=head1 CAVEATS
-
-=head2 Common options take precedence over subcommand options
-
-Common options (e.g. C<--help>) are parsed and removed from the command-line
-first. This is done for convenience so you can do something like C<cmd subc
---help> or C<cmd --help subc> to get help. The consequence is you cannot have a
-subcommand option with the same name as common option.
-
-Similarly, options for a subcommand takes precedence over its sub-subcommand,
-and so on.
-
 =head1 FUNCTIONS
 
 =head2 GetOptions(%cmdspec) => hash
@@ -519,6 +512,18 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 CAVEATS
+
+=head2 Common options take precedence over subcommand options
+
+Common options (e.g. C<--help>) are parsed and removed from the command-line
+first. This is done for convenience so you can do something like C<cmd subc
+--help> or C<cmd --help subc> to get help. The consequence is you cannot have a
+subcommand option with the same name as common option.
+
+Similarly, options for a subcommand takes precedence over its sub-subcommand,
+and so on.
+
 =head1 SEE ALSO
 
 L<Getopt::Long>
@@ -536,7 +541,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

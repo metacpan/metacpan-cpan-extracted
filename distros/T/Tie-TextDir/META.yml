@@ -1,20 +1,35 @@
---- #YAML:1.0
-name: Tie-TextDir
-version: 0.06
-license: perl
-distribution_type: module
-requires:
-  Carp: 0
-  Fcntl: 0
-  File::Spec: 0
-  File::Temp: 0
-  Symbol: 0
-recommends: {}
+---
+abstract: 'interface to directory of files'
+author:
+  - 'Ken Williams (ken@mathforum.org)'
 build_requires:
-  Test: 0
-conflicts: {}
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tie-TextDir
 provides:
   Tie::TextDir:
     file: TextDir.pm
-    version: 0.06
-generated_by: Module::Build version 0.20_01
+    version: '0.07'
+requires:
+  Carp: '0'
+  Fcntl: '0'
+  File::Basename: '0'
+  File::Find::Iterator: '0.4'
+  File::Path: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Symbol: '0'
+  perl: v5.6.0
+  strict: '0'
+  warnings: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

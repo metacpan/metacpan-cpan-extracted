@@ -7,7 +7,7 @@ use v5.26;
 
 use Object::Pad;
 
-package App::sdview::Output::Markdown 0.03;
+package App::sdview::Output::Markdown 0.04;
 class App::sdview::Output::Markdown
    does App::sdview::Output
    :strict(params);

@@ -1,12 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/pmgrep/pmgrep
-# and generated automatically using Perinci::CmdLine::Gen version 0.496
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-12'; # DATE
-our $DIST = 'App-PMUtils'; # DIST
-our $VERSION = '0.734'; # VERSION
+# and generated automatically using Perinci::CmdLine::Gen version 0.500
 
 use 5.010001;
 use strict;
@@ -14,6 +9,11 @@ use warnings;
 use Log::ger;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-08-27'; # DATE
+our $DIST = 'App-PMUtils'; # DIST
+our $VERSION = '0.736'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/pmgrep/pmgrep",
@@ -42,21 +42,13 @@ pmgrep - Print lines from installed Perl module sources matching a pattern
 
 =head1 VERSION
 
-This document describes version 0.734 of pmgrep (from Perl distribution App-PMUtils), released on 2020-06-12.
+This document describes version 0.736 of pmgrep (from Perl distribution App-PMUtils), released on 2021-08-27.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % pmgrep [--all] [-c] [--color=s] [--count] [--debug] [-e=s+]
-     [--format=name] [-i] [--ignore-case] [--invert-match] [--json]
-     [--line-number] [--log-level=level] [--module=s+] [--modules-json=s]
-     [-n] [--(no)naked-res] [--no-ignore-case] [--no-invert-match]
-     [--no-pm] [--no-pmc] [--no-pod] [--noignore-case] [--noinvert-match]
-     [--nopm] [--nopmc] [--nopod] [--page-result[=program]] [--pm] [--pmc]
-     [--pod] [-q] [--quiet] [--quiet-arg] [-r] [--recursive] [--regexp=s+]
-     [--regexps-json=s] [--silent] [--trace] [-v] [--verbose]
-     [--view-result[=program]] [pattern] [module] ...
+% B<pmgrep> [B<--all>] [B<--color>=I<str>] [B<--count>|B<-c>] [B<--dash-prefix-inverts>|B<--no-dash-prefix-inverts>|B<--nodash-prefix-inverts>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--format>=I<name>|B<--json>] [B<--ignore-case>|B<-i>|B<--no-ignore-case>|B<--noignore-case>] [B<--invert-match>|B<-v>|B<--no-invert-match>|B<--noinvert-match>] [B<--line-number>|B<-n>] [(B<--module>=I<perl::modnames>)+] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--pm>|B<--no-pm>|B<--nopm>] [B<--pmc>|B<--no-pmc>|B<--nopmc>] [B<--pod>|B<--no-pod>|B<--nopod>] [B<--quiet-arg>] [B<--recursive>|B<-r>] [(B<--regexp>=I<str>)+] [B<--modules-json>=I<json>] [B<--regexps-json>=I<json>|(B<-e>=I<str>)+] [B<-q>|B<--silent>] -- [I<pattern>] [I<module>] ...
 
 =head1 DESCRIPTION
 
@@ -85,15 +77,21 @@ C<*> marks required options.
 If not specified, all installed Perl modules will be searched.
 
 
+Can also be specified as the 2nd command-line argument and onwards.
+
 Can be specified multiple times.
 
 =item B<--modules-json>=I<s>
 
 See C<--module>.
 
+Can also be specified as the 2nd command-line argument and onwards.
+
 =item B<--no-pm>
 
 =item B<--pattern>=I<s>
+
+Can also be specified as the 1st command-line argument.
 
 =item B<--pmc>
 
@@ -128,6 +126,10 @@ Can be specified multiple times.
 =over
 
 =item B<--color>=I<s>
+
+Default value:
+
+ "auto"
 
 Valid values:
 
@@ -174,6 +176,16 @@ Shortcut for --log-level=info.
 =item B<--all>
 
 Require all patterns to match, instead of just one.
+
+=item B<--dash-prefix-inverts>
+
+When given pattern that starts with dash "-FOO", make it to mean "^(?!.*FOO)".
+
+This is a convenient way to search for lines that do not match a pattern.
+Instead of using `-v` to invert the meaning of all patterns, this option allows
+you to invert individual pattern using the dash prefix, which is also used by
+Google search and a few other search engines.
+
 
 =item B<--ignore-case>, B<-i>
 
@@ -294,6 +306,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-PMUtil
 
 Source repository is at L<https://github.com/perlancar/perl-App-PMUtils>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-PMUtils>
@@ -301,16 +341,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

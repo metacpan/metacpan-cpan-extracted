@@ -1,15 +1,15 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-# Database Object Interface - ~/lib/DB/Object/Postgres/Statement.pm
-# Version v0.300.1
-# Copyright(c) 2019-2021 DEGUEST Pte. Ltd.
-# Author: Jacques Deguest <jack@deguest.jp>
-# Created 2017/07/19
-# Modified 2020/12/07
-# All rights reserved
-# 
-# This program is free software; you can redistribute  it  and/or  modify  it
-# under the same terms as Perl itself.
+## Database Object Interface - ~/lib/DB/Object/Postgres/Statement.pm
+## Version v0.301.1
+## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
+## Created 2017/07/19
+## Modified 2021/08/29
+## All rights reserved
+## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 # This package's purpose is to automatically terminate the statement object and
 # separate them from the connection object (DB::Object).
@@ -23,10 +23,9 @@ BEGIN
     use DB::Object::Postgres;
     use DB::Object::Statement;
     use DateTime;
-    use IO::File;
     our( $VERSION, $VERBOSE, $DEBUG, @ISA );
     @ISA    = qw( DB::Object::Statement DB::Object::Postgres );
-    $VERSION    = 'v0.300.1';
+    $VERSION    = 'v0.301.1';
     $VERBOSE    = 0;
     $DEBUG      = 0;
 };
@@ -35,6 +34,48 @@ BEGIN
 # sub bind_param
 
 # sub commit is called by dbh, so it is in DB::Object::Postgres
+
+sub disable_trigger
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    $opts->{all} //= 0;
+    $opts->{name} //= '';
+    my $query = $self->{query} ||
+    return( $self->error( "No query found to temporarily disable trigger." ) );
+    my $q = $self->query_object;
+    my $tables = $q->join_tables->length ? $q->join_tables : $self->new_array( $q->table_object );
+    my( $before, $after );
+    if( $tables->length > 1 )
+    {
+        $before = $tables->map(sub
+        {
+            my $tbl = shift( @_ );
+            return( 'ALTER TABLE ' . $tbl->name . ' DISABLE TRIGGER ' . ( $opts->{all} ? 'ALL' : 'USER' ) . ';' );
+        })->join( ' ' );
+        $after = $tables->map(sub
+        {
+            my $tbl = shift( @_ );
+            return( 'ALTER TABLE ' . $tbl->name . ' ENABLE TRIGGER ' . ( $opts->{all} ? 'ALL' : 'USER' ) . ';' );
+        })->join( ' ' );
+    }
+    else
+    {
+        my $tbl = $q->table_object;
+        $before = 'ALTER TABLE ' . $tbl->name . ' DISABLE TRIGGER ' . ( $opts->{name} ? $opts->{name} : $opts->{all} ? 'ALL' : 'USER' ) . ';';
+        $after  = 'ALTER TABLE ' . $tbl->name . ' ENABLE TRIGGER ' . ( $opts->{name} ? $opts->{name} : $opts->{all} ? 'ALL' : 'USER' ) . ';';
+    }
+    my $new = "${before} ${query}; ${after}";
+    $q->query( $new );
+    my $sth = $self->table_object->_cache_this( $q ) ||
+    return( $self->error( "Error while preparing new query temporarily disabling triggers:\n$new" ) );
+    if( !defined( wantarray() ) )
+    {
+        $sth->execute() ||
+        return( $self->error( "Error while executing new query temporarily disabling triggers:\n$new" ) );
+    }
+    return( $sth );
+}
 
 # Customised for Postgres
 sub distinct
@@ -78,6 +119,7 @@ sub dump
     my $vsep  = ",";
     my $hsep  = "\n";
     my $width = 35;
+    require IO::File;
     my $fh    = IO::File->new;
     $fh->fdopen( fileno( STDOUT ), "w" );
     $vsep  = $args->{vsep} if( exists( $args->{vsep} ) );
@@ -247,6 +289,7 @@ DESTROY
 
 1;
 
+# XXX POD
 __END__
 
 =encoding utf-8
@@ -262,13 +305,60 @@ DB::Object::Postgres::Statement - PostgreSQL Statement Object
 
 =head1 VERSION
 
-    v0.300.1
+    v0.301.1
 
 =head1 DESCRIPTION
 
 This is a PostgreSQL specific statement object class.
 
 =head1 METHODS
+
+=head2 disable_trigger
+
+Provided some hash or hash reference of options and this will modify the current query to temporarily disable trigger and return a new statement handler object.
+
+If it is called in void context, then the statement is executed immediately and returned, otherwise it is just returned.
+
+For example, let's say you have a table C<properties> and you do not want properties to be removed, but instead marked as C<deleted> and to achieve that you create a table trigger that is triggered B<before> the C<delete> query is executed and does instead an C<update> setting the property C<status> to C<deleted>.
+
+    CREATE TABLE properties (
+         id     SERIAL NOT NULL
+        ,name   VARCHAR(255) NOT NULL
+        ,status VARCHAR(12) NOT NULL DEFAULT 'active'
+        ,CONSTRAINT pk_properties PRIMARY KEY(id)
+        ,CONSTRAINT idx_properties UNIQUE(name)
+    );
+
+    CREATE OR REPLACE FUNCTION f_properties_table() RETURNS TRIGGER AS $$
+        BEGIN
+            UPDATE properties SET status = 'deleted' WHERE name = OLD.name;
+            -- To prevent the original query from being executed
+            RETURN NULL;
+        END;
+    $$ LANGUAGE 'plpgsql';
+
+    DROP TRIGGER IF EXISTS t_properties_table ON properties;
+    CREATE TRIGGER t_properties_table
+    BEFORE DELETE ON properties
+    FOR EACH ROW EXECUTE PROCEDURE f_properties_table();
+
+If you issued a query like:
+
+    $tbl->insert( name => 'max_connections', status => 'active' );
+
+And then, to remove it:
+
+    $tbl->where( $tbl->fo->name == 'max_connections' );
+    $tbl->delete;
+
+The trigger will prevent that property from being removed and instead the row's status will be changed to C<deleted>, but if you B<really> wanted to force remove that property, you would do:
+
+    $tbl->where( $tbl->fo->name == 'max_connections' );
+    $tbl->delete->disable_trigger;
+
+And this would execute the following query:
+
+    ALTER TABLE properties DISABLE TRIGGER USER; DELETE FROM properties WHERE name = 'max_connections'; ALTER TABLE properties ENABLE TRIGGER USER;
 
 =head2 distinct
 

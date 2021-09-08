@@ -11,7 +11,7 @@ package mb::Encode;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.02';
+$VERSION = '0.03';
 $VERSION = $VERSION;
 
 require Exporter;
@@ -34,8 +34,8 @@ use strict;
 BEGIN {
     if ($] >= 5.008_001) {
         eval q{
-            use warnings;
-            use Encode; qw();
+use warnings;    # pmake.bat catches /^use .../
+use Encode qw(); # pmake.bat catches /^use .../
         };
     }
     else {

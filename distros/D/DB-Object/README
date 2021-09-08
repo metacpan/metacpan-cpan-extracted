@@ -103,8 +103,24 @@ SYNOPSIS
         # WHERE
         #     INET '?' << i.network
 
+    Using a promise (Promise::Me) to execute an asynchronous query:
+
+        my $sth = $dbh->prepare( "SELECT some_slow_function(?)" ) || die( $dbh->error );
+        my $p = $sth->promise(10)->then(sub
+        {
+            my $st = shift( @_ );
+            my $ref = $st->fetchrow_hashref;
+            my $obj = My::Module->new( %$ref );
+        })->catch(sub
+        {
+            $log->warn( "Failed to execute query: ", @_ );
+        });
+        # Do other regular processing here
+        # Get the My::Module object
+        my( $obj ) = await( $p );
+
 VERSION
-        v0.9.15
+        v0.9.16
 
 DESCRIPTION
     DB::Object is a SQL API much alike "DBI", but with the added benefits
@@ -141,6 +157,9 @@ DESCRIPTION
         }
         $sth->exec(12) || die( $sth->error );
         my $ref = $sth->fetchrow_hashref;
+
+    This will provide you with the convenience and power of DB::Object while
+    keeping execution fast.
 
 CONSTRUCTOR
   new
@@ -652,6 +671,10 @@ METHODS
 
   from_unixtime
     See "from_unixtime" in DB::Object::Tables
+
+  get_sql_type
+    Provided with a sql type, irrespective of the character case, and this
+    will return the driver equivalent constant value.
 
   group
     See "group" in DB::Object::Tables

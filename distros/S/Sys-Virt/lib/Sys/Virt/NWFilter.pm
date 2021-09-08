@@ -59,7 +59,7 @@ sub _new {
 	    die "UUID must be either 16 unsigned bytes, or 32/36 hex characters long";
 	}
     } elsif (exists $params{xml}) {
-	$self = Sys::Virt::NWFilter::_define_xml($con,  $params{xml});
+	$self = Sys::Virt::NWFilter::_define_xml($con,  $params{xml}, $params{flags});
     } else {
 	die "address, id or uuid parameters are required";
     }
@@ -93,6 +93,24 @@ the network's configuration
 
 Remove the configuration associated with a network filter previously defined
 with the C<define_nwfilter> method in L<Sys::Virt>.
+
+=back
+
+=head1 CONSTANTS
+
+This section documents constants that are used with various
+APIs described above
+
+=head2 NWFILTER DEFINE
+
+The following constants can be used to control the behaviour
+of network filter define operations
+
+=over 4
+
+=item Sys::Virt::NWFilter::DEFINE_VALIDATE
+
+Validate the XML document against the XML schema
 
 =cut
 

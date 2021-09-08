@@ -1,5 +1,26 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.001007 2021 September 06 
+          - !!! Totally changed the way we aggregate validations and filters from subclasses
+          and roles.   All the same validations will run but the run order is likely 
+          different.  THIS COULD BE A BREAKING CHANGE for you if you have code that is
+          validation order dependent (could be in your test cases for example).  I did warn you
+          that validation order was subject to change :)  On a positive note after working thru
+          this with mst I think order is a lot more firmed up.  I still consider it subject to
+          change but I will now only change it if I need to in order to address critical design
+          or secure or performance issues.
+          - !!! Removed for now some experimental introspection code.   It wasn't documented
+          and if you used it your code is now broken.  Contact me with your use case so I can
+          plan a sane API for this.
+          - Confirmation validator now skips when either the confirmation value or
+          check value is not defined.  This prevents showing a confirmation error
+          when both values are not defined which I think is correct but its a minor
+          breaking change.  
+          - Lots more test cases are DBIC nesting.
+          - Normalized how translations key names are looked up and documented that.  Its also
+          not impossible I introduced a breaking change if you are using translation tags with
+          lots of weird nesting.
+
 0.001006  2021 April 19
           - Possible fix for issue where windows doesn't find locale paths
 
@@ -31,4 +52,4 @@ The following logs changes for the CPAN distribution Valiant
           - First Post!  Please only use this if you are ready to help
           file bug reports and read all the docs carefully.
           - This release is dedicated to my dog Tornado who we lost to
-          cancer in August of 2020.
+          cancer on 18 August 2020.

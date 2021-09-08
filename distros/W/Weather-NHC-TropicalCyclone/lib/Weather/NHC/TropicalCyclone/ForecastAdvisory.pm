@@ -437,7 +437,7 @@ module's C<save_as_atcf> method.
   $nhc->fetch;
   my $storms_ref = $nhc->active_storms;
   foreach my $storm (@$storms_ref) {
-      my $advNum   = $storm->publicAdvisory->{advNum};
+      my ($text, $advNum, $local_file) = $storm->fetch_publicAdvisory($storm->id.q{.fst});
       my $imgs_ref = $storm->fetch_forecastGraphics_urls;
       if ( not $stormsAdvCache->{ $storm->id }->{$advNum} ) {
 

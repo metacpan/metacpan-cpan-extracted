@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use App::week;
+use  App::week;
 exit App::week->new->run(@ARGV);
 
 __END__
@@ -12,7 +12,7 @@ __END__
 
 =head1 NAME
 
-week - colorful calendar command
+week - colorful calendar command for terminal
 
 =head1 SYNOPSIS
 
@@ -53,7 +53,7 @@ Color modules:
 
 =head1 VERSION
 
-Version 1.0101
+Version 1.0202
 
 =head1 DESCRIPTION
 
@@ -109,7 +109,7 @@ environment.
 
     LANG=et_EE week
 
-This command is come with B<-Mi18n> module which provides easy way to
+This command come with B<-Mi18n> module which provides easy way to
 specify language by command option.  Option B<-l> displays option list
 provided by B<-Mi18n> module and option B<--i18n> and B<--i18n-v>
 enables them.  See L<Getopt::EX::i18n>.
@@ -118,9 +118,9 @@ enables them.  See L<Getopt::EX::i18n>.
 
 =head1 JAPANESE ERA
 
-By default, year is shown on current month and every January.  When
-used in Japanese locale environment, right side year is displayed in
-Japanese era (wareki: 和暦) format.
+By default, chronological year is shown on current month and every
+January.  When used in Japanese locale environment, right side year is
+displayed in Japanese era (wareki: 和暦) format.
 
 =head1 COLORMAP
 
@@ -208,6 +208,7 @@ load appropriate module automatically in default start up module
 
     --tokyo2020, --tokyo2020-rev
     --tokyo2020-gold, --tokyo2020-gold-rev
+    --para2020, --para2020-rev
 
 =item B<--theme>
 
@@ -236,6 +237,14 @@ Start up file.  Use like this:
     option default --i18n-v --theme tokyo2020
 
 =back
+
+=head1 INSTALL
+
+=head2 CPANMINUS
+
+    $ cpanm App::week
+    or
+    $ curl -sL http://cpanmin.us | perl - App::week
 
 =head1 SEE ALSO
 

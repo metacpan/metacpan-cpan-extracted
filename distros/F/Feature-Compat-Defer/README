@@ -1,0 +1,94 @@
+NAME
+
+    Feature::Compat::Defer - make defer syntax available
+
+SYNOPSIS
+
+       use Feature::Compat::Defer;
+    
+       {
+          my $dbh = DBI->connect( ... ) or die "Cannot connect";
+          defer { $dbh->disconnect; }
+    
+          my $sth = $dbh->prepare( ... ) or die "Cannot prepare";
+          defer { $sth->finish; }
+    
+          ...
+       }
+
+DESCRIPTION
+
+    This module provides a new syntax keyword, defer, in a
+    forward-compatible way.
+
+    The latest perl development source provides a defer block syntax, under
+    the defer named feature. If all goes well, this will become available
+    at development version 5.35.4, and included in the 5.36 release. On
+    such perls, this module simply enables that feature.
+
+    On older versions of perl before such syntax is available. this module
+    will instead depend on and use Syntax::Keyword::Defer to provide it.
+
+KEYWORDS
+
+ defer
+
+       defer {
+          STATEMENTS...
+       }
+
+    The defer keyword introduces a block which runs its code body at the
+    time that its immediately surrounding code block finishes.
+
+    When the defer statement is encountered, the body of the code block is
+    pushed to a queue of pending operations, which is then flushed when the
+    surrounding block finishes for any reason - either by implicit
+    fallthrough, or explicit termination by return, die or any of the loop
+    control statements next, last or redo.
+
+    For more information, see additionally the documentation in "defer" in
+    Syntax::Keyword::Defer and, on a recent enough perl, "defer blocks" in
+    perlsyn.
+
+COMPATIBILITY NOTES
+
+    This module may use either Syntax::Keyword::Defer or the perl core
+    defer feature to implement its syntax. While the two behave very
+    similarly, and both conform to the description given above, the
+    following differences should be noted.
+
+      * Double Exceptions
+
+      Because defer blocks will run during stack unwind because of
+      exception propagation it is possible to encounter a second exception
+      within the block, thus having two "in flight" at once. Neither
+      Syntax::Keyword::Defer nor core's defer feature currently guarantees
+      what exception will be seen by the caller in such a situation, other
+      than that some kind of exception will definitely happen.
+
+      In particular, you should not rely on definitely receiving either the
+      first, or the final exception, in this situation.
+
+      * Fragile Against Erroneous Control Flow
+
+      The core defer feature tries hard to forbid various kinds of
+      problematic control that jumps into or out of defer blocks. In
+      particular, things like using last to jump out of a control loop that
+      is outside the defer block are banned.
+
+      By comparison, there is less that Syntax::Keyword::Defer can do about
+      this situation because it does not have access to as many parser and
+      compiler tricks as the core implementation. Therefore, there are some
+      situations that the core feature can prohibit statically, that
+      Syntax::Keyword::Defer can only detect at runtime - if at all. There
+      may be odd cases where prohibited behaviour performs differently
+      between the two implementations.
+
+      As long as you don't do anything "weird" like using loop controls or
+      goto to abuse the flow of control into or out of a defer block, this
+      should not cause a problem.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

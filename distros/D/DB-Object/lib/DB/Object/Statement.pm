@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Statement.pm
-## Version v0.3.8
+## Version v0.4.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2021/08/18
+## Modified 2021/08/29
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -23,9 +23,10 @@ BEGIN
     use parent qw( DB::Object );
     use Class::Struct qw( struct );
     use DateTime;
+    use Promise::Me;
     use Want;
     our( $VERSION, $VERBOSE, $DEBUG );
-    $VERSION    = 'v0.3.8';
+    $VERSION    = 'v0.4.0';
     $VERBOSE    = 0;
     $DEBUG      = 0;
     use Devel::Confess;
@@ -297,10 +298,14 @@ sub execute
         {
             $_ = "$_";
         }
+        # Will work well with Module::Generic::Hash
+        elsif( $self->_is_hash( $_ ) && $self->_can( $_, 'as_json' ) )
+        {
+            $_ = $_->as_json;
+        }
     }
     
     $self->message( 3, "Binding '", CORE::join( ', ', @binded ), "' parameters for query: '$self->{query}'." );
-    ## debugh( 'binded', $binded ) if( $self->{ 'query' } =~ /^\s*SELECT/ );
     my $rv = 
     eval
     {
@@ -318,7 +323,7 @@ sub execute
             if( ref( $binded[$i] ) && 
                 $self->_is_object( $binded[$i] ) &&
                 overload::Overloaded( $binded[$i] ) &&
-                overload::method( $binded[$i], '""' ) )
+                overload::Method( $binded[$i], '""' ) )
             {
                 $binded[$i] .= '';
             }
@@ -1028,6 +1033,15 @@ sub priority
     return( $sth );
 }
 
+sub promise
+{
+    my $self = shift( @_ );
+    return( Promise::Me->new(sub
+    {
+        return( $self->execute( @_ ) );
+    }) );
+}
+
 sub query { return( shift->_set_get_scalar( 'query', @_ ) ); }
 
 sub query_object { return( shift->_set_get_object( 'query_object', 'DB::Object::Query', @_ ) ); }
@@ -1104,7 +1118,7 @@ DB::Object::Statement - Statement Object
 
 =head1 VERSION
 
-v0.3.8
+v0.4.0
 
 =head1 DESCRIPTION
 
@@ -1294,6 +1308,22 @@ If used on queries other than C<DELETE>, C<INSERT>, C<REPLACE>, C<SELECT>, C<UPD
 If called in void context, this will execute the newly create statement handler immediately.
 
 It returns the newly create statement handler.
+
+=head2 promise
+
+This the same as calling L</execute>, except that the query will be executed asynchronously and a L<Promise::Me> object will be returned, so you can do asynchronous queries like this:
+
+    my $sth = $dbh->prepare( "SELECT some_slow_function(?)" ) || die( $dbh->error );
+    my $p = $sth->promise(10)->then(sub
+    {
+        my $st = shift( @_ );
+        my $ref = $st->fetchrow_hashref;
+        my $obj = My::Module->new( %$ref );
+    })->catch(sub
+    {
+        $log->warn( "Failed to execute query: ", @_ );
+    });
+    my( $obj ) = await( $p );
 
 =head2 query
 

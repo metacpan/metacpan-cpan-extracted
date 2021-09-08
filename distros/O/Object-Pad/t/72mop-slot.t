@@ -42,6 +42,32 @@ is_deeply( [ $classmeta->slots ], [ $slotmeta ],
       '$obj->slot after $slotmeta->value as mutator' );
 }
 
+# slotmeta on roles (RT138927)
+{
+   role ARole {
+      has $data = 42;
+   }
+
+   my $slotmeta = Object::Pad::MOP::Class->for_class( 'ARole' )->get_slot( '$data' );
+   is( $slotmeta->name, '$data', '$slotmeta->name for slot of role' );
+
+   class AClass does ARole {
+      has $data = 21;
+   }
+
+   my $obja = AClass->new;
+   is( $slotmeta->value( $obja ), 42,
+      '$slotmeta->value as accessor on role instance fetches correct slot' );
+
+   class BClass isa AClass {
+      has $data = 63;
+   }
+
+   my $objb = BClass->new;
+   is( $slotmeta->value( $objb ), 42,
+      '$slotmeta->value as accessor on role instance subclass fetches correct slot' );
+}
+
 # RT136869
 {
    class A {

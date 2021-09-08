@@ -30,13 +30,37 @@ See also L<#7|https://github.com/johannessen/neo4j-driver-perl/issues/7>.
 
 =item * L<Neo4j::Driver/"Parameter syntax conversion">: make stable
 
+=item * L<Neo4j::Driver/"Custom networking modules">: make stable, but
+not until at least part of the C<result_handlers> API has been specified
+
+=item * L<Neo4j::Driver::Result/"Control result stream attachment">:
+make C<detach()> stable (it's only needed I<very> rarely, but when it is,
+there may be no good alternative); deprecate C<attached()>
+
+=item * L<Neo4j::Driver::Result/"Look ahead in the result stream">:
+make C<peek()> stable once C<fetch()> reliably buffers two records
+
 =item * L<Neo4j::Driver::Session/"Concurrent transactions">: make illegal
 for both nested explicit and nested autocommit transactions (for
 consistency with Bolt), but provide a driver config option (e. g.
 C<< nested_transactions => 1 >>) that lifts this restriction for HTTP
 
-=item * L<Neo4j::Driver::Transaction/"Return results in graph format">,
-L<Neo4j::Driver::Record/"graph">: make driver config option
+=item * L<Neo4j::Driver::Result/"Disable obtaining query statistics">:
+Deprecate in favour of modifying the JSON in a custom net module.
+Clarify that this is already now an internal API in the deprecation
+explanation, so that it can be dropped from the module pod.
+
+=item * L<Neo4j::Driver::Transaction/"Return results in graph format">:
+Deprecate in favour of modifying the JSON in a custom net module. Clarify that
+this and L<Neo4j::Driver::Record/"graph"> are already now internal APIs in the
+deprecation explanation, so that both can be dropped from the module pod.
+
+=item * Calling list methods in scalar context
+(L<in Node|Neo4j::Driver::Type::Node/"Calling in scalar context">,
+L<in Path|Neo4j::Driver::Type::Path/"Calling in scalar context">,
+L<in Result|Neo4j::Driver::Result/"Calling in scalar context">, and
+L<in ResultSummary|Neo4j::Driver::ResultSummary/"Calling in scalar context">):
+make stable
 
 =item * Jolt: The C<jolt> config option will be deprecated once
 Jolt implementation is fully complete. Those who use a modern Neo4j
@@ -102,22 +126,6 @@ demonstrate some of the net_module functionality and how that can be used.
 =head2 L<Neo4j::Driver>
 
 =over
-
-=item * Make the URL a config option, so that it can be queried (and changed).
-
-=item * Make the auth data a config option, so that it can be queried. As
-alternative ways to I<set> the auth data, C<basic_auth()> should continue
-to be supported as an alias and the user info should be parsed from the URL
-if given (however, URLs without user info should not change the auth data
-stored in the driver). A possible implementation would be to create a new
-L<AuthToken|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/AuthTokens.html>
-module that would offer suitable methods, but this seems like overkill.
-While sending/accepting userinfo to/from others is explicitly forbidden now by
-L<RFC7230:2.7.1|https://tools.ietf.org/html/rfc7230#section-2.7.1>,
-it's still allowed to use it in cases such as ours.
-
-=item * Allow passing config options directly to the constructor, e. g. in
-place of the URL (C<< Neo4j::Driver->new({ url=>"bolt:", timeout=>30 }) >>).
 
 =item * The C<neo4j> scheme should work for a community edition server out
 of the box. For starters, C<neo4j> should check if L<Neo4j::Bolt> is loaded
@@ -206,6 +214,8 @@ the official Java driver, so this alias should perhaps be experimental.
 
 =over
 
+=item * Improve documentation, esp. wrt. side-effects of e. g. C<has_next()>
+
 =item * Perhaps C<fetch()> should always buffer two records instead of just
 one. With the current implementation, the bolt connection might remain
 attached longer than desirable in cases where the client knows in advance
@@ -251,6 +261,31 @@ provides stats, and different APIs for HTTP and Bolt seem like a bad idea.
 =item * C<use Class::Accessor::Fast 0.34;>
 
 =item * It seems Neo4j 4 added new counters for system updates.
+
+=back
+
+=head2 L<Neo4j::Driver::Net>
+
+=over
+
+=item * The lingo for the different components is not very clear. Options
+to be considered:
+
+=over
+
+=item Should "net helper" be renamed to "net controller"?
+
+=item Should "net module" be renamed to "net agent"?
+
+Problem is, "agent" is already an overloaded term.
+
+=item Should "net module" be renamed to "net plugin"?
+
+Currently we include a net module with the distribution, so that's not really
+a plugin. However, we could simply describe that as the "default plugin". Also,
+perhaps the LWP module should be externalised anyway, to ease future expansion.
+
+=back
 
 =back
 

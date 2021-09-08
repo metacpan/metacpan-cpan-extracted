@@ -1,8 +1,8 @@
 package Devel::Git::MultiBisect::Opts;
-use strict;
-use warnings;
 use v5.14.0;
-our $VERSION = '0.15';
+use warnings;
+our $VERSION = '0.19';
+$VERSION = eval $VERSION;
 use base qw( Exporter );
 our @EXPORT_OK = qw(
     process_options
@@ -32,13 +32,10 @@ to prepare parameters for Devel::Git::MultiBisect.
 
 C<process_options()> takes as arguments an optional list of key-value pairs.
 This approach is useful in testing the subroutine but is not expected to be
-used otherwise.  C<process_options()> is a wrapper around
-Getopt::Long::GetOptions(), so is devoted to processing command-line arguments
-provided, for example, to the command-line utility F<multisect> (not yet
-created, but to be included in a future version of this CPAN distribution).
+used otherwise.
 
-The subroutine returns a reference to a hash populated with values in the
-following order:
+C<process_options()> is a wrapper around C<Getopt::Long::GetOptions()>.  It
+returns a reference to a hash populated with values in the following order:
 
 =over 4
 
@@ -62,14 +59,13 @@ sub process_options {
     }
     my $found_make = $Config{make};
     if ($args{verbose}) {
-        print "Arguments provided to process_options():\n";
-        print Dumper \%args;
-        print "\n";
-        print q|For 'make', %Config has: |, $found_make, "\n";
+        say "Arguments provided to process_options():";
+        say Dumper \%args;
+        say "";
+        say q|For 'make', %Config has: |, $found_make;
     }
 
     my %defaults = (
-       'workdir' => cwd(),
        'short' => 7,
        'repository' => 'origin',
        'branch' => 'master',
@@ -90,7 +86,6 @@ sub process_options {
         "configure_command=s" => \$opts{configure_command},
         "make_command=s" => \$opts{make_command},
         "test_command=s" => \$opts{test_command},
-        "workdir=s" => \$opts{workdir},
         "outputdir=s" => \$opts{outputdir},
         "short=i" => \$opts{short},
         "repository=s" => \$opts{repository},
@@ -99,12 +94,12 @@ sub process_options {
     ) or croak("Error in command line arguments\n");
 
     if ($opts{verbose}) {
-        print "Command-line arguments:\n";
+        say "Command-line arguments:";
         my %defined_opts;
         for my $k (keys %opts) {
             $defined_opts{$k} = $opts{$k} if defined $opts{$k};
         }
-        print Dumper \%defined_opts;
+        say Dumper \%defined_opts;
     }
 
     # Final selection of params starts with defaults.
@@ -137,7 +132,6 @@ sub process_options {
         unless (defined $params{last_before} or defined $params{first});
 
     for my $p ( qw|
-        workdir
         short
         repository
         branch

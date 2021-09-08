@@ -95,31 +95,33 @@ Time::Verbal - Convert time distance to words.
 
 =head1 VERSION
 
-version 1.1.0
+version 1.1.1
 
 =head1 SYNOPSIS
 
     use Time::Verbal;
 
     my $now = time;
+    my $then = $now - 76543210;
 
-    # Print the distance of two times in words.
-    say Time::Verbal::distance($now, $now);
-    #=> less the a minute
+    my $o = Time::Verbal->new();
 
-    # The second argument must not be less the the first one.
-    say Time::Verbal::distance($now, $now + 4200);
+    say $o->distance($then, $now);
+    #=> over a year
+
+    say $o->distance($now, $then);
     #=> about 1 hour
 
 =head1 DESCRIPTION
 
-Time::Verbal trys to represent time-related info as verbal text.
+Time::Verbal is a module for converting the difference between two
+timestamps to its verbal form -- something a human would say.
 
 =head1 METHODS
 
-=head2 new( key => value, ... )
+=head2 new(...)
 
-The constructor. You may pass arguments as key-value pairs.
+The constructor, with arguments being a list of key-value pairs.
 
 The valid keys are:
 
@@ -142,9 +144,9 @@ are recongized by L<Locale::Wolowitz>.
 
 =head2 distance($from_time, $to_time)
 
-Returns the distance of two timestamp in words.
+Returns the absolute distance of two timestamp in words.
 
-The possible outputs are:
+Output are in one of these forms:
 
     - less than a minute
     - 1 minute
@@ -178,8 +180,8 @@ Your should start by copying and modify one of the JSON file under
 C<Time::Verbal->i18n_dir>. The JSON file should be named after the
 language code as a good convention, but there is no strict rule for
 that. As a result, you may create your own language code like
-"LOLSPEAK" by first creating the translation file <LOLSPEAK.json>, and
-use "LOLSPEAK" as the value of C<locale> attribute of the object.
+C<"LOLSPEAK"> by first creating the translation file C<LOLSPEAK.json>, then
+use C<"LOLSPEAK"> as the value of C<locale> attribute.
 
 Current translations are imported from the rails-i18n project at
 L<https://github.com/svenfuchs/rails-i18n>
@@ -190,7 +192,7 @@ Kang-min Liu <gugod@gugod.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Kang-min Liu.
+This software is Copyright (c) 2021 by Kang-min Liu.
 
 This is free software, licensed under:
 

@@ -2,10 +2,10 @@ package Config::XrmDatabase::Failure;
 
 # ABSTRACT: Exception class
 
-use strict;
+use v5.26;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 use custom::failures::x::alias
   -suffix => '_failure',
@@ -14,6 +14,8 @@ use custom::failures::x::alias
   components
   file
   parameter
+  internal
+  query
   );
 
 1;
@@ -30,7 +32,7 @@ Config::XrmDatabase::Failure - Exception class
 
 =head1 VERSION
 
-version 0.02
+version 0.04
 
 =head1 SUPPORT
 

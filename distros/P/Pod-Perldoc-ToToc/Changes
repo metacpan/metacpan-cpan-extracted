@@ -1,5 +1,9 @@
 Revision history for Perl module Pod::Perldoc::ToToc
 
+1.122 2021-09-02T16:10:36Z
+	* Pod::TOC is now distributed with this module, so fix the Makefile.PL
+	for that. (GitHub #1)
+
 1.121 2018-05-21T13:34:52Z
 	* Clarify that it's the Artistic License 2.0
 

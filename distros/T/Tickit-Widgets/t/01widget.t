@@ -25,7 +25,7 @@ is_deeply( [ $widget->requested_size ], [ 1, 5 ],
 
 {
    my $widget = TestWidget->new(
-      i => 1,
+      style => { i => 1 },
    );
 
    is_deeply( { $widget->pen->getattrs }, { i => 1 }, 'Widget constructor sets initial pen' );

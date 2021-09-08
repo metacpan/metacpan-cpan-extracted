@@ -1,0 +1,35 @@
+Changes
+cpanfile
+etc/bench.pl
+etc/experiment/Util/Makefile.PL
+etc/experiment/Util/util.pd
+etc/for_profiling.pl
+lib/Statistics/Descriptive/PDL.pm
+lib/Statistics/Descriptive/PDL/SampleWeighted.pm
+lib/Statistics/Descriptive/PDL/Weighted.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+README.md
+t/00-load.t
+t/descr.t
+t/descr_weighted.t
+t/equal_weights.t
+t/lib/Utils.pm
+t/mode.t
+t/sample_weighted.t
+xt/01-has_versions.t
+xt/03-has_pod.t
+xt/04-pod-coverage.t
+xt/05-manifest.t
+xt/06-critic.t
+xt/07-notabs.t
+xt/09-use_strict.t
+xt/10-changes_format.t
+xt/boilerplate.t
+xt/cpan-changes.t
+xt/style-trailing-space.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

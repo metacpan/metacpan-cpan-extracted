@@ -1,5 +1,5 @@
 package Yancy::Model::Item;
-our $VERSION = '1.076';
+our $VERSION = '1.077';
 # ABSTRACT: Interface to a single item
 
 #pod =head1 SYNOPSIS
@@ -25,6 +25,19 @@ our $VERSION = '1.076';
 #pod =cut
 
 use Mojo::Base -base;
+use overload
+    '%{}' => \&_hashref,
+    fallback => 1;
+
+sub _hashref {
+    my ( $self ) = @_;
+    # If we're not being called by ourselves or one of our superclasses,
+    # we want to pretend we're a hashref of plain data.
+    if ( !$self->isa( scalar caller ) ) {
+        return $self->{data};
+    }
+    return $self;
+}
 
 #pod =attr schema
 #pod
@@ -104,7 +117,7 @@ Yancy::Model::Item - Interface to a single item
 
 =head1 VERSION
 
-version 1.076
+version 1.077
 
 =head1 SYNOPSIS
 

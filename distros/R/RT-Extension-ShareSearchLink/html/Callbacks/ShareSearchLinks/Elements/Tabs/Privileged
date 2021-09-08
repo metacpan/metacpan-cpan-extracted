@@ -1,0 +1,28 @@
+<%doc>
+Insert the "Share" link into the page menu, if we are on a search page.
+</%doc>
+\
+<%ARGS>
+$Path => undef
+$QueryString => ''
+$QueryArgs => {}
+</%ARGS>
+\
+<%INIT>
+my $RequestPath = $HTML::Mason::Commands::r->path_info;
+return if ( $RequestPath !~ qr{^/Search/} );
+
+my $CurrentSearch = $session{"CurrentSearchHash"} || {};
+my $Query = $DECODED_ARGS->{'Query'} || $CurrentSearch->{'Query'};
+if ($Query) {
+    PageMenu()
+        ->child( 'sharesearchlink' => raw_html =>
+              q[<a id="page-sharesearchlink" class="menu-item btn" href="#" onclick="]
+            . q[jQuery('#ShareSearchLinkForm').submit(); return false;]
+            . q[">]
+            . loc('Share')
+            . q[</a>] );
+}
+
+return;
+</%INIT>

@@ -1,0 +1,28 @@
+Changes
+lib/Game/TextMapper.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+script/text-mapper
+share/apocalypse.txt
+share/black-and-white.txt
+share/default.txt
+share/extract-svg.pl
+share/forgotten-depths.txt
+share/gnomeyland-example.png
+share/gnomeyland-example.txt
+share/gnomeyland.txt
+share/gridmapper-example.txt
+share/gridmapper.txt
+share/traveller-example.pdf
+share/traveller-example.svg
+share/traveller-example.txt
+share/traveller-original.svg
+share/traveller-square-example.svg
+share/traveller-square-example.txt
+share/traveller-square.txt
+share/traveller.txt
+t/basic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

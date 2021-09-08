@@ -1,0 +1,68 @@
+=encoding utf-8
+
+=head1 NAME
+
+SDL2::AudioCVT - The Structure that Holds a Set of Audio Conversion Filters
+
+=head1 SYNOPSIS
+
+    use SDL2 qw[:all];
+    # TODO: I need to whip up a quick example
+
+=head1 DESCRIPTION
+
+SDL2::AudioCVT is a structure to hold a set of audio conversion filters and
+buffers.
+
+Note that various parts of the conversion pipeline can take advantage of SIMD
+operations (like SSE2, for example). SDL2::AudioCVT doesn't require you to pass
+it aligned data, but can possibly run much faster if you set both its (C<buf>)
+field to a pointer that is aligned to 16 bytes, and its (C<len>) field to
+something that's a multiple of 16, if possible.
+
+=head1 Fields
+
+=over
+
+=item C<needed> - Set to 1 if conversion possible
+
+=item C<src_format> - Source audio format
+
+=item C<dst_format> - Target audio format
+
+=item C<rate_incr> - Rate conversion increment
+
+=item C<buf> - Buffer to hold entire audio data
+
+=item C<len> - Length of original audio buffer
+
+=item C<len_cvt> - Length of converted audio buffer
+
+=item C<len_mult> - Buffer must be C<len * len_mult> big
+
+=item C<len_ratio> - Given C<len>, final size is C<len * len_ratio>
+
+=item C<filters> - List of filter functions
+
+=item C<filter_index> - Current audio conversion function
+
+=back
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under
+the terms found in the Artistic License 2. Other copyrights, terms, and
+conditions may apply to data transmitted through this module.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=begin stopwords
+
+
+=end stopwords
+
+=cut

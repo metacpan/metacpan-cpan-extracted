@@ -1,0 +1,61 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA256 ff6ce2489958d16d294654999e6fb18f91858239298f2d8124251a8e0009f901 Changes
+SHA256 223974120dbd3382c8983daa96808c1dc09614ba1bc94f9323a73ecde977dabc Dist-Zilla-Plugin-DockerHub-0.01/Changes
+SHA256 759eaf1433075d9eb127f881372b7cdb1d0e60cf0fd89635e906c0ce946fde45 Dist-Zilla-Plugin-DockerHub-0.01/LICENSE
+SHA256 7a275d9dd76f7df768b05866a4e113e821eefc4b347fbca205319de6460314c5 Dist-Zilla-Plugin-DockerHub-0.01/MANIFEST
+SHA256 a48d0e933e3bae1d02a9d55afba812025a673d497953e4420734c5c652f07207 Dist-Zilla-Plugin-DockerHub-0.01/MANIFEST.SKIP
+SHA256 8da07f46ad7ecb51d6391e4a3f5a75bc58255608ae9bd32ab4a94e41ca9adf90 Dist-Zilla-Plugin-DockerHub-0.01/META.json
+SHA256 4a7c8ad1c2ca6d1c69571a0019c0d4cf5e1174f5ad9bfa982366c6dc10d3e811 Dist-Zilla-Plugin-DockerHub-0.01/META.yml
+SHA256 ba1df2504d39e095d2e583dfca14da8515ab6794838182d9504573fc10c67933 Dist-Zilla-Plugin-DockerHub-0.01/Makefile.PL
+SHA256 8422394afae8388a805bb2ebe632bc9668811ee06a9ce7230b38af08f350fdc5 Dist-Zilla-Plugin-DockerHub-0.01/README
+SHA256 7b433a49e5893fda3f9f04a68cf1188c5284b67e1f0e56cc037683507301d780 Dist-Zilla-Plugin-DockerHub-0.01/SIGNATURE
+SHA256 dce811b8c5406f009e0efd71570b2b22e5191e2dd5257e58e5048fd468c58992 Dist-Zilla-Plugin-DockerHub-0.01/cpanfile
+SHA256 25cb9ef2ddad8373cd44c4af3fb39902496e128b71955f4c09963a34f815f7f8 Dist-Zilla-Plugin-DockerHub-0.01/lib/Dist/Zilla/Plugin/Docker.pm
+SHA256 22260bced9a74c25197a4f62321c453d65c87758db111370b627aa5d56b07a9d Dist-Zilla-Plugin-DockerHub-0.01/lib/Dist/Zilla/Plugin/Docker/DockerClient.pm
+SHA256 305c657c6b73f10767a0ea286b8a73d693940f4cbb8b6a0a4d34e2b5a1c04635 Dist-Zilla-Plugin-DockerHub-0.01/t/author-pod-syntax.t
+SHA256 9a339818bc8fe7f23595b06538321f26436cb3318c81446d88cd8af2d2ff4806 Dist-Zilla-Plugin-DockerHub-0.01/t/author-signature.t
+SHA256 759eaf1433075d9eb127f881372b7cdb1d0e60cf0fd89635e906c0ce946fde45 LICENSE
+SHA256 17accf321c068a73bd540086a67487a038e3197ea835a98914a7b6cb92e11502 MANIFEST
+SHA256 a48d0e933e3bae1d02a9d55afba812025a673d497953e4420734c5c652f07207 MANIFEST.SKIP
+SHA256 c4111cc8ba50fe2b2541374fae27ae02954463b7a16057900ec5569b872ac3a0 META.json
+SHA256 8a14a0d9f3acfb7a11102efccccf8d409e0e19216706f8a9a05e4d3b8ebd1c56 META.yml
+SHA256 247d7656efc87a48c359d563d5370f5e79020ee09769446c99ba5c394d8a79e0 Makefile.PL
+SHA256 9a01eaf9ebba1141f2be3b39eb63318f46b0094278f258eddb25f616c217f92d README
+SHA256 ebb0e45fa99c9001f73e4cf0ece6e6b215921a52a167480cd9a6a109453467ff cpanfile
+SHA256 5415ba5ba89ae4abb7b51ec13a1fb14d98f44ae884397f34cc8f08a58a62c737 lib/Dist/Zilla/Plugin/Docker.pm
+SHA256 6a61cbcc58d65e3b8aa55f4b3f521a5de6e2088948ccd69049e5cbcfaba4f017 lib/Dist/Zilla/Plugin/Docker/DockerClient.pm
+SHA256 5025ffefce30f93628ad550b16ab4f0cc907e73c8fdc0642264df4264e55ec12 t/00-compile.t
+SHA256 305c657c6b73f10767a0ea286b8a73d693940f4cbb8b6a0a4d34e2b5a1c04635 t/author-pod-syntax.t
+SHA256 9a339818bc8fe7f23595b06538321f26436cb3318c81446d88cd8af2d2ff4806 t/author-signature.t
+-----BEGIN PGP SIGNATURE-----
+
+iQJFBAEBCAAvFiEE2EtuRfhGgngE8PsARAzvLrlUzY4FAmEul84RHG1zY2hvdXRA
+Y3Bhbi5vcmcACgkQRAzvLrlUzY5B/xAAkqoMorql+ocHyzjSfGA3JH1JWV2c8C6a
+Smd3iqGwO7cWD5EF61gxg6jk7FOtbvUny98Z3D9u7tLaMEJUGe8PZ8gAH0S28DeD
+oCRaJlY3i6fN31nEOpXYpCtLU6MI43MVU46F3nh99zkiIKBdoYMDvMMb3ZEvNNqW
+jO7BVMH2h7vu26jIhJYXRK6YN0UA0ufcku4xgGB8/8pe7RClmEY2wYjT8ljpUVgD
+5wI5JecsO0iqCrslwAxK9Qj2m5Wq0qemRVWHIlnnvqGGT2BLBk7vS4+Ijj9P4Nu4
+M9tpSbl1PLLa0dudsPrW/J9x29D26OglPAO0gJEw6ikDaQDMeGwsi+lEKC7nt9BF
+hYKPgo9iQ8Gm8okywFwgmd//Mns6zkv8MUvclm/W2BXMv60X1ZLXbb/Wt2vxmt+V
+lBrwLgCJqUsW9M/EZ5fr0JO25oMhysUbzU08C7l+1+JpTGSmctyCEiahFeHDd/fM
+AP4192OOlufgW0ECRHSFUtcD7lGiDO5ZDnP8LoIfII/ZpvG/adFhDakJVurXVSaB
+16VCGVipLaqSD8l2moNJOdP87eHUN0RVAZfaXWILFw4ZC/SFjSrLidRdgMb3VE2n
+yHxhyu1Spx9xyGh3l7riXJM7MfqgCxhAoiWDI5ggh+PP26zA3L8GjvR3K5Y0O9mc
+s4XePlhuXT0=
+=gtmg
+-----END PGP SIGNATURE-----

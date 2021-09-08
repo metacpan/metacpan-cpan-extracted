@@ -1,0 +1,7 @@
+Revision history for Net-SNMP-Mixin-ArubaCX-VlanStatic
+
+0.02	Mon, 06 Sep 2021 11:07:29 +0200
+	VlanStaticEgressPorts includes untagged VLANs
+
+0.01	Sat, 28 Aug 2021 13:55:26 +0200
+	First production release

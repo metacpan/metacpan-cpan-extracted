@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.10",
+   "generated_by" : "Minilla/v3.1.12",
    "license" : [
       "perl_5"
    ],
@@ -55,7 +55,7 @@
    "provides" : {
       "Text::Conceal" : {
          "file" : "lib/Text/Conceal.pm",
-         "version" : "0.99"
+         "version" : "0.9901"
       }
    },
    "release_status" : "stable",
@@ -69,7 +69,7 @@
          "web" : "https://github.com/kaz-utashiro/Text-Conceal"
       }
    },
-   "version" : "0.99",
+   "version" : "0.9901",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

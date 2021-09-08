@@ -215,6 +215,7 @@ sub align_shapes {
 # @param string $password Document password. (optional)
 # @param string $storage Document storage. (optional)
 # @param string $fonts_folder Custom fonts folder. (optional)
+# @param string $slides The indices of the slides to be converted. If not specified, all slides are converted by default. (optional)
 {
     my $params = {
     'document' => {
@@ -240,6 +241,11 @@ sub align_shapes {
     'fonts_folder' => {
         data_type => 'string',
         description => 'Custom fonts folder.',
+        required => '0',
+    },
+    'slides' => {
+        data_type => 'string',
+        description => 'The indices of the slides to be converted. If not specified, all slides are converted by default.',
         required => '0',
     },
     };
@@ -289,6 +295,11 @@ sub convert {
         $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
     }
 
+    # query params
+    if (exists $args{'slides'} && defined $args{'slides'}) {
+        $query_params->{'slides'} = $self->{api_client}->to_query_value($args{'slides'});
+    }
+
     # header params
     if ( exists $args{'password'}) {
         $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
@@ -328,6 +339,7 @@ sub convert {
 # @param string $password Document password. (optional)
 # @param string $storage Document storage. (optional)
 # @param string $fonts_folder Custom fonts folder. (optional)
+# @param string $slides The indices of the slides to be converted. If not specified, all slides are converted by default. (optional)
 {
     my $params = {
     'document' => {
@@ -358,6 +370,11 @@ sub convert {
     'fonts_folder' => {
         data_type => 'string',
         description => 'Custom fonts folder.',
+        required => '0',
+    },
+    'slides' => {
+        data_type => 'string',
+        description => 'The indices of the slides to be converted. If not specified, all slides are converted by default.',
         required => '0',
     },
     };
@@ -415,6 +432,11 @@ sub convert_and_save {
     # query params
     if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
         $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # query params
+    if (exists $args{'slides'} && defined $args{'slides'}) {
+        $query_params->{'slides'} = $self->{api_client}->to_query_value($args{'slides'});
     }
 
     # header params
@@ -12436,6 +12458,7 @@ sub download_notes_slide_shape {
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
 # @param string $fonts_folder Custom fonts folder. (optional)
+# @param string $slides The indices of the slides to be saved. If not specified, all slides are saved by default. (optional)
 {
     my $params = {
     'name' => {
@@ -12471,6 +12494,11 @@ sub download_notes_slide_shape {
     'fonts_folder' => {
         data_type => 'string',
         description => 'Custom fonts folder.',
+        required => '0',
+    },
+    'slides' => {
+        data_type => 'string',
+        description => 'The indices of the slides to be saved. If not specified, all slides are saved by default.',
         required => '0',
     },
     };
@@ -12523,6 +12551,11 @@ sub download_presentation {
     # query params
     if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
         $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # query params
+    if (exists $args{'slides'} && defined $args{'slides'}) {
+        $query_params->{'slides'} = $self->{api_client}->to_query_value($args{'slides'});
     }
 
     # header params
@@ -22104,6 +22137,7 @@ sub save_notes_slide_shape {
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
 # @param string $fonts_folder Custom fonts folder. (optional)
+# @param string $slides The indices of the slides to be saved. If not specified, all slides are saved by default. (optional)
 {
     my $params = {
     'name' => {
@@ -22144,6 +22178,11 @@ sub save_notes_slide_shape {
     'fonts_folder' => {
         data_type => 'string',
         description => 'Custom fonts folder.',
+        required => '0',
+    },
+    'slides' => {
+        data_type => 'string',
+        description => 'The indices of the slides to be saved. If not specified, all slides are saved by default.',
         required => '0',
     },
     };
@@ -22206,6 +22245,11 @@ sub save_presentation {
     # query params
     if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
         $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # query params
+    if (exists $args{'slides'} && defined $args{'slides'}) {
+        $query_params->{'slides'} = $self->{api_client}->to_query_value($args{'slides'});
     }
 
     # header params

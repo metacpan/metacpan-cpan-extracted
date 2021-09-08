@@ -4,7 +4,7 @@ AnyEvent::SOCKS::Client - AnyEvent-based SOCKS client!
 
 =head1 VERSION
 
-Version 0.02
+Version 0.051
 
 =cut
 
@@ -14,20 +14,24 @@ Constructs function which behave like AnyEvent::Socket::tcp_connect
 
     use AnyEvent::SOCKS::Client qw/tcp_connect_via/;
 
+    $AnyEvent::SOCKS::Client::TIMEOUT = 30;
+    # used only if prepare_cb NOT passed to proxied function
+    # e.g. AE::HTTP on_prepare callback is not present
+
     my @chain = qw/socks5://user:pass@192.0.2.100:1080 socks5://198.51.100.200:9080/;
     tcp_connect_via( @chain )->( 'example.com', 80, sub{
         my ($fh) = @_ or die "Connect failed $!";
-		...
+        ...
     }); 
-    
+
 SOCKS client for AnyEvent::HTTP
 
-   http_get "http://example.com/foo", 
-      tcp_connect => tcp_connect_via('socks5://198.51.100.200:9080'), 
-      sub{ 
-         my( $data, $header) = @_ ;
-         ...
-      };
+    http_get "http://example.com/foo",
+        tcp_connect => tcp_connect_via('socks5://198.51.100.200:9080'),
+        sub{
+            my( $data, $header) = @_ ;
+            ...
+        };
 
 =head1 SECURITY
 
@@ -54,14 +58,18 @@ use strict ;
 
 use AnyEvent;
 use AnyEvent::Util qw/guard/;
-use AnyEvent::Socket qw/tcp_connect format_ipv4 format_ipv6/;
+use AnyEvent::Socket qw/tcp_connect parse_ipv4 format_ipv4 parse_ipv6 format_ipv6/;
 use AnyEvent::Handle ;
 use AnyEvent::Log ;
 
+use Scalar::Util qw/weaken/;
+
 require Exporter;
-our $VERSION = '0.02';
+our $VERSION = '0.051';
 our @ISA = qw/Exporter/;
 our @EXPORT_OK = qw/tcp_connect_via/;
+
+our $TIMEOUT = 300;
 
 use constant {
 	TYPE_IP4 => 1,
@@ -81,56 +89,116 @@ use constant {
 sub _parse_uri{
 	my $re = qr!socks(4|4a|5)://(?:([^\s:]+):([^\s@]*)@)?(\[[0-9a-f:.]+\]|[^\s:]+):(\d+)!i ;
 	if( $_[0] =~ m/$re/gi ){
-		return {v => $1, login => $2, password => $3, host => $4, port => $5};
+		my $p = {v => $1, login => $2, password => $3, host => $4, port => $5};
+		$p->{host} =~ s/^\[|\]$//g;
+		return $p;
 	}
 	undef ;
 }
 # returns tcp_connect compatible function
 sub tcp_connect_via{
-	my(@chain) = @_ ; 
+	my(@chain) = @_ ;
+
+	unless( @chain ){
+		AE::log "error" => "No socks were given, abort"; 
+		return sub{ $_[2]->() };
+	}
+	my @parsed;
+	for(@chain){
+		if( my $p = _parse_uri($_) ){
+			push @parsed, $p; next;
+		}
+		AE::log "error" => "Invalid socks uri: $_";
+		return sub{ $_[2]->() };
+	}
+
 	return sub{
-		my $con = bless { chain => [ map _parse_uri($_), @chain ] }, __PACKAGE__ ;
-		$con->connect( @_ ) ;
-		guard { undef $con } ;
+		my( $dst_host, $dst_port, $c_cb, $pre_cb ) = @_ ;
+		my $con = bless {
+			chain => \@parsed,
+			dst_host => $dst_host,
+			dst_port => $dst_port,
+			c_cb => $c_cb,
+			pre_cb => $pre_cb,
+		}, __PACKAGE__ ;
+		$con->connect;
+
+		if( defined wantarray ){ # not void
+			weaken( $con );
+			return guard{
+				AE::log "debug" => "Guard triggered" ;
+				if( ref $con eq __PACKAGE__ ){
+					undef $con->{c_cb};
+					$con->DESTROY;
+				}
+			};
+		}
+		undef;
 	};
 }
 
 sub connect{
-	my( $self, $dst_host, $dst_port, $c_cb, $pre_cb ) = @_ ;
-	unless( @{ $self->{chain} } ){
-		AE::log "error" => "No socks were given, abort"; 
-		return $c_cb->();	
-	}
-	if( $self->{c_cb}){
-		AE::log "error" => "It's one-off object, create another instance.."; 
-		return $c_cb->();
-	}
-	$self->{dst_host} = $dst_host; 
-	$self->{dst_port} = $dst_port;
-	$self->{c_cb} = $c_cb ;
-	$self->{pre_cb} = $pre_cb ;
-	
+	my( $self ) = @_ ;
 	# tcp connect to first socks
 	my $that = $self->{chain}->[0] ;
-	return tcp_connect $that->{host}, $that->{port}, sub{
+	$self->{_guard} = tcp_connect $that->{host}, $that->{port}, sub{
 		my $fh = shift ;
-		return $c_cb->() unless($fh);
-		$self->{hd} = new AnyEvent::Handle( fh => $fh ) ;
-		$self->{hd}->on_error(sub{
-			my ($hd, $fatal, $msg) = @_;
-				AE::log "error" => ( $fatal ? "Fatal " : "" ) . $msg ; 
-				$hd->destroy;
-				undef $self ;
-				$c_cb->();
-		});
+		unless($fh){
+			AE::log "error" => "$that->{host}:$that->{port} connect failed: $!";
+			return;
+		}
+
+		$self->{hd} = new AnyEvent::Handle(
+			fh => $fh,
+			on_error => sub{
+				my ($hd, $fatal, $msg) = @_;
+				AE::log "error" => ( $fatal ? "Fatal " : "" ) . $msg ;
+				$hd->destroy unless( $hd->destroyed );
+				return;
+			}
+		);
+		if($that->{v} =~ /4a?/){
+			$self->connect_socks4;
+			return;
+		}
 		$self->handshake;
-	}; 
+	}, $self->{pre_cb} || sub{ $TIMEOUT };
 }
- 
+
+sub connect_socks4{
+	my( $self ) = @_;
+	my( $that, $next ) = @{ $self->{chain} } ;
+	my( $host, $port ) = $next 
+		? ( $next->{host}, $next->{port} )
+		: ( $self->{dst_host}, $self->{dst_port} ) ;
+
+	my $ip4 = parse_ipv4($host);
+	if( $that->{v} eq '4' and not $ip4 ){
+		AE::log "error" => "SOCKS4 is only support IPv4 addresses: $host given";
+		return;
+	}
+
+	if( $host =~ /:/ ){
+		AE::log "error" => "SOCKS4/4a doesn't support IPv6 addresses: $host given";
+		return;
+	}
+	AE::log "debug" => "SOCKS4 connect to $host:$port";
+	$self->{hd}->push_write( $ip4 
+		? pack('CCnA4A2', 4, CMD_CONNECT, $port, $ip4, "X\0" )
+		: pack('CCnCCCCA*', 4, CMD_CONNECT, $port, 0,0,0,7 , "X\0$host\0" )
+	);
+	$self->{hd}->push_read( chunk => 8, sub{
+		my($code, $dst_port, $dst_ip) = unpack('xCna4', $_[1]);
+		unless( $code == 90 ){
+			AE::log "error" => "SOCKS4/4a request rejected: code is $code";
+			return;
+		}
+		$self->socks_connect_done( format_ipv4( $dst_ip ), $dst_port );
+	});
+}
 
 sub handshake{
 	my( $self ) = @_;
-	
 	my $that = $self->{chain}->[0] ;
 	my @auth_methods = 0 ;
 	if($that->{login} and $that->{password}){
@@ -138,36 +206,34 @@ sub handshake{
 	}
 	$self->{hd}->push_write( 
 		pack('CC', 5, scalar @auth_methods ) . join( "", map( pack( 'C', $_ ), @auth_methods ))
-	 );
-	 
-	 $self->{hd}->push_read( chunk => 2 , sub{ 
-			my $method = unpack( 'xC', $_[1] ); 
-			AE::log "debug" => "Server want auth method $method" ;
-			if($method == AUTH_GTFO ){
-				AE::log "error" => "Server: no suitable auth method";
-				undef $self ;
-				return  ;
-			}
-			$self->auth($method) ; 
+	);
+	$self->{hd}->push_read( chunk => 2 , sub{
+		my $method = unpack( 'xC', $_[1] ); 
+		AE::log "debug" => "Server want auth method $method" ;
+		if($method == AUTH_GTFO ){
+			AE::log "error" => "Server: no suitable auth method";
+			return ;
+		}
+
+		if( $method ) {
+			$self->auth($method);
+		}
+		else {
+			$self->connect_cmd ;
+		}
 	 });
 }
 
 sub auth{
-	my( $self, $method ) = @_; 
-	
-	unless( $method ){
-		$self->connect_cmd ;
-		return ;
-	}
-	
+	my( $self, $method ) = @_;
 	my $that = $self->{chain}->[0] ;
-	if( $method == AUTH_LOGIN and $that->{login} and $that->{password}){  
+	if( $method == AUTH_LOGIN and $that->{login} and $that->{password}){
 		$self->{hd}->push_write( 
 			pack('CC', 5, length $that->{login} ) . $that->{login} 
 			. pack('C', length $that->{password}) . $that->{password} 
-		);		
+		);
 		$self->{hd}->push_read( chunk => 2, sub{
-			my $status = unpack('xC', $_[1]) ; 
+			my $status = unpack('xC', $_[1]) ;
 			if( $status == 0 ){
 				$self->connect_cmd ;
 				return ;
@@ -176,9 +242,7 @@ sub auth{
 		});
 		return ;
 	}
-	
 	AE::log "error" => "Auth method $method not implemented!";
-	undef $self; 
 }
 
 sub connect_cmd{
@@ -187,16 +251,26 @@ sub connect_cmd{
 	my( $host, $port ) = $next 
 		? ( $next->{host}, $next->{port} )
 		: ( $self->{dst_host}, $self->{dst_port} ) ;
-				
-	$self->{hd}->push_write( 
-		pack('CCCCC', 5, CMD_CONNECT, 0, TYPE_FQDN , length $host ) . $host . pack( 'n', $port)
-	);
-	
-	$self->{hd}->push_read( chunk => 4, sub{ 
+
+	my ($cmd, $ip );
+	if( $ip = parse_ipv4($host) ){
+		AE::log "debug" => "Connect IPv4: $host";
+		$cmd = pack('CCCCA4n', 5, CMD_CONNECT, 0, TYPE_IP4, $ip, $port);
+	}
+	elsif( $ip = parse_ipv6($host) ){
+		AE::log "debug" => "Connect IPv6: $host";
+		$cmd = pack('CCCCA16n', 5, CMD_CONNECT, 0, TYPE_IP6, $ip, $port);
+	}
+	else{
+		AE::log "debug" => "Connect hostname: $host";
+		$cmd = pack('CCCCCA*n', 5, CMD_CONNECT, 0, TYPE_FQDN , length $host, $host, $port);
+	}
+
+	$self->{hd}->push_write( $cmd );
+	$self->{hd}->push_read( chunk => 4, sub{
 		my( $status, $type ) = unpack( 'xCxC', $_[1] );
 		unless( $status == 0 ){
 			AE::log "error" => "Connect cmd rejected: status is $status" ;
-			undef $self ;	
 			return ;
 		}
 		$self->connect_cmd_finalize( $type ); 
@@ -205,9 +279,9 @@ sub connect_cmd{
 
 sub connect_cmd_finalize{ 
 	my( $self, $type ) = @_ ;
-	
+
 	AE::log "debug" => "Connect cmd done, bind atype is $type"; 
-	
+
 	if($type == TYPE_IP4){
 		$self->{hd}->push_read( chunk => 6, sub{
 			my( $host, $port) = unpack( "a4n", $_[1] );
@@ -218,10 +292,10 @@ sub connect_cmd_finalize{
 		$self->{hd}->push_read( chunk => 18, sub{
 			my( $host, $port) = unpack( "a16n", $_[1] );
 			$self->socks_connect_done( format_ipv6( $host ) , $port );
-		}); 
+		});
 	}
 	elsif($type == TYPE_FQDN){
-		#read 1 byte (fqdn len)
+		# read 1 byte (fqdn len)
 		# then read fqdn and port
 		$self->{hd}->push_read( chunk => 1, sub{
 			my $fqdn_len = unpack( 'C', $_[1] ) ;
@@ -233,33 +307,35 @@ sub connect_cmd_finalize{
 		});
 	}
 	else{
-		AE::log "error" => "Unknown atype $type"; 
-		undef $self ;
+		AE::log "error" => "Unknown atype $type";
 	}
 }
 
 sub socks_connect_done{ 
 	my( $self, $bind_host, $bind_port ) = @_; 
-	
+
 	my $that = shift @{ $self->{chain} }; # shift = move forward in chain
-	AE::log "debug" => "Done with server $that->{host}:$that->{port} , bound to $bind_host:$bind_port";
-	
+	AE::log "debug" => "Done with server socks$that->{v}://$that->{host}:$that->{port} , bound to $bind_host:$bind_port";
+
 	if( @{ $self->{chain} } ){
 		$self->handshake ;
 		return ;
-	} 
-	
-	my $fh = $self->{hd}->fh ;
+	}
+
 	AE::log "debug" => "Giving up fh and returning to void...";
-	$self->{c_cb}->($fh);
-	$self->{c_cb} = sub{};
-	undef $self; 
+	my( $fh, $c_cb ) = ( $self->{hd}->fh, delete $self->{c_cb} );
+	$self->DESTROY;
+	$c_cb->( $fh );
 }
 
 sub DESTROY {
 	my $self = shift ;
-	if($self->{hd}){ $self->{hd}->destroy ; }
-	if($self->{c_cb}){ $self->{c_cb}->(); }
+	AE::log "debug" => "Kitten saver called";
+	undef $self->{_guard};
+	$self->{hd}->destroy	if( $self->{hd} and not $self->{hd}->destroyed );
+	$self->{c_cb}->()		if( $self->{c_cb} );
+	undef %$self;
+	bless $self, __PACKAGE__ . '::destroyed';
 }
 
 

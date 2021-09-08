@@ -9,8 +9,7 @@ use Validate::Tiny    ();
 use HTML::TreeBuilder ();
 
 # specify accessors
-use Object::Tiny
-  qw/id binNumber name classification intensity pressure latitude longitude latitude_numberic movementDir movementSpeed lastUpdate publicAdvisory forecastAdvisory windSpeedProbabilities forecastDiscussion forecastGraphics forecastTrack windWatchesWarnings trackCone initialWindExtent forecastWindRadiiGIS bestTrackGIS earliestArrivalTimeTSWindsGIS mostLikelyTimeTSWindsGIS windSpeedProbabilitiesGIS kmzFile34kt kmzFile50kt kmzFile64kt stormSurgeWatchWarningGIS potentialStormSurgeFloodingGIS/;
+use Object::Tiny qw/id binNumber name classification intensity pressure latitude longitude latitude_numberic movementDir movementSpeed lastUpdate publicAdvisory forecastAdvisory windSpeedProbabilities forecastDiscussion forecastGraphics forecastTrack windWatchesWarnings trackCone initialWindExtent forecastWindRadiiGIS bestTrackGIS earliestArrivalTimeTSWindsGIS mostLikelyTimeTSWindsGIS windSpeedProbabilitiesGIS kmzFile34kt kmzFile50kt kmzFile64kt stormSurgeWatchWarningGIS potentialStormSurgeFloodingGIS/;
 
 our $DEFAULT_GRAPHICS_ROOT = q{https://www.nhc.noaa.gov/storm_graphics};
 our $DEFAULT_BTK_ROOT      = q{https://ftp.nhc.noaa.gov/atcf/btk};
@@ -119,7 +118,7 @@ sub basin {
 sub fetch_forecastGraphics_urls {
     my $self = shift;
 
-    my $url = $self->forecastGraphics->{url};
+    my $url = $self->forecastGraphics->url;
 
     my $http = HTTP::Tiny->new;
 
@@ -147,11 +146,12 @@ sub fetch_forecastGraphics_urls {
 sub _get_text {
     my ( $self, $resource, $local_file ) = @_;
 
-    if ( not( $self->$resource->{advNum} or $self->$resource->{issuance} or $self->$resource->{url} ) ) {
+    # note, accessors like "->advNum" are generated in Weather::NHC::TropicalCyclone using Util::H2O::h2o
+    if ( not( $self->$resource->advNum or $self->$resource->issuance or $self->$resource->url ) ) {
         die qq{Resource must be one of: 'publicAdvisory', 'forecastAdvisory', or 'forecastDiscssion'\n};
     }
 
-    my $url = $self->$resource->{url};
+    my $url = $self->$resource->url;
 
     my $http = HTTP::Tiny->new;
 
@@ -169,7 +169,7 @@ sub _get_text {
         close $fh;
     }
 
-    return ( $pre->as_text, $self->$resource->{advNum}, $local_file );
+    return ( $pre->as_text, $self->$resource->advNum, $local_file );
 }
 
 # optionally provide a local file name to save fetched file to
@@ -313,6 +313,7 @@ sub _get_file {
     }
 
     # bestTrackGIS resource doesn't provide "advNum" per specification
+    # so it doesn't try to deref an method that may not exist
     return ( $local_file, $self->$resource->{advNum} // q{N/A} );
 }
 

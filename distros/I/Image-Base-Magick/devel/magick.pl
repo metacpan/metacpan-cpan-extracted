@@ -28,6 +28,12 @@ use lib 't';
 use MyTestImageBase;
 
 
+# Is this wrapped by perlmagick ?
+# {
+#   my @MagickVersion = Image::Magick->GetMagickVersion;
+#   ### @MagickVersion
+#   exit 0;
+# }
 
 {
   # flat ellipse

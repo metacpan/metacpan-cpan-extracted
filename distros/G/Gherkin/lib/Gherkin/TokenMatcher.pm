@@ -1,5 +1,5 @@
 package Gherkin::TokenMatcher;
-$Gherkin::TokenMatcher::VERSION = '20.0.1';
+$Gherkin::TokenMatcher::VERSION = '21.0.0';
 use strict;
 use warnings;
 

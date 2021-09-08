@@ -1,5 +1,8 @@
 Revision history for Test2-Aggregate
 
+0.16    2021-08-26
+        Replaced File::Slurp with Path::Tiny (adding 'slurp_param' option).
+
 0.15    2020-08-10
         Fix for test_warnings output showing only first line of STDERR.
 

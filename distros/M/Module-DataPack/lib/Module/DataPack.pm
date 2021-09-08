@@ -1,8 +1,5 @@
 package Module::DataPack;
 
-our $DATE = '2017-07-14'; # DATE
-our $VERSION = '0.21'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -12,6 +9,11 @@ use File::Slurper qw(read_binary write_binary);
 require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(datapack_modules);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-08-29'; # DATE
+our $DIST = 'Module-DataPack'; # DIST
+our $VERSION = '0.222'; # VERSION
 
 our %SPEC;
 
@@ -155,20 +157,23 @@ sub datapack_modules {
     # how to line number (# line): position of __DATA__ + 1 (DSS header) + number of header lines + 1 (blank line) + $order+1 (number of ### file ### header) + lineoffset
     push @res, <<'_';
 # BEGIN DATAPACK CODE
+package main::_DataPacker;
+our $handler;
+sub main::_DataPacker::INC { goto $handler }
+
+package main;
 {
     my $toc;
     my $data_linepos = 1;
 _
-    if ($put_hook_at_the_end) {
-        push @res, <<'_';
-    push @INC, sub {
-_
-    } else {
-        push @res, <<'_';
-    unshift @INC, sub {
-_
-    }
     push @res, <<'_';
+    $main::_DataPacker::handler = sub {
+        my $debug = $ENV{PERL_DATAPACKER_DEBUG};
+        if ($debug) {
+            my @caller0 = caller;
+            warn "[datapacker] Hook called with arguments: (".join(",", @_).") by package $caller0[0] in file $caller0[1] line $caller0[2]\n";
+        }
+
         $toc ||= do {
 
             my $fh = \*DATA;
@@ -220,6 +225,7 @@ _
             \%toc;
         };
         if ($toc->{$_[1]}) {
+            warn "[datapacker] $_[1] FOUND in packed modules\n" if $debug;
             seek DATA, $toc->{$_[1]}[0], 0;
             read DATA, my($content), $toc->{$_[1]}[1];
             my ($order, $lineoffset) = split(';', $toc->{$_[1]}[2]);
@@ -228,9 +234,22 @@ _
             open my $fh, '<', \$content
                 or die "DataPacker error loading $_[1]: $!";
             return $fh;
+        } else {
+            warn "[datapacker] $_[1] NOT found in packed modules\n" if $debug;
         }
         return;
-    };
+    }; # handler
+_
+    if ($put_hook_at_the_end) {
+        push @res, <<'_';
+    push @INC, bless(sub {"dummy"}, "main::_DataPacker");
+_
+    } else {
+        push @res, <<'_';
+    unshift @INC, bless(sub {"dummy"}, "main::_DataPacker");
+_
+    }
+    push @res, <<'_';
 }
 # END DATAPACK CODE
 _
@@ -285,7 +304,7 @@ Module::DataPack - Like Module::FatPack, but uses datapacking instead of fatpack
 
 =head1 VERSION
 
-This document describes version 0.21 of Module::DataPack (from Perl distribution Module-DataPack), released on 2017-07-14.
+This document describes version 0.222 of Module::DataPack (from Perl distribution Module-DataPack), released on 2021-08-29.
 
 =head1 FUNCTIONS
 
@@ -294,7 +313,7 @@ This document describes version 0.21 of Module::DataPack (from Perl distribution
 
 Usage:
 
- datapack_modules(%args) -> [status, msg, result, meta]
+ datapack_modules(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Like Module::FatPack, but uses datapacking instead of fatpack.
 
@@ -372,18 +391,25 @@ Set strip_pod=1 (strip POD) in Perl::Stripper.
 
 Set strip_ws=1 (strip whitespace) in Perl::Stripper.
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
+=head1 ENVIRONMENT
+
+=head2 PERL_DATAPACKER_DEBUG
+
+Boolean. When set to true, the datapacker @INC hook will print debug messages.
 
 =head1 HOMEPAGE
 
@@ -392,14 +418,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Module-Dat
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Module-DataPack>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Module-DataPack>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -416,11 +434,36 @@ L<datapack-modules>, CLI for C<datapack_modules>.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Module-DataPack>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

@@ -4,7 +4,7 @@
       "Emiliano Bruni <info@ebruni.it>, Andrey Khozov <avkhozov@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -13,32 +13,61 @@
       "version" : 2
    },
    "name" : "Minion-Backend-MongoDB",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.016"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41"
          }
       },
       "runtime" : {
          "requires" : {
-            "BSON::OID" : "0",
-            "BSON::Types" : "0",
             "DateTime" : "0",
             "DateTime::Set" : "0",
             "DateTime::Span" : "0",
             "ExtUtils::MakeMaker" : "7.12",
-            "Minion" : "10.00",
-            "Mojolicious" : "8.10",
+            "Minion" : "10.17",
             "MongoDB" : "2.0",
-            "Tie::IxHash" : "0",
-            "boolean" : "0"
+            "Sys::Hostname" : "0",
+            "perl" : "5.016"
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
+            "ExtUtils::MakeMaker" : "7.12",
+            "File::Spec" : "0",
             "Test::More" : "0.98",
-            "Test::UseAllModules" : "0.15"
+            "Test::UseAllModules" : "0.15",
+            "perl" : "5.016"
          }
+      }
+   },
+   "provides" : {
+      "Minion::Backend::MongoDB" : {
+         "file" : "lib/Minion/Backend/MongoDB.pm",
+         "version" : "1.09"
       }
    },
    "release_status" : "stable",
@@ -50,8 +79,9 @@
          "web" : "https://github.com/avkhozov/Minion-Backend-MongoDB"
       }
    },
-   "version" : "1.06",
-   "x_generated_by_perl" : "v5.24.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.07"
+   "version" : "1.09",
+   "x_generated_by_perl" : "v5.32.1",
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_spdx_expression" : "GPL-3.0-only"
 }
 

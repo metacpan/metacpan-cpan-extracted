@@ -1,6 +1,6 @@
 package Log::Any::Adapter::JSON;
 
-our $VERSION = '1.15';
+our $VERSION = '1.16';
 
 use strict;
 use warnings;
@@ -71,9 +71,9 @@ sub _prepare_log_entry {
     $float .= 0 while length $float < 7;
 
     my %log_entry = (
-        time     => join('', $time->strftime('%FT%T'), $float, $time->strftime('%Z')),
-        level    => $level,
-        category => $category,
+        timestamp => join('', $time->strftime('%FT%T'), $float, $time->strftime('%Z')),
+        level     => $level,
+        category  => $category,
     );
 
     # Process pattern and values if present, unless not wanted
@@ -176,7 +176,7 @@ __END__
 
 =head1 VERSION
 
-version 1.15
+version 1.16
 
 =encoding utf8
 

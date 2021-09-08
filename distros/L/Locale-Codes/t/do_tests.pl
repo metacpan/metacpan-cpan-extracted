@@ -106,6 +106,13 @@ sub _test {
          return &{ "code2${::data_type}" }(@test)
       }
 
+   } elsif ($op eq '2names') {
+      if ($::obj) {
+         return $::obj->code2names(@test);
+      } else {
+         return &{ "code2${::data_type}s" }(@test)
+      }
+
    } elsif ($op eq 'code2code') {
       my $code;
       if ($::obj) {

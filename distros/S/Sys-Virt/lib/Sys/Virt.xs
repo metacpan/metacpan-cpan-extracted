@@ -6969,12 +6969,18 @@ _create_xml(con, xml)
 
 
 virNetworkPtr
-_define_xml(con, xml)
+_define_xml(con, xml, flags=0)
       virConnectPtr con;
       const char *xml;
+      unsigned int flags;
     CODE:
-      if (!(RETVAL = virNetworkDefineXML(con, xml)))
-          _croak_error();
+      if (flags) {
+          if (!(RETVAL = virNetworkDefineXMLFlags(con, xml, flags)))
+              _croak_error();
+      } else {
+	  if (!(RETVAL = virNetworkDefineXML(con, xml)))
+              _croak_error();
+      }
   OUTPUT:
       RETVAL
 
@@ -7396,11 +7402,12 @@ _create_xml(con, xml)
 
 
 virStoragePoolPtr
-_define_xml(con, xml)
+_define_xml(con, xml, flags=0)
       virConnectPtr con;
       const char *xml;
+      unsigned int flags;
     CODE:
-      if (!(RETVAL = virStoragePoolDefineXML(con, xml, 0)))
+      if (!(RETVAL = virStoragePoolDefineXML(con, xml, flags)))
           _croak_error();
   OUTPUT:
       RETVAL
@@ -8398,12 +8405,18 @@ MODULE = Sys::Virt::NWFilter  PACKAGE = Sys::Virt::NWFilter
 
 
 virNWFilterPtr
-_define_xml(con, xml)
+_define_xml(con, xml, flags=0)
       virConnectPtr con;
       const char *xml;
+      unsigned int flags;
     CODE:
-      if (!(RETVAL = virNWFilterDefineXML(con, xml)))
-          _croak_error();
+      if (flags) {
+          if (!(RETVAL = virNWFilterDefineXMLFlags(con, xml, flags)))
+              _croak_error();
+      } else {
+          if (!(RETVAL = virNWFilterDefineXML(con, xml)))
+              _croak_error();
+      }
   OUTPUT:
       RETVAL
 
@@ -10240,6 +10253,8 @@ BOOT:
       REGISTER_CONSTANT(VIR_STORAGE_POOL_DEGRADED, STATE_DEGRADED);
       REGISTER_CONSTANT(VIR_STORAGE_POOL_INACCESSIBLE, STATE_INACCESSIBLE);
 
+      REGISTER_CONSTANT(VIR_STORAGE_POOL_DEFINE_VALIDATE, DEFINE_VALIDATE);
+
       REGISTER_CONSTANT(VIR_STORAGE_POOL_BUILD_NEW, BUILD_NEW);
       REGISTER_CONSTANT(VIR_STORAGE_POOL_BUILD_REPAIR, BUILD_REPAIR);
       REGISTER_CONSTANT(VIR_STORAGE_POOL_BUILD_RESIZE, BUILD_RESIZE);
@@ -10293,6 +10308,8 @@ BOOT:
       stash = gv_stashpv( "Sys::Virt::Network", TRUE );
       REGISTER_CONSTANT(VIR_NETWORK_XML_INACTIVE, XML_INACTIVE);
 
+      REGISTER_CONSTANT(VIR_NETWORK_DEFINE_VALIDATE, DEFINE_VALIDATE);
+
       REGISTER_CONSTANT(VIR_NETWORK_UPDATE_COMMAND_NONE, UPDATE_COMMAND_NONE);
       REGISTER_CONSTANT(VIR_NETWORK_UPDATE_COMMAND_MODIFY, UPDATE_COMMAND_MODIFY);
       REGISTER_CONSTANT(VIR_NETWORK_UPDATE_COMMAND_DELETE, UPDATE_COMMAND_DELETE);
@@ -10345,6 +10362,8 @@ BOOT:
 
       stash = gv_stashpv( "Sys::Virt::Interface", TRUE );
       REGISTER_CONSTANT(VIR_INTERFACE_XML_INACTIVE, XML_INACTIVE);
+
+      REGISTER_CONSTANT(VIR_INTERFACE_DEFINE_VALIDATE, DEFINE_VALIDATE);
 
       REGISTER_CONSTANT(VIR_CONNECT_LIST_INTERFACES_ACTIVE, LIST_ACTIVE);
       REGISTER_CONSTANT(VIR_CONNECT_LIST_INTERFACES_INACTIVE, LIST_INACTIVE);
@@ -10431,6 +10450,7 @@ BOOT:
       REGISTER_CONSTANT(VIR_SECRET_USAGE_TYPE_TLS, USAGE_TYPE_TLS);
       REGISTER_CONSTANT(VIR_SECRET_USAGE_TYPE_VTPM, USAGE_TYPE_VTPM);
 
+      REGISTER_CONSTANT(VIR_SECRET_DEFINE_VALIDATE, DEFINE_VALIDATE);
 
       REGISTER_CONSTANT(VIR_CONNECT_LIST_SECRETS_EPHEMERAL, LIST_EPHEMERAL);
       REGISTER_CONSTANT(VIR_CONNECT_LIST_SECRETS_NO_EPHEMERAL, LIST_NO_EPHEMERAL);
@@ -10442,6 +10462,10 @@ BOOT:
 
       REGISTER_CONSTANT(VIR_SECRET_EVENT_DEFINED, EVENT_DEFINED);
       REGISTER_CONSTANT(VIR_SECRET_EVENT_UNDEFINED, EVENT_UNDEFINED);
+
+
+      stash = gv_stashpv( "Sys::Virt::NWFilter", TRUE );
+      REGISTER_CONSTANT(VIR_NWFILTER_DEFINE_VALIDATE, DEFINE_VALIDATE);
 
 
       stash = gv_stashpv( "Sys::Virt::Stream", TRUE );

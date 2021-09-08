@@ -11,6 +11,7 @@ WriteMakefile(
   LICENSE          => 'artistic_2',
   PL_FILES         => {},
   MIN_PERL_VERSION => 5.006,
+  EXE_FILES        => ['script/perl-muphone-build-data'],
   CONFIGURE_REQUIRES => {
     'ExtUtils::MakeMaker' => 0,
   },
@@ -18,12 +19,16 @@ WriteMakefile(
     'Test::More' => 0,
   },
   PREREQ_PM => {
-    'YAML::XS' => '0.21',
-    'Moo'      => '2.000000',
+    'Data::Dumper'    => '2.0',
+    'File::Fetch'     => '0.5',
+    'LWP::Simple'     => '6.0',
+    'Moo'             => '2.000000',
+    'Types::Standard' => '1.0',
+    'XML::Simple'     => '2.0',
   },
   dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
   clean => { FILES => 'Number-MuPhone-*' },
   test => {
-    TESTS => 't/tests/*/*/*.t t/tests/*/*/*/*.t t/tests/*/*/*/*/*.t',
+    TESTS => 't/*.t',
   }
 );

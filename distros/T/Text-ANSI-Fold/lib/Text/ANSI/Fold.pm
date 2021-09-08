@@ -4,11 +4,12 @@ use v5.14;
 use warnings;
 use utf8;
 
-our $VERSION = "2.0903";
+our $VERSION = "2.1101";
 
 use Data::Dumper;
 $Data::Dumper::Sortkeys = 1;
 use Carp;
+use List::Util qw(pairmap pairgrep);
 use Text::VisualWidth::PP 'vwidth';
 
 ######################################################################
@@ -30,6 +31,7 @@ sub ansi_fold {
 ######################################################################
 
 my $alphanum_re = qr{ [_\d\p{Latin}] }x;
+my $nonspace_re = qr{ \p{IsPrintableLatin} }x;
 my $reset_re    = qr{ \e \[ [0;]* m }x;
 my $color_re    = qr{ \e \[ [\d;]* m }x;
 my $erase_re    = qr{ \e \[ [\d;]* K }x;
@@ -48,6 +50,14 @@ my $osc_re      = qr{
 }x;
 
 use constant SGR_RESET => "\e[m";
+
+sub IsPrintableLatin {
+    return <<"END";
++utf8::ASCII
++utf8::Latin
+-utf8::White_Space
+END
+}
 
 sub IsWideSpacing {
     return <<"END";
@@ -86,11 +96,37 @@ our $DEFAULT_LINEBREAK = LINEBREAK_NONE;
 our $DEFAULT_RUNIN_WIDTH  = 2;
 our $DEFAULT_RUNOUT_WIDTH = 2;
 
-use charnames ':loose';
-my %tab_style = (
+use charnames ':full';
+our %TABSTYLE = (
+    pairmap {
+	( $a =~ s/_/-/gr, ref $b ? $b : [ $b, $b ] );
+    }
+    space  => [ ' ', ' ' ],
     dot    => [ '.', '.' ],
-    symbol => [ "\N{SYMBOL FOR HORIZONTAL TABULATION}", ' ' ],
-    shade  => [ "\N{MEDIUM SHADE}", "\N{LIGHT SHADE}" ],
+    symbol => [ "\N{SYMBOL FOR HORIZONTAL TABULATION}",			    # ␉
+		"\N{SYMBOL FOR SPACE}" ],				    # ␠
+    shade  => [ "\N{MEDIUM SHADE}",					    # ▒
+		"\N{LIGHT SHADE}" ],					    # ░
+    block  => [ "\N{LOWER ONE QUARTER BLOCK}",				    # ▂
+		"\N{LOWER ONE EIGHTH BLOCK}" ],				    # ▁
+    bar    => [ "\N{BOX DRAWINGS HEAVY RIGHT}",				    # ╺
+		"\N{BOX DRAWINGS LIGHT HORIZONTAL}" ],			    # ─
+    dash   => [ "\N{BOX DRAWINGS HEAVY RIGHT}",				    # ╺
+		"\N{BOX DRAWINGS LIGHT DOUBLE DASH HORIZONTAL}" ],	    # ╌
+
+    arrow        => "\N{RIGHTWARDS ARROW}",				    # →
+    double_arrow => "\N{RIGHTWARDS DOUBLE ARROW}",			    # ⇒
+    triple_arrow => "\N{RIGHTWARDS TRIPLE ARROW}",			    # ⇛
+    white_arrow  => "\N{RIGHTWARDS WHITE ARROW}",			    # ⇨
+    wave_arrow   => "\N{RIGHTWARDS WAVE ARROW}",			    # ↝
+    circle_arrow => "\N{CIRCLED HEAVY WHITE RIGHTWARDS ARROW}",		    # ➲
+    curved_arrow => "\N{HEAVY BLACK CURVED DOWNWARDS AND RIGHTWARDS ARROW}",# ➥
+    shadow_arrow => "\N{HEAVY UPPER RIGHT-SHADOWED WHITE RIGHTWARDS ARROW}",# ➮
+    squat_arrow  => "\N{SQUAT BLACK RIGHTWARDS ARROW}",			    # ➧
+    squiggle     => "\N{RIGHTWARDS SQUIGGLE ARROW}",			    # ⇝
+    harpoon      => "\N{RIGHTWARDS HARPOON WITH BARB UPWARDS}",		    # ⇀
+    cuneiform    => "\N{CUNEIFORM SIGN TAB}",				    # 𒋰
+
     );
 
 sub new {
@@ -156,8 +192,16 @@ sub configure {
 	my($a, $b) = splice @_, 0, 2;
 
 	if ($a eq 'tabstyle') {
-	    my $style = $tab_style{$b} or croak "$b: invalid tabstyle";
-	    unshift @_, tabhead => $style->[0], tabspace => $style->[1];
+	    $b // next;
+	    my($h, $s) = $b =~ /([-\w]+)/g or croak "$b: invalid tabstyle";
+	    $s ||= $h;
+	    my %style = (
+		h => ($TABSTYLE{$h} or croak "$h: invalid tabstyle"),
+		s => ($TABSTYLE{$s} or croak "$s: invalid tabstyle"),
+		);
+	    unshift @_,
+		tabhead  => $style{h}->[0],
+		tabspace => $style{s}->[1];
 	    next;
 	}
 
@@ -177,8 +221,6 @@ sub put_reset { @reset = shift };
 sub pop_reset {
     @reset ? do { @color_stack = (); pop @reset } : '';
 }
-
-use List::Util qw(pairgrep);
 
 sub fold {
     my $obj = ref $_[0] ? $_[0] : do {
@@ -202,6 +244,10 @@ sub fold {
 	croak "invalid margin";
     }
     $width -= $opt{margin};
+
+    my $word_char_re =
+	    { word => $alphanum_re, space => $nonspace_re }
+	    ->{$opt{boundary} // ''};
 
     $Text::VisualWidth::PP::EastAsian = $opt{ambiguous} eq 'wide';
 
@@ -304,15 +350,15 @@ sub fold {
 	}
     }
 
-    if ($opt{boundary} eq 'word'
-	and my $tail = (/\A(${alphanum_re}+)/)[0]
+    if ($word_char_re
+	and my $tail = (/\A(${word_char_re}+)/)[0]
 	and $folded =~ m{
 		^
 		( (?: [^\e]* ${csi_re}++ ) *+ )
 		( .*? )
-		( ${alphanum_re}+ )
+		( ${word_char_re}+ )
 		\z
-	}xo
+	}x
 	) {
 	## Break line before word only when enough space will be
 	## provided for the word in the next turn.
@@ -352,7 +398,7 @@ sub fold {
 	while ($m > 0 and
 	       m{\A (?<color> ${color_re}*+)
 	            (?<runin> $prohibition_re{head})
-	            (?<reset> ${reset_re}*)
+	            (?<reset> (?: $erase_re* $reset_re+ $erase_re* )? )
 	       }xp) {
 	    my $w = vwidth $+{runin};
 	    last if ($m -= $w) < 0;
@@ -465,7 +511,7 @@ Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and As
 
 =head1 VERSION
 
-Version 2.0903
+Version 2.1101
 
 =head1 SYNOPSIS
 
@@ -537,6 +583,9 @@ Because second argument is always taken as width, use I<undef> when
 using default width with additional parameter:
 
     ($folded, $remain) = ansi_fold($text, undef, padding => 1);
+
+Some other easy-to-use interfaces are provided by sister module
+L<Text::ANSI::Fold::Util>.
 
 =head1 OBJECT INTERFACE
 
@@ -624,15 +673,18 @@ Specify folding width.  Negative value means all the rest.
 Array reference can be specified but works only with B<chops> method,
 and retunrs empty string for zero width.
 
-=item B<boundary> => "word"
+=item B<boundary> => I<word> or I<space>
 
-B<boundary> option currently takes only "word" as a valid value.  In
-this case, text is folded on word boundary.  This occurs only when
-enough space will be provided to hold the word on next call with same
-width.
+Option B<boundary> takes I<word> and I<space> as a valid value.  These
+prohibit to fold a line in the middle of ASCII/Latin sequence.  Value
+I<word> means a sequence of alpha-numeric characters, and I<space>
+means simply non-space printables.
+
+This operation takes place only when enough space will be provided to
+hold the word on next call with same width.
 
 If the color of text is altered within a word, that position is also
-treated as an boundary.
+taken as an boundary.
 
 =item B<padding> => I<bool>
 
@@ -713,12 +765,42 @@ characters.  Both are white space by default.
 =item B<tabstyle> => I<style>
 
 Set tab expansion style.  This parameter set both B<tabhead> and
-B<tabspace> at once according to the given style name.  Currently
-these names are available.
+B<tabspace> at once according to the given style name.  Each style has
+two values for tabhead and tabspace.
 
+If two style names are combined, like C<symbol,space>, use
+C<symbols>'s tabhead and C<space>'s tabspace.
+
+Currently these names are available.
+
+    space  => [ ' ', ' ' ],
     dot    => [ '.', '.' ],
-    symbol => [ "\N{SYMBOL FOR HORIZONTAL TABULATION}", ' ' ],
-    shade  => [ "\N{MEDIUM SHADE}", "\N{LIGHT SHADE}" ],
+    symbol => [ "\N{SYMBOL FOR HORIZONTAL TABULATION}",
+                "\N{SYMBOL FOR SPACE}" ],
+    shade  => [ "\N{MEDIUM SHADE}",
+                "\N{LIGHT SHADE}" ],
+    block  => [ "\N{LOWER ONE QUARTER BLOCK}",
+                "\N{LOWER ONE EIGHTH BLOCK}" ],
+    bar    => [ "\N{BOX DRAWINGS HEAVY RIGHT}",
+                "\N{BOX DRAWINGS LIGHT HORIZONTAL}" ],
+    dash   => [ "\N{BOX DRAWINGS HEAVY RIGHT}",
+                "\N{BOX DRAWINGS LIGHT DOUBLE DASH HORIZONTAL}" ],
+
+Below are styles providing same character for both tabhead and
+tabspace.
+
+    arrow        => "\N{RIGHTWARDS ARROW}",
+    double-arrow => "\N{RIGHTWARDS DOUBLE ARROW}",
+    triple-arrow => "\N{RIGHTWARDS TRIPLE ARROW}",
+    white-arrow  => "\N{RIGHTWARDS WHITE ARROW}",
+    wave-arrow   => "\N{RIGHTWARDS WAVE ARROW}",
+    circle-arrow => "\N{CIRCLED HEAVY WHITE RIGHTWARDS ARROW}",
+    curved-arrow => "\N{HEAVY BLACK CURVED DOWNWARDS AND RIGHTWARDS ARROW}",
+    shadow-arrow => "\N{HEAVY UPPER RIGHT-SHADOWED WHITE RIGHTWARDS ARROW}",
+    squat-arrow  => "\N{SQUAT BLACK RIGHTWARDS ARROW}",
+    squiggle     => "\N{RIGHTWARDS SQUIGGLE ARROW}",
+    harpoon      => "\N{RIGHTWARDS HARPOON WITH BARB UPWARDS}",
+    cuneiform    => "\N{CUNEIFORM SIGN TAB}",
 
 =back
 
@@ -790,9 +872,9 @@ ANSI escape code definition.
 Requirements for Japanese Text Layout,
 W3C Working Group Note 11 August 2020
 
-=item L<http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-048.pdf>
+=item L<ECMA-48|https://www.ecma-international.org/wp-content/uploads/ECMA-48_5th_edition_june_1991.pdf>
 
-Control Functions for Coded Character Sets
+ECMA-48: Control Functions for Coded Character Sets
 
 =back
 

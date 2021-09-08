@@ -51,7 +51,7 @@ is applied to, and what symbol the cell was constrained to.
 
 Test script t/sudoku.t demonstrates these features. ActivePerl users
 will have to download the kit from L<https://www.cpan.org/>  or
-L<https://metacpan.org/release/Games-Sudoku-General> to get this
+L<https://metacpan.org/dist/Games-Sudoku-General> to get this
 file.
 
 =head2 Exported symbols
@@ -574,7 +574,7 @@ use warnings;
 
 use Exporter qw{ import };
 
-our $VERSION = '0.025';
+our $VERSION = '0.026';
 our @EXPORT_OK = qw{
     SUDOKU_SUCCESS
     SUDOKU_NO_SOLUTION
@@ -2466,54 +2466,54 @@ in understanding the mechanics of solving Sudoku puzzles.
 
 Ed Pegg, Jr, whose Mathematical Association of America C<Math Games>
 column number 41 for September 5 2005 ("Sudoku Variations",
-L<http://mathpuzzle.com/MAA/41-Sudoku%20Variations/mathgames_09_05_05.html>)
+L<https://mathpuzzle.com/MAA/41-Sudoku%20Variations/mathgames_09_05_05.html>)
 provided a treasure trove of 'non-standard' Sudoku puzzles.
 
 =head1 SEE ALSO
 
 The C<Games-LogicPuzzle> package by Andy Adler (see
-L<https://metacpan.org/release/Games-LogicPuzzle>) solves all sorts of
+L<https://metacpan.org/dist/Games-LogicPuzzle>) solves all sorts of
 combinatorial puzzles, by backtracking through the puzzle space and
 applying a user-supplied function to see whether it has a valid
 solution. The examples include a couple Sudoku puzzles.
 
 The C<Games-Sudoku> package by Eugene Kulesha (see
-C<http://metacpan.org/release/Games-Sudoku/>) solves the standard 9x9
+C<http://metacpan.org/dist/Games-Sudoku/>) solves the standard 9x9
 version of the puzzle. As of June 15 2019 this appears to have been
 retracted.
 
 The C<Games-Sudoku-Component> package by Kenichi Ishigaki (see
-L<https://metacpan.org/release/Games-Sudoku-Component>) both
+L<https://metacpan.org/dist/Games-Sudoku-Component>) both
 generates and solves the standard 9x9 version of the puzzle.
 
 The C<Games-Sudoku-Component-TkPlayer> by Kenichi Ishigaki (see
-L<https://metacpan.org/release/Games-Sudoku-Component-TkPlayer>). Tk
+L<https://metacpan.org/dist/Games-Sudoku-Component-TkPlayer>). Tk
 front end for his Games-Sudoku-Component.
 
 The C<Games-Sudoku-CPSearch> package by Martin-Louis Bright (see
-L<https://metacpan.org/release/Games-Sudoku-CPSearch>). Solves 9x9
+L<https://metacpan.org/dist/Games-Sudoku-CPSearch>). Solves 9x9
 Sudoku by use of "F" and "N" constraints and backtracking.
 
 The C<Games-Sudoku-Lite package> by Bob O'Neill (see
-L<https://metacpan.org/release/Games-Sudoku-Lite>) solves the standard
+L<https://metacpan.org/dist/Games-Sudoku-Lite>) solves the standard
 9x9 version of the puzzle.
 
 The C<Games-Sudoku-OO> package by Michael Cope (see
-L<https://metacpan.org/release/Games-Sudoku-OO>) also solves the
+L<https://metacpan.org/dist/Games-Sudoku-OO>) also solves the
 standard 9x9 version of the puzzle, with an option to solve (to the
 extent possible) a single row, column, or square. The implementation may
 be extensible to other topologies than the standard one.
 
 The C<Games-Sudoku-Solver> package by Fritz Mehner (see
-L<https://metacpan.org/release/Games-Sudoku-Solver>) solves 9x9 Sudoku
+L<https://metacpan.org/dist/Games-Sudoku-Solver>) solves 9x9 Sudoku
 puzzles by recursion and backtracking.
 
 The C<Games-Sudoku-SudokuTk> package by Christian Guine (see
-L<https://metacpan.org/release/Games-Sudoku-SudokuTk> claims to
+L<https://metacpan.org/dist/Games-Sudoku-SudokuTk> claims to
 implement a Tk-based Sudoku solver.
 
 The C<Games-YASudoku> package by Andrew Wyllie (see
-L<https://metacpan.org/release/Games-YASudoku>) also solves the standard
+L<https://metacpan.org/dist/Games-YASudoku>) also solves the standard
 9x9 version of the puzzle. In contrast to the other packages, this one
 represents the board as a list of cell/value pairs.
 

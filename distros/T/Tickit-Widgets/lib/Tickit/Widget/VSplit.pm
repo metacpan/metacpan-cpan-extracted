@@ -3,9 +3,9 @@
 #
 #  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.27;
+use Object::Pad 0.51;
 
-package Tickit::Widget::VSplit 0.32;
+package Tickit::Widget::VSplit 0.33;
 class Tickit::Widget::VSplit
    extends Tickit::Widget::LinearSplit;
 
@@ -99,15 +99,15 @@ Constructs a new C<Tickit::Widget::VSplit> object.
 
 =cut
 
-BUILD
+ADJUSTPARAMS
 {
-   my %args = @_;
+   my ( $params ) = @_;
 
    croak "The 'left_child' constructor argument to ${\ref $self} is no longer recognised; use ->set_left_child instead"
-      if $args{left_child};
+      if delete $params->{left_child};
 
    croak "The 'right_child' constructor argument to ${\ref $self} is no longer recognised; use ->set_right_child instead"
-      if $args{right_child};
+      if delete $params->{right_child};
 }
 
 method lines

@@ -1,0 +1,70 @@
+<%doc>
+Create a new shared search link using the given parameters, and output the
+contents of a modal dialog to allow it to be used.
+</%doc>
+\
+<%INIT>
+my $SharedSearchLink
+    = RT::ShareSearchLink::SharedSearchLink->new( $session{'CurrentUser'} );
+
+my ( $id, $ErrorMessage ) = ( undef, '' );
+
+# This is here so that if you click on a shared search link and then click
+# the share button again at the bottom of the results, you get the same link
+# again if you were the original creator of it.
+#
+if ( $ARGS{'ShareSearchLinkUUID'} ) {
+    $id = $SharedSearchLink->Load( $ARGS{ShareSearchLinkUUID} );
+    if (( not $id )
+        || ( $SharedSearchLink->CreatorObj->id
+            != $session{'CurrentUser'}->UserObj->id )
+       )
+    {
+        $id = undef;
+    }
+}
+
+# Create the new shared search link, if we didn't load one above.
+#
+if ( not $id ) {
+    ( $id, $ErrorMessage )
+        = $SharedSearchLink->Create( 'Parameters' => \%ARGS );
+    $SharedSearchLink->Load($id) if ($id);
+}
+</%INIT>
+\
+<div class="modal-dialog modal-dialog-centered" role="document">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title"><&|/l&>Share a link</&></h5>
+\
+% # This just shows up as "x" on RT 4.2.16 and that version shows a close
+% # button already anyway, so only output this in versions above 4.x.
+% #
+% if ($RT::MAJOR_VERSION > 4) {
+      <a href="javascript:void(0)" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </a>
+% }
+    </div>
+    <div class="modal-body">
+% if (not $id) {
+<h3><&|/l&>Error</&></h3>
+<p><%$ErrorMessage%></p>
+% } else {
+<p>
+<&|/l&>Sharing this link with other RT users will allow them to load the same search parameters you have used here.</&>
+</p>
+<p style="text-align:center;">
+<a class="button btn" id="NewShareSearchLink" target="_blank" href="<%RT->Config->Get('WebPath')%>/Search/ShareSearchLink.html?id=<%$SharedSearchLink->UUID|u%>" class="btn button"><&|/l&>Shared search link</&></a>
+</p>
+<p style="text-align:center;">
+<button type="button" title="<&|/l&>Copy</&>" onclick="CopyNewSharedSearchLink()">&#x1f4cb;</button>
+<input type="text" size="50" id="NewShareSearchLinkInput" value="<%RT->Config->Get('WebPath')%>/Search/ShareSearchLink.html?id=<%$SharedSearchLink->UUID|u%>" />
+</p>
+% }
+    </div>
+  </div>
+</div>
+
+% $m->abort();

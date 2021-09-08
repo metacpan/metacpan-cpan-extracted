@@ -1,3 +1,10 @@
+0.002   2021-04-06  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Boolean feature value was always rendered as yes.
+
+	- Include feature's summary & description
+
+
 0.001   2021-02-25  Released-By: PERLANCAR
 
         - First release.

@@ -25,19 +25,19 @@ optional_features: {}
 provides:
   Lingua::Poetry::Haiku::Finder:
     file: lib/Lingua/Poetry/Haiku/Finder.pm
-    version: '0.001'
+    version: '0.002'
   Lingua::Poetry::Haiku::Finder::NonWord:
     file: lib/Lingua/Poetry/Haiku/Finder/NonWord.pm
-    version: '0.001'
+    version: '0.002'
   Lingua::Poetry::Haiku::Finder::Sentence:
     file: lib/Lingua/Poetry/Haiku/Finder/Sentence.pm
-    version: '0.001'
+    version: '0.002'
   Lingua::Poetry::Haiku::Finder::SentencePart:
     file: lib/Lingua/Poetry/Haiku/Finder/SentencePart.pm
-    version: '0.001'
+    version: '0.002'
   Lingua::Poetry::Haiku::Finder::Word:
     file: lib/Lingua/Poetry/Haiku/Finder/Word.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Lingua::EN::Numbers: '0'
   Lingua::EN::Syllable: '0'
@@ -53,6 +53,8 @@ resources:
   homepage: https://metacpan.org/release/Lingua-Poetry-Haiku-Finder
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-lingua-poetry-haiku-finder.git
-version: '0.001'
+version: '0.002'
+x_provides_scripts:
+  haiku-find:
+    file: bin/haiku-find
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
-x_static_install: 1

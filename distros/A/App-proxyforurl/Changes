@@ -1,5 +1,8 @@
 Revision history for perl distribution App-proxyforurl
 
+0.09 2021-08-28T16:47:03+0200
+ - Fix demo link in documentation #4
+
 0.08 2021-06-17T09:10:12+0900
  - Add support for X-Request-Base
  - Compatible with Mojolicious 9.11

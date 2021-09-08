@@ -11,4 +11,6 @@ validates_with sub {
   $self->errors->add(name => _t 'bad', +{ all=>1 } );
 };
 
+push_to_i18n_lookup;
+
 1;

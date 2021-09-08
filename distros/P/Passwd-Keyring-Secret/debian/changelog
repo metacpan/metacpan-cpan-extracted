@@ -1,0 +1,5 @@
+libpasswd-keyring-secret-perl (1.00) sid; urgency=low
+
+  * Initial release.
+
+ -- Thomas Uhle <uhle@cpan.org>  Mon, 6 Sep 2021 20:20:08 +0200

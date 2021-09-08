@@ -2,6 +2,7 @@ package Valiant::Translation;
 
 use Moo::Role;
 use Text::Autoformat 'autoformat';
+use Valiant::Util 'debug';
 
 with 'Valiant::Naming';
 
@@ -19,9 +20,11 @@ sub i18n_scope { 'valiant' }
 sub human_attribute_name {
   my ($self, $attribute, $options) = @_;
   return undef unless defined($attribute);
+  debug 1, "Begin building human name for  attribute '$attribute'";
 
   # TODO I think we need to clean $option here so I don't need to manually
   # set count=>1 as I do below.
+  #
 
   my @defaults = ();
   my $i18n_scope = $self->i18n_scope;
@@ -30,16 +33,19 @@ sub human_attribute_name {
   my $namespace = join '/', @parts if @parts;
   my $attributes_scope = "${i18n_scope}.attributes";
 
-  if($self->can('ancestors') && $namespace) {
+  if($self->can('i18n_lookup')) {
+    debug 2, "Building defaults for attributes '$attribute'";
+    if($namespace) {
       @defaults = map {
         my $class = $_;
-        "${attributes_scope}.${\$class->i18n_key}/${namespace}.${attribute}"     
-      } grep { $_->can('i18n_key') } $self->ancestors;
-  } else {
+        "${attributes_scope}.${\$class->model_name->i18n_key}/${namespace}.${attribute}"     
+      } grep { $_->model_name->can('i18n_key') } $self->i18n_lookup;
+    } else {
       @defaults = map {
         my $class = $_;
-        "${attributes_scope}.${\$class->i18n_key}.${attribute}"    
-      } grep { $_->can('i18n_key') } $self->ancestors;
+        "${attributes_scope}.${\$class->model_name->i18n_key}.${attribute}"    
+      } grep { $_->model_name->can('i18n_key') } $self->i18n_lookup;
+    }
   }
 
   @defaults = map { $self->i18n->make_tag($_) } (@defaults, "attributes.${attribute}");
@@ -50,7 +56,6 @@ sub human_attribute_name {
     my @default = ref($default) ? @$default : ($default);
     push @defaults, @default;
   }
-
   # The final default is just our best attempt to make a name out of the actual
   # attribute name.  This is passed as a plain string so we don't actually try
   # to localize it.

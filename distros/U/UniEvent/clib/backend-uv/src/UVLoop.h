@@ -9,7 +9,7 @@ namespace panda { namespace unievent { namespace backend { namespace uv {
 struct UVLoop : LoopImpl, IMetricsProvider {
     uv_loop_t* uvloop;
 
-    UVLoop (Type type) : _delayer(this) {
+    UVLoop (Type type) : _delayer(this), _running(false) {
         switch (type) {
             case Type::GLOBAL:
                 uvloop = uv_default_loop();
@@ -38,6 +38,17 @@ struct UVLoop : LoopImpl, IMetricsProvider {
     bool     alive       () const override { return uv_loop_alive(uvloop) != 0; }
 
     bool _run (RunMode mode) override {
+        struct AutoResetFlag {
+            bool& flag;
+            AutoResetFlag(bool& flag) : flag(flag) {flag = true;}
+            ~AutoResetFlag() {flag = false;}
+        };
+
+        if (_running) {
+            throw panda::exception("Loop::run recursion");
+        }
+
+        AutoResetFlag autoflag(_running);
         uvloop->stop_flag = 0; // fix bug when UV immediately exits run() if stop() was called before run()
         switch (mode) {
             case RunMode::DEFAULT      : return uv_run(uvloop, UV_RUN_DEFAULT);
@@ -107,6 +118,7 @@ private:
     uv_loop_t    _uvloop_body;
     UVDelayer    _delayer;
     LAMetricsPtr _la_metrics;
+    bool         _running;
 };
 
 

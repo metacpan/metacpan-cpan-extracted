@@ -1,0 +1,2 @@
+version=3
+https://metacpan.org/release/Passwd-Keyring-Secret   .*/Passwd-Keyring-Secret-(\d[\d\._]*)\.(?:tar(?:\.gz|\.bz2)?|tgz)$

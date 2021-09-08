@@ -27,22 +27,30 @@ get('/cool')->requires('chi' => { key => sub { 'abc' } })->to(
   }
 );
 
-$t->get_ok('/cool')
+my $err = $t->get_ok('/cool')
   ->status_is(200)
   ->content_type_is('text/plain;charset=UTF-8')
   ->content_is('works: cool: 1')
-  ->text_is('#error','')
   ->header_is('X-Funny','hi')
   ->header_is('X-Cache-CHI', undef)
+  ->tx->res->dom->at('#error')
   ;
 
-$t->get_ok('/cool')
+if ($err) {
+  is($err->text, '');
+};
+
+$err = $t->get_ok('/cool')
   ->status_is(200)
   ->content_type_is('text/plain;charset=UTF-8')
-  ->text_is('#error','')
   ->content_is('works: cool: 2')
   ->header_is('X-Funny','hi')
   ->header_is('X-Cache-CHI', undef)
+  ->tx->res->dom->at('#error')
   ;
+
+if ($err) {
+  is($err->text, '');
+};
 
 done_testing;

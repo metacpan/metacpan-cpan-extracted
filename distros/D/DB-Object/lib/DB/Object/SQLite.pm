@@ -27,8 +27,6 @@ BEGIN
     use parent qw( DB::Object );
     require DB::Object::SQLite::Statement;
     require DB::Object::SQLite::Tables;
-    use File::Spec;
-    use File::Basename;
     use POSIX ();
     use DateTime;
     use DateTime::TimeZone;
@@ -348,6 +346,23 @@ sub func
     return( $self->{dbh}->func( $table, $func_name ) );
 }
 
+# <https://metacpan.org/pod/DBD::SQLite::Constants#datatypes-(fundamental_datatypes)>
+# <https://www.sqlite.org/datatype3.html>
+# In SQLite, there are only 4 types:
+# SQLITE_INTEGER
+# SQLITE_FLOAT
+# SQLITE_BLOB
+# SQLITE_NULL
+sub get_sql_type
+{
+    my $self = shift( @_ );
+    my $type = shift( @_ ) || return( $self->error( "No sql type was provided to get its constant." ) );
+    $self->message( 3, "Trying constant for '$type' using 'DBD::SQLite::SQLITE_\U${type}\E'" );
+    my $const = $self->{dbh}->can( "DBD::SQLite::SQLITE_\U${type}\E" );
+    return( '' ) if( !defined( $const ) );
+    return( $const->() );
+}
+
 sub having
 {
     my $self  = shift( @_ );
@@ -646,11 +661,13 @@ sub _check_connect_param
         my $db = $param->{database} ? $param->{database} : ( $uri->path_segments )[-1];
         $path = $uri ? $uri->path : $db;
         # $db = Cwd::abs_path( $uri ? $uri->path : $db );
-        $db = File::Spec->rel2abs( $path );
+        # $db = File::Spec->rel2abs( $path );
+        $db = $self->new_file( $path );
         # If we cannot find the file and it does not end with .sqlite, let's add the extension
         # So the user can provide the database parameter just like database => 'test' or database => './test'
         $db = "$db.sqlite" if( !-e( $db ) && $db !~ /\.sqlite$/i );
-        ( $filename, $path, $ext ) = File::Basename::fileparse( $db, qr/\.[^\.]+$/ );
+        # ( $filename, $path, $ext ) = File::Basename::fileparse( $db, qr/\.[^\.]+$/ );
+        ( $filename, $path, $ext ) = $db->baseinfo( qr/\.[^\.]+$/ );
         $self->message( 3, "Database file path is '$path', file name '$filename' and extension '$ext'." );
         $param->{database} = $filename;
         $param->{database_file} = $self->{database_file} = $db;

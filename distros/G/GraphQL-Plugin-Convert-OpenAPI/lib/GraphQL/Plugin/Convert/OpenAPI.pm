@@ -3,11 +3,12 @@ use 5.008001;
 use strict;
 use warnings;
 use GraphQL::Schema;
+use GraphQL::Plugin::Type::DateTime;
 use GraphQL::Debug qw(_debug);
 use JSON::Validator::OpenAPI::Mojolicious;
 use OpenAPI::Client;
 
-our $VERSION = "0.19";
+our $VERSION = "0.20";
 use constant DEBUG => $ENV{GRAPHQL_DEBUG};
 
 my %TYPEMAP = (
@@ -26,6 +27,11 @@ my %KIND2SIMPLE = (scalar => 1, enum => 1);
 sub _apply_modifier {
   my ($modifier, $typespec) = @_;
   return $typespec if !$modifier;
+  if (ref $modifier eq 'ARRAY') {
+    # several at once! order is innermost first
+    $typespec = _apply_modifier($_, $typespec) for @$modifier;
+    return $typespec;
+  }
   return $typespec if $modifier eq 'non_null'
     and ref $typespec eq 'ARRAY'
     and $typespec->[0] eq 'non_null'; # no double-non_null

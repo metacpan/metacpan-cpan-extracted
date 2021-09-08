@@ -37,11 +37,12 @@ sub validate_each {
 
   my $confirmation_value = $confirmation->($record);
 
-  unless(
-    defined($confirmation_value)
-      &&
-    ($value eq $confirmation_value)
-  ) {
+  # If confirmation is not defined then skip this validation.   If the user wants to have
+  # this defined they can use presense.
+
+  return unless defined($confirmation_value) || defined($value);
+
+  if( ($value||'') ne ($confirmation_value||'')) {
     my $human_attribute_name = $record->human_attribute_name($attribute);
     $record->errors->add($confirmation_attribute, $self->confirmation, +{%$opts, attribute=>"$human_attribute_name"})
   }

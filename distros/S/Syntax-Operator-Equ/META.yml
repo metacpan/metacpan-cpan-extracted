@@ -1,0 +1,29 @@
+---
+abstract: 'equality operators that distinguish C<undef>'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  ExtUtils::CBuilder: '0'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.4004'
+  XS::Parse::Infix::Builder: '0.15'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Syntax-Operator-Equ
+provides:
+  Syntax::Operator::Equ:
+    file: lib/Syntax/Operator/Equ.pm
+    version: '0.02'
+requires:
+  XS::Parse::Infix: '0.15'
+  perl: '5.014'
+resources:
+  IRC: irc://irc.perl.org/#io-async
+  license: http://dev.perl.org/licenses/
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

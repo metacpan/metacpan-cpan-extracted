@@ -8,13 +8,15 @@ use Path::Tiny 0.053;
 
 plan 1;
 
-my $CMD = $ENV{'LICENSECHECK'} || 'bin/licensecheck';
-
-# ensure local script is executable
-path($CMD)->chmod('a+x') if ( $CMD eq 'bin/licensecheck' );
+my @CMD
+	= ( $ENV{'LICENSECHECK'} )
+	|| path('blib')->exists
+	? ('blib/script/licensecheck')
+	: ( $^X, 'bin/licensecheck' );
+diag "executable: @CMD";
 
 subtest 'copyright declared on 3 lines' => sub {
-	run_ok $CMD, qw(-m --copyright t/devscripts/texinfo.tex);
+	run_ok @CMD, qw(-m --copyright t/devscripts/texinfo.tex);
 	like stdout,
 		qr{GNU General Public License v3.0 or later	1985.*2012 Free Software Foundation, Inc.},
 		'Testing stdout';

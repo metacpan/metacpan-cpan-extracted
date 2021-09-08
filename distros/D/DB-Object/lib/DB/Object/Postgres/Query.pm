@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres/Query.pm
-## Version v0.1.5
+## Version v0.1.6
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2021/08/18
+## Modified 2021/08/24
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,7 +19,7 @@ BEGIN
     use parent qw( DB::Object::Query );
     use Devel::Confess;
     our( $VERSION, $DEBUG, $VERBOSE );
-    $VERSION = 'v0.1.5';
+    $VERSION = 'v0.1.6';
 };
 
 {
@@ -168,9 +168,14 @@ sub format_statement
         if( exists( $data->{ $_ } ) )
         {
             my $value = $data->{ $_ };
-            if( Scalar::Util::blessed( $value ) && $value->isa( "${base_class}::Statement" ) )
+            if( $self->_is_a( $value, "${base_class}::Statement" ) )
             {
+                $self->message( 3, "Found a sub query as parameter value: ", $value->as_string );
+                $self->messagef( 3, "Sub query has %d binded types: '%s'", $value->query_object->binded_types->length, $value->query_object->binded_types->join( "', '" ) );
                 push( @format_values, '(' . $value->as_string . ')' );
+                push( @$binded, $value->query_object->binded_values->list ) if( $value->query_object->binded_values->length );
+                # $self->binded_types->push( $value->query_object->binded_types_as_param );
+                push( @types, $value->query_object->binded_types->list ) if( $value->query_object->binded_types->length );
             }
             # This is for insert or update statement types
             elsif( exists( $from_unix->{ $_ } ) )
@@ -201,9 +206,11 @@ sub format_statement
             {
                 push( @format_values, '?' );
                 push( @$binded, $value );
-                if( lc( $types->{ $_ } ) eq 'bytea' )
+                my $const;
+                if( lc( $types->{ $_ } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
                 {
-                    CORE::push( @types, DBD::Pg::PG_BYTEA );
+                    # CORE::push( @types, DBD::Pg::PG_BYTEA );
+                    CORE::push( @types, $const );
                 }
                 else
                 {
@@ -222,15 +229,18 @@ sub format_statement
 #             }
             elsif( !$bind )
             {
-                if( lc( $types->{ $_ } ) eq 'bytea' )
+                my $const;
+                if( lc( $types->{ $_ } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
                 {
-                    push( @format_values, $tbl_o->database_object->quote( $value, DBD::Pg::PG_BYTEA ) );
+                    # push( @format_values, $tbl_o->database_object->quote( $value, DBD::Pg::PG_BYTEA ) );
+                    push( @format_values, $tbl_o->database_object->quote( $value, { pg_type => $const } ) );
                 }
                 # Value is a hash and the data type is json, so we transform this value into a json data
                 elsif( $self->_is_hash( $value ) && ( lc( $types->{ $_ } ) eq 'jsonb' || lc( $types->{ $_ } ) eq 'json' ) )
                 {
                     my $this_json = $self->_encode_json( $value );
-                    push( @format_values, $tbl_o->database_object->quote( $this_json, ( lc( $types->{ $_ } ) eq 'jsonb' ? DBD::Pg::PG_JSONB : DBD::Pg::PG_JSON ) ) );
+                    # push( @format_values, $tbl_o->database_object->quote( $this_json, ( lc( $types->{ $_ } ) eq 'jsonb' ? DBD::Pg::PG_JSONB : DBD::Pg::PG_JSON ) ) );
+                    push( @format_values, $tbl_o->database_object->quote( $this_json, { pg_type => $self->database_object->get_sql_type( $types->{ $_ } ) } ) );
                 }
                 else
                 {
@@ -254,9 +264,10 @@ sub format_statement
             {
                 push( @format_values, '?' );
                 push( @$binded, $value );
-                if( lc( $types->{ $_ } ) eq 'bytea' )
+                my $const;
+                if( lc( $types->{ $_ } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
                 {
-                    CORE::push( @types, DBD::Pg::PG_BYTEA );
+                    CORE::push( @types, $const );
                 }
                 else
                 {
@@ -267,9 +278,11 @@ sub format_statement
             else
             {
                 # push( @format_values, "'" . quotemeta( $value ) . "'" );
-                if( lc( $types->{ $_ } ) eq 'bytea' )
+                my $const;
+                if( lc( $types->{ $_ } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
                 {
-                    push( @format_values, $tbl_o->database_object->quote( $value, DBD::Pg::PG_BYTEA ) );
+                    # push( @format_values, $tbl_o->database_object->quote( $value, DBD::Pg::PG_BYTEA ) );
+                    push( @format_values, $tbl_o->database_object->quote( $value, { pg_type => $const } ) );
                 }
                 else
                 {
@@ -619,7 +632,7 @@ sub _query_components
         }
         else
         {
-            warn( "The PostgreSQL ON CONFLICT clause is only supported for INSERT queries. Your query was of type \"$type\".\n" );
+            warn( "Warning only: the PostgreSQL ON CONFLICT clause is only supported for INSERT queries. Your query was of type \"$type\".\n" );
         }
     }
     push( @query, "RETURNING $returning" ) if( $returning && ( $type eq 'insert' || $type eq 'update' || $type eq 'delete' ) );
@@ -651,7 +664,7 @@ DB::Object::Postgres::Query - Query Object for PostgreSQL
 
 =head1 VERSION
 
-    v0.1.5
+    v0.1.6
 
 =head1 DESCRIPTION
 

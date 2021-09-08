@@ -3,9 +3,157 @@ use warnings;
 package MIDI::RtMidi::FFI;
 use base qw/ Exporter /;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 # ABSTRACT: Bindings for librtmidi - Realtime MIDI library
+
+our $SKIP_FREE = 1;
+
+my $enum_RtMidiApi;
+my $enum_RtMidiErrorType;
+my %binds;
+BEGIN {
+    $enum_RtMidiApi = {
+        RTMIDI_API_UNSPECIFIED  => 0,
+        RTMIDI_API_MACOSX_CORE  => 1,
+        RTMIDI_API_LINUX_ALSA   => 2,
+        RTMIDI_API_UNIX_JACK    => 3,
+        RTMIDI_API_WINDOWS_MM   => 4,
+        RTMIDI_API_RTMIDI_DUMMY => 5,
+        RTMIDI_API_NUM          => 6,
+    };
+
+    $enum_RtMidiErrorType = {
+        RTMIDI_ERROR_WARNING           => 0,
+        RTMIDI_ERROR_DEBUG_WARNING     => 1,
+        RTMIDI_ERROR_UNSPECIFIED       => 2,
+        RTMIDI_ERROR_NO_DEVICES_FOUND  => 3,
+        RTMIDI_ERROR_INVALID_DEVICE    => 4,
+        RTMIDI_ERROR_MEMORY_ERROR      => 5,
+        RTMIDI_ERROR_INVALID_PARAMETER => 6,
+        RTMIDI_ERROR_INVALID_USE       => 7,
+        RTMIDI_ERROR_DRIVER_ERROR      => 8,
+        RTMIDI_ERROR_SYSTEM_ERROR      => 9,
+        RTMIDI_ERROR_THREAD_ERROR      => 10,
+    };
+
+    %binds = (
+        rtmidi_api_display_name     => [ ['enum'] => 'string' ],
+        rtmidi_api_name             => [ ['enum'] => 'string' ],
+        rtmidi_get_compiled_api     => [ ['opaque', 'unsigned int'] => 'int', \&_get_compiled_api ],
+        rtmidi_compiled_api_by_name => [ ['string'] => 'enum' ],
+        rtmidi_open_port            => [ ['RtMidiPtr*', 'int', 'string'] => 'void' ],
+        rtmidi_open_virtual_port    => [ ['RtMidiPtr*', 'string'] => 'void' ],
+        rtmidi_close_port           => [ ['RtMidiPtr*'] => 'void' ],
+        rtmidi_get_port_count       => [ ['RtMidiPtr*'] => 'int' ],
+        rtmidi_get_port_name        => [ ['RtMidiPtr*', 'int'] => 'string' ],
+        rtmidi_in_create_default    => [ ['void'] => 'RtMidiInPtr*' ],
+        rtmidi_in_create            => [ ['enum', 'string', 'unsigned int'] => 'RtMidiInPtr*' ],
+        rtmidi_in_free              => [ ['RtMidiInPtr*'] => 'void', \&_free_wrapper ],
+        rtmidi_in_get_current_api   => [ ['RtMidiInPtr*'] => 'enum' ],
+        rtmidi_in_cancel_callback   => [ ['RtMidiInPtr*'] => 'void' ],
+        rtmidi_in_ignore_types      => [ ['RtMidiInPtr*','bool','bool','bool'] => 'void' ],
+        rtmidi_out_create_default   => [ ['void'] => 'RtMidiOutPtr*' ],
+        rtmidi_out_create           => [ ['enum', 'string'] => 'RtMidiOutPtr*' ],
+        rtmidi_out_free             => [ ['RtMidiOutPtr*'] => 'void', \&_free_wrapper ],
+        rtmidi_out_get_current_api  => [ ['RtMidiOutPtr*'] => 'enum' ],
+        rtmidi_in_get_message       => [ ['RtMidiInPtr*', 'opaque', 'size_t*'] => 'double', \&_in_get_message ],
+        rtmidi_out_send_message     => [ ['RtMidiOutPtr*', 'opaque', 'int' ] => 'int', \&_out_send_message ],
+        rtmidi_in_set_callback      => [ ['RtMidiInPtr*','RtMidiCCallback','opaque'] => 'void', \&_in_set_callback ],
+    );
+
+}
+
+use FFI::Platypus 1.00;
+use FFI::Platypus::Memory qw/ malloc free /;
+use FFI::Platypus::Buffer qw/ scalar_to_buffer buffer_to_scalar /;
+use Alien::RtMidi;
+my $ffi = FFI::Platypus->new( api => 1, lib => [ Alien::RtMidi->dynamic_libs ] );
+
+{
+    package RtMidiWrapper;
+    use FFI::Platypus::Record;
+
+    record_layout(
+        opaque => 'ptr',
+        opaque => 'data',
+        bool   => 'ok',
+        string => 'msg'
+    );
+}
+$ffi->type('record(RtMidiWrapper)' => 'RtMidiPtr');
+$ffi->type('record(RtMidiWrapper)' => 'RtMidiInPtr');
+$ffi->type('record(RtMidiWrapper)' => 'RtMidiOutPtr');
+$ffi->type('(double,string,size_t,opaque)->void' => 'RtMidiCCallback');
+
+for my $fn ( keys %binds ) {
+    my @sig = @{ $binds{ $fn } };
+    $ffi->attach( $fn => @sig );
+}
+
+use constant $enum_RtMidiApi;
+$ffi->type(enum => 'RtMidiApi');
+
+sub _sorted_enum_keys {
+    my ( $enum ) = @_;
+    sort { $enum->{ $a } <=> $enum->{ $b } } keys %{ $enum };
+}
+
+sub _exports {
+    sort keys %binds,
+    _sorted_enum_keys( $enum_RtMidiApi ),
+    _sorted_enum_keys( $enum_RtMidiErrorType ),
+}
+
+sub _get_compiled_api {
+    my ( $sub, $get ) = @_;
+    my $num_apis = $sub->();
+    return unless $num_apis;
+    return $num_apis unless $get;
+    my $apis = malloc RTMIDI_API_NUM * $ffi->sizeof('enum');
+    $sub->( $apis, RTMIDI_API_NUM );
+    my $api_arr = $ffi->cast( 'opaque' => "enum[$num_apis]", $apis );
+    free $apis;
+    return $api_arr;
+}
+
+sub _free_wrapper {
+    my ( $sub, $dev ) = @_;
+    rtmidi_close_port( $dev );
+    $sub->( $dev ) unless $SKIP_FREE;
+}
+
+sub _in_get_message {
+    my ( $sub, $dev, $size ) = @_;
+    $size //= 1024;
+    my $str = malloc $size;
+    $sub->( $dev, $str, \$size );
+    my $msg = buffer_to_scalar( $str, $size );
+    free $str;
+    return $msg;
+}
+
+sub _out_send_message {
+    my ( $sub, $dev, $str ) = @_;
+    my ( $buffer, $bufsize ) = scalar_to_buffer $str;
+    $sub->( $dev, $buffer, $bufsize );
+}
+
+sub _in_set_callback {
+    my ( $sub, $dev, $cb, $data ) = @_;
+    my $callback = sub {
+        my ( $timestamp, $inmsg, $size ) = @_;
+        $cb->( $timestamp, $inmsg, $data );
+    };
+    my $closure = $ffi->closure($callback);
+    $sub->( $dev, $closure );
+    return $closure;
+}
+
+our @EXPORT_OK = _exports();
+our %EXPORT_TAGS = ( all => \@EXPORT_OK );
+
+__END__
 
 =encoding UTF-8
 
@@ -15,7 +163,7 @@ MIDI::RtMidi::FFI - Perl bindings for RtMidi.
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -42,37 +190,13 @@ Multimedia.
 
 MIDI::RtMidi::FFI provides a more-or-less direct binding to
 L<RtMidi's C Interface|https://www.music.mcgill.ca/~gary/rtmidi/group__C-interface.html>.
-MIDI::RtMidi::FFI should work with v3.0.0, v4.0.0 and possibly later versions
-of librtmidi.
+MIDI::RtMidi::FFI requires librtmidi v4.0.0, though will possibly work with
+later versions.
+
+This is alpha software. Expect crashes, memory issues and possible API changes.
 
 Check out L<MIDI::RtMidi::FFI::Device> for an OO interface to this module.
 
-=cut
-
-{
-package RtMidiWrapper;
-use FFI::Platypus::Record;
-
-record_layout(
-    opaque => 'ptr',
-    opaque => 'data',
-    bool   => 'ok',
-    string => 'msg'
-);
-}
-
-use FFI::Platypus;
-use FFI::CheckLib;
-use FFI::Platypus::Buffer qw/ scalar_to_buffer buffer_to_scalar /;
-use FFI::Platypus::Memory qw/ malloc free /;
-
-my $ffi = FFI::Platypus->new;
-$ffi->lib( find_lib_or_die( lib => 'rtmidi' ) );
-$ffi->ignore_not_found(1);
-
-$ffi->type("record(RtMidiWrapper)" => 'RtMidiPtr');
-$ffi->type("record(RtMidiWrapper)" => 'RtMidiInPtr');
-$ffi->type("record(RtMidiWrapper)" => 'RtMidiOutPtr');
 
 =head1 ENUMS
 
@@ -82,18 +206,6 @@ RTMIDI_API_UNSPECIFIED, RTMIDI_API_MACOSX_CORE, RTMIDI_API_LINUX_ALSA,
 RTMIDI_API_UNIX_JACK, RTMIDI_API_WINDOWS_MM, RTMIDI_API_RTMIDI_DUMMY,
 RTMIDI_API_NUM
 
-=cut
-
-# enum RtMidiApi
-use constant RTMIDI_API_UNSPECIFIED  => 0;
-use constant RTMIDI_API_MACOSX_CORE  => 1;
-use constant RTMIDI_API_LINUX_ALSA   => 2;
-use constant RTMIDI_API_UNIX_JACK    => 3;
-use constant RTMIDI_API_WINDOWS_MM   => 4;
-use constant RTMIDI_API_RTMIDI_DUMMY => 5;
-use constant RTMIDI_API_NUM          => 6;
-$ffi->type(enum => 'RtMidiApi');
-
 =head2 RtMidiErrorType
 
 RTMIDI_ERROR_WARNING, RTMIDI_ERROR_DEBUG_WARNING, RTMIDI_ERROR_UNSPECIFIED,
@@ -102,161 +214,7 @@ RTMIDI_ERROR_MEMORY_ERROR, RTMIDI_ERROR_INVALID_PARAMETER,
 RTMIDI_ERROR_INVALID_USE, RTMIDI_ERROR_DRIVER_ERROR, RTMIDI_ERROR_SYSTEM_ERROR,
 RTMIDI_ERROR_THREAD_ERROR
 
-=cut
-
-# enum RtMidiErrorType
-use constant RTMIDI_ERROR_WARNING           => 0;
-use constant RTMIDI_ERROR_DEBUG_WARNING     => 1;
-use constant RTMIDI_ERROR_UNSPECIFIED       => 2;
-use constant RTMIDI_ERROR_NO_DEVICES_FOUND  => 3;
-use constant RTMIDI_ERROR_INVALID_DEVICE    => 4;
-use constant RTMIDI_ERROR_MEMORY_ERROR      => 5;
-use constant RTMIDI_ERROR_INVALID_PARAMETER => 6;
-use constant RTMIDI_ERROR_INVALID_USE       => 7;
-use constant RTMIDI_ERROR_DRIVER_ERROR      => 8;
-use constant RTMIDI_ERROR_SYSTEM_ERROR      => 9;
-use constant RTMIDI_ERROR_THREAD_ERROR      => 10;
-$ffi->type(enum => 'RtMidiErrorType');
-
 =head1 FUNCTIONS
-
-=cut
-
-$ffi->attach( rtmidi_api_display_name => ['int'] => 'string' );
-$ffi->attach( rtmidi_api_name => ['int'] => 'string' );
-
-sub RTMIDI_VERSION { defined &rtmidi_api_display_name ? 4 : 3 }
-
-$ffi->attach(
-    rtmidi_get_compiled_api =>
-    (RTMIDI_VERSION>3?['opaque', 'unsigned int']:['opaque*']) =>
-    'int', sub {
-        my ( $sub, $get ) = @_;
-        my $num_apis = $sub->();
-        return unless $num_apis;
-        return $num_apis unless $get;
-        my $apis = malloc RTMIDI_API_NUM * $ffi->sizeof('enum');
-        $sub->( $apis, RTMIDI_API_NUM ) if RTMIDI_VERSION > 3;
-        $sub->( \$apis ) if RTMIDI_VERSION==3;
-        my $api_arr = $ffi->cast( 'opaque' => "enum[$num_apis]", $apis );
-        free $apis;
-        return $api_arr;
-    }
-);
-$ffi->attach( rtmidi_compiled_api_by_name => ['string'] => 'int' );
-$ffi->attach( rtmidi_open_port => ['RtMidiPtr', 'int', 'string'] => 'void' );
-$ffi->attach( rtmidi_open_virtual_port => ['RtMidiPtr', 'string'] => 'void' );
-$ffi->attach( rtmidi_close_port => ['int'] => 'void' );
-$ffi->attach( rtmidi_get_port_count => ['RtMidiPtr'] => 'int' );
-$ffi->attach( rtmidi_get_port_name => ['RtMidiPtr', 'int'] => 'string' );
-$ffi->attach( rtmidi_in_create_default => ['void'] => 'RtMidiInPtr' );
-$ffi->attach( rtmidi_in_create => ['int', 'string', 'unsigned int'] => 'RtMidiInPtr' );
-$ffi->attach( rtmidi_in_free => ['RtMidiInPtr'] => 'void' );
-$ffi->attach( rtmidi_in_get_current_api => ['RtMidiInPtr'] => 'int' );
-$ffi->attach( rtmidi_in_cancel_callback => ['RtMidiInPtr'] => 'void' );
-$ffi->attach( rtmidi_in_ignore_types => ['RtMidiInPtr','bool','bool','bool'] => 'void' );
-$ffi->attach( rtmidi_out_create_default => ['void'] => 'RtMidiOutPtr' );
-$ffi->attach( rtmidi_out_create => ['int', 'string'] => 'RtMidiOutPtr' );
-$ffi->attach( rtmidi_out_free => ['RtMidiOutPtr'] => 'void' );
-$ffi->attach( rtmidi_out_get_current_api => ['RtMidiOutPtr'] => 'int' );
-$ffi->attach(
-    rtmidi_in_get_message =>
-    ['RtMidiInPtr',(RTMIDI_VERSION>3?'opaque':'opaque*'),'size_t*'] =>
-    'double',
-    sub {
-        my ( $sub, $dev, $size ) = @_;
-        $size //= 1024;
-        my $str = malloc $size;
-        $sub->( $dev, $str, \$size ) if RTMIDI_VERSION > 3;
-        $sub->( $dev, \$str, \$size ) if RTMIDI_VERSION == 3;
-        my $msg = buffer_to_scalar( $str, $size );
-        free $str;
-        return $msg;
-    }
-);
-$ffi->attach(
-    rtmidi_out_send_message =>
-    ['RtMidiOutPtr','opaque','int']
-    => 'int',
-    sub {
-        my ( $sub, $dev, $str ) = @_;
-        my ( $buffer, $bufsize ) = scalar_to_buffer $str;
-        $sub->( $dev, $buffer, $bufsize );
-    }
-);
-if ( RTMIDI_VERSION > 3 ) {
-    $ffi->type('(double,opaque,size_t,string)->void' => 'RtMidiCCallback');
-    $ffi->attach( rtmidi_in_set_callback => ['RtMidiInPtr','RtMidiCCallback','string'] => 'void', sub {
-        my ( $sub, $dev, $cb, $data ) = @_;
-        my $callback = sub {
-            my ( $timestamp, $inmsg, $size, $data ) = @_;
-            my $msg = buffer_to_scalar $inmsg, $size;
-            $cb->( $timestamp, $msg, $data );
-        };
-        my $closure = $ffi->closure($callback);
-        $sub->( $dev, $closure, $data );
-        return $closure;
-    } );
-}
-else {
-    $ffi->type('(double,string,string)->void' => 'RtMidiCCallback');
-    $ffi->attach( rtmidi_in_set_callback => ['RtMidiInPtr','RtMidiCCallback','string'] => 'void', sub {
-            my ( $sub, $dev, $cb, $data ) = @_;
-            my $closure = $ffi->closure($cb);
-            $sub->( $dev, $closure, $data );
-            return $closure;
-        }
-    );
-}
-
-our @EXPORT_OK = (qw/
-    RTMIDI_API_UNSPECIFIED
-    RTMIDI_API_MACOSX_CORE
-    RTMIDI_API_LINUX_ALSA
-    RTMIDI_API_UNIX_JACK
-    RTMIDI_API_WINDOWS_MM
-    RTMIDI_API_RTMIDI_DUMMY
-    RTMIDI_API_NUM
-    RTMIDI_ERROR_WARNING
-    RTMIDI_ERROR_DEBUG_WARNING
-    RTMIDI_ERROR_UNSPECIFIED
-    RTMIDI_ERROR_NO_DEVICES_FOUND
-    RTMIDI_ERROR_INVALID_DEVICE
-    RTMIDI_ERROR_MEMORY_ERROR
-    RTMIDI_ERROR_INVALID_PARAMETER
-    RTMIDI_ERROR_INVALID_USE
-    RTMIDI_ERROR_DRIVER_ERROR
-    RTMIDI_ERROR_SYSTEM_ERROR
-    RTMIDI_ERROR_THREAD_ERROR
-    RTMIDI_VERSION
-    rtmidi_get_compiled_api
-    rtmidi_api_display_name
-    rtmidi_api_name
-    rtmidi_compiled_api_by_name
-    rtmidi_open_port
-    rtmidi_open_virtual_port
-    rtmidi_close_port
-    rtmidi_get_port_count
-    rtmidi_get_port_name
-    rtmidi_in_create_default
-    rtmidi_in_create
-    rtmidi_in_free
-    rtmidi_in_get_current_api
-    rtmidi_in_cancel_callback
-    rtmidi_in_ignore_types
-    rtmidi_in_get_message
-    rtmidi_out_create_default
-    rtmidi_out_create
-    rtmidi_out_free
-    rtmidi_out_get_current_api
-    rtmidi_out_send_message
-    rtmidi_in_set_callback
-/);
-
-our %EXPORT_TAGS = ( all => \@EXPORT_OK );
-
-__END__
-
 
 =head2 rtmidi_get_compiled_api
 
@@ -334,6 +292,8 @@ Create a MIDI in device with initial values.
 
 Free the given MIDI in device.
 
+This currently skips delegating device deletion to librtmidi -- it just closes the port.
+
 =head2 rtmidi_in_get_current_api
 
     rtmidi_in_get_current_api( $device );
@@ -383,6 +343,8 @@ Create a MIDI out device with initial values.
 
 Free the given MIDI out device.
 
+This currently skips delegating device deletion to librtmidi -- it just closes the port.
+
 =head2 rtmidi_out_get_current_api
 
     rtmidi_out_get_current_api( $device );
@@ -398,6 +360,8 @@ Send a single message out an open MIDI output port.
 =head1 SEE ALSO
 
 L<RtMidi|https://www.music.mcgill.ca/~gary/rtmidi/>
+
+L<Alien::RtMidi>
 
 L<MIDI::RtMidi::FFI::Device>
 
@@ -427,7 +391,7 @@ Please direct all requests to L<https://github.com/jbarrett/MIDI-RtMidi-FFI/issu
 
 =head1 COPYRIGHT
 
-Copyright 2019 John Barrett.
+Copyright 2019-2021 John Barrett.
 
 =head1 LICENSE
 
@@ -435,3 +399,4 @@ This application is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
+

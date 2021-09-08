@@ -16,28 +16,28 @@ name: App-sdview
 provides:
   App::sdview:
     file: lib/App/sdview.pm
-    version: '0.03'
+    version: '0.04'
   App::sdview::Output:
     file: lib/App/sdview/Output.pm
-    version: '0.03'
+    version: '0.04'
   App::sdview::Output::Markdown:
     file: lib/App/sdview/Output/Markdown.pm
-    version: '0.03'
+    version: '0.04'
   App::sdview::Output::Pod:
     file: lib/App/sdview/Output/Pod.pm
-    version: '0.03'
+    version: '0.04'
   App::sdview::Output::Terminal:
     file: lib/App/sdview/Output/Terminal.pm
-    version: '0.03'
+    version: '0.04'
   App::sdview::Parser:
     file: lib/App/sdview/Parser.pm
-    version: '0.03'
+    version: '0.04'
   App::sdview::Parser::Markdown:
     file: lib/App/sdview/Parser/Markdown.pm
-    version: '0.03'
+    version: '0.04'
   App::sdview::Parser::Pod:
     file: lib/App/sdview/Parser/Pod.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   Convert::Color: '0'
   Convert::Color::XTerm: '0.06'
@@ -52,5 +52,5 @@ requires:
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

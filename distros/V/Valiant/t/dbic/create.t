@@ -364,9 +364,6 @@ use Test::DBIx::Class
       "Password can't be blank",
       "Password is too short (minimum is 8 characters)",
     ],
-    password_confirmation => [
-      "Password Confirmation doesn't match 'Password'",
-    ],
   }, 'Got expected errors';
 }
 
@@ -389,9 +386,6 @@ use Test::DBIx::Class
     password => [
       "Password can't be blank",
       "Password is too short (minimum is 8 characters)",
-    ],
-    password_confirmation => [
-      "Password Confirmation doesn't match 'Password'",
     ],
   }, 'Got expected errors';
 }

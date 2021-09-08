@@ -1,15 +1,77 @@
 #!/usr/bin/perl
-# abstract: list dependencies for perl modules/scripts, with core info
+# abstract: list dependencies for perl modules/scripts, with optional core info
 
 use vars qw($VERSION);
-our $VERSION = '0.014';
+our $VERSION = '0.016';
 
 use strict;
 use File::Find::Rule;
 use File::LibMagic ':easy';
 use Module::CoreList;
-use Term::ExtendedColor qw(fg);
+use Term::ExtendedColor qw(:attributes);
 use File::LsColor qw(ls_color);
+use Getopt::Long;
+
+my %opt = (
+    core => 0,
+  pragma => 0,
+);
+
+GetOptions(
+  'c|core'    => \$opt{core},
+  'p|pragmas' => \$opt{pragma},
+  'h|help'    => sub {
+    print "-c,  --core    also list core modules\n";
+    print "-h,  --help    display this help and exit\n";
+    exit;
+  },
+);
+
+#< pragmas
+my %pragmas = (
+  attributes    =>  "Get/set subroutine or variable attributes",
+  autodie       =>  "Replace functions with ones that succeed or die with lexical scope",
+  autouse       =>  "Postpone load of modules until a function is used",
+  base          =>  "Establish an ISA relationship with base classes at compile time",
+  bigint        =>  "Transparent BigInteger support for Perl",
+  bignum        =>  "Transparent BigNumber support for Perl",
+  bigrat        =>  "Transparent BigNumber/BigRational support for Perl",
+  blib          =>  "Use MakeMaker's uninstalled version of a package",
+  bytes         =>  "Expose the individual bytes of characters",
+  charnames     =>  "Access to Unicode character names and named character sequences; also define character names",
+  constant      =>  "Declare constants",
+  deprecate     =>  "Perl pragma for deprecating the inclusion of a module in core",
+  diagnostics   =>  "Produce verbose warning diagnostics",
+  encoding      =>  "Allows you to write your script in non-ASCII and non-UTF-8",
+  experimental  =>  "Experimental features made easy",
+  feature       =>  "Enable new features",
+  fields        =>  "Compile-time class fields",
+  filetest      =>  "Control the filetest permission operators",
+  if            =>  "use a Perl module if a condition holds",
+  integer       =>  "Use integer arithmetic instead of floating point",
+  less          =>  "Request less of something",
+  lib           =>  "Manipulate \@INC at compile time",
+  locale        =>  "Use or avoid POSIX locales for built-in operations",
+  mro           =>  "Method Resolution Order",
+  ok            =>  "Alternative to Test::More::use_ok",
+  open          =>  "Set default PerlIO layers for input and output",
+  ops           =>  "Restrict unsafe operations when compiling",
+  overload      =>  "Package for overloading Perl operations",
+  overloading   =>  "Lexically control overloading",
+  parent        =>  "Establish an ISA relationship with base classes at compile time",
+  re            =>  "Alter regular expression behaviour",
+  sigtrap       =>  "Enable simple signal handling",
+  sort          =>  "Control sort() behaviour",
+  strict        =>  "Restrict unsafe constructs",
+  subs          =>  "Predeclare subroutine names",
+  threads       =>  "Perl interpreter-based threads",
+  utf8          =>  "Enable/disable UTF-8 (or UTF-EBCDIC) in source code",
+  vars          =>  "Predeclare global variable names",
+  version       =>  "Perl extension for Version Objects",
+  vmsish        =>  "Control VMS-specific language features",
+  warnings      =>  "Control optional warnings",
+);
+#>
 
 my $file = shift;
 
@@ -18,7 +80,13 @@ if(-d $file) {
   my $ff = File::Find::Rule->new;
   $ff->file;
   $ff->name('*.pm', '*.pl');
-  @perls = grep{!/blib/ } $ff->in( $file );
+  @perls = grep{ !/blib/ } $ff->in( $file );
+
+  if(!@perls) {
+    $ff->name('*');
+    print $ff->in($file);
+    @perls = grep{ MagicFile($_) =~ m/perl/i } $ff->in($file);
+  }
 }
 elsif(-f $file) {
   @perls = $file;
@@ -38,14 +106,25 @@ my %result = %{ get_modules(@perls) };
 
 my $previous;
 for my $file(sort(keys(%result))) {
+  printf "%s\n", fg(240, join('', '-' x 40));
   if($previous ne $file) {
     $previous = $file;
-    print "\n";
   }
 
+  my %pragmas_in_use;
   for my $module(@{$result{$file}}) {
+
     my ($in_core) = Module::CoreList->find_modules($module);
-    if($in_core) {
+
+    if(exists($pragmas{$module})) {
+
+      $pragmas_in_use{$module}++;
+      next;
+#      printf "%s %s\n", ls_color($file), underline($module);
+#      next;
+    }
+
+    if($in_core and $opt{core}) {
       printf("%s %s (perl v%s)\n",
         ls_color($file),
         $module,
@@ -53,7 +132,16 @@ for my $file(sort(keys(%result))) {
       );
       next;
     }
-    printf("%s %s\n", ls_color($file), $module);
+
+  printf("%s %s\n", ls_color($file), $module);
+  }
+
+  if($opt{pragma} and %pragmas_in_use) {
+#    printf "%s\n", ls_color($file);
+    printf "%d pragmas in effect:\n", scalar %pragmas_in_use;
+    for my $p(keys(%pragmas_in_use)) {
+      printf "- %s: %s\n", underline($p), $pragmas{$p};
+    }
   }
 }
 
@@ -74,3 +162,4 @@ sub get_modules {
   }
   return \%used_modules;
 }
+

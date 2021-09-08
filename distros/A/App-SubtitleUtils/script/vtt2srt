@@ -1,15 +1,21 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-08'; # DATE
+our $DATE = '2021-08-11'; # DATE
 our $DIST = 'App-SubtitleUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
 use Log::ger::Screen;
+
+sub _strip {
+    my $str = shift;
+    $str =~ s/<.+?>//g;
+    $str;
+}
 
 $/ = "";
 my $num = 1;
@@ -23,7 +29,7 @@ while (my $para = <>) {
 
     $first_line =~ s/[.]/,/g;
 
-    print $num, "\n", $first_line, $subseq_lines;
+    print $num, "\n", _strip($first_line), _strip($subseq_lines);
     $num++;
 }
 
@@ -42,7 +48,7 @@ vtt2srt - Convert .vtt to .srt
 
 =head1 VERSION
 
-This document describes version 0.005 of vtt2srt (from Perl distribution App-SubtitleUtils), released on 2021-01-08.
+This document describes version 0.006 of vtt2srt (from Perl distribution App-SubtitleUtils), released on 2021-08-11.
 
 =head1 SYNOPSIS
 
@@ -60,7 +66,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-SubtitleUtils>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-SubtitleUtils/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-SubtitleUtils>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -76,9 +82,26 @@ C<--sub-format vtt>, C<--convert-subtitles srt>).
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

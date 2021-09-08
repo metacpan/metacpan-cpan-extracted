@@ -18,7 +18,7 @@ sub process_grammar_files {
     open(my $fh,'<',$grammar) || die "cannot read $grammar: $!";
     my @content = <$fh>;
     close $fh;
-    splice(@content,1,0,'our $VERSION=0.343;'."\n");
+    splice(@content,1,0,'our $VERSION=0.344;'."\n");
     open(my $out,">",$grammar) || die "cannot write $grammer: $!";
     print $out @content;
     close $out;
@@ -55,7 +55,7 @@ my %module_build_args = (
     'Kenichi Ishigaki <kishigaki@gmail.com>'
   ],
   'dist_name' => 'Module-ExtractUse',
-  'dist_version' => '0.343',
+  'dist_version' => '0.344',
     'license' => 'perl',
     'module_name' => 'Module::ExtractUse',
   'module_name' => 'Module::ExtractUse',

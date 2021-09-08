@@ -11,7 +11,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.30';
+$VERSION = '0.31';
 $VERSION = $VERSION;
 
 # internal use
@@ -3241,9 +3241,9 @@ sub parse_heredocument_as_qq_endswith {
             $parsed .= "\@{[mb::_CAPTURE($1)]}";
         }
 
-        # @{^CAPTURE} --> @{[join $", mb::_CAPTURE()]}
+        # @{^CAPTURE} --> @{[mb::_CAPTURE()]}
         elsif (/\G \@\{\^CAPTURE\} /xmsgc) {
-            $parsed .= '@{[join $", mb::_CAPTURE()]}';
+            $parsed .= '@{[mb::_CAPTURE()]}';
         }
 
         # ${^CAPTURE}[0] --> @{[mb::_CAPTURE(1)]}
@@ -3641,10 +3641,10 @@ sub parse_qq_like {
         $parsed_as_qq .= "\@{[mb::_CAPTURE($2)]}";
     }
 
-    # @{^CAPTURE} --> @{[join $", mb::_CAPTURE()]}
+    # @{^CAPTURE} --> @{[mb::_CAPTURE()]}
     elsif (/\G ( \@\{\^CAPTURE\} ) /xmsgc) {
         $parsed_as_q  .= $1;
-        $parsed_as_qq .= '@{[join $", mb::_CAPTURE()]}';
+        $parsed_as_qq .= '@{[mb::_CAPTURE()]}';
     }
 
     # ${^CAPTURE}[0] --> @{[mb::_CAPTURE(1)]}
@@ -4834,11 +4834,6 @@ END
         $parsed .= "\@{[mb::_clustered_codepoint(mb::_CAPTURE($1))]}";
     }
 
-    # @{^CAPTURE} --> @{[mb::_clustered_codepoint(join $", mb::_CAPTURE())]}
-    elsif (/\G \@\{\^CAPTURE\} /xmsgc) {
-        $parsed .= '@{[mb::_clustered_codepoint(join $", mb::_CAPTURE())]}';
-    }
-
     # ${^CAPTURE}[0] --> @{[mb::_clustered_codepoint(mb::_CAPTURE(1))]}
     # ${^CAPTURE}[1] --> @{[mb::_clustered_codepoint(mb::_CAPTURE(2))]}
     # ${^CAPTURE}[2] --> @{[mb::_clustered_codepoint(mb::_CAPTURE(3))]}
@@ -4847,12 +4842,12 @@ END
         $parsed .= "\@{[mb::_clustered_codepoint(mb::_CAPTURE($n_th+1))]}";
     }
 
-    # @-                   --> @{[join $", mb::_LAST_MATCH_START()]}
-    # @LAST_MATCH_START    --> @{[join $", mb::_LAST_MATCH_START()]}
-    # @{LAST_MATCH_START}  --> @{[join $", mb::_LAST_MATCH_START()]}
-    # @{^LAST_MATCH_START} --> @{[join $", mb::_LAST_MATCH_START()]}
+    # @-                   --> @{[mb::_LAST_MATCH_START()]}
+    # @LAST_MATCH_START    --> @{[mb::_LAST_MATCH_START()]}
+    # @{LAST_MATCH_START}  --> @{[mb::_LAST_MATCH_START()]}
+    # @{^LAST_MATCH_START} --> @{[mb::_LAST_MATCH_START()]}
     elsif (/\G (?: \@- | \@LAST_MATCH_START | \@\{LAST_MATCH_START\} | \@\{\^LAST_MATCH_START\} ) /xmsgc) {
-        $parsed .= '@{[join $", mb::_LAST_MATCH_START()]}';
+        $parsed .= '@{[mb::_LAST_MATCH_START()]}';
     }
 
     # $-[1]                   --> @{[mb::_LAST_MATCH_START(1)]}
@@ -4864,12 +4859,12 @@ END
         $parsed .= "\@{[mb::_LAST_MATCH_START($n_th)]}";
     }
 
-    # @+                 --> @{[join $", mb::_LAST_MATCH_END()]}
-    # @LAST_MATCH_END    --> @{[join $", mb::_LAST_MATCH_END()]}
-    # @{LAST_MATCH_END}  --> @{[join $", mb::_LAST_MATCH_END()]}
-    # @{^LAST_MATCH_END} --> @{[join $", mb::_LAST_MATCH_END()]}
+    # @+                 --> @{[mb::_LAST_MATCH_END()]}
+    # @LAST_MATCH_END    --> @{[mb::_LAST_MATCH_END()]}
+    # @{LAST_MATCH_END}  --> @{[mb::_LAST_MATCH_END()]}
+    # @{^LAST_MATCH_END} --> @{[mb::_LAST_MATCH_END()]}
     elsif (/\G (?: \@\+ | \@LAST_MATCH_END | \@\{LAST_MATCH_END\} | \@\{\^LAST_MATCH_END\} ) /xmsgc) {
-        $parsed .= '@{[join $", mb::_LAST_MATCH_END()]}';
+        $parsed .= '@{[mb::_LAST_MATCH_END()]}';
     }
 
     # $+[1]                 --> @{[mb::_LAST_MATCH_END(1)]}
@@ -5807,7 +5802,7 @@ To install this software without make, type the following:
   "$1"                                       "@{[mb::_CAPTURE(1)]}"
   "$2"                                       "@{[mb::_CAPTURE(2)]}"
   "$3"                                       "@{[mb::_CAPTURE(3)]}"
-  "@{^CAPTURE}"                              "@{[join $", mb::_CAPTURE()]}"
+  "@{^CAPTURE}"                              "@{[mb::_CAPTURE()]}"
   "${^CAPTURE}[0]"                           "@{[mb::_CAPTURE(0)]}"
   "${^CAPTURE}[1]"                           "@{[mb::_CAPTURE(1)]}"
   "${^CAPTURE}[2]"                           "@{[mb::_CAPTURE(2)]}"
@@ -6035,7 +6030,9 @@ To install this software without make, type the following:
   -----------------------------------------------------------------------------------------------
   in your script                             script transpiled by this software
   -----------------------------------------------------------------------------------------------
+  "\u\L MBCS-quotee \E\E"                    "@{[mb::ucfirst(qq<@{[mb::lc(qq< OO-quotee >)]}>)]}"
   "\L\u MBCS-quotee \E\E"                    "@{[mb::ucfirst(qq<@{[mb::lc(qq< OO-quotee >)]}>)]}"
+  "\l\U MBCS-quotee \E\E"                    "@{[mb::lcfirst(qq<@{[mb::uc(qq< OO-quotee >)]}>)]}"
   "\U\l MBCS-quotee \E\E"                    "@{[mb::lcfirst(qq<@{[mb::uc(qq< OO-quotee >)]}>)]}"
   "\L MBCS-quotee \E"                        "@{[mb::lc(qq< OO-quotee >)]}"
   "\U MBCS-quotee \E"                        "@{[mb::uc(qq< OO-quotee >)]}"
@@ -6146,7 +6143,7 @@ To install this software without make, type the following:
 
 =head1 Fatal Bugs Unavoidable
 
-You can avoid the following bugs with little hacks.
+For several reasons, we were unable to achieve the following features:
 
 =over 2
 
@@ -6192,8 +6189,7 @@ Similarly, empty string made by interpolated variable means empty string, too.
 
 =head1 Small Bugs Avoidable
 
-The following is a description of the minor incompatibilities. These are not
-likely to be programming constraints.
+You can avoid the following bugs with little hacks.
 
 =over 2
 
@@ -6383,6 +6379,9 @@ difficult to implement and you can write the same script in other any ways.
 =back
 
 =head1 Other Limitations
+
+The following is a description of the minor incompatibilities. These are not
+likely to be programming constraints.
 
 =over 2
 

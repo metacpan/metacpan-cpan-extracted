@@ -1,5 +1,13 @@
 Revision history for XS-Parse-Sublike
 
+0.13    2021-08-30
+        [CHANGES]
+         * New ABI version 4
+            + Set up functions in PL_modglobal instead of perl-visible global
+              symbol table
+            + Add a `permit_hintkey` convenient shortcut
+         * Better code structure of XS::Parse::Sublike::Builder
+
 0.12    2021-06-21
         [BUGFIXES]
          * Try to work around parse_block()'s unbalanced scopestack messups

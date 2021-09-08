@@ -2,7 +2,7 @@ package App::Yath::Command::replay;
 use strict;
 use warnings;
 
-our $VERSION = '1.000066';
+our $VERSION = '1.000071';
 
 use App::Yath::Options;
 require App::Yath::Command::test;
@@ -250,6 +250,24 @@ Can be specified multiple times
 
 =over 4
 
+=item --cover-aggregator ARG
+
+=item --cover-aggregator=ARG
+
+=item --no-cover-aggregator
+
+Choose an aggregator (default Test2::Harness::Log::CoverageAggregator)
+
+
+=item --cover-class ARG
+
+=item --cover-class=ARG
+
+=item --no-cover-class
+
+Choose a Test2::Plugin::Cover subclass
+
+
 =item --cover-dirs ARG
 
 =item --cover-dirs=ARG
@@ -487,6 +505,15 @@ Can also be set with the following environment variables: C<T2_HARNESS_DUMMY>
 =item --no-help
 
 exit after showing help information
+
+
+=item --interactive
+
+=item -i
+
+=item --no-interactive
+
+Use interactive mode, 1 test at a time, stdin forwarded to it
 
 
 =item --keep-dirs

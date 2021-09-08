@@ -7,7 +7,7 @@ use Moo::Role;
 
 use Data::Record::Serialize::Error { errors => [ '::create' ] }, -all;
 
-our $VERSION = '0.28';
+our $VERSION = '0.30';
 
 use IO::File;
 
@@ -26,7 +26,10 @@ has fh => (
           : ( IO::File->new( $self->output, 'w' )
               or error( '::create', "unable to create @{[ $self->output ]}" ) );
     },
+   clearer => 1,
+   predicate => 1,
 );
+
 
 
 
@@ -37,7 +40,18 @@ has fh => (
 
 sub print { shift->fh->print( @_ ) }
 sub say   { shift->fh->say( @_ ) }
-sub close { shift->fh->close }
+
+sub close {
+    my ( $self, $in_global_destruction ) = @_;
+
+    # don't bother closing the FH; it'll be done on its own.
+    return if $in_global_destruction;
+
+    # fh is lazy, so the object may close without every using it, so
+    # don't inadvertently create it.
+    $self->fh->close if $self->has_fh;
+    $self->clear_fh;
+}
 
 with 'Data::Record::Serialize::Role::Sink';
 
@@ -65,7 +79,7 @@ Data::Record::Serialize::Sink::stream - output encoded data to a stream.
 
 =head1 VERSION
 
-version 0.28
+version 0.30
 
 =head1 SYNOPSIS
 
@@ -85,6 +99,8 @@ It performs the L<Data::Record::Serialize::Role::Sink> role.
 =for Pod::Coverage print
  say
  close
+ has_fh
+ clear_fh
 
 =head1 INTERFACE
 

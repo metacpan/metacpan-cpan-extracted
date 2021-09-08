@@ -191,25 +191,19 @@ EOPOD
 
    my @items = $p[0]->items;
 
-   is( scalar @items, 6, '6 items' );
+   is( scalar @items, 3, '3 items' );
 
    is( $items[0]->type, "item",  'items[0] type' );
-   is( $items[0]->text, "First", 'items[0] text' );
+   is( $items[0]->term, "First", 'items[0] term' );
+   is( $items[0]->text, "The first item", 'items[1] text' );
 
-   is( $items[1]->type, "plain", 'items[1] type' );
-   is( $items[1]->text, "The first item", 'items[1] text' );
+   is( $items[1]->type, "item",  'items[2] type' );
+   is( $items[1]->term, "Second", 'items[2] term' );
+   is( $items[1]->text, "The second item", 'items[3] text' );
 
-   is( $items[2]->type, "item",  'items[2] type' );
-   is( $items[2]->text, "Second", 'items[2] text' );
-
-   is( $items[3]->type, "plain", 'items[3] type' );
-   is( $items[3]->text, "The second item", 'items[3] text' );
-
-   is( $items[4]->type, "item",  'items[4] type' );
-   is( $items[4]->text, "Third", 'items[4] text' );
-
-   is( $items[5]->type, "plain", 'items[5] type' );
-   is( $items[5]->text, "The third item", 'items[5] text' );
+   is( $items[2]->type, "item",  'items[4] type' );
+   is( $items[2]->term, "Third", 'items[4] term' );
+   is( $items[2]->text, "The third item", 'items[5] text' );
 };
 
 done_testing;

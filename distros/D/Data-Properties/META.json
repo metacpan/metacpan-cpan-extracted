@@ -1,12 +1,12 @@
 {
-   "abstract" : "Flexible properties handling",
+   "abstract" : "unknown",
    "author" : [
-      "Johan Vromans <jvromans@squirrel.nl>"
+      "unknown"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -29,29 +29,9 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
-      },
-      "runtime" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "6.46",
-            "File::LoadLines" : "1.02",
-            "String::Interpolate::Named" : "1.01",
-            "Test::More" : "0",
-            "Text::ParseWords" : "0",
-            "perl" : "5.010001"
-         }
       }
    },
    "release_status" : "stable",
-   "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/sciurius/perl-Data-Properties/issues"
-      },
-      "repository" : {
-         "type" : "git",
-         "url" : "https://github.com/sciurius/perl-Data-Properties.git",
-         "web" : "https://github.com/sciurius/perl-Data-Properties"
-      }
-   },
-   "version" : "1.05",
+   "version" : "1.06",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

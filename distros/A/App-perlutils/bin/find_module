@@ -1,0 +1,23 @@
+#!/usr/bin/perl
+# abstract: find where a module is residing
+
+use strict;
+use File::Find::Rule;
+use File::LsColor qw(ls_color);
+
+my $looking_for = shift || 'Audio::MPD';
+
+$looking_for =~ s{::}{/}g;
+
+my @perls;
+
+for my $incdir(@INC) {
+  my $ff = File::Find::Rule->new;
+  $ff->file;
+  $ff->name('*.pm');
+  push(@perls, grep{ /$looking_for/i } $ff->in($incdir));
+}
+
+for my $found(sort(@perls)) {
+  printf "%s\n", ls_color($found);
+}

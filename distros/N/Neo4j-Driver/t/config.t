@@ -16,23 +16,29 @@ use Neo4j_Test::MockHTTP;
 
 my ($d, $r);
 
-plan tests => 10 + 1;
+plan tests => 15 + 1;
 
 
 subtest 'config read/write' => sub {
-	plan tests => 7;
+	plan tests => 12;
 	lives_ok { $d = 0; $d = Neo4j::Driver->new(); } 'new driver';
 	# write and read single options
 	my $timeout = exp(1);
 	lives_and { is $d->config(timeout => $timeout), $d; } 'set timeout';
 	lives_and { is $d->config('timeout'), $timeout; } 'get timeout';
 	lives_and { is $d->config('ca_file'), undef; } 'get unset ca_file';
+	lives_and { is $d->config({ca_file => ''}), $d; } 'set ca_file ref';
+	lives_and { is $d->config('ca_file'), ''; } 'get ca_file ref';
 	# write and read multiple options
 	my $ca_file = '/dev/null';
 	my @options = (timeout => $timeout * 2, ca_file => $ca_file);
 	lives_and { is $d->config(@options), $d; } 'set two options';
 	lives_and { is $d->config('timeout'), $timeout * 2; } 'get timeout 2nd';
 	lives_and { is $d->config('ca_file'), $ca_file; } 'get ca_file';
+	@options = (timeout => $timeout * 3, ca_file => '');
+	lives_and { is $d->config({@options}), $d; } 'set two options ref';
+	lives_and { is $d->config('timeout'), $timeout * 3; } 'get timeout ref';
+	lives_and { is $d->config('ca_file'), ''; } 'get ca_file ref';
 };
 
 
@@ -51,15 +57,33 @@ subtest 'direct hash access' => sub {
 };
 
 
+subtest 'constructor config' => sub {
+	plan tests => 7;
+	lives_ok { $d = 0; $d = Neo4j::Driver->new(); } 'new driver default lives';
+	lives_and { is $d->{http_timeout}, undef; } 'new driver default';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new({timeout => 1}); } 'new driver hashref lives';
+	lives_and { is $d->{http_timeout}, 1; } 'new driver hashref';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new('http://test:10047'); } 'new driver uri lives';
+	lives_and { is $d->{uri}, 'http://test:10047'; } 'new driver uri';
+	throws_ok { Neo4j::Driver->new({}, 0) } qr/\bmultiple arguments unsupported\b/i, 'extra arg';
+};
+
+
 subtest 'config illegal args' => sub {
-	plan tests => 6;
+	plan tests => 8;
 	lives_ok { $d = 0; $d = Neo4j::Driver->new(); } 'new driver';
 	throws_ok {
 		 $d->config();
 	} qr/\bUnsupported\b/i, 'no args';
 	throws_ok {
+		 $d->config( {} );
+	} qr/\bUnsupported\b/i, 'no opts';
+	throws_ok {
 		 $d->config( timeout => 1,5 );
 	} qr/\bOdd number of elements\b/i, 'illegal hash';
+	throws_ok {
+		 $d->config( {}, 0 );
+	} qr/\bUnsupported\b/i, 'extra arg';
 	throws_ok {
 		 $d->config( 'http_timeout' );
 	} qr/\bUnsupported\b.*\bhttp_timeout\b/i, 'illegal name get';
@@ -69,6 +93,21 @@ subtest 'config illegal args' => sub {
 	throws_ok {
 		 $d->config( aaa => 1, bbb => 2 );
 	} qr/\bUnsupported\b.*\baaa\b.*\bbbb\b/i, 'illegal name set multi';
+};
+
+
+subtest 'uri config' => sub {
+	plan tests => 10;
+	lives_ok { $d = 0; $d = Neo4j::Driver->new('http://test:10023'); } 'new driver lives';
+	lives_and { is $d->config('uri'), 'http://test:10023'; } 'new driver get';
+	lives_ok { $d = $d->config(timeout => 60); } 'other config set lives';
+	lives_and { is $d->config('uri'), 'http://test:10023'; } 'other config no change';
+	lives_ok { $d = $d->config(uri => 'http://test:10057'); } 'uri set lives';
+	lives_and { is $d->config('uri'), 'http://test:10057'; } 'uri get';
+	lives_ok { $d = $d->config(uri => undef); } 'uri undef lives';
+	lives_and { is $d->config('uri'), 'http://localhost:7474'; } 'uri undef default';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new({uri => 'http://test:10059'}); } 'uri hashref lives';
+	lives_and { is $d->config('uri'), 'http://test:10059'; } 'uri hashref get';
 };
 
 
@@ -159,29 +198,80 @@ subtest 'uris with path/query' => sub {
 
 
 subtest 'tls' => sub {
-	plan tests => 7;
+	plan tests => 9;
 	my $ca_file = '8aA6EPsGYE7sbB7bLWiu.';  # doesn't exist
-	lives_ok { $d = Neo4j::Driver->new('https://test/')->config(tls_ca => $ca_file); } 'create https with CA file';
+	lives_ok { $d = Neo4j::Driver->new('https://test/')->config(trust_ca => $ca_file); } 'create https with CA file';
 	is $d->{tls_ca}, $ca_file, 'tls_ca';
 	throws_ok { $d->session; } qr/\Q$ca_file\E/, 'https session fails with missing CA file';
 	throws_ok {
-		Neo4j::Driver->new('https://test/')->config(tls => 0)->session;
+		Neo4j::Driver->new('https://test/')->config(encrypted => 0)->session;
 	} qr/\bHTTPS does not support unencrypted communication\b/i, 'no unencrypted https';
 	lives_ok {
-		$d = Neo4j::Driver->new('https://test/')->config(tls => 1);
+		$d = Neo4j::Driver->new('https://test/')->config(encrypted => 1);
 		Neo4j_Test->transaction_unconnected($d);
 	} 'encrypted https';
 	ok $d->{tls}, 'tls';
 	throws_ok {
-		Neo4j::Driver->new('http://test/')->config(tls => 1)->session;
+		Neo4j::Driver->new('http://test/')->config(encrypted => 1)->session;
 	} qr/\bHTTP does not support encrypted communication\b/i, 'no encrypted http';
+	lives_and { is(Neo4j::Driver->new->config(tls => 4)->config('encrypted'), 4) } 'config tls';
+	lives_and { is(Neo4j::Driver->new->config(tls_ca => $ca_file)->config('trust_ca'), $ca_file) } 'config tls_ca';
 };
 
 
 subtest 'auth' => sub {
-	plan tests => 2;
+	plan tests => 13;
+	my $a = { scheme => 'basic', principal => 'user', credentials => 'pass' };
+	lives_ok { $d = 0; $d = Neo4j::Driver->new->basic_auth(user => 'pass') } 'basic auth lives';
+	lives_and { is_deeply $d->config('auth'), $a } 'basic auth';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new; $d->config(auth => \$a) } 'ref auth lives';
+	lives_and { is_deeply ${$d->config('auth')}, $a } 'ref auth';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new->config(uri => 'http://foo:bar@test', auth => $a) } 'ambiguous auth lives';
+	lives_and { is_deeply $d->{auth}, $a } 'ambiguous auth prefers auth over uri';
+	# parsing from uri
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('http://user:pass@test:9999'); } 'auth in full uri lives';
-	lives_and { is $d->{uri}, 'http://user:pass@test:9999'; } 'auth in full uri';
+	lives_and { is $d->{uri}, 'http://test:9999'; } 'auth in full uri';
+	lives_and { is_deeply $d->{auth}, $a } 'auth from full uri';
+	$a = { scheme => 'basic', principal => 'foo', credentials => '' };
+	lives_ok { $d = 0; $d = Neo4j::Driver->new->config(uri => 'http://foo:@test') } 'uri no passwd auth lives';
+	lives_and { is_deeply $d->{auth}, $a } 'uri no passwd auth';
+	$a = { scheme => 'basic', principal => '', credentials => 'bar' };
+	lives_ok { $d = 0; $d = Neo4j::Driver->new->config(uri => 'http://:bar@test') } 'uri no userid auth lives';
+	lives_and { is_deeply $d->{auth}, $a } 'uri no userid auth';
+};
+
+
+subtest 'auth encoding unit' => sub {
+	plan tests => 12;
+	# The implied assumption here is that anything that *can* be decoded as UTF-8 probably *is* UTF-8.
+	my $a = { scheme => 'basic', principal => "foo\x{100}foo", credentials => '' };
+	lives_ok { $d = 0; $d = Neo4j::Driver->new("http://foo\x{c4}\x{80}foo\@test") } 'uri utf8 auth lives';
+	lives_and { is_deeply $d->{auth}, $a } 'uri utf8 auth';
+	lives_and { ok utf8::is_utf8 $d->{auth}->{principal} } 'uri utf8 auth flag';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new('http://foo%C4%80foo@test') } 'uri encoded utf8 auth lives';
+	lives_and { is_deeply $d->{auth}, $a } 'uri encoded utf8 auth';
+	lives_and { ok utf8::is_utf8 $d->{auth}->{principal} } 'uri encoded utf8 auth flag';
+	$a = { scheme => 'basic', principal => "bar\x{c4}\x{80}\x{ff}bar", credentials => '' };
+	lives_ok { $d = 0; $d = Neo4j::Driver->new("http://bar\x{c4}\x{80}\x{ff}bar\@test") } 'uri latin1 auth lives';
+	lives_and { is_deeply $d->{auth}, $a } 'uri latin1 auth';
+	lives_and { ok ! utf8::is_utf8 $d->{auth}->{principal} } 'uri latin1 auth flag';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new('http://bar%C4%80%ffbar@test') } 'uri encoded latin1 auth lives';
+	lives_and { is_deeply $d->{auth}, $a } 'uri encoded latin1 auth';
+	lives_and { ok ! utf8::is_utf8 $d->{auth}->{principal} } 'uri encoded latin1 auth flag';
+};
+
+
+subtest 'auth encoding integration' => sub {
+	plan tests => 6;
+	my ($m, $uri);
+	$uri = 'http://utf8:%C4%80@test1:10001';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new($uri) } 'utf8 driver lives';
+	lives_ok { $m = 0; $m = Neo4j::Driver::Net::HTTP::LWP->new($d) } 'utf8 net module lives';
+	lives_and { is ''.$m->uri(), $uri } 'utf8 uri';
+	$uri = 'http://latin1:%C4%80%FF@test2:10002';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new($uri) } 'latin1 driver lives';
+	lives_ok { $m = 0; $m = Neo4j::Driver::Net::HTTP::LWP->new($d) } 'latin1 net module lives';
+	lives_and { is ''.$m->uri(), $uri } 'latin1 uri';
 };
 
 
@@ -221,6 +311,19 @@ subtest 'cypher params' => sub {
 	lives_and { ok !! $d->session(database => 'dummy')->{cypher_params_v2} } 'Sim (0.0.0): filter';
 	$Neo4j_Test::MockHTTP::res[0]->{json}{neo4j_version} = '4.2.5';
 	$Neo4j_Test::MockHTTP::res[0]->{content} = undef;
+};
+
+
+subtest 'session config' => sub {
+	plan tests => 6;
+	my $d = Neo4j::Driver->new('http:');
+	lives_ok { $d->config(net_module => 'Neo4j_Test::MockHTTP') } 'set mock';
+	my %db = (database => 'foobar');
+	lives_and { like $d->session( %db)->{net}{endpoints}{new_commit}, qr/\bfoobar\b/ } 'session hash';
+	lives_and { like $d->session(\%db)->{net}{endpoints}{new_commit}, qr/\bfoobar\b/ } 'session hash ref';
+	throws_ok { $d->session(  ) } qr/\bdefault database\b/i, 'session empty hash';
+	throws_ok { $d->session({}) } qr/\bdefault database\b/i, 'session empty hash ref';
+	throws_ok { $d->session('') } qr/\bOdd number of elements\b/i, 'session no ref';
 };
 
 

@@ -2,7 +2,7 @@ NAME
     App::ModuleFeaturesUtils - CLI Utilities related to Module::Features
 
 VERSION
-    This document describes version 0.004 of App::ModuleFeaturesUtils (from
+    This document describes version 0.005 of App::ModuleFeaturesUtils (from
     Perl distribution App-ModuleFeaturesUtils), released on 2021-04-02.
 
 DESCRIPTION

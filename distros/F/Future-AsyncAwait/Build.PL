@@ -27,7 +27,7 @@ my $build = Module::Build->new(
    requires => {
       'Future' => '0.43',
       'perl' => '5.016', # PL_keyword_plugin, pad_new(), CvDYNFILE, many tests fail on 5.14
-      'XS::Parse::Keyword' => '0.05',
+      'XS::Parse::Keyword' => '0.13',
       'XS::Parse::Sublike' => '0.10',
    },
    test_requires => {
@@ -37,7 +37,7 @@ my $build = Module::Build->new(
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
-      'XS::Parse::Keyword::Builder' => '0.05',
+      'XS::Parse::Keyword::Builder' => '0.13',
       'XS::Parse::Sublike::Builder' => '0.10',
    },
    license => 'perl',

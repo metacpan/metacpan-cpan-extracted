@@ -15,7 +15,7 @@ use File::pushd 'pushd';
 
     around _build_MakeFile_PL_template => sub {
         my $orig = shift; my $self = shift;
-        return $self->$orig(@_) . "\n# in Makefile_PL_template\n"
+        return $self->$orig(@_) . "\n# in Makefile_PL_template with templated variable '{{ \$hello }}'\n"
     };
     around _build_WriteMakefile_args => sub {
         my $orig = shift; my $self = shift;
@@ -33,6 +33,10 @@ use File::pushd 'pushd';
     around _build_exe_files => sub {
         my $orig = shift; my $self = shift;
         return [ @{ $self->$orig(@_) }, 'bin/hello-world' ]
+    };
+    around template_arguments => sub {
+        my $orig = shift; my $self = shift;
+        return +{ %{ $self->$orig(@_) }, hello => 'hello world!' };
     };
 }
 
@@ -66,7 +70,7 @@ my $empty = "$]" < '5.010' ? qr/.{0}/ : '';
 my $content = $tzil->slurp_file('build/Makefile.PL');
 like(
     $content,
-    qr/^# in Makefile_PL_template$empty$/ms,
+    qr/^# in Makefile_PL_template$empty with templated variable 'hello world!'$/ms,
     '_build_MakeFile_PL_template hook called',
 );
 like(

@@ -1,5 +1,11 @@
 Revision history for String-Interpolate-RE
 
+0.11      2021-09-01 15:37:30-04:00 America/New_York
+
+  [BUG FIX]
+
+    * The emptyundef flag was broken for formatted interpolations
+
 0.10      2019-05-23 15:21:21-04:00 America/New_York
 
   [BUG FIX]

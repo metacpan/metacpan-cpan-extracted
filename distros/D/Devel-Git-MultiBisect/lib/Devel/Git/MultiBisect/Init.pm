@@ -1,14 +1,13 @@
 package Devel::Git::MultiBisect::Init;
-use strict;
-use warnings;
 use v5.14.0;
+use warnings;
 use Carp;
 use Cwd;
 use File::Spec;
 use File::Temp;
-#our @EXPORT_OK = qw( init );
 
-our $VERSION = '0.15';
+our $VERSION = '0.19';
+$VERSION = eval $VERSION;
 
 =head1 NAME
 
@@ -53,7 +52,7 @@ sub init {
     }
 
     my @missing_dirs = ();
-    for my $dir ( qw| gitdir workdir outputdir | ) {
+    for my $dir ( qw| gitdir outputdir | ) {
         push @missing_dirs, $data{$dir}
             unless (-d $data{$dir});
     }
@@ -75,7 +74,7 @@ sub _get_commits {
     chdir $dataref->{gitdir} or croak "Unable to chdir";
     my @commits = ();
     my ($older, $cmd);
-    my ($fh, $err) = File::Temp::tempfile();
+    my $err = File::Temp->new( UNLINK => 1, SUFFIX => '.err' );
     if ($dataref->{last_before}) {
         $older = '^' . $dataref->{last_before};
         $cmd = "git rev-list --reverse $older $dataref->{last} 2>$err";

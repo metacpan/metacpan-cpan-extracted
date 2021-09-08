@@ -1,0 +1,92 @@
+
+=head1 NAME
+
+Redis::OpenTracing - Wrap Redis inside OpenTracing
+
+
+
+=head1 SYNOPSIS
+
+    package My::Awesome::Module;
+    
+    use strict;
+    use warnings;
+    
+    use Redis::OpenTracing;
+    
+    my $redis = Redis::OpenTracing->new( );
+    
+    my $value = $redis->get( 'my-key' );
+    
+    1;
+
+
+
+=head1 DESCRIPTION
+
+The example above will use the default Redis server
+(from C<$ENV{REDIS_SERVER}>) and the Global Tracer
+(from C<$ENV{OPENTRACING_IMPLEMENTATION}>.
+
+It will create span with the name C<Redis::GET>, enriched with package /
+subroutine name and line number for easy debugging.
+
+
+
+=head1 CLASS METHODS
+
+
+
+=head2 C<new>
+
+Creates a new C<Redis::OpenTracing> client.
+
+    my $redis = Redis::OpenTracing->new(
+        redis => Redis::Fast->new,
+    );
+
+=over
+
+=item Optional Parameter(s)
+
+=over
+
+=item C<redis>
+
+A (existing) Redis client. This must be something like an instance of L<Redis>,
+and implement its methods to work properly.
+
+=back
+
+=back
+
+
+
+=head1 AUTHOR
+
+Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+
+
+=head1 CONTRIBUTORS
+
+The people listed below have helped to improve the quality of the code and fixed
+issues. Your work and effort is very much appreciated.
+
+Szymon Nieznanski <s.nez@member.fsf.org>
+
+
+
+=head1 COPYRIGHT AND LICENSE
+
+C<Redis::OpenTracing> is Copyright (C) 2021, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This library is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.
+
+=cut

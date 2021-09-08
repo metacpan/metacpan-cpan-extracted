@@ -1,0 +1,1139 @@
+<%doc>
+Allow a filter rule to be edited.
+
+  FilterRuleGroup - RT::FilterRuleGroup object containing the rules
+  FilterRule - RT::FilterRule object for this rule, undef if creating new
+  Edit - which type of rule to edit - "GroupRequirements" or "FilterRules"
+  PageLink - URL of page this element is on, to post the form to
+  Create - if true, show the form to create a new rule
+  SetEnabled - if true, the "Enabled" checkbox is on the page
+
+Assumes that $PageLink needs to be passed an "id" parameter of
+$FilterRuleGroup->id and a "Rule" parameter of the filter rule ID, to view
+or edit a filter rule.
+</%doc>
+\
+<%ARGS>
+$FilterRuleGroup => undef
+$FilterRule      => undef
+$Edit            => 'GroupRequirements'
+$PageLink        => undef
+$Create          => undef
+$SetEnabled      => undef
+</%ARGS>
+\
+<%INIT>
+return if ( not $FilterRuleGroup );
+
+my $CanSee    = $FilterRuleGroup->CurrentUserHasRight('SeeFilterRule');
+my $CanModify = $FilterRuleGroup->CurrentUserHasRight('ModifyFilterRule');
+my $CanCreate = $FilterRuleGroup->CurrentUserHasRight('CreateFilterRule');
+my $CanDelete = $FilterRuleGroup->CurrentUserHasRight('DeleteFilterRule');
+
+$CanSee = $CanModify = $CanCreate = $CanDelete = 1
+    if ( $session{'CurrentUser'}
+    ->HasRight( Right => 'SuperUser', Object => RT->System ) );
+
+my $EnabledChecked = 'checked="checked"';
+
+if ( ( not $Create ) && $FilterRule && $FilterRule->id ) {
+    $EnabledChecked = '' if ( $FilterRule->Disabled );
+} elsif ( $SetEnabled && ( not $ARGS{'Enabled'} ) ) {
+    $EnabledChecked = '';
+}
+
+my %VisibleCustomFields = ();
+my %StatusValues        = ();
+
+foreach my $QueueCollection (
+    $FilterRuleGroup->CanMatchQueuesObj,
+    $FilterRuleGroup->CanTransferQueuesObj
+    )
+{
+    while ( my $QueueObj = $QueueCollection->Next ) {
+        my $TicketCustomFields = $QueueObj->TicketCustomFields;
+        while ( my $CustomField = $TicketCustomFields->Next ) {
+            $VisibleCustomFields{ $CustomField->Name } = $CustomField->id;
+        }
+        $StatusValues{$_} = 1 foreach ( $QueueObj->LifecycleObj->Valid );
+    }
+}
+</%INIT>
+
+<p>
+<form action="<%$PageLink%>" method="post">
+<input type="hidden" name="id" value="<%$FilterRuleGroup->id%>" />
+<p>
+<input type="submit" value="&larr; <&|/l&>Back</&>" />
+</p>
+</form>
+
+% return
+%     if ( ( not defined $FilterRule )
+%     && ( not $Create ) );
+
+% if ($FilterRuleGroup->Disabled) {
+<& /Elements/ListActions, actions => 
+    [
+    loc('The filter rule group containing this rule is currently disabled.'),
+    loc('This rule will not be processed until the filter rule group as a whole is enabled.'),
+    ] &>
+% }
+
+<style type="text/css">
+tr[conditionrow] td, tr[actionrow] td { border-bottom: solid #888 1px; padding-top: 0.5em; padding-bottom: 0.5em; }
+</style>
+
+<form action="<%$PageLink%>" method="post">
+<input type="hidden" name="id" value="<%$FilterRuleGroup->id%>" />
+<input type="hidden" name="Rule" value="<% $Create ? 'new' : $FilterRule->id%>" />
+<input type="hidden" name="ModifyRule" value="1" />
+\
+%# Workaround so that hitting Enter submits rather than clicking the first button.
+<input style="display:none;" type="submit" />
+\
+<table>
+<tr>\
+<th style="text-align:right;"><&|/l&>Name</&>:</th>\
+<td>\
+% if ($CanModify || $CanCreate) {
+<input name="Name" required value="<% $Create ? '' : $FilterRule->Name || $ARGS{'Name'} %>" />\
+% } else {
+<% $FilterRule->Name %>\
+% }
+</td>\
+</tr>
+<tr>\
+% if ($CanModify || $CanCreate) {
+<td style="text-align:right;"><input type="checkbox" class="checkbox" id="Enabled" name="Enabled" value="1" <%$EnabledChecked|n%> /></td>\
+<td><label for="Enabled">\
+%     if ($Edit eq 'GroupRequirements') {
+<&|/l&>Enabled (Unchecking this box disables this requirement rule)</&>\
+%     } else {
+<&|/l&>Enabled (Unchecking this box disables this filter rule)</&>\
+%     }
+</label><br />\
+<input type="hidden" class="hidden" name="SetEnabled" value="1" />\
+</td>\
+% } else {
+<th style="text-align:right;"><&|/l&>Status</&>:</th><td><% $FilterRule->Disabled ? loc('Disabled') : loc('Enabled') %></td>\
+% }
+</tr>
+<tr>\
+<th style="text-align:right;"><&|/l&>Trigger type</&>:</th>\
+<td>\
+% my $TriggerTypeValue = $Create ? '' : $FilterRule->TriggerType || $ARGS{'TriggerType'};
+% if ($CanModify || $CanCreate) {
+<select id="TriggerType" name="TriggerType">\
+<option value="Create"<% $TriggerTypeValue eq 'Create'?' selected':'' %>><&|/l&>On ticket creation</&></option>\
+<option value="QueueMove"<% $TriggerTypeValue eq 'QueueMove'?' selected':'' %>><&|/l&>When a ticket moves between queues</&></option>\
+</select>\
+% } elsif ($TriggerTypeValue eq 'Create') {
+<&|/l&>On ticket creation</&>\
+% } elsif ($TriggerTypeValue eq 'QueueMove') {
+<&|/l&>When a ticket moves between queues</&>\
+% } else {
+<% $TriggerTypeValue %>\
+% }
+</td>\
+</tr>
+\
+<tr><td colspan="2"><hr /></td></tr>
+<tr>\
+<th style="text-align:right;vertical-align:top;">\
+<&|/l&>Conflict conditions</&>:<br />\
+<small><em><&|/l&>Rule must not meet any of these</&></em></small>\
+</th>\
+<td style="vertical-align:top;" conditionset="Conflicts">\
+% if ($CanModify || $CanCreate) {
+<table border="0" cellspacing="0" cellpadding="4">
+<tr emptymarker><td colspan="3"><em><&|/l&>No conflict conditions - rule will match if requirements are met</&></em></td></tr>
+</table>
+<button type="button" action="AddCondition"><&|/l&>Add condition</&></button>
+% } else {
+<% $FilterRule->DescribeConflicts |n%>\
+% }
+</td>\
+</tr>
+\
+<tr><td colspan="2"><hr /></td></tr>
+<tr>\
+<th style="text-align:right;vertical-align:top;">\
+<&|/l&>Requirement conditions</&>:<br />\
+<small><em><&|/l&>Rule must meet all of these</&></em></small>\
+</th>\
+<td style="vertical-align:top;" conditionset="Requirements">\
+% if ($CanModify || $CanCreate) {
+<table border="0" cellspacing="0" cellpadding="4">
+<tr emptymarker><td colspan="3"><em><&|/l&>No requirement conditions - rule will never match</&></em></td></tr>
+</table>
+<button type="button" action="AddCondition"><&|/l&>Add condition</&></button>
+% } else {
+<% $FilterRule->DescribeRequirements |n%>\
+% }
+</td>\
+</tr>
+\
+% if ($Edit ne 'GroupRequirements') {
+<tr><td colspan="2"><hr /></td></tr>
+<tr>\
+<th style="text-align:right;vertical-align:top;">\
+<&|/l&>Actions</&>:<br />\
+<small><em><&|/l&>Actions to perform when rule matches</&></em></small>\
+</th>\
+<td style="vertical-align:top;" actionset="Actions">\
+%     if ($CanModify || $CanCreate) {
+<table border="0" cellspacing="0" cellpadding="4">
+<tr emptymarker><td colspan="3"><em><&|/l&>No actions defined</&></em></td></tr>
+</table>
+<button type="button" action="AddAction"><&|/l&>Add action</&></button>
+%     } else {
+<% $FilterRule->DescribeActions |n%>\
+%     }
+</td>\
+</tr>
+% }
+\
+% if ($Edit ne 'GroupRequirements') {
+<tr><td colspan="2"><hr /></td></tr>
+<tr>\
+<th style="text-align:right;"><&|/l&>Stop if matched</&>:</th>\
+<td>\
+%     if ($CanModify || $CanCreate) {
+<select name="StopIfMatched">\
+<option value="0"<% ( $Create ? $ARGS{'StopIfMatched'} : $FilterRule->StopIfMatched ) ? '' : ' selected' %>>\
+<&|/l&>No - continue processing remaining rules if this rule matches</&>\
+</option>\
+<option value="1"<% ( $Create ? $ARGS{'StopIfMatched'} : $FilterRule->StopIfMatched ) ? ' selected' : '' %>>\
+<&|/l&>Yes - stop processing remaining rules if this rule matches</&>\
+</option>\
+</select>\
+%     } elsif ($FilterRule->StopIfMatched) {
+<&|/l&>Yes - stop processing remaining rules if this rule matches</&>\
+%     } else {
+<&|/l&>No - continue processing remaining rules if this rule matches</&>\
+%     }
+</td>\
+</tr>
+% }
+\
+% if ($CanModify || $CanCreate) {
+<tr>\
+<td colspan="2"><hr />\
+%     if ( $Create ) {
+<& /Elements/Submit, Label => loc('Create') &>
+%     } else {
+<& /Elements/Submit, Label => loc('Save Changes') &>
+%     }
+</td></tr>
+% }
+</table>
+</form>
+\
+% if ($CanCreate || $CanModify) {
+\
+%#   Hidden drop-down lists to use when constructing the form.
+\
+<span style="display:none;">
+\
+<select id="ConditionTypes">
+%     foreach ( RT::Extension::FilterRules->ConditionTypes( $session{'CurrentUser'} ) ) {
+<option\
+ value="<% $_->{'ConditionType'} %>"\
+ triggertypes="<% join (',', @{$_->{'TriggerTypes'}}) %>"\
+ valuetype="<% $_->{'ValueType'} %>"\
+><% $_->{'Name'} %></option>
+%     }
+</select>
+\
+<select id="ActionTypes">
+%     foreach ( RT::Extension::FilterRules->ActionTypes( $session{'CurrentUser'} ) ) {
+<option\
+ value="<% $_->{'ActionType'} %>"\
+ valuetype="<% $_->{'ValueType'} %>"\
+><% $_->{'Name'} %></option>
+%     }
+</select>
+\
+<select id="CanMatchQueues">
+<option value="">-</option>
+%     my ($Collection, $Item);
+%     $Collection = $FilterRuleGroup->CanMatchQueuesObj;
+%     $Collection->OrderByCols( { 'FIELD' => 'Name', 'ORDER' => 'ASC' } );
+%     while ($Item = $Collection->Next) {
+<option value="<% $Item->id %>"><% $Item->Name %></option>
+%     }
+</select>
+\
+<select id="CanTransferQueues">
+<option value="">-</option>
+%     $Collection = $FilterRuleGroup->CanTransferQueuesObj;
+%     $Collection->OrderByCols( { 'FIELD' => 'Name', 'ORDER' => 'ASC' } );
+%     while ($Item = $Collection->Next) {
+<option value="<% $Item->id %>"><% $Item->Name %></option>
+%     }
+</select>
+\
+<select id="CanUseGroups">
+<option value="">-</option>
+%     $Collection = $FilterRuleGroup->CanUseGroupsObj;
+%     $Collection->OrderByCols( { 'FIELD' => 'Name', 'ORDER' => 'ASC' } );
+%     while ($Item = $Collection->Next) {
+<option value="<% $Item->id %>"><% $Item->Name %></option>
+%     }
+</select>
+\
+<select id="CustomFields">
+<option value="">-</option>
+%     foreach (sort keys %VisibleCustomFields) {
+<option value="<% $VisibleCustomFields{$_} %>"><% $_ %></option>
+%     }
+</select>
+\
+<select id="Statuses">
+<option value="">-</option>
+%     foreach (sort keys %StatusValues) {
+<option><% $_ %></option>
+%     }
+</select>
+\
+</span>
+\
+<script type="text/javascript">
+\
+var countFilterRuleFields = 0;
+var countFilterRuleFieldValues = 0;
+\
+%# Add a new condition, where conditionSet is "Conflicts" or "Requirements"
+%# and the remaining values are what to set the condition and its first
+%# value to.  The new condition's "conditionrow" value will be in
+%# "countFilterRuleFields" afterwards as a side effect.
+\
+function addFilterRuleCondition (conditionSet, setCF, setType, setText, setQueue, setStatus) {
+    var mainTable;
+    var newRow = jQuery('<tr></tr>');
+    var cellType = jQuery('<td></td>');
+    var cellValue = jQuery('<td></td>');
+    var cellButton = jQuery('<td></td>');
+    var typePrefix = jQuery('<em></em>');
+    var typeCF = jQuery('<select></select>');
+    var typeType = jQuery('<select></select>');
+    var valueText = jQuery('<input />');
+    var valueQueue = jQuery('<select></select>');
+    var valueStatus = jQuery('<select></select>');
+
+    mainTable = jQuery('td[conditionset='+conditionSet+'] table').first();
+
+    countFilterRuleFields++;
+
+    if (conditionSet == 'Requirements') {
+        typePrefix.text(<%loc('AND')|j%>+' ');
+    } else {
+        typePrefix.text(<%loc('OR')|j%>+' ');
+    }
+
+    typeCF.html(jQuery('#CustomFields').html());
+    typeCF.attr('name', conditionSet+'-'+countFilterRuleFields+'-CustomField');
+    typeCF.attr('typecf', 1);
+    if (setCF)
+        typeCF.val(setCF);
+
+    typeType.html(jQuery('#ConditionTypes').html());
+    typeType.attr('name', conditionSet+'-'+countFilterRuleFields+'-ConditionType');
+    typeType.attr('settype', 1);
+    if (setType)
+        typeType.val(setType);
+
+    valueText.attr('type', 'text');
+    valueText.attr('size', '30');
+    valueText.attr('name', conditionSet+'-'+countFilterRuleFields+'-ValueText-0');
+    valueText.attr('textvalue', 1);
+    if (setText)
+        valueText.val(setText);
+
+    valueQueue.html(jQuery('#CanMatchQueues').html());
+    valueQueue.attr('name', conditionSet+'-'+countFilterRuleFields+'-ValueQueue-0');
+    valueQueue.attr('queuevalue', 1);
+    if (setQueue)
+        valueQueue.val(setQueue);
+
+    valueStatus.html(jQuery('#Statuses').html());
+    valueStatus.attr('name', conditionSet+'-'+countFilterRuleFields+'-ValueStatus-0');
+    valueStatus.attr('statusvalue', 1);
+    if (setStatus)
+        valueStatus.val(setStatus);
+
+    cellType.append(typePrefix);
+    cellType.append(typeCF);
+    cellType.append(typeType);
+    cellType.css('vertical-align', 'top');
+
+    cellValue.attr('valuecell', 1);
+    cellValue.append(valueText);
+    cellValue.append(valueQueue);
+    cellValue.append(valueStatus);
+    cellValue.append('<br />');
+    cellValue.append('<button action="AddValue">'+<%loc('Add value')|j%>+'</button>');
+
+    cellButton.append('<button action="RemoveCondition">'+<%loc('Remove condition')|j%>+'</button>');
+    cellButton.css('vertical-align', 'top');
+
+    newRow.append(cellType);
+    newRow.append(cellValue);
+    newRow.append(cellButton);
+    newRow.attr('conditionrow', countFilterRuleFields);
+
+    mainTable.find('tr[emptymarker]').hide();
+    mainTable.append(newRow);
+    mainTable.find('tr[conditionrow='+countFilterRuleFields+'] select[settype]').on('change', onFilterRuleConditionTypeChange);
+    mainTable.find('tr[conditionrow='+countFilterRuleFields+'] select[settype]').trigger('change');
+    mainTable.find('tr[conditionrow='+countFilterRuleFields+'] button').on('click', onFilterRuleConditionButton);
+
+    onTriggerTypeChange();
+    removeFirstLineTypePrefixes(mainTable);
+}
+\
+function onFilterRuleConditionTypeChange () {
+    var myRow = jQuery(this).parents('tr').first();
+    var selectedOption = myRow.find('select[settype] option:selected');
+
+    if (selectedOption.attr('valuetype') == 'Queue') {
+        myRow.find('td[valuecell] button').show();
+        myRow.find('input[textvalue]').hide();
+        myRow.find('input[textvalue]').prop('required', false);
+        myRow.find('input[textvalue]').prop('disabled', true);
+        myRow.find('select[queuevalue]').show();
+        myRow.find('select[queuevalue]').prop('required', true);
+        myRow.find('select[queuevalue]').prop('disabled', false);
+        myRow.find('select[statusvalue]').hide();
+        myRow.find('select[statusvalue]').prop('required', false);
+        myRow.find('select[statusvalue]').prop('disabled', true);
+    } else if (selectedOption.attr('valuetype') == 'Status') {
+        myRow.find('td[valuecell] button').show();
+        myRow.find('input[textvalue]').hide();
+        myRow.find('input[textvalue]').prop('required', false);
+        myRow.find('input[textvalue]').prop('disabled', true);
+        myRow.find('select[queuevalue]').hide();
+        myRow.find('select[queuevalue]').prop('required', false);
+        myRow.find('select[queuevalue]').prop('disabled', true);
+        myRow.find('select[statusvalue]').show();
+        myRow.find('select[statusvalue]').prop('required', true);
+        myRow.find('select[statusvalue]').prop('disabled', false);
+    } else if (selectedOption.attr('valuetype') == 'None') {
+        myRow.find('td[valuecell] button').hide();
+        myRow.find('input[textvalue]').hide();
+        myRow.find('input[textvalue]').prop('required', false);
+        myRow.find('input[textvalue]').prop('disabled', true);
+        myRow.find('select[queuevalue]').hide();
+        myRow.find('select[queuevalue]').prop('required', false);
+        myRow.find('select[queuevalue]').prop('disabled', true);
+        myRow.find('select[statusvalue]').hide();
+        myRow.find('select[statusvalue]').prop('required', false);
+        myRow.find('select[statusvalue]').prop('disabled', true);
+    } else {
+        myRow.find('td[valuecell] button').show();
+        if (selectedOption.attr('valuetype') == 'Integer') {
+            myRow.find('input[textvalue]').attr('size', 4);
+        } else {
+            myRow.find('input[textvalue]').attr('size', 30);
+        }
+        myRow.find('input[textvalue]').show();
+        myRow.find('input[textvalue]').prop('required', true);
+        myRow.find('input[textvalue]').prop('disabled', false);
+        myRow.find('select[queuevalue]').hide();
+        myRow.find('select[queuevalue]').prop('required', false);
+        myRow.find('select[queuevalue]').prop('disabled', true);
+        myRow.find('select[statusvalue]').hide();
+        myRow.find('select[statusvalue]').prop('required', false);
+        myRow.find('select[statusvalue]').prop('disabled', true);
+    }
+
+    if (/CustomField/.test(selectedOption.attr('value'))) {
+        myRow.find('select[typecf]').show();
+    } else {
+        myRow.find('select[typecf]').hide();
+    }
+}
+\
+function onFilterRuleConditionButton () {
+    var action = jQuery(this).attr('action');
+    if (action == 'AddValue') {
+       filterRuleConditionAddValue(jQuery(this).parents('td[conditionset]').attr('conditionset'), jQuery(this).parents('tr').first().attr('conditionrow'));
+    } else if (action == 'RemoveValue') {
+       filterRuleConditionRemoveValue(jQuery(this));
+    } else if (action == 'RemoveCondition') {
+       filterRuleConditionRemoveCondition(jQuery(this));
+    }
+    return false;
+}
+\
+%# Add a value to a condition, where conditionSet is "Conflicts" or
+%# "Requirements", conditionRow is the condition's "conditionrow" value, and
+%# the other values are what to set the new value to.
+\
+function filterRuleConditionAddValue (conditionSet, conditionRow, setText, setQueue, setStatus) {
+    var valuePrefix = jQuery('<span></span>');
+    var valueText = jQuery('<input />');
+    var valueQueue = jQuery('<select></select>');
+    var valueStatus = jQuery('<select></select>');
+    var cellValue = jQuery('td[conditionset='+conditionSet+'] table tr[conditionrow='+conditionRow+'] td[valuecell]').first();
+    var buttonElement = cellValue.find('button[action=AddValue]').first();
+
+    countFilterRuleFieldValues++;
+
+    valuePrefix.append(' <em>'+<%loc('OR')|j%>+'</em> ');
+    valuePrefix.attr('valuenumber', countFilterRuleFieldValues);
+
+    valueText.attr('type', 'text');
+    valueText.attr('size', '30');
+    valueText.attr('name', conditionSet+'-'+conditionRow+'-ValueText-'+countFilterRuleFieldValues);
+    valueText.attr('textvalue', 1);
+    valueText.attr('valuenumber', countFilterRuleFieldValues);
+    if (setText)
+        valueText.val(setText);
+
+    valueQueue.html(jQuery('#CanMatchQueues').html());
+    valueQueue.attr('name', conditionSet+'-'+conditionRow+'-ValueQueue-'+countFilterRuleFieldValues);
+    valueQueue.attr('queuevalue', 1);
+    valueQueue.attr('valuenumber', countFilterRuleFieldValues);
+    if (setQueue)
+        valueQueue.val(setQueue);
+
+    valueStatus.html(jQuery('#Statuses').html());
+    valueStatus.attr('name', conditionSet+'-'+countFilterRuleFields+'-ValueStatus-0');
+    valueStatus.attr('statusvalue', 1);
+    valueStatus.attr('valuenumber', countFilterRuleFieldValues);
+    if (setStatus)
+        valueStatus.val(setStatus);
+
+    cellValue.append(valuePrefix);
+    cellValue.append(valueText);
+    cellValue.append(valueQueue);
+    cellValue.append(valueStatus);
+    cellValue.append('<br valuenumber='+countFilterRuleFieldValues+' />');
+    cellValue.append('<button action="AddValue">'+<%loc('Add value')|j%>+'</button>');
+
+    buttonElement.text(<%loc('Remove value')|j%>);
+    buttonElement.attr('action', 'RemoveValue');
+    buttonElement.attr('valuenumber', countFilterRuleFieldValues);
+
+    cellValue.find('button').off('click');
+    cellValue.find('button').on('click', onFilterRuleConditionButton);
+    buttonElement.parents('tr').first().find('select[settype]').trigger('change');
+}
+\
+function filterRuleConditionRemoveValue (buttonElement) {
+    var valueNumber = buttonElement.attr('valuenumber');
+    buttonElement.parents('table').first().find('[valuenumber='+valueNumber+']').remove();
+}
+\
+function filterRuleConditionRemoveCondition (buttonElement) {
+    if (!confirm(<%loc('Remove this condition - are you sure?')|j%>))
+        return;
+    var myTable = buttonElement.parents('table').first();
+    buttonElement.parents('tr').first().remove();
+    if (myTable.find('tr').length < 2) {
+        myTable.find('tr[emptymarker]').show();
+    }
+    removeFirstLineTypePrefixes(myTable);
+}
+\
+function removeFirstLineTypePrefixes(table) {
+    table.find('tr[conditionrow]').first().find('td > em').remove();
+}
+\
+%# Add a new action, where the values are what to set the action's settings
+%# to.  The new action's "actionrow" value will be in
+%# "countFilterRuleFields" afterwards as a side effect.
+\
+function addFilterRuleAction (setType, setCF, setValue, setNotify) {
+    var mainTable;
+    var newRow = jQuery('<tr></tr>');
+    var cellAction = jQuery('<td></td>');
+    var cellValue = jQuery('<td></td>');
+    var cellButton = jQuery('<td></td>');
+    var hiddenValueType = jQuery('<input />');
+    var actionType = jQuery('<select></select>');
+    var actionCF = jQuery('<select></select>');
+    var actionNotifyGroup = jQuery('<select></select>');
+    var actionNotifyText = jQuery('<input />');
+    var valueText = jQuery('<input />');
+    var valueGroup = jQuery('<select></select>');
+    var valueQueue = jQuery('<select></select>');
+    var valueStatus = jQuery('<select></select>');
+    var valueHTML = jQuery('<span><textarea></textarea></span>');
+
+    mainTable = jQuery('td[actionset] table').first();
+
+    countFilterRuleFields++;
+
+    hiddenValueType.attr('type', 'hidden');
+    hiddenValueType.attr('name', 'Actions-'+countFilterRuleFields+'-ValueType');
+
+    actionType.html(jQuery('#ActionTypes').html());
+    actionType.attr('name', 'Actions-'+countFilterRuleFields+'-ActionType');
+    actionType.attr('actiontype', 1);
+    if (setType)
+        actionType.val(setType);
+
+    actionCF.html(jQuery('#CustomFields').html());
+    actionCF.attr('name', 'Actions-'+countFilterRuleFields+'-CustomField');
+    actionCF.attr('actioncf', 1);
+    if (setCF)
+        actionCF.val(setCF);
+
+    actionNotifyGroup.html(jQuery('#CanUseGroups').html());
+    actionNotifyGroup.attr('name', 'Actions-'+countFilterRuleFields+'-NotifyGroup');
+    actionNotifyGroup.attr('notifygroup', 1);
+    if (setNotify)
+        actionNotifyGroup.val(setNotify);
+
+    actionNotifyText.attr('type', 'text');
+    actionNotifyText.attr('size', '30');
+    actionNotifyText.attr('name', 'Actions-'+countFilterRuleFields+'-NotifyText');
+    actionNotifyText.attr('notifytext', 1);
+    if (setNotify)
+        actionNotifyText.val(setNotify);
+
+    valueText.attr('type', 'text');
+    valueText.attr('size', '30');
+    valueText.attr('name', 'Actions-'+countFilterRuleFields+'-ValueText');
+    valueText.attr('valuetext', 1);
+    if (setValue)
+        valueText.val(setValue);
+
+    valueGroup.html(jQuery('#CanUseGroups').html());
+    valueGroup.attr('name', 'Actions-'+countFilterRuleFields+'-ValueGroup');
+    valueGroup.attr('valuegroup', 1);
+    if (setValue)
+        valueGroup.val(setValue);
+
+    valueQueue.html(jQuery('#CanMatchQueues').html());
+    valueQueue.attr('name', 'Actions-'+countFilterRuleFields+'-ValueQueue');
+    valueQueue.attr('valuequeue', 1);
+    if (setValue)
+        valueQueue.val(setValue);
+
+    valueStatus.html(jQuery('#Statuses').html());
+    valueStatus.attr('name', 'Actions-'+countFilterRuleFields+'-ValueStatus');
+    valueStatus.attr('valuestatus', 1);
+    if (setValue)
+        valueStatus.val(setValue);
+
+    valueHTML.find('textarea').attr('name', 'Actions-'+countFilterRuleFields+'-ValueHTML');
+    valueHTML.attr('valuehtml', 1);
+    if (setValue)
+        valueHTML.find('textarea').val(setValue);
+
+    cellAction.attr('typecell', 1);
+    cellAction.append(hiddenValueType);
+    cellAction.append(actionType);
+    cellAction.append(actionCF);
+    cellAction.append(actionNotifyGroup);
+    cellAction.append(actionNotifyText);
+    cellAction.css('vertical-align', 'top');
+
+    cellValue.attr('valuecell', 1);
+    cellValue.append(valueText);
+    cellValue.append(valueGroup);
+    cellValue.append(valueQueue);
+    cellValue.append(valueStatus);
+    cellValue.append(valueHTML);
+
+    cellButton.append('<button action="RemoveAction">'+<%loc('Remove action')|j%>+'</button>');
+    cellButton.css('vertical-align', 'top');
+
+    newRow.append(cellAction);
+    newRow.append(cellValue);
+    newRow.append(cellButton);
+    newRow.attr('actionrow', countFilterRuleFields);
+
+    mainTable.find('tr[emptymarker]').hide();
+    mainTable.append(newRow);
+    mainTable.find('tr[actionrow='+countFilterRuleFields+'] select[actiontype]').on('change', onFilterRuleActionTypeChange);
+    mainTable.find('tr[actionrow='+countFilterRuleFields+'] select[actiontype]').trigger('change');
+    mainTable.find('tr[actionrow='+countFilterRuleFields+'] button[action=RemoveAction]').on('click', filterRuleActionRemove);
+}
+\
+function onFilterRuleActionTypeChange () {
+    var myRow = jQuery(this).parents('tr').first();
+    var selectedOption = myRow.find('select[actiontype] option:selected');
+    var actionType = selectedOption.attr('value');
+    var valueType = selectedOption.attr('valuetype');
+
+    myRow.find('input,select,span').removeAttr('isNeeded');
+    myRow.find('input,select,span').attr('notNeeded', 1);
+
+    myRow.find('input[type=hidden]').val(valueType);
+    myRow.find('input[type=hidden]').removeAttr('notNeeded');
+    myRow.find('[actiontype]').removeAttr('notNeeded');
+
+    if (/CustomField/.test(actionType)) {
+        myRow.find('[actioncf]').removeAttr('notNeeded').attr('isNeeded', 1);
+    } else if (/NotifyGroup/.test(actionType)) {
+        myRow.find('[notifygroup]').removeAttr('notNeeded').attr('isNeeded', 1);
+    } else if (/NotifyEmail/.test(actionType)) {
+        myRow.find('[notifytext]').removeAttr('notNeeded').attr('isNeeded', 1);
+    }
+
+    if (valueType == 'Group') {
+        myRow.find('[valuegroup]').removeAttr('notNeeded').attr('isNeeded', 1);
+    } else if (valueType == 'Queue') {
+        myRow.find('[valuequeue]').removeAttr('notNeeded').attr('isNeeded', 1);
+    } else if (valueType == 'Status') {
+        myRow.find('[valuestatus]').removeAttr('notNeeded').attr('isNeeded', 1);
+    } else if (valueType == 'HTML') {
+        myRow.find('[valuehtml]').removeAttr('notNeeded').attr('isNeeded', 1);
+    } else if (valueType != 'None') {
+        myRow.find('[valuetext]').removeAttr('notNeeded').attr('isNeeded', 1);
+        if (valueType == 'Integer') {
+            myRow.find('[valuetext]').attr('size', 4);
+        } else {
+            myRow.find('[valuetext]').attr('size', 30);
+        }
+    }
+
+    myRow.find('input[notNeeded],select[notNeeded],textarea[notNeeded]').prop('required', false);
+    myRow.find('input[notNeeded],select[notNeeded],textarea[notNeeded]').prop('disabled', true);
+    myRow.find('[notNeeded]').hide();
+    myRow.find('input[isNeeded],select[isNeeded],textarea[isNeeded]').prop('required', true);
+    myRow.find('input[isNeeded],select[isNeeded],textarea[isNeeded]').prop('disabled', false);
+    myRow.find('[isNeeded]').show();
+
+%# Only enable the rich text editor when we might need it
+    if (valueType == 'HTML' && CKEDITOR && myRow.find('[valuehtml]').attr('richText') != 1) {
+        CKEDITOR.replace(myRow.find('[valuehtml] textarea').first().attr('name'),{ width: '100%', height: RT.Config.MessageBoxRichTextHeight });
+        myRow.find('[valuehtml]').attr('richText', 1);
+    }
+}
+\
+function filterRuleActionRemove () {
+    if (!confirm(<%loc('Remove this action - are you sure?')|j%>))
+        return;
+    var myTable = jQuery(this).parents('table').first();
+    jQuery(this).parents('tr').first().remove();
+    if (myTable.find('tr').length < 2) {
+        myTable.find('tr[emptymarker]').show();
+    }
+}
+\
+function onTriggerTypeChange () {
+    var triggerType = jQuery('#TriggerType').val();
+    jQuery('select[settype] option').each(function () {
+        if (jQuery(this).attr('triggertypes').includes(triggerType)) {
+            jQuery(this).prop('disabled', false);
+        } else {
+            jQuery(this).prop('disabled', true);
+        }
+    });
+}
+\
+jQuery(function () {
+    jQuery('button[action=AddCondition]').on('click', function () { addFilterRuleCondition(jQuery(this).parents('td[conditionset]').first().attr('conditionset')); });
+    jQuery('button[action=AddAction]').on('click', function () { addFilterRuleAction(); });
+    jQuery('#TriggerType').on('change', onTriggerTypeChange);
+\
+\
+<%perl>
+    # Pre-populate the requirements and conflicts.
+
+    sub escapeJS {
+        my ($text) = @_;
+        $text =~ s/\\/\\\\/sg;
+        $text =~ s/\r//sg;
+        $text =~ s/\n/\\n/sg;
+        $text =~ s/'/\\'/sg;
+        $text =~ s/"/\\"/sg;
+
+        return "'" . $text . "'";
+    }
+
+    foreach my $ConditionSet ( 'Conflicts', 'Requirements' ) {
+        last if (not $FilterRule);
+        last if (not $FilterRule->id);
+        foreach my $Condition ( $FilterRule->$ConditionSet() ) {
+            my @Values = $Condition->Values;
+            $Values[0] = '' if ( not defined $Values[0] );
+            $m->out(
+                '    addFilterRuleCondition('
+                    . join(
+                    ', ',
+                    map { escapeJS($_) } (
+                        $ConditionSet,
+                        $Condition->CustomField   || '',
+                        $Condition->ConditionType || '',
+                        $Values[0],
+                        $Values[0],
+                        $Values[0]
+                        )
+                    )
+                    . ');' . "\n"
+                   );
+            shift @Values;
+            foreach ( grep { defined $_ } @Values ) {
+                $m->out(  '    filterRuleConditionAddValue('
+                        . escapeJS($ConditionSet)
+                        . ', countFilterRuleFields'
+                        . ( ( ', ' . escapeJS($_) ) x 3 ) . ');'
+                        . "\n" );
+            }
+        }
+    }
+
+    # Pre-populate the actions.
+
+    my @ActionsToList = ();
+    @ActionsToList = $FilterRule->Actions()
+        if ( $FilterRule && $FilterRule->id );
+    foreach my $Action (@ActionsToList) {
+        $m->out(
+            '    addFilterRuleAction('
+                . join(
+                ', ',
+                map { escapeJS($_) } (
+                    $Action->ActionType,
+                    $Action->CustomField || '',
+                    $Action->Value       || '',
+                    $Action->Notify      || ''
+                )
+                )
+                . ");\n"
+               );
+    }
+</%perl>
+\
+});
+</script>
+% }
+\
+% if ( $CanDelete && not $Create ) {
+<div style="text-align:right;margin-top:4em;">
+<form action="<%$PageLink%>" method="post">
+<input type="hidden" name="id" value="<% $FilterRuleGroup->id %>" />
+<input type="hidden" name="Rule" value="<% $FilterRule->id %>" />
+<div class="error" style="padding:0;display:inline-block;"><div class="error" style="padding:1em;border:solid #400 1px;text-align:left;display:inline-block;">
+<input type="submit" name="Delete" value="<&|/l&>Delete this filter rule</&>" />
+<br />
+<small><input type="checkbox" name="ConfirmDelete" value="1" /> <&|/l&>Check this box to confirm</&></small>
+</div></div>
+</form>
+</div>
+% }
+\
+% if ($FilterRule && $FilterRule->id) {
+<& /Elements/ShowHistory,
+    Object => $FilterRule,
+    ShowDisplayModes => 0,
+    DisplayPath => $PageLink,
+&>
+% }
+
+<%method Post>
+<%doc>
+Handle form submission to the rule editor, by creating, modifying, or
+deleting a rule as appropriate.
+</%doc>
+\
+<%ARGS>
+$ARGSRef         => {}
+$FilterRuleGroup => undef
+$Edit            => 'GroupRequirements'
+$Results         => []
+</%ARGS>
+\
+<%INIT>
+return if ( not $FilterRuleGroup );
+return if ( $ARGSRef->{'Create'} );
+return if ( $ARGSRef->{'ModifyRule'} && ( not $ARGSRef->{'Rule'} ) );
+
+my $CanSee    = $FilterRuleGroup->CurrentUserHasRight('SeeFilterRule');
+my $CanModify = $FilterRuleGroup->CurrentUserHasRight('ModifyFilterRule');
+my $CanCreate = $FilterRuleGroup->CurrentUserHasRight('CreateFilterRule');
+my $CanDelete = $FilterRuleGroup->CurrentUserHasRight('DeleteFilterRule');
+
+$CanSee = $CanModify = $CanCreate = $CanDelete = 1
+    if ( $session{'CurrentUser'}
+    ->HasRight( Right => 'SuperUser', Object => RT->System ) );
+
+# Load the filter rule we're going to need, if modifying / moving
+#
+my $FilterRule = undef;
+my $LoadRule   = undef;
+if ( $ARGSRef->{'ModifyRule'} && ( $ARGSRef->{'Rule'} ne 'new' ) ) {
+    $LoadRule = $ARGSRef->{'Rule'};
+} elsif ( $ARGSRef->{'Delete'} && $ARGSRef->{'Rule'} ) {
+    $LoadRule = $ARGSRef->{'Rule'};
+} elsif ( $ARGSRef->{'MoveUp'} ) {
+    $LoadRule = $ARGSRef->{'MoveUp'};
+} elsif ( $ARGSRef->{'MoveDown'} ) {
+    $LoadRule = $ARGSRef->{'MoveDown'};
+}
+if ($LoadRule) {
+    $FilterRule = RT::FilterRule->new( $session{'CurrentUser'} );
+    if ( not $FilterRule->Load($LoadRule) ) {
+        push @$Results, loc( 'Failed to load filter rule [_1]', $LoadRule );
+        return;
+    }
+    if ( $FilterRule->FilterRuleGroupObj->id != $FilterRuleGroup->id ) {
+        push @$Results,
+            loc( 'Filter rule [_1] is not part of filter rule group [_2]',
+            $LoadRule, $FilterRuleGroup->id );
+        return;
+    }
+
+    if ( $Edit eq 'GroupRequirements' ) {
+        if ( not $FilterRule->IsGroupRequirement ) {
+            push @$Results,
+                loc(
+                'Filter rule [_1] is not a requirement rule of filter rule group [_2]',
+                $LoadRule, $FilterRuleGroup->id
+                );
+            return;
+        }
+    } else {
+        if ( $FilterRule->IsGroupRequirement ) {
+            push @$Results,
+                loc(
+                'Filter rule [_1] is not a filter rule of filter rule group [_2]',
+                $LoadRule, $FilterRuleGroup->id
+                );
+            return;
+        }
+    }
+}
+
+if (   $FilterRule
+    && $FilterRule->id
+    && $ARGSRef->{'Delete'}
+    && not $ARGSRef->{'ConfirmDelete'} )
+{
+    push @$Results, loc('Not deleted - confirmation box not checked');
+    return;
+} elsif ( $FilterRule
+    && $FilterRule->id
+    && $ARGSRef->{'Delete'}
+    && $ARGSRef->{'ConfirmDelete'}
+    && not $CanDelete )
+{
+    push @$Results, loc('Permission denied');
+    return;
+} elsif ( $FilterRule
+    && $FilterRule->id
+    && $ARGSRef->{'Delete'}
+    && $ARGSRef->{'ConfirmDelete'} )
+{
+    my ( $ok, $msg ) = $FilterRule->Delete();
+    push @$Results, $msg;
+    if ($ok) {
+        $ARGSRef->{'Create'} = 1;
+        delete $ARGSRef->{'Rule'};
+    }
+    return;
+}
+
+# Parse form submissions to build up a new list of requirements, conflicts,
+# and actions.
+#
+
+my %ParsedSubmissions
+    = ( 'Conflicts' => [], 'Requirements' => [], 'Actions' => [] );
+
+foreach my $ConditionSet ( 'Conflicts', 'Requirements' ) {
+    foreach (
+        sort {
+            my ( $x, $y ) = ( $a, $b );
+            $x =~ s/([0-9]+)/sprintf('%09d',$1)/ge;
+            $y =~ s/([0-9]+)/sprintf('%09d',$1)/ge;
+            $x cmp $y
+        } grep {
+            /^\Q$ConditionSet\E-\d+-ConditionType/
+        } keys %$ARGSRef
+        )
+    {
+        next if ( !/-(\d+)-/ );
+        my $FieldNum = $1;
+        my $Details  = {
+            'ConditionType' => $ARGSRef->{ $ConditionSet . '-'
+                    . $FieldNum
+                    . '-ConditionType' },
+            'CustomField' => $ARGSRef->{ $ConditionSet . '-'
+                    . $FieldNum
+                    . '-CustomField' },
+            'Values' => []
+        };
+        foreach (
+            sort {
+                my ( $x, $y ) = ( $a, $b );
+                $x =~ s/([0-9]+)/sprintf('%09d',$1)/ge;
+                $y =~ s/([0-9]+)/sprintf('%09d',$1)/ge;
+                $x cmp $y
+            } grep {
+                /^\Q$ConditionSet\E-\Q$FieldNum\E-[A-Za-z]+-\d+/
+            } keys %$ARGSRef
+            )
+        {
+            next if ( !/-(\d+)$/ );
+            my $ValueNum = $1;
+            my $Value    = undef;
+            foreach ( 'ValueText', 'ValueQueue', 'ValueStatus' ) {
+                my $ValueField
+                    = $ConditionSet . '-'
+                    . $FieldNum . '-'
+                    . $_ . '-'
+                    . $ValueNum;
+                next if ( not exists $ARGSRef->{$ValueField} );
+                $Value = $ARGSRef->{$ValueField};
+                last;
+            }
+            push @{ $Details->{'Values'} }, $Value if ( defined $Value );
+        }
+
+        push @{ $ParsedSubmissions{$ConditionSet} },
+            RT::FilterRule::Condition->new( $session{'CurrentUser'},
+            %$Details );
+    }
+}
+
+foreach (
+    sort {
+        my ( $x, $y ) = ( $a, $b );
+        $x =~ s/([0-9]+)/sprintf('%09d',$1)/ge;
+        $y =~ s/([0-9]+)/sprintf('%09d',$1)/ge;
+        $x cmp $y
+    } grep {
+        /^Actions-\d+-ActionType/
+    } keys %$ARGSRef
+    )
+{
+    next if ( !/-(\d+)-/ );
+    my $FieldNum   = $1;
+    my $ActionType = $ARGSRef->{ 'Actions-' . $FieldNum . '-ActionType' }
+        || '';
+    my $ValueType = $ARGSRef->{ 'Actions-' . $FieldNum . '-ValueType' } || '';
+
+    my $Details = {
+        'ActionType' => $ActionType,
+        'CustomField' =>
+            $ARGSRef->{ 'Actions-' . $FieldNum . '-CustomField' },
+        'Value'  => '',
+        'Notify' => ''
+    };
+
+    if ( $ActionType eq 'NotifyGroup' ) {
+        $Details->{'Notify'}
+            = $ARGSRef->{ 'Actions-' . $FieldNum . '-NotifyGroup' } || '';
+    } elsif ( $ActionType =~ /^Notify/ ) {
+        $Details->{'Notify'}
+            = $ARGSRef->{ 'Actions-' . $FieldNum . '-NotifyText' } || '';
+    }
+
+    $Details->{'Value'}
+        = $ARGSRef->{ 'Actions-' . $FieldNum . '-Value' . $ValueType }
+        || $ARGSRef->{ 'Actions-' . $FieldNum . '-ValueText' }
+        || '';
+
+    push @{ $ParsedSubmissions{'Actions'} },
+        RT::FilterRule::Action->new( $session{'CurrentUser'}, %$Details );
+}
+
+#
+# Now create or modify.
+#
+
+if (   $ARGSRef->{'ModifyRule'}
+    && ( $ARGSRef->{'Rule'} eq 'new' )
+    && not $CanCreate )
+{
+    push @$Results, loc('Permission denied');
+    return;
+} elsif ( $ARGSRef->{'ModifyRule'} && ( $ARGSRef->{'Rule'} eq 'new' ) ) {
+
+    # Create a new filter rule.
+    #
+    if ( not $CanCreate ) {
+        push @$Results, loc('Permission denied');
+        $ARGSRef->{'Create'} = 1;
+        return;
+    }
+
+    my %CreateArgs = (
+        'Name'          => $ARGSRef->{'Name'},
+        'TriggerType'   => $ARGSRef->{'TriggerType'},
+        'StopIfMatched' => $ARGSRef->{'StopIfMatched'} ? 1 : 0,
+        'Conflicts'     => $ParsedSubmissions{'Conflicts'},
+        'Requirements'  => $ParsedSubmissions{'Requirements'},
+        'Actions'       => $ParsedSubmissions{'Actions'},
+        'Disabled'      => $ARGSRef->{'Enabled'} ? 0 : 1,
+    );
+
+    my ( $ok, $msg );
+
+    if ( $Edit eq 'GroupRequirements' ) {
+        ( $ok, $msg ) = $FilterRuleGroup->AddGroupRequirement(%CreateArgs);
+    } else {
+        ( $ok, $msg ) = $FilterRuleGroup->AddFilterRule(%CreateArgs);
+    }
+    if ($ok) {
+        $ARGSRef->{'Rule'} = $ok;
+    } else {
+        $ARGSRef->{'Create'} = 1;
+    }
+    push @$Results, $msg;
+
+} elsif ( $ARGSRef->{'ModifyRule'} && not $CanModify ) {
+    push @$Results, loc('Permission denied');
+    return;
+} elsif ( $ARGSRef->{'MoveUp'} && not $CanModify ) {
+    push @$Results, loc('Permission denied');
+    return;
+} elsif ( $ARGSRef->{'MoveDown'} && not $CanModify ) {
+    push @$Results, loc('Permission denied');
+    return;
+} elsif ( $ARGSRef->{'ModifyRule'} ) {
+
+    # Modify an existing filter rule.
+    #
+    my @Attributes = qw(Name TriggerType StopIfMatched Disabled);
+
+    $ARGSRef->{'Disabled'} = $ARGSRef->{'Enabled'} ? 0 : 1;
+
+    push @$Results,
+        UpdateRecordObject(
+        AttributesRef => \@Attributes,
+        Object        => $FilterRule,
+        ARGSRef       => $ARGSRef
+        );
+
+    my ( $ok, $msg );
+
+    ( $ok, $msg )
+        = $FilterRule->SetConflicts( @{ $ParsedSubmissions{'Conflicts'} } );
+    push @$Results, $msg if ($msg);
+
+    ( $ok, $msg )
+        = $FilterRule->SetRequirements(
+        @{ $ParsedSubmissions{'Requirements'} } );
+    push @$Results, $msg if ($msg);
+
+    ( $ok, $msg )
+        = $FilterRule->SetActions( @{ $ParsedSubmissions{'Actions'} } );
+    push @$Results, $msg if ($msg);
+
+} elsif ( $ARGSRef->{'MoveUp'} ) {
+
+    # Move an existing filter rule up.
+    #
+    my ( $ok, $msg ) = $FilterRule->MoveUp;
+    push @$Results, $msg;
+
+} elsif ( $ARGSRef->{'MoveDown'} ) {
+
+    # Move an existing filter rule down.
+    #
+    my ( $ok, $msg ) = $FilterRule->MoveDown;
+    push @$Results, $msg;
+}
+
+return;
+</%INIT>
+</%method>

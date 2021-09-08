@@ -1,5 +1,8 @@
 Changelog for Catmandu-PICA
 
+1.07 2021-09-07T08:50:20Z
+  - Fix broken SRU importer for ppxml format
+
 1.06 2021-08-17T10:28:19Z
   - Fix broken SRU importer with PICA::Data >= 1.27
   - Fix pica_add and pica_set by refactoring

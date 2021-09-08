@@ -1,4 +1,6 @@
 Changes
+JSON-Parser-Regexp-0.09.tar.gz
+JSON-Parser-Regexp-0.11.tar.gz
 lib/JSON/Parser/Regexp.pm
 Makefile.PL
 MANIFEST

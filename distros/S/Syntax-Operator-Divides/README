@@ -1,0 +1,57 @@
+NAME
+
+    Syntax::Operator::Divides - an infix operator for division test
+
+SYNOPSIS
+
+    On a suitably-patched perl:
+
+       use Syntax::Operator::Divides;
+    
+       say "Multiple of 10" if $x %% 10;
+
+    Or, on a standard perl via Syntax::Keyword::Match:
+
+       use v5.14;
+       use Syntax::Keyword::Match;
+       use Syntax::Operator::Divides;
+    
+       foreach ( 1 .. 100 ) {
+          match( $_ : %% ) {
+             case(15) { say "FizzBuzz" }
+             case(3)  { say "Fizz" }
+             case(5)  { say "Buzz" }
+             default  { say $_ }
+          }
+       }
+
+DESCRIPTION
+
+    This module provides an infix operator that implements an integer
+    divides test which returns true if the lefthand operand is a whole
+    multiple of the righthand.
+
+    Current versions of perl do not directly support custom infix
+    operators. The documentation of XS::Parse::Infix describes the
+    situation, with reference to a branch experimenting with this new
+    feature. This module is therefore almost entirely useless on standard
+    perl builds. While the regular parser does not support custom infix
+    operators, they are supported via XS::Parse::Infix and hence
+    XS::Parse::Keyword, and so custom keywords which attempt to parse
+    operator syntax may be able to use it. One such module is
+    Syntax::Keyword::Match; see the SYNOPSIS example given above.
+
+OPERATORS
+
+ %%
+
+       my $divides = $numerator %% $denominator;
+
+    Yields true if the numerator operand is a whole integer multiple of the
+    denominator. This is implemented by using the % modulus operator and
+    testing if the remainder is zero.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

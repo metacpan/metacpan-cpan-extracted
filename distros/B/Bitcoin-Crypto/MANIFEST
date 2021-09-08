@@ -44,5 +44,6 @@ t/15-ExtPrivateKey.t
 t/16-BIP44.t
 t/30-key-derivation.t
 t/31-edge-cases.t
+xt/01-deterministic-signatures.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

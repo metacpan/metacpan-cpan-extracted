@@ -106,6 +106,11 @@ KEYWORDS
           }
        }
 
+    Since version 0.08 the operator syntax is parsed using
+    XS::Parse::Infix, meaning that custom infix operators can be
+    recognised, even on versions of perl that do not support the full
+    PL_infix_plugin mechanism.
+
  case
 
        case(VAL) { STATEMENTS... }

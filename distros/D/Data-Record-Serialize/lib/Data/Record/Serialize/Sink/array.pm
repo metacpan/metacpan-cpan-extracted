@@ -7,7 +7,7 @@ use Moo::Role;
 
 use Data::Record::Serialize::Error { errors => [ '::create' ] }, -all;
 
-our $VERSION = '0.28';
+our $VERSION = '0.30';
 
 use IO::File;
 
@@ -66,7 +66,7 @@ Data::Record::Serialize::Sink::array - append encoded data to an array.
 
 =head1 VERSION
 
-version 0.28
+version 0.30
 
 =head1 SYNOPSIS
 

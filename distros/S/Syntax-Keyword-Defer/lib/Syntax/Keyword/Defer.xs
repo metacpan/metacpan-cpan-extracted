@@ -102,9 +102,9 @@ static void forbid_ops(OP *body)
   }
 }
 
-static int build_defer(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hookdata)
+static int build_defer(pTHX_ OP **out, XSParseKeywordPiece *arg0, void *hookdata)
 {
-  OP *body = arg0.op;
+  OP *body = arg0->op;
 
   forbid_ops(body);
 
@@ -119,13 +119,13 @@ static int build_defer(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hookdata)
 
 static const struct XSParseKeywordHooks hooks_defer = {
   .permit_hintkey = "Syntax::Keyword::Defer/defer",
-  .piece1 = XS_PARSE_KEYWORD_BLOCK,
+  .piece1 = XPK_BLOCK,
   .build1 = &build_defer,
 };
 
 static const struct XSParseKeywordHooks hooks_finally = {
   .permit_hintkey = "Syntax::Keyword::Defer/finally",
-  .piece1 = XS_PARSE_KEYWORD_BLOCK,
+  .piece1 = XPK_BLOCK,
   .build1 = &build_defer,
 };
 
@@ -138,7 +138,7 @@ BOOT:
   XopENTRY_set(&xop_pushdefer, xop_class, OA_LOGOP);
   Perl_custom_op_register(aTHX_ &pp_pushdefer, &xop_pushdefer);
 
-  boot_xs_parse_keyword(0);
+  boot_xs_parse_keyword(0.13);
 
   register_xs_parse_keyword("defer", &hooks_defer, NULL);
   register_xs_parse_keyword("FINALLY", &hooks_finally, NULL);

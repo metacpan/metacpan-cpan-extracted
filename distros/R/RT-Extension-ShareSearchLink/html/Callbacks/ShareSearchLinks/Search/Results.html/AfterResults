@@ -1,0 +1,68 @@
+<%doc>
+Display the "Share a link" button after the search results.
+</%doc>
+\
+<%ARGS>
+$ARGSRef => {}
+</%ARGS>
+\
+<div>
+<form method="post" action="<%RT->Config->Get('WebPath')%>/Helpers/ShareSearchLinks" id="ShareSearchLinkForm" onsubmit="return ShareSearchLink();">
+% foreach (keys %$ARGSRef) {
+<input type="hidden" class="hidden" name="<%$_%>" value="<%$ARGSRef->{$_}%>" />
+% }
+<div class="form-row">
+  <div class="col-auto">
+    <input type="submit" class="button btn btn-primary form-control" value="<&|/l&>Share a link</&>" />
+  </div>
+</div>
+</form>
+</div>
+
+<script type="text/javascript">
+function ShareSearchLink () {
+    var modal = jQuery('<div></div>');
+    var loadingMessage = jQuery('<p></p>');
+    modal.addClass('modal');
+    loadingMessage.addClass('transient-loading-message');
+    loadingMessage.text(<%loc('Loading')|j%>);
+    modal.append(loadingMessage);
+    modal.appendTo('body');
+    modal.bind('modal:close', function(ev) { modal.remove(); })
+    modal.on('hide.bs.modal', function(ev) { modal.remove(); })
+    modal.modal('show');
+    jQuery.ajax({
+        url: jQuery('#ShareSearchLinkForm').attr('action'),
+        method: 'POST',
+        dataType: 'html',
+        data: jQuery('#ShareSearchLinkForm').serialize(),
+        success: function (html) {
+\
+%# We remove the loading message and append the new content, rather than
+%# replacing all the HTML, because in RT 4.2.16 if we do that we lose the
+%# modal dialog's close icon.
+%#
+            modal.find('.transient-loading-message').remove();
+            modal.append(jQuery(html));
+\
+%# The button in the HTML we've just loaded has an href containing a
+%# relative URL.  We create a new "a" tag, set its "href", and clone it,
+%# because reading the cloned tag's "href" attribute gives us the full
+%# canonical URL.
+            var a = document.createElement('a');
+            a.href = jQuery('#NewShareSearchLink').attr('href');
+            var fullURL = a.cloneNode(false).href;
+\
+%# Now we can put the full URL of the shared search link into the text box
+%# for the user to cut and paste.
+%#
+            jQuery('#NewShareSearchLinkInput').val(fullURL);
+        },
+    });
+    return false;
+}
+function CopyNewSharedSearchLink () {
+    jQuery('#NewShareSearchLinkInput').select();
+    try { document.execCommand('copy'); } catch (e) { }
+}
+</script>

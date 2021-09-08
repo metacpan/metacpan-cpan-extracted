@@ -4,7 +4,7 @@
       "John Napiorkowski <jjnapiork@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -38,7 +38,7 @@
             "Role::Tiny::With" : "0",
             "Scalar::Util" : "1.55",
             "String::CamelCase" : "0",
-            "Sub::Exporter" : "0",
+            "Sub::Util" : "0",
             "Text::Autoformat" : "0",
             "namespace::autoclean" : "0",
             "overload" : "0"
@@ -51,6 +51,7 @@
             "DateTime" : "0",
             "DateTime::Format::Strptime" : "0",
             "Moo" : "2.004004",
+            "MooseX::MarkAsMethods" : "0",
             "MooseX::NonMoose" : "0.26",
             "Test::DBIx::Class" : "0.52",
             "Test::Lib" : "0.002",
@@ -72,8 +73,9 @@
          "web" : "https://github.com/jjn1056/Valiant"
       }
    },
-   "version" : "0.001006",
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+   "version" : "0.001007",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

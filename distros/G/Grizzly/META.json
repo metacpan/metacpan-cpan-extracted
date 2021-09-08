@@ -1,0 +1,57 @@
+{
+   "abstract" : "Grizzly - A command-line interface for looking up stock quote.",
+   "author" : [
+      "Nobunaga <nobunaga@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Grizzly",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Cmd::Setup" : "0",
+            "Finance::Quote" : "0",
+            "FindBin" : "0",
+            "Term::Clear" : "0",
+            "Term::ProgressBar" : "2.00",
+            "Web::NewsAPI" : "0",
+            "constant" : "0",
+            "lib" : "0",
+            "open" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "App::Cmd::Tester" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/iamllcoolray/grizzly.git",
+         "web" : "https://github.com/iamllcoolray/grizzly"
+      }
+   },
+   "version" : "0.102",
+   "x_generated_by_perl" : "v5.32.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "MIT"
+}
+

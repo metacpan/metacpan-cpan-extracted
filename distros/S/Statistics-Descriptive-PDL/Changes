@@ -1,0 +1,23 @@
+Revision history for Statistics-Descriptive-PDL
+
+0.07    2021-09-06
+        Another attempt to fix precision related test failures
+
+0.06    2021-09-06
+        Track down more sclr calls to work on PDL earlier than 2.056
+
+0.05    2021-09-05
+        Missed one test failure in 0.04.
+
+0.04    2021-09-05
+        Fix several CPAN test failures.  Thanks to SREZIC for reporting.
+
+0.03    2021-09-05
+        Add repo info to Makefile.PL
+
+0.02    2021-09-05
+        Finally get back to it.
+
+0.01    2015-07-19
+        First version.
+

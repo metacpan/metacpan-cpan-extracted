@@ -3,9 +3,9 @@
 #
 #  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.27;
+use Object::Pad 0.51;
 
-package Tickit::Widget::Border 0.32;
+package Tickit::Widget::Border 0.33;
 class Tickit::Widget::Border
    extends Tickit::SingleChildWidget;
 
@@ -65,11 +65,11 @@ has $_bottom_border :reader = 0;
 has $_left_border   :reader = 0;
 has $_right_border  :reader = 0;
 
-BUILD
+ADJUSTPARAMS
 {
-   my %params = @_;
+   my ( $params ) = @_;
 
-   defined $params{$_} and $self->${\"set_$_"}( delete $params{$_} ) for qw(
+   defined $params->{$_} and $self->${\"set_$_"}( delete $params->{$_} ) for qw(
       border
       h_border v_border
       top_border bottom_border left_border right_border

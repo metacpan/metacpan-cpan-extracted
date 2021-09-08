@@ -3,10 +3,10 @@ use utf8;
 use Moose;
 use Module::Load          qw/load/;
 use Date::Calc            qw/Add_Delta_Days/;
-use POSIX                 qw/strftime/;
+use POSIX                 qw/strftime modf/;
 use feature 'state';
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 #======================================================================
 # ATTRIBUTES
@@ -131,8 +131,7 @@ sub formatted_date {
   my ($self, $val, $date_format, $date_formatter) = @_;
 
   # separate date (integer part) from time (fractional part)
-  my $n_days = int($val);
-  my $time   = $val - $n_days;
+  my ($time, $n_days) = modf($val);
 
   # Convert $n_days into a date in Date::Calc format (year, month, day).
   # The algorithm is quite odd because in the 1900 system, 01.01.1900 == 0 while
@@ -146,17 +145,32 @@ sub formatted_date {
   my @d = Add_Delta_Days($base_year, 1, 1, $n_days);
 
   # decode the fractional part (the time) into hours, minutes, seconds, milliseconds
+  my @t;
   foreach my $subdivision (24, 60, 60, 1000) {
-    $time            *= $subdivision;
-    my $time_portion  = int($time);
-    $time            -= $time_portion;
-    push @d, $time_portion; # date
+    $time                    *= $subdivision;
+    ($time, my $time_portion) = modf($time);
+    push @t, $time_portion;
   }
+
+  # dirty hack to deal with float imprecisions : if 999 millisecs, round to the next second
+  my ($h, $m, $s, $ms) = @t;
+  if ($ms == 999) {
+    $s += 1, $ms = 0;
+    if ($s == 60) {
+      $m += 1, $s = 0;
+      if ($m == 60) {
+        $h += 1, $m = 0;
+      }
+    }
+  }
+  # NOTE : because of this hack, theoretically we could end up with a value
+  # like 01.01.2000 24:00:00, semantically equal to 02.01.2000 00:00:00 but different
+  # in its rendering.
 
   # call the date_formatter subroutine
   $date_formatter //= $self->date_formatter
     or die ref($self) . " has no date_formatter subroutine";
-  my $formatted_date = $date_formatter->($date_format, @d);
+  my $formatted_date = $date_formatter->($date_format, @d, $h, $m, $s, $ms);
 
   return $formatted_date;
 }
@@ -167,6 +181,7 @@ sub formatted_date {
 __END__
 
 =head1 NAME
+
 
 Excel::ValueReader::XLSX - extracting values from Excel workbooks in XLSX format, fast
 

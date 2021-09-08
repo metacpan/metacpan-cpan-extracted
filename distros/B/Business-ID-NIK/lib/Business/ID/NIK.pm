@@ -1,19 +1,21 @@
 package Business::ID::NIK;
 
-our $DATE = '2018-07-01'; # DATE
-our $VERSION = '0.093'; # VERSION
-
 use 5.010001;
 use warnings;
 use strict;
 
 use DateTime;
-use Locale::ID::Locality qw(list_id_localities);
-use Locale::ID::Province qw(list_id_provinces);
+use Locale::ID::Locality qw(list_idn_localities);
+use Locale::ID::Province qw(list_idn_provinces);
 
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(parse_nik);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-08-31'; # DATE
+our $DIST = 'Business-ID-NIK'; # DIST
+our $VERSION = '0.094'; # VERSION
 
 our %SPEC;
 
@@ -46,7 +48,7 @@ sub parse_nik {
 
     state $provinces;
     if (!$provinces) {
-        my $res = list_id_provinces(detail => 1);
+        my $res = list_idn_provinces(detail => 1);
         return [500, "Can't get list of provinces: $res->[0] - $res->[1]"]
             if $res->[0] != 200;
         $provinces = { map {$_->{bps_code} => $_} @{$res->[2]} };
@@ -68,7 +70,7 @@ sub parse_nik {
 
     $res->{loc_code}  = substr($nik, 0, 4);
     if ($args{check_locality} // 1) {
-        my $lres = list_id_localities(
+        my $lres = list_idn_localities(
             detail => 1, bps_code => $res->{loc_code});
         return [500, "Can't check locality: $lres->[0] - $lres->[1]"]
             unless $lres->[0] == 200;
@@ -115,7 +117,7 @@ Business::ID::NIK - Parse Indonesian citizenship registration number (NIK)
 
 =head1 VERSION
 
-This document describes version 0.093 of Business::ID::NIK (from Perl distribution Business-ID-NIK), released on 2018-07-01.
+This document describes version 0.094 of Business::ID::NIK (from Perl distribution Business-ID-NIK), released on 2021-08-31.
 
 =head1 SYNOPSIS
 
@@ -147,7 +149,7 @@ female), ssss is 4-digit serial starting from 1.
 
 Usage:
 
- parse_nik(%args) -> [status, msg, result, meta]
+ parse_nik(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Parse Indonesian citizenship registration number (NIK).
 
@@ -161,17 +163,22 @@ Examples:
 
 Result:
 
- {
-   dob => "2001-01-01",
-   gender => "M",
-   loc_code => 3273,
-   loc_ind_name => "BANDUNG",
-   loc_type => 1,
-   prov_code => 32,
-   prov_eng_name => "West Java",
-   prov_ind_name => "Jawa Barat",
-   serial => "0001",
- }
+ [
+   200,
+   "OK",
+   {
+     dob => "2001-01-01",
+     gender => "M",
+     loc_code => 3273,
+     loc_ind_name => "BANDUNG",
+     loc_type => 1,
+     prov_code => 32,
+     prov_eng_name => "West Java",
+     prov_ind_name => "Jawa Barat",
+     serial => "0001",
+   },
+   {},
+ ]
 
 =item * Example #2:
 
@@ -179,17 +186,22 @@ Result:
 
 Result:
 
- {
-   dob => "2001-01-31",
-   gender => "F",
-   loc_code => 3273,
-   loc_ind_name => "BANDUNG",
-   loc_type => 1,
-   prov_code => 32,
-   prov_eng_name => "West Java",
-   prov_ind_name => "Jawa Barat",
-   serial => "0001",
- }
+ [
+   200,
+   "OK",
+   {
+     dob => "2001-01-31",
+     gender => "F",
+     loc_code => 3273,
+     loc_ind_name => "BANDUNG",
+     loc_type => 1,
+     prov_code => 32,
+     prov_eng_name => "West Java",
+     prov_ind_name => "Jawa Barat",
+     serial => "0001",
+   },
+   {},
+ ]
 
 =back
 
@@ -211,16 +223,17 @@ Whether to check for known province codes.
 
 Input NIK to be validated.
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -232,14 +245,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Business-I
 
 Source repository is at L<https://github.com/perlancar/perl-Business-ID-NIK>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Business-ID-NIK>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Business::ID::NKK> to parse family card number (nomor kartu keluarga, nomor
@@ -249,11 +254,52 @@ KK, NKK)
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTORS
+
+=for stopwords Steven Haryanto (on PC)
+
+=over 4
+
+=item *
+
+Steven Haryanto (on PC) <stevenharyanto@gmail.com>
+
+=item *
+
+Steven Haryanto <steven@masterweb.net>
+
+=back
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2018, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Business-ID-NIK>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

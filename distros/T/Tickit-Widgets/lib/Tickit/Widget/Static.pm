@@ -3,9 +3,9 @@
 #
 #  (C) Paul Evans, 2009-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.41;  # :param
+use Object::Pad 0.51;
 
-package Tickit::Widget::Static 0.53;
+package Tickit::Widget::Static 0.54;
 class Tickit::Widget::Static
    extends Tickit::Widget;
 
@@ -92,15 +92,13 @@ For more details see the accessors below.
 has @_lines;
 has $_on_click :reader :writer :param = undef;
 
-BUILD
+ADJUSTPARAMS
 {
-   my %params = @_;
+   my ( $params ) = @_;
 
-   $self->set_text( $params{text} );
-   $self->set_align( $params{align} || 0 );
-   $self->set_valign( $params{valign} || 0 );
-
-   return $self;
+   $self->set_text( delete $params->{text} );
+   $self->set_align( delete $params->{align} || 0 );
+   $self->set_valign( delete $params->{valign} || 0 );
 }
 
 =head1 ACCESSORS

@@ -3,9 +3,10 @@
 use Test2::V0;
 
 use Config::XrmDatabase;
+use Config::XrmDatabase::Util ':funcs';
 
-*parse    = \&Config::XrmDatabase::_parse_resource_name;
-*parse_fq = \&Config::XrmDatabase::_parse_fq_resource_name;
+*parse    = \&parse_resource_name;
+*parse_fq = \&parse_fq_resource_name;
 
 # xmh*Paned*activeForeground:     red
 # *incorporate.Foreground:     blue

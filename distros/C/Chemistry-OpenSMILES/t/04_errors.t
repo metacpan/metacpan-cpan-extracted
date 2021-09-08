@@ -24,6 +24,8 @@ my %cases = (
 plan tests => scalar keys %cases;
 
 for (sort keys %cases) {
+    'intentionally polluting $1' =~ /(\S+)/;
+
     my $error;
     eval {
         my $parser = Chemistry::OpenSMILES::Parser->new;

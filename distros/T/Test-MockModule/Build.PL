@@ -24,7 +24,7 @@ my $builder = Module::Build->new(
 		'Scalar::Util'        => 0,
 		'SUPER'               => '1.20',
 	},
-	build_requires => {
+	test_requires => {
 		'Test::More'          => 0.88,
 		'Test::Warnings'      => 0
 	},

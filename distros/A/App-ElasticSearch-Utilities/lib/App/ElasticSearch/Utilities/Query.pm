@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::Query;
 use strict;
 use warnings;
 
-our $VERSION = '8.0'; # VERSION
+our $VERSION = '8.1'; # VERSION
 
 use App::ElasticSearch::Utilities qw(es_request es_indices);
 use App::ElasticSearch::Utilities::Aggregations;
@@ -49,6 +49,11 @@ has scroll_id => (
 
 
 
+has 'minimum_should_match' => (
+    is  => 'rw',
+    isa => Str,
+);
+
 my %QUERY = (
     must        => { isa => ArrayRef, coerce => $TO{array_ref} },
     must_not    => { isa => ArrayRef, coerce => $TO{array_ref} },
@@ -56,8 +61,8 @@ my %QUERY = (
     filter      => { isa => ArrayRef, coerce => $TO{array_ref} },
     nested      => { isa => HashRef },
     nested_path => { isa => Str },
-    minimum_should_match => { isa => Str },
 );
+
 
 
 my %REQUEST_BODY = (
@@ -220,7 +225,9 @@ sub query {
         };
     }
     else {
-        my %bool = ();
+        my %bool = (
+            $self->minimum_should_match ? ( minimum_should_match => $self->minimum_should_match ) : (),
+        );
         foreach my $k (keys %QUERY) {
             next if $k =~ /^nested/;
             $bool{$k} = [];
@@ -388,7 +395,7 @@ App::ElasticSearch::Utilities::Query - Object representing ES Queries
 
 =head1 VERSION
 
-version 8.0
+version 8.1
 
 =head1 ATTRIBUTES
 
@@ -420,11 +427,6 @@ Can be set using set_must_not and is a valid init_arg.
 The should section of a bool query as an array reference.  See: L<add_bool>
 Can be set using set_should and is a valid init_arg.
 
-=head2 minimum_should_match
-
-A string defining the minimum number of should conditions to qualify a match.
-See L<https://www.elastic.co/guide/en/elasticsearch/reference/7.3/query-dsl-minimum-should-match.html>
-
 =head2 filter
 
 The filter section of a bool query as an array reference.  See: L<add_bool>
@@ -438,6 +440,11 @@ on the nested queries.
 =head2 nested_path
 
 The path by being nested, only used in nested queries.
+
+=head2 minimum_should_match
+
+A string defining the minimum number of should conditions to qualify a match.
+See L<https://www.elastic.co/guide/en/elasticsearch/reference/7.3/query-dsl-minimum-should-match.html>
 
 =head2 from
 

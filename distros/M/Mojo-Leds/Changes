@@ -1,15 +1,16 @@
 Changelog for Mojo-Leds
 
+1.08 2021-09-06T14:33:00
+ - Moved from travis CI to GitHub workflow.
+
 1.07 2021-08-09T22:33:53
- - [Minor] Update version number
  - Add comments to some plugins previously loaded in default app but not
    installed by default in the installation of Mojo::Leds
- - docker now create a default app using leds_app command
+ - Docker now create a default app using leds_app command
 
 1.06 2021-08-05T17:12:30
  - Add command leds_app to generate application directory structures for
    fully functional Mojo::Leds applications
- - [Minor]: Pod syntax error
 
 1.05 2021-08-05T15:14:12
  - Add documentation
@@ -17,31 +18,18 @@ Changelog for Mojo-Leds
  - Moved duplicated code from Rest/*.pm to Rest.pm
 
 1.04 2021-08-04T13:49:22
- - [Minor] Removed Test::Needs for imcompatibility with Dist::Zilla. Manual
-   check of modules in tests
- - [Minor] Travis perl version changed
- - [Minor] Reduced loaded modules
  - Reduced number of prereqs
- - [Minor] Renamed tests
- - [Minor] cosmetic changes to the error pages
  - Solved a bug where keys is used with a scalar
 
 1.03 2021-08-03T17:07:50
  - Add test for server errors
- - [Minor] Add background images to customized server error code
  - Add customized server errors (404, 500) pages
- - [Minor] Removed comments
- - [Minor] Changes
  - Removed recursive load of config file
  - DBIx fully implemented
- - Riorganizzazione librerie REST e attuale implementazione parziale della
-   libreria M::L::Rest::DBIx
  - Add Rest module for Class::DBIx interface
  - Removed two required plugins that was required only for tests and can be
    optionally installed to use Mojo::Leds with MongoDB or other DB
    (M::P::Restify::OtherActions and M::P::Mongodbv2)
- - [Minor] Add Dockerfile
- - [Minor] Add $...::VERSION to modules
 
 1.02 2021-07-28T12:20:57
  - Better identification of static files managed by controller (e.g. .js,
@@ -49,7 +37,6 @@ Changelog for Mojo-Leds
  - Add minimum version for perl owing to s///r usage in Page.pm
 
 1.01 2021-07-27T15:56:12
- - [Minor] cosmetic changes
  - Log to file in configuration. If no log path configuration, no log to
    file
  - Solved a bug that incorrect route file with extension .css/.js/.txt
@@ -58,7 +45,6 @@ Changelog for Mojo-Leds
  - Update number version to major release
 
 0.03 2021-07-27T13:53:58
- - [Minor] Update GitHub badge
  - Removed a bug for Mojolicious > 9.00
  - Remove given/when constructs
  - Trying to resolve when/given experimental warnings
@@ -67,7 +53,6 @@ Changelog for Mojo-Leds
  - Applied perltidy to perl scripts
  - Now the configuration element 'plugins' is compatible with Mojolicious
    9.0. Add support for this parameter in previous versions
- - [MINOR] Add Readme
 
 0.01 2021-07-26T16:00:28
  - First Import

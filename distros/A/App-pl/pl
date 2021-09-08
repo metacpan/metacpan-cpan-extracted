@@ -2,9 +2,8 @@
 
 # Beware: DON'T PERFORM ANY ACTIONS AT TOP LEVEL: this file runs many times under -n!
 
-our $VERSION;
 BEGIN {
-    $VERSION = '0.59.0';
+    $pl::VERSION = 'v0.61.0';
     my $execed = shift if @ARGV && $ARGV[0] eq '+'; # don't recursively call perl again for -p
     return unless @ARGV and $ARGV[0] =~ /^-/s;
     my $onepl = qr/[oOrhv?]|[pP](?:[1-9][0-9]*)?/; # simple pl opts, reflect these in pod/html
@@ -78,14 +77,6 @@ BEGIN {
 
 use strict;
 
-{
-    package Data::Dumper;
-    our $Deparse = 1;
-    our $Quotekeys = 0;
-    our $Sortkeys = sub { [&pl::sort_keys] };
-    our $Terse = 1;
-}
-
 #use warnings;
 
 use feature ':'.substr $^V, 1; # Enable latest optional features.
@@ -93,6 +84,16 @@ use sort 'stable';
 
 use List::Util;
 use List::Util @List::Util::EXPORT_OK;
+BEGIN {
+    if( $] lt '5.02' ) {
+	*any = sub(&@) { my $prog = shift; &$prog && return 1 for @_ };
+	*all = sub(&@) { my $prog = shift; &$prog || return for @_; 1 };
+	*none = sub(&@) { my $prog = shift; &$prog && return for @_; 1 };
+	*notall = sub(&@) { my $prog = shift; &$prog || return 1 for @_ };
+	*product = sub(@) { reduce { $a * $b } 1, @_ };
+	*sum0 = sub(@) { sum 0, @_ } if !defined \&sum0;
+    }
+}
 
 
 our( $A, @A,
@@ -356,6 +357,7 @@ Predefined functions:
   E arg...          same, but no newline
   f fmt, arg...     format prettified args with newline
   F fmt, arg...     same, but no newline
+  h ip|name...      dns-lookup as hosts file
   I [arg...][, tz]  Isodate (from arg [s, us], s{.us}, offset [+-]s{.us}, tz ([+-]0-14{:mm|.ff})
   k [key, value]    store value or chomped $_ in $K{key or $1}[$I] for keydiff
   K [number, value] same, but key is $F[number] or $F[0]
@@ -439,17 +441,37 @@ EOF
     sub keydiff() {
 	goto &_keydiff if $c{E} && eval { require Algorithm::Diff };
 	for my $key ( sort_keys %::KEYDIFF ) {
-	    my( $same, $str ) = 1;
 	    $#{$::KEYDIFF{$key}} = $ARGIND - 1; # lengthen list if needed
-	    for( @{$::KEYDIFF{$key}} ) {
-		$str ||= $_ // '$pl::n_a';
-		$same = $str eq ($_ // '$pl::n_a');
-		last unless $same;
-	    }
-	    next if $same;
+	    my $str;
+	    next if ::all { ($str ||= $_) eq $_ if defined } @{$::KEYDIFF{$key}};
 	    say "$c{B}$key$c{E}";
-	    say defined() ? "\t$_" : "\t$c{I}n/a$c{E}"
-		for @{$::KEYDIFF{$key}};
+	    my( $begin, $end );
+	    if( $c{E} ) {
+		for( @{$::KEYDIFF{$key}} ) {
+		    if( !defined ) {
+		    } elsif( defined $end ) {
+			chop $begin while length $begin and !/\A\Q$begin/;
+			#substr( $begin, -1 ) = '' until !length $begin or /^\Q$begin/;
+			substr( $end, 0, 1 ) = '' while length $end and !/\Q$end\E\Z/;
+		    } else {
+			$begin = $end = $_;
+		    }
+		}
+		$begin = length $begin;
+		$end = length $end;
+		#$_ = length for $begin, $end;
+	    }
+	    say "\t",
+	      !defined() ? "$c{I}n/a$c{E}" :
+	      !defined( $end ) ? $_ :
+	      $begin == length() ? "$c{G}$_$c{E}" :
+
+	      ($begin ? $c{G} . substr( $_, 0, $begin ) : '') .
+	      $c{R} . substr( $_, $begin, length() - $begin - $end ) .
+	      ($end ? $c{G} . substr $_, length() - $end : '') .
+	      $c{E}
+
+	      for @{$::KEYDIFF{$key}};
 	}
     }
     sub _keydiff() {
@@ -576,7 +598,7 @@ BEGIN {
 		help undef;
 		exit;
 	    } elsif( /v/ ) {
-		say "This is pl v$VERSION, with perl $^V
+		say "This is pl $pl::VERSION, with perl $^V
 
 Copyright 1997-2020, Daniel Pfeiffer
 
@@ -638,6 +660,9 @@ GNU General Public License, which may be found in the Perl 5 source kit.";
     @pl::c{qw(B I G R E)} = $pl::c // (-t STDOUT && $^O !~ /^MSWin/) ?
       map "\e[${_}m", 1, 3, 32, 31, '' :
       ('')x5;
+
+    package Data::Dumper;
+    our( $Deparse, $Quotekeys, $Terse, $Sortkeys ) = (1, 0, 1, sub { [&pl::sort_keys] });
 }
 &pl::prog; # will be called repeatedly if -n
 
@@ -721,8 +746,8 @@ quotes mimic Shell quotes, so here they collide.  As Perl also uses Shell
 meta-characters like C<$>, the best solution is to protect Perl-code from the
 Shell with single quotes.  That means they can't be used inside.  (An ugly way
 around that is C<'\''>, which ends a string, blackslashes a quote and starts
-another.  For literal quotes use C<$q(uote)>.)  Double quotes or C<q{}> are
-the way to go.
+another.  For literal quotes use C<$q(uote)>.)  For quoting use double quotes
+or C<q{}>.
 
 =head1 DOCUMENTATION
 
@@ -907,8 +932,8 @@ some context, else echoes it.
     pl 'Date; $_ = Date -86400, "+3600"; e $_, " -- ", Date "+8:45"'
     pl 'D; $_ = D -86400, "+3600"; e $_, " -- ", D "+8:45"'
 
-    >   Tue Oct 13 23:45:16.858884 2020
-    >   Tue Oct 13 00:45:16.858968 2020  --  Wed Oct 14 06:30:16.859009 +08:45 2020
+    >   Wed Sep  1 00:25:17.583847 2021
+    >   Tue Aug 31 01:25:17.583923 2021  --  Wed Sep  1 07:10:17.583959 +08:45 2021
 
 =item C<echo I<[arg...]>> |
 C<e I<[arg...]>>
@@ -919,9 +944,9 @@ can be stringified, is.  Any other reference goes through C<Data::Dumper>,
 which is loaded only if needed.
 
 If it is called in scalar context (e.g. C<$x = echo ...>) instead return the
-same as it would echo, in one string.  If it is called in list context
-(e.g. C<@l = echo ...>) return each arg prettified individually, with a
-newline on the last one.
+same as it would echo, in one string (inspired by Shell C<$(...)>).  If it is
+called in list context (e.g. C<@l = echo ...>) return each arg prettified
+individually, with a newline on the last one.
 
 =item C<Echo I<[arg...]>> |
 C<E I<[arg...]>>
@@ -948,8 +973,8 @@ Same as C<D(ate)>, but uses ISO format.
     pl 'Isodate; $_ = Isodate 7 * -86400; e $_, " -- ", Isodate "+8.75"'
     pl 'I; $_ = I 7 * -86400; e $_, " -- ", I "+8.75"'
 
-    >   2020-10-13T23:45:16.879861
-    >   2020-10-06T23:45:16.879925  --  2020-10-14T06:30:16.879948 +08:45
+    >   2021-09-01T00:25:17.606616
+    >   2021-08-25T00:25:17.606698  --  2021-09-01T07:10:17.606730 +08:45
 
 =item C<keydiff I<[key[, value]]>> |
 C<k I<[key[, value]]>>
@@ -1028,12 +1053,43 @@ C<*R>
 At END, echo C<$RESULT> if defined, then C<@RESULT> one per line if not empty,
 then C<%RESULT> sorted by keys.
 
+=item C<$ENV{PLDUMP}>
+
+Since C<pl -MO=Deparse> won't show your parts of the program, it can be quite
+baffling when things go wrong.  If you export this before starting pl, you see
+how your parts get embedded in various bits of generated stuff.  If you
+install C<perltidy>, it will be used.
+
+You will not see the effect of B<-a>, B<-F> or B<-n> as those get wrapped
+around it by C<perl> behind the scenes.  Due to interfacing with those options
+and providing for various option-combinations, the generated code may be too
+complicated.  Expect it to change and be optimized further in the future:
+
+    PLDUMP=1 \
+        pl 'say "Hello Perld!"'
+
+    >   sub pl::prog {
+    >       $pl::last = 1;
+    >     LINE: {
+    >   #line 1 "main program"
+    >           say "Hello Perld!";
+    >       } continue {
+    >           $pl::last = 0;
+    >       }
+    >       if ( $pl::last || eof ) {
+    >           ++$ARGIND;
+    >           if ($pl::last) { my $d = $.; close ARGV; $. = $d }
+    >           exit if $pl::last == 2;
+    >       }
+    >   }
+
 =back
 
 =head1 COMPATIBILITY
 
-Even if it is rarer nowadays, Perl 5.10 is still found out in the wild.  Pl
-tries to accomodate it gracefully, falling back to what works.  Dumped
+Even if it is rare nowadays, Perl 5.10 is still found out in the wild.  Pl
+tries to accomodate it gracefully, falling back to what works.  It has shims
+for C<any>, C<all>, C<none>, C<notall>, C<product> & C<sum0>.  Dumped
 data-structures may be formatted with a funny margin and C<h(osts)> will find
 the less IPv6 resolutions, the older your Perl.
 

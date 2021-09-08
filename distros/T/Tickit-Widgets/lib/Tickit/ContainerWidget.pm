@@ -3,9 +3,9 @@
 #
 #  (C) Paul Evans, 2009-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.27;
+use Object::Pad 0.43;
 
-package Tickit::ContainerWidget 0.53;
+package Tickit::ContainerWidget 0.54;
 class Tickit::ContainerWidget
    extends Tickit::Widget;
 
@@ -59,7 +59,7 @@ section below.
 has %_child_opts;
 
 # This class should probably be a role
-BUILD
+ADJUST
 {
    my $class = ref $self;
 

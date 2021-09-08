@@ -100,6 +100,7 @@ my %options = (
   PREREQ_PM => {
                 'Math::MPFR'          => '4.14',
                 'ExtUtils::MakeMaker' => '6.58',
+                'Test::More'          => '0.88',
                },
   DEFINE   => $defines,
   LIBS => [

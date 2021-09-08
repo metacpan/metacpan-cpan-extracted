@@ -7,7 +7,7 @@ use vars qw( $VERSION );
 use warnings;
 no warnings;
 
-$VERSION = '1.12';
+$VERSION = '1.122';
 
 BEGIN {
 	my @Head_levels = 0 .. 4;
@@ -130,7 +130,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2006-2015, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2006-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the same terms as Perl itself.
 

@@ -24,6 +24,27 @@ changes that you use, feel free to contact me.  Based on my available
 time and the time until the next release is scheduled, I will try to
 do a release any time the standards change.
 
+=head1 VERSION 3.69  (expected 2021-12-01  sbeck)
+
+=head1 VERSION 3.68  (2021-09-02  sbeck)
+
+=over 5
+
+=item NEW CODE(s)
+
+NOTE: no code changes on 2021-06-01 so no release made at that time.
+
+=item Added code2names
+
+Also code2countrys, code2languages, etc.  This allows you to see all names and
+aliases that correspond to a code.  My apologies for making 'countrys' to be the
+plural of 'country', but because these modules are all derived, I didn't want to
+put in an exception for the strange pluralization.
+
+Prompted by David Cantrell.
+
+=back
+
 =head1 VERSION 3.67  (2021-03-01  sbeck)
 
 =over 5

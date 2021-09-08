@@ -1,3 +1,19 @@
+0.005   2021-08-27  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Add dependency (phase=develop) to Module::Features &
+	  Module::Features::*.
+
+
+0.004   2021-06-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Improve compatibility with Text::Table::Tiny by adding
+	  generate_table() as alias for table().
+
+	- Add more blurb about ourself.
+
+
 0.003   2021-04-02  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

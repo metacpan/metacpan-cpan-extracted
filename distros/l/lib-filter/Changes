@@ -1,6 +1,19 @@
-Revision history for lib-filter
+0.281   2021-08-29  Released-By: PERLANCAR; Urgency: medium
 
-0.27    2016-08-24 (PERLANCAR)
+	- Observe PERL_LIB_FILTER_DEBUG.
+
+	- [ux] Make our hook an object, to show clearly when @INC is printed;
+	  revert 'use no modules' commit.
+
+
+0.280   2021-05-20  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [doc] Mention lib::noop.
+
+
+0.27    2016-08-24  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -8,7 +21,7 @@ Revision history for lib-filter
 	  module, because base.pm is dual-life.
 
 
-0.26    2016-08-23 (PERLANCAR)
+0.26    2016-08-23  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -16,7 +29,7 @@ Revision history for lib-filter
           test failure to just printing the require'd module's path.
 
 
-0.25    2016-07-09 (PERLANCAR)
+0.25    2016-07-09  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -25,14 +38,14 @@ Revision history for lib-filter
         - [doc] Fix typos in examples.
 
 
-0.24    2016-07-08 (PERLANCAR)
+0.24    2016-07-08  Released-By: PERLANCAR
 
 	- Also deduce caller package name from filename, this handles e.g.
 	  Getopt::Long::Callback inside Getopt/Long.pm requiring other
 	  modules.
 
 
-0.23    2016-07-08 (PERLANCAR)
+0.23    2016-07-08  Released-By: PERLANCAR
 
 	- Add option: allow_is_recursive.
 
@@ -42,7 +55,7 @@ Revision history for lib-filter
 	- [doc] Mention File::Which::Patch::Hide.
 
 
-0.22    2016-05-19 (PERLANCAR)
+0.22    2016-05-19  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -50,12 +63,12 @@ Revision history for lib-filter
           make it optional.
 
 
-0.21    2016-05-18 (PERLANCAR)
+0.21    2016-05-18  Released-By: PERLANCAR
 
 	- Show error message "Can't locate FILE (...)" to fool Test::Needs.
 
 
-0.20    2015-07-01 (PERLANCAR)
+0.20    2015-07-01  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -63,12 +76,12 @@ Revision history for lib-filter
 	  lib::filter for some tasks.
 
 
-0.19    2015-06-30 (PERLANCAR)
+0.19    2015-06-30  Released-By: PERLANCAR
 
 	- Add lib::coreplus.
 
 
-0.18    2015-06-29 (PERLANCAR)
+0.18    2015-06-29  Released-By: PERLANCAR
 
 	- Update example because using 'allow_noncore=0 + allow some
 	  non-core XS modules' doesn't work because the non-core XS modules
@@ -78,7 +91,7 @@ Revision history for lib-filter
 	- Add option: debug.
 
 
-0.17    2015-06-28 (PERLANCAR)
+0.17    2015-06-28  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -86,7 +99,7 @@ Revision history for lib-filter
 	  instead of t/lib/Module/List/WithPath.pm, derp.
 
 
-0.16    2015-06-28 (PERLANCAR)
+0.16    2015-06-28  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -94,12 +107,12 @@ Revision history for lib-filter
 	  some system where Exporter is located in non-core dir [CT].
 
 
-0.15    2015-06-28 (PERLANCAR)
+0.15    2015-06-28  Released-By: PERLANCAR
 
         - Add option: filter.
 
 
-0.14    2015-06-28 (PERLANCAR)
+0.14    2015-06-28  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -107,7 +120,7 @@ Revision history for lib-filter
 	  that module is used as prereq.
 
 
-0.13    2015-06-28 (PERLANCAR)
+0.13    2015-06-28  Released-By: PERLANCAR
 
         - [testing] Print list of modules on failure to require.
 
@@ -116,30 +129,30 @@ Revision history for lib-filter
           now does not depend on any non-core modules.
 
 
-0.12    2015-06-26 (PERLANCAR)
+0.12    2015-06-26  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Allow running in perl 5.8.
 
 
-0.11    2015-06-26 (PERLANCAR)
+0.11    2015-06-26  Released-By: PERLANCAR
 
 	- [testing] Use dummy modules for most testing [GH#4].
 
 
-0.10    2015-06-25 (PERLANCAR)
+0.10    2015-06-25  Released-By: PERLANCAR
 
         - [testing] Fix test failures.
 
 
-0.09    2015-06-24 (PERLANCAR)
+0.09    2015-06-24  Released-By: PERLANCAR
 
         - [testing] Change tests to use external Perl interpreters instead of
           in-process, to isolate from internals of Test::More, etc.
 
 
-0.08    2015-06-18 (PERLANCAR)
+0.08    2015-06-18  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -149,7 +162,7 @@ Revision history for lib-filter
 	- [testing] Remove stacktrace printer.
 
 
-0.07    2015-06-18 (PERLANCAR)
+0.07    2015-06-18  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -157,7 +170,7 @@ Revision history for lib-filter
           Code::Embeddable.
 
 
-0.06    2015-06-18 (PERLANCAR)
+0.06    2015-06-18  Released-By: PERLANCAR
 
         - [testing] Preload Test::Builder's prerequisites before loading Test::*
           (thanks Sinan Ünür).
@@ -168,7 +181,7 @@ Revision history for lib-filter
         - Doc tweaks.
 
 
-0.05    2015-05-27 (PERLANCAR)
+0.05    2015-05-27  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -177,7 +190,7 @@ Revision history for lib-filter
         - [testing] Add more tests.
 
 
-0.04    2015-05-26 (PERLANCAR)
+0.04    2015-05-26  Released-By: PERLANCAR
 
         - Add lib::allow, lib::disallow.
 
@@ -187,20 +200,20 @@ Revision history for lib-filter
           more experimental).
 
 
-0.03    2015-05-22 (PERLANCAR)
+0.03    2015-05-22  Released-By: PERLANCAR
 
         - Add unimport().
 
         - [testing] Add minimal tests.
 
 
-0.02    2015-05-19 (PERLANCAR)
+0.02    2015-05-19  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Fix/add examples in Synopsis.
 
 
-0.01    2015-04-12 (PERLANCAR)
+0.01    2015-04-12  Released-By: PERLANCAR
 
         - First release.

@@ -3,9 +3,9 @@
 #
 #  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.27;
+use Object::Pad 0.51;
 
-package Tickit::SingleChildWidget 0.54;
+package Tickit::SingleChildWidget 0.55;
 class Tickit::SingleChildWidget
    extends Tickit::ContainerWidget
    implements Tickit::WidgetRole::SingleChildContainer;
@@ -42,11 +42,11 @@ Constructs a new C<Tickit::SingleChildWidget> object.
 
 =cut
 
-BUILD
+ADJUSTPARAMS
 {
-   my %args = @_;
+   my ( $params ) = @_;
 
-   if( exists $args{child} ) {
+   if( exists $params->{child} ) {
       croak "The 'child' constructor argument to ${\ref $self} is no longer recognised; use ->set_child instead";
    }
 }

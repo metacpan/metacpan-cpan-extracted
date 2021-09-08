@@ -1,5 +1,14 @@
 Revision history for perl module Sys::Virt
 
+7.7.0 2021-09-01
+
+ - Add support for virNWFilterDefineXMLFlags and
+   virNetworkDefineXMLFlags APIs and assoicated
+   flags
+ - Add support for flags with existing
+   virInterfaceDefineXML, virStoragePoolDefineXML
+   and virSecretDefineXML APIs
+
 7.5.0 2021-07-02
 
  - Add VIR_FROM_CH

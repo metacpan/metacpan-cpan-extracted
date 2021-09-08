@@ -6,7 +6,7 @@ use parent 'Exporter';
 use JSON::PP;  # required to properly handle booleans
 use XSLoader;
 
-our $VERSION = '0.000078';
+our $VERSION = '0.000079';
 XSLoader::load( __PACKAGE__, $VERSION );
 
 our @EXPORT_OK = qw[];
@@ -25,7 +25,7 @@ engine
 
 =head1 VERSION
 
-Version 0.000078
+Version 0.000079
 
 =head1 SYNOPSIS
 
@@ -121,6 +121,22 @@ The Perl value is converted into an equivalent JavaScript value, so you can
 freely pass nested structures (hashes of arrays of hashes) and they will be
 handled correctly.
 
+Plain scalars are converted thus:
+
+=over
+
+=item * Instances of L<JSON::PP::Boolean> become JavaScript booleans.
+
+=item * Strings are interpreted as character strings. For example,
+Perl C<"\xff"> will become C<"\u00ff"> in JavaScript.
+
+(If you see mangled Unicode in JavaScript, you may have neglected a
+character-decode step. See L<perlunitut> for more details.)
+
+=item * Integers & floats become JavaScript numbers.
+
+=back
+
 You can also pass a Perl coderef as a value, in which case the named JavaScript
 variable / object slot becomes a function which, when executed, will end up
 calling the Perl coderef.  Any values passed from JavaScript into the Perl
@@ -135,6 +151,10 @@ Get the value stored in a JavaScript variable or object slot.
 The JavaScript value is converted into an equivalent Perl value, so you can
 freely pass nested structures (hashes of arrays of hashes) and they will be
 handled correctly.
+
+JavaScript strings become Perl character strings. If you find these strings
+printing strangely, you may need to encode them before printing; see
+L<perlunitut> for more details.
 
 =head2 remove
 

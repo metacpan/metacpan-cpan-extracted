@@ -26,14 +26,14 @@ no_index:
 provides:
   App::Easer:
     file: lib/App/Easer.pm
-    version: '0.004'
+    version: '0.006'
 requires:
   perl: '5.024000'
 resources:
   bugtracker: https://github.com/polettix/App-Easer/issues
   homepage: https://github.com/polettix/App-Easer
   repository: https://github.com/polettix/App-Easer.git
-version: '0.004'
+version: '0.006'
 x_contributors:
   - 'Flavio Poletti <flavio@polettix.it>'
 x_generated_by_perl: v5.24.1

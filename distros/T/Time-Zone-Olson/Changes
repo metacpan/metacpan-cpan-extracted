@@ -1,5 +1,8 @@
 Revision history for Time-Zone-Olson
 
+0.41  Sun Aug 29 12:54:00 2021
+       Solaris fixes
+
 0.40  Fri Aug 20 16:44:00 2021
        Fix indexing
 

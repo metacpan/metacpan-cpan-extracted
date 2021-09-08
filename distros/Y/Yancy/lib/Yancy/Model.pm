@@ -1,5 +1,5 @@
 package Yancy::Model;
-our $VERSION = '1.076';
+our $VERSION = '1.077';
 # ABSTRACT: Model layer for Yancy apps
 
 #pod =head1 SYNOPSIS
@@ -146,13 +146,18 @@ sub read_schema {
 # XXX: Preload namespaces' Schema:: and Item:: classes?
 sub schema {
     my ( $self, $name, $data ) = @_;
-    return $self->_schema->{ $name } if !$data;
-
-    if ( !blessed $data ) {
-        my $class = $self->find_class( Schema => $name );
-        $data = $class->new( { %$data, model => $self, name => $name } );
+    if ( !$data ) {
+        if ( my $schema = $self->_schema->{ $name } ) {
+            return $schema;
+        }
+        # Create a default schema
+        $self->schema( $name, {} );
+        return $self->_schema->{$name};
     }
-
+    if ( !blessed $data || !$data->isa( 'Yancy::Model::Schema' ) ) {
+        my $class = $self->find_class( Schema => $name );
+        $data = $class->new( model => $self, name => $name, schema => $data );
+    }
     $self->_schema->{$name} = $data;
     return $self;
 }
@@ -169,7 +174,7 @@ Yancy::Model - Model layer for Yancy apps
 
 =head1 VERSION
 
-version 1.076
+version 1.077
 
 =head1 SYNOPSIS
 

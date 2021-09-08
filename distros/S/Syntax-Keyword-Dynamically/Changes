@@ -1,5 +1,9 @@
 Revision history for Syntax-Keyword-Dynamically
 
+0.09    2021-08-26
+        [CHANGES]
+         * Updated to XS::Parse::Keyword 0.13
+
 0.08    2021-05-01
         [CHANGES]
          * Rewrite parsing logic to use XS::Parse::Keyword

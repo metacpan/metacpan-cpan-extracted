@@ -45,6 +45,6 @@
          "http://www.opensource.org/licenses/artistic-license-2.0"
       ]
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

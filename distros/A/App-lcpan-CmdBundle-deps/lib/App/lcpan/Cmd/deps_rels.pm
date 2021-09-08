@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::deps_rels;
 
-our $DATE = '2021-06-01'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2021-06-03'; # DATE
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
@@ -54,7 +54,7 @@ App::lcpan::Cmd::deps_rels - List all known prereq relationships
 
 =head1 VERSION
 
-This document describes version 0.010 of App::lcpan::Cmd::deps_rels (from Perl distribution App-lcpan-CmdBundle-deps), released on 2021-06-01.
+This document describes version 0.011 of App::lcpan::Cmd::deps_rels (from Perl distribution App-lcpan-CmdBundle-deps), released on 2021-06-03.
 
 =head1 DESCRIPTION
 

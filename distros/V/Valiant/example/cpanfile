@@ -26,4 +26,5 @@ requires 'Mojo::ByteStream';
 requires 'Plack::Runner';
 requires 'SQL::Translator';
 requires 'Scalar::Util';
+requires 'Sub::Exporter';
 

@@ -13,6 +13,7 @@ inc/Module/Build/with/XSTests.pm
 lib/XS/Parse/Sublike.pm
 lib/XS/Parse/Sublike.xs
 lib/XS/Parse/Sublike/Builder.pm
+lib/XS/Parse/Sublike/Builder_data.pm.PL
 LICENSE
 MANIFEST			This list of files
 META.json

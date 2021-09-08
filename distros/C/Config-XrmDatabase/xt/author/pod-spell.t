@@ -12,12 +12,13 @@ all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 Astrophysical
 Config
-Constants
 Diab
 Failure
 Jerius
 Observatory
 Smithsonian
+Types
+Util
 XrmDatabase
 djerius
 lib

@@ -53,7 +53,7 @@
    "provides" : {
       "Locale::Utils::Autotranslator" : {
          "file" : "lib/Locale/Utils/Autotranslator.pm",
-         "version" : "1.011"
+         "version" : "1.013"
       },
       "Locale::Utils::Autotranslator::ApiMymemoryTranslatedNet" : {
          "file" : "lib/Locale/Utils/Autotranslator/ApiMymemoryTranslatedNet.pm",
@@ -61,7 +61,7 @@
       },
       "Locale::Utils::Autotranslator::Interactive" : {
          "file" : "lib/Locale/Utils/Autotranslator/Interactive.pm",
-         "version" : "1.011"
+         "version" : "1.012"
       }
    },
    "release_status" : "stable",
@@ -70,6 +70,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "1.011",
+   "version" : "1.013",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

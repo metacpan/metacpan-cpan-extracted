@@ -1,14 +1,16 @@
 #!perl
 
-our $DATE = '2021-08-09'; # DATE
-our $VERSION = '0.604'; # VERSION
-
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
 
 use Module::Load::Util qw(instantiate_class_with_optional_args);
 use Text::ANSITable;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-08-27'; # DATE
+our $DIST = 'Text-ANSITable'; # DIST
+our $VERSION = '0.606'; # VERSION
 
 binmode(STDOUT, ":encoding(utf8)");
 
@@ -67,7 +69,7 @@ ansitable-list-color-themes - List available color themes for Text::ANSITable
 
 =head1 VERSION
 
-This document describes version 0.604 of ansitable-list-color-themes (from Perl distribution Text-ANSITable), released on 2021-08-09.
+This document describes version 0.606 of ansitable-list-color-themes (from Perl distribution Text-ANSITable), released on 2021-08-27.
 
 =head1 SYNOPSIS
 
@@ -112,13 +114,13 @@ Sample output:
  .-------------------------------------------------------.
  |  num   percent%          date           bool?   text  |
  |                                                       |
- |    1     40,00%   2021-08-09 08:08:45     Y     hello |
- | -3.3    100,00%   2021-08-09 08:08:45     N     world |
+ |    1     40,00%   2021-08-27 09:50:49     Y     hello |
+ | -3.3    100,00%   2021-08-27 09:50:49     N     world |
  +-------------------------------------------------------+
  |    1     10,00%   2013-05-02 09:26:24     Y     x1    |
- |    2     20,00%   2013-05-02 12:13:04     N     x2    |
+ |    2     20,00%   2013-05-02 12:13:04     Y     x2    |
  |    3     30,00%   2013-05-02 14:59:44     Y     x3    |
- |    4     40,00%   2013-05-02 17:46:24     Y     x4    |
+ |    4     40,00%   2013-05-02 17:46:24     N     x4    |
  |    5     50,00%   2013-05-02 20:33:04     Y     x5    |
  `-------------------------------------------------------'
 
@@ -130,17 +132,26 @@ Please visit the project's homepage at L<https://metacpan.org/release/Text-ANSIT
 
 Source repository is at L<https://github.com/perlancar/perl-Text-ANSITable>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-ANSITable>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -148,5 +159,13 @@ This software is copyright (c) 2021, 2020, 2018, 2017, 2016, 2015, 2014, 2013 by
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-ANSITable>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

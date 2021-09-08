@@ -3,15 +3,15 @@ abstract: 'Bindings for librtmidi - Realtime MIDI library'
 author:
   - 'John Barrett <john@jbrt.org>'
 build_requires:
-  FindBin: '0'
-  Test::More: '0.88'
+  Proc::Find: '0'
+  Test2::V0: '0'
+  Test::Lib: '0'
   Time::HiRes: '0'
-  lib: '0'
+  ok: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  FFI::CheckLib: '0.11'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,9 +22,11 @@ no_index:
     - examples
     - t
     - xt
+  package:
+    - RtMidiWrapper
 requires:
-  FFI::CheckLib: '0'
-  FFI::Platypus: '0'
+  Alien::RtMidi: '0'
+  FFI::Platypus: '1.00'
   FFI::Platypus::Buffer: '0'
   FFI::Platypus::Memory: '0'
   FFI::Platypus::Record: '0'
@@ -33,6 +35,7 @@ resources:
   bugtracker: https://github.com/jbarrett/MIDI-RtMidi-FFI/issues
   homepage: https://github.com/jbarrett/MIDI-RtMidi-FFI
   repository: https://github.com/jbarrett/MIDI-RtMidi-FFI.git
-version: '0.01'
-x_generated_by_perl: v5.30.0
+version: '0.03'
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -132,7 +132,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.146';
+our $VERSION = '0.147';
 our @EXPORT_OK = qw{
     shell
 
@@ -1811,8 +1811,7 @@ The following commands are defined:
   source filename
     Executes the contents of the given file as shell commands.
   spaceflight
-    Retrieves orbital elements from http://spaceflight.nasa.gov/.
-    No login needed, but you only get the ISS.
+    Deprecated. Web site http://spaceflight.nasa.gov/ retired.
   spacetrack name
     Retrieves the named catalog of orbital elements from
     Space Track.
@@ -3961,7 +3960,7 @@ sub spaceflight {
     my @list;
     if (@args) {
 	foreach (@args) {
-	    $self->_deprecation_notice( spaceflight => $_ );
+	    $self->_deprecation_notice( spaceflight => lc $_ );
 	    my $info = $catalogs{spaceflight}{lc $_} or
 		return $self->_no_such_catalog (spaceflight => $_);
 	    exists $info->{url}
@@ -4897,9 +4896,7 @@ sub _check_cookie_generic {
 #	celestrak => {
 #	    sts	=> 3,
 #	},
-#	spaceflight => {
-#	    shuttle	=> 3,
-#	},
+	spaceflight => 1,
 	attribute	=> {
 	    url_iridium_status_mccants	=> 3,
 	},
@@ -4913,15 +4910,26 @@ sub _check_cookie_generic {
 
     sub _deprecation_notice {
 	my ( undef, $method, $argument ) = @_;	# Invocant unused
-	$deprecate{$method} or return;
-	defined $argument or confess( 'Bug - $argument undefined' );
-	$deprecate{$method}{$argument} or return;
-	$deprecate{$method}{$argument} >= 3
-	    and croak "$method $argument is retracted";
+	my $level = $deprecate{$method}
+	    or return;
+	my $desc = $method;
+	if ( ref $level ) {
+	    defined $argument or confess( 'Bug - $argument undefined' );
+	    $level = $level->{$argument}
+		or return;
+	    $desc = "$method $argument";
+	}
+	$level >= 3
+	    and croak "$desc is retracted";
 	warnings::enabled( 'deprecated' )
-	    and carp "$method $argument is deprecated";
-	$deprecate{$method}{$argument} == 1
-	    and $deprecate{$method}{$argument} = 0;
+	    and carp "$desc is deprecated";
+	1 == $level
+	    or return;
+	if ( ref $deprecate{$method} ) {
+	    $deprecate{$method}{$argument} = 0;
+	} else {
+	    $deprecate{$method} = 0;
+	}
 	return;
     }
 

@@ -9,7 +9,7 @@
 # data to automatically generate the Locale::Codes module containing that data.
 
 require 5.000000;
-use YAML;
+use YAML::XS;
 use IO::File;
 use strict;
 use warnings;
@@ -23,7 +23,7 @@ use Mojo::DOM;
 use lib "./internal";
 
 our $VERSION;
-$VERSION='3.67';
+$VERSION='3.68';
 
 # Some required executables
 my @exe     = qw( wget xls2csv );
@@ -1725,7 +1725,7 @@ use warnings;
 use utf8;
 
 our(\$VERSION);
-\$VERSION='3.67';
+\$VERSION='3.68';
 
 \$Locale::Codes::Data{'$type'}{'id'} = '$ID';
 

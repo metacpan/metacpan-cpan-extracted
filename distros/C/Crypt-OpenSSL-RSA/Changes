@@ -1,5 +1,12 @@
 Revision history for Perl extension Crypt::OpenSSL::RSA.
 
+0.32 Wed Sep 8 2021
+    - Prefix internal bn2sv function so it doesn't collide with Net::SSLeay
+    - Ensure that verify() leaves openssl error stack clean on failure
+    - Fixed broken SEE ALSO links.
+    - prevent outer $SIG{__DIE__} handler from being called during optional require.
+    - omit done_testing since it does not work for older perl versions
+
 0.31 Mon Sep 24 2018
     - Remove default of SHA256 for RSA keys. This has caused significant
       problems with downstream modules and it has always been possible to

@@ -1,0 +1,154 @@
+<%doc>
+Add the page menu items for this extension.
+</%doc>
+\
+<%INIT>
+return if ( not defined $session{'CurrentUser'} );
+return if ( not defined $session{'CurrentUser'}->id );
+return if ( not $session{'CurrentUser'}->Privileged );
+
+my $request_path = $HTML::Mason::Commands::r->path_info;
+$request_path =~ s!/{2,}!/!g;
+
+Menu->child('tools')->child(
+    'FilterRules',
+    'title'       => loc('Filter rules'),
+    'description' => loc('Manage ticket filtering rules'),
+    'path'        => '/Tools/FilterRules.html'
+);
+
+if ( $request_path =~ m|^/Tools/FilterRules.html| ) {
+    PageMenu()->child(
+        'FilterRules',
+        'title'       => loc('Filter rules'),
+        'description' => loc('Manage ticket filtering rules'),
+        'path'        => '/Tools/FilterRules.html'
+    );
+    PageMenu()->child(
+        'FilterRules-Test',
+        'title'       => loc('Test'),
+        'description' => loc('Test ticket filtering rules'),
+        'path'        => '/Tools/FilterRules.html?Test=1'
+            . (
+            ( ( $DECODED_ARGS->{'id'} || '' ) =~ /^(\d+)$/ )
+            ? '&id=' . $1
+            : ''
+            )
+    );
+}
+
+if ( $session{'CurrentUser'}
+       ->HasRight( Right => 'ShowConfigTab', Object => RT->System )
+    && $session{'CurrentUser'}
+    ->HasRight( Right => 'SuperUser', Object => RT->System ) )
+{
+    my $AdminMenu = Menu->child('admin')->child(
+        'FilterRules',
+        'title'       => loc('Filter rule groups'),
+        'description' => loc('Manage ticket filtering rule groups'),
+        'path'        => '/Admin/FilterRules/'
+    );
+    $AdminMenu->child(
+        'select',
+        'title' => loc('Select'),
+        'path'  => '/Admin/FilterRules/'
+    );
+    $AdminMenu->child(
+        'create',
+        'title' => loc('Create'),
+        'path'  => '/Admin/FilterRules/Modify.html?Create=1'
+    );
+    $AdminMenu->child(
+        'test',
+        'title' => loc('Test'),
+        'path'  => '/Admin/FilterRules/Test.html'
+    );
+
+    if ( $request_path =~ m{^/Admin/FilterRules} ) {
+        my $Menu = PageMenu();
+
+        if ($request_path =~ m|^/Admin/FilterRules/?(?:index.html)?$|
+            || (   $request_path =~ m|^/Admin/FilterRules/(?:Modify.html)$|
+                && $DECODED_ARGS->{'Create'} )
+           )
+        {
+            $Menu->child(
+                'select',
+                'title' => loc('Select'),
+                'path'  => '/Admin/FilterRules/'
+            );
+            $Menu->child(
+                'create',
+                'title' => loc('Create'),
+                'path'  => '/Admin/FilterRules/Modify.html?Create=1'
+            );
+        } else {
+            my $Submenu = $Menu->child(
+                'select',
+                'title' => loc('Filter rule groups'),
+                'path'  => '/Admin/FilterRules/'
+            );
+            $Submenu->child(
+                'select',
+                'title' => loc('Select'),
+                'path'  => '/Admin/FilterRules/'
+            );
+            $Submenu->child(
+                'create',
+                'title' => loc('Create'),
+                'path'  => '/Admin/FilterRules/Modify.html?Create=1'
+            );
+        }
+
+        if ( $DECODED_ARGS->{'id'} && $DECODED_ARGS->{'id'} =~ /^\d+$/ ) {
+            my $id     = $DECODED_ARGS->{'id'};
+            my $Object = RT::FilterRuleGroup->new( $session{'CurrentUser'} );
+            $Object->Load($id);
+
+            if ( $Object and $Object->id ) {
+                $Menu->child(
+                    'basics',
+                    title  => loc('Basics'),
+                    'path' => '/Admin/FilterRules/Modify.html?id=' . $id
+                );
+                $Menu->child(
+                    'requirements',
+                    title  => loc('Requirements'),
+                    'path' => '/Admin/FilterRules/Requirements.html?id=' . $id
+                );
+                $Menu->child(
+                    'filters',
+                    title  => loc('Filters'),
+                    'path' => '/Admin/FilterRules/Filters.html?id=' . $id
+                );
+                $Menu->child(
+                    'group-rights',
+                    title  => loc('Group Rights'),
+                    'path' => '/Admin/FilterRules/GroupRights.html?id=' . $id
+                );
+                $Menu->child(
+                    'user-rights',
+                    title  => loc('User Rights'),
+                    'path' => '/Admin/FilterRules/UserRights.html?id=' . $id
+                );
+                $Menu->child(
+                    'history',
+                    title  => loc('History'),
+                    'path' => '/Admin/FilterRules/History.html?id=' . $id
+                );
+                $Menu->child(
+                    'test',
+                    title  => loc('Test'),
+                    'path' => '/Admin/FilterRules/Test.html?id=' . $id
+                );
+            }
+        } else {
+            $Menu->child(
+                'test',
+                title  => loc('Test'),
+                'path' => '/Admin/FilterRules/Test.html'
+            );
+        }
+    }
+}
+</%INIT>

@@ -46,7 +46,7 @@ Net::SNMP::Mixin::ArubaCX::Dot1qFdb - mixin class for ArubaCX switch forwarding 
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 

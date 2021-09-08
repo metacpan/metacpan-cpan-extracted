@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Duadua::Parser;
 
-our $VERSION = '0.21';
+our $VERSION = '0.23';
 
 my @PARSER_PROC_LIST = qw/
     Duadua::Parser::Browser::MicrosoftEdge
@@ -245,6 +245,14 @@ If you would like to parse many times, then you can use C<reparse> method. It's 
             and say $result->name;
     }
 
+If you need to get version info, then you should set true value to version option like below.
+
+    use Duadua;
+
+    my $ua = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)';
+    my $d = Duadua->new($ua, { version => 1 });
+    say $d->version; # 2.1
+
 
 =head1 DESCRIPTION
 
@@ -275,11 +283,11 @@ NOTE that ParserClass is case sensitive, and it might be going to change results
 
 =head2 parse
 
-Parse User-Agent string
+Parses User-Agent string
 
 =head2 reparse($ua)
 
-Parse User-Agent string by same instance without new
+Parses User-Agent string by same instance without new
 
 =head2 GETTERS
 
@@ -287,39 +295,43 @@ Parse User-Agent string by same instance without new
 
 =item ua
 
-Return raw User-Agent string
+Returns raw User-Agent string
 
 =item name
 
-Get User-Agent name
+Gets User-Agent name
 
 =item is_bot
 
-Return true value if the User-Agent is bot.
+Returns true value if the User-Agent is bot.
 
 =item is_ios
 
-Return true value if the User-Agent is iOS.
+Returns true value if the User-Agent is iOS.
 
 =item is_android
 
-Return true value if the User-Agent is Android.
+Returns true value if the User-Agent is Android.
 
 =item is_linux
 
-Return true value if the User-Agent is Linux.
+Returns true value if the User-Agent is Linux.
 
 =item is_windows
 
-Return true value if the User-Agent is Windows.
+Returns true value if the User-Agent is Windows.
 
 =item is_chromeos
 
-Return true value if the User-Agent is ChromeOS.
+Returns true value if the User-Agent is ChromeOS.
 
 =item opt_version
 
-Return version option value. If it's true value, then parse to get User Agent version also.
+Returns version option value. If it's true value, then parse to get User Agent version also.
+
+=item version
+
+Returns version from user agent string
 
 =item parsers
 
@@ -331,7 +343,7 @@ The list of User Agent Parser
 
 =begin html
 
-<a href="https://github.com/bayashi/Duadua/blob/main/lib/Duadua.pm"><img src="https://img.shields.io/badge/Version-0.21-green?style=flat"></a> <a href="https://github.com/bayashi/Duadua/blob/main/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png?style=flat"></a> <a href="https://github.com/bayashi/Duadua/actions"><img src="https://github.com/bayashi/Duadua/workflows/main/badge.svg?_t=1628543082"/></a> <a href="https://coveralls.io/r/bayashi/Duadua"><img src="https://coveralls.io/repos/bayashi/Duadua/badge.png?_t=1628543082&branch=main"/></a>
+<a href="https://github.com/bayashi/Duadua/blob/main/lib/Duadua.pm"><img src="https://img.shields.io/badge/Version-0.23-green?style=flat"></a> <a href="https://github.com/bayashi/Duadua/blob/main/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png?style=flat"></a> <a href="https://github.com/bayashi/Duadua/actions"><img src="https://github.com/bayashi/Duadua/workflows/main/badge.svg?_t=1630745980"/></a> <a href="https://coveralls.io/r/bayashi/Duadua"><img src="https://coveralls.io/repos/bayashi/Duadua/badge.png?_t=1630745980&branch=main"/></a>
 
 =end html
 

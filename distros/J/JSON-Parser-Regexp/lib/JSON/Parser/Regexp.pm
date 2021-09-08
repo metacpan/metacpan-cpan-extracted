@@ -1,23 +1,28 @@
 package JSON::Parser::Regexp;
 
-use Mouse;
 use utf8;
-use Kavorka;
 use Regexp::Grammars;
 
-our $VERSION = '0.04';
+our $VERSION = '0.19';
 
+sub new {
+    my $class = shift;
+    return bless {}, $class;
+}
 
-method AST::JSON::X() {
+sub T::JSON::X {
+    my ($self) = @_;
     return $self->{Hash}->X();
 }
 
-method AST::Hash::X() {
+sub T::Hash::X {
+    my ($self) = @_;
     my %hash = $self->{Key_Values}->X();
     return \%hash;
 }
 
-method AST::Key_Values::X() {
+sub T::Key_Values::X {
+    my ($self) = @_;
     my @kvs = ();
     for my $element ( @{ $self->{Key_Value} } ) {
         push @kvs, $element->X();
@@ -25,54 +30,91 @@ method AST::Key_Values::X() {
     return @kvs;
 }
 
-method AST::Key_Value::X() {
-    my $key   = $self->{Key}->X();
-    my $sep   = $self->{Sep}->X();
-    my $value = $self->{Value}->X();
+sub T::Key_Value::X {
+    my ($self) = @_;
+    my $key    = $self->{Key}->X();
+    my $sep    = $self->{Sep}->X();
+    my $value  = $self->{Value}->X();
 
-    if( $sep eq ':' ) {
-        my @kv = ($key, $value);
+    if ( $sep eq ':' ) {
+        my @kv = ( $key, $value );
         return @kv;
     }
 }
 
-method AST::Key::X() {
+sub T::Key::X {
+    my ($self) = @_;
+    return $self->{String_Value}->X();
+}
+
+sub T::Value::X {
+    my ($self) = @_;
     return $self->{Any_Value}->X();
 }
 
-method AST::Value::X() {
-    return $self->{Any_Value}->X();
+sub T::Any_Value::X {
+    my ($self) = @_;
+    (      $self->{String_Value}
+        || $self->{Numeric_Value}
+        || $self->{Null_Value}
+        || $self->{Hash}
+        || $self->{Array}
+        || $self->{True}
+        || $self->{False} )->X();
 }
 
-method AST::Any_Value::X() {
-    ($self->{String_Value} || $self->{Numeric_Value} || $self->{Null_Value} || $self->{Hash} || $self->{Array})->X();
-}
-
-method AST::String_Value::X() {
+sub T::String_Value::X {
+    my ($self) = @_;
     return $self->{Words}->X();
 }
 
-method AST::Words::X() {
+sub T::Words::X {
+    my ($self) = @_;
     return $self->{''};
 }
 
-method AST::Numeric_Value::X() {
+sub T::Numeric_Value::X {
+    my ($self) = @_;
     return $self->{Number}->X();
 }
 
-method AST::Number::X() {
+sub T::Number::X {
+    my ($self) = @_;
     return $self->{''};
 }
 
-method AST::Null_Value::X() {
-    return $self->{''};
+sub T::Null_Value::X {
+    my ($self) = @_;
+    if ( $self->{''} eq 'null' ) {
+        return undef;
+    }
 }
 
-method AST::Array::X() {
+sub T::True::X {
+    my ($self) = @_;
+    if ( $self->{''} eq 'true' ) {
+        my $TRUE = 1;
+        my $class = "JSON::Parser::Regexp::Bool";
+        return bless \$TRUE, $class;
+    }
+}
+
+sub T::False::X {
+    my ($self) = @_;
+    if ( $self->{''} eq 'false' ) {
+        my $FALSE = 0;
+        my $class = "JSON::Parser::Regexp::Bool";
+        return bless \$FALSE, $class;
+    }
+}
+
+sub T::Array::X {
+    my ($self) = @_;
     return $self->{Array_Elements}->X();
 }
 
-method AST::Array_Elements::X() {
+sub T::Array_Elements::X {
+    my ($self) = @_;
     my @array = ();
     for my $element ( @{ $self->{Array_Element} } ) {
         push @array, $element->X();
@@ -80,57 +122,60 @@ method AST::Array_Elements::X() {
     return \@array;
 }
 
-method AST::Array_Element::X() {
+sub T::Array_Element::X {
+    my ($self) = @_;
     return $self->{Any_Value}->X();
 }
 
-method AST::Sep::X() {
+sub T::Sep::X {
+    my ($self) = @_;
     return $self->{''};
 }
 
-method AST::Comma::X() {
+sub T::Comma::X {
+    my ($self) = @_;
     return $self->{''};
 }
-
 
 my $Parser = qr {
     <nocontext:>
 
     <JSON>
-    <objrule:  AST::JSON>                <ws: (\s++)*>  <Hash>
+    <objrule:  T::JSON>                <ws: (\s++)*>  <Hash>
 
-    <objrule:  AST::Any_Value>           <String_Value> | <Numeric_Value> | <Null_Value> | <Hash> | <Array>
+    <objrule:  T::Any_Value>           <String_Value> | <Numeric_Value> | <Null_Value> | <Hash> | <Array> | <True> | <False>
 
-    <objrule:  AST::Hash>                \{ <Key_Values> \}
+    <objrule:  T::Hash>                \{ <Key_Values> \}
 
-    <objrule:  AST::Key_Values>          <[Key_Value]>+ % <Comma>
-    <objrule:  AST::Key_Value>           <Key> <Sep> <Value>
-    <objrule:  AST::Key>                 <Any_Value>
-    <objrule:  AST::Value>               <Any_Value>
+    <objrule:  T::Key_Values>          <[Key_Value]>+ % <Comma>
+    <objrule:  T::Key_Value>           <Key> <Sep> <Value>
+    <objrule:  T::Key>                 <String_Value>
+    <objrule:  T::Value>               <Any_Value>
 
-    <objrule:  AST::Array>               \[ <Array_Elements> \]
-    <objrule:  AST::Array_Elements>      <[Array_Element]>+ % <Comma>
-    <objrule:  AST::Array_Element>       <Any_Value>
+    <objrule:  T::Array>               \[ <Array_Elements> \]
+    <objrule:  T::Array_Elements>      <[Array_Element]>+ % <Comma>
+    <objrule:  T::Array_Element>       <Any_Value>
 
-    <objtoken: AST::String_Value>        \s*\"\s*<Words>\s*\"\s*
-    <objtoken: AST::Words>               (.)*?
+    <objtoken: T::String_Value>        \s*\"\s*<Words>\s*\"\s*
+    <objtoken: T::Words>               (.)*?
 
-    <objtoken: AST::Numeric_Value>       \s*<Number>\s*
-    <objtoken: AST::Number>              [-]?[\d\.]*
+    <objtoken: T::Numeric_Value>       \s*<Number>\s*
+    <objtoken: T::Number>              [-]?[\d\.]*
 
-    <objtoken: Null_Value>               null
-    <objtoken: AST::Sep>                 \:
-    <objtoken: AST::Comma>               \,
+    <objtoken: T::Null_Value>          null
+    <objtoken: T::True>                true
+    <objtoken: T::False>               false
+    <objtoken: T::Sep>                 \:
+    <objtoken: T::Comma>               \,
+
 }xms;
 
-
-method Json_Parse( $String ) {
-    if( $String =~ $Parser ) {
+sub decode {
+    my ( $self, $String ) = @_;
+    if ( $String =~ $Parser ) {
         $/{JSON}->X();
     }
 }
-
-
 
 1;
 __END__
@@ -145,9 +190,9 @@ JSON::Parser::Regexp - Json parser
 	use utf8;
   	use JSON::Parser::Regexp;
 
-	my $json = Json::Parser::Regexp->new();
+	my $json = JSON::Parser::Regexp->new();
 
-  	my $hash = $json->Json_Parse('{"foo" : [-1.2, -2, 3, 4, ౮], "buz": "a string ఈ వారపు వ్యాసం with spaces", "more": {3 : [8, 9]} , 1 : 41, "array": [1, 23]}');
+  	my $hash = $json->decode('{ "false" : false, "null" : null, "true" : true, "foo" : [3, 4, ౮], "buz": "a string ఈ వారపు వ్యాసం with spaces", "more": {"3" : [8, 9]} , "1" : 41}');
   	print $hash->{"more"}->{3}->[0];
 
 =head1 AUTHOR

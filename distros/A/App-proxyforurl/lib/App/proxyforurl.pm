@@ -2,7 +2,7 @@ package App::proxyforurl;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 1;
 
@@ -14,7 +14,7 @@ App::proxyforurl - An online proxy PAC file parser
 
 =head1 VERSION
 
-0.08
+0.09
 
 =head1 DESCRIPTION
 
@@ -27,7 +27,7 @@ a given net.
 
 =head2 Demo
 
-Check out L<http://home.thorsen.pm/proxyforurl> for a running example.
+Check out L<https://app.thorsen.pm/proxyforurl> for a running example.
 
 =head2 Missing features
 
@@ -43,7 +43,7 @@ intput is.
 
 =over 4
 
-=item * L<http://findproxyforurl.com/>
+=item * L<https://findproxyforurl.com/>
 
 =item * L<https://github.com/pacparser/pacparser>
 
@@ -60,7 +60,7 @@ this is software, there might be bugs.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014, Jan Henning Thorsen
+Copyright (C) Jan Henning Thorsen
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.

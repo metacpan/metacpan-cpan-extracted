@@ -3,15 +3,13 @@
 use strict;
 use warnings;
 
-use lib './t/lib';
-
 use Test::More tests => 5;
 use File::Spec;
 
 use File::Path;
-use File::Find::Object::TreeCreate;
+use File::TreeCreate ();
 
-my $tree_creator = File::Find::Object::TreeCreate->new();
+my $tree_creator = File::TreeCreate->new();
 
 {
     my $tree = {
@@ -19,18 +17,15 @@ my $tree_creator = File::Find::Object::TreeCreate->new();
         'subs' => [
             {
                 'name'     => "File-Find-Rule.t",
-                'contents' => $tree_creator->cat(
-                    "./t/sample-data/to-copy-from/File-Find-Rule.t"),
+                'contents' => "content",
             },
             {
                 'name'     => "findorule.t",
-                'contents' => $tree_creator->cat(
-                    "./t/sample-data/to-copy-from/findorule.t"),
+                'contents' => "content",
             },
             {
-                'name' => "foobar",
-                'contents' =>
-                    $tree_creator->cat("./t/sample-data/to-copy-from/foobar"),
+                'name'     => "foobar",
+                'contents' => "content",
 
             },
             {
@@ -55,11 +50,7 @@ my $tree_creator = File::Find::Object::TreeCreate->new();
                                                                 name =>
                                                                     "ATeam.pm",
                                                                 content =>
-                                                                    $tree_creator
-                                                                    ->cat(
-"./t/sample-data/to-copy-from/lib/File/Find/Object/Rule/Test/ATeam.pm"
-
-                                                                    ),
+                                                                    "content",
                                                             }
                                                         ],
                                                     },

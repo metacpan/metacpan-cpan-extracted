@@ -1,5 +1,5 @@
 package App::gimpgitbuild::Command::build;
-$App::gimpgitbuild::Command::build::VERSION = '0.26.1';
+$App::gimpgitbuild::Command::build::VERSION = '0.28.1';
 use strict;
 use warnings;
 use autodie;
@@ -80,6 +80,7 @@ sub execute
         { _mode => $mode, _process_executor => $_process_executor, } );
 
     my $env = App::gimpgitbuild::API::GitBuild->new()->new_env();
+    $ENV{LD_LIBRARY_PATH} = $env->{LD_LIBRARY_PATH};
     $ENV{PATH}            = $env->{PATH};
     $ENV{PKG_CONFIG_PATH} = $env->{PKG_CONFIG_PATH};
     $ENV{XDG_DATA_DIRS}   = $env->{XDG_DATA_DIRS};
@@ -104,7 +105,7 @@ __END__
 
 =head1 VERSION
 
-version 0.26.1
+version 0.28.1
 
 =begin foo return (
         [ "output|o=s", "Output path" ],

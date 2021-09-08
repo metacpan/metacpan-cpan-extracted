@@ -1,5 +1,13 @@
 # Changelog
 
+## 6.17.0
+
+- Allow true for `thousands_separator`
+
+## 6.16.0
+
+- Add `Money.from_cents` alias as a more explicit initializer, it's the same as `Money.new`
+
 ## 6.15.0
 
 - Add :delimiter_pattern option to the Formatter

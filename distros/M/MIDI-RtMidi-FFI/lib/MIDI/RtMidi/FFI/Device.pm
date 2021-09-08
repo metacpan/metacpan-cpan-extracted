@@ -12,7 +12,7 @@ MIDI::RtMidi::FFI::Device - OO interface for L<MIDI::RtMidi::FFI>
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -20,9 +20,9 @@ version 0.01
     
     my $device = MIDI::RtMidi::FFI::Device->new;
     $device->open_virtual_port( 'perl-rtmidi' );
-    $device->send_event( note_on => 0, 0, 0x40, 0x5a );
+    $device->send_event( note_on => 0x40, 0x5a );
     sleep 1;
-    $device->send_event( note_off => 0, 0, 0x40, 0x5a );
+    $device->send_event( note_off => 0x40, 0x5a );
 
 =head1 DESCRIPTION
 
@@ -36,6 +36,21 @@ use MIDI::Event;
 use Carp;
 
 our $VERSION = $MIDI::RtMidi::FFI::VERSION;
+
+my $rtmidi_api_names = {
+    unspecified => [ "Unknown",            RTMIDI_API_UNSPECIFIED ],
+    core        => [ "CoreMidi",           RTMIDI_API_MACOSX_CORE ],
+    alsa        => [ "ALSA",               RTMIDI_API_LINUX_ALSA ],
+    jack        => [ "Jack",               RTMIDI_API_UNIX_JACK ],
+    winmm       => [ "Windows MultiMedia", RTMIDI_API_WINDOWS_MM ],
+    dummy       => [ "Dummy",              RTMIDI_API_RTMIDI_DUMMY ]
+};
+
+my $music_events = +{ map { $_ => 1 } qw/
+    note_off note_on key_after_touch
+    control_change patch_change
+    channel_after_touch pitch_wheel_change
+/ };
 
 =head1 METHODS
 
@@ -51,6 +66,20 @@ Returns a new MIDI::RtMidi::FFI::Device object. Valid attributes:
 
 B<type> -
 Device type : 'in' or 'out' (defaults to 'out')
+
+=item *
+
+B<api> -
+MIDI API to use. This should be a L<RtMidiApi constant|MIDI::RtMidi::FFI/"RtMidiApi">.
+By default the device should use the first compiled API available. See search
+order notes in
+L<Using Simultaneous Multiple APIs|https://www.music.mcgill.ca/~gary/rtmidi/index.html#multi>
+on the RtMidi website.
+
+=item *
+
+B<api_name> -
+MIDI API to use by name. One of 'alsa', 'jack', 'core', 'winmm' or 'dummy'.
 
 =item *
 
@@ -84,10 +113,6 @@ B<ignore_sensing> -
 (Type 'in' only) Ignore incoming active sensing messages (defaults to true)
 
 =item *
-
-B<_skip_free> -
-A hack to prevent memory errors when a device is being cleaned up.
-Skips C<free()> (defaults to false)
 
 =back
 
@@ -259,7 +284,7 @@ sub get_current_api {
 Here be dragons.
 
     $device->set_callback( sub {
-        my ( $ts, $msg, $data );
+        my ( $ts, $msg, $data ) = @_;
         # handle $msg here
     }, $data );
 
@@ -324,6 +349,36 @@ sub get_message {
     rtmidi_in_get_message( $self->{device}, $self->{queue_size_limit} );
 }
 
+=head2 get_event
+
+    $device->get_event();
+
+Type 'in' only. Gets the next message from the queue, if available, as a decoded L<MIDI::Event>.
+
+=cut
+
+sub get_event {
+    my ( $self ) = @_;
+    my $msg = $self->get_message;
+    return unless $msg;
+    $msg = "0$msg"; # restore dtime
+    my $decoded = MIDI::Event::decode( \$msg )->[0];
+    if ( ref $decoded ne 'ARRAY' ) {
+        my $hmsg = join '', map { sprintf "%02x", ord $_ } split '', $msg;
+        warn "Could not decode message $hmsg";
+    }
+
+    my @event = @{ $decoded };
+    my $is_music_event = $music_events->{ $event[0] };
+    splice( @event, 1, 1 );                    # dtime
+    splice( @event, 1, 1 ) if $is_music_event; # channel
+
+    $event[0] = 'note_off' if ( $event[0] eq 'note_on' && $event[-1] == 0 );
+    return wantarray
+        ?  @event
+        : \@event;
+}
+
 =head2 send_message
 
     $device->send_message( $msg );
@@ -341,16 +396,22 @@ sub send_message {
 =head2 send_event
 
     $device->send_event( @event );
-    $device->send_event( note_on => 0, 0, 0x40, 0x5a );
+    $device->send_event( note_on => 0x40, 0x5a );
 
 Type 'out' only. Sends a L<MIDI::Event> encoded message to the open port.
+
+NOTE: The dtime and channel values should be omitted from the message.
 
 =cut
 
 sub send_event {
     my ( $self, @event ) = @_;
+    my $is_music_event = $music_events->{ $event[0] };
+    splice @event, 1, 0, 0;                     # dtime
+    splice @event, 1, 0, 0 if $is_music_event;  # channel
     my $msg = MIDI::Event::encode( [[@event]], { never_add_eot => 1 } );
-    $self->send_message( ${ $msg } );
+    substr( $$msg, 0, 1 ) = ''; # snip dtime
+    $self->send_message( $$msg );
 }
 
 sub port_name { $_[0]->{port_name}; }
@@ -369,6 +430,10 @@ sub _create_device {
     croak "Unknown type : $self->{type}" unless $create_dispatch->{ $fn };
 
     $self->{queue_size_limit} //= $self->{bufsize} //= 1024;
+    my $api_by_name;
+    $api_by_name = $rtmidi_api_names->{ $self->{api_str} } if $self->{api_str};
+    $self->{api} //= $api_by_name->[1] if $api_by_name;
+    $self->{api} //= $rtmidi_api_names->{ unspecified }->[1];
     $self->{device} = $create_dispatch->{ $fn }->( $self->{api}, $self->{name}, $self->{queue_size_limit} );
     $self->{type} eq 'in' && $self->ignore_types(
         $self->{ignore_sysex},
@@ -377,15 +442,17 @@ sub _create_device {
     );
 }
 
+my $free_dispatch = {
+    in  => \&rtmidi_in_free,
+    out => \&rtmidi_out_free
+};
 sub DESTROY {
     my ( $self ) = @_;
-    my $free_dispatch = {
-        rtmidi_in_free => \&rtmidi_in_free,
-        rtmidi_out_free => \&rtmidi_out_free
-    };
-    my $fn = "rtmidi_$self->{type}_free";
-    croak "Unable to free type : $self->{type}" unless $free_dispatch->{ $fn };
-    $free_dispatch->{ $fn }->( $self->{device} ) unless $self->{_skip_free};
+    my $fn = $free_dispatch->{ $self->{type} };
+    croak "Unable to free type : $self->{type}" unless $fn;
+    $self->close_port;
+    delete $self->{callback};
+    $fn->( delete $self->{device} );
 }
 
 1;
@@ -398,11 +465,6 @@ __END__
 
 The callback mechanism for handling incoming events is useful. It would be nice
 if it were more robust.
-
-=head2 Deprecate _skip_free
-
-I've found this is only required for certain builds of librtmidi v3.0.0, but
-not requiring it at all would be better.
 
 =head1 SEE ALSO
 
@@ -428,7 +490,7 @@ Please direct all requests to L<https://github.com/jbarrett/MIDI-RtMidi-FFI/issu
 
 =head1 COPYRIGHT
 
-Copyright 2019 John Barrett.
+Copyright 2019-2021 John Barrett.
 
 =head1 LICENSE
 

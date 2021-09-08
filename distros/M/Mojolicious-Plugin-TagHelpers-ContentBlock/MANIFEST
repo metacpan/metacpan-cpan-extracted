@@ -1,0 +1,16 @@
+lib/Mojolicious/Plugin/TagHelpers/ContentBlock.pm
+t/content_block.t
+t/content_block_position.t
+t/content_block_init.t
+t/content_block_separator.t
+t/synopsis.t
+t/ExamplePlugin/Admin.pm
+t/ExamplePlugin/Email.pm
+t/ExamplePlugin/Preferences.pm
+t/ExamplePlugin/preferences.html.ep
+Changes
+MANIFEST
+LICENSE
+Makefile.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,127 @@
+#pp_bless ('Statistics::Descriptive::PDL::Util');
+
+pp_addpm({At=>'Top'}, <<'EOD');
+ 
+use PDL::LiteF;
+use PDL::NiceSlice;
+use Carp;
+ 
+$PDL::onlinedoc->scan(__FILE__) if $PDL::onlinedoc;
+ 
+eval { require PDL::Core; require PDL::GSL::CDF; };
+my $CDF = 1 if !$@;
+ 
+=head1 NAME
+ 
+PDL::Stats::Basic -- basic statistics and related utilities such as standard deviation, Pearson correlation, and t-tests.
+ 
+=head1 DESCRIPTION
+ 
+The terms FUNCTIONS and METHODS are arbitrarily used to refer to methods that are threadable and methods that are NOT threadable, respectively.
+ 
+Does not have mean or median function here. see SEE ALSO.
+ 
+=head1 SYNOPSIS
+ 
+    use PDL::LiteF;
+    use PDL::NiceSlice;
+    use PDL::Stats::Basic;
+ 
+    my $stdv = $data->stdv;
+ 
+or
+ 
+    my $stdv = stdv( $data );  
+ 
+=cut
+ 
+EOD
+
+my $xxx = <<'EOSD'
+pp_def('stdv',
+  Pars      => 'a(n); float+ [o]b()',
+  GenericTypes => [F, D],
+  HandleBad => 1,
+  Code      => '
+    $GENERIC(b) sa, a2;
+    sa = 0; a2 = 0;
+    PDL_Indx N = $SIZE(n);
+    loop (n) %{
+      sa += $a();
+      a2 += pow($a(), 2);
+    %}
+    $b() = sqrt( a2 / N - pow(sa/N,2) );
+  ',
+  BadCode  => '
+    $GENERIC(b) sa, a2;
+    sa = 0; a2 = 0;
+    PDL_Indx N = 0;
+    loop (n) %{
+      if ( $ISGOOD($a()) ) {
+        sa += $a();
+        a2 += pow($a(), 2);
+        N  ++;
+      }
+    %}
+    if (N) {
+      $b() = sqrt( a2 / N - pow(sa/N,2) );
+    }
+    else {
+      $SETBAD(b());
+    }
+  ',
+  Doc      => '
+ 
+=for ref
+ 
+Sample standard deviation.
+ 
+=cut
+  ',
+ 
+);
+EOSD
+;
+
+pp_def('sum_a_by_contiguous_b',
+  Pars      => 'a(n); b(n); int+ [o]t();',
+  # GenericTypes => ['L', 'F', 'D'],
+  HandleBad => 0,  #  fix later, but we should not have any such data anyway?
+  Code      => '
+    double sum = 0;
+    PDL_Indx N = $SIZE(n);
+    PDL_Indx j = 0;
+    PDL_Indx i;
+    double xx[N];
+    double last_bval = 100000;  #  needs fixing
+    loop (n) %{
+      if (last_bval != $b()) {
+        xx[j] = sum;
+        sum = 0;
+        j += 1;
+      }
+      sum += $a();
+    %}
+    xx[j] = sum;
+    
+    https://github.com/PDLPorters/pdl/blob/459ff95039ea60716c019c91077dadfe7425564e/Basic/Primitive/primitive.pd#L1639
+    
+    for (i=0; i<=j; i++) {
+      $t() = xx[i];
+    }
+  ',
+  Doc      => '
+ 
+=for ref
+ 
+Sum values in first ndarray given contiguous sequences of
+the same value in the second ndarray.
+ 
+=cut
+  ',
+ 
+);
+
+#pp_export_nothing();
+
+pp_done();

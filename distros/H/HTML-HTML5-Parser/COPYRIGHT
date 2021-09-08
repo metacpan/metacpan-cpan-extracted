@@ -3,33 +3,16 @@ Upstream-Name: HTML-HTML5-Parser
 Upstream-Contact: Toby Inkster <tobyink@cpan.org>
 Source: https://metacpan.org/release/HTML-HTML5-Parser
 
-Files: CREDITS
- Changes
+Files: INSTALL
  LICENSE
- MANIFEST.SKIP
- META.ttl
- Makefile.PL
  NEWS
- README
  TODO
- bin/html2xhtml
- bin/html5debug
  examples/charsets.pl
  examples/html/iso-8859-15.html
  examples/html/utf-16.html
  examples/html/utf-8.html
- lib/HTML/HTML5/Parser/Charset/DecodeHandle.pm
- lib/HTML/HTML5/Parser/Charset/Info.pm
- lib/HTML/HTML5/Parser/Charset/UnicodeChecker.pm
- lib/HTML/HTML5/Parser/Charset/UniversalCharDet.pm
- lib/HTML/HTML5/Parser/Charset/WebLatin1.pm
- lib/HTML/HTML5/Parser/Charset/WebThai.pm
- lib/HTML/HTML5/Parser/TagSoupParser.pm
- lib/HTML/HTML5/Parser/Tokenizer.pm
- meta/changes.ttl
- meta/doap.ttl
- meta/makefile.ttl
- meta/rt-bugs.ttl
+ t/data/rt-96399-1.html
+ t/data/rt-96399-2.html
  t/html5lib-fail/domjs-unsafe.dat
  t/html5lib-fail/entities02.dat
  t/html5lib-fail/plain-text-unsafe.dat
@@ -77,9 +60,24 @@ Files: CREDITS
  t/html5lib-pass/tricky01.dat
  t/html5lib-pass/webkit01.dat
  t/html5lib-pass/webkit02.dat
- t/lib/Test/HTTP/Server.pm
 Copyright: Unknown
 License: Unknown
+
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+ lib/HTML/HTML5/Parser/Charset/DecodeHandle.pm
+ lib/HTML/HTML5/Parser/Charset/Info.pm
+ lib/HTML/HTML5/Parser/Charset/UnicodeChecker.pm
+ lib/HTML/HTML5/Parser/Charset/UniversalCharDet.pm
+ lib/HTML/HTML5/Parser/Charset/WebLatin1.pm
+ lib/HTML/HTML5/Parser/Charset/WebThai.pm
+ lib/HTML/HTML5/Parser/TagSoupParser.pm
+ lib/HTML/HTML5/Parser/Tokenizer.pm
+Copyright: Copyright 2021 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
 
 Files: lib/HTML/HTML5/Parser/UA.pm
  t/02html5.t
@@ -94,37 +92,21 @@ Files: lib/HTML/HTML5/Parser/UA.pm
 Copyright: Copyright (C) 2012 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: inc/Module/Install.pm
- inc/Module/Install/Include.pm
- inc/Module/Install/Metadata.pm
- inc/Module/Install/Scripts.pm
-Copyright: Copyright 2002 - 2012 Brian Ingerson, Audrey Tang and Adam Kennedy.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: inc/Module/Install/TrustMetaYml.pm
- inc/Module/Package/Dist/RDF.pm
-Copyright: This software is copyright (c) 2011-2012 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: inc/Module/Install/Package.pm
-Copyright: Copyright (c) 2011. Ingy doet Net.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
 Copyright: None
 License: public-domain
-Comment: This file! Automatically generated.
 
-Files: inc/Module/Install/Contributors.pm
-Copyright: This software is copyright (c) 2013 by Toby Inkster.
+Files: README
+ lib/HTML/HTML5/Parser.pm
+Copyright: Copyright (C) 2007-2011 by Wakaba.
+ Copyright (C) 2009-2012 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: inc/Module/Install/Base.pm
-Copyright: Copyright 2003, 2004 by Audrey Tang <autrijus@autrijus.org>.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: inc/Module/Install/Makefile.pm
-Copyright: Copyright 2002, 2003, 2004 Audrey Tang and Brian Ingerson.
+Files: bin/html2xhtml
+ bin/html5debug
+Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/01basic.t
@@ -135,26 +117,28 @@ Files: lib/HTML/HTML5/Parser/Error.pm
 Copyright: Copyright (C) 2011-2012 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: lib/HTML/HTML5/Parser.pm
-Copyright: Copyright (C) 2007-2011 by Wakaba.
- Copyright (C) 2009-2012 by Toby Inkster.
+Files: Makefile.PL
+Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: inc/YAML/Tiny.pm
-Copyright: Copyright 2006 - 2012 Adam Kennedy.
+Files: t/lib/Test/HTTP/Server.pm
+Copyright: Copyright 2012 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/rt-96399.t
+Copyright: Copyright (C) 2017 by Gregory Todd Williams.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
- This software is Copyright (c) 2013 by the copyright holder(s).
+ This software is Copyright (c) 2021 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2013 by the copyright holder(s).
+ This software is Copyright (c) 2021 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The GNU General Public License, Version 1, February 1989
-

@@ -9,13 +9,13 @@ qfdb.pl
 
 =head1 ABSTRACT
 
-A script to get the forwarding database table (FDB) from switches supporting the NX-OS limited Q-BRIDGE-MIB:
+A script to get the forwarding database table (FDB) from switches supporting the ArubaCX limited Q-BRIDGE-MIB:
 
 =head1 SYNOPSIS
 
- qfdb.pl OPTIONS agent agent ...
+ fdb.pl OPTIONS agent agent ...
 
- qfdb.pl OPTIONS -i <agents.txt
+ fdb.pl OPTIONS -i <agents.txt
 
 =head2 OPTIONS
 
@@ -165,7 +165,7 @@ Karl Gaissmaier, karl.gaissmaier (at) uni-ulm.de
 
 =head1 COPYRIGHT
 
-Copyright (C) 2020 by Karl Gaissmaier
+Copyright (C) 2021 by Karl Gaissmaier
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

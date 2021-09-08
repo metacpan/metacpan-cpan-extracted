@@ -1,28 +1,55 @@
 package Dist::Zilla::Plugin::Module::Features;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-26'; # DATE
-our $DIST = 'Dist-Zilla-Plugin-Module-Features'; # DIST
-our $VERSION = '0.002'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
 use Moose;
 with 'Dist::Zilla::Role::AfterBuild';
+with 'Dist::Zilla::Role::FileFinderUser' => {
+    default_finders => [':InstallModules'],
+};
 with 'Dist::Zilla::Role::FileGatherer';
-with 'Dist::Zilla::Role::PrereqSource';
 #with 'Dist::Zilla::Role::ModuleFeatures::CheckDefinesOrDeclaresFeatures';
+with 'Dist::Zilla::Role::PrereqSource';
+with 'Dist::Zilla::Role::RequireFromBuild';
 use namespace::autoclean;
 
 use PMVersions::Util qw(version_from_pmversions);
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-08-27'; # DATE
+our $DIST = 'Dist-Zilla-Plugin-Module-Features'; # DIST
+our $VERSION = '0.004'; # VERSION
+
+my %feature_decls; # key = module name
+my @definer_modules;
+sub _load_modules {
+    my $self = shift;
+
+    for my $file (@{ $self->found_files }) {
+        next unless $file->name =~ m!^lib/(.+\.pm)$!;
+        my $mod_pm = $1;
+        $self->require_from_build($mod_pm);
+        (my $mod = $mod_pm) =~ s/\.pm$//; $mod =~ s!/!::!g;
+        no strict 'refs'; ## no critic: TestingAndDebugging::RequireUseStrict
+        my $feature_decl = \%{"$mod\::FEATURES"};
+        if (keys %$feature_decl) {
+            $feature_decls{$mod} = $feature_decl;
+        }
+    }
+    #use DD; dd \%feature_decls;
+    for my $mod (sort keys %feature_decls) {
+        my $feature_decl = $feature_decls{$mod};
+        for my $fset (sort keys %{$feature_decl->{features}}) {
+            my $defmod = "Module::Features::$fset";
+            push @definer_modules, $defmod unless grep { $_ eq $defmod } @definer_modules;
+        }
+    }
+}
+
 sub register_prereqs {
     my ($self) = @_;
-
-    #return unless $self->check_dist_defines_module_features;
-
     $self->zilla->register_prereqs(
         {
             type  => 'requires',
@@ -30,6 +57,17 @@ sub register_prereqs {
         },
         'Test::Module::Features' => version_from_pmversions('Test::Module::Features') // '0.001',
     );
+
+    $self->_load_modules;
+    for my $defmod (@definer_modules) {
+        $self->zilla->register_prereqs(
+            {
+                type  => 'x_features_from',
+                phase => 'develop',
+            },
+            $defmod => version_from_pmversions($defmod) // '0',
+        );
+    }
 }
 
 sub gather_files {
@@ -94,7 +132,7 @@ Dist::Zilla::Plugin::Module::Features - Plugin to use when building Module::Feat
 
 =head1 VERSION
 
-This document describes version 0.002 of Dist::Zilla::Plugin::Module::Features (from Perl distribution Dist-Zilla-Plugin-Module-Features), released on 2021-02-26.
+This document describes version 0.004 of Dist::Zilla::Plugin::Module::Features (from Perl distribution Dist-Zilla-Plugin-Module-Features), released on 2021-08-27.
 
 =head1 SYNOPSIS
 
@@ -115,7 +153,13 @@ the following:
 =item * Make sure that L<Module::Features> is added as a (phase=develop, rel=x_spec) prerequisite
 
 This is a way to express that the module I<follows the specification> specified
-in L<Module::Features>.
+in L<Module::Features>. This recommendation is per Module::Features spec.
+
+=item * For a feature declarer module, make sure that the appropriate C<Module::Features::*> modules are added as (phase=develop, rel=x_features_from) prerequisites
+
+This is a way to express that the module declares features defined in the
+associated C<Module::Features::*> modules. This recommendation is per
+Module::Features spec.
 
 =back
 
@@ -129,14 +173,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Dist-Zilla
 
 Source repository is at L<https://github.com/perlancar/perl-Dist-Zilla-Plugin-Module-Features>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Dist-Zilla-Plugin-Module-Features/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Module::Features>
@@ -147,11 +183,36 @@ L<Pod::Weaver::Plugin::Module::Features>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Module-Features>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

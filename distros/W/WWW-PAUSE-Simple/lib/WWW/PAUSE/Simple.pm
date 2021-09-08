@@ -1,14 +1,11 @@
 package WWW::PAUSE::Simple;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-24'; # DATE
-our $DIST = 'WWW-PAUSE-Simple'; # DIST
-our $VERSION = '0.451'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
+
+use Perinci::Object;
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(
@@ -23,10 +20,13 @@ our @EXPORT_OK = qw(
                        set_account_info
                );
 
-use Perinci::Object;
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-08-26'; # DATE
+our $DIST = 'WWW-PAUSE-Simple'; # DIST
+our $VERSION = '0.452'; # VERSION
 
 our %SPEC;
-my $access_log = Log::ger->get_logger(category => "access");
+my $access_log = Log::ger->get_logger(category => "_access");
 
 our $re_archive_ext = qr/(?:tar|tar\.(?:Z|gz|bz2|xz)|zip|rar)/;
 
@@ -153,6 +153,7 @@ $SPEC{':package'} = {
 
 sub _parse_release_filename {
     my $filename = shift;
+    ## no critic: Subroutines::ProhibitExplicitReturnUndef
     return undef unless
         $filename =~ /\A
                       (\w+(?:-\w+)*)
@@ -957,7 +958,7 @@ WWW::PAUSE::Simple - An API for PAUSE
 
 =head1 VERSION
 
-This document describes version 0.451 of WWW::PAUSE::Simple (from Perl distribution WWW-PAUSE-Simple), released on 2021-05-24.
+This document describes version 0.452 of WWW::PAUSE::Simple (from Perl distribution WWW-PAUSE-Simple), released on 2021-08-26.
 
 =head1 SYNOPSIS
 
@@ -1578,14 +1579,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/WWW-PAUSE-
 
 Source repository is at L<https://github.com/perlancar/perl-WWW-PAUSE-Simple>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-WWW-PAUSE-Simple/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<CPAN::Uploader> which also does uploading from CLI.
@@ -1602,11 +1595,36 @@ L<https://perlancar.wordpress.com/2015/03/25/interacting-with-pause-using-cli/>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=WWW-PAUSE-Simple>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

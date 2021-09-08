@@ -14,7 +14,6 @@ BEGIN
 {
     use strict;
     use warnings;
-    use IO::File;
     use parent qw( DB::Object );
     require DB::Object::Mysql::Statement;
     require DB::Object::Mysql::Tables;

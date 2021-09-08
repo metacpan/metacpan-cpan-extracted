@@ -1,6 +1,9 @@
 Changes Log for File-Find-Object-Rule:
 --------------------------------------
 
+0.0313  2021-08-27
+    - Extract https://metacpan.org/pod/File::TreeCreate .
+
 0.0312  2020-01-28
     - Rebuild for order of 'NAME' and 'VERSION' sections in the generated
     POD documentation (see:

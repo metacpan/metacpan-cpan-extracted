@@ -115,6 +115,7 @@ t/testset/bot/yahoo_japan_bot.yaml
 t/testset/bot/yahoo_slurp.yaml
 t/testset/bot/yandexbot.yaml
 t/testset/browser/apple_safari.yaml
+t/testset/browser/browser_general.yaml
 t/testset/browser/browser_misc.yaml
 t/testset/browser/duckduckgo.yaml
 t/testset/browser/google_app.yaml

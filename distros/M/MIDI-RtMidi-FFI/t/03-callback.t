@@ -1,13 +1,13 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
+use Test::Lib;
 use Time::HiRes qw/ usleep /;
 
-use FindBin;
-use lib "$FindBin::RealBin/lib/";
-
 use MIDI::RtMidi::FFI::TestUtils;
+
+plan skip_all => "Sanity check failed" unless sanity_check;
 
 my ( $in, $out ) = ( newdevice( 'in' ), newdevice() );
 isa_ok( $_, 'MIDI::RtMidi::FFI::Device' ) for ( $in, $out );
@@ -24,7 +24,7 @@ $in->set_callback( sub {
 );
 
 subtest callback => sub {
-    plan skip_all => 'Cannot open virtual ports on MS-Windows' if $^O eq 'MSWin32';
+    plan skip_all => 'Cannot open virtual ports on this platform' if no_virtual;
 
     connect_devices( $in, $out );
 

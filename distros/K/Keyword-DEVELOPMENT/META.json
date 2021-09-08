@@ -44,6 +44,6 @@
          "web" : "https://github.com/Ovid/keyword-development"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

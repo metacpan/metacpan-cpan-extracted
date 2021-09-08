@@ -1,0 +1,45 @@
+#!/usr/bin/env perl
+#
+# This file is part of App-nioscli
+#
+# This software is Copyright (c) 2021 by Christian Segundo.
+#
+# This is free software, licensed under:
+#
+#   The Artistic License 2.0 (GPL Compatible)
+#
+# PODNAME: nioscli
+# ABSTRACT: CLI for NIOS
+# VERSION
+# AUTHORITY
+use strictures 2;
+use App::nioscli;
+App::nioscli->new_with_command->run;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+nioscli - CLI for NIOS
+
+=head1 VERSION
+
+version 0.001
+
+=head1 AUTHOR
+
+Christian Segundo <ssmn@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2021 by Christian Segundo.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

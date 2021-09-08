@@ -157,6 +157,12 @@ foreach my $backend (@backends) {
   my $dates = $reader->values('Dates');
   is_deeply($dates, \@expected_dates_and_times, "dates using $backend");
 
+  # check time conversions with rounding hack
+  my $t1 = $reader->formatted_date("44022.123599537037", "[h]:mm:ss");
+  is($t1, '02:57:59', 'time conversion 1');
+  my $t2 = $reader->formatted_date("0.123599537037", "[h]:mm:ss");
+  is($t2, '02:57:59', 'time conversion 2');
+
   # other date format
   my $expected_other_format = clone \@expected_dates_and_times;
   foreach my $row (@$expected_other_format) {

@@ -12,7 +12,7 @@ use 5.008001;
 use strict;
 no warnings;
 
-our $VERSION = '0.301';
+our $VERSION = '0.992';
 
 use IO::Handle;
 use HTML::HTML5::Parser::Tokenizer;

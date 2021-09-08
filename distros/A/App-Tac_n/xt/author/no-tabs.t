@@ -12,6 +12,7 @@ my @files = (
     't/00-compile.t',
     't/01-results.t',
     't/data/cat/cat-n-1.txt',
+    't/data/cat/three-lines.txt',
     't/data/sort/ints1.txt',
     't/data/sort/letters1.txt',
     't/data/sort/three-words.txt',

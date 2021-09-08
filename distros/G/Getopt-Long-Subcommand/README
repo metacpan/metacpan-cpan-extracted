@@ -3,8 +3,8 @@ NAME
     subcommands and completion
 
 VERSION
-    This document describes version 0.103 of Getopt::Long::Subcommand (from
-    Perl distribution Getopt-Long-Subcommand), released on 2019-02-27.
+    This document describes version 0.104 of Getopt::Long::Subcommand (from
+    Perl distribution Getopt-Long-Subcommand), released on 2021-05-30.
 
 SYNOPSIS
      use Getopt::Long::Subcommand; # exports GetOptions
@@ -112,17 +112,6 @@ DESCRIPTION
     @ARGV is parsed/formed from it. We then perform parsing to get
     subcommand names. Finally we hand it off to Complete::Getopt::Long.
 
-CAVEATS
-  Common options take precedence over subcommand options
-    Common options (e.g. "--help") are parsed and removed from the
-    command-line first. This is done for convenience so you can do something
-    like "cmd subc --help" or "cmd --help subc" to get help. The consequence
-    is you cannot have a subcommand option with the same name as common
-    option.
-
-    Similarly, options for a subcommand takes precedence over its
-    sub-subcommand, and so on.
-
 FUNCTIONS
   GetOptions(%cmdspec) => hash
     Exported by default.
@@ -212,6 +201,17 @@ BUGS
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
 
+CAVEATS
+  Common options take precedence over subcommand options
+    Common options (e.g. "--help") are parsed and removed from the
+    command-line first. This is done for convenience so you can do something
+    like "cmd subc --help" or "cmd --help subc" to get help. The consequence
+    is you cannot have a subcommand option with the same name as common
+    option.
+
+    Similarly, options for a subcommand takes precedence over its
+    sub-subcommand, and so on.
+
 SEE ALSO
     Getopt::Long
 
@@ -226,7 +226,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2017, 2016, 2015 by
+    This software is copyright (c) 2021, 2019, 2017, 2016, 2015 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

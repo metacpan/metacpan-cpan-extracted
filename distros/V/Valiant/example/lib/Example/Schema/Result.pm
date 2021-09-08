@@ -6,6 +6,7 @@ package Example::Schema::Result;
 use base 'DBIx::Class';
 
 __PACKAGE__->load_components(qw/
+  Valiant::Result
   Core
   InflateColumn::DateTime/);
 

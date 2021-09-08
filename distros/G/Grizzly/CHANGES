@@ -1,0 +1,24 @@
+v0.102 2021.09.07
+
+    Added CHANGES file
+    Implemented more sections to dist.ini: [MetaJSON], [PodWeaver], [PerlTidy], [Repository], [ReadmeFromPod], [CheckChangeLog]
+
+
+v0.101 2021.09.05
+
+    Fixed dependency issues 
+
+
+v0.100 2021.09.05
+
+    Added the news command feature
+
+
+v0.002 2021.09.01
+
+    Added documentation
+
+
+v0.001 2021.08.28
+
+    Releasing the first version of application

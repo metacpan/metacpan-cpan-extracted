@@ -1,0 +1,78 @@
+{
+   "abstract" : "Tab expand and unexpand with ANSI sequence",
+   "author" : [
+      "Kazumasa Utashiro <kaz@utashiro.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.12",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-ANSI-Tabs",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::Util" : "1.45",
+            "Text::ANSI::Fold" : "2.11",
+            "perl" : "v5.14.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Text::Tabs" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Text::ANSI::Tabs" : {
+         "file" : "lib/Text/ANSI/Tabs.pm",
+         "version" : "0.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kaz-utashiro/Text-ANSI-Tabs/issues"
+      },
+      "homepage" : "https://github.com/kaz-utashiro/Text-ANSI-Tabs",
+      "repository" : {
+         "url" : "git://github.com/kaz-utashiro/Text-ANSI-Tabs.git",
+         "web" : "https://github.com/kaz-utashiro/Text-ANSI-Tabs"
+      }
+   },
+   "version" : "0.07",
+   "x_authority" : "cpan:UTASHIRO",
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_static_install" : 1
+}

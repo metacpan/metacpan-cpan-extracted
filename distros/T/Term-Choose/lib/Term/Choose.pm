@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.736';
+our $VERSION = '1.737';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -63,8 +63,8 @@ sub _valid_options {
         include_highlighted => '[ 0 1 2 ]',
         page                => '[ 0 1 2 ]',
         search              => '[ 0 1 2 ]',
-        layout              => '[ 0 1 2 3 ]',
-        keep                => '[ 1-9 ][ 0-9 ]*', ## 0 ?
+        layout              => '[ 0 1 2 3 ]', # '[ 0 1 2 ]'
+        keep                => '[ 1-9 ][ 0-9 ]*',
         ll                  => '[ 1-9 ][ 0-9 ]*',
         max_cols            => '[ 1-9 ][ 0-9 ]*',
         max_height          => '[ 1-9 ][ 0-9 ]*',
@@ -231,8 +231,13 @@ sub __get_key {
 
 sub __modify_options {
     my ( $self ) = @_;
+    ############################## remove this with the next release
+    if ( $self->{layout} == 3 ) {
+        $self->{layout} = 2;
+    }
+    ##############################
     if ( defined $self->{max_cols} && $self->{max_cols} == 1 ) {
-        $self->{layout} = 3;
+        $self->{layout} = 2;
     }
     if ( length $self->{footer} && $self->{page} != 2 ) {
         $self->{page} = 2;
@@ -240,7 +245,7 @@ sub __modify_options {
     if ( $self->{page} == 2 && ! $self->{clear_screen} ) {
         $self->{clear_screen} = 1;
     }
-    if ( $self->{max_cols} && $self->{layout} != 0 && $self->{layout} != 3 ) { ##
+    if ( $self->{max_cols} && $self->{layout} != 0 && $self->{layout} != 2 ) { ##
         $self->{layout} = 0;
     }
     if ( ! defined $self->{prompt} ) {
@@ -1043,14 +1048,14 @@ sub __current_layout {
         $self->{current_layout} = -1;
     }
     elsif ( $self->{col_width} >= $self->{avail_width} ) {
-        $self->{current_layout} = 3;
+        $self->{current_layout} = 2;
         $self->{col_width} = $self->{avail_width};
     }
     else {
         $self->{current_layout} = $self->{layout};
     }
     $self->{col_width_plus} = $self->{col_width} + $self->{pad};
-    # 'col_width_plus' no effects if layout == 3
+    # 'col_width_plus' no effects if layout == 2
 }
 
 
@@ -1062,7 +1067,7 @@ sub __list_idx2rc {
         $self->{rc2idx}[0] = [ 0 .. $#{$self->{list}} ];
         $self->{idx_of_last_col_in_last_row} = $#{$self->{list}};
     }
-    elsif ( $layout == 3 ) {
+    elsif ( $layout == 2 ) {
         for my $list_idx ( 0 .. $#{$self->{list}} ) {
             $self->{rc2idx}[$list_idx][0] = $list_idx;
             $self->{idx_of_last_col_in_last_row} = 0;
@@ -1071,13 +1076,12 @@ sub __list_idx2rc {
     else {
         my $tmp_avail_width = $self->{avail_width} + $self->{pad};
         # auto_format
-        if ( $layout == 1 || $layout == 2 ) {
+        if ( $layout == 1 ) {
             my $tmc = int( @{$self->{list}} / $self->{avail_height} );
             $tmc++ if @{$self->{list}} % $self->{avail_height};
             $tmc *= $self->{col_width_plus};
             if ( $tmc < $tmp_avail_width ) {
-                $tmc = int( $tmc + ( ( $tmp_avail_width - $tmc ) / 1.5 ) ) if $layout == 1;
-                $tmc = int( $tmc + ( ( $tmp_avail_width - $tmc ) / 4 ) )   if $layout == 2;
+                $tmc = int( $tmc + ( ( $tmp_avail_width - $tmc ) / 1.5 ) );
                 $tmp_avail_width = $tmc;
             }
         }
@@ -1127,7 +1131,7 @@ sub __list_idx2rc {
 sub __marked_idx2rc {
     my ( $self, $list_of_indexes, $boolean ) = @_;
     my $last_list_idx = $#{$self->{list}};
-    if ( $self->{current_layout} == 3 ) {
+    if ( $self->{current_layout} == 2 ) {
         for my $list_idx ( @$list_of_indexes ) {
             if ( $list_idx > $last_list_idx ) {
                 next;
@@ -1213,7 +1217,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.736
+Version 1.737
 
 =cut
 
@@ -1542,9 +1546,7 @@ Allowed values: 1 or greater
 
 (default: 5)
 
-=head3 layout
-
-From broad to narrow: 0 > 1 > 2 > 3
+=head3 layout CHANGED
 
 =over
 
@@ -1563,7 +1565,7 @@ From broad to narrow: 0 > 1 > 2 > 3
 
 =item *
 
-1 - layout "H" (default)
+1 - default
 
  .----------------------.   .----------------------.   .----------------------.   .----------------------.
  | .. .. .. .. .. .. .. |   | .. .. .. .. ..       |   | .. .. .. .. .. ..    |   | .. .. .. .. .. .. .. |
@@ -1574,22 +1576,7 @@ From broad to narrow: 0 > 1 > 2 > 3
  |                      |   |                      |   |                      |   | .. .. .. .. .. .. .. |
  '----------------------'   '----------------------'   '----------------------'   '----------------------'
 
-=item *
-
-2 - layout "V"
-
- .----------------------.   .----------------------.   .----------------------.   .----------------------.
- | .. ..                |   | .. .. ..             |   | .. .. .. ..          |   | .. .. .. .. .. .. .. |
- | .. ..                |   | .. .. ..             |   | .. .. .. ..          |   | .. .. .. .. .. .. .. |
- | ..                   |   | .. .. ..             |   | .. .. .. ..          |   | .. .. .. .. .. .. .. |
- |                      |   | .. ..                |   | .. .. ..             |   | .. .. .. .. .. .. .. |
- |                      |   |                      |   | .. .. ..             |   | .. .. .. .. .. .. .. |
- |                      |   |                      |   |                      |   | .. .. .. .. .. .. .. |
- '----------------------'   '----------------------'   '----------------------'   '----------------------'
-
-=item *
-
-3 - all in a single column
+2 - all in a single column
 
  .----------------------.   .----------------------.   .----------------------.   .----------------------.
  | ..                   |   | ..                   |   | ..                   |   | ..                   |

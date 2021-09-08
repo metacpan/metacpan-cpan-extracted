@@ -14,7 +14,8 @@ autoload -Molympic \
 	--olympic-dow    --olympic-dow-rev \
 	--tokyo2020      --tokyo2020-rev \
 	--tokyo2020-gold --tokyo2020-gold-rev \
-	--gold-frame
+	--gold-frame \
+	--para2020 --para2020-rev
 
 option --themecolor::bg \
 	-Mtermcolor::bg(default=100,light=--$<shift>,dark=--$<shift>-rev)

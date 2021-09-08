@@ -11,7 +11,7 @@ use JSON::XS;
 use URI::Escape;
 use Carp qw/carp croak/;
 
-our $VERSION    = '0.09';
+our $VERSION    = '0.10';
 
 sub new {
     my ($class, %opt) = @_;
@@ -31,37 +31,41 @@ sub login {
     my ($self, %opt)   = @_;
     $self->{login}     = $opt{-login}       || $self->{login}       || croak "You must specify -login opt for 'login' method";
     $self->{password}  = $opt{-password}    || $self->{password}    || croak "You must specify -password opt for 'login' method";
-    my $ua = $self->{ua};
     my $res;
 
     #Get login token
-    $res = $ua->get('https://mail.ru');
+    $res = $self->{ua}->get('https://mail.ru');
     if ($res->code ne '200') {
         croak "Can't get start mail.ru page. Code: " . $res->code;
     }
-    my ($login_token) = $res->decoded_content =~ /CSRF\s*[:=]\s*"([0-9A-Za-z]+?)"/;
-    if (not $login_token) {
+
+    my $login_token;
+
+    # В бровзере ловится вот этой регулярочкой
+    if ($res->decoded_content =~ /CSRF\s*=\s*\"([a-f|A-F|0-9]+)\"/) {
+        $login_token = $1;
+    # В этом скрипте - почему-то вот этой
+    } elsif ($res->decoded_content =~ /CSRF:\s+\"([a-f|A-F|0-9]+)\"/) {
+        $login_token = $1;
+    } else {
         croak "Can't found login token";
     }
 
     #Login
-    my %param = (
+    my $param = {
             'login'         => $self->{login},
             'password'      => $self->{password},
             'saveauth'      => 1,
             'project'       => 'e.mail.ru',
             'token'         => $login_token,
-    );
+    };
+
     my %headers = (
-        'Content-type'      => 'application/x-www-form-urlencoded',
-        'Accept'            => '*/*',
-        'Accept-Encoding'   => 'gzip, deflate, br',
-        'Accept-Language'   => 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
         'Referer'           => 'https://mail.ru/?from=logout',
         'Origin'            => 'https://mail.ru',
     );
 
-    $res = $ua->post('https://auth.mail.ru/jsapi/auth', \%param, %headers);
+    $res = $self->{ua}->post('https://auth.mail.ru/jsapi/auth', $param, %headers);
     if ($res->code ne '200') {
         croak "Wrong response code from login form: " . $res->code;
     }
@@ -78,40 +82,28 @@ sub login {
 sub __getToken {
     my $self = shift;
 
-    my %headers = (
-        'Accept'                    => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-        'Accept-Encoding'           => 'gzip, deflate, br',
-        'Accept-Language'           => 'ru,en-US;q=0.9,en;q=0.8',
-        'Referer'                   => 'https://mail.ru/',
-        'Sec-Fetch-Dest'            => 'document',
-        'Sec-Fetch-Mode'            => 'navigate',
-        'Sec-Fetch-Site'            => 'same-site',
-        'Sec-Fetch-User'            => '?1',
-        'Upgrade-Insecure-Requests' => '1',
-    );
-    my $res = $self->{ua}->get('https://auth.mail.ru/sdc?from=' . uri_escape('https://cloud.mail.ru/?from=promo&from=authpopup') , %headers);
+    my $res = $self->{ua}->get('https://auth.mail.ru/sdc?from=' . uri_escape('https://cloud.mail.ru/?from=promo&from=authpopup') );
 
     if ($res->is_success) {
         my $content = $res->decoded_content;
-        $DB::single = 1;
-        if ($content =~ /"csrf"\s*:\s*"([a-zA-Z0-9]+?)"/) {
+        if ($content =~ /\"csrf\"\s*\:\s*\"([0-9|a-z|A-Z|_]+)\"/) {
             $self->{authToken} = $1;
             carp "Found authToken: $self->{authToken}" if $self->{debug};
 
-            if ($content =~ /"email"\s*:\s*"(.+?)"/) {
+            if ($content =~ /\"email\"\s*:\s*\"(.+?)\"/) {
                 $self->{email} = $1;
                 carp "Found email: $self->{email}" if $self->{debug};
 
                 #Get BUILD
                 $self->{build} = 'hotfix_CLOUDWEB-7726_50-0-3.201710311503';
-                if ($content =~ /"BUILD"\s*:\s*"(.+?)"/) {
+                if ($content =~ /\"BUILD\"\s*:\s*\"(.+?)\"/) {
                     $self->{build} = $1;
                     carp "Found and use new build $self->{build}" if $self->{debug};
                 }
 
                 #Get x-page-id
                 $self->{'x-page-id'} = 'f9jfLFeHA5';
-                if ($content =~ /"x-page-id"\s*:\s*"(.+?)"/) {
+                if ($content =~ /\"x\-page\-id\"\s*:\s*\"(.+?)\"/) {
                     $self->{'x-page-id'} = $1;
                     carp "Found and use new x-page_id $self->{build}" if $self->{debug};
                 }
@@ -190,7 +182,7 @@ __END__
 B<Mailru::Cloud::Auth> - authorize on site https://cloud.mail.ru and return csrf token
 
 =head1 VERSION
-    version 0.09
+    version 0.10
 
 =head1 SYNOPSYS
 

@@ -1,0 +1,132 @@
+<%doc>
+Define the /Elements/CollectionList column mappings for the
+RT::FilterRule class.
+</%doc>
+\
+<%ARGS>
+$Name => undef
+$Attr => undef
+$GenericMap => {}
+</%ARGS>
+\
+<%ONCE>
+my $COLUMN_MAP = {
+    'Disabled' => {
+        'title'     => 'Status',     # loc
+        'attribute' => 'Disabled',
+        'value'     => sub {
+            return $_[0]->Disabled
+                ? $_[0]->loc('Disabled')
+                : $_[0]->loc('Enabled');
+        },
+    },
+    'Name' => {
+        'title'     => 'Name',                       # loc
+        'attribute' => 'Name',
+        'value'     => sub { return $_[0]->Name },
+    },
+    'TriggerType' => {
+        'title'     => 'Trigger type',               # loc
+        'attribute' => 'TriggerType',
+        'value'     => sub {
+            my $Value = $_[0]->TriggerType || '-';
+            return $_[0]->loc('On ticket creation') if ( $Value eq 'Create' );
+            return $_[0]->loc('When a ticket moves between queues')
+                if ( $Value eq 'QueueMove' );
+            return $Value;
+        },
+    },
+    'StopIfMatched' => {
+        'title'     => 'Stop if matched',            # loc
+        'attribute' => 'StopIfMatched',
+        'value'     => sub {
+            return $_[0]->StopIfMatched
+                ? $_[0]->loc('Stop')
+                : $_[0]->loc('Continue');
+        },
+    },
+    'Conflicts' => {
+        'title'     => 'Conflicts',                  # loc
+        'attribute' => 'Conflicts',
+        'value'     => sub {
+            my $HTML = $_[0]->DescribeConflicts;
+            return \$HTML;
+        },
+    },
+    'Requirements' => {
+        'title'     => 'Requirements',               # loc
+        'attribute' => 'Requirements',
+        'value'     => sub {
+            my $HTML = $_[0]->DescribeRequirements;
+            return \$HTML;
+        },
+    },
+    'Actions' => {
+        'title'     => 'Actions',                    # loc
+        'attribute' => 'Actions',
+        'value'     => sub {
+            my $HTML = $_[0]->DescribeActions;
+            return \$HTML;
+        },
+    },
+    'MatchCounts' => {
+        'title' => 'Match Counts',                   # loc
+        'value' => sub {
+            my $HTML = join(
+                '<br />',
+                map { $m->interp->apply_escapes( $_, 'h' ) } (
+                    $_[0]->loc('Past hour') . ': ' . $_[0]->MatchCount(1),
+                    $_[0]->loc('Past day') . ': ' . $_[0]->MatchCount(24),
+                    $_[0]->loc('Past week') . ': ' . $_[0]->MatchCount(168),
+                    $_[0]->loc('All time') . ': ' . $_[0]->MatchCount(0),
+                )
+            );
+            return \$HTML;
+        },
+    },
+    'MoveFilterRule' => {
+        title => 'Move',    # loc
+        value => sub {
+            my $id = $_[0]->id;
+
+            my $args = $m->caller_args(1);
+            my @pass
+                = ref $args->{'PassArguments'}
+                ? @{ $args->{'PassArguments'} }
+                : ( $args->{'PassArguments'} );
+            my %pass = map { $_ => $args->{$_} } grep exists $args->{$_},
+                @pass;
+
+            my $uri = RT->Config->Get('WebPath') . $m->request_path;
+
+            my @res = (
+                \'<a href="',
+                $uri . '?'
+                    . $m->comp(
+                    "/Elements/QueryString", %pass, 'MoveUp' => $id
+                    ),
+                \'">',
+                loc('~[Up~]'),
+                \'</a>',
+                \' <a href="',
+                $uri . '?'
+                    . $m->comp(
+                    "/Elements/QueryString", %pass, 'MoveDown' => $id
+                    ),
+                \'">',
+                loc('~[Down~]'),
+                \'</a>'
+            );
+
+            return @res;
+        },
+    },
+};
+</%ONCE>
+<%INIT>
+return GetColumnMapEntry(
+    Map       => $COLUMN_MAP,
+    Name      => $Name,
+    Attribute => $Attr
+);
+</%INIT>

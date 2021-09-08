@@ -1,5 +1,12 @@
 Revision history for Device-AVR-UPDI
 
+0.10    2021-08-25
+        [CHANGES]
+         * Fix some (harmless) warnings that would otherwise become apparent
+           after Object::Pad RT139027 bugfix
+         * Use ADJUSTPARAMS from Object::Pad 0.51
+         * Set :strict(params)
+
 0.09    2021-07-17
         [CHANGES]
          * Support multiple commands to avr-updi; useful for writing

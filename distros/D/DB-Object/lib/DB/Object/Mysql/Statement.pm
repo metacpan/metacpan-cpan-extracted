@@ -23,7 +23,6 @@ BEGIN
     use DB::Object::Mysql;
     use DB::Object::Statement;
     use DateTime;
-    use IO::File;
     use parent qw( DB::Object::Statement DB::Object::Mysql );
     our( $VERSION, $VERBOSE, $DEBUG );
     $VERSION    = 'v0.300.0';
@@ -74,6 +73,7 @@ sub dump
     my $vsep  = ",";
     my $hsep  = "\n";
     my $width = 35;
+    require IO::File;
     my $fh    = IO::File->new;
     $fh->fdopen( fileno( STDOUT ), 'w' );
     $vsep  = $args->{vsep} if( exists( $args->{vsep} ) );

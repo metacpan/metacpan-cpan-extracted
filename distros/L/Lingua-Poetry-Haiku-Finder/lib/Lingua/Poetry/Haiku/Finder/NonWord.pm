@@ -5,7 +5,7 @@ use warnings;
 package Lingua::Poetry::Haiku::Finder::NonWord;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001';
+our $VERSION   = '0.002';
 
 use Moo;
 use Types::Standard -types;

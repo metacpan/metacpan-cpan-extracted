@@ -54,7 +54,7 @@ for my $key ( @simple ) {
     next if $key ~~ @skip;
     my $opt;
     for my $line ( @{$pod{$key}} ) {
-        if ( $line =~ /(\d).*\(default\)/ ) {
+        if ( $line =~ /(\d).*\(default\)/ || $line =~ /(\d) - default/ ) {
             $pod_default{$key} = $1;
             last;
         }

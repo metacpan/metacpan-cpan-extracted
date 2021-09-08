@@ -5,6 +5,12 @@ todo:
   - update ::WSDL on handling Faults using $trace
   - #t/76wsdl11enc.t
 
+version 3.08: Fri 27 Aug 08:08:27 CEST 2021
+
+	Improvements:
+	- add dependency to XML::Compile::Tester
+	  rt.cpan.org#130097 [Kent Fredric]
+
 version 3.07: Fri May 11 00:42:08 CEST 2018
 
 	Improvements:

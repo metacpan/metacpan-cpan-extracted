@@ -68,7 +68,7 @@ The default whitelist is 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1, -2, -3, -4, -5, -6, -
 
 To opt-out more, add C<whitelist_numbers> like this in C<.perlcriticrc>
 
-    [TooMuchCode:ProhibitDuplicateLiteral]
+    [TooMuchCode::ProhibitDuplicateLiteral]
     whitelist_numbers = 42, 10
 
 This configurable parameter appends to the default whitelist and there

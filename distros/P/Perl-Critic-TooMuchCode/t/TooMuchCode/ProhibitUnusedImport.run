@@ -91,3 +91,26 @@ print 42;
 
 use Encode qw( decode );
 my $ref = \&decode;
+
+## name $Bin. issue 19
+## failures 0
+## cut
+
+use FindBin qw( $Bin );
+use lib "$Bin/../../../../";
+my $bar;
+
+## name $Bin. issue 19.
+## failures 0
+## cut
+
+use FindBin qw( $Bin );
+use lib $Bin . "/../../../../";
+
+## name $Bin in interpolated string in print. issue 19.
+## failures 0
+## cut
+
+use FindBin qw( $Bin );
+my $bar;
+print "Here it is: $Bin";

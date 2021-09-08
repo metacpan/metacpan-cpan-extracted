@@ -1,0 +1,30 @@
+CHANGE LOG
+==========
+ 
+
+2021-08-31 v0.0.4
+-----------------
+- Fix Dependencies minimal version as mentioned in the `cpanfile`
+- Fix code improvements, and pull `operation_name` outside `do { ... }` block
+- Save the `do { ... }` block into the symbol-table, so we skip all preparations
+
+
+2021-08-30 v0.0.3
+-----------------
+- Code improvements using OpenTracing built-in features
+- Fix Documentation and typo's
+
+ 
+2021-08-30 v0.0.2
+-----------------
+ 
+- Add common tags to the traces
+- Fix problems during installation and testing
+
+
+2021-08-26 v0.0.1
+-----------------
+ 
+Initial first simple implementation, which does not enrich the spans with more
+useful information. It only generates a span with the name of the Redis command
+capitilized for a operation-name.

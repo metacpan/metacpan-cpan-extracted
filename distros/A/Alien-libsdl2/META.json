@@ -4,7 +4,7 @@
       "Sanko Robinson <sanko@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.023, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -87,7 +87,7 @@
    "provides" : {
       "Alien::libsdl2" : {
          "file" : "lib/Alien/libsdl2.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       }
    },
    "release_status" : "stable",
@@ -102,13 +102,12 @@
          "web" : "https://github.com/sanko/Alien-libsdl2"
       }
    },
-   "version" : "1.06",
+   "version" : "1.07",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {
          "share" : {
             "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",
-            "Alien::gmake" : "0.11",
             "Archive::Tar" : "0",
             "Config" : "0",
             "HTTP::Tiny" : "0.044",

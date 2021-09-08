@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-App-ModuleFeaturesUtils/issues
   homepage: https://metacpan.org/release/App-ModuleFeaturesUtils
   repository: git://github.com/perlancar/perl-App-ModuleFeaturesUtils.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

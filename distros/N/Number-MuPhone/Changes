@@ -1,25 +1,42 @@
 Revision history for Number::MuPhone
 
-0.07    2017-08-14
-        Added more informative error messages for bad country codes
+1.02        2021-09-06 - initial 1.0 release (no change from last dev release)
 
-0.06    2017-07-17
-        Accidentally pushed file I was working on in previous release
-        (still learning CPAN best practices :D)
+1.02D       2031-08-17 (dev release)
+            POD Cleanup
 
-0.05    2017-07-14
-        fixed NANP "international" dial/display
+1.01D       2031-08-17 (dev release)
+            Minor cleanup, extra documentation, and typo removal
 
-0.04    2017-07-13
-        Cleaned up strictures
+1.0D        2021-08-15 (dev release)
+            Complete rebuild from scratch, with slightly different syntax to older version
 
-0.03    2017-07-12
-        Fixed error caused by $ENV{HOME} not existing
+0.07_003    2018-04-02
+            forgot to rebuild manifest (tests fail)
 
-0.02    2017-07-10
-        Screwed up initial upload. Deleted from PAUSE and reuploaded with new 
-        version number to be on safe side
+0.07_002    2018-03-28
+            Dev upload, work in progress
 
-0.01    2017-07-07
-        Initial stab - just to get the damn thing out there...
+0.07        2017-08-14
+            Added more informative error messages for bad country codes
+
+0.06        2017-07-17
+            Accidentally pushed file I was working on in previous release
+            (still learning CPAN best practices :D)
+
+0.05        2017-07-14
+            fixed NANP "international" dial/display
+
+0.04        2017-07-13
+            Cleaned up strictures
+
+0.03        2017-07-12
+            Fixed error caused by $ENV{HOME} not existing
+
+0.02        2017-07-10
+            Screwed up initial upload. Deleted from PAUSE and reuploaded with new 
+            version number to be on safe side
+
+0.01        2017-07-07
+            Initial stab - just to get the damn thing out there...
 

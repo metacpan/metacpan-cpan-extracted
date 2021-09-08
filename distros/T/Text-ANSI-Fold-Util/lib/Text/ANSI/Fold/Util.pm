@@ -1,5 +1,5 @@
 package Text::ANSI::Fold::Util;
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 use v5.14;
 use utf8;
@@ -17,24 +17,26 @@ use Text::ANSI::Fold qw(ansi_fold);
 
 =head1 NAME
 
-Text::ANSI::Fold::Util - Text::ANSI::Fold utilities (width, substr, expand)
-
-=head1 VERSION
-
-Version 0.05
+Text::ANSI::Fold::Util - Text::ANSI::Fold utilities (width, substr)
 
 =head1 SYNOPSIS
 
     use Text::ANSI::Fold::Util qw(:all);
-    use Text::ANSI::Fold::Util qw(ansi_width ansi_substr ansi_expand);
+    use Text::ANSI::Fold::Util qw(ansi_width ansi_substr);
     ansi_width($text);
     ansi_substr($text, $offset, $width [, $replacement]);
-    ansi_expand($text);
 
     use Text::ANSI::Fold::Util;
     Text::ANSI::Fold::Util::width($text);
     Text::ANSI::Fold::Util::substr($text, ...);
+
+    # ansi_expand() was moved to Text::ANSI::Tabs
+    ansi_expand($text);
     Text::ANSI::Fold::Util::expand($text);
+
+=head1 VERSION
+
+Version 0.06
 
 =head1 DESCRIPTION
 
@@ -75,7 +77,7 @@ Returns substring just like Perl's B<substr> function, but string
 position is calculated by the visible width on the screen instead of
 number of characters.
 
-If an optional I<replacemnt> parameter is given, replace the substring
+If an optional I<replacement> parameter is given, replace the substring
 by the replacement and return the entire string.
 
 It does not cut the text in the middle of multi-byte character, of
@@ -106,37 +108,16 @@ sub substr {
 
 =item B<ansi_expand>(I<text>, ...)
 
-Expand tabs.  Interface is compatible with L<Text::Tabs>::expand().
-
-Dafault tabstop is 8, and can be accessed through
-C<$Text::ANSI::Fold::Util::tabstop> variable.
-
-Option for underlying B<ansi_fold> can be passed by first parameter as
-an array reference, as well as C<< Text::ANSI::Fold->configure >> call.
-
-    my $opt = [ tabhead => 'T', tabspace => '_' ];
-    ansi_expand($opt, @text);
-
-    Text::ANSI::Fold->configure(tabhead => 'T', tabspace => '_');
-    ansi_expand($opt);
+This function is now moved to L<Text::ANSI::Tabs> module.  Interface
+remains only for backward compatibility, and may be deprecated in the
+future.
 
 =cut
 
-BEGIN { push @EXPORT_OK, qw(&ansi_expand $tabstop) }
-sub ansi_expand { goto &expand }
-
-our $tabstop = 8;
-our $spacechar = ' ';
-
-sub expand {
-    my @opt = ref $_[0] eq 'ARRAY' ? @{+shift} : ();
-    my @l = map {
-	s{^(.*\t)}{
-	    (ansi_fold($1, -1, expand => 1, tabstop => $tabstop, @opt))[0];
-	}mger;
-    } @_;
-    wantarray ? @l : $l[0];
-}
+use Text::ANSI::Tabs qw(ansi_expand);
+BEGIN { push @EXPORT_OK, qw(&ansi_expand) }
+*tabstop = \$Text::ANSI::Tabs::tabstop;
+*expand  = \&Text::ANSI::Tabs::expand;
 
 =back
 
@@ -148,21 +129,29 @@ __END__
 
 =head1 SEE ALSO
 
-L<Text::ANSI::Fold::Util>, L<https://github.com/kaz-utashiro/Text-ANSI-Fold-Util>
+L<Text::ANSI::Fold::Util>,
+L<https://github.com/kaz-utashiro/Text-ANSI-Fold-Util>
 
-L<Text::ANSI::Fold>, L<https://github.com/kaz-utashiro/Text-ANSI-Fold>
+L<Text::ANSI::Fold::Tabs>,
+L<https://github.com/kaz-utashiro/Text-ANSI-Fold-Tabs>
+
+L<Text::ANSI::Fold>,
+L<https://github.com/kaz-utashiro/Text-ANSI-Fold>
 
 L<Text::Tabs>
 
 =head1 LICENSE
 
-Copyright 2020 Kazumasa Utashiro.
+Copyright 2020-2021 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-Kazumasa Utashiro E<lt>kaz@utashiro.comE<gt>
+Kazumasa Utashiro
 
 =cut
+
+#  LocalWords:  ansi utf substr exportable unexportable
+#  LocalWords:  tabstop tabhead tabspace Kazumasa Utashiro

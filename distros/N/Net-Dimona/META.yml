@@ -1,0 +1,30 @@
+---
+abstract: 'acesso rápido à API de print-on-demand da Dimona.'
+author:
+  - 'Breno G. de Oliveira <garu@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Dimona
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  JSON::MaybeXS: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/garu/Net-Dimona/issues/
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/garu/Net-Dimona
+version: 0.01
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

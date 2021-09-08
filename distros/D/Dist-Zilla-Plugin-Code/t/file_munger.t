@@ -14,77 +14,79 @@ use lib 't/lib';
 main();
 
 sub main {
-    my $class     = 'Dist::Zilla::Plugin::Code::FileMunger';
-    my $code_name = 'munge_file';
+    my $class = 'Dist::Zilla::Plugin::Code::FileMunger';
 
     use_ok( $class, "$class can be use'd" );
 
-    note('Dist::Zilla::Role::PluginBundle');
-    {
-        my $prime = 1237;
-        my $name  = 'MyName1277';
+    for my $code_name (qw(munge_file munge_files)) {
 
-        my $tzil = Builder->from_config(
-            { dist_root => tempdir() },
-            {
-                add_files => {
-                    'source/dist.ini' => simple_ini(
-                        'GatherDir',
-                        [
-                            '=Local::PluginBundle',
-                            {
-                                plugin => $class,
-                                input  => $prime,
-                                name   => $name,
-                                code   => $code_name,
-                            },
-                        ],
-                    ),
+        note("$class ($code_name)");
+        {
+            my $prime = $code_name eq 'munge_file' ? 1237         : 5281;
+            my $name  = $code_name eq 'munge_file' ? 'MyName1277' : 'MyName1278';
+
+            my $tzil = Builder->from_config(
+                { dist_root => tempdir() },
+                {
+                    add_files => {
+                        'source/dist.ini' => simple_ini(
+                            'GatherDir',
+                            [
+                                '=Local::PluginBundle',
+                                {
+                                    plugin => $class,
+                                    input  => $prime,
+                                    name   => $name,
+                                    code   => $code_name,
+                                },
+                            ],
+                        ),
+                    },
                 },
-            },
-        );
+            );
 
-        local $Local::PluginBundle::RESULT;
+            local $Local::PluginBundle::RESULT;
 
-        $tzil->build;
+            $tzil->build;
 
-        is( $Local::PluginBundle::RESULT,                                          $prime * $prime, '... code did run' );
-        is( ( scalar grep { $_ eq "[$name] $prime" } @{ $tzil->log_messages() } ), 1,               '... correct message got logged' )
-          or diag 'got log messages: ', explain $tzil->log_messages;
-    }
+            is( $Local::PluginBundle::RESULT,                                          $prime * $prime, '... code did run' );
+            is( ( scalar grep { $_ eq "[$name] $prime" } @{ $tzil->log_messages() } ), 1,               '... correct message got logged' )
+              or diag 'got log messages: ', explain $tzil->log_messages;
+        }
 
-    note('Dist::Zilla::Role::PluginBundle::Easy');
-    {
-        my $prime = 1249;
-        my $name  = 'MyName1279';
+        note("$class ($code_name)");
+        {
+            my $prime = $code_name eq 'munge_file' ? 1249         : 5297;
+            my $name  = $code_name eq 'munge_file' ? 'MyName1279' : 'MyName1280';
 
-        my $tzil = Builder->from_config(
-            { dist_root => tempdir() },
-            {
-                add_files => {
-                    'source/dist.ini' => simple_ini(
-                        'GatherDir',
-                        [
-                            '=Local::PluginBundleEasy',
-                            {
-                                plugin => $class,
-                                input  => $prime,
-                                name   => $name,
-                                code   => $code_name,
-                            },
-                        ],
-                    ),
+            my $tzil = Builder->from_config(
+                { dist_root => tempdir() },
+                {
+                    add_files => {
+                        'source/dist.ini' => simple_ini(
+                            'GatherDir',
+                            [
+                                '=Local::PluginBundleEasy',
+                                {
+                                    plugin => $class,
+                                    input  => $prime,
+                                    name   => $name,
+                                    code   => $code_name,
+                                },
+                            ],
+                        ),
+                    },
                 },
-            },
-        );
+            );
 
-        local $Local::PluginBundleEasy::RESULT;
+            local $Local::PluginBundleEasy::RESULT;
 
-        $tzil->build;
+            $tzil->build;
 
-        is( $Local::PluginBundleEasy::RESULT,                                                               $prime * $prime, '... code did run' );
-        is( ( scalar grep { $_ eq "[=Local::PluginBundleEasy/$name] $prime" } @{ $tzil->log_messages() } ), 1,               '... correct message got logged' )
-          or diag 'got log messages: ', explain $tzil->log_messages;
+            is( $Local::PluginBundleEasy::RESULT,                                                               $prime * $prime, '... code did run' );
+            is( ( scalar grep { $_ eq "[=Local::PluginBundleEasy/$name] $prime" } @{ $tzil->log_messages() } ), 1,               '... correct message got logged' )
+              or diag 'got log messages: ', explain $tzil->log_messages;
+        }
     }
 
     note('Dist::Zilla::Role::PluginBundle (wrong usage)');
@@ -110,7 +112,7 @@ sub main {
             );
         };
 
-        isnt( $e, undef, q{throws an exception if the code attribute isn't given} );
+        like( $e, qr{^\QAttribute (munge_file) or (munge_files) is required at constructor\E}xsm, q{throws an exception if neither the munge_file nor the munge_files attribute isn't given} );
     }
 
     done_testing();

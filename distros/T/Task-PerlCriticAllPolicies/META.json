@@ -36,7 +36,6 @@
             "Perl::Critic::Git" : "0",
             "Perl::Critic::Itch" : "0",
             "Perl::Critic::Lax" : "0",
-            "Perl::Critic::Lokku" : "0",
             "Perl::Critic::MergeProfile" : "0",
             "Perl::Critic::Moose" : "0",
             "Perl::Critic::More" : "0",
@@ -55,6 +54,7 @@
             "Perl::Critic::Policy::Documentation::RequirePodLinksIncludeText" : "0",
             "Perl::Critic::Policy::Dynamic::NoIndirect" : "0",
             "Perl::Critic::Policy::HTTPCookies" : "0",
+            "Perl::Critic::Policy::InputOutput::ProhibitHighPrecedentLogicalOperatorErrorHandling" : "0",
             "Perl::Critic::Policy::Modules::ProhibitUseLib" : "0",
             "Perl::Critic::Policy::Moo::ProhibitMakeImmutable" : "0",
             "Perl::Critic::Policy::Perlsecret" : "0",
@@ -96,7 +96,7 @@
    "provides" : {
       "Task::PerlCriticAllPolicies" : {
          "file" : "lib/Task/PerlCriticAllPolicies.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -110,7 +110,7 @@
          "web" : "https://github.com/gugod/Task-PerlCriticAllPolicies"
       }
    },
-   "version" : "0.02",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_spdx_expression" : "MIT",
    "x_static_install" : "1"

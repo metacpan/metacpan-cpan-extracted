@@ -60,7 +60,7 @@ sub _new {
 	}
     } elsif (exists $params{xml}) {
 	if ($params{nocreate}) {
-	    $self = Sys::Virt::Network::_define_xml($con,  $params{xml});
+	    $self = Sys::Virt::Network::_define_xml($con,  $params{xml}, $params{flags});
 	} else {
 	    $self = Sys::Virt::Network::_create_xml($con,  $params{xml});
 	}
@@ -268,6 +268,19 @@ Include networks which are persistent
 =item Sys::Virt::Network::LIST_TRANSIENT
 
 Include networks which are transient
+
+=back
+
+=head2 NETWORK DEFINE
+
+The following constants can be used to control the behaviour
+of network define operations
+
+=over 4
+
+=item Sys::Virt::Network::DEFINE_VALIDATE
+
+Validate the XML document against the XML schema
 
 =back
 

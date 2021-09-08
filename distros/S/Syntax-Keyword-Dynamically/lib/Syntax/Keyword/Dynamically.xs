@@ -443,9 +443,9 @@ static OP *pp_helemdyn(pTHX)
   RETURN;
 }
 
-static int build_dynamically(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hookdata)
+static int build_dynamically(pTHX_ OP **out, XSParseKeywordPiece *arg0, void *hookdata)
 {
-  OP *aop = arg0.op;
+  OP *aop = arg0->op;
   OP *lvalop = NULL, *rvalop = NULL;
 
   /* While most scalar assignments become OP_SASSIGN, some cases of assignment
@@ -508,7 +508,7 @@ static int build_dynamically(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hoo
 
 static const struct XSParseKeywordHooks hooks_dynamically = {
   .permit_hintkey = "Syntax::Keyword::Dynamically/dynamically",
-  .piece1 = XS_PARSE_KEYWORD_TERMEXPR,
+  .piece1 = XPK_TERMEXPR,
   .build1 = &build_dynamically,
 };
 
@@ -538,7 +538,7 @@ BOOT:
   XopENTRY_set(&xop_startdyn, xop_class, OA_UNOP);
   Perl_custom_op_register(aTHX_ &pp_startdyn, &xop_startdyn);
 
-  boot_xs_parse_keyword(0);
+  boot_xs_parse_keyword(0.13);
 
   register_xs_parse_keyword("dynamically", &hooks_dynamically, NULL);
 #ifdef HAVE_DMD_HELPER

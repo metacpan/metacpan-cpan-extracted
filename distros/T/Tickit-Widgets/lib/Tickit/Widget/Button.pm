@@ -3,9 +3,9 @@
 #
 #  (C) Paul Evans, 2012-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.41;  # :param
+use Object::Pad 0.51;
 
-package Tickit::Widget::Button 0.32;
+package Tickit::Widget::Button 0.33;
 class Tickit::Widget::Button
    extends Tickit::Widget;
 
@@ -139,12 +139,14 @@ has $_on_click :reader :writer :param = undef;
 has $_active;
 has $_dragging_on_self;
 
-BUILD
+ADJUSTPARAMS
 {
-   my %params = @_;
+   my ( $params ) = @_;
 
-   $self->set_align ( $params{align}  // 0.5 );
-   $self->set_valign( $params{valign} // 0.5 );
+   foreach (qw( align valign )) {
+      my $val = delete $params->{$_};
+      $self->${\"set_$_"}( $val // 0.5 );
+   }
 }
 
 method lines

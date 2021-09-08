@@ -1,13 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.27;
+use Object::Pad 0.51;
 
-package Tickit::Widget::Box 0.54;
+package Tickit::Widget::Box 0.55;
 class Tickit::Widget::Box
    extends Tickit::SingleChildWidget;
+
+use Carp;
 
 use Tickit::Style;
 use Tickit::RenderBuffer;
@@ -101,19 +103,24 @@ Initial values for alignment options.
 
 =cut
 
-BUILD
+ADJUSTPARAMS
 {
-   my %args = @_;
+   my ( $params ) = @_;
 
    foreach (qw( child_lines_min child_lines_max child_cols_min child_cols_max
                 child_lines                     child_cols )) {
-      if( defined $args{$_} ) { $self->${\"set_$_"}( $args{$_} ) }
+      my $val = delete $params->{$_};
+      $self->${\"set_$_"}( $val ) if defined $val;
    }
 
-   $self->set_align ( $args{align}  // 0.5 );
-   $self->set_valign( $args{valign} // 0.5 );
+   foreach (qw( align valign )) {
+      my $val = delete $params->{$_};
+      $self->${\"set_$_"}( $val // 0.5 );
+   }
 
-   $self->set_child( $args{child} ) if $args{child};
+   if( exists $params->{child} ) {
+      croak "The 'child' constructor argument to ${\ref $self} is no longer recognised; use ->add_child instead";
+   }
 }
 
 method lines

@@ -1,6 +1,0 @@
-[submodule "t/lib/list-compare"]
-	path = t/lib/list-compare
-	url = https://github.com/jkeenan/list-compare
-[submodule "t/lib/dummyrepo"]
-	path = t/lib/dummyrepo
-	url = https://github.com/jkeenan/dummyrepo

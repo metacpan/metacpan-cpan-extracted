@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,23 +26,23 @@ no_index:
 provides:
   Kossy:
     file: lib/Kossy.pm
-    version: '0.40'
+    version: '0.50'
   Kossy::Connection:
     file: lib/Kossy/Connection.pm
-    version: '0.40'
+    version: '0.50'
   Kossy::Exception:
     file: lib/Kossy/Exception.pm
-    version: '0.40'
+    version: '0.50'
   Kossy::Request:
     file: lib/Kossy/Request.pm
-    version: '0.40'
+    version: '0.50'
   Kossy::Response:
     file: lib/Kossy/Response.pm
-    version: '0.40'
+    version: '0.50'
 requires:
   Class::Accessor::Lite: '0'
-  Cookie::Baker: '0.03'
-  Cookie::Baker::XS: '0.03'
+  Cookie::Baker: '0.08'
+  Cookie::Baker::XS: '0.08'
   Cwd: '0'
   Data::Section::Simple: '0'
   File::Basename: '0'
@@ -72,14 +72,16 @@ resources:
   bugtracker: https://github.com/kazeburo/Kossy/issues
   homepage: https://github.com/kazeburo/Kossy
   repository: git://github.com/kazeburo/Kossy.git
-version: '0.40'
+version: '0.50'
 x_contributors:
   - 'FUJIWARA Shunichiro <fujiwara.shunichiro@gmail.com>'
-  - 'sonots <sonots@gmail.com>'
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
   - 'Nobuhiro Nikushi <deneb.ge@gmail.com>'
+  - 'Songmu <y.songmu@gmail.com>'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
   - 'Yutaka Imoto <yutaka.imoto@dena.com>'
   - 'hisaichi5518 <hisaichi5518@gmail.com>'
-  - 'Syohei YOSHIDA <syohex@gmail.com>'
-  - 'Songmu <y.songmu@gmail.com>'
-  - 'Masahiro Nagano <kazeburo@gmail.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+  - 'kfly8 <kfly@cpan.org>'
+  - 'sonots <sonots@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

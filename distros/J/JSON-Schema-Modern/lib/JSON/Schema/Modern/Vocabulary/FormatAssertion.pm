@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::FormatAssertion;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Format-Assertion vocabulary
 
-our $VERSION = '0.516';
+our $VERSION = '0.517';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -67,9 +67,9 @@ sub keywords {
 
   my $formats = +{
     'date-time' => $is_datetime,
-    date => sub { $_[0] =~ /^\d{4}-(\d\d)-(\d\d)$/ && $is_datetime->($_[0].'T00:00:00Z') },
+    date => sub { $_[0] =~ /^\d{4}-(\d\d)-(\d\d)$/a && $is_datetime->($_[0].'T00:00:00Z') },
     time => sub {
-      return if $_[0] !~ /^(\d\d):(\d\d):(\d\d)(?:\.\d+)?([Zz]|([+-])(\d\d):(\d\d))$/
+      return if $_[0] !~ /^(\d\d):(\d\d):(\d\d)(?:\.\d+)?([Zz]|([+-])(\d\d):(\d\d))$/a
         or $1 > 23
         or $2 > 59
         or $3 > 60
@@ -149,16 +149,16 @@ sub _eval_keyword_format {
 
   try {
     if ($schema->{format} eq 'date-time' or $schema->{format} eq 'date') {
-      +require Time::Moment;
+      require Time::Moment;
     }
     elsif ($schema->{format} eq 'email' or $schema->{format} eq 'idn-email') {
-      +require Email::Address::XS; Email::Address::XS->VERSION(1.04);
+      require Email::Address::XS; Email::Address::XS->VERSION(1.04);
     }
     elsif ($schema->{format} eq 'hostname' or $schema->{format} eq 'idn-hostname') {
-      +require Data::Validate::Domain;
+      require Data::Validate::Domain;
     }
     elsif ($schema->{format} eq 'idn-hostname') {
-      +require Net::IDN::Encode;
+      require Net::IDN::Encode;
     }
   }
   catch ($e) {
@@ -195,7 +195,7 @@ JSON::Schema::Modern::Vocabulary::FormatAssertion - Implementation of the JSON S
 
 =head1 VERSION
 
-version 0.516
+version 0.517
 
 =head1 DESCRIPTION
 

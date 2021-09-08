@@ -1,6 +1,34 @@
+4.17
+ - In Rmpfr_set_default_prec(), Rmpfr_set_prec() and Rmpfr_set_prec_raw(), check
+   that the argument is not less than 2 if mpfr version is less than 4.0.0.
+   (This change was actually applied to Rmpfr_set_default_prec in Math-MPFR-4.16.)
+ - Remove all occurrences of "scalar reverse" demos\doubledouble.p and
+   t\subnormal_doubles.t.
+ - Add q_add_fr, q_sub_fr, q_mul_fr, q_div_fr and fr_cmp_q_rounded functions.
+ - Add Rmpfr_cmp_IV, Rmpfr_cmp_UV, Rmpfr_cmp_sj and Rmpfr_cmp_uj (though the MPFR
+   library currently contains neither mpfr_cmp_sj nor mpfr_cmp_uj).
+ - Fix Rmpfr_get_str_ndigits and Rmpfr_get_str_ndigits_alt so that they don't change
+   the inexflag from unset to set. (This was fixed for mpfr_get_str_ndigits in
+   mpfr versions > 4.1.0.)
+ - Add new function mpfrtoa.
+ - Fix typo in Rmpfr_get_str_ndigits code:
+   https://github.com/sisyphus/math-mpfr/commit/1f47b34b4d6b289bef9a40994f95ff57da3c6952#commitcomment-50313325
+   Thanks @trizen.
+ - Add new functions Rmpfr_acosu, Rmpfr_acospi, Rmpfr_asinu, Rmpfr_asinpi,
+   Rmpfr_atanu, Rmpfr_atanpi, Rmpfr_atan2u, Rmpfr_atan2pi, Rmpfr_powr, Rmpfr_pown,
+   Rmpfr_pow_uj, Rmpfr_pow_sj, Rmpfr_log2p1, Rmpfr_log10p1, Rmpfr_compound_si,
+   Rmpfr_exp2m1 and Rmpfr_exp10m1.
+ - Add Rmpfr_pow_IV and Rmpfr_pow_UV
+ - Alter decimalize() such that, if a second argument is provided, the function returns
+   the projected number of significant digits. This does not break backward compatibility.
+   (See the POD for elaboration.)
+ - Add anytoa() function.
+ - Use POSIX in demos/doubledouble.p to fix a (rarely encountered) bug.
+ - Refactor IV/UV/NV/PV handling inside overload subs.
+
 4.16
- - Workaround mpfr library assertion failure in decimalize() that occurs when
-   precision is 1 && mpfr library version is 4.0.1.
+ - Workaround mpfr library assertion failure in decimalize() could occur when
+   precision is 1 && mpfr library version is less than 4.0.2.
 
 4.15
  - Make some changes in test files relating to bareword filehandles and indirect

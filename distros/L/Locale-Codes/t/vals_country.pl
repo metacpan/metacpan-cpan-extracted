@@ -172,6 +172,18 @@ all_codes foo 2          => 'ERROR: _code: invalid codeset provided: foo'
 
 2name z0 alpha-2 retired => 'ERROR: _code: code not in codeset: z0 [alpha-2]'
 
+2names us =>
+          'United States of America'
+          'The United States of America'
+          'United States of America, The'
+          'United States of America (The)'
+          'The United States'
+          'United States'
+          'United States, The'
+          'United States (The)'
+          'US'
+          'USA'
+
 ##################
 # country2code
 

@@ -24,7 +24,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Module-Features-PerlTrove/issues
   homepage: https://metacpan.org/release/Module-Features-PerlTrove
   repository: git://github.com/perlancar/perl-Module-Features-PerlTrove.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

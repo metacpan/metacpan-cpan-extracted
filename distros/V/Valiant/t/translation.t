@@ -3,7 +3,6 @@
 
   use Moo;
 
-  with 'Valiant::Util::Ancestors';
   with 'Valiant::Translation';
 
   sub validate {

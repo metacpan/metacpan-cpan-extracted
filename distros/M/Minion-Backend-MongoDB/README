@@ -1,161 +1,244 @@
 NAME
-
     Minion::Backend::MongoDB - MongoDB backend for Minion
 
 VERSION
-
-    version 1.06
+    version 1.09
 
 SYNOPSIS
-
       use Minion::Backend::MongoDB;
-    
+
       my $backend = Minion::Backend::MongoDB->new('mongodb://127.0.0.1:27017');
 
 DESCRIPTION
-
-    This is a MongoDB backend for Minion v10.01 (2019-12-16) derived from
-    MongoDB::Minion::Pg and which supports all its features.
+    This is a MongoDB backend for Minion derived from Minion::Backend::Pg
+    and supports for all its features. Mojolicious 9.0 compatibility and
+    synced with Minion::Backend::Pg v.10.22 features.
 
 ATTRIBUTES
-
     Minion::Backend::MongoDB inherits all attributes from Minion::Backend
     and implements the following new ones.
 
- mongodb
-
+  mongodb
       my $mongodb = $backend->mongodb;
       $backend  = $backend->mongodb(MongoDB->new);
 
     MongoDB::Database object used to store collections.
 
- jobs
-
+  jobs
       my $jobs = $backend->jobs;
       $backend = $backend->jobs(MongoDB::Collection->new);
 
-    MongoDB::Collection object for jobs collection, defaults to one based
+    MongoDB::Collection object for "jobs" collection, defaults to one based
     on "prefix".
 
- notifications
-
+  notifications
       my $notifications = $backend->notifications;
       $backend          = $backend->notifications(MongoDB::Collection->new);
 
-    MongoDB::Collection object for notifications collection, defaults to
+    MongoDB::Collection object for "notifications" collection, defaults to
     one based on "prefix".
 
- prefix
-
+  prefix
       my $prefix = $backend->prefix;
       $backend   = $backend->prefix('foo');
 
-    Prefix for collections, defaults to minion.
+    Prefix for collections, defaults to "minion".
 
- workers
-
+  workers
       my $workers = $backend->workers;
       $backend    = $backend->workers(MongoDB::Collection->new);
 
-    MongoDB::Collection object for workers collection, defaults to one
+    MongoDB::Collection object for "workers" collection, defaults to one
     based on "prefix".
 
 METHODS
-
     Minion::Backend::MongoDB inherits all methods from Minion::Backend and
     implements the following new ones.
 
- broadcast
-
+  broadcast
       my $bool = $backend->broadcast('some_command');
       my $bool = $backend->broadcast('some_command', [@args]);
       my $bool = $backend->broadcast('some_command', [@args], [$id1, $id2, $id3]);
 
     Broadcast remote control command to one or more workers.
 
- dequeue
-
+  dequeue
       my $info = $backend->dequeue($worker_id, 0.5);
+      my $job_info = $backend->dequeue($worker_id, 0.5, {queues => ['important']});
 
-    Wait for job, dequeue it and transition from inactive to active state
-    or return undef if queue was empty.
+    Wait a given amount of time in seconds for a job, dequeue it and
+    transition from "inactive" to "active" state, or return "undef" if
+    queues were empty.
 
- enqueue
+    These options are currently available:
 
+    id
+        id => '10023'
+
+      Dequeue a specific job.
+
+    min_priority
+        min_priority => 3
+
+      Do not dequeue jobs with a lower priority.
+
+    queues
+        queues => ['important']
+
+      One or more queues to dequeue jobs from, defaults to "default".
+
+    These fields are currently available:
+
+    args
+        args => ['foo', 'bar']
+
+      Job arguments.
+
+    id
+        id => '10023'
+
+      Job ID.
+
+    retries
+        retries => 3
+
+      Number of times job has been retried.
+
+    task
+        task => 'foo'
+
+      Task name.
+
+  enqueue
       my $job_id = $backend->enqueue('foo');
       my $job_id = $backend->enqueue(foo => [@args]);
       my $job_id = $backend->enqueue(foo => [@args] => {priority => 1});
 
-    Enqueue a new job with inactive state. These options are currently
-    available:
+    Enqueue a new job with "inactive" state.
+
+    These options are currently available:
+
+    attempts
+        attempts => 25
+
+      Number of times performing this job will be attempted, with a delay
+      based on "backoff" in Minion after the first attempt, defaults to 1.
 
     delay
-
         delay => 10
 
-      Delay job for this many seconds from now.
+      Delay job for this many seconds (from now), defaults to 0.
+
+    expire
+        expire => 300
+
+      Job is valid for this many seconds (from now) before it expires. Note
+      that this option is EXPERIMENTAL and might change without warning!
+
+    lax
+        lax => 1
+
+      Existing jobs this job depends on may also have transitioned to the
+      "failed" state to allow for it to be processed, defaults to "false".
+      Note that this option is EXPERIMENTAL and might change without
+      warning!
+
+    notes
+        notes => {foo => 'bar', baz => [1, 2, 3]}
+
+      Hash reference with arbitrary metadata for this job.
+
+    parents
+        parents => [$id1, $id2, $id3]
+
+      One or more existing jobs this job depends on, and that need to have
+      transitioned to the state "finished" before it can be processed.
 
     priority
-
         priority => 5
 
-      Job priority, defaults to 0.
+      Job priority, defaults to 0. Jobs with a higher priority get performed
+      first. Priorities can be positive or negative, but should be in the
+      range between 100 and -100.
 
- fail_job
+    queue
+        queue => 'important'
 
+      Queue to put job in, defaults to "default".
+
+    sequence
+        sequence => 'host:mojolicious.org'
+
+      Sequence this job belongs to. The previous job from the sequence will
+      be automatically added as a parent to continue the sequence. Note that
+      this option is EXPERIMENTAL and might change without warning!
+
+  fail_job
       my $bool = $backend->fail_job($job_id);
       my $bool = $backend->fail_job($job_id, 'Something went wrong!');
 
-    Transition from active to failed state.
+    Transition from "active" to "failed" state.
 
- finish_job
-
+  finish_job
       my $bool = $backend->finish_job($job_id);
 
-    Transition from active to finished state.
+    Transition from "active" to "finished" state.
 
- job_info
-
+  job_info
       my $info = $backend->job_info($job_id);
 
-    Get information about a job or return undef if job does not exist.
+    Get information about a job or return "undef" if job does not exist.
 
- list_jobs
-
+  list_jobs
       my $batch = $backend->list_jobs($skip, $limit);
       my $batch = $backend->list_jobs($skip, $limit, {state => 'inactive'});
 
     Returns the same information as "job_info" but in batches.
 
+      # Get the total number of results (without limit)
+      my $num = $backend->list_jobs(0, 100, {queues => ['important']})->{total};
+      # Check job state
+      my $results = $backend->list_jobs(0, 1, {ids => [$job_id]});
+      my $state = $results->{jobs}[0]{state};
+      # Get job result
+      my $results = $backend->list_jobs(0, 1, {ids => [$job_id]});
+      my $result = $results->{jobs}[0]{result};
+
     These options are currently available:
 
-    ids
+    before
+        before => 23
 
+      List only jobs before this id.
+
+    ids
         ids => ['23', '24']
 
       List only jobs with these ids.
 
     notes
-
         notes => ['foo', 'bar']
 
       List only jobs with one of these notes. Note that this option is
       EXPERIMENTAL and might change without warning!
 
     queues
-
         queues => ['important', 'unimportant']
 
       List only jobs in these queues.
 
-    state
+    sequences
+        sequences => ['host:localhost', 'host:mojolicious.org']
 
+      List only jobs from these sequences. Note that this option is
+      EXPERIMENTAL and might change without warning!
+
+    state
         state => 'inactive'
 
       List only jobs in this state.
 
     task
-
         task => 'test'
 
       List only jobs for this task.
@@ -163,121 +246,117 @@ METHODS
     These fields are currently available:
 
     args
-
         args => ['foo', 'bar']
 
       Job arguments.
 
     attempts
-
         attempts => 25
 
       Number of times performing this job will be attempted.
 
     children
-
         children => ['10026', '10027', '10028']
 
       Jobs depending on this job.
 
     created
-
         created => 784111777
 
       Epoch time job was created.
 
     delayed
-
         delayed => 784111777
 
       Epoch time job was delayed to.
 
     finished
-
         finished => 784111777
 
       Epoch time job was finished.
 
     id
-
         id => 10025
 
       Job id.
 
-    notes
+    next
+        next => 10024
 
+      Next job in sequence.
+
+    notes
         notes => {foo => 'bar', baz => [1, 2, 3]}
 
       Hash reference with arbitrary metadata for this job.
 
-    parents
+    previous
+        previous => 10022
 
+      Previous job in sequence.
+
+    parents
         parents => ['10023', '10024', '10025']
 
       Jobs this job depends on.
 
     priority
-
         priority => 3
 
       Job priority.
 
     queue
-
         queue => 'important'
 
       Queue name.
 
     result
-
         result => 'All went well!'
 
       Job result.
 
     retried
-
         retried => 784111777
 
       Epoch time job has been retried.
 
     retries
-
         retries => 3
 
       Number of times job has been retried.
 
-    started
+    sequence
+        sequence => 'host:mojolicious.org'
 
+      Sequence name.
+
+    started
         started => 784111777
 
       Epoch time job was started.
 
     state
-
         state => 'inactive'
 
-      Current job state, usually active, failed, finished or inactive.
+      Current job state, usually "active", "failed", "finished" or
+      "inactive".
 
     task
-
         task => 'foo'
 
       Task name.
 
     time
-
         time => 78411177
 
       Server time.
 
     worker
-
         worker => '154'
 
       Id of worker that is processing the job.
 
- list_locks
-
+  list_locks
       my $results = $backend->list_locks($offset, $limit);
       my $results = $backend->list_locks($offset, $limit, {names => ['foo']});
 
@@ -285,7 +364,7 @@ METHODS
 
       # Get the total number of results (without limit)
       my $num = $backend->list_locks(0, 100, {names => ['bar']})->{total};
-    
+
       # Check expiration time
       my $results = $backend->list_locks(0, 1, {names => ['foo']});
       my $expires = $results->{locks}[0]{expires};
@@ -293,7 +372,6 @@ METHODS
     These options are currently available:
 
     names
-
         names => ['foo', 'bar']
 
       List only locks with these names.
@@ -301,19 +379,16 @@ METHODS
     These fields are currently available:
 
     expires
-
         expires => 784111777
 
       Epoch time this lock will expire.
 
     name
-
         name => 'foo'
 
       Lock name.
 
- list_workers
-
+  list_workers
       my $results = $backend->list_workers($offset, $limit);
       my $results = $backend->list_workers($offset, $limit, {ids => [23]});
 
@@ -321,15 +396,19 @@ METHODS
 
       # Get the total number of results (without limit)
       my $num = $backend->list_workers(0, 100)->{total};
-    
+
       # Check worker host
       my $results = $backend->list_workers(0, 1, {ids => [$worker_id]});
       my $host    = $results->{workers}[0]{host};
 
     These options are currently available:
 
-    ids
+    before
+        before => 23
 
+      List only workers before this id.
+
+    ids
         ids => ['23', '24']
 
       List only workers with these ids.
@@ -337,50 +416,42 @@ METHODS
     These fields are currently available:
 
     id
-
         id => 22
 
       Worker id.
 
     host
-
         host => 'localhost'
 
       Worker host.
 
     jobs
-
         jobs => ['10023', '10024', '10025', '10029']
 
       Ids of jobs the worker is currently processing.
 
     notified
-
         notified => 784111777
 
       Epoch time worker sent the last heartbeat.
 
     pid
-
         pid => 12345
 
       Process id of worker.
 
     started
-
         started => 784111777
 
       Epoch time worker was started.
 
     status
-
         status => {queues => ['default', 'important']}
 
       Hash reference with whatever status information the worker would like
       to share.
 
- lock
-
+  lock
       my $bool = $backend->lock('foo', 3600);
       my $bool = $backend->lock('foo', 3600, {limit => 20});
 
@@ -391,29 +462,25 @@ METHODS
     These options are currently available:
 
     limit
-
         limit => 20
 
       Number of shared locks with the same name that can be active at the
       same time, defaults to 1.
 
- new
-
+  new
       my $backend = Minion::Backend::MongoDB->new('mongodb://127.0.0.1:27017');
 
     Construct a new Minion::Backend::MongoDB object. Required a connection
     string URI. Optional every other attributes will be pass to
     MongoDB::MongoClient costructor.
 
- note
-
+  note
       my $bool = $backend->note($job_id, {mojo => 'rocks', minion => 'too'});
 
-    Change one or more metadata fields for a job. Setting a value to undef
+    Change one or more metadata fields for a job. Setting a value to "undef"
     will remove the field.
 
- purge
-
+  purge
       $backend->purge();
       $backend->purge({states => ['inactive'], older => 3600});
 
@@ -422,7 +489,6 @@ METHODS
     These options are currently available:
 
     older
-
         older => 3600
 
       Value in seconds to purge jobs older than this value.
@@ -430,7 +496,6 @@ METHODS
       Default: $minion->remove_after
 
     older_field
-
         older_field => 'created'
 
       What date field to use to check if job is older than.
@@ -438,57 +503,48 @@ METHODS
       Default: 'finished'
 
     queues
-
         queues => ['important', 'unimportant']
 
       Purge only jobs in these queues.
 
     states
-
         states => ['inactive', 'failed']
 
       Purge only jobs in these states.
 
     tasks
-
         tasks => ['task1', 'task2']
 
       Purge only jobs for these tasks.
 
     queues
-
         queues => ['q1', 'q2']
 
       Purge only jobs for these queues.
 
- receive
-
+  receive
       my $commands = $backend->receive($worker_id);
 
     Receive remote control commands for worker.
 
- register_worker
-
+  register_worker
       my $worker_id = $backend->register_worker;
       my $worker_id = $backend->register_worker($worker_id);
 
     Register worker or send heartbeat to show that this worker is still
     alive.
 
- remove_job
-
+  remove_job
       my $bool = $backend->remove_job($job_id);
 
-    Remove failed, finished or inactive job from queue.
+    Remove "failed", "finished" or "inactive" job from queue.
 
- repair
-
+  repair
       $backend->repair;
 
     Repair worker registry and job queue if necessary.
 
- reset
-
+  reset
       $backend->reset({all => 1});
 
     Reset job queue.
@@ -496,61 +552,52 @@ METHODS
     These options are currently available:
 
     all
-
         all => 1
 
       Reset everything.
 
     locks
-
         locks => 1
 
       Reset only locks.
 
- retry_job
-
+  retry_job
       my $bool = $backend->retry_job($job_id);
       my $bool = $backend->retry_job($job_id, {delay => 10});
 
-    Transition from failed or finished state back to inactive.
+    Transition from "failed" or "finished" state back to "inactive".
 
     These options are currently available:
 
     delay
-
         delay => 10
 
       Delay job for this many seconds (from now).
 
- stats
-
+  stats
       my $stats = $backend->stats;
 
     Get statistics for jobs and workers.
 
- unregister_worker
-
+  unregister_worker
       $backend->unregister_worker($worker_id);
 
     Unregister worker.
 
- worker_info
-
+  worker_info
       my $info = $backend->worker_info($worker_id);
 
-    Get information about a worker or return undef if worker does not
+    Get information about a worker or return "undef" if worker does not
     exist.
 
- _oid
-
+  _oid
       my $mongo_oid = $backend->_oid($hex_24length);
 
-    EXPERIMENTAL: Convert an 24-byte hexadecimal value into a BSON::OID
-    object. Usually, it should be used only if you need to query the
-    MongoDB directly
+    EXPERIMENTAL: Convert an 24-byte hexadecimal value into a "BSON::OID"
+    object. Usually, it should be used only if you need to query the MongoDB
+    directly
 
 NOTES ABOUT USER
-
     User must have this roles
 
       "roles" : [
@@ -568,17 +615,27 @@ NOTES ABOUT USER
                     }
             ]
 
-SEE ALSO
+BUGS/CONTRIBUTING
+    Please report any bugs through the web interface at
+    <https://github.com/avkhozov/Minion-Backend-MongoDB/issues> If you want
+    to contribute changes or otherwise involve yourself in development, feel
+    free to fork the Git repository from
+    <https://github.com/avkhozov/Minion-Backend-MongoDB/>.
 
-    Minion, MongoDB, http://mojolicio.us.
+SUPPORT
+    You can find this documentation with the perldoc command too.
+
+        perldoc Minion::Backend::MongoDB
+
+SEE ALSO
+    Minion, MongoDB, Minion::Guide, <https://minion.pm>,
+    Mojolicious::Guides, <https://mojolicious.org>.
 
 AUTHOR
-
     Emiliano Bruni <info@ebruni.it>, Andrey Khozov <avkhozov@gmail.com>
 
 COPYRIGHT AND LICENSE
-
-    This software is Copyright (c) 2019-2020 by Emiliano Bruni, Andrey
+    This software is Copyright (c) 2019-2021 by Emiliano Bruni, Andrey
     Khozov.
 
     This is free software, licensed under:

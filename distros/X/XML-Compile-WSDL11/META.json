@@ -36,7 +36,8 @@
             "Test::More" : "0.54",
             "XML::Compile" : "1.48",
             "XML::Compile::Cache" : "1.03",
-            "XML::Compile::SOAP11" : "3.23"
+            "XML::Compile::SOAP11" : "3.23",
+            "XML::Compile::Tester" : "0"
          }
       }
    },
@@ -52,6 +53,6 @@
          "web" : "https://github.com/markov2/perl5-XML-Compile-WSDL11"
       }
    },
-   "version" : "3.07",
+   "version" : "3.08",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

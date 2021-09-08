@@ -9,6 +9,10 @@ README
 cpanfile
 dist.ini
 lib/Acme/CoC/Dice.pm
+lib/Acme/CoC/Types.pm
+lib/Acme/CoC/Util.pm
 t/01_role.t
+t/Types.t
+t/Util.t
 t/author-pod-syntax.t
 t/basic.t

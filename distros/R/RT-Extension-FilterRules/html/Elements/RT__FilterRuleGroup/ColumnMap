@@ -1,0 +1,126 @@
+<%doc>
+Define the /Elements/CollectionList column mappings for the
+RT::FilterRuleGroup class.
+</%doc>
+\
+<%ARGS>
+$Name => undef
+$Attr => undef
+$GenericMap => {}
+</%ARGS>
+\
+<%ONCE>
+my $COLUMN_MAP = {
+    'Disabled' => {
+        'title'     => 'Status',     # loc
+        'attribute' => 'Disabled',
+        'value'     => sub {
+            return $_[0]->Disabled
+                ? $_[0]->loc('Disabled')
+                : $_[0]->loc('Enabled');
+        },
+    },
+    'Name' => {
+        'title'     => 'Name',                       # loc
+        'attribute' => 'Name',
+        'value'     => sub { return $_[0]->Name },
+    },
+    'CanMatchQueues' => {
+        'title'     => 'Queues to allow in match rules',    # loc
+        'attribute' => 'CanMatchQueues',
+        'value'     => sub {
+            my $Collection = $_[0]->CanMatchQueuesObj;
+            return '-' if ( $Collection->CountAll() == 0 );
+            my $Output = '';
+            while ( my $Item = $Collection->Next ) {
+                $Output .= '<br />' if ( $Output ne '' );
+                $Output .= $m->interp->apply_escapes(
+                    '#' . $Item->id . ': ' . $Item->Name, 'h' );
+            }
+            return \$Output;
+            }
+    },
+    'CanTransferQueues' => {
+        'title'     => 'Queues to allow as transfer destinations',    # loc
+        'attribute' => 'CanTransferQueues',
+        'value'     => sub {
+            my $Collection = $_[0]->CanTransferQueuesObj;
+            return '-' if ( $Collection->CountAll() == 0 );
+            my $Output = '';
+            while ( my $Item = $Collection->Next ) {
+                $Output .= '<br />' if ( $Output ne '' );
+                $Output .= $m->interp->apply_escapes(
+                    '#' . $Item->id . ': ' . $Item->Name, 'h' );
+            }
+            return \$Output;
+            }
+    },
+    'CanUseGroups' => {
+        'title'     => 'Groups to allow in rule actions',    # loc
+        'attribute' => 'CanUseGroups',
+        'value'     => sub {
+            my $Collection = $_[0]->CanUseGroupsObj;
+            return '-' if ( $Collection->CountAll() == 0 );
+            my $Output = '';
+            while ( my $Item = $Collection->Next ) {
+                $Output .= '<br />' if ( $Output ne '' );
+                $Output .= $m->interp->apply_escapes(
+                    '#' . $Item->id . ': ' . $Item->Name, 'h' );
+            }
+            return \$Output;
+            }
+    },
+    'RequirementsCount' => {
+        'title' => 'Requirements',                                      # loc
+        'value' => sub { return $_[0]->GroupRequirements->CountAll; }
+    },
+    'FilterRulesCount' => {
+        'title' => 'Filter rules',                                      # loc
+        'value' => sub { return $_[0]->FilterRules->CountAll; }
+    },
+    'MoveFilterRuleGroup' => {
+        title => 'Move',                                                # loc
+        value => sub {
+            my $id = $_[0]->id;
+
+            my $args = $m->caller_args(1);
+            my @pass
+                = ref $args->{'PassArguments'}
+                ? @{ $args->{'PassArguments'} }
+                : ( $args->{'PassArguments'} );
+            my %pass = map { $_ => $args->{$_} } grep exists $args->{$_},
+                @pass;
+
+            my $uri = RT->Config->Get('WebPath') . $m->request_path;
+
+            my @res = (
+                \'<a href="',
+                $uri . '?'
+                    . $m->comp(
+                    "/Elements/QueryString", %pass, 'MoveUp' => $id
+                    ),
+                \'">',
+                loc('~[Up~]'),
+                \'</a>',
+                \' <a href="',
+                $uri . '?'
+                    . $m->comp(
+                    "/Elements/QueryString", %pass, 'MoveDown' => $id
+                    ),
+                \'">',
+                loc('~[Down~]'),
+                \'</a>'
+            );
+
+            return @res;
+        },
+    },
+};
+</%ONCE>
+<%INIT>
+return GetColumnMapEntry(
+    Map       => $COLUMN_MAP,
+    Name      => $Name,
+    Attribute => $Attr
+);
+</%INIT>

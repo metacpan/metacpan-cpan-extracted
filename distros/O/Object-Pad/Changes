@@ -1,5 +1,15 @@
 Revision history for Object-Pad
 
+0.52    2021-08-25
+        [BUGFIXES]
+         * Remember to actually enable `use warnings` (RT139027)
+         * Permit slotmeta value lookup on roles applied to instances
+           (RT138927)
+         * Ensure `ADJUSTPARAMS` on superclass still works on subclasses that
+           don't add an `ADJUSTPARAMS` themselves
+
+        Development time for this release was sponsored by Perl-Verein Schweiz
+
 0.51    2021-08-10
         [CHANGES]
          * Added `ADJUSTPARAMS` blocks
@@ -14,7 +24,7 @@ Revision history for Object-Pad
          * Don't segfault on colliding :param names (RT138633)
          * Don't ship the authoring test xt/99exported-symbols.t (RT138634)
 
-        Developement time for this release was sponsored by Perl-Verein Schweiz
+        Development time for this release was sponsored by Perl-Verein Schweiz
 
 0.50    2021-08-08
         [CHANGES]
@@ -26,7 +36,7 @@ Revision history for Object-Pad
            structures for (hopefully) better forward compatibility
          * Add the concept of class hooks, analogous to slot hooks
 
-        Developement time for this release was sponsored by Deriv
+        Development time for this release was sponsored by Deriv
 
 0.49    2021-08-06
         [CHANGES]
@@ -45,7 +55,7 @@ Revision history for Object-Pad
          * Make slots visible to string-eval(), PadWalker, perl -d, etc..
            (RT138399)
 
-        Developement time for this release was partly sponsored by
+        Development time for this release was partly sponsored by
         Perl-Verein Schweiz
 
 0.48    2021-08-02
@@ -62,7 +72,7 @@ Revision history for Object-Pad
            (RT138073)
          * Fixed segfault caused by runtime generation of roles (RT137952)
 
-        Developement time for this release was sponsored by Deriv and
+        Development time for this release was sponsored by Deriv and
         Perl-Verein Schweiz
 
 0.47    2021-07-29
@@ -74,7 +84,7 @@ Revision history for Object-Pad
               externally-visible plugin-type system of hooks
          * Removed `->param_name` and `->has_param` MOP::Slot accessors
 
-        Developement time for this release was sponsored by Perl-Verein Schweiz
+        Development time for this release was sponsored by Perl-Verein Schweiz
 
 0.46    2021-07-21
         [CHANGES]

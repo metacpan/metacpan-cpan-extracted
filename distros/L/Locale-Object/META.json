@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "unrestricted"
    ],
@@ -46,7 +46,7 @@
    "provides" : {
       "Locale::Object" : {
          "file" : "lib/Locale/Object.pm",
-         "version" : "0.80"
+         "version" : "0.82"
       },
       "Locale::Object::Continent" : {
          "file" : "lib/Locale/Object/Continent.pm",
@@ -79,6 +79,6 @@
          "url" : "https://github.com/castaway/Locale-Object"
       }
    },
-   "version" : "0.80",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.82",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

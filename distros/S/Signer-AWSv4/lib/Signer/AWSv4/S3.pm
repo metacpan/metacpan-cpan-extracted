@@ -5,6 +5,7 @@ package Signer::AWSv4::S3;
 
   has bucket => (is => 'ro', isa => Str, required => 1);
   has key => (is => 'ro', isa => Str, required => 1);
+  has version_id => (is => 'ro', isa => Str);
 
   has '+service' => (default => 's3');
   has '+uri' => (init_arg => undef, lazy => 1, default => sub {
@@ -31,6 +32,7 @@ package Signer::AWSv4::S3;
       'X-Amz-Date' => $self->date_timestamp,
       'X-Amz-Expires' => $self->expires,
       'X-Amz-SignedHeaders' => $self->signed_header_list,
+      (versionId => $self->version_id) x!! $self->version_id,
     }
   }
 

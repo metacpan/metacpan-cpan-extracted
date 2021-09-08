@@ -1,4 +1,9 @@
-0.103   2019-02-27 (PERLANCAR)
+0.104   2021-05-30  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Show summaries of subcommand in completion.
+
+
+0.103   2019-02-27  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -7,20 +12,20 @@
 	  incompatible with us [RT#128643] [thanks Eric 'ikegami' Brine].
 
 
-0.102   2017-08-12 (PERLANCAR)
+0.102   2017-08-12  Released-By: PERLANCAR
 
 	- Comment-out Log::ger because we broke
 	  Perinci::CmdLine::Inline-based scripts which do not expect us to
 	  use Log::ger.
 
 
-0.101   2017-08-01 (PERLANCAR)
+0.101   2017-08-01  Released-By: PERLANCAR
 
 	- [Bugfix] Catch a couple more constant-in-grep bugs (thanks
 	  perlcritic).
 
 
-0.100   2017-08-01 (PERLANCAR)
+0.100   2017-08-01  Released-By: PERLANCAR
 
         - Add cmdspec 'configure' to allow customizing Getopt::Long
           configuration (including in specific subcommands only). Thanks to
@@ -31,7 +36,7 @@
         - Replace Log::Any with Log::ger, reinstate logging statements.
 
 
-0.09    2017-01-06 (PERLANCAR)
+0.09    2017-01-06  Released-By: PERLANCAR
 
         - Add specification key: default_subcommand.
 
@@ -40,7 +45,7 @@
           @ARGV.
 
 
-0.08    2017-01-06 (PERLANCAR)
+0.08    2017-01-06  Released-By: PERLANCAR
 
 	- Provide workaround $res->{_non_options_argv} to option handler so
 	  it can extract subcommand name from it when otherwise the
@@ -51,7 +56,7 @@
 	  regard it as a fail (success=0), but as a success.
 
 
-0.07    2017-01-03 (PERLANCAR)
+0.07    2017-01-03  Released-By: PERLANCAR
 
         - Remove experimental label.
 
@@ -62,17 +67,17 @@
           [RT#119165]).
 
 
-0.06    2016-12-02 (PERLANCAR)
+0.06    2016-12-02  Released-By: PERLANCAR
 
 	- Set Getopt::Long configuration no_getopt_compat & gnu_compat.
 
 
-0.05    2016-02-03 (PERLANCAR)
+0.05    2016-02-03  Released-By: PERLANCAR
 
 	- Adjust to Complete::Bash 0.27.
 
 
-0.04    2015-12-30 (PERLANCAR)
+0.04    2015-12-30  Released-By: PERLANCAR
 
 	- [ux] Use Complete::Bash's new truncate_current_word option for
 	  convenience, like in Perinci::Sub::Complete &
@@ -81,7 +86,7 @@
 	- Bump prereq version Log::Any::IfLOG to 0.07.
 
 
-0.03    2015-03-09 (PERLANCAR)
+0.03    2015-03-09  Released-By: PERLANCAR
 
         - [Incompatible change] 'subcommand' passed to completion routine is now
           an array instead of string.
@@ -89,13 +94,13 @@
         - Demo nested subcommand in demo script.
 
 
-0.02    2015-02-12 (PERLANCAR)
+0.02    2015-02-12  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Tweak/update documentation.
 
 
-0.01    2015-02-11 (PERLANCAR)
+0.01    2015-02-11  Released-By: PERLANCAR
 
         - First release.

@@ -1,0 +1,57 @@
+{
+   "abstract" : "A close to drop-in replacement for Statistics::Descriptive using PDL as the back-end",
+   "author" : [
+      "Shawn Laffan <shawnlaffan@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Statistics-Descriptive-PDL",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Devel::Symdump" : "0",
+            "Scalar::Util" : "0",
+            "Statistics::Descriptive" : "3.06",
+            "Test::More" : "0",
+            "rlib" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PDL" : "2.012",
+            "PDL::Stats" : "0.7",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/shawnlaffan/Statistics-Descriptive-PDL/issues/"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/shawnlaffan/Statistics-Descriptive-PDL"
+      }
+   },
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

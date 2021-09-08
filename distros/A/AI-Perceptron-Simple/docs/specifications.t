@@ -50,15 +50,23 @@ done_testing;
 #
 # Version 1.01
 #   [v] fixed currently known issues as much as possible (see 'Changes')
-#       - the "long size integer" problem happens when tests are run in the incorrect sequence, at least that's what 
-#           happened when I tested it on Windows :) Running the test a second time didn't give eny errors.
+#       - "long size integer" === "byte order not compatible"
 #
 # Version 1.02
-#   [] support for more file types (nerve file) for portability
-#   [] refactor codes
-#   [] improve the documentation
+#   [v] minimum perl version changed to 5.8 due to Test::Output
+#   [v] YAML (nerve file) for portability
+#       [v] make subroutines exportable, the names are too long
+#           [v] :local_data
+#           [v] :portable_data
+#   [v] fix test for display_confusion_matrix
+#       [v] modifier "n" (perl 5.22 and above) changed to primitive '?:', 5.22 is too high
+#       [v] fixed inaccurate test for output part
+#   [v] clean & refactor codes
+#       [v] refactored &display_confusion_matrix
+#   [v] improve the documentation
 #
 # Version 0.0x
+#   -add more useful data to the confusion matrix
 #   -implement shuffling system
 #
 # ...

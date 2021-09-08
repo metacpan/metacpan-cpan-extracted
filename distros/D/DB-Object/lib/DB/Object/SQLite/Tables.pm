@@ -25,6 +25,18 @@ BEGIN
     $VERSION    = 'v0.300.0';
     $VERBOSE    = 0;
     $DEBUG      = 0;
+    # <https://metacpan.org/pod/DBD::SQLite::Constants>
+    # <https://www.sqlite.org/datatype3.html>
+    # <https://metacpan.org/pod/DBD::SQLite::Constants#datatypes-(fundamental_datatypes)>
+    # NULL, INTEGER, REAL, TEXT, BLOB
+    our $TYPE_TO_CONSTANT =
+    {
+    qr/^(INT|INTEGER|TINYINT|SMALLINT|MEDIUMINT|BIGINT|UNSIGNED\s+BIG\s+INT|INT2|INT8)/ => { constant => '', name => 'SQLITE_INTEGER', type => 'integer' },
+qr/^(CHARACTER\(\d+\)|VARCHAR\(\d+\)|VARYING\s+CHARACTER\(\d+\)|NCHAR\(\d+\)|NATIVE\s+CHARACTER\(\d+\)|NVARCHAR\(\d+\)|TEXT|CLOB)/  => { constant => '', name => 'SQLITE_TEXT', type => 'text' },
+    qr/^BLOB/                                               => { constant => '', name => 'SQLITE_BLOB', type => 'blob' },
+    qr/^(REAL|DOUBLE\s+DOUBLE\s+PRECISION|FLOAT)/           => { constant => '', name => 'SQLITE_FLOAT', type => 'float' },
+    qr/^(NUMERIC|DECIMAL\(\d+,\d+\)|BOOLEAN|DATETIME|DATE)/ => { constant => '', name => 'SQLITE_NULL', type => 'bool' },
+    };
 };
 
 sub init
@@ -281,10 +293,21 @@ EOT
             $data{default} = '' if( !defined( $data{default} ) );
             # push( @order, $data{ 'field' } );
             $fields->{ $data{field} }  = ++$c;
-            $types->{ $data{field} } = $data{ 'type' };
+            $types->{ $data{field} } = $data{type};
             $default->{ $data{field} } = '';
-            $default->{ $data{field} } = $data{ 'default' } if( $data{default} ne '' && $data{notnull} );
-            $null->{ $data{field} } = $data{ 'notnull' } ? 0 : 1;
+            $default->{ $data{field} } = $data{default} if( $data{default} ne '' && $data{notnull} );
+            $null->{ $data{field} } = $data{notnull} ? 0 : 1;
+            # Get the constant
+            DATA_TYPE_RE: foreach my $re ( keys( %$TYPE_TO_CONSTANT ) )
+            {
+                if( $data{type} =~ /$re/i )
+                {
+                    my $dict = \%{$TYPE_TO_CONSTANT->{ $re }};
+                    $dict->{constant} = $self->database_object->get_sql_type( $dict->{type} );
+                    $const->{ $data{field} } = $dict;
+                    last DATA_TYPE_RE;
+                }
+            }
             my @define = ( $data{type} );
             push( @define, "DEFAULT '$data{default}'" ) if( $data{default} ne '' || $data{notnull} );
             push( @define, "NOT NULL" ) if( $data{notnull} );

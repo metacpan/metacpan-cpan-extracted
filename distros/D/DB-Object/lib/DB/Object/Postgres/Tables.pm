@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres/Tables.pm
-## Version v0.4.2
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Version v0.5.0
+## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2021/08/20
+## Modified 2021/08/29
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -22,10 +22,57 @@ BEGIN
     use warnings;
     our( $VERSION, $VERBOSE, $DEBUG );
     use parent qw( DB::Object::Tables DB::Object::Postgres );
-    $VERSION    = 'v0.4.2';
+    $VERSION    = 'v0.5.0';
     $VERBOSE    = 0;
     $DEBUG      = 0;
     use Devel::Confess;
+    # the 'constant' property in the dictionary hash is added in structure()
+    # <https://www.postgresql.org/docs/13/datatype.html>
+    our $TYPE_TO_CONSTANT =
+    {
+    qr/^(bigint|int8)/                  => { constant => '', name => 'PG_INT8', type => 'int8' },
+    qr/^(bigserial|serial8)/            => { constant => '', name => 'PG_INT8', type => 'int8' },
+    qr/^bit(?!>\s+varying)/             => { constant => '', name => 'PG_BIT', type => 'bit' },
+    qr/^(bit\s+varying|varbit)/         => { constant => '', name => 'PG_VARBIT', type => 'varbit' },
+    qr/^(boolean|bool)/                 => { constant => '', name => 'PG_BOOL', type => 'bool' },
+    qr/^box/                            => { constant => '', name => 'PG_BOX', type => 'box' },
+    qr/^bytea/                          => { constant => '', name => 'PG_BYTEA', type => 'bytea' },
+    qr/^(character|char)\b/             => { constant => '', name => 'PG_CHAR', type => 'char' },
+    qr/^(character varying|varchar)/    => { constant => '', name => 'PG_VARCHAR', type => 'varchar' },
+    qr/^cidr\b/                         => { constant => '', name => 'PG_CIDR', type => 'cidr' },
+    qr/^circle/                         => { constant => '', name => 'PG_CIRCLE', type => 'circle' },
+    qr/^date\b/                         => { constant => '', name => 'PG_DATE', type => 'date' },
+    qr/^(double precision|float8)/      => { constant => '', name => 'PG_FLOAT8', type => 'float8' },
+    qr/^inet/                           => { constant => '', name => 'PG_INET', type => 'inet' },
+    qr/^(integer|int|int4)\b/           => { constant => '', name => 'PG_INT4', type => 'int4' },
+    qr/^interval/                       => { constant => '', name => 'PG_INTERVAL', type => 'interval' },
+    qr/^json\b/                         => { constant => '', name => 'PG_JSON', type => 'json' },
+    qr/^jsonb\b/                        => { constant => '', name => 'PG_JSONB', type => 'jsonb' },
+    qr/^line/                           => { constant => '', name => 'PG_LINE', type => 'line' },
+    qr/^lseg/                           => { constant => '', name => 'PG_LSEG', type => 'lseg' },
+    qr/^macaddr/                        => { constant => '', name => 'PG_MACADDR', type => 'macaddr' },
+    qr/^macaddr8/                       => { constant => '', name => 'PG_MACADDR8', type => 'macaddr8' },
+    qr/^money/                          => { constant => '', name => 'PG_MONEY', type => 'money' },
+    qr/^(numeric|decimal)/              => { constant => '', name => 'PG_NUMERIC', type => 'numeric' },
+    qr/^path/                           => { constant => '', name => 'PG_PATH', type => 'path' },
+    qr/^pg_lsn/                         => { constant => '', name => 'PG_PG_LSN', type => 'pg_lsn' },
+    qr/^point/                          => { constant => '', name => 'PG_POINT', type => 'point' },
+    qr/^polygon/                        => { constant => '', name => 'PG_POLYGON', type => 'polygon' },
+    qr/^(real|float4)/                  => { constant => '', name => 'PG_FLOAT4', type => 'float4' },
+    qr/^(smallint|int2)/                => { constant => '', name => 'PG_INT2', type => 'int2' },
+    qr/^(smallserial|serial2)/          => { constant => '', name => 'PG_INT2', type => 'int2' },
+    qr/^(serial|serial4)/               => { constant => '', name => 'PG_INT4', type => 'int4' },
+    qr/^text/                           => { constant => '', name => 'PG_TEXT', type => 'text' },
+    qr/^time(\([^\)]+\))?\s+without\s+time\s+zone/          => { constant => '', name => 'PG_TIME', type => 'time' },
+    qr/^(time(\([^\)]+\))?\s+with\s+time\s+zone)|timetz/    => { constant => '', name => 'PG_TIMETZ', type => 'timetz' },
+    qr/^timestamp(\([^\)]+\))?\s+without\s+time\s+zone/     => { constant => '', name => 'PG_TIMESTAMP', type => 'timestamp' },
+    qr/^(timestamp(\([^\)]+\))?\s+with\s+time\s+zone)|timestamptz/  => { constant => '', name => 'PG_TIMESTAMPTZ', type => 'timestamptz' },
+    qr/^tsquery/                        => { constant => '', name => 'PG_TSQUERY', type => 'tsquery' },
+    qr/^tsvector/                       => { constant => '', name => 'PG_TSVECTOR', type => 'tsvector' },
+    qr/^txid_snapshot/                  => { constant => '', name => 'PG_TXID_SNAPSHOT', type => 'txid_snapshot' },
+    qr/^uuid/                           => { constant => '', name => 'PG_UUID', type => 'uuid' },
+    qr/^xml/                            => { constant => '', name => 'PG_XML', type => 'xml' },
+    };
 };
 
 sub init
@@ -158,6 +205,38 @@ sub create_info
 # Inherited from DB::Object::Tables
 # sub default
 
+# <https://www.postgresql.org/docs/10/sql-altertable.html>
+sub disable_trigger
+{
+    my $self  = shift( @_ );
+    my $table = $self->{table} || 
+        return( $self->error( "No table was provided to disable trigger." ) );
+    my $opts  = $self->_get_args_as_hash( @_ );
+    $opts->{all} //= 0;
+    # This feature exists only since version 8.1
+    unless( $self->database_object->version >= version->declare( '8.1' ) )
+    {
+        return( $self->error( "Disabling trigger on a table requires PostgreSQL version 8.1 or higher." ) );
+    }
+    my $query = 'ALTER TABLE ' . $table . ' DISABLE TRIGGER ';
+    if( defined( $opts->{name} ) && length( $opts->{name} ) )
+    {
+        $query .= $opts->{name};
+    }
+    else
+    {
+        $query .= $opts->{all} ? 'ALL' : 'USER';
+    }
+    my $sth = $self->database_object->prepare( $query ) ||
+        return( $self->error( "Error while preparing query to disable trigger for table '$table':\n$query", $self->database_object->errstr() ) );
+    if( !defined( wantarray() ) )
+    {
+        $sth->execute() ||
+        return( $self->error( "Error while executing query to disable trigger for table '$table':\n$query", $sth->errstr() ) );
+    }
+    return( $sth );
+}
+
 sub drop
 {
     my $self  = shift( @_ );
@@ -182,6 +261,38 @@ sub drop
     {
         $sth->execute() ||
         return( $self->error( "Error while executing query to drop table '$table':\n$query", $sth->errstr() ) );
+    }
+    return( $sth );
+}
+
+# <https://www.postgresql.org/docs/10/sql-altertable.html>
+sub enable_trigger
+{
+    my $self  = shift( @_ );
+    my $table = $self->{table} || 
+    return( $self->error( "No table was provided to enable trigger." ) );
+    my $opts  = $self->_get_args_as_hash( @_ );
+    $opts->{all} //= 0;
+    # This feature exists only since version 8.1
+    unless( $self->database_object->version >= version->declare( '8.1' ) )
+    {
+        return( $self->error( "Enabling trigger on a table requires PostgreSQL version 8.1 or higher." ) );
+    }
+    my $query = 'ALTER TABLE ' . $table . ' ENABLE TRIGGER ';
+    if( defined( $opts->{name} ) && length( $opts->{name} ) )
+    {
+        $query .= $opts->{name};
+    }
+    else
+    {
+        $query .= $opts->{all} ? 'ALL' : 'USER';
+    }
+    my $sth = $self->database_object->prepare( $query ) ||
+    return( $self->error( "Error while preparing query to disable trigger for table '$table':\n$query", $self->database_object->errstr() ) );
+    if( !defined( wantarray() ) )
+    {
+        $sth->execute() ||
+        return( $self->error( "Error while executing query to disable trigger for table '$table':\n$query", $sth->errstr() ) );
     }
     return( $sth );
 }
@@ -295,6 +406,8 @@ sub structure
     my $default = $self->{default};
     my $null    = $self->{null};
     my $types   = $self->{types};
+    # <https://www.postgresql.org/docs/10/datatype.html>
+    my $const   = $self->{types_const};
     # If we have a cache, use it instead of reprocessing it.
     if( !%$fields || !%$struct || !%$default )
     {
@@ -384,8 +497,8 @@ EOT
         'character varying' => 'varchar',
         'character'         => 'char',
         };
-        ## Mysql: field, type, null, key, default, extra
-        ## Postgres: tablename, field, field_num, type, len, comment, is_nullable, key, foreign_key, default 
+        # Mysql: field, type, null, key, default, extra
+        # Postgres: tablename, field, field_num, type, len, comment, is_nullable, key, foreign_key, default 
         while( $ref = $sth->fetchrow_hashref() )
         {
             $self->{type} = $ref->{table_type} if( !$self->{type} );
@@ -405,6 +518,17 @@ EOT
                 $default->{ $data{field} } = $data{default} if( $data{default} ne '' && !$data{is_nullable} );
             }
             $null->{ $data{field} } = $data{is_nullable} ? 1 : 0;
+            # Get the constant
+            DATA_TYPE_RE: foreach my $re ( keys( %$TYPE_TO_CONSTANT ) )
+            {
+                if( $data{type} =~ /$re/i )
+                {
+                    my $dict = \%{$TYPE_TO_CONSTANT->{ $re }};
+                    $dict->{constant} = $self->database_object->get_sql_type( $dict->{type} );
+                    $const->{ $data{field} } = $dict;
+                    last DATA_TYPE_RE;
+                }
+            }
             my @define = ( $data{type} );
             push( @define, "DEFAULT '$data{default}'" ) if( $data{default} ne '' || !$data{is_nullable} );
             push( @define, "NOT NULL" ) if( !$data{is_nullable} );
@@ -414,14 +538,15 @@ EOT
         $sth->finish();
         if( @primary )
         {
-            ## $struct->{ '_primary' } = \@primary;
+            # $struct->{_primary} = \@primary;
             $self->{primary} = \@primary;
         }
-        ## $self->{ '_structure_real' } = $struct;
-        $self->{default}   = $default;
-        $self->{fields}    = $fields;
-        $self->{structure} = $struct;
-        $self->{types}     = $types;
+        # $self->{_structure_real} = $struct;
+        # XXX 2021-08-27: Given those are references in the first place, it is pointless to re-assign it
+        # $self->{default}   = $default;
+        # $self->{fields}    = $fields;
+        # $self->{structure} = $struct;
+        # $self->{types}     = $types;
         ## $self->message( 3, "Fields found: ", sub{ $self->dumper( $fields ) } );
     }
     ## $self->messagef( 3, "struct ($struct) has %d keys:\n%s", scalar( keys( %$struct ) ), $self->printer( $struct ) );
@@ -474,7 +599,7 @@ DB::Object::Postgres::Tables - PostgreSQL Table Object
 
 =head1 VERSION
 
-    v0.4.2
+    v0.5.0
 
 =head1 DESCRIPTION
 
@@ -526,6 +651,36 @@ Upon success, it will return the new statement to create the table. However, if 
 
 This returns the create info for the current table object as a string representing the sql script necessary to recreate the table.
 
+=head2 disable_trigger
+
+    my $sth = $tbl->disable_trigger;
+    my $sth = $tbl->disable_trigger( all => 1 );
+    my $sth = $tbl->disable_trigger( name => 'my_trigger' );
+
+Provided with some optional parameters and this will return a statement handler to disable all triggers or a given trigger on the table.
+
+If it is called in void context, then the statement is executed immediately and returned, otherwise it is just returned.
+
+    $tbl->disable_trigger;
+    # would issue immediately the following query:
+    ALTER TABLE my_table DISABLE TRIGGER USER
+
+It takes the following options:
+
+=over 4
+
+=item I<all>
+
+If true, this will disable all trigger on the table. Please note that, as per the L<PostgreSQL documentation|https://www.postgresql.org/docs/10/sql-altertable.html> this requires super user privilege.
+
+If false, this will disable only the user triggers, i.e. not including the system ones.
+
+=item I<name>
+
+If a trigger name is provided, it will be used to specifically disable this trigger.
+
+=back
+
 =head2 drop
 
 This will prepare a drop statement to drop the current table.
@@ -553,6 +708,36 @@ If true, C<RESTRICT> will be added to the C<DROP> query.
 =back
 
 See L<PostgreSQL documentation for more information|https://www.postgresql.org/docs/9.5/sql-droptable.html>
+
+=head2 enable_trigger
+
+    my $sth = $tbl->enable_trigger;
+    my $sth = $tbl->enable_trigger( all => 1 );
+    my $sth = $tbl->enable_trigger( name => 'my_trigger' );
+
+Provided with some optional parameters and this will return a statement handler to enable all triggers or a given trigger on the table.
+
+If it is called in void context, then the statement is executed immediately and returned, otherwise it is just returned.
+
+    $tbl->enable_trigger;
+    # would issue immediately the following query:
+    ALTER TABLE my_table ENABLE TRIGGER USER
+
+It takes the following options:
+
+=over 4
+
+=item I<all>
+
+If true, this will enable all trigger on the table. Please note that, as per the L<PostgreSQL documentation|https://www.postgresql.org/docs/10/sql-altertable.html> this requires super user privilege.
+
+If false, this will enable only the user triggers, i.e. not including the system ones.
+
+=item I<name>
+
+If a trigger name is provided, it will be used to specifically enable this trigger.
+
+=back
 
 =head2 exists
 

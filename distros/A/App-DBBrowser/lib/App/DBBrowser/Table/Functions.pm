@@ -96,7 +96,7 @@ sub __confirm_all {
         # Choose
         my $choice = $tc->choose(
             [ undef, $sf->{i}{_confirm} ],
-            { %{$sf->{i}{lyt_v}}, info => $info, layout => 3, keep => 3 }
+            { %{$sf->{i}{lyt_v}}, info => $info, layout => 2, keep => 3 }
         );
         if ( ! $choice ) {
             return;
@@ -354,7 +354,7 @@ sub __func_Round {
                     # Choose
                     my $choice = $tc->choose(
                         [ undef, $positive_precision, $negative_precision ],
-                        { layout => 3, undef => '<<', info => $info, prompt => $prompt }
+                        { layout => 2, undef => '<<', info => $info, prompt => $prompt }
                     );
                     if ( ! defined $choice ) {
                         next PRECISION;
@@ -512,7 +512,7 @@ sub __func_Date_Time {
         # Choose
         my $choice = $tc->choose(
             [ undef, $sf->{i}{_confirm} ],
-            { %{$sf->{i}{lyt_v}}, info => $info, tabs_info => [ 0, $longest_key + 2 ], layout => 3, prompt => 'Choose:' }
+            { %{$sf->{i}{lyt_v}}, info => $info, tabs_info => [ 0, $longest_key + 2 ], layout => 2, prompt => 'Choose:' }
         );
         if ( ! $choice ) {
             $auto_interval = {};
@@ -558,7 +558,7 @@ sub __func_Date_Time {
                 # Choose
                 $interval = $tc->choose( # menu-memory
                     $menu,
-                    { %{$sf->{i}{lyt_v}}, prompt => 'Choose interval:', info => $info, keep => 7, layout => 3, undef => '<<' }
+                    { %{$sf->{i}{lyt_v}}, prompt => 'Choose interval:', info => $info, keep => 7, layout => 2, undef => '<<' }
                 );
                 if ( ! defined $interval ) {
                     if ( $i == 0 ) {
@@ -589,7 +589,7 @@ sub __func_Date_Time {
             # Choose
             my $choice = $tc->choose(
                 [ undef, $sf->{i}{_confirm} ],
-                { %{$sf->{i}{lyt_v}}, info => $info, layout => 3, keep => 3 }
+                { %{$sf->{i}{lyt_v}}, info => $info, layout => 2, keep => 3 }
             );
             if ( ! $choice ) {
                 if ( exists $auto_interval->{$qt_col} ) {

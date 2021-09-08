@@ -1,3 +1,22 @@
+0.5.1 2021-08-29
+
+    - Working around an incompatibility with Graph v0.9721.
+
+0.5.0 2021-08-26
+
+    - Handling raw parsing output in
+      Chemistry::OpenSMILES::clean_chiral_centers().
+    - Fixing a bug in position counting due to $1 pollution.
+    - Detecting and reporting disconnected parts of moieties.
+    - Introducing Chemistry::OpenSMILES::is_chiral() to detect both chiral
+      atoms and moieties.
+    - Fixing bug in Chemistry::OpenSMILES::clean_chiral_centers() which
+      caused removal of all chiral centers, not just tetrahedral.
+    - Introducing Chemistry::OpenSMILES::mirror() to invert chiral centers,
+      currently only tetrahedral.
+    - Fixing bug in printing of chiral centers, previously only tetrahedral
+      centers were printed.
+
 0.4.6 2021-04-14
 
     - Fixing reading/writing of cis/trans ring bonds.

@@ -29,7 +29,7 @@ static inline bool _from_regex (char* lzname, const char* filename, regex_t* pat
     if (regexec(pattern, content.data(), 10, m, 0) != 0) return false; // no match
     
     size_t len = m[nmatch].rm_eo - m[nmatch].rm_so;
-    if (len < 1 || len > TZNAME_MAX) return false;
+    if (len < 1 || len > TZNAME_MAXLEN) return false;
     
     strncpy(lzname, content.data() + m[nmatch].rm_so, len);
     lzname[len] = '\0';

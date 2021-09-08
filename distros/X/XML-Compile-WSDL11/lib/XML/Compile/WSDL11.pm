@@ -1,4 +1,4 @@
-# Copyrights 2014-2018 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2014-2021 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package XML::Compile::WSDL11;
 use vars '$VERSION';
-$VERSION = '3.07';
+$VERSION = '3.08';
 
 use base 'XML::Compile::Cache';
 

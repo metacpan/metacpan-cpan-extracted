@@ -1,3 +1,17 @@
+0.005   2021-08-28  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [ux] Show results of some examples.
+
+
+0.004   2021-08-27  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Use Module::Abtract.
+
+
 0.003   2021-05-25  Released-By: PERLANCAR; Urgency: high
 
 	- [build] Rebuild to update Sah coercion module names (old Sah coercion

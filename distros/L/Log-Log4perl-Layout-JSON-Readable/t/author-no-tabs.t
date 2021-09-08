@@ -16,7 +16,8 @@ use Test::NoTabs;
 
 my @files = (
     'lib/Log/Log4perl/Layout/JSON/Readable.pm',
-    't/tests/basic.t'
+    't/basic.t',
+    't/quoted-values.t'
 );
 
 notabs_ok($_) foreach @files;

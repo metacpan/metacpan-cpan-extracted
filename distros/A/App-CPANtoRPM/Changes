@@ -2,6 +2,13 @@ Written by:
    Sullivan Beck (sbeck@cpan.org)
 Any suggestions, bug reports, or donations :-) should be sent to me.
 
+1.10  2021-08-30
+  - Several fixes and improvements requested by Sven Willenbuecher.
+       Several fixes for AIX
+       Fixed the use of some RPM macros
+  - Added the --config-input and --build-input options.  Based on
+    GitHub #9 by sreerajkksd.
+
 1.09  2019-03-20
   - Fixed bug where -h wasn't working.
   - Now supports Module::Build::Tiny modules.  Iyad Kandalaft and F. Li

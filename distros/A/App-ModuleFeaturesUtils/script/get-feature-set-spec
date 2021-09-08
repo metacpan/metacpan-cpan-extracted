@@ -6,7 +6,7 @@
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-04-02'; # DATE
 our $DIST = 'App-ModuleFeaturesUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,7 +38,7 @@ get-feature-set-spec - Get feature set specification
 
 =head1 VERSION
 
-This document describes version 0.004 of get-feature-set-spec (from Perl distribution App-ModuleFeaturesUtils), released on 2021-04-02.
+This document describes version 0.005 of get-feature-set-spec (from Perl distribution App-ModuleFeaturesUtils), released on 2021-04-02.
 
 =head1 SYNOPSIS
 

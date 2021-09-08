@@ -32,7 +32,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Lingua-Poetry-Haiku-Finder";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Lingua-Poetry-Haiku-Finder/v_0-001>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Lingua-Poetry-Haiku-Finder/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Lingua-Poetry-Haiku-Finder/v_0-002>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-lingua-poetry-haiku-finder>;
@@ -47,6 +47,20 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Lingua-Poetry-Haiku-Finder-0.001.tar.gz>;
 	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Lingua-Poetry-Haiku-Finder/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Lingua-Poetry-Haiku-Finder-0.002"^^xsd:string;
+	dc:issued            "2021-09-06"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Bundle a script `haiku-find`.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Lingua-Poetry-Haiku-Finder-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

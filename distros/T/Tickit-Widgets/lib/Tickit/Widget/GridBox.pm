@@ -3,9 +3,9 @@
 #
 #  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.27;
+use Object::Pad 0.51;
 
-package Tickit::Widget::GridBox 0.32;
+package Tickit::Widget::GridBox 0.33;
 class Tickit::Widget::GridBox
    extends Tickit::ContainerWidget;
 
@@ -101,11 +101,11 @@ sub BUILDARGS {
 has @_grid;
 has $_max_col = -1;
 
-BUILD
+ADJUSTPARAMS
 {
-   my %args = @_;
+   my ( $params ) = @_;
 
-   if( $args{children} ) {
+   if( $params->{children} ) {
       croak "The 'children' constructor argument to ${\ref $self} is no longer recognised; use ->append_row instead";
    }
 }

@@ -152,7 +152,6 @@ clib/tests/tcp/connect.cc
 clib/tests/tcp/ssl.cc
 clib/tests/timer.cc
 clib/tests/util.cc
-clib/tests/var/streamer/fout.txt
 clib/tests/work.cc
 clib/unievent-config.cmake
 examples/ca.key

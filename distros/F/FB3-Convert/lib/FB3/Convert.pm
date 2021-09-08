@@ -25,7 +25,7 @@ use Image::Magick;
 use File::ShareDir qw/dist_dir/;
 binmode(STDOUT,':utf8');
 
-our $VERSION = 0.47;
+our $VERSION = 0.48;
 
 =head1 NAME
 
@@ -84,7 +84,7 @@ sub xmlescape {
   return $Esc;
 }
 
-#Элементы, которые парсим в контенте и сохраняем в структуру 
+#Элементы, которые парсим в контенте и сохраняем в структуру
 our $ElsMainList = {
   'span'=>undef,
   'a'=>undef,
@@ -150,13 +150,13 @@ my %AllowElementsMain = (
     'allow_elements_inside' => $ElsMainList,
   },
   'u' => {
-    'allow_attributes' => ['id']  
+    'allow_attributes' => ['id']
   },
   'sup' => {
-    'allow_attributes' => ['id']  
+    'allow_attributes' => ['id']
   },
   'sub' => {
-    'allow_attributes' => ['id']  
+    'allow_attributes' => ['id']
   },
   'p' => {
     'allow_attributes' => ['id'],
@@ -194,7 +194,7 @@ my %AllowElementsMain = (
       'underline'=>undef,
       'b'=>undef,
       'strong'=>undef,
-      'span'=>undef, 
+      'span'=>undef,
       'div'=>undef,
       'b'=>undef,
       'h1'=>undef,
@@ -204,16 +204,16 @@ my %AllowElementsMain = (
       'h5'=>undef,
       'h6'=>undef,
       'table'=>undef,
-      'ul'=>undef, 
+      'ul'=>undef,
       'ol'=>undef, #полноправные элементы корня
       'p'=>undef,  # см. ^^^
       'title'=>undef, #разрешен, так как нужен в заголовочном section, но в body его необходимо удалять
       'subtitle'=>undef,
-      'img' => undef, #некоторые элементы попадаются в корне, их так же нужно разрешить. Transform2Valid() их обрамит в <p> 
+      'img' => undef, #некоторые элементы попадаются в корне, их так же нужно разрешить. Transform2Valid() их обрамит в <p>
       'a' => undef # см. ^^^
     }
   },
-  
+
 );
 
 my $XSLT = XML::LibXSLT->new;
@@ -228,7 +228,7 @@ sub new {
   my $class = shift;
   my $X = {};
   my %Args = @_;
-  
+
   if ($Args{'empty'}) {
     bless $X, $class;
     return $X;
@@ -241,7 +241,7 @@ sub new {
   my $DestinationDir = $Args{'destination_dir'} || tempdir();
   my $DestinationFile = $Args{'destination_file'};
 
-  if ($DestinationFile) {    
+  if ($DestinationFile) {
     if ($DestinationFile =~ /^[^\/]/) {
       $DestinationFile = cwd()."/".$DestinationFile;
     }
@@ -262,7 +262,7 @@ sub new {
   }
 
   Error($X, "File '".$SourcePath."' format '".$FileType."' not detected") unless $MODULES{$FileType};
-  
+
   my $Sub = $FileType;
 
   my $Module = $MODULES{$Sub}->{class};
@@ -367,10 +367,10 @@ sub new {
   if ($Args{'metadata'}) {
     $X->Error("Meta file ".$Args{'metadata'}." not exists\n") unless -f $Args{'metadata'};
     $X->{'metadata'} = $Args{'metadata'};
-    $X->ParseMetaFile() unless $Args{'simple'}; 
+    $X->ParseMetaFile() unless $Args{'simple'};
     File::Copy::copy($X->{'metadata'}, $X->{'DestinationDir'}."/fb3/description.xml");
   } elsif ($Args{'meta'}) {
-    #или мета из  параметров  
+    #или мета из  параметров
     $X->BuildOuterMeta(meta => $Args{'meta'});
   }
 
@@ -434,13 +434,13 @@ sub _Unpacker {
     Error($X,"Error reading file '".$Source."' as zip");
   }
 
-  my @FilesInZip = $Zip->members(); 
+  my @FilesInZip = $Zip->members();
 
   Msg($X,"Unzip source file to directory: ".$TMPPath."\n");
   foreach (@FilesInZip) {
     my $Fname = $_->fileName;
     next if $Fname =~ /\.(ttf|otf|ttc)$/i; #излишество на данный момент
-    Error($X,"Error reading file '".$Source."' as zip. So file '".substr($Fname,-100,100)."' have strange structure. [may be exploit?]") if $Fname =~ m#\.\./# || $Fname =~ m#^\W*/#; 
+    Error($X,"Error reading file '".$Source."' as zip. So file '".substr($Fname,-100,100)."' have strange structure. [may be exploit?]") if $Fname =~ m#\.\./# || $Fname =~ m#^\W*/#;
     my $ExtFile = $TMPPath.'/'.$Fname;
 
     my $Code;
@@ -487,7 +487,7 @@ sub InNode {
 }
 
 # function Obj2DOM()
-# 
+#
 # example:
 # my $Doc = Obj2DOM($X,
 #  obj => {
@@ -516,7 +516,7 @@ sub InNode {
 # print $Doc->toString(
 #     1 #pretty
 # );
-# 
+#
 # (hashes sorted by keys) =>
 # <?xml version="1.0" encoding="utf-8"?>
 # <root attr1="1" attr2="2">
@@ -589,8 +589,8 @@ sub Obj2DOM {
         Obj2DOM($X, sub=>1, obj => $Obj->{$Key}, parent => $Parent, like_parent => $ArrayNodeNameLikeParent, compact => $Compact);
       } else {
         my $Child = $Doc->createElement($Key);
-        Obj2DOM($X, sub=>1, obj => $Obj->{$Key}, parent => $Child, like_parent => $ArrayNodeNameLikeParent, compact => $Compact);            
-        $Parent->addChild($Child); 
+        Obj2DOM($X, sub=>1, obj => $Obj->{$Key}, parent => $Child, like_parent => $ArrayNodeNameLikeParent, compact => $Compact);
+        $Parent->addChild($Child);
       }
 
     }
@@ -602,8 +602,8 @@ sub Obj2DOM {
          ) {
         my $Child;
         $Child = $Doc->createElement($ArrayNodeNameLikeParent?$Parent->nodeName:'item') unless $Compact;
-        Obj2DOM($X, sub=>1, obj => $Item, parent => ($Compact ? $Parent : $Child), like_parent => $ArrayNodeNameLikeParent, compact => $Compact);            
-        $Parent->addChild($Child) unless $Compact;     
+        Obj2DOM($X, sub=>1, obj => $Item, parent => ($Compact ? $Parent : $Child), like_parent => $ArrayNodeNameLikeParent, compact => $Compact);
+        $Parent->addChild($Child) unless $Compact;
       } else {
         Obj2DOM($X, sub=>1, obj => $Item, parent => $Parent, like_parent => $ArrayNodeNameLikeParent, compact => $Compact);
       }
@@ -710,7 +710,7 @@ sub StructHaveInside {
 sub NormalizeTree {
   my $X = shift;
   my $Data = shift;
-  
+
   return unless ref $Data eq 'ARRAY';
 
   my @Ar;
@@ -744,7 +744,7 @@ sub NormalizeTree {
   }
 
   @$Data = @Ar;
-  return \@Ar; 
+  return \@Ar;
 }
 
 sub ProcNode {
@@ -753,15 +753,15 @@ sub ProcNode {
   my $RelPath = shift;
   my $LastGoodParent = lc(shift);
   my @Dist;
- 
+
   my %AllowElements = %{$X->{'allow_elements'}};
- 
+
   foreach my $Child ( $Node->getChildnodes ) {
 
     my $ChildNodeName = lc($Child->nodeName);
-  
+
     my $Allow = 1;
-    
+
     if ($AllowElements{$ChildNodeName}->{'exclude_if_inside'}) { #проверка на вшивость 1
       $Allow = 0 if $X->NodeHaveInside($Child, $AllowElements{$ChildNodeName}->{'exclude_if_inside'});
     }
@@ -776,8 +776,8 @@ sub ProcNode {
         ? 1 : 0;
     }
 
-    #если ноду прибиваем, нужно чтобы дочерние работали по правилам пэрент-ноды (она ведь теперь и есть пэрент для последующих вложенных)      
-    my $GoodParent = $Allow ? $ChildNodeName : $LastGoodParent; #если нода прошла разрешение, то теперь она становится последней parent в ветке и далее равняемся на ее правила 
+    #если ноду прибиваем, нужно чтобы дочерние работали по правилам пэрент-ноды (она ведь теперь и есть пэрент для последующих вложенных)
+    my $GoodParent = $Allow ? $ChildNodeName : $LastGoodParent; #если нода прошла разрешение, то теперь она становится последней parent в ветке и далее равняемся на ее правила
 
     my $OldNodeName = $Child->nodeName;
 
@@ -788,7 +788,7 @@ sub ProcNode {
       && $AllowElements{$ChildNodeName}->{'allow_attributes'}
       ? $X->NodeGetAllowAttributes($Child)
       : 0;
-        
+
     if ($Allow && $AllowElements{$ChildNodeName}->{'processor'}) {
       $Child =  $AllowElements{$ChildNodeName}->{'processor'}->($X,'node'=>$Child, 'relpath'=>$RelPath, params=>$AllowElements{$ChildNodeName}->{'processor_params'});
     }
@@ -802,7 +802,7 @@ sub ProcNode {
         ? { #тэг в ноде выводим
           $NodeName => $AllowAttributes
             ? {attributes => ConvertIds($X,$X->NodeGetAllowAttributes($Child),$RelPath), 'value' => &ProcNode($X,$Child,$RelPath,$GoodParent), 'was'=>$OldNodeName} # надо с атрибутами выводить
-            : &ProcNode($X,$Child,$RelPath,$GoodParent), # дочку строим по упрощенной схеме ('value' не обязателен)  
+            : &ProcNode($X,$Child,$RelPath,$GoodParent), # дочку строим по упрощенной схеме ('value' не обязателен)
           }
         :   &ProcNode($X,$Child,$RelPath,$GoodParent) # не выводим тэг, шагаем дальше строить дерево
         ;
@@ -815,16 +815,16 @@ sub NodeHaveInside {
   my $X = shift;
   my $Node = shift;
   my $Elements = shift;
-  
+
   my %H = map {lc($_)=>1} @$Elements;
-  
+
   foreach my $Child ( $Node->getChildnodes ) {
     if (exists $H{lc($Child->nodeName())}) {
       undef %H;
       return 1;
     }
   }
-  
+
   undef %H;
   return 0;
 }
@@ -873,7 +873,7 @@ sub RealPath {
   my $Skip = shift;
 
   my $RealPath = undef;
-  
+
   if ($RealPath = Cwd::realpath($Path)) {
     $RealPath =~ s/%20/ /g;
     my $RealPath2 = $RealPath;
@@ -942,7 +942,7 @@ sub unquot {
   $str =~ s/&guot;/"/g;
   $str =~ s/&apos;/'/g;
 
-  return $str; 
+  return $str;
 }
 
 sub quot {
@@ -986,9 +986,9 @@ sub qent {
 sub html_trim {
   my $X = shift;
   my $str = shift;
-  
+
   $str = quot($X,trim($X,$str));
- 
+
   return $str;
 }
 
@@ -1034,7 +1034,7 @@ sub Validate {
   my %Args = @_;
   my $ValidateDir = $Args{'path'};
   my $XsdPath = $Args{'xsd'};
-  
+
   $X->Msg("Validate result\n");
   my $Valid = FB3::Validator->new( $XsdPath );
   return $Valid->Validate($ValidateDir||$X->{'DestinationDir'});
@@ -1043,17 +1043,17 @@ sub Validate {
 sub Cleanup {
   my $X = shift;
   my $CleanDest = shift;
-  
+
   if ($X->{'unzipped'} && $X->{'SourceDir'}) { #если наследили распаковкой в tmp
     ForceRmDir($X,$X->{'SourceDir'});
     Msg($X,"Clean tmp directory ".$X->{'SourceDir'}."\n");
   }
-  
+
   #просят почистить результат
   if ($CleanDest) {
     ForceRmDir($X,$X->{'DestinationDir'}) if $X->{'DestinationDir'};
   }
-  
+
 }
 
 sub ForceRmDir{
@@ -1208,7 +1208,7 @@ sub IsEmptyLineValue {
   my $X = shift;
   my $Item = shift;
   return 0 unless ref $Item eq 'ARRAY';
-  
+
   return 1 if (!scalar @$Item || (scalar @$Item == 1 && $Item->[0] =~ /^[\s\t\n\r]+$/) );
   return 0;
 }
@@ -1268,7 +1268,7 @@ sub ValidURL{
   '?)?)?'.                                                   # path and query string optional
   '(#([a-z0-9$_\.\+!\*\'\(\),;:@&=-]|%[0-9a-f]{2})*)?'.      # fragment
   '$';
-	
+
   return $Url=~/$RegExp/i;
 }
 
@@ -1288,7 +1288,7 @@ sub ShitFixFile {
   map {$Content.=$_;} <$Fo>;
   close $Fo;
 
-  $Content = $X->ShitFix($Content); 
+  $Content = $X->ShitFix($Content);
 
   open my $Fs,">".$Fname or $X->Error("Can't open file $Fname: $!");
   print $Fs $Content;
@@ -1341,7 +1341,7 @@ sub ParseMetaFile {
   if ($MetaFile) {
 
     my $DESCRIPTION = $X->{'STRUCTURE'}->{'DESCRIPTION'};
- 
+
     Msg($X,"Parse metafile ".$MetaFile."\n");
     my $xpc = XML::LibXML::XPathContext->new($Parser->load_xml(
       location        => $MetaFile,
@@ -1411,7 +1411,7 @@ sub _bs {
       'desc' => $Desc,
       'timers' => []
     } unless exists $X->{'bench_list'}->{$Key};
-  
+
   my $Timers = $X->{'bench_list'}->{$Key}->{'timers'};
 
   if (@$Timers) {
@@ -1514,8 +1514,8 @@ sub Img2JPG {
   my $Image = new Image::Magick;
 
   $Image->Read($ImgFile); #почему-то у IM "or die" всегда срабатывает...;
-  
-  if ($UseProfile) {  
+
+  if ($UseProfile) {
     if (!-s $sRGBProfile) {
       $X->Msg("Can't find sRGB ICC profile $sRGBProfile. Try convert to RGB colorspace without profile. May wrong colors for CMYK->RGB\n");
       $Image->Quantize(colorspace=>'sRGB');
@@ -1523,24 +1523,24 @@ sub Img2JPG {
       $X->Msg("Can't find CMYK ICC profile $CMYKProfile. Try convert to RGB colorspace without profile. May wrong colors for CMYK->RGB\n");
       $Image->Quantize(colorspace=>'sRGB');
     } else {
-      
-      #вытираем профили 
+
+      #вытираем профили
       $Image->Profile(name => 'ICC', profile => '');
       $Image->Profile(name => 'IPTC', profile => '');
 
       open my $PHRGB,"<".$sRGBProfile or die $!;
       binmode($PHRGB);
-      my $ProfRGBBLOB = join("", <$PHRGB>); 
+      my $ProfRGBBLOB = join("", <$PHRGB>);
       close $PHRGB;
 
       open my $PHCMYK,"<".$CMYKProfile or die $!;
       binmode($PHCMYK);
-      my $ProfCMYKBLOB = join("", <$PHCMYK>); 
+      my $ProfCMYKBLOB = join("", <$PHCMYK>);
       close $PHCMYK;
 
       $Image->Profile(name => 'ICC', profile => $ProfCMYKBLOB);
       $Image->Profile(name => 'ICC', profile => $ProfRGBBLOB);
- 
+
      }
   }
 
@@ -1573,5 +1573,5 @@ Full text of License L<http://www.gnu.org/licenses/lgpl-3.0.en.html>.
 
 =cut
 
-  
+
 1;

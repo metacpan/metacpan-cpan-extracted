@@ -2,7 +2,8 @@
 package HTML::HTML5::Parser::Charset::WebLatin1;
 ## skip Test::Tabs
 use strict;
-our $VERSION='0.301';
+use warnings;
+our $VERSION='0.992';
 
 ## NOTE: This module does not expect that its standalone uses.
 ## See Message::Charset::Info for how it is used.

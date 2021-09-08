@@ -15,7 +15,8 @@ my $cb   = SDL_AddHintCallback( SDL_HINT_XINPUT_ENABLED, sub { ddx \@_ }, \%ENV 
 #SDL_DelHintCallback('SDL_HINT_XINPUT_ENABLED', $cb, \%INC);
 #SDL_SetHintWithPriority( SDL_HINT_XINPUT_ENABLED, 1, SDL_HINT_OVERRIDE );
 #SDL_SetHint( SDL_HINT_XINPUT_ENABLED, 1 );
-#SDL_SetHint( SDL_HINT_XINPUT_ENABLED, 0 );
+SDL_SetHint( SDL_HINT_XINPUT_ENABLED, 0 );
+
 #SDL_ClearHints;
 #SDL_SetError( 'This operation has failed: %d', 4 );
 SDL_Log( 'This operation has failed: %d', 4 );

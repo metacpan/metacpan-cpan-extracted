@@ -6,7 +6,7 @@ use HTTP::Status;
 use Text::Xslate qw/html_escape/;
 use Kossy::Response;
 
-our $VERSION = '0.40';
+our $VERSION = '0.50';
 
 sub new {
     my $class = shift;
@@ -29,18 +29,25 @@ sub new {
 sub response {
     my $self = shift;
     my $code = $self->{code} || 500;
-    my $message = $self->{message};
-    $message ||= HTTP::Status::status_message($code);
 
-    my @headers = (
-         'Content-Type' => q!text/html; charset=UTF-8!,
-    );
-
-    if ($code =~ /^3/ && (my $loc = eval { $self->{location} })) {
-        push(@headers, Location => $loc);
+    if ($self->{response}) {
+        $self->{response}->code($code);
+        return $self->{response}->finalize;
     }
+    else {
+        my $message = $self->{message};
+        $message ||= HTTP::Status::status_message($code);
 
-    return Kossy::Response->new($code, \@headers, [$self->html($code,$message)])->finalize;
+        my @headers = (
+             'Content-Type' => q!text/html; charset=UTF-8!,
+        );
+
+        if ($code =~ /^3/ && (my $loc = eval { $self->{location} })) {
+            push(@headers, Location => $loc);
+        }
+
+        return Kossy::Response->new($code, \@headers, [$self->html($code,$message)])->finalize;
+    }
 }
 
 sub html {

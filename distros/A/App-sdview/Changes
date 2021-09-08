@@ -1,5 +1,13 @@
 Revision history for App-sdview
 
+0.04    2021-08-25
+        [CHANGES]
+         * Better handling of POD's item-text paragraphs
+         * Better terminal rendering of leader items in bullet/number/term
+           paragraphs
+         * Fix some (harmless but really annoying) warnings that would
+           otherwise become apparent after Object::Pad RT139027 bugfix
+
 0.03    2021-07-25
         [CHANGES]
          * Implement different output plugins too - generate POD and Markdown

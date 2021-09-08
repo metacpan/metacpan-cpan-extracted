@@ -1,5 +1,10 @@
 Revision history for Syntax-Keyword-Defer
 
+0.06    2021-08-26
+        [CHANGES]
+         * Updated for XS::Parse::Keyword 0.13
+         * Print a deprecation warning when enabling the `FINALLY` keyword
+
 0.05    2021-04-21
         [CHANGES]
          * Rewrite parsing logic to use XS::Parse::Keyword

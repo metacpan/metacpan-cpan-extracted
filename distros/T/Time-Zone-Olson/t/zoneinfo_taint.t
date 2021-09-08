@@ -9,33 +9,44 @@ use POSIX();
 use Config;
 use English qw( -no_match_vars );
 use Time::Local();
-use Taint::Util();
 
-$ENV{PATH} = '/bin:/usr/bin:/usr/sbin:/sbin';
-delete @ENV{'IFS', 'CDPATH', 'ENV', 'BASH_ENV'};
+SKIP: {
+	eval {
+		require Taint::Util;
+	} or do {
+		if ($ENV{RELEASE_TESTING}) {
+			die "Taint::Util module could not be loaded";
+		} else {
+			skip("Taint::Util module is not available for tests.  Skipping taint tests", 1);
+		}
+	};
 
-TAINTED_TZ: {
-	local $ENV{TZ} = 'Australia/Melbourne';
-	Taint::Util::taint($ENV{TZ});
-	my $timezone = Time::Zone::Olson->new();
-	ok(!Taint::Util::tainted($timezone->timezone()), "Local timezone has been untainted as " . $timezone->timezone() );
-	ok(Taint::Util::tainted($ENV{TZ}), "TZ environment variable is still tainted");
-}
+	$ENV{PATH} = '/bin:/usr/bin:/usr/sbin:/sbin';
+	delete @ENV{'IFS', 'CDPATH', 'ENV', 'BASH_ENV'};
 
-TAINTED_TIMEZONE: {
-	my $tz = 'Australia/Brisbane';
-	Taint::Util::taint($tz);
-	my $timezone = Time::Zone::Olson->new( timezone => $tz );
-	ok(!Taint::Util::tainted($timezone->timezone()), "Local timezone has been untainted as " . $timezone->timezone() );
-	ok(Taint::Util::tainted($tz), "timezone parameter is still tainted");
-}
+	TAINTED_TZ: {
+		local $ENV{TZ} = 'Australia/Melbourne';
+		Taint::Util::taint($ENV{TZ});
+		my $timezone = Time::Zone::Olson->new();
+		ok(!Taint::Util::tainted($timezone->timezone()), "Local timezone has been untainted as " . $timezone->timezone() );
+		ok(Taint::Util::tainted($ENV{TZ}), "TZ environment variable is still tainted");
+	}
 
-TAINTED_DEFAULT: {
-	delete $ENV{TZ};
-	delete $ENV{TZDIR};
-	my $timezone = Time::Zone::Olson->new();
-	if (defined $timezone->timezone()) {
-		ok(!Taint::Util::tainted($timezone->timezone()), "Default timezone has been untainted as " . $timezone->timezone() );
+	TAINTED_TIMEZONE: {
+		my $tz = 'Australia/Brisbane';
+		Taint::Util::taint($tz);
+		my $timezone = Time::Zone::Olson->new( timezone => $tz );
+		ok(!Taint::Util::tainted($timezone->timezone()), "Local timezone has been untainted as " . $timezone->timezone() );
+		ok(Taint::Util::tainted($tz), "timezone parameter is still tainted");
+	}
+
+	TAINTED_DEFAULT: {
+		delete $ENV{TZ};
+		delete $ENV{TZDIR};
+		my $timezone = Time::Zone::Olson->new();
+		if (defined $timezone->timezone()) {
+			ok(!Taint::Util::tainted($timezone->timezone()), "Default timezone has been untainted as " . $timezone->timezone() );
+		}
 	}
 }
 

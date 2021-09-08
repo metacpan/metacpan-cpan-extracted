@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,16 +19,16 @@ name: Weather-NHC-TropicalCyclone
 provides:
   Weather::NHC::TropicalCyclone:
     file: lib/Weather/NHC/TropicalCyclone.pm
-    version: '0.20'
+    version: '0.31'
   Weather::NHC::TropicalCyclone::ForecastAdvisory:
     file: lib/Weather/NHC/TropicalCyclone/ForecastAdvisory.pm
-    version: '0.20'
+    version: '0.31'
   Weather::NHC::TropicalCyclone::Storm:
     file: lib/Weather/NHC/TropicalCyclone/Storm.pm
-    version: '0.20'
+    version: '0.31'
   Weather::NHC::TropicalCyclone::StormTable:
     file: lib/Weather/NHC/TropicalCyclone/StormTable.pm
-    version: '0.20'
+    version: '0.31'
 requires:
   Date::Calc: '0'
   File::Temp: '0'
@@ -38,8 +38,9 @@ requires:
   IO::Socket::SSL: '0'
   JSON::XS: '0'
   Object::Tiny: '0'
+  Util::H2O: '0'
   Validate::Tiny: '0'
-version: '0.20'
-x_generated_by_perl: v5.28.2
+version: '0.31'
+x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

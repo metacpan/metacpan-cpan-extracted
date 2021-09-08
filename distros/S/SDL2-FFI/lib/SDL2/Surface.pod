@@ -1,0 +1,27 @@
+=encoding utf-8
+
+=head1 NAME
+
+SDL2::Surface - A collection of pixels used in software blitting
+
+=head1 SYNOPSIS
+
+    use SDL2 qw[:all];
+    # TODO
+
+=head1 DESCRIPTION
+
+SDL2::Surface should be treated as read-only, except for C<pixels>, which, if
+defined, contains the raw pixel data for the surface.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=begin stopwords
+
+blitting
+
+=end stopwords
+
+=cut

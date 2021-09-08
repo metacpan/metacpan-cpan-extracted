@@ -119,11 +119,11 @@ App::Licensecheck - functions for a simple license checker for source files
 
 =head1 VERSION
 
-Version v3.2.11
+Version v3.2.12
 
 =cut
 
-our $VERSION = version->declare('v3.2.11');
+our $VERSION = version->declare('v3.2.12');
 
 =head1 SYNOPSIS
 

@@ -22,10 +22,12 @@ no_index:
     - inc
 requires:
   File::Share: '0.25'
+  HTML::Template: '2.95'
   JSON: '2.90'
   Text::CSV: '2.0'
   Text::CSV_XS: '1.39'
+  URI::Query: '0.16'
   XML::Twig: '3.48'
   perl: '5.006'
-version: v0.6.4
+version: v0.6.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

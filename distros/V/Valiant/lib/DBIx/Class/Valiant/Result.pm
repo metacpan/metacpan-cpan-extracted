@@ -11,7 +11,6 @@ use Scalar::Util 'blessed';
 use Carp;
 use namespace::autoclean -also => ['debug'];
 
-with 'Valiant::Util::Ancestors';
 with 'DBIx::Class::Valiant::Validates';
 with 'Valiant::Filterable';
 
@@ -39,6 +38,22 @@ sub many_to_many {
     set_method => "set_${meth_name}",
     remove_method => "remove_from_${meth_name}",
   };
+
+  my $pk_meth = qq[
+    package $class;
+
+    sub ${meth_name}_pks {
+      my \$self = shift;
+      my \@pks = \$self->related_resultset("${link}")->related_resultset("${far_side}")->result_source->primary_columns;
+      return map {
+        my \$row = \$_;
+        +{ map { \$_ => \$row->\$_ } \@pks };
+      } \$self->\$meth_name->all;
+    }
+  ];
+
+  eval $pk_meth;
+  die $@ if $@;
  
   #inheritable data workaround
   $class->_m2m_metadata({ $meth_name => $attrs, %$store});
@@ -138,6 +153,7 @@ sub update {
   my %validate_args = (context => \@context) if @context;
 
   $self->set_inflated_columns($upd) if $upd;
+
   foreach my $related(keys %related) {
 
     if(my $cb = $nested{$related}->{reject_if}) {
@@ -180,7 +196,6 @@ sub update {
   $txn_guard->commit;
 
   return $result;
-
 }
 
 sub register_column {
@@ -204,15 +219,15 @@ sub register_column {
 # DBIC model messes with the result namespace but not the schema
 # namespace
 
-#sub namespace {
-#  my $self = shift;  
-#  my $class = ref($self) ? ref($self) : $self; 
-#  $class =~s/::${source_name}$//;
+sub namespace {
+  my $self = shift;  
+  return '' unless ref $self;
 
-# Rest of this is to deal with Catalyst wrapper (for later)
-#  my $source_name = $class->new->result_source->source_name#;
-#  return unless $source_name; # Trouble... somewhere $self is a# package
-#}
+  my $class = ref($self) ? ref($self) : $self; 
+  my $source_name = $self->result_source->source_name;
+  $class =~s/::${source_name}$//;
+  return $class;
+}
 
 # Trouble here is you can only inject one attribute per model.  Will be an
 # issue if you have more than one confirmation validation on the model. Should be an easy
@@ -303,11 +318,6 @@ sub delete_if_in_storage {
 
 ####
 
-sub build {
-  my ($self, %attrs) = @_;
-  return $self->result_source->resultset->new_result(\%attrs);
-}
-
 sub build_related {
   my ($self, $related, $attrs) = @_;
   debug 2, "Building related entity '$related' for @{[ $self->model_name->human ]}";
@@ -381,9 +391,32 @@ sub set_from_params_recursively {
       if($self->in_storage) {
         debug 3, "Unmarking record @{[ ref $self ]}, id @{[ $self->id ]} for deletion";
         $self->unmark_for_deletion;
-        delete $params{_destroy}; 
+        delete $params{_delete}; 
       } else {
         die "didn't deal with restore on unsaved records";
+      }
+    } elsif($param eq '_action') {
+      my $action = $params{$param};
+      $action = ref($action)||'' ? $action->[-1] : $action; # If action is a ref always use the last one
+      if($action eq 'delete') {
+        if($self->in_storage) {
+          debug 2, "Marking record @{[ ref $self ]}, id @{[ $self->id ]} for deletion";
+          $self->mark_for_deletion;
+        } else {
+          die "didn't deal with action 'delete' on unsaved records";
+        }
+      } elsif($action eq 'restore') {
+        if($self->in_storage) {
+          debug 3, "Unmarking record @{[ ref $self ]}, id @{[ $self->id ]} for deletion";
+          $self->unmark_for_deletion;
+          delete $params{_destroy}; 
+        } else {
+          die "didn't deal with restore on unsaved records";
+        }
+      } elsif($action eq 'nop') {
+        # Just skip, this is just a no op to deal with checkboxes and radio controls in HTML
+      } else {
+        die "Not sure what action '$action' is";
       }
     } else {
       die "Not sure what to do with '$param'";
@@ -429,7 +462,7 @@ sub set_m2m_related_from_params {
     next;
     die "We expect '$params' to be some sort of reference but its not!";
   }
-  debug 2, "Setting m2m relation '$related' for@{[ ref $self ]} via '$foreign_relation'";
+  debug 2, "Setting m2m relation '$related' for @{[ ref $self ]} via '$relation' => '$foreign_relation'";
 
   # TODO its possible we need to creeate the m2m cache here
   return $self->set_multi_related_from_params($relation, [ map { +{ $foreign_relation => $_ } } @param_rows ]);
@@ -438,6 +471,10 @@ sub set_m2m_related_from_params {
 ## TODO
 sub is_pruned {
   return shift->{__valiant_is_pruned} ? 1:0;
+}
+
+sub is_removed {
+  return (($_[0]->{__valiant_is_pruned} || $_[0]->{__valiant_kiss_of_death}) ? 1:0);
 }
 
 sub set_multi_related_from_params {
@@ -458,6 +495,7 @@ sub set_multi_related_from_params {
   }
 
   # introspect $related
+  debug 2, "looking for uniques for $related";
   my %uniques = $self->related_resultset($related)->result_source->unique_constraints;
 
   my @related_models = ();
@@ -467,7 +505,6 @@ sub set_multi_related_from_params {
     if(blessed $param_row) {
       $related_model = $param_row;
     } elsif( (ref($param_row)||'') eq 'HASH') {
-
       foreach my $key (keys %uniques) {
         my %possible = map { $_ => $param_row->{$_} } grep { exists $param_row->{$_} } @{ $uniques{$key}};
         $related_model = $self->find_related($related, \%possible, {key=>$key}) if %possible;
@@ -478,11 +515,15 @@ sub set_multi_related_from_params {
       }
 
       $related_model = $self->find_related($related, $param_row) unless $related_model || !%{$param_row}; # last resort, probably broken code but m2m seems to need it
-      $related_model = $self->new_related($related,+{}) unless $related_model;
-      $related_model->set_from_params_recursively(%$param_row);
+      debug 2, "Didn't find related model '$related' so making it" unless $related_model;
+      #$related_model = $self->new_related($related, $param_row) unless $related_model;
+      $related_model = $self->new_related($related, +{}) unless $related_model;
+      #$related_model->set_from_params_recursively(%$param_row);
     } else {
       die "Not sure what to do with $param_row";
     }
+    debug 2, "About to set_from_params_recursively for @{[ ref $related_model ]}";
+    $related_model->set_from_params_recursively(%$param_row) unless blessed $param_row;
     push @related_models, $related_model;
   }
 
@@ -496,7 +537,7 @@ sub set_multi_related_from_params {
   my $rs = $self->related_resultset($related);
   unless(scalar @{$rs->get_cache||[]}) {
     #die "You must prefetch rows for relation '$related'"; ## TODO not sure we want this
-  }
+  } 
 
   while(my $current = $rs->next) {
     next if grep {
@@ -506,6 +547,7 @@ sub set_multi_related_from_params {
       } keys %fields;
       scalar(@matches) == keys %fields ? 1 : 0;
     } @new_pks;
+
     $current->mark_for_deletion if $current->in_storage; #Don't mark to delete if not already stored
 
     if($current->in_storage) {
@@ -532,6 +574,8 @@ sub set_multi_related_from_params {
 
     push @related_models, $current if $current->in_storage; # don't preserve unsaved previous
   }
+
+  debug 3, "About to save cache for @{[ ref $self ]} related resultset $related; has @{[ scalar @related_models ]} models to cache";
 
   $self->related_resultset($related)->set_cache(\@related_models);
   $self->{_relationship_data}{$related} = \@related_models;
@@ -854,7 +898,42 @@ validation on a per result/set basis as well.
 =head2 accept_nested_for (field => \%options)
 
 Allows you to update / create related objected which are nested under the parent (via has_one,
-might_have or has_many defined relationships).
+might_have or has_many defined relationships).  Accepts the following hashref of options:
+
+=over 4
+
+=item allow_destroy
+
+By default you cannot delete related (nested) results.  Setting this to true allows that.
+
+=item reject_if
+
+A coderef that will cause a nested result to skip if you return true.   Arguments are the
+parent result and a hashref of the values to be used for the nested build:
+
+    __PACKAGE__->accept_nested_for(
+      might => {
+        reject_if => sub {
+          my ($self, $params) = @_;
+          return ($params->{value}||'') eq 'test14' ? 1:0;
+        },
+      }
+    );
+
+Please note that if you have this on a C<has_many> relationship the code ref will be invoked
+on each result in the collection of related results you are attempted to nest values into.  This
+can impact performance.
+
+=item limit
+
+accepts a scalar which will cause the nested results to fail of the number of items is
+greater than the scalar.
+
+=item update_only
+
+For C<has_one> or C<might_have> relationships will force update the existing nested result (if
+any exists) even if you fail to set the primary key.  Otherwise the current record will be
+deleted and a new one inserted.  Default is false.
 
 =head1 METHODS
 
@@ -868,11 +947,25 @@ Will be true if the result has been marked for deletion.   You might see this in
 nested under a parent when an update calls for the record to be deleted but validation errors prevented
 the deletion from occuring.
 
-=head2 build
+=head2 is_pruned
+
+Will be true if the result is nested under a result which has been C<marked_for_deletion>.  The result
+is not itself marked to be deleted (if validation passes) but it will no longer be attached to the
+parent result under which it is nested.
+
+=head2 is_removed
+
+Is true if C<is_pruned> or C<is_marked_for_deletion> is true.
 
 =head2 build_related
 
 =head2 build_related_if_empty
+
+Builds a related result into the cache. The result is only in memory; it can be used to run validation
+but is not inserted unless specified later.
+
+You might use these methods if you are validating a nested results but the results are not already in
+the database (see C<example> directory for an application that uses this).
 
 =head1 AUTHOR
  

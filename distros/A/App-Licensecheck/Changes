@@ -7,6 +7,14 @@ Home page:    <https://metacpan.org/release/App-Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.2.12	2021-08-30
+
+ [ Bug Fixes ]
+ - use path-less shebang (not indirect env executable, and execute from
+   blib subdir when available
+   SCANTRELL++
+   Slaven Rezić++
+
 v3.2.11	2021-08-18
 
  [ Test Suite ]

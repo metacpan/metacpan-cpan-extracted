@@ -18,5 +18,7 @@ t/10context.t
 t/11ordering.t
 t/20experimental-dispatch.t
 t/21experimental-dispatch-isa.t
+t/80match-divides.t
+t/80match-equ.t
 t/95benchmark.t
 t/99pod.t

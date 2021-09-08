@@ -1,3 +1,20 @@
+Revision history for SPVM
+0.9011  2021-08-31
+        [CHANGES]
+        * None
+        
+        [BUGFIXES]
+        * Fix excnahge API any object return value bug
+
+0.9010  2021-08-25
+        [CHANGES]
+        * improve SPVM::Document::ExchangeAPI
+        * add SPVM::Bool module
+        * add SPVM::BlessedObject::Array overloding array dereference
+        
+        [BUGFIXES]
+        * None
+        
 0.9009 2021-06-29
   - Native API get_basic_type_id performance become O(1)
   - Native API get_field_id performance become O(1)

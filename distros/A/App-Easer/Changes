@@ -1,3 +1,6 @@
+0.006  2021-08-29 22:05:40 CEST
+   - regenerate expansions with the right Template::Perlish (1.56)
+
 0.004  2021-08-18 23:48:44 CEST
    - release after 34 PASSes on CPAN Testers (thanks!)
 

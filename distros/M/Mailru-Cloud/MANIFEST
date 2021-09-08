@@ -1,7 +1,7 @@
 Changes
 Makefile.PL
 MANIFEST
-README
+README.md
 t/00_mailcloudauth.t
 t/test_upload.f
 lib/Mailru/Cloud.pm

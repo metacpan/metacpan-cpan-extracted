@@ -1,0 +1,744 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#EXPORT">EXPORT</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#CONVENTIONS-USED">CONVENTIONS USED</a></li>
+  <li><a href="#DATASET-STRUCTURE">DATASET STRUCTURE</a></li>
+  <li><a href="#PERCEPTRON-DATA">PERCEPTRON DATA</a></li>
+  <li><a href="#CREATION-RELATED-SUBROUTINES-METHODS">CREATION RELATED SUBROUTINES/METHODS</a>
+    <ul>
+      <li><a href="#new-options">new ( \%options )</a></li>
+      <li><a href="#get_attributes">get_attributes</a></li>
+      <li><a href="#learning_rate-value">learning_rate ( $value )</a></li>
+      <li><a href="#learning_rate">learning_rate</a></li>
+      <li><a href="#threshold-value">threshold ( $value )</a></li>
+      <li><a href="#threshold">threshold</a></li>
+    </ul>
+  </li>
+  <li><a href="#TRAINING-RELATED-SUBROUTINES-METHODS">TRAINING RELATED SUBROUTINES/METHODS</a>
+    <ul>
+      <li><a href="#tame">tame ( ... )</a></li>
+      <li><a href="#exercise">exercise ( ... )</a></li>
+      <li><a href="#train-stimuli_train_csv-expected_output_header-save_nerve_to_file">train ( $stimuli_train_csv, $expected_output_header, $save_nerve_to_file )</a></li>
+      <li><a href="#train-stimuli_train_csv-expected_output_header-save_nerve_to_file-display_stats-identifier">train ( $stimuli_train_csv, $expected_output_header, $save_nerve_to_file, $display_stats, $identifier )</a></li>
+      <li><a href="#calculate_output-self-stimuli_hash">&amp;_calculate_output( $self, \%stimuli_hash )</a></li>
+      <li><a href="#tune-self-stimuli_hash-tune_up_or_down">&amp;_tune( $self, \%stimuli_hash, $tune_up_or_down )</a></li>
+    </ul>
+  </li>
+  <li><a href="#VALIDATION-RELATED-METHODS">VALIDATION RELATED METHODS</a>
+    <ul>
+      <li><a href="#take_mock_exam">take_mock_exam (...)</a></li>
+      <li><a href="#take_lab_test">take_lab_test (...)</a></li>
+      <li><a href="#validate-options">validate ( \%options )</a></li>
+    </ul>
+  </li>
+  <li><a href="#TESTING-RELATED-SUBROUTINES-METHODS">TESTING RELATED SUBROUTINES/METHODS</a>
+    <ul>
+      <li><a href="#take_real_exam">take_real_exam (...)</a></li>
+      <li><a href="#work_in_real_world">work_in_real_world (...)</a></li>
+      <li><a href="#test-options">test ( \%options )</a></li>
+      <li><a href="#real_validate_or_test-data_hash_ref">_real_validate_or_test ( $data_hash_ref )</a></li>
+      <li><a href="#fill_predicted_values-self-stimuli_validate-predicted_index-aoa">&amp;_fill_predicted_values ( $self, $stimuli_validate, $predicted_index, $aoa )</a></li>
+    </ul>
+  </li>
+  <li><a href="#RESULTS-RELATED-SUBROUTINES-METHODS">RESULTS RELATED SUBROUTINES/METHODS</a>
+    <ul>
+      <li><a href="#get_exam_results">get_exam_results ( ... )</a></li>
+      <li><a href="#get_confusion_matrix-options">get_confusion_matrix ( \%options )</a></li>
+      <li><a href="#collect_stats-options">&amp;_collect_stats ( \%options )</a></li>
+      <li><a href="#calculate_total_entries-c_matrix_ref">&amp;_calculate_total_entries ( $c_matrix_ref )</a></li>
+      <li><a href="#calculate_accuracy-c_matrix_ref">&amp;_calculate_accuracy ( $c_matrix_ref )</a></li>
+      <li><a href="#calculate_sensitivity-c_matrix_ref">&amp;_calculate_sensitivity ( $c_matrix_ref )</a></li>
+      <li><a href="#display_exam_results">display_exam_results ( ... )</a></li>
+      <li><a href="#display_confusion_matrix-confusion_matrix-labels">display_confusion_matrix ( \%confusion_matrix, \%labels )</a></li>
+      <li><a href="#build_matrix-c_matrix-labels">&amp;_build_matrix ( $c_matrix, $labels )</a></li>
+      <li><a href="#print_extended_matrix-matrix-c_matrix">&amp;_print_extended_matrix ( $matrix, $c_matrix )</a></li>
+    </ul>
+  </li>
+  <li><a href="#NERVE-DATA-RELATED-SUBROUTINES">NERVE DATA RELATED SUBROUTINES</a>
+    <ul>
+      <li><a href="#preserve">preserve ( ... )</a></li>
+      <li><a href="#save_perceptron-nerve_file">save_perceptron ( $nerve_file )</a></li>
+      <li><a href="#revive">revive (...)</a></li>
+      <li><a href="#load_perceptron-nerve_file_to_load">load_perceptron ( $nerve_file_to_load )</a></li>
+    </ul>
+  </li>
+  <li><a href="#NERVE-PORTABILITY-RELATED-SUBROUTINES">NERVE PORTABILITY RELATED SUBROUTINES</a>
+    <ul>
+      <li><a href="#preserve_as_yaml">preserve_as_yaml ( ... )</a></li>
+      <li><a href="#save_perceptron_yaml-nerve_file">save_perceptron_yaml ( $nerve_file )</a></li>
+      <li><a href="#revive_from_yaml">revive_from_yaml (...)</a></li>
+      <li><a href="#load_perceptron_yaml-yaml_nerve_file">load_perceptron_yaml ( $yaml_nerve_file )</a></li>
+    </ul>
+  </li>
+  <li><a href="#TO-DO">TO DO</a></li>
+  <li><a href="#KNOWN-ISSUES">KNOWN ISSUES</a>
+    <ul>
+      <li><a href="#Portability-of-Nerve-Data">Portability of Nerve Data</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>AI::Perceptron::Simple</p>
+
+<p>A Newbie Friendly Module to Create, Train, Validate and Test Perceptrons / Neurons</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>Version 1.02</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    #!/usr/bin/perl
+
+    use AI::Perceptron::Simple qw(...);
+
+    # create a new nerve / neuron / perceptron
+    $perceptron = AI::Perceptron::Simple-&gt;new( {
+        initial_value =&gt; $any_value_that_makes_sense, # size of each dendrite :)
+        learning_rate =&gt; 0.3, # optional
+        threshold =&gt; 0.85, # optional
+        attribs =&gt; \@attributes, # dendrites
+    } );
+
+    # train
+    $perceptron-&gt;tame( ... );
+    $perceptron-&gt;exercise( ... );
+    $perceptron-&gt;train( $training_data_csv, $expected_column_name, $save_nerve_to );
+    # or
+    $perceptron-&gt;train(
+        $training_data_csv, $expected_column_name, $save_nerve_to, 
+        $show_progress, $identifier); # these two parameters must go together
+
+
+    # validate
+    $perceptron-&gt;take_lab_test( ... );
+    $perceptron-&gt;take_mock_exam( ... );
+
+    # fill results to original file
+    $perceptron-&gt;validate( { 
+        stimuli_validate =&gt; $validation_data_csv, 
+        predicted_column_index =&gt; 4,
+     } );
+    # or        
+    # fill results to a new file
+    $perceptron-&gt;validate( {
+        stimuli_validate =&gt; $validation_data_csv,
+        predicted_column_index =&gt; 4,
+        results_write_to =&gt; $new_csv
+    } );
+
+
+    # test - see &quot;validate&quot; method, same usage
+    $perceptron-&gt;take_real_exam( ... );
+    $perceptron-&gt;work_in_real_world( ... );
+    $perceptron-&gt;test( ... );
+
+
+    # confusion matrix
+    my %c_matrix = $perceptron-&gt;get_confusion_matrix( { 
+        full_data_file =&gt; $file_csv, 
+        actual_output_header =&gt; $header_name,
+        predicted_output_header =&gt; $predicted_header_name
+    } );
+
+    # accessing the confusion matrix
+    my @keys = qw( true_positive true_negative false_positive false_negative 
+                   total_entries accuracy sensitivity );
+    for ( @keys ) {
+        print $_, &quot; =&gt; &quot;, $c_matrix{ $_ }, &quot;\n&quot;;
+    }
+
+    # output to console
+    $perceptron-&gt;display_confusion_matrix( \%c_matrix, { 
+        zero_as =&gt; &quot;bad apples&quot;, # cat  milk   green  etc.
+        one_as =&gt; &quot;good apples&quot;, # dog  honey  pink   etc.
+    } );
+
+
+    # saving and loading data of perceptron locally
+    # NOTE: nerve data is automatically saved after each trainning process
+    use AI::Perceptron::Simple &quot;:local_data&quot;;
+
+    my $nerve_file = &quot;apples.nerve&quot;;
+    preserve( ... );
+    save_perceptron( $perceptron, $nerve_file );
+
+    # load data of percpetron for use in actual program
+    my $apple_nerve = revive( ... );
+    my $apple_nerve = load_perceptron( $nerve_file );
+
+
+    # for portability of nerve data
+    use AI::Perceptron::Simple &quot;:portable_data&quot;;
+
+    my $yaml_nerve_file = &quot;pearls.yaml&quot;;
+    preserve_as_yaml ( ... );
+    save_perceptron_yaml ( $perceptron, $yaml_nerve_file );
+
+    # load nerve data on the other computer
+    my $pearl_nerve = revive_from_yaml ( ... );
+    my $pearl_nerve = load_perceptron_yaml ( $yaml_nerve_file );</code></pre>
+
+<h1 id="EXPORT">EXPORT</h1>
+
+<p>None by default.</p>
+
+<p>All the subroutines from <code>NERVE DATA RELATED SUBROUTINES</code> and <code>NERVE PORTABILITY RELATED SUBROUTINES</code> sections are exportable.</p>
+
+<p>Export tags include the following:</p>
+
+<dl>
+
+<dt id="local_data---subroutines-under-NERVE-DATA-RELATED-SUBROUTINES-section"><code>:local_data</code> - subroutines under <code>NERVE DATA RELATED SUBROUTINES</code> section.</dt>
+<dd>
+
+</dd>
+<dt id="portable_data---subroutines-under-NERVE-PORTABILITY-RELATED-SUBROUTINES-section"><code>:portable_data</code> - subroutines under <code>NERVE PORTABILITY RELATED SUBROUTINES</code> section.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<p>Most of the stuff are OO.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module provides methods to build, train, validate and test a perceptron. It can also save the data of the perceptron for future use for any actual AI programs.</p>
+
+<p>This module is also aimed to help newbies grasp hold of the concept of perceptron, training, validation and testing as much as possible. Hence, all the methods and subroutines in this module are decoupled as much as possible so that the actual scripts can be written as simple complete programs.</p>
+
+<p>The implementation here is super basic as it only takes in input of the dendrites and calculate the output. If the output is higher than the threshold, the final result (category) will be 1 aka perceptron is activated. If not, then the result will be 0 (not activated).</p>
+
+<p>Depending on how you view or categorize the final result, the perceptron will fine tune itself (aka train) based on the learning rate until the desired result is met. Everything from here on is all mathematics and numbers which only makes sense to the computer and not humans anymore.</p>
+
+<p>Whenever the perceptron fine tunes itself, it will increase/decrease all the dendrites that is significant (attributes labelled 1) for each input. This means that even when the perceptron successfully fine tunes itself to suite all the data in your file for the first round, the perceptron might still get some of the things wrong for the next round of training. Therefore, the perceptron should be trained for as many rounds as possible. The more &quot;confusion&quot; the perceptron is able to correctly handle, the more &quot;mature&quot; the perceptron is. No one defines how &quot;mature&quot; it is except the programmer himself/herself :)</p>
+
+<h1 id="CONVENTIONS-USED">CONVENTIONS USED</h1>
+
+<p>Please take note that not all subroutines/method must be used to make things work. All the subroutines and methods are listed out for the sake of writing the documentation.</p>
+
+<p>Private methods/subroutines are prefixed with <code>_</code> or <code>&amp;_</code> and they aren&#39;t meant to be called directly. You can if you want to. There are quite a number of them to be honest, just ignore them if you happen to see them :)</p>
+
+<p>Synonyms are placed before the actual ie. technical subroutines/methods. You will see <code>...</code> as the parameters if they are synonyms. Move to the next subroutine/method until you find something like <code>\%options</code> as the parameter or anything that isn&#39;t <code>...</code> for the description.</p>
+
+<h1 id="DATASET-STRUCTURE">DATASET STRUCTURE</h1>
+
+<p><i>This module can only process CSV files.</i></p>
+
+<p>Any field ie columns that will be used for processing must be binary ie. <code>0</code> or <code>1</code> only. Your dataset can contain other columns with non-binary data as long as they are not one of the dendrites.</p>
+
+<p>There are soem sample dataset which can be found in the <code>t</code> directory. The original dataset can also be found in <code>docs/book_list.csv</code>. The files can also be found <a href="https://github.com/Ellednera/AI-Perceptron-Simple">here</a>.</p>
+
+<h1 id="PERCEPTRON-DATA">PERCEPTRON DATA</h1>
+
+<p>The perceptron/neuron data is stored using the <code>Storable</code> module.</p>
+
+<p>See <code>Portability of Nerve Data</code> section below for more info on some known issues.</p>
+
+<h1 id="CREATION-RELATED-SUBROUTINES-METHODS">CREATION RELATED SUBROUTINES/METHODS</h1>
+
+<h2 id="new-options">new ( \%options )</h2>
+
+<p>Creates a brand new perceptron and initializes the value of each attribute / densrite aka. weight. Think of it as the thickness or plasticity of the dendrites.</p>
+
+<p>For <code>%options</code>, the followings are needed unless mentioned:</p>
+
+<dl>
+
+<dt id="initial_value-decimal">initial_value =&gt; $decimal</dt>
+<dd>
+
+<p>The value or thickness of ALL the dendrites when a new perceptron is created.</p>
+
+<p>Generally speaking, this value is usually between 0 and 1. However, it all depend on your combination of numbers for the other options.</p>
+
+</dd>
+<dt id="attribs-array_ref">attribs =&gt; $array_ref</dt>
+<dd>
+
+<p>An array reference containing all the attributes / dendrites names. Yes, give them some names :)</p>
+
+</dd>
+<dt id="learning_rate-decimal">learning_rate =&gt; $decimal</dt>
+<dd>
+
+<p>Optional. The default is <code>0.05</code>.</p>
+
+<p>The learning rate of the perceptron for the fine-tuning process.</p>
+
+<p>This value is usually between 0 and 1. However, it all depends on your combination of numbers for the other options.</p>
+
+</dd>
+<dt id="threshold-decimal">threshold =&gt; $decimal</dt>
+<dd>
+
+<p>Optional. The default is <code>0.5</code></p>
+
+<p>This is the passing rate to determine the neuron output (<code>0</code> or <code>1</code>).</p>
+
+<p>Generally speaking, this value is usually between <code>0</code> and <code>1</code>. However, it all depend on your combination of numbers for the other options.</p>
+
+</dd>
+</dl>
+
+<h2 id="get_attributes">get_attributes</h2>
+
+<p>Obtains a hash of all the attributes of the perceptron</p>
+
+<h2 id="learning_rate-value">learning_rate ( $value )</h2>
+
+<h2 id="learning_rate">learning_rate</h2>
+
+<p>If <code>$value</code> is given, sets the learning rate to <code>$value</code>. If not, then it returns the learning rate.</p>
+
+<h2 id="threshold-value">threshold ( $value )</h2>
+
+<h2 id="threshold">threshold</h2>
+
+<p>If <code>$value</code> is given, sets the threshold / passing rate to <code>$value</code>. If not, then it returns the passing rate.</p>
+
+<h1 id="TRAINING-RELATED-SUBROUTINES-METHODS">TRAINING RELATED SUBROUTINES/METHODS</h1>
+
+<p>All the training methods here have the same parameters as the two actual <code>train</code> method and they all do the same stuff. They are also used in the same way.</p>
+
+<h2 id="tame">tame ( ... )</h2>
+
+<h2 id="exercise">exercise ( ... )</h2>
+
+<h2 id="train-stimuli_train_csv-expected_output_header-save_nerve_to_file">train ( $stimuli_train_csv, $expected_output_header, $save_nerve_to_file )</h2>
+
+<h2 id="train-stimuli_train_csv-expected_output_header-save_nerve_to_file-display_stats-identifier">train ( $stimuli_train_csv, $expected_output_header, $save_nerve_to_file, $display_stats, $identifier )</h2>
+
+<p>Trains the perceptron.</p>
+
+<p><code>$stimuli_train_csv</code> is the set of data / input (in CSV format) to train the perceptron while <code>$save_nerve_to_file</code> is the filename that will be generate each time the perceptron finishes the training process. This data file is the data of the <code>AI::Perceptron::Simple</code> object and it is used in the <code>validate</code> method.</p>
+
+<p><code>$expected_output_header</code> is the header name of the columns in the csv file with the actual category or the exepcted values. This is used to determine to tune the nerve up or down. This value should only be 0 or 1 for the sake of simplicity.</p>
+
+<p><code>$display_stats</code> is <b>optional</b> and the default is 0. It will display more output about the tuning process. It will show the followings:</p>
+
+<dl>
+
+<dt id="tuning-status">tuning status</dt>
+<dd>
+
+<p>Indicates the nerve was tuned up, down or no tuning needed</p>
+
+</dd>
+<dt id="old-sum">old sum</dt>
+<dd>
+
+<p>The original sum of all <code>weightage * input</code> or <code>dendrite_size * binary_input</code></p>
+
+</dd>
+<dt id="threshold1">threshold</dt>
+<dd>
+
+<p>The threshold of the nerve</p>
+
+</dd>
+<dt id="new-sum">new sum</dt>
+<dd>
+
+<p>The new sum of all <code>weightage * input</code> after fine-tuning the nerve</p>
+
+</dd>
+</dl>
+
+<p>If <code>$display_stats</code> is specified ie. set to <code>1</code>, then you <b>MUST</b> specify the <code>$identifier</code>. <code>$identifier</code> is the column / header name that is used to identify a specific row of data in <code>$stimuli_train_csv</code>.</p>
+
+<h2 id="calculate_output-self-stimuli_hash">&amp;_calculate_output( $self, \%stimuli_hash )</h2>
+
+<p>Calculates and returns the <code>sum(weightage*input)</code> for each individual row of data. Actually, it justs add up all the existing weight since the <code>input</code> is always 1 for now :)</p>
+
+<p><code>%stimuli_hash</code> is the actual data to be used for training. It might contain useless columns.</p>
+
+<p>This will get all the avaible dendrites using the <code>get_attributes</code> method and then use all the keys ie. headers to access the corresponding values.</p>
+
+<p>This subroutine should be called in the procedural way for now.</p>
+
+<h2 id="tune-self-stimuli_hash-tune_up_or_down">&amp;_tune( $self, \%stimuli_hash, $tune_up_or_down )</h2>
+
+<p>Fine tunes the nerve. This will directly alter the attributes values in <code>$self</code> according to the attributes / dendrites specified in <code>new</code>.</p>
+
+<p>The <code>%stimuli_hash</code> here is the same as the one in the <code>_calculate_output</code> method.</p>
+
+<p><code>%stimuli_hash</code> will be used to determine which dendrite in <code>$self</code> needs to be fine-tuned. As long as the value of any key in <code>%stimuli_hash</code> returns true (1) then that dendrite in <code>$self</code> will be tuned.</p>
+
+<p>Tuning up or down depends on <code>$tune_up_or_down</code> specifed by the <code>train</code> method. The following constants can be used for <code>$tune_up_or_down</code>:</p>
+
+<dl>
+
+<dt id="TUNE_UP">TUNE_UP</dt>
+<dd>
+
+<p>Value is <code>1</code></p>
+
+</dd>
+<dt id="TUNE_DOWN">TUNE_DOWN</dt>
+<dd>
+
+<p>Value is <code>0</code></p>
+
+</dd>
+</dl>
+
+<p>This subroutine should be called in the procedural way for now.</p>
+
+<h1 id="VALIDATION-RELATED-METHODS">VALIDATION RELATED METHODS</h1>
+
+<p>All the validation methods here have the same parameters as the actual <code>validate</code> method and they all do the same stuff. They are also used in the same way.</p>
+
+<h2 id="take_mock_exam">take_mock_exam (...)</h2>
+
+<h2 id="take_lab_test">take_lab_test (...)</h2>
+
+<h2 id="validate-options">validate ( \%options )</h2>
+
+<p>This method validates the perceptron against another set of data after it has undergone the training process.</p>
+
+<p>This method calculates the output of each row of data and write the result into the predicted column. The data begin written into the new file or the original file will maintain it&#39;s sequence.</p>
+
+<p>Please take note that this method will load all the data of the validation stimuli, so please split your stimuli into multiple files if possible and call this method a few more times.</p>
+
+<p>For <code>%options</code>, the followings are needed unless mentioned:</p>
+
+<dl>
+
+<dt id="stimuli_validate-csv_file">stimuli_validate =&gt; $csv_file</dt>
+<dd>
+
+<p>This is the CSV file containing the validation data, make sure that it contains a column with the predicted values as it is needed in the next key mentioned: <code>predicted_column_index</code></p>
+
+</dd>
+<dt id="predicted_column_index-column_number">predicted_column_index =&gt; $column_number</dt>
+<dd>
+
+<p>This is the index of the column that contains the predicted output values. <code>$index</code> starts from <code>0</code>.</p>
+
+<p>This column will be filled with binary numbers and the full new data will be saved to the file specified in the <code>results_write_to</code> key.</p>
+
+</dd>
+<dt id="results_write_to-new_csv_file">results_write_to =&gt; $new_csv_file</dt>
+<dd>
+
+<p>Optional.</p>
+
+<p>The default behaviour will write the predicted output back into <code>stimuli_validate</code> ie the original data. The sequence of the data will be maintained.</p>
+
+</dd>
+</dl>
+
+<p><i>*This method will call <code>_real_validate_or_test</code> to do the actual work.</i></p>
+
+<h1 id="TESTING-RELATED-SUBROUTINES-METHODS">TESTING RELATED SUBROUTINES/METHODS</h1>
+
+<p>All the testing methods here have the same parameters as the actual <code>test</code> method and they all do the same stuff. They are also used in the same way.</p>
+
+<h2 id="take_real_exam">take_real_exam (...)</h2>
+
+<h2 id="work_in_real_world">work_in_real_world (...)</h2>
+
+<h2 id="test-options">test ( \%options )</h2>
+
+<p>This method is used to put the trained nerve to the test. You can think of it as deploying the nerve for the actual work or maybe putting the nerve into an empty brain and see how well the brain survives :)</p>
+
+<p>This method works and behaves the same way as the <code>validate</code> method. See <code>validate</code> for the details.</p>
+
+<p><i>*This method will call &amp;_real_validate_or_test to do the actual work.</i></p>
+
+<h2 id="real_validate_or_test-data_hash_ref">_real_validate_or_test ( $data_hash_ref )</h2>
+
+<p>This is where the actual validation or testing takes place.</p>
+
+<p><code>$data_hash_ref</code> is the list of parameters passed into the <code>validate</code> or <code>test</code> methods.</p>
+
+<p>This is a <b>method</b>, so use the OO way. This is one of the exceptions to the rules where private subroutines are treated as methods :)</p>
+
+<h2 id="fill_predicted_values-self-stimuli_validate-predicted_index-aoa">&amp;_fill_predicted_values ( $self, $stimuli_validate, $predicted_index, $aoa )</h2>
+
+<p>This is where the filling in of the predicted values takes place. Take note that the parameters naming are the same as the ones used in the <code>validate</code> and <code>test</code> method.</p>
+
+<p>This subroutine should be called in the procedural way.</p>
+
+<h1 id="RESULTS-RELATED-SUBROUTINES-METHODS">RESULTS RELATED SUBROUTINES/METHODS</h1>
+
+<p>This part is related to generating the confusion matrix.</p>
+
+<h2 id="get_exam_results">get_exam_results ( ... )</h2>
+
+<p>The parameters and usage are the same as <code>get_confusion_matrix</code>. See the next method.</p>
+
+<h2 id="get_confusion_matrix-options">get_confusion_matrix ( \%options )</h2>
+
+<p>Returns the confusion matrix in the form of a hash. The hash will contain these keys: <code>true_positive</code>, <code>true_negative</code>, <code>false_positive</code>, <code>false_negative</code>, <code>accuracy</code>, <code>sensitivity</code>.</p>
+
+<p>Take note that the <code>accuracy</code> and <code>sensitivity</code> are in percentage (%) in decimal (if any).</p>
+
+<p>For <code>%options</code>, the followings are needed unless mentioned:</p>
+
+<dl>
+
+<dt id="full_data_file-filled_test_file">full_data_file =&gt; $filled_test_file</dt>
+<dd>
+
+<p>This is the CSV file filled with the predicted values.</p>
+
+<p>Make sure that you don&#39;t do anything to the actual and predicted output in this file after testing the nerve. These two columns must contain binary values only!</p>
+
+</dd>
+<dt id="actual_output_header-actual_column_name">actual_output_header =&gt; $actual_column_name</dt>
+<dd>
+
+</dd>
+<dt id="predicted_output_header-predicted_column_name">predicted_output_header =&gt; $predicted_column_name</dt>
+<dd>
+
+</dd>
+</dl>
+
+<p>The binary values are treated as follows:</p>
+
+<dl>
+
+<dt id="is-negative"><code>0</code> is negative</dt>
+<dd>
+
+</dd>
+<dt id="is-positive"><code>1</code> is positive</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h2 id="collect_stats-options">&amp;_collect_stats ( \%options )</h2>
+
+<p>Generates a hash of confusion matrix based on <code>%options</code> given in the <code>get_confusion_matrix</code> method.</p>
+
+<h2 id="calculate_total_entries-c_matrix_ref">&amp;_calculate_total_entries ( $c_matrix_ref )</h2>
+
+<p>Calculates and adds the data for the <code>total_entries</code> key in the confusion matrix hash.</p>
+
+<h2 id="calculate_accuracy-c_matrix_ref">&amp;_calculate_accuracy ( $c_matrix_ref )</h2>
+
+<p>Calculates and adds the data for the <code>accuracy</code> key in the confusion matrix hash.</p>
+
+<h2 id="calculate_sensitivity-c_matrix_ref">&amp;_calculate_sensitivity ( $c_matrix_ref )</h2>
+
+<p>Calculates and adds the data for the <code>sensitivity</code> key in the confusion matrix hash.</p>
+
+<h2 id="display_exam_results">display_exam_results ( ... )</h2>
+
+<p>The parameters are the same as <code>display_confusion_matrix</code>. See the next method.</p>
+
+<h2 id="display_confusion_matrix-confusion_matrix-labels">display_confusion_matrix ( \%confusion_matrix, \%labels )</h2>
+
+<p>Display the confusion matrix.</p>
+
+<p><code>%confusion_matrix</code> is the same confusion matrix returned by the <code>get_confusion_matrix</code> method.</p>
+
+<p>For <code>%labels</code>, since <code>0</code>&#39;s and <code>1</code>&#39;s won&#39;t make much sense as the output in most cases, therefore, the following keys must be specified:</p>
+
+<dl>
+
+<dt id="zero_as-category_zero_name">zero_as =&gt; $category_zero_name</dt>
+<dd>
+
+</dd>
+<dt id="one_as-category_one_name">one_as =&gt; $category_one_name</dt>
+<dd>
+
+</dd>
+</dl>
+
+<p>Please take note that non-ascii characters ie. non-English alphabets <b>might</b> cause the output to go off :)</p>
+
+<p>For the <code>%labels</code>, there is no need to enter &quot;actual X&quot;, &quot;predicted X&quot; etc. It will be prefixed with <code>A: </code> for actual and <code>P: </code> for the predicted values by default.</p>
+
+<h2 id="build_matrix-c_matrix-labels">&amp;_build_matrix ( $c_matrix, $labels )</h2>
+
+<p>Builds the matrix using <code>Text::Matrix</code> module.</p>
+
+<p><code>$c_matrix</code> and <code>$labels</code> are the same as the ones passed to <code>display_exam_results</code> and <code></code>display_confusion_matrix.</p>
+
+<p>Returns a list <code>( $matrix, $c_matrix )</code> which can directly be passed to <code>_print_extended_matrix</code>.</p>
+
+<h2 id="print_extended_matrix-matrix-c_matrix">&amp;_print_extended_matrix ( $matrix, $c_matrix )</h2>
+
+<p>Extends and outputs the matrix on the screen.</p>
+
+<p><code>$matrix</code> and <code>$c_matrix</code> are the same as returned by <code>&amp;_build_matrix</code>.</p>
+
+<h1 id="NERVE-DATA-RELATED-SUBROUTINES">NERVE DATA RELATED SUBROUTINES</h1>
+
+<p>This part is about saving the data of the nerve. These subroutines can be exported using the <code>:local_data</code> tag.</p>
+
+<p><b>The subroutines are to be called in the procedural way</b>. No checking is done currently.</p>
+
+<p>The subroutines here are not exported in any way whatsoever.</p>
+
+<p>See <code>PERCEPTRON DATA</code> and <code>KNOWN ISSUES</code> sections for more details on the subroutines in this section.</p>
+
+<h2 id="preserve">preserve ( ... )</h2>
+
+<p>The parameters and usage are the same as <code>save_perceptron</code>. See the next subroutine.</p>
+
+<h2 id="save_perceptron-nerve_file">save_perceptron ( $nerve_file )</h2>
+
+<p>Saves the <code>AI::Perceptron::Simple</code> object into a <code>Storable</code> file. There shouldn&#39;t be a need to call this method manually since after every training process this will be called automatically.</p>
+
+<h2 id="revive">revive (...)</h2>
+
+<p>The parameters and usage are the same as <code>load_perceptron</code>. See the next subroutine.</p>
+
+<h2 id="load_perceptron-nerve_file_to_load">load_perceptron ( $nerve_file_to_load )</h2>
+
+<p>Loads the data and turns it into a <code>AI::Perceptron::Simple</code> object as the return value.</p>
+
+<h1 id="NERVE-PORTABILITY-RELATED-SUBROUTINES">NERVE PORTABILITY RELATED SUBROUTINES</h1>
+
+<p>These subroutines can be exported using the <code>:portable_data</code> tag.</p>
+
+<p>The file type currently supported is YAML. Please be careful with the data as you won&#39;t want the nerve data accidentally modified.</p>
+
+<h2 id="preserve_as_yaml">preserve_as_yaml ( ... )</h2>
+
+<p>The parameters and usage are the same as <code>save_perceptron_yaml</code>. See the next subroutine.</p>
+
+<h2 id="save_perceptron_yaml-nerve_file">save_perceptron_yaml ( $nerve_file )</h2>
+
+<p>Saves the <code>AI::Perceptron::Simple</code> object into a <code>YAML</code> file.</p>
+
+<h2 id="revive_from_yaml">revive_from_yaml (...)</h2>
+
+<p>The parameters and usage are the same as <code>load_perceptron</code>. See the next subroutine.</p>
+
+<h2 id="load_perceptron_yaml-yaml_nerve_file">load_perceptron_yaml ( $yaml_nerve_file )</h2>
+
+<p>Loads the YAML data and turns it into a <code>AI::Perceptron::Simple</code> object as the return value.</p>
+
+<h1 id="TO-DO">TO DO</h1>
+
+<p>These are the to-do&#39;s that <b>MIGHT</b> be done in the future. Don&#39;t put too much hope in them please :)</p>
+
+<ul>
+
+<li><p>Clean up and refactor source codes</p>
+
+</li>
+<li><p>Add more useful data for confusion matrix</p>
+
+</li>
+<li><p>Implement shuffling data feature</p>
+
+</li>
+<li><p>Implement fast/smart training feature</p>
+
+</li>
+<li><p>Write a tutorial or something for this module</p>
+
+</li>
+<li><p>and something yet to be known...</p>
+
+</li>
+</ul>
+
+<h1 id="KNOWN-ISSUES">KNOWN ISSUES</h1>
+
+<h2 id="Portability-of-Nerve-Data">Portability of Nerve Data</h2>
+
+<p>Take note that the <code>Storable</code> nerve data is not compatible across different versions. See <code>Storable</code>&#39;s documentation for more information.</p>
+
+<p>If you really need to send the nerve data to different computers with different versions of <code>Storable</code> module, see the docs of the following subroutines:</p>
+
+<ul>
+
+<li><p><code>&amp;preserve_as_yaml</code> or <code>&amp;save_perceptron_yaml</code> for storing data.</p>
+
+</li>
+<li><p><code>&amp;revive_from_yaml</code> or <code>&amp;load_perceptron_yaml</code> for retrieving the data.</p>
+
+</li>
+</ul>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Raphael Jong Jun Jie, <code>&lt;ellednera at cpan.org&gt;</code></p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>Please report any bugs or feature requests to <code>bug-ai-perceptron-simple at rt.cpan.org</code>, or through the web interface at <a href="https://rt.cpan.org/NoAuth/ReportBug.html?Queue=AI-Perceptron-Simple">https://rt.cpan.org/NoAuth/ReportBug.html?Queue=AI-Perceptron-Simple</a>. I will be notified, and then you&#39;ll automatically be notified of progress on your bug as I make changes.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>You can find documentation for this module with the perldoc command.</p>
+
+<pre><code>    perldoc AI::Perceptron::Simple</code></pre>
+
+<p>You can also look for information at:</p>
+
+<ul>
+
+<li><p>RT: CPAN&#39;s request tracker (report bugs here)</p>
+
+<p><a href="https://rt.cpan.org/NoAuth/Bugs.html?Dist=AI-Perceptron-Simple">https://rt.cpan.org/NoAuth/Bugs.html?Dist=AI-Perceptron-Simple</a></p>
+
+</li>
+<li><p>CPAN Ratings</p>
+
+<p><a href="https://cpanratings.perl.org/d/AI-Perceptron-Simple">https://cpanratings.perl.org/d/AI-Perceptron-Simple</a></p>
+
+</li>
+<li><p>Search CPAN</p>
+
+<p><a href="https://metacpan.org/release/AI-Perceptron-Simple">https://metacpan.org/release/AI-Perceptron-Simple</a></p>
+
+</li>
+</ul>
+
+<h1 id="ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</h1>
+
+<p>Besiyata d&#39;shmaya, Wikipedia</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>AI::Perceptron, Text::Matrix</p>
+
+<h1 id="LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</h1>
+
+<p>This software is Copyright (c) 2021 by Raphael Jong Jun Jie.</p>
+
+<p>This is free software, licensed under:</p>
+
+<pre><code>  The Artistic License 2.0 (GPL Compatible)</code></pre>
+
+
+</body>
+
+</html>
+
+

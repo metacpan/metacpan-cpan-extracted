@@ -3,9 +3,9 @@
 #
 #  (C) Paul Evans, 2009-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.27;
+use Object::Pad 0.51;
 
-package Tickit::Widget::LinearBox 0.49;
+package Tickit::Widget::LinearBox 0.50;
 class Tickit::Widget::LinearBox
    extends Tickit::ContainerWidget;
 
@@ -81,11 +81,11 @@ sub BUILDARGS
    return $class->SUPER::BUILDARGS( %args );
 }
 
-BUILD
+ADJUSTPARAMS
 {
-   my %args = @_;
+   my ( $params ) = @_;
 
-   if( $args{children} ) {
+   if( delete $params->{children} ) {
       croak "The 'children' constructor argument to ${\ref $self} is no longer recognised; use ->add_children instead";
    }
 }

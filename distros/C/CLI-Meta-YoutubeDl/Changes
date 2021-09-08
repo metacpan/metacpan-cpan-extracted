@@ -1,3 +1,9 @@
+0.002   2021-09-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Update to youtube-dl 2021.06.06 (new option:
+	  --output-na-placeholder).
+
+
 0.001   2020-09-09  Released-By: PERLANCAR
 
         - First release, extracted from App-ShellCompleter-YoutubeDl (which was

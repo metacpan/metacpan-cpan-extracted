@@ -30,7 +30,7 @@ our @EXPORT_OK = (
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
 
-our $VERSION = '0.01';
+our $VERSION = '0.012';
 
 
 ##########################################################################

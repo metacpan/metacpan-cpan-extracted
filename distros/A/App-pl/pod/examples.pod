@@ -145,14 +145,14 @@ it must be the last matching line.  Append the keep variable to it.
 
 =item Rename a file depending on contents
 
-This reads each file without newlines in a B<-ln> loop.  When it finds the
-C<package> declaration, which gives the logical name of this file, it replaces
+This reads each file in an B<-n> loop.  When it finds the C<package>
+declaration, which gives the logical name of this file, it replaces
 double-colons with slashes.  It renames the file to the result.  The C<last>
 statement then makes this the last line read of the current file, continuing
 with the next file:
 
-    pl -ln 'if( s/^\s*package\s+([^\s;]+).*/$1/ ) { s!::!/!g; rename $ARGV, "$_.pm" or warn "$ARGV -> $_.pm: $!\n"; last }' *.pm
-    pl -ln 'if( s/^\s*package\s+([^\s;]+).*/$1/ ) { s!::!/!g; rename $A, "$_.pm" or warn "$A -> $_.pm: $!\n"; last }' *.pm
+    pl -n 'if( s/^\s*package\s+([^\s;]+).*/$1/s ) { s!::!/!g; rename $ARGV, "$_.pm" or warn "$ARGV -> $_.pm: $!\n"; last }' *.pm
+    pl -n 'if( s/^\s*package\s+([^\s;]+).*/$1/s ) { s!::!/!g; rename $A, "$_.pm" or warn "$A -> $_.pm: $!\n"; last }' *.pm
 
 This assumes all files are at the root of the destination directories.  If not
 you must add the common part of the target directories before C<$_>.
@@ -164,8 +164,8 @@ For Java, it's a bit more complicated, because the full name is split into a
 C<package> followed by a C<class> or similar statement.  Join them when we
 find the latter:
 
-    pl -n 'if( /^\s*package\s+([^\s;]+)/ ) { $d = $1 =~ tr+.+/+r } elsif( /^\s*(?:(?:public|private|protected|abstract|final)\s+)*(?:class|interface|enum|record)\s+([^\s;]+)/ ) { rename $ARGV, "$d/$1.java" or warn "$ARGV -> $d/$1.java: $!\n"; last }' *.java
-    pl -n 'if( /^\s*package\s+([^\s;]+)/ ) { $d = $1 =~ tr+.+/+r } elsif( /^\s*(?:(?:public|private|protected|abstract|final)\s+)*(?:class|interface|enum|record)\s+([^\s;]+)/ ) { rename $A, "$d/$1.java" or warn "$A -> $d/$1.java: $!\n"; last }' *.java
+    pl -n 'if( /^\s*package\s+([^\s;]+)/ ) { $d = $1 =~ tr+.+/+r } elsif( /^\s*(?:(?:public|private|protected|abstract|sealed|final)\s+)*(?:class|interface|enum|record)\s+([^\s;]+)/ ) { rename $ARGV, "$d/$1.java" or warn "$ARGV -> $d/$1.java: $!\n"; last }' *.java
+    pl -n 'if( /^\s*package\s+([^\s;]+)/ ) { $d = $1 =~ tr+.+/+r } elsif( /^\s*(?:(?:public|private|protected|abstract|sealed|final)\s+)*(?:class|interface|enum|record)\s+([^\s;]+)/ ) { rename $A, "$d/$1.java" or warn "$A -> $d/$1.java: $!\n"; last }' *.java
 
 =item Delete matching files, except last one
 
@@ -512,10 +512,11 @@ I<Always remember you're unique, just like everyone else. :-)>
 
 The function C<k(eydiff)> stores the 2nd arg or chomped C<$_> in C<%K(EYDIFF)>
 keyed by 1st arg or C<$1> and the arg counter C<$ARGIND> (or C<$I>).  Its
-sibling C<K(eydiff)> does the same using 1st arg or 0 as an index into C<@F(IELD)>
-for the 1st part of the key.  At the end only the rows differing between files
-are shown.  If you specify B<--color> and have C<Algorithm::Diff> the exact
-difference gets color-highlighted.
+sibling C<K(eydiff)> does the same using 1st arg or 0 as an index into
+C<@F(IELD)> for the 1st part of the key.  At the end only the rows differing
+between files are shown.  If you write to a terminal or specify B<--color> the
+difference gets color-highlighted in per-character detail with
+C<Algorithm::Diff>, or in just one red blob without.
 
 =over
 
@@ -538,13 +539,17 @@ commas, and C<K(eydiff)> by default takes the 1st field as your unique key:
     >   	4,Pl,Perlium,2:pl basis,5.32.0
     >   	n/a
     >   8
-    >   	8,O,Oxygen,16:O & chalcogen,15.999
+    >   	8,O,Oxygen,16:O & chalcogen,16
     >   	8,O,Oxygen,16:O & chalcogen,16
     >   	8,O,Oxygen,16:O and chalcogen,16
     >   41
     >   	41,Nb,Niobium,5:no name,92.906
     >   	n/a
     >   	41,Nb,Columbium,5:no name,93
+    >   42
+    >   	42,Ve,Veritasium,6:an element of truth,i
+    >   	n/a
+    >   	n/a
     >   74
     >   	74,W,Tungsten,6:transition metal,183.84
     >   	74,W,Wolfram,6:transition metal,183.8
@@ -578,13 +583,17 @@ line:
     >   	Pl,Perlium,2:pl basis,5.32.0
     >   	n/a
     >   8
-    >   	O,Oxygen,16:O & chalcogen,15.999
+    >   	O,Oxygen,16:O & chalcogen,16
     >   	O,Oxygen,16:O & chalcogen,16
     >   	O,Oxygen,16:O and chalcogen,16
     >   41
     >   	Nb,Niobium,5:no name,92.906
     >   	n/a
     >   	Nb,Columbium,5:no name,93
+    >   42
+    >   	Ve,Veritasium,6:an element of truth,i
+    >   	n/a
+    >   	n/a
     >   74
     >   	W,Tungsten,6:transition metal,183.84
     >   	W,Wolfram,6:transition metal,183.8
@@ -613,13 +622,17 @@ escaped from the Shell as C<\\t>:
     >   	4	Pl	Perlium	2:pl basis	5.32.0
     >   	n/a
     >   8
-    >   	8	O	Oxygen	16:O & chalcogen	15.999
+    >   	8	O	Oxygen	16:O & chalcogen	16
     >   	8	O	Oxygen	16:O & chalcogen	16
     >   	8	O	Oxygen	16:O and chalcogen	16
     >   41
     >   	41	Nb	Niobium	5:no name	92.906
     >   	n/a
     >   	41	Nb	Columbium	5:no name	93
+    >   42
+    >   	42	Ve	Veritasium	6:an element of truth	i
+    >   	n/a
+    >   	n/a
     >   74
     >   	74	W	Tungsten	6:transition metal	183.84
     >   	74	W	Wolfram	6:transition metal	183.8
@@ -645,13 +658,17 @@ escaped from the Shell as C<\\t>:
     >   	Pl	Perlium	2:pl basis	5.32.0
     >   	n/a
     >   8
-    >   	O	Oxygen	16:O & chalcogen	15.999
+    >   	O	Oxygen	16:O & chalcogen	16
     >   	O	Oxygen	16:O & chalcogen	16
     >   	O	Oxygen	16:O and chalcogen	16
     >   41
     >   	Nb	Niobium	5:no name	92.906
     >   	n/a
     >   	Nb	Columbium	5:no name	93
+    >   42
+    >   	Ve	Veritasium	6:an element of truth	i
+    >   	n/a
+    >   	n/a
     >   74
     >   	W	Tungsten	6:transition metal	183.84
     >   	W	Wolfram	6:transition metal	183.8
@@ -676,13 +693,14 @@ several hosts.  Here we additionally need to ignore commented out lines:
 
 =item Diff several zip archives by member name
 
+I<Growing old you forget to zip up your fly.  Later you forget to unzip your fly. (-:>
+
 This uses the same mechanism as the csv example.  Addidionally, through the
 C<p(iped)> block, it reads the output of C<unzip -vql> for each archive.  That
-has an almost fixed format, except with extreme member sizes.  The regexp
-picks up only those lines which refer to files:
+has an almost fixed format, except with extreme member sizes:
 
-    pl -oB 'echo for @ARGV' 'piped { keydiff if s@.{29,}% .{16} [\da-f]{8}\K  (.*[^/])\n@@ } "unzip", "-vql", $_' *.zip
-    pl -oB 'e for @A' 'p { k if s@.{29,}% .{16} [\da-f]{8}\K  (.*[^/])\n@@ } "unzip", "-vql", $_' *.zip
+    pl -oB 'echo for @ARGV' 'piped { keydiff if s@.{29,}% .{16} [\da-f]{8}\K  (.+)@@ } "unzip", "-vqq", $_' *.zip
+    pl -oB 'e for @A' 'p { k if s@.{29,}% .{16} [\da-f]{8}\K  (.+)@@ } "unzip", "-vqq", $_' *.zip
 
     >   perl-5.30.0.zip
     >   perl-5.30.1.zip
@@ -709,8 +727,8 @@ Java .jar, .ear & .war files (which are aliases for .zip), after a clean build
 have many class files with the identical crc, but a different date.  This
 excludes the date:
 
-    pl -o 'piped { keydiff $2 if s@.{29,}% \K.{16} ([\da-f]{8})  (.*[^/])\n@$1@ } "unzip", "-vql", $_' *.zip
-    pl -o 'p { k $2 if s@.{29,}% \K.{16} ([\da-f]{8})  (.*[^/])\n@$1@ } "unzip", "-vql", $_' *.zip
+    pl -o 'piped { keydiff $2 if s@.{16} ([\da-f]{8})  (.+)@$1@ } "unzip", "-vqq", $_' *.zip
+    pl -o 'p { k $2 if s@.{16} ([\da-f]{8})  (.+)@$1@ } "unzip", "-vqq", $_' *.zip
 
     >   AUTHORS
     >   	   48831  Defl:N    22282  54% cc2a1286
@@ -733,6 +751,13 @@ excludes the date:
     >   	  107649  Defl:N    37211  65% 9db83c1e
     >   	  107649  Defl:N    37211  65% 16726160
     >   ...
+
+Browsers have a bug of not checking for updated resources.  A workaround is to
+add a random hex number to some file names.  In that case use only the rest of
+the filename as a key:
+
+    pl -o 'piped { keydiff $2 if s@.{16} ([\da-f]{8})  (.+?)(?:\.([0-9a-f]{20})(\..[a-z]+))?$@if( $3 ) { $n = "$2.\$x$4"; "$1  \$x=$3" } else { $n = $2; $1 }@e } "unzip", "-vqq", $_' *.jar
+    pl -o 'p { k $2 if s@.{16} ([\da-f]{8})  (.+?)(?:\.([0-9a-f]{20})(\..[a-z]+))?$@if( $3 ) { $n = "$2.\$x$4"; "$1  \$x=$3" } else { $n = $2; $1 }@e } "unzip", "-vqq", $_' *.jar
 
 =item Diff several tarballs by member name
 
@@ -897,16 +922,16 @@ Print the first line (B<-P1>) where the substitution was successful.  To avoid
 the hassle of protecting them from (sometimes multiple levels of) Shell
 quoting, there are variables for single C<$q(uote)> & double C<$Q(uote)>:
 
-    pl -P1 's/.+\bVERSION\s*=\s*[v$Quote$quote]([0-9.]+).+/$1/' pl
-    pl -P1 's/.+\bVERSION\s*=\s*[v$Q$q]([0-9.]+).+/$1/' pl
+    pl -P1 's/.+\bVERSION\s*=\s*[v$Quote$quote]{0,2}([0-9.]+).+/$1/' pl
+    pl -P1 's/.+\bVERSION\s*=\s*[v$Q$q]{0,2}([0-9.]+).+/$1/' pl
 
-    >   0.59.0
+    >   0.61.0
 
 For multple files, add the filename, and reset (B<-r>) the B<-P> count for each
 file:
 
-    pl -rP1 's/.+\bVERSION\s*=\s*[v$Quote$quote]([0-9.]+).+/$ARGV: $1/' *.pm
-    pl -rP1 's/.+\bVERSION\s*=\s*[v$Q$q]([0-9.]+).+/$A: $1/' *.pm
+    pl -rP1 's/.+\bVERSION\s*=\s*[v$Quote$quote]{0,2}([0-9.]+).+/$ARGV: $1/' *.pm
+    pl -rP1 's/.+\bVERSION\s*=\s*[v$Q$q]{0,2}([0-9.]+).+/$A: $1/' *.pm
 
 =item Only POD or non-POD
 
@@ -928,7 +953,8 @@ C<perl -n>!) each file.  It strips any comment (not quite reliably, also
 inside a string).  Then it strips leading whitespace and adds the remaining
 length to print-at-end C<$R(ESULT)>:
 
-    pl -ln 'last if /^__(?:DATA|END)__/; s/(?:^|\s+)#.*//s; s/^\s+//; $result += length' *.pm
+    pl -ln 'last if /^__(?:DATA|END)__/; s/(?:^|\s+)#.*//s; s/^\s+//; $RESULT += length' *.pm
+    pl -ln 'last if /^__(?:DATA|END)__/; s/(?:^|\s+)#.*//s; s/^\s+//; $R += length' *.pm
 
 If you want the count per file, instead of C<$R(ESULT)> use either
 sort-lexically C<$RESULT{$ARGV}> (or C<$R{$A}>) or sort-numerically
@@ -949,6 +975,7 @@ out just separated by spaces:
     >     EXPORT => *List::Util::EXPORT,
     >     EXPORT_OK => *List::Util::EXPORT_OK,
     >     ISA => *List::Util::ISA,
+    >     RAND => *List::Util::RAND,
     >     REAL_MULTICALL => *List::Util::List::Util,
     >     VERSION => *List::Util::VERSION,
     >     XS_VERSION => *List::Util::XS_VERSION,
@@ -973,11 +1000,14 @@ out just separated by spaces:
     >     pairvalues => *List::Util::pairvalues,
     >     product => *List::Util::product,
     >     reduce => *List::Util::reduce,
+    >     reductions => *List::Util::reductions,
+    >     sample => *List::Util::sample,
     >     shuffle => *List::Util::shuffle,
     >     sum => *List::Util::sum,
     >     sum0 => *List::Util::sum0,
     >     tail => *List::Util::tail,
     >     uniq => *List::Util::uniq,
+    >     uniqint => *List::Util::uniqint,
     >     uniqnum => *List::Util::uniqnum,
     >     uniqstr => *List::Util::uniqstr,
     >     unpairs => *List::Util::unpairs
@@ -992,17 +1022,17 @@ Where does perl load from, and what exactly has it loaded?
 
     >   [
     >     '/etc/perl',
-    >     '/usr/local/lib/x86_64-linux-gnu/perl/5.30.3',
-    >     '/usr/local/share/perl/5.30.3',
-    >     '/usr/lib/x86_64-linux-gnu/perl5/5.30',
+    >     '/usr/local/lib/x86_64-linux-gnu/perl/5.32.1',
+    >     '/usr/local/share/perl/5.32.1',
+    >     '/usr/lib/x86_64-linux-gnu/perl5/5.32',
     >     '/usr/share/perl5',
     >     '/usr/lib/x86_64-linux-gnu/perl-base',
-    >     '/usr/lib/x86_64-linux-gnu/perl/5.30',
-    >     '/usr/share/perl/5.30',
+    >     '/usr/lib/x86_64-linux-gnu/perl/5.32',
+    >     '/usr/share/perl/5.32',
     >     '/usr/local/lib/site_perl'
     >   ] {
     >     'Carp.pm' => '/usr/lib/x86_64-linux-gnu/perl-base/Carp.pm',
-    >     'Data/Dumper.pm' => '/usr/lib/x86_64-linux-gnu/perl/5.30/Data/Dumper.pm',
+    >     'Data/Dumper.pm' => '/usr/lib/x86_64-linux-gnu/perl/5.32/Data/Dumper.pm',
     >     'Exporter.pm' => '/usr/lib/x86_64-linux-gnu/perl-base/Exporter.pm',
     >     'List/Util.pm' => '/usr/lib/x86_64-linux-gnu/perl-base/List/Util.pm',
     >     'XSLoader.pm' => '/usr/lib/x86_64-linux-gnu/perl-base/XSLoader.pm',
@@ -1010,7 +1040,7 @@ Where does perl load from, and what exactly has it loaded?
     >     'constant.pm' => '/usr/lib/x86_64-linux-gnu/perl-base/constant.pm',
     >     'feature.pm' => '/usr/lib/x86_64-linux-gnu/perl-base/feature.pm',
     >     'overloading.pm' => '/usr/lib/x86_64-linux-gnu/perl-base/overloading.pm',
-    >     'sort.pm' => '/usr/share/perl/5.30/sort.pm',
+    >     'sort.pm' => '/usr/share/perl/5.32/sort.pm',
     >     'strict.pm' => '/usr/lib/x86_64-linux-gnu/perl-base/strict.pm',
     >     'warnings.pm' => '/usr/lib/x86_64-linux-gnu/perl-base/warnings.pm',
     >     'warnings/register.pm' => '/usr/lib/x86_64-linux-gnu/perl-base/warnings/register.pm'
@@ -1075,7 +1105,7 @@ It returns a hash reference, from which you can lookup an entry:
     pl 'echo Config->{sitelib}'
     pl 'e C->{sitelib}'
 
-    >   /usr/local/share/perl/5.30.3
+    >   /usr/local/share/perl/5.32.1
 
 You can also return a sub-hash, of only the keys matching any regexps you
 pass:
@@ -1097,6 +1127,59 @@ pass:
 =head2 Tables
 
 =over
+
+=item Number bases
+
+Perl natively handles the 4 different bases common to programming.  If you
+want to list them side by side, simply quadruple them and C<f(orm)> them with
+the 4 corresponding formats:
+
+    pl 'form "0b%08b  0%03o  %3d  0x%02x", ($_)x4_ for 0..0xff'
+    pl 'f "0b%08b  0%03o  %3d  0x%02x", ($_)x4_ for 0..0xff'
+
+    >   0b00000000  0000    0  0x00
+    >   0b00000001  0001    1  0x01
+    >   0b00000010  0002    2  0x02
+    >   0b00000011  0003    3  0x03
+    >   0b00000100  0004    4  0x04
+    >   0b00000101  0005    5  0x05
+    >   0b00000110  0006    6  0x06
+    >   0b00000111  0007    7  0x07
+    >   0b00001000  0010    8  0x08
+    >   ...
+    >   0b11111100  0374  252  0xfc
+    >   0b11111101  0375  253  0xfd
+    >   0b11111110  0376  254  0xfe
+    >   0b11111111  0377  255  0xff
+
+That makes a rather long table.  You can get a better overview with 4 nested
+tables, by quadrupling the format, quartering the range and passing in the
+quadrupled numbers with 4 different offsets:
+
+    pl 'form join( "\t", ("0b%08b  0%03o  %3d  0x%02x")x4), map +($_)x4, $_, $_+0x40, $_+0x80, $_+0xc0 for 0..0x3f'
+    pl 'f join( "\t", ("0b%08b  0%03o  %3d  0x%02x")x4), map +($_)x4, $_, $_+0x40, $_+0x80, $_+0xc0 for 0..0x3f'
+
+    >   0b00000000  0000    0  0x00	0b01000000  0100   64  0x40	0b10000000  0200  128  0x80	0b11000000  0300  192  0xc0
+    >   0b00000001  0001    1  0x01	0b01000001  0101   65  0x41	0b10000001  0201  129  0x81	0b11000001  0301  193  0xc1
+    >   0b00000010  0002    2  0x02	0b01000010  0102   66  0x42	0b10000010  0202  130  0x82	0b11000010  0302  194  0xc2
+    >   0b00000011  0003    3  0x03	0b01000011  0103   67  0x43	0b10000011  0203  131  0x83	0b11000011  0303  195  0xc3
+    >   0b00000100  0004    4  0x04	0b01000100  0104   68  0x44	0b10000100  0204  132  0x84	0b11000100  0304  196  0xc4
+    >   ...
+    >   0b00111101  0075   61  0x3d	0b01111101  0175  125  0x7d	0b10111101  0275  189  0xbd	0b11111101  0375  253  0xfd
+    >   0b00111110  0076   62  0x3e	0b01111110  0176  126  0x7e	0b10111110  0276  190  0xbe	0b11111110  0376  254  0xfe
+    >   0b00111111  0077   63  0x3f	0b01111111  0177  127  0x7f	0b10111111  0277  191  0xbf	0b11111111  0377  255  0xff
+
+If you prefer to enumerate sideways:
+
+    pl 'form join( "\t", ("0b%08b  0%03o  %3d  0x%02x")x4), map +($_)x4, $_*4, $_*4+1, $_*4+2, $_*4+3 for 0..0x3f'
+    pl 'f join( "\t", ("0b%08b  0%03o  %3d  0x%02x")x4), map +($_)x4, $_*4, $_*4+1, $_*4+2, $_*4+3 for 0..0x3f'
+
+    >   0b00000000  0000    0  0x00	0b00000001  0001    1  0x01	0b00000010  0002    2  0x02	0b00000011  0003    3  0x03
+    >   0b00000100  0004    4  0x04	0b00000101  0005    5  0x05	0b00000110  0006    6  0x06	0b00000111  0007    7  0x07
+    >   0b00001000  0010    8  0x08	0b00001001  0011    9  0x09	0b00001010  0012   10  0x0a	0b00001011  0013   11  0x0b
+    >   ...
+    >   0b11111000  0370  248  0xf8	0b11111001  0371  249  0xf9	0b11111010  0372  250  0xfa	0b11111011  0373  251  0xfb
+    >   0b11111100  0374  252  0xfc	0b11111101  0375  253  0xfd	0b11111110  0376  254  0xfe	0b11111111  0377  255  0xff
 
 =item ISO paper sizes
 
@@ -1243,8 +1326,7 @@ to 5:
 
     >   15
 
-Factorial is the equivalent for products.  This requires List::Util as of Perl
-5.20 or newer:
+Factorial is the equivalent for products:
 
     pl 'echo product 1..5'
     pl 'e product 1..5'
@@ -1320,13 +1402,345 @@ semi-symbolic fractional math:
 
 =item Primes
 
-This calculates all primes in a given range, e.g. 2 to 99.  This requires Perl
-5.18, which introduced C<all>:
+This calculates all primes in a given range, e.g. 2 to 99:
 
     pl 'echo grep { $a = $_; all { $a % $_ } 2..$_/2 } 2..99'
     pl 'e grep { $a = $_; all { $a % $_ } 2..$_/2 } 2..99'
 
     >   2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97
+
+=item Collatz 3n + 1
+
+I<Collatz drives nerds mad?  B< >No, madness is a prereq. (-:>
+
+Collatz' unproven & unrefuted conjecture is that the function C<f(n) = if odd:
+3n + 1 else n/2> will always lead to 1, when applied repeatedly to any natural
+number C<n>.  Since C<if odd: 3n + 1> is even, we can skip it and go straight
+to the postsuccessor C<(3n + 1)/2 = (2n + n-1 + 2)/2 = n + int(n/2) + 1>.
+Loop with B<-o> over remaining args in C<$_>.  Having simplified the factor 3,
+inline the function as more efficient bit-ops:
+
+    pl -o 'echo "---" if $ARGIND; echo; while( $_ > 1 ) { if( $_ & 1 ) { ++($_ += $_ >> 1) } else { $_ >>= 1 } echo }' 23 27
+    pl -o 'e "---" if $I; e; while( $_ > 1 ) { if( $_ & 1 ) { ++($_ += $_ >> 1) } else { $_ >>= 1 } e }' 23 27
+
+    >   23
+    >   35
+    >   53
+    >   80
+    >   40
+    >   20
+    >   10
+    >   5
+    >   8
+    >   4
+    >   2
+    >   1
+    >   ---
+    >   27
+    >   41
+    >   62
+    >   31
+    >   47
+    >   71
+    >   107
+    >   161
+    >   242
+    >   121
+    >   182
+    >   91
+    >   137
+    >   206
+    >   103
+    >   155
+    >   233
+    >   350
+    >   175
+    >   263
+    >   395
+    >   593
+    >   890
+    >   445
+    >   668
+    >   334
+    >   167
+    >   251
+    >   377
+    >   566
+    >   283
+    >   425
+    >   638
+    >   319
+    >   479
+    >   719
+    >   1079
+    >   1619
+    >   2429
+    >   3644
+    >   1822
+    >   911
+    >   1367
+    >   2051
+    >   3077
+    >   4616
+    >   2308
+    >   1154
+    >   577
+    >   866
+    >   433
+    >   650
+    >   325
+    >   488
+    >   244
+    >   122
+    >   61
+    >   92
+    >   46
+    >   23
+    >   35
+    >   53
+    >   80
+    >   40
+    >   20
+    >   10
+    >   5
+    >   8
+    >   4
+    >   2
+    >   1
+
+Add some fancy indent to show the turns, starting far enough right to let the
+snakes wiggle in both directions:
+
+    pl -o 'echo "---" if $ARGIND; $i = 40; form "%*d", $i, $_; while( $_ > 1 ) { if( $_ & 1 ) { ++$i; ++($_ += $_ >> 1) } else { --$i; $_ >>= 1 } form "%*d", $i, $_ }' 15 48 49
+    pl -o 'e "---" if $I; $i = 40; f "%*d", $i, $_; while( $_ > 1 ) { if( $_ & 1 ) { ++$i; ++($_ += $_ >> 1) } else { --$i; $_ >>= 1 } f "%*d", $i, $_ }' 15 48 49
+
+    >                                         15
+    >                                          23
+    >                                           35
+    >                                            53
+    >                                             80
+    >                                            40
+    >                                           20
+    >                                          10
+    >                                          5
+    >                                           8
+    >                                          4
+    >                                         2
+    >                                        1
+    >   ---
+    >                                         48
+    >                                        24
+    >                                       12
+    >                                       6
+    >                                      3
+    >                                       5
+    >                                        8
+    >                                       4
+    >                                      2
+    >                                     1
+    >   ---
+    >                                         49
+    >                                          74
+    >                                         37
+    >                                          56
+    >                                         28
+    >                                        14
+    >                                        7
+    >                                        11
+    >                                         17
+    >                                          26
+    >                                         13
+    >                                          20
+    >                                         10
+    >                                         5
+    >                                          8
+    >                                         4
+    >                                        2
+    >                                       1
+
+Powers of 2 only get halved, so check only as long as the result has more than
+one bit on (C<n & (n - 1)>).  Furthermore this tricky problem alternates
+between the binary & ternary realms which never meet, as no power of three is
+even.  At least we can show each number in both bases (manually, to avoid
+installing a library), as well as, out of habit, in decimal:
+
+    pl -o 'sub disp() { ($r, $t) = ("", $_); while( $t ) { substr $r, 0, 0, $t % 3; $t = int $t / 3 } form "%26b %16s %8d", $_, $r, $_ } echo "---" if $ARGIND; disp; while( $_ & ($_ - 1) ) { if( $_ & 1 ) { ++($_ += $_ >> 1) } else { $_ >>= 1 } disp }' 255 511
+    pl -o 'sub disp() { ($r, $t) = ("", $_); while( $t ) { substr $r, 0, 0, $t % 3; $t = int $t / 3 } f "%26b %16s %8d", $_, $r, $_ } e "---" if $I; disp; while( $_ & ($_ - 1) ) { if( $_ & 1 ) { ++($_ += $_ >> 1) } else { $_ >>= 1 } disp }' 255 511
+
+    >                     11111111           100110      255
+    >                    101111111           112012      383
+    >                   1000111111           210022      575
+    >                   1101011111          1011222      863
+    >                  10100001111          1202222     1295
+    >                  11110010111          2122222     1943
+    >                 101101100011         10222222     2915
+    >                1000100010101         12222222     4373
+    >                1100110100000         22222222     6560
+    >                 110011010000         11111111     3280
+    >                  11001101000          2020202     1640
+    >                   1100110100          1010101      820
+    >                    110011010           120012      410
+    >                     11001101            21121      205
+    >                    100110100           102102      308
+    >                     10011010            12201      154
+    >                      1001101             2212       77
+    >                      1110100            11022      116
+    >                       111010             2011       58
+    >                        11101             1002       29
+    >                       101100             1122       44
+    >                        10110              211       22
+    >                         1011              102       11
+    >                        10001              122       17
+    >                        11010              222       26
+    >                         1101              111       13
+    >                        10100              202       20
+    >                         1010              101       10
+    >                          101               12        5
+    >                         1000               22        8
+    >   ---
+    >                    111111111           200221      511
+    >                   1011111111          1001102      767
+    >                  10001111111          1120122     1151
+    >                  11010111111          2100222     1727
+    >                 101000011111         10112222     2591
+    >                 111100101111         12022222     3887
+    >                1011011000111         21222222     5831
+    >               10001000101011        102222222     8747
+    >               11001101000001        122222222    13121
+    >              100110011100010        222222222    19682
+    >               10011001110001        111111111     9841
+    >               11100110101010        202020202    14762
+    >                1110011010101        101010101     7381
+    >               10101101000000        120012002    11072
+    >                1010110100000         21121001     5536
+    >                 101011010000         10210112     2768
+    >                  10101101000          1220021     1384
+    >                   1010110100           221122      692
+    >                    101011010           110211      346
+    >                     10101101            20102      173
+    >                    100000100           100122      260
+    >                     10000010            11211      130
+    >                      1000001             2102       65
+    >                      1100010            10122       98
+    >                       110001             1211       49
+    >                      1001010             2202       74
+    >                       100101             1101       37
+    >                       111000             2002       56
+    >                        11100             1001       28
+    >                         1110              112       14
+    >                          111               21        7
+    >                         1011              102       11
+    >                        10001              122       17
+    >                        11010              222       26
+    >                         1101              111       13
+    >                        10100              202       20
+    >                         1010              101       10
+    >                          101               12        5
+    >                         1000               22        8
+
+As we are only ever shifting right, several lowest bits predict the next
+steps, which we can combine to leap ahead.  We can nest their expressions,
+simplify it algebraically and as bitops.  For biggger leaps this may overshoot
+to 0, but if we iterate over every unexplored big number, it's enough to stop
+as soon as it gets smaller.  The result of optimizing three 2-bit cases (here
+stretched next to the first example above, to show the benefit):
+
+    pl -o 'echo "---" if $ARGIND; echo; while( $_ > 1 ) { if( $_ & 1 ) { if( $_ & 2 ) { $_ = ($_ << 1) + ($_ + 2 >> 2) + 1 } else { $_ += $_ >> 1 | 1; $_ >>= 1 }} else { $_ >>= $_ & 2 ? 1 : 2 } echo }' 23 27
+    pl -o 'e "---" if $I; e; while( $_ > 1 ) { if( $_ & 1 ) { if( $_ & 2 ) { $_ = ($_ << 1) + ($_ + 2 >> 2) + 1 } else { $_ += $_ >> 1 | 1; $_ >>= 1 }} else { $_ >>= $_ & 2 ? 1 : 2 } e }' 23 27
+
+    >   23	23
+    >   35
+    >   53	53
+    >   80
+    >   40	40
+    >   20
+    >   10	10
+    >   5	5
+    >   8
+    >   4	4
+    >   2
+    >   1	1
+    >   ---	---
+    >   27	27
+    >   41
+    >   62	62
+    >   31	31
+    >   47
+    >   71	71
+    >   107
+    >   161	161
+    >   242
+    >   121	121
+    >   182
+    >   91	91
+    >   137
+    >   206	206
+    >   103	103
+    >   155
+    >   233	233
+    >   350
+    >   175	175
+    >   263
+    >   395	395
+    >   593
+    >   890	890
+    >   445	445
+    >   668
+    >   334	334
+    >   167	167
+    >   251
+    >   377	377
+    >   566
+    >   283	283
+    >   425
+    >   638	638
+    >   319	319
+    >   479
+    >   719	719
+    >   1079
+    >   1619	1619
+    >   2429
+    >   3644	3644
+    >   1822
+    >   911	911
+    >   1367
+    >   2051	2051
+    >   3077
+    >   4616	4616
+    >   2308
+    >   1154	1154
+    >   577	577
+    >   866
+    >   433	433
+    >   650
+    >   325	325
+    >   488
+    >   244	244
+    >   122
+    >   61	61
+    >   92
+    >   46	46
+    >   23	23
+    >   35
+    >   53	53
+    >   80
+    >   40	40
+    >   20
+    >   10	10
+    >   5	5
+    >   8
+    >   4	4
+    >   2
+    >   1	1
+
+Put differently, bit patterns ending in zeroes C<*1_0...> can have those
+chopped of to C<*1>.  Bit patterns ending in zero-one-pairs after a one, lead
+to so many zeroes, which chopped off can again be predicted: For C<*1_0101...>
+we chop off the pairs to C<*1> and take that as the next input.  Those now
+ending in ones C<*1...> will need step by step calculation or nested formulas.
+Pseudocode:
+
+    while( $_ > 1 ) { $_ >>= 1 until $_ & 1; $_ >>= 2 while ($_ & 0b111) == 0b101; (3n + 1) / 2 while $_ & 1 if $_ > 1 }
 
 =item Separate big numbers with commas, ...
 
@@ -1443,28 +1857,32 @@ scalar context, e.g. C<$x = form ...>:
     pl '$x = "%04x"; form "$x$x-$x-$x-$x-$x$x$x", map rand 0x10000, 0..7'
     pl '$x = "%04x"; f "$x$x-$x-$x-$x-$x$x$x", map rand 0x10000, 0..7'
 
-    >   5db1227d-83c1-6dd2-20f9-0e5c13b631a3
+    >   ea940814-b5ed-146a-3b3e-504ee5b49217
 
 To be RFC 4122 conformant, the 4 version & 2 variant bits need to have
-standard values.  Note that Shell strings can span more than one line:
+standard values.  Note that Shell strings can span more than one line.  As a
+different approach, B<-o> "loops" over the one parameter in C<$_>.  That's a
+template to be transformed into a format.  This uses C</r> which requires Perl
+v5.20:
 
-    pl '@u = map rand 0x10000, 0..7; ($u[3] /= 16) |= 0x4000; ($u[4] /= 4) |= 0x8000;
-        $x = "%04x"; form "$x$x-$x-$x-$x-$x$x$x", @u'
-    pl '@u = map rand 0x10000, 0..7; ($u[3] /= 16) |= 0x4000; ($u[4] /= 4) |= 0x8000;
-        $x = "%04x"; f "$x$x-$x-$x-$x-$x$x$x", @u'
+    pl -o '@u = map rand 0x10000, 0..7; ($u[3] /= 16) |= 0x4000; ($u[4] /= 4) |= 0x8000;
+        form s/x/%04x/gr, @u' xx-x-x-x-xxx
+    pl -o '@u = map rand 0x10000, 0..7; ($u[3] /= 16) |= 0x4000; ($u[4] /= 4) |= 0x8000;
+        f s/x/%04x/gr, @u' xx-x-x-x-xxx
 
-    >   cf59581b-a65f-47b1-84b6-d155c30c2b44
+    >   9e71f381-507b-4612-9ed1-6c40abfe63d8
 
 =item Generate a random password
 
-I<Why should you trust atoms? They make up everything. :-)>
+I<Why should you trust atoms?  They make up everything. :-)>
 
 Use C<say>, which doesn't put spaces between its arguments.  Generate twelve
-random characters between 33 & 127, i.e. printable Ascii characters:
+random characters from 33 to 126, i.e. printable Ascii characters.  Note that
+C<rand 94> will always be less than 94 and C<chr> will round it down:
 
     pl 'say map chr(33 + rand 94), 1..12'
 
-    >   qt2c;0a5TnTB
+    >   hfQw1<sXtJx^
 
 =item DNS lookup
 
@@ -1480,9 +1898,9 @@ C<@A(RGV)>:
     pl 'h qw(perl.org 127.0.0.1 perldoc.perl.org cpan.org)'
 
     >   127.0.0.1 localhost
-    >   147.75.38.240 cpan.org perl.org
-    >   151.101.14.217 perldoc.perl.org
-    >   2a04:4e42:3::729 perldoc.perl.org
+    >   139.178.67.96 cpan.org perl.org
+    >   151.101.114.132 perldoc.perl.org
+    >   2a04:4e42:1b::644 perldoc.perl.org
 
     pl 'hosts @ARGV' perl.org 127.0.0.1 perldoc.perl.org cpan.org
     pl 'h @A' perl.org 127.0.0.1 perldoc.perl.org cpan.org
@@ -1493,11 +1911,11 @@ addresses:
     pl 'hosts for qw(perl.org 127.0.0.1 perldoc.perl.org cpan.org)'
     pl 'h for qw(perl.org 127.0.0.1 perldoc.perl.org cpan.org)'
 
-    >   147.75.38.240 perl.org
+    >   139.178.67.96 perl.org
     >   127.0.0.1 localhost
-    >   151.101.14.217 perldoc.perl.org
-    >   2a04:4e42:3::729 perldoc.perl.org
-    >   147.75.38.240 cpan.org
+    >   151.101.114.132 perldoc.perl.org
+    >   2a04:4e42:1b::644 perldoc.perl.org
+    >   139.178.67.96 cpan.org
 
     pl -o hosts perl.org 127.0.0.1 perldoc.perl.org cpan.org
     pl -o h perl.org 127.0.0.1 perldoc.perl.org cpan.org
@@ -1537,12 +1955,11 @@ format string that gets fed to itself:
 
 The same approach, but without adding C<pl ''>, so this works only in the
 pl-Shell, which you start by calling pl without arguments.  In the spirit of
-L<Code
-Golf|https://codegolf.stackexchange.com/questions/69/golf-you-a-quine-for-great-good#answer-4827>,
-made it very compact.  This is inspired by the shortest Perl quine, which we
-beat by 6 characters in the short form.  That uses C<x2> to duplicate the
-argument to the pre-prototypes C<printf>.  But C<f(orm)> has a prototype.  So
-use the C<&>-syntax to prevent it giving 2 (the length of the list):
+L<Code Golf|https://codegolf.stackexchange.com/a/213629/98751>, made it very
+compact.  This is inspired by the shortest Perl quine, which we beat by 6
+characters in the short form.  That uses C<x2> to duplicate the argument to
+the pre-prototypes C<printf>.  But C<f(orm)> has a prototype.  So use the
+C<&>-syntax to prevent it giving 2 (the length of the list):
 
     &form(qw(&form(qw(%s)x2))x2)
     &f(qw(&f(qw(%s)x2))x2)
@@ -1556,9 +1973,9 @@ I<If you can't convince 'em, confuse 'em! ;-)>
 
 Just another Perl hacker, adapted.  This obfuscated mock turtle soup
 L<JAPH|https://en.wikipedia.org/wiki/Just_another_Perl_hacker> is left for you
-to figure out:
+to figure out.  You may wonder why "y", why things start or end in "y":
 
-    pl -plo y' ya-zyOoh, Turtleneck phrase Jar! 'y xguietlbickheqjectnokhd
+    pl -ploiy y' ya-zy You, Turtleneck phrase Jar. Yoda? Yes! 'y yhvjfumcjslifrkfsuoplie
 
     >   Just another pl hacker,
 

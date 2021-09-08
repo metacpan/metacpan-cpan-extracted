@@ -201,6 +201,10 @@ The following functions are exported automatically:
 
 See B<code2name> in L<Locale::Codes>
 
+=item B<code2${type}s(CODE [,CODESET])>
+
+See B<code2names> in L<Locale::Codes>
+
 =item B<${type}2code(NAME [,CODESET] [,'retired'])>
 
 See B<name2code> in L<Locale::Codes>
@@ -304,6 +308,7 @@ use Locale::Codes::Constants;
 
 \@EXPORT    = qw(
                 code2${type}
+                code2${type}s
                 ${type}2code
                 all_${type}_codes
                 all_${type}_names
@@ -321,6 +326,10 @@ sub show_errors {
 
 sub code2${type} {
    return \$obj->code2name(\@_);
+}
+
+sub code2${type}s {
+   return \$obj->code2names(\@_);
 }
 
 sub ${type}2code {

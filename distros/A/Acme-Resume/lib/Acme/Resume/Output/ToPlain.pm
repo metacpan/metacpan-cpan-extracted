@@ -5,7 +5,7 @@ use warnings;
 
 # ABSTRACT: Role for plain output
 # PODNAME: Acme::Resume::Output::ToPlain
-our $VERSION = '0.0103';
+our $VERSION = '0.0104';
 
 role Acme::Resume::Output::ToPlain {
 
@@ -88,7 +88,7 @@ Acme::Resume::Output::ToPlain - Role for plain output
 
 =head1 VERSION
 
-Version 0.0103, released 2021-05-29.
+Version 0.0104, released 2021-08-31.
 
 =head1 SOURCE
 

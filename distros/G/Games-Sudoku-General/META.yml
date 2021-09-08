@@ -21,13 +21,14 @@ meta-spec:
 name: Games-Sudoku-General
 no_index:
   directory:
+    - eg
     - inc
     - t
     - xt
 provides:
   Games::Sudoku::General:
     file: lib/Games/Sudoku/General.pm
-    version: '0.025'
+    version: '0.026'
 requires:
   Carp: '0'
   Data::Dumper: '0'
@@ -42,5 +43,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Games-Sudoku-General
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Games-Sudoku-General.git
-version: '0.025'
+version: '0.026'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

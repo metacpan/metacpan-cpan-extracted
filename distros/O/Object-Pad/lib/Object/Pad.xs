@@ -479,6 +479,7 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
     croak("Expected a block or ';'");
 
   import_pragma("strict", NULL);
+  import_pragma("warnings", NULL);
 #if HAVE_PERL_VERSION(5, 31, 9)
   import_pragma("-feature", "indirect");
 #else
@@ -1070,9 +1071,6 @@ static int dumppackage_class(pTHX_ const SV *sv)
   for(i = 0; i < av_count(meta->slots); i++)
     ret += dump_slotmeta(aTHX_ sv, (SlotMeta *)AvARRAY(meta->slots)[i]);
 
-  if(meta->foreign_new)
-    ret += DMD_ANNOTATE_SV(sv, (SV *)meta->foreign_new, "the Object::Pad foreign superclass constructor CV");
-
   ret += DMD_ANNOTATE_SV(sv, (SV *)meta->initslots, "the Object::Pad initslots CV");
 
   ret += DMD_ANNOTATE_SV(sv, (SV *)meta->buildblocks, "the Object::Pad BUILD blocks AV");
@@ -1080,6 +1078,17 @@ static int dumppackage_class(pTHX_ const SV *sv)
   ret += DMD_ANNOTATE_SV(sv, (SV *)meta->adjustblocks, "the Object::Pad ADJUST blocks AV");
 
   ret += DMD_ANNOTATE_SV(sv, (SV *)meta->methodscope, "the Object::Pad temporary method scope");
+
+  switch(meta->type) {
+    case METATYPE_CLASS:
+      if(meta->cls.foreign_new)
+        ret += DMD_ANNOTATE_SV(sv, (SV *)meta->cls.foreign_new, "the Object::Pad foreign superclass constructor CV");
+      break;
+
+    case METATYPE_ROLE:
+      ret += DMD_ANNOTATE_SV(sv, (SV *)meta->role.applied_classes, "the Object::Pad role applied classes HV");
+      break;
+  }
 
   return ret;
 }

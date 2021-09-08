@@ -1,9 +1,11 @@
+# no code
+## no critic: TestingAndDebugging::RequireUseStrict
 package Module::Features;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-25'; # DATE
+our $DATE = '2021-08-27'; # DATE
 our $DIST = 'Module-Features'; # DIST
-our $VERSION = '0.1.6'; # VERSION
+our $VERSION = '0.1.7'; # VERSION
 
 1;
 # ABSTRACT: Define features for modules
@@ -24,7 +26,7 @@ Module::Features - Define features for modules
 
 =head1 VERSION
 
-This document describes version 0.1.6 of Module::Features (from Perl distribution Module-Features), released on 2021-02-25.
+This document describes version 0.1.7 of Module::Features (from Perl distribution Module-Features), released on 2021-08-27.
 
 =head1 DESCRIPTION
 
@@ -39,7 +41,7 @@ interpreted as described in RFC 2119.
 
 =head1 SPECIFICATION STATUS
 
-The series 0.1.x version is still unstable.
+The 0.1.x version series is still unstable.
 
 =head1 GLOSSARY
 
@@ -69,7 +71,7 @@ target module.
 
 =head2 feature name
 
-A string, preferably an identifier matching regex pattern /\A\w+\z/.
+A non-empty string, preferably an identifier matching regex pattern /\A\w+\z/.
 
 =head2 feature value
 
@@ -160,7 +162,7 @@ For example, in L<Module::Features::TextTable>:
      },
  );
 
-=head3 Recommendation for feature name
+=head2 Recommendations for feature name
 
 Features should be written in lower case and words are separated by underscores,
 e.g. C<can_color>, C<max_colors>. The name should be self-explanatory when
@@ -191,6 +193,12 @@ preferred.
 
 Features that specify an upper or lower limit of something should be named with
 C<max_> or C<min_> prefix. They typically have int/float/num schemas.
+
+=head2 Recommendations for feature definer module
+
+The distribution that ships a feature definer module should add a dependency
+(phase=develop, rel=x_spec) to C<Module::Features>, to express that it follows
+the Module::Features specification.
 
 =head2 Declaring features
 
@@ -285,6 +293,15 @@ having to load the feature declarer module. When multiple features declaration
 exist, the C<module_v> and/or C<serial> can be used to find out which
 declaration is the most recent or suitable.
 
+=head2 Recommendations for feature declarer module
+
+The distribution that ships a feature declarer module should add a dependency
+(phase=develop, rel=x_spec) to C<Module::Features>, to express that it follows
+the Module::Features specification. It should also add a dependency
+(phase=develop, x=features_from> to associated feature definer module(s), to
+express that it declares features defined in the associated feature definer
+module(s).
+
 =head2 Checking whether a module has a certain feature
 
 The user of a L</"feature declarer module"> can check whether the module has a
@@ -320,14 +337,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Module-Fea
 
 Source repository is at L<https://github.com/perlancar/perl-Module-Features>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Module-Features/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<DefHash>
@@ -338,11 +347,36 @@ L<Sah>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Features>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

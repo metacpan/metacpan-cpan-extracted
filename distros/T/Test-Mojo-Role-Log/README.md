@@ -31,7 +31,7 @@ Points to an array with all the log messages issued since the last request.
 
 # METHODS
 
-The role [Test::Mojo::Role::Log](https://metacpan.org/pod/Test%3A%3AMojo%3A%3ARole%3A%3ALog) adds following new methods to [Test::Mojo](https://metacpan.org/pod/Test%3A%3AMojo) ones.
+The role [Test::Mojo::Role::Log](https://metacpan.org/pod/Test%3A%3AMojo%3A%3ARole%3A%3ALog) adds the following new methods to [Test::Mojo](https://metacpan.org/pod/Test%3A%3AMojo) ones.
 
 ## log\_like($rx,$desc)
 
@@ -43,6 +43,10 @@ The role [Test::Mojo::Role::Log](https://metacpan.org/pod/Test%3A%3AMojo%3A%3ARo
 
 Check if the given log message has been issued. All the log messages issued since the start of the current request will get checked.
 If $logLevel is set to undef the logLevel does not get checked.
+
+## log\_trace\_like($rx,$desc)  (if mojo supports it)
+
+Find a trace level log message matching the given $rx.
 
 ## log\_debug\_like($rx,$desc)
 
@@ -67,7 +71,8 @@ Find a fatal level log message matching the given $rx.
 ## \*\_unlike
 
 For each of the methods above there is ac coresponding
-&#x3d;head1 AUTHOR
+
+# AUTHOR
 
 Tobias Oetiker <tobi@oetiker.ch>
 

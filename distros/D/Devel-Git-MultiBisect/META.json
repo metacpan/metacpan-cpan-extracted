@@ -1,12 +1,12 @@
 {
-   "abstract" : "Study test output over a range of git commits",
+   "abstract" : "Study build or test output over a range of git commits",
    "author" : [
       "James E Keenan (jkeenan@cpan.org)"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -51,7 +51,7 @@
       "test" : {
          "requires" : {
             "Capture::Tiny" : "0",
-            "IO::CaptureOutput" : "0",
+            "Data::Dump" : "0",
             "Test::Simple" : "0.44"
          }
       }
@@ -64,6 +64,6 @@
          "web" : "https://github.com/jkeenan/devel-git-multibisect"
       }
    },
-   "version" : "0.15",
+   "version" : "0.19",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

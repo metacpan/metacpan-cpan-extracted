@@ -6,88 +6,44 @@ use String::CamelCase 'camelize';
 use Scalar::Util 'blessed';
 use Valiant::Util 'throw_exception', 'debug';
 use namespace::autoclean -also => ['throw_exception', 'debug'];
+use Valiant::Validations ();
 
 with 'Valiant::Translation';
 
-requires 'ancestors';
-
 has _instance_validations => (is=>'rw', init_arg=>undef);
 
-my @validations;
+sub push_to_i18n_lookup {
+  my ($class_or_self, @args) = @_;
+  my $class = ref($class_or_self) ? ref($class_or_self) : $class_or_self;
+  @args = $class unless @args;
+  Valiant::Validations::_add_metadata($class, 'i18n', @args);
+}
+
+sub i18n_lookup { 
+  my ($class_or_self, $arg) = @_;
+  my $class = ref($class_or_self) ? ref($class_or_self) : $class_or_self;
+  no strict "refs";
+  my @proposed = @{"${class}::ISA"};
+  push @proposed, $class_or_self->i18n_metadata if $class_or_self->can('i18n_metadata');
+  return grep { $_->can('model_name') } ($class, @proposed);
+}
+
 sub validations {
   my ($class_or_self, $arg) = @_;
   my $class = ref($class_or_self) ? ref($class_or_self) : $class_or_self;
-  my $varname = "${class}::validations";
 
-  no strict "refs";
+  my @existing = ();
   if(defined($arg)) {
     if(ref($class_or_self)) { # its $self
       my @existing = @{ $class_or_self->_instance_validations||[] };
       $class_or_self->_instance_validations([$arg, @existing]);
     } else {
-      push @$varname, $arg;
+      Valiant::Validations::_add_metadata($class_or_self, 'validations', $arg);
     }
   }
-
-  return @{ ref($class_or_self) ? $class_or_self->_instance_validations||[] : [] },
-    @$varname,
-    map { $_->validations } 
-    grep { $_->can('validations') }
-      $class->ancestors;
-}
-
-my $named_validators;
-my $attribute_valiators;
-
-sub named_validators {
-  my $class = shift;
-  $class = ref($class) if ref($class);
-  my $varname = "${class}::named_validators";
-
-  no strict "refs";
-  return %$varname,
-    map { $_->named_validators } 
-    grep { $_->can('named_validators') }
-      $class->ancestors;
-}
-
-sub attribute_valiators {
-  my $class = shift;
-  $class = ref($class) if ref($class);
-  my $varname = "${class}::attribute_valiators";
-
-  no strict "refs";
-  return %$varname,
-    map { $_->attribute_valiators } 
-    grep { $_->can('attribute_valiators') }
-      $class->ancestors;
-}
-
-sub attribute_valiators_for {
-  my ($class, $attr) = @_;
-  my %validators = $class->attribute_valiators;
-  return $validators{$attr} ||+{};
-}
-
-sub has_validator_for_attribute {
-  my ($class, $validator_name, $attr) = @_;
-  my %validators = $class->attribute_valiators;
-  return @{ $validators{$attr}{$validator_name}||[] };
-}
-
-sub _push_named_validators {
-  my ($class, $name, $validator) = @_;
-  $class = ref($class) if ref($class);
-  my $named_validators = "${class}::named_validators";
-  my $attribute_valiators = "${class}::attribute_valiators";
-
-  if(defined $validator) {
-    no strict "refs";
-    push @{$named_validators->{$name}}, $validator;
-    foreach my $attr ( @{ $validator->attributes||[] }) {
-      push @{$attribute_valiators->{$attr}{$name}}, $validator;
-    }
-  }
+  @existing = @{ $class_or_self->_instance_validations||[] } if ref $class_or_self;
+  my @validations = $class_or_self->validations_metadata if $class_or_self->can('validations_metadata');
+  return @validations, @existing;
 }
 
 sub errors_class { 'Valiant::Errors' }
@@ -103,12 +59,14 @@ has 'errors' => (
 );
 
 sub has_errors {
-  shift->errors->size ? 1:0; 
+  return shift->errors->size ? 1:0; 
 }
 
 has 'validated' => (is=>'rw', required=>1, init_args=>undef, default=>0);
 has 'skip_validation' =>  (is=>'rw', required=>1, init_args=>undef, default=>0);
 has '_context' => (is=>'rw', required=>0, predicate=>'has_context');
+
+sub get_context { shift->_context }
 
 sub context {
   my ($self, $args) = @_;
@@ -274,7 +232,6 @@ sub validates {
 
     my $new_validator = $self->_create_validator($validator_package, $args);
     push @validators, $new_validator;
-    $self->_push_named_validators($package_part, $new_validator);
   }
   my $coderef = sub { $_->validate(@_) foreach @validators };
   $self->_validates_coderef($coderef, %global_options); 
@@ -441,7 +398,7 @@ arguments for the validate set as a whole:
       \&must_be_unique,
     );
 
-    valiates age => (
+    validates age => (
       Int->where('$_ >= 65'), +{
         message => 'A retiree must be at least 65 years old,
       },
@@ -533,7 +490,7 @@ context.  All other arguments will be passed down to the C<$opts> hashref.
 
 Return true or false depending on if the current object state is valid or not.  If you call this method and
 validations have not been run (via C<validate>) then we will first run validations and pass any arguments
-to L</valiates>.  If validations have already been run we just return true or false directly UNLESS you
+to L</validates>.  If validations have already been run we just return true or false directly UNLESS you
 pass arguments in which case we clear errors first and then rerun validations with the arguments before
 returning true or false.
 

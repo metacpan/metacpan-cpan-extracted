@@ -6,6 +6,7 @@ Source: https://metacpan.org/release/Lingua-Poetry-Haiku-Finder
 Files: Changes
  META.json
  META.yml
+ bin/haiku-find
  dist.ini
  doap.ttl
  lib/Lingua/Poetry/Haiku/Finder/NonWord.pm
@@ -21,15 +22,15 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: INSTALL
- LICENSE
-Copyright: Unknown
-License: Unknown
-
 Files: README
  lib/Lingua/Poetry/Haiku/Finder.pm
 Copyright: This software is copyright (c) 2021 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
+
+Files: INSTALL
+ LICENSE
+Copyright: Unknown
+License: Unknown
 
 Files: t/01basic.t
 Copyright: This software is copyright (c) 2021 by Toby Inkster.

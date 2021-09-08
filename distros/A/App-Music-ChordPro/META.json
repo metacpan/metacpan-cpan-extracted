@@ -41,7 +41,6 @@
       "runtime" : {
          "requires" : {
             "App::Packager" : "1.43",
-            "Data::Properties" : "1.05",
             "File::LoadLines" : "1.02",
             "Image::Info" : "1.41",
             "JSON::PP" : "2.27203",
@@ -65,11 +64,11 @@
    "provides" : {
       "App::Music::ChordPro" : {
          "file" : "lib/App/Music/ChordPro.pm",
-         "version" : "5.981"
+         "version" : "5.982"
       },
       "chordpro" : {
          "file" : "script/chordpro",
-         "version" : "5.981"
+         "version" : "5.982"
       }
    },
    "release_status" : "stable",
@@ -85,6 +84,6 @@
          "url" : "https://github.com/sciurius/chordpro"
       }
    },
-   "version" : "5.981",
+   "version" : "5.982",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

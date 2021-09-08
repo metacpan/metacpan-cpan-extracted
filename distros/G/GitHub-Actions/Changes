@@ -1,3 +1,11 @@
+2021-09-08  jmerelo  <jmerelo@princess-carolyn>
+
+	* lib/GitHub/Actions.pm: This 0.1.0 has a complete set of instructions, including in this last release the group handling commands, which merits a change in minor version.
+
+2021-09-05  jmerelo  <jmerelo@bojack>
+
+	* lib/GitHub/Actions.pm: 0.0.7 includes several new functions, mainly related to creating warnings.
+
 2021-01-14  jmerelo  <jmerelo@princess-carolyn>
 
 	* lib/GitHub/Actions.pm: Fixes warning with empty output value.

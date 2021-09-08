@@ -1,32 +1,10 @@
-Revision history for Data-Properties
+Revision history for Perl extension Data::Properties.
 
-1.05	2021-07-16
+0.02  Tue Nov 27 09:10:31 2001
+        - use $| instead of flush to avoid loading IO::Handle
 
-	Data::Properties now replaces the old and slightly
-	incompatible version (IX/Data-Properties). Trap incompatible
-	API calls.
-
-1.04	2021-07-13
-
-	Fix test in case of case insensitive environment variables.
-
-1.03	2021-07-12
-
-	Prevent misinterpretation of 'include=...' lines.
-
-1.02	2021-04-16
-
-	Arrays with simple contents may go on a single line.
-	Add option to prevent include handling.
-	Add prp2json script. Also dumps perl and properties.
-
-1.01	2020-09-09
-
-	Make ${foo:bar} work.
-	Add 'null' and testing for it.
-	Add arrays and data() export.
-	Handle string escapes just like Perl.
-
-1.00    2020-09-05
-        First version, released on an unsuspecting world.
-
+0.01  Mon Nov 26 10:03:02 2001
+	- a perl version of java.util.Properties. loads and stores
+	property lists. supports defaults. doesnt handle escape sequences
+	or one or two other tricky things.
+	

@@ -3,8 +3,8 @@ NAME
     options
 
 VERSION
-    This document describes version 0.016 of Text::Table::More (from Perl
-    distribution Text-Table-More), released on 2021-08-09.
+    This document describes version 0.020 of Text::Table::More (from Perl
+    distribution Text-Table-More), released on 2021-08-28.
 
 SYNOPSIS
      #!perl
@@ -145,6 +145,34 @@ DESCRIPTION
 
 DECLARED FEATURES
     Features declared by this module:
+
+  From feature set PerlTrove
+    Features from feature set PerlTrove declared by this module:
+
+    *   Development Status
+
+        Value: "4 - Beta".
+
+    *   Environment
+
+        Value: "Console".
+
+    *   Intended Audience
+
+        Value: ["Developers"].
+
+    *   License
+
+        Value: "OSI Approved :: Artistic License".
+
+    *   Programming Language
+
+        Value: "Perl".
+
+    *   Topic
+
+        Value: ["Software Development :: Libraries :: Perl
+        Modules","Utilities"].
 
   From feature set TextTable
     Features from feature set TextTable declared by this module:
@@ -398,7 +426,7 @@ FUNCTIONS
 
         Array of arrayrefs (of strings or hashrefs). Required. Each array
         element is a row of cells. A cell can be a string like "foo"
-        specifying only the text (equivalent to "<{ text=""foo" >>) or a
+        specifying only the text (equivalent to "{text=>"foo"}") or a
         hashref which allows you to specify a cell's text ("text") as well
         as attributes like "rowspan" (int, >= 1), "colspan" (int, >= 1),
         etc. See "PER-CELL ATTRIBUTES" for the list of known per-cell
@@ -488,13 +516,6 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Text-Table-More>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Table-More>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     Text::ANSITable also offers lots of formatting options, but currently
     lacks support for rowspan/colspan. It also uses an OO interface and has
@@ -512,9 +533,32 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Table-More>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

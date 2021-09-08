@@ -7,5 +7,12 @@ cpanfile
 lib/Text/Conceal.pm
 minil.toml
 t/00_compile.t
+t/VPrintf/01_simple.t
+t/VPrintf/02_multi.t
+t/VPrintf/03_special.t
+t/VPrintf/04_combined.t
+t/VPrintf/05_filehandle.t
+t/VPrintf/07_backspace.t
+t/lib/Text/VPrintf.pm
 META.yml
 MANIFEST

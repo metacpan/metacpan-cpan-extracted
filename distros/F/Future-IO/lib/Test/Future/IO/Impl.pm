@@ -8,7 +8,7 @@ package Test::Future::IO::Impl;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Test::More;
 use Test::Builder;
@@ -187,24 +187,33 @@ sub run_syswrite_test
    # ->syswrite success
    {
       pipe my ( $rd, $wr ) or die "Cannot pipe() - $!";
+
+      my $f = Future::IO->syswrite( $wr, "BYTES" );
+
+      is( scalar $f->get, 5, 'Future::IO->syswrite yields written count' );
+
+      $rd->read( my $buf, 5 );
+      is( $buf, "BYTES", 'Future::IO->syswrite wrote bytes' );
+   }
+
+   # ->syswrite yielding EAGAIN
+   SKIP: {
+      $^O eq "MSWin32" and skip "MSWin32 doesn't do EAGAIN properly", 2;
+
+      pipe my ( $rd, $wr ) or die "Cannot pipe() - $!";
       $wr->blocking( 0 );
 
       # Attempt to fill the pipe
       $wr->syswrite( "X" x 4096 ) for 1..256;
 
-      my $f = Future::IO->syswrite( $wr, "BYTES" );
+      my $f = Future::IO->syswrite( $wr, "more" );
 
       ok( !$f->is_ready, '$f is still pending' );
 
       # Now make some space
       $rd->read( my $buf, 4096 );
 
-      is( scalar $f->get, 5, 'Future::IO->syswrite yields written count' );
-
-      # Drain it
-      1 while $rd->sysread( $buf, 4096 ) == 4096;
-
-      is( $buf, "BYTES", 'Future::IO->syswrite wrote bytes' );
+      is( scalar $f->get, 4, 'Future::IO->syswrite yields written count' );
    }
 
    # ->syswrite yielding EPIPE

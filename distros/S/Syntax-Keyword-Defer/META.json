@@ -1,5 +1,5 @@
 {
-   "abstract" : "add C<defer> block syntax to perl",
+   "abstract" : "execute code when leaving a block",
    "author" : [
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
@@ -22,12 +22,12 @@
       "configure" : {
          "requires" : {
             "Module::Build" : "0.4004",
-            "XS::Parse::Keyword::Builder" : "0"
+            "XS::Parse::Keyword::Builder" : "0.13"
          }
       },
       "runtime" : {
          "requires" : {
-            "XS::Parse::Keyword" : "0",
+            "XS::Parse::Keyword" : "0.13",
             "perl" : "5.014"
          }
       },
@@ -40,11 +40,11 @@
    "provides" : {
       "Syntax::Keyword::Defer" : {
          "file" : "lib/Syntax/Keyword/Defer.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Syntax::Keyword::Finally" : {
          "file" : "lib/Syntax/Keyword/Finally.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -54,6 +54,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

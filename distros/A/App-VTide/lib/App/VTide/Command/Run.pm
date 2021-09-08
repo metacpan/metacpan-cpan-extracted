@@ -16,10 +16,11 @@ use Path::Tiny;
 use File::stat;
 use File::chdir;
 use IO::Prompt qw/prompt/;
+use Algorithm::Cron;
 
 extends 'App::VTide::Command';
 
-our $VERSION = version->new('0.1.15');
+our $VERSION = version->new('0.1.16');
 our $NAME    = 'run';
 our $OPTIONS = [
     'name|n=s',
@@ -44,7 +45,7 @@ sub run {
     my @cmd    = $self->command( $params );
 
     @ARGV = ();
-    if ( !( $self->first && $params->{watch} && $params->{wait} ) ) {
+    if ( !( $self->first && ($params->{watch} || $params->{cron}) && $params->{wait} ) ) {
 
         if ( $params->{clear} ) {
             system 'clear';
@@ -102,6 +103,7 @@ sub restart {
     my $params = $self->params( $cmd );
 
     return $self->watch($cmd) if !$no_watch && $params->{watch};
+    return $self->cron($cmd) if !$no_watch && $params->{cron};
 
     return if ! $params->{restart};
 
@@ -204,6 +206,54 @@ sub watch {
     }
 
     return;
+}
+
+sub cron {
+    my ($self, $cmd) = @_;
+
+    my $params = $self->params( $cmd );
+    my $cron = Algorithm::Cron->new(
+       base => 'local',
+       crontab => $params->{cron},
+   );
+
+    while (1) {
+        my $done = 0;
+        local $SIG{INT} = sub { $done = $self->restart($cmd, 1) ? 1 : undef; };
+
+        my $next_time = $cron->next_time(time);
+        #sleep $next_time - time;
+        sleep 1;
+
+        # return if interrupted
+        return 1 if $done;
+        # return if asked to quit
+        return if !defined $done;
+
+        if ($params->{cron_verbose}) {
+            print {*STDERR} "\33[2K\r" . pretty_time($next_time - time);
+        }
+        if ($next_time <= time) {
+            if ($params->{cron_verbose}) {
+                print {*STDERR} "\33[2K\r";
+            }
+            return 1;
+        }
+    }
+
+    return;
+}
+
+sub pretty_time {
+    my ($time) = @_;
+
+    my $pretty = '';
+    my $days = int $time / (24 * 60 * 60);
+    my $hours = int $time / (60 * 60) - $days * 24;
+    my $minutes = int $time / 60 - $days * 24 * 60 - $hours * 60;
+    my $seconds = $time % 60;
+
+    return "$days days $hours hours $minutes minutes $seconds seconds";
 }
 
 sub params {
@@ -385,7 +435,7 @@ App::VTide::Command::Run - Run a terminal command
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Run version 0.1.15
+This documentation refers to App::VTide::Command::Run version 0.1.16
 
 =head1 SYNOPSIS
 
@@ -444,6 +494,14 @@ Executes a command (with --test skipping)
 =head2 C<watch ( $cmd )>
 
 Watches files till they change then returns.
+
+=head2 C<cron ( $cmd )>
+
+Runs the command based on cron tab settings in params
+
+=head2 C<pretty_time ( $time )>
+
+Creates a mildly pretty version of the number of seconds
 
 =head2 C<auto_complete ()>
 

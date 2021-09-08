@@ -9,7 +9,6 @@ build_requires:
   HTTP::Request: '0'
   LWP::Protocol::https: '6.06'
   LWP::UserAgent: '0'
-  Taint::Util: '0'
   Test::More: '0'
   Time::Local: '0'
   XML::LibXML: '0'
@@ -43,5 +42,5 @@ requires:
 resources:
   bugtracker: https://github.com/david-dick/time-zone-olson/issues
   repository: https://github.com/david-dick/time-zone-olson
-version: '0.40'
+version: '0.41'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

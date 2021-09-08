@@ -30,22 +30,44 @@ value(self, obj)
   PPCODE:
   {
     SlotMeta *meta = NUM2PTR(SlotMeta *, SvUV(SvRV(self)));
+    ClassMeta *classmeta = meta->class;
     SV *objrv;
 
     if(!SvROK(obj) || !SvOBJECT(objrv = SvRV(obj)))
       croak("Cannot fetch slot value of a non-instance");
 
-    const char *stashname = HvNAME(meta->class->stash);
+    AV *slotsav;
+    SLOTOFFSET slotix;
 
-    if(!stashname || !sv_derived_from(obj, stashname))
-      croak("Cannot fetch slot value from a non-derived instance");
+    if(classmeta->type == METATYPE_ROLE) {
+      HV *objstash = SvSTASH(objrv);
+      STRLEN klen = HvNAMELEN(objstash);
+      if(HvNAMEUTF8(objstash))
+        klen = -klen;
 
-    AV *slotsav = (AV *)get_obj_slotsav(obj, meta->class->repr, true);
+      SV **svp = hv_fetch(classmeta->role.applied_classes, HvNAME(objstash), klen, 0);
+      if(!svp)
+        croak("Cannot fetch role slot value from a non-applied instance");
 
-    if(meta->slotix > av_top_index(slotsav))
-      croak("ARGH: instance does not have a slot at index %ld", (long int)meta->slotix);
+      RoleEmbedding *embedding = (RoleEmbedding *)*svp;
 
-    SV *value = AvARRAY(slotsav)[meta->slotix];
+      slotsav = (AV *)get_obj_slotsav(obj, embedding->classmeta->repr, true);
+      slotix = meta->slotix + embedding->offset;
+    }
+    else {
+      const char *stashname = HvNAME(classmeta->stash);
+
+      if(!stashname || !sv_derived_from(obj, stashname))
+        croak("Cannot fetch slot value from a non-derived instance");
+
+      slotsav = (AV *)get_obj_slotsav(obj, classmeta->repr, true);
+      slotix = meta->slotix;
+    }
+
+    if(slotix > av_top_index(slotsav))
+      croak("ARGH: instance does not have a slot at index %ld", (long int)slotix);
+
+    SV *value = AvARRAY(slotsav)[slotix];
 
     /* We must prevent caller from assigning to non-scalar slots, in case
      * they break the SvTYPE of the value. We can't cancel the CvLVALUE but we

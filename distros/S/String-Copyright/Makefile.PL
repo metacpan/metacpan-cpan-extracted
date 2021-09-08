@@ -9,7 +9,7 @@ my $meta = {
   "dynamic_config"   => 0,
   "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
   "keywords"         => ["Licensing", "Sourcecode"],
-  "license"          => ["gpl_3"],
+  "license"          => ["agpl_3"],
   "meta-spec"        => {
                           url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
                           version => 2,
@@ -19,17 +19,20 @@ my $meta = {
   "prereqs"          => {
                           configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
                           runtime => {
-                            requires => {
-                              "constant" => 0,
-                              "Exporter::Tiny" => 0,
-                              "Number::Range" => 0.04,
-                              "perl" => 5.008001,
-                            },
+                            recommends => { "re::engine::RE2" => 0 },
+                            requires   => {
+                                            "constant" => 0,
+                                            "Exporter::Tiny" => 0,
+                                            "Number::Range" => 0.04,
+                                            "perl" => 5.008001,
+                                          },
                           },
-                          test => { requires => { "Test2::V0" => 0, "utf8" => 0 } },
+                          test => {
+                            requires => { "Test2::V0" => 0, "Test::Without::Module" => 0, "utf8" => 0 },
+                          },
                         },
   "provides"         => {
-                          "String::Copyright" => { file => "lib/String/Copyright.pm", version => 0.003008 },
+                          "String::Copyright" => { file => "lib/String/Copyright.pm", version => 0.003011 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -37,14 +40,14 @@ my $meta = {
                                             web => "https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=libstring-copyright-perl",
                                           },
                           homepage     => "https://metacpan.org/pod/String::Copyright",
-                          license      => ["http://www.gnu.org/licenses/gpl-3.0.txt"],
+                          license      => ["http://www.gnu.org/licenses/agpl-3.0.txt"],
                           repository   => {
                                             type => "git",
                                             web  => "https://anonscm.debian.org/cgit/build-common/string-copyright.git",
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/String-Copyright/project",
                         },
-  "version"          => 0.003008,
+  "version"          => 0.003011,
   "x_help_wanted"    => ["tester", "documenter"],
   "x_static_install" => 1,
 };

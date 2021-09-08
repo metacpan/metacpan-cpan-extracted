@@ -2,7 +2,7 @@ package App::Yath::Command::start;
 use strict;
 use warnings;
 
-our $VERSION = '1.000066';
+our $VERSION = '1.000071';
 
 use App::Yath::Util qw/find_pfile/;
 use App::Yath::Options;
@@ -13,7 +13,7 @@ use Test2::Harness::Util::File::JSON;
 use Test2::Harness::IPC;
 
 use Test2::Harness::Util::JSON qw/encode_json decode_json/;
-use Test2::Harness::Util qw/mod2file open_file parse_exit/;
+use Test2::Harness::Util qw/mod2file open_file parse_exit clean_path/;
 use Test2::Util::Table qw/table/;
 
 use Test2::Harness::Util::IPC qw/run_cmd USE_P_GROUPS/;
@@ -45,6 +45,16 @@ option_group {prefix => 'runner', category => "Persistent Runner Options"} => su
         default => 0,
     );
 
+    option restrict_reload => (
+        type => 'D',
+        long_examples  => ['', '=path'],
+        short_examples => ['', '=path'],
+        description => "Only reload modules under the specified path, if no path is specified look at anything under the .yath.rc path, or the current working directory.",
+
+        normalize => sub { $_[0] eq '1' ? $_[0] : clean_path($_[0]) },
+        action    => \&restrict_action,
+    );
+
     option quiet => (
         short       => 'q',
         type        => 'c',
@@ -52,6 +62,21 @@ option_group {prefix => 'runner', category => "Persistent Runner Options"} => su
         default     => 0,
     );
 };
+
+sub restrict_action {
+    my ($prefix, $field, $raw, $norm, $slot, $settings) = @_;
+
+    if ($norm eq '1') {
+        my $hset = $settings->harness;
+        my $path = $hset->config_file || $hset->cwd;
+        $path //= do { require Cwd; Cwd::getcwd() };
+        $path =~ s{\.yath\.rc$}{}g;
+        push @{$$slot} => $path;
+    }
+    else {
+        push @{$$slot} => $norm;
+    }
+}
 
 sub MAX_ATTACH() { 1_048_576 }
 
@@ -318,6 +343,24 @@ Can be specified multiple times
 
 =over 4
 
+=item --cover-aggregator ARG
+
+=item --cover-aggregator=ARG
+
+=item --no-cover-aggregator
+
+Choose an aggregator (default Test2::Harness::Log::CoverageAggregator)
+
+
+=item --cover-class ARG
+
+=item --cover-class=ARG
+
+=item --no-cover-class
+
+Choose a Test2::Plugin::Cover subclass
+
+
 =item --cover-dirs ARG
 
 =item --cover-dirs=ARG
@@ -421,6 +464,15 @@ Can also be set with the following environment variables: C<T2_HARNESS_DUMMY>
 exit after showing help information
 
 
+=item --interactive
+
+=item -i
+
+=item --no-interactive
+
+Use interactive mode, 1 test at a time, stdin forwarded to it
+
+
 =item --keep-dirs
 
 =item --keep_dir
@@ -456,6 +508,17 @@ Can be specified multiple times
 =item --no-reload
 
 Attempt to reload modified modules in-place, restarting entire stages only when necessary.
+
+
+=item --restrict-reload
+
+=item --restrict-reload=path
+
+=item --no-restrict-reload
+
+Only reload modules under the specified path, if no path is specified look at anything under the .yath.rc path, or the current working directory.
+
+Can be specified multiple times
 
 
 =back

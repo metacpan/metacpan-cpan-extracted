@@ -43,21 +43,24 @@ sub init {
 sub add_locale_path {
   my ($class, $path) = @_;
   return if $locale_paths{$path};
+  debug 2, "Found new possible locales path at $path";
   my @found = glob($path);
   my $flag = @found ? 1 : -1;
   if($flag == 1) {
-    debug 1, "Adding locale_path at $path";
+    debug 1, "Translation files found at $path";
     $class->dl->add_localizer(Data::Localize::MultiLevel->new(paths => [$path]));
   } else {
-    debug 1, "No translation files found at $path";
+    debug 2, "No translation files found at $path";
   }
   $locale_paths{$path} = $flag;
   return $flag == 1 ? 1:0;
 }
 
 sub _module_path {
-  my @parts = split '::', shift;
+  my $class_name = shift;
+  my @parts = split '::', $class_name;
   my $path = File::Spec->catfile(@parts);
+  debug 3, "trying to find module path for class '$class_name' via 'INC{${path}.pm}'";
   return $INC{"${path}.pm"};
 }
 
@@ -106,6 +109,8 @@ sub translate {
   $key = $$key if $self->is_i18n_tag($key);
   $key = "${scope}.${key}" if $scope;
 
+  debug 1 , "Trying to translate '$key' with defaults: [@{[ join ',', @defaults]}]";
+  
   debug 1, "Trying to translate: '$key'";
   my $translated = $self->dl->localize($key, \%args);
 
@@ -132,17 +137,22 @@ sub translate {
   # it.  So you should stick your ultimate fallback string at the very end
   # of the defaults list.
   #
+  debug 1, "Trying to translate defaults: [@{[ join ',', @defaults]}]";
 
   foreach my $default(@defaults) {
-    debug 1, "Trying to translate defaults: '$default'";
+    debug 2, "Trying to translate default: '$default'";
 
-    return $default unless $self->is_i18n_tag($default);
+    unless ($self->is_i18n_tag($default)) {
+      debug 1, "'$default' is just a string, so using that.";
+      return $default;
+    }
+
     my $tag = $$default;
     my $translated = $self->dl->localize($tag, \%args);
     $translated = $self->_lookup_translation_by_count($count, $tag, $translated, %args)
       if ref($translated) and defined($count);
 
-    debug 1, "Proposed translation: '$translated'";
+    debug 2, "Proposed translation: '$translated'";
     unless($translated eq $tag) {
       debug 1, "Translated '$default' to '$translated'";
       return $translated;

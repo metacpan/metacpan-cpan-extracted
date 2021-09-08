@@ -2,7 +2,7 @@ package Net::GitHub::V3::Repos;
 
 use Moo;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 our $AUTHORITY = 'cpan:FAYLAND';
 
 use Carp;
@@ -258,7 +258,7 @@ my %__methods = (
     delete_collaborator => { url => "/repos/%s/%s/collaborators/%s", method => 'DELETE', check_status => 204 },
 
     # http://developer.github.com/v3/repos/commits/
-    commit   => { url => "/repos/%s/%s/commits/%s" },
+    commit   => { url => "/repos/:owner/:repo/commits/:ref", v => 2 },
     comments => { url => "/repos/%s/%s/comments", paginate => 1 },
     comment  => { url => "/repos/%s/%s/comments/%s" },
     commit_comments => { url => "/repos/%s/%s/commits/%s/comments", paginate => 1 },

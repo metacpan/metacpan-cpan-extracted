@@ -82,15 +82,23 @@ do { my $x = {
                                       'File::Slurper' => '0',
                                       'Hash::Fold' => '0',
                                       'Hash::Merge' => '0',
+                                      'Moo' => '2',
+                                      'MooX::StrictConstructor' => '0',
+                                      'Ref::Util' => '0',
                                       'Scalar::Util' => '0',
                                       'Storable' => '0',
+                                      'Type::Library' => '0',
+                                      'Type::Params' => '0',
+                                      'Type::Utils' => '0',
+                                      'Types::Standard' => '1.010003',
                                       'constant' => '0',
                                       'custom::failures' => '0',
                                       'custom::failures::x::alias' => '0',
                                       'experimental' => '0',
                                       'namespace::clean' => '0',
-                                      'perl' => '5.020000',
+                                      'perl' => '5.026000',
                                       'strict' => '0',
+                                      'vars' => '0',
                                       'warnings' => '0'
                                     }
                     },
@@ -106,10 +114,10 @@ do { my $x = {
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
                                    'JSON::PP' => '0',
+                                   'List::Util' => '1.29',
                                    'Test2::V0' => '0',
                                    'Test::More' => '0',
-                                   'Test::TempDir::Tiny' => '0',
-                                   'perl' => '5.020000'
+                                   'Test::TempDir::Tiny' => '0'
                                  }
                  }
      };

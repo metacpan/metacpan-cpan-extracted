@@ -1,0 +1,32 @@
+---
+abstract: 'A close to drop-in replacement for Statistics::Descriptive using PDL as the back-end'
+author:
+  - 'Shawn Laffan <shawnlaffan@gmail.com>'
+build_requires:
+  Devel::Symdump: '0'
+  Scalar::Util: '0'
+  Statistics::Descriptive: '3.06'
+  Test::More: '0'
+  rlib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Statistics-Descriptive-PDL
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  PDL: '2.012'
+  PDL::Stats: '0.7'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/shawnlaffan/Statistics-Descriptive-PDL/issues/
+  repository: https://github.com/shawnlaffan/Statistics-Descriptive-PDL
+version: '0.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,7 @@
+--- !!perl/hash:AI::Perceptron::Simple
+attributes_hash_ref:
+  has_other_living_things: 0.01
+  has_trees: 0.01
+  trees_coverage_more_than_half: 0.01
+learning_rate: 0.05
+threshold: 0.5

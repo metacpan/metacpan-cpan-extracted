@@ -6,6 +6,7 @@ MPC.pod
 MPC.xs
 README
 CHANGES
+t/_itsa.t
 t/aaa_compat.t
 t/aab_basic.t
 t/bool.t

@@ -6,7 +6,7 @@
 
 use Object::Pad 0.41;  # :param
 
-package Tickit::Widget::Placegrid 0.32;
+package Tickit::Widget::Placegrid 0.33;
 class Tickit::Widget::Placegrid
    extends Tickit::Widget;
 

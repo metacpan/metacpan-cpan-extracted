@@ -21,13 +21,8 @@ my %script_prereq = (
 );
 
 my %test_prereq = (
-   'Cwd'                      => '0',
-   'File::Basename'           => '0',
-   'File::Find::Rule'         => '0',
    'Test::Inter'              => '1.09',
    'Test::More'               => '0',
-   'Test::Pod'                => '1.00',
-   'Test::Pod::Coverage'      => '1.00',
 );
 
 my %config_prereq = (
@@ -43,7 +38,7 @@ if ($EU_MM_V < 6.64) {
 
 WriteMakefile(
    NAME             => "App::CPANtoRPM",
-   VERSION          => "1.09",
+   VERSION          => "1.10",
    ABSTRACT         => "An RPM packager for perl modules",
    LICENSE          => "perl",
    ($EU_MM_V >= 6.48
@@ -64,11 +59,11 @@ WriteMakefile(
           provides     => {
              'App::CPANtoRPM' => {
                 file    => 'lib/App/CPANtoRPM.pm',
-                version => '1.09',
+                version => '1.10',
              },
              'cpantorpm' => {
                 file    => 'cpantorpm',
-                version => '1.09',
+                version => '1.10',
              },
 
           },

@@ -18,6 +18,16 @@ static duk_ret_t perl_caller(duk_context* ctx);
 
 static HV* seen;
 
+static inline SV* _cstr_to_svpv(pTHX_ const char* cstr, STRLEN clen) {
+    SV* ret = newSVpv(cstr, clen);
+
+    if (!sv_utf8_decode(ret)) {
+        warn("Received invalid UTF-8 from JavaScript: [%.*s]\n", (int) clen, cstr);
+    }
+
+    return ret;
+}
+
 static SV* pl_duk_to_perl_impl(pTHX_ duk_context* ctx, int pos, HV* seen)
 {
     SV* ret = &PL_sv_undef; /* return undef by default */
@@ -41,8 +51,7 @@ static SV* pl_duk_to_perl_impl(pTHX_ duk_context* ctx, int pos, HV* seen)
         case DUK_TYPE_STRING: {
             duk_size_t clen = 0;
             const char* cstr = duk_get_lstring(ctx, pos, &clen);
-            ret = newSVpvn(cstr, clen);
-            SvUTF8_on(ret); /* yes, always */
+            ret = _cstr_to_svpv(aTHX_ cstr, clen);
             break;
         }
         case DUK_TYPE_OBJECT: {
@@ -87,6 +96,11 @@ static SV* pl_duk_to_perl_impl(pTHX_ duk_context* ctx, int pos, HV* seen)
                         }
                     }
                 }
+            } else if (duk_is_buffer_data(ctx, pos)) {
+                duk_size_t clen = 0;
+                const char* cstr = duk_get_buffer_data(ctx, pos, &clen);
+                ret = newSVpvn(cstr, clen);
+                break;
             } else { /* if (duk_is_object(ctx, pos)) { */
                 void* ptr = duk_get_heapptr(ctx, pos);
                 char kstr[100];
@@ -155,7 +169,7 @@ static int pl_perl_to_duk_impl(pTHX_ SV* value, duk_context* ctx, HV* seen, int 
         duk_push_boolean(ctx, val);
     } else if (SvPOK(value)) {
         STRLEN vlen = 0;
-        const char* vstr = SvPV_const(value, vlen);
+        const char* vstr = SvPVutf8(value, vlen);
         duk_push_lstring(ctx, vstr, vlen);
     } else if (SvIOK(value)) {
         long val = SvIV(value);
@@ -238,8 +252,7 @@ static int pl_perl_to_duk_impl(pTHX_ SV* value, duk_context* ctx, HV* seen, int 
                     if (!key) {
                         continue; /* invalid key */
                     }
-                    SvUTF8_on(key); /* yes, always */
-                    kstr = SvPV(key, klen);
+                    kstr = SvPVutf8(key, klen);
                     if (!kstr) {
                         continue; /* invalid key */
                     }
@@ -248,7 +261,6 @@ static int pl_perl_to_duk_impl(pTHX_ SV* value, duk_context* ctx, HV* seen, int 
                     if (!value) {
                         continue; /* invalid value */
                     }
-                    SvUTF8_on(value); /* yes, always */
 
                     if (!pl_perl_to_duk_impl(aTHX_ value, ctx, seen, 0)) {
                         croak("Could not create JS element for hash\n");
@@ -283,20 +295,22 @@ static int pl_perl_to_duk_impl(pTHX_ SV* value, duk_context* ctx, HV* seen, int 
 
 SV* pl_duk_to_perl(pTHX_ duk_context* ctx, int pos)
 {
+    SV* ret = 0;
     if (!seen) {
         seen = newHV();
     }
-    SV* ret = pl_duk_to_perl_impl(aTHX_ ctx, pos, seen);
+    ret = pl_duk_to_perl_impl(aTHX_ ctx, pos, seen);
     hv_clear(seen);
     return ret;
 }
 
 int pl_perl_to_duk(pTHX_ SV* value, duk_context* ctx)
 {
+    int ret = 0;
     if (!seen) {
         seen = newHV();
     }
-    int ret = pl_perl_to_duk_impl(aTHX_ value, ctx, seen, 0);
+    ret = pl_perl_to_duk_impl(aTHX_ value, ctx, seen, 0);
     hv_clear(seen);
     return ret;
 }
@@ -469,7 +483,9 @@ SV* pl_typeof_global_or_property(pTHX_ duk_context* ctx, const char* name)
         cstr = get_typeof(ctx, -1);
         duk_pop(ctx); /* pop value */
     }
-    ret = newSVpv(cstr, clen);
+
+    ret = _cstr_to_svpv(aTHX_ cstr, clen);
+
     return ret;
 }
 
@@ -642,8 +658,7 @@ SV* pl_global_objects(pTHX_ duk_context* ctx)
     while (duk_next(ctx, -1, 0)) { /* get keys only */
         duk_size_t klen = 0;
         const char* kstr = duk_get_lstring(ctx, -1, &klen);
-        SV* name = sv_2mortal(newSVpvn(kstr, klen));
-        SvUTF8_on(name); /* yes, always */
+        SV* name = sv_2mortal(_cstr_to_svpv(aTHX_ kstr, klen));
         if (av_store(values, count, name)) {
             SvREFCNT_inc(name);
             ++count;
@@ -689,7 +704,7 @@ static void add_hash_key_str(pTHX_ HV* hash, const char* key, const char* val)
 {
     STRLEN klen = strlen(key);
     STRLEN vlen = strlen(val);
-    SV* pval = sv_2mortal(newSVpv(val, vlen));
+    SV* pval = sv_2mortal(_cstr_to_svpv(aTHX_ val, vlen));
     if (hv_store(hash, key, klen, pval, 0)) {
         SvREFCNT_inc(pval);
     }
@@ -700,22 +715,24 @@ static void add_hash_key_str(pTHX_ HV* hash, const char* key, const char* val)
 
 HV* pl_get_version_info(pTHX)
 {
+    int patch = 0;
+    int minor = 0;
+    int major = 0;
+    char buf[100];
     HV* version = newHV();
-
     long duk_version = DUK_VERSION;
-    int patch = duk_version % 100;
+
+    patch = duk_version % 100;
     duk_version /= 100;
-    int minor = duk_version % 100;
+    minor = duk_version % 100;
     duk_version /= 100;
-    int major = duk_version;
+    major = duk_version;
 
     add_hash_key_int(aTHX_ version, "major"  , major);
     add_hash_key_int(aTHX_ version, "minor"  , minor);
     add_hash_key_int(aTHX_ version, "patch"  , patch);
 
-    char buf[100];
     sprintf(buf, "%d.%d.%d", major, minor, patch);
-
     add_hash_key_str(aTHX_ version, "version", buf);
 
     return version;

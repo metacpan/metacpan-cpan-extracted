@@ -5,9 +5,11 @@
 
 use Object::Pad 0.43;  # ADJUST
 
-package Tickit::Widget::Entry 0.32;
+package Tickit::Widget::Entry 0.33;
 class Tickit::Widget::Entry
    extends Tickit::Widget;
+
+use Carp;
 
 use Tickit::Style;
 Tickit::Window->VERSION( '0.39' ); # expose_after_scroll default on
@@ -329,9 +331,9 @@ method reposition_cursor
 {
    my ( $pos_ch ) = @_;
 
-   my $win = $self->window or return;
-
    $_pos_ch = $pos_ch if defined $pos_ch;
+
+   my $win = $self->window or return;
 
    my $new_scrolloffs = $self->_recalculate_scroll( $_pos_ch );
    if( defined $new_scrolloffs ) {
@@ -530,6 +532,42 @@ method bind_keys
          delete $_keybindings{$str};
       }
    }
+}
+
+=head2 make_popup_at_cursor
+
+   $win = $entry->make_popup_at_cursor( $top_offset, $left_offset, $lines, $cols )
+
+I<Since version 0.33.>
+
+Creates a new popup window, as if calling L<Tickit::Window/make_popup> on the
+widget's main window, but with an offset relative to the current cursor
+position.
+
+An offet of (0, 0) will position the popup window's top left corner exactly over
+the cursor; this is likely not what you want.
+
+To position the popup just below the widget, use a top offset of +1:
+
+   $win = $entry->make_popup_at_cursor( +1, 0, $lines, $cols )
+
+To position the popup just above the widget, use a top offset of negative the
+number of lines:
+
+   $win = $entry->make_popup_at_cursor( -$lines, 0, $lines, $cols )
+
+=cut
+
+method make_popup_at_cursor
+{
+   my ( $topoff, $leftoff, $lines, $cols ) = @_;
+
+   $self->window or
+      croak "Cannot ->make_popup_at_cursor on an Entry widget with no window";
+
+   my $pos_x = $self->char2col( $_pos_ch ) - $_scrolloffs_co;
+
+   return $self->window->make_popup( $topoff, $pos_x + $leftoff, $lines, $cols );
 }
 
 =head1 TEXT MODEL METHODS

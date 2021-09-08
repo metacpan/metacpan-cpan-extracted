@@ -1,0 +1,7 @@
+Revision history for RT-Extension-ShareSearchLink
+
+0.02 Fri Aug 27 2021
+ - Added PostgreSQL database schema
+
+0.01 Thu Aug 26 2021
+ - Initial version

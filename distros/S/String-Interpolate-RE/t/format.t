@@ -12,4 +12,13 @@ is( strinterp( $str, \%vars, { UseENV => 0, Format => 0 } ),
 is( strinterp( $str, \%vars, { UseENV => 0, Format => 1 } ),
     '01 1 1', "format = on" );
 
+is(
+    strinterp(
+        '${a:%02d-}/$a/${a}',
+        {}, { UseENV => 0, Format => 1, EmptyUndef => 1 }
+    ),
+    '//',
+    "format = on, emptyundef = on"
+);
+
 done_testing;

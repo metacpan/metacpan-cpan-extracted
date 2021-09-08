@@ -3,19 +3,21 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Defer 0.05;
+package Syntax::Keyword::Defer 0.06;
 
 use v5.14;
 use warnings;
 
 use Carp;
 
+our @CARP_NOT = qw( Syntax::Keyword::Finally );
+
 require XSLoader;
 XSLoader::load( __PACKAGE__, our $VERSION );
 
 =head1 NAME
 
-C<Syntax::Keyword::Defer> - add C<defer> block syntax to perl
+C<Syntax::Keyword::Defer> - execute code when leaving a block
 
 =head1 SYNOPSIS
 
@@ -179,7 +181,9 @@ sub import_into
 
    my %syms = map { $_ => 1 } @syms;
    $^H{"Syntax::Keyword::Defer/defer"}++   if delete $syms{defer};
-   $^H{"Syntax::Keyword::Defer/finally"}++ if delete $syms{finally};
+
+   carp "'finally' is now deprecated; use 'defer' instead" and $^H{"Syntax::Keyword::Defer/finally"}++
+      if delete $syms{finally};
 
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
 }

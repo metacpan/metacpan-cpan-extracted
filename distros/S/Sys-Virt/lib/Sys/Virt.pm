@@ -81,7 +81,7 @@ use Sys::Virt::DomainSnapshot;
 use Sys::Virt::DomainCheckpoint;
 use Sys::Virt::Stream;
 
-our $VERSION = '7.5.0';
+our $VERSION = '7.7.0';
 require XSLoader;
 XSLoader::load('Sys::Virt', $VERSION);
 
@@ -309,7 +309,7 @@ sub create_network {
     return Sys::Virt::Network->_new(connection => $self, xml => $xml);
 }
 
-=item my $net = $conn->define_network($xml);
+=item my $net = $conn->define_network($xml, $flags = 0);
 
 Defines, but does not start, a new network based on the XML description
 passed into the C<$xml> parameter. The returned object is an instance
@@ -323,11 +323,12 @@ object.
 sub define_network {
     my $self = shift;
     my $xml = shift;
+    my $flags = shift || 0;
 
-    return Sys::Virt::Network->_new(connection => $self, xml => $xml, nocreate => 1);
+    return Sys::Virt::Network->_new(connection => $self, xml => $xml, nocreate => 1, flags => $flags);
 }
 
-=item my $nwfilter = $conn->define_nwfilter($xml);
+=item my $nwfilter = $conn->define_nwfilter($xml, $flags=0);
 
 Defines a new network filter based on the XML description
 passed into the C<$xml> parameter. The returned object is an instance
@@ -339,11 +340,12 @@ unprivileged connections to the hypervisor.
 sub define_nwfilter {
     my $self = shift;
     my $xml = shift;
+    my $flags = shift || 0;
 
-    return Sys::Virt::NWFilter->_new(connection => $self, xml => $xml, nocreate => 1);
+    return Sys::Virt::NWFilter->_new(connection => $self, xml => $xml, nocreate => 1, flags => $flags);
 }
 
-=item my $secret = $conn->define_secret($xml);
+=item my $secret = $conn->define_secret($xml, $flags=0);
 
 Defines a new secret based on the XML description
 passed into the C<$xml> parameter. The returned object is an instance
@@ -355,8 +357,9 @@ unprivileged connections to the hypervisor.
 sub define_secret {
     my $self = shift;
     my $xml = shift;
+    my $flags = shift || 0;
 
-    return Sys::Virt::Secret->_new(connection => $self, xml => $xml, nocreate => 1);
+    return Sys::Virt::Secret->_new(connection => $self, xml => $xml, nocreate => 1, flags => $flags);
 }
 
 =item my $pool = $conn->create_storage_pool($xml);
@@ -375,7 +378,7 @@ sub create_storage_pool {
     return Sys::Virt::StoragePool->_new(connection => $self, xml => $xml);
 }
 
-=item my $pool = $conn->define_storage_pool($xml);
+=item my $pool = $conn->define_storage_pool($xml, $flags=0);
 
 Defines, but does not start, a new storage pol based on the XML description
 passed into the C<$xml> parameter. The returned object is an instance
@@ -389,8 +392,9 @@ object.
 sub define_storage_pool {
     my $self = shift;
     my $xml = shift;
+    my $flags = shift || 0;
 
-    return Sys::Virt::StoragePool->_new(connection => $self, xml => $xml, nocreate => 1);
+    return Sys::Virt::StoragePool->_new(connection => $self, xml => $xml, nocreate => 1, flags => $flags);
 }
 
 =item my $pool = $conn->create_interface($xml);
@@ -427,7 +431,7 @@ sub create_nwfilter_binding {
 
 
 
-=item my $iface = $conn->define_interface($xml);
+=item my $iface = $conn->define_interface($xml, $flags=0);
 
 Defines, but does not start, a new interface based on the XML description
 passed into the C<$xml> parameter. The returned object is an instance
@@ -441,8 +445,9 @@ object.
 sub define_interface {
     my $self = shift;
     my $xml = shift;
+    my $flags = shift || 0;
 
-    return Sys::Virt::Interface->_new(connection => $self, xml => $xml, nocreate => 1);
+    return Sys::Virt::Interface->_new(connection => $self, xml => $xml, nocreate => 1, flags => $flags);
 }
 
 =item my $dev = $conn->create_node_device($xml, $flags=0);

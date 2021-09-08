@@ -5,7 +5,7 @@
 
 use Object::Pad 0.43;  # ADJUST
 
-package Tickit::Widget::RadioButton 0.32;
+package Tickit::Widget::RadioButton 0.33;
 class Tickit::Widget::RadioButton
    extends Tickit::Widget;
 

@@ -5,7 +5,7 @@
       "Thomas R. Wyant, III <wyant at cpan dot org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -45,7 +45,7 @@
    "provides" : {
       "DateTime::Calendar::Julian" : {
          "file" : "lib/DateTime/Calendar/Julian.pm",
-         "version" : "0.104"
+         "version" : "0.105"
       }
    },
    "release_status" : "stable",
@@ -63,6 +63,6 @@
          "web" : "https://github.com/trwyant/perl-Date-Tolkien-Shire"
       }
    },
-   "version" : "0.104",
+   "version" : "0.105",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

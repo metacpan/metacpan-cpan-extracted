@@ -23,9 +23,15 @@ sub new_fsp
 	{
 		my $cwd = $xftp->{xftp}->current_dir();
 		$xftp->{cwd} = $cwd  if ($cwd);
+		$xftp->{protocol} = 'Net::FSP';
 		return $xftp;
 	}
 	return undef;
+}
+
+sub protocol
+{
+	return shift->{protocol};
 }
 
 {

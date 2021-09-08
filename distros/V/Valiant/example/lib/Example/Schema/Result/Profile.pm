@@ -21,7 +21,7 @@ __PACKAGE__->validates(city => (presence=>1, length=>[2,32]));
 __PACKAGE__->validates(zip => (presence=>1, format=>'zip'));
 __PACKAGE__->validates(phone_number => (presence=>1, length=>[10,32]));
 __PACKAGE__->validates(state_id => (presence=>1));
-
+__PACKAGE__->validates(state => (result=>1));
 __PACKAGE__->validates(birthday => (
     date => {
       max => sub { pop->now->subtract(days=>2) }, 

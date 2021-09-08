@@ -1,17 +1,18 @@
 use 5.012;
 use warnings;
 use Test::More;
-use Test::Deep;
 use XS::Framework;
+use Scalar::Util qw(reftype);
 
 my $obj;
 
 # undefs to HV
 $obj = bless \(my $a = undef), 'AAA';
+is(Scalar::Util::reftype(\$a), 'SCALAR');
 XS::Framework::obj2hv($obj);
 ok($obj->{key} = 1);
 is($obj->{key}, 1);
-ok defined $a;
+is(Scalar::Util::reftype(\$a), 'HASH');
 XS::Framework::obj2hv($obj);
 
 

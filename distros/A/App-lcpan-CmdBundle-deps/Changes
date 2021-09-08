@@ -1,3 +1,12 @@
+0.011   2021-06-03  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Fix swapped summary for --include-perl and --exclude-perl.
+
+	- Typo & wording.
+
+
 0.010   2021-06-01  Released-By: PERLANCAR; Urgency: medium
 
 	- [subcommand deps-unindexed][bugfix] Fix swapped logic

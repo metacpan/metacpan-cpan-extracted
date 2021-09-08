@@ -20,7 +20,7 @@ BEGIN {
     }
 }
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 sub _SIZE_OF_TZ_HEADER                     { return 44 }
 sub _SIZE_OF_TRANSITION_TIME_V1            { return 4 }
@@ -207,68 +207,69 @@ my %olson_to_win32_timezones = (
     'America/Cayenne'                => ['SA Eastern Standard Time'],
     'America/Cayman'                 => ['SA Pacific Standard Time'],
     'America/Chicago'                => ['Central Standard Time'],
-    'America/Chihuahua'              => ['Mexico Standard Time 2', 'Mountain Standard Time (Mexico)'],
-    'America/Coral_Harbour'          => ['SA Pacific Standard Time'],
-    'America/Cordoba'                => ['Argentina Standard Time'],
-    'America/Costa_Rica'             => ['Central America Standard Time'],
-    'America/Creston'                => ['US Mountain Standard Time'],
-    'America/Cuiaba'                 => ['Central Brazilian Standard Time'],
-    'America/Curacao'                => ['SA Western Standard Time'],
-    'America/Danmarkshavn'           => ['UTC'],
-    'America/Dawson'                 => ['Pacific Standard Time'],
-    'America/Dawson_Creek'           => ['US Mountain Standard Time'],
-    'America/Denver'                 => ['Mountain Standard Time'],
-    'America/Detroit'                => ['Eastern Standard Time'],
-    'America/Dominica'               => ['SA Western Standard Time'],
-    'America/Edmonton'               => ['Mountain Standard Time'],
-    'America/Eirunepe'               => ['SA Pacific Standard Time'],
-    'America/El_Salvador'            => ['Central America Standard Time'],
-    'America/Fort_Nelson'            => ['US Mountain Standard Time'],
-    'America/Fortaleza'              => ['SA Eastern Standard Time'],
-    'America/Glace_Bay'              => ['Atlantic Standard Time'],
-    'America/Godthab'                => ['Greenland Standard Time'],
-    'America/Goose_Bay'              => ['Atlantic Standard Time'],
-    'America/Grand_Turk'             => ['Turks And Caicos Standard Time'],
-    'America/Grenada'                => ['SA Western Standard Time'],
-    'America/Guadeloupe'             => ['SA Western Standard Time'],
-    'America/Guatemala'              => ['Central America Standard Time'],
-    'America/Guayaquil'              => ['SA Pacific Standard Time'],
-    'America/Guyana'                 => ['SA Western Standard Time'],
-    'America/Halifax'                => ['Atlantic Standard Time'],
-    'America/Havana'                 => ['Cuba Standard Time'],
-    'America/Hermosillo'             => ['US Mountain Standard Time'],
-    'America/Indiana/Knox'           => ['Central Standard Time'],
-    'America/Indiana/Marengo'        => ['US Eastern Standard Time'],
-    'America/Indiana/Petersburg'     => ['Eastern Standard Time'],
-    'America/Indiana/Tell_City'      => ['Central Standard Time'],
-    'America/Indiana/Vevay'          => ['US Eastern Standard Time'],
-    'America/Indiana/Vincennes'      => ['Eastern Standard Time'],
-    'America/Indiana/Winamac'        => ['Eastern Standard Time'],
-    'America/Indianapolis'           => ['US Eastern Standard Time'],
-    'America/Inuvik'                 => ['Mountain Standard Time'],
-    'America/Iqaluit'                => ['Eastern Standard Time'],
-    'America/Jamaica'                => ['SA Pacific Standard Time'],
-    'America/Jujuy'                  => ['Argentina Standard Time'],
-    'America/Juneau'                 => ['Alaskan Standard Time'],
-    'America/Kentucky/Monticello'    => ['Eastern Standard Time'],
-    'America/Kralendijk'             => ['SA Western Standard Time'],
-    'America/La_Paz'                 => ['SA Western Standard Time'],
-    'America/Lima'                   => ['SA Pacific Standard Time'],
-    'America/Los_Angeles'            => ['Pacific Standard Time'],
-    'America/Louisville'             => ['Eastern Standard Time'],
-    'America/Lower_Princes'          => ['SA Western Standard Time'],
-    'America/Maceio'                 => ['SA Eastern Standard Time'],
-    'America/Managua'                => ['Central America Standard Time'],
-    'America/Manaus'                 => ['SA Western Standard Time'],
-    'America/Marigot'                => ['SA Western Standard Time'],
-    'America/Martinique'             => ['SA Western Standard Time'],
-    'America/Matamoros'              => ['Central Standard Time'],
-    'America/Mazatlan'               => ['Mountain Standard Time (Mexico)'],
-    'America/Mendoza'                => ['Argentina Standard Time'],
-    'America/Menominee'              => ['Central Standard Time'],
-    'America/Merida'                 => ['Central Standard Time (Mexico)'],
-    'America/Metlakatla'             => ['Alaskan Standard Time'],
-    'America/Mexico_City'            =>
+    'America/Chihuahua'              =>
+      [ 'Mexico Standard Time 2', 'Mountain Standard Time (Mexico)' ],
+    'America/Coral_Harbour'       => ['SA Pacific Standard Time'],
+    'America/Cordoba'             => ['Argentina Standard Time'],
+    'America/Costa_Rica'          => ['Central America Standard Time'],
+    'America/Creston'             => ['US Mountain Standard Time'],
+    'America/Cuiaba'              => ['Central Brazilian Standard Time'],
+    'America/Curacao'             => ['SA Western Standard Time'],
+    'America/Danmarkshavn'        => ['UTC'],
+    'America/Dawson'              => ['Pacific Standard Time'],
+    'America/Dawson_Creek'        => ['US Mountain Standard Time'],
+    'America/Denver'              => ['Mountain Standard Time'],
+    'America/Detroit'             => ['Eastern Standard Time'],
+    'America/Dominica'            => ['SA Western Standard Time'],
+    'America/Edmonton'            => ['Mountain Standard Time'],
+    'America/Eirunepe'            => ['SA Pacific Standard Time'],
+    'America/El_Salvador'         => ['Central America Standard Time'],
+    'America/Fort_Nelson'         => ['US Mountain Standard Time'],
+    'America/Fortaleza'           => ['SA Eastern Standard Time'],
+    'America/Glace_Bay'           => ['Atlantic Standard Time'],
+    'America/Godthab'             => ['Greenland Standard Time'],
+    'America/Goose_Bay'           => ['Atlantic Standard Time'],
+    'America/Grand_Turk'          => ['Turks And Caicos Standard Time'],
+    'America/Grenada'             => ['SA Western Standard Time'],
+    'America/Guadeloupe'          => ['SA Western Standard Time'],
+    'America/Guatemala'           => ['Central America Standard Time'],
+    'America/Guayaquil'           => ['SA Pacific Standard Time'],
+    'America/Guyana'              => ['SA Western Standard Time'],
+    'America/Halifax'             => ['Atlantic Standard Time'],
+    'America/Havana'              => ['Cuba Standard Time'],
+    'America/Hermosillo'          => ['US Mountain Standard Time'],
+    'America/Indiana/Knox'        => ['Central Standard Time'],
+    'America/Indiana/Marengo'     => ['US Eastern Standard Time'],
+    'America/Indiana/Petersburg'  => ['Eastern Standard Time'],
+    'America/Indiana/Tell_City'   => ['Central Standard Time'],
+    'America/Indiana/Vevay'       => ['US Eastern Standard Time'],
+    'America/Indiana/Vincennes'   => ['Eastern Standard Time'],
+    'America/Indiana/Winamac'     => ['Eastern Standard Time'],
+    'America/Indianapolis'        => ['US Eastern Standard Time'],
+    'America/Inuvik'              => ['Mountain Standard Time'],
+    'America/Iqaluit'             => ['Eastern Standard Time'],
+    'America/Jamaica'             => ['SA Pacific Standard Time'],
+    'America/Jujuy'               => ['Argentina Standard Time'],
+    'America/Juneau'              => ['Alaskan Standard Time'],
+    'America/Kentucky/Monticello' => ['Eastern Standard Time'],
+    'America/Kralendijk'          => ['SA Western Standard Time'],
+    'America/La_Paz'              => ['SA Western Standard Time'],
+    'America/Lima'                => ['SA Pacific Standard Time'],
+    'America/Los_Angeles'         => ['Pacific Standard Time'],
+    'America/Louisville'          => ['Eastern Standard Time'],
+    'America/Lower_Princes'       => ['SA Western Standard Time'],
+    'America/Maceio'              => ['SA Eastern Standard Time'],
+    'America/Managua'             => ['Central America Standard Time'],
+    'America/Manaus'              => ['SA Western Standard Time'],
+    'America/Marigot'             => ['SA Western Standard Time'],
+    'America/Martinique'          => ['SA Western Standard Time'],
+    'America/Matamoros'           => ['Central Standard Time'],
+    'America/Mazatlan'            => ['Mountain Standard Time (Mexico)'],
+    'America/Mendoza'             => ['Argentina Standard Time'],
+    'America/Menominee'           => ['Central Standard Time'],
+    'America/Merida'              => ['Central Standard Time (Mexico)'],
+    'America/Metlakatla'          => ['Alaskan Standard Time'],
+    'America/Mexico_City'         =>
       [ 'Mexico Standard Time', 'Central Standard Time (Mexico)' ],
     'America/Miquelon'               => ['Saint Pierre Standard Time'],
     'America/Moncton'                => ['Atlantic Standard Time'],
@@ -961,7 +962,7 @@ sub timezone {
                 my %mapping = $self->win32_mapping();
                 if ( !defined $mapping{$new} ) {
                     Carp::croak(
-"'$new' is not an time zone in the existing Win32 registry"
+"'$new' is not a time zone in the existing Win32 registry"
                     );
                 }
             }
@@ -976,7 +977,7 @@ sub timezone {
                   File::Spec->catfile( $self->directory(), @directories );
                 if ( !-f $path ) {
                     Carp::croak(
-"'$new' is not an time zone in the existing Olson database"
+"'$new' is not a time zone in the existing Olson database"
                     );
                 }
             }
@@ -2353,7 +2354,7 @@ sub _read_transition_times {
               $buffer;
         };
     }
-    return [ sort { $a <=> $b } @transition_times ];
+    return \@transition_times;
 }
 
 sub _read_local_time_indexes {
@@ -2824,6 +2825,36 @@ sub _set_abbrs {
     return;
 }
 
+sub _sort_transition_times {
+    my ( $self, $tz ) = @_;
+    my @sorted_transition_times =
+      sort { $a <=> $b } @{ $self->{_tzdata}->{$tz}->{transition_times} };
+    my %transition_time_original_indexes;
+    my $count = 0;
+    foreach my $time ( @{ $self->{_tzdata}->{$tz}->{transition_times} } ) {
+        if ( defined $transition_time_original_indexes{$time} ) {
+            Carp::croak(
+"There are two transition times for $time in $tz, which cannot be coped with at the moment.  Please file a bug with Time::Zone::Olson"
+            );
+        }
+        else {
+            $transition_time_original_indexes{$time} = $count;
+        }
+        $count += 1;
+    }
+    my @sorted_local_time_indexes;
+    $count = 0;
+    foreach my $time (@sorted_transition_times) {
+        push @sorted_local_time_indexes,
+          $self->{_tzdata}->{$tz}->{local_time_indexes}
+          ->[ $transition_time_original_indexes{$time} ];
+        $count += 1;
+    }
+    $self->{_tzdata}->{$tz}->{transition_times}   = \@sorted_transition_times;
+    $self->{_tzdata}->{$tz}->{local_time_indexes} = \@sorted_local_time_indexes;
+    return;
+}
+
 sub _read_v1_tzfile {
     my ( $self, $handle, $path, $header, $tz ) = @_;
     $self->{_tzdata}->{$tz}->{transition_times} =
@@ -2833,6 +2864,7 @@ sub _read_v1_tzfile {
       $self->_read_local_time_indexes( $handle, $path, $header->{timecnt} );
     $self->{_tzdata}->{$tz}->{local_time_types} =
       $self->_read_local_time_types( $handle, $path, $header->{typecnt} );
+    $self->_sort_transition_times($tz);
     $self->{_tzdata}->{$tz}->{time_zone_abbreviation_strings} =
       $self->_read_time_zone_abbreviation_strings( $handle, $path,
         $header->{charcnt} );
@@ -2862,6 +2894,7 @@ sub _read_v2_tzfile {
             _SIZE_OF_TRANSITION_TIME_V2() );
         $self->{_tzdata}->{$tz}->{local_time_indexes} =
           $self->_read_local_time_indexes( $handle, $path, $header->{timecnt} );
+        $self->_sort_transition_times($tz);
         $self->{_tzdata}->{$tz}->{local_time_types} =
           $self->_read_local_time_types( $handle, $path, $header->{typecnt} );
         $self->{_tzdata}->{$tz}->{time_zone_abbreviation_strings} =
@@ -3226,7 +3259,7 @@ Time::Zone::Olson - Provides an Olson timezone database interface
 
 =head1 VERSION
 
-Version 0.40
+Version 0.41
 
 =cut
 
@@ -3354,13 +3387,17 @@ The designated file encountered an error reading either the version 1 or version
 
 The designated file is shorter than expected
 
-=item C<< %s is not an time zone in the existing Olson database >>
+=item C<< %s is not a time zone in the existing Olson database >>
 
 The designated time zone could not be found on the file system.  The time zone is expected to be in the designated directory + the time zone name, for example, /usr/share/zoneinfo/Australia/Melbourne
 
 =item C<< %s does not have a valid format for a TZ time zone >>
 
 The designated time zone name could not be matched by the regular expression for a time zone in Time::Zone::Olson
+
+=item C<< There are two transition times for %s in %s, which cannot be coped with at the moment.  Please file a bug with Time::Zone::Olson >>
+
+The transition times are sorted to handle unsorted (on disk) transition times which has been found on solaris.  Please file a bug.
 
 =item C<< Failed to close %s:%s >>
 

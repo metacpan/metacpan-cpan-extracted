@@ -2,7 +2,7 @@ NAME
     Log::ger::Layout::Pattern - Pattern layout
 
 VERSION
-    version 0.007
+    version 0.008
 
 SYNOPSIS
      use Log::ger::Layout 'Pattern', format => '%d (%F:%L)> %m';
@@ -60,7 +60,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2019, 2017 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

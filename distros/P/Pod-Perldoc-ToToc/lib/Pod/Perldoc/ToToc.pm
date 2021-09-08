@@ -8,7 +8,7 @@ use Pod::TOC;
 use warnings;
 no warnings;
 
-$VERSION = '1.121';
+$VERSION = '1.122';
 
 sub is_pageable        { 1 }
 sub write_with_binmode { 0 }
@@ -68,7 +68,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2006-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2006-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

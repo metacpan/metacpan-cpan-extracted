@@ -14,7 +14,7 @@ use Encode;
 use IO::Socket::SSL;
 use base qw/Mailru::Cloud::Auth/;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 my $BUFF_SIZE = 512;
 
@@ -37,13 +37,38 @@ sub uploadFile {
         $path .= '/';
     }
 
-    my $request = 'https://cld-upload10.cloud.mail.ru/upload/?' .'cloud_domain=2&x-email=' . uri_escape($self->{email});
+    # 10-го нету
+    my @n = (1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12);
+    my $n = $n[1 + int(rand($#n))];
 
+    my $request = sprintf (
+        "https://cld-uploader%s.cloud.mail.ru/upload-web/?cloud_domain=2&x-email=%s",
+        $n,
+        uri_escape($self->{email})
+    );
+
+    my $headers = [
+        'Access-Control-Request-Method'  => 'PUT',
+        'Access-Control-Request-Headers' => 'x-requested-with',
+        'Origin'                         => 'https://cloud.mail.ru',
+        'Referer'                        => 'https://cloud.mail.ru/',
+    ];
+
+    # Вначале разрешим аплодить файл
+    my $req = HTTP::Request->new(OPTIONS => $request, $headers);
+    my $res = $self->{ua}->request($req);
+    my $code = $res->code;
+
+    if ($code ne '200') {
+        croak "Cant request permission to upload $upload_file. Code $code";
+    }
+
+    # Теперь загрузим данные на сервер
     my ($file_hash, $size) = $self->__upload_file($request, $upload_file) or return;
     $self->{file_hash} = $file_hash;
 
-    #Опубликуем файл
-    my %param = (
+    # И опубликуем файл
+    my $param = {
             'api'       => '2',
             'build'     => $self->{build},
             'conflict'  => $conflict_mode,
@@ -51,13 +76,17 @@ sub uploadFile {
             'hash'      => $file_hash,
             'home'      => $path . basename($upload_file),
             'size'      => $size,
-            'token'     => $self->{authToken},
             'x-email'   => $self->{email},
             'x-page-id' => $self->{'x-page-id'},
-    );
-    my $res = $self->{ua}->post('https://cloud.mail.ru/api/v2/file/add', \%param);
+    };
 
-    my $code = $res->code;
+    $res = $self->{ua}->post (
+        'https://cloud.mail.ru/api/v2/file/add',
+        $param,
+        'X-CSRF-Token' => $self->{authToken},
+    );
+
+    $code = $res->code;
     if ($code eq '200') {
         my $json = JSON::XS::decode_json($res->content);
         my $new_fname = $json->{body};
@@ -98,18 +127,21 @@ sub createFolder {
 
     $self->__isLogin();
 
-    my $ua = $self->{ua};
-    my %param = (
+    my $param = {
         'api'       => '2',
         'build'     => $self->{build},
         'conflict'  => 'strict',
         'email'     => $self->{email},
         'home'      => $path,
-        'token'     => $self->{authToken},
         'x-email'   => $self->{email},
         'x-page-id' => $self->{'x-page-id'},
+    };
+
+    my $res = $self->{ua}->post (
+        'https://cloud.mail.ru/api/v2/folder/add',
+        $param,
+        'X-CSRF-Token' => $self->{authToken},
     );
-    my $res = $ua->post('https://cloud.mail.ru/api/v2/folder/add', \%param);
 
     my $code = $res->code;
     if ($code eq '200') {
@@ -119,8 +151,8 @@ sub createFolder {
         carp "Can't create folder $path. Folder exists";
         return;
     }
-    croak "Cant create folder $path. Code: $code";
 
+    croak "Cant create folder $path. Code: $code";
 }
 
 sub deleteResource {
@@ -129,17 +161,21 @@ sub deleteResource {
 
     $self->__isLogin();
 
-    my %param = (
+    my $param = {
         'api'           => '2',
         'build'         => $self->{build},
         'email'         => $self->{email},
         'home'          => $path,
-        'token'         => $self->{authToken},
         'x-email'       => $self->{email},
         'x-page-id'     => $self->{'x-page-id'},
+    };
+
+    my $res = $self->{ua}->post (
+        'https://cloud.mail.ru/api/v2/file/remove',
+        $param,
+        'X-CSRF-Token' => $self->{authToken},
     );
 
-    my $res = $self->{ua}->post('https://cloud.mail.ru/api/v2/file/remove', \%param);
     my $code = $res->code;
 
     if ($code eq '200') {
@@ -153,21 +189,27 @@ sub emptyTrash {
 
     $self->__isLogin();
 
-    my  %param = (
+    my  $param = {
         'api'       => '2',
         'build'     => $self->{build},
         'email'     => $self->{email},
         'token'     => $self->{authToken},
         'x-email'   => $self->{email},
         'x-page-id' => $self->{'x-page-id'},
+    };
+
+    my $res = $self->{ua}->post (
+        'https://cloud.mail.ru/api/v2/trashbin/empty',
+        $param,
+        'X-CSRF-Token' => $self->{authToken},
     );
 
-    my $res = $self->{ua}->post('https://cloud.mail.ru/api/v2/trashbin/empty', \%param);
     my $code = $res->code;
 
     if ($code eq '200') {
         return 1;
     }
+
     croak "Cant empty trash. Code: $code";
 }
 
@@ -200,6 +242,7 @@ sub listFiles {
     if ($code eq '404') {
         croak "Folder $orig_path not exists";
     }
+
     croak "Cant get file list for path: $orig_path. Code: $code";
 }
 
@@ -210,23 +253,28 @@ sub shareResource {
     #Добавим слеш в начало, если его нет
     $path =~ s/^([^\/])/\/$1/;
 
-    my %param = (
-                    'api'           => '2',
-                    'build'         => $self->{build},
-                    'email'         => $self->{email},
-                    'home'          => $path,
-                    'token'         => $self->{authToken},
-                    'x-email'       => $self->{email},
-                    'x-page-id'     => $self->{'x-page-id'},
+    my $param = {
+        'api'           => '2',
+        'build'         => $self->{build},
+        'email'         => $self->{email},
+        'home'          => $path,
+        'x-email'       => $self->{email},
+        'x-page-id'     => $self->{'x-page-id'},
+    };
+
+    my $res = $self->{ua}->post (
+        'https://cloud.mail.ru/api/v2/file/publish',
+        $param,
+        'X-CSRF-Token' => $self->{authToken},
     );
 
-    my $res = $self->{ua}->post('https://cloud.mail.ru/api/v2/file/publish', \%param);
     my $code = $res->code;
     if ($code ne '200') {
         croak "Error on shareResource. Path: $path. Code: $code";
     }
     my $json = decode_json($res->decoded_content);
     my $link = 'https://cloud.mail.ru/public/' . $json->{body};
+
     return $link;
 }
 
@@ -324,7 +372,7 @@ __END__
 B<Mailru::Cloud> - Simple REST API cloud mail.ru client
 
 =head1 VERSION
-    version 0.09
+    version 0.10
 
 =head1 SYNOPSYS
 

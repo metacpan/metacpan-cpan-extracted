@@ -44,12 +44,12 @@
          "requires" : {
             "Date::Japanese::Era" : "0",
             "Getopt::EX" : "v1.23.3",
-            "Getopt::EX::Hashed" : "0.9912",
+            "Getopt::EX::Hashed" : "0.9917",
             "Getopt::EX::i18n" : "0.09",
             "Getopt::EX::termcolor" : "1.06",
             "Hash::Util" : "0",
             "List::Util" : "1.45",
-            "Text::ANSI::Fold" : "2.10",
+            "Text::ANSI::Fold" : "2.11",
             "Text::VisualWidth::PP" : "0.05",
             "perl" : "v5.14.0"
          }
@@ -63,7 +63,7 @@
    "provides" : {
       "App::week" : {
          "file" : "lib/App/week.pm",
-         "version" : "1.0101"
+         "version" : "1.0202"
       },
       "App::week::CalYear" : {
          "file" : "lib/App/week/CalYear.pm"
@@ -92,7 +92,7 @@
          "web" : "https://github.com/kaz-utashiro/App-week"
       }
    },
-   "version" : "1.0101",
+   "version" : "1.0202",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>",

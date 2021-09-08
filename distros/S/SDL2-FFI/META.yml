@@ -5,7 +5,9 @@ author:
 build_requires:
   Test2::V0: '0'
   Test::More: '0.98'
+  Test::NeedsDisplay: '1.07'
 configure_requires:
+  Alien::libsdl2: '== 1.06'
   Devel::CheckBin: '0'
   Module::Build::Tiny: '0.039'
 dynamic_config: 0
@@ -27,116 +29,123 @@ no_index:
     - builder
 provides:
   SDL2::AssertData:
-    file: lib/SDL2/FFI.pm
-  SDL2::AtomicLock:
-    file: lib/SDL2/FFI.pm
+    file: lib/SDL2/assert.pm
   SDL2::AudioCVT:
-    file: lib/SDL2/AudioCVT.pm
+    file: lib/SDL2/audio.pm
   SDL2::AudioDeviceEvent:
-    file: lib/SDL2/AudioDeviceEvent.pm
-  SDL2::AudioDeviceID:
-    file: lib/SDL2/FFI.pm
+    file: lib/SDL2/events.pm
   SDL2::AudioSpec:
-    file: lib/SDL2/AudioSpec.pm
+    file: lib/SDL2/audio.pm
   SDL2::AudioStream:
-    file: lib/SDL2/FFI.pm
+    file: lib/SDL2/audio.pm
+  SDL2::Cocoa:
+    file: lib/SDL2/syswm.pm
   SDL2::Color:
-    file: lib/SDL2/Color.pm
+    file: lib/SDL2/pixels.pm
   SDL2::CommonEvent:
-    file: lib/SDL2/CommonEvent.pm
+    file: lib/SDL2/events.pm
   SDL2::Cond:
-    file: lib/SDL2/Cond.pm
+    file: lib/SDL2/mutex.pm
   SDL2::ControllerAxisEvent:
-    file: lib/SDL2/ControllerAxisEvent.pm
+    file: lib/SDL2/events.pm
   SDL2::ControllerButtonEvent:
-    file: lib/SDL2/ControllerButtonEvent.pm
+    file: lib/SDL2/events.pm
   SDL2::ControllerDeviceEvent:
-    file: lib/SDL2/ControllerDeviceEvent.pm
+    file: lib/SDL2/events.pm
+  SDL2::ControllerSensorEvent:
+    file: lib/SDL2/events.pm
   SDL2::ControllerTouchpadEvent:
-    file: lib/SDL2/FFI.pm
+    file: lib/SDL2/events.pm
   SDL2::Cursor:
-    file: lib/SDL2/FFI.pm
+    file: lib/SDL2/mouse.pm
+    version: '0.01'
+  SDL2::DFB:
+    file: lib/SDL2/syswm.pm
   SDL2::DisplayEvent:
-    file: lib/SDL2/DisplayEvent.pm
+    file: lib/SDL2/events.pm
   SDL2::DisplayMode:
-    file: lib/SDL2/DisplayMode.pm
+    file: lib/SDL2/video.pm
   SDL2::DollarGestureEvent:
-    file: lib/SDL2/DollarGestureEvent.pm
+    file: lib/SDL2/events.pm
   SDL2::DropEvent:
-    file: lib/SDL2/DropEvent.pm
-  SDL2::Enum:
-    file: lib/SDL2/Enum.pm
+    file: lib/SDL2/events.pm
   SDL2::Event:
-    file: lib/SDL2/Event.pm
+    file: lib/SDL2/events.pm
   SDL2::FFI:
     file: lib/SDL2/FFI.pm
-    version: '0.05'
+    version: '0.07'
   SDL2::FPoint:
-    file: lib/SDL2/FPoint.pm
+    file: lib/SDL2/rect.pm
   SDL2::FRect:
-    file: lib/SDL2/FRect.pm
+    file: lib/SDL2/rect.pm
   SDL2::Finger:
-    file: lib/SDL2/FFI.pm
+    file: lib/SDL2/touch.pm
   SDL2::GLContext:
-    file: lib/SDL2/FFI.pm
+    file: lib/SDL2/video.pm
+    version: '0.01'
+  SDL2::GameController:
+    file: lib/SDL2/gamecontroller.pm
   SDL2::GameControllerButtonBind:
-    file: lib/SDL2/GameControllerButtonBind.pm
+    file: lib/SDL2/gamecontroller.pm
   SDL2::GameControllerButtonBind_Hat:
-    file: lib/SDL2/GameControllerButtonBind.pm
-  SDL2::GameCrontroller:
-    file: lib/SDL2/FFI.pm
+    file: lib/SDL2/gamecontroller.pm
+  SDL2::GameControllerButtonBind_Value:
+    file: lib/SDL2/gamecontroller.pm
   SDL2::Haptic:
-    file: lib/SDL2/FFI.pm
+    file: lib/SDL2/haptic.pm
+    version: '0.01'
   SDL2::HapticCondition:
-    file: lib/SDL2/HapticCondition.pm
+    file: lib/SDL2/haptic.pm
   SDL2::HapticConstant:
-    file: lib/SDL2/HapticConstant.pm
+    file: lib/SDL2/haptic.pm
   SDL2::HapticCustom:
-    file: lib/SDL2/HapticCustom.pm
+    file: lib/SDL2/haptic.pm
   SDL2::HapticDirection:
-    file: lib/SDL2/HapticDirection.pm
+    file: lib/SDL2/haptic.pm
   SDL2::HapticEffect:
-    file: lib/SDL2/HapticEffect.pm
+    file: lib/SDL2/haptic.pm
   SDL2::HapticLeftRight:
-    file: lib/SDL2/HapticLeftRight.pm
+    file: lib/SDL2/haptic.pm
   SDL2::HapticPeriodic:
-    file: lib/SDL2/HapticPeriodic.pm
+    file: lib/SDL2/haptic.pm
   SDL2::HapticRamp:
-    file: lib/SDL2/HapticRamp.pm
+    file: lib/SDL2/haptic.pm
+  SDL2::ID3D11Device:
+    file: lib/SDL2/system.pm
+  SDL2::IDirect3DDevice9:
+    file: lib/SDL2/system.pm
   SDL2::Image:
     file: lib/SDL2/FFI.pm
   SDL2::JoyAxisEvent:
-    file: lib/SDL2/JoyAxisEvent.pm
+    file: lib/SDL2/events.pm
   SDL2::JoyBallEvent:
-    file: lib/SDL2/JoyBallEvent.pm
+    file: lib/SDL2/events.pm
   SDL2::JoyButtonEvent:
-    file: lib/SDL2/JoyButtonEvent.pm
+    file: lib/SDL2/events.pm
   SDL2::JoyDeviceEvent:
-    file: lib/SDL2/JoyDeviceEvent.pm
+    file: lib/SDL2/events.pm
   SDL2::JoyHatEvent:
-    file: lib/SDL2/JoyHatEvent.pm
+    file: lib/SDL2/events.pm
   SDL2::Joystick:
-    file: lib/SDL2/Joystick.pm
+    file: lib/SDL2/joystick.pm
   SDL2::JoystickGUID:
-    file: lib/SDL2/JoystickGUID.pm
-  SDL2::JoystickID:
-    file: lib/SDL2/FFI.pm
+    file: lib/SDL2/joystick.pm
   SDL2::KeyboardEvent:
-    file: lib/SDL2/KeyboardEvent.pm
+    file: lib/SDL2/events.pm
   SDL2::Keysym:
-    file: lib/SDL2/Keysym.pm
+    file: lib/SDL2/keyboard.pm
   SDL2::Locale:
-    file: lib/SDL2/Locale.pm
+    file: lib/SDL2/locale.pm
   SDL2::MessageBoxButtonData:
-    file: lib/SDL2/MessageBoxButtonData.pm
+    file: lib/SDL2/messagebox.pm
   SDL2::MessageBoxColor:
-    file: lib/SDL2/MessageBoxColor.pm
+    file: lib/SDL2/messagebox.pm
   SDL2::MessageBoxColorScheme:
-    file: lib/SDL2/MessageBoxColorScheme.pm
+    file: lib/SDL2/messagebox.pm
   SDL2::MessageBoxData:
-    file: lib/SDL2/MessageBoxData.pm
+    file: lib/SDL2/messagebox.pm
   SDL2::MetalView:
-    file: lib/SDL2/MetalView.pm
+    file: lib/SDL2/metal.pm
   SDL2::Mixer:
     file: lib/SDL2/FFI.pm
   SDL2::Mixer::Chunk:
@@ -156,27 +165,29 @@ provides:
   SDL2::Mixer::MusicType:
     file: lib/SDL2/FFI.pm
   SDL2::MouseButtonEvent:
-    file: lib/SDL2/MouseButtonEvent.pm
+    file: lib/SDL2/events.pm
   SDL2::MouseMotionEvent:
-    file: lib/SDL2/MouseMotionEvent.pm
+    file: lib/SDL2/events.pm
   SDL2::MouseWheelEvent:
-    file: lib/SDL2/MouseWheelEvent.pm
+    file: lib/SDL2/events.pm
   SDL2::MultiGestureEvent:
-    file: lib/SDL2/MultiGestureEvent.pm
+    file: lib/SDL2/events.pm
   SDL2::Mutex:
-    file: lib/SDL2/Mutex.pm
+    file: lib/SDL2/mutex.pm
   SDL2::Net:
     file: lib/SDL2/FFI.pm
+  SDL2::OS2:
+    file: lib/SDL2/syswm.pm
   SDL2::OSEvent:
-    file: lib/SDL2/OSEvent.pm
+    file: lib/SDL2/events.pm
   SDL2::Palette:
-    file: lib/SDL2/Palette.pm
+    file: lib/SDL2/pixels.pm
   SDL2::PixelFormat:
-    file: lib/SDL2/PixelFormat.pm
+    file: lib/SDL2/pixels.pm
   SDL2::Point:
-    file: lib/SDL2/Point.pm
+    file: lib/SDL2/rect.pm
   SDL2::QuitEvent:
-    file: lib/SDL2/QuitEvent.pm
+    file: lib/SDL2/events.pm
   SDL2::RTF:
     file: lib/SDL2/FFI.pm
   SDL2::RTF::Context:
@@ -184,35 +195,29 @@ provides:
   SDL2::RTF::FontEngine:
     file: lib/SDL2/FFI.pm
   SDL2::RWops:
-    file: lib/SDL2/FFI.pm
+    file: lib/SDL2/rwops.pm
   SDL2::Rect:
-    file: lib/SDL2/Rect.pm
+    file: lib/SDL2/rect.pm
   SDL2::Renderer:
-    file: lib/SDL2/Renderer.pm
+    file: lib/SDL2/render.pm
   SDL2::RendererInfo:
-    file: lib/SDL2/RendererInfo.pm
-  SDL2::Sem:
-    file: lib/SDL2/Sem.pm
+    file: lib/SDL2/render.pm
   SDL2::Semaphore:
-    file: lib/SDL2/Semaphore.pm
+    file: lib/SDL2/mutex.pm
   SDL2::Sensor:
-    file: lib/SDL2/FFI.pm
+    file: lib/SDL2/sensor.pm
   SDL2::SensorEvent:
-    file: lib/SDL2/SensorEvent.pm
-  SDL2::SensorID:
-    file: lib/SDL2/FFI.pm
-  SDL2::ShapeDriver:
-    file: lib/SDL2/FFI.pm
-  SDL2::SpinLock:
-    file: lib/SDL2/FFI.pm
+    file: lib/SDL2/events.pm
   SDL2::Surface:
-    file: lib/SDL2/Surface.pm
+    file: lib/SDL2/surface.pm
   SDL2::SysWMEvent:
-    file: lib/SDL2/SysWMEvent.pm
+    file: lib/SDL2/events.pm
+    version: '0.01'
   SDL2::SysWMinfo:
-    file: lib/SDL2/FFI.pm
+    file: lib/SDL2/syswm.pm
+    version: '0.01'
   SDL2::SysWMmsg:
-    file: lib/SDL2/SysWMmsg.pm
+    file: lib/SDL2/syswm.pm
   SDL2::TTF:
     file: lib/SDL2/FFI.pm
   SDL2::TTF::Font:
@@ -222,63 +227,188 @@ provides:
   SDL2::TTF::PosBuf:
     file: lib/SDL2/FFI.pm
   SDL2::TextEditingEvent:
-    file: lib/SDL2/TextEditingEvent.pm
+    file: lib/SDL2/events.pm
   SDL2::TextInputEvent:
-    file: lib/SDL2/TextInputEvent.pm
+    file: lib/SDL2/events.pm
   SDL2::Texture:
-    file: lib/SDL2/Texture.pm
+    file: lib/SDL2/render.pm
   SDL2::Thread:
-    file: lib/SDL2/FFI.pm
+    file: lib/SDL2/thread.pm
   SDL2::TouchFingerEvent:
-    file: lib/SDL2/TouchFingerEvent.pm
+    file: lib/SDL2/events.pm
+  SDL2::UIKit:
+    file: lib/SDL2/syswm.pm
   SDL2::UserEvent:
-    file: lib/SDL2/UserEvent.pm
+    file: lib/SDL2/events.pm
   SDL2::Utils:
     file: lib/SDL2/Utils.pm
-  SDL2::VideoBootStrap:
-    file: lib/SDL2/FFI.pm
-  SDL2::VideoDevice:
-    file: lib/SDL2/FFI.pm
-  SDL2::VideoDisplay:
-    file: lib/SDL2/FFI.pm
+  SDL2::Utils::Type::Enum:
+    file: lib/SDL2/Utils/Type/Enum.pm
+    version: '0.07'
+  SDL2::Version:
+    file: lib/SDL2/version.pm
+  SDL2::Vivante:
+    file: lib/SDL2/syswm.pm
+  SDL2::Win:
+    file: lib/SDL2/syswm.pm
   SDL2::Window:
-    file: lib/SDL2/Window.pm
+    file: lib/SDL2/video.pm
   SDL2::WindowEvent:
-    file: lib/SDL2/WindowEvent.pm
+    file: lib/SDL2/events.pm
   SDL2::WindowShapeMode:
-    file: lib/SDL2/FFI.pm
+    file: lib/SDL2/shape.pm
   SDL2::WindowShapeParams:
-    file: lib/SDL2/FFI.pm
-  SDL2::WindowShaper:
-    file: lib/SDL2/WindowShaper.pm
-  SDL2::WindowUserData:
-    file: lib/SDL2/FFI.pm
-  SDL2::assert_data:
-    file: lib/SDL2/FFI.pm
+    file: lib/SDL2/shape.pm
+  SDL2::X11:
+    file: lib/SDL2/syswm.pm
+  SDL2::assert:
+    file: lib/SDL2/assert.pm
+  SDL2::atomic:
+    file: lib/SDL2/atomic.pm
   SDL2::atomic_t:
-    file: lib/SDL2/FFI.pm
+    file: lib/SDL2/atomic_t.pm
+  SDL2::audio:
+    file: lib/SDL2/audio.pm
+  SDL2::blendmode:
+    file: lib/SDL2/blendmode.pm
+    version: '0.01'
+  SDL2::clipboard:
+    file: lib/SDL2/clipboard.pm
+    version: '0.01'
+  SDL2::endian:
+    file: lib/SDL2/endian.pm
+  SDL2::error:
+    file: lib/SDL2/error.pm
+    version: '0.01'
+  SDL2::events:
+    file: lib/SDL2/events.pm
+    version: '0.01'
+  SDL2::filesystem:
+    file: lib/SDL2/filesystem.pm
+    version: '0.01'
+  SDL2::gamecontroller:
+    file: lib/SDL2/gamecontroller.pm
+    version: '0.01'
+  SDL2::gesture:
+    file: lib/SDL2/gesture.pm
+    version: '0.01'
+  SDL2::haptic:
+    file: lib/SDL2/haptic.pm
+    version: '0.01'
+  SDL2::hints:
+    file: lib/SDL2/hints.pm
+    version: '0.01'
   SDL2::iconv_t:
-    file: lib/SDL2/FFI.pm
+    file: lib/SDL2/iconv_t.pm
+    version: '0.01'
+  SDL2::joystick:
+    file: lib/SDL2/joystick.pm
+    version: '0.01'
+  SDL2::keyboard:
+    file: lib/SDL2/keyboard.pm
+    version: '0.01'
+  SDL2::keycode:
+    file: lib/SDL2/keycode.pm
+    version: '0.01'
+  SDL2::loadso:
+    file: lib/SDL2/loadso.pm
+    version: '0.01'
+  SDL2::locale:
+    file: lib/SDL2/locale.pm
+  SDL2::log:
+    file: lib/SDL2/log.pm
+    version: '0.01'
+  SDL2::messagebox:
+    file: lib/SDL2/messagebox.pm
+    version: '0.01'
+  SDL2::metal:
+    file: lib/SDL2/metal.pm
+    version: '0.01'
+  SDL2::misc:
+    file: lib/SDL2/misc.pm
+  SDL2::mouse:
+    file: lib/SDL2/mouse.pm
+    version: '0.01'
+  SDL2::msg:
+    file: lib/SDL2/syswm.pm
+  SDL2::mutex:
+    file: lib/SDL2/mutex.pm
+    version: '0.01'
+  SDL2::pixels:
+    file: lib/SDL2/pixels.pm
+    version: '0.01'
+  SDL2::platform:
+    file: lib/SDL2/platform.pm
+    version: '0.01'
+  SDL2::power:
+    file: lib/SDL2/power.pm
+    version: '0.01'
+  SDL2::quit:
+    file: lib/SDL2/quit.pm
+    version: '0.01'
+  SDL2::rect:
+    file: lib/SDL2/rect.pm
+  SDL2::render:
+    file: lib/SDL2/render.pm
+    version: '0.01'
+  SDL2::rwops_h:
+    file: lib/SDL2/rwops.pm
+  SDL2::scancode:
+    file: lib/SDL2/scancode.pm
+    version: '0.01'
+  SDL2::sensor:
+    file: lib/SDL2/sensor.pm
+    version: '0.01'
+  SDL2::shape:
+    file: lib/SDL2/shape.pm
+    version: '0.01'
+  SDL2::stdinc:
+    file: lib/SDL2/stdinc.pm
+    version: '0.01'
+  SDL2::surface:
+    file: lib/SDL2/surface.pm
+    version: '0.01'
+  SDL2::system:
+    file: lib/SDL2/system.pm
+    version: '0.01'
+  SDL2::syswm:
+    file: lib/SDL2/syswm.pm
+    version: '0.01'
+  SDL2::thread:
+    file: lib/SDL2/thread.pm
+    version: '0.01'
+  SDL2::timer:
+    file: lib/SDL2/timer.pm
+    version: '0.01'
+  SDL2::touch:
+    file: lib/SDL2/touch.pm
+    version: '0.01'
   SDL2::version:
     file: lib/SDL2/version.pm
     version: '0.01'
-  SDL3:
-    file: lib/SDL2/FFI.pm
+  SDL2::video:
+    file: lib/SDL2/video.pm
+recommends:
+  B::Deparse: '0'
 requires:
-  Alien::libsdl2: '1.02'
+  Alien::libsdl2: '== 1.06'
   Data::Dump: '0'
+  Devel::CheckBin: '0'
   Exporter::Tiny: '0'
+  FFI::Build: '1.04'
   FFI::C: '0'
-  FFI::Platypus: '1.46'
-  File::ShareDir: '0'
+  FFI::Platypus: '1.55'
+  File::Share: '0'
   File::Spec::Functions: '0'
+  Path::Tiny: '0'
+  Try::Tiny: '0'
   perl: '5.02000'
   strictures: '2'
 resources:
   bugtracker: https://github.com/sanko/SDL2.pm/issues
   homepage: https://github.com/sanko/SDL2.pm
   repository: git://github.com/sanko/SDL2.pm.git
-version: '0.05'
+version: '0.07'
 x_authority: cpan:SANKO
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -1,9 +1,0 @@
-# place this in your homedir as file .muphone_conf.yaml
-# if you want to run the home dir conf loading test
-default_country: 'US'
-dialer:
-  pause: ','
-countries:
-  US:
-    some: 'value'
-is_home_conf: 1

@@ -32,7 +32,7 @@ in more detail below:
 
 =item B<Create the RPM packages>
 
-=item B<Sign the RPM packages>
+=item B<Sign the RPM packages (optional)>
 
 =item B<Install the RPM (optional)>
 
@@ -328,6 +328,10 @@ The given string is passed to either the 'perl Build.PL' or 'perl
 Makefile.PL' command used to configure the module and create a Build
 script or a Makefile.  This option can be passed in any number of
 times, but only a single option should be included in each STRING.
+B<STRING> is passed in as a command line argument:
+
+   perl Makefile.PL STRING
+   perl Build.PL STRING
 
 Since the arguments passed in differ when using a Makefile.PL and a
 Build.PL procedure, for safety, you should always include the B<--build-type>
@@ -336,6 +340,29 @@ option when using this option.
 =item B<--build STRING>
 
 Similar to the B<--config> option except this passes strings which
+are passed to either the './Build' or 'make' command used to actually
+build the module.  This option can be passed in any number of times.
+
+=item B<--config-input STRING>
+
+Sometimes, the configure step prompts for input that cannot be set
+using an environment variable.  In this case, this option may be used
+to pass in a single line of input to the 'perl Build.PL' or 'perl
+Makefile.PL' command used to configure the module and create a Build
+script or a Makefile.  This option can be passed in any number of
+times, but each value should include a single line of input.  This will
+result in the following:
+
+   echo STRING | perl Makefile.PL
+   echo STRING | perl Build.PL
+
+Since the arguments passed in differ when using a Makefile.PL and a
+Build.PL procedure, for safety, you should always include the B<--build-type>
+option when using this option.
+
+=item B<--build-input STRING>
+
+Similar to the B<--config-input> option except this passes strings which
 are passed to either the './Build' or 'make' command used to actually
 build the module.  This option can be passed in any number of times.
 

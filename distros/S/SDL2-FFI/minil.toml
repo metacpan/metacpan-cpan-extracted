@@ -6,6 +6,8 @@ license="artistic_2"
 authority="cpan:SANKO"
 readme_from="lib/SDL2/FFI.pm"
 abstract_from="lib/SDL2/FFI.pm"
+#requires_external_bin=["make');check_bin('gcc');\nBuild_PL();\nmkdir 'share';chdir 'ffi';`make install prefix='../share'`;\nexit;('1"]
+#requires_external_bin=["perl');\nBuild_PL();\nuse lib qw[blib/lib lib];use SDL2::Utils;SDL2::Utils::ffi();\nexit;('1"]
 
 [release]
 hook=[

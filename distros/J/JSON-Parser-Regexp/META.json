@@ -32,14 +32,11 @@
       },
       "runtime" : {
          "requires" : {
-            "Alt::Devel::CallParser::ButWorking" : "0",
-            "Kavorka" : "0",
-            "Mouse" : "0",
             "Regexp::Grammars" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.04",
+   "version" : "0.19",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

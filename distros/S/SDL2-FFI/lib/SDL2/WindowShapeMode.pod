@@ -1,0 +1,47 @@
+=encoding utf-8
+
+=head1 NAME
+
+SDL2::WindowShapeMode - SDL Window-shaper Structure
+
+=head1 SYNOPSIS
+
+    use SDL2 qw[:all];
+
+=head1 DESCRIPTION
+
+SDL2::WindowShapeMode is a struct that tags the L<SDL2::WindowShapeParams>
+union with an enum describing the type of its contents.
+
+=head2 Fields
+
+=over
+
+=item C<mode> - The mode of these window-shape parameters
+
+=item C<parameters> - Window-shape parameters
+
+=back
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under
+the terms found in the Artistic License 2. Other copyrights, terms, and
+conditions may apply to data transmitted through this module.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=begin stopwords
+
+struct enum
+
+=end stopwords
+
+=cut
+
+};
+1;

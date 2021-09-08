@@ -1,0 +1,34 @@
+<%doc>
+Show the search results page using the parameters saved in the search link
+with the given ID.
+</%doc>
+\
+<%ARGS>
+$id => undef
+</%ARGS>
+\
+<%INIT>
+if ( not $id ) {
+    $m->comp( '/Elements/Error', Why => loc('No ID specified') );
+}
+
+if ( $id =~ /^\d+$/ ) {
+    $m->comp( '/Elements/Error', Why => loc('Not a valid link') );
+}
+
+my $SharedSearchLink
+    = RT::ShareSearchLink::SharedSearchLink->new( $session{'CurrentUser'} );
+
+if ( not $SharedSearchLink->Load($id) ) {
+    $m->comp( '/Elements/Error',
+        Why => loc('Link not found - it may have expired') );
+}
+
+my %StoredArgs = $SharedSearchLink->Parameters();
+
+$SharedSearchLink->AddView();
+
+$m->comp( 'Results.html', %StoredArgs,
+    'ShareSearchLinkUUID' => $SharedSearchLink->UUID );
+return;
+</%INIT>

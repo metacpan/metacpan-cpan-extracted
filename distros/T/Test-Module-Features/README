@@ -1,0 +1,82 @@
+NAME
+    Test::Module::Features - Test feature set specifications and features
+    declarations
+
+VERSION
+    This document describes version 0.001 of Test::Module::Features (from
+    Perl distribution Test-Module-Features), released on 2021-02-26.
+
+SYNOPSIS
+    To check a single a module:
+
+     use Test::Module::Features;
+     module_features_in_module_ok("Foo::Bar", {opt => ...}, $msg);
+
+    Alternatively, you can check all modules in a distro:
+
+     # save in release-module-features.t, put in distro's t/ subdirectory
+     use Test::More;
+     plan skip_all => "Not release testing" unless $ENV{RELEASE_TESTING};
+     eval "use Test::Module::Features";
+     plan skip_all => "Test::Module::Features required for testing feature set specifications and features declarations" if $@;
+     module_features_in_all_modules_ok({opt => ...}, $msg);
+
+DESCRIPTION
+ACKNOWLEDGEMENTS
+    Some code taken from Test::Pod::Coverage by Andy Lester.
+
+FUNCTIONS
+    All these functions are exported by default.
+
+  module_features_in_module_ok
+    Usage:
+
+     module_features_in_module_ok($module [, \%opts ] [, $msg])
+
+    Load $module and perform test on module's feature set specifications
+    and/or features declarations.
+
+    Available options:
+
+  module_features_in_all_modules_ok
+    Usage:
+
+     module_features_in_all_modules_ok([ \%opts ] [, $msg])
+
+    Look for modules in directory "lib" (or "blib" instead, if it exists),
+    and run "module_features_in_module_ok()" against each of them.
+
+    Options are the same as in "module_features_in_module_ok()".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Test-Module-Features>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Test-Module-Features>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-Test-Module-Features/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    test-module-features, a command-line interface for
+    "module_features_in_all_modules_ok()".
+
+    Module::Features
+
+    Dist::Zilla::Plugin::Module::Features
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

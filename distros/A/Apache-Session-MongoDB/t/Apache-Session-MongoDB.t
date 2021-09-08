@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use utf8;
 
-use Test::More tests => 11;
+use Test::More tests => 24;
 BEGIN { use_ok('Apache::Session::MongoDB') }
 
 #########################
@@ -20,7 +20,7 @@ BEGIN { use_ok('Apache::Session::MongoDB') }
 SKIP: {
 
     unless ( defined $ENV{MONGODB_SERVER} ) {
-        skip 'MONGODB_SERVER is not set', 10;
+        skip 'MONGODB_SERVER is not set', 23;
     }
     my %h;
     my $args = { host => $ENV{MONGODB_SERVER} };
@@ -54,6 +54,79 @@ SKIP: {
     #binmode(STDERR, ":utf8");
     #print STDERR $h2{utf8}."\n";
 
+    # Create a few sessions to test deleteIfLowerThan
+    my @delSessions;
+    push @delSessions,
+      newsession( $args, type => "persistent", ttl => 100 ),
+      newsession( $args, type => "persistent", ttl => 10 ),
+      newsession( $args, type => "temporary",  ttl => 100 ),
+      newsession( $args, type => "temporary",  ttl => 10 ),
+      newsession( $args, type => "temporary",  ttl => 100, actttl => 10 ),
+      newsession( $args, type => "temporary",  ttl => 10 );
+
+    is(
+        keys
+          %{ Apache::Session::MongoDB->searchOn( $args, "type", "persistent" )
+          },
+        2,
+        "Check correct number of permanent sessions"
+    );
+    is(
+        keys
+          %{ Apache::Session::MongoDB->searchOn( $args, "type", "temporary" ) },
+        4,
+        "check correct number of temp sessions"
+    );
+
+    my ( $status, $count ) = Apache::Session::MongoDB->deleteIfLowerThan(
+        $args,
+        {
+            not => { 'type' => 'persistent' },
+            or  => {
+                ttl    => 50,
+                actttl => 50,
+            }
+        }
+    );
+    is( $status, 1, "reported success" );
+    is( $count,  3, "3 sessions deleted" );
+
+    # Make sure success is correctly returned as a scalar when no job is done
+    $status = Apache::Session::MongoDB->deleteIfLowerThan(
+        $args,
+        {
+            not => { 'type' => 'persistent' },
+            or  => {
+                ttl    => 50,
+                actttl => 50,
+            }
+        }
+    );
+    is( $status, 1, "Status is OK" );
+
+    is(
+        keys
+          %{ Apache::Session::MongoDB->searchOn( $args, "type", "persistent" )
+          },
+        2,
+        "Check correct number of permanent sessions"
+    );
+    is(
+        keys
+          %{ Apache::Session::MongoDB->searchOn( $args, "type", "temporary" ) },
+        1,
+        "check correct number of temp sessions"
+    );
+
+    # Delete sessions
+    for (@delSessions) {
+        my %h;
+        eval {
+            tie( %h, 'Apache::Session::MongoDB', $_, $args );
+            tied(%h)->delete;
+        }
+    }
+
     ok( ( tied(%h2)->delete or 1 ), 'Delete session' );
 
     unless ( defined $ENV{MONGODB_USER} and defined $ENV{MONGODB_DB_NAME} ) {
@@ -66,4 +139,16 @@ SKIP: {
     ok( tie( %h, 'Apache::Session::MongoDB', undef, $args ),
         'Authentified object' );
     ok( ( tied(%h)->delete or 1 ), 'Delete session' );
+}
+
+sub newsession {
+    my ( $args, %data ) = @_;
+    my %h;
+    ok( tie( %h, 'Apache::Session::MongoDB', undef, $args ), 'New object' );
+    for ( keys %data ) {
+        $h{$_} = $data{$_};
+    }
+    my $id = $h{_session_id};
+    untie(%h);
+    return $id;
 }

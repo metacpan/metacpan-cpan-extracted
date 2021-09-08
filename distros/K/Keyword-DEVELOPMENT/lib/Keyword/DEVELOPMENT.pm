@@ -15,7 +15,7 @@ Version 0.06
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 
@@ -48,8 +48,17 @@ This is primarily a development tool for performance-critical code.
 
 =cut
 
+my %CALLER;
+
 sub import {
+    my $class = shift;
     my $caller = caller;
+
+    my $include_production;
+    if ( grep { '-production' eq $_ } @_ ) {
+        $include_production = 1;
+        $CALLER{PRODUCTION} = $include_production;
+    }
 
     my $match = $ENV{PERL_KEYWORD_DEVELOPMENT_MATCH};
     if ( defined $match ) {
@@ -76,10 +85,22 @@ sub import {
         }
         substr( $$ref, 0, 0 ) = "if ($in_development)";
     };
-}
 
-sub unimport {
-    Keyword::Simple::undefine 'DEVELOPMENT';
+    if ($include_production) {
+        Keyword::Simple::define 'PRODUCTION', sub {
+            my $in_development = 0;
+            my ($ref) = @_;
+            if ( $ENV{PERL_KEYWORD_DEVELOPMENT} ) {
+                if ( defined $match ) {
+                    $in_development = $caller =~ /$match/ ? 1 : 0;
+                }
+                else {
+                    $in_development = 1;
+                }
+            }
+            substr( $$ref, 0, 0 ) = "unless ($in_development)";
+        };
+    }
 }
 
 =head1 EXAMPLE
@@ -144,6 +165,30 @@ As you can see, there are only comments there, no code.
 Note the handy line directive on line 13 to ensure your line numbers remain
 correct. If you're not familiar with line directives, see
 L<https://perldoc.perl.org/perlsyn.html#Plain-Old-Comments-(Not!)>
+
+=head1 PRODUCTION
+
+As an if/else, you use pass C<-production> in the import list and get a
+C<PRODUCTION> keyword, too. A C<PRODUCTION> block will always fire when a
+C<DEVELOPMENT> block does not, and vice versa.
+
+    use Test::More;
+    use Keyword::DEVELOPMENT '-production';
+
+    my $value = 0;
+    DEVELOPMENT {
+        $value = 1;
+        fail "DEVELOPMENT should be off, so we shouldn't get to here";
+    }
+    is $value, 0, 'Our DEVELOPMENT function should not be called';
+
+    $value = 0;
+    PRODUCTION {
+        $value = 1;
+        pass "DEVELOPMENT should be off, so PRODUCTION blocks should fire";
+    }
+    ok $value, '... and be able to alter variables in its scope.';
+    done_testing;
 
 =head1 MATCHING PACKAGES
 

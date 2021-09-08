@@ -1,6 +1,6 @@
 package Bitcoin::Crypto::Role::Compressed;
 
-our $VERSION = "0.997";
+our $VERSION = "1.000";
 
 use v5.10;
 use warnings;
@@ -20,7 +20,10 @@ has "compressed" => (
 sub set_compressed
 {
 	my ($self, $state) = @_;
-	$state //= 1;
+
+	$state = 1
+		if @_ == 1;
+
 	$self->_set_compressed($state);
 	return $self;
 }

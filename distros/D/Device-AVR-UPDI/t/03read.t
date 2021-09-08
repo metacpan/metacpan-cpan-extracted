@@ -15,6 +15,7 @@ my $mockfio = Test::Future::IO->controller;
 
 my $updi = Device::AVR::UPDI->new( fh => MockFH->new, part => "ATtiny814" );
 # can't easily ->init_link without upsetting $mockfio
+$updi->_set_nvm_version( 0 );
 
 # read_updirev
 {

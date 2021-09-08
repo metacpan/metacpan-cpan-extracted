@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Test::More;
 
-use AI::Perceptron::Simple;
+use AI::Perceptron::Simple qw( :local_data );
 
 # pwd is the actual .pm module in blib
 # ie. My-Perceptron/blib/lib/My/Perceptron.pm
@@ -53,14 +53,17 @@ ok ( $perceptron->train( TRAINING_DATA, "brand", $nerve_file), "No problem with 
 # no longer returns the file anymore since v0.03
 # is ( $perceptron->train( TRAINING_DATA, "brand", $nerve_file), $nerve_file, "\'train\' method returns the correct value" );
 
-ok( AI::Perceptron::Simple->can("save_perceptron"), "&save_perceptron is persent" );
-ok( AI::Perceptron::Simple->can("load_perceptron"), "&loaded_perceptron is present" );
+subtest "Data related subroutine found" => sub {
+    ok( AI::Perceptron::Simple->can("save_perceptron"), "&save_perceptron is persent" );
+    ok( AI::Perceptron::Simple->can("load_perceptron"), "&loaded_perceptron is present" );
+};
 
-ok( AI::Perceptron::Simple::save_perceptron( $perceptron, $nerve_file ), "save_perceptron is working good so far" );
+
+ok( save_perceptron( $perceptron, $nerve_file ), "save_perceptron is working good so far" );
 ok( -e $nerve_file, "Found the perceptron file" );
 
-ok( AI::Perceptron::Simple::load_perceptron( $nerve_file ), "Perceptron loaded" );
-my $loaded_perceptron = AI::Perceptron::Simple::load_perceptron( $nerve_file );
+ok( load_perceptron( $nerve_file ), "Perceptron loaded" );
+my $loaded_perceptron = load_perceptron( $nerve_file );
 is( ref $loaded_perceptron, MODULE_NAME, "Correct class after loading" );
 
 done_testing();

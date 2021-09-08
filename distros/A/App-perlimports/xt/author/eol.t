@@ -32,6 +32,7 @@ my @files = (
     't/config-in-import.pl',
     't/cpan-modules/pithub.t',
     't/cpan-modules/test2-v0.t',
+    't/datetime.t',
     't/do-block.t',
     't/dump-perl-exports.t',
     't/dupes.t',

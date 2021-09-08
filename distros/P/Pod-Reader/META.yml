@@ -1,0 +1,38 @@
+---
+abstract: 'curses TUI to read Perl POD from.'
+author:
+  - 'Patrice Clement <monsieurp@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Reader
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Curses: '1.36'
+  Curses::UI: '0.9609'
+  File::Find: '0'
+  Getopt::Long: '0'
+  Pod::Usage: '0'
+  Term::ANSIColor: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/monsieurp/Pod-Reader/issues
+  homepage: https://github.com/monsieurp/Pod-Reader
+  license: https://opensource.org/licenses/BSD-3-Clause
+  repository: https://github.com/monsieurp/Pod-Reader.git
+version: '1.020'
+x_licence:
+  - bsd
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

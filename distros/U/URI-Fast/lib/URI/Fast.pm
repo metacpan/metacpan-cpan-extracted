@@ -1,6 +1,6 @@
 package URI::Fast;
 
-our $XS_VERSION = our $VERSION = '0.52';
+our $XS_VERSION = our $VERSION = '0.54';
 $VERSION =~ tr/_//;
 
 use utf8;
@@ -517,6 +517,10 @@ Both '&' and ';' are treated as separators for key/value parameters.
 =head2 frag
 
 The fragment section of the URI, excluding the leading C<#>.
+
+=head2 fragment
+
+An alias of L</frag>.
 
 =head1 METHODS
 

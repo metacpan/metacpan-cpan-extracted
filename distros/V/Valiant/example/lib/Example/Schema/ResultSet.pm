@@ -5,12 +5,12 @@ use warnings;
 use base 'DBIx::Class::ResultSet';
 
 __PACKAGE__->load_components(qw/
+  Valiant::ResultSet
   Helper::ResultSet::Shortcut
   Helper::ResultSet::Me
   Helper::ResultSet::SetOperations
   Helper::ResultSet::IgnoreWantarray
   ResultSet::CallbackInflator
-  Valiant::ResultSet
 /);
 
 sub to_array {

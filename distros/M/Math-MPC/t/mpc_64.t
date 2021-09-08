@@ -12,14 +12,15 @@ print "1..2\n";
 my $_64i = Math::MPC::_has_longlong();
 my $_64d = Math::MPC::_has_longdouble();
 
-if($_64i) {print "Using 64-bit integer\n"}
-else {print "Using 32-bit integer\n"}
+if($_64i) {warn "Using 64-bit integer\n"}
+else {warn "Using 32-bit integer\n"}
 
-if($_64d) {print "Using long double\n"}
-else {print "Not using long double\n"};
+if($_64d) {warn "Using long double\n"}
+else {warn "Not using long double\n"};
 
 my $uimax = ~0;
 my $simax = ($uimax - 1) / -2;
+#print "simax: $simax\n";
 my $mpc1 = Rmpc_init3(100, 100);
 my $mpfr1 = Rmpfr_init();
 my $uimpfr = Math::MPFR->new(~0);
@@ -60,7 +61,8 @@ else {Rmpc_set_d_d($mpc1, $uimax + 2, $uimax + 2, MPC_RNDNN)}
 # $uimax + 2 == $uimax + 1 (overflow) unless the precision of the NV exceeds that of the UV,
 # in which case $uimax + 2 == $uimax + 2
 
-if($Config{nvtype} ne '__float128' || MPFR_LDBL_DIG == 33) {
+if( $Config{nvtype} ne '__float128' || MPFR_LDBL_DIG == 33 ||
+   ($Config{nvtype} eq '__float128' && $Config{ivsize} == 4) ) {
   RMPC_RE($mpfr1, $mpc1);
   if($mpfr1 == $uimax + 2) {$ok .= 'e'}
   else {

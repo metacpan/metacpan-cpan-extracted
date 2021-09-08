@@ -5,7 +5,7 @@
 
 use Object::Pad 0.09;
 
-package Tickit::Widget::Fill 0.32;
+package Tickit::Widget::Fill 0.33;
 class Tickit::Widget::Fill
    extends Tickit::Widget;
 

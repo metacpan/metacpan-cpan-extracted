@@ -1,20 +1,15 @@
 package Devel::Git::MultiBisect::AllCommits;
-use strict;
-use warnings;
 use v5.14.0;
+use warnings;
 use parent( qw| Devel::Git::MultiBisect | );
 use Devel::Git::MultiBisect::Opts qw( process_options );
-use Devel::Git::MultiBisect::Auxiliary qw(
-    clean_outputfile
-    hexdigest_one_file
-    validate_list_sequence
-);
 use Carp;
 use Cwd;
 use File::Temp;
 use List::Util qw(first sum);
 
-our $VERSION = '0.15';
+our $VERSION = '0.19';
+$VERSION = eval $VERSION;
 
 =head1 NAME
 
@@ -48,9 +43,8 @@ large, a test may fail in B<more than one way> over that range.
 If that is the case, then simply asking, I<"When did this file start to
 fail?"> is insufficient.  We may want to capture the test output for each
 commit, or, more usefully, may want to capture the test output only at those
-commits where the output changed.
-
-F<Devel::Git::MultiBisect> provides methods to achieve that objective.  More specifically:
+commits where the output changed.  F<Devel::Git::MultiBisect::AllCommits>
+provides methods for the first of those objectives.  That is:
 
 =over 4
 

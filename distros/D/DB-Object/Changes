@@ -1,8 +1,20 @@
 Revision history for Perl module DB::Object
 
+v0.10.1 2021-08-29T16:13:07+0900
+    - Correcting minor bug in DB::Object::Postgres::Statement->disable_trigger
+
+v0.10.0 2021-08-29T12:03:12+0900
+    - Added method get_sql_type() to get driver specific constant called in DB::Object::Query and sub classes
+    - Added support for sub-query in tables/view fields operations in DB::Object::Fields::Field
+    - Added support for disabling and enabling triggers in DB::Object::Postgres::Table
+    - Added support for temporarily disabling and enabling triggers on an existing query in DB::Object::Postgres::Statement
+    - Added method promise in DB::Object::Statement to perform asynchronous query and returning a promise (Promise::Me) object
+    - Added method types_const() in DB::Object::Tables, which is a column name to hash of data type constant and name properties created by DB::Object::Tables->structure. This is then shared with the DB::Object::Fields::Field object and enables better placeholder management
+    - Added method constant in DB::Object::Fields::Field which returns an hash object with the following properties: constant (integer), name (string), and type (string)
+
 v0.9.15 2021-08-20T02:40:51+0900
     - Moved on_conflict from DB::Object to DB::Object::Tables, and DB::Object::Postgres to DB::Object::Postgres::Table and DB::Object::SQLite to DB::Object::SQLite::Tables where it belongs
-    - Moved alias as_string avoid insert limit local order replace reset returning reverse select sort tie unix_timestamp update where to L<DB::Object::Query>
+    - Moved alias as_string avoid insert limit local order replace reset returning reverse select sort tie unix_timestamp update where to DB::Object::Query
     - Updated the pod documentation with links for all of the above
     - Corrected a small bug in DB::Object::Postgres::Tables->on_conflict whereby an error was assumed when the turn value from DB::Object::Postgres::Query->on_conflict was false, but the latter returned a legitimate empty string that was mis-construed as an error
     - In DB::Object->table, which is used to instantiate DB::Object::Tables object, since it uses a cache to increase speed, here if a cached table object, it is cloned before it is returned to avoid undesirable effect like some table alias previously set and disturbing potential new queries.

@@ -1,5 +1,10 @@
 Revision history for JSON-Schema-Modern
 
+0.517     2021-08-28 04:34:17Z
+          - restore some optional modules used for format validation to the
+            prereq list that were mistakenly dropped in version 0.515
+          - date-time, date and time formats no longer match non-ascii digits
+
 0.516     2021-08-14 19:53:16Z
           - fix email format tests on older prereqs
           - avoid errors when enabling validate_formats before evaluating but

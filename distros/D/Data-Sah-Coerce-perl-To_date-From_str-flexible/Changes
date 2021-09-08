@@ -1,3 +1,23 @@
+0.009   2021-09-07  Released-By: PERLANCAR; Urgency: high
+
+	- [bugfix] Fix setting time zone.
+
+	- Add coercion rule: From_str::flexible_jakarta.
+
+
+0.008   2021-09-06  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention DateTime::Format::Flexible.
+
+
+0.007   2021-09-06  Released-By: PERLANCAR; Urgency: medium
+
+	- Add
+	  Data::Sah::Coerce::perl::To_date::From_str::flexible_{local,utc}.
+
+
 0.006   2019-11-28  Released-By: PERLANCAR; Urgency: medium
 
 	- Rename coerce rule modules again, revert to using lower_case

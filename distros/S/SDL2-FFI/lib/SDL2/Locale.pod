@@ -1,0 +1,49 @@
+=encoding utf-8
+
+=head1 NAME
+
+SDL2::Locale - SDL Locale Structure
+
+=head1 SYNOPSIS
+
+    use SDL2 qw[:locale];
+    my $locale = SDL_GetPreferredLocales( );
+
+=head1 DESCRIPTION
+
+SDL2::Locale is a structure containing the user's preferred locale.
+
+=head1 Fields
+
+=over
+
+=item C<language> - a language name; like "C<en>" for English
+
+=item C<country> - a country; like "C<US>" for the United States. Can be C<undef>
+
+=back
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under
+the terms found in the Artistic License 2. Other copyrights, terms, and
+conditions may apply to data transmitted through this module.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=begin stopwords
+
+fullscreen non-fullscreen high-dpi borderless resizable draggable taskbar
+tooltip popup subwindow macOS iOS NSHighResolutionCapable videomode screensaver
+wgl lifespan vsync glX framebuffer framerate
+
+=end stopwords
+
+=cut
+
+};
+1;

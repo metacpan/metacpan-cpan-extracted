@@ -2,7 +2,7 @@ NAME
     String::Copyright - Representation of text-based copyright statements
 
 VERSION
-    Version 0.003008
+    Version 0.003011
 
 SYNOPSIS
         use String::Copyright;
@@ -72,24 +72,25 @@ AUTHOR
     Jonas Smedegaard `<dr@jones.dk>`
 
 COPYRIGHT AND LICENSE
-    Derived from App::Licensecheck originally part of the KDE SDK, originally
-    introduced by Stefan Westerfeld `<stefan@space.twc.de>`; and on the script
-    licensecheck2dep5 part of Debian CDBS tool, written by Jonas Smedegaard.
+    This program is based on the script "licensecheck" from the KDE SDK,
+    originally introduced by Stefan Westerfeld `<stefan@space.twc.de>`.
 
       Copyright © 2007, 2008 Adam D. Barratt
 
-      Copyright © 2005-2012, 2016 Jonas Smedegaard
+      Copyright © 2005-2012, 2016, 2018, 2020-2021 Jonas Smedegaard
 
-    This program is free software; you can redistribute it and/or modify it
-    under the terms of the GNU General Public License as published by the Free
-    Software Foundation; either version 3, or (at your option) any later
-    version.
+      Copyright © 2018, 2020-2021 Purism SPC
+
+    This program is free software: you can redistribute it and/or modify it
+    under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3, or (at your option) any
+    later version.
 
     This program is distributed in the hope that it will be useful, but
     WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-    for more details.
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+    License for more details.
 
-    You should have received a copy of the GNU General Public License along
-    with this program. If not, see <https://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU Affero General Public License
+    along with this program. If not, see <https://www.gnu.org/licenses/>.
 

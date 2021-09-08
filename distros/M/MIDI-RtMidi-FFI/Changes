@@ -1,5 +1,11 @@
 Revision history for perl module MIDI::RtMidi::FFI
 
+0.03 2020-09-02
+
+  - Updated for FFI::Platypus API v1
+  - Neater integration with MIDI::Event
+  - New get_event method attempts to decode incoming messages
+
 0.01 2019-10-12
 
   - Initial release

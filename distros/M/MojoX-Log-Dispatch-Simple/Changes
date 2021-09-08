@@ -1,5 +1,8 @@
 Revision history for MojoX::Log::Dispatch::Simple
 
+1.10      2021-08-26 09:51:16-07:00 America/Los_Angeles
+        - Additional support for latest Mojo::Log improvements (sort of)
+
 1.09      2021-08-17 11:06:44-07:00 America/Los_Angeles
         - Support (hacks) for latest Mojo::Log improvements (sort of)
 

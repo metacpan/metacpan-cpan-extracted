@@ -1,5 +1,5 @@
 package Yancy::Model::Schema;
-our $VERSION = '1.076';
+our $VERSION = '1.077';
 # ABSTRACT: Interface to a single schema
 
 #pod =head1 SYNOPSIS
@@ -96,8 +96,8 @@ sub build_item {
 #pod =cut
 
 sub get {
-    my ( $self, $id ) = @_;
-    return $self->build_item( $self->_backend->get( $self->name, $id ) // return undef );
+    my ( $self, $id, %opt ) = @_;
+    return $self->build_item( $self->_backend->get( $self->name, $id, %opt ) // return undef );
 }
 
 #pod =method list
@@ -163,7 +163,7 @@ Yancy::Model::Schema - Interface to a single schema
 
 =head1 VERSION
 
-version 1.076
+version 1.077
 
 =head1 SYNOPSIS
 

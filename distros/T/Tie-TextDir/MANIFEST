@@ -1,8 +1,11 @@
 Build.PL
 Changes
-MANIFEST
-META.yml
 Makefile.PL
+MANIFEST
+META.json
+META.yml
 README
-TextDir.pm
 t/basic.t
+t/hierarchic.t
+TextDir.pm
+SIGNATURE    Added here by Module::Build

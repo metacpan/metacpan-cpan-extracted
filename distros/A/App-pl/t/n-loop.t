@@ -8,7 +8,6 @@ $_ = $0;
 s~[^/\\]+$~~;
 chdir $_ if length;
 
-open my $ffhh, '>', '/run/shm/ffhh';
 # run pl, expect $_
 sub pl(@) {
     my $fh;
@@ -21,7 +20,7 @@ sub pl(@) {
     local $/;
     my $ret = <$fh>;
     ok $ret eq $_, join ' ', 'pl', map /[\s*?()[\]{}\$\\'";|&]|^$/ ? "'$_'" : $_, @_
-      or print $ffhh "got: '$ret', expected: '$_'\n";
+      or print "got: '$ret', expected: '$_'\n";
 }
 # run pl, expect shift
 sub pl_e($@) {
@@ -46,9 +45,10 @@ bof
 0;atom-weight-1.csv:2 1,H,Hydrogen,1:H & alkali metal,1.008
 0;atom-weight-1.csv:3 4,Be,Beryllium,2:alkaline earth metal,9.012
 0;atom-weight-1.csv:4 41,Nb,Niobium,5:no name,92.906
-0;atom-weight-1.csv:5 74,W,Tungsten,6:transition metal,183.84
-0;atom-weight-1.csv:6 8,O,Oxygen,16:O & chalcogen,15.999
-0;atom-weight-1.csv:7 80,Hg,Mercury,12:no name,200.592
+0;atom-weight-1.csv:5 42,Ve,Veritasium,6:an element of truth,i
+0;atom-weight-1.csv:6 74,W,Tungsten,6:transition metal,183.84
+0;atom-weight-1.csv:7 8,O,Oxygen,16:O & chalcogen,16
+0;atom-weight-1.csv:8 80,Hg,Mercury,12:no name,200.592
 eof
 bof
 1;atom-weight-2.csv:1 0,n,Neutronium,18:noble gas,1

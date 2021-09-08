@@ -54,11 +54,17 @@ sub new_foreign
 			$xftp->{xftp_lastmsg} = $xftp->{xftp}->error;
 			$xftp->{xftp_lastmsg} .= ' ' . $errORwarn  if ($errORwarn);
 			$@ = $xftp->{xftp_lastmsg};
+			$xftp->{protocol} = 'Net::SFTP::Foreign';
 			return undef;
 		}
 		return $xftp;
 	}
 	return undef;
+}
+
+sub protocol
+{
+	return shift->{protocol};
 }
 
 {

@@ -33,4 +33,3 @@
     %= button_tag { class=>'btn btn-lg btn-primary btn-block', value=>'Sign In' }, 'Sign In'
   </fieldset>
 % end
-

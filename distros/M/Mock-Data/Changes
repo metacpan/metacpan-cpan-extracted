@@ -1,0 +1,7 @@
+0.02 - 2021-09-06
+  - Updated to support perl back to 5.10
+  - Optimized the 'brute force' character set building
+  - Documented the Plugin system
+
+0.01 - 2021-09-04
+  - Initial public release

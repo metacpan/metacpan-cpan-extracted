@@ -10,14 +10,6 @@
 
 #include "XSParseSublike.h"
 
-static bool red_permit(pTHX_ void *_)
-{
-  if(!hv_fetchs(GvHV(PL_hintgv), "t::registrations/red", 0))
-    return false;
-
-  return true;
-}
-
 static void red_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *_)
 {
   /* Throw away the entire function body; replace it with a constant */
@@ -26,17 +18,9 @@ static void red_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *_)
 }
 
 static const struct XSParseSublikeHooks parse_red_hooks = {
-  .permit       = red_permit,
+  .permit_hintkey = "t::registrations/red",
   .pre_blockend = red_pre_blockend,
 };
-
-static bool blue_permit(pTHX_ void *_)
-{
-  if(!hv_fetchs(GvHV(PL_hintgv), "t::registrations/blue", 0))
-    return false;
-
-  return true;
-}
 
 static void blue_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *_)
 {
@@ -46,7 +30,7 @@ static void blue_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *_)
 }
 
 static const struct XSParseSublikeHooks parse_blue_hooks = {
-  .permit       = blue_permit,
+  .permit_hintkey = "t::registrations/blue",
   .pre_blockend = blue_pre_blockend,
 };
 

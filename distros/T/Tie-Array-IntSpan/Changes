@@ -1,0 +1,8 @@
+0.002   2021-08-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump minimum perl version to 5.18 (RT#139145).
+
+
+0.001   2021-07-25  Released-By: PERLANCAR
+
+        - First release.

@@ -6,7 +6,7 @@ use Encode qw(decode_utf8);
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '1.011';
+our $VERSION = '1.012';
 
 extends qw(
     Locale::Utils::Autotranslator
@@ -52,7 +52,7 @@ Locale::Utils::Autotranslator::Interactive - Interface for manual translation wi
 
 =head1 VERSION
 
-1.011
+1.012
 
 =head1 SYNOPSIS
 

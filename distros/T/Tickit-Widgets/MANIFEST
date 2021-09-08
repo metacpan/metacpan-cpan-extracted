@@ -45,7 +45,6 @@ lib/Tickit/WidgetRole/Alignable.pm
 lib/Tickit/WidgetRole/SingleChildContainer.pm
 lib/Tickit/Widgets.pm
 LICENSE
-Makefile.PL
 MANIFEST			This list of files
 META.json
 META.yml
@@ -62,6 +61,7 @@ t/10static.t
 t/11entry-model.t
 t/12entry-input.t
 t/13entry-scroll.t
+t/14entry-popup.t
 t/20button.t
 t/21radiobutton.t
 t/22checkbutton.t

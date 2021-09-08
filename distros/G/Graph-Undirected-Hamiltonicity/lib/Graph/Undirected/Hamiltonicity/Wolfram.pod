@@ -4,7 +4,7 @@ Graph::Undirected::Hamiltonicity::Wolfram - determine the Hamiltonicity of a giv
 
 =head1 VERSION
 
-Version 0.01
+Version 0.012
 
 =head1 SYNOPSIS
 

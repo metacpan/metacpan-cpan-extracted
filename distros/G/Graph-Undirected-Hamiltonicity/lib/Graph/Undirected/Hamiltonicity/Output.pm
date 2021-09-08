@@ -13,7 +13,7 @@ our @EXPORT_OK = qw(
 
 our %EXPORT_TAGS = ( all => \@EXPORT_OK, );
 
-our $VERSION = '0.01';
+our $VERSION = '0.012';
 
 ##############################################################################
 

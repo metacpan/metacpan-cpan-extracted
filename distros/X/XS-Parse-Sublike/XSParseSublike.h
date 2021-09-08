@@ -1,7 +1,7 @@
 #ifndef __XS_PARSE_SUBLIKE_H__
 #define __XS_PARSE_SUBLIKE_H__
 
-#define XSPARSESUBLIKE_ABI_VERSION 3
+#define XSPARSESUBLIKE_ABI_VERSION 4
 
 struct XSParseSublikeContext {
   SV *name;  /* may be NULL for anon subs */
@@ -28,7 +28,11 @@ struct XSParseSublikeHooks {
   U16  flags;
   U8   require_parts;
   U8   skip_parts;
-  bool (*permit)         (pTHX_ void *hookdata);
+
+  /* These two hooks are ANDed together; both must pass, if present */
+  const char *permit_hintkey;
+  bool (*permit)(pTHX_ void *hookdata);
+
   void (*pre_subparse)   (pTHX_ struct XSParseSublikeContext *ctx, void *hookdata);
   void (*post_blockstart)(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata);
   void (*pre_blockend)   (pTHX_ struct XSParseSublikeContext *ctx, void *hookdata);
@@ -70,23 +74,33 @@ static int S_xs_parse_sublike_any(pTHX_ const struct XSParseSublikeHooks *hooks,
 
 #define boot_xs_parse_sublike(ver) S_boot_xs_parse_sublike(aTHX_ ver)
 static void S_boot_xs_parse_sublike(pTHX_ double ver) {
+  SV **svp;
   SV *versv = ver ? newSVnv(ver) : NULL;
 
   load_module(PERL_LOADMOD_NOIMPORT, newSVpvs("XS::Parse::Sublike"), versv, NULL);
 
-  int abi_version = SvIV(get_sv("XS::Parse::Sublike::ABIVERSION", 0));
-  if(abi_version != XSPARSESUBLIKE_ABI_VERSION)
-    croak("XS::Parse::Sublike ABI version mismatch - library provides %d, compiled for %d",
-        abi_version, XSPARSESUBLIKE_ABI_VERSION);
+  svp = hv_fetchs(PL_modglobal, "XS::Parse::Sublike/ABIVERSION_MIN", 0);
+  if(!svp)
+    croak("XS::Parse::Sublike ABI minimum version missing");
+  int abi_ver = SvIV(*svp);
+  if(abi_ver > XSPARSESUBLIKE_ABI_VERSION)
+    croak("XS::Parse::Sublike ABI version mismatch - library supports >= %d, compiled for %d",
+        abi_ver, XSPARSESUBLIKE_ABI_VERSION);
+
+  svp = hv_fetchs(PL_modglobal, "XS::Parse::Sublike/ABIVERSION_MAX", 0);
+  abi_ver = SvIV(*svp);
+  if(abi_ver < XSPARSESUBLIKE_ABI_VERSION)
+    croak("XS::Parse::Sublike ABI version mismatch - library supports <= %d, compiled for %d",
+        abi_ver, XSPARSESUBLIKE_ABI_VERSION);
 
   parse_xs_parse_sublike_func = INT2PTR(int (*)(pTHX_ const struct XSParseSublikeHooks *, void *, OP**),
-      SvUV(get_sv("XS::Parse::Sublike::PARSE", 0)));
+      SvUV(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/parse()@4", 0)));
 
   register_xs_parse_sublike_func = INT2PTR(void (*)(pTHX_ const char *, const struct XSParseSublikeHooks *, void *),
-      SvUV(get_sv("XS::Parse::Sublike::REGISTER", 0)));
+      SvUV(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/register()@4", 0)));
 
   parseany_xs_parse_sublike_func = INT2PTR(int (*)(pTHX_ const struct XSParseSublikeHooks *, void *, OP**),
-      SvUV(get_sv("XS::Parse::Sublike::PARSEANY", 0)));
+      SvUV(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/parseany()@4", 0)));
 }
 
 #endif

@@ -95,12 +95,7 @@ sub module_name {
 
 sub no_index {
     return +{
-      directory => [
-                     'inc',
-                     't',
-                     'tools',
-                     'xt',
-                   ],
+	directory => [ qw{ eg inc t tools xt } ],
     };
 }
 
@@ -135,16 +130,22 @@ EOD
 }
 
 sub provides {
-    -d 'lib'
-	or return;
+    my $provides;
     local $@ = undef;
-    my $provides = eval {
-	require Module::Metadata;
-	Module::Metadata->provides( version => 2, dir => 'lib' );
-    } or return;
 
     eval {
 	require CPAN::Meta;
+	require ExtUtils::Manifest;
+	require Module::Metadata;
+
+	my $manifest;
+	{
+	    local $SIG{__WARN__} = sub {};
+	    $manifest = ExtUtils::Manifest::maniread();
+	}
+	keys %{ $manifest || {} }
+	    or return;
+
 	# Skeleton so we can use should_index_file() and
 	# should_index_package().
 	my $meta = CPAN::Meta->new( {
@@ -153,11 +154,22 @@ sub provides {
 		no_index	=> no_index(),
 	    },
 	);
-	foreach my $pkg ( keys %{ $provides } ) {
-	    $meta->should_index_package( $pkg )
-		and $meta->should_index_file( $provides->{$pkg}{file} )
-		and next;
-	    delete $provides->{$pkg};
+
+	# The Module::Metadata docs say not to use
+	# package_versions_from_directory() directly, but the 'files =>'
+	# version of provides() is broken, and has been known to be so
+	# since 2014, so it's not getting fixed any time soon. So:
+
+	foreach my $fn ( sort keys %{ $manifest } ) {
+	    $fn =~ m/ [.] pm \z /smx
+		or next;
+	    my $pvd = Module::Metadata->package_versions_from_directory(
+		undef, [ $fn ] );
+	    foreach my $pkg ( keys %{ $pvd } ) {
+		$meta->should_index_package( $pkg )
+		    and $meta->should_index_file( $pvd->{$pkg}{file} )
+		    and $provides->{$pkg} = $pvd->{$pkg};
+	    }
 	}
 
 	1;

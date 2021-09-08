@@ -1,6 +1,9 @@
 Revision history for Term::Choose
 
 
+1.737   2021-08-28
+    - Option 'layout': removed one layout.
+
 1.736   2021-08-24
     - renamed the option 'f3' to 'search'.
     - 'Ctrl-F' instead of 'F3' to open the search prompt.

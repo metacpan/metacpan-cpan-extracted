@@ -1,8 +1,9 @@
 package HTML::HTML5::Parser::Charset::UnicodeChecker;
 ## skip Test::Tabs
 use strict;
+use warnings;
 
-our $VERSION = '0.301';
+our $VERSION = '0.992';
 
 ## NOTE: For more information (including rationals of checks performed
 ## in this module), see

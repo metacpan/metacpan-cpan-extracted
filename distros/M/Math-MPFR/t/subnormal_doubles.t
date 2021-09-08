@@ -61,8 +61,8 @@ if(
         my $prefix = "1" . ("0" x ($exp * -1));
         my $nv = atonv($prefix . $val);
 
-        my $hex_dd = scalar reverse unpack "h*", pack "D<", $nv;
-        my $hex_d  = scalar reverse unpack "h*", pack "d<", $d;
+        my $hex_dd = unpack "H*", pack "D>", $nv;
+        my $hex_d  = unpack "H*", pack "d>", $d;
 
         if($hex_dd !~ /$hex_d$/) {
           warn "\n $hex_dd !~ /$hex_d\$/\n";

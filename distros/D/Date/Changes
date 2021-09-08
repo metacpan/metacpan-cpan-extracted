@@ -1,4 +1,6 @@
-5.2.8    xx.xx.2021
+5.2.9    xx.xx.2021
+           - fix compilation failure on some systems: clash with fucking C marco
+5.2.8    13.07.2021
            - internal improvements
 5.2.7    02.07.2021
            - add Date::strptime

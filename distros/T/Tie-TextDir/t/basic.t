@@ -1,13 +1,16 @@
 use strict;
-use Test;
+use Test::More;
 use Tie::TextDir;
 use File::Spec;
+use File::Path;
 
 plan tests => 14;
 ok 1;
 
 my $dir = "data";
 
+# Just to be sure the dir is empty
+rmtree($dir);
 
 {
   my $val = "one line\ntwo lines\nbad stuff\003\005\n";
@@ -31,23 +34,23 @@ my $dir = "data";
   local $^W;  # Don't generate superfluous warnings here
   
   # 6: check whether the empty key exists()
-  ok exists $hash{''}, '';
+  is exists $hash{''}, '';
   
   # 7: check whether the . key exists()
-  ok exists $hash{'.'}, '';
+  is exists $hash{'.'}, '';
   
   # 8: check whether the .. key exists()
-  ok exists $hash{'..'}, '';
+  is exists $hash{'..'}, '';
   
   untie %hash;
   
   # Clean up
   ok tie(%hash, 'Tie::TextDir', $dir, 'rw');
   delete $hash{$_} foreach keys %hash;
-  ok keys %hash, 0;
+  is keys %hash, 0;
   
   rmdir $dir;
-  ok -e $dir, undef;
+  is -e $dir, undef;
 }
 
 {
@@ -56,10 +59,11 @@ my $dir = "data";
   my %hash;
   ok tie(%hash, 'Tie::TextDir', $dir, 'rw');
   $hash{foo} = 'bar';
-  ok $hash{foo}, 'bar';
+  is $hash{foo}, 'bar';
   
   chmod 0444, File::Spec->catfile($dir, 'foo');
   eval { $hash{foo} = 'baz' };
   
-  ok keys %hash, 1;
+  is keys %hash, 1
+      or diag("Expected only 1 key in hash, but found keys @{[keys %hash]}");
 }

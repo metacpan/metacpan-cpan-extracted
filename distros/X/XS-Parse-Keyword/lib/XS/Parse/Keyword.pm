@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Keyword 0.12;
+package XS::Parse::Keyword 0.15;
 
 use v5.14;
 use warnings;
@@ -42,7 +42,7 @@ and parsing hooks.
 I<ver> should either be 0 or a decimal number for the module version
 requirement; e.g.
 
-   boot_xs_parse_keyword(0.01);
+   boot_xs_parse_keyword(0.14);
 
 =head2 register_xs_parse_keyword
 
@@ -149,7 +149,7 @@ This alternative is somewhat less generic and powerful than providing C<parse>
 yourself, but involves much less parsing work and is shorter and easier to
 implement.
 
-   int (*build1)(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hookdata);
+   int (*build1)(pTHX_ OP **out, XSParseKeywordPiece *arg0, void *hookdata);
 
 If neither C<parse> nor C<build> are present, this is called as a simpler
 variant of C<build> when only a single argument is required. It takes its type
@@ -176,12 +176,13 @@ function, using a C<struct> type consisting of the following fields:
             SV *value;
          } attr;
          PADOFFSET padix;
+         struct XSParseInfixInfo *infix;
       };
       int line;
    } XSParseKeywordPiece;
 
-Which field of the anonymous is set depends on the type of the piece. The
-I<line> field contains the line number of the source file where parsing of
+Which field of the anonymous union is set depends on the type of the piece.
+The I<line> field contains the line number of the source file where parsing of
 that piece began.
 
 Some piece types are "atomic", whose definition is self-contained. Others are
@@ -363,6 +364,22 @@ C<XPK_LEXVARNAME>.
 I<atomic, can probe, emits nothing.>
 
 A literal character (C<,>, C<:> or C<=>) is expected. No argument value is passed.
+
+=head2 XPK_INFIX_*
+
+I<atomic, can probe, emits infix.>
+
+An infix operator as recognised by L<XS::Parse::Infix>. The returned pointer
+points to a structure allocated by C<XS::Parse::Infix> describing the
+operator.
+
+Various versions of the macro are provided, each using a different selection
+filter to choose certain available infix operators:
+
+   XPK_INFIX_RELATION         # any relational operator
+   XPK_INFIX_EQUALITY         # an equality operator like `==` or `eq`
+   XPK_INFIX_MATCH_NOSMART    # any sort of "match"-like operator, except smartmatch
+   XPK_INFIX_MATCH_SMART      # XPK_INFIX_MATCH_NOSMART plus smartmatch
 
 =head2 XPK_LITERAL
 

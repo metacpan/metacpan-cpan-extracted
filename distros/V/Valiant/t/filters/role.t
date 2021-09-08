@@ -19,8 +19,7 @@ use Test::Most;
 
   use Moo;
 
-  with 'Valiant::Util::Ancestors',
-    'Valiant::Filterable';
+  with 'Valiant::Filterable';
 
   has 'name' => (is=>'ro', required=>1);
   has 'last' => (is=>'ro', required=>1);

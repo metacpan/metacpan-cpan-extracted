@@ -35,7 +35,7 @@ warn "HAVE_IEEE_754_LONG_DOUBLE is ", Math::MPFR::_have_IEEE_754_long_double(), 
 warn "HAVE_EXTENDED_PRECISION_LONG_DOUBLE is ", Math::MPFR::_have_extended_precision_long_double(), "\n";
 
 
-print "1..15\n";
+print "1..19\n";
 
 my $arb = 40;
 Rmpfr_set_default_prec($arb);
@@ -113,14 +113,20 @@ else {
   print "not ok 6\n";
 }
 
-my $hex_53_fr  = Rmpfr_init2(53);
-my $hex_64_fr  = Rmpfr_init2(64);
-my $hex_2098_fr = Rmpfr_init2(2098);
-my $hex_113_fr = Rmpfr_init2(113);
+my $hex_53_fr    = Rmpfr_init2(53);
+my $hex_64_fr    = Rmpfr_init2(64);
+my $hex_2098_fr  = Rmpfr_init2(2098);
+my $hex_2098_fr2 = Rmpfr_init2(2098);
+my $hex_2098_fr3 = Rmpfr_init2(2098);
+my $hex_113_fr   = Rmpfr_init2(113);
+
+my $longstring = '0b0.11111111111111111111111111111111111111111111111111111011111111111111111111111111111111111111111111111111111100E1024';
 
 Rmpfr_strtofr($hex_53_fr,  '2.3',    10, MPFR_RNDN);
 Rmpfr_strtofr($hex_64_fr,  '2.3',    10, MPFR_RNDN);
 Rmpfr_strtofr($hex_2098_fr, '1e+127', 10, MPFR_RNDN);
+Rmpfr_strtofr($hex_2098_fr2,   $longstring,  0, MPFR_RNDN);
+Rmpfr_strtofr($hex_2098_fr3, "-$longstring", 0, MPFR_RNDN);
 Rmpfr_strtofr($hex_113_fr, '2.3',    10, MPFR_RNDN);
 
 $hex_53 = Math::MPFR::bytes($hex_53_fr, 53);
@@ -212,6 +218,40 @@ if(Rmpfr_get_default_prec() == $arb) { print "ok 15\n" }
 else {
   warn "\nexpected: 40\ngot     : $arb\n";
   print "not ok 15\n";
+}
+
+# 4 specific examples that were once failing:
+
+$hex_2098 = Math::MPFR::bytes($hex_2098_fr2, 2098);
+
+if($hex_2098 eq '7ff00000000000000000000000000000') { print "ok 16\n" }
+else {
+  warn "expected: 7ff00000000000000000000000000000\ngot     : $hex_2098\n";
+  print "not ok 16\n";
+}
+
+$hex_2098 = Math::MPFR::bytes($hex_2098_fr3, 2098);
+
+if($hex_2098 eq 'fff00000000000000000000000000000') { print "ok 17\n" }
+else {
+  warn "expected: fff00000000000000000000000000000\ngot     : $hex_2098\n";
+  print "not ok 17\n";
+}
+
+$hex_2098 = Math::MPFR::bytes($longstring, 2098);
+
+if($hex_2098 eq '7ff00000000000000000000000000000') { print "ok 18\n" }
+else {
+  warn "expected: 7ff00000000000000000000000000000\ngot     : $hex_2098\n";
+  print "not ok 18\n";
+}
+
+$hex_2098 = Math::MPFR::bytes("-$longstring", 2098);
+
+if($hex_2098 eq 'fff00000000000000000000000000000') { print "ok 19\n" }
+else {
+  warn "expected: fff00000000000000000000000000000\ngot     : $hex_2098\n";
+  print "not ok 19\n";
 }
 
 

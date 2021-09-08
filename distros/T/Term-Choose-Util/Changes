@@ -1,6 +1,9 @@
 Revision history for Term::Choose::Util
 
 
+0.131   2021-08-29
+        - Option 'layout': removed one layout.
+
 0.130   2021-08-24
         - The option 'enchanted' has been removed.
         - Bugfix line_fold 'subseq_tab'.

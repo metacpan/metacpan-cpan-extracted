@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Query.pm
-## Version v0.4.6
-## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## Version v0.4.7
+## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2021/08/20
+## Modified 2021/08/24
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,10 +17,9 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( DB::Object );
-    use Scalar::Util ();
     use Devel::Confess;
     our( $VERSION, $DEBUG, $VERBOSE );
-    $VERSION = 'v0.4.6';
+    $VERSION = 'v0.4.7';
     $DEBUG = 0;
     $VERBOSE = 0;
 };
@@ -138,7 +137,7 @@ sub delete
     my @query = ( "DELETE FROM $table" );
     ## 'query_reset' condition to avoid catching parameters from pervious queries.
     push( @query, @$clauses ) if( scalar( @$clauses ) );
-    my $query = $self->{ 'query' } = CORE::join( ' ', @query );
+    my $query = $self->{query} = CORE::join( ' ', @query );
     return( $self->error( "Refusing to do a bulk delete. Enable the allow_bulk_delete database object property if you want to do so. Original query was: $query" ) ) if( !$self->where && !$self->database_object->allow_bulk_delete );
     $self->_save_bind();
     my $sth = $tbl_o->_cache_this( $self ) ||
@@ -185,7 +184,7 @@ sub format_statement
     $opts = shift( @_ ) if( @_ );
     my $tbl_o = $self->table_object || return( $self->error( "No table object is set." ) );
     # Should we use bind statement?
-    my $bind   = $tbl_o->database_object->use_bind;
+    my $bind  = $tbl_o->database_object->use_bind;
     $self->message( 3, "Formatting statement with table '", $tbl_o->name, "' object '$tbl_o' and bind value '$bind'." );
     $opts->{data} = $self->{_default} if( !$opts->{data} );
     $opts->{order} = $self->{_fields} if( !$opts->{order} );
@@ -241,9 +240,10 @@ sub format_statement
         if( exists( $data->{ $_ } ) )
         {
             my $value = $data->{ $_ };
-            if( Scalar::Util::blessed( $value ) && $value->isa( "${base_class}::Statement" ) )
+            if( $self->_is_a( $value => "${base_class}::Statement" ) )
             {
                 push( @format_values, '(' . $value->as_string . ')' );
+                $self->binded_types->push( $value->query_object->binded_types_as_param );
             }
             # This is for insert or update statement types
             elsif( exists( $from_unix->{ $_ } ) )
@@ -356,9 +356,9 @@ sub format_statement
             push( @format_fields, $_ );
         }
     }
-    if( !wantarray() && scalar( @{$self->{ '_extra' }} ) )
+    if( !wantarray() && scalar( @{$self->{_extra}} ) )
     {
-        push( @format_fields, @{$self->{ '_extra' }} );
+        push( @format_fields, @{$self->{_extra}} );
     }
     $values = CORE::join( ', ', @format_values );
     $fields = CORE::join( ', ', @format_fields );
@@ -461,13 +461,14 @@ sub format_update($;%)
         elsif( !$bind )
         {
             ## push( @fields, sprintf( "$field='%s'", quotemeta( $value ) ) );
+            my $const;
             if( $value eq '?' )
             {
                 push( @fields, "$field = ?" );
-                if( lc( $types->{ $field } ) eq 'bytea' )
+                if( lc( $types->{ $field } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
                 {
                     ## $self->message( 3, "Field '$field' is of type bytea, adding special type '", DBD::Pg::PG_BYTEA, "'." );
-                    CORE::push( @types, DBD::Pg::PG_BYTEA );
+                    CORE::push( @types, $const );
                 }
                 else
                 {
@@ -475,15 +476,18 @@ sub format_update($;%)
                     CORE::push( @types, '' );
                 }
             }
-            elsif( lc( $types->{ $field } ) eq 'bytea' )
+            elsif( lc( $types->{ $field } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
             {
                 ## $self->message( 3, "Field '$field' is of type bytea, adding special type '", DBD::Pg::PG_BYTEA, "'." );
-                push( @fields, sprintf( "$field=%s", $tbl_o->database_object->quote( $value, DBD::Pg::PG_BYTEA ) ) );
+                # push( @fields, sprintf( "$field=%s", $tbl_o->database_object->quote( $value, DBD::Pg::PG_BYTEA ) ) );
+                push( @fields, sprintf( "$field=%s", $tbl_o->database_object->quote( $value, $const ) ) );
             }
-            elsif( $self->_is_hash( $value ) && ( lc( $types->{ $field } ) eq 'jsonb' || lc( $types->{ $field } ) eq 'json' ) )
+            elsif( $self->_is_hash( $value ) && 
+                   ( lc( $types->{ $field } ) eq 'jsonb' || lc( $types->{ $field } ) eq 'json' ) )
             {
                 my $this_json = $self->_encode_json( $value );
-                push( @fields, sprintf( "$field=%s", $tbl_o->database_object->quote( $this_json, ( lc( $types->{ $field } ) eq 'jsonb' ? DBD::Pg::PG_JSONB : BDD::Pg::PG_JSON ) ) ) );
+                # push( @fields, sprintf( "$field=%s", $tbl_o->database_object->quote( $this_json, ( lc( $types->{ $field } ) eq 'jsonb' ? DBD::Pg::PG_JSONB : BDD::Pg::PG_JSON ) ) ) );
+                push( @fields, sprintf( "$field=%s", $tbl_o->database_object->quote( $this_json, ( lc( $types->{ $field } ) eq 'jsonb' ? $self->database_object->get_sql_type( 'jsonb' ) : $self->database_object->get_sql_type( 'json' ) ) ) ) );
             }
             else
             {
@@ -502,10 +506,12 @@ sub format_update($;%)
             ## $self->message( 3, "Bind is required for field '$field'." );
             push( @fields, "$field=?" );
             push( @binded, $value );
-            if( lc( $types->{ $field } ) eq 'bytea' )
+            my $const;
+            if( lc( $types->{ $field } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
             {
-                ## $self->message( 3, "Field '$field' is of type bytea, adding special type '", DBD::Pg::PG_BYTEA, "'." );
-                CORE::push( @types, DBD::Pg::PG_BYTEA );
+                # $self->message( 3, "Field '$field' is of type bytea, adding special type '", DBD::Pg::PG_BYTEA, "'." );
+                # CORE::push( @types, DBD::Pg::PG_BYTEA );
+                CORE::push( @types, $const );
             }
             else
             {
@@ -515,12 +521,14 @@ sub format_update($;%)
         }
         else
         {
-            ## $value = "'" . quotemeta( $value ) . "'";
-            ## push( @fields, "$field='" . quotemeta( $value ) . "'" );
-            if( lc( $types->{ $field } ) eq 'bytea' )
+            # $value = "'" . quotemeta( $value ) . "'";
+            # push( @fields, "$field='" . quotemeta( $value ) . "'" );
+            my $const;
+            if( lc( $types->{ $field } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
             {
-                ## $self->message( 3, "Field '$field' is of type bytea, adding special type '", DBD::Pg::PG_BYTEA, "'." );
-                push( @fields, "$field=" . $tbl_o->database_object->quote( $value, DBD::Pg::PG_BYTEA ) );
+                # $self->message( 3, "Field '$field' is of type bytea, adding special type '", DBD::Pg::PG_BYTEA, "'." );
+                # push( @fields, "$field=" . $tbl_o->database_object->quote( $value, DBD::Pg::PG_BYTEA ) );
+                push( @fields, "$field=" . $tbl_o->database_object->quote( $value, $const ) );
             }
             else
             {
@@ -794,8 +802,8 @@ sub insert
         foreach my $field ( keys( %$structure ) )
         {
             push( @avoid, $field ) if( $structure->{ $field } =~ /\b(AUTO_INCREMENT|SERIAL|nextval)\b/i && !$arg{ $field } );
-            ## It is useless to insert a blank data in a field whose default value is NULL.
-            ## Especially since a test on a NULL field may be made specifically.
+            # It is useless to insert a blank data in a field whose default value is NULL.
+            # Especially since a test on a NULL field may be made specifically.
             push( @avoid, $field ) if( scalar( @arg ) && !exists( $arg{ $field } ) && $null->{ $field } );
         }
         $self->getdefault({
@@ -1244,7 +1252,7 @@ sub _group_order
     if( @_ )
     {
         my $clause = '';
-        my $data   = ( @_ == 1 && !Scalar::Util::blessed( $_[0] ) ) ? shift( @_ ) : [ @_ ];
+        my $data   = ( @_ == 1 && !$self->_is_object( $_[0] ) ) ? shift( @_ ) : [ @_ ];
         # $self->message( 3, "Called with parameters: ", sub{ $self->dump( $data ) } );
         if( $self->_is_array( $data ) )
         {
@@ -1702,11 +1710,11 @@ sub _where_having
             # my @parameters = @_;
             # $self->message( 3, "Data to process is: ", sub{ $self->dump( [@_] ) } );
             # $self->message( 3, "Received arguments: ", sub{ $self->dumper( \@parameters, { depth => 1}) } );
-            my $data = shift( @_ ) if( @_ % 2 && !( scalar( @_ ) == 1 && Scalar::Util::blessed( $_[0] ) ) );
+            my $data = shift( @_ ) if( @_ % 2 && !( scalar( @_ ) == 1 && $self->_is_object( $_[0] ) ) );
             # $self->message( 3, "\$data is '$data'." );
             my $agg_op = 'AND';
             my @arg = ();
-            if( Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'DB::Object::Operator' ) )
+            if( $self->_is_a( $_[0], 'DB::Object::Operator' ) )
             {
                 return( $self->error( "I was expecting an operator object, but got \"", $_[0], "\" instead." ) ) if( !$_[0]->isa( 'DB::Object::Operator' ) );
                 $agg_op = $_[0]->operator || return( $self->error( "Unknown operator for \"", $_[0], "\"." ) );
@@ -1813,7 +1821,7 @@ sub _where_having
                         $field =~ s/\b(?<!\.)($fields)\b/$prefix.$1/gs if( $prefix );
                     }
                     my $i_am_negative = 0;
-                    if( Scalar::Util::blessed( $value ) && $value->isa( 'DB::Object::NOT' ) )
+                    if( $self->_is_a( $value, 'DB::Object::NOT' ) )
                     {
                         ( $value ) = $value->value;
                         # $self->message( 3, "NOT value is '$value' (", \$value, ")." );
@@ -1925,10 +1933,12 @@ sub _where_having
                     else
                     {
                         my $cl;
-                        if( lc( $fields_type->{ $field } ) eq 'bytea' )
+                        my $const;
+                        if( lc( $fields_type->{ $field } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
                         {
                             $cl = $self->new_clause({
-                                value => "$f" . ( $i_am_negative ? '!=' : '=' ) . $tbl_o->database_object->quote( $value, DBD::Pg::PG_BYTEA ),
+                                # value => "$f" . ( $i_am_negative ? '!=' : '=' ) . $tbl_o->database_object->quote( $value, DBD::Pg::PG_BYTEA ),
+                                value => "$f" . ( $i_am_negative ? '!=' : '=' ) . $tbl_o->database_object->quote( $value, $const ),
                                 type => 'where',
                             });
                         }
@@ -1942,10 +1952,12 @@ sub _where_having
                             $cl->bind->values( $value );
                         }
                         $cl->fields( $field ) if( $self->_is_object( $field ) && $field->isa( 'DB::Object::Fields::Field' ) );
-                        if( lc( $fields_type->{ $field } ) eq 'bytea' )
+                        if( lc( $fields_type->{ $field } ) eq 'bytea' && 
+                            ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
                         {
                             # XXX Really need to fix this !!
-                            $cl->bind->types( DBD::Pg::PG_BYTEA );
+                            # $cl->bind->types( DBD::Pg::PG_BYTEA );
+                            $cl->bind->types( $const );
                         }
                         else
                         {
@@ -2160,7 +2172,7 @@ DB::Object::Query - Query Object
 
 =head1 VERSION
 
-    v0.4.6
+    v0.4.7
 
 =head1 DESCRIPTION
 

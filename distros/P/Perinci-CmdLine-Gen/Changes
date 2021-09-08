@@ -1,3 +1,9 @@
+0.500   2021-08-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Reorder generated '# AUTHORITY', et al to after strict/warnings to
+	  pass perlcritic policy TestingAndDebugging::RequireUseStrict.
+
+
 0.499   2021-06-23  Released-By: PERLANCAR; Urgency: medium
 
 	- Bump generated prereq versions: Perinci::CmdLine::Any -> 0.152,

@@ -1,8 +1,9 @@
 package HTML::HTML5::Parser::Charset::DecodeHandle;
 ## skip Test::Tabs
 use strict;
+use warnings;
 
-our $VERSION = '0.301';
+our $VERSION = '0.992';
 
 ## NOTE: |Message::Charset::Info| uses this module without calling
 ## the constructor.
@@ -703,11 +704,13 @@ sub read ($$$;$) {
         $self->{bom_checked} = 1;
       }
       my $string = do {
-			BEGIN { $SIG{__WARN__} = sub { warn $_[0] unless $_[0] =~ /^Code point/ } }
-			Encode::decode ($self->{perl_encoding_name},
-                         $self->{byte_buffer},
-                         Encode::FB_QUIET ());
-		};
+        local $SIG{__WARN__} = sub { warn $_[0] unless $_[0] =~ /^Code point/ };
+        Encode::decode (
+          $self->{perl_encoding_name},
+          $self->{byte_buffer},
+          Encode::FB_QUIET(),
+        );
+      };
       if (length $string) {
         $self->{char_buffer} = \$string;
         $self->{char_buffer_pos} = 0;

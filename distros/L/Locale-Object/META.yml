@@ -11,7 +11,7 @@ configure_requires:
   DBD::SQLite: '0'
   Module::Build: '0.40'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: unrestricted
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,7 +20,7 @@ name: Locale-Object
 provides:
   Locale::Object:
     file: lib/Locale/Object.pm
-    version: '0.80'
+    version: '0.82'
   Locale::Object::Continent:
     file: lib/Locale/Object/Continent.pm
     version: '0.78'
@@ -51,5 +51,5 @@ requires:
   perl: v5.6.0
 resources:
   repository: https://github.com/castaway/Locale-Object
-version: '0.80'
+version: '0.82'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

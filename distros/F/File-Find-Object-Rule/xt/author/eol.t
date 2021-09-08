@@ -16,7 +16,6 @@ my @files = (
     't/findorule.t',
     't/foobar',
     't/lib/File/Find/Object/Rule/Test/ATeam.pm',
-    't/lib/File/Find/Object/TreeCreate.pm',
     't/release-trailing-space.t',
     't/sample-data/to-copy-from/File-Find-Rule.txt',
     't/sample-data/to-copy-from/findorule.txt',

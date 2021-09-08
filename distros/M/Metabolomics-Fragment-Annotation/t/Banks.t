@@ -10,7 +10,6 @@ use warnings;
 
 use FindBin qw($Bin);
 use lib "$Bin/../lib";
-use lib "$Bin/../lib/Metabolomics/Banks/lib";
 
 use Metabolomics::Fragment::Annotation qw( :all ) ;
 
@@ -7478,7 +7477,7 @@ BEGIN {
 		my ( $o ) = @_ ;
 		
 		# colonm_code and delta
-		$o->buildSpectralBankFromPeakForest(undef, 0.05, 1) ; ## column, delta in DA, MIN_FRAG filter 
+		$o->buildSpectralBankFromPeakForest(undef, 'MMU', 0.05, 1) ; ## column, delta type, delta in MMU, MIN_FRAG filter 
 #		print Dumper $o ;
 		
 		return($o) ;

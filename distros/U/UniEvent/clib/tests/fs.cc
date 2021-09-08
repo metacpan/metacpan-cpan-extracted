@@ -1,8 +1,6 @@
 #include "lib/test.h"
 #include <stdlib.h>
 
-string root_vdir = "tests/var";
-
 #ifdef __WIN32
     static bool win32 = true;
 #else

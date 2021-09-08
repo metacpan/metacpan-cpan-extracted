@@ -1,7 +1,9 @@
 package Data::Cmp;
 
-our $DATE = '2019-11-18'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-04-12'; # DATE
+our $DIST = 'Data-Cmp'; # DIST
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -104,7 +106,7 @@ Data::Cmp - Compare two data structures, return -1/0/1 like cmp
 
 =head1 VERSION
 
-This document describes version 0.007 of Data::Cmp (from Perl distribution Data-Cmp), released on 2019-11-18.
+This document describes version 0.010 of Data::Cmp (from Perl distribution Data-Cmp), released on 2021-04-12.
 
 =head1 SYNOPSIS
 
@@ -132,8 +134,11 @@ Sort data structures (of similar structures):
 
 This relatively lightweight (no non-core dependencies, under 100 lines of code)
 module offers the C<cmp_data> function that, like Perl's C<cmp>, returns -1/0/1
-value. In addition to that, it can also return 2 if the two data structures
-differ but there is no sensible notion of which one is "greater than" the other.
+value. C<cmp_data> differs from C<cmp> in that it can compare two data of
+different types and compare data items recursively, with pretty sensible
+semantics. In addition to returning -1/0/1, C<cmp_data> can also return 2 if two
+data differ but not comparable: there is no sensible notion of which one is
+"greater than" the other. An example is empty hash C<{}> vs empty array C<[]>).
 
 This module can handle circular structure.
 
@@ -154,15 +159,15 @@ The following are the rules of comparison used by C<cmp_data()>:
  cmp_data("a", "A"); # 1
  cmp_data(10, 9);    # -1
 
-=item * A reference and non-reference are different
+=item * A reference and non-reference are different and not comparable
 
  cmp_data([], 0); # 2
 
-=item * Two references that are of different types are different
+=item * Two references that are of different types are different and not comparable
 
  cmp_data([], {}); # 2
 
-=item * Blessed references that are blessed into different packages are different
+=item * Blessed references that are blessed into different packages are different and not comparable
 
  cmp_data(bless([], "foo"), bless([], "bar")); # 2
  cmp_data(bless([], "foo"), bless([], "foo")); # 0
@@ -184,13 +189,14 @@ The following are the rules of comparison used by C<cmp_data()>:
 
 =item * When two hash references share a common subset of pairs but have non-common pairs, the greater hashref is the one that has more non-common pairs
 
-If the number of non-common pairs are the same, they are just different.
+If the number of non-common pairs are the same, they are just different and not
+comparable:
 
- cmp_data({k1=>"", k2=>"", k3=>""}, {k1=>"", k5=>""});                #  1
- cmp_data({k1=>"", k2=>"", k3=>""}, {k1=>"", k5=>"", k6=>"});         #  2
- cmp_data({k1=>"", k2=>"", k3=>""}, {k1=>"", k5=>"", k6=>", k7=>""}); # -1
+ cmp_data({k1=>"", k2=>"", k3=>""}, {k1=>"", k5=>""});                #  1 (hash1 has 2 non-common keys: k2 & k3; hash2 only has 1: k5)
+ cmp_data({k1=>"", k2=>"", k3=>""}, {k1=>"", k5=>"", k6=>", k7=>""}); # -1 (hash1 has 2 non-common keys: k2 & k3; hash2 has 3 non-common pairs: k5, k6, k7)
+ cmp_data({k1=>"", k2=>"", k3=>""}, {k1=>"", k5=>"", k6=>"});         #  2 (both hashes have 2 non-common pairs)
 
-=item * All other types of references (i.e. non-hash, non-array) are the same only if their address is the same
+=item * All other types of references (i.e. non-hash, non-array) are the same only if their address is the same; otherwise they are different and not comparable
 
  cmp_data(\1, \1); # 2
  my $ref = \1; cmp_data($ref, $ref); # 0
@@ -223,7 +229,7 @@ Source repository is at L<https://github.com/perlancar/perl-Data-Cmp>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Cmp>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Data-Cmp/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -264,7 +270,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -24,6 +24,9 @@ This repository contains Aspose.Slides Cloud SDK for Perl source code. This SDK 
 **Web:** HTML
 **Other:** SWF (export whole presentations)
 
+## Enhancements in Version 21.8
+* New **slides** parameter for **Convert**, **ConvertAndSave**, **DownloadPresentation** and **SavePresentation** methods that allows to convert a specified set of slides in the presentation.
+
 ## Enhancements in Version 21.6
 * New **CreateComment**, **CreateCommentOnline**, **DeleteComments**, **DeleteCommentsOnline**, **DeleteSlideComments** and **DeleteSlideCommentsOnline** methods to add or delete comments in presentations.
 

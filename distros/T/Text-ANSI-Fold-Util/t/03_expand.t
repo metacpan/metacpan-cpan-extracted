@@ -7,8 +7,6 @@ use Text::ANSI::Fold::Util qw(ansi_expand);
 use Text::Tabs;
 use Data::Dumper;
 
-Text::ANSI::Fold->configure(expand => 1);
-
 sub r { $_[0] =~ s/(\S+)/\e[31m$1\e[m/gr }
 
 my $pattern = <<"END";

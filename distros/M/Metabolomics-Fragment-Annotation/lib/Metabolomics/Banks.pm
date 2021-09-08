@@ -240,6 +240,10 @@ sub parsingMsFragments {
     	$csv = Text::CSV->new ( { 'sep_char' => "\t", binary => 1, auto_diag => 1, eol => "\n" } )  # should set binary attribute.
     	or die "Cannot use CSV: ".Text::CSV->error_diag ();	
     }
+    else { # By default considering tabular as default format
+    	$csv = Text::CSV->new ( { 'sep_char' => "\t", binary => 1, auto_diag => 1, eol => "\n" } )  # should set binary attribute.
+    	or die "Cannot use TSV: ".Text::CSV->error_diag ();	
+    }
     
     ## Adapte the number of the colunm : (nb of column to position in array)
 	$column = $column - 1 ;
@@ -310,7 +314,11 @@ sub parsingMsFragmentsByCluster {
     elsif ($Xfile =~/\.(tsv|TSV|TABULAR|tabular)$/) {
     	print "Parsing a tabular file...\n" ;
     	$csv = Text::CSV->new ( { 'sep_char' => "\t", binary => 1, auto_diag => 1, eol => "\n" } )  # should set binary attribute.
-    	or die "Cannot use CSV: ".Text::CSV->error_diag ();	
+    	or die "Cannot use TSV: ".Text::CSV->error_diag ();	
+    }
+    else { # By default considering tabular as default format
+    	$csv = Text::CSV->new ( { 'sep_char' => "\t", binary => 1, auto_diag => 1, eol => "\n" } )  # should set binary attribute.
+    	or die "Cannot use TSV: ".Text::CSV->error_diag ();	
     }
     
     open (CSV, '<:crlf', $Xfile) or die $! ;
@@ -890,11 +898,13 @@ sub _setPeak_CLUSTER_ID {
     my $self = shift ;
     my ( $VALUE ) = @_;
     
-    if ( (defined $VALUE) and ( ($VALUE > 0) or ($VALUE < 0) )  ) {
+    if ( (defined $VALUE)  ) {
     	$VALUE =~ s/\s//g ;
     	$self->{_CLUSTER_ID_} = $VALUE ; 
     }
-    else {	carp "[ERROR] the method _setPeak_CLUSTER_ID can't set any undef or non numerical value\n" ; }
+    else {	
+#    	warn "[WARN] the method _setPeak_CLUSTER_ID set an undef or non numerical value\n" ; 
+    }
     
     return (0) ;
 }
@@ -904,8 +914,8 @@ sub _setPeak_CLUSTER_ID {
 
 	## Description : _getPeak_CLUSTER_ID
 	## Input : void
-	## Output : $MESURED_MONOISOTOPIC_MASS
-	## Usage : my ( $MESURED_MONOISOTOPIC_MASS ) = _getPeak_CLUSTER_ID () ;
+	## Output : $VALUE
+	## Usage : my ( $VALUE ) = _getPeak_CLUSTER_ID () ;
 
 =cut
 
@@ -916,8 +926,68 @@ sub _getPeak_CLUSTER_ID {
     
     my $VALUE = undef ;
     
-    if ( (defined $self->{_CLUSTER_ID_}) and ( $self->{_CLUSTER_ID_} > 0 ) or $self->{_CLUSTER_ID_} < 0  ) {	$VALUE = $self->{_CLUSTER_ID_} ; }
-    else {	 $VALUE = 0 ; warn "[WARN] the method _getPeak_CLUSTER_ID can't _getPeak a undef or non numerical value\n" ; }
+    if ( (defined $self->{_CLUSTER_ID_}) ) {
+    	$VALUE = $self->{_CLUSTER_ID_} ; 
+    }
+    else {	 
+    	$VALUE = undef ; 
+#    	warn "[WARN] the method _getPeak_CLUSTER_ID get an undef value\n" ; 
+	}
+    
+    return ( $VALUE ) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _setPeakFilterPass
+
+	## Description : _setPeakFilterPass
+	## Input : $VALUE
+	## Output : TRUE
+	## Usage : _setPeakFilterPass ( $VALUE ) ;
+
+=cut
+
+## START of SUB
+sub _setPeakFilterPass {
+    ## Retrieve Values
+    my $self = shift ;
+    my ( $VALUE ) = @_;
+    
+    if ( (defined $VALUE)  ) {
+    	$VALUE =~ s/\s//g ;
+    	$self->{_FILTER_PASSED_} = $VALUE ; 
+    }
+    else {	
+#    	warn "[WARN] the method _setPeakFilterPass set an undef or non numerical value\n" ; 
+    }
+    
+    return (0) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _getPeakFilterPass
+
+	## Description : _getPeakFilterPass
+	## Input : void
+	## Output : $VALUE
+	## Usage : my ( $VALUE ) = _getPeakFilterPass () ;
+
+=cut
+
+## START of SUB
+sub _getPeakFilterPass {
+    ## Retrieve Values
+    my $self = shift ;
+    
+    my $VALUE = undef ;
+    
+    if ( (defined $self->{_FILTER_PASSED_}) ) {
+    	$VALUE = $self->{_FILTER_PASSED_} ; 
+    }
+    else {	 
+    	$VALUE = undef ; 
+#    	warn "[WARN] the method _getPeakFilterPass get an undef value\n" ; 
+	}
     
     return ( $VALUE ) ;
 }

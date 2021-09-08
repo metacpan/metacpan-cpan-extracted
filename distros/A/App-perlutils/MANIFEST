@@ -5,6 +5,7 @@ bin/func
 bin/methods
 bin/version
 bin/version_up
+bin/find_module
 MANIFEST
 lib/App/perlutils.pm
 README

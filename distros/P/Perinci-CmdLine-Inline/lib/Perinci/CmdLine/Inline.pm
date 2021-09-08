@@ -9,11 +9,6 @@
 
 package Perinci::CmdLine::Inline;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-18'; # DATE
-our $DIST = 'Perinci-CmdLine-Inline'; # DIST
-our $VERSION = '0.551'; # VERSION
-
 use 5.010001;
 use strict 'subs', 'vars';
 use warnings;
@@ -27,6 +22,11 @@ use Perinci::Sub::Util qw(err);
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(gen_inline_pericmd_script);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-08-29'; # DATE
+our $DIST = 'Perinci-CmdLine-Inline'; # DIST
+our $VERSION = '0.552'; # VERSION
 
 our %SPEC;
 
@@ -140,11 +140,44 @@ sub _gen_read_config {
     return "" unless $cd->{gen_args}{read_config};
 
     push @l2, 'if ($_pci_r->{read_config}) {', "\n";
+
+    # TOOO: these are manual selection and will be replaced with a recursive
+    # tracer
+
     _pack_module($cd, "Perinci::CmdLine::Util::Config");
     _pack_module($cd, "Log::ger"); # required by Perinci::CmdLine::Util::Config
     _pack_module($cd, "Config::IOD::Reader"); # required by Perinci::CmdLine::Util::Config
     _pack_module($cd, "Config::IOD::Base"); # required by Config::IOD::Reader
     _pack_module($cd, "Data::Sah::Normalize"); # required by Perinci::CmdLine::Util::Config
+    _pack_module($cd, "Data::Sah::Resolve"); # required by Perinci::CmdLine::Util::Config
+
+    # required by Data::Sah::Resolve
+    _pack_module($cd, "Data::Sah::Type::all");
+    _pack_module($cd, "Data::Sah::Type::any");
+    _pack_module($cd, "Data::Sah::Type::array");
+    _pack_module($cd, "Data::Sah::Type::bool");
+    _pack_module($cd, "Data::Sah::Type::buf");
+    _pack_module($cd, "Data::Sah::Type::cistr");
+    _pack_module($cd, "Data::Sah::Type::code");
+    _pack_module($cd, "Data::Sah::Type::date");
+    _pack_module($cd, "Data::Sah::Type::datenotime");
+    _pack_module($cd, "Data::Sah::Type::datetime");
+    _pack_module($cd, "Data::Sah::Type::duration");
+    _pack_module($cd, "Data::Sah::Type::float");
+    _pack_module($cd, "Data::Sah::Type::hash");
+    _pack_module($cd, "Data::Sah::Type::int");
+    _pack_module($cd, "Data::Sah::Type::num");
+    _pack_module($cd, "Data::Sah::Type::obj");
+    _pack_module($cd, "Data::Sah::Type::re");
+    _pack_module($cd, "Data::Sah::Type::str");
+    _pack_module($cd, "Data::Sah::Type::undef");
+    _pack_module($cd, "Data::Sah::Util::Role"); # required by Data::Sah::Type::*
+    _pack_module($cd, "Role::Tiny"); # required by Data::Sah::Type::*
+    _pack_module($cd, "Role::Tiny::With"); # required by Data::Sah::Type::*
+    _pack_module($cd, "Data::Sah::Type::BaseType"); # required by Data::Sah::Type::*
+    _pack_module($cd, "Data::Sah::Type::Comparable"); # required by Data::Sah::Type::*
+    _pack_module($cd, "Data::Sah::Type::HasElems"); # required by Data::Sah::Type::*
+
     _pack_module($cd, "Perinci::Sub::Normalize"); # required by Perinci::CmdLine::Util::Config
     _pack_module($cd, "Sah::Schema::rinci::function_meta"); # required by Perinci::Sub::Normalize
     push @l2, 'log_trace("Reading config file(s) ...");', "\n" if $cd->{gen_args}{log};
@@ -497,7 +530,7 @@ sub _gen_common_opt_handler {
     } elsif ($co eq 'format') {
         push @l, '$_pci_r->{format} = $_[1];';
     } elsif ($co eq 'json') {
-        push @l, '$_pci_r->{format} = (-t STDOUT) ? "json-pretty" : "json";';
+        push @l, '$_pci_r->{format} = (-t STDOUT) ? "json-pretty" : "json"; ## no critic InputOutput::ProhibitInteractiveTest' . "\n";
     } elsif ($co eq 'naked_res') {
         push @l, '$_pci_r->{naked_res} = 1;';
     } elsif ($co eq 'no_naked_res') {
@@ -1135,7 +1168,7 @@ sub gen_inline_pericmd_script {
         "Perinci::Result::Format::Lite",
 
         # this will be removed if we don't need formatting
-        "Text::Table::Tiny",
+        "Text::Table::Sprintf",
 
         @{ $args{include} // [] },
     ) {
@@ -1388,7 +1421,7 @@ _
         push @l, 'my $fh;', "\n";
         push @l, 'if ($_pci_r->{page_result} // $ENV{PAGE_RESULT} // $_pci_r->{res}[3]{"cmdline.page_result"}) {', "\n";
         push @l, 'my $pager = $_pci_r->{pager} // $_pci_r->{res}[3]{"cmdline.pager"} // $ENV{PAGER} // "less -FRSX";', "\n";
-        push @l, 'open $fh, "| $pager";', "\n";
+        push @l, 'open $fh, "| $pager"; ## no critic InputOutput::ProhibitTwoArgOpen', "\n";
         push @l, '} else {', "\n";
         push @l, '$fh = \*STDOUT;', "\n";
         push @l, '}', "\n";
@@ -1429,7 +1462,7 @@ _
         if ($args{skip_format}) {
             delete $cd->{module_srcs}{'Data::Check::Structure'};
             delete $cd->{module_srcs}{'Perinci::Result::Format::Lite'};
-            delete $cd->{module_srcs}{'Text::Table::Tiny'};
+            delete $cd->{module_srcs}{'Text::Table::Sprintf'};
         }
 
         if ($args{pass_cmdline_object}) {
@@ -1506,11 +1539,6 @@ _
                 JSON::MaybeXS->new->canonical(1)->encode(\%tmp);
             }, "\n\n",
 
-            'my $_pci_metas = ', do {
-                local $Data::Dmp::OPT_DEPARSE=0;
-                dmp($cd->{metas});
-            }, ";\n\n",
-
             "# This script is generated by ", __PACKAGE__,
             " version ", (${__PACKAGE__."::VERSION"} // 'dev'), " on ",
             scalar(localtime), ".\n\n",
@@ -1520,8 +1548,6 @@ _
             "# You probably should not manually edit this file.\n\n",
 
             # for dzil
-            "# DATE\n",
-            "# VERSION\n",
             "# PODNAME: ", ($args{script_name} // ''), "\n",
             do {
                 my $abstract = $args{script_summary} // $cd->{metas}{''}{summary};
@@ -1547,6 +1573,17 @@ _
             "\n",
 
             "### declare global variables\n\n",
+            # for dzil
+            "# AUTHORITY\n",
+            "# DATE\n",
+            "# DIST\n",
+            "# VERSION\n",
+            "\n",
+            'my $_pci_metas = ', do {
+                local $Data::Dmp::OPT_DEPARSE=0;
+                dmp($cd->{metas});
+            }, ";\n\n",
+
             (map { "our $_" . (defined($cd->{vars}{$_}) ? " = ".dmp($cd->{vars}{$_}) : "").";\n" } sort keys %{$cd->{vars}}),
             (keys(%{$cd->{vars}}) ? "\n" : ""),
 
@@ -1630,7 +1667,7 @@ Perinci::CmdLine::Inline - Generate inline Perinci::CmdLine CLI script
 
 =head1 VERSION
 
-This document describes version 0.551 of Perinci::CmdLine::Inline (from Perl distribution Perinci-CmdLine-Inline), released on 2020-05-18.
+This document describes version 0.552 of Perinci::CmdLine::Inline (from Perl distribution Perinci-CmdLine-Inline), released on 2021-08-29.
 
 =head1 SYNOPSIS
 
@@ -1666,7 +1703,7 @@ dependency, these modules' source codes are included in the generated script
 using the datapack technique (see L<Module::DataPack>).
 
 Among the modules are L<Getopt::Long::EvenLess> to parse command-line options,
-L<Text::Table::Tiny> to produce text table output, and also a few generated
+L<Text::Table::Sprintf> to produce text table output, and also a few generated
 modules to modularize the generated script's structure.
 
 =item * vars => hash
@@ -1697,7 +1734,7 @@ enveloped result. This makes debugging easier.
 
 Usage:
 
- gen_inline_pericmd_script(%args) -> [status, msg, payload, meta]
+ gen_inline_pericmd_script(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Generate inline Perinci::CmdLine CLI script.
 
@@ -1939,12 +1976,12 @@ Generate script with debugging outputs.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1964,14 +2001,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Cm
 
 Source repository is at L<https://github.com/perlancar/perl-Perinci-CmdLine-Inline>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Inline>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Perinci::CmdLine>, L<Perinci::CmdLine::Any>, L<Perinci::CmdLine::Lite>,
@@ -1983,11 +2012,36 @@ L<App::GenPericmdScript>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Inline>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

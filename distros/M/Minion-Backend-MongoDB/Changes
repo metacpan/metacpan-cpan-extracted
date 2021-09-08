@@ -1,22 +1,34 @@
 Revision history for Perl extension Minion-Backend-MongoDB
 
-1.06 2020-03-14T12:11:10Z (ebruni)
+1.09 2021-09-xxTxx:xx:00Z (ebruni)
+    - Some optimization in dequeue jobs
+    - Solved a bug where process forks while MongoDB not reconnect
 
+1.08 2021-09-05T17:03:00Z (ebruni)
+    - Removed verbose prereqs and reduce perl minimum version.
+
+1.07 2021-09-03T17:43:00Z (ebruni)
+    - Added support for high priority fast lane (Minion 10.17).
+    - Added support for lax dependencies (Minon 10.13).
+    - Added support for expiring jobs (Minion 10.12).
+    - Improved repair method to detect stuck jobs (Minion 10.10).
+    - Add support for job sequences (removed in Minion 10.12).
+    - Add before options to list_jobs and list_workers methods (Minion 10.03).
+    - Fixed Mojolicious 9.0 compatibility.
+
+1.06 2020-03-14T12:11:10Z (ebruni)
     - In purge, solved a bugged default value for older param
     - In purge, add an older_field to set on which field check for job age
 
 1.05 2019-12-18T14:31:45Z (ebruni)
-
     - Added a method (purge) to delete jobs older
 
 1.04 2019-12-18T10:01:31Z (ebruni)
-
     - According to changes in Minion v10.00, now it's possible, for locks, to be
       reset without resetting the whole queue. Now, in reset, it's mandatory to
       explicitly state what needs to be destroyed.
 
 1.03 2019-10-14T15:40:00Z (ebruni)
-
     - MongoDB's primary key (_id) is an object (BSON::OID) so ids of workers,
       jobs and so on are currently objects too. This is ambiguous because, when
       search for a specific id, Pg backend expected a string and also returned
@@ -30,18 +42,14 @@ Revision history for Perl extension Minion-Backend-MongoDB
     - Optimization in job->note where now you can set/remove items at one time
 
 1.02 2019-09-02T08:03:19Z (ebruni)
-
     - Add cleanup event, note options according to Minion v9.12 an v9.13
     - Added some version check in mongo.t to be compatible to all Minion >= v9.00
 
 1.01 2019-08-28T16:27:34Z (ebruni)
-
     - Solved a memory leak-like bug in dequeuing jobs.
 
 1.00 2019-08-07T11:20:06Z (ebruni)
-
     - Full support for Minion > 9.0 and MongoDB > 2.0
 
 0.97 2015-06-27T07:35:30Z (avkhozov)
-
     - Initial release

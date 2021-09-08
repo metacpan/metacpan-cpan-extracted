@@ -1,5 +1,14 @@
 Revision history for App-gimpgitbuild
 
+0.28.1   2021-08-30
+    - Restrict clean_install to the "build" mode.
+
+0.28.0   2021-08-30
+    - Disable lua in GEGL and gimp:
+        - https://gitlab.gnome.org/GNOME/gimp/-/issues/7196
+    - Delete the installation directories to avoid stale files
+    - Apply LD_LIBRARY_PATH
+
 0.26.1   2020-07-28
     - Avoid recommending against a meson build when the mode is "non-build"
     (e.g "clean" mode).

@@ -2,7 +2,7 @@ package Alien::libsdl2;
 use strict;
 use warnings;
 use base qw[Alien::Base];
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 1;
 __END__
@@ -50,11 +50,6 @@ require L<libsdl2|http://libsdl.org>.
 This dist has been tested on various modern versions of perl on Windows Server
 2019, Ubuntu (20.04.2), and OSX (10.15.7). See
 https://github.com/sanko/Alien-libsdl2/actions
-
-On OSX and *nix, libsdl2 is built from source.
-
-On Windows, prebuilt shared libraries are downloaded from libsdl.org and
-installed.
 
 =head1 LICENSE
 

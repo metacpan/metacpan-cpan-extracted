@@ -7,6 +7,55 @@ Home page:    <https://metacpan.org/release/String-Copyright>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=libstring-copyright-perl>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+0.003011	2021-09-04
+
+ [ Documentation ]
+ - add Purism SPC as copyright holder
+
+ [ Test Suite ]
+ - teach author test pod-spell about the word 'Affero'
+
+ [ Packaging ]
+ - runtime-recommend re::engine::RE2
+ - skip kwalitee test: fails to recognize AGPL licensing
+ - test-require Test::Without::Module
+
+ [ Other ]
+ - detect '\(co' (© in roff markup) as identifier
+ - detect pseudo-sign after years
+ - detect real copyright preceded by bogus (have bogus match be non-greedy)
+ - detect vague sign '-C-' as identifier, except standalone
+ - relicense project as AGPL-3-or-newer
+ - skip identifier followed by ' dates '
+ - skip identifier followed by ' for '
+ - skip non-indentifier followed by ' This '
+ - skip non-indentifier followed by ' of '
+ - skip non-range '19xx'
+ - skip pseudo-sign chatter of single character in (at least ending) parens
+ - skip pseudo-sign followed by ' all begin '
+ - tighten to detect only vague year as owner (not other strings beginning
+   with dash)
+ - treat leading dash with space around as delimiter (not part of owner)
+ - use re::engine::RE2 when available
+
+0.003010	2021-08-28
+
+ - relax to cover double colon or colon preceded by space
+ - skip non-identifier ' for copyright'
+ - skip non-identifiers 'copyright sign ' 'copyright symbol ' 'copyright
+   text '
+
+0.003009	2021-08-28
+
+ - skip bogus pseudo-sign chatter '(c) You must'
+ - skip dummy year
+ - skip non-owner starting with
+   are/disclaimer/if/interest/permission/treaty
+ - skip non-owner starting with (non-delimiting) comma
+ - skip non-owner the library/software, then comma
+ - skip nonidentifier 'Copyright Act'
+ - skip nonidentifier 'we copyright'
+
 0.003008	2021-08-18
 
  [ Packaging ]

@@ -2,8 +2,8 @@ use warnings;
 
 package Git::Hooks::CheckLog;
 # ABSTRACT: Git::Hooks plugin to enforce commit log policies
-$Git::Hooks::CheckLog::VERSION = '3.1.0';
-use 5.016;
+$Git::Hooks::CheckLog::VERSION = '3.1.1';
+use v5.16.0;
 use utf8;
 use Log::Any '$log';
 use Git::Hooks;
@@ -351,7 +351,7 @@ Git::Hooks::CheckLog - Git::Hooks plugin to enforce commit log policies
 
 =head1 VERSION
 
-version 3.1.0
+version 3.1.1
 
 =head1 SYNOPSIS
 

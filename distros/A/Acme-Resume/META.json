@@ -141,19 +141,19 @@
    "provides" : {
       "Acme::Resume" : {
          "file" : "lib/Acme/Resume.pm",
-         "version" : "0.0103"
+         "version" : "0.0104"
       },
       "Acme::Resume::Internal" : {
          "file" : "lib/Acme/Resume/Internal.pm",
-         "version" : "0.0103"
+         "version" : "0.0104"
       },
       "Acme::Resume::MoopsParserTrait" : {
          "file" : "lib/Acme/Resume/MoopsParserTrait.pm",
-         "version" : "0.0103"
+         "version" : "0.0104"
       },
       "Acme::Resume::Moose" : {
          "file" : "lib/Acme/Resume/Moose.pm",
-         "version" : "0.0103"
+         "version" : "0.0104"
       }
    },
    "release_status" : "stable",
@@ -168,7 +168,7 @@
          "web" : "https://github.com/Csson/p5-Acme-Resume"
       }
    },
-   "version" : "0.0103",
+   "version" : "0.0104",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.020001"

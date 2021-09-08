@@ -1,0 +1,9 @@
+- ua: 'Mozilla/5.0 (Linux; Android 10; vivo 1938; wv) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.84 Mobile Safari/537.36 VivoBrowser/7.9.0.0'
+  name: 'VivoBrowser'
+  is_bot: false
+  is_ios: false
+  is_android: true
+  is_linux: true
+  is_windows: false
+  is_chromeos: false
+  version: '7.9.0.0'

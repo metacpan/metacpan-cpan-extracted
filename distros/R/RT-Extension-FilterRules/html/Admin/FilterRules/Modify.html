@@ -1,0 +1,207 @@
+<%doc>
+Modify the settings of a filter rule group, or create a new one.
+</%doc>
+\
+<%ARGS>
+$id            => undef
+$Create        => undef
+$Name          => undef
+$SetEnabled    => undef
+$Enabled       => undef
+$Delete        => undef
+$ConfirmDelete => undef
+</%ARGS>
+\
+<%INIT>
+unless ( $session{'CurrentUser'}
+    ->HasRight( Object => $RT::System, Right => 'SuperUser' ) )
+{
+    Abort( loc('This feature is only available to system administrators.') );
+}
+
+my ( $Title, @Results, $Disabled, $EnabledChecked );
+my $Object = RT::FilterRuleGroup->new( $session{'CurrentUser'} );
+$Object->Load($id) if ( $id && $id ne 'new' );
+
+@Results = ();
+
+if ( $Delete && not $ConfirmDelete ) {
+    push @Results, loc('Not deleted - confirmation box not checked');
+} elsif ( $Delete && $ConfirmDelete ) {
+    my ( $ok, $msg ) = $Object->Delete();
+    push @Results, $msg;
+    if ($ok) {
+        $Create = 1;
+        $id     = 'new';
+        delete $ARGS{'id'};
+        $Object = RT::FilterRuleGroup->new( $session{'CurrentUser'} );
+    }
+}
+
+if ($SetEnabled) {
+    $Disabled = $ARGS{'Disabled'} = $Enabled ? 0 : 1;
+}
+$EnabledChecked = 'checked="checked"';
+
+if ( not $Create ) {
+    if ( defined $id && $id eq 'new' ) {
+        my ( $ok, $msg )
+            = $Object->Create( Name => $Name, Disabled => $Disabled );
+        if ( not $ok ) {
+            $Create = 1;    # Create failed, so bring us back to step 1
+        }
+        push @Results, $msg;
+    } else {
+        $Object->Load($id)
+            || $Object->Load($Name)
+            || Abort(
+            loc( "Couldn't load filter rule group '[_1]'", $Name ) );
+    }
+}
+
+if ( $Object->id && not $Create ) {
+    $Title = loc( 'Configuration for filter rule group [_1]', $Object->Name );
+    my @Attributes
+        = qw(Name CanMatchQueues CanTransferQueues CanUseGroups Disabled);
+
+    foreach my $ListAttribute ( 'CanMatchQueues', 'CanTransferQueues',
+        'CanUseGroups' )
+    {
+        my @ValueList = $Object->$ListAttribute;
+        if ( $ARGS{ 'Add' . $ListAttribute } ) {
+            push @ValueList, $ARGS{ 'Add' . $ListAttribute }
+                if ( not grep { $_ eq $ARGS{ 'Add' . $ListAttribute } }
+                @ValueList );
+        }
+        if ( $ARGS{ 'Remove' . $ListAttribute } ) {
+            foreach my $Value (
+                @{  ref $ARGS{ 'Remove' . $ListAttribute }
+                    ? $ARGS{ 'Remove' . $ListAttribute }
+                    : [ $ARGS{ 'Remove' . $ListAttribute } ]
+                }
+                )
+            {
+                @ValueList = grep { $_ ne $Value } @ValueList;
+            }
+        }
+        $ARGS{$ListAttribute} = join( ',', @ValueList );
+    }
+
+    push @Results,
+        UpdateRecordObject(
+        AttributesRef => \@Attributes,
+        Object        => $Object,
+        ARGSRef       => \%ARGS
+        );
+
+    $Disabled = $ARGS{'Disabled'} = $Enabled ? 0 : 1;
+
+    $EnabledChecked = "" if $Object->Disabled;
+
+} else {
+    $Title = loc('Create a filter rule group');
+}
+
+# This code does automatic redirection if any updates happen.
+MaybeRedirectForResults(
+    Actions   => \@Results,
+    Arguments => { id => $Object->id },
+) if $Object->id;
+</%INIT>
+\
+<& /Admin/Elements/Header, Title => $Title &>
+<& /Elements/Tabs &>
+<& /Elements/ListActions, actions => \@Results &>
+
+<form action="<%RT->Config->Get('WebPath')%>/Admin/FilterRules/Modify.html" method="post">
+<input type="hidden" class="hidden" name="id" value="<% $Create ? 'new': $Object->id %>" />
+<p></p>
+<table>
+<tr>\
+<th style="text-align:right;vertical-align:top;"><&|/l&>Name</&>:</th>\
+<td><input required name="Name" value="<% $Create ? '' : $Object->Name || $Name %>" /></td>\
+</tr>
+% if (not $Create) {
+<tr>\
+<th style="text-align:right;vertical-align:top;"><&|/l&>Queues to allow in match rules</&>:</th>\
+<td><& /Elements/SelectObject, ObjectType => 'Queue', CheckRight => 'SeeQueue', ShowAll => 1, Name => 'AddCanMatchQueues' &>\
+ <input type="submit" value="<&|/l&>Add queue</&>" />\
+%     my ($Collection, $Count);
+%     $Collection = $Object->CanMatchQueuesObj;
+%     $Count = 0;
+%     while (my $Item = $Collection->Next) {
+%         $Count++;
+<br /><label><input type="checkbox" name="RemoveCanMatchQueues" value="<%$Item->id%>" /> #<%$Item->id%>: <%$Item->Name%></label>
+%     }
+%     if ($Count > 0) {
+<p><em><&|/l&>(Check box to delete)</&></em></p>\
+%     }
+</td>\
+</tr>
+<tr>\
+<th style="text-align:right;vertical-align:top;"><&|/l&>Queues to allow as transfer destinations</&>:</th>\
+<td><& /Elements/SelectObject, ObjectType => 'Queue', CheckRight => 'SeeQueue', ShowAll => 1, Name => 'AddCanTransferQueues' &>\
+ <input type="submit" value="<&|/l&>Add queue</&>" />\
+%     $Collection = $Object->CanTransferQueuesObj;
+%     $Count = 0;
+%     while (my $Item = $Collection->Next) {
+%         $Count++;
+<br /><label><input type="checkbox" name="RemoveCanTransferQueues" value="<%$Item->id%>" /> #<%$Item->id%>: <%$Item->Name%></label>
+%     }
+%     if ($Count > 0) {
+<p><em><&|/l&>(Check box to delete)</&></em></p>\
+%     }
+</td>\
+</tr>
+<tr>\
+<th style="text-align:right;vertical-align:top;"><&|/l&>Groups to allow in rule actions</&>:</th>\
+<td><select name="AddCanUseGroups"><option value="">-</option>\
+%     $Collection = RT::Groups->new( $session{'CurrentUser'} );
+%     $Collection->LimitToEnabled();
+%     $Collection->LimitToUserDefinedGroups();
+%     $Collection->OrderByCols( { FIELD => 'Name', ORDER => 'ASC' } );
+%     while (my $Item = $Collection->Next) {
+<option value="<%$Item->id%>"><%$Item->Name%></option>\
+%     }
+</select>\
+ <input type="submit" value="<&|/l&>Add group</&>" />\
+%     $Collection = $Object->CanUseGroupsObj;
+%     $Count = 0;
+%     while (my $Item = $Collection->Next) {
+%         $Count++;
+<br /><label><input type="checkbox" name="RemoveCanUseGroups" value="<%$Item->id%>" /> #<%$Item->id%>: <%$Item->Name%></label>
+%     }
+%     if ($Count > 0) {
+<p><em><&|/l&>(Check box to delete)</&></em></p>\
+%     }
+</td>\
+</tr>
+% }
+<tr>\
+<th style="text-align:right;"><input type="checkbox" class="checkbox" id="Enabled" name="Enabled" value="1" <%$EnabledChecked|n%> /></th>\
+<td><label for="Enabled"><&|/l&>Enabled (Unchecking this box disables this filter rule group)</&></label><br />\
+<input type="hidden" class="hidden" name="SetEnabled" value="1" />\
+</td>\
+</tr>
+<tr><td colspan="2"><hr />\
+% if ( $Create ) {
+<& /Elements/Submit, Label => loc('Create') &>
+% } else {
+<& /Elements/Submit, Label => loc('Save Changes') &>
+% }
+</td></tr>
+</table>
+</form>
+
+% if ( not $Create ) {
+<div style="text-align:right;margin-top:4em;">
+<form action="Modify.html" method="post">
+<input type="hidden" name="id" value="<% $Object->id %>" />
+<div class="error" style="padding:0;display:inline-block;"><div class="error" style="padding:1em;border:solid #400 1px;text-align:left;display:inline-block;">
+<input type="submit" name="Delete" value="<&|/l&>Delete this filter rule group and all its filter rules</&>" />
+<br />
+<small><input type="checkbox" name="ConfirmDelete" value="1" /> <&|/l&>Check this box to confirm</&></small>
+</div></div>
+</form>
+</div>
+% }

@@ -29,7 +29,7 @@ use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
 # uncomment this to run the ### lines
-#use Smart::Comments;
+# use Smart::Comments;
 
 
 # only test on 6.6 up since 6.5.5 seen doing dodgy stuff on a 3x3 ellipse,
@@ -75,7 +75,7 @@ require Image::Base::Magick;
 #------------------------------------------------------------------------------
 # VERSION
 
-my $want_version = 6;
+my $want_version = 7;
 ok ($Image::Base::Magick::VERSION,
     $want_version,
     'VERSION variable');

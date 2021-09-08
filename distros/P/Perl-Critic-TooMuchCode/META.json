@@ -27,9 +27,11 @@
       "runtime" : {
          "requires" : {
             "List::Util" : "1.50",
+            "PPIx::QuoteLike" : "0",
             "PPIx::Utils" : "0.002",
             "Perl::Critic" : "0",
-            "Scalar::Util" : "1.50"
+            "Scalar::Util" : "1.50",
+            "version" : "0.77"
          }
       },
       "test" : {
@@ -75,7 +77,7 @@
       },
       "Perl::Critic::TooMuchCode" : {
          "file" : "lib/Perl/Critic/TooMuchCode.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       }
    },
    "release_status" : "stable",
@@ -89,7 +91,7 @@
          "web" : "https://github.com/gugod/Perl-Critic-TooMuchCode"
       }
    },
-   "version" : "0.15",
+   "version" : "0.16",
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_spdx_expression" : "MIT",
    "x_static_install" : "1"

@@ -1,9 +1,5 @@
-use Test::More;
+use Test2::V0;
 
-my @requires = ( qw/ MIDI::RtMidi::FFI MIDI::RtMidi::FFI::Device / );
-
-for my $require ( @requires ) {
-    require_ok $require or BAIL_OUT "Can't load $require - is librtmidi installed?";
-}
+use ok 'MIDI::RtMidi::FFI::Device';
 
 done_testing

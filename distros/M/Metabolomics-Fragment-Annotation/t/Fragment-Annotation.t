@@ -10,7 +10,6 @@ use warnings;
 
 use FindBin;                 # locate this script
 use lib "$FindBin::Bin/../lib";  # use the parent directory
-use lib "$FindBin::Bin/../lib/Metabolomics/Banks/lib";
 
 use Metabolomics::Fragment::Annotation qw( :all ) ;
 use Metabolomics::Banks qw( :all ) ;
@@ -75,7 +74,7 @@ BEGIN {
     ],
       ## PeakList:
 	[
-        {
+         bless( {
             '_ANNOTATION_FORMULA_' => 'NA',
             '_ANNOTATION_IN_NEG_MODE_' => 'NA',
             '_ANNOTATION_IN_POS_MODE_' => 'NA',
@@ -84,8 +83,8 @@ BEGIN {
             '_COMPUTED_MONOISOTOPIC_MASS_' => 0,
             '_ANNOTATION_NAME_' => 'NA',
             '_ANNOTATION_TYPE_' => 'NA'
-        },
-		{
+        },  'Metabolomics::Banks' ),
+		 bless( {
             '_ANNOTATION_FORMULA_' => 'NA',
             '_MESURED_MONOISOTOPIC_MASS_' => '993.9955766',
             '_ANNOTATION_IN_POS_MODE_' => 'NA',
@@ -94,8 +93,8 @@ BEGIN {
             '_COMPUTED_MONOISOTOPIC_MASS_' => 0,
             '_PPM_ERROR_' => 0,
             '_ANNOTATION_TYPE_' => 'NA'
-          },
-          {
+          },  'Metabolomics::Banks' ),
+           bless( {
             '_ANNOTATION_FORMULA_' => 'NA',
             '_ANNOTATION_IN_NEG_MODE_' => 'NA',
             '_ANNOTATION_IN_POS_MODE_' => 'NA',
@@ -104,12 +103,12 @@ BEGIN {
             '_COMPUTED_MONOISOTOPIC_MASS_' => 0,
             '_ANNOTATION_NAME_' => 'NA',
             '_ANNOTATION_TYPE_' => 'NA'
-          }
+          }, 'Metabolomics::Banks' ),
     ]
     ),
 	## Expected	
 		[
-          {
+           bless( {
             '_COMPUTED_MONOISOTOPIC_MASS_' => 0,
             '_ANNOTATION_FORMULA_' => 'NA',
             '_ANNOTATION_TYPE_' => 'NA',
@@ -118,8 +117,8 @@ BEGIN {
             '_ANNOTATION_NAME_' => 'NA',
             '_MESURED_MONOISOTOPIC_MASS_' => '85.02824868',
             '_PPM_ERROR_' => 0
-          },
-          {
+          }, 'Metabolomics::Banks' ),
+           bless( {
             '_ANNOTATION_FORMULA_' => 'NA',
             '_COMPUTED_MONOISOTOPIC_MASS_' => 0,
             '_MESURED_MONOISOTOPIC_MASS_' => '993.9955766',
@@ -128,8 +127,8 @@ BEGIN {
             '_ANNOTATION_TYPE_' => 'NA',
             '_ANNOTATION_IN_POS_MODE_' => 'NA',
             '_ANNOTATION_IN_NEG_MODE_' => 'NA'
-          },
-          {
+          }, 'Metabolomics::Banks' ),
+           bless( {
             '_COMPUTED_MONOISOTOPIC_MASS_' => 0,
             '_ANNOTATION_FORMULA_' => 'NA',
             '_ANNOTATION_NAME_' => 'NA',
@@ -138,7 +137,7 @@ BEGIN {
             '_ANNOTATION_IN_NEG_MODE_' => 'NA',
             '_MESURED_MONOISOTOPIC_MASS_' => '994.245866',
             '_PPM_ERROR_' => 0
-          }
+          }, 'Metabolomics::Banks' ),
         ],
 	## MSG
 		'Method \'_mapPeakListWithTemplateFields\' maps well with a peak list and template fields content');
@@ -211,7 +210,7 @@ BEGIN {
                                                 }, 'Metabolomics::Banks' ),
                                        ],
                }, 'Metabolomics::Banks' ),
-        'DA', 0.05),
+        'MMU', 0.05),
 	## Expected	
 		bless( {
 				 '_ANNOTATION_TOOL_' => 'mzBiH',
@@ -221,7 +220,7 @@ BEGIN {
                  '_ANNOTATION_DB_SOURCE_TYPE_' => 'FRAGMENT',
                  '_ANNOTATION_TOOL_VERSION_' => '0.1',
                  '_ANNOTATION_PARAMS_DELTA_' => 0.05,
-                 '_ANNOTATION_PARAMS_DELTA_TYPE_' => 'DA',
+                 '_ANNOTATION_PARAMS_DELTA_TYPE_' => 'MMU',
                  '_ANNOTATION_PARAMS_INSTRUMENTS_' => [],
                  '_ANNOTATION_PARAMS_FILTERS_' => [],
                  '_ANNOTATION_DB_SOURCE_VERSION_' => '1.0',
@@ -453,7 +452,7 @@ BEGIN {
                                                 }, 'Metabolomics::Banks' ),
                                        ],
                }, 'Metabolomics::Fragment::Annotation' ),
-        'DA', 0.05),
+        'MMU', 0.05),
 	## Expected	
 		bless( {
                  '_EXP_PEAK_LIST_' => [
@@ -484,7 +483,7 @@ BEGIN {
                                       ],
                  '_ANNOTATION_TOOL_VERSION_' => '0.1',
                  '_ANNOTATION_PARAMS_DELTA_' => 0.05,
-                 '_ANNOTATION_PARAMS_DELTA_TYPE_' => 'DA',
+                 '_ANNOTATION_PARAMS_DELTA_TYPE_' => 'MMU',
                  '_ANNOTATION_PARAMS_INSTRUMENTS_' => [],
                  '_ANNOTATION_PARAMS_FILTERS_' => [],
                  '_ANNOTATION_DB_SOURCE_VERSION_' => '1.0',
@@ -586,7 +585,7 @@ BEGIN {
                                                 }, 'Metabolomics::Banks' ),
                                        ],
                }, 'Metabolomics::Fragment::Annotation' ),
-        'DA', 0.05),
+        'MMU', 0.05),
 	## Expected	
 		bless( {
                  '_ANNOTATION_DB_SOURCE_' => 'Blood Exposome',
@@ -627,7 +626,7 @@ BEGIN {
                  '_ANNOTATION_DB_SOURCE_VERSION_' => '1.0',
                  '_ANNOTATION_TOOL_VERSION_' => '0.1',
                  '_ANNOTATION_PARAMS_DELTA_' => 0.05,
-                 '_ANNOTATION_PARAMS_DELTA_TYPE_' => 'DA',
+                 '_ANNOTATION_PARAMS_DELTA_TYPE_' => 'MMU',
                  '_ANNOTATION_PARAMS_INSTRUMENTS_' => [],
                  '_ANNOTATION_PARAMS_FILTERS_' => [],
                  '_EXP_PEAK_LIST_' => [
@@ -810,7 +809,7 @@ BEGIN {
                                                  '_PPM_ERROR_' => 0,
                                                  '_MMU_ERROR_' => 0,
                                                  '_ANNOTATION_TYPE_' => undef
-                                               }, 'Metabolomics::Fragment::Annotation' ),
+                                               }, 'Metabolomics::Banks' ),
                                         bless( {
                                                  '_ANNOTATION_IN_POS_MODE_' => undef,
                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => 0,
@@ -820,7 +819,7 @@ BEGIN {
                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
                                                  '_MMU_ERROR_' => 0,
                                                  '_ANNOTATION_TYPE_' => undef
-                                               }, 'Metabolomics::Fragment::Annotation' ),
+                                               }, 'Metabolomics::Banks' ),
                                         bless( {
                                                  '_ANNOTATION_TYPE_' => undef,
                                                  '_MMU_ERROR_' => 0,
@@ -830,7 +829,7 @@ BEGIN {
                                                  '_ANNOTATION_IN_POS_MODE_' => undef,
                                                  '_MESURED_MONOISOTOPIC_MASS_' => '128.9587',
                                                  '_PPM_ERROR_' => 0
-                                               }, 'Metabolomics::Fragment::Annotation' ),
+                                               }, 'Metabolomics::Banks' ),
                                         bless( {
                                                  '_ANNOTATION_NAME_' => undef,
                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
@@ -840,7 +839,7 @@ BEGIN {
                                                  '_ANNOTATION_IN_POS_MODE_' => undef,
                                                  '_MMU_ERROR_' => 0,
                                                  '_ANNOTATION_TYPE_' => undef
-                                               }, 'Metabolomics::Fragment::Annotation' ),
+                                               }, 'Metabolomics::Banks' ),
                                         bless( {
                                                  '_MESURED_MONOISOTOPIC_MASS_' => '60.02425',
                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => '60.02113',
@@ -851,7 +850,7 @@ BEGIN {
                                                  '_MMU_ERROR_' => '0.00312',
                                                  '_ANNOTATION_TYPE_' => 'Solvent',
                                                  '_ID_' => 'CON00001'
-                                               }, 'Metabolomics::Fragment::Annotation' )
+                                               }, 'Metabolomics::Banks' )
                                       ]
                }, 'Metabolomics::Fragment::Annotation' ),
 		$modulePath.'/_template.tabular',
@@ -883,7 +882,7 @@ BEGIN {
                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => 0,
                                                  '_ANNOTATION_NAME_' => undef,
                                                  '_ANNOTATION_IN_NEG_MODE_' => undef
-                                               }, 'Metabolomics::Fragment::Annotation' ),
+                                               }, 'Metabolomics::Banks' ),
                                         bless( {
                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => 0,
                                                  '_ANNOTATION_IN_POS_MODE_' => undef,
@@ -891,7 +890,7 @@ BEGIN {
                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
                                                  '_ANNOTATION_TYPE_' => undef,
                                                  '_MESURED_MONOISOTOPIC_MASS_' => '156.0351'
-                                               }, 'Metabolomics::Fragment::Annotation' ),
+                                               }, 'Metabolomics::Banks' ),
                                         bless( {
                                                  '_MESURED_MONOISOTOPIC_MASS_' => '128.9587',
                                                  '_ANNOTATION_TYPE_' => undef,
@@ -899,7 +898,7 @@ BEGIN {
                                                  '_ANNOTATION_NAME_' => undef,
                                                  '_ANNOTATION_IN_POS_MODE_' => undef,
                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => 0
-                                               }, 'Metabolomics::Fragment::Annotation' ),
+                                               }, 'Metabolomics::Banks' ),
                                         bless( {
                                                  '_ANNOTATION_NAME_' => undef,
                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
@@ -907,7 +906,7 @@ BEGIN {
                                                  '_ANNOTATION_IN_POS_MODE_' => undef,
                                                  '_MESURED_MONOISOTOPIC_MASS_' => '118.9756',
                                                  '_ANNOTATION_TYPE_' => undef
-                                               }, 'Metabolomics::Fragment::Annotation' ),
+                                               }, 'Metabolomics::Banks' ),
                                         bless( {
                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => '60.02113',
@@ -918,7 +917,7 @@ BEGIN {
                                                  '_ID_' => 'CON00001',
                                                  '_ANNOTATION_IN_POS_MODE_' => undef,
                                                  '_PPM_ERROR_' => 552,
-                                               }, 'Metabolomics::Fragment::Annotation' )
+                                               }, 'Metabolomics::Banks' )
                                       ]
                }, 'Metabolomics::Fragment::Annotation' ),
         $modulePath.'/in_test01_pos.tabular',
@@ -954,7 +953,7 @@ BEGIN {
                                                  '_ANNOTATION_NAME_' => undef,
                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
                                                  '_ANNOTATIONS_' => []
-                                               }, 'Metabolomics::Fragment::Annotation' ),
+                                               }, 'Metabolomics::Banks' ),
                                         bless( {
                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => 0,
                                                  '_ANNOTATION_IN_POS_MODE_' => undef,
@@ -963,7 +962,7 @@ BEGIN {
                                                  '_ANNOTATION_TYPE_' => undef,
                                                  '_MESURED_MONOISOTOPIC_MASS_' => '156.0351',
                                                  '_ANNOTATIONS_' => []
-                                               }, 'Metabolomics::Fragment::Annotation' ),
+                                               }, 'Metabolomics::Banks' ),
                                         bless( {
                                                  '_MESURED_MONOISOTOPIC_MASS_' => '128.9587',
                                                  '_ANNOTATION_TYPE_' => undef,
@@ -972,7 +971,7 @@ BEGIN {
                                                  '_ANNOTATION_IN_POS_MODE_' => undef,
                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => 0,
                                                  '_ANNOTATIONS_' => []
-                                               }, 'Metabolomics::Fragment::Annotation' ),
+                                               }, 'Metabolomics::Banks' ),
                                         bless( {
                                                  '_ANNOTATION_NAME_' => undef,
                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
@@ -981,7 +980,7 @@ BEGIN {
                                                  '_MESURED_MONOISOTOPIC_MASS_' => '118.9756',
                                                  '_ANNOTATION_TYPE_' => undef,
                                                  '_ANNOTATIONS_' => []
-                                               }, 'Metabolomics::Fragment::Annotation' ),
+                                               }, 'Metabolomics::Banks' ),
                                         bless( {
                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => '60.02113',
@@ -1034,7 +1033,7 @@ BEGIN {
                                                  
                                                  
                                                  ]
-                                               }, 'Metabolomics::Fragment::Annotation' )
+                                               }, 'Metabolomics::Banks' )
                                       ]
                }, 'Metabolomics::Fragment::Annotation' ),
         $modulePath.'/in_test01_pos.tabular',
@@ -1416,7 +1415,8 @@ BEGIN {
 		2, 
 		21,
 		13,
-		0.05,
+		0.05, ##PPM
+		'MMU',
 		'https://metabohub.peakforest.org/rest/v2/',
 		undef, # url card
 		'2big17k7a871tfatk1b4cm8pr7',
@@ -1441,7 +1441,8 @@ BEGIN {
 		3, 
 		22,
 		14,
-		0.05,
+		0.05, ## DA
+		'MMU',
 		'https://pfem.peakforest.org/rest/v2/',
 		'https://pfem.peakforest.org/webapp/home?PFc=',
 		'ta8j54uq85k00hi9qrnrrghgei',
@@ -1767,7 +1768,7 @@ BEGIN {
 	## sub fullCompare_GCMS_ExpPeakList_And_TheoPeakForestBank_FromDataAnalysis_V2
 	sub fullCompare_GCMS_ExpPeakList_And_TheoPeakForestBank_FromDataAnalysis_V2_TEST {
 		# get values
-		my ($expFile, $is_header, $col_Mzs, $col_Ints, $col_ClusterIds, $delta, $url, $url_card, $token, $polarity, $resolution, $column_code, $template, $tabular, $templateHTML, $htmlFile) = @_ ;
+		my ($expFile, $is_header, $col_Mzs, $col_Ints, $col_ClusterIds, $delta, $deltaType, $url, $url_card, $token, $polarity, $resolution, $column_code, $template, $tabular, $templateHTML, $htmlFile) = @_ ;
 		
 		## sending REST API Query as:
 		#curl "https://metabohub.peakforest.org/rest/v2//spectra-peakmatching/fullscan-gcms
@@ -1797,17 +1798,20 @@ BEGIN {
 #		print Dumper $oBank ;
 		
 		# build pseudo spectra from 
-		my $NbSpectra = $oBank->buildSpectralBankFromPeakForest($column_code, $delta) ;
+		my $NbSpectra = $oBank->buildSpectralBankFromPeakForest($column_code, $deltaType, $delta, undef) ; ## Support ONLY MMU
 #	    print Dumper $oBank ;
 		
 		my $oAnalysis = Metabolomics::Fragment::Annotation->new($oBank) ;
 #		print Dumper $oAnalysis ;
 		
 #		$oAnalysis->compareExpMzToTheoMzList('PPM', $delta) ;
-		$oAnalysis->compareExpMzToTheoMzListAllMatches('PPM', $delta) ;
-#		print Dumper $oAnalysis ;
+		$oAnalysis->compareExpMzToTheoMzListAllMatches($deltaType, $delta) ;
 		
 		my $scores = $oAnalysis->computeHrGcmsMatchingScores() ;
+#		print Dumper $oAnalysis ;
+		
+		$oAnalysis->filterAnalysisSpectralAnnotationByScores($scores, '_SCORE_PEARSON_CORR_', "0.5") ; # _SCORE_PEARSON_CORR_
+#		print Dumper $oAnalysis ;
 #		print Dumper $scores ;
 		
 		my $tabularFullfile = $oAnalysis->writeFullTabularWithPeakBankObject($expFile, $template, $tabular, 'FALSE') ;

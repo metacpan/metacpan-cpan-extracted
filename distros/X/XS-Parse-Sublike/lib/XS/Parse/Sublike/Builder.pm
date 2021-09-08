@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Sublike::Builder 0.12;
+package XS::Parse::Sublike::Builder 0.13;
 
 use v5.14;
 use warnings;
@@ -38,10 +38,7 @@ distribution to be able to make use of C<XS::Parse::Sublike>.
 
 =cut
 
-my $XSParseSublike_h = do {
-   local $/;
-   readline DATA;
-};
+require XS::Parse::Sublike::Builder_data;
 
 =head1 FUNCTIONS
 
@@ -63,7 +60,7 @@ sub write_XSParseSublike_h
    open my $out, ">", "XSParseSublike.h" or
       die "Cannot open XSParseSublike.h for writing - $!\n";
 
-   $out->print( $XSParseSublike_h );
+   $out->print( XS::Parse::Sublike::Builder_data->XSPARSESUBLIKE_H );
 }
 
 =head2 extra_compiler_flags

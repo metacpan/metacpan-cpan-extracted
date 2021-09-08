@@ -1,9 +1,9 @@
 package App::lcpan::Cmd::deps_unindexed;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-01'; # DATE
+our $DATE = '2021-06-03'; # DATE
 our $DIST = 'App-lcpan-CmdBundle-deps'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
@@ -24,10 +24,9 @@ $SPEC{handle_cmd} = {
 This subcommand lists unindexed dependencies. It does not require you to specify
 a distribution name, so you can view all unindexed dependencies in the `dep`
 table. Only "unindexed dependencies" are listed though, meaning modules that are
-not currently indexed by `02packages.details.txt.gz` and are not listed in the
-`module` table. Obviously, distributions normallyd specify dependencies to
-indexed modules so they can be found and installed. To list those, use the
-`deps-all` subcommand.
+not currently indexed by `02packages.details.txt.gz`. Obviously, distributions
+normally specify dependencies to indexed modules so they can be found and
+installed. To list those, use the `deps-all` subcommand.
 
 _
     args => {
@@ -66,8 +65,8 @@ including ones to 'perl'.
 _
             schema => 'bool*',
             cmdline_aliases => {
-                exclude_perl => {is_flag=>1, summary=>"Equivalent to --perl", code=>sub {$_[0]{perl}=0}},
-                include_perl => {is_flag=>1, summary=>"Equivalent to --no-perl", code=>sub {$_[0]{perl}=1}},
+                exclude_perl => {is_flag=>1, summary=>"Equivalent to --no-perl", code=>sub {$_[0]{perl}=0}},
+                include_perl => {is_flag=>1, summary=>"Equivalent to --perl", code=>sub {$_[0]{perl}=1}},
             },
         },
     },
@@ -161,7 +160,7 @@ App::lcpan::Cmd::deps_unindexed - List all unindexed dependencies
 
 =head1 VERSION
 
-This document describes version 0.010 of App::lcpan::Cmd::deps_unindexed (from Perl distribution App-lcpan-CmdBundle-deps), released on 2021-06-01.
+This document describes version 0.011 of App::lcpan::Cmd::deps_unindexed (from Perl distribution App-lcpan-CmdBundle-deps), released on 2021-06-03.
 
 =head1 DESCRIPTION
 
@@ -181,10 +180,9 @@ List all unindexed dependencies.
 This subcommand lists unindexed dependencies. It does not require you to specify
 a distribution name, so you can view all unindexed dependencies in the C<dep>
 table. Only "unindexed dependencies" are listed though, meaning modules that are
-not currently indexed by C<02packages.details.txt.gz> and are not listed in the
-C<module> table. Obviously, distributions normallyd specify dependencies to
-indexed modules so they can be found and installed. To list those, use the
-C<deps-all> subcommand.
+not currently indexed by C<02packages.details.txt.gz>. Obviously, distributions
+normally specify dependencies to indexed modules so they can be found and
+installed. To list those, use the C<deps-all> subcommand.
 
 This function is not exported.
 

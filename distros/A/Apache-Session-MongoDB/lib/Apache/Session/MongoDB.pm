@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use AutoLoader 'AUTOLOAD';
 
-our $VERSION = '0.21';
+our $VERSION = '0.23';
 our @ISA     = qw(Apache::Session);
 
 use Apache::Session;
@@ -44,6 +44,58 @@ sub searchOnExpr {
     $value =~ s/([\/\\\^\$\.\?\+\[\]\{\}\(\)])/\\$1/g;
     $value =~ s/\*/\.\*/g;
     return $class->_query( $args, { $selectField => qr/$value/i } );
+}
+
+sub deleteIfLowerThan {
+    my ( $class, $args, $rule ) = @_;
+    my $query;
+
+    if ( $rule->{or} ) {
+        $query = {
+            '$or' => [
+                map {
+                    { $_ => { '$lt' => $rule->{or}->{$_} } }
+                  }
+                  keys %{ $rule->{or} }
+            ]
+        };
+    }
+    elsif ( $rule->{and} ) {
+        $query = {
+            '$and' => [
+                map {
+                    { $_ => { '$lt' => $rule->{or}->{$_} } }
+                  }
+                  keys %{ $rule->{or} }
+            ]
+        };
+    }
+    if ( $rule->{not} ) {
+        $query = {
+            '$and' => [
+                $query,
+                map {
+                    { $_ => { '$ne' => $rule->{not}->{$_} } }
+                  }
+                  keys %{ $rule->{not} }
+            ]
+        };
+    }
+    return 0 unless ($query);
+
+    my $col    = $class->_col($args);
+    my $result = $col->delete_many($query);
+    if ( $result->acknowledged ) {
+        if (wantarray) {
+            return 1, $result->deleted_count;
+        }
+        else {
+            return 1;
+        }
+    }
+    else {
+        return 1;
+    }
 }
 
 sub _query {

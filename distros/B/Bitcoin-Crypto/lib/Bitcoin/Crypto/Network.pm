@@ -1,6 +1,6 @@
 package Bitcoin::Crypto::Network;
 
-our $VERSION = "0.997";
+our $VERSION = "1.000";
 
 use v5.10;
 use warnings;
@@ -207,6 +207,26 @@ This package allows you to manage non-bitcoin cryptocurrencies.
 Before you start producing keys and addresses for your favorite crypto
 you have to configure it's network first.
 
+=head1 PREDEFINED NETWORKS
+
+There are a couple of networks that are already defined and can be used without defining them:
+
+=over
+
+=item * Bitcoin Mainnet
+
+defined with id: C<bitcoin>
+
+=item * Bitcoin Testnet
+
+defined with id: C<bitcoin_testnet>
+
+=back
+
+If you want to see more predefined networks added and you're willing to make
+some research to find out the correct values for the configuration fields,
+consider opening a pull request on Github.
+
 =head1 CONFIGURATION
 
 Right now networks only require four keys, which are marked with (*)
@@ -215,9 +235,9 @@ Right now networks only require four keys, which are marked with (*)
 		id             => "(*) identifier for the network",
 		name           => "(*) human-readable network name",
 		p2pkh_byte     => "(*) p2pkh address prefix byte, eg. 0x00",
+		wif_byte       => "(*) WIF private key prefix byte, eg. 0x80",
 		p2sh_byte      => "p2sh address prefix byte, eg. 0x05",
 		segwit_hrp     => "segwit native address human readable part, eg. 'bc'",
-		wif_byte       => "(*) WIF private key prefix byte, eg. 0x80",
 		extprv_version => "version of extended private keys, eg. 0x0488ade4",
 		extpub_version => "version of extended public keys, eg. 0x0488b21e",
 		bip44_coin     => "bip44 coin number, eg. 0",
@@ -238,44 +258,51 @@ with custom network without segwit_hrp field set.
 
 =head2 register
 
-	sig: register($self, %config)
+	$network_object = $class->register(%config)
+	$network_object = $object->register()
 
-Calls Moose's new with keys present in C<$config> hash when called in static context.
-Adds the newly created network instance or the one that the method was called on to a list of known networks.
-The hash %config is ignored in object context.
+Adds the network instance to a list of known networks.
+
+Calls L</new> with keys present in C<%config> hash when called in static context.
+
+Returns the network instance.
 
 =head2 set_default
 
-	sig: set_default($self)
+	$network_object = $object->set_default()
 
-Sets the network as default one. All newly created private and public
-keys will be bound to this network.
+Sets the network as default one. All newly created private and public keys will be bound to this network.
 
-=head1 STATIC METHODS
+Returns the network instance.
 
 =head2 new
 
-	sig: new($class, %config)
+	$network_object = $class->new(%config)
 
-Works the same as C<register> does in static context, but does not add the newly created network to a list of known networks.
+Creates a new network instance. See L</CONFIGURATION> for a list of possible C<%config> keys.
 
 =head2 get
 
-	sig: get($class, $id = undef)
+	$network_object = $class->get($id = undef)
 
-Without arguments, returns default network configuration, the Bitcoin::Crypto::Network instance
-With the $id argument (string), returns the instance of a configuration matching the id.
+Without arguments, returns the default network configuration as the Bitcoin::Crypto::Network instance.
+
+With the C<$id> argument (string), returns the instance of a configuration matching the id.
+
 Throws an exception if network doesn't exist.
 
 =head2 find
 
-	sig: find($class, $sub = undef)
+	@network_objects = $class->find($sub = undef)
 
 Without arguments, returns a list of all registered network ids.
-With the $sub argument (coderef), searches for all networks that pass the criteria and returns their ids.
-Returns list.
 
-The $sub will be passed all the instances of registered networks, one at a time.
+With the C<$sub> argument (coderef), searches for all networks that pass the criteria and returns their ids.
+
+Returns list of network instances.
+
+The C<$sub> will be passed all the instances of registered networks, one at a time.
+
 If must perform required checks and return a boolean value. All the networks that pass this
 test will be returned. Example:
 

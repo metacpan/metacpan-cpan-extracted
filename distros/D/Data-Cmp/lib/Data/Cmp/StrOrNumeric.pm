@@ -1,7 +1,7 @@
 package Data::Cmp::StrOrNumeric;
 
-our $DATE = '2019-11-18'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2021-04-12'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -116,7 +116,7 @@ Data::Cmp::StrOrNumeric - Compare two data structures, return -1/0/1 like cmp or
 
 =head1 VERSION
 
-This document describes version 0.007 of Data::Cmp::StrOrNumeric (from Perl distribution Data-Cmp), released on 2019-11-18.
+This document describes version 0.010 of Data::Cmp::StrOrNumeric (from Perl distribution Data-Cmp), released on 2021-04-12.
 
 =head1 SYNOPSIS
 
@@ -174,7 +174,7 @@ Source repository is at L<https://github.com/perlancar/perl-Data-Cmp>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Cmp>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Data-Cmp/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -192,7 +192,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.142';
+our $VERSION = '0.143';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -353,7 +353,7 @@ sub __write_table {
             @idxs_tbl_print ? [ @{$vw->{tbl_print}}[@idxs_tbl_print] ]
                             :     $vw->{tbl_print},
             { info => $self->{info}, prompt => $prompt, index => 1, default => $old_row, ll => $vw->{table_w},
-              layout => 3, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0, footer => $footer,
+              layout => 2, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0, footer => $footer,
               color => $self->{color}, codepage_mapping => $self->{codepage_mapping}, search => $self->{search},
               keep => $self->{keep}, page => $self->{page} }
         );
@@ -718,7 +718,7 @@ sub __print_single_row {
     # Choose
     choose(
         $row_data,
-        { prompt => '', layout => 3, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0,
+        { prompt => '', layout => 2, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0,
           search => $self->{search}, skip_items => $regex, footer => $footer, page => $self->{page} }
     );
 }
@@ -857,7 +857,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.142
+Version 0.143
 
 =cut
 

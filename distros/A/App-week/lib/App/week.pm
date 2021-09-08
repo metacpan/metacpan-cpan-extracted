@@ -1,5 +1,5 @@
 package App::week;
-our $VERSION = "1.0101";
+our $VERSION = "1.0202";
 
 use v5.14;
 use warnings;
@@ -62,17 +62,21 @@ use Getopt::EX::Hashed; {
     has help        => spec => ' h        ' ;
     has version     => spec => ' v        ' ;
     has months      => spec => ' m =i     ' , default => 0;
-    has after       => spec => ' A :1     ' ;
-    has before      => spec => ' B :1     ' , default => 1;
-    has column      => spec => ' c =i     ' , default => 3;
+    has after       => spec => ' A :1     ' , min => 0;
+    has before      => spec => ' B :1     ' , min => 0, default => 1;
+    has center      => spec => ' C :4     ' , min => 0;
+    has column      => spec => ' c =i     ' , min => 1, default => 3;
     has colordump   => spec => '          ' ;
     has colormap    => spec => '   =s@ cm ' , default => [];
     has show_year   => spec => ' y        ' ;
-    has years       => spec => ' Y :1     ' ;
+    has years       => spec => ' Y :1     ' , max => 100;
     has rgb24       => spec => '   !      ' ;
     has year_on_all => spec => ' P        ' ;
-    has year_on     => spec => ' p =i     ' ;
+    has year_on     => spec => ' p =i     ' , min => 0, max => 12;
     has config      => spec => '   =s%    ' , default => {};
+
+    has '+center' =>
+	action => sub { $_->{after} = $_->{before} = $_[1] };
 
     has '+help' => action => sub {
 	pod2usage
@@ -84,12 +88,6 @@ use Getopt::EX::Hashed; {
 	print "Version: $VERSION\n";
 	exit;
     };
-
-    has center =>
-	spec   => 'C:4',
-	action => sub {
-	    $_->{after} = $_->{before} = $_[1];
-	};
 
     has "<>" =>
 	action => sub {

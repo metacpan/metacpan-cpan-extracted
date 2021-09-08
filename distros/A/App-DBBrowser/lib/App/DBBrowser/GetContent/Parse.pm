@@ -168,7 +168,7 @@ sub parse_with_template {
         # Choose
         my $idx = $tc->choose(
             $menu,
-            { prompt => $prompt, index => 1, default => $old_idx, layout => 3, undef => '  <=', clear_screen => 1, info => $info }
+            { prompt => $prompt, index => 1, default => $old_idx, layout => 2, undef => '  <=', clear_screen => 1, info => $info }
         );
         $ax->print_sql_info( $info );
         if ( ! $idx ) {
@@ -250,7 +250,7 @@ sub parse_with_template {
                 # Choose
                 my $remove_leading_spaces = $tc->choose(
                     [ undef, $no, $yes ],
-                    { info => $info, prompt => $prompt, undef => '  ' . $sf->{i}{back}, layout => 3 }
+                    { info => $info, prompt => $prompt, undef => '  ' . $sf->{i}{back}, layout => 2 }
                 );
                 $ax->print_sql_info( $info );
                 if ( ! defined $remove_leading_spaces ) {

@@ -4,7 +4,7 @@ Time::Zone::Olson - Provides an Olson timezone database interface
 
 # VERSION
 
-Version 0.40
+Version 0.41
 
 # SYNOPSIS
 
@@ -128,13 +128,17 @@ This method will return true if the object is using the Windows registry for Ols
 
     The designated file is shorter than expected
 
-- `%s is not an time zone in the existing Olson database`
+- `%s is not a time zone in the existing Olson database`
 
     The designated time zone could not be found on the file system.  The time zone is expected to be in the designated directory + the time zone name, for example, /usr/share/zoneinfo/Australia/Melbourne
 
 - `%s does not have a valid format for a TZ time zone`
 
     The designated time zone name could not be matched by the regular expression for a time zone in Time::Zone::Olson
+
+- `There are two transition times for %s in %s, which cannot be coped with at the moment.  Please file a bug with Time::Zone::Olson`
+
+    The transition times are sorted to handle unsorted (on disk) transition times which has been found on solaris.  Please file a bug.
 
 - `Failed to close %s:%s`
 

@@ -9,6 +9,7 @@ META.yml
 Makefile.PL
 README
 SIGNATURE
+bin/haiku-find
 dist.ini
 doap.ttl
 lib/Lingua/Poetry/Haiku/Finder.pm

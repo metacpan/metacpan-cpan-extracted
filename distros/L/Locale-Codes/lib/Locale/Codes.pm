@@ -16,7 +16,7 @@ use if $] >= 5.027007, 'deprecate';
 use Locale::Codes::Constants;
 
 our($VERSION);
-$VERSION='3.67';
+$VERSION='3.68';
 
 use Exporter qw(import);
 our(@EXPORT_OK,%EXPORT_TAGS);
@@ -199,6 +199,7 @@ sub _code {
 ###############################################################################
 
 # $name = $o->code2name(CODE [,CODESET] [,'retired'])
+# @name = $o->code2names(CODE, [,CODESET])
 # $code = $o->name2code(NAME [,CODESET] [,'retired'])
 #
 #    Returns the name associated with the CODE (or vice versa).
@@ -278,7 +279,8 @@ sub code2code {
    my($self,@args) = @_;
 
    if (! $$self{'type'}) {
-      carp "ERROR: code2code: no type set for Locale::Codes object\n"  if ($$self{'err'});
+      carp "ERROR: code2code: no type set for Locale::Codes object\n"
+        if ($$self{'err'});
       return undef;
    }
    my $type = $$self{'type'};
@@ -303,6 +305,23 @@ sub code2code {
    return $out;
 }
 
+sub code2names {
+   my($self,@args)   = @_;
+
+   if (! $$self{'type'}) {
+      carp "ERROR: code2named: no type set for Locale::Codes object\n"
+        if ($$self{'err'});
+      return undef;
+   }
+   my $type = $$self{'type'};
+
+   my ($err,$code,$codeset) = $self->_code(@args);
+   return undef  if ($err  ||  ! $code);
+
+   my $id   = $Data{$type}{'code2id'}{$codeset}{$code}[0];
+   my @name = @{ $Data{$type}{'id2names'}{$id} };
+   return @name;
+}
 ###############################################################################
 
 # @codes = $o->all_codes([CODESET] [,'retired']);

@@ -20,8 +20,8 @@ my $res = gen_inline_pericmd_script(
     code_before_enable_logging => 'require Log::ger::Layout::JSON;',
     code_add_extra_log_outputs => join(
         "",
-        '$_pci_log_outputs->{Screen}{category_level}{access} = "off"; ',
-        '$_pci_log_outputs->{SimpleFile} = {conf=>{path => ($ENV{HOME} || ".")."/pause-access.log"}, level=>"off", layout=>[JSON=>{}], category_level=>{access=>"info"}}; ',
+        '$_pci_log_outputs->{Screen}{category_level}{_access} = "off"; ',
+        '$_pci_log_outputs->{SimpleFile} = {conf=>{path => ($ENV{HOME} || ".")."/pause-access.log"}, level=>"off", layout=>[JSON=>{}], category_level=>{_access=>"info"}}; ',
         ),
     %App::pause::cli_attrs,
 );

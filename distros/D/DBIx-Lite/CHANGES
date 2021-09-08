@@ -1,30 +1,17 @@
 ==================================================
-Changes from 2017-12-30 00:00:00 +0000 to present.
+Changes from 2020-09-07 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.32 at 2018-12-30 20:05:29 +0000
+version 0.33 at 2021-09-07 13:28:28 +0000
 -----------------------------------------
 
-  Change: 4176d124d7f8a214890300244f9383722d236a41
+  Change: 1622568c1fb952bd388341a59a2a9b66dd587fef
   Author: Alessandro Ranellucci <alessandro@pintle.it>
-  Date : 2018-12-29 14:45:49 +0000
+  Date : 2021-09-07 15:05:55 +0000
 
-    Add a DBIx::Lite::Row::db() method 
-
-  Change: 5e71ab2f9bdee754328dcf220b8e6bd12168d1c5
-  Author: Alessandro Ranellucci <alessandro@pintle.it>
-  Date : 2018-12-29 14:33:22 +0000
-
-    Bugfix: pk() did not accept a list of values as suggested by docs.
-    #17 
-
-  Change: 0affe3275dfb455997f295c661c83200a8b42c5d
-  Author: Alessandro Ranellucci <alessandro@pintle.it>
-  Date : 2018-12-29 14:32:50 +0000
-
-    Add .vscode to .gitignore 
+    Make DBIx::Lite compatible with newer SQL::Abstract versions. #19 
 
 =================================================
-Plus 22 releases after 2017-12-30 00:00:00 +0000.
+Plus 23 releases after 2020-09-07 00:00:00 +0000.
 =================================================

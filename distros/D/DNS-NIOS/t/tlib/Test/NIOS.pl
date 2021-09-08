@@ -118,7 +118,7 @@ group {
         if $_->{name} eq $c->req->json->{name};
     }
 
-    push( @records_a, _a_record_from_payload( $c->req->json ) );
+    unshift( @records_a, _a_record_from_payload( $c->req->json ) );
     $c->render( text => "\"" . $c->req->json->{_ref} . "\"", status => 201 );
   };
 
@@ -131,7 +131,7 @@ group {
         status   => 400
       );
     }
-    else {
+    elsif ( $#records_a < 1000 ) {
       return $c->render(
         json => {
           result => \@records_a
@@ -140,16 +140,41 @@ group {
       );
     }
 
-    if (  %{ $c->req->params->to_hash }{_paging}
+    elsif ( %{ $c->req->params->to_hash }{_paging}
       and %{ $c->req->params->to_hash }{_return_as_object} )
     {
+
+      if ( %{ $c->req->params->to_hash }{_page_id} ) {
+        my $requested_page = %{ $c->req->params->to_hash }{_page_id};
+        if ( $requested_page + 1 >= $#records_a ) {
+          return $c->render(
+            json => {
+              result => sub { \@_ }
+                ->( @records_a[ $requested_page .. $requested_page ] )
+            },
+            status => 200
+          );
+        }
+        return $c->render(
+          json => {
+            next_page_id => ++$requested_page,
+            result       => sub { \@_ }
+              ->( @records_a[ $requested_page .. $requested_page ] )
+          },
+          status => 200
+        );
+
+      }
+
       return $c->render(
         json => {
-          next_page_id => "789c55904d6ec3201046f",
-          result       => \@records_a
+          next_page_id => 1,
+          result       => sub { \@_ }
+            ->( @records_a[ 0 .. 0 ] )
         },
         status => 200
       );
+
     }
   };
 

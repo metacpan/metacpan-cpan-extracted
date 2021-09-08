@@ -1,6 +1,6 @@
 # -*- perl -*-
 # t/007-auxiliary.t
-use strict;
+use 5.14.0;
 use warnings;
 use Carp;
 use Devel::Git::MultiBisect::Auxiliary qw(
@@ -12,9 +12,8 @@ use Test::More tests => 55;
 use Cwd;
 use File::Copy;
 use File::Spec;
-use File::Temp qw(tempfile tempdir);
+use File::Temp qw(tempdir);
 use List::Util qw( sum );
-#use Data::Dump qw(pp);
 
 my $cwd = cwd();
 my $datadir = File::Spec->catfile($cwd, qw| t lib | );
@@ -56,6 +55,16 @@ my $datadir = File::Spec->catfile($cwd, qw| t lib | );
 
 ##### hexdigest_one_file() #####
 
+sub hex_tempfile {
+    my ($string, $count, $extra) = @_;
+    my $fh = File::Temp->new( UNLINK => 1, SUFFIX => '' );
+    binmode $fh, ':raw';
+    for (1..$count) { say $fh $string }
+    say $fh $extra if $extra;
+    close $fh or croak "Unable to close $fh after writing";
+    return hexdigest_one_file($fh);
+}
+
 {
     my $basic       = 'x' x 10**2;
     my $minus       = 'x' x (10**2 - 1);
@@ -63,41 +72,14 @@ my $datadir = File::Spec->catfile($cwd, qw| t lib | );
     my $end_b       = 'x' x (10**2 - 1) . 'b';
     my $plus        = 'x' x 10**2 . 'y';
 
-    my @digests;
-
-    my ($fh1, $t1) = tempfile();
-    for (1..100) { say $fh1 $basic }
-    close $fh1 or croak "Unable to close $t1 after writing";
-    push @digests, hexdigest_one_file($t1);
-
-    my ($fh2, $t2) = tempfile();
-    for (1..100) { say $fh2 $basic }
-    close $fh2 or croak "Unable to close $t2 after writing";
-    push @digests, hexdigest_one_file($t2);
-
-    my ($fh3, $t3) = tempfile();
-    for (1.. 99) { say $fh3 $basic }
-    say $fh3 $minus;
-    close $fh3 or croak "Unable to close $t3 after writing";
-    push @digests, hexdigest_one_file($t3);
-
-    my ($fh4, $t4) = tempfile();
-    for (1.. 99) { say $fh4 $basic }
-    say $fh4 $end_a;
-    close $fh4 or croak "Unable to close $t4 after writing";
-    push @digests, hexdigest_one_file($t4);
-
-    my ($fh5, $t5) = tempfile();
-    for (1.. 99) { say $fh5 $basic }
-    say $fh5 $end_b;
-    close $fh5 or croak "Unable to close $t5 after writing";
-    push @digests, hexdigest_one_file($t5);
-
-    my ($fh6, $t6) = tempfile();
-    for (1.. 99) { say $fh6 $basic }
-    say $fh6 $plus;
-    close $fh6 or croak "Unable to close $t6 after writing";
-    push @digests, hexdigest_one_file($t6);
+    my @digests = (
+        hex_tempfile($basic, 100, ''),
+        hex_tempfile($basic, 100, ''),
+        hex_tempfile($basic,  99, $minus),
+        hex_tempfile($basic,  99, $end_a),
+        hex_tempfile($basic,  99, $end_b),
+        hex_tempfile($basic,  99, $plus),
+    );
 
     cmp_ok($digests[0], 'eq', $digests[1],
         "Same md5_hex for identically written files");
@@ -229,7 +211,6 @@ my $datadir = File::Spec->catfile($cwd, qw| t lib | );
     is(ref($rv), 'ARRAY', "validate_list_sequence() returned array ref");
     is(scalar(@$rv), 1, "validate_list_sequence() returned array with 1 element");
     ok($rv->[0], "validate_list_sequence() has true status");
-    #pp(\@list_basic);
 
     note("Problematic list");
     my $observed = [
@@ -297,3 +278,4 @@ my $datadir = File::Spec->catfile($cwd, qw| t lib | );
     is(scalar(@$rv), 1, "validate_list_sequence() returned array with 1 element");
     ok($rv->[0], "validate_list_sequence() has true status");
 }
+

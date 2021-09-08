@@ -4,7 +4,7 @@ package Data::Record::Serialize::Role::Default;
 
 use Moo::Role;
 
-our $VERSION = '0.28';
+our $VERSION = '0.30';
 
 use Hash::Util qw[ hv_store ];
 use Ref::Util qw[ is_coderef ];
@@ -139,7 +139,11 @@ before 'send' => sub {
 };
 
 sub DEMOLISH {
-    $_[0]->close;
+    my ( $self, $in_global_destruction ) = @_;
+
+    # we can't make the decision about whether to pay attention during
+    # Global Destruction. the objects have to do that
+    $self->close( $in_global_destruction );
     return;
 }
 
@@ -167,7 +171,7 @@ Data::Record::Serialize::Role::Default - Default methods for Data::Record::Seria
 
 =head1 VERSION
 
-version 0.28
+version 0.30
 
 =head1 DESCRIPTION
 

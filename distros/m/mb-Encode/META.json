@@ -1,6 +1,6 @@
 {
     "name" : "mb-Encode",
-    "version" : "0.02",
+    "version" : "0.03",
     "abstract" : "provides MBCS encoder and decoder",
     "author" : [
         "ina <ina@cpan.org>"
@@ -26,6 +26,7 @@
     "prereqs" : {
         "build" : {
             "requires" : {
+                "Encode" : "0",
                 "ExtUtils::MakeMaker" : "5.4302",
                 "File::Basename" : "2.6",
                 "File::Copy" : "2.02",
@@ -36,11 +37,13 @@
                 "lib" : "0",
                 "perl" : "5.00503",
                 "strict" : "1.01",
-                "vars" : "0"
+                "vars" : "0",
+                "warnings" : "0"
             }
         },
         "configure" : {
             "requires" : {
+                "Encode" : "0",
                 "ExtUtils::MakeMaker" : "5.4302",
                 "File::Basename" : "2.6",
                 "File::Copy" : "2.02",
@@ -51,11 +54,13 @@
                 "lib" : "0",
                 "perl" : "5.00503",
                 "strict" : "1.01",
-                "vars" : "0"
+                "vars" : "0",
+                "warnings" : "0"
             }
         },
         "runtime" : {
             "requires" : {
+                "Encode" : "0",
                 "ExtUtils::MakeMaker" : "5.4302",
                 "File::Basename" : "2.6",
                 "File::Copy" : "2.02",
@@ -66,7 +71,8 @@
                 "lib" : "0",
                 "perl" : "5.00503",
                 "strict" : "1.01",
-                "vars" : "0"
+                "vars" : "0",
+                "warnings" : "0"
             }
         }
     }

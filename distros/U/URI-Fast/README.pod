@@ -193,6 +193,10 @@ Both '&' and ';' are treated as separators for key/value parameters.
 
 The fragment section of the URI, excluding the leading C<#>.
 
+=head2 fragment
+
+An alias of L</frag>.
+
 =head1 METHODS
 
 =head2 query_keys

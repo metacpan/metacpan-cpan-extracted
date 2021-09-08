@@ -2292,9 +2292,9 @@ static void check_await(pTHX_ void *hookdata)
       "Cannot 'await' outside of an 'async sub'");
 }
 
-static int build_await(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hookdata)
+static int build_await(pTHX_ OP **out, XSParseKeywordPiece *arg0, void *hookdata)
 {
-  OP *expr = arg0.op;
+  OP *expr = arg0->op;
 
   if(PL_compcv == PL_main_cv)
     *out = newUNOP_CUSTOM(&pp_await, OPf_SPECIAL, expr);
@@ -2332,9 +2332,9 @@ static void check_cancel(pTHX_ void *hookdata)
 #endif
 }
 
-static int build_cancel(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hookdata)
+static int build_cancel(pTHX_ OP **out, XSParseKeywordPiece *arg0, void *hookdata)
 {
-  CV *on_cancel = arg0.cv;
+  CV *on_cancel = arg0->cv;
   OP *pushcancel;
 
   *out = op_prepend_elem(OP_LINESEQ,
@@ -2389,7 +2389,7 @@ BOOT:
   XopENTRY_set(&xop_pushcancel, xop_class, OA_SVOP);
   Perl_custom_op_register(aTHX_ &pp_pushcancel, &xop_pushcancel);
 
-  boot_xs_parse_keyword(0.05);
+  boot_xs_parse_keyword(0.13);
 
   register_xs_parse_keyword("async", &hooks_async, NULL);
   register_xs_parse_keyword("await", &hooks_await, NULL);

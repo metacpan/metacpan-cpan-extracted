@@ -27,7 +27,9 @@ my %WriteMakefileArgs = (
         'Text::CSV' => '2.0',
         'XML::Twig' => '3.48',
         'File::Share' => '0.25',
-        'JSON'	=> '2.90'
+        'JSON'	=> '2.90',
+        'HTML::Template' => '2.95',
+        'URI::Query' => '0.16'
     },
     
     test  => {TESTS => 't/*.t'},

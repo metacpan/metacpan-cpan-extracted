@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Tables.pm
-## Version v0.4.2
-## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## Version v0.5.0
+## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2021/08/20
+## Modified 2021/08/29
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -23,7 +23,7 @@ BEGIN
     use parent qw( DB::Object );
     use DB::Object::Fields;
     our( $VERSION, $VERBOSE, $DEBUG );
-    $VERSION    = 'v0.4.2';
+    $VERSION    = 'v0.5.0';
     $VERBOSE    = 0;
     $DEBUG      = 0;
     use Devel::Confess;
@@ -61,6 +61,9 @@ sub init
     $self->{structure}      = {};
     $self->{table}          = $table if( $table );
     $self->{types}          = {};
+    # An hash to contain table field to an hash of constant value and constant name:
+    # field => { constant => 12, name => PG_JSONB, type => 'jsonb' };
+    $self->{types_const}    = {};
     # The table type. It could be table or view
     $self->{type}           = '';
     my $keys = [keys( %arg )];
@@ -637,6 +640,15 @@ sub types
     return( wantarray() ? %$types : $types );
 }
 
+sub types_const
+{
+    my $self = shift( @_ );
+    $self->structure();
+    my $types = $self->{types_const};
+    return( wantarray() ? () : undef() ) if( !%$types );
+    return( wantarray() ? %$types : $types );
+}
+
 # sub structure must be superseded by sub classes
 sub structure
 {
@@ -741,7 +753,7 @@ DB::Object::Tables - Database Table Object
 
 =head1 VERSION
 
-    v0.4.2
+    v0.5.0
 
 =head1 DESCRIPTION
 
@@ -1099,6 +1111,18 @@ The table type
 This calls L</structure> which may return cached data.
 
 Returns an hash in list context and an hash reference in scalar representing column to data type.
+
+If nothing is found, it returns an empty list in list context and L<perlfunc/undef> in scalar context.
+
+=head2 types_const
+
+This calls L</structure> which may return cached data.
+
+Returns an hash in list context and an hash reference in scalar representing column to hash that defines the driver constant for this data type:
+
+    some_column => { constant => 17, name => 'PG_JSONB', type => 'jsonb' }
+
+This is used to help manage binded value with the right type, or helps when converting an hash into json.
 
 If nothing is found, it returns an empty list in list context and L<perlfunc/undef> in scalar context.
 

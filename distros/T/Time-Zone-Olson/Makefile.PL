@@ -60,7 +60,7 @@ WriteMakefile(
         'LWP::UserAgent'       => 0,
         'LWP::Protocol::https' => 6.06,
         'HTTP::Request'        => 0,
-        'Taint::Util'          => 0,
+        $ENV{RELEASE_TESTING} ? ( 'Taint::Util' => 0 ) : (),
         'Fcntl'                => 0,
         'File::Temp'           => 0,
         $^O eq 'MSWin32' ? ( 'Win32' => 0 ) : (),

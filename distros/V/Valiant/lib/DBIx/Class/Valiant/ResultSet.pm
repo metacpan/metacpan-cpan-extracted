@@ -6,11 +6,6 @@ use Carp;
 use Valiant::Util 'debug';
 use namespace::autoclean -also => ['debug'];
 
-sub build {
-  my ($self, %attrs) = @_;
-  return $self->new_result(\%attrs);
-}
-
 sub skip_validation {
   my ($self, $arg) = @_;
   if(defined($arg)) {
@@ -79,35 +74,64 @@ sub new_result {
   return $result;
 }
 
+# Utility methods
+
+# this should cache results betters
+sub contains {
+  my ($self, $row) = @_;
+  my %pk = map { $_ => $row->$_ }
+    $self->result_source->primary_columns;
+  foreach my $item ($self->all) {
+    next if $item->is_removed;
+    my @matches = grep { 
+      $item->get_column($_) eq $pk{$_}
+    } keys %pk;
+    return 1 if scalar(@matches) == keys %pk;
+  }
+  return 0;
+}
+
 1;
 
 =head1 NAME
 
 DBIx::Class::Valiant::ResultSet - Validation support for resultsets
 
+=head1 SYNOPSIS
+
+    package Example::Schema::ResultSet::Person;
+
+    use base 'DBIx::Class::ResultSet';
+
+    __PACKAGE__->load_components('Valiant::ResultSet');
+
+See <example> directory in the distribution for a more complete example
+setup and application.
+
 =head1 DESCRIPTION
+
+A component that needs to be used on any result classes for which you want to add
+L<Valiant> validations on.   Its best to add this to your base and default resultset
+classes if you plan to use L<DBIx::Class::Valiant> across all your result classes.
 
 =head1 METHODS
 
 This component adds the following methods to your resultset classes.
 
-=head2 build
+=head2 skip_validation (1|0)
 
-This just wraps C<new_result> to provide a new result object, optionally
-with fields set, that is not yet in storage.  
-
-=head2 skip_validation
-
-    $schema->resultset('User')->skip_validation(1)->...
+    $schema->resultset('User')->skip_validation(1)->create(...
 
 Turns off automatic validation on any creates / updates / etc going forward 
-in this chain if arg is true
+in this chain if arg is true.  You may still manually run validations in the
+normal way as described in L<Valiant> (via ->validate for example).
 
 =head2 skip_validate
 
 =head2 do_validate
 
-Skip validations or reenable validations
+Skip validations or reenable validations.  This is just a wrapper on L</skip_validation>
+which presets the enable or disable value.
 
   $schema->resultset('User')
     ->skip_validate

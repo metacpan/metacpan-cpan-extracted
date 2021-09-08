@@ -5,6 +5,7 @@ use warnings;
 use HTTP::Tiny ();
 use HTTP::Status qw/:constants/;
 use JSON::XS                             ();
+use Util::H2O                       qw/h2o/;
 use Weather::NHC::TropicalCyclone::Storm ();
 
 our $VERSION                     = q{0.20};
@@ -52,6 +53,9 @@ sub fetch {
         die qq{JSON decode error\n};
     }
 
+    # add accessors based on elements in returned hash ref
+    $ref = h2o -recurse, $ref;
+
     $self->{_obj} = $ref;
 
     # reset and update storms cache
@@ -68,8 +72,8 @@ sub active_storms {
 # there is no checking, if the storm is not in the cache,
 # an undefined value is returned
 sub get_storm_by_id {
-    my ( $self, $want_id ) = @_;
-    return $self->{_storms}->{$want_id};
+    my ( $self, $id ) = @_;
+    return $self->{_storms}->{$id};
 }
 
 # returns storm Ids

@@ -37,13 +37,21 @@
       }
    },
    "provides" : {
+      "XS::Parse::Infix" : {
+         "file" : "lib/XS/Parse/Infix.pm",
+         "version" : "0.15"
+      },
+      "XS::Parse::Infix::Builder" : {
+         "file" : "lib/XS/Parse/Infix/Builder.pm",
+         "version" : "0.15"
+      },
       "XS::Parse::Keyword" : {
          "file" : "lib/XS/Parse/Keyword.pm",
-         "version" : "0.12"
+         "version" : "0.15"
       },
       "XS::Parse::Keyword::Builder" : {
          "file" : "lib/XS/Parse/Keyword/Builder.pm",
-         "version" : "0.12"
+         "version" : "0.15"
       }
    },
    "release_status" : "stable",
@@ -52,6 +60,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.12",
+   "version" : "0.15",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

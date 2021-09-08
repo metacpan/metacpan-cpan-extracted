@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{Perl7::Handy},
-    'VERSION'   => q{0.10},
+    'VERSION'   => q{0.11},
     'ABSTRACT'  => q{Handy Perl7 scripting environment on Perl5},
     'PREREQ_PM' => {
         'ExtUtils::MakeMaker' => '5.4302',

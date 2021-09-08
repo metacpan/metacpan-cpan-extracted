@@ -30,8 +30,6 @@ struct ClassMeta {
   HV *parammap;        /* NULL, or each elem is a raw pointer directly at a ParamMeta */
   SV *requireslots;    /* NULL, or the PV is a bitmap of which slots are required params */
   AV *requiremethods;  /* each elem is an SVt_PV giving a name */
-  CV *foreign_new;     /* superclass is not Object::Pad, here is the constructor */
-  CV *foreign_does;    /* superclass is not Object::Pad, here is SUPER::DOES (which could be UNIVERSAL::DOES) */
   CV *initslots;       /* the INITSLOTS method body */
   AV *buildblocks;     /* the BUILD {} phaser blocks; each elem is a CV* directly */
   AV *adjustblocks;    /* the ADJUST {} phaser blocks; each elem is a AdjustBlock* */
@@ -41,6 +39,19 @@ struct ClassMeta {
 
   COP *tmpcop;         /* a COP to use during generated constructor */
   CV *methodscope;     /* a temporary CV used just during compilation of a `method` */
+
+  union {
+    /* Things that only true classes have */
+    struct {
+      CV *foreign_new;     /* superclass is not Object::Pad, here is the constructor */
+      CV *foreign_does;    /* superclass is not Object::Pad, here is SUPER::DOES (which could be UNIVERSAL::DOES) */
+    } cls; /* not 'class' or C++ compilers get upset */
+
+    /* Things that only roles have */
+    struct {
+      HV *applied_classes; /* keyed by class name each elem is a raw pointer directly to a RoleEmbedding */
+    } role;
+  };
 };
 
 /* Metadata about the embedding of a role into a class */
