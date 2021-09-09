@@ -1,11 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
 
-use Term::VTerm;
+use Term::VTerm::Color;
 
 my $color = Term::VTerm::Color->new( red => 10, green => 20, blue => 30 );
 

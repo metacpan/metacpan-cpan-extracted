@@ -16,6 +16,7 @@ t/00-base.t
 t/02-create.t
 t/04-key.t
 t/05-sv.t
+t/07-new.t
 t/10-av.t
 t/15-hv.t
 t/17-attributes.t
@@ -36,7 +37,7 @@ t/63-nested_segs_tidy.t
 t/64-nested_segs_untidy.t
 t/65-seg_size.t
 t/66-size_exceeded.t
-t/67-out_of_memory.t
+t/67-exhaust_shm_slots.t
 t/71-unspawn.t
 t/72-unspawn_destroy.t
 t/75-graceful.t
@@ -52,6 +53,8 @@ t/93-manifest.t
 t/_spawn
 t/_spawn_class
 t/SpawnTest.pm
+testing/new_one.pl
+testing/new_two.pl
 testing/one_deep_hash.pl
 testing/sharelite_with_sereal.pl
 testing/two_deep_hash.pl

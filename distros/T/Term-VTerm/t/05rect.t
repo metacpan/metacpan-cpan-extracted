@@ -1,11 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
 
-use Term::VTerm;
+use Term::VTerm::Rect;
 
 my $rect = Term::VTerm::Rect->new( start_row => 10, end_row => 15, start_col => 20, end_col => 40 );
 

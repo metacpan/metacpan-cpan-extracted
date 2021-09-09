@@ -51,7 +51,7 @@ them.
 
 package Data::Properties;
 
-$VERSION = '1.06';
+$VERSION = '1.07';
 
 use strict;
 use POSIX ();

@@ -9,8 +9,10 @@ use utf8;
 binmode STDOUT, ":utf8";
 
 require local::lib; # no local::lib in tests, this is also to avoid loading local::lib multiple times
-use Text::CSV qw(csv);
+use Text::CSV qw( csv );
 use Text::Matrix;
+use File::Basename qw( basename );
+use List::Util qw( shuffle );
 
 =head1 NAME
 
@@ -20,11 +22,11 @@ A Newbie Friendly Module to Create, Train, Validate and Test Perceptrons / Neuro
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =cut
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 # default values
 use constant LEARNING_RATE => 0.05;
@@ -84,7 +86,8 @@ use constant TUNE_DOWN => 0;
     my %c_matrix = $perceptron->get_confusion_matrix( { 
         full_data_file => $file_csv, 
         actual_output_header => $header_name,
-        predicted_output_header => $predicted_header_name
+        predicted_output_header => $predicted_header_name,
+        more_stats => 1, # optional
     } );
 
     # accessing the confusion matrix
@@ -125,15 +128,24 @@ use constant TUNE_DOWN => 0;
     my $pearl_nerve = revive_from_yaml ( ... );
     my $pearl_nerve = load_perceptron_yaml ( $yaml_nerve_file );
 
+
+    # processing data
+    use AI::Perceptron::Simple ":process_data";
+    shuffle_stimuli ( ... )
+    shuffle_data ( ORIGINAL_STIMULI, $new_file_1, $new_file_2, ... );
+    shuffle_data ( $original_stimuli => $new_file_1, $new_file_2, ... );
+
 =head1 EXPORT
 
 None by default.
 
-All the subroutines from C<NERVE DATA RELATED SUBROUTINES> and C<NERVE PORTABILITY RELATED SUBROUTINES> sections are exportable.
+All the subroutines from C<DATA PROCESSING RELATED SUBROUTINES>, C<NERVE DATA RELATED SUBROUTINES> and C<NERVE PORTABILITY RELATED SUBROUTINES> sections are importable through tags or manually specifying them.
 
-Export tags include the following:
+The tags available include the following:
 
 =over 4
+
+=item C<:process_data> - subroutines under C<DATA PROCESSING RELATED SUBROUTINES> section.
 
 =item C<:local_data> - subroutines under C<NERVE DATA RELATED SUBROUTINES> section.
 
@@ -147,10 +159,12 @@ Most of the stuff are OO.
 
 use Exporter qw( import );
 our @EXPORT_OK = qw( 
+    shuffle_data shuffle_stimuli
     preserve save_perceptron revive load_perceptron
     preserve_as_yaml save_perceptron_yaml revive_from_yaml load_perceptron_yaml
 );
 our %EXPORT_TAGS = ( 
+    process_data => [ qw( shuffle_data shuffle_stimuli ) ],
     local_data => [ qw( preserve save_perceptron revive load_perceptron ) ],
     portable_data => [ qw( preserve_as_yaml save_perceptron_yaml revive_from_yaml load_perceptron_yaml ) ],
 );
@@ -194,11 +208,54 @@ The perceptron/neuron data is stored using the C<Storable> module.
 
 See C<Portability of Nerve Data> section below for more info on some known issues.
 
+=head1 DATA PROCESSING RELATED SUBROUTINES
+
+These subroutines can be imported using the tag C<:process_data>.
+
+These subroutines should be called in the procedural way.
+
+=head2 shuffle_stimuli ( ... )
+
+The parameters and usage are the same as C<shuffled_data>. See the next two subroutines.
+
+=head2 shuffle_data ( $original_data => $shuffled_1, $shuffled_2, ... )
+
+=head2 shuffle_data ( ORIGINAL_DATA, $shuffled_1, $shuffled_2, ... )
+
+Shuffles C<$original_data> or C<ORIGINAL_DATA> and saves them to other files.
+
+=cut
+
+sub shuffle_stimuli {
+    shuffle_data( @_ );
+}
+
+sub shuffle_data {
+    my $stimuli = shift or croak "Please specify the original file name";
+    my @shuffled_stimuli_names = @_ 
+        or croak "Please specify the output files for the shuffled data";
+    
+    my @aoa;
+    for ( @shuffled_stimuli_names ) {
+        # copied from _real_validate_or_test
+        # open for shuffling
+        my $aoa = csv (in => $stimuli, encoding => ":encoding(utf-8)");
+        my $attrib_array_ref = shift @$aoa; # 'remove' the header, it's annoying :)
+        @aoa = shuffle( @$aoa ); # this can only process actual array
+        unshift @aoa, $attrib_array_ref; # put back the headers before saving file
+
+        csv( in => \@aoa, out => $_, encoding => ":encoding(utf-8)" ) 
+        and
+        print "Saved shuffled data into ", basename($_), "!\n";;
+
+    }
+}
+
 =head1 CREATION RELATED SUBROUTINES/METHODS
 
 =head2 new ( \%options )
 
-Creates a brand new perceptron and initializes the value of each attribute / densrite aka. weight. Think of it as the thickness or plasticity of the dendrites.
+Creates a brand new perceptron and initializes the value of each attribute / dendrite aka. weight. Think of it as the thickness or plasticity of the dendrites.
 
 For C<%options>, the followings are needed unless mentioned:
 
@@ -734,9 +791,9 @@ The parameters and usage are the same as C<get_confusion_matrix>. See the next m
 
 =head2 get_confusion_matrix ( \%options )
 
-Returns the confusion matrix in the form of a hash. The hash will contain these keys: C<true_positive>, C<true_negative>, C<false_positive>, C<false_negative>, C<accuracy>, C<sensitivity>.
+Returns the confusion matrix in the form of a hash. The hash will contain these keys: C<true_positive>, C<true_negative>, C<false_positive>, C<false_negative>, C<accuracy>, C<sensitivity>. More stats like C<precision>, C<specificity> and C<F1_Score> can be obtain by setting the optional C<more_stats> key to C<1>.
 
-Take note that the C<accuracy> and C<sensitivity> are in percentage (%) in decimal (if any).
+If you are trying to manipulate the confusion matrix hash or something, take note that all the stats are in percentage (%) in decimal (if any) except the total entries.
 
 For C<%options>, the followings are needed unless mentioned:
 
@@ -752,8 +809,6 @@ Make sure that you don't do anything to the actual and predicted output in this 
 
 =item predicted_output_header => $predicted_column_name
 
-=back
-
 The binary values are treated as follows:
 
 =over 4
@@ -761,6 +816,14 @@ The binary values are treated as follows:
 =item C<0> is negative
 
 =item C<1> is positive
+
+=back
+
+=item more_stats => 1
+
+Optional.
+
+Setting it to C<1> will process more stats that are usually not so important eg. C<precision>, C<specificity> and C<F1_Score>
 
 =back
 
@@ -794,6 +857,7 @@ sub _collect_stats {
     my $file = $info->{ full_data_file };
     my $actual_header = $info->{ actual_output_header };
     my $predicted_header = $info->{ predicted_output_header };
+    my $more_stats = defined ( $info->{ more_stats } ) ? 1 : 0;
     
     my %c_matrix = ( 
         true_positive => 0, true_negative => 0, false_positive => 0, false_negative => 0,
@@ -851,6 +915,22 @@ sub _collect_stats {
     
     _calculate_accuracy( \%c_matrix );
     
+    if ( $more_stats == 1 ) {
+        _calculate_precision( \%c_matrix );
+        
+        _calculate_specificity( \%c_matrix );
+        
+        _calculate_f1_score( \%c_matrix );
+        
+        # unimplemented, some more left
+        _calculate_negative_predicted_value( \%c_matrix ); #
+        _calculate_false_negative_rate( \%c_matrix ); #
+        _calculate_false_positive_rate( \%c_matrix ); #
+        _calculate_false_discovery_rate( \%c_matrix ); #
+        _calculate_false_omission_rate( \%c_matrix ); #
+        _calculate_balanced_accuracy( \%c_matrix ); #
+    }
+    
     %c_matrix;
 }
 
@@ -905,13 +985,148 @@ sub _calculate_sensitivity {
     # no need to return anything, we're using ref
 }
 
+=head2 &_calculate_precision ( $c_matrix_ref )
+
+Calculates and adds the data for the C<precision> key in the confusion matrix hash.
+
+=cut
+
+sub _calculate_precision {
+    my $c_matrix = shift;
+    
+    my $numerator = $c_matrix->{ true_positive };
+    my $denominator = $numerator + $c_matrix->{ false_positive };
+    
+    $c_matrix->{ precision } = $numerator / $denominator * 100;
+}
+
+=head2 &_calculate_specificity ( $c_matrix_ref )
+
+Calculates and adds the data for the C<specificity> key in the confusion matrix hash.
+
+=cut
+
+sub _calculate_specificity {
+    my $c_matrix = shift;
+    
+    my $numerator = $c_matrix->{ true_negative };
+    my $denominator = $numerator + $c_matrix->{ false_positive };
+    
+    $c_matrix->{ specificity } = $numerator / $denominator * 100;
+}
+
+=head2 &_calculate_f1_score ( $c_matrix_ref )
+
+Calculates and adds the data for the C<F1_Score> key in the confusion matrix hash.
+
+=cut
+
+sub _calculate_f1_score {
+    my $c_matrix = shift;
+    
+    my $numerator = 2 * $c_matrix->{ true_positive };
+    my $denominator = $numerator + $c_matrix->{ false_positive } + $c_matrix->{ false_negative };
+    
+    $c_matrix->{ F1_Score } = $numerator / $denominator * 100;
+}       
+
+=head2  &_calculate_negative_predicted_value( $c_matrix_ref )
+
+Calculates and adds the data for the C<negative_predicted_value> key in the confusion matrix hash.
+
+=cut
+
+sub _calculate_negative_predicted_value {
+    my $c_matrix = shift;
+    
+    my $numerator = $c_matrix->{ true_negative };
+    my $denominator = $numerator + $c_matrix->{ false_negative };
+    
+    $c_matrix->{ negative_predicted_value } = $numerator / $denominator * 100;
+}
+
+=head2  &_calculate_false_negative_rate( $c_matrix_ref )
+
+Calculates and adds the data for the C<false_negative_rate> key in the confusion matrix hash.
+
+=cut
+
+sub _calculate_false_negative_rate {
+    my $c_matrix = shift;
+    
+    my $numerator = $c_matrix->{ false_negative };
+    my $denominator = $numerator + $c_matrix->{ true_positive };
+    
+    $c_matrix->{ false_negative_rate } = $numerator / $denominator * 100;
+}
+
+=head2  &_calculate_false_positive_rate( $c_matrix_ref )
+
+Calculates and adds the data for the C<false_positive_rate> key in the confusion matrix hash.
+
+=cut
+
+sub _calculate_false_positive_rate {
+    my $c_matrix = shift;
+    
+    my $numerator = $c_matrix->{ false_positive };
+    my $denominator = $numerator + $c_matrix->{ true_negative };
+    
+    $c_matrix->{ false_positive_rate } = $numerator / $denominator * 100;
+}
+
+=head2  &_calculate_false_discovery_rate( $c_matrix_ref )
+
+Calculates and adds the data for the C<false_discovery_rate> key in the confusion matrix hash.
+
+=cut
+
+sub _calculate_false_discovery_rate {
+    my $c_matrix = shift;
+    
+    my $numerator = $c_matrix->{ false_positive };
+    my $denominator = $numerator + $c_matrix->{ true_positive };
+    
+    $c_matrix->{ false_discovery_rate } = $numerator / $denominator * 100;
+}
+
+=head2  &_calculate_false_omission_rate( $c_matrix_ref )
+
+Calculates and adds the data for the C<false_omission_rate> key in the confusion matrix hash.
+
+=cut
+
+sub _calculate_false_omission_rate {
+    my $c_matrix = shift;
+    
+    my $numerator = $c_matrix->{ false_negative };
+    my $denominator = $numerator + $c_matrix->{ true_negative };
+    
+    $c_matrix->{ false_omission_rate } = $numerator / $denominator * 100;
+}
+
+=head2  &_calculate_balanced_accuracy( $c_matrix_ref )
+
+Calculates and adds the data for the C<balanced_accuracy> key in the confusion matrix hash.
+
+=cut
+
+sub _calculate_balanced_accuracy {
+    my $c_matrix = shift;
+    
+    my $numerator = $c_matrix->{ sensitivity } + $c_matrix->{ specificity };
+    my $denominator = 2;
+    
+    $c_matrix->{ balanced_accuracy } = $numerator / $denominator; # numerator already in %
+}
+
 =head2 display_exam_results ( ... )
 
 The parameters are the same as C<display_confusion_matrix>. See the next method.
 
 =head2 display_confusion_matrix ( \%confusion_matrix, \%labels ) 
 
-Display the confusion matrix.
+Display the confusion matrix. If C<%confusion_matrix> has C<more_stats> elements, it will display them if they exists. The default elements ie C<accuracy> and C<sensitivity> must be present, while the rest can be absent.
 
 C<%confusion_matrix> is the same confusion matrix returned by the C<get_confusion_matrix> method.
 
@@ -968,12 +1183,20 @@ sub _build_matrix {
 
     my ( $c_matrix, $labels ) = @_;
 
-    my $predicted_columns = [ "P: ".$labels->{ zero_as }, "P: ".$labels->{ one_as } ];
-    my $actual_rows = [ "A: ".$labels->{ zero_as }, "A: ".$labels->{ one_as }];
+    my $predicted_columns = [ "P: ".$labels->{ zero_as }, "P: ".$labels->{ one_as }, "Sum" ];
+    my $actual_rows = [ "A: ".$labels->{ zero_as }, "A: ".$labels->{ one_as }, "Sum"];
+    
+    # row sum
+    my $actual_0_sum = $c_matrix->{ true_negative } + $c_matrix->{ false_positive };
+    my $actual_1_sum = $c_matrix->{ false_negative } + $c_matrix->{ true_positive };
+    # column sum
+    my $predicted_0_sum = $c_matrix->{ true_negative } + $c_matrix->{ false_negative };
+    my $predicted_1_sum = $c_matrix->{ false_positive } + $c_matrix->{ true_positive };
     
     my $data = [ 
-        [ $c_matrix->{ true_negative },  $c_matrix->{ false_positive } ],
-        [ $c_matrix->{ false_negative }, $c_matrix->{ true_positive } ]
+        [ $c_matrix->{ true_negative },  $c_matrix->{ false_positive }, $actual_0_sum ],
+        [ $c_matrix->{ false_negative }, $c_matrix->{ true_positive }, $actual_1_sum ],
+        [ $predicted_0_sum, $predicted_1_sum, $c_matrix->{ total_entries } ],
     ];
     my $matrix = Text::Matrix->new(
         rows => $actual_rows,
@@ -1006,16 +1229,24 @@ sub _print_extended_matrix {
     print "Total of ", $c_matrix->{ total_entries } , " entries\n";
     print "  Accuracy: $c_matrix->{ accuracy } %\n";
     print "  Sensitivity: $c_matrix->{ sensitivity } %\n";
+    # more stats
+    print "  Precision: $c_matrix->{ precision } %\n" if exists $c_matrix->{ precision };
+    print "  Specificity: $c_matrix->{ specificity } %\n" if exists $c_matrix->{ specificity };
+    print "  F1 Score: $c_matrix->{ F1_Score } %\n" if exists $c_matrix->{ F1_Score };
+    print "  Negative Predicted Value: $c_matrix->{ negative_predicted_value } %\n" if exists $c_matrix->{ negative_predicted_value };
+    print "  False Negative Rate: $c_matrix->{ false_negative_rate } %\n" if exists $c_matrix->{ false_negative_rate };
+    print "  False Positive Rate: $c_matrix->{ false_positive_rate } %\n" if exists $c_matrix->{ false_positive_rate };
+    print "  False Discovery Rate: $c_matrix->{ false_discovery_rate } %\n" if exists $c_matrix->{ false_discovery_rate };
+    print "  False Omission Rate: $c_matrix->{ false_omission_rate } %\n" if exists $c_matrix->{ false_omission_rate };
+    print "  Balanced Accuracy: $c_matrix->{ balanced_accuracy } %\n" if exists $c_matrix->{ balanced_accuracy };
     print "~~" x24, "\n";
 }
 
 =head1 NERVE DATA RELATED SUBROUTINES
 
-This part is about saving the data of the nerve. These subroutines can be exported using the C<:local_data> tag.
+This part is about saving the data of the nerve. These subroutines can be imported using the C<:local_data> tag.
 
 B<The subroutines are to be called in the procedural way>. No checking is done currently.
-
-The subroutines here are not exported in any way whatsoever.
 
 See C<PERCEPTRON DATA> and C<KNOWN ISSUES> sections for more details on the subroutines in this section.
 
@@ -1067,7 +1298,7 @@ sub load_perceptron {
 
 =head1 NERVE PORTABILITY RELATED SUBROUTINES
 
-These subroutines can be exported using the C<:portable_data> tag.
+These subroutines can be imported using the C<:portable_data> tag.
 
 The file type currently supported is YAML. Please be careful with the data as you won't want the nerve data accidentally modified.
 
@@ -1140,7 +1371,7 @@ These are the to-do's that B<MIGHT> be done in the future. Don't put too much ho
 
 =head2 Portability of Nerve Data
 
-Take note that the C<Storable> nerve data is not compatible across different versions. See C<Storable>'s documentation for more information.
+Take note that the C<Storable> nerve data is not compatible across different versions.
 
 If you really need to send the nerve data to different computers with different versions of C<Storable> module, see the docs of the following subroutines: 
 
@@ -1194,7 +1425,7 @@ Besiyata d'shmaya, Wikipedia
 
 =head1 SEE ALSO
 
-AI::Perceptron, Text::Matrix
+AI::Perceptron, Text::Matrix, YAML
 
 =head1 LICENSE AND COPYRIGHT
 

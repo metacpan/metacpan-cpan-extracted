@@ -1,5 +1,14 @@
 Revision history for MooX-PDL-Role-Proxy
 
+0.07      2021-09-03 13:21:51-04:00 America/New_York
+
+  [ENHANCEMENTS]
+
+    * using new PDL "ndarray" versus old "piddle" terminology
+    * tags piddle and ndarray are both recognized.
+    * clone_with_piddles still accepted.
+    * may now pass extra arguments to the clone method when using new _clone_with_ndarray
+
 0.06      2021-07-01 16:45:27-04:00 America/New_York
 
 

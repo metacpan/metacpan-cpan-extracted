@@ -1,5 +1,10 @@
 Revision history for Smartcat-App
 
+0.0.11  2021-09-08 21:01:55 UTC
+        - Add --external-tag option for `push` command
+        - Add --extract-id-from-name option to extract external document identifiers 
+          from filenames using `push` command
+
 0.0.10  2021-04-22 22:05:04 UTC
         - Fix `pull` command for projects with folders for a single file
         - Fix `push` command for projects with folders on Win32

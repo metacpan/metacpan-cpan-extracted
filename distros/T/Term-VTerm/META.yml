@@ -19,14 +19,31 @@ name: Term-VTerm
 provides:
   Term::VTerm:
     file: lib/Term/VTerm.pm
-    version: '0.06'
+    version: '0.07'
+  Term::VTerm::Color:
+    file: lib/Term/VTerm/Color.pm
+    version: '0.07'
+  Term::VTerm::GlyphInfo:
+    file: lib/Term/VTerm/GlyphInfo.pm
+    version: '0.07'
+  Term::VTerm::LineInfo:
+    file: lib/Term/VTerm/LineInfo.pm
+    version: '0.07'
+  Term::VTerm::Pos:
+    file: lib/Term/VTerm/Pos.pm
+    version: '0.07'
+  Term::VTerm::Rect:
+    file: lib/Term/VTerm/Rect.pm
+    version: '0.07'
   Term::VTerm::Screen:
     file: lib/Term/VTerm/Screen.pm
-    version: '0.06'
+    version: '0.07'
   Term::VTerm::State:
     file: lib/Term/VTerm/State.pm
-    version: '0.06'
+    version: '0.07'
+requires:
+  perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.06'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

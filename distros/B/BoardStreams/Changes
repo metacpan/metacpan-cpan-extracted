@@ -1,5 +1,11 @@
 Revision history for Perl extension BoardStreams
 
+v0.0.23 2021-09-08T23:14:09Z
+
+    - upgraded version of Mojo::Pg dependency to 4.26, and removed
+      some previously necessary, inefficient code
+    - increased efficiency of Perl client, with op_share
+
 v0.0.22 2021-02-28T03:24:32Z
 
     - perl client also pings the server

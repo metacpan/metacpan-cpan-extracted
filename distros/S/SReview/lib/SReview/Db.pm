@@ -472,6 +472,7 @@ CREATE TYPE talkstate_new AS ENUM (
 );
 ALTER TABLE talks ALTER state DROP DEFAULT;
 DROP VIEW talk_list;
+UPDATE talks SET state='broken' WHERE state='ignored';
 ALTER TABLE talks ALTER state TYPE talkstate_new USING (state::varchar)::talkstate_new;
 ALTER TABLE talks ALTER state SET DEFAULT 'waiting_for_files';
 CREATE VIEW talk_list AS
@@ -762,6 +763,7 @@ CREATE TYPE talkstate_new AS ENUM (
 );
 ALTER TABLE talks ALTER state DROP DEFAULT;
 DROP VIEW talk_list;
+UPDATE talks SET state='done' WHERE state='announcing';
 ALTER TABLE talks ALTER state TYPE talkstate_new USING (state::varchar)::talkstate_new;
 ALTER TABLE talks ALTER state SET DEFAULT 'waiting_for_files';
 CREATE VIEW talk_list AS
@@ -1087,6 +1089,7 @@ CREATE TYPE talkstate_new AS ENUM (
     'ignored'
 );
 ALTER TABLE talks ALTER state DROP DEFAULT;
+UPDATE talks SET state='announcing' WHERE state='publishing';
 ALTER TABLE talks ALTER state TYPE talkstate_new USING(state::varchar)::talkstate_new;
 ALTER TABLE talks ALTER state SET DEFAULT 'waiting_for_files';
 DROP TYPE talkstate;
@@ -1136,6 +1139,7 @@ CREATE TYPE talkstate_new AS ENUM (
     'ignored'
 );
 ALTER TABLE talks ALTER state DROP DEFAULT;
+UPDATE talks SET state='broken' WHERE state='injecting';
 ALTER TABLE talks ALTER state TYPE talkstate_new USING(state::varchar)::talkstate_new;
 ALTER TABLE talks ALTER state SET DEFAULT 'waiting_for_files';
 DROP TYPE talkstate;
@@ -1146,6 +1150,129 @@ ALTER TABLE talks ALTER flags TYPE jsonb;
 -- 23 down
 ALTER TABLE raw_files DROP CONSTRAINT unique_filename;
 ALTER TABLE talks ALTER flags TYPE json;
+-- 24 up
+CREATE TYPE talkstate_new AS ENUM (
+    'waiting_for_files',
+    'cutting',
+    'generating_previews',
+    'notification',
+    'preview',
+    'transcoding',
+    'uploading',
+    'publishing',
+    'finalreview',
+    'announcing',
+    'done',
+    'injecting',
+    'removing',
+    'broken',
+    'needs_work',
+    'lost',
+    'ignored'
+);
+ALTER TABLE talks ALTER state DROP DEFAULT;
+ALTER TABLE talks ALTER state TYPE talkstate_new USING(state::varchar)::talkstate_new;
+ALTER TABLE talks ALTER state SET DEFAULT 'waiting_for_files';
+DROP TYPE talkstate;
+ALTER TYPE talkstate_new RENAME TO talkstate;
+-- 24 down
+CREATE TYPE talkstate_new AS ENUM (
+    'waiting_for_files',
+    'cutting',
+    'generating_previews',
+    'notification',
+    'preview',
+    'transcoding',
+    'uploading',
+    'publishing',
+    'announcing',
+    'done',
+    'injecting',
+    'broken',
+    'needs_work',
+    'lost',
+    'ignored'
+);
+ALTER TABLE talks ALTER state DROP DEFAULT;
+UPDATE talks SET state='publishing' WHERE state IN ('finalreview','removing');
+ALTER TABLE talks ALTER state TYPE talkstate_new USING(state::varchar)::talkstate_new;
+ALTER TABLE talks ALTER state SET DEFAULT 'waiting_for_files';
+DROP TYPE talkstate;
+ALTER TYPE talkstate_new RENAME TO talkstate;
+-- 25 up
+CREATE TABLE commentlog (
+    id SERIAL PRIMARY KEY,
+    talk integer REFERENCES talks(id),
+    comment TEXT,
+    state varchar,
+    logdate TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+INSERT INTO commentlog(talk, comment) SELECT id, comments FROM talks WHERE comments IS NOT NULL;
+UPDATE talks SET comments = NULL;
+-- 25 down
+WITH logtexts(talk, comments) AS
+(WITH orderedlog(talk, comment, logdate) AS
+(SELECT talk, comment, logdate FROM commentlog ORDER BY logdate)
+SELECT talk, string_agg(logdate || E'\n' || comment, E'\n\n') AS comments
+FROM orderedlog
+GROUP BY talk)
+UPDATE talks SET comments = logtexts.comments
+FROM logtexts
+WHERE talks.id = logtexts.talk;
+DROP TABLE commentlog;
+-- 26 up
+CREATE TYPE talkstate_new AS ENUM (
+    'waiting_for_files',
+    'cutting',
+    'generating_previews',
+    'notification',
+    'preview',
+    'transcoding',
+    'uploading',
+    'publishing',
+    'notify_final',
+    'finalreview',
+    'announcing',
+    'done',
+    'injecting',
+    'remove',
+    'removing',
+    'broken',
+    'needs_work',
+    'lost',
+    'ignored'
+);
+ALTER TABLE talks ALTER state DROP DEFAULT;
+ALTER TABLE talks ALTER state TYPE talkstate_new USING(state::varchar)::talkstate_new;
+ALTER TABLE talks ALTER state SET DEFAULT 'waiting_for_files';
+DROP TYPE talkstate;
+ALTER TYPE talkstate_new RENAME TO talkstate;
+-- 26 down
+CREATE TYPE talkstate_new AS ENUM (
+    'waiting_for_files',
+    'cutting',
+    'generating_previews',
+    'notification',
+    'preview',
+    'transcoding',
+    'uploading',
+    'publishing',
+    'finalreview',
+    'announcing',
+    'done',
+    'injecting',
+    'removing',
+    'broken',
+    'needs_work',
+    'lost',
+    'ignored'
+);
+ALTER TABLE talks ALTER state DROP DEFAULT;
+UPDATE talks SET state='finalreview' WHERE state='notify_final';
+ALTER TABLE talks ALTER state TYPE talkstate_new USING(state::varchar)::talkstate_new;
+ALTER TABLE talks ALTER state SET DEFAULT 'waiting_for_files';
+DROP TYPE talkstate;
+ALTER TYPE talkstate_new RENAME TO talkstate;
 @@ code
 -- 1 up
 CREATE VIEW last_room_files AS
@@ -1638,3 +1765,174 @@ CREATE VIEW talk_list AS
      LEFT JOIN talks ON rooms.id = talks.room
      LEFT JOIN events ON talks.event = events.id
      LEFT JOIN tracks ON talks.track = tracks.id;
+-- 5 up
+CREATE OR REPLACE FUNCTION state_next(talkstate) RETURNS talkstate
+    LANGUAGE plpgsql
+    AS $_$
+DECLARE
+    enumvals talkstate[];
+    startval ALIAS FOR $1;
+BEGIN
+  IF startval = 'injecting' THEN
+    return 'generating_previews'::talkstate;
+  ELSE
+    IF startval = 'removing' THEN
+      return 'waiting_for_files'::talkstate;
+    ELSE
+      IF startval >= 'done' THEN
+        return startval;
+      ELSE
+        enumvals := enum_range(startval, NULL);
+        return enumvals[2];
+      END IF;
+    END IF;
+  END IF;
+END $_$;
+-- 5 down
+CREATE OR REPLACE FUNCTION state_next(talkstate) RETURNS talkstate
+    LANGUAGE plpgsql
+    AS $_$
+DECLARE
+  enumvals talkstate[];
+  startval ALIAS FOR $1;
+BEGIN
+  IF startval = 'injecting' THEN
+    return 'generating_previews'::talkstate;
+  ELSE
+    IF startval >= 'done' THEN
+      return startval;
+    ELSE
+      enumvals := enum_range(startval, NULL);
+      return enumvals[2];
+    END IF;
+  END IF;
+END $_$;
+-- 6 up
+CREATE OR REPLACE FUNCTION state_next(talkstate) RETURNS talkstate
+    LANGUAGE Plpgsql
+    AS $_$
+DECLARE
+  enumvals talkstate[];
+  startval ALIAS FOR $1;
+BEGIN
+  IF startval = 'injecting' THEN
+    return 'generating_previews'::talkstate;
+  ELSE
+    IF startval = 'remove' THEN
+      return 'removing'::talkstate;
+    ELSE
+      IF startval = 'removing' THEN
+        return 'waiting_for_files'::talkstate;
+      ELSE
+        IF startval >= 'done' THEN
+          return startval;
+        ELSE
+          enumvals := enum_range(startval, NULL);
+          return enumvals[2];
+        END IF;
+      END IF;
+    END IF;
+  END IF;
+END $_$;
+-- 6 down
+CREATE OR REPLACE FUNCTION state_next(talkstate) RETURNS talkstate
+    LANGUAGE plpgsql
+    AS $_$
+DECLARE
+    enumvals talkstate[];
+    startval ALIAS FOR $1;
+BEGIN
+  IF startval = 'injecting' THEN
+    return 'generating_previews'::talkstate;
+  ELSE
+    IF startval = 'removing' THEN
+      return 'waiting_for_files'::talkstate;
+    ELSE
+      IF startval >= 'done' THEN
+        return startval;
+      ELSE
+        enumvals := enum_range(startval, NULL);
+        return enumvals[2];
+      END IF;
+    END IF;
+  END IF;
+END $_$;
+-- 7 up
+CREATE FUNCTION adjusted_raw_talks(integer, interval, interval, interval) RETURNS SETOF raw_talks LANGUAGE plpgsql AS $_$
+DECLARE
+  talk_id ALIAS FOR $1;
+  start_off ALIAS FOR $2;
+  end_off ALIAS FOR $3;
+  audio_margin ALIAS FOR $4;
+BEGIN
+  RETURN QUERY
+    SELECT talk_id AS talkid,
+           talks.slug,
+           raw_files.id AS rawid,
+           raw_files.filename AS raw_filename,
+           talks.starttime + start_off AS talk_start, -- the time where the talk starts, after adjustments
+           talks.endtime + start_off + end_off AS talk_end, -- the time where the talk ends, after adjustments
+           raw_files.starttime AS raw_start,
+           raw_files.endtime AS raw_end,
+           (talks.endtime + start_off + end_off) - (talks.starttime + start_off) AS talk_length,
+           raw_files.endtime - raw_files.starttime AS raw_length,
+           LEAST(raw_files.endtime, talks.endtime + start_off + end_off) - GREATEST(raw_files.starttime, talks.starttime + start_off - audio_margin) AS raw_length_corrected,
+           SUM(LEAST(raw_files.endtime, talks.endtime + start_off + end_off) - GREATEST(raw_files.starttime, talks.starttime + start_off - audio_margin)) OVER (range unbounded preceding) AS raw_total,
+           CASE
+             WHEN raw_files.starttime < talks.starttime + start_off - audio_margin THEN talks.starttime + start_off - audio_margin - raw_files.starttime
+             ELSE '00:00:00'::interval
+           END AS fragment_start
+      FROM raw_files JOIN rooms ON raw_files.room = rooms.id JOIN talks ON rooms.id = talks.room
+      WHERE talks.id = talk_id
+        AND ((talks.starttime + start_off - audio_margin) >= raw_files.starttime AND (talks.starttime + start_off - audio_margin) <= raw_files.endtime
+            OR (talks.endtime + start_off + end_off) >= raw_files.starttime AND (talks.endtime + start_off + end_off) <= raw_files.endtime
+            OR (talks.starttime + start_off - audio_margin) <= raw_files.starttime AND (talks.endtime + start_off + end_off) >= raw_files.endtime)
+      UNION
+    SELECT
+        -1 AS talkid, -- use -1 to mark that this is the pre video
+        talks.slug,
+        raw_files.id AS rawid,
+        raw_files.filename AS raw_filename,
+        talks.starttime + start_off - '00:20:00'::interval AS talk_start,
+        talks.starttime + start_off AS talk_end,
+        raw_files.starttime AS raw_start,
+        raw_files.endtime AS raw_end,
+        '00:20:00'::interval AS talk_length,
+        raw_files.endtime - raw_files.starttime AS raw_length,
+        LEAST(raw_files.endtime, talks.starttime + start_off) - GREATEST(raw_files.starttime, talks.starttime + start_off - '00:20:00'::interval - audio_margin) AS raw_length_corrected,
+        SUM(LEAST(raw_files.endtime, talks.starttime + start_off) - GREATEST(raw_files.starttime, talks.starttime + start_off - '00:20:00'::interval - audio_margin)) OVER (range unbounded preceding) AS raw_total,
+        CASE
+          WHEN raw_files.starttime < talks.starttime + start_off - '00:20:00'::interval - audio_margin THEN talks.starttime + start_off - '00:20:00'::interval - audio_margin - raw_files.starttime
+          ELSE '00:00:00'::interval
+        END AS fragment_start
+      FROM raw_files JOIN rooms ON raw_files.room = rooms.id JOIN talks ON rooms.id = talks.room
+      WHERE talks.id = talk_id
+        AND ((talks.starttime + start_off - '00:20:00'::interval - audio_margin) >= raw_files.starttime AND (talks.starttime + start_off - '00:20:00'::interval - audio_margin) <= raw_files.endtime
+            OR (talks.starttime + start_off) >= raw_files.starttime AND (talks.starttime + start_off) <= raw_files.endtime
+            OR (talks.starttime + start_off - '00:20:00'::interval - audio_margin) <= raw_files.starttime AND (talks.endtime + start_off) >= raw_files.endtime)
+      UNION
+    SELECT
+        -2 AS talkid, -- use -2 to mark that this is the post video
+        talks.slug,
+        raw_files.id AS rawid,
+        raw_files.filename AS raw_filename,
+        talks.endtime + start_off + end_off AS talk_start,
+        talks.endtime + start_off + end_off + '00:20:00'::interval AS talk_end,
+        raw_files.starttime AS raw_start,
+        raw_files.endtime AS raw_end,
+        '00:20:00'::interval AS talk_length,
+        raw_files.endtime - raw_files.starttime AS raw_length,
+        LEAST(raw_files.endtime, talks.endtime + start_off + end_off + '00:20:00'::interval) - GREATEST(raw_files.starttime, talks.endtime + start_off + end_off - audio_margin) AS raw_length_corrected,
+        SUM(LEAST(raw_files.endtime, talks.endtime + start_off + end_off + '00:20:00'::interval) - GREATEST(raw_files.starttime, talks.endtime + start_off + end_off - audio_margin)) OVER (range unbounded preceding) AS raw_total,
+        CASE
+          WHEN raw_files.starttime < talks.endtime + start_off + end_off - audio_margin THEN talks.endtime + start_off + end_off - audio_margin - raw_files.starttime
+          ELSE '00:00:00'::interval
+        END AS fragment_start
+      FROM raw_files JOIN rooms ON raw_files.room = rooms.id JOIN talks ON rooms.id = talks.room
+      WHERE talks.id = talk_id
+        AND ((talks.endtime + start_off + end_off - audio_margin) >= raw_files.starttime AND (talks.endtime + start_off + end_off - audio_margin) <= raw_files.endtime
+            OR (talks.endtime + start_off + end_off + '00:20:00'::interval) >= raw_files.starttime AND (talks.endtime + start_off + end_off + '00:20:00'::interval) <= raw_files.endtime
+            OR (talks.endtime + start_off + end_off - audio_margin) <= raw_files.starttime AND (talks.endtime + start_off + end_off + '00:20:00'::interval) >= raw_files.endtime);
+END $_$;
+-- 7 down
+DROP FUNCTION adjusted_raw_talks(integer, interval, interval, interval);

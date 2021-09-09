@@ -1,5 +1,10 @@
 Revision history for Perl extension Data::Properties.
 
+1.07  Thu Sep 09 10:34:35
+      - Re-released 0.02 as 1.07 to supercede an incompatible 1.05 version.
+      - Updated Changes file on request of Petr Pisar.
+      - Added LICENSE file on request of Emmanuel Seyman.
+
 0.02  Tue Nov 27 09:10:31 2001
         - use $| instead of flush to avoid loading IO::Handle
 

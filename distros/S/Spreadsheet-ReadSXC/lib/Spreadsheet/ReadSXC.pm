@@ -7,7 +7,7 @@ use warnings;
 use Exporter 'import';
 
 our @EXPORT_OK = qw(read_sxc read_sxc_fh read_xml_file read_xml_string);
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 use Archive::Zip ':ERROR_CODES';
 use Carp qw(croak);

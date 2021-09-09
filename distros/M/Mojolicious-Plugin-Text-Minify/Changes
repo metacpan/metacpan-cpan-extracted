@@ -1,0 +1,15 @@
+Revision history for Mojolicious-Plugin-Text-Minify:
+
+v0.2.0    2021-09-09 14:04:34+01:00 Europe/London
+  [Enhancements]
+  - Use "mojox.no-minify" stash key to disable minification.
+
+  [Toolchain]
+  - Removed unnecessary prereqs
+
+v0.1.1    2021-09-09 13:22:04+01:00 Europe/London
+  [Documentation]
+  - fixed typo in the ABSTRACT
+
+v0.1.0    2021-09-09 13:18:36+01:00 Europe/London
+  - Initial release.

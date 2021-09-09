@@ -3,18 +3,14 @@
 
 ansifold - fold command handling ANSI terminal sequences
 
-# VERSION
-
-Version 1.0902
-
 # SYNOPSIS
 
 ansifold \[ options \]
 
     -w#   --width=#                Folding width (default 72)
-          --boundary=word          Fold on word boundary
-          --padding                Padding to margin space
-          --padchar=_              Padding character
+          --boundary=word|space    Fold on word boundary
+          --padding[=#]            Padding to margin space
+          --padchar=_              Default padding character
           --ambiguous=narrow|wide  Unicode ambiguous character handling
     -p    --paragraph              Print extra newline
           --separate=string        Set separator string (default newline)
@@ -30,6 +26,10 @@ ansifold \[ options \]
           --tabstyle=style         Tab expansion style (shade, dot, symbol)
     -h    --help                   Show help message
     -v    --version                Show version
+
+# VERSION
+
+Version 1.1101
 
 # DESCRIPTION
 
@@ -47,8 +47,9 @@ change the folding width.
 Single field is used repeatedly for the same line.
 
 With option **--padding**, remained columns are filled by padding
-character (space by default).  You can use **--padchar** to change
-padding character.
+character, space by default, or specified by optional value like
+`--padding=_`.  Default padding character can be set by **--padchar**
+option.
 
 **ansifold** handles Unicode multi-byte characters properly.  Option
 **--ambiguous** takes _wide_ or _narrow_ and it specifies the visual
@@ -144,10 +145,12 @@ Line break adjustment is supported for ASCII word boundaries.  As for
 Japanese, more complicated prohibition processing is performed.  Use
 option **-s** to enable everything.
 
-## **--boundary**=_word_
+## **--boundary**=_word_|_space_
 
-Option **--boundary=word** prohibit breaking line in the middle of
-alpha-numeric word.
+This option prohibit breaking line in the middle of ASCII/Latin word.
+Context of word is defined by option value; _word_ means
+alpha-numeric sequence, while _space_ means simply non-space
+printables.
 
 ## **--linebreak**=_all_|_ruunin_|_runout_|_none_
 
@@ -171,6 +174,9 @@ and **--runout** option.  Default values are 4.
 
 Option **--smart** (or simply **-s**) set both **--boundary=word** and
 **--linebreak=all**, and enables all smart text formatting capability.
+
+Use option **--boundary=space** if you want the command to behave more
+like **-s** option of [fold(1)](http://man.he.net/man1/fold) command.
 
 # TAB EXPANSION
 

@@ -4,6 +4,7 @@
  *  (C) Paul Evans, 2014-2020 -- leonerd@leonerd.org.uk
  */
 
+#define PERL_NO_GET_CONTEXT
 
 #include "EXTERN.h"
 #include "perl.h"
@@ -21,7 +22,16 @@
 
 #define FREE_CB(v)  if(self->v) SvREFCNT_dec(self->v)
 
+#ifdef tTHX
+#  define dTHXa_FROM_SELF   dTHXa(self->myperl)
+#else
+#  define dTHXa_FROM_SELF
+#endif
+
 typedef struct Term__VTerm {
+#ifdef tTHX
+  tTHX myperl;
+#endif
   VTerm *vt;
 
   struct {
@@ -46,8 +56,13 @@ typedef VTermRect       *Term__VTerm__Rect;
 typedef VTermScreenCell *Term__VTerm__Screen__Cell;
 
 typedef struct Term__VTerm__State {
+#ifdef tTHX
+  tTHX myperl;
+#endif
   VTermState *state;
   SV         *vterm;
+
+  int has_selection_cb : 1;
 
   struct {
     CV *putglyph;
@@ -61,10 +76,16 @@ typedef struct Term__VTerm__State {
     CV *bell;
     CV *resize;
     CV *setlineinfo;
+
+    CV *selection_set;
+    CV *selection_query;
   } cb;
 } *Term__VTerm__State;
 
 typedef struct Term__VTerm__Screen {
+#ifdef tTHX
+  tTHX myperl;
+#endif
   VTermScreen *screen;
   SV          *vterm;
 
@@ -164,7 +185,8 @@ static int dmd_helper_vterm_screen(pTHX_ const SV *sv)
 }
 #endif
 
-static SV *newSVcolor(VTermColor *col)
+#define newSVcolor(col)  S_newSVcolor(aTHX_ col)
+static SV *S_newSVcolor(pTHX_ VTermColor *col)
 {
   VTermColor *self;
   SV *sv = newSV(0);
@@ -176,7 +198,8 @@ static SV *newSVcolor(VTermColor *col)
   return sv;
 }
 
-static SV *newSVlineinfo(const VTermLineInfo *info)
+#define newSVlineinfo(info)  S_newSVlineinfo(aTHX_ info)
+static SV *S_newSVlineinfo(pTHX_ const VTermLineInfo *info)
 {
   VTermLineInfo *self;
   SV *sv = newSV(0);
@@ -188,7 +211,8 @@ static SV *newSVlineinfo(const VTermLineInfo *info)
   return sv;
 }
 
-static SV *newSVglyphinfo(VTermGlyphInfo *info)
+#define newSVglyphinfo(info)  S_newSVglyphinfo(aTHX_ info)
+static SV *S_newSVglyphinfo(pTHX_ VTermGlyphInfo *info)
 {
   VTermGlyphInfo *self;
   SV *sv = newSV(0);
@@ -210,7 +234,8 @@ static SV *newSVglyphinfo(VTermGlyphInfo *info)
   return sv;
 }
 
-static SV *newSVpos(VTermPos pos)
+#define newSVpos(pos)  S_newSVpos(aTHX_ pos)
+static SV *S_newSVpos(pTHX_ VTermPos pos)
 {
   VTermPos *self;
   SV *sv = newSV(0);
@@ -222,7 +247,8 @@ static SV *newSVpos(VTermPos pos)
   return sv;
 }
 
-static SV *newSVrect(VTermRect rect)
+#define newSVrect(rect)  S_newSVrect(aTHX_ rect)
+static SV *S_newSVrect(pTHX_ VTermRect rect)
 {
   VTermRect *self;
   SV *sv = newSV(0);
@@ -234,7 +260,8 @@ static SV *newSVrect(VTermRect rect)
   return sv;
 }
 
-static SV *newSVscreencell(VTermScreenCell cell)
+#define newSVscreencell(cell)  S_newSVscreencell(aTHX_ cell)
+static SV *S_newSVscreencell(pTHX_ VTermScreenCell cell)
 {
   VTermScreenCell *self;
   SV *sv = newSV(0);
@@ -246,7 +273,8 @@ static SV *newSVscreencell(VTermScreenCell cell)
   return sv;
 }
 
-static SV *newSVvalue(VTermValue *val, VTermValueType type)
+#define newSVvalue(val, type)  S_newSVvalue(aTHX_ val, type)
+static SV *S_newSVvalue(pTHX_ VTermValue *val, VTermValueType type)
 {
   switch(type) {
     case VTERM_VALUETYPE_BOOL:
@@ -263,8 +291,9 @@ static SV *newSVvalue(VTermValue *val, VTermValueType type)
 
 static int parser_text(const char *bytes, size_t len, void *user)
 {
-  dSP;
   Term__VTerm self = user;
+  dTHXa_FROM_SELF;
+  dSP;
   CV *cb = self->parser_cb.text;
 
   SV *str = newSVpv(bytes, len);
@@ -292,8 +321,9 @@ static int parser_text(const char *bytes, size_t len, void *user)
 
 static int parser_control(unsigned char control, void *user)
 {
-  dSP;
   Term__VTerm self = user;
+  dTHXa_FROM_SELF;
+  dSP;
   CV *cb = self->parser_cb.control;
 
   if(!cb)
@@ -317,8 +347,9 @@ static int parser_control(unsigned char control, void *user)
 
 static int parser_escape(const char *bytes, size_t len, void *user)
 {
-  dSP;
   Term__VTerm self = user;
+  dTHXa_FROM_SELF;
+  dSP;
   CV *cb = self->parser_cb.escape;
 
   SV *str = newSVpv(bytes, len);
@@ -344,8 +375,9 @@ static int parser_escape(const char *bytes, size_t len, void *user)
 
 static int parser_csi(const char *leader, const long args[], int argcount, const char *intermed, char command, void *user)
 {
-  dSP;
   Term__VTerm self = user;
+  dTHXa_FROM_SELF;
+  dSP;
   int i;
   CV *cb = self->parser_cb.csi;
 
@@ -391,8 +423,9 @@ static int parser_csi(const char *leader, const long args[], int argcount, const
 
 static int parser_osc(int command, VTermStringFragment frag, void *user)
 {
-  dSP;
   Term__VTerm self = user;
+  dTHXa_FROM_SELF;
+  dSP;
   CV *cb = self->parser_cb.osc;
 
   if(!cb)
@@ -424,8 +457,9 @@ static int parser_osc(int command, VTermStringFragment frag, void *user)
 
 static int parser_dcs(const char *command, size_t commandlen, VTermStringFragment frag, void *user)
 {
-  dSP;
   Term__VTerm self = user;
+  dTHXa_FROM_SELF;
+  dSP;
   CV *cb = self->parser_cb.dcs;
 
   if(!cb)
@@ -457,8 +491,9 @@ static int parser_dcs(const char *command, size_t commandlen, VTermStringFragmen
 
 static int parser_resize(int rows, int cols, void *user)
 {
-  dSP;
   Term__VTerm self = user;
+  dTHXa_FROM_SELF;
+  dSP;
   CV *cb = self->parser_cb.resize;
 
   if(!cb)
@@ -479,7 +514,7 @@ static int parser_resize(int rows, int cols, void *user)
   LEAVE;
 }
 
-VTermParserCallbacks parser_cbs = {
+static const VTermParserCallbacks parser_cbs = {
   .text    = parser_text,
   .control = parser_control,
   .escape  = parser_escape,
@@ -491,8 +526,9 @@ VTermParserCallbacks parser_cbs = {
 
 static int state_putglyph(VTermGlyphInfo *info, VTermPos pos, void *user)
 {
-  dSP;
   Term__VTerm__State self = user;
+  dTHXa_FROM_SELF;
+  dSP;
   CV *cb = self->cb.putglyph;
 
   if(!cb)
@@ -517,8 +553,9 @@ static int state_putglyph(VTermGlyphInfo *info, VTermPos pos, void *user)
 
 static int state_movecursor(VTermPos pos, VTermPos oldpos, int visible, void *user)
 {
-  dSP;
   Term__VTerm__State self = user;
+  dTHXa_FROM_SELF;
+  dSP;
   CV *cb = self->cb.movecursor;
 
   if(!cb)
@@ -544,8 +581,9 @@ static int state_movecursor(VTermPos pos, VTermPos oldpos, int visible, void *us
 
 static int state_scrollrect(VTermRect rect, int downward, int rightward, void *user)
 {
-  dSP;
   Term__VTerm__State self = user;
+  dTHXa_FROM_SELF;
+  dSP;
   CV *cb = self->cb.scrollrect;
   int ret;
 
@@ -577,8 +615,9 @@ static int state_scrollrect(VTermRect rect, int downward, int rightward, void *u
 
 static int state_moverect(VTermRect dest, VTermRect src, void *user)
 {
-  dSP;
   Term__VTerm__State self = user;
+  dTHXa_FROM_SELF;
+  dSP;
   CV *cb = self->cb.moverect;
 
   if(!cb)
@@ -603,8 +642,9 @@ static int state_moverect(VTermRect dest, VTermRect src, void *user)
 
 static int state_erase(VTermRect rect, int selective, void *user)
 {
-  dSP;
   Term__VTerm__State self = user;
+  dTHXa_FROM_SELF;
+  dSP;
   CV *cb = self->cb.erase;
 
   if(!cb)
@@ -629,8 +669,9 @@ static int state_erase(VTermRect rect, int selective, void *user)
 
 static int state_initpen(void *user)
 {
-  dSP;
   Term__VTerm__State self = user;
+  dTHXa_FROM_SELF;
+  dSP;
   CV *cb = self->cb.initpen;
 
   if(!cb)
@@ -651,8 +692,9 @@ static int state_initpen(void *user)
 
 static int state_setpenattr(VTermAttr attr, VTermValue *val, void *user)
 {
-  dSP;
   Term__VTerm__State self = user;
+  dTHXa_FROM_SELF;
+  dSP;
   CV *cb = self->cb.setpenattr;
 
   if(!cb)
@@ -679,8 +721,9 @@ static int state_setpenattr(VTermAttr attr, VTermValue *val, void *user)
 
 static int state_settermprop(VTermProp prop, VTermValue *val, void *user)
 {
-  dSP;
   Term__VTerm__State self = user;
+  dTHXa_FROM_SELF;
+  dSP;
   CV *cb = self->cb.settermprop;
   VTermValueType type = vterm_get_prop_type(prop);
   SV *strbuf;
@@ -721,8 +764,9 @@ static int state_settermprop(VTermProp prop, VTermValue *val, void *user)
 
 static int state_bell(void *user)
 {
-  dSP;
   Term__VTerm__State self = user;
+  dTHXa_FROM_SELF;
+  dSP;
   CV *cb = self->cb.bell;
 
   if(!cb)
@@ -743,8 +787,9 @@ static int state_bell(void *user)
 
 static int state_setlineinfo(int row, const VTermLineInfo *info, const VTermLineInfo *oldinfo, void *user)
 {
-  dSP;
   Term__VTerm__State self = user;
+  dTHXa_FROM_SELF;
+  dSP;
   CV *cb = self->cb.setlineinfo;
   int ret;
 
@@ -774,7 +819,7 @@ static int state_setlineinfo(int row, const VTermLineInfo *info, const VTermLine
   return ret;
 }
 
-VTermStateCallbacks state_cbs = {
+static const VTermStateCallbacks state_cbs = {
   .putglyph    = state_putglyph,
   .movecursor  = state_movecursor,
   .scrollrect  = state_scrollrect,
@@ -787,10 +832,91 @@ VTermStateCallbacks state_cbs = {
   .setlineinfo = state_setlineinfo,
 };
 
+static int state_selection_set(VTermSelectionMask mask, VTermStringFragment frag, void *user)
+{
+  Term__VTerm__State self = user;
+  dTHXa_FROM_SELF;
+  SV *strbuf;
+  dSP;
+  CV *cb = self->cb.selection_set;
+  int ret;
+
+  if(!cb)
+    return 0;
+
+  strbuf = (INT2PTR(Term__VTerm, SvIV(SvRV(self->vterm))))->strbuf;
+
+  if(frag.initial)
+    SvCUR_set(strbuf, 0);
+  if(frag.len)
+    sv_catpvn(strbuf, frag.str, frag.len);
+  if(!frag.final)
+    return 1;
+
+  ENTER;
+  SAVETMPS;
+
+  PUSHMARK(SP);
+  EXTEND(SP, 2);
+  mPUSHi(mask);
+  PUSHs(strbuf);
+  PUTBACK;
+
+  call_sv((SV*)cb, G_SCALAR);
+
+  SPAGAIN;
+
+  ret = POPi;
+
+  PUTBACK;
+  FREETMPS;
+  LEAVE;
+
+  return ret;
+}
+
+static int state_selection_query(VTermSelectionMask mask, void *user)
+{
+  Term__VTerm__State self = user;
+  dTHXa_FROM_SELF;
+  dSP;
+  CV *cb = self->cb.selection_query;
+  int ret;
+
+  if(!cb)
+    return 0;
+
+  ENTER;
+  SAVETMPS;
+
+  PUSHMARK(SP);
+  EXTEND(SP, 1);
+  mPUSHi(mask);
+  PUTBACK;
+
+  call_sv((SV*)cb, G_SCALAR);
+
+  SPAGAIN;
+
+  ret = POPi;
+
+  PUTBACK;
+  FREETMPS;
+  LEAVE;
+
+  return ret;
+}
+
+static const VTermSelectionCallbacks state_selection_cbs = {
+  .set   = state_selection_set,
+  .query = state_selection_query,
+};
+
 static int screen_damage(VTermRect rect, void *user)
 {
-  dSP;
   Term__VTerm__Screen self = user;
+  dTHXa_FROM_SELF;
+  dSP;
   CV *cb = self->cb.damage;
   SV *retsv;
   int ret;
@@ -826,8 +952,9 @@ static int screen_damage(VTermRect rect, void *user)
 
 static int screen_moverect(VTermRect dest, VTermRect src, void *user)
 {
-  dSP;
   Term__VTerm__Screen self = user;
+  dTHXa_FROM_SELF;
+  dSP;
   CV *cb = self->cb.moverect;
 
   if(!cb)
@@ -852,8 +979,9 @@ static int screen_moverect(VTermRect dest, VTermRect src, void *user)
 
 static int screen_movecursor(VTermPos pos, VTermPos oldpos, int visible, void *user)
 {
-  dSP;
   Term__VTerm__Screen self = user;
+  dTHXa_FROM_SELF;
+  dSP;
   CV *cb = self->cb.movecursor;
 
   if(!cb)
@@ -879,8 +1007,9 @@ static int screen_movecursor(VTermPos pos, VTermPos oldpos, int visible, void *u
 
 static int screen_settermprop(VTermProp prop, VTermValue *val, void *user)
 {
-  dSP;
   Term__VTerm__Screen self = user;
+  dTHXa_FROM_SELF;
+  dSP;
   CV *cb = self->cb.settermprop;
   VTermValueType type = vterm_get_prop_type(prop);
   SV *strbuf;
@@ -921,8 +1050,9 @@ static int screen_settermprop(VTermProp prop, VTermValue *val, void *user)
 
 static int screen_bell(void *user)
 {
-  dSP;
   Term__VTerm__Screen self = user;
+  dTHXa_FROM_SELF;
+  dSP;
   CV *cb = self->cb.bell;
 
   if(!cb)
@@ -943,8 +1073,9 @@ static int screen_bell(void *user)
 
 static int screen_resize(int rows, int cols, void *user)
 {
-  dSP;
   Term__VTerm__Screen self = user;
+  dTHXa_FROM_SELF;
+  dSP;
   CV *cb = self->cb.resize;
 
   if(!cb)
@@ -965,7 +1096,7 @@ static int screen_resize(int rows, int cols, void *user)
   LEAVE;
 }
 
-VTermScreenCallbacks screen_cbs = {
+static const VTermScreenCallbacks screen_cbs = {
   .damage      = screen_damage,
   .moverect    = screen_moverect,
   .movecursor  = screen_movecursor,
@@ -974,7 +1105,7 @@ VTermScreenCallbacks screen_cbs = {
   .resize      = screen_resize,
 };
 
-static void setup_constants(void)
+static void S_setup_constants(pTHX)
 {
   HV *stash  = gv_stashpvn("Term::VTerm", 11, TRUE);
   AV *export = get_av("Term::VTerm::EXPORT_OK", TRUE);
@@ -1040,6 +1171,12 @@ static void setup_constants(void)
   DO_CONSTANT(VTERM_KEY_PAGEUP);
   DO_CONSTANT(VTERM_KEY_PAGEDOWN);
   DO_CONSTANT(VTERM_KEY_FUNCTION_0);
+
+  DO_CONSTANT(VTERM_SELECTION_CLIPBOARD);
+  DO_CONSTANT(VTERM_SELECTION_PRIMARY);
+  DO_CONSTANT(VTERM_SELECTION_SECONDARY);
+  DO_CONSTANT(VTERM_SELECTION_SELECT);
+  DO_CONSTANT(VTERM_SELECTION_CUT0);
 }
 
 MODULE = Term::VTerm        PACKAGE = Term::VTerm
@@ -1057,6 +1194,9 @@ _new(package,rows,cols)
       XSRETURN_UNDEF;
 
     Newxz(RETVAL, 1, struct Term__VTerm);
+#ifdef tTHX
+    RETVAL->myperl = aTHX;
+#endif
     RETVAL->vt = vt;
 
     RETVAL->strbuf = newSV(256);
@@ -1246,8 +1386,13 @@ obtain_state(self)
       XSRETURN_UNDEF;
 
     Newxz(RETVAL, 1, struct Term__VTerm__State);
+#ifdef tTHX
+    RETVAL->myperl = aTHX;
+#endif
     RETVAL->state = state;
     RETVAL->vterm = SvREFCNT_inc(ST(0));
+
+    RETVAL->has_selection_cb = FALSE;
 
   OUTPUT:
     RETVAL
@@ -1263,6 +1408,9 @@ obtain_screen(self)
       XSRETURN_UNDEF;
 
     Newxz(RETVAL, 1, struct Term__VTerm__Screen);
+#ifdef tTHX
+    RETVAL->myperl = aTHX;
+#endif
     RETVAL->screen = screen;
     RETVAL->vterm  = SvREFCNT_inc(ST(0));
 
@@ -1867,6 +2015,57 @@ set_callbacks(self,...)
         *cvp = NULL;
     }
 
+void
+set_selection_callbacks(self,...)
+  Term::VTerm::State self
+  INIT:
+    int i;
+  CODE:
+    /* TODO: argument to set buffer size? */
+    if(!self->has_selection_cb) {
+      vterm_state_set_selection_callbacks(self->state, &state_selection_cbs, self,
+        NULL, 4096);
+      self->has_selection_cb = TRUE;
+    }
+
+    for(i = 1; i < items; i++) {
+      char *name = SvPV_nolen(ST(i));
+      SV *newcb;
+      CV **cvp;
+      i++;
+
+      if     (streq(name, "on_set"  )) cvp = &self->cb.selection_set;
+      else if(streq(name, "on_query")) cvp = &self->cb.selection_query;
+      else
+        croak("Unrecognised state callback name '%s'", name);
+
+      if(*cvp)
+        SvREFCNT_dec(*cvp);
+
+      if(i < items && (newcb = ST(i)) && SvOK(newcb))
+        *cvp = (CV *)SvREFCNT_inc(newcb);
+      else
+        *cvp = NULL;
+    }
+
+void
+send_selection(self,mask,str)
+  Term::VTerm::State self
+  int mask
+  SV *str
+  INIT:
+    STRLEN len;
+    VTermStringFragment frag;
+  CODE:
+    frag = (VTermStringFragment){
+      .str     = SvPVbyte(str, len),
+      .initial = TRUE,
+      .final   = TRUE,
+    };
+    frag.len = len;
+
+    vterm_state_send_selection(self->state, mask, frag);
+
 SV *
 convert_color_to_rgb(self,col)
   Term::VTerm::State self
@@ -1879,7 +2078,7 @@ convert_color_to_rgb(self,col)
 
 
 BOOT:
-  setup_constants();
+  S_setup_constants(aTHX);
 #ifdef HAVE_DMD_HELPER
   DMD_SET_PACKAGE_HELPER("Term::VTerm",         dmd_helper_vterm);
   DMD_SET_PACKAGE_HELPER("Term::VTerm::State",  dmd_helper_vterm_state);

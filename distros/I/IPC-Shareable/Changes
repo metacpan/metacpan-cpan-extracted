@@ -1,5 +1,16 @@
 Revision history for Perl extension IPC::Shareable.
 
+1.06    2021-09-08
+    - Fix significant bug where at least on MacOS, if we generated a CRC of a
+      key that was greater than 0x80000000, it would round down the key to that
+      number exactly, casuing duplicates, and incorrect segment access
+    - Added new() method, returns a reference (default hash) without having to
+      do the tie() directly
+    - Modify t/65-seg_size.t beyond RAM max test to cover varying error messages
+      on differing OSs
+    - Renamed t/67-out_of_memory.t as the tests are related to exhausting SHM
+      slots, not RAM
+
 1.05    2021-07-16
     - Bump prereq version of Test::SharedFork to 0.35
     - Added ability to use JSON as the serializer

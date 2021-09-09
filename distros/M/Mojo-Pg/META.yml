@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,11 +26,11 @@ requires:
   perl: '5.016'
 resources:
   IRC:
-    url: irc://chat.freenode.net/#mojo
-    web: https://webchat.freenode.net/#mojo
+    url: irc://irc.libera.chat/#mojo
+    web: https://web.libera.chat/#mojo
   bugtracker: https://github.com/mojolicious/mojo-pg/issues
   homepage: https://mojolicious.org
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/mojolicious/mojo-pg.git
-version: '4.25'
+version: '4.26'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

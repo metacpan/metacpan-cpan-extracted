@@ -21,7 +21,7 @@ sub startup {
 	SReview::API::init($self);
 
 	my $config = SReview::Config::Common::setup;
-	$self->max_request_size(1024*1024*1024);
+	$self->max_request_size(2*1024*1024*1024);
 
 	if(defined($config->get("web_pid_file"))) {
 		$self->config(hypnotoad => { pid_file => $config->get("web_pid_file") });
@@ -32,11 +32,12 @@ sub startup {
 
 	SReview::Db::init($config);
 
-	if($self->mode eq "production") {
+	if(-d "/usr/share/sreview/templates") {
 		push @{$self->renderer->paths}, "/usr/share/sreview/templates";
 		push @{$self->static->paths}, "/usr/share/sreview/public";
 		push @{$self->static->paths}, "/usr/share/javascript";
-	} else {
+	}
+	if(-d "public") {
 		push @{$self->static->paths}, "./public";
 		push @{$self->renderer->paths}, "./templates";
 	}
@@ -47,11 +48,18 @@ sub startup {
 	$self->hook(before_dispatch => sub {
 		my $c = shift;
 		my $vpr = $config->get('vid_prefix');
-		my $media = "media-src 'self'";
-		my $url = Mojo::URL->new($vpr);
-		if(defined($url->host)) {
-			$vpr = $url->host;
-			$media = "media-src $vpr;";
+		state $media = undef;
+		if(!defined($media)) {
+			$media = "media-src 'self'";
+			my $url = Mojo::URL->new($vpr);
+			if(defined($url->host)) {
+				$vpr = $url->host;
+				$media = "media-src $vpr";
+			}
+			if(defined($config->get("finalhosts"))) {
+				$media .= " " . $config->get("finalhosts");
+			}
+			$media .= ";";
 		}
 		$c->res->headers->content_security_policy("default-src 'none'; connect-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; font-src 'self'; style-src 'self'; img-src 'self'; frame-ancestors 'none'; $media");
 	});
@@ -208,59 +216,8 @@ sub startup {
 	$r->get('/r/:nonce')->to(controller => 'review', action => 'view', layout => 'default');
 	$r->post('/r/:nonce/update')->to(controller => 'review', layout => 'default', action => 'update');
         $r->get('/r/:nonce/data')->to(controller => 'review', action => 'data');
-
-	$r->get('/review/:nonce' => sub {
-		my $c = shift;
-		my $stt = $c->dbh->prepare("SELECT state, name, id, extract(epoch from prelen) as prelen, extract(epoch from postlen) as postlen, extract(epoch from (endtime - starttime)) as length, speakers, starttime, endtime, slug, room, comments FROM talk_list WHERE nonce=?");
-		my $rv = $stt->execute($c->param("nonce"));
-		if($rv == 0) {
-			$c->res->code(404);
-			$c->render(text => "Invalid URL");
-			return undef;
-		}
-		my $row = $stt->fetchrow_hashref("NAME_lc");
-		if($row->{state} ne 'preview' && $row->{state} ne 'broken') {
-			$c->stash(message => "The talk <q>" . $row->{name} . "</q> is not currently available for review. It is in the state <tt>" . $row->{state} . "</tt>, whereas we need the <tt>preview</tt> state to do review. For more information, please see <a href='https://yoe.github.io/sreview/'>the documentation</a>");
-			$c->stash(title => 'Review finished or not yet available.');
-			$c->render('msg');
-			return undef;
-		}
-		my $stp = $c->dbh->prepare("SELECT properties.name, properties.description, properties.helptext, corrections.property_value FROM properties left join corrections on (properties.id = corrections.property AND talk = ?) ORDER BY properties.description");
-		$stp->execute($row->{id});
-		my $viddata = {};
-		$viddata->{corrvals} = {};
-		$viddata->{corrdescs} = {};
-		$viddata->{corrhelps} = {};
-		while(my $corrrow = $stp->fetchrow_hashref) {
-			$viddata->{corrdescs}{$corrrow->{name}} = $corrrow->{description};
-			$viddata->{corrhelps}{$corrrow->{name}} = $corrrow->{helptext};
-			$viddata->{corrvals}{$corrrow->{name}} = $corrrow->{property_value} + 0;
-		}
-
-		$viddata->{mainlen} = $row->{length} + 0;
-		$viddata->{prelen} = $row->{prelen} + 0;
-		$viddata->{postlen} = $row->{postlen} + 0;
-
-		$c->stash(title => 'Review for ' . $row->{name});
-		$c->stash(talk_title => $row->{name});
-		$c->stash(talk_speakers => $row->{speakers});
-		$c->stash(talk_start => $row->{starttime});
-		$c->stash(talk_end => $row->{endtime});
-		$c->stash(talk_nonce => $c->param("nonce"));
-		$c->stash(slug => $row->{slug});
-		$c->stash(event => $config->get("event"));
-		$c->stash(eventid => $c->eventid);
-		$c->stash(room => $row->{room});
-		$c->stash(state => $row->{state});
-		$c->stash(corrections => $viddata);
-		$c->stash(comments => $row->{comments});
-		$c->stash(target => "talk_update");
-		$c->stash(layout => 'default');
-		$c->stash(scripts_raw => ['sreview_viddata = ' . encode_json($viddata) . ';']);
-		$c->stash(scripts_extra => ['/mangler.js']);
-		$c->stash(exten => $config->get('preview_exten'));
-		$c->stash(vid_hostname => $config->get("vid_prefix"));
-	} => 'talk');
+	$r->get('/f/:nonce')->to(controller => 'finalreview', action => 'view', layout => 'default');
+	$r->post('/f/:nonce/update')->to(controller => 'finalreview', action => 'update', layout => 'default');
 
 	$r->get('/released' => sub {
 		my $c = shift;
@@ -339,19 +296,11 @@ sub startup {
 	});
 
 	$r->get('/overview' => sub {
-		my $c = shift;
-		$c->stash(event => $c->eventid);
-		my $events = $c->dbh->prepare("SELECT id, name FROM events");
-		$events->execute();
-		my $event_res = [];
-		while(my $e = $events->fetchrow_hashref) {
-			my $v = {};
-			$v->{id} = $e->{id};
-			$v->{name} = $e->{name};
-			push @$event_res, $v;
-		}
-		$c->stash(events => $event_res);
-		$c->render;
+		shift->render;
+	});
+
+	$r->get("/credits" => sub {
+		shift->render;
 	});
 
 	$r->post('/talk_update' => sub {
@@ -411,7 +360,7 @@ sub startup {
 	$admin->any('/schedule/talk/')->to(controller => 'schedule', action => 'mod_talk');
 	$admin->any('/schedule/')->to(controller => 'schedule', action => 'index');
 
-	$admin->get('/')->to('admin#main');
+	$admin->get('/')->to('admin#main')->name("admin_talk");
 
 	$admin->get('/logout' => sub {
 		my $c = shift;
@@ -420,75 +369,7 @@ sub startup {
 		$c->redirect_to('/');
 	});
 
-	$admin->get('/talk' => sub {
-		my $c = shift;
-		my $id = $c->param("talk");
-		my $st;
-
-		if(defined($c->session->{room})) {
-			$st = $c->dbh->prepare('SELECT state, name, id, extract(epoch from prelen) as prelen, extract(epoch from postlen) as postlen, extract(epoch from (endtime - starttime)) as length, speakers, starttime, endtime, slug, room, comments, apologynote, nonce FROM talk_list WHERE id = ? AND roomid = ?');
-			$st->execute($id, $c->session->{room});
-		} else {
-			$st = $c->dbh->prepare('SELECT state, name, id, extract(epoch from prelen) as prelen, extract(epoch from postlen) as postlen, extract(epoch from (endtime - starttime)) as length, speakers, starttime, endtime, slug, room, comments, apologynote, nonce FROM talk_list WHERE id = ?');
-			$st->execute($id);
-		}
-		my $row = $st->fetchrow_hashref("NAME_lc");
-		my $stp = $c->dbh->prepare("SELECT properties.name, properties.description, properties.helptext, corrections.property_value FROM properties left join corrections on (properties.id = corrections.property AND corrections.talk = ?) ORDER BY properties.description");
-		$stp->execute($id);
-
-		if(!defined($row)) {
-			$c->stash(message => "Unknown talk.");
-			$c->render('error');
-			return undef;
-		}
-		my $viddata = {};
-		$viddata->{corrvals} = {};
-		$viddata->{corrdescs} = {};
-		$viddata->{corrhelps} = {};
-		while(my $corrrow = $stp->fetchrow_hashref) {
-			$viddata->{corrdescs}{$corrrow->{name}} = $corrrow->{description};
-			$viddata->{corrvals}{$corrrow->{name}} = $corrrow->{property_value} + 0;
-			$viddata->{corrhelps}{$corrrow->{name}} = $corrrow->{helptext};
-		}
-		$viddata->{mainlen} = $row->{length} + 0;
-		$viddata->{prelen} = $row->{prelen} + 0;
-		$viddata->{postlen} = $row->{postlen} + 0;
-
-		$c->stash(talk_title => $row->{name});
-		$c->stash(talk_speakers => $row->{speakers});
-		$c->stash(talk_start => $row->{starttime});
-		$c->stash(talk_end => $row->{endtime});
-		$c->stash(talk_nonce => $row->{nonce});
-		$c->stash(slug => $row->{slug});
-		$c->stash(event => $config->get("event"));
-		$c->stash(eventid => $c->eventid);
-		$c->stash(room => $row->{room});
-		$c->stash(state => $row->{state});
-		$c->stash(comments => $row->{comments});
-		$c->stash(corrections => $viddata);
-		$c->stash(target => "talk_update_admin");
-		$c->stash(scripts_raw => ['sreview_viddata = ' . encode_json($viddata) . ';']);
-		$c->stash(scripts_extra => ['/mangler.js']);
-		$c->stash(type => "admin");
-		$c->stash(apology => $row->{apologynote});
-		$c->stash(vid_hostname => $config->get("vid_prefix"));
-		$c->stash(exten => $config->get('preview_exten'));
-		$c->render(template => 'talk');
-	} => 'admin_talk');
-
-	$admin->post('/talk_update' => sub {
-		my $c = shift;
-		my $talk = $c->param("talk");
-		if(!defined($talk)) {
-			$c->stash(message => "Required parameter talk missing.");
-			$c->render("error");
-			return undef;
-		}
-		$c->stash(template => 'talk');
-		$c->flash(completion_message => 'Your change has been accepted. Thanks for your help!');
-		$c->talk_update($talk);
-		$c->redirect_to("/admin/talk?talk=$talk");
-	} => 'talk_update_admin');
+	$admin->get('/talk')->to('review#view');
 
 	$admin->get('/brokens' => sub {
 		my $c = shift;

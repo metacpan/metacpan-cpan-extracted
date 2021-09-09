@@ -16,7 +16,7 @@ use Test::More;
 
     is $ok, 1, "IPC::Shareable accepts old string way of sending in key";
     is $k->attributes('key'), 'TEST', "...and the key is ok";
-    is $k->seg->key, 4008350648, "...and the converted seg key is ok";
+    is $k->seg->key, 4008350648 - 0x80000000, "...and the converted seg key is ok";
     is $@, '', "...and no error message was set";
 }
 
@@ -31,7 +31,7 @@ use Test::More;
     my $k = tie my $sv, 'IPC::Shareable', {key => 'TES', create => 1, destroy => 1};
 
     is $k->{attributes}{key}, 'TES', "attr key is TES ok";
-    is $k->seg->key, 3952665712, "three letter attr key is  ok";
+    is $k->seg->key, 3952665712 - 0x80000000, "three letter attr key is  ok";
 }
 
 # four letter caps
@@ -39,7 +39,7 @@ use Test::More;
     my $k = tie my $sv, 'IPC::Shareable', {key => 'TEST', create => 1, destroy => 1};
 
     is $k->{attributes}{key}, 'TEST', "attr key is TEST ok";
-    is $k->seg->key, 4008350648, "four letter attr key is ok";
+    is $k->seg->key, 4008350648 - 0x80000000, "four letter attr key is ok";
 }
 
 # three letter lower case
@@ -74,6 +74,16 @@ use Test::More;
         is $k->attributes('key'), $_, "$_ as key is the proper attribute ok";
 
         my $key = $k->seg->key;
+
+        if ($key_hash{$_} > 0x80000000) {
+            is
+                $key_hash{$_} - 0x80000000 == $k->_shm_key($_),
+                1,
+                "key > 0x80000000 with subtract matches _shm_key() ok";
+
+            $key_hash{$_} = $k->_shm_key($_);
+        }
+
         is $key, $key_hash{$_}, "...and key $_ converted to '$key' ok";
 
         $k->clean_up_all;
@@ -97,6 +107,16 @@ use Test::More;
         is $attr_key, $_, "'$_' as key is the proper attribute ok";
 
         my $key = $k->seg->key;
+
+        if ($key_hash{$_} > 0x80000000) {
+            is
+                $key_hash{$_} - 0x80000000 == $k->_shm_key($_),
+                1,
+                "key > 0x80000000 with subtract matches _shm_key() ok";
+
+            $key_hash{$_} = $k->_shm_key($_);
+        }
+
         is $key, $key_hash{$_}, "...and key '$_' converted to '$key' ok";
 
         $k->clean_up_all;

@@ -1,5 +1,5 @@
 ---
-abstract: 'treat a container of piddles as if it were a piddle'
+abstract: 'treat a container of ndarrays (piddles) as if it were an ndarray (piddle)'
 author:
   - 'Diab Jerius <djerius@cpan.org>'
 build_requires:
@@ -9,7 +9,6 @@ build_requires:
   IPC::Open3: '0'
   Module::Load: '0'
   Moo: '0'
-  PDL: '0'
   PDL::Lite: '0'
   Role::Tiny: '0'
   Role::Tiny::With: '0'
@@ -38,7 +37,7 @@ no_index:
 provides:
   MooX::PDL::Role::Proxy:
     file: lib/MooX/PDL/Role/Proxy.pm
-    version: '0.06'
+    version: '0.07'
 requires:
   Carp: '0'
   Hash::Wrap: '0'
@@ -52,13 +51,13 @@ requires:
   Types::Standard: '0'
   constant: '0'
   namespace::clean: '0'
-  perl: '5.010'
+  perl: '5.010000'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-PDL-Role-Proxy
   repository: https://gitlab.com/djerius/moox-pdl-role-proxy.git
-version: '0.06'
+version: '0.07'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: GPL-3.0-only

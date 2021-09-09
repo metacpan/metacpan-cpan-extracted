@@ -6,6 +6,10 @@ SYNOPSIS
 
         use IPC::Shareable qw(:lock);
     
+        my $href = IPC::Shareable->new(%options);
+    
+        # ...or
+    
         tie SCALAR, 'IPC::Shareable', OPTIONS;
         tie ARRAY,  'IPC::Shareable', OPTIONS;
         tie HASH,   'IPC::Shareable', OPTIONS;
@@ -204,6 +208,22 @@ OPTIONS
         serializer  => 'storable',
 
 METHODS
+
+ new
+
+    Instantiates and returns a reference to a hash backed by shared memory.
+
+    Parameters:
+
+    Hash, Optional: See the "OPTIONS" section for a list of all available
+    options. Most often, you'll want to send in the key, create and destroy
+    options.
+
+    It is possible to get a reference to an array or scalar as well. Simply
+    send in either var = > 'ARRAY' or var => 'SCALAR' to do so.
+
+    Return: A reference to a hash (or array or scalar) which is backed by
+    shared memory.
 
  singleton($glue, $warn)
 

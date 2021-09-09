@@ -65,11 +65,27 @@ done_testing;
 #       [v] refactored &display_confusion_matrix
 #   [v] improve the documentation
 #
-# Version 0.0x
-#   -add more useful data to the confusion matrix
-#   -implement shuffling system
+# Version 1.03
+#   [v] data processing: shuffle data + import tag
+#   [v] add more useful data to the confusion matrix
+#       [v] sum of column and rows to make it look more classic :)
+#   [v] optional option to show more stats
+#       [v] precision    [v] specificity    [v] F1 score
+#       [v] negative_predicted_value    [v] false_negative_rate    [v] false_positive_rate
+#       [v] false_discovery_rate    [v] false_omission_rate    [v] balanced_accuracy
 #
-# ...
+# Version 1.04
+#   -colorise the confusion matrix if option is enabled
+#   -add public function:
+#       -predict result from non-csv input (single row), might be useful when gui is involved
+#   -add a simple tutorial
+#   -smart tuning feature: automatically increase/decrease learning_rate in multiples in training stage
+#
+# Version ?.??
+#   ? implement shuffling system into training stage, bulk data processing   
+#   ? Data processing: splitting data, k-fold
+#   -...
+#
 #
 ############ "flow" of the codes ############
 

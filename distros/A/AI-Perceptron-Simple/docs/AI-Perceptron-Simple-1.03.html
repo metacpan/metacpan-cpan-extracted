@@ -20,6 +20,13 @@
   <li><a href="#CONVENTIONS-USED">CONVENTIONS USED</a></li>
   <li><a href="#DATASET-STRUCTURE">DATASET STRUCTURE</a></li>
   <li><a href="#PERCEPTRON-DATA">PERCEPTRON DATA</a></li>
+  <li><a href="#DATA-PROCESSING-RELATED-SUBROUTINES">DATA PROCESSING RELATED SUBROUTINES</a>
+    <ul>
+      <li><a href="#shuffle_stimuli">shuffle_stimuli ( ... )</a></li>
+      <li><a href="#shuffle_data-original_data-shuffled_1-shuffled_2">shuffle_data ( $original_data =&gt; $shuffled_1, $shuffled_2, ... )</a></li>
+      <li><a href="#shuffle_data-ORIGINAL_DATA-shuffled_1-shuffled_2">shuffle_data ( ORIGINAL_DATA, $shuffled_1, $shuffled_2, ... )</a></li>
+    </ul>
+  </li>
   <li><a href="#CREATION-RELATED-SUBROUTINES-METHODS">CREATION RELATED SUBROUTINES/METHODS</a>
     <ul>
       <li><a href="#new-options">new ( \%options )</a></li>
@@ -64,6 +71,15 @@
       <li><a href="#calculate_total_entries-c_matrix_ref">&amp;_calculate_total_entries ( $c_matrix_ref )</a></li>
       <li><a href="#calculate_accuracy-c_matrix_ref">&amp;_calculate_accuracy ( $c_matrix_ref )</a></li>
       <li><a href="#calculate_sensitivity-c_matrix_ref">&amp;_calculate_sensitivity ( $c_matrix_ref )</a></li>
+      <li><a href="#calculate_precision-c_matrix_ref">&amp;_calculate_precision ( $c_matrix_ref )</a></li>
+      <li><a href="#calculate_specificity-c_matrix_ref">&amp;_calculate_specificity ( $c_matrix_ref )</a></li>
+      <li><a href="#calculate_f1_score-c_matrix_ref">&amp;_calculate_f1_score ( $c_matrix_ref )</a></li>
+      <li><a href="#calculate_negative_predicted_value-c_matrix_ref">&amp;_calculate_negative_predicted_value( $c_matrix_ref )</a></li>
+      <li><a href="#calculate_false_negative_rate-c_matrix_ref">&amp;_calculate_false_negative_rate( $c_matrix_ref )</a></li>
+      <li><a href="#calculate_false_positive_rate-c_matrix_ref">&amp;_calculate_false_positive_rate( $c_matrix_ref )</a></li>
+      <li><a href="#calculate_false_discovery_rate-c_matrix_ref">&amp;_calculate_false_discovery_rate( $c_matrix_ref )</a></li>
+      <li><a href="#calculate_false_omission_rate-c_matrix_ref">&amp;_calculate_false_omission_rate( $c_matrix_ref )</a></li>
+      <li><a href="#calculate_balanced_accuracy-c_matrix_ref">&amp;_calculate_balanced_accuracy( $c_matrix_ref )</a></li>
       <li><a href="#display_exam_results">display_exam_results ( ... )</a></li>
       <li><a href="#display_confusion_matrix-confusion_matrix-labels">display_confusion_matrix ( \%confusion_matrix, \%labels )</a></li>
       <li><a href="#build_matrix-c_matrix-labels">&amp;_build_matrix ( $c_matrix, $labels )</a></li>
@@ -108,7 +124,7 @@
 
 <h1 id="VERSION">VERSION</h1>
 
-<p>Version 1.02</p>
+<p>Version 1.03</p>
 
 <h1 id="SYNOPSIS">SYNOPSIS</h1>
 
@@ -162,7 +178,8 @@
     my %c_matrix = $perceptron-&gt;get_confusion_matrix( { 
         full_data_file =&gt; $file_csv, 
         actual_output_header =&gt; $header_name,
-        predicted_output_header =&gt; $predicted_header_name
+        predicted_output_header =&gt; $predicted_header_name,
+        more_stats =&gt; 1, # optional
     } );
 
     # accessing the confusion matrix
@@ -201,18 +218,29 @@
 
     # load nerve data on the other computer
     my $pearl_nerve = revive_from_yaml ( ... );
-    my $pearl_nerve = load_perceptron_yaml ( $yaml_nerve_file );</code></pre>
+    my $pearl_nerve = load_perceptron_yaml ( $yaml_nerve_file );
+
+
+    # processing data
+    use AI::Perceptron::Simple &quot;:process_data&quot;;
+    shuffle_stimuli ( ... )
+    shuffle_data ( ORIGINAL_STIMULI, $new_file_1, $new_file_2, ... );
+    shuffle_data ( $original_stimuli =&gt; $new_file_1, $new_file_2, ... );</code></pre>
 
 <h1 id="EXPORT">EXPORT</h1>
 
 <p>None by default.</p>
 
-<p>All the subroutines from <code>NERVE DATA RELATED SUBROUTINES</code> and <code>NERVE PORTABILITY RELATED SUBROUTINES</code> sections are exportable.</p>
+<p>All the subroutines from <code>DATA PROCESSING RELATED SUBROUTINES</code>, <code>NERVE DATA RELATED SUBROUTINES</code> and <code>NERVE PORTABILITY RELATED SUBROUTINES</code> sections are importable through tags or manually specifying them.</p>
 
-<p>Export tags include the following:</p>
+<p>The tags available include the following:</p>
 
 <dl>
 
+<dt id="process_data---subroutines-under-DATA-PROCESSING-RELATED-SUBROUTINES-section"><code>:process_data</code> - subroutines under <code>DATA PROCESSING RELATED SUBROUTINES</code> section.</dt>
+<dd>
+
+</dd>
 <dt id="local_data---subroutines-under-NERVE-DATA-RELATED-SUBROUTINES-section"><code>:local_data</code> - subroutines under <code>NERVE DATA RELATED SUBROUTINES</code> section.</dt>
 <dd>
 
@@ -259,11 +287,27 @@
 
 <p>See <code>Portability of Nerve Data</code> section below for more info on some known issues.</p>
 
+<h1 id="DATA-PROCESSING-RELATED-SUBROUTINES">DATA PROCESSING RELATED SUBROUTINES</h1>
+
+<p>These subroutines can be imported using the tag <code>:process_data</code>.</p>
+
+<p>These subroutines should be called in the procedural way.</p>
+
+<h2 id="shuffle_stimuli">shuffle_stimuli ( ... )</h2>
+
+<p>The parameters and usage are the same as <code>shuffled_data</code>. See the next two subroutines.</p>
+
+<h2 id="shuffle_data-original_data-shuffled_1-shuffled_2">shuffle_data ( $original_data =&gt; $shuffled_1, $shuffled_2, ... )</h2>
+
+<h2 id="shuffle_data-ORIGINAL_DATA-shuffled_1-shuffled_2">shuffle_data ( ORIGINAL_DATA, $shuffled_1, $shuffled_2, ... )</h2>
+
+<p>Shuffles <code>$original_data</code> or <code>ORIGINAL_DATA</code> and saves them to other files.</p>
+
 <h1 id="CREATION-RELATED-SUBROUTINES-METHODS">CREATION RELATED SUBROUTINES/METHODS</h1>
 
 <h2 id="new-options">new ( \%options )</h2>
 
-<p>Creates a brand new perceptron and initializes the value of each attribute / densrite aka. weight. Think of it as the thickness or plasticity of the dendrites.</p>
+<p>Creates a brand new perceptron and initializes the value of each attribute / dendrite aka. weight. Think of it as the thickness or plasticity of the dendrites.</p>
 
 <p>For <code>%options</code>, the followings are needed unless mentioned:</p>
 
@@ -495,9 +539,9 @@
 
 <h2 id="get_confusion_matrix-options">get_confusion_matrix ( \%options )</h2>
 
-<p>Returns the confusion matrix in the form of a hash. The hash will contain these keys: <code>true_positive</code>, <code>true_negative</code>, <code>false_positive</code>, <code>false_negative</code>, <code>accuracy</code>, <code>sensitivity</code>.</p>
+<p>Returns the confusion matrix in the form of a hash. The hash will contain these keys: <code>true_positive</code>, <code>true_negative</code>, <code>false_positive</code>, <code>false_negative</code>, <code>accuracy</code>, <code>sensitivity</code>. More stats like <code>precision</code>, <code>specificity</code> and <code>F1_Score</code> can be obtain by setting the optional <code>more_stats</code> key to <code>1</code>.</p>
 
-<p>Take note that the <code>accuracy</code> and <code>sensitivity</code> are in percentage (%) in decimal (if any).</p>
+<p>If you are trying to manipulate the confusion matrix hash or something, take note that all the stats are in percentage (%) in decimal (if any) except the total entries.</p>
 
 <p>For <code>%options</code>, the followings are needed unless mentioned:</p>
 
@@ -518,9 +562,6 @@
 <dt id="predicted_output_header-predicted_column_name">predicted_output_header =&gt; $predicted_column_name</dt>
 <dd>
 
-</dd>
-</dl>
-
 <p>The binary values are treated as follows:</p>
 
 <dl>
@@ -531,6 +572,17 @@
 </dd>
 <dt id="is-positive"><code>1</code> is positive</dt>
 <dd>
+
+</dd>
+</dl>
+
+</dd>
+<dt id="more_stats-1">more_stats =&gt; 1</dt>
+<dd>
+
+<p>Optional.</p>
+
+<p>Setting it to <code>1</code> will process more stats that are usually not so important eg. <code>precision</code>, <code>specificity</code> and <code>F1_Score</code></p>
 
 </dd>
 </dl>
@@ -551,13 +603,49 @@
 
 <p>Calculates and adds the data for the <code>sensitivity</code> key in the confusion matrix hash.</p>
 
+<h2 id="calculate_precision-c_matrix_ref">&amp;_calculate_precision ( $c_matrix_ref )</h2>
+
+<p>Calculates and adds the data for the <code>precision</code> key in the confusion matrix hash.</p>
+
+<h2 id="calculate_specificity-c_matrix_ref">&amp;_calculate_specificity ( $c_matrix_ref )</h2>
+
+<p>Calculates and adds the data for the <code>specificity</code> key in the confusion matrix hash.</p>
+
+<h2 id="calculate_f1_score-c_matrix_ref">&amp;_calculate_f1_score ( $c_matrix_ref )</h2>
+
+<p>Calculates and adds the data for the <code>F1_Score</code> key in the confusion matrix hash.</p>
+
+<h2 id="calculate_negative_predicted_value-c_matrix_ref">&amp;_calculate_negative_predicted_value( $c_matrix_ref )</h2>
+
+<p>Calculates and adds the data for the <code>negative_predicted_value</code> key in the confusion matrix hash.</p>
+
+<h2 id="calculate_false_negative_rate-c_matrix_ref">&amp;_calculate_false_negative_rate( $c_matrix_ref )</h2>
+
+<p>Calculates and adds the data for the <code>false_negative_rate</code> key in the confusion matrix hash.</p>
+
+<h2 id="calculate_false_positive_rate-c_matrix_ref">&amp;_calculate_false_positive_rate( $c_matrix_ref )</h2>
+
+<p>Calculates and adds the data for the <code>false_positive_rate</code> key in the confusion matrix hash.</p>
+
+<h2 id="calculate_false_discovery_rate-c_matrix_ref">&amp;_calculate_false_discovery_rate( $c_matrix_ref )</h2>
+
+<p>Calculates and adds the data for the <code>false_discovery_rate</code> key in the confusion matrix hash.</p>
+
+<h2 id="calculate_false_omission_rate-c_matrix_ref">&amp;_calculate_false_omission_rate( $c_matrix_ref )</h2>
+
+<p>Calculates and adds the data for the <code>false_omission_rate</code> key in the confusion matrix hash.</p>
+
+<h2 id="calculate_balanced_accuracy-c_matrix_ref">&amp;_calculate_balanced_accuracy( $c_matrix_ref )</h2>
+
+<p>Calculates and adds the data for the <code>balanced_accuracy</code> key in the confusion matrix hash.</p>
+
 <h2 id="display_exam_results">display_exam_results ( ... )</h2>
 
 <p>The parameters are the same as <code>display_confusion_matrix</code>. See the next method.</p>
 
 <h2 id="display_confusion_matrix-confusion_matrix-labels">display_confusion_matrix ( \%confusion_matrix, \%labels )</h2>
 
-<p>Display the confusion matrix.</p>
+<p>Display the confusion matrix. If <code>%confusion_matrix</code> has <code>more_stats</code> elements, it will display them if they exists. The default elements ie <code>accuracy</code> and <code>sensitivity</code> must be present, while the rest can be absent.</p>
 
 <p><code>%confusion_matrix</code> is the same confusion matrix returned by the <code>get_confusion_matrix</code> method.</p>
 
@@ -595,11 +683,9 @@
 
 <h1 id="NERVE-DATA-RELATED-SUBROUTINES">NERVE DATA RELATED SUBROUTINES</h1>
 
-<p>This part is about saving the data of the nerve. These subroutines can be exported using the <code>:local_data</code> tag.</p>
+<p>This part is about saving the data of the nerve. These subroutines can be imported using the <code>:local_data</code> tag.</p>
 
 <p><b>The subroutines are to be called in the procedural way</b>. No checking is done currently.</p>
-
-<p>The subroutines here are not exported in any way whatsoever.</p>
 
 <p>See <code>PERCEPTRON DATA</code> and <code>KNOWN ISSUES</code> sections for more details on the subroutines in this section.</p>
 
@@ -621,7 +707,7 @@
 
 <h1 id="NERVE-PORTABILITY-RELATED-SUBROUTINES">NERVE PORTABILITY RELATED SUBROUTINES</h1>
 
-<p>These subroutines can be exported using the <code>:portable_data</code> tag.</p>
+<p>These subroutines can be imported using the <code>:portable_data</code> tag.</p>
 
 <p>The file type currently supported is YAML. Please be careful with the data as you won&#39;t want the nerve data accidentally modified.</p>
 
@@ -671,7 +757,7 @@
 
 <h2 id="Portability-of-Nerve-Data">Portability of Nerve Data</h2>
 
-<p>Take note that the <code>Storable</code> nerve data is not compatible across different versions. See <code>Storable</code>&#39;s documentation for more information.</p>
+<p>Take note that the <code>Storable</code> nerve data is not compatible across different versions.</p>
 
 <p>If you really need to send the nerve data to different computers with different versions of <code>Storable</code> module, see the docs of the following subroutines:</p>
 
@@ -726,7 +812,7 @@
 
 <h1 id="SEE-ALSO">SEE ALSO</h1>
 
-<p>AI::Perceptron, Text::Matrix</p>
+<p>AI::Perceptron, Text::Matrix, YAML</p>
 
 <h1 id="LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</h1>
 

@@ -1,8 +1,12 @@
 Build.PL
 Changes
-examples/term-in-tickit.pl
 lib/Term/VTerm.pm
 lib/Term/VTerm.xs
+lib/Term/VTerm/Color.pm
+lib/Term/VTerm/GlyphInfo.pm
+lib/Term/VTerm/LineInfo.pm
+lib/Term/VTerm/Pos.pm
+lib/Term/VTerm/Rect.pm
 lib/Term/VTerm/Screen.pm
 lib/Term/VTerm/State.pm
 LICENSE
@@ -21,5 +25,6 @@ t/20state.t
 t/30screen.t
 t/40keyboard.t
 t/41mouse.t
+t/42selection.t
 t/99pod.t
 typemap

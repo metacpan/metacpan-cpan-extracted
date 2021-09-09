@@ -16,21 +16,26 @@ BEGIN {
 	}
 }
 
-use Test::More tests => 31;
+use Test::More tests => 34;
 use Test::Mojo;
 use Mojo::File qw/path/;
 use SReview::Talk;
 use SReview::Video;
+use SReview::Web;
 
 my $cfgname = path()->to_abs->child('config.pm');
 
 SKIP: {
-	skip("Need a database to play with", 31) unless exists($ENV{SREVIEWTEST_DB});
+	skip("Need a database to play with", 34) unless (exists($ENV{SREVIEWTEST_DB}) or exists($ENV{SREVIEWTEST_INSTALLED}) or exists($ENV{AUTOPKGTEST_TMP}));
 
 	my $script = path(__FILE__);
 	$script = $script->dirname->child('..')->child('web')->child('sreview-web')->to_abs;
-	symlink "../t", "web/t";
-	chdir($script->dirname);
+	if(exists($ENV{SREVIEWTEST_INSTALLED}) or exists($ENV{AUTOPKGTEST_TMP})) {
+		$script = "SReview::Web";
+	} else {
+		symlink "../t", "web/t";
+		chdir($script->dirname);
+	}
 	my $t = Test::Mojo->new($script);
 
 	my $talk = SReview::Talk->new(talkid => 1);
@@ -93,6 +98,19 @@ SKIP: {
 
 	$talk = SReview::Talk->new(talkid => 1);
 	ok($talk->corrections->{offset_audio} == 0, "video delay A/V sync value is set correctly");
+
+	$talk->set_state("finalreview");
+
+	$formdata = {
+		video_state => "ok",
+		serial => $talk->corrections->{serial},
+	};
+
+	$talkurl = "/f/" . $talk->nonce;
+
+	$t->post_ok("$talkurl/update" => form => $formdata)->status_is(200);
+	$talk = SReview::Talk->new(talkid => 1);
+	ok($talk->state eq 'finalreview', 'confirmation in final review is handled correctly');
 
 	chdir("..");
 	unlink("web/t");

@@ -32,12 +32,13 @@
       },
       "runtime" : {
          "requires" : {
+            "Class::Type::Enum" : "0",
             "DateTime" : "0",
             "DateTime::Format::ISO8601" : "0",
             "DateTime::Format::Pg" : "0",
             "Mojo::JSON" : "0",
             "Mojo::Pg" : "0",
-            "Mojolicious::Plugin::OpenAPI" : "0",
+            "Mojolicious::Plugin::OpenAPI" : "4.03",
             "Moose" : "0",
             "Net::Amazon::S3" : "0",
             "Net::SSH::AuthorizedKeysFile" : "0"
@@ -45,7 +46,8 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "YAML::XS" : "0"
          }
       }
    },
@@ -58,6 +60,6 @@
          "web" : "https://github.com/yoe/SReview"
       }
    },
-   "version" : "v0.7.1",
+   "version" : "v0.8.0",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

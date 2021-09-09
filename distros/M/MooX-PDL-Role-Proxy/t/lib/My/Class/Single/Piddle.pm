@@ -1,29 +1,25 @@
-package My::NestedClass;
-
-use My::Class;
+package My::Class::Single::Piddle;
 
 use Moo;
 use MooX::PDL::Role::Proxy;
-use PDL::Lite ();
 
-
-has c1 => (
+has p1 => (
     is      => 'rwp',
-    default => sub { My::Class->new },
     piddle  => 1,
+    trigger => sub { $_[0]->triggered( 1 ) },
 );
 
-has c2 => (
+has p2 => (
     is      => 'rwp',
-    default => sub { My::Class->new },
-    piddle  => 1,
+    piddle => 1,
+    trigger => sub { $_[0]->triggered( 1 ) },
 );
 
 sub clone_with_piddles {
-
     my ( $self, %attr ) = @_;
-
     $self->new->_set_attr( %attr );
 }
+
+with 'My::Class::Single';
 
 1;

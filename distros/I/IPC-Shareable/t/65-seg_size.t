@@ -38,6 +38,7 @@ use constant BYTES => 2000000; # ~2MB
     }
 }
 
+# beyond RAM limits
 {
     my $size_ok = eval {
         tie my $var, 'IPC::Shareable', {
@@ -50,12 +51,7 @@ use constant BYTES => 2000000; # ~2MB
 
     is $size_ok, undef, "We croak if size is greater than max RAM";
 
-    if ($^O eq 'linux') {
-        like $@, qr/Cannot allocate memory/, "...and error is sane";
-    }
-    else {
-        like $@, qr/Invalid argument/, "...and error is sane";
-    }
+    like $@, qr/Cannot allocate memory|Out of memory|Invalid argument/, "...and error is sane";
 }
 
 my $k = tie my $sv, 'IPC::Shareable', {

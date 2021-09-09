@@ -4,19 +4,19 @@ MooX::PDL::Role::Proxy is a Moo::Role which turns its consumer into a
 proxy object for some of its attributes, which are assumed to be PDL
 objects (or other proxy objects). A subset of PDL methods applied to the
 proxy object are applied to the selected attributes. (See PDL::QuckStart
-for more information on PDL and its objects (piddles)).
+for more information on PDL and its objects (ndarrays)).
 
 As an example, consider an object representing a set of detected events
 (think physics, not computing), which contains metadata describing the
-events as well as piddles representing event position, energy, and
+events as well as ndarrays representing event position, energy, and
 arrival time. The structure might look like this:
 
   {
       metadata => \%metadata,
-      time   => $time,         # piddle
-      x      => $x,            # piddle
-      y      => $y,            # piddle
-      energy => $energy        # piddle
+      time   => $time,         # ndarray
+      x      => $x,            # ndarray
+      y      => $y,            # ndarray
+      energy => $energy        # ndarray
   }
 
 To filter the events on energy would traditionally be performed
@@ -45,35 +45,56 @@ Or, if the results should be stored in the same object,
   Usage and Class requirements
 
 Each attribute to be operated on by the common "PDL"-like operators
-should be given a "piddle" option, e.g.
+should be given a "ndarray" option, e.g.
 
   has p1 => (
       is      => 'rw',
       default => sub { sequence( 10 ) },
-      piddle  => 1,
+      ndarray  => 1,
   );
 
-(Treat the option value as an identifier for the group of piddles which
+(Treat the option value as an identifier for the group of ndarrays which
 should be operated on, rather than as a boolean).
 
-To support non-inplace operations, the class must provide a
-"clone_with_piddles" method with the following signature:
+  Results of Operations
 
-   sub clone_with_piddles ( $self, %piddles )
+The results of operations may either be stored "In Place" or returned in
+"Cloned Objects". By default, operations return cloned objects.
 
-It should clone $self and assign the values in %piddles to the
-attributes named by its keys. To assist with the latter operation, see
-the provided "_set_attrs" method.
+   In Place
 
-To support inplace operations, attributes tagged with the "piddle"
+Use one of the following methods, "inplace", "inplace_store",
+"inplace_set". to indicate that the next in-place aware operation should
+be performed in-place. After the operation is completed, the in-place
+flag will be reset.
+
+To support inplace operations, attributes tagged with the "ndarray"
 option must have write accessors. They may be public or private.
+
+   Cloned Objects
+
+The class must provide a a clone method. If cloning an object requires
+extra arguments, use "_set_clone_args" and "_clear_clone_args" to set or
+reset the arguments.
+
+If the class provides the _clone_with_ndarrays method, then it will be
+called as
+
+   $object->_clone_with_ndarrays( \%ndarrays, ?$arg);
+
+where $arg will only be passed if "_set_clone_args" was called.
+
+For backwards compatibility, the clone_with_piddles method is supported,
+but it is not possible to pass in extra arguments. It will be called as
+
+   $object->clone_with_piddles ( %ndarrays );
 
   Nested Proxy Objects
 
 A class with the applied role should respond equivalently to a true
-piddle when the supported methods are called on it (it's a bug
+ndarray when the supported methods are called on it (it's a bug
 otherwise). Thus, it is possible for a proxy object to contain another,
-and as long as the contained object has the "piddle" attribute set, the
+and as long as the contained object has the "ndarray" attribute set, the
 supported method will be applied to the contained object appropriately.
 
 INSTALLATION

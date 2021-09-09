@@ -1,5 +1,18 @@
 Revision history for `ansifold' command.
 
+1.1101 2021-09-09T04:37:08Z
+
+    - Improve option validation.
+
+1.11 2021-08-15T01:01:45Z
+
+    - Make --padding option to take optional padchar value.
+
+1.10 2021-08-07T06:21:29Z
+
+    - Update help and version style.
+    - Add --boundary=space option.
+
 1.0902 2021-08-05T05:43:11Z
 
     - Adopt the latest version of Getopt::EX::Hashed.

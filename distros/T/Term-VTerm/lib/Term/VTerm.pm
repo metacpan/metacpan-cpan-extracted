@@ -3,27 +3,26 @@
 #
 #  (C) Paul Evans, 2014-2020 -- leonerd@leonerd.org.uk
 
-package Term::VTerm;
+package Term::VTerm 0.07;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.06';
 
 use Carp;
 
 require XSLoader;
-XSLoader::load( __PACKAGE__, $VERSION );
+XSLoader::load( __PACKAGE__, our $VERSION );
 
 use Exporter 'import';
 our @EXPORT_OK; # set up from XS
 our %EXPORT_TAGS = (
-   types  => [ grep m/^VALUETYPE_/, @EXPORT_OK ],
-   attrs  => [ grep m/^ATTR_/, @EXPORT_OK ],
-   props  => [ grep m/^PROP_/, @EXPORT_OK ],
-   mod    => [ grep m/^MOD_/, @EXPORT_OK ],
-   damage => [ grep m/^DAMAGE_/, @EXPORT_OK ],
-   keys   => [ grep m/^KEY_/, @EXPORT_OK ],
+   types      => [ grep m/^VALUETYPE_/, @EXPORT_OK ],
+   attrs      => [ grep m/^ATTR_/, @EXPORT_OK ],
+   props      => [ grep m/^PROP_/, @EXPORT_OK ],
+   mod        => [ grep m/^MOD_/, @EXPORT_OK ],
+   damage     => [ grep m/^DAMAGE_/, @EXPORT_OK ],
+   keys       => [ grep m/^KEY_/, @EXPORT_OK ],
+   selections => [ grep m/^SELECTION_/, @EXPORT_OK ],
 );
 
 =head1 NAME
@@ -60,6 +59,11 @@ Size constants for C<VTermScreen> damage merging.
 =head2 KEY_* (:keys)
 
 Key symbol constants for C<keyboard_key>.
+
+=head2 SELECTION_* (:selections)
+
+Selection bitmask constants for C<send_selection> and selection callback
+events.
 
 =cut
 
@@ -254,129 +258,6 @@ layer, creating it if necessary. After calling this method, any parser or
 state callbacks will no longer work.
 
 =cut
-
-=head1 COLOR OBJECTS
-
-A C<VTermColor> instance can be constructed by
-
-=head2 $color = Term::VTerm::Color->new( red => $r, green => $g, blue => $b )
-
-A C<VTermColor> instance has the following field accessors:
-
-=head2 $bool = $color->is_indexed
-
-True if the colour is a palette index.
-
-=head2 $bool = $color->is_rgb
-
-True if the colour contains RGB values directly.
-
-=head2 $idx = $color->index
-
-The palette index for indexed colours.
-
-=head2 $r = $color->red
-
-=head2 $g = $color->green
-
-=head2 $b = $color->blue
-
-The components of the colour as an integer between 0 and 255 for RGB colours.
-
-=head2 $hex = $color->rgb_hex
-
-A 6-character string containing the three colour components, hex encoded.
-
-=head2 $bool = $color->is_default_fg
-
-=head2 $bool = $color->is_default_bg
-
-True if the colour is the default colour for terminal foreground or
-background.
-
-=cut
-
-sub Term::VTerm::Color::new
-{
-   my ( $class, %args ) = @_;
-   $class->_new_rgb( $args{red}, $args{green}, $args{blue} );
-}
-
-sub Term::VTerm::Color::rgb_hex
-{
-   my $self = shift;
-   sprintf "%02x%02x%02x", $self->red, $self->green, $self->blue
-}
-
-=head1 GLYPH INFO OBJECTS
-
-A C<VTermGlyphInfo> instance has the following field accessors:
-
-=head2 @chars = $info->chars
-
-A list of Unicode character numbers. This list does not include the
-terminating 0.
-
-=head2 $width = $info->width
-
-The width of this glyph in screen columns.
-
-=head2 $str = $info->str
-
-A Unicode string containing the characters.
-
-=cut
-
-=head1 POSITION OBJECTS
-
-A C<VTermPos> instance can be constructed by
-
-=head2 $pos = Term::VTerm::Pos->new( row => $row, col => $col )
-
-A C<VTermPos> instance has the following field accessors:
-
-=head2 $row = $pos->row
-
-=head2 $col = $pos->col
-
-The row and column number of the position, 0-indexed.
-
-=cut
-
-sub Term::VTerm::Pos::new
-{
-   my ( $class, %args ) = @_;
-   $class->_new( $args{row}, $args{col} )
-}
-
-=head1 RECTANGLE OBJECTS
-
-A C<VTermRect> instance can be constructed by
-
-=head2 $rect = Term::VTerm::Rect->new( start_row => ..., end_row => ..., start_col => ..., end_col => ... )
-
-A C<VTermRect> instance has the following field accessors:
-
-=head2 $row = $rect->start_row
-
-=head2 $col = $rect->start_col
-
-The row and column number of the top left corner of the rectangle.
-
-=head2 $row = $rect->end_row
-
-=head2 $col = $rect->end_col
-
-The row and column number of the cell just after the bottom right corner of
-the rectangle; i.e. exclusive limit.
-
-=cut
-
-sub Term::VTerm::Rect::new
-{
-   my ( $class, %args ) = @_;
-   $class->_new( $args{start_row}, $args{end_row}, $args{start_col}, $args{end_col} )
-}
 
 =head1 FUNCTIONS
 

@@ -64,7 +64,7 @@ sub overview {
 	}
 
 	if($c->srconfig->get("anonreviews")) {
-		$query = "SELECT '/r/' || nonce AS reviewurl, name, speakers, room, starttime::timestamp, endtime::timestamp, state, progress FROM talk_list WHERE eventid = ? AND state IS NOT NULL ORDER BY state, progress, room, starttime";
+		$query = "SELECT CASE WHEN state IN ('preview', 'broken') THEN '/r/' || nonce WHEN state='finalreview' THEN '/f/' || nonce ELSE null END AS reviewurl, nonce, name, speakers, room, starttime::timestamp, endtime::timestamp, state, progress FROM talk_list WHERE eventid = ? AND state IS NOT NULL ORDER BY state, progress, room, starttime";
 	} else {
 		$query = "SELECT name, speakers, room, starttime::timestamp, endtime::timestamp, state, progress FROM talk_list WHERE eventid = ? AND state IS NOT NULL ORDER BY state, progress, room, starttime";
 	}
@@ -80,7 +80,7 @@ sub talksByState {
 	my $eventId = $c->param("eventId");
 	my $state = SReview::Talk::State->new($c->param("state"));
 
-	my $st = $c->dbh->prepare("SELECT MIN(starttime::date) AS start, MAX(endtime::date) AS end, title FROM events WHERE id = ?");
+	my $st = $c->dbh->prepare("SELECT MIN(starttime::date) AS start, MAX(endtime::date) AS end, name AS title FROM events JOIN talks ON events.id = talks.event WHERE events.id = ? GROUP BY events.name");
 	$st->execute($eventId);
 	if($st->rows < 1) {
 		return $c->render(openapi => {errors => [{message => "not found"}]},status => 404);

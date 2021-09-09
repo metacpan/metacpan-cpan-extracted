@@ -1,6 +1,9 @@
-Revision history for Perl module Foo::Bar
+Revision history for Perl module Tk::Text::SuperText
 
-Release history is not exact for the pre 0.9.5 release
+0.12 2016-02-24
+
+  - further improved POD
+  - fixed typos
 
 0.11 2016-02-11
 
@@ -27,6 +30,7 @@ Release history is not exact for the pre 0.9.5 release
 0.9.5 2016-02-01
 
   - applied patch from RT #24700 by Darren Meyer
+  - note: release history is not exact for the pre 0.9.5 release
 
 0.9.4 2001-01-17
 

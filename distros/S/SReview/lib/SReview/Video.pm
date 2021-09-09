@@ -558,6 +558,48 @@ sub _probe_astream_id {
 	return $self->_get_audiodata->{index};
 }
 
+=head2 blackspots
+
+Returns an array of hashes. Each hash contains a member C<start>,
+C<end>, and C<duration>, containing the start, end, and duration,
+respectively, of locations in the video file that are (almost) entirely
+black.
+
+Could be used by a script for automatic review.
+
+Note that the ffmpeg run required to detect blackness is CPU intensive
+and may require a very long time to finish.
+
+=cut
+
+has blackspots => (
+	is => 'ro',
+	isa => 'ArrayRef[HashRef[Num]]',
+	builder => '_probe_blackspots',
+	lazy => 1,
+);
+
+sub _probe_blackspots {
+	my $self = shift;
+	my $blacks = [];
+	pipe R, W;
+	if(fork == 0) {
+		open STDERR, ">&W";
+		open STDOUT, ">&W";
+		my @cmd = ("ffmpeg", "-threads", "1", "-nostats", "-i", $self->url, "-vf", "blackdetect=d=0:pix_th=.01", "-f", "null", "/dev/null");
+		exec @cmd;
+		die "exec failed";
+	}
+	close W;
+	while(<R>) {
+		if(/blackdetect.*black_start:(?<start>[\d\.]+)\sblack_end:(?<end>[\d\.]+)\sblack_duration:(?<duration>[\d\.]+)/) {
+			push @$blacks, { %+ };
+		}
+	}
+	close(R);
+	return $blacks;
+}
+
 =head2 astream_ids
 
 Returns an array with the IDs for the audio streams in this file.
@@ -635,6 +677,20 @@ sub _probe_extra_params {
 	return {};
 }
 
+=head2 time_offset
+
+Apply an input time offset to this video (only valid when used as an
+input video in L<SReview::Videopipe>). Can be used to apply A/V sync
+correction values.
+
+=cut
+
+has 'time_offset' => (
+	isa => 'Num',
+	is => 'ro',
+	predicate => 'has_time_offset',
+);
+
 # Only to be used by the Videopipe class when doing multiple passes
 has 'pass' => (
 	is => 'rw',
@@ -667,6 +723,9 @@ sub readopts {
 	my $self = shift;
 	my @opts = ();
 
+	if($self->has_time_offset) {
+		push @opts, ("-itsoffset", $self->time_offset);
+	}
 	push @opts, ("-i", $self->url);
 	return @opts;
 }

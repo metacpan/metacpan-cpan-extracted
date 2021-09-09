@@ -21,22 +21,28 @@ use Scalar::Util;
 use String::CRC32;
 use Storable 0.6 qw(freeze thaw);
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 $SIG{CHLD} = 'IGNORE';
 
 use constant {
-    LOCK_SH     => 1,
-    LOCK_EX     => 2,
-    LOCK_NB     => 4,
-    LOCK_UN     => 8,
+    LOCK_SH      => 1,
+    LOCK_EX      => 2,
+    LOCK_NB      => 4,
+    LOCK_UN      => 8,
 
-    DEBUGGING   => ($ENV{SHAREABLE_DEBUG} or 0),
-    SHM_BUFSIZ  =>  65536,
-    SEM_MARKER  =>  0,
-    SHM_EXISTS  =>  1,
+    DEBUGGING    => ($ENV{SHAREABLE_DEBUG} or 0),
+    SHM_BUFSIZ   => 65536,
+    SEM_MARKER   => 0,
+    SHM_EXISTS   => 1,
 
-    SHMMAX_BYTES    => 1073741824, # 1 GB
+    SHMMAX_BYTES => 1073741824, # 1 GB
+
+    # Perl sends in a double as opposed to an integer to shmat(), and on some
+    # systems, this causes the IPC system to round down to the maximum integer
+    # size of 0x80000000 we correct that when generating keys with CRC32
+
+    MAX_KEY_INT_SIZE => 0x80000000,
 };
 
 require Exporter;
@@ -149,6 +155,7 @@ sub STORE {
             croak "Could not write to shared memory: $!\n";
         }
     }
+
     return 1;
 }
 sub FETCH {
@@ -369,6 +376,24 @@ sub STORESIZE {
 
 # --- Public methods
 
+sub new {
+    my ($class, %opts) = @_;
+
+    my $type = $opts{var} || 'HASH';
+
+    if ($type eq 'HASH') {
+        my $k = tie my %h, 'IPC::Shareable', \%opts;
+        return \%h;
+    }
+    if ($type eq 'ARRAY') {
+        my $k = tie my @a, 'IPC::Shareable', \%opts;
+        return \@a;
+    }
+    if ($type eq 'SCALAR') {
+        my $k = tie my $s, 'IPC::Shareable', \%opts;
+        return \$s;
+    }
+}
 sub global_register {
     return \%global_register;
 }
@@ -679,7 +704,8 @@ sub _tie {
 
     if ($knot->attributes('limit') && $shm_size > SHMMAX_BYTES) {
         croak
-            "Shared memory segment size '$shm_size' is larger than max size of " .              SHMMAX_BYTES;
+            "Shared memory segment size '$shm_size' is larger than max size of " .
+            SHMMAX_BYTES;
     }
 
     my $seg;
@@ -784,9 +810,13 @@ sub _parse_args {
     return $opts;
 }
 sub _shm_key {
-    my ($knot) = @_;
+    # Generates a 32-bit CRC on the key string. The $key_str parameter is used
+    # for testing only, for purposes of testing various key strings
 
-    my $key_str = ($knot->attributes('key') or '');
+    my ($knot, $key_str) = @_;
+
+    $key_str //= ($knot->attributes('key') || '');
+
     my $key;
 
     if ($key_str eq '') {
@@ -800,6 +830,14 @@ sub _shm_key {
     }
 
     $used_ids{$key}++;
+
+    if ($key > MAX_KEY_INT_SIZE) {
+        $key = $key - MAX_KEY_INT_SIZE;
+
+        if ($key == 0) {
+            croak "We've calculated a key which equals 0. This is a fatal error";
+        }
+    }
 
     return $key;
 }
@@ -999,6 +1037,10 @@ IPC::Shareable - Use shared memory backed variables across processes
 
     use IPC::Shareable qw(:lock);
 
+    my $href = IPC::Shareable->new(%options);
+
+    # ...or
+
     tie SCALAR, 'IPC::Shareable', OPTIONS;
     tie ARRAY,  'IPC::Shareable', OPTIONS;
     tie HASH,   'IPC::Shareable', OPTIONS;
@@ -1194,6 +1236,21 @@ Default values for options are:
     serializer  => 'storable',
 
 =head1 METHODS
+
+=head2 new
+
+Instantiates and returns a reference to a hash backed by shared memory.
+
+Parameters:
+
+Hash, Optional: See the L</OPTIONS> section for a list of all available options.
+Most often, you'll want to send in the B<key>, B<create> and B<destroy> options.
+
+It is possible to get a reference to an array or scalar as well. Simply send in
+either C<< var = > 'ARRAY' >> or C<< var => 'SCALAR' >> to do so.
+
+Return: A reference to a hash (or array or scalar) which is backed by shared
+memory.
 
 =head2 singleton($glue, $warn)
 

@@ -1,6 +1,4 @@
 %layout "default", scripts_extra => [ "/vue/vue.min.js" ];
-% my $event = stash('event');
-% my $e = stash('events');
 <div id="overview">
   <h1>Video status overview</h1>
   <p v-if="events.length > 0">Event:
@@ -20,7 +18,7 @@
       <th>Progress</th>
     </tr>
     <tr v-for="row in rows">
-      <td v-if="row.reviewurl"><a v-bind:href="row.reviewurl">{{row.name}}</a></td><td v-if="row.reviewurl===undefined">{{row.name}}</td>
+      <td v-if="row.reviewurl"><a v-bind:href="row.reviewurl">{{row.name}}</a></td><td v-if="!(row.reviewurl)">{{row.name}}</td>
       <td>{{row.speakers}}</td>
       <td>{{row.room}}</td>
       <td>{{new Date(row.starttime).toLocaleString()}}</td>

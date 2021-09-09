@@ -6,6 +6,8 @@ use Test2::Tools::PDL;
 
 use Scalar::Util qw[ refaddr ];
 
+use My::Test::Role;
+
 our $pbase = PDL->sequence( 5 );
 
 package Test {
@@ -14,7 +16,7 @@ package Test {
     use Role::Tiny::With;
     use PDL::Lite;
 
-    with 'My::Test::Role::Nested';
+    with My::Test::Role::Nested();
 
     sub test_obj {
         my $class = shift;
@@ -30,9 +32,7 @@ package Test {
                 p2 => $::pbase + 2,    # 2 3 4 5 6
             ),
         );
-
     }
-
 }
 
 Test->test(
@@ -104,7 +104,7 @@ subtest 'copy' => sub {
                     isnt(
                         refaddr( $orig->$c->$p->get_dataref ),
                         refaddr( $new->$c->$p->get_dataref ),
-                        "same piddle not returned"
+                        "same ndarray not returned"
                     );
 
                     pdl_is( $new->$c->$p, $orig->$c->$p, 'contents' );

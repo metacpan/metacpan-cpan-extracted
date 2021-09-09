@@ -12,7 +12,7 @@ no autovivification;
 
 use experimental 'postderef';
 
-our $VERSION = "v0.0.22";
+our $VERSION = "v0.0.23";
 
 use constant SINGLE_VARS => qw/ join leave cleanup /;
 

@@ -3,12 +3,12 @@
 use Test::Lib;
 use Test2::V0;
 
-use PDL ();
+use PDL::Lite ();
 
 use My::Class;
 
 sub new {
-    My::Class->new(
+    My::Class::Single()->new(
         p1 => PDL->sequence( 5 ),
         p2 => PDL->sequence( 5 ),
     );

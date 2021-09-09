@@ -6,6 +6,8 @@ use Mojo::Template;
 use Mojo::JSON qw/encode_json decode_json/;
 use SReview::Config::Common;
 use SReview::Talk::State;
+use SReview::Video;
+use SReview::Video::ProfileFactory;
 use DateTime::Format::Pg;
 
 my $config = SReview::Config::Common::setup;
@@ -176,7 +178,7 @@ has 'comment' => (
 
 sub _load_comment {
         my $self = shift;
-        my $st = $pg->db->dbh->prepare("SELECT comments FROM talks WHERE id = ?");
+        my $st = $pg->db->dbh->prepare("WITH orderedlog(talk, comment, logdate) AS (SELECT talk, comment, logdate FROM commentlog ORDER BY logdate DESC) SELECT talk, string_agg(logdate || E'\n' || comment, E'\n\n') AS comments FROM orderedlog WHERE talk = ? GROUP BY talk");
         $st->execute($self->talkid);
         my $row = $st->fetchrow_hashref;
         return $row->{comments};
@@ -505,14 +507,10 @@ sub _load_corrections {
 		$corrections{$name} = $val;
 	}
 
-	foreach my $prop ("offset_start", "length_adj", "offset_audio") {
+	foreach my $prop ("offset_start", "length_adj", "offset_audio", "audio_channel") {
 		if(!exists($corrections{$prop})) {
 			$corrections{$prop} = 0;
 		}
-	}
-
-	if(!exists($corrections{audio_channel})) {
-		$corrections{audio_channel} = 0;
 	}
 
 	return \%corrections;
@@ -570,6 +568,37 @@ sub _load_video_fragments {
 
 	my $talk_data = $pg->db->dbh->prepare("SELECT talkid, rawid, raw_filename, extract(epoch from fragment_start) AS fragment_start, extract(epoch from raw_length) as raw_length, extract(epoch from raw_length_corrected) as raw_length_corrected FROM adjusted_raw_talks(?, make_interval(secs :=?::numeric), make_interval(secs := ?::numeric)) ORDER BY talk_start, raw_start");
 	$talk_data->execute($self->talkid, $corrections->{"offset_start"}, $corrections->{"length_adj"});
+
+	my $rows;
+	while(my $row = $talk_data->fetchrow_hashref()) {
+		push @$rows, $row;
+	}
+
+	return $rows;
+}
+
+=head2 avs_video_fragments
+
+The same values as the video_fragments attribute, but with every length
+extended as needed for A/V sync operations.
+
+=cut
+
+has 'avs_video_fragments' => (
+	lazy => 1,
+	is => 'rw',
+	builder => '_load_avs_video_fragments',
+);
+
+sub _load_avs_video_fragments {
+	my $self = shift;
+	my $corrections = $self->corrections;
+
+	if($corrections->{offset_audio} == 0) {
+		return $self->video_fragments;
+	}
+	my $talk_data = $pg->db->dbh->prepare("SELECT talkid, rawid, raw_filename, extract(epoch from fragment_start) as fragment_start, extract(epoch from raw_length) as raw_length, extract(epoch from raw_length_corrected) as raw_length_corrected from adjusted_raw_talks(?, make_interval(secs :=?::numeric), make_interval(secs := ?::numeric), make_interval(secs :=abs(?::numeric))) order by talk_start, raw_start");
+	$talk_data->execute($self->talkid, $corrections->{"offset_start"}, $corrections->{"length_adj"}, $corrections->{"offset_audio"});
 
 	my $rows;
 	while(my $row = $talk_data->fetchrow_hashref()) {
@@ -684,7 +713,7 @@ sub _load_eventurl {
 	my $self = shift;
 	my $mt = Mojo::Template->new;
 	if(defined($config->get('eventurl_format'))) {
-		return $mt->vars(1)->render($config->get('eventurl_format'), {
+		my $rv = $mt->vars(1)->render($config->get('eventurl_format'), {
 			slug => $self->slug,
 			room => $self->room,
 			date => $self->date,
@@ -692,11 +721,52 @@ sub _load_eventurl {
 			event_output => $self->event_output,
 			talk => $self,
 			year => $self->_get_pathinfo->{raw}{year}});
+		chomp $rv;
+		return $rv;
 	}
 	return "";
 }
 
-=head2
+=head2 output_video_urls
+
+An array of URLs for the output videos, as they will be published. Used by final review.
+
+=cut
+
+has 'output_video_urls' => (
+	lazy => 1,
+	is => 'ro',
+	isa => 'ArrayRef[HashRef[Str]]',
+	builder => '_load_output_urls',
+);
+
+sub _load_output_urls {
+	my $self = shift;
+	my $mt = Mojo::Template->new;
+	my $form = $config->get("output_video_url_format");
+	my $rv = [];
+	if(defined($form)) {
+		my $vid = SReview::Video->new(url => "");
+		foreach my $prof(@{$config->get("output_profiles")}) {
+			my $item = {prof => $prof};
+			if($prof eq "copy") {
+				$prof = $config->get("input_profile");
+			}
+			my $exten = SReview::Video::ProfileFactory->create($prof, $vid)->exten;
+			my $url = $mt->vars(1)->render($form, {
+				talk => $self,
+				year => $self->_get_pathinfo->{raw}{year},
+				exten => $exten
+			});
+			chomp $url;
+			$item->{url} = $url;
+			push @$rv, $item;
+		}
+	}
+	return $rv;
+}
+
+=head2 preview_exten
 
 The file extension of the preview file (.webm or .mp4)
 
@@ -712,6 +782,12 @@ has 'preview_exten' => (
 sub _load_preview_exten {
 	return $config->get('preview_exten');
 }
+
+=head2 scheduled_length
+
+The length of the talk, as scheduled
+
+=cut
 
 has 'scheduled_length' => (
 	is => "ro",
@@ -814,9 +890,7 @@ sub done_correcting {
                 $st->execute($self->talkid, $pair->[0], $pair->[1]);
         }
         if($self->has_comment) {
-                $db->prepare("UPDATE talks SET comments=? WHERE id = ?")->execute($self->comment, $self->talkid);
-        } else {
-                $db->prepare("UPDATE talks SET comments = NULL WHERE id = ?")->execute($self->talkid);
+                $db->prepare("INSERT INTO commentlog(comment, talk, state) VALUES (?, ?, ?)")->execute($self->comment, $self->talkid, $self->state);
         }
 	if($self->has_apology) {
 		$db->prepare("UPDATE talks SET apologynote=? WHERE id = ?")->execute($self->apology, $self->talkid);

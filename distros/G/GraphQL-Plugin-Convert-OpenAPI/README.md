@@ -20,8 +20,8 @@ GraphQL::Plugin::Convert::OpenAPI - convert OpenAPI schema to GraphQL schema
 
 # DESCRIPTION
 
-This module implements the [GraphQL::Plugin::Convert](https://metacpan.org/pod/GraphQL::Plugin::Convert) API to convert
-a [JSON::Validator::OpenAPI::Mojolicious](https://metacpan.org/pod/JSON::Validator::OpenAPI::Mojolicious) specification to [GraphQL::Schema](https://metacpan.org/pod/GraphQL::Schema) etc.
+This module implements the [GraphQL::Plugin::Convert](https://metacpan.org/pod/GraphQL%3A%3APlugin%3A%3AConvert) API to convert
+a [JSON::Validator::OpenAPI::Mojolicious](https://metacpan.org/pod/JSON%3A%3AValidator%3A%3AOpenAPI%3A%3AMojolicious) specification to [GraphQL::Schema](https://metacpan.org/pod/GraphQL%3A%3ASchema) etc.
 
 It uses, from the given API spec:
 
@@ -46,13 +46,13 @@ To the `to_graphql` method: a URL to a specification, or a filename
 containing a JSON specification, or a data structure, of an OpenAPI v2.
 
 Optionally, a [Mojolicious](https://metacpan.org/pod/Mojolicious) app can be given as the second argument. In
-this case, with a [Mojolicious::Lite](https://metacpan.org/pod/Mojolicious::Lite) app, do:
+this case, with a [Mojolicious::Lite](https://metacpan.org/pod/Mojolicious%3A%3ALite) app, do:
 
     my $api = plugin OpenAPI => {spec => 'data://main/api.yaml'};
     plugin(GraphQL => {convert => [ 'OpenAPI', $api->validator->bundle, app ]});
 
 with the usual mapping in the case of a full app. For this to work you
-need [Mojolicious::Plugin::OpenAPI](https://metacpan.org/pod/Mojolicious::Plugin::OpenAPI) version 1.25+, which returns itself
+need [Mojolicious::Plugin::OpenAPI](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AOpenAPI) version 1.25+, which returns itself
 on `register`.
 
 # PACKAGE FUNCTIONS
@@ -93,7 +93,7 @@ have information about input types.
 
     - is\_enum
 
-        Boolean value indicating whether the type is a [GraphQL::Type::Enum](https://metacpan.org/pod/GraphQL::Type::Enum).
+        Boolean value indicating whether the type is a [GraphQL::Type::Enum](https://metacpan.org/pod/GraphQL%3A%3AType%3A%3AEnum).
 
 and returns a closure that can be used as a field resolver.
 

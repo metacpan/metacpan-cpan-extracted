@@ -6,11 +6,13 @@ use Test2::Tools::PDL;
 
 use Scalar::Util qw[ refaddr ];
 
+use My::Class;
+use My::Test::Role;
 
 package ClassHandles {
 
     use Moo;
-    extends 'My::Class';
+    extends My::Class::Single();
     has '+p1' => (
         is      => 'rwp',
         handles => ['qsorti'],
@@ -24,7 +26,9 @@ package Test {
     use Role::Tiny::With;
     use PDL::Lite;
 
-    with 'My::Test::Role::Single';
+    use My::Test;
+
+    with My::Test::Role::Single();
 
     our $p = PDL->random( 5 )->qsorti;
 
@@ -56,7 +60,7 @@ Test->test(
 );
 
 
-my $obj = My::Class->new();
+my $obj = My::Class::Single()->new();
 like(
     dies { $obj->qsort },
     qr/can't locate object method.*qsorti/i,

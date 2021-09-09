@@ -106,6 +106,45 @@ for $piece ( @pieces ) {
     like ( $@, qr/zero_as one_as/, "Both keys not found" );
 }
 
+# more_stats enabled
+
+subtest "More stats" => sub {
+
+    my %c_matrix_more_stats = $perceptron->get_confusion_matrix( { 
+            full_data_file => TEST_FILE, 
+            actual_output_header => "brand",
+            predicted_output_header => "predicted",
+            more_stats => 1,
+        } );
+
+    like ( $c_matrix_more_stats{ precision }, qr/66.66/, "Precision seems correct to me" );
+    is ( $c_matrix_more_stats{ specificity }, 80, "Specificity seems correct to me" );
+    is ( $c_matrix_more_stats{ F1_Score }, 50, "F1 Score seems correct to me" );
+    like ( $c_matrix_more_stats{ negative_predicted_value }, qr/57.142/, "Negative Predicted Value seems correct to me" );
+    is ( $c_matrix_more_stats{ false_negative_rate }, 60, "False Negative Rate seems correct to me" );
+    is ( $c_matrix_more_stats{ false_positive_rate }, 20, "False positive Rate seems correct to me" );
+    like ( $c_matrix_more_stats{ false_discovery_rate }, qr/33.33/, "False Discovery Rate seems correct to me" );
+    like ( $c_matrix_more_stats{ false_omission_rate }, qr/42.85/, "False Omission Rate seems correct to me" );
+    is ( $c_matrix_more_stats{ balanced_accuracy }, 60, "Balanced Acuracy seems correct to me" );
+
+
+    my $piece;
+    my @pieces = ('A: ', 'P: ', 'actual', 'predicted', 'entries', 'Accuracy', 'Sensitivity', 'MP520', 'Yi Lin', "Precision", "Specificity", "F1 Score", "Negative Predicted Value", "False Negative Rate", "False Positive Rate", "False Discovery Rate", "False Omission Rate", "Balanced Accuracy");
+
+    for $piece ( @pieces ) {
+        stdout_like {
+        
+            ok ( $perceptron->display_exam_results( \%c_matrix_more_stats, { zero_as => "MP520", one_as => "Yi Lin"  } ),
+                "display_exam_results is working");
+            
+        } qr /(?:$piece)/, "$piece displayed";
+
+    }
+    $perceptron->display_exam_results( \%c_matrix_more_stats, { 
+        zero_as => "MP520", 
+        one_as => "Yi Lin"  } );
+};
+
 done_testing;
 
 # besiyata d'shmaya

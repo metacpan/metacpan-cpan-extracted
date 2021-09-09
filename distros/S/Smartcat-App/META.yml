@@ -64,9 +64,10 @@ resources:
   bugtracker: https://github.com/smartcatai/smartcat-app-perl/issues
   homepage: https://github.com/smartcatai/smartcat-app-perl
   repository: https://github.com/smartcatai/smartcat-app-perl.git
-version: 0.0.10
+version: 0.0.11
 x_contributors:
   - 'Igor Afanasyev <igor.afanasyev@gmail.com>'
+  - 'Sergey Derunov <derunov.sergey@yandex.ru>'
 x_generated_by_perl: v5.20.3
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 1

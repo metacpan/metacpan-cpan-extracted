@@ -1,5 +1,9 @@
 Revision history for Perl extension Spreadsheet::ReadSXC.
 
+0.35  2021-09-08
+    * Fix memory leak in the XML parser callbacks
+      Reported as GH #8 with a test case, thanks to troost-c!
+
 0.34  2021-03-10
     * Fix OrderBySheet option in Spreadsheet::ReadSXC, thanks to Kuerbis!
 

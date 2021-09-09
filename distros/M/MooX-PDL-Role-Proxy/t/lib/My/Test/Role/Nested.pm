@@ -11,45 +11,29 @@ with 'My::Test::Role::Base';
 
 use namespace::clean;
 
-requires 'test_class';
-requires 'nested_test_class';
-
 requires 'test_obj';
-
-sub test_class { 'My::Class' }
 
 sub test_class_new {
     my $class = shift;
-
     load $class->test_class;
-
     return $class->test_class->new( @_ );
 }
-
-
 
 sub nested_test_class { 'My::NestedClass' }
 
 sub nested_test_class_new {
     my $class = shift;
-
     load $class->nested_test_class;
-
     return $class->nested_test_class->new( @_ );
 }
 
 sub test_inplace {
-
     my $class = shift;
-
     my ( $sub, $expected, $build_test_obj ) = @_;
-
     my $context = context();
 
     subtest 'inplace' => sub {
-
         my $orig = $class->test_obj;
-
         my $new = $sub->( $orig->inplace );
 
         for my $c ( 'c1', 'c2' ) {
@@ -59,28 +43,21 @@ sub test_inplace {
                     $expected->$c );
             }
         }
-
     };
 
     $context->release;
 }
 
 sub test_not_inplace {
-
     my $class = shift;
-
     my ( $sub, $expected ) = @_;
-
     my $context = context();
 
     subtest '! inplace' => sub {
-
         my $orig = $class->test_obj;
-
         my %data;
 
         for my $c ( 'c1', 'c2' ) {
-
             my $pobj = $orig->$c;
 
             my $expected = $expected->$c;
@@ -95,7 +72,6 @@ sub test_not_inplace {
         }
 
         my $new = $sub->( $orig );
-
         for my $c ( 'c1', 'c2' ) {
             subtest $c => sub {
                 $class->test_not_inplace_flat_obj( $orig->$c, $new->$c,
@@ -109,7 +85,6 @@ sub test_not_inplace {
 
 sub build_expected {
     my $class = shift;
-
     my %data = @_;
 
     $class->nested_test_class_new(
@@ -122,7 +97,6 @@ sub build_expected {
             p2 => PDL->new( $data{c2}{p2} ),
         ),
     );
-
 }
 
 1;

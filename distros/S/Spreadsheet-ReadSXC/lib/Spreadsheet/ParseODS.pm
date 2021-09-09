@@ -9,13 +9,14 @@ use XML::Twig::XPath;
 use Carp qw(croak);
 use List::Util 'max';
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 our @CARP_NOT = (qw(XML::Twig));
 
 use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 use PerlX::Maybe;
+use Scalar::Util 'weaken';
 
 use Spreadsheet::ParseODS::Workbook;
 use Spreadsheet::ParseODS::Worksheet;
@@ -225,6 +226,7 @@ sub _empty_cell( $self, $readonly, $is_merged ) {
 }
 
 sub parse( $self, $source, @options ) {
+    weaken $self;
     my %options;
     my $formatter;
     if( @options % 2 == 0 ) {

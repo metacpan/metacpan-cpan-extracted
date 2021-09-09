@@ -1,40 +1,16 @@
 package My::Class;
 
-use Moo;
-use MooX::PDL::Role::Proxy;
-use PDL::Lite ();
+use Test::Lib;
+use My::Test;
 
-use overload '""'     => 'to_string';
-use overload fallback => 1;
+use constant {
+    Single => 'My::Class::Single::' . My::Test::NAME,
+    Nested => 'My::Class::Nested::' . My::Test::NAME,
+};
 
-sub to_string {
-    return join( "\n", "p1 = " . $_[0]->p1, "p2 = " . $_[0]->p2, );
-}
+use Module::Load;
 
-has p1 => (
-    is      => 'rwp',
-    default => sub { PDL->null },
-    piddle  => 1,
-    trigger => sub { $_[0]->triggered(1) },
-);
-
-has p2 => (
-    is      => 'rwp',
-    default => sub { PDL->null },
-    piddle  => 1,
-);
-
-has triggered => (
-    is      => 'rw',
-    clearer => 1,
-    default => 0,
-);
-
-sub clone_with_piddles {
-
-    my ( $self, %attr ) = @_;
-
-    $self->new->_set_attr( %attr );
-}
+load Single();
+load Nested();
 
 1;

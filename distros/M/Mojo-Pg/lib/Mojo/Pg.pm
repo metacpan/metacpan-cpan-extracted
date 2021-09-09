@@ -22,7 +22,7 @@ has options         => sub {
 has [qw(password username)] => '';
 has pubsub                  => sub { Mojo::Pg::PubSub->new(pg => shift) };
 
-our $VERSION = '4.25';
+our $VERSION = '4.26';
 
 sub db { $_[0]->database_class->new(dbh => $_[0]->_prepare, pg => $_[0]) }
 
@@ -266,11 +266,11 @@ Which get integrated into your application with helpers.
 =head1 EXAMPLES
 
 This distribution also contains two great L<example
-applications|https://github.com/mojolicious/mojo-pg/tree/master/examples/> you can use for inspiration. The minimal
-L<chat|https://github.com/mojolicious/mojo-pg/tree/master/examples/chat.pl> application will show you how to scale
+applications|https://github.com/mojolicious/mojo-pg/tree/main/examples/> you can use for inspiration. The minimal
+L<chat|https://github.com/mojolicious/mojo-pg/tree/main/examples/chat.pl> application will show you how to scale
 WebSockets to multiple servers, and the well-structured
-L<blog|https://github.com/mojolicious/mojo-pg/tree/master/examples/blog> application how to apply the MVC design
-pattern in practice.
+L<blog|https://github.com/mojolicious/mojo-pg/tree/main/examples/blog> application how to apply the MVC design pattern
+in practice.
 
 =head1 EVENTS
 

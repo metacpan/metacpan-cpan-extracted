@@ -2,8 +2,8 @@ NAME
     Text::WideChar::Util - Routines for text containing wide characters
 
 VERSION
-    This document describes version 0.171 of Text::WideChar::Util (from Perl
-    distribution Text-WideChar-Util), released on 2021-01-23.
+    This document describes version 0.172 of Text::WideChar::Util (from Perl
+    distribution Text-WideChar-Util), released on 2021-04-14.
 
 SYNOPSIS
      use Text::WideChar::Util qw(
@@ -136,6 +136,12 @@ FUNCTIONS
   trunc($text, $width) => STR
     The non-wide version of mbtrunc(), just like in mbwrap() vs wrap(). This
     is actually not much more than Perl's "substr($text, 0, $width)".
+
+FAQ
+  Why split functionalities of wide character and color support into multiple modules/distributions?
+    Performance (see numbers in the function description), dependency
+    (Unicode::GCString is used for wide character support), and overhead
+    (loading Unicode::GCString).
 
 HOMEPAGE
     Please visit the project's homepage at

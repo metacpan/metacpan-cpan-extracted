@@ -25,7 +25,7 @@ use Encode 'encode_utf8';
 
 use experimental 'postderef';
 
-our $VERSION = "v0.0.22";
+our $VERSION = "v0.0.23";
 
 use constant {
     DEFAULT_CLEANUP_INTERVAL          => 5,
@@ -221,15 +221,6 @@ sub register ($self, $app, $config) {
                 $txn->commit;
             });
         }
-
-        # Remove this code when this issue has been addressed:
-        #  https://github.com/mojolicious/mojo-pg/issues/77
-        $app->$bs_prefix->pubsub->listen('dummy_notification' => sub {});
-        rx_timer(rand(0.5), 0.5)->pipe(
-            op_take_until($graceful_stop_o),
-        )->subscribe(sub {
-            $app->$bs_prefix->pubsub->notify('dummy_notification' => '{}');
-        });
     });
 
     $app->helper("$bs_prefix.on_action", sub ($c, $channel_name, $action_name, $action_sub) {

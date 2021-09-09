@@ -5,6 +5,7 @@ use SReview::Config;
 use strict;
 use warnings;
 use feature 'state';
+use Mojo::JSON qw/decode_json/;
 
 sub get_default_cfile {
 	my $dir = $ENV{SREVIEW_WDIR};
@@ -16,6 +17,38 @@ sub get_default_cfile {
 		$cfile = join('/', '', 'etc', 'sreview', 'config.pm');
 	}
 	return $cfile;
+}
+
+sub compute_dbistring {
+	if(!exists($ENV{SREVIEW_DBICOMPONENTS})) {
+		return undef;
+	}
+	my @comps = ();
+	foreach my $comp(split /\s/, $ENV{SREVIEW_DBICOMPONENTS}) {
+		my $COMP = uc $comp;
+		push @comps, "$comp=" . $ENV{"SREVIEW_DBI_" . $COMP};
+	}
+	return "dbi:Pg:" . join(";", @comps);
+}
+
+sub compute_accessconfig {
+	if(!exists($ENV{SREVIEW_S3_DEFAULT_ACCESSKEY}) || !exists($ENV{SREVIEW_S3_DEFAULT_SECRETKEY})) {
+		return undef;
+	}
+	my $rv = { default => {aws_access_key_id => $ENV{SREVIEW_S3_DEFAULT_ACCESSKEY}, aws_secret_access_key => $ENV{SREVIEW_S3_DEFAULT_SECRETKEY} } };
+	if(exists($ENV{SREVIEW_S3_DEFAULT_SECURE})) {
+		$rv->{secure} = $ENV{SREVIEW_S3_DEFAULT_SECURE};
+	}
+	if(exists($ENV{SREVIEW_S3_DEFAULT_HOST})) {
+		$rv->{host} = $ENV{SREVIEW_S3_DEFAULT_HOST};
+	}
+	if(exists($ENV{SREVIEW_S3_EXTRA_CONFIGS})) {
+		my $extras = decode_json($ENV{SREVIEW_S3_EXTRA_CONFIGS});
+		foreach my $extra(keys %$extras) {
+			$rv->{$extra} = $extras->{$extra};
+		}
+	}
+	return $rv;
 }
 
 sub setup {
@@ -30,8 +63,10 @@ sub setup {
 	$config = SReview::Config->new($cfile);
 	# common values
 	$config->define('dbistring', 'The DBI connection string used to connect to the database', 'dbi:Pg:dbname=sreview');
+	$config->define_computed('dbistring', \&compute_dbistring);
 	$config->define('accessmethods', 'The way to access files for each collection. Can be \'direct\' or \'S3\'. For the latter, the \'$s3_access_config\' configuration needs to be set, too', {input => 'direct', output => 'direct', intermediate => 'direct'});
 	$config->define('s3_access_config', 'Configuration for accessing S3-compatible buckets. Any option that can be passed to the "new" method of the Net::Amazon::S3 Perl module can be passed to any of the child hashes of the toplevel hash. Uses the same toplevel keys as the "$accessmethods" configuration item, but falls back to "default"', {default => {}});
+	$config->define_computed('s3_access_config', \&compute_accessconfig);
 	$config->define('api_key', 'The API key, to allow access to the API', undef);
 
 	# Values for sreview-web
@@ -62,6 +97,7 @@ sub setup {
 	$config->define('audio_multiplex_mode', 'The way in which the primary and backup audio are multiplexed in the input stream. One of \'stereo\' for the primary in the left channel of the first audio stream and the backup in the right channel, or \'astream\' for the primary in the first audio stream, and the backup in the second audio stream', 'stereo');
 	$config->define('normalizer', 'The implementation used to normalize audio. Currently only bs1770gain is supported', 'bs1770gain');
 	$config->define('web_pid_file', 'The PID file for the webinterface, when running under hypnotoad.','/var/run/sreview/sreview-web.pid');
+	$config->define('autoreview_detect', 'The script to run when using sreview-autoreview', undef);
 
 	# Values for detection script
 	$config->define('inputglob', 'A filename pattern (glob) that tells SReview where to find new files', '/srv/sreview/incoming/*/*/*');
@@ -85,18 +121,23 @@ sub setup {
 	# Values for notification script
 	$config->define('notify_actions', 'An array of things to do when notifying the readyness of a preview video. Can contain one or more of: email, command.', []);
 	$config->define('announce_actions', 'An array of things to do when announcing the completion of a transcode. Can contain one or more of: email, command.', []);
+	$config->define('notify_final_actions', 'An array of things to do when notifying the readiness of a final review. Can contain one or more of: email, command', []);
 	$config->define('email_template', 'A filename of a Mojo::Template template to process, returning the email body used in notifications or announcements. Can be overridden by announce_email_template or notify_email_template.', undef);
 	$config->define('notify_email_template', 'A filename of a Mojo::Template template to process, returning the email body used in notifications. Required, but defaults to the value of email_template', undef);
 	$config->define('announce_email_template', 'A filename of a Mojo::Template template to process, returning the email body used in announcements. Required, but defaults to the value of email_template', undef);
-	$config->define('email_from', 'The data for the From: header in any email. Required if notify_actions or announce_actions includes email.', undef);
+	$config->define('notify_final_email_template', 'A filename of a Mojo::Template template to process, returning the email body used in final review notifications. Required, but defaults to the value of email_template', undef);
+	$config->define('email_from', 'The data for the From: header in any email. Required if notify_actions, notify_final_actions, or announce_actions includes email.', undef);
 	$config->define('notify_email_subject', 'The data for the Subject: header in the email. Required if notify_actions includes email.', undef);
 	$config->define('announce_email_subject', 'The data for the Subject: header in the email. Required if announc_actions includes email.', undef);
+	$config->define('notify_final_email_subject', 'The data for the Subject: header in the email. Required if notify_final_actions includes email.', undef);
 	$config->define('urlbase', 'The URL on which SReview runs. Note that this is used by sreview-notify to generate URLs, not by sreview-web.', '');
 	$config->define('notify_commands', 'An array of commands to run to perform notifications. Each component is passed through Mojo::Template before processing. To avoid quoting issues, it is a two-dimensional array, so that no shell will be called to run this.', [['echo', '<%== $title %>', 'is', 'available', 'at', '<%== $url %>']]);
 	$config->define('announce_commands', 'An array of commands to run to perform announcements. Each component is passed through Mojo::Template before processing. To avoid quoting issues, it is a two-dimensional array, so that no shell will be called to run this.', [['echo', '<%== $title %>', 'is', 'available', 'at', '<%== $url %>']]);
+	$config->define('notify_final_commands', 'An array of commands to run to perform final review notification. Each component is passed through Mojo::Template before processing. To avoid quoting issues, it is a two-dimensional array, so that no shell will be called to run this.', [['echo', '<%== $title %>', 'is', 'available', 'for', 'final', 'review', 'at', '<%== $url %>']]);
 
 	# Values for upload script
 	$config->define('upload_actions', 'An array of commands to run on each file to be uploaded. Each component is passed through Mojo::Template before processing. To avoid quoting issues, it is a two-dimensional array, so that no shell will be called to run this.', [['echo', '<%== $file %>', 'ready for upload']]);
+	$config->define('remove_actions', 'An array of commands to run on each file to be removed, when final review determines that the file needs to be reprocessed. Same format as upload_actions', [['echo', '<%== $file %>', 'ready for removal']]);
 	$config->define('cleanup', 'Whether to remove files after they have been published. Possible values: "all" (removes all files), "previews" (removes the output of sreview-cut, but not that of sreview-transcode), and "output" (removes the output of sreview-transcode, but not the output of sreview-cut). Other values will not remove files', 'none');
 	# for sreview-copy
 	$config->define('extra_collections', 'A hash of extra collection basenames. Can be used by sreview-copy.', undef);
@@ -112,10 +153,15 @@ sub setup {
 	$config->define('schedule_options', 'The options to pass to the schedule parser as specified through schedule_format. See the documentation of your chosen parser for details.', {});
 
 	# for sreview-inject
-	$config->define('inject_transcode_skip_checks', "Minimums and maximums, or exact values, of video assets that cause sreview-inject to skip the transcode check if they are found in the video asset", {});
+	$config->define('inject_transcode_skip_checks', "Minimums and maximums, or exact values, of video assets that cause sreview-inject to skip the transcode if they match the video asset", {});
+	$config->define('inject_collection', "The collection into which uploads are stored. One of: input, pub, or any of the keys of the 'extra_collections' hash", "input");
 
 	# for tuning command stuff
 	$config->define('command_tune', 'Some commands change incompatibly from one version to the next. This option exists to deal with such incompatibilities', {});
+
+	# for final review
+	$config->define('finalhosts', 'A list of hosts that may host videos for final review, to be added to Content-Security-Policy "media-src" directive.', undef);
+	$config->define('output_video_url_format', 'A Mojo::Template that will produce the URLs for the produced videos. Can use the $talk variable for the SReview::Talk, and the $exten variable for the extension of the current video profile');
 
 	return $config;
 }

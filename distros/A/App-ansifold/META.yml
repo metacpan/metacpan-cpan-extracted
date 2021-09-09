@@ -4,7 +4,6 @@ author:
   - 'Kazumasa Utashiro'
 build_requires:
   Command::Runner: '0'
-  List::Util: '1.29'
   Test::More: '0.98'
 configure_requires:
   Module::Build::Tiny: '0.035'
@@ -28,17 +27,17 @@ no_index:
 provides:
   App::ansifold:
     file: lib/App/ansifold.pm
-    version: '1.0902'
+    version: '1.1101'
 requires:
-  Getopt::EX: v1.21.1
-  Getopt::EX::Hashed: '0.9906'
-  Text::ANSI::Fold: '2.0903'
+  Getopt::EX: v1.24.1
+  Getopt::EX::Hashed: '0.9917'
+  Text::ANSI::Fold: '2.1101'
   perl: '5.016'
 resources:
   bugtracker: https://github.com/kaz-utashiro/ansifold/issues
   homepage: https://github.com/kaz-utashiro/ansifold
   repository: git://github.com/kaz-utashiro/ansifold.git
-version: '1.0902'
+version: '1.1101'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

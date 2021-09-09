@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,58 +26,58 @@ no_index:
 provides:
   BoardStreams:
     file: lib/BoardStreams.pm
-    version: v0.0.22
+    version: v0.0.23
   BoardStreams::Client:
     file: lib/BoardStreams/Client.pm
-    version: v0.0.22
+    version: v0.0.23
   BoardStreams::Client::Channel:
     file: lib/BoardStreams/Client/Channel.pm
-    version: v0.0.22
+    version: v0.0.23
   BoardStreams::Client::Manager:
     file: lib/BoardStreams/Client/Manager.pm
-    version: v0.0.22
+    version: v0.0.23
   BoardStreams::Client::StructDiff:
     file: lib/BoardStreams/Client/StructDiff.pm
-    version: v0.0.22
+    version: v0.0.23
   BoardStreams::Client::Utils:
     file: lib/BoardStreams/Client/Utils.pm
-    version: v0.0.22
+    version: v0.0.23
   BoardStreams::Client::WebSocket:
     file: lib/BoardStreams/Client/WebSocket.pm
-    version: v0.0.22
+    version: v0.0.23
   BoardStreams::DBMigrations:
     file: lib/BoardStreams/DBMigrations.pm
-    version: v0.0.22
+    version: v0.0.23
   BoardStreams::Exception:
     file: lib/BoardStreams/Exception.pm
-    version: v0.0.22
+    version: v0.0.23
   BoardStreams::Exception::DbError:
     file: lib/BoardStreams/Exception.pm
-    version: v0.0.22
+    version: v0.0.23
   BoardStreams::Exception::DbError::Duplicate:
     file: lib/BoardStreams/Exception.pm
-    version: v0.0.22
+    version: v0.0.23
   BoardStreams::ListenerObservable:
     file: lib/BoardStreams/ListenerObservable.pm
-    version: v0.0.22
+    version: v0.0.23
   BoardStreams::Registry:
     file: lib/BoardStreams/Registry.pm
-    version: v0.0.22
+    version: v0.0.23
   BoardStreams::Transaction:
     file: lib/BoardStreams/Transaction.pm
-    version: v0.0.22
+    version: v0.0.23
   BoardStreams::Util:
     file: lib/BoardStreams/Util.pm
-    version: v0.0.22
+    version: v0.0.23
   Mojolicious::Plugin::BoardStreams:
     file: lib/Mojolicious/Plugin/BoardStreams.pm
-    version: v0.0.22
+    version: v0.0.23
 requires:
   Data::Dump: '0'
   Data::GUID: '0'
   Future::AsyncAwait: '0.36'
   List::AllUtils: '0'
-  Mojo::Pg: '4.24'
+  Mojo::Pg: '4.26'
   Mojolicious: '8.32'
   Moo: '0'
   RxPerl: v6.5.0
@@ -92,7 +92,7 @@ resources:
   bugtracker: https://gitlab.com/karjala/boardstreams.pm/issues
   homepage: https://gitlab.com/karjala/boardstreams.pm
   repository: git://gitlab.com/karjala/boardstreams.pm.git
-version: v0.0.22
+version: v0.0.23
 x_authority: cpan:KARJALA
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

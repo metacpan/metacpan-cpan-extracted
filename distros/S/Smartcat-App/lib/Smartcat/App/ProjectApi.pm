@@ -102,7 +102,7 @@ sub get_all_projects {
 }
 
 sub upload_file {
-    my ( $self, $path, $filename, $target_languages ) = @_;
+    my ( $self, $path, $filename, $external_id, $target_languages ) = @_;
 
     my %args;
     $args{targetLanguages} = $target_languages
@@ -124,6 +124,8 @@ sub upload_file {
             filename => $utf8_filename
         }
     );
+    $args{external_id} = $external_id 
+      if defined $external_id;
     $args{disassemble_algorithm_name} =
       $self->{rundata}->{disassemble_algorithm_name}
       if defined $self->{rundata}->{disassemble_algorithm_name};

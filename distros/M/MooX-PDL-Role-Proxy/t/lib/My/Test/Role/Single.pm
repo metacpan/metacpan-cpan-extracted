@@ -13,34 +13,22 @@ with 'My::Test::Role::Base';
 
 use namespace::clean;
 
-requires 'test_class';
 requires 'test_obj';
-
-sub test_class { 'My::Class' }
 
 sub test_class_new {
     my $class = shift;
-
     load $class->test_class;
-
     return $class->test_class->new( @_ );
 }
 
-
 sub test_inplace {
-
     my $class = shift;
-
     my $context = context();
-
     my ( $sub, $expected ) = @_;
 
     subtest 'inplace' => sub {
-
         my $orig = $class->test_obj;
-
         my $new = $sub->( $orig->inplace );
-
         $class->test_inplace_flat_obj( $orig, $new, $expected );
     };
 
@@ -48,19 +36,14 @@ sub test_inplace {
 }
 
 sub test_not_inplace {
-
     my $class = shift;
-
     my $context = context();
 
     my ( $sub, $expected, $build_test_obj ) = @_;
 
     subtest '! inplace' => sub {
-
         my $orig = $class->test_obj;
-
         my %data;
-
         for my $p ( 'p1', 'p2' ) {
             $data{$p} = wrap_hash( {
                     refaddr => refaddr( $orig->$p->get_dataref ),
@@ -70,7 +53,6 @@ sub test_not_inplace {
         }
 
         my $new = $sub->( $orig );
-
         $class->test_not_inplace_flat_obj( $orig, $new, $expected, %data );
     };
 
@@ -78,16 +60,13 @@ sub test_not_inplace {
 }
 
 sub build_expected {
-
     my $class = shift;
-
     my %data = @_;
 
     $class->test_class_new(
         p1 => PDL->new( $data{p1} ),
         p2 => PDL->new( $data{p2} ),
     );
-
 }
 
 1;

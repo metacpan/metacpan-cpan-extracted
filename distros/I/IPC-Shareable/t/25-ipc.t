@@ -4,6 +4,7 @@ use strict;
 use Carp;
 use IPC::Shareable;
 use Test::More;
+use Test::SharedFork;
 
 my $awake = 0;
 local $SIG{ALRM} = sub { $awake = 1 };

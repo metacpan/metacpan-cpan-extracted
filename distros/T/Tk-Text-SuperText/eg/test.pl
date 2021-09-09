@@ -9,9 +9,9 @@ use lib File::Spec->catdir($Bin, '..', 'lib');
 use Tk;
 use Tk::Text::SuperText;
 
-say $Tk::Text::SuperText::VERSION;
-
-my $mw = Tk::MainWindow->new;
+my $mw = Tk::MainWindow->new(
+	-title => 'Tk::Text::SuperText v' . $Tk::Text::SuperText::VERSION,
+);
 
 my $text = $mw->Scrolled('SuperText',
 	-scrollbars => 'se',

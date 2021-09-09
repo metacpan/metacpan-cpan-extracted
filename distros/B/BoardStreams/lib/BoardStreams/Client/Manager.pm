@@ -12,7 +12,7 @@ use Data::Dump 'dump';
 use List::Util 'min';
 use Carp 'croak';
 
-our $VERSION = "v0.0.22";
+our $VERSION = "v0.0.23";
 
 has 'url';
 has 'connection_status_o';
@@ -86,6 +86,7 @@ sub new ($class, $url) {
             my $data = decode_json($bytes);
             return rx_of($data);
         }),
+        op_share(),
     );
 
     $msgs_from_ws_o->pipe(

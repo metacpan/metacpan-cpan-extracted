@@ -1,9 +1,9 @@
 package Text::WideChar::Util;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-23'; # DATE
+our $DATE = '2021-04-14'; # DATE
 our $DIST = 'Text-WideChar-Util'; # DIST
-our $VERSION = '0.171'; # VERSION
+our $VERSION = '0.172'; # VERSION
 
 use 5.010001;
 use locale;
@@ -429,7 +429,7 @@ Text::WideChar::Util - Routines for text containing wide characters
 
 =head1 VERSION
 
-This document describes version 0.171 of Text::WideChar::Util (from Perl distribution Text-WideChar-Util), released on 2021-01-23.
+This document describes version 0.172 of Text::WideChar::Util (from Perl distribution Text-WideChar-Util), released on 2021-04-14.
 
 =head1 SYNOPSIS
 
@@ -574,6 +574,14 @@ Does *not* handle multiple lines.
 
 The non-wide version of mbtrunc(), just like in mbwrap() vs wrap(). This is
 actually not much more than Perl's C<< substr($text, 0, $width) >>.
+
+=head1 FAQ
+
+=head2 Why split functionalities of wide character and color support into multiple modules/distributions?
+
+Performance (see numbers in the function description), dependency
+(L<Unicode::GCString> is used for wide character support), and overhead (loading
+Unicode::GCString).
 
 =head1 HOMEPAGE
 

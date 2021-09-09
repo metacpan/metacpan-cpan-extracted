@@ -1,0 +1,21 @@
+*** The original email message, with full headers is held by Fedora
+Legal. If there is a need to see it, please email
+legal@fedoraproject.org. ***
+
+Subject: Re: Perl Data::Properties
+From: Brian Moseley <bcm@maz.org>
+Date: 08/10/2010 07:00 PM
+To: OMITTED
+
+huh, I'm surprised that you find it that useful, but okay. it doesn't
+look like I included a license in the distribution, but if I were to
+do so today, it would be under the most recent Apache license.
+
+On Tue, Aug 10, 2010 at 9:18 AM, OMITTED wrote:
+> Hi
+>
+> I was trying to package this Perl module for inclusion in Fedora Linux,
+> and I am stumbling on the license.  On CPAN the license is listed as
+> 'unknown'.  Could you let me know what license it should be please?
+>
+> Many thanks

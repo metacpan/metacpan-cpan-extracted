@@ -17,7 +17,7 @@ our %EXPORT_TAGS = (
     bool => [qw/ true false to_bool /],
 );
 
-our $VERSION = "v0.0.22";
+our $VERSION = "v0.0.23";
 
 sub to_bool :prototype(_) { $_[0] ? true : false }
 

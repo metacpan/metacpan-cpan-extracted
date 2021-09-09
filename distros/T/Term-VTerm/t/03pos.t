@@ -1,11 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
 
-use Term::VTerm;
+use Term::VTerm::Pos;
 
 my $pos = Term::VTerm::Pos->new( row => 10, col => 20 );
 

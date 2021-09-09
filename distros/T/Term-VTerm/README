@@ -31,6 +31,11 @@ EXPORTED CONSTANTS
 
     Key symbol constants for keyboard_key.
 
+ SELECTION_* (:selections)
+
+    Selection bitmask constants for send_selection and selection callback
+    events.
+
 CONSTRUCTOR
 
  new
@@ -177,100 +182,6 @@ METHODS
     Returns a Term::VTerm::Screen object representing the terminal screen
     layer, creating it if necessary. After calling this method, any parser
     or state callbacks will no longer work.
-
-COLOR OBJECTS
-
-    A VTermColor instance can be constructed by
-
- $color = Term::VTerm::Color->new( red => $r, green => $g, blue => $b )
-
-    A VTermColor instance has the following field accessors:
-
- $bool = $color->is_indexed
-
-    True if the colour is a palette index.
-
- $bool = $color->is_rgb
-
-    True if the colour contains RGB values directly.
-
- $idx = $color->index
-
-    The palette index for indexed colours.
-
- $r = $color->red
-
- $g = $color->green
-
- $b = $color->blue
-
-    The components of the colour as an integer between 0 and 255 for RGB
-    colours.
-
- $hex = $color->rgb_hex
-
-    A 6-character string containing the three colour components, hex
-    encoded.
-
- $bool = $color->is_default_fg
-
- $bool = $color->is_default_bg
-
-    True if the colour is the default colour for terminal foreground or
-    background.
-
-GLYPH INFO OBJECTS
-
-    A VTermGlyphInfo instance has the following field accessors:
-
- @chars = $info->chars
-
-    A list of Unicode character numbers. This list does not include the
-    terminating 0.
-
- $width = $info->width
-
-    The width of this glyph in screen columns.
-
- $str = $info->str
-
-    A Unicode string containing the characters.
-
-POSITION OBJECTS
-
-    A VTermPos instance can be constructed by
-
- $pos = Term::VTerm::Pos->new( row => $row, col => $col )
-
-    A VTermPos instance has the following field accessors:
-
- $row = $pos->row
-
- $col = $pos->col
-
-    The row and column number of the position, 0-indexed.
-
-RECTANGLE OBJECTS
-
-    A VTermRect instance can be constructed by
-
- $rect = Term::VTerm::Rect->new( start_row => ..., end_row => ...,
- start_col => ..., end_col => ... )
-
-    A VTermRect instance has the following field accessors:
-
- $row = $rect->start_row
-
- $col = $rect->start_col
-
-    The row and column number of the top left corner of the rectangle.
-
- $row = $rect->end_row
-
- $col = $rect->end_col
-
-    The row and column number of the cell just after the bottom right
-    corner of the rectangle; i.e. exclusive limit.
 
 FUNCTIONS
 

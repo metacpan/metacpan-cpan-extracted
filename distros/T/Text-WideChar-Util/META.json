@@ -61,12 +61,17 @@
          "web" : "https://github.com/perlancar/perl-Text-WideChar-Util"
       }
    },
-   "version" : "0.171",
+   "version" : "0.172",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::InsertBlock::FromModule",
+            "name" : "InsertBlock::FromModule",
+            "version" : "0.101"
+         },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease",
             "name" : "@Author::PERLANCAR/PERLANCAR::CheckPendingRelease",

@@ -134,6 +134,19 @@ sub define_deprecated {
 	}
 }
 
+=head2 $config->define_computed('name')
+
+Defines a default value for a particular configuration parameter through
+a subroutine.
+
+If the subroutine returns C<undef>, that value will be ignored (and the
+normal logic for defining a default will be used).
+
+Should be used on a parameter that has already been defined through
+  $config->define
+
+=cut
+
 sub define_computed {
 	my $self = shift;
 	my $name = shift;
@@ -162,13 +175,16 @@ sub get {
 	my $talk = shift;
 
 	if(!exists($self->{defs}{$name})) {
-		die "e: definition for config file item $name does not exist!";
+		croak "e: definition for config file item $name does not exist!";
 	}
 
-	if(exists($self->{defs}{$name}{sub})) {
-		return &{$self->{defs}{$name}{sub}}($self, $talk);
-	}
 	$self->{fixed} = 1;
+	if(exists($self->{defs}{$name}{sub})) {
+		my $rv = &{$self->{defs}{$name}{sub}}($self, $talk);
+		if(defined($rv)) {
+			return $rv;
+		}
+	}
 	if(exists($SReview::Config::_private::{$name})) {
 		return ${$SReview::Config::_private::{$name}};
 	}

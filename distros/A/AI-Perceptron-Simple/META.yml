@@ -21,11 +21,15 @@ no_index:
     - t
     - inc
 requires:
+  Carp: '0'
+  File::Basename: '0'
+  List::Util: '0'
   Storable: '0'
   Text::CSV: '2.01'
   Text::Matrix: '1.00'
   YAML: '0'
   local::lib: '0'
   perl: '5.008001'
-version: '1.02'
+  utf8: '0'
+version: '1.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

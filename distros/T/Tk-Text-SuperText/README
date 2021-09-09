@@ -1,21 +1,22 @@
 DESCRIPTION
 
 	Tk::Text::SuperText is a Perl module that extends and in some ways redefines 
-	the standard perl/TK Tk::Text widget.
-	It adds rectangular selections,selection left/right shift,unlimited undo and
-	redo,autoindent,'inline' selection paste,matching paretheses highlight/find,
-	commands binded via virtual events.
+	the standard Perl/Tk Tk::Text widget.
+	It adds rectangular selections, selection left/right shift, unlimited undo and
+	redo, auto-indent, 'inline' selection paste, matching parentheses highlight/find,
+	commands bound via virtual events.
 
 AUTHOR
+
 	Send comments,suggestions,flames :) to:
 	
-	Current maintainer is Alexander Becker, L<c a p f a n -at- g m x %dot% d e>.
+	Current maintainer is Alexander Becker.
 	
 	Originally written by Alessandro Iob.
 	
 COPYRIGHT
 	
-	Copyright (c) 2016 Alexander Becker. All rights reserved. 
+	Copyright (c) 2016-2021 Alexander Becker. All rights reserved. 
 	This program is free software; you can redistribute it and/or modify it under 
 	the same terms as Perl itself.
 	
@@ -34,4 +35,4 @@ HOW TO BUILD AND INSTALL
 	
 TODO
 
-	Configurable syntax highlighting ( as a separate module???).
+	Configurable syntax highlighting (as a separate module???).

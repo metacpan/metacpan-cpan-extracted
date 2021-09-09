@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2015-2018 -- leonerd@leonerd.org.uk
 
-package Term::VTerm::Screen;
+package Term::VTerm::Screen 0.07;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.06';
 
 =head1 NAME
 
@@ -61,7 +59,7 @@ state.
    $str = $screen->get_text( $rect )
 
 Returns a UTF-8 string containing the text in the screen buffer within the
-given C<VTermRect>.
+given L<Term::VTerm::Rect>.
 
 =head2 set_callbacks
 
@@ -75,19 +73,19 @@ Sets the screen-layer callbacks. Takes the following named arguments:
 
    $on_damage->( $rect )
 
-C<$rect> is a C<VTermRect> structure.
+C<$rect> is a L<Term::VTerm::Rect> instance.
 
 =item on_moverect => CODE
 
    $on_moverect->( $dest, $src )
 
-C<$dest> and C<$src> are C<VTermRect> structures.
+C<$dest> and C<$src> are L<Term::VTerm::Rect> instances.
 
 =item on_movecursor => CODE
 
    $on_movecursor->( $pos, $oldpos, $is_visible )
 
-C<$pos> and C<$oldpos> are a C<VTermPos>. C<$is_visible> is a boolean.
+C<$pos> and C<$oldpos> are a L<Term::VTerm::Pos>. C<$is_visible> is a boolean.
 
 =item on_settermprop => CODE
 
@@ -110,7 +108,7 @@ the property type - see similar to C<get_penattr>.
 
    $col = $screen->convert_color_to_rgb( $col )
 
-Converts a C<VTermColor> structure from indexed to RGB form.
+Converts a L<Term::VTerm::Color> instance from indexed to RGB form.
 
 =cut
 
@@ -156,7 +154,7 @@ Font selection; an integer between 0 and 10.
 
 =head2 $bg = $cell->bg
 
-The foreground and background colours, as C<VTermColor> instances.
+The foreground and background colours, as L<Term::VTerm::Color> instances.
 
 =cut
 

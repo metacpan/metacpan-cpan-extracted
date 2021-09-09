@@ -9,7 +9,7 @@ Smartcat::App::Utils tests
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More tests => 25;
 use Test::Exception;
 use Test::Fatal;
 
@@ -41,7 +41,49 @@ is( get_ts_file_key(qw( var/serge/ts/test_smartcat_folders var/serge/ts/test_sma
 
 is( get_ts_file_key(qw( var/serge/ts/test_smartcat_folders var/serge/ts/test_smartcat_folders/uk/en.json )), 'en.json (uk)',
     "ts file key built corretly");
+    
+is( get_ts_file_key(qw( var/serge/ts/test_smartcat_folders var/serge/ts/test_smartcat_folders/uk/en.json 1 )), 'en.json (uk)',
+    "ts file key built correctly");
+    
+is( get_ts_file_key(qw( var/serge/ts/test_smartcat_folders var/serge/ts/test_smartcat_folders/uk/en---123.json 1 )), '123.json (uk)',
+    "ts file key built correctly");
+    
+is( get_ts_file_key(qw( var/serge/ts/test_smartcat_folders var/serge/ts/test_smartcat_folders/uk/en---777---123.json 1 )), '123.json (uk)',
+    "ts file key built correctly");
 
+is( get_document_key(qw( en---123.json_ru ru )), 'en---123.json (ru)',
+    "document key built correctly");
+
+is( get_document_key(qw( inner_folder/en---123.json_ru ru )), 'inner_folder/en---123.json (ru)',
+    "document key built correctly");
+
+is( get_document_key(qw( en---123.json_ru ru 1 )), '123.json (ru)',
+    "document key built correctly");
+
+is( get_document_key(qw( inner_folder/en---123.json_ru ru 1 )), 'inner_folder/123.json (ru)',
+    "document key built correctly");
+
+is( get_document_key(qw( en---777---123.json_ru ru 1 )), '123.json (ru)',
+    "document key built correctly");
+
+is( get_document_key(qw( inner_folder/en---777---123.json_ru ru 1 )), 'inner_folder/123.json (ru)',
+    "document key built correctly");
+
+is ( get_file_id(qw(en.json)), undef,
+    "file id built correctly");
+
+is ( get_file_id(qw(en---123.json)), "123",
+    "file id built correctly");
+
+is ( get_file_id(qw(en---777---123.json)), "123",
+    "file id built correctly");
+
+is ( get_file_id(qw(inner_folder/en---123.json)), "123",
+    "file id built correctly");
+
+is ( get_file_id(qw(inner_folder/en---777---123.json)), "123",
+    "file id built correctly");
+    
 my $test_data_dir =
   catfile( dirname( abs_path(__FILE__) ), 'data' );
 

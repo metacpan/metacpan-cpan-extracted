@@ -1,6 +1,6 @@
 package Bitcoin::Crypto::Types;
 
-our $VERSION = "1.000";
+our $VERSION = "1.001";
 
 use v5.10;
 use warnings;
@@ -8,7 +8,7 @@ use Type::Library -base;
 use Type::Coercion;
 use Types::Common::Numeric qw(assert_PositiveInt);
 use Types::Standard qw(Int InstanceOf);
-use Math::BigInt 1.999808 try => 'LTM,GMP';
+use Math::BigInt 1.999808 try => 'GMP,LTM';
 
 __PACKAGE__->add_type(
 	name => "IntMaxBits",

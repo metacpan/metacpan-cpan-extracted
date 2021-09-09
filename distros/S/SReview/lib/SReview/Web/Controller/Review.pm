@@ -77,13 +77,16 @@ sub update {
                 return;
         }
         $talk->add_correction(serial => 0);
-        if($c->param('serial') ne $talk->corrections->{serial}) {
+        if($c->param('serial') != $talk->corrections->{serial}) {
                 $c->stash(error => 'This talk was updated (probably by someone else) since you last loaded it. Please reload the page, and try again.');
                 $c->render(variant => 'error');
                 return;
         }
+        if(defined($c->param("comment_text")) && length($c->param("comment_text")) > 0) {
+                $talk->comment($c->param("comment_text"));
+        }
 
-        if(defined($c->param("complete_reset")) && $c->param("complete_reset") == 1) {
+        if(defined($c->param("complete_reset")) && $c->param("complete_reset") eq "1") {
                 $talk->reset_corrections();
                 $talk->set_state("cutting");
                 $c->render(variant => 'reset');
@@ -100,6 +103,7 @@ sub update {
 			$c->render(variant => "error");
 			return;
 		}
+                $talk->done_correcting;
                 $talk->state_done("preview");
                 $c->render(variant => 'done');
                 return;
@@ -152,8 +156,7 @@ sub update {
                 $talk->add_correction("offset_audio", "-" . $c->param("av_seconds"));
                 $corrections->{audio_offset} = "-" . $c->param("av_seconds");
         }
-        if(defined($c->param("comment_text")) && length($c->param("comment_text")) > 0) {
-                $talk->comment($c->param("comment_text"));
+        if(defined($c->param("broken")) && $c->param("broken") eq "yes") {
                 $talk->set_state("broken");
                 $c->stash(other_msg => $c->param("comment_text"));
                 $talk->done_correcting;

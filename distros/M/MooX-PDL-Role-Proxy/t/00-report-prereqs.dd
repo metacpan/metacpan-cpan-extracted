@@ -87,7 +87,7 @@ do { my $x = {
                                       'Types::Standard' => '0',
                                       'constant' => '0',
                                       'namespace::clean' => '0',
-                                      'perl' => '5.010',
+                                      'perl' => '5.010000',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -103,7 +103,6 @@ do { my $x = {
                                    'IPC::Open3' => '0',
                                    'Module::Load' => '0',
                                    'Moo' => '0',
-                                   'PDL' => '0',
                                    'PDL::Lite' => '0',
                                    'Role::Tiny' => '0',
                                    'Role::Tiny::With' => '0',

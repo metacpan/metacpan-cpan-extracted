@@ -1,12 +1,13 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 use utf8;
 
 use Test::More;
 
 use Term::VTerm qw( :attrs );
+use Term::VTerm::Color;
 
 my $vt = Term::VTerm->new( cols => 80, rows => 25 );
 $vt->set_utf8( 1 );

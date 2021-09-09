@@ -1,5 +1,5 @@
 Changes
-docs/AI-Perceptron-Simple-1.02.html
+docs/AI-Perceptron-Simple-1.03.html
 docs/book_list.csv
 docs/specifications.t
 lib/AI/Perceptron/Simple.pm
@@ -25,11 +25,14 @@ t/08-confusion_matrix_synonyms.t
 t/10-test.t
 t/10-test_synonyms_exam.t
 t/10-test_synonyms_work.t
+t/12-shuffle_data.t
+t/12-shuffle_data_synonym.t
 t/book_list_test-filled-non-binary.csv
 t/book_list_test-filled.csv
 t/book_list_test.csv
 t/book_list_test_exam-filled.csv
 t/book_list_test_work-filled.csv
+t/book_list_to_shuffle.csv
 t/book_list_train.csv
 t/book_list_validate-filled.csv
 t/book_list_validate.csv
@@ -41,6 +44,9 @@ t/perceptron_state_synonyms.nerve
 t/perceptron_tame.nerve
 t/portable.nerve
 t/portable_nerve.yaml
+t/shuffled_1.csv
+t/shuffled_2.csv
+t/shuffled_3.csv
 xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

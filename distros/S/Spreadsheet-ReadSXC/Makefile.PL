@@ -61,6 +61,7 @@ my %module = (
         'XML::Twig::XPath'   => 0,
         'Storable'           => 0,
         'Moo'                => 2,
+        'Scalar::Util'       => 0, # for weaken()
     },
     TEST_REQUIRES => {
         'Test::More'     => 0,

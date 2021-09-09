@@ -1,12 +1,15 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 use utf8;
 
 use Test::More;
 
 use Term::VTerm;
+use Term::VTerm::Color;
+use Term::VTerm::Pos;
+use Term::VTerm::Rect;
 
 use Encode qw( encode_utf8 );
 

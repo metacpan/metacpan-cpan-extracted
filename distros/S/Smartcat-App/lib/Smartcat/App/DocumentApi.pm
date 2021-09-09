@@ -32,6 +32,29 @@ sub new {
     return $self;
 }
 
+sub rename_document {
+    my ( $self, $document_id, $document_name ) = @_;
+    return unless $document_id && $document_name;
+
+    $log->info("Renaming document '$document_id' to '$document_name'...");
+    my $utf8_name = $document_name;
+    utf8::encode($utf8_name);
+    my %args = (
+        document_id           => $document_id,
+        name                  => $utf8_name,
+    );
+
+    eval { $self->{api}->document_rename(%args) };
+    die $log->error(
+        sprintf(
+            "Failed to rename document '%s' to '%s'.\nError:\n%s",
+            $document_id, $document_name, format_error_message($@)
+        )
+    ) if $@;
+
+    return;
+}
+
 sub update_document {
     my ( $self, $path, $document_id ) = @_;
     return unless $path && $document_id;
@@ -51,6 +74,7 @@ sub update_document {
         update_document_model => $doc_props,
         file                  => $utf8_path
     );
+
     $args{disassemble_algorithm_name} =
       $self->{rundata}->{disassemble_algorithm_name}
       if defined $self->{rundata}->{disassemble_algorithm_name};

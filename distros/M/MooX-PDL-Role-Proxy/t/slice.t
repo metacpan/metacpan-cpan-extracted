@@ -3,16 +3,15 @@
 use Test::Lib;
 use Test2::V0;
 use Test2::Tools::PDL;
-
 use Scalar::Util qw[ refaddr ];
 
-
+use My::Test::Role;
 package Test {
 
     use Role::Tiny::With;
     use PDL::Lite;
 
-    with 'My::Test::Role::Single';
+    with My::Test::Role::Single();
 
     sub test_obj {
         my $class = shift;
