@@ -4,17 +4,17 @@ package SPVM::ByteList;
 
 =head1 NAME
 
-SPVM::ByteList - Dynamic Byte Array
+SPVM::ByteList - ByteList in SPVM | Dynamic Byte Array
 
 =head1 SYNOPSYS
   
-  use SPVM::ByteList;
+  use ByteList;
   
   # Create a byte list with array
-  my $byte_list = SPVM::ByteList->new([(byte)1, 2, 3]);
+  my $byte_list = ByteList->new([(byte)1, 2, 3]);
   
   # Create a byte list with array length
-  my $byte_list = SPVM::ByteList->new_len(10);
+  my $byte_list = ByteList->new_len(10);
 
   # Get list length
   my $length = $byte_list->length;
@@ -43,20 +43,20 @@ SPVM::ByteList - Dynamic Byte Array
   # Remove byte value
   my $byte_value = $byte_list->remove(1);
 
-  # Convert SPVM::ByteList to byte array.
+  # Convert ByteList to byte array.
   my $byte_array = $byte_list->to_array;
 
 =head1 DESCRIPTION
 
-L<SPVM::ByteList> is Dynamic Byte Array.
+L<ByteList|SPVM::ByteList> is Dynamic Byte Array.
 
-=head1 STATIC METHODS
+=head1 CLASS METHODS
 
 =head2 new
 
-    sub new : SPVM::ByteList ($array : byte[])
+    sub new : ByteList ($array : byte[])
 
-Create a new L<SPVM::ByteList> object with byte array.
+Create a new L<ByteList|SPVM::ByteList> object with byte array.
 
 Internally, new array is created, and each element of argument array is copied to internal array.
 
@@ -64,9 +64,9 @@ If array is undef, 0-length internal array is created.
 
 =head2 new_len
 
-    sub new_len : SPVM::ByteList ($length : int)
+    sub new_len : ByteList ($length : int)
 
-Create a new L<SPVM::ByteList> object with array length.
+Create a new L<ByteList|SPVM::ByteList> object with array length.
 
 =head1 INSTANCE METHODS
 
@@ -143,7 +143,7 @@ If there are no elements in the list, exception occur.
 
   sub to_array : byte[] ($self : self)
 
-Convert L<SPVM::ByteList> to byte array.
+Convert L<ByteList|SPVM::ByteList> to byte array.
 
 =head2 unshift
 

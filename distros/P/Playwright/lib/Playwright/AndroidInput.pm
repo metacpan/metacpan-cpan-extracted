@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::AndroidInput;
-$Playwright::AndroidInput::VERSION = '0.013';
+$Playwright::AndroidInput::VERSION = '0.014';
 use parent 'Playwright::Base';
 
 sub new {
@@ -18,21 +18,21 @@ sub new {
     return $self->SUPER::new(%options);
 }
 
-sub press {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'press',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub drag {
     my $self = shift;
     return $self->_request(
         args    => [@_],
         command => 'drag',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub press {
+    my $self = shift;
+    return $self->_request(
+        args    => [@_],
+        command => 'press',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -112,7 +112,7 @@ Playwright::AndroidInput - Automatically generated class for Playwright::Android
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 CONSTRUCTOR
 
@@ -123,17 +123,17 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 press(@args)
-
-Execute the AndroidInput::press playwright routine.
-
-See L<https://playwright.dev/api/class-AndroidInput#AndroidInput-press> for more information.
-
 =head2 drag(@args)
 
 Execute the AndroidInput::drag playwright routine.
 
 See L<https://playwright.dev/api/class-AndroidInput#AndroidInput-drag> for more information.
+
+=head2 press(@args)
+
+Execute the AndroidInput::press playwright routine.
+
+See L<https://playwright.dev/api/class-AndroidInput#AndroidInput-press> for more information.
 
 =head2 tap(@args)
 

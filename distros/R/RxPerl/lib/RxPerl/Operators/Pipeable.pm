@@ -20,7 +20,7 @@ our @EXPORT_OK = qw/
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.8.0";
+our $VERSION = "v6.8.1";
 
 sub op_audit_time {
     my ($duration) = @_;
@@ -381,7 +381,7 @@ sub op_distinct_until_key_changed {
     my ($key) = @_;
 
     return op_distinct_until_changed(sub {
-        $_[0]->{$key} eq $_[1]->{$key};
+        _eqq($_[0]->{$key}, $_[1]->{$key});
     }),
 }
 

@@ -4,30 +4,30 @@ package SPVM::Double;
 
 =head1 NAME
 
-SPVM::Double - Double object
+SPVM::Double - Double in SPVM | Double object
 
 =head1 SYNOPSYS
 
-  use SPVM::Double;
+  use Double;
   
-  my $double_object = SPVM::Double->new(0.25);
+  my $double_object = Double->new(0.25);
   my $double_value = $double_object->value;
 
 =head1 DESCRIPTION
 
-L<SPVM::Double> object stores a C<double> value.
+L<Double|SPVM::Double> object stores a C<double> value.
 
 This object is immutable and its value cannot be changed.
 
-L<SPVM::Double> is automatically loaded just after the program starts.
+L<Double|SPVM::Double> is automatically loaded just after the program starts.
 
-=head1 STATIC METHODS
+=head1 CLASS METHODS
 
 =head2 new
 
-  sub new : SPVM::Double ($value : double)
+  sub new : Double ($value : double)
 
-Create a new L<SPVM::Double> object with a C<double> value.
+Create a new L<Double|SPVM::Double> object with a C<double> value.
 
 =head1 INSTANCE METHODS
 

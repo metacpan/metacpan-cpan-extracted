@@ -1,5 +1,10 @@
 Revision history for Perl extension RxPerl
 
+v6.8.1 2021-09-10T04:54:47Z
+
+    - improved documentation of rx_partition
+    - FIXED: op_distinct_until_key_changed supports undef values w/o warning
+
 v6.8.0 2021-08-02T05:38:17Z
 
     - added rx_partition

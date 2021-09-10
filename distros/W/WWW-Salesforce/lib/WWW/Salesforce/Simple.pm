@@ -6,8 +6,7 @@ use warnings;
 use base 'WWW::Salesforce';
 
 #handle versioning and exporting
-our $VERSION = '0.303';
-$VERSION = eval $VERSION;
+our $VERSION = '0.304';
 
 # alias these methods to the base class
 

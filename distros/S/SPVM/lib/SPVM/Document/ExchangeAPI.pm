@@ -14,23 +14,23 @@ If you load SVPM module from Perl, use the following syntax.
 
   use SPVM 'Foo';
 
-Suppose the following C<Foo.spvm> is placed on a module search path.
+Suppose the following C<SPVM/Foo.spvm> is placed on a module search path.
 
-  # Foo.spvm
-  package Foo {
+  # SPVM/Foo.spvm
+  class Foo {
     sub sum : int ($x1: int, $x2: int) {
       return $x1 + $x2;
     }
   }
 
-If you load C<Foo::Bar> module, do the following.
+If you load SPVM C<Foo::Bar> module, do the following.
 
   use SPVM 'Foo::Bar';
 
-Suppose the following C<Foo/Bar.spvm> is placed on a module search path.
+Suppose the following C<SPVM/Foo/Bar.spvm> is placed on a module search path.
 
-  # Foo/Bar.spvm
-  package Foo::Bar {
+  # SPVM/Foo/Bar.spvm
+  class Foo::Bar {
     sub sum : int ($x1: int, $x2: int) {
       return $x1 + $x2;
     }
@@ -46,18 +46,18 @@ A default SPVM runtime is created the first time you call a method of SPVM modul
 
 The method of SPVM module can be called from Perl directory.
 
-=head2 CALL STATIC METHOD
+=head2 CALL CLASS METHOD
 
-Let's call SPVM static method from Perl.
+Let's call SPVM class method from Perl.
 
   use SPVM 'Foo';
 
-  my $total = Foo->sum(1, 2);
+  my $total = SPVM::Foo->sum(1, 2);
 
 The definition of C<Foo> module is the following.
 
-  # Foo.spvm
-  package Foo {
+  # SPVM/Foo.spvm
+  class Foo {
     sub sum : int ($x1: int, $x2: int) {
       return $x1 + $x2;
     }
@@ -79,14 +79,14 @@ Let's call SPVM instance method from Perl.
 
   use SPVM 'Foo';
 
-  my $foo = Foo->new;
+  my $foo = SPVM::Foo->new;
 
   my $total = $foo->sum(1, 2);
 
 The definition of C<Foo> module is the following.
 
-  # Foo.spvm
-  package Foo {
+  # SPVM/Foo.spvm
+  class Foo {
     sub new : Foo () {
       return new Foo;
     }
@@ -98,48 +98,160 @@ The definition of C<Foo> module is the following.
 
 =head2 ARGUMENT CONVERSION
 
-=head3 Perl Scalar to SPVM Number
+Perl arguments are converted to SPVM arguments in the following rules.
 
-If the argument type of the SPVM Method definition is a Numeric Type, the argument value is <a href="#exchange-api-rule-perl-scalar-to-spvm-numeric">Perl scalar data. It is converted</a> to SPVM number by the Rule to Convert to SPVM number types.
+=head3 Perl scalar to SPVM byte
 
-  # SPVM Method definition
-  package Foo {
-    sub call_byte : void ($num: byte);
-    sub call_short : void ($num: short);
-    sub call_int : void ($num: int);
-    sub call_long : void ($num: long);
-    sub call_float : void ($num: float);
-    sub call_double : void ($num: double);
-  }
+If the SPVM argument type is C<byte>, Perl scalar is converted to SPVM C<byte> value using L<SvIV of perlapi|https://perldoc.perl.org/perlapi#SvIV>
 
-  # Call from Perl
-  Foo->call_byte(23);
-  Foo->call_short(23);
-  Foo->call_int(23);
-  Foo->call_long(23);
-  Foo->call_float(2.3);
-  Foo->call_double(2.3);
+  (int8_t)SvIV(perl_scalar)
+
+=head3 Perl scalar to SPVM short
+
+If the SPVM argument type is C<short>, Perl scalar is converted to SPVM C<short> value using L<SvIV of perlapi|https://perldoc.perl.org/perlapi#SvIV>
+  
+  (int16_t)SvIV(perl_scalar)
+
+=head3 Perl scalar to SPVM int
+
+If the SPVM argument type is C<int>, Perl scalar is converted to SPVM C<int> value using L<SvIV of perlapi|https://perldoc.perl.org/perlapi#SvIV>
+
+  (int32_t)SvIV(perl_scalar)
+
+=head3 Perl scalar to SPVM long
+
+If the SPVM argument type is C<long>, Perl scalar is converted to SPVM C<long> value using L<SvIV of perlapi|https://perldoc.perl.org/perlapi#SvIV>
+
+  (int64_t)SvIV(perl_scalar)
+
+=head3 Perl scalar to SPVM float
+
+If the SPVM argument type is C<float>, Perl scalar is converted to SPVM C<float> value using L<SvNV of perlapi|https://perldoc.perl.org/perlapi#SvIV>
+
+  (float)SvNV(perl_scalar)
+
+=head3 Perl scalar to SPVM double
+
+If the SPVM argument type is C<double>, Perl scalar is converted to SPVM C<double> value using L<SvNV of perlapi|https://perldoc.perl.org/perlapi#SvIV>
+
+  (double)SvNV(perl_scalar)
+
+=head3 Perl value to SPVM string
+
+=head4 Perl scalar to SPVM string
+
+If the SPVM argument type is C<string>, the Perl scalar is converted to SPVM C<string> value.
+
+The scalar value must be non-ref scalar, otherwise a exception occurs.
+
+The scalar value is assumed to a Perl decoded string, and is converted to a SPVM C<string>.
+
+=head4 string object to SPVM string
+
+A string object which class name is L<SPVM::BlessedObject::String> is converted to a SPVM C<string>.
+
+=head4 other to SPVM string
+
+If the Perl value is not the avobe things, a exception occurs.
+
+=head3 Perl array reference to SPVM array
+
+A Perl array reference is converted to a SPVM array by the following rules.
+
+=head4 Perl array reference to SPVM byte array
+
+If the SPVM argument type is C<byte[]>, the Perl array reference is converted to SPVM array which type is C<byte[]>. Each element is converted to C<byte> value by L<the rule of Perl scalar to SPVM byte|"Perl scalar to SPVM byte">. Perl C<undef> is coverted to SPVM C<undef>.
+
+=head4 Perl array reference to SPVM short array
+
+If the SPVM argument type is C<short[]>, the Perl array reference is converted to SPVM array which type is C<short[]>. Each element is converted to C<short> value by L<the rule of Perl scalar to SPVM short|"Perl scalar to SPVM short">. Perl C<undef> is coverted to SPVM C<undef>.
+
+=head4 Perl array reference to SPVM int array
+
+If the SPVM argument type is C<int[]>, the Perl array reference is converted to SPVM array which type is C<int[]>. Each element is converted to C<int> value by L<the rule of Perl scalar to SPVM int|"Perl scalar to SPVM int">. Perl C<undef> is coverted to SPVM C<undef>.
+
+=head4 Perl array reference to SPVM long array
+
+If the SPVM argument type is C<long[]>, the Perl array reference is converted to SPVM array which type is C<long[]>. Each element is converted to C<long> value by L<the rule of Perl scalar to SPVM long|"Perl scalar to SPVM long">. Perl C<undef> is coverted to SPVM C<undef>.
+
+=head4 Perl array reference to SPVM float array
+
+If the SPVM argument type is C<float[]>, the Perl array reference is converted to SPVM array which type is C<float[]>. Each element is converted to C<float> value by L<the rule of Perl scalar to SPVM float|"Perl scalar to SPVM float">. Perl C<undef> is coverted to SPVM C<undef>.
+
+=head4 Perl array reference to SPVM double array
+
+If the SPVM argument type is C<double[]>, the Perl array reference is converted to SPVM array which type is C<double[]>. Each element is converted to C<double> value by L<the rule of Perl scalar to SPVM double|"Perl scalar to SPVM double">. Perl C<undef> is coverted to SPVM C<undef>.
+
+=head4 Perl array reference to SPVM string array
+
+If the SPVM argument type is C<string[]>, the Perl array reference is converted to SPVM array which type is C<string[]>. Each element is converted to C<string> value by L<the rule of Perl scalar to SPVM string|"Perl scalar to SPVM string">. Perl C<undef> is coverted to SPVM C<undef>.
+
+=head3 SPVM array to SPVM array
+
+A SPVM array which inherits L<SPVM::BlessedObject::Array> is converted to a SPVM array by the following rules.
+
+=head4 SPVM array to SPVM byte array
+
+If the SPVM argument type is C<byte[]>, the SPVM array which inherits L<SPVM::BlessedObject::Array> is converted to SPVM array which type is C<byte[]>. Each element is converted to C<byte> value by L<the rule of Perl scalar to SPVM byte|"Perl scalar to SPVM byte">. Perl C<undef> is coverted to SPVM C<undef>.
+
+If the type is invalid, a exception occurs.
+
+=head4 SPVM array to SPVM short array
+
+If the SPVM argument type is C<short[]>, the SPVM array which inherits L<SPVM::BlessedObject::Array> is converted to SPVM array which type is C<short[]>. Each element is converted to C<short> value by L<the rule of Perl scalar to SPVM short|"Perl scalar to SPVM short">. Perl C<undef> is coverted to SPVM C<undef>.
+
+If the type is invalid, a exception occurs.
+
+=head4 SPVM array to SPVM int array
+
+If the SPVM argument type is C<int[]>, the SPVM array which inherits L<SPVM::BlessedObject::Array> is converted to SPVM array which type is C<int[]>. Each element is converted to C<int> value by L<the rule of Perl scalar to SPVM int|"Perl scalar to SPVM int">. Perl C<undef> is coverted to SPVM C<undef>.
+
+If the type is invalid, a exception occurs.
+
+=head4 SPVM array to SPVM long array
+
+If the SPVM argument type is C<long[]>, the SPVM array which inherits L<SPVM::BlessedObject::Array> is converted to SPVM array which type is C<long[]>. Each element is converted to C<long> value by L<the rule of Perl scalar to SPVM long|"Perl scalar to SPVM long">. Perl C<undef> is coverted to SPVM C<undef>.
+
+If the type is invalid, a exception occurs.
+
+=head4 SPVM array to SPVM float array
+
+If the SPVM argument type is C<float[]>, the SPVM array which inherits L<SPVM::BlessedObject::Array> is converted to SPVM array which type is C<float[]>. Each element is converted to C<float> value by L<the rule of Perl scalar to SPVM float|"Perl scalar to SPVM float">. Perl C<undef> is coverted to SPVM C<undef>.
+
+If the type is invalid, a exception occurs.
+
+=head4 SPVM array to SPVM double array
+
+If the SPVM argument type is C<double[]>, the SPVM array which inherits L<SPVM::BlessedObject::Array> is converted to SPVM array which type is C<double[]>. Each element is converted to C<double> value by L<the rule of Perl scalar to SPVM double|"Perl scalar to SPVM double">. Perl C<undef> is coverted to SPVM C<undef>.
+
+If the type is invalid, a exception occurs.
+
+=head4 SPVM array to SPVM string array
+
+If the SPVM argument type is C<string[]>, the SPVM array which inherits L<SPVM::BlessedObject::Array> is converted to SPVM array which type is C<string[]>. Each element is converted to C<string> value by L<the rule of Perl scalar to SPVM string|"Perl scalar to SPVM string">. Perl C<undef> is coverted to SPVM C<undef>.
+
+If the type is invalid, a exception occurs.
 
 =head3 Perl Hash reference to SPVM Multi Numeric Type
 
 If the argument type in the SPVM Method definition was a Multi Numeric Type, the argument value must be a hash reference and the key must contain all Multi Numeric field names. Otherwise, an Exception will be raised. The value of the hash reference is <a href="#exchange-api-rule-perl-scalar-to-spvm-numeric">The rule that converts the scalar value of Perl to the Numeric Type of SPVM</a> Is converted to a value.
 
   # SPVM Method definition
-  package Foo {
-    sub call_complex_float : void ($z: SPVM::Complex_2f);
-    sub call_complex_double : void ($z: SPVM::Complex_2d);
+  class Foo {
+    sub call_complex_float : void ($z: Complex_2f);
+    sub call_complex_double : void ($z: Complex_2d);
   }
 
   # Call from Perl
-  Foo->call_complex_float({re => 2.3, im => 5.6});
-  Foo->call_complex_double({re => 2.3, im => 5.6});
+  SPVM::Foo->call_complex_float({re => 2.3, im => 5.6});
+  SPVM::Foo->call_complex_double({re => 2.3, im => 5.6});
   
 =head3 Perl Refernce to SPVM Numeric Reference Type
 
 If the argument type in the SPVM Method definition was a Numeric Reference Type, the argument value must be a scalar reference. Otherwise, an Exception will be raised.
 
   # SPVM Method definition
-  package Foo {
+  class Foo {
     sub call_byte_ref : void ($num: byte&);
     sub call_short_ref : void ($num: short&);
     sub call_int_ref : void ($num: int&);
@@ -150,34 +262,26 @@ If the argument type in the SPVM Method definition was a Numeric Reference Type,
 
   # Call from Perl
   my $num_byte = 23;
-  Foo->call_byte_ref(\$num_byte);
+  SPVM::Foo->call_byte_ref(\$num_byte);
 
   my $num_short = 23;
-  Foo->call_short_ref(\$num_short);
+  SPVM::Foo->call_short_ref(\$num_short);
 
   my $num_int = 23;
-  Foo->call_int_ref(\$num_int);
+  SPVM::Foo->call_int_ref(\$num_int);
 
   my $num_long = 23;
-  Foo->call_long_ref(\$num_long);
+  SPVM::Foo->call_long_ref(\$num_long);
 
   my $num_float = 23;
-  Foo->call_float_ref(\$num_float);
+  SPVM::Foo->call_float_ref(\$num_float);
 
   my $num_double = 23;
-  Foo->call_double_ref(\$num_double);
+  SPVM::Foo->call_double_ref(\$num_double);
 
 If the argument type in the SPVM Method definition was a Multi Numeric Reference Type, the argument value is a hash reference reference and the key contains all Multi Numeric field names. is needed. Otherwise, an Exception will be raised.
 
-If the argument type of the SPVM Method definition is a numeric array type, the Perl Array Reference is converted to the corresponding Perl L<SPVM::BlessedObject::Array> object. The value of the element is <a href="#exchange-api-rule-perl-scalar-to-spvm-numeric">The rule that converts the scalar value of Perl to the Numeric Type of SPVM</a> Will be converted to. The argument is a string,
-
-If the argument type of the SPVM Method definition is a byte[] value, the Perl decoded string is encoded in UTF-8 and represents byte[] Perl's SPVM::Data: Converted to a: Array object.
-
 If the argument type of the SPVM Method definition is an object type and the value passed to the argument is an Undefined Value, it is converted to the SPVM Undefined Value.
-
-If the argument type of the SPVM Method definition is a string compatible type and the value passed to the argument is a scalar value that is not a reference, it is encoded in UTF-8 and represents the SPVM byte[] value. Converts to a Perl L<SPVM::BlessedObject::Array> object.
-
-If the argument type of the SPVM Method definition is a string compatible array type and the value passed to the argument is Array Reference and the first element is a scalar value that is not a reference, SPVM byte[] Converted to a Perl L<SPVM::BlessedObject::Array> object representing[]. If the element has an Undefined Value, it is converted to SPVM Undefined Value, otherwise it is encoded to UTF-8 and converted to SPVM byte[] value.
 
 If the argument type of the SPVM Method definition is a byte[] value and the value passed to the argument is Array Reference, convert it to a Perl L<SPVM::BlessedObject::Array> object that represents byte[]. Will be done. The element value is converted by the <a href="#exchange-api-rule-perl-scalar-to-spvm-numeric">Rule to Convert Perl scalar data ​​to SPVM Numeric Value</a>.
 
@@ -193,30 +297,6 @@ If the argument type of the SPVM Method definition is double[] type and the valu
 
 If the argument type of the SPVM Method definition is an object[] type and the value passed to the argument is Array Reference, convert it to a Perl L<SPVM::BlessedObject::Array> object that represents object[]. Will be done. If the element value is an Undefined Value, it is converted to SPVM undefined, and if it is a non-reference scalar value, it is encoded to UTF-8 and converted to SPVM byte[] value. If it is SPVM::Data object, it will not be converted. Otherwise, an Exception will be raised.
 
-=head3 Convert Perl scalar data to SPVM byte value
-  
-
-  (int8_t)SvIV(perl_scalar_data)
-
-=head3 Convert Perl scalar data to SPVM short value
-
-  (int16_t)SvIV(perl_scalar_data)
-
-=head3 Convert Perl scalar data to SPVM int value
-
-  (int32_t)SvIV(perl_scalar_data)
-
-=head3 Convert Perl scalar data to SPVM long value
-
-  (int64_t)SvIV(perl_scalar_data)
-
-=head3 Convert Perl scalar data to SPVM float value
-
-  (float)SvNV(perl_scalar_data)
-
-Convert Perl scalar data to SPVM double value
-
-  (double)SvNV(perl_scalar_data)
   
 =head2 RETURN VALUE CONVERSION
 
@@ -274,7 +354,7 @@ SPVM string is converted to a Perl decoded string. If SPVM C<undef> is returned,
 
 =head3 SPVM object to Perl object
 
-a SPVM object(not contain array) is converted to a Perl object which class name is same as SPVM class name and inherits L<SPVM::BlessedObject::Package>.
+a SPVM object(not contain array) is converted to a Perl object which class name is same as SPVM class name and inherits L<SPVM::BlessedObject::Class>.
 
 =head3 SPVM multi numeric value to Perl hash reference
 
@@ -286,7 +366,7 @@ a SPVM array is converted to a Perl L<SPVM::BlessedObject::Array> object. If SPV
 
 =head3 SPVM object to Perl object
 
-a SPVM object is converted to a Perl object which package name is same as SPVM package name and inherits L<SPVM::BlessedObject::Package>.
+a SPVM object is converted to a Perl object which class name is same as SPVM class name and inherits L<SPVM::BlessedObject::Class>.
 
 =head1 FUNCTIONS AND METHODS
 
@@ -296,37 +376,37 @@ Funtions and methods which create SPVM datas and convert SVPM datas to/from Perl
 
   my $spvm_byte = SPVM::Byte->new(98);
 
-Convert a Perl scalar data to a L<SPVM::Byte> object. Return value is B<SPVM::Byte> object which inherits L<SPVM::BlessedObject::Package>.
+Convert a Perl scalar data to a L<SPVM::Byte> object. Return value is B<SPVM::Byte> object which inherits L<SPVM::BlessedObject::Class>.
 
 =head2 SPVM::Short->new
 
   my $spvm_short = SPVM::Short->new(9800);
 
-Convert a Perl scalar data to a L<SPVM::Short> object. Return value is B<SPVM::Short> object which inherits L<SPVM::BlessedObject::Package>.
+Convert a Perl scalar data to a L<SPVM::Short> object. Return value is B<SPVM::Short> object which inherits L<SPVM::BlessedObject::Class>.
 
 =head2 SPVM::Int->new
 
   my $spvm_int = SPVM::Int->new(100000);
 
-Convert a Perl scalar data to a L<SPVM::Int> object. Return value is B<SPVM::Int> object which inherits L<SPVM::BlessedObject::Package>.
+Convert a Perl scalar data to a L<SPVM::Int> object. Return value is B<SPVM::Int> object which inherits L<SPVM::BlessedObject::Class>.
 
 =head2 SPVM::Long->new
 
   my $spvm_long = SPVM::Long->new(98);
 
-Convert a Perl scalar data to a L<SPVM::Long> object. Return value is B<SPVM::Long> object which inherits L<SPVM::BlessedObject::Package>.
+Convert a Perl scalar data to a L<SPVM::Long> object. Return value is B<SPVM::Long> object which inherits L<SPVM::BlessedObject::Class>.
 
 =head2 SPVM::Float->new
 
   my $spvm_float = SPVM::Float->new(2.5);Rule to Convert 
 
-Convert a Perl scalar data to a L<SPVM::Float> object. Return value is B<SPVM::Float> object which inherits L<SPVM::BlessedObject::Package>.
+Convert a Perl scalar data to a L<SPVM::Float> object. Return value is B<SPVM::Float> object which inherits L<SPVM::BlessedObject::Class>.
 
 =head2 SPVM::Double->new
 
   my $spvm_double = SPVM::Double->new(2.5);
 
-Convert a Perl scalar data to a L<SPVM::Double> object. Return value is B<SPVM::Double> object which inherits L<SPVM::BlessedObject::Package>.
+Convert a Perl scalar data to a L<SPVM::Double> object. Return value is B<SPVM::Double> object which inherits L<SPVM::BlessedObject::Class>.
 
 =head2 SPVM::new_byte_array
 
@@ -637,7 +717,7 @@ B<Examples:>
       {x => 6, y => 7, z => 8},
     ];
     my $spvm_mulnum_array = SPVM::new_mulnum_array("TestCase::Point_3d[],"$values);
-    ok(TestCase::ExchangeAPI-spvm_new_mulnum_array_double($spvm_mulnum_array));
+    ok(SPVM::TestCase::ExchangeAPI-spvm_new_mulnum_array_double($spvm_mulnum_array));
     my $out_values = $spvm_mulnum_array->to_elems;
     is_deeply($out_values, $values);
   }

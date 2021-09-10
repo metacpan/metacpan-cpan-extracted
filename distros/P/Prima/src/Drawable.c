@@ -31,6 +31,8 @@ Drawable_init( Handle self, HV * profile)
 	inherited init( self, profile);
 	apc_gp_init( self);
 	var-> w = var-> h = 0;
+	my-> set_alpha        ( self, pget_i ( alpha));
+	my-> set_antialias    ( self, pget_B ( antialias));
 	my-> set_color        ( self, pget_i ( color));
 	my-> set_backColor    ( self, pget_i ( backColor));
 	my-> set_fillMode     ( self, pget_i ( fillMode));
@@ -38,7 +40,7 @@ Drawable_init( Handle self, HV * profile)
 	my-> set_lineEnd      ( self, pget_i ( lineEnd));
 	my-> set_lineJoin     ( self, pget_i ( lineJoin));
 	my-> set_linePattern  ( self, pget_sv( linePattern));
-	my-> set_lineWidth    ( self, pget_i ( lineWidth));
+	my-> set_lineWidth    ( self, pget_f ( lineWidth));
 	my-> set_miterLimit   ( self, pget_i ( miterLimit));
 	my-> set_region       ( self, pget_H ( region));
 	my-> set_rop          ( self, pget_i ( rop));
@@ -284,18 +286,6 @@ Drawable_font_add( Handle self, Font * source, Font * dest)
 	return useSize && !useHeight;
 }
 
-
-int
-Drawable_get_paint_state( Handle self)
-{
-	if ( is_opt( optInDraw))
-		return psEnabled;
-	else if ( is_opt( optInDrawInfo))
-		return psInformation;
-	else
-		return psDisabled;
-}
-
 int
 Drawable_get_bpp( Handle self)
 {
@@ -308,20 +298,15 @@ Drawable_get_bpp( Handle self)
 	return ret;
 }
 
-SV *
-Drawable_linePattern( Handle self, Bool set, SV * pattern)
+int
+Drawable_get_paint_state( Handle self)
 {
-	if ( set) {
-		STRLEN len;
-		unsigned char *pat = ( unsigned char *) SvPV( pattern, len);
-		if ( len > 255) len = 255;
-		apc_gp_set_line_pattern( self, pat, len);
-	} else {
-		unsigned char ret[ 256];
-		int len = apc_gp_get_line_pattern( self, ret);
-		return newSVpvn((char*) ret, len);
-	}
-	return NULL_SV;
+	if ( is_opt( optInDraw))
+		return psEnabled;
+	else if ( is_opt( optInDrawInfo))
+		return psInformation;
+	else
+		return psDisabled;
 }
 
 Color
@@ -333,15 +318,6 @@ Drawable_get_nearest_color( Handle self, Color color)
 	color = apc_gp_get_nearest_color( self, color);
 	gpLEAVE;
 	return color;
-}
-
-Point
-Drawable_resolution( Handle self, Bool set, Point resolution)
-{
-	CHECK_GP(resolution);
-	if ( set)
-		croak("Attempt to write read-only property %s", "Drawable::resolution");
-	return apc_gp_get_resolution( self);
 }
 
 SV *
@@ -483,6 +459,15 @@ Drawable_height( Handle self, Bool set, int height)
 }
 
 Point
+Drawable_resolution( Handle self, Bool set, Point resolution)
+{
+	CHECK_GP(resolution);
+	if ( set)
+		croak("Attempt to write read-only property %s", "Drawable::resolution");
+	return apc_gp_get_resolution( self);
+}
+
+Point
 Drawable_size ( Handle self, Bool set, Point size)
 {
 	if ( set)
@@ -522,6 +507,213 @@ Drawable_put_image_indirect( Handle self, Handle image, int x, int y, int xFrom,
 }
 
 static Bool
+primitive( Handle self, Bool fill, char * method, ...)
+{
+	Bool r;
+	SV * ret;
+	char format[256];
+	va_list args;
+	va_start( args, method);
+	ENTER;
+	SAVETMPS;
+	strcpy(format, "<");
+	strncat(format, method, 255);
+	ret = call_perl_indirect( self, fill ? "fill_aa_primitive" : "stroke_aa_primitive", format, true, false, args);
+	va_end( args);
+	r = ret ? SvTRUE( ret) : false;
+	FREETMPS;
+	LEAVE;
+	return r;
+}
+
+#define IS_AA (var->antialias || (var->alpha < 255))
+#define TRUNC(x) x=trunc(x)
+#define TRUNC2(x,y) {TRUNC(x);TRUNC(y);}
+#define TRUNC4(x,y,z,t) {TRUNC(x);TRUNC(y);TRUNC(z);TRUNC(t);}
+
+
+Bool
+Drawable_arc( Handle self, double x, double y, double dX, double dY, double startAngle, double endAngle)
+{
+	CHECK_GP(false);
+	while ( startAngle > endAngle ) endAngle += 360.0;
+	return IS_AA ?
+		primitive( self, 0, "snnnnnn", "arc", x, y, dX-1, dY-1, startAngle, endAngle) :
+		apc_gp_arc(self, x, y, dX, dY, startAngle, endAngle);
+}
+
+Bool
+Drawable_chord( Handle self, double x, double y, double dX, double dY, double startAngle, double endAngle)
+{
+	CHECK_GP(false);
+	return IS_AA ?
+		primitive( self, 0, "snnnnnn", "chord", x, y, dX-1, dY-1, startAngle, endAngle) :
+		apc_gp_chord(self, x, y, dX, dY, startAngle, endAngle);
+}
+
+Bool
+Drawable_ellipse( Handle self, double x, double y,  double dX, double dY)
+{
+	CHECK_GP(false);
+	return IS_AA ?
+		primitive( self, 0, "snnnn", "ellipse", x, y, dX-1, dY-1) :
+		apc_gp_ellipse(self, x, y, dX, dY);
+}
+
+Bool
+Drawable_bar( Handle self, double x1, double y1, double x2, double y2)
+{
+	CHECK_GP(false);
+
+	if ( !var->antialias ) TRUNC4(x1,y1,x2,y2);
+
+	if (IS_AA) {
+		NPoint r[5] = { {x1,y1}, {x2,y1}, {x2,y2}, {x1,y2}, {x1,y1} };
+		return apc_gp_aa_fill_poly( self, 5, r);
+	} else
+		return apc_gp_bar(self, x1, y1, x2, y2);
+}
+
+Bool
+Drawable_bars( Handle self, SV * rects)
+{
+	int count;
+	Rect * p;
+	Bool ret = false, do_free;
+	CHECK_GP(false);
+	if (( p = prima_read_array( rects, "Drawable::bars",
+		IS_AA ? 'd' : 'i',
+		4, 0, -1, &count, &do_free)) == NULL)
+		return false;
+
+	if ( IS_AA ) {
+		int i;
+		NRect *r;
+		for ( i = 0, r = (NRect*)p; i < count; i++, r++) {
+			NPoint xr[5] = {
+				{r->left,r->bottom},
+				{r->left,r->top},
+				{r->right,r->top},
+				{r->right,r->bottom},
+				{r->left,r->bottom}
+			};
+			if ( !var->antialias) {
+				int j;
+				for ( j = 0; j < 5; j++)
+					TRUNC2(xr[j].x,xr[j].y);
+			}
+			if ( !( ret = apc_gp_aa_fill_poly( self, 5, xr)))
+				break;
+		}
+	} else
+		ret = apc_gp_bars( self, count, p);
+	if ( !ret) perl_error();
+	if ( do_free ) free( p);
+	return ret;
+}
+
+Bool
+Drawable_clear( Handle self, double x1, double y1, double x2, double y2)
+{
+	Bool full;
+	CHECK_GP(false);
+
+	full = x1 < 0 && y1 < 0 && x2 < 0 && y2 < 0;
+	if ( !var->antialias ) TRUNC4(x1,y1,x2,y2);
+	if ( !full && IS_AA) {
+		Bool ok;
+		Color color;
+		FillPattern fp;
+		NPoint r[5] = { {x1,y1}, {x2,y1}, {x2,y2}, {x1,y2}, {x1,y1} };
+		color = apc_gp_get_color(self);
+		memcpy(&fp, apc_gp_get_fill_pattern(self), sizeof(FillPattern));
+		apc_gp_set_color(self, apc_gp_get_back_color(self));
+		apc_gp_set_fill_pattern(self, fillPatterns[fpSolid]);
+		ok = apc_gp_aa_fill_poly( self, 5, r);
+		apc_gp_set_fill_pattern(self, fp);
+		apc_gp_set_color(self, color);
+		return ok;
+	} else return apc_gp_clear(self,
+		x1,y1,x2,y2
+	);
+}
+
+Bool
+Drawable_fill_chord( Handle self, double x, double y, double dX, double dY, double startAngle, double endAngle)
+{
+	CHECK_GP(false);
+	if (IS_AA) {
+		return primitive( self, 1, "snnnnnn", "chord", x, y, dX, dY, startAngle, endAngle);
+	} else return apc_gp_fill_chord(self,
+		x, y, dX, dY, startAngle, endAngle
+	);
+}
+
+Bool
+Drawable_fill_ellipse( Handle self, double x, double y,  double dX, double dY)
+{
+	if (IS_AA) {
+		return primitive( self, 1, "snnnn", "ellipse", x, y, dX, dY);
+	} else return apc_gp_fill_ellipse(self,
+		x, y, dX, dY
+	);
+}
+
+Bool
+Drawable_fill_sector( Handle self, double x, double y, double dX, double dY, double startAngle, double endAngle)
+{
+	CHECK_GP(false);
+	if (IS_AA) {
+		return primitive( self, 1, "snnnnnn", "sector", x, y, dX, dY, startAngle, endAngle);
+	} else return apc_gp_fill_sector(self,
+		x, y, dX, dY, startAngle, endAngle
+	);
+}
+
+Bool
+Drawable_fillpoly(Handle self, SV * points)
+{
+	int count;
+	void *p;
+	Bool ret = false;
+	Bool do_free = true;
+	CHECK_GP(false);
+
+	if (( p = prima_read_array(
+		points, "fillpoly",
+		IS_AA ? 'd' : 'i',
+		2, 2, -1, &count, 
+		(var->alpha < 255 && !var->antialias) ? NULL : &do_free
+	)) == NULL)
+		return false;
+
+	if ( var->alpha < 255 && !var->antialias ) {
+		int i;
+		NPoint *pp = (NPoint*)p;
+		for ( i = 0; i < count; i++, pp++) TRUNC2(pp->x,pp->y);
+	}
+
+	ret = IS_AA ?
+		apc_gp_aa_fill_poly( self, count, (NPoint*) p) :
+		apc_gp_fill_poly( self, count, (Point*) p);
+	if ( !ret) perl_error();
+	if ( do_free ) free(p);
+
+	return ret;
+}
+
+Bool
+Drawable_line(Handle self, double x1, double y1, double x2, double y2)
+{
+	CHECK_GP(false);
+	if (IS_AA)
+		return primitive( self, 0, "snnnn", "line", x1, y1, x2, y2);
+	else return apc_gp_line(self,
+		x1, y1, x2, y2
+	);
+}
+
+static Bool
 read_polypoints( Handle self, SV * points, char * procName, int min, Bool (*procPtr)(Handle,int,Point*))
 {
 	int count;
@@ -536,30 +728,35 @@ read_polypoints( Handle self, SV * points, char * procName, int min, Bool (*proc
 	return ret;
 }
 
-#define DEF_LINE_PROCESSOR(name,func) Bool \
-Drawable_##name( Handle self, SV * points)\
-{\
-	CHECK_GP(false);\
-	return read_polypoints( self, points, "Drawable::" #name, 2, func);\
+Bool
+Drawable_lines(Handle self, SV * lines)
+{
+	CHECK_GP(false);
+
+	if (IS_AA)
+		return primitive( self, 0, "sS", "lines", lines);
+	else
+		return read_polypoints( self, lines, "Drawable::lines", 2, apc_gp_draw_poly2);
 }
 
-DEF_LINE_PROCESSOR(polyline, apc_gp_draw_poly)
-DEF_LINE_PROCESSOR(lines, apc_gp_draw_poly2)
-DEF_LINE_PROCESSOR(fillpoly, apc_gp_fill_poly)
+Bool
+Drawable_polyline(Handle self, SV * lines)
+{
+	CHECK_GP(false);
+
+	if (IS_AA)
+		return primitive( self, 0, "sS", "line", lines);
+	else
+		return read_polypoints( self, lines, "Drawable::polyline", 2, apc_gp_draw_poly);
+}
 
 Bool
-Drawable_bars( Handle self, SV * rects)
+Drawable_rectangle( Handle self, double x1, double y1, double x2, double y2)
 {
-	int count;
-	Rect * p;
-	Bool ret = false, do_free;
 	CHECK_GP(false);
-	if (( p = prima_read_array( rects, "Drawable::bars", 'i', 4, 0, -1, &count, &do_free)) != NULL) {
-		ret = apc_gp_bars( self, count, p);
-		if ( !ret) perl_error();
-		if ( do_free ) free( p);
-	}
-	return ret;
+	return IS_AA ?
+		primitive( self, 0, "snnnn", "rectangle", x1,y1,x2,y2) :
+		apc_gp_rectangle(self, x1, y1, x2, y2);
 }
 
 SV *
@@ -630,7 +827,7 @@ static Bool
 render_point(
 	double t,
 	int degree, int n_points, int dimensions, double * v,
-	double * knots, int * last_found_knot, Point * result
+	double * knots, int * last_found_knot, Point * result, NPoint * nresult
 ) {
 	double lo, hi;
 	int l, i, n_knots = n_points + degree + 1, s, found = false;
@@ -676,12 +873,21 @@ render_point(
 	if ( dimensions == 3 ) {
 		double f;
 		f = v[s] / v[s+2];
-		result-> x = ( f < 0 ) ? (f - .5) : (f + .5);
+		if ( result )
+			result-> x = ( f < 0 ) ? (f - .5) : (f + .5);
+		else
+			nresult-> x = f;
 		f = v[s+1] / v[s+2];
-		result-> y = ( f < 0 ) ? (f - .5) : (f + .5);
-	} else {
+		if ( result )
+			result-> y = ( f < 0 ) ? (f - .5) : (f + .5);
+		else
+			nresult-> y = f;
+	} else if ( result ) {
 		result-> x = (v[s] < 0) ? (v[s] - .5) : (v[s] + .5);
 		result-> y = (v[s+1] < 0) ? (v[s+1] - .5) : (v[s+1] + .5);
+	} else {
+		nresult-> x = v[s];
+		nresult-> y = v[s+1];
 	}
 
 	return true;
@@ -765,8 +971,9 @@ Drawable_render_spline( SV * obj, SV * points, HV * profile)
 	dPROFILE;
 	NPoint *p, *pp;
 	Point *rendered, *storage;
+	NPoint *nrendered, *nstorage;
 	SV *ret;
-	Bool ok, closed;
+	Bool ok, closed, as_integer;
 	int i, j, degree, precision, n_points, final_size, k, dim, n_add_points, temp_size,
 		tangent, last_tangent;
 	double *knots, *weights, t, dt, *weighted, *temp;
@@ -794,6 +1001,8 @@ Drawable_render_spline( SV * obj, SV * points, HV * profile)
 		}
 	} else
 		precision = 24;
+
+	as_integer = pexist(integer) ? pget_B( integer ) : true;
 
 	p = (NPoint*) prima_read_array( points, "Drawable::render_spline", 'd', 2, degree + 1, -1, &n_points, NULL);
 	if ( !p) goto EXIT;
@@ -830,7 +1039,7 @@ Drawable_render_spline( SV * obj, SV * points, HV * profile)
 
 	/* allocate result storage */
 	precision *= n_points - n_add_points;
-	ret = prima_array_new(( precision + 1) * sizeof(Point) );
+	ret = prima_array_new(( precision + 1) * (as_integer ? sizeof(Point) : sizeof(NPoint)) );
 
 	temp_size = sizeof(double) * 3 * n_points;
 	if ( !(weighted = malloc( 2 * temp_size ))) {
@@ -850,14 +1059,20 @@ Drawable_render_spline( SV * obj, SV * points, HV * profile)
 
 	/* render */
 	final_size = 0;
-	rendered = storage = (Point*) prima_array_get_storage(ret);
+	if ( as_integer ) {
+		nrendered = nstorage = NULL;
+		rendered  = storage  = (Point*) prima_array_get_storage(ret);
+	} else {
+		rendered  = storage  = NULL;
+		nrendered = nstorage = (NPoint*) prima_array_get_storage(ret);
+	}
 	k = -1;
 	last_tangent = -1;
 	for ( i = 0, t = 0.0, dt = 1.0 / precision; i < precision - 1; i++, t += dt) {
 		memcpy( temp, weighted, temp_size);
-		if (!render_point(t, degree, n_points, dim, temp, knots, &k, rendered))
+		if (!render_point(t, degree, n_points, dim, temp, knots, &k, rendered, nrendered))
 			goto EXIT;
-		if ( i > 0 ) {
+		if ( as_integer && i > 0 ) {
 			/* primitive line detection */
 			tangent = tangent_detect( rendered-1, rendered);
 			if ( tangent == 0 ) continue;
@@ -875,26 +1090,38 @@ Drawable_render_spline( SV * obj, SV * points, HV * profile)
 				last_tangent = tangent;
 		}
 		final_size++;
-		rendered++;
+		if ( as_integer )
+			rendered++;
+		else
+			nrendered++;
 	}
 	memcpy( temp, weighted, temp_size);
-	if ( !render_point(1.0, degree, n_points, dim, temp, knots, &k, rendered))
+	if ( !render_point(1.0, degree, n_points, dim, temp, knots, &k, rendered, nrendered))
 		goto EXIT;
 	final_size++;
 	rendered++;
+	nrendered++;
 
 	/* looks good */
 	ok = true;
 	if ( closed ) {
 		final_size++;
-		*rendered = storage[0];
-		rendered++;
+		if ( as_integer ) {
+			*rendered = storage[0];
+			rendered++;
+		} else {
+			*nrendered = nstorage[0];
+			nrendered++;
+		}
 	}
 	if ( final_size == 1 ) {
 		final_size = 2;
-		storage[1] = storage[0];
+		if ( as_integer )
+			storage[1] = storage[0];
+		else
+			nstorage[1] = nstorage[0];
 	}
-	prima_array_truncate( ret, final_size * sizeof( Point) );
+	prima_array_truncate( ret, final_size * (as_integer ? sizeof( Point) : sizeof(NPoint)) );
 
 EXIT:
 	hv_clear(profile); /* old gencls bork */
@@ -903,7 +1130,10 @@ EXIT:
 	if (knots)    free(knots);
 	if (weights)  free(weights);
 	if ( ok ) {
-		return prima_array_tie( ret, sizeof(int), "i");
+		return prima_array_tie( ret,
+			as_integer ? sizeof(int) : sizeof(double),
+			as_integer ? "i" : "d"
+		);
 	} else {
 		if (ret)  sv_free(ret);
 		return newRV_noinc(( SV *) newAV());
@@ -922,6 +1152,8 @@ Drawable_render_polyline( SV * obj, SV * points, HV * profile)
 
 	if (( input = (double*) prima_read_array( points, "render_polyline", 'd', 2, 1, -1, &count, &free_input)) == NULL)
 		goto FAIL;
+
+	if ( pexist(integer)) as_integer = pget_B(integer);
 
 	if ( pexist(matrix) ) {
 		int i;
@@ -967,13 +1199,16 @@ Drawable_render_polyline( SV * obj, SV * points, HV * profile)
 		}
 		box[2] -= box[0] - 1;
 		box[3] -= box[1] - 1;
+		if ( as_integer ) {
+			box[0] = floor(box[0]);
+			box[1] = floor(box[1]);
+		}
 		if ( free_buffer ) free(buffer);
 		free_buffer = false;
 		buffer = box;
 		count  = 2;
 	}
 
-	if ( pexist(integer)) as_integer = pget_B(integer);
 	ret = prima_array_new(count * 2 * (as_integer ? sizeof(int) : sizeof(double)));
 	storage = prima_array_get_storage(ret);
 	if ( as_integer ) {
@@ -1034,6 +1269,34 @@ prima_read_palette( int * palSize, SV * palette)
 	return ( PRGBColor) buf;
 }
 
+Bool
+Drawable_sector( Handle self, double x, double y, double dX, double dY, double startAngle, double endAngle)
+{
+	CHECK_GP(false);
+	return IS_AA ?
+		primitive( self, 0, "snnnnnn", "sector", x, y, dX-1, dY-1, startAngle, endAngle) :
+		apc_gp_sector(self, x, y, dX, dY, startAngle, endAngle);
+}
+
+/* Properties */
+
+int
+Drawable_alpha( Handle self, Bool set, int alpha)
+{
+	if (!set) return apc_gp_get_alpha( self);
+	if ( alpha < 0 ) alpha = 0;
+	if ( alpha > 255 ) alpha = 255;
+	apc_gp_set_alpha( self, alpha);
+	return var->alpha = apc_gp_get_alpha(self);
+}
+
+Bool
+Drawable_antialias( Handle self, Bool set, Bool aa)
+{
+	if (set) apc_gp_set_antialias( self, aa );
+	return var->antialias = apc_gp_get_antialias( self );
+}
+
 Color
 Drawable_backColor( Handle self, Bool set, Color color)
 {
@@ -1067,6 +1330,71 @@ Drawable_fillMode( Handle self, Bool set, int fillMode)
 	return fillMode;
 }
 
+SV *
+Drawable_fillPattern( Handle self, Bool set, SV * svpattern)
+{
+	int i;
+	if ( !set) {
+		AV * av;
+		FillPattern * fp = apc_gp_get_fill_pattern( self);
+		if ( !fp) return NULL_SV;
+		av = newAV();
+		for ( i = 0; i < 8; i++) av_push( av, newSViv(( int) (*fp)[i]));
+		return newRV_noinc(( SV *) av);
+	} else {
+		if ( SvROK( svpattern) && ( SvTYPE( SvRV( svpattern)) == SVt_PVAV)) {
+			FillPattern fp;
+			AV * av = ( AV *) SvRV( svpattern);
+			if ( av_len( av) != 7) {
+				warn("Illegal fillPattern passed to Drawable::fillPattern");
+				return NULL_SV;
+			}
+			for ( i = 0; i < 8; i++) {
+				SV ** holder = av_fetch( av, i, 0);
+				if ( !holder) {
+					warn("Array panic on Drawable::fillPattern");
+					return NULL_SV;
+				}
+				fp[ i] = SvIV( *holder);
+			}
+			apc_gp_set_fill_pattern( self, fp);
+		} else {
+			int id = SvIV( svpattern);
+			if (( id < 0) || ( id > fpMaxId)) {
+				warn("fillPattern index out of range passed to Drawable::fillPattern");
+				return NULL_SV;
+			}
+			apc_gp_set_fill_pattern( self, fillPatterns[ id]);
+		}
+	}
+	return NULL_SV;
+}
+
+Point
+Drawable_fillPatternOffset( Handle self, Bool set, Point fpo)
+{
+	if (!set) return apc_gp_get_fill_pattern_offset( self);
+	fpo. x %= 8;
+	fpo. y %= 8;
+	apc_gp_set_fill_pattern_offset( self, fpo);
+	return fpo;
+}
+
+Font
+Drawable_get_font( Handle self)
+{
+	return var-> font;
+}
+
+void
+Drawable_set_font( Handle self, Font font)
+{
+	clear_font_abc_caches( self);
+	apc_font_pick( self, &font, &var-> font);
+	apc_gp_set_font( self, &var-> font);
+}
+
+
 int
 Drawable_lineEnd( Handle self, Bool set, int lineEnd)
 {
@@ -1083,11 +1411,28 @@ Drawable_lineJoin( Handle self, Bool set, int lineJoin)
 	return lineJoin;
 }
 
-int
-Drawable_lineWidth( Handle self, Bool set, int lineWidth)
+SV *
+Drawable_linePattern( Handle self, Bool set, SV * pattern)
+{
+	if ( set) {
+		STRLEN len;
+		unsigned char *pat = ( unsigned char *) SvPV( pattern, len);
+		if ( len > 255) len = 255;
+		apc_gp_set_line_pattern( self, pat, len);
+	} else {
+		unsigned char ret[ 256];
+		int len = apc_gp_get_line_pattern( self, ret);
+		return newSVpvn((char*) ret, len);
+	}
+	return NULL_SV;
+}
+
+
+double
+Drawable_lineWidth( Handle self, Bool set, double lineWidth)
 {
 	if (!set) return apc_gp_get_line_width( self);
-	if ( lineWidth < 0 ) lineWidth = 0;
+	if ( lineWidth < 0.0 ) lineWidth = 0.0;
 	apc_gp_set_line_width( self, lineWidth);
 	return lineWidth;
 }
@@ -1213,70 +1558,6 @@ Drawable_translate( Handle self, Bool set, Point translate)
 	if (!set) return apc_gp_get_transform( self);
 	apc_gp_set_transform( self, translate. x, translate. y);
 	return translate;
-}
-
-SV *
-Drawable_fillPattern( Handle self, Bool set, SV * svpattern)
-{
-	int i;
-	if ( !set) {
-		AV * av;
-		FillPattern * fp = apc_gp_get_fill_pattern( self);
-		if ( !fp) return NULL_SV;
-		av = newAV();
-		for ( i = 0; i < 8; i++) av_push( av, newSViv(( int) (*fp)[i]));
-		return newRV_noinc(( SV *) av);
-	} else {
-		if ( SvROK( svpattern) && ( SvTYPE( SvRV( svpattern)) == SVt_PVAV)) {
-			FillPattern fp;
-			AV * av = ( AV *) SvRV( svpattern);
-			if ( av_len( av) != 7) {
-				warn("Illegal fillPattern passed to Drawable::fillPattern");
-				return NULL_SV;
-			}
-			for ( i = 0; i < 8; i++) {
-				SV ** holder = av_fetch( av, i, 0);
-				if ( !holder) {
-					warn("Array panic on Drawable::fillPattern");
-					return NULL_SV;
-				}
-				fp[ i] = SvIV( *holder);
-			}
-			apc_gp_set_fill_pattern( self, fp);
-		} else {
-			int id = SvIV( svpattern);
-			if (( id < 0) || ( id > fpMaxId)) {
-				warn("fillPattern index out of range passed to Drawable::fillPattern");
-				return NULL_SV;
-			}
-			apc_gp_set_fill_pattern( self, fillPatterns[ id]);
-		}
-	}
-	return NULL_SV;
-}
-
-Point
-Drawable_fillPatternOffset( Handle self, Bool set, Point fpo)
-{
-	if (!set) return apc_gp_get_fill_pattern_offset( self);
-	fpo. x %= 8;
-	fpo. y %= 8;
-	apc_gp_set_fill_pattern_offset( self, fpo);
-	return fpo;
-}
-
-Font
-Drawable_get_font( Handle self)
-{
-	return var-> font;
-}
-
-void
-Drawable_set_font( Handle self, Font font)
-{
-	clear_font_abc_caches( self);
-	apc_font_pick( self, &font, &var-> font);
-	apc_gp_set_font( self, &var-> font);
 }
 
 #ifdef __cplusplus

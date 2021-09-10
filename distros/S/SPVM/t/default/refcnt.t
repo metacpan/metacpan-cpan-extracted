@@ -21,7 +21,7 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 {
   # Add - Operation
   {
-    ok(TestCase::Refcnt->refcnt_test);
+    ok(SPVM::TestCase::Refcnt->refcnt_test);
   }
 }
 

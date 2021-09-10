@@ -1,5 +1,19 @@
 Revision history for Perl distribution Passwd-Keyring-Secret
 
+1.01	Thu, 9 Sep 2021
+
+  * Make testing more friendly for automated CPAN Testers.
+    - Move Pod::Readme, Pod::Markup from 'build_requires' to
+      'configure_requires'.
+    - Add testrules.yml to enforce correct order of tests.
+    - Add show-config-log.t for CPAN Testers.
+    - Amend SKIP message in kwalitee.t.
+    - Bail out with 'OS unsupported' on systems without Secret service or
+      missing Secret-1.typelib to prevent CPAN Testers from sending FAIL
+      reports.
+  * Catch typelib import errors to additionally provide a helpful hint
+    for simple-minded users.
+
 1.00	Mon, 6 Sep 2021
 
   * Initial release.

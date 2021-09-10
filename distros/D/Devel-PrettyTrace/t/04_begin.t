@@ -14,10 +14,9 @@ $f =~ s/eval \d+/eval/g;
 
 like($f, qr!\Q  main::z() called at t/inc/Foo.pm line 4
   Foo::import(
-    [0] "Foo"
+    [0] "Foo"\E(?: \(read-only\))?\Q
   ) called at (eval) line \E\d\Q
   main::BEGIN() called at \E[^ ]+\Q line \E\d\Q
   eval {...} called at \E[^ ]+\Q line \E\d\Q
   eval 'use Foo\E;?\Q' called at t/04_begin.t line 12
 \E!s);
-

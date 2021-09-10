@@ -2,6 +2,14 @@
 #define _WIN32_H_
 #include <windows.h>
 #include <winspool.h>
+#include <wtypes.h>
+#define Rect xxRect
+#define Color xxColor
+#define Point xxPoint
+#include <gdiplus/gdiplus.h>
+#undef Rect
+#undef Color
+#undef Point
 #include "apricot.h"
 
 #ifdef __cplusplus
@@ -78,10 +86,12 @@ typedef HANDLE SOCKETHANDLE;
 #define exsLineEnd      2
 #define exsLineJoin     4
 
-#define stbPen          1
-#define stbBrush        2
-#define stbText         4
-#define stbBacking      8
+#define stbPen          0x01
+#define stbBrush        0x02
+#define stbText         0x04
+#define stbBacking      0x08
+#define stbGDIMask      0x0F
+#define stbGPBrush      0x10
 
 #define SOCKETS_NONE         ( guts. socket_version == -1)
 #define SOCKETS_AS_HANDLES   ( guts. socket_version == 1)
@@ -113,6 +123,16 @@ typedef HANDLE SOCKETHANDLE;
 #define apcErrRet(err)    { apcErr(err);          return false; }
 #define apcErrClear       { apcError = errOk;                   }
 
+#define GPCALL rc = (DWORD)
+#define apiGPErr { \
+	apcError = errApcError; \
+	if ( debug ) \
+		warn( "win32 error 0x%x: '%s' at line %d in %s\n", (unsigned int)rc, \
+			err_msg_gplus( rc, NULL), __LINE__, __FILE__);   \
+	rc |= 0x40000;    \
+}
+#define apiGPErrCheck if (rc) apiGPErr;
+#define apiGPErrCheckRet(f) if (rc) { apiGPErr; return f; }
 #define apiHErr(hr) {           \
 	apcError = errApcError; \
 	rc = hr;                \
@@ -123,6 +143,10 @@ typedef HANDLE SOCKETHANDLE;
 
 #define objCheck          if ( var stage == csDead) return
 #define dobjCheck(handle) if ((( PObject)handle)-> stage == csDead) return
+
+#define SHIFT_X(X)    X + sys gp_transform.x
+#define SHIFT_Y(Y)    sys lastSize.y - (Y) - 1 + sys gp_transform.y
+#define SHIFT_XY(X,Y) X += sys gp_transform.x,Y = sys lastSize.y - (Y) - 1 + sys gp_transform.y
 
 typedef struct _HandleOptions_ {
 	unsigned aptWM_PAINT             : 1;       // true if inside WM_PAINT
@@ -157,6 +181,7 @@ typedef struct _HandleOptions_ {
 	unsigned aptLayeredRequested     : 1;       // Prima wants layered
 	unsigned aptClipByChildren       : 1;       // cached clipping by children
 	unsigned aptIgnoreSizeMessages   : 1;       // during window recreation
+	unsigned aptGDIPlus              : 1;       // uses GDI+
 } HandleOptions;
 
 #define CLIPBOARD_MAIN 0
@@ -211,6 +236,7 @@ typedef struct _WinGuts
 	Bool           dont_xlate_message; // one-time stopper to TranslateMessage() call
 	int            utf8_prepend_0x202D;// newer windows do automatic bidi conversion, this is to cancel it
 	WCHAR *      (*alloc_utf8_to_wchar_visual)(const char*,int,int*);
+	ULONG_PTR      gdiplusToken;       // GDI+ handle
 	Handle         clipboards[2];
 	Bool           ole_initialized;
 	void*          dndDataSender;      // IDropTarget.DragEnter.DataObject dnd storage object
@@ -304,9 +330,11 @@ typedef struct _PrinterData
 
 typedef struct _PaintSaveData
 {
+	Bool        antialias;
+	int         alpha;
 	Color       lbs[2];
 	Bool        fillMode;
-	int         lineWidth;
+	float       lineWidth;
 	int         lineEnd;
 	int         lineJoin;
 	unsigned char * linePattern;
@@ -335,6 +363,7 @@ typedef struct _EXTPEN
 	DWORD           style;
 	DWORD           lineEnd;
 	DWORD           lineJoin;
+	float           lineWidth;
 	PatResource  *  patResource;
 } EXTPEN, *PEXTPEN;
 
@@ -374,10 +403,30 @@ typedef struct _DCFont
 	HFONT         hfont;
 } DCFont, *PDCFont;
 
+#define GP_BRUSH_SOLID       0
+#define GP_BRUSH_FILLPATTERN 1
+#define GP_SOLID_PEN         2
+
+typedef struct _GPStylus
+{
+	int type, opaque;
+	uint32_t fg, bg;
+	FillPattern fill;
+} GPStylus, *PGPStylus;
+
+typedef struct _DCGPStylus
+{
+	GPStylus s;
+	int refcnt;
+	GpBrush * brush;
+	GpPen   * pen;
+} DCGPStylus, *PDCGPStylus;
+
 typedef struct _DrawableData
 {
 	/* Drawable basic data*/
 	HDC            ps;                      // general HDC
+	GpGraphics    *graphics;                // GDI+ context
 	PAINTSTRUCT    paintStruc;              // HDC counterpart
 	HBITMAP        bm;                      // cached bitmap
 	HPALETTE       pal;                     // cached palette
@@ -387,6 +436,7 @@ typedef struct _DrawableData
 	int            stylusFlags;             // stylus resource cache( stbXXXX)
 	Stylus         stylus;                  // widgets stylus record
 	PDCFont        fontResource;            // font resource pointer
+	PDCGPStylus    stylusGPResource;        // GDI+ resource pointer
 
 	/* Stock objects of HDC - to be restored after paint mode */
 	HPEN           stockPen;
@@ -400,9 +450,10 @@ typedef struct _DrawableData
 	Point          res;                     // resolution
 
 	/* for opaque stroke emulation */
-	Bool           currentROP;
-	Bool           currentROP2;
-	HPEN	          opaquePen;
+	int            currentROP;
+	int            currentROP2;
+	int            alpha;
+	HPEN	       opaquePen;
 
 	/* cached GetTextMetrics */
 	BYTE           tmPitchAndFamily;
@@ -413,7 +464,7 @@ typedef struct _DrawableData
 	/* HDC attributes storage outside paint mode */
 	Color          lbs[2];
 	int            fillMode, psFillMode;
-	int            lineWidth;
+	float          lineWidth;
 	int            lineEnd;
 	int            lineJoin;
 	unsigned char *linePattern;
@@ -425,6 +476,7 @@ typedef struct _DrawableData
 	int            rop2;
 	float          miterLimit;
 	Point          transform;
+	Point          gp_transform;
 	PPaintSaveData psd;                     // Their values during paint saved in sys psd
 
 	/* Basic widget fields */
@@ -468,6 +520,16 @@ typedef struct _DrawableData
 	Point          layeredPaintOffset;
 	HDC            layeredPaintSurface;
 	HRGN           layeredParentRegion;
+
+	/* alpha text amulation */
+	HDC            alphaArenaDC;
+	HBITMAP        alphaArenaBitmap;
+	uint32_t*      alphaArenaPtr;
+	Point          alphaArenaSize;
+	Bool           alphaArenaFontChanged;
+	HFONT          alphaArenaStockFont;
+	HBITMAP        alphaArenaStockBitmap;
+	uint32_t*      alphaArenaPalette;
 
 	/* Other class-specific data */
 	union {
@@ -530,6 +592,15 @@ typedef struct _MusClkRec {
 		sys stylusFlags |= stbBacking;                       \
 	}
 
+
+#define STYLUS_USE_GP_BRUSH                          \
+	if ( !( sys stylusFlags & stbGPBrush)) {                \
+		if ( stylus_gp_alloc(self) == NULL ) return false; \
+		sys stylusFlags |= stbGPBrush;                      \
+	}
+
+#define STYLUS_FREE_GP_BRUSH sys stylusFlags &= ~stbGPBrush
+
 #define psDot         "\3\3"
 #define psDash        "\x16\6"
 #define psDashDot     "\x9\6\3\6"
@@ -572,6 +643,7 @@ extern MusClkRec    musClk;
 extern PHash        patMan;
 extern DWORD        rc;
 extern PHash        stylusMan;
+extern PHash        stylusGpMan;
 extern HBRUSH       hBrushHollow;
 extern PatResource  hPatHollow;
 extern HPEN         hPenHollow;
@@ -601,6 +673,7 @@ extern void         dc_compat_free( void);
 extern void         dbm_recreate( Handle self);
 extern Bool         destroy_font_hash( void);
 extern char *       err_msg( DWORD errId, char * buffer);
+extern char *       err_msg_gplus( GpStatus errId, char * buffer);
 extern PDCFont      font_alloc( Font * data);
 extern void         font_change( Handle self, Font * font);
 extern void         font_clean( void);
@@ -645,6 +718,10 @@ extern Bool         stylus_complex( PStylus stylus, HDC dc);
 extern Bool         stylus_extpenned( PStylus stylus);
 extern void         stylus_free( PDCStylus res, Bool permanent);
 extern DWORD        stylus_get_extpen_style( PStylus s);
+extern GpBrush*     stylus_gp_alloc(Handle self);
+extern void         stylus_gp_clean( void);
+extern void         stylus_gp_free( PDCGPStylus res, Bool permanent);
+extern GpPen*       stylus_gp_get_pen(int lineWidth, uint32_t color);
 extern HRGN         region_create( Handle mask);
 extern WCHAR *      alloc_utf8_to_wchar( const char * utf8, int length, int * mb_len);
 extern WCHAR *      alloc_utf8_to_wchar_visual( const char * utf8, int length, int * mb_len);
@@ -672,6 +749,11 @@ extern Bool         clipboard_get_data(int cfid, PClipboardDataRec c, void * p1,
 extern void *       image_create_dib(Handle image, Bool global_alloc);
 extern Bool         HWND_lock( Bool lock);
 extern Bool         process_msg( MSG * msg);
+extern Bool         aa_text_out( Handle self, int x, int y, void * text, int len, Bool wide);
+extern Bool         aa_glyphs_out( Handle self, PGlyphsOutRec t, int x, int y, int * text_advance, HFONT font);
+extern void         aa_free_arena(Handle self, Bool for_reuse);
+extern void         gp_get_text_widths( Handle self, const char* text, int len, int flags, ABC * extents);
+extern void         gp_get_text_box( Handle self, ABC * abc, Point * pt);
 
 /* compatibility to MSVC 6 */
 #ifndef GWLP_USERDATA

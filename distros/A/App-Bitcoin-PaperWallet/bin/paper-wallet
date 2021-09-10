@@ -1,0 +1,124 @@
+#!/usr/bin/env perl
+
+use v5.12;
+use warnings;
+use utf8;
+
+use Text::QRCode;
+use List::Util qw(pairs);
+use App::Bitcoin::PaperWallet;
+
+sub get_qr
+{
+	my ($data) = @_;
+	my $arrayref = Text::QRCode->new->plot($data);
+	return map { $_ =~ s/\*/█/g; $_ } map { join '', map { $_, $_ } @$_ } @$arrayref;
+}
+
+sub align_qrs
+{
+	my @qr1 = @{shift()};
+	my @qr2 = @{shift()};
+	my $offset = ' ' x (length $qr1[0]);
+
+	my @output;
+	while (@qr1 || @qr2) {
+		my $line = shift(@qr1) // $offset;
+		$line .= ' ' x 4;
+		$line .= shift(@qr2) // '';
+		push @output, $line;
+	}
+
+	return @output;
+}
+
+sub prompt
+{
+	my ($info) = @_;
+	say $info;
+
+	my $data = <STDIN>;
+	chomp $data;
+
+	return $data;
+}
+
+sub get_entropy
+{
+	say 'Waiting for user defined entropy. Use --auto for automatic generation';
+	return prompt "Enter any random entropy: by rolling dice, drawing cards or other means available";
+}
+
+sub get_passphrase
+{
+	return prompt 'Enter passphrase for your private key. Warning: plaintext!';
+}
+
+my $wallet_file = 'wallet.txt';
+die "wallet file $wallet_file already exists" if -f $wallet_file;
+
+my $flag = shift;
+my $entropy = $flag eq '--auto' ? undef : get_entropy;
+my $pass = get_passphrase;
+
+my $bitcoin_data = App::Bitcoin::PaperWallet->generate($entropy, $pass);
+
+open my $fh, '>:utf8', $wallet_file
+	or die 'cannot open ' . $wallet_file;
+
+my @data;
+
+push @data,
+	'-- PASSWORD PROTECTED PRIVATE KEY --',
+	$bitcoin_data->{mnemonic},
+	'',
+	'-- ADDRESSES --',
+	''
+;
+
+my @qrs;
+for my $addr (@{$bitcoin_data->{addresses}}) {
+	push @data, $addr;
+	push @qrs, [get_qr $addr];
+}
+
+push @data, '';
+
+for my $qr (pairs @qrs) {
+	push @data,
+		align_qrs(@$qr),
+		'',
+		''
+	;
+}
+
+say {$fh} join "\n", @data;
+
+close $fh
+	or die 'could not close the file';
+
+say "done - see $wallet_file";
+
+__END__
+
+=head1 NAME
+
+paper-wallet - Script to generate a paper wallet file
+
+=head1 SYNOPSIS
+
+	paper-wallet [--auto]
+
+=head1 DESCRIPTION
+
+This script will generate a C<wallet.txt> file in your current working directory that contains Bitcoin wallet details ready to be printed or stored on a flash drive. This file must not exist already or the script will fail (to ensure that you don't override your previously generated wallet that you might have already used).
+
+This is intended to be used as cold storage (Bitcoin wallet which does not have active connection to the Internet). The generation should best take place while being offline.
+
+The script will interactively ask for wallet password and entropy (random data that secures your funds). If you don't have any means to generate random data, like rolling dice, or you don't know how to properly do so (to ensure large enough entropy), it is recommended to use the C<--auto> flag, which will use secure random generators to do it for you. Password can be skipped by hitting enter, but it is not recommended to do so. Remember that there is no way to restore your password, so make sure you won't lose it.
+
+After printing, you can cut off the top section (mnemonic seed) and store it apart from the addresses for safety.
+
+=head1 SEE ALSO
+
+L<App::Bitcoin::PaperWallet>

@@ -13,14 +13,16 @@ WriteMakefile(
     MIN_PERL_VERSION   => '5.006',
 
     BUILD_REQUIRES => {
+        'vars' => 0,
         'Module::Build' => '0.19',
         'Test::More' => '0.88',
-        'Pod::Readme' => '1.001002',
-        'Pod::Markdown' => '2.000',
+        'File::Slurp' => 0,
     },
 
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '6.6303',
+        'Pod::Readme' => '1.001002',
+        'Pod::Markdown' => '2.000',
     },
 
     PREREQ_PM => {

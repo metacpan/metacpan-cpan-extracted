@@ -1,0 +1,35 @@
+#!/usr/bin/env perl
+# parse-one-warnings-group
+use 5.14.0;
+use warnings;
+use Carp;
+
+use Perl5::Build::Warnings;
+use Data::Dump qw(dd pp);
+
+=pod
+
+    perl parse-one-warnings-group <make-output-file> <Wwarnings-group>
+
+The first command-line argument must be the path to a file holding F<make> output.
+
+The second command-line argument must be a warnings group, beginning with a
+'C<W>' (but not with a leading hyphen 'C<->').
+
+=cut
+
+croak "Must provide two command-line arguments: 'make' output file and warnings group"
+    unless @ARGV == 2;
+
+my ($file, $warnings_group) = @ARGV;
+
+croak "Cannot locate file '$file'" unless -f $file;
+
+say "File:  $file";
+say '';
+my $self = Perl5::Build::Warnings->new( { file => $file } );
+my $aref = $self->get_warnings_for_group($warnings_group);
+dd $aref;
+say '';
+
+__END__

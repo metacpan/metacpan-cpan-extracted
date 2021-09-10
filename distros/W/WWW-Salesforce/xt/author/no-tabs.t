@@ -14,6 +14,8 @@ my @files = (
     'lib/WWW/Salesforce/Simple.pm',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
+    't/01-load-salesforce-simple.t',
+    't/01-load-salesforce.t',
     't/WWW-Salesforce.t',
     't/www_sf_utils.t'
 );

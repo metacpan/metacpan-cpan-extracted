@@ -4,13 +4,13 @@ package SPVM::Comparator::Int;
 
 =head1 NAME
 
-SPVM::Comparator::Int - a callback interface for int comparation
+SPVM::Comparator::Int - Comparator::Int in SPVM | a callback interface for int comparation
 
 =head1 SYNOPSYS
   
-  use SPVM::Comparator::Int;
+  use Comparator::Int;
   
-  my $comparator : SPVM::Comparator::Int = sub : int ($self : self, $a : int, $b : int); {
+  my $comparator : Comparator::Int = sub : int ($self : self, $a : int, $b : int); {
     return $a <=> $b;
   };
   
@@ -18,7 +18,7 @@ SPVM::Comparator::Int - a callback interface for int comparation
 
 =head1 DESCRIPTION
 
-L<SPVM::Comparator::Int> is a callback interface to compare two int values.
+L<Comparator::Int|SPVM::Comparator::Int> is a callback interface to compare two int values.
 
 =head1 CALLBACK METHOD INTERFACE
 

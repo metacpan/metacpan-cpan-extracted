@@ -128,19 +128,6 @@ static char  fontspecific[] = "fontspecific";
 static char  utf8_encoding[] = "iso10646-1";
 static CharSetInfo * locale = NULL;
 
-#ifdef NEED_X11_EXTENSIONS_XRENDER_H
-/* piece of Xrender guts */
-typedef struct _XExtDisplayInfo {
-	struct _XExtDisplayInfo *next;
-	Display *display;
-	XExtCodes *codes;
-	XPointer data;
-} XExtDisplayInfo;
-
-extern XExtDisplayInfo *
-XRenderFindDisplay (Display *dpy);
-#endif
-
 typedef struct {
 	Font font;
 	XftFont *orig, *xft_font;
@@ -183,13 +170,15 @@ font_context_next( FontContext * fc )
 
 	src = *_src;
 	dst = fc->font;
-	src.size = dst.size;
-	src.undef.size = 0;
+#define CP(x) src.x = dst.x; src.undef.x = 0;
+	CP(size)
+	CP(direction)
+#undef CP
 
 	prima_xft_font_pick( NULL_HANDLE, &src, &dst, NULL, &fc->xft_font);
 	if ( !fc->orig_base )
 		return;
-	
+
 	if ( IS_ZERO(fc->font.direction))
 		fc-> xft_base_font = fc->xft_font;
 	else {
@@ -224,14 +213,6 @@ prima_xft_init(void)
 	size_t ibl, obl;
 	uint32_t *optr;
 	int j;
-#endif
-
-#ifdef NEED_X11_EXTENSIONS_XRENDER_H
-	{ /* snatch error code from xrender guts */
-		XExtDisplayInfo *info = XRenderFindDisplay( DISP);
-		if ( info && info-> codes)
-			guts. xft_xrender_major_opcode = info-> codes-> major_opcode;
-	}
 #endif
 
 	if ( !apc_fetch_resource( "Prima", "", "UseXFT", "usexft",
@@ -1678,9 +1659,15 @@ get_no_aa_font( PDrawableSysData selfxx, XftFont * font)
 static void
 setup_alpha(PDrawableSysData selfxx, XftColor * xftcolor, XftFont ** font)
 {
-	if ( XX-> flags. layered) {
-		xftcolor->color.alpha = 0xffff;
-	} else if ( XX-> type. bitmap) {
+	if ( XX-> flags. layered || !XX->type.bitmap) {
+		if ( selfxx->flags.antialias ) {
+			float div = 65535.0 / (float)(xftcolor->color.alpha = (selfxx->paint_alpha << 8));
+			xftcolor->color.red   = (float) xftcolor->color.red   / div;
+			xftcolor->color.green = (float) xftcolor->color.green / div;
+			xftcolor->color.blue  = (float) xftcolor->color.blue  / div;
+		} else
+			xftcolor->color.alpha = 0xffff;
+	} else {
 		xftcolor->color.alpha = (
 			(
 				xftcolor->color.red/3 + 
@@ -1693,8 +1680,6 @@ setup_alpha(PDrawableSysData selfxx, XftColor * xftcolor, XftFont ** font)
 			;
 		if ( !guts. xft_no_antialias && !XX-> font-> xft_no_aa)
 			*font = get_no_aa_font(XX, *font);
-	} else {
-		xftcolor->color.alpha = 0xffff;
 	}
 }
 
@@ -1729,7 +1714,7 @@ static void
 overstrike( Handle self, int x, int y, Point *ovx, int advance)
 {
 	DEFXX;
-	int lw = apc_gp_get_line_width( self);
+	float lw = apc_gp_get_line_width( self);
 	int d  = - PDrawable(self)-> font. descent;
 	int ay, x1, y1, x2, y2;
 	double c = XX-> xft_font_cos, s = XX-> xft_font_sin;
@@ -1740,8 +1725,8 @@ overstrike( Handle self, int x, int y, Point *ovx, int advance)
 		XX-> flags. brush_fore = 1;
 	}
 
-	if ( lw != 1)
-		apc_gp_set_line_width( self, 1);
+	if ( lw != 1.0)
+		apc_gp_set_line_width( self, 1.0);
 
 	if ( ovx->x < 0 ) ovx->x = 0;
 	if ( ovx->y < 0 ) ovx->y = 0;
@@ -1765,7 +1750,7 @@ overstrike( Handle self, int x, int y, Point *ovx, int advance)
 		XDrawLine( DISP, XX-> gdrawable, XX-> gc, x1, REVERT( y1), x2, REVERT( y2));
 	}
 
-	if ( lw != 1)
+	if ( lw != 1.0)
 		apc_gp_set_line_width( self, lw);
 }
 
@@ -2613,7 +2598,7 @@ prima_xft_init_font_substitution(void)
 		s = FcFontList( 0, pat, os);
 		if ( s && s->nfont ) {
 			PFont f;
-			if (( f = prima_font_mapper_save_font(guts.default_font.name)) != NULL ) {
+			if (( f = prima_font_mapper_save_font(guts.default_font.name, 0)) != NULL ) {
 				f->is_utf8 = guts.default_font.is_utf8;
 				f->undef.name = 0;
 				strncpy(f->family, guts.default_font.family,256);
@@ -2630,7 +2615,7 @@ prima_xft_init_font_substitution(void)
 
 	pat = FcPatternCreate();
 	FcPatternAddBool( pat, FC_SCALABLE, 1);
-	os = FcObjectSetBuild( FC_FAMILY, FC_FOUNDRY, FC_SCALABLE, FC_SPACING, (void*) 0);
+	os = FcObjectSetBuild( FC_FAMILY, FC_FOUNDRY, FC_SCALABLE, FC_SPACING, FC_WEIGHT, FC_SLANT, (void*) 0);
 	s = FcFontList( 0, pat, os);
 	FcObjectSetDestroy( os);
 	FcPatternDestroy( pat);
@@ -2640,7 +2625,8 @@ prima_xft_init_font_substitution(void)
 	ppat = s-> fonts;
 	for ( i = 0; i < s->nfont; i++, ppat++) {
 		PFont f;
-		int j;
+		int j, slant, weight;
+		unsigned int style = 0;
 		FcChar8 * s;
 		PList list;
 		char lower[512], *llower = lower, *lupper;
@@ -2660,7 +2646,18 @@ prima_xft_init_font_substitution(void)
 			}
 		}
 
-		if ( !( f = prima_font_mapper_save_font((const char*) s)))
+		if ( FcPatternGetInteger( *ppat, FC_SLANT, 0, &slant) == FcResultMatch) {
+			if ( slant == FC_SLANT_ITALIC || slant == FC_SLANT_OBLIQUE)
+				style |= fsItalic;
+		}
+		if ( FcPatternGetInteger( *ppat, FC_WEIGHT, 0, &weight) == FcResultMatch) {
+			if ( weight <= FC_WEIGHT_LIGHT )
+				style |= fsThin;
+			else if ( weight >= FC_WEIGHT_BOLD)
+				style |= fsBold;
+		}
+
+		if ( !( f = prima_font_mapper_save_font((const char*) s, style)))
 			continue;
 
 		f-> is_utf8.name = utf8_flag_strncpy( f->name, (char*)s, 255);

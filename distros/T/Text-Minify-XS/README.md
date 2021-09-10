@@ -4,7 +4,7 @@ Text::Minify::XS - Simple text minification
 
 # VERSION
 
-version v0.4.2
+version v0.4.3
 
 # SYNOPSIS
 

@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More 'no_plan';
 
-use SPVM 'TestCase::Lib::SPVM::ShortList';
+use SPVM 'TestCase::Lib::ShortList';
 
 
 
@@ -15,19 +15,19 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
 # SPVM::ShortList
 {
-  ok(TestCase::Lib::SPVM::ShortList->length);
-  ok(TestCase::Lib::SPVM::ShortList->new);
-  ok(TestCase::Lib::SPVM::ShortList->new_len);
-  ok(TestCase::Lib::SPVM::ShortList->get);
-  ok(TestCase::Lib::SPVM::ShortList->pop);
-  ok(TestCase::Lib::SPVM::ShortList->push);
-  ok(TestCase::Lib::SPVM::ShortList->insert);
-  ok(TestCase::Lib::SPVM::ShortList->remove);
-  ok(TestCase::Lib::SPVM::ShortList->set);
-  ok(TestCase::Lib::SPVM::ShortList->set_array);
-  ok(TestCase::Lib::SPVM::ShortList->shift);
-  ok(TestCase::Lib::SPVM::ShortList->to_array);
-  ok(TestCase::Lib::SPVM::ShortList->unshift);
+  ok(SPVM::TestCase::Lib::ShortList->length);
+  ok(SPVM::TestCase::Lib::ShortList->new);
+  ok(SPVM::TestCase::Lib::ShortList->new_len);
+  ok(SPVM::TestCase::Lib::ShortList->get);
+  ok(SPVM::TestCase::Lib::ShortList->pop);
+  ok(SPVM::TestCase::Lib::ShortList->push);
+  ok(SPVM::TestCase::Lib::ShortList->insert);
+  ok(SPVM::TestCase::Lib::ShortList->remove);
+  ok(SPVM::TestCase::Lib::ShortList->set);
+  ok(SPVM::TestCase::Lib::ShortList->set_array);
+  ok(SPVM::TestCase::Lib::ShortList->shift);
+  ok(SPVM::TestCase::Lib::ShortList->to_array);
+  ok(SPVM::TestCase::Lib::ShortList->unshift);
 }
 
 # All object is freed

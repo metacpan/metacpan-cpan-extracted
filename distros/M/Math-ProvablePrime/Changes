@@ -1,5 +1,14 @@
 Revision history for Perl module Math::ProvablePrime
 
+0.51
+    - BUG FIX: Prevent indefinite hang w/ new Math::BigInt (RT 139268)
+        Thanks, PJACKLAM!
+    - BUG FIX: Prevent even-numbered small “primes” (RT 139270)
+        Thanks, PJACKLAM!
+    - BUG FIX: Use crypto-random for small primes.
+    - Recognize Math::BigInt::GMPz and Math::BigInt::LTM as “fast”.
+    - Various small optimizations.
+
 0.045
     - Fix LICENSE file.
 

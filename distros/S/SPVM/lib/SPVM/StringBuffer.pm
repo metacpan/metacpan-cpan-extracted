@@ -4,14 +4,14 @@ package SPVM::StringBuffer;
 
 =head1 NAME
 
-SPVM::StringBuffer - String buffer
+SPVM::StringBuffer - StringBuffer in SPVM | String buffer
 
 =head1 SYNOPSYS
   
-  use SPVM::StringBuffer;
+  use StringBuffer;
   
   # new
-  my $buffer = SPVM::StringBuffer->new;
+  my $buffer = StringBuffer->new;
   
   # push string
   $buffer->push("abc");
@@ -24,13 +24,13 @@ SPVM::StringBuffer - String buffer
 
 String buffer.
 
-=head1 STATIC METHODS
+=head1 CLASS METHODS
 
 =head2 new
 
-  sub new : SPVM::StringBuffer ()
+  sub new : StringBuffer ()
 
-Create new L<SPVM::StringBuffer> object.
+Create new L<StringBuffer|SPVM::StringBuffer> object.
 
 =head1 INSTANCE METHODS
 

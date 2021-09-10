@@ -1,7 +1,7 @@
 use utf8;
 
 package WebService::Postex;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 use Moose;
 use namespace::autoclean;
 
@@ -37,7 +37,17 @@ has ua => (
     isa     => 'LWP::UserAgent',
     lazy    => 1,
     builder => '_build_ua',
+    trigger => \&_set_ua_defaults,
 );
+
+
+sub _set_ua_defaults {
+    my ($self, $ua) = @_;
+    $ua->default_header(Accept        => 'application/json');
+    $ua->default_header(Authorization => "Bearer " . $self->secret);
+    return $ua;
+
+}
 
 sub _build_ua {
     my $self = shift;
@@ -45,9 +55,7 @@ sub _build_ua {
         agent   => sprintf('%s/%s', __PACKAGE__, $VERSION),
         timeout => 30,
     );
-    $ua->default_header(Accept        => 'application/json');
-    $ua->default_header(Authorization => "Bearer " . $self->secret);
-    return $ua;
+    return $self->_set_ua_defaults($ua);
 }
 
 sub _call {
@@ -173,7 +181,7 @@ WebService::Postex - A Postex WebService implemenation in Perl
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

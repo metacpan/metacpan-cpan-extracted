@@ -1,4 +1,32 @@
 Revision history for SPVM
+0.9012  2021-09-10
+        [CHANGES]
+        * Exchange API call method string arugment copy count is reduced
+        * Remove SPVM::Unicode UTF-16 related methods because I concentrate UTF-8 and Unicode
+        * The name of SPVM module must start SPVM::, otherwise a compile error occurs.
+          For this, Many documents of tutorial, examples, etc are changed. Sorry.
+        * If the name is package name which start with upper case and the name is not start "SPVM::",
+          add "SPVM::" to the package name
+        * If a packag variable access contains :: and start with $ + upper case, and the name is not start "$SPVM::",
+          insert "SPVM::" to the package name after $
+        * Improve error message when package name is different from the package name corresponding to the module file
+        * use SPVM MODULE_NAME add "SPVM::" to the top of the module name if the module name does not t start with "SPVM::".
+        * Perl package name "SPVM::Foo" become correspoinding to SPVM class name "Foo".
+          This is big change because all SPVM::Foo in SPVM program must be rewriten to Foo. Sorry.
+          However, short name is good. SPVM::Sort->foo becomes Sort->foo
+        * create Fn module, remove NumberUtil, StringUtil, ArrayUtil modules. the funtions is moved to Fn module. Sorry.
+          However, short name is good. Fn->join(',', ["abc", "de"])
+        * package keyword is renamed to class. And all of the part of the methods and things which contains "package" is replaced to "class". Sorry
+        * Static method concept is changed to Class method
+        * Lexical Variable concept is changed to Local Variable for other language users.
+        * Lexical Analysis concept is changed to Tokenizing
+        * Native function prefix is changed to SPVM__ from SPNATIVE__. Sorry.
+        * Precompile function prefix is changed to SPVMPRECOMPILE__ from SPPRECOMPILE.
+        * SPVM::Builder::Exe target_class_name field is renamed to module_name
+        
+        [BUGFIXES]
+        * None
+
 0.9011  2021-08-31
         [CHANGES]
         * None

@@ -1,3 +1,12 @@
+libpasswd-keyring-secret-perl (1.01) sid; urgency=low
+
+  * Make testing more friendly for automated CPAN Testers.
+  * Catch typelib import errors to additionally provide a helpful hint
+    for simple-minded users.
+  * Add libfile-slurp-perl to Build-Depends.
+
+ -- Thomas Uhle <uhle@cpan.org>  Thu, 9 Sep 2021 22:55:46 +0200
+
 libpasswd-keyring-secret-perl (1.00) sid; urgency=low
 
   * Initial release.

@@ -83,8 +83,8 @@ static pdl *new_pdl (int a, int b, int c)
 
 static void old_pdl (pdl **p, short ndims, int dim0)
 {
+  *p = PDL->get_convertedpdl(*p, PDL_B);
   PDL->make_physical (*p);
-  PDL->converttype (p, PDL_B, PDL_PERM);
 
   if ((*p)->ndims < ndims + (dim0 > 1))
     croak (__("dimension mismatch, pdl has dimension %d but at least %d dimensions required"), (*p)->ndims, ndims + (dim0 > 1));

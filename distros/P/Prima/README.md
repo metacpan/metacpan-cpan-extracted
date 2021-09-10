@@ -13,15 +13,20 @@ Debian/Ubuntu
 
 For easy setup, run this:
 
-  apt-get install libgtk2.0-dev libgif-dev libjpeg-dev libtiff-dev libxpm-dev \
+  apt-get install libgtk2.0-dev libgif-dev libjpeg-dev libtiff-dev libxpm-dev
       libwebp-dev libfribidi-dev libharfbuzz-dev
 
 OpenSUSE
 --------
 
-  zypper install gtk2-devel giflib-devel libXpm-devel libjpeg-devel libtiff-devel \
-      libXpm-devel libXrandr-devel libXcomposite-devel libXcursor-devel \
-      libfribidi-devel libwebp-devel
+  zypper install gtk2-devel giflib-devel libjpeg-devel libtiff-devel
+      libXpm-devel libXrandr-devel libXcomposite-devel libXcursor-devel
+      libfribidi-devel libwebp-devel libharfbuzz-devel
+
+Solaris
+-------
+
+Download and install Oracle Developer Studio as perl there is compiled with cc, not gcc.
 
 Cygwin
 ------
@@ -29,12 +34,13 @@ Cygwin
 - install apt-cyg:
 
    wget https://raw.githubusercontent.com/transcode-open/apt-cyg/master/apt-cyg -O /usr/bin/apt-cyg
+
    chmod +x /usr/bin/apt-cyg
 
 - install prerequisites:
 
-   apt-cyg install libgtk2.0-devel libfribidi-devel libgif-devel libjpeg-devel libtiff-devel \
-       libXpm-devel libwebp-devel
+   apt-cyg install libgtk2.0-devel libfribidi-devel libgif-devel libjpeg-devel libtiff-devel libXpm-devel
+        libwebp-devel libharfbuzz-devel
 
 
 Graphic libraries
@@ -50,7 +56,6 @@ libraries can be compiled in on all platforms:
    - libjpeg
    - libgif
    - libtiff
-   - libX11  - support for native X11 bitmap files
    - libwebp,libwebpdemux,libwebpmux
 
 Win32
@@ -67,10 +72,6 @@ for this purpose:
 it should work for all MSVC and GCC compilers and for native,
 cygwin, and mingw/strawberry perl runtimes.
 
-WebP libraries are unavailable for strawberry, get them here:
-
- http://prima.eu.org/download/webp-win.zip
-
 MacOSX
 ------
 
@@ -78,17 +79,18 @@ You'll need homebrew, XQuartz, and a set of extra libraries.
 
 - install homebrew:
 
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 - install XQuartz:
 
-  brew cask install xquartz
+  brew install --cask xquartz
 
 - install support libraries:
 
-  brew install fribidi fontconfig freetype giflib gtk+ harfbuzz jpeg libpng libtiff webp
+  brew install libiconv libxcomposite libxrandr libxcursor libxft fribidi fontconfig
+     freetype giflib gtk+ harfbuzz jpeg libpng libtiff webp libxpm
 
-- install custom built xorg libraries, either very minimal
+Note: if Prima crashes in libxft, do this: remove libxft and install custom built xorg libraries, either very minimal
 
   brew install dk/x11/xorg-macros dk/x11/libxft
 
@@ -205,16 +207,18 @@ COPYRIGHT
 
 (c) 1997-2003 The Protein Laboratory, University of Copenhagen
 
-AUTHORS
-=======
+(c) 1997-2021 Dmitry Karasik
+
+AUTHOR
+======
 
  - Dmitry Karasik <dmitry@karasik.eu.org>
- - Anton Berezin  <tobez@tobez.org>
- - Vadim Belman   <voland@lflat.org>
 
 CREDITS
 =======
 
+ - Anton Berezin
+ - Vadim Belman
  - David Scott
  - Teo Sankaro
  - Kai Fiebach

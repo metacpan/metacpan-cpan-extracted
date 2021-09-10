@@ -10,7 +10,7 @@ WriteMakefile(
         'Test::More'        => 0,
     },
     PREREQ_PM       => {
-        'Data::Printer'     => '0.19',
+        'Data::Printer'     => '1.00',
         'Exporter'          => 0,
         'parent'            => 0,
         'List::Util'        => '1.43',

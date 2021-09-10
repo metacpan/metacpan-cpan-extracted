@@ -58,7 +58,7 @@ void* SPVM_HASH_fetch(SPVM_HASH* hash, const char* key, int32_t length) {
 }
 
 void* SPVM_HASH_fetch_with_exists(SPVM_HASH* hash, const char* key, int32_t length, int32_t* exists) {
-  
+
   assert(hash);
   assert(length >= 0);
   

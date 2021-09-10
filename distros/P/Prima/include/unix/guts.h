@@ -704,9 +704,12 @@ typedef struct _UnixGuts
 	int                          visualClass;
 	XVisualInfo                  argb_visual;
 #ifdef HAVE_X11_EXTENSIONS_XRENDER_H
-	XRenderPictFormat *          xrender_argb_pic_format;
-	XRenderPictFormat *          xrender_argb_compat_format;
+	XRenderPictFormat *          xrender_display_format;
+	XRenderPictFormat *          xrender_argb32_format;
+	XRenderPictFormat *          xrender_a8_format;
+	XRenderPictFormat *          xrender_a1_format;
 #endif
+	Bool                         xrender_pen_dirty;
 	MainColorEntry *             palette;
 	int                          mappingPlace[256];
 	unsigned long                monochromeMap[2];
@@ -839,8 +842,9 @@ typedef struct _drawable_sys_data
 #endif
 	int rop, paint_rop;
 	int rop2, paint_rop2;
-	int line_style, line_width;
-	float miter_limit;
+	int alpha, paint_alpha;
+	int line_style;
+	float line_width, paint_line_width, miter_limit;
 	unsigned char *dashes, *paint_dashes;
 	int ndashes, paint_ndashes;
 	Point clip_mask_extent, shape_extent, shape_offset;
@@ -854,6 +858,8 @@ typedef struct _drawable_sys_data
 	void * recreateData;
 	XWindow client;
 	struct {
+		unsigned antialias                : 1;
+		unsigned saved_antialias          : 1;
 		unsigned base_line                : 1;
 		unsigned brush_fore               : 1;
 		unsigned brush_back               : 1;
@@ -1120,10 +1126,19 @@ extern Bool
 prima_init_color_subsystem( char * error_buf);
 
 extern Bool
+prima_init_xrender_subsystem( char * error_buf);
+
+extern Bool
+prima_find_color_mask_range( unsigned long mask, unsigned int * shift, unsigned int * range);
+
+extern Bool
 prima_color_subsystem_set_option( char *, char *);
 
 extern void
 prima_done_color_subsystem( void);
+
+extern void
+prima_done_xrender_subsystem( void);
 
 extern int
 prima_color_find( Handle self, long color, int maxDiff, int * diff, int maxRank);
@@ -1184,6 +1199,30 @@ prima_std_query_image( Handle self, Pixmap px);
 
 extern Pixmap
 prima_std_pixmap( Handle self, int type);
+
+#ifdef HAVE_X11_EXTENSIONS_XRENDER_H
+
+#define DELETE_ARGB_PICTURE(x) if ((x)) { \
+	XRenderFreePicture( DISP, x);     \
+	x = 0;                            \
+}
+
+#define CLIP_ARGB_PICTURE(x,region) if ((x)) \
+	XRenderSetPictureClipRegion(DISP, x, region);
+
+#define CREATE_ARGB_PICTURE(drawable, depth, target) \
+	if ( guts.render_extension) target = prima_render_create_picture(drawable, depth)
+
+extern Picture
+prima_render_create_picture(XDrawable drawable, int depth);
+
+#else
+
+#define CREATE_ARGB_PICTURE(drawable, depth, target)
+#define DELETE_ARGB_PICTURE(x)
+#define CLIP_ARGB_PICTURE(x,region)
+
+#endif
 
 extern void
 prima_cleanup_drawable_after_painting( Handle self);
@@ -1489,6 +1528,9 @@ prima_cocoa_application_get_bitmap( int x, int y, int xLen, int yLen, int yMax);
 
 extern char *
 prima_cocoa_system_action( char * params);
+
+extern int
+prima_cocoa_is_x11_local(void);
 #endif
 
 typedef struct _ViewProfile {

@@ -15,7 +15,7 @@ use SPVM 'TestCase::Seqop';
 my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
 {
-  ok(TestCase::Seqop->seqop);
+  ok(SPVM::TestCase::Seqop->seqop);
 }
 
 # All object is freed

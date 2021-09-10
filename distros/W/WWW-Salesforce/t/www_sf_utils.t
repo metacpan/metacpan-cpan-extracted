@@ -1,13 +1,13 @@
 use strict;
 use warnings;
 
-use Test::More 0.88; # done_testing
+use Test::More 0.88;
 use DateTime ();
 
 use WWW::Salesforce;
 
 my $test_time = time;
-my $tm = DateTime->from_epoch(epoch=>$test_time);
+my $tm        = DateTime->from_epoch(epoch => $test_time);
 
 {
     my $dt = $tm->clone();
@@ -18,10 +18,8 @@ my $tm = DateTime->from_epoch(epoch=>$test_time);
 
 # Timezones from http://science.ksc.nasa.gov/software/winvn/userguide/3_1_4.htm
 my @places = (
-    'Australia/Sydney',
-    'America/Chicago',
-    'Canada/Newfoundland',
-    'Australia/Adelaide',
+    'Australia/Sydney',    'America/Chicago',
+    'Canada/Newfoundland', 'Australia/Adelaide',
     'Pacific/Chatham',
 );
 

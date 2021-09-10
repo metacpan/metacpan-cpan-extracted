@@ -110,7 +110,7 @@ prima_release_gc( PDrawableSysData selfxx)
 */
 #define MAX_DASH_LEN 2048
 #define dDASH_FIX(line_width,source,length) \
-	int df_i, df_lw = line_width, df_len = length; \
+	int df_i, df_lw = line_width + .5, df_len = length; \
 	char df_list[MAX_DASH_LEN], *df_src = (char*)source, *df_dst = df_list
 #define DASH_FIX \
 	if ( df_lw > 1) {\
@@ -166,10 +166,11 @@ Unbuffered:
 
 	XX-> paint_rop = XX-> rop;
 	XX-> paint_rop2 = XX-> rop2;
+	XX-> paint_alpha = XX-> alpha;
+	XX-> paint_line_width = XX-> line_width;
 	XX-> flags. paint_base_line = XX-> flags. base_line;
 	XX-> flags. paint_opaque    = XX-> flags. opaque;
 	XX-> saved_font = PDrawable( self)-> font;
-	XX-> line_width = XX-> gcv. line_width;
 	XX-> gcv. clip_mask = None;
 	XX-> gtransform = XX-> transform;
 	XX-> fill_mode = XX->saved_fill_mode;
@@ -181,7 +182,7 @@ Unbuffered:
 	XCHECKPOINT;
 
 	if ( XX-> dashes) {
-		dDASH_FIX( XX-> line_width, XX-> dashes, XX-> ndashes);
+		dDASH_FIX( XX-> paint_line_width, XX-> dashes, XX-> ndashes);
 		DASH_FIX;
 		XSetDashes( DISP, XX-> gc, 0, DASHES);
 		XX-> paint_ndashes = XX-> ndashes;
@@ -227,6 +228,7 @@ Unbuffered:
 	XX-> clip_mask_extent. x = XX-> clip_mask_extent. y = 0;
 	XX-> flags. xft_clip = 0;
 
+	apc_gp_set_antialias( self, XX-> flags.saved_antialias);
 	apc_gp_set_color( self, XX-> saved_fore);
 	apc_gp_set_back_color( self, XX-> saved_back);
 	memcpy( XX-> saved_fill_pattern, XX-> fill_pattern, sizeof( FillPattern));
@@ -248,6 +250,7 @@ void
 prima_cleanup_drawable_after_painting( Handle self)
 {
 	DEFXX;
+	DELETE_ARGB_PICTURE(XX->argb_picture);
 #ifdef USE_XFT
 	prima_xft_gp_destroy( self );
 #endif
@@ -539,7 +542,7 @@ XChangeGC( DISP, XX-> gc, GCLineWidth, &gcv);\
 }
 #define FILL_ANTIDEFECT_CLOSE {\
 XGCValues gcv;\
-gcv. line_width = XX-> line_width;\
+gcv. line_width = XX-> paint_line_width + .5;\
 XChangeGC( DISP, XX-> gc, GCLineWidth, &gcv);\
 }
 
@@ -652,17 +655,15 @@ Bool
 apc_gp_can_draw_alpha( Handle self)
 {
 	DEFXX;
-	Bool xrender =
-#ifdef HAVE_X11_EXTENSIONS_XRENDER_H
-			true
-#else
-			false
-#endif
-		;
 	if (XT_IS_BITMAP(XX) || (( XT_IS_PIXMAP(XX) || XT_IS_APPLICATION(XX)) && guts.depth==1))
 		return false;
 	else
-		return xrender;
+		return
+			guts.render_extension
+#ifdef WITH_COCOA
+			&& !prima_cocoa_is_x11_local()
+#endif
+		;
 }
 
 Bool
@@ -1363,13 +1364,13 @@ apc_gp_line( Handle self, int x1, int y1, int x2, int y2)
 	SHIFT( x1, y1); SHIFT( x2, y2);
 	RANGE4(x1, y1, x2, y2); /* not really correct */
 	PURE_FOREGROUND;
-	if (( XX-> line_width == 0) && (x1 == x2 || y1 == y2)) {
+	if (((int)(XX-> paint_line_width + .5) == 0) && (x1 == x2 || y1 == y2)) {
 		XGCValues gcv;
 		gcv. line_width = 1;
 		XChangeGC( DISP, XX-> gc, GCLineWidth, &gcv);
 	}
 	XDrawLine( DISP, XX-> gdrawable, XX-> gc, x1, REVERT( y1), x2, REVERT( y2));
-	if (( XX-> line_width == 0) && (x1 == x2 || y1 == y2)) {
+	if (((int)(XX-> paint_line_width + .5) == 0) && (x1 == x2 || y1 == y2)) {
 		XGCValues gcv;
 		gcv. line_width = 0;
 		XChangeGC( DISP, XX-> gc, GCLineWidth, &gcv);
@@ -1382,6 +1383,7 @@ Bool
 apc_gp_rectangle( Handle self, int x1, int y1, int x2, int y2)
 {
 	DEFXX;
+	int lw = XX-> paint_line_width + .5;
 
 	if ( PObject( self)-> options. optInDrawInfo) return false;
 	if ( !XF_IN_PAINT(XX)) return false;
@@ -1390,8 +1392,7 @@ apc_gp_rectangle( Handle self, int x1, int y1, int x2, int y2)
 	SORT( x1, x2); SORT( y1, y2);
 	RANGE4(x1, y1, x2, y2);
 	PURE_FOREGROUND;
-	if ( XX-> line_width > 0 &&
-		(XX-> line_width % 2) == 0) {
+	if ( lw > 0 && (lw % 2) == 0) {
 		y2--;
 		y1--;
 	}
@@ -1460,6 +1461,24 @@ apc_gp_set_pixel( Handle self, int x, int y, Color color)
 }
 
 /* gpi settings */
+int
+apc_gp_get_alpha( Handle self)
+{
+	DEFXX;
+	if ( XF_IN_PAINT(XX)) {
+		return XX-> paint_alpha;
+	} else {
+		return XX-> alpha;
+	}
+}
+
+Bool
+apc_gp_get_antialias( Handle self)
+{
+	DEFXX;
+	return XF_IN_PAINT(XX) ? XX-> flags.antialias : XX->flags.saved_antialias;
+}
+
 Color
 apc_gp_get_back_color( Handle self)
 {
@@ -1589,11 +1608,11 @@ apc_gp_get_line_join( Handle self)
 	return ljRound;
 }
 
-int
+float
 apc_gp_get_line_width( Handle self)
 {
 	DEFXX;
-	return XF_IN_PAINT(XX) ? XX-> line_width : XX-> gcv. line_width;
+	return XF_IN_PAINT(XX) ? XX-> paint_line_width : XX-> line_width;
 }
 
 int
@@ -1692,12 +1711,53 @@ apc_gp_get_text_out_baseline( Handle self)
 }
 
 Bool
+apc_gp_set_alpha( Handle self, int alpha)
+{
+	DEFXX;
+
+	if (XT_IS_BITMAP(XX) || (( XT_IS_PIXMAP(XX) || XT_IS_APPLICATION(XX)) && guts.depth==1))
+		alpha = 255;
+	if ( !guts.render_extension)
+		alpha = 255;
+
+	if ( XF_IN_PAINT(XX)) {
+		if ( XX-> paint_alpha == alpha)
+			return true;
+		XX-> paint_alpha = alpha;
+		guts.xrender_pen_dirty = true;
+	} else {
+		XX-> alpha = alpha;
+	}
+	return true;
+}
+
+Bool
+apc_gp_set_antialias( Handle self, Bool antialias )
+{
+	DEFXX;
+	if ( antialias ) {
+		if (XT_IS_BITMAP(XX) || (( XT_IS_PIXMAP(XX) || XT_IS_APPLICATION(XX)) && guts.depth==1))
+			return false;
+		if ( !guts.render_extension)
+			return false;
+	}
+	if ( XF_IN_PAINT(XX) ) {
+		XX-> flags.antialias = antialias;
+	} else {
+		XX-> flags.saved_antialias = antialias;
+	}
+	return true;
+}
+
+Bool
 apc_gp_set_back_color( Handle self, Color color)
 {
 	DEFXX;
 	if ( XF_IN_PAINT(XX)) {
 		prima_allocate_color( self, color, &XX-> back);
 		XX-> flags. brush_back = 0;
+		if ( !XX-> flags. brush_null_hatch)
+			guts.xrender_pen_dirty = true;
 	} else
 		XX-> saved_back = color;
 	return true;
@@ -1710,6 +1770,7 @@ apc_gp_set_color( Handle self, Color color)
 	if ( XF_IN_PAINT(XX)) {
 		prima_allocate_color( self, color, &XX-> fore);
 		XX-> flags. brush_fore = 0;
+		guts.xrender_pen_dirty = true;
 	} else
 		XX-> saved_fore = color;
 	return true;
@@ -1744,6 +1805,8 @@ apc_gp_set_fill_pattern( Handle self, FillPattern pattern)
 	XX-> flags. brush_null_hatch =
 	( memcmp( pattern, fillPatterns[fpSolid], sizeof(FillPattern)) == 0);
 	memcpy( XX-> fill_pattern, pattern, sizeof( FillPattern));
+	if ( XF_IN_PAINT(XX))
+		guts.xrender_pen_dirty = true;
 	return true;
 }
 
@@ -1761,6 +1824,8 @@ apc_gp_set_fill_pattern_offset( Handle self, Point fpo)
 		gcv. ts_y_origin = fpo. y;
 		XChangeGC( DISP, XX-> gc, GCTileStipXOrigin | GCTileStipYOrigin, &gcv);
 		XCHECKPOINT;
+		if ( !XX-> flags. brush_null_hatch)
+			guts.xrender_pen_dirty = true;
 	} else {
 		XX-> gcv. ts_x_origin = fpo. x;
 		XX-> gcv. ts_y_origin = fpo. y;
@@ -1822,13 +1887,14 @@ apc_gp_set_line_join( Handle self, int lineJoin)
 }
 
 Bool
-apc_gp_set_line_width( Handle self, int line_width)
+apc_gp_set_line_width( Handle self, float line_width)
 {
 	DEFXX;
 	XGCValues gcv;
 
 	if ( XF_IN_PAINT(XX)) {
-		XX-> line_width = gcv. line_width = line_width;
+		XX-> paint_line_width = line_width;
+		gcv. line_width = line_width +.5;
 		if ( !( XX-> paint_ndashes == 0 || (XX-> paint_ndashes == 1 && XX-> paint_dashes[0] == 1))) {
 			dDASH_FIX( line_width, XX-> paint_dashes, XX-> paint_ndashes);
 			DASH_FIX;
@@ -1836,8 +1902,10 @@ apc_gp_set_line_width( Handle self, int line_width)
 		}
 		XChangeGC( DISP, XX-> gc, GCLineWidth, &gcv);
 		XCHECKPOINT;
-	} else
-		XX-> gcv. line_width = line_width;
+	} else {
+		XX-> gcv. line_width = line_width + .5;
+		XX-> line_width = line_width;
+	}
 	return true;
 }
 
@@ -1908,6 +1976,7 @@ apc_gp_set_rop( Handle self, int rop)
 			rop = ropNoOper;
 		XX-> paint_rop = rop;
 		XSetFunction( DISP, XX-> gc, function);
+		guts.xrender_pen_dirty = true;
 		XCHECKPOINT;
 	} else {
 		XX-> gcv. function = function;
@@ -1928,6 +1997,7 @@ apc_gp_set_rop2( Handle self, int rop)
 			gcv. line_style = ( rop == ropCopyPut) ? LineDoubleDash : LineOnOffDash;
 			XChangeGC( DISP, XX-> gc, GCLineStyle, &gcv);
 		}
+		guts.xrender_pen_dirty = true;
 	} else {
 		XX-> rop2 = rop;
 		if ( XX-> gcv. line_style != LineSolid)

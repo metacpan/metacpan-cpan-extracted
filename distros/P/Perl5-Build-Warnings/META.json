@@ -4,7 +4,7 @@
       "James E Keenan (jkeenan@cpan.org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -55,6 +55,6 @@
          "web" : "https://github.com/jkeenan/perl5-build-warnings"
       }
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

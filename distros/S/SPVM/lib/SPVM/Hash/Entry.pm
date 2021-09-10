@@ -4,12 +4,12 @@ package SPVM::Hash::Entry;
 
 =head1 NAME
 
-SPVM::Hash::Entry - Hash entry
+SPVM::Hash::Entry - Hash::Entry in SPVM | Hash entry
 
 =head1 SYNOPSYS
   
-  use SPVM::Hash::Entry;
+  use Hash::Entry;
 
 =head1 DESCRIPTION
 
-L<SPVM::Hash::Entry> is used for L<SPVM::Hash> internally.
+L<Hash::Entry|SPVM::Hash::Entry> is used for L<Hash|SPVM::Hash> internally.

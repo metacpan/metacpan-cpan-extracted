@@ -1,0 +1,10 @@
+bin/paper-wallet
+Changes
+lib/App/Bitcoin/PaperWallet.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/01-compile.t
+t/02-generate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

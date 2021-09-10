@@ -4,7 +4,7 @@ use warnings;
 
 package Path::Iterator::Rule;
 # ABSTRACT: Iterative, recursive file finder
-our $VERSION = '1.014';
+our $VERSION = '1.015';
 
 # Register warnings category
 use warnings::register;
@@ -247,7 +247,12 @@ sub _iter {
                     }
                     else {
                         $next = sub {
-                            opendir( my $dh, $string_item );
+                            my $dh;
+                            # Windows can return true for -r but still fail opendir.
+                            if ( ! opendir( $dh, $string_item ) ) {
+                                warnings::warnif("Directory '$string_item' is not readable. Skipping it");
+                                return;
+                            }
                             if ($opt_sorted) {
                                 map { ( "$string_item/$_", $_, $depth_p1, $origin ) }
                                   sort { $a cmp $b } grep { $_ ne "." && $_ ne ".." } readdir $dh;
@@ -752,7 +757,7 @@ Path::Iterator::Rule - Iterative, recursive file finder
 
 =head1 VERSION
 
-version 1.014
+version 1.015
 
 =head1 SYNOPSIS
 
@@ -1558,7 +1563,7 @@ See L<the speed of Perl file finders|http://rjbs.manxome.org/rubric/entry/1981>
 
 =back
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 

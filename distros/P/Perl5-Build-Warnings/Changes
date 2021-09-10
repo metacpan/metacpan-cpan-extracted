@@ -1,5 +1,9 @@
 Revision history for Perl module Perl5::Build::Warnings
 
+0.05 Fri 10 Sep 2021 08:14:54 AM EDT
+    - No change in functionality
+    - Provide programs with typical usage under examples/
+
 0.04 Thu Dec  5 17:42:24 EST 2019
     - Correct spelling errors in documentation
     - Regenerate README.md with '-t markdown_github'

@@ -388,6 +388,7 @@ unix/apc_menu.c
 unix/apc_misc.c
 unix/apc_pointer.c
 unix/apc_region.c
+unix/apc_render.c
 unix/apc_text.c
 unix/apc_timer.c
 unix/apc_widget.c
@@ -410,6 +411,7 @@ win32/cursor.c
 win32/dev.c
 win32/dnd.c
 win32/files.c
+win32/gdiplus.c
 win32/global.c
 win32/gp.c
 win32/image.c

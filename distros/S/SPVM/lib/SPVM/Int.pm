@@ -4,30 +4,30 @@ package SPVM::Int;
 
 =head1 NAME
 
-SPVM::Int - Int object
+SPVM::Int - Int in SPVM | Int object
 
 =head1 SYNOPSYS
 
-  use SPVM::Int;
+  use Int;
 
-  my $int_object = SPVM::Int->new(5);
+  my $int_object = Int->new(5);
   my $int_value = $int_object->value;
 
 =head1 DESCRIPTION
 
-L<SPVM::Int> object stores a C<int> value.
+L<Int|SPVM::Int> object stores a C<int> value.
 
 This object is immutable and its value cannot be changed.
 
-L<SPVM::Int> is automatically loaded just after the program starts.
+L<Int|SPVM::Int> is automatically loaded just after the program starts.
 
-=head1 STATIC METHODS
+=head1 CLASS METHODS
 
 =head2 new
 
-  sub new : SPVM::Int ($value : int)
+  sub new : Int ($value : int)
 
-Create a new L<SPVM::Int> object with a C<int> value.
+Create a new L<Int|SPVM::Int> object with a C<int> value.
 
 =head1 INSTANCE METHODS
 

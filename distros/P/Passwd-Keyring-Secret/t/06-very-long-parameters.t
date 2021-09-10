@@ -16,7 +16,13 @@ BEGIN
         plan skip_all => "Session D-Bus not available (not running a desktop session?), skipping tests";
     }
 
-    require_ok('Passwd::Keyring::Secret') or BAIL_OUT("Cannot load Passwd::Keyring::Secret");
+    ok(eval { require Passwd::Keyring::Secret; 1 }, "load Passwd::Keyring::Secret");
+
+    if ($@)
+    {
+        diag($@);
+        BAIL_OUT("OS unsupported");
+    }
 }
 
 my $APP = 'Passwd::Keyring::Secret Tests 06 ';
@@ -28,8 +34,14 @@ my $USER = 'A' x 256;
 my $PWD =  'B' x 256;
 my $REALM = 'C' x 256;
 
-my $secrets = Passwd::Keyring::Secret->new(app => $APP, group => $GROUP, alias => 'session');
+my $secrets = eval { Passwd::Keyring::Secret->new(app => $APP, group => $GROUP, alias => 'session') };
 isa_ok($secrets, 'Passwd::Keyring::Secret', "new keyring object");
+
+if ($@)
+{
+    diag($@);
+    BAIL_OUT("OS unsupported");
+}
 
 $secrets->set_password($USER, $PWD, $REALM);
 pass("set_password() works with long parameters");

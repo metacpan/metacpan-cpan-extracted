@@ -11,4 +11,4 @@ use SPVM 'MyZlib';
 
 my $out_file = "$ENV{HOME}/tmp/output.gz";
 
-MyZlib->test($out_file);
+SPVM::MyZlib->test($out_file);

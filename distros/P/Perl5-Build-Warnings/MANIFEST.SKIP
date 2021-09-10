@@ -32,7 +32,6 @@ svndiff/
 ^htmlify
 \.git/
 MYMETA.*$
-MYMETA.json$
 .version_info.pl
 \.gitignore
 \.travis.yml

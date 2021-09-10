@@ -15,15 +15,15 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
 # Inline constant sub
 {
-  ok(TestCase::Inline->constant_method);
-  ok(TestCase::Inline->constant_method_return_double == 0.25);
+  ok(SPVM::TestCase::Inline->constant_method);
+  ok(SPVM::TestCase::Inline->constant_method_return_double == 0.25);
 }
 
 # Inline new
 {
-  ok(TestCase::Inline->new_inline);
-  ok(TestCase::Inline->new);
-  is(ref TestCase::Inline->new, "TestCase::Inline");
+  ok(SPVM::TestCase::Inline->new_inline);
+  ok(SPVM::TestCase::Inline->new);
+  is(ref SPVM::TestCase::Inline->new, "SPVM::TestCase::Inline");
 }
 
 # All object is freed

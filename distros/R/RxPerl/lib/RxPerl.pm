@@ -15,7 +15,7 @@ our @EXPORT_OK = (
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.8.0";
+our $VERSION = "v6.8.1";
 
 1;
 __END__
@@ -264,7 +264,7 @@ L<https://rxjs.dev/api/index/function/partition>
     my $source = rx_interval(1)->pipe( op_take(10) );
     my ($o1, $o2) = rx_partition(
         $source,
-        sub { $_[0] % 2 == 1 },
+        sub ($value, $index) { $value % 2 == 1 },
     );
     rx_concat($o1, $o2)->subscribe($observer);
 

@@ -39,9 +39,27 @@ If you have any objection, please let me know.
 
 =head1 SPEED
 
-This module is too slow for practical use. If L<Math::BigInt::GMP> or
-L<Math::BigInt::Pari> is available, then this module will use one of those
-backends to achieve reasonable speed. It’ll still be pretty slow, though.
+This module is too slow for practical use in pure Perl. If a recognized
+alternate backend for L<Math::BigInt> is available, though, then this module
+will use that to achieve reasonable (though still unimpressive) speed.
+
+Recognized alternate backends are (in order of preference):
+
+=over
+
+=item * L<Math::BigInt::GMPz>
+
+=item * L<Math::BigInt::GMP>
+
+=item * L<Math::BigInt::LTM>
+
+=item * L<Math::BigInt::Pari>
+
+=back
+
+L<Math::BigInt::BitVect> and L<Math::BigInt::FastCalc> are also
+recognized, but these don’t seem to achieve speed that’s practical
+for use in, e.g., creation of RSA keys.
 
 =head1 LICENSE
 
@@ -52,14 +70,14 @@ This module is released under the same license as Perl.
 use strict;
 use warnings;
 
-use Math::BigInt try => 'GMP,Pari,FastCalc';
+use Math::BigInt try => 'GMPz,GMP,LTM,Pari,BitVect,FastCalc';
 
 #To force pure Perl
 #use Math::BigInt;
 
 use Math::ProvablePrime::Rand ();
 
-our $VERSION = 0.045;
+our $VERSION = '0.51';
 
 my (@ptab, $MI);
 
@@ -645,35 +663,37 @@ sub find {
             1673450759,
         );
 
-        $BGCD_CHECK = Math::BigInt->new(@NON_XS_BGCD_CHECK);
+        $BGCD_CHECK = Math::BigInt->new($NON_XS_BGCD_CHECK[0]);
         $BGCD_CHECK->bmul($_) for @NON_XS_BGCD_CHECK[ 1 .. $#NON_XS_BGCD_CHECK ];
     }
 
     #The Python original had 20 here; I’ve added more primes in @ptab
     #in order to speed things up.
     if ($ki <= 31) {
+
+        # A quick way to avoid even numbers: decrement the bit length
+        # by one, then bit-shift the random int and add 1.
+        $ki -= 1;
+        my $lower = 2 ** ($ki - 1);
+        my $upper = (2 ** $ki) - 1;
+
       RAND_INT:
         while (1) {
-            my $lower = 2 ** ($ki - 1);
-            my $upper = (2 ** $ki) - 1;
 
-#print "before _randint\n";
-            #same as _randint($lower, $upper), but for a scalar
-            my $n = $lower + int rand(1 + $upper - $lower);
-#print "$lower <= $n <= $upper\n";
+            # This is one bit shorter than we need:
+            my $n = Math::ProvablePrime::Rand::int($lower, $upper);
 
-            #my $sqrt = _ceil_sqrt( $n );    #needs bsqrt
+            # Now add a 1 at the end of the number to make it
+            # actually suit our needs:
+            $n <<= 1;
+            $n += 1;
+
             my $sqrt = ceil( sqrt $n );
-#print "sqrt: $sqrt\n";
 
             for my $p ( @ptab[ 0 .. $#ptab ] ) {
                 return $n if $p >= $sqrt;
 
-                #last if !($n % $p);
-                if ( !($n % $p) ) {
-                    #print "$n divisible by $p (but $rem)\n";
-                    next RAND_INT;
-                }
+                next RAND_INT if !($n % $p);
             }
 
             #NOT IN PYTHON ORIGINAL - but, at this point,
@@ -712,7 +732,7 @@ sub find {
 
     my $q = find( 1 + int( $r * $ki ) );
 
-    my $ib = $_MBI_1->copy()->blsft($ki - 1)->bdiv($q)->bdiv($_MBI_2);
+    my $ib = $_MBI_1->copy()->blsft($ki - 1)->bdiv($q)->brsft(1);
 
     my $n;
     my $success = 0;
@@ -722,9 +742,9 @@ sub find {
 
   RANDOM_NUM:
     while (!$success) {
-        my $rr = _randint( $rand_low, $rand_high );
+        my $rr_dbl = _randint( $rand_low, $rand_high )->blsft(1);
 
-        $n = $rr->copy()->badd($rr)->bmul($q)->binc();
+        $n = $rr_dbl->copy()->bmul($q)->binc();
 
         #Optimization #1: check for any GCDs (aka GCFs) > 1
         #Currently this catches factors of any primes up to 101.
@@ -746,7 +766,7 @@ sub find {
         my $a = _randint( $_MBI_2, $n->copy()->binc()->binc() );
         if ( $a->copy()->bmodpow( $n->copy()->bdec(), $n )->is_one() ) {
 
-            $a->bmodpow( $rr->badd($rr), $n );
+            $a->bmodpow( $rr_dbl, $n );
             if ( $a->bdec()->bgcd($n)->is_one() ) {
                 $success = 1;
             }

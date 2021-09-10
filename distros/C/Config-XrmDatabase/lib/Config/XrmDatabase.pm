@@ -5,7 +5,7 @@ package Config::XrmDatabase;
 use v5.26;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 use Feature::Compat::Try;
 
@@ -370,12 +370,27 @@ sub read_file ( $class, $file, %opts ) {
 
 
 
-
-
-
-
-
 sub write_file ( $self, $file ) {
+    require File::Slurper;
+    File::Slurper::write_text( $file, $self->to_string );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub to_string ( $self ) {
+
     my $folded = $self->_folded;
     my @records;
 
@@ -390,7 +405,7 @@ sub write_file ( $self, $file ) {
         push @records, "$key : $value";
     }
 
-    File::Slurper::write_text( $file, join( "\n", @records ) );
+   return @records ? join( "\n", @records, '' ) : '';
 }
 
 
@@ -730,7 +745,7 @@ Config::XrmDatabase - Pure Perl X Resource Manager Database
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -885,7 +900,7 @@ record is a single line of the form
 
   key : value
 
-Multiline values are not parsed.
+Multiline values are not parsed properly.
 
 C<%opts> is passed to the class constructor.
 
@@ -990,13 +1005,20 @@ Note that the subroutine's return value will be returned by L<query>.
 
   $db->write_file( $file );
 
-Write a simplified form of an X Resource Manager database file.
+Write a simplified form of an X Resource Manager database file.  See L</to_string>
+for the format.
+
+=head2 to_string
+
+  $string = $db->to_string( );
+
+Encode a simplified form of an X Resource Manager database as a string.
 
 Each record is a single line of the form
 
   key : value
 
-Multiline values are not supported, and will create an unparseable file.
+Multiline values are not supported, and will create an unparseable result.
 
 =head2 merge
 

@@ -16,11 +16,23 @@ BEGIN
         plan skip_all => "Session D-Bus not available (not running a desktop session?), skipping tests";
     }
 
-    require_ok('Passwd::Keyring::Secret') or BAIL_OUT("Cannot load Passwd::Keyring::Secret");
+    ok(eval { require Passwd::Keyring::Secret; 1 }, "load Passwd::Keyring::Secret");
+
+    if ($@)
+    {
+        diag($@);
+        BAIL_OUT("OS unsupported");
+    }
 }
 
-my $secrets = Passwd::Keyring::Secret->new();
+my $secrets = eval { Passwd::Keyring::Secret->new() };
 isa_ok($secrets, 'Passwd::Keyring::Secret', "new keyring object");
+
+if ($@)
+{
+    diag($@);
+    BAIL_OUT("OS unsupported");
+}
 
 ok($secrets->is_persistent(), "is_persistent() returns that default keyring is persistent");
 

@@ -14,11 +14,10 @@ WriteMakefile(
     },
     TEST_REQUIRES => {
         'Test::Class' => 0.4,
-        'Test::NoWarnings' => 0.01,
         'Test::Deep' => 0,
         'Test::More' => 0.01,
         'Test::Exception' => 0,
-        'Test::NoWarnings' => 0,
+        'Test::FailWarnings' => 0,
         'File::Which' => 0,
     },
     META_MERGE => {

@@ -1,8 +1,8 @@
+#include "win32\win32guts.h"
 #ifndef _APRICOT_H_
 #include "apricot.h"
 #endif
 #include "guts.h"
-#include "win32\win32guts.h"
 #include "Image.h"
 
 #ifdef __cplusplus
@@ -452,6 +452,11 @@ apc_gp_get_clip_rect( Handle self)
 	rr. top    += p.y;
 	rr. bottom += p.y;
 
+	rr. left   += sys transform2. x;
+	rr. right  += sys transform2. x;
+	rr. top    -= sys transform2. y;
+	rr. bottom -= sys transform2. y;
+
 	return rr;
 }
 
@@ -475,10 +480,13 @@ apc_gp_set_clip_rect( Handle self, Rect c)
 	if ( is_apt(aptLayeredPaint) && sys layeredParentRegion )
 		CombineRgn( rgn, rgn, sys layeredParentRegion, RGN_AND);
 	if ( !SelectClipRgn( sys ps, rgn)) apiErr;
+	if ( sys graphics ) {
+		GPCALL GdipSetClipHrgn(sys graphics, rgn, CombineModeReplace);
+		apiGPErrCheck;
+	}
 	if ( !DeleteObject( rgn)) apiErr;
 	return true;
 }
-
 
 Bool
 apc_gp_get_region( Handle self, Handle mask)
@@ -526,6 +534,10 @@ apc_gp_set_region( Handle self, Handle region)
 	if ( is_apt(aptLayeredPaint) && sys layeredParentRegion )
 		CombineRgn( rgn, rgn, sys layeredParentRegion, RGN_AND);
 	SelectClipRgn( sys ps, rgn);
+	if ( sys graphics ) {
+		GPCALL GdipSetClipHrgn(sys graphics, rgn, CombineModeReplace);
+		apiGPErrCheck;
+	}
 	DeleteObject( rgn);
 	return true;
 }

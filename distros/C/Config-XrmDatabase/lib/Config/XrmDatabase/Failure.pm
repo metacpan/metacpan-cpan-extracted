@@ -5,7 +5,7 @@ package Config::XrmDatabase::Failure;
 use v5.26;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 use custom::failures::x::alias
   -suffix => '_failure',
@@ -32,7 +32,7 @@ Config::XrmDatabase::Failure - Exception class
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 SUPPORT
 

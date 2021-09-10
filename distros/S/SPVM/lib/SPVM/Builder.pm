@@ -20,7 +20,7 @@ sub new {
   my $class = shift;
   
   my $self = {
-    module_dirs => [@INC],
+    module_dirs => [map { "$_/SPVM" } @INC],
     @_
   };
   
@@ -80,10 +80,9 @@ sub create_build_lib_path {
 }
 
 sub get_shared_lib_file_dist {
-  my ($self, $package_name, $category) = @_;
-  
-  my @package_name_parts = split(/::/, $package_name);
-  my $module_module_file = $self->get_module_file($package_name);
+  my ($self, $class_name, $category) = @_;
+
+  my $module_module_file = $self->get_module_file($class_name);
   
   my $shared_lib_file = SPVM::Builder::Util::convert_module_file_to_shared_lib_file($module_module_file, $category);
   
@@ -91,9 +90,9 @@ sub get_shared_lib_file_dist {
 }
 
 sub build_shared_lib_dist {
-  my ($self, $package_name, $category) = @_;
-  
-  my $compile_success = $self->compile_spvm($package_name, '(build_shared_lib_dist)', 0);
+  my ($self, $class_name, $category) = @_;
+
+  my $compile_success = $self->compile_spvm($class_name, '(build_shared_lib_dist)', 0);
   unless ($compile_success) {
     exit(255);
   }
@@ -105,12 +104,12 @@ sub build_shared_lib_dist {
     quiet => 0,
   );
   
-  my $method_names = $self->get_method_names($package_name, $category);
-  $cc_native->build_shared_lib_dist($package_name);
+  my $method_names = $self->get_method_names($class_name, $category);
+  $cc_native->build_shared_lib_dist($class_name);
 }
 
 sub build_and_bind_shared_lib {
-  my ($self, $package_name, $category) = @_;
+  my ($self, $class_name, $category) = @_;
   
   my $cc = SPVM::Builder::CC->new(
     build_dir => $self->{build_dir},
@@ -119,28 +118,30 @@ sub build_and_bind_shared_lib {
     quiet => 1,
   );
   
-  my $method_names = $self->get_method_names($package_name, $category);
+  my $method_names = $self->get_method_names($class_name, $category);
   
   if (@$method_names) {
     # Shared library which is already installed in distribution directory
-    my $shared_lib_file = $self->get_shared_lib_file_dist($package_name, $category);
+    my $shared_lib_file = $self->get_shared_lib_file_dist($class_name, $category);
+
     
     # Try runtime compile if shared library is not found
     unless (-f $shared_lib_file) {
-      $shared_lib_file = $cc->build_shared_lib_runtime($package_name);
+      $shared_lib_file = $cc->build_shared_lib_runtime($class_name);
     }
-    $self->bind_methods($cc, $shared_lib_file, $package_name, $category);
+    $self->bind_methods($cc, $shared_lib_file, $class_name, $category);
   }
+  
 }
 
 sub bind_methods {
-  my ($self, $cc, $shared_lib_file, $package_name, $category) = @_;
-  
+  my ($self, $cc, $shared_lib_file, $class_name, $category) = @_;
+
   # m library is maybe not dynamic link library
   my %must_not_load_libs = map { $_ => 1 } ('m');
-  
+
   # Load pre-required dynamic library
-  my $bconf = $self->get_config($package_name, $category);
+  my $bconf = $self->get_config($class_name, $category);
   my $lib_dirs = $bconf->get_lib_dirs;
   {
     local @DynaLoader::dl_library_path = (@$lib_dirs, @DynaLoader::dl_library_path);
@@ -157,42 +158,46 @@ sub bind_methods {
     }
   }
   
-  my $method_names = $self->get_method_names($package_name, $category);
+  my $method_names = $self->get_method_names($class_name, $category);
   my $method_infos = [];
   for my $method_name (@$method_names) {
     my $method_info = {};
-    $method_info->{package_name} = $package_name;
+    $method_info->{class_name} = $class_name;
     $method_info->{method_name} = $method_name;
     push @$method_infos, $method_info;
   }
   
-  # Add anon package sub names if precompile
+  
+  # Add anon class sub names if precompile
   if ($category eq 'precompile') {
-    my $anon_package_names = $self->get_anon_package_names_by_parent_package_name($package_name);
-    for my $anon_package_name (@$anon_package_names) {
+    my $anon_class_names = $self->get_anon_class_names_by_parent_class_name($class_name);
+    for my $anon_class_name (@$anon_class_names) {
       my $method_info = {};
-      $method_info->{package_name} = $anon_package_name;
+      $method_info->{class_name} = $anon_class_name;
       $method_info->{method_name} = "";
       push @$method_infos, $method_info;
     }
   }
-  
-  for my $method_info (@$method_infos) {
-    my $package_name = $method_info->{package_name};
-    my $method_name = $method_info->{method_name};
-    
-    my $method_abs_name = "${package_name}::$method_name";
 
-    my $cfunc_name = SPVM::Builder::Util::create_cfunc_name($package_name, $method_name, $category);
+  for my $method_info (@$method_infos) {
+    my $class_name = $method_info->{class_name};
+    my $method_name = $method_info->{method_name};
+
+    my $method_abs_name = "${class_name}::$method_name";
+    
+    my $cfunc_name = SPVM::Builder::Util::create_cfunc_name($class_name, $method_name, $category);
+
     my $cfunc_address;
     if ($shared_lib_file) {
       my $shared_lib_libref = DynaLoader::dl_load_file($shared_lib_file);
+      
       if ($shared_lib_libref) {
+
         $cfunc_address = DynaLoader::dl_find_symbol($shared_lib_libref, $cfunc_name);
         unless ($cfunc_address) {
           my $dl_error = DynaLoader::dl_error();
           my $error = <<"EOS";
-Can't find native function \"$cfunc_name\" corresponding to ${package_name}->$method_name in \"$shared_lib_file\"
+Can't find native function \"$cfunc_name\" corresponding to ${class_name}->$method_name in \"$shared_lib_file\"
 
 You must write the following definition.
 --------------------------------------------------
@@ -217,19 +222,20 @@ EOS
     else {
       confess "DLL file is not specified";
     }
-    
-    $self->bind_method($package_name, $method_name, $cfunc_address, $category);
+
+    $self->bind_method($class_name, $method_name, $cfunc_address, $category);
   }
+
 }
 
 sub get_config {
-  my ($self, $package_name, $category) = @_;
-  
-  my $module_file = $self->get_module_file($package_name);
-  my $src_dir = SPVM::Builder::Util::remove_package_part_from_file($module_file, $package_name);
+  my ($self, $class_name, $category) = @_;
 
+  my $module_file = $self->get_module_file($class_name);
+  my $src_dir = SPVM::Builder::Util::remove_class_part_from_file($module_file, $class_name);
+  
   # Config file
-  my $config_rel_file = SPVM::Builder::Util::convert_package_name_to_category_rel_file($package_name, $category, 'config');
+  my $config_rel_file = SPVM::Builder::Util::convert_class_name_to_category_rel_file($class_name, $category, 'config');
   my $config_file = "$src_dir/$config_rel_file";
   
   # Config
@@ -260,7 +266,8 @@ EOS
       $bconf = SPVM::Builder::Config->new_c99;
     }
   }
-  
+
+
   return $bconf;
 }
 

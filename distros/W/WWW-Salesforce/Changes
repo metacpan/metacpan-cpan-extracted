@@ -1,5 +1,14 @@
 Revision history for Perl extension WWW-Salesforce
 
+0.304     2021-09-09
+    - Update to a newer dzil config
+    - Re-document a bit to fix some misconceptions
+    - Allow `version` to be passed to the constructor
+    - Allow `serverurl` to be passed to the constructor
+    - Setup GitHub Workflows with secrets to actually run tests
+    - Use perltidy against our tests
+    - Set the default version to be 52.0
+
 0.303     2017-10-07
     - Fix dependency issue due to subclass with 'base'.
       Both SOAP::Lite and SOAP define SOAP::Serializer and SOAP seems to win the

@@ -139,10 +139,16 @@ subtest 'op_distinct_until_key_changed' => sub {
         {name => 'Peter', grade => 'B'},
         {name => 'Mary', grade => 'B'},
         {name => 'Mary', grade => 'A'},
+        {name => undef, grade => 'A'},
+        {name => undef, grade => 'B'},
     )->pipe(
         op_distinct_until_key_changed('name'),
     );
-    obs_is $o, ['(ab)', {a => {name => 'Peter', grade => 'A'}, b => {name => 'Mary', grade => 'B'}}];
+    obs_is $o, ['(abc)', {
+        a => { name => 'Peter', grade => 'A' },
+        b => { name => 'Mary', grade => 'B' },
+        c => { name => undef, grade => 'A' },
+    }];
 };
 
 subtest 'op_first' => sub {
@@ -169,11 +175,21 @@ subtest 'op_take_while' => sub {
 subtest 'op_map' => sub {
     my $o = rx_interval(1)->pipe( op_map(sub {$_[0] * 10}), op_take(3) );
     obs_is $o, ['-abc', {a => 0, b => 10, c => 20}], 'map with three numbers';
+
+    $o = cold('12345')->pipe(
+        op_map(sub {$_[1] + 2}),
+    );
+    obs_is $o, ['23456'], 'map with index';
 };
 
 subtest 'op_filter' => sub {
     my $o = rx_interval(1)->pipe( op_filter(sub {$_[0] % 2 == 1}), op_take(3) );
     obs_is $o, ['--a-b-c', {a => 1, b => 3, c => 5}], 'filter with three/six values';
+
+    $o = cold('1234567890')->pipe(
+        op_filter(sub {$_[1] % 3 == 1}),
+    );
+    obs_is $o, ['-2--5--8--'], 'filter by index';
 };
 
 subtest 'op_pluck' => sub {
@@ -332,8 +348,18 @@ subtest 'rx_partition' => sub {
         sub { $_[0] % 2 == 1 },
     );
 
-    obs_is $o1, ['-1-3-5-7-9'], 'o1';
-    obs_is $o2, ['0-2-4-6-8-'], 'o2';
+    obs_is $o1, ['-1-3-5-7-9'], 'value o1';
+    obs_is $o2, ['0-2-4-6-8-'], 'value o2';
+
+    $source = cold('1234567890');
+
+    ($o1, $o2) = rx_partition(
+        $source,
+        sub { $_[1] % 2 == 1 },
+    );
+
+    obs_is $o1, ['-2-4-6-8-0'], 'index o1';
+    obs_is $o2, ['1-3-5-7-9-'], 'index o2';
 };
 
 done_testing();

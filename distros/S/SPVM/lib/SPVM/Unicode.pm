@@ -4,24 +4,24 @@ package SPVM::Unicode;
 
 =head1 NAME
 
-SPVM::Unicode - Unicode utilities.
+SPVM::Unicode - Unicode in SPVM | Unicode utilities.
 
 =head1 SYNOPSYS
 
-  use SPVM::Unicode;
+  use Unicode;
   
   # Get a UTF-32(Unicode) codepoint from UTF-8 string with the byte offset and proceed the offset to next UTF-8 character position
   my $str = "あいうえお";
   my $pos = 0;
-  while ((my $uchar = SPVM::Unicode->uchar($str, \$pos)) >= 0) {
+  while ((my $uchar = Unicode->uchar($str, \$pos)) >= 0) {
     # ...
   }
   
 =head1 DESCRIPTION
 
-L<SPVM::Unicode> is Unicode utilities. This module privides the methods to convert UTF-8, UTF-16, UTF-32, Unicode codepoint each others.
+L<Unicode|SPVM::Unicode> is Unicode utilities. This module privides the methods to convert UTF-8, UTF-16, UTF-32, Unicode codepoint each others.
 
-=head1 STATIC METHODS
+=head1 CLASS METHODS
 
 =head2 ERROR_INVALID_UTF8
 

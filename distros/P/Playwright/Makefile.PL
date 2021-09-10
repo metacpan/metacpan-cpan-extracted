@@ -14,7 +14,8 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Playwright",
   "EXE_FILES" => [
-    "bin/playwright_server"
+    "bin/playwright_server",
+    "bin/reap_playwright_servers"
   ],
   "LICENSE" => "mit",
   "MIN_PERL_VERSION" => "5.028000",
@@ -33,6 +34,7 @@ my %WriteMakefileArgs = (
     "List::Util" => "1.33",
     "Net::EmptyPort" => 0,
     "POSIX" => 0,
+    "Proc::ProcessTable" => 0,
     "Sereal::Decoder" => 0,
     "Sereal::Encoder" => 0,
     "Sub::Install" => 0,
@@ -49,7 +51,7 @@ my %WriteMakefileArgs = (
     "Test::MockFile" => 0,
     "Test::MockModule" => 0
   },
-  "VERSION" => "0.013",
+  "VERSION" => "0.014",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -70,6 +72,7 @@ my %FallbackPrereqs = (
   "List::Util" => "1.33",
   "Net::EmptyPort" => 0,
   "POSIX" => 0,
+  "Proc::ProcessTable" => 0,
   "Sereal::Decoder" => 0,
   "Sereal::Encoder" => 0,
   "Sub::Install" => 0,

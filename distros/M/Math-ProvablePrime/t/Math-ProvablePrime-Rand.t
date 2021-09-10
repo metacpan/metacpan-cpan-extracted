@@ -13,7 +13,7 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 
 use Test::More;
-use Test::NoWarnings;
+use Test::FailWarnings -allow_deps => 1;
 
 use parent qw(
     Test::Class
@@ -23,11 +23,7 @@ use Math::BigInt ();
 
 use Math::ProvablePrime::Rand ();
 
-if ( !caller ) {
-    my $test_obj = __PACKAGE__->new();
-    plan tests => $test_obj->expected_tests(+1);
-    $test_obj->runtests();
-}
+__PACKAGE__->new()->runtests() if !caller;
 
 #----------------------------------------------------------------------
 

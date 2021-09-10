@@ -1,3 +1,0 @@
-package MyGSL {
-  native sub stat : void ();
-}

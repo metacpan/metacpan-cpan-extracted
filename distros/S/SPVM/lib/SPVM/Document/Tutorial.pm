@@ -46,13 +46,13 @@ Let's take SPVM for the first time. This is a first simple example. Let's calcur
 
 <h4>Create SPVM module</h4>
 
-Create SPVM module. The extension is "spvm". In this example, the name of SPVM module is "MyMath.spvm".
+Create SPVM module. The extension is "spvm". In this example, the name of SPVM module is "SPVM/MyMath.spvm".
 
-Create "MyMath.spvm" in the "lib" directory, and you write the following code.
+Create "SPVM/MyMath.spvm" in the "lib" directory, and you write the following code.
 
 <pre>
-# lib/MyMath.spvm
-package MyMath {
+# lib/SPVM/MyMath.spvm
+class MyMath {
   sub sum : int ($nums : int[]) {
     
     my $total = 0;
@@ -65,25 +65,25 @@ package MyMath {
 }
 </pre>
 
-<h4>Package Definition</h4>
+<h4>Class Definition</h4>
 
-Write <b>Package Definition</b> by <b>package</b> keyword. Unlike Perl, SPVM always need package. The whole SPVM grammar is a set of packages.
+Write <b>Class Definition</b> by <b>class</b> keyword. Unlike Perl, SPVM always need class. The whole SPVM grammar is a set of classes.
 
 <pre>
-# Package Definition
-package MyMath {
+# Class Definition
+class MyMath {
 
 }
 </pre>
 
-See also <a href="/language.html#language-package">Package - SPVM Language Specification</a> about Package.
+See also <a href="/language.html#language-class">Class - SPVM Language Specification</a> about Class.
 
 <h4>Method Definition</h4>
 
 Write <b>Method Definition</b> by <b>sub</b> keyword. Unlike Perl, SPVM Method Definition have return type and argument types.
   
 <pre>
-package MyMath {
+class MyMath {
   # Method Definition
   sub sum : int ($nums : int[]) {
     
@@ -177,9 +177,9 @@ In this point, unlike Perl where all value are assigned to the dynamic type SV, 
 
 See also <a href="http://59.106.185.196:3000/spvmdoc-public/language.html#language-type">Type - SPVM Language Specification</a> about Type.
 
-<h4>Lexical Variable Declaration</h4>
+<h4>Local Variable Declaration</h4>
 
-Write <b>Lexical Variable Declaration</b> by <b>my</b> keyword. You can initialize variables at the same time you declare variables.
+Write <b>Local Variable Declaration</b> by <b>my</b> keyword. You can initialize variables at the same time you declare variables.
 
 <pre>
 my $total = 0;
@@ -193,7 +193,7 @@ my $total : int = 0;
 
 0 on the right side is a signed 32-bit integer, so the type of the variable is automatically determined by type inference.
 
-See also <a href="/language.html#language-lex-var">Lexical Variabe - SPVM Language Specification</a> about Lexical Variabe Declaration.
+See also <a href="/language.html#language-local-var">Lexical Variabe - SPVM Language Specification</a> about Lexical Variabe Declaration.
 
 See also <a href="/language.html#language-type-inference">Type Inference - SPVM Language Specification</a> about Type Inference.
 
@@ -335,14 +335,14 @@ use lib "$FindBin::Bin/lib";
 use SPVM 'MyMath';
 
 # Call method
-my $total = MyMath->sum([3, 6, 8, 9]);
+my $total = SPVM::MyMath->sum([3, 6, 8, 9]);
 
 print "Total: $total\n";
 
 # Call method with packed data
 my $nums_packed = pack('l*', 3, 6, 8, 9);
 my $sv_nums = SPVM::new_int_array_from_bin($nums_packed);
-my $total_packed = MyMath->sum($sv_nums);
+my $total_packed = SPVM::MyMath->sum($sv_nums);
 
 print "Total Packed: $total_packed\n";
 </pre>
@@ -373,7 +373,7 @@ Call SPVM Method. It's amazing that SPVM method can be called as Perl method.
 
 <pre>
 # Call method
-my $total = MyMath->sum([3, 6, 8, 9]);
+my $total = SPVM::MyMath->sum([3, 6, 8, 9]);
 </pre>
 
 Perl array reference is converted to SPVM int array.
@@ -392,7 +392,7 @@ you can pass packed binary data. SPVM::new_int_array_from_bin create SPVM int ar
 # Call method with packed data
 my $nums_packed = pack('l*', 3, 6, 8, 9);
 my $sv_nums = SPVM::new_int_array_from_bin($nums_packed);
-my $total_packed = MyMath->sum($sv_nums);
+my $total_packed = SPVM::MyMath->sum($sv_nums);
 </pre>
 
 See <a href="/exchange-api.html">SPVM Exchange API</a> about SPVM Exchange API like SPVM::new_int_array_from_bin.
@@ -413,8 +413,8 @@ If you're searching SPVM for performance reasons, here's what you really want to
 SPVM Module:
 
 <pre>
-# lib/MyMath.spvm
-package MyMath {
+# lib/SPVM/MyMath.spvm
+class MyMath {
   sub sum : int ($nums : int[]) {
     
     my $total = 0;
@@ -439,14 +439,14 @@ use lib "$FindBin::Bin/lib";
 use SPVM 'MyMath';
 
 # Call method
-my $total = MyMath->sum([3, 6, 8, 9]);
+my $total = SPVM::MyMath->sum([3, 6, 8, 9]);
 
 print "Total: $total\n";
 
 # Call method with packed data
 my $nums_packed = pack('l*', 3, 6, 8, 9);
 my $sv_nums = SPVM::new_int_array_from_bin($nums_packed);
-my $total_packed = MyMath->sum($sv_nums);
+my $total_packed = SPVM::MyMath->sum($sv_nums);
 
 print "Total Packed: $total_packed\n";
 </pre>
@@ -454,8 +454,8 @@ print "Total Packed: $total_packed\n";
 Precompiled SPVM Method. This means SPVM code is converted to Machine Code:
 
 <pre>
-# lib/MyMath.spvm
-package MyMath : precompile {
+# lib/SPVM/MyMath.spvm
+class MyMath : precompile {
   sub sum_precompile : int ($nums : int[]) {
     
     my $total = 0;
@@ -480,7 +480,7 @@ use lib "$FindBin::Bin/lib";
 use SPVM 'MyMath';
 
 # Call precompile method
-my $total_precompile = MyMath->sum_precompile([3, 6, 8, 9]);
+my $total_precompile = SPVM::MyMath->sum_precompile([3, 6, 8, 9]);
 
 print "Total Precompile: $total_precompile\n";
 </pre>
@@ -488,15 +488,15 @@ print "Total Precompile: $total_precompile\n";
 SPVM Native Method. This means SPVM method call C/C++ native method:
 
 <pre>
-# lib/MyMath.spvm
-package MyMath {
+# lib/SPVM/MyMath.spvm
+class MyMath {
   native sub sum_native : int ($nums : int[]);
 }
 
-// lib/MyMath.c
+// lib/SPVM/MyMath.c
 #include "spvm_native.h"
 
-int32_t SPNATIVE__MyMath__sum_native(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__SPVM__MyMath__sum_native(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* sv_nums = stack[0].oval;
   
@@ -514,7 +514,7 @@ int32_t SPNATIVE__MyMath__sum_native(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
-# lib/MyMath.config
+# lib/SPVM/MyMath.config
 
 use strict;
 use warnings;
@@ -537,7 +537,7 @@ use lib "$FindBin::Bin/lib";
 use SPVM 'MyMath';
 
 # Call native method
-my $total_native = MyMath->sum_native([3, 6, 8, 9]);
+my $total_native = SPVM::MyMath->sum_native([3, 6, 8, 9]);
 
 print "Total Native: $total_native\n";
 </pre>
@@ -583,7 +583,7 @@ use lib "$FindBin::Bin/lib";
 
 use SPVM 'BindCLib';
 
-my $total = BindCLib->sum([1, 2, 3, 4]);
+my $total = SPVM::BindCLib->sum([1, 2, 3, 4]);
 
 print "Total: $total\n";
 </pre>
@@ -591,8 +591,8 @@ print "Total: $total\n";
 SPVM Method Definition.
 
 <pre>
-# lib/BindCLib.spvm
-package BindCLib {
+# lib/SPVM/BindCLib.spvm
+class BindCLib {
   native sub sum : int ($nums : int[]);
 }
 </pre>
@@ -600,7 +600,7 @@ package BindCLib {
 Native Config.
 
 <pre>
-# lib/BindCLib.config
+# lib/SPVM/BindCLib.config
 use strict;
 use warnings;
 
@@ -613,12 +613,12 @@ $bconf;
 Call C library from C program.
 
 <pre>
-// lib/BindCLib.c
+// lib/SPVM/BindCLib.c
 #include "spvm_native.h"
 
 #include "bind_clib.h"
 
-int32_t SPNATIVE__BindCLib__sum(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__SPVM__BindCLib__sum(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* sv_nums = stack[0].oval;
   
@@ -640,7 +640,7 @@ Notice the line reading the header.
 #include "bind_clib.h"
 </pre>
 
-This header is included from "lib/BindCLib.native/include/bind_clib.h". This is pure C header file.
+This header is included from "lib/SPVM/BindCLib.native/include/bind_clib.h". This is pure C header file.
 
 <pre>
 #include <inttypes.h>
@@ -648,9 +648,9 @@ This header is included from "lib/BindCLib.native/include/bind_clib.h". This is 
 int32_t bind_clib_sum(int32_t* nums, int32_t length);
 </pre>
 
-SPVM sets the include directory("BindCLib.native/include") as the default header file read path.
+SPVM sets the include directory("SPVM/BindCLib.native/include") as the default header file read path.
 
-C library source file is "lib/BindCLib.native/src/bind_clib.c". This is pure C source file.
+C library source file is "lib/SPVM/BindCLib.native/src/bind_clib.c". This is pure C source file.
 
 <pre>
 #include "bind_clib.h"
@@ -666,7 +666,7 @@ int32_t bind_clib_sum(int32_t* nums, int32_t length) {
 }
 </pre>
 
-SPVM compiles all source files in the source directory("BindCLib.native/src"). It can contain multiple source files.
+SPVM compiles all source files in the source directory("SPVM/BindCLib.native/src"). It can contain multiple source files.
 
 <h3>How to bind other C Library to SPVM</h3>
 
@@ -700,32 +700,32 @@ SPVM provides common arithmetic for complex numbers at the same level as C99.
 
 <h3>Complex Type</h3>
 
-Complex Type is SPVM::Complex_2f for complex float and SPVM::Complex_2d for complex double.
+Complex Type is Complex_2f for complex float and Complex_2d for complex double.
 
-SPVM::Complex_2f and SPVM::Complex_2d is <a href="/language.html#language-type-multi-numeric">Multi Numeric Type</a>. This is allocated on Method Call Stack.
+Complex_2f and Complex_2d is <a href="/language.html#language-type-multi-numeric">Multi Numeric Type</a>. This is allocated on Method Call Stack.
 
 This is not Object Type which is allocated on Heap Memory.
 
 See <a href="https://github.com/yuki-kimoto/SPVM/tree/master/examples/matrix">SPVM Complex Examples</a> at first.
 
-<h4>SPVM::Complex_2f</h4>
+<h4>Complex_2f</h4>
 
 <pre>
 # Complex float type
-use SPVM::Complex_2f;
+use Complex_2f;
 
-my $z : SPVM::Complex_2f;
+my $z : Complex_2f;
 $z->{re} = 1.5f;
 $z->{im} = 1.7f;
 </pre>
 
-<h4>SPVM::Complex_2d</h4>
+<h4>Complex_2d</h4>
 
 <pre>
 # Complex double type
-use SPVM::Complex_2d;
+use Complex_2d;
 
-my $z : SPVM::Complex_2d;
+my $z : Complex_2d;
 $z->{re} = 1.5;
 $z->{im} = 1.7;
 </pre>
@@ -735,12 +735,12 @@ $z->{im} = 1.7;
 New Complex functions
 
 <pre>
-use SPVM::Math (complexf, complex);
+use Math (complexf, complex);
 
-# SPVM::Complex_2f
+# Complex_2f
 my $z = complexf(1.5f, 1.7f);
 
-# SPVM::Complex_2d
+# Complex_2d
 my $z = complex(1.5, 1.7);
 </pre>
 
@@ -752,7 +752,7 @@ float Complex Addition, Subtract, Multiply, Scalar Multiply, Division.
 
 <pre>
 # float Addition, Subtract, Multiply, Scalar Multiply, Division functions
-use SPVM::Math(caddf, csubf, cmulf, cscamulf, cdivf);
+use Math(caddf, csubf, cmulf, cscamulf, cdivf);
 
 my $z1 = complexf(1.5f, 1.7f);
 my $z2 = complexf(2.5f, 2.7f);
@@ -777,7 +777,7 @@ my $z_div = cdivf($z1, $z2);
 
 <pre>
 # double Addition, Subtract, Multiply, Scalar Multiply, Division functions
-use SPVM::Math(cadd, csub, cmul, cscamul, cdiv);
+use Math(cadd, csub, cmul, cscamul, cdiv);
 
 my $z1 = complex(1.5, 1.7);
 my $z2 = complex(2.5, 2.7);
@@ -808,7 +808,7 @@ float Trigonometric functions.
 
 <pre>
 # float Trigonometric functions
-use SPVM::Math(csinf, ccosf, ctanf);
+use Math(csinf, ccosf, ctanf);
 
 my $z = complexf(1.5f, 1.7f);
 
@@ -828,7 +828,7 @@ double Trigonometric functions.
 
 <pre>
 # double Trigonometric functions
-use SPVM::Math(csin, ccos, ctan);
+use Math(csin, ccos, ctan);
 
 my $z = complex(1.5, 1.7);
 
@@ -842,19 +842,19 @@ my $z_cos = ccos($z);
 my $z_tan = ctan($z);
 </pre>
 
-See SPVM::Math for more complex functions
+See Math for more complex functions
 
 <h3>Complex Array</h3>
 
 SPVM Array of Complex has values arranged in contiguous memory areas.
 
-<h4>SPVM::Complex_2f[]</h4>
+<h4>Complex_2f[]</h4>
 
 <pre>
 # Complex float type
-use SPVM::Complex_2f;
+use Complex_2f;
 
-my $zs = new SPVM::Complex_2f[100];
+my $zs = new Complex_2f[100];
 
 for (my $i = 0; $i < @$zs; $i++) {
   my $z = $zs->[$i];
@@ -863,13 +863,13 @@ for (my $i = 0; $i < @$zs; $i++) {
 }
 </pre>
 
-<h4>SPVM::Complex_2d</h4>
+<h4>Complex_2d</h4>
 
 <pre>
 # Complex double type
-use SPVM::Complex_2d;
+use Complex_2d;
 
-my $zs = new SPVM::Complex_2d[100];
+my $zs = new Complex_2d[100];
 
 for (my $i = 0; $i < @$zs; $i++) {
   my $z = $zs->[$i];

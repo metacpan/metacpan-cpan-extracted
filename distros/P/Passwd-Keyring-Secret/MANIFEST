@@ -17,6 +17,7 @@ debian/rules
 debian/watch
 debian/source/format
 debian/upstream/metadata
+testrules.yml
 t/00-load.t
 t/01-set-get-reset.t
 t/02-is-persistent.t
@@ -33,3 +34,4 @@ t/pod.t
 t/pod-coverage.t
 t/pod-linkcheck.t
 t/kwalitee.t
+t/show-config-log.t

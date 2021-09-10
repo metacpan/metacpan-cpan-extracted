@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,7 +19,7 @@ no_index:
     - t
     - inc
 requires:
-  Data::Printer: '0.19'
+  Data::Printer: '1.00'
   Exporter: '0'
   List::Util: '1.43'
   parent: '0'
@@ -27,4 +27,5 @@ requires:
 resources:
   bugtracker: https://github.com/dur-randir/Devel-PrettyTrace/issues
   repository: https://github.com/dur-randir/Devel-PrettyTrace
-version: '0.06'
+version: '0.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

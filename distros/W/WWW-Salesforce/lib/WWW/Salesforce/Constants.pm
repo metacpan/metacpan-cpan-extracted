@@ -3,8 +3,7 @@ package WWW::Salesforce::Constants;
 use strict;
 use warnings;
 
-our $VERSION = '0.303';
-$VERSION = eval $VERSION;
+our $VERSION = '0.304';
 
 #thanks to Jun Shimizu and Garth Webb
 our %TYPES = (

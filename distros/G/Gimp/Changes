@@ -1,3 +1,7 @@
+2.35 2021-09-09
+- ignore GEGL-WARNING too
+- use less-obsolete PDL->get_convertedpdl API
+
 2.34 2021-04-17
 - updated constants to GIMP 2.10 versions
 - remove menu path up to last / and call gimp_plugin_menu_register with that

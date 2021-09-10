@@ -68,7 +68,7 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
   {
     # test_warn
     {
-      my $func_call = 'TestCase::Warn->test_warn';
+      my $func_call = 'SPVM::TestCase::Warn->test_warn';
       write_script_file($script_file, $func_call);
       system("$^X -Mblib $script_file 2> $output_file");
       my $output = slurp_binmode($output_file);
@@ -77,7 +77,7 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
     # test_warn_newline
     {
-      my $func_call = 'TestCase::Warn->test_warn_newline';
+      my $func_call = 'SPVM::TestCase::Warn->test_warn_newline';
       write_script_file($script_file, $func_call);
       system("$^X -Mblib $script_file 2> $output_file");
       my $output = slurp_binmode($output_file);
@@ -87,7 +87,7 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
     
     # test_warn_long_lines
     {
-      my $func_call = 'TestCase::Warn->test_warn_long_lines';
+      my $func_call = 'SPVM::TestCase::Warn->test_warn_long_lines';
       write_script_file($script_file, $func_call);
       system("$^X -Mblib $script_file 2> $output_file");
       my $output = slurp_binmode($output_file);
@@ -96,7 +96,7 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
     # test_warn_empty
     {
-      my $func_call = 'TestCase::Warn->test_warn_empty';
+      my $func_call = 'SPVM::TestCase::Warn->test_warn_empty';
       write_script_file($script_file, $func_call);
       system("$^X -Mblib $script_file 2> $output_file");
       my $output = slurp_binmode($output_file);
@@ -105,7 +105,7 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
     # test_warn_long_lines
     {
-      my $func_call = 'TestCase::Warn->test_warn_undef';
+      my $func_call = 'SPVM::TestCase::Warn->test_warn_undef';
       write_script_file($script_file, $func_call);
       system("$^X -Mblib $script_file 2> $output_file");
       my $output = slurp_binmode($output_file);

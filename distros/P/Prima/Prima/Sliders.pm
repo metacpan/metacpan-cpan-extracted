@@ -2430,6 +2430,7 @@ my $TIMER_SILENT_PERIOD = 2000;
 my $TIMER_ACTIVE_PERIOD = 10;
 my $TAB_STEP            = 10;
 my $INDENT              = 1;
+my $USE_ANIMATION;
 
 sub profile_default
 {
@@ -2455,10 +2456,12 @@ sub init
 	my %profile = $self-> SUPER::init(@_);
 	$self->$_($profile{$_}) for qw( min max value);
 
+	$USE_ANIMATION //= $self->can_draw_alpha;
+
 	$self->insert( 'Prima::Timer' =>
 		name        => 'Timer',
 		delegations => ['Tick'],
-	);
+	) if $USE_ANIMATION;
 	$self-> next_tick if $self-> visible;
 
 	return %profile;
@@ -2503,7 +2506,7 @@ sub create_tab
 	$tab_mask-> put_image_indirect( $tabend_mask, 0, 0, $y, 0, $y, 1, $y, 1, rop::SrcOver | rop::ConstantColor | rop::Premultiply);
 	$tab_mask-> put_image_indirect( $tabend_mask, $tab_mask-> width - $y, 0, 0, 0, $y, 1, $y, 1, rop::SrcOver | rop::ConstantColor | rop::Premultiply);
 
-	$self->{cache}->{tab}  = mask2icon( $tab_mask, cl::White );
+	$self->{cache}->{tab}  = mask2icon( $tab_mask, cl::White )-> bitmap;
 	$self->{cache}->{tabx} = $tab_mask-> width;
 }
 
@@ -2529,6 +2532,8 @@ sub recalc_images
 sub next_tick
 {
 	my $self = shift;
+
+	return unless $USE_ANIMATION;
 
 	my $timer = $self-> Timer;
 	if ( $self->{tabmode} eq 'silent' ) {

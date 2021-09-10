@@ -4,13 +4,13 @@ package SPVM::Comparator::Double;
 
 =head1 NAME
 
-SPVM::Comparator::Double - a callback interface for double comparation
+SPVM::Comparator::Double - Comparator::Double in SPVM | a callback interface for double comparation
 
 =head1 SYNOPSYS
   
-  use SPVM::Comparator::Double;
+  use Comparator::Double;
   
-  my $comparator : SPVM::Comparator::Double = sub : int ($self : self, $a : double, $b : double); {
+  my $comparator : Comparator::Double = sub : int ($self : self, $a : double, $b : double); {
     return $a <=> $b;
   };
   
@@ -18,7 +18,7 @@ SPVM::Comparator::Double - a callback interface for double comparation
 
 =head1 DESCRIPTION
 
-L<SPVM::Comparator::Double> is a callback interface to compare two double values.
+L<Comparator::Double|SPVM::Comparator::Double> is a callback interface to compare two double values.
 
 =head1 CALLBACK METHOD INTERFACE
 

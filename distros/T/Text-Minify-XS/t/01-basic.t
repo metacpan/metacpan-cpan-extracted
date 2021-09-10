@@ -55,12 +55,12 @@ is minify(" £ simple") => "£ simple";
 
 my $warning = warning {
     my $n = chr(160);
-    my $r = minify($n);
+    my $r = eval { minify($n) };
 };
 like $warning, qr/Malformed UTF-8 character/;
 
 {
-    my $n = encode_utf8(chr(160));
+    my $n = eval { encode_utf8(chr(160)) };
     is minify($n) => $n;
 }
 

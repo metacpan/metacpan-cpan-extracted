@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More 'no_plan';
 
-use SPVM 'TestCase::Lib::SPVM::FloatList';
+use SPVM 'TestCase::Lib::FloatList';
 
 
 
@@ -15,19 +15,19 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
 # SPVM::FloatList
 {
-  ok(TestCase::Lib::SPVM::FloatList->push);
-  ok(TestCase::Lib::SPVM::FloatList->pop);
-  ok(TestCase::Lib::SPVM::FloatList->new);
-  ok(TestCase::Lib::SPVM::FloatList->new_len);
-  ok(TestCase::Lib::SPVM::FloatList->unshift);
-  ok(TestCase::Lib::SPVM::FloatList->shift);
-  ok(TestCase::Lib::SPVM::FloatList->length);
-  ok(TestCase::Lib::SPVM::FloatList->get);
-  ok(TestCase::Lib::SPVM::FloatList->set);
-  ok(TestCase::Lib::SPVM::FloatList->set_array);
-  ok(TestCase::Lib::SPVM::FloatList->to_array);
-  ok(TestCase::Lib::SPVM::FloatList->insert);
-  ok(TestCase::Lib::SPVM::FloatList->remove);
+  ok(SPVM::TestCase::Lib::FloatList->push);
+  ok(SPVM::TestCase::Lib::FloatList->pop);
+  ok(SPVM::TestCase::Lib::FloatList->new);
+  ok(SPVM::TestCase::Lib::FloatList->new_len);
+  ok(SPVM::TestCase::Lib::FloatList->unshift);
+  ok(SPVM::TestCase::Lib::FloatList->shift);
+  ok(SPVM::TestCase::Lib::FloatList->length);
+  ok(SPVM::TestCase::Lib::FloatList->get);
+  ok(SPVM::TestCase::Lib::FloatList->set);
+  ok(SPVM::TestCase::Lib::FloatList->set_array);
+  ok(SPVM::TestCase::Lib::FloatList->to_array);
+  ok(SPVM::TestCase::Lib::FloatList->insert);
+  ok(SPVM::TestCase::Lib::FloatList->remove);
 }
 
 # All object is freed

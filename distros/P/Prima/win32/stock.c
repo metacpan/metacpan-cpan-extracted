@@ -115,21 +115,6 @@ stylus_free( PDCStylus res, Bool permanent)
 	hash_delete( stylusMan, &res-> s, sizeof( Stylus) - ( res-> s. extPen. actual ? 0 : sizeof( EXTPEN)), true);
 }
 
-void
-stylus_change( Handle self)
-{
-	PDCStylus p;
-	PDCStylus newP;
-	if ( is_apt( aptDCChangeLock)) return;
-	p    = sys stylusResource;
-	newP = stylus_alloc( &sys stylus);
-	if ( p != newP) {
-		sys stylusResource = newP;
-		sys stylusFlags = 0;
-	}
-	stylus_free( p, false);
-}
-
 static Bool _st_cleaner( PDCStylus s, int keyLen, void * key, void * dummy) {
 	if ( s-> refcnt <= 0) stylus_free( s, true);
 	return false;
@@ -175,6 +160,170 @@ DWORD
 stylus_get_extpen_style( PStylus s)
 {
 	return s-> extPen. lineEnd | s-> pen. lopnStyle | s-> extPen. lineJoin | PS_GEOMETRIC;
+}
+
+void
+stylus_gp_free( PDCGPStylus res, Bool permanent)
+{
+	if ( !res || --res-> refcnt > 0) return;
+	if ( !permanent) {
+		res-> refcnt = 0;
+		return;
+	}
+	if ( res-> brush) GdipDeleteBrush( res-> brush);
+	res-> brush = NULL;
+	if ( res-> pen ) GdipDeletePen(res-> pen);
+	res-> pen = NULL;
+	hash_delete( stylusGpMan, &res-> s, sizeof( GPStylus), true);
+}
+
+static Bool _gp_cleaner( PDCGPStylus s, int keyLen, void * key, void * dummy) {
+	if ( s-> refcnt <= 0) stylus_gp_free( s, true);
+	return false;
+}
+
+void
+stylus_gp_clean()
+{
+	hash_first_that( stylusGpMan, _gp_cleaner, nil, nil, nil);
+}
+
+static PDCGPStylus
+stylus_gp_fetch( GPStylus * key)
+{
+	PDCGPStylus cached;
+
+	cached = ( PDCGPStylus) hash_fetch( stylusGpMan, key, sizeof(GPStylus));
+
+	if ( cached == NULL ) {
+		if (( cached = malloc(sizeof(DCGPStylus))) == NULL) {
+			warn("Not enough memory");
+			return NULL;
+		}
+		memset( cached, 0, sizeof(DCGPStylus));
+		cached->s = *key;
+		if ( hash_count( stylusGpMan) > 128)
+			stylus_gp_clean();
+		hash_store( stylusGpMan, key, sizeof(GPStylus), cached);
+	}
+
+	return cached;
+}
+
+GpBrush*
+stylus_gp_alloc(Handle self)
+{
+	GPStylus key;
+	DCGPStylus *cached;
+	int r,g,b;
+	PStylus s = & sys stylus;
+
+	if ( sys stylusGPResource) {
+		stylus_gp_free( sys stylusGPResource, 0);
+		sys stylusGPResource = NULL;
+	}
+
+	memset(&key, 0, sizeof(key));
+
+	b = (s->pen.lopnColor >> 16) & 0xff;
+	g = (s->pen.lopnColor & 0xff00) >> 8;
+	r = s->pen.lopnColor & 0xff;
+	key.fg = (sys alpha << 24) | (r << 16) | (g << 8) | b;
+	if ( s-> brush. lb. lbStyle != BS_SOLID ) {
+		key.opaque = (sys currentROP2 == ropCopyPut) ? 1 : 0;
+		b = (s->brush.backColor >> 16) & 0xff;
+		g = (s->brush.backColor & 0xff00) >> 8;
+		r = s->brush.backColor & 0xff;
+		key.bg = (sys alpha << 24) | (r << 16) | (g << 8) | b;
+		*key.fill = *sys fillPattern;
+	}
+
+	if ((cached = stylus_gp_fetch(&key)) == NULL)
+		return NULL;
+
+	if ( cached->brush == NULL ) {
+		if ( s-> brush. lb. lbStyle == BS_SOLID ) {
+			GpSolidFill *f;
+			GPCALL GdipCreateSolidFill((ARGB)key.fg, &f);
+			if ( rc ) goto FAIL;
+
+			cached->brush = (GpBrush*)f;
+		} else {
+			GpBitmap * b;
+			GpTexture * t;
+			uint32_t x, y, fp[64], *fpp, bg;
+
+			bg = key.opaque ? key.bg : 0x00000000;
+			for ( y = 0, fpp = fp; y < 8; y++) {
+				Byte src = sys fillPattern[y];
+				for ( x = 0; x < 8; x++)
+					*(fpp++) = (src & ( 1 << x )) ? key.fg : bg;
+			}
+
+			GPCALL GdipCreateBitmapFromScan0( 8, 8, 32, PixelFormat32bppARGB, (BYTE*)fp, &b);
+			apiGPErrCheck;
+			if ( rc ) goto FAIL;
+
+			GPCALL GdipCreateTexture((GpImage*) b, WrapModeTile, &t);
+			apiGPErrCheck;
+			GdipDisposeImage((GpImage*) b);
+			if ( rc ) goto FAIL;
+
+			cached->brush = (GpBrush*) t;
+		}
+	}
+
+	cached-> refcnt++;
+	sys stylusGPResource = cached;
+	return cached;
+
+FAIL:
+	hash_delete( stylusGpMan, &key, sizeof(key), true);
+	return NULL;
+}
+
+void
+stylus_change( Handle self)
+{
+	PDCStylus p;
+	PDCStylus newP;
+
+	if ( is_apt( aptDCChangeLock)) return;
+	sys stylusFlags &= ~stbGPBrush;
+
+	p    = sys stylusResource;
+	newP = stylus_alloc( &sys stylus);
+	if ( p != newP) {
+		sys stylusResource = newP;
+		sys stylusFlags &= stbGPBrush;
+	}
+	stylus_free( p, false);
+}
+
+GpPen*
+stylus_gp_get_pen(int lineWidth, uint32_t color)
+{
+	GPStylus key;
+	PDCGPStylus cached;
+
+	memset( &key, 0, sizeof(key));
+	key.type   = GP_SOLID_PEN;
+	key.fg     = color;
+	key.opaque = lineWidth;
+	if (( cached = stylus_gp_fetch(&key)) == NULL)
+		return NULL;
+
+	if ( cached->pen == NULL ) {
+		GPCALL GdipCreatePen1(color, lineWidth, UnitPixel, &cached->pen);
+		apiGPErrCheck;
+		if ( rc ) goto FAIL;
+	}
+
+	return cached->pen;
+
+FAIL:
+	hash_delete( stylusGpMan, &key, sizeof(key), true);
+	return NULL;
 }
 
 PPatResource
@@ -466,8 +615,14 @@ font_change( Handle self, Font * font)
 	PDCFont p;
 	PDCFont newP;
 	if ( is_apt( aptDCChangeLock)) return;
+
+	sys alphaArenaFontChanged = true;
 	p    = sys fontResource;
 	newP = ( sys fontResource = font_alloc( font));
+	if ( sys alphaArenaStockFont ) {
+		SelectObject( sys alphaArenaDC, sys alphaArenaStockFont );
+		sys alphaArenaFontChanged = true;
+	}
 	font_free( p, false);
 	if ( sys ps)
 		SelectObject( sys ps, newP-> hfont);
@@ -591,28 +746,35 @@ utf8_flag_strncpy( char * dst, const WCHAR * src, unsigned int maxlen)
 int CALLBACK
 fep_register_mapper_fonts( ENUMLOGFONTEXW FAR *e, NEWTEXTMETRICEXW FAR *t, DWORD type, LPARAM _es)
 {
-	PFont f;
 	char name[LF_FACESIZE + 1];
 	Bool name_is_utf8;
+	unsigned int i, styles[4], pitch;
 	if (type & RASTER_FONTTYPE) return 1;
 
 	if (e-> elfLogFont.lfFaceName[0] == '@') return 1; /* vertical font */
 
 	name_is_utf8 = utf8_flag_strncpy( name, e-> elfLogFont.lfFaceName, LF_FACESIZE);
-	if ((f = prima_font_mapper_save_font(name)) == NULL)
-		return 1;
-
-	f-> is_utf8.name = name_is_utf8;
-
-	f-> pitch =
+	pitch =
 		((( e-> elfLogFont.lfPitchAndFamily & 3) == DEFAULT_PITCH ) ? fpDefault :
 		((( e-> elfLogFont.lfPitchAndFamily & 3) == VARIABLE_PITCH) ? fpVariable : fpFixed));
-	f->undef.pitch = 0;
 
-	f->undef.vector = 0;
-	f->vector = fvOutline;
+	styles[0] = fsNormal;
+	styles[1] = fsBold;
+	styles[2] = fsItalic;
+	styles[3] = fsBold | fsItalic;
+	for ( i = 0; i < 4; i++) {
+		PFont f;
 
-	f->is_utf8.family = utf8_flag_strncpy( f-> family, e-> elfFullName, LF_FULLFACESIZE);
+		if ((f = prima_font_mapper_save_font(name, styles[i])) == NULL)
+			continue;
+
+		f->undef.pitch    = 0;
+		f->pitch          = pitch;
+		f->undef.vector   = 0;
+		f->vector         = fvOutline;
+		f->is_utf8.name   = name_is_utf8;
+		f->is_utf8.family = utf8_flag_strncpy( f-> family, e-> elfFullName, LF_FULLFACESIZE);
+	}
 	return 1;
 }
 
@@ -623,7 +785,7 @@ register_mapper_fonts(void)
 	LOGFONTW elf;
 
 	/* MS Shell Dlg is a virtual font, not reported by enum */
-	prima_font_mapper_save_font(guts.windowFont.name);
+	prima_font_mapper_save_font(guts.windowFont.name, 0);
 
 	if ( !( dc = dc_alloc()))
 		return;
@@ -675,7 +837,7 @@ font_logfont2font( LOGFONTW * lf, Font * f, Point * res)
 		( lf-> lfItalic     ? fsItalic     : 0) |
 		( lf-> lfUnderline  ? fsUnderlined : 0) |
 		( lf-> lfStrikeOut  ? fsStruckOut  : 0) |
-	(( lf-> lfWeight >= 700) ? fsBold   : 0);
+		(( lf-> lfWeight >= 700) ? fsBold   : 0);
 	f-> pitch               = ((( lf-> lfPitchAndFamily & 3) == DEFAULT_PITCH) ? fpDefault :
 		((( lf-> lfPitchAndFamily & 3) == VARIABLE_PITCH) ? fpVariable : fpFixed));
 	strcpy( f-> encoding, font_charset2encoding( lf-> lfCharSet));
@@ -1575,6 +1737,7 @@ hwnd_enter_paint( Handle self)
 		sys stockPalette = GetCurrentObject( sys ps, OBJ_PAL);
 	font_free( sys fontResource, false);
 	sys stylusResource = NULL;
+	sys stylusGPResource = NULL;
 	sys fontResource   = NULL;
 	sys stylusFlags    = 0;
 	sys stylus. extPen. actual = false;
@@ -1591,6 +1754,8 @@ hwnd_enter_paint( Handle self)
 	if ( sys psd == NULL) sys psd = ( PPaintSaveData) malloc( sizeof( PaintSaveData));
 	if ( sys psd == NULL) return;
 
+	apc_gp_set_alpha( self, sys alpha);
+	apc_gp_set_antialias( self, is_apt( aptGDIPlus));
 	apc_gp_set_text_opaque( self, is_apt( aptTextOpaque));
 	apc_gp_set_text_out_baseline( self, is_apt( aptTextOutBaseline));
 	apc_gp_set_fill_mode( self, sys fillMode);
@@ -1606,6 +1771,8 @@ hwnd_enter_paint( Handle self)
 	apc_gp_set_rop2( self, sys rop2);
 	apc_gp_set_transform( self, sys transform. x, sys transform. y);
 	apc_gp_set_fill_pattern( self, sys fillPattern2);
+	sys psd-> alpha          = sys alpha;
+	sys psd-> antialias      = is_apt( aptGDIPlus);
 	sys psd-> font           = var font;
 	sys psd-> fillMode       = sys fillMode;
 	sys psd-> fillPatternOffset = sys fillPatternOffset;
@@ -1619,6 +1786,7 @@ hwnd_enter_paint( Handle self)
 	sys psd-> transform      = sys transform;
 	sys psd-> textOpaque     = is_apt( aptTextOpaque);
 	sys psd-> textOutB       = is_apt( aptTextOutBaseline);
+	sys psd-> antialias      = is_apt( aptGDIPlus);
 
 	apt_clear( aptDCChangeLock);
 	stylus_change( self);
@@ -1631,6 +1799,10 @@ hwnd_enter_paint( Handle self)
 void
 hwnd_leave_paint( Handle self)
 {
+	if ( sys graphics) {
+		GdipDeleteGraphics(sys graphics);
+		sys graphics = NULL;
+	}
 	SelectObject( sys ps,  sys stockPen);
 	SelectObject( sys ps,  sys stockBrush);
 	SelectObject( sys ps,  sys stockFont);
@@ -1646,6 +1818,7 @@ hwnd_leave_paint( Handle self)
 	}
 	if ( sys psd != NULL) {
 		var font           = sys psd-> font;
+		sys alpha          = sys psd-> alpha;
 		sys fillMode       = sys psd-> fillMode;
 		sys fillPatternOffset  = sys psd-> fillPatternOffset;
 		sys lineWidth      = sys psd-> lineWidth;
@@ -1656,8 +1829,9 @@ hwnd_leave_paint( Handle self)
 		sys rop            = sys psd-> rop;
 		sys rop2           = sys psd-> rop2;
 		sys transform      = sys psd-> transform;
-		apt_assign( aptTextOpaque, sys psd-> textOpaque);
+		apt_assign( aptTextOpaque,      sys psd-> textOpaque);
 		apt_assign( aptTextOutBaseline, sys psd-> textOutB);
+		apt_assign( aptGDIPlus,         sys psd-> antialias);
 		free( sys psd);
 		sys psd = NULL;
 	}

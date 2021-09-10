@@ -6,15 +6,33 @@ use warnings;
 use Carp qw(carp croak);
 use Glib::Object::Introspection;
 
-Glib::Object::Introspection->setup(
-    basename => 'Secret',
-    version => '1',
-    package => 'Secret',
-    class_static_methods => [
-        'Secret::Collection::for_alias_sync',
-        'Secret::Service::get_sync',
-    ]
-);
+eval
+{
+    Glib::Object::Introspection->setup(
+        basename => 'Secret',
+        version => '1',
+        package => 'Secret',
+        class_static_methods => [
+            'Secret::Collection::for_alias_sync',
+            'Secret::Service::get_sync',
+        ]
+    );
+};
+
+if ($@)
+{
+    if (ref($@) eq 'Glib::Error' && $@->domain() eq 'g-irepository-error-quark')
+    {
+        my $msg = $@;
+        chomp($msg);
+        $@ = (<< "EOM") . "Import failed";
+Error: $msg
+You probably need to install the file 'Secret-1.typelib' on your system.
+EOM
+    }
+
+    croak $@;
+}
 
 =head1 NAME
 
@@ -22,11 +40,11 @@ Passwd::Keyring::Secret - Password storage implementation using the GObject-base
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 =head1 SYNOPSIS
 

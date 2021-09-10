@@ -46,12 +46,14 @@ sub rect_focus
 	( $y, $y1) = ( $y1, $y) if $y > $y1;
 
 	$width = 1 if !defined $width || $width < 1;
-	my ( $cl, $cl2) = ( $canvas-> color, $canvas-> backColor);
+	my ( $cl, $cl2, $aa, $alpha) = ( $canvas-> color, $canvas-> backColor, $canvas-> antialias, $canvas-> alpha);
 	my $fp = $canvas-> fillPattern;
 	$canvas-> set(
 		fillPattern => fp::SimpleDots,
 		color       => cl::White,
 		backColor   => cl::Black,
+		antialias   => 0,
+		alpha       => 255,
 	);
 
 	if ( $width * 2 >= $x1 - $x or $width * 2 >= $y1 - $y) {
@@ -234,7 +236,7 @@ sub new_glyph_obj
 	return Prima::Drawable::Glyphs->new(@_);
 }
 
-sub stroke_primitive
+sub stroke_img_primitive
 {
 	my ( $self, $request ) = (shift, shift);
 	return 1 if $self->rop == rop::NoOper;
@@ -245,7 +247,7 @@ sub stroke_primitive
 	$path->translate(@offset);
 	$path->$request(@_);
 	my $ok = 1;
-	if ( $self->lineWidth == 0 ) {
+	if ( int($self->lineWidth + .5) == 0 ) {
 		# paths produce floating point coordinates and line end arcs,
 		# here we need internal pixel-wise plotting
 		for my $pp ( map { @$_ } @{ $path->points } ) {
@@ -292,7 +294,7 @@ sub stroke_primitive
 	return $ok;
 }
 
-sub fill_primitive
+sub fill_img_primitive
 {
 	my ( $self, $request ) = (shift, shift);
 	my $path = $self->new_path;
@@ -310,6 +312,89 @@ sub fill_primitive
 	$self->translate(@offset);
 	$self->region($region2);
 	return $ok;
+}
+
+sub stroke_imgaa_primitive
+{
+	my ( $self, $request ) = (shift, shift);
+	return 1 if $self->rop == rop::NoOper;
+	my $lp = $self->linePattern;
+	return 1 if $lp eq lp::Null && $self->rop2 == rop::NoOper;
+
+	my $aa = $self->new_aa_surface;
+	return 0 unless $aa->can_aa;
+
+	my $path = $self->new_path;
+	$path->$request(@_);
+	$path = $path->widen(
+		linePattern => ( $lp eq lp::Null) ? lp::Solid : $lp
+	);
+	my %save;
+	$save{fillPattern} = $self->fillPattern;
+	$save{fillMode}    = $self->fillMode;
+	$self->fillPattern(fp::Solid);
+	$self->fillMode(fm::Winding);
+	if ( $lp eq lp::Null ) {
+		$save{color} = $self->color;
+		$self->color($self->backColor);
+	}
+	my $ok = 1;
+	for ($path->points(fill => 1)) {
+		$ok &= $aa->fillpoly($_);
+		last unless $ok;
+	}
+	$self->$_($save{$_}) for keys %save;
+	return $ok;
+}
+
+sub fill_imgaa_primitive
+{
+	my ( $self, $request ) = (shift, shift);
+	my $path = $self->new_path;
+	$path->$request(@_);
+	my $aa = $self->new_aa_surface;
+	return 0 unless $aa->can_aa;
+	for ($path->points(fill => 1)) {
+		return 0 unless $aa->fillpoly($_);
+	}
+	return 1;
+}
+
+sub stroke_aa_primitive
+{
+	my ( $self, $request ) = (shift, shift);
+	return 1 if $self->rop == rop::NoOper;
+	my $lp = $self->linePattern;
+	return 1 if $lp eq lp::Null && $self->rop2 == rop::NoOper;
+
+	my $path = $self->new_path;
+	$path->$request(@_);
+	$path = $path->widen(
+		linePattern => ( $lp eq lp::Null) ? lp::Solid : $lp
+	);
+	my %save;
+	$save{fillPattern} = $self->fillPattern;
+	$save{fillMode}    = $self->fillMode;
+	$self->fillPattern(fp::Solid);
+	$self->fillMode(fm::Winding);
+	if ( $lp eq lp::Null ) {
+		$save{color} = $self->color;
+		$self->color($self->backColor);
+	}
+	my $ok = $path->fill;
+	$self->$_($save{$_}) for keys %save;
+	return $ok;
+}
+
+sub fill_aa_primitive
+{
+	my ( $self, $request ) = (shift, shift);
+	my $path = $self->new_path;
+	$path->$request(@_);
+	for ($path->points(fill => 1)) {
+		return 0 unless $self->fillpoly($_);
+	}
+	return 1;
 }
 
 sub text_shape_out

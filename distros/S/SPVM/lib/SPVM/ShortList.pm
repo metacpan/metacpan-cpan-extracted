@@ -4,17 +4,17 @@ package SPVM::ShortList;
 
 =head1 NAME
 
-SPVM::ShortList - Dynamic short array
+SPVM::ShortList - ShortList in SPVM | Dynamic short array
 
 =head1 SYNOPSYS
   
-  use SPVM::ShortList;
+  use ShortList;
   
   # Create a short list with array length
-  my $short_list = SPVM::ShortList->new_len(10);
+  my $short_list = ShortList->new_len(10);
 
   # Create a short list with array
-  my $short_list = SPVM::ShortList->new([(short)1, 2, 3]);
+  my $short_list = ShortList->new([(short)1, 2, 3]);
   
   # Get list length
   my $length = $short_list->length;
@@ -43,20 +43,20 @@ SPVM::ShortList - Dynamic short array
   # Remove byte value
   my $byte_value = $byte_list->remove(1);
 
-  # Convert SPVM::ShortList to short array.
+  # Convert ShortList to short array.
   my $short_array = $short_list->to_array;
 
 =head1 DESCRIPTION
 
-L<SPVM::ShortList> is dynamic  short array.
+L<ShortList|SPVM::ShortList> is dynamic  short array.
 
-=head1 STATIC METHODS
+=head1 CLASS METHODS
 
 =head2 new
 
-    sub new : SPVM::ShortList ($array : short[])
+    sub new : ShortList ($array : short[])
 
-Create a new L<SPVM::ShortList> object with specific C<short> array.
+Create a new L<ShortList|SPVM::ShortList> object with specific C<short> array.
 
 Internally, new array is created, and each element of argument array is copied to internal array.
 
@@ -64,9 +64,9 @@ If array is undef, 0-length internal array is created.
 
 =head2 new_len
 
-    sub new_len : SPVM::ShortList ($length : int)
+    sub new_len : ShortList ($length : int)
 
-Create a new L<SPVM::ShortList> object with array length.
+Create a new L<ShortList|SPVM::ShortList> object with array length.
 
 =head1 INSTANCE METHODS
 
@@ -143,7 +143,7 @@ If there are no elements in the list, exception occur.
 
   sub to_array : short[] ($self : self)
 
-Convert L<SPVM::ShortList> to short array.
+Convert L<ShortList|SPVM::ShortList> to short array.
 
 =head2 unshift
 

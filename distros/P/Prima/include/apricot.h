@@ -1928,6 +1928,8 @@ SV(FixedPointerSize)
 SV(MenuCheckSize)
 #define   svFriBidi         37
 SV(FriBidi)
+#define   svAntialias       38
+SV(Antialias)
 END_TABLE(sv,UV)
 #undef SV
 
@@ -2879,7 +2881,7 @@ LP(ShortDash)
 LP(Dot)
 #define    lpDotDot         (unsigned char*) "\1\1"          /* ............ */
 LP(DotDot)
-#define    lpDashDot        (unsigned char*) "\x9\6\1\3"     /* _._._._._._  */
+#define    lpDashDot        (unsigned char*) "\x9\3\1\3"     /* _._._._._._  */
 LP(DashDot)
 #define    lpDashDotDot     (unsigned char*) "\x9\3\1\3\1\3" /* _.._.._.._.. */
 LP(DashDotDot)
@@ -3544,6 +3546,9 @@ extern Bool
 apc_gp_done( Handle self);
 
 extern Bool
+apc_gp_aa_fill_poly( Handle self, int numPts, NPoint * points);
+
+extern Bool
 apc_gp_alpha( Handle self, int alpha, int x1, int y1, int x2, int y2);
 
 extern Bool
@@ -3680,6 +3685,12 @@ extern Bool
 apc_gp_text_out( Handle self, const char * text, int x, int y, int len, int flags);
 
 /* gpi settings */
+extern int
+apc_gp_get_alpha( Handle self);
+
+extern Bool
+apc_gp_get_antialias( Handle self);
+
 extern Color
 apc_gp_get_back_color( Handle self);
 
@@ -3734,7 +3745,7 @@ apc_gp_get_line_end( Handle self);
 extern int
 apc_gp_get_line_join( Handle self);
 
-extern int
+extern float
 apc_gp_get_line_width( Handle self);
 
 extern int
@@ -3795,6 +3806,12 @@ extern Point
 apc_gp_get_transform( Handle self);
 
 extern Bool
+apc_gp_set_alpha( Handle self, int alpha);
+
+extern Bool
+apc_gp_set_antialias( Handle self, Bool aa);
+
+extern Bool
 apc_gp_set_back_color( Handle self, Color color);
 
 extern Bool
@@ -3822,7 +3839,7 @@ extern Bool
 apc_gp_set_line_join( Handle self, int lineJoin);
 
 extern Bool
-apc_gp_set_line_width( Handle self, int lineWidth);
+apc_gp_set_line_width( Handle self, float lineWidth);
 
 extern Bool
 apc_gp_set_line_pattern( Handle self, unsigned char * pattern, int len);

@@ -38,14 +38,16 @@ my $builder = $class->new(
     license            => 'Artistic_2_0',
 
     build_requires => {
+        'vars' => 0,
         'Module::Build' => '0.19',
         'Test::More' => '0.88',
-        'Pod::Readme' => '1.001002',
-        'Pod::Markdown' => '2.000',
+        'File::Slurp' => 0,
     },
 
     configure_requires => {
         'Module::Build' => '0.4004',
+        'Pod::Readme' => '1.001002',
+        'Pod::Markdown' => '2.000',
     },
 
     requires => {

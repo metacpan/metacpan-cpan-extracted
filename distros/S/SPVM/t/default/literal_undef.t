@@ -15,7 +15,7 @@ use SPVM 'TestCase::Literal::Undef';
 my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
 {
-  ok(TestCase::Literal::Undef->undef_test);
+  ok(SPVM::TestCase::Literal::Undef->undef_test);
 }
 
 # All object is freed

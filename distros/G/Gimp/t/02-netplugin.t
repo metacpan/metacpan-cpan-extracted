@@ -6,7 +6,7 @@ my $LIKE_RX;
 BEGIN {
 #  $Gimp::verbose = 3;
   @PLUGINS = qw(dots glowing_steel map_to_gradient redeye);
-  $LIKE_RX = qr/^(Xlib:\s*extension "RANDR" missing.*|)$/m;
+  $LIKE_RX = qr/^(Xlib:\s*extension "RANDR" missing.*|.*(GEGL-WARNING|GeglBuffers leaked).*|)$/m;
   $DEBUG = 0;
   require './t/gimpsetup.pl';
   # most minimal and elegant would be to symlink sandbox gimp-dir's
@@ -70,7 +70,7 @@ for my $test (@testbench) {
     }
   }
   like(join('', @errlines), $LIKE_RX, "$name stderr not of concern");
-  is(join('', @outlines), '', "$name stdout empty");
+  like(join('', @outlines), $LIKE_RX, "$name stdout not of concern");
   waitpid($pid, 0);
   is($? >> 8, 0, "$file exit=0");
   ok(-f $output, "$file output exists");

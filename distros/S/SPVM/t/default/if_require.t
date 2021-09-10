@@ -15,7 +15,7 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
 # Import sub
 {
-  ok(TestCase::IfRequire->if_require);
+  ok(SPVM::TestCase::IfRequire->if_require);
 }
 
 # All object is freed

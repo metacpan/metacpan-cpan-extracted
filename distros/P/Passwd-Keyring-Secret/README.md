@@ -4,7 +4,7 @@ Passwd::Keyring::Secret - Password storage implementation using the GObject-base
 
 # VERSION
 
-Version 1.00
+Version 1.01
 
 # SYNOPSIS
 

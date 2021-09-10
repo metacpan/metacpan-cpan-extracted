@@ -28,6 +28,7 @@ sub new
 		canvas          => $canvas,
 		commands        => [],
 		precision       => undef,
+		subpixel        => $opt{antialias} // (($canvas && ref($canvas)) ? $canvas->antialias : 0),
 		antialias       => 0,
 		%opt
 	}, $class;
@@ -278,7 +279,8 @@ sub lines
 	my $p = $#_ ? [@_] : $_[0];
 	@$p % 4 and Carp::croak('bad parameters to lines');
 	for ( my $i = 0; $i < @$p; $i += 4 ) {
-		$self->cmd( line => [ @$p[ $i .. $i + 3 ] ] );
+		$self->moveto(@$p[ $i .. $i + 1 ]);
+		$self->cmd( line   => [ @$p[ $i .. $i + 3 ] ] );
 	}
 }
 
@@ -312,7 +314,7 @@ sub round_rect
 	$dx = $maxd if $dx > $maxd;
 	$dy = $maxd if $dy > $maxd;
 	my $d = ( $dx < $dy ) ? $dx : $dy;
-	my $r = int($d/2);
+	my $r = $self->{subpixel} ? $d/2 : int($d/2);
 #  plots roundrect:
 # A'        B'
 #  /------\
@@ -340,22 +342,23 @@ sub round_rect
 	return $self;
 }
 
+sub new_array { shift->{subpixel} ? Prima::array->new_double : Prima::array->new_int }
+
 sub points
 {
-	my ($self, $for_fill) = @_;
+	my ($self, %opt) = @_;
 	unless ( $self->{points} ) {
 		local $self->{stack} = [];
 		local $self->{curr}  = {
 			matrix => [ identity ],
-			( map { $_, $self->{$_} } qw(precision ) )
+			( map { $_, $self->{$_} } qw(precision) )
 		};
-		$self->{points} = [[ Prima::array->new_int ]];
+		$self->{points} = [[ $self->new_array ]];
 		my $c = $self->{commands};
 		for ( my $i = 0; $i < @$c; ) {
 			my ($cmd,$len) = @$c[$i,$i+1];
 			$self-> can("_$cmd")-> ( $self, @$c[$i+2..$i+$len+1] );
 			$i += $len + 2;
-			
 		}
 		for my $ppp ( @{$self->{points}}) {
 			@$ppp = grep { @$_ > 2 } @$ppp;
@@ -363,10 +366,10 @@ sub points
 		$self->{last_matrix} = $self->{curr}->{matrix};
 	}
 
-	if ( $for_fill ) {
+	if ( $opt{fill} ) {
 		my @ret;
 		for my $ppp ( @{ $self->points } ) {
-			my $arr = Prima::array->new_int;
+			my $arr = $self->new_array;
 			Prima::array::append( $arr, $_ ) for @$ppp;
 			push @ret, $arr if @$arr > 2;
 		}
@@ -446,12 +449,12 @@ sub  _moveto
 	my ( $self, $mx, $my, $rel) = @_;
 	($mx, $my) = $self->matrix_apply($mx, $my);
 	my ($lx, $ly) = $rel ? $self->last_point : (0,0);
-	my $arr = Prima::array->new_int;
-	push @$arr, int($lx + $mx + .5), int($ly + $my + .5);
+	my $arr = $self->new_array;
+	push @$arr, $self->{subpixel} ? ($lx + $mx, $ly + $my) : (int($lx + $mx + .5), int($ly + $my + .5));
 	push @{$self->{points}->[-1]}, $arr;
 }
 
-sub _open { push @{shift->{points}}, [Prima::array->new_int] }
+sub _open { push @{$_[0]->{points}}, [$_[0]->new_array] }
 
 sub _close
 {
@@ -460,13 +463,17 @@ sub _close
 	return unless @$p;
 	my $l = $p->[-1]->[-1];
 	push @$l, $$l[0], $$l[1] if @$l && ($$l[0] != $$l[-2] || $$l[1] != $$l[-1]);
-	push @$p, [Prima::array->new_int];
+	push @$p, [$self->new_array];
 }
 
 sub _line
 {
 	my ( $self, $line ) = @_;
-	push @{ $self->{points}->[-1]->[-1] }, map { int($_ + .5) } @{ $self-> matrix_apply( $line ) };
+	if ( $self->{subpixel} ) {
+		push @{ $self->{points}->[-1]->[-1] }, @{ $self-> matrix_apply( $line ) };
+	} else {
+		push @{ $self->{points}->[-1]->[-1] }, map { int($_ + .5) } @{ $self-> matrix_apply( $line ) };
+	}
 }
 
 sub _spline
@@ -475,7 +482,8 @@ sub _spline
 	Prima::array::append( $self->{points}->[-1]->[-1],
 		Prima::Drawable->render_spline(
 			$self-> matrix_apply( $points ),
-			%$options
+			%$options,
+			integer => !$self->{subpixel},
 		)
 	)
 }
@@ -552,6 +560,7 @@ sub _arc
 
 	my %xopt;
 	$xopt{precision} = $self->{curr}->{precision} if defined $self->{curr}->{precision};
+	$xopt{integer}   = !$self->{subpixel};
 
 	for my $set ( @$nurbset ) {
 		my ( $points, @options ) = @$set;
@@ -568,7 +577,7 @@ sub _arc
 sub stroke {
 	return 0 unless $_[0]->{canvas};
 	for ( map { @$_ } @{ $_[0]->points }) {
-		if ( $_[0]->{antialias} ) {
+		if ( $_[0]->{antialias} && !$_[0]->{canvas}->antialias) {
 			return 0 unless $_[0]->{canvas}->new_aa_surface->polyline($_);
 		} else {
 			return 0 unless $_[0]->{canvas}->polyline($_);
@@ -580,7 +589,7 @@ sub stroke {
 sub fill {
 	my ( $self, $fillMode ) = @_;
 	return 0 unless my $c = $self->{canvas};
-	my @p = $self->points(1);
+	my @p = $self->points(fill => 1);
 	my $ok = 1;
 	my $save;
 	if ( defined $fillMode ) {
@@ -588,7 +597,7 @@ sub fill {
 		$c->fillMode($fillMode);
 	}
 	for ( @p ) {
-		if ( $self->{antialias} ) {
+		if ( $self->{antialias} && !$_[0]->{canvas}->antialias) {
 			last unless $ok &= $c->new_aa_surface->fillpoly($_);
 		} else {
 			last unless $ok &= $c->fillpoly($_);
@@ -646,6 +655,7 @@ sub flatten
 
 			my %xopt;
 			$xopt{precision} = $self->{curr}->{precision} if defined $self->{curr}->{precision};
+			$xopt{integer}   = !$self->{subpixel};
 			my $polyline;
 			my $nurbset = $self->arc2nurbs( $from, $to);
 			for my $set ( @$nurbset ) {
@@ -731,7 +741,7 @@ sub contours
 
 sub poly2patterns
 {
-	my ($pp, $lp, $lw) = @_;
+	my ($pp, $lp, $lw, $int) = @_;
 	$lw = 1 if $lw < 1;
 	my @steps = map { 1 + $lw * (ord($_) - 1 ) } split '', $lp;
 #	print "$lw: steps: @steps\n";
@@ -763,7 +773,7 @@ sub poly2patterns
 				$dx = $b[0] - $a[0];
 				$dy = $b[1] - $a[1];
 				my $dl = $dx * $dx + $dy * $dy;
-				$pixlen = (($dl < 1024 ) ?
+				$pixlen = (($dl < 1024 && $int ) ?
 					$sqrt[$dl + .5] //= sqrt(int($dl + .5)) :
 					sqrt($dl)
 				);
@@ -771,7 +781,7 @@ sub poly2patterns
 				@r = ($pixlen > 0) ? 
 					($dx / $pixlen, $dy / $pixlen):
 					(1,1);
-				$pixlen = int( $pixlen + .5 );
+				$pixlen = int( $pixlen + .5 ) if $int;
 				if (($i == $#$p - 1 && !$closed) || ($pixlen == 0)) {
 					$pixlen++;
 				} else {
@@ -786,6 +796,7 @@ sub poly2patterns
 			}
 			($draw, $black) = ( $advance > 0 ) ? ($advance, 0) : ($strokelen, $strokecolor);
 #			print "draw:$advance/$strokelen pixlen:$pixlen plotted:$plotted black:$black\n";
+			my $next_seg_advance = $black ? $lw - 1 : 1;
 			if ( $draw < $pixlen ) {
 				$plotted += $draw;
 				@b1 = ($draw == 1) ? @a1 : (
@@ -795,19 +806,19 @@ sub poly2patterns
 #				print "pix($black): @a1 -> @b1\n";
 				push @$segment, @a1, @b1 if $black;
 				$pixlen -= $draw;
-				$advance += ($advance > 0) ? -$draw : ($lw-1);
+				$advance += ($advance > 0) ? -$draw : $next_seg_advance;
 				@a1 = ( $b1[0] + $r[0], $b1[1] + $r[1]);
 #				print "new adv to @a1? =$advance\n";
 				($new_point, $new_stroke) = (0,1);
 			} elsif ( $draw == $pixlen ) {
 				push @$segment, @a1, @b if $black;
 				$new_stroke = $new_point = 1;
-				$advance += ($advance > 0) ? -$draw : ($lw-1);
+				$advance += ($advance > 0) ? -$draw : $next_seg_advance;
 #				print "=: pix($black): @a1 -> @b\n";
 				$joiner = $black;
 			} elsif ( $black && $draw == 1 && $pixlen <= 0 )  {
 				$new_point = $new_stroke = 1;
-				$advance = $lw-1;
+				$advance = $next_seg_advance;
 #				print "skip tail\n";
 			} else {
 #				print ">: pix($black): @a1 -> @b\n";
@@ -857,9 +868,9 @@ sub widen
 
 	my $pp = [ map { @$_ } @{$self->points} ];
 	return $dst if $lp eq lp::Null;
-	$pp = poly2patterns($pp, $lp, $lw) if $lp ne lp::Solid;
+	$pp = poly2patterns($pp, $lp, $lw, !$self->{subpixel}) if $lp ne lp::Solid;
 
-	if ( $lw < 1 ) {
+	if ( $lw < 1 && !$self->{subpixel} ) {
 		for my $p ( @$pp ) {
 			$dst->line($p);
 			$dst->line([map { @{$p}[-2*$_,-2*$_+1] } 1..@$p/2 ])
@@ -944,13 +955,14 @@ sub widen
 					($prev, $next) = ($i - 2, 0);
 				}
 				my ($xo,$yo,$xa,$ya,$xb,$yb) = @$p[$i,$i+1,$prev,$prev+1,$next,$next+1];
-				my $theta = atan2( $yo - $ya, $xo - $xa );
-        	        	my $alpha = atan2( $yb - $yo, $xb - $xo ) - $theta;
+				my $dya = $yo - $ya;
+				my $dxa = $xo - $xa;
+				my $dyb = $yb - $yo;
+				my $dxb = $xb - $xo;
+				my $theta = atan2( $dya, $dxa );
+        	        	my $alpha = atan2( $dyb, $dxb ) - $theta;
 				$alpha += $PI * (($alpha > 0) ? -1 : 1);
 				# next if $alpha == 0.0; # XXX
-				my $_lj = $lj;
-				$_lj = lj::Bevel if
-					$_lj == lj::Miter && ($alpha == 0 || $ml < abs( 1 / sin($alpha/2)));
 				my $sign = ( $alpha > 0) ? -1 : 1;
 				my ( $in, $out) = ($alpha > 0) ? (\@u,\@d) : (\@d,\@u);
 				my ( $dx1, $dy1, $dx2, $dy2) = map { $sign * $lw2 * $_ } (
@@ -959,10 +971,18 @@ sub widen
 					cos($theta + $alpha + $PI_2),
 					sin($theta + $alpha + $PI_2)
 				);
+				my $_lj = $lj;
+				my $dmin = 3;
+				$_lj = lj::Miter if $_lj != lj::Miter &&
+					abs($dya) < $dmin && abs($dxa) < $dmin && abs($dyb) < $dmin && abs($dxb) < $dmin;
+				$_lj = lj::Bevel if
+					$_lj == lj::Miter && ($alpha == 0 || $ml < abs( 1 / sin($alpha/2)));
 				if ($i == 0) {
 					@$firstin = ( $xo + $dx1, $yo + $dy1);
 					$firstsign = $sign;
 				}
+				next if $dxa == 0 && $dya == 0;
+				next if $dxb == 0 && $dyb == 0;
 				push @$in, [ line => [ $xo + $dx1, $yo + $dy1 ]];
 				push @$in, [ line => [ $xo - $dx2, $yo - $dy2 ]];
 				if ( $_lj == lj::Miter) {
@@ -1050,7 +1070,7 @@ sub clip
 	$p->clear;
 	$p->set(%opt) if scalar keys %opt;
 	$p->translate($tx, $ty);
-	$p->fillpoly($_) for $self->points(1);
+	$p->fillpoly($_) for $self->points(fill => 1);
 	return $p->image;
 }
 
@@ -1061,7 +1081,7 @@ sub region
 	$mode //= fm::Winding | fm::Overlay;
 	$rgnop //= rgnop::Union;
 	$reg ? $reg->combine($_, $rgnop) : ($reg = $_)
-		for map { Prima::Region->new( polygon => $_, fillMode => $mode) } $self->points(1);
+		for map { Prima::Region->new( polygon => $_, fillMode => $mode) } $self->points(fill => 1);
 	return $reg;
 }
 
@@ -1254,6 +1274,12 @@ Adds shearing to the current matrix
 =item scale X, Y = X
 
 Adds scaling to the current matrix
+
+=item subpixel BOOLEAN
+
+Turns on and off slow but more precise floating-point calculation mode
+
+Default: depends on canvas antialiasing mode
 
 =item translate X, Y = X
 

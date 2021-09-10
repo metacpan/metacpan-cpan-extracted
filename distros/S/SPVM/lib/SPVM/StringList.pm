@@ -4,17 +4,17 @@ package SPVM::StringList;
 
 =head1 NAME
 
-SPVM::StringList - Dynamic string array
+SPVM::StringList - StringList in SPVM | Dynamic string array
 
 =head1 SYNOPSYS
   
-  use SPVM::StringList;
+  use StringList;
   
   # Create a string list
-  my $string_list = SPVM::StringList->new_len(10);
+  my $string_list = StringList->new_len(10);
 
   # Create a string list with array
-  my $string_list = SPVM::StringList->new(["abc", "def", "ghi"]);
+  my $string_list = StringList->new(["abc", "def", "ghi"]);
   
   # Get list length
   my $length = $string_list->length;
@@ -43,20 +43,20 @@ SPVM::StringList - Dynamic string array
   # Remove string value
   my $string_value = $string_list->remove(1);
 
-  # Convert SPVM::StringList to string array.
+  # Convert StringList to string array.
   my $string_array = $string_list->to_array;
 
 =head1 DESCRIPTION
 
-L<SPVM::StringList> is dynamic string array.
+L<StringList|SPVM::StringList> is dynamic string array.
 
-=head1 STATIC METHODS
+=head1 CLASS METHODS
 
 =head2 new
 
-    sub new : SPVM::StringList ($array : string[])
+    sub new : StringList ($array : string[])
 
-Create a new L<SPVM::StringList> object with specific C<string> array.
+Create a new L<StringList|SPVM::StringList> object with specific C<string> array.
 
 Internally, new array is created, and each element of argument array is copied to internal array.
 
@@ -64,9 +64,9 @@ If array is undef, 0-length internal array is created.
 
 =head2 new_len
 
-    sub new_len : SPVM::StringList ($length : int)
+    sub new_len : StringList ($length : int)
 
-Create a new L<SPVM::StringList> object with array length.
+Create a new L<StringList|SPVM::StringList> object with array length.
 
 =head1 INSTANCE METHODS
 
@@ -142,7 +142,7 @@ If there are no elements in the list, exception occur.
 
   sub to_array : string[] ($self : self)
 
-Convert L<SPVM::StringList> to string array.
+Convert L<StringList|SPVM::StringList> to string array.
 
 =head2 unshift
 

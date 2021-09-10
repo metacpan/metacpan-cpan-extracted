@@ -408,6 +408,7 @@ apc_dbm_create( Handle self, int type)
 {
 	int depth;
 	DEFXX;
+
 	if ( !DISP) return false;
 	if ( guts. idepth == 1) type = dbtBitmap;
 
@@ -445,10 +446,9 @@ apc_dbm_create( Handle self, int type)
 	XCHECKPOINT;
 	prima_prepare_drawable_for_painting( self, false);
 
-#ifdef HAVE_X11_EXTENSIONS_XRENDER_H
-	if ( XF_LAYERED(XX) )
-		XX->argb_picture = XRenderCreatePicture( DISP, XX->gdrawable, guts. xrender_argb_pic_format, 0, NULL);
-#endif
+	CREATE_ARGB_PICTURE(XX->gdrawable,
+		XX->type.bitmap ? 1 : (XF_LAYERED(XX) ? 32 : 0),
+		XX->argb_picture);
 
 	return true;
 }
@@ -457,12 +457,6 @@ Bool
 apc_dbm_destroy( Handle self)
 {
 	DEFXX;
-#ifdef HAVE_X11_EXTENSIONS_XRENDER_H
-	if ( XF_LAYERED(XX) && XX->argb_picture ) {
-		XRenderFreePicture( DISP, XX->argb_picture);
-		XX->argb_picture = 0;
-	}
-#endif
 	if ( XX->gdrawable) {
 		prima_cleanup_drawable_after_painting( self);
 		XFreePixmap( DISP, XX->gdrawable);
@@ -1823,17 +1817,12 @@ img_put_layered_on_pixmap( Handle self, Handle image, PutImageRequest * req)
 #ifdef HAVE_X11_EXTENSIONS_XRENDER_H
 	DEFXX;
 	PDrawableSysData YY = X(image);
-	Picture target;
 
-	target  = XRenderCreatePicture( DISP, XX->gdrawable, guts. xrender_argb_compat_format, 0, NULL);
-	if ( XX-> clip_mask_extent. x != 0 && XX-> clip_mask_extent. y != 0)
-		XRenderSetPictureClipRegion(DISP, target, XX->current_region);
 	XRenderComposite(
-		DISP, (req-> rop == ropSrcCopy) ? PictOpSrc : PictOpOver, YY-> argb_picture, 0, target,
+		DISP, (req-> rop == ropSrcCopy) ? PictOpSrc : PictOpOver, YY-> argb_picture, 0, XX-> argb_picture,
 		req->src_x, req->src_y, 0, 0,
 		req->dst_x, req->dst_y, req->w, req->h
 	);
-	XRenderFreePicture( DISP, target);
 	XSync(DISP, false);
 	return true;
 #else
@@ -1909,7 +1898,6 @@ img_put_pixmap_on_layered( Handle self, Handle image, PutImageRequest * req)
 #ifdef HAVE_X11_EXTENSIONS_XRENDER_H
 	DEFXX;
 	PDrawableSysData YY = X(image);
-	Picture picture;
 	int render_rop = PictOpMinimum - 1;
 
 	switch ( req-> rop ) {
@@ -1920,15 +1908,11 @@ img_put_pixmap_on_layered( Handle self, Handle image, PutImageRequest * req)
 
 	if ( render_rop >= PictOpMinimum ) {
 		/* cheap on-server blit */
-		picture = XRenderCreatePicture( DISP, YY->gdrawable, guts. xrender_argb_compat_format, 0, NULL);
-		if ( XX-> clip_mask_extent. x != 0 && XX-> clip_mask_extent. y != 0)
-			XRenderSetPictureClipRegion(DISP, picture, XX->current_region);
 		XRenderComposite(
-			DISP, render_rop, picture, 0, XX-> argb_picture,
+			DISP, render_rop, YY->argb_picture, 0, XX-> argb_picture,
 			req->src_x, req->src_y, 0, 0,
 			req->dst_x, req->dst_y, req->w, req->h
 		);
-		XRenderFreePicture( DISP, picture);
 		XSync(DISP, false);
 		return true;
 	} else {
@@ -1957,7 +1941,7 @@ img_put_argb_on_pixmap_or_widget( Handle self, Handle image, PutImageRequest * r
 	GC gc;
 	XGCValues gcv;
 	Bool ret = false;
-	Picture picture, target;
+	Picture picture;
 
 	if ( !guts. argb_visual. visual)
 		return fallback( self, image, req);
@@ -1976,16 +1960,12 @@ img_put_argb_on_pixmap_or_widget( Handle self, Handle image, PutImageRequest * r
 		req->w, req->h
 	))) goto FAIL;
 
-	picture = XRenderCreatePicture( DISP, pixmap, guts. xrender_argb_pic_format, 0, NULL);
-	target  = XRenderCreatePicture( DISP, XX->gdrawable, guts. xrender_argb_compat_format, 0, NULL);
-	if ( XX-> clip_mask_extent. x != 0 && XX-> clip_mask_extent. y != 0)
-		XRenderSetPictureClipRegion(DISP, target, XX->current_region);
+	picture = XRenderCreatePicture( DISP, pixmap, guts. xrender_argb32_format, 0, NULL);
 	XRenderComposite(
-		DISP, (req-> rop == ropSrcCopy) ? PictOpSrc : PictOpOver, picture, 0, target,
+		DISP, (req-> rop == ropSrcCopy) ? PictOpSrc : PictOpOver, picture, 0, XX->argb_picture,
 		0, 0, 0, 0,
 		req->dst_x, req->dst_y, req->w, req->h
 	);
-	XRenderFreePicture( DISP, target);
 	XRenderFreePicture( DISP, picture);
 	XSync(DISP, false);
 	ret = true;
@@ -2071,7 +2051,7 @@ img_put_argb_on_layered( Handle self, Handle image, PutImageRequest * req)
 		req->w, req->h
 	))) goto FAIL;
 
-	picture = XRenderCreatePicture( DISP, pixmap, guts. xrender_argb_pic_format, 0, NULL);
+	picture = XRenderCreatePicture( DISP, pixmap, guts. xrender_argb32_format, 0, NULL);
 	if ( XX-> clip_mask_extent. x != 0 && XX-> clip_mask_extent. y != 0)
 		XRenderSetPictureClipRegion(DISP, picture, XX->current_region);
 	XRenderComposite(
@@ -2255,13 +2235,13 @@ apc_image_begin_paint( Handle self)
 	XX-> flags.layered = layered;
 	XX-> visual      = &guts. visual;
 	XX-> colormap    = guts. defaultColormap;
-#ifdef HAVE_X11_EXTENSIONS_XRENDER_H
-	if ( XF_LAYERED(XX) ) {
-		XX-> argb_picture = XRenderCreatePicture( DISP, XX->gdrawable, guts. xrender_argb_pic_format, 0, NULL);
-		XX-> visual      = &guts. argb_visual;
-		XX-> colormap    = guts. argbColormap;
+	if ( XF_LAYERED(XX)) {
+		XX-> visual    = &guts. argb_visual;
+		XX-> colormap  = guts. argbColormap;
 	}
-#endif
+	CREATE_ARGB_PICTURE(XX->gdrawable,
+		bitmap ? 1 : (XF_LAYERED(XX) ? 32 : 0),
+		XX->argb_picture);
 	XCHECKPOINT;
 	XX-> type. icon = 0;
 	prima_prepare_drawable_for_painting( self, false);
@@ -2694,12 +2674,6 @@ Bool
 apc_image_end_paint( Handle self)
 {
 	DEFXX;
-#ifdef HAVE_X11_EXTENSIONS_XRENDER_H
-	if ( XF_LAYERED(XX) && XX->argb_picture ) {
-		XRenderFreePicture( DISP, XX->argb_picture);
-		XX->argb_picture = 0;
-	}
-#endif
 	if ( XF_LAYERED(XX))
 		prima_query_argb_image( self, XX-> gdrawable);
 	else
@@ -2861,7 +2835,7 @@ apc_application_get_bitmap( Handle self, Handle image, int x, int y, int xLen, i
 	if ( xLen <= 0 || yLen <= 0) return false;
 
 #ifdef WITH_COCOA
-	if ( guts. use_quartz) {
+	if ( guts. use_quartz && prima_cocoa_is_x11_local()) {
 		uint32_t *pixels;
 		if ( PImage(image)->type != imRGB)
 			CImage( image)-> create_empty( image, xLen, yLen, imRGB);

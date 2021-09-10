@@ -12,7 +12,7 @@ use SPVM 'MyGSL';
 # Initialize SPVM
 
 
-MyGSL->stat;
+SPVM::MyGSL->stat;
 
 =head2 GSL Installation from source
   

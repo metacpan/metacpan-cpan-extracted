@@ -15,7 +15,7 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
 # Enumeration
 {
-  ok(TestCase::Enum->enum_int());
+  ok(SPVM::TestCase::Enum->enum_int());
 }
 
 # All object is freed

@@ -13,7 +13,7 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 
 use Test::More;
-use Test::NoWarnings;
+use Test::FailWarnings -allow_deps => 1;
 use Test::Exception;
 
 use File::Which;
@@ -26,16 +26,15 @@ use parent qw(
 
 use Math::ProvablePrime ();
 
-if ( !caller ) {
-    my $test_obj = __PACKAGE__->new();
-    plan tests => $test_obj->expected_tests(+1);
-    $test_obj->runtests();
-}
+__PACKAGE__->new()->runtests();
 
 #----------------------------------------------------------------------
 
 sub _ACCEPT_BIGINT_LIBS {
-    return qw( Math::BigInt::GMP  Math::BigInt::Pari );
+    return qw(
+        Math::BigInt::GMP  Math::BigInt::Pari
+        Math::BigInt::GMPz Math::BigInt::LTM
+    );
 }
 
 sub SKIP_CLASS {
@@ -46,12 +45,12 @@ sub SKIP_CLASS {
     if (!$self->{'_checked_lib'}) {
         $self->{'_checked_lib'} = 1;
 
-        diag "Your Crypt::Perl::BigInt backend is “$bigint_lib”.";
+        diag "Your Math::BigInt backend is “$bigint_lib”.";
     }
 
 
     if ( !grep { $_ eq $bigint_lib } _ACCEPT_BIGINT_LIBS() ) {
-        return "“$bigint_lib” isn’t recognized as a C-based Math::BigInt backend. This module is too slow to be practical without such a backend. Skipping …";
+        return "I think $bigint_lib is too slow for this test. Skipping …";
     }
 
     return;

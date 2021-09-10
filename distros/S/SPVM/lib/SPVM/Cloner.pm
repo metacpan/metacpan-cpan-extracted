@@ -4,26 +4,26 @@ package SPVM::Cloner;
 
 =head1 NAME
 
-SPVM::Cloner - a callback interface to clone a object
+SPVM::Cloner - Cloner in SPVM | a callback interface to clone a object
 
 =head1 SYNOPSYS
   
-  use SPVM::Cloner;
+  use Cloner;
   
-  my $cloner : SPVM::Cloner = sub : object ($self : self, $object : object) {
-    my $point = (SPVM::Point)$object;
+  my $cloner : Cloner = sub : object ($self : self, $object : object) {
+    my $point = (Point)$object;
     
-    my $new_point = SPVM::Point->new($point->x, $point->y);
+    my $new_point = Point->new($point->x, $point->y);
     
     return $new_point;
   };
   
-  my $point = SPVM::Point->new(1, 2);
+  my $point = Point->new(1, 2);
   my $point_clone = $cloner->($point);
 
 =head1 DESCRIPTION
 
-L<SPVM::Cloner> is a callback interface to clone a object.
+L<Cloner|SPVM::Cloner> is a callback interface to clone a object.
 
 =head1 CALLBACK METHOD INTERFACE
 

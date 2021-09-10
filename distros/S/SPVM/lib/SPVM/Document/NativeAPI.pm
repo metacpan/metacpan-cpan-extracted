@@ -14,8 +14,8 @@ Native method can be written by C language or C++, If the code is compatible wit
 
 Native Method Declaration is written using Method Descriptor "native" in SPVM module file. SPVM Native Method Declaration ends with a semicolon without Sobroutine Block.
 
-  # Foo/Bar.spvm
-  package Foo::Bar {
+  # SPVM/Foo/Bar.spvm
+  class Foo::Bar {
     native sub sum : int ($num1 : int, $num2 : int);
   }
 
@@ -24,11 +24,11 @@ Native Method Declaration is written using Method Descriptor "native" in SPVM mo
 SPVM Native Config File must be created for SPVM Native Method. The base name without the extension of native config file must be same as SPVM module file and the extension must be ".config".
 
   # Native configuration file for Foo::Bar module
-  Foo/Bar.config
+  SPVM/Foo/Bar.config
 
 If native configuration file does not exist, an exception occurs.
 
-Native Config File is Perl source code. Native Config File must return properly L<SPVM::Builder::Config> object, otherwise an exception occurs.
+Native Config File is Perl source code. Native Config File must return properly L<Builder::Config|SPVM::Builder::Config> object, otherwise an exception occurs.
 
 =head3 C99 Config File Example
 
@@ -131,13 +131,13 @@ Native Config File is Perl source code. Native Config File must return properly 
 Native Method Definition is written in native source file. Native source file is basically C language source file which extension is ".c". This extension can be changed to ".cpp" for C++ source file, or ".cu" for CUDA source file, etc.
 
   # Native source file for Foo::Bar module
-  Foo/Bar.c
+  SPVM/Foo/Bar.c
 
 The following is natvie source file example written by C language.
 
   #include "spvm_native.h"
 
-  int32_t SPNATIVE__Foo__Bar__sum(SPVM_ENV* env, SPVM_VALUE* stack) {
+  int32_t SPVM__Foo__Bar__sum(SPVM_ENV* env, SPVM_VALUE* stack) {
 
     int32_t num1 = stack[0].ival;
     int32_t num2 = stakc[1].ival;
@@ -168,11 +168,11 @@ The return type is "int32_t" type. If the method raises an exception, "1" is ret
 
 Native Method Definition is a simple C language function such as
 
-  SPNATIVE__Foo__Bar__sum
+  SPVM__Foo__Bar__sum
 
-The function name starts with "SPNATIVE__".
+The function name starts with "SPVM__".
 
-Followed by package name "Foo__Bar", which is replaced "::" in Foo::Bar.
+Followed by class name "Foo__Bar", which is replaced "::" in Foo::Bar.
 
 Followed by "__".
 
@@ -182,7 +182,7 @@ If Native Method Name is invalid, a compile error will occur.
 
 There are two arguments, the first argument is "SPVM_ENV* env" which has the information of the execution environment, and the second argument is "SPVM_VALUE* stack" which is used for the argument and return value.
 
-  int32_t SPNATIVE__Foo__Bar__sum(SPVM_ENV* env, SPVM_VALUE* stack) {
+  int32_t SPVM__Foo__Bar__sum(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   }
 
@@ -190,7 +190,7 @@ In the above sample, it takes two int type arguments of SPVM, calculates the sum
 
   #include "spvm_native.h"
 
-  int32_t SPNATIVE__Foo__Bar__sum(SPVM_ENV* env, SPVM_VALUE* stack) {
+  int32_t SPVM__Foo__Bar__sum(SPVM_ENV* env, SPVM_VALUE* stack) {
 
     int32_t num1 = stack[0].ival;
     int32_t num2 = stakc[1].ival;
@@ -230,7 +230,7 @@ The generated shared libraries exists under "work/lib" under the build directory
 
 The stack is the second argument of the definition of the Native Method. This is called stack. Stack is used getting arguments and return the value.
 
-  int32_t SPNATIVE__Foo__Bar__sum(SPVM_ENV* env, SPVM_VALUE* stack) {
+  int32_t SPVM__Foo__Bar__sum(SPVM_ENV* env, SPVM_VALUE* stack) {
 
   }
 
@@ -332,12 +332,12 @@ If you get SPVM double Reference Type Argument, use "dref" field. it can be assi
 
 In a Native Method, multiple numeric type arguments are assigned to the coresponding multiple arguments.
 
-For example, In the case of the argument values of L<SPVM::Complex_2d> type, you can get them by the following way.
+For example, In the case of the argument values of L<Complex_2d|SPVM::Complex_2d> type, you can get them by the following way.
 
   double args_re = stack[0].dval;
   double args_im = stack[1].dval;
 
-Note that you cannot access the values by the field name of L<SPVM::Complex_2d>.
+Note that you cannot access the values by the field name of L<Complex_2d|SPVM::Complex_2d>.
 
 
 =head2 Return Value
@@ -395,7 +395,7 @@ Use C<oval> field of C<SPVM_VALUE> to set a return value which type of SPVM is o
 
 If you set multiple numeric return value in native method, set multiple return values.
 
-For example, in the case of L<SPVM::Complex_2d>, do the following.
+For example, in the case of L<Complex_2d|SPVM::Complex_2d>, do the following.
 
   double retval_x;
   double retval_y;
@@ -490,10 +490,10 @@ The exception is stored in env.
 
 There is a type called pointer type in SPVM, but I will explain how to use it.
 
-The pointer type definition specifies the pointer_t descriptor in the SPVM package definition. Pointer types cannot have field definitions. This example describes how to use the C standard "struct tm" as a pointer type.
+The pointer type definition specifies the pointer_t descriptor in the SPVM class definition. Pointer types cannot have field definitions. This example describes how to use the C standard "struct tm" as a pointer type.
 
-  # MyTimeInfo.spvm
-  package MyTimeInfo : pointer_t {
+  # SPVM/MyTimeInfo.spvm
+  class MyTimeInfo : pointer_t {
 
     # Constructor
     native sub new : MyTimeInfo ();
@@ -509,9 +509,9 @@ It defines a new constructor, a method that takes seconds information called sec
 
 Next is the definition on the C language side.
 
-  # MyTimeInfo.c
+  # SPVM/MyTimeInfo.c
 
-  int32_t SPNATIVE__MyTimeInfo__new(SPVM_ENV* env, SPVM_VALUE* stack) {
+  int32_t SPVM__SPVM__MyTimeInfo__new(SPVM_ENV* env, SPVM_VALUE* stack) {
 
     // Alloc strcut tm
     void* tm_ptr = env->alloc_memory_block_zero (sizeof (struct tm));
@@ -524,7 +524,7 @@ Next is the definition on the C language side.
     return 0;
   }
 
-  int32_t SPNATIVE__MyTimeInfo__sec(SPVM_ENV* env, SPVM_VALUE* stack) {
+  int32_t SPVM__SPVM__MyTimeInfo__sec(SPVM_ENV* env, SPVM_VALUE* stack) {
     void* tm_obj = stack[0].oval;
 
     strcut tm* tm_ptr = (struct tm*) env->get_pointer(env, tm_obj);
@@ -534,7 +534,7 @@ Next is the definition on the C language side.
     return 0;
   }
 
-  int32_t SPNATIVE__MyTimeInfo__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
+  int32_t SPVM__SPVM__MyTimeInfo__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
 
     void* tm_obj = stack[0].oval;
     strcut tm* tm_ptr = (struct tm*) env->get_pointer(env, tm_obj);
@@ -570,7 +570,7 @@ Next, let's get the value of tm_sec. sec method. The get_pointer function can be
 
 The last is the destructor. Be sure to define a destructor, as the allocated memory will not be released automatically.
 
-  int32_t SPNATIVE__MyTimeInfo__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
+  int32_t SPVM__SPVM__MyTimeInfo__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
 
     void* tm_obj = stack[0].oval;
 
@@ -587,15 +587,15 @@ Execute the free_memory_block function to free the memory. Be sure to free the m
 
 Native API can be called from "SPVM_ENV* env" passed as an argument. Note that you have to pass env as the first argument.
 
-  int32_t basic_type_id = env->get_basic_type_id(env, "SPVM::Int");
+  int32_t basic_type_id = env->get_basic_type_id(env, "Int");
 
 =head1 List of Native APIs
 
-=head2 package_vars_heap
+=head2 class_vars_heap
 
-  void* package_vars_heap;
+  void* class_vars_heap;
 
-the pointer to the storage area of the package variables. This is used internally.
+the pointer to the storage area of the class variables. This is used internally.
 
 =head2 object_header_byte_size
 
@@ -649,37 +649,37 @@ The length offset in the object structure. This is used internally.
 
   void* byte_object_basic_type_id;
 
-Basic type ID of SPVM::Byte type. This is used internally.
+Basic type ID of L<Byte|SPVM::Byte> type. This is used internally.
 
 =head2 short_object_basic_type_id
 
   void* short_object_basic_type_id;
 
-ID of the base type of SPVM::Short type. This is used internally.
+ID of the base type of L<Short|SPVM::Short> type. This is used internally.
 
 =head2 int_object_basic_type_id
 
   void* int_object_basic_type_id;
 
-ID of the base type of SPVM::Int type. This is used internally.
+ID of the base type of L<Int|SPVM::Int> type. This is used internally.
 
 =head2 long_object_basic_type_id
 
   void* long_object_basic_type_id;
 
-ID of the base type of SPVM::Long type. This is used internally.
+ID of the base type of L<Long|SPVM::Long> type. This is used internally.
 
 =head2 float_object_basic_type_id
 
   void* float_object_basic_type_id;
 
-ID of the base type of SPVM::Float type. This is used internally.
+ID of the base type of L<Float|SPVM::Float> type. This is used internally.
 
 =head2 double_object_basic_type_id
 
   void* double_object_basic_type_id;
 
-ID of the base type of SPVM::Double type. This is used internally.
+ID of the base type of L<Double|SPVM::Double> type. This is used internally.
 
 =head2 compiler
 
@@ -719,13 +719,13 @@ Get the ID of the base type given the name of the base type. If it does not exis
 
 Example:
 
-  int32_t basic_type_id = env->get_basic_type_id(env, "SPVM::Int");
+  int32_t basic_type_id = env->get_basic_type_id(env, "Int");
 
 =head2 get_field_id
 
-  int32_t (*get_field_id)(SPVM_ENV* env, const char* package_name, const char* field_name, const char* signature);
+  int32_t (*get_field_id)(SPVM_ENV* env, const char* class_name, const char* field_name, const char* signature);
 
-Get the ID of the field given the package name, field name, and signature. If the field does not exist, a value less than 0 is returned.
+Get the ID of the field given the class name, field name, and signature. If the field does not exist, a value less than 0 is returned.
 
 The signature is the same as the field type name.
 
@@ -739,23 +739,23 @@ Example:
 
 Gets the offset of the field given the field ID. The field ID must be a valid field ID obtained with the field_id function.
 
-=head2 get_package_var_id
+=head2 get_class_var_id
 
-  int32_t (*get_package_var_id)(SPVM_ENV* env, const char* package_name, const char* package_var_name, const char* signature);
+  int32_t (*get_class_var_id)(SPVM_ENV* env, const char* class_name, const char* class_var_name, const char* signature);
 
-Get the package variable ID given the package name, package variable name and signature. If the package variable does not exist, a value less than 0 is returned.
+Get the class variable ID given the class name, class variable name and signature. If the class variable does not exist, a value less than 0 is returned.
 
-The signature is the same as the package variable type name.
+The signature is the same as the class variable type name.
 
 Example:
 
-  int32_t pkgvar_id = env->get_package_var_id(env, "Foo", "$VAR", "int");
+  int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "int");
 
 =head2 get_method_id
 
-  int32_t (*get_method_id)(SPVM_ENV* env, const char* package_name, const char* method_name, const char* signature);
+  int32_t (*get_method_id)(SPVM_ENV* env, const char* class_name, const char* method_name, const char* signature);
 
-Get the method ID by specifying the package name, method name, and signature. If no method exists, a value less than 0 is returned.
+Get the method ID by specifying the class name, method name, and signature. If no method exists, a value less than 0 is returned.
 
 The signature has the following format: Must not contain white space.
 
@@ -791,7 +791,7 @@ Do the same as C<new_object_raw>, and add the created object to the mortal stack
 
 Example:
 
-  int32_t basic_type_id = env->get_basic_type_id(env, "SPVM::Int");
+  int32_t basic_type_id = env->get_basic_type_id(env, "Int");
   void* object = env->new_object(env, basic_type_id);
 
 =head2 new_byte_array_raw
@@ -904,7 +904,7 @@ Do the same as C<new_object_array_raw>, and add the created array to the mortal 
 
 Example:
 
-  int32_t basic_type_id = env->get_basic_type_id(env, "SPVM::Int");
+  int32_t basic_type_id = env->get_basic_type_id(env, "Int");
   void* object_array = env->new_object_array(env, basic_type_id, 100);
 
 =head2 new_muldim_array_raw
@@ -921,8 +921,8 @@ Do the same as C<new_muldim_array_raw>, and add the created array to the mortal 
 
 Example:
 
-  // new SPVM::Int[][][100]
-  int32_t basic_type_id = env->get_basic_type_id(env, "SPVM::Int");
+  // new Int[][][100]
+  int32_t basic_type_id = env->get_basic_type_id(env, "Int");
   void* multi_array = env->new_muldim_array(env, basic_type_id, 2, 100);
 
 =head2 new_mulnum_array_raw
@@ -939,7 +939,7 @@ Do the same as C<new_mulnum_array_raw>, and add the created array to the mortal 
 
 Example:
 
-  int32_t basic_type_id = env->get_basic_type_id(env, "SPVM::Complex_2d");
+  int32_t basic_type_id = env->get_basic_type_id(env, "Complex_2d");
   void* value_array = env->new_mulnum_array(env, basic_type_id, 100);
 
 =head2 new_string_nolen_raw
@@ -988,7 +988,7 @@ Do the same as C<new_pointer_raw>, and add the created string object to the mort
 
 Example:
 
-  int32_t basic_type_id = env->get_basic_type_id(env, "SPVM::MyTime");
+  int32_t basic_type_id = env->get_basic_type_id(env, "MyTime");
   void* pointer = malloc(sizeof (struct tm));
   void* pointer_obj = env->new_pointer(env, basic_type_id, pointer);
 
@@ -1006,17 +1006,17 @@ Do the same as C<concat_raw>, and add the created string object to the mortal st
 
 =head2 new_stack_trace_raw
 
-  void* (*new_stack_trace_raw)(SPVM_ENV* env, void* exception, const char* package_name, const char* method_name, const char* file, int32_t line);
+  void* (*new_stack_trace_raw)(SPVM_ENV* env, void* exception, const char* class_name, const char* method_name, const char* file, int32_t line);
 
-If you specify a byte[] type exception message and a package name, method name, file name and line number, the character string of the package name, method name, file name and line number is added to the end of the byte[] type exception message. The added character string will be returned.
+If you specify a byte[] type exception message and a class name, method name, file name and line number, the character string of the class name, method name, file name and line number is added to the end of the byte[] type exception message. The added character string will be returned.
 
 This function does not add objects to the mortal stack, use new_stack_trace to avoid memory leaks for normal use.
 
 =head2 new_stack_trace
 
-  void* (*new_stack_trace)(SPVM_ENV* env, void* exception, const char* package_name, const char* method_name, const char* file, int32_t line);
+  void* (*new_stack_trace)(SPVM_ENV* env, void* exception, const char* class_name, const char* method_name, const char* file, int32_t line);
 
-When a byte[] type exception message and a package name, method name, file name and line number are specified, the string of the package name, method name, file name and line number is added to the end of the string type exception message. Returns a new string type object. Add the newly created object to the mortal stack.
+When a byte[] type exception message and a class name, method name, file name and line number are specified, the string of the class name, method name, file name and line number is added to the end of the string type exception message. Returns a new string type object. Add the newly created object to the mortal stack.
 
 =head2 length
 
@@ -1186,7 +1186,7 @@ Example:
 
 If you specify the object and field ID, the value of the object type field is returned as a void* type value in C language. The field ID must be a valid field ID obtained with the field_id function. If the field is a weak reference, it will be removed.
 
-  int32_t field_id = env->get_field_id(env, "Foo", "x", "SPVM::Int");
+  int32_t field_id = env->get_field_id(env, "Foo", "x", "Int");
   void* field_value = env->get_field_object(env, object, field_id);
 
 =head2 set_field_byte
@@ -1269,172 +1269,172 @@ Object and field Specify the ID and the value of the field and set the value to 
 
 Example:
 
-  int32_t field_id = env->get_field_id(env, "Foo", "x", "SPVM::Int");
-  int32_t basic_type_id = env->get_basic_type_id(env, "SPVM::Int");
+  int32_t field_id = env->get_field_id(env, "Foo", "x", "Int");
+  int32_t basic_type_id = env->get_basic_type_id(env, "Int");
   void* object = env->new_object(env, basic_type_id);
   env->set_field_object(env, object, field_id, object);
 
-=head2 get_package_var_byte
+=head2 get_class_var_byte
 
-  int8_t (*get_package_var_byte)(SPVM_ENV* env, int32_t pkgvar_id);
+  int8_t (*get_class_var_byte)(SPVM_ENV* env, int32_t pkgvar_id);
 
-If an object and a package variable ID are specified, the value of the byte type package variable is returned as a C language int8_t type value. The package variable ID must be a valid package variable ID obtained with the field_id function.
-
-Example:
-
-  int32_t pkgvar_id = env->get_package_var_id(env, "Foo", "$VAR", "byte");
-  int8_t pkgvar_value = env->get_package_var_byte(env, object, pkgvar_id);
-
-=head2 get_package_var_short
-
-  int16_t (*get_package_var_short)(SPVM_ENV* env, int32_t pkgvar_id);
-
-If an object and a package variable ID are specified, the value of the short type package variable will be returned as a C language int16_t type value. The package variable ID must be a valid package variable ID obtained with the field_id function.
+If an object and a class variable ID are specified, the value of the byte type class variable is returned as a C language int8_t type value. The class variable ID must be a valid class variable ID obtained with the field_id function.
 
 Example:
 
-  int32_t pkgvar_id = env->get_package_var_id(env, "Foo", "$VAR", "short");
-  int16_t pkgvar_value = env->get_package_var_short(env, object, pkgvar_id);
+  int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "byte");
+  int8_t pkgvar_value = env->get_class_var_byte(env, object, pkgvar_id);
 
-=head2 get_package_var_int
+=head2 get_class_var_short
 
-  int32_t (*get_package_var_int)(SPVM_ENV* env, int32_t pkgvar_id);
+  int16_t (*get_class_var_short)(SPVM_ENV* env, int32_t pkgvar_id);
 
-If an object and a package variable ID are specified, the value of the int type package variable will be returned as a C language int32_t type value. The package variable ID must be a valid package variable ID obtained with the field_id function.
-
-Example:
-
-  int32_t pkgvar_id = env->get_package_var_id(env, "Foo", "$VAR", "int");
-  int32_t pkgvar_value = env->get_package_var_int(env, object, pkgvar_id);
-
-=head2 get_package_var_long
-
-  int64_t (*get_package_var_long)(SPVM_ENV* env, int32_t pkgvar_id);
-
-If an object and a package variable ID are specified, the value of the long type package variable will be returned as a C language int64_t type value. The package variable ID must be a valid package variable ID obtained with the field_id function.
+If an object and a class variable ID are specified, the value of the short type class variable will be returned as a C language int16_t type value. The class variable ID must be a valid class variable ID obtained with the field_id function.
 
 Example:
 
-  int32_t pkgvar_id = env->get_package_var_id(env, "Foo", "$VAR", "long");
-  int64_t pkgvar_value = env->get_package_var_long(env, object, pkgvar_id);
+  int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "short");
+  int16_t pkgvar_value = env->get_class_var_short(env, object, pkgvar_id);
 
-=head2 get_package_var_float
+=head2 get_class_var_int
 
-  float (*get_package_var_float)(SPVM_ENV* env, int32_t pkgvar_id);
+  int32_t (*get_class_var_int)(SPVM_ENV* env, int32_t pkgvar_id);
 
-If an object and a package variable ID are specified, the value of the float type package variable will be returned as a C language float type value. The package variable ID must be a valid package variable ID obtained with the field_id function.
-
-Example:
-
-  int32_t pkgvar_id = env->get_package_var_id(env, "Foo", "$VAR", "float");
-  float pkgvar_value = env->get_package_var_float(env, object, pkgvar_id);
-
-=head2 get_package_var_double
-
-  double (*get_package_var_double)(SPVM_ENV* env, int32_t pkgvar_id);
-
-If you specify an object and a package variable ID, the value of the double type package variable is returned as a C type double type value. The package variable ID must be a valid package variable ID obtained with the field_id function.
+If an object and a class variable ID are specified, the value of the int type class variable will be returned as a C language int32_t type value. The class variable ID must be a valid class variable ID obtained with the field_id function.
 
 Example:
 
-  int32_t pkgvar_id = env->get_package_var_id(env, "Foo", "$VAR", "double");
-  double pkgvar_value = env->get_package_var_double(env, object, pkgvar_id);
+  int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "int");
+  int32_t pkgvar_value = env->get_class_var_int(env, object, pkgvar_id);
 
-=head2 get_package_var_object
+=head2 get_class_var_long
 
-  void* (*get_package_var_object)(SPVM_ENV* env, int32_t pkgvar_id);
+  int64_t (*get_class_var_long)(SPVM_ENV* env, int32_t pkgvar_id);
 
-When an object and a package variable ID are specified, the value of the object type package variable is returned as a C language void* type value. The package variable ID must be a valid package variable ID obtained with the field_id function.
+If an object and a class variable ID are specified, the value of the long type class variable will be returned as a C language int64_t type value. The class variable ID must be a valid class variable ID obtained with the field_id function.
 
 Example:
 
-  int32_t pkgvar_id = env->get_package_var_id(env, "Foo", "$VAR", "SPVM::Int");
-  void* pkgvar_value = env->get_package_var_byte(env, object, pkgvar_id);
+  int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "long");
+  int64_t pkgvar_value = env->get_class_var_long(env, object, pkgvar_id);
 
-=head2 set_package_var_byte
+=head2 get_class_var_float
 
-  void (*set_package_var_byte)(SPVM_ENV* env, int32_t pkgvar_id, int8_t value);
+  float (*get_class_var_float)(SPVM_ENV* env, int32_t pkgvar_id);
+
+If an object and a class variable ID are specified, the value of the float type class variable will be returned as a C language float type value. The class variable ID must be a valid class variable ID obtained with the field_id function.
+
+Example:
+
+  int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "float");
+  float pkgvar_value = env->get_class_var_float(env, object, pkgvar_id);
+
+=head2 get_class_var_double
+
+  double (*get_class_var_double)(SPVM_ENV* env, int32_t pkgvar_id);
+
+If you specify an object and a class variable ID, the value of the double type class variable is returned as a C type double type value. The class variable ID must be a valid class variable ID obtained with the field_id function.
+
+Example:
+
+  int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "double");
+  double pkgvar_value = env->get_class_var_double(env, object, pkgvar_id);
+
+=head2 get_class_var_object
+
+  void* (*get_class_var_object)(SPVM_ENV* env, int32_t pkgvar_id);
+
+When an object and a class variable ID are specified, the value of the object type class variable is returned as a C language void* type value. The class variable ID must be a valid class variable ID obtained with the field_id function.
+
+Example:
+
+  int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "Int");
+  void* pkgvar_value = env->get_class_var_byte(env, object, pkgvar_id);
+
+=head2 set_class_var_byte
+
+  void (*set_class_var_byte)(SPVM_ENV* env, int32_t pkgvar_id, int8_t value);
 
 If you specify the object and field ID and the value of the field, the value is set to the byte type field. The field ID must be a valid field ID obtained with the field_id function.
 
 Example:
 
-  int32_t pkgvar_id = env->get_package_var_id(env, "Foo", "$VAR", "byte");
+  int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "byte");
   int8_t pkgvar_value = 5;
-  env->set_package_var_byte(env, pkgvar_id, pkgvar_value);
+  env->set_class_var_byte(env, pkgvar_id, pkgvar_value);
 
-=head2 set_package_var_short
+=head2 set_class_var_short
 
-  void (*set_package_var_short)(SPVM_ENV* env, int32_t pkgvar_id, int16_t value);
+  void (*set_class_var_short)(SPVM_ENV* env, int32_t pkgvar_id, int16_t value);
 
 If you specify the object and field ID and the value of the field, the value is set to the short type field. The field ID must be a valid field ID obtained with the field_id function.
 
 Example:
 
-  int32_t pkgvar_id = env->get_package_var_id(env, "Foo", "$VAR", "short");
+  int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "short");
   int16_t pkgvar_value = 5;
-  env->set_package_var_short(env, pkgvar_id, pkgvar_value);
+  env->set_class_var_short(env, pkgvar_id, pkgvar_value);
 
-=head2 set_package_var_int
+=head2 set_class_var_int
 
-  void (*set_package_var_int)(SPVM_ENV* env, int32_t pkgvar_id, int32_t value);
+  void (*set_class_var_int)(SPVM_ENV* env, int32_t pkgvar_id, int32_t value);
 
 If you specify the object and field ID and the value of the field, the value is set to the int type field. The field ID must be a valid field ID obtained with the field_id function.
 
 Example:
 
-  int32_t pkgvar_id = env->get_package_var_id(env, "Foo", "$VAR", "int");
+  int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "int");
   int32_t pkgvar_value = 5;
-  env->set_package_var_int(env, pkgvar_id, pkgvar_value);
+  env->set_class_var_int(env, pkgvar_id, pkgvar_value);
 
-=head2 set_package_var_long
+=head2 set_class_var_long
 
-  void (*set_package_var_long)(SPVM_ENV* env, int32_t pkgvar_id, int64_t value);
+  void (*set_class_var_long)(SPVM_ENV* env, int32_t pkgvar_id, int64_t value);
 
 If you specify the object and field ID and the value of the field, the value is set to the long type field. The field ID must be a valid field ID obtained with the field_id function.
 
 Example:
 
-  int32_t pkgvar_id = env->get_package_var_id(env, "Foo", "$VAR", "long");
+  int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "long");
   int64_t pkgvar_value = 5;
-  env->set_package_var_long(env, pkgvar_id, pkgvar_value);
+  env->set_class_var_long(env, pkgvar_id, pkgvar_value);
 
-=head2 set_package_var_float
+=head2 set_class_var_float
 
-  void (*set_package_var_float)(SPVM_ENV* env, int32_t pkgvar_id, float value);
+  void (*set_class_var_float)(SPVM_ENV* env, int32_t pkgvar_id, float value);
 
 If you specify the object and field ID and the value of the field, the value is set to the float type field. The field ID must be a valid field ID obtained with the field_id function.
 
 Example:
 
-  int32_t pkgvar_id = env->get_package_var_id(env, "Foo", "$VAR", "float");
+  int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "float");
   float pkgvar_value = 5;
-  env->set_package_var_float(env, pkgvar_id, pkgvar_value);
+  env->set_class_var_float(env, pkgvar_id, pkgvar_value);
 
-=head2 set_package_var_double
+=head2 set_class_var_double
 
-  void (*set_package_var_double)(SPVM_ENV* env, int32_t pkgvar_id, double value);
+  void (*set_class_var_double)(SPVM_ENV* env, int32_t pkgvar_id, double value);
 
 If you specify the object and field ID and the value of the field, the value is set to the double type field. The field ID must be a valid field ID obtained with the field_id function.
 
 Example:
 
-  int32_t pkgvar_id = env->get_package_var_id(env, "Foo", "$VAR", "double");
+  int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "double");
   double pkgvar_value = 5;
-  env->set_package_var_double(env, pkgvar_id, pkgvar_value);
+  env->set_class_var_double(env, pkgvar_id, pkgvar_value);
 
-=head2 set_package_var_object
+=head2 set_class_var_object
 
-  void (*set_package_var_object)(SPVM_ENV* env, int32_t pkgvar_id, void* value);
+  void (*set_class_var_object)(SPVM_ENV* env, int32_t pkgvar_id, void* value);
 
 Object and field Specify the ID and the value of the field and set the value to the object type field. The field ID must be a valid field ID obtained with the field_id function. After setting, the reference count is incremented by 1. The original value has the reference count decremented by 1.
 
 Example:
 
-  int32_t pkgvar_id = env->get_package_var_id(env, "Foo", "$VAR", "SPVM::Int");
-  int32_t basic_type_id = env->get_basic_type_id(env, "SPVM::Int");
+  int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "Int");
+  int32_t basic_type_id = env->get_basic_type_id(env, "Int");
   void* object = env->new_object(env, basic_type_id);
-  env->set_package_var_object(env, pkgvar_id, pkgvar_value);
+  env->set_class_var_object(env, pkgvar_id, pkgvar_value);
 
 =head2 get_pointer
 
@@ -1622,7 +1622,7 @@ Create a new SPVM runtime environment.
 
 The exception object and mortal stack information will be initialized.
 
-Share the package variables with the original execution environment.
+Share the class variables with the original execution environment.
 
 The number of memory blocks is shared with the original execution environment.
 
@@ -1666,9 +1666,9 @@ Example:
 
 =head2 new_object_by_name
 
-  void* (*new_object_by_name)(SPVM_ENV* env, const char* package_name, int32_t* exception_flag, const char* file, int32_t line);
+  void* (*new_object_by_name)(SPVM_ENV* env, const char* class_name, int32_t* exception_flag, const char* file, int32_t line);
 
-This is same as C<new_object> function, but you can specify package name directry.
+This is same as C<new_object> function, but you can specify class name directry.
 
 If function is succeeded, C<exception_flag> is set to 0. If a exception occurs, C<exception_flag> is set to 1. 
 
@@ -1680,9 +1680,9 @@ Example:
 
 =head2 new_pointer_by_name
 
-  void* (*new_pointer_by_name)(SPVM_ENV* env, const char* package_name, void* pointer, int32_t* exception_flag, const char* file, int32_t line);
+  void* (*new_pointer_by_name)(SPVM_ENV* env, const char* class_name, void* pointer, int32_t* exception_flag, const char* file, int32_t line);
 
-This is same as C<new_pointer> function, but you can specify package name directry.
+This is same as C<new_pointer> function, but you can specify class name directry.
 
 If function is succeeded, C<exception_flag> is set to 0. If a exception occurs, C<exception_flag> is set to 1. 
 
@@ -1693,10 +1693,10 @@ If function is succeeded, C<exception_flag> is set to 0. If a exception occurs, 
 =head2 set_field_byte_by_name
 
   void (*set_field_byte_by_name)(SPVM_ENV* env, void* object,
-    const char* package_name, const char* field_name, int8_t value,
+    const char* class_name, const char* field_name, int8_t value,
     int32_t* exception_flag, const char* file, int32_t line);
 
-This is same as C<set_field_byte> function, but you can specify package name and field name directry.
+This is same as C<set_field_byte> function, but you can specify class name and field name directry.
 
 If function is succeeded, C<exception_flag> is set to 0. If a exception occurs, C<exception_flag> is set to 1. 
 
@@ -1709,10 +1709,10 @@ Example:
 =head2 set_field_short_by_name
 
   void (*set_field_short_by_name)(SPVM_ENV* env, void* object,
-    const char* package_name, const char* field_name, int16_t value,
+    const char* class_name, const char* field_name, int16_t value,
     int32_t* exception_flag, const char* file, int32_t line);
 
-This is same as C<set_field_short> function, but you can specify package name and field name directry.
+This is same as C<set_field_short> function, but you can specify class name and field name directry.
 
 If function is succeeded, C<exception_flag> is set to 0. If a exception occurs, C<exception_flag> is set to 1. 
 
@@ -1725,10 +1725,10 @@ Example:
 =head2 set_field_int_by_name
 
   void (*set_field_int_by_name)(SPVM_ENV* env, void* object,
-    const char* package_name, const char* field_name, int32_t value,
+    const char* class_name, const char* field_name, int32_t value,
     int32_t* exception_flag, const char* file, int32_t line);
 
-This is same as C<set_field_int> function, but you can specify package name and field name directry.
+This is same as C<set_field_int> function, but you can specify class name and field name directry.
 
 If function is succeeded, C<exception_flag> is set to 0. If a exception occurs, C<exception_flag> is set to 1. 
 
@@ -1741,10 +1741,10 @@ Example:
 =head2 set_field_long_by_name
 
   void (*set_field_long_by_name)(SPVM_ENV* env, void* object,
-    const char* package_name, const char* field_name, int64_t value,
+    const char* class_name, const char* field_name, int64_t value,
     int32_t* exception_flag, const char* file, int32_t line);
 
-This is same as C<set_field_long> function, but you can specify package name and field name directry.
+This is same as C<set_field_long> function, but you can specify class name and field name directry.
 
 If function is succeeded, C<exception_flag> is set to 0. If a exception occurs, C<exception_flag> is set to 1. 
 
@@ -1757,10 +1757,10 @@ Example:
 =head2 set_field_float_by_name
 
   void (*set_field_float_by_name)(SPVM_ENV* env, void* object,
-    const char* package_name, const char* field_name, float value,
+    const char* class_name, const char* field_name, float value,
     int32_t* exception_flag, const char* file, int32_t line);
 
-This is same as C<set_field_float> function, but you can specify package name and field name directry.
+This is same as C<set_field_float> function, but you can specify class name and field name directry.
 
 If function is succeeded, C<exception_flag> is set to 0. If a exception occurs, C<exception_flag> is set to 1. 
 
@@ -1773,10 +1773,10 @@ Example:
 =head2 set_field_double_by_name
 
   void (*set_field_double_by_name)(SPVM_ENV* env, void* object,
-    const char* package_name, const char* field_name, double value,
+    const char* class_name, const char* field_name, double value,
     int32_t* exception_flag, const char* file, int32_t line);
 
-This is same as C<set_field_double> function, but you can specify package name and field name directry.
+This is same as C<set_field_double> function, but you can specify class name and field name directry.
 
 If function is succeeded, C<exception_flag> is set to 0. If a exception occurs, C<exception_flag> is set to 1. 
 
@@ -1789,10 +1789,10 @@ Example:
 =head2 set_field_object_by_name
 
   void (*set_field_object_by_name)(SPVM_ENV* env, void* object,
-    const char* package_name, const char* field_name, const char* signature, void* value,
+    const char* class_name, const char* field_name, const char* signature, void* value,
     int32_t* exception_flag, const char* file, int32_t line);
 
-This is same as C<set_field_object> function, but you can specify package name and field name directry.
+This is same as C<set_field_object> function, but you can specify class name and field name directry.
 
 If function is succeeded, C<exception_flag> is set to 0. If a exception occurs, C<exception_flag> is set to 1. 
 
@@ -1805,10 +1805,10 @@ Example:
 =head2 get_field_byte_by_name
 
   int8_t (*get_field_byte_by_name)(SPVM_ENV* env, void* object,
-    const char* package_name, const char* field_name,
+    const char* class_name, const char* field_name,
     int32_t* exception_flag, const char* file, int32_t line);
 
-This is same as C<get_field_byte> function, but you can specify package name and field name directry.
+This is same as C<get_field_byte> function, but you can specify class name and field name directry.
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
@@ -1821,10 +1821,10 @@ Example:
 =head2 get_field_short_by_name
 
   int16_t (*get_field_short_by_name)(SPVM_ENV* env, void* object,
-    const char* package_name, const char* field_name,
+    const char* class_name, const char* field_name,
     int32_t* exception_flag, const char* file, int32_t line);
 
-This is same as C<get_field_short> function, but you can specify package name and field name directry.
+This is same as C<get_field_short> function, but you can specify class name and field name directry.
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
@@ -1837,10 +1837,10 @@ Example:
 =head2 get_field_int_by_name
 
   int32_t (*get_field_int_by_name)(SPVM_ENV* env, void* object,
-    const char* package_name, const char* field_name,
+    const char* class_name, const char* field_name,
     int32_t* exception_flag, const char* file, int32_t line);
 
-This is same as C<get_field_int> function, but you can specify package name and field name directry.
+This is same as C<get_field_int> function, but you can specify class name and field name directry.
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
@@ -1853,10 +1853,10 @@ Example:
 =head2 get_field_long_by_name
 
   int64_t (*get_field_long_by_name)(SPVM_ENV* env, void* object,
-    const char* package_name, const char* field_name,
+    const char* class_name, const char* field_name,
     int32_t* exception_flag, const char* file, int32_t line);
 
-This is same as C<get_field_long> function, but you can specify package name and field name directry.
+This is same as C<get_field_long> function, but you can specify class name and field name directry.
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
@@ -1869,10 +1869,10 @@ Example:
 =head2 get_field_float_by_name
 
   float (*get_field_float_by_name)(SPVM_ENV* env, void* object,
-    const char* package_name, const char* field_name,
+    const char* class_name, const char* field_name,
     int32_t* exception_flag, const char* file, int32_t line);
 
-This is same as C<get_field_float> function, but you can specify package name and field name directry.
+This is same as C<get_field_float> function, but you can specify class name and field name directry.
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
@@ -1885,10 +1885,10 @@ Example:
 =head2 get_field_double_by_name
 
   double (*get_field_double_by_name)(SPVM_ENV* env, void* object,
-    const char* package_name, const char* field_name,
+    const char* class_name, const char* field_name,
     int32_t* exception_flag, const char* file, int32_t line);
 
-This is same as C<get_field_double> function, but you can specify package name and field name directry.
+This is same as C<get_field_double> function, but you can specify class name and field name directry.
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
@@ -1901,10 +1901,10 @@ Example:
 =head2 get_field_object_by_name
 
   void* (*get_field_object_by_name)(SPVM_ENV* env, void* object,
-    const char* package_name, const char* field_name, const char* signature,
+    const char* class_name, const char* field_name, const char* signature,
     int32_t* exception_flag, const char* file, int32_t line);
 
-This is same as C<get_field_object> function, but you can specify package name and field name directry.
+This is same as C<get_field_object> function, but you can specify class name and field name directry.
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
@@ -1914,237 +1914,237 @@ Example:
   void* object_minimal = env->get_field_object_by_name(env, object_simple, "TestCase::Simple", "object_value", "TestCase::Minimal", &e, __FILE__, __LINE__);
   if (e) { return e; }
 
-=head2 set_package_var_byte_by_name
+=head2 set_class_var_byte_by_name
 
-  void (*set_package_var_byte_by_name)(SPVM_ENV* env,
-    const char* package_name, const char* package_var_name, int8_t value,
+  void (*set_class_var_byte_by_name)(SPVM_ENV* env,
+    const char* class_name, const char* class_var_name, int8_t value,
     int32_t* exception_flag, const char* file, int32_t line);
 
-This is same as C<set_package_var_byte> function, but you can specify the package name directry.
+This is same as C<set_class_var_byte> function, but you can specify the class name directry.
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
 Example:
 
   int32_t e;
-  env->set_package_var_byte_by_name(env, "TestCase::NativeAPI", "$BYTE_VALUE", 15, &e, __FILE__, __LINE__);
+  env->set_class_var_byte_by_name(env, "TestCase::NativeAPI", "$BYTE_VALUE", 15, &e, __FILE__, __LINE__);
   if (e) { return e; }
 
-=head2 set_package_var_short_by_name
+=head2 set_class_var_short_by_name
 
-  void (*set_package_var_short_by_name)(SPVM_ENV* env,
-    const char* package_name, const char* package_var_name, int16_t value,
+  void (*set_class_var_short_by_name)(SPVM_ENV* env,
+    const char* class_name, const char* class_var_name, int16_t value,
     int32_t* exception_flag, const char* file, int32_t line);
 
-This is same as C<set_package_var_short> function, but you can specify the package name directry.
+This is same as C<set_class_var_short> function, but you can specify the class name directry.
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
 Example:
 
   int32_t e;
-  env->set_package_var_short_by_name(env, "TestCase::NativeAPI", "$SHORT_VALUE", 15, &e, __FILE__, __LINE__);
+  env->set_class_var_short_by_name(env, "TestCase::NativeAPI", "$SHORT_VALUE", 15, &e, __FILE__, __LINE__);
   if (e) { return e; }
 
-=head2 set_package_var_int_by_name
+=head2 set_class_var_int_by_name
 
-  void (*set_package_var_int_by_name)(SPVM_ENV* env,
-    const char* package_name, const char* package_var_name, int32_t value,
+  void (*set_class_var_int_by_name)(SPVM_ENV* env,
+    const char* class_name, const char* class_var_name, int32_t value,
     int32_t* exception_flag, const char* file, int32_t line);
 
-This is same as C<set_package_var_int> function, but you can specify the package name directry.
+This is same as C<set_class_var_int> function, but you can specify the class name directry.
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
 Example:
 
   int32_t e;
-  env->set_package_var_int_by_name(env, "TestCase::NativeAPI", "$INT_VALUE", 15, &e, __FILE__, __LINE__);
+  env->set_class_var_int_by_name(env, "TestCase::NativeAPI", "$INT_VALUE", 15, &e, __FILE__, __LINE__);
   if (e) { return e; }
 
-=head2 set_package_var_long_by_name
+=head2 set_class_var_long_by_name
 
-  void (*set_package_var_long_by_name)(SPVM_ENV* env
-    const char* package_name, const char* package_var_name, int64_t value,
+  void (*set_class_var_long_by_name)(SPVM_ENV* env
+    const char* class_name, const char* class_var_name, int64_t value,
     int32_t* exception_flag, const char* file, int32_t line);
 
-This is same as C<set_package_var_long> function, but you can specify the package name directry.
+This is same as C<set_class_var_long> function, but you can specify the class name directry.
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
 Example:
 
   int32_t e;
-  env->set_package_var_long_by_name(env, "TestCase::NativeAPI", "$LONG_VALUE", 15, &e, __FILE__, __LINE__);
+  env->set_class_var_long_by_name(env, "TestCase::NativeAPI", "$LONG_VALUE", 15, &e, __FILE__, __LINE__);
   if (e) { return e; }
 
-=head2 set_package_var_float_by_name
+=head2 set_class_var_float_by_name
 
-  void (*set_package_var_float_by_name)(SPVM_ENV* env,
-    const char* package_name, const char* package_var_name, float value,
+  void (*set_class_var_float_by_name)(SPVM_ENV* env,
+    const char* class_name, const char* class_var_name, float value,
     int32_t* exception_flag, const char* file, int32_t line);
 
-This is same as C<set_package_var_float> function, but you can specify the package name directry.
+This is same as C<set_class_var_float> function, but you can specify the class name directry.
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
 Example:
 
   int32_t e;
-  env->set_package_var_float_by_name(env, "TestCase::NativeAPI", "$FLOAT_VALUE", 15, &e, __FILE__, __LINE__);
+  env->set_class_var_float_by_name(env, "TestCase::NativeAPI", "$FLOAT_VALUE", 15, &e, __FILE__, __LINE__);
   if (e) { return e; }
 
-=head2 set_package_var_double_by_name
+=head2 set_class_var_double_by_name
 
-  void (*set_package_var_double_by_name)(SPVM_ENV* env,
-    const char* package_name, const char* package_var_name, double value,
+  void (*set_class_var_double_by_name)(SPVM_ENV* env,
+    const char* class_name, const char* class_var_name, double value,
     int32_t* exception_flag, const char* file, int32_t line);
 
-This is same as C<set_package_var_double> function, but you can specify the package name directry.
+This is same as C<set_class_var_double> function, but you can specify the class name directry.
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
 Example:
 
   int32_t e;
-  env->set_package_var_double_by_name(env, "TestCase::NativeAPI", "$DOUBLE_VALUE", 15, &e, __FILE__, __LINE__);
+  env->set_class_var_double_by_name(env, "TestCase::NativeAPI", "$DOUBLE_VALUE", 15, &e, __FILE__, __LINE__);
   if (e) { return e; }
 
-=head2 set_package_var_object_by_name
+=head2 set_class_var_object_by_name
 
-  void (*set_package_var_object_by_name)(SPVM_ENV* env,
-    const char* package_name, const char* package_var_name, const char* signature, void* value,
+  void (*set_class_var_object_by_name)(SPVM_ENV* env,
+    const char* class_name, const char* class_var_name, const char* signature, void* value,
     int32_t* exception_flag, const char* file, int32_t line);
 
-This is same as C<set_package_var_object> function, but you can specify the package name directry.
+This is same as C<set_class_var_object> function, but you can specify the class name directry.
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
 Example:
 
   int32_t e;
-  env->set_package_var_object_by_name(env, "TestCase::NativeAPI", "$MINIMAL_VALUE", "TestCase::Minimal", minimal, &e, __FILE__, __LINE__);
+  env->set_class_var_object_by_name(env, "TestCase::NativeAPI", "$MINIMAL_VALUE", "TestCase::Minimal", minimal, &e, __FILE__, __LINE__);
   if (e) { return e; }
 
-=head2 get_package_var_byte_by_name
+=head2 get_class_var_byte_by_name
 
-  int8_t (*get_package_var_byte_by_name)(SPVM_ENV* env,
-    const char* package_name, const char* package_var_name,
+  int8_t (*get_class_var_byte_by_name)(SPVM_ENV* env,
+    const char* class_name, const char* class_var_name,
     int32_t* exception_flag, const char* file, int32_t line);
 
-This is same as C<get_package_var_byte> function, but you can specify the package name directry.
+This is same as C<get_class_var_byte> function, but you can specify the class name directry.
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
 Example:
 
   int32_t e;
-  int8_t value = env->get_package_var_byte_by_name(env, "TestCase::NativeAPI", "$BYTE_VALUE", &e, __FILE__, __LINE__);
+  int8_t value = env->get_class_var_byte_by_name(env, "TestCase::NativeAPI", "$BYTE_VALUE", &e, __FILE__, __LINE__);
   if (e) { return e; }
 
-=head2 get_package_var_short_by_name
+=head2 get_class_var_short_by_name
 
-  int16_t (*get_package_var_short_by_name)(SPVM_ENV* env,
-    const char* package_name, const char* package_var_name,
+  int16_t (*get_class_var_short_by_name)(SPVM_ENV* env,
+    const char* class_name, const char* class_var_name,
     int32_t* exception_flag, const char* file, int32_t line);
 
-This is same as C<get_package_var_short> function, but you can specify the package name directry.
+This is same as C<get_class_var_short> function, but you can specify the class name directry.
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
 Example:
 
   int32_t e;
-  int16_t value = env->get_package_var_short_by_name(env, "TestCase::NativeAPI", "$SHORT_VALUE", &e, __FILE__, __LINE__);
+  int16_t value = env->get_class_var_short_by_name(env, "TestCase::NativeAPI", "$SHORT_VALUE", &e, __FILE__, __LINE__);
   if (e) { return e; }
 
-=head2 get_package_var_int_by_name
+=head2 get_class_var_int_by_name
 
-  int32_t (*get_package_var_int_by_name)(SPVM_ENV* env,
-    const char* package_name, const char* package_var_name,
+  int32_t (*get_class_var_int_by_name)(SPVM_ENV* env,
+    const char* class_name, const char* class_var_name,
     int32_t* exception_flag, const char* file, int32_t line);
 
-This is same as C<get_package_var_int> function, but you can specify the package name directry.
+This is same as C<get_class_var_int> function, but you can specify the class name directry.
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
 Example:
 
   int32_t e;
-  int8_t value = env->get_package_var_byte_by_name(env, "TestCase::NativeAPI", "$BYTE_VALUE", &e, __FILE__, __LINE__);
+  int8_t value = env->get_class_var_byte_by_name(env, "TestCase::NativeAPI", "$BYTE_VALUE", &e, __FILE__, __LINE__);
   if (e) { return e; }
 
-=head2 get_package_var_long_by_name
+=head2 get_class_var_long_by_name
 
-  int64_t (*get_package_var_long_by_name)(SPVM_ENV* env,
-    const char* package_name, const char* package_var_name,
+  int64_t (*get_class_var_long_by_name)(SPVM_ENV* env,
+    const char* class_name, const char* class_var_name,
     int32_t* exception_flag, const char* file, int32_t line);
 
-This is same as C<get_package_var_long> function, but you can specify the package name directry.
+This is same as C<get_class_var_long> function, but you can specify the class name directry.
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
 Example:
 
   int32_t e;
-  int64_t value = env->get_package_var_long_by_name(env, "TestCase::NativeAPI", "$LONG_VALUE", &e, __FILE__, __LINE__);
+  int64_t value = env->get_class_var_long_by_name(env, "TestCase::NativeAPI", "$LONG_VALUE", &e, __FILE__, __LINE__);
   if (e) { return e; }
 
-=head2 get_package_var_float_by_name
+=head2 get_class_var_float_by_name
 
-  float (*get_package_var_float_by_name)(SPVM_ENV* env,
-    const char* package_name, const char* package_var_name,
+  float (*get_class_var_float_by_name)(SPVM_ENV* env,
+    const char* class_name, const char* class_var_name,
     int32_t* exception_flag, const char* file, int32_t line);
 
-This is same as C<get_package_var_float> function, but you can specify the package name directry.
+This is same as C<get_class_var_float> function, but you can specify the class name directry.
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
 Example:
 
   int32_t e;
-  float value = env->get_package_var_float_by_name(env, "TestCase::NativeAPI", "$FLOAT_VALUE", &e, __FILE__, __LINE__);
+  float value = env->get_class_var_float_by_name(env, "TestCase::NativeAPI", "$FLOAT_VALUE", &e, __FILE__, __LINE__);
   if (e) { return e; }
 
-=head2 get_package_var_double_by_name
+=head2 get_class_var_double_by_name
 
-  double (*get_package_var_double_by_name)(SPVM_ENV* env,
-    const char* package_name, const char* package_var_name,
+  double (*get_class_var_double_by_name)(SPVM_ENV* env,
+    const char* class_name, const char* class_var_name,
     int32_t* exception_flag, const char* file, int32_t line);
 
-This is same as C<get_package_var_double> function, but you can specify the package name directry.
+This is same as C<get_class_var_double> function, but you can specify the class name directry.
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
 Example:
 
   int32_t e;
-  double value = env->get_package_var_double_by_name(env, "TestCase::NativeAPI", "$DOUBLE_VALUE", &e, __FILE__, __LINE__);
+  double value = env->get_class_var_double_by_name(env, "TestCase::NativeAPI", "$DOUBLE_VALUE", &e, __FILE__, __LINE__);
   if (e) { return e; }
 
-=head2 get_package_var_object_by_name
+=head2 get_class_var_object_by_name
 
-  void* (*get_package_var_object_by_name)(SPVM_ENV* env,
-    const char* package_name, const char* package_var_name, const char* signature,
+  void* (*get_class_var_object_by_name)(SPVM_ENV* env,
+    const char* class_name, const char* class_var_name, const char* signature,
     int32_t* exception_flag, const char* file, int32_t line);
 
-This is same as C<get_package_var_object> function, but you can specify the package name directry.
+This is same as C<get_class_var_object> function, but you can specify the class name directry.
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
 Example:
   
   int32_t e;
-  void* value = env->get_package_var_object_by_name(env, "TestCase::NativeAPI", "$MINIMAL_VALUE", "TestCase::Minimal", &e, __FILE__, __LINE__);
+  void* value = env->get_class_var_object_by_name(env, "TestCase::NativeAPI", "$MINIMAL_VALUE", "TestCase::Minimal", &e, __FILE__, __LINE__);
   if (e) { return e; }
 
 =head2 call_spvm_method_by_name
 
   int32_t (*call_spvm_method_by_name)(SPVM_ENV* env,
-    const char* package_name, const char* method_name, const char* signature, SPVM_VALUE* stack,
+    const char* class_name, const char* method_name, const char* signature, SPVM_VALUE* stack,
     const char* file, int32_t line);
 
-This is same as C<call_spvm_method> function, but you can specify the package name and sub name directry.
+This is same as C<call_spvm_method> function, but you can specify the class name and sub name directry.
 
 Example:
 
@@ -2170,7 +2170,7 @@ Example:
 =head2 get_field_string_chars_by_name
 
   const char* (*get_field_string_chars_by_name)(SPVM_ENV* env, void* object,
-    const char* package_name, const char* field_name,
+    const char* class_name, const char* field_name,
     int32_t* exception_flag, const char* file, int32_t line);
 
 Example:
@@ -2197,7 +2197,7 @@ Do the same as C<dump_raw>, and add the created string object to the mortal stac
 
 Native APIs have indexes which correspond to the names. These indexes are permanently same for the binary compatibility. When a new Native API is added, it will be added to the end.
 
-  0 package_vars_heap
+  0 class_vars_heap
   1 object_header_byte_size
   2 object_weaken_backref_head_offset
   3 object_ref_count_offset
@@ -2220,7 +2220,7 @@ Native APIs have indexes which correspond to the names. These indexes are perman
   20 get_basic_type_id
   21 get_field_id
   22 get_field_offset
-  23 get_package_var_id
+  23 get_class_var_id
   24 get_method_id
   25 get_method_id_by_object
   26 new_object_raw
@@ -2276,20 +2276,20 @@ Native APIs have indexes which correspond to the names. These indexes are perman
   76 set_field_float
   77 set_field_double
   78 set_field_object
-  79 get_package_var_byte
-  80 get_package_var_short
-  81 get_package_var_int
-  82 get_package_var_long
-  83 get_package_var_float
-  84 get_package_var_double
-  85 get_package_var_object
-  86 set_package_var_byte
-  87 set_package_var_short
-  88 set_package_var_int
-  89 set_package_var_long
-  90 set_package_var_float
-  91 set_package_var_double
-  92 set_package_var_object
+  79 get_class_var_byte
+  80 get_class_var_short
+  81 get_class_var_int
+  82 get_class_var_long
+  83 get_class_var_float
+  84 get_class_var_double
+  85 get_class_var_object
+  86 set_class_var_byte
+  87 set_class_var_short
+  88 set_class_var_int
+  89 set_class_var_long
+  90 set_class_var_float
+  91 set_class_var_double
+  92 set_class_var_object
   93 get_pointer
   94 set_pointer
   95 call_spvm_method
@@ -2335,20 +2335,20 @@ Native APIs have indexes which correspond to the names. These indexes are perman
   135 get_field_float_by_name
   136 get_field_double_by_name
   137 get_field_object_by_name
-  138 set_package_var_byte_by_name
-  139 set_package_var_short_by_name
-  140 set_package_var_int_by_name
-  141 set_package_var_long_by_name
-  142 set_package_var_float_by_name
-  143 set_package_var_double_by_name
-  144 set_package_var_object_by_name
-  145 get_package_var_byte_by_name
-  146 get_package_var_short_by_name
-  147 get_package_var_int_by_name
-  148 get_package_var_long_by_name
-  149 get_package_var_float_by_name
-  150 get_package_var_double_by_name
-  151 get_package_var_object_by_name
+  138 set_class_var_byte_by_name
+  139 set_class_var_short_by_name
+  140 set_class_var_int_by_name
+  141 set_class_var_long_by_name
+  142 set_class_var_float_by_name
+  143 set_class_var_double_by_name
+  144 set_class_var_object_by_name
+  145 get_class_var_byte_by_name
+  146 get_class_var_short_by_name
+  147 get_class_var_int_by_name
+  148 get_class_var_long_by_name
+  149 get_class_var_float_by_name
+  150 get_class_var_double_by_name
+  151 get_class_var_object_by_name
   152 call_spvm_method_by_name
   153 call_callback_method_by_name
   154 get_field_string_chars_by_name

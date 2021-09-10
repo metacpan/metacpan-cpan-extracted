@@ -4,12 +4,12 @@ package SPVM::Regex::Pattern;
 
 =head1 NAME
 
-SPVM::Regex::Pattern - Regular expression pattern
+SPVM::Regex::Pattern - Regex::Pattern in SPVM | Regular expression pattern
 
 =head1 SYNOPSYS
   
-  use SPVM::Regex::Pattern;
+  use Regex::Pattern;
 
 =head1 DESCRIPTION
 
-L<SPVM::Regex::Pattern> is a internal data structure which represents regular expression patterns for L<SPVM::Regex>.
+L<Regex::Pattern|SPVM::Regex::Pattern> is a internal data structure which represents regular expression patterns for L<Regex|SPVM::Regex>.

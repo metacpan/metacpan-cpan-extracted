@@ -1,3 +1,0 @@
-package MyAdd {
-  native sub add_cuda : float ($nums1 : float[], $nums2 : float[]);
-}

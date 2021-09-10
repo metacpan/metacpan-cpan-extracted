@@ -11,6 +11,6 @@ use lib "$FindBin::Bin/lib";
 
 use SPVM 'MinimalMethod';
 
-MinimalMethod->foo;
+SPVM::MinimalMethod->foo;
 
 ok(1);

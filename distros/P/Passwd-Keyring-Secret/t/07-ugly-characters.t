@@ -16,11 +16,23 @@ BEGIN
         plan skip_all => "Session D-Bus not available (not running a desktop session?), skipping tests";
     }
 
-    require_ok('Passwd::Keyring::Secret') or BAIL_OUT("Cannot load Passwd::Keyring::Secret");
+    ok(eval { require Passwd::Keyring::Secret; 1 }, "load Passwd::Keyring::Secret");
+
+    if ($@)
+    {
+        diag($@);
+        BAIL_OUT("OS unsupported");
+    }
 }
 
-my $secrets = Passwd::Keyring::Secret->new(app => 'Passwd::Keyring::Secret', group => 'Tests with Ugly Characters', alias => 'session');
+my $secrets = eval { Passwd::Keyring::Secret->new(app => 'Passwd::Keyring::Secret', group => 'Tests with Ugly Characters', alias => 'session') };
 isa_ok($secrets, 'Passwd::Keyring::Secret', "new keyring object");
+
+if ($@)
+{
+    diag($@);
+    BAIL_OUT("OS unsupported");
+}
 
 my $UGLY_NAME = 'Joh ## no ^^ »Gźegąćęłóśż«';
 my $UGLY_PWD = '«tajne hąsło»';

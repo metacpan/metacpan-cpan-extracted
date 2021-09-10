@@ -11,6 +11,7 @@ sub profile_default
 		%{$self-> SUPER::profile_default},
 		style	    => 'drops',
 		active	    => 1,
+		antialias   => 1,
 		buffered    => 1,
 		value	    => 50,
 		showPercent => 1,

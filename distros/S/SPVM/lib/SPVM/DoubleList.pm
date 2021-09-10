@@ -4,17 +4,17 @@ package SPVM::DoubleList;
 
 =head1 NAME
 
-SPVM::DoubleList - Dynamic double array
+SPVM::DoubleList - DoubleList in SPVM | Dynamic double array
 
 =head1 SYNOPSYS
   
-  use SPVM::DoubleList;
+  use DoubleList;
   
   # Create a double list
-  my $double_list = SPVM::DoubleList->new_len;
+  my $double_list = DoubleList->new_len;
 
   # Create a double list with array
-  my $double_list = SPVM::DoubleList->new([1.5, 2.5, 3.5]);
+  my $double_list = DoubleList->new([1.5, 2.5, 3.5]);
   
   # Get list length
   my $length = $double_list->length;
@@ -43,20 +43,20 @@ SPVM::DoubleList - Dynamic double array
   # Remove double value
   my $double_value = $double_list->remove(1);
 
-  # Convert SPVM::DoubleList to double array.
+  # Convert DoubleList to double array.
   my $double_array = $double_list->to_array;
 
 =head1 DESCRIPTION
 
-L<SPVM::DoubleList> is dynamic double array.
+L<DoubleList|SPVM::DoubleList> is dynamic double array.
 
-=head1 STATIC METHODS
+=head1 CLASS METHODS
 
 =head2 new
 
-    sub new : SPVM::DoubleList ($array : double[])
+    sub new : DoubleList ($array : double[])
 
-Create a new L<SPVM::DoubleList> object with specific C<double> array.
+Create a new L<DoubleList|SPVM::DoubleList> object with specific C<double> array.
 
 Internally, new array is created, and each element of argument array is copied to internal array.
 
@@ -64,9 +64,9 @@ If array is undef, 0-length internal array is created.
 
 =head2 new_len
 
-    sub new_len : SPVM::DoubleList ($length : int)
+    sub new_len : DoubleList ($length : int)
 
-Create a new L<SPVM::DoubleList> object with array length.
+Create a new L<DoubleList|SPVM::DoubleList> object with array length.
 
 =head1 INSTANCE METHODS
 
@@ -136,7 +136,7 @@ If there are no elements in the list, exception occur.
 
   sub to_array : double[] ($self : self)
 
-Convert L<SPVM::DoubleList> to double array.
+Convert L<DoubleList|SPVM::DoubleList> to double array.
 
 =head2 pop
 

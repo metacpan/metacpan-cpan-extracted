@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Video;
-$Playwright::Video::VERSION = '0.013';
+$Playwright::Video::VERSION = '0.014';
 use parent 'Playwright::Base';
 
 sub new {
@@ -18,21 +18,21 @@ sub new {
     return $self->SUPER::new(%options);
 }
 
-sub path {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'path',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub delete {
     my $self = shift;
     return $self->_request(
         args    => [@_],
         command => 'delete',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub path {
+    my $self = shift;
+    return $self->_request(
+        args    => [@_],
+        command => 'path',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -92,7 +92,7 @@ Playwright::Video - Automatically generated class for Playwright::Video
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 CONSTRUCTOR
 
@@ -103,17 +103,17 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 path(@args)
-
-Execute the Video::path playwright routine.
-
-See L<https://playwright.dev/api/class-Video#Video-path> for more information.
-
 =head2 delete(@args)
 
 Execute the Video::delete playwright routine.
 
 See L<https://playwright.dev/api/class-Video#Video-delete> for more information.
+
+=head2 path(@args)
+
+Execute the Video::path playwright routine.
+
+See L<https://playwright.dev/api/class-Video#Video-path> for more information.
 
 =head2 saveAs(@args)
 

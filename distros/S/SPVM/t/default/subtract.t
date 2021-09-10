@@ -17,21 +17,21 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 {
   # Subtract - Operation
   {
-    ok(TestCase::Subtract->subtract_byte_byte);
-    ok(TestCase::Subtract->subtract_short_short);
-    ok(TestCase::Subtract->subtract_int_byte);
-    ok(TestCase::Subtract->subtract_int_short);
-    ok(TestCase::Subtract->subtract_byte_int);
-    ok(TestCase::Subtract->subtract_short_int);
-    ok(TestCase::Subtract->subtract_int_int);
-    ok(TestCase::Subtract->subtract_long_long);
-    ok(TestCase::Subtract->subtract_int_float);
-    ok(TestCase::Subtract->subtract_int_double);
-    ok(TestCase::Subtract->subtract_minus);
-    ok(TestCase::Subtract->subtract_zero_minus);
-    ok(TestCase::Subtract->subtract_float_float);
-    ok(TestCase::Subtract->subtract_double_double);
-    ok(TestCase::Subtract->subtract_double_double_big);
+    ok(SPVM::TestCase::Subtract->subtract_byte_byte);
+    ok(SPVM::TestCase::Subtract->subtract_short_short);
+    ok(SPVM::TestCase::Subtract->subtract_int_byte);
+    ok(SPVM::TestCase::Subtract->subtract_int_short);
+    ok(SPVM::TestCase::Subtract->subtract_byte_int);
+    ok(SPVM::TestCase::Subtract->subtract_short_int);
+    ok(SPVM::TestCase::Subtract->subtract_int_int);
+    ok(SPVM::TestCase::Subtract->subtract_long_long);
+    ok(SPVM::TestCase::Subtract->subtract_int_float);
+    ok(SPVM::TestCase::Subtract->subtract_int_double);
+    ok(SPVM::TestCase::Subtract->subtract_minus);
+    ok(SPVM::TestCase::Subtract->subtract_zero_minus);
+    ok(SPVM::TestCase::Subtract->subtract_float_float);
+    ok(SPVM::TestCase::Subtract->subtract_double_double);
+    ok(SPVM::TestCase::Subtract->subtract_double_double_big);
   }
 
   # Subtract - Compile Error
@@ -51,13 +51,13 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
 # Optional tests
 {
-  ok(TestCase::Subtract->subtract());
+  ok(SPVM::TestCase::Subtract->subtract());
 
-  is(TestCase::Subtract->subtract_int_max(), 2147483646);
-  is(TestCase::Subtract->subtract_int_min(), -2147483648);
-  is(TestCase::Subtract->subtract_int_underflow(), 2147483647);
-  is(TestCase::Subtract->subtract_long_max(), 9223372036854775806);
-  is(TestCase::Subtract->subtract_long_min(), -9223372036854775808);
+  is(SPVM::TestCase::Subtract->subtract_int_max(), 2147483646);
+  is(SPVM::TestCase::Subtract->subtract_int_min(), -2147483648);
+  is(SPVM::TestCase::Subtract->subtract_int_underflow(), 2147483647);
+  is(SPVM::TestCase::Subtract->subtract_long_max(), 9223372036854775806);
+  is(SPVM::TestCase::Subtract->subtract_long_min(), -9223372036854775808);
 }
 
 # All object is freed

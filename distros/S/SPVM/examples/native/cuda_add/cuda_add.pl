@@ -21,5 +21,5 @@ my $nums2_pack = pack('f*', @$nums2);
 
   my $start_time = time;
   my $start_time_high = [gettimeofday];
-  MyAdd->add_cuda($sp_nums1, $sp_nums2);
+  SPVM::MyAdd->add_cuda($sp_nums1, $sp_nums2);
 }

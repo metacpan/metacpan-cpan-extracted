@@ -21,14 +21,14 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 {
   # Remainder - Operation
   {
-    ok(TestCase::Remainder->remainder_byte_byte);
-    ok(TestCase::Remainder->remainder_short_short);
-    ok(TestCase::Remainder->remainder_int_byte);
-    ok(TestCase::Remainder->remainder_int_short);
-    ok(TestCase::Remainder->remainder_byte_int);
-    ok(TestCase::Remainder->remainder_short_int);
-    ok(TestCase::Remainder->remainder_int_int);
-    ok(TestCase::Remainder->remainder_long_long);
+    ok(SPVM::TestCase::Remainder->remainder_byte_byte);
+    ok(SPVM::TestCase::Remainder->remainder_short_short);
+    ok(SPVM::TestCase::Remainder->remainder_int_byte);
+    ok(SPVM::TestCase::Remainder->remainder_int_short);
+    ok(SPVM::TestCase::Remainder->remainder_byte_int);
+    ok(SPVM::TestCase::Remainder->remainder_short_int);
+    ok(SPVM::TestCase::Remainder->remainder_int_int);
+    ok(SPVM::TestCase::Remainder->remainder_long_long);
   }
 
   # Remainder - Compile Error
@@ -48,7 +48,7 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
 # Optional tests
 {
-  ok(TestCase::Remainder->remainder());
+  ok(SPVM::TestCase::Remainder->remainder());
 }
 
 # All object is freed

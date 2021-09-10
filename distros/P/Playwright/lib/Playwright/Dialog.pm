@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Dialog;
-$Playwright::Dialog::VERSION = '0.013';
+$Playwright::Dialog::VERSION = '0.014';
 use parent 'Playwright::Base';
 
 sub new {
@@ -23,26 +23,6 @@ sub defaultValue {
     return $self->_request(
         args    => [@_],
         command => 'defaultValue',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub message {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'message',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub dismiss {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'dismiss',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -63,6 +43,26 @@ sub accept {
     return $self->_request(
         args    => [@_],
         command => 'accept',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub message {
+    my $self = shift;
+    return $self->_request(
+        args    => [@_],
+        command => 'message',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub dismiss {
+    my $self = shift;
+    return $self->_request(
+        args    => [@_],
+        command => 'dismiss',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -112,7 +112,7 @@ Playwright::Dialog - Automatically generated class for Playwright::Dialog
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 CONSTRUCTOR
 
@@ -129,18 +129,6 @@ Execute the Dialog::defaultValue playwright routine.
 
 See L<https://playwright.dev/api/class-Dialog#Dialog-defaultValue> for more information.
 
-=head2 message(@args)
-
-Execute the Dialog::message playwright routine.
-
-See L<https://playwright.dev/api/class-Dialog#Dialog-message> for more information.
-
-=head2 dismiss(@args)
-
-Execute the Dialog::dismiss playwright routine.
-
-See L<https://playwright.dev/api/class-Dialog#Dialog-dismiss> for more information.
-
 =head2 type(@args)
 
 Execute the Dialog::type playwright routine.
@@ -152,6 +140,18 @@ See L<https://playwright.dev/api/class-Dialog#Dialog-type> for more information.
 Execute the Dialog::accept playwright routine.
 
 See L<https://playwright.dev/api/class-Dialog#Dialog-accept> for more information.
+
+=head2 message(@args)
+
+Execute the Dialog::message playwright routine.
+
+See L<https://playwright.dev/api/class-Dialog#Dialog-message> for more information.
+
+=head2 dismiss(@args)
+
+Execute the Dialog::dismiss playwright routine.
+
+See L<https://playwright.dev/api/class-Dialog#Dialog-dismiss> for more information.
 
 =head2 on(@args)
 

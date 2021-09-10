@@ -4,13 +4,13 @@ package SPVM::Comparator::Long;
 
 =head1 NAME
 
-SPVM::Comparator::Long - a callback interface for long comparation
+SPVM::Comparator::Long - Comparator::Long in SPVM | a callback interface for long comparation
 
 =head1 SYNOPSYS
   
-  use SPVM::Comparator::Long;
+  use Comparator::Long;
   
-  my $comparator : SPVM::Comparator::Long = sub : int ($self : self, $a : long, $b : long); {
+  my $comparator : Comparator::Long = sub : int ($self : self, $a : long, $b : long); {
     return $a <=> $b;
   };
   
@@ -18,7 +18,7 @@ SPVM::Comparator::Long - a callback interface for long comparation
 
 =head1 DESCRIPTION
 
-L<SPVM::Comparator::Long> is a callback interface to compare two long values.
+L<Comparator::Long|SPVM::Comparator::Long> is a callback interface to compare two long values.
 
 =head1 CALLBACK METHOD INTERFACE
 

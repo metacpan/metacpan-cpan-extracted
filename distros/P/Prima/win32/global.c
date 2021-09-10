@@ -22,6 +22,7 @@ extern "C" {
 WinGuts guts;
 DWORD   rc;
 PHash   stylusMan      = NULL; // pen & brush manager
+PHash   stylusGpMan    = NULL; // pen & brush manager for GDI+
 PHash   fontMan        = NULL; // font manager
 PHash   patMan         = NULL; // pattern resource manager
 PHash   menuMan        = NULL; // HMENU manager
@@ -147,6 +148,7 @@ window_subsystem_init( char * error_buf)
 	HDC dc;
 	HBITMAP hbm;
 	OSVERSIONINFO os = { sizeof( OSVERSIONINFO)};
+	GdiplusStartupInput gdiplusStartupInputDef = { 1, NULL, FALSE, FALSE };
 
 	guts. version  = GetVersion();
 	GetVersionEx( &os);
@@ -211,6 +213,7 @@ window_subsystem_init( char * error_buf)
 	RegisterClassW( &wc);
 
 	stylusMan  = hash_create();
+	stylusGpMan= hash_create();
 	fontMan    = hash_create();
 	patMan     = hash_create();
 	menuMan    = hash_create();
@@ -358,6 +361,7 @@ window_subsystem_init( char * error_buf)
 	guts. smDblClk. x = GetSystemMetrics( SM_CXDOUBLECLK);
 	guts. smDblClk. y = GetSystemMetrics( SM_CYDOUBLECLK);
 
+	GdiplusStartup(&guts.gdiplusToken, &gdiplusStartupInputDef, NULL);
 	{
 		HRESULT r = OleInitialize(NULL);
 		guts. ole_initialized = (r == S_OK || r == S_FALSE );
@@ -422,10 +426,15 @@ window_subsystem_done()
 
 	font_clean();
 	stylus_clean();
+
+	stylus_gp_clean();
+	GdiplusShutdown(guts.gdiplusToken);
+
 	hash_destroy( imageMan,   false);
 	hash_destroy( menuMan,    false);
 	hash_destroy( patMan,     true);
 	hash_destroy( fontMan,    true);
+	hash_destroy( stylusGpMan,true);
 	hash_destroy( stylusMan,  true);
 	hash_destroy( regnodeMan, false);
 
@@ -477,6 +486,37 @@ char * err_msg( DWORD errId, char * buffer)
 		buffer[len] = 0;
 	}
 
+	return buffer;
+}
+
+char * err_msg_gplus( GpStatus errId, char * buffer)
+{
+	if ( buffer == nil) buffer = err_buf;
+	switch(errId) {
+	case Ok                        : strcpy(buffer, "Ok");                               break;
+	case GenericError              : strcpy(buffer, "GDI+ generic error");               break;
+	case InvalidParameter          : strcpy(buffer, "GDI+ invalid parameter");           break;
+	case OutOfMemory               : strcpy(buffer, "GDI+ out of memory");               break;
+	case ObjectBusy                : strcpy(buffer, "GDI+ object busy");                 break;
+	case InsufficientBuffer        : strcpy(buffer, "GDI+ insufficient buffer");         break;
+	case NotImplemented            : strcpy(buffer, "GDI+ not implemented");             break;
+	case Win32Error                : strcpy(buffer, "GDI+ Win32 error");                 break;
+	case WrongState                : strcpy(buffer, "GDI+ Wrong state");                 break;
+	case Aborted                   : strcpy(buffer, "GDI+ aborted");                     break;
+	case FileNotFound              : strcpy(buffer, "GDI+ file not found");              break;
+	case ValueOverflow             : strcpy(buffer, "GDI+ value overflow");              break;
+	case AccessDenied              : strcpy(buffer, "GDI+ access denied");               break;
+	case UnknownImageFormat        : strcpy(buffer, "GDI+ unknown image format");        break;
+	case FontFamilyNotFound        : strcpy(buffer, "GDI+ font family not found");       break;
+	case FontStyleNotFound         : strcpy(buffer, "GDI+ font style not found");        break;
+	case NotTrueTypeFont           : strcpy(buffer, "GDI+ not a TrueType font");         break;
+	case UnsupportedGdiplusVersion : strcpy(buffer, "GDI+ unsipported Gdiplus version"); break;
+	case GdiplusNotInitialized     : strcpy(buffer, "GDI+ not initialized");             break;
+	case PropertyNotFound          : strcpy(buffer, "GDI+ property not found");          break;
+	case PropertyNotSupported      : strcpy(buffer, "GDI+ property not supported");      break;
+	case ProfileNotFound           : strcpy(buffer, "GDI+ profile not found");           break;
+	default                        : strcpy(buffer, "GDI+ unknown error");
+	}
 	return buffer;
 }
 
@@ -1648,6 +1688,7 @@ LRESULT CALLBACK generic_app_handler( HWND win, UINT  msg, WPARAM mp1, LPARAM mp
 		}
 		case WM_COMPACTING:
 			stylus_clean();
+			stylus_gp_clean();
 			font_clean();
 			destroy_font_hash();
 			hash_first_that( imageMan, kill_img_cache, NULL, NULL, NULL);

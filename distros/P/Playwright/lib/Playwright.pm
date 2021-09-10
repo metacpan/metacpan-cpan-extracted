@@ -1,5 +1,5 @@
 package Playwright;
-$Playwright::VERSION = '0.013';
+$Playwright::VERSION = '0.014';
 use strict;
 use warnings;
 
@@ -106,7 +106,10 @@ sub new ( $class, %options ) {
             ua      => $options{ua} // LWP::UserAgent->new(),
             port    => $port,
             debug   => $options{debug},
-            pid     => _start_server( $port, $timeout, $options{debug} ),
+            cleanup => $options{cleanup} // 1,
+            pid     => _start_server(
+                $port, $timeout, $options{debug}, $options{cleanup} // 1
+            ),
             parent  => $$,
             timeout => $timeout,
         },
@@ -145,11 +148,20 @@ sub launch ( $self, %args ) {
         type => delete $args{type},
         args => [ \%args ]
     );
+
     return $Playwright::mapper{ $msg->{_type} }->( $self, $msg )
       if ( ref $msg eq 'HASH' )
       && $msg->{_type}
       && exists $Playwright::mapper{ $msg->{_type} };
     return $msg;
+}
+
+sub server ( $self, %args ) {
+    return Playwright::Util::request(
+        'POST', 'server', $self->{port}, $self->{ua},
+        object  => $args{browser}{guid},
+        command => $args{command},
+    );
 }
 
 sub await ( $self, $promise ) {
@@ -172,6 +184,9 @@ sub quit ($self) {
     # Prevent destructor from firing in child processes so we can do things like async()
     # This should also prevent the waitpid below from deadlocking due to two processes waiting on the same pid.
     return unless $$ == $self->{parent};
+
+    # Prevent destructor from firing in the event the caller instructs it to not fire
+    return unless $self->{cleanup};
 
     # Make sure we don't mash the exit code of things like prove
     local $?;
@@ -204,7 +219,7 @@ sub DESTROY ($self) {
     $self->quit();
 }
 
-sub _start_server ( $port, $timeout, $debug ) {
+sub _start_server ( $port, $timeout, $debug, $cleanup ) {
     $debug = $debug ? '-d' : '';
 
     $ENV{DEBUG} = 'pw:api' if $debug;
@@ -214,9 +229,23 @@ sub _start_server ( $port, $timeout, $debug ) {
         Net::EmptyPort::wait_port( $port, $timeout )
           or confess("Server never came up after 30s!");
         print "done\n" if $debug;
+
         return $pid;
     }
 
+    # Orphan the process in the event that cleanup => 0
+    if ( !$cleanup ) {
+        print "Detaching child process...\n";
+        chdir '/';
+        require POSIX;
+        die "Cannot detach playwright_server process for persistence"
+          if POSIX::setsid() < 0;
+        require Capture::Tiny;
+        capture_merged {
+            exec( $node_bin, $server_bin, "--port", $port, $debug )
+        };
+        die("Could not exec!");
+    }
     exec( $node_bin, $server_bin, "--port", $port, $debug );
 }
 
@@ -234,7 +263,7 @@ Playwright - Perl client for Playwright
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -322,7 +351,7 @@ The renamed functions are as follows:
 
 =item $$ => selectMulti
 
-=item $eval => eval
+=item $eval => evaluate
 
 =item $$eval => evalMulti
 
@@ -399,6 +428,27 @@ To suppress this behavior (such as in the event you are await()ing a download ev
     # Assuming $handle is a Playwright object
     my $browser = $handle->launch( type => 'firefox', firefoxUserPrefs => { 'pdfjs.disabled' => JSON::true } );
 
+=head2 Leaving browsers alive for manual debugging
+
+Passing the cleanup => 0 parameter to new() will prevent DESTROY() from cleaning up the playwright server when a playwright object goes out of scope.
+
+Be aware that this will prevent debug => 1 from printing extra messages from playwright_server itself, as we redirect the output streams in this case so as not to fill your current session with prints later.
+
+A convenience script has been provided to clean up these orphaned instances, `reap_playwright_servers` which will kill all extant `playwright_server` processes.
+
+=head2 Taking videos
+
+We spawn browsers via BrowserType.launchServer() and then connect to them over websocket.
+This means you can't just set paths up front and have videos recorded, the Video.path() method will throw.
+Instead you will need to call the Video.saveAs() method after closing a page to record video:
+
+    # Do stuff
+    ...
+    # Save video
+    my $video = $page->video;
+    $page->close();
+    $video->saveAs('video/example.webm');
+
 =head1 INSTALLATION NOTE
 
 If you install this module from CPAN, you will likely encounter a croak() telling you to install node module dependencies.
@@ -414,8 +464,9 @@ Creates a new browser and returns a handle to interact with it.
 
 =head3 INPUT
 
-    debug (BOOL) : Print extra messages from the Playwright server process
+    debug (BOOL) : Print extra messages from the Playwright server process. Default: false
     timeout (INTEGER) : Seconds to wait for the playwright server to spin up and down.  Default: 30s
+    cleanup (BOOL) : Whether or not to clean up the playwright server when this object goes out of scope.  Default: true
 
 =head1 METHODS
 
@@ -425,6 +476,23 @@ The Argument hash here is essentially those you'd see from browserType.launch().
 L<https://playwright.dev/docs/api/class-browsertype#browsertypelaunchoptions>
 
 There is an additional "special" argument, that of 'type', which is used to specify what type of browser to use, e.g. 'firefox'.
+
+=head2 server (HASH) = MIXED
+
+Call Playwright::BrowserServer methods on the server which launched your browser object.
+
+Parameters:
+
+    browser : The Browser object you wish to call a server method upon.
+    command : The BrowserServer method you wish to call
+
+The most common use for this is to get the PID of the underlying browser process:
+
+    my $browser = $playwright->launch( browser => chrome );
+    my $process = $playwright->server( browser => $browser, command => 'process' );
+    print "Browser process PID: $process->{pid}\n";
+
+BrowserServer methods (at the time of writing) take no arguments, so they are not processed.
 
 =head2 await (HASH) = Object
 

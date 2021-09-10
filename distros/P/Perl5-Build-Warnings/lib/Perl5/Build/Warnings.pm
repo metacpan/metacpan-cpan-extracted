@@ -1,7 +1,7 @@
 package Perl5::Build::Warnings;
 use 5.14.0;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 use Carp;
 use IO::File;
 use IO::Zlib;
@@ -338,7 +338,7 @@ L<http://rt.cpan.org> rather than pull requests at github.
     James E Keenan
     CPAN ID: JKEENAN
     jkeenan@cpan.org
-    http://thenceforward.net/perl/modules/Perl5-Parse-MakeLog-Warnings
+    http://thenceforward.net/perl/modules/Perl5-Build-Warnings/
 
 =head1 COPYRIGHT
 

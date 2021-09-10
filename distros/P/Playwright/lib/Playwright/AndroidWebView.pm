@@ -9,23 +9,13 @@ use strict;
 use warnings;
 
 package Playwright::AndroidWebView;
-$Playwright::AndroidWebView::VERSION = '0.013';
+$Playwright::AndroidWebView::VERSION = '0.014';
 use parent 'Playwright::Base';
 
 sub new {
     my ( $self, %options ) = @_;
     $options{type} = 'AndroidWebView';
     return $self->SUPER::new(%options);
-}
-
-sub page {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'page',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
 }
 
 sub pkg {
@@ -43,6 +33,16 @@ sub close {
     return $self->_request(
         args    => [@_],
         command => 'close',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub page {
+    my $self = shift;
+    return $self->_request(
+        args    => [@_],
+        command => 'page',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -102,7 +102,7 @@ Playwright::AndroidWebView - Automatically generated class for Playwright::Andro
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 CONSTRUCTOR
 
@@ -112,12 +112,6 @@ You shouldn't have to call this directly.
 Instead it should be returned to you as the result of calls on Playwright objects, or objects it returns.
 
 =head1 METHODS
-
-=head2 page(@args)
-
-Execute the AndroidWebView::page playwright routine.
-
-See L<https://playwright.dev/api/class-AndroidWebView#AndroidWebView-page> for more information.
 
 =head2 pkg(@args)
 
@@ -130,6 +124,12 @@ See L<https://playwright.dev/api/class-AndroidWebView#AndroidWebView-pkg> for mo
 Execute the AndroidWebView::close playwright routine.
 
 See L<https://playwright.dev/api/class-AndroidWebView#AndroidWebView-close> for more information.
+
+=head2 page(@args)
+
+Execute the AndroidWebView::page playwright routine.
+
+See L<https://playwright.dev/api/class-AndroidWebView#AndroidWebView-page> for more information.
 
 =head2 pid(@args)
 

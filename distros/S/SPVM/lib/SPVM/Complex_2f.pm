@@ -1,20 +1,20 @@
 =head1 NAME
 
-SPVM::Complex_2f - float complex type
+SPVM::Complex_2f - Complex_2f in SPVM | float complex type
 
 =head1 SYNOPSYS
 
-  my $z : SPVM::Complex_2f;
+  my $z : Complex_2f;
   $z->{re} = 1;
   $z->{im} = 2;
   
 =head1 DESCRIPTION
 
-SPVM::Complex_2f is float complex type.
+Complex_2f is float complex type.
 
 This module is multi numeric type.
 
-  package SPVM::Complex_2f : mulnum_t {
+  class Complex_2f : mulnum_t {
     has re : float;
     has im : float;
   }

@@ -8,12 +8,12 @@ on 'runtime' => sub {
     requires 'IO::Socket::SSL' => '1.94';
     requires 'LWP::Protocol::https' => '6.00';
     requires 'SOAP::Lite' => '1.0';
+    requires 'URI';
 };
 
 on 'build' => sub {
     requires 'ExtUtils::MakeMaker';
 };
-
 
 on 'test' => sub {
     requires 'strict';

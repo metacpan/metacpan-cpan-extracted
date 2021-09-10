@@ -13,7 +13,7 @@ use SPVM 'TestCase::Precedence';
 # Start objects count
 my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
-ok(TestCase::Precedence->basic);
+ok(SPVM::TestCase::Precedence->basic);
 
 # All object is freed
 my $end_memory_blocks_count = SPVM::get_memory_blocks_count();

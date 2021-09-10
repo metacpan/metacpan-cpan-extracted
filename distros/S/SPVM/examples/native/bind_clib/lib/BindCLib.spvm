@@ -1,3 +1,0 @@
-package BindCLib {
-  native sub sum : int ($nums : int[]);
-}

@@ -337,7 +337,8 @@ Utils_setenv(SV * varname, SV * value)
 {
 	return apc_fs_setenv(
 		SvPV_nolen(varname), prima_is_utf8_sv(varname),
-		SvPV_nolen(value), prima_is_utf8_sv(value)
+		(SvTYPE(value) != SVt_NULL) ? SvPV_nolen(value) : NULL,
+		(SvTYPE(value) != SVt_NULL) ? prima_is_utf8_sv(value) : false
 	);
 }
 
@@ -347,6 +348,7 @@ XS(Utils_stat_FROMPERL) {
 	StatRec stats;
 	int ok;
 	Bool link = false;
+	U8 gimme;
 
 	if ( items > 2)
 		croak( "invalid usage of Prima::Utils::stat");
@@ -357,7 +359,11 @@ XS(Utils_stat_FROMPERL) {
 	ok = apc_fs_stat( name, prima_is_utf8_sv(ST(0)), link, &stats);
 	SPAGAIN;
 	SP -= items;
-	if ( ok) {
+	gimme = GIMME_V;
+	if ( gimme != G_ARRAY ) {
+		if ( gimme != G_VOID )
+			XPUSHs(newSViv(ok));
+	} else if ( ok) {
 		EXTEND( sp, 11 );
 		PUSHs( sv_2mortal(newSVuv( stats. dev    )));
 		PUSHs( sv_2mortal(newSVuv( stats. ino    )));

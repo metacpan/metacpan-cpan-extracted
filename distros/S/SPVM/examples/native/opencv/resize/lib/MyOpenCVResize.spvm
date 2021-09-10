@@ -1,3 +1,0 @@
-package MyOpenCVResize {
-  native sub resize : void ($in_file : string, $out_file : string);
-}

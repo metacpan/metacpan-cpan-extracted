@@ -9,7 +9,7 @@ use File::Basename 'basename', 'dirname';
 
 use SPVM::BlessedObject;
 use SPVM::BlessedObject::Array;
-use SPVM::BlessedObject::Package;
+use SPVM::BlessedObject::Class;
 use SPVM::BlessedObject::String;
 use FindBin;
 
@@ -20,7 +20,7 @@ use Encode 'encode', 'decode';
 
 use Carp 'confess';
 
-our $VERSION = '0.9011';
+our $VERSION = '0.9012';
 
 my $SPVM_INITED;
 my $BUILDER;
@@ -31,35 +31,38 @@ XSLoader::load('SPVM', $VERSION);
 my $loaded_spvm_modules = {};
 
 sub import {
-  my ($class, $package_name) = @_;
+  my ($class, $class_name) = @_;
 
   unless ($BUILDER) {
     my $build_dir = $ENV{SPVM_BUILD_DIR};
     $BUILDER = SPVM::Builder->new(build_dir => $build_dir, include_dirs => [@INC]);
   }
 
-  # Add package informations
-  if (defined $package_name) {
+  # Add class informations
+  if (defined $class_name) {
+    $class_name =~ s/^SPVM:://;
+    
     my ($file, $line) = (caller)[1, 2];
 
     # Compile SPVM source code and create runtime env
-    my $compile_success = $BUILDER->compile_spvm($package_name, $file, $line);
+    my $compile_success = $BUILDER->compile_spvm($class_name, $file, $line);
+    
     unless ($compile_success) {
       exit(255);
     }
     if ($compile_success) {
-      my $added_package_names = $BUILDER->get_added_package_names;
+      my $added_class_names = $BUILDER->get_added_class_names;
+      for my $added_class_name (@$added_class_names) {
+        
+        # Build Precompile classs - Compile C source codes and link them to SPVM precompile method
+        $BUILDER->build_and_bind_shared_lib($added_class_name, 'precompile');
 
-      for my $added_package_name (@$added_package_names) {
-        # Build Precompile packages - Compile C source codes and link them to SPVM precompile method
-        $BUILDER->build_and_bind_shared_lib($added_package_name, 'precompile');
-
-        # Build native packages - Compile C source codes and link them to SPVM native method
-        $BUILDER->build_and_bind_shared_lib($added_package_name, 'native');
+        # Build native classs - Compile C source codes and link them to SPVM native method
+        $BUILDER->build_and_bind_shared_lib($added_class_name, 'native');
       }
 
       # Bind SPVM method to Perl
-      bind_to_perl($BUILDER, $added_package_names);
+      bind_to_perl($BUILDER, $added_class_names);
     }
   }
 }
@@ -74,25 +77,26 @@ sub init {
   }
 }
 
-my $package_name_h = {};
-my $binded_package_name_h = {};
+my $class_name_h = {};
+my $binded_class_name_h = {};
 sub bind_to_perl {
-  my ($builder, $added_package_names) = @_;
+  my ($builder, $added_class_names) = @_;
 
-  for my $package_name (@$added_package_names) {
-
-    unless ($package_name_h->{$package_name}) {
-
-      my $code = "package $package_name; our \@ISA = ('SPVM::BlessedObject::Package');";
+  for my $class_name (@$added_class_names) {
+    my $perl_class_name = "SPVM::$class_name";
+    
+    unless ($class_name_h->{$class_name}) {
+    
+      my $code = "package $perl_class_name; our \@ISA = ('SPVM::BlessedObject::Class');";
       eval $code;
 
       if (my $error = $@) {
         confess $error;
       }
-      $package_name_h->{$package_name} = 1;
+      $class_name_h->{$class_name} = 1;
     }
 
-    my $method_names = $builder->get_method_names($package_name);
+    my $method_names = $builder->get_method_names($class_name);
 
     for my $method_name (@$method_names) {
       # Destrutor is skip
@@ -104,19 +108,16 @@ sub bind_to_perl {
         next;
       }
 
-      my $method_abs_name = "${package_name}::$method_name";
 
-      # Define SPVM method
+      my $perl_method_abs_name = "${perl_class_name}::$method_name";
+
+      # Define Perl method
       no strict 'refs';
-
-      my ($package_name, $method_name) = $method_abs_name =~ /^(?:(.+)::)(.*)/;
-
-      # Declare method
-      *{"$method_abs_name"} = sub {
+      *{"$perl_method_abs_name"} = sub {
         SPVM::init() unless $SPVM_INITED;
 
         my $return_value;
-        eval { $return_value = SPVM::call_spvm_method($package_name, $method_name, @_) };
+        eval { $return_value = SPVM::call_spvm_method($class_name, $method_name, @_) };
         my $error = $@;
         if ($error) {
           confess $error;
@@ -297,8 +298,8 @@ SPVM - Static Perl Virtual Machine. Fast Calculation, Fast Array Operation, and 
 
 SPVM Module:
 
-  # lib/MyMath.spvm
-  package MyMath {
+  # lib/SPVM/MyMath.spvm
+  class MyMath {
     sub sum : int ($nums : int[]) {
 
       my $total = 0;
@@ -321,21 +322,21 @@ Call SPVM method from Perl
   use SPVM 'MyMath';
 
   # Call method
-  my $total = MyMath->sum([3, 6, 8, 9]);
+  my $total = SPVM::MyMath->sum([3, 6, 8, 9]);
 
   print "Total: $total\n";
 
   # Call method with packed data
   my $nums_packed = pack('l*', 3, 6, 8, 9);
   my $sv_nums = SPVM::new_int_array_from_bin($nums_packed);
-  my $total_packed = MyMath->sum($sv_nums);
+  my $total_packed = SPVM::MyMath->sum($sv_nums);
 
   print "Total Packed: $total_packed\n";
 
 Precompiled SPVM Method. This code is converted to C language and then converted to a shared library.
 
-  # lib/MyMath.spvm
-  package MyMath : precompile {
+  # lib/SPVM/MyMath.spvm
+  class MyMath : precompile {
     sub sum : int ($nums : int[]) {
 
       my $total = 0;
@@ -377,7 +378,7 @@ SPVM Tutorial.
 
 =over 2
 
-=item * L<SPVM::Document::Tutorial>
+=item * L<Tutorial|SPVM::Document::Tutorial>
 
 =back
 
@@ -387,17 +388,27 @@ SPVM Language Specification.
 
 =over 2
 
-=item * L<SPVM::Document::LanguageSpecification>
+=item * L<Language Specification|SPVM::Document::LanguageSpecification>
 
 =back
 
-=head2 Core Modules
+=head2 Standard Functions
 
-SPVM Core Modules.
+SPVM Standard Functions
 
 =over 2
 
-=item * L<SPVM::Document::Modules>
+=item * L<Standard Functions|SPVM::Fn>
+
+=back
+
+=head2 Standard Modules
+
+SPVM Starndard Modules.
+
+=over 2
+
+=item * L<Standard Modules|SPVM::Document::Modules>
 
 =back
 
@@ -407,7 +418,7 @@ SPVM Performance Benchmark.
 
 =over 2
 
-=item * L<SPVM::Document::Benchmark>
+=item * L<Benchmark|SPVM::Document::Benchmark>
 
 =back
 
@@ -417,7 +428,7 @@ SPVM Exchange API is APIs which convert Perl data structures to SPVM data struct
 
 =over 2
 
-=item * L<SPVM::Document::ExchangeAPI>
+=item * L<ExchangeAPI|SPVM::Document::ExchangeAPI>
 
 =back
 
@@ -427,7 +438,7 @@ SPVM Native APIs is C APIs used in SPVM native method.
 
 =over 2
 
-=item * L<SPVM::Document::NativeAPI>
+=item * L<NativeAPI|SPVM::Document::NativeAPI>
 
 =back
 

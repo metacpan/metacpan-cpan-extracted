@@ -37,7 +37,7 @@ BEGIN {
     };
 }
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 use constant IS_VMS	=> { map { $_ => 1 } qw{ VMS } }->{$^O};
 use constant IS_WINDOWS	=> { map { $_ => 1 } qw{ MSWin32 } }->{$^O};

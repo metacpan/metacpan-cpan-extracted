@@ -4,30 +4,30 @@ package SPVM::Float;
 
 =head1 NAME
 
-SPVM::Float - Float object
+SPVM::Float - Float in SPVM | Float object
 
 =head1 SYNOPSYS
 
-  use SPVM::Float;
+  use Float;
 
-  my $float_object = SPVM::Float->new(0.25f);
+  my $float_object = Float->new(0.25f);
   my $float_value = $float_object->value;
 
 =head1 DESCRIPTION
 
-L<SPVM::Float> object stores a C<float> value.
+L<Float|SPVM::Float> object stores a C<float> value.
 
 This object is immutable and its value cannot be changed.
 
-L<SPVM::Float> is automatically loaded just after the program starts.
+L<Float|SPVM::Float> is automatically loaded just after the program starts.
 
-=head1 STATIC METHODS
+=head1 CLASS METHODS
 
 =head2 new
 
-  sub new : SPVM::Float ($value : float)
+  sub new : Float ($value : float)
 
-Create a new L<SPVM::Float> object with a C<float> value.
+Create a new L<Float|SPVM::Float> object with a C<float> value.
 
 =head1 INSTANCE METHODS
 

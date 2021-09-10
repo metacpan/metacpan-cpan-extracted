@@ -91,6 +91,7 @@ get_window( Handle self, PMenuItemReg m)
 		wx-> next = w;
 	} else
 		XX-> w = w;
+	CREATE_ARGB_PICTURE(w->w, X(self)->flags.layered ? 32 : 0, w->argb_picture);
 	return w;
 }
 
@@ -159,6 +160,7 @@ menu_window_delete_downlinks( PMenuSysData XX, PMenuWindow wx)
 		PMenuWindow xw = w-> next;
 		hash_delete( guts. menu_windows, &w-> w, sizeof( w-> w), false);
 		XFillRectangle( DISP, w-> w, guts. menugc, 0, 0, w-> sz. x, w-> sz. y);
+		DELETE_ARGB_PICTURE(w->argb_picture);
 		XDestroyWindow( DISP, w-> w);
 		XFlush( DISP);
 		free_unix_items( w);
@@ -1110,10 +1112,10 @@ DECL_DRAW(image)
 	dummy_s.drawable.current_region = rgn;
 	if ( draw->layered ) {
 		dummy_s.drawable.flags.layered = 1;
-#ifdef HAVE_X11_EXTENSIONS_XRENDER_H
-		dummy_s.drawable.argb_picture = w-> argb_picture;
-#endif
 	}
+#ifdef HAVE_X11_EXTENSIONS_XRENDER_H
+	dummy_s.drawable.argb_picture = w-> argb_picture;
+#endif
 
 	if ( bm-> is_mono ) {
 		if ( m-> flags. disabled ) {
@@ -1301,10 +1303,8 @@ handle_menu_expose( XEvent *ev, XWindow win, Handle self)
 	XSetRegion( DISP, draw.gc, rgn);
 #ifdef USE_XFT
 	if ( draw. xft_drawable) XftDrawSetClip(( XftDraw*) draw.xft_drawable, rgn);
-#ifdef HAVE_X11_EXTENSIONS_XRENDER_H
-	if ( w-> argb_picture ) XRenderSetPictureClipRegion(DISP, w->argb_picture, rgn);
 #endif
-#endif
+	CLIP_ARGB_PICTURE(w->argb_picture, rgn);
 
 #ifdef USE_XFT
 	if ( !kf-> xft)
@@ -1962,6 +1962,7 @@ prima_end_menu(void)
 	XX-> focused = NULL;
 	if ( XX-> w != &XX-> wstatic) {
 		hash_delete( guts. menu_windows, &w-> w, sizeof( w-> w), false);
+		DELETE_ARGB_PICTURE(w->argb_picture);
 		XDestroyWindow( DISP, w-> w);
 		free_unix_items( w);
 		free( w);
@@ -2357,12 +2358,7 @@ apc_window_set_menu( Handle self, Handle menu)
 		PMenuWindow w = M(m)-> w;
 		if ( m-> handle == guts. currentMenu) prima_end_menu();
 		hash_delete( guts. menu_windows, &w-> w, sizeof( w-> w), false);
-#ifdef HAVE_X11_EXTENSIONS_XRENDER_H
-		if ( w->argb_picture ) {
-			XRenderFreePicture( DISP, w->argb_picture);
-			w->argb_picture = 0;
-		}
-#endif
+		DELETE_ARGB_PICTURE(w->argb_picture);
 		XDestroyWindow( DISP, w-> w);
 		free_unix_items( w);
 		m-> handle = NULL_HANDLE;
@@ -2392,10 +2388,7 @@ apc_window_set_menu( Handle self, Handle menu)
 		M(m)-> w-> w = m-> handle = XCreateWindow( DISP, X_WINDOW,
 			0, 0, 1, 1, 0, CopyFromParent,
 			InputOutput, CopyFromParent, valuemask, &attrs);
-#ifdef HAVE_X11_EXTENSIONS_XRENDER_H
-		if ( XF_LAYERED(XX) )
-			M(m)->w->argb_picture = XRenderCreatePicture( DISP, M(m)->w->w, guts. xrender_argb_pic_format, 0, NULL);
-#endif
+		CREATE_ARGB_PICTURE(M(m)->w->w, 0, M(m)->w->argb_picture);
 		hash_store( guts. menu_windows, &m-> handle, sizeof( m-> handle), m);
 		XResizeWindow( DISP, m-> handle, XX-> size.x, y);
 		XMapRaised( DISP, m-> handle);
@@ -2444,8 +2437,7 @@ apc_menu_item_begin_paint( Handle self, PEvent event)
 	YY-> flags.paint   = 1;
 	YY-> flags.layered = pe->layered;
 #ifdef HAVE_X11_EXTENSIONS_XRENDER_H
-	if ( pe-> layered )
-		YY-> argb_picture = M(pe->self)->w->argb_picture;
+	YY-> argb_picture  = M(pe->self)->w->argb_picture;
 #endif
 	YY-> gdrawable     = pe->win;
 	YY-> size          = event-> gen.P;

@@ -21,12 +21,12 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 {
   # Unary plus - Operation
   {
-    ok(TestCase::UnaryPlus->unary_plus_byte);
-    ok(TestCase::UnaryPlus->unary_plus_short);
-    ok(TestCase::UnaryPlus->unary_plus_int);
-    ok(TestCase::UnaryPlus->unary_plus_long);
-    ok(TestCase::UnaryPlus->unary_plus_float);
-    ok(TestCase::UnaryPlus->unary_plus_double);
+    ok(SPVM::TestCase::UnaryPlus->unary_plus_byte);
+    ok(SPVM::TestCase::UnaryPlus->unary_plus_short);
+    ok(SPVM::TestCase::UnaryPlus->unary_plus_int);
+    ok(SPVM::TestCase::UnaryPlus->unary_plus_long);
+    ok(SPVM::TestCase::UnaryPlus->unary_plus_float);
+    ok(SPVM::TestCase::UnaryPlus->unary_plus_double);
   }
 
   # Unary plus - Compile Error

@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::ElectronApplication;
-$Playwright::ElectronApplication::VERSION = '0.013';
+$Playwright::ElectronApplication::VERSION = '0.014';
 use parent 'Playwright::Base';
 
 sub new {
@@ -18,21 +18,31 @@ sub new {
     return $self->SUPER::new(%options);
 }
 
-sub windows {
+sub waitForEvent {
     my $self = shift;
     return $self->_request(
         args    => [@_],
-        command => 'windows',
+        command => 'waitForEvent',
         object  => $self->{guid},
         type    => $self->{type}
     );
 }
 
-sub firstWindow {
+sub window {
     my $self = shift;
     return $self->_request(
         args    => [@_],
-        command => 'firstWindow',
+        command => 'window',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub windows {
+    my $self = shift;
+    return $self->_request(
+        args    => [@_],
+        command => 'windows',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -48,16 +58,6 @@ sub evaluateHandle {
     );
 }
 
-sub waitForEvent {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'waitForEvent',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub close {
     my $self = shift;
     return $self->_request(
@@ -68,11 +68,11 @@ sub close {
     );
 }
 
-sub evaluate {
+sub firstWindow {
     my $self = shift;
     return $self->_request(
         args    => [@_],
-        command => 'evaluate',
+        command => 'firstWindow',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -98,11 +98,11 @@ sub browserWindow {
     );
 }
 
-sub window {
+sub evaluate {
     my $self = shift;
     return $self->_request(
         args    => [@_],
-        command => 'window',
+        command => 'evaluate',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -132,7 +132,7 @@ Playwright::ElectronApplication - Automatically generated class for Playwright::
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 CONSTRUCTOR
 
@@ -143,17 +143,23 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
+=head2 waitForEvent(@args)
+
+Execute the ElectronApplication::waitForEvent playwright routine.
+
+See L<https://playwright.dev/api/class-ElectronApplication#ElectronApplication-waitForEvent> for more information.
+
+=head2 window(@args)
+
+Execute the ElectronApplication::window playwright routine.
+
+See L<https://playwright.dev/api/class-ElectronApplication#ElectronApplication-window> for more information.
+
 =head2 windows(@args)
 
 Execute the ElectronApplication::windows playwright routine.
 
 See L<https://playwright.dev/api/class-ElectronApplication#ElectronApplication-windows> for more information.
-
-=head2 firstWindow(@args)
-
-Execute the ElectronApplication::firstWindow playwright routine.
-
-See L<https://playwright.dev/api/class-ElectronApplication#ElectronApplication-firstWindow> for more information.
 
 =head2 evaluateHandle(@args)
 
@@ -161,23 +167,17 @@ Execute the ElectronApplication::evaluateHandle playwright routine.
 
 See L<https://playwright.dev/api/class-ElectronApplication#ElectronApplication-evaluateHandle> for more information.
 
-=head2 waitForEvent(@args)
-
-Execute the ElectronApplication::waitForEvent playwright routine.
-
-See L<https://playwright.dev/api/class-ElectronApplication#ElectronApplication-waitForEvent> for more information.
-
 =head2 close(@args)
 
 Execute the ElectronApplication::close playwright routine.
 
 See L<https://playwright.dev/api/class-ElectronApplication#ElectronApplication-close> for more information.
 
-=head2 evaluate(@args)
+=head2 firstWindow(@args)
 
-Execute the ElectronApplication::evaluate playwright routine.
+Execute the ElectronApplication::firstWindow playwright routine.
 
-See L<https://playwright.dev/api/class-ElectronApplication#ElectronApplication-evaluate> for more information.
+See L<https://playwright.dev/api/class-ElectronApplication#ElectronApplication-firstWindow> for more information.
 
 =head2 context(@args)
 
@@ -191,11 +191,11 @@ Execute the ElectronApplication::browserWindow playwright routine.
 
 See L<https://playwright.dev/api/class-ElectronApplication#ElectronApplication-browserWindow> for more information.
 
-=head2 window(@args)
+=head2 evaluate(@args)
 
-Execute the ElectronApplication::window playwright routine.
+Execute the ElectronApplication::evaluate playwright routine.
 
-See L<https://playwright.dev/api/class-ElectronApplication#ElectronApplication-window> for more information.
+See L<https://playwright.dev/api/class-ElectronApplication#ElectronApplication-evaluate> for more information.
 
 =head2 on(@args)
 

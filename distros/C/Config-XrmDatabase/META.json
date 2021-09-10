@@ -4,7 +4,7 @@
       "Diab Jerius <djerius@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.020, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -149,19 +149,19 @@
    "provides" : {
       "Config::XrmDatabase" : {
          "file" : "lib/Config/XrmDatabase.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       },
       "Config::XrmDatabase::Failure" : {
          "file" : "lib/Config/XrmDatabase/Failure.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       },
       "Config::XrmDatabase::Types" : {
          "file" : "lib/Config/XrmDatabase/Types.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       },
       "Config::XrmDatabase::Util" : {
          "file" : "lib/Config/XrmDatabase/Util.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -176,9 +176,9 @@
          "web" : "https://gitlab.com/djerius/config-xrmdatabase"
       }
    },
-   "version" : "0.04",
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.17",
+   "version" : "0.06",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_spdx_expression" : "GPL-3.0-only"
 }
 

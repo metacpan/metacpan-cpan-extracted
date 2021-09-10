@@ -14,12 +14,18 @@ use File::Basename 'dirname';
 # so this module must be wrote as pure perl script, not contain XS functions and don't use any other SPVM modules.
 
 sub create_cfunc_name {
-  my ($package_name, $method_name, $category) = @_;
+  my ($class_name, $method_name, $category) = @_;
   
-  my $prefix = 'SP' . uc($category) . '__';
+  my $prefix;
+  if ($category eq 'native') {
+    $prefix = 'SPVM__';
+  }
+  elsif ($category eq 'precompile') {
+    $prefix = 'SPVMPRECOMPILE__'
+  }
   
   # Precompile Method names
-  my $method_abs_name_under_score = "${package_name}::$method_name";
+  my $method_abs_name_under_score = "${class_name}::$method_name";
   $method_abs_name_under_score =~ s/:/_/g;
   my $cfunc_name = "$prefix$method_abs_name_under_score";
   
@@ -77,20 +83,22 @@ sub convert_module_file_to_shared_lib_file {
   return $shared_lib_category_file;
 }
 
-sub convert_package_name_to_shared_lib_rel_file {
-  my ($package_name, $category) = @_;
+sub convert_class_name_to_shared_lib_rel_file {
+  my ($class_name, $category) = @_;
   
   my $dlext = $Config{dlext};
-  my $shared_lib_category_rel_file = convert_package_name_to_rel_file($package_name);
+  my $shared_lib_category_rel_file = convert_class_name_to_rel_file($class_name);
   $shared_lib_category_rel_file .= $category eq 'native' ? ".$dlext" : ".$category.$dlext";
   
   return $shared_lib_category_rel_file;
 }
 
-sub convert_package_name_to_category_rel_file {
-  my ($package_name, $category, $ext) = @_;
+sub convert_class_name_to_category_rel_file {
+  my ($class_name, $category, $ext) = @_;
   
-  my $rel_file_with_ext = $package_name;
+  $class_name =~ s/^SPVM:://;
+  
+  my $rel_file_with_ext = "SPVM::$class_name";
   $rel_file_with_ext =~ s/::/\//g;
   $rel_file_with_ext .= $category eq 'native' ? "" : ".$category";
   if (defined $ext) {
@@ -100,26 +108,25 @@ sub convert_package_name_to_category_rel_file {
   return $rel_file_with_ext;
 }
 
-sub convert_package_name_to_rel_dir {
-  my ($package_name) = @_;
-  
+sub convert_class_name_to_rel_dir {
+  my ($class_name) = @_;
+
+  $class_name =~ s/^SPVM:://;
+
   my $rel_dir;
-  if ($package_name =~ /::/) {
-    my $rel_file = $package_name;
-    $rel_file =~ s/::/\//g;
-    $rel_dir = dirname $rel_file;
-  }
-  else {
-    $rel_dir = '';
-  }
+  my $rel_file = "SPVM::$class_name";
+  $rel_file =~ s/::/\//g;
+  $rel_dir = dirname $rel_file;
   
   return $rel_dir;
 }
 
-sub convert_package_name_to_rel_file {
-  my ($package_name, $ext) = @_;
+sub convert_class_name_to_rel_file {
+  my ($class_name, $ext) = @_;
+
+  $class_name =~ s/^SPVM:://;
   
-  my $rel_file_with_ext = $package_name;
+  my $rel_file_with_ext = "SPVM::$class_name";
   $rel_file_with_ext =~ s/::/\//g;
   
   if (defined $ext) {
@@ -129,32 +136,36 @@ sub convert_package_name_to_rel_file {
   return $rel_file_with_ext;
 }
 
-sub remove_package_part_from_file {
-  my ($file, $package_name) = @_;
+sub remove_class_part_from_file {
+  my ($file, $class_name) = @_;
+
+  $class_name =~ s/^SPVM:://;
   
   $file =~ s/\.spvm$//;
-  my $package_file = $package_name;
-  $package_file =~ s/::/\//g;
-  $file =~ s/$package_file$//;
+  my $class_file = "SPVM::$class_name";
+  $class_file =~ s/::/\//g;
+  $file =~ s/$class_file$//;
   $file =~ s/[\\\/]$//;
   
   return $file;
 }
 
 sub create_make_rule_native {
-  my $package_name = shift;
+  my $class_name = shift;
   
-  create_package_make_rule($package_name, 'native');
+  create_class_make_rule($class_name, 'native');
 }
 
 sub create_make_rule_precompile {
-  my $package_name = shift;
+  my $class_name = shift;
   
-  create_package_make_rule($package_name, 'precompile');
+  create_class_make_rule($class_name, 'precompile');
 }
 
-sub create_package_make_rule {
-  my ($package_name, $category) = @_;
+sub create_class_make_rule {
+  my ($class_name, $category) = @_;
+
+  $class_name =~ s/^SPVM:://;
   
   my $make_rule;
   
@@ -162,22 +173,22 @@ sub create_package_make_rule {
   $make_rule
   = "dynamic :: ";
 
-  my $package_name_under_score = $package_name;
-  $package_name_under_score =~ s/:/_/g;
+  my $class_name_under_score = $class_name;
+  $class_name_under_score =~ s/:/_/g;
   
-  my $target_name = "spvm_${category}_$package_name_under_score ";
+  my $target_name = "spvm_${category}_$class_name_under_score ";
   $make_rule
     .= "$target_name ";
   $make_rule .= "\n\n";
   
-  my $module_base_name = $package_name;
+  my $module_base_name = $class_name;
   $module_base_name =~ s/^.+:://;
   
   my $src_dir = 'lib';
 
-  my $package_rel_file = convert_package_name_to_rel_file($package_name, 'spvm');
+  my $class_rel_file = convert_class_name_to_rel_file($class_name, 'spvm');
   
-  my $noext_file = $package_rel_file;
+  my $noext_file = $class_rel_file;
   $noext_file =~ s/\.[^\.]+$//;
   
   my $spvm_file = $noext_file;
@@ -196,7 +207,7 @@ sub create_package_make_rule {
   my @deps;
   
   # Dependency c source files
-  push @deps, grep { $_ ne '.' && $_ ne '..' } glob "$src_dir/$package_rel_file/*";
+  push @deps, grep { $_ ne '.' && $_ ne '..' } glob "$src_dir/$class_rel_file/*";
   
   # Dependency module file
   if ($category eq 'native') {
@@ -207,7 +218,7 @@ sub create_package_make_rule {
   }
   
   # Shared library file
-  my $shared_lib_rel_file = convert_package_name_to_shared_lib_rel_file($package_name, $category);
+  my $shared_lib_rel_file = convert_class_name_to_shared_lib_rel_file($class_name, $category);
   my $shared_lib_file = "blib/lib/$shared_lib_rel_file";
   
   # Get source files
@@ -216,7 +227,7 @@ sub create_package_make_rule {
   $make_rule
     .= "$shared_lib_file :: @deps\n\n";
   $make_rule
-    .= "\t$^X -Mblib -MSPVM::Builder -e \"SPVM::Builder->new(build_dir => '.spvm_build')->build_shared_lib_dist('$package_name', '$category')\"\n\n";
+    .= "\t$^X -Mblib -MSPVM::Builder -e \"SPVM::Builder->new(build_dir => '.spvm_build')->build_shared_lib_dist('$class_name', '$category')\"\n\n";
   
   return $make_rule;
 }

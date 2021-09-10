@@ -4,13 +4,13 @@ package SPVM::Comparator::String;
 
 =head1 NAME
 
-SPVM::Comparator::String - a callback interface for string comparation
+SPVM::Comparator::String - Comparator::String in SPVM | a callback interface for string comparation
 
 =head1 SYNOPSYS
   
-  use SPVM::Comparator::String;
+  use Comparator::String;
   
-  my $comparator : SPVM::Comparator::String = sub : int ($self : self, $a : string, $b : string); {
+  my $comparator : Comparator::String = sub : int ($self : self, $a : string, $b : string); {
     return $a cmp $b;
   };
   
@@ -18,7 +18,7 @@ SPVM::Comparator::String - a callback interface for string comparation
 
 =head1 DESCRIPTION
 
-L<SPVM::Comparator::String> is a callback interface to compare two strings.
+L<Comparator::String|SPVM::Comparator::String> is a callback interface to compare two strings.
 
 =head1 CALLBACK METHOD INTERFACE
 

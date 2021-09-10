@@ -9,7 +9,7 @@ use File::Slurper qw(read_text);
 use JSON;
 use parent 'Test::Builder::Module'; # Included in Test::Simple
 
-use version; our $VERSION = qv('0.0.3');
+use version; our $VERSION = qv('0.0.4');
 
 # Other recommended modules (uncomment to use):
 #  use IO::Prompt;
@@ -78,10 +78,10 @@ sub issues_well_closed {
   my $repo = $self->{'_name'};
 
   my $page = get_github( "https://github.com/$user/$repo".'/issues?q=is%3Aissue+is%3Aclosed' );
-  my (@closed_issues ) = ( $page =~ m{<a\s+(id=\".+?\")}gs );
+  my (@closed_issues ) = ( $page =~ m{<a\s+(id=\"issue_\d+_link\")}gs );
   for my $i (@closed_issues) {
-    my ($issue_id) = ($i =~ /issue-id-(\d+)/);
-      
+    my ($issue_id) = ($i =~ /issue_(\d+)_link/);
+
     $tb->ok(closes_from_commit($user,$repo,$issue_id),"El issue $issue_id se ha cerrado desde commit")
   }
 
@@ -117,20 +117,13 @@ This document describes App::GitHub::Repository version 0.0.1
 
     use App::GitHub::Repository;
 
-=for author to fill in:
-    Brief code example(s) here showing commonest usage(s).
-    This section will be as far as many users bother reading
-    so make it as educational and exeplary as possible.
-  
-  
+
 =head1 DESCRIPTION
 
-=for author to fill in:
-    Write a full description of the module and its features here.
-    Use subsections (=head2, =head3) as appropriate.
+A series of sanity checks on GitHub repositories.
 
 
-=head1 INTERFACE 
+=head1 INTERFACE
 
 =head2 new
 

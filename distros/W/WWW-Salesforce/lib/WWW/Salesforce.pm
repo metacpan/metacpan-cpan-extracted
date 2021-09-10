@@ -3,22 +3,22 @@ package WWW::Salesforce;
 use strict;
 use warnings;
 
-use SOAP::Lite;    # ( +trace => 'all', readable => 1, );#, outputxml => 1, );
-use DateTime;
+use SOAP::Lite ();    # ( +trace => 'all', readable => 1, );#, outputxml => 1, );
+use DateTime ();
+use URI ();
 # use Data::Dumper;
 use WWW::Salesforce::Constants;
 use WWW::Salesforce::Deserializer;
 use WWW::Salesforce::Serializer;
 
-our $VERSION = '0.303';
-$VERSION = eval $VERSION;
+our $VERSION = '0.304';
 
-our $SF_PROXY       = 'https://login.salesforce.com/services/Soap/u/8.0';
+our $SF_PROXY       = 'https://login.salesforce.com/services/Soap/u/52.0';
 our $SF_URI         = 'urn:partner.soap.sforce.com';
 our $SF_PREFIX      = 'sforce';
 our $SF_SOBJECT_URI = 'urn:sobject.partner.soap.sforce.com';
 our $SF_URIM        = 'http://soap.sforce.com/2006/04/metadata';
-our $SF_APIVERSION  = '23.0';
+our $SF_APIVERSION  = '52.0';
 # set webproxy if firewall blocks port 443 to SF_PROXY
 our $WEB_PROXY  = ''; # e.g., http://my.proxy.com:8080
 
@@ -27,53 +27,110 @@ our $WEB_PROXY  = ''; # e.g., http://my.proxy.com:8080
 
 =head1 NAME
 
-WWW::Salesforce - this class provides a simple abstraction layer between SOAP::Lite and Salesforce.com.
+WWW::Salesforce - This class provides a simple SOAP client for Salesforce.com.
 
 =head1 SYNOPSIS
 
-    use WWW::Salesforce;
-    my $sforce = eval { WWW::Salesforce->login( username => 'foo',
-                                                password => 'bar' ); };
-    die "Could not login to SFDC: $@" if $@;
-
-    # eval, eval, eval.  WWW::Salesforce uses a SOAP connection to
-    # salesforce.com, so things can go wrong unexpectedly.  Be prepared
-    # by eval'ing and handling any exceptions that occur.
+    use Try::Tiny;
+    use WWW::Salesforce ();
+    try {
+        my $sforce = WWW::Salesforce->login(
+            username => 'foo',
+            password => 'password' . 'pass_token',
+            serverurl => 'https://test.salesforce.com',
+            version => '52.0' # must be a string
+        );
+        my $res = $sforce->query(query => 'select Id, Name from Account');
+        say "Found this many: ", $res->valueof('//queryResponse/result/size');
+        my @records = $res->valueof('//queryResponse/result/records');
+        say $records[0];
+    }
+    catch {
+        # log or whatever. we'll just die for example
+        die "Could not perform an action: $_";
+    }
 
 =head1 DESCRIPTION
 
-This class provides a simple abstraction layer between SOAP::Lite and Salesforce.com. Because SOAP::Lite does not support complexTypes, and document/literal encoding is limited, this module works around those limitations and provides a more intuitive interface a developer can interact with.
+This class provides a simple abstraction layer between L<SOAP::Lite> and
+L<Salesforce|https://www.salesforce.com>. Because L<SOAP::Lite> does not
+support C<complexTypes>, and document/literal encoding is limited, this module
+works around those limitations and provides a more intuitive interface a
+developer can interact with.
+
+=head1 CONSTRUCTOR ARGUMENTS
+
+Given that L<WWW::Salesforce> doesn't have attributes in the traditional
+sense, the following arguments, rather than attributes, can be passed
+into the constructor.
+
+=head2 password
+
+  my $sforce = WWW::Salesforce->new(password => 'foobar1232131');
+
+The password is a combination of your Salesforce password and your user's
+L<Security Token|https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_concepts_security.htm>.
+
+=head2 serverurl
+
+  my $sforce = WWW::Salesforce->new(serverurl => 'https://login.salesforce.com');
+  # or maybe one of your developer instances
+  $sforce = WWW::Salesforce->new(serverurl => 'https://test.salesforce.com');
+
+When you login to Salesforce, it's sometimes useful to login to one of your sandbox or
+other instances. All you need is the base URL here.
+
+=head2 username
+
+  my $sforce = WWW::Salesforce->new(username => 'foo@bar.com');
+
+When you login to Salesforce, your username is necessary.
+
+=head2 version
+
+  my $sforce = WWW::Salesforce->new(version => '52.0');
+
+Salesforce makes changes to their API and luckily for us, they version those changes.
+You can choose which API version you want to use by passing this argument. However, it
+B<must> be a string.
 
 =head1 CONSTRUCTORS
 
-=head2 new( HASH )
+L<WWW::Salesforce> constructs its instance and immediately logs you into the
+L<Salesforce|https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_login.htm>
+API. So that there's less confusion, we have the traditional constructor as well as a
+second constructor named login.
 
-Synonym for C<login>
+=head2 new
+
+  my $sforce = WWW::Salesforce->new(
+    username => 'foo@bar.com',
+    password => 'password' . 'security_token',
+    serverurl => 'https://login.salesforce.com',
+    version => '52.0'
+  );
+
+When you create a new instance, the L<WWW::Salesforce/username> and L<WWW::Salesforce/password>
+arguments are required. The others are not required. After construction, these items are
+not mutable.
 
 =cut
 
-sub new {
-    return login(@_);
-}
+sub new { return shift->login(@_); }
 
 
-=head2 login( HASH )
+=head2 login
 
-The C<login> method returns an object of type WWW::Salesforce if the login attempt was successful, and C<0> otherwise. Upon a successful login, the C<sessionId> is saved and the serverUrl set properly so that developers need not worry about setting these values manually. Upon failure, the method dies with an error string.
+  my $sforce = WWW::Salesforce->login(
+    username => 'foo@bar.com',
+    password => 'password' . 'security_token',
+    serverurl => 'https://login.salesforce.com',
+    version => '52.0'
+  );
 
-The following are the accepted input parameters:
-
-=over
-
-=item username
-
-A Salesforce.com username.
-
-=item password
-
-The password for the user indicated by C<username>.
-
-=back
+When you create a new instance, the L<WWW::Salesforce/username> and L<WWW::Salesforce/password>
+arguments are required. The others are not required. After construction, these items are
+not mutable.
 
 =cut
 
@@ -81,43 +138,50 @@ sub login {
     my $class = shift;
     my (%params) = @_;
 
-    unless ( defined $params{'username'} and length $params{'username'} ) {
+    unless (defined $params{'username'} and length $params{'username'}) {
         die("WWW::Salesforce::login() requires a username");
     }
-    unless ( defined $params{'password'} and length $params{'password'} ) {
+    unless (defined $params{'password'} and length $params{'password'}) {
         die("WWW::Salesforce::login() requires a password");
     }
+
+    # build the login URL
+    my $version = $params{version} || $SF_APIVERSION || '52.0';
+    my $url
+        = URI->new($params{serverurl}
+            || $SF_PROXY
+            || 'https://login.salesforce.com');
+    $url->path('/services/Soap/u/' . $version);
+
     my $self = {
         sf_user      => $params{'username'},
         sf_pass      => $params{'password'},
-        sf_serverurl => $SF_PROXY,
-        sf_sid       => undef,                 #session ID
+        sf_serverurl => $url->as_string(),
+        sf_version   => $version,
+        sf_sid       => undef,
     };
-    $self->{'sf_serverurl'} = $params{'serverurl'}
-      if ( $params{'serverurl'} && length( $params{'serverurl'} ) );
     bless $self, $class;
 
     my $client = $self->_get_client();
     my $r      = $client->login(
-        SOAP::Data->name( 'username' => $self->{'sf_user'} ),
-        SOAP::Data->name( 'password' => $self->{'sf_pass'} )
+        SOAP::Data->name('username' => $self->{'sf_user'}),
+        SOAP::Data->name('password' => $self->{'sf_pass'})
     );
     unless ($r) {
-        die sprintf( "could not login, user %s, pass %s",
-            $self->{'sf_user'}, $self->{'sf_pass'} );
+        die sprintf("could not login, user %s, pass %s",
+            $self->{'sf_user'}, $self->{'sf_pass'});
     }
-    if ( $r->fault() ) {
-        die( $r->faultstring() );
+    if ($r->fault()) {
+        die($r->faultstring());
     }
 
     $self->{'sf_sid'}       = $r->valueof('//loginResponse/result/sessionId');
     $self->{'sf_uid'}       = $r->valueof('//loginResponse/result/userId');
     $self->{'sf_serverurl'} = $r->valueof('//loginResponse/result/serverUrl');
-    $self->{'sf_metadataServerUrl'} = $r->valueof('//loginResponse/result/metadataServerUrl');
+    $self->{'sf_metadataServerUrl'}
+        = $r->valueof('//loginResponse/result/metadataServerUrl');
     return $self;
 }
-
-
 
 =head1 METHODS
 
@@ -672,55 +736,66 @@ sub logout {
     return $r;
 }
 
+=head2 query
 
+  my $res = $sf->query(query => 'SELECT Id, Name FROM Account');
+  $res = $sf->query(query => 'SELECT Id, Name FROM Account', limit => 20);
+  # records as an array
+  my @records = $res->valueof('//QueryResult/result/records');
+  # number of records returned (int)
+  my $number = $res->valueof('//QueryResult/result/size');
+  # When our query has more results than our limit, we get paged results
+  my $done = $res->valueof('//queryResponse/result/done');
+  while (!$done) {
+    my $locator = $res->valueof('//queryResponse/result/queryLocator');
+    # use that locator for the queryMore method
+  }
 
-=head2 query( HASH )
+Executes a L<query|https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_query.htm>
+against the specified object and returns data that matches the specified
+criteria.
 
-Executes a query against the specified object and returns data that matches the specified criteria.
+The method takes in a hash with two potential keys, C<query> and C<limit>.
 
-=over
+The C<query> key is required and should contain an
+L<SOQL|https://developer.salesforce.com/docs/atlas.en-us.soql_sosl.meta/soql_sosl/sforce_api_calls_soql.htm>
+query string.
 
-=item query
-
-The query string to use for the query. The query string takes the form of a I<basic> SQL statement. For example, "SELECT Id,Name FROM Account".
-
-=item limit
-
-This sets the batch size, or size of the result returned. This is helpful in producing paginated results, or fetch small sets of data at a time.
-
-=back
+The C<limit> key sets the batch size, or size of the result returned.
+This is helpful in producing paginated results, or fetching small sets
+of data at a time.
 
 =cut
 
 sub query {
     my $self = shift;
     my (%in) = @_;
-    if ( !defined $in{'query'} || !length $in{'query'} ) {
+    if (!defined $in{'query'} || !length $in{'query'}) {
         die("A query is needed for the query() method.");
     }
-    if ( !defined $in{'limit'} || $in{'limit'} !~ m/^\d+$/ ) {
+    if (!defined $in{'limit'} || $in{'limit'} !~ m/^\d+$/) {
         $in{'limit'} = 500;
     }
-    if ( $in{'limit'} < 1 || $in{'limit'} > 2000 ) {
+    if ($in{'limit'} < 1 || $in{'limit'} > 2000) {
         die("A query's limit cannot exceed 2000. 500 is default.");
     }
 
-    my $limit = SOAP::Header->name(
-        'QueryOptions' => \SOAP::Header->name( 'batchSize' => $in{'limit'} ) )
-      ->prefix($SF_PREFIX)->uri($SF_URI);
+    my $limit
+        = SOAP::Header->name(
+        'QueryOptions' => \SOAP::Header->name('batchSize' => $in{'limit'}))
+        ->prefix($SF_PREFIX)->uri($SF_URI);
     my $client = $self->_get_client();
-    my $r = $client->query( SOAP::Data->type( 'string' => $in{'query'} ),
-        $limit, $self->_get_session_header() );
+    my $r      = $client->query(SOAP::Data->type('string' => $in{'query'}),
+        $limit, $self->_get_session_header());
 
     unless ($r) {
         die "could not query " . $in{'query'};
     }
-    if ( $r->fault() ) {
-        die( $r->faultstring() );
+    if ($r->fault()) {
+        die($r->faultstring());
     }
     return $r;
 }
-
 
 =head2 queryAll( HASH )
 
@@ -1206,7 +1281,7 @@ sub describeMetadata {
 
     my $r = $client->call(
           $method =>
-          SOAP::Data->prefix($SF_PREFIX)->name( 'asOfVersion' )->value( $SF_APIVERSION ), $self->_get_session_header_meta() );
+          SOAP::Data->prefix($SF_PREFIX)->name( 'asOfVersion' )->value( $self->{sf_version} ), $self->_get_session_header_meta() );
     unless ($r) {
         die "could not call method $method";
     }
@@ -1217,7 +1292,7 @@ sub describeMetadata {
 }
 
 
-=head2 retrieveMetadata()
+=head2 retrieveMetadata
 
 =cut
 
@@ -1226,35 +1301,35 @@ sub retrieveMetadata {
     my %list = @_;
     my @req;
     foreach my $i (keys %list) {
-       push (@req,SOAP::Data->name('types'=>
-                        \SOAP::Data->value(
-                            SOAP::Data->name('members'=>$list{$i}),
-                            SOAP::Data->name('name'=>$i)
-                        )
-                    ));
+        push(
+           @req,
+           SOAP::Data->name(
+                'types' => \SOAP::Data->value(
+                    SOAP::Data->name('members' => $list{$i}),
+                    SOAP::Data->name('name' => $i)
+                )
+            )
+        );
     }
     my $client = $self->_get_client_meta(1);
-    my $method =
-      SOAP::Data->name('retrieve')->prefix($SF_PREFIX)->uri($SF_URIM);
+    my $method = SOAP::Data->name('retrieve')->prefix($SF_PREFIX)->uri($SF_URIM);
     my $r = $client->call(
-            $method,
-            $self->_get_session_header_meta(),
-SOAP::Data->name('retrieveRequest'=>
-       \SOAP::Data->value(
-       SOAP::Data->name( 'apiVersion'=>$SF_APIVERSION),
-       SOAP::Data->name( 'singlePackage'=>'true'),
-       SOAP::Data->name('unpackaged'=>
-                   \SOAP::Data->value( @req
-           ,SOAP::Data->name('version'=>$SF_APIVERSION))
-         )
-       )
-     )
+        $method,
+        $self->_get_session_header_meta(),
+        SOAP::Data->name('retrieveRequest' => \SOAP::Data->value(
+            SOAP::Data->name('apiVersion' => $self->{sf_version}),
+            SOAP::Data->name('singlePackage' => 'true'),
+            SOAP::Data->name('unpackaged' => \SOAP::Data->value(
+                @req,
+                SOAP::Data->name('version' => $self->{sf_version})
+            ))
+        ))
     );
     unless ($r) {
         die "could not call method $method";
     }
-    if ( $r->fault() ) {
-        die( $r->faultstring() );
+    if ($r->fault()) {
+        die($r->faultstring());
     }
     $r = $r->valueof('//retrieveResponse/result');
     return $r;

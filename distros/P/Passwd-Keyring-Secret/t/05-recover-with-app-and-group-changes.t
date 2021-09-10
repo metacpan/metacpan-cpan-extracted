@@ -16,7 +16,13 @@ BEGIN
         plan skip_all => "Session D-Bus not available (not running a desktop session?), skipping tests";
     }
 
-    require_ok('Passwd::Keyring::Secret') or BAIL_OUT("Cannot load Passwd::Keyring::Secret");
+    ok(eval { require Passwd::Keyring::Secret; 1 }, "load Passwd::Keyring::Secret");
+
+    if ($@)
+    {
+        diag($@);
+        BAIL_OUT("OS unsupported");
+    }
 }
 
 my $USER = 'Paul Anton';
@@ -36,8 +42,14 @@ subtest "test with App1 and Group1" => sub
 {
     plan tests => 4;
 
-    my $secrets = Passwd::Keyring::Secret->new(app => $APP1, group => $GROUP1, alias => 'session');
+    my $secrets = eval { Passwd::Keyring::Secret->new(app => $APP1, group => $GROUP1, alias => 'session') };
     isa_ok($secrets, 'Passwd::Keyring::Secret', "new keyring object");
+
+    if ($@)
+    {
+        diag($@);
+        BAIL_OUT("OS unsupported");
+    }
 
     is($secrets->get_password($USER, $REALM), undef, "initially unset password");
 

@@ -5,7 +5,7 @@ package Config::XrmDatabase::Util;
 use v5.26;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 use Config::XrmDatabase::Failure ':all';
 
@@ -183,7 +183,7 @@ Config::XrmDatabase::Util - Constants that won't change, and other utilitarian t
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 SUBROUTINES
 

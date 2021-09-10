@@ -15,9 +15,9 @@ use SPVM 'TestCase::LINERN';
 # Start objects count
 my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
-ok(TestCase::LINEN->line);
-ok(TestCase::LINER->line);
-ok(TestCase::LINERN->line);
+ok(SPVM::TestCase::LINEN->line);
+ok(SPVM::TestCase::LINER->line);
+ok(SPVM::TestCase::LINERN->line);
 
 # All object is freed
 my $end_memory_blocks_count = SPVM::get_memory_blocks_count();

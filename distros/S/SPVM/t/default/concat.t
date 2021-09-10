@@ -16,16 +16,16 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
 # Concat
 {
-  ok(TestCase::Concat->concat_empty_string);
-  ok(TestCase::Concat->concat_string);
-  ok(TestCase::Concat->concat_left_is_number);
-  ok(TestCase::Concat->concat_right_is_number);
+  ok(SPVM::TestCase::Concat->concat_empty_string);
+  ok(SPVM::TestCase::Concat->concat_string);
+  ok(SPVM::TestCase::Concat->concat_left_is_number);
+  ok(SPVM::TestCase::Concat->concat_right_is_number);
 }
 
 # Concat exception
 {
-  ok(TestCase::Concat->concat_left_is_undef);
-  ok(TestCase::Concat->concat_right_is_undef);
+  ok(SPVM::TestCase::Concat->concat_left_is_undef);
+  ok(SPVM::TestCase::Concat->concat_right_is_undef);
 }
 
 # All object is freed

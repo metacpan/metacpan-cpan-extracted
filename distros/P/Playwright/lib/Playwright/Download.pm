@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Download;
-$Playwright::Download::VERSION = '0.013';
+$Playwright::Download::VERSION = '0.014';
 use parent 'Playwright::Base';
 
 sub new {
@@ -18,21 +18,21 @@ sub new {
     return $self->SUPER::new(%options);
 }
 
-sub path {
+sub failure {
     my $self = shift;
     return $self->_request(
         args    => [@_],
-        command => 'path',
+        command => 'failure',
         object  => $self->{guid},
         type    => $self->{type}
     );
 }
 
-sub createReadStream {
+sub page {
     my $self = shift;
     return $self->_request(
         args    => [@_],
-        command => 'createReadStream',
+        command => 'page',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -58,21 +58,11 @@ sub delete {
     );
 }
 
-sub failure {
+sub url {
     my $self = shift;
     return $self->_request(
         args    => [@_],
-        command => 'failure',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub page {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'page',
+        command => 'url',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -98,11 +88,21 @@ sub cancel {
     );
 }
 
-sub url {
+sub createReadStream {
     my $self = shift;
     return $self->_request(
         args    => [@_],
-        command => 'url',
+        command => 'createReadStream',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub path {
+    my $self = shift;
+    return $self->_request(
+        args    => [@_],
+        command => 'path',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -152,7 +152,7 @@ Playwright::Download - Automatically generated class for Playwright::Download
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 CONSTRUCTOR
 
@@ -162,30 +162,6 @@ You shouldn't have to call this directly.
 Instead it should be returned to you as the result of calls on Playwright objects, or objects it returns.
 
 =head1 METHODS
-
-=head2 path(@args)
-
-Execute the Download::path playwright routine.
-
-See L<https://playwright.dev/api/class-Download#Download-path> for more information.
-
-=head2 createReadStream(@args)
-
-Execute the Download::createReadStream playwright routine.
-
-See L<https://playwright.dev/api/class-Download#Download-createReadStream> for more information.
-
-=head2 suggestedFilename(@args)
-
-Execute the Download::suggestedFilename playwright routine.
-
-See L<https://playwright.dev/api/class-Download#Download-suggestedFilename> for more information.
-
-=head2 delete(@args)
-
-Execute the Download::delete playwright routine.
-
-See L<https://playwright.dev/api/class-Download#Download-delete> for more information.
 
 =head2 failure(@args)
 
@@ -199,6 +175,24 @@ Execute the Download::page playwright routine.
 
 See L<https://playwright.dev/api/class-Download#Download-page> for more information.
 
+=head2 suggestedFilename(@args)
+
+Execute the Download::suggestedFilename playwright routine.
+
+See L<https://playwright.dev/api/class-Download#Download-suggestedFilename> for more information.
+
+=head2 delete(@args)
+
+Execute the Download::delete playwright routine.
+
+See L<https://playwright.dev/api/class-Download#Download-delete> for more information.
+
+=head2 url(@args)
+
+Execute the Download::url playwright routine.
+
+See L<https://playwright.dev/api/class-Download#Download-url> for more information.
+
 =head2 saveAs(@args)
 
 Execute the Download::saveAs playwright routine.
@@ -211,11 +205,17 @@ Execute the Download::cancel playwright routine.
 
 See L<https://playwright.dev/api/class-Download#Download-cancel> for more information.
 
-=head2 url(@args)
+=head2 createReadStream(@args)
 
-Execute the Download::url playwright routine.
+Execute the Download::createReadStream playwright routine.
 
-See L<https://playwright.dev/api/class-Download#Download-url> for more information.
+See L<https://playwright.dev/api/class-Download#Download-createReadStream> for more information.
+
+=head2 path(@args)
+
+Execute the Download::path playwright routine.
+
+See L<https://playwright.dev/api/class-Download#Download-path> for more information.
 
 =head2 on(@args)
 

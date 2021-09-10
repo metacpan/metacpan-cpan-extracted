@@ -15,9 +15,9 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
 # Array
 {
-  ok(TestCase::Unless->unless_ok);
-  ok(TestCase::Unless->unless_not_ok);
-  ok(TestCase::Unless->unless_else);
+  ok(SPVM::TestCase::Unless->unless_ok);
+  ok(SPVM::TestCase::Unless->unless_not_ok);
+  ok(SPVM::TestCase::Unless->unless_else);
 }
 
 # All object is freed

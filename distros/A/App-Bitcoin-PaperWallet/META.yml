@@ -1,0 +1,30 @@
+---
+abstract: 'Generate printable cold storage of bitcoins'
+author:
+  - 'Bartosz Jarzyna <brtastic.dev@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Bitcoin-PaperWallet
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Bitcoin::Crypto: '0'
+  List::Util: '1.29'
+  Text::QRCode: '0'
+  perl: '5.012000'
+resources:
+  bugtracker: https://github.com/brtastic/perl-app-bitcoin-paperwallet/issues
+  license: https://dev.perl.org/licenses
+  repository: https://github.com/brtastic/perl-app-bitcoin-paperwallet.git
+version: '1.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

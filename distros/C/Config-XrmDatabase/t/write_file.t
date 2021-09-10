@@ -2,14 +2,22 @@
 
 use Test2::V0;
 
-use JSON::PP;
-use File::Slurper;
 use Test::TempDir::Tiny;
 use Config::XrmDatabase;
 
 my $config = 't/configs/config001';
 
-my $db  = Config::XrmDatabase->read_file( $config );
+open my $fh, '<', $config
+  or die( "unable to open test configuration '$config'" );
+
+my $db = Config::XrmDatabase->new;
+
+while( my $record = $fh->getline ) {
+    chomp $record;
+    my ( $key, $value ) = split( /\s*:\s*/, $record, 2 );
+    $db->insert( $key, $value );
+}
+
 my $exp = $db->TO_HASH;
 
 my $got;

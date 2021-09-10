@@ -9,4 +9,4 @@ use SPVM 'MyOpenMP';
 # Initialize SPVM
 
 
-MyOpenMP->test;
+SPVM::MyOpenMP->test;

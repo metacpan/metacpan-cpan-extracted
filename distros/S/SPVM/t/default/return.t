@@ -20,7 +20,7 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 # Optional tests
 {
   {
-    ok(TestCase::Return->return_implicite_convertion);
+    ok(SPVM::TestCase::Return->return_implicite_convertion);
   }
 }
 

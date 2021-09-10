@@ -390,9 +390,10 @@ apc_widget_create( Handle self, Handle owner, Bool sync_paint,
 	}
 
 	XX-> client = X_WINDOW = XCreateWindow( DISP, parent,
-									0, 0, 1, 1, 0, XX-> visual-> depth,
-									InputOutput, XX-> visual-> visual,
-									valuemask, &attrs);
+		0, 0, 1, 1, 0, XX-> visual-> depth,
+		InputOutput, XX-> visual-> visual,
+		valuemask, &attrs
+	);
 	XCHECKPOINT;
 	if (!X_WINDOW) {
 		warn("error creating window");
@@ -471,10 +472,7 @@ apc_widget_begin_paint( Handle self, Bool inside_on_paint)
 	if ( guts. dynamicColors && inside_on_paint) prima_palette_free( self, false);
 	prima_no_cursor( self);
 	prima_prepare_drawable_for_painting( self, inside_on_paint);
-#ifdef HAVE_X11_EXTENSIONS_XRENDER_H
-	if ( XF_LAYERED(XX) )
-		XX->argb_picture = XRenderCreatePicture( DISP, XX->gdrawable, guts. xrender_argb_pic_format, 0, NULL);
-#endif
+	CREATE_ARGB_PICTURE(XX->gdrawable, XF_LAYERED(XX) ? 32 : 0, XX->argb_picture);
 	if ( useRPDraw) {
 		Handle owner = PWidget(self)->owner;
 		Point po = apc_widget_get_pos( self);
@@ -630,12 +628,7 @@ apc_widget_end_paint( Handle self)
 		XChangeGC( DISP, XX->gc, GCPlaneMask, &gcv);
 	}
 
-#ifdef HAVE_X11_EXTENSIONS_XRENDER_H
-	if ( XF_LAYERED(XX) && XX->argb_picture ) {
-		XRenderFreePicture( DISP, XX->argb_picture);
-		XX->argb_picture = 0;
-	}
-#endif
+	DELETE_ARGB_PICTURE(XX->argb_picture);
 	prima_cleanup_drawable_after_painting( self);
 	prima_update_cursor( self);
 	return true;

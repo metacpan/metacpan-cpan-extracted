@@ -4,30 +4,30 @@ package SPVM::Short;
 
 =head1 NAME
 
-SPVM::Short - Short object
+SPVM::Short - Short in SPVM | Short object
 
 =head1 SYNOPSYS
   
-  use SPVM::Short;
+  use Short;
   
-  my $short_object = SPVM::Short->new(5);
+  my $short_object = Short->new(5);
   my $short_value = $short_object->value;
 
 =head1 DESCRIPTION
 
-L<SPVM::Short> object stores a C<short> value.
+L<Short|SPVM::Short> object stores a C<short> value.
 
 This object is immutable and its value cannot be changed.
 
-L<SPVM::Short> is automatically loaded just after the program starts.
+L<Short|SPVM::Short> is automatically loaded just after the program starts.
 
-=head1 STATIC METHODS
+=head1 CLASS METHODS
 
 =head2 new
 
-  sub new : SPVM::Short ($value : short)
+  sub new : Short ($value : short)
 
-Create a new L<SPVM::Short> object with a C<short> value.
+Create a new L<Short|SPVM::Short> object with a C<short> value.
 
 =head1 INSTANCE METHODS
 

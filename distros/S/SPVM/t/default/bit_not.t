@@ -21,11 +21,11 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 {
   # Bit not - Operation
   {
-    ok(TestCase::BitNot->bit_not_byte);
-    ok(TestCase::BitNot->bit_not_short);
-    ok(TestCase::BitNot->bit_not_int);
-    ok(TestCase::BitNot->bit_not_int_theory);
-    ok(TestCase::BitNot->bit_not_long);
+    ok(SPVM::TestCase::BitNot->bit_not_byte);
+    ok(SPVM::TestCase::BitNot->bit_not_short);
+    ok(SPVM::TestCase::BitNot->bit_not_int);
+    ok(SPVM::TestCase::BitNot->bit_not_int_theory);
+    ok(SPVM::TestCase::BitNot->bit_not_long);
   }
 
   # Bit not - Compile Error

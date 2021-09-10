@@ -4,7 +4,7 @@
       "Wesley Schwengle <waterkip@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "bsd"
    ],
@@ -80,7 +80,7 @@
    "provides" : {
       "WebService::Postex" : {
          "file" : "lib/WebService/Postex.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -91,7 +91,7 @@
          "web" : "https://gitlab.com/opndev/perl5/webservice-postex"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_contributors" : [
       "Wesley Schwengle <wesley@opndev.io>"
    ],

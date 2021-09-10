@@ -8,7 +8,14 @@ use Test::More;
 BEGIN
 {
     plan tests => 1;
-    require_ok('Passwd::Keyring::Secret') or BAIL_OUT("Cannot load Passwd::Keyring::Secret");
+
+    ok(eval { require Passwd::Keyring::Secret; 1 }, "load Passwd::Keyring::Secret");
+
+    if ($@)
+    {
+        diag($@);
+        BAIL_OUT("OS unsupported");
+    }
 }
 
 diag("Testing Passwd::Keyring::Secret $Passwd::Keyring::Secret::VERSION, Perl $], $^X");

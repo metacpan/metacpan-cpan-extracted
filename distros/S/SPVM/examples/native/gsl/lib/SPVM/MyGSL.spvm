@@ -1,0 +1,3 @@
+class MyGSL {
+  native sub stat : void ();
+}

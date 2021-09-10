@@ -238,7 +238,7 @@ should apply to RxPerl too).
         my $source = rx_interval(1)->pipe( op_take(10) );
         my ($o1, $o2) = rx_partition(
             $source,
-            sub { $_[0] % 2 == 1 },
+            sub ($value, $index) { $value % 2 == 1 },
         );
         rx_concat($o1, $o2)->subscribe($observer);
 

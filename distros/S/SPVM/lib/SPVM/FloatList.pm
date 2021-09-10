@@ -4,17 +4,17 @@ package SPVM::FloatList;
 
 =head1 NAME
 
-SPVM::FloatList - Dynamic float array
+SPVM::FloatList - FloatList in SPVM | Dynamic float array
 
 =head1 SYNOPSYS
   
-  use SPVM::FloatList;
+  use FloatList;
   
   # Create a float list
-  my $float_list = SPVM::FloatList->new_len(10);
+  my $float_list = FloatList->new_len(10);
 
   # Create a float list with array
-  my $float_list = SPVM::FloatList->new([1.5f, 2.5f, 3.5f]);
+  my $float_list = FloatList->new([1.5f, 2.5f, 3.5f]);
   
   # Get list length
   my $length = $float_list->length;
@@ -43,20 +43,20 @@ SPVM::FloatList - Dynamic float array
   # Remove float value
   my $float_value = $float_list->remove(1);
 
-  # Convert SPVM::FloatList to float array.
+  # Convert FloatList to float array.
   my $float_array = $float_list->to_array;
 
 =head1 DESCRIPTION
 
-L<SPVM::FloatList> is dynamic float array.
+L<FloatList|SPVM::FloatList> is dynamic float array.
 
-=head1 STATIC METHODS
+=head1 CLASS METHODS
 
 =head2 new
 
-    sub new : SPVM::FloatList ($array : float[])
+    sub new : FloatList ($array : float[])
 
-Create a new L<SPVM::FloatList> object with specific C<float> array.
+Create a new L<FloatList|SPVM::FloatList> object with specific C<float> array.
 
 Internally, new array is created, and each element of argument array is copied to internal array.
 
@@ -64,9 +64,9 @@ If array is undef, 0-length internal array is created.
 
 =head2 new_len
 
-    sub new_len : SPVM::FloatList ($length : int)
+    sub new_len : FloatList ($length : int)
 
-Create a new L<SPVM::FloatList> object with array length.
+Create a new L<FloatList|SPVM::FloatList> object with array length.
 
 =head1 INSTANCE METHODS
 
@@ -143,7 +143,7 @@ If there are no elements in the list, exception occur.
 
   sub to_array : float[] ($self : self)
 
-Convert L<SPVM::FloatList> to float array.
+Convert L<FloatList|SPVM::FloatList> to float array.
 
 =head2 unshift
 

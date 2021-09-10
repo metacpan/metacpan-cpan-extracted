@@ -1008,7 +1008,7 @@ MSCVER
 		'include/generic',
 	);
 
-	push @LIBS, qw(usp10 gdi32 mpr winspool comdlg32 msimg32 ole32 uuid) if $Win32; # add more when appropriate
+	push @LIBS, qw(usp10 gdi32 gdiplus mpr winspool comdlg32 msimg32 ole32 uuid) if $Win32; # add more when appropriate
 	push @LIBPATH, '/usr/lib/w32api' if $cygwin;
 	if ($^O eq 'solaris') {
 		push @LIBPATH, '/opt/csw/lib';
@@ -1058,6 +1058,7 @@ sub setup_defines
 	have_funcs_in( 'stdlib.h', 'reallocf');
 	have_funcs_in( 'strings.h', 'bzero');
 	have_funcs_in( 'string.h', 'memmem');
+	have_funcs_in( 'unistd.h', 'eaccess');
 	if ( $Win32) {
 		have_type( "BOOLEAN", "windows.h");
 	}
@@ -1703,7 +1704,7 @@ sub setup_macosx
 	printlog "Can compile with Cocoa...";
 	my $old_ldflags = $LDFLAGS;
 
-	$LDFLAGS .= ' -framework Foundation /System/Library/Frameworks/Cocoa.framework/Cocoa';
+	$LDFLAGS .= ' -framework Cocoa';
 	my $ok = compile(<<TEXT);
 #import <ApplicationServices/ApplicationServices.h>
 int main() {

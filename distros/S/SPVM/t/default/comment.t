@@ -16,9 +16,9 @@ use SPVM 'TestCase::Comment::CRLF';
 my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
 {
-  ok(TestCase::Comment::LF->comment);
-  ok(TestCase::Comment::CR->comment);
-  ok(TestCase::Comment::CRLF->comment);
+  ok(SPVM::TestCase::Comment::LF->comment);
+  ok(SPVM::TestCase::Comment::CR->comment);
+  ok(SPVM::TestCase::Comment::CRLF->comment);
 }
 
 # All object is freed

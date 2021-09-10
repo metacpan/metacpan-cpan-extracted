@@ -38,6 +38,7 @@ do { my $x = {
                                       'IO::Socket::SSL' => '1.94',
                                       'LWP::Protocol::https' => '6.00',
                                       'SOAP::Lite' => '1.0',
+                                      'URI' => '0',
                                       'base' => '0',
                                       'perl' => '5.008001',
                                       'strict' => '0',

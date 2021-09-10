@@ -15,6 +15,7 @@
    "name" : "Game-Life-Faster",
    "no_index" : {
       "directory" : [
+         "eg",
          "inc",
          "t",
          "xt"
@@ -49,7 +50,7 @@
    "provides" : {
       "Game::Life::Faster" : {
          "file" : "lib/Game/Life/Faster.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -67,6 +68,6 @@
          "web" : "https://github.com/trwyant/perl-Game-Life-Faster"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

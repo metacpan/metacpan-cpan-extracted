@@ -1,0 +1,22 @@
+#!/usr/bin/env perl
+use 5.14.0;
+use warnings;
+use Carp;
+
+use Perl5::Build::Warnings;
+
+croak "Must provide path to 'make' output"
+    unless @ARGV;
+
+my @inputs = @ARGV;
+for (@inputs) {
+    croak "Cannot locate file '$_'" unless -f $_;
+}
+
+for my $f (@inputs) {
+    say "File:  $f";
+    say '';
+    my $self = Perl5::Build::Warnings->new( { file => $f } );
+    $self->report_warnings_groups;
+    say '';
+}

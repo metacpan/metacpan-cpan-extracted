@@ -4,7 +4,7 @@
       "Felipe Gasper (FELIPE)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -42,8 +42,8 @@
             "Test::Class" : "0.4",
             "Test::Deep" : "0",
             "Test::Exception" : "0",
-            "Test::More" : "0.01",
-            "Test::NoWarnings" : "0"
+            "Test::FailWarnings" : "0",
+            "Test::More" : "0.01"
          }
       }
    },
@@ -55,6 +55,6 @@
          "web" : "https://github.com/FGasper/p5-Math-ProvablePrime"
       }
    },
-   "version" : 0.045,
+   "version" : "0.51",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

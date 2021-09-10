@@ -4,36 +4,36 @@ package SPVM::Regex;
 
 =head1 NAME
 
-SPVM::Regex - Regular expression
+SPVM::Regex - Regex in SPVM | Regular expression
 
 =head1 SYNOPSYS
   
-  use SPVM::Regex;
+  use Regex;
   
   # Pattern match
   {
-    my $re = SPVM::Regex->new("ab*c");
+    my $re = Regex->new("ab*c");
     my $target = "zabcz";
     my $match = $re->match($target, 0);
   }
 
   # Pattern match - UTF-8
   {
-    my $re = SPVM::Regex->new("あ+");
+    my $re = Regex->new("あ+");
     my $target = "いあああい";
     my $match = $re->match($target, 0);
   }
 
   # Pattern match - Character class and the nagation
   {
-    my $re = SPVM::Regex->new("[A-Z]+[^A-Z]+");
+    my $re = Regex->new("[A-Z]+[^A-Z]+");
     my $target = "ABCzab";
     my $match = $re->match($target, 0);
   }
 
   # Pattern match with captures
   {
-    my $re = SPVM::Regex->new("^(\w+) (\w+) (\w+)$");
+    my $re = Regex->new("^(\w+) (\w+) (\w+)$");
     my $target = "abc1 abc2 abc3";
     my $match = $re->match($target, 0);
     
@@ -46,7 +46,7 @@ SPVM::Regex - Regular expression
   
   # Replace
   {
-    my $re = SPVM::Regex->new("abc");
+    my $re = Regex->new("abc");
     my $target = "ppzabcz";
     
     # "ppzABCz"
@@ -57,18 +57,18 @@ SPVM::Regex - Regular expression
 
   # Replace with a callback and capture
   {
-    my $re = SPVM::Regex->new("a(bc)");
+    my $re = Regex->new("a(bc)");
     my $target = "ppzabcz";
     
     # "ppzABbcCz"
-    my $result = $re->replace_cb($target, 0, sub : string ($self : self, $re : SPVM::Regex) {
+    my $result = $re->replace_cb($target, 0, sub : string ($self : self, $re : Regex) {
       return "AB" . $re->captures->[0] . "C";
     });
   }
 
   # Replace all
   {
-    my $re = SPVM::Regex->new("abc");
+    my $re = Regex->new("abc");
     my $target = "ppzabczabcz";
     
     # "ppzABCzABCz"
@@ -77,22 +77,22 @@ SPVM::Regex - Regular expression
 
   # Replace all with a callback and capture
   {
-    my $re = SPVM::Regex->new("a(bc)");
+    my $re = Regex->new("a(bc)");
     my $target = "ppzabczabcz";
     
     # "ppzABCbcPQRSzABCbcPQRSz"
-    my $result = $re->replace_all_cb($target, 0, sub : string ($self : self, $re : SPVM::Regex) {
+    my $result = $re->replace_all_cb($target, 0, sub : string ($self : self, $re : Regex) {
       return "ABC" . $re->captures->[0] . "PQRS";
     });
   }
   
 =head1 DESCRIPTION
 
-L<SPVM::Regex> provides regular expression functions.
+L<Regex|SPVM::Regex> provides regular expression functions.
 
 =head1 REGULAR EXPRESSION SYNTAX
 
-L<SPVM::Regex> provides the methodset of Perl regular expression. The target string and regex string is interpretted as UTF-8 string.
+L<Regex|SPVM::Regex> provides the methodset of Perl regular expression. The target string and regex string is interpretted as UTF-8 string.
   
   # Quantifier
   +     more than or equals to 1 repeats
@@ -127,37 +127,37 @@ B<Regex Options:>
 
 Regex options is used by C<new_with_options> method.
 
-  my $re = SPVM::Regex->new("^ab+c", "sa");
+  my $re = Regex->new("^ab+c", "sa");
 
 B<Limitations:>
 
-L<SPVM::Regex> do not support the same set of characters after a quantifier.
+L<Regex|SPVM::Regex> do not support the same set of characters after a quantifier.
       
   # A exception occurs
-  SPVM::Regex->new("a*a");
-  SPVM::Regex->new("a?a");
-  SPVM::Regex->new("a+a");
-  SPVM::Regex->new("a{1,3}a")
+  Regex->new("a*a");
+  Regex->new("a?a");
+  Regex->new("a+a");
+  Regex->new("a{1,3}a")
       
 If 0 width quantifir is between two same set of characters after a quantifier, it is invalid.
       
   # A exception occurs
-  SPVM::Regex->new("\d+\D*\d+");
-  SPVM::Regex->new("\d+\D?\d+");
+  Regex->new("\d+\D*\d+");
+  Regex->new("\d+\D?\d+");
 
-=head1 STATIC METHODS
+=head1 CLASS METHODS
 
 =head2 new
 
-  my $re = SPVM::Regex->new("^ab+c");
+  my $re = Regex->new("^ab+c");
 
-Create a new L<SPVM::Regex> object and compile the regex.
+Create a new L<Regex|SPVM::Regex> object and compile the regex.
 
 =head2 new_with_options
 
-  my $re = SPVM::Regex->new("^ab+c", "s");
+  my $re = Regex->new("^ab+c", "s");
 
-Create a new L<SPVM::Regex> object and compile the regex with the options.
+Create a new L<Regex|SPVM::Regex> object and compile the regex with the options.
 
 =head1 INSTANCE METHODS
 
@@ -205,9 +205,9 @@ Replace the target string specified with the start byte offset with replace stri
 
 =head2 replace_cb
 
-  sub replace_cb  : string ($self : self, $target : string, $target_offset : int, $replace_cb : SPVM::Regex::Replacer)
+  sub replace_cb  : string ($self : self, $target : string, $target_offset : int, $replace_cb : Regex::Replacer)
 
-Replace the target string specified with the start byte offset with replace callback. The callback must have "replace_to" method defined in L<SPVM::Regex::Replacer>.
+Replace the target string specified with the start byte offset with replace callback. The callback must have "replace_to" method defined in L<Regex::Replacer|SPVM::Regex::Replacer>.
 
 =head2 replace_all
 
@@ -217,6 +217,6 @@ Replace all of the target strings specified with the start byte offset with repl
 
 =head2 replace_all_cb
 
-  sub replace_all_cb  : string ($self : self, $target : string, $target_offset : int, $replace_cb : SPVM::Regex::Replacer)
+  sub replace_all_cb  : string ($self : self, $target : string, $target_offset : int, $replace_cb : Regex::Replacer)
 
-Replace all of the target strings specified with the start byte offset with replace callback. The callback must have "replace_to" method defined in L<SPVM::Regex::Replacer>.
+Replace all of the target strings specified with the start byte offset with replace callback. The callback must have "replace_to" method defined in L<Regex::Replacer|SPVM::Regex::Replacer>.

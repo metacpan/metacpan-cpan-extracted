@@ -5,6 +5,7 @@ Maintainer: Thomas Uhle <uhle@cpan.org>
 Build-Depends: debhelper (>= 12),
  gir1.2-secret-1,
  gnome-keyring,
+ libfile-slurp-perl,
  libglib-object-introspection-perl,
  libmodule-build-perl (>= 0.400400),
  libpod-markdown-perl (>= 2.000000),

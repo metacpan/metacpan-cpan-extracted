@@ -1,0 +1,51 @@
+class TestCase::Lib::Bool {
+  use Bool;
+  
+  sub basic : int () {
+    # true
+    {
+      my $true = Bool->true;
+      
+      # Bool type
+      unless ($true isa Bool) {
+        return 0;
+      }
+      
+      # Singleton
+      unless ($true == Bool->true) {
+        return 0;
+      }
+      
+      # Value
+      my $true_value = $true->value;
+      
+      unless ($true_value == 1) {
+        return 0;
+      }
+    }
+
+    # false
+    {
+      my $false = Bool->false;
+      
+      # Bool type
+      unless ($false isa Bool) {
+        return 0;
+      }
+      
+      # Singleton
+      unless ($false == Bool->false) {
+        return 0;
+      }
+      
+      # Value
+      my $false_value = $false->value;
+      
+      unless ($false_value == 0) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+}

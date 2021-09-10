@@ -1,5 +1,10 @@
 Revision history for WebService-Postex
 
+0.003     2021-09-09 15:08:16Z
+
+    * Create trigger for custom LWP object to keep the default headers
+      for Accept and Authorisation
+
 0.002     2021-03-30 15:21:35Z
 
     * Use full path of base URI to send messages too

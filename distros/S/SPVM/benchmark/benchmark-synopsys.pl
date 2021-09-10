@@ -25,13 +25,13 @@ my $result = timethese($bench_count, {
     perl_sum($loop_count);
   },
   spvm_sum => sub {
-    MyMath->spvm_sum($loop_count);
+    SPVM::MyMath->spvm_sum($loop_count);
   },
   spvm_sum_precompile => sub {
-    MyMathPrecompile->spvm_sum($loop_count);
+    SPVM::MyMathPrecompile->spvm_sum($loop_count);
   },
   spvm_sum => sub {
-    MyMathNative->spvm_sum($loop_count);
+    SPVM::MyMathNative->spvm_sum($loop_count);
   },
 });
 

@@ -4,14 +4,14 @@ package SPVM::Time::Info;
 
 =head1 NAME
 
-SPVM::Time::Info - Time information
+SPVM::Time::Info - Time::Info in SPVM | Time information
 
 =head1 SYNOPSYS
   
-  use SPVM::Time::Info;
+  use Time::Info;
   
   # Time information
-  my $time_info = SPVM::Time::Info->new;
+  my $time_info = Time::Info->new;
   
   # Set and get second
   my $sec = $time_info->sec;
@@ -53,15 +53,15 @@ SPVM::Time::Info - Time information
 
 Time information
 
-=head1 STATIC METHODS
+=head1 CLASS METHODS
 
 =head2 new
 
-  sub new : SPVM::Time::Info ()
+  sub new : Time::Info ()
 
-Create a new L<SPVM::Time::Info> object.
+Create a new L<Time::Info|SPVM::Time::Info> object.
 
-  my $time_info = SPVM::Time::Info->new;
+  my $time_info = Time::Info->new;
 
 =head1 INSTANCE METHODS
 

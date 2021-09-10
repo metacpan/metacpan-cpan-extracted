@@ -1,5 +1,22 @@
 Revision history for Config-XrmDatabase
 
+0.06      2021-09-09 17:16:32-04:00 America/New_York
+
+  [BUG FIX]
+
+    * stringified version of db (via write_file or to_string) was
+      missing a trailing newline
+
+0.05      2021-09-09 17:16:32-04:00 America/New_York
+
+  [BUG FIX]
+
+    * write_file wasn't loading a required module
+
+  [ENHANCEMENT]
+
+    * add to_string method
+
 0.04      2021-08-24 15:51:23-04:00 America/New_York
 
   [ENHANCEMENT]

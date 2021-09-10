@@ -76,13 +76,13 @@ Benchmark raw output
       perl_sum($loop_count);
     },
     spvm_sum => sub {
-      MyMath->spvm_sum($loop_count);
+      SPVM::MyMath->spvm_sum($loop_count);
     },
     spvm_sum_precompile => sub {
-      MyMathPrecompile->spvm_sum($loop_count);
+      SPVM::MyMathPrecompile->spvm_sum($loop_count);
     },
     spvm_sum => sub {
-      MyMathNative->spvm_sum($loop_count);
+      SPVM::MyMathNative->spvm_sum($loop_count);
     },
   });
 
@@ -99,9 +99,9 @@ Benchmark raw output
     return $total;
   }
 
-B<MyMath.spvm>
+B<SPVM/MyMath.spvm>
 
-  package MyMath {
+  class MyMath {
     sub spvm_sum : int ($loop_count : int) {
       
       my $total = 0;
@@ -113,9 +113,9 @@ B<MyMath.spvm>
     }
   }
 
-B<MyMathPrecompile.spvm>
+B<SPVM/MyMathPrecompile.spvm>
 
-  package MyMathPrecompile : precompile {
+  class MyMathPrecompile : precompile {
     sub spvm_sum : int ($loop_count : int) {
       
       my $total = 0;
@@ -127,13 +127,13 @@ B<MyMathPrecompile.spvm>
     }
   }
 
-B<MyMathNative.spvm>
+B<SPVM/MyMathNative.spvm>
 
-  package MyMathNative {
+  class MyMathNative {
     native sub spvm_sum : int ($loop_count : int);
   }
 
-B<MyMath.config>
+B<SPVM/MyMath.config>
 
   use strict;
   use warnings;
@@ -144,11 +144,11 @@ B<MyMath.config>
 
   $bconf;
 
-B<MyMathNative.c>
+B<SPVM/MyMathNative.c>
 
   #include "spvm_native.h"
 
-  int32_t SPNATIVE__MyMathNative__spvm_sum(SPVM_ENV* env, SPVM_VALUE* stack) {
+  int32_t SPVM__SPVM__MyMathNative__spvm_sum(SPVM_ENV* env, SPVM_VALUE* stack) {
     
     int32_t loop_count = stack[0].ival;
 

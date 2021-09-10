@@ -16,6 +16,7 @@ use Test::EOL;
 
 my @files = (
     'bin/playwright_server',
+    'bin/reap_playwright_servers',
     'lib/Playwright.pm',
     'lib/Playwright/Accessibility.pm',
     'lib/Playwright/Android.pm',

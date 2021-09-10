@@ -4,13 +4,13 @@ package SPVM::Comparator::Short;
 
 =head1 NAME
 
-SPVM::Comparator::Short - a callback interface for short comparation
+SPVM::Comparator::Short - Comparator::Short in SPVM | a callback interface for short comparation
 
 =head1 SYNOPSYS
   
-  use SPVM::Comparator::Short;
+  use Comparator::Short;
   
-  my $comparator : SPVM::Comparator::Short = sub : int ($self : self, $a : short, $b : short); {
+  my $comparator : Comparator::Short = sub : int ($self : self, $a : short, $b : short); {
     return $a <=> $b;
   };
   
@@ -18,7 +18,7 @@ SPVM::Comparator::Short - a callback interface for short comparation
 
 =head1 DESCRIPTION
 
-L<SPVM::Comparator::Short> is a callback interface to compare two short values.
+L<Comparator::Short|SPVM::Comparator::Short> is a callback interface to compare two short values.
 
 =head1 CALLBACK METHOD INTERFACE
 

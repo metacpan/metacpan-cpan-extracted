@@ -1,0 +1,13 @@
+---
+seq:
+  - par:
+    - t/cpan-meta.t
+    - t/cpan-meta-json.t
+    - t/manifest.t
+    - t/pod.t
+    - t/pod-coverage.t
+    - t/pod-linkcheck.t
+    - t/kwalitee.t
+  - seq:
+    - t/0*.t
+    - t/show-config-log.t

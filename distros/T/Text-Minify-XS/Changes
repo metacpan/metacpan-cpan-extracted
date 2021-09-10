@@ -1,5 +1,9 @@
 Revision history for Text-Minify-XS:
 
+v0.4.3    2021-09-10 08:38:34+01:00 Europe/London
+  [Tests]
+  - Improve tests for malformed UTF-8 on some platforms.
+
 v0.4.2    2021-06-21 16:48:35+01:00 Europe/London
   [Documentation]
   - Updated SEE ALSO section.

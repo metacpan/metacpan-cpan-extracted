@@ -6,6 +6,6 @@ use lib "$FindBin::Bin/lib";
 
 use SPVM 'BindCLib';
 
-my $total = BindCLib->sum([1, 2, 3, 4]);
+my $total = SPVM::BindCLib->sum([1, 2, 3, 4]);
 
 print "Total: $total\n";

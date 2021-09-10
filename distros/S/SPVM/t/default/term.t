@@ -19,7 +19,7 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
 # Spec tests
 {
-  ok(TestCase::Term->evaluate_left_to_right);
+  ok(SPVM::TestCase::Term->evaluate_left_to_right);
 }
 
 # All object is freed

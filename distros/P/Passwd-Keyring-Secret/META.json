@@ -25,15 +25,17 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "File::Slurp" : "0",
             "Module::Build" : "0.19",
-            "Pod::Markdown" : "2.000",
-            "Pod::Readme" : "1.001002",
-            "Test::More" : "0.88"
+            "Test::More" : "0.88",
+            "vars" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.4004"
+            "Module::Build" : "0.4004",
+            "Pod::Markdown" : "2.000",
+            "Pod::Readme" : "1.001002"
          }
       },
       "runtime" : {
@@ -57,7 +59,7 @@
    "provides" : {
       "Passwd::Keyring::Secret" : {
          "file" : "Secret.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       }
    },
    "release_status" : "stable",
@@ -75,6 +77,6 @@
          "web" : "https://gitlab.com/uhle/Passwd-Keyring-Secret"
       }
    },
-   "version" : "1.00",
+   "version" : "1.01",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }
