@@ -5,7 +5,7 @@ use warnings;
 use Devel::Git::MultiBisect::AllCommits;
 use Devel::Git::MultiBisect::Transitions;
 use Devel::Git::MultiBisect::Opts qw( process_options );
-use Test::More tests => 351;
+use Test::More tests => 352;
 use Carp;
 use Cwd;
 use File::Spec;
@@ -423,7 +423,7 @@ SKIP: {
 note("Block 4");
 
 SKIP: {
-    skip "No git checkout of dummyrepo found", 197
+    skip "No git checkout of dummyrepo found", 198
     unless (
         $ENV{PERL_DUMMYREPO_GIT_CHECKOUT_DIR}
             and
@@ -533,12 +533,18 @@ SKIP: {
 
     note("Second object");
 
-    my ($Tself, $Ttransitions, $commit_range, $idx, $initial_multisected_outputs, $initial_multisected_outputs_undef_count);
+    my ($Tparams, $Tself, $Ttransitions, $commit_range, $idx);
+    my ($initial_multisected_outputs, $initial_multisected_outputs_undef_count);
     my ($multisected_outputs, $timings);
 
-    $Tself = Devel::Git::MultiBisect::Transitions->new({ %{$params}, verbose => 1 });
+    $Tparams = { %{$params}, verbose => 1 };
+    $Tself = Devel::Git::MultiBisect::Transitions->new($Tparams);
     ok($Tself, "new() returned true value");
     isa_ok($Tself, 'Devel::Git::MultiBisect::Transitions');
+    for my $attr (qw| probe |) {
+        ok(! exists $Tself->{$attr},
+            "AllCommits has no need of '$attr' attribute");
+    }
 
     $commit_range = $Tself->get_commits_range;
 

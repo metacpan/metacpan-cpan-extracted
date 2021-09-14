@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Getopt::Long" => "2.50",
     "Module::FeaturesUtil::Check" => "0.002",
-    "Module::FeaturesUtil::Get" => "0.003",
+    "Module::FeaturesUtil::Get" => "0.004",
     "Test::Builder" => 0,
     "Test::More" => 0,
     "strict" => 0,
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,7 +48,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Module::FeaturesUtil::Check" => "0.002",
-  "Module::FeaturesUtil::Get" => "0.003",
+  "Module::FeaturesUtil::Get" => "0.004",
   "Test::Builder" => 0,
   "Test::More" => 0,
   "strict" => 0,

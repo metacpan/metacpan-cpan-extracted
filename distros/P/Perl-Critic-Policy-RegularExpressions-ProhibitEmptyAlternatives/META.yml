@@ -22,13 +22,14 @@ meta-spec:
 name: Perl-Critic-Policy-RegularExpressions-ProhibitEmptyAlternatives
 no_index:
   directory:
+    - examples
     - inc
     - t
     - xt
 provides:
   Perl::Critic::Policy::RegularExpressions::ProhibitEmptyAlternatives:
     file: lib/Perl/Critic/Policy/RegularExpressions/ProhibitEmptyAlternatives.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Carp: '0'
   English: '0'
@@ -45,5 +46,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Critic-Policy-RegularExpressions-ProhibitEmptyAlternatives
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Perl-Critic-Policy-RegularExpressions-ProhibitEmptyAlternatives.git
-version: '0.004'
+version: '0.005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -6,12 +6,12 @@ use Carp;
 use Perl::PrereqScanner::NotQuiteLite::Context;
 use Perl::PrereqScanner::NotQuiteLite::Util;
 
-our $VERSION = '0.9913';
+our $VERSION = '0.9914';
 
 our @BUNDLED_PARSERS = qw/
   Aliased AnyMoose Autouse Catalyst ClassAccessor
   ClassAutouse ClassLoad Core Inline KeywordDeclare Later
-  Mixin ModuleRuntime MojoBase Moose MooseXDeclare Only
+  Mixin ModuleRuntime MojoBase Moose MooseXDeclare ObjectPad Only
   PackageVariant Plack POE Prefork Superclass Syntax SyntaxCollector
   TestClassMost TestMore TestRequires UniversalVersion Unless
 /;

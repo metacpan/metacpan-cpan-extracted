@@ -1,5 +1,13 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.001008 2021 September 14
+          - More changes to the way the exporter works.   Shouldn't break anything but this
+          change will setup the code to be more compatible with Object::Pad, which is the
+          sketch for Cor, the possible new Perl object system.  This way we start the process
+          of being Cor friendly.
+          - Some documentation cleanup and additions around how internationalized works. Its
+          still underdocumented (volunteers very welcomed).
+
 0.001007 2021 September 06 
           - !!! Totally changed the way we aggregate validations and filters from subclasses
           and roles.   All the same validations will run but the run order is likely 

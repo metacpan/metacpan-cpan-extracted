@@ -1,0 +1,58 @@
+\=[POWELLS] [http://www.powells.com/partner/28585]
+
+\==[author] [1] [\class(author)[by \1]]
+\==[editor] [1] [\class(author)[edited by \1]]
+\==[title]  [1] [\h1[\cite[\1]]]
+\==[header] [2]
+    [\heading[Review: \1 by \2][review]\title[\1]\author[\2]]
+\==[edited] [2]
+    [\heading[Review: \1 by \2 (ed.)][review]\title[\1]\editor[\2]]
+\==[isbn]   [1] [\=POWELLS/biblio/\1?p_isbn]
+\==[keyword][1] [\=POWELLS/s?kw=\1]
+\==[buy]    [1]
+    [\class(buy)[\link[\1][\image[../powells.png][Buy at Powell's Books]]]]
+\==[info]   [2] [
+    \div(info)[
+        \table(info)[][\1]
+
+        \buy[\2]]]
+\==[cover]  [3] [
+    \div(info)[
+        \class(cover)[\image[../covers/\3.jpg][Cover image]]
+
+        \table(info)[][\1]
+
+        \buy[\2]]]
+\==[online]  [2] [
+    \div(info)[
+        \class(cover)[\image[../covers/\2.jpg][Cover image]]
+
+        \table(info)[][\1]
+
+        \class(ebook)[This is an on-line work, so metadata may be
+        inaccurate or missing.]]]
+\==[ebook]  [3] [
+    \div(info)[
+        \class(cover)[\image[../covers/\3.jpg][Cover image]]
+
+        \table(info)[][\1]
+
+        \class(ebook)[This is an ebook, so metadata may be inaccurate or
+        missing.  See \link[../notes.html#kindle][notes on ebooks] for more
+        information.]
+
+        \buy[\2]]]
+\==[einfo]  [2] [
+    \div(info)[
+        \table(info)[][\1]
+
+        \class(ebook)[This is an ebook, so metadata may be inaccurate or
+        missing.  See \link[../notes.html#kindle][notes on ebooks] for more
+        information.]
+
+        \buy[\2]]]
+\==[data]   [2] [\tablerow[\class(datahead)[\1:]][\class(data)[\2]]]
+\==[data]   [2] [\tablerow[\class(datahead)[\1:]][\class(data)[\2]]]
+\==[done]   [1] [\class(reviewed)[Reviewed: \1]]
+\==[rating] [1] [\class(rating)[Rating: \1 out of 10]]
+\==[story]  [2] [\class(story)[\class(#s\1)[\2]]]

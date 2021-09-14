@@ -30,5 +30,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://alexschroeder.ch/cgit/text-mapper
-version: 1
+version: 1.02
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

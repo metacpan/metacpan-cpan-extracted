@@ -58,6 +58,7 @@ lib/Duadua/Parser/Browser/SamsungInternetBrowser.pm
 lib/Duadua/Parser/Browser/UCBrowser.pm
 lib/Duadua/Parser/Browser/Vivaldi.pm
 lib/Duadua/Parser/Browser/Xiaomi.pm
+lib/Duadua/Parser/Browser/YahooJapanAppBrowser.pm
 lib/Duadua/Parser/Browser/Yandex.pm
 lib/Duadua/Parser/FeaturePhone/FeaturePhone.pm
 lib/Duadua/Parser/HTTPClient/HTTPClient.pm
@@ -129,6 +130,7 @@ t/testset/browser/samsung_browser.yaml
 t/testset/browser/uc_browser.yaml
 t/testset/browser/vivaldi.yaml
 t/testset/browser/xiaomi.yaml
+t/testset/browser/yahoo_japan_app_browser.yaml
 t/testset/browser/yandex.yaml
 t/testset/feature_phone/feature_phone.yaml
 t/testset/http_client/http_clients.yaml

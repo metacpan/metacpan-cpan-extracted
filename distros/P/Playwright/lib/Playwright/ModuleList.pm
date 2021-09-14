@@ -3,49 +3,51 @@
 # You should not use this directly; use Playwright instead.
 
 package Playwright::ModuleList;
-$Playwright::ModuleList::VERSION = '0.014';
+$Playwright::ModuleList::VERSION = '0.015';
 use strict;
 use warnings;
 
-use Playwright::Request;
-use Playwright::Frame;
+use Playwright::Page;
+use Playwright::FetchResponse;
+use Playwright::FileChooser;
+use Playwright::Electron;
+use Playwright::Android;
+use Playwright::Worker;
 use Playwright::Keyboard;
-use Playwright::JSHandle;
 use Playwright::WebSocketFrame;
-use Playwright::ElectronApplication;
-use Playwright::Browser;
-use Playwright::Error;
+use Playwright::WebSocket;
+use Playwright::PlaywrightException;
+use Playwright::Frame;
+use Playwright::ElementHandle;
+use Playwright::Selectors;
+use Playwright::Logger;
+use Playwright::Request;
 use Playwright::Mouse;
 use Playwright::BrowserContext;
-use Playwright::Selectors;
-use Playwright::Locator;
+use Playwright::BrowserServer;
 use Playwright::AndroidInput;
-use Playwright::PlaywrightException;
-use Playwright::AndroidDevice;
 use Playwright::Response;
-use Playwright::Logger;
-use Playwright::FileChooser;
+use Playwright::Coverage;
+use Playwright::Error;
+use Playwright::Route;
+use Playwright::BrowserType;
+use Playwright::Download;
 use Playwright::Video;
 use Playwright::AndroidSocket;
-use Playwright::ElementHandle;
-use Playwright::Accessibility;
-use Playwright::Download;
-use Playwright::Worker;
-use Playwright::AndroidWebView;
-use Playwright::BrowserType;
-use Playwright::Route;
-use Playwright::Dialog;
-use Playwright::Electron;
-use Playwright::TimeoutError;
-use Playwright::CDPSession;
-use Playwright::Coverage;
-use Playwright::Page;
-use Playwright::BrowserServer;
-use Playwright::WebSocket;
-use Playwright::Touchscreen;
-use Playwright::Android;
-use Playwright::Tracing;
 use Playwright::ConsoleMessage;
+use Playwright::Tracing;
+use Playwright::Locator;
+use Playwright::CDPSession;
+use Playwright::AndroidDevice;
+use Playwright::Dialog;
+use Playwright::JSHandle;
+use Playwright::ElectronApplication;
+use Playwright::FetchRequest;
+use Playwright::Touchscreen;
+use Playwright::Browser;
+use Playwright::AndroidWebView;
+use Playwright::Accessibility;
+use Playwright::TimeoutError;
 use Playwright::Mouse;
 use Playwright::Keyboard;
 
@@ -63,7 +65,7 @@ Playwright::ModuleList - Playwright sub classes.
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SEE ALSO
 

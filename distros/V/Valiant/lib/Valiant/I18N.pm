@@ -158,6 +158,11 @@ sub translate {
       return $translated;
     }
   }
+
+  # If we get this far that means the key and defaults can't be translated.   So return
+  # message if it exists as a raw untranslated string.
+
+  #return $message if $message;
   
   my $list = join (', ', $key, map { $$_ if $self->is_i18n_tag($_) } @defaults);
   my $path = join ',', $self->valid_paths;
@@ -223,11 +228,45 @@ Valiant::I18N - Translations
 
 =head1 SYNOPSIS
 
-=head1 DESCRIPTION
+    package Example::Person;
 
-=head1 METHODS
+    use Valiant::I18N;
 
-This package defines the following methods;
+    my $tag = _t 'translation_tag';
+
+    my $translated_string = Valiant::I18N->translate($tag, %args);
+
+    =head1 DESCRIPTION
+
+You should see L<Valiant> for some details on how this is used with the core
+validations code.
+
+=head1 CLASS METHODS
+
+This package defines the following class methods
+
+=head2 translate ($key, %args)
+
+Given a translation tag will attempt to return a translated string.  Also accepts arguments as
+a hash of values.   The follow hash keys has special meaning (all others will be passed as placeholder
+values for the translation string).
+
+=over 4
+
+=item default
+
+An array of translation tags to check if the passed key doesn't resolve.   First one
+to resolve gets returned.
+
+=item scope
+
+key namespace that will be prepended to the translation tag for lookup.
+
+=item count
+
+an integer to specify pluralization subkeys.
+
+=back
 
 =head1 SEE ALSO
  

@@ -569,6 +569,25 @@ sub test_mindex_maxdex {
     }
 }
 
+sub test_add_new_data_from_hashref {
+    my @data = (1..10);
+    my @wts  = (2) x @data;
+    my %hash;
+    @hash{@data} = @wts;
+    my $stat_array = $stats_class->new();
+    my $stat_hash  = $stats_class->new();
+    
+    $stat_array->add_data (\@data, \@wts);
+    $stat_hash->add_data (\%hash);
+    
+    ok $stat_hash->values_are_unique, 'values flagged as unique first data added from a hash';
+    is $stat_array->sd, $stat_hash->sd, 'same sd values for identical array and hash data';
+    
+    $stat_array->add_data (\@data, \@wts);
+    $stat_hash->add_data (\%hash);
+    ok !$stat_hash->values_are_unique, 'values not flagged as unique when second data added from a hash';
+    is $stat_array->sd, $stat_hash->sd, 'same sd values for identical array and hash data, second run';
+}
 
 #  what happens when we add new data?
 #  Recycle the same data so mean, sd etc remain the same

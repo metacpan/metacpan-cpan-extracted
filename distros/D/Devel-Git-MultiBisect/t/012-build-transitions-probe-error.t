@@ -4,6 +4,7 @@ use 5.14.0;
 use warnings;
 use Devel::Git::MultiBisect::BuildTransitions;
 use Devel::Git::MultiBisect::Opts qw( process_options );
+use Devel::Git::MultiBisect::Auxiliary qw( write_transitions_report );
 use Test::More;
 unless (
     $ENV{PERL_GIT_CHECKOUT_DIR}
@@ -13,14 +14,18 @@ unless (
     plan skip_all => "No git checkout of perl found";
 }
 else {
-    plan tests => 58;
+    plan tests => 63;
 }
 use Carp;
 use Cwd;
 use File::Spec;
 use File::Temp qw( tempdir );
 use lib qw( t/lib );
-use Helpers qw( test_report );
+use Helpers qw(
+    test_report
+    test_commit_range
+    test_transitions_data
+);
 use Data::Dump;
 
 my $startdir = cwd();
@@ -32,6 +37,7 @@ my (%args, $params, $self);
 my ($first, $last, $branch, $configure_command, $test_command);
 my ($git_checkout_dir, $outputdir, $rv, $this_commit_range);
 my ($multisected_outputs, @invalids);
+my ($default_probe, $probe_validated, $set_probe);
 my $compiler = 'clang';
 
 $git_checkout_dir = cwd();
@@ -80,13 +86,10 @@ ok(! exists $self->{targets},
     "BuildTransitions has no need of 'targets' attribute");
 ok(! exists $self->{test_command},
     "BuildTransitions has no need of 'test_command' attribute");
+is($self->{probe}, 'error',
+    "BuildTransitions has default 'probe' attribute: error");
 
-$this_commit_range = $self->get_commits_range();
-ok($this_commit_range, "get_commits_range() returned true value");
-is(ref($this_commit_range), 'ARRAY', "get_commits_range() returned array ref");
-is($this_commit_range->[0], $first, "Got expected first commit in range");
-is($this_commit_range->[-1], $last, "Got expected last commit in range");
-note("Observed " . scalar(@{$this_commit_range}) . " commits in range");
+test_commit_range($self->get_commits_range(), $first, $last);
 
 note("Test for bad arguments to multisect_builds()");
 
@@ -114,6 +117,23 @@ note("Test for bad arguments to multisect_builds()");
     like($@, qr/\QInvalid value '$bad_value' in 'probe' element in hashref passed to multisect_builds()\E/,
         "Got expected error for bad argument to multisect_builds()");
 }
+
+note("_validate_multisect_builds_args(): tested explicitly because multisect_builds() takes a long time");
+
+$default_probe = 'error';
+
+$probe_validated = $self->_validate_multisect_builds_args();
+is($probe_validated, $default_probe,
+    "_validate_multisect_builds_args() returned default value of $default_probe");
+is($self->{probe}, $probe_validated,
+    "'probe' set to default value of $default_probe");
+
+$set_probe = 'error';
+$probe_validated = $self->_validate_multisect_builds_args( { probe => $set_probe } );
+is($probe_validated, $set_probe,
+    "_validate_multisect_builds_args() returned set value of $set_probe");
+is($self->{probe}, $probe_validated,
+    "'probe' set to value of $default_probe");
 
 note("multisect_builds, probing for C-level errors");
 
@@ -145,41 +165,14 @@ note("inspect_transitions()");
 
 my $transitions = $self->inspect_transitions();
 
-my $transitions_report = File::Spec->catfile($outputdir, "transitions.$compiler.pl");
-open my $TR, '>', $transitions_report
-    or croak "Unable to open $transitions_report for writing";
-my $old_fh = select($TR);
-Data::Dump::dd($transitions);
-select($old_fh);
-close $TR or croak "Unable to close $transitions_report after writing";
+my $transitions_report = write_transitions_report(
+    $outputdir,
+    "transitions.$compiler.pl",
+    $transitions
+);
+note("Report: $transitions_report");
 
-is(ref($transitions), 'HASH',
-    "inspect_transitions() returned hash reference");
-is(scalar(keys %{$transitions}), 3,
-    "inspect_transitions() has 3 elements");
-for my $k ( qw| newest oldest | ) {
-    is(ref($transitions->{$k}), 'HASH',
-        "Got hashref as value for '$k'");
-    for my $l ( qw| idx md5_hex file | ) {
-        ok(exists $transitions->{$k}->{$l},
-            "Got key '$l' for '$k'");
-    }
-}
-is(ref($transitions->{transitions}), 'ARRAY',
-    "Got arrayref as value for 'transitions'");
-my @arr = @{$transitions->{transitions}};
-for my $t (@arr) {
-    is(ref($t), 'HASH',
-        "Got hashref as value for element in 'transitions' array");
-    for my $m ( qw| newer older | ) {
-        ok(exists $t->{$m}, "Got key '$m'");
-        is(ref($t->{$m}), 'HASH', "Got hashref");
-        for my $n ( qw| idx md5_hex file | ) {
-            ok(exists $t->{$m}->{$n},
-                "Got key '$n'");
-        }
-    }
-}
+my @arr = test_transitions_data($transitions);
 is(scalar(@arr), 2, "Observed 2 older/newer transitions, as expected");
 
 # clean up

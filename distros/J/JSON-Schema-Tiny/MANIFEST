@@ -25,7 +25,6 @@ t/additional-tests-draft2019-09/loose-types-const-enum.json
 t/additional-tests-draft2019-09/ref-and-id.json
 t/additional-tests-draft2019-09/ref.json
 t/additional-tests-draft2019-09/short-circuit.json
-t/additional-tests-draft2019-09/unicode.json
 t/additional-tests-draft2019-09/unknownKeyword.json
 t/additional-tests-draft2019-09/vocabulary.json
 t/additional-tests-draft2020-12.t
@@ -39,7 +38,6 @@ t/additional-tests-draft2020-12/keyword-independence.json
 t/additional-tests-draft2020-12/loose-types-const-enum.json
 t/additional-tests-draft2020-12/ref.json
 t/additional-tests-draft2020-12/short-circuit.json
-t/additional-tests-draft2020-12/unicode.json
 t/additional-tests-draft2020-12/unknownKeyword.json
 t/additional-tests-draft2020-12/vocabulary.json
 t/additional-tests-draft7.t
@@ -54,7 +52,6 @@ t/additional-tests-draft7/loose-types-const-enum.json
 t/additional-tests-draft7/ref-and-id.json
 t/additional-tests-draft7/ref.json
 t/additional-tests-draft7/short-circuit.json
-t/additional-tests-draft7/unicode.json
 t/additional-tests-draft7/unknownKeyword.json
 t/additional-tests-draft7/vocabulary.json
 t/boolean-data.t

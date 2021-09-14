@@ -30,7 +30,7 @@ no_index:
 provides:
   Net::APNS::Simple:
     file: lib/Net/APNS/Simple.pm
-    version: '0.06'
+    version: '0.07'
 recommends:
   Crypt::JWT: '0.018'
   Crypt::PK::ECC: '0.059'
@@ -46,7 +46,7 @@ resources:
   bugtracker: https://github.com/rockbone/p5-Net-APNS-Simple/issues
   homepage: https://github.com/rockbone/p5-Net-APNS-Simple
   repository: git://github.com/rockbone/p5-Net-APNS-Simple.git
-version: '0.06'
+version: '0.07'
 x_contributors:
   - 'Nikolay Pelov <npelov@gmail.com>'
   - 'Tooru Tsurukawa <rockbone.g@gmail.com>'

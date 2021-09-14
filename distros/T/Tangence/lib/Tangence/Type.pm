@@ -3,9 +3,9 @@
 #
 #  (C) Paul Evans, 2013-2017 -- leonerd@leonerd.org.uk
 
-package Tangence::Type;
+package Tangence::Type 0.26;
 
-use strict;
+use v5.14;
 use warnings;
 
 use base qw( Tangence::Meta::Type );

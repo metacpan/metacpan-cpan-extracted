@@ -1,0 +1,24 @@
+[name]
+=over without =item
+
+[input]
+=over 4
+
+Some paragraph of text.
+
+Another paragraph of text
+with multiple lines.  Make this long enough that it will wrap to multiple
+lines after Pod::Thread is done with it.
+
+=back
+
+[output]
+\block
+[Some paragraph of text.
+
+Another paragraph of text
+with multiple lines.  Make this long enough that it will wrap to multiple
+lines after Pod::Thread is done with it.
+]
+
+\signature

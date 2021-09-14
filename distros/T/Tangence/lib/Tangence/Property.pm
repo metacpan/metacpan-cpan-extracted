@@ -3,9 +3,9 @@
 #
 #  (C) Paul Evans, 2013-2016 -- leonerd@leonerd.org.uk
 
-package Tangence::Property;
+package Tangence::Property 0.26;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Tangence::Meta::Property );
 
@@ -17,8 +17,6 @@ require Tangence::Type;
 
 use Struct::Dumb;
 struct Instance => [qw( value callbacks cursors )];
-
-our $VERSION = '0.25';
 
 sub build_accessor
 {

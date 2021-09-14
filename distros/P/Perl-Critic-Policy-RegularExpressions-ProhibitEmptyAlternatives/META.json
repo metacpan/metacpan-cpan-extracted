@@ -15,6 +15,7 @@
    "name" : "Perl-Critic-Policy-RegularExpressions-ProhibitEmptyAlternatives",
    "no_index" : {
       "directory" : [
+         "examples",
          "inc",
          "t",
          "xt"
@@ -57,7 +58,7 @@
    "provides" : {
       "Perl::Critic::Policy::RegularExpressions::ProhibitEmptyAlternatives" : {
          "file" : "lib/Perl/Critic/Policy/RegularExpressions/ProhibitEmptyAlternatives.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -75,6 +76,6 @@
          "web" : "https://github.com/trwyant/perl-Perl-Critic-Policy-RegularExpressions-ProhibitEmptyAlternatives"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

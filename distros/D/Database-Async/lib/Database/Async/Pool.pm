@@ -3,7 +3,7 @@ package Database::Async::Pool;
 use strict;
 use warnings;
 
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 =head1 NAME
 
@@ -17,7 +17,9 @@ use Database::Async::Backoff;
 
 use Future;
 use Future::AsyncAwait;
-use Scalar::Util qw(blessed);
+use Syntax::Keyword::Try;
+use Scalar::Util qw(blessed refaddr);
+use List::UtilsBy qw(extract_by);
 use Log::Any qw($log);
 
 sub new {
@@ -61,7 +63,21 @@ sub register_engine {
 
 sub unregister_engine {
     my ($self, $engine) = @_;
-    --$self->{count};
+    try {
+        $log->tracef('Engine is removed from the pool, with %d in the queue', 0 + @{$self->{waiting}});
+        my $addr = refaddr($engine);
+        # This engine may have been actively processing a request, and not in the pool:
+        # that's fine, we only remove if we had it.
+        my $count = () = extract_by { refaddr($_) == $addr } @{$self->{ready}};
+        $log->tracef('Removed %d engine instances from the ready pool', $count);
+        # Any engine that wasn't in the ready queue (`count`) was out on assignment
+        # and thus included in `pending_count`
+        --$self->{$count ? 'count' : 'pending_count'};
+        $log->infof('After cleanup we have %d count, %d pending, %d waiting', $self->{count}, $self->{pending_count}, 0 + @{$self->{waiting}});
+        $self->process_pending->retain if @{$self->{waiting}};
+    } catch ($e) {
+        $log->errorf('Failed %s', $e);
+    }
     $self
 }
 
@@ -107,10 +123,16 @@ async sub next_engine {
         return $engine;
     }
     push @{$self->{waiting}}, my $f = $self->new_future;
+    await $self->process_pending;
+    return await $f;
+}
+
+async sub process_pending {
+    my ($self) = @_;
     my $total = $self->count + $self->pending_count;
     $log->tracef('Might request, current count is %d/%d (%d pending, %d active)', $total, $self->max, $self->pending_count, $self->count);
     await $self->request_engine unless $total >= $self->max;
-    return await $f;
+    return;
 }
 
 sub new_future {

@@ -31,8 +31,6 @@ example/lib/Example/Schema/ResultSet.pm
 example/lib/Example/Schema/ResultSet/PersonRole.pm
 example/lib/Example/Server.pm
 example/lib/Example/View/HTML.pm
-example/lib/Valiant/Params.pm
-example/lib/Valiant/Params/Role.pm
 example/lib/locale/names.pl
 example/root/authenticate.ep
 example/root/home.html

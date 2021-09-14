@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Changes to Russ Allbery's Web Pages</title>
+    <link>https://www.eyrie.org/~eagle/</link>
+    <description>Recent changes to Russ Allbery's web pages.</description>
+    <language>en-us</language>
+    <pubDate>%DATE%</pubDate>
+    <lastBuildDate>%DATE%</lastBuildDate>
+    <generator>DocKnot %VERSION%</generator>
+    <atom:link href="https://www.eyrie.org/~eagle/changes.rss" rel="self"
+               type="application/rss+xml" />
+
+    <item>
+      <title>kstart 4.3</title>
+      <link>https://www.eyrie.org/~eagle/software/kstart/</link>
+      <description><![CDATA[
+        <p>Add support for kafs by continuing with -t behavior if kafs is present.
+        Use libkeyutils if available to isolate a command's keyring from the
+        invoking program if running a specific command with -t.  Use a better
+        exit status when a command is killed with a signal.  Use explicit_bzero
+        to clear the password for k5start -s.  Other portability fixes and
+        updates.</p>
+      ]]></description>
+      <pubDate>%DATE%</pubDate>
+      <guid isPermaLink="false">%DATE%</guid>
+    </item>
+    <item>
+      <title>Review: The Past is Red</title>
+      <link>https://www.eyrie.org/~eagle/reviews/books/1-250-30112-2.html</link>
+      <description><![CDATA[
+        <p>Review of The Past is Red by Catherynne M. Valente.</p>
+      ]]></description>
+      <pubDate>%DATE%</pubDate>
+      <guid isPermaLink="false">%DATE%</guid>
+    </item>
+    <item>
+      <title>Review: Black Sun</title>
+      <link>https://www.eyrie.org/~eagle/reviews/books/1-5344-3769-X.html</link>
+      <description><![CDATA[
+        <p>Review of Black Sun by Rebecca Roanhorse.</p>
+      ]]></description>
+      <pubDate>%DATE%</pubDate>
+      <guid isPermaLink="false">%DATE%</guid>
+    </item>
+    <item>
+      <title>Review: The Galaxy, and the Ground Within</title>
+      <link>https://www.eyrie.org/~eagle/reviews/books/0-06-293605-0.html</link>
+      <description><![CDATA[
+        <p>Review of The Galaxy, and the Ground Within by Becky Chambers.</p>
+      ]]></description>
+      <pubDate>%DATE%</pubDate>
+      <guid isPermaLink="false">%DATE%</guid>
+    </item>
+    <item>
+      <title>Review: The Last Battle</title>
+      <link>https://www.eyrie.org/~eagle/reviews/books/0-02-044210-6.html</link>
+      <description><![CDATA[
+        <p>Review of The Last Battle by C.S. Lewis.</p>
+      ]]></description>
+      <pubDate>%DATE%</pubDate>
+      <guid isPermaLink="false">%DATE%</guid>
+    </item>
+    <item>
+      <title>Broken link cleanup</title>
+      <link>https://www.eyrie.org/~eagle/</link>
+      <description><![CDATA[
+        <p>Another periodic cleanup of broken links.</p>
+      ]]></description>
+      <pubDate>%DATE%</pubDate>
+      <guid isPermaLink="false">%DATE%</guid>
+    </item>
+    <item>
+      <title>Review: Piranesi</title>
+      <link>https://www.eyrie.org/~eagle/reviews/books/1-63557-564-8.html</link>
+      <description><![CDATA[
+        <p>Review of Piranesi by Susanna Clarke.</p>
+      ]]></description>
+      <pubDate>%DATE%</pubDate>
+      <guid isPermaLink="false">%DATE%</guid>
+    </item>
+    <item>
+      <title>Review: Fugitive Telemetry</title>
+      <link>https://www.eyrie.org/~eagle/reviews/books/1-250-76538-2.html</link>
+      <description><![CDATA[
+        <p>Review of Fugitive Telemetry by Martha Wells.</p>
+      ]]></description>
+      <pubDate>%DATE%</pubDate>
+      <guid isPermaLink="false">%DATE%</guid>
+    </item>
+    <item>
+      <title>Add finalists for the World Fantasy Award</title>
+      <link>https://www.eyrie.org/~eagle/reviews/awards.html</link>
+      <description><![CDATA[
+        <p>Add the finalists for the 2021 World Fantasy Award for best novel.</p>
+      ]]></description>
+      <pubDate>%DATE%</pubDate>
+      <guid isPermaLink="false">%DATE%</guid>
+    </item>
+    <item>
+      <title>Broken link cleanup</title>
+      <link>https://www.eyrie.org/~eagle/</link>
+      <description><![CDATA[
+        <p>Another periodic cleanup of broken links.</p>
+      ]]></description>
+      <pubDate>%DATE%</pubDate>
+      <guid isPermaLink="false">%DATE%</guid>
+    </item>
+    <item>
+      <title>Add Clarke Award nominees and Locus Award Winners</title>
+      <link>https://www.eyrie.org/~eagle/reviews/awards.html</link>
+      <description><![CDATA[
+        <p>Add the nominees for the 2021 Arthur C. Clarke Award, and the winners of
+        the 2021 Locus Awards (Network Effect by Martha Wells for best SF novel,
+        The City We Became by N.K. Jemisin for best fantasy novel, and Elatsoe by
+        Darcie Little Badger for best first novel).</p>
+      ]]></description>
+      <pubDate>%DATE%</pubDate>
+      <guid isPermaLink="false">%DATE%</guid>
+    </item>
+    <item>
+      <title>control-archive 1.9.1</title>
+      <link>https://www.eyrie.org/~eagle/software/control-archive/</link>
+      <description><![CDATA[
+        <p>A data-only release that updates the Big Eight control signing key and
+        removes some obsolete information about net.*.</p>
+      ]]></description>
+      <pubDate>%DATE%</pubDate>
+      <guid isPermaLink="false">%DATE%</guid>
+    </item>
+    <item>
+      <title>Added web page for Big Eight control information</title>
+      <link>https://www.eyrie.org/~eagle/big-8/</link>
+      <description><![CDATA[
+        <p>New web page summarizing control information for the Big Eight
+        hierarchies with links to the control message signing keys and the PGP
+        Moose key.</p>
+      ]]></description>
+      <pubDate>%DATE%</pubDate>
+      <guid isPermaLink="false">%DATE%</guid>
+    </item>
+    <item>
+      <title>Review: Demon Lord of Karanda</title>
+      <link>https://www.eyrie.org/~eagle/reviews/books/0-345-36331-0.html</link>
+      <description><![CDATA[
+        <p>Review of Demon Lord of Karanda by David Eddings.</p>
+      ]]></description>
+      <pubDate>%DATE%</pubDate>
+      <guid isPermaLink="false">%DATE%</guid>
+    </item>
+    <item>
+      <title>Review: The Magician's Nephew</title>
+      <link>https://www.eyrie.org/~eagle/reviews/books/0-02-044230-0.html</link>
+      <description><![CDATA[
+        <p>Review of The Magician's Nephew by C.S. Lewis.</p>
+      ]]></description>
+      <pubDate>%DATE%</pubDate>
+      <guid isPermaLink="false">%DATE%</guid>
+    </item>
+  </channel>
+</rss>

@@ -1,6 +1,7 @@
 use utf8;
 
 use Test::More 1.302183;
+use Test::Exception 0.41;
 use Test::Warnings qw/ warning /;
 
 use Encode qw/ encode_utf8 /;
@@ -53,15 +54,19 @@ is minify(" £ simple") => "£ simple";
 
 }
 
-my $warning = warning {
-    my $n = chr(160);
-    my $r = eval { minify($n) };
-};
-like $warning, qr/Malformed UTF-8 character/;
+lives_and {
 
-{
-    my $n = eval { encode_utf8(chr(160)) };
-    is minify($n) => $n;
-}
+    my $warning = warning {
+        my $n = chr(160);
+        my $r = eval { minify($n) };
+    };
+    like $warning, qr/Malformed UTF-8 character/;
+
+    {
+        my $n = eval { encode_utf8( chr(160) ) };
+        is minify($n) => $n;
+    }
+
+};
 
 done_testing;

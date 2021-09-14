@@ -1,0 +1,19 @@
+Changes
+CONTRIBUTING.md
+hex-describe.conf
+lib/Game/HexDescribe.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+RELEASE.md
+script/hex-describe
+share/hex-describe-default-map.txt
+share/hex-describe-johnston-table.txt
+share/hex-describe-schroeder-table.txt
+share/hex-describe-seckler-table.txt
+share/hex-describe-strom-table.txt
+share/hex-describe-traveller-table.txt
+t/basic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

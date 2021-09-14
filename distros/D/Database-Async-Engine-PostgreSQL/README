@@ -121,6 +121,11 @@ METHODS
     Ryu::Source representing incoming packets for the current database
     connection.
 
+ connected
+
+    A Ryu::Observable which will be 1 while the connection is in a valid
+    state, and 0 if we're disconnected.
+
  authenticated
 
     Resolves once database authentication is complete.
@@ -186,6 +191,8 @@ Implementation notes
 AUTHOR
 
     Tom Molesworth <TEAM@cpan.org>
+
+    with contributions from Tortsten Förtsch <OPI@cpan.org>
 
 LICENSE
 

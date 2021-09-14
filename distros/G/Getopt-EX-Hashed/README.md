@@ -5,7 +5,7 @@ Getopt::EX::Hashed - Hash store object automation
 
 # VERSION
 
-Version 0.9917
+Version 0.9918
 
 # SYNOPSIS
 
@@ -60,6 +60,9 @@ If the name start with plus (`+`), given parameters are added to
 current value.
 
     has '+left' => ( default => 1 );
+
+If the number of parameter is not even, first parameter is taken as
+`spec`.
 
 Following parameters are available.
 

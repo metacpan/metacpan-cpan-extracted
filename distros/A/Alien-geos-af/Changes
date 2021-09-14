@@ -1,5 +1,8 @@
 Revision history for Alien::geos::af
 
+1.008 2021-09-11
+    - Switch to cmake.  GEOS 3.10 will remove autotools support.
+
 1.007 2019-01-06
     - Require FFI::CheckLib 0.23 so dynamic_libs calls find geos-3-7-0.dll
     - Ensure we use the correct geos-config when setting alien props

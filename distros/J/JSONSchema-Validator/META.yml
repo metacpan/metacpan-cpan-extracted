@@ -46,9 +46,10 @@ requires:
 resources:
   bugtracker: https://github.com/skbkontur/perl-jsonschema-validator/issues
   repository: git://github.com/skbkontur/perl-jsonschema-validator.git
-version: '0.006'
+version: '0.008'
 x_contributors:
   - 'James Waters <james@jcwaters.co.uk>'
+  - 'uid66 <19481514+uid66@users.noreply.github.com>'
 x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: MIT

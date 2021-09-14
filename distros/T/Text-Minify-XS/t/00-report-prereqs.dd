@@ -41,6 +41,7 @@ do { my $x = {
                                    'Encode' => '0',
                                    'File::Spec' => '0',
                                    'Module::Metadata' => '0',
+                                   'Test::Exception' => '0.41',
                                    'Test::More' => '1.302183',
                                    'Test::Warnings' => '0',
                                    'utf8' => '0'

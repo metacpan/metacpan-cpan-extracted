@@ -1,368 +1,377 @@
-                       User-Visible DocKnot Changes
+                       Revision history for DocKnot
 
-DocKnot 4.01 (unreleased)
+5.00 - 2021-09-12
 
-    DocKnot now supports a global configuration file.  The default
-    location is $HOME/.config/docknot/config.yaml, but it honors the XDG
-    environment variables.  Currently, this configuration file can be used
-    to set the distribution directory and signing PGP key for docknot
-    dist.
+ - Merge spin and spin-rss into this package, making it a full, if highly
+   idiosyncratic, static site generator built around a macro language
+   called thread.  This adds new commands docknot spin, docknot spin-rss,
+   and docknot spin-thread, as well as modules App::DocKnot::Spin and
+   several submodules.  docknot spin should be equivalent to the old spin
+   command except that \id support has been dropped.  DocKnot now depends
+   on Date::Parse (from TimeDate), Git::Repository, Image::Size, and
+   Pod::Thread 3.00 or later.
 
-    docknot dist can now optionally sign distribution tarballs with GnuPG
-    after they have been generated.  To request signing, use the --pgp-key
-    command-line option or set pgp_key in the new global configuration
-    file.
+ - Support setting distribution.packaging.debian.package along with
+   distribution.packaging.debian.personal to specify the package name.  Do
+   not generate links to Debian in that case.
 
-    The -d option to docknot dist is now optional if distdir is set in
-    DocKnot's global configuration file.
+ - Ignore configure~ when checking distribution tarballs.
 
-    Remove the load_appdata_json helper function from App::DocKnot.  This
-    is no longer used now that all DocKnot data is in YAML.
+ - Stop generating a developer link to a to-do list by default in thread
+   output.  Not all of my packages use a TODO file, so the ones that do
+   should explicitly add this to the developer docs list.
 
-    Properly import Pod::Usage so that docknot --help works.
+4.01 - 2021-02-27
 
-    Correct the REQUIREMENTS sections of the module documentation to
-    reflect new dependencies and the removal of a JSON dependency from
-    most of DocKnot.
+ - DocKnot now supports a global configuration file.  The default location
+   is $HOME/.config/docknot/config.yaml, but it honors the XDG environment
+   variables.  Currently, this configuration file can be used to set the
+   distribution directory and signing PGP key for docknot dist.
 
-    Fix left-over documentation references to the old metatada path.
+ - docknot dist can now optionally sign distribution tarballs with GnuPG
+   after they have been generated.  To request signing, use the --pgp-key
+   command-line option or set pgp_key in the new global configuration
+   file.
 
-DocKnot 4.00 (2020-12-25)
+ - The -d option to docknot dist is now optional if distdir is set in
+   DocKnot's global configuration file.
 
-    Change the metadata format to a single YAML file, with a slightly
-    different internal representation, whose default location is
-    docs/docknot.yaml.  The new docknot update command (or the
-    App::DocKnot::Update module) will convert from the old JSON format.
-    The new metadata format is checked against a schema when read.
-    DocKnot now depends on YAML::XS and Kwalify.
+ - Remove the load_appdata_json helper function from App::DocKnot.  This
+   is no longer used now that all DocKnot data is in YAML.
 
-    Support a test.override metadata key that overrides the Testing
-    section in README and README.md files entirely, except for the note
-    about Lancaster Consensus environment variables.
+ - Properly import Pod::Usage so that docknot --help works.
 
-    Move bootstrap metadata to build.bootstrap, build.lancaster to
-    test.lancaster, packaging to distribution.packaging, packaging.debian
-    to distribution.packaging.debian.package, debian to
-    distribution.packaging.debian, and readme.sections to sections to
-    clean up some old issues with the schema now that there's an upgrade
-    process.  If readme.sections defined a testing section, move that to
-    test.override.
+ - Correct the REQUIREMENTS sections of the module documentation to
+   reflect new dependencies and the removal of a JSON dependency from most
+   of DocKnot.
 
-    Drop support for the support.cpan metadata key, since the CPAN RT
-    instance is going away.  For packages with support.cpan set, if
-    vcs.github was set and support.github was not, set support.github to
-    match vcs.github during a docknot update.
+ - Fix left-over documentation references to the old metatada path.
 
-    Drop the current version number from the title of README.md.  This is
-    not a common practice and doesn't seem to add much value.
+4.00 - 2020-12-25
 
-    Word wrap numeric lists and, in Markdown output, quoted paragraphs.
-    Previously these preserved the original spacing from the input text
-    snippets.
+ - Change the metadata format to a single YAML file, with a slightly
+   different internal representation, whose default location is
+   docs/docknot.yaml.  The new docknot update command (or the
+   App::DocKnot::Update module) will convert from the old JSON format.
+   The new metadata format is checked against a schema when read.  DocKnot
+   now depends on YAML::XS and Kwalify.
 
-    Require paragraphs be indented by at least six spaces, not five, to be
-    treated as verbatim paragraphs and left unwrapped.  (Markdown
-    paragraphs can still use four spaces because they are wrapped in
-    markup lines.)
+ - Support a test.override metadata key that overrides the Testing section
+   in README and README.md files entirely, except for the note about
+   Lancaster Consensus environment variables.
 
-    Add some additional markup to the Markdown version of building
-    instructions for packages that use Kerberos and Autoconf.
+ - Move bootstrap metadata to build.bootstrap, build.lancaster to
+   test.lancaster, packaging to distribution.packaging, packaging.debian
+   to distribution.packaging.debian.package, debian to
+   distribution.packaging.debian, and readme.sections to sections to clean
+   up some old issues with the schema now that there's an upgrade process.
+   If readme.sections defined a testing section, move that to
+   test.override.
 
-    Use https for the link and badge for unmaintained packages.
+ - Drop support for the support.cpan metadata key, since the CPAN RT
+   instance is going away.  For packages with support.cpan set, if
+   vcs.github was set and support.github was not, set support.github to
+   match vcs.github during a docknot update.
 
-DocKnot 3.05 (2020-08-09)
+ - Drop the current version number from the title of README.md.  This is
+   not a common practice and doesn't seem to add much value.
 
-    Change the heuristic for when to refrain from wrapping output
-    paragraphs to require they start with three short lines rather than
-    two, ignore the indentation, and increase the threshold for a short
-    line to 45 characters from 40.
+ - Word wrap numeric lists and, in Markdown output, quoted paragraphs.
+   Previously these preserved the original spacing from the input text
+   snippets.
 
-    Force the badge for the Debian version in README.md to point to
-    unstable rather than stable.
+ - Require paragraphs be indented by at least six spaces, not five, to be
+   treated as verbatim paragraphs and left unwrapped.  (Markdown
+   paragraphs can still use four spaces because they are wrapped in markup
+   lines.)
 
-    Depend on JSON::MaybeXS instead of JSON, and List::SomeUtils instead
-    of List::MoreUtils.
+ - Add some additional markup to the Markdown version of building
+   instructions for packages that use Kerberos and Autoconf.
 
-    Update to rra-c-util 8.3:
+ - Use https for the link and badge for unmaintained packages.
 
-    * Fix style issues caught by Perl::Critic::Freenode.
-    * Ignore debian/changelog when checking for obsolete strings.
+3.05 - 2020-08-09
 
-DocKnot 3.04 (2020-05-16)
+ - Change the heuristic for when to refrain from wrapping output
+   paragraphs to require they start with three short lines rather than
+   two, ignore the indentation, and increase the threshold for a short
+   line to 45 characters from 40.
 
-    Change the vcs.travis metadata key to vcs.status.travis.  This will
-    require changes to all templates and package metadata.json files that
-    use this key.
+ - Force the badge for the Debian version in README.md to point to
+   unstable rather than stable.
 
-    Add support for generating a build status badge from a GitHub Actions
-    workflow.  To do this, set vcs.status.workflow to the name of the
-    workflow that should be referenced for the badge.
+ - Depend on JSON::MaybeXS instead of JSON, and List::SomeUtils instead
+   of List::MoreUtils.
 
-    Also specify DocKnot's dependencies with a cpanfile.  This makes it
-    easier to install its dependencies with some tools, such as cpm.
+3.04 - 2020-05-16
 
-DocKnot 3.03 (2020-01-19)
+ - Change the vcs.travis metadata key to vcs.status.travis.  This will
+   require changes to all templates and package metadata.json files that
+   use this key.
 
-    For CPAN packages pushed to GitHub, add a Shields.io license badge to
-    the Markdown README file.
+ - Add support for generating a build status badge from a GitHub Actions
+   workflow.  To do this, set vcs.status.workflow to the name of the
+   workflow that should be referenced for the badge.
 
-    For packages with a Debian package, add a Shields.io badge for the
-    version in Debian.
+ - Also specify DocKnot's dependencies with a cpanfile.  This makes it
+   easier to install its dependencies with some tools, such as cpm.
 
-    docknot dist now uses IO::Uncompress::Gunzip and IO::Compress::Xz to
-    generate a missing xz tarball rather than running external gzip and xz
-    programs, which avoids test failures when those programs aren't
-    available or don't support the expected options.  Thanks to Slaven
-    Rezić for the testing and report.  (#131406)
+3.03 - 2020-01-19
 
-    docknot dist now supports a distribution/ignore metadata setting,
-    which contains a list of regular expressions of files to ignore when
-    checking a distribution tarball for completeness.
+ - For CPAN packages pushed to GitHub, add a Shields.io license badge to
+   the Markdown README file.
 
-    Stop leaking exceptions via $@ to the caller of App::DocKnot::Config.
-    Configuration parsing catches and ignores a variety of errors, which
-    previously were polluting the caller's $@.
+ - For packages with a Debian package, add a Shields.io badge for the
+   version in Debian.
 
-DocKnot 3.02 (2020-01-08)
+ - docknot dist now uses IO::Uncompress::Gunzip and IO::Compress::Xz to
+   generate a missing xz tarball rather than running external gzip and xz
+   programs, which avoids test failures when those programs aren't
+   available or don't support the expected options.  Thanks to Slaven
+   Rezić for the testing and report.  (#131406)
 
-    Add support for the No Maintenance Intended badge in the Markdown
-    README file if the package is marked as orphaned.
+ - docknot dist now supports a distribution/ignore metadata setting, which
+   contains a list of regular expressions of files to ignore when checking
+   a distribution tarball for completeness.
 
-    If the native distribution generation commands create only a
-    gzip-compressed tarball, generate an xz-compressed tarball from the
-    gzip-compressed tarball during docknot dist.
+ - Stop leaking exceptions via $@ to the caller of App::DocKnot::Config.
+   Configuration parsing catches and ignores a variety of errors, which
+   previously were polluting the caller's $@.
 
-    docknot dist now checks for files present in the source tree but
-    missing from the distribution, apart from a (currently hard-coded)
-    list of exceptions.
+3.02 - 2020-01-08
 
-    docknot dist now removes any existing directory when creating a new
-    distribution.  It overrides permissions if possible while doing this
-    so that it can clean up from a failed Automake make distcheck, so the
-    destination directory should be trusted, not one to which an attacker
-    may be able to write files.
+ - Add support for the No Maintenance Intended badge in the Markdown
+   README file if the package is marked as orphaned.
 
-    Remove make warnings from the commands when building a distribution
-    that supports C++ with the C++ compiler, since my current Autoconf
-    warning flag discovery code doesn't properly exclude options that are
-    unsupported by C++.
+ - If the native distribution generation commands create only a
+   gzip-compressed tarball, generate an xz-compressed tarball from the
+   gzip-compressed tarball during docknot dist.
 
-    Properly skip a test on Windows that requires tar.
+ - docknot dist now checks for files present in the source tree but
+   missing from the distribution, apart from a (currently hard-coded) list
+   of exceptions.
 
-DocKnot 3.01 (2019-07-14)
+ - docknot dist now removes any existing directory when creating a new
+   distribution.  It overrides permissions if possible while doing this so
+   that it can clean up from a failed Automake make distcheck, so the
+   destination directory should be trusted, not one to which an attacker
+   may be able to write files.
 
-    docknot dist now also runs make check-cppcheck for Autoconf build
-    systems.
+ - Remove make warnings from the commands when building a distribution
+   that supports C++ with the C++ compiler, since my current Autoconf
+   warning flag discovery code doesn't properly exclude options that are
+   unsupported by C++.
 
-    If the valgrind key is set to true in the package build metadata,
-    docknot dist now also runs make check-valgrind for Autoconf build
-    systems.
+ - Properly skip a test on Windows that requires tar.
 
-    Allow the path to Perl to be configured in App::DocKnot::Dist.  This
-    is used primarily for testing so that we can try building a
-    distribution using Module::Build with the same Perl used to run the
-    test suite.  This is exposed by the module API but (intentionally) not
-    exposed on the docknot command line.  Thanks, Slaven Rezic.  (#129958)
+3.01 - 2019-07-14
 
-    Set user.name and user.email for Git in dist/basic.t test.
+ - docknot dist now also runs make check-cppcheck for Autoconf build
+   systems.
 
-    Hopefully fix tests on Windows via more correct use of File::Temp
-    objects: be clear about using the file name instead of the file
-    descriptor, and delete the file by letting the File::Temp object go
-    out of scope.
+ - If the valgrind key is set to true in the package build metadata,
+   docknot dist now also runs make check-valgrind for Autoconf build
+   systems.
 
-DocKnot 3.00 (2019-06-29)
+ - Allow the path to Perl to be configured in App::DocKnot::Dist.  This is
+   used primarily for testing so that we can try building a distribution
+   using Module::Build with the same Perl used to run the test suite.
+   This is exposed by the module API but (intentionally) not exposed on
+   the docknot command line.  Thanks, Slaven Rezic.  (#129958)
 
-    Separate configuration parsing into a new App::DocKnot::Config module,
-    used by App::DocKnot::Generate.
+ - Set user.name and user.email for Git in dist/basic.t test.
 
-    Move the entry point for command-line commands from App::DocKnot to
-    App::DocKnot::Command.  The App::DocKnot module now only provides some
-    helper methods to load application data, used by both
-    App::DocKnot::Config and App::DocKnot::Generate.  It's no longer
-    necessary to explicitly load App::DocKnot before using one of the
-    submodules.
+ - Hopefully fix tests on Windows via more correct use of File::Temp
+   objects: be clear about using the file name instead of the file
+   descriptor, and delete the file by letting the File::Temp object go out
+   of scope.
 
-    Add new docknot dist command and App::DocKnot::Dist module, which runs
-    appropriate commands to create a distribution tarball.  This command
-    will also run the test suite, with both Clang and GCC for packages
-    using Autoconf, and will also build and test with C++ if the package
-    indicates that it supports C++ via the build.cplusplus key in the
-    package metadata.
+3.00 - 2019-06-29
 
-    Support orphaned warnings in the README and README.md output as well
-    as thread output.
+ - Separate configuration parsing into a new App::DocKnot::Config module,
+   used by App::DocKnot::Generate.
 
-    Add bug tracker links pointing to the CPAN RT installation to the
-    developer documentation links section of the thread template if
-    support.cpan is set.
+ - Move the entry point for command-line commands from App::DocKnot to
+   App::DocKnot::Command.  The App::DocKnot module now only provides some
+   helper methods to load application data, used by both
+   App::DocKnot::Config and App::DocKnot::Generate.  It's no longer
+   necessary to explicitly load App::DocKnot before using one of the
+   submodules.
 
-    Output more helpful information about test failures on Windows and
-    other systems that don't have the diff command.
+ - Add new docknot dist command and App::DocKnot::Dist module, which runs
+   appropriate commands to create a distribution tarball.  This command
+   will also run the test suite, with both Clang and GCC for packages
+   using Autoconf, and will also build and test with C++ if the package
+   indicates that it supports C++ via the build.cplusplus key in the
+   package metadata.
 
-DocKnot 2.00 (2019-01-12)
+ - Support orphaned warnings in the README and README.md output as well as
+   thread output.
 
-    Move previous docknot command functionality to a new docknot generate
-    subcommand.  All docknot actions in the future will be added as
-    subcommands.
+ - Add bug tracker links pointing to the CPAN RT installation to the
+   developer documentation links section of the thread template if
+   support.cpan is set.
 
-    docknot generate now takes the name of the template as its first
-    positional argument instead of as the -t option.
+ - Output more helpful information about test failures on Windows and
+   other systems that don't have the diff command.
 
-    generate() and therefore the generate subcommand now defaults to
-    looking for metadata in docs/metadata, and the -m option is now
-    optional.
+2.00 - 2019-01-12
 
-    The -o option to docknot generate and the output argument to
-    generate_output() is now optional if there is a default output file
-    defined for the template.  The two defaults are README for the readme
-    template and README.md for the readme-md template, both in the current
-    directory.
+ - Move previous docknot command functionality to a new docknot generate
+   subcommand.  All docknot actions in the future will be added as
+   subcommands.
 
-    Rename App::DocKnot to App:DocKnot::Generate and add a new
-    generate_output() method that writes the generated output to a
-    specified file instead of returning it as a string.  App::DocKnot must
-    be loaded as well to use the module API.
+ - docknot generate now takes the name of the template as its first
+   positional argument instead of as the -t option.
 
-    Add new generate-all command and generate_all() method that generates
-    all package documentation files with a default output file.
+ - generate() and therefore the generate subcommand now defaults to
+   looking for metadata in docs/metadata, and the -m option is now
+   optional.
 
-    Separate the TESTING section from BUILD AND INSTALLATION for Perl
-    modules in both README and README.md, and move the Lancaster
-    instructions to that section.  Add instructions for how to run a
-    single test with Perl build systems.  Test dependencies for Perl
-    modules should now move into docs/metadata/test/suffix, the same as
-    for packages with an Autoconf build system.
+ - The -o option to docknot generate and the output argument to
+   generate_output() is now optional if there is a default output file
+   defined for the template.  The two defaults are README for the readme
+   template and README.md for the readme-md template, both in the current
+   directory.
 
-    If build.lancaster is set to true, add the standard section on
-    Lancaster consensus variables to the end of a TESTING section in
-    README and README.md even when a custom testing section is provided in
-    the metadata.
+ - Rename App::DocKnot to App:DocKnot::Generate and add a new
+   generate_output() method that writes the generated output to a
+   specified file instead of returning it as a string.  App::DocKnot must
+   be loaded as well to use the module API.
 
-    Update to rra-c-util 8.0:
+ - Add new generate-all command and generate_all() method that generates
+   all package documentation files with a default output file.
 
-    * Fix t/style/strict.t to skip blib and .git directories.
-    * Update style for the latest perltidy.
+ - Separate the TESTING section from BUILD AND INSTALLATION for Perl
+   modules in both README and README.md, and move the Lancaster
+   instructions to that section.  Add instructions for how to run a single
+   test with Perl build systems.  Test dependencies for Perl modules
+   should now move into docs/metadata/test/suffix, the same as for
+   packages with an Autoconf build system.
 
-DocKnot 1.06 (2018-08-31)
+ - If build.lancaster is set to true, add the standard section on
+   Lancaster consensus variables to the end of a TESTING section in README
+   and README.md even when a custom testing section is provided in the
+   metadata.
 
-    When generating text output, put the footnotes containing URLs for
-    links immediately following the containing paragraph rather than the
-    end of the text block.  This is both more readable and avoids odd
-    placement of the footnotes when a template adds further paragraphs to
-    the end of a text block containing footnotes.
+1.06 - 2018-08-31
 
-    Do not wrap paragraphs in output that seem to be a bunch of short
-    lines, and add support for broken quotes (multiple short lines, such
-    as poetry) in quotes in the thread template.
+ - When generating text output, put the footnotes containing URLs for
+   links immediately following the containing paragraph rather than the
+   end of the text block.  This is both more readable and avoids odd
+   placement of the footnotes when a template adds further paragraphs to
+   the end of a text block containing footnotes.
 
-    Adjust the README and README.md template to say that make warnings
-    requires either GCC or Clang, instead of only mentioning GCC.
+ - Do not wrap paragraphs in output that seem to be a bunch of short
+   lines, and add support for broken quotes (multiple short lines, such as
+   poetry) in quotes in the thread template.
 
-    Adjust the README.md wording for the list information URL when package
-    releases are announced on a mailing list.
+ - Adjust the README and README.md template to say that make warnings
+   requires either GCC or Clang, instead of only mentioning GCC.
 
-    Add support for additional developer documentation links in the thread
-    output template.
+ - Adjust the README.md wording for the list information URL when package
+   releases are announced on a mailing list.
 
-    Add support for contributed program documentation links in the thread
-    output template.
+ - Add support for additional developer documentation links in the thread
+   output template.
 
-DocKnot 1.05 (2018-05-05)
+ - Add support for contributed program documentation links in the thread
+   output template.
 
-    Add the Travis-CI badge to README.md and a link to Travis-CI to the
-    thread development links if the vcs.travis key is set in
-    metadata.json.
+1.05 - 2018-05-05
 
-    Add a Shields.io badge for the CPAN version to README.md and a link to
-    metacpan.org in the thread output if the distribution.cpan key is set
-    in metadata.json.
+ - Add the Travis-CI badge to README.md and a link to Travis-CI to the
+   thread development links if the vcs.travis key is set in metadata.json.
 
-    Move the description of Lancaster Consensus environment variables into
-    the testing section of README and README.md instead of the
-    requirements section, since they're more about running the tests and
-    less about package requirements in general.
+ - Add a Shields.io badge for the CPAN version to README.md and a link to
+   metacpan.org in the thread output if the distribution.cpan key is set
+   in metadata.json.
 
-    Add support for a new packaging/extra metadata file (setting the
-    packaging.extra key in templates) and use it in the thread template.
+ - Move the description of Lancaster Consensus environment variables into
+   the testing section of README and README.md instead of the requirements
+   section, since they're more about running the tests and less about
+   package requirements in general.
 
-    Correctly handle multi-paragraph debian.summary metadata in the thread
-    template.
+ - Add support for a new packaging/extra metadata file (setting the
+   packaging.extra key in templates) and use it in the thread template.
 
-    Fix formatting bug in the README template when additional bootstrap
-    documentation is provided.
+ - Correctly handle multi-paragraph debian.summary metadata in the thread
+   template.
 
-    DocKnot now requires Perl 5.24 or later.
+ - Fix formatting bug in the README template when additional bootstrap
+   documentation is provided.
 
-DocKnot 1.04 (2018-03-24)
+ - DocKnot now requires Perl 5.24 or later.
 
-    Fix SPDX test failure on Windows.
+1.04 - 2018-03-24
 
-DocKnot 1.03 (2018-03-17)
+ - Fix SPDX test failure on Windows.
 
-    Add support for a new metadata file, support/extra, that includes
-    information that should be added into the middle of the normal SUPPORT
-    section of README and README.md files.
+1.03 - 2018-03-17
 
-    Add a paragraph to the license section of README and README.md saying
-    that SPDX license identifiers are in use and providing a pointer to
-    the SPDX license list.
+ - Add support for a new metadata file, support/extra, that includes
+   information that should be added into the middle of the normal SUPPORT
+   section of README and README.md files.
 
-    Add SPDX-License-Identifier headers to all substantial source files,
-    and add a test to check for them.
+ - Add a paragraph to the license section of README and README.md saying
+   that SPDX license identifiers are in use and providing a pointer to the
+   SPDX license list.
 
-DocKnot 1.02 (2017-12-31)
+ - Add SPDX-License-Identifier headers to all substantial source files,
+   and add a test to check for them.
 
-    Support quoted paragraphs (each line starting with ">") and turn them
-    into indentation when turning markup into plain text.
+1.02 - 2017-12-31
 
-    Support numbered lists when converting to thread.
+ - Support quoted paragraphs (each line starting with ">") and turn them
+   into indentation when turning markup into plain text.
 
-    Force long, unbreakable lines to be left intact when wrapping.
+ - Support numbered lists when converting to thread.
 
-    When wrapping paragraphs, preserve two spaces after periods even when
-    the period comes before a closing parenthesis or quote mark.
+ - Force long, unbreakable lines to be left intact when wrapping.
 
-    Support test/prefix metadata, which replaces the introduction to the
-    test instructions.
+ - When wrapping paragraphs, preserve two spaces after periods even when
+   the period comes before a closing parenthesis or quote mark.
 
-    Add new license text BSD-3-clause-or-GPL-1+ to support pam-krb5.
-    Support markdown formatting in license texts when converting to
-    thread to handle the numbered clauses.
+ - Support test/prefix metadata, which replaces the introduction to the
+   test instructions.
 
-    Support more complex quote attributions in thread output, and
-    automatically add \cite[] around work names if they don't contain
-    double quotes.
+ - Add new license text BSD-3-clause-or-GPL-1+ to support pam-krb5.
+   Support markdown formatting in license texts when converting to thread
+   to handle the numbered clauses.
 
-    Add security advisory support to the thread template.
+ - Support more complex quote attributions in thread output, and
+   automatically add \cite[] around work names if they don't contain
+   double quotes.
 
-DocKnot 1.01 (2016-12-25)
+ - Add security advisory support to the thread template.
 
-    Add build and test instructions for Autoconf packages, including
-    details about Kerberos configuration, to the README and README.md
-    templates.  Allow a testing section in the metadata to override the
-    added testing section.  Add a flag to indicate that the package is not
-    intended to be installed, which suppresses some of the template.
+1.01 - 2016-12-25
 
-    Add support for license notices (the notices metadata file), which
-    should be appended to the end of the stock license statement wherever
-    it is generated.
+ - Add build and test instructions for Autoconf packages, including
+   details about Kerberos configuration, to the README and README.md
+   templates.  Allow a testing section in the metadata to override the
+   added testing section.  Add a flag to indicate that the package is not
+   intended to be installed, which suppresses some of the template.
 
-    Add support for stock building and installation sections for Perl
-    module packages using either Module::Build or ExtUtils::MakeMaker.
+ - Add support for license notices (the notices metadata file), which
+   should be appended to the end of the stock license statement wherever
+   it is generated.
 
-    Add thread template support for annotating quotes shorter than 80
-    characters with the "short" class.
+ - Add support for stock building and installation sections for Perl
+   module packages using either Module::Build or ExtUtils::MakeMaker.
 
-    Add support for additional bootstrapping requirements in a separate
-    bootstrap metadata file, appended to the Autotools bootstrapping
-    section (at least for right now).
+ - Add thread template support for annotating quotes shorter than 80
+   characters with the "short" class.
 
-    Allow markup in the license notices section.
+ - Add support for additional bootstrapping requirements in a separate
+   bootstrap metadata file, appended to the Autotools bootstrapping
+   section (at least for right now).
 
-DocKnot 1.00 (2016-10-26)
+ - Allow markup in the license notices section.
 
-    Initial public release.  Supports generating text and Markdown README
-    files and a thread index page.  There is some automation of the
-    requirements section, but only automation for the build and test
-    section for Module::Build Perl modules.
+1.00 - 2016-10-26
+
+ - Initial public release.  Supports generating text and Markdown README
+   files and a thread index page.  There is some automation of the
+   requirements section, but only automation for the build and test
+   section for Module::Build Perl modules.

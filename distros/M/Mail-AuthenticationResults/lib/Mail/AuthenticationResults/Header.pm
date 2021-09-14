@@ -4,7 +4,7 @@ package Mail::AuthenticationResults::Header;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '2.20210112'; # VERSION
+our $VERSION = '2.20210914'; # VERSION
 use Carp;
 
 use Mail::AuthenticationResults::Header::AuthServID;
@@ -246,7 +246,7 @@ Mail::AuthenticationResults::Header - Class modelling the Entire Authentication 
 
 =head1 VERSION
 
-version 2.20210112
+version 2.20210914
 
 =head1 DESCRIPTION
 
@@ -320,7 +320,7 @@ Marc Bradshaw <marc@marcbradshaw.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Marc Bradshaw.
+This software is copyright (c) 2021 by Marc Bradshaw.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

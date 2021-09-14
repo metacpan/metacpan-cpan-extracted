@@ -1,5 +1,8 @@
 Change log for Mail::AuthenticationResults
 
+2.20210914 2021-09-14 05:17:31+00:00 UTC
+  - New method to copy children from 1 object to another
+
 2.20210112 2021-01-12 22:10:28+00:00 UTC
   - Switch to a purely numeric version string
 

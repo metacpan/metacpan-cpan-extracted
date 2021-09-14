@@ -7,8 +7,9 @@ use Devel::Git::MultiBisect::Auxiliary qw(
     clean_outputfile
     hexdigest_one_file
     validate_list_sequence
+    write_transitions_report
 );
-use Test::More tests => 55;
+use Test::More tests => 61;
 use Cwd;
 use File::Copy;
 use File::Spec;
@@ -279,3 +280,82 @@ sub hex_tempfile {
     ok($rv->[0], "validate_list_sequence() has true status");
 }
 
+##### write_transitions_report #####
+
+{
+    my $outputdir = tempdir( CLEANUP => 1 );
+    my $report_basename = 'transitions.pl';
+
+    {
+        local $@;
+        eval { write_transitions_report($outputdir, $report_basename); };
+        like($@, qr/\QMust supply 3 arguments to write_transitions_report()\E/,
+            "Got exception for insufficient number of arguments to write_transitions_report()");
+    }
+    {
+        local $@;
+        my $bad_arg = [];
+        eval { write_transitions_report($outputdir, $report_basename, $bad_arg); };
+        like($@, qr/\Q3rd argument to write_transitions_report() must be hashref\E/,
+            "Got exception for non-hashref as 3rd argument to write_transitions_report()");
+    }
+    {
+        local $@;
+        my $bad_arg = { newest => 'foo', oldest => 'bar' };
+        eval { write_transitions_report($outputdir, $report_basename, $bad_arg); };
+        like($@, qr/\QMust be 3 elements in 3rd argument to write_transitions_report()\E/,
+            "Got exception for insufficient number of elements in 3rd argument to write_transitions_report()");
+    }
+    {
+        local $@;
+        my $bad_arg = { newest => 'foo', oldest => 'bar', baz => 1 };
+        my $missing = 'transitions';
+        eval { write_transitions_report($outputdir, $report_basename, $bad_arg); };
+        like($@, qr/\Q'$missing' element missing from 3rd argument to write_transitions_report()\E/,
+            "Got exception for missing element '$missing' in 3rd argument to write_transitions_report()");
+    }
+
+    $outputdir = tempdir();  # Set CLEANUP => 1 when we're sure it's working
+    my $expected_path = File::Spec->catdir($outputdir, $report_basename);
+    my $transitions_data = {
+      newest => {
+        file => "/tmp/uLAXJKytVu/cab7765.make.stderr.txt",
+        idx => 308,
+        md5_hex => "b9723c289e0d60084f639c8ed3c9a846",
+      },
+      oldest => {
+        file => "/tmp/uLAXJKytVu/7631dcc.make.stderr.txt",
+        idx => 0,
+        md5_hex => "54fc3796601f695b047d9fbcbc309d74",
+      },
+      transitions => [
+        {
+          newer => {
+                     file => "/tmp/uLAXJKytVu/6e7a781.make.stderr.txt",
+                     idx => 1,
+                     md5_hex => "42dcaf235c5d2ac2a555896ca43e0ba8",
+                   },
+          older => {
+                     file => "/tmp/uLAXJKytVu/7631dcc.make.stderr.txt",
+                     idx => 0,
+                     md5_hex => "54fc3796601f695b047d9fbcbc309d74",
+                   },
+        },
+        {
+          newer => {
+                     file => "/tmp/uLAXJKytVu/48d2135.make.stderr.txt",
+                     idx => 283,
+                     md5_hex => "b9723c289e0d60084f639c8ed3c9a846",
+                   },
+          older => {
+                     file => "/tmp/uLAXJKytVu/7073dfe.make.stderr.txt",
+                     idx => 282,
+                     md5_hex => "42dcaf235c5d2ac2a555896ca43e0ba8",
+                   },
+        },
+      ],
+    };
+    my $transitions_report = write_transitions_report($outputdir, $report_basename, $transitions_data);
+    ok(-f $transitions_report, "Wrote $transitions_report");
+    ok(-s $transitions_report, "$transitions_report has content");
+}

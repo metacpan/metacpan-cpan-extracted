@@ -18,7 +18,7 @@ use PDL::NiceSlice;
 
 ## no critic (ProhibitExplicitReturnUndef)
 
-our $VERSION = '0.07';
+our $VERSION = '0.12';
 
 use parent 'Statistics::Descriptive::PDL';
 
@@ -54,9 +54,12 @@ sub add_data {
 
     my ($data_piddle, $weights_piddle);
 
+    my $data_from_hash;
+    
     if (ref $data eq 'HASH') {
         $data_piddle    = PDL->pdl ([keys %$data])->flat;
         $weights_piddle = PDL->pdl ($self->_wt_type, [values %$data])->flat;
+        $data_from_hash = 1;
     }
     else {
         $data_piddle    = PDL->pdl ($self->{data_type}, $data)->flat;
@@ -87,12 +90,55 @@ sub add_data {
         $self->_set_weights_piddle ($weights_piddle);
     }
 
-    #  need to clear late
+    #  need to clear late because count is cached
     $self->clear_cache;
+
+    #  somewhat awkward but needs to be set after clearing the cache
+    if ($data_from_hash && !$has_existing_data) {
+        $self->values_are_unique(1);
+    }
 
     return $self->count;
 }
 
+sub get_data {
+    my $self = shift;
+    my $piddle = $self->_get_piddle;
+    my $wts_piddle = $self->_get_weights_piddle;
+    
+    my $data = defined $piddle ? $piddle->unpdl : [];
+    my $wts  = defined $wts_piddle ? $wts_piddle->unpdl : [];
+    
+    return wantarray ? ($data, $wts) : [$data, $wts];
+}
+
+sub get_data_as_hash {
+    my $self = shift;
+    
+    my $piddle = $self->_get_piddle;
+
+    return wantarray ? () : {}
+      if !defined $piddle;
+
+    $self->_deduplicate_piddle;
+
+    my $data = $self->_get_piddle->unpdl;
+    my $wts  = $self->_get_weights_piddle->unpdl;
+    my %h;
+    @h{@$data} = @$wts;
+
+    return wantarray ? (%h) : \%h;
+}
+
+
+sub values_are_unique {
+    my $self = shift;
+    if (@_) {
+        my $flag = shift;
+        $self->{_cache}{deduplicated} = !!$flag;
+    }
+    return $self->{_cache}{deduplicated};
+}
 
 sub _set_weights_piddle {
     my ($self, $data) = @_;
@@ -206,12 +252,18 @@ sub _deduplicate_piddle {
     my $self = shift;
     my $piddle = $self->_get_piddle;
     
-    return undef if !defined $piddle;
+    return undef
+      if !defined $piddle;
+
+    return $piddle
+      if $self->values_are_unique;
 
     my $unique = $piddle->uniq;
 
-    return $self->_get_piddle
-      if $unique->nelem == $piddle->nelem;
+    if ($unique->nelem == $piddle->nelem) {
+        $self->values_are_unique(1);
+        return $piddle
+    }
 
     if (!$self->{sorted}) {
         $unique = $unique->qsort;
@@ -239,7 +291,8 @@ sub _deduplicate_piddle {
     $self->_set_piddle($unique);
     $self->_set_weights_piddle(\@wts);
 
-    delete $self->{_cache};
+    $self->clear_cache;
+    $self->values_are_unique (1);
 
     return $self->_get_piddle;
 }
@@ -345,7 +398,7 @@ sub _percentile {
 
     my $target_wt = $self->sum_weights * ($p / 100);
 
-    my $idx = PDL->pdl($target_wt)->vsearch_insert_leftmost($cumsum->reshape);  
+    my $idx = PDL->pdl($target_wt)->vsearch_insert_leftmost($cumsum->reshape);
 
     return $data->at($idx);
 }
@@ -363,7 +416,7 @@ Statistics::Descriptive::Weighted using PDL as the back-end
 
 =head1 VERSION
 
-Version 0.07
+Version 0.11
 
 =cut
 
@@ -374,8 +427,8 @@ Version 0.07
 
     my $stats = Statistics::Descriptive::PDL::Weighted->new;
     $stats->add_data([1,2,3,4], [1,3,5,6]);  #  values then weights
-    my $mean = $stat->mean;
-    my $var  = $stat->variance;
+    my $mean = $stats->mean;
+    my $var  = $stats->variance;
     
     #  or you can add data using a hash ref
     my %data = (1 => 1, 2 => 3, 3 => 5, 4 => 6);
@@ -418,6 +471,29 @@ specify anything pdl accepts as valid.
 
 An exception is raised the weights are <= 0, or are not the same size as the data.
 
+=item get_data
+
+Returns arrays of the data and the weights.
+
+In scalar context returns an array of arrays, i.e. C<[\@data,\@wts]>.
+
+=item get_data_as_hash
+
+Returns the data as a perl hash, with the data values as the hash keys and weights as the hash values.
+Deduplicates the data if needed, incrementing the weights as appropriate.
+
+Data values are stringified so there is obviously potential for loss of precision.  
+
+Returns a hash ref in scalar context.
+
+=item values_are_unique
+
+=item values_are_unique (1)
+
+Flag to indicate if the data have duplicate values.
+Pass a true value to indicate your data have no
+duplicate values, making the median and percentile
+calculations faster (at the risk of you not being correct).
 
 =item sum_wts
 

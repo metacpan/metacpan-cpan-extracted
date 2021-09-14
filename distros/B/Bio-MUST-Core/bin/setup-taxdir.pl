@@ -31,7 +31,7 @@ setup-taxdir.pl - Setup a local mirror of the NCBI Taxonomy (or GTDB) database
 
 =head1 VERSION
 
-version 0.211470
+version 0.212530
 
 =head1 USAGE
 
@@ -58,7 +58,7 @@ Path to the directory to be created.
 Source database from where to download taxonomy files (either NCBI or GTDB,
 respectively designated as C<ncbi> and C<gtdb>) [default: ncbi].
 
-=for Euclid: str.type:       /ncbi|gtdb/
+=for Euclid: str.type:       string, str eq 'ncbi' || str eq 'gtdb'
     str.type.error: <str> must be on ncbi or gtdb (not str)
     str.default:    "ncbi"
 

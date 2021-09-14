@@ -1,5 +1,17 @@
 Revision history for Tangence
 
+0.26    2021-09-12
+        [CHANGES]
+         * General code modernisation:
+            + Use Syntax::Keyword::Match instead of given/when
+            + Use Feature::Compat::Try instead of eval {}
+            + use VERSION in every .pm file
+         * Support core booleans in 'any' type packing
+         * Ensure that boolean stream values unpack to real booleans
+
+        [BUGFIXES]
+         * Depend on Future >= 0.36 for ->retain method (RT131471)
+
 0.25    2020-01-14
         [CHANGES]
          * Allow servers to disallow access to Registry

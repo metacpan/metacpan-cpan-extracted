@@ -32,7 +32,7 @@ tree2list.pl - Generate id lists from tree tips
 
 =head1 VERSION
 
-version 0.211470
+version 0.212530
 
 =head1 USAGE
 

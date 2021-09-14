@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use parent qw( Alien::Base );
 
-our $VERSION = '1.007';
+our $VERSION = '1.008';
 
 #  make sure we find geos and geos_c
 sub dynamic_libs {
@@ -29,8 +29,9 @@ sub dynamic_libs {
         if (-d $dynamic) {
             $dir = $dynamic;
         }
-        
-        my @libs;
+
+        my @libs = $class->SUPER::dynamic_libs;
+
         push @libs, FFI::CheckLib::find_lib(
             lib        => ['geos', 'geos_c'],
             libpath    => $dir,
@@ -76,9 +77,9 @@ Alien::geos::af - Compile GEOS, the Geometry Engine, Open Source
 
 GEOS is the Geometry Engine, Open Source.  See L<http://geos.osgeo.org/>.
 
-The name is chosen to not clash with a pre-existing Alien::GEOS distribution.
-This package differs in that it uses the alienfile approach, hence the ::af
-suffix in the name.  
+The name Aien::geos::AF is chosen to not clash with a pre-existing
+Alien::GEOS distribution.  This package differs in that it uses the
+alienfile approach, hence the ::af suffix in the name.
 
 
 =head1 REPORTING BUGS
@@ -88,11 +89,13 @@ L<https://github.com/shawnlaffan/perl-alien-geos/issues>.
 
 =head1 SEE ALSO
 
-L<Geo::GDAL>
-
 L<Geo::GDAL::FFI>
 
 L<Alien::gdal>
+
+L<Alien::proj>
+
+L<Geo::Geos>
 
 =head1 AUTHORS
 
@@ -102,7 +105,7 @@ Shawn Laffan, E<lt>shawnlaffan@gmail.comE<gt>
 =head1 COPYRIGHT AND LICENSE
 
 
-Copyright 2018 by Shawn Laffan
+Copyright 2018- by Shawn Laffan
 
 
 This library is free software; you can redistribute it and/or modify

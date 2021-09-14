@@ -45,10 +45,14 @@ sub import {
     next if Role::Tiny::does_role($target, $default_role);
     debug 1, "Applying role '$default_role' to '$target'";
     Moo::Role->apply_roles_to_package($target, $default_role);
+    foreach my $export ($class->default_exports) {
+      debug 2, "Adding method '__${export}_for_exporter' as alias for '$export'";
+      Moo::_Utils::_install_tracked($target, "__${export}_for_exporter", \&{"${target}::${export}"});
+    }
   }
 
   my %cb = map {
-    $_ => $target->can($_);
+    $_ => $target->can("__${_}_for_exporter");
   } $class->default_exports;
 
   foreach my $exported_method (keys %cb) {

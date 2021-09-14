@@ -1,5 +1,11 @@
 Revision history for Tickit-Widget-Term
 
+0.005   2021-09-14
+        [CHANGES]
+         * Added ->use_pty method to simplify common case of using an IO::Pty
+           handle
+         * Updated for Term::VTerm 0.07 - need to `use Term::VTerm::Pos`
+
 0.004   2021-08-17
         First version, released on an unsuspecting world.
         Well, almost first release. This distribution replaces a previous one

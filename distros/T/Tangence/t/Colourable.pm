@@ -1,6 +1,6 @@
 package t::Colourable;
 
-use strict;
+use v5.14;
 
 use Tangence::Constants;
 

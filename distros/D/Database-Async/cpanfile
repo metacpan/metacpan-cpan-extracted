@@ -7,6 +7,7 @@ requires 'IO::Async', '>= 0.68';
 requires 'IO::Async::Notifier', '>= 0.68';
 requires 'JSON::MaybeUTF8', 0;
 requires 'List::Util', '>= 1.50';
+requires 'List::UtilsBy', 0;
 requires 'Log::Any', '>= 1.050';
 requires 'Module::Load', 0;
 requires 'mro', 0;

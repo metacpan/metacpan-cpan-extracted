@@ -3,7 +3,7 @@ package Database::Async;
 use strict;
 use warnings;
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 use parent qw(Database::Async::DB IO::Async::Notifier);
 
@@ -416,7 +416,7 @@ async sub request_engine {
     $log->tracef('Requesting new engine');
     my $engine = $self->engine_instance;
     $log->tracef('Connecting');
-    return await $engine->connect->retain;
+    return await $engine->connect;
 }
 
 =head2 engine_instance
@@ -465,6 +465,11 @@ ready for queries.
 sub engine_ready {
     my ($self, $engine) = @_;
     $self->pool->queue_ready_engine($engine);
+}
+
+sub engine_disconnected {
+    my ($self, $engine) = @_;
+    $self->pool->unregister_engine($engine);
 }
 
 sub db { shift }

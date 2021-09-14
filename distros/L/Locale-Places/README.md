@@ -1,12 +1,10 @@
-[![Kritika Analysis Status](https://kritika.io/users/nigelhorne/repos/4663014674766170/heads/master/status.svg)](https://kritika.io/users/nigelhorne/repos/4663014674766170/heads/master/)
-
 # NAME
 
 Locale::Places - Translate places using http://download.geonames.org/
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # METHODS
 

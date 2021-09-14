@@ -1,3 +1,15 @@
+0.004   2021-09-13  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [cli import-csv-to-sqlite] Expand/fix description.
+
+
+0.003   2021-09-12  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLI: import-csv-to-sqlite.
+
+
 0.002   2021-01-21  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

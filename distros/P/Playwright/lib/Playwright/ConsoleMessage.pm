@@ -9,13 +9,23 @@ use strict;
 use warnings;
 
 package Playwright::ConsoleMessage;
-$Playwright::ConsoleMessage::VERSION = '0.014';
+$Playwright::ConsoleMessage::VERSION = '0.015';
 use parent 'Playwright::Base';
 
 sub new {
     my ( $self, %options ) = @_;
     $options{type} = 'ConsoleMessage';
     return $self->SUPER::new(%options);
+}
+
+sub args {
+    my $self = shift;
+    return $self->_request(
+        args    => [@_],
+        command => 'args',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
 }
 
 sub text {
@@ -43,16 +53,6 @@ sub type {
     return $self->_request(
         args    => [@_],
         command => 'type',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub args {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'args',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -102,7 +102,7 @@ Playwright::ConsoleMessage - Automatically generated class for Playwright::Conso
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 CONSTRUCTOR
 
@@ -112,6 +112,12 @@ You shouldn't have to call this directly.
 Instead it should be returned to you as the result of calls on Playwright objects, or objects it returns.
 
 =head1 METHODS
+
+=head2 args(@args)
+
+Execute the ConsoleMessage::args playwright routine.
+
+See L<https://playwright.dev/api/class-ConsoleMessage#ConsoleMessage-args> for more information.
 
 =head2 text(@args)
 
@@ -130,12 +136,6 @@ See L<https://playwright.dev/api/class-ConsoleMessage#ConsoleMessage-location> f
 Execute the ConsoleMessage::type playwright routine.
 
 See L<https://playwright.dev/api/class-ConsoleMessage#ConsoleMessage-type> for more information.
-
-=head2 args(@args)
-
-Execute the ConsoleMessage::args playwright routine.
-
-See L<https://playwright.dev/api/class-ConsoleMessage#ConsoleMessage-args> for more information.
 
 =head2 on(@args)
 

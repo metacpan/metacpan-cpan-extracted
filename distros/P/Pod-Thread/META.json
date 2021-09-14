@@ -34,15 +34,24 @@
    "provides" : {
       "Pod::Thread" : {
          "file" : "lib/Pod/Thread.pm",
-         "version" : "2.00"
+         "version" : "3.00"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/rra/pod-thread/issues"
+      },
+      "homepage" : "https://www.eyrie.org/~eagle/software/pod-thread/",
       "license" : [
          "http://www.opensource.org/licenses/mit-license.php"
-      ]
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/rra/pod-thread.git",
+         "web" : "https://github.com/rra/pod-thread"
+      }
    },
-   "version" : "2.00",
+   "version" : "3.00",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

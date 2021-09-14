@@ -21,12 +21,21 @@
 
 \h1[DocKnot]
 
+\quote(short)[
+
+    Whenever you set out to do something, something else must be done
+    first.
+
+][Murphy's Fourth Corollary][]
+
 \div(sidebar)[
     \h2[Download]
 
     \download[DocKnot][docknot]
         [devel/App-DocKnot-\version[docknot]]
 
+    \link[https://packages.debian.org/source/sid/docknot]
+         [Debian packages] \break
     \link[https://archives.eyrie.org/software/ARCHIVE/App-DocKnot/]
          [Archive]
 
@@ -46,36 +55,36 @@
     \link[https://git.eyrie.org/?p=devel/docknot.git]
          [Git repository] \break
     \link[https://metacpan.org/release/App-DocKnot]
-         [MetaCPAN]
+         [MetaCPAN] \break
+    \link[https://tracker.debian.org/pkg/docknot]
+         [Debian package tracker] \break
 ]
 
 \h2[Blurb]
 
-DocKnot is a system for generating consistent human-readable software
-package documentation from a YAML metadata file and templates.  The goal
-is to generate both web pages and distributed documentation files (such as
-\code[README]) from the same source, using templates for consistency
-across multiple packages.  DocKnot also automates generating distribution
-tarballs for software packages.
+DocKnot is a static web site generator built around a macro language
+called thread, with special support for managing software releases.  In
+addition to building a web site, it can generate distribution tarballs and
+consistent human-readable software package documentation from a YAML
+metadata file and templates.  The goal is to generate both web pages and
+distributed documentation files (such as \code[README]) from the same
+source, using templates for consistency across multiple packages.
 
 \h2[Description]
 
-After years of maintaining a variety of small free software packages, I
-found the most tedious part of making a new release was updating the
-documentation in multiple locations.  Copyright dates would change,
-prerequisites and package descriptions would change, and I had to update
-at least the package \code[README] file and its web pages separately.  The
-last straw was when GitHub became popular and I wanted to provide a
-Markdown version of \code[README] as well, avoiding the ugly text
-rendering on the GitHub page for a package.
+In 1999, I wrote a program named \code[spin] that implemented an
+idiosyncratic macro language called thread.  It slowly expanded into a
+static web site generator and gained additional features to manage the
+journal entries, book reviews, RSS feeds, and software releases.  DocKnot
+is the latest incarnation.
 
-This package uses one metadata file as its source information and
-generates all the various bits of documentation for a package.  This
-allows me to make any changes in one place and then just regenerate the
-web page, included documentation, and other files to incorporate those
-changes.  It also lets me make changes to the templates to improve shared
-wording and push that out to every package I maintain during its next
-release, without having to remember which changes I wanted to make.
+In addition to its static web site generator, DocKnot can use one metadata
+file as its source information and generate all the various bits of
+documentation for a software package.  This allows me to make any changes
+in one place and then regenerate the web page, included documentation, and
+other files to incorporate those changes.  It also lets me make changes to
+the templates to improve shared wording and push that out to every package
+I maintain without having to remember track those changes in each package.
 
 DocKnot is also slowly absorbing other tools that I use for software
 distribution and web site maintenance, such as generating distribution
@@ -84,34 +93,33 @@ tarballs for software packages.
 DocKnot was designed and written for my personal needs, and I'm not sure
 it will be useful for anyone else.  At the least, the template files are
 rather specific to my preferences about how to write package
-documentation, and the web page output is in my personal thread language
-as opposed to HTML.  I'm not sure if I'll have the time to make it a more
+documentation, and the thread macro language is highly specialized for my
+personal web site.  I'm not sure if I'll have the time to make it a more
 general tool.  But you're certainly welcome to use it if you find it
 useful, send pull requests to make it more general, or take ideas from it
 for your own purposes.
-
-Currently included in this package are just the App::DocKnot module and
-its submodules, a small docknot driver program, and the templates I use
-for my own software.  Over time, it may include more of my web publishing
-framework, time permitting.
 
 \h2[Requirements]
 
 Perl 5.24 or later and Module::Build are required to build this module.
 The following additional Perl modules are required to use it:
 
+\bullet(packed)[Date::Parse (part of TimeDate)]
 \bullet(packed)[File::BaseDir]
 \bullet(packed)[File::ShareDir]
+\bullet(packed)[Git::Repository]
+\bullet(packed)[Image::Size]
 \bullet(packed)[IO::Compress::Xz (part of IO-Compress-Lzma)]
 \bullet(packed)[IO::Uncompress::Gunzip (part of IO-Compress)]
 \bullet(packed)[IPC::Run]
 \bullet(packed)[IPC::System::Simple]
 \bullet(packed)[JSON::MaybeXS]
 \bullet(packed)[Kwalify]
-\bullet(packed)[List::SomeUtils]
+\bullet(packed)[List::SomeUtils 0.07 or later]
 \bullet(packed)[Perl6::Slurp]
+\bullet(packed)[Pod::Thread 3.00 or later]
 \bullet(packed)[Template (part of Template Toolkit)]
-\bullet(packed)[YAML::XS]
+\bullet(packed)[YAML::XS 0.81 or later]
 
 \h2[Download]
 
@@ -125,8 +133,9 @@ The distribution:
 An \link[https://archives.eyrie.org/software/ARCHIVE/App-DocKnot/]
 [archive of older releases] is also available.
 
-A Debian package is available from my \link[../debian.html][personal
-repository].
+DocKnot is packaged in Debian 11 (bullseye) and later as docknot.  See the
+\link[https://tracker.debian.org/pkg/docknot][Debian package tracker] for
+more information.
 
 DocKnot is available from CPAN as the
 \link[https://metacpan.org/release/App-DocKnot] [App-DocKnot
@@ -159,7 +168,6 @@ development source].
         [GitHub]
     \doc[https://github.com/rra/docknot/issues]
         [Bug tracker]
-
 ]
 
 \div(right)[
@@ -170,6 +178,11 @@ development source].
     \doc[api/app-docknot-config.html][App::DocKnot::Config]
     \doc[api/app-docknot-dist.html][App::DocKnot::Dist]
     \doc[api/app-docknot-generate.html][App::DocKnot::Generate]
+    \doc[api/app-docknot-spin.html][App::DocKnot::Spin]
+    \doc[api/app-docknot-spin-rss.html][App::DocKnot::Spin::RSS]
+    \doc[api/app-docknot-spin-sitemap.html][App::DocKnot::Spin::Sitemap]
+    \doc[api/app-docknot-spin-thread.html][App::DocKnot::Spin::Thread]
+    \doc[api/app-docknot-spin-versions.html][App::DocKnot::Spin::Versions]
     \doc[api/app-docknot-update.html][App::DocKnot::Update]
 ]
 
@@ -180,7 +193,7 @@ license:
 
 \block[
 
-    Copyright 2013-2021
+    Copyright 1999-2021
         Russ Allbery <rra@cpan.org>
 
     Permission is hereby granted, free of charge, to any person obtaining

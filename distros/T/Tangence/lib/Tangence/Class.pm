@@ -3,9 +3,9 @@
 #
 #  (C) Paul Evans, 2010-2020 -- leonerd@leonerd.org.uk
 
-package Tangence::Class;
+package Tangence::Class 0.26;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Tangence::Meta::Class );
 
@@ -20,8 +20,6 @@ use Tangence::Meta::Argument;
 use Carp;
 
 use Sub::Util 1.40 qw( set_subname );
-
-our $VERSION = '0.25';
 
 our %metas; # cache one per class, keyed by _Tangence_ class name
 

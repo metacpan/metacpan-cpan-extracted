@@ -1,0 +1,5 @@
+/: Russ Allbery
+  /faqs/: FAQs and Documentation
+    /faqs/questions.html
+    ---
+    /faqs/comments.html: Why This Journal Doesn't Support Comments

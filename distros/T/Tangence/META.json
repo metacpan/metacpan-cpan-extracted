@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -23,12 +23,14 @@
          "requires" : {
             "Encode" : "0",
             "Exporter" : "5.57",
-            "Future" : "0",
+            "Feature::Compat::Try" : "0",
+            "Future" : "0.36",
             "List::Util" : "1.29",
             "Parser::MGC" : "0.04",
             "Struct::Dumb" : "0",
             "Sub::Util" : "1.40",
-            "perl" : "5.01"
+            "Syntax::Keyword::Match" : "0",
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -46,101 +48,103 @@
    "provides" : {
       "Tangence" : {
          "file" : "lib/Tangence.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "Tangence::Class" : {
          "file" : "lib/Tangence/Class.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "Tangence::Client" : {
          "file" : "lib/Tangence/Client.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "Tangence::Compiler::Parser" : {
          "file" : "lib/Tangence/Compiler/Parser.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "Tangence::Constants" : {
          "file" : "lib/Tangence/Constants.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "Tangence::Message" : {
          "file" : "lib/Tangence/Message.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "Tangence::Meta::Argument" : {
          "file" : "lib/Tangence/Meta/Argument.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "Tangence::Meta::Class" : {
          "file" : "lib/Tangence/Meta/Class.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "Tangence::Meta::Event" : {
          "file" : "lib/Tangence/Meta/Event.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "Tangence::Meta::Field" : {
          "file" : "lib/Tangence/Meta/Field.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "Tangence::Meta::Method" : {
          "file" : "lib/Tangence/Meta/Method.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "Tangence::Meta::Property" : {
          "file" : "lib/Tangence/Meta/Property.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "Tangence::Meta::Struct" : {
          "file" : "lib/Tangence/Meta/Struct.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "Tangence::Meta::Type" : {
          "file" : "lib/Tangence/Meta/Type.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "Tangence::Object" : {
          "file" : "lib/Tangence/Object.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "Tangence::ObjectProxy" : {
          "file" : "lib/Tangence/ObjectProxy.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "Tangence::Property" : {
          "file" : "lib/Tangence/Property.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "Tangence::Registry" : {
          "file" : "lib/Tangence/Registry.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "Tangence::Server" : {
          "file" : "lib/Tangence/Server.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "Tangence::Server::Context" : {
          "file" : "lib/Tangence/Server/Context.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "Tangence::Stream" : {
          "file" : "lib/Tangence/Stream.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "Tangence::Struct" : {
          "file" : "lib/Tangence/Struct.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "Tangence::Type" : {
-         "file" : "lib/Tangence/Type.pm"
+         "file" : "lib/Tangence/Type.pm",
+         "version" : "0.26"
       },
       "Tangence::Type::Primitive" : {
-         "file" : "lib/Tangence/Type/Primitive.pm"
+         "file" : "lib/Tangence/Type/Primitive.pm",
+         "version" : "0.26"
       },
       "Tangence::Types" : {
          "file" : "lib/Tangence/Types.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       }
    },
    "release_status" : "stable",
@@ -149,6 +153,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.25",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.26",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

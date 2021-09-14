@@ -13,7 +13,7 @@ WriteMakefile(
 	],
 
 	PREREQ_PM => {
-		'Bitcoin::Crypto' => 0,
+		'Bitcoin::Crypto' => '1.000',
 		'Text::QRCode' => 0,
 		'List::Util' => '1.29',
 	},

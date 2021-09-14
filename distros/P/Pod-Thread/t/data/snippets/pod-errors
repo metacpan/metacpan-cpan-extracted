@@ -1,0 +1,24 @@
+[name]
+Handling of POD errors
+
+[input]
+=over
+
+=item *
+
+There is no back here.
+
+=cut
+
+[output]
+\bullet
+[There is no back here.
+]
+
+\signature
+
+[errors]
+Pod input around line 1: =over without closing =back
+
+[exception]
+POD document had syntax errors

@@ -291,20 +291,52 @@ sub _validate_content {
     } else {
         my $mtype_map = $content_ptr->value;
         my @keys = $content_ptr->keys(raw => 1);
-        return 0, [error(message => qq{schema has more than one content_type})], [] if scalar(@keys) > 1;
+        return 0, [error(message => qq{schema must has exactly one content_type})], [] unless scalar(@keys) == 1;
 
         $content_type = $keys[0];
         $ctype_ptr = $content_ptr->xget($content_type);
     }
 
     unless (ref $data) {
-        if ($content_type eq 'application/json') {
-            $data = json_decode($data);
+        if (index($content_type, 'application/json') != -1) {
+            eval { $data = json_decode($data); };
         }
-        # need to support other content-type?
+        # do we need to support other content-type?
     }
 
     my $schema_ptr = $ctype_ptr->xget('schema');
+    my $schema_prop_ptr = $schema_ptr->xget('properties');
+
+    if (
+        $schema_prop_ptr &&
+        $content_type &&
+        (
+            index($content_type ,'application/x-www-form-urlencoded') != -1 ||
+            index($content_type, 'multipart/') != -1
+        ) &&
+        ref $data eq 'HASH'
+    ) {
+        for my $property_name ($schema_prop_ptr->keys(raw => 1)) {
+            my $property_ctype_ptr = $ctype_ptr->xget('encoding', $property_name, 'contentType');
+            my $property_ctype = $property_ctype_ptr ? $property_ctype_ptr->value : '';
+            unless ($property_ctype) {
+                my $prop_type_ptr = $schema_prop_ptr->xget($property_name, 'type');
+                $property_ctype = $prop_type_ptr && $prop_type_ptr->value eq 'object' ? 'application/json' : '';
+            }
+
+            if (
+                index($property_ctype, 'application/json') != -1 &&
+                exists $data->{$property_name} &&
+                !ref $data->{$property_name}
+            ) {
+                eval {
+                    $data->{$property_name} = json_decode($data->{$property_name});
+                };
+            }
+            # do we need to support other content-type?
+        }
+    }
+
     return $self->validate_schema($data,
         schema => $schema_ptr->value,
         path => '/',
@@ -383,7 +415,7 @@ JSONSchema::Validator::OAS30 - Validator for OpenAPI Specification 3.0
 
 =head1 VERSION
 
-version 0.006
+version 0.008
 
 =head1 SYNOPSIS
 

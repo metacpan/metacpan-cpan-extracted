@@ -23,6 +23,13 @@ my %WriteMakefileArgs = (
   META_MERGE     => {
     'dynamic_config' => 0,
     'meta-spec'      => {version => 2},
+    'prereqs'        => {
+      'runtime' =>
+        {'recommends' => {
+  'Text::Markdown' => 'v1.0.31'
+}
+}
+    },
     'resources'      => {
       bugtracker => {web => 'https://github.com/jhthorsen/mojolicious-plugin-openapi/issues'},
       homepage   => 'https://github.com/jhthorsen/mojolicious-plugin-openapi',

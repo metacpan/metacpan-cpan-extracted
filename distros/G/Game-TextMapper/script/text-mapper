@@ -18,13 +18,17 @@
 
 text-mapper - a web app to generate maps based on text files
 
+=head1 SYNOPSIS
+
+    text-mapper daemon --listen "http://*:3010"
+
 =head1 DESCRIPTION
 
 This command starts a web server using Mojolicious.
 
 =head1 SEE ALSO
 
-For more information, see <Game::TextMapper>.
+For more information, see L<Game::TextMapper>.
 
 =head1 LICENSE
 
@@ -32,7 +36,8 @@ GNU Affero General Public License
 
 =cut
 
-use Modern::Perl;
-use Mojo::Home;
-my $home = Mojo::Home->new;
-do $home->detect('Game::TextMapper')->child('lib/Game/TextMapper.pm');
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+my $res = require Game::TextMapper
+    or not defined $res and die "Cannot load Game::TextMapper: $!"
+    or not $res and die "Game::TextMapper did not return a true value\n";

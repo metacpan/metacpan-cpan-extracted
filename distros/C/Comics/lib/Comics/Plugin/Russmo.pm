@@ -20,5 +20,7 @@ our $pattern =
 	        class="wp-image-\d+"
 	      }x;
 
+our $disabled = 1;		# ceased?
+
 # Important: Return the package name!
 __PACKAGE__;

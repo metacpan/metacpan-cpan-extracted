@@ -135,6 +135,11 @@ L<Ryu::Source> representing outgoing packets for the current database connection
 
 L<Ryu::Source> representing incoming packets for the current database connection.
 
+=head2 connected
+
+A L<Ryu::Observable> which will be 1 while the connection is in a valid state,
+and 0 if we're disconnected.
+
 =head2 authenticated
 
 Resolves once database authentication is complete.
@@ -225,6 +230,8 @@ L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/a
 =head1 AUTHOR
 
 Tom Molesworth C<< <TEAM@cpan.org> >>
+
+with contributions from Tortsten Förtsch C<< <OPI@cpan.org> >>
 
 =head1 LICENSE
 

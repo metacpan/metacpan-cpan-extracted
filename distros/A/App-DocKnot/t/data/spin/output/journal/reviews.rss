@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Eagle's Path</title>
+    <link>https://www.eyrie.org/~eagle/</link>
+    <description>"Passion and dispassion.  Choose two." -- Larry Wall</description>
+    <language>en-us</language>
+    <pubDate>%DATE%</pubDate>
+    <lastBuildDate>%DATE%</lastBuildDate>
+    <generator>DocKnot %VERSION%</generator>
+    <atom:link href="https://www.eyrie.org/~eagle/journal/reviews.rss" rel="self"
+               type="application/rss+xml" />
+
+    <item>
+      <title>Review: Fermat's Enigma</title>
+      <link>https://www.eyrie.org/~eagle/reviews/books/1-250-30112-2.html</link>
+      <description><![CDATA[
+<p>Review: <cite>Fermat's Enigma</cite>, by Simon Singh</p>
+
+<table>
+  <tr>
+    <td>Publisher:</td>
+    <td>Anchor</td>
+  </tr>
+  <tr>
+    <td>Copyright:</td>
+    <td>1997</td>
+  </tr>
+  <tr>
+    <td>Printing:</td>
+    <td>October 1998</td>
+  </tr>
+  <tr>
+    <td>ISBN:</td>
+    <td>0-385-49362-2</td>
+  </tr>
+  <tr>
+    <td>Format:</td>
+    <td>Mass market</td>
+  </tr>
+  <tr>
+    <td>Pages:</td>
+    <td>305</td>
+  </tr></table>
+
+<p>
+Fermat's Last Theorem is the infamous proposal that:
+</p>
+
+<blockquote><p>
+    <i>x<sup>n</sup> + y<sup>n</sup> = z<sup>n</sup></i>
+</p></blockquote>
+
+<p>
+has no solutions for integer <i>x, y, z, n</i> and <i>n &gt; 2</i>.  It's
+infamous for being very simple to state and understand, a variation on the
+equation produced by the Pythagorean Theorem, but incredibly difficult to
+prove.  It's also infamous for Pierre de Fermat's maddening marginal note:
+"I have discovered a truly marvelous demonstration of this proposition
+which this margin is too narrow to contain."  350 years after Fermat wrote
+this, the theorem was still unproven in the general case, although the
+theorem for many specific values of <i>n</i> had since been proven.
+</p>
+
+<p>
+<cite>Fermat's Enigma</cite> is a popular history of Fermat's Last Theorem and
+the attempts to prove it, the partial successes and famous failures.  It's
+also the story of Andrew Wiles, a Princeton mathematics professor who
+finally proved the theorem in a complex, brilliant proof that builds on
+much of the power of modern mathematics and almost certainly did not
+follow the same path that Fermat himself did.  If, in fact, Fermat had
+truly proven the theorem at all, something that we will probably never
+know.
+</p>
+
+<p>
+Singh comes to this subject with a serious structural problem: he's trying
+to write a popular account that's accessible even to people who are hazy
+on algebra and unfamiliar with basic proof technique, but he's trying to
+tell the story of one of the most complex proofs in modern mathematics.
+He tries to avoid the problem by talking about personalities instead of
+mathematical details, mostly successfully.  It helps that Fermat's Last
+Theorem has been tackled by a collection of colorful geniuses, and even
+the soft-spoken Wiles has a subtle dramatic charm.  Still, he has to cover
+enough of the mathematics for the reader to follow, and I found those
+sections tedious and a little overdramatized.  For example, I can see
+using a domino analogy once to explain inductive proof, but Singh belabors
+the analogy until it's painful and talks about infinite chains of infinite
+dominos as if he doesn't understand that such setups are common in even
+simple inductive proofs.
+</p>
+
+<p>
+An excess of drama, cliche, and reptition are the largest problems with
+this book.  Explaining why Fermat's Last Theorem is so interesting
+requires diving into areas of math that many readers have never paid
+attention to, and I got the impression that Singh felt he had to create as
+much drama as possible to keep people reading.  Occasionally this works.
+The circumstances around Wiles's proof are inherently dramatic, a great
+conclusion to the story.  But at times it feels forced, such as when Singh
+goes on about the wonder of absolute mathematical proof and the supposedly
+unique way that mathematicians are more rigorous than any other
+profession.  I enjoyed the bits of history and connection he uncovers and
+explains despite his tone, rather than because of it.  The book is based
+on a TV documentary, and I started wondering if some of the dramatic tone
+of television carried over into the book where it's more obvious and less
+useful.
+</p>
+
+<p>
+Another difficulty of aiming at such a broad audience is that Singh can't
+dig too deeply into the aspects of this proof that make it so important to
+modern mathematics.  Too much background in very difficult math would be
+needed, so his choice makes sense, but I have some of that background and
+I was wanting more.  Wiles proved Fermat's Last Theorem by proving the
+Taniyama-Shimura conjecture, a fifty-year-old conjecture about a
+connection between elliptic curves and modular forms that had previously
+been shown to be equivalent to Fermat's Last Theorem, but which is
+considerably more important to the structure of mathematics.  The
+Taniyama-Shimura conjecture covers a portion of the Langlands program, a
+series of conjectures about a deep unity between very disparate sections
+of mathematics that, if proven, would permit techniques of one branch of
+mathematics to be used to attack problems in a very different branch.
+Singh does cover this, but not in as much detail as I would have liked (I
+would have loved a good description of modular forms, for instance), nor
+does he talk much about the other aspects of the Langlands program or
+about the usefulness of the other theorems Wiles proved in the course of
+proving Taniyama-Shimura and Fermat's Last Theorem.
+</p>
+
+<p>
+More detail here is probably a difficult request.  From a quick glance
+through Wikipedia, it's not clear whether Singh could adequately explain
+the impact of the math even to someone with my mathematical background,
+and that would be abandoning much of his audience.  Still, <cite>Fermat's
+Enigma</cite> left me a bit unsatisfied.
+</p>
+
+<p>
+Worth reading, though, particularly for the last portion of the book.  The
+detailed story of Wiles's proof is engrossing, dramatic, and matters for
+more reasons than just solving a long-standing puzzle.  I'm not a big fan
+of Singh's writing style, but he does make the story accessible and
+includes several interesting nuggets of mathematical history.
+</p>
+
+<p>Rating: 6 out of 10</p>
+
+      ]]></description>
+      <pubDate>%DATE%</pubDate>
+      <guid>https://www.eyrie.org/~eagle/reviews/books/1-250-30112-2.html</guid>
+    </item>
+  </channel>
+</rss>

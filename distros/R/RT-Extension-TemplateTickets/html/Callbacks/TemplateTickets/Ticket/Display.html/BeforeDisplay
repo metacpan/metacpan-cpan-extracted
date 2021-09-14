@@ -1,0 +1,193 @@
+<%doc>
+Just after a new ticket has been created, if the submission form contained
+details of a template ticket, perform the appropriate action.
+
+This will set attributes on the new ticket to mark it as having been derived
+from the selected template.
+
+If the template involves child tickets, we create those child tickets here.
+
+See the FormStart callback of /Ticket/Create.html for more details.
+</%doc>
+\
+<%ARGS>
+$TicketObj => undef
+$Actions   => undef
+$title     => undef
+$ARGSRef   => undef
+</%ARGS>
+\
+<%INIT>
+return if ( not defined $TicketObj );
+return if ( not defined ${$TicketObj} );
+return if ( not defined $ARGSRef );
+
+# Do nothing unless we are creating a new ticket.
+return if ( not defined $ARGSRef->{'id'} );
+return if ( $ARGSRef->{'id'} ne 'new' );
+
+# Do nothing if a template was not loaded.
+return if ( not defined $ARGSRef->{'Attribute-TemplateTicketId'} );
+
+# Load details of all templates, and do nothing if we can't find the one
+# we've loaded.
+#
+my $Templates = {};
+$m->comp(
+    '/Ticket/Elements/TemplateTicketsList',
+    'Queue'     => $ARGSRef->{'Queue'},
+    'Templates' => $Templates
+);
+my $ChosenTemplate = $Templates->{ $ARGSRef->{'Attribute-TemplateTicketId'} };
+
+return if ( not $ChosenTemplate );
+
+my $TemplateTicketObj = $ChosenTemplate->{'Ticket'};
+
+# Set the attribute on the new ticket.
+#
+${$TicketObj}->SetAttribute(
+    'Name' => 'TemplateTicketId',
+    'Description' =>
+        'The ID of the ticket which was used as a template for this one',
+    'Content' => $ARGSRef->{'Attribute-TemplateTicketId'}
+);
+
+# If there are no child tickets to create, just return.
+#
+return if ( not $ChosenTemplate->{'ChildTickets'} );
+
+# Create the child tickets required by the template.
+#
+my $mode                     = $RT::Link::TYPEMAP{'Member'}->{'Mode'};
+my $ModeURI                  = "${mode}URI";
+my $ModeObj                  = "${mode}Obj";
+my $TemplateChildTicketLinks = $TemplateTicketObj->Members;
+while ( my $TemplateChildTicketLink = $TemplateChildTicketLinks->Next ) {
+    my $TemplateChildTicketObj = $TemplateChildTicketLink->$ModeObj;
+
+    my %CreateArgs = (
+        'Queue'        => ${$TicketObj}->Queue,
+        'new-MemberOf' => ${$TicketObj}->id,
+        'Requestors'   => ${$TicketObj}->RequestorAddresses,
+    );
+
+    my @InitialStatuses = ${$TicketObj}->QueueObj->LifecycleObj->Initial;
+
+    # Set the queue of the new child ticket, if Queue is selected as a
+    # template field.
+    #
+    if ( grep { $_ eq 'Queue' } @{ $ChosenTemplate->{'ChildFields'} || [] } )
+    {
+        $CreateArgs{'Queue'} = $TemplateChildTicketObj->Queue;
+        @InitialStatuses
+            = $TemplateChildTicketObj->QueueObj->LifecycleObj->Initial;
+    }
+
+    $CreateArgs{'Status'} = $InitialStatuses[0];
+
+    # Set the selected fields on the new child ticket.
+    #
+    foreach my $Field ( @{ $ChosenTemplate->{'ChildFields'} || [] } ) {
+        if ( $Field eq 'Subject' ) {
+
+            # Load the subject.
+            $CreateArgs{'Subject'} = $TemplateChildTicketObj->Subject;
+
+            # Substitute {SUBJECT} for the parent new ticket's subject.
+            my $OurSubject = ${$TicketObj}->Subject;
+            $CreateArgs{'Subject'} =~ s/{SUBJECT}/$OurSubject/ig;
+
+        } elsif ( $Field eq 'Content' ) {
+
+            # Load the content (first transaction).
+            my $FirstTransaction
+                = $TemplateChildTicketObj->SortedTransactions->First;
+            my $FirstContentObj = $FirstTransaction->ContentObj;
+
+            next if ( not defined $FirstContentObj );
+            next if ( $FirstContentObj->ContentLength <= 0 );
+
+            $CreateArgs{'Content'}
+                = $FirstTransaction->Content( 'Type' => 'text/html' );
+            $CreateArgs{'ContentType'} = 'text/html';
+
+            if ( ( $CreateArgs{'Content'} || '' ) !~ /\S/ ) {
+                $CreateArgs{'Content'}
+                    = $FirstTransaction->Content( 'Type' => 'text/plain' );
+                $CreateArgs{'ContentType'} = 'text/plain';
+            }
+
+        } elsif ( $Field eq 'Priority' ) {
+
+            # Load the priority.
+            $CreateArgs{'InitialPriority'}
+                = $TemplateChildTicketObj->Priority;
+
+        } elsif ( $Field eq 'FinalPriority' ) {
+
+            # Load the final priority.
+            $CreateArgs{'FinalPriority'}
+                = $TemplateChildTicketObj->FinalPriority;
+
+        } elsif ( $Field eq 'Requestors' ) {
+
+            # Load the requestor email addresses.
+            $CreateArgs{'Requestors'} = $TemplateChildTicketObj->Requestor
+                ->MemberEmailAddressesAsString();
+
+        } elsif ( $Field eq 'Cc' ) {
+
+            # Load the CC email addresses.
+            $CreateArgs{'Cc'}
+                = $TemplateChildTicketObj->Cc->MemberEmailAddressesAsString();
+        } elsif ( $Field eq 'AdminCc' ) {
+
+            # Load the AdminCC email addresses.
+            $CreateArgs{'AdminCc'} = $TemplateChildTicketObj->AdminCc
+                ->MemberEmailAddressesAsString();
+        } elsif ( $Field =~ /^CF\.(\d+)$/ ) {
+
+            # Load a custom field.
+            my $cf_id = $1;
+
+            my $NewValue
+                = $TemplateChildTicketObj->CustomFieldValuesAsString($cf_id);
+            my $NewCF = $TemplateChildTicketObj->LoadCustomFieldByIdentifier(
+                $cf_id);
+            my $NamePrefix
+                = 'Object-RT::Ticket--CustomField-' . $NewCF->id . '-';
+            $CreateArgs{ $NamePrefix . 'Value' }        = $NewValue;
+            $CreateArgs{ $NamePrefix . 'Values' }       = $NewValue;
+            $CreateArgs{ $NamePrefix . 'Value-Magic' }  = 1;
+            $CreateArgs{ $NamePrefix . 'Values-Magic' } = 1;
+
+        }
+    }
+
+    # Create the child ticket; do this inside "eval" so that if
+    # CreateTicket() tries to Abort() due to the resultant ticket not being
+    # viewable, we can still continue.
+    #
+    my ( $NewChildTicketObj, @ChildActions );
+    $NewChildTicketObj = undef;
+    eval {
+        ( $NewChildTicketObj, @ChildActions ) = CreateTicket(%CreateArgs);
+    };
+
+    # Set the attribute on the new child ticket.
+    #
+    if ( defined $NewChildTicketObj ) {
+        $NewChildTicketObj->SetAttribute(
+            'Name' => 'TemplateTicketId',
+            'Description' =>
+                'The ID of the ticket which was used as a template for this one',
+            'Content' => $ARGSRef->{'Attribute-TemplateTicketId'}
+        );
+    }
+
+    push @$Actions, @ChildActions if ( defined $Actions );
+}
+
+return;
+</%INIT>

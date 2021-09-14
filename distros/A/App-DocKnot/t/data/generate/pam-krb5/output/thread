@@ -53,7 +53,6 @@
 
     \h2[Development]
 
-    \link[todo.html][To-do list] \break
     \link[https://github.com/rra/pam-krb5]
          [GitHub] \break
     \link[https://github.com/rra/pam-krb5/issues]
@@ -63,7 +62,7 @@
     \link[https://www.openhub.net/p/pamkrb5]
          [Open HUB code analysis] \break
     \link[https://tracker.debian.org/pkg/libpam-krb5]
-         [Debian package tracker]
+         [Debian package tracker] \break
 ]
 
 \h2[Blurb]
@@ -194,7 +193,6 @@ Security advisories:
 
 Developer documentation:
 
-\doc[todo.html][To-do list]
 \doc[https://github.com/rra/pam-krb5]
     [GitHub]
 \doc[https://github.com/rra/pam-krb5/issues]

@@ -32,6 +32,7 @@ do { my $x = {
                                       'IO::Async::Notifier' => '0.68',
                                       'JSON::MaybeUTF8' => '0',
                                       'List::Util' => '1.50',
+                                      'List::UtilsBy' => '0',
                                       'Log::Any' => '1.050',
                                       'Module::Load' => '0',
                                       'Path::Tiny' => '0.108',

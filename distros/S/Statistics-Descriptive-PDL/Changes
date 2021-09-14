@@ -1,23 +1,46 @@
 Revision history for Statistics-Descriptive-PDL
 
+0.12    2021-09-14
+        - Fix issue with Weighted::get_data_as_hash
+          We weren't updating the data ndarray after deduping,
+          so the weights (hash values) were all out of kilter.
+
+0.11    2021-09-13
+        - fix an egregious error in SampleWeighted percentile method
+
+0.10    2021-09-13
+        - add get_data and get_data_as_hash methods
+
+0.09    2021-09-13
+        - Add values_are_unique method to allow the user to flag
+          (or check) that the values are unique.  This can be used
+          to speed up percentile and median calcs.
+          Caveat emptor if the data are not unique, obviously.
+
+0.08    2021-09-12
+        - Cache all integer percentiles
+        - Add percentiles method to get multiple values.
+          This is simply a wrapper around the percentile method
+        - Add sd and stdev as aliases of standard_deviation
+
 0.07    2021-09-06
-        Another attempt to fix precision related test failures
+        - Another attempt to fix precision related test failures
 
 0.06    2021-09-06
-        Track down more sclr calls to work on PDL earlier than 2.056
+        - Track down more sclr calls to work on PDL earlier than 2.056
 
 0.05    2021-09-05
-        Missed one test failure in 0.04.
+        - Missed one test failure in 0.04.
 
 0.04    2021-09-05
-        Fix several CPAN test failures.  Thanks to SREZIC for reporting.
+        - Fix several CPAN test failures.  Thanks to SREZIC for reporting.
 
 0.03    2021-09-05
-        Add repo info to Makefile.PL
+        - Add repo info to Makefile.PL
 
 0.02    2021-09-05
-        Finally get back to it.
+        - Finally get back to it.
 
 0.01    2015-07-19
-        First version.
+        - First version.
 

@@ -1,0 +1,80 @@
+<%doc>
+Given a queue ID, populate %$Templates with details of ticket templates for
+that queue which are available to the current user, keyed by ticket ID. 
+
+Each value is a hashref containing the ticket template settings from the
+"TemplateTicketsDefinition" attribute (for full details, see
+/Admin/Queues/TemplateTickets.html), with these extra keys:
+
+  Ticket  - the RT::Ticket object containing the template ticket itself
+  id      - the ticket ID
+  Subject - the ticket subject
+
+Note that the tickets are loaded as the current user, so they need to have
+permission to see them.
+</%doc>
+\
+<%ARGS>
+$Queue
+$Templates
+</%ARGS>
+\
+<%INIT>
+# We load the queue as the system user in case the current user has
+# CreateTicket but not SeeQueue rights.
+#
+my $QueueObj = RT::Queue->new( RT->SystemUser );
+$QueueObj->Load($Queue);
+return if ( not $QueueObj->id );
+
+# Build a hash of the IDs of the groups the current user is a member of.
+#
+my %CurrentUserGroupIDs = ();
+my $CurrentUserGroups   = $session{'CurrentUser'}->UserObj->OwnGroups;
+my $GroupObj;
+while (( defined $CurrentUserGroups )
+    && ( $GroupObj = $CurrentUserGroups->Next ) )
+{
+    $CurrentUserGroupIDs{ $GroupObj->id } = 1;
+}
+
+# Go through all of the template tickets for this queue, and place details
+# of any the current user has permission to use into %$Templates.
+#
+my $TemplateTickets = RT::Tickets->new( $session{'CurrentUser'} );
+$TemplateTickets->FromSQL( 'Queue = '
+        . $QueueObj->id
+        . ' AND HasAttribute = "TemplateTicketsDefinition"' );
+$TemplateTickets->GotoFirstItem();
+while ( my $TemplateTicketObj = $TemplateTickets->Next ) {
+    next if ( not $TemplateTicketObj->id );
+
+    my $Attribute
+        = $TemplateTicketObj->FirstAttribute('TemplateTicketsDefinition');
+    next if ( not defined $Attribute );
+    my $Settings = $Attribute->Content;
+    next if ( not defined $Settings );
+
+    my $UserCanSeeThisTemplate = 0;
+
+    if ( scalar @{ $Settings->{'Groups'} || [] } == 0 ) {
+        $UserCanSeeThisTemplate = 1;
+    }
+    foreach ( @{ $Settings->{'Groups'} || [] } ) {
+        next if ( not $CurrentUserGroupIDs{$_} );
+        $UserCanSeeThisTemplate = 1;
+        last;
+    }
+
+    next if ( not $UserCanSeeThisTemplate );
+
+    $Templates->{ $TemplateTicketObj->id } = {
+        %$Settings,
+        'Ticket'  => $TemplateTicketObj,
+        'id'      => $TemplateTicketObj->id,
+        'Subject' => $TemplateTicketObj->Subject
+    };
+}
+
+return;
+</%INIT>

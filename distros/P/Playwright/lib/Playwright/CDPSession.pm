@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::CDPSession;
-$Playwright::CDPSession::VERSION = '0.014';
+$Playwright::CDPSession::VERSION = '0.015';
 use parent 'Playwright::Base';
 
 sub new {
@@ -82,7 +82,7 @@ Playwright::CDPSession - Automatically generated class for Playwright::CDPSessio
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 CONSTRUCTOR
 

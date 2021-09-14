@@ -19,7 +19,7 @@ my $has_PDL_stats_basic = $@ ? undef : 1;
 #  to hide the piddle from the caller to avoid arbitrary changes
 #  being applied to it.
 
-our $VERSION = '0.07';
+our $VERSION = '0.12';
 
 our $Tolerance = 0.0;  #  for compatibility with Stats::Descr, but not used here
 
@@ -116,6 +116,32 @@ sub add_data {
     return $self->count;
 }
 
+sub get_data {
+    my $self = shift;
+    my $piddle = $self->_get_piddle;
+    
+    my $data = defined $piddle ? $piddle->unpdl : [];
+    
+    return wantarray ? @$data : $data;
+}
+
+sub get_data_as_hash {
+    my $self = shift;
+
+    my $piddle = $self->_get_piddle;
+    if (defined $piddle) {
+        require Statistics::Descriptive::PDL::SampleWeighted;
+        my $wtd_obj = Statistics::Descriptive::PDL::SampleWeighted->new;
+        my $wts_piddle = PDL->ones ($piddle->dims);
+        $wtd_obj->add_data ($piddle->copy, $wts_piddle);
+        return $wtd_obj->get_data_as_hash;
+    }
+
+    return wantarray ? () : {};
+}
+
+sub values_are_unique {}
+
 #  flatten $data if multidimensional
 sub _set_piddle {
     my ($self, $data) = @_;
@@ -159,6 +185,9 @@ sub _mean {
     return $self->_get_piddle->average;
 }
 
+
+sub sd    {return $_[0]->standard_deviation}
+sub stdev {return $_[0]->standard_deviation}
 
 sub _standard_deviation {
     my $self = shift;
@@ -296,6 +325,20 @@ sub _mode {
     return $mode;
 }
 
+sub percentiles {
+    my ($self, @percentiles) = @_;
+
+    my $piddle = $self->_get_piddle;
+
+    return
+      if !defined $piddle || $piddle->nelem == 0;
+
+    my @vals = map {$self->percentile($_)} @percentiles;
+
+    return @vals;
+}
+
+
 #  caching wrapper
 #  need to convert $p to fraction, or perhaps die if it is between 0 and 1
 #  hard-coded cache percentiles not ideal
@@ -306,10 +349,18 @@ sub percentile {
     return undef
       if !defined $piddle || $piddle->nelem == 0;
 
-    if (fmod ($p, 5) == 0) {
-        return $self->{_cache}{percentile}{$p}
-          if defined $self->{_cache}{percentile}{$p};
-    }
+    return $self->median
+      if $p == 50;
+
+    die "Percentile $p outside range 0..100"
+      if $p < 0 or $p > 100;
+    
+    #  allow for other number formats like '005'
+    #  needed for cache
+    $p += 0;
+
+    return $self->{_cache}{percentile}{$p}
+      if defined $self->{_cache}{percentile}{$p};
 
     my $pctl = $self->_percentile($p);
 
@@ -317,7 +368,7 @@ sub percentile {
         $pctl = $pctl->sclr;
     }
 
-    if (fmod ($p, 5) == 0) {
+    if (int ($p) == $p) {
         $self->{_cache}{percentile}{$p} = $pctl;
     }
 
@@ -350,7 +401,7 @@ Statistics::Descriptive using PDL as the back-end
 
 =head1 VERSION
 
-Version 0.07
+Version 0.11
 
 =cut
 
@@ -361,8 +412,8 @@ Version 0.07
 
     my $stats = Statistics::Descriptive::PDL->new();
     $stats->add_data(1,2,3,4);
-    my $mean = $stat->mean;
-    my $var  = $stat->variance();
+    my $mean = $stats->mean;
+    my $var  = $stats->variance();
 
 =head1 DESCRIPTION
 
@@ -384,7 +435,29 @@ Create a new statistics object.  Takes no arguments.
 Add data to the stats object.  Passed through to the underlying PDL object.
 Appends to any existing data.
 
-Multidimensional data are flattened into a singe dimensional array.
+Multidimensional data are flattened into a single dimensional array.
+
+=item get_data
+
+Return the data as a perl array.  Returns an array ref in scalar context.
+
+=item get_data_as_hash
+
+Returns the data as a perl hash, with the unique data values as the hash keys and
+the counts of each unique data value as the hash values.
+
+Deduplicates the data if needed, incrementing the weights as appropriate.
+Internally it uses a L<Statistics::Descriptive::PDL::SampleWeighted> object.
+
+Data values are stringified so there is obviously potential for loss of precision.
+
+
+=item values_are_unique
+
+Flag whether the data have duplicate values.
+Has no effect on unweighted data.
+It is provided purely for a consistent interface with
+the weighted variants.
 
 =item clear_cache
 
@@ -432,6 +505,12 @@ Skewness and kurtosis to match that of MS Excel.
 If you are used to R then these are the same as type=2
 in e1071::skewness and e1071::kurtosis.
 
+=item sd
+
+=item stdev
+
+These are aliases for the standard_deviation method.
+
 
 =item percentile (10)
 
@@ -440,6 +519,11 @@ in e1071::skewness and e1071::kurtosis.
 The percentile calculation differs from Statistics::Descriptive in that it uses
 linear interpolation to determine the values, and thus does not
 return the exact same values as the input data.
+
+=item percentiles (10, 20, 30)
+
+A simple wrapper around the percentile method to allow calculation of
+multiple values in one call.
 
 =item iqr
 

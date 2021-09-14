@@ -1,10 +1,10 @@
-use strict;
-use warnings;
+#use strict;
+#use warnings;
 
 use ExtUtils::MakeMaker;
 use PDL::Core::Dev;
  
-$package = ["util.pd",Util,Statistics::Descriptive::PDL::Util];
+$package = ["util.pd", 'Util', 'Statistics::Descriptive::PDL::Util'];
 %hash = pdlpp_stdargs($package);
 
 WriteMakefile( %hash );

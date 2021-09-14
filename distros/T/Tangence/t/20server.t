@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -28,6 +28,38 @@ my $obj = $registry->construct(
 );
 
 is_oneref( $obj, '$obj has refcount 1 initially' );
+
+package TestServer
+{
+   use base qw( Tangence::Server );
+
+   sub new
+   {
+      return bless { written => "" }, shift;
+   }
+
+   sub tangence_write
+   {
+      my $self = shift;
+      $self->{written} .= $_[0];
+   }
+
+   sub send_message
+   {
+      my $self = shift;
+      my ( $message ) = @_;
+      $self->tangence_readfrom( $message );
+      length($message) == 0 or die "Server failed to read the whole message";
+   }
+
+   sub recv_message
+   {
+      my $self = shift;
+      my $message = $self->{written};
+      $self->{written} = "";
+      return $message;
+   }
+}
 
 my $server = TestServer->new();
 $server->registry( $registry );
@@ -165,35 +197,3 @@ is_oneref( $obj, '$obj has refcount 1 before shutdown' );
 is_oneref( $registry, '$registry has refcount 1 before shutdown' );
 
 done_testing;
-
-package TestServer;
-
-use strict;
-use base qw( Tangence::Server );
-
-sub new
-{
-   return bless { written => "" }, shift;
-}
-
-sub tangence_write
-{
-   my $self = shift;
-   $self->{written} .= $_[0];
-}
-
-sub send_message
-{
-   my $self = shift;
-   my ( $message ) = @_;
-   $self->tangence_readfrom( $message );
-   length($message) == 0 or die "Server failed to read the whole message";
-}
-
-sub recv_message
-{
-   my $self = shift;
-   my $message = $self->{written};
-   $self->{written} = "";
-   return $message;
-}

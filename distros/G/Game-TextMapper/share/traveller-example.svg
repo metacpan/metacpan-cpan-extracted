@@ -502,6 +502,6 @@
 <text font-size="24pt" x="0" y="0" transform="translate(1310,815) rotate(90) " font-family="Optima, Helvetica, sans-serif">trailing</text>
 <text font-size="14pt" x="0" y="0" transform="translate(-20,1850) rotate(-90) " font-family="Optima, Helvetica, sans-serif">◉ gas giant – ■ imperial consulate – ☼ TAS – ▲ scout base – ★ navy base – π research base – ☠ pirate base – <tspan fill="#ff6347">▮</tspan> communication – <tspan fill="#afeeee">▮</tspan> trade</text>
 <!-- Source
-include https://campaignwiki.org/contrib/traveller-example.txt
+include traveller-example.txt
 -->
 </svg>

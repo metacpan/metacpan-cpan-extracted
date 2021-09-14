@@ -3,25 +3,34 @@
 #
 #  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
 
-package App::eachperl;
+use v5.26;
+use Object::Pad 0.43;
 
-use 5.010;  # //
-use strict;
-use warnings;
+package App::eachperl 0.04;
+class App::eachperl;
 
 use Config::Tiny;
+use Syntax::Keyword::Dynamically;
 
-our $VERSION = '0.03';
+use IO::Term::Status;
+use IPC::Run ();
+use String::Tagged 0.17;
+use Convert::Color::XTerm 0.06;
 
 my $RESET = "\e[m";
 my $BOLD  = "\e[1m";
+
+my %COL = (
+   ( map { $_ => Convert::Color->new( "vga:$_" ) } qw( red blue green ) ),
+   grey => Convert::Color->new( "xterm:grey(70%)" ),
+);
 
 # Allow conversion of signal numbers into names
 use Config;
 my @SIGNAMES = split m/\s+/, $Config{sig_name};
 
 use Struct::Dumb qw( struct );
-struct Perl => [qw( name fullpath version selected )];
+struct Perl => [qw( name fullpath version is_threads selected )];
 
 =head1 NAME
 
@@ -47,87 +56,78 @@ For more detail see the manpage for the eachperl(1) script.
 
 =cut
 
-sub new
+has $_perls;
+has $_no_system_perl :param;
+has $_no_test        :param;
+has $_since_version  :param;
+has $_until_version  :param;
+has $_reverse        :param;
+has $_stop_on_fail   :param;
+
+has $_io_term;
+
+ADJUST
 {
-   my $class = shift;
-   my %args = @_;
-
-   my $self = bless {
-      map { $_ => $args{$_} } qw(
-         no_system_perl no_test since_version until_version reverse stop_on_fail
-      ),
-   }, $class;
-
    $self->maybe_apply_config( "./.eachperlrc" );
    $self->maybe_apply_config( "$ENV{HOME}/.eachperlrc" );
    $self->postprocess_config;
 
-   return $self;
+   $_io_term = IO::Term::Status->new_for_stdout;
 }
 
-sub maybe_apply_config
+method maybe_apply_config ( $path )
 {
-   my $self = shift;
-   my ( $path ) = @_;
-
    # Only accept files readable and owned by UID
    return unless -r $path;
    return unless -o _;
 
    my $config = Config::Tiny->read( $path );
 
-   foreach my $key (qw( perls since_version until_version )) {
-      $self->{$key} //= $config->{_}{$key};
-   }
+   $_perls         //= $config->{_}{perls};
+   $_since_version //= $config->{_}{since_version};
+   $_until_version //= $config->{_}{until_version};
 }
 
-sub postprocess_config
+method postprocess_config ()
 {
-   my $self = shift;
-
-   foreach (qw( since_version until_version )) {
-      my $ver = $self->{$_} or next;
-      $ver =~ m/^v/ or $ver = "v$ver";
+   foreach ( $_since_version, $_until_version ) {
+      defined $_ or next;
+      m/^v/ or $_ = "v$_";
       # E.g. --until 5.14 means until the /end/ of the 5.14 series; so 5.14.999
-      $ver .= ".999" if $_ eq "until_version" and $ver !~ m/\.\d+\./;
-      $self->{$_} = version->parse( $ver );
+      $_ .= ".999" if \$_ == \$_until_version and $_ !~ m/\.\d+\./;
+      $_ = version->parse( $_ );
    }
 
-   if( my $perls = $self->{perls} ) {
-      $self->{perls} = \my @perls;
-      foreach my $perl ( split m/\s+/, $perls ) {
+   if( my $perlnames = $_perls ) {
+      $_perls = \my @perls;
+      foreach my $perl ( split m/\s+/, $perlnames ) {
          chomp( my $fullpath = `which $perl` );
          $? and warn( "Can't find perl at $perl" ), next;
 
-         my $ver;
-         if( $perl =~ m/(5\.[\d.]+)/ ) {
-            $ver = version->parse( "v$1" );
-         }
-         else {
-            my $verstring = `$fullpath -e 'print \$^V'`;
-            $ver = version->parse( $verstring );
-         }
+         my ( $ver, $threads ) = split m/\n/,
+            scalar `$fullpath -MConfig -e 'print "\$]\\n\$Config{usethreads}\\n"'`;
 
-         push @perls, Perl( $perl, $fullpath, $ver, undef );
+         $ver = version->parse( $ver )->normal;
+         $threads = ( $threads eq "define" );
+
+         push @perls, Perl( $perl, $fullpath, $ver, $threads, undef );
       }
    }
 }
 
-sub perls
+method perls ()
 {
-   my $self = shift;
-
-   my @perls = @{ $self->{perls} };
-   @perls = reverse @perls if $self->{reverse};
+   my @perls = @$_perls;
+   @perls = reverse @perls if $_reverse;
 
    return map {
       my $perl = $_;
       my $ver = $perl->version;
 
       my $selected = 1;
-      $selected = 0 if $self->{since_version} and $ver lt $self->{since_version};
-      $selected = 0 if $self->{until_version} and $ver gt $self->{until_version};
-      $selected = 0 if $self->{no_system_perl} and $perl->fullpath eq $^X;
+      $selected = 0 if $_since_version and $ver lt $_since_version;
+      $selected = 0 if $_until_version and $ver gt $_until_version;
+      $selected = 0 if $_no_system_perl and $perl->fullpath eq $^X;
 
       $perl->selected = $selected;
 
@@ -135,11 +135,8 @@ sub perls
    } @perls;
 }
 
-sub run
+method run ( @argv )
 {
-   my $self = shift;
-   my ( @argv ) = @_;
-
    if( $argv[0] =~ m/^-/ ) {
       unshift @argv, "exec";
    }
@@ -151,39 +148,89 @@ sub run
    return $self->$code( @argv );
 }
 
-sub run_list
+method run_list ()
 {
-   my $self = shift;
-
    foreach my $perl ( $self->perls ) {
-      printf "%s%s: %s (%s)\n",
+      printf "%s%s: %s (%s%s)\n",
          ( $perl->selected ? "* " : "  " ),
-         $perl->name, $perl->fullpath, $perl->version;
+         $perl->name, $perl->fullpath, $perl->version,
+         $perl->is_threads ? ",threads" : "";
    }
    return 0;
 }
 
-sub run_exec
+method run_exec ( @argv )
 {
-   my $self = shift;
-   my ( @argv ) = @_;
    my %opts = %{ shift @argv } if @argv and ref $argv[0] eq "HASH";
 
    my @results;
+   my $ok = 1;
 
    my $signal;
 
-   foreach ( $self->perls ) {
+   my @perls = $self->perls;
+   my $idx = 0;
+   foreach ( @perls ) {
+      $idx++;
       next unless $_->selected;
 
       my $perl = $_->name;
       my $path = $_->fullpath;
 
-      print $opts{oneline} ?
-         "$BOLD$perl:$RESET " :
-         "\n$BOLD  --- $perl --- $RESET\n";
+      my @status = (
+         ( $ok
+            ? String::Tagged->new_tagged( "-OK-", fg => $COL{grey} )
+            : String::Tagged->new_tagged( "FAIL", fg => $COL{red} ) ),
 
-      system( $path, @argv );
+         String::Tagged->new
+            ->append( "Running " )
+            ->append_tagged( $perl, bold => 1 ),
+
+         ( $idx < @perls
+            ? String::Tagged->new_tagged( sprintf( "(%d more)", @perls - $idx ), fg => $COL{grey} )
+            : () ),
+      );
+
+      $_io_term->set_status(
+         String::Tagged->join( " | ", @status )
+            ->apply_tag( 0, -1, bg => Convert::Color->new( "vga:blue" ) )
+      );
+
+      $opts{oneline} ?
+         print "$BOLD$perl:$RESET " :
+         $_io_term->print_line( "\n$BOLD  --- $perl --- $RESET" );
+
+      my $has_partial = 0;
+      IPC::Run::run [ $path, @argv ], ">pty>", sub {
+         my @lines = split m/\r?\n/, $_[0], -1;
+
+         if( $has_partial ) {
+            my $line = shift @lines;
+
+            if( $line =~ s/^\r// ) {
+               $_io_term->replace_partial( $line );
+            }
+            else {
+               $_io_term->more_partial( $line );
+            }
+
+            if( @lines ) {
+               $_io_term->finish_partial;
+               $has_partial = 0;
+            }
+         }
+
+         # Final element will be empty string if it ended in a newline
+         my $partial = pop @lines;
+
+         $_io_term->print_line( $_ ) for @lines;
+
+         if( length $partial ) {
+            $_io_term->more_partial( $partial );
+            $has_partial = 1;
+         }
+      };
+
       if( $? & 127 ) {
          # Exited via signal
          $signal = $?;
@@ -192,32 +239,30 @@ sub run_exec
       }
       else {
          push @results, [ $perl => $? >> 8 ];
-         last if $? and $self->{stop_on_fail};
+         last if $? and $_stop_on_fail;
       }
+
+      $ok = 0 if $?;
    }
 
+   $_io_term->set_status( "" );
+
    unless( $opts{no_summary} ) {
-      print "\n----------\n";
-      printf "%-20s: %s\n", @$_ for @results;
+      $_io_term->print_line( "\n----------" );
+      $_io_term->print_line( sprintf "%-20s: %s", @$_ ) for @results;
    }
 
    kill $signal, $$ if $signal;
    return 0;
 }
 
-sub run_cpan
+method run_cpan ( @argv )
 {
-   my $self = shift;
-   my ( @argv ) = @_;
-
    return $self->run_exec( "-MCPAN", "-e", join( " ", @argv ) );
 }
 
-sub _invoke_local
+method _invoke_local ( %opts )
 {
-   my $self = shift;
-   my %opts = @_;
-
    my $perl = "";
    my @args;
 
@@ -251,61 +296,45 @@ EOPERL
 EOPERL
 }
 
-sub run_install
+method run_install ( $module )
 {
-   my $self = shift;
-   my ( $module ) = @_;
-
-   local $self->{no_system_perl} = 1;
+   dynamically $_no_system_perl = 1;
 
    return $self->run_install_local if $module eq ".";
    return $self->run_cpan( install => "\"$module\"" );
 }
 
-sub run_install_local
+method run_install_local ()
 {
-   my $self = shift;
-   $self->_invoke_local( test => !$self->{no_test}, install => 1 );
+   $self->_invoke_local( test => !$_no_test, install => 1 );
 }
 
-sub run_test
+method run_test ( $module )
 {
-   my $self = shift;
-   my ( $module ) = @_;
-
    return $self->run_test_local if $module eq ".";
    return $self->run_cpan( test => "\"$module\"" );
 }
 
-sub run_test_local
+method run_test_local ()
 {
-   my $self = shift;
    $self->_invoke_local( test => 1 );
 }
 
-sub run_build_then_perl
+method run_build_then_perl ( @argv )
 {
-   my $self = shift;
-   my ( @argv ) = @_;
-   $self->_invoke_local( test => !$self->{no_test}, perl => \@argv );
+   $self->_invoke_local( test => !$_no_test, perl => \@argv );
 }
 
-sub run_modversion
+method run_modversion ( $module )
 {
-   my $self = shift;
-   my ( $module ) = @_;
-
    return $self->run_exec(
       { oneline => 1, no_summary => 1 },
       "-M$module", "-e", "print ${module}\->VERSION, qq(\\n);"
    );
 }
 
-sub run_modpath
+method run_modpath ( $module )
 {
-   my $self = shift;
-   my ( $module ) = @_;
-
    ( my $filename = "$module.pm" ) =~ s{::}{/}g;
 
    return $self->run_exec(

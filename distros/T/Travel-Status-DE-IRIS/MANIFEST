@@ -10,7 +10,6 @@ lib/Travel/Status/DE/IRIS/Result.pm
 lib/Travel/Status/DE/IRIS/Stations.pm
 lib/Travel/Status/DE/IRIS/Stations.pm.PL
 MANIFEST			This list of files
-META.json
 README.md
 scripts/acronyms.pl
 scripts/acronyms.sh
@@ -62,4 +61,5 @@ xt/00-compile-pm.t
 xt/01-compile-pl.t
 xt/02-compile-pod.t
 META.yml
+META.json
 SIGNATURE    Added here by Module::Build

@@ -142,7 +142,7 @@ ali2phylip.pl - Convert (and filter) ALI files to PHYLIP files for tree building
 
 =head1 VERSION
 
-version 0.211470
+version 0.212530
 
 =head1 USAGE
 
@@ -197,7 +197,7 @@ Stringency of the Gblocks mask to be applied [default: none]. The following
 modes are available: strict, medium and loose. This option requires to have a
 C<Gblocks> executable in the C<$PATH>.
 
-=for Euclid: mode.type:       /strict|medium|loose/
+=for Euclid: mode.type:       string, mode eq 'strict' || mode eq 'medium' || mode eq 'loose'
     mode.type.error: <mode> must be one of strict, medium or loose (not mode)
 
 =item --bmge-mask=<mode>
@@ -211,7 +211,7 @@ The C<bmge.sh> script should be as follows:
     #!/bin/sh
     java -jar path-to-bmge/BMGE.jar -i $1 -t $2 -h $3 -g $4 -oh $5
 
-=for Euclid: mode.type:       /strict|medium|loose/
+=for Euclid: mode.type:       string, mode eq 'strict' || mode eq 'medium' || mode eq 'loose'
     mode.type.error: <mode> must be one of strict, medium or loose (not mode)
 
 =item --pars-mask

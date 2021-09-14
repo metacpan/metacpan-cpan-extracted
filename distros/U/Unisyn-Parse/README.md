@@ -38,7 +38,7 @@ loops and if statements with nested expressions:
 ```
      is
  sub          as
-        array             then
+        [array](https://en.wikipedia.org/wiki/Dynamic_array)             then
                     ==                    else
                  v1    v2         plus                  then
                                v3      v4         ==                     else
@@ -54,8 +54,35 @@ The new operators provided by the [Unicode](https://en.wikipedia.org/wiki/Unicod
 wider range of operators and brackets with which to express their intentions
 clearly within the three levels of operator precedence provided.
 
+
+## Minimalism through Unicode
+
+This [module](https://en.wikipedia.org/wiki/Modular_programming) is part of the Earl Zero project: using Perl 5 to create a minimal,
+modern [Unicode](https://en.wikipedia.org/wiki/Unicode) based scripting language which generates x86 assembler [code](https://en.wikipedia.org/wiki/Computer_program) directly. An
+Earl Zero [program](https://en.wikipedia.org/wiki/Computer_program) is a single [Unicode](https://en.wikipedia.org/wiki/Unicode) expression with no key words: only expressions
+constructed from [user](https://en.wikipedia.org/wiki/User_(computing)) defined
+[unary](https://en.wikipedia.org/wiki/Unary_operation)
+and
+[binary](https://en.wikipedia.org/wiki/Binary_operation)
+[operators](https://en.wikipedia.org/wiki/Operator_(mathematics))
+are used to construct programs.
+
+Minimalism is an important part of Earl Zero; the "Hello World" [program](https://en.wikipedia.org/wiki/Computer_program) is:
+
+```
+Hello World
+```
+
+Earl Zero leverages Perl 5 as its [macro
+assembler](https://en.wikipedia.org/wiki/Assembly_language#Macros) and
+[CPAN](https://metacpan.org/author/PRBRENAN) as its [module](https://en.wikipedia.org/wiki/Modular_programming) repository.
+
 ## Other languages
  [Lisp](https://en.wikipedia.org/wiki/Lisp), [Bash](https://en.wikipedia.org/wiki/Bash_(Unix_shell)), [Tcl](https://en.wikipedia.org/wiki/Tcl) are well known, successful languages that use generic syntaxes.
+
+## Join in!
+
+Please feel free to join in with this interesting project - we need all the [help](https://en.wikipedia.org/wiki/Online_help) we can get.
 
 
 For documentation see: [CPAN](https://metacpan.org/pod/Unisyn::Parse)

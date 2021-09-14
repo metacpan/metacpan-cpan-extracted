@@ -20,7 +20,7 @@ App::lcpan::Manual::Cookbook - App::lcpan cookbook
 
 =head1 VERSION
 
-version 1.062.000
+version 1.065.000
 
 =head1 DESCRIPTION
 
@@ -39,9 +39,28 @@ TODO.
 
 =head1 QUERYING DEPENDENCIES
 
+=head2 Checking if you currently specify a dependency to a "non-existing" (unindexed) module in one of your distributions [author] [item-dep-1]
+
+ % lcpan deps-unindexed --dist-author YOUR-CPAN-ID
+
+This requires you installing L<App::lcpan::CmdBundle::deps>.
+
+A "non-existing" module simply means that the module (the dependency) is not
+currently listed in F<02packages.details.txt.gz>. The dependency could be
+mispelled. Or the module has been purged from CPAN, either accidentally or
+deliberately. Or PAUSE index was momentarily incomplete or corrupt (this happens
+from time to time). In this case, if you happen to maintain the module yourself,
+you can request a PAUSE reindex ("pause reindex" if using L<pause>).
+
 =head2 Checking if your distribution depends on a non-core Perl module [author]
 
  % lcpan deps YOUR-DIST --exclude-core
+
+=head2 Checking if your distribution depends on a "non-existing" (unindexed) module [author]
+
+ % lcpan deps YOUR-DIST --exclude-indexed
+
+See also: [item-dep-1].
 
 =head2 Checking if your distribution specifies a circular dependency
 
@@ -52,22 +71,22 @@ TODO.
 To find out which prerequisites that your distributions specify but are
 currently not indexed (i.e. probably cannot be installed by users):
 
- % lcpan author-deps YOURCPANID --broken --dont-uniquify
+ % lcpan author-deps YOUR-CPAN-ID --broken --dont-uniquify
 
 =head2 Listing distributions of other CPAN authors that depend on one of your modules [author]
 
-    % lcpan author-rdeps YOURCPANID --user-author-isnt YOURCPANID
+    % lcpan author-rdeps YOUR-CPAN-ID --user-author-isnt YOUR-CPAN-ID
 
 =head2 Listing distributions of other CPAN authors that recently depend on one of your modules [author]
 
     # Show dependencies that were added in the last 2 weeks
-    % lcpan author-rdeps YOURCPANID --user-author-isnt YOURCPANID --added-since '2 weeks ago'
+    % lcpan author-rdeps YOUR-CPAN-ID --user-author-isnt YOUR-CPAN-ID --added-since '2 weeks ago'
 
     # Show dependencies that were updated in the last 2 weeks
-    % lcpan author-rdeps YOURCPANID --user-author-isnt YOURCPANID --updated-since '2 weeks ago'
+    % lcpan author-rdeps YOUR-CPAN-ID --user-author-isnt YOUR-CPAN-ID --updated-since '2 weeks ago'
 
     # Show dependencies that were not present before your last 'lcpan update'
-    % lcpan author-rdeps YOURCPANID --user-author-isnt YOURCPANID --added-in-last-update
+    % lcpan author-rdeps YOUR-CPAN-ID --user-author-isnt YOUR-CPAN-ID --added-in-last-update
 
 =head2 Showing what other distributions you will have to download and install when you install a module
 
@@ -83,6 +102,16 @@ TODO
 
  % lcpan dists    --random --result-limit 100
  % lcpan dists -l --random --result-limit 100
+
+=head1 QUERYING MENTIONS
+
+=head2 Finding out who (which script's or module's POD) mentions your module [author]
+
+ % lcpan mentions-for-mod YOUR-MODULE
+
+=head2 Finding out who (which script's or module's POD) mentions your script [author]
+
+ % lcpan mentions-for-script YOUR-SCRIPT
 
 =head1 QUERYING MODULES
 
@@ -129,6 +158,11 @@ You like L<Sub::Exporter> and wonder what other modules might be similar or
 related to it:
 
     % lcpan related-mods Sub::Exporter
+
+The C<related-mods> subcommand uses the degree of being mentioned together as a
+proxy for relatedness. If you want to see in which POD documents the module and
+related module are being mentioned together, you can add `--with-content-paths`
+option.
 
 =head1 QUERYING RELEASES
 

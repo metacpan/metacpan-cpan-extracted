@@ -38,8 +38,8 @@ navigation bar at the top of the generated file.
 
 ## Requirements
 
-Perl 5.24 or later and Pod::Parser 3.06 or later.  As mentioned above,
-it's also not particularly useful without spin.
+Perl 5.24 or later.  As mentioned above, it's also not particularly useful
+without spin.
 
 ## Building and Installation
 
@@ -75,6 +75,7 @@ modules will be used by the test suite if present:
 
 * Devel::Cover
 * Perl::Critic::Freenode
+* Test::CPAN::Changes (part of CPAN-Changes)
 * Test::MinimumVersion
 * Test::Perl::Critic
 * Test::Pod

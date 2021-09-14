@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2014 -- leonerd@leonerd.org.uk
 
-package Tangence::Types;
+package Tangence::Types 0.26;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.25';
 
 use Exporter 'import';
 our @EXPORT = qw(

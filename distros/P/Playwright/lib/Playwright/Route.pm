@@ -9,33 +9,13 @@ use strict;
 use warnings;
 
 package Playwright::Route;
-$Playwright::Route::VERSION = '0.014';
+$Playwright::Route::VERSION = '0.015';
 use parent 'Playwright::Base';
 
 sub new {
     my ( $self, %options ) = @_;
     $options{type} = 'Route';
     return $self->SUPER::new(%options);
-}
-
-sub continue {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'continue',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub fulfill {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'fulfill',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
 }
 
 sub abort {
@@ -53,6 +33,26 @@ sub request {
     return $self->_request(
         args    => [@_],
         command => 'request',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub continue {
+    my $self = shift;
+    return $self->_request(
+        args    => [@_],
+        command => 'continue',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub fulfill {
+    my $self = shift;
+    return $self->_request(
+        args    => [@_],
+        command => 'fulfill',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -102,7 +102,7 @@ Playwright::Route - Automatically generated class for Playwright::Route
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 CONSTRUCTOR
 
@@ -112,18 +112,6 @@ You shouldn't have to call this directly.
 Instead it should be returned to you as the result of calls on Playwright objects, or objects it returns.
 
 =head1 METHODS
-
-=head2 continue(@args)
-
-Execute the Route::continue playwright routine.
-
-See L<https://playwright.dev/api/class-Route#Route-continue> for more information.
-
-=head2 fulfill(@args)
-
-Execute the Route::fulfill playwright routine.
-
-See L<https://playwright.dev/api/class-Route#Route-fulfill> for more information.
 
 =head2 abort(@args)
 
@@ -136,6 +124,18 @@ See L<https://playwright.dev/api/class-Route#Route-abort> for more information.
 Execute the Route::request playwright routine.
 
 See L<https://playwright.dev/api/class-Route#Route-request> for more information.
+
+=head2 continue(@args)
+
+Execute the Route::continue playwright routine.
+
+See L<https://playwright.dev/api/class-Route#Route-continue> for more information.
+
+=head2 fulfill(@args)
+
+Execute the Route::fulfill playwright routine.
+
+See L<https://playwright.dev/api/class-Route#Route-fulfill> for more information.
 
 =head2 on(@args)
 

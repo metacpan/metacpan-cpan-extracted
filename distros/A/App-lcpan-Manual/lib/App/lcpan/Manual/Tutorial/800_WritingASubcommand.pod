@@ -18,7 +18,7 @@ App::lcpan::Manual::Tutorial::800_WritingASubcommand - Writing your own lcpan su
 
 =head1 VERSION
 
-version 1.062.000
+version 1.065.000
 
 =head1 DESCRIPTION
 

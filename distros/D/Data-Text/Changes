@@ -1,0 +1,12 @@
+Revision history for Data::Text
+
+0.03	Mon Sep 13 17:53:32 EDT 2021
+	Added the trim() method
+
+0.02	Mon Sep 13 14:44:50 EDT 2021
+	append() messages can now be daisy chained
+	Added length() method
+	append() now supports a reference to an array of strings to add
+
+0.01	Sun Sep 12 16:40:26 EDT 2021
+        First draft

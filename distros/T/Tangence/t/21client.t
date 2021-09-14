@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -16,6 +16,42 @@ use lib ".";
 use t::Conversation;
 
 $Tangence::Message::SORT_HASH_KEYS = 1;
+
+package TestClient
+{
+   use base qw( Tangence::Client );
+
+   sub new
+   {
+      my $self = bless { written => "" }, shift;
+      $self->identity( "testscript" );
+      $self->on_error( sub { die "Test failed early - $_[0]" } );
+      $self->tangence_connected();
+      return $self;
+   }
+
+   sub tangence_write
+   {
+      my $self = shift;
+      $self->{written} .= $_[0];
+   }
+
+   sub send_message
+   {
+      my $self = shift;
+      my ( $message ) = @_;
+      $self->tangence_readfrom( $message );
+      length($message) == 0 or die "Client failed to read the whole message";
+   }
+
+   sub recv_message
+   {
+      my $self = shift;
+      my $message = $self->{written};
+      $self->{written} = "";
+      return $message;
+   }
+}
 
 my $client = TestClient->new();
 
@@ -309,39 +345,3 @@ undef $client;
 is_oneref( $objproxy, '$objproxy has refcount 1 before shutdown' );
 
 done_testing;
-
-package TestClient;
-
-use strict;
-use base qw( Tangence::Client );
-
-sub new
-{
-   my $self = bless { written => "" }, shift;
-   $self->identity( "testscript" );
-   $self->on_error( sub { die "Test failed early - $_[0]" } );
-   $self->tangence_connected();
-   return $self;
-}
-
-sub tangence_write
-{
-   my $self = shift;
-   $self->{written} .= $_[0];
-}
-
-sub send_message
-{
-   my $self = shift;
-   my ( $message ) = @_;
-   $self->tangence_readfrom( $message );
-   length($message) == 0 or die "Client failed to read the whole message";
-}
-
-sub recv_message
-{
-   my $self = shift;
-   my $message = $self->{written};
-   $self->{written} = "";
-   return $message;
-}

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>The Usenet Article Format and Protocols</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link rel="stylesheet" href="/~eagle/styles/indent.css" type="text/css" />
+  <link rel="previous" href="../photos/" title="Photos" />
+  <link rel="next" href="../nntp/" title="NNTP" />
+  <link rel="up" href="../" title="Russ Allbery" />
+  <link rel="top" href="../" />
+</head>
+
+<!-- Spun from index.th by DocKnot %VERSION% on %DATE% -->
+
+<body>
+<table class="navbar"><tr>
+  <td class="navleft">&lt;&nbsp;<a href="../photos/">Photos</a></td>
+  <td>
+    <a href="../">Russ Allbery</a>
+  </td>
+  <td class="navright"><a href="../nntp/">NNTP</a>&nbsp;&gt;</td>
+</tr></table>
+
+
+<h1>The Usenet Article Format and Protocols</h1>
+
+<blockquote class="quote"><p class="short">
+    Usenet interprets management as damage and routes around it.
+</p><p class="attribution">
+    Peter da Silva
+</p></blockquote>
+
+<h2>Standards</h2>
+
+<p>
+The current standard for the format of Usenet (Netnews) articles is
+<a href="rfcs/rfc5536.txt">RFC 5536</a>, published in November of 2009.  The
+standard for the architecture and protocols of Netnews, including how
+articles are modified and checked when traveling from system to system, is
+<a href="rfcs/rfc5537.txt">RFC 5537</a>, published at the same time.  I was the
+document editor for RFC 5537.  Both of these documents are built on
+<a href="rfcs/rfc5322.txt">RFC 5322</a>, the current standard for mail messages.
+Netnews articles are compliant mail messages with some additional fields
+and a few additional restrictions.
+</p>
+
+<p>
+These RFCs obsolete the previous standard for the format of Usenet
+articles, <a href="rfcs/rfc1036.txt">RFC 1036</a>, and the draft document known
+as "Son-of-1036" which was published as <a href="rfcs/rfc1849.txt">RFC 1849</a>.
+All software should now follow the newer standards, but RFC 1036 and RFC
+1849 may be of interest in understanding the behavior of older standards.
+</p>
+
+<p>
+There is one additional Netnews-specific RFC: <a href="rfcs/rfc8315.txt">RFC
+8315</a>, which standardizes Cancel-Locks for Netnews articles.
+</p>
+
+<p>
+See my <a href="rfcs/">Netnews standards index</a> for a hopefully-complete list
+of Netnews-related standards, and the <a href="https://mailarchive.ietf.org/arch/browse/usefor/">usefor</a> mailing list
+archives for the discussion that led up to the current documents.
+</p>
+
+<h2>Header Registry</h2>
+
+<p>
+Usenet (Netnews) articles use the same basic header format as e-mail
+messages and HTTP headers and share the same <a href="https://www.iana.org/assignments/message-headers/message-headers.xhtml">IANA registry
+for header field names</a>.  Most of the references here for Netnews header
+field names are to the current article format standards.
+</p>
+
+<p>
+There is a separate <a href="https://www.iana.org/assignments/netnews-parameters/netnews-parameters.xhtml">IANA registry for parameters specific
+to Netnews</a>, currently used only by Cancel-Lock hash algorithms.
+</p>
+
+<h2>Protocol Drafts</h2>
+
+<p>
+Four Netnews-related drafts were never published as RFCs but may be of
+interest:
+</p>
+
+<ul>
+<li class="packed"><a href="drafts/draft-ietf-usefor-useage-01.txt">Usenet Best Practice</a> (2KB)</li>
+<li class="packed"><a href="drafts/draft-ietf-usefor-message-id-01.txt">Recommendations for Generating Message IDs</a> (215B)</li>
+<li class="packed"><a href="drafts/draft-ietf-usefor-posted-mailed-01.txt">Identification of Messages Delivered Via Both Mail and News</a> (215B)</li>
+<li class="packed"><a href="drafts/draft-lindsey-usefor-signed-01.txt">Signed Headers in Mail and Netnews</a> (215B)</li>
+</ul>
+
+<p>
+If you're curious about the history of these documents, or want to see the
+other drafts that have gone into the working group discussions, you can
+review my <a href="drafts/">draft archive</a>.  I may have missed a few, but
+most of them should be here.  Also see the IETF Internet-Draft search for
+<a href="https://tools.ietf.org/id/draft-ietf-usefor">USEFOR working group
+drafts</a>.
+</p>
+
+<h2>Other Documents</h2>
+
+<dl>
+<dt><a href="other/moderators-handbook">Netnews Moderator's Handbook</a></dt>
+<dd><p>
+    This is a set of best-practice guidelines for Netnews moderators
+    written back in 1994.  This was intended to be published as an RFC,
+    but was never completed.  Some of the advice is out of date, but much
+    of this information is still relevant.
+</p></dd>
+
+<dt><a href="other/pgpmoose">PGP Moose</a></dt>
+<dd><p>
+    The PGP Moose protocol specifies a mechanism for signing articles
+    including certain key headers so that the resulting signature can
+    be used to check several key header fields and the newsgroups to which
+    the article was posted.  This protocol is used primarily to validate
+    approvals to moderated groups.
+</p>
+
+<p>
+    This document is the original README by Greg Rose that accompanied the
+    reference implementation of PGP Moose.  The canonical version is on
+    <a href="http://seer-grog.net/">Greg Rose's web site</a>.
+</p></dd>
+
+<dt><a href="other/pgpverify">Signing Control Messages (pgpverify)</a></dt>
+<dd><p>
+    The pgpverify protocol is another protocol for signing a Usenet
+    article that includes a different set of metadata and header fields
+    than the PGP Moose protocol.  It's used primarily (and very widely) to
+    authenticate control messages.
+</p>
+
+<p>
+    This document is the FORMAT document for the pgpcontrol software.  The
+    canonical version is in the
+    <a href="ftp://ftp.isc.org/pub/pgpcontrol/FORMAT">pgpcontrol distribution
+    site</a>.
+</p></dd>
+</dl>
+
+<table class="navbar"><tr>
+  <td class="navleft">&lt;&nbsp;<a href="../photos/">Photos</a></td>
+  <td>
+    <a href="../">Russ Allbery</a>
+  </td>
+  <td class="navright"><a href="../nntp/">NNTP</a>&nbsp;&gt;</td>
+</tr></table>
+
+<address>
+    Last <a href="https://www.eyrie.org/~eagle/software/web/">spun</a>
+    %DATE% from thread modified %DATE%
+</address>
+</body>
+</html>

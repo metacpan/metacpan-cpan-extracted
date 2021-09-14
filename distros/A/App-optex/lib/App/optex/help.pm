@@ -85,6 +85,7 @@ sub perldoc {
     my @modules = do {
 	grep { $_ ne 'default' }
 	grep { $_ !~ m:^/: }
+	grep { defined }
 	map  { $_->module }
 	$rcloader->buckets;
     } or die "No modules.\n";

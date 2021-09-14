@@ -1,5 +1,11 @@
 Revision history for this software.
 
+2.13.6.18 2021-09-12 00:00:00
+  - fixed some erratas of mapping
+  - added many code to mapping
+  - add lib/Jacode4e.pm-*.txt files
+  - created by INABA Hitoshi
+
 2.13.6.17 2021-02-11 00:00:00
   - rewrote global "%_" to "my %x"
   - created by INABA Hitoshi

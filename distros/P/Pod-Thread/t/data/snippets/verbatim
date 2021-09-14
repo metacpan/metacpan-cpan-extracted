@@ -1,0 +1,39 @@
+[name]
+Verbatim blocks
+
+[input]
+=pod
+
+    Some verbatim text
+
+=over 4
+
+    Verbatim text indented
+
+=back
+
+=over 4
+
+=item Heading
+
+    Some verbatim text
+    with some newlines
+
+=back
+
+[output]
+\pre
+[    Some verbatim text]
+
+\block
+[\pre
+[    Verbatim text indented]
+]
+
+\desc[Heading]
+[\pre
+[    Some verbatim text
+    with some newlines]
+]
+
+\signature

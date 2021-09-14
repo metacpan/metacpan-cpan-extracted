@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -41,6 +41,7 @@
             "CHI" : "0",
             "DBD::CSV" : "0",
             "DBD::SQLite" : "0",
+            "DBD::SQLite::Constants" : "0",
             "DBI" : "0",
             "Error::Simple" : "0",
             "File::Spec" : "0",
@@ -70,6 +71,6 @@
          "web" : "https://github.com/nigelhorne/Locale-Places"
       }
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

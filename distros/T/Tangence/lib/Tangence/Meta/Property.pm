@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2011-2017 -- leonerd@leonerd.org.uk
 
-package Tangence::Meta::Property;
+package Tangence::Meta::Property 0.26;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.25';
 
 use Tangence::Constants;
 

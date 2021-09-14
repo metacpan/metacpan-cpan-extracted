@@ -1,3 +1,10 @@
+0.31      2021-09-13 18:14:20-04:00 America/New_York
+
+  [BUG FIX]
+
+   * table names were not appropriately quoted.
+
+
 0.30      2021-09-01 18:09:05-04:00 America/New_York
 
   [BUG FIX]

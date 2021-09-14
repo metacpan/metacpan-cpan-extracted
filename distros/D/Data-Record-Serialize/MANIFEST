@@ -7,7 +7,6 @@ MANIFEST
 META.json
 META.yml
 README
-README.mkdn
 dist.ini
 lib/Data/Record/Serialize.pm
 lib/Data/Record/Serialize/Encode/dbi.pm

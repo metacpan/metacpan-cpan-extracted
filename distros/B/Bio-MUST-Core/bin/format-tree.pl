@@ -179,7 +179,7 @@ format-tree.pl - Format (and annotate) trees for printing
 
 =head1 VERSION
 
-version 0.211470
+version 0.212530
 
 =head1 USAGE
 
@@ -266,7 +266,7 @@ al. (2002), as implemented in C<Bio::Phylo>.
 Direction of the node sorting operation [default: none]. The following
 directions are available: asc and desc.
 
-=for Euclid: dir.type:       /asc|desc/
+=for Euclid: dir.type:       string, dir eq 'asc' || dir eq 'desc'
     dir.type.error: <dir> must be one of asc or desc (not dir)
 
 =item --annotate[=][<level>]

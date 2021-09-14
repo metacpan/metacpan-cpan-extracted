@@ -10,7 +10,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Dist 4.01;
+package App::DocKnot::Dist 5.00;
 
 use 5.024;
 use autodie;
@@ -81,6 +81,7 @@ our @DIST_IGNORE = (
     qr{ \A _build \z }xms,
     qr{ \A blib \z }xms,
     qr{ \A config[.]h[.]in~ \z }xms,
+    qr{ \A configure~ \z }xms,
     qr{ \A cover_db \z }xms,
     qr{ \A tests/config \z }xms,
     qr{ [.]tar[.][gx]z \z }xms,
@@ -245,8 +246,10 @@ sub _sign_tarballs {
     my @files = $self->_find_matching_tarballs($path, $prefix);
     for my $file (@files) {
         my $tarball_path = File::Spec->catdir($path, $file);
-        systemx($self->{gpg}, '--detach-sign', '--armor', '-u',
-            $self->{pgp_key}, $tarball_path);
+        systemx(
+            $self->{gpg},     '--detach-sign', '--armor', '-u',
+            $self->{pgp_key}, $tarball_path,
+        );
     }
     return;
 }
@@ -387,8 +390,11 @@ sub make_distribution {
     }
 
     # Export the Git repository into a new directory.
-    my @git = ('git', 'archive', "--remote=$source", "--prefix=${prefix}/",
-        'master',);
+    my @git = (
+        'git',              'archive',
+        "--remote=$source", "--prefix=${prefix}/",
+        'master',
+    );
     my @tar = qw(tar xf -);
     run(\@git, q{|}, \@tar) or die "@git | @tar failed with status $?\n";
 

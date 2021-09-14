@@ -16,11 +16,14 @@ name: Pod-Thread
 provides:
   Pod::Thread:
     file: lib/Pod/Thread.pm
-    version: '2.00'
+    version: '3.00'
 requires:
   Pod::Simple: '3.06'
   perl: '5.024'
 resources:
+  bugtracker: https://github.com/rra/pod-thread/issues
+  homepage: https://www.eyrie.org/~eagle/software/pod-thread/
   license: http://www.opensource.org/licenses/mit-license.php
-version: '2.00'
+  repository: https://github.com/rra/pod-thread.git
+version: '3.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

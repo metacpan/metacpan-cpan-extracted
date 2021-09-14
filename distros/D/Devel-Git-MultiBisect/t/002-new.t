@@ -12,9 +12,6 @@ unless (
 ) {
     plan skip_all => "No git checkout of List-Compare found";
 }
-else {
-    plan tests => 15;
-}
 use Carp;
 use Capture::Tiny qw( :all );
 use Cwd;
@@ -45,6 +42,10 @@ isa_ok($self, 'Devel::Git::MultiBisect::AllCommits');
 for my $d (qw| gitdir outputdir |) {
     ok(defined $self->{$d}, "'$d' has been defined");
     ok(-d $self->{$d}, "'$d' exists: $self->{$d}");
+}
+for my $attr (qw| probe |) {
+    ok(! exists $self->{$attr},
+        "AllCommits has no need of '$attr' attribute");
 }
 
 my ($bad_gitdir, $bad_last_before, $bad_last);
@@ -124,4 +125,5 @@ isa_ok($self, 'Devel::Git::MultiBisect::AllCommits');
 
 chdir $startdir or croak "Unable to return to $startdir";
 
+done_testing();
 __END__

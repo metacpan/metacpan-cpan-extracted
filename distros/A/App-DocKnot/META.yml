@@ -17,34 +17,52 @@ name: App-DocKnot
 provides:
   App::DocKnot:
     file: lib/App/DocKnot.pm
-    version: '4.01'
+    version: '5.00'
   App::DocKnot::Command:
     file: lib/App/DocKnot/Command.pm
-    version: '4.01'
+    version: '5.00'
   App::DocKnot::Config:
     file: lib/App/DocKnot/Config.pm
-    version: '4.01'
+    version: '5.00'
   App::DocKnot::Dist:
     file: lib/App/DocKnot/Dist.pm
-    version: '4.01'
+    version: '5.00'
   App::DocKnot::Generate:
     file: lib/App/DocKnot/Generate.pm
-    version: '4.01'
+    version: '5.00'
+  App::DocKnot::Spin:
+    file: lib/App/DocKnot/Spin.pm
+    version: '5.00'
+  App::DocKnot::Spin::RSS:
+    file: lib/App/DocKnot/Spin/RSS.pm
+    version: '5.00'
+  App::DocKnot::Spin::Sitemap:
+    file: lib/App/DocKnot/Spin/Sitemap.pm
+    version: '5.00'
+  App::DocKnot::Spin::Thread:
+    file: lib/App/DocKnot/Spin/Thread.pm
+    version: '5.00'
+  App::DocKnot::Spin::Versions:
+    file: lib/App/DocKnot/Spin/Versions.pm
+    version: '5.00'
   App::DocKnot::Update:
     file: lib/App/DocKnot/Update.pm
-    version: '4.01'
+    version: '5.00'
 requires:
+  Date::Parse: '0'
   File::BaseDir: '0'
   File::ShareDir: '1.00'
+  Git::Repository: '0'
   IO::Compress::Xz: '0'
   IO::Uncompress::Gunzip: '0'
   IPC::Run: '0'
   IPC::System::Simple: '0'
+  Image::Size: '0'
   JSON::MaybeXS: '0'
   Kwalify: '0'
-  List::SomeUtils: '0'
+  List::SomeUtils: '0.07'
   Perl6::Slurp: '0'
-  Pod::Usage: '0'
+  Pod::Thread: '3.00'
   Template: '0'
   YAML::XS: '0.81'
   perl: '5.024'
@@ -53,5 +71,5 @@ resources:
   homepage: https://www.eyrie.org/~eagle/software/docknot
   license: http://www.opensource.org/licenses/mit-license.php
   repository: https://github.com/rra/docknot.git
-version: '4.01'
+version: '5.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

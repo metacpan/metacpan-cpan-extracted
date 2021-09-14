@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Roles::Listable;
 # ABSTRACT: Listable Moose role for objects with implied id lists
-$Bio::MUST::Core::Roles::Listable::VERSION = '0.211470';
+$Bio::MUST::Core::Roles::Listable::VERSION = '0.212530';
 use Moose::Role;
 
 use autodie;
@@ -229,7 +229,7 @@ Bio::MUST::Core::Roles::Listable - Listable Moose role for objects with implied 
 
 =head1 VERSION
 
-version 0.211470
+version 0.212530
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,167 @@
+\==[section]  [3] [\h2(#\1)[\2]\table(software)[][\3]]
+\==[package]  [3] [\tablerow[\class(package)[\strong[\link[\1][\2]]]][\3]]
+\==[b]        [0] [\entity[ndash]]
+\==[bolddesc] [2] [\desc[\strong[\1]][\2]]
+\==[desclink] [3] [\bolddesc[\link[\1][\2]][\3]]
+
+\rss[../journal/software.rss][Releases of Russ Allbery's Software]
+
+\heading[Russ's Software][indent]
+
+\h1[Software]
+
+\class(sections)[
+       \link[#kerberos][Kerberos]
+    \b \link[#info][Information Management]
+    \b \link[#mail][Mail]
+    \b \link[#perl][Perl Modules]
+       \break
+       \link[#software][Software Management]
+    \b \link[#usenet][Usenet]
+    \b \link[#web][Web]
+       \break
+       \link[#other][Other Links]
+]
+
+\quote(short)[
+    It is a simple task to make things complex, but a complex task to make
+    them simple.
+][Meyer's Law][]
+
+All of this software is free software / open source, and I welcome patches
+and improvements that are generally useful.  I'm happy to include
+generally useful improvements into the version that I distribute, even if
+I don't use the feature personally.  If you have some need that you wish
+one of these packages would handle but don't know how to implement it,
+please feel free to send me e-mail; I might be able to give you some hints
+or find the time to implement it (although I can't promise anything).
+
+I'm in the process of migrating all software I maintain except for scripts
+to Git.  The Git repositories for packages that have been migrated are
+available from \link[https://git.eyrie.org/][git.eyrie.org].
+
+There is an \class(feed)[\link[/~eagle/journal/software.rss]
+[\image[/~eagle/journal/feed.png][]] \link[/~eagle/journal/software.rss]
+[RSS feed]] where new releases of these software packages are announced.
+Those announcements are also posted to my
+\link[/~eagle/journal/][journal], which also offers a
+\class(feed)[\link[/~eagle/journal/index.rss]
+[\image[/~eagle/journal/feed.png][]] \link[/~eagle/journal/index.rss]
+[general RSS feed]] if you're interested in more than software release
+announcements.  For following development in detail,
+\link[https://git.eyrie.org/][git.eyrie.org] provides RSS feeds per project
+repository that list every committed change.
+
+I maintain Debian packages for much of the software here, as well as other
+packages I'm interested in.  Some of those packages are in Debian proper;
+others are only available from my personal repository.  See my
+\link[debian.html][Debian package page] for more information.
+
+There may be additional software and patches available from my
+\link[https://archives.eyrie.org/software/][archive site] that I've not
+yet had a chance to write a web page for.  I'm still in the process of
+adding to this page all of the various software that I've written,
+maintained, or contributed to.
+
+\section[kerberos][Kerberos][
+    \package[krb5-strength/][krb5-strength]
+        [Kerberos kadmind strength checking plugin]
+    \package[kstart/][kstart]
+        [Daemon version of Kerberos kinit with other features]
+    \package[pam-krb5/][pam-krb5]
+        [Kerberos PAM module]
+    \package[remctl/][remctl]
+        [Run specific commands remotely with Kerberos and ACLs]
+    \package[wallet/][wallet]
+        [Secure credential management system]
+]
+
+\section[info][Information Management][
+    \package[reminder/][reminder]
+        [Remind of possibly periodic tasks via e-mail]
+]
+
+\section[mail][Mail][
+    \package[mdfrm/][mdfrm]
+        [Summarize the content of a maildir like frm]
+]
+
+\section[perl][Perl Modules][
+    \package[pgp-sign/][PGP::Sign]
+        [Generate and/or verify detached PGP signatures]
+    \package[podlators/][podlators]
+        [Pod::Man and Pod::Text POD formatting modules]
+    \package[ansicolor/][Term::ANSIColor]
+        [Easy interface for ANSI color escape sequences]
+    \package[shadowhash/][Tie::ShadowHash]
+        [Overlay multiple hashes to form a single logical hash]
+]
+
+\section[devel][Software Development][
+    \package[c-tap-harness/][C TAP Harness]
+        [C harness for running TAP-compliant tests]
+    \package[cvslog/][cvslog]
+        [Featureful e-mail commit notification from CVS]
+    \package[docknot/][DocKnot]
+        [Package documentation generator]
+    \package[rra-c-util/][rra-c-util]
+        [Russ Allbery's utility libraries for C]
+    \package[svnlog/][svnlog]
+        [Featureful e-mail commit notification from Subversion]
+]
+
+\section[usenet][Usenet][
+    \package[control-archive/][control-archive]
+        [Netnews control message processing and archiving]
+    \package[inn/][INN]
+        [Full-featured, flexible and configurable news server]
+    \package[gateway/][News::Gateway]
+        [General toolkit for mail gatewaying and moderation]
+    \package[postfaq/][postfaq]
+        [Post FAQs and periodic postings with superseding]
+]
+
+\section[web][Web][
+    \package[pod-thread/][Pod::Thread]
+        [Format POD source into thread, an HTML macro language]
+    \package[web/][Web tools]
+        [Web page generation from a macro language and other sources]
+]
+
+\h2(#other)[Other Links]
+
+\desclink[scripts/][Scripts][
+    Some smaller scripts that don't warrant their own set of pages.  Some
+    larger or more generally useful scripts get their own pages above;
+    these are scripts with a narrower or specialized purpose, or scripts
+    that are most commonly found inside another package.
+]
+
+\desclink[orphaned.html][Orphaned Software][
+    Packages that I no longer maintain, but which may still be useful.  If
+    you use any of this software and are interested in maintaining it,
+    please consider adopting it.  Barring exceptional circumstances, such
+    as security vulnerabilities, I will not be making any further releases
+    of these packages.
+]
+
+\desclink[obsolete.html][Obsolete Software][
+    Packages that I no longer maintain and that are probably not of
+    interest to most people.  In some cases (such as Kerberos v4 packages)
+    the software is obsolete; in others, it's just for things I no longer
+    use.  Barring exceptional circumstances, there will not be any further
+    releases of these packages, but they are still available for
+    historical reference and in case someone else wants to pick them up.
+]
+
+\desclink[patches/][Patches][
+    Patches to some packages that I don't maintain which may be of
+    interest to others.  Things will come and go from this page as the
+    patches are incorporated into the upstream software.  Patches may also
+    be obsolete, if upstream has changed without incorporating my changes.
+    The files here aren't checked or updated very often and are provided
+    just in case they're of interest; you will probably have to do some
+    work to use them.
+]
+
+\signature

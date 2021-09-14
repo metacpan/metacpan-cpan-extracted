@@ -1,0 +1,22 @@
+[name]
+Random headings
+
+[input]
+=head1 First Heading
+
+=head2 Second Heading
+
+=head3 Third Heading
+
+=head4 Fourth Heading
+
+[output]
+\h2(#S1)[First Heading]
+
+\h3[Second Heading]
+
+\h4[Third Heading]
+
+\h5[Fourth Heading]
+
+\signature

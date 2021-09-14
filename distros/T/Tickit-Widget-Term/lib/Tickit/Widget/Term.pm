@@ -8,7 +8,7 @@ use Object::Pad 0.51;
 
 use Syntax::Keyword::Match;
 
-package Tickit::Widget::Term 0.004;
+package Tickit::Widget::Term 0.005;
 class Tickit::Widget::Term
    isa Tickit::Widget;
 
@@ -18,6 +18,7 @@ use constant CAN_FOCUS => 1;
 
 use List::Util qw( min max );
 
+use Tickit 0.71;  # ->watch_io
 use Tickit::Style;
 
 BEGIN {
@@ -27,6 +28,7 @@ BEGIN {
 }
 
 use Term::VTerm;
+use Term::VTerm::Pos;
 
 use Convert::Color::RGB8;
 use Convert::Color::XTerm;
@@ -60,9 +62,9 @@ bytes containing terminal sequences which are used to draw the content to the
 screen.
 
 Typically this would be used connected to some external process via a PTY
-device. Currently, this class does not provide management of that, so the
-application will have to perform this bytewise IO itself, via the
-L</write_input> method and L</set_on_output> event handler.
+device. The L</use_pty> method can be used to connect this PTY device to the
+widget. Alternatively, the application can perform this bytewise IO itself, via
+the L</write_input> method and L</set_on_output> event handler.
 
 =cut
 
@@ -251,6 +253,90 @@ the terminal of its new output size.
 =cut
 
 has $_on_resize :reader :writer :param = undef;
+
+# Various bits of PTY setup need access to the toplevel Tickit instance
+# for its event loop handling. We might not have that yet.
+# This structure lets us defer until we have one.
+
+# TODO: That we have to do this at all suggests an API shape problem in
+#   Tickit itself
+
+has @_on_tickit;
+method _on_tickit ( $code )
+{
+   if( my $win = $self->window ) {
+      $code->( $win->tickit );
+   }
+   else {
+      push @_on_tickit, $code;
+   }
+}
+
+method window_gained ( $win )
+{
+   $self->SUPER::window_gained( $win );
+
+   if( @_on_tickit ) {
+      my $tickit = $self->window->tickit;
+      ( shift @_on_tickit )->( $tickit ) while @_on_tickit;
+   }
+}
+
+has $_pty;
+has $_pty_read_watch;
+
+=head2 use_pty
+
+   $term->use_pty( $pty )
+
+Takes an opened PTY device and sets up an IO watcher on it to receive bytes of
+input. Additionally, arranges for output bytes to be sent to the handle.
+
+This is a convenient alternative to feeding in bytes by calling
+L</input_write> and receiving them with a callback set by L</set_on_output>.
+
+The C<$pty> handle should be an L<IO::Pty> instance; or at least, well-behaved
+as an IO handle and support the following methods:
+
+   $pty->blocking( 0 );
+   $pty->set_winsize( $lines, $cols );
+   $pty->sysread( $buf, $len );
+   $pty->syswrite( $buf );
+
+=cut
+
+method use_pty ( $pty )
+{
+   $_pty = $pty;
+
+   $_pty->blocking( 0 );
+
+   $self->_on_tickit( sub ( $tickit ) {
+      $_pty_read_watch = $tickit->watch_io( $_pty, Tickit::IO_IN|Tickit::IO_HUP, sub ( $info ) {
+         if( $info->cond & Tickit::IO_HUP ) {
+            $tickit->watch_cancel( $_pty_read_watch );
+            undef $_pty_read_watch;
+            return;
+         }
+
+         my $buf;
+         while(1) {
+            $_pty->sysread( $buf, 8192 ) or last;
+            $self->write_input( $buf );
+         }
+         $self->flush;
+      } );
+   } );
+
+   $self->set_on_output( sub ( $buf ) {
+      # TODO: Handle buffering of nonblocking writes returning EAGAIN
+      $_pty->syswrite( $buf );
+   } );
+
+   $self->set_on_resize( sub ( $lines, $cols ) {
+      $_pty->set_winsize( $lines, $cols );
+   } );
+}
 
 method reshape ()
 {

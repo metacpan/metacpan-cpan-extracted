@@ -1,0 +1,62 @@
+\==[imagehead] [2] [\h1(shadowed)[\image[\1][\2]]]
+\==[section]   [2] [\link[\1][\2]]
+
+\rss[changes.rss][Changes to Russ Allbery's Web Pages]
+
+\heading[Russ Allbery (Eagle)][basic]
+
+\imagehead[names.png][Eagle]
+
+\quote(broken)[
+    All that is gold does not glitter,
+    Not all those who wander are lost;
+    The old that is strong does not wither,
+    Deep roots are not reached by the frost.
+][J. R. R. Tolkien][\cite[The Fellowship of the Ring]]
+
+\class(navbar)[
+   \strong[Technical:]
+   \section [software/]    [Software] \entity[ndash]
+   \section [faqs/]        [FAQs] \entity[ndash]
+   \section [notes/]       [Technical Notes]
+   \break
+   \strong[Creative:]
+   \section [reviews/]     [Reviews] \entity[ndash]
+   \section [stories/]     [Stories] \entity[ndash]
+   \section [writing/]     [Other Writing] \entity[ndash]
+   \section [photos/]      [Photos]
+   \break
+   \strong[Usenet:]
+   \section [usefor/]      [Article Format] \entity[ndash]
+   \section [nntp/]        [NNTP] \entity[ndash]
+   \section [big-8/]       [Big Eight]
+   \break
+   \strong[Personal:]
+   \section [personal/]    [About] \entity[ndash]
+   \section [links/]       [Links] \entity[ndash]
+   \section [journal/]     [Journal]
+   \break
+   \strong[Meta:]
+   \section [changes.html] [Change Log] \entity[ndash]
+   \section [sitemap.html] [Sitemap]
+]
+
+It has been said that the web is a triumph of form over content.  The
+Internet equivalent of television.  The medium designed for people with
+five second attention spans.  Well, anything that can only hold my
+attention for five seconds, I don't want to see in the first place.  I
+like words.  I don't like pointless graphics.  I don't have a burning
+desire to click on everything I see.  And so, these are my web pages.
+
+An attempt to create a triumph of content over form, if you will.
+
+Graphics are sparse.  Text is common.  Links are present only when they
+add something to the content.  All pages are validated
+\link[notes/xhtml.html][XHTML], as strict as possible, with all formatting
+information in style sheets, so that they will be readable on any
+standards-compliant browser.  And somewhere herein is, I hope, something
+that will capture your attention for more than five seconds.
+
+Welcome.
+
+\signature

@@ -6,8 +6,9 @@ use Test::Alien;
 use Alien::geos::af;
 
 alien_ok 'Alien::geos::af';
-
+warn '===';
 diag ('libs: '   . Alien::geos::af->libs // '');
+warn '+++';
 diag ('cflags: ' . Alien::geos::af->cflags // '');
 eval {
     diag ('Dynamic libs: ' . join (':', Alien::geos::af->dynamic_libs));

@@ -11,7 +11,7 @@ use MooX::Types::MooseLike::Base qw(:all);
 use PDF::Table;
 use PDF::TextBlock 0.13;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 =head1 NAME
 
@@ -323,7 +323,7 @@ room for the header (if defined) + room for the logo (if defined).
 
 has margin_top => (
     is      => 'lazy',
-    isa     => Int,
+    isa     => Num,
 );
 
 sub _build_margin_top
@@ -335,7 +335,7 @@ sub _build_margin_top
         $size += $self->logo_height;
         $size += $self->logo_padding;
     }
-    return $size;
+    return int $size;
 };
 
 =head2 margin_bottom
@@ -520,7 +520,7 @@ Sets the current Y position. See L</y_position>.
 
 sub set_y_position
 {   my ($self, $y) = @_;
-    $y && $y =~ /^[0-9]+$/
+    $y && $y =~ /^[0-9]+(\.[0-9]+)?$/
         or croak "Invalid y value for set_y_position: $y";
     $self->_set__y($y);
 }
@@ -534,7 +534,7 @@ will move the cursor up the page, negative values down. See L</y_position>.
 
 sub move_y_position
 {   my ($self, $y) = @_;
-    $y && $y =~ /^[0-9]+$/
+    $y && $y =~ /^[0-9]+(\.[0-9]+)?$/
         or croak "Invalid y value for move_y_position: $y";
     $self->_set__y($self->_y + $y);
 }

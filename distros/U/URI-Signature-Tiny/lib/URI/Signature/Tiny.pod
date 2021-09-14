@@ -118,7 +118,7 @@ which gets called with the fresh URI and its signature as arguments.
 =item C<verify>
 
 Takes a signed URI and checks whether it matches its signature.
-It passes its arguments to the L</C<after_sign>> callback,
+It passes its arguments to the L</C<before_verify>> callback,
 which must return two values:
 the bare URI with the signature stripped off, and the signature.
 

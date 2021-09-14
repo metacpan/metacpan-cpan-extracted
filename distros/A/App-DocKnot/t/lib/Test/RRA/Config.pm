@@ -24,15 +24,15 @@ our (@EXPORT_OK, $VERSION);
 # consistency is good).
 BEGIN {
     @EXPORT_OK = qw(
-      $COVERAGE_LEVEL @COVERAGE_SKIP_TESTS @CRITIC_IGNORE $LIBRARY_PATH
-      $MINIMUM_VERSION %MINIMUM_VERSION @MODULE_VERSION_IGNORE
-      @POD_COVERAGE_EXCLUDE @STRICT_IGNORE @STRICT_PREREQ
+        $COVERAGE_LEVEL @COVERAGE_SKIP_TESTS @CRITIC_IGNORE $LIBRARY_PATH
+        $MINIMUM_VERSION %MINIMUM_VERSION @MODULE_VERSION_IGNORE
+        @POD_COVERAGE_EXCLUDE @STRICT_IGNORE @STRICT_PREREQ
     );
 
     # This version should match the corresponding rra-c-util release, but with
     # two digits for the minor version, including a leading zero if necessary,
     # so that it will sort properly.
-    $VERSION = '9.00';
+    $VERSION = '9.01';
 }
 
 # If C_TAP_BUILD or C_TAP_SOURCE are set in the environment, look for
@@ -121,9 +121,9 @@ this setting.
 
 =item @CRITIC_IGNORE
 
-Additional directories to ignore when doing recursive perlcritic testing.  The
-contents of this directory must be either top-level directory names or
-directory names starting with F<tests/>.
+Additional files or directories to ignore when doing recursive perlcritic
+testing.  To ignore files that will be installed, the path should start with
+F<blib>.
 
 =item $LIBRARY_PATH
 
@@ -183,7 +183,7 @@ Russ Allbery <eagle@eyrie.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2015-2016, 2019 Russ Allbery <eagle@eyrie.org>
+Copyright 2015-2016, 2019, 2021 Russ Allbery <eagle@eyrie.org>
 
 Copyright 2013-2014 The Board of Trustees of the Leland Stanford Junior
 University

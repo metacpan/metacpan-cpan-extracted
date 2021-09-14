@@ -56,7 +56,7 @@ if($Config{'osname'} eq 'MSWin32') {
 }
 
 if(my $dbh = DBI->connect("dbi:SQLite:dbname=$sqlite", undef, undef, { RaiseError => 1, AutoCommit => 0, synchronous => 0, locking_mode => 'EXCLUSIVE' })) {
-	$dbh->do('CREATE TABLE gb(code1 INTEGER, code2 INTEGER, type VARCHAR(4), data VARCHAR NOT NULL, ispreferredname BIT)');
+	$dbh->do('CREATE TABLE gb(code1 INTEGER, code2 INTEGER, type VARCHAR(4), data VARCHAR NOT NULL, ispreferredname BIT, isshortname BIT)');
 	# keys
 	# if($place = $self->{'gb'}->fetchrow_hashref({ type => $from, data => $place })) {
 		# if(my $line = $self->{'gb'}->fetchrow_hashref({ type => $to, code2 => $place->{'code2'} })) {
@@ -84,7 +84,7 @@ sub doit($$) {
 	while(my $line = <$fin>) {
 		chomp $line;
 
-		my ($code1, $code2, $type, $data, $ispreferredname) = split(/\t/, $line);
+		my ($code1, $code2, $type, $data, $ispreferredname, $isshortname) = split(/\t/, $line);
 		next if($type eq 'link');
 		next if($type eq 'wkdt');
 
@@ -95,7 +95,8 @@ sub doit($$) {
 			code2 => $code2,
 			type => $type,
 			data => $data,
-			ispreferredname => $ispreferredname
+			ispreferredname => $ispreferredname,
+			isshortname => $isshortname
 		};
 	}
 	return \%queue;
@@ -109,7 +110,7 @@ sub flush($)
 
 	while(my ($key, $value) = each (%{$queue})) {
 		if(!defined($query)) {
-			$query = 'INSERT INTO gb(code1, code2, type, data, ispreferredname) VALUES (';
+			$query = 'INSERT INTO gb(code1, code2, type, data, ispreferredname, isshortname) VALUES (';
 		} else {
 			$query .= ',(';
 		}
@@ -125,7 +126,8 @@ sub flush($)
 		}
 		$value->{'data'} =~ s/'/''/g;
 		my $ispreferredname = $value->{'ispreferredname'} ? 1 : 0;
-		$query .= "'" . $value->{'data'} . "',$ispreferredname)";
+		my $isshortname = $value->{'isshortname'} ? 1 : 0;
+		$query .= "'" . $value->{'data'} . "',$ispreferredname,$isshortname)";
 		# use Data::Dumper;
 		# print Data::Dumper->new([$value])->Dump() if($ispreferredname);
 	}

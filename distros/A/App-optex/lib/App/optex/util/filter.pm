@@ -7,6 +7,7 @@ use Carp;
 use utf8;
 use Encode;
 use open IO => 'utf8', ':std';
+use Hash::Util qw(lock_keys);
 use Data::Dumper;
 
 my($mod, $argv);
@@ -17,17 +18,15 @@ sub initialize {
 
 =head1 NAME
 
-util::filter - optex fitler utility module
+util::filter - optex filter utility module
 
 =head1 SYNOPSIS
 
-B<optex> [ --if/--of I<command> ] I<command>
+B<optex> -Mutil::filter [ --if/--of/--ef I<command> ] I<command>
 
-B<optex> [ --if/--of I<&function> ] I<command>
+B<optex> -Mutil::filter [ --if/--of/--ef I<&function> ] I<command>
 
-B<optex> [ --isub/--osub/--psub I<function> ] I<command>
-
-B<optex> I<command> -Mutil::I<filter> [ options ]
+B<optex> -Mutil::filter [ --isub/--osub/--esub/--psub I<function> ] I<command>
 
 =head1 OPTION
 
@@ -37,24 +36,28 @@ B<optex> I<command> -Mutil::I<filter> [ options ]
 
 =item B<--of> I<command>
 
-Set input/output filter command.  If the command start by C<&>, module
-function is called instead.
+=item B<--ef> I<command>
 
-=item B<--pf> I<&function>
+Set input/output filter command for STDIN, STDOUT and STDERR.  If the
+command start by C<&>, module function is called instead.
+
+=item B<--isub> I<function>
+
+=item B<--osub> I<function>
+
+=item B<--esub> I<function>
+
+Set filter function.  These are shortcut for B<--if> B<&>I<function>
+and such.
+
+=item B<--psub> I<function>, B<--pf> I<&function>
 
 Set pre-fork filter function.  This function is called before
 executing the target command process, and expected to return text
 data, that will be poured into target process's STDIN.  This allows
 you to share information between pre-fork and output filter processes.
 
-=item B<--isub> I<function>
-
-=item B<--osub> I<function>
-
-=item B<--psub> I<function>
-
-Set filter function.  These are shortcut for B<--if> B<&>I<function>
-and such.
+See L<App::optex::xform> for actual use case.
 
 =item B<--set-io-color> IO=I<color>
 
@@ -132,7 +135,7 @@ sub set {
 	    }
 	    use Getopt::EX::Func qw(parse_func);
 	    my $func = parse_func($filter);
-	    io_filter { $func->call($io => $opt{$io}) } $io => 1;
+	    io_filter { $func->call() } $io => 1;
 	}
 	else {
 	    io_filter { exec $filter or die "exec: $!\n" } $io => 1;
@@ -141,18 +144,145 @@ sub set {
     %opt and die "Unknown parameter: " . Dumper \%opt;
     ();
 }
-	
-=item B<set>()
 
-Set input/output filter.
+=item B<set>(I<io>=I<command>)
+
+=item B<set>(I<io>=&I<function>)
+
+Primitive function to prepare input/output filter.  All options are
+implemented by this function.  Takes C<STDIN>, C<STDOUT>, C<STDERR>,
+C<PREFORK> as an I<io> name and I<command> or &I<function> as a vaule.
+
+    mode function
+    option --if   &set(STDIN=$<shift>)
+    option --isub &set(STDIN=&$<shift>)
 
 =cut
 
 ######################################################################
 
-=item B<rev_line>()
+sub unctrl {
+    while (<>) {
+	s/([\000-\010\013-\037\177])/'^' . pack('c', ord($1)|0100)/ge;
+	print;
+    }
+}
 
-Reverse output.
+=item B<unctrl>()
+
+Visualize control characters.
+
+=cut
+
+######################################################################
+
+my %control = (
+    nul => [ 's', "\000", "\x{2400}" ], # ␀ SYMBOL FOR NULL
+    soh => [ 's', "\001", "\x{2401}" ], # ␁ SYMBOL FOR START OF HEADING
+    stx => [ 's', "\002", "\x{2402}" ], # ␂ SYMBOL FOR START OF TEXT
+    etx => [ 's', "\003", "\x{2403}" ], # ␃ SYMBOL FOR END OF TEXT
+    eot => [ 's', "\004", "\x{2404}" ], # ␄ SYMBOL FOR END OF TRANSMISSION
+    enq => [ 's', "\005", "\x{2405}" ], # ␅ SYMBOL FOR ENQUIRY
+    ack => [ 's', "\006", "\x{2406}" ], # ␆ SYMBOL FOR ACKNOWLEDGE
+    bel => [ 's', "\007", "\x{2407}" ], # ␇ SYMBOL FOR BELL
+    bs  => [ 's', "\010", "\x{2408}" ], # ␈ SYMBOL FOR BACKSPACE
+    ht  => [ 's', "\011", "\x{2409}" ], # ␉ SYMBOL FOR HORIZONTAL TABULATION
+    nl  => [  '', "\012", "\x{240A}" ], # ␊ SYMBOL FOR LINE FEED
+    vt  => [ 's', "\013", "\x{240B}" ], # ␋ SYMBOL FOR VERTICAL TABULATION
+    np  => [ 's', "\014", "\x{240C}" ], # ␌ SYMBOL FOR FORM FEED
+    cr  => [ 's', "\015", "\x{240D}" ], # ␍ SYMBOL FOR CARRIAGE RETURN
+    so  => [ 's', "\016", "\x{240E}" ], # ␎ SYMBOL FOR SHIFT OUT
+    si  => [ 's', "\017", "\x{240F}" ], # ␏ SYMBOL FOR SHIFT IN
+    dle => [ 's', "\020", "\x{2410}" ], # ␐ SYMBOL FOR DATA LINK ESCAPE
+    dc1 => [ 's', "\021", "\x{2411}" ], # ␑ SYMBOL FOR DEVICE CONTROL ONE
+    dc2 => [ 's', "\022", "\x{2412}" ], # ␒ SYMBOL FOR DEVICE CONTROL TWO
+    dc3 => [ 's', "\023", "\x{2413}" ], # ␓ SYMBOL FOR DEVICE CONTROL THREE
+    dc4 => [ 's', "\024", "\x{2414}" ], # ␔ SYMBOL FOR DEVICE CONTROL FOUR
+    nak => [ 's', "\025", "\x{2415}" ], # ␕ SYMBOL FOR NEGATIVE ACKNOWLEDGE
+    syn => [ 's', "\026", "\x{2416}" ], # ␖ SYMBOL FOR SYNCHRONOUS IDLE
+    etb => [ 's', "\027", "\x{2417}" ], # ␗ SYMBOL FOR END OF TRANSMISSION BLOCK
+    can => [ 's', "\030", "\x{2418}" ], # ␘ SYMBOL FOR CANCEL
+    em  => [ 's', "\031", "\x{2419}" ], # ␙ SYMBOL FOR END OF MEDIUM
+    sub => [ 's', "\032", "\x{241A}" ], # ␚ SYMBOL FOR SUBSTITUTE
+    esc => [  '', "\033", "\x{241B}" ], # ␛ SYMBOL FOR ESCAPE
+    fs  => [ 's', "\034", "\x{241C}" ], # ␜ SYMBOL FOR FILE SEPARATOR
+    gs  => [ 's', "\035", "\x{241D}" ], # ␝ SYMBOL FOR GROUP SEPARATOR
+    rs  => [ 's', "\036", "\x{241E}" ], # ␞ SYMBOL FOR RECORD SEPARATOR
+    us  => [ 's', "\037", "\x{241F}" ], # ␟ SYMBOL FOR UNIT SEPARATOR
+    sp  => [ 's', "\040", "\x{2420}" ], # ␠ SYMBOL FOR SPACE
+    del => [ 's', "\177", "\x{2421}" ], # ␡ SYMBOL FOR DELETE
+);
+
+use List::Util qw(pairmap);
+my %symbol = pairmap { $b->[1] => $b->[2] } %control;
+my %char   = pairmap { $a => $b->[1] } %control;
+
+my $keep_after = qr/[\n]/;
+
+use Text::ANSI::Tabs qw(ansi_expand);
+
+sub visible {
+    my %opt = @_;
+    my %flag = pairmap { $a => $b->[0] } %control;
+    lock_keys %flag;
+    if (my $all = delete $opt{all}) {
+	$flag{$_} = $all for keys %flag;
+    }
+    my($tabstyle, $s_char, $c_char) = ('bar', '', '');
+    if (exists $opt{tabstyle} and $tabstyle = delete $opt{tabstyle}) {
+	Text::ANSI::Tabs->configure(tabstyle => $tabstyle);
+    }
+    %flag = (%flag, %opt);
+    for my $name (keys %flag) {
+	if    ($flag{$name} eq 'c') { $c_char .= $char{$name} }
+	elsif ($flag{$name})        { $s_char .= $char{$name} }
+    }
+    while (<>) {
+	if ($tabstyle) {
+	    $_ = ansi_expand($_);
+	}
+	s{(?=(${keep_after}?))([$s_char]|(?#bug?)(?!))}{$symbol{$2}$1}g
+	    if $s_char ne '';
+	s{(?=(${keep_after}?))([$c_char]|(?#bug?)(?!))}{
+	    '^'.pack('c',ord($2)+64).$1
+	}ge if $c_char ne '';
+	print;
+    }
+}
+
+=item B<visible>(I<name>=I<flag>)
+
+Make control and space characters visible.
+
+By default, ESCAPE and NEWLINE is not touched.  Other control
+characters and space are shown in unicode symbol.  Tab character and
+following space is visualized in unicode mark.
+
+When newline character is visualized, it is not deleted and shown with
+visible representation.
+
+=over 7
+
+=item I<name>
+
+Name is C<tabstyle>, C<all>, or one of these: [ nul soh stx etx eot
+enq ack bel bs ht nl vt np cr so si dle dc1 dc2 dc3 dc4 nak syn etb
+can em sub esc fs gs rs us sp del ].
+
+If the name is C<all>, the value is set for all characters.
+Default is equivalent to:
+
+    visible(tabstyle=bar,all=s,esc=0,nl=0)
+
+As for C<tabstyle>, use anything defined in L<Text::ANSI::Fold>.
+
+=item I<flag>
+
+If the flag is empty or 0, the character is displayed as is.  If flag
+is C<c>, it is shown in C<^c> format.  Otherwise shown in unicode
+symbol.
+
+=back
 
 =cut
 
@@ -277,6 +407,11 @@ sub timestamp {
 
 Put timestamp on each line of output.
 
+Format is interpreted by C<strftime> function.  Default format is
+C<"%T.%f"> where C<%T> is 24h style time C<%H:%M:%S>, and C<%f> is
+microsecond.  C<%L> means millisecond. C<%nN> can be used to specify
+precision.
+
 =cut
 
 ######################################################################
@@ -300,9 +435,27 @@ Gzip standard input.
 
 =back
 
+=head1 EXAMPLE
+
+Next command print C<ping> command output with timestamp.
+
+    optex -Mutil::filter --osub timestamp ping -c 10 localhost
+
+Put next line in your F<~/.optex.d/optex.rc>.  Then for any command
+executed by optex, standard error output will be shown in visible and
+colored.  This is convenient or debug.
+
+    option default -Mutil::filter --io-color --esub visible
+
+Above setting is not effective for command executed through symbolic
+link.  You can set F<~/.optex.d/default.rc>, but it sometime calls
+unexpected behavior.  This is a future issue.
+
 =head1 SEE ALSO
 
 L<App::optex::xform>
+
+L<https://qiita.com/kaz-utashiro/items/2df8c7fbd2fcb880cee6>
 
 =cut
 
@@ -324,3 +477,5 @@ option --psub &set(PREFORK=&$<shift>)
 
 option --set-io-color &io_color($<shift>)
 option --io-color --set-io-color STDERR=555/201;E
+
+#  LocalWords:  optex STDIN filehandle STDERR STDOUT strftime

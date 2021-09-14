@@ -9,7 +9,7 @@ use Protocol::HTTP2::Client;
 use IO::Select;
 use IO::Socket::SSL qw();
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 
 has [qw/auth_key key_id team_id bundle_id development/] => (
     is => 'rw',
@@ -46,11 +46,7 @@ sub _socket {
     my ($self) = @_;
     if (!$self->{_socket} || !$self->{_socket}->opened){
         my %ssl_opts = (
-             # openssl 1.0.1 support only NPN
-             SSL_npn_protocols => ['h2'],
-             # openssl 1.0.2 also have ALPN
              SSL_alpn_protocols => ['h2'],
-             SSL_version => 'TLSv1_2',
         );
         for (qw/cert_file key_file passwd_cb/) {
             $ssl_opts{"SSL_$_"} = $self->{$_} if defined $self->{$_};

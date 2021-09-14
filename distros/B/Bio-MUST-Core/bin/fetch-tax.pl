@@ -175,7 +175,7 @@ fetch-tax.pl - Fetch (and format) information from the NCBI Taxonomy database
 
 =head1 VERSION
 
-version 0.211470
+version 0.212530
 
 =head1 USAGE
 
@@ -255,7 +255,7 @@ Using C<gi> items requires having installed the GI-to-taxid mapper during
 setup of the local mirror of the NCBI Taxonomy database (see
 L<setup-taxdir.pl> for details).
 
-=for Euclid: str.type:       /mustid|baseid|strain|name|lineage|taxid|gi/
+=for Euclid: str.type:       string, str eq 'mustid' || str eq 'baseid' || str eq 'strain' || str eq 'name' || str eq 'lineage' || str eq 'taxid' || str eq 'gi'
     str.type.error: <str> must be one of mustid, baseid, strain, name, lineage, taxid or gi (not str)
     str.default:    'mustid'
 

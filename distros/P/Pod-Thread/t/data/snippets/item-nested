@@ -1,0 +1,76 @@
+[name]
+Nested item with F<>
+
+[input]
+=over 2
+
+=item F<inn.conf>
+
+=over 2
+
+=item *
+
+Blah blah blah blah blah blah blah
+
+=over 2
+
+=item 1.
+
+=over 2
+
+=item Foo
+
+Bar
+
+baz
+
+=item Bar
+
+=back
+
+baz
+
+=back
+
+=back
+
+=item F<newsfeeds>
+
+=over 2
+
+=item *
+
+Blah blah blah blah blah blah
+
+=back
+
+=back
+
+[output]
+\desc[\italic(file)[inn.conf]]
+[\bullet
+[Blah blah blah blah blah blah blah
+
+\number
+[
+
+\desc[Foo]
+[Bar
+
+baz
+]
+
+\desc[Bar]
+[]
+baz
+]
+
+]
+]
+\desc[\italic(file)[newsfeeds]]
+[\bullet
+[Blah blah blah blah blah blah
+]
+
+]
+\signature

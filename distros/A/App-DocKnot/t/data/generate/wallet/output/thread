@@ -57,7 +57,6 @@
 
     \h2[Development]
 
-    \link[todo.html][To-do list] \break
     \link[design.html][Overall design] \break
     \link[design-acl.html][ACL design] \break
     \link[design-api.html][Server module API design] \break
@@ -69,7 +68,7 @@
     \link[https://git.eyrie.org/?p=kerberos/wallet.git]
          [Git repository] \break
     \link[https://www.openhub.net/p/wallet]
-         [Open HUB code analysis]
+         [Open HUB code analysis] \break
 ]
 
 \h2[Blurb]
@@ -235,7 +234,6 @@ development source].
 
     Developer documentation:
 
-    \doc[todo.html][To-do list]
     \doc[design.html][Overall design]
     \doc[design-acl.html][ACL design]
     \doc[design-api.html][Server module API design]

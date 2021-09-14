@@ -49,7 +49,6 @@
 
     \h2[Development]
 
-    \link[todo.html][To-do list] \break
     \link[https://github.com/rra/pgp-sign]
          [GitHub] \break
     \link[https://github.com/rra/pgp-sign/issues]
@@ -59,7 +58,7 @@
     \link[https://metacpan.org/release/PGP-Sign]
          [MetaCPAN] \break
     \link[https://tracker.debian.org/pkg/libpgp-sign-perl]
-         [Debian package tracker]
+         [Debian package tracker] \break
 ]
 
 \h2[Blurb]
@@ -149,7 +148,6 @@ User documentation:
 
 Developer documentation:
 
-\doc[todo.html][To-do list]
 \doc[https://github.com/rra/pgp-sign]
     [GitHub]
 \doc[https://github.com/rra/pgp-sign/issues]

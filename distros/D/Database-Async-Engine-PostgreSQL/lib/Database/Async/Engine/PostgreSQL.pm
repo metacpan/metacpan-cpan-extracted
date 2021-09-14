@@ -4,9 +4,13 @@ package Database::Async::Engine::PostgreSQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.011';
+use utf8;
+
+our $VERSION = '0.012';
 
 use parent qw(Database::Async::Engine);
+
+=encoding utf8
 
 =head1 NAME
 
@@ -46,6 +50,7 @@ to localhost (similar to C<psql -h localhost> behaviour).
 =cut
 
 no indirect;
+use Syntax::Keyword::Try;
 use Ryu::Async;
 use Ryu::Observable;
 use curry;
@@ -81,7 +86,7 @@ Database::Async::Engine->register_class(
 
 sub configure {
     my ($self, %args) = @_;
-    for (qw(service encoding)) {
+    for (qw(service encoding application_name)) {
         $self->{$_} = delete $args{$_} if exists $args{$_};
     }
     return $self->next::method(%args);
@@ -155,6 +160,9 @@ async sub connect {
     my ($self) = @_;
     my $loop = $self->loop;
 
+    my $connected = $self->connected;
+    die 'We think we are already connected, and that is bad' if $connected->as_numeric;
+
     # Initial connection is made directly through the URI
     # parameters. Eventually we also want to support UNIX
     # socket and other types.
@@ -163,12 +171,15 @@ async sub connect {
     die 'bad URI' unless ref $uri;
     $log->tracef('URI for connection is %s', "$uri");
     my $endpoint = join ':', $uri->host, $uri->port;
+
     $log->tracef('Will connect to %s', $endpoint);
     $self->{ssl} = do {
         my $mode = $uri->query_param('sslmode') // 'prefer';
         $Protocol::Database::PostgreSQL::Constants::SSL_NAME_MAP{$mode} // die 'unknown SSL mode ' . $mode;
     };
 
+    # We're assuming TCP (either v4 or v6) here, but there's not really any reason we couldn't have
+    # UNIX sockets or other transport layers here other than lack of demand so far.
     my $sock = await $loop->connect(
         service     => $uri->port,
         host        => $uri->host,
@@ -209,14 +220,20 @@ async sub connect {
     );
 
     $log->tracef('Send initial request with user %s', $uri->user);
+
+    # This is where the extensible options for initial connection are applied:
+    # we have already handled SSL by this point, so we exclude this from the
+    # list and pass everything else directly to the startup packet.
     my %qp = $uri->query_params;
     delete $qp{sslmode};
+
     $qp{application_name} //= $self->application_name;
     $self->protocol->send_startup_request(
         database         => $self->database_name,
         user             => $self->database_user,
         %qp
     );
+    $connected->set_numeric(1);
     return $stream;
 }
 
@@ -259,6 +276,54 @@ sub database_name {
 sub database_user {
     my $uri = shift->uri;
     return $uri->user // 'postgres'
+}
+
+sub password_from_file {
+    my $self = shift;
+    my $pwfile = $ENV{PGPASSFILE} || File::HomeDir->my_home . '/.pgpass';
+
+    unless ($^O eq 'MSWin32') { # same as libpq
+        # libpq also does stat here instead of lstat. So, pgpass can be
+        # a logical link.
+        my (undef, undef, $mode) = stat $pwfile or return undef;
+        unless (-f _) {
+            $log->warnf("WARNING: password file \"%s\" is not a plain file\n", $pwfile);
+            return undef;
+        }
+
+        if ($mode & 077) {
+            $log->warnf("WARNING: password file \"%s\" has group or world access; permissions should be u=rw (0600) or less", $pwfile);
+            return undef;
+        }
+        # libpq has the same race condition of stat versus open.
+    }
+
+    # It's not an error for this file to be missing: it might not
+    # be readable for various reasons, but for now we ignore that case as well
+    # (we've already checked for overly-lax permissions above)
+    open my $fh, '<', $pwfile or return undef;
+
+    while (defined(my $line = readline $fh)) {
+        next if $line =~ '^#';
+        chomp $line;
+        my ($host, $port, $db, $user, $pw) = ($line =~ /((?:\\.|[^:])*)(?::|$)/g)
+            or next;
+        s/\\(.)/$1/g for ($host, $port, $db, $user, $pw);
+
+        return $pw if (
+            $host eq '*' || $host eq $self->uri->host and
+            $port eq '*' || $port eq $self->uri->port and
+            $user eq '*' || $user eq $self->database_user and
+            $db   eq '*' || $db   eq $self->database_name
+        );
+    }
+
+    return undef;
+}
+
+sub database_password {
+    my $self = shift;
+    return $self->uri->password // $ENV{PGPASSWORD} || $self->password_from_file
 }
 
 =head2 negotiate_ssl
@@ -335,9 +400,17 @@ sub uri_for_dsn {
 sub uri_for_service {
     my ($class, $service) = @_;
     my $cfg = $class->find_service($service);
+
+    # Start with common default values (i.e. follow libpq behaviour unless there's a strong reason not to)
     my $uri = URI->new('postgresql://postgres@localhost/postgres');
+
+    # Standard fields supported by URI::pg
     $uri->$_(delete $cfg->{$_}) for grep exists $cfg->{$_}, qw(host port user password dbname);
+    # ... note that `hostaddr` takes precedence over plain `host`
     $uri->host(delete $cfg->{hostaddr}) if exists $cfg->{hostaddr};
+
+    # Everything else is handled via query parameters, this list is non-exhaustive and likely to be
+    # extended in future (e.g. text/binary protocol mode)
     $uri->query_param($_ => delete $cfg->{$_}) for grep exists $cfg->{$_}, qw(
         application_name
         fallback_application_name
@@ -378,10 +451,20 @@ Expects the following parameters:
 sub on_read {
     my ($self, $stream, $buffref, $eof) = @_;
 
-    $log->tracef('Have server message of length %d', length $$buffref);
-    while(my $msg = $self->protocol->extract_message($buffref)) {
-        $log->tracef('Message: %s', $msg);
-        $self->incoming->emit($msg);
+    try {
+        $log->tracef('Have server message of length %d', length $$buffref);
+        while(my $msg = $self->protocol->extract_message($buffref)) {
+            $log->tracef('Message: %s', $msg);
+            $self->incoming->emit($msg);
+        }
+    } catch($e) {
+        # This really shouldn't happen, but since we can't trust our current state we should drop
+        # the connection ASAP, and avoid any chance of barrelling through to a COMMIT or other
+        # risky operation.
+        $log->errorf('Failed to handle read, connection is no longer in a valid state: %s', $e);
+        $self->close_now;
+    } finally {
+        $self->connected->set_numeric(0) if $eof;
     }
     return 0;
 }
@@ -424,6 +507,38 @@ sub incoming {
     $self->{incoming} //= $self->ryu->source;
 }
 
+=head2 connected
+
+A L<Ryu::Observable> which will be 1 while the connection is in a valid state,
+and 0 if we're disconnected.
+
+=cut
+
+sub connected {
+    my ($self) = @_;
+    $self->{connected} //= do {
+        my $obs = Ryu::Observable->new(0);
+        $obs->subscribe(
+            $self->$curry::weak(sub {
+                my ($self, $v) = @_;
+                # We only care about disconnection events
+                return if $v;
+
+                # If we were doing something, then it didn't work
+                if(my $query = delete $self->{active_query}) {
+                    $query->completed->fail('disconnected') unless $query->completed->is_ready;
+                }
+
+                # Tell the database pool management that we're no longer useful
+                if(my $db = $self->db) {
+                    $db->engine_disconnected($self);
+                }
+            })
+        );
+        $obs
+    };
+}
+
 =head2 authenticated
 
 Resolves once database authentication is complete.
@@ -451,7 +566,7 @@ our %AUTH_HANDLER = (
             'PasswordMessage',
             user          => $self->encode_text($self->uri->user),
             password_type => 'plain',
-            password      => $self->encode_text($self->uri->password),
+            password      => $self->encode_text($self->database_password),
         );
     },
     AuthenticationMD5Password => sub {
@@ -461,7 +576,7 @@ our %AUTH_HANDLER = (
             user          => $self->encode_text($self->uri->user),
             password_type => 'md5',
             password_salt => $msg->password_salt,
-            password      => $self->encode_text($self->uri->password),
+            password      => $self->encode_text($self->database_password),
         );
     },
     AuthenticationSCMCredential => sub {
@@ -510,7 +625,7 @@ sub protocol {
                     my ($self, %args) = @_;
                     $log->tracef('Auth request received: %s', \%args);
                     $self->protocol->{user} = $self->uri->user;
-                    $self->protocol->send_message('PasswordMessage', password => $self->encode_text($self->uri->password));
+                    $self->protocol->send_message('PasswordMessage', password => $self->encode_text($self->database_password));
                 }),
                 parameter_status => $self->$curry::weak(sub {
                     my ($self, $msg) = @_;
@@ -576,10 +691,13 @@ sub protocol {
                 }),
                 error_response => $self->$curry::weak(sub {
                     my ($self, $msg) = @_;
-                    my $query = $self->active_query;
-                    $log->warnf('Query returned error %s for %s', $msg->error, $self->active_query);
-                    my $f = $query->completed;
-                    $f->fail($msg->error) unless $f->is_ready;
+                    if(my $query = $self->active_query) {
+                        $log->warnf('Query returned error %s for %s', $msg->error, $self->active_query);
+                        my $f = $query->completed;
+                        $f->fail($msg->error) unless $f->is_ready;
+                    } else {
+                        $log->errorf('Received error %s with no active query', $msg->error);
+                    }
                 }),
                 copy_in_response => $self->$curry::weak(sub {
                     my ($self, $msg) = @_;
@@ -828,6 +946,8 @@ a ->connection first
 =head1 AUTHOR
 
 Tom Molesworth C<< <TEAM@cpan.org> >>
+
+with contributions from Tortsten Förtsch C<< <OPI@cpan.org> >>
 
 =head1 LICENSE
 

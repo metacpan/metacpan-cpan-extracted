@@ -52,6 +52,7 @@
          "requires" : {
             "Capture::Tiny" : "0",
             "Data::Dump" : "0",
+            "Data::Dumper" : "0",
             "Test::Simple" : "0.44"
          }
       }
@@ -64,6 +65,6 @@
          "web" : "https://github.com/jkeenan/devel-git-multibisect"
       }
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

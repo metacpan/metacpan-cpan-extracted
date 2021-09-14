@@ -137,14 +137,20 @@ sub decode_content {
 
     my $schema;
     if ($mime_type) {
-        $schema = yaml_load($response) if $mime_type =~ m/yaml/;
-        $schema = json_decode($response) if $mime_type =~ m/json/;
+        if ($mime_type =~ m{yaml}) {
+            $schema = eval{ yaml_load($response) };
+            croak "Failed to load resource $resource as $mime_type ( $@ )" if $@;
+        }
+        elsif ($mime_type =~ m{json}) {
+            $schema = eval{ json_decode($response) };
+            croak "Failed to load resource $resource as $mime_type ( $@ )" if $@;
+        }
     }
     unless ($schema) {
         # try to guess
         $schema = eval { json_decode($response) };
         $schema = eval { yaml_load($response) } if $@;
-        croak "Unsupported mime type $mime_type of resource " . $resource unless $schema;
+        croak "Unsupported mime type $mime_type of resource $resource" unless $schema;
     }
 
     return $schema;
@@ -269,7 +275,7 @@ JSONSchema::Validator::Util - Useful functions
 
 =head1 VERSION
 
-version 0.006
+version 0.008
 
 =head1 AUTHORS
 

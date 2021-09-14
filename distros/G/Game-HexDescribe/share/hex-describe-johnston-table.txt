@@ -1,0 +1,4596 @@
+# The Post-Apocalyptic table
+# Written by Josh Johnston and Alex Schroeder
+
+;TOP
+1,These are the lands of the post-apocalypse. You’ll find a short description of all the mutations at the end.
+# TODO: add global threats and powers to the introduction.
+
+;forest
+1,The [colour] trees of the *[name for forest]* surround you and grow towards the sun in tight spirals. [forest people]
+1,The *[name for forest]* is quiet and peaceful except for the sound of mutated animals ripping each other apart.
+1,Strange looking birds call out high above the [colour] trees of the *[name for forest]*.
+1,An occasional [colour] eye stalk pokes through the mounds of leaves beneath the towering trees of the *[name for forest]*.
+1,Giant, large-trunked [colour] trees dominate the *[name for forest]*. They've broken through the road here and there creating insurmountable obstacles that require extra travel time.
+1,Trees that resemble Old Earth mushrooms climb to heights of 50 to 70 meters in the *[name for forest]*. The [colour] spores from the trees litter the road.
+1,Irradiated [colour] trees and [colour] meadows form an eye pleasing patchwork of colour in the *[name for forest]*.
+1,A recent fire has left this part of the *[name for forest]* a hellish landscape of brittle trunks and ashen ground.
+1,Twisted, gnarled tree roots have made this region of the *[name for forest]* famous for tripping up and slowing down uwary travelers.
+1,Deep in the heart of the *[name for forest]*, the long tree branches overhead rub together creating a haunting melody.
+
+;desert
+1,A lizard as large as an Old Earth automobile basks in the unrelenting sun of the *[name for desert]*.<p>[desert people]<p>[desert point of interest]
+1,The *[name for desert]* sun bakes you to the point of blacking out.<p>[desert people]<p>[desert point of interest]
+1,Tall [colour] cacti slowly creep along the *[name for desert]* floor in search of food.<p>[desert people]<p>[desert point of interest]
+1,It's easy to get lost in the *[name for desert]*. The hard-packed sand stretches out for kilometers in every direction. Bones of previous travellers have been pushed to the side of the road.<p>[desert people]<p>[desert point of interest]
+1,You were warned that the *[name for desert]* is a wasteland.<p>[desert point of interest]
+1,The *[name for desert]* has turned into a vast ancient lake bed of salt.<p>[desert point of interest]
+1,High clouds crawl slowly by providing little relief in the *[name for desert]*.<p>[desert point of interest]
+1,Time seems to stand still in the *[name for desert]* and the mind wanders with boredom.<p>[desert point of interest]
+1,The *[name for desert]* is quiet and bleak today as always.<p>[desert point of interest]
+1,The *[name for desert]* flowers are in full bloom and there are thousands of [colour] mutated insects flying here and there collecting pollen.<p>[desert point of interest]
+
+;mountain
+1,The fresh mountain air up in the *[name for mountain]* is a nice change from the smell of burning mutants and androids.<p>[point of interest in the mountains]
+1,You are surrounded by the steep peaks of the *[name for mountain]* in all directions. Any further travel will be difficult.
+1,The air of the *[name for mountain]* is cold and thin. It’s getting harder and harder to catch your breath.<p>[mountain people]
+1,The slopes up the the *[name for mountain]* are steep and the trails are slippery with ice and slush. It’s impossible to tell if you’re walking on bones or thin ice.
+1,Climbing, climbing, climbing. It's all that's left to do up here in the *[name for mountain]*.
+1,The high canyon walls feel like they're closing in on you in the *[name for mountain]*. The trail winds ahead like a snake.
+1,The atmosphere in the *[name for mountain]* feels slightly less radioactive at 3,000m. The clouds look mesmerisingly beautiful.
+1,The views in the *[name for mountain]* are spectacular, and the saw-toothed peaks dominate the horizon.
+1,Rising peaks in the *[name for mountain]* resemble man-made pyramids of lava rock.
+1,Visibility in the *[name for mountain]* is extremely limited as the snow begins to fall at an accelerated pace.
+
+;jungle
+1,[jungle description] [jungle encounter]
+
+;jungle description
+1,The extreme humidity of the *[name for jungle]* makes breathing difficult, but has the added benefit of disabling most robots.
+1,The *[name for jungle]* seems to be extra hostile today. Swaying [colour] vines grab at your arms and legs.
+1,The *[name for jungle]* is thick with [colour] vegetation and surprisingly unyielding.
+1,The rain is unceasing as you stumble your way through the *[name for jungle]*. The trail is slowly being eroded away.
+1,The [colour] under and overgrowth are heavy tangled in the *[name for jungle]*.
+1,The *[name for jungle]* is alive with animal grunts and growls which are nearly deafening and definitely terrifying.
+1,There are sudden cliffs and precarious paths hiddden by choking, thorny vines in the *[name for jungle]*.
+1,The triple canopies in the *[name for jungle]* have trapped almost all of the heat and humidity close to the ground making it feel like a madman's greenhouse. 
+1,The *[name for jungle]* seems to be alive and waiting for you to let down your guard.
+1,[capitalize colour] dew drips unceasingly from all species of foliage in the *[name for jungle]*.
+
+;swamp
+1,The foul smelling quicksand of the *[name for swamp]* pulls at your feet as you trudge along.
+1,The tidal quicksand of the *[name for swamp]* ebbs and flows, and you feel yourself sinking in deeper and deeper.
+1,Mutated [colour] frogs crunch beneath your feet as you slog through the *[name for swamp]*. You suspect there are even bigger amphibians under the surface. [swamp people]
+1,The *[name for swamp]* reeks of dead bodies and ruin. [River|Water|Swamp] [duckers|rhinos|hulks] [bay|call|cronk|cry|honk|trumpet] in the distance. [swamp people]
+1,The sulfurous smell of the *[name for swamp]* has you gagging and retching. [swamp people]
+1,The *[name for swamp]* is waterlogged and hard to navigate on foot. You're going to need a boat here.<p>[point of interest in the swamp]
+1,Scummy, brackish water and mangrove trees dominate this area of the *[name for swamp]*.
+1,The algae-laden mud in the *[name for swamp]* has covered you from head to foot.
+1,The *[name for swamp]* is vast and fetid, and defies your sense of direction.
+1,The rumours are that the *[name for swamp]* has swallowed up unwary travelers with no trace.
+
+;grass
+1,The *[name for grass]* hums with a radioactive intensity. [grass people]
+1,There seems to be no end to the *[name for grass]*. [grass people]
+1,The *[name for grass]* stretches in all directions. Large buzzing [colour] insects hover menacingly.
+1,One meter tall [colour] crickets chew the rainbow grass contentedly. This is the *[name for grass]*.
+1,Lush [with colour] and [and colour] grasses flow with the wind in the *[name for grass]*.
+1,The wide open grasses of the *[name for grass]* undulate gently in the constant breeze.
+1,The *[name for grass]* was once a dense forest ages ago, but all that's left of the forest are fallen trunks amid the unending grasses.
+1,The [colour] grasses of the *[name for grass]* seem unnaturally still and flat.
+1,The *[name for grass]* seems healthier than the surrounding areas. The [colour] grasses teem with insect life.
+1,The ground in the *[name for grass]* is much rockier and drier here.
+
+;river-start river
+1,<p>[name for river] starts here.
+
+;river
+1,<p>[name for river] flows through here.
+
+;river-merge river
+1,<p>[names for river] merge here.
+
+;name for river
+5,*[river 1] [river 2]*
+1,*[human name]’s [river 2]*
+
+;river 1
+5,[element]
+1,[climate prefix]
+2,[chemical prefix]
+1,[fecal prefix]
+2,[water prefix]
+1,[war prefix]
+1,[colour prefix]
+
+;river 2
+1,River
+1,Creek
+
+;ruin
+1,<p>Piles of ash are all that remain where a small town once stood. Partial skeletons are scattered indiscriminately.
+1,<p>Multiple craters litter the landscape. It’s impossible to tell what once stood here.
+1,<p>A partially standing library smoulders in the distance. The bookshelves poke through the crumbled masonry like old bones.
+1,<p>A wreck of a gas station lies in several burning piles. The underground tanks have been long siphoned dry.
+1,<p>What was an airport once stood here. Craters both large and small have shattered the runway. The control tower is still intact although leaning heavily to one side.
+1,<p>Large parts of planes litter the ground. Animal hides hang over the entrances on the remaining fuselages of the Old Earth machines. A humanoid hangs from the control tower as a warning.
+1,<p>The scorch marks on the battered concrete slab are all that remain of this starport.
+1,<p>A sign on the corner of a burned out brick building points to a bomb shelter up ahead. You hope you can reach it before the radioactive rains start again.
+1,<p>The ruins of a sprawling hospital complex cover several acres. There are rumours that medical supplies as well as mutant horrors can still be found inside.
+1,<p>This ancient manufacturing city covers several square miles. The sounds of machinery echo from some of the larger buildings.
+1,<p>[An old|An abandoned|A destroyed|A crumbling|A ruined] [building] can be found nearby. [ruin dwellers]
+
+;building
+1,airport
+1,armory
+1,bomb shelter
+1,body bank
+1,factory
+1,farm
+1,hotel
+1,medical facility
+1,military base
+1,mine
+1,missile silo
+1,nuclear facility
+1,police station
+1,power plant
+1,resort
+1,mall
+1,spaceport
+
+;ruin dwellers
+1,A small band of desperados has settled in the remains. [3d6] **[here humanoid raiders as raiders]** ([human stats]) led by *[human fancy name as leader]* ([human npc stats]). Treasure: [raider treasure]
+
+;raider treasure
+1,it’s all scraps and garbage, as far as you can tell.
+1,textiles for some clothes, a pile of rags, nothing of value.
+1,a bunch of tools, hammers, nails, some wire, a pair of tongs.
+1,a big, wooden loom, and wool to operate it, if you know how to weave.
+1,a book called [here store [same leader] as book thief]*[book]*.
+1,[ammunition stash]
+
+;fort
+1,<p>An old Police station has been repurposed into a crumbling shelter. Several figures can be seen moving through the shadows. There is a large laser weapon on the roof. [fort people]
+1,<p>A collapsing crater hides an entrance to a well fortified station. [fort people]
+1,<p>An old convenience store has been repurposed as an impressive fortification. Sturdy wooden scaffolding surrounds the second floor. [fort people]
+
+;cave
+1,<p>There is a hidden cave entrance barely big enough to squeeze into. The smell is overpowering and impossible to identify. [cave people]
+1,<p>There’s an entrance to one of the old radiation shelters, here. This cave system stretches for many hundreds of meters in different directions. It looks to have been abandoned long ago. [cave people]
+1,<p>Cave paintings of grass and hoof stencils show that this was once a bovinoid shelter. Why they would shelter here and not out in the open grassland is a mystery. [cave people]
+
+# Mountain
+
+;name for mountain
+1,[White|Black|Grey|Low|High|Hell|Rocky] [Mountains|Atlas|Alps|Peaks|Wall]
+
+;point of interest in the mountains
+1,On one of the cliffs overhead you see the narrow slits of bunker windows. There must an entrance around here somehere. [bunker]
+
+;bunker
+1,TODO
+
+;mountain people
+1,At the top of the highest mountain [2d6] **atom gazers** ([atom gazer stats]) led by *[here human fancy name as atom gazer]* have settled one of the old observatories. Their library is still intact! Example books: *[here book 1]* and *[here book 2]*.<p>[atom gazer library mission]
+
+;atom gazer library mission
+1,Actually, *[same atom gazer]* would love nothing more than getting a copy of *[nearby book [1|2]]* to add to their library. “Will you help me get this book, [by hook or by crook|legally, of course|discreetly]?”
+1,If you show some interest in the library, *[same atom gazer]* pulls you aside and says: “You seem like an honest person! Will you help me recover a book? *[nearby book thief]* recently [stole a book from me|failed to return a book to me they had borrowed]. [Get it back to me and I will make it worth your while|I’ll reward you both for the book and their head]!”
+
+;atom gazer stats
+1,TODO
+
+# Jungle
+
+;name for jungle
+1,[Green|Great|Big|Rain] [Hell|Forest|Jungle|Ur-Forest]
+
+# Swamp
+
+;name for swamp
+1,[Gray|Grey|Black|Bleak|Drowning|Mirrored] [Wasteland|Swamp|Bog|Fenn|Wetland|Morass|Mire]
+1,[Gator|Crane|Eel] [Lands|Flats|Country|Marsh]
+
+;point of interest in the swamp
+1,There's a crashed, half sunken airplane, here. The hull serves as a campsite. [tech hermit]
+1,There's a sunk wheel steamer boat here. Most of the wood has rotten away but the wheels are still there. The hull serves as a lair. [swamp creature]
+1,A whirlpool spins lazily. Something large and shapeless swims through it. *[swamp creature]*
+1,The bubbling swamp wastewater reveals an android graveyard. A metallic crucifix embedded in the ground sags to one side. Is this hallowed ground you're wading through?
+
+;tech hermit
+1,TODO
+
+;swamp creature
+1,TODO
+
+;swamp people
+1,There’s a camp of [3d6+10] **[here anuraoid raiders as raiders]** ([anuraoid stats]) led by *[frog name as leader]* (add *[physical mutation]*). Treasure: [raider treasure]
+
+;frog name
+1,[Long|Far|Fast] [Tongue|Jump]
+1,[Googly|Staring|Piercing] Eyes
+1,[capitalize colour] [King|Queen|Boss|Brain]
+1,[Strong|Long|Fast|Jumping] Legs
+1,[Strong|Sticky] [Fingers|Hands]
+
+;anuraoid stats
+1,HD 4 AC 7 #AT1 1d8 HP 4d6 Wil 8 SV 4 36m; surprise on 1–5 in 6; jumping charge for double damage
+
+# Grass lands
+
+;name for grass
+1,[capitalize colour] [Sea|Ocean|Grassland|Sea of Blades|Flats]
+
+;grass people
+1,There is a camp of [3d6+25] **bovinoids** ([bovinoid stats]) of the *[bovinoid tribe name]* led by *[bovinoid name]* (HD 3+3). They are herding [herd animal]. [bovinoid trouble]
+1,There’s a camp of [3d6+25] **[here humanoid raiders as raiders]** ([human stats]) led by *[human fancy name as leader]* ([human npc stats]). Treasure: [raider treasure]
+
+;bovinoid name
+1,[Mad|Chill|Strong|Calm] [Bull|Cow|Horns|Head|Father|Mother]
+
+;bovinoid tribe name
+1,The [Twinkling|Shining|Blinking] [Stars|Planets|Moon] [People|Tribe|Clan]
+
+;bovinoid stats
+# TODO: use a different system for stats?
+1,AC 8 HD 1+1 1d6 MV 36m; a successful charge of 16+ throws the target 10’ back and prone
+
+;herd animal
+1,llama
+1,cattle
+1,sheep
+1,goats
+1,buffaloes
+
+;bovinoid trouble
+1,A pride of **lions** ([lion stats]) has found that [same herd animal] hunting is super easy. *[same bovinoid name]* is asking you for help.
+
+;lion stats
+1,HD 5 AC 6 1d6/1d6/1d10 MV 45m; surprise on 1–4 in 6
+
+# Forest
+
+;name for forest
+1,[Green|Dark|Black|Petrified|Hungry|Withered|Lost] Forest
+
+;forest people
+1,There’s a camp of [3d6+15] **[here ursoid raiders as raiders]** ([ursoid stats]) led by *[bear name as leader]* (add *[physical mutation]*). Treasure: [raider treasure]
+
+;ursoid stats
+1,HD 10 AC 6 #AT3 1d8/1d8/1d10 HP 10d6 Wil 13 SV L5 MV 36m
+
+# TODO: nead better bear/ursoid names
+;bear name
+1,Honey
+1,Claw
+1,Bear
+1,Strong
+1,Fearless
+1,Mauler
+
+# Jungle
+
+;point of interest in the jungle
+1,An old dirty grey temple stands here almost completely hidden by [colour] vines and [colour] undergrowth. The ashes of a recent fire by the entrance are still warm.
+1,Up ahead through the [colour] vines is a ramshackle shelter with light blue smoke wafting out a crude chimney.
+
+# Desert
+
+;name for desert
+1,[Big|Great|Cursed|Dead|Death] [Valley|Flat|Desert|Dry]
+1,[Sea|Plain|Dunes] of [Sand|Rock|Pebbles|Bones|[capitalize colour] Sand]
+1,[Forever|Endless|Merciless] [Sands|Rocks|Bones|Graveyard]
+
+;desert point of interest
+1,You notice giant buzzards overhead circling ominously.
+1,A churning black smoke suddenly erupts on the horizon. Are these the *[caravan name]* that *[human fancy name]* was telling us about?
+1,There's no sign of life anywhere except for the tracks of an Old Earth vehicle stretching to the horizon.
+1,A multitude of giant lizard tracks cross the road at odd angles. You remember *[human fancy name]* telling you about the seasonal migration and wonder if lizard is on the menu tonight.
+1,Various abandoned salt mines litter the surface. At least there will be shelter tonight.<p>[desert people]
+1,The road has begun to enter a maze of giant [colour] rocks.<p>[desert people]
+
+;caravan name
+1,Easy Riders
+1,[Silver|Golden] [Boys|Girls|Riders|Mauraders|Corsairs|Outlaws]
+1,[chemical prefix] [Boys|Girls|Riders|Mauraders|Corsairs|Outlaws]
+1,[war prefix] [Boys|Girls|Riders|Mauraders|Corsairs|Outlaws]
+
+;desert people
+1,There’s a camp of [3d6+15] **[here cactoid raiders as raiders]** ([cactoid stats]) led by *[cactoid name]* ([mutant plant stats]). [vehicle park].
+1,A dust devil spins in the distance with several [humans|cactoids] inside. (TODO)
+1,Out of the sand rise giant ribs like towers, and between the ribs is a tent town of [2d6x10] **humans** ([human stats]) led by *[human fancy name]* ([human npc stats]) belonging to *[faction]*.
+
+;cactoid stats
+1,TODO
+
+# TODO: nead better cactus/cactoid names
+;cactoid name
+1,[Spikey|Spine|Thorn|Blade] [Head|Face|Boss|Man|Woman|Fist|Death|Destiny]
+1,[Needle|Syringe|Lancet] of [Death|Pain|Poison]
+
+# Forts
+
+;fort people
+1,About  [2d6x10] **humans** live here ([human stats]), led by *[human fancy name]* ([human npc stats]). Treasure: [fort treasure]<p>[fort speciality]<p>[secret society presence]<p>[settlement mission]
+
+;fort treasure
+1,[ammunition stash]
+
+;fort speciality
+1,Visitors are mostly travelling [merchants|tradesmen|settlers|nomads|androids|manimals|traders]. The [trade post|pub|tavern|market] run by *[here human fancy name as trader]* is fairly well known. The *[guest house name]* is open to all.
+
+;guest house name
+1,[hotel] of [Rich|Epic|Successful|Long [Fingered|Legged]] [Traders|Merchants|Business [Men|Women]]
+1,[hotel] of the [Rising|Shining|Dominating|Radioactive|Nuclear|Atomic] [Sun|Moon|Flag|[capitalize colour] Banner]
+
+;hotel
+1,House
+1,Caravansary
+1,Hotel
+1,Motel
+1,Inn
+1,Hostelry
+1,Hospice
+1,Public House
+
+;secret society presence
+1,No secret society has taken hold in this settlement.
+1,This settlement is firmly in the hands of the *[name for a secret society[1|2|3]]* led by *[human fancy name]*. “Join us and enjoy all these benefits! [capitalize secret society benefit]!”
+1,[save 1 as a][save [2|3] as b][secret society conflict]
+1,[save 2 as a][save [1|3] as b][secret society conflict]
+1,[save 3 as a][save [1|2] as b][secret society conflict]
+
+;secret society conflict
+1,Two secret societies are involved in a turf war, here: The *[name for a secret society[same a]]* have arrived and are putting the pressure on the *[name for a secret society[same b]]*. The *[name for a secret society[same a]]* are led by *[human fancy name as boss a]*. They need your help. The *[name for a secret society[same b]]* are led by *[human fancy name]* who is in fact [human crime]. “Help me get rid of them!” says *[same boss a]*
+1,Two secret societies are involved in a turf war, here: The *[name for a secret society[same a]]* have arrived and are in the process of kicking the *[name for a secret society[same b]]* out. The *[name for a secret society[same a]]* are led by *[human fancy name]* who claims that the *[name for a secret society[same b]]* are no good and failing their members. They are led by *[human fancy name]* who is a sad excuse of a leader and deserves to be kicked out. If you talk to *[same human fancy name]*, however, it sounds that this is not true at all and you get a proposal to double-cross the *[name for a secret society[same a]]*. “Let’s set them a trap!” says *[same human fancy name]*.
+1,The *[name for a secret society[same a]]* are trying to get a foothold. Their leader *[human fancy name as boss a]* needs to know the layout of the *[name for a secret society[same b]]* headquarter and where their leader *[human fancy name]* is sleeping. And so *[same boss a]* is asking for your help: “Will you be our eyes and ears? Infiltrate this hive of scum and villainy for us!”
+
+;human crime
+1,a cannibal
+1,a mass-murderer
+1,a predator
+# TODO: what’s the rating we’re aiming for, here?
+
+;secret society benefit
+1,free food
+1,free lodging
+1,a free ride on the monthly caravan heading [direction]
+1,protection from [raiders|pirates|marauders|thieves]
+
+;a secret society
+1,[name for a secret society1]
+1,[name for a secret society2]
+1,[name for a secret society3]
+
+;name for a secret society1
+1,[secret society]
+
+;name for a secret society2
+1,[secret society]
+
+;name for a secret society3
+1,[secret society]
+
+;secret society
+1,[secret society prefix][secret society adjective] [old computer] [people prefix][people]
+1,[secret society prefix][secret society adjective] [people prefix][old computer] [people]
+1,[secret society prefix][secret society adjective] [biology] [people prefix][people]
+1,[secret society prefix][secret society adjective] [people prefix][biology] [people]
+
+;secret society prefix
+9,
+1,All-
+
+;secret society adjective
+1,Friendly
+1,Great
+1,Powerful
+1,Knowing
+1,Wise
+
+;old computer
+1,C[64|65|128]
+1,Commodore
+1,6502
+1,SID
+1,NES
+1,HAL
+1,Amiga
+1,Atari
+1,Apple
+1,Skynet
+1,Usenet
+1,Fidonet
+1,Nokia
+1,Acorn
+1,Archimedes
+1,Spectrum
+
+;people prefix
+1,Arch-
+1,Neo-
+1,Ur-
+1,True-
+1,Honest-
+1,Über-
+1,Cyber-
+1,Security-
+
+;people
+1,Men
+1,Women
+1,People
+1,Philosophers
+1,Programmers
+1,Bros
+1,Hackers
+1,Cooperative
+1,Association
+1,Foundation
+1,Corporation
+1,Machines
+1,Syndicate
+1,Anarchists
+1,Communists
+1,Capitalists
+1,Socialists
+1,Fascists
+1,Clans
+1,Ladies
+1,Lords
+1,Kings
+1,Queens
+1,Priests
+1,Knights
+1,Defenders
+1,Servants
+1,Savants
+1,Scholars
+1,Sophonts
+1,Librarians
+1,Libertarians
+1,Scribes
+1,Sisters
+1,Family
+1,Families
+1,Huggers
+1,Lovers
+1,Fighters
+
+;biology
+1,Plant
+1,Fungus
+1,Tree
+1,Horticulture
+1,Fruit
+1,Vegetable
+1,Fish
+1,Meat
+1,Cheese
+1,Dairy
+1,Garden
+
+;faction
+1,The House of the Falling Sun
+1,The Plasteel Patriots
+1,The Cybernetic Squatters
+1,The Mission for Truth and Reconciliation
+1,The Ministry of Our Lord Hydrogen
+1,The Kill All Freaks Collective
+1,The Green Machine
+1,The Manimals United
+1,The Atom Gazers
+1,The Gamma Lords
+1,The Necromagisters
+
+;settlement mission
+1,All is quiet here.
+1,The people really don’t like outsiders disturbing the delicate power balance.
+1,Currently, [marshal|sheriff|boss] *[here human fancy name as sheriff]* is in the area, looking for a fugitive. “I’m looking for *[nearby wanted criminal]*. [Do me a favour and let me know if you find them|I’ll reward you if you lead me to them|There’s a reward waiting for your if you bring them here, dead or alive]. [You can be on the good side of the law, you know|You know what you have to do|Think about it|Do this for me and all is forgiven|Enough is enough]!”
+
+# Caves
+
+;cave people
+1,The [1d6x10] **morlocks** ([morlock stats]) living in these caves have no access to the deeper levels. All they seek is shelter from the elements and a defensible home. At night, they emerge from the underground to do their hunting and gathering. [morlock witch]<p>[morlock trouble]
+1,The [3d6] **vat people** ([human stats]) living in these caves have gained access to bio-genesis labs and have used them for self-improvement. The chief [scientist|grower|lab master|bio wizard|genetic improviser] *[here human fancy name as scientist]* is in charge of the research program. It requires a lot of organic base material from the surface.<p>[vat people servants]<p>[vat people trouble]
+1,[vat dungeon]
+1,The [2d6] **nuclear wizards** ([nuclear wizard stats]) led by *[here human fancy name as nuclear wizard]* living in these caves have gained control of the power banks and the geothermal vents far below the earth surface. Endless energy to power the shield generators and charge their [energy weapons] (there’s but one per nuclear wizard).
+
+;nuclear wizard stats
+1,TODO
+
+;energy weapons
+1,laser weapons
+1,rail guns
+1,needle guns
+1,plasma weapons
+1,EMP defenses
+# TODO
+
+;vat people servants
+1,The vat people are served by [6d6] of **weaker morlocks** – siblings the elders judged to be “unfit” for lab work ([human stats]). It’s a terribly unjust society and if you spend any amount of time in the labs, or if you manage to catch one of them on their material gathering expeditions, they’ll beg for your help. [“Please, free us from these eugenitocracy!”|“Help us topple the genetic purists!”]
+1,The vat people are served by [6d6] **plantoids** ([plantoid stats]). They are mobile, mute, appear to be totally subservient. If you can communicate with them telepathically, however, you’ll soon discover that they often squirrel away nutrients and have an entire *hidden* community of [3d6x10] mobile plantoids living in the canals and sewers below the lab. Revolution is brewing, down there…
+
+;plantoid stats
+1,TODO
+
+;vat people trouble
+1,Sadly, the vat solutions have contracted some sort of infection. *[same scientist]* says that *[nearby scientist]* might be able to help. [“Will you go and ask them to come and have a look?”|“I know they would hate coming. Can’t you just go and kidnap them?”|“Here’s a tube of [tube content] to give them in exchange for their coming.”]
+1,A swarm of acid worms have eaten into the n-field generator. With the n-field generator down, the vat people’s body banks are left unprotected. *[same scientist]* says that *[nearby nuclear wizard]* might be able to help. [“Will you go and beg them to come and have a look?”|“I beg you, please have them come. We will make it up to them.”]
+1,The vat banks have not been sterilized in a lunar cycle because of a nesting dirt devil (TODO). If the dirt devil can be killed or captured, the eggs can be harvested and the vats re-sterilised.
+1,The entrances to the vat people’s caves have been blocked due to the annual migration of the incredibly aggressive cactoids ([cactoid stats]). If we could lure the cactoids away with their favourite food ([food]), the vat people would reward us with free healing and DNA splicing.
+1,The vat people’s long time enemies, the nuclear wizards led by *[nearby nuclear wizard]*, have raided and stolen data integral to the body bank’s manufacturing process. “With the help of our mobile AI station, we could hack into their matrix, reroute the subroutines, and steal back the code! All we need is to get close to them. Will you escort us?”
+1,The vat people’s body banks have gone haywire, and are generating body parts with too many unsuitable mutations. “Only the [knowledge|wisdom|library] of *[nearby atom gazer]* can help us reprogram the AI loop. Will you [go and fetch them|escort one of us]?”
+1,*[same scientist]* is missing a book for their current research: *[nearby book [1|2]]*. “Will you borrow this book for me? You might have to [beg them|threaten them|steal it], I don’t care. Just get me the book.”
+
+;food
+1,canned beef
+1,canned sausages
+1,canned beans
+1,phosphorous beer
+1,bovinoid carcasses
+1,anuroid carcasses
+1,lion meat
+1,rad bear meat
+1,electric crab meat
+1,worm skin
+1,ant antenae
+1,mothowl wings
+1,dragonbirs meat
+1,rad hare meat
+1,fel dog meat
+1,hellhound meat
+1,grasschopper legs
+1,rad rattler meat
+1,wolfling meat
+1,sky whale blubber
+# TODO
+
+;tube content
+1,mutagenic acid
+1,neurotransmitter [inhibitors|catalysts]
+1,radioactive [contrast|tracer]
+1,undetectable radiation poison
+1,potassium iodide to counter radiation poisoning
+1,multi-vitamins and trace elements
+1,monoxide inhibitors
+1,valuable dihydro oxide
+
+;morlock stats
+1,TODO
+
+;morlock witch
+1,They are led by *[morlock name]* the **morlock witch** (TODO), a natural [necromant|healer|bat person].
+
+;morlock trouble
+1,The morlocks are being harassed on a regular basis by a band of [nearby raiders]. *[same morlock name]* asks you to help out: [“Soon they’ll be back. Help us defend these caves!”|“We must confront our enemies. Help us attack their camp!”]
+
+# Names based on longer, common words from the Brown corpus
+;morlock name
+1,According
+1,Account
+1,Activity
+1,Actually
+1,Addition
+1,Administration
+1,Afternoon
+1,Against
+1,Agreement
+1,Already
+1,Although
+1,America
+1,Analysis
+1,Another
+1,Anything
+1,Apparently
+1,Appear
+1,Apply
+1,Approach
+1,Association
+1,Attention
+1,Attitude
+1,Audience
+1,Available
+1,Average
+1,Beautiful
+1,Because
+1,Beginning
+1,Believe
+1,Between
+1,Bring
+1,Building
+1,Business
+1,Carry
+1,Central
+1,Century
+1,Certain
+1,Changes
+1,Character
+1,Clear
+1,College
+1,Committee
+1,Community
+1,Company
+1,Complete
+1,Concern
+1,Condition
+1,Congress
+1,Consider
+1,Continue
+1,Control
+1,Country
+1,Current
+1,Decide
+1,Decision
+1,Defence
+1,Democrat
+1,Department
+1,Describe
+1,Design
+1,Despite
+1,Determine
+1,Develop
+1,Development
+1,Difference
+1,Different
+1,Difficult
+1,Direction
+1,Directly
+1,Distance
+1,District
+1,Division
+1,Early
+1,Economic
+1,Education
+1,Effect
+1,Effective
+1,Effort
+1,Element
+1,English
+1,Equipment
+1,Establish
+1,Evening
+1,Everything
+1,Evidence
+1,Example
+1,Existence
+1,Expectation
+1,Experience
+1,Factor
+1,Federal
+1,Feeling
+1,Figure
+1,Finally
+1,Follow
+1,Foreign
+1,Forward
+1,Freedom
+1,Friend
+1,Function
+1,Further
+1,General
+1,Government
+1,Great
+1,Grow
+1,History
+1,Hospital
+1,However
+1,Immediately
+1,Important
+1,Include
+1,Increase
+1,Indicate
+1,Individual
+1,Industry
+1,Influence
+1,Information
+1,Instead
+1,Interest
+1,International
+1,Involve
+1,Justice
+1,Knowledge
+1,Language
+1,Leader
+1,Learn
+1,Letter
+1,Limited
+1,Literature
+1,Look
+1,Material
+1,Meaning
+1,Medic
+1,Meeting
+1,Member
+1,Method
+1,Military
+1,Million
+1,Minute
+1,Morning
+1,Movement
+1,National
+1,Natural
+1,Necessary
+1,Neither
+1,Nothing
+1,Nuclear
+1,Number
+1,Obtain
+1,Obviously
+1,Operation
+1,Opportunity
+1,Organization
+1,Outside
+1,Particular
+1,Pattern
+1,Performance
+1,Perhaps
+1,Person
+1,Personal
+1,Physical
+1,Picture
+1,Political
+1,Population
+1,Position
+1,Possible
+1,Present
+1,President
+1,Pressure
+1,Principle
+1,Private
+1,Probably
+1,Problem
+1,Process
+1,Product
+1,Production
+1,Professional
+1,Program
+1,Progress
+1,Property
+1,Provide
+1,Purpose
+1,Quality
+1,Question
+1,Reach
+1,Reaction
+1,Read
+1,Receive
+1,Recently
+1,Religion
+1,Remain
+1,Remember
+1,Report
+1,Republican
+1,Require
+1,Research
+1,Respect
+1,Responsibility
+1,Result
+1,Return
+1,Running
+1,School
+1,Science
+1,Secretary
+1,Section
+1,Serious
+1,Service
+1,Several
+1,Similar
+1,Situation
+1,Society
+1,Something
+1,Sometime
+1,Somewhat
+1,Special
+1,Specific
+1,Standard
+1,Start
+1,Statement
+1,Station
+1,Stop
+1,Straight
+1,Strength
+1,Student
+1,Subject
+1,Suddenly
+1,Suggest
+1,Support
+1,Surface
+1,System
+1,Technical
+1,Temperature
+1,Therefore
+1,Thinking
+1,Thought
+1,Throughout
+1,Together
+1,Training
+1,Treatment
+1,Trouble
+1,Understand
+1,University
+1,Usually
+1,Various
+1,Waiting
+1,Washington
+1,Western
+1,Whatever
+1,Whether
+1,William
+1,Without
+1,Working
+1,Writing
+
+# Cave Dungeon
+
+# Before calling [dungeon] you need to save [store vat as monsters],
+# for example. This makes sure the “vat” subtables are used for
+# monsters. Alternatively, if instead you have an appropriate table,
+# use [save cave theme as monsters] to pick an entry from the “cave
+# theme” table. If you’re looking for an example, search the file for
+# “#VAT”.
+
+#VAT
+;vat dungeon
+1,[store vat as monsters][dungeon]
+
+;dungeon
+# 5 rooms (the first being an entrance and the last being the “boss”)
+5,[dungeon header][cave map with 5 rooms]<ol>[entrance room html][interior room html][interior room html][interior room html][final room html]</ol>
+# 7 rooms (the first being an entrance and the last being the “boss”)
+4,[dungeon header][cave map with 7 rooms]<ol>[entrance room html][interior room html][interior room html][interior room html][interior room html][interior room html][final room html]</ol>
+# 10 rooms (5+5)
+3,[dungeon header][cave map with 10 rooms]<ol>[entrance room html][interior room html][interior room html][interior room html][final room html][entrance room html][interior room html][interior room html][interior room html][final room html]</ol>
+# 12 rooms (5+7)
+2,[dungeon header][cave map with 12 rooms]<ol>[entrance room html][interior room html][interior room html][interior room html][final room html][entrance room html][interior room html][interior room html][interior room html][interior room html][interior room html][final room html]</ol>
+# 14 rooms (7+7)
+1,[dungeon header][cave map with 14 rooms]<ol>[entrance room html][interior room html][interior room html][interior room html][interior room html][interior room html][final room html][entrance room html][interior room html][interior room html][interior room html][interior room html][interior room html][final room html]</ol>
+
+;dungeon header
+1,This is *[here [same monsters] dungeon name]*.<p class="sidebar">Wandering monsters: [[same monsters] encounter].<p>
+
+#VAT
+;vat dungeon name
+1,The vats of [Doom|Pain|Purity|the Masters|Pink Flesh]
+
+#VAT
+;vat encounter
+1,[3d6] **vat people** ([human stats])
+
+;entrance room html
+1,<li>[[same monsters] entrance]</li>
+;interior room html
+1,<li>[[same monsters] interior room]<ul><li>[[same monsters] room feature]</li></ul></li>
+;final room html
+1,<li>[[same monsters] final room]<ul><li>[[same monsters] boss]</li><li>[[same monsters] treasure]</li></ul></li>
+
+;cave map with 5 rooms
+1,<img class="map" src="[[redirect https://campaignwiki.org/text-mapper/gridmapper/redirect?pillars=0&seed=$seed&caves=1]]" alt="5 room cave" title="5 room cave"/>
+
+;cave map with 7 rooms
+1,<img class="map" src="[[redirect https://campaignwiki.org/text-mapper/gridmapper/redirect?pillars=0&rooms=7&seed=$seed&caves=1]]" alt="7 room cave" title="7 room cave"/>
+
+;cave map with 10 rooms
+1,<img class="map" src="[[redirect https://campaignwiki.org/text-mapper/gridmapper/redirect?pillars=0&rooms=10&seed=$seed&caves=1]]" alt="10 room cave" title="10 room cave"/>
+
+;cave map with 12 rooms
+1,<img class="map" src="[[redirect https://campaignwiki.org/text-mapper/gridmapper/redirect?pillars=0&rooms=12&seed=$seed&caves=1]]" alt="12 room cave" title="12 room cave"/>
+
+;cave map with 14 rooms
+1,<img class="map" src="[[redirect https://campaignwiki.org/text-mapper/gridmapper/redirect?pillars=0&rooms=14&seed=$seed&caves=1]]" alt="14 room cave" title="14 room cave"/>
+
+#VAT
+;vat entrance
+1,<u>Hidden entrance</u>. Once of the big boulders on the surface uses a solar-powered camouflage-tarpaulin to hide a narrow shaft leading downwards. Improvised stairs built of tarred logs lead into the cave below. The air is warm and humid.
+
+#VAT
+;vat interior room
+1,<u>Bunks</u>. Narrow beds made of thin metal frames and covered in rags, wooden crates full of worthless junk, candles, pictures on the wall showing [a peaceful forest and some deer|the ocean|a ship on a lake|a grey fish smiling in the water].
+
+#VAT
+;vat room feature
+1,A partial collapse of the ceiling has destroyed the old equipment here. The floor is full of broken glass, twisted tubes and rocks. Nobody has cleaned this up.
+1,The cave walls are humid and black slime has been spreading.
+1,A pile of bones. Looks like [human|horse|pig|cow|bird] bones. Rats. Cockroaches. The usual.
+1,Along the wall are plastic bottles full of [colour] liquid. The inscriptions are faded. The caps have been opened many times.
+
+#VAT
+;vat final room
+1,<u>Regeneration tank</u>. This is a working treasure from the before times: a <i>regeneration tank</i>, humming quietly. It is filled with green, semi-transparent liquid and bubbling softly. Inside floats a human body, motionless, pierced with tubes. This is *[here human fancy name as wanted criminal]* ([human stats]), a rich [mercenary captain|bandit leader|gang leader|gangster|mobster] being stitched together again after a gunfight that went bad.
+
+#VAT
+;vat boss
+1,The chief [scientist|grower|lab master|bio wizard|genetic improviser] *[here human fancy name as scientist]* runs the lab down here ([human npc stats]).
+
+#VAT
+;vat treasure
+1,There’s a canister of *regenerating goo*, good for all sorts of trauma.
+1,There’s a canister of *sulphuric acid*, good for dissolving all sorts of organic material.
+
+# Terrain encounter tables
+
+;jungle encounter
+1,[jungle animal encounter]
+1,[jungle plant encounter]
+
+# Animal
+
+# don’t forget an appropriate stat block!
+;animal
+1,rad bear
+1,electric crab
+1,acid worm
+1,giant ant
+1,mothowl
+1,dragonbird
+1,rad hare
+1,sky jelly
+1,algaefish
+1,swamp thing
+1,fel dog
+1,hellhound
+1,grasschopper
+1,horse fly
+1,burke's hawk
+1,rad rattler
+1,wolfling
+1,fire ant
+1,no see um
+1,sky whale
+1,slime ander
+
+;jungle animal encounter
+1,The problem in this area has a name: **giant ants**. They carve their trails through the undergrowth, making travel easy. The problem is that these trails always lead to their nests. Just as the jungle clears up a bit, you stumble onto one of these trails and are suddenly confronted by [1d6] of these ants ([giant ant stats]).
+
+;rad bear stats
+1,HD 10 AC 6 #AT3 1d8/1d8/1d10 HP 10d6 Wil 13 SV L5 MV 36m, Radiation Vomit
+
+;electric crab stats
+1,HD 8 AC 4 #AT2 2d8/2d8 HP 8d6 Wil 12 SV 4 MV 36m, Electric Touch
+
+;acid worm stats
+1,HD 7 AC 6 #AT1 1d8 HP 7d6 Wil 12 SV L3 MV 36m, Acid Touch
+
+;giant ant stats
+1,HD 10 AC 3 #AT1 1d12 HP 10d6 Wil 11 SV 5 MV 36m, Animal Telepathy
+
+;mothowl stats
+1,HD 5 AC 6 HP 5d6 Wil 14 SV 2 MV 36m, Energy Drain
+
+;dragonbird stats
+1,HD 12 AC 3 #AT3 1d8/1d8/1d10 HP 12d6 Wil 15 MV 55m, Heat Metal
+
+;rad hare stats
+1,HD 4 AC 5 HP 4d6 MV 13 Wil 8 SV 2 55m, Radiation Vomit
+
+;sky jelly stats
+1,HD 3 AC 7 HP 3d6 Wil 15 SV 1 MV 18m, Paralyzing Touch, Energy Drain
+
+;algaefish stats
+1,HD 9 AC 5 #AT1 1d12 HP 9d6 Wil 9 SV 4 MV 36m, Confusion
+
+;swamp thing stats
+1,HD 20 AC 2 HP 20d6 Wil 17 SV 10 MV 36m, Heal Self, Poison Vomit, Eye Eruption
+
+;fel dog stats
+1,HD 8 AC 5 #AT3 1d8/1d8/1d10 HP 8d6 Wil 8 SV 4 MV 36m, Chameleon
+
+;hellhound stats
+1,HD 11 AC 0 #AT3 1d8/1d8/1d10 HP 11d6 Wil 12 SV 5 MV 36m, Exoskeleton, Fire Breath
+
+;grasschopper stats
+1,HD 8 AC 4 #AT1 1d10 HP 8d6 Wil 7 SV 4 MV 36m, Far Hearing, Photosynthesis
+
+;horse fly stats
+1,HD 3 AC 6 #AT1 1d12 HP 3d6 Wil 8 SV 1 MV 54m, Poison Resist
+
+;burke's hawk stats
+1,HD 4 AC 4 #AT3 1d8/1d8/1d10 HP 4d6 Wil 10 SV 2 MV 54m, Reflect Light
+
+;rad rattler stats
+1,HD 7 AC 4 #AT1 1d12 HP 7d6 Wil 14 SV 3 MV 36m, Radiation Vomit, Poison Vomit
+
+;wolfling stats
+1,HD 12 AC 5 #AT3 1d8/1d8/1d10 HP 12d6 Wil 10 SV 6 MV 36m, Tentacles, Blur
+
+;fire ant stats
+1,HD 8 AC 5 #AT1 1d12 HP 8d6 Wil 13 SV 4 MV 36m, Resist Heat, Fire Breath
+
+;no see um stats
+1,HD 2 AC 5 #AT3 1d8/1d8 HP 2d6 Wil 10 SV 1 MV 36m, Invisibility
+
+;sky whale stats
+1,HD 20 AC 5 #AT1 1d20 HP 20d6 Wil 16 SV 10 MV 36m, Mass Control Mind, Gills, Chameleon, Eye Eruption
+
+;slime ander stats
+1,HD 7 AC 6 #AT1 1d8 HP 7d6 Wil 14 SV 3 MV 36m, Acid Touch
+
+# Plants
+
+# don’t forget an appropriate stat block!
+;plant
+1,weeping willow
+1,razor grass
+1,jumping juniper
+1,oak herder
+1,cattail
+1,land anemone
+1,mars fly trap
+1,octopus grass
+1,zombie vine
+1,dirt devil
+1,eye stalker
+1,box cactus
+1,poison-tipped peony
+1,catch you sleeping vine
+1,baby jade
+1,elephant cactus
+1,pygmy palm
+1,tiger tree
+
+;jungle plant encounter
+1,If you make camp in this jungle, a **catch you sleeping vine** will sneak up to the camp ([catch you sleeping vine stats]).
+1,Making your way through the jungle risks walking into a copse of [2d3] **mars fly traps** ([mars fly trap stats]). If you’re surprised, you start inside the copse, surrounded, as the red maws open…
+1,Resting in this area is dangerous, for you’re sure to attract the attention of a pack of [[2d6]] **eye stalkers** ([eye stalker stats]).
+1,There’s a rocky outcrop in the area, providing an excellent view of the surrounding area from above the tree cover. Unfortunately, it is also colonised by a pack of [3d6] **land anemones** ([land anemone stats]). The way back down is blocked by three of them, and every three round another one arrives, as they slowly close in on any disturbance.
+
+;weeping willow stats
+1,HD 7 AC 6 HP 7d6 Wil 14 SV 3, Favorite Fragrance, Constrictive Tendrils
+
+;razor grass stats
+1,HD 3 AC 6 HP 3d6 Wil 11 SV 1, Free Movement, Vegetal Weapons
+
+;jumping juniper stats
+1,HD 11 AC 5 HP 11d6 Wil 10 SV 5, Movement, Electric Shock
+
+;oak herder stats
+1,HD 12 AC 4 HP 12d6 Wil 14 SV 5, Free Movement, Plant Telepathy, Irradiated Foliage
+
+;cattail stats
+1,HD 6 AC 7 HP 6d6 Wil 10 SV 2, Shriek
+
+;land anemone stats
+1,HD 4 AC 8 HP 4d6 Wil 10 SV 2, Paralytic Poison, Tendrils
+
+;mars fly trap stats
+1,HD 8 AC 5 HP 8d6 Wil 10 SV 4, Carnivore
+
+;octopus grass stats
+1,HD 5 AC 6 HP 5d6 Wil 16 SV 2, Plant Chameleon, Constrictive Tendrils
+
+;zombie vine stats
+1,HD 3 AC 8 HP 3d6 Wil 10 SV 1, Parasite, Tendrils
+
+;dirt devil stats
+1,HD 13 AC 3 HP 13d6 Wil 16 SV 6, Poison Spore, Exploding Fruit, Electric Shock
+
+;eye stalker stats
+1,HD 5 AC 6 HP 5d6 Wil 10 SV 2, Free Movement, Acid Sap
+
+;box cactus stats
+1,HD 10 AC 4 HP 10d6 Wil 11 SV 5, Projectile Thorns, Plant Telepathy
+
+;poison-tipped peony stats
+1,HD 3 AC 8 HP 3d6 Wil 11 SV 1, Poison Sap
+
+;catch you sleeping vine stats
+1,HD 7 AC 7 HP 7d6 Wil 8 SV 3, Paralytic Poison, Tendrils
+
+;baby jade stats
+1,HD 5 AC 7 HP 5d6 Wil 9 SV 2, Irradiated Foliage
+
+;elephant cactus stats
+1,HD 13 AC 4 HP 13d6 Wil 15 SV 6, Accumulated Resistance, Acid Sap, Vegetal Weapons
+
+;pygmy palm stats
+1,HD 5 AC 4 HP 5d6 Wil 12 SV 2, Poison Sap, Projectile Thorns
+
+;tiger tree stats
+1,HD 9 AC 4 HP 9d6 Wil 15 SV 4, Shriek, Plant Chameleon, Free Movement
+
+# Robots
+
+;consumer robot
+1,house bot
+1,library bot
+1,mechanic droid
+1,trash bot
+1,delivery droid
+1,mover droid
+
+;commercial/industrial robot
+1,construction bot
+1,agri droid
+1,engineer bot
+1,med droid
+1,manu bot
+1,security droid
+1,containment bot
+
+;military robot
+1,tank droid
+1,sub droid
+1,aero droid
+1,defense droid
+1,mobile AI station
+1,death droid
+
+# NPCs
+
+;npc stats
+1,[android stats]
+3,[synthetic stats]
+1,[replicant stats]
+1,[mutant animal stats]
+4,[mutant human stats]
+2,[mutant plant stats]
+5,[pure human stats]
+
+;human npc stats
+1,[mutant human stats]
+2,[pure human stats]
+
+;human stats
+1,HD 10 AC 7 1d6 L1 HP 10d8 MV 36m; average pure human
+
+;android stats
+3,STR [3d6] DEX [3d6] CON [3d6] INT [3d6] WIL [3d6] CHA [3d6] HP 50; [armor]; [weapon]; android; immune to poisons, blinding, stun; radiation -3 class levels; no additional mutations; resistant to heat and cold, +1 to saves vs. heat or cold; *[mutation]*; *[mutation]*; *[mutation]*
+1,STR [3d6+2] DEX [3d6+1] CON [3d6] INT [3d6-3] WIL [3d6] CHA [3d6] HP 50; [armor]; [weapon]; combat android; immune to poisons, blinding, stun;radiation -3 class levels; no additional mutations; resistant to heat and cold, +1 to saves vs. heat or cold; *[mutation]*; *[mutation]*; *[mutation]*
+1,STR [3d6+1] DEX [3d6+2] CON [3d6] INT [3d6] WIL [3d6] CHA [3d6-3] HP 50; [armor]; [weapon]; basic android; immune to poisons, blinding, stun; radiation -3 class levels; no additional mutations; resistant to heat and cold, +1 to saves vs. heat or cold; *[mutation]*; *[mutation]*; *[mutation]*
+
+;synthetic stats
+1,STR [3d6] DEX [3d6] CON [3d6] INT [3d6] WIL [3d6] CHA [3d6] HP 50; [armor]; [weapon]; synthetic; immune to poisons, blinding, stun; radiation -1 class level; no additional mutations; resistant to heat and cold, +3 to saves vs. heat or cold; *[mutation]*; *[mutation]*; *[mutation]*
+
+;replicant stats
+1,STR [3d6] DEX [3d6] CON [3d6 as con] INT [3d6] WIL [3d6] CHA [3d6] HP [[same con]d6]; [armor]; [weapon]; replicant; radiation causes wasting disease instead of mutations; resistant to heat and cold, +2 to saves vs. heat or cold; *[mutation]*; *[mutation]*; *[mutation]*
+
+;mutant animal stats
+1,TODO: mutant animal
+
+;mutant human stats
+1,STR [3d6] DEX [3d6] CON [3d6 as con] INT [3d6] WIL [3d6] CHA [3d6] HP [[same con]d6]; [armor]; [weapon]; mutant human; [standard mutations]
+
+;standard mutations
+1,[1d4 standard physical mutations], [1d4 standard mental mutations]
+
+;1d4 standard physical mutations
+1,*[physical mutation]*
+1,*[physical mutation]*, *[physical mutation]*
+1,*[physical mutation]*, *[physical mutation]*, *[physical mutation]*
+1,*[physical mutation]*, *[physical mutation]*, *[physical mutation]*, *[physical mutation]*
+
+;1d4 standard mental mutations
+1,and *[mental mutation]*
+1,*[mental mutation]*, and *[mental mutation]*
+1,*[mental mutation]*, *[mental mutation]*, and *[mental mutation]*
+1,*[mental mutation]*, *[mental mutation]*, *[mental mutation]* and *[mental mutation]*
+
+;mutant plant stats
+1,STR [3d6] DEX [3d6] CON [3d6 as con] INT [3d6] WIL [3d6] CHA [3d6] HP [[same con]d6]; [armor]; [weapon]; mutant plant; *[plant mutation]*, *[plant mutation]*, [plus 1d6 human mutations]
+
+;plus 1d6 human mutations
+1,and *[physical mutation]*
+1,and *[mental mutation]*
+2,*[physical mutation]*, and *[mental mutation]*
+1,*[physical mutation]*, *[physical mutation]*, and *[mental mutation]*
+1,*[physical mutation]*, *[mental mutation]*, and *[mental mutation]*
+2,*[physical mutation]*, *[physical mutation]*, *[mental mutation]*, and *[mental mutation]*
+1,*[physical mutation]*, *[physical mutation]*, *[physical mutation]*, *[mental mutation]*, and *[mental mutation]*
+1,*[physical mutation]*, *[physical mutation]*, *[mental mutation]*, *[mental mutation]*, and *[mental mutation]*
+2,*[physical mutation]*, *[physical mutation]*, *[physical mutation]*, *[mental mutation]*, *[mental mutation]*, and *[mental mutation]*
+
+;pure human stats
+1,STR [3d6] DEX [3d6] CON [3d6+3 as con] INT [3d6+3] WIL [3d6] CHA [3d6+3] HP [[max18([same con])]d8]; [armor]; [weapon]; pure human; no additional mutations
+
+;max18(6)
+1,6
+;max18(7)
+1,7
+;max18(8)
+1,8
+;max18(9)
+1,9
+;max18(10)
+1,10
+;max18(11)
+1,11
+;max18(12)
+1,12
+;max18(13)
+1,13
+;max18(14)
+1,14
+;max18(15)
+1,15
+;max18(16)
+1,16
+;max18(17)
+1,17
+;max18(18)
+1,18
+;max18(19)
+1,18
+;max18(20)
+1,18
+;max18(21)
+1,18
+
+;human fancy name
+1,[human name] [epithet]
+1,[title] [human name]
+
+# to be used as a title or as part of the epithet
+# must be without gender
+;person word
+1,Wise
+1,Great
+1,All-Knowing
+1,Ponderous
+1,Strong
+1,Mighty
+1,Smart
+1,Good
+1,Evil
+1,Saint
+1,Sinner
+1,Powerful
+1,Hungry
+1,Monster
+1,Cruel
+1,Kind
+1,Quiet
+1,Old
+1,Young
+1,Elder
+
+;epithet
+1,the [person word]
+1,the Defender of all [people]
+1,the Best of all [people]
+
+# must be without gender
+;title
+1,Law & Order
+10,[person word]
+
+# TODO: what would human names in the post-apocalypse be? Add some product names?
+;human name
+1,[english name]
+1,[native american name]
+1,[chinese name]
+1,[japanese name]
+
+# https://www.ssa.gov/OACT/babynames/decades/century.html
+;english name
+1,[english name for a woman]
+1,[english name for a man]
+
+;english name for a woman
+1,Mary
+1,Patricia
+1,Jennifer
+1,Linda
+1,Elizabeth
+1,Barbara
+1,Susan
+1,Jessica
+1,Sarah
+1,Karen
+1,Nancy
+1,Lisa
+1,Margaret
+1,Betty
+1,Sandra
+1,Ashley
+1,Dorothy
+1,Kimberly
+1,Emily
+1,Donna
+1,Michelle
+1,Carol
+1,Amanda
+1,Melissa
+1,Deborah
+1,Stephanie
+1,Rebecca
+1,Laura
+1,Sharon
+1,Cynthia
+1,Kathleen
+1,Amy
+1,Shirley
+1,Angela
+1,Helen
+1,Anna
+1,Brenda
+1,Pamela
+1,Nicole
+1,Samantha
+1,Katherine
+1,Emma
+1,Ruth
+1,Christine
+1,Catherine
+1,Debra
+1,Rachel
+1,Carolyn
+1,Janet
+1,Virginia
+1,Maria
+1,Heather
+1,Diane
+1,Julie
+1,Joyce
+1,Victoria
+1,Kelly
+1,Christina
+1,Lauren
+1,Joan
+1,Evelyn
+1,Olivia
+1,Judith
+1,Megan
+1,Cheryl
+1,Martha
+1,Andrea
+1,Frances
+1,Hannah
+1,Jacqueline
+1,Ann
+1,Gloria
+1,Jean
+1,Kathryn
+1,Alice
+1,Teresa
+1,Sara
+1,Janice
+1,Doris
+1,Madison
+1,Julia
+1,Grace
+1,Judy
+1,Abigail
+1,Marie
+1,Denise
+1,Beverly
+1,Amber
+1,Theresa
+1,Marilyn
+1,Danielle
+1,Diana
+1,Brittany
+1,Natalie
+1,Sophia
+1,Rose
+1,Isabella
+1,Alexis
+1,Kayla
+1,Charlotte
+
+;english name for a man
+1,James
+1,John
+1,Robert
+1,Michael
+1,William
+1,David
+1,Richard
+1,Joseph
+1,Thomas
+1,Charles
+1,Christopher
+1,Daniel
+1,Matthew
+1,Anthony
+1,Donald
+1,Mark
+1,Paul
+1,Steven
+1,Andrew
+1,Kenneth
+1,Joshua
+1,Kevin
+1,Brian
+1,George
+1,Edward
+1,Ronald
+1,Timothy
+1,Jason
+1,Jeffrey
+1,Ryan
+1,Jacob
+1,Gary
+1,Nicholas
+1,Eric
+1,Jonathan
+1,Stephen
+1,Larry
+1,Justin
+1,Scott
+1,Brandon
+1,Benjamin
+1,Samuel
+1,Frank
+1,Gregory
+1,Raymond
+1,Alexander
+1,Patrick
+1,Jack
+1,Dennis
+1,Jerry
+1,Tyler
+1,Aaron
+1,Jose
+1,Henry
+1,Adam
+1,Douglas
+1,Nathan
+1,Peter
+1,Zachary
+1,Kyle
+1,Walter
+1,Harold
+1,Jeremy
+1,Ethan
+1,Carl
+1,Keith
+1,Roger
+1,Gerald
+1,Christian
+1,Terry
+1,Sean
+1,Arthur
+1,Austin
+1,Noah
+1,Lawrence
+1,Jesse
+1,Joe
+1,Bryan
+1,Billy
+1,Jordan
+1,Albert
+1,Dylan
+1,Bruce
+1,Willie
+1,Gabriel
+1,Alan
+1,Juan
+1,Logan
+1,Wayne
+1,Ralph
+1,Roy
+1,Eugene
+1,Randy
+1,Vincent
+1,Russell
+1,Louis
+1,Philip
+1,Bobby
+1,Johnny
+1,Bradley
+
+;native american name
+1,[native american name for a woman]
+1,[native american name for a man]
+
+;native american name for a woman
+1,Abedabun
+1,Abequa
+1,Abeque
+1,Abetzi
+1,Abey
+1,Abeytu
+1,Adoette
+1,Adsila
+1,Aiyana
+1,Alameda
+1,Alaqua
+1,Alawa
+1,Algoma
+1,Alsoomse
+1,Altsoba
+1,Amadahy
+1,Amayeta
+1,Amitola
+1,Anaba
+1,Anevay
+1,Angeni
+1,Angwusnasomtaqa
+1,Ankti
+1,Anna
+1,Anpaytoo
+1,Aponi
+1,Aquene
+1,Asdza
+1,At’Eed
+1,Atepa
+1,Awanata
+1,Awenasa
+1,Awendela
+1,Awentia
+1,Awinita
+1,Ayashe
+1,Ayasha
+1,Ayita
+1,Bena
+1,Bly
+1,Catori
+1,Cha’Kwaina
+1,Cha’Risa
+1,Chapa
+1,Chenoa
+1,Chepi
+1,Chilaili
+1,Chimalis
+1,Chitsa
+1,Chochmingwu
+1,Cholena
+1,Chosovi
+1,Chosposi
+1,Chu’Mana
+1,Chu’Si
+1,Chumani
+1,Cocheta
+1,Dena
+1,Dezba
+1,Dibe
+1,Doba
+1,Doli
+1,Donoma
+1,Dyani
+1,Ehawee
+1,Enola
+1,Etenia
+1,Eyota
+1,Fala
+1,Flo
+1,Gaho
+1,Galilahi
+1,Hakidonmuya
+1,Haloke
+1,Halona
+1,Hantaywee
+1,Hausis
+1,Hausisse
+1,Hehewuti
+1,Helki
+1,Honovi
+1,Huata
+1,Humita
+1,Hurit
+1,Huyana
+1,Imala
+1,Isi
+1,Istas
+1,Ituha
+1,Ituha
+1,Kachina
+1,Kai
+1,Kakawangwa
+1,Kaliska
+1,Kanti
+1,Kasa
+1,Kaya
+1,Keegsquaw
+1,Keezheekoni
+1,Kimama
+1,Kimi
+1,Kimimela
+1,Kineks
+1,Kiwidinok
+1,Koko
+1,Kokyangwuti
+1,Kolenya
+1,Kuwanlelenta
+1,Kuwanyamtiwa
+1,Kuwanyauma
+1,Leotie
+1,Lenmana
+1,Lequoia
+1,Liluye
+1,Liseli
+1,Litonya
+1,Lomahongva
+1,Lomasi
+1,Lulu
+1,Luyu
+1,Macawi
+1,Magaskawee
+1,Magena
+1,Mahal
+1,Mahu
+1,Mai
+1,Maka
+1,Makawee
+1,Makkitotosimew
+1,Malia
+1,Malila
+1,Manaba
+1,Mankalita
+1,Mansi
+1,Mapiya
+1,Maralah
+1,Mausi
+1,Meda
+1,Meli
+1,Memdi
+1,Meoquanee
+1,Migisi
+1,Miakoda
+1,Migina
+1,Mika
+1,Mimiteh
+1,Minal
+1,Misae
+1,Mituna
+1,Mona
+1,Mosi
+1,Muna
+1,Nadie
+1,Nahimana
+1,Namid
+1,Nara
+1,Nascha
+1,Nashota
+1,Nata
+1,Niabi
+1,Nidawi
+1,Nijlon
+1,Nina
+1,Nita
+1,Nittawosew
+1,Nituna
+1,Nokomis
+1,Nova
+1,Nukpana
+1,Numees
+1,Nuna
+1,Nuttah
+1,Odahingum
+1,Ogin
+1,Olathe
+1,Ominotago
+1,Omusa
+1,Onatah
+1,Onawa
+1,Onida
+1,Ooljee
+1,Oota Dabun
+1,Orenda
+1,Pakwa
+1,Pakuna
+1,Pamuya
+1,Papina
+1,Pati
+1,Pauwau
+1,Pavati
+1,Peta
+1,Petunia
+1,Polikwaptiwa
+1,Poloma
+1,Posala
+1,Powaqa
+1,Ptaysanwee
+1,Pules
+1,Rozene
+1,Sahkyo
+1,Salali
+1,Sanuye
+1,Satinka
+1,Shada
+1,Shadi
+1,Sheshebens
+1,Shideezhi
+1,Shima
+1,Shimasani
+1,Shuman
+1,Sihu
+1,Sinopa
+1,Sisika
+1,Sitala
+1,Sitsi
+1,Sokanon
+1,Sokw
+1,Sooleawa
+1,Soyala
+1,Suletu
+1,Sunki
+1,Tablita
+1,Tadewi
+1,Tadita
+1,Taigi
+1,Taini
+1,Taima
+1,Taipa
+1,Takala
+1,Takchawee
+1,Takhi
+1,Tala
+1,Talulah
+1,Talutah
+1,Tama
+1,Tansy
+1,Tayanita
+1,Tehya
+1,Tiponi
+1,Tis-See-Woo-Na-Tis
+1,Tiva
+1,Tolinka
+1,Totsi
+1,Tuwa
+1,Una
+1,Urika
+1,Utina
+1,Wachiwi
+1,Wakanda
+1,Waki
+1,Waneta
+1,Wauna
+1,Weeko
+1,Wenona
+1,Wicapi Wakan
+1,Wihakayda
+1,Wikimak
+1,Winema
+1,Winona
+1,Wenona
+1,Wenonah
+1,Witashnah
+1,Wuti
+1,Wyanet
+1,Yamka
+1,Yazhi
+1,Yepa
+1,Yoki
+1,Zaltana
+1,Zihna
+1,Zitkala
+
+;native american name for a man
+1,Abukcheech
+1,Achak
+1,Adahy
+1,Ahanu
+1,Ahiga
+1,Ahiliya
+1,Ahmik
+1,Ahote
+1,Ahtunowhiho
+1,Akando
+1,Akecheta
+1,Akule
+1,Alo
+1,Alosaka
+1,Anakausuen
+1,Anoki
+1,Apenimon
+1,Aponivi
+1,Aranck
+1,Ashkii
+1,Askook
+1,Askuwheteau
+1,Ata’Halne’
+1,Avonaco
+1,Awan
+1,Ayawamat
+1,Bemossed
+1,Bidziil
+1,Bilagaana
+1,Bimisi
+1,Bodaway
+1,Cha’Akmongwi
+1,Cha’Tima
+1,Chankoowashtay
+1,Chansomps
+1,Chas-Chunk-A
+1,Chavatangakwunua
+1,Chayton
+1,Chesmu
+1,Cheveyo
+1,Chochmo
+1,Chochokpi
+1,Chochuschuvio
+1,Chogan
+1,Choovio
+1,Choviohoya
+1,Chowilawu
+1,Chu’A
+1,Chuchip
+1,Chunta
+1,Ciqala
+1,Delsin
+1,Demothi
+1,Dichali
+1,Dohosan
+1,Dustu
+1,Dyami
+1,Elan
+1,Elki
+1,Elsu
+1,Eluwilussit
+1,Enapay
+1,Enkoodabooaoo
+1,Enkoodabaoo
+1,Enyeto
+1,Etchemin
+1,Etlelooaat
+1,Etu
+1,Ezhno
+1,Gaagii
+1,Gad
+1,Gosheven
+1,Guyapi
+1,Hahkethomemah
+1,Harkahome
+1,Hahnee
+1,Hakan
+1,Hania
+1,Hassun
+1,Hastiin
+1,Hawiovi
+1,He-Lush-Ka
+1,Heammawihio
+1,Helaku
+1,Helki
+1,Heskovizenako
+1,Hesutu
+1,Hevataneo
+1,Hevovitastamiutsto
+1,Hiamovi
+1,Hinun
+1,Hinto
+1,Kohkahycumest
+1,Hohnihohkaiyohos
+1,Neeheeoeewootis
+1,Hok’Ee
+1,Honani
+1,Honaw
+1,Honiahaka
+1,Honon
+1,Honovi
+1,Hotah
+1,Hototo
+1,Hotuaekhaashtait
+1,Howahkan
+1,Howi
+1,Huritt
+1,Igasho
+1,Istaqa
+1,Inteus
+1,Istu
+1,Iye
+1,Jacy
+1,Jolon
+1,Kachada
+1,Kaga
+1,Kajika
+1,Kangee
+1,Kele
+1,Keme
+1,Kesegowaase
+1,Kestejoo
+1,Kitchi
+1,Knoton
+1,Kohana
+1,Kolichiyaw
+1,Kono
+1,Kosumi
+1,Kotori
+1,Kuckunniwi
+1,Kuruk
+1,Kwahu
+1,Kwatoko
+1,Langundo
+1,Lansa
+1,Lanu
+1,Lapu
+1,Len
+1,Lenno
+1,Leyati
+1,Lise
+1,Liwanu
+1,Lokni
+1,Lonato
+1,Lootah
+1,Machakw
+1,Machk
+1,Mahkah
+1,Mahpee
+1,Makkapitew
+1,Makya
+1,Manipi
+1,Mantotohpa
+1,Masichuvio
+1,Maska
+1,Masou
+1,Matchitehew
+1,Matchitisiw
+1,Matoskah
+1,Matunaaga
+1,Matwau
+1,Maza Blaska
+1,Megedagik
+1,Melkedoodum
+1,Melvern
+1,Meturato
+1,Mokatavatah
+1,Moketavato
+1,Moketaveto
+1,Moketoveto
+1,Mokovaoto,
+1,Motavato
+1,Milap
+1,Mingan
+1,Minninnewah
+1,Misu
+1,Mochni
+1,Mojag
+1,Moki
+1,Molimo
+1,Momuso
+1,Mona
+1,Mongwau
+1,Motega
+1,Muata
+1,Mukki
+1,Muraco
+1,Naalnish
+1,Naalyehe Ya Sidahi
+1,Nahcomence
+1,Nahele
+1,Nahiossi
+1,Napayshni
+1,Nastas
+1,Nawat
+1,Nawkaw
+1,Nayati
+1,Neka
+1,Nigan
+1,Niichaad
+1,Nikiti
+1,Nitis
+1,Nixkamich
+1,Niyol
+1,Nodin
+1,Nootau
+1,Nosh
+1,Noshi
+1,Nukpana
+1,Ocumwhowurst
+1,Ocunnowhurst
+1,Odakota
+1,Ogaleesha
+1,Ohanko
+1,Ohanzee
+1,Ohcumgache
+1,Okhmhaka
+1,Ohitekah
+1,Omawnakw
+1,Otaktay
+1,Otoahhastis
+1,Otoahnacto
+1,Ouray
+1,Oya
+1,Pachu’A
+1,Paco
+1,Pahana
+1,Pajackok
+1,Pallaton
+1,Pannoowau
+1,Pat
+1,Patamon
+1,Patwin
+1,Payat
+1,Pay
+1,Payatt
+1,Paytah
+1,Pinon
+1,Pivane
+1,Powwaw
+1,Qaletaqa
+1,Qochata
+1,Rowtag
+1,Sahale
+1,Sakima
+1,Sani
+1,Segenam
+1,Sewati
+1,Shilah
+1,Shiriki
+1,Shiye
+1,Shizhe’E
+1,Shoemowetochawcawewahcatowe
+1,Sicheii
+1,Sik’Is
+1,Sike
+1,Sikyahonaw
+1,Sikyatavo
+1,Siwili
+1,Skah
+1,Songan
+1,Sowi’Ngwa
+1,Sucki
+1,Sunukkuhkau
+1,T’Iis
+1,Tahkeome
+1,Tahmelapachme
+1,Taima
+1,Takoda
+1,Tangakwunu
+1,Taregan
+1,Tasunke
+1,Tatanka-Ptecila
+1,Tate
+1,Teetonka
+1,Telutci
+1,Tuketu
+1,Tihkoosue
+1,Tocho
+1,Togquos
+1,Tohopka
+1,Tokala
+1,Tooantuh
+1,Tse
+1,Tsiishch’Ili
+1,Tupi
+1,Uzumati
+1,Vaiveahtoish
+1,Vaive Atoish
+1,Viho
+1,Vipponah
+1,Vohkinne
+1,Voistitoevitz
+1,Voisttitoevetz
+1,Vokivocummast
+1,Wahanassatta
+1,Wahchinksapa
+1,Wahchintonka
+1,Wahkan
+1,Wakiza
+1,Wamblee
+1,Wambleeska
+1,Wambli-Waste
+1,Wanageeska
+1,Wanahton
+1,Wanikiya
+1,Wapi
+1,Waquini
+1,Weayaya
+1,Wematin
+1,Wemilat
+1,Wicasa
+1,Wikvaya
+1,Wilny
+1,Wohehiv
+1,Wokaihwokomas
+1,Wuyi
+1,Wynono
+1,Yahto
+1,Yancy
+1,Yanisin
+1,Yas
+1,Yiska
+1,Yoskolo
+1,Yuma
+
+;chinese name
+1,[chinese name for a man]
+1,[chinese name for a woman]
+
+;chinese name for a man
+1,Aiguo
+1,An
+1,Bai
+1,Bingwen
+1,Bojing
+1,Bolin
+1,Chaoxiang
+1,Chenglei
+1,Chongan
+1,Chonglin
+1,Deming
+1,Déwei
+1,Dingxiang
+1,Donghai
+1,Duyi
+1,Fan
+1,Fang
+1,Fu
+1,Gan
+1,Gen
+1,Gui
+1,Guiren
+1,Guozhi
+1,Han
+1,Hongqi
+1,Hop
+1,Huiqing
+1,Huojin
+1,Jaw-Long
+1,Jiang
+1,Jianyu
+1,Jiayi
+1,Jin
+1,Jinjing
+1,Junjie
+1,Kang
+1,Lei
+1,Lì
+1,Liu
+1,Lok
+1,Longwei
+1,Manchu
+1,Ming-Húa
+1,Mingyu
+1,Minzhe
+1,Peizhi
+1,Ping
+1,Qianfan
+1,Qiang
+1,Qing
+1,Qiqiang
+1,Qiquiang
+1,Qiu
+1,Ru
+1,Shan
+1,Shanyuan
+1,Shen
+1,Shihong
+1,Shing
+1,Shining
+1,Shoi-Ming
+1,Shu-Sai
+1,Song
+1,Tengfei
+1,Tingfeng
+1,Tingguang
+1,Tung
+1,Wei
+1,Weiyuan
+1,Weizhe
+1,Wen
+1,Wencheng
+1,Wenyan
+1,Xiang
+1,Xiaobo
+1,Xiaodan
+1,Xiaosheng
+1,Xiaowen
+1,Xiasheng
+1,Xin
+1,Xiu
+1,Xueyou
+1,Yang
+1,Yaochuan
+1,Yi
+1,Yingjie
+1,Yingpei
+1,Yongzheng
+1,Yuanjun
+1,Zedong
+1,Zemin
+1,Zhaohui
+1,Zhensheng
+1,Zhiqiang
+1,Zhìxin
+1,Zhìyuan
+1,Zhong
+1,Zian
+1,Zihao
+1,Zixin
+
+;chinese name for a woman
+1,Ai
+1,Bao
+1,Baozhai
+1,Bo
+1,Caihong
+1,Changying
+1,Chenguang
+1,Chunhua
+1,Chuntao
+1,Daiyu
+1,Da-xia
+1,Dongmei
+1,Hua
+1,Huan
+1,Huifang
+1,Huifen
+1,Jingfei
+1,Jinghua
+1,Ju
+1,Jun
+1,Lan
+1,Lanfen
+1,Lanying
+1,Lee
+1,Li
+1,Li Mei
+1,Li Ming
+1,Lian
+1,Lifen
+1,Lihua
+1,Lin
+1,Ling
+1,Liqin
+1,Lixue
+1,Luan
+1,Mei
+1,Meifeng
+1,Meihui
+1,Meili
+1,Meirong
+1,Meixiang
+1,Meixiu
+1,Meiying
+1,Mingmei
+1,Mingxia
+1,Mingyu
+1,Mingzhu
+1,Ning
+1,Ninghong
+1,Nuwa
+1,Nuying
+1,Pangfua
+1,Peijing
+1,Peizhi
+1,Qi
+1,Qiang
+1,Qiao
+1,Qing
+1,Qingyuan
+1,Qingling
+1,Qingzhao
+1,Qinyang
+1,Qiuyue
+1,Renxiang
+1,Rou
+1,Ruiling
+1,Ruolan
+1,Shan
+1,Shu
+1,Shuang
+1,Shuchun
+1,Shui
+1,Suyin
+1,Ting
+1,Weici
+1,Xia
+1,Xiang
+1,Xiaodan
+1,Xiaoli
+1,Xiaolian
+1,Xiaozhi
+1,Xifeng
+1,Xingjuan
+1,Xiu
+1,Xiulan
+1,Xiuying
+1,Xue
+1,Xueman
+1,Yenay
+1,Ying
+1,Yingtai
+1,Yu
+1,Yuan
+1,Yuming
+1,Yun
+1,Zhaohui
+1,Zhenzhen
+1,Zhilan
+1,Zhu
+
+;japanese name
+1,[japanese name for a man]
+1,[japanese name for a woman]
+
+;japanese name for a woman
+1,Ai
+1,Aika
+1,Aiko
+1,Aimi
+1,Aina
+1,Airi
+1,Akane
+1,Akari
+1,Akemi
+1,Akeno
+1,Aki
+1,Akie
+1,Akiko
+1,Akina
+1,Akiyo
+1,Amane
+1,Ami
+1,Anzu
+1,Aoi
+1,Ariko
+1,Arisa
+1,Asako
+1,Asami
+1,Asuka
+1,Asumi
+1,Asuna
+1,Atsuko
+1,Atsumi
+1,Aya
+1,Ayaka
+1,Ayako
+1,Ayame
+1,Ayami
+1,Ayana
+1,Ayane
+1,Ayano
+1,Ayu
+1,Ayuka
+1,Ayuko
+1,Ayumi
+1,Azumi
+1,Azusa
+1,Chidori
+1,Chie
+1,Chieko
+1,Chiemi
+1,Chigusa
+1,Chiharu
+1,Chiho
+1,Chika
+1,Chikage
+1,Chikako
+1,Chinami
+1,Chinatsu
+1,Chisato
+1,Chitose
+1,Chiya
+1,Chiyako
+1,Chiyo
+1,Chiyoko
+1,Chizuko
+1,Chizuru
+1,Eiko
+1,Eimi
+1,Emi
+1,Emika
+1,Emiko
+1,Emiri
+1,Eri
+1,Erika
+1,Eriko
+1,Erina
+1,Etsuko
+1,Fujie
+1,Fujiko
+1,Fūka
+1,Fukumi
+1,Fumi
+1,Fumie
+1,Fumika
+1,Fumiko
+1,Fumino
+1,Fumiyo
+1,Fusako
+1,Futaba
+1,Fuyuko
+1,Fuyumi
+1,Hana
+1,Hanae
+1,Hanako
+1,Harue
+1,Haruhi
+1,Haruko
+1,Haruna
+1,Haruno
+1,Haruyo
+1,Hasumi
+1,Hatsue
+1,Hatsumi
+1,Hideko
+1,Hidemi
+1,Himawari
+1,Himeko
+1,Hina
+1,Hinako
+1,Hiroe
+1,Hiroka
+1,Hiroko
+1,Hiroyo
+1,Hisa
+1,Hisae
+1,Hisako
+1,Hisayo
+1,Hitomi
+1,Honami
+1,Honoka
+1,Ichiko
+1,Ikue
+1,Ikuko
+1,Ikumi
+1,Ikuyo
+1,Io
+1,Itsuko
+1,Itsumi
+1,Jitsuko
+1,Junko
+1,Juri
+1,Kaguya
+1,Kaho
+1,Kahori
+1,Kahoru
+1,Kana
+1,Kanae
+1,Kanako
+1,Kanami
+1,Kanna
+1,Kanoko
+1,Kaori
+1,Kaoruko
+1,Karen
+1,Karin
+1,Kasumi
+1,Katsuko
+1,Kawai
+1,Kaya
+1,Kayoko
+1,Kazue
+1,Kazuha
+1,Kazuko
+1,Kazusa
+1,Kazuyo
+1,Keiki
+1,Keiko
+1,Kiho
+1,Kiko
+1,Kikue
+1,Kikuko
+1,Kimi
+1,Kimiko
+1,Kinuko
+1,Kira
+1,Kiyoko
+1,Koharu
+1,Komako
+1,Konomi
+1,Kotoe
+1,Kotomi
+1,Kotono
+1,Kotori
+1,Kou
+1,Kozue
+1,Kumi
+1,Kumiko
+1,Kuniko
+1,Kurenai
+1,Kuriko
+1,Kyoko
+1,Maaya
+1,Machi
+1,Machiko
+1,Madoka
+1,Maho
+1,Mai
+1,Maki
+1,Makiko
+1,Mami
+1,Mamiko
+1,Mana
+1,Manaka
+1,Manami
+1,Mao
+1,Mari
+1,Marie
+1,Marika
+1,Mariko
+1,Marina
+1,Masae
+1,Masako
+1,Masayo
+1,Matsuko
+1,Mayako
+1,Mayo
+1,Mayu
+1,Mayuka
+1,Mayuko
+1,Mayumi
+1,Megu
+1,Megumi
+1,Mei
+1,Meiko
+1,Meisa
+1,Michiko
+1,Mie
+1,Mieko
+1,Miharu
+1,Miho
+1,Mihoko
+1,Miiko
+1,Mika
+1,Mikako
+1,Miki
+1,Mikiko
+1,Miku
+1,Mikuru
+1,Mimori
+1,Mina
+1,Minae
+1,Minako
+1,Minami
+1,Mineko
+1,Mio
+1,Miori
+1,Mira
+1,Misaki
+1,Misako
+1,Misato
+1,Misumi
+1,Misuzu
+1,Mitsuki
+1,Mitsuko
+1,Mitsuyo
+1,Miu
+1,Miwa
+1,Miwako
+1,Miya
+1,Miyabi
+1,Miyako
+1,Miyo
+1,Miyoko
+1,Miyoshi
+1,Miyu
+1,Miyū
+1,Miyuki
+1,Miyumi
+1,Mizue
+1,Mizuko
+1,Moe
+1,Moeka
+1,Moeko
+1,Momo
+1,Momoe
+1,Momoka
+1,Momoko
+1,Motoko
+1,Mutsuko
+1,Mutsumi
+1,Nagako
+1,Naho
+1,Nako
+1,Nami
+1,Nana
+1,Nanae
+1,Nanako
+1,Nanami
+1,Nanase
+1,Nao
+1,Naoko
+1,Narumi
+1,Natsue
+1,Natsuko
+1,Natsume
+1,Natsumi
+1,Noa
+1,Nobue
+1,Nobuko
+1,Nodoka
+1,Nonoka
+1,Noriko
+1,Noriyo
+1,Nozomi
+1,Omi
+1,Otoha
+1,Otome
+1,Ran
+1,Ranko
+1,Reika
+1,Reiko
+1,Reina
+1,Rena
+1,Reona
+1,Rie
+1,Rieko
+1,Riho
+1,Rika
+1,Rikako
+1,Riko
+1,Rina
+1,Rino
+1,Rio
+1,Risa
+1,Risako
+1,Ritsuko
+1,Rumi
+1,Rumiko
+1,Runa
+1,Ruri
+1,Ruriko
+1,Ryōka
+1,Ryoko
+1,Sachi
+1,Sachie
+1,Sachiko
+1,Sadako
+1,Sae
+1,Saeko
+1,Saiko
+1,Saki
+1,Sakie
+1,Sakiko
+1,Saku
+1,Sakura
+1,Sakurako
+1,Sanae
+1,Saori
+1,Sari
+1,Satoko
+1,Satomi
+1,Sawa
+1,Sawako
+1,Saya
+1,Sayaka
+1,Sayako
+1,Sayo
+1,Sayoko
+1,Sayumi
+1,Sayuri
+1,Seiko
+1,Setsuko
+1,Shigeko
+1,Shiho
+1,Shihori
+1,Shiina
+1,Shimako
+1,Shinako
+1,Shino
+1,Shiori
+1,Shizue
+1,Shizuko
+1,Shizuru
+1,Shōko
+1,Shuko
+1,Sonoko
+1,Sugako
+1,Sumie
+1,Sumika
+1,Sumiko
+1,Sumire
+1,Suzue
+1,Suzuka
+1,Suzuko
+1,Taeko
+1,Takako
+1,Takayo
+1,Takeko
+1,Tamako
+1,Tamami
+1,Tamao
+1,Tamayo
+1,Tamiko
+1,Tatsuko
+1,Tazuko
+1,Teiko
+1,Teruko
+1,Terumi
+1,Tokiko
+1,Tokuko
+1,Tomie
+1,Tomiko
+1,Tomoka
+1,Tomoko
+1,Tomoyo
+1,Toshiko
+1,Toyoko
+1,Tsukiko
+1,Tsuneko
+1,Tsuru
+1,Umeko
+1,Uta
+1,Waka
+1,Wakako
+
+;japanese name for a man
+1,Akifumi
+1,Akihiko
+1,Akihiro
+1,Akihisa
+1,Akihito
+1,Akimasa
+1,Akimitsu
+1,Akinari
+1,Akinobu
+1,Akinori
+1,Akio
+1,Akisada
+1,Akitake
+1,Akito
+1,Akitomo
+1,Akitoshi
+1,Akitsugu
+1,Akiya
+1,Akiyoshi
+1,Akiyuki
+1,Arashi
+1,Arata
+1,Arihiro
+1,Arinaga
+1,Arinobu
+1,Aritomo
+1,Asahiko
+1,Asao
+1,Asayama
+1,Atomu
+1,Atsuhiko
+1,Atsuhiro
+1,Atsuji
+1,Atsuki
+1,Atsunobu
+1,Atsuo
+1,Atsushi
+1,Atsuto
+1,Atsuya
+1,Azuma
+1,Banri
+1,Bunji
+1,Bunta
+1,Bunzō
+1,Chikao
+1,Chikara
+1,Chikashi
+1,Chikayoshi
+1,Chōbyō
+1,Chōei
+1,Choki
+1,Chūichi
+1,Chūjirō
+1,Dai
+1,Daichi
+1,Daigo
+1,Daihachi
+1,Daiji
+1,Daijirō
+1,Daiju
+1,Daiki
+1,Daikichi
+1,Dairoku
+1,Daisaku
+1,Daishi
+1,Daishin
+1,Daisuke
+1,Daizen
+1,Daizō
+1,Eiichi
+1,Eiichiro
+1,Eiji
+1,Eijirō
+1,Eiken
+1,Eikichi
+1,Einosuke
+1,Eisaku
+1,Eisen
+1,Eishun
+1,Eisuke
+1,Eita
+1,Eitarō
+1,Eizō
+1,Emon
+1,Enji
+1,Etsuji
+1,Fujio
+1,Fukashi
+1,Fumiaki
+1,Fumihiko
+1,Fumihiro
+1,Fumihisa
+1,Fuminori
+1,Fumio
+1,Fumitaka
+1,Fumito
+1,Fumiya
+1,Fusanosuke
+1,Fusao
+1,Fusazane
+1,Futoshi
+1,Fuyuki
+1,Fuyukichi
+1,Gaku
+1,Gakuto
+1,Gen
+1,Gen'ichi
+1,Gen'ichirō
+1,Genjirō
+1,Genki
+1,Genta
+1,Gentarō
+1,Genzō
+1,Giichi
+1,Gin
+1,Ginji
+1,Gō
+1,Goichi
+1,Goro
+1,Gota
+1,Hachirō
+1,Hakaru
+1,Haruaki
+1,Haruchika
+1,Haruhiko
+1,Haruhiro
+1,Haruhisa
+1,Haruki
+1,Harukichi
+1,Harumitsu
+1,Harunobu
+1,Harunori
+1,Haruo
+1,Harutaka
+1,Haruto
+1,Haruya
+1,Haruyoshi
+1,Hatsuo
+1,Hayanari
+1,Hayao
+1,Hayata
+1,Hayato
+1,Heihachirō
+1,Heiichirō
+1,Heisuke
+1,Heizō
+1,Hide
+1,Hideaki
+1,Hideharu
+1,Hidehiko
+1,Hidehisa
+1,Hidehito
+1,Hideji
+1,Hidekazu
+1,Hideki
+1,Hidemaro
+1,Hidemasa
+1,Hidemi
+1,Hidemitsu
+1,Hidenobu
+1,Hidenori
+1,Hideo
+1,Hideomi
+1,Hideshi
+1,Hidetada
+1,Hidetaka
+1,Hideto
+1,Hidetoshi
+1,Hidetsugu
+1,Hideya
+1,Hideyo
+1,Hideyoshi
+1,Hideyuki
+1,Hiro
+1,Hiroaki
+1,Hirofumi
+1,Hirohide
+1,Hirohisa
+1,Hiroji
+1,Hirokatsu
+1,Hirokazu
+1,Hiroki
+1,Hirokuni
+1,Hiromasa
+1,Hiromichi
+1,Hiromitsu
+1,Hiromori
+1,Hiromoto
+1,Hironari
+1,Hironobu
+1,Hironori
+1,Hiroo
+1,Hirooki
+1,Hiroomi
+1,Hiroshi
+1,Hiroshige
+1,Hirotaka
+1,Hirotami
+1,Hiroto
+1,Hirotoki
+1,Hirotomo
+1,Hirotoshi
+1,Hirotsugu
+1,Hiroya
+1,Hiroyasu
+1,Hiroyoshi
+1,Hiroyuki
+1,Hisaharu
+1,Hisahito
+1,Hisaichi
+1,Hisaki
+1,Hisamitsu
+1,Hisamoto
+1,Hisanobu
+1,Hisanori
+1,Hisao
+1,Hisashi
+1,Hisataka
+1,Hisateru
+1,Hisato
+1,Hisatsugu
+1,Hisayasu
+1,Hisayoshi
+1,Hisayuki
+1,Hitoshi
+1,Hokuto
+1,Hozumi
+1,Ichiei
+1,Ichirō
+1,Ichizō
+1,Iehira
+1,Iehiro
+1,Iehisa
+1,Iemasa
+1,Iemon
+1,Iesada
+1,Ikki
+1,Ikko
+1,Ikuo
+1,Ikurō
+1,Inasa
+1,Ippei
+1,Isami
+1,Isamu
+1,Isao
+1,Issei
+1,Isshō
+1,Itaru
+1,Itsuo
+1,Itsurō
+1,Iwao
+1,Jiichirō
+1,Jin
+1,Jin'ichi
+1,Jinpachi
+1,Jinzaburō
+1,Jiro
+1,Jirokichi
+1,Jo
+1,Jōichirō
+1,Joji
+1,Jōkichi
+1,Jōtarō
+1,Jūbei
+1,Jūkichi
+1,Jun'ichi
+1,Jun'ichirō
+1,Junji
+1,Junki
+1,Junnosuke
+1,Junpei
+1,Junto
+1,Jun'ya
+1,Junzō
+1,Jūshirō
+1,Jūtarō
+1,Jūzō
+1,Kagemori
+1,Kagenori
+1,Kagetaka
+1,Kai
+1,Kaichi
+1,Kaii
+1,Kaiji
+1,Kaisei
+1,Kaito
+1,Kakichi
+1,Kaku
+1,Kakuji
+1,Kakutarō
+1,Kamon
+1,Kanehira
+1,Kanehiro
+1,Kanehisa
+1,Kanemaru
+1,Kanematsu
+1,Kanemoto
+1,Kanesuke
+1,Kanetake
+1,Kaneto
+1,Kanetsugu
+1,Kaneyoshi
+1,Kan'ichi
+1,Kanji
+1,Kankuro
+1,Kansuke
+1,Kanta
+1,Kantarō
+1,Katsuaki
+1,Katsuhiko
+1,Katsuhiro
+1,Katsuhisa
+1,Katsuhito
+1,Katsuji
+1,Katsuki
+1,Katsukiyo
+1,Katsumasa
+1,Katsumoto
+1,Katsunaga
+1,Katsunari
+1,Katsunori
+1,Katsunosuke
+1,Katsuo
+1,Katsushi
+1,Katsusuke
+1,Katsutarō
+1,Katsuteru
+1,Katsutomo
+1,Katsutoshi
+1,Katsuya
+1,Katsuyoshi
+1,Katsuyuki
+1,Katsuzō
+1,Kazuaki
+1,Kazufumi
+1,Kazuharu
+1,Kazuhiko
+1,Kazuhiro
+1,Kazuhisa
+1,Kazuhito
+1,Kazuki
+1,Kazuma
+1,Kazumasa
+1,Kazumichi
+1,Kazunari
+1,Kazunori
+1,Kazuo
+1,Kazuoki
+1,Kazurō
+1,Kazushi
+1,Kazushige
+1,Kazutaka
+1,Kazuto
+1,Kazutoki
+1,Kazutoshi
+1,Kazuya
+1,Kazuyasu
+1,Kazuyoshi
+1,Kazuyuki
+1,Keigo
+1,Keiichi
+1,Keiichirō
+1,Keiji
+1,Keijirō
+1,Keiju
+1,Keiki
+1,Keinosuke
+1,Keishi
+1,Keisuke
+1,Keita
+1,Keizaburō
+1,Keizō
+1,Ken
+1,Ken'ichi
+1,Ken'ya
+1,Kengo
+1,Ken'ichirō
+1,Kenji
+1,Kenjirō
+1,Kenki
+1,Kenkichi
+1,Kenrō
+1,Kensaku
+1,Kensei
+1,Kenshi
+1,Kenshin
+1,Kensuke
+1,Kenta
+1,Kentarō
+1,Kento
+1,Ken'yū
+1,Kenzo
+1,Kesao
+1,Kihachi
+1,Kihachirō
+1,Kihei
+1,Kiichi
+1,Kiichirō
+1,Kikuo
+1,Kimihiro
+1,Kimio
+1,Kimitoshi
+1,Kimiya
+1,Kin'ichi
+1,Kin'ichirō
+1,Kinji
+1,Kinjirō
+1,Kinsuke
+1,Kintaro
+1,Kin'ya
+1,Kisaburō
+1,Kisaku
+1,Kishio
+1,Kishō
+1,Kiyoaki
+1,Kiyofumi
+1,Kiyohide
+1,Kiyohiko
+1,Kiyohiro
+1,Kiyoji
+1,Kiyokazu
+1,Kiyomitsu
+1,Kiyomoto
+1,Kiyonari
+1,Kiyonori
+1,Kiyoo
+1,Kiyoshi
+1,Kiyosue
+1,Kiyotaka
+1,Kiyotake
+1,Kiyoto
+1,Kiyoyuki
+1,Kōdai
+1,Kogo
+1,Kogorō
+1,Kōhei
+1,Kōichi
+1,Koichiro
+1,Kōji
+1,Kojiro
+1,Kōki
+1,Kōkichi
+1,Kōnosuke
+1,Korechika
+1,Korekiyo
+1,Kōrō
+1,Kosaburo
+1,Kōsaku
+1,Kōsei
+1,Koshi
+1,Kōshirō
+1,Koson
+1,Kōsuke
+1,Kōta
+1,Kotaro
+1,Kou
+1,Kouki
+1,Koya
+1,Kōyō
+1,Kōzaburō
+1,Kōzō
+1,Kumatarō
+1,Kuniaki
+1,Kunihiko
+1,Kunihiro
+1,Kunihisa
+1,Kunimitsu
+1,Kunio
+1,Kunishige
+1,Kunitake
+1,Kuniyoshi
+1,Kuniyuki
+1,Kuranosuke
+1,Kusuo
+1,Kyōgo
+1,Kyōhei
+1,Kyōichi
+1,Kyōji
+1,Kyōsuke
+1,Kyukichi
+1,Mahiro
+1,Mahito
+1,Makio
+1,Makito
+1,Mamoru
+1,Manabu
+1,Manato
+1,Manjirō
+1,Mantarō
+1,Mareo
+1,Masaaki
+1,Masabumi
+1,Masachika
+1,Masafumi
+1,Masaharu
+1,Masahide
+1,Masahiko
+1,Masahiro
+1,Masahisa
+1,Masahito
+1,Masaichi
+1,Masaie
+1,Masaji
+1,Masakage
+1,Masakata
+1,Masakatsu
+1,Masakazu
+1,Masakichi
+1,Masakoto
+1,Masakuni
+1,Masamichi
+1,Masamitsu
+1,Masamori
+1,Masamoto
+1,Masamune
+1,Masamura
+1,Masanaga
+1,Masanao
+1,Masanari
+1,Masanobu
+1,Masanori
+1,Masanosuke
+1,Masao
+1,Masaomi
+1,Masaru
+1,Masasada
+1,Masashi
+1,Masashige
+1,Masataka
+1,Masatake
+1,Masatane
+1,Masateru
+1,Masato
+1,Masatomi
+1,Masatomo
+1,Masatoshi
+1,Masatsugu
+1,Masatsune
+1,Masaya
+1,Masayoshi
+1,Masayuki
+1,Masazumi
+1,Masujirō
+1,Masuo
+1,Masuzō
+1,Matabei
+1,Matsuchi
+1,Matsuki
+1,Matsuo
+1,Matsushige
+1,Michiaki
+1,Michiharu
+1,Michihiko
+1,Michihiro
+1,Michihisa
+1,Michinori
+1,Michio
+1,Michirō
+1,Michitaka
+1,Michitarō
+1,Michiya
+1,Michiyoshi
+1,Mikio
+1,Mikito
+1,Mikiya
+1,Mikuni
+1,Mineichi
+1,Mineo
+1,Minoru
+1,Mitsuaki
+1,Mitsugi
+1,Mitsugu
+1,Mitsuharu
+1,Mitsuhide
+1,Mitsuhiko
+1,Mitsuhira
+1,Mitsuhiro
+1,Mitsuhisa
+1,Mitsumasa
+1,Mitsumori
+1,Mitsunobu
+1,Mitsunori
+1,Mitsuo
+1,Mitsuomi
+1,Mitsushige
+1,Mitsusuke
+1,Mitsutaka
+1,Mitsutarō
+1,Mitsuteru
+1,Mitsutoshi
+1,Mitsuyasu
+1,Mitsuyo
+1,Mitsuyoshi
+1,Mitsuyuki
+1,Mitsuzō
+1,Mochiaki
+1,Mokichi
+1,Morihiko
+1,Morihiro
+1,Morikazu
+1,Morimasa
+1,Morio
+1,Morishige
+1,Moritaka
+1,Moriyasu
+1,Mosuke
+1,Motoaki
+1,Motofumi
+1,Motoharu
+1,Motohiko
+1,Motohira
+1,Motohiro
+1,Motoichi
+1,Motojirō
+1,Motokazu
+1,Motoki
+1,Motomu
+1,Motonobu
+1,Motoo
+1,Motoshi
+1,Motoshige
+1,Motosuke
+1,Mototada
+1,Mototsugu
+1,Motoyasu
+1,Motoyoshi
+1,Motoyuki
+1,Motozane
+1,Mukuro
+1,Munehiro
+1,Munehisa
+1,Munemori
+1,Munenobu
+1,Munenori
+1,Muneo
+1,Muneshige
+1,Munetaka
+1,Munetoki
+1,Munetoshi
+1,Muneyoshi
+1,Murashige
+1,Musashi
+1,Mutsuhiko
+1,Mutsuki
+1,Mutsuo
+1,Nagaharu
+1,Nagahide
+1,Nagamasa
+1,Nagamichi
+1,Naganao
+1,Naganori
+1,Nagatoki
+1,Nagatomo
+1,Nagayasu
+1,Namio
+1,Nankichi
+1,Naofumi
+1,Naoharu
+1,Naohiko
+1,Naohiro
+1,Naohisa
+1,Naohito
+1,Naoji
+1,Naokatsu
+1,Naoki
+1,Naomasa
+1,Naomichi
+1,Naomori
+1,Naonobu
+1,Naoshi
+1,Naotaka
+1,Naotake
+1,Naoto
+1,Naoya
+1,Naoyuki
+1,Naozumi
+1,Nariaki
+1,Nariakira
+1,Narihiro
+1,Naritaka
+1,Nariyasu
+1,Nariyuki
+1,Naruhisa
+1,Naruhito
+1,Naruki
+1,Naruyuki
+1,Natsuhiko
+1,Noboru
+1,Nobuaki
+1,Nobuatsu
+1,Nobuharu
+1,Nobuhiko
+1,Nobuhiro
+1,Nobuhisa
+1,Nobuhito
+1,Nobukatsu
+1,Nobukazu
+1,Nobuki
+1,Nobumasa
+1,Nobumitsu
+1,Nobumoto
+1,Nobunaga
+1,Nobunao
+1,Nobunari
+1,Nobuo
+1,Nobusada
+1,Nobusuke
+1,Nobutada
+1,Nobutaka
+1,Nobuteru
+1,Nobutoki
+1,Nobutomo
+1,Nobutoshi
+1,Nobutsuna
+1,Nobuyasu
+1,Nobuyoshi
+1,Nobuyuki
+1,Nobuzane
+1,Noriaki
+1,Norifumi
+1,Norifusa
+1,Norihide
+1,Norihiko
+1,Norihiro
+1,Norihisa
+1,Norihito
+1,Norikazu
+1,Norimasa
+1,Norimichi
+1,Norimoto
+1,Norio
+1,Noritoshi
+1,Noriyasu
+1,Noriyoshi
+1,Noriyuki
+1,Nozomu
+1,Okimoto
+1,Osamu
+1,Otohiko
+1,Raizo
+1,Reiichi
+1,Reiji
+1,Reizō
+1,Rentarō
+1,Reo
+1,Riichi
+1,Riki
+1,Rikichi
+1,Rikio
+1,Rikiya
+1,Rinshō
+1,Risaburō
+1,Ritsuo
+1,Rokurō
+1,Ryōga
+1,Ryōhei
+1,Ryōichi
+1,Ryōji
+1,Ryōki
+1,Ryōkichi
+1,Ryōma
+1,Ryōsei
+1,Ryōsuke
+1,Ryōta
+1,Ryōtarō
+1,Ryōya
+1,Ryōzō
+1,Ryu
+1,Ryūga
+1,Ryūhei
+1,Ryūichi
+1,Ryūji
+1,Ryūjirō
+1,Ryūki
+1,Ryūma
+1,Ryūnosuke
+1,Ryūsaku
+1,Ryūsei
+1,Ryūshi
+1,Ryūsuke
+1,Ryūta
+1,Ryūtarō
+1,Ryūya
+1,Ryūzō
+1,Saburō
+1,Sachihiko
+1,Sachio
+1,Sadaaki
+1,Sadaharu
+1,Sadahiko
+1,Sadahiro
+1,Sadakatsu
+1,Sadakazu
+1,Sadanaga
+1,Sadao
+1,Sadatoshi
+1,Sadayoshi
+1,Sadayuki
+1,Sadazane
+1,Saiichi
+1,Sakichi
+1,Sakutarō
+1,Sanji
+1,Sankichi
+1,Sanshiro
+1,Satonari
+1,Satoru
+1,Satoshi
+1,Satsuo
+1,Sawao
+1,Seigen
+1,Seigo
+1,Seihō
+1,Seiichi
+1,Seiichirō
+1,Seiji
+1,Seijin
+1,Seijirō
+1,Seiki
+1,Seikichi
+1,Seimei
+1,Seishi
+1,Seishirō
+1,Seitarō
+1,Seiya
+1,Seizō
+1,Sendai
+1,Senkichi
+1,Setsuji
+1,Setsuo
+1,Setsurō
+1,Shichirō
+1,Shigeaki
+1,Shigefumi
+1,Shigeharu
+1,Shigehiro
+1,Shigehisa
+1,Shigekazu
+1,Shigeki
+1,Shigemasa
+1,Shigematsu
+1,Shigemi
+1,Shigemitsu
+1,Shigemori
+1,Shigemoto
+1,Shigenaga
+1,Shigenobu
+1,Shigenori
+1,Shigeo
+1,Shigeru
+1,Shigetada
+1,Shigetaka
+1,Shigeto
+1,Shigetoshi
+1,Shigetsugu
+1,Shigeyasu
+1,Shigeyoshi
+1,Shigeyuki
+1,Shikō
+1,Shin
+1,Shingo
+1,Shin'ichi
+1,Shin'ichirō
+1,Shinji
+1,Shinjirō
+1,Shinjō
+1,Shinkichi
+1,Shinnosuke
+1,Shinpachi
+1,Shinpei
+1,Shinsaku
+1,Shinsuke
+1,Shinta
+1,Shintarō
+1,Shinya
+1,Shinzō
+1,Shiro
+1,Shiryu
+1,Shizuo
+1,Shō
+1,Shogo
+1,Shōhei
+1,Shōichi
+1,Shōichirō
+1,Shōji
+1,Shōjirō
+1,Shōma
+1,Shōsuke
+1,Shōta
+1,Shōtarō
+1,Shōya
+1,Shōzō
+1,Shu
+1,Shūgo
+1,Shūichi
+1,Shūji
+1,Shuko
+1,Shun
+1,Shungo
+1,Shun'ichi
+1,Shun'ichirō
+1,Shunji
+1,Shunki
+1,Shunkichi
+1,Shunpei
+1,Shunsaku
+1,Shunsui
+1,Shunsuke
+1,Shunta
+1,Shuntarō
+1,Shun'ya
+1,Shunzō
+1,Shūsaku
+1,Shūsuke
+1,Shūta
+1,Shuto
+1,Shūhei
+1,Shuya
+1,Shūzō
+1,Sō
+1,Sōgen
+1,Sōichi
+1,Sōichirō
+1,Sōji
+1,Sōma
+1,Sōnosuke
+1,Sōsuke
+1,Sota
+1,Sōtarō
+1,Suehiro
+1,Suenaga
+1,Suguru
+1,Sukehiro
+1,Sukemasa
+1,Sukenobu
+1,Suketoshi
+1,Suketsugu
+1,Sukeyuki
+1,Sumihiro
+1,Sumimoto
+1,Sumio
+1,Sumiyoshi
+1,Sunao
+1,Susumu
+1,Sutemi
+1,Tadaaki
+1,Tadachika
+1,Tadafumi
+1,Tadaharu
+1,Tadahiko
+1,Tadahiro
+1,Tadahito
+1,Tadakatsu
+1,Tadamasa
+1,Tadami
+1,Tadamitsu
+1,Tadamori
+1,Tadanaga
+1,Tadanao
+1,Tadanari
+1,Tadanobu
+1,Tadanori
+1,Tadao
+1,Tadaoki
+1,Tadashi
+1,Tadataka
+1,Tadateru
+1,Tadatomo
+1,Tadatoshi
+1,Tadatsugu
+1,Tadatsune
+1,Tadayo
+1,Tadayoshi
+1,Tadayuki
+1,Taichi
+1,Taichirō
+1,Taiga
+1,Taiichi
+1,Taiji
+1,Taiki
+1,Taisei
+1,Taishi
+1,Taishin
+1,Taisuke
+1,Taiyō
+1,Taizō
+1,Taka
+1,Takaaki
+1,Takafumi
+1,Takaharu
+1,Takahide
+1,Takahiko
+1,Takahira
+1,Takahiro
+1,Takahisa
+1,Takahito
+1,Takaji
+1,Takakazu
+1,Takaki
+1,Takamasa
+1,Takamitsu
+1,Takamori
+1,Takanao
+1,Takanobu
+1,Takanori
+1,Takao
+1,Takashi
+1,Takasuke
+1,Takatō
+1,Takatomi
+1,Takatoshi
+1,Takatsugu
+1,Takauji
+1,Takaya
+1,Takayasu
+1,Takayoshi
+1,Takayuki
+1,Takeaki
+1,Takefumi
+1,Takeharu
+1,Takehiko
+1,Takehiro
+1,Takehisa
+1,Takehito
+1,Takeichi
+1,Takejirō
+1,Takenaga
+1,Takenaka
+1,Takenori
+1,Takeo
+1,Takerō
+1,Takeru
+1,Takeshi
+1,Takeshirō
+1,Taketo
+1,Taketora
+1,Taketoshi
+1,Takeya
+1,Takeyoshi
+1,Takeyuki
+1,Takezō
+1,Taku
+1,Takuji
+1,Takuma
+1,Takumi
+1,Takumu
+1,Takuo
+1,Takurō
+1,Takuto
+1,Takuya
+1,Takuzō
+1,Tamio
+1,Tamotsu
+1,Tarō
+1,Tasuku
+1,Tateo
+1,Tatsuaki
+1,Tatsuhiko
+1,Tatsuhiro
+1,Tatsuhito
+1,Tatsuji
+1,Tatsuma
+1,Tatsumi
+1,Tatsunori
+1,Tatsunosuke
+1,Tatsuo
+1,Tatsurō
+1,Tatsushi
+1,Tatsuya
+1,Tatsuyoshi
+1,Tatsuyuki
+1,Tatsuzō
+1,Teiichi
+1,Teiji
+1,Teijirō
+1,Teiko
+1,Teizō
+1,Teppei
+1,Teruaki
+1,Teruhiko
+1,Teruhisa
+1,Teruichi
+1,Teruki
+1,Terumasa
+1,Terunobu
+1,Teruo
+1,Teruyasu
+1,Teruyoshi
+1,Teruyuki
+1,Tetsu
+1,Tetsuharu
+1,Tetsuhiro
+1,Tetsuji
+1,Tetsumasa
+1,Tetsunosuke
+1,Tetsuo
+1,Tetsurō
+1,Tetsushi
+1,Tetsutarō
+1,Tetsuya
+1,Tetsuzō
+1,Tetta
+1,Togo
+1,Tōichi
+1,Tokihiko
+1,Tokio
+1,Tokuji
+1,Tokujirō
+1,Tokuo
+1,Tokurō
+1,Tokutarō
+1,Tokuzō
+1,Tomiaki
+1,Tomio
+1,Tomoaki
+1,Tomochika
+1,Tomoharu
+1,Tomohide
+1,Tomohiko
+1,Tomohiro
+1,Tomohisa
+1,Tomohito
+1,Tomoji
+1,Tomokazu
+1,Tomoki
+1,Tomomichi
+1,Tomonaga
+1,Tomonobu
+1,Tomonori
+1,Tomoo
+1,Tomotaka
+1,Tomoya
+1,Tomoyasu
+1,Tomoyoshi
+1,Tomoyuki
+1,Torahiko
+1,Toranosuke
+1,Toru
+1,Toshi
+1,Toshiaki
+1,Toshiei
+1,Toshifumi
+1,Toshiharu
+1,Toshihide
+1,Toshihiko
+1,Toshihiro
+1,Toshihisa
+1,Toshihito
+1,Toshiji
+1,Toshikatsu
+1,Toshikazu
+1,Toshiki
+1,Toshimasa
+1,Toshimichi
+1,Toshimitsu
+1,Toshinaga
+1,Toshinao
+1,Toshinari
+1,Toshinobu
+1,Toshinori
+1,Toshio
+1,Toshirō
+1,Toshitada
+1,Toshitaka
+1,Toshitsugu
+1,Toshiya
+1,Toshiyasu
+1,Toshiyoshi
+1,Toshiyuki
+1,Toshizō
+1,Toya
+1,Toyoaki
+1,Toyohiko
+1,Toyokazu
+1,Toyoki
+1,Toyomatsu
+1,Toyoshige
+1,Toyotarō
+1,Toyozō
+1,Tsugio
+1,Tsugumasa
+1,Tsugumichi
+1,Tsugutoshi
+1,Tsuneharu
+1,Tsunehiko
+1,Tsunehisa
+1,Tsunejirō
+1,Tsunekazu
+1,Tsunemi
+1,Tsunenobu
+1,Tsunenori
+1,Tsuneo
+1,Tsuneyoshi
+1,Tsuneyuki
+1,Tsutomu
+1,Tsutsumi
+1,Tsuyoshi
+1,Umanosuke
+1,Umeji
+1,Uryū
+1,Wataru
+1,Yahiko
+1,Yahiro
+1,Yamato
+1,Yanosuke
+1,Yashiro
+1,Yasuaki
+1,Yasufumi
+1,Yasuharu
+1,Yasuhide
+1,Yasuhiko
+1,Yasuhiro
+1,Yasuhisa
+1,Yasuji
+1,Yasujirō
+1,Yasukazu
+1,Yasuki
+1,Yasumasa
+1,Yasumi
+1,Yasumichi
+1,Yasunari
+1,Yasunobu
+1,Yasunori
+1,Yasuo
+1,Yasuomi
+1,Yasurō
+1,Yasushi
+1,Yasutaka
+1,Yasutake
+1,Yasutarō
+1,Yasutomo
+1,Yasutoshi
+1,Yasuyoshi
+1,Yasuyuki
+1,Yatarō
+1,Yawara
+1,Yō
+1,Yōhei
+1,Yoichi
+1,Yōichi
+1,Yōichirō
+1,Yōji
+1,Yōjirō
+1,Yorimitsu
+1,Yorinobu
+1,Yorishige
+1,Yoritaka
+1,Yoritsugu
+1,Yoritsune
+1,Yoriyuki
+1,Yoshi
+1,Yoshiaki
+1,Yoshifumi
+1,Yoshiharu
+1,Yoshihide
+1,Yoshihiko
+1,Yoshihiro
+1,Yoshihisa
+1,Yoshihito
+1,Yoshiie
+1,Yoshikane
+1,Yoshikatsu
+1,Yoshikazu
+1,Yoshiki
+1,Yoshikiyo
+1,Yoshikuni
+1,Yoshimasa
+1,Yoshimatsu
+1,Yoshimichi
+1,Yoshimitsu
+1,Yoshimori
+1,Yoshimoto
+1,Yoshinaga
+1,Yoshinao
+1,Yoshinari
+1,Yoshinobu
+1,Yoshinori
+1,Yoshio
+1,Yoshirō
+1,Yoshisada
+1,Yoshishige
+1,Yoshisuke
+1,Yoshitaka
+1,Yoshitake
+1,Yoshitarō
+1,Yoshiteru
+1,Yoshito
+1,Yoshitomo
+1,Yoshitsugu
+1,Yoshiya
+1,Yoshiyasu
+1,Yoshiyuki
+1,Yoshizumi
+1,Yōsuke
+1,Yōta
+1,Yōzō
+1,Yūdai
+1,Yugi
+1,Yugo
+1,Yūhei
+1,Yuhi
+1,Yuichi
+1,Yūichirō
+1,Yūji
+1,Yūjirō
+1,Yūkichi
+1,Yukiharu
+1,Yukihiko
+1,Yukihiro
+1,Yukimasa
+1,Yukimura
+1,Yukinobu
+1,Yukinori
+1,Yukio
+1,Yukishige
+1,Yukitaka
+1,Yukito
+1,Yukitoshi
+1,Yukiya
+1,Yukiyoshi
+1,Yuma
+1,Yūsaku
+1,Yūsei
+1,Yūshi
+1,Yūsuke
+1,Yūta
+1,Yutaka
+1,Yūtarō
+1,Yūto
+1,Yūya
+1,Yūzō
+1,Yuzuru
+1,Zenji
+1,Zenjirō
+1,Zenkichi
+1,Zentarō
+1,Zenzō
+
+# Mutations
+
+;mutation
+1,[mental mutation]
+1,[physical mutation]
+
+# Mental Mutations
+
+;mental mutation
+1,Animal Friendship
+1,Animal Telepathy
+1,Blur
+1,Confusion
+1,Cloak of Darkness
+1,Counteract Poison Other
+1,Control Mind
+1,Emp Blast
+1,Energy Drain
+1,Eye Eruption
+1,Fear Glance
+1,Freeze Metal
+1,Heal Other
+1,Heat Metal
+1,Invisibility
+1,Mass Control Mind
+1,Mind Death
+1,Mind Freeze
+1,Mind Gate
+1,Mind Melt
+1,Mind Shield
+1,Mirror Mind
+1,Paralyzing Touch
+1,Plant Friendship
+1,Plant Telepathy
+1,Resist Cold
+1,Resist Heat
+1,Sense Animal
+1,Sense Foe
+1,Sense Mutant
+1,Slow Motion
+1,Telekinesis
+1,Telepathic Projection
+1,Teleport
+
+# Physical Mutations
+
+;physical mutation
+1,Acid Touch
+1,Cat Eyes
+1,Chameleon
+1,Counteract Poison Self
+1,Crushing Tail
+1,Electric Touch
+1,Exoskeleton
+1,Far Hearing
+1,Far Sight
+1,Fire Breath
+1,Gills
+1,Glue Touch
+1,Heal Self
+1,Poison Resist
+1,Poison Vomit
+1,Prehensile Tail
+1,Radiation Vomit
+1,Reflect Light
+1,Shape Alter
+1,Spit Web
+1,Stoneskin
+1,Tentacles
+1,Unihorn
+1,Vice Grip
+1,Wings
+
+# Plant Mutations
+
+;plant mutation
+1,Accumulated Resistance
+1,Acid Sap
+1,Animal Telepathy
+1,Carnivore
+1,Cellulose Armor
+1,Cellulose Reflection
+1,Constrictive Tendrils
+1,Electric Shock
+1,Exploding Fruit
+1,Favorite Fragrance
+1,Free Movement
+1,Irradiated Foliage
+1,Paralytic Poison
+1,Parasite
+1,Plant Chameleon
+1,Plant Telepathy
+1,Poison Sap
+1,Poison Spore
+1,Projectile Thorns
+1,Shriek
+1,Tendrils
+1,Vegetal Weapons
+
+# Equipment
+
+;weapon
+1,[future weapon]
+1,[future ranged weapons]
+3,[medieval weapon]
+
+;future weapon
+1,laser pistol (4d6) 150m, with [1d10] charges
+1,laser rifle (5d6) 450m, with [1d20] charges
+2,para pistol stun (2d4) rounds 75m, with [1d10] charges
+2,para rifle stun (2d4) rounds 150m, with [1d20] charges
+1,rail pistol (6d6) 650m, with [1d10] charges
+1,rail rifle (7d6) 1000m, with [1d20] charges
+1,para baton stun (2d6), stun (1d6) rounds
+5,auto pistol (1d10) thrice a round, 200m, with [1d10] charges
+5,auto rifle (1d12) thrice a round, 350m, with [1d20] charges
+1,radiation pistol Class 4 radiation (4d6, save for half) 25m, with [1d10] charges
+1,radiation rifle Class 5 radiation (5d6, save for half) 50m, with [1d20] charges
+1,plasma rifle (4d6) 300m, plus (4d6) explosion in 10m radius, with [1d20] charges
+1,plasma pistol (4d6) 150m, plus (3d6) explosion in 10m radius, with [1d10] charges
+1,EMP grenade (5d8) robots/androids 25m
+1,[1d5+1] EMP grenades (5d8) robots/androids 25m
+1,EMP pistol (4d8) robots/androids 50m, with [1d10] charges
+1,EMP rifle (5d8) robots/androids 100m, with [1d20] charges
+1,frag grenade (4d4), 10 meter radius
+5,[1d5+1] frag grenades (4d4), 10 meter radius
+1,para grenade (2d6) stun (2d4) rounds, 10m radius
+1,[1d5+1] para grenades (2d6) stun (2d4) rounds, 10m radius
+1,atomic glass dagger (2d4)
+1,atomic glass sword (2d8)
+1,atomic glass club (2d6)
+1,atomic glass mace (2d6)
+1,atomic glass spear (2d6)
+1,atomic glass halberd (2d10)
+1,atomic glass poleaxe (2d8)
+1,atomic glass axe (2d8)
+1,atomic glass arrows (2d6)
+
+;medieval weapon
+3,[medieval melee weapon]
+1,[medieval ranged weapon]
+
+;medieval melee weapon
+5,primitive spear (1d6) 25m
+4,stone club (1d6)
+3,primitive dagger (1d4)
+2,rock mace (1d6)
+1,stone axe (1d8)
+1,primitive sword (1d8)
+1,primitive halberd (1d10)
+1,primitive poleaxe (1d8)
+1,primitive quarterstaff (1d6)
+
+;medieval ranged weapon
+2,[2d3] throwing knives (1d4) 10m
+2,simple bow and [2d10] arrows (1d6) 50m
+1,simple crossbow and [2d6] bolts (2d4) 75m
+3,simple sling and [2d6] bullets (1d4) 40m
+2,[2d3] darts (1d3) 10m
+
+;future ranged weapons
+1,[2d3] atomic glass throwing knives (2d4) 10m
+1,atomic glass bow and [2d10] atomic glass arrows (2d6) 75m
+1,atomic glass crossbow and [2d6] atomic glass bolts (3d4) 125m
+1,sling and [2d6] atomic glass bullets (2d4) 60m
+1,[2d3] atomic glass darts (1d6) 20m
+
+;armor
+1,[future armor]
+3,[medieval armor]
+
+;medieval armor
+1,leather armor (AC 8)
+1,studded leather (AC 7)
+1,chain mail (AC 5)
+1,plate mail (AC 3)
+1,primitive shield (AC -1)
+1,leather helm (AC -1)
+1,chain helm (AC -1)
+1,plate helm (AC -1)
+
+;future armor
+1,light power armor (AC 1) MV 36m, laser pistol (4d6) 150m, with [1d10] charges, EMP pistol (4d8) robots/androids 50m, with [1d10] charges, para grenade launcher (2d6) 50m, stun (2d4) rounds, 10m radius, with [2d4] grenades
+1,medium power armor (AC 0) MV 55m, laser rifle (5d6) 450m, with [1d20] charges, EMP rifle (5d8) robots/androids 100m, with [1d20] charges, frag grenade launcher (4d4) 50m, 10 meter radius, with [2d4] grenades
+1,heavy power armor (AC -1) MV 72m, rail rifle (7d6) 1000m, plasma rifle (4d6) 300m, plus (4d6) explosion in 10m radius, with [1d20] charges, frag grenade launcher (4d4) 100m, 10 meter radius, with [2d6] grenades
+1,carapace armor (AC 5)
+1,plasteel armor (AC 2)
+1,carapace helm (AC -1)
+1,atomic glass helm (AC -1)
+1,plasteel helm (AC -1)
+1,atomic glass armor (AC 3)
+
+;power sources
+1,fusion battery
+1,hydrogen cell
+1,plutonium pack
+
+# this does not match what people are carrying!
+;ammunition stash
+1,[ammunition]
+1,[ammunition], and [ammunition]
+1,[ammunition], [ammunition], and [ammunition]
+1,[ammunition], [ammunition], [ammunition], and [ammunition]
+1,[ammunition], [ammunition], [ammunition], [ammunition], and [ammunition]
+1,[ammunition], [ammunition], [ammunition], [ammunition], [ammunition], and [ammunition]
+
+;ammunition
+1,laser rifle mag with [1d20] charges
+1,laser pistol mag with [1d10] charges
+2,para rifle mag with [1d20] charges
+2,para pistol mag with [1d10] charges
+1,rail rifle mag with [1d20] charges
+1,rail pistol mag with [1d10] charges
+1,laser rifle mag with [1d20] charges
+1,laser pistol mag with [1d10] charges
+4,auto rifle mag with [1d20] charges
+5,auto pistol mag with [1d10] charges
+1,radiation rifle mag with [1d20] charges
+1,radiation pistol mag with [1d10] charges
+1,plasma rifle mag with [1d20] charges
+1,plasma pistol mag with [1d10] charges
+1,EMP rifle mag with [1d20] charges
+1,EMP pistol mag with [1d10] charges
+
+# Books
+
+;book
+1,[book 1]
+1,[book 2]
+# TODO add more books
+
+# We have two kinds of books here so that we can quickly generate two
+# books in a library that cannot be the same.
+
+;book 1
+1,[save science as topic][book title]
+
+;book 2
+1,[save applied science as topic][book title]
+
+;book title
+1,[same topic]
+1,[same topic] For Dummies
+1,[same topic] Basics
+1,An Introduction to [same topic]
+1,The History of [same topic]
+1,Advanced [same topic]
+1,Expert [same topic]
+1,[same topic] For Professionals
+1,Ultimate [same topic]
+1,[same topic]: An Overview
+1,[same topic] In Depth
+1,[same topic] in the Space Age
+1,[same topic] on Alien Worlds
+
+;science
+3,[formal science]
+15,[natural science]
+15,[social science]
+
+;formal science
+1,Logic
+1,Mathematics
+1,Statistics
+
+;natural science
+1,Physics
+1,Chemistry
+1,Biochemistry
+1,Biology
+1,Microbiology
+1,Botany
+1,Zoology
+1,Ethology
+1,Ecology
+1,Geology
+1,Geography
+1,Oceanography
+1,Meteorology
+1,Astronomy
+
+;social science
+1,Sociology
+1,Ethnography
+1,Anthropology
+1,Archaeology
+1,Economics
+1,Linguistics
+1,Management Science
+1,Media Studies
+1,Political Science
+1,Psychology
+1,Philosophy
+1,Ethics
+
+;applied science
+20,[applied physics]
+20,[engineering science]
+3,[medicine]
+1,Business Administration
+1,Jurisprudence
+1,Pedagogy
+
+;medicine
+1,Medicine
+1,Dentistry
+1,Pharmacy
+
+;applied physics
+1,Optics
+1,Quantum Physics
+1,Materials Science
+1,Applied Mechanics
+1,Electronics
+1,Nanotechnology
+1,Microfabrication
+1,Microelectronics
+1,Computing
+1,Photonics
+1,Mechanical Engineering
+1,Electrical Engineering
+1,Nuclear Engineering
+1,Biophysics
+1,Control Theory
+1,Aerodynamics
+1,Energy
+1,Solid-State Physics
+
+;engineering science
+1,Fluid Dynamics
+1,Quantum Physics
+1,Economics
+1,Plasma Physics
+1,Relativity
+1,Solid Mechanics
+1,Operations Research
+1,Quantitative Finance
+1,Information Technology
+1,Information Engineering
+1,Dynamical Systems
+1,Bioengineering
+1,Environmental Engineering
+1,Computational Engineering
+1,Engineering Mathematics
+1,Engineering Statistics
+1,Solid-State Devices
+1,Materials Science
+1,Electromagnetism
+1,Nanoscience
+1,Nanotechnology
+1,Energy
+1,Optics
+
+# Treasure
+
+;computer
+1,n-field generator
+1,ai terminal
+
+;vehicle park
+1,[vehicle]
+1,[2d4] [bike]s
+1,[2d4] [bike]s and a [car]
+1,[2d4] [bike]s and a [truck]
+1,[2d4] [bike]s and [2d2] [car]s
+1,[2d4] [car]s
+1,[2d4] [car]s and a [truck]
+1,[2d4] [bike]s, [2d2] [car]s, and a [truck]
+
+;vehicle
+5,[bike]
+3,[car]
+1,[truck]
+
+;bike
+1,rocket sled
+1,magna cycle
+2,gasoline-powered motorcycle
+
+;car
+2,magna car
+3,gasoline-powered muscle car
+
+;truck
+1,magna truck
+2,gasoline-powered truck
+
+# General
+
+;colour
+1,red
+1,green
+1,blue
+1,purple
+1,pink
+1,neon-pink
+1,ultra-violet
+1,jale
+1,ulfire
+1,cyan
+1,orange
+1,yellow
+1,brown
+1,black
+1,white
+1,dark brown
+1,dirty white
+1,light blue
+1,navy blue
+1,dark blue
+1,bright orange
+1,dull orange
+1,bright red
+1,dark red
+1,dull red
+1,bright yellow
+1,bright purple
+1,dark purple
+1,crimson
+1,dark green
+1,bright green
+1,forest green
+1,dirty yellow
+
+;colour prefix
+1,[capitalize colour]
+
+;war prefix
+1,Battle
+1,Bone
+1,Boiling
+1,Blood
+1,Corpse
+1,Dead
+1,Massacre
+1,War
+1,Old
+1,Long
+
+;water prefix
+1,Undrinkable
+1,Dead Fish
+1,Deep
+1,Loud
+
+;fecal prefix
+1,Shit
+1,Fecal
+
+;chemical prefix
+1,Acetate
+1,Acid
+1,Lye
+1,Noxious
+1,Poison
+1,Alkaline
+1,Basic
+1,Oxide
+1,Agent
+1,Compound
+1,Cyanide
+1,Formaldehyde
+1,Ethyl
+1,Sulfide
+1,Ether
+1,Methyl
+
+;climate prefix
+1,Cold
+1,Hot
+1,Blazing
+1,Fiery
+1,Scorching
+1,Muggy
+1,Steamy
+1,Sticky
+1,Damp
+1,Arid
+1,Suffocating
+1,Clear
+1,Mild
+1,Temperate
+1,Crisp
+1,Refreshing
+1,Clammy
+1,Bracing
+1,Gloomy
+1,Bleak
+1,Dreary
+1,Icy
+1,Glacial
+1,Bone-chilling
+1,Unforgiving
+1,Raw
+1,Harsh
+1,Biting
+1,Violent
+1,Deluge
+1,Rainy
+1,Foggy
+1,Sunny
+
+;element
+1,Argon
+1,Arsenic
+1,Barium
+1,Beryllium
+1,Cadmium
+1,Calcium
+1,Cerium
+1,Chlorine
+1,Chromium
+1,Copper
+1,Dysprosium
+1,Erbium
+1,Gadolinium
+1,Hafnium
+1,Helium
+1,Iron
+1,Krypton
+1,Lead
+1,Magnesium
+1,Mercury
+1,Molybdenum
+1,Neodymium
+1,Neon
+1,Nickel
+1,Osmium
+1,Palladium
+1,Plutonium
+1,Quantum
+1,Ruthenium
+1,Samarium
+1,Selenium
+1,Strontium
+1,Sulphur
+1,Tellurium
+1,Thorium
+1,Tin
+1,Titanium
+1,Tungsten
+1,Uranium
+1,Xenon
+1,Ytterbium
+1,Zinc
+1,Zirconium
+
+;direction
+1,north
+1,south
+1,east
+1,west
+1,northwest
+1,northeast
+1,southwest
+1,southeast
+# The explanations at the end… big HTML blobs
+
+;END
+1,[physical mutations explained][mental mutations explained][plant mutations explained]
+
+;physical mutations explained
+1,<h2>Physical Mutations</h2><dl><dt>Acid Touch<dd>The mutant can convey a strong acid by touch. The acid will do 1d10 damage for 3 rounds.<dt>Cat Eyes<dd>The mutant is able to see in complete darkness as if it were daylight.<dt>Chameleon<dd>The mutant can change skin color and texture to match the environment. The mutant's skin is permanently bright red.<dt>Counteract Poison Self<dd>The mutant is able to nullify the effects of poison once a day.<dt>Crushing Tail<dd>This swing of this large, hammer-shaped tail will crush an enemy for 1d10 damage within 2 meters in addition to any other attacks.<dt>Electric Touch<dd>The mutant transfers a jolt of current to one target for 1d10 damage, and stuns the target for 1d4 rounds. This current can be transfered through metal. The mutant has no hair.<dt>Exoskeleton<dd>This hardened layer of skin will give the mutant -4 to Armor Class. The mutant's skin is permanently light grey.<dt>Far Hearing<dd>Hearing range is quadrupled. Unfortunately, this makes the ears three times as large.<dt>Far Sight<dd>Vision for the mutant is quadrupled. Unfortunately, this makes the eyes twice as large.<dt>Fire Breath<dd>The mutant breathes a cone of flame that does 3d10 damage to targets within 5 meters. The mutant's breath has a strong sulfur smell.<dt>Gills<dd>The mutant is able to breath underwater indefinitely. The gills are on the neck just below the ears.<dt>Glue Touch<dd>The mutant is able to ooze out a glue-like material from between it's fingers. Only acid or laser weapons can cut through the glue.<dt>Heal Self<dd>The mutant can heal itself for 1d12 hit points three times a day.<dt>Phosphorescent Skin<dd>The mutant can enable or disable a glow to help in dark environments. The mutant's skin is permanently light blue. <dt>Photosynthesis<dd>The mutant gains 1d12 hit points of healing per day if in the full sun for at least 6 hours. The mutant's skin is turned permanently light green.<dt>Poison Resist<dd>Immunity to all poison.<dt>Poison Vomit<dd>The mutant vomits class 1d20 poison up to 10 meters at one target. The mutant's breath smells like death.<dt>Prehensile Tail<dd>This 2 meter tail is able to manipulate objects, fire weapons and swing swords. 1d4 damage if used as a weapon in addition to all other attacks.<dt>Radiation Resist<dd>Immunity to all radiation.<dt>Radiation Vomit<dd>The mutant vomits class 1d10 radioactive phlegm up to 10 meters at one target. The mutant's breath smells like radioactive sludge.<dt>Reflect Light<dd>This causes laser weapons to refract in random directions. The mutant's skin resembles a highly polished mirror.<dt>Shape Alter<dd>The mutant is able to alter their shape to mimic any plantoid/plant/animal/animaloid/humanoid but they can't gain or lose mass. The mutant is covered in fur when not mimicing.<dt>Spit Web<dd>The mutant is able to spit an incredibly sticky web up to 10 meters at one target. The target will be totally disabled. Only acid or laser weapons can eat through the web. The mutant's breath smells like dead insects.<dt>Stoneskin<dd>This hardened layer of skin will give the mutant -6 to Armor Class but movement is halved in combat. The mutant's skin is permanently dark grey.<dt>Tentacles<dd>1d4 two meter long tentacles grow from the mutant's back. The tentacles are prehensile and can fire weapons, swing swords, etc. in addition to any other attacks. 1d4 damage each if used as a bludgeon.<dt>Unihorn<dd>A single horn grows out from the forehead. It is 1.5 meters long and can impale for 1d8 damage within 2 meters in addition to any other attacks.<dt>Vice Grip<dd>The mutants hands become as strong as a robot. Once latched on, the mutant will not let go except upon death. Depending on where the mutant grips this can cause weapons to be dropped, decreased movement, or a quick death due to strangulation.<dt>Wings<dd>The mutant can fly twice it's movement speed and carry up to 25 kg. Any clothing worn must accomodate the wings.<dt>X-ray Vision<dd>A mutant can see silhouettes through all materials except lead. The mutant's eyes are permanently black.</dl>
+
+;mental mutations explained
+1,<h2>Mental Mutations</h2><dl><dt>Animal Friendship<dd>The mutant is friendly to all animals and animaloids.<dt>Animal Telepathy<dd>The mutant can communicate with all animals and animaloids up to 25 meters.<dt>Blur<dd>The mutant is just a blur for 1d4 rounds! All attacks suffer a -5 to hit.<dt>Confusion<dd>All within 10 meters become confused and stop all actions for 1d4 rounds.<dt>Cloak of Darkness<dd>The mutant can hide itself in a sphere of darkness 10 meters in diameter for 1d6 rounds once a day.<dt>Counteract Poison Other<dd>The mutant can counteract poison in another once a day.<dt>Control Mind<dd>If successful the mutant can control one target's mind for 1d4 rounds within 10 meters.<dt>EMP Blast<dd>The mutant detonates an invisible electromagnetic pulse that disables all robots and androids within 15 meters.<dt>Energy Drain<dd>The mutant drains the life energy for 1d12 hit points from one target within 15 meters. The drained energy is added to the mutant's hit points if any hit points are missing.<dt>Eye Eruption<dd>If successful this attacks causes the opponent's eyes to explode within 10 meters causing immediate blindness. <dt>Fear Glance<dd>Once the eyes of this mutant turn red look away! The glance of the mutant is enough to cause one opponent to run as far away from the mutant as possible for 1d4 rounds.<dt>Freeze Metal<dd>The mutant causes all metal to freeze within 10 meters causing 1d4 damage the first round, 1d8 damage the second round, and 1d12 damage the third round. All metal becomes so cold by the fourth round that it must be dropped and may not be used for another three rounds and any robots and androids become permanently frozen and brittle.<dt>Heal Other<dd>The mutant can heal another for 1d12 hit points three times a day.<dt>Heat Metal<dd>The mutant causes all metal to heat up within 10 meters causing 1d4 damage the first round, 1d8 damage the second round, and 1d12 damage the third round. All metal becomes so hot by the fourth round that it must be dropped and may not be used for another three rounds and any robots and androids become permanently molten.<dt>Invisibility<dd>The mutant becomes invisible to all within 10 meters for 1d6 rounds once a day. <dt>Mass Control Mind<dd>The mutant can mind control 1d4 targets for 1d4 rounds within 10 meters.<dt>Mind Death<dd>The mutant inflicts a terrible psychic blow by killing the target's personality thus leaving it to have no sense of self. All movement and attacks cease.<dt>Mind Freeze<dd>Once per day, the mutant can attempt to freeze the mind of one foe within 10 meters. No damage if the saving throw is successful, but instant death if the saving throw fails.<dt>Mind Gate<dd>The attacking mutant's mind gets locked behind the defender's mental gate and may not use any mental mutations for 1d4 rounds.<dt>Mind Melt<dd>Once per day, the mutant can attempt to melt the mind of one foe within 10 meters. No damage if the saving throw is successful, but instant death if the saving throw fails.<dt>Mind Shield<dd>The mutant can protect itself from all mental attacks, but may take no other action except movement.<dt>Mirror Mind<dd>The mutant can reflect any mental attack, but may take no other action except movement.<dt>Paralyzing Touch<dd>Upon touch one opponent falls to the ground alive and aware but unable to move for 1d6 rounds.<dt>Plant Friendship<dd>The mutant is friendly to all plants and plantoids.<dt>Plant Telepathy<dd>The mutant can communicate with all plants and plantoids up to 25 meters.<dt>Resist Cold<dd>The mutant becomes impervious to cold of all kinds including mind freeze.<dt>Resist Heat<dd>The mutant becomes impervious to heat of all kinds including mind melt.<dt>Sense Animal<dd>The mutant can sense animals/animaloids up to 30 meters in any direction.<dt>Sense Foe<dd>The mutant is able to sense those that wish it harm for up to 20 meters.<dt>Sense Mutant<dd>The mutant can sense others like itself up to 30 meters in any direction.<dt>Slow Motion<dd>The mutant causes everything within 10 meters to slow movement by half and attacks to every other round.<dt>Telekinesis<dd>The mutant is able to move objects weighing 100 kilograms or less up to 50 meters in any direction.<dt>Telepathic Projection<dd>The mutant is able to project a 3D hologram into one opponent's mind within 20 meters.<dt>Teleport<dd>The mutant can teleport itself up to 30 meters in any direction three times a day.</dl>
+
+;plant mutations explained
+1,<h2>Plant Mutations</h2><dl><dt>Accumulated Resistance<dd>The plant gains immunity to cold, electric, energy, heat, or radiation attacks after 1 round.<dt>Acid Sap<dd>The plant conveys an acidic sap on contact which does 3d6 damage.<dt>Animal Telepathy<dd>The plant can communicate with all animals and animaloids up to 25 meters.<dt>Carnivore<dd>The plant possesses 1d12 mouths that attack for 1d8 damage each within 2 meters.<dt>Cellulose Armor<dd>Toughened cells grant a -4 to AC.<dt>Cellulose Reflection<dd>The plant is able to absorb one of the following without damage: cold, electric, energy, heat, or radiation.<dt>Constrictive Tendrils<dd>The plant possesses 1d10 tendrils that are 3 meters long and are capable of constricting for 2d6 damage.<dt>Electric Shock<dd>The plant emits an electric shock on touch for 2d10 damage.<dt>Exploding Fruit<dd>The plant is able to launch 1d6 exploding fruit that do 5d4 damage each for 20 meters.<dt>Favorite Fragrance<dd>The plant distributes a pleasant scent on the wind that convinces all creatures within 30 meters to aggressively defend it for 1d5 rounds on a failed saving throw. Additional saving throws can be made every 5 rounds.<dt>Free Movement<dd>The plant is capable of moving at 36 meters per combat turn.<dt>Irradiated Foliage<dd>The plant emits class 1d10 radiation in a 20 meter radius.<dt>Paralytic Poison<dd>The plant conveys a poison on touch that does no damage but paralyzes its vicitm for 1d4 rounds.<dt>Parasite<dd>The plant is able to control a creature if it can maintain contact for 3 or more rounds.<dt>Plant Chameleon<dd>The plant is able to change foliage color and texture to match the environment.<dt>Plant Telepathy<dd>The plant can communicate with all plants and plantoids up to 25 meters.<dt>Poison Sap<dd>The plant conveys a class 1d20 poison sap on contact.<dt>Poison Spore<dd>The plant emits a cloud of class 1d10 poison spores in a 5 meter radius.<dt>Projectile Thorns<dd>The plant is covered with 1d20 thorns that can be launched 10 meters which strike for 1d4 damage each.<dt>Shriek<dd>The plant emits a piercing shriek once every 4 rounds that does 3d6 damage in a 10 meter radius.<dt>Tendrils<dd>The plant possesses 1d20 tendrils that have a low strength, but can overwhelm and suffocate unconscious or paralyzed creatures within 4 meters.<dt>Vegetal Weapons<dd>The plant leaves are formed into 1d10 sword-like and club-like weapons that do 1d6 damage each.</dl>

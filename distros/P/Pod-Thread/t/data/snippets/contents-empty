@@ -1,0 +1,20 @@
+[name]
+Contents with no headings
+
+[options]
+contents 1
+title Page Title
+
+[input]
+=pod
+
+Some random text with no headings.
+
+[output]
+\heading[Page Title][]
+
+\h1[Page Title]
+
+Some random text with no headings.
+
+\signature

@@ -15,7 +15,7 @@ format: v1
 
 name: Pod::Thread
 maintainer: Russ Allbery <rra@cpan.org>
-version: '2.00'
+version: '3.00'
 synopsis: Format POD source into thread, an HTML macro language
 
 license:
@@ -80,8 +80,8 @@ description: |
   navigation bar at the top of the generated file.
 
 requirements: |
-  Perl 5.24 or later and Pod::Parser 3.06 or later.  As mentioned above, it's
-  also not particularly useful without spin.
+  Perl 5.24 or later.  As mentioned above, it's also not particularly useful
+  without spin.
 
 test:
   lancaster: true
@@ -91,6 +91,7 @@ test:
 
     * Devel::Cover
     * Perl::Critic::Freenode
+    * Test::CPAN::Changes (part of CPAN-Changes)
     * Test::MinimumVersion
     * Test::Perl::Critic
     * Test::Pod

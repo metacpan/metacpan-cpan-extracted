@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Tiny; # git description: v0.008-8-gfd19373
+package JSON::Schema::Tiny; # git description: v0.009-7-g8a6730f
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema, minimally
 # KEYWORDS: JSON Schema data validation structure specification tiny
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 use 5.016;  # for the unicode_strings feature
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -13,7 +13,7 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 
 use B;
-use Ref::Util 0.100 qw(is_plain_arrayref is_plain_hashref is_ref);
+use Ref::Util 0.100 qw(is_plain_arrayref is_plain_hashref is_ref is_arrayref);
 use Mojo::URL;
 use Mojo::JSON::Pointer;
 use Carp qw(croak carp);
@@ -389,9 +389,7 @@ sub _eval_keyword_vocabulary {
   assert_keyword_type($state, $schema, 'object');
 
   foreach my $property (sort keys %{$schema->{'$vocabulary'}}) {
-    abort($state, '$vocabulary/%s value is not a boolean', $property)
-      if not is_type('boolean', $schema->{'$vocabulary'}{$property});
-
+    assert_keyword_type({ %$state, _schema_path_suffix => $property }, $schema, 'boolean');
     assert_uri($state, $schema, $property);
   }
 
@@ -647,11 +645,11 @@ sub _eval_keyword_dependentRequired {
   assert_keyword_type($state, $schema, 'object');
 
   foreach my $property (sort keys %{$schema->{dependentRequired}}) {
-    E({ %$state, _schema_path_suffix => $property }, 'dependentRequired value is not an array'), next
+    E({ %$state, _schema_path_suffix => $property }, 'value is not an array'), next
       if not is_type('array', $schema->{dependentRequired}{$property});
 
     foreach my $index (0..$#{$schema->{dependentRequired}{$property}}) {
-      abort({ %$state, _schema_path_suffix => $property }, 'element #%d is not a string', $index)
+      abort({ %$state, _schema_path_suffix => [ $property, $index ] }, 'element #%d is not a string', $index)
         if not is_type('string', $schema->{dependentRequired}{$property}[$index]);
     }
 
@@ -795,7 +793,7 @@ sub _eval_keyword_dependencies {
       # as in dependentRequired
 
       foreach my $index (0..$#{$schema->{dependencies}{$property}}) {
-        abort({ %$state, _schema_path_suffix => $property }, 'element #%d is not a string', $index)
+        $valid = E({ %$state, _schema_path_suffix => [ $property, $index ] }, 'element #%d is not a string', $index)
           if not is_type('string', $schema->{dependencies}{$property}[$index]);
       }
 
@@ -1228,13 +1226,14 @@ sub is_elements_unique {
 
 # shorthand for creating and appending json pointers
 sub jsonp {
-  return join('/', shift, map s/~/~0/gr =~ s!/!~1!gr, grep defined, @_);
+  return join('/', shift, map s/~/~0/gr =~ s!/!~1!gr, map +(is_arrayref($_) ? @$_ : $_), grep defined, @_);
 }
 
 # shorthand for finding the canonical uri of the present schema location
 sub canonical_schema_uri {
   my ($state, @extra_path) = @_;
 
+  splice(@extra_path, -1, 1, @{$extra_path[-1]}) if @extra_path and is_arrayref($extra_path[-1]);
   my $uri = $state->{initial_schema_uri}->clone;
   $uri->fragment(($uri->fragment//'').jsonp($state->{schema_path}, @extra_path));
   $uri->fragment(undef) if not length($uri->fragment);
@@ -1276,7 +1275,12 @@ sub abort {
 # one common usecase of abort()
 sub assert_keyword_type {
   my ($state, $schema, $type) = @_;
-  return 1 if is_type($type, $schema->{$state->{keyword}});
+  my $value = $schema->{$state->{keyword}};
+  $value = is_plain_hashref($value) ? $value->{$state->{_schema_path_suffix}}
+      : is_plain_arrayref($value) ? $value->[$state->{_schema_path_suffix}]
+      : die 'unknown type'
+    if exists $state->{_schema_path_suffix};
+  return 1 if is_type($type, $value);
   abort($state, '%s value is not a%s %s', $state->{keyword}, ($type =~ /^[aeiou]/ ? 'n' : ''), $type);
 }
 
@@ -1359,7 +1363,7 @@ JSON::Schema::Tiny - Validate data against a schema, minimally
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

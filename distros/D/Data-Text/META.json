@@ -1,0 +1,66 @@
+{
+   "abstract" : "Class to handle text in an OO way",
+   "author" : [
+      "Nigel Horne <njh@bandsman.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-Text",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "String::Util" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Carp" : "0",
+            "Test::Compile" : "0",
+            "Test::Most" : "0",
+            "Test::NoWarnings" : "0",
+            "Test::Requires" : "0",
+            "Test::Warn" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Data-Text@rt.cpan.org",
+         "web" : "https://github.com/nigelhorne/Data-Text/issues",
+         "x_url" : "https://github.com/nigelhorne/Data-Text/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/Data-Text.git",
+         "web" : "https://github.com/nigelhorne/Data-Text",
+         "x_repository" : "https://github.com/nigelhorne/Data-Text"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

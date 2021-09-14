@@ -3,14 +3,12 @@
 #
 #  (C) Paul Evans, 2012-2017 -- leonerd@leonerd.org.uk
 
-package Tangence::Meta::Struct;
+package Tangence::Meta::Struct 0.26;
 
-use strict;
+use v5.14;
 use warnings;
 
 use Carp;
-
-our $VERSION = '0.25';
 
 =head1 NAME
 

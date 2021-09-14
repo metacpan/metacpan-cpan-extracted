@@ -1,5 +1,10 @@
 Revision history for Locale::Places
 
+0.05	Mon Sep 13 09:25:24 EDT 2021
+	Looking for a translation from English to French of Durham, Bromley and Lambeth gave
+		error about more than one preferred entry
+	Improved handling of LANG=C.UTF-8
+
 0.04	Wed Feb 17 22:25:40 EST 2021
 	Fix http://www.cpantesters.org/cpan/report/f59da8fa-5743-11eb-9b90-718ee0dd574a
 	Use SQLite3 for the database, provides a major speedup

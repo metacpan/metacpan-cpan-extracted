@@ -38,6 +38,8 @@ my @files = (
     'lib/Playwright/ElectronApplication.pm',
     'lib/Playwright/ElementHandle.pm',
     'lib/Playwright/Error.pm',
+    'lib/Playwright/FetchRequest.pm',
+    'lib/Playwright/FetchResponse.pm',
     'lib/Playwright/FileChooser.pm',
     'lib/Playwright/Frame.pm',
     'lib/Playwright/JSHandle.pm',

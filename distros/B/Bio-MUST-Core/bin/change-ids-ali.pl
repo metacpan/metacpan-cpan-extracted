@@ -55,7 +55,7 @@ change-ids-ali.pl - Abbreviate or restore the org component of full seq ids in A
 
 =head1 VERSION
 
-version 0.211470
+version 0.212530
 
 =head1 USAGE
 
@@ -84,7 +84,7 @@ Path to the IDM file listing the long_org => abbr_org pairs.
 Direction of the id changing operation. The following directions are
 available: long2abbr and abbr2long.
 
-=for Euclid: dir.type:       /long2abbr|abbr2long/
+=for Euclid: dir.type:       string, dir eq 'long2abbr' || dir eq 'abbr2long'
     dir.type.error: <dir> must be one of long2abbr or abbr2long (not dir)
 
 =back

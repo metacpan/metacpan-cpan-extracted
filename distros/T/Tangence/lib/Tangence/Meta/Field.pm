@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2012-2017 -- leonerd@leonerd.org.uk
 
-package Tangence::Meta::Field;
+package Tangence::Meta::Field 0.26;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.25';
 
 =head1 NAME
 

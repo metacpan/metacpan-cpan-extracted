@@ -1,0 +1,11 @@
+/: Russ Allbery
+  /software/: Software
+    /software/cvslog/: "cvslog"
+    /software/docknot/: DocKnot
+      /software/docknot/api/app-docknot.html: App::DocKnot
+      /software/docknot/api/app-docknot-command.html: App::DocKnot::Command
+    /software/rra-c-util/: rra-c-util>
+  /faqs/: FAQs and Documentation
+  /photos/: Photos
+  /usefor/: Usenet Format and Protocols
+  /nntp/: NNTP

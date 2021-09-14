@@ -1,0 +1,107 @@
+NAME
+
+    IO::Term::Status - print log lines to a terminal with a running status
+    bar
+
+SYNOPSIS
+
+       use IO::Term::Status;
+    
+       my $io = IO::Term::Status->new_for_stdout;
+    
+       $io->set_status( "Running" );
+    
+       my @items = ...;
+    
+       foreach my $idx ( 0 .. $#items ) {
+          $io->set_status( sprintf "Running | %d of %d", $idx+1, scalar @items );
+    
+          my $item = $items[$idx];
+          $io->print_line( "Processing item $item..." );
+          ...
+       }
+    
+       $io->set_status( "" );   # Clear the status line before exiting
+
+DESCRIPTION
+
+    This module provides a subclass of IO::Handle for maintaining a running
+    status display on the terminal. It presumes the terminal can handle
+    basic ANSI control characters (thus is not suitable for printing to log
+    files, etc).
+
+    The "status bar" consists of a single additional line of text, printed
+    below the current log of output. More lines of regular log can be
+    printed using the "print_line" method, which maintains the running
+    status bar below the output.
+
+ With String::Tagged
+
+    If the String::Tagged::Terminal module is available, then the status
+    string can set to an instance of String::Tagged, obeying the
+    String::Tagged::Formatting tag conventions. This will be converted to
+    terminal output.
+
+    As an extra convenience, whatever the prevailing background colour is
+    at the end of the string will be preserved for line-erase purposes,
+    meaning that colour will extend the entire width of the status bar
+    line.
+
+CONSTRUCTORS
+
+ new
+
+       $io = IO::Term::Status->new
+
+    Constructs a new IO::Handle subclassed instance of this type.
+
+ new_for_stdout
+
+       $io = IO::Term::Status->new_for_stdout
+
+    Constructs a new instance wrapping the STDOUT filehandle, with
+    autoflush turned on. This is usually what you want for printing regular
+    output to the controlling terminal.
+
+METHODS
+
+ print_line
+
+       $io->print_line( @args )
+
+    Prints a new line from the given arguments, joined as a string. @args
+    should not contain the terminating linefeed.
+
+    This line is printed above any pending partial line.
+
+ more_partial
+
+       $io->more_partial( $more )
+
+    Adds more text to the pending partial line displayed at the bottom,
+    after any complete lines.
+
+ replace_partial
+
+       $io->replace_partial( $more )
+
+    Replace the content of the pending partial line displayed at the
+    bottom.
+
+ finish_partial
+
+       $io->finish_partial( $more )
+
+    Adds more text to the pending partial line then turns it into a
+    complete line that gets printed.
+
+ set_status
+
+       $io->set_status( $status )
+
+    Sets the status message string.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

@@ -28,9 +28,44 @@ my $tolerance = 1E-10;
 
 test_wikipedia_percentile_example();
 test_equal_weights();
+test_percentile_from_hash();
 
 done_testing();
 
+sub test_percentile_from_hash {
+    
+    my @data = (15, 20, 35, 40, 50);
+    my @wts  = (1) x @data;
+    my %data_hash;
+    @data_hash{@data} = @wts;
+    my $weighted   = $stats_class_wtd->new;
+    $weighted->add_data(\%data_hash);
+
+    is $weighted->percentile(40),   29, 'interpolated pctl 40, weighted';
+    is $weighted->percentile(50), $weighted->median, 'median same as 50th percentile';
+
+    $weighted->add_data(\@data, \@wts);
+    is $weighted->percentile(40), 29,                  'interpolated pctl 75, weighted, after doubling data' . join ' ', @data;
+    is $weighted->percentile(50), $weighted->median,   "median same as 50th percentile, " . join ' ', @data;
+
+    ok $weighted->values_are_unique, "unique flag set to true value after calculating percentiles";
+
+    #  data from R
+    my %exp = (
+        20 => 19, 30 => 20, 40 => 29,
+        50 => 35, 60 => 37, 70 => 40,
+        80 => 42, 90 => 50,
+        21 => 19.45,
+    );
+
+    for my $p (sort {$a <=> $b} keys %exp) {
+        cmp_ok abs ($weighted->percentile($p) - $exp{$p}),
+                '<',
+                1e-10,
+                "interpolated pctl $p, weighted, doubled data";
+    }
+    
+}
 
 sub test_wikipedia_percentile_example {
     my @data = (15, 20, 35, 40, 50);
@@ -50,6 +85,8 @@ sub test_wikipedia_percentile_example {
     is $weighted->percentile(40), 29,                  'interpolated pctl 75, weighted, after doubling data' . join ' ', @data;
     is $weighted->percentile(50), $weighted->median,   "median same as 50th percentile, " . join ' ', @data;
     is $weighted->percentile(50), $unweighted->median, 'weighted and unweighted median';
+
+    ok $weighted->values_are_unique, "unique flag set to true value after calculating percentiles";
 
     #  data from R
     my %exp = (

@@ -1,0 +1,54 @@
+<%doc>
+If the ticket was based on a template, show details of that template, if the
+template is configured to allow this.
+</%doc>
+\
+<%ARGS>
+$Ticket => undef
+</%ARGS>
+\
+<%INIT>
+return if ( not defined $Ticket );
+
+my $Attribute = $Ticket->FirstAttribute('TemplateTicketId');
+return if ( not defined $Attribute );
+my $TemplateId = $Attribute->Content;
+
+return if ( not defined $TemplateId );
+return if ( $TemplateId !~ /^[0-9]+$/ );
+
+my $TemplateTicketObj = RT::Ticket->new( $session{'CurrentUser'} );
+return if ( not $TemplateTicketObj->Load($TemplateId) );
+return if ( not $TemplateTicketObj->id );
+
+my $TemplateSubject = $TemplateTicketObj->Subject;
+
+$Attribute = $TemplateTicketObj->FirstAttribute('TemplateTicketsDefinition');
+return if ( not defined $Attribute );
+my $TemplateSettings = $Attribute->Content;
+return if ( not defined $TemplateSettings );
+
+my $TemplateDescription = $TemplateSettings->{'Description'};
+
+return if (not $TemplateSettings->{'ShowDerivation'});
+</%INIT>
+\
+% if ($RT::MAJOR_VERSION > 4) {
+  <div class="form-row">
+    <div class="label col-3"><&|/l&>Derived from template</&>:</div>
+    <div class="value col-9"><span class="current-value"><a href="<% RT->Config->Get('WebPath') %>/Ticket/Display.html?id=<% $TemplateId %>">#<% $TemplateId %> - <% $TemplateSubject %></a>\
+%     if ($TemplateDescription) {
+<br /><i><% $TemplateDescription %></i>\
+%     }
+</span></div>
+  </div>
+% } else {
+<tr>
+ <td class="label"><&|/l&>Derived from template</&>:</td>
+ <td class="value"><a href="<% RT->Config->Get('WebPath') %>/Ticket/Display.html?id=<% $TemplateId %>">#<% $TemplateId %> - <% $TemplateSubject %></a>\
+%     if ($TemplateDescription) {
+<br /><i><% $TemplateDescription %></i>\
+%     }
+</td>
+</tr>
+% }

@@ -1,6 +1,6 @@
 package Getopt::EX::Hashed;
 
-our $VERSION = '0.9917';
+our $VERSION = '0.9918';
 
 =head1 NAME
 
@@ -8,7 +8,7 @@ Getopt::EX::Hashed - Hash store object automation
 
 =head1 VERSION
 
-Version 0.9917
+Version 0.9918
 
 =head1 SYNOPSIS
 
@@ -74,6 +74,7 @@ sub import {
     *{"$caller\::$_"} = \&$_ for @EXPORT;
     my $config = __Config__($caller);
     unless (%$config) {
+	unlock_keys %$config;
 	%$config = %DefaultConfig or die "something wrong!";
 	lock_keys %$config;
     }
@@ -112,10 +113,10 @@ sub reset {
 
 sub has {
     my($key, @param) = @_;
+    @param % 2 and unshift @param, 'spec';
     my @name = ref $key eq 'ARRAY' ? @$key : $key;
     my $caller = caller;
     my $member = __Member__($caller);
-    my $config = __Config__($caller);
     for my $name (@name) {
 	my $append = $name =~ s/^\+//;
 	my $i = first { $member->[$_]->[0] eq $name } 0 .. $#{$member};
@@ -124,7 +125,9 @@ sub has {
 	    push @{$member->[$i]}, @param;
 	} else {
 	    defined $i and die "$name: Duplicated\n";
-	    if (my $default = $config->{DEFAULT}) {
+	    my $config = __Config__($caller);
+	    if (exists $config->{DEFAULT} and
+		my $default = $config->{DEFAULT}) {
 		if (ref $default eq 'ARRAY') {
 		    unshift @param, @$default;
 		}
@@ -169,8 +172,8 @@ sub getopt {
 
 sub use_keys {
     my $obj = shift;
-    unlock_keys %{$obj};
-    lock_keys_plus %{$obj}, @_;
+    unlock_keys %$obj;
+    lock_keys_plus %$obj, @_;
 }
 
 sub _conf   { $_[0]->{__Config__} }
@@ -334,6 +337,9 @@ If the name start with plus (C<+>), given parameters are added to
 current value.
 
     has '+left' => ( default => 1 );
+
+If the number of parameter is not even, first parameter is taken as
+C<spec>.
 
 Following parameters are available.
 

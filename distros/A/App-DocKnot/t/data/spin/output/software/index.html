@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Russ's Software</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link rel="stylesheet" href="/~eagle/styles/indent.css" type="text/css" />
+  <link rel="alternate" type="application/rss+xml" href="../journal/software.rss"
+        title="Releases of Russ Allbery's Software" />
+  <link rel="next" href="../faqs/" title="FAQs and Documentation" />
+  <link rel="up" href="../" title="Russ Allbery" />
+  <link rel="top" href="../" />
+</head>
+
+<!-- Spun from index.th by DocKnot %VERSION% on %DATE% -->
+
+<body>
+<table class="navbar"><tr>
+  <td class="navleft"></td>
+  <td>
+    <a href="../">Russ Allbery</a>
+  </td>
+  <td class="navright"><a href="../faqs/">FAQs and Documentation</a>&nbsp;&gt;</td>
+</tr></table>
+
+
+<h1>Software</h1>
+
+<p class="sections">
+       <a href="#kerberos">Kerberos</a>
+    &ndash; <a href="#info">Information Management</a>
+    &ndash; <a href="#mail">Mail</a>
+    &ndash; <a href="#perl">Perl Modules</a>
+       <br />
+       <a href="#software">Software Management</a>
+    &ndash; <a href="#usenet">Usenet</a>
+    &ndash; <a href="#web">Web</a>
+       <br />
+       <a href="#other">Other Links</a>
+</p>
+
+<blockquote class="quote"><p class="short">
+    It is a simple task to make things complex, but a complex task to make
+    them simple.
+</p><p class="attribution">
+    Meyer's Law
+</p></blockquote>
+
+<p>
+All of this software is free software / open source, and I welcome patches
+and improvements that are generally useful.  I'm happy to include
+generally useful improvements into the version that I distribute, even if
+I don't use the feature personally.  If you have some need that you wish
+one of these packages would handle but don't know how to implement it,
+please feel free to send me e-mail; I might be able to give you some hints
+or find the time to implement it (although I can't promise anything).
+</p>
+
+<p>
+I'm in the process of migrating all software I maintain except for scripts
+to Git.  The Git repositories for packages that have been migrated are
+available from <a href="https://git.eyrie.org/">git.eyrie.org</a>.
+</p>
+
+<p>
+There is an <span class="feed"><a href="/~eagle/journal/software.rss"><img src="/~eagle/journal/feed.png" alt="" /></a> <a href="/~eagle/journal/software.rss">RSS feed</a></span> where new releases of these software packages are announced.
+Those announcements are also posted to my
+<a href="/~eagle/journal/">journal</a>, which also offers a
+<span class="feed"><a href="/~eagle/journal/index.rss"><img src="/~eagle/journal/feed.png" alt="" /></a> <a href="/~eagle/journal/index.rss">general RSS feed</a></span> if you're interested in more than software release
+announcements.  For following development in detail,
+<a href="https://git.eyrie.org/">git.eyrie.org</a> provides RSS feeds per project
+repository that list every committed change.
+</p>
+
+<p>
+I maintain Debian packages for much of the software here, as well as other
+packages I'm interested in.  Some of those packages are in Debian proper;
+others are only available from my personal repository.  See my
+<a href="debian.html">Debian package page</a> for more information.
+</p>
+
+<p>
+There may be additional software and patches available from my
+<a href="https://archives.eyrie.org/software/">archive site</a> that I've not
+yet had a chance to write a web page for.  I'm still in the process of
+adding to this page all of the various software that I've written,
+maintained, or contributed to.
+</p>
+
+<h2 id="kerberos"><a name="kerberos">Kerberos</a></h2>
+<table class="software">
+      <tr>
+    <td class="package"><strong><a href="krb5-strength/">krb5-strength</a></strong></td>
+    <td>Kerberos kadmind strength checking plugin</td>
+  </tr>
+
+      <tr>
+    <td class="package"><strong><a href="kstart/">kstart</a></strong></td>
+    <td>Daemon version of Kerberos kinit with other features</td>
+  </tr>
+
+      <tr>
+    <td class="package"><strong><a href="pam-krb5/">pam-krb5</a></strong></td>
+    <td>Kerberos PAM module</td>
+  </tr>
+
+      <tr>
+    <td class="package"><strong><a href="remctl/">remctl</a></strong></td>
+    <td>Run specific commands remotely with Kerberos and ACLs</td>
+  </tr>
+
+      <tr>
+    <td class="package"><strong><a href="wallet/">wallet</a></strong></td>
+    <td>Secure credential management system</td>
+  </tr></table>
+
+<h2 id="info"><a name="info">Information Management</a></h2>
+<table class="software">
+      <tr>
+    <td class="package"><strong><a href="reminder/">reminder</a></strong></td>
+    <td>Remind of possibly periodic tasks via e-mail</td>
+  </tr></table>
+
+<h2 id="mail"><a name="mail">Mail</a></h2>
+<table class="software">
+      <tr>
+    <td class="package"><strong><a href="mdfrm/">mdfrm</a></strong></td>
+    <td>Summarize the content of a maildir like frm</td>
+  </tr></table>
+
+<h2 id="perl"><a name="perl">Perl Modules</a></h2>
+<table class="software">
+      <tr>
+    <td class="package"><strong><a href="pgp-sign/">PGP::Sign</a></strong></td>
+    <td>Generate and/or verify detached PGP signatures</td>
+  </tr>
+
+      <tr>
+    <td class="package"><strong><a href="podlators/">podlators</a></strong></td>
+    <td>Pod::Man and Pod::Text POD formatting modules</td>
+  </tr>
+
+      <tr>
+    <td class="package"><strong><a href="ansicolor/">Term::ANSIColor</a></strong></td>
+    <td>Easy interface for ANSI color escape sequences</td>
+  </tr>
+
+      <tr>
+    <td class="package"><strong><a href="shadowhash/">Tie::ShadowHash</a></strong></td>
+    <td>Overlay multiple hashes to form a single logical hash</td>
+  </tr></table>
+
+<h2 id="devel"><a name="devel">Software Development</a></h2>
+<table class="software">
+      <tr>
+    <td class="package"><strong><a href="c-tap-harness/">C TAP Harness</a></strong></td>
+    <td>C harness for running TAP-compliant tests</td>
+  </tr>
+
+      <tr>
+    <td class="package"><strong><a href="cvslog/">cvslog</a></strong></td>
+    <td>Featureful e-mail commit notification from CVS</td>
+  </tr>
+
+      <tr>
+    <td class="package"><strong><a href="docknot/">DocKnot</a></strong></td>
+    <td>Package documentation generator</td>
+  </tr>
+
+      <tr>
+    <td class="package"><strong><a href="rra-c-util/">rra-c-util</a></strong></td>
+    <td>Russ Allbery's utility libraries for C</td>
+  </tr>
+
+      <tr>
+    <td class="package"><strong><a href="svnlog/">svnlog</a></strong></td>
+    <td>Featureful e-mail commit notification from Subversion</td>
+  </tr></table>
+
+<h2 id="usenet"><a name="usenet">Usenet</a></h2>
+<table class="software">
+      <tr>
+    <td class="package"><strong><a href="control-archive/">control-archive</a></strong></td>
+    <td>Netnews control message processing and archiving</td>
+  </tr>
+
+      <tr>
+    <td class="package"><strong><a href="inn/">INN</a></strong></td>
+    <td>Full-featured, flexible and configurable news server</td>
+  </tr>
+
+      <tr>
+    <td class="package"><strong><a href="gateway/">News::Gateway</a></strong></td>
+    <td>General toolkit for mail gatewaying and moderation</td>
+  </tr>
+
+      <tr>
+    <td class="package"><strong><a href="postfaq/">postfaq</a></strong></td>
+    <td>Post FAQs and periodic postings with superseding</td>
+  </tr></table>
+
+<h2 id="web"><a name="web">Web</a></h2>
+<table class="software">
+      <tr>
+    <td class="package"><strong><a href="pod-thread/">Pod::Thread</a></strong></td>
+    <td>Format POD source into thread, an HTML macro language</td>
+  </tr>
+
+      <tr>
+    <td class="package"><strong><a href="web/">Web tools</a></strong></td>
+    <td>Web page generation from a macro language and other sources</td>
+  </tr></table>
+
+<h2 id="other"><a name="other">Other Links</a></h2>
+
+<dl>
+<dt><strong><a href="scripts/">Scripts</a></strong></dt>
+<dd><p>
+    Some smaller scripts that don't warrant their own set of pages.  Some
+    larger or more generally useful scripts get their own pages above;
+    these are scripts with a narrower or specialized purpose, or scripts
+    that are most commonly found inside another package.
+</p></dd>
+
+<dt><strong><a href="orphaned.html">Orphaned Software</a></strong></dt>
+<dd><p>
+    Packages that I no longer maintain, but which may still be useful.  If
+    you use any of this software and are interested in maintaining it,
+    please consider adopting it.  Barring exceptional circumstances, such
+    as security vulnerabilities, I will not be making any further releases
+    of these packages.
+</p></dd>
+
+<dt><strong><a href="obsolete.html">Obsolete Software</a></strong></dt>
+<dd><p>
+    Packages that I no longer maintain and that are probably not of
+    interest to most people.  In some cases (such as Kerberos v4 packages)
+    the software is obsolete; in others, it's just for things I no longer
+    use.  Barring exceptional circumstances, there will not be any further
+    releases of these packages, but they are still available for
+    historical reference and in case someone else wants to pick them up.
+</p></dd>
+
+<dt><strong><a href="patches/">Patches</a></strong></dt>
+<dd><p>
+    Patches to some packages that I don't maintain which may be of
+    interest to others.  Things will come and go from this page as the
+    patches are incorporated into the upstream software.  Patches may also
+    be obsolete, if upstream has changed without incorporating my changes.
+    The files here aren't checked or updated very often and are provided
+    just in case they're of interest; you will probably have to do some
+    work to use them.
+</p></dd>
+</dl>
+
+<table class="navbar"><tr>
+  <td class="navleft"></td>
+  <td>
+    <a href="../">Russ Allbery</a>
+  </td>
+  <td class="navright"><a href="../faqs/">FAQs and Documentation</a>&nbsp;&gt;</td>
+</tr></table>
+
+<address>
+    Last <a href="https://www.eyrie.org/~eagle/software/web/">spun</a>
+    %DATE% from thread modified %DATE%
+</address>
+</body>
+</html>

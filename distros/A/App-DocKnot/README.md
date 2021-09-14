@@ -5,38 +5,38 @@ status](https://github.com/rra/docknot/workflows/build/badge.svg)](https://githu
 [![CPAN
 version](https://img.shields.io/cpan/v/App-DocKnot)](https://metacpan.org/release/App-DocKnot)
 [![License](https://img.shields.io/cpan/l/App-DocKnot)](https://github.com/rra/docknot/blob/master/LICENSE)
+[![Debian
+package](https://img.shields.io/debian/v/docknot/unstable)](https://tracker.debian.org/pkg/docknot)
 
-Copyright 2013-2021 Russ Allbery <rra@cpan.org>.  This software is
+Copyright 1999-2021 Russ Allbery <rra@cpan.org>.  This software is
 distributed under a BSD-style license.  Please see the section
 [License](#license) below for more information.
 
 ## Blurb
 
-DocKnot is a system for generating consistent human-readable software
-package documentation from a YAML metadata file and templates.  The goal
-is to generate both web pages and distributed documentation files (such as
-`README`) from the same source, using templates for consistency across
-multiple packages.  DocKnot also automates generating distribution
-tarballs for software packages.
+DocKnot is a static web site generator built around a macro language
+called thread, with special support for managing software releases.  In
+addition to building a web site, it can generate distribution tarballs and
+consistent human-readable software package documentation from a YAML
+metadata file and templates.  The goal is to generate both web pages and
+distributed documentation files (such as `README`) from the same source,
+using templates for consistency across multiple packages.
 
 ## Description
 
-After years of maintaining a variety of small free software packages, I
-found the most tedious part of making a new release was updating the
-documentation in multiple locations.  Copyright dates would change,
-prerequisites and package descriptions would change, and I had to update
-at least the package `README` file and its web pages separately.  The last
-straw was when GitHub became popular and I wanted to provide a Markdown
-version of `README` as well, avoiding the ugly text rendering on the
-GitHub page for a package.
+In 1999, I wrote a program named `spin` that implemented an idiosyncratic
+macro language called thread.  It slowly expanded into a static web site
+generator and gained additional features to manage the journal entries,
+book reviews, RSS feeds, and software releases.  DocKnot is the latest
+incarnation.
 
-This package uses one metadata file as its source information and
-generates all the various bits of documentation for a package.  This
-allows me to make any changes in one place and then just regenerate the
-web page, included documentation, and other files to incorporate those
-changes.  It also lets me make changes to the templates to improve shared
-wording and push that out to every package I maintain during its next
-release, without having to remember which changes I wanted to make.
+In addition to its static web site generator, DocKnot can use one metadata
+file as its source information and generate all the various bits of
+documentation for a software package.  This allows me to make any changes
+in one place and then regenerate the web page, included documentation, and
+other files to incorporate those changes.  It also lets me make changes to
+the templates to improve shared wording and push that out to every package
+I maintain without having to remember track those changes in each package.
 
 DocKnot is also slowly absorbing other tools that I use for software
 distribution and web site maintenance, such as generating distribution
@@ -45,34 +45,33 @@ tarballs for software packages.
 DocKnot was designed and written for my personal needs, and I'm not sure
 it will be useful for anyone else.  At the least, the template files are
 rather specific to my preferences about how to write package
-documentation, and the web page output is in my personal thread language
-as opposed to HTML.  I'm not sure if I'll have the time to make it a more
+documentation, and the thread macro language is highly specialized for my
+personal web site.  I'm not sure if I'll have the time to make it a more
 general tool.  But you're certainly welcome to use it if you find it
 useful, send pull requests to make it more general, or take ideas from it
 for your own purposes.
-
-Currently included in this package are just the App::DocKnot module and
-its submodules, a small docknot driver program, and the templates I use
-for my own software.  Over time, it may include more of my web publishing
-framework, time permitting.
 
 ## Requirements
 
 Perl 5.24 or later and Module::Build are required to build this module.
 The following additional Perl modules are required to use it:
 
+* Date::Parse (part of TimeDate)
 * File::BaseDir
 * File::ShareDir
+* Git::Repository
+* Image::Size
 * IO::Compress::Xz (part of IO-Compress-Lzma)
 * IO::Uncompress::Gunzip (part of IO-Compress)
 * IPC::Run
 * IPC::System::Simple
 * JSON::MaybeXS
 * Kwalify
-* List::SomeUtils
+* List::SomeUtils 0.07 or later
 * Perl6::Slurp
+* Pod::Thread 3.00 or later
 * Template (part of Template Toolkit)
-* YAML::XS
+* YAML::XS 0.81 or later
 
 ## Building and Installation
 
@@ -108,6 +107,7 @@ suite if present:
 
 * Devel::Cover
 * Perl::Critic::Freenode
+* Test::CPAN::Changes (part of CPAN-Changes)
 * Test::MinimumVersion
 * Test::Perl::Critic
 * Test::Pod
@@ -157,7 +157,7 @@ requests are gratefully reviewed and normally accepted.
 The DocKnot package as a whole is covered by the following copyright
 statement and license:
 
-> Copyright 2013-2021
+> Copyright 1999-2021
 >     Russ Allbery <rra@cpan.org>
 >
 > Permission is hereby granted, free of charge, to any person obtaining a

@@ -32,7 +32,7 @@
 
     \download[[% name %]][[% distribution.version %]]
         [[% distribution.section %]/[% distribution.tarname %]-\version[[% distribution.version %]]]
-[% IF distribution.packaging.debian.package %]
+[% IF distribution.packaging.debian.package && !distribution.packaging.debian.personal %]
     \link[https://packages.debian.org/source/sid/[% distribution.packaging.debian.package %]]
          [Debian packages] \break[% END %]
     \link[https://archives.eyrie.org/software/ARCHIVE/[% distribution.tarname %]/]
@@ -50,23 +50,22 @@
         [[% advisory.date %]]: [% name %] [% advisory.versions %]\break
 [% END %][% END %]
     \h2[Development]
-
-    \link[todo.html][To-do list][% FOREACH doc IN docs.developer %] \break
-    \link[[% doc.name %].html][[% doc.title %]][% END %][% IF vcs.github %] \break
+[% FOREACH doc IN docs.developer %]
+    \link[[% doc.name %].html][[% doc.title %]] \break[% END %][% IF vcs.github %]
     \link[https://github.com/[% vcs.github %]]
-         [GitHub][% END %][% IF support.github %] \break
+         [GitHub] \break[% END %][% IF support.github %]
     \link[https://github.com/[% support.github %]/issues]
-         [Bug tracker][% END %][% IF vcs.type == 'Git' %] \break
+         [Bug tracker] \break[% END %][% IF vcs.type == 'Git' %]
     \link[[% vcs.browse %]]
-         [Git repository][% END %][% IF vcs.status.travis %] \break
+         [Git repository] \break[% END %][% IF vcs.status.travis %]
     \link[https://travis-ci.org/[% vcs.status.travis %]]
-         [Travis-CI][% END %][% IF distribution.cpan %] \break
+         [Travis-CI] \break[% END %][% IF distribution.cpan %]
     \link[https://metacpan.org/release/[% distribution.cpan %]]
-         [MetaCPAN][% END %][% IF vcs.openhub %] \break
+         [MetaCPAN] \break[% END %][% IF vcs.openhub %]
     \link[[% vcs.openhub %]]
-         [Open HUB code analysis][% END %][% IF distribution.packaging.debian.package %] \break
+         [Open HUB code analysis] \break[% END %][% IF distribution.packaging.debian.package && !distribution.packaging.debian.personal %]
     \link[https://tracker.debian.org/pkg/[% distribution.packaging.debian.package %]]
-         [Debian package tracker][% END %]
+         [Debian package tracker] \break[% END %]
 ]
 [% IF orphaned %]
 \h2[Warning]
@@ -109,14 +108,15 @@ An \link[https://archives.eyrie.org/software/ARCHIVE/[% distribution.tarname %]/
 \class(alert)[Versions older than [% advisories.0.threshold %] have known
 security vulnerabilities and should not be used.][% END %]
 [% IF distribution.packaging.debian.summary %]
-[% to_thread(distribution.packaging.debian.summary) | trim %][% IF distribution.packaging.debian.summary.match('\n\n') %]
+[% IF distribution.packaging.debian.personal %][% to_thread(distribution.packaging.debian.summary) %]
+[% ELSE %][% to_thread(distribution.packaging.debian.summary) | trim %][% IF distribution.packaging.debian.summary.match('\n\n') %]
 
 [% ELSE %]  [% END %]See the \link[https://tracker.debian.org/pkg/[%
 distribution.packaging.debian.package %]][Debian package tracker] for more
 information.
 
-[% ELSIF distribution.packaging.debian.personal %]
-A Debian package is available from my \link[../debian.html][personal
+[% END %][% ELSIF distribution.packaging.debian.personal %]
+A Debian package [% IF distribution.packaging.debian.package %]([% distribution.packaging.debian.package %]) [% END %]is available from my \link[../debian.html][personal
 repository].
 [% END %][% IF distribution.cpan %]
 [% name %] is available from CPAN as the
@@ -150,8 +150,7 @@ also \link[[% vcs.browse %]][browse the current development source].
         [[% advisory.date %]: [% advisory.versions %]][% END %]
 [% END %]
     Developer documentation:
-
-    \doc[todo.html][To-do list][% FOREACH doc IN docs.developer %]
+[% FOREACH doc IN docs.developer %]
     \doc[[% doc.name %].html][[% doc.title %]][% END %][% IF vcs.github %]
     \doc[https://github.com/[% vcs.github %]]
         [GitHub][% END %][% IF support.github %]
@@ -160,10 +159,10 @@ also \link[[% vcs.browse %]][browse the current development source].
     \doc[https://travis-ci.org/[% vcs.status.travis %]]
         [Travis-CI][% END %][% IF vcs.openhub %]
     \doc[[% vcs.openhub %]]
-        [Open HUB code analysis][% END %]
-    [% IF docs.contrib %]
+        [Open HUB code analysis][% END %][% IF docs.contrib %]
+
     Contributed programs:
-    [% FOREACH doc IN docs.contrib %]
+[% FOREACH doc IN docs.contrib %]
     \doc[[% doc.name %].html][[% doc.title %]][% END %]
 [% END %]
 ]
@@ -193,8 +192,7 @@ Security advisories:
     [[% advisory.date %]: [% advisory.versions %]]
 [% END %][% END %]
 Developer documentation:
-
-\doc[todo.html][To-do list][% FOREACH doc IN docs.developer %]
+[% FOREACH doc IN docs.developer %]
     \doc[[% doc.name %].html][[% doc.title %]][% END %][% IF vcs.github %]
 \doc[https://github.com/[% vcs.github %]]
     [GitHub][% END %][% IF support.github %]

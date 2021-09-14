@@ -1,5 +1,10 @@
 Revision history for Perl extension String::Random:
 
+0.32    2021-09-14
+    - Add ->get_pattern and ->set_pattern.
+        - https://github.com/shlomif/String-Random/pull/5
+        - Thanks to https://github.com/ology
+
 0.31    2020-10-17
     - dist.ini / weaver.ini / .tidyallrc / etc. cleanup
         - Move to @SHLOMIF

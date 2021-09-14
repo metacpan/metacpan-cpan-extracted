@@ -1,7 +1,7 @@
 package Bio::MUST::Core::SeqId;
 # ABSTRACT: Modern and legacy MUST-compliant sequence id
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::SeqId::VERSION = '0.211470';
+$Bio::MUST::Core::SeqId::VERSION = '0.212530';
 use Moose;
 use namespace::autoclean;
 
@@ -204,8 +204,8 @@ const my @GENERA  => qw(
     A-2
     acetamiprid-degrading
     Activation-tagging
-    Adeno-Associated
     Adeno-associated
+    Adeno-Associated
     Aids-associated
     alk-system
     Altai-like
@@ -273,6 +273,7 @@ const my @GENERA  => qw(
     bromate-reducing
     bromoform-metabolizing
     Bromus-associated
+    Bronnoya-like
     BTEX-degrading
     BtMd-BetaCoV/HuB2013
     BtMf-AlphaCoV/AH2011
@@ -317,6 +318,7 @@ const my @GENERA  => qw(
     Calf-giraffe
     Calhevirus-2a
     Calhevirus-2b
+    Camellia-associated
     Campylobacter-like
     carbazole-degrading
     Carpediemonas-like
@@ -360,6 +362,7 @@ const my @GENERA  => qw(
     Cr(VI)-reducing
     Crane-associated
     crAss-like
+    CrAss-like
     Cre-expression
     Cre-lox
     Crimean-Congo
@@ -525,6 +528,7 @@ const my @GENERA  => qw(
     Drosophila-associated
     DSMP-degrading
     Dual-tagging
+    Duck-associated
     Duck-dominant
     dye-degrading
     EDTA-degrading
@@ -620,6 +624,8 @@ const my @GENERA  => qw(
     Hump-back
     Husa-like
     HVAC-associated
+    hydrocarbon-degrading
+    hydrogen-producing
     Hyphomicrobium-like
     Ichthyobodo-related
     IncP-1
@@ -632,6 +638,7 @@ const my @GENERA  => qw(
     IRE/CTVM19-associated
     iron-reducing
     Isosphaera-like
+    Issyk-kul
     Issyk-Kul
     J-virus
     Janibacter-like
@@ -702,13 +709,16 @@ const my @GENERA  => qw(
     mouse-rat
     Mu-like
     Multi-host
+    Multi-promoter
     Murine-associated
+    Murray-Darling
     Mx-Lox
     Mycobacteria-E.coli
     N-peptide-mCherry
     N-terminal
     N-tropic
     Nanovirus-like
+    naphthalene-degrading
     naphthalene-utilizing
     narna-like
     Nebraska-like
@@ -765,18 +775,20 @@ const my @GENERA  => qw(
     P-element
     P1-specific
     PAH-contaminated
-    PAH-degrading
     Paracoccus-like
     Parecho-like
     Paromomycin-resistant
     Partiti-like
     Partitivirus-like
     Parvo-like
+    Passionfruit-associated
     PCB-dechlorinating
+    Peach-associated
     Pechuel-loeschea
     Peptococcus-like
-    Perchlorate-reducing
+    Percalates-clade
     perchlorate-reducing
+    Perchlorate-reducing
     Perkinsela-like
     Perkinsiella-like
     pesticide-degrading
@@ -819,10 +831,12 @@ const my @GENERA  => qw(
     Puumala-like
     PVB_OTU_4-like
     Qinvirus-like
+    Quinoa-associated
     R6K-based
     Raccoon-associated
     RDHV-like
     Red-bellied
+    Red-billed
     Red-capped
     Red-crowned
     Red-eared
@@ -886,6 +900,7 @@ const my @GENERA  => qw(
     SARS-related
     Saxo-fridericia
     Sciuro-hypnum
+    Sebastiano-Schaueria
     selenate-reducing
     Selenomonas-like
     Self-inactivating
@@ -901,6 +916,7 @@ const my @GENERA  => qw(
     Sindbis-like
     Single-copy
     Sint-Jan
+    Sisal-associated
     Site-specific
     SIV-derived
     SIV-wrc
@@ -928,6 +944,7 @@ const my @GENERA  => qw(
     Sticholonche-like
     Stolbur-It
     Stolbur-Rus
+    Striga-associated
     Stripa-derived
     Stx1-converting
     Stx1a-converting
@@ -948,6 +965,7 @@ const my @GENERA  => qw(
     T7-like
     Taro-associated
     Taxeobacter-like
+    Tea-oil
     Temperature-sensitive
     Tent-making
     Tetracycline-inducible
@@ -1015,6 +1033,7 @@ const my @GENERA  => qw(
     Xanthomonas-like
     XMRV-like
     XMRV-related
+    xylene-degrading
     Y-symbiont
     Yaba-7
     Yaba-like
@@ -1603,6 +1622,7 @@ const my @SPECIES => qw(
     ADB_BD015
     ADB_BD042
     ADB_BD111
+    Ae_JM910
     AF_NAK1-3
     Al31_1
     AO2_32
@@ -1618,11 +1638,11 @@ const my @SPECIES => qw(
     ARS06759_00001
     ARS06980_00002
     ARS07370_00002
-    astrovirus_12
     AstV_Rat1
     AstV_Rat4
     ATA3_5Q_KO9_cl1
     ATA3_5Q_KO9_cl2
+    AZ4_17
     AZD10a_EZLN1
     AZD10a_EZLN2
     AZD11_3
@@ -1985,6 +2005,7 @@ const my @SPECIES => qw(
     D3_1_1F-16sF
     D3_1_3_2F-16sF
     DAB_16s_R32(2)
+    Davis_19N
     DB_16s_F5
     DB_16s_F77
     DB_16s_F8
@@ -2091,12 +2112,8 @@ const my @SPECIES => qw(
     Fen7940_21
     FGPV_KD09.ZAF
     flour_#16
-    FMAS_AP8
-    FMAS_AP9
-    FMAS_PD2
     FMAS_PN2
     FMAS_PN3
-    FMAS_PN4
     FMAS_PN5
     FR1_11-MR-2014
     FR1_16_MR-2014
@@ -5302,6 +5319,10 @@ const my @SPECIES => qw(
     p5_H12
     p62_G06
     p8_G05
+    P_269_FSTHT
+    P_270_FSTHT
+    P_278_FSTHT
+    P_321_FSTCO
     PE_BacIPD31B
     PE_IP16
     PE_IP5a
@@ -5321,8 +5342,15 @@ const my @SPECIES => qw(
     PE_IPFFD21
     PE_IPMFB27
     PE_IPMFB28
+    pEAQ-HT_OsD27-myc
+    pEAQ-HT_OsD27deltaDIS-myc
     pEBO_BDBV-GP
     PEPV_San92
+    pET19b_DAD2cpGFP(G166)
+    pET19b_DAD2cpGFP(G166)LSSmOrange
+    pET19b_HisDAD2
+    pET19b_HisDAD2cpGFP(G166)
+    pET19b_ShHTL7cpGFP(L166)LSSmOrange
     PGPV10K_LD1
     PGPV10K_RP1
     PGPV10K_SP1
@@ -5361,6 +5389,7 @@ const my @SPECIES => qw(
     Pip1_Cr_FR_2014
     Pip2_Cr_FR_2014
     Pip3_M_FR_2014
+    pKW20_CDFtet_pAraRedCas9_TracrRNA
     pLC_pBBR1_ori
     PM58B_RA
     PREDICT_AdV-13
@@ -5435,8 +5464,16 @@ const my @SPECIES => qw(
     PREDICT_AdV-87
     PREDICT_AdV-90
     PREDICT_AdV-91
+    PREDICT_CoV-17
+    PREDICT_CoV-35
+    PREDICT_CoV-47
     PREDICT_CoV-49
     PREDICT_CoV-50
+    PREDICT_CoV-82
+    PREDICT_CoV-90
+    PREDICT_CoV-92
+    PREDICT_CoV-93
+    PREDICT_CoV-96
     PREDICT_Orbi-6
     PREDICT_PapV-1
     PREDICT_PbV-1
@@ -5734,6 +5771,14 @@ const my @SPECIES => qw(
     pRS315_Ppdc_xyr1V821F:ace1
     pRS315_Pxyn1_ReCel3a:slp1
     pRS315_res1
+    pRS425_AtD27
+    pRS425_AtD27_MAX3_MAX4
+    pRS425_DbD27
+    pRS425_OsD27
+    pRS425_YPRCtau3-BTS1-CrtI-CrtYB
+    pRS425_YPRCtau3-CrtE-CrtI-CrtYB
+    pSC101_rK-sacB_selection-construct
+    pSC101_sC-rpsL_selection-construct
     pStA0.BBa_J23100
     pStA0.BBa_J23102
     pStA0.BBa_J23107
@@ -5741,6 +5786,7 @@ const my @SPECIES => qw(
     pStA0.BBa_J23116
     pStA0.BBa_J23118
     pT7SA11NSP1_3xFL_UnaG
+    pTU2-b_TrxD27-TrxCCD7-MBPCCD8
     Q_sR_OV_011
     Q_sR_OV_019
     Q_sR_OV_020
@@ -5916,6 +5962,12 @@ const my @SPECIES => qw(
     SAL_7
     salicis_cluster2
     salicis_cluster3
+    SAV/Human/BRA/IAL01_42160/2010
+    SAV/Human/BRA/IAL03_21214/2010
+    SAV/Human/BRA/IAL03_21218/2010
+    SAV/Human/BRA/IAL03_21220/2010
+    SAV/Human/BRA/IAL11_10818/2010
+    SAV/Human/BRA/IAL11_9928/2010
     SB_Bac1
     SB_Bac10
     SB_Bac11
@@ -6100,7 +6152,8 @@ const my @SPECIES => qw(
     UBP9_UBA6438
     Udayana_MDPVA
     Udayana_MDPVB
-    vB_NpeS-2AV2
+    vB_SabS_Sds2
+    vB_SauM_SDQ
     VPXV_CA85
     W13C10_B
     W13C11_B
@@ -6295,6 +6348,7 @@ const my @SPECIES => qw(
     XZ97_XZ_CHN_2017
     XZ98_XZ_CHN_2017
     XZ99_XZ_CHN_2017
+    Y2H-GFP_URA3
     Y4_579_1
     YS1-2_2434
     YS1-2_2437
@@ -6695,7 +6749,7 @@ Bio::MUST::Core::SeqId - Modern and legacy MUST-compliant sequence id
 
 =head1 VERSION
 
-version 0.211470
+version 0.212530
 
 =head1 SYNOPSIS
 

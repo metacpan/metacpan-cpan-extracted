@@ -353,9 +353,11 @@ Dictyoglomus_thermophilum_309799@206901837,label,#0bdbbc,normal,1
 Sulfurovum_sp._387093@152991915|Helicobacter_felis_936155@315452791,label,#9e58d8,normal,1
 Sulfurovum_sp._387093@152991915,label,#9e58d8,normal,1
 Helicobacter_felis_936155@315452791,label,#9e58d8,normal,1
+Anaerolinea_thermophila_926569@320161734|Roseiflexus_sp._357808@148657879,label,#73dc63,normal,1
 Anaerolinea_thermophila_926569@320161734|Caldilinea_aerophila_926550@383764770,label,#73dc63,normal,1
 Anaerolinea_thermophila_926569@320161734,label,#73dc63,normal,1
 Caldilinea_aerophila_926550@383764770,label,#73dc63,normal,1
+Chloroflexus_aggregans_326427@219849711|Sphaerobacter_thermophilus_479434@269838020,label,#73dc63,normal,1
 Chloroflexus_aggregans_326427@219849711|Roseiflexus_sp._357808@148657879,label,#73dc63,normal,1
 Chloroflexus_aggregans_326427@219849711|Chloroflexus_aurantiacus_324602@163846344,label,#73dc63,normal,1
 Chloroflexus_aggregans_326427@219849711,label,#73dc63,normal,1
@@ -367,6 +369,8 @@ Herpetosiphon_aurantiacus_316274@159900034,label,#73dc63,normal,1
 Roseiflexus_castenholzii_383372@156741089|Roseiflexus_sp._357808@148657879,label,#73dc63,normal,1
 Roseiflexus_castenholzii_383372@156741089,label,#73dc63,normal,1
 Roseiflexus_sp._357808@148657879,label,#73dc63,normal,1
+Thermobaculum_terrenum_525904@269926719|Sphaerobacter_thermophilus_479434@269838020,label,#73dc63,normal,1
+Thermobaculum_terrenum_525904@269926719,label,#73dc63,normal,1
 Thermomicrobium_roseum_309801@221632093|Sphaerobacter_thermophilus_479434@269838020,label,#73dc63,normal,1
 Thermomicrobium_roseum_309801@221632093,label,#73dc63,normal,1
 Sphaerobacter_thermophilus_479434@269838020,label,#73dc63,normal,1
@@ -488,6 +492,7 @@ Bacillus_subtilis_224308@16079785,label,#02ae94,normal,1
 Solibacter_usitatus_234267@116622382|Solibacter_usitatus_234267@116626558,label,#e5585d,normal,1
 Solibacter_usitatus_234267@116622382,label,#e5585d,normal,1
 Solibacter_usitatus_234267@116626558,label,#e5585d,normal,1
+Roseiflexus_sp._357808@148657939|Thermomicrobium_roseum_309801@221632841,label,#73dc63,normal,1
 Roseiflexus_sp._357808@148657939|Chloroflexus_aurantiacus_324602@163847366,label,#73dc63,normal,1
 Roseiflexus_sp._357808@148657939|Roseiflexus_castenholzii_383372@156740597,label,#73dc63,normal,1
 Roseiflexus_sp._357808@148657939,label,#73dc63,normal,1
@@ -503,6 +508,8 @@ Chloroflexus_aggregans_326427@219849488,label,#73dc63,normal,1
 Chloroflexus_sp._480224@222525211|Chloroflexus_aurantiacus_324602@163847366,label,#73dc63,normal,1
 Chloroflexus_sp._480224@222525211,label,#73dc63,normal,1
 Chloroflexus_aurantiacus_324602@163847366,label,#73dc63,normal,1
+Thermobaculum_terrenum_525904@269926482|Thermomicrobium_roseum_309801@221632841,label,#73dc63,normal,1
+Thermobaculum_terrenum_525904@269926482,label,#73dc63,normal,1
 Sphaerobacter_thermophilus_479434@269837193|Thermomicrobium_roseum_309801@221632841,label,#73dc63,normal,1
 Sphaerobacter_thermophilus_479434@269837193,label,#73dc63,normal,1
 Thermomicrobium_roseum_309801@221632841,label,#73dc63,normal,1
@@ -570,6 +577,7 @@ Selenomonas_sputigena_546271@330838952,label,#02ae94,normal,1
 Desulfitobacterium_hafniense_138119@89895432|Clostridium_thermocellum_203119@125975526,label,#02ae94,normal,1
 Desulfitobacterium_hafniense_138119@89895432,label,#02ae94,normal,1
 Clostridium_thermocellum_203119@125975526,label,#02ae94,normal,1
+Thermobaculum_terrenum_525904@269925615,label,#73dc63,normal,1
 Selenomonas_sputigena_546271@330838272|Acidaminococcus_fermentans_591001@284049155,label,#02ae94,normal,1
 Selenomonas_sputigena_546271@330838272,label,#02ae94,normal,1
 Megasphaera_elsdenii_1064535@348026778|Acidaminococcus_fermentans_591001@284049155,label,#02ae94,normal,1
@@ -579,6 +587,7 @@ Veillonella_parvula_479436@269798284,label,#02ae94,normal,1
 Acidaminococcus_intestini_568816@352683709|Acidaminococcus_fermentans_591001@284049155,label,#02ae94,normal,1
 Acidaminococcus_intestini_568816@352683709,label,#02ae94,normal,1
 Acidaminococcus_fermentans_591001@284049155,label,#02ae94,normal,1
+Herpetosiphon_aurantiacus_316274@159901286|Sphaerobacter_thermophilus_479434@269838037,label,#73dc63,normal,1
 Herpetosiphon_aurantiacus_316274@159901286|Chloroflexus_aurantiacus_324602@163845712,label,#73dc63,normal,1
 Herpetosiphon_aurantiacus_316274@159901286,label,#73dc63,normal,1
 Roseiflexus_castenholzii_383372@156741654|Chloroflexus_aurantiacus_324602@163845712,label,#73dc63,normal,1
@@ -590,6 +599,9 @@ Chloroflexus_aggregans_326427@219848100,label,#73dc63,normal,1
 Chloroflexus_sp._480224@222523417|Chloroflexus_aurantiacus_324602@163845712,label,#73dc63,normal,1
 Chloroflexus_sp._480224@222523417,label,#73dc63,normal,1
 Chloroflexus_aurantiacus_324602@163845712,label,#73dc63,normal,1
+Thermobaculum_terrenum_525904@269926729|Caldilinea_aerophila_926550@383761769,label,#73dc63,normal,1
+Thermobaculum_terrenum_525904@269926729|Sphaerobacter_thermophilus_479434@269838037,label,#73dc63,normal,1
+Thermobaculum_terrenum_525904@269926729,label,#73dc63,normal,1
 Thermomicrobium_roseum_309801@221633900|Sphaerobacter_thermophilus_479434@269838037,label,#73dc63,normal,1
 Thermomicrobium_roseum_309801@221633900,label,#73dc63,normal,1
 Sphaerobacter_thermophilus_479434@269838037,label,#73dc63,normal,1

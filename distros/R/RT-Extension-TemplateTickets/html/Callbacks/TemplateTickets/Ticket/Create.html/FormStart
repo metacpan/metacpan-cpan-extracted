@@ -1,0 +1,58 @@
+<%doc>
+At the start of the ticket creation form, if the current user can see any
+template tickets, provide a list of templates to load.
+
+When they choose a template, the form will be submitted as usual, but this
+will trigger the BeforeCreate callback of /Ticket/Create.html, which will
+set the "skip creation" flag so the form is redisplayed.
+
+In that second case, we ensure that a note is shown on the form to say we
+have loaded the template, and add hidden fields to the form so that when the
+ticket is finally created, it is tied to the template and any required child
+tickets will also be created.
+
+The actual ticket creation is performed in /Ticket/Display.html, so the
+above hidden fields are picked up by our BeforeDisplay callback on that
+page.
+</%doc>
+\
+<%ARGS>
+$QueueObj => undef
+$ARGSRef  => undef
+</%ARGS>
+\
+<%INIT>
+return if ( not defined $QueueObj );
+return if ( not defined $ARGSRef );
+return if ( not $QueueObj->id );
+
+my $Templates = {};
+$m->comp(
+    '/Ticket/Elements/TemplateTicketsList',
+    'Queue'     => $QueueObj->id,
+    'Templates' => $Templates
+);
+
+return if ( scalar keys %$Templates == 0 );
+
+my $ChosenTemplate = undef;
+if ( $ARGSRef->{'LoadTemplateTicket'} ) {
+    $ChosenTemplate = $Templates->{ $ARGSRef->{'LoadTemplateTicket'} };
+} elsif ( $ARGSRef->{'Attribute-TemplateTicketId'} ) {
+    $ChosenTemplate = $Templates->{ $ARGSRef->{'Attribute-TemplateTicketId'} };
+}
+</%INIT>
+\
+% if ( $ChosenTemplate ) {
+<& /Elements/ListActions, actions => [ loc('Using template: [_1]', $ChosenTemplate->{'Subject'}) ] &>
+% }
+\
+%# NB we don't set the default selection to the chosen template, because if
+%# we did, submitting the form would load the template again, wiping out
+%# anything the user had entered.
+\
+<& /Ticket/Elements/TemplateTicketsForm, 'Templates' => $Templates, 'Default' => '' &>
+\
+% if ( $ChosenTemplate ) {
+<input type="hidden" name="Attribute-TemplateTicketId" value="<% $ChosenTemplate->{'id'} %>" />
+% }

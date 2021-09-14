@@ -42,6 +42,7 @@ t/subname.t
 t/sum.t
 t/sum0.t
 t/tainted.t
+t/undefined-block.t
 t/uniq.t
 t/uniqnum.t
 t/weak.t

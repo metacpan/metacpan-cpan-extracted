@@ -1,0 +1,60 @@
+{
+   "abstract" : "JSON support for Test::Mock::LWP::Distilled",
+   "author" : [
+      "Sam Kington <skington@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-Mock-LWP-Distilled-JSON",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "LWP::JSON::Tiny" : "0",
+            "Moo::Role" : "0",
+            "Test::Mock::LWP::Distilled" : "0.001_02"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Status" : "0",
+            "JSON::MaybeXS" : "0",
+            "LWP::UserAgent::JSON" : "0",
+            "Moo" : "0",
+            "Test2::Tools::Compare" : "0",
+            "Test::Mock::LWP::Distilled" : "0.001_02",
+            "Test::More" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "1.08",
+            "lib::abs" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/skington/test-mock-lwp-distilled/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/skington/test-mock-lwp-distilled.git",
+         "web" : "https://github.com/skington/test-mock-lwp-distilled"
+      }
+   },
+   "version" : "1.000",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

@@ -8,15 +8,16 @@ build_requires:
   File::Temp: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Log::Any::Test: '1.710'
   Test::CheckDeps: '0.010'
   Test::Fatal: '0.010'
-  Test::MockModule: '0'
+  Test::MockModule: '0.171'
   Test::More: '0.98'
   Test::Refcount: '0.07'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.020, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,13 +33,13 @@ no_index:
 provides:
   Database::Async::Engine::PostgreSQL:
     file: lib/Database/Async/Engine/PostgreSQL.pm
-    version: '0.011'
+    version: '0.012'
   Database::Async::Engine::PostgreSQL::DDL:
     file: lib/Database/Async/Engine/PostgreSQL/DDL.pm
-    version: '0.011'
+    version: '0.012'
 requires:
   Config::Tiny: '0'
-  Database::Async: '0.014'
+  Database::Async: '0.016'
   Encode: '0'
   File::HomeDir: '0'
   Future: '0.46'
@@ -47,6 +48,7 @@ requires:
   Path::Tiny: '0'
   Protocol::Database::PostgreSQL: '1.005'
   Ryu::Async: '0.017'
+  Syntax::Keyword::Try: '0.25'
   Template: '2.28'
   URI::QueryParam: '0'
   URI::postgres: '0'
@@ -58,10 +60,12 @@ resources:
   bugtracker: https://github.com/team-at-cpan/Database-Async-Engine-PostgreSQL/issues
   homepage: https://github.com/team-at-cpan/Database-Async-Engine-PostgreSQL
   repository: https://github.com/team-at-cpan/Database-Async-Engine-PostgreSQL.git
-version: '0.011'
+version: '0.012'
 x_authority: cpan:TEAM
 x_contributors:
+  - 'Arash <arashThr@outlook.com>'
   - 'Tom M <tom@audioboundary.com>'
+  - 'Torsten Foertsch <torsten@binary.com>'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

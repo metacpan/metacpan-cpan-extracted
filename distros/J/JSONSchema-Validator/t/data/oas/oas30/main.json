@@ -145,6 +145,82 @@
                             }
                         }
                     }
+                },
+                "/encoding/common": {
+                    "post" : {
+                        "requestBody": {
+                            "content": {
+                                "application/x-www-form-urlencoded": {
+                                    "schema": {
+                                        "type" : "object",
+                                        "properties" : {
+                                            "name" : {
+                                                "type" : "string"
+                                            },
+                                            "info" : {
+                                                "type" : "object",
+                                                "properties" : {
+                                                    "grade" : {
+                                                        "type" : "integer"
+                                                    },
+                                                    "age" : {
+                                                        "type" : "integer"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "encoding" : {
+                                        "info" : {
+                                            "contentType" : "application/json"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "responses" : {
+                            "200" : {
+                                "description" : ""
+                            }
+                        }
+                    }
+                },
+                "/encoding/default": {
+                    "post" : {
+                        "requestBody": {
+                            "content": {
+                                "application/x-www-form-urlencoded": {
+                                    "schema" : {
+                                        "type" : "object",
+                                        "properties" : {
+                                            "name" : {
+                                                "type" : "string"
+                                            },
+                                            "surname" : {
+                                                "type" : "string"
+                                            },
+                                            "info" : {
+                                                "type" : "object",
+                                                "properties" : {
+                                                    "grade" : {
+                                                        "type" : "integer"
+                                                    },
+                                                    "age" : {
+                                                        "type" : "integer"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "responses" : {
+                            "200" : {
+                                "description" : ""
+                            }
+                        }
+                    }
                 }
             },
             "components": {
@@ -683,6 +759,112 @@
 
                 "status" : "202",
                 "body_res" : {},
+                "ctype_res" : "application/json",
+
+                "valid_req": true,
+                "valid_res": true
+            },
+
+            {
+                "description": "ctype url-encoded/form-data and property has encoding option; incorrect; github issue 8",
+                "method" : "post",
+                "openapi_path" : "/encoding/common",
+
+                "path" : { },
+                "query" : { },
+                "header_req" : { },
+                "body_req" : {
+                    "name" : "Anna",
+                    "info" : "{\"grade\" : 5, \"age\": {}}"
+                },
+                "ctype_req" : "application/x-www-form-urlencoded",
+
+                "status" : "200",
+                "body_res" : null,
+                "ctype_res" : "application/json",
+
+                "valid_req": false,
+                "valid_res": true
+            },
+            {
+                "description": "ctype url-encoded/form-data and property has encoding option; correct; github issue 8",
+                "method" : "post",
+                "openapi_path" : "/encoding/common",
+
+                "path" : { },
+                "query" : { },
+                "header_req" : { },
+                "body_req" : {
+                    "name" : "Anna",
+                    "info" : "{\"grade\" : 5, \"age\": 12}"
+                },
+                "ctype_req" : "application/x-www-form-urlencoded",
+
+                "status" : "200",
+                "body_res" : null,
+                "ctype_res" : "application/json",
+
+                "valid_req": true,
+                "valid_res": true
+            },
+            {
+                "description": "ctype url-encoded/form-data and property has encoding option; not json; github issue 8",
+                "method" : "post",
+                "openapi_path" : "/encoding/common",
+
+                "path" : { },
+                "query" : { },
+                "header_req" : { },
+                "body_req" : {
+                    "name" : "Anna",
+                    "info" : "not json"
+                },
+                "ctype_req" : "application/x-www-form-urlencoded",
+
+                "status" : "200",
+                "body_res" : null,
+                "ctype_res" : "application/json",
+
+                "valid_req": false,
+                "valid_res": true
+            },
+            {
+                "description": "ctype url-encoded/form-data and property has encoding option; default incorrect; github issue 8",
+                "method" : "post",
+                "openapi_path" : "/encoding/default",
+
+                "path" : { },
+                "query" : { },
+                "header_req" : { },
+                "body_req" : {
+                    "name" : "Anna",
+                    "info" : "{\"grade\" : 5, \"age\": {}}"
+                },
+                "ctype_req" : "application/x-www-form-urlencoded",
+
+                "status" : "200",
+                "body_res" : null,
+                "ctype_res" : "application/json",
+
+                "valid_req": false,
+                "valid_res": true
+            },
+            {
+                "description": "ctype url-encoded/form-data and property has encoding option; default correct; github issue 8",
+                "method" : "post",
+                "openapi_path" : "/encoding/default",
+
+                "path" : { },
+                "query" : { },
+                "header_req" : { },
+                "body_req" : {
+                    "name" : "Anna",
+                    "info" : "{\"grade\" : 5, \"age\": 12}"
+                },
+                "ctype_req" : "application/x-www-form-urlencoded",
+
+                "status" : "200",
+                "body_res" : null,
                 "ctype_res" : "application/json",
 
                 "valid_req": true,

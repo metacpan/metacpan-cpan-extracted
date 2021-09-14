@@ -1,0 +1,169 @@
+\==[doc]      [2] [\bullet(packed)[\link[\1][\2]]]
+\==[program]  [3]
+    [\tablerow[\1 \version[\2]] [\release[\2]]
+        [\link[https://archives.eyrie.org/software/\3.tar.gz][tar.gz]
+        (\link[https://archives.eyrie.org/software/\3.tar.gz.asc]
+              [PGP signature])]
+        [\link[https://archives.eyrie.org/software/\3.tar.xz][tar.xz]
+        (\link[https://archives.eyrie.org/software/\3.tar.xz.asc]
+              [PGP signature])]]
+\==[download] [3]
+    [\1 \version[\2]\break
+     \link[https://archives.eyrie.org/software/\3.tar.gz][tar.gz]
+     (\link[https://archives.eyrie.org/software/\3.tar.gz.asc]
+           [signature])\break
+     \link[https://archives.eyrie.org/software/\3.tar.xz][tar.xz]
+     (\link[https://archives.eyrie.org/software/\3.tar.xz.asc]
+           [signature])\break
+    Released \release[\2]]
+
+\heading[Pod::Thread][software]
+
+\h1[Pod::Thread]
+
+\div(sidebar)[
+    \h2[Download]
+
+    \download[Pod::Thread][pod-thread]
+        [web/Pod-Thread-\version[pod-thread]]
+
+    \link[https://archives.eyrie.org/software/ARCHIVE/Pod-Thread/]
+         [Archive]
+
+    \h2[Documentation]
+
+    \link[readme.html][General overview] \break
+    \link[news.html][Change summary] \break
+    \link[pod2thread.html][pod2thread manual page]
+
+    \h2[Development]
+
+    \link[https://github.com/rra/pod-thread]
+         [GitHub] \break
+    \link[https://github.com/rra/pod-thread/issues]
+         [Bug tracker] \break
+    \link[https://git.eyrie.org/?p=web/pod-thread.git]
+         [Git repository] \break
+    \link[https://metacpan.org/release/Pod-Thread]
+         [MetaCPAN] \break
+]
+
+\h2[Blurb]
+
+Pod::Thread translates POD source into thread, a macro language processed
+by spin.  It supports optionally adding a table of contents and a
+navigation bar to the genenerated file.  This package also includes the
+pod2thread driver script, invoked automatically by spin for POD files and
+pointers to POD files.
+
+\h2[Description]
+
+This package contains a module to translate POD into thread, an HTML macro
+language.  As such, it's not very useful without
+\link[https://www.eyrie.org/~eagle/software/web/][spin], a separate
+program to convert thread into HTML.  I wrote this module for my personal
+needs and it may not be (and in fact probably isn't) suitable for more
+general use as yet.
+
+The eventual intention is to incorporate spin into
+\link[https://www.eyrie.org/~eagle/software/docknot/][DocKnot], at which
+point this module will provide the POD support for DocKnot as a static
+site generator.  I have no estimate for when that work will be done.
+
+The conversion done by this module is mostly straightforward.  The only
+notable parts are the optional generation of a table of contents or a
+navigation bar at the top of the generated file.
+
+\h2[Requirements]
+
+Perl 5.24 or later and Pod::Parser 3.06 or later.  As mentioned above,
+it's also not particularly useful without spin.
+
+\h2[Download]
+
+The distribution:
+
+\table[][
+    \program[Pod::Thread][pod-thread]
+        [web/Pod-Thread-\version[pod-thread]]
+]
+
+An \link[https://archives.eyrie.org/software/ARCHIVE/Pod-Thread/] [archive
+of older releases] is also available.
+
+A Debian package (libpod-thread-perl) is available from my
+\link[../debian.html][personal repository].
+
+Pod::Thread is available from CPAN as the
+\link[https://metacpan.org/release/Pod-Thread] [Pod-Thread distribution].
+
+Pod::Thread is maintained using the Git version control system.  To check
+out the current development tree, see
+\link[https://github.com/rra/pod-thread][GitHub] or clone:
+
+\pre[    https://git.eyrie.org/web/pod-thread.git]
+
+Pull requests on GitHub are welcome.  You can also
+\link[https://git.eyrie.org/?p=web/pod-thread.git][browse the current
+development source].
+
+\h2[Documentation]
+
+\div(left)[
+    \class(first)[User documentation:]
+
+    \doc[readme.html][README]
+    \doc[news.html][Change summary]
+    \doc[pod2thread.html][pod2thread manual page]
+    \doc[license.html][License and copyright]
+
+    Developer documentation:
+
+    \doc[https://github.com/rra/pod-thread]
+        [GitHub]
+    \doc[https://github.com/rra/pod-thread/issues]
+        [Bug tracker]
+]
+
+\div(right)[
+    \class(first)[API documentation:]
+
+    \doc[pod-thread.html][Pod::Thread]
+]
+
+\h2(after)[License]
+
+The Pod::Thread package as a whole is covered by the following copyright
+and license:
+
+\block[
+
+    Copyright 2002, 2008-2009, 2013, 2021
+        Russ Allbery <rra@cpan.org>
+
+    Permission is hereby granted, free of charge, to any person obtaining
+    a copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be
+    included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+]
+
+Some individual source files are covered by other, compatible licenses.
+For complete copyright and license information, see the file
+\link[license.html][LICENSE] in the Pod::Thread source distribution.
+
+\signature

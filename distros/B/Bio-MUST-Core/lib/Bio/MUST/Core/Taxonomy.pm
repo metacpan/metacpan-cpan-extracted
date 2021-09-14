@@ -2,7 +2,7 @@ package Bio::MUST::Core::Taxonomy;
 # ABSTRACT: NCBI Taxonomy one-stop shop
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::Taxonomy::VERSION = '0.211470';
+$Bio::MUST::Core::Taxonomy::VERSION = '0.212530';
 use Moose;
 use namespace::autoclean;
 
@@ -190,27 +190,25 @@ sub _build_ncbi_tax {
 
         # allow most NCBI Taxonomy synonyms classes
         # cut -f4 -d'|' names.dmp | sort | uniq -c
-        # last updated on Apr-15-2020
-        #    1163   acronym
-        #     287   anamorph
-        #  484181   authority
+        # last updated on Aug-18-2021
+        #    1582   acronym
+        #  576856   authority
         #     228   blast name
-        #   14484   common name
-        #   48839   equivalent name
-        #     482   genbank acronym
-        #   29528   genbank common name
-        #    1107   genbank synonym
-        #     535   in-part
-        #   51944   includes
-        # 2240432   scientific name
-        #  166703   synonym
-        #     169   teleomorph
-        #  147495   type material
+        #   14555   common name
+        #   52040   equivalent name
+        #     484   genbank acronym
+        #   29979   genbank common name
+        #    1096   genbank synonym
+        #     733   in-part
+        #   61755   includes
+        # 2354398   scientific name
+        #  199012   synonym
+        #  167825   type material
 
         synonyms => [
             'synonym', 'genbank synonym',
             'acronym', 'genbank acronym',
-            'anamorph', 'genbank anamorph', 'teleomorph',
+            'anamorph', 'genbank anamorph', 'teleomorph',       # now useless
             'blast name', 'common name', 'genbank common name',
             'equivalent name', 'includes',
           # 'authority', 'in-part', 'type material',
@@ -351,7 +349,7 @@ sub _build_dupes_for {
 
 # Note: taken from nodes.dmp as follows (then manually re-ordered)
 # cut -f3 -d'|' nodes.dmp | sort | uniq
-# last updated on Jul-25-2020
+# last updated on Aug-18-2021
 const my @LEVELS => (
     'skip',                     # default collapsing level
     'top',                      # useful to preserve 'cellular organisms'
@@ -368,7 +366,7 @@ const my @LEVELS => (
     'species group', 'species subgroup', 'species', 'subspecies',
 
     'subvariety', 'varietas',   # relative order of all these terms is unclear
-    'forma', 'forma specialis',
+    'morph', 'forma', 'forma specialis',
     'isolate', 'strain',
     'pathogroup', 'serogroup', 'serotype',
     'biotype', 'genotype',
@@ -2017,7 +2015,7 @@ Bio::MUST::Core::Taxonomy - NCBI Taxonomy one-stop shop
 
 =head1 VERSION
 
-version 0.211470
+version 0.212530
 
 =head1 SYNOPSIS
 

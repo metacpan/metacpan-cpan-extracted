@@ -7,19 +7,15 @@ package Comics::Plugin::Sinfest;
 
 use parent qw(Comics::Fetcher::Single);
 
-our $VERSION = "0.02";
+our $VERSION = "1.00";
 
-sub register {
-    shift->SUPER::register
-      ( { name    => "Sinfest",
-	  url     => "http://www.sinfest.net/",
-	  pat	  =>
+our $name    = "Sinfest";
+our $url     = "https://sinfest.xyz/";
+our $pattern =
 	    qr{ <img \s+
-		src="(?<url>btphp/comics/(?<image>\d+-\d+-\d+\.gif))" \s+
+		src="(?<url>btphp/comics/(?<image>\d+-\d+-\d+\.(?:jpg|gif)))" \s+
 		alt="(?<alt>.*?)">
-	      }x,
-	} );
-}
+	      }x;
 
 # Important: Return the package name!
 __PACKAGE__;

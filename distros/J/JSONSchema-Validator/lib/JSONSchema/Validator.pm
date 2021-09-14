@@ -14,7 +14,7 @@ use JSONSchema::Validator::Draft7;
 use JSONSchema::Validator::OAS30;
 use JSONSchema::Validator::Util qw(get_resource decode_content read_file);
 
-our $VERSION = '0.006';
+our $VERSION = '0.008';
 
 my $SPECIFICATIONS = {
     JSONSchema::Validator::OAS30::ID => JSONSchema::Validator::OAS30::SPECIFICATION,
@@ -149,11 +149,11 @@ JSONSchema::Validator - Validator for JSON Schema Draft4/Draft6/Draft7 and OpenA
 
 =head1 VERSION
 
-version 0.006
+version 0.008
 
 =head1 SYNOPSIS
 
-    # to get OpenAPI validator of schema in YAML format
+    # to get OpenAPI validator in YAML format
     $validator = JSONSchema::Validator->new(resource => 'file:///some/path/to/oas30.yml');
     my ($result, $errors, $warnings) = $validator->validate_request(
         method => 'GET',
@@ -186,7 +186,7 @@ version 0.006
         }
     )
 
-    # to get JSON Schema Draft4/Draft6/Draft7 validator of schema in JSON format
+    # to get JSON Schema Draft4/Draft6/Draft7 validator in JSON format
     $validator = JSONSchema::Validator->new(resource => 'http://example.com/draft4/schema.json')
     my ($result, $errors) = $validator->validate_schema($object_to_validate)
 
@@ -276,11 +276,21 @@ Andrey Khozov <andrey@rydlab.ru>
 
 =back
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords James Waters
+=for stopwords James Waters uid66
+
+=over 4
+
+=item *
 
 James Waters <james@jcwaters.co.uk>
+
+=item *
+
+uid66 <19481514+uid66@users.noreply.github.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

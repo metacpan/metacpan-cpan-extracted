@@ -1,0 +1,16 @@
+[name]
+Random formatting codes
+
+[input]
+=pod
+
+B<bold> C<code> X<ignored> I<italic>
+
+L<Other::Module/SECTION>
+
+[output]
+\bold[bold] \code[code]  \italic[italic]
+
+"SECTION" in Other::Module
+
+\signature

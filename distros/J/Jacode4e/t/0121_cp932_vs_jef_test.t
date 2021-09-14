@@ -489,10 +489,10 @@ for my $test (@test) {
 
     my $option_content = '';
     if (defined $option) {
-        $option_content .= qq{INPUT_LAYOUT=>$option->{'INPUT_LAYOUT'}}        if exists $option->{'INPUT_LAYOUT'};
-        $option_content .= qq{OUTPUT_SHIFTING=>$option->{'OUTPUT_SHIFTING'}}  if exists $option->{'OUTPUT_SHIFTING'};
-        $option_content .= qq{SPACE=>@{[uc unpack('H*',$option->{'SPACE'})]}} if exists $option->{'SPACE'};
-        $option_content .= qq{GETA=>@{[uc unpack('H*',$option->{'GETA'})]}}   if exists $option->{'GETA'};
+        $option_content .= qq{INPUT_LAYOUT=>$option->{'INPUT_LAYOUT'},}        if exists $option->{'INPUT_LAYOUT'};
+        $option_content .= qq{OUTPUT_SHIFTING=>$option->{'OUTPUT_SHIFTING'},}  if exists $option->{'OUTPUT_SHIFTING'};
+        $option_content .= qq{SPACE=>@{[uc unpack('H*',$option->{'SPACE'})]},} if exists $option->{'SPACE'};
+        $option_content .= qq{GETA=>@{[uc unpack('H*',$option->{'GETA'})]},}   if exists $option->{'GETA'};
         $option_content = "{$option_content}";
     }
 

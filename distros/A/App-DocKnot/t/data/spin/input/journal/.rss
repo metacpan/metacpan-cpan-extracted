@@ -1,0 +1,39 @@
+Base:         https://www.eyrie.org/~eagle/
+Index-Base:   https://www.eyrie.org/~eagle/journal/
+RSS-Base:     https://www.eyrie.org/~eagle/journal/
+Title:        Eagle's Path
+Description:  "Passion and dispassion.  Choose two." -- Larry Wall
+Language:     en-us
+Output:       *:index:index.th *:rss:index.rss debian:rss:debian.rss
+              review:rss:reviews.rss
+Index-Prefix:
+ \rss[index.rss][Eagle's Path]
+ \rss[debian.rss][Eagle's Path (Debian focused)]
+ \rss[reviews.rss][Eagle's Path (reviews only)]
+ .
+ \==[date][1][\class(date)[\1]]
+ .
+ \heading[Eagle's Path][journal-set]
+ .
+ \h1[Eagle's Path]
+ .
+ \quote(short)[
+     Passion and dispassion.  Choose two.
+ ][Larry Wall][]
+ .
+ \include[.navbar]
+ .
+ \div(journal)[
+Index-Suffix:
+ ]
+
+Date: 2011-08-13 00:09
+Title: NPR Top 100 SFF meme
+Link: journal/2011-08/006.html
+Journal: journal/2011-08/006.th
+Tags: debian
+
+Date: 2007-01-14 21:30
+Title: Review: Fermat's Enigma
+Link: reviews/books/1-250-30112-2.html
+Review: reviews/books/0-385-49362-2.th

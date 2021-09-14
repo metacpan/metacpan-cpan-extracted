@@ -62,7 +62,7 @@
          "web" : "https://github.com/perlancar/perl-Text-ANSI-WideUtil"
       }
    },
-   "version" : "0.231",
+   "version" : "0.232",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -71,7 +71,7 @@
          {
             "class" : "Dist::Zilla::Plugin::InsertBlock::FromModule",
             "name" : "InsertBlock::FromModule",
-            "version" : "0.100"
+            "version" : "0.101"
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease",

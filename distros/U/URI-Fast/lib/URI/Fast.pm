@@ -1,6 +1,6 @@
 package URI::Fast;
 
-our $XS_VERSION = our $VERSION = '0.54';
+our $XS_VERSION = our $VERSION = '0.55';
 $VERSION =~ tr/_//;
 
 use utf8;
@@ -424,22 +424,29 @@ OO equivalent to L</html_url>.
 All attributes serve as full accessors, allowing the URI segment to be both
 retrieved and modified.
 
+=head2 RAW ACCESSORS
+
 Each attribute defines a C<raw_*> method, which returns the raw, encoded string
-value for that attribute.
+value for that attribute. If a new value is passed, it will set the field to
+the raw, unchanged value without checking it or changing it in any way.
+
+=head2 CLEARERS
 
 Each attribute further has a matching clearer method (C<clear_*>) which unsets
 its value.
+
+=head2 ACCESSORS
 
 In general, accessors accept an I<unencoded> string and set their slot value to
 the I<encoded> value. They return the decoded value. See L</ENCODING> for an in
 depth description of their behavior as well as an explanation of the more
 complex behavior of compound fields.
 
-=head2 scheme
+=head3 scheme
 
 Gets or sets the scheme portion of the URI (e.g. C<http>), excluding C<://>.
 
-=head2 auth
+=head3 auth
 
 The authorization section is composed of the username, password, host name, and
 port number:
@@ -454,29 +461,29 @@ C<host>, and C<port>). In both cases, the existing values are completely
 replaced by the new values and any values missing from the caller-supplied
 input are deleted.
 
-=head3 usr
+=head4 usr
 
 The username segment of the authorization string. Updating this value alters
 L</auth>.
 
-=head3 pwd
+=head4 pwd
 
 The password segment of the authorization string. Updating this value alters
 L</auth>.
 
-=head3 host
+=head4 host
 
 The host name segment of the authorization string. May be a domain string or an
 IP address. If the host is an IPV6 address, it must be surrounded by square
 brackets (per spec), which are included in the host string. Updating this value
 alters L</auth>.
 
-=head3 port
+=head4 port
 
 The port number segment of the authorization string. Updating this value alters
 L</auth>.
 
-=head2 path
+=head3 path
 
 In scalar context, returns the entire path string. In list context, returns a
 list of path segments, split by C</>.
@@ -500,7 +507,7 @@ C<split_path>), always return an array reference.
   $uri->split_path;         # ['foo', 'bar'];
   $uri->split_path_compat;  # ['', 'foo', 'bar'];
 
-=head2 query
+=head3 query
 
 In scalar context, returns the complete query string, excluding the leading
 C<?>. The query string may be set in several ways.
@@ -514,11 +521,11 @@ values (see L</query_hash>).
 
 Both '&' and ';' are treated as separators for key/value parameters.
 
-=head2 frag
+=head3 frag
 
 The fragment section of the URI, excluding the leading C<#>.
 
-=head2 fragment
+=head3 fragment
 
 An alias of L</frag>.
 

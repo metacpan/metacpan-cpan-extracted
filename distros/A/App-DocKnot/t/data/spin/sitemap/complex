@@ -1,0 +1,147 @@
+/: Russ Allbery
+# comments are ignored
+  /faqs/: FAQs and Documentation
+    /faqs/questions.html: Why Ask Questions in Public?
+    ---
+    /faqs/comments.html: Why This Journal Doesn't Support Comments
+    ---
+    /faqs/big-eight.html: Big Eight Newsgroup Creation Process
+    ---
+    /faqs/mod-pitfalls.html: Pitfalls of Moderation
+    ---
+    /faqs/usenet-hier.html: Usenet Hierarchy Administration
+    ---
+    /faqs/racc.html: rec.arts.comics.creative FAQ
+    ---
+    /faqs/rgra.html: rec.games.roguelike.announce Posting Guidelines
+    ---
+    /faqs/inn.html: INN 2.x FAQ
+    ---
+    /faqs/soundness-inn.html: Soundness for INN
+    /faqs/soundness-cnews.html: Soundness for C News
+    /faqs/soundness-other.html: Soundness for Other Servers
+    ---
+    /faqs/mjqmail.html: Using Majordomo with qmail
+  /notes/: Technical Notes
+    /notes/afs/: AFS
+      /notes/afs/afsdb.html: AFS Reporting Database
+      /notes/afs/balance.html: AFS Server Balancing
+    /notes/style/: Coding Style
+      /notes/style/build.html: Build System Style
+      /notes/style/doc.html: Package Documentation Style
+      /notes/style/c.html: C Coding Style
+      /notes/style/perl.html: Perl Coding Style
+    /notes/cvs/: CVS
+      /notes/cvs/overview.html: Overview of CVS
+      /notes/cvs/why.html: Why put a set of files into CVS?
+      /notes/cvs/basic-usage.html: Basic CVS usage
+      /notes/cvs/command-summary.html: Short CVS command summary
+      /notes/cvs/emacs.html: Using CVS inside emacs
+      /notes/cvs/cvsignore.html: Telling CVS to ignore files
+      /notes/cvs/renaming-files.html: Renaming in CVS
+      /notes/cvs/revisions.html: CVS revision numbers
+      /notes/cvs/conflicts.html: Resolving CVS conflicts
+      /notes/cvs/import.html: Tracking vendor source
+      /notes/cvs/tagging-branching.html: Tagging and branching
+      /notes/cvs/aliases.html: tcsh aliases for CVS
+      /notes/cvs/file-headers.html: CVS keywords in file headers
+    /notes/debian/: Debian
+      /notes/debian/server.html: Debian Best Practices
+      /notes/debian/private-repo.html: Debian Private Repositories
+      /notes/debian/build-tools.html: Debian Packaging Tools
+      /notes/debian/git.html: Using Git for Debian
+      /notes/debian/scripts.html: Packaging Scripts for Debian
+      /notes/debian/sbuild.html: sbuild with btrfs
+      /notes/debian/firebird.html: Debian on HP Firebird 802
+      /notes/debian/shuttle.html: Debian on Shuttle SN85G4
+      /notes/debian/jce-policy.html: Java JCE Policy Packaging
+      /notes/debian/kernel-build.html: Debian Kernel Build
+      /notes/debian/qmail.html: qmail on Debian
+      /notes/debian/quotas.html: Enabling Quotas on Debian
+    /notes/kerberos/: Kerberos
+    /notes/perl-sig.html: Perl Signature Quine
+    /notes/languages/: Programming Languages
+      /notes/languages/background.html: Programming Background
+      ---
+      /notes/languages/python.html: Notes on Python
+      /notes/languages/java.html: Notes on Java
+    /notes/xemacs-mt.html: XEmacs and Movable Type
+    /notes/scrum/: Scrum
+    /notes/rpath.html: Shared Library Search Paths
+    /notes/puppet.html: Small-Scale Puppet
+    /notes/bundle.html: System Templating with Bundle
+    /notes/solaris/: Solaris
+      /notes/solaris/dns-cache.html: Flushing nscd's Cache
+      /notes/solaris/setuid-core.html: setuid Core Dumps
+      /notes/solaris/boot-disk.html: Swapping Boot Disks
+      /notes/solaris/ipv6.html: Minimal IPv6 Setup
+      /notes/solaris/swap-file.html: Adding a Swap File
+    /notes/xhtml.html: XHTML
+  /stories/: Stories
+    /stories/drifter.html: Drifter
+      /stories/drifter.01.html: Drifter #1
+      /stories/drifter.02.html: Drifter #2
+      /stories/drifter.03.html: Drifter #3
+      /stories/drifter.04.html: Drifter #4
+      /stories/drifter.05.html: Drifter #5
+      /stories/drifter.special.html: Drifter RACC Vote Special
+    /stories/retcon.html: Retcon Midnight
+      /stories/retcon.intro.html: Introduction
+      /stories/retcon.prologue.html: Prologue
+      /stories/retcon.01.html: Retcon Midnight #1
+      /stories/retcon.02.html: Retcon Midnight #2
+      /stories/retcon.03.html: Retcon Midnight #3
+      /stories/retcon.04.html: Retcon Midnight #4
+      /stories/retcon.05.html: Retcon Midnight #5
+      /stories/retcon.source.html: Retcon Midnight Sourcebook
+    /stories/birds.fly.html: Birds Fly
+      /stories/birds.fly.01.html: Birds Fly #1
+      /stories/birds.fly.02.html: Birds Fly #2
+      /stories/birds.fly.03.html: Birds Fly #3
+    /stories/perspectives.html: Perspectives
+      /stories/perspectives.01.html: Perspectives #1
+      /stories/perspectives.02.html: Perspectives #2
+  ---
+  /writing/: Other Writing
+    /writing/rant.html: A Rant About Usenet
+    ---
+    /writing/community.html: On Community
+    ---
+    /writing/homesteading.html: Comments on Homesteading the Noosphere
+    ---
+    /writing/terrorism.html: Terrorism and War
+    ---
+    /writing/defiantly.html: Defiantly Free
+  /usefor/: Usenet Format and Protocols
+    /usefor/rfcs/: Netnews Standards
+    /usefor/drafts/: Netnews Drafts
+  /nntp/: NNTP
+    /nntp/rfcs/: NNTP Standards
+    /nntp/drafts/: NNTP Drafts
+    ---
+    /nntp/ietf.html: IETF nntpext WG
+  /big-8/: Big Eight Hierarchy
+  /personal/: Personal Information
+    /personal/contact.html: Contact Information
+    ---
+    /personal/projects.html: Current Projects
+  /links/: Links
+    /links/books.html: Books
+    /links/charities.html: Charities and Non-Profits
+    /links/people.html: Interesting People
+    /links/vendors.html: On-Line Stores and Vendors
+  /changes.html: Recent Changes
+    /changes/2020.html: 2020 Changes
+    /changes/2019.html: 2019 Changes
+    /changes/2018.html: 2018 Changes
+    /changes/2017.html: 2017 Changes
+    /changes/2016.html: 2016 Changes
+    /changes/2015.html: 2015 Changes
+    /changes/2014.html: 2014 Changes
+    /changes/2013.html: 2013 Changes
+    /changes/2012.html: 2012 Changes
+    /changes/2011.html: 2011 Changes
+    /changes/2010.html: 2010 Changes
+    /changes/2009.html: 2009 Changes
+    /changes/2008.html: 2008 Changes
+  /sitemap.html: Sitemap

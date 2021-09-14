@@ -1,12 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/SQLiteUtils/list_sqlite_columns
-# and generated automatically using Perinci::CmdLine::Gen version 0.497
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-21'; # DATE
-our $DIST = 'App-SQLiteUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+# and generated automatically using Perinci::CmdLine::Gen version 0.500
 
 use 5.010001;
 use strict;
@@ -14,6 +9,11 @@ use warnings;
 use Log::ger;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-09-13'; # DATE
+our $DIST = 'App-SQLiteUtils'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/SQLiteUtils/list_sqlite_columns",
@@ -40,16 +40,13 @@ list-sqlite-columns - list-sqlite-columns
 
 =head1 VERSION
 
-This document describes version 0.002 of list-sqlite-columns (from Perl distribution App-SQLiteUtils), released on 2021-01-21.
+This document describes version 0.004 of list-sqlite-columns (from Perl distribution App-SQLiteUtils), released on 2021-09-13.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % list-sqlite-columns [--debug] [--format=name] [--json]
-     [--log-level=level] [--(no)naked-res] [--page-result[=program]]
-     [--quiet] [--trace] [--verbose] [--view-result[=program]] <db_file>
-     <table>
+% B<list-sqlite-columns> [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] -- E<lt>I<db_file>E<gt> E<lt>I<table>E<gt>
 
 =head1 DESCRIPTION
 
@@ -65,7 +62,11 @@ C<*> marks required options.
 
 =item B<--db-file>=I<s>*
 
+Can also be specified as the 1st command-line argument.
+
 =item B<--table>=I<s>*
+
+Can also be specified as the 2nd command-line argument.
 
 =back
 
@@ -198,23 +199,40 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-SQLite
 
 Source repository is at L<https://github.com/perlancar/perl-App-SQLiteUtils>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-SQLiteUtils/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-SQLiteUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

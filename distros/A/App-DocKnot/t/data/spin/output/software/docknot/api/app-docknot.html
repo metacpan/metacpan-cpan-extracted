@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>App::DocKnot</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link rel="stylesheet" href="/~eagle/styles/pod.css" type="text/css" />
+  <link rel="next" href="app-docknot-command.html"
+        title="App::DocKnot::Command" />
+  <link rel="up" href="../" title="DocKnot" />
+  <link rel="top" href="../../../" />
+</head>
+
+<!-- Spun by DocKnot %VERSION% on %DATE% -->
+
+<body>
+<table class="navbar"><tr>
+  <td class="navleft"></td>
+  <td>
+    <a href="../../../">Russ Allbery</a>
+    &gt; <a href="../../">Software</a>
+    &gt; <a href="../">DocKnot</a>
+  </td>
+  <td class="navright"><a href="app-docknot-command.html">App::DocKnot::Command</a>&nbsp;&gt;</td>
+</tr></table>
+
+
+<h1>App::DocKnot</h1>
+
+<p class="subhead">(Documentation and software release management)</p>
+
+<p class="navbar">
+  <a href="#S1">Requirements</a>
+  | <a href="#S2">Description</a>
+  | <a href="#S3">Instance Methods</a>
+  | <a href="#S4">Author</a>
+<br />
+  <a href="#S5">Copyright and License</a>
+  | <a href="#S6">See Also</a>
+</p>
+
+<h2 id="S1"><a name="S1">REQUIREMENTS</a></h2>
+
+<p>
+Perl 5.24 or later and the modules File::BaseDir and File::ShareDir, both of
+which are available from CPAN.
+</p>
+
+<h2 id="S2"><a name="S2">DESCRIPTION</a></h2>
+
+<p>
+DocKnot is a system for documentation and software release management.  Its
+functionality is provided by various submodules, often invoked via the
+<b>docknot</b> command-line program.  For more information, see docknot(1).
+</p>
+
+<p>
+This module only provides helper functions to load configuration and metadata
+that are used by its various submodules.
+</p>
+
+<h2 id="S3"><a name="S3">INSTANCE METHODS</a></h2>
+
+<dl>
+<dt>appdata_path(PATH[, ...])</dt>
+<dd><p>
+Return the path of a file from the application data.  The file is specified as
+one or more path components.
+</p>
+
+<p>
+These data files are installed with App::DocKnot, but each file can be
+overridden by the user via files in <i class="file">$HOME/.config/docknot</i> or
+<i class="file">/etc/xdg/docknot</i> (or whatever $XDG_CONFIG_HOME and $XDG_CONFIG_DIRS are set
+to).  Raises a text exception if the desired file could not be located.
+</p></dd>
+</dl>
+
+<h2 id="S4"><a name="S4">AUTHOR</a></h2>
+
+<p>
+Russ Allbery &lt;rra@cpan.org&gt;
+</p>
+
+<h2 id="S5"><a name="S5">COPYRIGHT AND LICENSE</a></h2>
+
+<p>
+Copyright 2013-2021 Russ Allbery &lt;rra@cpan.org&gt;
+</p>
+
+<p>
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+</p>
+
+<p>
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+</p>
+
+<p>
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+</p>
+
+<h2 id="S6"><a name="S6">SEE ALSO</a></h2>
+
+<p>
+docknot(1)
+</p>
+
+<p>
+This module is part of the App-DocKnot distribution.  The current version of
+DocKnot is available from CPAN, or directly from its web site at
+&lt;<a href="https://www.eyrie.org/~eagle/software/docknot/">https://www.eyrie.org/~eagle/software/docknot/</a>&gt;.
+</p>
+
+<table class="navbar"><tr>
+  <td class="navleft"></td>
+  <td>
+    <a href="../../../">Russ Allbery</a>
+    &gt; <a href="../../">Software</a>
+    &gt; <a href="../">DocKnot</a>
+  </td>
+  <td class="navright"><a href="app-docknot-command.html">App::DocKnot::Command</a>&nbsp;&gt;</td>
+</tr></table>
+
+<address>
+    Last <a href="https://www.eyrie.org/~eagle/software/web/">spun</a>
+    %DATE% from thread modified %DATE%
+</address>
+</body>
+</html>

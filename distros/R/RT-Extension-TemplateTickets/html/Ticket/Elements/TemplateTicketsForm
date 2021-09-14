@@ -1,0 +1,63 @@
+<%doc>
+Output form elements for choosing a template ticket to load, including some
+Javascript to show a description for each template, and to hide the "Load"
+button when nothing is selected.
+</%doc>
+\
+<%ARGS>
+$Templates => {}
+$Default   => ''
+</%ARGS>
+\
+<%INIT>
+return if (not $Templates);
+return if (scalar keys %$Templates == 0);
+
+$Default = '' if (not defined $Default);
+
+my @SortedTemplates = sort {
+          ( $a->{'Category'} || '' ) eq ( $b->{'Category'} || '' )
+        ? ( $a->{'Subject'} cmp $b->{'Subject'} )
+        : ( $a->{'Category'} || '' ) cmp( $b->{'Category'} || '' )
+} values %$Templates;
+</%INIT>
+\
+<table border="0">
+<tr>
+<td><&|/l&>Load defaults from template</&>:</td>
+<td>\
+<select name="LoadTemplateTicket">
+<option value="" description="">-</option>
+% my $InGroup = '';
+% foreach my $Template (@SortedTemplates) {
+%     if ($InGroup ne $Template->{'Category'}) {
+%         if ($InGroup) {
+</optgroup>
+%         }
+%         $InGroup = $Template->{'Category'};
+<optgroup label="<% $InGroup %>">
+%      }
+<option<% $Default eq $Template->{'id'} ? ' selected' : '' %> value="<% $Template->{'id'} %>" description="<% $Template->{'Description'} %>"><% $Template->{'Subject'} %></option>
+% }
+% if ($InGroup) {
+</optgroup>
+% }
+</select></td>
+<td><input type="submit" value="<&|/l&>Load</&>" /></td>
+<td><i><% $Templates->{$Default} ? $Templates->{$Default}->{'Description'} : '' %></i></td>
+</tr>
+</table>
+<script type="text/javascript">
+jQuery('select[name=LoadTemplateTicket').off();
+jQuery('select[name=LoadTemplateTicket').on('change', function () {
+    var selectedOption = jQuery(this).find('option:selected');
+    if (selectedOption.attr('value')) {
+        jQuery(this).parents('tr').first().find('i').text(selectedOption.attr('description'));
+        jQuery(this).parents('tr').first().find('input[type=submit]').show();
+    } else {
+        jQuery(this).parents('tr').first().find('i').text('');
+        jQuery(this).parents('tr').first().find('input[type=submit]').hide();
+    }
+});
+jQuery('select[name=LoadTemplateTicket').trigger('change');
+</script>

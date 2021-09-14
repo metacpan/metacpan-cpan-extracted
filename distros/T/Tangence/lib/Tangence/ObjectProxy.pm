@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2010-2020 -- leonerd@leonerd.org.uk
 
-package Tangence::ObjectProxy;
+package Tangence::ObjectProxy 0.26;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.25';
 
 use Carp;
 
@@ -269,7 +267,7 @@ Takes the following named callbacks:
 
 Callback function to invoke whenever the event is fired
 
- $on_fire->( @args )
+   $on_fire->( @args )
 
 The returned C<Future> it is guaranteed to be completed before any invocation
 of the C<on_fire> event handler.
@@ -542,7 +540,7 @@ Takes the following named arguments:
 
 Optional. Callback function to invoke whenever the property value changes.
 
- $on_updated->( $new_value )
+   $on_updated->( $new_value )
 
 If not provided, then individual handlers for individual change types must be
 provided.

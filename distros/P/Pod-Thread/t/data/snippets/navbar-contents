@@ -16,7 +16,7 @@ foo - Some description of foo
 
 Some scription.
 
-=head1 OTHER SECTION
+=head1 SECTION AND SECTION
 
 Another — section.
 
@@ -30,8 +30,6 @@ With some subsection.
 
 =head1 LONG SECTION NAME
 
-Yet more stuff.
-
 [output]
 \heading[foo][]
 
@@ -41,7 +39,7 @@ Yet more stuff.
 
 \class(navbar)[
   \link[#S1][Description]
-  | \link[#S2][Other Section]
+  | \link[#S2][Section and Section]
   | \link[#S3][Yet Another Section]
 \break
   \link[#S4][Long Section Name]
@@ -50,7 +48,7 @@ Yet more stuff.
 \h2[Table of Contents]
 
 \number(packed)[\link[#S1][DESCRIPTION]]
-\number(packed)[\link[#S2][OTHER SECTION]]
+\number(packed)[\link[#S2][SECTION AND SECTION]]
 \number(packed)[\link[#S3][YET ANOTHER SECTION]]
 \number(packed)[\link[#S4][LONG SECTION NAME]]
 
@@ -58,7 +56,7 @@ Yet more stuff.
 
 Some scription.
 
-\h2(#S2)[OTHER SECTION]
+\h2(#S2)[SECTION AND SECTION]
 
 Another — section.
 
@@ -71,7 +69,5 @@ More stuff.
 With some subsection.
 
 \h2(#S4)[LONG SECTION NAME]
-
-Yet more stuff.
 
 \signature

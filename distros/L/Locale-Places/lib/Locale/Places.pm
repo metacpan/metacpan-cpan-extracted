@@ -15,11 +15,11 @@ Locale::Places - Translate places using http://download.geonames.org/
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 METHODS
 
@@ -123,21 +123,42 @@ sub translate {
 	# TODO: Add a country argument and choose a database based on that
 	$self->{'gb'} ||= Locale::Places::DB::GB->new(no_entry => 1);
 
-	my @places = @{$self->{'gb'}->selectall_hashref({ type => $from, data => $place, ispreferredname => 1 })};
+	# my @places = @{$self->{'gb'}->selectall_hashref({ type => $from, data => $place, ispreferredname => 1 })};
+	my @places = $self->{'gb'}->code2({ type => $from, data => $place, ispreferredname => 1 });
 	if(scalar(@places) == 0) {
-		@places = @{$self->{'gb'}->selectall_hashref({ type => $from, data => $place })};
+		# @places = @{$self->{'gb'}->selectall_hashref({ type => $from, data => $place })};
+		@places = $self->{'gb'}->code2({ type => $from, data => $place });
 	}
 
 	if(scalar(@places) == 1) {
-		if(my $line = $self->{'gb'}->fetchrow_hashref({ type => $to, code2 => $places[0]->{'code2'} })) {
-			return $line->{'data'};
+		if(my $data = $self->{'gb'}->data({ type => $to, code2 => $places[0] })) {
+		# if(my $data = $self->{'gb'}->data({ type => $to, code2 => $places[0]->{'code2'} })) {
+			return $data;
 		}
 	} elsif(scalar(@places) > 1) {
-		foreach my $p(@places) {
-			if(my $line = $self->{'gb'}->fetchrow_hashref({ type => $to, code2 => $p->{'code2'} })) {
-				return $line->{'data'};
+		@places = $self->{'gb'}->code2({ type => $from, data => $place, ispreferredname => 1, isshortname => 0 });
+		if(scalar(@places) == 1) {
+			if(my $data = $self->{'gb'}->data({ type => $to, code2 => $places[0] })) {
+				return $data;
+			}
+			@places = $self->{'gb'}->code2({ type => $from, data => $place, ispreferredname => 1, isshortname => 1 });
+			if(scalar(@places) == 1) {
+				if(my $data = $self->{'gb'}->data({ type => $to, code2 => $places[0] })) {
+					return $data;
+				}
+			}
+		} elsif(scalar(@places) == 0) {
+			@places = $self->{'gb'}->code2({ type => $from, data => $place, isshortname => 0 });
+			if(my $data = $self->{'gb'}->data({ type => $to, code2 => $places[0] })) {
+				return $data;
 			}
 		}
+		Carp::croak(__PACKAGE__, ": database has more than one preferred entry for $place in language $to");
+		# foreach my $p(@places) {
+			# if(my $line = $self->{'gb'}->fetchrow_hashref({ type => $to, code2 => $p->{'code2'} })) {
+				# return $line->{'data'};
+			# }
+		# }
 	}
 	return;	# undef
 }
@@ -157,6 +178,9 @@ sub _get_language {
 		if($val =~ /^([a-z]{2})/i) {
 			return lc($1);
 		}
+	}
+	if(defined($ENV{'LANG'}) && (($ENV{'LANG'} =~ /^C\./) || ($ENV{'LANG'} eq 'C'))) {
+		return 'en';
 	}
 	return;	# undef
 }

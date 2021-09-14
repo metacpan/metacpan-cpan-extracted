@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Config;
 
 use lib 't/lib';
 
@@ -11,10 +12,10 @@ use JSONSchema::Validator;
 use JSONSchema::Validator::Util qw/get_resource/;
 
 BEGIN {
-  unless ($ENV{ACCEPTANCE_TESTING}) {
-    print qq{1..0 # SKIP these tests are for testing by the developer\n};
-    exit
-  }
+    unless ($ENV{ACCEPTANCE_TESTING}) {
+        print qq{1..0 # SKIP these tests are for testing by the developer\n};
+        exit
+    }
 }
 
 unless (eval { require Test::JSON::Schema::Acceptance; 1; }) {
@@ -42,7 +43,12 @@ for my $validator_class (@{$JSONSchema::Validator::JSON_SCHEMA_VALIDATORS}) {
                 scheme_handlers => {'http' => $ua_get}
             )->validate_schema($input_data);
             return $result;
-        }
+        },
+        todo_tests => [
+            $Config{nvsize} >= 12
+                ? { file => 'multipleOf.json' } # issue https://github.com/json-schema-org/JSON-Schema-Test-Suite/pull/438
+                : ()
+        ]
     );
 }
 

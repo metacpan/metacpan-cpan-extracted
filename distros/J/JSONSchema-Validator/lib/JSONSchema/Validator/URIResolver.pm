@@ -212,7 +212,7 @@ JSONSchema::Validator::URIResolver - URI resolver
 
 =head1 VERSION
 
-version 0.006
+version 0.008
 
 =head1 AUTHORS
 

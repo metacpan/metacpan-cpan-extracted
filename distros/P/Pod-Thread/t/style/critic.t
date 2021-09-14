@@ -7,7 +7,7 @@
 # files, junk, and any files explicitly configured to be ignored.
 #
 # Written by Russ Allbery <eagle@eyrie.org>
-# Copyright 2019-2020 Russ Allbery <eagle@eyrie.org>
+# Copyright 2019-2021 Russ Allbery <eagle@eyrie.org>
 # Copyright 2013-2014
 #     The Board of Trustees of the Leland Stanford Junior University
 #
@@ -53,8 +53,21 @@ use_prereq('Test::Perl::Critic');
 # Force the embedded Perl::Tidy check to use the correct configuration.
 local $ENV{PERLTIDY} = 't/data/perltidyrc';
 
-# Import the configuration file and run Perl::Critic.
-Test::Perl::Critic->import(-profile => 't/data/perlcriticrc');
+# Import the configuration file.
+#
+# Probe for whether Perl::Critic::Community is installed and use that to
+# control whether to pass an exclusion to Perl::Critic.  This is the new name
+# of Perl::Critic::Freenode, and we have to customize one of our exclusions
+# based on its name or we get a spurious warning.
+eval { require Perl::Critic::Policy::Community::EmptyReturn };
+if ($@) {
+    Test::Perl::Critic->import(-profile => 't/data/perlcriticrc');
+} else {
+    Test::Perl::Critic->import(
+        -exclude => ['Community::EmptyReturn'],
+        -profile => 't/data/perlcriticrc',
+    );
+}
 
 # By default, Test::Perl::Critic only checks blib.  We also want to check t,
 # Build.PL, and examples.

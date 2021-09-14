@@ -13,13 +13,14 @@ use Data::Record::Serialize::Error { errors =>
         sqlite_backend
    )] }, -all;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use Data::Record::Serialize::Types -types;
 
 use SQL::Translator;
 use SQL::Translator::Schema;
 use Types::Standard -types;
+use Types::Common::String qw( NonEmptySimpleStr );
 
 use List::Util qw[ pairmap ];
 
@@ -87,8 +88,7 @@ has table => (
 
 has schema => (
     is        => 'ro',
-    predicate => 1,
-    isa       => Str,
+    isa       => Maybe[NonEmptySimpleStr],
 );
 
 
@@ -274,8 +274,7 @@ sub _table_exists {
 
 sub _fq_table_name {
     my $self = shift;
-
-    join( '.', ( $self->has_schema ? ( $self->schema ) : () ), $self->table );
+    defined $self->schema ? $self->schema . '.' . $self->table : $self->table;
 }
 
 has _dsn_components => (
@@ -383,7 +382,6 @@ sub setup {
         my $sql = $tr->translate
           or error( 'schema', $tr->error );
 
-        # print STDERR $sql;
         eval { $self->_dbh->do( $sql ); };
 
         error( 'create', { msg => "error in table creation: $@", payload => $sql } )
@@ -394,7 +392,7 @@ sub setup {
 
     my $sql = sprintf(
         "insert into %s (%s) values (%s)",
-        $self->_fq_table_name,
+        $self->_dbh->quote_identifier( undef, $self->schema, $self->table ),
         join( ',', @{ $self->output_fields } ),
         join( ',', ( '?' ) x @{ $self->output_fields } ),
     );
@@ -619,7 +617,7 @@ Data::Record::Serialize::Encode::dbi - store a record in a database
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -10,6 +10,41 @@ use Tangence::Constants;
 
 my @calls;
 my $written = "";
+
+package Testing::Stream
+{
+   use base qw( Tangence::Stream );
+
+   use Future;
+
+   sub new
+   {
+      return bless {}, shift;
+   }
+
+   sub new_future
+   {
+      return Future->new;
+   }
+
+   sub tangence_write
+   {
+      my $self = shift;
+      $written .= $_[0];
+   }
+
+   sub handle_request_EVENT
+   {
+      my $self = shift;
+      my ( $token, $message ) = @_;
+
+      push @calls, [ $self, $token, $message ];
+      return 1;
+   }
+
+   sub minor_version { shift->VERSION_MINOR }
+}
+
 my $stream = Testing::Stream->new();
 
 ok( defined $stream, 'defined $stream' );
@@ -121,39 +156,3 @@ isa_ok( $stream, "Tangence::Stream", '$stream isa Tangence::Stream' );
 }
 
 done_testing;
-
-package Testing::Stream;
-
-use strict;
-use base qw( Tangence::Stream );
-
-use Future;
-
-sub new
-{
-   return bless {}, shift;
-}
-
-sub new_future
-{
-   return Future->new;
-}
-
-sub tangence_write
-{
-   my $self = shift;
-   $written .= $_[0];
-}
-
-sub handle_request_EVENT
-{
-   my $self = shift;
-   my ( $token, $message ) = @_;
-
-   push @calls, [ $self, $token, $message ];
-   return 1;
-}
-
-sub minor_version { shift->VERSION_MINOR }
-
-1;

@@ -65,7 +65,7 @@ require AutoLoader;
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
 
-our $VERSION = '2.20';
+our $VERSION = '2.21';
 
 
 bootstrap Math::GMP $VERSION;
@@ -118,7 +118,7 @@ Math::GMP - High speed arbitrary size integer math
 
 =head1 VERSION
 
-version 2.20
+version 2.21
 
 =head1 SYNOPSIS
 
@@ -536,6 +536,31 @@ For internal use. B<Do not use directly>.
 
 For internal use. B<Do not use directly>.
 
+=head1 DIVISION BY ZERO
+
+Whereas perl normally catches division by zero to provide a standard
+perl-level error message, C<libgmp> does not; the result is usually
+a SIGFPE (floating point exception) giving a core dump if you ever
+attempt to divide a C<Math::GMP> object by anything that evaluates
+to zero. This can make it hard to diagnose where the error has occurred
+in your perl code.
+
+As of perl-5.36.0, SIGFPE is delivered in a way that can be caught
+by a C<%SIG> handler. So you can get a stack trace with code like:
+
+  use Carp;  # load it up front
+  local $SIG{FPE} = sub { confess(@_) };
+
+Before perl-5.36.0 this approach won't work: you'll need to use
+L<POSIX/sigaction> instead:
+
+  use Carp;
+  use POSIX qw{ sigaction SIGFPE };
+  sigaction(SIGFPE, POSIX::SigAction->new(sub { confess(@_) }));
+
+In either case, you should not attempt to return from the signal
+handler, since the signal will just be thrown again.
+
 =head1 BUGS
 
 As of version 1.0, Math::GMP is mostly compatible with the old
@@ -570,11 +595,18 @@ implementation.
 See L<Math::BigInt> and L<Math::BigInt::GMP> or
 L<Math::BigInt::Pari> or L<Math::BigInt::BitVect>.
 
+See L<Math::GMPz>, L<Math::GMPq>, and friends
+( L<https://metacpan.org/search?q=math%3A%3Agmp> ) for bindings of
+other parts of GMP / MPFR / etc.
+
 =head1 AUTHOR
 
 Chip Turner <chip@redhat.com>, based on the old Math::BigInt by Mark Biggar
 and Ilya Zakharevich.  Further extensive work provided by Tels
 <tels@bloodgate.com>.
+
+Shlomi Fish ( L<https://www.shlomifish.org/> ) has done some maintenance work
+while putting his changes under CC0.
 
 =head1 AUTHOR
 

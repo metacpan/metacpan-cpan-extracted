@@ -4,11 +4,11 @@ JSONSchema::Validator - Validator for JSON Schema Draft4/Draft6/Draft7 and OpenA
 
 # VERSION
 
-version 0.006
+version 0.008
 
 # SYNOPSIS
 
-    # to get OpenAPI validator of schema in YAML format
+    # to get OpenAPI validator in YAML format
     $validator = JSONSchema::Validator->new(resource => 'file:///some/path/to/oas30.yml');
     my ($result, $errors, $warnings) = $validator->validate_request(
         method => 'GET',
@@ -41,7 +41,7 @@ version 0.006
         }
     )
 
-    # to get JSON Schema Draft4/Draft6/Draft7 validator of schema in JSON format
+    # to get JSON Schema Draft4/Draft6/Draft7 validator in JSON format
     $validator = JSONSchema::Validator->new(resource => 'http://example.com/draft4/schema.json')
     my ($result, $errors) = $validator->validate_schema($object_to_validate)
 
@@ -113,9 +113,10 @@ Validates all files specified by path globs.
 - Denis Ibaev <dionys@gmail.com>
 - Andrey Khozov <andrey@rydlab.ru>
 
-# CONTRIBUTOR
+# CONTRIBUTORS
 
-James Waters <james@jcwaters.co.uk>
+- James Waters <james@jcwaters.co.uk>
+- uid66 <19481514+uid66@users.noreply.github.com>
 
 # COPYRIGHT AND LICENSE
 

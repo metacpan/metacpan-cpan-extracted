@@ -1,5 +1,13 @@
 Revision history for `optex' command.
 
+v0.5.1 2021-09-12T13:54:25Z
+
+    - Fix for unexpected regex behavior.
+
+v0.5 2021-09-10T15:49:36Z
+
+    - Implement -Mutil::filter::visible() interface.
+
 v0.4.1 2020-11-17T00:14:33Z
 
     - Add dependency for Time::Piece.

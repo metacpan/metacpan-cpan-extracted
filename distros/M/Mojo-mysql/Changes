@@ -1,7 +1,12 @@
 Revision history for perl distribution Mojo-mysql
 
-1.22 2020-12-22T11:33:16+0900
- - Fix MANIFEST.SKIP #82
+1.23 2021-09-11T10:36:17+0200
+ - Fix version number issues #84
+ - Internal changes regarding MariaDB/mysql attributes
+
+1.21 2021-04-28T12:15:39+0900
+ - Fix uninitialized warning with expand(1) #83
+ - Removed delay() from tests and documentation
 
 1.20 2020-09-05T13:27:52+0900
  - Mojo::mysql::PubSub is less susceptible to deadlocks/timeouts #80

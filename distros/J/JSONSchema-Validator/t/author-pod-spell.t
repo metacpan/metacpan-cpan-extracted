@@ -18,6 +18,7 @@ use Pod::Wordlist;
 add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
+19481514
 Alexey
 Andrey
 Anton
@@ -50,5 +51,6 @@ lib
 logioniz
 tosha
 uid
+uid66
 validator
 validators

@@ -9,7 +9,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Update 4.01;
+package App::DocKnot::Update 5.00;
 
 use 5.024;
 use autodie;
@@ -29,14 +29,14 @@ use YAML::XS ();
 # configuration in a key of the same name.  If the key contains a slash, like
 # foo/bar, it will be stored as a nested hash, as $data{foo}{bar}.
 our @JSON_METADATA_FILES = qw(
-  bootstrap
-  build/middle
-  build/suffix
-  debian/summary
-  packaging/extra
-  support/extra
-  test/prefix
-  test/suffix
+    bootstrap
+    build/middle
+    build/suffix
+    debian/summary
+    packaging/extra
+    support/extra
+    test/prefix
+    test/suffix
 );
 
 ##############################################################################
@@ -270,7 +270,7 @@ sub update {
     if ($@) {
         my $errors = $@;
         chomp($errors);
-        die "Schema validation failed:\n$errors\n";
+        die "schema validation failed:\n$errors\n";
     }
 
     # Write the new YAML package configuration.

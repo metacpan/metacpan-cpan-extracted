@@ -1,17 +1,20 @@
 package Devel::Git::MultiBisect::Auxiliary;
 use v5.14.0;
 use warnings;
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 $VERSION = eval $VERSION;
 use base qw( Exporter );
 our @EXPORT_OK = qw(
     clean_outputfile
     hexdigest_one_file
     validate_list_sequence
+    write_transitions_report
 );
 use Carp;
+use Data::Dumper;
 use Digest::MD5;
 use File::Copy;
+use File::Spec;
 use List::Util qw(first);
 
 =head1 NAME
@@ -295,6 +298,76 @@ sub validate_list_sequence {
         }
     }
     return [$status];
+}
+
+
+=head2 C<write_transitions_report()>
+
+=over 4
+
+=item * Purpose
+
+Write data about transitions to file on disk.
+
+=item * Arguments
+
+    $transitions_report = write_transitions_report($outputdir, $report_basename, $transitions_data);
+
+List of 3 arguments:
+
+=over 4
+
+=item *
+
+String holding path to output directory (typically,
+C<$self-E<gt>{outputdir}>).
+
+=item *
+
+String holding desired basename for transitions report file (typically,
+C<$self-E<gt>{transitions_report}>).
+
+=item *
+
+Hash reference which is return value of C<$self-E<gt>inspect_transitions()>.
+
+=back
+
+=item * Return Value
+
+String holding full path to transitions report file.
+
+=back
+
+=cut
+
+sub write_transitions_report {
+    my ($outputdir, $report_basename, $transitions_data) = @_;
+    croak "Must supply 3 arguments to write_transitions_report()"
+        unless @_ == 3;
+    croak "3rd argument to write_transitions_report() must be hashref"
+        unless ref($transitions_data) eq 'HASH';
+    croak "Must be 3 elements in 3rd argument to write_transitions_report()"
+        unless (scalar keys %$transitions_data == 3);
+    my %expected_keys = map { $_ => 1 } (qw| newest oldest transitions |);
+    for my $k (keys %expected_keys) {
+        croak "'$k' element missing from 3rd argument to write_transitions_report()"
+            unless $transitions_data->{$k};
+    }
+
+    my $transitions_report = File::Spec->catfile($outputdir, $report_basename);
+    open my $TR, '>', $transitions_report
+        or croak "Unable to open $transitions_report for writing";
+    if ( eval { require Data::Dump; } ) {
+        my $old_fh = select($TR);
+        Data::Dump::dd($transitions_data);
+        select($old_fh);
+    }
+    else {
+        print Data::Dumper->Dump($transitions_data);
+    }
+    close $TR or croak "Unable to close $transitions_report after writing";
+    return $transitions_report;
 }
 
 1;

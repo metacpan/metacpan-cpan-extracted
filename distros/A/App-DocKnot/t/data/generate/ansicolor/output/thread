@@ -46,13 +46,12 @@
 
     \h2[Development]
 
-    \link[todo.html][To-do list] \break
     \link[https://github.com/rra/ansicolor]
          [GitHub] \break
     \link[https://github.com/rra/ansicolor/issues]
          [Bug tracker] \break
     \link[https://git.eyrie.org/?p=perl/ansicolor.git]
-         [Git repository]
+         [Git repository] \break
 ]
 
 \h2[Blurb]
@@ -157,7 +156,6 @@ User documentation:
 
 Developer documentation:
 
-\doc[todo.html][To-do list]
 \doc[https://github.com/rra/ansicolor]
     [GitHub]
 \doc[https://github.com/rra/ansicolor/issues]

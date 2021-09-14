@@ -14,8 +14,7 @@ keyword-independence.json                  756          0     0
 loose-types-const-enum.json                  8          0     0
 ref.json                                     4          0     0
 short-circuit.json                          16          0     0
-unicode.json                                 9          0     0
 unknownKeyword.json                          4          0     0
 vocabulary.json                              1          0     0
 ---------------------------------------------------------------
-TOTAL                                      811          0     0
+TOTAL                                      802          0     0

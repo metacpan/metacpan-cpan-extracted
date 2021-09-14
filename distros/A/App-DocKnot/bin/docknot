@@ -22,11 +22,11 @@ __END__
 
 =for stopwords
 Allbery DocKnot docknot MERCHANTABILITY NONINFRINGEMENT sublicense subcommand
-subcommands distdir pgp-key
+subcommands distdir pgp-key cl2xhtml cvs2xhtml faq2html spin-rss
 
 =head1 NAME
 
-docknot - Manage software documentation and distributions
+docknot - Static web site and documentation generator
 
 =head1 SYNOPSIS
 
@@ -38,20 +38,28 @@ B<docknot> generate [B<-m> I<metadata>] [B<-w> I<width>] I<template> [I<output>]
 
 B<docknot> generate-all [B<-m> I<metadata>] [B<-w> I<width>]
 
+B<docknot> spin [B<-d>] [B<-e> I<pattern> ...] [B<-s> I<url>] I<source>
+I<output>
+
+B<docknot> spin-rss [B<-b> I<base>] I<file>
+
+B<docknot> spin-thread [B<-f>] [B<-s> I<url>] [I<source> [I<output>]]
+
 B<docknot> update [B<-m> I<metadata>] [B<-o> I<output>]
 
 =head1 DESCRIPTION
 
-B<docknot> can perform various actions related to documenting or releasing
-software packages, organized into subcommands.  The supported subcommands are:
+B<docknot> is a static web site generator with special support for managing
+the documentation and releases of software packages.  Its actions are
+organized into subcommands.  The supported subcommands are:
 
 =over 4
 
 =item dist
 
-Build, test, and generate a distribution tarball of the package in the
-current directory.  The exact commands used is determined by the package
-metadata (see L<App::DocKnot::Generate> for format documentation).
+Build, test, and generate a distribution tarball of the package in the current
+directory.  The exact commands used is determined by the package metadata (see
+L<App::DocKnot::Config> for format documentation).
 
 After the distribution is built, it will be checked against the source tree
 and B<docknot> will report an error and exit with a non-zero status if there
@@ -60,7 +68,7 @@ are any expected files missing.
 =item generate
 
 Use metadata files and templates to generate human-readable documentation
-files for a package.  See L<App::DocKnot::Generate> for documentation on the
+files for a package.  See L<App::DocKnot::Config> for documentation on the
 metadata format, configuration files, and paths.
 
 =item generate-all
@@ -68,6 +76,22 @@ metadata format, configuration files, and paths.
 Like C<generate>, but generates all of the package documentation for which
 default output files are configured.  This is a quick short-cut to generating
 all documentation that's shipped with the package.
+
+=item spin
+
+Spin a tree of files written in the macro language thread into an HTML web
+site.  See L<App::DocKnot::Spin> for documentation on the input format and
+details of the site generation.
+
+=item spin-rss
+
+Process a single F<.rss> file with L<App::DocKnot::Spin::RSS> (normally done
+as part of using C<spin> to process a tree of files).  See that module's
+documentation for more details.
+
+=item spin-thread
+
+Like C<spin>, but convert a single file written in thread to HTML.
 
 =item update
 
@@ -116,7 +140,8 @@ a project).
 The name of the PGP key to use to sign the generated distribution tarballs.
 The key can be named in any way that the B<-u> option of GnuPG understands.
 The generated signature will be armored and stored in a file named by
-appending C<.asc> to the name of the tarball.
+appending C<.asc> to the name of the tarball.  Default: The C<pgp_key> option
+in the global DocKnot configuration file.
 
 =back
 
@@ -165,6 +190,79 @@ current directory (which is the recommended metadata path for a project).
 =item B<-w> I<width>, B<--width>=I<width>
 
 Column width at which the generated output is wrapped.  Default: 74.
+
+=back
+
+=head2 spin
+
+=over 4
+
+=item B<-d>, B<--delete>
+
+After populating the I<output> tree with the results of converting or copying
+all the files in the I<source> tree, delete all files and directories in the
+I<output> tree that do not have a corresponding file in the I<source> tree.
+
+=item B<-e> I<pattern>, B<--exclude>=I<pattern>
+
+Exclude files matching the given regular expression I<pattern> from being
+converted.  This flag may be used multiple times.
+
+=item B<-s> I<url>, B<--style-url>=I<url>
+
+The base URL for style sheets.  All style sheets specified in C<\heading>
+commands will be considered to be relative to this URL and this URL will be
+prepended to them.  If this option is not given, the name of the style sheet
+will be used verbatim as its URL, except with C<.css> appended.  This will
+also be used as the base URL to style sheets for the output of B<cl2xhtml>,
+B<cvs2xhtml>, and B<faq2html>.
+
+=item I<source>
+
+The input tree of files to spin into a web site.  This must be a directory.
+
+=item I<output>
+
+The output location to write the generated web site.  If this directory does
+not exist, it will be created.  If it exists, it must be a directory.
+
+=back
+
+=head2 spin-rss
+
+=over 4
+
+=item B<-b> I<base>, B<--base>=I<base>
+
+By default, output files are relative to the current working directory.  If
+this option is given, output files will be relative to I<base> instead.
+Output files specified as absolute paths will not be affected.
+
+=item I<file>
+
+The F<.rss> file to process.  See L<App::DocKnot::Spin::RSS> for the details
+of the file format.
+
+=back
+
+=head2 spin-thread
+
+=over 4
+
+=item B<-s> I<url>, B<--style-url>=I<url>
+
+The base URL for style sheets.  A style sheet specified in a C<\heading>
+command will be considered to be relative to this URL and this URL will be
+prepended to it.  If this option is not given, the name of the style sheet
+will be used verbatim as its URL, except with C<.css> appended.
+
+=item I<source>
+
+The input file.  If not given, standard input will be used.
+
+=item I<output>
+
+The output file.  If not given, standard output will be used.
 
 =back
 
@@ -245,7 +343,8 @@ SOFTWARE.
 =head1 SEE ALSO
 
 L<App::DocKnot::Config>, L<App::DocKnot::Dist>, L<App::DocKnot::Generate>,
-L<App::DocKnot::Update>
+L<App::DocKnot::Spin>, L<App::DocKnot::Spin::RSS>,
+L<App::DocKnot::Spin::Thread>, L<App::DocKnot::Update>
 
 This program is part of the App-DocKnot distribution.  The current version of
 DocKnot is available from CPAN, or directly from its web site at

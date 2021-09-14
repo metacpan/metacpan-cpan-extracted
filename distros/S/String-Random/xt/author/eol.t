@@ -15,7 +15,8 @@ my @files = (
     't/04_randpattern.t',
     't/05_randregex.t',
     't/06_random_regex.t',
-    't/07_rand_gen.t'
+    't/07_rand_gen.t',
+    't/08_get_set.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

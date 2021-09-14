@@ -1,4 +1,4 @@
-                             Pod::Thread 2.00
+                             Pod::Thread 3.00
          (Format POD source into thread, an HTML macro language)
                 Maintained by Russ Allbery <rra@cpan.org>
 
@@ -36,8 +36,8 @@ DESCRIPTION
 
 REQUIREMENTS
 
-  Perl 5.24 or later and Pod::Parser 3.06 or later.  As mentioned above,
-  it's also not particularly useful without spin.
+  Perl 5.24 or later.  As mentioned above, it's also not particularly
+  useful without spin.
 
 BUILDING AND INSTALLATION
 
@@ -67,6 +67,7 @@ TESTING
 
   * Devel::Cover
   * Perl::Critic::Freenode
+  * Test::CPAN::Changes (part of CPAN-Changes)
   * Test::MinimumVersion
   * Test::Perl::Critic
   * Test::Pod

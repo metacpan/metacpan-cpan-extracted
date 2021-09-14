@@ -491,26 +491,25 @@ sub get_alien_state_hash {
 
 
 sub get_drivers_to_disable {
+  #  some of these are already disabled in recent versions of GDAL
   my @drivers = qw /
-    e00grid
-    jdem
-    xpm
-    grib
-    zmap
+    e00grid  jdem     xpm       grib
+    zmap     adrg     arg       blx
+    bt       cals     ceos      coasp
+    cosar    ctg      dimap     elas
+    fit      gff      gsg       gxf
+    hf2      iris     lan       leveller
+    mrf      msgn     northwood prf
+    rmf      rs2      sgi       sigdem
+    stacta   terragen til       rik
+    ozi      webp
     
-    aeronavfaa
-    arcgen
-    bna
-    couchdb
-    geomedia
-    gtm
-    htf
-    openair
-    cloudant
-    rec
-    sdts
-    sua
-    walk
+    aeronavfaa arcgen   bna    couchdb
+    geomedia   gtm      htf    openair
+    cloudant   rec      sdts   sua
+    walk       tiger    edigeo
+    geoconcept georss   gmt    jml
+    s57        wasp     vdv
   /;
   my @args = map {"--disable-driver-$_"} @drivers;
   return wantarray ? @args : \@args;

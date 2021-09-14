@@ -15,9 +15,10 @@ use lib 't/lib';
 use Test::More;
 use Test::Snippets qw(list_snippets test_snippet);
 
-# Determine the number of tests and test that the module loads.
+# Determine the number of tests and test that the module loads.  We run one
+# snippet that has an error and an exception, adding two extra tests.
 BEGIN {
-    plan tests => scalar(list_snippets()) * 2 + 1;
+    plan tests => scalar(list_snippets()) * 2 + 2 + 1;
     use_ok('Pod::Thread');
 }
 

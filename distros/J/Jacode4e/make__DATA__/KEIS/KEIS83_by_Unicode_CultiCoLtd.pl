@@ -2,7 +2,7 @@
 #
 # KEIS83_by_Unicode_CultiCoLtd.pl
 #
-# Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 # KEIS code book, Culti Co.,Ltd.
@@ -42,6 +42,22 @@ while (<DATA>) {
     $Unicode_by_KEIS83_CultiCoLtd{$keis83}  = $unicode;
 }
 
+# fixed mapping
+# Jacode4e 2.13.6.18 or newer
+# Jacode4e::RoundTrip 2.13.81.12 or newer
+
+my %fix_mapping = (
+    '82BA' => '',     # èŠº OLD:68CF
+    '8980' => '',     # è¦€ OLD:59A9
+    '9EBD' => '6DFB', # éº½ OLD:5EC3
+);
+
+for my $unicode (sort keys %fix_mapping) {
+    my $keis83 = $fix_mapping{$unicode};
+    $KEIS83_by_Unicode_CultiCoLtd{$unicode} = $keis83;
+    $Unicode_by_KEIS83_CultiCoLtd{$keis83}  = $unicode;
+}
+
 sub KEIS83_by_Unicode_CultiCoLtd {
     my($unicode) = @_;
     return $KEIS83_by_Unicode_CultiCoLtd{$unicode};
@@ -57,7 +73,7 @@ sub values_of_KEIS83_by_Unicode_CultiCoLtd {
 
 1;
 
-# KEISƒR[ƒh	•”ñ”Ô†	‰æ”	–Ê‹æ“_”Ô†	JISƒR[ƒh	Unicode
+# KEISã‚³ãƒ¼ãƒ‰	éƒ¨é¦–ç•ªå·	ç”»æ•°	é¢åŒºç‚¹ç•ªå·	JISã‚³ãƒ¼ãƒ‰	Unicode
 __DATA__
 A1A1			01-01-01	2121	3000
 A1A2			01-01-02	2122	3001

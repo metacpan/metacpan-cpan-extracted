@@ -10,7 +10,7 @@ use Mojo::URL;
 use Scalar::Util 'weaken';
 use SQL::Abstract::mysql;
 
-our $VERSION = '1.22';
+our $VERSION = '1.23';
 
 has abstract        => sub { SQL::Abstract::mysql->new(quote_char => chr(96), name_sep => '.') };
 has auto_migrate    => 0;
@@ -108,14 +108,6 @@ sub strict_mode {
   return $self;
 }
 
-sub _dbi_attr {
-  my ($self, $handle) = (shift, shift);
-  my $key = $self->dsn =~ m!^dbi:(\w+):! ? lc "$1_$_[0]" : "mysql_$_[0]";
-  return $handle->{$key} if @_ == 1;
-  $handle->{$key} = $_[1];
-  $handle;
-}
-
 sub _dequeue {
   my $self = shift;
   my $dbh;
@@ -127,7 +119,7 @@ sub _dequeue {
   # especially once he discovers that DBD::mysql randomly reconnects under
   # you, silently, but only if certain env vars are set
   # hint: force-set mysql_auto_reconnect or whatever it's called to 0
-  $self->_dbi_attr($dbh, auto_reconnect => 0);
+  Mojo::mysql::Database->_dbh_attr($dbh, mysql_auto_reconnect => 0);
 
   # Maintain Commits with Mojo::mysql::Transaction
   $dbh->{AutoCommit} = 1;
@@ -211,16 +203,10 @@ Mojo::mysql - Mojolicious and Async MySQL/MariaDB
     ->hashes->map(sub { $_->{name} })->join("\n")->say;
 
   # Select all rows non-blocking
-  Mojo::IOLoop->delay(
-    sub {
-      my $delay = shift;
-      $db->query('select * from names' => $delay->begin);
-    },
-    sub {
-      my ($delay, $err, $results) = @_;
-      $results->hashes->map(sub { $_->{name} })->join("\n")->say;
-    }
-  )->wait;
+  $db->query('select * from names' => sub {
+    my ($db, $err, $results) = @_;
+    $results->hashes->map(sub { $_->{name} })->join("\n")->say;
+  });
 
   # Concurrent non-blocking queries (synchronized with promises)
   my $now   = $db->query_p('select now() as now');

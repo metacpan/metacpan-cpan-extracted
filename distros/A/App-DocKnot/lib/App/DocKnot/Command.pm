@@ -10,7 +10,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Command 4.01;
+package App::DocKnot::Command 5.00;
 
 use 5.024;
 use autodie;
@@ -18,6 +18,9 @@ use warnings;
 
 use App::DocKnot::Dist;
 use App::DocKnot::Generate;
+use App::DocKnot::Spin;
+use App::DocKnot::Spin::RSS;
+use App::DocKnot::Spin::Thread;
 use App::DocKnot::Update;
 use Getopt::Long;
 use Pod::Usage qw(pod2usage);
@@ -74,6 +77,26 @@ our %COMMANDS = (
         module  => 'App::DocKnot::Generate',
         options => ['metadata|m=s', 'width|w=i'],
         maximum => 0,
+    },
+    spin => {
+        method  => 'spin',
+        module  => 'App::DocKnot::Spin',
+        options => ['delete|d', 'exclude|e=s@', 'style-url|s=s'],
+        minimum => 2,
+        maximum => 2,
+    },
+    'spin-rss' => {
+        method  => 'generate',
+        module  => 'App::DocKnot::Spin::RSS',
+        options => ['base|b=s'],
+        minimum => 1,
+        maximum => 1,
+    },
+    'spin-thread' => {
+        method  => 'spin_thread_file',
+        module  => 'App::DocKnot::Spin::Thread',
+        options => ['style-url|s=s'],
+        maximum => 2,
     },
     update => {
         method  => 'update',
@@ -143,6 +166,29 @@ sub _parse_command {
 }
 
 ##############################################################################
+# Error handling
+##############################################################################
+
+# Reformat an error message (from warn or die) to prepend the command run and
+# to strip the file and line information from Perl.
+#
+# $command - Invoked command
+# $error   - Error to reformat
+#
+# Return: Reformatted error suitable for passing to warn or die, with no
+#         trailing newline (the caller should add it)
+sub _reformat_error {
+    my ($self, $command, $error) = @_;
+    chomp($error);
+    $error =~ s{ \s+ at \s+ \S+ \s+ line \s+ \d+ [.]? \z }{}xms;
+    if ($error =~ m{ \S+ : \d+ : \s+ \S }xms) {
+        return "$0 $command:$error";
+    } else {
+        return "$0 $command: $error";
+    }
+}
+
+##############################################################################
 # Public interface
 ##############################################################################
 
@@ -206,17 +252,21 @@ sub run {
         }
     }
 
-    # Dispatch the command and turn exceptions into error messages.
+    # Dispatch the command and turn exceptions into error messages.  Also
+    # capture warnings and perform the same transformation on those.
+    local $SIG{__WARN__} = sub {
+        my ($error) = @_;
+        $error = $self->_reformat_error($command, $error);
+        warn "$error\n";
+    };
     eval {
         my $object = $COMMANDS{$command}{module}->new($opts_ref);
         my $method = $COMMANDS{$command}{method};
         $object->$method($args_ref->@*);
     };
     if ($@) {
-        my $error = $@;
-        chomp($error);
-        $error =~ s{ \s+ at \s+ \S+ \s+ line \s+ \d+ [.]? \z }{}xms;
-        die "$0 $command: $error\n";
+        my $error = $self->_reformat_error($command, $@);
+        die "$error\n";
     }
     return;
 }
@@ -230,7 +280,7 @@ __END__
 
 =for stopwords
 Allbery DocKnot docknot MERCHANTABILITY NONINFRINGEMENT sublicense Kwalify
-IO-Compress-Lzma
+IO-Compress-Lzma TimeDate
 
 =head1 NAME
 
@@ -243,11 +293,12 @@ App::DocKnot::Command - Run DocKnot commands
 
 =head1 REQUIREMENTS
 
-Perl 5.24 or later and the modules File::BaseDir, File::ShareDir,
-IO::Compress::Xz (part of IO-Compress-Lzma), IO::Uncompress::Gunzip (part of
-IO-Compress), IPC::Run, IPC::System::Simple, JSON::MaybeXS, Kwalify,
-List::SomeUtils, Perl6::Slurp, Template (part of Template Toolkit), and
-YAML::XS, all of which are available from CPAN.
+Perl 5.24 or later and the modules Date::Parse (part of TimeDate),
+File::BaseDir, File::ShareDir, Git::Repository, Image::Size, IO::Compress::Xz
+(part of IO-Compress-Lzma), IO::Uncompress::Gunzip (part of IO-Compress),
+IPC::Run, IPC::System::Simple, JSON::MaybeXS, Kwalify, List::SomeUtils,
+Perl6::Slurp, Template (part of Template Toolkit), and YAML::XS, all of which
+are available from CPAN.
 
 =head1 DESCRIPTION
 

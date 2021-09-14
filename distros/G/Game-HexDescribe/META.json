@@ -1,0 +1,58 @@
+{
+   "abstract" : "a web app to add random table driven data to map data",
+   "author" : [
+      "Alex Schroeder"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "agpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Game-HexDescribe",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.52",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Array::Utils" : "0",
+            "File::ShareDir" : "0",
+            "List::MoreUtils" : "0",
+            "Modern::Perl" : "1.20180701",
+            "Mojolicious" : "0",
+            "Text::Autoformat" : "0",
+            "perl" : "5.026000",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://alexschroeder.ch/cgit/hex-describe",
+         "web" : "https://alexschroeder.ch/cgit/hex-describe/about/"
+      }
+   },
+   "version" : 1,
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

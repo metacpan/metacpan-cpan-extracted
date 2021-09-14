@@ -1,5 +1,9 @@
 Revision history for JSON-Schema-Tiny
 
+0.010     2021-09-11 23:09:29Z
+          - skip some regex tests when Unicode library is too old for those
+            character classes being tested
+
 0.009     2021-08-05 03:51:04Z
           - skip acceptance test for integer overflow when nvsize is too
             large to produce the expected error

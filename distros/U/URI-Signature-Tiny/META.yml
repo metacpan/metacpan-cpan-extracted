@@ -25,7 +25,7 @@ requires:
 resources:
   bugtracker: https://github.com/ap/URI-Signature-Tiny/issues
   repository: git://github.com/ap/URI-Signature-Tiny.git
-version: '1.001'
+version: '1.003'
 x_copyright:
   holder: 'Aristotle Pagaltzis'
   year: 2020

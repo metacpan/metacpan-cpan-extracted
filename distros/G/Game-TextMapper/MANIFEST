@@ -1,5 +1,28 @@
 Changes
 lib/Game/TextMapper.pm
+lib/Game/TextMapper/Apocalypse.pm
+lib/Game/TextMapper/Command/random.pm
+lib/Game/TextMapper/Command/render.pm
+lib/Game/TextMapper/Constants.pm
+lib/Game/TextMapper/Gridmapper.pm
+lib/Game/TextMapper/Hex.pm
+lib/Game/TextMapper/Line.pm
+lib/Game/TextMapper/Line/Hex.pm
+lib/Game/TextMapper/Line/Square.pm
+lib/Game/TextMapper/Log.pm
+lib/Game/TextMapper/Mapper.pm
+lib/Game/TextMapper/Mapper/Hex.pm
+lib/Game/TextMapper/Mapper/Square.pm
+lib/Game/TextMapper/Point.pm
+lib/Game/TextMapper/Schroeder/Alpine.pm
+lib/Game/TextMapper/Schroeder/Archipelago.pm
+lib/Game/TextMapper/Schroeder/Base.pm
+lib/Game/TextMapper/Schroeder/Hex.pm
+lib/Game/TextMapper/Schroeder/Island.pm
+lib/Game/TextMapper/Schroeder/Square.pm
+lib/Game/TextMapper/Smale.pm
+lib/Game/TextMapper/Square.pm
+lib/Game/TextMapper/Traveller.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
@@ -24,5 +47,6 @@ share/traveller-square-example.txt
 share/traveller-square.txt
 share/traveller.txt
 t/basic.t
+t/commands.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

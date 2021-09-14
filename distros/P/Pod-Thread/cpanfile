@@ -4,6 +4,7 @@ on 'test' => sub {
     requires 'Perl6::Slurp';
     suggests 'Devel::Cover';
     suggests 'Perl::Critic::Freenode';
+    suggests 'Test::CPAN::Changes';
     suggests 'Test::MinimumVersion';
     suggests 'Test::Perl::Critic';
     suggests 'Test::Pod';

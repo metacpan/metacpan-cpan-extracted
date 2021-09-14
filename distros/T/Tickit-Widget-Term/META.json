@@ -26,13 +26,15 @@
             "List::Util" : "0",
             "Object::Pad" : "0.51",
             "Syntax::Keyword::Match" : "0",
-            "Term::VTerm" : "0.06",
+            "Term::VTerm" : "0.07",
+            "Tickit" : "0.71",
             "Tickit::Widget" : "0.32",
             "perl" : "5.026"
          }
       },
       "test" : {
          "requires" : {
+            "IO::Pty" : "1.12",
             "Test::More" : "0.88"
          }
       }
@@ -40,7 +42,7 @@
    "provides" : {
       "Tickit::Widget::Term" : {
          "file" : "lib/Tickit/Widget/Term.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -50,6 +52,6 @@
       ],
       "x_IRC" : "irc://irc.freenode.net/#tickit"
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2011-2017 -- leonerd@leonerd.org.uk
 
-package Tangence::Meta::Event;
+package Tangence::Meta::Event 0.26;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.25';
 
 use Scalar::Util qw( weaken );
 

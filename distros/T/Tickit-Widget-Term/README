@@ -27,9 +27,10 @@ DESCRIPTION
     the content to the screen.
 
     Typically this would be used connected to some external process via a
-    PTY device. Currently, this class does not provide management of that,
-    so the application will have to perform this bytewise IO itself, via
-    the "write_input" method and "set_on_output" event handler.
+    PTY device. The "use_pty" method can be used to connect this PTY device
+    to the widget. Alternatively, the application can perform this bytewise
+    IO itself, via the "write_input" method and "set_on_output" event
+    handler.
 
 METHODS
 
@@ -76,6 +77,26 @@ METHODS
     Accessors for the on_resize event callback, which is invoked after a
     resize of the displayed widget. This may be required to inform the
     appliction driving the terminal of its new output size.
+
+ use_pty
+
+       $term->use_pty( $pty )
+
+    Takes an opened PTY device and sets up an IO watcher on it to receive
+    bytes of input. Additionally, arranges for output bytes to be sent to
+    the handle.
+
+    This is a convenient alternative to feeding in bytes by calling
+    "input_write" and receiving them with a callback set by
+    "set_on_output".
+
+    The $pty handle should be an IO::Pty instance; or at least,
+    well-behaved as an IO handle and support the following methods:
+
+       $pty->blocking( 0 );
+       $pty->set_winsize( $lines, $cols );
+       $pty->sysread( $buf, $len );
+       $pty->syswrite( $buf );
 
 AUTHOR
 

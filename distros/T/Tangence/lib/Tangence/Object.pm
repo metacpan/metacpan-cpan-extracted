@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2010-2017 -- leonerd@leonerd.org.uk
 
-package Tangence::Object;
+package Tangence::Object 0.26;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.25';
 
 use Carp;
 
@@ -289,7 +287,7 @@ Subscribes an event-handling callback CODE ref to the named event. When the
 event is fired by C<fire_event> this callback will be invoked, being passed
 the object reference and the event's arguments.
 
- $callback->( $obj, @args )
+   $callback->( $obj, @args )
 
 Returns an opaque ID value that can be used to remove this subscription by
 calling C<unsubscribe_event>.

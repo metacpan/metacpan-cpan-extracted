@@ -7,7 +7,7 @@ package Comics::Plugin::Soopah;
 
 use parent qw(Comics::Fetcher::Single);
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 sub register {
     shift->SUPER::register
@@ -25,6 +25,8 @@ sub register {
               }sx,
 	} );
 }
+
+our $disabled = 1;
 
 # Important: Return the package name!
 __PACKAGE__;

@@ -51,12 +51,8 @@ sub _stderr_save {
         mkdir($tmpdir, 0777);
     }
     my $path = File::Spec->catfile($tmpdir, "out$$.err");
-
-    ## no critic(InputOutput::RequireBriefOpen)
     open($OLD_STDERR, '>&', \*STDERR);
     open(STDERR,      '>',  $path);
-    ## use critic
-
     $SAVED_STDERR = $path;
     return;
 }
@@ -208,7 +204,8 @@ sub test_snippet {
 __END__
 
 =for stopwords
-Allbery podlators PerlIO UTF-8 formatter FH whitespace
+Allbery podlators PerlIO UTF-8 formatter FH whitespace MERCHANTABILITY
+NONINFRINGEMENT sublicense
 
 =head1 NAME
 
@@ -299,8 +296,23 @@ Russ Allbery <rra@cpan.org>
 
 Copyright 2015-2016, 2018-2021 Russ Allbery <rra@cpan.org>
 
-This program is free software; you may redistribute it and/or modify it
-under the same terms as Perl itself.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 =cut
 

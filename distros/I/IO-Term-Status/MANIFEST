@@ -1,0 +1,14 @@
+Build.PL
+Changes
+examples/countdown.pl
+lib/IO/Term/Status.pm
+MANIFEST			This list of files
+t/00use.t
+t/01no-status.t
+t/02status.t
+t/10status-string-tagged.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Mouse;
-$Playwright::Mouse::VERSION = '0.014';
+$Playwright::Mouse::VERSION = '0.015';
 use parent 'Playwright::Base';
 
 sub new {
@@ -18,21 +18,11 @@ sub new {
     return $self->SUPER::new(%options);
 }
 
-sub down {
+sub dblclick {
     my $self = shift;
     return $self->_request(
         args    => [@_],
-        command => 'down',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub click {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'click',
+        command => 'dblclick',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -48,11 +38,21 @@ sub up {
     );
 }
 
-sub dblclick {
+sub click {
     my $self = shift;
     return $self->_request(
         args    => [@_],
-        command => 'dblclick',
+        command => 'click',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub down {
+    my $self = shift;
+    return $self->_request(
+        args    => [@_],
+        command => 'down',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -112,7 +112,7 @@ Playwright::Mouse - Automatically generated class for Playwright::Mouse
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 CONSTRUCTOR
 
@@ -123,17 +123,11 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 down(@args)
+=head2 dblclick(@args)
 
-Execute the Mouse::down playwright routine.
+Execute the Mouse::dblclick playwright routine.
 
-See L<https://playwright.dev/api/class-Mouse#Mouse-down> for more information.
-
-=head2 click(@args)
-
-Execute the Mouse::click playwright routine.
-
-See L<https://playwright.dev/api/class-Mouse#Mouse-click> for more information.
+See L<https://playwright.dev/api/class-Mouse#Mouse-dblclick> for more information.
 
 =head2 up(@args)
 
@@ -141,11 +135,17 @@ Execute the Mouse::up playwright routine.
 
 See L<https://playwright.dev/api/class-Mouse#Mouse-up> for more information.
 
-=head2 dblclick(@args)
+=head2 click(@args)
 
-Execute the Mouse::dblclick playwright routine.
+Execute the Mouse::click playwright routine.
 
-See L<https://playwright.dev/api/class-Mouse#Mouse-dblclick> for more information.
+See L<https://playwright.dev/api/class-Mouse#Mouse-click> for more information.
+
+=head2 down(@args)
+
+Execute the Mouse::down playwright routine.
+
+See L<https://playwright.dev/api/class-Mouse#Mouse-down> for more information.
 
 =head2 move(@args)
 

@@ -213,14 +213,14 @@ sub remove_path {
     my $dir = shift;
     -d $dir or return 0; # useless, but harmless.
     if (($cmd_name ne $abs_name) and (abs_path($dir) eq $cmd_dir)) {
-	warn "$abs_name($$): remove $dir\n" if $debug;
+	warn "$abs_name($$): remove $dir from PATH.\n" if $debug;
 	return 1;
     }
     my $path = "$dir/$target_name";
     -l $path or return 0;
     my $link = readlink $path or return 1; # impossible?
     if ($link =~ m:/$abs_name$:o) {
-	warn "optex($$): remove $dir\n" if $debug;
+	warn "optex($$): remove $dir from PATH.\n" if $debug;
 	return 1;
     }
     return 0;
@@ -237,46 +237,48 @@ sub self_option {
 
     use Getopt::Long qw(GetOptionsFromArray);
     Getopt::Long::Configure(qw"bundling require_order");
-    my %opt;
-    my @optargs = (
-	"d|debug!"  => \$debug,
-	"v|version" => \$opt{version},
-	"h|man"     => \$opt{man},
-	"link|ln"   => \$opt{link},
-	"unlink|rm" => \$opt{unlink},
-	"f|force"   => \$opt{force},
-	"ls"        => \$opt{ls},
-	"rc"        => \$opt{rc},
-	"l|long"    => \$opt{long},
-	"m|cat"     => \$opt{cat},
-	"M"         => \$opt{M},
-	"module!"   => \$main::mod_arg,
-	"x|nop!"    => \$main::no_operation,
-	"exit=i"    => \$main::exit_code,
-	);
-    GetOptionsFromArray $argv, @optargs;
+    use Getopt::EX::Hashed qw(has); {
+	Getopt::EX::Hashed->configure(DEFAULT => [ is => 'ro' ]);
+	has debug   => " ! d  " , default => \$debug;
+	has version => "   v  " ;
+	has man     => "   h  " ;
+	has link    => "   ln " ;
+	has unlink  => "   rm " ;
+	has force   => "   f  " ;
+	has ls      => "      " ;
+	has rc      => "      " ;
+	has long    => "   l  " ;
+	has path    => "   p  " ;
+	has cat     => "   m  " ;
+	has M       => "      " ;
+	has module  => " !    " , default => \$main::mod_arg;
+	has nop     => " ! x  " , default => \$main::no_operation;
+	has exit    => " =i   " , default => \$main::exit_code;
+    }; no Getopt::EX::Hashed;
+    my $opt = Getopt::EX::Hashed->new->reset();
+    GetOptionsFromArray($argv, $opt->optspec) or usage();
 
-    if ($opt{man}) {
+    if ($opt->man) {
 	exec "perldoc $abs_name";
 	die "exec: $!";
     }
-    elsif ($opt{version}) {
+    elsif ($opt->version) {
 	print $version, "\n";
 	exit;
     }
-    elsif ($opt{link} || $opt{unlink}) {
-	_symlink($argv, \%opt);
+    elsif ($opt->link || $opt->unlink) {
+	_symlink($argv, $opt);
 	exit 0;
     }
-    elsif ($opt{ls}) {
-	_ls($argv, \%opt);
+    elsif ($opt->ls) {
+	_ls($argv, $opt);
 	exit 0;
     }
-    elsif ($opt{rc}) {
-	_rc($argv, \%opt);
+    elsif ($opt->rc) {
+	_rc($argv, $opt);
 	exit 0;
     }
-    elsif ($opt{M}) {
+    elsif ($opt->M) {
 	show_modules();
 	exit 0;
     }
@@ -305,7 +307,6 @@ sub _symlink {
 			"Use -f option to force unlink.\n" ;
 		    next;
 		}
-			
 	    }
 	    unlink $link or die "$link: $!\n";
 	    print "$link removed.\n";
@@ -872,7 +873,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2017-2020 Kazumasa Utashiro
+Copyright 2017-2021 Kazumasa Utashiro
 
 
 =cut

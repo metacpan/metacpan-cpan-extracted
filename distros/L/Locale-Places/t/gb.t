@@ -1,6 +1,6 @@
 #!perl -wT
 
-# Check the GBN database is sensible
+# Check the GB database is sensible
 
 use strict;
 use warnings;

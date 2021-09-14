@@ -1,0 +1,89 @@
+format: v1
+
+name: Pod::Thread
+maintainer: Russ Allbery <rra@cpan.org>
+version: '2.00'
+synopsis: Format POD source into thread, an HTML macro language
+
+license:
+  name: Expat
+copyrights:
+  - holder: Russ Allbery <rra@cpan.org>
+    years: 2002, 2008-2009, 2013, 2021
+
+build:
+  type: Module::Build
+distribution:
+  cpan: Pod-Thread
+  packaging:
+    debian:
+      package: libpod-thread-perl
+      personal: true
+  section: web
+  tarname: Pod-Thread
+  version: pod-thread
+support:
+  email: rra@cpan.org
+  github: rra/pod-thread
+  web: https://www.eyrie.org/~eagle/software/pod-thread/
+vcs:
+  browse: https://git.eyrie.org/?p=web/pod-thread.git
+  github: rra/pod-thread
+  status:
+    workflow: build
+  type: Git
+  url: https://git.eyrie.org/web/pod-thread.git
+
+docs:
+  api:
+    - name: pod-thread
+      title: Pod::Thread
+  user:
+    - name: pod2thread
+      title: pod2thread manual page
+
+blurb: |
+  Pod::Thread translates POD source into thread, a macro language processed by
+  spin.  It supports optionally adding a table of contents and a navigation
+  bar to the genenerated file.  This package also includes the pod2thread
+  driver script, invoked automatically by spin for POD files and pointers to
+  POD files.
+
+description: |
+  This package contains a module to translate POD into thread, an HTML macro
+  language.  As such, it's not very useful without
+  [spin](https://www.eyrie.org/~eagle/software/web/), a separate program to
+  convert thread into HTML.  I wrote this module for my personal needs and it
+  may not be (and in fact probably isn't) suitable for more general use as
+  yet.
+
+  The eventual intention is to incorporate spin into
+  [DocKnot](https://www.eyrie.org/~eagle/software/docknot/), at which point
+  this module will provide the POD support for DocKnot as a static site
+  generator.  I have no estimate for when that work will be done.
+
+  The conversion done by this module is mostly straightforward.  The only
+  notable parts are the optional generation of a table of contents or a
+  navigation bar at the top of the generated file.
+
+requirements: |
+  Perl 5.24 or later and Pod::Parser 3.06 or later.  As mentioned above, it's
+  also not particularly useful without spin.
+
+test:
+  lancaster: true
+  suffix: |
+    Perl6::Slurp is required by the test suite.  The following additional Perl
+    modules will be used by the test suite if present:
+
+    * Devel::Cover
+    * Perl::Critic::Freenode
+    * Test::MinimumVersion
+    * Test::Perl::Critic
+    * Test::Pod
+    * Test::Spelling
+    * Test::Strict
+    * Test::Synopsis
+
+    All are available on CPAN.  Those tests will be skipped if the modules
+    are not available.

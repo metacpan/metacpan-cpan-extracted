@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -8,12 +9,14 @@ my $build = Module::Build->new(
    requires => {
       'Encode' => 0,
       'Exporter' => '5.57',
-      'Future' => 0,
+      'Feature::Compat::Try' => 0,
+      'Future' => '0.36',
       'List::Util' => '1.29',
-      'perl' => 5.010,
+      'perl' => '5.014',
       'Parser::MGC' => '0.04',
       'Struct::Dumb' => 0,
       'Sub::Util' => '1.40',
+      'Syntax::Keyword::Match' => 0,
    },
    test_requires => {
       'Struct::Dumb' => '0.09',

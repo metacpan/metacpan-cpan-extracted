@@ -1,6 +1,6 @@
 package t::Ball;
 
-use strict;
+use v5.14;
 
 use base qw( Tangence::Object t::Colourable );
 

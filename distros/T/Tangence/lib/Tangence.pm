@@ -3,16 +3,14 @@
 #
 #  (C) Paul Evans, 2010 -- leonerd@leonerd.org.uk
 
-package Tangence;
+package Tangence 0.26;
 
-use strict;
+use v5.14;
 use warnings;
 
 # This package contains no code other than a declaration of the version.
 # It is provided simply to keep CPAN happy:
 #   cpan -i Tangence
-
-our $VERSION = '0.25';
 
 =head1 NAME
 

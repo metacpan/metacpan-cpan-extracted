@@ -1,5 +1,12 @@
 Revision history for App-eachperl
 
+0.04    2021-09-11
+        [CHANGES]
+         * Have `eachperl list` show which perls are thready
+         * Rewrite to use Object::Pad
+         * Better status printing during `exec`-like commands by using
+           IO::Term::Status and running perls via PTY
+
 0.03    2021-04-28
         [CHANGES]
          * Added `--reverse/-r` and `--stop-on-fail/-s` options

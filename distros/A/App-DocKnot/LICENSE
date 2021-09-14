@@ -9,8 +9,8 @@ Comment: This file documents the copyright statements and licenses for
 Files: *
 Copyright: 1993-1994, 1996-1998, 2000, 2002-2014
     The Board of Trustees of the Leland Stanford Junior University
-  2000-2004, 2006-2019 Russ Allbery <eagle@eyrie.org>
-  2013-2021 Russ Allbery <rra@cpan.org>
+  2000-2004, 2006-2021 Russ Allbery <eagle@eyrie.org>
+  1999-2011, 2013-2021 Russ Allbery <rra@cpan.org>
 License: Expat
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the
@@ -34,6 +34,7 @@ License: Expat
 Files: t/data/perltidyrc
 Copyright: 2012-2013
     The Board of Trustees of the Leland Stanford Junior University
+  2021 Russ Allbery <eagle@eyrie.org>
 License: all-permissive
  Copying and distribution of this file, with or without modification, are
  permitted in any medium without royalty provided the copyright notice and

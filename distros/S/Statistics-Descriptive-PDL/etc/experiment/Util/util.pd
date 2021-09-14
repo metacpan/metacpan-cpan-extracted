@@ -1,5 +1,7 @@
 #pp_bless ('Statistics::Descriptive::PDL::Util');
 
+our $VERSION = '0.08';
+
 pp_addpm({At=>'Top'}, <<'EOD');
  
 use PDL::LiteF;
@@ -8,107 +10,113 @@ use Carp;
  
 $PDL::onlinedoc->scan(__FILE__) if $PDL::onlinedoc;
  
-eval { require PDL::Core; require PDL::GSL::CDF; };
-my $CDF = 1 if !$@;
- 
 =head1 NAME
  
-PDL::Stats::Basic -- basic statistics and related utilities such as standard deviation, Pearson correlation, and t-tests.
+PDL::Gobble::Gobble::Gobble -- experiment
  
 =head1 DESCRIPTION
  
-The terms FUNCTIONS and METHODS are arbitrarily used to refer to methods that are threadable and methods that are NOT threadable, respectively.
- 
-Does not have mean or median function here. see SEE ALSO.
+stuff
  
 =head1 SYNOPSIS
  
     use PDL::LiteF;
     use PDL::NiceSlice;
-    use PDL::Stats::Basic;
+    use PDL::Gobble::Gobble::Gobble;
  
-    my $stdv = $data->stdv;
- 
-or
- 
-    my $stdv = stdv( $data );  
  
 =cut
  
 EOD
+;
 
-my $xxx = <<'EOSD'
-pp_def('stdv',
-  Pars      => 'a(n); float+ [o]b()',
-  GenericTypes => [F, D],
-  HandleBad => 1,
+#ADAPTED FROM
+#https://github.com/PDLPorters/pdl/blob/5e95b25dd982df40e5b074594776c4a2c008945d/Basic/Slices/slices.pd#L1287
+pp_def('rle_sum',
+  Pars      => 'a(n); b(n); [o]t(n); indx s(n);',
+  PMCode    => <<'EOC',
+sub PDL::rle_sum {
+  my ($x,$y) = @_;
+  #  will not handle overflow
+  my $t     = $x->zeroes ($x->type(), $x->dims);
+  #  indices with values - if 1D ndarray then we could use a single value for highest index 
+  my $sizer = $x->zeroes (PDL::indx, $x->dims);
+  my $zz = &PDL::_rle_sum_int($x,$y,$t,$sizer);
+  #say STDERR $t;
+  #say STDERR $t->which;
+  return ($t->where($sizer));
+}
+EOC
+  HandleBad => 0,  #  fix later, but we should not have any such data anyway?
   Code      => '
-    $GENERIC(b) sa, a2;
-    sa = 0; a2 = 0;
-    PDL_Indx N = $SIZE(n);
+    PDL_Indx j = 0;
+    double sum = 0;
+    $GENERIC(b) bval, last_bval;
+    last_bval = $b(n=>0);
+    $t(n=>0) = 0;
     loop (n) %{
-      sa += $a();
-      a2 += pow($a(), 2);
-    %}
-    $b() = sqrt( a2 / N - pow(sa/N,2) );
-  ',
-  BadCode  => '
-    $GENERIC(b) sa, a2;
-    sa = 0; a2 = 0;
-    PDL_Indx N = 0;
-    loop (n) %{
-      if ( $ISGOOD($a()) ) {
-        sa += $a();
-        a2 += pow($a(), 2);
-        N  ++;
+      bval = $b();
+      if (last_bval != bval) {
+        $t(n=>j) = sum;
+        $s(n=>j) = 1;
+        sum = 0;
+        j++;
+        last_bval = bval;
       }
+      sum += $a();
     %}
-    if (N) {
-      $b() = sqrt( a2 / N - pow(sa/N,2) );
-    }
-    else {
-      $SETBAD(b());
-    }
+    $t(n=>j) = sum;
+    $s(n=>j) = 1;
   ',
   Doc      => '
  
 =for ref
  
-Sample standard deviation.
+Sum values in first ndarray given contiguous sequences of
+the same value in the second ndarray.
  
 =cut
   ',
  
 );
-EOSD
-;
 
-pp_def('sum_a_by_contiguous_b',
-  Pars      => 'a(n); b(n); int+ [o]t();',
-  # GenericTypes => ['L', 'F', 'D'],
+
+pp_def('rle_sum_onesie',
+  Pars      => 'a(n); b(n); [o]t(n); indx s(n);',
+  PMCode    => <<'EOC',
+sub PDL::rle_sum_onesie {
+  my ($x,$y) = @_;
+  #  will not handle overflow
+  my $t     = $x->zeroes ($x->type(), $x->dims);
+  #  this stores in its first value the highest index into $t
+  my $sizer = pdl(PDL::indx, [0]);
+  &PDL::_rle_sum_onesie_int($x,$y,$t,$sizer);
+  #say STDERR "S IS: " . $sizer;
+  #say STDERR "T IS $t";
+  $sizer = $sizer->at(0);
+  #say STDERR "S IS: " . $sizer;
+  return ($t->slice("0:$sizer")->sever);
+}
+EOC
   HandleBad => 0,  #  fix later, but we should not have any such data anyway?
   Code      => '
-    double sum = 0;
-    PDL_Indx N = $SIZE(n);
     PDL_Indx j = 0;
-    PDL_Indx i;
-    double xx[N];
-    double last_bval = 100000;  #  needs fixing
+    double sum = 0;
+    $GENERIC(b) bval, last_bval;
+    last_bval = $b(n=>0);
+    $t(n=>0) = 0;
     loop (n) %{
-      if (last_bval != $b()) {
-        xx[j] = sum;
+      bval = $b();
+      if (last_bval != bval) {
+        $t(n=>j) = sum;
         sum = 0;
-        j += 1;
+        j++;
+        last_bval = bval;
       }
       sum += $a();
     %}
-    xx[j] = sum;
-    
-    https://github.com/PDLPorters/pdl/blob/459ff95039ea60716c019c91077dadfe7425564e/Basic/Primitive/primitive.pd#L1639
-    
-    for (i=0; i<=j; i++) {
-      $t() = xx[i];
-    }
+    $t(n=>j) = sum;
+    $s(n=>0) = j;
   ',
   Doc      => '
  

@@ -14,7 +14,7 @@ BEGIN {
 
 use Graph::AdjacencyMap qw(:flags :fields);
 
-our $VERSION = '0.9723';
+our $VERSION = '0.9724';
 
 require 5.006; # Weak references are absolutely required.
 
@@ -1162,6 +1162,7 @@ sub _deep_copy_DataDumper {
 }
 
 sub deep_copy {
+    local $. = $.;
     my $g2 = _deep_copy_best(@_);
     $g2->[ _V ]->reindex if grep ref, &_vertices05;
     $g2;

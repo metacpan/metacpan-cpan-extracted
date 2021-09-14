@@ -1,0 +1,18 @@
+- ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 YJApp-IOS jp.co.yahoo.ipn.appli/4.46.0'
+  name: 'Browser of Yahoo! JAPAN App'
+  is_bot: false
+  is_ios: true
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '4.46.0'
+- ua: 'Mozilla/5.0 (Linux; U; Android 4.2.2; ja-jp; SH-07E Build/S5310) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30 YJApp-ANDROID jp.co.yahoo.android.yjtop/2.3.16'
+  name: 'Browser of Yahoo! JAPAN App'
+  is_bot: false
+  is_ios: false
+  is_android: true
+  is_linux: true
+  is_windows: false
+  is_chromeos: false
+  version: '2.3.16'

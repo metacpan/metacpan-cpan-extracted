@@ -3,9 +3,9 @@
 #
 #  (C) Paul Evans, 2013-2016 -- leonerd@leonerd.org.uk
 
-package Tangence::Type::Primitive;
+package Tangence::Type::Primitive 0.26;
 
-use strict;
+use v5.14;
 use warnings;
 
 use base qw( Tangence::Type );
@@ -34,8 +34,8 @@ sub unpack_value
    my ( $type, $num ) = $message->_unpack_leader();
 
    $type == DATA_NUMBER or croak "Expected to unpack a number(bool) but did not find one";
-   $num == DATANUM_BOOLFALSE and return 0;
-   $num == DATANUM_BOOLTRUE  and return 1;
+   $num == DATANUM_BOOLFALSE and return !!0;
+   $num == DATANUM_BOOLTRUE  and return !!1;
    croak "Expected to find a DATANUM_BOOL subtype but got $num";
 }
 
@@ -459,6 +459,8 @@ use Carp;
 use Scalar::Util qw( blessed );
 use Tangence::Constants;
 
+use constant HAVE_ISBOOL => defined eval { Scalar::Util->import( 'isbool' ) };
+
 # We can't use Tangence::Types here without a dependency cycle
 # However, it's OK to create even TYPE_ANY right here, because the 'any' class
 # now exists.
@@ -494,8 +496,11 @@ sub pack_value
          $tmp =~ m/^[[:ascii:]]+$/ and ( $value ^ $value ) eq "0"
       };
 
+      if( HAVE_ISBOOL && Scalar::Util::isbool($value) ) {
+         TYPE_BOOL->pack_value( $message, $value );
+      }
       # test for integers, but exclude NaN
-      if( int($value) eq $value and $value == $value ) {
+      elsif( int($value) eq $value and $value == $value ) {
          TYPE_INT->pack_value( $message, $value );
       }
       elsif( $message->stream->_ver_can_num_float and $is_numeric ) {

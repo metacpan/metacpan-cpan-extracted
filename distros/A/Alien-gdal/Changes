@@ -1,6 +1,9 @@
 Revision history for Alien::gdal
 
-1.24 2021-05011
+1.25 2021-09-11
+    - Disable more drivers by default so as not to exceed the linker limits.  
+
+1.24 2021-05-11
     - Trim dangling -L in LDFLAGS for source installs on Windows.
       Possibly affect(s|ed) other OSes.
 

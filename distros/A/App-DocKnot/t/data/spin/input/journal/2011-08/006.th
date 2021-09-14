@@ -1,0 +1,466 @@
+\include[../.macros]
+
+\heading[Eagle's Path: NPR Top 100 SFF meme (2011-08-12)][journal]
+
+\h1[NPR Top 100 SFF meme]
+
+By way of \link[http://firecat.dreamwidth.org/profile]
+[\image[/~eagle/journal/dw.png][]]\link[http://firecat.dreamwidth.org/]
+[\strong[firecat]], this is the result of a public nomination process,
+panel review, and Internet voting on the NPR web site: an attempt at the
+top 100 works of science fiction or fantasy.  Series are counted as single
+works for the purposes of the list.
+
+This list has a ton of problems, like any list of this sort will have.  It
+leans rather more heavily towards white male than the actual literature,
+and certainly than my reading.  The lack of non-white writers is
+particularly troubling.  But it's still an interesting selection.  (For
+those wondering about some obvious omissions, young adult was explicitly
+excluded.)
+
+The rules are to bold the works one has read in their entirety and
+italicize the ones you've read part of but not finished.  I'll add
+underlining the works that I own, which provides some indication of the
+things that I've not read but that are on my to-read list.
+
+\==[ro] [2] [\number(packed)[\strong[\under[\1]]: \2]]
+\==[r]  [2] [\number(packed)[\strong[\1]: \2]]
+\==[po] [2] [\number(packed)[\emph[\under[\1]]: \2]]
+\==[p]  [2] [\number(packed)[\emph[\1]: \2]]
+\==[o]  [2] [\number(packed)[\under[\1]: \2]]
+\==[n]  [2] [\number(packed)[\1: \2]]
+
+\ro[The Lord Of The Rings Trilogy, by J.R.R. Tolkien][
+    It's a boring winner because it always wins, but it's an amazing book
+    and I can't argue with it.  I'll probably never review this one since
+    I'm not sure I have anything original to say about it.
+]
+\ro[The Hitchhiker's Guide To The Galaxy, by Douglas Adams][
+    Probably the best humorous SF.  I've read the entire series except for
+    \cite[The Salmon of Doubt], the unfinished book left when Adams died.
+    Will re-read them all at some point.
+]
+\ro[Ender's Game, by Orson Scott Card][
+    I intensely dislike Card's politics, but this book is still very good.
+    It's on my re-read list so that I can write a proper review of it.
+]
+\r[The Dune Chronicles, by Frank Herbert][
+    I've read the whole series, but only own the first, which is by far
+    the best.  I'm tempted to re-read the whole series at some point,
+    since I don't remember it well enough to analyze it, but I'll probably
+    stop after re-reading just the first.
+]
+\p[\link[../../reviews/books/0-553-57340-3.html][A Song Of Ice And Fire
+    Series], by George R. R. Martin][
+    I own the first couple and have read and reviewed the first four.  I
+    think they're somewhat overrated, but will probably read the latest.
+    I'm not sure if I'll re-read the previous books to remember what the
+    heck was going on.
+]
+
+\o[1984, by George Orwell][
+    I've somehow never read this.  I keep meaning to, particularly since I
+    generally love Orwell.
+]
+\r[Fahrenheit 451, by Ray Bradbury][
+    Massively overrated, or perhaps just made unoriginal by subsequent
+    history.  I found it boring and uninteresting.
+]
+\ro[The Foundation Trilogy, by Isaac Asimov][
+    Thoroughly enjoyed this when I was a teenager.  I suspect I'll like it
+    less as an adult, but definitely on my to-read list.
+]
+\o[Brave New World, by Aldous Huxley][Another classic I've never read.]
+\ro[American Gods, by Neil Gaiman][
+    Great book.  Need to re-read to review.
+]
+
+\o[The Princess Bride, by William Goldman][
+    On the list to read.  Apparently significantly better than the movie,
+    which I liked less than everyone else on the planet.
+]
+\p[The Wheel Of Time Series, by Robert Jordan][
+    I read up to book eight (\cite[The Path of Daggers]) and bailed
+    halfway through it.  It started as somewhat interesting fantasy with
+    deep world building and fun world surprises, but the writing got worse
+    and worse and the characters became miserably unlikeable.  I'm still
+    occasionally tempted to re-read and finish it, but it's a bad
+    temptation.
+]
+\ro[\link[../../reviews/books/animal-farm.html][Animal Farm], by George
+    Orwell][
+    Great book, and a political and historical classic.  Best read in
+    combination with a good history.
+]
+\ro[Neuromancer, by William Gibson][Meh.]
+\ro[Watchmen, by Alan Moore][Brilliant.  On my list to re-read.]
+
+\ro[I, Robot, by Isaac Asimov][
+    Okay, but I generally find Asimov a bit overrated.  Good for
+    intellectual puzzle stories, but not that deep of ones, and the
+    characters are essentially nonentities.
+]
+\r[Stranger In A Strange Land, by Robert Heinlein][
+    The only book that I've ever put down within fifteen pages of the end
+    and could never muster enough caring to pick up again.  I should
+    re-read it at some point to review it, but I don't think it's very
+    good.
+]
+\o[The Kingkiller Chronicles, by Patrick Rothfuss][
+    Well, I own the first one at least.
+]
+\n[Slaughterhouse-Five, by Kurt Vonnegut][Need to read.]
+\n[Frankenstein, by Mary Shelley][
+    I've never actually read this, but I'm not sure there's much point in
+    reading it.  I've been so thoroughly exposed to the angles and
+    interpretations of it that reading it at this point would be an odd
+    experience.  I probably should for completion's sake at some point.
+    (This is the first woman on the list, and of course she's long-dead
+    and not writing in the modern SF tradition.)
+]
+
+\o[Do Androids Dream Of Electric Sheep?, by Philip K. Dick][
+    I do need to read more Dick.  I don't think this is as good as its
+    placement on the list; everyone just knows \cite[Blade Runner] (which
+    was based on this).
+]
+\o[The Handmaid's Tale, by Margaret Atwood][
+    I have a bunch of Atwood, but haven't yet read any of it.
+]
+\n[The Dark Tower Series, by Stephen King][
+    It's rare for me to find any horror I actually like, but my
+    understanding is that this is less horror than a lot of King.  I may
+    give it a try someday (but probably won't).
+]
+\r[2001: A Space Odyssey, by Arthur C. Clarke][
+    Much better than the movie since it actually explained what was going
+    on, although it wasn't as atmospheric.  Not actually as good as its
+    position on lists like this would indicate.  Mostly it's just a book
+    everyone has heard of.
+]
+\o[The Stand, by Stephen King][See above about horror.]
+
+\ro[\link[../../reviews/books/0-553-56261-4.html][Snow Crash], by Neal
+    Stephenson][
+    One of my favorite humorous SF books, plus features the trademark
+    Stephenson infodumping and some neat bits about building a virtual
+    world.
+]
+\o[The Martian Chronicles, by Ray Bradbury][On the list to read.]
+\n[Cat's Cradle, by Kurt Vonnegut][Need to track down and read.]
+\ro[The Sandman Series, by Neil Gaiman][
+    Quite possibly the best comic book series ever written.  Utterly
+    brilliant.  The one set of graphic novels that everyone should read at
+    some point in their life.
+]
+\n[A Clockwork Orange, by Anthony Burgess][
+    Huh.  Not really on my radar to read, although of course I've heard of
+    it.
+]
+
+\ro[\link[../../reviews/books/0-441-78358-9.html][Starship Troopers], by
+    Robert Heinlein][
+    Also overrated, particularly since it's not much of a story.  It's an
+    extended and multifaceted political essay, which isn't as simple as it
+    appears to be.  The movie, quite contrary to the negative impression
+    people have of it, is a delightful parody of how the book comes across
+    on its surface reading.
+]
+\o[Watership Down, by Richard Adams][Yeah, yeah, I know I should read it.]
+\ro[Dragonflight, by Anne McCaffrey][
+    I loved the Pern books as a teenager up until the point when the just
+    became retellings of the same book from a new perspective.  I'm afraid
+    to re-read them.
+]
+\ro[\link[../../reviews/books/0-425-03436-4.html][The Moon Is A Harsh
+    Mistress], by Robert Heinlein][
+    Much, much better than \cite[Starship Troopers].  One of the better
+    non-juvenile Heinleins.  Still not as good as people think it is.
+]
+\ro[\link[../../reviews/books/0-553-37926-7.html][A Canticle For
+    Leibowitz], by Walter M. Miller][
+    I was disappointed in this given how much people like it, but it
+    deserves some credit for being foundational to post-apocalyptic SF.
+]
+
+\ro[\link[../../reviews/books/0-517-26188-Xa.html][The Time Machine], by
+    H.G. Wells][
+    More interesting than you might think it would be, given when it was
+    written and the emphasis on description rather than characterization.
+    But it still suffers from a lack of characters for me.  Hard to come
+    to this fresh now, since the ideas have been so used elsewhere.
+]
+\n[20,000 Leagues Under The Sea, by Jules Verne][
+    I've seen the movie take on it.  I've not felt a strong urge to read
+    the book, although I probably "should."
+]
+\ro[\link[../../reviews/books/0-553-27450-3.html][Flowers For Algernon],
+    by Daniel Keys][
+    Unforgettable and very strongly affecting (and depressing).
+]
+\o[The War Of The Worlds, by H.G. Wells][Will read at some point.]
+\o[The Chronicles Of Amber, by Roger Zelazny][Will probably read soon.]
+
+\ro[The Belgariad, by David Eddings][
+    Yeah, I read this as a teenager and quite liked it.  But I have no
+    idea what it's doing on this list; it is in absolutely no way one of
+    the best 100 SFF works of all time.  (Well, that's not true; I know
+    what it's doing on this list.  People have heard of it and read it.
+    But it shouldn't be on this list.)
+]
+\o[The Mists Of Avalon, by Marion Zimmer Bradley][On the list.]
+\n[The Mistborn Series, by Brandon Sanderson][Want to read this.]
+\ro[Ringworld, by Larry Niven][
+    Interesting idea fiction with a great sense of scale.  Shame the
+    characters aren't as good as the background.  But it's a good book,
+    worth reading.
+]
+\ro[\link[../../reviews/books/0-441-47812-3.html][The Left Hand Of
+    Darkness], by Ursula K. LeGuin][
+    A deserved classic of anthropological SF with profound things to say
+    about how culture and friendship are constructed.
+]
+
+\ro[The Silmarillion, by J.R.R. Tolkien][
+    I love this book, but the first section is hard going if you don't
+    like reading mythology.  Skip ahead if you're struggling; the gems are
+    later.
+]
+\o[The Once And Future King, by T.H. White][Definitely on the list to read.]
+\ro[Neverwhere, by Neil Gaiman][
+    I'm not sure I'd put it on this list, as there are better Gaiman (and
+    Gaiman is already overrepresented), but it's a solid "urban" fantasy
+    in the old sense of that term.  Inventive, with a feel similar to some
+    of the \cite[Sandman] stories.
+]
+\ro[Childhood's End, by Arthur C. Clarke][
+    I read this eons ago and can barely remember it.  I definitely need to
+    re-read it.
+]
+\n[Contact, by Carl Sagan][
+    Liked the movie, have never had any particular urge to read the book.
+]
+
+\ro[\link[../../reviews/books/0-553-28368-5.html][The Hyperion Cantos], by
+    Dan Simmons][
+    Some of my favorite SF novels ever.  The third book is the weakest,
+    and the fourth book has problems, but I adore it.
+]
+\ro[\link[../../reviews/books/1-56389-470-X.html][Stardust], by Neil
+    Gaiman][
+    Really far too much Gaiman on this list.  But also a good book.
+]
+\ro[\link[../../reviews/books/0-380-78862-4.html][Cryptonomicon], by Neal
+    Stephenson][
+    Fantastic stuff.  Not SF in any traditional sense.  It's a combination
+    of secret history and contemporary thriller.  But it's written in the
+    Stephenson massive entertaining infodumping style, so it feels like SF
+    and makes it onto lists like this.  It's very long, but I've read it
+    twice and don't regret it.
+]
+\n[World War Z, by Max Brooks][
+    Have a hard time believing this really belongs here, but I haven't
+    read it so I couldn't say for sure.
+]
+\ro[\link[../../reviews/books/0-345-27505-5.html][The Last Unicorn], by
+    Peter S. Beagle][
+    Eh, it's not a bad book, but I'm not sure it really belongs on this
+    list.  But it does have an aesthetic that's hard to find in any other
+    book.
+]
+
+\ro[\link[../../reviews/books/0-380-70821-3.html][The Forever War], by Joe
+    Haldeman][
+    A very important response to the whole sub-genre of military SF, and
+    very influential.
+]
+\o[Small Gods, by Terry Pratchett][Getting to it.]
+\po[The Chronicles Of Thomas Covenant, The Unbeliever, by Stephen
+    R. Donaldson][
+    Read the first book, wasn't much of a fan.  I might get back to it at
+    some point, but I'm not particularly eager.
+]
+\r[\link[../../reviews/books/0-671-87749-6a.html][The Vorkosigan Saga], by
+    Lois McMaster Bujold][
+    I don't like the early books as much as some, but I love some of the
+    later books.  The last few have been disappointing, but overall very
+    much worth reading, and belongs around here on the list.
+]
+\n[Going Postal, by Terry Pratchett][Getting to it.]
+
+\r[The Mote In God's Eye, by Larry Niven & Jerry Pournelle][
+    Read many years ago and barely remember it.  I need to re-read it,
+    particularly since there's a new sequal by Pournelle's daughter that
+    looks well worth reading.
+]
+\p[The Sword Of Truth, by Terry Goodkind][
+    I read way too many books in this series.  Others should not repeat my
+    mistake.  Generic fantasy about incredibly stupid people that turns
+    into libertarian political ravings.
+]
+\n[The Road, by Cormac McCarthy][Not my thing.]
+\r[\link[../../reviews/books/1-58234-416-7.html][Jonathan Strange & Mr
+    Norrell], by Susanna Clarke][
+    A nearly unique reading experience, and the best footnoted fantasy
+    that I've ever read (and that includes Pratchett).  Great stuff if you
+    don't mind the slow pace.  I'm eagerly hoping for an actual sequel.
+]
+\n[I Am Legend, by Richard Matheson][
+    Having a hard time getting interested enough in a book about zombies.
+    But I've been wrong about that
+    \link[../../reviews/books/0-316-12246-7.html][before].
+]
+
+\n[The Riftwar Saga, by Raymond E. Feist][
+    Heard of it, but not enough to get it onto my want list.
+]
+\n[The Shannara Trilogy, by Terry Brooks][
+    Heard enough about it to not put it on my want list.
+]
+\n[The Conan The Barbarian Series, by R.E. Howard][
+    Something that I feel like I "should" read, but usually I'm not a big
+    fan of pulp.
+]
+\o[The Farseer Trilogy, by Robin Hobb][
+    Own the first, which has been on my to-read list for a very long time.
+    Someday I'll get to it.  I should probably buy all of the trilogy
+    before starting it.
+]
+\r[\link[../../reviews/books/1-931561-64-8.html][The Time Traveler's
+    Wife], by Audrey Niffenegger][
+    Surprisingly good for a literary fantasy, with some fantastic moments
+    of description.
+]
+
+\n[The Way Of Kings, by Brandon Sanderson][Want to read at some point.]
+\n[A Journey To The Center Of The Earth, by Jules Verne][
+    As above, uninspired to read Verne.
+]
+\p[\link[../../reviews/books/0-88038-905-2.html][The Legend Of Drizzt
+    Series], by R.A. Salvatore][
+    Read the first one, and unless they get substantially better, I have
+    no interest in reading more.  Very stock power fantasy with
+    one-dimensional characters.
+]
+\ro[\link[../../reviews/books/0-765-31524-6.html][Old Man's War], by John
+    Scalzi][
+    The later books in the series are better than the first one.  An
+    interesting take on military SF, but I'm not sure it really rises to
+    the level of this sort of list.
+]
+\ro[\link[../../reviews/books/0-553-57331-4.html][The Diamond Age], by
+    Neil Stephenson][
+    One too many Stephenson for this list, plus \cite[Anathem] is probably
+    more deserving of this place, but there are some neat bits about
+    computation theory.
+]
+
+\ro[\link[../../reviews/books/0-553-28789-3.html][Rendezvous With Rama],
+    by Arthur C. Clarke][
+    Completely overrated.  A bad book that just happens to be foundational
+    in a particular sub-genre of SF.  Done much better by other people.
+]
+\ro[\link[../../reviews/books/0-765-34298-7.html][The Kushiel's Legacy
+    Series], by Jacqueline Carey][
+    By far my favorite epic fantasy series.  Lush, involved, very
+    creative, and with a truly unusual heroine.  Wonderful stuff.
+]
+\ro[\link[../../reviews/books/0-06-105488-7.html][The Dispossessed], by
+    Ursula K. LeGuin][
+    Great, thoughtful SF.  Probably the best in the utopia genre, even
+    though it isn't a utopia.
+]
+\n[Something Wicked This Way Comes, by Ray Bradbury][Horror.  Eh.]
+\o[Wicked, by Gregory Maguire][
+    On the list, but after a general Oz re-read.
+]
+
+\o[The Malazan Book Of The Fallen Series, by Steven Erikson][
+    Own the first.  Completely intimidated by the length of the series.
+]
+\o[The Eyre Affair, by Jasper Fforde][On the list.]
+\po[\link[../../reviews/books/1-85723-138-4.html][The Culture Series], by
+    Iain M. Banks][
+    Brilliant stuff, highly recommended.  I only haven't read it all
+    because I'm slowly digesting it.  Should be higher on the list than
+    this.
+]
+\o[The Crystal Cave, by Mary Stewart][On the list.]
+\o[Anathem, by Neal Stephenson][On the list.]
+
+\n[The Codex Alera Series, by Jim Butcher][
+    I'll read the Dresden series, or least part of it, first, and see if
+    that inspires me to read more Butcher.  Dubious that this belongs on
+    this list.
+]
+\ro[\link[../../reviews/books/0-671-45070-0.html][The Book Of The New
+    Sun], by Gene Wolfe][
+    Incredibly influential and important fantasy-flavored SF that should
+    be much higher on the list than this.
+]
+\ro[The Thrawn Trilogy, by Timothy Zahn][
+    This is a \cite[Star Wars] media tie-in series, and one of the few of
+    that type that I've read.  I remember quite enjoying it a long time
+    ago, and it's on the list to re-read at some point.
+]
+\n[The Outlander Series, by Diana Gabaldan][
+    The only thing on this list that I've never even heard of.
+]
+\n[The Elric Saga, by Michael Moorcock][
+    Definitely want to read this at some point, once I figure out the
+    right place to start and probably after I've read some other
+    Moorcock.
+]
+
+\n[The Illustrated Man, by Ray Bradbury][
+    Waiting to see if I like the better-known Bradbury first.
+]
+\ro[\link[../../reviews/books/0-515-13881-9.html][Sunshine], by Robin
+    McKinley][
+    Quite possibly the best urban fantasy (in the modern definition) that
+    I've ever read.
+]
+\ro[\link[../../reviews/books/0-812-51528-5.html][A Fire Upon The Deep],
+    by Vernor Vinge][
+    A little overrated, but it has a fun rendition of Usenet and some
+    neat aliens.
+]
+\r[The Caves Of Steel, by Isaac Asimov][
+    Read long ago.  Enjoyed it, but don't remember being grabbed by it.
+    There's a bit too much Asimov on this list.
+]
+\ro[\link[../../reviews/books/0-553-56073-5.html][The Mars Trilogy], by
+    Kim Stanley Robinson][
+    The most detailed and in-depth politics that you'll find in SF, even
+    more than Le Guin, at the cost of being mind-numbingly boring.  Very
+    ambitious, but just doesn't move fast enough or have enough plot.
+    Robinson is less a novelist than a political and hard science essayist
+    in the form of a novel.
+]
+
+\ro[Lucifer's Hammer, by Larry Niven & Jerry Pournelle][
+    Large-screen disaster novel with a heavy helping of libertarian
+    utopian politics.  Does not belong anywhere near this list.
+]
+\ro[\link[../../reviews/books/0-553-56273-8.html][Doomsday Book], by
+    Connie Willis][
+    The best of Willis's time travel novels, with fewer communication
+    failures and frantic faffing about than the other ones.  Borderline
+    for this list, but probably deserves to be here.
+]
+\ro[\link[../../reviews/books/0-345-45940-7.html][Perdido Street Station],
+    by China Mieville][
+    Revolutionary fantasy.  The founding book of New Weird.  I think
+    \link[../../reviews/books/0-345-44438-8.html][The Scar] is a better
+    book, but I can't argue with this being here.
+]
+\n[The Xanth Series, by Piers Anthony][I've been warned off these.]
+\ro[The Space Trilogy, by C.S. Lewis][
+    I need to re-read this and write long reviews of them, since I have a
+    lot to say about them.  But they need to be read in the context of the
+    Christian faith to make any sense.
+]
+
+\date[Posted: 2011-08-13 00:09]
+
+\signature

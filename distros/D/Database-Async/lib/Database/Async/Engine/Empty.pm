@@ -3,7 +3,7 @@ package Database::Async::Engine::Empty;
 use strict;
 use warnings;
 
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 use parent qw(Database::Async::Engine);
 

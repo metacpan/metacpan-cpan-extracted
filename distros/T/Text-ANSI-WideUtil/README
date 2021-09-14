@@ -3,8 +3,8 @@ NAME
     (wide-character functions only)
 
 VERSION
-    This document describes version 0.231 of Text::ANSI::WideUtil (from Perl
-    distribution Text-ANSI-WideUtil), released on 2021-01-23.
+    This document describes version 0.232 of Text::ANSI::WideUtil (from Perl
+    distribution Text-ANSI-WideUtil), released on 2021-04-14.
 
 SYNOPSIS
      use Text::ANSI::WideUtil qw(
@@ -82,6 +82,11 @@ FUNCTIONS
     visual width, not number of characters.
 
 FAQ
+  Why split functionalities of wide character and color support into multiple modules/distributions?
+    Performance (see numbers in the function description), dependency
+    (Unicode::GCString is used for wide character support), and overhead
+    (loading Unicode::GCString).
+
   How do I truncate string based on number of characters instead of columns?
     You can simply use "ta_trunc()" even on text containing wide characters.
     ta_trunc() uses Perl's length() which works on a per-character basis.

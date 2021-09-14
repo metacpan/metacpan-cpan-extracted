@@ -1,0 +1,71 @@
+{
+   "abstract" : "make and use LWP mocks, distilled to their essence",
+   "author" : [
+      "Sam Kington <skington@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-Mock-LWP-Distilled",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Compare" : "0",
+            "Data::Dumper" : "0",
+            "English" : "0",
+            "HTTP::Status" : "6.03",
+            "JSON::MaybeXS" : "0",
+            "Moo::Role" : "0",
+            "Path::Class" : "0",
+            "Types::Standard" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Cwd" : "0",
+            "File::Spec" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "HTTP::Response" : "0",
+            "HTTP::Status" : "6.03",
+            "LWP::UserAgent" : "0",
+            "Moo" : "0",
+            "Test2::Tools::Compare" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "1.08",
+            "lib::abs" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/skington/test-mock-lwp-distilled/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/skington/test-mock-lwp-distilled.git",
+         "web" : "https://github.com/skington/test-mock-lwp-distilled"
+      }
+   },
+   "version" : "1.000",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

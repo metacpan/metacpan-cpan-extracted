@@ -65,6 +65,7 @@
             "Encode" : "0",
             "File::Spec" : "0",
             "Module::Metadata" : "0",
+            "Test::Exception" : "0.41",
             "Test::More" : "1.302183",
             "Test::Warnings" : "0",
             "utf8" : "0"
@@ -74,7 +75,7 @@
    "provides" : {
       "Text::Minify::XS" : {
          "file" : "lib/Text/Minify/XS.pm",
-         "version" : "v0.4.3"
+         "version" : "v0.4.6"
       }
    },
    "release_status" : "stable",
@@ -89,7 +90,7 @@
          "web" : "https://github.com/robrwo/Text-Minify-XS"
       }
    },
-   "version" : "v0.4.3",
+   "version" : "v0.4.6",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",

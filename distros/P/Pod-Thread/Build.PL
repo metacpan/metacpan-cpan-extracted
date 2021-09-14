@@ -19,6 +19,22 @@ my $build = Module::Build->new(
     license              => 'mit',
     recursive_test_files => 1,
 
+    # Add additional package metadata.
+    meta_merge => {
+        'meta-spec' => { version => '2' },
+        resources   => {
+            bugtracker => {
+                web => 'https://github.com/rra/pod-thread/issues',
+            },
+            homepage   => 'https://www.eyrie.org/~eagle/software/pod-thread/',
+            repository => {
+                url  => 'https://github.com/rra/pod-thread.git',
+                web  => 'https://github.com/rra/pod-thread',
+                type => 'git',
+            },
+        },
+    },
+
     # Other package relationships.
     configure_requires => { 'Module::Build' => 0.28 },
     test_requires      => { 'Perl6::Slurp'  => 0 },

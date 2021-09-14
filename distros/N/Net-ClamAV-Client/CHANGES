@@ -1,0 +1,41 @@
+==================================================
+Changes from 2020-09-10 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 0.1 at 2021-09-10 19:32:24 +0000
+----------------------------------------
+
+  Change: 11ec3b3e84663c772461bec37046b9cbe71b596a
+  Author: Dominik Meyer <dmeyer@hsu-hh.de>
+  Date : 2021-09-10 21:32:19 +0000
+
+    ADD: ignore some files 
+
+  Change: 878867e498cf8909319900ebb088459d11abb55c
+  Author: Dominik Meyer <dmeyer@hsu-hh.de>
+  Date : 2021-09-10 21:32:09 +0000
+
+    FIX: added release plugin 
+
+  Change: ae17a9663682080668f684972f297dc172b228a1
+  Author: Dominik Meyer <dmeyer@hsu-hh.de>
+  Date : 2021-09-10 21:21:29 +0000
+
+    ADD: Fix readme 
+
+  Change: 5b7e3aea0eb9dda2571b93104d6dd4aa8e512caa
+  Author: Dominik Meyer <dmeyer@hsu-hh.de>
+  Date : 2021-09-10 21:17:56 +0000
+
+    ADD: initial version 
+
+  Change: c7e0b7eb301a8e14bae6f4c6980ad12888482cf7
+  Author: Dominik Meyer <dmeyer@hsu-hh.de>
+  Date : 2021-09-05 20:03:54 +0000
+
+    ADD: initial commit 
+
+================
+End of releases.
+================

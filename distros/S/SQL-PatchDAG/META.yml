@@ -22,7 +22,7 @@ requires:
 resources:
   bugtracker: https://github.com/ap/SQL-PatchDAG/issues
   repository: git://github.com/ap/SQL-PatchDAG.git
-version: '0.100'
+version: '0.102'
 x_copyright:
   holder: 'Aristotle Pagaltzis'
   year: 2020

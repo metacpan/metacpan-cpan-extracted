@@ -3,14 +3,12 @@
 #
 #  (C) Paul Evans, 2010-2020 -- leonerd@leonerd.org.uk
 
-package Tangence::Client;
+package Tangence::Client 0.26;
 
-use strict;
+use v5.14;
 use warnings;
 
 use base qw( Tangence::Stream );
-
-our $VERSION = '0.25';
 
 use Carp;
 
@@ -18,7 +16,7 @@ use Tangence::Constants;
 use Tangence::Types;
 use Tangence::ObjectProxy;
 
-use Future;
+use Future 0.36; # ->retain
 
 use List::Util qw( max );
 
@@ -32,37 +30,37 @@ C<Tangence::Client> - mixin class for building a C<Tangence> client
 
 This class is a mixin, it cannot be directly constructed
 
- package Example::Client;
- use base qw( Base::Client Tangence::Client );
+   package Example::Client;
+   use base qw( Base::Client Tangence::Client );
 
- sub connect
- {
-    my $self = shift;
-    $self->SUPER::connect( @_ );
+   sub connect
+   {
+      my $self = shift;
+      $self->SUPER::connect( @_ );
 
-    $self->tangence_connected;
+      $self->tangence_connected;
 
-    wait_for { defined $self->rootobj };
- }
+      wait_for { defined $self->rootobj };
+   }
 
- sub tangence_write
- {
-    my $self = shift;
-    $self->write( $_[0] );
- }
+   sub tangence_write
+   {
+      my $self = shift;
+      $self->write( $_[0] );
+   }
 
- sub on_read
- {
-    my $self = shift;
-    $self->tangence_readfrom( $_[0] );
- }
+   sub on_read
+   {
+      my $self = shift;
+      $self->tangence_readfrom( $_[0] );
+   }
 
- package main;
+   package main;
 
- my $client = Example::Client->new;
- $client->connect( "server.location.here" );
+   my $client = Example::Client->new;
+   $client->connect( "server.location.here" );
 
- my $rootobj = $client->rootobj;
+   my $rootobj = $client->rootobj;
 
 =head1 DESCRIPTION
 
@@ -185,19 +183,19 @@ to be disabled.
 Optional callback to be invoked once the root object has been returned. It
 will be passed a L<Tangence::ObjectProxy> to the root object.
 
- $on_root->( $rootobj )
+   $on_root->( $rootobj )
 
 =item on_registry => CODE
 
 Optional callback to be invoked once the registry has been returned. It will
 be passed a L<Tangence::ObjectProxy> to the registry.
 
- $on_registry->( $registry )
+   $on_registry->( $registry )
 
 Note that in the case that the server does not permit access to the registry
 or an error occurs while requesting it, this is invoked with an empty list.
 
- $on_registry->()
+   $on_registry->()
 
 =item version_minor_min => INT
 

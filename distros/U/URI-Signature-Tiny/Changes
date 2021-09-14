@@ -1,5 +1,13 @@
 Release history for URI-Signature-Tiny
 
+1.003 Sat 11 Sep 2021
+	- Changelog fix
+	- No functional changes
+
+1.002 Fri 10 Sep 2021
+	- Documentation typo fix
+	- No functional changes
+
 1.001 Tue 29 Oct 2020
 	- Correct tests under Carp versions before 1.25
 

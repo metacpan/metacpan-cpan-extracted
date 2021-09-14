@@ -49,7 +49,7 @@
          "web" : "https://github.com/ap/URI-Signature-Tiny"
       }
    },
-   "version" : "1.001",
+   "version" : "1.003",
    "x_copyright" : {
       "holder" : "Aristotle Pagaltzis",
       "year" : 2020

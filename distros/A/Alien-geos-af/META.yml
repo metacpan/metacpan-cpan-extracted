@@ -3,34 +3,39 @@ abstract: 'Alien package for GEOS - Geometry Engine, Open Source'
 author:
   - 'Shawn Laffan <shawnlaffan@gmail.com>'
 build_requires:
-  Alien::Build: '1.41'
-  Alien::Build::MM: '1.41'
+  Alien::Build: '2.25'
+  Alien::Build::MM: '1.74'
   Alien::Build::Plugin::Cleanse::BuildDir: '0'
   Alien::MSYS: '0.07'
+  Alien::cmake3: '0.05'
   Archive::Tar: '0'
   ExtUtils::MakeMaker: '6.52'
   FFI::CheckLib: '0.23'
   File::Find::Rule: '0'
-  HTML::LinkExtor: '0'
   HTTP::Tiny: '0.044'
   IO::Compress::Bzip2: '0'
   IO::Uncompress::Bunzip2: '0'
+  Mojo::DOM58: '1.00'
   PkgConfig: '0.19026'
   Sort::Versions: '0'
   Test::Alien: '0'
   URI: '0'
   URI::Escape: '0'
 configure_requires:
-  Alien::Build: '1.41'
-  Alien::Build::MM: '1.41'
+  Alien::Build: '2.25'
+  Alien::Build::MM: '1.74'
+  Alien::Build::Plugin::Build::CMake: '0.99'
+  Alien::Build::Plugin::Build::Make: '0.99'
   Alien::Build::Plugin::Cleanse::BuildDir: '0'
   Alien::MSYS: '0'
+  Alien::cmake3: '0.05'
   ExtUtils::MakeMaker: '6.52'
+  File::Copy: '0'
   File::Find::Rule: '0'
   PkgConfig: '0'
   Sort::Versions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -42,22 +47,23 @@ no_index:
     - inc
 requires:
   Alien::Base: '1.41'
-  Alien::Build: '0.25'
+  Alien::Build: '1.74'
   FFI::CheckLib: '0.23'
 resources:
   bugtracker: https://github.com/shawnlaffan/perl-alien-geos/issues/
   repository: https://github.com/shawnlaffan/perl-alien-geos
-version: '1.007'
+version: '1.008'
 x_alienfile:
-  generated_by: 'Alien::Build::MM version 1.49'
+  generated_by: 'Alien::Build::MM version 2.38'
   requires:
     share:
       Alien::MSYS: '0.07'
+      Alien::cmake3: '0.02'
       Archive::Tar: '0'
-      HTML::LinkExtor: '0'
       HTTP::Tiny: '0.044'
       IO::Compress::Bzip2: '0'
       IO::Uncompress::Bunzip2: '0'
+      Mojo::DOM58: '1.00'
       Sort::Versions: '0'
       URI: '0'
       URI::Escape: '0'

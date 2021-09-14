@@ -1,5 +1,9 @@
 Revision history for Perl extension Math::GMP.
 
+2.21  2021-09-11 Shlomif
+    - Apply doc patch from @hvds documenting the pitfalls of division by zero.
+        - https://github.com/turnstep/Math-GMP/issues/5
+
 2.20  2020-02-09 Shlomif
     - Try to fix tests when using libgmp version 6.2.0
         - https://rt.cpan.org/Public/Bug/Display.html?id=131718

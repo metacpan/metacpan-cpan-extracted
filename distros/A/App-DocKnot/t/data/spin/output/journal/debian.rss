@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Eagle's Path</title>
+    <link>https://www.eyrie.org/~eagle/</link>
+    <description>"Passion and dispassion.  Choose two." -- Larry Wall</description>
+    <language>en-us</language>
+    <pubDate>%DATE%</pubDate>
+    <lastBuildDate>%DATE%</lastBuildDate>
+    <generator>DocKnot %VERSION%</generator>
+    <atom:link href="https://www.eyrie.org/~eagle/journal/debian.rss" rel="self"
+               type="application/rss+xml" />
+
+    <item>
+      <title>NPR Top 100 SFF meme</title>
+      <link>https://www.eyrie.org/~eagle/journal/2011-08/006.html</link>
+      <description><![CDATA[
+<p>
+By way of <a href="http://firecat.dreamwidth.org/profile"><img src="https://www.eyrie.org/~eagle/journal/dw.png" alt="" /></a><a href="http://firecat.dreamwidth.org/"><strong>firecat</strong></a>, this is the result of a public nomination process,
+panel review, and Internet voting on the NPR web site: an attempt at the
+top 100 works of science fiction or fantasy.  Series are counted as single
+works for the purposes of the list.
+</p>
+
+<p>
+This list has a ton of problems, like any list of this sort will have.  It
+leans rather more heavily towards white male than the actual literature,
+and certainly than my reading.  The lack of non-white writers is
+particularly troubling.  But it's still an interesting selection.  (For
+those wondering about some obvious omissions, young adult was explicitly
+excluded.)
+</p>
+
+<p>
+The rules are to bold the works one has read in their entirety and
+italicize the ones you've read part of but not finished.  I'll add
+underlining the works that I own, which provides some indication of the
+things that I've not read but that are on my to-read list.
+</p>
+
+<ol>
+<li class="packed"><strong><u>The Lord Of The Rings Trilogy, by J.R.R. Tolkien</u></strong>: 
+    It's a boring winner because it always wins, but it's an amazing book
+    and I can't argue with it.  I'll probably never review this one since
+    I'm not sure I have anything original to say about it.</li>
+<li class="packed"><strong><u>The Hitchhiker's Guide To The Galaxy, by Douglas Adams</u></strong>: 
+    Probably the best humorous SF.  I've read the entire series except for
+    <cite>The Salmon of Doubt</cite>, the unfinished book left when Adams died.
+    Will re-read them all at some point.</li>
+<li class="packed"><strong><u>Ender's Game, by Orson Scott Card</u></strong>: 
+    I intensely dislike Card's politics, but this book is still very good.
+    It's on my re-read list so that I can write a proper review of it.</li>
+<li class="packed"><strong>The Dune Chronicles, by Frank Herbert</strong>: 
+    I've read the whole series, but only own the first, which is by far
+    the best.  I'm tempted to re-read the whole series at some point,
+    since I don't remember it well enough to analyze it, but I'll probably
+    stop after re-reading just the first.</li>
+<li class="packed"><em><a href="https://www.eyrie.org/~eagle/reviews/books/0-553-57340-3.html">A Song Of Ice And Fire
+    Series</a>, by George R. R. Martin</em>: 
+    I own the first couple and have read and reviewed the first four.  I
+    think they're somewhat overrated, but will probably read the latest.
+    I'm not sure if I'll re-read the previous books to remember what the
+    heck was going on.</li>
+<li class="packed"><u>1984, by George Orwell</u>: 
+    I've somehow never read this.  I keep meaning to, particularly since I
+    generally love Orwell.</li>
+<li class="packed"><strong>Fahrenheit 451, by Ray Bradbury</strong>: 
+    Massively overrated, or perhaps just made unoriginal by subsequent
+    history.  I found it boring and uninteresting.</li>
+<li class="packed"><strong><u>The Foundation Trilogy, by Isaac Asimov</u></strong>: 
+    Thoroughly enjoyed this when I was a teenager.  I suspect I'll like it
+    less as an adult, but definitely on my to-read list.</li>
+<li class="packed"><u>Brave New World, by Aldous Huxley</u>: Another classic I've never read.</li>
+<li class="packed"><strong><u>American Gods, by Neil Gaiman</u></strong>: 
+    Great book.  Need to re-read to review.</li>
+<li class="packed"><u>The Princess Bride, by William Goldman</u>: 
+    On the list to read.  Apparently significantly better than the movie,
+    which I liked less than everyone else on the planet.</li>
+<li class="packed"><em>The Wheel Of Time Series, by Robert Jordan</em>: 
+    I read up to book eight (<cite>The Path of Daggers</cite>) and bailed
+    halfway through it.  It started as somewhat interesting fantasy with
+    deep world building and fun world surprises, but the writing got worse
+    and worse and the characters became miserably unlikeable.  I'm still
+    occasionally tempted to re-read and finish it, but it's a bad
+    temptation.</li>
+<li class="packed"><strong><u><a href="https://www.eyrie.org/~eagle/reviews/books/animal-farm.html">Animal Farm</a>, by George
+    Orwell</u></strong>: 
+    Great book, and a political and historical classic.  Best read in
+    combination with a good history.</li>
+<li class="packed"><strong><u>Neuromancer, by William Gibson</u></strong>: Meh.</li>
+<li class="packed"><strong><u>Watchmen, by Alan Moore</u></strong>: Brilliant.  On my list to re-read.</li>
+<li class="packed"><strong><u>I, Robot, by Isaac Asimov</u></strong>: 
+    Okay, but I generally find Asimov a bit overrated.  Good for
+    intellectual puzzle stories, but not that deep of ones, and the
+    characters are essentially nonentities.</li>
+<li class="packed"><strong>Stranger In A Strange Land, by Robert Heinlein</strong>: 
+    The only book that I've ever put down within fifteen pages of the end
+    and could never muster enough caring to pick up again.  I should
+    re-read it at some point to review it, but I don't think it's very
+    good.</li>
+<li class="packed"><u>The Kingkiller Chronicles, by Patrick Rothfuss</u>: 
+    Well, I own the first one at least.</li>
+<li class="packed">Slaughterhouse-Five, by Kurt Vonnegut: Need to read.</li>
+<li class="packed">Frankenstein, by Mary Shelley: 
+    I've never actually read this, but I'm not sure there's much point in
+    reading it.  I've been so thoroughly exposed to the angles and
+    interpretations of it that reading it at this point would be an odd
+    experience.  I probably should for completion's sake at some point.
+    (This is the first woman on the list, and of course she's long-dead
+    and not writing in the modern SF tradition.)</li>
+<li class="packed"><u>Do Androids Dream Of Electric Sheep?, by Philip K. Dick</u>: 
+    I do need to read more Dick.  I don't think this is as good as its
+    placement on the list; everyone just knows <cite>Blade Runner</cite> (which
+    was based on this).</li>
+<li class="packed"><u>The Handmaid's Tale, by Margaret Atwood</u>: 
+    I have a bunch of Atwood, but haven't yet read any of it.</li>
+<li class="packed">The Dark Tower Series, by Stephen King: 
+    It's rare for me to find any horror I actually like, but my
+    understanding is that this is less horror than a lot of King.  I may
+    give it a try someday (but probably won't).</li>
+<li class="packed"><strong>2001: A Space Odyssey, by Arthur C. Clarke</strong>: 
+    Much better than the movie since it actually explained what was going
+    on, although it wasn't as atmospheric.  Not actually as good as its
+    position on lists like this would indicate.  Mostly it's just a book
+    everyone has heard of.</li>
+<li class="packed"><u>The Stand, by Stephen King</u>: See above about horror.</li>
+<li class="packed"><strong><u><a href="https://www.eyrie.org/~eagle/reviews/books/0-553-56261-4.html">Snow Crash</a>, by Neal
+    Stephenson</u></strong>: 
+    One of my favorite humorous SF books, plus features the trademark
+    Stephenson infodumping and some neat bits about building a virtual
+    world.</li>
+<li class="packed"><u>The Martian Chronicles, by Ray Bradbury</u>: On the list to read.</li>
+<li class="packed">Cat's Cradle, by Kurt Vonnegut: Need to track down and read.</li>
+<li class="packed"><strong><u>The Sandman Series, by Neil Gaiman</u></strong>: 
+    Quite possibly the best comic book series ever written.  Utterly
+    brilliant.  The one set of graphic novels that everyone should read at
+    some point in their life.</li>
+<li class="packed">A Clockwork Orange, by Anthony Burgess: 
+    Huh.  Not really on my radar to read, although of course I've heard of
+    it.</li>
+<li class="packed"><strong><u><a href="https://www.eyrie.org/~eagle/reviews/books/0-441-78358-9.html">Starship Troopers</a>, by
+    Robert Heinlein</u></strong>: 
+    Also overrated, particularly since it's not much of a story.  It's an
+    extended and multifaceted political essay, which isn't as simple as it
+    appears to be.  The movie, quite contrary to the negative impression
+    people have of it, is a delightful parody of how the book comes across
+    on its surface reading.</li>
+<li class="packed"><u>Watership Down, by Richard Adams</u>: Yeah, yeah, I know I should read it.</li>
+<li class="packed"><strong><u>Dragonflight, by Anne McCaffrey</u></strong>: 
+    I loved the Pern books as a teenager up until the point when the just
+    became retellings of the same book from a new perspective.  I'm afraid
+    to re-read them.</li>
+<li class="packed"><strong><u><a href="https://www.eyrie.org/~eagle/reviews/books/0-425-03436-4.html">The Moon Is A Harsh
+    Mistress</a>, by Robert Heinlein</u></strong>: 
+    Much, much better than <cite>Starship Troopers</cite>.  One of the better
+    non-juvenile Heinleins.  Still not as good as people think it is.</li>
+<li class="packed"><strong><u><a href="https://www.eyrie.org/~eagle/reviews/books/0-553-37926-7.html">A Canticle For
+    Leibowitz</a>, by Walter M. Miller</u></strong>: 
+    I was disappointed in this given how much people like it, but it
+    deserves some credit for being foundational to post-apocalyptic SF.</li>
+<li class="packed"><strong><u><a href="https://www.eyrie.org/~eagle/reviews/books/0-517-26188-Xa.html">The Time Machine</a>, by
+    H.G. Wells</u></strong>: 
+    More interesting than you might think it would be, given when it was
+    written and the emphasis on description rather than characterization.
+    But it still suffers from a lack of characters for me.  Hard to come
+    to this fresh now, since the ideas have been so used elsewhere.</li>
+<li class="packed">20,000 Leagues Under The Sea, by Jules Verne: 
+    I've seen the movie take on it.  I've not felt a strong urge to read
+    the book, although I probably "should."</li>
+<li class="packed"><strong><u><a href="https://www.eyrie.org/~eagle/reviews/books/0-553-27450-3.html">Flowers For Algernon</a>,
+    by Daniel Keys</u></strong>: 
+    Unforgettable and very strongly affecting (and depressing).</li>
+<li class="packed"><u>The War Of The Worlds, by H.G. Wells</u>: Will read at some point.</li>
+<li class="packed"><u>The Chronicles Of Amber, by Roger Zelazny</u>: Will probably read soon.</li>
+<li class="packed"><strong><u>The Belgariad, by David Eddings</u></strong>: 
+    Yeah, I read this as a teenager and quite liked it.  But I have no
+    idea what it's doing on this list; it is in absolutely no way one of
+    the best 100 SFF works of all time.  (Well, that's not true; I know
+    what it's doing on this list.  People have heard of it and read it.
+    But it shouldn't be on this list.)</li>
+<li class="packed"><u>The Mists Of Avalon, by Marion Zimmer Bradley</u>: On the list.</li>
+<li class="packed">The Mistborn Series, by Brandon Sanderson: Want to read this.</li>
+<li class="packed"><strong><u>Ringworld, by Larry Niven</u></strong>: 
+    Interesting idea fiction with a great sense of scale.  Shame the
+    characters aren't as good as the background.  But it's a good book,
+    worth reading.</li>
+<li class="packed"><strong><u><a href="https://www.eyrie.org/~eagle/reviews/books/0-441-47812-3.html">The Left Hand Of
+    Darkness</a>, by Ursula K. LeGuin</u></strong>: 
+    A deserved classic of anthropological SF with profound things to say
+    about how culture and friendship are constructed.</li>
+<li class="packed"><strong><u>The Silmarillion, by J.R.R. Tolkien</u></strong>: 
+    I love this book, but the first section is hard going if you don't
+    like reading mythology.  Skip ahead if you're struggling; the gems are
+    later.</li>
+<li class="packed"><u>The Once And Future King, by T.H. White</u>: Definitely on the list to read.</li>
+<li class="packed"><strong><u>Neverwhere, by Neil Gaiman</u></strong>: 
+    I'm not sure I'd put it on this list, as there are better Gaiman (and
+    Gaiman is already overrepresented), but it's a solid "urban" fantasy
+    in the old sense of that term.  Inventive, with a feel similar to some
+    of the <cite>Sandman</cite> stories.</li>
+<li class="packed"><strong><u>Childhood's End, by Arthur C. Clarke</u></strong>: 
+    I read this eons ago and can barely remember it.  I definitely need to
+    re-read it.</li>
+<li class="packed">Contact, by Carl Sagan: 
+    Liked the movie, have never had any particular urge to read the book.</li>
+<li class="packed"><strong><u><a href="https://www.eyrie.org/~eagle/reviews/books/0-553-28368-5.html">The Hyperion Cantos</a>, by
+    Dan Simmons</u></strong>: 
+    Some of my favorite SF novels ever.  The third book is the weakest,
+    and the fourth book has problems, but I adore it.</li>
+<li class="packed"><strong><u><a href="https://www.eyrie.org/~eagle/reviews/books/1-56389-470-X.html">Stardust</a>, by Neil
+    Gaiman</u></strong>: 
+    Really far too much Gaiman on this list.  But also a good book.</li>
+<li class="packed"><strong><u><a href="https://www.eyrie.org/~eagle/reviews/books/0-380-78862-4.html">Cryptonomicon</a>, by Neal
+    Stephenson</u></strong>: 
+    Fantastic stuff.  Not SF in any traditional sense.  It's a combination
+    of secret history and contemporary thriller.  But it's written in the
+    Stephenson massive entertaining infodumping style, so it feels like SF
+    and makes it onto lists like this.  It's very long, but I've read it
+    twice and don't regret it.</li>
+<li class="packed">World War Z, by Max Brooks: 
+    Have a hard time believing this really belongs here, but I haven't
+    read it so I couldn't say for sure.</li>
+<li class="packed"><strong><u><a href="https://www.eyrie.org/~eagle/reviews/books/0-345-27505-5.html">The Last Unicorn</a>, by
+    Peter S. Beagle</u></strong>: 
+    Eh, it's not a bad book, but I'm not sure it really belongs on this
+    list.  But it does have an aesthetic that's hard to find in any other
+    book.</li>
+<li class="packed"><strong><u><a href="https://www.eyrie.org/~eagle/reviews/books/0-380-70821-3.html">The Forever War</a>, by Joe
+    Haldeman</u></strong>: 
+    A very important response to the whole sub-genre of military SF, and
+    very influential.</li>
+<li class="packed"><u>Small Gods, by Terry Pratchett</u>: Getting to it.</li>
+<li class="packed"><em><u>The Chronicles Of Thomas Covenant, The Unbeliever, by Stephen
+    R. Donaldson</u></em>: 
+    Read the first book, wasn't much of a fan.  I might get back to it at
+    some point, but I'm not particularly eager.</li>
+<li class="packed"><strong><a href="https://www.eyrie.org/~eagle/reviews/books/0-671-87749-6a.html">The Vorkosigan Saga</a>, by
+    Lois McMaster Bujold</strong>: 
+    I don't like the early books as much as some, but I love some of the
+    later books.  The last few have been disappointing, but overall very
+    much worth reading, and belongs around here on the list.</li>
+<li class="packed">Going Postal, by Terry Pratchett: Getting to it.</li>
+<li class="packed"><strong>The Mote In God's Eye, by Larry Niven &amp; Jerry Pournelle</strong>: 
+    Read many years ago and barely remember it.  I need to re-read it,
+    particularly since there's a new sequal by Pournelle's daughter that
+    looks well worth reading.</li>
+<li class="packed"><em>The Sword Of Truth, by Terry Goodkind</em>: 
+    I read way too many books in this series.  Others should not repeat my
+    mistake.  Generic fantasy about incredibly stupid people that turns
+    into libertarian political ravings.</li>
+<li class="packed">The Road, by Cormac McCarthy: Not my thing.</li>
+<li class="packed"><strong><a href="https://www.eyrie.org/~eagle/reviews/books/1-58234-416-7.html">Jonathan Strange &amp; Mr
+    Norrell</a>, by Susanna Clarke</strong>: 
+    A nearly unique reading experience, and the best footnoted fantasy
+    that I've ever read (and that includes Pratchett).  Great stuff if you
+    don't mind the slow pace.  I'm eagerly hoping for an actual sequel.</li>
+<li class="packed">I Am Legend, by Richard Matheson: 
+    Having a hard time getting interested enough in a book about zombies.
+    But I've been wrong about that
+    <a href="https://www.eyrie.org/~eagle/reviews/books/0-316-12246-7.html">before</a>.</li>
+<li class="packed">The Riftwar Saga, by Raymond E. Feist: 
+    Heard of it, but not enough to get it onto my want list.</li>
+<li class="packed">The Shannara Trilogy, by Terry Brooks: 
+    Heard enough about it to not put it on my want list.</li>
+<li class="packed">The Conan The Barbarian Series, by R.E. Howard: 
+    Something that I feel like I "should" read, but usually I'm not a big
+    fan of pulp.</li>
+<li class="packed"><u>The Farseer Trilogy, by Robin Hobb</u>: 
+    Own the first, which has been on my to-read list for a very long time.
+    Someday I'll get to it.  I should probably buy all of the trilogy
+    before starting it.</li>
+<li class="packed"><strong><a href="https://www.eyrie.org/~eagle/reviews/books/1-931561-64-8.html">The Time Traveler's
+    Wife</a>, by Audrey Niffenegger</strong>: 
+    Surprisingly good for a literary fantasy, with some fantastic moments
+    of description.</li>
+<li class="packed">The Way Of Kings, by Brandon Sanderson: Want to read at some point.</li>
+<li class="packed">A Journey To The Center Of The Earth, by Jules Verne: 
+    As above, uninspired to read Verne.</li>
+<li class="packed"><em><a href="https://www.eyrie.org/~eagle/reviews/books/0-88038-905-2.html">The Legend Of Drizzt
+    Series</a>, by R.A. Salvatore</em>: 
+    Read the first one, and unless they get substantially better, I have
+    no interest in reading more.  Very stock power fantasy with
+    one-dimensional characters.</li>
+<li class="packed"><strong><u><a href="https://www.eyrie.org/~eagle/reviews/books/0-765-31524-6.html">Old Man's War</a>, by John
+    Scalzi</u></strong>: 
+    The later books in the series are better than the first one.  An
+    interesting take on military SF, but I'm not sure it really rises to
+    the level of this sort of list.</li>
+<li class="packed"><strong><u><a href="https://www.eyrie.org/~eagle/reviews/books/0-553-57331-4.html">The Diamond Age</a>, by
+    Neil Stephenson</u></strong>: 
+    One too many Stephenson for this list, plus <cite>Anathem</cite> is probably
+    more deserving of this place, but there are some neat bits about
+    computation theory.</li>
+<li class="packed"><strong><u><a href="https://www.eyrie.org/~eagle/reviews/books/0-553-28789-3.html">Rendezvous With Rama</a>,
+    by Arthur C. Clarke</u></strong>: 
+    Completely overrated.  A bad book that just happens to be foundational
+    in a particular sub-genre of SF.  Done much better by other people.</li>
+<li class="packed"><strong><u><a href="https://www.eyrie.org/~eagle/reviews/books/0-765-34298-7.html">The Kushiel's Legacy
+    Series</a>, by Jacqueline Carey</u></strong>: 
+    By far my favorite epic fantasy series.  Lush, involved, very
+    creative, and with a truly unusual heroine.  Wonderful stuff.</li>
+<li class="packed"><strong><u><a href="https://www.eyrie.org/~eagle/reviews/books/0-06-105488-7.html">The Dispossessed</a>, by
+    Ursula K. LeGuin</u></strong>: 
+    Great, thoughtful SF.  Probably the best in the utopia genre, even
+    though it isn't a utopia.</li>
+<li class="packed">Something Wicked This Way Comes, by Ray Bradbury: Horror.  Eh.</li>
+<li class="packed"><u>Wicked, by Gregory Maguire</u>: 
+    On the list, but after a general Oz re-read.</li>
+<li class="packed"><u>The Malazan Book Of The Fallen Series, by Steven Erikson</u>: 
+    Own the first.  Completely intimidated by the length of the series.</li>
+<li class="packed"><u>The Eyre Affair, by Jasper Fforde</u>: On the list.</li>
+<li class="packed"><em><u><a href="https://www.eyrie.org/~eagle/reviews/books/1-85723-138-4.html">The Culture Series</a>, by
+    Iain M. Banks</u></em>: 
+    Brilliant stuff, highly recommended.  I only haven't read it all
+    because I'm slowly digesting it.  Should be higher on the list than
+    this.</li>
+<li class="packed"><u>The Crystal Cave, by Mary Stewart</u>: On the list.</li>
+<li class="packed"><u>Anathem, by Neal Stephenson</u>: On the list.</li>
+<li class="packed">The Codex Alera Series, by Jim Butcher: 
+    I'll read the Dresden series, or least part of it, first, and see if
+    that inspires me to read more Butcher.  Dubious that this belongs on
+    this list.</li>
+<li class="packed"><strong><u><a href="https://www.eyrie.org/~eagle/reviews/books/0-671-45070-0.html">The Book Of The New
+    Sun</a>, by Gene Wolfe</u></strong>: 
+    Incredibly influential and important fantasy-flavored SF that should
+    be much higher on the list than this.</li>
+<li class="packed"><strong><u>The Thrawn Trilogy, by Timothy Zahn</u></strong>: 
+    This is a <cite>Star Wars</cite> media tie-in series, and one of the few of
+    that type that I've read.  I remember quite enjoying it a long time
+    ago, and it's on the list to re-read at some point.</li>
+<li class="packed">The Outlander Series, by Diana Gabaldan: 
+    The only thing on this list that I've never even heard of.</li>
+<li class="packed">The Elric Saga, by Michael Moorcock: 
+    Definitely want to read this at some point, once I figure out the
+    right place to start and probably after I've read some other
+    Moorcock.</li>
+<li class="packed">The Illustrated Man, by Ray Bradbury: 
+    Waiting to see if I like the better-known Bradbury first.</li>
+<li class="packed"><strong><u><a href="https://www.eyrie.org/~eagle/reviews/books/0-515-13881-9.html">Sunshine</a>, by Robin
+    McKinley</u></strong>: 
+    Quite possibly the best urban fantasy (in the modern definition) that
+    I've ever read.</li>
+<li class="packed"><strong><u><a href="https://www.eyrie.org/~eagle/reviews/books/0-812-51528-5.html">A Fire Upon The Deep</a>,
+    by Vernor Vinge</u></strong>: 
+    A little overrated, but it has a fun rendition of Usenet and some
+    neat aliens.</li>
+<li class="packed"><strong>The Caves Of Steel, by Isaac Asimov</strong>: 
+    Read long ago.  Enjoyed it, but don't remember being grabbed by it.
+    There's a bit too much Asimov on this list.</li>
+<li class="packed"><strong><u><a href="https://www.eyrie.org/~eagle/reviews/books/0-553-56073-5.html">The Mars Trilogy</a>, by
+    Kim Stanley Robinson</u></strong>: 
+    The most detailed and in-depth politics that you'll find in SF, even
+    more than Le Guin, at the cost of being mind-numbingly boring.  Very
+    ambitious, but just doesn't move fast enough or have enough plot.
+    Robinson is less a novelist than a political and hard science essayist
+    in the form of a novel.</li>
+<li class="packed"><strong><u>Lucifer's Hammer, by Larry Niven &amp; Jerry Pournelle</u></strong>: 
+    Large-screen disaster novel with a heavy helping of libertarian
+    utopian politics.  Does not belong anywhere near this list.</li>
+<li class="packed"><strong><u><a href="https://www.eyrie.org/~eagle/reviews/books/0-553-56273-8.html">Doomsday Book</a>, by
+    Connie Willis</u></strong>: 
+    The best of Willis's time travel novels, with fewer communication
+    failures and frantic faffing about than the other ones.  Borderline
+    for this list, but probably deserves to be here.</li>
+<li class="packed"><strong><u><a href="https://www.eyrie.org/~eagle/reviews/books/0-345-45940-7.html">Perdido Street Station</a>,
+    by China Mieville</u></strong>: 
+    Revolutionary fantasy.  The founding book of New Weird.  I think
+    <a href="https://www.eyrie.org/~eagle/reviews/books/0-345-44438-8.html">The Scar</a> is a better
+    book, but I can't argue with this being here.</li>
+<li class="packed">The Xanth Series, by Piers Anthony: I've been warned off these.</li>
+<li class="packed"><strong><u>The Space Trilogy, by C.S. Lewis</u></strong>: 
+    I need to re-read this and write long reviews of them, since I have a
+    lot to say about them.  But they need to be read in the context of the
+    Christian faith to make any sense.</li>
+
+      ]]></description>
+      <pubDate>%DATE%</pubDate>
+      <guid>https://www.eyrie.org/~eagle/journal/2011-08/006.html</guid>
+    </item>
+  </channel>
+</rss>

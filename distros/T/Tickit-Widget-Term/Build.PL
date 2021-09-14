@@ -13,10 +13,12 @@ my $build = Module::Build->new(
       'Convert::Color::RGB8' => 0,
       'Convert::Color::XTerm' => 0,
       'List::Util' => 0,
-      'Term::VTerm' => '0.06',
+      'Term::VTerm' => '0.07',
+      'Tickit' => '0.71',
       'Tickit::Widget' => '0.32',
    },
    test_requires => {
+      'IO::Pty' => '1.12',
       'Test::More' => '0.88', # done_testing
    },
    configure_requires => {

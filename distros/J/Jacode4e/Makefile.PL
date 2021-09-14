@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{Jacode4e},
-    'VERSION'   => q{2.13.6.17},
+    'VERSION'   => q{2.13.6.18},
     'ABSTRACT'  => q{jacode.pl-like program for enterprise},
     'PREREQ_PM' => {
         'ExtUtils::MakeMaker' => '5.4302',
@@ -14,7 +14,7 @@ WriteMakefile(
         'FindBin' => '1.42',
         'Socket' => '0',
         'lib' => '0',
-        'perl' => '5.005_03',
+        'perl' => '5.00503',
         'strict' => '1.01',
     },
     'AUTHOR'    => q{ina <ina@cpan.org>},

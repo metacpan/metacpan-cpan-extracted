@@ -3,5 +3,13 @@ Release history for SQL-PatchDAG
 TODO user manual
 TODO tests and more tests
 
+0.102 Sat 11 Sep 2021
+	- Changelog fix
+	- No functional changes
+
+0.101 Fri 10 Sep 2021
+	- Bugfix for the -e switch
+	- Added tests
+
 0.100 Wed 24 Dec 2020
 	- Initial release

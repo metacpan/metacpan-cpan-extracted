@@ -4,13 +4,13 @@ Alien::TidyHTML5 - Download and install HTML Tidy
 
 # VERSION
 
-version v0.3.3
+version v0.3.4
 
 # DESCRIPTION
 
 This distribution provides tidy (a.k.a. "libtidy" or "html-tidy")
 v5.6.0 or newer, so that it can be used by other Perl
-distributions. . It does this by first trying to detect an existing
+distributions. It does this by first trying to detect an existing
 install of tidy on your system. If found it will use that. If it
 cannot be found, the source code will be downloaded from the official
 git repository, and it will be installed in a private share location
@@ -31,8 +31,9 @@ the path to the executable.
 
 ## Other CPAN Modules
 
-[HTML::Tidy5](https://metacpan.org/pod/HTML::Tidy5) uses the the tidy library, but may not work well with
-this installation. You may want to use [HTML::T5](https://metacpan.org/pod/HTML::T5) as an alternative.
+[HTML::Tidy5](https://metacpan.org/pod/HTML::Tidy5) uses the the tidy library, but may not make use of the
+library installed by this distribution. You may want to use
+[HTML::T5](https://metacpan.org/pod/HTML::T5) as an alternative.
 
 [HTML::Valid](https://metacpan.org/pod/HTML::Valid) includes a version of the tidy library as part of the
 distribution.

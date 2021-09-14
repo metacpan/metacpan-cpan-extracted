@@ -58,7 +58,6 @@
 
     \h2[Development]
 
-    \link[todo.html][To-do list] \break
     \link[extending.html][Extending remctl] \break
     \link[protocol.html][Protocol specification] \break
     \link[protocol-v4.html][Protocol v4 draft] \break
@@ -73,7 +72,7 @@
     \link[https://www.openhub.net/p/remctl]
          [Open HUB code analysis] \break
     \link[https://tracker.debian.org/pkg/remctl]
-         [Debian package tracker]
+         [Debian package tracker] \break
 ]
 
 \h2[Blurb]
@@ -267,7 +266,6 @@ development source].
 
     Developer documentation:
 
-    \doc[todo.html][To-do list]
     \doc[extending.html][Extending remctl]
     \doc[protocol.html][Protocol specification]
     \doc[protocol-v4.html][Protocol v4 draft]
@@ -279,7 +277,6 @@ development source].
         [Travis-CI]
     \doc[https://www.openhub.net/p/remctl]
         [Open HUB code analysis]
-
 ]
 
 \div(right)[

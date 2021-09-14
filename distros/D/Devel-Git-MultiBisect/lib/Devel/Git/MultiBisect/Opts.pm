@@ -1,7 +1,7 @@
 package Devel::Git::MultiBisect::Opts;
 use v5.14.0;
 use warnings;
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 $VERSION = eval $VERSION;
 use base qw( Exporter );
 our @EXPORT_OK = qw(
@@ -73,6 +73,7 @@ sub process_options {
        'configure_command' => 'perl Makefile.PL 1>/dev/null',
        'make_command' => "$found_make 1>/dev/null",
        'test_command' => 'prove -vb',
+       'probe' => 'error',
    );
 
     my %opts;
@@ -83,6 +84,7 @@ sub process_options {
         "last-before=s" => \$opts{last_before},
         "first=s" => \$opts{first},
         "last=s" => \$opts{last},
+        "compiler=s" => \$opts{compiler},
         "configure_command=s" => \$opts{configure_command},
         "make_command=s" => \$opts{make_command},
         "test_command=s" => \$opts{test_command},
@@ -90,6 +92,7 @@ sub process_options {
         "short=i" => \$opts{short},
         "repository=s" => \$opts{repository},
         "branch=s" => \$opts{branch},
+        "probe=s" => \$opts{probe},
         "verbose"  => \$opts{verbose}, # flag
     ) or croak("Error in command line arguments\n");
 

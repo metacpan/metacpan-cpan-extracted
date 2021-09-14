@@ -3,16 +3,13 @@
 #
 #  (C) Paul Evans, 2011-2017 -- leonerd@leonerd.org.uk
 
-package Tangence::Compiler::Parser;
+package Tangence::Compiler::Parser 0.26;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Parser::MGC );
 
-use feature qw( switch ); # we like given/when
-no if $] >= 5.017011, warnings => 'experimental::smartmatch';
-
-our $VERSION = '0.25';
+use Syntax::Keyword::Match;
 
 use File::Basename qw( dirname );
 
@@ -44,16 +41,16 @@ and C<class> and C<struct> definitions.
 An C<include> directive imports the definitions from another file, named
 relative to the current file.
 
- include "filename.tan"
+   include "filename.tan"
 
 =head2 class
 
 A C<class> definition defines the set of methods, events and properties
 defined by a named class.
 
- class N {
-    ...
- }
+   class N {
+      ...
+   }
 
 The contents of the class block will be a list of C<method>, C<event>, C<prop>
 and C<isa> declarations.
@@ -63,9 +60,9 @@ and C<isa> declarations.
 A C<struct> definition defines the list of fields contained within a named
 structure type.
 
- struct N {
-    ...
- }
+   struct N {
+      ...
+   }
 
 The contents of the struct block will be a list of C<field> declarations.
 
@@ -78,8 +75,8 @@ sub parse
    local $self->{package} = \my %package;
 
    while( !$self->at_eos ) {
-      given( $self->token_kw(qw( class struct include )) ) {
-         when( 'class' ) {
+      match( $self->token_kw(qw( class struct include )) : eq ) {
+         case( 'class' ) {
             my $classname = $self->token_ident;
 
             exists $package{$classname} and
@@ -90,7 +87,7 @@ sub parse
 
             $self->scope_of( '{', sub { $self->parse_classblock( $class ) }, '}' ),
          }
-         when( 'struct' ) {
+         case( 'struct' ) {
             my $structname = $self->token_ident;
 
             exists $package{$structname} and
@@ -101,7 +98,7 @@ sub parse
 
             $self->scope_of( '{', sub { $self->parse_structblock( $struct ) }, '}' ),
          }
-         when( 'include' ) {
+         case( 'include' ) {
             my $filename = dirname($self->{filename}) . "/" . $self->token_string;
 
             my $subparser = (ref $self)->new;
@@ -128,14 +125,14 @@ sub parse
 A C<method> declaration defines one method in the class, giving its name (N)
 and types of its arguments and and return (T).
 
- method N(T, T, ...) -> T;
+   method N(T, T, ...) -> T;
 
 =head2 event
 
 An C<event> declaration defines one event raised by the class, giving its name
 (N) and types of its arguments (T).
 
- event N(T, T, ...);
+   event N(T, T, ...);
 
 =head2 prop
 
@@ -143,17 +140,17 @@ A C<prop> declaration defines one property supported by the class, giving its
 name (N), dimension (D) and type (T). It may be declared as a C<smashed>
 property.
 
- [smashed] prop N = D of T;
+   [smashed] prop N = D of T;
 
 Scalar properties may omit the C<scalar of>, by supplying just the type
 
- [smashed] prop N = T;
+   [smashed] prop N = T;
 
 =head2 isa
 
 An C<isa> declaration declares a superclass of the class, by its name (C)
 
- isa C;
+   isa C;
 
 =cut
 
@@ -168,8 +165,8 @@ sub parse_classblock
    my @superclasses;
 
    while( !$self->at_eos ) {
-      given( $self->token_kw(qw( method event prop smashed isa )) ) {
-         when( 'method' ) {
+      match( $_ = $self->token_kw(qw( method event prop smashed isa )) : eq ) {
+         case( 'method' ) {
             my $methodname = $self->token_ident;
 
             exists $methods{$methodname} and
@@ -192,7 +189,7 @@ sub parse_classblock
             );
          }
 
-         when( 'event' ) {
+         case( 'event' ) {
             my $eventname = $self->token_ident;
 
             exists $events{$eventname} and
@@ -207,15 +204,14 @@ sub parse_classblock
             );
          }
 
-         my $smashed = 0;
-         when( 'smashed' ) {
-            $smashed = 1;
+         case( 'smashed' ), case( 'prop' ) {
+            my $smashed = 0;
 
-            $self->expect( 'prop' );
+            if( $_ eq 'smashed' ) {
+               $smashed = 1;
+               $self->expect( 'prop' );
+            }
 
-            $_ = 'prop'; continue; # goto case 'prop'
-         }
-         when( 'prop' ) {
             my $propname = $self->token_ident;
 
             exists $properties{$propname} and
@@ -240,7 +236,7 @@ sub parse_classblock
             );
          }
 
-         when( 'isa' ) {
+         case( 'isa' ) {
             my $supername = $self->token_ident;
 
             my $super = $self->{package}{$supername} or
@@ -291,8 +287,8 @@ sub parse_structblock
    my %fieldnames;
 
    while( !$self->at_eos ) {
-      given( $self->token_kw(qw( field )) ) {
-         when( 'field' ) {
+      match( $self->token_kw(qw( field )) : eq ) {
+         case( 'field' ) {
             my $fieldname = $self->token_ident;
 
             exists $fieldnames{$fieldname} and
@@ -321,12 +317,12 @@ sub parse_structblock
 
 The following basic type names are recognised
 
- bool int str obj any
- s8 s16 s32 s64 u8 u16 u32 u64
+   bool int str obj any
+   s8 s16 s32 s64 u8 u16 u32 u64
 
 Aggregate types may be formed of any type (T) by
 
- list(T) dict(T)
+   list(T) dict(T)
 
 =cut
 

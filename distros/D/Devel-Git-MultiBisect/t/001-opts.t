@@ -3,8 +3,8 @@
 use 5.14.0;
 use warnings;
 use Devel::Git::MultiBisect::Opts qw( process_options );
-use Test::More tests => 20;
-use Capture::Tiny qw( :all );
+use Test::More;
+use Capture::Tiny qw( capture_stdout );
 use File::Spec;
 
 my $ptg = File::Spec->catfile('', qw| path to gitdir |);
@@ -77,7 +77,46 @@ my $pttf = File::Spec->catfile('', qw| path to test file |);
     );
 }
 
+my %params_expected = ();
+my %these_params_expected = ();
 my (%args, $params);
+
+# Below is the smallest set of elements we must provide in %args
+# Could substitute 'first' for 'last_before'
+%args = (
+    last_before => '12345ab',
+    gitdir => $ptg,
+    last => '67890ab',
+);
+%params_expected = map { $_ => 1 } ( qw|
+  branch
+  configure_command
+  gitdir
+  last
+  last_before
+  make_command
+  outputdir
+  probe
+  repository
+  short
+  test_command
+  verbose
+|);
+
+$params = process_options(%args);
+ok($params, "process_options() returned true value");
+ok(ref($params) eq 'HASH', "process_options() returned hash reference");
+for my $k (sort keys %params_expected) {
+    ok(defined($params->{$k}), "A value has been defined for $k: $params->{$k}");
+}
+is(scalar keys %$params, scalar keys %params_expected,
+    "Got expected number of parameters with defined value");
+%these_params_expected = map { $_ => 1 } grep { ! exists $args{$_} } keys %params_expected;
+for my $k (sort keys %these_params_expected) {
+    ok(defined($params->{$k}), "A default value was assigned to $k: $params->{$k}");
+}
+is(scalar keys %$params, (scalar keys %these_params_expected) + (scalar keys %args),
+    "Got expected number of parameters assigned from default values");
 
 %args = (
     last_before => '12345ab',
@@ -85,22 +124,21 @@ my (%args, $params);
     targets => [ $pttf ],
     last => '67890ab',
 );
+$params_expected{targets} = 1;
 $params = process_options(%args);
 ok($params, "process_options() returned true value");
 ok(ref($params) eq 'HASH', "process_options() returned hash reference");
-for my $k ( qw|
-    configure_command
-    last_before
-    make_command
-    outputdir
-    repository
-    branch
-    short
-    test_command
-    verbose
-| ) {
-    ok(defined($params->{$k}), "A default value was assigned for $k: $params->{$k}");
+for my $k (sort keys %params_expected) {
+    ok(defined($params->{$k}), "A value has been defined for $k: $params->{$k}");
 }
+is(scalar keys %$params, scalar keys %params_expected,
+    "Got expected number of parameters with defined value");
+%these_params_expected = map { $_ => 1 } grep { ! exists $args{$_} } keys %params_expected;
+for my $k (sort keys %these_params_expected) {
+    ok(defined($params->{$k}), "A default value was assigned to $k: $params->{$k}");
+}
+is(scalar keys %$params, (scalar keys %these_params_expected) + (scalar keys %args),
+    "Got expected number of parameters assigned from default values");
 
 $args{verbose} = 1;
 my ($stdout, @result);
@@ -125,3 +163,6 @@ my @cl_opts = (
     like($stdout, qr/Command-line arguments:/s,
         "Got expected verbose output with 'verbose' on command-line");
 }
+
+done_testing();
+

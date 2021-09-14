@@ -31,6 +31,7 @@ t/lib/Helpers.pm
 t/lib/output1.txt
 t/lib/output2.txt
 xt/104-gcc-build-transitions-warnings.t
+xt/identify-build-transitions
 xt/stderr-transitions.pl
 xt/warnings-transitions.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)

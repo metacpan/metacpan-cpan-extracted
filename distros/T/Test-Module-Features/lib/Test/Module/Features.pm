@@ -5,7 +5,7 @@ package Test::Module::Features;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-02-26'; # DATE
 our $DIST = 'Test-Module-Features'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -177,7 +177,7 @@ Test::Module::Features - Test feature set specifications and features declaratio
 
 =head1 VERSION
 
-This document describes version 0.001 of Test::Module::Features (from Perl distribution Test-Module-Features), released on 2021-02-26.
+This document describes version 0.002 of Test::Module::Features (from Perl distribution Test-Module-Features), released on 2021-02-26.
 
 =head1 SYNOPSIS
 

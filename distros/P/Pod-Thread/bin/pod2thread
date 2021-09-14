@@ -88,18 +88,11 @@ in the POD document.
 
 =head1 DIAGNOSTICS
 
-If B<pod2thread> fails with errors, see L<Pod::Thread> and L<Pod::Parser>
+If B<pod2thread> fails with errors, see L<Pod::Thread> and L<Pod::Simple>
 for information about what those errors might mean.  Internally, it can also
 produce the following diagnostic:
 
 =over 4
-
-=item Can't close %s: %s
-
-=item Can't open %s: %s
-
-(F) The specified file, given on the command line as the POD source, could
-not be opened or closed.
 
 =item Unknown option: %s
 
@@ -138,7 +131,7 @@ SOFTWARE.
 
 =head1 SEE ALSO
 
-L<Pod::Parser>, L<Pod::Thread>, L<spin(1)>
+L<Pod::Simple>, L<Pod::Thread>, L<spin(1)>
 
 This program is part of the Pod-Thread distribution.  The current version of
 Pod-Thread is available from CPAN, or directly from its web site at

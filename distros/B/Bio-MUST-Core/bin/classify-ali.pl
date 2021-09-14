@@ -79,7 +79,7 @@ classify-ali.pl - Classify ALI files based on taxonomic filters
 
 =head1 VERSION
 
-version 0.211470
+version 0.212530
 
 =head1 USAGE
 
@@ -114,10 +114,12 @@ A category is characterized by one or more 'criteria'. To match a category,
 an ALI must satisfy all criteria. Criteria are thus linked by logical ANDs
 (and their order of definition is irrelevant).
 
-Each criterion has a 'tax_filter' describing its taxonomic requirements.
-Wanted taxa are to be prefixed by a '+' symbol, whereas unwanted taxa are to
-be prefixed by a '-' symbol. Wanted and unwanted taxa are linked by logical
-ORs.
+Each criterion has a 'tax_filter' describing its taxonomic requirements. Wanted
+taxa are to be prefixed by a C<+> symbol, whereas unwanted taxa are to be
+prefixed by a C<-> symbol. Wanted taxa are linked by logical ORs while unwanted
+taxa are linked by logical ANDs. Unwanted taxa should not include wanted taxa
+because the former ones take precedence over the latter ones. In contrast the
+opposite helps fine-tuning the tax_filter.
 
 Criteria may also have a 'min_seq_count' and a 'max_seq_count' arguments.
 These respectively specify the minimum and maximum number of sequences that

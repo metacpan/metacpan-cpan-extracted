@@ -1,6 +1,6 @@
 package App::Bitcoin::PaperWallet;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use v5.12;
 use warnings;
@@ -94,7 +94,7 @@ Bartosz Jarzyna, E<lt>brtastic.dev@gmail.comE<gt>
 Copyright (C) 2021 by Bartosz Jarzyna
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.34.0 or,
+it under the same terms as Perl itself, either Perl version 5.12.0 or,
 at your option, any later version of Perl 5 you may have available.
 
 

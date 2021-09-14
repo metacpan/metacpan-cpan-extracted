@@ -1,6 +1,6 @@
 package t::TestObj;
 
-use strict;
+use v5.14;
 
 use base qw( Tangence::Object );
 

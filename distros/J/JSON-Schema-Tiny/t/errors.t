@@ -1086,4 +1086,21 @@ subtest 'absoluteKeywordLocation' => sub {
   );
 };
 
+subtest dependentRequired => sub {
+  cmp_deeply(
+    evaluate(1, { dependentRequired => { foo => [ 1 ] } }),
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '',
+          keywordLocation => '/dependentRequired/foo/0',
+          error => 'element #0 is not a string',
+        },
+      ],
+    },
+    'dependentRequired traversal error',
+  );
+};
+
 done_testing;

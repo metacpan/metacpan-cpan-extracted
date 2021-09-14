@@ -1,0 +1,28 @@
+[name]
+Headings with markup
+
+[options]
+contents 1
+navbar 1
+
+[input]
+=head1 HEAD B<BOLD I<ITALIC C<CODE>>>
+
+=head1 S<WHITE SPACE>
+
+[output]
+\class(navbar)[
+  \link[#S1][Head \bold[BOLD \italic[ITALIC \code[CODE]]]]
+  | \link[#S2][White Space]
+]
+
+\h2[Table of Contents]
+
+\number(packed)[\link[#S1][HEAD \bold[BOLD \italic[ITALIC \code[CODE]]]]]
+\number(packed)[\link[#S2][WHITE SPACE]]
+
+\h2(#S1)[HEAD \bold[BOLD \italic[ITALIC \code[CODE]]]]
+
+\h2(#S2)[WHITE SPACE]
+
+\signature

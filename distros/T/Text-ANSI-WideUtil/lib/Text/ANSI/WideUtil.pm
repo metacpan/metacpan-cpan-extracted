@@ -1,9 +1,9 @@
 package Text::ANSI::WideUtil;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-23'; # DATE
+our $DATE = '2021-04-14'; # DATE
 our $DIST = 'Text-ANSI-WideUtil'; # DIST
-our $VERSION = '0.231'; # VERSION
+our $VERSION = '0.232'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -43,7 +43,7 @@ Text::ANSI::WideUtil - Routines for text containing ANSI color codes (wide-chara
 
 =head1 VERSION
 
-This document describes version 0.231 of Text::ANSI::WideUtil (from Perl distribution Text-ANSI-WideUtil), released on 2021-01-23.
+This document describes version 0.232 of Text::ANSI::WideUtil (from Perl distribution Text-ANSI-WideUtil), released on 2021-04-14.
 
 =head1 SYNOPSIS
 
@@ -131,6 +131,12 @@ Like C<ta_substr()>, but handles wide characters. C<$pos> is counted in visual
 width, not number of characters.
 
 =head1 FAQ
+
+=head2 Why split functionalities of wide character and color support into multiple modules/distributions?
+
+Performance (see numbers in the function description), dependency
+(L<Unicode::GCString> is used for wide character support), and overhead (loading
+Unicode::GCString).
 
 =head2 How do I truncate string based on number of characters instead of columns?
 

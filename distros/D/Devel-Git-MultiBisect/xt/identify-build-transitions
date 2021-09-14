@@ -1,0 +1,233 @@
+#!/usr/bin/env perl
+# identify-build-transitions
+use 5.14.0;
+use warnings;
+use Devel::Git::MultiBisect::BuildTransitions;
+use Devel::Git::MultiBisect::Opts qw( process_options );
+use Devel::Git::MultiBisect::Auxiliary qw( write_transitions_report );
+use Carp;
+use Data::Dump ( qw| dd pp | );
+
+=head1 NAME
+
+identify-build-transitions - Identify crucial changes in build-time output
+
+=head1 USAGE
+
+=head2 C-level build-time errors
+
+    identify-build-transitions \
+        --compiler=clang \
+        --gitdir="$GIT_WORKDIR/perl2" \
+        --branch=squash-multibisect-probe-errors-retain-20210827 \
+        --first=2623ca3c173506cabaa0bad66c0e8ed775985f19 \
+        --last=17053877bc526a49bfb8d3974b2ca7528c151b3e \
+        --configure_command='sh ./Configure -des -Dusedevel -Dcc=clang -Accflags=-DPERL_GLOBAL_STRUCT 1>/dev/null 2>&1' \
+        --probe=error \
+        --verbose
+
+=head2 C-level build-time warnings
+
+    identify-build-transitions \
+        --compiler=clang \
+        --gitdir="$GIT_WORKDIR/perl2" \
+        --branch=blead \
+        --first=b38ce61ef5b98631f9924bea9364ec344b9a8d10 \
+        --last=bec292a9fa46f45c0e524b673451cf5292e5d35b \
+        --configure_command='sh ./Configure -des -Dusedevel -Dcc=clang 1>/dev/null 2>&1' \
+        --probe=warning \
+        --verbose
+
+=head2 Any changes in build-time STDERR output
+
+    identify-build-transitions \
+        --compiler=clang \
+        --gitdir="$GIT_WORKDIR/perl2" \
+        --branch=blead \
+        --first=d4bf6b07402c770d61a5f8692f24fe944655d99f \
+        --last=9be343bf32d0921e5c792cbaa2b0038f43c6e463 \
+        --configure_command='sh ./Configure -des -Dusedevel 1>/dev/null 2>&1' \
+        --probe=stderr \
+        --verbose
+
+=cut
+
+# Because this program will get all its parameters from the command-line,
+# there is no need to define a hash of key-value pairs to be passed to
+# process_options();
+my $params = process_options();
+my $outputdir = $params->{outputdir};
+my $compiler = $params->{compiler};
+my $verbose = $params->{verbose};
+pp($params) if $verbose;
+
+my $self = Devel::Git::MultiBisect::BuildTransitions->new($params);
+pp($self) if $verbose;
+croak "Devel::Git::MultiBisect::BuildTransitions->new did not return defined value"
+    unless defined $self;
+croak "Object is not a Devel::Git::MultiBisect::BuildTransitions object"
+    unless ref($self) eq 'Devel::Git::MultiBisect::BuildTransitions';
+
+my $rv = $self->multisect_builds();
+croak "multisect_builds() did not return true value"
+    unless $rv;
+
+my $multisected_outputs = $self->get_multisected_outputs();
+croak "get_multisected_outputs() did not return array ref"
+    unless ref($multisected_outputs) eq 'ARRAY';
+
+my $transitions = $self->inspect_transitions();
+
+my $transitions_report = write_transitions_report(
+    $outputdir,
+    "transitions.$compiler.pl",
+    $transitions
+);
+say "See results in $transitions_report";
+say "Finished!";
+
+=head1 SAMPLE OUTPUT
+
+=head2 C-level build-time errors
+
+    $ cat /tmp/Ayxrn84UJP/transitions.clang.pl
+    {
+      newest => {
+        file => "/tmp/Ayxrn84UJP/1705387.make.errors.rpt.txt",
+        idx => 7,
+        md5_hex => "fdce7ff2f07a0a8cd64005857f4060d4",
+      },
+      oldest => {
+        file => "/tmp/Ayxrn84UJP/2623ca3.make.errors.rpt.txt",
+        idx => 0,
+        md5_hex => "d41d8cd98f00b204e9800998ecf8427e",
+      },
+      transitions => [
+        {
+          newer => {
+                     file => "/tmp/Ayxrn84UJP/bcbe40e.make.errors.rpt.txt",
+                     idx => 2,
+                     md5_hex => "9d854980ad688c673a3c19635e72ab86",
+                   },
+          older => {
+                     file => "/tmp/Ayxrn84UJP/8ecdd39.make.errors.rpt.txt",
+                     idx => 1,
+                     md5_hex => "d41d8cd98f00b204e9800998ecf8427e",
+                   },
+        },
+        {
+          newer => {
+                     file => "/tmp/Ayxrn84UJP/951ae19.make.errors.rpt.txt",
+                     idx => 5,
+                     md5_hex => "fdce7ff2f07a0a8cd64005857f4060d4",
+                   },
+          older => {
+                     file => "/tmp/Ayxrn84UJP/273c84e.make.errors.rpt.txt",
+                     idx => 4,
+                     md5_hex => "9d854980ad688c673a3c19635e72ab86",
+                   },
+        },
+      ],
+    }
+
+    $ diff -w /tmp/Ayxrn84UJP/8ecdd39.make.errors.rpt.txt /tmp/Ayxrn84UJP/bcbe40e.make.errors.rpt.txt
+    0a1,19
+    > op.c:_:_: error: use of undeclared identifier 'my_vars'
+    >         if (o->op_ppaddr != PL_ppaddr[OP_SASSIGN])
+    >                             ^
+    > --
+    > op.c:_:_: error: use of undeclared identifier 'my_vars'
+    >         if (topop->op_ppaddr != PL_ppaddr[OP_STRINGIFY])
+    >                                 ^
+    > --
+    > op.c:_:_: error: use of undeclared identifier 'my_vars'
+    >         if (topop->op_ppaddr != PL_ppaddr[OP_SPRINTF])
+    >                                 ^
+    > --
+    > op.c:_:_: error: use of undeclared identifier 'my_vars'
+    >         if (topop->op_ppaddr != PL_ppaddr[OP_CONCAT])
+    >                                 ^
+    > --
+    > op.c:_:_: error: use of undeclared identifier 'my_vars'
+    >     o->op_ppaddr       = PL_ppaddr[OP_MULTICONCAT];
+    >                          ^
+
+
+    $ diff -w /tmp/Ayxrn84UJP/273c84e.make.errors.rpt.txt /tmp/Ayxrn84UJP/951ae19.make.errors.rpt.txt
+    19a20,23
+    > --
+    > op.c:_:_: error: use of undeclared identifier 'my_vars'
+    >     OpTYPE_set(condop, OP_ONCE);
+    >     ^
+
+=head2 C-level build-time warnings
+
+    $ cat /tmp/kNIEYodA1z/transitions.clang.pl
+    {
+      newest => {
+        file => "/tmp/kNIEYodA1z/bec292a.make.warnings.rpt.txt",
+        idx => 4,
+        md5_hex => "0d3037d6d7e3e89cf092e6eabf72f564",
+      },
+      oldest => {
+        file => "/tmp/kNIEYodA1z/b38ce61.make.warnings.rpt.txt",
+        idx => 0,
+        md5_hex => "dd06dffb30258ca89400a68366c7ddbc",
+      },
+      transitions => [
+        {
+          newer => {
+                     file => "/tmp/kNIEYodA1z/ea4caf5.make.warnings.rpt.txt",
+                     idx => 2,
+                     md5_hex => "0d3037d6d7e3e89cf092e6eabf72f564",
+                   },
+          older => {
+                     file => "/tmp/kNIEYodA1z/102356a.make.warnings.rpt.txt",
+                     idx => 1,
+                     md5_hex => "dd06dffb30258ca89400a68366c7ddbc",
+                   },
+        },
+      ],
+    }
+
+    $ diff -w /tmp/kNIEYodA1z/102356a.make.warnings.rpt.txt /tmp/kNIEYodA1z/ea4caf5.make.warnings.rpt.txt
+    7a8
+    > Call.xs:_:_: warning: comparison of integers of different signs: 'int' and 'size_t' (aka 'unsigned long') [Wsign-compare]
+
+=head2 Any changes in build-time STDERR output
+
+    $ cat /tmp/fxFRNZNDGg/transitions.clang.pl
+    {
+      newest => {
+        file => "/tmp/fxFRNZNDGg/9be343b.make.stderr.txt",
+        idx => 6,
+        md5_hex => "ab1929f5430d268610ff294fec259011",
+      },
+      oldest => {
+        file => "/tmp/fxFRNZNDGg/d4bf6b0.make.stderr.txt",
+        idx => 0,
+        md5_hex => "d65999a7b3ba5c8a149c89e0e8c52405",
+      },
+      transitions => [
+        {
+          newer => {
+                     file => "/tmp/fxFRNZNDGg/22f363f.make.stderr.txt",
+                     idx => 3,
+                     md5_hex => "ab1929f5430d268610ff294fec259011",
+                   },
+          older => {
+                     file => "/tmp/fxFRNZNDGg/22afef8.make.stderr.txt",
+                     idx => 2,
+                     md5_hex => "d65999a7b3ba5c8a149c89e0e8c52405",
+                   },
+        },
+      ],
+    }
+
+    $ diff -w /tmp/fxFRNZNDGg/22afef8.make.stderr.txt /tmp/fxFRNZNDGg/22f363f.make.stderr.txt
+    0a1
+    > embed.fnc entry overrides redundant information in 'Am|STRLEN|isUTF8_CHAR_flags|const U8 *s|const U8 *e| const U32 flags' in inline.h at autodoc.pl line 494, <F> line 2172.
+
+=cut
+
+__END__

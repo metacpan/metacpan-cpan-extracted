@@ -101,11 +101,11 @@ my @valid_ids = (
         q{'Curvibacter putative symbiont of Hydra magnipapillata'},
         q{'Curvibacter putative symbiont of Hydra magnipapillata [260221396]'} ],
     [ 'Desulfotomaculum gibsoniae_767817@357041591',
-        'cellular organisms; Bacteria; Terrabacteria group; Firmicutes; Clostridia; Clostridiales; Peptococcaceae; Desulfallas; Desulfallas gibsoniae; Desulfallas gibsoniae DSM 7213',
-        'cellular organisms; Bacteria; Terrabacteria group; Firmicutes; Clostridia; Clostridiales; Peptococcaceae; Desulfallas; Desulfallas gibsoniae',
-       ('cellular organisms; Bacteria; Terrabacteria group; Firmicutes; Clostridia; Clostridiales; Peptococcaceae; Desulfallas; Desulfallas gibsoniae; Desulfallas gibsoniae DSM 7213') x 3,
-        q{'Desulfallas gibsoniae DSM 7213'},
-        q{'Desulfallas gibsoniae DSM 7213 [357041591]'} ],
+        'cellular organisms; Bacteria; Terrabacteria group; Firmicutes; Clostridia; Eubacteriales; Desulfallaceae; Desulfoscipio; Desulfoscipio gibsoniae; Desulfoscipio gibsoniae DSM 7213',
+        'cellular organisms; Bacteria; Terrabacteria group; Firmicutes; Clostridia; Eubacteriales; Desulfallaceae; Desulfoscipio; Desulfoscipio gibsoniae',
+       ('cellular organisms; Bacteria; Terrabacteria group; Firmicutes; Clostridia; Eubacteriales; Desulfallaceae; Desulfoscipio; Desulfoscipio gibsoniae; Desulfoscipio gibsoniae DSM 7213') x 3,
+        q{'Desulfoscipio gibsoniae DSM 7213'},
+        q{'Desulfoscipio gibsoniae DSM 7213 [357041591]'} ],
 
     # Eukaryota
     [ 'Arabidopsis halleri_81971@184160085',
@@ -365,10 +365,6 @@ my @dupe_tests = (
         [ qw(Eukaryota Viridiplantae Chlorophyta Chlorophyceae Chlamydomonadales Chlamydomonadaceae Chlamydomonas undef) ] ],
 
     # subtaxa named after higher taxa
-    [ 'Actinobacteria', 'cellular organisms; Bacteria; Terrabacteria group; Actinobacteria; Actinobacteria', 1760,
-        [ qw(Bacteria undef Actinobacteria Actinobacteria undef undef undef undef) ]  ],
-    [ 'Actinobacteria', 'cellular organisms; Bacteria; Terrabacteria group; Actinobacteria', 201174,
-        [ qw(Bacteria undef Actinobacteria undef undef undef undef undef) ]  ],
     [ 'Aedes', 'cellular organisms; Eukaryota; Opisthokonta; Metazoa; Eumetazoa; Bilateria; Protostomia; Ecdysozoa; Panarthropoda; Arthropoda; Mandibulata; Pancrustacea; Hexapoda; Insecta; Dicondylia; Pterygota; Neoptera; Holometabola; Diptera; Nematocera; Culicomorpha; Culicoidea; Culicidae; Culicinae; Aedini; Aedes; Aedes', 149531,
         [ qw(Eukaryota Metazoa Arthropoda Insecta Diptera Culicidae Aedes undef) ]  ],
     [ 'Aedes', 'cellular organisms; Eukaryota; Opisthokonta; Metazoa; Eumetazoa; Bilateria; Protostomia; Ecdysozoa; Panarthropoda; Arthropoda; Mandibulata; Pancrustacea; Hexapoda; Insecta; Dicondylia; Pterygota; Neoptera; Holometabola; Diptera; Nematocera; Culicomorpha; Culicoidea; Culicidae; Culicinae; Aedini; Aedes', 7158,
@@ -377,6 +373,12 @@ my @dupe_tests = (
         [ qw(Bacteria undef Aquificae Aquificae undef undef undef undef) ]  ],
     [ 'Aquificae', 'cellular organisms; Bacteria; Aquificae', 200783,
         [ qw(Bacteria undef Aquificae undef undef undef undef undef) ]  ],
+    # formerly problematic taxa
+    # Actinomycetia were once known as Actinobacteria too
+    [ 'Actinomycetia', 'cellular organisms; Bacteria; Terrabacteria group; Actinobacteria; Actinomycetia', 1760,
+        [ qw(Bacteria undef Actinobacteria Actinomycetia undef undef undef undef) ]  ],
+    [ 'Actinobacteria', 'cellular organisms; Bacteria; Terrabacteria group; Actinobacteria', 201174,
+        [ qw(Bacteria undef Actinobacteria undef undef undef undef undef) ]  ],
 
     # duplicate genera
     [ 'Uronema', 'cellular organisms; Eukaryota; Sar; Alveolata; Ciliophora; Intramacronucleata; Oligohymenophorea; Scuticociliatia; Philasterida; Uronematidae; Uronema', 35106,
@@ -397,8 +399,8 @@ my @dupe_tests = (
         [ qw(Viruses undef undef undef undef undef undef undef) ] ],
 
     # names impossible to disambiguate due to completely identical lineage
-    [ 'Frankia', 'cellular organisms; Bacteria; Terrabacteria group; Actinobacteria; Actinobacteria; Frankiales; Frankiaceae; Frankia; unclassified Frankia; Frankia sp. NRRL B-16315', 683320,
-        [ qw(Bacteria undef Actinobacteria Actinobacteria Frankiales Frankiaceae Frankia), 'Frankia sp. NRRL B-16315' ]  ],
+    [ 'Frankia', 'cellular organisms; Bacteria; Terrabacteria group; Actinobacteria; Actinomycetia; Frankiales; Frankiaceae; Frankia; unclassified Frankia; Frankia sp. NRRL B-16315', 683320,
+        [ qw(Bacteria undef Actinobacteria Actinomycetia Frankiales Frankiaceae Frankia), 'Frankia sp. NRRL B-16315' ]  ],
 );
 
 {

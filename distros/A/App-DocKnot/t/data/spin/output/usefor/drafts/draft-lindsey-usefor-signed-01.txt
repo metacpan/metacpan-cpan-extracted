@@ -1,0 +1,3 @@
+This is a fake draft to test the \size function of spin.  I would include
+the real draft but the Internet-Draft license is not necessarily free,
+so a fake file like this is used instead to avoid any license issues.

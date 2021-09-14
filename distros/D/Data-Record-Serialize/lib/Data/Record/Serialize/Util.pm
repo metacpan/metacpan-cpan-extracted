@@ -4,7 +4,7 @@ package Data::Record::Serialize::Util;
 
 use strict;
 use warnings;
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use parent 'Exporter::Tiny';
 
@@ -99,7 +99,7 @@ Data::Record::Serialize::Util - Useful things
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =for Pod::Coverage index_types
 is_type

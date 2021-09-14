@@ -1,10 +1,13 @@
-package Tangence::Struct;
+#  You may distribute under the terms of either the GNU General Public License
+#  or the Artistic License (the same terms as Perl itself)
+#
+#  (C) Paul Evans, 2012-2014 -- leonerd@leonerd.org.uk
 
-use strict;
+package Tangence::Struct 0.26;
+
+use v5.14;
 use warnings;
 use base qw( Tangence::Meta::Struct );
-
-our $VERSION = '0.25';
 
 use Carp;
 

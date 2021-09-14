@@ -1,0 +1,26 @@
+<%doc>
+Insert the "Tickets" menu option into the queue admin page menu under the
+"Templates" menu.
+</%doc>
+\
+<%INIT>
+my $RequestPath = $HTML::Mason::Commands::r->path_info;
+$RequestPath =~ s!/{2,}!/!g;
+
+if (   ( $RequestPath =~ m{^/Admin/Queues} )
+    && ( ( $DECODED_ARGS->{'id'} || $DECODED_ARGS->{'Queue'} || '' ) =~ /\S/ )
+   )
+{
+    my $PageMenu = PageMenu();
+    if ( $PageMenu && $PageMenu->child('templates') ) {
+
+        $PageMenu->child('templates')->child(
+            'tickettemplates' => 'title' => loc('Tickets'),
+            path => '/Admin/Queues/TemplateTickets.html?id='
+                . $m->interp->apply_escapes(
+                $DECODED_ARGS->{'id'} || $DECODED_ARGS->{'Queue'}, 'u'
+                )
+        );
+    }
+}
+</%INIT>

@@ -1,3 +1,8 @@
+1.01
+
+- Extracted all the inline modules into separate files. Added some
+  documentation. No visible changes for web app users, though.
+
 1.00
 
 - New, extracted from a previous repository where it was mixed with

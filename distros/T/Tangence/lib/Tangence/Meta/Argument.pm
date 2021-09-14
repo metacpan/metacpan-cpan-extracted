@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2011-2012 -- leonerd@leonerd.org.uk
 
-package Tangence::Meta::Argument;
+package Tangence::Meta::Argument 0.26;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.25';
 
 =head1 NAME
 

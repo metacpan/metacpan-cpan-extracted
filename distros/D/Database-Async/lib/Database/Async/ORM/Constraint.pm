@@ -3,7 +3,7 @@ package Database::Async::ORM::Constraint;
 use strict;
 use warnings;
 
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 sub new {
     my ($class, %args) = @_;

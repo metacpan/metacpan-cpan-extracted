@@ -18,7 +18,7 @@ use PDL::NiceSlice;
 
 ## no critic (ProhibitExplicitReturnUndef)
 
-our $VERSION = '0.07';
+our $VERSION = '0.12';
 
 use parent 'Statistics::Descriptive::PDL::Weighted';
 
@@ -107,6 +107,9 @@ sub _kurtosis {
     return ( $correction1 * $sumpow4 ) - $correction2;
 }
 
+#  crude memoisation - would be nice to use
+#  state but it has issues with lists on older perls
+my %k_piddle_cache;
 
 #  Uses same basic algorithm as PDL::pctl.
 sub _percentile {
@@ -117,7 +120,7 @@ sub _percentile {
     return undef
       if !defined $piddle or $piddle->isempty;
 
-    #return $self->median if $p == 50;
+    $self->_sort_piddle;
 
     $piddle = $self->_deduplicate_piddle;
 
@@ -132,11 +135,18 @@ sub _percentile {
     my $k = floor $target_wt;
     my $d = $target_wt - $k;
 
-    my $idx = PDL->pdl($k)->vsearch_insert_leftmost($cumsum)->sclr;
+    my $idx = ($k_piddle_cache{$k} //= PDL->pdl(PDL::indx(), [$k]))->vsearch_insert_leftmost($cumsum)->at(0);
+
+    if (scalar keys %k_piddle_cache > 10000) {
+        #  Reset if we get too many
+        #  - could be more nuanced based on frequency
+        #  but then we would have to track it
+        %k_piddle_cache = ();
+    }
 
     #  we need to interpolate if our target weight falls between two sets of weights
     #  e.g. target is 1.3, but the cumulative weights are [1,2] or [1,5]
-    my $fraction = $target_wt - $cumsum->at($idx);
+    my $fraction = $target_wt - ($cumsum->at($idx));
     if ($fraction > 0 && $fraction < 1) {
         my $lower_val = $piddle->at($idx);
         my $upper_val = $piddle->at($idx+1);
@@ -160,7 +170,7 @@ Statistics::Descriptive::PDL::SampleWeighted - Sample weighted descriptive stati
 
 =head1 VERSION
 
-Version 0.07
+Version 0.12
 
 =cut
 
@@ -171,8 +181,8 @@ Version 0.07
 
     my $stats = Statistics::Descriptive::PDL::SampleWeighted->new;
     $stats->add_data([1,2,3,4], [1,3,5,6]);  #  values then weights
-    my $mean = $stat->mean;
-    my $var  = $stat->variance;
+    my $mean = $stats->mean;
+    my $var  = $stats->variance;
     
     #  or you can add data using a hash ref
     my %data = (1 => 1, 2 => 3, 3 => 5, 4 => 6);
@@ -206,10 +216,10 @@ Create a new statistics object.  Takes no arguments.
 
 =item add_data ([1,2,3,4], [5,1,1,2)
 
-Same as L<Statistics::Descriptive::PDL::Weighted> except that non-integer weights
-will be converted to integer using PDL's rules.  
-
 Add data to the stats object.  Appends to any existing data.
+
+Same as L<Statistics::Descriptive::PDL::Weighted> except that non-integer weights
+will be converted to integer using PDL's rules.
 
 =back
 

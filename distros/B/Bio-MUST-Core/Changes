@@ -1,3 +1,9 @@
+0.212530  2021-09-10 23:55:21+02:00 Europe/Brussels
+    - Changes
+      - binaries: moved 'inst' executables to 'bin' dir (for default install)
+    - Fixes
+      - binaries: improved command-line robustness towards enum-like option values
+
 0.211470  2021-05-27 22:53:20+02:00 Europe/Brussels
     - Additions
       - binaries: split-rates-ali.pl can now analyse pairs of profiles

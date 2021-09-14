@@ -1,0 +1,51 @@
+[name]
+Special character escaping
+
+[options]
+contents 1
+navbar 1
+
+[input]
+=head1 NAME
+
+\foo[ - All about [ and \
+
+=head1 FOO
+
+Forward link to L</"ABOUT [ and \">
+
+=head1 ABOUT [ and \
+
+Some []s are \great.
+
+    ][ are also \great in \verbatim.
+
+[output]
+\heading[\\foo\entity[91]][]
+
+\h1[\\foo\entity[91]]
+
+\class(subhead)[(All about \entity[91] and \\)]
+
+\class(navbar)[
+  \link[#S1][Foo]
+  | \link[#S2][About \entity[91] and \\]
+]
+
+\h2[Table of Contents]
+
+\number(packed)[\link[#S1][FOO]]
+\number(packed)[\link[#S2][ABOUT \entity[91] and \\]]
+
+\h2(#S1)[FOO]
+
+Forward link to \link[#S2][ABOUT \entity[91] and \\]
+
+\h2(#S2)[ABOUT \entity[91] and \\]
+
+Some \entity[91]\entity[93]s are \\great.
+
+\pre
+[    \entity[93]\entity[91] are also \\great in \\verbatim.]
+
+\signature

@@ -1,0 +1,34 @@
+[name]
+Internal section links
+
+[input]
+=head1 FOO
+
+Some foo stuff with L</BAR> forward reference.
+
+=head1 BAR
+
+Some bar stuff linking to L</"FOO">.
+
+=head1 FOO BAR
+
+Can link to myself: L</FOO BAR>.  But links to L</NOWHERE> should
+disappear and links to L<Other::Module/FOO> should get the default text.
+
+=cut
+
+[output]
+\h2(#S1)[FOO]
+
+Some foo stuff with \link[#S2][BAR] forward reference.
+
+\h2(#S2)[BAR]
+
+Some bar stuff linking to \link[#S1][FOO].
+
+\h2(#S3)[FOO BAR]
+
+Can link to myself: \link[#S3][FOO BAR].  But links to NOWHERE should
+disappear and links to "FOO" in Other::Module should get the default text.
+
+\signature

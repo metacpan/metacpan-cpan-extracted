@@ -1,5 +1,9 @@
 Revision history for CtrlO::PDF
 
+0.21 Tues Sep 14 2021
+
+    * Fix exception when logo has fractional dimensions
+
 0.20 Mon Feb 1 2021
 
     * Many minor tweaks to make default page layout better. This breaks

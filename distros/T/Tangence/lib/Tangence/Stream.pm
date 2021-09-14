@@ -3,13 +3,10 @@
 #
 #  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
-package Tangence::Stream;
+package Tangence::Stream 0.26;
 
-use strict;
+use v5.14;
 use warnings;
-use 5.010; # //
-
-our $VERSION = '0.25';
 
 use Carp;
 
@@ -240,7 +237,7 @@ The message body
 CODE reference to the callback to be invoked when a response to the message is
 received. It will be passed the response message:
 
- $on_response->( $message )
+   $on_response->( $message )
 
 =back
 

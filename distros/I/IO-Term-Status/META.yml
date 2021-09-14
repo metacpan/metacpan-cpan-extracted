@@ -1,0 +1,27 @@
+---
+abstract: 'print log lines to a terminal with a running status bar'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test::HexString: '0'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IO-Term-Status
+provides:
+  IO::Term::Status:
+    file: lib/IO/Term/Status.pm
+    version: '0.01'
+requires:
+  IO::Handle: '0'
+  perl: '5.014'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

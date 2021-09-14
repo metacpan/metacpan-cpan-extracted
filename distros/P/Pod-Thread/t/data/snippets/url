@@ -13,7 +13,6 @@ URL without anchor text: L<http://example.com/>.
 
 URL with \link[http://example.com/][anchor text].
 
-URL without anchor text:
-<\link[http://example.com/][http://example.com/]>.
+URL without anchor text: <\link[http://example.com/][http://example.com/]>.
 
 \signature

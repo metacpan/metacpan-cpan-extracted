@@ -58,4 +58,4 @@
 # larger label example
 other <text x="100" y="1170" font-size="40pt">Small Example</text>
 
-include https://campaignwiki.org/contrib/gnomeyland.txt
+include gnomeyland.txt

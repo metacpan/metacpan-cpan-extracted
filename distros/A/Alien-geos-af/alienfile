@@ -1,6 +1,7 @@
 use 5.010;
 use alienfile;
 use Sort::Versions;
+use Path::Tiny;
 
 my $on_windows = ($^O =~ /mswin/i);
 my $on_automated_rig
@@ -8,10 +9,15 @@ my $on_automated_rig
   || $ENV{PERL_CPAN_REPORTER_CONFIG}
   || $ENV{AUTOMATED_TESTING}
   || $ENV{TRAVIS}
-  || $ENV{APPVEYOR};
+  || $ENV{APPVEYOR}
+  || $ENV{CI};
 
 use Cwd;
 my $base_dir = getcwd();
+
+configure {
+  requires 'File::Copy' => 0, 'File::Find::Rule' => 0;
+};
 
 my $min_target_version = '3.6.0';
 
@@ -47,7 +53,8 @@ share {
   
   plugin Extract => (format => 'tar.bz2');
 
-  plugin 'Build::Autoconf' => ();
+  #plugin 'Build::Autoconf' => ();
+  plugin 'Build::CMake';
 
   my $build_static = ($on_windows) ? '' : '--disable-shared';
   $build_static = '';
@@ -66,10 +73,15 @@ share {
     #  but not sure if /usr/local is needed yet
     plugin 'Build::Make' => 'gmake';
   }
+  elsif ($^O eq 'MSWin32') {
+    plugin 'Build::Make' => 'gmake';
+  }
 
   my $make_cmd = '%{make}';
   my $make_inst_cmd = '%{make} install';
-  my @make_clean;
+  my $run_tests = $ENV{ALIEN_GEOS_ENABLE_TESTS};
+  my $run_tests_bool_text = $run_tests ? 'ON' : 'OFF';
+
   #  try not to exceed the cpan-testers log limits
   if ($on_automated_rig) {
     say "Running under CI or automated testing";
@@ -83,30 +95,141 @@ share {
         $make_inst_cmd =~ s/type/cat/;
         $make_inst_cmd =~ s/"/'/g;
     }
-    if (! ($ENV{TRAVIS} || $ENV{APPVEYOR})) {
-        push @make_clean, '%{make} clean';
-    }
+
     #  clean up the build dir on cpan testers etc
-    #after 'build' => \&cleanse_build_dir;
-    plugin 'Cleanse::BuildDir';
+    #plugin 'Cleanse::BuildDir';
   }
+  my $cmake_cmd = [
+    '%{cmake}',
+    -G => '%{cmake_generator}',
+    '-DCMAKE_MAKE_PROGRAM=%{make}',
+    '-DBUILD_DOCUMENTATION=NO',
+    "-DGEOS_ENABLE_TESTS=$run_tests_bool_text", #  seems not be in the source tree?
+    "-DBUILD_TESTING:BOOL=$run_tests_bool_text",
+    #'-DCMAKE_BUILD_TYPE=Release',
+    '-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true',
+    '-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}',
+    '..'
+  ];
   
+  #say join ' ', @$cmake_cmd;
+
   build [
-    "%{configure} $with_local $with_cpp11 $build_static",
+    #\&set_rectangle_intersection,  #  disable
+    #"%{configure} $with_local $with_cpp11 $build_static",
+    #'echo %{make}',
+    #\&pause,
+    'mkdir _build',
+    'cd _build',
+    $cmake_cmd,
     $make_cmd,
-    \&pause,
+    ($run_tests ? '%{make} test' : ()),
+    #\&pause,
     $make_inst_cmd,
-    @make_clean
+    \&rename_la_files,
   ];
 
 };
 
 
 gather [
-    \&rename_la_files,
-    #  get all the geos-config fields
-    \&set_runtime_props_from_config,
+  \&copy_geos_c_dll,
+  \&copy_geos_so_on_bsd,
+  #\&pause,
+  #  get all the geos-config fields
+  \&set_runtime_props_from_config,
 ];
+
+
+#  a bit brute force
+sub copy_geos_c_dll {
+  my $build = shift;
+  
+  return unless $^O eq 'MSWin32';
+  
+  log 'Searching for libgeos_c.dll';
+
+  my @files
+    = File::Find::Rule->file()
+                      ->name( 'libgeos_c.dll' )
+                      ->in( '.' );
+
+  foreach my $from (@files) {
+    my $to = Path::Tiny->new($from)->parent->child('libgeos_c-1.dll');
+    if (!$to->exists) {
+      log "copying $from to $to";
+      eval {File::Copy::copy ("$from", "$to")};
+      log $@ if $@;
+    }
+  }
+}
+
+#  also a bit brute force
+#  and numbering is volatile
+sub copy_geos_so_on_bsd {
+  my $build = shift;
+  
+  return unless $^O =~ /bsd/i;
+  
+  log 'Searching for libgeos so files to rename';
+
+  my @renames = (
+    ['libgeos_c.so.1'   => 'libgeos_c.so.17'],
+    ['libgeos_c.so.1'   => 'libgeos_c.so'],
+    ['libgeos.so.3.9.0' => 'libgeos-3.9.0.so'],
+    ['libgeos.so.3.9.0' => 'libgeos-3.so'],
+  );
+
+  
+  foreach my $names (@renames) {
+    my ($from_name, $to_name) = @$names;
+
+    my @files
+      = File::Find::Rule->file()
+                        ->name( $from_name )
+                        ->in( '.' );
+  
+    foreach my $from (@files) {
+      my $to = Path::Tiny->new($from)->parent->child($to_name);
+      if (!$to->exists) {
+        log "copying $from to $to";
+        eval {File::Copy::copy ("$from", "$to")};
+        log $@ if $@;
+      }
+    }
+  }
+}
+
+
+sub set_rectangle_intersection {
+    my ($build) = @_;
+    
+    #  disable as we get test failures in Biodiverse,
+    #  which is probably for the same reasons this is
+    #  disabled in GEOS in the first place
+    return;  
+    
+    return if $build->install_type ne 'share';
+
+    say 'set_rectangle_intersection: Currently in ' . getcwd();
+    
+    use File::Find::Rule;
+    use Path::Tiny qw /path/;
+    my (@files)
+      = File::Find::Rule
+                ->file()
+                ->name( 'Geometry.cpp' )
+                ->in( $base_dir );
+    #  loop is brute force
+    foreach my $file (@files) {
+        say "Modifying file $file";
+        path($file)->edit (
+            sub {
+              s{^//(#define USE_RECTANGLE_INTERSECTION 1)}{$1}ms;
+            }
+        );
+    }
+}
 
 sub set_runtime_props_from_config {
     my ($build) = @_;
@@ -143,6 +266,10 @@ sub set_runtime_props_from_config {
             #  windowsify the paths
             $build->runtime_prop->{$flag} =~ s|(?<=-[IL])/C/|C:/|i;
         }
+        if ($^O =~ /bsd/i) {
+            #  maybe will help?
+            $build->runtime_prop->{$flag} =~ s/-\d+$//;
+        }
         say "Runtime prop $flag is " . $build->runtime_prop->{$flag};
     }
 }
@@ -157,14 +284,14 @@ sub rename_la_files {
                         ->name( '*.la' )
                         ->in( '.' );
     foreach my $file (@la_files) {
-        say "Renaming $file so it will not intefere with gdal compilation";
+        say "Renaming $file so it will not interfere with gdal compilation";
         rename $file, $file . '.bak';
     }
 
 }
 
 sub pause {
-    return;  #  disable
+    #return;  #  disable
     return if !$on_windows || $on_automated_rig;
 
     say "CONTINUE?";

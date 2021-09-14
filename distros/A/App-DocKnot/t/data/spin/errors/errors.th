@@ -1,0 +1,17 @@
+\heading[Errors]
+
+\==[macro]    [1]   [\1
+                     \2]
+\==[badcount] [foo] [bar]
+
+\macro[
+   foo
+   \=UNKNOWN
+
+   \unknown
+]
+
+\h1(#foo bar)[Heading]
+\release[something]
+\sitemap
+\version[something] \size[nonexistent-file]

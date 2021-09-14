@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>DocKnot</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link rel="stylesheet" href="/~eagle/styles/software.css" type="text/css" />
+  <link rel="previous" href="../cvslog/" title="&quot;cvslog&quot;" />
+  <link rel="next" href="../rra-c-util/" title="rra-c-util&gt;" />
+  <link rel="up" href="../" title="Software" />
+  <link rel="top" href="../../" />
+</head>
+
+<!-- Spun from index.th by DocKnot %VERSION% on %DATE% -->
+
+<body>
+<table class="navbar"><tr>
+  <td class="navleft">&lt;&nbsp;<a href="../cvslog/">"cvslog"</a></td>
+  <td>
+    <a href="../../">Russ Allbery</a>
+    &gt; <a href="../">Software</a>
+  </td>
+  <td class="navright"><a href="../rra-c-util/">rra-c-util&gt;</a>&nbsp;&gt;</td>
+</tr></table>
+
+
+<h1>DocKnot</h1>
+
+<div class="sidebar">
+    <h2>Download</h2>
+
+    <p>
+DocKnot 4.01<br />
+     <a href="https://archives.eyrie.org/software/devel/App-DocKnot-4.01.tar.gz">tar.gz</a>
+     (<a href="https://archives.eyrie.org/software/devel/App-DocKnot-4.01.tar.gz.asc">signature</a>)<br />
+     <a href="https://archives.eyrie.org/software/devel/App-DocKnot-4.01.tar.xz">tar.xz</a>
+     (<a href="https://archives.eyrie.org/software/devel/App-DocKnot-4.01.tar.xz.asc">signature</a>)<br />
+    Released %DATE%
+</p>
+
+<p>
+    <a href="https://packages.debian.org/source/sid/docknot">Debian packages</a> <br />
+    <a href="https://archives.eyrie.org/software/ARCHIVE/App-DocKnot/">Archive</a>
+</p>
+
+    <h2>Documentation</h2>
+
+<p>
+    <a href="readme.html">General overview</a> <br />
+    <a href="news.html">Change summary</a> <br />
+    <a href="docknot.html">docknot manual page</a>
+</p>
+
+    <h2>Development</h2>
+
+<p>
+    <a href="todo.html">To-do list</a> <br />
+    <a href="https://github.com/rra/docknot">GitHub</a> <br />
+    <a href="https://github.com/rra/docknot/issues">Bug tracker</a> <br />
+    <a href="https://git.eyrie.org/?p=devel/docknot.git">Git repository</a> <br />
+    <a href="https://metacpan.org/release/App-DocKnot">MetaCPAN</a> <br />
+    <a href="https://tracker.debian.org/pkg/docknot">Debian package tracker</a>
+</p></div>
+
+<h2>Blurb</h2>
+
+<p>
+DocKnot is a system for generating consistent human-readable software
+package documentation from a YAML metadata file and templates.  The goal
+is to generate both web pages and distributed documentation files (such as
+<code>README</code>) from the same source, using templates for consistency
+across multiple packages.  DocKnot also automates generating distribution
+tarballs for software packages.
+</p>
+
+<h2>Description</h2>
+
+<p>
+After years of maintaining a variety of small free software packages, I
+found the most tedious part of making a new release was updating the
+documentation in multiple locations.  Copyright dates would change,
+prerequisites and package descriptions would change, and I had to update
+at least the package <code>README</code> file and its web pages separately.  The
+last straw was when GitHub became popular and I wanted to provide a
+Markdown version of <code>README</code> as well, avoiding the ugly text
+rendering on the GitHub page for a package.
+</p>
+
+<p>
+This package uses one metadata file as its source information and
+generates all the various bits of documentation for a package.  This
+allows me to make any changes in one place and then just regenerate the
+web page, included documentation, and other files to incorporate those
+changes.  It also lets me make changes to the templates to improve shared
+wording and push that out to every package I maintain during its next
+release, without having to remember which changes I wanted to make.
+</p>
+
+<p>
+DocKnot is also slowly absorbing other tools that I use for software
+distribution and web site maintenance, such as generating distribution
+tarballs for software packages.
+</p>
+
+<p>
+DocKnot was designed and written for my personal needs, and I'm not sure
+it will be useful for anyone else.  At the least, the template files are
+rather specific to my preferences about how to write package
+documentation, and the web page output is in my personal thread language
+as opposed to HTML.  I'm not sure if I'll have the time to make it a more
+general tool.  But you're certainly welcome to use it if you find it
+useful, send pull requests to make it more general, or take ideas from it
+for your own purposes.
+</p>
+
+<p>
+Currently included in this package are just the App::DocKnot module and
+its submodules, a small docknot driver program, and the templates I use
+for my own software.  Over time, it may include more of my web publishing
+framework, time permitting.
+</p>
+
+<h2>Requirements</h2>
+
+<p>
+Perl 5.24 or later and Module::Build are required to build this module.
+The following additional Perl modules are required to use it:
+</p>
+
+<ul>
+<li class="packed">File::BaseDir</li>
+<li class="packed">File::ShareDir</li>
+<li class="packed">IO::Compress::Xz (part of IO-Compress-Lzma)</li>
+<li class="packed">IO::Uncompress::Gunzip (part of IO-Compress)</li>
+<li class="packed">IPC::Run</li>
+<li class="packed">IPC::System::Simple</li>
+<li class="packed">JSON::MaybeXS</li>
+<li class="packed">Kwalify</li>
+<li class="packed">List::SomeUtils</li>
+<li class="packed">Perl6::Slurp</li>
+<li class="packed">Template (part of Template Toolkit)</li>
+<li class="packed">YAML::XS</li>
+</ul>
+
+<h2>Download</h2>
+
+<p>
+The distribution:
+</p>
+
+<table>
+      <tr>
+    <td>DocKnot 4.01</td>
+    <td>2021-02-27</td>
+    <td><a href="https://archives.eyrie.org/software/devel/App-DocKnot-4.01.tar.gz">tar.gz</a>
+        (<a href="https://archives.eyrie.org/software/devel/App-DocKnot-4.01.tar.gz.asc">PGP signature</a>)</td>
+    <td><a href="https://archives.eyrie.org/software/devel/App-DocKnot-4.01.tar.xz">tar.xz</a>
+        (<a href="https://archives.eyrie.org/software/devel/App-DocKnot-4.01.tar.xz.asc">PGP signature</a>)</td>
+  </tr></table>
+
+<p>
+An <a href="https://archives.eyrie.org/software/ARCHIVE/App-DocKnot/">archive of older releases</a> is also available.
+</p>
+
+<p>
+DocKnot is packaged for Debian as docknot.  See the
+<a href="https://tracker.debian.org/pkg/docknot">Debian package tracker</a> for
+more information.
+</p>
+
+<p>
+DocKnot is available from CPAN as the
+<a href="https://metacpan.org/release/App-DocKnot">App-DocKnot
+distribution</a>.
+</p>
+
+<p>
+DocKnot is maintained using the Git version control system.  To check out
+the current development tree, see
+<a href="https://github.com/rra/docknot">GitHub</a> or clone:
+</p>
+
+<pre>    https://git.eyrie.org/git/devel/docknot.git</pre>
+
+<p>
+Pull requests on GitHub are welcome.  You can also
+<a href="https://git.eyrie.org/?p=devel/docknot.git">browse the current
+development source</a>.
+</p>
+
+<h2>Documentation</h2>
+
+<div class="left">    <p class="first">User documentation:</p>
+
+    <ul>
+<li class="packed"><a href="readme.html">README</a></li>
+    <li class="packed"><a href="news.html">Change summary</a></li>
+    <li class="packed"><a href="docknot.html">docknot manual page</a></li>
+    <li class="packed"><a href="license.html">License and copyright</a></li>
+</ul>
+
+<p>
+    Developer documentation:
+</p>
+
+    <ul>
+<li class="packed"><a href="todo.html">To-do list</a></li>
+    <li class="packed"><a href="https://github.com/rra/docknot">GitHub</a></li>
+    <li class="packed"><a href="https://github.com/rra/docknot/issues">Bug tracker</a></li>
+</ul></div>
+
+<div class="right">    <p class="first">API documentation:</p>
+
+    <ul>
+<li class="packed"><a href="api/app-docknot.html">App::DocKnot</a></li>
+    <li class="packed"><a href="api/app-docknot-command.html">App::DocKnot::Command</a></li>
+    <li class="packed"><a href="api/app-docknot-config.html">App::DocKnot::Config</a></li>
+    <li class="packed"><a href="api/app-docknot-dist.html">App::DocKnot::Dist</a></li>
+    <li class="packed"><a href="api/app-docknot-generate.html">App::DocKnot::Generate</a></li>
+    <li class="packed"><a href="api/app-docknot-update.html">App::DocKnot::Update</a></li></ul></div>
+
+<h2 class="after">License</h2>
+
+<p>
+The DocKnot package as a whole is covered by the following copyright and
+license:
+</p>
+
+<blockquote><p>
+    Copyright 2013-2021
+        Russ Allbery &lt;rra@cpan.org&gt;
+</p>
+
+<p>
+    Permission is hereby granted, free of charge, to any person obtaining
+    a copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+</p>
+
+<p>
+    The above copyright notice and this permission notice shall be
+    included in all copies or substantial portions of the Software.
+</p>
+
+<p>
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+</p></blockquote>
+
+<p>
+Some individual source files are covered by other, compatible licenses.
+For complete copyright and license information, see the file
+<a href="license.html">LICENSE</a> in the DocKnot source distribution.
+</p>
+
+<table class="navbar"><tr>
+  <td class="navleft">&lt;&nbsp;<a href="../cvslog/">"cvslog"</a></td>
+  <td>
+    <a href="../../">Russ Allbery</a>
+    &gt; <a href="../">Software</a>
+  </td>
+  <td class="navright"><a href="../rra-c-util/">rra-c-util&gt;</a>&nbsp;&gt;</td>
+</tr></table>
+
+<address>
+    Last <a href="https://www.eyrie.org/~eagle/software/web/">spun</a>
+    %DATE% from thread modified %DATE%
+</address>
+</body>
+</html>

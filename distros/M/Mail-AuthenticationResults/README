@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.20210112
+    version 2.20210914
 
 DESCRIPTION
 
@@ -21,8 +21,6 @@ DESCRIPTION
 
     Comments added between key/value pairs will be added after them in the
     data structures and when stringified.
-
-    It is a work in progress..
 
 METHODS
 
@@ -47,7 +45,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2020 by Marc Bradshaw.
+    This software is copyright (c) 2021 by Marc Bradshaw.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

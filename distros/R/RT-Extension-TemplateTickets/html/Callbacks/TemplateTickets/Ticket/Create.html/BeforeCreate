@@ -1,0 +1,173 @@
+<%doc>
+When the ticket creation form is submitted, check whether the user chose to
+load a template ticket; if so, skip ticket creation, and populate %$ARGSRef
+with the parameters from the template ticket so that when the form is
+redisplayed, it shows the values loaded from the template.
+
+See the FormStart callback of /Ticket/Create.html for more details.
+</%doc>
+\
+<%ARGS>
+$ARGSRef        => {}
+$skip_create    => undef
+$checks_failure => undef
+$results        => []
+</%ARGS>
+\
+<%INIT>
+return if ( not defined $ARGSRef );
+return if ( not defined $skip_create );
+return if ( not $ARGSRef->{'LoadTemplateTicket'} );
+
+# Since LoadTemplateTicket was set, the user selected a template ticket to
+# load, so we must skip ticket creation and redisplay the form.
+#
+${$skip_create} = 1;
+
+# Load all template tickets for this queue, and then load the selected
+# template ticket.
+#
+my $Templates = {};
+$m->comp(
+    '/Ticket/Elements/TemplateTicketsList',
+    'Queue'     => $ARGSRef->{'Queue'},
+    'Templates' => $Templates
+);
+
+if ( scalar keys %$Templates == 0 ) {
+    push @$results,
+        loc('Failed to load template ticket - no templates found.')
+        if ($results);
+    return;
+}
+
+my $ChosenTemplate = $Templates->{ $ARGSRef->{'LoadTemplateTicket'} };
+
+if ( not $ChosenTemplate ) {
+    push @$results,
+        loc( 'Failed to load template ticket - template [_1] not found.',
+        $ARGSRef->{'LoadTemplateTicket'} )
+        if ($results);
+    return;
+}
+
+my $TemplateTicketObj = $ChosenTemplate->{'Ticket'};
+
+# Read all custom field values from the template ticket (this is loosely
+# based on RT 4.2.16's /Ticket/Create.html).
+#
+
+# Adapted from /Ticket/Create.html, to get custom field values.
+#
+my $TemplateCustomFields = {};
+my $cfs                  = $TemplateTicketObj->QueueObj->TicketCustomFields();
+while ( my $cf = $cfs->Next ) {
+    my $cf_id     = $cf->id;
+    my $cf_values = $TemplateTicketObj->CustomFieldValues( $cf->id );
+    my @cf_values;
+    my $cf_name = $cf->Name || '';
+    while ( my $cf_value = $cf_values->Next ) {
+
+        my $cf_content = $cf_value->Content;
+
+        # Callback here so other extensions can alter what happens to
+        # templated custom field values.
+        #
+        $m->callback(
+            %ARGS,
+            'CallbackName'    => 'ModifyTemplateTicketCF',
+            'CallbackPage'    => '/Ticket/Create.html',
+            'CustomField'     => $cf,
+            'CustomFieldName' => $cf_name,
+            'ValueRef'        => \$cf_content
+        );
+
+        push @cf_values, $cf_content;
+    }
+
+    if ( @cf_values > 1 && $cf->Type eq 'Select' ) {
+        $TemplateCustomFields->{ GetCustomFieldInputName(
+                'CustomField' => $cf ) } = \@cf_values;
+    } else {
+        $TemplateCustomFields->{ GetCustomFieldInputName(
+                'CustomField' => $cf ) } = join "\n",
+            @cf_values;
+    }
+}
+
+# Insert this template's selected values into the form.
+#
+foreach my $Field ( @{ $ChosenTemplate->{'Fields'} || [] } ) {
+    if ( $Field eq 'Subject' ) {
+
+        # Load the subject.
+        $ARGSRef->{'Subject'} = $TemplateTicketObj->Subject;
+
+    } elsif ( $Field eq 'Content' ) {
+
+        # Load the content (first transaction).
+        my $FirstTransaction = $TemplateTicketObj->SortedTransactions->First;
+        my $FirstContentObj  = $FirstTransaction->ContentObj;
+
+        next if ( not defined $FirstContentObj );
+        next if ( $FirstContentObj->ContentLength <= 0 );
+
+        if (RT->Config->Get( 'MessageBoxRichText', $session{'CurrentUser'} ) )
+        {
+            $ARGSRef->{'Content'}
+                = $FirstTransaction->Content( 'Type' => 'text/html' )
+                || $FirstTransaction->Content( 'Type' => 'text/plain' );
+        } else {
+            $ARGSRef->{'Content'}
+                = $FirstTransaction->Content( 'Type' => 'text/plain' );
+        }
+
+    } elsif ( $Field eq 'Priority' ) {
+
+        # Load the priority.
+        $ARGSRef->{'InitialPriority'} = $TemplateTicketObj->Priority;
+
+    } elsif ( $Field eq 'FinalPriority' ) {
+
+        # Load the final priority.
+        $ARGSRef->{'FinalPriority'} = $TemplateTicketObj->FinalPriority;
+
+    } elsif ( $Field eq 'Requestors' ) {
+
+        # Load the requestor email addresses.
+        $ARGSRef->{'Requestors'}
+            = $TemplateTicketObj->Requestor->MemberEmailAddressesAsString();
+
+    } elsif ( $Field eq 'Cc' ) {
+
+        # Load the CC email addresses.
+        $ARGSRef->{'Cc'}
+            = $TemplateTicketObj->Cc->MemberEmailAddressesAsString();
+    } elsif ( $Field eq 'AdminCc' ) {
+
+        # Load the AdminCC email addresses.
+        $ARGSRef->{'AdminCc'}
+            = $TemplateTicketObj->AdminCc->MemberEmailAddressesAsString();
+    } elsif ( $Field =~ /^CF\.(\d+)$/ ) {
+
+        # Load a custom field.
+        my $CustomField = $TemplateTicketObj->LoadCustomFieldByIdentifier($1);
+        next if ( not defined $CustomField );
+
+        my $FormFieldName = undef;
+        $FormFieldName
+            = GetCustomFieldInputName( 'CustomField' => $CustomField );
+        $ARGSRef->{$FormFieldName} = $TemplateCustomFields->{$FormFieldName}
+            if ( ( defined $FormFieldName )
+            && ( exists $TemplateCustomFields->{$FormFieldName} ) );
+    }
+}
+
+# Redo the custom field groupings.
+#
+$m->comp(
+    '/Elements/ValidateCustomFields',
+    'CustomFields' => $TemplateTicketObj->QueueObj->TicketCustomFields,
+    'ARGSRef'      => $ARGSRef
+);
+</%INIT>

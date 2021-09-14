@@ -31,7 +31,7 @@ STATIC U8* TextMinify(pTHX_ U8* src, STRLEN len, STRLEN* packed) {
     return dest;
   }
 
-  while (len) {
+  while (len > 0) {
 
     UV c = *src;
 
@@ -42,14 +42,22 @@ STATIC U8* TextMinify(pTHX_ U8* src, STRLEN len, STRLEN* packed) {
     else {
       STRLEN skip;
       c = utf8_to_uvchr_buf(src, end, &skip);
-      if (c != 0) {
+      if (c == 0) {
+        c = *src;
+      }
+      if ((int) skip > 0) {
         src += skip;
         len -= skip;
       }
       else {
-        c = *src;
         src ++;
         len --;
+      }
+      if (len < 0) {
+        croak("UTF-8 character overflow");
+        src = end;
+        len = 0;
+        trailing = NULL;
       }
     }
 

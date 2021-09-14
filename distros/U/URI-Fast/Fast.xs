@@ -68,6 +68,21 @@ static void set_##member(pTHX_ SV *sv_uri, SV *sv_value) { \
   } \
 }
 
+// Defines a setter method that accepts an arbitrary string value and copies it
+// into the slot 'member' without changing it in any way.
+#define URI_RAW_SETTER(member) \
+static void set_raw_##member(pTHX_ SV *sv_uri, SV *sv_value) { \
+  uri_t *uri = URI(sv_uri); \
+  if (is_defined(aTHX_ sv_value)) { \
+    size_t len_value; \
+    const char *value = SvPV_const(sv_value, len_value); \
+    str_set(aTHX_ uri->member, value, len_value); \
+  } \
+  else { \
+    str_clear(aTHX_ uri->member); \
+  } \
+}
+
 // Defines a getter method that returns the raw, encoded value of the member
 // slot. If the object is an IRI, decodes utf8 characters from hex sequences if
 // present.
@@ -1145,6 +1160,42 @@ SV* get_param(pTHX_ SV* sv_uri, SV* sv_key) {
   }
 
   return newRV_noinc((SV*) out);
+}
+
+/*------------------------------------------------------------------------------
+ * Raw setters
+ -----------------------------------------------------------------------------*/
+
+URI_RAW_SETTER(scheme);
+URI_RAW_SETTER(path);
+URI_RAW_SETTER(query);
+URI_RAW_SETTER(frag);
+URI_RAW_SETTER(usr);
+URI_RAW_SETTER(pwd);
+URI_RAW_SETTER(host);
+URI_RAW_SETTER(port);
+
+static
+void set_raw_auth(pTHX_ SV *sv_uri, SV *sv_value) {
+  uri_t *uri = URI(sv_uri);
+
+  str_clear(aTHX_ uri->usr);
+  str_clear(aTHX_ uri->pwd);
+  str_clear(aTHX_ uri->host);
+  str_clear(aTHX_ uri->port);
+
+  if (is_defined(aTHX_ sv_value)) {
+    size_t vlen;
+    const char *value = SvPV_const(sv_value, vlen);
+
+    if (vlen > URI_SIZE_auth) {
+      croak("set_auth: size of auth string exceeds max of %lu", URI_SIZE_auth);
+    }
+
+    // auth isn't stored as an individual field, so just rescan from the new
+    // source string.
+    uri_scan_auth(aTHX_ uri, value, vlen);
+  }
 }
 
 /*------------------------------------------------------------------------------
@@ -2235,67 +2286,76 @@ void clear_auth(uri_obj)
     clear_auth(aTHX_ uri_obj);
 
 #-------------------------------------------------------------------------------
-# Raw getters
+# Raw accessors
 #-------------------------------------------------------------------------------
-SV* raw_scheme(uri_obj)
+SV* raw_scheme(uri_obj, ...)
   SV *uri_obj
   CODE:
+    if (items > 1) set_raw_scheme(aTHX_ uri_obj, ST(1));
     RETVAL = get_raw_scheme(aTHX_ uri_obj);
   OUTPUT:
     RETVAL
 
-SV* raw_auth(uri_obj)
+SV* raw_auth(uri_obj, ...)
   SV *uri_obj
   CODE:
+    if (items > 1) set_raw_auth(aTHX_ uri_obj, ST(1));
     RETVAL = get_raw_auth(aTHX_ uri_obj);
   OUTPUT:
     RETVAL
 
-SV* raw_path(uri_obj)
+SV* raw_path(uri_obj, ...)
   SV *uri_obj
   CODE:
+    if (items > 1) set_raw_path(aTHX_ uri_obj, ST(1));
     RETVAL = get_raw_path(aTHX_ uri_obj);
   OUTPUT:
     RETVAL
 
-SV* raw_query(uri_obj)
+SV* raw_query(uri_obj, ...)
   SV *uri_obj
   CODE:
+    if (items > 1) set_raw_query(aTHX_ uri_obj, ST(1));
     RETVAL = get_raw_query(aTHX_ uri_obj);
   OUTPUT:
     RETVAL
 
-SV* raw_frag(uri_obj)
+SV* raw_frag(uri_obj, ...)
   SV *uri_obj
   CODE:
+    if (items > 1) set_raw_frag(aTHX_ uri_obj, ST(1));
     RETVAL = get_raw_frag(aTHX_ uri_obj);
   OUTPUT:
     RETVAL
 
-SV* raw_usr(uri_obj)
+SV* raw_usr(uri_obj, ...)
   SV *uri_obj
   CODE:
+    if (items > 1) set_raw_usr(aTHX_ uri_obj, ST(1));
     RETVAL = get_raw_usr(aTHX_ uri_obj);
   OUTPUT:
     RETVAL
 
-SV* raw_pwd(uri_obj)
+SV* raw_pwd(uri_obj, ...)
   SV *uri_obj
   CODE:
+    if (items > 1) set_raw_pwd(aTHX_ uri_obj, ST(1));
     RETVAL = get_raw_pwd(aTHX_ uri_obj);
   OUTPUT:
     RETVAL
 
-SV* raw_host(uri_obj)
+SV* raw_host(uri_obj, ...)
   SV *uri_obj
   CODE:
+    if (items > 1) set_raw_host(aTHX_ uri_obj, ST(1));
     RETVAL = get_raw_host(aTHX_ uri_obj);
   OUTPUT:
     RETVAL
 
-SV* raw_port(uri_obj)
+SV* raw_port(uri_obj, ...)
   SV *uri_obj
   CODE:
+    if (items > 1) set_raw_port(aTHX_ uri_obj, ST(1));
     RETVAL = get_raw_port(aTHX_ uri_obj);
   OUTPUT:
     RETVAL

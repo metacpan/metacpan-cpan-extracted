@@ -1,0 +1,109 @@
+\=[HEADER]
+  [https://www.iana.org/assignments/message-headers/message-headers.xhtml]
+\=[CANCEL]
+  [https://www.iana.org/assignments/netnews-parameters/netnews-parameters.xhtml]
+\=[USEFOR]
+  [https://mailarchive.ietf.org/arch/browse/usefor/]
+
+\==[bolddesc] [2] [\desc[\strong[\1]][\2]]
+\==[desclink] [3] [\bolddesc[\link[\1][\2]][\3]]
+\==[draft]    [2] [\bullet(packed)[\link[drafts/\1][\2] (\size[drafts/\1])]]
+
+\heading[The Usenet Article Format and Protocols][indent]
+
+\h1[The Usenet Article Format and Protocols]
+
+\quote(short)[
+    Usenet interprets management as damage and routes around it.
+][Peter da Silva][]
+
+\h2[Standards]
+
+The current standard for the format of Usenet (Netnews) articles is
+\link[rfcs/rfc5536.txt][RFC 5536], published in November of 2009.  The
+standard for the architecture and protocols of Netnews, including how
+articles are modified and checked when traveling from system to system, is
+\link[rfcs/rfc5537.txt][RFC 5537], published at the same time.  I was the
+document editor for RFC 5537.  Both of these documents are built on
+\link[rfcs/rfc5322.txt][RFC 5322], the current standard for mail messages.
+Netnews articles are compliant mail messages with some additional fields
+and a few additional restrictions.
+
+These RFCs obsolete the previous standard for the format of Usenet
+articles, \link[rfcs/rfc1036.txt][RFC 1036], and the draft document known
+as "Son-of-1036" which was published as \link[rfcs/rfc1849.txt][RFC 1849].
+All software should now follow the newer standards, but RFC 1036 and RFC
+1849 may be of interest in understanding the behavior of older standards.
+
+There is one additional Netnews-specific RFC: \link[rfcs/rfc8315.txt][RFC
+8315], which standardizes Cancel-Locks for Netnews articles.
+
+See my \link[rfcs/][Netnews standards index] for a hopefully-complete list
+of Netnews-related standards, and the \link[\=USEFOR][usefor] mailing list
+archives for the discussion that led up to the current documents.
+
+\h2[Header Registry]
+
+Usenet (Netnews) articles use the same basic header format as e-mail
+messages and HTTP headers and share the same \link[\=HEADER][IANA registry
+for header field names].  Most of the references here for Netnews header
+field names are to the current article format standards.
+
+There is a separate \link[\=CANCEL][IANA registry for parameters specific
+to Netnews], currently used only by Cancel-Lock hash algorithms.
+
+\h2[Protocol Drafts]
+
+Four Netnews-related drafts were never published as RFCs but may be of
+interest:
+
+\draft[draft-ietf-usefor-useage-01.txt]
+      [Usenet Best Practice]
+\draft[draft-ietf-usefor-message-id-01.txt]
+      [Recommendations for Generating Message IDs]
+\draft[draft-ietf-usefor-posted-mailed-01.txt]
+      [Identification of Messages Delivered Via Both Mail and News]
+\draft[draft-lindsey-usefor-signed-01.txt]
+      [Signed Headers in Mail and Netnews]
+
+If you're curious about the history of these documents, or want to see the
+other drafts that have gone into the working group discussions, you can
+review my \link[drafts/][draft archive].  I may have missed a few, but
+most of them should be here.  Also see the IETF Internet-Draft search for
+\link[https://tools.ietf.org/id/draft-ietf-usefor][USEFOR working group
+drafts].
+
+\h2[Other Documents]
+
+\desc[\link[other/moderators-handbook][Netnews Moderator's Handbook]][
+    This is a set of best-practice guidelines for Netnews moderators
+    written back in 1994.  This was intended to be published as an RFC,
+    but was never completed.  Some of the advice is out of date, but much
+    of this information is still relevant.
+]
+
+\desc[\link[other/pgpmoose][PGP Moose]][
+    The PGP Moose protocol specifies a mechanism for signing articles
+    including certain key headers so that the resulting signature can
+    be used to check several key header fields and the newsgroups to which
+    the article was posted.  This protocol is used primarily to validate
+    approvals to moderated groups.
+
+    This document is the original README by Greg Rose that accompanied the
+    reference implementation of PGP Moose.  The canonical version is on
+    \link[http://seer-grog.net/][Greg Rose's web site].
+]
+
+\desc[\link[other/pgpverify][Signing Control Messages (pgpverify)]][
+    The pgpverify protocol is another protocol for signing a Usenet
+    article that includes a different set of metadata and header fields
+    than the PGP Moose protocol.  It's used primarily (and very widely) to
+    authenticate control messages.
+
+    This document is the FORMAT document for the pgpcontrol software.  The
+    canonical version is in the
+    \link[ftp://ftp.isc.org/pub/pgpcontrol/FORMAT][pgpcontrol distribution
+    site].
+]
+
+\signature

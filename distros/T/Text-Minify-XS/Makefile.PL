@@ -26,11 +26,12 @@ my %WriteMakefileArgs = (
     "Encode" => 0,
     "File::Spec" => 0,
     "Module::Metadata" => 0,
+    "Test::Exception" => "0.41",
     "Test::More" => "1.302183",
     "Test::Warnings" => 0,
     "utf8" => 0
   },
-  "VERSION" => "v0.4.3",
+  "VERSION" => "v0.4.6",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,6 +43,7 @@ my %FallbackPrereqs = (
   "Exporter" => 0,
   "File::Spec" => 0,
   "Module::Metadata" => 0,
+  "Test::Exception" => "0.41",
   "Test::More" => "1.302183",
   "Test::Warnings" => 0,
   "XSLoader" => 0,

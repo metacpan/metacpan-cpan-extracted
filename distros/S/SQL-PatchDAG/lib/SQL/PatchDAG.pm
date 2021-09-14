@@ -2,7 +2,7 @@ use strict; use warnings;
 
 package SQL::PatchDAG;
 
-our $VERSION = '0.100';
+our $VERSION = '0.102';
 
 use File::Spec ();
 use Fcntl ();
@@ -30,7 +30,7 @@ sub open :method {
 	my ( $self, $name, $do_rw ) = ( shift, @_ );
 	die "Bad patch name '$name'\n" if $name !~ /\A[a-z0-9_][a-z0-9_-]*\z/;
 	my $fn = File::Spec->catfile( $self->dir, "$name.sql" );
-	my $mode = $do_rw ? Fcntl::O_RDWR | Fcntl::O_CREAT : Fcntl::O_RDONLY;
+	my $mode = $do_rw ? Fcntl::O_RDWR() | Fcntl::O_CREAT() : Fcntl::O_RDONLY();
 	sysopen my $fh, $fn, $mode  or die "Couldn't open '$fn': $!\n";
 	binmode $fh, $self->binmode or die "Couldn't binmode '$fn': $!\n";
 	( $fn, $fh );
@@ -115,7 +115,7 @@ sub create {
 sub run {
 	my $self = shift;
 
-	my $fn
+	my ( $fn )
 		= @_ == 1 && $_[0] !~ /^-/ ? $self->create( $_[0] )
 		: @_ == 2 && $_[0] eq '-r' ? $self->create( $_[1], 'recreate' )
 		: @_ == 2 && $_[0] eq '-e' ? $self->open( $_[1] )
@@ -124,8 +124,10 @@ sub run {
 	die "No editor to run, EDITOR environment variable unset\n"
 		if do { no warnings 'uninitialized'; '' eq $ENV{'EDITOR'} };
 
-	exec $ENV{'EDITOR'}, $fn;
+	$self->_exec( $ENV{'EDITOR'}, $fn );
 }
+
+sub _exec { shift; exec { $_[0] } @_ }
 
 1;
 

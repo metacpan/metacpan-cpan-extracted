@@ -5,10 +5,12 @@
 #-------------------------------------------------------------------------------
 # podDocumentation
 # Finished in 13.14s, bytes: 2,655,008, execs: 465,858
+# Can we remove more Pushr  by doing one big save in parseutf8 ?
 # abcdefghijklmnopqrstuvwxyz
 # 0123    456789ABCDEF
+# Waiting on quarks
 package Unisyn::Parse;
-our $VERSION = "20210830";
+our $VERSION = "20210915";
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess cluck);
@@ -18,29 +20,40 @@ use Nasm::X86 qw(:all);
 use feature qw(say current_sub);
 use utf8;
 
-my  $develop = -e q(/home/phil/);                                               # Developing
-our $arena;                                                                     # We always reload the actual arena address from rax and so this is permissible
-our $debug   = 0;                                                               # Print evolution of stack if true.
+my  $develop    = -e q(/home/phil/);                                            # Developing
+#our $arena;                                                                    # We always reload the actual arena address from rax and so this is permissible
+our %parameters;                                                                # A copy of the parameter list parsed into the parser so that all the related subroutines can see it. The alternative would have been to code these subroutines as my subs but this makes it much harder to test them.  As parses are not interrupted by other parses reentrancy is not a problem.
+our $Parse;                                                                     # The latest parse request
+our $Quarks;                                                                    # The quarks associated with this parse
+our $Operators;                                                                 # The subQuarks associated with this parse
+our $debug      = 0;                                                            # Print evolution of stack if true.
 
 #D1 Create                                                                      # Create a Unisyn parse of a utf8 string.
 
-sub create($)                                                                   # Create a new unisyn parse from a utf8 string.
- {my ($address) = @_;                                                           # Address of utf8 source string to parse as a variable
-  @_ == 1 or confess;
+sub create($%)                                                                  # Create a new unisyn parse from a utf8 string.
+ {my ($address, %options) = @_;                                                 # Address of a zero terminated utf8 source string to parse as a variable, parse options.
+  @_ >= 1 or confess "One or more parameters";
 
-  my $a    = $arena = CreateArena;                                              # Arena to hold parse tree - every parse tree gets its own arena so that we can free parses separately
+  my $a    = CreateArena;                                                       # Arena to hold parse tree - every parse tree gets its own arena so that we can free parses separately
   my $size = StringLength string => $address;                                   # Length of input utf8
 
-  my $p = genHash(__PACKAGE__,                                                  # Description of parse
-     arena          => $a,                                                      # Arena containing tree
-     size8          => $size,                                                   # Size of source string as utf8
-     address8       => $address,                                                # Address of source string as utf8
-     source32       => V(source32),                                             # Source text as utf32
-     sourceSize32   => V(sourceSize32),                                         # Size of utf32 allocation
-     sourceLength32 => V(sourceLength32),                                       # Length of utf32 string
-     parse          => V('parse'),                                              # Offset to the head of the parse tree
-     fails          => V('fail'),                                               # Number of failures encountered in this parse
+  my $p = $Parse   = genHash(__PACKAGE__,                                       # Description of parse
+    arena          => $a,                                                       # Arena containing tree
+    size8          => $size,                                                    # Size of source string as utf8
+    address8       => $address,                                                 # Address of source string as utf8
+    source32       => V(source32),                                              # Source text as utf32
+    sourceSize32   => V(sourceSize32),                                          # Size of utf32 allocation
+    sourceLength32 => V(sourceLength32),                                        # Length of utf32 string
+    parse          => V('parse'),                                               # Offset to the head of the parse tree
+    fails          => V('fail'),                                                # Number of failures encountered in this parse
+    quarks         => $a->CreateQuarks,                                         # Quarks representing the strings used in this parse
+    operators      => undef,                                                    # Methods implementing each lexical operator
    );
+
+  if (my $o = $options{operators})                                              # Operator methods for lexical items
+   {$p->operators = $a->CreateSubQuarks;                                        # Create quark set to translate operator names to offsets
+    $o->($p);
+   }
 
   $p->parseUtf8;                                                                # Parse utf8 source string
 
@@ -59,7 +72,7 @@ our $element          = r13;                                                    
 our $start            = r14;                                                    # Start of the parse string
 our $size             = r15;                                                    # Length of the input string
 our $parseStackBase   = rsi;                                                    # The base of the parsing stack in the stack
-our $arenaReg         = rax;                                                    # The arena in which we are building the parse tree
+#ur $arenaReg         = rax;                                                    # The arena in which we are building the parse tree
 our $indexScale       = 4;                                                      # The size of a utf32 character
 our $lexCodeOffset    = 3;                                                      # The offset in a classified character to the lexical code.
 our $bitsPerByte      = 8;                                                      # The number of bits in a byte
@@ -79,10 +92,20 @@ our $variable         = $$Lex{lexicals}{variable}        {number};              
 our $WhiteSpace       = $$Lex{lexicals}{WhiteSpace}      {number};              # Variable
 our $firstSet         = $$Lex{structure}{first};                                # First symbols allowed
 our $lastSet          = $$Lex{structure}{last};                                 # Last symbols allowed
-our $bracketsBase     = $$Lex{bracketsBase};                                    # BAse lexical item for brackets
+our $bracketsBase     = $$Lex{bracketsBase};                                    # Base lexical item for brackets
 
 our $asciiNewLine     = ord("\n");                                              # New line in ascii
 our $asciiSpace       = ord(' ');                                               # Space in ascii
+
+our $lexItemType      = 0;                                                      # Field number of lexical item type in the description of a lexical item
+our $lexItemOffset    = 1;                                                      # Field number of the offset in the utf32 source of the lexical item in the description of a lexical item or - if this a term - the offset of the invariant first block of the sub tree
+our $lexItemLength    = 2;                                                      # Field number of the length of the lexical item in the utf32 source in the description of a lexical item
+our $lexItemQuark     = 3;                                                      # Quark containing the text of this lexical item.
+our $lexItemWidth     = 4;                                                      # The number of fields used to describe a lexical item  in the parse tree
+
+our $opType           = 0;                                                      # Operator type field - currently always a term
+our $opCount          = 1;                                                      # Number of operands for this operator
+our $opSub            = 2;                                                      # Offset of sub associated with this lexical item
 
 sub getAlpha($$$)                                                               #P Load the position of a lexical item in its alphabet from the current character.
  {my ($register, $address, $index) = @_;                                        # Register to load, address of start of string, index into string
@@ -96,7 +119,6 @@ sub getLexicalCode($$$)                                                         
 
 sub putLexicalCode($$$$)                                                        #P Put the specified lexical code into the current character in memory.
  {my ($register, $address, $index, $code) = @_;                                 # Register used to load code, address of string, index into string, code to put
-  defined($code) or confess;
   Mov $register, $code;
   Mov "[$address+$indexScale*$index+$lexCodeOffset]", $register;                # Save lexical code
  }
@@ -170,51 +192,137 @@ sub lexicalNumberFromLetter($)                                                  
   $N
  }
 
+sub lexicalItemLength($$)                                                       #P Put the length of a lexical item into variable B<size>.
+ {my ($source32, $offset) = @_;                                                 # B<address> of utf32 source representation, B<offset> to lexical item in utf32
+
+  my $s = Subroutine
+   {my ($p, $s) = @_;                                                           # Parameters
+#   PushR r14, r15;                                                             # We do not need to save the zmm and mask registers because they are only used as temporary work registers and they have been saved in L<parseUtf8>
+
+    $$p{source32}->setReg(r14);
+    $$p{offset}  ->setReg(r15);
+    Vmovdqu8 zmm0, "[r14+4*r15]";                                               # Load source to examine
+    Pextrw r15, xmm0, 1;                                                        # Extract lexical type of first element
+
+    OrBlock                                                                     # The size of a bracket or a semi colon is always 1
+     {my ($pass, $end, $start) = @_;
+      Cmp r15, $OpenBracket;
+      Je  $pass;
+      Cmp r15, $CloseBracket;
+      Je  $pass;
+      Cmp r15, $semiColon;
+      Je  $pass;
+
+      Vpbroadcastw zmm1, r15w;                                                  # Broadcast lexical type
+      Vpcmpeqw k0, zmm0, zmm1;                                                  # Check extent of first lexical item up to 16
+      Mov r15, 0x55555555;                                                      # Set odd positions to one where we know the match will fail
+      Kmovq k1, r15;
+      Korq k2, k0, k1;                                                          # Fill in odd positions
+
+      Kmovq r15, k2;
+      Not r15;                                                                  # Swap zeroes and ones
+      Tzcnt r15, r15;                                                           # Trailing zero count is a factor two too big
+      Shr r15, 1;                                                               # Normalized count of number of characters in lexical item
+      $$p{size}->getReg(r15);                                                   # Save size in supplied variable
+     }
+    Pass                                                                        # Show unitary length
+     {my ($end, $pass, $start) = @_;
+      $$p{size}->getConst(1);                                                   # Save size in supplied variable
+     };
+
+#   PopR;
+   } [qw(offset source32 size)],
+  name => q(Unisyn::Parse::lexicalItemLength);
+
+  $s->call(offset => $offset, source32 => $source32, my $size = V(size));
+
+  $size
+ }
+
 sub new($$)                                                                     #P Create a new term in the parse tree rooted on the stack.
  {my ($depth, $description) = @_;                                               # Stack depth to be converted, text reason why we are creating a new term
+  Comment "New start";
   PrintErrStringNL "New: $description" if $debug;
 
-  $arena->bs->getReg($arenaReg);                                                # Address arena
-  my $t = $arena->CreateTree;                                                   # Create a tree in the arena to hold the details of the lexical elements on the stack
-  my $d = V(data);
-  $t->insert(V(key, 0), V(data, $term));                                        # Create a term - we only have terms at the moment in the parse tee - but that might change in the future
-  $t->insert(V(key, 1), V(data, $depth));                                       # The number of elements in the term
+  my $a = DescribeArena $parameters{bs};                                        # Create a tree in the arena to hold the details of the lexical elements on the stack
+  my $t = $a->CreateTree;                                                       # Create a tree in the arena to hold the details of the lexical elements on the stack
+  my $o = V(offset);                                                            # Offset into source for lexical item
+  $t->insert(V(key, $opType),  V(data, $term));                                 # Create a term - we only have terms at the moment in the parse tree - but that might change in the future
+  $t->insert(V(key, $opCount), V(data, $depth));                                # The number of elements in the term which is the number of operands for the operator
+
+  my $liOnStack = $w1;                                                          # The lexical item as it appears on the stack
+  my $liType    = $w2;                                                          # The lexical item type
+  my $liOffset  = $w3;                                                          # The lexical item offset in the source
 
   for my $i(1..$depth)                                                          # Each term,
    {my $j = $depth + 1 - $i;
-    Pop $w1;                                                                    # Unload stack
-    PrintErrRegisterInHex $w1 if $debug;
+    Pop $liOnStack;                                                             # Unload stack
+    PrintErrRegisterInHex $liOnStack if $debug;
 
-    Mov $w2, $w1;
-    Shr $w2, 32;                                                                # Offset in source
-    $d->getReg($w2);                                                            # Offset in source in lower dword
+    Mov $liOffset, $liOnStack;                                                  # Offset of either the text in the source or the offset of the first block of the tree describing a term
+    Shr $liOffset, 32;                                                          # Offset in source: either the actual text of the offset of the first block of the tree containing a term shifted over to look as if it were an offset in the source
+    $o->getReg($liOffset);                                                      # Offset of lexical item in source or offset of first block in tree describing a term
 
-    Cmp $w1."b", $term;                                                         # Check whether the lexical item on the stack is a term
+    ClearRegisters $liType;
+    Mov $liType."b", $liOnStack."b";                                            # The lexical item type in the lowest byte, the rest clear.
+
+    Cmp $liType, $term;                                                         # Check whether the lexical item on the stack is a term
     IfEq                                                                        # Insert a sub tree if we are inserting a term
     Then
-     {$t->insertTree(V(key, 2 * $j + 1), $d);                                   # A reference to another term
+     {$t->insertTree(V(key, $lexItemWidth * $j + $lexItemOffset), $o);          # Offset of first block in the tree representing the term
      },
     Else                                                                        # Insert the offset in the utf32 source if we are not on a term
-     {$t->insert    (V(key, 2 * $j + 1), $d);                                   # Offset in source
+     {$t->insert    (V(key, $lexItemWidth * $j + $lexItemOffset), $o);          # Offset in source of non term
      };
 
-    Cmp $w1."b", $variable;                                                     # Check whether the lexical item is a variable which can also represent ascii
+    Cmp $liType, $variable;                                                     # Check whether the lexical item is a variable which can also represent ascii
     IfEq                                                                        # Insert a sub tree if we are inserting a term
     Then
-     {ClearRegisters $w1;
-      Mov $w1."b", "[$start+4*$w2+3]";
+     {Mov $liType."b", "[$start+4*$liOffset+3]";                                # Load lexical type from source
      };
-    $d->getReg($w1);                                                            # Lexical type
-    $t->insert      (V(key, 2 * $j    ), $d);                                   # Save lexical type in parse tree
-   }
 
-  $t->first->setReg($w1);                                                       # Term
-  Shl $w1, 32;                                                                  # Push offset to tree into the upper dword
-  Or  $w1."b", $term;                                                           # Mark as a term tree
-  Push $w1;                                                                     # Place new term on stack
+    Cmp $liType, $term;                                                         # Length of lexical item that is not a term
+    IfNe
+    Then                                                                        # Not a term
+     {my $size = lexicalItemLength(V(address, $start), $o);                     # Get the size of the lexical item at the offset indicated on the stack
+      $t->insert(V(key, $lexItemWidth * $j + $lexItemLength), $size);           # Save size of lexical item in parse tree
+
+      my $s = CreateShortString(0);                                             # Short string to hold text of lexical item so we can load it into a quark
+      PushR r15;
+      r15 ne $start && r15 ne $liOffset or confess "r15 in use";
+      Lea r15, "[$start+4*$liOffset]";                                          # Start address of lexical item
+      my $start = V(address, r15);                                              # Save start address of lexical item
+      PopR;
+#     $s->loadDwordBytes(0, $start, $size);                                     # Load text of lexical item into short string
+      $s->loadDwordBytes(0, $start, $size, 1);                                  # Load text of lexical item into short string
+      Pinsrb "xmm0", $liType."b", 1;                                            # Set lexical type as the first byte of the short string
+
+      my $q = $Quarks->quarkFromShortString($s);
+      $t->insert(V(key, $lexItemWidth * $j + $lexItemQuark), $q);               # Save quark number of lexical item in parse tree
+
+      if ($Operators)                                                           # The parse has operator definitions
+       {if ($j == 1)                                                            # The operator quark is always first
+         {my $N = $Operators->subFromQuark($Quarks, $q);                        # Look up the subroutine associated with this operator
+          If $N >= 0,                                                           # Found a matching operator subroutine
+          Then
+           {$t->insert(V(key, $opSub), $N);                                     # Save offset to subroutine associated with this lexical item
+           };
+         }
+       }
+     };
+
+    $t->insert  (V(key, $lexItemWidth * $j + $lexItemType),                     # Save lexical type in parse tree
+                 V(data)->getReg($liType));
+   }
+                                                                                # Push new term onto the stack in place of the items popped off
+  $t->first->setReg($liOffset);                                                 # Offset of new term tree
+  Shl $liOffset, 32;                                                            # Push offset to term tree into the upper dword to make it look like a source offset
+  Or  $liOffset."b", $term;                                                     # Mark as a term tree
+  Push $liOffset;                                                               # Place new term on stack
+  Comment "New end";
  }
 
-sub error($)                                                                    #P Die.
+sub error($)                                                                    #P Write an error message and stop.
  {my ($message) = @_;                                                           # Error message
   PrintOutStringNL "Error: $message";
   PrintOutString "Element: ";
@@ -302,7 +410,6 @@ sub reduce($)                                                                   
          };
        };
      };
-#   KeepFree $l, $d, $r;
    };
 
   checkStackHas 2;                                                              # At least two elements on the stack
@@ -450,7 +557,7 @@ sub accept_v                                                                    
     });
   }
 
-sub parseExpressionCode()                                                       #P Parse the string of classified lexical items addressed by register $start of length $length.  The resulting parse tree (if any) is returned in r15.
+sub parseExpression()                                                           #P Parse the string of classified lexical items addressed by register $start of length $length.  The resulting parse tree (if any) is returned in r15.
  {my $end = Label;
   my $eb  = $element."b";                                                       # Contains a byte from the item being parsed
 
@@ -551,35 +658,11 @@ END
   Pop r15;                                                                      # The resulting parse tree
   Shr r15, 32;                                                                  # The offset of the resulting parse tree
   SetLabel $end;
- } # parseExpressionCode
-
-sub parseExpression(@)                                                          #P Create a parser for an expression described by variables.
- {my (@parameters) = @_;                                                        # Parameters describing expression
-
-  my $s = Subroutine
-   {my ($p) = @_;                                                               # Parameters
-    PushR $parseStackBase, map {"r$_"} 8..15;
-    $$p{source}->setReg($start);                                                # Start of expression string after it has been classified
-    $$p{size}  ->setReg($size);                                                 # Number of characters in the expression
-
-    Mov $parseStackBase, rsp;                                                   # Set base of parse stack
-
-    parseExpressionCode;
-
-    $$p{parse}->getReg(r15);                                                    # Number of characters in the expression
-
-    Mov rsp, $parseStackBase;                                                   # Remove parse stack
-                                                                                # Remove new frame
-    PopR;
-   } [qw(source size parse)], name => q(Unisyn::Parse::parse);
-
-
-  $s->call(@parameters);
- } # parse
+ } # parseExpression
 
 sub MatchBrackets(@)                                                            #P Replace the low three bytes of a utf32 bracket character with 24 bits of offset to the matching opening or closing bracket. Opening brackets have even codes from 0x10 to 0x4e while the corresponding closing bracket has a code one higher.
  {my (@parameters) = @_;                                                        # Parameters
-  @_ >= 1 or confess;
+  @_ >= 1 or confess "One or more parameters";
 
   my $s = Subroutine
    {my ($p) = @_;                                                               # Parameters
@@ -651,7 +734,7 @@ sub MatchBrackets(@)                                                            
 
 sub ClassifyNewLines(@)                                                         #P Scan input string looking for opportunities to convert new lines into semi colons.
  {my (@parameters) = @_;                                                        # Parameters
-  @_ >= 1 or confess;
+  @_ >= 1 or confess "One or more parameters";
 
   my $s = Subroutine
    {my ($p) = @_;                                                               # Parameters
@@ -753,7 +836,7 @@ sub ClassifyNewLines(@)                                                         
 
 sub ClassifyWhiteSpace(@)                                                       #P Classify white space per: "lib/Unisyn/whiteSpace/whiteSpaceClassification.pl".
  {my (@parameters) = @_;                                                        # Parameters
-  @_ >= 1 or confess;
+  @_ >= 1 or confess "One or more parameters";
 
   my $s = Subroutine
    {my ($p) = @_;                                                               # Parameters
@@ -955,15 +1038,25 @@ sub ClassifyWhiteSpace(@)                                                       
  } # ClassifyWhiteSpace
 
 sub parseUtf8($@)                                                               #P Parse a unisyn expression encoded as utf8 and return the parse tree.
- {my ($p, @parameters) = @_;                                                    # Parse, parameters
-  @_ >= 1 or confess;
+ {my ($parse, @parameters) = @_;                                                # Parse, parameters
+  @_ >= 1 or confess "One or more parameters";
 
   my $s = Subroutine
    {my ($p) = @_;                                                               # Parameters
+    %parameters = %$p;                                                          # Make the parameters available in all the called parse subroutines.
+
+    $Quarks =  $parse->quarks->reload(arena => $$p{bs},                         # Reload the quarks because the quarks used to create this subroutine might not be the same as the quarks that are reusing it now.
+      array => $$p{numbersToStringsFirst},
+      tree  => $$p{stringsToNumbersFirst});
+
+    $Operators =  $parse->operators->reload(arena => $$p{bs},                   # Reload the subQuarks because the subQuarks used to create this subroutine might not be the same as the subQuarks that are reusing it now.
+      array => $$p{opNumbersToStringsFirst},
+      tree  => $$p{opStringsToNumbersFirst}) if $parse->operators;
 
     PrintErrStringNL "ParseUtf8" if $debug;
 
-    PushR $arenaReg; PushZmm 0..1;                                              # Used to hold arena and classifiers
+    PushR $parseStackBase, map {"r$_"} 8..15;
+    PushZmm 0..1; PushMask 0..2;                                                # Used to hold arena and classifiers. Zmm0 is used to as a short string to quark the lexical item strings.
 
     my $source32       = $$p{source32};
     my $sourceSize32   = $$p{sourceSize32};
@@ -1021,83 +1114,127 @@ sub parseUtf8($@)                                                               
       PrintUtf32($sourceLength32, $source32);
      }
 
-    $$p{arena}->setReg($arenaReg);                                              # Rather than passing the arena as a parameter to all the parsing routines we put it in rax and access it from there when needed
-    parseExpression source=>$source32, size=>$sourceLength32, $$p{parse};
+    $$p{source32}      ->setReg($start);                                        # Start of expression string after it has been classified
+    $$p{sourceLength32}->setReg($size);                                         # Number of characters in the expression
+    Mov $parseStackBase, rsp;                                                   # Set base of parse stack
+
+    parseExpression;                                                            # Parse the expression
+
+    $$p{parse}->getReg(r15);                                                    # Number of characters in the expression
+    Mov rsp, $parseStackBase;                                                   # Remove parse stack
 
     $$p{parse}->errNL if $debug;
 
-    PopZmm; PopR;
-   } [qw(arena address size parse fail source32 sourceSize32 sourceLength32)],
+    PopMask; PopZmm; PopR;
+
+   }
+  [qw(bs address size parse fail source32 sourceSize32 sourceLength32),
+   qw(numbersToStringsFirst stringsToNumbersFirst),
+   qw(opNumbersToStringsFirst opStringsToNumbersFirst)],
   name => q(Unisyn::Parse::parseUtf8);
 
-  $s->call(arena          => $p->arena->bs,
-           address        => $p->address8,
-           size           => $p->size8,
-           source32       => $p->source32,
-           sourceSize32   => $p->sourceSize32,
-           sourceLength32 => $p->sourceLength32,
-           parse          => $p->parse,
-           fail           => $p->fails);
+  my $op = $parse->operators;                                                   # The operator methods if supplied
+  my $zero = K(zero, 0);
+
+  $s->call                                                                      # Parameterize the parse
+   (bs                      => $parse->arena->bs,
+    address                 => $parse->address8,
+    fail                    => $parse->fails,
+    parse                   => $parse->parse,
+    size                    => $parse->size8,
+    source32                => $parse->source32,
+    sourceLength32          => $parse->sourceLength32,
+    sourceSize32            => $parse->sourceSize32,
+    numbersToStringsFirst   => $parse->quarks->numbersToStrings->first,
+    stringsToNumbersFirst   => $parse->quarks->stringsToNumbers->first,
+    opNumbersToStringsFirst => $op ? $op->subQuarks->numbersToStrings->first : $zero,
+    opStringsToNumbersFirst => $op ? $op->subQuarks->stringsToNumbers->first : $zero,
+   );
  } # parseUtf8
+
+#D1 Traverse                                                                    # Traverse the parse tree
+
+sub traverseTermsAndCall($)                                                     # Traverse the terms in parse tree in post order and call the operator subroutine associated with each term.
+ {my ($parse) = @_;                                                             # Parse tree
+
+  my $s = Subroutine                                                            # Print a tree
+   {my ($p, $s) = @_;                                                           # Parameters, sub definition
+    my $t = Nasm::X86::DescribeTree (arena=>$$p{bs}, first=>$$p{first});
+
+    $t->find(K(key, $opType));                                                  # The lexical type of the element - normally a term
+
+    If $t->found == 0,                                                          # Not found lexical type of element
+    Then
+     {PrintOutString "No type for node";
+      Exit(1);
+     };
+
+    If $t->data != $term,                                                       # Expected a term
+    Then
+     {PrintOutString "Expected a term";
+      Exit(1);
+     };
+
+    my $operands = V(operands);                                                 # Number of operands
+    $t->find(K(key, 1));                                                        # Key 1 tells us the number of operands
+    If $t->found > 0,                                                           # Found key 1
+    Then
+     {$operands->copy($t->data);                                                # Number of operands
+     },
+    Else
+     {PrintOutString "Expected at least one operand";
+      Exit(1);
+     };
+
+    $operands->for(sub                                                          # Each operand
+     {my ($index, $start, $next, $end) = @_;                                    # Execute body
+      my $i = (1 + $index) * $lexItemWidth;                                     # Operand detail
+      $t->find($i+$lexItemType);   my $lex = V(key) ->copy($t->data);           # Lexical type
+      $t->find($i+$lexItemOffset); my $off = V(key) ->copy($t->data);           # Offset of first block of sub tree
+
+      If $lex == $term,                                                         # Term
+      Then
+       {$s->call($$p{bs}, first => $off);                                       # Traverse sub tree referenced by offset field
+        $t->first  ->copy($$p{first});                                          # Re-establish addressability to the tree after the recursive call
+       },
+     });
+
+
+    $t->find(K(key, $opSub));                                                   # The subroutine for the term
+    If $t->found > 0,                                                           # Found subroutine for term
+    Then                                                                        # Call subroutine for this term
+     {PushR r15, zmm0;
+      my $l = RegisterSize rax;
+      $$p{bs}   ->putQIntoZmm(0, 0*$l, r15);
+      $$p{first}->putQIntoZmm(0, 1*$l, r15);
+      $t->data  ->setReg(r15);
+      Cmp r15, 0;
+      IfGt
+      Then
+       {Call r15;
+       };
+      PopR;
+     },
+    Else                                                                        # Missing subroutine for term
+     {#PrintOutStringNL "No sub for term";
+     };
+
+   } [qw(bs first)], name => "Nasm::X86::Tree::traverseTermsAndCall";
+
+  $s->call($parse->arena->bs, first => $parse->parse);
+
+  $a
+ } # traverseTermsAndCall
 
 #D1 Print                                                                       # Print a parse tree
 
-sub lexicalItemLength($$$)                                                      #P Put the length of a lexical item into variable B<size>.
- {my ($parse, $source32, $offset) = @_;                                         # Parse tree, variable address of utf32 source representation, variable offset to lexical item in utf32
-
-  my $s = Subroutine
-   {my ($p, $s) = @_;                                                           # Parameters
-    PushR zmm0, zmm1, k0, k1, k2, r14, r15;
-
-    $$p{source32}->setReg(r14);
-    $$p{offset}  ->setReg(r15);
-    Vmovdqu8 zmm0, "[r14+4*r15]";                                               # Load source to examine
-    Pextrw r15, xmm0, 1;                                                        # Extract lexical type of first element
-
-    OrBlock                                                                     # The size of a bracket or a semi colon is always 1
-     {my ($pass, $end, $start) = @_;
-      Cmp r15, $OpenBracket;
-      Je  $pass;
-      Cmp r15, $CloseBracket;
-      Je  $pass;
-      Cmp r15, $semiColon;
-      Je  $pass;
-
-      Vpbroadcastw zmm1, r15w;                                                  # Broadcast lexical type
-      Vpcmpeqw k0, zmm0, zmm1;                                                  # Check extent of first lexical item up to 16
-      Mov r15, 0x55555555;                                                      # Set odd positions to one where we know the match will fail
-      Kmovq k1, r15;
-      Korq k2, k0, k1;                                                          # Fill in odd positions
-
-      Kmovq r15, k2;
-      Not r15;                                                                  # Swap zeroes and ones
-      Tzcnt r15, r15;                                                           # Trailing zero count is a factor two too big
-      Shr r15, 1;                                                               # Normalized count of number of characters in lexical item
-      $$p{size}->getReg(r15);                                                   # Save size in supplied variable
-     }
-    Pass                                                                        # Show unitary length
-     {my ($end, $pass, $start) = @_;
-      $$p{size}->getConst(1);                                                   # Save size in supplied variable
-     };
-
-    PopR;
-   } [qw(offset source32 size)],
-  name => q(Unisyn::Parse::lexicalItemLength);
-
-  $s->call(offset => $offset, source32 => $source32, my $size = V(size));
-
-  $size
- }
-
-sub printLexicalItem($$$)                                                       #P Print the utf8 string corresponding to a lexical item at a variable offset.
- {my ($parse, $source32, $offset) = @_;                                         # Parse tree, variable address of utf32 source representation, variable offset to lexical item in utf32
+sub printLexicalItem($$$$)                                                      #P Print the utf8 string corresponding to a lexical item at a variable offset.
+ {my ($parse, $source32, $offset, $size) = @_;                                  # Parse tree, B<address> of utf32 source representation, B<offset> to lexical item in utf32, B<size> in utf32 chars of item
   my $t = $parse->arena->DescribeTree;
 
   my $s = Subroutine
    {my ($p, $s) = @_;                                                           # Parameters
     PushR r12, r13, r14, r15;
-
-    my $l = $parse->lexicalItemLength($$p{source32}, $$p{offset});
 
     $$p{source32}->setReg(r14);
     $$p{offset}  ->setReg(r15);
@@ -1173,7 +1310,7 @@ sub printLexicalItem($$$)                                                       
 
     SetLabel $print;                                                            # Decoded
 
-    $l->for(sub                                                                 # Write each letter out from its position on the stack
+    $$p{size}->for(sub                                                          # Write each letter out from its position on the stack
      {my ($index, $start, $next, $end) = @_;                                    # Execute body
       $index->setReg(r14);                                                      # Index stack
       ClearRegisters r15;                                                       # Next instruction does not clear the entire register
@@ -1186,42 +1323,13 @@ sub printLexicalItem($$$)                                                       
     SetLabel $success;                                                          # Done
 
     PopR;
-   } [qw(offset source32)],
+   } [qw(offset source32 size)],
   name => q(Unisyn::Parse::printLexicalItem);
 
-  $s->call(offset => $offset, source32 => $source32);
+  $s->call(offset => $offset, source32 => $source32, size => $size);
  }
 
-sub printBrackets($$$)                                                          #P Print the utf8 string corresponding to a lexical item at a variable offset.
- {my ($parse, $source32, $offset) = @_;                                         # Parse tree, variable address of utf32 source representation, variable offset to lexical item in utf32
-  my $t = $parse->arena->DescribeTree;
-
-  my $s = Subroutine
-   {my ($p, $s) = @_;                                                           # Parameters
-    PushR rax, rdi, r14, r15;
-
-    $$p{source32}->setReg(r14);
-    $$p{offset}  ->setReg(r15);
-    Mov r15b, "[r14+4*r15+3]";                                                  # Bracket number
-
-    my $o = $Lex->{bracketsOpen};                                               # Opening brackets
-    my $c = $Lex->{bracketsClose};                                              # Closing brackets
-    my $O = Rutf8 map {($_, chr(0))} @$o;                                       # Brackets in 3 bytes of utf8 each, with each bracket followed by a zero to make 4 bytes which is more easily addressed
-    my $C = Rutf8 map {($_, chr(0))} @$c;                                       # Brackets in 3 bytes of utf8 each, with each bracket followed by a zero to make 4 bytes which is more easily addressed
-    Mov r14, $O;                                                                # Address open bracket
-    Lea rax, "[r14+4*r15]";
-    PrintOutUtf8Char;                                                           # Print opening bracket
-    Mov r14, $C;                                                                # Address close bracket
-    Lea rax, "[r14+4*r15]";                                                     # Closing brackets occupy 3 bytes
-    PrintOutUtf8Char;                                                           # Print closing bracket
-    PopR;
-   } [qw(offset source32)],
-  name => q(Unisyn::Parse::printBrackets);
-
-  $s->call(offset => $offset, source32 => $source32);
- }
-
-sub print($)                                                                    # Create a parser for an expression described by variables.
+sub print($)                                                                    # Print a parse tree.
  {my ($parse) = @_;                                                             # Parse tree
   my $t = $parse->arena->DescribeTree;
 
@@ -1267,59 +1375,61 @@ sub print($)                                                                    
 
     $operands->for(sub                                                          # Each operand
      {my ($index, $start, $next, $end) = @_;                                    # Execute body
-      my $i = 2 + $index * 2; my $j = $i + 1;                                   # Operand type and value
-      $t->find($i); my $key  = V(key) ->copy($t->data);
-      $t->find($j); my $data = V(data)->copy($t->data);
+      my $i = (1 + $index) * $lexItemWidth;                                     # Operand detail
+      $t->find($i+$lexItemType);   my $lex = V(key) ->copy($t->data);           # Lexical type
+      $t->find($i+$lexItemOffset); my $off = V(data)->copy($t->data);           # Offset in source
+      $t->find($i+$lexItemLength); my $len = V(data)->copy($t->data);           # Length in source
+
       $b->call;                                                                 # Indent
 
-      If $key == $term,                                                         # Term
+      If $lex == $term,                                                         # Term
       Then
        {PrintOutStringNL "Term";
         Inc $depthR;                                                            # Increase indentation for sub terms
-        $s->call($B, first => $data, $$p{source32});                            # Print sub tree referenced by data field
+        $s->call($B, first => $off, $$p{source32});                             # Print sub tree referenced by offset field
         Dec $depthR;                                                            # Restore existing indentation
         $t->first  ->copy($$p{first});                                          # Re-establish addressability to the tree after the recursive call
        },
 
-      Ef {$key == $semiColon}                                                   # Semicolon
+      Ef {$lex == $semiColon}                                                   # Semicolon
       Then
        {PrintOutStringNL "Semicolon";
        },
 
       Else
-       {If $key == $variable,                                                   # Variable
+       {If $lex == $variable,                                                   # Variable
         Then
          {PrintOutString "Variable: ";
          },
 
-        Ef {$key == $assign}                                                    # Assign
+        Ef {$lex == $assign}                                                    # Assign
         Then
          {PrintOutString "Assign: ";
          },
 
-        Ef {$key == $OpenBracket}                                               # Open brackets
+        Ef {$lex == $OpenBracket}                                               # Open brackets
         Then
          {PrintOutString "Brackets: ";
          },
 
-        Ef {$key == $dyad}                                                      # Dyad
+        Ef {$lex == $dyad}                                                      # Dyad
         Then
          {PrintOutString "Dyad: ";
          },
 
-        Ef {$key == $Ascii}                                                     # Ascii
+        Ef {$lex == $Ascii}                                                     # Ascii
         Then
          {PrintOutString "Ascii: ";
          },
 
         Else                                                                    # Unexpected lexical type
          {PrintErrStringNL "Unexpected lexical type:";
-          $key->d;
+          $lex->d;
           PrintErrTraceBack;
           Exit(1);
          };
 
-        $parse->printLexicalItem($$p{source32}, $data);                         # Print the variable name
+        $parse->printLexicalItem($$p{source32}, $off, $len);                    # Print the variable name
         PrintOutNL;
       };
 
@@ -1338,6 +1448,160 @@ sub print($)                                                                    
 
   PopR;
  } # print
+
+#D1 SubQuark                                                                    # A set of quarks describing the method to be called for each lexical operator.  These routines specialize the general purpose quark methods for use on parse methods.
+
+sub Nasm::X86::Arena::DescribeSubQuarks($)                                      # Return a descriptor for a subQuarks in the specified arena.
+ {my ($arena) = @_;                                                             # Arena descriptor
+
+  genHash(__PACKAGE__."::SubQuarks",                                            # Sub quarks
+    subQuarks => undef,                                                         # The quarks used to map a subroutine name to an offset
+   );
+ }
+
+sub Nasm::X86::Arena::CreateSubQuarks($)                                        # Create quarks in a specified arena.
+ {my ($arena) = @_;                                                             # Arena description optional arena address
+  @_ == 1 or confess "One parameter";
+
+  my $q = $arena->DescribeSubQuarks;                                            # Return a descriptor for a tree at the specified offset in the specified arena
+  $q->subQuarks = $arena->CreateQuarks;
+  $q                                                                            # Description of array
+ }
+
+sub Unisyn::Parse::SubQuarks::reload($%)                                        # Reload the description of a set of sub quarks.
+ {my ($q, %options) = @_;                                                       # Subquarks, {arena=>arena to use; tree => first tree block; array => first array block}
+  @_ >= 1 or confess "One or more parameters";
+
+  $q->subQuarks(%options);
+  $q                                                                            # Return upgraded quarks descriptor
+ }
+
+sub Unisyn::Parse::SubQuarks::put($$$)                                          # Put a new subroutine definition into the sub quarks.
+ {my ($q, $string, $sub) = @_;                                                  # Subquarks, string containing operator type and method name, variable offset to subroutine
+  @_ == 3 or confess "3 parameters";
+  ref($sub) && ref($sub) =~ m(Nasm::X86::Sub) or
+    confess "Subroutine definition required";
+
+  PushR zmm0;
+  my $s = CreateShortString(0)->loadConstantString($string);                    # Load the operator name in its alphabet with the alphabet number on the first byte
+  my $N = $q->subQuarks->quarkFromSub($sub, $s);                                # Create quark from sub
+  PopR;
+  $N                                                                            # Created quark number for subroutine
+ }
+
+sub Unisyn::Parse::SubQuarks::subFromQuark($$$)                                 # Given the quark number for a lexical item and the quark set of lexical items get the offset of the associated method.
+ {my ($q, $lexicals, $number) = @_;                                             # Sub quarks, lexical item quarks, lexical item quark
+  @_ == 3 or confess "3 parameters";
+
+  ref($lexicals) && ref($lexicals) =~ m(Nasm::X86::Quarks) or                   # Check that we have been given a quark set as expected
+    confess "Quarks expected";
+
+  my $Q = $lexicals->quarkToQuark($number, $q->subQuarks);                      # Either the offset to the specified method or -1.
+  my $r = V('sub', -1);                                                         # Matching routine not found
+  If $Q >= 0,                                                                   # Quark found
+   Then
+    {$q->subQuarks->numbersToStrings->get(index=>$Q, element=>$r);              # Load subroutine offset
+    };
+  $r                                                                            # Return sub routine offset
+ }
+
+sub Unisyn::Parse::SubQuarks::lexToString($$$)                                  # Convert a lexical item to a string.
+ {my ($q, $alphabet, $op) = @_;                                                 # Sub quarks, the alphabet number, the operator name in that alphabet
+  my $a = &lexicalData->{alphabetsOrdered}{$alphabet};                          # Alphabet
+  my $n = $$Lex{lexicals}{$alphabet}{number};                                   # Number of lexical type
+  my %i = map {$$a[$_]=>$_} keys @$a;
+  my @b = ($n, map {$i{ord $_}} split //, $op);                                 # Bytes representing the operator name
+  join '', map {chr $_} @b                                                      # String representation
+ }
+
+sub Unisyn::Parse::SubQuarks::dyad($$$)                                         # Define a method for a dyadic operator.
+ {my ($q, $text, $sub) = @_;                                                    # Sub quarks, sub quarks, the name of the operator as a utf8 string, variable associated subroutine offset
+  my $s = $q->lexToString("dyad", $text);                                       # Operator name in operator alphabet preceded by alphabet number
+  $q->put($s, $sub);                                                            # Add the named dyad to the sub quarks
+ }
+
+sub Unisyn::Parse::SubQuarks::assign($$$)                                       # Define a method for an assign operator.
+ {my ($q, $text, $sub) = @_;                                                    # Sub quarks, the name of the operator as a utf8 string, variable associated subroutine offset
+  my $s = $q->lexToString("assign", $text);                                     # Operator name in operator alphabet preceded by alphabet number
+  $q->put($s, $sub);                                                            # Add the named dyad to the sub quarks
+ }
+
+sub assignToShortString($$)                                                     # Create a short string representing a dyad and put it in the specified short string.
+ {my ($short, $text) = @_;                                                      # The number of the short string, the text of the operator in the assign alphabet
+  lexToShortString($short, "assign", $text);
+ }
+
+#D1 Alphabets                                                                   # Translate between alphabets
+
+sub showAlphabet($)                                                             #P Show an alphabet.
+ {my ($alphabet) = @_;                                                          # Alphabet name
+  my $out;
+  my $lex = &lexicalData;
+  my $abc = $lex->{alphabetsOrdered}{$alphabet};
+  for my $a(@$abc)
+   {$out .= chr($a);
+   }
+  $out
+ }
+
+sub asciiToAssignLatin($)                                                       # Translate ascii to the corresponding letters in the assign latin alphabet.
+ {my ($in) = @_;                                                                # A string of ascii
+  $in =~ tr/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz/𝐴𝐵𝐶𝐷𝐸𝐹𝐺𝐻𝐼𝐽𝐾𝐿𝑀𝑁𝑂𝑃𝑄𝑅𝑆𝑇𝑈𝑉𝑊𝑋𝑌𝑍𝑎𝑏𝑐𝑑𝑒𝑓𝑔ℎ𝑖𝑗𝑘𝑙𝑚𝑛𝑜𝑝𝑞𝑟𝑠𝑡𝑢𝑣𝑤𝑥𝑦𝑧/r;
+ }
+
+sub asciiToAssignGreek($)                                                       # Translate ascii to the corresponding letters in the assign greek alphabet.
+ {my ($in) = @_;                                                                # A string of ascii
+  $in =~ tr/ABGDEZNHIKLMVXOPRQSTUFCYWabgdeznhiklmvxoprqstufcyw/𝛢𝛣𝛤𝛥𝛦𝛧𝛨𝛩𝛪𝛫𝛬𝛭𝛮𝛯𝛰𝛱𝛲𝛳𝛴𝛵𝛶𝛷𝛸𝛹𝛺𝛼𝛽𝛾𝛿𝜀𝜁𝜂𝜃𝜄𝜅𝜆𝜇𝜈𝜉𝜊𝜋𝜌𝜍𝜎𝜏𝜐𝜑𝜒𝜓𝜔/r;
+ }
+
+sub asciiToDyadLatin($)                                                         # Translate ascii to the corresponding letters in the dyad latin alphabet.
+ {my ($in) = @_;                                                                # A string of ascii
+  $in =~ tr/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz/𝐀𝐁𝐂𝐃𝐄𝐅𝐆𝐇𝐈𝐉𝐊𝐋𝐌𝐍𝐎𝐏𝐐𝐑𝐒𝐓𝐔𝐕𝐖𝐗𝐘𝐙𝐚𝐛𝐜𝐝𝐞𝐟𝐠𝐡𝐢𝐣𝐤𝐥𝐦𝐧𝐨𝐩𝐪𝐫𝐬𝐭𝐮𝐯𝐰𝐱𝐲𝐳/r;
+ }
+
+sub asciiToDyadGreek($)                                                         # Translate ascii to the corresponding letters in the dyad greek alphabet.
+ {my ($in) = @_;                                                                # A string of ascii
+  $in =~ tr/ABGDEZNHIKLMVXOPRQSTUFCYWabgdeznhiklmvxoprqstufcyw/𝚨𝚩𝚪𝚫𝚬𝚭𝚮𝚯𝚰𝚱𝚲𝚳𝚴𝚵𝚶𝚷𝚸𝚹𝚺𝚻𝚼𝚽𝚾𝚿𝛀𝛂𝛃𝛄𝛅𝛆𝛇𝛈𝛉𝛊𝛋𝛌𝛍𝛎𝛏𝛐𝛑𝛒𝛓𝛔𝛕𝛖𝛗𝛘𝛙𝛚/r;
+ }
+
+sub asciiToPrefixLatin($)                                                       # Translate ascii to the corresponding letters in the prefix latin alphabet.
+ {my ($in) = @_;                                                                # A string of ascii
+  $in =~ tr/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz/𝑨𝑩𝑪𝑫𝑬𝑭𝑮𝑯𝑰𝑱𝑲𝑳𝑴𝑵𝑶𝑷𝑸𝑹𝑺𝑻𝑼𝑽𝑾𝑿𝒀𝒁𝒂𝒃𝒄𝒅𝒆𝒇𝒈𝒉𝒊𝒋𝒌𝒍𝒎𝒏𝒐𝒑𝒒𝒓𝒔𝒕𝒖𝒗𝒘𝒙𝒚𝒛/r;
+ }
+
+sub asciiToPrefixGreek($)                                                       # Translate ascii to the corresponding letters in the prefix greek alphabet.
+ {my ($in) = @_;                                                                # A string of ascii
+  $in =~ tr/ABGDEZNHIKLMVXOPRQSTUFCYWabgdeznhiklmvxoprqstufcyw/𝜜𝜝𝜞𝜟𝜠𝜡𝜢𝜣𝜤𝜥𝜦𝜧𝜨𝜩𝜪𝜫𝜬𝜭𝜮𝜯𝜰𝜱𝜲𝜳𝜴𝜶𝜷𝜸𝜹𝜺𝜻𝜼𝜽𝜾𝜿𝝀𝝁𝝂𝝃𝝄𝝅𝝆𝝇𝝈𝝉𝝊𝝋𝝌𝝍𝝎/r;
+ }
+
+sub asciiToSuffixLatin($)                                                       # Translate ascii to the corresponding letters in the suffix latin alphabet.
+ {my ($in) = @_;                                                                # A string of ascii
+  $in =~ tr/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz/𝘼𝘽𝘾𝘿𝙀𝙁𝙂𝙃𝙄𝙅𝙆𝙇𝙈𝙉𝙊𝙋𝙌𝙍𝙎𝙏𝙐𝙑𝙒𝙓𝙔𝙕𝙖𝙗𝙘𝙙𝙚𝙛𝙜𝙝𝙞𝙟𝙠𝙡𝙢𝙣𝙤𝙥𝙦𝙧𝙨𝙩𝙪𝙫𝙬𝙭𝙮𝙯/r;
+ }
+
+sub asciiToSuffixGreek($)                                                       # Translate ascii to the corresponding letters in the suffix greek alphabet.
+ {my ($in) = @_;                                                                # A string of ascii
+  $in =~ tr/ABGDEZNHIKLMVXOPRQSTUFCYWabgdeznhiklmvxoprqstufcyw/𝞐𝞑𝞒𝞓𝞔𝞕𝞖𝞗𝞘𝞙𝞚𝞛𝞜𝞝𝞞𝞟𝞠𝞡𝞢𝞣𝞤𝞥𝞦𝞧𝞨𝞪𝞫𝞬𝞭𝞮𝞯𝞰𝞱𝞲𝞳𝞴𝞵𝞶𝞷𝞸𝞹𝞺𝞻𝞼𝞽𝞾𝞿𝟀𝟁𝟂/r;
+ }
+
+sub asciiToVariableLatin($)                                                     # Translate ascii to the corresponding letters in the suffix latin alphabet.
+ {my ($in) = @_;                                                                # A string of ascii
+  $in =~ tr/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz/𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇/r;
+ }
+
+sub asciiToVariableGreek($)                                                     # Translate ascii to the corresponding letters in the suffix greek alphabet.
+ {my ($in) = @_;                                                                # A string of ascii
+  $in =~ tr/ABGDEZNHIKLMVXOPRQSTUFCYWabgdeznhiklmvxoprqstufcyw/𝝖𝝗𝝘𝝙𝝚𝝛𝝜𝝝𝝞𝝟𝝠𝝡𝝢𝝣𝝤𝝥𝝦𝝧𝝨𝝩𝝪𝝫𝝬𝝭𝝮𝝰𝝱𝝲𝝳𝝴𝝵𝝶𝝷𝝸𝝹𝝺𝝻𝝼𝝽𝝾𝝿𝞀𝞁𝞂𝞃𝞄𝞅𝞆𝞇𝞈/r;
+ }
+
+sub asciiToEscaped($)                                                           # Translate ascii to the corresponding letters in the escaped ascii alphabet.
+ {my ($in) = @_;                                                                # A string of ascii
+  $in =~ tr/abcdefghijklmnopqrstuvwxyz/🅐🅑🅒🅓🅔🅕🅖🅗🅘🅙🅚🅛🅜🅝🅞🅟🅠🅡🅢🅣🅤🅥🅦🅧🅨🅩/r;
+ }
+
+sub semiColon()                                                                 # Translate ascii to the corresponding letters in the escaped ascii alphabet.
+ {chr(10210)
+ }
 
 #d
 sub lexicalData {do {
@@ -1833,7 +2097,7 @@ Semicolon
 Parse a Unisyn expression.
 
 
-Version "20210829".
+Version "20210915".
 
 
 The following sections describe the methods in each functional area of this
@@ -1845,20 +2109,21 @@ module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
 
 Create a Unisyn parse of a utf8 string.
 
-=head2 create($address)
+=head2 create($address, %options)
 
 Create a new unisyn parse from a utf8 string.
 
      Parameter  Description
-  1  $address   Address of utf8 source string to parse as a variable
+  1  $address   Address of a zero terminated utf8 source string to parse as a variable
+  2  %options   Parse options.
 
 B<Example:>
 
 
+  
+    create (K(address, Rutf8 $Lex->{sampleText}{vav}))->print;                    # Create parse tree from source terminated with zero  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    create (K(address, Rutf8 $Lex->{sampleText}{vav}))->print;                    # Create parse tree from source terminated with  zero  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-
+  
     ok Assemble(debug => 0, eq => <<END);
   Assign: 𝑎
     Term
@@ -1866,19 +2131,19 @@ B<Example:>
     Term
       Variable: 𝗯
   END
-
+  
 
 =head1 Parse
 
 Parse Unisyn expressions
 
-=head1 Print
+=head1 Traverse
 
-Print a parse tree
+Traverse the parse tree
 
-=head2 print($parse)
+=head2 traverseTermsAndCall($parse)
 
-Create a parser for an expression described by variables.
+Traverse the terms in parse tree in post order and call the operator subroutine associated with each term.
 
      Parameter  Description
   1  $parse     Parse tree
@@ -1886,10 +2151,49 @@ Create a parser for an expression described by variables.
 B<Example:>
 
 
+    my $p = create (K(address, Rutf8 $Lex->{sampleText}{A}), operators => sub
+     {my ($parse) = @_;
+  
+      my $assign = Subroutine
+       {PrintOutStringNL "call assign";
+       } [], name=>"UnisynParse::assign";
+  
+      my $equals = Subroutine
+       {PrintOutStringNL "call equals";
+       } [], name=>"UnisynParse::equals";
+  
+      my $o = $parse->operators;                                                  # Operator subroutines
+      $o->assign(asciiToAssignLatin("assign"), $assign);
+      $o->assign(asciiToAssignLatin("equals"), $equals);
+     });
+  
+  
+    $p->traverseTermsAndCall;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    create (K(address, Rutf8 $Lex->{sampleText}{vav}))->print;                    # Create parse tree from source terminated with  zero  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+  
+    Assemble(debug => 0, eq => <<END)
+  call equals
+  END
+  
+
+=head1 Print
+
+Print a parse tree
+
+=head2 print($parse)
+
+Print a parse tree.
+
+     Parameter  Description
+  1  $parse     Parse tree
+
+B<Example:>
 
 
+  
+    create (K(address, Rutf8 $Lex->{sampleText}{vav}))->print;                    # Create parse tree from source terminated with zero  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
     ok Assemble(debug => 0, eq => <<END);
   Assign: 𝑎
     Term
@@ -1897,6 +2201,171 @@ B<Example:>
     Term
       Variable: 𝗯
   END
+  
+
+=head1 SubQuark
+
+A set of quarks describing the method to be called for each lexical operator.  These routines specialize the general purpose quark methods for use on parse methods.
+
+=head2 Nasm::X86::Arena::DescribeSubQuarks($arena)
+
+Return a descriptor for a subQuarks in the specified arena.
+
+     Parameter  Description
+  1  $arena     Arena descriptor
+
+=head2 Nasm::X86::Arena::CreateSubQuarks($arena)
+
+Create quarks in a specified arena.
+
+     Parameter  Description
+  1  $arena     Arena description optional arena address
+
+=head2 Unisyn::Parse::SubQuarks::reload($q, %options)
+
+Reload the description of a set of sub quarks.
+
+     Parameter  Description
+  1  $q         Subquarks
+  2  %options   {arena=>arena to use; tree => first tree block; array => first array block}
+
+=head2 Unisyn::Parse::SubQuarks::put($q, $string, $sub)
+
+Put a new subroutine definition into the sub quarks.
+
+     Parameter  Description
+  1  $q         Subquarks
+  2  $string    String containing operator type and method name
+  3  $sub       Variable offset to subroutine
+
+=head2 Unisyn::Parse::SubQuarks::subFromQuark($q, $lexicals, $number)
+
+Given the quark number for a lexical item and the quark set of lexical items get the offset of the associated method.
+
+     Parameter  Description
+  1  $q         Sub quarks
+  2  $lexicals  Lexical item quarks
+  3  $number    Lexical item quark
+
+=head2 Unisyn::Parse::SubQuarks::lexToString($q, $alphabet, $op)
+
+Convert a lexical item to a string.
+
+     Parameter  Description
+  1  $q         Sub quarks
+  2  $alphabet  The alphabet number
+  3  $op        The operator name in that alphabet
+
+=head2 Unisyn::Parse::SubQuarks::dyad($q, $text, $sub)
+
+Define a method for a dyadic operator.
+
+     Parameter  Description
+  1  $q         Sub quarks
+  2  $text      Sub quarks
+  3  $sub       The name of the operator as a utf8 string
+
+=head2 Unisyn::Parse::SubQuarks::assign($q, $text, $sub)
+
+Define a method for an assign operator.
+
+     Parameter  Description
+  1  $q         Sub quarks
+  2  $text      The name of the operator as a utf8 string
+  3  $sub       Variable associated subroutine offset
+
+=head2 assignToShortString($short, $text)
+
+Create a short string representing a dyad and put it in the specified short string.
+
+     Parameter  Description
+  1  $short     The number of the short string
+  2  $text      The text of the operator in the assign alphabet
+
+=head1 Alphabets
+
+Translate between alphabets
+
+=head2 asciiToAssignLatin($in)
+
+Translate ascii to the corresponding letters in the assign latin alphabet.
+
+     Parameter  Description
+  1  $in        A string of ascii
+
+=head2 asciiToAssignGreek($in)
+
+Translate ascii to the corresponding letters in the assign greek alphabet.
+
+     Parameter  Description
+  1  $in        A string of ascii
+
+=head2 asciiToDyadLatin($in)
+
+Translate ascii to the corresponding letters in the dyad latin alphabet.
+
+     Parameter  Description
+  1  $in        A string of ascii
+
+=head2 asciiToDyadGreek($in)
+
+Translate ascii to the corresponding letters in the dyad greek alphabet.
+
+     Parameter  Description
+  1  $in        A string of ascii
+
+=head2 asciiToPrefixLatin($in)
+
+Translate ascii to the corresponding letters in the prefix latin alphabet.
+
+     Parameter  Description
+  1  $in        A string of ascii
+
+=head2 asciiToPrefixGreek($in)
+
+Translate ascii to the corresponding letters in the prefix greek alphabet.
+
+     Parameter  Description
+  1  $in        A string of ascii
+
+=head2 asciiToSuffixLatin($in)
+
+Translate ascii to the corresponding letters in the suffix latin alphabet.
+
+     Parameter  Description
+  1  $in        A string of ascii
+
+=head2 asciiToSuffixGreek($in)
+
+Translate ascii to the corresponding letters in the suffix greek alphabet.
+
+     Parameter  Description
+  1  $in        A string of ascii
+
+=head2 asciiToVariableLatin($in)
+
+Translate ascii to the corresponding letters in the suffix latin alphabet.
+
+     Parameter  Description
+  1  $in        A string of ascii
+
+=head2 asciiToVariableGreek($in)
+
+Translate ascii to the corresponding letters in the suffix greek alphabet.
+
+     Parameter  Description
+  1  $in        A string of ascii
+
+=head2 asciiToEscaped($in)
+
+Translate ascii to the corresponding letters in the escaped ascii alphabet.
+
+     Parameter  Description
+  1  $in        A string of ascii
+
+=head2 semiColon()
+
+Translate ascii to the corresponding letters in the escaped ascii alphabet.
 
 
 
@@ -1908,7 +2377,7 @@ B<Example:>
 =head2 Unisyn::Parse Definition
 
 
-Description of parse
+Sub quarks
 
 
 
@@ -1928,9 +2397,17 @@ Arena containing tree
 
 Number of failures encountered in this parse
 
+=head4 operators
+
+Methods implementing each lexical operator
+
 =head4 parse
 
 Offset to the head of the parse tree
+
+=head4 quarks
+
+Quarks representing the strings used in this parse
 
 =head4 size8
 
@@ -1947,6 +2424,10 @@ Length of utf32 string
 =head4 sourceSize32
 
 Size of utf32 allocation
+
+=head4 subQuarks
+
+The quarks used to map a subroutine name to an offset
 
 
 
@@ -2016,6 +2497,14 @@ Lexical number for a lexical item described by its letter.
      Parameter  Description
   1  $l         Letter of the lexical item
 
+=head2 lexicalItemLength($source32, $offset)
+
+Put the length of a lexical item into variable B<size>.
+
+     Parameter  Description
+  1  $source32  B<address> of utf32 source representation
+  2  $offset    B<offset> to lexical item in utf32
+
 =head2 new($depth, $description)
 
 Create a new term in the parse tree rooted on the stack.
@@ -2026,7 +2515,7 @@ Create a new term in the parse tree rooted on the stack.
 
 =head2 error($message)
 
-Die.
+Write an error message and stop.
 
      Parameter  Description
   1  $message   Error message
@@ -2100,17 +2589,10 @@ Semi colon.
 Variable.
 
 
-=head2 parseExpressionCode()
+=head2 parseExpression()
 
 Parse the string of classified lexical items addressed by register $start of length $length.  The resulting parse tree (if any) is returned in r15.
 
-
-=head2 parseExpression(@parameters)
-
-Create a parser for an expression described by variables.
-
-     Parameter    Description
-  1  @parameters  Parameters describing expression
 
 =head2 MatchBrackets(@parameters)
 
@@ -2133,35 +2615,43 @@ Classify white space per: "lib/Unisyn/whiteSpace/whiteSpaceClassification.pl".
      Parameter    Description
   1  @parameters  Parameters
 
-=head2 parseUtf8($p, @parameters)
+=head2 parseUtf8($parse, @parameters)
 
 Parse a unisyn expression encoded as utf8 and return the parse tree.
 
      Parameter    Description
-  1  $p           Parse
+  1  $parse       Parse
   2  @parameters  Parameters
 
-=head2 printLexicalItem($parse, $source32, $offset)
+=head2 printLexicalItem($parse, $source32, $offset, $size)
 
 Print the utf8 string corresponding to a lexical item at a variable offset.
 
      Parameter  Description
   1  $parse     Parse tree
-  2  $source32  Variable address of utf32 source representation
-  3  $offset    Variable offset to lexical item in utf32
+  2  $source32  B<address> of utf32 source representation
+  3  $offset    B<offset> to lexical item in utf32
+  4  $size      B<size> in utf32 chars of item
 
-=head2 printBrackets($parse, $source32, $offset)
+=head2 showAlphabet($alphabet)
 
-Print the utf8 string corresponding to a lexical item at a variable offset.
+Show an alphabet.
 
      Parameter  Description
-  1  $parse     Parse tree
-  2  $source32  Variable address of utf32 source representation
-  3  $offset    Variable offset to lexical item in utf32
+  1  $alphabet  Alphabet name
 
 =head2 T($key, $expected, %options)
 
-Test a parse.
+Parse some text and dump the results.
+
+     Parameter  Description
+  1  $key       Key of text to be parsed
+  2  $expected  Expected result
+  3  %options   Options
+
+=head2 C($key, $expected, %options)
+
+Parse some text and print the results.
 
      Parameter  Description
   1  $key       Key of text to be parsed
@@ -2174,9 +2664,9 @@ Test a parse.
 
 1 L<accept_a|/accept_a> - Assign.
 
-2 L<accept_b|/accept_b> - Open.
+2 L<accept_B|/accept_B> - Closing parenthesis.
 
-3 L<accept_B|/accept_B> - Closing parenthesis.
+3 L<accept_b|/accept_b> - Open.
 
 4 L<accept_d|/accept_d> - Infix but not assign or semi-colon.
 
@@ -2188,57 +2678,103 @@ Test a parse.
 
 8 L<accept_v|/accept_v> - Variable.
 
-9 L<checkSet|/checkSet> - Check that one of a set of items is on the top of the stack or complain if it is not.
+9 L<asciiToAssignGreek|/asciiToAssignGreek> - Translate ascii to the corresponding letters in the assign greek alphabet.
 
-10 L<checkStackHas|/checkStackHas> - Check that we have at least the specified number of elements on the stack.
+10 L<asciiToAssignLatin|/asciiToAssignLatin> - Translate ascii to the corresponding letters in the assign latin alphabet.
 
-11 L<ClassifyNewLines|/ClassifyNewLines> - Scan input string looking for opportunities to convert new lines into semi colons.
+11 L<asciiToDyadGreek|/asciiToDyadGreek> - Translate ascii to the corresponding letters in the dyad greek alphabet.
 
-12 L<ClassifyWhiteSpace|/ClassifyWhiteSpace> - Classify white space per: "lib/Unisyn/whiteSpace/whiteSpaceClassification.
+12 L<asciiToDyadLatin|/asciiToDyadLatin> - Translate ascii to the corresponding letters in the dyad latin alphabet.
 
-13 L<create|/create> - Create a new unisyn parse from a utf8 string.
+13 L<asciiToEscaped|/asciiToEscaped> - Translate ascii to the corresponding letters in the escaped ascii alphabet.
 
-14 L<error|/error> - Die.
+14 L<asciiToPrefixGreek|/asciiToPrefixGreek> - Translate ascii to the corresponding letters in the prefix greek alphabet.
 
-15 L<getAlpha|/getAlpha> - Load the position of a lexical item in its alphabet from the current character.
+15 L<asciiToPrefixLatin|/asciiToPrefixLatin> - Translate ascii to the corresponding letters in the prefix latin alphabet.
 
-16 L<getLexicalCode|/getLexicalCode> - Load the lexical code of the current character in memory into the specified register.
+16 L<asciiToSuffixGreek|/asciiToSuffixGreek> - Translate ascii to the corresponding letters in the suffix greek alphabet.
 
-17 L<lexicalNameFromLetter|/lexicalNameFromLetter> - Lexical name for a lexical item described by its letter.
+17 L<asciiToSuffixLatin|/asciiToSuffixLatin> - Translate ascii to the corresponding letters in the suffix latin alphabet.
 
-18 L<lexicalNumberFromLetter|/lexicalNumberFromLetter> - Lexical number for a lexical item described by its letter.
+18 L<asciiToVariableGreek|/asciiToVariableGreek> - Translate ascii to the corresponding letters in the suffix greek alphabet.
 
-19 L<loadCurrentChar|/loadCurrentChar> - Load the details of the character currently being processed so that we have the index of the character in the upper half of the current character and the lexical type of the character in the lowest byte.
+19 L<asciiToVariableLatin|/asciiToVariableLatin> - Translate ascii to the corresponding letters in the suffix latin alphabet.
 
-20 L<MatchBrackets|/MatchBrackets> - Replace the low three bytes of a utf32 bracket character with 24 bits of offset to the matching opening or closing bracket.
+20 L<assignToShortString|/assignToShortString> - Create a short string representing a dyad and put it in the specified short string.
 
-21 L<new|/new> - Create a new term in the parse tree rooted on the stack.
+21 L<C|/C> - Parse some text and print the results.
 
-22 L<parseExpression|/parseExpression> - Create a parser for an expression described by variables.
+22 L<checkSet|/checkSet> - Check that one of a set of items is on the top of the stack or complain if it is not.
 
-23 L<parseExpressionCode|/parseExpressionCode> - Parse the string of classified lexical items addressed by register $start of length $length.
+23 L<checkStackHas|/checkStackHas> - Check that we have at least the specified number of elements on the stack.
 
-24 L<parseUtf8|/parseUtf8> - Parse a unisyn expression encoded as utf8 and return the parse tree.
+24 L<ClassifyNewLines|/ClassifyNewLines> - Scan input string looking for opportunities to convert new lines into semi colons.
 
-25 L<print|/print> - Create a parser for an expression described by variables.
+25 L<ClassifyWhiteSpace|/ClassifyWhiteSpace> - Classify white space per: "lib/Unisyn/whiteSpace/whiteSpaceClassification.
 
-26 L<printBrackets|/printBrackets> - Print the utf8 string corresponding to a lexical item at a variable offset.
+26 L<create|/create> - Create a new unisyn parse from a utf8 string.
 
-27 L<printLexicalItem|/printLexicalItem> - Print the utf8 string corresponding to a lexical item at a variable offset.
+27 L<error|/error> - Write an error message and stop.
 
-28 L<pushElement|/pushElement> - Push the current element on to the stack.
+28 L<getAlpha|/getAlpha> - Load the position of a lexical item in its alphabet from the current character.
 
-29 L<pushEmpty|/pushEmpty> - Push the empty element on to the stack.
+29 L<getLexicalCode|/getLexicalCode> - Load the lexical code of the current character in memory into the specified register.
 
-30 L<putLexicalCode|/putLexicalCode> - Put the specified lexical code into the current character in memory.
+30 L<lexicalItemLength|/lexicalItemLength> - Put the length of a lexical item into variable B<size>.
 
-31 L<reduce|/reduce> - Convert the longest possible expression on top of the stack into a term  at the specified priority.
+31 L<lexicalNameFromLetter|/lexicalNameFromLetter> - Lexical name for a lexical item described by its letter.
 
-32 L<reduceMultiple|/reduceMultiple> - Reduce existing operators on the stack.
+32 L<lexicalNumberFromLetter|/lexicalNumberFromLetter> - Lexical number for a lexical item described by its letter.
 
-33 L<T|/T> - Test a parse.
+33 L<loadCurrentChar|/loadCurrentChar> - Load the details of the character currently being processed so that we have the index of the character in the upper half of the current character and the lexical type of the character in the lowest byte.
 
-34 L<testSet|/testSet> - Test a set of items, setting the Zero Flag is one matches else clear the Zero flag.
+34 L<MatchBrackets|/MatchBrackets> - Replace the low three bytes of a utf32 bracket character with 24 bits of offset to the matching opening or closing bracket.
+
+35 L<Nasm::X86::Arena::CreateSubQuarks|/Nasm::X86::Arena::CreateSubQuarks> - Create quarks in a specified arena.
+
+36 L<Nasm::X86::Arena::DescribeSubQuarks|/Nasm::X86::Arena::DescribeSubQuarks> - Return a descriptor for a subQuarks in the specified arena.
+
+37 L<new|/new> - Create a new term in the parse tree rooted on the stack.
+
+38 L<parseExpression|/parseExpression> - Parse the string of classified lexical items addressed by register $start of length $length.
+
+39 L<parseUtf8|/parseUtf8> - Parse a unisyn expression encoded as utf8 and return the parse tree.
+
+40 L<print|/print> - Print a parse tree.
+
+41 L<printLexicalItem|/printLexicalItem> - Print the utf8 string corresponding to a lexical item at a variable offset.
+
+42 L<pushElement|/pushElement> - Push the current element on to the stack.
+
+43 L<pushEmpty|/pushEmpty> - Push the empty element on to the stack.
+
+44 L<putLexicalCode|/putLexicalCode> - Put the specified lexical code into the current character in memory.
+
+45 L<reduce|/reduce> - Convert the longest possible expression on top of the stack into a term  at the specified priority.
+
+46 L<reduceMultiple|/reduceMultiple> - Reduce existing operators on the stack.
+
+47 L<semiColon|/semiColon> - Translate ascii to the corresponding letters in the escaped ascii alphabet.
+
+48 L<showAlphabet|/showAlphabet> - Show an alphabet.
+
+49 L<T|/T> - Parse some text and dump the results.
+
+50 L<testSet|/testSet> - Test a set of items, setting the Zero Flag is one matches else clear the Zero flag.
+
+51 L<traverseTermsAndCall|/traverseTermsAndCall> - Traverse the terms in parse tree in post order and call the operator subroutine associated with each term.
+
+52 L<Unisyn::Parse::SubQuarks::assign|/Unisyn::Parse::SubQuarks::assign> - Define a method for an assign operator.
+
+53 L<Unisyn::Parse::SubQuarks::dyad|/Unisyn::Parse::SubQuarks::dyad> - Define a method for a dyadic operator.
+
+54 L<Unisyn::Parse::SubQuarks::lexToString|/Unisyn::Parse::SubQuarks::lexToString> - Convert a lexical item to a string.
+
+55 L<Unisyn::Parse::SubQuarks::put|/Unisyn::Parse::SubQuarks::put> - Put a new subroutine definition into the sub quarks.
+
+56 L<Unisyn::Parse::SubQuarks::reload|/Unisyn::Parse::SubQuarks::reload> - Reload the description of a set of sub quarks.
+
+57 L<Unisyn::Parse::SubQuarks::subFromQuark|/Unisyn::Parse::SubQuarks::subFromQuark> - Given the quark number for a lexical item and the quark set of lexical items get the offset of the associated method.
 
 =head1 Installation
 
@@ -2291,7 +2827,7 @@ Test::More->builder->output("/dev/null") if $localTest;                         
 
 if ($^O =~ m(bsd|linux|cygwin)i)                                                # Supported systems
  {if (confirmHasCommandLineCommand(q(nasm)) and LocateIntelEmulator)            # Network assembler and Intel Software Development emulator
-   {plan tests => 12;
+   {plan tests => 23;
    }
   else
    {plan skip_all => qq(Nasm or Intel 64 emulator not available);
@@ -2305,17 +2841,17 @@ my $startTime = time;                                                           
 
 eval {goto latest} if !caller(0) and -e "/home/phil";                           # Go to latest test if specified
 
-sub T($$%)                                                                      #P Test a parse.
+sub T($$%)                                                                      #P Parse some text and dump the results.
  {my ($key, $expected, %options) = @_;                                          # Key of text to be parsed, expected result, options
   my $source  = $$Lex{sampleText}{$key};                                        # String to be parsed in utf8
-  defined $source or confess;
+  defined $source or confess "No such source";
   my $address = Rutf8 $source;
   my $size    = StringLength V(string, $address);
 
-  my $p = create V(address, $address);
+  my $p = create V(address, $address), %options;                                # Parse
 
   if (1)                                                                        # Print the parse tree if requested
-   {my $t = $arena->DescribeTree;
+   {my $t = $p->arena->DescribeTree;
     $t->first->copy($p->parse);
     $t->dump;
    }
@@ -2323,134 +2859,159 @@ sub T($$%)                                                                      
   Assemble(debug => 0, eq => $expected);
  }
 
+sub C($$%)                                                                      #P Parse some text and print the results.
+ {my ($key, $expected, %options) = @_;                                          # Key of text to be parsed, expected result, options
+  create (K(address, Rutf8 $Lex->{sampleText}{$key}), %options)->print;
+
+  Assemble(debug => 0, eq => $expected);
+ }
+
 #latest:
-ok T(q(brackets), <<END, comments=>10, debug => 0);
-Tree at:  0000 0000 0000 0618  length: 0000 0000 0000 0008
+ok T(q(brackets), <<END, debug => 0) if 1;
+Tree at:  0000 0000 0000 0AD8  length: 0000 0000 0000 000A
   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000
-  0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0598 0000 0009   0000 0018 0000 0009   0000 0001 0000 0005   0000 0003 0000 0009
-  0000 0658 00A0 0008   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0007 0000 0006   0000 0005 0000 0004   0000 0003 0000 0002   0000 0001 0000 0000
+  0000 0000 0000 0014   0000 0000 0000 0000   0000 0000 0000 0000   0000 0A18 0000 0009   0000 00D8 0000 0009   0000 0008 0000 0006   0000 0001 0000 0005   0000 0003 0000 0009
+  0000 0B18 0280 000A   0000 0000 0000 0000   0000 0000 0000 0000   0000 000D 0000 000C   0000 0009 0000 0008   0000 0007 0000 0006   0000 0005 0000 0004   0000 0001 0000 0000
     index: 0000 0000 0000 0000   key: 0000 0000 0000 0000   data: 0000 0000 0000 0009
     index: 0000 0000 0000 0001   key: 0000 0000 0000 0001   data: 0000 0000 0000 0003
-    index: 0000 0000 0000 0002   key: 0000 0000 0000 0002   data: 0000 0000 0000 0005
-    index: 0000 0000 0000 0003   key: 0000 0000 0000 0003   data: 0000 0000 0000 0001
-    index: 0000 0000 0000 0004   key: 0000 0000 0000 0004   data: 0000 0000 0000 0009
-    index: 0000 0000 0000 0005   key: 0000 0000 0000 0005   data: 0000 0000 0000 0018 subTree
-    index: 0000 0000 0000 0006   key: 0000 0000 0000 0006   data: 0000 0000 0000 0009
-    index: 0000 0000 0000 0007   key: 0000 0000 0000 0007   data: 0000 0000 0000 0598 subTree
-  Tree at:  0000 0000 0000 0018  length: 0000 0000 0000 0004
+    index: 0000 0000 0000 0002   key: 0000 0000 0000 0004   data: 0000 0000 0000 0005
+    index: 0000 0000 0000 0003   key: 0000 0000 0000 0005   data: 0000 0000 0000 0001
+    index: 0000 0000 0000 0004   key: 0000 0000 0000 0006   data: 0000 0000 0000 0006
+    index: 0000 0000 0000 0005   key: 0000 0000 0000 0007   data: 0000 0000 0000 0008
+    index: 0000 0000 0000 0006   key: 0000 0000 0000 0008   data: 0000 0000 0000 0009
+    index: 0000 0000 0000 0007   key: 0000 0000 0000 0009   data: 0000 0000 0000 00D8 subTree
+    index: 0000 0000 0000 0008   key: 0000 0000 0000 000C   data: 0000 0000 0000 0009
+    index: 0000 0000 0000 0009   key: 0000 0000 0000 000D   data: 0000 0000 0000 0A18 subTree
+  Tree at:  0000 0000 0000 00D8  length: 0000 0000 0000 0006
     0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000
-    0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0006   0000 0001 0000 0009
-    0000 0058 0000 0004   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0003 0000 0002   0000 0001 0000 0000
+    0000 0000 0000 000C   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0001   0000 0000 0000 0006   0000 0001 0000 0009
+    0000 0118 0000 0006   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0007 0000 0006   0000 0005 0000 0004   0000 0001 0000 0000
       index: 0000 0000 0000 0000   key: 0000 0000 0000 0000   data: 0000 0000 0000 0009
       index: 0000 0000 0000 0001   key: 0000 0000 0000 0001   data: 0000 0000 0000 0001
-      index: 0000 0000 0000 0002   key: 0000 0000 0000 0002   data: 0000 0000 0000 0006
-      index: 0000 0000 0000 0003   key: 0000 0000 0000 0003   data: 0000 0000 0000 0000
+      index: 0000 0000 0000 0002   key: 0000 0000 0000 0004   data: 0000 0000 0000 0006
+      index: 0000 0000 0000 0003   key: 0000 0000 0000 0005   data: 0000 0000 0000 0000
+      index: 0000 0000 0000 0004   key: 0000 0000 0000 0006   data: 0000 0000 0000 0001
+      index: 0000 0000 0000 0005   key: 0000 0000 0000 0007   data: 0000 0000 0000 0000
   end
-  Tree at:  0000 0000 0000 0598  length: 0000 0000 0000 0006
+  Tree at:  0000 0000 0000 0A18  length: 0000 0000 0000 0008
     0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000
-    0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0518 0000 0009   0000 0007 0000 0000   0000 0002 0000 0009
-    0000 05D8 0020 0006   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0005 0000 0004   0000 0003 0000 0002   0000 0001 0000 0000
+    0000 0000 0000 0010   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0998 0000 0009   0000 0007 0000 0001   0000 0007 0000 0000   0000 0002 0000 0009
+    0000 0A58 0080 0008   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0009 0000 0008   0000 0007 0000 0006   0000 0005 0000 0004   0000 0001 0000 0000
       index: 0000 0000 0000 0000   key: 0000 0000 0000 0000   data: 0000 0000 0000 0009
       index: 0000 0000 0000 0001   key: 0000 0000 0000 0001   data: 0000 0000 0000 0002
-      index: 0000 0000 0000 0002   key: 0000 0000 0000 0002   data: 0000 0000 0000 0000
-      index: 0000 0000 0000 0003   key: 0000 0000 0000 0003   data: 0000 0000 0000 0007
-      index: 0000 0000 0000 0004   key: 0000 0000 0000 0004   data: 0000 0000 0000 0009
-      index: 0000 0000 0000 0005   key: 0000 0000 0000 0005   data: 0000 0000 0000 0518 subTree
-    Tree at:  0000 0000 0000 0518  length: 0000 0000 0000 0004
+      index: 0000 0000 0000 0002   key: 0000 0000 0000 0004   data: 0000 0000 0000 0000
+      index: 0000 0000 0000 0003   key: 0000 0000 0000 0005   data: 0000 0000 0000 0007
+      index: 0000 0000 0000 0004   key: 0000 0000 0000 0006   data: 0000 0000 0000 0001
+      index: 0000 0000 0000 0005   key: 0000 0000 0000 0007   data: 0000 0000 0000 0007
+      index: 0000 0000 0000 0006   key: 0000 0000 0000 0008   data: 0000 0000 0000 0009
+      index: 0000 0000 0000 0007   key: 0000 0000 0000 0009   data: 0000 0000 0000 0998 subTree
+    Tree at:  0000 0000 0000 0998  length: 0000 0000 0000 0004
       0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000
-      0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0498 0000 0009   0000 0001 0000 0009
-      0000 0558 0008 0004   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0003 0000 0002   0000 0001 0000 0000
+      0000 0000 0000 0008   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 07D8 0000 0009   0000 0001 0000 0009
+      0000 09D8 0008 0004   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0005 0000 0004   0000 0001 0000 0000
         index: 0000 0000 0000 0000   key: 0000 0000 0000 0000   data: 0000 0000 0000 0009
         index: 0000 0000 0000 0001   key: 0000 0000 0000 0001   data: 0000 0000 0000 0001
-        index: 0000 0000 0000 0002   key: 0000 0000 0000 0002   data: 0000 0000 0000 0009
-        index: 0000 0000 0000 0003   key: 0000 0000 0000 0003   data: 0000 0000 0000 0498 subTree
-      Tree at:  0000 0000 0000 0498  length: 0000 0000 0000 0008
+        index: 0000 0000 0000 0002   key: 0000 0000 0000 0004   data: 0000 0000 0000 0009
+        index: 0000 0000 0000 0003   key: 0000 0000 0000 0005   data: 0000 0000 0000 07D8 subTree
+      Tree at:  0000 0000 0000 07D8  length: 0000 0000 0000 000A
         0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000
-        0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0418 0000 0009   0000 0298 0000 0009   0000 000E 0000 0003   0000 0003 0000 0009
-        0000 04D8 00A0 0008   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0007 0000 0006   0000 0005 0000 0004   0000 0003 0000 0002   0000 0001 0000 0000
+        0000 0000 0000 0014   0000 0000 0000 0000   0000 0000 0000 0000   0000 0718 0000 0009   0000 0518 0000 0009   0000 0006 0000 0004   0000 000E 0000 0003   0000 0003 0000 0009
+        0000 0818 0280 000A   0000 0000 0000 0000   0000 0000 0000 0000   0000 000D 0000 000C   0000 0009 0000 0008   0000 0007 0000 0006   0000 0005 0000 0004   0000 0001 0000 0000
           index: 0000 0000 0000 0000   key: 0000 0000 0000 0000   data: 0000 0000 0000 0009
           index: 0000 0000 0000 0001   key: 0000 0000 0000 0001   data: 0000 0000 0000 0003
-          index: 0000 0000 0000 0002   key: 0000 0000 0000 0002   data: 0000 0000 0000 0003
-          index: 0000 0000 0000 0003   key: 0000 0000 0000 0003   data: 0000 0000 0000 000E
-          index: 0000 0000 0000 0004   key: 0000 0000 0000 0004   data: 0000 0000 0000 0009
-          index: 0000 0000 0000 0005   key: 0000 0000 0000 0005   data: 0000 0000 0000 0298 subTree
-          index: 0000 0000 0000 0006   key: 0000 0000 0000 0006   data: 0000 0000 0000 0009
-          index: 0000 0000 0000 0007   key: 0000 0000 0000 0007   data: 0000 0000 0000 0418 subTree
-        Tree at:  0000 0000 0000 0298  length: 0000 0000 0000 0006
+          index: 0000 0000 0000 0002   key: 0000 0000 0000 0004   data: 0000 0000 0000 0003
+          index: 0000 0000 0000 0003   key: 0000 0000 0000 0005   data: 0000 0000 0000 000E
+          index: 0000 0000 0000 0004   key: 0000 0000 0000 0006   data: 0000 0000 0000 0004
+          index: 0000 0000 0000 0005   key: 0000 0000 0000 0007   data: 0000 0000 0000 0006
+          index: 0000 0000 0000 0006   key: 0000 0000 0000 0008   data: 0000 0000 0000 0009
+          index: 0000 0000 0000 0007   key: 0000 0000 0000 0009   data: 0000 0000 0000 0518 subTree
+          index: 0000 0000 0000 0008   key: 0000 0000 0000 000C   data: 0000 0000 0000 0009
+          index: 0000 0000 0000 0009   key: 0000 0000 0000 000D   data: 0000 0000 0000 0718 subTree
+        Tree at:  0000 0000 0000 0518  length: 0000 0000 0000 0008
           0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000
-          0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0218 0000 0009   0000 0008 0000 0000   0000 0002 0000 0009
-          0000 02D8 0020 0006   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0005 0000 0004   0000 0003 0000 0002   0000 0001 0000 0000
+          0000 0000 0000 0010   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0498 0000 0009   0000 0003 0000 0001   0000 0008 0000 0000   0000 0002 0000 0009
+          0000 0558 0080 0008   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0009 0000 0008   0000 0007 0000 0006   0000 0005 0000 0004   0000 0001 0000 0000
             index: 0000 0000 0000 0000   key: 0000 0000 0000 0000   data: 0000 0000 0000 0009
             index: 0000 0000 0000 0001   key: 0000 0000 0000 0001   data: 0000 0000 0000 0002
-            index: 0000 0000 0000 0002   key: 0000 0000 0000 0002   data: 0000 0000 0000 0000
-            index: 0000 0000 0000 0003   key: 0000 0000 0000 0003   data: 0000 0000 0000 0008
-            index: 0000 0000 0000 0004   key: 0000 0000 0000 0004   data: 0000 0000 0000 0009
-            index: 0000 0000 0000 0005   key: 0000 0000 0000 0005   data: 0000 0000 0000 0218 subTree
-          Tree at:  0000 0000 0000 0218  length: 0000 0000 0000 0004
+            index: 0000 0000 0000 0002   key: 0000 0000 0000 0004   data: 0000 0000 0000 0000
+            index: 0000 0000 0000 0003   key: 0000 0000 0000 0005   data: 0000 0000 0000 0008
+            index: 0000 0000 0000 0004   key: 0000 0000 0000 0006   data: 0000 0000 0000 0001
+            index: 0000 0000 0000 0005   key: 0000 0000 0000 0007   data: 0000 0000 0000 0003
+            index: 0000 0000 0000 0006   key: 0000 0000 0000 0008   data: 0000 0000 0000 0009
+            index: 0000 0000 0000 0007   key: 0000 0000 0000 0009   data: 0000 0000 0000 0498 subTree
+          Tree at:  0000 0000 0000 0498  length: 0000 0000 0000 0004
             0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000
-            0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0198 0000 0009   0000 0001 0000 0009
-            0000 0258 0008 0004   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0003 0000 0002   0000 0001 0000 0000
+            0000 0000 0000 0008   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 03D8 0000 0009   0000 0001 0000 0009
+            0000 04D8 0008 0004   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0005 0000 0004   0000 0001 0000 0000
               index: 0000 0000 0000 0000   key: 0000 0000 0000 0000   data: 0000 0000 0000 0009
               index: 0000 0000 0000 0001   key: 0000 0000 0000 0001   data: 0000 0000 0000 0001
-              index: 0000 0000 0000 0002   key: 0000 0000 0000 0002   data: 0000 0000 0000 0009
-              index: 0000 0000 0000 0003   key: 0000 0000 0000 0003   data: 0000 0000 0000 0198 subTree
-            Tree at:  0000 0000 0000 0198  length: 0000 0000 0000 0006
+              index: 0000 0000 0000 0002   key: 0000 0000 0000 0004   data: 0000 0000 0000 0009
+              index: 0000 0000 0000 0003   key: 0000 0000 0000 0005   data: 0000 0000 0000 03D8 subTree
+            Tree at:  0000 0000 0000 03D8  length: 0000 0000 0000 0008
               0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000
-              0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0118 0000 0009   0000 0009 0000 0000   0000 0002 0000 0009
-              0000 01D8 0020 0006   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0005 0000 0004   0000 0003 0000 0002   0000 0001 0000 0000
+              0000 0000 0000 0010   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0358 0000 0009   0000 0002 0000 0001   0000 0009 0000 0000   0000 0002 0000 0009
+              0000 0418 0080 0008   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0009 0000 0008   0000 0007 0000 0006   0000 0005 0000 0004   0000 0001 0000 0000
                 index: 0000 0000 0000 0000   key: 0000 0000 0000 0000   data: 0000 0000 0000 0009
                 index: 0000 0000 0000 0001   key: 0000 0000 0000 0001   data: 0000 0000 0000 0002
-                index: 0000 0000 0000 0002   key: 0000 0000 0000 0002   data: 0000 0000 0000 0000
-                index: 0000 0000 0000 0003   key: 0000 0000 0000 0003   data: 0000 0000 0000 0009
-                index: 0000 0000 0000 0004   key: 0000 0000 0000 0004   data: 0000 0000 0000 0009
-                index: 0000 0000 0000 0005   key: 0000 0000 0000 0005   data: 0000 0000 0000 0118 subTree
-              Tree at:  0000 0000 0000 0118  length: 0000 0000 0000 0004
+                index: 0000 0000 0000 0002   key: 0000 0000 0000 0004   data: 0000 0000 0000 0000
+                index: 0000 0000 0000 0003   key: 0000 0000 0000 0005   data: 0000 0000 0000 0009
+                index: 0000 0000 0000 0004   key: 0000 0000 0000 0006   data: 0000 0000 0000 0001
+                index: 0000 0000 0000 0005   key: 0000 0000 0000 0007   data: 0000 0000 0000 0002
+                index: 0000 0000 0000 0006   key: 0000 0000 0000 0008   data: 0000 0000 0000 0009
+                index: 0000 0000 0000 0007   key: 0000 0000 0000 0009   data: 0000 0000 0000 0358 subTree
+              Tree at:  0000 0000 0000 0358  length: 0000 0000 0000 0004
                 0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000
-                0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0098 0000 0009   0000 0001 0000 0009
-                0000 0158 0008 0004   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0003 0000 0002   0000 0001 0000 0000
+                0000 0000 0000 0008   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0218 0000 0009   0000 0001 0000 0009
+                0000 0398 0008 0004   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0005 0000 0004   0000 0001 0000 0000
                   index: 0000 0000 0000 0000   key: 0000 0000 0000 0000   data: 0000 0000 0000 0009
                   index: 0000 0000 0000 0001   key: 0000 0000 0000 0001   data: 0000 0000 0000 0001
-                  index: 0000 0000 0000 0002   key: 0000 0000 0000 0002   data: 0000 0000 0000 0009
-                  index: 0000 0000 0000 0003   key: 0000 0000 0000 0003   data: 0000 0000 0000 0098 subTree
-                Tree at:  0000 0000 0000 0098  length: 0000 0000 0000 0004
+                  index: 0000 0000 0000 0002   key: 0000 0000 0000 0004   data: 0000 0000 0000 0009
+                  index: 0000 0000 0000 0003   key: 0000 0000 0000 0005   data: 0000 0000 0000 0218 subTree
+                Tree at:  0000 0000 0000 0218  length: 0000 0000 0000 0006
                   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000
-                  0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 000A 0000 0006   0000 0001 0000 0009
-                  0000 00D8 0000 0004   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0003 0000 0002   0000 0001 0000 0000
+                  0000 0000 0000 000C   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0001 0000 0002   0000 000A 0000 0006   0000 0001 0000 0009
+                  0000 0258 0000 0006   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0007 0000 0006   0000 0005 0000 0004   0000 0001 0000 0000
                     index: 0000 0000 0000 0000   key: 0000 0000 0000 0000   data: 0000 0000 0000 0009
                     index: 0000 0000 0000 0001   key: 0000 0000 0000 0001   data: 0000 0000 0000 0001
-                    index: 0000 0000 0000 0002   key: 0000 0000 0000 0002   data: 0000 0000 0000 0006
-                    index: 0000 0000 0000 0003   key: 0000 0000 0000 0003   data: 0000 0000 0000 000A
+                    index: 0000 0000 0000 0002   key: 0000 0000 0000 0004   data: 0000 0000 0000 0006
+                    index: 0000 0000 0000 0003   key: 0000 0000 0000 0005   data: 0000 0000 0000 000A
+                    index: 0000 0000 0000 0004   key: 0000 0000 0000 0006   data: 0000 0000 0000 0002
+                    index: 0000 0000 0000 0005   key: 0000 0000 0000 0007   data: 0000 0000 0000 0001
                 end
               end
             end
           end
         end
-        Tree at:  0000 0000 0000 0418  length: 0000 0000 0000 0006
+        Tree at:  0000 0000 0000 0718  length: 0000 0000 0000 0008
           0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000
-          0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0398 0000 0009   0000 0012 0000 0000   0000 0002 0000 0009
-          0000 0458 0020 0006   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0005 0000 0004   0000 0003 0000 0002   0000 0001 0000 0000
+          0000 0000 0000 0010   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0698 0000 0009   0000 0005 0000 0001   0000 0012 0000 0000   0000 0002 0000 0009
+          0000 0758 0080 0008   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0009 0000 0008   0000 0007 0000 0006   0000 0005 0000 0004   0000 0001 0000 0000
             index: 0000 0000 0000 0000   key: 0000 0000 0000 0000   data: 0000 0000 0000 0009
             index: 0000 0000 0000 0001   key: 0000 0000 0000 0001   data: 0000 0000 0000 0002
-            index: 0000 0000 0000 0002   key: 0000 0000 0000 0002   data: 0000 0000 0000 0000
-            index: 0000 0000 0000 0003   key: 0000 0000 0000 0003   data: 0000 0000 0000 0012
-            index: 0000 0000 0000 0004   key: 0000 0000 0000 0004   data: 0000 0000 0000 0009
-            index: 0000 0000 0000 0005   key: 0000 0000 0000 0005   data: 0000 0000 0000 0398 subTree
-          Tree at:  0000 0000 0000 0398  length: 0000 0000 0000 0004
+            index: 0000 0000 0000 0002   key: 0000 0000 0000 0004   data: 0000 0000 0000 0000
+            index: 0000 0000 0000 0003   key: 0000 0000 0000 0005   data: 0000 0000 0000 0012
+            index: 0000 0000 0000 0004   key: 0000 0000 0000 0006   data: 0000 0000 0000 0001
+            index: 0000 0000 0000 0005   key: 0000 0000 0000 0007   data: 0000 0000 0000 0005
+            index: 0000 0000 0000 0006   key: 0000 0000 0000 0008   data: 0000 0000 0000 0009
+            index: 0000 0000 0000 0007   key: 0000 0000 0000 0009   data: 0000 0000 0000 0698 subTree
+          Tree at:  0000 0000 0000 0698  length: 0000 0000 0000 0004
             0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000
-            0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0318 0000 0009   0000 0001 0000 0009
-            0000 03D8 0008 0004   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0003 0000 0002   0000 0001 0000 0000
+            0000 0000 0000 0008   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 05D8 0000 0009   0000 0001 0000 0009
+            0000 06D8 0008 0004   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0005 0000 0004   0000 0001 0000 0000
               index: 0000 0000 0000 0000   key: 0000 0000 0000 0000   data: 0000 0000 0000 0009
               index: 0000 0000 0000 0001   key: 0000 0000 0000 0001   data: 0000 0000 0000 0001
-              index: 0000 0000 0000 0002   key: 0000 0000 0000 0002   data: 0000 0000 0000 0009
-              index: 0000 0000 0000 0003   key: 0000 0000 0000 0003   data: 0000 0000 0000 0318 subTree
-            Tree at:  0000 0000 0000 0318  length: 0000 0000 0000 0004
+              index: 0000 0000 0000 0002   key: 0000 0000 0000 0004   data: 0000 0000 0000 0009
+              index: 0000 0000 0000 0003   key: 0000 0000 0000 0005   data: 0000 0000 0000 05D8 subTree
+            Tree at:  0000 0000 0000 05D8  length: 0000 0000 0000 0006
               0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000
-              0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0013 0000 0006   0000 0001 0000 0009
-              0000 0358 0000 0004   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0003 0000 0002   0000 0001 0000 0000
+              0000 0000 0000 000C   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0004 0000 0002   0000 0013 0000 0006   0000 0001 0000 0009
+              0000 0618 0000 0006   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0007 0000 0006   0000 0005 0000 0004   0000 0001 0000 0000
                 index: 0000 0000 0000 0000   key: 0000 0000 0000 0000   data: 0000 0000 0000 0009
                 index: 0000 0000 0000 0001   key: 0000 0000 0000 0001   data: 0000 0000 0000 0001
-                index: 0000 0000 0000 0002   key: 0000 0000 0000 0002   data: 0000 0000 0000 0006
-                index: 0000 0000 0000 0003   key: 0000 0000 0000 0003   data: 0000 0000 0000 0013
+                index: 0000 0000 0000 0002   key: 0000 0000 0000 0004   data: 0000 0000 0000 0006
+                index: 0000 0000 0000 0003   key: 0000 0000 0000 0005   data: 0000 0000 0000 0013
+                index: 0000 0000 0000 0004   key: 0000 0000 0000 0006   data: 0000 0000 0000 0002
+                index: 0000 0000 0000 0005   key: 0000 0000 0000 0007   data: 0000 0000 0000 0004
             end
           end
         end
@@ -2461,43 +3022,48 @@ end
 END
 
 #latest:
-ok T(q(vav), <<END, comments=>10);
-Tree at:  0000 0000 0000 0118  length: 0000 0000 0000 0008
+ok T(q(vav), <<END) if 1;
+Tree at:  0000 0000 0000 02D8  length: 0000 0000 0000 000A
   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000
-  0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0098 0000 0009   0000 0018 0000 0009   0000 0001 0000 0005   0000 0003 0000 0009
-  0000 0158 00A0 0008   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0007 0000 0006   0000 0005 0000 0004   0000 0003 0000 0002   0000 0001 0000 0000
+  0000 0000 0000 0014   0000 0000 0000 0000   0000 0000 0000 0000   0000 0218 0000 0009   0000 00D8 0000 0009   0000 0002 0000 0001   0000 0001 0000 0005   0000 0003 0000 0009
+  0000 0318 0280 000A   0000 0000 0000 0000   0000 0000 0000 0000   0000 000D 0000 000C   0000 0009 0000 0008   0000 0007 0000 0006   0000 0005 0000 0004   0000 0001 0000 0000
     index: 0000 0000 0000 0000   key: 0000 0000 0000 0000   data: 0000 0000 0000 0009
     index: 0000 0000 0000 0001   key: 0000 0000 0000 0001   data: 0000 0000 0000 0003
-    index: 0000 0000 0000 0002   key: 0000 0000 0000 0002   data: 0000 0000 0000 0005
-    index: 0000 0000 0000 0003   key: 0000 0000 0000 0003   data: 0000 0000 0000 0001
-    index: 0000 0000 0000 0004   key: 0000 0000 0000 0004   data: 0000 0000 0000 0009
-    index: 0000 0000 0000 0005   key: 0000 0000 0000 0005   data: 0000 0000 0000 0018 subTree
-    index: 0000 0000 0000 0006   key: 0000 0000 0000 0006   data: 0000 0000 0000 0009
-    index: 0000 0000 0000 0007   key: 0000 0000 0000 0007   data: 0000 0000 0000 0098 subTree
-  Tree at:  0000 0000 0000 0018  length: 0000 0000 0000 0004
+    index: 0000 0000 0000 0002   key: 0000 0000 0000 0004   data: 0000 0000 0000 0005
+    index: 0000 0000 0000 0003   key: 0000 0000 0000 0005   data: 0000 0000 0000 0001
+    index: 0000 0000 0000 0004   key: 0000 0000 0000 0006   data: 0000 0000 0000 0001
+    index: 0000 0000 0000 0005   key: 0000 0000 0000 0007   data: 0000 0000 0000 0002
+    index: 0000 0000 0000 0006   key: 0000 0000 0000 0008   data: 0000 0000 0000 0009
+    index: 0000 0000 0000 0007   key: 0000 0000 0000 0009   data: 0000 0000 0000 00D8 subTree
+    index: 0000 0000 0000 0008   key: 0000 0000 0000 000C   data: 0000 0000 0000 0009
+    index: 0000 0000 0000 0009   key: 0000 0000 0000 000D   data: 0000 0000 0000 0218 subTree
+  Tree at:  0000 0000 0000 00D8  length: 0000 0000 0000 0006
     0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000
-    0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0006   0000 0001 0000 0009
-    0000 0058 0000 0004   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0003 0000 0002   0000 0001 0000 0000
+    0000 0000 0000 000C   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0001   0000 0000 0000 0006   0000 0001 0000 0009
+    0000 0118 0000 0006   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0007 0000 0006   0000 0005 0000 0004   0000 0001 0000 0000
       index: 0000 0000 0000 0000   key: 0000 0000 0000 0000   data: 0000 0000 0000 0009
       index: 0000 0000 0000 0001   key: 0000 0000 0000 0001   data: 0000 0000 0000 0001
-      index: 0000 0000 0000 0002   key: 0000 0000 0000 0002   data: 0000 0000 0000 0006
-      index: 0000 0000 0000 0003   key: 0000 0000 0000 0003   data: 0000 0000 0000 0000
+      index: 0000 0000 0000 0002   key: 0000 0000 0000 0004   data: 0000 0000 0000 0006
+      index: 0000 0000 0000 0003   key: 0000 0000 0000 0005   data: 0000 0000 0000 0000
+      index: 0000 0000 0000 0004   key: 0000 0000 0000 0006   data: 0000 0000 0000 0001
+      index: 0000 0000 0000 0005   key: 0000 0000 0000 0007   data: 0000 0000 0000 0000
   end
-  Tree at:  0000 0000 0000 0098  length: 0000 0000 0000 0004
+  Tree at:  0000 0000 0000 0218  length: 0000 0000 0000 0006
     0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000
-    0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0002 0000 0006   0000 0001 0000 0009
-    0000 00D8 0000 0004   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0003 0000 0002   0000 0001 0000 0000
+    0000 0000 0000 000C   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0001 0000 0001   0000 0002 0000 0006   0000 0001 0000 0009
+    0000 0258 0000 0006   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0007 0000 0006   0000 0005 0000 0004   0000 0001 0000 0000
       index: 0000 0000 0000 0000   key: 0000 0000 0000 0000   data: 0000 0000 0000 0009
       index: 0000 0000 0000 0001   key: 0000 0000 0000 0001   data: 0000 0000 0000 0001
-      index: 0000 0000 0000 0002   key: 0000 0000 0000 0002   data: 0000 0000 0000 0006
-      index: 0000 0000 0000 0003   key: 0000 0000 0000 0003   data: 0000 0000 0000 0002
+      index: 0000 0000 0000 0002   key: 0000 0000 0000 0004   data: 0000 0000 0000 0006
+      index: 0000 0000 0000 0003   key: 0000 0000 0000 0005   data: 0000 0000 0000 0002
+      index: 0000 0000 0000 0004   key: 0000 0000 0000 0006   data: 0000 0000 0000 0001
+      index: 0000 0000 0000 0005   key: 0000 0000 0000 0007   data: 0000 0000 0000 0001
   end
 end
 END
 
-#latest:
 if (1) {                                                                        #Tcreate #Tprint
-  create (K(address, Rutf8 $Lex->{sampleText}{vav}))->print;                    # Create parse tree from source terminated with  zero
+  create (K(address, Rutf8 $Lex->{sampleText}{vav}))->print;                    # Create parse tree from source terminated with zero
 
   ok Assemble(debug => 0, eq => <<END);
 Assign: 𝑎
@@ -2509,10 +3075,7 @@ END
  }
 
 #latest:
-if (1) {
-  create (K(address, Rutf8 $Lex->{sampleText}{vavav}))->print;
-
-  ok Assemble(debug => 0, eq => <<END);
+ok C(q(vavav), <<END);
 Assign: 𝑎
   Term
     Variable: 𝗮
@@ -2523,58 +3086,54 @@ Assign: 𝑎
       Term
         Variable: 𝗰
 END
- }
 
 #latest:
-ok T(q(bvB), <<END, comments=>10);
-Tree at:  0000 0000 0000 0118  length: 0000 0000 0000 0006
+ok T(q(bvB), <<END) if 1;
+Tree at:  0000 0000 0000 0298  length: 0000 0000 0000 0008
   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000
-  0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0098 0000 0009   0000 0000 0000 0000   0000 0002 0000 0009
-  0000 0158 0020 0006   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0005 0000 0004   0000 0003 0000 0002   0000 0001 0000 0000
+  0000 0000 0000 0010   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0218 0000 0009   0000 0001 0000 0001   0000 0000 0000 0000   0000 0002 0000 0009
+  0000 02D8 0080 0008   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0009 0000 0008   0000 0007 0000 0006   0000 0005 0000 0004   0000 0001 0000 0000
     index: 0000 0000 0000 0000   key: 0000 0000 0000 0000   data: 0000 0000 0000 0009
     index: 0000 0000 0000 0001   key: 0000 0000 0000 0001   data: 0000 0000 0000 0002
-    index: 0000 0000 0000 0002   key: 0000 0000 0000 0002   data: 0000 0000 0000 0000
-    index: 0000 0000 0000 0003   key: 0000 0000 0000 0003   data: 0000 0000 0000 0000
-    index: 0000 0000 0000 0004   key: 0000 0000 0000 0004   data: 0000 0000 0000 0009
-    index: 0000 0000 0000 0005   key: 0000 0000 0000 0005   data: 0000 0000 0000 0098 subTree
-  Tree at:  0000 0000 0000 0098  length: 0000 0000 0000 0004
+    index: 0000 0000 0000 0002   key: 0000 0000 0000 0004   data: 0000 0000 0000 0000
+    index: 0000 0000 0000 0003   key: 0000 0000 0000 0005   data: 0000 0000 0000 0000
+    index: 0000 0000 0000 0004   key: 0000 0000 0000 0006   data: 0000 0000 0000 0001
+    index: 0000 0000 0000 0005   key: 0000 0000 0000 0007   data: 0000 0000 0000 0001
+    index: 0000 0000 0000 0006   key: 0000 0000 0000 0008   data: 0000 0000 0000 0009
+    index: 0000 0000 0000 0007   key: 0000 0000 0000 0009   data: 0000 0000 0000 0218 subTree
+  Tree at:  0000 0000 0000 0218  length: 0000 0000 0000 0004
     0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000
-    0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0018 0000 0009   0000 0001 0000 0009
-    0000 00D8 0008 0004   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0003 0000 0002   0000 0001 0000 0000
+    0000 0000 0000 0008   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 00D8 0000 0009   0000 0001 0000 0009
+    0000 0258 0008 0004   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0005 0000 0004   0000 0001 0000 0000
       index: 0000 0000 0000 0000   key: 0000 0000 0000 0000   data: 0000 0000 0000 0009
       index: 0000 0000 0000 0001   key: 0000 0000 0000 0001   data: 0000 0000 0000 0001
-      index: 0000 0000 0000 0002   key: 0000 0000 0000 0002   data: 0000 0000 0000 0009
-      index: 0000 0000 0000 0003   key: 0000 0000 0000 0003   data: 0000 0000 0000 0018 subTree
-    Tree at:  0000 0000 0000 0018  length: 0000 0000 0000 0004
+      index: 0000 0000 0000 0002   key: 0000 0000 0000 0004   data: 0000 0000 0000 0009
+      index: 0000 0000 0000 0003   key: 0000 0000 0000 0005   data: 0000 0000 0000 00D8 subTree
+    Tree at:  0000 0000 0000 00D8  length: 0000 0000 0000 0006
       0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000
-      0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0001 0000 0006   0000 0001 0000 0009
-      0000 0058 0000 0004   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0003 0000 0002   0000 0001 0000 0000
+      0000 0000 0000 000C   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0003   0000 0001 0000 0006   0000 0001 0000 0009
+      0000 0118 0000 0006   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0007 0000 0006   0000 0005 0000 0004   0000 0001 0000 0000
         index: 0000 0000 0000 0000   key: 0000 0000 0000 0000   data: 0000 0000 0000 0009
         index: 0000 0000 0000 0001   key: 0000 0000 0000 0001   data: 0000 0000 0000 0001
-        index: 0000 0000 0000 0002   key: 0000 0000 0000 0002   data: 0000 0000 0000 0006
-        index: 0000 0000 0000 0003   key: 0000 0000 0000 0003   data: 0000 0000 0000 0001
+        index: 0000 0000 0000 0002   key: 0000 0000 0000 0004   data: 0000 0000 0000 0006
+        index: 0000 0000 0000 0003   key: 0000 0000 0000 0005   data: 0000 0000 0000 0001
+        index: 0000 0000 0000 0004   key: 0000 0000 0000 0006   data: 0000 0000 0000 0003
+        index: 0000 0000 0000 0005   key: 0000 0000 0000 0007   data: 0000 0000 0000 0000
     end
   end
 end
 END
 
 #latest:
-if (1) {
-  create (K(address, Rutf8 $Lex->{sampleText}{bvB}))->print;
-
-  ok Assemble(debug => 0, eq => <<END);
+ok C(q(bvB), <<END);
 Brackets: ❨❩
   Term
     Term
       Variable: 𝗮𝗯𝗰
 END
- }
 
 #latest:
-if (1) {
-  create (K(address, Rutf8 $Lex->{sampleText}{brackets}))->print;
-
-  ok Assemble(debug => 0, eq => <<END);
+ok C(q(brackets), <<END);
 Assign: 𝑎𝑠𝑠𝑖𝑔𝑛
   Term
     Variable: 𝗮
@@ -2597,13 +3156,9 @@ Assign: 𝑎𝑠𝑠𝑖𝑔𝑛
                   Term
                     Variable: 𝘀𝗰
 END
- }
 
 #latest:
-if (1) {
-  create (K(address, Rutf8 $Lex->{sampleText}{ws}))->print;
-
-  ok Assemble(debug => 0, eq => <<END);
+ok C(q(ws), <<END);
 Semicolon
   Term
     Assign: 𝑎𝑠𝑠𝑖𝑔𝑛
@@ -2641,101 +3196,207 @@ Semicolon
                 Term
                   Variable: 𝗰𝗰
 END
- }
 
 #latest:;
-ok T(q(s), <<END, comments=>10);
-Tree at:  0000 0000 0000 0118  length: 0000 0000 0000 0008
+ok T(q(s), <<END) if 1;
+Tree at:  0000 0000 0000 02D8  length: 0000 0000 0000 000A
   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000
-  0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0098 0000 0009   0000 0018 0000 0009   0000 0001 0000 0008   0000 0003 0000 0009
-  0000 0158 00A0 0008   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0007 0000 0006   0000 0005 0000 0004   0000 0003 0000 0002   0000 0001 0000 0000
+  0000 0000 0000 0014   0000 0000 0000 0000   0000 0000 0000 0000   0000 0218 0000 0009   0000 00D8 0000 0009   0000 0002 0000 0001   0000 0001 0000 0008   0000 0003 0000 0009
+  0000 0318 0280 000A   0000 0000 0000 0000   0000 0000 0000 0000   0000 000D 0000 000C   0000 0009 0000 0008   0000 0007 0000 0006   0000 0005 0000 0004   0000 0001 0000 0000
     index: 0000 0000 0000 0000   key: 0000 0000 0000 0000   data: 0000 0000 0000 0009
     index: 0000 0000 0000 0001   key: 0000 0000 0000 0001   data: 0000 0000 0000 0003
-    index: 0000 0000 0000 0002   key: 0000 0000 0000 0002   data: 0000 0000 0000 0008
-    index: 0000 0000 0000 0003   key: 0000 0000 0000 0003   data: 0000 0000 0000 0001
-    index: 0000 0000 0000 0004   key: 0000 0000 0000 0004   data: 0000 0000 0000 0009
-    index: 0000 0000 0000 0005   key: 0000 0000 0000 0005   data: 0000 0000 0000 0018 subTree
-    index: 0000 0000 0000 0006   key: 0000 0000 0000 0006   data: 0000 0000 0000 0009
-    index: 0000 0000 0000 0007   key: 0000 0000 0000 0007   data: 0000 0000 0000 0098 subTree
-  Tree at:  0000 0000 0000 0018  length: 0000 0000 0000 0004
+    index: 0000 0000 0000 0002   key: 0000 0000 0000 0004   data: 0000 0000 0000 0008
+    index: 0000 0000 0000 0003   key: 0000 0000 0000 0005   data: 0000 0000 0000 0001
+    index: 0000 0000 0000 0004   key: 0000 0000 0000 0006   data: 0000 0000 0000 0001
+    index: 0000 0000 0000 0005   key: 0000 0000 0000 0007   data: 0000 0000 0000 0002
+    index: 0000 0000 0000 0006   key: 0000 0000 0000 0008   data: 0000 0000 0000 0009
+    index: 0000 0000 0000 0007   key: 0000 0000 0000 0009   data: 0000 0000 0000 00D8 subTree
+    index: 0000 0000 0000 0008   key: 0000 0000 0000 000C   data: 0000 0000 0000 0009
+    index: 0000 0000 0000 0009   key: 0000 0000 0000 000D   data: 0000 0000 0000 0218 subTree
+  Tree at:  0000 0000 0000 00D8  length: 0000 0000 0000 0006
     0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000
-    0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0006   0000 0001 0000 0009
-    0000 0058 0000 0004   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0003 0000 0002   0000 0001 0000 0000
+    0000 0000 0000 000C   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0001   0000 0000 0000 0006   0000 0001 0000 0009
+    0000 0118 0000 0006   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0007 0000 0006   0000 0005 0000 0004   0000 0001 0000 0000
       index: 0000 0000 0000 0000   key: 0000 0000 0000 0000   data: 0000 0000 0000 0009
       index: 0000 0000 0000 0001   key: 0000 0000 0000 0001   data: 0000 0000 0000 0001
-      index: 0000 0000 0000 0002   key: 0000 0000 0000 0002   data: 0000 0000 0000 0006
-      index: 0000 0000 0000 0003   key: 0000 0000 0000 0003   data: 0000 0000 0000 0000
+      index: 0000 0000 0000 0002   key: 0000 0000 0000 0004   data: 0000 0000 0000 0006
+      index: 0000 0000 0000 0003   key: 0000 0000 0000 0005   data: 0000 0000 0000 0000
+      index: 0000 0000 0000 0004   key: 0000 0000 0000 0006   data: 0000 0000 0000 0001
+      index: 0000 0000 0000 0005   key: 0000 0000 0000 0007   data: 0000 0000 0000 0000
   end
-  Tree at:  0000 0000 0000 0098  length: 0000 0000 0000 0004
+  Tree at:  0000 0000 0000 0218  length: 0000 0000 0000 0006
     0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000
-    0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0002 0000 0006   0000 0001 0000 0009
-    0000 00D8 0000 0004   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0003 0000 0002   0000 0001 0000 0000
+    0000 0000 0000 000C   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0001 0000 0001   0000 0002 0000 0006   0000 0001 0000 0009
+    0000 0258 0000 0006   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0007 0000 0006   0000 0005 0000 0004   0000 0001 0000 0000
       index: 0000 0000 0000 0000   key: 0000 0000 0000 0000   data: 0000 0000 0000 0009
       index: 0000 0000 0000 0001   key: 0000 0000 0000 0001   data: 0000 0000 0000 0001
-      index: 0000 0000 0000 0002   key: 0000 0000 0000 0002   data: 0000 0000 0000 0006
-      index: 0000 0000 0000 0003   key: 0000 0000 0000 0003   data: 0000 0000 0000 0002
+      index: 0000 0000 0000 0002   key: 0000 0000 0000 0004   data: 0000 0000 0000 0006
+      index: 0000 0000 0000 0003   key: 0000 0000 0000 0005   data: 0000 0000 0000 0002
+      index: 0000 0000 0000 0004   key: 0000 0000 0000 0006   data: 0000 0000 0000 0001
+      index: 0000 0000 0000 0005   key: 0000 0000 0000 0007   data: 0000 0000 0000 0001
   end
 end
 END
 
 #latest:
-if (1) {
-  create (K(address, Rutf8 $Lex->{sampleText}{s}))->print;
-
-  ok Assemble(debug => 0, eq => <<END);
+ok C(q(s), <<END);
 Semicolon
   Term
     Variable: 𝗮
   Term
     Variable: 𝗯
 END
- }
 
 #latest:
-ok T(q(A), <<END);
-Tree at:  0000 0000 0000 0118  length: 0000 0000 0000 0008
+ok T(q(A), <<END) if 1;
+Tree at:  0000 0000 0000 03D8  length: 0000 0000 0000 000A
   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000
-  0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0098 0000 0009   0000 0018 0000 0009   0000 0002 0000 0005   0000 0003 0000 0009
-  0000 0158 00A0 0008   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0007 0000 0006   0000 0005 0000 0004   0000 0003 0000 0002   0000 0001 0000 0000
+  0000 0000 0000 0014   0000 0000 0000 0000   0000 0000 0000 0000   0000 0218 0000 0009   0000 00D8 0000 0009   0000 0002 0000 0006   0000 0002 0000 0005   0000 0003 0000 0009
+  0000 0418 0280 000A   0000 0000 0000 0000   0000 0000 0000 0000   0000 000D 0000 000C   0000 0009 0000 0008   0000 0007 0000 0006   0000 0005 0000 0004   0000 0001 0000 0000
     index: 0000 0000 0000 0000   key: 0000 0000 0000 0000   data: 0000 0000 0000 0009
     index: 0000 0000 0000 0001   key: 0000 0000 0000 0001   data: 0000 0000 0000 0003
-    index: 0000 0000 0000 0002   key: 0000 0000 0000 0002   data: 0000 0000 0000 0005
-    index: 0000 0000 0000 0003   key: 0000 0000 0000 0003   data: 0000 0000 0000 0002
-    index: 0000 0000 0000 0004   key: 0000 0000 0000 0004   data: 0000 0000 0000 0009
-    index: 0000 0000 0000 0005   key: 0000 0000 0000 0005   data: 0000 0000 0000 0018 subTree
-    index: 0000 0000 0000 0006   key: 0000 0000 0000 0006   data: 0000 0000 0000 0009
-    index: 0000 0000 0000 0007   key: 0000 0000 0000 0007   data: 0000 0000 0000 0098 subTree
-  Tree at:  0000 0000 0000 0018  length: 0000 0000 0000 0004
+    index: 0000 0000 0000 0002   key: 0000 0000 0000 0004   data: 0000 0000 0000 0005
+    index: 0000 0000 0000 0003   key: 0000 0000 0000 0005   data: 0000 0000 0000 0002
+    index: 0000 0000 0000 0004   key: 0000 0000 0000 0006   data: 0000 0000 0000 0006
+    index: 0000 0000 0000 0005   key: 0000 0000 0000 0007   data: 0000 0000 0000 0002
+    index: 0000 0000 0000 0006   key: 0000 0000 0000 0008   data: 0000 0000 0000 0009
+    index: 0000 0000 0000 0007   key: 0000 0000 0000 0009   data: 0000 0000 0000 00D8 subTree
+    index: 0000 0000 0000 0008   key: 0000 0000 0000 000C   data: 0000 0000 0000 0009
+    index: 0000 0000 0000 0009   key: 0000 0000 0000 000D   data: 0000 0000 0000 0218 subTree
+  Tree at:  0000 0000 0000 00D8  length: 0000 0000 0000 0006
     0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000
-    0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0006   0000 0001 0000 0009
-    0000 0058 0000 0004   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0003 0000 0002   0000 0001 0000 0000
+    0000 0000 0000 000C   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0002   0000 0000 0000 0006   0000 0001 0000 0009
+    0000 0118 0000 0006   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0007 0000 0006   0000 0005 0000 0004   0000 0001 0000 0000
       index: 0000 0000 0000 0000   key: 0000 0000 0000 0000   data: 0000 0000 0000 0009
       index: 0000 0000 0000 0001   key: 0000 0000 0000 0001   data: 0000 0000 0000 0001
-      index: 0000 0000 0000 0002   key: 0000 0000 0000 0002   data: 0000 0000 0000 0006
-      index: 0000 0000 0000 0003   key: 0000 0000 0000 0003   data: 0000 0000 0000 0000
+      index: 0000 0000 0000 0002   key: 0000 0000 0000 0004   data: 0000 0000 0000 0006
+      index: 0000 0000 0000 0003   key: 0000 0000 0000 0005   data: 0000 0000 0000 0000
+      index: 0000 0000 0000 0004   key: 0000 0000 0000 0006   data: 0000 0000 0000 0002
+      index: 0000 0000 0000 0005   key: 0000 0000 0000 0007   data: 0000 0000 0000 0000
   end
-  Tree at:  0000 0000 0000 0098  length: 0000 0000 0000 0004
+  Tree at:  0000 0000 0000 0218  length: 0000 0000 0000 0006
     0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000
-    0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0008 0000 0002   0000 0001 0000 0009
-    0000 00D8 0000 0004   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0003 0000 0002   0000 0001 0000 0000
+    0000 0000 0000 000C   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0001 0000 0007   0000 0008 0000 0002   0000 0001 0000 0009
+    0000 0258 0000 0006   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0007 0000 0006   0000 0005 0000 0004   0000 0001 0000 0000
       index: 0000 0000 0000 0000   key: 0000 0000 0000 0000   data: 0000 0000 0000 0009
       index: 0000 0000 0000 0001   key: 0000 0000 0000 0001   data: 0000 0000 0000 0001
-      index: 0000 0000 0000 0002   key: 0000 0000 0000 0002   data: 0000 0000 0000 0002
-      index: 0000 0000 0000 0003   key: 0000 0000 0000 0003   data: 0000 0000 0000 0008
+      index: 0000 0000 0000 0002   key: 0000 0000 0000 0004   data: 0000 0000 0000 0002
+      index: 0000 0000 0000 0003   key: 0000 0000 0000 0005   data: 0000 0000 0000 0008
+      index: 0000 0000 0000 0004   key: 0000 0000 0000 0006   data: 0000 0000 0000 0007
+      index: 0000 0000 0000 0005   key: 0000 0000 0000 0007   data: 0000 0000 0000 0001
   end
 end
 END
 
 #latest:
-if (1) {
-  create (K(address, Rutf8 $Lex->{sampleText}{A}))->print;
-
-  ok Assemble(debug => 0, eq => <<END);
+ok C(q(A), <<END);
 Assign: 𝑒𝑞𝑢𝑎𝑙𝑠
   Term
     Variable: 𝗮𝗮
   Term
     Ascii: abc 123
+END
+
+=pod
+# q(𝚨𝚩𝚾𝚫𝚬𝚽𝚪𝚯𝚰J𝚱𝚲𝚳𝚮𝚶𝚷𝚹𝚸𝚺𝚻𝚼𝚴𝛀𝚵𝚿𝚭𝛂𝛃𝛘𝛅𝛆𝛗𝛄𝛉𝛊j𝛋𝛌𝛍𝛈𝛐𝛑𝛓𝛒𝛔𝛕𝛖𝛎𝛚𝛏𝛙𝛇)
+# q(𝜜𝜝𝜲𝜟𝜠𝜱𝜞𝜣𝜤J𝜥𝜦𝜧𝜢𝜪𝜫𝜭𝜬𝜮𝜯𝜰𝜨𝜴𝜩𝜳𝜡𝜶𝜷𝝌𝜹𝜺𝝋𝜸𝜽𝜾j𝜿𝝀𝝁𝜼𝝄𝝅𝝇𝝆𝝈𝝉𝝊𝝂𝝎𝝃𝝍𝜻)
+# q(𝞐𝞑𝞦𝞓𝞔𝞥𝞒𝞗𝞘J𝞙𝞚𝞛𝞖𝞞𝞟𝞡𝞠𝞢𝞣𝞤𝞜𝞨𝞝𝞧𝞕𝞪𝞫𝟀𝞭𝞮𝞿𝞬𝞱𝞲j𝞳𝞴𝞵𝞰𝞸𝞹𝞻𝞺𝞼𝞽𝞾𝞶𝟂𝞷𝟁𝞯)
+# q(𝝖𝝗𝝬𝝙𝝚𝝫𝝘𝝝𝝞J𝝟𝝠𝝡𝝜𝝤𝝥𝝧𝝦𝝨𝝩𝝪𝝢𝝮𝝣𝝭𝝛𝝰𝝱𝞆𝝳𝝴𝞅𝝲𝝷𝝸j𝝹𝝺𝝻𝝶𝝾𝝿𝞁𝞀𝞂𝞃𝞄𝝼𝞈𝝽𝞇𝝵)
+=cut
+#latest:
+is_deeply asciiToDyadLatin    ("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"), q(𝐀𝐁𝐂𝐃𝐄𝐅𝐆𝐇𝐈𝐉𝐊𝐋𝐌𝐍𝐎𝐏𝐐𝐑𝐒𝐓𝐔𝐕𝐖𝐗𝐘𝐙𝐚𝐛𝐜𝐝𝐞𝐟𝐠𝐡𝐢𝐣𝐤𝐥𝐦𝐧𝐨𝐩𝐪𝐫𝐬𝐭𝐮𝐯𝐰𝐱𝐲𝐳);
+is_deeply asciiToDyadGreek    ("ABGDEZNHIKLMVXOPRQSTUFCYWabgdeznhiklmvxoprqstufcyw"),   q(𝚨𝚩𝚪𝚫𝚬𝚭𝚮𝚯𝚰𝚱𝚲𝚳𝚴𝚵𝚶𝚷𝚸𝚹𝚺𝚻𝚼𝚽𝚾𝚿𝛀𝛂𝛃𝛄𝛅𝛆𝛇𝛈𝛉𝛊𝛋𝛌𝛍𝛎𝛏𝛐𝛑𝛒𝛓𝛔𝛕𝛖𝛗𝛘𝛙𝛚);
+is_deeply asciiToPrefixLatin  ("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"), q(𝑨𝑩𝑪𝑫𝑬𝑭𝑮𝑯𝑰𝑱𝑲𝑳𝑴𝑵𝑶𝑷𝑸𝑹𝑺𝑻𝑼𝑽𝑾𝑿𝒀𝒁𝒂𝒃𝒄𝒅𝒆𝒇𝒈𝒉𝒊𝒋𝒌𝒍𝒎𝒏𝒐𝒑𝒒𝒓𝒔𝒕𝒖𝒗𝒘𝒙𝒚𝒛);
+is_deeply asciiToPrefixGreek  ("ABGDEZNHIKLMVXOPRQSTUFCYWabgdeznhiklmvxoprqstufcyw"),   q(𝜜𝜝𝜞𝜟𝜠𝜡𝜢𝜣𝜤𝜥𝜦𝜧𝜨𝜩𝜪𝜫𝜬𝜭𝜮𝜯𝜰𝜱𝜲𝜳𝜴𝜶𝜷𝜸𝜹𝜺𝜻𝜼𝜽𝜾𝜿𝝀𝝁𝝂𝝃𝝄𝝅𝝆𝝇𝝈𝝉𝝊𝝋𝝌𝝍𝝎);
+is_deeply asciiToSuffixLatin  ("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"), q(𝘼𝘽𝘾𝘿𝙀𝙁𝙂𝙃𝙄𝙅𝙆𝙇𝙈𝙉𝙊𝙋𝙌𝙍𝙎𝙏𝙐𝙑𝙒𝙓𝙔𝙕𝙖𝙗𝙘𝙙𝙚𝙛𝙜𝙝𝙞𝙟𝙠𝙡𝙢𝙣𝙤𝙥𝙦𝙧𝙨𝙩𝙪𝙫𝙬𝙭𝙮𝙯);
+is_deeply asciiToSuffixGreek  ("ABGDEZNHIKLMVXOPRQSTUFCYWabgdeznhiklmvxoprqstufcyw"),   q(𝞐𝞑𝞒𝞓𝞔𝞕𝞖𝞗𝞘𝞙𝞚𝞛𝞜𝞝𝞞𝞟𝞠𝞡𝞢𝞣𝞤𝞥𝞦𝞧𝞨𝞪𝞫𝞬𝞭𝞮𝞯𝞰𝞱𝞲𝞳𝞴𝞵𝞶𝞷𝞸𝞹𝞺𝞻𝞼𝞽𝞾𝞿𝟀𝟁𝟂);
+is_deeply asciiToVariableLatin("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"), q(𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇);
+is_deeply asciiToVariableGreek("ABGDEZNHIKLMVXOPRQSTUFCYWabgdeznhiklmvxoprqstufcyw"),   q(𝝖𝝗𝝘𝝙𝝚𝝛𝝜𝝝𝝞𝝟𝝠𝝡𝝢𝝣𝝤𝝥𝝦𝝧𝝨𝝩𝝪𝝫𝝬𝝭𝝮𝝰𝝱𝝲𝝳𝝴𝝵𝝶𝝷𝝸𝝹𝝺𝝻𝝼𝝽𝝾𝝿𝞀𝞁𝞂𝞃𝞄𝞅𝞆𝞇𝞈);
+is_deeply asciiToEscaped      ("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"), q(ABCDEFGHIJKLMNOPQRSTUVWXYZ🅐🅑🅒🅓🅔🅕🅖🅗🅘🅙🅚🅛🅜🅝🅞🅟🅠🅡🅢🅣🅤🅥🅦🅧🅨🅩);
+is_deeply semiColon, q(⟢);
+
+#latest:
+ok T(q(A), <<END,
+Quark : 0000 0000 0000 0000 = 0000 0000 0040 207B
+Quark : 0000 0000 0000 0001 = 0000 0000 0040 20EF
+Tree at:  0000 0000 0000 0698  length: 0000 0000 0000 000B
+  0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000
+  0000 0000 0000 0016   0000 0000 0000 0000   0000 0000 0000 04D8   0000 0009 0000 0398   0000 0009 0000 0002   0000 0006 0000 0002   0000 0005 0040 20EF   0000 0003 0000 0009
+  0000 06D8 0500 000B   0000 0000 0000 0000   0000 0000 0000 000D   0000 000C 0000 0009   0000 0008 0000 0007   0000 0006 0000 0005   0000 0004 0000 0002   0000 0001 0000 0000
+    index: 0000 0000 0000 0000   key: 0000 0000 0000 0000   data: 0000 0000 0000 0009
+    index: 0000 0000 0000 0001   key: 0000 0000 0000 0001   data: 0000 0000 0000 0003
+    index: 0000 0000 0000 0002   key: 0000 0000 0000 0002   data: 0000 0000 0040 20EF
+    index: 0000 0000 0000 0003   key: 0000 0000 0000 0004   data: 0000 0000 0000 0005
+    index: 0000 0000 0000 0004   key: 0000 0000 0000 0005   data: 0000 0000 0000 0002
+    index: 0000 0000 0000 0005   key: 0000 0000 0000 0006   data: 0000 0000 0000 0006
+    index: 0000 0000 0000 0006   key: 0000 0000 0000 0007   data: 0000 0000 0000 0002
+    index: 0000 0000 0000 0007   key: 0000 0000 0000 0008   data: 0000 0000 0000 0009
+    index: 0000 0000 0000 0008   key: 0000 0000 0000 0009   data: 0000 0000 0000 0398 subTree
+    index: 0000 0000 0000 0009   key: 0000 0000 0000 000C   data: 0000 0000 0000 0009
+    index: 0000 0000 0000 000A   key: 0000 0000 0000 000D   data: 0000 0000 0000 04D8 subTree
+  Tree at:  0000 0000 0000 0398  length: 0000 0000 0000 0006
+    0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000
+    0000 0000 0000 000C   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0002   0000 0000 0000 0006   0000 0001 0000 0009
+    0000 03D8 0000 0006   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0007 0000 0006   0000 0005 0000 0004   0000 0001 0000 0000
+      index: 0000 0000 0000 0000   key: 0000 0000 0000 0000   data: 0000 0000 0000 0009
+      index: 0000 0000 0000 0001   key: 0000 0000 0000 0001   data: 0000 0000 0000 0001
+      index: 0000 0000 0000 0002   key: 0000 0000 0000 0004   data: 0000 0000 0000 0006
+      index: 0000 0000 0000 0003   key: 0000 0000 0000 0005   data: 0000 0000 0000 0000
+      index: 0000 0000 0000 0004   key: 0000 0000 0000 0006   data: 0000 0000 0000 0002
+      index: 0000 0000 0000 0005   key: 0000 0000 0000 0007   data: 0000 0000 0000 0000
+  end
+  Tree at:  0000 0000 0000 04D8  length: 0000 0000 0000 0006
+    0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000
+    0000 0000 0000 000C   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0001 0000 0007   0000 0008 0000 0002   0000 0001 0000 0009
+    0000 0518 0000 0006   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0000 0000 0000   0000 0007 0000 0006   0000 0005 0000 0004   0000 0001 0000 0000
+      index: 0000 0000 0000 0000   key: 0000 0000 0000 0000   data: 0000 0000 0000 0009
+      index: 0000 0000 0000 0001   key: 0000 0000 0000 0001   data: 0000 0000 0000 0001
+      index: 0000 0000 0000 0002   key: 0000 0000 0000 0004   data: 0000 0000 0000 0002
+      index: 0000 0000 0000 0003   key: 0000 0000 0000 0005   data: 0000 0000 0000 0008
+      index: 0000 0000 0000 0004   key: 0000 0000 0000 0006   data: 0000 0000 0000 0007
+      index: 0000 0000 0000 0005   key: 0000 0000 0000 0007   data: 0000 0000 0000 0001
+  end
+end
+END
+operators => sub                                                                # Define lexical operator methods
+ {my ($parse) = @_;                                                             # Parse definition
+  my $o = $parse->operators;                                                    # Sub quarks describing operators
+
+  my $assign = Subroutine
+   {PrintOutStringNL "call assign";
+   } [], name=>"UnisynParse::assign";
+
+  my $equals = Subroutine
+   {PrintOutStringNL "call equals";
+   } [], name=>"UnisynParse::equals";
+
+  $o->assign(asciiToAssignLatin("assign"), $assign);
+  $o->assign(asciiToAssignLatin("equals"), $equals);
+  $parse->operators->subQuarks->dumpSubs;
+ });
+
+#latest:
+if (1) {                                                                        #TtraverseTermsAndCall
+  my $p = create (K(address, Rutf8 $Lex->{sampleText}{A}), operators => sub
+   {my ($parse) = @_;
+
+    my $assign = Subroutine
+     {PrintOutStringNL "call assign";
+     } [], name=>"UnisynParse::assign";
+
+    my $equals = Subroutine
+     {PrintOutStringNL "call equals";
+     } [], name=>"UnisynParse::equals";
+
+    my $o = $parse->operators;                                                  # Operator subroutines
+    $o->assign(asciiToAssignLatin("assign"), $assign);
+    $o->assign(asciiToAssignLatin("equals"), $equals);
+   });
+
+  $p->traverseTermsAndCall;
+
+  Assemble(debug => 0, eq => <<END)
+call equals
 END
  }
 

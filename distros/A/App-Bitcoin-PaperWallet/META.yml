@@ -18,7 +18,7 @@ no_index:
     - t
     - inc
 requires:
-  Bitcoin::Crypto: '0'
+  Bitcoin::Crypto: '1.000'
   List::Util: '1.29'
   Text::QRCode: '0'
   perl: '5.012000'
@@ -26,5 +26,5 @@ resources:
   bugtracker: https://github.com/brtastic/perl-app-bitcoin-paperwallet/issues
   license: https://dev.perl.org/licenses
   repository: https://github.com/brtastic/perl-app-bitcoin-paperwallet.git
-version: '1.00'
+version: '1.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

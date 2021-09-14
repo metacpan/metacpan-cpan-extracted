@@ -3,17 +3,10 @@
 #
 #  (C) Paul Evans, 2010-2014 -- leonerd@leonerd.org.uk
 
-package Tangence::Message;
+package Tangence::Message 0.26;
 
-use strict;
+use v5.14;
 use warnings;
-
-# Currently depends on atleast Perl 5.10.0 to provide the > format modifier
-# for pack, to specify big-endian integers. If this code can be modified, this
-# restriction could be listed.
-use 5.010; # pack endian formats
-
-our $VERSION = '0.25';
 
 use Carp;
 

@@ -3,13 +3,11 @@
 #
 #  (C) Paul Evans, 2010-2017 -- leonerd@leonerd.org.uk
 
-package Tangence::Registry;
+package Tangence::Registry 0.26;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Tangence::Object );
-
-our $VERSION = '0.25';
 
 use Carp;
 

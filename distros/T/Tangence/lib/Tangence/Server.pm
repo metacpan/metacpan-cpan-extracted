@@ -3,19 +3,18 @@
 #
 #  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
-package Tangence::Server;
+package Tangence::Server 0.26;
 
-use strict;
+use v5.14;
 use warnings;
 
 use base qw( Tangence::Stream );
-
-our $VERSION = '0.25';
 
 use Carp;
 
 use Scalar::Util qw( weaken );
 use Sub::Util 1.40 qw( set_subname );
+use Feature::Compat::Try;
 
 use Tangence::Constants;
 use Tangence::Types;
@@ -35,34 +34,34 @@ C<Tangence::Server> - mixin class for building a C<Tangence> server
 
 This class is a mixin, it cannot be directly constructed
 
- package Example::Server;
- use base qw( Base::Server Tangence::Server );
+   package Example::Server;
+   use base qw( Base::Server Tangence::Server );
 
- sub new
- {
-    my $class = shift;
-    my %args = @_;
+   sub new
+   {
+      my $class = shift;
+      my %args = @_;
 
-    my $registry = delete $args{registry};
+      my $registry = delete $args{registry};
 
-    my $self = $class->SUPER::new( %args );
+      my $self = $class->SUPER::new( %args );
 
-    $self->registry( $registry );
+      $self->registry( $registry );
 
-    return $self;
- }
+      return $self;
+   }
 
- sub tangence_write
- {
-    my $self = shift;
-    $self->write( $_[0] );
- }
+   sub tangence_write
+   {
+      my $self = shift;
+      $self->write( $_[0] );
+   }
 
- sub on_read
- {
-    my $self = shift;
-    $self->tangence_readfrom( $_[0] );
- }
+   sub on_read
+   {
+      my $self = shift;
+      $self->tangence_readfrom( $_[0] );
+   }
 
 =head1 DESCRIPTION
 
@@ -161,14 +160,17 @@ sub handle_request_CALL
 
    my $ctx = Tangence::Server::Context->new( $self, $token );
 
-   my $response = eval {
+   my $response;
+   try {
       my $objid = $message->unpack_int();
 
       my $object = $self->get_by_id( $objid );
 
-      $object->handle_request_CALL( $ctx, $message )
-   };
-   $@ and return $ctx->responderr( $@ );
+      $response = $object->handle_request_CALL( $ctx, $message );
+   }
+   catch ( $e ) {
+      return $ctx->responderr( $e );
+   }
 
    $ctx->respond( $response );
 }
@@ -180,7 +182,8 @@ sub handle_request_SUBSCRIBE
 
    my $ctx = Tangence::Server::Context->new( $self, $token );
 
-   my $response = eval {
+   my $response;
+   try {
       my $objid = $message->unpack_int();
       my $event = $message->unpack_str();
 
@@ -203,9 +206,11 @@ sub handle_request_SUBSCRIBE
 
       push @{ $self->subscriptions }, [ $object, $event, $id ];
 
-      Tangence::Message->new( $self, MSG_SUBSCRIBED )
-   };
-   $@ and return $ctx->responderr( $@ );
+      $response = Tangence::Message->new( $self, MSG_SUBSCRIBED )
+   }
+   catch ( $e ) {
+      return $ctx->responderr( $e );
+   }
 
    $ctx->respond( $response );
 }
@@ -217,7 +222,8 @@ sub handle_request_UNSUBSCRIBE
 
    my $ctx = Tangence::Server::Context->new( $self, $token );
 
-   my $response = eval {
+   my $response;
+   try {
       my $objid = $message->unpack_int();
       my $event = $message->unpack_str();
 
@@ -235,9 +241,11 @@ sub handle_request_UNSUBSCRIBE
 
       $object->unsubscribe_event( $event, $id );
 
-      Tangence::Message->new( $self, MSG_OK )
-   };
-   $@ and return $ctx->responderr( $@ );
+      $response = Tangence::Message->new( $self, MSG_OK )
+   }
+   catch ( $e ) {
+      return $ctx->responderr( $e );
+   }
 
    $ctx->respond( $response );
 }
@@ -249,14 +257,17 @@ sub handle_request_GETPROP
 
    my $ctx = Tangence::Server::Context->new( $self, $token );
 
-   my $response = eval {
+   my $response;
+   try {
       my $objid = $message->unpack_int();
 
       my $object = $self->get_by_id( $objid );
 
-      $object->handle_request_GETPROP( $ctx, $message )
-   };
-   $@ and return $ctx->responderr( $@ );
+      $response = $object->handle_request_GETPROP( $ctx, $message )
+   }
+   catch ( $e ) {
+      return $ctx->responderr( $e );
+   }
 
    $ctx->respond( $response );
 }
@@ -268,14 +279,17 @@ sub handle_request_GETPROPELEM
 
    my $ctx = Tangence::Server::Context->new( $self, $token );
 
-   my $response = eval {
+   my $response;
+   try {
       my $objid = $message->unpack_int();
 
       my $object = $self->get_by_id( $objid );
 
-      $object->handle_request_GETPROPELEM( $ctx, $message )
-   };
-   $@ and return $ctx->responderr( $@ );
+      $response = $object->handle_request_GETPROPELEM( $ctx, $message )
+   }
+   catch ( $e ) {
+      return $ctx->responderr( $e );
+   }
 
    $ctx->respond( $response );
 }
@@ -287,14 +301,17 @@ sub handle_request_SETPROP
 
    my $ctx = Tangence::Server::Context->new( $self, $token );
 
-   my $response = eval {
+   my $response;
+   try {
       my $objid = $message->unpack_int();
 
       my $object = $self->get_by_id( $objid );
 
-      $object->handle_request_SETPROP( $ctx, $message )
-   };
-   $@ and return $ctx->responderr( $@ );
+      $response = $object->handle_request_SETPROP( $ctx, $message )
+   }
+   catch ( $e ) {
+      return $ctx->responderr( $e );
+   }
 
    $ctx->respond( $response );
 }
@@ -310,7 +327,8 @@ sub _handle_request_WATCHany
 
    my ( $want_initial, $object, $prop );
 
-   my $response = eval {
+   my $response;
+   try {
       my $objid = $message->unpack_int();
       $prop     = $message->unpack_str();
 
@@ -324,7 +342,7 @@ sub _handle_request_WATCHany
       if( $message->code == MSG_WATCH ) {
          $want_initial = $message->unpack_bool();
 
-         Tangence::Message->new( $self, MSG_WATCHING )
+         $response = Tangence::Message->new( $self, MSG_WATCHING )
       }
       elsif( $message->code == MSG_WATCH_CUSR ) {
          my $from = $message->unpack_int();
@@ -334,13 +352,15 @@ sub _handle_request_WATCHany
          my $id = $self->message_state->{next_cursorid}++;
 
          $self->peer_hascursor->{$id} = CursorObject( $cursor, $object );
-         Tangence::Message->new( $self, MSG_WATCHING_CUSR )
+         $response = Tangence::Message->new( $self, MSG_WATCHING_CUSR )
             ->pack_int( $id )
             ->pack_int( 0 ) # first index
             ->pack_int( $#{ $object->${\"get_prop_$prop"} } ) # last index
       }
-   };
-   $@ and return $ctx->responderr( $@ );
+   }
+   catch ( $e ) {
+      return $ctx->responderr( $e );
+   }
 
    $ctx->respond( $response );
 
@@ -355,15 +375,17 @@ sub _send_initial
    my $m = "get_prop_$prop";
    return unless( $object->can( $m ) );
 
-   eval {
+   try {
       my $value = $object->$m();
       my $message = $object->generate_message_UPDATE( $self, $prop, CHANGE_SET, $value );
       $self->request(
          request     => $message,
          on_response => sub { "IGNORE" },
       );
-   };
-   warn "$@ during initial property fetch" if $@;
+   }
+   catch ( $e ) {
+      warn "$e during initial property fetch";
+   }
 }
 
 sub handle_request_UNWATCH
@@ -373,7 +395,8 @@ sub handle_request_UNWATCH
 
    my $ctx = Tangence::Server::Context->new( $self, $token );
 
-   my $response = eval {
+   my $response;
+   try {
       my $objid = $message->unpack_int();
       my $prop  = $message->unpack_str();
 
@@ -391,9 +414,11 @@ sub handle_request_UNWATCH
 
       $object->unwatch_property( $prop, $id );
 
-      Tangence::Message->new( $self, MSG_OK );
-   };
-   $@ and return $ctx->responderr( $@ );
+      $response = Tangence::Message->new( $self, MSG_OK );
+   }
+   catch ( $e ) {
+      return $ctx->responderr( $e );
+   }
 
    $ctx->respond( $response );
 }

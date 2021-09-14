@@ -4,10 +4,11 @@ package Mail::AuthenticationResults::Header::Base;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '2.20210112'; # VERSION
+our $VERSION = '2.20210914'; # VERSION
 use Scalar::Util qw{ weaken refaddr };
 use JSON;
 use Carp;
+use Clone qw{ clone };
 
 use Mail::AuthenticationResults::Header::Group;
 use Mail::AuthenticationResults::FoldableHeader;
@@ -121,6 +122,16 @@ sub orphan {
     croak 'Child does not have a parent' if ! exists $self->{ 'parent' };
     delete $self->{ 'parent' };
     return;
+}
+
+
+sub copy_children_from {
+  my ( $self, $object ) = @_;
+  for my $original_entry ($object->children()->@*) {
+    my $entry = clone $original_entry;
+    $entry->orphan if exists $entry->{ 'parent' };;
+    $self->add_child( $entry );
+  }
 }
 
 
@@ -415,7 +426,7 @@ Mail::AuthenticationResults::Header::Base - Base class for modelling parts of th
 
 =head1 VERSION
 
-version 2.20210112
+version 2.20210914
 
 =head1 DESCRIPTION
 
@@ -529,6 +540,11 @@ Removes the parent for this instance.
 
 Croaks if this instance does not have a parent.
 
+=head2 copy_children_from( $object )
+
+Copy (clone) all of the children from the given object
+into this object.
+
 =head2 add_parent( $parent )
 
 Sets the parent for this instance to the supplied object.
@@ -607,7 +623,7 @@ Marc Bradshaw <marc@marcbradshaw.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Marc Bradshaw.
+This software is copyright (c) 2021 by Marc Bradshaw.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

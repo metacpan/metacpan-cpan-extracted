@@ -4,7 +4,7 @@ use 5.010;
 use ExtUtils::MakeMaker;
 
 my %common_reqs = (
-    "Alien::Build" => "1.41",
+    "Alien::Build" => "2.25",
     "ExtUtils::MakeMaker" => "6.52",
     "Alien::Build::MM" => "1.41",
     "File::Find::Rule" => 0,
@@ -12,6 +12,7 @@ my %common_reqs = (
     "Alien::Build::Plugin::Cleanse::BuildDir" => 0,
     'Sort::Versions' => 0,
     ($^O =~ /mswin/i) ? ("Alien::MSYS" => 0) : (),
+    'Alien::cmake3' => 0.05,
 );
 
 my %WriteMakefileArgs = (
@@ -52,7 +53,13 @@ my %WriteMakefileArgs = (
 );
 
 use Alien::Build::MM;
-my $abmm = Alien::Build::MM->new ();
+my $abmm = Alien::Build::MM->new (
+  clean_install => 1,
+);
+sub MY::install {
+  $abmm->mm_install(@_);
+}
+
 %WriteMakefileArgs = $abmm->mm_args(%WriteMakefileArgs);
 
 WriteMakefile(%WriteMakefileArgs);

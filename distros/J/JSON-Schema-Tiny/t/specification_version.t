@@ -581,5 +581,28 @@ subtest 'prefixItems, items and additionalItems' => sub {
   );
 };
 
+subtest '$id' => sub {
+  my $schema = { '$id' => '#/foo/bar/baz' };
+  foreach my $version (qw(draft2020-12 draft2019-09 draft7)) {
+    local $JSON::Schema::Tiny::SPECIFICATION_VERSION = $version;
+    cmp_deeply(
+      evaluate(1, $schema),
+      {
+        valid => false,
+        errors => [
+          {
+            instanceLocation => '',
+            keywordLocation => '/$id',
+            error => ($version eq 'draft7'
+              ? '$id value does not match required syntax'
+              : '$id value "#/foo/bar/baz" cannot have a non-empty fragment'),
+          },
+        ],
+      },
+      'json pointer fragment is valid in $id in '.$version,
+    );
+  }
+};
+
 had_no_warnings() if $ENV{AUTHOR_TESTING};
 done_testing;

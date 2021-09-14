@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Test::Carp;
-use Test::Most tests => 9;
+use Test::Most tests => 10;
 
 BEGIN {
 	use_ok('Locale::Places');
@@ -28,4 +28,6 @@ CARP: {
 
 	does_carp_that_matches(sub { $places->translate('London') }, qr/can't work out which language to translate to/);
 	does_carp_that_matches(sub { $places->translate({ place => 'London', to => 'y' }) }, qr/can't work out which language to translate from/);
+
+	does_carp_that_matches(sub { $places->translate(place => 'Dover', from => undef) }, qr/usage/);
 }

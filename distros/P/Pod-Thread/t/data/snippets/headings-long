@@ -1,0 +1,44 @@
+[name]
+Long headings with newlines
+
+[options]
+contents 1
+navbar 1
+
+[input]
+=pod
+
+Forward link to L</Heading of excessive length continued on multiple lines
+(POD is required to handle this)>
+
+=head1 Heading of
+excessive length continued on
+multiple lines (POD is required to handle this)
+
+L</Heading of excessive length continued on multiple lines (POD is
+required to handle this)>
+
+[output]
+\class(navbar)[
+  \link[#S1][Heading Of
+Excessive Length Continued On
+Multiple Lines (pod Is Required To Handle This)]
+]
+
+\h2[Table of Contents]
+
+\number(packed)[\link[#S1][Heading of
+excessive length continued on
+multiple lines (POD is required to handle this)]]
+
+Forward link to \link[#S1][Heading of excessive length continued on multiple lines
+(POD is required to handle this)]
+
+\h2(#S1)[Heading of
+excessive length continued on
+multiple lines (POD is required to handle this)]
+
+\link[#S1][Heading of excessive length continued on multiple lines (POD is
+required to handle this)]
+
+\signature

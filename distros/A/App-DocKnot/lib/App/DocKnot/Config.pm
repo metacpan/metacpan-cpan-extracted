@@ -9,7 +9,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Config 4.01;
+package App::DocKnot::Config 5.00;
 
 use 5.024;
 use autodie;
@@ -48,7 +48,7 @@ sub _load_yaml_file {
     if ($@) {
         my $errors = $@;
         chomp($errors);
-        die "Schema validation for $path failed:\n$errors\n";
+        die "schema validation for $path failed:\n$errors\n";
     }
 
     # Return the verified contents.
@@ -113,7 +113,7 @@ sub config {
     my $licenses_path = $self->appdata_path('licenses.yaml');
     my $licenses_ref  = YAML::XS::LoadFile($licenses_path);
     if (!exists($licenses_ref->{$license})) {
-        die "Unknown license $license\n";
+        die "unknown license $license\n";
     }
     $data_ref->{license}{summary} = $licenses_ref->{$license}{summary};
     $data_ref->{license}{text}    = $licenses_ref->{$license}{text};

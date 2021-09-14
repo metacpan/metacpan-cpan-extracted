@@ -7,18 +7,19 @@ package Comics::Plugin::ToonHole;
 
 use parent qw(Comics::Fetcher::Single);
 
-our $VERSION = "1.00";
+our $VERSION = "1.02";
 
 our $name    = "Toon Hole";
-our $url     = "http://www.toonhole.com/";
+our $url     = "https://www.toonhole.com/";
 
 our $pattern =
-  qr{ <div \s+ id="comic"> \s*
+  qr{ <noscript>
       <img \s+
-       src="(?<url>http://toonhole.com/wp-content/uploads/
+       width="\d+" \s+
+       height="\d+" \s+
+       src="(?<url>https://toonhole.com/wp-content/uploads/
             \d+/\d+/
-            (?<image>.+\.\w+))" \s+
-            (?:title|alt)="(?<title>.*?)"
+            (?<image>\d\d\d_.+\.\w+))" \s+
     }x;
 
 # Important: Return the package name!

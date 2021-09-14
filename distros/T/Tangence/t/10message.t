@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -16,11 +16,14 @@ sub _make_type { Tangence::Type->new_from_sig( shift ) }
 use lib ".";
 use t::Colourable;
 
+use Scalar::Util ();
+use constant HAVE_ISBOOL => defined eval { Scalar::Util->import( 'isbool' ) };
+
 my $VERSION_MINOR = Tangence::Constants->VERSION_MINOR;
 
+package TestStream
 {
    # We need a testing stream that declares a version
-   package TestStream;
    use base qw( Tangence::Stream );
 
    sub minor_version { $VERSION_MINOR }
@@ -92,12 +95,12 @@ $ball->id == 1 or die "Expected ball->id to be 1";
 
 test_specific "bool f",
    type   => "bool",
-   data   => 0,
+   data   => !!0,
    stream => "\x00";
 
 test_specific "bool t",
    type   => "bool",
-   data   => 1,
+   data   => !!1,
    stream => "\x01";
 
 # So many parts of code would provide undef == false, so we will serialise
@@ -106,7 +109,7 @@ test_specific "bool undef",
    type   => "bool",
    data   => undef,
    stream => "\x00",
-   retdata => 0;
+   retdata => !!0;
 
 test_specific_dies "bool from str",
    type   => "bool",
@@ -244,12 +247,12 @@ sub test_typed_dies
 
 test_typed "bool f",
    sig    => "bool",
-   data   => 0,
+   data   => !!0,
    stream => "\x00";
 
 test_typed "bool t",
    sig    => "bool",
-   data   => 1,
+   data   => !!1,
    stream => "\x01";
 
 test_typed_dies "bool from str",
@@ -492,6 +495,11 @@ test_typed "any (undef)",
    sig    => "any",
    data   => undef,
    stream => "\x80";
+
+test_typed "any (bool)",
+   sig    => "any",
+   data   => !!0,
+   stream => "\x00" if HAVE_ISBOOL;
 
 test_typed "any (int)",
    sig    => "any",

@@ -15,7 +15,8 @@ my @files = (
     't/04_randpattern.t',
     't/05_randregex.t',
     't/06_random_regex.t',
-    't/07_rand_gen.t'
+    't/07_rand_gen.t',
+    't/08_get_set.t'
 );
 
 notabs_ok($_) foreach @files;

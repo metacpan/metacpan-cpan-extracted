@@ -1,0 +1,474 @@
+Base:        https://www.eyrie.org/~eagle/
+RSS-Base:    https://www.eyrie.org/~eagle/
+Title:       Changes to Russ Allbery's Web Pages
+Description: Recent changes to Russ Allbery's web pages.
+Language:    en-us
+Output:      *:thread:changes.th *:rss:changes.rss
+Thread-Prefix:
+ \rss[changes.rss][Changes to Russ Allbery's Web Pages]
+ .
+ \heading[Recent Changes][indent]
+ .
+ \h1[Recent Changes]
+ .
+ \quote(broken)[
+     Put up in a place
+     where it's easy to see
+     the cryptic admonishment
+     T.T.T.
+     When you feel how depressingly
+     slowly you climb,
+     it's well to remember that
+     Things Take Time.
+ ][Piet Hein][]
+ .
+ This page lists all recent changes to my web site except for new
+ \link[journal/][journal entries], along with a brief description.  Some
+ of this information will be repeated in my journal, but more minor
+ changes will only be noted here.  An \class(feed)[\link[changes.rss]
+ [\image[journal/feed.png][]] \link[changes.rss][RSS feed]] of this
+ information is also available.
+ .
+ Also see changes from \link[changes/2020.html][2020],
+ \link[changes/2019.html][2019], \link[changes/2018.html][2018],
+ \link[changes/2017.html][2017], \link[changes/2016.html][2016],
+ \link[changes/2015.html][2015], \link[changes/2014.html][2014],
+ \link[changes/2013.html][2013], \link[changes/2012.html][2012],
+ \link[changes/2011.html][2011], \link[changes/2010.html][2010],
+ \link[changes/2009.html][2009], and \link[changes/2008.html][2008].
+
+Date: 2021-08-30 21:25
+Title: kstart 4.3
+Link: software/kstart/
+Description:
+ Add support for kafs by continuing with -t behavior if kafs is present.
+ Use libkeyutils if available to isolate a command's keyring from the
+ invoking program if running a specific command with -t.  Use a better
+ exit status when a command is killed with a signal.  Use explicit_bzero
+ to clear the password for k5start -s.  Other portability fixes and
+ updates.
+
+Date: 2021-08-18 21:30
+Title: Review: The Past is Red
+Link: reviews/books/1-250-30112-2.html
+Description: Review of The Past is Red by Catherynne M. Valente.
+
+Date: 2021-08-16 20:58
+Title: Review: Black Sun
+Link: reviews/books/1-5344-3769-X.html
+Description: Review of Black Sun by Rebecca Roanhorse.
+
+Date: 2021-08-15 19:21
+Title: Review: The Galaxy, and the Ground Within
+Link: reviews/books/0-06-293605-0.html
+Description: Review of The Galaxy, and the Ground Within by Becky Chambers.
+
+Date: 2021-08-08 19:39
+Title: Review: The Last Battle
+Link: reviews/books/0-02-044210-6.html
+Description: Review of The Last Battle by C.S. Lewis.
+
+Date: 2021-08-07 17:24
+Title: Broken link cleanup
+Link: /
+Description:
+ Another periodic cleanup of broken links.
+
+Date: 2021-08-01 21:12
+Title: Review: Piranesi
+Link: reviews/books/1-63557-564-8.html
+Description: Review of Piranesi by Susanna Clarke.
+
+Date: 2021-07-31 21:26
+Title: Review: Fugitive Telemetry
+Link: reviews/books/1-250-76538-2.html
+Description: Review of Fugitive Telemetry by Martha Wells.
+
+Date: 2021-07-24 08:23
+Title: Add finalists for the World Fantasy Award
+Link: reviews/awards.html
+Description:
+ Add the finalists for the 2021 World Fantasy Award for best novel.
+
+Date: 2021-07-24 08:22
+Title: Broken link cleanup
+Link: /
+Description:
+ Another periodic cleanup of broken links.
+
+Date: 2021-07-03 17:21
+Title: Add Clarke Award nominees and Locus Award Winners
+Link: reviews/awards.html
+Description:
+ Add the nominees for the 2021 Arthur C. Clarke Award, and the winners of
+ the 2021 Locus Awards (Network Effect by Martha Wells for best SF novel,
+ The City We Became by N.K. Jemisin for best fantasy novel, and Elatsoe by
+ Darcie Little Badger for best first novel).
+
+Date: 2021-06-27 19:55
+Title: control-archive 1.9.1
+Link: software/control-archive/
+Description:
+ A data-only release that updates the Big Eight control signing key and
+ removes some obsolete information about net.*.
+
+Date: 2021-06-27 15:23
+Title: Added web page for Big Eight control information
+Link: big-8/
+Description:
+ New web page summarizing control information for the Big Eight
+ hierarchies with links to the control message signing keys and the PGP
+ Moose key.
+
+Date: 2021-06-20 20:57
+Title: Review: Demon Lord of Karanda
+Link: reviews/books/0-345-36331-0.html
+Description: Review of Demon Lord of Karanda by David Eddings.
+
+Date: 2021-06-19 21:03
+Title: Review: The Magician's Nephew
+Link: reviews/books/0-02-044230-0.html
+Description: Review of The Magician's Nephew by C.S. Lewis.
+
+Date: 2021-06-06 21:56
+Title: Review: Stoneskin
+Link: reviews/books/stoneskin.html
+Description: Review of Stoneskin by K.B. Spangler.
+
+Date: 2021-06-05 20:18
+Title: Add winner of 2021 Nebula Award for best novel
+Link: reviews/awards.html
+Description:
+ Add the winner of the 2021 Nebula Award for best novel (Network Effect by
+ Martha Wells).
+
+Date: 2021-06-05 19:37
+Title: Broken link cleanup
+Link: /
+Description:
+ Another periodic cleanup of broken links.
+
+Date: 2021-05-31 21:14
+Title: Review: The Horse and His Boy
+Link: reviews/books/0-02-044200-9.html
+Description: Review of The Horse and His Boy by C.S. Lewis.
+
+Date: 2021-05-30 22:40
+Title: Review: The Relentless Moon
+Link: reviews/books/1-250-23648-7.html
+Description: Review of The Relentless Moon by Mary Robinette Kowal.
+
+Date: 2021-05-29 22:53
+Title: Review: The Silver Chair
+Link: reviews/books/0-02-044250-5.html
+Description: Review of The Silver Chair by C.S. Lewis.
+
+Date: 2021-05-29 20:51
+Title: Broken link cleanup
+Link: /
+Description:
+ Another periodic cleanup of broken links.
+
+Date: 2021-05-15 21:16
+Title: Review: A Desolation Called Peace
+Link: reviews/books/1-250-18648-X.html
+Description: Review of A Desolation Called Peace by Arkady Martine.
+
+Date: 2021-05-02 20:03
+Title: Review: The Voyage of the Dawn Treader
+Link: reviews/books/0-02-044260-2.html
+Description: Review of The Voyage of the Dawn Treader by C.S. Lewis.
+
+Date: 2021-04-27 20:10
+Title: Review: Beyond Shame
+Link: reviews/books/beyond-shame.html
+Description: Review of Beyond Shame by Kit Rocha.
+
+Date: 2021-04-24 22:15
+Title: Review: Learning React
+Link: reviews/books/1-4920-5172-1.html
+Description: Review of Learning React by Alex Banks & Eve Porcello.
+
+Date: 2021-04-24 22:12
+Title: Add nominees for the 2021 Hugo Award
+Link: reviews/awards.html
+Description:
+ Add the nominees for the 2021 Hugo Award for best novel.
+
+Date: 2021-04-10 19:24
+Title: Broken link cleanup
+Link: /
+Description:
+ Another periodic cleanup of broken links.
+
+Date: 2021-04-05 18:59
+Title: Add 2021 winner of the BSFA award
+Link: reviews/awards.html
+Description:
+ Add 2021 winner of the BSFA award for best novel (The City We Became, by
+ N.K. Jemisin).
+
+Date: 2021-04-05 18:56
+Title: Add 2021 winner of the Philip K. Dick Award
+Link: reviews/awards.html
+Description:
+ Add 2021 winner of the Philip K. Dick Award for best novel (The Road out
+ of Winter, by Alison Stine).
+
+Date: 2021-04-03 19:21
+Title: Review: Prince Caspian
+Link: reviews/books/0-02-044240-8.html
+Description: Review of Prince Caspian by C.S. Lewis.
+
+Date: 2021-03-30 22:53
+Title: Review: Paladin's Strength
+Link: reviews/books/paladins-strength.html
+Description: Review of Paladin's Strength by T. Kingfisher.
+
+Date: 2021-03-29 10:11
+Title: Add series information to Paladin's Grace
+Link: reviews/books/paladins-grace.html
+Description:
+ Paladin's Grace by T. Kingfisher is the first of a series.  Add the
+ series information and a mention of the sequel.
+
+Date: 2021-03-28 21:55
+Title: Review: JavaScript: The Definitive Guide
+Link: reviews/books/1-4919-5202-4.html
+Description: Review of JavaScript: The Definitive Guide by David Flanagan.
+
+Date: 2021-03-28 17:07
+Title: Add sample INN init script and systemd unit file
+Link: software/inn/
+Description:
+ In the documentation pages for INN CURRENT, 2.6, and 2.5, add the sample
+ init script and systemd unit.
+
+Date: 2021-03-28 09:21
+Title: Pod::Thread 2.00
+Link: software/pod-thread/
+Description:
+ Handle the navbar and table of contents internally in the module rather
+ than via a pre-scanning pass.  Honor CVS Id strings found anywhere in the
+ document.  Don't title-case words in section titles in the navbar that
+ contain an underscore.
+
+Date: 2021-03-21 19:58
+Title: cvs2xhtml 1.15
+Link: software/web/
+Description:
+ Convert to Python 3.  Update my email address.
+
+Date: 2021-03-21 19:57
+Title: cl2xhtml 1.12
+Link: software/web/
+Description:
+ Convert to Python 3.  Update my email address.
+
+Date: 2021-03-21 19:56
+Title: faq2html 1.36
+Link: software/web/
+Description:
+ Support formatting of dense bullet lists with line continuations but no
+ blank lines between bullets.  Update my email address.
+
+Date: 2021-03-21 19:03
+Title: Remove DocKnot from my personal Debian repository list
+Link: software/debian.html
+Description: DocKnot has now been uploaded to Debian proper.
+
+Date: 2021-03-21 18:57
+Title: Add separate web pages for Pod::Thread
+Link: software/pod-thread/
+Description:
+ As the first step in cleaning up my static site generator pages, and in
+ prepration for uploading it to CPAN in its own right, move Pod::Thread to
+ its own separate web pages.
+
+Date: 2021-03-20 13:35
+Title: pam-krb5 4.10
+Link: software/pam-krb5/
+Description:
+ Fix use-after-free if krb5_cc_get_principal fails on the newly-created
+ ticket cache.
+
+Date: 2021-03-20 13:16
+Title: rra-c-util 9.0
+Link: software/rra-c-util/
+Description:
+ Rename SQLite Autoconf macros and their outputs from SQLITE to SQLITE3.
+ Fix support for optional libraries.  Rename KRB5_CPPFLAGS_GCC to
+ KRB5_CPPFLAGS_WARNINGS.  Stop defining AM_CONDITIONAL in Autoconf
+ macros.  Check for working Kerberos headers as well as libraries.  Add C
+ stubs for sd_notify and sd_notifyf and a preprocessor stub for
+ sd_is_socket.  Fix portable/sd-daemon.h to include prerequisite headers.
+ Fix RRA_PROG_PYTHON with Python 3.0 and older Python 2.x versions.  Fix
+ problems with the util/fdflag test.  Use AS_ECHO where possible.  Fix
+ perlcritic with YAML::XS.
+
+Date: 2021-03-20 11:38
+Title: Clean GnuPG key
+Link: personal/contact.html
+Description:
+ Refresh the expiration on my signing key and re-export my key with the
+ export-clean flag, which cleans up a bunch of duplicate and expired
+ signatures.
+
+Date: 2021-03-20 09:36
+Title: Add nominees for 2021 Nebula Award for best novel
+Link: reviews/awards.html
+Description:
+ Add the nominees for the 2021 Nebula Award for best novel.
+
+Date: 2021-03-14 11:03
+Title: New experimental Big Eight control message signing key
+Link: journal/2021-03/001.html
+Description:
+ Published a new experimental signing key for Big Eight control messages
+ that was generated with a modern GnuPG.
+
+Date: 2021-03-13 09:17
+Title: Add 2020 British Fantasy Award winner
+Link: reviews/awards.html
+Description:
+ Add winner of the 2020 British Fantasy Robert Holdstock Award for best
+ fantasy novel (The Bone Ships, by RJ Barker).
+
+Date: 2021-03-01 19:36
+Title: Review: The Lion, the Witch and the Wardrobe
+Link: reviews/books/0-02-044220-3.html
+Description: Review of The Lion, the Witch and the Wardrobe by C.S. Lewis.
+
+Date: 2021-02-28 19:29
+Title: Review: Architects of Memory
+Link: reviews/books/1-250-21546-3.html
+Description: Review of Architects of Memory by Karen Osborne.
+
+Date: 2021-02-27 13:11
+Title: DocKnot 4.01
+Link: software/docknot/
+Description:
+ Add support for a global user configuration file.  Allow the distribution
+ directory to be specified in it.  Add support for GnuPG signing of
+ generated tarballs.  Fix docknot --help.  Remove the obsolete
+ load_appdata_json helper.  Fix some documentation bugs left over from the
+ 4.00 release.
+
+Date: 2021-02-21 20:06
+Title: Review: Finder
+Link: reviews/books/0-7564-1511-X.html
+Description: Review of Finder by Suzanne Palmer.
+
+Date: 2021-02-20 20:43
+Title: Review: The Fated Sky
+Link: reviews/books/0-7653-9893-1.html
+Description: Review of The Fated Sky by Mary Robinette Kowal.
+
+Date: 2021-02-17 21:19
+Title: Review: Solutions and Other Problems
+Link: reviews/books/1-9821-5694-5.html
+Description: Review of Solutions and Other Problems by Allie Brosh.
+
+Date: 2021-02-14 20:35
+Title: Review: Spheres of Influence
+Link: reviews/books/1-4516-3937-6.html
+Description: Review of Spheres of Influence by Ryk E. Spoor.
+
+Date: 2021-02-14 19:20
+Title: Add winner of 2020 Mythopoeic Award
+Link: reviews/mythopoeic.html
+Description:
+ Add the winner of the (delayed) 2020 Mythopoeic Fantasy Award for Adult
+ Literature (Snow White Learns Witchcraft, by Theodora Goss).
+
+Date: 2021-02-13 09:53
+Title: Broken link cleanup
+Link: /
+Description:
+ Another periodic cleanup of broken links.
+
+Date: 2021-02-07 19:31
+Title: Review: The Future of Another Timeline
+Link: reviews/books/0-7653-9212-7.html
+Description: Review of The Future of Another Timeline by Annalee Newitz.
+
+Date: 2021-02-01 20:57
+Title: Remove changes from December 2020
+Link: changes.html
+Description: Remove the changes from December 2020 from the recent changes
+ page.
+
+Date: 2021-01-30 15:12
+Title: Broken link cleanup
+Link: /
+Description:
+ Another periodic cleanup of broken links.
+
+Date: 2021-01-28 22:23
+Title: INN 2.6.4
+Link: software/inn/
+Description:
+ Added support for systemd notifications and socket activation.  Adapt the
+ length of the DH parameter during DHE key exchanges in nnrpd.  Return
+ information about retired CNFS buffers from cnfsstat.  Externalize the
+ CSS information from generated innreport reports.  Support storing wire
+ format articles with sm.  Add a flag to rnews to disallow additional
+ unpackers, a flag to save rejected articles, and a flag to log the
+ message ID of duplicate articles.  Add a compile-time option to enable
+ hardening flags.
+
+Date: 2021-01-26 20:12
+Title: Review: A Deadly Education
+Link: reviews/books/0-593-12849-4.html
+Description: Review of A Deadly Education by Naomi Novik.
+
+Date: 2021-01-25 20:11
+Title: Review: The City We Became
+Link: reviews/books/0-316-50985-X.html
+Description: Review of The City We Became by N.K. Jemisin.
+
+Date: 2021-01-24 21:00
+Title: Review: Laziness Does Not Exist
+Link: reviews/books/1-9821-4013-5.html
+Description: Review of Laziness Does Not Exist by Devon Price.
+
+Date: 2021-01-18 20:00
+Title: Review: The Secret Barrister
+Link: reviews/books/1-5098-4115-6.html
+Description: Review of The Secret Barrister by The Secret Barrister.
+
+Date: 2021-01-04 22:13
+Title: Update some blog roll links
+Link: journal/
+Description:
+ Update URL to Nicola Griffith's blog, and switch Karl Schroeder's blog to
+ https.
+
+Date: 2021-01-03 18:49
+Title: Review: The Once and Future Witches
+Link: reviews/books/0-316-42202-9.html
+Description: Review of The Once and Future Witches by Alix E. Harrow.
+
+Date: 2021-01-01 19:01
+Title: Update award winners
+Link: reviews/awards.html
+Description:
+ Add links to all award pages that have good award web sites.  Add notes
+ where the 2020 award was canceled or delayed.  Add the winner of the 2020
+ Prix Aurora Award for best adult novel (The Gossamer Mage by Julie
+ E. Czerneda) and the Sunburst award for adults (Gods of Jade and Shadow
+ by Silvia Moreno-Garcia).
+
+Date: 2021-01-01 13:53
+Title: Rotate 2020 changes
+Link: changes/2020.html
+Description:
+ Move all web site changes from 2020 to a separate page and remove all
+ entries older than December of 2020 from the current changes page.
+
+Date: 2021-01-01 11:12
+Title: 2020 reading in review
+Link: reviews/year/2020.html
+Description:
+ Add an overview of my 2020 reading, main book recommendations, and
+ reading statistics.

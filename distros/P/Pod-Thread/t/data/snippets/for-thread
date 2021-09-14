@@ -1,0 +1,36 @@
+[name]
+=for thread
+
+[input]
+=pod
+
+Some paragraph of text.
+
+=for thread
+Verbatim \strong[thread] output.
+
+=begin thread
+
+\table[][
+
+    \tablerow[And more][verbatim output]
+
+]
+
+=end thread
+
+More text.
+
+[output]
+Some paragraph of text.
+
+Verbatim \strong[thread] output.
+
+\table[][
+
+    \tablerow[And more][verbatim output]
+]
+
+More text.
+
+\signature
