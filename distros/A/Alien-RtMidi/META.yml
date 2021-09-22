@@ -3,16 +3,20 @@ abstract: 'Install RtMidi'
 author:
   - 'John Barrett <john@jbrt.org>'
 build_requires:
+  Alien::Base: '1.00'
   Alien::Build: '0.32'
   Alien::Build::MM: '0.32'
   ExtUtils::MakeMaker: '6.52'
+  FFI::Platypus: '1.00'
   Test2::V0: '0'
   Test::Alien: '0'
+  perl: '5.006'
 configure_requires:
   Alien::Build: '0.32'
   Alien::Build::MM: '0.32'
   Alien::Build::Plugin::PkgConfig::Negotiate: '1.53'
   ExtUtils::MakeMaker: '6.52'
+  perl: '5.006'
 dynamic_config: 1
 generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -25,13 +29,18 @@ no_index:
     - examples
     - t
     - xt
+provides:
+  Alien::RtMidi:
+    file: lib/Alien/RtMidi.pm
+    version: '0.04'
 requires:
   Alien::Base: '1.00'
+  perl: '5.006'
 resources:
   bugtracker: https://github.com/jbarrett/Alien-RtMidi/issues
   homepage: https://github.com/jbarrett/Alien-RtMidi
   repository: https://github.com/jbarrett/Alien-RtMidi.git
-version: '0.02'
+version: '0.04'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:

@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Unevaluated;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Unevaluated vocabulary
 
-our $VERSION = '0.517';
+our $VERSION = '0.519';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -23,11 +23,13 @@ sub vocabulary {
   return
       $spec_version eq 'draft2019-09' ? 'https://json-schema.org/draft/2019-09/vocab/applicator'
     : $spec_version eq 'draft2020-12' ? 'https://json-schema.org/draft/2020-12/vocab/unevaluated'
-    : undef;
+    : die 'Unevaluated not implemented in '.$spec_version;
 }
 
 # This vocabulary should be evaluated after the Applicator vocabulary.
 sub keywords {
+  my ($self, $spec_version) = @_;
+  die 'Unevaluated not implemented in '.$spec_version if $spec_version =~ /^draft[467]$/;
   qw(unevaluatedItems unevaluatedProperties);
 }
 
@@ -183,7 +185,7 @@ JSON::Schema::Modern::Vocabulary::Unevaluated - Implementation of the JSON Schem
 
 =head1 VERSION
 
-version 0.517
+version 0.519
 
 =head1 DESCRIPTION
 

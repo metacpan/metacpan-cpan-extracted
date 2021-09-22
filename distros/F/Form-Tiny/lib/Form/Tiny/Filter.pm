@@ -7,7 +7,7 @@ use Types::Standard qw(HasMethods CodeRef Maybe Str);
 
 use namespace::clean;
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 has "type" => (
 	is => "ro",
@@ -73,6 +73,8 @@ A Type::Tiny type that will be checked against.
 Required.
 
 =head2 field
+
+B<DEPRECATED>
 
 A string name of a field that should be filtered, or undef if this filter should execute for every field in the form.
 

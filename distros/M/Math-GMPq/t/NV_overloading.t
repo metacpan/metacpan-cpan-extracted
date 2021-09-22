@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use Math::GMPq;
 
-print "1..119\n";
+print "1..121\n";
 
 my $inf  = 999 ** (999 ** 999);
 my $ninf = $inf * -1;
@@ -18,7 +18,7 @@ my $strnan = $strinf / $strinf;
 my ($ret, $x);
 
 eval{$ret = Math::GMPq->new(10) *  $inf };
-if($@ =~ /In Rmpq_set_NV, cannot coerce an Inf to a Math::GMPq value/) {print "ok 1\n"}
+if($@ =~ /cannot coerce an Inf to a Math::GMP/) {print "ok 1\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 1\n";
@@ -32,7 +32,7 @@ else {
 }
 
 eval{$ret = Math::GMPq->new(10) *  $nan };
-if($@ =~ /In Rmpq_set_NV, cannot coerce a NaN to a Math::GMPq value/) {print "ok 3\n"}
+if($@ =~ /cannot coerce a NaN to a Math::GMP/) {print "ok 3\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 3\n";
@@ -54,6 +54,7 @@ else {
 
 if(Math::GMPq->new(10) * 61.2 == '21532835718365185/35184372088832' ||
    Math::GMPq->new(10) * 61.2 == '88198495102423793665/144115188075855872' ||
+   Math::GMPq->new(10) * 61.2 == '387901083669838196857991180845055/633825300114114700748351602688' ||
    Math::GMPq->new(10) * 61.2 == '24825669354869644598911435574083585/40564819207303340847894502572032') {
   print "ok 6\n";
 }
@@ -66,7 +67,7 @@ else {
 }
 
 eval{$ret = Math::GMPq->new(10) +  $inf };
-if($@ =~ /In Rmpq_set_NV, cannot coerce an Inf to a Math::GMPq value/) {print "ok 7\n"}
+if($@ =~ /cannot coerce an Inf to a Math::GMP/) {print "ok 7\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 7\n";
@@ -80,7 +81,7 @@ else {
 }
 
 eval{$ret = Math::GMPq->new(10) +  $nan };
-if($@ =~ /In Rmpq_set_NV, cannot coerce a NaN to a Math::GMPq value/) {print "ok 9\n"}
+if($@ =~ /cannot coerce a NaN to a Math::GMP/) {print "ok 9\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 9\n";
@@ -101,19 +102,21 @@ else {
 
 if(Math::GMPq->new(10) + 61.2 == '5010254585449677/70368744177664' ||
    Math::GMPq->new(10) + 61.2 == '20522002782001876173/288230376151711744' ||
+   Math::GMPq->new(10) + 61.2 == '90256722736249933386565268222771/1267650600228229401496703205376' ||
    Math::GMPq->new(10) + 61.2 == '5776430255119995736740177166257357/81129638414606681695789005144064') {
   print "ok 12\n";
 }
 else {
   warn "\n Expected:\n   5010254585449677/70368744177664 or ",
                    "\n   20522002782001876173/288230376151711744 or ",
+                   "\n   90256722736249933386565268222771/1267650600228229401496703205376 or ",
                    "\n   5776430255119995736740177166257357/81129638414606681695789005144064\nGot: ",
                    Math::GMPq->new(10) + 61.2, "\n";
   print "not ok 12\n";
 }
 
 eval{$ret = Math::GMPq->new(10) /  $inf };
-if($@ =~ /In Rmpq_set_NV, cannot coerce an Inf to a Math::GMPq value/) {print "ok 13\n"}
+if($@ =~ /cannot coerce an Inf to a Math::GMP/) {print "ok 13\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 13\n";
@@ -127,7 +130,7 @@ else {
 }
 
 eval{$ret = Math::GMPq->new(10) /  $nan };
-if($@ =~ /In Rmpq_set_NV, cannot coerce a NaN to a Math::GMPq value/) {print "ok 15\n"}
+if($@ =~ /cannot coerce a NaN to a Math::GMP/) {print "ok 15\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 15\n";
@@ -149,19 +152,21 @@ else {
 
 if(Math::GMPq->new(10) / 61.2 == '703687441776640/4306567143673037' ||
    Math::GMPq->new(10) / 61.2 == '2882303761517117440/17639699020484758733' ||
+   Math::GMPq->new(10) / 61.2 == '12676506002282294014967032053760/77580216733967639371598236169011' ||
    Math::GMPq->new(10) / 61.2 == '811296384146066816957890051440640/4965133870973928919782287114816717') {
   print "ok 18\n";
 }
 else {
   warn "\n Expected:\n   703687441776640/4306567143673037 or ",
                    "\n   2882303761517117440/17639699020484758733 or ",
+                   "\n   12676506002282294014967032053760/77580216733967639371598236169011 or ",
                    "\n   811296384146066816957890051440640/4965133870973928919782287114816717\nGot: ",
                    Math::GMPq->new(10) / 61.2, "\n";
   print "not ok 18\n";
 }
 
 eval{$ret = Math::GMPq->new(10) -  $inf };
-if($@ =~ /In Rmpq_set_NV, cannot coerce an Inf to a Math::GMPq value/) {print "ok 19\n"}
+if($@ =~ /cannot coerce an Inf to a Math::GMP/) {print "ok 19\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 19\n";
@@ -175,7 +180,7 @@ else {
 }
 
 eval{$ret = Math::GMPq->new(10) -  $nan };
-if($@ =~ /In Rmpq_set_NV, cannot coerce a NaN to a Math::GMPq value/) {print "ok 21\n"}
+if($@ =~ /cannot coerce a NaN to a Math::GMP/) {print "ok 21\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 21\n";
@@ -197,12 +202,14 @@ else {
 
 if(Math::GMPq->new(10) - 61.2 == '-3602879701896397/70368744177664' ||
    Math::GMPq->new(10) - 61.2 == '-14757395258967641293/288230376151711744' ||
+   Math::GMPq->new(10) - 61.2 == '-64903710731685345356631204115251/1267650600228229401496703205376' ||
    Math::GMPq->new(10) - 61.2 == '-4153837486827862102824397063376077/81129638414606681695789005144064') {
   print "ok 24\n";
 }
 else {
   warn "\n Expected:\n   -3602879701896397/70368744177664 or ",
                    "\n   -14757395258967641293/288230376151711744 or ",
+                   "\n   -64903710731685345356631204115251/1267650600228229401496703205376 or ",
                    "\n   -4153837486827862102824397063376077/81129638414606681695789005144064\nGot: ",
                    Math::GMPq->new(10) - 61.2, "\n";
   print "not ok 24\n";
@@ -211,7 +218,7 @@ else {
 $ret = Math::GMPq->new(10);
 
 eval{$ret *=  $inf };
-if($@ =~ /In Rmpq_set_NV, cannot coerce an Inf to a Math::GMPq value/) {print "ok 25\n"}
+if($@ =~ /cannot coerce an Inf to a Math::GMP/) {print "ok 25\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 25\n";
@@ -225,7 +232,7 @@ else {
 }
 
 eval{$ret *=  $nan };
-if($@ =~ /In Rmpq_set_NV, cannot coerce a NaN to a Math::GMPq value/) {print "ok 27\n"}
+if($@ =~ /cannot coerce a NaN to a Math::GMP/) {print "ok 27\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 27\n";
@@ -249,16 +256,18 @@ $ret *= 61.2;
 
 if($ret == '21532835718365185/35184372088832' ||
    $ret == '88198495102423793665/144115188075855872' ||
+   $ret == '387901083669838196857991180845055/633825300114114700748351602688' ||
    $ret == '24825669354869644598911435574083585/40564819207303340847894502572032') {print "ok 30\n"}
 else {
   warn "\n Expected:\n   21532835718365185/35184372088832 or ",
                    "\n   88198495102423793665/144115188075855872 or ",
+                   "\n   387901083669838196857991180845055/633825300114114700748351602688 or ",
                    "\n   24825669354869644598911435574083585/40564819207303340847894502572032\nGot: $ret\n";
   print "not ok 30\n";
 }
 
 eval{$ret +=  $inf };
-if($@ =~ /In Rmpq_set_NV, cannot coerce an Inf to a Math::GMPq value/) {print "ok 31\n"}
+if($@ =~ /cannot coerce an Inf to a Math::GMP/) {print "ok 31\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 31\n";
@@ -272,7 +281,7 @@ else {
 }
 
 eval{$ret +=  $nan };
-if($@ =~ /In Rmpq_set_NV, cannot coerce a NaN to a Math::GMPq value/) {print "ok 33\n"}
+if($@ =~ /cannot coerce a NaN to a Math::GMP/) {print "ok 33\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 33\n";
@@ -297,16 +306,18 @@ $ret += 61.2;
 
 if($ret == '47372238580403407/70368744177664' ||
    $ret == '194036689225332346063/288230376151711744' ||
+   $ret == '853382384073644033087580597859121/1267650600228229401496703205376' ||
    $ret == '54616472580713218117605158262983887/81129638414606681695789005144064') {print "ok 36\n"}
 else {
   warn "\n Expected:\n   47372238580403407/70368744177664 or ",
                    "\n   194036689225332346063/288230376151711744 or ",
+                   "\n   853382384073644033087580597859121/1267650600228229401496703205376 or ",
                    "\n   54616472580713218117605158262983887/81129638414606681695789005144064\nGot: $ret\n";
   print "not ok 36\n";
 }
 
 eval{$ret -=  $inf };
-if($@ =~ /In Rmpq_set_NV, cannot coerce an Inf to a Math::GMPq value/) {print "ok 37\n"}
+if($@ =~ /cannot coerce an Inf to a Math::GMP/) {print "ok 37\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 37\n";
@@ -320,7 +331,7 @@ else {
 }
 
 eval{$ret -=  $nan };
-if($@ =~ /In Rmpq_set_NV, cannot coerce a NaN to a Math::GMPq value/) {print "ok 39\n"}
+if($@ =~ /cannot coerce a NaN to a Math::GMP/) {print "ok 39\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 39\n";
@@ -340,21 +351,22 @@ else {
   print "not ok 41\n";
 }
 
-# $ret is 673.2
 $ret -= 61.2;
 
 if($ret == '21532835718365185/35184372088832' ||
    $ret == '88198495102423793665/144115188075855872' ||
+   $ret == '387901083669838196857991180845055/633825300114114700748351602688' ||
    $ret == '24825669354869644598911435574083585/40564819207303340847894502572032') {print "ok 42\n"}
 else {
   warn "\n Expected:\n   21532835718365185/35184372088832 or ",
                    "\n   88198495102423793665/144115188075855872 or ",
+                   "\n   387901083669838196857991180845055/633825300114114700748351602688 or ",
                    "\n   24825669354869644598911435574083585/40564819207303340847894502572032\nGot: $ret\n";
   print "not ok 42\n";
 }
 
 eval{$ret /=  $inf };
-if($@ =~ /In Rmpq_set_NV, cannot coerce an Inf to a Math::GMPq value/) {print "ok 43\n"}
+if($@ =~ /cannot coerce an Inf to a Math::GMP/) {print "ok 43\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 43\n";
@@ -368,7 +380,7 @@ else {
 }
 
 eval{$ret /=  $nan };
-if($@ =~ /In Rmpq_set_NV, cannot coerce a NaN to a Math::GMPq value/) {print "ok 45\n"}
+if($@ =~ /cannot coerce a NaN to a Math::GMP/) {print "ok 45\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 45\n";
@@ -536,7 +548,7 @@ else {
 }
 
 eval{$x = (Math::GMPq->new(10) <  $nan )};
-if($@ =~ /In Rmpq_cmp_NV, cannot coerce a NaN to a Math::GMPq value/) {print "ok 66\n"}
+if($@ =~ /cannot coerce a NaN to a Math::GMP/) {print "ok 66\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 66\n";
@@ -593,7 +605,7 @@ else {
 }
 
 eval{$x = (Math::GMPq->new(10) <=  $nan )};
-if($@ =~ /In Rmpq_cmp_NV, cannot coerce a NaN to a Math::GMPq value/) {print "ok 73\n"}
+if($@ =~ /cannot coerce a NaN to a Math::GMP/) {print "ok 73\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 73\n";
@@ -649,7 +661,7 @@ else {
 }
 
 eval{$x = (Math::GMPq->new(10) >=  $nan )};
-if($@ =~ /In Rmpq_cmp_NV, cannot coerce a NaN to a Math::GMPq value/) {print "ok 80\n"}
+if($@ =~ /cannot coerce a NaN to a Math::GMP/) {print "ok 80\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 80\n";
@@ -706,7 +718,7 @@ else {
 }
 
 eval{$x = (Math::GMPq->new(10) >  $nan )};
-if($@ =~ /In Rmpq_cmp_NV, cannot coerce a NaN to a Math::GMPq value/) {print "ok 87\n"}
+if($@ =~ /cannot coerce a NaN to a Math::GMP/) {print "ok 87\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 87\n";
@@ -813,7 +825,7 @@ else {
 }
 
 eval{$x = (Math::GMPq->new(10) <=>  $nan )};
-if($@ =~ /In Rmpq_cmp_NV, cannot coerce a NaN to a Math::GMPq value/) {print "ok 102\n"}
+if($@ =~ /cannot coerce a NaN to a Math::GMP/) {print "ok 102\n"}
 else {
   warn "\n\$\@: $@\n";
   print "not ok 102\n";
@@ -939,4 +951,18 @@ if(Math::GMPq->new(-0.0) == '0') {print "ok 119\n"}
 else {
   warn "\n ", Math::GMPq->new(-0.0), "!= 0\n";
   print "not ok 119\n";
+}
+
+if(Math::GMPq->new(0.1) == 0.1) {print "ok 120\n" }
+else {
+  warn "\n ", Math::GMPq->new(0.1), "!= 0.1\n";
+  print "not ok 120\n";
+}
+
+my $s1 = sprintf "%.5g", Math::GMPq->new(0.625);
+
+if($s1 == 0.625) {print "ok 121\n"}
+else {
+  warn "\n $s1 != 0.625\n";
+  print "not ok 121\n";
 }

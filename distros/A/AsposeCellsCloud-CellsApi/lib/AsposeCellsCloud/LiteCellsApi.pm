@@ -506,6 +506,92 @@ sub post_export {
 }
 
 #
+# post_import
+#
+# 
+# 
+# @param File $file File to upload (required)
+# @param string $object_type  (required)
+# @param string $format  (required)
+{
+    my $params = {
+    'file' => {
+        data_type => 'hash',
+        description => 'File to upload',
+        required => '1',
+    },
+    'import_option' => {
+        data_type => 'String',
+        description => '',
+        required => '1',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_import' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FilesResult',
+        };
+}
+# @return FilesResult
+#
+sub post_import {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'file' is set
+    unless (exists $args{'file'}) {
+      croak("Missing the required parameter 'file' when calling post_import");
+    }
+
+    # verify the required parameter 'object_type' is set
+    unless (exists $args{'import_option'}) {
+      croak("Missing the required parameter 'import_option' when calling post_import");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/import';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    $self->{api_client}->check_access_token();
+
+    my $_body_data;
+    # body params
+    if ( exists $args{'file'} ) {   
+        my $map_file =$args{'file'};
+        while ( my ($filename,$value) = each( %$map_file ) ) {
+             $form_params->{$filename} = [$value ,$filename,'application/octet-stream'];
+        }
+        if ( exists $args{'import_option'} ) {
+            $form_params->{'importoption'} =  $args{'import_option'};
+        }
+    }
+
+
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FilesResult', $response);
+    return $_response_object;
+}
+
+#
 # post_merge
 #
 # 
@@ -537,6 +623,7 @@ sub post_export {
         returns => 'FileInfo',
         };
 }
+
 # @return FileInfo
 #
 sub post_merge {

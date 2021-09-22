@@ -126,6 +126,7 @@ lib/PDF/API2/Resource/XObject/Image/TIFF/File.pm
 lib/PDF/API2/Resource/uniglyph.txt
 lib/PDF/API2/UniWrap.pm
 lib/PDF/API2/Util.pm
+lib/PDF/API2/ViewerPreferences.pm
 lib/PDF/API2/Win32.pm
 t/00-all-usable.t
 t/01-basic.t
@@ -138,6 +139,7 @@ t/barcode.t
 t/bbox.t
 t/circular-references.t
 t/cmap.t
+t/content-deprecated.t
 t/content.t
 t/cs-webcolor.t
 t/deprecations.t
@@ -151,8 +153,10 @@ t/font-ttf.t
 t/font-type1.t
 t/gd.t
 t/gif.t
+t/info.t
 t/jpg.t
 t/lite.t
+t/named-destinations.t
 t/outline.t
 t/page.t
 t/papersizes.t
@@ -177,4 +181,5 @@ t/rt69503.t
 t/string.t
 t/text.t
 t/tiff.t
+t/version.t
 t/viewer-preferences.t

@@ -20,7 +20,7 @@ use Encode 'encode', 'decode';
 
 use Carp 'confess';
 
-our $VERSION = '0.9012';
+our $VERSION = '0.9014';
 
 my $SPVM_INITED;
 my $BUILDER;
@@ -70,7 +70,7 @@ sub import {
 sub init {
   unless ($SPVM_INITED) {
     if (my $builder = $BUILDER) {
-      # Call begin blocks
+      # Call init blocks
       $builder->_init;
     }
     $SPVM_INITED = 1;
@@ -300,7 +300,7 @@ SPVM Module:
 
   # lib/SPVM/MyMath.spvm
   class MyMath {
-    sub sum : int ($nums : int[]) {
+    static method sum : int ($nums : int[]) {
 
       my $total = 0;
       for (my $i = 0; $i < @$nums; $i++) {
@@ -337,7 +337,7 @@ Precompiled SPVM Method. This code is converted to C language and then converted
 
   # lib/SPVM/MyMath.spvm
   class MyMath : precompile {
-    sub sum : int ($nums : int[]) {
+    static method sum : int ($nums : int[]) {
 
       my $total = 0;
       for (my $i = 0; $i < @$nums; $i++) {

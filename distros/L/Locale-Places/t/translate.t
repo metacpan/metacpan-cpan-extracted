@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 18;
+use Test::Most tests => 19;
 use lib 't/lib';
 use MyLogger;
 
@@ -17,8 +17,6 @@ TRANSLATE: {
 	} else {
 		$places = new_ok('Locale::Places');
 	}
-
-	$ENV{'LANG'} = 'C.UTF-8';
 
 	like($places->translate(place => 'London', from => 'en', to => 'fr'), qr/Londres$/, 'French for London is Londres');
 	like($places->translate(place => 'Londres', from => 'fr', to => 'en'), qr/London$/, 'English for Londres is London');
@@ -44,6 +42,8 @@ TRANSLATE: {
 	is($places->translate(place => 'Durham', 'from' => 'en', 'to' => 'fr'), 'Durham', 'Durham has different matches');
 	is($places->translate(place => 'Bromley', 'from' => 'en', 'to' => 'fr'), 'Bromley', 'Bromley has different matches');
 	is($places->translate(place => 'Lewisham', 'from' => 'en', 'to' => 'fr'), 'Lewisham', 'Lewisham has different matches');
+
+	is($places->translate(place => 'Cardiff', 'from' => 'en', 'to' => 'fr'), 'Cardiff', 'unable to find a good match for Cardiff');
 
 	$ENV{'LANG'} = 'en_GB';
 

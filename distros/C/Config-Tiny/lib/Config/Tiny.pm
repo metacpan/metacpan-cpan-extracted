@@ -6,16 +6,16 @@ use strict;
 
 # Warning: There is another version line, in t/02.main.t.
 
-our $VERSION = '2.26';
+our $VERSION = '2.27';
 
 BEGIN {
 	require 5.008001; # For the utf8 stuff.
 	$Config::Tiny::errstr  = '';
 }
 
-# Create an empty object.
+# Create an object.
 
-sub new { return bless {}, shift }
+sub new { return bless defined $_[1] ? $_[1] : {}, $_[0] }
 
 # Create an object from a file.
 
@@ -181,8 +181,13 @@ Config::Tiny - Read/Write .ini style files with as little code as possible
 	# In your program
 	use Config::Tiny;
 
-	# Create a config
+	# Create an empty config
 	my $Config = Config::Tiny->new;
+
+	# Create a config with data
+	my $config = Config::Tiny->new({
+		_ => { rootproperty => "Bar" },
+		section => { one => "value", Foo => 42 } });
 
 	# Open the config
 	$Config = Config::Tiny->read( 'file.conf' );
@@ -259,9 +264,16 @@ Returns a string representing the most recent error, or the empty string.
 
 You can also retrieve the error message from the C<$Config::Tiny::errstr> variable.
 
-=head2 new()
+=head2 new([$config])
 
-The constructor C<new> creates and returns an empty C<Config::Tiny> object.
+Here, the [] indicate an optional parameter.
+
+The constructor C<new> creates and returns a C<Config::Tiny> object.
+
+This will normally be a new, empty configuration, but you may also pass a
+hashref here which will be turned into an object of this class. This hashref
+should have a structure suitable for a configuration file, that is, a hash of
+hashes where the key C<_> is treated specially as the root section.
 
 =head2 read($filename, [$encoding])
 

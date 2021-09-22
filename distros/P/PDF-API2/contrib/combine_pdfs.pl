@@ -24,9 +24,9 @@ foreach my $input_file (@ARGV) {
         print " $page_number,";
         $output_pdf->import_page($input_pdf, $page_number);
     }
-    $input_pdf->end();
+    $input_pdf->close();
     print " Done.\n\n";
 }
 
 print "Writing $output_file\n";
-$output_pdf->saveas($output_file);
+$output_pdf->save($output_file);

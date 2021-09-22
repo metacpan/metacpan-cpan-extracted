@@ -31,6 +31,11 @@ blog posts at L<http://www.welshpiper.com/hex-based-campaign-design-part-1/> and
 L<http://www.welshpiper.com/hex-based-campaign-design-part-2/> for more
 information.
 
+Generally speaking, the idea is that the algorithm picks a random terrain for a
+hex in the middle of the map. Based on that, the surrounding hexes a bit further
+away are picked, and finally the remaining hexes are picked. This is why the
+maps vary so drastically in terrain distribution.
+
 =head1 METHODS
 
 Note that this module acts as a class with the C<generate_map> method, but none

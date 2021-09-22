@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.006;
 
 use ExtUtils::MakeMaker;
 
@@ -22,15 +22,18 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Alien-RtMidi",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Alien::RtMidi",
   "PREREQ_PM" => {
     "Alien::Base" => "1.00"
   },
   "TEST_REQUIRES" => {
+    "Alien::Base" => "1.00",
+    "FFI::Platypus" => "1.00",
     "Test2::V0" => 0,
     "Test::Alien" => 0
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,6 +45,7 @@ my %FallbackPrereqs = (
   "Alien::Build" => "0.32",
   "Alien::Build::MM" => "0.32",
   "ExtUtils::MakeMaker" => "6.52",
+  "FFI::Platypus" => "1.00",
   "Test2::V0" => 0,
   "Test::Alien" => 0
 );
@@ -62,10 +66,6 @@ unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
 
 delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
-
-if ( $^O eq 'MSWin32' ) {
-	$WriteMakefileArgs{PREREQ_PM}{'Alien::MSYS'} = $FallbackPrereqs{'Alien::MSYS'} = '0.14';
-}
 
 WriteMakefile(%WriteMakefileArgs);
 

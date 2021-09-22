@@ -13,7 +13,7 @@ use MooX::Types::MooseLike::Numeric qw(PositiveInt);
 use Try::Tiny;
 use namespace::autoclean;
 
-our $VERSION = '1.013';
+our $VERSION = '1.015';
 
 # plural_ref e.g. ru
 # The key is the plural form 0, 1 or 2.
@@ -768,7 +768,7 @@ Locale::Utils::Autotranslator - Base class to translate automaticly
 
 =head1 VERSION
 
-1.013
+1.015
 
 =head1 SYNOPSIS
 

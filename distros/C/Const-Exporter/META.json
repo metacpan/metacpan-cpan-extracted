@@ -4,7 +4,7 @@
       "Robert Rothenberg <rrwo@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "export",
       "Const::Fast",
@@ -83,7 +83,7 @@
    "provides" : {
       "Const::Exporter" : {
          "file" : "lib/Const/Exporter.pm",
-         "version" : "v1.2.0"
+         "version" : "v1.2.1"
       }
    },
    "release_status" : "stable",
@@ -97,7 +97,7 @@
          "web" : "https://github.com/robrwo/Const-Exporter"
       }
    },
-   "version" : "v1.2.0",
+   "version" : "v1.2.1",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Slaven Rezi\u0107 <slaven@rezic.de>",

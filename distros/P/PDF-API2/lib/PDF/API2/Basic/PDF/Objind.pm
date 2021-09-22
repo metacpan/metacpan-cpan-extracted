@@ -11,12 +11,11 @@ package PDF::API2::Basic::PDF::Objind;
 use strict;
 use warnings;
 
-our $VERSION = '2.041'; # VERSION
+our $VERSION = '2.042'; # VERSION
 
 =head1 NAME
 
-PDF::API2::Basic::PDF::Objind - PDF indirect object reference. Also acts as an abstract
-superclass for all elements in a PDF file.
+PDF::API2::Basic::PDF::Objind - Low-level PDF indirect object
 
 =head1 INSTANCE VARIABLES
 

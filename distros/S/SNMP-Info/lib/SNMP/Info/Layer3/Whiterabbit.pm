@@ -53,7 +53,7 @@ use SNMP::Info::MAU;
 
 our ($VERSION, %GLOBALS, %MIBS, %FUNCS, %PORTSTAT, %MODEL_MAP, %MUNGE);
 
-$VERSION = '3.78';
+$VERSION = '3.80';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,
@@ -168,7 +168,7 @@ Overwrite snmp value, we support 1-3
 
 =item $whiterabbit->os()
 
-staticly returns whiterabbit
+statically returns whiterabbit
 
 =item $whiterabbit->vendor()
 

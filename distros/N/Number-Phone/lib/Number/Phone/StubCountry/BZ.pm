@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210602223257;
+our $VERSION = 1.20210921211829;
 
 my $formatters = [
                 {
@@ -39,17 +39,39 @@ my $formatters = [
 my $validators = {
                 'fixed_line' => '
           (?:
-            236|
-            732
-          )\\d{4}|
-          [2-578][02]\\d{5}
+            2(?:
+              [02]\\d|
+              36|
+              [68]0
+            )|
+            [3-58](?:
+              [02]\\d|
+              [68]0
+            )|
+            7(?:
+              [02]\\d|
+              32|
+              [68]0
+            )
+          )\\d{4}
         ',
                 'geographic' => '
           (?:
-            236|
-            732
-          )\\d{4}|
-          [2-578][02]\\d{5}
+            2(?:
+              [02]\\d|
+              36|
+              [68]0
+            )|
+            [3-58](?:
+              [02]\\d|
+              [68]0
+            )|
+            7(?:
+              [02]\\d|
+              32|
+              [68]0
+            )
+          )\\d{4}
         ',
                 'mobile' => '6[0-35-7]\\d{5}',
                 'pager' => '',
@@ -59,12 +81,12 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"5017", "Toledo\ District",
-"5012", "Belize\ District",
-"5014", "Corozal\ District",
-"5015", "Stann\ Creek\ District",
+$areanames{en} = {"5014", "Corozal\ District",
+"5013", "Orange\ Walk\ District",
 "5018", "Cayo\ District",
-"5013", "Orange\ Walk\ District",};
+"5017", "Toledo\ District",
+"5015", "Stann\ Creek\ District",
+"5012", "Belize\ District",};
 
     sub new {
       my $class = shift;

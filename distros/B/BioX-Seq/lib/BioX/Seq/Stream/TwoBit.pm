@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use POSIX qw/ceil/;
 
+use parent qw/BioX::Seq::Stream/;
+
 use constant MAGIC => 0x1a412743;
 use constant LE_MAGIC_S => pack('C2', 0x43, 0x27);
 use constant LE_MAGIC_L => pack('C2', 0x41, 0x1a);

@@ -2,7 +2,7 @@ package App::Yath::Plugin::Cover;
 use strict;
 use warnings;
 
-our $VERSION = '1.000072';
+our $VERSION = '1.000073';
 
 use Test2::Harness::Util qw/clean_path mod2file/;
 use Test2::Harness::Util::JSON qw/encode_json/;
@@ -74,6 +74,16 @@ option_group {prefix => 'cover', category => "Cover Options"} => sub {
         default => 'Test2::Plugin::Cover',
     );
 };
+
+sub spawn_args {
+    my $self = shift;
+    my ($settings) = @_;
+
+    return () unless $settings->cover->files || $settings->cover->metrics || $settings->cover->write;
+
+    my $class = $settings->cover->class;
+    return ('-M' . $class . '=disabled,1');
+}
 
 sub post_process {
     my %params   = @_;

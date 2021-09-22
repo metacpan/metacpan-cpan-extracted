@@ -16,6 +16,8 @@ is minify("\t\t \n") => "", "empty";
 
 is minify("simple") => "simple";
 
+is minify("\nsimple") => "simple";
+
 is minify("\n  simple") => "simple";
 
 is minify("\n  simple\n") => "simple\n";
@@ -27,6 +29,8 @@ is minify("simple  \n") => "simple\n";
 is minify("simple  \nstuff  ") => "simple\nstuff";
 
 is minify("\r\n\r\n\t0\r\n\t\t1\r\n") => "0\n1\n";
+
+is minify(" £ ") => "£";
 
 is minify(" £ simple") => "£ simple";
 
@@ -62,10 +66,21 @@ lives_and {
     };
     like $warning, qr/Malformed UTF-8 character/;
 
-    {
-        my $n = eval { encode_utf8( chr(160) ) };
-        is minify($n) => $n;
-    }
+};
+
+lives_and {
+
+    my $warning = warning {
+        my $n = chr(160);
+        my $r = eval { minify("  $n  \n  \n") };
+    };
+    like $warning, qr/Malformed UTF-8 character/;
+};
+
+lives_and {
+
+    my $n = eval { encode_utf8( chr(160) ) };
+    is minify($n) => $n;
 
 };
 

@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Mojolicious::Plugin::Text::Minify",
   "PREREQ_PM" => {
     "Mojolicious" => 0,
-    "Text::Minify::XS" => 0
+    "Text::Minify::XS" => "0.4.8"
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "v0.2.0",
+  "VERSION" => "v0.2.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,7 +41,7 @@ my %FallbackPrereqs = (
   "Mojolicious" => 0,
   "Test::Mojo" => 0,
   "Test::More" => 0,
-  "Text::Minify::XS" => 0,
+  "Text::Minify::XS" => "0.4.8",
   "strict" => 0,
   "warnings" => 0
 );

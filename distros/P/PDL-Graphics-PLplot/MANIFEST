@@ -4,7 +4,6 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 plplot.pd
 README
-t/01-checkmanifest.t
 t/not_covered/x00c.c
 t/not_covered/x14.pl
 t/not_covered/x14c.c

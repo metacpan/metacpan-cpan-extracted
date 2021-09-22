@@ -44,11 +44,11 @@ Asm::X86 - List of instructions and registers of x86-compatible processors, vali
 
 =head1 VERSION
 
-Version 0.61
+Version 0.62
 
 =cut
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 =head1 DESCRIPTION
 
@@ -2574,358 +2574,346 @@ sub conv_att_addr_to_intel($) {
 sub conv_intel_addr_to_att($) {
 
 	my $par = shift;
-	my ($a1, $a2, $a3, $z1, $z2, $z3);
+	my ($z1, $z2, $z3);
 	# seg: disp(base, index, scale)
 	# [seg:base+index*scale+disp]
-	if ( $par =~ 	 /\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/o ) {
+	my $a_seg_base_index_scale_disp = qr/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/o;
+	my $a_seg_base_disp_index_scale = qr/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/o;
+	my $a_seg_index_scale_base_disp = qr/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/o;
+	my $a_seg_base_index_disp = qr/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/o;
+	my $a_seg_base_index_scale = qr/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/o;
+	my $a_seg_base_index = qr/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/o;
+	my $a_seg_base = qr/\[\s*(\w+)\s*:\s*(\w+)\s*\]/o;
+	my $a_seg_index_scale_base = qr/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/o;
 
-		$a1 = $2;
-		$a2 = $4;
-		$a3 = $7;
-		$z1 = _nopluses($a1);
-		$z2 = _nopluses($a2);
-		$z3 = _nopluses($a3);
+	my $a_base_index_scale_disp = qr/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/o;
+	my $a_index_scale_base_disp = qr/\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/o;
+	my $a_base_disp_index_scale = qr/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/o;
+	my $a_base_index_disp = qr/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/o;
+	my $a_base_index_scale = qr/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/o;
+	my $a_base_index = qr/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/o;
+	my $a_base = qr/\[\s*(\w+)\s*\]/o;
+	my $a_index_scale_base = qr/\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/o;
+
+	if ( $par =~ /$a_seg_base_index_scale_disp/ ) {
+
+		$z1 = _nopluses($2);
+		$z2 = _nopluses($4);
+		$z3 = _nopluses($7);
 		if ( is_reg($3) && is_reg($5) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z3$8)$9($3,$5,$6)/o;
+			$par =~ s/$a_seg_base_index_scale_disp/$1:($z3$8)$9($3,$5,$6)/;
 		} elsif ( is_reg($3) && is_reg($6) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z3$8)$9($3,$6,$5)/o;
+			$par =~ s/$a_seg_base_index_scale_disp/$1:($z3$8)$9($3,$6,$5)/;
 		} elsif ( is_reg($5) && is_reg($8) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3)$9($8,$5,$6)/o;
+			$par =~ s/$a_seg_base_index_scale_disp/$1:($z1$3)$9($8,$5,$6)/;
 		} elsif ( is_reg($6) && is_reg($8) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3)$9($8,$6,$5)/o;
+			$par =~ s/$a_seg_base_index_scale_disp/$1:($z1$3)$9($8,$6,$5)/;
 		} elsif ( is_reg($3) && is_reg($8) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z2$5*$6)$9($3,$8)/o;
+			$par =~ s/$a_seg_base_index_scale_disp/$1:($z2$5*$6)$9($3,$8)/;
 		} elsif ( is_reg($3) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z3$8$z2$5*$6)$9($3)/o;
+			$par =~ s/$a_seg_base_index_scale_disp/$1:($z3$8$z2$5*$6)$9($3)/;
 		} elsif ( is_reg($5) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z3$8$z1$3)$9(,$5,$6)/o;
+			$par =~ s/$a_seg_base_index_scale_disp/$1:($z3$8$z1$3)$9(,$5,$6)/;
 		} elsif ( is_reg($6) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z3$8$z1$3)$9(,$6,$5)/o;
+			$par =~ s/$a_seg_base_index_scale_disp/$1:($z3$8$z1$3)$9(,$6,$5)/;
 		} elsif ( is_reg($8) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3$z2$5*$6)$9($8)/o;
+			$par =~ s/$a_seg_base_index_scale_disp/$1:($z1$3$z2$5*$6)$9($8)/;
 		} else {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3$z2$5*$6$z3$8)$9(,1)/o;
+			$par =~ s/$a_seg_base_index_scale_disp/$1:($z1$3$z2$5*$6$z3$8)$9(,1)/;
 		}
 	}
-	elsif ( $par =~  /\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/o ) {
+	elsif ( $par =~ /$a_seg_base_disp_index_scale/ ) {
 
-		$a1 = $2;
-		$a2 = $4;
-		$a3 = $6;
-		$z1 = _nopluses($a1);
-		$z2 = _nopluses($a2);
-		$z3 = _nopluses($a3);
+		$z1 = _nopluses($2);
+		$z2 = _nopluses($4);
+		$z3 = _nopluses($6);
 		if ( is_reg($3) && is_reg($5) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/$1:($z3$7*$8)$9($3,$5)/o;
+			$par =~ s/$a_seg_base_disp_index_scale/$1:($z3$7*$8)$9($3,$5)/;
 		} elsif ( is_reg($5) && is_reg($7) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3)$9($5,$7,$8)/o;
+			$par =~ s/$a_seg_base_disp_index_scale/$1:($z1$3)$9($5,$7,$8)/;
 		} elsif ( is_reg($5) && is_reg($8) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3)$9($5,$8,$7)/o;
+			$par =~ s/$a_seg_base_disp_index_scale/$1:($z1$3)$9($5,$8,$7)/;
 		} elsif ( is_reg($3) && is_reg($7) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/$1:($z2$5)$9($3,$7,$8)/o;
+			$par =~ s/$a_seg_base_disp_index_scale/$1:($z2$5)$9($3,$7,$8)/;
 		} elsif ( is_reg($3) && is_reg($8) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/$1:($z2$5)$9($3,$8,$7)/o;
+			$par =~ s/$a_seg_base_disp_index_scale/$1:($z2$5)$9($3,$8,$7)/;
 		} elsif ( is_reg($3) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/$1:($z2$5$z3$7*$8)$9($3)/o;
+			$par =~ s/$a_seg_base_disp_index_scale/$1:($z2$5$z3$7*$8)$9($3)/;
 		} elsif ( is_reg($5) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3$z3$7*$8)$9($5)/o;
+			$par =~ s/$a_seg_base_disp_index_scale/$1:($z1$3$z3$7*$8)$9($5)/;
 		} elsif ( is_reg($7) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3$z2$5)$9(,$7,$8)/o;
+			$par =~ s/$a_seg_base_disp_index_scale/$1:($z1$3$z2$5)$9(,$7,$8)/;
 		} elsif ( is_reg($8) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3$z2$5)$9(,$8,$7)/o;
+			$par =~ s/$a_seg_base_disp_index_scale/$1:($z1$3$z2$5)$9(,$8,$7)/;
 		} else {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3$z2$5$z3$7*$8)$9(,1)/o;
+			$par =~ s/$a_seg_base_disp_index_scale/$1:($z1$3$z2$5$z3$7*$8)$9(,1)/;
 		}
 	}
-	elsif ( $par =~  /\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/o ) {
+	elsif ( $par =~ /$a_seg_index_scale_base_disp/ ) {
 
-		$a1 = $2;
-		$a2 = $5;
-		$a3 = $7;
-		$z1 = _nopluses($a1);
-		$z2 = _nopluses($a2);
-		$z3 = _nopluses($a3);
+		$z1 = _nopluses($2);
+		$z2 = _nopluses($5);
+		$z3 = _nopluses($7);
 		if ( is_reg($3) && is_reg($6) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z3$8)$9($6,$3,$4)/o;
+			$par =~ s/$a_seg_index_scale_base_disp/$1:($z3$8)$9($6,$3,$4)/;
 		} elsif ( is_reg($4) && is_reg($6) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z3$8)$9($6,$4,$3)/o;
+			$par =~ s/$a_seg_index_scale_base_disp/$1:($z3$8)$9($6,$4,$3)/;
 		} elsif ( is_reg($6) && is_reg($8) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3*$4)$9($6,$8)/o;
+			$par =~ s/$a_seg_index_scale_base_disp/$1:($z1$3*$4)$9($6,$8)/;
 		} elsif ( is_reg($3) && is_reg($8) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z2$6)$9($8,$3,$4)/o;
+			$par =~ s/$a_seg_index_scale_base_disp/$1:($z2$6)$9($8,$3,$4)/;
 		} elsif ( is_reg($4) && is_reg($8) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z2$6)$9($8,$4,$3)/o;
+			$par =~ s/$a_seg_index_scale_base_disp/$1:($z2$6)$9($8,$4,$3)/;
 		} elsif ( is_reg($3) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z2$6$z3$8)$9(,$3,$4)/o;
+			$par =~ s/$a_seg_index_scale_base_disp/$1:($z2$6$z3$8)$9(,$3,$4)/;
 		} elsif ( is_reg($4) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z2$6$z3$8)$9(,$4,$3)/o;
+			$par =~ s/$a_seg_index_scale_base_disp/$1:($z2$6$z3$8)$9(,$4,$3)/;
 		} elsif ( is_reg($6) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3*$4$z3$8)$9($6)/o;
+			$par =~ s/$a_seg_index_scale_base_disp/$1:($z1$3*$4$z3$8)$9($6)/;
 		} elsif ( is_reg($8) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3*$4$z2$6)$9($8)/o;
+			$par =~ s/$a_seg_index_scale_base_disp/$1:($z1$3*$4$z2$6)$9($8)/;
 		} else {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3*$4$z2$6$z3$8)$9(,1)/o;
+			$par =~ s/$a_seg_index_scale_base_disp/$1:($z1$3*$4$z2$6$z3$8)$9(,1)/;
 		}
 	}
-	elsif ( $par =~  /\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/o ) {
+	elsif ( $par =~ /$a_seg_base_index_disp/ ) {
 
-		$a1 = $2;
-		$a2 = $4;
-		$a3 = $6;
-		$z1 = _nopluses($a1);
-		$z2 = _nopluses($a2);
-		$z3 = _nopluses($a3);
+		$z1 = _nopluses($2);
+		$z2 = _nopluses($4);
+		$z3 = _nopluses($6);
 		if ( is_reg($3) && is_reg($5) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z3$7)$8($3,$5,)/o;
+			$par =~ s/$a_seg_base_index_disp/$1:($z3$7)$8($3,$5,)/;
 		} elsif ( is_reg($3) && is_reg($7) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z2$5)$8($3,$7,)/o;
+			$par =~ s/$a_seg_base_index_disp/$1:($z2$5)$8($3,$7,)/;
 		} elsif ( is_reg($5) && is_reg($7) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3)$8($7,$5,)/o;
+			$par =~ s/$a_seg_base_index_disp/$1:($z1$3)$8($7,$5,)/;
 		} elsif ( is_reg($3) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z1$5$z3$7)$8($3)/o;
+			$par =~ s/$a_seg_base_index_disp/$1:($z1$5$z3$7)$8($3)/;
 		} elsif ( is_reg($5) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3$z3$7)$8($5)/o;
+			$par =~ s/$a_seg_base_index_disp/$1:($z1$3$z3$7)$8($5)/;
 		} elsif ( is_reg($7) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3$z2$5)$8($7)/o;
+			$par =~ s/$a_seg_base_index_disp/$1:($z1$3$z2$5)$8($7)/;
 		} else {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3$z2$5$z3$7)$8(,1)/o;
+			$par =~ s/$a_seg_base_index_disp/$1:($z1$3$z2$5$z3$7)$8(,1)/;
 		}
 	}
-	elsif ( $par =~  /\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/o ) {
+	elsif ( $par =~ /$a_seg_base_index_scale/ ) {
 
-		$a1 = $2;
-		$a2 = $4;
-		$z1 = _nopluses($a1);
-		$z2 = _nopluses($a2);
+		$z1 = _nopluses($2);
+		$z2 = _nopluses($4);
 		if ( is_reg($3) && is_reg($5) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/$1:($3,$5,$6)/o;
+			$par =~ s/$a_seg_base_index_scale/$1:($3,$5,$6)/;
 		} elsif ( is_reg($3) && is_reg($6) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/$1:($3,$6,$5)/o;
+			$par =~ s/$a_seg_base_index_scale/$1:($3,$6,$5)/;
 		} elsif ( is_reg($3) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/$1:($z2$5*$6)$7($3)/o;
+			$par =~ s/$a_seg_base_index_scale/$1:($z2$5*$6)$7($3)/;
 		} elsif ( is_reg($5) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3)$7(,$5,$6)/o;
+			$par =~ s/$a_seg_base_index_scale/$1:($z1$3)$7(,$5,$6)/;
 		} elsif ( is_reg($6) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3)$7(,$6,$5)/o;
+			$par =~ s/$a_seg_base_index_scale/$1:($z1$3)$7(,$6,$5)/;
 		} else {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3$z2$5*$6)$7(,1)/o;
+			$par =~ s/$a_seg_base_index_scale/$1:($z1$3$z2$5*$6)$7(,1)/;
 		}
 	}
-	elsif ( $par =~  /\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/o ) {
+	elsif ( $par =~ /$a_seg_base_index/ ) {
 
-		$a1 = $2;
-		$a2 = $4;
-		$z1 = _nopluses($a1);
-		$z2 = _nopluses($a2);
+		$z1 = _nopluses($2);
+		$z2 = _nopluses($4);
 		if ( is_reg($3) && is_reg($5) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($3,$5,)/o;
+			$par =~ s/$a_seg_base_index/$1:($3,$5,)/;
 		} elsif ( is_reg($3) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z2$5)$6($3)/o;
+			$par =~ s/$a_seg_base_index/$1:($z2$5)$6($3)/;
 		} elsif ( is_reg($5) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3)$6($5)/o;
+			$par =~ s/$a_seg_base_index/$1:($z1$3)$6($5)/;
 		} else {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3$z2$5)$6(,1)/o;
+			$par =~ s/$a_seg_base_index/$1:($z1$3$z2$5)$6(,1)/;
 		}
 	}
-	elsif ( $par =~  /\[\s*(\w+)\s*:\s*(\w+)\s*\]/o ) {
+	elsif ( $par =~ /$a_seg_base/ ) {
 
 		if ( is_reg($2) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*(\w+)\s*\]/$1:($2)/o;
+			$par =~ s/$a_seg_base/$1:($2)/;
 		} else {
-			$par =~ s/\[\s*(\w+)\s*:\s*(\w+)\s*\]/$1:$2(,1)/o;
+			$par =~ s/$a_seg_base/$1:$2(,1)/;
 		}
 	}
-	elsif ( $par =~  /\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/o ) {
+	elsif ( $par =~ /$a_seg_index_scale_base/ ) {
 
-		$a1 = $2;
-		$a2 = $5;
-		$z1 = _nopluses($a1);
-		$z2 = _nopluses($a2);
+		$z1 = _nopluses($2);
+		$z2 = _nopluses($5);
 		if ( is_reg($3) && is_reg($6) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($6,$3,$4)/o;
+			$par =~ s/$a_seg_index_scale_base/$1:($6,$3,$4)/;
 		} elsif ( is_reg($4) && is_reg($6) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($6,$4,$3)/o;
+			$par =~ s/$a_seg_index_scale_base/$1:($6,$4,$3)/;
 		} elsif ( is_reg($3) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z2$6)$7(,$3,$4)/o;
+			$par =~ s/$a_seg_index_scale_base/$1:($z2$6)$7(,$3,$4)/;
 		} elsif ( is_reg($4) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z2$6)$7(,$4,$3)/o;
+			$par =~ s/$a_seg_index_scale_base/$1:($z2$6)$7(,$4,$3)/;
 		} elsif ( is_reg($6) ) {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3*$4)$7($6)/o;
+			$par =~ s/$a_seg_index_scale_base/$1:($z1$3*$4)$7($6)/;
 		} else {
-			$par =~ s/\[\s*(\w+)\s*:\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/$1:($z1$3*$4$z2$6)$7(,1)/o;
+			$par =~ s/$a_seg_index_scale_base/$1:($z1$3*$4$z2$6)$7(,1)/;
 		}
 	}
-
 	# disp(base, index, scale)
-	elsif ( $par =~  /\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/o ) {
-		$a1 = $1;
-		$a2 = $3;
-		$a3 = $6;
-		$z1 = _nopluses($a1);
-		$z2 = _nopluses($a2);
-		$z3 = _nopluses($a3);
+	elsif ( $par =~ /$a_base_index_scale_disp/ ) {
+
+		$z1 = _nopluses($1);
+		$z2 = _nopluses($3);
+		$z3 = _nopluses($6);
 		if ( is_reg($2) && is_reg($4) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z3$7)$8($2,$4,$5)/o;
+			$par =~ s/$a_base_index_scale_disp/($z3$7)$8($2,$4,$5)/;
 		} elsif ( is_reg($2) && is_reg($5) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z3$7)$8($2,$5,$4)/o;
+			$par =~ s/$a_base_index_scale_disp/($z3$7)$8($2,$5,$4)/;
 		} elsif ( is_reg($2) && is_reg($7) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z2$4*$5)$8($2,$7)/o;
+			$par =~ s/$a_base_index_scale_disp/($z2$4*$5)$8($2,$7)/;
 		} elsif ( is_reg($4) && is_reg($7) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z1$2)$8($7,$4,$5)/o;
+			$par =~ s/$a_base_index_scale_disp/($z1$2)$8($7,$4,$5)/;
 		} elsif ( is_reg($5) && is_reg($7) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z1$2)$8($7,$5,$4)/o;
+			$par =~ s/$a_base_index_scale_disp/($z1$2)$8($7,$5,$4)/;
 		} elsif ( is_reg($2) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z3$7$z2$4*$5)$8($2)/o;
+			$par =~ s/$a_base_index_scale_disp/($z3$7$z2$4*$5)$8($2)/;
 		} elsif ( is_reg($4) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z3$7+$z1$2)$8(,$4,$5)/o;
+			$par =~ s/$a_base_index_scale_disp/($z3$7+$z1$2)$8(,$4,$5)/;
 		} elsif ( is_reg($5) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z3$7+$z1$2)$8(,$5,$4)/o;
+			$par =~ s/$a_base_index_scale_disp/($z3$7+$z1$2)$8(,$5,$4)/;
 		} elsif ( is_reg($7) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z1$2$z2$4*$5)$8($7)/o;
+			$par =~ s/$a_base_index_scale_disp/($z1$2$z2$4*$5)$8($7)/;
 		} else {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z1$2$z2$4*$5$z3$7)$8(,1)/o;
+			$par =~ s/$a_base_index_scale_disp/($z1$2$z2$4*$5$z3$7)$8(,1)/;
 		}
 	}
-	elsif ( $par =~  /\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/o ) {
-		$a1 = $1;
-		$a2 = $4;
-		$a3 = $6;
-		$z1 = _nopluses($a1);
-		$z2 = _nopluses($a2);
-		$z3 = _nopluses($a3);
+	elsif ( $par =~ /$a_index_scale_base_disp/ ) {
+
+		$z1 = _nopluses($1);
+		$z2 = _nopluses($4);
+		$z3 = _nopluses($6);
 		if ( is_reg($2) && is_reg($5) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z3$7)$8($5,$2,$3)/o;
+			$par =~ s/$a_index_scale_base_disp/($z3$7)$8($5,$2,$3)/;
 		} elsif ( is_reg($3) && is_reg($5) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z3$7)$8($5,$3,$2)/o;
+			$par =~ s/$a_index_scale_base_disp/($z3$7)$8($5,$3,$2)/;
 		} elsif ( is_reg($2) && is_reg($7) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z2$5)$8($7,$2,$3)/o;
+			$par =~ s/$a_index_scale_base_disp/($z2$5)$8($7,$2,$3)/;
 		} elsif ( is_reg($3) && is_reg($7) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z2$5)$8($7,$3,$2)/o;
+			$par =~ s/$a_index_scale_base_disp/($z2$5)$8($7,$3,$2)/;
 		} elsif ( is_reg($5) && is_reg($7) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z1$2*$3)$8($5,$7)/o;
+			$par =~ s/$a_index_scale_base_disp/($z1$2*$3)$8($5,$7)/;
 		} elsif ( is_reg($2) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z2$5$z3$7)$8(,$2,$3)/o;
+			$par =~ s/$a_index_scale_base_disp/($z2$5$z3$7)$8(,$2,$3)/;
 		} elsif ( is_reg($3) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z2$5$z3$7)$8(,$3,$2)/o;
+			$par =~ s/$a_index_scale_base_disp/($z2$5$z3$7)$8(,$3,$2)/;
 		} elsif ( is_reg($5) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z1$2*$3$z3$7)$8($5)/o;
+			$par =~ s/$a_index_scale_base_disp/($z1$2*$3$z3$7)$8($5)/;
 		} elsif ( is_reg($7) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z1$2*$3$z2$5)$8($7)/o;
+			$par =~ s/$a_index_scale_base_disp/($z1$2*$3$z2$5)$8($7)/;
 		} else {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z1$2*$3$z2$5$z3$7)$8(,1)/o;
+			$par =~ s/$a_index_scale_base_disp/($z1$2*$3$z2$5$z3$7)$8(,1)/;
 		}
 	}
-	elsif ( $par =~  /\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/o ) {
-		$a1 = $1;
-		$a2 = $3;
-		$a3 = $5;
-		$z1 = _nopluses($a1);
-		$z2 = _nopluses($a2);
-		$z3 = _nopluses($a3);
+	elsif ( $par =~ /$a_base_disp_index_scale/ ) {
+
+		$z1 = _nopluses($1);
+		$z2 = _nopluses($3);
+		$z3 = _nopluses($5);
 		if ( is_reg($2) && is_reg($4) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/($z3$6*$7)$8($2,$4)/o;
+			$par =~ s/$a_base_disp_index_scale/($z3$6*$7)$8($2,$4)/;
 		} elsif ( is_reg($2) && is_reg($6) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/($z2$4)$8($2,$6,$7)/o;
+			$par =~ s/$a_base_disp_index_scale/($z2$4)$8($2,$6,$7)/;
 		} elsif ( is_reg($2) && is_reg($7) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/($z2$4)$8($2,$7,$6)/o;
+			$par =~ s/$a_base_disp_index_scale/($z2$4)$8($2,$7,$6)/;
 		} elsif ( is_reg($4) && is_reg($6) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/($z1$2)$8($4,$6,$7)/o;
+			$par =~ s/$a_base_disp_index_scale/($z1$2)$8($4,$6,$7)/;
 		} elsif ( is_reg($4) && is_reg($7) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/($z1$2)$8($4,$7,$6)/o;
+			$par =~ s/$a_base_disp_index_scale/($z1$2)$8($4,$7,$6)/;
 		} elsif ( is_reg($2) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/($z2$4$z3$6*$7)$8($2)/o;
+			$par =~ s/$a_base_disp_index_scale/($z2$4$z3$6*$7)$8($2)/;
 		} elsif ( is_reg($4) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/($z3$6*$7$z1$2)$8($4)/o;
+			$par =~ s/$a_base_disp_index_scale/($z3$6*$7$z1$2)$8($4)/;
 		} elsif ( is_reg($6) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/($z1$2$z2$4)$8(,$6,$7)/o;
+			$par =~ s/$a_base_disp_index_scale/($z1$2$z2$4)$8(,$6,$7)/;
 		} elsif ( is_reg($7) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/($z1$2$z2$4)$8(,$7,$6)/o;
+			$par =~ s/$a_base_disp_index_scale/($z1$2$z2$4)$8(,$7,$6)/;
 		} else {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/($z1$2$z2$4$z3$6*$7)$8(,1)/o;
+			$par =~ s/$a_base_disp_index_scale/($z1$2$z2$4$z3$6*$7)$8(,1)/;
 		}
 	}
-	elsif ( $par =~  /\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/o ) {
-		$a1 = $1;
-		$a2 = $3;
-		$a3 = $5;
-		$z1 = _nopluses($a1);
-		$z2 = _nopluses($a2);
-		$z3 = _nopluses($a3);
+	elsif ( $par =~ /$a_base_index_disp/ ) {
+
+		$z1 = _nopluses($1);
+		$z2 = _nopluses($3);
+		$z3 = _nopluses($5);
 		if ( is_reg($2) && is_reg($4) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z3$6)$7($2,$4)/o;
+			$par =~ s/$a_base_index_disp/($z3$6)$7($2,$4)/;
 		} elsif ( is_reg($2) && is_reg($6) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z2$4)$7($2,$6)/o;
+			$par =~ s/$a_base_index_disp/($z2$4)$7($2,$6)/;
 		} elsif ( is_reg($4) && is_reg($6) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z1$2)$7($4,$6)/o;
+			$par =~ s/$a_base_index_disp/($z1$2)$7($4,$6)/;
 		} elsif ( is_reg($2) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z3$6$z2$4)$7($2)/o;
+			$par =~ s/$a_base_index_disp/($z3$6$z2$4)$7($2)/;
 		} elsif ( is_reg($4) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z3$6+$z1$2)$7($4)/o;
+			$par =~ s/$a_base_index_disp/($z3$6+$z1$2)$7($4)/;
 		} elsif ( is_reg($6) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z1$2$z2$4)$7($6)/o;
+			$par =~ s/$a_base_index_disp/($z1$2$z2$4)$7($6)/;
 		} else {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z1$2$z2$4$z3$6)$7(,1)/o;
+			$par =~ s/$a_base_index_disp/($z1$2$z2$4$z3$6)$7(,1)/;
 		}
 	}
-	elsif ( $par =~  /\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/o ) {
-		$a1 = $1;
-		$a2 = $3;
-		$z1 = _nopluses($a1);
-		$z2 = _nopluses($a2);
+	elsif ( $par =~ /$a_base_index_scale/ ) {
+
+		$z1 = _nopluses($1);
+		$z2 = _nopluses($3);
 		if ( is_reg($2) && is_reg($4) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/($2,$4,$5)/o;
+			$par =~ s/$a_base_index_scale/($2,$4,$5)/;
 		} elsif ( is_reg($2) && is_reg($5) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/($2,$5,$4)/o;
+			$par =~ s/$a_base_index_scale/($2,$5,$4)/;
 		} elsif ( is_reg($2) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/($z2$4*$5)$6($2)/o;
+			$par =~ s/$a_base_index_scale/($z2$4*$5)$6($2)/;
 		} elsif ( is_reg($4) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/($z1$2)$6(,$4,$5)/o;
+			$par =~ s/$a_base_index_scale/($z1$2)$6(,$4,$5)/;
 		} elsif ( is_reg($5) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/($z1$2)$6(,$5,$4)/o;
+			$par =~ s/$a_base_index_scale/($z1$2)$6(,$5,$4)/;
 		} else {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*\*\s*(\w+)\s*(\)*)\s*\]/($z1$2$z2$4*$5)$6(,1)/o;
+			$par =~ s/$a_base_index_scale/($z1$2$z2$4*$5)$6(,1)/;
 		}
 	}
-	elsif ( $par =~  /\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/o ) {
-		$a1 = $1;
-		$a2 = $3;
-		$z1 = _nopluses($a1);
-		$z2 = _nopluses($a2);
+	elsif ( $par =~ /$a_base_index/ ) {
+
+		$z1 = _nopluses($1);
+		$z2 = _nopluses($3);
 		if ( is_reg($2) && is_reg($4) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($2,$4)/o;
+			$par =~ s/$a_base_index/($2,$4)/;
 		} elsif ( is_reg($2) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z2$4)$5($2)/o;
+			$par =~ s/$a_base_index/($z2$4)$5($2)/;
 		} elsif ( is_reg($4) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z1$2)$5($4)/o;
+			$par =~ s/$a_base_index/($z1$2)$5($4)/;
 		} else {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($2$z2$4)$5(,1)/o;
+			$par =~ s/$a_base_index/($2$z2$4)$5(,1)/;
 		}
 	}
-	elsif ( $par =~  /\[\s*(\w+)\s*\]/o ) {
+	elsif ( $par =~ /$a_base/ ) {
 		if ( is_reg($1) ) {
 			# disp(base)
-			$par =~ s/\[\s*(\w+)\s*\]/($1)/o;
+			$par =~ s/$a_base/($1)/;
 		} else {
-			$par =~ s/\[\s*(\w+)\s*\]/$1(,1)/o;
+			$par =~ s/$a_base/$1(,1)/;
 		}
 	}
-	elsif ( $par =~  /\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/o ) {
-		$a1 = $1;
-		$a2 = $4;
-		$z1 = _nopluses($a1);
-		$z2 = _nopluses($a2);
+	elsif ( $par =~ /$a_index_scale_base/ ) {
+
+		$z1 = _nopluses($1);
+		$z2 = _nopluses($4);
 		if ( is_reg($2) && is_reg($5) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($5,$2,$3)/o;
+			$par =~ s/$a_index_scale_base/($5,$2,$3)/;
 		} elsif ( is_reg($3) && is_reg($5) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($5,$3,$2)/o;
+			$par =~ s/$a_index_scale_base/($5,$3,$2)/;
 		} elsif ( is_reg($2) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z2$5)$6(,$2,$3)/o;
+			$par =~ s/$a_index_scale_base/($z2$5)$6(,$2,$3)/;
 		} elsif ( is_reg($3) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z2$5)$6(,$3,$2)/o;
+			$par =~ s/$a_index_scale_base/($z2$5)$6(,$3,$2)/;
 		} elsif ( is_reg($5) ) {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z1$2*$3)$6($5)/o;
+			$par =~ s/$a_index_scale_base/($z1$2*$3)$6($5)/;
 		} else {
-			$par =~ s/\[\s*([\+\-\(\)]*)\s*(\w+)\s*\*\s*(\w+)\s*([\+\-\(\)]+)\s*(\w+)\s*(\)*)\s*\]/($z1$2*$3$z2$5)$6(,1)/o;
+			$par =~ s/$a_index_scale_base/($z1$2*$3$z2$5)$6(,1)/;
 		}
 	}
 	foreach my $i (@regs_intel) {
@@ -2935,6 +2923,26 @@ sub conv_intel_addr_to_att($) {
 	foreach my $r (@regs_intel) {
 
 		$par =~ s/\%\%$r\b/\%$r/gi;
+	}
+	return $par;
+}
+
+# =head2 _change_to_intel_addr_if_applicable
+#
+#  PRIVATE SUBROUTINE.
+#  If the parameter is applicable to be an address (i.e. not a variable,
+#   register or a label), returns its value in square brackets (intel-syntax
+#   memory reference).
+#
+# =cut
+#
+sub _change_to_intel_addr_if_applicable($) {
+
+	my $par = shift;
+	# (we mustn't change digits and %st(n))
+	if ( $par !~ /\$/o && $par !~ /\%/o && $par !~ /_L\d+/o && $par =~ /[a-zA-Z_\.]/o ) {
+
+		return "[$par]";
 	}
 	return $par;
 }
@@ -2963,22 +2971,11 @@ sub conv_att_instr_to_intel($) {
 		$a3 = $3;
 		$a4 = $4;
 
-		# (don't touch "call/jmp xxx")
 		#if ( $a1 !~ /call/io && $a1 !~ /^\s*j[a-z]{1,3}/io ) {
 
-			# (we mustn't change digits and %st(n))
-			if ( $a2 !~ /\$/o && $a2 !~ /\%/o && $a2 !~ /_L\d+/o && $a2 =~ /[a-zA-Z_\.]/o ) {
-
-				$a2 = "[$a2]";
-			}
-			if ( $a3 !~ /\$/o && $a3 !~ /\%/o && $a3 !~ /_L\d+/o && $a3 =~ /[a-zA-Z_\.]/o ) {
-
-				$a3 = "[$a3]";
-			}
-			if ( $a4 !~ /\$/o && $a4 !~ /\%/o && $a4 !~ /_L\d+/o && $a4 =~ /[a-zA-Z_\.]/o ) {
-
-				$a4 = "[$a4]";
-			}
+			$a2 = _change_to_intel_addr_if_applicable ($a2);
+			$a3 = _change_to_intel_addr_if_applicable ($a3);
+			$a4 = _change_to_intel_addr_if_applicable ($a4);
 
 			# (ATTENTION: operand order will be changed later)
 			$par = "\t$a1\t$a2, $a3, $a4\n";
@@ -2993,18 +2990,10 @@ sub conv_att_instr_to_intel($) {
 		$a2 = $2;
 		$a3 = $3;
 
-		# (don't touch "call/jmp xxx")
 		#if ( $a1 !~ /call/io && $a1 !~ /^\s*j[a-z]{1,3}/io ) {
 
-			# (we mustn't change digits and %st(n))
-			if ( $a2 !~ /\$/o && $a2 !~ /\%/o && $a2 !~ /_L\d+/o && $a2 =~ /[a-zA-Z_\.]/o ) {
-
-				$a2 = "[$a2]";
-			}
-			if ( $a3 !~ /\$/o && $a3 !~ /\%/o && $a3 !~ /_L\d+/o && $a3 =~ /[a-zA-Z_\.]/o ) {
-
-				$a3 = "[$a3]";
-			}
+			$a2 = _change_to_intel_addr_if_applicable ($a2);
+			$a3 = _change_to_intel_addr_if_applicable ($a3);
 
 			# (ATTENTION: operand order will be changed later)
 			$par = "\t$a1\t$a2, $a3\n";
@@ -3021,11 +3010,7 @@ sub conv_att_instr_to_intel($) {
 		# (don't touch "call/jmp xxx")
 		if ( $a1 !~ /call/io && $a1 !~ /^\s*j[a-z]{1,3}/io ) {
 
-			# (we mustn't change digits and %st(n))
-			if ( $a2 !~ /\$/o && $a2 !~ /\%/o && $a2 !~ /_L\d+/o && $a2 =~ /[a-zA-Z_\.]/o ) {
-
-				$a2 = "[$a2]";
-			}
+			$a2 = _change_to_intel_addr_if_applicable ($a2);
 
 			# (ATTENTION: operand order will be changed later)
 			$par = "\t$a1\t$a2\n";
@@ -3047,21 +3032,23 @@ sub conv_att_instr_to_intel($) {
 	# (changing "st" to "st0")
 	$par =~ s/(\s)st(\s|,)/$1 st0$2/go;
 
-
 	# (changing operands' order):
-	if ( $par =~  /^\s*(\w+)\s+(\[?[:\.\w\*\+\-\(\)]+\]?)\s*,\s*(\[?[:\.\w\*\+\-\(\)]+\]?)\s*,\s*(\[?[:\.\w\*\+\-\(\)]+\]?)/o ) {
+	my $i_3op = qr/^\s*(\w+)\s+(\[?[:\.\w\*\+\-\(\)]+\]?)\s*,\s*(\[?[:\.\w\*\+\-\(\)]+\]?)\s*,\s*(\[?[:\.\w\*\+\-\(\)]+\]?)/o;
+	my $i_2op = qr/^\s*(\w+)\s+(\[?[:\.\w\*\+\-\(\)]+\]?)\s*,\s*(\[?[:\.\w\*\+\-\(\)]+\]?)([^,]*(;.*)?)$/o;
+	my $i_1op = qr/^\s*(\w+)\s+(\[?[:\.\w\*\+\-\(\)]+\]?)([^,]*(;.*)?)$/o;
+	if ( $par =~ /$i_3op/ ) {
 		if ( is_instr($1) ) {
-			$par =~ s/^\s*(\w+)\s+(\[?[:\.\w\*\+\-\(\)]+\]?)\s*,\s*(\[?[:\.\w\*\+\-\(\)]+\]?)\s*,\s*(\[?[:\.\w\*\+\-\(\)]+\]?)/\t$1\t$4, $3, $2/o;
+			$par =~ s/$i_3op/\t$1\t$4, $3, $2/;
 		}
 	}
-	if ( $par =~  /^\s*(\w+)\s+(\[?[:\.\w\*\+\-\(\)]+\]?)\s*,\s*(\[?[:\.\w\*\+\-\(\)]+\]?)([^,]*(;.*)?)$/o ) {
+	if ( $par =~ /$i_2op/) {
 		if ( is_instr($1) ) {
-			$par =~ s/^\s*(\w+)\s+(\[?[:\.\w\*\+\-\(\)]+\]?)\s*,\s*(\[?[:\.\w\*\+\-\(\)]+\]?)([^,]*(;.*)?)$/\t$1\t$3, $2$4/o;
+			$par =~ s/$i_2op/\t$1\t$3, $2$4/;
 		}
 	}
-	if ( $par =~  /^\s*(\w+)\s+(\[?[:\.\w\*\+\-\(\)]+\]?)([^,]*(;.*)?)$/o ) {
+	if ( $par =~ /$i_1op/ ) {
 		if ( is_instr($1) ) {
-			$par =~ s/^\s*(\w+)\s+(\[?[:\.\w\*\+\-\(\)]+\]?)([^,]*(;.*)?)$/\t$1\t$2$3/o;
+			$par =~ s/$i_1op/\t$1\t$2$3/;
 		}
 	}
 
@@ -3097,6 +3084,29 @@ sub conv_att_instr_to_intel($) {
 	# (REP**: removing the end of line char)
 	$par =~ s/^\s*(rep[enz]{0,2})\s*/\t$1/io;
 
+	return $par;
+}
+
+# =head2 _remove_size_qualifiers_add_dollar_add_dollar
+#
+#  PRIVATE SUBROUTINE.
+#  Returns the parameter after removing any size qualifiers (byte, word,
+#   dword, etc.) and any leading and trailing whitespace.
+#  If the parameter is not a memory reference or a register, prefixes it with
+#   a dollar-sign.
+#
+# =cut
+#
+sub _remove_size_qualifiers_add_dollar($) {
+
+	my $par = shift;
+	$par =~ s/\s+$//o;
+	$par =~ s/(t?byte|[dqpft]?word)//io;
+	$par =~ s/^\s+//o;
+	if ( $par !~ /\[/o && !is_reg($par) )
+	{
+		$par = "\$$par";
+	}
 	return $par;
 }
 
@@ -3331,19 +3341,22 @@ sub conv_intel_instr_to_att($) {
 	}
 
 	# (changing operands' order):
-	if ( $par =~ 	 /^\s*(\w+)\s+((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)\s*,\s*((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)\s*,\s*((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)/o ) {
+	my $i_3op = qr/^\s*(\w+)\s+((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)\s*,\s*((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)\s*,\s*((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)/o;
+	my $i_2op = qr/^\s*(\w+)\s+((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)\s*,\s*((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)([^,]*(;.*)?)$/o;
+	my $i_1op = qr/^\s*(\w+)\s+((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)([^,]*(;.*)?)$/o;
+	if ( $par =~ /$i_3op/ ) {
 		if ( is_instr($1) ) {
-			$par =~ s/^\s*(\w+)\s+((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)\s*,\s*((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)\s*,\s*((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)/\t$1\t$6, $4, $2/o;
+			$par =~ s/$i_3op/\t$1\t$6, $4, $2/;
 		}
 	}
-	if ( $par =~ 	 /^\s*(\w+)\s+((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)\s*,\s*((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)([^,]*(;.*)?)$/o ) {
+	if ( $par =~ /$i_2op/ ) {
 		if ( is_instr($1) ) {
-			$par =~ s/^\s*(\w+)\s+((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)\s*,\s*((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)([^,]*(;.*)?)$/\t$1\t$4, $2$6\n/o;
+			$par =~ s/$i_2op/\t$1\t$4, $2$6\n/;
 		}
 	}
-	if ( $par =~ 	 /^\s*(\w+)\s+((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)([^,]*(;.*)?)$/o ) {
+	if ( $par =~ /$i_1op/ ) {
 		if ( is_instr($1) ) {
-			$par =~ s/^\s*(\w+)\s+((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)([^,]*(;.*)?)$/\t$1\t$2$4\n/o;
+			$par =~ s/$i_1op/\t$1\t$2$4\n/;
 		}
 	}
 
@@ -3363,57 +3376,29 @@ sub conv_intel_instr_to_att($) {
 		if ( $par =~ /^\s*(\w+)\s+([^,]+)\s*,\s*([^,]+)\s*,\s*([^,]+)\s*/gio ) {
 
 			$a1 = $1;
-			$a2 = $2;
-			$a3 = $3;
-			$a4 = $4;
 			$a1 =~ s/\s+$//o;
-			$a2 =~ s/\s+$//o;
-			$a3 =~ s/\s+$//o;
-			$a4 =~ s/\s+$//o;
-			$a2 =~ s/(t?byte|[dqpft]?word)//io;
-			$a3 =~ s/(t?byte|[dqpft]?word)//io;
-			$a4 =~ s/(t?byte|[dqpft]?word)//io;
-			$a2 =~ s/^\s+//o;
-			$a3 =~ s/^\s+//o;
-			$a4 =~ s/^\s+//o;
-
-			if ( $a2 !~ /\[/o && !is_reg($a2) ) { $a2 = "\$$a2"; }
-			if ( $a3 !~ /\[/o && !is_reg($a3) ) { $a3 = "\$$a3"; }
-			if ( $a4 !~ /\[/o && !is_reg($a4) ) { $a4 = "\$$a4"; }
+			$a2 = _remove_size_qualifiers_add_dollar ($2);
+			$a3 = _remove_size_qualifiers_add_dollar ($3);
+			$a4 = _remove_size_qualifiers_add_dollar ($4);
 
 			$par = "\t$a1\t$a2, $a3, $a4\n";
 
 		} elsif ( $par =~ /^\s*(\w+)\s+([^,]+)\s*,\s*([^,]+)\s*/gio ) {
 
 			$a1 = $1;
-			$a2 = $2;
-			$a3 = $3;
 			$a1 =~ s/\s+$//o;
-			$a2 =~ s/\s+$//o;
-			$a3 =~ s/\s+$//o;
-			$a2 =~ s/(t?byte|[dqpft]?word)//io;
-			$a3 =~ s/(t?byte|[dqpft]?word)//io;
-			$a2 =~ s/^\s+//o;
-			$a3 =~ s/^\s+//o;
-
-			if ( $a2 !~ /\[/o && !is_reg($a2) ) { $a2 = "\$$a2"; }
-			if ( $a3 !~ /\[/o && !is_reg($a3) ) { $a3 = "\$$a3"; }
+			$a2 = _remove_size_qualifiers_add_dollar ($2);
+			$a3 = _remove_size_qualifiers_add_dollar ($3);
 
 			$par = "\t$a1\t$a2, $a3\n";
 
 		} elsif ( $par =~ /^\s*(\w+)\s+([^,]+)\s*/gio ) {
 
 			$a1 = $1;
-			$a2 = $2;
 			$a1 =~ s/\s+$//o;
-			$a2 =~ s/\s+$//o;
-			$a2 =~ s/(t?byte|[dqpft]?word)//io;
-			$a2 =~ s/^\s+//o;
-
-			if ( $a2 !~ /\[/o && !is_reg($a2) ) { $a2 = "\$$a2"; }
+			$a2 = _remove_size_qualifiers_add_dollar ($2);
 
 			$par = "\t$a1\t$a2\n";
-
 		}
 	}
 

@@ -28,7 +28,6 @@ subtest 'set_parameters' => sub {
 
     note 'exceptions';
     ok dies { $meta->set_parameters(bless {}, 'Foo') }, 'not Sub::Meta::Parameters object';
-    ok dies { $meta->set_parameters({}) },              'hashref';
     ok dies { $meta->set_parameters('Int') },           'string';
     ok dies { $meta->set_parameters(['Int']) },         'arrayref';
 };
@@ -48,9 +47,8 @@ subtest 'set_args' => sub {
 
 subtest 'set_slurpy' => sub {
     my $meta = Sub::Meta->new;
-    ok dies { $meta->set_slurpy('Int') }, 'no parameters';
-
-    is $meta->set_args([]), $meta, 'set parameters';
+    is $meta->set_slurpy('Num'), $meta;
+    is $meta->slurpy, Sub::Meta::Param->new(isa => 'Num');
 
     is $meta->set_slurpy('Int'), $meta;
     is $meta->slurpy, Sub::Meta::Param->new(isa => 'Int');

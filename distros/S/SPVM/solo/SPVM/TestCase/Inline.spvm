@@ -1,14 +1,14 @@
 class TestCase::Native {
   use TestCase::Native;
 
-  native sub sum : int ($num1 : int, $num2 : int);
+  native static method sum : int ($num1 : int, $num2 : int);
 }
 
 __NATIVE__
 
 #include "spvm_native.h"
 
-int32_t Test__Native(SPVM_ENV env, SPVM_VALUE* args) {
+int32_t SPVM__Test__Native(SPVM_ENV env, SPVM_VALUE* args) {
   int32_t total = args[0].ival + args[1].ival;
   
   return total;

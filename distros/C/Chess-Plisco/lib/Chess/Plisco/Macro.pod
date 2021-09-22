@@ -1,0 +1,535 @@
+=head1 NAME
+
+Chess::Plisco::Macro - Macros/inline functions for Chess::Plisco
+
+=head1 SYNOPSIS
+
+    use integer;
+    use Chess::Plisco qw(:all);
+    use Chess::Plisco::Macro;
+
+    my $white_pieces = cp_pos_white_pieces(Chess::Plisco->new);
+
+    my $bitboard = '0x8080808080808080';
+    my $popcount;
+
+    cp_bitboard_popcount $bitboard, $popcount;
+    cp_bitboard_popcount($bitboard, $popcount); # You can also use parentheses ...
+
+    print "There are $popcount bits set in $bitboard.\n";
+
+=head1 DESCRIPTION
+
+The module L<Chess::Plisco::Macro> is a source filter.  It makes a number
+of macros respectively inline functions available that can be invoked without
+any subroutine call overhead.  In fact, all invocations of these macros are
+translated into constant expressions at compile-time.
+
+All the functionality available in the module is also available as instance
+or class methods of L<Chess::Plisco>.  You should only use the macros
+defined here if you have to squeeze out the last bit of performance from
+your code, for example, when writing a chess engine.  Otherwise, using the
+macros has only disadvantages:
+
+=over 4
+
+=item It increases the compile-time of your code significantly.
+
+=item Syntax checks on your code may fail.
+
+=item Seemingly correct syntax may lead to syntax errors.
+
+=item Your code becomes less readable; although sometimes it may not.
+
+=back
+
+If performance outweighs these problems in your use case, read on!
+
+The source filter is probably not perfect but is able to translate at least
+the source code of L<Chess::Plisco>.  If you have trouble like unexpected
+syntax errors in your own code, you can use the function C<preprocess()> (see
+below), to get a translation of your source file, and find the problem.
+
+Please note that not all translation errors are considered a bug of the
+source filter.  If the problem can be avoided by re-formulating your code,
+a fix will probably be refused.
+
+=head1 MOTIVATION
+
+Chess programming should be really fast, and in this context the unavoidable
+overhead of method or subroutine calls contributes enormously to the execution
+time of the software.
+
+In the C programming language, you can use preprocessor macros or inline
+functions in order to avoid the calling overhead.  In Perl, this can only
+be done for constants with the L<constant> pragma:
+
+    use constant CP_FILE_A => 0;
+    use constant CP_SQUARE_E1 => 0x0808080808080808 | 0x00000000000000ff;
+
+These are actually subroutines but Perl inlines them into your code, even
+with constant folding (see the second example), so that you pay no price for
+the use of these constants.
+
+But L<Chess::Plisco> needs parametrized macros.  For example, if you want
+to extract the start square of a move, you have to do this:
+
+    $from = ((($move) >> 6) & 0x3f);
+
+But it is awkward to remember.  Other computations are even more complicated.
+For example to get the number of bits set in a bitboard C<$bb>, you have to
+do the following:
+
+    my $_b = $bb;
+
+    for ($popcount = 0; $_b; ++$popcount) {
+        $_b &= $_b - 1;
+    }
+
+This is a well-known algorithm but you either have to implement it in a function
+or method and pay the price of subroutine calls, or you have to repeat it over
+and over in your code.
+
+This module tries to mitigate that dilemma. If you just "use" it, all
+invocations of the macros defined here, are translated into a regular statements
+so that you can do these computations without subroutine call overhead.
+
+Depending on the exact implementation of the macro, you can sometimes even use
+them as l-vales (the left-hand side of an assignment) but you should generally
+avoid this because the resulting code will become hard to understand.
+
+=head1 PITFALLS
+
+There are a number of caveats, when using this module.  You had been warned
+before, do not use it! If you cannot help, then ...
+
+=head2 Import Constants from L<Chess::Plisco>
+
+Remember that the macro calls defined in your code will be replaced by other
+code at compile-time and that other code makes use of constants defined in
+L<Chess::Plisco>.  Therefore, you should always import these constants
+with C<use Chess::Plisco ':all'>.
+
+=head2 Use C<integer>
+
+Almost all of the macros run a lot faster with C<use integer> and some of them
+I<only> work with C<use integer>.  Therefore, you should always enable that
+pragma for your code.
+
+=head2 Do Not Use Here Documents
+
+The translation currently chokes on here documents (E<lt>E<lt>EOF ...).
+
+=head2 Use More Parentheses
+
+Remember that the macros are expanded by a rather dumb search and replace.  That
+can lead to problems with parentheses. Say you have a line like this in a test
+written with L<Test::More>
+
+    is cp_pos_material($pos), 0, "material test";
+
+But this may be expanded into something like:
+
+    is (($pos->[CP_POS_INFO]) >> 19), 0, "material test";
+
+And this is not what you meant.  Now, C<is()> is called with just one
+argument instead of 3 like you expected.
+
+If the parentheses were omitted in the macro definition, strange precedence
+problems in the expanded code would occur instead.  In other words, it is
+not possible to fix both problems at once.  In doubt, macros are wrapped
+into parentheses and it is therefore usually safer to also use parentheses,
+when you want to use macros as arguments to subroutines.  The correct test
+code would look like this:
+
+    is(cp_pos_material($pos), 0, "material test");
+
+=head2 Do not Create References to Macros
+
+The macro calls will be replaced at compile-time with other code.  Therefore,
+it is not possible to create a reference to a macro.  Doing so may or may not
+cause a compile-time error but it will never do what you wanted.
+
+=head2 Do not Use the String Form of C<eval>
+
+You should not do that anyway but with macros it would not even work because
+the source code filter cannot know whether a string constant is really code.
+
+The same applies to using the L<Benchmark> module.  If you want to benchmark
+the macros, you either have to translate them first with C<preprocess()>
+before (see below), or somehow wrap it into a function call.  Doing the latter
+will probably eat up the performance gain the macros give you.
+
+=head2 Expect Errors
+
+Macros are expanded with the use of L<PPI::Document> and so the technique
+shares all limitations of L<PPI::Document>.
+
+And some more esoteric usages will probaly also not work.
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item B<preprocess>
+
+You should only use one single function of this module, the function
+C<preprocess()> that does the actual translation of your code.  Example:
+
+    require Chess::Plisco::Macro;
+    open my $fh, '<', 'YourModule.pm' or die;
+    print Chess::Plisco::Macro::preprocess(join '', <$fh>);
+
+This will dump the translated source code of F<YourModule.pm> on standard
+output.
+
+=back
+
+=head1 MACROS
+
+Note that the source filter is theoretically able to inline constants (that
+are macros without arguments) as well but this feature is not used because
+it does not have any advantage over the regular L<constant> pragma of Perl.
+
+=head2 Macros for L<Chess::Plisco> Instances
+
+=over 4
+
+=item B<cp_pos_white_pieces(POS)>
+
+Same as L<Chess::Plisco/whitePieces>.
+
+=item B<cp_pos_black_pieces(POS)>
+
+Same as L<Chess::Plisco/blackPieces>.
+
+=item B<cp_pos_kings(POS)>
+
+Same as L<Chess::Plisco/kings>.
+
+=item B<cp_pos_queens(POS)>
+
+Same as L<Chess::Plisco/queens>.
+
+=item B<cp_pos_rooks(POS)>
+
+Same as L<Chess::Plisco/rooks>.
+
+=item B<cp_pos_bishops(POS)>
+
+Same as L<Chess::Plisco/bishops>.
+
+=item B<cp_pos_knights(POS)>
+
+Same as L<Chess::Plisco/knights>.
+
+=item B<cp_pos_pawns(POS)>
+
+Same as L<Chess::Plisco/pawns>.
+
+=item B<cp_pos_to_move(POS)>
+
+Same as L<Chess::Plisco/toMove>.
+
+=item B<cp_pos_castling_rights(POS)>
+
+Same as L<Chess::Plisco/castlingRights>.
+
+=item B<cp_pos_white_king_side_castling_right(POS)>
+
+Same as L<Chess::Plisco/whiteKingSideCastlingRight>.
+
+=item B<cp_pos_white_queen_side_castling_right(POS)>
+
+Same as L<Chess::Plisco/whiteQueenSideCastlingRight>.
+
+=item B<cp_pos_black_king_side_castling_right(POS)>
+
+Same as L<Chess::Plisco/blackKingSideCastlingRight>.
+
+=item B<cp_pos_black_queen_side_castling_right(POS)>
+
+Same as L<Chess::Plisco/blackQueenSideCastlingRight>.
+
+=item B<cp_pos_half_move_clock(POS)>
+
+Same as L<Chess::Plisco/halfMoveClock>.
+
+=item B<cp_pos_half_moves(POS)>
+
+Same as L<Chess::Plisco/halfMoves>.
+
+=item B<cp_pos_en_passant_shift(POS)>
+
+Same as L<Chess::Plisco/enPassantShift>.
+
+=item B<cp_pos_king_shift(POS)>
+
+Same as L<Chess::Plisco/kingShift>.
+
+=item B<cp_pos_in_check(POS)>
+
+Same as L<Chess::Plisco/inCheck>.
+
+=item B<cp_pos_evasion(POS)>
+
+Same as L<Chess::Plisco/evasion>.
+
+=item B<cp_pos_evasion_squares(POS)>
+
+Same as L<Chess::Plisco/evasionSquares>.
+
+=item B<cp_pos_signature(POS)>
+
+Same as L<Chess::Plisco/signature>.
+
+=item B<cp_pos_material(POS)>
+
+Same as L<Chess::Plisco/material>.
+
+=item B<cp_pos_info(POS)>
+
+Same as L<Chess::Plisco/info>.  See also L</Position Info Macros> below!
+
+=back
+
+=head2 Position Info Macros
+
+All these work directly on a position info as returned by L</cp_pos_info>.
+
+=over 4
+
+=item B<cp_pos_info_castling_rights(INFO)>
+
+Same as L</cp_pos_castling_rights> but work directly on position
+info B<INFO> as returned by L</cp_pos_info>.
+
+=item B<cp_pos_info_white_king_side_castling_right(INFO)>
+
+Same as L</cp_pos_white_king_side_castling_right> but work directly on position
+info B<INFO> as returned by L</cp_pos_info>.
+
+=item B<cp_pos_info_white_queen_side_castling_right(INFO)>
+
+Same as L</cp_pos_white_queen_side_castling_right> but work directly on position
+info B<INFO> as returned by L</cp_pos_info>.
+
+=item B<cp_pos_info_black_king_side_castling_right(INFO)>
+
+Same as L</cp_pos_black_king_side_castling_right> but work directly on position
+info B<INFO> as returned by L</cp_pos_info>.
+
+=item B<cp_pos_info_black_queen_side_castling_right(INFO)>
+
+Same as L</cp_pos_black_queen_side_castling_right> but work directly on position
+info B<INFO> as returned by L</cp_pos_info>.
+
+=item B<cp_pos_info_to_move(INFO)>
+
+Same as L</cp_pos_to_move> but work directly on position
+info B<INFO> as returned by L</cp_pos_info>.
+
+=item B<cp_pos_info_en_passant_shift(INFO)>
+
+Same as L</cp_pos_en_passant_shift> but work directly on position
+info B<INFO> as returned by L</cp_pos_info>.
+
+=item B<cp_pos_info_king_shift(INFO)>
+
+Same as L</cp_pos_king_shift> but work directly on position
+info B<INFO> as returned by L</cp_pos_info>.
+
+=item B<cp_pos_info_evasion(INFO)>
+
+Same as L</cp_pos_evasion> but work directly on position
+info B<INFO> as returned by L</cp_pos_info>.
+
+=item B<cp_pos_info_material(INFO)>
+
+Same as L</cp_pos_material> but work directly on position
+info B<INFO> as returned by L</cp_pos_info>.
+
+=back
+
+=head2 Move Macros
+
+These macros operate on scalar moves for L<Chess::Plisco> which are just
+plain integers.  They do I<not> work for instances of a
+L<Chess::Plisco::Move>!
+
+=over 4
+
+=item B<cp_move_to(MOVE)>
+
+Same as L<Chess::Plisco/moveTo>.
+
+=item B<cp_move_set_to(MOVE, TO)>
+
+Same as L<Chess::Plisco/moveSetTo> but modifies B<MOVE> directly.
+
+=item B<cp_move_from(MOVE)>
+
+Same as L<Chess::Plisco/moveFrom>.
+
+=item B<cp_move_set_from(MOVE, FROM)>
+
+Same as L<Chess::Plisco/moveSetFrom> but modifies B<MOVE> directly.
+
+=item B<cp_move_promote(MOVE)>
+
+Same as L<Chess::Plisco/movePromote>.
+
+=item B<cp_move_set_promote(MOVE, PROMOTE)>
+
+Same as L<Chess::Plisco/moveSetPromote> but modifies B<MOVE> directly.
+
+=item B<cp_move_piece(MOVE)>
+
+Same as L<Chess::Plisco/movePiece>.
+
+=item B<cp_move_set_piece(MOVE, PIECE)>
+
+Same as L<Chess::Plisco/moveSetPiece> but modifies B<MOVE> directly.
+
+=item B<cp_move_captured(MOVE)>
+
+Same as L<Chess::Plisco/moveCaptured>.
+
+=item B<cp_move_set_captured(MOVE, PIECE)>
+
+Same as L<Chess::Plisco/moveSetCaptured> but modifies B<MOVE> directly.
+
+=item B<cp_move_color(MOVE)>
+
+Same as L<Chess::Plisco/moveCaptured>.
+
+=item B<cp_move_set_color(MOVE, COLOR)>
+
+Same as L<Chess::Plisco/moveSetColor> but modifies B<MOVE> directly.
+
+=item B<cp_move_equivalent(MOVE)>
+
+Same as L<Chess::Plisco/moveEquivalent>.
+
+=item B<cp_move_coordinate_notation(MOVE)>
+
+Same as L<Chess::Plisco/moveCoordinateNotation>.
+
+=back
+
+=head2 Macros for Magic Moves Resp. Magic Bitboards
+
+=over 4
+
+=item B<cp_mm_bmagic(SHIFT, OCCUPANCY)>
+
+Same as L<Chess::Plisco/bMagic>.
+
+=item B<cp_mm_rmagic(SHIFT, OCCUPANCY)>
+
+Same as L<Chess::Plisco/rMagic>.
+
+=back
+
+=head2 Bitboard Macros
+
+=over 4
+
+=item B<cp_bitboard_popcount(BITBOARD, COUNT)>
+
+Count the number of bits set in B<BITBOARD> and store it in B<COUNT>.
+
+Example:
+
+    cp_bitboard_popcount $bitboard, $count;
+    print "There are $count bits set in $bitboard.\n";
+
+See also L<Chess::Plisco/bitboardPopcount>!
+
+Important! This works only under the "use integer" pragma!
+
+=item B<cp_bitboard_clear_but_least_set(BITBOARD)>
+
+Same as L<Chess::Plisco/bitboardclearButLeastSet> but modifies
+B<BITBOARD> directly.
+
+Important! This works only under the "use integer" pragma!
+
+=item B<cp_bitboard_clear_but_most_set(BITBOARD)>
+
+Same as L<Chess::Plisco/bitboardclearButMostSet> but modifies
+B<BITBOARD> directly.
+
+Important! This works only under the "use integer" pragma!
+
+=item B<cp_bitboard_clear_least_set(BITBOARD)>
+
+Same as L<Chess::Plisco/clearLeastSet> but modifies B<BITBOARD> directly.
+
+Important! This works only under the "use integer" pragma!
+
+=item B<cp_bitboard_count_trailing_zbits(BITBOARD)>
+
+Same as L<Chess::Plisco/countTrailingZbits>.
+
+=item B<cp_bitboard_count_isolated_trailing_zbits(BITBOARD)>
+
+Same as L<Chess::Plisco/countIsolatedTrailingZbits>.
+
+=back
+
+=head2 Miscellaneous Macros
+
+=over 4
+
+=item B<cp_coordinates_to_shift(FILE, RANK)>
+
+Calculate a bit shift offset (0-63) for the square that B<FILE> (0-7) and
+B<RANK> (0-7) point to.
+
+=item B<cp_shift_to_coordinates(SHIFT)>
+
+Calculate the file (0-7) and rank (0-7) for the bit shift offset B<SHIFT>
+(0-63).
+
+=item B<cp_coordinates_to_square(FILE, RANK)>
+
+Calculate the square in coordinate notation ("e4", "c5", ...) for
+B<FILE> (0-7) and B<RANK> (0-7).
+
+=item B<cp_square_to_coordinates(SQUARE)>
+
+Calculate the file (0-7) and rank (0-7) for the B<SQUARE> in coordinate
+notation ("e4", "c5", ...).
+
+=item B<cp_square_to_shift(SQUARE)>
+
+Calculate the bit shift offset (0-63) for the B<SQUARE> in coordinate
+notation ("e4", "c5", ...).
+
+=item B<cp_shift_to_square(SHIFT)>
+
+Calculate the square in coordinate notation ("e4", "c5", ...) for the bit shift
+offset B<SHIFT> (0-63).
+
+=item B<cp_abs(INTEGER)>
+
+Calculate the absolve value of B<INTEGER>.
+
+=item B<cp_max(A, B)>
+
+Calculate the maximum of B<A> and B<B>.
+
+=item B<cp_min(A, B)>
+
+Calculate the minimum of B<A> and B<B>.
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (C) 2021 Guido Flohr <guido.flohr@cantanea.com>.
+
+=head1 SEE ALSO
+
+L<Chess::Plisco>, L<constant>, L<Filter::Util::Call>, perl(1)

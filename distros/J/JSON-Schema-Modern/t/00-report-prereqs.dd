@@ -63,6 +63,7 @@ do { my $x = {
                                       'Safe::Isa' => '0',
                                       'Scalar::Util' => '0',
                                       'Storable' => '0',
+                                      'Sub::Install' => '0',
                                       'Types::Standard' => '1.010002',
                                       'constant' => '0',
                                       'if' => '0',

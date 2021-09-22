@@ -18,6 +18,7 @@ $modules{$_} = $_ for qw(
   File::ShareDir::Dist
   File::ShareDir::Dist::Install
   File::Which
+  Path::Tiny
   Test::More
 );
 

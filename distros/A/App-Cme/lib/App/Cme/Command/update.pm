@@ -10,7 +10,7 @@
 # ABSTRACT: Update the configuration of an application
 
 package App::Cme::Command::update ;
-$App::Cme::Command::update::VERSION = '1.032';
+$App::Cme::Command::update::VERSION = '1.033';
 use strict;
 use warnings;
 use 5.10.1;
@@ -27,6 +27,7 @@ sub validate_args {
     my ($self, $opt, $args) = @_;
     $self->check_unknown_args($args);
     $self->process_args($opt,$args);
+    return;
 }
 
 sub opt_spec {
@@ -75,6 +76,7 @@ sub execute {
         say join("\n", grep {defined $_} @msgs );
     }
 
+    return;
 }
 
 1;
@@ -91,7 +93,7 @@ App::Cme::Command::update - Update the configuration of an application
 
 =head1 VERSION
 
-version 1.032
+version 1.033
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,14 @@
+Revision history for Acme-PodOnly
+
+0.001003 - 2021-09-20
+  - fix file name of NoVersion file from pm to pod
+  - add test that files are all Pod and have no version
+
+0.001002 - 2021-09-20
+  - include version number in provides data
+  - add provides data for pod file with no version
+  - add provides data for pod file that doesn't exist
+  - add provides data that doesn't include a file name
+
+0.001001 - 2021-09-20
+  - initial release

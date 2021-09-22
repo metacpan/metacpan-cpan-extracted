@@ -109,6 +109,7 @@ getPlanSummary
 getPlans
 getPlansPaginated
 getPossibleTestStatuses
+getPriorityByName
 getProjectByID
 getProjectByName
 getProjects

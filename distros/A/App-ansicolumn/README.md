@@ -30,7 +30,7 @@ ansicolumn \[options\] \[file ...\]
     --runin=#            run-in width
     --runout=#           run-out width
     --[no-]pagebreak     allow page break
-    --border=#           print border
+    --border[=#]         print border
     --border-style=#     border style
     --[no-]ignore-space  ignore space in table output
     --[no-]isolation     page-end line isolation
@@ -43,7 +43,7 @@ ansicolumn \[options\] \[file ...\]
 
 # VERSION
 
-Version 1.12
+Version 1.13
 
 # DESCRIPTION
 
@@ -149,7 +149,7 @@ default, from the standard input.
 
     Set page height and page mode on.  See ["CALCULATION"](#calculation) section.
 
-- **--column-unit**=#
+- **--column-unit**=#, **--cu**=#
 
     Each columns are placed at the unit of 8 by default.  This option
     changes the number of the unit.
@@ -183,7 +183,7 @@ default, from the standard input.
     Move to next pane when form feed character found.
     Default true.
 
-- **--border**\[=_style_\]
+- **--border**\[=_style_\], **-B**\[_style_\]
 
     Print border.  Enabled by **--page** option automatically.  If the
     optional _style_ is given, it is used as a border style and precedes
@@ -264,7 +264,7 @@ default, from the standard input.
     Set the style how tab is expanded.  Select from `dot`, `symbol` or
     `shade`.  Styles are defined in [Text::ANSI::Fold](https://metacpan.org/pod/Text::ANSI::Fold) library.
 
-- **--ambiguous**=_width\_spec_
+- **--ambiguous**=`wide`|`narrow`
 
     Specifies how to treat Unicode ambiguous width characters.  Take a
     value of 'narrow' or 'wide.  Default is 'narrow'.

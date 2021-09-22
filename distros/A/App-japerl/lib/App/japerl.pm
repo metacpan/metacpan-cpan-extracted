@@ -3,12 +3,12 @@ package App::japerl;
 #
 # App::japerl - JPerl-again Perl glocalization scripting environment
 #
-# https://metacpan.org/release/App-japerl
+# https://metacpan.org/dist/App-japerl
 #
 # Copyright (c) 2018, 2019, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSION = '0.13';
+$VERSION = '0.14';
 $VERSION = $VERSION;
 
 use 5.00503;
@@ -60,6 +60,17 @@ This software can do the following.
 =back
 
 May you do good magic with japerl.
+
+=head1 How to find mb.pm modulino ?
+
+ Running japerl.bat requires mb.pm modulino.
+ japerl.bat finds for mb.pm modulino in the following order and
+ uses the first mb.pm found.
+ 
+ 1. @PERL_LOCAL_LIB_ROOT
+ 2. $FindBin::Bin
+ 3. $FindBin::Bin/lib
+ 4. @INC
 
 =head1 AUTHOR
 

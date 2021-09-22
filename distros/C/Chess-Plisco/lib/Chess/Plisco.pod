@@ -1,0 +1,1167 @@
+=head1 NAME 
+
+Chess::Plisco - A comprehensive chess library for Perl
+
+=head1 SYNOPSIS
+
+    use Chess::Plisco(:all);
+
+    $pos = Chess::Plisco->new;
+    $pos = Chess::Plisco->new('k7/8/8/8/8/8/8/7K w - - 0 1');
+
+=head1 DESCRIPTION
+
+B<Chess::Plisco> is a comprehensive chess library for Perl, aiming at being
+as fast and efficient as possible for a scripting language.  It is also
+somewhat opinionated but this is not an end in itself but owed to its intention
+of being fast and efficient.  In doubt, flexibility is sacrificed for
+performance and efficiency.
+
+The library features:
+
+=over 4
+
+=item bitboards for board representation
+
+=item macros/inline functions for often used computations
+
+=item pseudo-legal move generation
+
+=item legality checks for moves
+
+=item magic bitboards for generation of sliding piece moves and attacks
+
+=item handling of moves in Standard-Algebraic Notation (SAN) as well as
+coordinate notation
+
+=item FEN (Forsyth-Edwards Notation) import and export
+
+=item Static Exchange Evaluation (SEE)
+
+=item Zobrist Keys
+
+=back
+
+For a gentler introduction, please see L<Chess::Plisco::Tutorial>.  The rest
+of this document contains reference documentation only.
+
+If performance is key for you, you are strongly advised to have a look at
+L<Chess::Plisco::Macro> which documents macros resp. inline functions that
+speed up tasks that can be done with L<Chess::Plisco> significantly.
+
+The class exports a number of constants that can either be imported
+individually, by export tag, or all at once by the export tag ':all'.  All
+constants are prefixed with 'CP_' and you will have little reason to not
+import all constants.
+
+=head2 Internals
+
+An instance of a B<Chess::Plisco> is a blessed array reference.  You can
+access its properties through accessor macros or by using constants for
+the array indices.
+
+A move in B<Chess::Plisco> is a regular scalar, more precisely an unsigned
+integer. You can access its properties with the move methods described below.
+
+It is guaranteed that every legal chess move is represented by a non-zero
+integer.  It is therefore safe to use moves in boolean context.
+
+=head2 Terminology
+
+For the sake of brevity, this document uses the following terms without
+further explanation:
+
+=over 4
+
+=item I<Square>
+
+A square is a square of the chess board as a string like "e4" or "f7".
+
+=item I<Coordinates>
+
+Coordinates are a pair of a file (0-7) and a rank (0-7).
+
+=item I<Shift>
+
+A "shift" is an integer in the range of 0-63 where 0 is the shift for "a1" and
+63 is the shift for "h8".
+
+=item I<Bitboard>
+
+A bitboard is an unsigned 64-bit integer.  Each bit stands for one square of
+the chess board.
+
+=item I<Mask>
+
+A mask is a bitboard with exactly one bit set.  The mask representing "e4" is
+a 1 shifted left 28 bits, because the shift for "e4" is 28.
+
+=item I<Move>
+
+When an argument is called "move", it is really an integer representing a chess
+move.
+
+=item I<Notation>
+
+When an argument is called "notation", it is a supported notation of a chess
+move, either Standard-Algebraic Notation SAN or coordinate notation.
+
+=back
+
+=head2 Limitations
+
+B<Chess::Plisco> requires 64-bit support for Perl.  It will not run on
+32-bit Perls.
+
+=head2 Similar Software
+
+L<Chess::Rep> and L<Chess::Play> provide similar functionality.  Both compile
+a lot faster than B<Chess::Plisco> but once compiled, a perft test of
+B<Chess::Plisco> runs more than 30 times faster than one of L<Chess::Play>
+and more than 100 times faster than one of L<Chess::Rep>.
+
+At the time of this writing, B<Chess::Plisco> also outperforms
+L<python-chess|https://python-chess.readthedocs.io/en/latest/> by about 50 %.
+
+=head1 CONSTRUCTORS
+
+=over 4
+
+=item B<new([FEN])>
+
+Creates a new B<Chess::Plisco> instance that represents the starting position
+of standard chess.
+
+If an argument is passed to the constructor, it is interpreted as a position in
+Forsyth-Edwards Notation (FEN).  This has the same effect as using the
+constructor C<newFromFEN>.
+
+=item B<newFromFEN(FEN)>
+
+Creates a new B<Chess::Plisco> instance from a string containing the
+Forsyth-Edwards Notation (FEN) of a chess position.  The only difference to
+C<new()> is that the string argument is required. 
+
+This constructor may throw an exception if the described position does not meet
+the requirements of the library.
+
+All legal chess positions meet the requirements of the library.  But positions
+that are not legal and may cause the library to malfunction, are rejected.
+
+=item B<copy(POSITION)>
+
+Clones B<POSITION>.
+
+=back
+
+=head1 OVERLOADED OPERATORS
+
+In string context, the position is encoded in Forsyth-Edwards Notation.  No
+other operators are overloaded.
+
+Note that the Forsyth-Edwards Notation does not cover all aspects of a chess
+position, especially the history of moves.  String-wise equality of two
+instances of a B<Chess::Plisco> does therefore not imply that the two
+positions are identical.  Use the method L</equal> for a strict equality
+check.
+
+=head1 METHODS
+
+=head2 General Methods
+
+=over 4
+
+=item B<toFEN>
+
+Renders the position to Forsyth-Edwards Notation.  Alternatively, you can just
+use the object as a string:
+
+    $position = Chess::Plisco->new;
+    say $position->toFEN;
+    say "$position"; # Does the same as above.
+
+=item B<legalMoves>
+
+Returns a list of legal moves for the current position.  A move is just an
+integer.
+
+=item B<pseudoLegalMoves>
+
+Generates all pseudo-legal moves for the current position.
+
+Pseudo-legal are all moves that can be executed by the pieces on the side to
+move ignoring whether the side to move is in check after the move.
+
+Only the lower 15 bits of the move are set, that means the start and destination
+square, and a possible promotion piece.
+
+If you also need the captured piece and the color, you either have to call
+L</legalMoves> or you must use the state information returned from L</doMove>
+to retrieve the enriched move.  The first element of the state array is the
+enriched move.
+
+=item B<pseudoLegalAttacks>
+
+Like L</pseudoLegalMoves> but only returns "interesting" moves.  Interesting
+moves are captures, promotions, and moves directly giving check.  Discovered
+checks are not generated.  This has performance reasons.
+
+You will want to call this method for generating moves in a quiescence search.
+Since quiescence search is imperfect anyway, it is assumed that ignoring
+discovered checks does not have a negative impact.
+
+Future versions of this library may include discovered checks.
+
+=item B<equals(POSITION)>
+
+Returns true if the current position is equivalent to B<POSITION>.
+
+=back
+
+=head2 Methods for Accessing Position Properties
+
+=over 4
+
+=item B<whitePieces>
+
+Returns the bitboard of all white pieces.
+
+=item B<blackPieces>
+
+Returns the bitboard of all black pieces.
+
+=item B<occupied>
+
+Returns the bitboard of all squares that are occupied by any piece.
+
+=item B<vacant>
+
+Returns the bitboard of all squares that are not occupied by any piece.
+
+=item B<kings>
+
+Returns the bitboard of all kings (black and white).
+
+=item B<queens>
+
+Returns the bitboard of all queens (black and white).
+
+=item B<rooks>
+
+Returns the bitboard of all rooks (black and white).
+
+=item B<bishops>
+
+Returns the bitboard of all bishops (black and white).
+
+=item B<knights>
+
+Returns the bitboard of all knights (black and white).
+
+=item B<pawns>
+
+Returns the bitboard of all pawns (black and white).
+
+=item B<toMove>
+
+Returns the side to move, either L</CP_BLACK> or L</CP_WHITE>.
+
+=item B<halfMoves>
+
+Returns the number of half-moves made.  Initially, this is 0.  After white has
+made their first move, it is 1. After black has made their first move, it is
+2, and so on.
+
+=item B<halfMoveClock>
+
+Returns the number of reversible moves immediately leading to the current
+position.  The following moves are irreversible:
+
+=over 4
+
+=item Pawn moves
+
+Reason: A pawn cannot move backwards.
+
+=item Captures
+
+Reason: Captured pieces are gone for good.
+
+=item First king move of each side
+
+Reason: The side to move loses the castling rights.
+
+=item First move of each rook of each side
+
+Reason: The side to move loses at least one of their castling rights.
+
+=item Castlings
+
+Reason: The side to move loses the castling rights.  This is also implied by
+the fact that they are necessarily the first king move.
+
+=back
+
+The half-move-clock is important because both players can claim a draw, when
+the half-move clock has reached 50.
+
+=item B<signature>
+
+Returns a 64-bit Zobrist key (aka 64-bit integer) that identifies the position.
+Properties taken into account are:
+
+=over 4
+
+=item B<piece positions>
+
+=item B<color to move>
+
+=item B<castling rights>
+
+=item B<en-passant status>
+
+=back
+
+Note that hash collisions albeit unlikely, may occur because 64 bit are, of
+course, not sufficient to uniquely identify a chess position.
+
+The signature computed for a certain position is guaranteed not to change for
+one release of B<Chess::Plisco>.  In order to compute different signatures,
+you have to override either the pseudo-random number generator L</RNG> or its
+seed L</CP_RANDOM_SEED>.  If you turn the constant L</CP_RANDOM_SEED> into
+a non-constant subroutine, you can also get different signatures, whenever
+you re-load the library.
+
+=item B<inCheck>
+
+Returns false if the side to move is not in check, a truthy value otherwise.
+The truthy value returned is a bitboard of all pieces giving check.
+
+=item B<evasion>
+
+If the side to move is in check, returns the required check evasion strategy:
+
+=over 4
+
+=item L</CP_EVASION_KING_MOVE>
+
+The king must move.  This is the case, when multiple pieces give check.
+
+=item L</CP_EVASION_CAPTURE>
+
+Either the king must move or the piece giving check must be captured.
+
+=item L</CP_EVASION_ALL>
+
+Either the king must move, the piece giving check must be captured, or another
+piece must be moved between the king and the attacking piece.
+
+=back
+
+=item B<evasionSquares>
+
+If a check can be evaded by moving a piece between the king and the attacking
+piece of the opponent, this bitboard gives all squares where the check can be
+blocked.  These are all squares between the king and the attacking piece,
+including the square where the attacker is standing.
+
+=item B<enPassantShift>
+
+If en-passant is possible, returns the shift of the square where the capturing
+pawn has to move.  If en-passant is not possible, 0 is returned.  0 happens to
+be the shift of "a1" but "a1" is not a valid en-passant square.  It is
+therefore safe to use this method in boolean context.
+
+=item B<material>
+
+Gives the material balance from the perspective of the white player.  That
+means that all white pieces have a positive value, and all black pieces have
+a negative value.
+
+The values are:
+
+=over 4
+
+=item L</CP_QUEEN_VALUE> for each queen
+
+=item L</CP_ROOK_VALUE> for each rook
+
+=item L</CP_BISHOP_VALUE> for each bishop
+
+=item L</CP_KNIGHT_VALUE> for each knight
+
+=item L</CP_PAWN_VALUE> for each pawn
+
+=back
+
+These constants can be overridden by inheriting from B<Chess::Plisco>.
+
+Note: Kings do not count!
+
+=item B<whiteKingSideCastlingRight>
+
+Returns a truthy value if white still has the right to castle king-side
+("O-O"), false otherwise.
+
+=item B<whiteQueenSideCastlingRight>
+
+Returns a truthy value if white still has the right to castle queen-side,
+("O-O-O"), false otherwise.
+
+=item B<blackKingSideCastlingRight>
+
+Returns a truthy value if black still has the right to castle king-side
+("O-O"), false otherwise.
+
+=item B<blackQueenSideCastlingRight>
+
+Returns a truthy value if black still has the right to castle queen-side,
+("O-O-O"), false otherwise.
+
+=item B<castlingRights>
+
+Returns a bitmap of castling rights for the current position:
+
+=over 4
+
+=item 0x1 is set if white can still castle king-side
+
+=item 0x2 is set if white can still castle queen-side
+
+=item 0x4 is set if black can still castle king-side
+
+=item 0x8 is set if black can still castle queen-side
+
+=back
+
+=item B<kingShift>
+
+Return the shift of the square of the king of the side to move.  This
+information is needed internally.
+
+=item B<info>
+
+Returns an integer encoding various other aspects of the position.  You do not
+need this because there are dedicated methods available for all these
+properties.
+
+=back
+
+=head2 Move Methods
+
+=over 4
+
+=item B<parseMove(NOTATION)>
+
+Parses the string B<NOTATION> into an integer representing the move or returns
+false, if the B<NOTATION> cannot be parsed or is an illegal move.
+
+B<NOTATION> can either be a move in Standard Algebraic Notation (SAN) or in
+coordinate notation.  Coordinate notation is the format used by most chess
+engines and is the concatenation of the start and destination square and a
+possible promotion piece, for example "e2e4" or "f2f1q".
+
+=item B<SAN(MOVE)>
+
+Renders the integer B<MOVE> into Standard-Algebraic Notation SAN, for example
+"e4", "Bxc4", "O-O", or "fxe1=Q".
+
+=item B<moveCoordinateNotation(MOVE)>
+
+Renders the integer B<MOVE> into coordinate notation, for example "e2e4" or
+"f2f1q".
+
+=item B<LAN(MOVE)>
+
+Returns the Long Algebraic Notation LAN of the move.  This is an alias for
+L</moveCoordinateNotation>.
+
+=item B<moveEquivalent(MOVE1, MOVE2)>
+
+Returns true if the significant parts of B<MOVE1> and B<MOVE2> are equivalent.
+This is the case, when the start and destination square, and a possible
+promotion piece are equal.
+
+Although, this is technically a class method you should keep in mind that 
+the redundant parts of the moves depend on the current position.
+
+=item B<moveFrom(MOVE)>
+
+Extracts the shift (0-63) of the starting square.
+
+=item B<moveSetFrom(MOVE, FROM)>
+
+Sets the shift (0-63) of the starting square in B<MOVE> to B<FROM> and returns
+the move.
+
+=item B<moveTo(MOVE)>
+
+Extracts the shift (0-63) of the destination square.
+
+=item B<moveSetTo(MOVE, TO)>
+
+Sets the shift (0-63) of the destination square in B<MOVE> to B<TO> and returns
+the move.
+
+=item B<movePromote(MOVE)>
+
+Extracts the piece that a pawn is promoted to if the move is a promotion.
+Returns either L</CP_QUEEN>, L</CP_ROOK>, L</CP_BISHOP>, or L</CP_KNIGHT>.
+
+=item B<moveSetPromote(MOVE, PROMOTE)>
+
+Sets the piece to promote to in B<MOVE> to B<PROMOTE> and returns
+the move.  The piece should be one of L</CP_QUEEN>, L</CP_ROOK>, L</CP_BISHOP>,
+or L</CP_KNIGHT>.
+
+=item B<movePiece(MOVE)>
+
+Extracts the piece that does the move.  Returns one of L</CP_KING>,
+L</CP_QUEEN>, L</CP_ROOK>, L</CP_BISHOP>, L</CP_KNIGHT>, or L</CP_PAWN>.
+
+=item B<moveSetPiece(MOVE, PIECE)>
+
+Sets the piece that moves in B<MOVE> to B<PIECE> and returns
+the move.  The piece should be one of L</CP_KING>, L</CP_QUEEN>, L</CP_ROOK>,
+L</CP_BISHOP>, L</CP_KNIGHT>, or L</CP_PAWN>.
+
+=item B<moveCaptured(MOVE)>
+
+Extracts the piece that gets captured if any.  Returns one of L</CP_QUEEN>,
+L</CP_ROOK>, L</CP_BISHOP>, L</CP_KNIGHT>, L</CP_PAWN>, L</CP_NO_PIECE>.
+
+=item B<moveSetCaptured(MOVE, PIECE)>
+
+Sets the piece that gets captured in B<MOVE> to B<PIECE> and returns
+the move.  The piece should be one of L</CP_QUEEN>,
+L</CP_ROOK>, L</CP_BISHOP>, L</CP_KNIGHT>, L</CP_PAWN>, L</CP_NO_PIECE>.
+
+=item B<moveColor(MOVE)>
+
+Extracts the color that does the move.
+
+=item B<moveSetColor(MOVE, COLOR)>
+
+Sets the color in B<MOVE> to B<COLOR> and returns the move.
+
+=item B<moveLegal(MOVE|NOTATION)>
+
+Returns a truthy value, when the argument is a valid and legal move.  The move
+can be given either as an integer returned by L</parseMove> or as a string
+that is accepted by L</parseMove>.
+
+=item B<applyMove(MOVE|NOTATION)>
+
+Parses the move given in B<NOTATION> and applies it to the position if the
+move is valid and legal.  Otherwise false is returned.  You can also pass
+the move as an integer as returned by L</parseMove>.
+
+The method returns state information that can later be used to undo the move
+and reset the position to the state it had before the move was applied.
+
+Engines should use the method L</doMove> instead because it is faster.
+
+=item B<unapplyMove(STATE)>
+
+If B<STATE> is state information returned by L</applyMove>, takes back the
+move that was given as an argument to L</applyMove>.
+
+Engines should use the method L</undoMove> instead because it is faster.
+
+=item B<doMove(MOVE)>
+
+Applies the move represented by the integer(!) B<MOVE> to the position.  If
+the move is legal, the method returns state information that can be used to
+undo the move with L</undoMove>.
+
+The method returns false, if the move is illegal.  Note that this is not a
+complete legality check but works only for those moves that
+L</pseudoLegalMoves> has returned for the current position.
+
+This method is fast and is the one that should be used by engines.
+
+The state information returned is an array of various bits of information.
+The first one is the move itself but the captured piece is set in that
+move.
+
+=item B<undoMove(STATE)>
+
+If B<STATE> is state information returned by L</doMove>, takes back the
+move that was given as an argument to L</doMove>.
+
+This method is fast and is the one that should be used by engines.
+
+=item B<SEE(MOVE)>
+
+Does a static exchange evaluation SEE for move B<MOVE>.  B<MOVE> B<must> be
+a capture, a promotion, a move giving check, or any combination of it.  It
+returns the raw material balance expected from the move.
+
+The routine assumes, that after B<MOVE> had been made, all moves that re-capture
+on the target field of B<MOVE> will be executed, starting with the least
+valuable attacker of each side proceeding to the most valuable attacker.  As
+soon as a re-capture becomes disadvantageous, the sequence stops, and the
+balance up to that point is returned.
+
+Disadvantageous means that advancing to the "next round" would make the result
+worse.  For example a bishop would not normally capture a pawn that is
+protected.
+
+If you assign different values to bishops and knights by overriding
+L</CP_KNIGHT_VALUE> and L</CP_BISHOP_VALUE> you may receive small values by
+this routine, if the exchange of bishops and knights is involved.  Depending
+on your preferences you may ignore absolute values under a certain threshold,
+for example 100 centipawns.
+
+It should also be noted that the routine assumes that the values of pieces
+follows this relation:
+
+pawn E<lt> knight E<lt>= bishop E<lt> rook E<lt> queen (E<lt> king)
+
+=back
+
+=head2 Methods for Converting Locations
+
+=over 4
+
+=item B<squareToShift(SQUARE)>
+
+Converts B<SQUARE> to a shift.
+
+This is a class method.
+
+=item B<squareToCoordinates(SQUARE)>
+
+Converts B<SQUARE> to coordinates.  It returns a list, not a an array reference.
+Be sure to call it in array context!
+
+This is a class method.
+
+=item B<shiftToSquare(SHIFT)>
+
+Converts B<SHIFT> to a square.
+
+This is a class method.
+
+=item B<shiftToCoordinates(SHIFT)>
+
+Converts a shift to coordinates.  It returns a list, not a an array reference.
+Be sure to call it in array context!
+
+This is a class method.
+
+=item B<coordinatesToSquare(FILE, RANK)>
+
+Converts coordinates to a square.
+
+This is a class method.
+
+=item B<coordinatesToShift(FILE, RANK)>
+
+Converts coordinates to a shift.
+
+This is a class method.
+
+=back
+
+=head2 Methods for Inspecting a Square
+
+The following methods answer the question which piece of which color occupies
+a particular location on the chess board.
+
+=over 4
+
+=item B<pieceAtSquare(SQUARE)>
+
+In array context returns a pair of a piece and a color.  In scalar context,
+only the piece is returned.  The piece is one of L</CP_PAWN>, L</CP_KNIGHT>,
+L</CP_BISHOP>, L</CP_ROOK>, L</CP_QUEEN>, L</CP_KING>, or L</CP_NO_PIECE> if
+the square is empty.
+
+The color is one of L</CP_BLACK> or L</CP_WHITE>.  If the square is empty,
+C<undef> is returned instead of a color.
+
+This method is relatively expensive!
+
+=item B<pieceAtCoordinates(FILE, RANK)>
+
+In array context returns a pair of a piece and a color.  In scalar context,
+only the piece is returned.  The piece is one of L</CP_PAWN>, L</CP_KNIGHT>,
+L</CP_BISHOP>, L</CP_ROOK>, L</CP_QUEEN>, L</CP_KING>, or L</CP_NO_PIECE> if
+the square is empty.
+
+The color is one of L</CP_BLACK> or L</CP_WHITE>.  If the square is empty,
+C<undef> is returned instead of a color.
+
+This method is relatively expensive!
+
+=item B<pieceAtShift(SHIFT)>
+
+In array context returns a pair of a piece and a color.  In scalar context,
+only the piece is returned.  The piece is one of L</CP_PAWN>, L</CP_KNIGHT>,
+L</CP_BISHOP>, L</CP_ROOK>, L</CP_QUEEN>, L</CP_KING>, or L</CP_NO_PIECE> if
+the square is empty.
+
+The color is one of L</CP_BLACK> or L</CP_WHITE>.  If the square is empty,
+C<undef> is returned instead of a color.
+
+This method is relatively expensive!
+
+=back
+
+=head2 Analysis Methods
+
+These methods can be used to analyze features of the current position.
+
+=over 4
+
+=item B<attacked(SHIFT)>
+
+Returns true if the ssquare indicated by B<SHIFT> is attacked by a piece of
+the opponent.
+
+=item B<moveAttacked(MOVE|NOTATION)>
+
+Returns true if when executing B<MOVE>, the moving piece would be attacked
+by a piece of the opponent.  A typical usage example would be to check if
+the king moving from B<FROM> to B<TO> would move into check.
+
+You can give the move either as an integer or in one of the supported move
+notations.
+
+=item B<movePinned(MOVE|NOTATION)>
+
+Returns true if a piece doing B<MOVE> is pinned.  A piece is pinned if it would
+leave the king in check when doing the move.  Exposing other pieces to an
+opponent attack is not considered a pin by this method.
+
+You can give the move either as an integer or in one of the supported move
+notations.
+
+=item B<rMagic(SHIFT, OCCUPANCY)>
+
+Returns a bitboard of all squares that a rook can reach from B<SHIFT>.
+B<OCCUPANCY> is a bitboard of all squares that are occupied by pieces.
+The first piece that the sliding piece would reach is considered a potential
+captured of a capture and is a valid target square.
+
+See L<Chess::Plisco::Tutorial/Understanding C<rMagic> and C<bMagic>> for
+more information.
+
+=item B<bMagic(SHIFT, OCCUPANCY)>
+
+Returns a bitboard of all squares that a bishop can reach from B<SHIFT>.
+B<OCCUPANCY> is a bitboard of all squares that are occupied by pieces.
+The first piece that the sliding piece would reach is considered a potential
+captured of a capture and is a valid target square.
+
+See L<Chess::Plisco::Tutorial/Understanding C<rMagic> and C<bMagic>> for
+more information.
+
+=back
+
+=head2 Bit(board) Fiddling Methods
+
+=over 4
+
+=item B<bitboardPopcount(BITBOARD)>
+
+Counts and returns the bits sets in B<BITBOARD>.
+
+This does the same as the builtin function C<__builtin_popcountll> of the C
+compilers llvm and gcc.
+
+=item B<bitboardClearLeastSet(BITBOARD)>
+
+Clears the least signicant bit that is set in B<BITBOARD>.
+
+=item B<bitboardClearButLeastSet(BITBOARD)>
+
+Clears all set bits in B<BITBOARD> except for the least significant one that
+is set.
+
+=item B<bitboardCountTrailingZbits(BITBOARD)>
+
+Counts all trailing zero bits, that is all bits that are not set starting with
+the least significant bit (bit number 0).
+
+=item B<bitboardCountIsolatedTrailingZbits(BITBOARD)>
+
+Counts all trailing zero bits, that is all bits that are not set starting with
+the least significant bit (bit number 0).  In other words,
+this method gives you the shift of the set bit in B<BITBOARD>.  It only
+works if exactlye one bit is set in B<BITBOARD>, otherwise the behavior is
+undefined.  
+
+This does the same as the builtin function C<__builtin_ctzll> of the C
+compilers llvm and gcc.
+
+=back
+
+=head2 Perft Methods
+
+A "perft" (B<PERF>ormance B<T>est) is a standard test for measuring the
+performance of the move generator.  Starting from the current position, it
+generates all legal moves up to the specified depth.  It is also important for
+testing the correct functioning of the move generator because the number of
+leave nodes for certain positions are well known.
+
+Internally, each legal move is applied to the position, then the next level
+is computed from the resulting position, and finally the move is undone.
+
+=over 4
+
+=item B<perftByCopy(DEPTH)>
+
+Does a performance test for the current position to depth B<DEPTH>.  Returns
+the number of leaf nodes found.
+
+Instead of calling L</undoMove> the moves found are applied to a copy of the
+current position that is discarded later.  This is currently slightly faster
+than undoing the move programatically with L</undoMove>.
+
+=item B<perftByUndo(DEPTH)>
+
+Does a performance test for the current position to depth B<DEPTH>.  Returns
+the number of leaf nodes found.
+
+Moves are undone programmatically with L</undoMove>.  This is currently
+slightly slower than just copying the position, see L</perftByCopy>.
+
+=item B<perftByCopyWithOutput(DEPTH, FILEHANDLE)>
+
+Does the the same as B<perftByCopy> but prints out all top-level moves found
+with the number of subnodes for each move.  The time needed is measured
+with L<Time::HiRes/gettimeofday> and reported at the end as well as the
+number of nodes found.
+
+This method can be used directly to implement the command "go perft" for a UCI
+compatible chess engine.
+
+=item B<perftByUndoWithOutput(DEPTH, FILEHANDLE)>
+
+Does the the same as B<perftByUndo> but prints out all top-level moves found
+with the number of subnodes for each move.  The time needed is measured
+with L<Time::HiRes/gettimeofday> and reported at the end as well as the
+number of nodes found.
+
+This method can be used directly to implement the command "go perft" for a UCI
+compatible chess engine.
+
+=back
+
+=head2 Methods for Debugging and Diagnostics
+
+=over 4
+
+=item B<consistent>
+
+Does an extensive consistency check on the position and throws an exception
+if any inconsistency is encountered.
+
+=item B<dumpBitboard(BITBOARD)>
+
+Generate a string representation of B<BITBOARD> in ASCII art.
+
+=item B<dumpAll>
+
+Generates a string representation of all bitboards in ASCII art plus some
+additional information.
+
+=item B<dumpInfo(INFO)>
+
+Returns a string with the decoded position information as retured by
+L</info>.
+
+=item B<movesCoordinateNotation(MOVES)>
+
+Takes an array of moves (as integers) and converts it into an array of moves
+in coordinate notation.
+
+=back
+
+=head2 Other Methods
+
+=over 4
+
+=item B<RNG>
+
+Returns a pseudo-random integer created by the well-known xor-shift
+pseudo-random number generator.
+
+The random-number generator is always seeded with the same seed (initial value).
+This is on purpose, so that the numbers returned are deterministic.  The
+method is currently only used for generating the Zobrist keys for position
+signatures.
+
+If you want a different seed, you should override the constant
+L</CP_RANDOM_SEED>.
+
+=back
+
+=head1 PROPERTIES
+
+You can access individual properties either by using index constants or by
+using accessor macros from L<Chess::Plisco::Macro>.  All accessor macros
+can be assigned to; they are L-values.  But you are strongly advised
+to modify properties of a B<Chess::Plisco> instance only with the methods
+documented here.
+
+For getting or setting the bitboard of all white pieces, you have
+these options:
+
+    $whites_pieces = $pos->[CP_W_PIECES];
+    $white_pieces = cp_w_pieces $pos;
+    $white_pieces = cp_w_pieces($pos);
+    $pos->[CP_W_PIECES] = $white_pieces;
+    cp_w_pieces $pos = $white_pieces;
+    cp_w_pieces($pos) = $white_pieces;
+
+The macros (all starting with "cp_") are only available when you have loaded
+L<Chess::Plisco::Macro>, see there for more information.
+
+All elements of the position array are documented below under
+L</Accessor Indexes (:accessors)>.
+
+=head1 EXPORT TAGS
+
+The module exports only constants, all prefixed with "CP_".
+
+Note that (lowercase) macros "cp_" are defined by using
+L<Chess::Plisco::Macro>.
+
+=head2 All Constants (:all)
+
+You can import all constants with the export tag ":all".
+
+=head2 Accessor Indexes (:accessors)
+
+The array indices were carefully so that the following conditions are met:
+
+=over 4
+
+=item All piece types (L</CP_PAWN>, L</CP_KNIGHT>, ..., L</CP_KING>) can be used as indexes into the instance in order to retrieve their respective bitboard
+
+=item The white bitboard comes directly before the black bitboard.
+
+=back
+
+The bitboard for the pieces of the side to move is therefore always at the
+location C<CP_POS_WHITE_PIECES + $pos->toMove>.  Or in other words, the
+constants C<CP_POS_PAWNS> and C<CP_PAWN> (likewise for the other piece types)
+are guaranteed to be the same and to point to the corresponding piece bitboard.
+
+=over 4
+
+=item B<POS-E<gt>[CP_POS_WHITE_PIECES]>
+
+A bitboard of all white pieces on the board. See also L</whitePieces>.
+
+=item B<POS-E<gt>[CP_POS_BLACK_PIECES]>
+
+A bitboard of all black pieces on the board.  See also L</blackPieces>.
+
+=item B<POS-E<gt>[CP_POS_KINGS]>
+
+A bitboard of all kings (black and white) on the board.  See also L</kings>.
+
+=item B<POS-E<gt>[CP_POS_QUEENS]>
+
+A bitboard of all rooks (black and white) on the board.  See also L</queens>.
+
+=item B<POS-E<gt>[CP_POS_ROOKS]>
+
+A bitboard of all rooks (black and white) on the board.  See also L</rooks>.
+
+=item B<POS-E<gt>[CP_POS_BISHOPS]>
+
+A bitboard of all bishops (black and white) on the board.  See also L</bishops>.
+
+=item B<POS-E<gt>[CP_POS_KNIGHTS]>
+
+A bitboard of all knights (black and white) on the board.  See also L</knights>.
+
+=item B<POS-E<gt>[CP_POS_PAWNS]>
+
+A bitboard of all pawns (black and white) on the board.  See also L</pawns>.
+
+=item B<POS-E<gt>[CP_POS_HALF_MOVES]>
+
+The number of half-moves made.  See also L</halfMoves>.
+
+=item B<POS-E<gt>[CP_POS_HALF_MOVE_CLOCK]>
+
+The current value of the half-move clock.  See also L</halfMoveClock>.
+
+=item B<POS-E<gt>[CP_POS_IN_CHECK]>
+
+Bitmask of pieces giving check.  See also L</inCheck>.
+
+=item B<POS-E<gt>[CP_POS_EVASION_SQUARES]>
+
+Bitboard of squares where a check can be blocked.  See also L</evasionSquares>.
+
+=item B<POS-E<gt>[CP_POS_SIGNATURE]>
+
+Same as L</signature>.
+
+=item B<POS-E<gt>[CP_POS_INFO]>
+
+Additional properties of the position. See also L</info>.
+
+=back
+
+=head2 Piece Constants (:pieces)
+
+=head3 CP_WHITE =E<gt> 0
+
+Symbolic constant for white pieces, side to move, and so on.
+
+=head3 CP_BLACK =E<gt> 1
+
+Symbolic constant for black pieces, side to move, and so on.  Actually, usage
+of this constant is avoided internally so that any truthy value can be used.
+Most of the time, this is simply the else branch of a conditional.
+
+=head3 CP_NO_PIECE =E<gt> 0
+
+Symbolic constant for no piece.
+
+=head3 CP_PAWN
+
+Symbolic constant for a pawn.
+
+=head3 CP_KNIGHT
+
+Symbolic constant for a knight.
+
+=head3 CP_BISHOP
+
+Symbolic constant for a bishop.
+
+=head3 CP_ROOK
+
+Symbolic constant for a rook.
+
+=head3 CP_QUEEN
+
+Symbolic constant for a queen.
+
+=head3 CP_KING
+
+Symbolic constant for a king.
+
+=head3 CP_PAWN_VALUE =E<gt> 100
+
+Value of a pawn in centipawns.  Feel free to override this constant in derived
+classes.
+
+=head3 CP_KNIGHT_VALUE =E<gt> 300
+
+Value of a knight in centipawns.  Feel free to override this constant in derived
+classes.
+
+=head3 CP_BISHOP_VALUE =E<gt> 300
+
+Value of a bishop in centipawns.  Feel free to override this constant in derived
+classes.
+
+=head3 CP_ROOK_VALUE =E<gt> 500
+
+Value of a rook in centipawns.  Feel free to override this constant in derived
+classes.
+
+=head3 CP_QUEEN_VALUE =E<gt> 900
+
+Value of a queen in centipawns.  Feel free to override this constant in derived
+classes.
+
+Note that there is no value for a king.  This is on purpose.
+
+=head3 CP_PIECE_CHARS
+
+An array of arrays that maps numeric piece constants (C<CP_PAWN>, C<CP_KNIGHT>,
+...) to characters.  The first array are uppercase letters, normally used
+for white pieces, the second one are lowercase letters, normally used for
+black pieces.
+
+Example to get the character for a black knight:
+
+    $char = CP_PIECE_CHARS->[CP_BLACK]->[CP_KNIGHT];
+
+=head2 Board Constants (:board)
+
+=head3 CP_A_MASK .. CP_H_MASK
+
+These are bitboards of all files ("a" to "h") of the chess board.
+
+=head3 CP_1_MASK .. CP_8_MASK
+
+These are bitboards of all ranks ("1" to "8") of the chess board.
+
+=head3 CP_FILE_A .. CP_FILE_H
+
+0-based numbers of all files ("a" to "h").
+
+=head3 CP_RANK_1 .. CP_RANK_8
+
+0-based numbers of all ranks ("1" to "8").
+
+=head3 CP_A1 .. CP_H8
+
+Shifts for all squares of the chess board.
+
+=head2 Magic Moves Resp. Magic Bitboard Constants (:magicmoves)
+
+These are all large data tables that are used internally for the magic
+bitboards that generate the attack masks for the sliding pieces (queens,
+bishops, and rooks).  See the source if you are curious.  Otherwise just import
+them if you want to use the macros C<cp_mm_bmagic()> and C<cp_mm_rmagic()>
+from L<Chess::Plisco::Macro>.
+
+=head3 CP_MAGICMOVES_B_MAGICS
+
+Internal.
+
+=head3 CP_MAGICMOVES_R_MAGICS
+
+Internal.
+
+=head3 CP_MAGICMOVES_B_MASK
+
+Internal.
+
+=head3 CP_MAGICMOVES_R_MASK
+
+Internal.
+
+=head3 CP_MAGICMOVESBDB
+
+Internal.
+
+=head3 CP_MAGICMOVESRDB
+
+Internal.
+
+=head2 Auxiliary Constants (:aux)
+
+=head3 CP_INT_SIZE
+
+The size in bits of an integer.  Should be at least 64.
+
+=head3 CP_CHAR_BITS
+
+The number of bits in a char.  Should be 8.
+
+=head3 CP_RANDOM_SEED
+
+A pretty arbitrary value used to initialize the pseudo-random number
+generator L</RNG>.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2021 Guido Flohr <guido.flohr@cantanea.com>.
+
+=head1 SEE ALSO
+
+L<Chess::Plisco::Macro>, perl(1)

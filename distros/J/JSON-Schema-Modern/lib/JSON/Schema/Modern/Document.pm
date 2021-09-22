@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.517';
+our $VERSION = '0.519';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -18,7 +18,7 @@ use Safe::Isa;
 use Moo;
 use MooX::TypeTiny;
 use MooX::HandlesVia;
-use Types::Standard qw(InstanceOf HashRef Str Dict ArrayRef Enum);
+use Types::Standard qw(InstanceOf HashRef Str Dict ArrayRef Enum ClassName Undef slurpy);
 use namespace::clean;
 
 extends 'Mojo::JSON::Pointer', 'Moo::Object';
@@ -37,16 +37,17 @@ has canonical_uri => (
   clearer => '_clear_canonical_uri',
 );
 
-has specification_version => (
-  is => 'rwp',
-  isa => Enum([qw(draft7 draft2019-09 draft2020-12)]),
-);
-
+# "A JSON Schema resource is a schema which is canonically identified by an absolute URI."
+# https://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.4.3.5
 has resource_index => (
   is => 'bare',
-  isa => HashRef[Dict[
+  isa => HashRef[my $resource_type = Dict[
       canonical_uri => InstanceOf['Mojo::URL'],
-      path => Str,  # always a json pointer, relative to the document root
+      path => Str,  # always a JSON pointer, relative to the document root
+      specification_version => Str,
+      # the vocabularies used when evaluating instance data against schema
+      vocabularies => ArrayRef[ClassName->where(sub { $_->DOES('JSON::Schema::Modern::Vocabulary') })],
+      slurpy HashRef[Undef],  # no other fields allowed
     ]],
   handles_via => 'Hash',
   handles => {
@@ -62,17 +63,16 @@ has resource_index => (
   default => sub { {} },
 );
 
-has canonical_uri_index => (
+has _path_to_resource => (
   is => 'bare',
-  isa => HashRef[InstanceOf['Mojo::URL']],
+  isa => HashRef[$resource_type],
   handles_via => 'Hash',
   handles => {
-    path_to_canonical_uri => 'get',
-    _add_canonical_uri => 'set',
+    path_to_resource => 'get',
   },
   init_arg => undef,
   lazy => 1,
-  default => sub { {} },
+  default => sub { +{ map +($_->{path} => $_), shift->_canonical_resources } },
 );
 
 # for internal use only
@@ -104,12 +104,16 @@ has evaluation_configs => (
 around _add_resources => sub {
   my $orig = shift;
   my $self = shift;
+
+  $resource_type->($_[1]) if @_;  # check type of hash value against Dict
+
   foreach my $pair (pairs @_) {
     my ($key, $value) = @$pair;
     if (my $existing = $self->_get_resource($key)) {
       croak 'uri "'.$key.'" conflicts with an existing schema resource'
         if $existing->{path} ne $value->{path}
-          or $existing->{canonical_uri} ne $value->{canonical_uri};
+          or $existing->{canonical_uri} ne $value->{canonical_uri}
+          or $existing->{specification_version} ne $value->{specification_version};
     }
 
     # this will never happen, if we parsed $id correctly
@@ -117,7 +121,6 @@ around _add_resources => sub {
       if ($value->{canonical_uri}->fragment // '') =~ m{^[^/]};
 
     $self->$orig($key, $value);
-    $self->_add_canonical_uri($value->{path}, $value->{canonical_uri});
   }
 };
 
@@ -154,17 +157,18 @@ sub BUILD {
   # if the schema identified a canonical uri for itself, it overrides the initial value
   $self->_set_canonical_uri($state->{initial_schema_uri});
 
-  # TODO: in the future, this will be a dialect object, which describes the vocabularies in effect
-  # as well as draft specification version
-  $self->_set_specification_version($state->{spec_version});
-
   if (@{$state->{errors}}) {
     $self->_set_errors($state->{errors});
     return;
   }
 
   # make sure the root schema is always indexed against *something*.
-  $self->_add_resources($original_uri => { path => '', canonical_uri => $self->canonical_uri })
+  $self->_add_resources($original_uri => {
+      path => '',
+      canonical_uri => $self->canonical_uri,
+      specification_version => $state->{spec_version},
+      vocabularies => $state->{vocabularies},
+    })
     if (not "$original_uri" and $original_uri eq $self->canonical_uri)
       or "$original_uri";
 
@@ -190,7 +194,7 @@ JSON::Schema::Modern::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.517
+version 0.519
 
 =head1 SYNOPSIS
 
@@ -226,7 +230,7 @@ document. Is normally determined automatically at construction time.
 
 =head2 resource_index
 
-An index of URIs to subschemas (json path to reach the location, and the canonical URI of that
+An index of URIs to subschemas (JSON pointer to reach the location, and the canonical URI of that
 location) for all identifiable subschemas found in the document. An entry for URI C<''> is added
 only when no other suitable identifier can be found for the root schema.
 
@@ -238,7 +242,7 @@ C<resource_pairs> which returns a list of tuples as arrayrefs.
 
 =head2 canonical_uri_index
 
-An index of json paths (from the document root) to canonical URIs. This is the inversion of
+An index of JSON pointers (from the document root) to canonical URIs. This is the inversion of
 L</resource_index> and is constructed as that is built up.
 
 =head2 errors
@@ -263,7 +267,7 @@ override anything you have already explicitly set.
 
 =for stopwords fragmentless
 
-Given a JSON path within this document, returns the canonical URI corresponding to that location.
+Given a JSON pointer (a path) within this document, returns the canonical URI corresponding to that location.
 Only fragmentless URIs can be looked up in this manner, so it is only suitable for finding the
 canonical URI corresponding to a subschema known to have an C<$id> keyword.
 
@@ -280,6 +284,20 @@ See L<Mojo::JSON::Pointer/get>.
 =head2 TO_JSON
 
 Returns a data structure suitable for serialization. See L</schema>.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<JSON::Schema::Modern>
+
+=item *
+
+L<Mojo::JSON::Pointer>
+
+=back
 
 =head1 SUPPORT
 

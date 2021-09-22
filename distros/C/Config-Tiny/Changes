@@ -1,5 +1,14 @@
 ﻿Revision history for Perl extension Config-Tiny:
 
+2.27  2021-09-21T15:48:00
+	- Add the option of passing a hashref to the constructor, where it is turned into an
+		object of the class. See POD under new([$config]) for details.
+		This patch to the code and POD includes the new test t/08.constructor.t.
+		The patch was provided by D Hauke, with thanx.
+	- Move test.conf back into t/, where it was years ago, before someone tried to remove
+		all uses of File::Spec. But since File::Spec is used often now, there is no point
+		in keeping test.conf in the root directory of the distro.
+
 2.26  2021-02-01T17:11:00
 	- Update POD to change RT to github.
 	- Reformat Makefile.PL.
@@ -20,7 +29,7 @@
 	- Add corresponding test t/07.trailing.comment.t.
 	- Romanize Gregory Kidrenko's name so Config::IniFiles does not get 'Wide char in print'.
 	- Move xt/pod.t to xt/author/pod.t.
- 	- Adopt new repo structure. See
+	- Adopt new repo structure. See
 		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
 	- Move require 5.008001 from Tiny.pm into Makefile.PL.
 

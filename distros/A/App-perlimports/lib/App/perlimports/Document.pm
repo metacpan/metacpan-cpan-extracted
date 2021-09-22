@@ -3,10 +3,11 @@ package App::perlimports::Document;
 use Moo;
 use utf8;
 
-our $VERSION = '0.000018';
+our $VERSION = '0.000019';
 
-use App::perlimports::Annotations ();
-use App::perlimports::Include     ();
+use App::perlimports::Annotations     ();
+use App::perlimports::ExportInspector ();
+use App::perlimports::Include         ();
 use File::Basename qw( fileparse );
 use List::Util qw( any uniq );
 use Module::Runtime qw( module_notional_filename );
@@ -982,7 +983,7 @@ App::perlimports::Document - Make implicit imports explicit
 
 =head1 VERSION
 
-version 0.000018
+version 0.000019
 
 =head2 inspector_for( $module_name )
 

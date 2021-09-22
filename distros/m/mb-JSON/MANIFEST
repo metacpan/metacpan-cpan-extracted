@@ -1,0 +1,12 @@
+lib/mb/JSON.pm
+README
+Changes
+META.yml
+META.json
+Makefile.PL
+pmake.bat
+MANIFEST
+LICENSE
+CONTRIBUTING
+t/1001_basic_json.t
+t/9001_podtest.t

@@ -19,6 +19,19 @@
 
 Game::TextMapper::Mapper - a text map parser and builder
 
+=head1 SYNOPSIS
+
+    use Modern::Perl;
+    use Game::TextMapper::Mapper::Hex;
+    my $map = <<EOT;
+    0101 forest
+    include default.txt
+    EOT
+    my $svg = Game::TextMapper::Mapper::Hex->new(dist_dir => 'share')
+      ->initialize($map)
+      ->svg();
+    print $svg;
+
 =head1 DESCRIPTION
 
 This class knows how to parse a text containing a map description into SVG
@@ -26,13 +39,8 @@ definitions, and regions. Once the map is built, this class knows how to
 generate the SVG for the entire map.
 
 The details depend on whether the map is a hex map or a square map. You should
-use the appropriate class instead of this one.
-
-=head1 SEE ALSO
-
-L<Game::TextMapper::Mapper::Hex> is for hex maps.
-
-L<Game::TextMapper::Mapper::Square> is for square maps.
+use the appropriate class instead of this one: L<Game::TextMapper::Mapper::Hex>
+or L<Game::TextMapper::Mapper::Square>.
 
 =cut
 
@@ -45,6 +53,16 @@ use File::Slurper qw(read_text);
 use Encode qw(decode_utf8);
 use File::ShareDir 'dist_dir';
 
+=head1 ATTRIBUTES
+
+=head2 dist_dir
+
+You need to pass this during instantiation so that the mapper knows where to
+find files it needs to include.
+
+=cut
+
+has 'dist_dir';
 has 'map';
 has 'regions' => sub { [] };
 has 'attributes' => sub { {} };
@@ -62,7 +80,6 @@ has 'license' => '';
 has 'other' => sub { [] };
 has 'url' => '';
 has 'offset' => sub { [] };
-has 'dist_dir';
 
 my $log = Game::TextMapper::Log->get;
 
@@ -92,6 +109,14 @@ include default.txt
 license <text>Public Domain</text>
 EOT
 }
+
+=head1 METHODS
+
+=head2 initialize($map)
+
+Call this to load a map into the mapper.
+
+=cut
 
 sub initialize {
   my ($self, $map) = @_;
@@ -272,7 +297,7 @@ sub svg_defs {
   my ($self) = @_;
   # All the definitions are included by default.
   my $doc = "  <defs>\n";
-  $doc .= "    " . join("\n    ", @{$self->defs}) if @{$self->defs};
+  $doc .= "    " . join("\n    ", @{$self->defs}, "") if @{$self->defs};
   # collect region types from attributess and paths in case the sets don't overlap
   my %types = ();
   foreach my $region (@{$self->regions}) {
@@ -391,6 +416,12 @@ sub svg_labels {
   return $doc;
 }
 
+=head2 svg()
+
+This method generates the SVG once the map is initialized.
+
+=cut
+
 sub svg {
   my ($self) = @_;
 
@@ -422,5 +453,13 @@ sub svg {
 
   return $doc;
 }
+
+=head1 SEE ALSO
+
+L<Game::TextMapper::Mapper::Hex> is for hex maps.
+
+L<Game::TextMapper::Mapper::Square> is for square maps.
+
+=cut
 
 1;

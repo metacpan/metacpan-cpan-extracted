@@ -1,5 +1,9 @@
 Revision history for WWW::Mechanize
 
+2.05      2021-09-21 14:06:00Z
+    - Update docs for protocols_allowed and protocols_forbidden (GH#323) (Olaf
+      Alders)
+
 2.04      2021-08-06 12:28:31Z
     [ENHANCEMENTS]
     - Add a head() method to allow relative URLs (GH#321) (Julien Fiegehenn)

@@ -4,7 +4,7 @@
       "George S. Baugh <teodesian@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.020, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -104,35 +104,35 @@
    "provides" : {
       "App::Prove::Plugin::TestRail" : {
          "file" : "lib/App/Prove/Plugin/TestRail.pm",
-         "version" : "0.048"
+         "version" : "0.049"
       },
       "Test::Rail::Harness" : {
          "file" : "lib/Test/Rail/Harness.pm",
-         "version" : "0.048"
+         "version" : "0.049"
       },
       "Test::Rail::Parser" : {
          "file" : "lib/Test/Rail/Parser.pm",
-         "version" : "0.048"
+         "version" : "0.049"
       },
       "TestRail::API" : {
          "file" : "lib/TestRail/API.pm",
-         "version" : "0.048"
+         "version" : "0.049"
       },
       "TestRail::Utils" : {
          "file" : "lib/TestRail/Utils.pm",
-         "version" : "0.048"
+         "version" : "0.049"
       },
       "TestRail::Utils::Find" : {
          "file" : "lib/TestRail/Utils/Find.pm",
-         "version" : "0.048"
+         "version" : "0.049"
       },
       "TestRail::Utils::Lock" : {
          "file" : "lib/TestRail/Utils/Lock.pm",
-         "version" : "0.048"
+         "version" : "0.049"
       },
       "TestRail::Utils::Results" : {
          "file" : "lib/TestRail/Utils/Results.pm",
-         "version" : "0.048"
+         "version" : "0.049"
       }
    },
    "release_status" : "stable",
@@ -147,7 +147,7 @@
          "web" : "https://github.com/teodesian/TestRail-Perl"
       }
    },
-   "version" : "0.048",
+   "version" : "0.049",
    "x_contributors" : [
       "Andy Baugh <thomas.baugh@cpanel.net>",
       "George S. Baugh <doge@teodesian.net>",
@@ -159,7 +159,8 @@
       "Ryan Sherer <ryan.sherer@cpanel.net>",
       "Todd Rinaldo <toddr@cpan.org>"
    ],
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.21"
+   "x_generated_by_perl" : "v5.32.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

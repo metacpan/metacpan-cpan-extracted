@@ -10,7 +10,7 @@
 # ABSTRACT: Run a cme script
 
 package App::Cme::Command::run ;
-$App::Cme::Command::run::VERSION = '1.032';
+$App::Cme::Command::run::VERSION = '1.033';
 use strict;
 use warnings;
 use 5.10.1;
@@ -26,7 +26,7 @@ use App::Cme -command ;
 use base qw/App::Cme::Common/;
 
 my $__test_home = '';
-sub _set_test_home { $__test_home = shift; }
+sub _set_test_home { $__test_home = shift; return;}
 
 my $home = $__test_home || File::HomeDir->my_home;
 
@@ -47,7 +47,6 @@ sub opt_spec {
         [ "no-commit|nc!" => "skip commit to git" ],
         [ "doc!"    => "show documention of script" ],
         [ "list!"   => "list available scripts" ],
-        [ "verbose!" => "show execution of the instructions from the 'run' script" ],
         $class->cme_global_options,
     );
 }
@@ -56,6 +55,7 @@ sub validate_args {
     my ($self, $opt, $args) = @_;
 
     $self->check_unknown_args($args);
+    return;
 }
 
 sub usage_desc {
@@ -228,7 +228,9 @@ sub execute {
 
     # override commit message. may also trigger a commit even if none
     # is specified in script
-    $commit_msg ||= $opt->{commit};
+    if ($opt->{commit}) {
+        $commit_msg = $opt->{commit};
+    }
 
     # check if workspace and index are clean
     if ($commit_msg) {
@@ -249,10 +251,12 @@ sub execute {
     if ($commit_msg and not $opt->{'no-commit'}) {
         system(qw/git commit -a -m/, $commit_msg);
     }
+
+    return;
 }
 
-package App::Cme::Run::Var;
-$App::Cme::Run::Var::VERSION = '1.032';
+package App::Cme::Run::Var; ## no critic (Modules::ProhibitMultiplePackages)
+$App::Cme::Run::Var::VERSION = '1.033';
 require Tie::Hash;
 
 our @ISA = qw(Tie::ExtraHash);
@@ -279,7 +283,7 @@ App::Cme::Command::run - Run a cme script
 
 =head1 VERSION
 
-version 1.032
+version 1.033
 
 =head1 SYNOPSIS
 

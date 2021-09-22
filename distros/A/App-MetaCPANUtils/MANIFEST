@@ -11,6 +11,8 @@ lib/App/MetaCPANUtils.pm
 script/list-metacpan-distributions
 script/list-metacpan-releases
 script/list-recent-metacpan-releases
+script/open-metacpan-dist-page
+script/open-metacpan-module-page
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

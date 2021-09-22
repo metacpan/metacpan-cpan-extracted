@@ -157,6 +157,17 @@ Please see the `set_from()` documentation for details on values.
 
 # CLASS METHODS
 
+- $class->enable()
+- $class->disable()
+- $bool = $class->enabled()
+
+    Toggle or check enabled status. When disabled no coverage is recorded.
+
+- $class->reload()
+
+    Reset filter if $0 or \_\_FILE\_\_ have changed. This is advanced usage, you will
+    probably never need this.
+
 - $val = $class->get\_from()
 
     Get the current 'from' value. The default is `'*'` when nothing has set a from

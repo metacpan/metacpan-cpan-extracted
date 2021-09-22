@@ -1,8 +1,9 @@
 package Bitcoin::Crypto::Types;
 
-our $VERSION = "1.001";
+our $VERSION = "1.002";
 
 use v5.10;
+use strict;
 use warnings;
 use Type::Library -base;
 use Type::Coercion;

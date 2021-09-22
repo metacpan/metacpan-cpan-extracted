@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.13";
+our $VERSION = "0.14";
 
 use Scalar::Util ();
 
@@ -132,65 +132,9 @@ sub _eq {
         }
     }
     else {
-        return unless $type eq $other;
+        return unless defined $other && $type eq $other;
     }
     return 1;
-}
-
-sub error_message {
-    my ($self, $other) = @_;
-
-    return sprintf('must be Sub::Meta::Returns. got: %s', $other // '')
-        unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Returns');
-
-    if ($self->has_scalar) {
-        return sprintf('invalid scalar return. got: %s, expected: %s', $other->scalar, $self->scalar)
-            unless _eq($self->scalar, $other->scalar);
-    }
-    else {
-        return 'should not have scalar return' if $other->has_scalar;
-    }
-
-    if ($self->has_list) {
-        return sprintf('invalid list return. got: %s, expected: %s', $other->list, $self->list)
-            unless _eq($self->list, $other->list);
-    }
-    else {
-        return 'should not have list return' if $other->has_list;
-    }
-
-    if ($self->has_void) {
-        return sprintf('invalid void return. got: %s, expected: %s', $other->void, $self->void)
-            unless _eq($self->void, $other->void);
-    }
-    else {
-        return 'should not have void return' if $other->has_void;
-    }
-    return '';
-}
-
-sub relaxed_error_message {
-    my ($self, $other) = @_;
-
-    return sprintf('must be Sub::Meta::Returns. got: %s', $other // '')
-        unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Returns');
-
-    if ($self->has_scalar) {
-        return sprintf('invalid scalar return. got: %s, expected: %s', $other->scalar, $self->scalar)
-            unless _eq($self->scalar, $other->scalar);
-    }
-
-    if ($self->has_list) {
-        return sprintf('invalid list return. got: %s, expected: %s', $other->list, $self->list)
-            unless _eq($self->list, $other->list);
-    }
-
-    if ($self->has_void) {
-        return sprintf('invalid void return. got: %s, expected: %s', $other->void, $self->void)
-            unless _eq($self->void, $other->void);
-    }
-
-    return '';
 }
 
 sub _eq_inlined {
@@ -205,20 +149,101 @@ sub _eq_inlined {
         }
     }
     else {
-        push @src => sprintf('"%s" eq %s', $type, $v);
+        push @src => sprintf('defined %s && "%s" eq %s', $v, $type, $v);
     }
 
     return join "\n && ", @src;
 }
 
+sub error_message {
+    my ($self, $other) = @_;
+
+    return sprintf('other returns must be Sub::Meta::Returns. got: %s', $other // 'Undef')
+        unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Returns');
+
+    if ($self->has_scalar) {
+        return sprintf('invalid scalar return. got: %s, expected: %s', $other->scalar // '', $self->scalar)
+            unless _eq($self->scalar, $other->scalar);
+    }
+    else {
+        return 'should not have scalar return' if $other->has_scalar;
+    }
+
+    if ($self->has_list) {
+        return sprintf('invalid list return. got: %s, expected: %s', $other->list // '', $self->list)
+            unless _eq($self->list, $other->list);
+    }
+    else {
+        return 'should not have list return' if $other->has_list;
+    }
+
+    if ($self->has_void) {
+        return sprintf('invalid void return. got: %s, expected: %s', $other->void // '', $self->void)
+            unless _eq($self->void, $other->void);
+    }
+    else {
+        return 'should not have void return' if $other->has_void;
+    }
+    return '';
+}
+
+sub relaxed_error_message {
+    my ($self, $other) = @_;
+
+    return sprintf('other returns must be Sub::Meta::Returns. got: %s', $other // 'Undef')
+        unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Returns');
+
+    if ($self->has_scalar) {
+        return sprintf('invalid scalar return. got: %s, expected: %s', $other->scalar // '', $self->scalar)
+            unless _eq($self->scalar, $other->scalar);
+    }
+
+    if ($self->has_list) {
+        return sprintf('invalid list return. got: %s, expected: %s', $other->list // '', $self->list)
+            unless _eq($self->list, $other->list);
+    }
+
+    if ($self->has_void) {
+        return sprintf('invalid void return. got: %s, expected: %s', $other->void // '', $self->void)
+            unless _eq($self->void, $other->void);
+    }
+
+    return '';
+}
+
+sub _all_eq {
+    my $self = shift;
+    return $self->has_scalar
+       && _eq($self->scalar, $self->list)
+       && _eq($self->scalar, $self->void);
+}
+
+sub _display {
+    my $type = shift;
+
+    if (ref $type && ref $type eq "ARRAY") {
+        return sprintf('[%s]', join ",", map { $_ . '' } @$type);
+    }
+    else {
+        return $type . '';
+    }
+}
+
 sub display {
     my $self = shift;
 
-    if (_eq($self->scalar, $self->list) && _eq($self->list, $self->void)) {
-        return $self->scalar . '';
+    if (!$self->has_scalar && !$self->has_list && !$self->has_void) {
+        return '*';
+    }
+    elsif (_all_eq($self)) {
+        return _display($self->scalar);
     }
     else {
-        my @r = map { $self->$_ ? "$_ => @{[$self->$_]}" : () } qw(scalar list void);
+        my @r;
+        for my $key (qw(scalar list void)) {
+            my $has = "has_$key";
+            push @r => "$key => @{[_display($self->$key)]}" if $self->$has;
+        }
         return "(@{[join ', ', @r]})";
     }
 }

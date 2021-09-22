@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -18,7 +18,8 @@
          "requires" : {
             "FFI::Build" : "0",
             "FFI::CheckLib" : "0",
-            "File::ShareDir::Dist::Install" : "0"
+            "File::ShareDir::Dist::Install" : "0",
+            "Path::Tiny" : "0"
          }
       },
       "configure" : {
@@ -30,6 +31,15 @@
          }
       },
       "develop" : {
+         "recommends" : {
+            "Dist::Zilla::Plugin::Author::Plicease::Thanks" : "0",
+            "Dist::Zilla::Plugin::Author::Plicease::Upload" : "0",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
+            "Dist::Zilla::Plugin::PruneFiles" : "0",
+            "Dist::Zilla::Plugin::RemovePrereqs" : "0",
+            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.51",
+            "Software::License::Perl_5" : "0"
+         },
          "requires" : {
             "File::Spec" : "0",
             "FindBin" : "0",
@@ -53,6 +63,7 @@
             "File::ShareDir::Dist" : "0",
             "File::ShareDir::Dist::Install" : "0",
             "File::Which" : "0",
+            "Path::Tiny" : "0",
             "base" : "0",
             "perl" : "5.008"
          }
@@ -78,9 +89,13 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.05",
-   "x_generated_by_perl" : "v5.33.8",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "version" : "0.06",
+   "x_contributors" : [
+      "Graham Ollis <plicease@cpan.org>",
+      "Sanko Robinson (SANKO)"
+   ],
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }

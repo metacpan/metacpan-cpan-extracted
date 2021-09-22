@@ -2,7 +2,6 @@ Changes
 ex/inline_form.pl
 ex/metaobject.pl
 ex/regular_form.pl
-Form-Tiny-2.00.tar.gz
 lib/Form/Tiny.pm
 lib/Form/Tiny/Error.pm
 lib/Form/Tiny/FieldDefinition.pm
@@ -55,6 +54,7 @@ t/22-default.t
 t/23-nesting-escape.t
 t/24-context.t
 t/25-messages.t
+t/26-additional-validators.t
 t/99-examples/inline-form.t
 t/99-examples/metaobject.t
 t/99-examples/regular-form.t
@@ -64,5 +64,7 @@ t/lib/GrandparentForm.pm
 t/lib/ParentForm.pm
 t/lib/TestForm.pm
 t/lib/TestInnerForm.pm
+xt/01-object-pad.t
+xt/02-bless.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

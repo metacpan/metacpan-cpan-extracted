@@ -1,5 +1,10 @@
 Revision history for Plack-Middleware-Text-Minify:
 
+v0.2.1    2021-09-19 11:26:10+01:00 Europe/London
+  [Bug Fixes]
+  - Upgrade minimum version of Text::Minify::XS to v0.4.8 to improve
+    handling of malformed UTF-8.
+
 v0.2.0    2021-05-21 14:05:48+01:00 Europe/London
   [Enhancements]
   - Do not minify if the `psgix.no-minify` key is true.

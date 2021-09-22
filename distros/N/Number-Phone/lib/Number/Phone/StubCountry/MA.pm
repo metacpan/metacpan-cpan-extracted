@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210602223300;
+our $VERSION = 1.20210921211832;
 
 my $formatters = [
                 {
@@ -84,9 +84,8 @@ my $validators = {
           )\\d{4}|
           5(?:
             2(?:
-              [015-7]\\d|
-              2[02-9]|
-              3[0-578]|
+              [0-25-7]\\d|
+              3[1-578]|
               4[02-46-8]|
               8[0235-7]|
               90
@@ -115,9 +114,8 @@ my $validators = {
           )\\d{4}|
           5(?:
             2(?:
-              [015-7]\\d|
-              2[02-9]|
-              3[0-578]|
+              [0-25-7]\\d|
+              3[1-578]|
               4[02-46-8]|
               8[0235-7]|
               90
@@ -143,7 +141,7 @@ my $validators = {
             )|
             7(?:
               0\\d|
-              10|
+              1[0-3]|
               6[1267]|
               7[0-57]
             )
@@ -161,88 +159,96 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en} = {"212532", "Fès\/Errachidia\/Meknès\/Nador\/Oujda\/Taza",
-"2125399", "Al\ Hoceima\/Larache\/Tangier",
-"2125357", "Goulmima",
-"2125246", "El\ Youssoufia\/Safi",
-"2125377", "Rabat",
-"212521", "Casablanca\/Central\ Morocco",
-"2125244", "Marrakech",
-"2125368", "Figuig",
-"2125380", "Rabat\ area",
-"2125233", "El\ Jedida\/Mohammedia",
-"21252990", "Agadir\ area",
-"2125363", "Nador",
-"2125395", "Larache",
-"2125287", "Guelmim\/Tan\ Tan",
-"2125286", "Tiznit",
-"2125354", "Meknès",
-"2125376", "Rabat\/Témara",
-"21252980", "Marrakech\ area",
-"2125247", "Essaouira",
-"2125393", "Tangier",
-"2125365", "Oujda",
-"2125374", "Ouazzane",
-"2125356", "Fès",
-"212520", "Casablanca",
-"2125235", "Oued\ Zem",
-"2125362", "Berkane",
-"2125232", "Mohammedia",
-"2125398", "Al\ Hoceima\/Chefchaouen",
-"2125358", "Ifrane",
-"21253880", "Tangier\ area",
-"2125396", "Fnideq\/Martil\/Mdiq",
-"2125353", "Midelt",
-"2125242", "El\ Kelaa\ des\ Sraghna",
-"2125394", "Asilah",
-"2125288", "Agadir\/Es\-Semara\/Tarfaya",
-"2125373", "Kénitra",
-"2125378", "Salé",
-"2125283", "Inezgane\/Taroudant",
-"2125367", "Bouarfa\/Oujda",
-"2125237", "Settat",
-"212530", "Rabat\/Kènitra",
-"2125289", "Dakhla\/Laayoune",
-"2125366", "Figuig\/Oujda",
-"212522", "Casablanca",
-"2125355", "Meknès",
-"2125379", "Souk\ Larbaa",
-"2125352", "Taza",
-"2125359", "Fès",
-"2125372", "Rabat",
-"21253890", "Fès\/Meknès\ areas",
-"2125285", "Oulad\ Teima\/Taroudant",
-"2125397", "Tétouan",
-"2125243", "Marrakech",
-"2125248", "Ouarzazate",
-"212525", "Southern\ Morocco",
-"2125375", "Khémisset",
-"212531", "Tangier\/Al\ Hoceima\/Larache\/Tètouan\/Chefchaouen",
-"2125282", "Agadir\/Ait\ Meloul\/Inezgane",
-"2125234", "Settai",
-"2125290", "Casablanca",};
-$areanames{fr} = {"2125289", "Laayoune\/Dakhla",
-"2125366", "Oujda\/Figuig",
-"212525", "Maroc\ Sud",
-"2125234", "Settat",
-"2125282", "Agadir\/Inezgane\/Ait\ Melou",
-"212531", "Tanger\/Tétouan\/Larache\/Al\ Hoceima\/Cherfchaouen",
+$areanames{fr} = {"2125282", "Agadir\/Inezgane\/Ait\ Melou",
 "21253890", "Fès\/Maknès\ et\ alentours",
-"2125285", "Taroudannt\/Oulad\ Teima",
-"21253880", "Tanger\ et\ alentours",
-"2125367", "Oujda\/Bouarfa",
-"2125283", "Inezgane\/Taroudannt",
-"212530", "Rabat\/Kénitra",
-"2125288", "Es\-Semara\/Agadir\/Tarfaya",
-"21252980", "Marrakech\ et\ alentours",
-"2125393", "Tanger",
-"2125399", "Tanger\/Larache\/Al\ Hoceima",
-"212532", "Fès\/Oujda\/Meknès\/Taza\/Nador\/Errachidia",
-"2125246", "Safi\/El\ Youssoufia",
-"2125233", "Mohammedia\/El\ Jadida",
 "21252990", "Agadir\ et\ alentours",
 "212521", "Casablanca\/Maroc\ Central",
-"2125380", "Rabat\ et\ alentours",};
+"212525", "Maroc\ Sud",
+"2125288", "Es\-Semara\/Agadir\/Tarfaya",
+"2125285", "Taroudannt\/Oulad\ Teima",
+"2125366", "Oujda\/Figuig",
+"2125367", "Oujda\/Bouarfa",
+"2125246", "Safi\/El\ Youssoufia",
+"21253880", "Tanger\ et\ alentours",
+"21252980", "Marrakech\ et\ alentours",
+"2125233", "Mohammedia\/El\ Jadida",
+"2125283", "Inezgane\/Taroudannt",
+"2125380", "Rabat\ et\ alentours",
+"212531", "Tanger\/Tétouan\/Larache\/Al\ Hoceima\/Cherfchaouen",
+"2125234", "Settat",
+"2125393", "Tanger",
+"212532", "Fès\/Oujda\/Meknès\/Taza\/Nador\/Errachidia",
+"2125399", "Tanger\/Larache\/Al\ Hoceima",
+"2125289", "Laayoune\/Dakhla",
+"212530", "Rabat\/Kénitra",};
+$areanames{en} = {"2125286", "Tiznit",
+"212525", "Southern\ Morocco",
+"2125244", "Marrakech",
+"2125397", "Tétouan",
+"2125229", "Casablanca",
+"2125378", "Salé",
+"2125355", "Meknès",
+"2125287", "Guelmim\/Tan\ Tan",
+"2125396", "Fnideq\/Martil\/Mdiq",
+"2125375", "Khémisset",
+"2125358", "Ifrane",
+"2125232", "Mohammedia",
+"2125398", "Al\ Hoceima\/Chefchaouen",
+"2125376", "Rabat\/Témara",
+"2125223", "Casablanca",
+"2125288", "Agadir\/Es\-Semara\/Tarfaya",
+"2125377", "Rabat",
+"2125285", "Oulad\ Teima\/Taroudant",
+"2125357", "Goulmima",
+"2125395", "Larache",
+"2125356", "Fès",
+"2125363", "Nador",
+"2125282", "Agadir\/Ait\ Meloul\/Inezgane",
+"212520", "Casablanca",
+"2125243", "Marrakech",
+"2125237", "Settat",
+"21253890", "Fès\/Meknès\ areas",
+"21252990", "Agadir\ area",
+"2125372", "Rabat",
+"2125235", "Oued\ Zem",
+"2125224", "Casablanca",
+"212521", "Casablanca\/Central\ Morocco",
+"2125352", "Taza",
+"2125380", "Rabat\ area",
+"2125283", "Inezgane\/Taroudant",
+"2125362", "Berkane",
+"2125393", "Tangier",
+"2125234", "Settai",
+"2125379", "Souk\ Larbaa",
+"2125290", "Casablanca",
+"2125228", "Casablanca",
+"212531", "Tangier\/Al\ Hoceima\/Larache\/Tètouan\/Chefchaouen",
+"2125242", "El\ Kelaa\ des\ Sraghna",
+"2125225", "Casablanca",
+"2125359", "Fès",
+"212532", "Fès\/Errachidia\/Meknès\/Nador\/Oujda\/Taza",
+"2125226", "Casablanca",
+"2125373", "Kénitra",
+"2125399", "Al\ Hoceima\/Larache\/Tangier",
+"2125227", "Casablanca",
+"2125289", "Dakhla\/Laayoune",
+"212530", "Rabat\/Kènitra",
+"2125353", "Midelt",
+"2125366", "Figuig\/Oujda",
+"2125367", "Bouarfa\/Oujda",
+"21253880", "Tangier\ area",
+"2125246", "El\ Youssoufia\/Safi",
+"2125233", "El\ Jedida\/Mohammedia",
+"2125247", "Essaouira",
+"21252980", "Marrakech\ area",
+"2125220", "Casablanca",
+"2125394", "Asilah",
+"2125222", "Casablanca",
+"2125368", "Figuig",
+"2125354", "Meknès",
+"2125374", "Ouazzane",
+"2125365", "Oujda",
+"2125248", "Ouarzazate",};
 
     sub new {
       my $class = shift;

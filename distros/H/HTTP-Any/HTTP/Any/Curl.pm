@@ -11,8 +11,8 @@ BEGIN {
 	Net::Curl::Easy->can('CURLOPT_COOKIEFILE')      or die "Rebuild curl with Cookies support\n";
 }
 
-sub do_http {
-	my ($multi_ev, $easy, $url, $opt, $cb) = @_;
+sub _prepare {
+	my ($easy, $url, $opt) = @_;
 
 	$easy->setopt(CURLOPT_URL, $url);
 
@@ -93,7 +93,7 @@ sub do_http {
 			my $size = length $data;
 			$body_size += $size;
 			if ($on_header) {
-				my ($is_success, $headers, $redirects) = headers($easy, $url, $headers);
+				my ($is_success, $headers, $redirects) = _headers($easy, $url, $headers);
 				my $r = $on_header->($is_success, $headers, $redirects);
 				$on_header = undef;
 				$r or return 0;
@@ -118,7 +118,7 @@ sub do_http {
 		my ($easy, $result) = @_;
 
 		if ($headers) {
-			my ($is_success, $headers, $redirects) = headers($easy, $url, $headers);
+			my ($is_success, $headers, $redirects) = _headers($easy, $url, $headers);
 			if ($result == CURLE_WRITE_ERROR and $aborted_by_max_size) {
 				$is_success = 0;
 				$$headers{"Status"} = 599;
@@ -133,41 +133,48 @@ sub do_http {
 				$$headers{"Reason"} = "$result";
 			}
 			$easy = undef;
-			$cb->($is_success, $body, $headers, $redirects);
+			return ($is_success, $body, $headers, $redirects);
 		} else {
 			$easy = undef;
-			$cb->(0, undef, { Status => 500, Reason => "$result", URL => $url }, []);
+			return (0, undef, { Status => 500, Reason => "$result", URL => $url }, []);
 		}
 
 	};
-	if ($multi_ev) {
-		$multi_ev->($easy, $finish, 4 * 60);
-	} else {
-		eval { $easy->perform() };
-		if ($@) {
-			if (ref $@ eq "Net::Curl::Easy::Code" ) {
-				$finish->($easy, $@);
-			} else {
-				die $@;
-			}
+
+	return $finish;
+}
+
+
+sub _do_http {
+	my ($easy, $url, $opt) = @_;
+
+	my $finish = _prepare($easy, $url, $opt);
+
+	eval { $easy->perform() };
+	if ($@) {
+		if (ref $@ eq "Net::Curl::Easy::Code" ) {
+			return $finish->($easy, $@);
 		} else {
-			$finish->($easy, CURLE_OK);
+			die $@;
 		}
+	} else {
+		return $finish->($easy, CURLE_OK);
 	}
 }
 
 
-sub headers {
-	my ($easy, $url, $headers) = @_;
-
-	my ($h, @hr) = reverse _headers($url, split /\r?\n\r?\n/, $headers);
-
-	my $status = $$h{Status};
-	my $is_success = ($status >= 200 and $status < 300) ? 1 : 0;
-
-	$$h{URL} = $easy->getinfo(CURLINFO_EFFECTIVE_URL);
-
-	return $is_success, $h, \@hr;
+sub do_http {
+	if (@_ == 5) {
+		my ($multi_ev, $easy, $url, $opt, $cb) = @_;
+		my $finish = _prepare($easy, $url, $opt);
+		if ($multi_ev) {
+			$multi_ev->($easy, sub { $cb->($finish->(@_)) }, 4 * 60);
+		} else {
+			$cb->(_do_http($easy, $url, $opt));
+		}
+	} else {
+		goto &_do_http;
+	}
 }
 
 
@@ -201,14 +208,30 @@ sub _parse_headers {
 }
 
 
-sub _headers {
+sub __headers {
 	my ($url, $htext, @h) = @_;
 	my $h = _parse_headers($url, $htext);
 	if (@h) {
-		return $h, _headers($$h{location}, @h);
+		return $h, __headers($$h{location}, @h);
 	} else {
 		return $h;
 	}
 }
+
+
+sub _headers {
+	my ($easy, $url, $headers) = @_;
+
+	my ($h, @hr) = reverse __headers($url, split /\r?\n\r?\n/, $headers);
+
+	my $status = $$h{Status};
+	my $is_success = ($status >= 200 and $status < 300) ? 1 : 0;
+
+	$$h{URL} = $easy->getinfo(CURLINFO_EFFECTIVE_URL);
+
+	return $is_success, $h, \@hr;
+}
+
+
 
 1;

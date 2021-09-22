@@ -2,7 +2,7 @@
 # PODNAME: Test::Rail::Parser
 
 package Test::Rail::Parser;
-$Test::Rail::Parser::VERSION = '0.048';
+$Test::Rail::Parser::VERSION = '0.049';
 use strict;
 use warnings;
 use utf8;
@@ -73,7 +73,7 @@ sub new {
         $tropts->{'debug'},
         1,
         $tropts->{max_tries},
-        { 'skip_userdata_cache' => 1 },
+        { 'skip_usercache' => 1 },
     );
     $tropts->{'testrail'} = $tr;
     $tr->{'browser'}      = $tropts->{'browser'}
@@ -761,7 +761,7 @@ Test::Rail::Parser - Upload your TAP results to TestRail
 
 =head1 VERSION
 
-version 0.048
+version 0.049
 
 =head1 DESCRIPTION
 

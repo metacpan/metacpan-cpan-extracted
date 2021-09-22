@@ -1,6 +1,6 @@
 package Lab::Moose::Instrument::ABB_TRMC2;
 #ABSTRACT: ABB TRMC2 temperature controller
-$Lab::Moose::Instrument::ABB_TRMC2::VERSION = '3.771';
+$Lab::Moose::Instrument::ABB_TRMC2::VERSION = '3.772';
 use v5.20;
 
 use Moose;
@@ -389,7 +389,7 @@ Lab::Moose::Instrument::ABB_TRMC2 - ABB TRMC2 temperature controller
 
 =head1 VERSION
 
-version 3.771
+version 3.772
 
 =head1 SYNOPSIS
 

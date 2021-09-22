@@ -9,7 +9,6 @@ META.json
 META.yml
 Makefile.PL
 README.md
-SIGNATURE
 dist.ini
 lib/Math/GMP.pm
 t/00-compile.t

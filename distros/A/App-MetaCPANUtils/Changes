@@ -1,3 +1,8 @@
+0.005   2021-04-14  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLIs: open-metacpan-{dist,module}-page.
+
+
 0.004   2021-01-02  Released-By: PERLANCAR; Urgency: medium
 
 	- Add CLI: list-metacpan-distributions (not much filtering or fields

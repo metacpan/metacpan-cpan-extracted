@@ -5,8 +5,8 @@ use warnings;
 
 
 
-sub do_http {
-	my ($ua, $url, $opt, $cb) = @_;
+sub _do_http {
+	my ($ua, $url, $opt) = @_;
 
 	$ua->agent($$opt{agent})       if $$opt{agent};
 	$ua->timeout($$opt{timeout})   if $$opt{timeout};
@@ -129,25 +129,33 @@ sub do_http {
 			}
 		}
 		$$h{Status} = 599;
-		$cb->(0, "", $h, \@hr);
-		return;
+		return (0, "", $h, \@hr);
 	}
 
 	if ($on_body) {
-			$cb->($is_success, undef, $h, \@hr);
+			return ($is_success, undef, $h, \@hr);
 	} else {
 		my $content_encoding = $$h{'content-encoding'};
 		if ($res->content and ($$opt{compressed} or $$opt{gzip}) and $content_encoding and ($content_encoding eq 'deflate' or $content_encoding eq 'gzip')) {
 			my $inflate = Compress::Raw::Zlib::Inflate->new($content_encoding eq 'gzip' ? (-WindowBits => Compress::Raw::Zlib::WANT_GZIP()) : ());
 			my $status = $inflate->inflate($res->content, my $output);
 			$status == Compress::Raw::Zlib::Z_OK() or $status == Compress::Raw::Zlib::Z_STREAM_END() or warn "inflation failed: $status\n";
-			$cb->($is_success, $output, $h, \@hr);
+			return ($is_success, $output, $h, \@hr);
 		} else {
-			$cb->($is_success, $res->content, $h, \@hr);
+			return ($is_success, $res->content, $h, \@hr);
 		}
 	}
 }
 
+
+sub do_http {
+	my ($ua, $url, $opt, $cb) = @_;
+	if (@_ == 4) {
+		$cb->(_do_http($ua, $url, $opt));
+	} else {
+		goto &_do_http;
+	}
+}
 
 sub _headers {
 	my ($res) = @_;

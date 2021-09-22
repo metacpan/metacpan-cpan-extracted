@@ -14,6 +14,24 @@ print "Forty three";
 print "Forty two";
 print "Forty two";
 
+## name allowed duplicate string
+## parms { whitelist => '"Forty two"' }
+## failures 0
+## cut
+
+print "Forty two";
+print "Forty two";
+
+## name multiple allowed duplicate strings
+## parms { whitelist => '"Forty two" \'Forty three\'' }
+## failures 0
+## cut
+
+print "Forty two";
+print "Forty two";
+print "Forty three";
+print "Forty three";
+
 ## name Strings with different different quote.
 ## failures 1
 ## cut
@@ -36,3 +54,69 @@ my $o = foo() ? 1 : 0;
 my $two = 1 + 1 + 0;
 my $n = 42;
 print 42;
+
+## name duplicate numbers
+## failures 1
+## cut
+
+if ($a < 42) {
+  if ($b < 42) {
+    print("Hello World")
+  }
+}
+
+## name certain duplicate numbers are OK
+## parms { whitelist => '42' }
+## failures 0
+## cut
+
+if ($a < 42) {
+  if ($b < 42) {
+    print("Hello World")
+  }
+}
+
+## name without whitelist
+## failures 2
+## cut
+
+if ($a < 42) {
+  if ($b < 42) {
+    print("Hello World");
+    print("Hello World");
+  }
+}
+
+## name with whitelist
+## parms { whitelist => '42 "Hello World"' }
+## failures 0
+## cut
+
+if ($a < 42) {
+  if ($b < 42) {
+    print("Hello World");
+    print("Hello World");
+  }
+}
+
+## name whitelisting numbers also whitelist their string counterpart
+## parms { whitelist => '42' }
+## failures 0
+## cut
+
+if ($a eq "42") {
+  if ($b ne "42") {
+    print("Hello World");
+  }
+}
+
+## name whitelisting strings also whitelist their numerical counterpart
+## parms { whitelist => '"42"' }
+## failures 0
+## cut
+
+if ($a == 42) {
+  if ($b != 42) {
+    print("Hello World");
+  }
+}

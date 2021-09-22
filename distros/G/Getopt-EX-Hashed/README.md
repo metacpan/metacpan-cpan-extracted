@@ -5,7 +5,7 @@ Getopt::EX::Hashed - Hash store object automation
 
 # VERSION
 
-Version 0.9918
+Version 0.9919
 
 # SYNOPSIS
 
@@ -56,13 +56,15 @@ If array reference is given, multiple names can be declared at once.
 
     has [ 'left', 'right' ] => ( spec => "=i" );
 
+If the number of parameter is not even, first parameter is taken as
+`spec`.  So the above example can be written as this:
+
+    has [ 'left', 'right' ] => "=i";
+
 If the name start with plus (`+`), given parameters are added to
 current value.
 
     has '+left' => ( default => 1 );
-
-If the number of parameter is not even, first parameter is taken as
-`spec`.
 
 Following parameters are available.
 
@@ -74,7 +76,7 @@ Following parameters are available.
     If you want to make accessor for all following members, use
     `configure` and set `DEFAULT` parameter.
 
-        Getopt::EX::Hashed->configure( DEFAULT => is => 'rw' );
+        Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] );
 
 - **spec** => _string_
 
@@ -245,9 +247,9 @@ for common rules.
         call with `+` is not affected.
 
         Typical use of DEFAULT is `is` to prepare accessor method for all
-        following hash entries.  Declare `is => ''` to reset.
+        following hash entries.  Declare `DEFAULT => []` to reset.
 
-            Getopt::EX::Hashed->configure(is => 'ro');
+            Getopt::EX::Hashed->configure(DEFAULT => [ is => 'ro' ]);
 
 - **reset**
 

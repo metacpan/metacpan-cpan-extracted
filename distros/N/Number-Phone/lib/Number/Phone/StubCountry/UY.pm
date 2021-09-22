@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210602223301;
+our $VERSION = 1.20210921211833;
 
 my $formatters = [
                 {
@@ -81,33 +81,33 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"598433", "Canelones",
-"598445", "Treinta\ y\ Tres",
-"598472", "Paysandu",
-"59842", "San\ Carlos",
-"598477", "Artigas",
-"5984369", "Durazno",
-"5984366", "Durazno",
+$areanames{en} = {"5984361", "Durazno",
+"5984360", "Durazno",
+"598462", "Rivera",
+"598444", "Minas\/Lavalleja",
 "5984364", "Trinidad\/Flores",
+"598456", "Fray\ Bentos\/Rio\ Negro",
+"598472", "Paysandu",
+"598447", "Rocha",
+"59842", "San\ Carlos",
+"598445", "Treinta\ y\ Tres",
 "5984362", "Durazno",
 "598452", "Colonia\ del\ Scaramento",
-"5984360", "Durazno",
-"598444", "Minas\/Lavalleja",
-"598463", "Tacuarembo",
 "5984365", "Durazno",
-"598447", "Rocha",
-"598456", "Fray\ Bentos\/Rio\ Negro",
-"598473", "Salto",
-"5984361", "Durazno",
-"598434", "San\ Jose\ de\ Mayo",
-"5984367", "Durazno",
-"5982", "Montevideo",
-"598462", "Rivera",
+"598435", "Florida",
 "598453", "Mercedes\/Soriano",
-"5984363", "Durazno",
+"598473", "Salto",
+"5982", "Montevideo",
+"598477", "Artigas",
+"598433", "Canelones",
+"5984369", "Durazno",
 "5984368", "Durazno",
+"598434", "San\ Jose\ de\ Mayo",
+"598463", "Tacuarembo",
 "598464", "Melo\/Cerro\ Largo",
-"598435", "Florida",};
+"5984366", "Durazno",
+"5984363", "Durazno",
+"5984367", "Durazno",};
 
     sub new {
       my $class = shift;

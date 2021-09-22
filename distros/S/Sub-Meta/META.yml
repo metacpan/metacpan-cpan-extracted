@@ -3,7 +3,9 @@ abstract: 'handle subroutine meta information'
 author:
   - 'kfly8 <kfly@cpan.org>'
 build_requires:
+  Devel::Refcount: '0'
   Test2::V0: '0.000135'
+  Test::LeakTrace: '0'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
@@ -24,51 +26,63 @@ no_index:
     - author
     - builder
 optional_features:
-  finder-function-parameters:
-    description: finder-function-parameters
+  finder_function_parameters:
+    description: finder_function_parameters
     requires:
       Function::Parameters: '2.000003'
-  finder-sub-wrap-in-type:
-    description: finder-sub-wrap-in-type
+  finder_sub_wrap_in_type:
+    description: finder_sub_wrap_in_type
     requires:
       Sub::WrapInType: '0.04'
-      Type::Tiny: '1.012000'
 provides:
   Sub::Meta:
     file: lib/Sub/Meta.pm
-    version: '0.13'
+    version: '0.14'
   Sub::Meta::Creator:
     file: lib/Sub/Meta/Creator.pm
-    version: '0.13'
+    version: '0.14'
+  Sub::Meta::CreatorFunction:
+    file: lib/Sub/Meta/CreatorFunction.pm
+  Sub::Meta::Finder::Default:
+    file: lib/Sub/Meta/Finder/Default.pm
   Sub::Meta::Finder::FunctionParameters:
     file: lib/Sub/Meta/Finder/FunctionParameters.pm
   Sub::Meta::Finder::SubWrapInType:
     file: lib/Sub/Meta/Finder/SubWrapInType.pm
   Sub::Meta::Library:
     file: lib/Sub/Meta/Library.pm
-    version: '0.13'
+    version: '0.14'
   Sub::Meta::Param:
     file: lib/Sub/Meta/Param.pm
-    version: '0.13'
+    version: '0.14'
   Sub::Meta::Parameters:
     file: lib/Sub/Meta/Parameters.pm
-    version: '0.13'
+    version: '0.14'
   Sub::Meta::Returns:
     file: lib/Sub/Meta/Returns.pm
-    version: '0.13'
+    version: '0.14'
   Sub::Meta::Test:
     file: lib/Sub/Meta/Test.pm
+  Sub::Meta::Type:
+    file: lib/Sub/Meta/Type.pm
+  Sub::Meta::TypeSub:
+    file: lib/Sub/Meta/TypeSub.pm
+  Types::Sub:
+    file: lib/Types/Sub.pm
+    version: '0.14'
 requires:
   Carp: '0'
+  Class::Load: '0'
   Scalar::Util: '0'
   Sub::Identify: '0.14'
   Sub::Util: '1.50'
+  Type::Tiny: '1.012000'
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/kfly8/p5-Sub-Meta/issues
   homepage: https://github.com/kfly8/p5-Sub-Meta
   repository: git://github.com/kfly8/p5-Sub-Meta.git
-version: '0.13'
+version: '0.14'
 x_authority: cpan:KFLY
 x_contributors:
   - 'Kenta Kobayashi <kentafly88@gmail.com>'

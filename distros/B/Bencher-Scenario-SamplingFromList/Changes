@@ -1,3 +1,8 @@
+0.002   2021-09-18  Released-By: PERLANCAR; Urgency: medium
+
+	- Add participant: List::Util::sample().
+
+
 0.001   2019-09-15  Released-By: PERLANCAR
 
         - First release.

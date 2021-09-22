@@ -20,6 +20,7 @@ HV *report;
 
 #define fetch_from SV *from = get_sv("Test2::Plugin::Cover::FROM", 0);
 #define fetch_root SV *root = get_sv("Test2::Plugin::Cover::ROOT", 0);
+#define fetch_enabled SV *enabled = get_sv("Test2::Plugin::Cover::ENABLED", 0);
 
 void add_entry(char *fname, STRLEN fnamelen, char *sname, STRLEN snamelen) {
     fetch_report;
@@ -62,6 +63,11 @@ void add_entry(char *fname, STRLEN fnamelen, char *sname, STRLEN snamelen) {
 static OP* my_subhandler(pTHX) {
     dSP;
     OP* out = orig_subhandler(aTHX);
+
+    fetch_enabled;
+    if (!SvTRUE(enabled)) {
+        return out;
+    }
 
     if (out != NULL && (out->op_type == OP_NEXTSTATE || out->op_type == OP_DBSTATE)) {
         char *fname = CopFILE(cCOPx(out));
@@ -195,12 +201,16 @@ void _sv_file_handler(SV *filename) {
 
 static OP* my_openhandler(pTHX) {
     dSP;
-    SV **mark = PL_stack_base + TOPMARK;
-    I32 items = (I32)(sp - mark);
 
-    // Only grab for 2-arg or 3-arg form
-    if (items == 2 || items == 3) {
-        _sv_file_handler(TOPs);
+    fetch_enabled;
+    if (SvTRUE(enabled)) {
+        SV **mark = PL_stack_base + TOPMARK;
+        I32 items = (I32)(sp - mark);
+
+        // Only grab for 2-arg or 3-arg form
+        if (items == 2 || items == 3) {
+            _sv_file_handler(TOPs);
+        }
     }
 
     return orig_openhandler(aTHX);
@@ -208,12 +218,16 @@ static OP* my_openhandler(pTHX) {
 
 //static OP* my_sysopenhandler(pTHX) {
 //    dSP;
-//    SV **mark = PL_stack_base + TOPMARK;
-//    I32 ax    = (I32)(mark - PL_stack_base + 1);
-//    I32 items = (I32)(sp - mark);
 //
-//    if (items >= 2) {
-//        _sv_file_handler(PL_stack_base[ax + (1)]);
+//    fetch_enabled;
+//    if (SvTRUE(enabled)) {
+//        SV **mark = PL_stack_base + TOPMARK;
+//        I32 ax    = (I32)(mark - PL_stack_base + 1);
+//        I32 items = (I32)(sp - mark);
+//
+//        if (items >= 2) {
+//            _sv_file_handler(PL_stack_base[ax + (1)]);
+//        }
 //    }
 //
 //    return orig_sysopenhandler(aTHX);

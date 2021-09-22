@@ -1,6 +1,6 @@
 package App::ansiecho;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 use v5.14;
 use warnings;
@@ -17,32 +17,32 @@ use Data::Dumper;
 use open IO => 'utf8', ':std';
 use Pod::Usage;
 
-use Getopt::EX::Hashed;
+use Getopt::EX::Hashed; {
+    Getopt::EX::Hashed->configure(DEFAULT => [ is => 'rw' ]);
+    has debug      => "      " ;
+    has no_newline => " n !  " ;
+    has join       => " j !  " ;
+    has escape     => " e !  " , default => 1;
+    has rgb24      => "   !  " ;
+    has separate   => "   =s " , default => " ";
+    has help       => " h    " ;
+    has version    => " v    " ;
 
-has debug      => spec => "      " ;
-has no_newline => spec => " n !  " ;
-has join       => spec => " j !  " ;
-has escape     => spec => " e !  " , default => 1;
-has rgb24      => spec => "   !  " ;
-has separate   => spec => "   =s " , default => " ";
-has help       => spec => " h    " ;
-has version    => spec => " v    " ;
+    has '+help' => action => sub {
+	pod2usage
+	    -verbose  => 99,
+	    -sections => [ qw(SYNOPSIS VERSION) ];
+    };
 
-has '+help' => action => sub {
-    pod2usage
-	-verbose  => 99,
-	-sections => [ qw(SYNOPSIS VERSION) ];
-};
+    has '+version' => action => sub {
+	say "Version: $VERSION";
+	exit;
+    };
 
-has '+version' => action => sub {
-    say "Version: $VERSION";
-    exit;
-};
+    has terminate  => default => "\n";
+    has params     => default => [];
 
-has terminate  => default => "\n";
-has params     => default => [];
-
-no Getopt::EX::Hashed;
+} no Getopt::EX::Hashed;
 
 use App::ansiecho::Util;
 use Getopt::EX v1.24.1;
@@ -59,19 +59,19 @@ sub run {
     Configure qw(bundling no_getopt_compat pass_through);
     $app->getopt || pod2usage();
     $app->initialize();
-    $app->{params} = \@ARGV;
-    print join($app->{separate}, $app->retrieve()), $app->{terminate};
+    $app->params(\@ARGV);
+    print join($app->separate, $app->retrieve()), $app->terminate;
 }
 
 sub initialize {
     my $app = shift;
-    $app->{terminate} = '' if $app->{no_newline};
-    $app->{separate} = '' if $app->{join};
-    if ($app->{separate}) {
-	$app->{separate} = safe_backslash($app->{separate});
+    $app->terminate('') if $app->no_newline;
+    $app->separate('') if $app->join;
+    if ($app->separate) {
+	$app->separate(safe_backslash($app->separate));
     }
-    if (defined $app->{rgb24}) {
-	$Getopt::EX::Colormap::RGB24 = !!$app->{rgb24};
+    if (defined $app->rgb24) {
+	$Getopt::EX::Colormap::RGB24 = !!$app->rgb24;
     }
 }
 
@@ -80,7 +80,7 @@ use Getopt::EX::Colormap qw(colorize ansi_code);
 sub retrieve {
     my $app = shift;
     my $count = shift;
-    my $in = $app->{params};
+    my $in = $app->params;
     my @out;
     my @pending;
     my(@style, @effect);
@@ -148,7 +148,7 @@ sub retrieve {
 	# normal string argument
 	#
 	else {
-	    if ($app->{escape}) {
+	    if ($app->escape) {
 		$arg = safe_backslash($arg);
 	    }
 	}

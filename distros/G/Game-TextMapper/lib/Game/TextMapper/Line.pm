@@ -19,6 +19,19 @@
 
 Game::TextMapper::Line - a line between two points
 
+=head1 SYNOPSIS
+
+    use Modern::Perl;
+    use Game::TextMapper::Line::Hex;
+    use Game::TextMapper::Point::Hex;
+    my $line = Game::TextMapper::Line::Hex->new();
+    my $from = Game::TextMapper::Point::Hex->new(x => 1, y => 1, z => 0);
+    my $to   = Game::TextMapper::Point::Hex->new(x => 5, y => 3, z => 0);
+    $line->points([$from, $to]);
+    my @line = $line->compute_missing_points;
+    say join(" ", map { $_->str } @line);
+    # (1,1,0) (2,1,0) (3,2,0) (4,2,0) (5,3,0)
+
 =head1 DESCRIPTION
 
 The line connects two points. This class knows how to compute all the regions
@@ -28,12 +41,6 @@ to output SVG.
 In order to do this, the class needs to know how to work with the regions on the
 map. This is different for hexes and squares. Therefore you should always be
 using the appropriate Hex or Square class instead.
-
-=head1 SEE ALSO
-
-L<Game::TextMapper::Point>
-L<Game::TextMapper::Line::Hex>
-L<Game::TextMapper::Line::Square>
 
 =cut
 
@@ -45,12 +52,31 @@ use Mojo::Base -base;
 
 our $debug;
 
+=head1 ATTRIBUTES
+
+=head2 points
+
+An array reference of points using a class derived from
+L<Game::TextMapper::Point>, i.e. L<Game::TextMapper::Line::Hex> uses
+L<Game::TextMapper::Point::Hex> and L<Game::TextMapper::Line::Square> uses
+L<Game::TextMapper::Point::Square>.
+
+=cut
+
 has 'id';
 has 'points';
 has 'offset';
 has 'type';
 has 'label';
 has 'map';
+
+=head1 METHODS
+
+=head2 compute_missing_points
+
+Compute the missing points between the points in C<points> and return it.
+
+=cut
 
 sub compute_missing_points {
   my $self = shift;
@@ -76,6 +102,12 @@ sub partway {
   return $x1 + ($x2 - $x1) * $q, $y1 + ($y2 - $y1) * $q if wantarray;
   return sprintf("%.1f,%.1f", $x1 + ($x2 - $x1) * $q, $y1 + ($y2 - $y1) * $q);
 }
+
+=head2 svg($offset)
+
+This returns an SVG fragment, a string with a C<path>.
+
+=cut
 
 sub svg {
   my ($self, $offset) = @_;
@@ -132,6 +164,13 @@ sub svg {
   return $data;
 }
 
+=head2 svg_label
+
+This returns an SVG fragment, a group C<g> with C<text> and a C<textPath>
+element.
+
+=cut
+
 sub svg_label {
   my ($self) = @_;
   return '' unless defined $self->label;
@@ -187,5 +226,14 @@ sub circle {
     . "x='$x' y='$y'>$i</text>" if $i;
   return "$data\n";
 }
+
+=head1 SEE ALSO
+
+Lines consist of L<Game::TextMapper::Point> instances.
+
+Use either L<Game::TextMapper::Line::Hex> or L<Game::TextMapper::Line::Square>
+to implement lines.
+
+=cut
 
 1;

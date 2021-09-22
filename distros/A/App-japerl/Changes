@@ -1,5 +1,9 @@
 Revision history for this software.
 
+0.14 2021-09-19 00:00:00
+  - finds mb.pm from $ENV{'PERL_LOCAL_LIB_ROOT'}, $FindBin::Bin, and "$FindBin::Bin/lib" then from @INC
+  - created by INABA Hitoshi
+
 0.13 2021-02-18 00:00:00
   - born again using mb.pm modulino
   - created by INABA Hitoshi

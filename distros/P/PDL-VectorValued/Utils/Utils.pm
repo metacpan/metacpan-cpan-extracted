@@ -4,7 +4,7 @@
 #
 package PDL::VectorValued::Utils;
 
-@EXPORT_OK  = qw( PDL::PP rlevec PDL::PP rldvec PDL::PP enumvec PDL::PP enumvecg PDL::PP rleseq PDL::PP rldseq PDL::PP vsearchvec PDL::PP cmpvec PDL::PP vv_qsortvec PDL::PP vv_qsortveci PDL::PP vv_union PDL::PP vv_intersect PDL::PP vv_setdiff PDL::PP v_union PDL::PP v_intersect PDL::PP v_setdiff PDL::PP vv_vcos );
+@EXPORT_OK  = qw( PDL::PP rlevec PDL::PP rldvec PDL::PP enumvec PDL::PP enumvecg PDL::PP rleseq PDL::PP rldseq PDL::PP vsearchvec PDL::PP cmpvec vv_qsortvec vv_qsortveci PDL::PP vv_union PDL::PP vv_intersect PDL::PP vv_setdiff PDL::PP v_union PDL::PP v_intersect PDL::PP v_setdiff PDL::PP vv_vcos );
 %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
@@ -13,7 +13,7 @@ use DynaLoader;
 
 
 
-   $PDL::VectorValued::Utils::VERSION = 1.0.10;
+   $PDL::VectorValued::Utils::VERSION = 1.0.13;
    @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::VectorValued::Utils $VERSION;
@@ -366,13 +366,10 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =head1 Vector-Valued Sorting and Comparison
 
 The following functions are provided for lexicographic sorting of
-vectors, rsp. axis indices.   Note that vv_qsortvec() is functionally
-identical to the builtin PDL function qsortvec(), but also that
-the latter is broken in the stock PDL-2.4.3 distribution.  The version
-included here includes Chris Marshall's "uniqsortvec" patch, which
-is available here:
-
- http://sourceforge.net/tracker/index.php?func=detail&aid=1548824&group_id=612&atid=300612
+vectors, rsp. axis indices.   As of PDL::VectorValued v1.0.12, vv_qsortvec() and
+vv_qsortveci() are just deprecated aliases for the builtin PDL functions of the same names.
+Older versions of this module used a dedicated implementation as a workaround
+for a bug in PDL-2.4.3, which has long since been fixed.
 
 =cut
 
@@ -410,7 +407,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
-
 =head2 vv_qsortvec
 
 =for sig
@@ -420,27 +416,8 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 =for ref
 
-Drop-in replacement for qsortvec(),
-which is broken in the stock PDL-2.4.3 release.
-See PDL::Ufunc::qsortvec.
-
-
-=for bad
-
-Vectors with bad components should be moved to the end of the array.
-
-
-=cut
-
-
-
-
-
-
-*vv_qsortvec = \&PDL::vv_qsortvec;
-
-
-
+Deprecated alias for L<PDL::Ufunc::qsortvec()|PDL::Ufunc/qsortvec>,
+which see for details.
 
 
 =head2 vv_qsortveci
@@ -449,25 +426,17 @@ Vectors with bad components should be moved to the end of the array.
 
   Signature: (a(n,m); indx [o]ix(m))
 
-
 =for ref
 
-Get lexicographic sort order of a matrix $a() viewed as a list of vectors.
-
-
-=for bad
-
-Vectors with bad components should be treated as last in  the lexicographic order.
-
+Deprecated alias for L<PDL::Ufunc::qsortveci()|PDL::Ufunc/qsortveci>,
+which see for details.
 
 =cut
 
-
-
-
-
-
-*vv_qsortveci = \&PDL::vv_qsortveci;
+BEGIN {
+  *vv_qsortvec = *PDL::vv_qsortvec = *PDL::qsortvec;
+  *vv_qsortveci = *PDL::vv_qsortveci = *PDL::qsortveci;
+}
 
 
 
@@ -865,12 +834,6 @@ PDL by Karl Glazebrook, Tuomas J. Lukka, Christian Soeller, and others.
 Code for rlevec() and rldvec() derived from the PDL builtin functions
 rle() and rld() in $PDL_SRC_ROOT/Basic/Slices/slices.pd
 
-=item *
-
-Code for vv_qsortvec() copied nearly verbatim from the builtin PDL functions
-in $PDL_SRC_ROOT/Basic/Ufunc/ufunc.pd, with Chris Marshall's "uniqsortvec" patch.
-Code for vv_qsortveci() based on the same.
-
 =back
 
 =cut
@@ -911,7 +874,7 @@ the file.
 
 =item *
 
-All other parts copyright (c) 2007-2015, Bryan Jurish.  All rights reserved.
+All other parts copyright (c) 2007-2021, Bryan Jurish.  All rights reserved.
 
 This package is free software, and entirely without warranty.
 You may redistribute it and/or modify it under the same terms

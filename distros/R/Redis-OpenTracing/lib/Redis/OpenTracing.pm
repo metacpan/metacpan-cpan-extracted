@@ -5,31 +5,21 @@ use warnings;
 
 use syntax 'maybe';
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v0.1.1';
 
 use Moo;
 use Types::Standard qw/Maybe Object Str is_Str/;
 
-use Redis;
 use OpenTracing::AutoScope;
 use Scalar::Util 'blessed';
 
 
 
 has 'redis' => (
-    is => 'lazy',
+    is => 'ro',
     isa => Object, # beyond current scope to detect if it is a Redis like client
+    required => 1,
 );
-
-# _build_redis()
-#
-# returns a (auto-connected) Redis instance. We may opt for Redis::Fast instead,
-# but will leave that for a later iteration. It is always possible to
-# instantiate any client and inject it into the constructor.
-#
-sub _build_redis {
-    Redis->new
-}
 
 
 

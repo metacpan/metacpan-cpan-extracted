@@ -4,7 +4,7 @@ package Mail::AuthenticationResults::Header::Comment;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '2.20210914'; # VERSION
+our $VERSION = '2.20210915'; # VERSION
 use Scalar::Util qw{ weaken };
 use Carp;
 
@@ -88,7 +88,7 @@ Mail::AuthenticationResults::Header::Comment - Class modelling Comment parts of 
 
 =head1 VERSION
 
-version 2.20210914
+version 2.20210915
 
 =head1 DESCRIPTION
 

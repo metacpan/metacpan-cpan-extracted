@@ -5,16 +5,23 @@ use warnings;
 use Moo;
 use Carp qw(croak);
 use Scalar::Util qw(blessed);
+use Types::Standard qw(HashRef);
 
 use Form::Tiny::FieldDefinition;
 
 use namespace::clean;
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 has "data" => (
 	is => "ro",
 	required => 1,
+);
+
+has 'addons' => (
+	is => 'ro',
+	isa => HashRef,
+	default => sub { {} },
 );
 
 sub build
@@ -32,16 +39,21 @@ sub build
 
 	return $self if $dynamic;
 
+	my $definition;
 	if (defined blessed $data && $data->isa('Form::Tiny::FieldDefinition')) {
-		return $data;
+		$definition = $data;
 	}
 	elsif (ref $data eq 'HASH') {
-		return Form::Tiny::FieldDefinition->new($data);
+		$definition = Form::Tiny::FieldDefinition->new($data);
 	}
 	else {
 		croak sprintf 'Invalid form field "%s" data: must be hashref or instance of Form::Tiny::FieldDefinition',
 			$self->name;
 	}
+
+	$definition->addons($self->addons);
+
+	return $definition;
 }
 
 1;

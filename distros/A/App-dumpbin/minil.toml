@@ -1,0 +1,13 @@
+name = "App-dumpbin"
+badges = ["github-actions/windows", "github-actions/linux", "github-actions/macos", "metacpan"]
+
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+
+authority="cpan:SANKO"
+license="artistic_2"
+
+[release]
+hook=[
+    'tidyall -a'
+]

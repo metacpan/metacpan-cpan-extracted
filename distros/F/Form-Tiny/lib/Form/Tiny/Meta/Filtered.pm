@@ -4,12 +4,13 @@ use v5.10;
 use warnings;
 use Types::Standard qw(ArrayRef InstanceOf);
 use Scalar::Util qw(blessed);
+use Carp qw(carp);
 
 use Form::Tiny::Hook;
 use Form::Tiny::Filter;
 use Moo::Role;
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 requires qw(setup);
 
@@ -43,10 +44,20 @@ sub add_field_filter
 {
 	my ($self, $field, $filter, $code) = @_;
 
-	if (defined blessed $field && $field->isa('Form::Tiny::Filter')) {
-		push @{$self->filters}, $field;
+	if (defined blessed $field) {
+		if ($field->isa('Form::Tiny::Filter')) {
+			carp 'passing field filter as a sole argument without context for field_filter is deprecated';
+			push @{$self->filters}, $field;
+		}
+		elsif ($field->isa('Form::Tiny::FieldDefinition') || $field->isa('Form::Tiny::FieldDefinitionBuilder')) {
+			push @{$field->addons->{filters}}, Form::Tiny::Filter->new(
+				type => $filter,
+				code => $code
+			);
+		}
 	}
 	else {
+		carp 'passing context explicitly for field_filter is deprecated';
 		push @{$self->filters}, Form::Tiny::Filter->new(
 			field => $field,
 			type => $filter,
@@ -65,6 +76,10 @@ sub _apply_filters
 	for my $filter (@{$self->filters}) {
 		$value = $filter->filter($value)
 			if $filter->check_field($name);
+	}
+
+	for my $filter (@{$def->addons->{filters}}) {
+		$value = $filter->filter($value);
 	}
 
 	return $value;

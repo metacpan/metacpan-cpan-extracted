@@ -1,9 +1,13 @@
 Revision history for Perl extension Getopt-EX-Hashed
 
+0.9919 2021-09-17T06:52:33Z
+
+    - Define accessor method only once.
+
 0.9918 2021-09-12T03:01:33Z
 
     - Unlock keys of config hash just in case.
-    - Support odd-number parameter for shuot-cut for option spec.
+    - Support odd-number parameter for short-cut for option spec.
 
 0.9917 2021-08-24T13:56:53Z
 

@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,139 +20,6 @@ name: Benchmark-Perl-Formance
 no_index:
   directory:
     - inc
-provides:
-  Benchmark::Perl::Formance:
-    file: lib/Benchmark/Perl/Formance.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::AccessorsArray:
-    file: lib/Benchmark/Perl/Formance/Plugin/AccessorsArray.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::AccessorsClassAccessor:
-    file: lib/Benchmark/Perl/Formance/Plugin/AccessorsClassAccessor.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::AccessorsClassAccessorFast:
-    file: lib/Benchmark/Perl/Formance/Plugin/AccessorsClassAccessorFast.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::AccessorsClassMethodMaker:
-    file: lib/Benchmark/Perl/Formance/Plugin/AccessorsClassMethodMaker.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::AccessorsClassXSAccessor:
-    file: lib/Benchmark/Perl/Formance/Plugin/AccessorsClassXSAccessor.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::AccessorsClassXSAccessorArray:
-    file: lib/Benchmark/Perl/Formance/Plugin/AccessorsClassXSAccessorArray.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::AccessorsHash:
-    file: lib/Benchmark/Perl/Formance/Plugin/AccessorsHash.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::AccessorsMoo:
-    file: lib/Benchmark/Perl/Formance/Plugin/AccessorsMoo.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::AccessorsMoose:
-    file: lib/Benchmark/Perl/Formance/Plugin/AccessorsMoose.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::AccessorsMouse:
-    file: lib/Benchmark/Perl/Formance/Plugin/AccessorsMouse.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::AccessorsObjectTinyRW:
-    file: lib/Benchmark/Perl/Formance/Plugin/AccessorsObjectTinyRW.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::DPath:
-    file: lib/Benchmark/Perl/Formance/Plugin/DPath.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::Fib:
-    file: lib/Benchmark/Perl/Formance/Plugin/Fib.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::FibMXDeclare:
-    file: lib/Benchmark/Perl/Formance/Plugin/FibMXDeclare.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::FibMoose:
-    file: lib/Benchmark/Perl/Formance/Plugin/FibMoose.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::FibMouse:
-    file: lib/Benchmark/Perl/Formance/Plugin/FibMouse.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::FibOO:
-    file: lib/Benchmark/Perl/Formance/Plugin/FibOO.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::FibOOSig:
-    file: lib/Benchmark/Perl/Formance/Plugin/FibOOSig.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::Incubator:
-    file: lib/Benchmark/Perl/Formance/Plugin/Incubator.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::MatrixReal:
-    file: lib/Benchmark/Perl/Formance/Plugin/MatrixReal.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::Mem:
-    file: lib/Benchmark/Perl/Formance/Plugin/Mem.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::P6STD:
-    file: lib/Benchmark/Perl/Formance/Plugin/P6STD.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::PerlCritic:
-    file: lib/Benchmark/Perl/Formance/Plugin/PerlCritic.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::Prime:
-    file: lib/Benchmark/Perl/Formance/Plugin/Prime.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::RegexpCommonTS:
-    file: lib/Benchmark/Perl/Formance/Plugin/RegexpCommonTS.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::Rx:
-    file: lib/Benchmark/Perl/Formance/Plugin/Rx.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::RxCmp:
-    file: lib/Benchmark/Perl/Formance/Plugin/RxCmp.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::RxMicro:
-    file: lib/Benchmark/Perl/Formance/Plugin/RxMicro.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::Shootout:
-    file: lib/Benchmark/Perl/Formance/Plugin/Shootout.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::Shootout::binarytrees:
-    file: lib/Benchmark/Perl/Formance/Plugin/Shootout/binarytrees.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::Shootout::fannkuch:
-    file: lib/Benchmark/Perl/Formance/Plugin/Shootout/fannkuch.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::Shootout::fasta:
-    file: lib/Benchmark/Perl/Formance/Plugin/Shootout/fasta.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::Shootout::knucleotide:
-    file: lib/Benchmark/Perl/Formance/Plugin/Shootout/knucleotide.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::Shootout::mandelbrot:
-    file: lib/Benchmark/Perl/Formance/Plugin/Shootout/mandelbrot.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::Shootout::nbody:
-    file: lib/Benchmark/Perl/Formance/Plugin/Shootout/nbody.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::Shootout::pidigits:
-    file: lib/Benchmark/Perl/Formance/Plugin/Shootout/pidigits.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::Shootout::regexdna:
-    file: lib/Benchmark/Perl/Formance/Plugin/Shootout/regexdna.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::Shootout::revcomp:
-    file: lib/Benchmark/Perl/Formance/Plugin/Shootout/revcomp.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::Shootout::spectralnorm:
-    file: lib/Benchmark/Perl/Formance/Plugin/Shootout/spectralnorm.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::Skeleton:
-    file: lib/Benchmark/Perl/Formance/Plugin/Skeleton.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::SpamAssassin:
-    file: lib/Benchmark/Perl/Formance/Plugin/SpamAssassin.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::Threads:
-    file: lib/Benchmark/Perl/Formance/Plugin/Threads.pm
-    version: '0.53'
-  Benchmark::Perl::Formance::Plugin::ThreadsShared:
-    file: lib/Benchmark/Perl/Formance/Plugin/ThreadsShared.pm
-    version: '0.53'
 recommends:
   BenchmarkAnything::Storage::Frontend::Lib: '0'
   Clone: '0'
@@ -170,16 +37,18 @@ requires:
   List::Util: '0'
   Math::MatrixReal: '0'
   Math::Primality: '0'
+  Module::Pluggable: '0'
+  Module::Runtime: '0'
   Sys::Hostname: '0'
   Sys::Info: '0'
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Benchmark-Perl-Formance
   homepage: http://metacpan.org/release/Benchmark-Perl-Formance
   repository: git://github.com/renormalist/Benchmark-Perl-Formance.git
-version: '0.53'
+version: '0.55'
 x_Dist_Zilla:
   perl:
-    version: '5.022001'
+    version: '5.022000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GatherDir
@@ -193,90 +62,74 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@Filter/@Basic/GatherDir'
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Filter/@Basic/PruneCruft'
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Filter/@Basic/ManifestSkip'
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Filter/@Basic/MetaYAML'
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Filter/@Basic/License'
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@Filter/@Basic/Readme'
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Filter/@Basic/ExtraTests'
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Filter/@Basic/ExecDir'
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Filter/@Basic/ShareDir'
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Filter/@Basic/MakeMaker'
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Filter/@Basic/Manifest'
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Filter/@Basic/TestRelease'
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Filter/@Basic/ConfirmRelease'
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Filter/MetaConfig'
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Filter/MetaJSON'
-      version: '5.043'
-    -
-      class: Dist::Zilla::Plugin::MetaProvides::Package
-      config:
-        Dist::Zilla::Plugin::MetaProvides::Package:
-          finder_objects:
-            -
-              class: Dist::Zilla::Plugin::FinderCode
-              name: '@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '5.043'
-        Dist::Zilla::Role::MetaProvider::Provider:
-          Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.001011'
-          inherit_missing: '1'
-          inherit_version: '1'
-          meta_noindex: '1'
-      name: '@Filter/MetaProvides::Package'
-      version: '2.003001'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@Filter/PkgVersion'
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Filter/PodSyntaxTests'
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
@@ -298,7 +151,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@Filter/MetaResources'
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::Authority
       name: '@Filter/Authority'
@@ -394,7 +247,7 @@ x_Dist_Zilla:
               name: '@SCHWIGON/SingleEncoding'
               version: '4.012'
       name: '@Filter/PodWeaver'
-      version: '4.006'
+      version: '4.008'
     -
       class: Dist::Zilla::Plugin::Git::Describe
       name: '@Filter/Git::Describe'
@@ -406,7 +259,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@Filter/NextRelease'
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
@@ -465,7 +318,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.53
+          tag: v0.55
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -488,11 +341,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: UploadToCPAN
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: ManifestSkip
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -500,7 +353,7 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -508,7 +361,7 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: TestRequires
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -516,7 +369,7 @@ x_Dist_Zilla:
           phase: runtime
           type: recommends
       name: RuntimeRecommends
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::AssertOS
       name: AssertOS
@@ -524,50 +377,49 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '5.043'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '5.043'
-    -
-      class: Dist::Zilla::Plugin::FinderCode
-      name: '@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '5.043'
+      version: '6.015'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '5.043'
+    version: '6.015'
 x_authority: cpan:SCHWIGON
+x_generated_by_perl: v5.22.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

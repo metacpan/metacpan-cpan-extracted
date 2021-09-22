@@ -10,11 +10,11 @@ package PDF::API2::Basic::PDF::File;
 
 use strict;
 
-our $VERSION = '2.041'; # VERSION
+our $VERSION = '2.042'; # VERSION
 
 =head1 NAME
 
-PDF::API2::Basic::PDF::File - Holds the trailers and cross-reference tables for a PDF file
+PDF::API2::Basic::PDF::File - Low-level PDF file access
 
 =head1 SYNOPSIS
 
@@ -240,8 +240,8 @@ sub open {
     binmode $fh, ':raw';
     $fh->seek(0, 0);            # go to start of file
     $fh->read($buffer, 255);
-    unless ($buffer =~ m/^\%PDF\-([12]\.\d)+\s*$cr/mo) {
-        die "$filename not a PDF file version 1.x";
+    unless ($buffer =~ /^\%PDF\-([12]\.\d+)\s*$cr/m) {
+        croak "$filename does not appear to be a valid PDF";
     }
     $self->{' version'} = $1;
 
@@ -264,6 +264,88 @@ sub open {
         $self->{$key} = $tdict->{$key};
     }
     return $self;
+}
+
+=head2 $p->version($version)
+
+Gets/sets the PDF version (e.g. 1.4)
+
+=cut
+
+sub version {
+    my $self = shift();
+
+    if (@_) {
+        my $version = shift();
+        croak "Invalid version $version" unless $version =~ /^([12]\.[0-9]+)$/;
+        $self->header_version($version);
+        if ($version >= 1.4) {
+            $self->trailer_version($version);
+        }
+        else {
+            delete $self->{'Root'}->{'Version'};
+            $self->out_obj($self->{'Root'});
+        }
+        return $version;
+    }
+
+    my $header_version = $self->header_version();
+    my $trailer_version = $self->trailer_version();
+    return $trailer_version if $trailer_version > $header_version;
+    return $header_version;
+}
+
+=head2 $version = $p->header_version($version)
+
+Gets/sets the PDF version stored in the file header.
+
+=cut
+
+sub header_version {
+    my $self = shift();
+
+    if (@_) {
+        my $version = shift();
+        croak "Invalid version $version" unless $version =~ /^([12]\.[0-9]+)$/;
+        $self->{' version'} = $version;
+    }
+
+    return $self->{' version'};
+}
+
+=head2 $version = $p->trailer_version($version)
+
+Gets/sets the PDF version stored in the document catalog.
+
+=cut
+
+sub trailer_version {
+    my $self = shift();
+
+    if (@_) {
+        my $version = shift();
+        croak "Invalid version $version" unless $version =~ /^([12]\.[0-9]+)$/;
+        $self->{'Root'}->{'Version'} = PDFName($version);
+        $self->out_obj($self->{'Root'});
+        return $version;
+    }
+
+    return unless $self->{'Root'}->{'Version'};
+    $self->{'Root'}->{'Version'}->realise();
+    return $self->{'Root'}->{'Version'}->val();
+}
+
+=head2 $prev_version = $p->require_version($version)
+
+Ensures that the PDF version is at least C<$version>.
+
+=cut
+
+sub require_version {
+    my ($self, $min_version) = @_;
+    my $current_version = $self->version();
+    $self->version($min_version) if $current_version < $min_version;
+    return $current_version;
 }
 
 =head2 $p->release()
@@ -397,7 +479,7 @@ sub create_file {
     }
 
     $self->{' OUTFILE'} = $fh;
-    $fh->print('%PDF-' . ($self->{' version'} || '1.2') . "\n");
+    $fh->print('%PDF-' . ($self->{' version'} // '1.4') . "\n");
     $fh->print("%\xC6\xCD\xCD\xB5\n");   # and some binary stuff in a comment
     return $self;
 }

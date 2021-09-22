@@ -6,7 +6,7 @@ use Encode qw(decode_utf8);
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '1.012';
+our $VERSION = '1.014';
 
 extends qw(
     Locale::Utils::Autotranslator
@@ -35,7 +35,18 @@ sub translate_text {
         $msgstr .= $_;
         redo LOOP;
     }
-    chomp $msgstr;
+
+    # normally newline count of msgid and msgstr is equal
+    my $newline_count_msgid  = () = $msgid  =~ m{ \x{A} }xmsg;
+    my $newline_count_msgstr = () = $msgstr =~ m{ \x{A} }xmsg;
+    if ($newline_count_msgstr > $newline_count_msgid) {
+        chomp $msgstr;
+    }
+
+    # newlines should be equal to msgid
+    my ($newline) = $msgid =~ m{ (\r? \n) }xms;
+    $newline ||= "\n";
+    $msgstr =~ s{\r? \n}{$newline}xmsg;
 
     return decode_utf8($msgstr);
 }
@@ -52,7 +63,7 @@ Locale::Utils::Autotranslator::Interactive - Interface for manual translation wi
 
 =head1 VERSION
 
-1.012
+1.014
 
 =head1 SYNOPSIS
 
@@ -83,8 +94,13 @@ Locale::Utils::Autotranslator::Interactive - Interface for manual translation wi
 
 Interface for translation by terminal input
 
-Type __END__ to stop the translation.
+Type <ctrl> D to send an EOF. That means end of current translation.
+
+Type __END__ to stop the translation completely.
 Otherwise the file is stored back after all translations for that file are done.
+You lost all translations by canceling the program before it writes back the file.
+
+Newlines of msgid are equal to msgid and not equal to operating system.
 
 =head1 SUBROUTINES/METHODS
 

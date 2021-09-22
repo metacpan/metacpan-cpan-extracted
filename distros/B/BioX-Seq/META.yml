@@ -1,15 +1,16 @@
 ---
 abstract: 'a (very) basic biological sequence object'
 author:
-  - 'Jeremy Volkening <jdv@base2bio.com>'
+  - 'Jeremy Volkening <volkening@cpan.org>'
 build_requires:
-  File::Which: '0'
+  Compress::BGZF: '0'
+  IPC::Cmd: '0'
   Test::Exception: '0'
   Test::More: '0'
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,7 +19,7 @@ name: BioX-Seq
 provides:
   BioX::Seq:
     file: lib/BioX/Seq.pm
-    version: '0.007003'
+    version: '0.008002'
   BioX::Seq::Fetch:
     file: lib/BioX/Seq/Fetch.pm
   BioX::Seq::Stream:
@@ -32,14 +33,13 @@ provides:
   BioX::Seq::Utils:
     file: lib/BioX/Seq/Utils.pm
 requires:
-  Compress::BGZF: '0'
   Cwd: '0'
   File::Basename: '0'
-  File::Which: '0'
+  IPC::Cmd: '0'
   POSIX: '0'
   Scalar::Util: '0'
 resources:
   license: http://www.gnu.org/licenses/gpl-3.0.txt
   repository: https://github.com/jvolkening/p5-BioX-Seq
-version: '0.007003'
+version: '0.008002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

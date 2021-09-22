@@ -1,5 +1,9 @@
 Revision history for Tk-Markdown
 
+0.06    2021-09-18
+        Added Github repo
+        Cosmetic changes to POD and code only, no functional changes
+
 0.05    2014-01-09/16:20
         Updated dependencies in Makefile.PL
 

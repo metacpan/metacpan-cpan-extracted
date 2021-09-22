@@ -54,7 +54,7 @@ use SNMP::Info::DocsisHE;
 
 our ($VERSION, %GLOBALS, %FUNCS, %MIBS, %MUNGE);
 
-$VERSION = '3.78';
+$VERSION = '3.80';
 
 %MIBS = (
     %SNMP::Info::MIBS,

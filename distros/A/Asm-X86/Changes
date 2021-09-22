@@ -1,13 +1,36 @@
 Revision history for Asm-X86
 
-2021-06-19	Bogdan Drozdowski <bogdro@cpan.org>
+2021-09-19	Bogdan Drozdowski <bogdro \at\ cpan . org>
+
+	* Version 0.62
+	* Changes, Makefile.PL, META.*, MYMETA.*: Fix the e-mail addresses.
+	* lib/Asm/X86.pm (conv_intel_addr_to_att): remove unnecessary
+	  variables, change regexes to variables and qr// for better
+	  readability and reduced code duplication.
+	* lib/Asm/X86.pm (_change_to_intel_addr_if_applicable): a new private
+	  subroutine to convert an applicable expression to an intel memory
+	  reference.
+	* lib/Asm/X86.pm (conv_att_instr_to_intel): call the new subroutine
+	  _change_to_intel_addr_if_applicable to simplify, remove duplicated
+	  code, change regexes to variables and qr// for better readability
+	  and reduced duplication.
+	* lib/Asm/X86.pm (_remove_size_qualifiers_add_dollar): a new private
+	  subroutine to remove any size qualifiers and leading or trailing
+	  whitespace from the parameter, prefixing it with a dollar-sign when
+	  necessary.
+	* lib/Asm/X86.pm (conv_intel_instr_to_att): call the new subroutine
+	  _remove_size_qualifiers_add_dollar to simplify and remove
+	  duplicated code, change regexes to variables and qr// for better
+	  readability and reduced duplication.
+
+2021-06-19	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.61
 	  Fixed compatibility issues.
 	* Makefile.PL: corrected hash keys and values to be strings
 	* t/zz_regs_{att,intel}.t: fix passing parameters and hash usage
 
-2021-06-16	Bogdan Drozdowski <bogdro@cpan.org>
+2021-06-16	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.60
 	  Fixed compatibility issues. Significant code simplification in the
@@ -39,7 +62,7 @@ Revision history for Asm-X86
 	* t/zz_{addr_att,addr_intel,conv,duplicates,regs_att,regs_intel}.t:
 	  added prototypes to subroutines and fixed the tests where necessary
 
-2021-06-05	Bogdan Drozdowski <bogdro@cpan.org>
+2021-06-05	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.50
 	  Fixed some defects found by comparing new test results and GNU as
@@ -81,7 +104,7 @@ Revision history for Asm-X86
 	* t/zz_regs_mixed.t: merged into zz_regs_att.t and zz_regs_intel.t and
 	  deleted the file
 
-2021-05-09	Bogdan Drozdowski <bogdro@cpan.org>
+2021-05-09	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.40
 	  Fixed many defects revealed by new unit tests. 100% code is now
@@ -112,14 +135,14 @@ Revision history for Asm-X86
 	* t/*.t: many more unit tests, much more complex and covering 100%
 	* README: updated the links and copyright
 
-2020-07-19	Bogdan Drozdowski <bogdro@cpan.org>
+2020-07-19	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.33
 	* X86.pm: Updated the instruction list from NASM version 2.15.03.
 	* Makefile.PL: added the minimum Perl version of '5.006' (arbitrarily
 	  chosen based on the version of the Exporter module on my system)
 
-2020-05-20	Bogdan Drozdowski <bogdro@cpan.org>
+2020-05-20	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.32
 	  Fix some build/distribution errors in the previous version (README,
@@ -129,27 +152,27 @@ Revision history for Asm-X86
 	  Added a parameter to sign the package.
 	* CONTRIBUTING: added, for metacpan.
 
-2020-05-13	Bogdan Drozdowski <bogdro@cpan.org>
+2020-05-13	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.31
 	* X86.pm: Updated the instruction list from FASM version 1.73.24.
 
-2019-12-23	Bogdan Drozdowski <bogdro@cpan.org>
+2019-12-23	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.30
 	* X86.pm: Updated the instruction list from FASM version 1.73.21.
 
-2019-11-24	Bogdan Drozdowski <bogdro@cpan.org>
+2019-11-24	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.29
 	* X86.pm: Updated the instruction list from FASM version 1.73.18.
 
-2019-08-16	Bogdan Drozdowski <bogdro@cpan.org>
+2019-08-16	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.28
 	* X86.pm: Updated the instruction list from FASM version 1.73.16.
 
-2019-01-03	Bogdan Drozdowski <bogdro@cpan.org>
+2019-01-03	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.27
 	* Makefile.PL: remove hard-coded INSTALLDIRS, allowing it to be set
@@ -157,7 +180,7 @@ Revision history for Asm-X86
 	* X86.pm: Updated copyright inside the module.
 	* README: updated copyright inside the file.
 
-2018-11-18	Bogdan Drozdowski <bogdro@cpan.org>
+2018-11-18	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.26
 	* X86.pm: Updated the register and instruction list from NASM version
@@ -165,14 +188,14 @@ Revision history for Asm-X86
 	* README: updated copyright inside the file.
 	* Makefile.PL: fixed some rpmlint errors.
 
-2017-05-06	Bogdan Drozdowski <bogdro@cpan.org>
+2017-05-06	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.25
 	* X86.pm: Updated the register and instruction list from NASM version
 	  2.13.01. Updated copyright inside the module.
 	* README: updated copyright inside the file.
 
-2016-03-22	Bogdan Drozdowski <bogdro@cpan.org>
+2016-03-22	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.24
 	* X86.pm: Updated the register and instruction list from FASM version
@@ -180,25 +203,25 @@ Revision history for Asm-X86
 	  module.
 	* README: updated copyright inside the file, quoted module names.
 
-2015-11-01	Bogdan Drozdowski <bogdro@cpan.org>
+2015-11-01	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.23
 	* X86.pm: Updated the register and instruction list from FASM version
 	  1.71.46. Updated copyright inside the module.
 
-2014-11-15	Bogdan Drozdowski <bogdro@cpan.org>
+2014-11-15	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.22
 	* X86.pm: Updated the register and instruction list from NASM version
 	  2.11.06.
 
-2014-03-01	Bogdan Drozdowski <bogdro@cpan.org>
+2014-03-01	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.21
 	* X86.pm: Updated the register and instruction list from NASM version
 	  2.11.02.
 
-2014-01-11	Bogdan Drozdowski <bogdro@cpan.org>
+2014-01-11	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.20
 	* X86.pm: Updated the register and instruction list from NASM version
@@ -206,22 +229,22 @@ Revision history for Asm-X86
 	  (K[0-7]) registers. Added subroutines to check for opmask registers.
 	  Upgraded tests.
 
-2013-12-07	Bogdan Drozdowski <bogdro@cpan.org>
+2013-12-07	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.16
 	* X86.pm: Updated the register list with YMM registers.
 
-2012-09-16	Bogdan Drozdowski <bogdro@cpan.org>
+2012-09-16	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.15
 	* X86.pm: Updated the instruction list from NASM version 2.10.05.
 
-2012-07-21	Bogdan Drozdowski <bogdro@cpan.org>
+2012-07-21	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.14
 	* X86.pm: Updated the instruction list from NASM version 2.10.02.
 
-2012-03-31	Bogdan Drozdowski <bogdro@cpan.org>
+2012-03-31	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.13
 	* X86.pm: Updated the instruction list from NASM version 2.10 and
@@ -234,7 +257,7 @@ Revision history for Asm-X86
 	* X86.pm (conv_intel_addr_to_att): removing double percent character
 	  that may be created during the conversion.
 
-2012-01-22	Bogdan Drozdowski <bogdro@cpan.org>
+2012-01-22	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.12
 	* X86.pm: Removed duplicates from the instruction and mnemonic list.
@@ -247,48 +270,48 @@ Revision history for Asm-X86
 	* zz_duplicates.t: a new test to detect duplicate entries in all the
 	  arrays exported by the module.
 
-2011-12-30	Bogdan Drozdowski <bogdro@cpan.org>
+2011-12-30	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.11:
 	  Updated the instruction and mnemonic list from FASM version 1.69.35.
 
-2010-09-08	Bogdan Drozdowski <bogdro@cpan.org>
+2010-09-08	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.10:
 	  Updated the instruction list from NASM version 2.09.01.
 
-2010-04-18	Bogdan Drozdowski <bogdro@cpan.org>
+2010-04-18	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.09:
 	  Updated the instruction list from NASM version 2.08.01. Minor
 	  whitespace changes in the source, for better readability.
 
-2009-07-05	Bogdan Drozdowski <bogdro@cpan.org>
+2009-07-05	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.08:
 	  Updated the instruction list from NASM version 2.06. Changed one
 	  private procedure's name.
 
-2008-11-09	Bogdan Drozdowski <bogdro@cpan.org>
+2008-11-09	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.07:
 	  Documentation fixes.
 	  Verified instruction list to be complete with fasm-1.67.28 and
 	  updated it from nasm-2.05.01.
 
-2008-10-24	Bogdan Drozdowski <bogdro@cpan.org>
+2008-10-24	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.06:
 	  Updated instruction list from fasm-1.67.27. Changed double to
 	  single quotes in one place.
 
-2008-05-18	Bogdan Drozdowski <bogdro@cpan.org>
+2008-05-18	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.05:
 	  A bit better coding style.
 	  Added the tests to the package.
 
-2008-04-17	Bogdan Drozdowski <bogdro@cpan.org>
+2008-04-17	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.04:
 	  Added functions checking if the given string represents a register
@@ -316,7 +339,7 @@ Revision history for Asm-X86
 	  Added the compile-once flag where applicable.
 	  Added PRIVATE to documentation of private non-exported subroutines.
 
-2008-03-29	Bogdan Drozdowski <bogdro@cpan.org>
+2008-03-29	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.03:
 	  Fixed a bug with 64-bit addressing, where valid addresses of the
@@ -324,7 +347,7 @@ Revision history for Asm-X86
 	  Added the "SUPPORT AND DOCUMENTATION" section from the README file
 	   to the module.
 
-2008-03-27	Bogdan Drozdowski <bogdro@cpan.org>
+2008-03-27	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.02:
 	  Fixed a bug with the 'fs' segment register.
@@ -335,7 +358,7 @@ Revision history for Asm-X86
 	  Added a list of FPU registers and a function for checking
 	   if a given string represents an FPU register.
 
-2008-03-08	Bogdan Drozdowski <bogdro@cpan.org>
+2008-03-08	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.01:
 	  Includes all known by FASM instruction mnemonics and registers.

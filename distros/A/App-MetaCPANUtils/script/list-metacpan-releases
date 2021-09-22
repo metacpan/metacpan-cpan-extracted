@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/MetaCPANUtils/list_metacpan_releases
-# and generated automatically using Perinci::CmdLine::Gen version 0.497
+# and generated automatically using Perinci::CmdLine::Gen version 0.498
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-02'; # DATE
+our $DATE = '2021-04-14'; # DATE
 our $DIST = 'App-MetaCPANUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ list-metacpan-releases - list-metacpan-releases
 
 =head1 VERSION
 
-This document describes version 0.004 of list-metacpan-releases (from Perl distribution App-MetaCPANUtils), released on 2020-01-02.
+This document describes version 0.005 of list-metacpan-releases (from Perl distribution App-MetaCPANUtils), released on 2021-04-14.
 
 =head1 SYNOPSIS
 

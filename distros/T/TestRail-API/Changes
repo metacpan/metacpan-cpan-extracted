@@ -1,6 +1,9 @@
 Revision history for Perl module TestRail::API
 
-0.048 2021-11-01 TEODESIAN
+0.049 2021-08-22 TEODESIAN
+    - Add getPriorities, getPriorityByName and priorityNamesToIds, contributed by Matt Spahr
+
+0.048 2021-01-11 TEODESIAN
     - Fix issue with getUsers patch in 0.047
 
 0.047 2020-04-12 TEODESIAN
@@ -22,7 +25,7 @@ Revision history for Perl module TestRail::API
     - Fix improper caching by project rather than by testsuite in getSections
     - Fix broken repository links
 
-0.043 2018-6-16 TEODESIAN
+0.043 2018-06-16 TEODESIAN
     - Better error messaging when bad custom result fields are configured in Test::Rail::Parser
 
 0.042 2018-04-30 TEODESIAN

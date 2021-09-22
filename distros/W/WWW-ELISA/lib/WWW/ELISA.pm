@@ -1,6 +1,6 @@
 package WWW::ELISA;
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 use strict;
 use warnings;
@@ -13,28 +13,44 @@ use Try::Tiny;
 
 sub new {
     my $class = shift;
-    my %args = (endpoint => 'https://elisa.hbz-nrw.de:8091/api/rest', @_,);
+    my %args  = (endpoint => 'https://elisa.hbz-nrw.de:8091/api/rest', @_,);
 
     return bless {%args}, $class;
 }
 
+# leave it for backwards compatibility
 sub push {
     my ($self, $notepad) = @_;
 
-    $self->_create_notepad($notepad);
+    $self->create_notepad($notepad);
 }
 
-sub _create_notepad {
+sub create_notepad {
     my ($self, $notepad) = @_;
 
     my $data = {
-        userID      => $notepad->{userID},
-        token       => $self->_authenticate(),
-        notepadName => $notepad->{notepadName},
-        titleList   => $notepad->{titleList},
+        userID         => $notepad->{userID},
+        token          => $self->_authenticate(),
+        notepadName    => $notepad->{notepadName},
+        titleList      => $notepad->{titleList},
+        available_only => $notepad->{available_only} // "false",
     };
 
     my $response = $self->_do_request("/createNotepad", $data);
+}
+
+sub create_basket {
+    my ($self, $notepad) = @_;
+
+    my $data = {
+        userID         => $notepad->{userID},
+        token          => $self->_authenticate(),
+        notepadName    => $notepad->{notepadName},
+        titleList      => $notepad->{titleList},
+        available_only => $notepad->{available_only} // "false",
+    };
+
+    my $response = $self->_do_request("/createBasket", $data);
 }
 
 sub _authenticate {
@@ -111,9 +127,12 @@ WWW::ELISA - a module for working the the REST API ELi:SA (https://elisa.hbz-nrw
             {title => {isbn => "9780822363804", notiz => "WWW::ELISA Test", notiz_intern => "Info"}},
             {title => {isbn => "9788793379312", notiz => "WWW::ELISA Test2", notiz_intern => "Info2"}},
         ],
+        available_only => "true", # optional
     };
 
-    $api->push($data);
+    $api->create_notepad($data);
+    # or
+    $api->create_basket($data);
 
 =head1 METHODS
 

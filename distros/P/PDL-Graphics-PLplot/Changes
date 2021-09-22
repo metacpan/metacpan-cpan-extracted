@@ -1,3 +1,7 @@
+0.78 2021-09-20
+- doc improvement for dates in XBOX - thanks @mvgrimes
+- relax required PLplot version to 5.13.0+ - thanks @zmughal
+
 0.77 2021-07-30
 - fix logic error in plslabelfunc
 - build will stop unless has plplot 5.15+

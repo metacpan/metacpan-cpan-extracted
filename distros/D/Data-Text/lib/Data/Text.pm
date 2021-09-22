@@ -11,11 +11,11 @@ Data::Text - Class to handle text in an OO way
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -80,8 +80,8 @@ sub append {
 
 	# FIXME: handle ending with an abbreviation
 
-	if($self->{'text'} && ($self->{'text'} =~ /[\.\,]\s*$/)) {
-		if($params{'text'} =~ /^\s*[\.\,]/) {
+	if($self->{'text'} && ($self->{'text'} =~ /[\.\,;]\s*$/)) {
+		if($params{'text'} =~ /^\s*[\.\,;]/) {
 			Carp::carp(__PACKAGE__, ': attempt to add consecutive punctuation');
 			return;
 		}
@@ -126,7 +126,21 @@ sub trim {
 
 	$self->{'text'} = String::Util::trim($self->{'text'});
 
-	return $self
+	return $self;
+}
+
+=head2	rtrim
+
+Removes trailing spaces from the string.
+
+=cut
+
+sub rtrim {
+	my $self = shift;
+
+	$self->{'text'} = String::Util::rtrim($self->{'text'});
+
+	return $self;
 }
 
 =head1 AUTHOR

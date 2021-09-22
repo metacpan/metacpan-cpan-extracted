@@ -9,7 +9,7 @@ my $config = File::ShareDir::Dist::dist_config('FFI-ExtractSymbols');
 our @EXPORT = qw( extract_symbols );
 
 # ABSTRACT: Extract symbol names from a shared object or DLL
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 $FFI::ExtractSymbols::mode = '';
@@ -45,7 +45,7 @@ FFI::ExtractSymbols - Extract symbol names from a shared object or DLL
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -147,7 +147,11 @@ L<Regexp::Assemble> which appears to be unmaintained.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Sanko Robinson (SANKO)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -10,7 +10,7 @@
 # ABSTRACT: Migrate the configuration of an application
 
 package App::Cme::Command::migrate ;
-$App::Cme::Command::migrate::VERSION = '1.032';
+$App::Cme::Command::migrate::VERSION = '1.033';
 use strict;
 use warnings;
 use 5.10.1;
@@ -25,6 +25,7 @@ sub validate_args {
     my ($self, $opt, $args) = @_;
     $self->check_unknown_args($args);
     $self->process_args($opt,$args);
+    return;
 }
 
 sub opt_spec {
@@ -54,6 +55,7 @@ sub execute {
     $root->migrate;
 
     $self->save($inst,$opt) ;
+    return;
 }
 
 1;
@@ -70,7 +72,7 @@ App::Cme::Command::migrate - Migrate the configuration of an application
 
 =head1 VERSION
 
-version 1.032
+version 1.033
 
 =head1 SYNOPSIS
 

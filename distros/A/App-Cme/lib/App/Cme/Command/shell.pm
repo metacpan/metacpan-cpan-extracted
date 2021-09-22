@@ -10,7 +10,7 @@
 # ABSTRACT: Edit the configuration of an application with a shell
 
 package App::Cme::Command::shell ;
-$App::Cme::Command::shell::VERSION = '1.032';
+$App::Cme::Command::shell::VERSION = '1.033';
 use strict;
 use warnings;
 use 5.10.1;
@@ -23,6 +23,7 @@ sub validate_args {
     my ($self, $opt, $args) = @_;
     $self->check_unknown_args($args);
     $self->process_args($opt,$args);
+    return;
 }
 
 sub opt_spec {
@@ -61,6 +62,8 @@ sub execute {
         require Config::Model::TermUI;
         $self->run_shell_ui('Config::Model::TermUI', $inst) ;
     }
+
+    return;
 }
 
 1;
@@ -77,7 +80,7 @@ App::Cme::Command::shell - Edit the configuration of an application with a shell
 
 =head1 VERSION
 
-version 1.032
+version 1.033
 
 =head1 SYNOPSIS
 

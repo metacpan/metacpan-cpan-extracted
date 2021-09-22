@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210602223259;
+our $VERSION = 1.20210921211831;
 
 my $formatters = [
                 {
@@ -103,12 +103,20 @@ my $validators = {
               0\\d|
               50
             )|
-            111\\d|
-            (?:
-              52|
-              75
-            )00|
+            11(?:
+              1\\d|
+              2[0-4]
+            )|
+            5200|
+            75(?:
+              00|
+              [57]5
+            )|
             8(?:
+              0(?:
+                [01]\\d|
+                2[0-4]
+              )|
               58[89]|
               8(?:
                 55|
@@ -134,81 +142,81 @@ my $validators = {
                 'voip' => '70[67]\\d{6}'
               };
 my %areanames = ();
-$areanames{en} = {"995417", "Chkhorotskhu",
-"995369", "Kareli",
-"995493", "Poti",
-"995412", "Abasha",
-"995437", "Lentekhi",
-"995432", "Vani",
-"995368", "Khashuri",
-"995354", "Lagodekhi",
-"995479", "Chiatura",
-"995347", "Djava",
-"995342", "Akhalgori",
-"995356", "DedoplisTskaro",
+$areanames{en} = {"995479", "Chiatura",
 "995350", "Telavi",
-"995361", "Ninotsminda",
-"995345", "Stefanstminda\/Kazbegi",
-"995435", "Sachkhere",
-"995372", "Gardabani",
-"995415", "Zugdidi",
-"995448", "Gulripshi",
-"995413", "Senaki",
-"995492", "Zestafoni",
-"995426", "Kobuleti",
-"995497", "Tkibuli",
-"995359", "TetriTskaro",
-"995433", "Kharagauli",
-"995424", "Shuaxevi",
-"995358", "Bolnisi",
-"995364", "Aspindza",
-"995366", "Adigeni",
-"995360", "Dmanisi",
-"995444", "Gudauta",
-"995351", "Sagaredjo",
-"995446", "Tkvarcheli",
-"995373", "Mtskheta",
-"995495", "Khoni",
-"995346", "Dusheti",
-"995344", "Tskhinvali",
-"995357", "Marneuli",
-"995363", "Tsalka",
-"995352", "Kvareli",
-"995434", "Bagdati",
-"995423", "Xulo",
-"995416", "Tsalendjikha",
 "995370", "Gori",
-"995414", "Xobi",
-"995473", "Oni",
-"995436", "Tskaltubo",
-"995374", "Tigvi",
-"995410", "Mestia",
-"995491", "Terdjola",
-"995355", "Signagi",
+"995366", "Adigeni",
+"995349", "Akhmeta",
+"995413", "Senaki",
+"995496", "Ozurgeti",
 "99532", "Tbilisi",
-"995443", "Gagra",
-"995439", "Ambrolauri",
+"995352", "Kvareli",
+"995345", "Stefanstminda\/Kazbegi",
+"995368", "Khashuri",
+"995371", "Kaspi",
+"995442", "Sukhumi",
+"995422", "Batumi",
+"995433", "Kharagauli",
+"995351", "Sagaredjo",
+"995344", "Tskhinvali",
+"995347", "Djava",
+"995372", "Gardabani",
+"995493", "Poti",
+"995416", "Tsalendjikha",
+"995355", "Signagi",
+"995342", "Akhalgori",
+"995374", "Tigvi",
 "995445", "Ochamchire",
+"995425", "Qeda",
+"995436", "Tskaltubo",
+"995354", "Lagodekhi",
+"995341", "Rustavi",
+"995472", "Tsageri",
+"995447", "Gali",
+"995427", "Xelvachauri",
+"995444", "Gudauta",
+"995424", "Shuaxevi",
+"995357", "Marneuli",
+"995359", "TetriTskaro",
+"995363", "Tsalka",
 "995418", "Martvili",
-"995367", "Bordjomi",
-"995353", "Gurdjaani",
+"995439", "Ambrolauri",
+"995358", "Bolnisi",
 "995362", "Akhalkalaki",
 "995419", "Choxatauri",
-"995427", "Xelvachauri",
-"995496", "Ozurgeti",
-"995348", "Tianeti",
-"995422", "Batumi",
-"995472", "Tsageri",
-"995494", "lanchxuti",
-"995349", "Akhmeta",
-"995371", "Kaspi",
+"995448", "Gulripshi",
+"995361", "Ninotsminda",
+"995360", "Dmanisi",
+"995417", "Chkhorotskhu",
+"995434", "Bagdati",
+"995473", "Oni",
+"995491", "Terdjola",
+"995437", "Lentekhi",
+"995414", "Xobi",
+"995426", "Kobuleti",
+"995446", "Tkvarcheli",
+"995435", "Sachkhere",
+"995356", "DedoplisTskaro",
+"995492", "Zestafoni",
+"995415", "Zugdidi",
+"995373", "Mtskheta",
 "995431", "Kutaisi",
-"995425", "Qeda",
+"995497", "Tkibuli",
+"995494", "lanchxuti",
 "995411", "Samtredia",
+"995423", "Xulo",
+"995443", "Gagra",
+"995432", "Vani",
+"995353", "Gurdjaani",
+"995346", "Dusheti",
+"995369", "Kareli",
+"995412", "Abasha",
+"995495", "Khoni",
+"995348", "Tianeti",
 "995365", "Akhaltsikhe",
-"995442", "Sukhumi",
-"995341", "Rustavi",
-"995447", "Gali",};
+"995367", "Bordjomi",
+"995410", "Mestia",
+"995364", "Aspindza",};
 
     sub new {
       my $class = shift;

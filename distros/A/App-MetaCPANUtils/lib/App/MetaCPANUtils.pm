@@ -1,9 +1,9 @@
 package App::MetaCPANUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-02'; # DATE
+our $DATE = '2021-04-14'; # DATE
 our $DIST = 'App-MetaCPANUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -373,6 +373,42 @@ sub list_metacpan_modules {
     _resultset_to_envres($res, $args{fields});
 }
 
+$SPEC{open_metacpan_module_page} = {
+    v => 1.1,
+    args => {
+        module => {
+            schema => 'perl::modname*',
+            req => 1,
+            pos => 0,
+        },
+    },
+};
+sub open_metacpan_module_page {
+    require Browser::Open;
+
+    my %args = @_;
+    Browser::Open::open_browser("https://metacpan.org/pod/$args{module}");
+    [200];
+}
+
+$SPEC{open_metacpan_dist_page} = {
+    v => 1.1,
+    args => {
+        dist => {
+            schema => 'perl::distname*',
+            req => 1,
+            pos => 0,
+        },
+    },
+};
+sub open_metacpan_dist_page {
+    require Browser::Open;
+
+    my %args = @_;
+    Browser::Open::open_browser("https://metacpan.org/release/$args{dist}");
+    [200];
+}
+
 1;
 # ABSTRACT: CLI utilities related to MetaCPAN
 
@@ -388,7 +424,7 @@ App::MetaCPANUtils - CLI utilities related to MetaCPAN
 
 =head1 VERSION
 
-This document describes version 0.004 of App::MetaCPANUtils (from Perl distribution App-MetaCPANUtils), released on 2020-01-02.
+This document describes version 0.005 of App::MetaCPANUtils (from Perl distribution App-MetaCPANUtils), released on 2021-04-14.
 
 =head1 DESCRIPTION
 
@@ -401,6 +437,10 @@ This distribution contains CLI utilities related to MetaCPAN:
 =item * L<list-metacpan-releases>
 
 =item * L<list-recent-metacpan-releases>
+
+=item * L<open-metacpan-dist-page>
+
+=item * L<open-metacpan-module-page>
 
 =back
 
@@ -555,6 +595,66 @@ that contains extra information.
 
 Return value:  (any)
 
+
+
+=head2 open_metacpan_dist_page
+
+Usage:
+
+ open_metacpan_dist_page(%args) -> [status, msg, payload, meta]
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<dist>* => I<perl::distname>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 open_metacpan_module_page
+
+Usage:
+
+ open_metacpan_module_page(%args) -> [status, msg, payload, meta]
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<module>* => I<perl::modname>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
 =head1 ENVIRONMENT
 
 =head2 METACPANUTILS_DUMP_API_RESULT
@@ -585,6 +685,9 @@ Other distributions providing CLIs for MetaCPAN: L<MetaCPAN::Clients>,
 L<App::metacpansearch>.
 
 MetaCPAN API Client: L<MetaCPAN::Client>
+
+L<this-mod-on-metacpan>, L<this-dist-on-metacpan> from
+L<App::ThisDist::OnMetaCPAN>.
 
 =head1 AUTHOR
 

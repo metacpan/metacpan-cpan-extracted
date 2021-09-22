@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/MetaCPANUtils.pm','script/list-metacpan-distributions','script/list-metacpan-releases','script/list-recent-metacpan-releases'];
+my $filenames = ['lib/App/MetaCPANUtils.pm','script/list-metacpan-distributions','script/list-metacpan-releases','script/list-recent-metacpan-releases','script/open-metacpan-dist-page','script/open-metacpan-module-page'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

@@ -1,0 +1,78 @@
+#!perl
+use 5.010001;
+use strict;
+use warnings;
+#
+use File::Which;
+use Path::Tiny;
+#
+use lib '../lib';
+use App::dumpbin;
+#
+$|++;
+
+# Just hand things off just in case
+my @paths = grep {/\.exe$/} which 'dumpbin';
+exit system $paths[0], @ARGV if @paths;
+
+# No idea what to install... I use Linux
+die 'Please install VS code for Microsoft\'s official dumpbin utility.'
+    if ( $ARGV[0] ne '/exports' || !-f $ARGV[1] );
+#
+my %exports = App::dumpbin::exports( $ARGV[1] );
+for my $export (
+    sort { $exports{exports}{$a}[1] <=> $exports{exports}{$b}[1] }
+    keys %{ $exports{exports} }
+) {
+    printf "%03X 0 %08X %s\n", $exports{exports}{$export}[1], $exports{exports}{$export}[0],
+        $export;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+dumpbin - Pure Perl PE Exports Lister
+
+=head1 SYNOPSIS
+
+ % dumpbin /exports some.dll
+
+=head1 DESCRIPTION
+
+This is a PE parser with just enough functionality to make L<FFI::ExtractSymbols::Windows> work without installing Visual Studio for Microsoft's C<dumpbin> utility.
+
+If Microsoft's C<dumpbin> is installed, this script will pass everything along to it otherwise, only the ability to list exported functions is supported.
+
+=head1 See Also
+
+=over
+
+=item L<https://docs.microsoft.com/en-us/windows/win32/debug/pe-format>
+
+=item L<App::dumpbin>
+
+=back
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under
+the terms found in the Artistic License 2. Other copyrights, terms, and
+conditions may apply to data transmitted through this module.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=begin stopwords
+
+
+=end stopwords
+
+=cut

@@ -17,15 +17,16 @@ undef(@rem=@rem);
 #
 # App::japerl - JPerl-again Perl glocalization scripting environment
 #
-# https://metacpan.org/release/App-japerl
+# https://metacpan.org/dist/App-japerl
 #
 # Copyright (c) 2018, 2019, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSION = '0.13';
+$VERSION = '0.14';
 $VERSION = $VERSION;
 BEGIN { pop @INC if $INC[-1] eq '.' } # CVE-2016-1238: Important unsafe module load path flaw
 use FindBin;
+use Config;
 
 use 5.00503;
 use strict;
@@ -41,8 +42,31 @@ END
 }
 
 # mb.pm modulino exists or not
-if (not -e "$FindBin::Bin/lib/mb.pm") {
-    die "@{[__FILE__]}: $FindBin::Bin/lib/mb.pm not found.\n";
+my @PERL_LOCAL_LIB_ROOT = ();
+if (defined $ENV{'PERL_LOCAL_LIB_ROOT'}) {
+    @PERL_LOCAL_LIB_ROOT = split(/$Config{'path_sep'}/, $ENV{'PERL_LOCAL_LIB_ROOT'});
+}
+my($mbpm_modulino) = grep(-e, map {"$_/mb.pm"}
+    @PERL_LOCAL_LIB_ROOT,
+    $FindBin::Bin,
+    "$FindBin::Bin/lib",
+    @INC,
+);
+if (not defined $mbpm_modulino) {
+    die sprintf(<<'END', __FILE__, join("\n",map{"    $_/mb.pm"} @PERL_LOCAL_LIB_ROOT), "    $FindBin::Bin/mb.pm", "    $FindBin::Bin/lib/mb.pm", join("\n",map{"    $_/mb.pm"} @INC));
+%s: "mb.pm" modulino not found anywhere.
+
+@PERL_LOCAL_LIB_ROOT
+%s
+$FindBin::Bin
+%s
+$FindBin::Bin/lib
+%s
+@INC
+%s
+
+see you again on https://metacpan.org/dist/mb
+END
 }
 
 # configuration of this software
@@ -52,7 +76,7 @@ my %x = (
     'PERL5LIB' => [
 
         # local::lib compatible
-        defined($ENV{'PERL_LOCAL_LIB_ROOT'}) ? ($ENV{'PERL_LOCAL_LIB_ROOT'}) : (),
+        @PERL_LOCAL_LIB_ROOT,
     ],
 
     # The PERL5OPT environment variable (for passing command line arguments
@@ -96,10 +120,12 @@ $| = 1;
 system(
     "$x{'PERL5BIN'}",
     (map { "-I$_" } grep { -e $_ } @{$x{'PERL5LIB'}}),
+    (map { "-I$_" } grep { -e $_ } $FindBin::Bin),
+    (map { "-I$_" } grep { -e $_ } "$FindBin::Bin/lib"),
     @switch,
     $x{'PERL5OPT'},
     '--',
-    "$FindBin::Bin/lib/mb.pm",
+    $mbpm_modulino,
     @ARGV,
 );
 exit($? >> 8);
@@ -147,6 +173,17 @@ This software can do the following.
 =back
 
 May you do good magic with japerl.
+
+=head1 How to find mb.pm modulino ?
+
+ Running japerl.bat requires mb.pm modulino.
+ japerl.bat finds for mb.pm modulino in the following order and
+ uses the first mb.pm found.
+ 
+ 1. @PERL_LOCAL_LIB_ROOT
+ 2. $FindBin::Bin
+ 3. $FindBin::Bin/lib
+ 4. @INC
 
 =head1 AUTHOR
 

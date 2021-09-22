@@ -65,7 +65,7 @@ require AutoLoader;
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
 
-our $VERSION = '2.21';
+our $VERSION = '2.22';
 
 
 bootstrap Math::GMP $VERSION;
@@ -118,7 +118,7 @@ Math::GMP - High speed arbitrary size integer math
 
 =head1 VERSION
 
-version 2.21
+version 2.22
 
 =head1 SYNOPSIS
 

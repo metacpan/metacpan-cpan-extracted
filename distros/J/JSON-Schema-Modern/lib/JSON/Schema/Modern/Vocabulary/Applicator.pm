@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Applicator;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Applicator vocabulary
 
-our $VERSION = '0.517';
+our $VERSION = '0.519';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -13,11 +13,10 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use strictures 2;
 use List::Util 1.45 qw(any uniqstr);
 use Ref::Util 0.100 'is_plain_arrayref';
+use Sub::Install;
 use JSON::Schema::Modern::Utilities qw(is_type jsonp E A assert_keyword_type assert_pattern true is_elements_unique);
 use JSON::Schema::Modern::Vocabulary::Unevaluated;
 use Moo;
-use MooX::TypeTiny 0.002002;
-use Types::Standard 1.010002 'InstanceOf';
 use namespace::clean;
 
 with 'JSON::Schema::Modern::Vocabulary';
@@ -48,20 +47,23 @@ sub keywords {
     'items',
     $spec_version =~ qr/^draft(7|2019-09)$/ ? 'additionalItems' : (),
     qw(contains properties patternProperties additionalProperties propertyNames),
-    $spec_version eq 'draft2019-09' ? $self->unevaluated_vocabulary->keywords($spec_version) : (),
+    $spec_version eq 'draft2019-09' ? qw(unevaluatedItems unevaluatedProperties) : (),
   );
 }
 
 # in draft2019-09, the unevaluated keywords were part of the Applicator vocabulary
-has unevaluated_vocabulary => (
-  is => 'ro',
-  isa => InstanceOf['JSON::Schema::Modern::Vocabulary::Unevaluated'],
-  handles => [
-    map { my $x = $_; map +($_.'_keyword_unevaluated'.$x), qw(_traverse _eval) } qw(Items Properties)
-  ],
-  lazy => 1,
-  default => sub { JSON::Schema::Modern::Vocabulary::Unevaluated->new },
-);
+foreach my $phase (qw(traverse eval)) {
+  foreach my $type (qw(Items Properties)) {
+    my $method = '_'.$phase.'_keyword_unevaluated'.$type;
+    Sub::Install::install_sub({
+      as   => $method,
+      code => sub {
+        shift;
+        JSON::Schema::Modern::Vocabulary::Unevaluated->$method(@_);
+      }
+    }),
+  }
+}
 
 sub _traverse_keyword_allOf { shift->traverse_array_schemas(@_) }
 
@@ -218,7 +220,7 @@ sub _traverse_keyword_dependencies {
       # as in dependentRequired
 
       foreach my $index (0..$#{$schema->{dependencies}{$property}}) {
-        $valid = E({ %$state, _schema_path_suffix => $property }, 'element #%d is not a string', $index)
+        $valid = E({ %$state, _schema_path_suffix => [ $property, $index ] }, 'element #%d is not a string', $index)
           if not is_type('string', $schema->{dependencies}{$property}[$index]);
       }
 
@@ -611,7 +613,7 @@ JSON::Schema::Modern::Vocabulary::Applicator - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.517
+version 0.519
 
 =head1 DESCRIPTION
 

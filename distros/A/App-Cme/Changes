@@ -1,3 +1,14 @@
+1.033 2021-09-19
+
+  Bug fix:
+    * fix (fix command): display node name when needed
+    * remove duplicate option definition
+    * fix (run command): fix override of --commit option
+    * fix force-load doc
+
+  Dependency changes:
+    * rm test dependency on Probe::Perl
+
 1.032 2020-07-17
 
   cme improvements:

@@ -4,8 +4,8 @@
 #include "spvm_typedecl.h"
 
 enum {
-  SPVM_METHOD_C_CALL_TYPE_ID_STATIC_METHOD,
-  SPVM_METHOD_C_CALL_TYPE_ID_METHOD,
+  SPVM_METHOD_C_CALL_TYPE_ID_CLASS_METHOD,
+  SPVM_METHOD_C_CALL_TYPE_ID_INSTANCE_METHOD,
 };
 
 enum {
@@ -19,6 +19,23 @@ enum {
   SPVM_METHOD_C_FLAG_PRIVATE = 128,
 };
 
+enum {
+  SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_VOID,
+  SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_BYTE,
+  SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_SHORT,
+  SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_INT,
+  SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_LONG,
+  SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_FLOAT,
+  SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_DOUBLE,
+  SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_OBJECT,
+  SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_MULNUM_BYTE,
+  SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_MULNUM_SHORT,
+  SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_MULNUM_INT,
+  SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_MULNUM_LONG,
+  SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_MULNUM_FLOAT,
+  SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_MULNUM_DOUBLE,
+};
+
 // Method information
 struct spvm_method {
   SPVM_OP* op_method;
@@ -30,15 +47,15 @@ struct spvm_method {
   SPVM_LIST* captures;
   int32_t opcodes_base;
   int32_t opcodes_length;
-  int32_t call_spvm_method_arg_stack_max;
+  int32_t call_method_arg_stack_max;
   int32_t rel_id;
   int32_t eval_stack_max_length;
   int32_t mortal_stack_length;
-  int32_t call_type_id;
   int32_t id;
   void* precompile_address;
   void* native_address;
   SPVM_TYPE* return_type;
+  int32_t return_type_category_id;
   SPVM_LIST* args;
   const char* name;
   const char* signature;
@@ -62,7 +79,8 @@ struct spvm_method {
   int8_t is_field_getter;
   int8_t is_simple_constructor;
   int8_t is_constant;
-  int8_t is_begin;
+  int8_t is_init;
+  int8_t is_class_method;
   const char* accessor_original_name;
   SPVM_OP* op_list_tmp_mys;
   int32_t tmp_vars_length;

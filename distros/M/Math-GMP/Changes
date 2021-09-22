@@ -1,5 +1,11 @@
 Revision history for Perl extension Math::GMP.
 
+2.22  2021-09-20 Shlomif
+    - Signature files are generated unreliably and are an ongoing source of
+    bug reports. As a result, we decided to axe them altogether.
+        - https://github.com/turnstep/Math-GMP/issues/6
+        - Thanks to @lemrouch .
+
 2.21  2021-09-11 Shlomif
     - Apply doc patch from @hvds documenting the pitfalls of division by zero.
         - https://github.com/turnstep/Math-GMP/issues/5

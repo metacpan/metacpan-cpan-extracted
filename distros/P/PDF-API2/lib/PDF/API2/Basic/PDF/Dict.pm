@@ -13,7 +13,7 @@ use base 'PDF::API2::Basic::PDF::Objind';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '2.041'; # VERSION
+our $VERSION = '2.042'; # VERSION
 
 our $mincache = 16 * 1024 * 1024;
 
@@ -24,7 +24,7 @@ use PDF::API2::Basic::PDF::Name;
 
 =head1 NAME
 
-PDF::API2::Basic::PDF::Dict - PDF Dictionaries and Streams. Inherits from L<PDF::Objind>
+PDF::API2::Basic::PDF::Dict - Low-level dictionary and stream objects
 
 =head1 INSTANCE VARIABLES
 
@@ -54,7 +54,7 @@ source PDF the stream starts.
 =cut
 
 sub new {
-    my ($class) = @_;
+    my $class = shift();
     $class = ref($class) if ref($class);
 
     my $self = $class->SUPER::new(@_);

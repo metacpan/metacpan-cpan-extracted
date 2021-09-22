@@ -70,6 +70,31 @@ subtest simple_coverage => sub {
         {},
         "Cleared subs",
     );
+
+    Fake1->fake;
+    $CLASS->disable;
+    Fake2->fake;
+    $CLASS->enable;
+
+    is(
+        $CLASS->files(root => path('t/lib')),
+        [
+            'Fake1.pm',
+        ],
+        "Got just the 2 files under the specified dir"
+    );
+
+    is(
+        $CLASS->data(root => path('t/lib')),
+        {
+            'Fake1.pm' => {
+                'fake' => ['*'],
+            },
+        },
+        "Got expected subs",
+        $CLASS->data(root => path('t/lib')),
+    );
+
 };
 
 subtest goto_and_lvalue => sub {

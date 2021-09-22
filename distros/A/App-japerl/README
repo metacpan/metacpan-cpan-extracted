@@ -31,6 +31,17 @@ DESCRIPTION
 
   May you do good magic with japerl.
 
+How to find mb.pm modulino ?
+
+  Running japerl.bat requires mb.pm modulino.
+  japerl.bat finds for mb.pm modulino in the following order and
+  uses the first mb.pm found.
+  
+  1. @PERL_LOCAL_LIB_ROOT
+  2. $FindBin::Bin
+  3. $FindBin::Bin/lib
+  4. @INC
+
 SUPPORTED PERL VERSIONS
 
   perl version 5.005_03 to newest perl
@@ -39,10 +50,11 @@ SEE ALSO
 
   https://metacpan.org/author/INA
   http://backpan.cpantesters.org/authors/id/I/IN/INA/
-  https://metacpan.org/release/mb
-  https://metacpan.org/release/UTF8-R2
-  https://metacpan.org/release/Perl7-Handy
-  https://metacpan.org/release/Jacode4e-RoundTrip
-  https://metacpan.org/release/Jacode4e
-  https://metacpan.org/release/Jacode
+  https://metacpan.org/dist/mb
+  https://metacpan.org/dist/mb-Encode
+  https://metacpan.org/dist/UTF8-R2
+  https://metacpan.org/dist/Perl7-Handy
+  https://metacpan.org/dist/Jacode4e-RoundTrip
+  https://metacpan.org/dist/Jacode4e
+  https://metacpan.org/dist/Jacode
 

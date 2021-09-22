@@ -22,14 +22,16 @@ Game::TextMapper::Gridmapper - generate dungeon maps
 =head1 DESCRIPTION
 
 This generates dungeon maps. At its core, this uses a 3×3 layout, 9 sections
-total. 5 or 7 of these 9 sections get a room. The connections for the rooms is
-picked at random from a fixed list of configurations (plus mirrored and rotated
-variants). The first room contains the stairs.
+total. 5 or 7 of these 9 sections get a room. The connections for the rooms (the
+"shape") is picked at random from a fixed list of configurations (plus flipped
+and rotated variants). The first room contains the stairs.
 
 To generate bigger dungeons, more of these 3×3 layouts are added to the first.
 As the number of rooms is dynamic, the algorithm figures out how to best use a
-number of layouts containing 5 or 7 rooms tp get to that number, and then simply
+number of layouts containing 5 or 7 rooms to get to that number, and then simply
 drops the extra rooms.
+
+=head1 METHODS
 
 =cut
 
@@ -80,6 +82,21 @@ sub recompute {
 	     + 4);
   $self->max_tiles($self->row * $self->col - 1);
 }
+
+=head2 generate_map($pillars, $n, $caves)
+
+If C<$pillars> is true, then rooms with pillars are generated. This is usually a
+good idea. It's harder to pull off from I<Hex Describe> because the description
+of the dungeon should mention the pillars but there's now way to do that.
+Perhaps, if C<$pillars> were to be a reference of room numbers with pillars, it
+might work; right now, however, it's simply a boolean value.
+
+C<$n> is number of rooms.
+
+If C<$caves> is true, then the entire map uses cave walls instead of regular
+walls.
+
+=cut
 
 sub generate_map {
   my $self = shift;
@@ -187,205 +204,290 @@ sub one {
   return $_[int(rand(scalar @_))];
 }
 
+=head1 LAYOUT
+
+One of the shapes is picked, and then flipped and rotated to generate more
+shapes. This is why we can skip any shape that is a flipped and/or rotated
+version of an existing shape.
+
+=head2 5 Room Dungeons
+
+These are inspired by L<The Nine Forms of the Five Room
+Dungeon|https://gnomestew.com/the-nine-forms-of-the-five-room-dungeon/> by
+Matthew J. Neagley, for Gnome Stew.
+
+=cut
+
 sub five_room_shape {
   my $self = shift;
-  return $self->shape_flip(one(
-    # The Nine Forms of the Five Room Dungeon
-    # https://gnomestew.com/the-nine-forms-of-the-five-room-dungeon/
-    #
-    # The Railroad
-    #
-    #       5        5     4--5         5--4
-    #       |        |     |               |
-    #       4     3--4     3       5--4    3
-    #       |     |        |          |    |
-    # 1--2--3  1--2     1--2    1--2--3 1--2
-    [[0, 2], [1, 2], [2, 2], [2, 1], [2, 0]],
-    [[0, 2], [1, 2], [1, 1], [2, 1], [2, 0]],
-    [[0, 2], [1, 2], [1, 1], [1, 0], [2, 0]],
-    [[0, 2], [1, 2], [2, 2], [2, 1], [1, 1]],
-    [[0, 2], [1, 2], [1, 1], [1, 0], [0, 0]],
-    #
-    # Note how whenever there is a non-linear connection, there is a an extra
-    # element pointing to the "parent". This is necessary for all but the
-    # railroads.
-    #
-    # Foglio's Snail
-    #
-    #    5  4
-    #    |  |
-    # 1--2--3
-    [[0, 2], [1, 2], [2, 2], [2, 1], [1, 1, 1]],
-    #
-    # The Fauchard Fork
-    #
-    #    5       5
-    #    |       |
-    #    3--4 4--3 5--3--4
-    #    |       |    |
-    # 1--2    1--2 1--2
-    [[0, 2], [1, 2], [1, 1], [2, 1], [1, 0, 2]],
-    [[0, 2], [1, 2], [1, 1], [0, 1], [1, 0, 2]],
-    [[0, 2], [1, 2], [1, 1], [2, 1], [0, 1, 2]],
-    #
-    # The Moose
-    #
-    #            4
-    #            |
-    # 5     4 5  3
-    # |     | |  |
-    # 1--2--3 1--2
-    [[0, 2], [1, 2], [2, 2], [2, 1], [0, 1, 0]],
-    [[0, 2], [1, 2], [1, 1], [1, 0], [0, 1, 0]],
-    #
-    # The Paw
-    #
-    #    5
-    #    |
-    # 3--2--4
-    #    |
-    #    1
-    [[1, 2], [1, 1], [0, 1], [2, 1, 1], [1, 0, 1]],
-    #
-    # The Arrow
-    #
-    #    3
-    #    |
-    #    2
-    #    |
-    # 5--1--4
-    [[1, 2], [1, 1], [1, 0], [2, 2, 0], [0, 2, 0]],
-    #
-    # The Cross
-    #
-    #    5
-    #    |
-    # 3--1--4
-    #    |
-    #    2
-    [[1, 1], [1, 2], [0, 1, 0], [2, 1, 0], [1, 0, 0]],
-    #
-    # The Nose Ring
-    #
-    #    5--4  2--3--4
-    #    |  |  |  |
-    # 1--2--3  1--5
-    [[0, 2], [1, 2], [2, 2], [2, 1], [1, 1, 1, 3]],
-    [[0, 2], [0, 1], [1, 1], [2, 1], [1, 2, 0, 2]],
-      ));
+  my @shapes;
+
+=head3 The Railroad
+
+          5        5     4--5         5--4
+          |        |     |               |
+          4     3--4     3       5--4    3
+          |     |        |          |    |
+    1--2--3  1--2     1--2    1--2--3 1--2
+
+=cut
+
+  push(@shapes,
+       [[0, 2], [1, 2], [2, 2], [2, 1], [2, 0]],
+       [[0, 2], [1, 2], [1, 1], [2, 1], [2, 0]],
+       [[0, 2], [1, 2], [1, 1], [1, 0], [2, 0]],
+       [[0, 2], [1, 2], [2, 2], [2, 1], [1, 1]],
+       [[0, 2], [1, 2], [1, 1], [1, 0], [0, 0]]);
+
+=head3 Foglio's Snail
+
+       5  4
+       |  |
+    1--2--3
+
+=cut
+
+  # Note how whenever there is a non-linear connection, there is a an extra
+  # element pointing to the "parent". This is necessary for all but the
+  # railroads.
+  push(@shapes,
+       [[0, 2], [1, 2], [2, 2], [2, 1], [1, 1, 1]]);
+
+=head3 The Fauchard Fork
+
+       5       5
+       |       |
+       3--4 4--3 5--3--4
+       |       |    |
+    1--2    1--2 1--2
+
+=cut
+
+  push(@shapes,
+       [[0, 2], [1, 2], [1, 1], [2, 1], [1, 0, 2]],
+       [[0, 2], [1, 2], [1, 1], [0, 1], [1, 0, 2]],
+       [[0, 2], [1, 2], [1, 1], [2, 1], [0, 1, 2]]);
+
+=head3 The Moose
+
+               4
+               |
+    5     4 5  3
+    |     | |  |
+    1--2--3 1--2
+
+=cut
+
+  push(@shapes,
+       [[0, 2], [1, 2], [2, 2], [2, 1], [0, 1, 0]],
+       [[0, 2], [1, 2], [1, 1], [1, 0], [0, 1, 0]]);
+
+=head3 The Paw
+
+       5
+       |
+    3--2--4
+       |
+       1
+
+=cut
+
+  push(@shapes,
+       [[1, 2], [1, 1], [0, 1], [2, 1, 1], [1, 0, 1]]);
+
+=head3 The Arrow
+
+       3
+       |
+       2
+       |
+    5--1--4
+
+=cut
+
+  push(@shapes,
+       [[1, 2], [1, 1], [1, 0], [2, 2, 0], [0, 2, 0]]);
+
+=head3 The Cross
+
+       5
+       |
+    3--1--4
+       |
+       2
+
+=cut
+
+  push(@shapes,
+       [[1, 1], [1, 2], [0, 1, 0], [2, 1, 0], [1, 0, 0]]);
+
+=head3 The Nose Ring
+
+       5--4  2--3--4
+       |  |  |  |
+    1--2--3  1--5
+
+=cut
+
+  push(@shapes,
+       [[0, 2], [1, 2], [2, 2], [2, 1], [1, 1, 1, 3]],
+       [[0, 2], [0, 1], [1, 1], [2, 1], [1, 2, 0, 2]]);
+
+  return $self->shape_flip(one(@shapes));
 }
+
+=head2 7 Room Dungeons
+
+High room density is a desirable property, so we can fill the 9 sections of the
+3×3 base layout with more than just five rooms. The algorithm uses 7 room
+shapes in addition to the five room shapes.
+
+=cut
 
 sub seven_room_shape {
   my $self = shift;
-  return $self->shape_flip(one(
-    #
-    # The Snake
-    #
-    # 7--6--5  7--6--5     4--5 7
-    #       |        |     |  | |
-    #       4     3--4     3  6 6--5--4
-    #       |     |        |  |       |
-    # 1--2--3  1--2     1--2  7 1--2--3
+  my @shapes;
+
+=head3 The Snake
+
+    7--6--5  7--6--5     4--5 7
+          |        |     |  | |
+          4     3--4     3  6 6--5--4
+          |     |        |  |       |
+    1--2--3  1--2     1--2  7 1--2--3
+
+=cut
+
+  push(@shapes,
     [[0, 2], [1, 2], [2, 2], [2, 1], [2, 0], [1, 0], [0, 0]],
     [[0, 2], [1, 2], [1, 1], [2, 1], [2, 0], [1, 0], [0, 0]],
     [[0, 2], [1, 2], [1, 1], [1, 0], [2, 0], [2, 1], [2, 2]],
-    [[0, 2], [1, 2], [2, 2], [2, 1], [1, 1] ,[0, 1], [0, 0]],
-    #
-    # Note how whenever there is a non-linear connection, there is a an extra
-    # element pointing to the "parent". This is necessary for all but the
-    # railroads.
-    #
-    # The Fork
-    #
-    #    7  5 7     5 7-----5
-    #    |  | |     | |     |
-    #    6  4 6     4 6     4
-    #    |  | |     | |     |
-    # 1--2--3 1--2--3 1--2--3
+    [[0, 2], [1, 2], [2, 2], [2, 1], [1, 1] ,[0, 1], [0, 0]]);
+
+=head3 The Fork
+
+       7  5 7     5 7-----5
+       |  | |     | |     |
+       6  4 6     4 6     4
+       |  | |     | |     |
+    1--2--3 1--2--3 1--2--3
+
+=cut
+
+  # Note how whenever there is a non-linear connection, there is a an extra
+  # element pointing to the "parent". This is necessary for all but the
+  # railroads.
+
+  push(@shapes,
     [[0, 2], [1, 2], [2, 2], [2, 1], [2, 0], [1, 1, 1], [1, 0]],
     [[0, 2], [1, 2], [2, 2], [2, 1], [2, 0], [0, 1, 0], [0, 0]],
-    [[0, 2], [1, 2], [2, 2], [2, 1], [2, 0], [0, 1, 0], [0, 0, 5, 4]],
-    #
-    # The Sidequest
-    #
-    # 6--5       5--6 7     5 6--5       5--6 7     5
-    # |  |       |  | |     | |  |       |  | |     |
-    # 7  3--4 4--3  7 6--3--4 7  3--4 4--3  7 6--3--4
-    #    |       |       |    |  |    |  |    |  |
-    # 1--2    1--2    1--2    1--2    1--2    1--2
+    [[0, 2], [1, 2], [2, 2], [2, 1], [2, 0], [0, 1, 0], [0, 0, 5, 4]]);
+
+=head3 The Sidequest
+
+    6--5       5--6 7     5 6--5       5--6 7     5
+    |  |       |  | |     | |  |       |  | |     |
+    7  3--4 4--3  7 6--3--4 7  3--4 4--3  7 6--3--4
+       |       |       |    |  |    |  |    |  |
+    1--2    1--2    1--2    1--2    1--2    1--2
+
+=cut
+
+  push(@shapes,
     [[0, 2], [1, 2], [1, 1], [2, 1], [1, 0, 2], [0, 0], [0, 1]],
     [[0, 2], [1, 2], [1, 1], [0, 1], [1, 0, 2], [2, 0], [2, 1]],
     [[0, 2], [1, 2], [1, 1], [2, 1], [2, 0], [0, 1, 2], [0, 0]],
     [[0, 2], [1, 2], [1, 1], [2, 1], [1, 0, 2], [0, 0], [0, 1, 5, 0]],
     [[0, 2], [1, 2], [1, 1], [0, 1, 2, 0], [1, 0, 2], [2, 0], [2, 1]],
-    [[0, 2], [1, 2], [1, 1], [2, 1], [2, 0], [0, 1, 2, 0], [0, 0]],
-    #
-    # The Unbalanced Fork
-    #
-    # 7     5 7  4--5 7     5 7        7  4--5 7     5 7
-    # |     | |  |    |     | |        |  |    |     | |
-    # 6     4 6  3    6  3--4 6  3--4  6--3    6--3--4 6--3--4
-    # |     | |  |    |  |    |  |  |  |  |    |  |    |  |  |
-    # 1--2--3 1--2    1--2    1--2  5  1--2    1--2    1--2  5
+    [[0, 2], [1, 2], [1, 1], [2, 1], [2, 0], [0, 1, 2, 0], [0, 0]]);
+
+=head3 The Unbalanced Fork
+
+    7     5 7  4--5 7     5 7        7  4--5 7     5 7
+    |     | |  |    |     | |        |  |    |     | |
+    6     4 6  3    6  3--4 6  3--4  6--3    6--3--4 6--3--4
+    |     | |  |    |  |    |  |  |  |  |    |  |    |  |  |
+    1--2--3 1--2    1--2    1--2  5  1--2    1--2    1--2  5
+
+=cut
+
+  push(@shapes,
     [[0, 2], [1, 2], [2, 2], [2, 1], [2, 0], [0, 1, 0], [0, 0]],
     [[0, 2], [1, 2], [1, 1], [1, 0], [2, 0], [0, 1, 0], [0, 0]],
     [[0, 2], [1, 2], [1, 1], [2, 1], [2, 0], [0, 1, 0], [0, 0]],
     [[0, 2], [1, 2], [1, 1], [2, 1], [2, 2], [0, 1, 0], [0, 0]],
     [[0, 2], [1, 2], [1, 1], [1, 0], [2, 0], [0, 1, 2, 0], [0, 0]],
     [[0, 2], [1, 2], [1, 1], [2, 1], [2, 0], [0, 1, 2, 0], [0, 0]],
-    [[0, 2], [1, 2], [1, 1], [2, 1], [2, 2], [0, 1, 2, 0], [0, 0]],
-    #
-    # The Triplet
-    #
-    # 4  5  7     5  7     5     4--5  7     5  7     5
-    # |  |  |     |  |     |     |  |  |     |  |     |
-    # 3--2--6  3--2--6  3--2--6  3--2--6  3--2--6  3--2--6
-    #    |     |  |     |  |  |     |     |  |     |  |  |
-    #    1     4  1     4  1  7     1     4--1     4--1  7
+    [[0, 2], [1, 2], [1, 1], [2, 1], [2, 2], [0, 1, 2, 0], [0, 0]]);
+
+=head3 The Triplet
+
+    4  5  7     5  7     5     4--5  7     5  7     5
+    |  |  |     |  |     |     |  |  |     |  |     |
+    3--2--6  3--2--6  3--2--6  3--2--6  3--2--6  3--2--6
+       |     |  |     |  |  |     |     |  |     |  |  |
+       1     4  1     4  1  7     1     4--1     4--1  7
+
+=cut
+
+  push(@shapes,
     [[1, 2], [1, 1], [0, 1], [0, 0], [1, 0, 1], [2, 1, 1], [2, 0]],
     [[1, 2], [1, 1], [0, 1], [0, 2], [1, 0, 1], [2, 1, 1], [2, 0]],
     [[1, 2], [1, 1], [0, 1], [0, 2], [1, 0, 1], [2, 1, 1], [2, 2]],
     [[1, 2], [1, 1], [0, 1], [0, 0], [1, 0, 1, 3], [2, 1, 1], [2, 0]],
     [[1, 2], [1, 1], [0, 1], [0, 2, 2, 0], [1, 0, 1], [2, 1, 1], [2, 0]],
-    [[1, 2], [1, 1], [0, 1], [0, 2, 2, 0], [1, 0, 1], [2, 1, 1], [2, 2]],
-    #
-    # The Fake Fork
-    #
-    # 7  3    7        7  3    7
-    # |  |    |        |  |    |
-    # 6  2    6  2--3  6--2    6--2--3
-    # |  |    |  |     |  |    |  |
-    # 5--1--4 5--1--4  5--1--4 5--1--4
+    [[1, 2], [1, 1], [0, 1], [0, 2, 2, 0], [1, 0, 1], [2, 1, 1], [2, 2]]);
+
+=head3 The Fake Fork
+
+    7  3    7        7  3    7
+    |  |    |        |  |    |
+    6  2    6  2--3  6--2    6--2--3
+    |  |    |  |     |  |    |  |
+    5--1--4 5--1--4  5--1--4 5--1--4
+
+=cut
+
+  push(@shapes,
     [[1, 2], [1, 1], [1, 0], [2, 2, 0], [0, 2, 0], [0, 1], [0, 0]],
     [[1, 2], [1, 1], [2, 1], [2, 2, 0], [0, 2, 0], [0, 1], [0, 0]],
     [[1, 2], [1, 1], [1, 0], [2, 2, 0], [0, 2, 0], [0, 1, 4, 1], [0, 0]],
-    [[1, 2], [1, 1], [2, 1], [2, 2, 0], [0, 2, 0], [0, 1, 4, 1], [0, 0]],
-    #
-    # The Shuriken
-    #
-    # 5  6--7  5  6--7  5--6    5--6--7  5--6--7  5--6
-    # |  |     |  |     |       |  |     |  |     |
-    # 4--1     4--1     4--1--7 4--1     4--1     4--1--7
-    #    |        |        |       |        |     |  |
-    # 3--2        2--3  3--2    3--2        2--3  3--2
+    [[1, 2], [1, 1], [2, 1], [2, 2, 0], [0, 2, 0], [0, 1, 4, 1], [0, 0]]);
+
+=head3 The Shuriken
+
+    5  6--7  5  6--7  5--6    5--6--7  5--6--7  5--6
+    |  |     |  |     |       |  |     |  |     |
+    4--1     4--1     4--1--7 4--1     4--1     4--1--7
+       |        |        |       |        |     |  |
+    3--2        2--3  3--2    3--2        2--3  3--2
+
+=cut
+
+  push(@shapes,
     [[1, 1], [1, 2], [0, 2], [0, 1, 0], [0, 0], [1, 0, 0], [2, 0]],
     [[1, 1], [1, 2], [2, 2], [0, 1, 0], [0, 0], [1, 0, 0], [2, 0]],
     [[1, 1], [1, 2], [0, 2], [0, 1, 0], [0, 0], [1, 0], [2, 1, 0]],
     [[1, 1], [1, 2], [0, 2], [0, 1, 0], [0, 0], [1, 0, 4, 0], [2, 0]],
     [[1, 1], [1, 2], [2, 2], [0, 1, 0], [0, 0], [1, 0, 4, 0], [2, 0]],
-    [[1, 1], [1, 2], [0, 2], [0, 1, 2, 0], [0, 0], [1, 0], [2, 1, 0]],
-    #
-    # The Noose
-    #
-    #    6--5  3--4     3--4
-    #    |  |  |  |     |  |
-    #    7  4  2  5     2  5--7
-    #    |  |  |  |     |  |
-    # 1--2--3  1--6--7  1--6
+    [[1, 1], [1, 2], [0, 2], [0, 1, 2, 0], [0, 0], [1, 0], [2, 1, 0]]);
+
+=head3 The Noose
+
+       6--5  3--4     3--4
+       |  |  |  |     |  |
+       7  4  2  5     2  5--7
+       |  |  |  |     |  |
+    1--2--3  1--6--7  1--6
+
+=cut
+
+  push(@shapes,
     [[0, 2], [1, 2], [2, 2], [2, 1], [2, 0], [1, 0], [1, 1, 1, 5]],
     [[0, 2], [0, 1], [0, 0], [1, 0], [1, 1], [1, 2, 0, 4], [2, 2, 5]],
-    [[0, 2], [0, 1], [0, 0], [1, 0], [1, 1], [1, 2, 0, 4], [2, 1, 4]],
-      ));
+    [[0, 2], [0, 1], [0, 0], [1, 0], [1, 1], [1, 2, 0, 4], [2, 1, 4]]);
+
+  return $self->shape_flip(one(@shapes));
 }
 
 sub shape_flip {
@@ -1195,5 +1297,12 @@ sub to_gridmapper_link {
   my $url = 'https://campaignwiki.org/gridmapper?' . url_escape($code);
   return $url;
 }
+
+=head1 SEE ALSO
+
+L<Gridmapper|https://alexschroeder.ch/cgit/gridmapper/about/> is a web
+application that lets you draw dungeons with strong focus on using the keyboard.
+
+=cut
 
 1;

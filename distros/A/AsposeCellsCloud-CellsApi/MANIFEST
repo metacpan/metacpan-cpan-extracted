@@ -344,6 +344,7 @@ lib/AsposeCellsCloud/Object/ImportDoubleArrayOption.pm
 lib/AsposeCellsCloud/Object/ImportIntArrayOption.pm
 lib/AsposeCellsCloud/Object/ImportOption.pm
 lib/AsposeCellsCloud/Object/ImportStringArrayOption.pm
+lib/AsposeCellsCloud/Object/ImportPictureOption.pm
 lib/AsposeCellsCloud/Object/Legend.pm
 lib/AsposeCellsCloud/Object/LegendResponse.pm
 lib/AsposeCellsCloud/Object/Line.pm

@@ -7,7 +7,7 @@ use lib "$FindBin::Bin/lib";
 use TestRail::API;
 use Test::LWP::UserAgent::TestRailMock;
 
-use Test::More tests => 91;
+use Test::More tests => 94;
 use Test::Fatal;
 use Test::Deep;
 use Scalar::Util ();
@@ -71,6 +71,15 @@ my @type_ids = map {$_->{'id'}} @$caseTypes;
 is($tr->getCaseTypeByName($type_names[0])->{'id'},$type_ids[0],"Can get case type by name correctly");
 my @computed_type_ids = $tr->typeNamesToIds(@type_names);
 cmp_deeply(\@computed_type_ids,\@type_ids,"typeNamesToIds returns the correct type IDs in the correct order");
+
+#Test PRIORITY method
+my $priorities = $tr->getPriorities();
+is(ref($priorities),'ARRAY',"getPriorities returns ARRAY of priorities");
+my @priority_names = map {$_->{'name'}} @$priorities;
+my @priority_ids = map {$_->{'id'}} @$priorities;
+is($tr->getPriorityByName($priority_names[0])->{'id'},$priority_ids[0],"Can get case priority by name correctly");
+my @computed_priority_ids = $tr->priorityNamesToIds(@priority_names);
+cmp_deeply(\@computed_priority_ids,\@priority_ids,"priorityNamesToIds returns the correct priority IDs in the correct order");
 
 #Test PROJECT methods
 my $project_name = 'CRUSH ALL HUMANS';

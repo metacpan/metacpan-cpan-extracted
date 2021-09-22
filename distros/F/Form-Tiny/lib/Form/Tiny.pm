@@ -2,7 +2,7 @@ package Form::Tiny;
 
 use v5.10;
 use warnings;
-use Carp qw(croak);
+use Carp qw(croak carp);
 use Types::Standard qw(Str);
 use Import::Into;
 
@@ -10,14 +10,14 @@ use Form::Tiny::Form;
 use Form::Tiny::Utils qw(trim :meta_handlers);
 require Moo;
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 sub import
 {
 	my ($package, $caller) = (shift, scalar caller);
 
 	my @wanted = @_;
-	my @wanted_subs = qw(form_field form_cleaner form_hook);
+	my @wanted_subs = qw(form_field form_cleaner form_hook field_validator);
 	my @wanted_roles;
 
 	my %subs = %{$package->_generate_helpers($caller)};
@@ -56,10 +56,18 @@ sub _generate_helpers
 	my ($package, $caller) = @_;
 
 	my $field_context;
+	my $use_context = sub {
+		if (@_ == 2) {
+			croak 'context using DSL keyword called without context'
+				unless defined $field_context;
+			unshift @_, $field_context;
+		}
+		return @_;
+	};
+
 	return {
 		form_field => sub {
-			$field_context = ref $_[0] eq '' ? $_[0] : undef;
-			$caller->form_meta->add_field(@_);
+			$field_context = $caller->form_meta->add_field(@_);
 		},
 		form_cleaner => sub {
 			$field_context = undef;
@@ -74,12 +82,10 @@ sub _generate_helpers
 			$caller->form_meta->add_filter(@_);
 		},
 		field_filter => sub {
-			if (@_ == 2) {
-				croak 'field_filter called in invalid context'
-					unless defined $field_context;
-				unshift @_, $field_context;
-			}
-			$caller->form_meta->add_field_filter(@_);
+			$caller->form_meta->add_field_filter($use_context->(@_));
+		},
+		field_validator => sub {
+			$caller->form_meta->add_field_validator($use_context->(@_));
 		},
 		form_trim_strings => sub {
 			$field_context = undef;
@@ -231,11 +237,17 @@ This creates a new hook for C<$stage>. Each stage may have multiple hooks and ea
 
 A shortcut for C<< form_hook cleanup => $coderef; >>.
 
+=head3 field_validator
+
+	field_validator $message => $coderef; # uses current context
+
+Adds an additional custom validator, ran after the type of the field is validated. C<$message> should be something that can present itself as a string. If for a given input parameter C<$coderef> returns false, that message will be added to form errors for that field. See L<Form::Tiny::Manual/"Additional validators"> for details.
+
 =head3 form_filter
 
 	form_filter $type, $coderef;
 
-C<$type> should be a Type::Tiny (or compatible) type check. For each input field that passes that check, C<$coderef> will be ran. See L<Form::Tiny::Manual/"Filters"> for details on filters.
+Filters the input value before the validation. C<$type> should be a Type::Tiny (or compatible) type check. For each input field that passes that check, C<$coderef> will be ran. See L<Form::Tiny::Manual/"Filters"> for details on filters.
 
 =head3 field_filter
 

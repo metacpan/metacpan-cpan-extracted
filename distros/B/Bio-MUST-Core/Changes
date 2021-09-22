@@ -1,3 +1,7 @@
+0.212650  2021-09-22 22:37:09+02:00 Europe/Brussels
+    - Changes
+      - Seq: refactored gapify method for speed (visible in ali2phylip.pl)
+
 0.212530  2021-09-10 23:55:21+02:00 Europe/Brussels
     - Changes
       - binaries: moved 'inst' executables to 'bin' dir (for default install)

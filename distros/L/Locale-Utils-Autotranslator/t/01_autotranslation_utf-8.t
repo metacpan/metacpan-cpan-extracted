@@ -52,7 +52,7 @@ unlink $output_filename;
 
 eq_or_diff
     [ split m{ \r? \n }xms, $content ],
-    [ split m{ \r? \n }xms, <<"EOT" ],
+    [ split m{ \n }xms, <<"EOT" ],
 msgid ""
 msgstr ""
 "Project-Id-Version: \\n"

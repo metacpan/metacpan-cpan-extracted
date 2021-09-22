@@ -95,9 +95,13 @@ sub doit($$) {
 			code2 => $code2,
 			type => $type,
 			data => $data,
-			ispreferredname => $ispreferredname,
-			isshortname => $isshortname
 		};
+		if(length($ispreferredname)) {
+			$queue{$code1}->{'ispreferredname'} = $ispreferredname;
+		}
+		if(length($isshortname)) {
+			$queue{$code1}->{'isshortname'} = $isshortname;
+		}
 	}
 	return \%queue;
 }
@@ -114,8 +118,6 @@ sub flush($)
 		} else {
 			$query .= ',(';
 		}
-		# use Data::Dumper;
-		# print Data::Dumper->new([$value])->Dump();
 
 		$query .= $value->{'code1'} . ',' . $value->{'code2'} . ',';
 
@@ -125,9 +127,22 @@ sub flush($)
 			$query .= 'NULL,';
 		}
 		$value->{'data'} =~ s/'/''/g;
-		my $ispreferredname = $value->{'ispreferredname'} ? 1 : 0;
-		my $isshortname = $value->{'isshortname'} ? 1 : 0;
-		$query .= "'" . $value->{'data'} . "',$ispreferredname,$isshortname)";
+		$query .= "'" . $value->{'data'} . "',";
+
+		if(defined($value->{'ispreferredname'})) {
+			my $ispreferredname = $value->{'ispreferredname'} ? 1 : 0;
+			$query .= "$ispreferredname,";
+		} else {
+			$query .= 'NULL,';
+		}
+
+		if(defined($value->{'isshortname'})) {
+			my $isshortname = $value->{'isshortname'} ? 1 : 0;
+			$query .= "$isshortname)";
+		} else {
+			$query .= 'NULL)';
+		}
+
 		# use Data::Dumper;
 		# print Data::Dumper->new([$value])->Dump() if($ispreferredname);
 	}

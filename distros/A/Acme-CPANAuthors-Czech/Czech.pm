@@ -4,7 +4,7 @@ use strict;
 use utf8;
 use warnings;
 
-our $VERSION = 0.29;
+our $VERSION = 0.30;
 
 # Modules.
 use Acme::CPANAuthors::Register(
@@ -28,6 +28,7 @@ use Acme::CPANAuthors::Register(
 	'MILSO' => 'Milan Šorm',
 	'MJFO' => 'Michal Jurosz',
 	'PAJAS' => 'Petr Pajas',
+	'PAJOUT' => 'Jan Poslušný',
 	'PASKY' => 'Petr Baudiš',
 	'PCIMPRICH' => 'Petr Cimprich',
 	'PEK' => 'Petr Kletečka',
@@ -130,7 +131,7 @@ See documentation for L<Acme::CPANAuthors> for more details.
  #     [7]  "HPA",
  #     [8]  "JANPAZ",
  #     [9]  "JANPOM",
- #     [10]  "JENDA",
+ #     [10] "JENDA",
  #     [11] "JIRA",
  #     [12] "JSPICAK",
  #     [13] "KLE",
@@ -140,30 +141,31 @@ See documentation for L<Acme::CPANAuthors> for more details.
  #     [17] "MILSO",
  #     [18] "MJFO",
  #     [19] "PAJAS",
- #     [20] "PASKY",
- #     [21] "PCIMPRICH",
- #     [22] "PEK",
- #     [23] "PETRIS",
- #     [24] "PKUBANEK",
- #     [25] "POPEL",
- #     [26] "PSME",
- #     [27] "RUR",
- #     [28] "RVASICEK",
- #     [29] "SARFY",
- #     [30] "SEIDLJAN",
- #     [31] "SKIM",
- #     [32] "SMRZ",
- #     [33] "STRAKA",
- #     [34] "TKR",
- #     [35] "TPODER",
- #     [36] "TRIPIE",
- #     [37] "TYNOVSKY",
- #     [38] "VARISD",
- #     [39] "VASEKD",
- #     [40] "YENYA",
- #     [41] "ZABA",
- #     [42] "ZEMAN",
- #     [43] "ZOUL"
+ #     [20] "PAJOUT",
+ #     [21] "PASKY",
+ #     [22] "PCIMPRICH",
+ #     [23] "PEK",
+ #     [24] "PETRIS",
+ #     [25] "PKUBANEK",
+ #     [26] "POPEL",
+ #     [27] "PSME",
+ #     [28] "RUR",
+ #     [29] "RVASICEK",
+ #     [30] "SARFY",
+ #     [31] "SEIDLJAN",
+ #     [32] "SKIM",
+ #     [33] "SMRZ",
+ #     [34] "STRAKA",
+ #     [35] "TKR",
+ #     [36] "TPODER",
+ #     [37] "TRIPIE",
+ #     [38] "TYNOVSKY",
+ #     [39] "VARISD",
+ #     [40] "VASEKD",
+ #     [41] "YENYA",
+ #     [42] "ZABA",
+ #     [43] "ZEMAN",
+ #     [44] "ZOUL"
  # ]
 
 =head1 DEPENDENCIES
@@ -188,6 +190,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.29
+0.30
 
 =cut

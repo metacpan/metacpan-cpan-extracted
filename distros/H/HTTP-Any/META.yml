@@ -1,5 +1,5 @@
 ---
-abstract: 'HTML::Any - a common interface for HTTP clients (LWP, AnyEvent::HTTP, Curl)'
+abstract: 'HTTP::Any - a common interface for HTTP clients (LWP, AnyEvent::HTTP, Curl)'
 author:
   - <kni@cpan.org>
 build_requires:
@@ -17,5 +17,5 @@ no_index:
   directory:
     - t
     - inc
-version: '0.15'
+version: '1.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

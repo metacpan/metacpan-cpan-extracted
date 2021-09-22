@@ -26,19 +26,19 @@ no_index:
 provides:
   Kossy:
     file: lib/Kossy.pm
-    version: '0.50'
+    version: '0.60'
   Kossy::Connection:
     file: lib/Kossy/Connection.pm
-    version: '0.50'
+    version: '0.60'
   Kossy::Exception:
     file: lib/Kossy/Exception.pm
-    version: '0.50'
+    version: '0.60'
   Kossy::Request:
     file: lib/Kossy/Request.pm
-    version: '0.50'
+    version: '0.60'
   Kossy::Response:
     file: lib/Kossy/Response.pm
-    version: '0.50'
+    version: '0.60'
 requires:
   Class::Accessor::Lite: '0'
   Cookie::Baker: '0.08'
@@ -72,7 +72,7 @@ resources:
   bugtracker: https://github.com/kazeburo/Kossy/issues
   homepage: https://github.com/kazeburo/Kossy
   repository: git://github.com/kazeburo/Kossy.git
-version: '0.50'
+version: '0.60'
 x_contributors:
   - 'FUJIWARA Shunichiro <fujiwara.shunichiro@gmail.com>'
   - 'Masahiro Nagano <kazeburo@gmail.com>'

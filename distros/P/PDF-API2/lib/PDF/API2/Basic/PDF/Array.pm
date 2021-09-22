@@ -13,11 +13,11 @@ use base 'PDF::API2::Basic::PDF::Objind';
 use strict;
 use warnings;
 
-our $VERSION = '2.041'; # VERSION
+our $VERSION = '2.042'; # VERSION
 
 =head1 NAME
 
-PDF::API2::Basic::PDF::Array - Corresponds to a PDF array. Inherits from L<PDF::Objind>
+PDF::API2::Basic::PDF::Array - Low-level PDF array object
 
 =head1 METHODS
 

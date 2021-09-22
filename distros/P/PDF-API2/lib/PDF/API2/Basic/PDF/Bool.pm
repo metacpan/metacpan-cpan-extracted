@@ -12,11 +12,11 @@ use base 'PDF::API2::Basic::PDF::String';
 
 use strict;
 
-our $VERSION = '2.041'; # VERSION
+our $VERSION = '2.042'; # VERSION
 
 =head1 NAME
 
-PDF::API2::Basic::PDF::Bool - A special form of L<PDF::String> which holds the strings
+PDF::API2::Basic::PDF::Bool - Low-level PDF boolean object
 B<true> or B<false>
 
 =head1 METHODS

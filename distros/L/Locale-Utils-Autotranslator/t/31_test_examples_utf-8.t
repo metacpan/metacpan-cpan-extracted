@@ -109,6 +109,6 @@ for my $data (@data) {
     #$result =~ tr{\\}{/};
     eq_or_diff
         [ split m{ \r? \n }xms, $result ],
-        [ split m{ \r? \n }xms, $data->{result} ],
+        [ split m{ \n }xms, $data->{result} ],
         $data->{test};
 }

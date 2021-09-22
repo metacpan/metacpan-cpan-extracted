@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210602223301;
+our $VERSION = 1.20210921211833;
 
 my $formatters = [
                 {
@@ -67,7 +67,10 @@ my $formatters = [
                   'leading_digits' => '
             1|
             28|
-            6[1-35-9]|
+            6(?:
+              0[5-7]|
+              [1-35-9]
+            )|
             9[2-9]
           ',
                   'pattern' => '(\\d{2})(\\d{5,7})'
@@ -102,25 +105,32 @@ my $validators = {
           )\\d{4}
         ',
                 'mobile' => '
-          28\\d{5}|
           (?:
-            6[1-9]|
-            79
-          )\\d{6,7}|
-          (?:
-            15|
-            24|
             (?:
-              3[59]|
-              4[89]|
-              8[08]
+              15|
+              (?:
+                3[59]|
+                4[89]|
+                79|
+                8[08]
+              )\\d|
+              6(?:
+                0[5-7]|
+                [1-9]\\d
+              )|
+              9(?:
+                0\\d|
+                [2-9]
+              )
             )\\d|
-            60|
-            7[1-8]|
-            9(?:
-              0\\d|
-              [2-9]
+            2(?:
+              4\\d|
+              8
             )
+          )\\d{5}|
+          (?:
+            6\\d|
+            7[1-9]
           )\\d{6}
         ',
                 'pager' => '',
@@ -130,8 +140,8 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"2524", "Garowe",
-"2521", "Mogadishu",
+$areanames{en} = {"2521", "Mogadishu",
+"2524", "Garowe",
 "2523", "Hargeisa",};
 
     sub new {

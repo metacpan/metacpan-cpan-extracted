@@ -1,23 +1,26 @@
---- #YAML:1.0
-name:               Tk-Markdown
-version:            0.05
-abstract:           display markdown in a Text
+---
+abstract: 'display Markdown in a Text'
 author:
-    - JimiWills <jimi@webu.co.uk>
-license:            Artistic_2_0
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'JimiWills <jimi@webu.co.uk>'
 build_requires:
-    Test::More:  0
-requires:
-    perl:  5.006
-    Tk:    5
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.57_05
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.46'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tk-Markdown
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Tk: '5'
+  perl: '5.006'
+resources:
+  repository: https://github.com/asb-capfan/Tk-Markdown
+version: '0.06'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

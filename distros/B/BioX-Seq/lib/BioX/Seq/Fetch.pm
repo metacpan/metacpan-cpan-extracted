@@ -12,12 +12,13 @@ sub new {
 
     my ($class,$fn,%args) = @_;
 
-    die "Can't find or read input filename"
-        if (! defined $fn || ! -e $fn);
+    die "Must define input filename for random access"
+        if (! defined $fn);
 
     my $self = bless {fn => $fn}, $class;
 
-    open my $fh, '<', $fn or die "Error opening $fn for reading: $!\n";
+    open my $fh, '<', $fn
+        or die "Error opening $fn for reading: $!\n";
 
     # read magic bytes and reset filehandle
     my $old_layers = join '', map {":$_"} PerlIO::get_layers($fh);
@@ -31,6 +32,7 @@ sub new {
     if ($magic_start eq MAGIC_GZIP) {
         die "Gzip files must be compressed with bgzip for non-sequential access"
             if (ord($magic_end) != 0x04);
+        # TODO: find way to test missing library during unit testing
         require Compress::BGZF::Reader
             or die "Compress::BGZF::Reader not installed, no gzip support";
         close $fh;
@@ -49,17 +51,17 @@ sub new {
 
 sub write_index {
     
-    my ($self, $fn) = @_;
+    my ($self, $fn_idx) = @_;
 
-    my $fn_idx  = $fn // $self->{fn} . '.fai';
+    $fn_idx //= $self->{fn} . '.fai';
 
     if (-e $fn_idx) {
         warn "Index file exists, won't overwrite\n";
         return 0;
     }
 
-    #warn "Creating index at $fn_idx\n";
-    open my $idx, '>:raw', $fn_idx or die "Error opening $fn_idx for writing: $!\n";
+    open my $idx, '>:raw', $fn_idx
+        or die "Error opening $fn_idx for writing: $!\n";
 
     my $fh = $self->{fh};
 
@@ -117,6 +119,7 @@ sub write_index {
     }
 
     # write remaining index
+    # uncoverable branch false
     if (defined $curr_id) {
         say {$idx} join "\t",
             $curr_id,
@@ -128,6 +131,10 @@ sub write_index {
     }
 
     close $idx;
+
+    #reset filehandle
+    seek $self->{fh}, 0, 0;
+
     return 1;
 
 }
@@ -141,7 +148,8 @@ sub _load_faidx {
     $self->write_index if (! -e $fn_idx);
     my @ids;
 
-    open my $in, '<', $fn_idx or die "Error opening index file: $!\n";
+    open my $in, '<', $fn_idx
+        or die "Error opening index file: $!\n";
     while (my $line = <$in>) {
         chomp $line;
         my ($name, $len, $offset, $bases_per_line, $bytes_per_line)

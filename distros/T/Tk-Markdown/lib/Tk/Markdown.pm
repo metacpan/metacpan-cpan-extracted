@@ -6,7 +6,7 @@ use warnings FATAL => 'all';
 
 =head1 NAME
 
-Tk::Markdown - display markdown in a Text
+Tk::Markdown - display Markdown in a Text
 
 =head1 VERSION
 
@@ -14,7 +14,7 @@ Version 0.05
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use base qw(Tk::Derived Tk::Text);
 use Tk::Font;
@@ -29,10 +29,10 @@ Construct Tk::Widget 'Markdown';
 
   use Tk;
   use Tk::MarkdownTk;
-
+  
   my $mw = new MainWindow();
-    my $mdt = $mw->MarkdownTk();
-
+  my $mdt = $mw->MarkdownTk();
+  
   $mdt->insert(q{
     some markdown here
   });
@@ -41,30 +41,25 @@ Construct Tk::Widget 'Markdown';
 
 =head2 insert
 
-Whenever insert is called on the Markdown, 
-some translation is done on the text in order to
-diplay it nicely as markdown.  Tables are reformatted
-(if the line starts with a bar) and headers are
-tagged with different fonts.
+Whenever insert is called on the Markdown, some translation is done on the text in order to display it nicely as Markdown.
+Tables are reformatted (if the line starts with a bar) and headers are tagged with different fonts.
 
-This module is currently under development and
-there's plenty to do, e.g. links, images, etc.
+This module is currently under development and there's plenty to do, e.g. links, images, etc.
 
 =cut
 
 ### add the processing functionality to the insert method
-sub insert
-{
-  my ($self,$index,$content) = @_;
-  my $res = $self->SUPER::insert($index,FormatMarkdown($content));
-  if(! $self->{inserting}){ ### don't allow recursion...
-    $self->{inserting} = 1;
-    $self->PaintMarkdown();
-#    $self->TransformTk();
-    $self->see("1.0");
-    $self->{inserting} = 0;
-  }
-  return $res;
+sub insert {
+    my ($self,$index,$content) = @_;
+    my $res = $self->SUPER::insert($index,FormatMarkdown($content));
+    if(! $self->{inserting}) { ### don't allow recursion...
+        $self->{inserting} = 1;
+        $self->PaintMarkdown();
+        # $self->TransformTk();
+        $self->see("1.0");
+        $self->{inserting} = 0;
+    }
+    return $res;
 }
 
 
@@ -73,165 +68,170 @@ sub insert
 
 =head2 defaultStyles 
 
-Called internally.  You can access the styles like this:
+Called internally. You can access the styles like this:
 
-	use Data::Dumper;
-	print Dumper $o->{styles};
+    use Data::Dumper;
+    print Dumper $o->{styles};
 
-To set styles, use $o->setStyles
+To set styles, use C<$o-E<gt>setStyles>
 
 =cut
 
 ### named styles, used in _rules_ below.
 sub defaultStyles { 
-  my $self = shift;   
-  my @sans = qw/-family Helvetica -size/;
-  my @serif = qw/-family Times -size/;
-  my @mono = qw/-family Courier -size/;
-  my @bold = qw/-weight bold/;
-  my @italic = qw/-slant italic/;
-  my @under = qw/-underline 1/;
-  my @over = qw/-overstrike 1/;
-  my %ss = (
-    body => ['black',@serif,12],
-    h1 => ['navy',@sans,18,@bold,@italic],
-    h2 => ['firebrick',@sans,18,@bold],
-    h3 => ['darkgreen',@sans,16,@bold,@italic],
-    h4 => ['brown',@sans,16,@bold],
-    h5 => ['seagreen',@sans,14,@bold,@italic],
-    h6 => ['darkslateblue',@sans,14,@bold],
-    code => ['DarkSlateGray',@mono,10],
-    list => ['black', @sans, 10],
-  );
-  #foreach(keys %ss){
-  #  print @{$ss{$_}} % 2, "\n";
-  #}
-  $self->{'styles'} = \%ss;
-  $self->setStyles(%ss);
+    my $self = shift;   
+    my @sans = qw/-family Helvetica -size/;
+    my @serif = qw/-family Times -size/;
+    my @mono = qw/-family Courier -size/;
+    my @bold = qw/-weight bold/;
+    my @italic = qw/-slant italic/;
+    my @under = qw/-underline 1/;
+    my @over = qw/-overstrike 1/;
+    my %ss = (
+        body => ['black',@serif,12],
+        h1 => ['navy',@sans,18,@bold,@italic],
+        h2 => ['firebrick',@sans,18,@bold],
+        h3 => ['darkgreen',@sans,16,@bold,@italic],
+        h4 => ['brown',@sans,16,@bold],
+        h5 => ['seagreen',@sans,14,@bold,@italic],
+        h6 => ['darkslateblue',@sans,14,@bold],
+        code => ['DarkSlateGray',@mono,10],
+        list => ['black', @sans, 10],
+    );
+    #foreach(keys %ss){
+    #    print @{$ss{$_}} % 2, "\n";
+    #}
+    $self->{'styles'} = \%ss;
+    $self->setStyles(%ss);
 }
 
 
 =head2 setStyles
 
-The argument is a hash of styles.  The keys are predefined names, currently:
+The argument is a hash of styles. The keys are predefined names, currently:
 
 =over
 
 =item body
+
 =item h1
+
 =item h2
+
 =item h3
+
 =item h4
+
 =item h5
+
 =item h6
+
 =item code
+
 =item list
 
 =back
 
-and the values are listrefs, in which the first element is the -foreground color, and 
-the remainder are options for the Tk::Font object.  For example:
+And the values are listrefs, in which the first element is the C<-foreground> color, and the remainder are options for the L<Tk::Font> object.
+For example:
 
-	$o->setStyles(
-		'h1' => [ qw/ red -family Times -weight bold -size 32 / ],
-	)
+    $o->setStyles(
+        'h1' => [ qw/ red -family Times -weight bold -size 32 / ],
+    )
 
 =cut
 
 
 ### add styles as tags to the text
 sub setStyles {
-  my ($self,%styles) = @_;
-  %{$self->{styles}} = (%{$self->{styles}},%styles);
-  foreach (keys %styles){
-    my ($color,@font) = @{$styles{$_}};
-    $self->tagConfigure($_, -foreground=>$color, -font=>$self->Font(@font));
-  }
-  my ($color,@font) = @{$styles{body}};
-  $self->configure(-font=>$self->Font(@font),-foreground=>$color);
+    my ($self,%styles) = @_;
+    %{$self->{styles}} = (%{$self->{styles}},%styles);
+    foreach (keys %styles) {
+        my ($color,@font) = @{$styles{$_}};
+        $self->tagConfigure($_, -foreground=>$color, -font=>$self->Font(@font));
+    }
+    my ($color,@font) = @{$styles{body}};
+    $self->configure(-font=>$self->Font(@font),-foreground=>$color);
 }
 
 =head2 FormatMarkdown
 
-This is called internally.  It prettifies markdown prior to insertion.
+This is called internally. It prettifies markdown prior to insertion.
 
-<%  perl code here %> is interpretted here, so if you want to have perl
-code that results in formatted markdown, you'll need to put it inside
-<% %>  (as opposed to the <? ?> that will get run by MarkdownTk)
+<% Perl code here %> is interpreted here, so if you want to have Perl code that results in formatted markdown, you'll need to put it inside <% %> (as opposed to the <? ?> that will get run by MarkdownTk)
 
 =cut
 
 ### reformat the text of certain markdown components to make them prettier...
-sub FormatMarkdown
-{
-  my $markdown = shift;
-  $markdown =~ s/<\%=(.*?)\%>/ my $v=$1; eval("\$v = sub{ $v }"); &$v()/ges;
-  $markdown =~ s/<\%(.*?)\%>/ eval($1); ''/ges;
-  my @lines = split /\n/, $markdown;
-  my $i = 0;
-  while($i < @lines){
-    if($lines[$i] =~ /^\|/){ # tables!
-      my $j = $i;
-      while($lines[$j+1] =~ /^\||^-+$/){ $j++; }
-      @lines[$i..$j] = FormatMarkdownTable(@lines[$i..$j]);
-      $i = $j;
+sub FormatMarkdown {
+    my $markdown = shift;
+    $markdown =~ s/<\%=(.*?)\%>/ my $v=$1; eval("\$v = sub{ $v }"); &$v()/ges;
+    $markdown =~ s/<\%(.*?)\%>/ eval($1); ''/ges;
+    my @lines = split /\n/, $markdown;
+    my $i = 0;
+    while($i < @lines) {
+        if($lines[$i] =~ /^\|/){ # tables!
+            my $j = $i;
+            while($lines[$j+1] =~ /^\||^-+$/){ $j++; }
+            @lines[$i..$j] = FormatMarkdownTable(@lines[$i..$j]);
+            $i = $j;
+        }
+        $i++;
     }
-    $i++;
-  }
-  $markdown = join("\n", @lines);
-  return $markdown;
+    $markdown = join("\n", @lines);
+    return $markdown;
 }
 
 =head2 FormatMarkdownTable
 
-This is called internally.  It prettifies markdown tables.
+This is called internally. It prettifies markdown tables.
 
 =cut
 
 ### reformat the text of tables to make them prettier...
 sub FormatMarkdownTable {
-  s/\s*\|\s*/|/g foreach @_;
-  s/^\s*\|\s*// foreach @_;
-  s/\s*\|\s*$// foreach @_;
-  my @colwidths = map {0} split /\|/, $_[0];
-  foreach my $row (@_){
-    next if $row =~ /^-+$/;
-    my @row = split /\|/, $row;
-    @colwidths = map {$colwidths[$_] > length($row[$_]) ? $colwidths[$_] : length($row[$_])} 0..$#row;
-  }
-  my $sum = 0;
-  foreach (@colwidths){
-    $sum += $_;
-    $sum += 3;
-  }
-  my $hr = '-' x $sum;
-  my @table;
-  foreach my $row (@_){
-    if($row =~ /^-+$/){
-      push @table, $hr;
-      next;
+    s/\s*\|\s*/|/g foreach @_;
+    s/^\s*\|\s*// foreach @_;
+    s/\s*\|\s*$// foreach @_;
+    my @colwidths = map {0} split /\|/, $_[0];
+    foreach my $row (@_) {
+        next if $row =~ /^-+$/;
+        my @row = split /\|/, $row;
+        @colwidths = map {$colwidths[$_] > length($row[$_]) ? $colwidths[$_] : length($row[$_])} 0..$#row;
     }
-    my @row = split /\|/, $row;
-    foreach my $j(0..$#row){
-      my $diff = $colwidths[$j] - length($row[$j]);
-      my $spaces = ' ' x $diff;
-      # if a number...
-      if($row[$j] =~ /^[-+]?(?:0[bx]|)\d+\.?\d*[fe][+-]?\d*$/){
-        $row[$j] = $spaces . $row[$j];
-      }
-      else {
-        $row[$j] .= $spaces;
-      }
-      $row[$j] = " $row[$j] ";
+    my $sum = 0;
+    foreach (@colwidths) {
+        $sum += $_;
+        $sum += 3;
     }
-    push @table, "|".join('|', @row)."|";
-  }
-  return @table;
+    my $hr = '-' x $sum;
+    my @table;
+    foreach my $row (@_) {
+        if($row =~ /^-+$/){
+            push @table, $hr;
+            next;
+        }
+        my @row = split /\|/, $row;
+        foreach my $j(0..$#row) {
+            my $diff = $colwidths[$j] - length($row[$j]);
+            my $spaces = ' ' x $diff;
+            # if a number...
+            if($row[$j] =~ /^[-+]?(?:0[bx]|)\d+\.?\d*[fe][+-]?\d*$/){
+                $row[$j] = $spaces . $row[$j];
+            }
+            else {
+                $row[$j] .= $spaces;
+            }
+            $row[$j] = " $row[$j] ";
+        }
+        push @table, "|".join('|', @row)."|";
+    }
+    return @table;
 }
 
 =head2 PaintMarkdown
 
-This is call internally.  It applies the styles.
+This is call internally. It applies the styles.
 
 
 
@@ -240,91 +240,90 @@ This is call internally.  It applies the styles.
 
 
 ### Add tags and substitute some characters to format the markdown.
-sub PaintMarkdown
-{
-  my $self = shift;
-  my @rules = (
-      ### HEADERS
-    [qr/^#[^#].*$/m, 'h1', qr/^#\s*(?=[^#])/m ,''],
-    [qr/^##[^#].*$/m, 'h2', qr/^##\s*(?=[^#])/m, ''],
-    [qr/^###[^#].*$/m, 'h3', qr/^###\s*(?=[^#])/m, ''],
-    [qr/^####[^#].*$/m, 'h4', qr/^####\s*(?=[^#])/m, ''],
-    [qr/^#####[^#].*$/m, 'h5', qr/^#####\s*(?=[^#])/m, ''],
-    [qr/^######[^#].*$/m, 'h6', qr/^######\s*(?=[^#])/m, ''],
-      ### TABLES
-    [qr/^\|.*\|$|^-+$|^\s\s\s\s/m, 'code', '', ''],
-      ### LISTS
-    [qr/^\*[^*].*$/m, 'list', qr/^\*(?=[^*])/, "   \x{2022} "],
-    [qr/^\*\*[^*].*$/m, 'list', qr/^\*\*(?=[^*])/, "      \x{25E6} "],
-    [qr/^\*\*\*[^*].*$/m, 'list', qr/^\*\*\*(?=[^*])/, "         \x{2022} "],
-    [qr/^\*\*\*\*[^*].*$/m, 'list', qr/^\*\*\*\*(?=[^*])/, "            \x{25E6} "],
-    [qr/^\*\*\*\*\*[^*].*$/m, 'list', qr/^\*\*\*\*\*(?=[^*])/, "               \x{2022} "],
-    [qr/^\*\*\*\*\*\*[^*].*$/m, 'list', qr/^\*\*\*\*\*\*(?=[^*])/, "                  \x{25E6} "],
-      ### CODE
-    [qr/^\s\s\s\s.*$/m, 'code', '', ''],
-  );
-  foreach(@rules){
-    my ($re,$tag,$search,$replace) = @$_;
-    $self->FindAll('-regexp','-case', $re );
-    my @i = $self->tagRanges('sel');
-    $self->tagAdd($tag,@i) if @i;
-    if($search){
-      #print "$search\n";
-      $self->FindAndReplaceAll('-regexp','-case', $search, $replace);
+sub PaintMarkdown {
+    my $self = shift;
+    my @rules = (
+        ### HEADERS
+        [qr/^#[^#].*$/m, 'h1', qr/^#\s*(?=[^#])/m ,''],
+        [qr/^##[^#].*$/m, 'h2', qr/^##\s*(?=[^#])/m, ''],
+        [qr/^###[^#].*$/m, 'h3', qr/^###\s*(?=[^#])/m, ''],
+        [qr/^####[^#].*$/m, 'h4', qr/^####\s*(?=[^#])/m, ''],
+        [qr/^#####[^#].*$/m, 'h5', qr/^#####\s*(?=[^#])/m, ''],
+        [qr/^######[^#].*$/m, 'h6', qr/^######\s*(?=[^#])/m, ''],
+        
+        ### TABLES
+        [qr/^\|.*\|$|^-+$|^\s\s\s\s/m, 'code', '', ''],
+        
+        ### LISTS
+        [qr/^\*[^*].*$/m, 'list', qr/^\*(?=[^*])/, "   \x{2022} "],
+        [qr/^\*\*[^*].*$/m, 'list', qr/^\*\*(?=[^*])/, "      \x{25E6} "],
+        [qr/^\*\*\*[^*].*$/m, 'list', qr/^\*\*\*(?=[^*])/, "         \x{2022} "],
+        [qr/^\*\*\*\*[^*].*$/m, 'list', qr/^\*\*\*\*(?=[^*])/, "            \x{25E6} "],
+        [qr/^\*\*\*\*\*[^*].*$/m, 'list', qr/^\*\*\*\*\*(?=[^*])/, "               \x{2022} "],
+        [qr/^\*\*\*\*\*\*[^*].*$/m, 'list', qr/^\*\*\*\*\*\*(?=[^*])/, "                  \x{25E6} "],
+      
+        ### CODE
+        [qr/^\s\s\s\s.*$/m, 'code', '', ''],
+    );
+    
+    foreach(@rules) {
+        my ($re,$tag,$search,$replace) = @$_;
+        $self->FindAll('-regexp','-case', $re );
+        my @i = $self->tagRanges('sel');
+        $self->tagAdd($tag,@i) if @i;
+        if($search){
+            #print "$search\n";
+            $self->FindAndReplaceAll('-regexp','-case', $search, $replace);
+        }
     }
-  }
 }
 
 =head2 clipEvents
 
-This copied directly from Tk::ROText
+This copied directly from L<Tk::ROText>.
 
 =cut
 
-sub clipEvents
-{
-  return qw[Copy];
+sub clipEvents {
+    return qw[Copy];
 }
 
 =head2 ClassInit
 
-This is copied directly from Tk::ROText.
+This is copied directly from L<Tk::ROText>.
 
 =cut
 
-sub ClassInit
-{
-  my ($class,$mw) = @_;
-  my $val = $class->bindRdOnly($mw);
-  my $cb = $mw->bind($class,'<Next>');
-  $mw->bind($class,'<space>',$cb) if (defined $cb);
-  $cb = $mw->bind($class,'<Prior>');
-  $mw->bind($class,'<BackSpace>', $cb) if (defined $cb);
-  $class->clipboardOperations($mw,'Copy');
-  return $val;
+sub ClassInit {
+    my ($class,$mw) = @_;
+    my $val = $class->bindRdOnly($mw);
+    my $cb = $mw->bind($class,'<Next>');
+    $mw->bind($class,'<space>',$cb) if (defined $cb);
+    $cb = $mw->bind($class,'<Prior>');
+    $mw->bind($class,'<BackSpace>', $cb) if (defined $cb);
+    $class->clipboardOperations($mw,'Copy');
+    return $val;
 }
 
 =head2 Populate
 
-This is copied and modified from Tk::ROText.  The modification is the addition
-of a call to setDefaultStyles.  That's all.
+This is copied and modified from L<Tk::ROText>. The modification is the addition of a call to setDefaultStyles. That's all.
 
 =cut
 
-sub Populate
-{
-  my ($self,$args) = @_;
-  $self->SUPER::Populate($args);
-  my $m = $self->menu->entrycget($self->menu->index('Search'), '-menu');
-  $m->delete($m->index('Replace'));
-  $self->ConfigSpecs(-background=>['SELF'], -foreground=>['SELF'],);
-  $self->defaultStyles(); ### Jimi added this line... does a bit more setup.
+sub Populate {
+    my ($self,$args) = @_;
+    $self->SUPER::Populate($args);
+    my $m = $self->menu->entrycget($self->menu->index('Search'), '-menu');
+    $m->delete($m->index('Replace'));
+    $self->ConfigSpecs(-background=>['SELF'], -foreground=>['SELF'],);
+    $self->defaultStyles(); ### Jimi added this line... does a bit more setup.
 }
 
 
 =head2 Tk::Widget::ScrlMardown
 
-Copied and adapted from Tk::ROText
+Copied and adapted from L<Tk::ROText>.
 
 =cut
 
@@ -338,9 +337,7 @@ JimiWills, C<< <jimi at webu.co.uk> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-tk-markdown at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Tk-Markdown>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests via GitHub: L<https://github.com/asb-capfan/Tk-Markdown>
 
 
 
@@ -356,21 +353,9 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * GitHub (report bugs here):
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tk-Markdown>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Tk-Markdown>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Tk-Markdown>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Tk-Markdown/>
+L<https://github.com/asb-capfan/Tk-Markdown>
 
 =back
 

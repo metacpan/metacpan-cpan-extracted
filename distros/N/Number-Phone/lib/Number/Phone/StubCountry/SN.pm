@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210602223301;
+our $VERSION = 1.20210921211833;
 
 my $formatters = [
                 {
@@ -67,6 +67,10 @@ my $validators = {
           )\\d{5}
         ',
                 'mobile' => '
+          75(?:
+            01|
+            [38]3
+          )\\d{5}|
           7(?:
             [06-8]\\d|
             21|
@@ -79,21 +83,26 @@ my $validators = {
                 'specialrate' => '(81[02468]\\d{6})|(88[4689]\\d{6})',
                 'toll_free' => '800\\d{6}',
                 'voip' => '
-          93330\\d{4}|
-          3(?:
-            392|
-            9[01]\\d
-          )\\d{5}
+          (?:
+            3(?:
+              392|
+              9[01]\\d
+            )\\d|
+            93(?:
+              3[13]0|
+              929
+            )
+          )\\d{4}
         '
               };
 my %areanames = ();
-$areanames{en} = {"221338", "Dakar",
-"2213396", "Outside\ Dakar",
-"2213393", "Outside\ Dakar",
-"2213399", "Outside\ Dakar",
-"2213395", "Outside\ Dakar",
+$areanames{en} = {"2213395", "Outside\ Dakar",
+"221338", "Dakar",
 "2213394", "Outside\ Dakar",
+"2213393", "Outside\ Dakar",
+"2213396", "Outside\ Dakar",
 "2213398", "Outside\ Dakar",
+"2213399", "Outside\ Dakar",
 "2213397", "Outside\ Dakar",};
 
     sub new {

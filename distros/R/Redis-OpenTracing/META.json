@@ -1,7 +1,7 @@
 {
    "abstract" : "Wrap Redis inside OpenTracing",
    "author" : [
-      "unknown"
+      "Theo van Hoesel <tvanhoesel@perceptyx.com"
    ],
    "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
@@ -34,10 +34,12 @@
          "requires" : {
             "Moo" : "0",
             "OpenTracing::AutoScope" : "v0.107.3",
-            "Redis" : "0",
             "Scalar::Util" : "0",
             "Syntax::Feature::Maybe" : "0",
             "Types::Standard" : "0"
+         },
+         "suggests" : {
+            "Redis::Fast" : "0"
          }
       },
       "test" : {
@@ -48,12 +50,11 @@
             "Test::Mock::Redis" : "0",
             "Test::MockObject" : "0",
             "Test::Most" : "0",
-            "Test::OpenTracing::Integration" : "v0.102.1",
-            "Test::RedisServer" : "0"
+            "Test::OpenTracing::Integration" : "v0.102.1"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v0.0.4",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "v0.1.1",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

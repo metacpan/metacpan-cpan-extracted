@@ -18,7 +18,7 @@ is($png->width(), 1,
 
 my $gfx = $pdf->page->gfx();
 $gfx->image($png, 72, 144, 216, 288);
-like($pdf->stringify(), qr/q 216 0 0 288 72 144 cm \S+ Do Q/,
+like($pdf->to_string(), qr/q 216 0 0 288 72 144 cm \S+ Do Q/,
      q{Add PNG to PDF});
 
 # RGBA PNG file
@@ -33,7 +33,7 @@ my $page = $pdf->page();
 $page->mediabox(840,600);
 $gfx=$page->gfx;
 $gfx->image($png,134,106,510,281);
-my $rgba1_pdf_string = $pdf->stringify();
+my $rgba1_pdf_string = $pdf->to_string();
 
 # RGBA PNG file Pure Perl
 
@@ -47,7 +47,7 @@ my $page2 = $pdf->page();
 $page2->mediabox(840,600);
 my $gfx2=$page2->gfx;
 $gfx2->image($png2,134,106,510,281);
-my $rgba2_pdf_string = $pdf->stringify();
+my $rgba2_pdf_string = $pdf->to_string();
 delete $ENV{'PDFAPI2_PNG_PP'};
 
 is(substr($rgba1_pdf_string, 0, 512), substr($rgba2_pdf_string, 0, 512),
@@ -57,9 +57,9 @@ is(substr($rgba1_pdf_string, 0, 512), substr($rgba2_pdf_string, 0, 512),
 
 $pdf = PDF::API2->new();
 open my $fh, '<', 't/resources/1x1.png';
-$png = $pdf->image_png($fh);
+$png = $pdf->image($fh);
 isa_ok($png, 'PDF::API2::Resource::XObject::Image::PNG',
-       q{$pdf->image_png(filehandle)});
+       q{$pdf->image(filehandle)});
 
 is($png->width(), 1,
    q{Image from filehandle has a width});
@@ -71,5 +71,3 @@ close $fh;
 $pdf = PDF::API2->new();
 eval { $pdf->image_png('t/resources/this.file.does.not.exist') };
 ok($@, q{Fail fast if the requested file doesn't exist});
-
-$pdf->end();

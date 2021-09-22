@@ -1,20 +1,58 @@
 Revision history for Text-Minify-XS:
 
+v0.5.0    2021-09-19 11:30:42+01:00 Europe/London
+  - No changes to the code since v0.4.8, but you should upgrade ensure
+    you have bug fixes related to handling malformed UTF-8.
+
+v0.4.10   2021-09-18 13:54:07+01:00 Europe/London (TRIAL RELEASE)
+  [Tests]
+  - Fixed variable redeclaration warning.
+
+v0.4.9    2021-09-17 22:40:30+01:00 Europe/London (TRIAL RELEASE)
+  [Documentation]
+  - Document croak from v0.4.6 in the KNOWN ISSUES section.
+
+  - Explicitly state that nothing is exported by default.
+
+  [Tests]
+  - Add author tests for memory leaks.
+
+  - Added more test cases.
+
+v0.4.8    2021-09-16 09:59:39+01:00 Europe/London
+  [Bug Fixes]
+  - Use safer NewSVpvn function, GH#5.
+
+v0.4.7    2021-09-15 15:34:10+01:00 Europe/London
+  [Bug Fixes]
+  - Ensure an extra byte is allocated in the result string.
+
+  [Documentation]
+  - Fixed typo in Changes.
+
+  - Added references to GH#5 to Changes.
+
+  - Documented potentially incompatible change in v0.4.6.
+
 v0.4.6    2021-09-14 13:25:42+01:00 Europe/London
   [Bug Fixes]
-  - Improved fix possible segfault for malformed UTF-8, GH#5.
+  - Improved fix for possible segfault for malformed UTF-8, GH#5.
+
+  [Incompatabilities]
+  - Croak when `utf8_to_uvchr_buf` believes the string uses more
+    bytes than are in the buffer.
 
 v0.4.5    2021-09-13 10:30:31+01:00 Europe/London
   [Bug Fixes]
-  - Fix possible segfault for malformed UTF-8.
+  - Fix possible segfault for malformed UTF-8, GH#5.
 
 v0.4.4    2021-09-12 11:48:42+01:00 Europe/London
   [Tests]
-  - Add more changes to tests for malformed UTF-8 on some platforms.
+  - Add more changes to tests for malformed UTF-8 on some platforms, GH#5.
 
 v0.4.3    2021-09-10 08:38:34+01:00 Europe/London
   [Tests]
-  - Improve tests for malformed UTF-8 on some platforms.
+  - Improve tests for malformed UTF-8 on some platforms, GH#5.
 
 v0.4.2    2021-06-21 16:48:35+01:00 Europe/London
   [Documentation]

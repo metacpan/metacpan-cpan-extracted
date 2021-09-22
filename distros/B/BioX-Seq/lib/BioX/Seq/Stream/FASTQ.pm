@@ -3,6 +3,8 @@ package BioX::Seq::Stream::FASTQ;
 use strict;
 use warnings;
 
+use parent qw/BioX::Seq::Stream/;
+
 sub _check_type {
 
     my ($class,$self) = @_;

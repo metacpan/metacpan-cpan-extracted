@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::MetaData;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Meta-Data vocabulary
 
-our $VERSION = '0.517';
+our $VERSION = '0.519';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -91,7 +91,7 @@ JSON::Schema::Modern::Vocabulary::MetaData - Implementation of the JSON Schema M
 
 =head1 VERSION
 
-version 0.517
+version 0.519
 
 =head1 DESCRIPTION
 

@@ -12,12 +12,11 @@ use base 'PDF::API2::Basic::PDF::Objind';
 
 use strict;
 
-our $VERSION = '2.041'; # VERSION
+our $VERSION = '2.042'; # VERSION
 
 =head1 NAME
 
-PDF::API2::Basic::PDF::String - PDF String type objects and superclass
-for simple objects that are basically stringlike (Number, Name, etc.)
+PDF::API2::Basic::PDF::String - Low-level PDF string object
 
 =head1 METHODS
 

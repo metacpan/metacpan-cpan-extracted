@@ -1,5 +1,8 @@
 Revision history for RT::Extension::HistoryFilter
 
+3.02 2021-09-16
+ - Remove the Select overlay template in favor of a patch
+
 3.01 2021-01-17
  - Generate pot file for further translations
  - Add french translation

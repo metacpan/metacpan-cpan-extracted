@@ -112,6 +112,7 @@ do { my $x = {
                                    'Test2::V0' => '0',
                                    'Test::Lib' => '0',
                                    'Test::More' => '0',
+                                   'Test::TempDir::Tiny' => '0',
                                    'YAML::PP' => '0'
                                  }
                  }

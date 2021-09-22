@@ -161,6 +161,20 @@ KNOWING WHAT CALLED WHAT
 
 CLASS METHODS
 
+    $class->enable()
+
+    $class->disable()
+
+    $bool = $class->enabled()
+
+      Toggle or check enabled status. When disabled no coverage is
+      recorded.
+
+    $class->reload()
+
+      Reset filter if $0 or __FILE__ have changed. This is advanced usage,
+      you will probably never need this.
+
     $val = $class->get_from()
 
       Get the current 'from' value. The default is '*' when nothing has set

@@ -1,3 +1,15 @@
+0.482   2021-07-04  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Add orgstat as shortcut for stat-org-document.
+
+	- [ux] Add orgdump as shortcut for dump-org-structure.
+
+        - [ux] Add orgdump-tiny as shortcut for dump-org-structure-tiny.
+
+	- Rename script move-done-todos -> move-done-org-todos, for consistency
+	  with other scripts.
+
+
 0.481   2020-10-14  Released-By: PERLANCAR; Urgency: medium
 
 	- [cli list-org-headlines][ux] Allow --has-tag and --lacks-tag in

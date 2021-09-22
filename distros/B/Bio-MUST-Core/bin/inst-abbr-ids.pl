@@ -112,7 +112,7 @@ inst-abbr-ids.pl - Abbreviate seq ids in FASTA files (optimized)
 
 =head1 VERSION
 
-version 0.212530
+version 0.212650
 
 =head1 USAGE
 

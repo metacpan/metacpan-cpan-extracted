@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.13";
+our $VERSION = "0.14";
 
 use Carp ();
 use Scalar::Util ();
@@ -31,7 +31,10 @@ sub _croak { require Carp; goto &Carp::croak }
 
 sub new {
     my ($class, @args) = @_;
-    my %args = @args == 1 ? %{$args[0]} : @args;
+
+    my %args = @args == 1 && (ref $args[0]||"") ne "HASH" ? _croak "single arg must be hashref"
+             : @args == 1 ? %{$args[0]}
+             : @args;
 
     my $self = bless \%args => $class;
 
@@ -40,17 +43,9 @@ sub new {
     $self->set_stashname(delete $args{stashname}) if exists $args{stashname};
     $self->set_fullname(delete $args{fullname})   if exists $args{fullname};
 
-    if (my $is_method = $self->_normalize_args_is_method(\%args)) {
-        $self->set_is_method($is_method);
-    }
-
-    if (my $parameters = $self->_normalize_args_parameters(\%args)) {
-        $self->set_parameters($parameters);
-    }
-
-    if (exists $args{returns}) {
-        $self->set_returns($args{returns})
-    }
+    $self->set_is_method($self->_normalize_args_is_method(\%args));
+    $self->set_parameters($self->_normalize_args_parameters(\%args));
+    $self->set_returns($args{returns});
 
     # cleaning
     delete $args{args};
@@ -64,29 +59,12 @@ sub new {
 sub _normalize_args_is_method {
     my ($self, $args) = @_;
 
-    if (exists $args->{parameters}) {
-        my $is_method = $args->{is_method}
-                     || $args->{parameters}{nshift}
-                     || $args->{parameters}{invocant};
-
-        my $exists_is_method = exists $args->{is_method}
-                            || exists $args->{parameters}{nshift}
-                            || exists $args->{parameters}{invocant};
-
-        return $is_method if $exists_is_method
-    }
-    elsif(exists $args->{args}) {
-        my $is_method = $args->{is_method}
-                     || $args->{nshift}
-                     || $args->{invocant};
-
-        my $exists_is_method = exists $args->{is_method}
-                            || exists $args->{nshift}
-                            || exists $args->{invocant};
-
-        return $is_method if $exists_is_method;
-    }
-    return;
+    return !!$args->{invocant}             if exists $args->{invocant};
+    return !!$args->{nshift}               if exists $args->{nshift};
+    return !!$args->{parameters}{nshift}   if exists $args->{parameters} && exists $args->{parameters}{nshift};
+    return !!$args->{parameters}{invocant} if exists $args->{parameters} && exists $args->{parameters}{invocant};
+    return !!$args->{is_method}            if exists $args->{is_method};
+    return !!0;
 }
 
 sub _normalize_args_parameters {
@@ -95,19 +73,18 @@ sub _normalize_args_parameters {
     if (exists $args->{parameters}) {
         return $args->{parameters};
     }
-    elsif(exists $args->{args}) {
+    else {
         my $nshift = exists $args->{nshift}    ? $args->{nshift}
                    : $self->is_method          ? 1
-                   : exists $self->{is_method} ? 0
-                   : undef;
+                   : 0;
 
-        my $parameters = { args => $args->{args} };
+        my $parameters;
+        $parameters->{args}     = $args->{args}     if exists $args->{args};
         $parameters->{slurpy}   = $args->{slurpy}   if exists $args->{slurpy};
         $parameters->{invocant} = $args->{invocant} if exists $args->{invocant};
-        $parameters->{nshift}   = $nshift           if defined $nshift;
+        $parameters->{nshift}   = $nshift;
         return $parameters;
     }
-    return;
 }
 
 sub sub() :method { my $self = shift; return $self->{sub} } ## no critic (ProhibitBuiltinHomonyms)
@@ -149,14 +126,13 @@ sub has_subname()    { my $self = shift; return defined $self->subinfo->[1] }
 sub has_stashname()  { my $self = shift; return defined $self->subinfo->[0] }
 sub has_prototype()  { my $self = shift; return !!$self->prototype } # after build_prototype
 sub has_attribute()  { my $self = shift; return !!$self->attribute } # after build_attribute
-sub has_parameters() { my $self = shift; return defined $self->{parameters} }
-sub has_returns()    { my $self = shift; return defined $self->{returns} }
 sub has_file()       { my $self = shift; return defined $self->{file} }
 sub has_line()       { my $self = shift; return defined $self->{line} }
 
 sub set_sub {
     my ($self, $v) = @_;
     $self->{sub} = $v;
+    Scalar::Util::weaken($self->{sub});
 
     # rebuild
     for (qw/subinfo file line prototype attribute is_constant/) {
@@ -205,12 +181,7 @@ sub set_parameters {
 
 sub set_args {
     my ($self, $args) = @_;
-    if ($self->has_parameters) {
-        $self->parameters->set_args($args);
-    }
-    else {
-        $self->set_parameters($self->parameters_class->new(args => $args));
-    }
+    $self->parameters->set_args($args);
     return $self;
 }
 
@@ -247,7 +218,13 @@ sub set_returns {
     return $self
 }
 
-sub _build_subinfo     { my $self = shift; return $self->sub ? [ Sub::Identify::get_code_info($self->sub) ] : [] }
+sub _build_subinfo     {
+    my $self = shift;
+    return [] unless $self->has_sub;
+    my @info = Sub::Identify::get_code_info($self->sub);
+    return [ $info[0], $info[1] eq '__ANON__' ? undef : $info[1] ];
+}
+
 sub _build_file        { my $self = shift; return $self->sub ? (Sub::Identify::get_code_location($self->sub))[0] : undef }
 sub _build_line        { my $self = shift; return $self->sub ? (Sub::Identify::get_code_location($self->sub))[1] : undef }
 sub _build_is_constant { my $self = shift; return $self->sub ? Sub::Identify::is_sub_constant($self->sub) : undef }
@@ -305,22 +282,15 @@ sub is_same_interface {
 
     return unless $self->is_method eq $other->is_method;
 
-    if ($self->has_parameters) {
-        return unless $self->parameters->is_same_interface($other->parameters)
-    }
-    else {
-        return if $other->has_parameters;
-    }
+    return unless $self->parameters->is_same_interface($other->parameters);
 
-    if ($self->has_returns) {
-        return unless $self->returns->is_same_interface($other->returns)
-    }
-    else {
-        return if $other->has_returns;
-    }
+    return unless $self->returns->is_same_interface($other->returns);
 
     return !!1;
 }
+
+sub is_strict_same_interface;
+*is_strict_same_interface = \&is_same_interface;
 
 sub is_relaxed_same_interface {
     my ($self, $other) = @_;
@@ -333,13 +303,9 @@ sub is_relaxed_same_interface {
 
     return unless $self->is_method eq $other->is_method;
 
-    if ($self->has_parameters) {
-        return unless $self->parameters->is_relaxed_same_interface($other->parameters)
-    }
+    return unless $self->parameters->is_relaxed_same_interface($other->parameters);
 
-    if ($self->has_returns) {
-        return unless $self->returns->is_relaxed_same_interface($other->returns)
-    }
+    return unless $self->returns->is_relaxed_same_interface($other->returns);
 
     return !!1;
 }
@@ -356,14 +322,15 @@ sub is_same_interface_inlined {
 
     push @src => sprintf("'%s' eq %s->is_method", $self->is_method, $v);
 
-    push @src => $self->has_parameters ? $self->parameters->is_same_interface_inlined(sprintf('%s->parameters', $v))
-                                       : sprintf('!%s->has_parameters', $v);
+    push @src => $self->parameters->is_same_interface_inlined(sprintf('%s->parameters', $v));
 
-    push @src => $self->has_returns ? $self->returns->is_same_interface_inlined(sprintf('%s->returns', $v))
-                                    : sprintf('!%s->has_returns', $v);
+    push @src => $self->returns->is_same_interface_inlined(sprintf('%s->returns', $v));
 
     return join "\n && ", @src;
 }
+
+sub is_strict_same_interface_inlined;
+*is_strict_same_interface_inlined = \&is_same_interface_inlined;
 
 sub is_relaxed_same_interface_inlined {
     my ($self, $v) = @_;
@@ -376,9 +343,9 @@ sub is_relaxed_same_interface_inlined {
 
     push @src => sprintf("'%s' eq %s->is_method", $self->is_method, $v);
 
-    push @src => $self->parameters->is_relaxed_same_interface_inlined(sprintf('%s->parameters', $v)) if $self->has_parameters;
+    push @src => $self->parameters->is_relaxed_same_interface_inlined(sprintf('%s->parameters', $v));
 
-    push @src => $self->returns->is_relaxed_same_interface_inlined(sprintf('%s->returns', $v)) if $self->has_returns;
+    push @src => $self->returns->is_relaxed_same_interface_inlined(sprintf('%s->returns', $v));
 
     return join "\n && ", @src;
 }
@@ -386,7 +353,7 @@ sub is_relaxed_same_interface_inlined {
 sub error_message {
     my ($self, $other) = @_;
 
-    return sprintf('must be Sub::Meta. got: %s', $other // '')
+    return sprintf('other must be Sub::Meta. got: %s', $other // 'Undef')
         unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta');
 
     if ($self->has_subname) {
@@ -397,32 +364,22 @@ sub error_message {
         return sprintf('should not have subname. got: %s', $other->subname) if $other->has_subname;
     }
 
-    if ($self->is_method ne $other->is_method) {
-        return 'invalid method';
-    }
+    return 'invalid method'
+        unless $self->is_method eq $other->is_method;
 
-    if ($self->has_parameters) {
-        return "invalid parameters:" . $self->parameters->error_message($other->parameters)
-            unless $self->parameters->is_same_interface($other->parameters)
-    }
-    else {
-        return 'should not have parameters' if $other->parameters;
-    }
+    return "invalid parameters: " . $self->parameters->error_message($other->parameters)
+        unless $self->parameters->is_same_interface($other->parameters);
 
-    if ($self->has_returns) {
-        return "invalid returns:" . $self->returns->error_message($other->returns)
-            unless $self->returns->is_same_interface($other->returns)
-    }
-    else {
-        return 'should not have returns' if $other->returns;
-    }
+    return "invalid returns: " . $self->returns->error_message($other->returns)
+        unless $self->returns->is_same_interface($other->returns);
+
     return '';
 }
 
 sub relaxed_error_message {
     my ($self, $other) = @_;
 
-    return sprintf('must be Sub::Meta. got: %s', $other // '')
+    return sprintf('other must be Sub::Meta. got: %s', $other // 'Undef')
         unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta');
 
     if ($self->has_subname) {
@@ -430,19 +387,15 @@ sub relaxed_error_message {
             unless $self->subname eq $other->subname
     }
 
-    if ($self->is_method ne $other->is_method) {
-        return 'invalid method'
-    }
+    return 'invalid method'
+        unless $self->is_method eq $other->is_method;
 
-    if ($self->has_parameters) {
-        return "invalid parameters:" . $self->parameters->relaxed_error_message($other->parameters)
-            unless $self->parameters->is_relaxed_same_interface($other->parameters)
-    }
+    return "invalid parameters: " . $self->parameters->relaxed_error_message($other->parameters)
+        unless $self->parameters->is_relaxed_same_interface($other->parameters);
 
-    if ($self->has_returns) {
-        return "invalid returns:" . $self->returns->relaxed_error_message($other->returns)
-            unless $self->returns->is_relaxed_same_interface($other->returns)
-    }
+    return "invalid returns: " . $self->returns->relaxed_error_message($other->returns)
+        unless $self->returns->is_relaxed_same_interface($other->returns);
+
     return '';
 }
 
@@ -454,8 +407,8 @@ sub display {
 
     my $s = $keyword;
     $s .= ' ' . $subname if $subname;
-    $s .= '('. $self->parameters->display .')' if $self->parameters;
-    $s .= ' => ' . $self->returns->display if $self->returns;
+    $s .= '('. $self->parameters->display .')';
+    $s .= ' => ' . $self->returns->display;
     return $s;
 }
 
@@ -504,7 +457,7 @@ And you can hold meta information of parameter type and return type. See also L<
 
     $meta->set_parameters(args => ['Str']));
     $meta->parameters->args; # [ Sub::Meta::Param->new({ type => 'Str' }) ]
-    
+
     $meta->set_args(['Str']);
     $meta->args; # [ Sub::Meta::Param->new({ type => 'Str' }) ]
 
@@ -551,7 +504,7 @@ Others are as follows:
         returns => Int,
     );
 
-    # method hello(Str) -> Str 
+    # method hello(Str) -> Str
     Sub::Meta->new(
         subname   => 'hello',
         args      => [{ message => Str }],
@@ -859,7 +812,7 @@ Accessor for attribute of subroutine reference.
     method attribute() => Maybe[ArrayRef[Str]]
 
 If the subroutine is set, it returns a attribute of subroutine, if not set, it returns undef.
-e.g. C<['method']>, C<undef> 
+e.g. C<['method']>, C<undef>
 
 =item C<< has_attribute >>
 
@@ -907,15 +860,9 @@ Accessor for parameters object of L<Sub::Meta::Parameters>
 
 =item C<< parameters >>
 
-    method parameters() => Maybe[InstanceOf[Sub::Meta]]
+    method parameters() => InstanceOf[Sub::Meta::Parameters]
 
 If the parameters is set, it returns the parameters object.
-
-=item C<< has_parameters >>
-
-    method has_parameters() => Bool
-
-Whether Sub::Meta has parameters or not.
 
 =item C<< set_parameters($parameters) >>
 
@@ -986,15 +933,9 @@ Accessor for returns object of L<Sub::Meta::Returns>
 
 =item C<< returns >>
 
-    method returns() => Maybe[InstanceOf[Sub::Meta]]
+    method returns() => InstanceOf[Sub::Meta::Returns]
 
 If the returns is set, it returns the returns object.
-
-=item C<< has_returns >>
-
-    method has_returns() => Bool
-
-Whether Sub::Meta has returns or not.
 
 =item C<< set_returns($returns) >>
 
@@ -1028,22 +969,50 @@ Apply subroutine subname, prototype and attributes of C<$other_meta>.
 A boolean value indicating whether the subroutine's interface is same or not.
 Specifically, check whether C<subname>, C<is_method>, C<parameters> and C<returns> are equal.
 
+=head3 is_strict_same_interface($other_meta)
+
+Alias for C<is_same_interface>
+
 =head3 is_relaxed_same_interface($other_meta)
 
     method is_relaxed_same_interface(InstanceOf[Sub::Meta] $other_meta) => Bool
 
 A boolean value indicating whether the subroutine's interface is relaxed same or not.
 Specifically, check whether C<subname>, C<is_method>, C<parameters> and C<returns> satisfy
-the condition of C<$self> side:
+the condition of C<$self> side.
 
-    my $meta = Sub::Meta->new;
-    my $other = Sub::Meta->new(subname => 'foo');
-    $meta->is_same_interface($other); # NG
-    $meta->is_relaxed_same_interface($other); # OK. The reason is that $meta does not specify the subname.
+=head4 Difference between C<strict> and C<relaxed>
+
+If it is C<is_relaxed_same_interface> method, the conditions can be many.
+For example, the number of arguments can be many.
+The following code is a test to show the difference between strict and relaxed.
+
+    my @tests = (
+        {},                { subname => 'foo' },
+        {},                { args => [Int] },
+        { args => [Int] }, { args => [Int, Str] },
+        { args => [Int] }, { args => [Int], slurpy => Str },
+        { args => [Int] }, { args => [{ type => Int, name => '$a' }] },
+        {},                { returns => Int },
+        { returns => { scalar => Int } }, { returns => { scalar => Int, list => Int } },
+    );
+
+    while (@tests) {
+        my ($a, $b) = splice @tests, 0, 2;
+        my $meta = Sub::Meta->new($a);
+        my $other = Sub::Meta->new($b);
+
+        ok !$meta->is_strict_same_interface($other);
+        ok $meta->is_relaxed_same_interface($other);
+    }
 
 =head3 is_same_interface_inlined($other_meta_inlined)
 
     method is_same_interface_inlined(InstanceOf[Sub::Meta] $other_meta) => Str
+
+=head3 is_strict_same_interface_inlined($other_meta)
+
+Alias for C<is_same_interface_inlined>
 
 Returns inlined C<is_same_interface> string:
 

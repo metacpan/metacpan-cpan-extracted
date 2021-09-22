@@ -3,9 +3,9 @@ package PDF::API2::Content;
 use base 'PDF::API2::Basic::PDF::Dict';
 
 use strict;
-no warnings qw( deprecated recursion uninitialized );
+use warnings;
 
-our $VERSION = '2.041'; # VERSION
+our $VERSION = '2.042'; # VERSION
 
 use Carp;
 use Compress::Zlib ();
@@ -27,18 +27,17 @@ PDF::API2::Content - Methods for adding graphics and text to a PDF
     my $page = $pdf->page();
 
     # Add a new content object
-    my $content = $page->gfx();
+    my $content = $page->graphics();
     my $content = $page->text();
 
     # Then call the methods below add graphics and text to the page.
 
-=head1 METHODS
-
 =cut
 
 sub new {
-    my $class = $_[0];
-    my $self = $class->SUPER::new(@_);
+    my $class = shift();
+    my $self = $class->SUPER::new();
+
     $self->{' stream'} = '';
     $self->{' poststream'} = '';
     $self->{' font'} = undef;
@@ -60,6 +59,7 @@ sub new {
     $self->{' skew'} = [0, 0];
     $self->{' rotate'} = 0;
     $self->{' apiistext'} = 0;
+
     return $self;
 }
 
@@ -71,27 +71,22 @@ sub outobjdeep {
         $self->{' nofilt'} = 1;
         delete $self->{'-docompress'};
     }
-    $self->SUPER::outobjdeep(@_);
+    return $self->SUPER::outobjdeep(@_);
 }
 
-=head2 Coordinate Transformations
+=head1 COORDINATE TRANSFORMATIONS
 
 The methods in this section change the coordinate system for the current content
 object relative to the rest of the document.
 
-If you call more than one of these methods, the PDF specification recommends
-calling them in the following order: translate, rotate, scale, skew.  Each
-change builds on the last, and you can get unexpected results when calling them
-in a different order.
+Changes to the coordinate system only affect subsequent paths or text.
 
-=over
+A call to any of the methods in this section resets the coordinate system before
+applying its changes, unless the C<relative> option is set.
 
-=cut
+=head2 translate
 
-# The following transformations are described in the PDF 1.7 specification,
-# section 8.3.3: Common Transformations.
-
-=item $content->translate($x, $y)
+    $content = $content->translate($x, $y);
 
 Moves the origin along the x and y axes.
 
@@ -104,10 +99,12 @@ sub _translate {
 
 sub translate {
     my ($self, $x, $y) = @_;
-    $self->transform(-translate => [$x, $y]);
+    $self->transform(translate => [$x, $y]);
 }
 
-=item $content->rotate($degrees)
+=head2 rotate
+
+    $content = $content->rotate($degrees);
 
 Rotates the coordinate system counter-clockwise.
 
@@ -122,12 +119,15 @@ sub _rotate {
 
 sub rotate {
     my ($self, $a) = @_;
-    $self->transform(-rotate => $a);
+    $self->transform(rotate => $a);
 }
 
-=item $content->scale($sx, $sy)
+=head2 scale
 
-Scales (stretches) the coordinate systems along the x and y axes.
+    $content = $content->scale($x, $y);
+
+Scales (stretches) the coordinate systems along the x and y axes.  A value of 1
+for either C<$x> or C<$y> represents 100% scale (i.e. no change).
 
 =cut
 
@@ -138,13 +138,15 @@ sub _scale {
 
 sub scale {
     my ($self, $sx, $sy) = @_;
-    $self->transform(-scale => [$sx, $sy]);
+    $self->transform(scale => [$sx, $sy]);
 }
 
-=item $content->skew($sa, $sb)
+=head2 skew
 
-Skews the coordinate system by C<$sa> degrees (counter-clockwise) from
-the x axis and C<$sb> degrees (clockwise) from the y axis.
+    $content = $content->skew($a, $b);
+
+Skews the coordinate system by C<$a> degrees (counter-clockwise) from the x axis
+and C<$b> degrees (clockwise) from the y axis.
 
 =cut
 
@@ -156,23 +158,27 @@ sub _skew {
 
 sub skew {
     my ($self, $a, $b) = @_;
-    $self->transform(-skew => [$a, $b]);
+    $self->transform(skew => [$a, $b]);
 }
 
-=item $content->transform(%options)
+=head2 transform
 
-    $content->transform(
-        -translate => [$x, $y],
-        -rotate    => $degrees,
-        -scale     => [$sx, $sy],
-        -skew      => [$sa, $sb],
-    )
+    $content = $content->transform(
+        translate => [$x, $y],
+        rotate    => $degrees,
+        scale     => [$x, $y],
+        skew      => [$a, $b],
+        relative  => $boolean,
+    );
 
-Performs multiple coordinate transformations at once, in the order
-recommended by the PDF specification (translate, rotate, scale, then
-skew).
+Performs multiple coordinate transformations, in the order recommended by the
+PDF specification (translate, rotate, scale, then skew).  Omitted options will
+be unchanged.
 
-This is equivalent to making each transformation separately.
+If C<relative> is true, the specified transformations will be added to any
+previous changes to the coordinate system.  By default, calling C<transform> or
+any of the other transformation methods will overwrite any previous changes to
+the coordinate system.
 
 =cut
 
@@ -194,17 +200,17 @@ sub _transform {
 
     # Note that the transformations are applied in reverse order.  See PDF 1.7
     # specification section 8.3.4: Transformation Matrices.
-    if (defined $opts{'-skew'}) {
-        $m = $m->multiply(_to_matrix(_skew(@{$opts{'-skew'}})));
+    if (defined $opts{'skew'}) {
+        $m = $m->multiply(_to_matrix(_skew(@{$opts{'skew'}})));
     }
-    if (defined $opts{'-scale'}) {
-        $m = $m->multiply(_to_matrix(_scale(@{$opts{'-scale'}})));
+    if (defined $opts{'scale'}) {
+        $m = $m->multiply(_to_matrix(_scale(@{$opts{'scale'}})));
     }
-    if (defined $opts{'-rotate'}) {
-        $m = $m->multiply(_to_matrix(_rotate($opts{'-rotate'})));
+    if (defined $opts{'rotate'}) {
+        $m = $m->multiply(_to_matrix(_rotate($opts{'rotate'})));
     }
-    if (defined $opts{'-translate'}) {
-        $m = $m->multiply(_to_matrix(_translate(@{$opts{'-translate'}})));
+    if (defined $opts{'translate'}) {
+        $m = $m->multiply(_to_matrix(_translate(@{$opts{'translate'}})));
     }
 
     # Undocumented; only used by textpos()
@@ -222,52 +228,75 @@ sub _transform {
     );
 }
 
+# Transformations are described in the PDF 1.7 specification, section 8.3.3:
+# Common Transformations.
 sub transform {
-    my ($self, %opts) = @_;
-    $self->matrix(_transform(%opts));
-    $self->{' translate'} = $opts{'-translate'} // [0, 0];
-    $self->{' rotate'}    = $opts{'-rotate'}    // 0;
-    $self->{' scale'}     = $opts{'-scale'}     // [1, 1];
-    $self->{' skew'}      = $opts{'-skew'}      // [0, 0];
+    my ($self, %options) = @_;
+    return $self->transform_rel(%options) if $options{'relative'};
+
+    # Deprecated options (remove hyphens)
+    foreach my $option (qw(translate rotate scale skew)) {
+        if (exists $options{'-' . $option}) {
+            $options{$option} //= delete $options{'-' . $option};
+        }
+    }
+
+    # Apply the transformations
+    $self->matrix(_transform(%options));
+
+    # Store the transformations for lookup or future relative transformations
+    $self->{' translate'} = $options{'translate'} // [0, 0];
+    $self->{' rotate'}    = $options{'rotate'}    // 0;
+    $self->{' scale'}     = $options{'scale'}     // [1, 1];
+    $self->{' skew'}      = $options{'skew'}      // [0, 0];
+
     return $self;
 }
 
-=item $content->transform_rel(%options)
-
-Makes transformations similarly to C<transform>, except that it adds
-to the previously set values.
-
-=cut
-
 sub transform_rel {
-    my ($self, %opt) = @_;
+    my ($self, %options) = @_;
 
-    my ($sa1, $sb1) = @{$opt{'-skew'} ? $opt{'-skew'} : [0, 0]};
+    # Deprecated options (remove hyphens)
+    foreach my $option (qw(translate rotate scale skew)) {
+        if (exists $options{'-' . $option}) {
+            $options{$option} //= delete $options{'-' . $option};
+        }
+    }
+
+    my ($sa1, $sb1) = @{$options{'skew'} ? $options{'skew'} : [0, 0]};
     my ($sa0, $sb0) = @{$self->{' skew'}};
 
-    my ($sx1, $sy1) = @{$opt{'-scale'} ? $opt{'-scale'} : [1, 1]};
+    my ($sx1, $sy1) = @{$options{'scale'} ? $options{'scale'} : [1, 1]};
     my ($sx0, $sy0) = @{$self->{' scale'}};
 
-    my $r1 = $opt{'-rotate'} // 0;
+    my $r1 = $options{'rotate'} // 0;
     my $r0 = $self->{' rotate'};
 
-    my ($tx1, $ty1) = @{$opt{'-translate'} ? $opt{'-translate'} : [0, 0]};
+    my ($tx1, $ty1) = @{$options{'translate'} ? $options{'translate'} : [0, 0]};
     my ($tx0, $ty0) = @{$self->{' translate'}};
 
     $self->transform(
-        -skew      => [$sa0 + $sa1, $sb0 + $sb1],
-        -scale     => [$sx0 * $sx1, $sy0 * $sy1],
-        -rotate    => $r0 + $r1,
-        -translate => [$tx0 + $tx1, $ty0 + $ty1],
+        skew      => [$sa0 + $sa1, $sb0 + $sb1],
+        scale     => [$sx0 * $sx1, $sy0 * $sy1],
+        rotate    => $r0 + $r1,
+        translate => [$tx0 + $tx1, $ty0 + $ty1],
     );
+
     return $self;
 }
 
-=item $content->matrix($a, $b, $c, $d, $e, $f)
+=head2 matrix
 
-(Advanced) Sets the current transformation matrix manually.  Unless you have a
-particular need to enter transformations manually, you should use the
-C<transform> method instead.
+    $graphics = $graphics->matrix($a, $b, $c, $d, $e, $f);
+
+    ($a, $b, $c, $d, $e, $f) = $text->matrix($a, $b, $c, $d, $e, $f);
+
+Sets the current transformation matrix manually.  Unless you have a particular
+need to enter transformations manually, you should use the C<transform> method
+instead.
+
+The return value differs based on whether the caller is a graphics content
+object or a text content object.
 
 =cut
 
@@ -304,21 +333,19 @@ sub matrix {
 }
 
 sub matrix_update {
-    my ($self, $tx, $ty)=@_;
+    my ($self, $tx, $ty) = @_;
     $self->{' textlinematrix'}->[0] += $tx;
     $self->{' textlinematrix'}->[1] += $ty;
     return $self;
 }
 
-=back
+=head1 GRAPHICS STATE
 
-=head2 Graphics State Parameters
+=head2 save
 
-=over
+    $content = $content->save();
 
-=item $content->save
-
-Saves the current graphics state and text state on a stack.
+Saves the current graphics state on a stack.
 
 =cut
 
@@ -328,15 +355,21 @@ sub _save {
 
 sub save {
     my $self = shift;
-    unless ($self->_in_text_object()) {
-        $self->add(_save());
+    if ($self->_in_text_object()) {
+        carp 'Calling save from a text content object has no effect';
+        return;
     }
+
+    $self->add(_save());
+
+    return $self;
 }
 
-=item $content->restore
+=head2 restore
 
-Restores the most recently saved graphics state and text state, removing it from
-the stack.
+    $content = $content->restore();
+
+Restores the most recently saved graphics state, removing it from the stack.
 
 =cut
 
@@ -346,14 +379,21 @@ sub _restore {
 
 sub restore {
     my $self = shift;
-    unless ($self->_in_text_object()) {
-        $self->add(_restore());
+    if ($self->_in_text_object()) {
+        carp 'Calling save from a text content object has no effect';
+        return;
     }
+
+    $self->add(_restore());
+
+    return $self;
 }
 
-=item $content->linewidth($width)
+=head2 line_width
 
-Sets the width of the stroke.
+    $content = $content->line_width($points);
+
+Sets the width of the stroke in points.
 
 =cut
 
@@ -362,27 +402,36 @@ sub _linewidth {
     return ($linewidth, 'w');
 }
 
-sub linewidth {
-    my ($self, $linewidth) = @_;
-    $self->add(_linewidth($linewidth));
+# Deprecated (renamed)
+sub linewidth { return line_width(@_) }
+
+sub line_width {
+    my ($self, $line_width) = @_;
+
+    $self->add(_linewidth($line_width));
+
+    return $self;
 }
 
-=item $content->linecap($style)
+=head2 line_cap
 
-Sets the style to be used at the end of a stroke.
+    $content = $content->line_cap($style);
+
+Sets the shape that will be used at the ends of open subpaths (and dashes, if
+any) when they are stroked.
 
 =over
 
-=item 0 = Butt Cap
+=item * "butt" or 0 = Butt Cap, default
 
 The stroke ends at the end of the path, with no projection.
 
-=item 1 = Round Cap
+=item * "round" or 1 = Round Cap)
 
 An arc is drawn around the end of the path with a diameter equal to the line
 width, and is filled in.
 
-=item 2 = Projecting Square Cap
+=item * "square" or 2 = Projecting Square Cap
 
 The stroke continues past the end of the path for half the line width.
 
@@ -395,28 +444,54 @@ sub _linecap {
     return ($linecap, 'J');
 }
 
-sub linecap {
-    my ($self, $linecap) = @_;
-    $self->add(_linecap($linecap));
+# Deprecated (renamed)
+sub linecap { return line_cap(@_) }
+
+sub line_cap {
+    my $self = shift();
+
+    if ($self->{' graphics'} and not @_) {
+        croak "Missing argument to line_cap";
+    }
+
+    my $style = shift() // 0;
+    $style = 0 if $style eq 'butt';
+    $style = 1 if $style eq 'round';
+    $style = 2 if $style eq 'square';
+
+    unless ($style >= 0 and $style <= 2) {
+        if ($self->{' graphics'}) {
+            croak "Unknown line cap style \"$style\"";
+        }
+        else {
+            confess "Unknown line cap style \"$style\"";
+        }
+    }
+
+    $self->add(_linecap($style));
+
+    return $self;
 }
 
-=item $content->linejoin($style)
+=head2 line_join
+
+    $content = $content->line_join($style);
 
 Sets the style of join to be used at corners of a path.
 
 =over
 
-=item 0 = Miter Join
+=item * "miter" or 0 = Miter Join, default
 
 The outer edges of the stroke extend until they meet, up to the limit specified
 below.  If the limit would be surpassed, a bevel join is used instead.
 
-=item 1 = Round Join
+=item * "round" or 1 = Round Join
 
 A circle with a diameter equal to the linewidth is drawn around the corner
 point, producing a rounded corner.
 
-=item 2 = Bevel Join
+=item * "bevel" or 2 = Bevel Join
 
 A triangle is drawn to fill in the notch between the two strokes.
 
@@ -429,12 +504,38 @@ sub _linejoin {
     return ($linejoin, 'j');
 }
 
-sub linejoin {
-    my ($this, $linejoin) = @_;
-    $this->add(_linejoin($linejoin));
+# Deprecated (renamed)
+sub linejoin { return line_join(@_) }
+
+sub line_join {
+    my $self = shift();
+
+    if ($self->{' graphics'} and not @_) {
+        croak "Missing argument to line_join";
+    }
+
+    my $style = shift() // 0;
+    $style = 0 if $style eq 'miter';
+    $style = 1 if $style eq 'round';
+    $style = 2 if $style eq 'bevel';
+
+    unless ($style >= 0 and $style <= 2) {
+        if ($self->{' graphics'}) {
+            croak "Unknown line join style \"$style\"";
+        }
+        else {
+            confess "Unknown line join style \"$style\"";
+        }
+    }
+
+    $self->add(_linejoin($style));
+
+    return $self;
 }
 
-=item $content->miterlimit($ratio)
+=head2 miter_limit
+
+    $content = $content->miter_limit($ratio);
 
 Sets the miter limit when the line join style is a miter join.
 
@@ -452,22 +553,36 @@ sub _miterlimit {
     return ($limit, 'M');
 }
 
-sub miterlimit {
+# Deprecated; miterlimit was originally named incorrectly
+sub meterlimit { return miter_limit(@_) }
+
+# Deprecated (renamed)
+sub miterlimit { return miter_limit(@_) }
+
+sub miter_limit {
     my ($self, $limit) = @_;
+
     $self->add(_miterlimit($limit));
+
+    return $self;
 }
 
-# Deprecated: miterlimit was originally named incorrectly
-sub  meterlimit { return  miterlimit(@_) }
-sub _meterlimit { return _miterlimit(@_) }
+=head2 line_dash_pattern
 
-=item $content->linedash()
+    # Solid line
+    $content = $content->line_dash_pattern();
 
-=item $content->linedash($length)
+    # Equal length lines and gaps
+    $content = $content->line_dash_pattern($length);
 
-=item $content->linedash($dash_length, $gap_length, ...)
+    # Specified line and gap lengths
+    $content = $content->line_dash_pattern($line1, $gap1, $line2, $gap2, ...);
 
-=item $content->linedash(-pattern => [$dash_length, $gap_length, ...], -shift => $offset)
+    # Offset the starting point
+    $content = $content->line_dash_pattern(
+        pattern => [$line1, $gap1, $line2, $gap2, ...],
+        offset => $points,
+    );
 
 Sets the line dash pattern.
 
@@ -484,36 +599,56 @@ distance into the pattern at which to start the dash.
 =cut
 
 sub _linedash {
-    my @a = @_;
-    unless (scalar @a) {
+    my @options = @_;
+
+    unless (@options) {
         return ('[', ']', '0', 'd');
     }
-    else {
-        if ($a[0] =~ /^\-/) {
-            my %a = @a;
 
-            # Deprecated: the -full and -clear options will be removed in a
-            # future release
-            unless (exists $a{'-pattern'}) {
-                $a{'-pattern'} = [$a{'-full'} || 0, $a{'-clear'} || 0];
-            }
-
-            return ('[', floats(@{$a{'-pattern'}}), ']', ($a{'-shift'} || 0), 'd');
-        }
-        else {
-            return ('[', floats(@a), '] 0 d');
-        }
+    if ($options[0] =~ /^\d/) {
+        return ('[', floats(@options), '] 0 d');
     }
+
+    my %options = @options;
+
+    # Deprecated option names
+    if ($options{'-pattern'}) {
+        $options{'pattern'} //= delete $options{'-pattern'};
+    }
+    if ($options{'-shift'}) {
+        $options{'offset'} //= delete $options{'-shift'};
+    }
+
+    # Deprecated: the -full and -clear options will be removed in a future
+    # release
+    if (exists $options{'-full'} or exists $options{'-clear'}) {
+        $options{'pattern'} //= [$options{'-full'} // 0, $options{'-clear'} // 0];
+    }
+
+    return ('[', floats(@{$options{'pattern'}}), ']',
+            ($options{'offset'} || 0), 'd');
 }
 
-sub linedash {
+# Deprecated (renamed)
+sub linedash { return line_dash_pattern(@_) }
+
+sub line_dash_pattern {
     my ($self, @a) = @_;
+
     $self->add(_linedash(@a));
+
+    return $self;
 }
 
-=item $content->flatness($tolerance)
+=head2 flatness_tolerance
 
-(Advanced) Sets the maximum variation in output pixels when drawing curves.
+    $content = $content->flatness_tolerance($tolerance);
+
+Sets the maximum distance in device pixels between the mathematically correct
+path for a curve and an approximation constructed from straight line segments.
+
+C<$tolerance> is an integer between 0 and 100, where 0 represents the device's
+default flatness tolerance.
 
 =cut
 
@@ -522,15 +657,23 @@ sub _flatness {
     return ($flatness, 'i');
 }
 
-sub flatness {
+# Deprecated (renamed)
+sub flatness { return flatness_tolerance(@_) }
+
+sub flatness_tolerance {
     my ($self, $flatness) = @_;
+
     $self->add(_flatness($flatness));
+
+    return $self;
 }
 
-=item $content->egstate($object)
+=head2 egstate
 
-(Advanced) Adds an Extended Graphic State object containing additional state
-parameters.
+    $content = $content->egstate($object);
+
+Adds a L<PDF::API2::Resource::ExtGState> object containing a set of graphics
+state parameters.
 
 =cut
 
@@ -541,13 +684,14 @@ sub egstate {
     return $self;
 }
 
-=back
+=head1 PATH CONSTRUCTION (DRAWING)
 
-=head2 Path Construction (Drawing)
+Note that paths will not appear until a path painting method is called
+(L</"stroke">, L</"fill">, or L</"paint">).
 
-=over
+=head2 move
 
-=item $content->move($x, $y)
+    $content = $content->move($x, $y);
 
 Starts a new path at the specified coordinates.
 
@@ -575,12 +719,12 @@ sub move {
     return $self;
 }
 
-=item $content->line($x, $y)
+=head2 line
+
+    $content = $content->line($x, $y);
 
 Extends the path in a line from the current coordinates to the specified
-coordinates, and updates the current position to be the new coordinates.
-
-Note: The line will not appear until you call C<stroke>.
+coordinates.
 
 =cut
 
@@ -606,11 +750,12 @@ sub line {
     return $self;
 }
 
-=item $content->hline($x)
+=head2 hline
 
-=item $content->vline($y)
+    $content = $content->hline($x);
 
-Shortcut for drawing horizontal and vertical lines from the current position.
+Extends the path in a horizontal line from the current position to the specified
+x coordinate.
 
 =cut
 
@@ -626,6 +771,15 @@ sub hline {
     return $self;
 }
 
+=head2 vline
+
+    $content = $content->vline($x);
+
+Extends the path in a vertical line from the current position to the specified y
+coordinate.
+
+=cut
+
 sub vline {
     my ($self, $y) = @_;
     if ($self->_in_text_object()) {
@@ -638,13 +792,32 @@ sub vline {
     return $self;
 }
 
-=item $content->poly($x1, $y1, ..., $xn, $yn)
+=head2 polyline
 
-Shortcut for creating a polyline path.  Moves to C<[$x1, $y1]>, and then extends
-the path in lines along the specified coordinates.
+    $content = $content->polyline($x1, $y1, $x2, $y2, ...);
+
+Extends the path from the current position in one or more straight lines.
 
 =cut
 
+sub polyline {
+    my $self = shift();
+    unless (@_ % 2 == 0) {
+        croak 'polyline requires pairs of coordinates';
+    }
+
+    while (@_) {
+        my $x = shift();
+        my $y = shift();
+        $self->line($x, $y);
+    }
+
+    return $self;
+}
+
+# Deprecated; replace with move and polyline.  Deprecated because poly breaks
+# the convention followed by every other path-drawing method (other than
+# enclosed shapes) of extending the path from the current position.
 sub poly {
     my $self = shift();
     my $x = shift();
@@ -654,13 +827,12 @@ sub poly {
     return $self;
 }
 
-=item $content->curve($cx1, $cy1, $cx2, $cy2, $x, $y)
+=head2 curve
+
+    $content = $content->curve($cx1, $cy1, $cx2, $cy2, $x, $y);
 
 Extends the path in a curve from the current point to C<($x, $y)>, using the two
-specified points to create a cubic Bezier curve, and updates the current
-position to be the new point.
-
-Note: The curve will not appear until you call C<stroke>.
+specified points to create a cubic Bezier curve.
 
 =cut
 
@@ -685,13 +857,12 @@ sub curve {
     return $self;
 }
 
-=item $content->spline($cx1, $cy1, $x, $y)
+=head2 spline
 
-Extends the path in a curve from the current point to C<($x, $y)>,
-using the two specified points to create a spline, and updates the
-current position to be the new point.
+    $content = $content->spline($cx1, $cy1, $x, $y);
 
-Note: The curve will not appear until you call C<stroke>.
+Extends the path in a curve from the current point to C<($x, $y)>, using the two
+specified points to create a spline.
 
 =cut
 
@@ -711,15 +882,13 @@ sub spline {
     }
 }
 
-=item $content->arc($x, $y, $a, $b, $alpha, $beta, $move)
+=head2 arc
 
-Extends the path along an arc of an ellipse centered at C<[x, y]>.  The major
-and minor axes of the ellipse are C<$a> and C<$b>, respectively, and the arc
-moves from C<$alpha> degrees to C<$beta> degrees.  The current position is then
-set to the endpoint of the arc.
+    $content = $content->arc($x, $y, $major, $minor, $a, $b);
 
-Set C<$move> to a true value if this arc is the beginning of a new path instead
-of the continuation of an existing path.
+Extends the path along an arc of an ellipse centered at C<[$x, $y]>.  C<$major>
+and C<$minor> represent the axes of the ellipse, and the arc moves from C<$a>
+degrees to C<$b> degrees.
 
 =cut
 
@@ -763,6 +932,7 @@ sub arc {
     $p0_x = $x + shift(@points);
     $p0_y = $y + shift(@points);
 
+    # Deprecated
     $self->move($p0_x, $p0_y) if $move;
 
     while (scalar @points) {
@@ -781,27 +951,21 @@ sub arc {
     return $self;
 }
 
-=item $content->bogen($x1, $y1, $x2, $y2, $radius, $move, $outer, $reverse)
+# Extends the path along an arc of a circle of the specified radius from
+# C<[x1,y1]> to C<[x2,y2]>.
+#
+# Set C<$move> to a true value if this arc is the beginning of a new path
+# instead of the continuation of an existing path.
+#
+# Set C<$outer> to a true value to draw the larger arc between the two points
+# instead of the smaller one.
+#
+# Set C<$reverse> to a true value to draw the mirror image of the specified arc.
+#
+# C<$radius * 2> cannot be smaller than the distance from C<[x1,y1]> to
+# C<[x2,y2]>.
 
-Extends the path along an arc of a circle of the specified radius between
-C<[x1,y1]> to C<[x2,y2]>.  The current position is then set to the endpoint of
-the arc.
-
-Set C<$move> to a true value if this arc is the beginning of a new path instead
-of the continuation of an existing path.
-
-Set C<$outer> to a true value to draw the larger arc between the two points
-instead of the smaller one.
-
-Set C<$reverse> to a true value to draw the mirror image of the specified arc.
-
-C<$radius * 2> cannot be smaller than the distance from C<[x1,y1]> to
-C<[x2,y2]>.
-
-Note: The curve will not appear until you call C<stroke>.
-
-=cut
-
+# Deprecated; recreate using arc (Bogen is German for arc)
 sub bogen {
     my ($self, $x1, $y1, $x2, $y2, $r, $move, $larc, $spf) = @_;
     my ($p0_x, $p0_y, $p1_x, $p1_y, $p2_x, $p2_y, $p3_x, $p3_y);
@@ -864,10 +1028,12 @@ sub bogen {
     return $self;
 }
 
-=item $content->close()
+=head2 close
 
-Closes and ends the current path by extending a line from the current position
-to the starting position.
+    $content = $content->close();
+
+Closes the current path by extending a line from the current position to the
+starting position.
 
 =cut
 
@@ -879,79 +1045,62 @@ sub close {
     return $self;
 }
 
-=item $content->endpath()
+=head2 end
 
-Ends the current path without explicitly enclosing it.
+    $content = $content->end();
+
+Ends the current path without filling or stroking.
 
 =cut
 
-sub endpath {
-    my $self = shift;
+# Deprecated (renamed)
+sub endpath { return end(@_) }
+
+sub end {
+    my $self = shift();
     $self->add('n');
     return $self;
 }
 
-=item $content->ellipse($x, $y, $a, $b)
+=head1 SHAPE CONSTRUCTION (DRAWING)
 
-Creates an elliptical path centered on C<[$x,$y]>, with major and minor axes
-specified by C<$a> and C<$b>, respectively.
+The following are convenience methods for drawing closed paths.
 
-Note: The ellipse will not appear until you call C<stroke> or C<fill>.
+Note that shapes will not appear until a path painting method is called
+(L</"stroke">, L</"fill">, or L</"paint">).
+
+=head2 rectangle
+
+    $content = $content->rectangle($x1, $y1, $x2, $y2);
+
+Creates a new rectangle-shaped path, between the two points C<[$x1, $y1]>
+and C<[$x2, $y2]>.
 
 =cut
 
-sub ellipse {
-    my ($self, $x, $y, $a, $b) = @_;
-    $self->arc($x, $y, $a, $b, 0, 360, 1);
-    $self->close();
+sub rectangle {
+    my ($self, $x1, $y1, $x2, $y2) = @_;
+
+    # Ensure that x1,y1 is lower-left and x2,y2 is upper-right
+    if ($x2 < $x1) {
+        my $x = $x1;
+        $x1 = $x2;
+        $x2 = $x;
+    }
+    if ($y2 < $y1) {
+        my $y = $y1;
+        $y1 = $y2;
+        $y2 = $y;
+    }
+
+    $self->add(floats($x1, $y1, ($x2 - $x1), ($y2 - $y1)), 're');
+    $self->{' x'} = $x1;
+    $self->{' y'} = $y1;
+
     return $self;
 }
 
-=item $content->circle($x, $y, $radius)
-
-Creates a circular path centered on C<[$x, $y]> with the specified
-radius.
-
-Note: The circle will not appear until you call C<stroke> or C<fill>.
-
-=cut
-
-sub circle {
-    my ($self, $x, $y, $r) = @_;
-    $self->arc($x, $y, $r, $r, 0, 360, 1);
-    $self->close();
-    return $self;
-}
-
-=item $content->pie($x, $y, $a, $b, $alpha, $beta)
-
-Creates a pie-shaped path from an ellipse centered on C<[$x,$y]>.  The major and
-minor axes of the ellipse are C<$a> and C<$b>, respectively, and the arc moves
-from C<$alpha> degrees to C<$beta> degrees.
-
-Note: The pie will not appear until you call C<stroke> or C<fill>.
-
-=cut
-
-sub pie {
-    my $self = shift();
-    my ($x, $y, $a, $b, $alpha, $beta) = @_;
-    my ($p0_x, $p0_y) = arctocurve($a, $b, $alpha, $beta);
-    $self->move($x, $y);
-    $self->line($p0_x + $x, $p0_y + $y);
-    $self->arc($x, $y, $a, $b, $alpha, $beta);
-    $self->close();
-}
-
-=item $content->rect($x1, $y1, $w1, $h1, ..., $xn, $yn, $wn, $hn)
-
-Creates paths for one or more rectangles, with their lower left points at
-C<[$x,$y]> and with the specified widths and heights.
-
-Note: The rectangles will not appear until you call C<stroke> or C<fill>.
-
-=cut
-
+# Deprecated; replace with individual calls to rectangle
 sub rect {
     my $self = shift();
     my ($x, $y, $w, $h);
@@ -966,109 +1115,94 @@ sub rect {
     return $self;
 }
 
-=item $content->rectxy($x1, $y1, $x2, $y2)
-
-Creates a rectangular path, with C<[$x1,$y1]> and and C<[$x2,$y2]> specifying
-opposite corners.
-
-Note: The rectangle will not appear until you call C<stroke> or C<fill>.
-
-=cut
-
+# Deprecated; replace with rectangle, converting x2/y2 to w/h.
 sub rectxy {
     my ($self, $x, $y, $x2, $y2) = @_;
     $self->rect($x, $y, ($x2 - $x), ($y2 - $y));
     return $self;
 }
 
-=back
+=head2 circle
 
-=head2 Path Painting (Drawing)
+    $content = $content->circle($x, $y, $radius);
 
-=over
-
-=item $content->stroke
-
-Strokes the current path.
+Creates a new circular path centered on C<[$x, $y]> with the specified radius.
 
 =cut
 
-sub _stroke {
-    return 'S';
-}
-
-sub stroke {
-    my $self = shift();
-    $self->add(_stroke());
+sub circle {
+    my ($self, $x, $y, $r) = @_;
+    $self->arc($x, $y, $r, $r, 0, 360, 1);
+    $self->close();
     return $self;
 }
 
-=item $content->fill($use_even_odd_fill)
+=head2 ellipse
 
-Fills the current path.
+    $content = $content->ellipse($x, $y, $major, $minor);
 
-If the path intersects with itself, the nonzero winding rule will be used to
-determine which part of the path is filled in.  If you would prefer to use the
-even-odd rule, pass a true argument.
-
-See the PDF Specification, section 8.5.3.3, for more details on filling.
+Creates a new elliptical path centered on C<[$x, $y]> with the specified major
+and minor axes.
 
 =cut
 
-sub fill {
-    my $self = shift();
-    $self->add(shift() ? 'f*' : 'f');
+sub ellipse {
+    my ($self, $x, $y, $a, $b) = @_;
+    $self->arc($x, $y, $a, $b, 0, 360, 1);
+    $self->close();
     return $self;
 }
 
-=item $content->fillstroke($use_even_odd_fill)
+=head2 pie
 
-Fills and then strokes the current path.
+    $content = $content->pie($x, $y, $major, $minor, $a, $b);
+
+Creates a new wedge-shaped path from an ellipse centered on C<[$x, $y]> with the
+specified major and minor axes, extending from C<$a> degrees to C<$b> degrees.
 
 =cut
 
-sub fillstroke {
+sub pie {
     my $self = shift();
-    $self->add(shift() ? 'B*' : 'B');
-    return $self;
+    my ($x, $y, $a, $b, $alpha, $beta) = @_;
+    my ($p0_x, $p0_y) = arctocurve($a, $b, $alpha, $beta);
+    $self->move($x, $y);
+    $self->line($p0_x + $x, $p0_y + $y);
+    $self->arc($x, $y, $a, $b, $alpha, $beta);
+    $self->close();
 }
 
-=item $content->clip($use_even_odd_fill)
+=head1 PATH PAINTING (DRAWING)
 
-Modifies the current clipping path by intersecting it with the current path.
+=head2 stroke_color
 
-=cut
+    $content = $content->stroke_color($color, @arguments);
 
-sub clip {
-    my $self = shift();
-    $self->add(shift() ? 'W*' : 'W');
-    return $self;
-}
-
-=back
-
-=head2 Colors
-
-=over
-
-=item $content->fillcolor($color)
-
-=item $content->strokecolor($color)
-
-Sets the fill or stroke color.
+Sets the stroke color, which is black by default.
 
     # Use a named color
-    $content->fillcolor('blue');
+    $content->stroke_color('blue');
 
     # Use an RGB color (start with '#')
-    $content->fillcolor('#FF0000');
+    $content->stroke_color('#FF0000');
 
     # Use a CMYK color (start with '%')
-    $content->fillcolor('%FF000000');
+    $content->stroke_color('%FF000000');
 
-RGB and CMYK colors can have one-byte, two-byte, three-byte, or
-four-byte values for each color.  For instance, cyan can be given as
-C<%F000> or C<%FFFF000000000000>.
+    # Use a spot color with 100% coverage.
+    my $spot = $pdf->colorspace('spot', 'PANTONE Red 032 C', '#EF3340');
+    $content->stroke_color($spot, 1.0);
+
+RGB and CMYK colors can have one-byte, two-byte, three-byte, or four-byte values
+for each color, depending on the level of precision needed.  For instance, cyan
+can be given as C<%F000> or C<%FFFF000000000000>.
+
+=head2 fill_color
+
+    $content = $content->fill_color($color, @arguments);
+
+Sets the fill color, which is black by default.  Arguments are the same as in
+L</"stroke_color">.
 
 =cut
 
@@ -1080,9 +1214,6 @@ C<%F000> or C<%FFFF000000000000>.
 #
 # legacy greylevel
 #   ... only one value
-#
-#
-
 sub _makecolor {
     my ($self, $sf, @clr) = @_;
 
@@ -1143,214 +1274,426 @@ sub _makecolor {
 }
 
 sub _fillcolor {
-    my ($self,@clrs)=@_;
+    my ($self, @clrs) = @_;
     if (ref($clrs[0]) =~ m|^PDF::API2::Resource::ColorSpace|) {
-        $self->resource('ColorSpace',$clrs[0]->name,$clrs[0]);
+        $self->resource('ColorSpace', $clrs[0]->name(), $clrs[0]);
     }
     elsif (ref($clrs[0]) =~ m|^PDF::API2::Resource::Pattern|) {
-        $self->resource('Pattern',$clrs[0]->name,$clrs[0]);
+        $self->resource('Pattern', $clrs[0]->name(), $clrs[0]);
     }
 
-    return $self->_makecolor(1,@clrs);
+    return $self->_makecolor(1, @clrs);
 }
 
-sub fillcolor {
-    my $self = shift;
-    if (scalar @_) {
-        @{$self->{' fillcolor'}}=@_;
+# Deprecated
+sub fillcolor { return fill_color(@_) }
+
+sub fill_color {
+    my $self = shift();
+    if (@_) {
+        @{$self->{' fillcolor'}} = @_;
         $self->add($self->_fillcolor(@_));
     }
     return @{$self->{' fillcolor'}};
 }
 
 sub _strokecolor {
-    my ($self,@clrs)=@_;
+    my ($self, @clrs) = @_;
     if (ref($clrs[0]) =~ m|^PDF::API2::Resource::ColorSpace|) {
-        $self->resource('ColorSpace',$clrs[0]->name,$clrs[0]);
+        $self->resource('ColorSpace', $clrs[0]->name(), $clrs[0]);
     }
     elsif (ref($clrs[0]) =~ m|^PDF::API2::Resource::Pattern|) {
-        $self->resource('Pattern',$clrs[0]->name,$clrs[0]);
+        $self->resource('Pattern', $clrs[0]->name(), $clrs[0]);
     }
-    return $self->_makecolor(0,@clrs);
+    return $self->_makecolor(0, @clrs);
 }
 
-sub strokecolor {
-    my $self = shift;
-    if (scalar @_) {
-        @{$self->{' strokecolor'}}=@_;
+# Deprecated
+sub strokecolor { return stroke_color(@_) }
+
+sub stroke_color {
+    my $self = shift();
+    if (@_) {
+        @{$self->{' strokecolor'}} = @_;
         $self->add($self->_strokecolor(@_));
     }
     return @{$self->{' strokecolor'}};
 }
 
+=head2 stroke
 
-sub shade {
-    my $self = shift;
-    my $shade = shift;
-    my @cord = @_;
-    my @tm = (
-        $cord[2]-$cord[0] , 0,
-        0                 , $cord[3]-$cord[1],
-        $cord[0]          , $cord[1],
-    );
-    $self->save;
-    $self->matrix(@tm);
-    $self->add('/'.$shade->name,'sh');
+    $content = $content->stroke();
 
-    $self->resource('Shading',$shade->name,$shade);
-
-    $self->restore;
-    return $self;
-}
-
-=back
-
-=head2 External Objects
-
-=over
-
-=item $content->image($image_object, $x, $y, $width, $height)
-
-=item $content->image($image_object, $x, $y, $scale)
-
-=item $content->image($image_object, $x, $y)
-
-    # Example
-    my $image_object = $pdf->image_jpeg($my_image_file);
-    $content->image($image_object, 100, 200);
-
-Places an image on the page in the specified location.
-
-If coordinate transformations have been made (see Coordinate
-Transformations above), the position and scale will be relative to the
-updated coordinates.  Otherwise, [0,0] will represent the bottom left
-corner of the page, and C<$width> and C<$height> will be measured at
-72dpi.
-
-For example, if you have a 600x600 image that you would like to be
-shown at 600dpi (i.e. one inch square), set the width and height to 72.
+Strokes the current path.
 
 =cut
 
+sub _stroke {
+    return 'S';
+}
+
+sub stroke {
+    my $self = shift();
+    $self->add(_stroke());
+    return $self;
+}
+
+=head2 fill
+
+    $content = $content->fill(rule => $rule);
+
+Fills the current path.
+
+C<$rule> describes which areas are filled in when the path intersects with itself.
+
+=over
+
+=item * nonzero (default)
+
+Use the nonzero winding number rule.  This tends to mean that the entire area
+enclosed by the path is filled in, with some exceptions depending on the
+direction of the path.
+
+=item * even-odd
+
+Use the even-odd rule.  This tends to mean that the presence of fill alternates
+each time the path is intersected.
+
+=back
+
+See PDF specification 1.7 section 8.5.3.3, Filling, for more details.
+
+=cut
+
+sub fill {
+    my $self = shift();
+
+    my $even_odd;
+    if (@_ == 2) {
+        my %options = @_;
+        if (($options{'rule'} // 'nonzero') eq 'even-odd') {
+            $even_odd = 1;
+        }
+    }
+    else {
+        # Deprecated
+        $even_odd = shift();
+    }
+
+    $self->add($even_odd ? 'f*' : 'f');
+
+    return $self;
+}
+
+=head2 paint
+
+    $content = $content->paint(rule => $rule);
+
+Fills and strokes the current path.  C<$rule> is as described in L</"fill">.
+
+=cut
+
+# Deprecated (renamed)
+sub fillstroke { return paint(@_) }
+
+sub paint {
+    my $self = shift();
+
+    my $even_odd;
+    if (@_ == 2) {
+        my %options = @_;
+        if (($options{'rule'} // 'nonzero') eq 'even-odd') {
+            $even_odd = 1;
+        }
+    }
+    else {
+        # Deprecated
+        $even_odd = shift();
+    }
+
+    $self->add($even_odd ? 'B*' : 'B');
+
+    return $self;
+}
+
+=head2 clip
+
+    $content = $content->clip(rule => $rule);
+
+Modifies the current clipping path (initially the entire page) by intersecting
+it with the current path following the next path-painting command.  C<$rule> is
+as described in L</"fill">.
+
+=cut
+
+sub clip {
+    my $self = shift();
+
+    my $even_odd;
+    if (@_ == 2) {
+        my %options = @_;
+        if (($options{'rule'} // 'nonzero') eq 'even-odd') {
+            $even_odd = 1;
+        }
+    }
+    else {
+        # Deprecated
+        $even_odd = shift();
+    }
+
+    $self->add($even_odd ? 'W*' : 'W');
+
+    return $self;
+}
+
+sub shade {
+    my ($self, $shade, @cord) = @_;
+
+    my @tm = (
+        $cord[2] - $cord[0], 0,
+        0                  , $cord[3] - $cord[1],
+        $cord[0]           , $cord[1],
+    );
+
+    $self->save();
+    $self->matrix(@tm);
+    $self->add('/' . $shade->name(), 'sh');
+    $self->resource('Shading', $shade->name(), $shade);
+    $self->restore();
+
+    return $self;
+}
+
+=head1 EXTERNAL OBJECTS
+
+=head2 object
+
+    $content = $content->object($object, $x, $y, $scale_x, $scale_y);
+
+Places an image or other external object (a.k.a. XObject) on the page in the
+specified location.
+
+For images, C<$scale_x> and C<$scale_y> represent the width and height of the
+image on the page in points.  If C<$scale_x> is omitted, it will default to 72
+pixels per inch.  If C<$scale_y> is omitted, the image will be scaled
+proportionally based on the image dimensions.
+
+For other external objects, the scale is a multiplier, where 1 (the default)
+represents 100% (i.e. no change).
+
+If coordinate transformations have been made (see Coordinate Transformations
+above), the position and scale will be relative to the updated coordinates.
+
+If no coordinate transformations are needed, this method can be called directly
+from the L<PDF::API2::Page> object instead.
+
+=cut
+
+# Behavior based on argument count
+# 0: Place at 0, 0, 100%
+# 2: Place at X, Y, 100%
+# 3: Place at X, Y, scaled
+# 4: Place at X, Y, scale_w, scale_h
+sub object {
+    my ($self, $object, $x, $y, $scale_x, $scale_y) = @_;
+    $x //= 0;
+    $y //= 0;
+    if ($object->isa('PDF::API2::Resource::XObject::Image')) {
+        $scale_x //= $object->width();
+        $scale_y //= $object->height() * $scale_x / $object->width();
+    }
+    else {
+        $scale_x //= 1;
+        $scale_y //= $scale_x;
+    }
+
+    $self->save();
+    $self->matrix($scale_x, 0, 0, $scale_y, $x, $y);
+    $self->add('/' . $object->name(), 'Do');
+    $self->restore();
+
+    $self->resource('XObject', $object->name(), $object);
+
+    return $self;
+}
+
+# Deprecated
 sub image {
     my $self = shift;
     my $img = shift;
-    my ($x,$y,$w,$h) = @_;
-    if (defined $img->{Metadata}) {
-        $self->metaStart('PPAM:PlacedImage',$img->{Metadata});
+    my ($x, $y, $w, $h) = @_;
+    if (defined $img->{'Metadata'}) {
+        $self->metaStart('PPAM:PlacedImage', $img->{'Metadata'});
     }
-    $self->save;
-    if (!defined $w) {
-        $h=$img->height;
-        $w=$img->width;
+    $self->save();
+    unless (defined $w) {
+        $h = $img->height();
+        $w = $img->width();
     }
-    elsif (!defined $h) {
-        $h=$img->height*$w;
-        $w=$img->width*$w;
+    elsif (not defined $h) {
+        $h = $img->height() * $w;
+        $w = $img->width() * $w;
     }
-    $self->matrix($w,0,0,$h,$x,$y);
-    $self->add("/".$img->name,'Do');
-    $self->restore;
-    $self->{' x'}=$x;
-    $self->{' y'}=$y;
-    $self->resource('XObject',$img->name,$img);
-    if(defined $img->{Metadata}) {
-        $self->metaEnd;
+    $self->matrix($w, 0, 0, $h, $x, $y);
+    $self->add('/' . $img->name(), 'Do');
+    $self->restore();
+    $self->{' x'} = $x;
+    $self->{' y'} = $y;
+    $self->resource('XObject', $img->name(), $img);
+    if (defined $img->{'Metadata'}) {
+        $self->metaEnd();
     }
     return $self;
 }
 
-=item $content->formimage($form_object, $x, $y, $scale)
+# Deprecated
+sub formimage {
+    my ($self, $img, $x, $y, $s) = @_;
+    $self->save();
+    if (defined $s) {
+        $self->matrix($s, 0, 0, $s, $x, $y);
+    }
+    else {
+        $self->matrix(1, 0, 0, 1, $x, $y);
+    }
+    $self->add('/' . $img->name(), 'Do');
+    $self->restore();
+    $self->resource('XObject', $img->name(), $img);
+    return $self;
+}
 
-=item $content->formimage($form_object, $x, $y)
+=head1 TEXT STATE
 
-Places an XObject on the page in the specified location.
+All of the following parameters that take a size are applied before any scaling
+takes place, so you don't need to adjust values to counteract scaling.
+
+=head2 font
+
+    $content = $content->font($font, $size);
+
+Sets the font and font size.  C<$font> is an object created by calling
+L<PDF::API2/"font"> to add the font to the document.
+
+    my $pdf = PDF::API2->new();
+    my $page = $pdf->page();
+    my $text = $pdf->text();
+
+    my $font = $pdf->font('Helvetica');
+    $text->font($font, 24);
+    $text->position(72, 720);
+    $text->text('Hello, World!');
+
+    $pdf->save('sample.pdf');
 
 =cut
 
-sub formimage {
-    my $self = shift;
-    my $img = shift;
-    my ($x,$y,$s) = @_;
-    $self->save;
-    if (!defined $s) {
-        $self->matrix(1,0,0,1,$x,$y);
+sub _font {
+    my ($font, $size) = @_;
+    if ($font->isvirtual()) {
+        return('/' . $font->fontlist->[0]->name() . ' ' . float($size) . ' Tf');
     }
     else {
-        $self->matrix($s,0,0,$s,$x,$y);
+        return('/' . $font->name() . ' ' . float($size) . ' Tf');
     }
-    $self->add('/'.$img->name,'Do');
-    $self->restore;
-    $self->resource('XObject',$img->name,$img);
+}
+sub font {
+    my ($self, $font, $size) = @_;
+    unless ($size) {
+        croak q{A font size is required};
+    }
+    $self->fontset($font, $size);
+    $self->add(_font($font, $size));
+    $self->{' fontset'} = 1;
     return $self;
 }
 
-=back
+sub fontset {
+    my ($self, $font, $size) = @_;
+    $self->{' font'} = $font;
+    $self->{' fontsize'} = $size;
+    $self->{' fontset'} = 0;
 
-=head2 Text State Parameters
+    if ($font->isvirtual()) {
+        foreach my $f (@{$font->fontlist()}) {
+            $self->resource('Font', $f->name(), $f);
+        }
+    }
+    else {
+        $self->resource('Font', $font->name(), $font);
+    }
 
-All of the following parameters that take a size are applied before
-any scaling takes place, so you don't need to adjust values to
-counteract scaling.
+    return $self;
+}
 
-=over
+=head2 character_spacing
 
-=item $spacing = $content->charspace($spacing)
+    $spacing = $content->character_spacing($spacing);
 
 Sets the spacing between characters.  This is initially zero.
 
 =cut
 
 sub _charspace {
-    my ($para) = @_;
-    return float($para, 6) . ' Tc';
+    my $spacing = shift();
+    return float($spacing, 6) . ' Tc';
 }
-sub charspace {
-    my ($self, $para) = @_;
-    if (defined $para) {
-        $self->{' charspace'}=$para;
-        $self->add(_charspace($para));
+
+# Deprecated (renamed)
+sub charspace { return character_spacing(@_) }
+
+sub character_spacing {
+    my ($self, $spacing) = @_;
+    if (defined $spacing) {
+        $self->{' charspace'} = $spacing;
+        $self->add(_charspace($spacing));
     }
     return $self->{' charspace'};
 }
 
-=item $spacing = $content->wordspace($spacing)
+=head2 word_spacing
 
-Sets the spacing between words.  This is initially zero (or, in other
-words, just the width of the space).
+    $spacing = $content->word_spacing($spacing);
 
-Word spacing might only affect simple fonts and composite fonts where
-the space character is a single-byte code.  This is a limitation of
-the PDF specification at least as of version 1.7 (see section 9.3.3).
-It's possible that a later version of the specification will support
-word spacing in fonts that use multi-byte codes.
+Sets the spacing between words.  This is initially zero (i.e. just the width of
+the space).
+
+Word spacing might only affect simple fonts and composite fonts where the space
+character is a single-byte code.  This is a limitation of the PDF specification
+at least as of version 1.7 (see section 9.3.3).  It's possible that a later
+version of the specification will support word spacing in fonts that use
+multi-byte codes.
 
 =cut
 
 sub _wordspace {
-    my ($para) = @_;
-    return float($para, 6) . ' Tw';
+    my $spacing = shift();
+    return float($spacing, 6) . ' Tw';
 }
 
-sub wordspace {
-    my ($self, $para) = @_;
-    if (defined $para) {
-        $self->{' wordspace'}=$para;
-        $self->add(_wordspace($para));
+# Deprecated (renamed)
+sub wordspace { return word_spacing(@_) }
+
+sub word_spacing {
+    my ($self, $spacing) = @_;
+    if (defined $spacing) {
+        $self->{' wordspace'} = $spacing;
+        $self->add(_wordspace($spacing));
     }
     return $self->{' wordspace'};
 }
 
-=item $scale = $content->hscale($scale)
+=head2 hscale
 
-Sets and returns the percentage of horizontal text scaling.  Enter a
-scale greater than 100 to stretch text, less than 100 to squeeze
-text, or 100 to disable any existing scaling.
+    $scale = $content->hscale($scale);
+
+Sets/gets the percentage of horizontal text scaling.  Enter a scale greater than
+100 to stretch text, less than 100 to squeeze text, or 100 to disable any
+existing scaling.
 
 =cut
 
 sub _hscale {
-    my ($scale) = @_;
+    my $scale = shift();
     return float($scale, 6) . ' Tz';
 }
 
@@ -1367,11 +1710,12 @@ sub hscale {
 sub  hspace { return  hscale(@_) }
 sub _hspace { return _hscale(@_) }
 
-=item $leading = $content->leading($leading)
+=head2 leading
 
-Sets the text leading, which is the distance between baselines.  This
-is initially zero (i.e. the lines will be printed on top of each
-other).
+    $leading = $content->leading($leading);
+
+Sets/gets the text leading, which is the distance between baselines.  This is
+initially zero (i.e. the lines will be printed on top of each other).
 
 =cut
 
@@ -1380,226 +1724,175 @@ sub _lead { return _leading(@_) }
 sub  lead { return  leading(@_) }
 
 sub _leading {
-    my ($para) = @_;
-    return float($para) . ' TL';
+    my $leading = shift();
+    return float($leading) . ' TL';
 }
 sub leading {
-    my ($self,$para) = @_;
-    if (defined ($para)) {
-        $self->{' leading'} = $para;
-        $self->add(_leading($para));
+    my ($self, $leading) = @_;
+    if (defined ($leading)) {
+        $self->{' leading'} = $leading;
+        $self->add(_leading($leading));
     }
     return $self->{' leading'};
 }
 
-=item $mode = $content->render($mode)
+=head2 render
+
+    $mode = $content->render($mode);
 
 Sets the text rendering mode.
 
 =over
 
-=item 0 = Fill text
+=item * 0 = Fill text
 
-=item 1 = Stroke text (outline)
+=item * 1 = Stroke text (outline)
 
-=item 2 = Fill, then stroke text
+=item * 2 = Fill, then stroke text
 
-=item 3 = Neither fill nor stroke text (invisible)
+=item * 3 = Neither fill nor stroke text (invisible)
 
-=item 4 = Fill text and add to path for clipping
+=item * 4 = Fill text and add to path for clipping
 
-=item 5 = Stroke text and add to path for clipping
+=item * 5 = Stroke text and add to path for clipping
 
-=item 6 = Fill, then stroke text and add to path for clipping
+=item * 6 = Fill, then stroke text and add to path for clipping
 
-=item 7 = Add text to path for clipping
+=item * 7 = Add text to path for clipping
 
 =back
 
 =cut
 
 sub _render {
-    my ($para) = @_;
-    return intg($para) . ' Tr';
+    my $mode = shift();
+    return intg($mode) . ' Tr';
 }
 
 sub render {
-    my ($self, $para) = @_;
-    if (defined ($para)) {
-        $self->{' render'} = $para;
-        $self->add(_render($para));
+    my ($self, $mode) = @_;
+    if (defined ($mode)) {
+        $self->{' render'} = $mode;
+        $self->add(_render($mode));
     }
     return $self->{' render'};
 }
 
-=item $distance = $content->rise($distance)
+=head2 rise
 
-Adjusts the baseline up or down from its current location.  This is
-initially zero.
+    $distance = $content->rise($distance);
 
-Use this for creating superscripts or subscripts (usually with an
-adjustment to the font size as well).
+Adjusts the baseline up or down from its current location.  This is initially
+zero.
+
+Use this to create superscripts or subscripts (usually with an adjustment to the
+font size as well).
 
 =cut
 
 sub _rise {
-    my ($para) = @_;
-    return float($para) . ' Ts';
+    my $distance = shift();
+    return float($distance) . ' Ts';
 }
 
 sub rise {
-    my ($self, $para) = @_;
-    if (defined ($para)) {
-        $self->{' rise'} = $para;
-        $self->add(_rise($para));
+    my ($self, $distance) = @_;
+    if (defined ($distance)) {
+        $self->{' rise'} = $distance;
+        $self->add(_rise($distance));
     }
     return $self->{' rise'};
 }
 
-=item %state = $content->textstate(charspace => $value, wordspace => $value, ...)
-
-Shortcut for setting multiple text state parameters at once.
-
-This can also be used without arguments to retrieve the current text
-state settings.
-
-Note: This does not currently work with the C<save> and C<restore> commands.
-
-=cut
-
+# Formerly documented; still used internally
 sub textstate {
-    my $self = shift;
+    my $self = shift();
     my %state;
-    if (scalar @_) {
+    if (@_) {
         %state = @_;
-        foreach my $k (qw( charspace hscale wordspace leading rise render )) {
-            next unless($state{$k});
+        foreach my $k (qw(charspace hscale wordspace leading rise render)) {
+            next unless $state{$k};
             $self->can($k)->($self, $state{$k});
         }
-        if ($state{font} && $state{fontsize}) {
-            $self->font($state{font},$state{fontsize});
+        if ($state{'font'} and $state{'fontsize'}) {
+            $self->font($state{'font'}, $state{'fontsize'});
         }
-        if ($state{textmatrix}) {
-            $self->matrix(@{$state{textmatrix}});
-            @{$self->{' translate'}}=@{$state{translate}};
-            $self->{' rotate'}=$state{rotate};
-            @{$self->{' scale'}}=@{$state{scale}};
-            @{$self->{' skew'}}=@{$state{skew}};
+        if ($state{'textmatrix'}) {
+            $self->matrix(@{$state{'textmatrix'}});
+            @{$self->{' translate'}} = @{$state{'translate'}};
+            $self->{' rotate'} = $state{'rotate'};
+            @{$self->{' scale'}} = @{$state{'scale'}};
+            @{$self->{' skew'}} = @{$state{'skew'}};
         }
-        if ($state{fillcolor}) {
-            $self->fillcolor(@{$state{fillcolor}});
+        if ($state{'fillcolor'}) {
+            $self->fillcolor(@{$state{'fillcolor'}});
         }
-        if ($state{strokecolor}) {
-            $self->strokecolor(@{$state{strokecolor}});
+        if ($state{'strokecolor'}) {
+            $self->strokecolor(@{$state{'strokecolor'}});
         }
         %state = ();
     }
     else {
-        foreach my $k (qw( font fontsize charspace hscale wordspace leading rise render )) {
-            $state{$k}=$self->{" $k"};
+        foreach my $k (qw(font fontsize charspace hscale wordspace leading rise render)) {
+            $state{$k} = $self->{" $k"};
         }
-        $state{matrix}=[@{$self->{" matrix"}}];
-        $state{textmatrix}=[@{$self->{" textmatrix"}}];
-        $state{textlinematrix}=[@{$self->{" textlinematrix"}}];
-        $state{rotate}=$self->{" rotate"};
-        $state{scale}=[@{$self->{" scale"}}];
-        $state{skew}=[@{$self->{" skew"}}];
-        $state{translate}=[@{$self->{" translate"}}];
-        $state{fillcolor}=[@{$self->{" fillcolor"}}];
-        $state{strokecolor}=[@{$self->{" strokecolor"}}];
+        $state{'matrix'}         = [@{$self->{' matrix'}}];
+        $state{'textmatrix'}     = [@{$self->{' textmatrix'}}];
+        $state{'textlinematrix'} = [@{$self->{' textlinematrix'}}];
+        $state{'rotate'}         = $self->{' rotate'};
+        $state{'scale'}          = [@{$self->{' scale'}}];
+        $state{'skew'}           = [@{$self->{' skew'}}];
+        $state{'translate'}      = [@{$self->{' translate'}}];
+        $state{'fillcolor'}      = [@{$self->{' fillcolor'}}];
+        $state{'strokecolor'}    = [@{$self->{' strokecolor'}}];
     }
     return %state;
 }
 
-=item $content->font($font_object, $size)
+=head1 TEXT PLACEMENT
 
-    # Example
-    my $pdf = PDF::API2->new();
-    my $font = $pdf->corefont('Helvetica');
-    $content->font($font, 12);
+=head2 position
 
-Sets the font and font size.
+    # Set
+    $content = $content->position($x, $y);
 
-=cut
+    # Get
+    ($x, $y) = $content->position();
 
-sub _font {
-    my ($font, $size) = @_;
-    if ($font->isvirtual()) {
-        return('/'.$font->fontlist->[0]->name.' '.float($size).' Tf');
-    }
-    else {
-        return('/'.$font->name.' '.float($size).' Tf');
-    }
-}
-sub font {
-    my ($self, $font, $size) = @_;
-    unless ($size) {
-        croak q{A font size is required};
-    }
-    $self->fontset($font, $size);
-    $self->add(_font($font, $size));
-    $self->{' fontset'} = 1;
-    return $self;
-}
+If called with arguments, moves to the start of the current line of text, offset
+by C<$x> and C<$y>.
 
-sub fontset {
-    my ($self,$font,$size)=@_;
-    $self->{' font'}=$font;
-    $self->{' fontsize'}=$size;
-    $self->{' fontset'}=0;
-
-    if ($font->isvirtual()) {
-        foreach my $f (@{$font->fontlist}) {
-            $self->resource('Font', $f->name, $f);
-        }
-    }
-    else {
-        $self->resource('Font', $font->name, $font);
-    }
-
-    return $self;
-}
-
-=back
-
-=head2 Text-Positioning
-
-Note: There is a very good chance that these commands will be replaced
-in a future release.
-
-=over
-
-=item $content->distance($dx, $dy)
-
-Moves to the start of the next line, offset by the given amounts,
-which are both required.
+If called without arguments, returns the current position of the cursor (before
+the effects of any coordinate transformation methods).
 
 =cut
 
+sub position {
+    my ($self, $x, $y) = @_;
+
+    if (defined $x and not defined $y) {
+        croak 'position requires either 0 or 2 arguments';
+    }
+
+    if (defined $x) {
+        $self->add(float($x), float($y), 'Td');
+        $self->matrix_update($x, $y);
+        $self->{' textlinematrix'}->[0] = $x;
+        return $self;
+    }
+
+    return @{$self->{' textlinematrix'}};
+}
+
+# Deprecated; replace with position
 sub distance {
-    my ($self,$dx,$dy)=@_;
-    $self->add(float($dx),float($dy),'Td');
-    $self->matrix_update($dx,$dy);
-    $self->{' textlinematrix'}->[0]=$dx;
+    my ($self, $dx, $dy) = @_;
+    $self->add(float($dx), float($dy), 'Td');
+    $self->matrix_update($dx, $dy);
+    $self->{' textlinematrix'}->[0] = $dx;
 }
 
-=item $content->cr()
-
-=item $content->cr($vertical_offset)
-
-Moves the cursor to the start of the line when called without an
-argument.  If leading has been set, the cursor will move to the next
-line instead.
-
-An offset can be passed as an argument to override the leading value.
-A positive offset will move the cursor up, and a negative offset will
-move the cursor down.
-
-Pass zero as the argument to ignore the leading and get just a
-carriage return.
-
-=cut
-
+# Deprecated; use position (ignores leading) or crlf (uses leading) instead
 sub cr {
     my ($self, $offset) = @_;
     if (defined $offset) {
@@ -1613,12 +1906,33 @@ sub cr {
     $self->{' textlinematrix'}->[0] = 0;
 }
 
-=item $content->nl()
+=head2 crlf
 
-Moves to the start of the next line.
+    $content = $content->crlf();
+
+Moves to the start of the next line, based on the L</"leading"> setting.
+
+If leading isn't set, a default distance of 120% of the font size will be used.
 
 =cut
 
+sub crlf {
+    my $self = shift();
+    my $leading = $self->leading();
+    if ($leading or not $self->{' fontsize'}) {
+        $self->add('T*');
+    }
+    else {
+        $leading = $self->{' fontsize'} * 1.2;
+        $self->add(0, float($leading * -1), 'Td');
+    }
+
+    $self->matrix_update(0, $leading * -1);
+    $self->{' textlinematrix'}->[0] = 0;
+    return $self;
+}
+
+# Deprecated; replace with crlf
 sub nl {
     my $self = shift();
     $self->add('T*');
@@ -1626,178 +1940,211 @@ sub nl {
     $self->{' textlinematrix'}->[0] = 0;
 }
 
-=item ($tx, $ty) = $content->textpos()
-
-Gets the current estimated text position.
-
-Note: This does not affect the PDF in any way.
-
-=cut
-
 sub _textpos {
-    my ($self,@xy)=@_;
-    my ($x,$y)=(0,0);
-    while (scalar @xy > 0) {
-        $x+=shift @xy;
-        $y+=shift @xy;
+    my ($self, @xy) = @_;
+
+    my ($x, $y) = (0, 0);
+    while (@xy) {
+        $x += shift(@xy);
+        $y += shift(@xy);
     }
-    my (@m)=_transform(
-        -matrix=>$self->{" textmatrix"},
-        -point=>[$x,$y]
+    my (@m) = _transform(
+        -matrix => $self->{' textmatrix'},
+        -point  => [$x, $y],
     );
-    return($m[0],$m[1]);
+
+    return ($m[0], $m[1]);
 }
+
+# Deprecated
 sub textpos {
-    my $self=shift @_;
-    return($self->_textpos(@{$self->{" textlinematrix"}}));
+    my $self = shift();
+    return $self->_textpos(@{$self->{' textlinematrix'}});
 }
+
+# Deprecated; replace with position (without arguments)
 sub textpos2 {
-    my $self=shift @_;
-    return(@{$self->{" textlinematrix"}});
+    my $self = shift();
+    return $self->position();
 }
 
-=back
+=head2 text
 
-=head2 Text-Showing
+    my $width = $content->text($text, %options);
 
-=over
-
-=item $width = $content->text($text, %options)
-
-Adds text to the page.
-
-Returns the width of the text in points.
+Places text on the page.  Returns the width of the text in points.
 
 Options:
 
 =over
 
-=item -indent
+=item * align
+
+One of C<left> (default), C<center>, or C<right>.  Text will be placed such that
+it begins, is centered on, or ends at the current text position, respectively.
+
+In each case, the position will then be moved to the end of the text.
+
+=item * indent
 
 Indents the text by the number of points.
 
-=item -underline => 'auto'
+If C<align> is set to anything other than C<left>, this setting will be ignored.
 
-=item -underline => $distance
+=item * underline
 
-=item -underline => [$distance, $thickness, ...]
+Underlines the text.  The value may be one of the following:
 
-Underlines the text.  C<$distance> is the number of units beneath the
-baseline, and C<$thickness> is the width of the line.
+=over
 
-Multiple underlines can be made by passing several distances and
-thicknesses.
+=item * auto
+
+Determines the underline distance from the text based on the font and font size.
+
+=item * $distance
+
+Manually set the underline distance in points.  A positive distance moves the
+line downward.
+
+=item * [$distance, $thickness, ...]
+
+Manually set both the underline distance and line thickness, both in points.
+
+Repeat these arguments to include multiple underlines.
+
+=back
 
 =back
 
 =cut
 
 sub _text_underline {
-    my ($self,$xy1,$xy2,$underline,$color) = @_;
-    $color||='black';
-    my @underline=();
+    my ($self, $xy1, $xy2, $underline, $color) = @_;
+    $color ||= 'black';
+
+    my @underline;
     if (ref($underline) eq 'ARRAY') {
-        @underline=@{$underline};
+        @underline = @$underline;
     }
     else {
-        @underline=($underline,1);
+        @underline = ($underline, 1);
     }
-    push @underline,1 if(@underline%2);
+    push @underline, 1 if @underline % 2;
 
-    my $underlineposition=(-$self->{' font'}->underlineposition()*$self->{' fontsize'}/1000||1);
-    my $underlinethickness=($self->{' font'}->underlinethickness()*$self->{' fontsize'}/1000||1);
-    my $pos=1;
+    my $underlineposition = (-$self->{' font'}->underlineposition() * $self->{' fontsize'} / 1000 || 1);
+    my $underlinethickness = ($self->{' font'}->underlinethickness() * $self->{' fontsize'} / 1000 || 1);
+    my $pos = 1;
 
-    while(@underline) {
-        $self->add_post(_save);
+    while (@underline) {
+        $self->add_post(_save());
 
-        my $distance=shift @underline;
-        my $thickness=shift @underline;
-        my $scolor=$color;
-        if (ref $thickness) {
-            ($thickness,$scolor)=@{$thickness};
+        my $distance = shift(@underline);
+        my $thickness = shift(@underline);
+        my $scolor = $color;
+        if (ref($thickness)) {
+            ($thickness, $scolor) = @$thickness;
         }
-
         if ($distance eq 'auto') {
-            $distance=$pos*$underlineposition;
+            $distance = $pos * $underlineposition;
         }
         if ($thickness eq 'auto') {
-            $thickness=$underlinethickness;
+            $thickness = $underlinethickness;
         }
 
-        my ($x1,$y1)=$self->_textpos(@{$xy1},0,-($distance+($thickness/2)));
-        my ($x2,$y2)=$self->_textpos(@{$xy2},0,-($distance+($thickness/2)));
+        my ($x1, $y1) = $self->_textpos(@$xy1, 0, -($distance + ($thickness / 2)));
+        my ($x2, $y2) = $self->_textpos(@$xy2, 0, -($distance + ($thickness / 2)));
 
         $self->add_post($self->_strokecolor($scolor));
         $self->add_post(_linewidth($thickness));
-        $self->add_post(_move($x1,$y1));
-        $self->add_post(_line($x2,$y2));
-        $self->add_post(_stroke);
+        $self->add_post(_move($x1, $y1));
+        $self->add_post(_line($x2, $y2));
+        $self->add_post(_stroke());
 
-        $self->add_post(_restore);
+        $self->add_post(_restore());
         $pos++;
     }
 }
 
 sub text {
     my ($self, $text, %opts) = @_;
-    if ($self->{' fontset'} == 0) {
+    unless ($self->{' fontset'}) {
         unless (defined $self->{' font'} and $self->{' fontsize'}) {
             croak q{Can't add text without first setting a font and font size};
         }
         $self->font($self->{' font'}, $self->{' fontsize'});
         $self->{' fontset'} = 1;
     }
-    if (defined $opts{'-indent'}) {
-        $self->matrix_update($opts{'-indent'}, 0);
-    }
-    my $ulxy1 = [$self->textpos2()];
 
-    if (defined $opts{'-indent'}) {
-        my $indent = -$opts{'-indent'} * (1000 / $self->{' fontsize'}) * (100 / $self->hscale());
+    # Deprecated options (remove hyphens)
+    if (exists $opts{'-indent'}) {
+        $opts{'indent'} //= delete $opts{'-indent'};
+    }
+    if (exists $opts{'-underline'}) {
+        $opts{'underline'} //= delete $opts{'-underline'};
+    }
+
+    my $width = $self->text_width($text);
+
+    if (defined $opts{'align'}) {
+        if ($opts{'align'} eq 'left') {
+            # NOOP
+        }
+        elsif ($opts{'align'} eq 'center') {
+            $opts{'indent'} = -($width / 2);
+        }
+        elsif ($opts{'align'} eq 'right') {
+            $opts{'indent'} = -$width;
+        }
+        else {
+            croak 'Invalid alignment: ' . $opts{'align'};
+        }
+    }
+
+    if (defined $opts{'indent'}) {
+        $self->matrix_update($opts{'indent'}, 0);
+    }
+
+    my $underline_start = [$self->position()];
+
+    if (defined $opts{'indent'}) {
+        my $indent = -$opts{'indent'};
+        $indent *= (1000 / $self->{' fontsize'}) * (100 / $self->hscale());
         $self->add($self->{' font'}->text($text, $self->{' fontsize'}, $indent));
     }
     else {
         $self->add($self->{' font'}->text($text, $self->{' fontsize'}));
     }
 
-    my $width = $self->advancewidth($text);
     $self->matrix_update($width, 0);
 
-    my $ulxy2 = [$self->textpos2()];
+    my $underline_end = [$self->position()];
 
-    if (defined $opts{'-underline'}) {
-        $self->_text_underline($ulxy1, $ulxy2, $opts{'-underline'}, $opts{'-strokecolor'});
+    if (defined $opts{'underline'}) {
+        $self->_text_underline($underline_start, $underline_end,
+                               $opts{'underline'},
+                               $opts{'-strokecolor'});
     }
 
     return $width;
 }
 
-=item $width = $content->text_center($text, %options)
-
-As C<text>, but centered on the current point.
-
-=cut
-
+# Deprecated; replace with text($line, align => 'center')
 sub text_center {
     my ($self, $text, @opts) = @_;
     my $width = $self->advancewidth($text);
     return $self->text($text, -indent => -($width / 2), @opts);
 }
 
-=item $width = $content->text_right($text, %options)
-
-As C<text>, but right-aligned to the current point.
-
-=cut
-
+# Deprecated; replace with text($line, align => 'right')
 sub text_right {
     my ($self, $text, @opts) = @_;
-    my $width=$self->advancewidth($text);
+    my $width = $self->advancewidth($text);
     return $self->text($text, -indent => -$width, @opts);
 }
 
-=item $width = $content->text_justified($text, $width, %options)
+=head2 text_justified
+
+    my $width = $content->text_justified($text, $width, %options);
 
 As C<text>, filling the specified width by adjusting the space between words.
 
@@ -1805,35 +2152,13 @@ As C<text>, filling the specified width by adjusting the space between words.
 
 sub text_justified {
     my ($self, $text, $width, %opts) = @_;
-    my $initial_width = $self->advancewidth($text);
-    my $space_count = scalar split /\s/, $text;
+    my $initial_width = $self->text_width($text);
+    my $space_count = (split /\s/, $text) - 1;
     my $ws = $self->wordspace();
-    $self->wordspace(($width - $initial_width) / $space_count) if $space_count > 0;
+    $self->wordspace(($width - $initial_width) / $space_count) if $space_count;
     $self->text($text, %opts);
     $self->wordspace($ws);
     return $width;
-}
-
-=item $width = $txt->advancewidth($string, %text_state)
-
-Returns the width of the string based on all currently set text state
-attributes.  These can optionally be overridden.
-
-=cut
-
-sub advancewidth {
-    my ($self, $text, %opts) = @_;
-    return 0 unless defined($text) and length($text);
-    foreach my $k (qw(font fontsize wordspace charspace hscale)) {
-        $opts{$k} = $self->{" $k"} unless defined $opts{$k};
-    }
-    my $glyph_width = $opts{'font'}->width($text) * $opts{'fontsize'};
-    my $num_space = $text =~ y/\x20/\x20/;
-    my $num_char = length($text);
-    my $word_spaces = $opts{'wordspace'} * $num_space;
-    my $char_spaces = $opts{'charspace'} * ($num_char - 1);
-    my $advance = ($glyph_width + $word_spaces + $char_spaces) * $opts{'hscale'} / 100;
-    return $advance;
 }
 
 sub _text_fill_line {
@@ -1879,70 +2204,73 @@ sub text_fill_justified {
     my ($line, $ret) = $self->_text_fill_line($text, $width);
     my $ws = $self->wordspace();
     my $w = $self->advancewidth($line);
-    my $space_count = scalar split /\s/, $line;
+    my $space_count = (split /\s/, $line) - 1;
 
     # Normal Line
     if ($ret) {
         $self->wordspace(($width - $w) / $space_count) if $space_count;
-        $width = $self->text($line, %opts);
+        $width = $self->text($line, %opts, align => 'left');
         $self->wordspace($ws);
         return $width, $ret;
     }
 
     # Last Line
-    if ($opts{'-align-last'}) {
-        unless ($opts{'-align-last'} =~ /^(left|center|right|justified)$/) {
-            croak 'Invalid -align-last (must be left, center, right, or justified)';
+    if ($opts{'align-last'}) {
+        unless ($opts{'align-last'} =~ /^(left|center|right|justified)$/) {
+            croak 'Invalid align-last (must be left, center, right, or justified)';
         }
     }
-    my $align_last = $opts{'-align-last'} // 'left';
+    my $align_last = $opts{'align-last'} // 'left';
     if ($align_last eq 'left') {
-        $self->text($line, %opts);
+        $width = $self->text($line, %opts, align => 'left');
     }
     elsif ($align_last eq 'center') {
-        $self->text_center($line, %opts);
+        $width = $self->text($line, %opts, align => 'center');
     }
     elsif ($align_last eq 'right') {
-        $self->text_right($line, %opts);
+        $width = $self->text($line, %opts, align => 'right');
     }
     else {
         $self->wordspace(($width - $w) / $space_count) if $space_count;
-        $width = $self->text($line, %opts);
+        $width = $self->text($line, %opts, align => 'left');
         $self->wordspace($ws);
     }
     return $width, $ret;
 }
 
-=item $overflow_text = $content->paragraph($text, $width, $height, %options)
+=head2 paragraph
 
-Fill the rectangle with as much of the provided text as will fit.
+    # Scalar context
+    $overflow_text = $content->paragraph($text, $width, $height, %options);
 
-Line spacing is set using the C<leading> call.
+    # Array context
+    ($overflow, $height) = $content->paragraph($text, $width, $height, %options);
+
+Fills the rectangle with as much of the provided text as will fit.
 
 In array context, returns the remaining text (if any) of the positioned text and
 the remaining (unused) height.  In scalar context, returns the remaining text
 (if any).
 
+Line spacing follows L</"leading">, if set, or 120% of the font size by default.
+
 B<Options>
 
-=over 4
+=over
 
-=item -align => $alignment
+=item * align
 
-Specifies the alignment for each line of text.  May be set to left, center,
-right, or justified.  Default is left.
+Specifies the alignment for each line of text.  May be set to C<left> (default),
+C<center>, C<right>, or C<justified>.
 
-=item -align-last => $alignment
+=item * align-last
 
 Specifies the alignment for the last line of justified text.  May be set to
-left, center, right, or justified.  Default is left.
+C<left> (default), C<center>, C<right>, or C<justified>.
 
-=item -underline => $distance
+=item * underline
 
-=item -underline => [ $distance, $thickness, ... ]
-
-If a scalar, distance below baseline, else array reference with pairs of
-distance and line thickness.
+As described in L</"text">.
 
 =back
 
@@ -1950,127 +2278,198 @@ distance and line thickness.
 
 sub paragraph {
     my ($self, $text, $width, $height, %opts) = @_;
-    my @line;
-    my $w;
+
+    # Deprecated options (remove hyphens)
+    if (exists $opts{'-align'}) {
+        $opts{'align'} //= delete $opts{'-align'};
+    }
+    if (exists $opts{'-align-last'}) {
+        $opts{'align-last'} //= delete $opts{'-align-last'};
+    }
+    if (exists $opts{'-underline'}) {
+        $opts{'underline'} //= delete $opts{'-underline'};
+    }
+
     my $leading = $self->leading();
     unless ($leading) {
-        carp "Leading is unset; paragraph lines will be placed on top of each other";
+        $leading = $self->{' fontsize'} * 1.2;
     }
+
+    # If the text contains newlines, call paragraph on each line
+    if ($text =~ /\n/) {
+        my $overflow = '';
+        foreach my $line (split /\n/, $text) {
+            # If there's overflow, no more text can be placed.
+            if (length($overflow)) {
+                $overflow .= "\n" . $line;
+                next;
+            }
+
+            # Place a blank line if there are consecutive newlines
+            unless (length($line)) {
+                $self->crlf();
+                $height -= $leading;
+                next;
+            }
+
+            ($line, $height) = $self->paragraph($line, $width, $height, %opts);
+            $overflow .= $line if length($line);
+        }
+
+        return ($overflow, $height) if wantarray();
+        return $overflow;
+    }
+
+    my $w;
     while (length($text) > 0) {
         $height -= $leading;
         last if $height < 0;
 
-        if ($opts{'-align'} eq 'justified') {
+        my $align = $opts{'align'} // 'left';
+        if ($align eq 'justified') {
             ($w, $text) = $self->text_fill_justified($text, $width, %opts);
         }
-        elsif ($opts{'-align'} eq 'right') {
+        elsif ($align eq 'right') {
             ($w, $text) = $self->text_fill_right($text, $width, %opts);
         }
-        elsif ($opts{'-align'} eq 'center') {
+        elsif ($align eq 'center') {
             ($w, $text) = $self->text_fill_center($text, $width, %opts);
         }
         else {
             ($w, $text) = $self->text_fill_left($text, $width, %opts);
         }
-        $self->nl();
+        $self->crlf();
     }
+
     return ($text, $height) if wantarray();
     return $text;
 }
 
-=item $overflow_text = $content->paragraphs($text, $width, $height, %options)
-
-As C<paragraph>, but start a new line after every newline character.
-
-=back
-
-=cut
-
 # Deprecated former name
 sub section { return paragraphs(@_) }
 
-sub paragraphs {
-    my ($self, $text, $width, $height, %opts) = @_;
-    my $overflow = '';
-
-    foreach my $para (split(/\n/, $text)) {
-        # If there's overflow, no more text can be placed.
-        if (length($overflow) > 0) {
-            $overflow .= "\n" . $para;
-            next;
-        }
-
-        # Place a blank line if there are consecutive newlines.
-        unless (length($para)) {
-            $self->nl();
-            $height -= $self->leading();
-            next;
-        }
-
-        ($para, $height) = $self->paragraph($para, $width, $height, %opts);
-        $overflow .= $para if length($para) > 0;
-    }
-
-    return ($overflow, $height) if wantarray();
-    return $overflow;
-}
+# Deprecated; merged into paragraph
+sub paragraphs { return paragraph(@_) }
 
 sub textlabel {
-    my ($self,$x,$y,$font,$size,$text,%opts,$wht) = @_;
-    my %trans_opts=( -translate => [$x,$y] );
-    my %text_state=();
-    $trans_opts{-rotate} = $opts{-rotate} if($opts{-rotate});
+    my ($self, $x, $y, $font, $size, $text, %opts, $wht) = @_;
+    my %trans_opts = (-translate => [$x,$y]);
+    my %text_state;
+    $trans_opts{'-rotate'} = $opts{'-rotate'} if $opts{'-rotate'};
 
-    my $wastext = $self->_in_text_object;
+    my $wastext = $self->_in_text_object();
     if ($wastext) {
-        %text_state=$self->textstate;
-        $self->textend;
+        %text_state = $self->textstate();
+        $self->textend();
     }
-    $self->save;
-    $self->textstart;
+    $self->save();
+    $self->textstart();
 
     $self->transform(%trans_opts);
 
-    $self->fillcolor(ref($opts{-color}) ? @{$opts{-color}} : $opts{-color}) if($opts{-color});
-    $self->strokecolor(ref($opts{-strokecolor}) ? @{$opts{-strokecolor}} : $opts{-strokecolor}) if($opts{-strokecolor});
-
-    $self->font($font,$size);
-
-    $self->charspace($opts{-charspace})     if($opts{-charspace});
-    $self->hscale($opts{-hscale})           if($opts{-hscale});
-    $self->wordspace($opts{-wordspace})     if($opts{-wordspace});
-    $self->render($opts{-render})           if($opts{-render});
-
-    if ($opts{-right} || $opts{-align}=~/^r/i) {
-        $wht = $self->text_right($text,%opts);
+    if ($opts{'-color'}) {
+        my $color = ref($opts{'-color'}) ? @{$opts{'-color'}} : $opts{'-color'};
+        $self->fillcolor($color);
     }
-    elsif ($opts{-center} || $opts{-align}=~/^c/i) {
-        $wht = $self->text_center($text,%opts);
+    if ($opts{'-strokecolor'}) {
+        my $color = (ref($opts{'-strokecolor'})
+                     ? @{$opts{'-strokecolor'}}
+                     : $opts{'-strokecolor'});
+        $self->strokecolor($color);
+    }
+
+    $self->font($font, $size);
+
+    $self->charspace($opts{'-charspace'}) if $opts{'-charspace'};
+    $self->hscale($opts{'-hscale'})       if $opts{'-hscale'};
+    $self->wordspace($opts{'-wordspace'}) if $opts{'-wordspace'};
+    $self->render($opts{'-render'})       if $opts{'-render'};
+
+    my $align = $opts{'-align'} // 'left';
+    if ($opts{'-right'} or $align =~ /^r/i) {
+        $wht = $self->text_right($text, %opts);
+    }
+    elsif ($opts{'-center'} or $align =~ /^c/i) {
+        $wht = $self->text_center($text, %opts);
     }
     else {
-        $wht = $self->text($text,%opts);
+        $wht = $self->text($text, %opts);
     }
 
-    $self->textend;
-    $self->restore;
+    $self->textend();
+    $self->restore();
 
     if ($wastext) {
-        $self->textstart;
+        $self->textstart();
         $self->textstate(%text_state);
     }
     return $wht;
 }
 
+=head2 text_width
+
+    my $width = $content->text_width($line, %overrides);
+
+Returns the width of a line of text based on the current text state attributes.
+These can optionally be overridden:
+
+    my $width = $content->text_width($line,
+        font => $font,
+        size => $size,
+        character_spacing => $spacing,
+        word_spacing => $spacing,
+        hscale => $scale,
+    );
+
+=cut
+
+# Deprecated (renamed)
+sub advancewidth { return text_width(@_) }
+
+sub text_width {
+    my ($self, $text, %opts) = @_;
+    return 0 unless defined($text) and length($text);
+
+    # Convert new names to old names
+    if (exists $opts{'size'}) {
+        $opts{'fontsize'} = delete $opts{'size'};
+    }
+    if (exists $opts{'character_spacing'}) {
+        $opts{'charspace'} = delete $opts{'character_spacing'};
+    }
+    if (exists $opts{'word_spacing'}) {
+        $opts{'charspace'} = delete $opts{'word_spacing'};
+    }
+
+    foreach my $k (qw(font fontsize wordspace charspace hscale)) {
+        $opts{$k} = $self->{" $k"} unless defined $opts{$k};
+    }
+
+    # Width of glyphs
+    my $width = $opts{'font'}->width($text) * $opts{'fontsize'};
+
+    # Width of space characters
+    my $space_count = $text =~ y/\x20/\x20/;
+    $width += $opts{'wordspace'} * $space_count;
+
+    # Width of space between characters
+    my $char_count = length($text);
+    $width += $opts{'charspace'} * ($char_count - 1);
+
+    # Horizontal scale multiplier
+    $width *= $opts{'hscale'} / 100;
+
+    return $width;
+}
+
 sub metaStart {
-    my $self=shift @_;
-    my $tag=shift @_;
-    my $obj=shift @_;
+    my ($self, $tag, $obj) = @_;
     $self->add("/$tag");
     if (defined $obj) {
-        my $dict=PDFDict();
-        $dict->{Metadata}=$obj;
-        $self->resource('Properties',$obj->name,$dict);
-        $self->add('/'.($obj->name));
+        my $dict = PDFDict();
+        $dict->{'Metadata'} = $obj;
+        $self->resource('Properties', $obj->name(), $dict);
+        $self->add('/' . $obj->name());
         $self->add('BDC');
     }
     else {
@@ -2080,33 +2479,29 @@ sub metaStart {
 }
 
 sub metaEnd {
-    my $self=shift @_;
+    my $self = shift();
     $self->add('EMC');
     return $self;
 }
 
-=head2 Advanced Methods
-
-=over
-
-=item $content->add @content
-
-Add raw content to the PDF stream.  You will generally want to use the
-other methods in this class instead.
-
-=cut
-
 sub add_post {
-    my $self = shift;
-    if (scalar @_) {
-        $self->{' poststream'} .= ($self->{' poststream'} =~ m|\s$|o ? '' : ' ') . join(' ', @_) . ' ';
+    my $self = shift();
+    if (@_) {
+        unless ($self->{' poststream'} =~ /\s$/) {
+            $self->{' poststream'} .= ' ';
+        }
+        $self->{' poststream'} .= join(' ', @_) . ' ';
     }
     return $self;
 }
+
 sub add {
-    my $self = shift;
-    if (scalar @_) {
-        $self->{' stream'} .= encode('iso-8859-1', ($self->{' stream'} =~ m|\s$|o ? '' : ' ') . join(' ', @_) . ' ');
+    my $self = shift();
+    if (@_) {
+        unless ($self->{' stream'} =~ /\s$/) {
+            $self->{' stream'} .= ' ';
+        }
+        $self->{' stream'} .= encode('iso-8859-1', join(' ', @_) . ' ');
     }
     return $self;
 }
@@ -2115,65 +2510,45 @@ sub add {
 # (i.e. between BT and ET).  See textstart and textend.
 sub _in_text_object {
     my $self = shift();
-    return defined($self->{' apiistext'}) && $self->{' apiistext'};
+    return $self->{' apiistext'};
 }
 
-=item $content->compressFlate
-
-Marks content for compression on output.  This is done automatically
-in nearly all cases, so you shouldn't need to call this yourself.
-
-=cut
-
 sub compressFlate {
-    my $self=shift @_;
-    $self->{'Filter'}=PDFArray(PDFName('FlateDecode'));
-    $self->{-docompress}=1;
+    my $self = shift();
+    $self->{'Filter'} = PDFArray(PDFName('FlateDecode'));
+    $self->{'-docompress'} = 1;
     return $self;
 }
 
-=item $content->textstart
-
-Starts a text object.  You will likely want to use the C<text> method
-instead.
-
-=cut
-
 sub textstart {
-    my ($self) = @_;
+    my $self = shift();
     unless ($self->_in_text_object()) {
         $self->add(' BT ');
-        $self->{' apiistext'}=1;
-        $self->{' font'}=undef;
-        $self->{' fontset'}=0;
-        $self->{' fontsize'}=0;
-        $self->{' charspace'}=0;
-        $self->{' hscale'}=100;
-        $self->{' wordspace'}=0;
-        $self->{' leading'}=0;
-        $self->{' rise'}=0;
-        $self->{' render'}=0;
-        @{$self->{' matrix'}}=(1,0,0,1,0,0);
-        @{$self->{' textmatrix'}}=(1,0,0,1,0,0);
-        @{$self->{' textlinematrix'}}=(0,0);
-        @{$self->{' fillcolor'}}=(0);
-        @{$self->{' strokecolor'}}=(0);
-        @{$self->{' translate'}}=(0,0);
-        @{$self->{' scale'}}=(1,1);
-        @{$self->{' skew'}}=(0,0);
-        $self->{' rotate'}=0;
+        $self->{' apiistext'} = 1;
+        $self->{' font'} = undef;
+        $self->{' fontset'} = 0;
+        $self->{' fontsize'} = 0;
+        $self->{' charspace'} = 0;
+        $self->{' hscale'} = 100;
+        $self->{' wordspace'} = 0;
+        $self->{' leading'} = 0;
+        $self->{' rise'} = 0;
+        $self->{' render'} = 0;
+        @{$self->{' matrix'}} = (1, 0, 0, 1, 0, 0);
+        @{$self->{' textmatrix'}} = (1, 0, 0, 1, 0, 0);
+        @{$self->{' textlinematrix'}} = (0, 0);
+        @{$self->{' fillcolor'}} = 0;
+        @{$self->{' strokecolor'}} = 0;
+        @{$self->{' translate'}} = (0, 0);
+        @{$self->{' scale'}} = (1, 1);
+        @{$self->{' skew'}} = (0, 0);
+        $self->{' rotate'} = 0;
     }
     return $self;
 }
 
-=item $content->textend
-
-Ends a text object.
-
-=cut
-
 sub textend {
-    my ($self) = @_;
+    my $self = shift();
     if ($self->_in_text_object()) {
         $self->add(' ET ', $self->{' poststream'});
         $self->{' apiistext'} = 0;
@@ -2181,10 +2556,6 @@ sub textend {
     }
     return $self;
 }
-
-=back
-
-=cut
 
 sub resource {
     my ($self, $type, $key, $obj, $force) = @_;
@@ -2194,26 +2565,169 @@ sub resource {
     }
     else {
         # we are a self-contained content stream.
-        $self->{Resources}||=PDFDict();
+        $self->{'Resources'} //= PDFDict();
 
-        my $dict=$self->{Resources};
-        $dict->realise if(ref($dict)=~/Objind$/);
+        my $dict = $self->{'Resources'};
+        $dict->realise() if ref($dict) =~ /Objind$/;
 
-        $dict->{$type}||= PDFDict();
-        $dict->{$type}->realise if(ref($dict->{$type})=~/Objind$/);
+        $dict->{$type} ||= PDFDict();
+        $dict->{$type}->realise() if ref($dict->{$type}) =~ /Objind$/;
         unless (defined $obj) {
-            return($dict->{$type}->{$key} || undef);
+            return $dict->{$type}->{$key};
         }
         else {
             if ($force) {
-                $dict->{$type}->{$key}=$obj;
+                $dict->{$type}->{$key} = $obj;
             }
             else {
-                $dict->{$type}->{$key}||=$obj;
+                $dict->{$type}->{$key} //= $obj;
             }
             return $dict;
         }
     }
 }
+
+=head1 MIGRATION
+
+See L<PDF::API2/"MIGRATION"> for an overview.
+
+=over
+
+=item transform(%hyphen_prefixed_options);
+
+Remove hyphens from option names (C<-translate> becomes C<translate>, etc.).
+
+=item transform_rel
+
+Replace with L</"transform">, setting option C<relative> to true.  Remove
+hyphens from the names of other options.
+
+=item linewidth
+
+Replace with L</"line_width">.
+
+=item linecap
+
+Replace with L</"line_cap">.
+
+=item linejoin
+
+Replace with L</"line_join">.
+
+=item meterlimit
+
+=item miterlimit
+
+Replace with L</"miter_limit">.
+
+=item linedash
+
+Replace with L</"line_dash_pattern">.  Remove hyphens from option names.  Rename
+C<-shift> to C<offset>.
+
+=item flatness
+
+Replace with L</"flatness_tolerance">.
+
+=item poly
+
+Replace with L</"move"> (first two arguments) and L</"polyline"> (remaining
+arguments).
+
+=item endpath
+
+Replace with L</"end">.
+
+=item rect
+
+Replace with L</"rectangle">, converting the C<$w> (third) and C<$h> (fourth)
+arguments to the X and Y values of the upper-right corner:
+
+    # Old
+    $content->rect($x, $y, $w, $h);
+
+    # New
+    $content->rectangle($x, $y, $x + $w, $y + $h);
+
+=item rectxy
+
+Replace with L</"rectangle">.
+
+=item fill(1)
+
+Replace with C<$content-E<gt>fill(rule =E<gt> 'even-odd')>.
+
+=item fillstroke
+
+Replace with L</"paint">.
+
+=item clip(1)
+
+Replace with C<$content-E<gt>clip(rule =E<gt> 'even-odd')>.
+
+=item image
+
+=item formimage
+
+Replace with L</"object">.
+
+=item charspace
+
+Replace with L</"character_spacing">.
+
+=item wordspace
+
+Replace with L</"word_spacing">.
+
+=item hspace
+
+Replace with L</"hscale">.
+
+=item lead
+
+Replace with L</"leading">.
+
+=item distance
+
+Replace with L</"position">.
+
+=item cr
+
+Replace with either L</"position"> (if called with arguments) or L</"crlf"> (if
+called without arguments).
+
+=item nl
+
+Replace with L</"crlf">.
+
+=item text(%hyphen_prefixed_options)
+
+Remove initial hyphens from option names.
+
+=item text_center
+
+Replace with L</"text">, setting C<align> to C<center>.
+
+=item text_right
+
+Replace with L</"text">, setting C<align> to C<right>.
+
+=item paragraph(%hyphen_prefixed_options)
+
+Remove initial hyphens from option names.  C<-align-last> becomes C<align-last>.
+
+=item section
+
+=item paragraphs
+
+Replace with L</"paragraph">.
+
+=item advancewidth
+
+Replace with L</"text_width">.
+
+=back
+
+=cut
 
 1;

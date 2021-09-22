@@ -17,6 +17,7 @@
 
 #include "make_argcheck_ops.c.inc"
 #include "newOP_CUSTOM.c.inc"
+#include "op_sibling.c.inc"
 
 #if HAVE_PERL_VERSION(5,32,0)
 #  define HAVE_OP_ISA
@@ -33,13 +34,8 @@
 #  define block_end(a,b)         Perl_block_end(aTHX_ a,b)
 #endif
 
-
-#ifndef OpSIBLING
-#  define OpSIBLING(op)  (op->op_sibling)
-#endif
-
-#ifndef OpMORESIB_set
-#  define OpMORESIB_set(op,sib)  ((op)->op_sibling = (sib))
+#ifndef G_LIST
+#  define G_LIST  G_ARRAY
 #endif
 
 struct HooksAndData {
@@ -62,6 +58,8 @@ struct Registration {
   struct HooksAndData hd;
 
   STRLEN permit_hintkey_len;
+
+  int opname_is_WIDE : 1;
 };
 
 static struct Registration *registrations;
@@ -78,7 +76,27 @@ static OP *new_op(pTHX_ const struct HooksAndData hd, U32 flags, OP *lhs, OP *rh
   return ret;
 }
 
+/* copypasta from core's op.c */
+#define force_list(o, nullit)  S_force_list(aTHX_ o, nullit)
+static OP *S_force_list(pTHX_ OP *o, bool nullit)
+{
+  if(!o || o->op_type != OP_LIST) {
+    OP *rest = NULL;
+    if(o) {
+      rest = OpSIBLING(o);
+      OpLASTSIB_set(o, NULL);
+    }
+    o = newLISTOP(OP_LIST, 0, o, NULL);
+    if(rest)
+      op_sibling_splice(o, cLISTOPo->op_last, 0, rest);
+  }
+  if(nullit)
+    op_null(o);
+  return o;
+}
+
 #ifdef HAVE_PL_INFIX_PLUGIN
+
 OP *parse(pTHX_ OP *lhs, struct Perl_custom_infix *def)
 {
   struct Registration *reg = (struct Registration *)def;
@@ -86,7 +104,28 @@ OP *parse(pTHX_ OP *lhs, struct Perl_custom_infix *def)
   /* TODO: maybe operator has a 'parse' hook? */
 
   lex_read_space(0);
-  OP *rhs = parse_termexpr(0);
+  OP *rhs = NULL;
+
+  switch(reg->hd.hooks->rhs_flags & 0x07) {
+    case XPI_OPERAND_TERM:
+      rhs = parse_termexpr(0);
+      break;
+
+    case XPI_OPERAND_TERM_LIST:
+      /* force_list nulls out the OP_LIST itself but preserves the OP_PUSHMARK
+       * inside it. This is essential or else op_contextualize() will null out
+       * both of them and we lose the mark
+       */
+      rhs = op_contextualize(force_list(parse_termexpr(0), TRUE), G_LIST);
+      break;
+
+    case XPI_OPERAND_LIST:
+      rhs = op_contextualize(force_list(parse_listexpr(0), TRUE), G_LIST);
+      break;
+
+    default:
+      croak("hooks->rhs_flags did not provide a valid RHS type");
+  }
 
   return new_op(aTHX_ reg->hd, 0, lhs, rhs);
 }
@@ -240,7 +279,15 @@ static OP *ckcall_wrapper_func(pTHX_ OP *op, GV *namegv, SV *ckobj)
   return op;
 }
 
-static void make_wrapper_func(pTHX_ const struct HooksAndData *hd)
+#define newSLUGOP(idx)  S_newSLUGOP(aTHX_ idx)
+static OP *S_newSLUGOP(pTHX_ int idx)
+{
+  OP *op = newGVOP(OP_AELEMFAST, 0, PL_defgv);
+  op->op_private = idx;
+  return op;
+}
+
+static void make_wrapper_func(pTHX_ const struct HooksAndData *hd, U8 rhs_type)
 {
   /* Prepare to make a new optree-based CV */
   I32 floor_ix = start_subparse(FALSE, 0);
@@ -251,20 +298,108 @@ static void make_wrapper_func(pTHX_ const struct HooksAndData *hd)
   I32 save_ix = block_start(TRUE);
 
   OP *body = NULL;
+  OP *(*ckcall)(pTHX_ OP *, GV *, SV *) = NULL;
 
-  body = op_append_list(OP_LINESEQ, body,
-      make_argcheck_ops(2, 0, 0, funcname));
+  switch(rhs_type) {
+    case XPI_OPERAND_TERM:
+      body = op_append_list(OP_LINESEQ, body,
+          make_argcheck_ops(2, 0, 0, funcname));
 
-  /* Body of the function is just  shift() OP shift() */
-  body = op_append_list(OP_LINESEQ, body,
-      new_op(aTHX_ *hd, 0, newOP(OP_SHIFT, OPf_SPECIAL), newOP(OP_SHIFT, OPf_SPECIAL)));
+      body = op_append_list(OP_LINESEQ, body,
+          newSTATEOP(0, NULL, NULL));
+
+      /* Body of the function is just  $_[0] OP $_[1] */
+      body = op_append_list(OP_LINESEQ, body,
+          new_op(aTHX_ *hd, 0, newSLUGOP(0), newSLUGOP(1)));
+
+      ckcall = &ckcall_wrapper_func;
+      break;
+
+    case XPI_OPERAND_TERM_LIST:
+    case XPI_OPERAND_LIST:
+      body = op_append_list(OP_LINESEQ, body,
+          make_argcheck_ops(1, 0, '@', funcname));
+
+      body = op_append_list(OP_LINESEQ, body,
+          newSTATEOP(0, NULL, NULL));
+
+      /* Body of the function is just  shift OP @_ */
+      body = op_append_list(OP_LINESEQ, body,
+          new_op(aTHX_ *hd, 0,
+            newOP(OP_SHIFT, 0),
+            force_list(newUNOP(OP_RV2AV, OPf_WANT_LIST, newGVOP(OP_GV, 0, PL_defgv)), TRUE)));
+
+      /* no ckcall */
+      break;
+  }
 
   SvREFCNT_inc(PL_compcv);
   body = block_end(save_ix, body);
 
   CV *cv = newATTRSUB(floor_ix, newSVOP(OP_CONST, 0, funcname), NULL, NULL, body);
 
-  cv_set_call_checker(cv, &ckcall_wrapper_func, newSVuv(PTR2UV(hd)));
+  if(ckcall)
+    cv_set_call_checker(cv, ckcall, newSVuv(PTR2UV(hd)));
+}
+
+static XS(deparse_infix);
+static XS(deparse_infix)
+{
+  dXSARGS;
+  struct Registration *reg = XSANY.any_ptr;
+
+  SV *deparseobj = ST(0);
+  SV *ret;
+
+#ifdef HAVE_PL_INFIX_PLUGIN
+  SV **hinthashsvp = hv_fetchs(MUTABLE_HV(SvRV(deparseobj)), "hinthash", 0);
+  HV *hinthash = hinthashsvp ? MUTABLE_HV(SvRV(*hinthashsvp)) : NULL;
+
+  if(hinthash && hv_fetch(hinthash, reg->hd.hooks->permit_hintkey, reg->permit_hintkey_len, 0)) {
+    ENTER;
+    SAVETMPS;
+
+    EXTEND(SP, 4);
+    PUSHMARK(SP);
+    PUSHs(deparseobj);
+    mPUSHs(newSVpvn_flags(reg->info.opname, reg->oplen, reg->opname_is_WIDE ? SVf_UTF8 : 0));
+    PUSHs(ST(1));
+    PUSHs(ST(2));
+    PUTBACK;
+
+    call_method("_deparse_infix_named", G_SCALAR);
+
+    SPAGAIN;
+    ret = SvREFCNT_inc(POPs);
+
+    FREETMPS;
+    LEAVE;
+  }
+  else
+#endif
+  {
+    ENTER;
+    SAVETMPS;
+
+    EXTEND(SP, 4);
+    PUSHMARK(SP);
+    PUSHs(deparseobj);
+    mPUSHp(reg->hd.hooks->wrapper_func_name, strlen(reg->hd.hooks->wrapper_func_name));
+    PUSHs(ST(1));
+    PUSHs(ST(2));
+    PUTBACK;
+
+    call_method("_deparse_infix_wrapperfunc", G_SCALAR);
+
+    SPAGAIN;
+    ret = SvREFCNT_inc(POPs);
+
+    FREETMPS;
+    LEAVE;
+  }
+
+  ST(0) = sv_2mortal(ret);
+  XSRETURN(1);
 }
 
 static void reg_builtin(pTHX_ const char *opname, enum XSParseInfixClassification cls, OPCODE opcode)
@@ -310,6 +445,15 @@ void XSParseInfix_register(pTHX_ const char *opname, const struct XSParseInfixHo
   reg->hd.hooks = hooks;
   reg->hd.data  = hookdata;
 
+  reg->opname_is_WIDE = FALSE;
+  int i;
+  for(i = 0; i < reg->oplen; i++) {
+    if(opname[i] & 0x80) {
+      reg->opname_is_WIDE = TRUE;
+      break;
+    }
+  }
+
   if(hooks->permit_hintkey)
     reg->permit_hintkey_len = strlen(hooks->permit_hintkey);
   else
@@ -320,8 +464,29 @@ void XSParseInfix_register(pTHX_ const char *opname, const struct XSParseInfixHo
     registrations = reg;
   }
 
-  if(hooks->wrapper_func_name)
-    make_wrapper_func(aTHX_ &reg->hd);
+  if(hooks->wrapper_func_name) {
+    make_wrapper_func(aTHX_ &reg->hd, (hooks->rhs_flags & 0x07));
+  }
+
+  if(hooks->ppaddr) {
+    XOP *xop;
+    Newx(xop, 1, XOP);
+
+    SV *namesv = newSVpvf("B::Deparse::pp_infix_0x%p", hooks->ppaddr);
+    SAVEFREESV(namesv);
+
+    XopENTRY_set(xop, xop_name, savepv(SvPVX(namesv) + sizeof("B::Deparse::pp")));
+    XopENTRY_set(xop, xop_desc, "custom infix operator");
+    XopENTRY_set(xop, xop_class, OA_BINOP);
+    XopENTRY_set(xop, xop_peep, NULL);
+
+    Perl_custom_op_register(aTHX_ hooks->ppaddr, xop);
+
+    CV *cv = newXS(SvPVX(namesv), deparse_infix, __FILE__);
+    CvXSUBANY(cv).any_ptr = reg;
+
+    load_module(PERL_LOADMOD_NOIMPORT, newSVpvs("XS::Parse::Infix"), NULL);
+  }
 }
 
 void XSParseInfix_boot(pTHX)

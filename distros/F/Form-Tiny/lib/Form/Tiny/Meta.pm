@@ -5,14 +5,14 @@ use warnings;
 use Moo;
 use Types::Standard qw(ArrayRef HashRef InstanceOf Bool);
 use Scalar::Util qw(blessed);
-use Carp qw(croak);
+use Carp qw(croak carp);
 
 use Form::Tiny::FieldDefinitionBuilder;
 use Form::Tiny::Hook;
 
 use namespace::clean;
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 has 'fields' => (
 	is => 'ro',
@@ -85,7 +85,6 @@ sub resolved_fields
 sub add_field
 {
 	my ($self, @parameters) = @_;
-	my $fields = $self->fields;
 
 	croak 'adding a form field requires at least one parameter'
 		unless scalar @parameters;
@@ -95,7 +94,17 @@ sub add_field
 		$scalar_param = {@parameters, name => $scalar_param};
 	}
 
-	push @{$fields}, Form::Tiny::FieldDefinitionBuilder->new(data => $scalar_param)->build;
+	my $builder = Form::Tiny::FieldDefinitionBuilder->new(data => $scalar_param)->build;
+	push @{$self->fields}, $builder;
+
+	return $builder;
+}
+
+sub add_field_validator
+{
+	my ($self, $field, $message, $code) = @_;
+
+	push @{$field->addons->{validators}}, [$message, $code];
 	return $self;
 }
 

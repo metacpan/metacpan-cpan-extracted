@@ -2,7 +2,7 @@ package MediaWiki::Bot::Constants;
 use strict;
 use warnings;
 # ABSTRACT: constants for MediaWiki::Bot
-our $VERSION = '5.006003'; # VERSION
+our $VERSION = '5.006004'; # VERSION
 
 use MediaWiki::API; # How to grab these constants?
 use Constant::Generate {
@@ -78,35 +78,7 @@ MediaWiki::Bot::Constants - constants for MediaWiki::Bot
 
 =head1 VERSION
 
-version 5.006003
-
-=head1 SYNOPSIS
-
-    use MediaWiki::Bot;
-    use MediaWiki::Bot::Constants qw(:file);
-
-    my $bot = MediaWiki::Bot->new();
-    my $file_existence = $bot->test_image_exists("File:...");
-
-    # Make sense of MediaWiki::Bot's random numbers
-    if ($file_existence == FILE_LOCAL) {
-        # Get from local media repository
-    }
-    elsif ($file_existence == FILE_SHARED) {
-        # Get from shared (remote) media repository
-    }
-
-=head1 DESCRIPTION
-
-Exportable constants used by L<MediaWiki::Bot>. Use these constants
-in your code to avoid the use of magical numbers, and to ensure
-compatibility with future changes in C<MediaWiki::Bot>.
-
-You can also import C<:constants> or any constant name(s) from
-L<MediaWiki::Bot>:
-
-    use MediaWiki::Bot qw(:constants);
-    use MediaWiki::Bot qw(PAGE_NONEXISTENT);
+version 5.006004
 
 =head1 CONSTANTS
 
@@ -142,6 +114,34 @@ functions for getting namespace information for your wiki.
 
 No symbols are exported by default. The available tags are err, bool, page, file, ns, and all.
 
+=head1 SYNOPSIS
+
+    use MediaWiki::Bot;
+    use MediaWiki::Bot::Constants qw(:file);
+
+    my $bot = MediaWiki::Bot->new();
+    my $file_existence = $bot->test_image_exists("File:...");
+
+    # Make sense of MediaWiki::Bot's random numbers
+    if ($file_existence == FILE_LOCAL) {
+        # Get from local media repository
+    }
+    elsif ($file_existence == FILE_SHARED) {
+        # Get from shared (remote) media repository
+    }
+
+=head1 DESCRIPTION
+
+Exportable constants used by L<MediaWiki::Bot>. Use these constants
+in your code to avoid the use of magical numbers, and to ensure
+compatibility with future changes in C<MediaWiki::Bot>.
+
+You can also import C<:constants> or any constant name(s) from
+L<MediaWiki::Bot>:
+
+    use MediaWiki::Bot qw(:constants);
+    use MediaWiki::Bot qw(PAGE_NONEXISTENT);
+
 =head1 AVAILABILITY
 
 The project homepage is L<https://metacpan.org/module/MediaWiki::Bot>.
@@ -152,7 +152,7 @@ site near you, or see L<https://metacpan.org/module/MediaWiki::Bot/>.
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/MediaWiki-Bot/MediaWiki-Bot>
+The development version is on github at L<https://github.com/MediaWiki-Bot/MediaWiki-Bot>
 and may be cloned from L<git://github.com/MediaWiki-Bot/MediaWiki-Bot.git>
 
 =head1 BUGS AND LIMITATIONS
@@ -208,7 +208,7 @@ patch and bug report contributors
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by the MediaWiki::Bot team <perlwikibot@googlegroups.com>.
+This software is Copyright (c) 2021 by the MediaWiki::Bot team <perlwikibot@googlegroups.com>.
 
 This is free software, licensed under:
 

@@ -9,7 +9,7 @@ use constant ();
 my $config = File::ShareDir::Dist::dist_config('FFI-ExtractSymbols');
 
 # ABSTRACT: Posix nm implementation for FFI::ExtractSymbols
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 return 1 if FFI::ExtractSymbols->can('extract_symbols');
@@ -80,7 +80,7 @@ FFI::ExtractSymbols::PosixNm - Posix nm implementation for FFI::ExtractSymbols
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 DESCRIPTION
 
@@ -99,7 +99,11 @@ instead.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Sanko Robinson (SANKO)
 
 =head1 COPYRIGHT AND LICENSE
 

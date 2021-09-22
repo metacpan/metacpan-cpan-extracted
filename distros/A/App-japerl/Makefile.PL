@@ -4,9 +4,10 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{App::japerl},
-    'VERSION'   => q{0.13},
+    'VERSION'   => q{0.14},
     'ABSTRACT'  => q{JPerl-again Perl glocalization scripting environment},
     'PREREQ_PM' => {
+        'Config' => '0',
         'ExtUtils::MakeMaker' => '5.4302',
         'File::Basename' => '2.6',
         'File::Copy' => '2.02',
@@ -14,7 +15,7 @@ WriteMakefile(
         'FindBin' => '1.42',
         'Socket' => '0',
         'lib' => '0',
-        'perl' => '5.005_03',
+        'perl' => '5.00503',
         'strict' => '1.01',
     },
     'AUTHOR'    => q{ina <ina@cpan.org>},

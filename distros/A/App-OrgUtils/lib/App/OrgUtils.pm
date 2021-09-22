@@ -1,9 +1,9 @@
 package App::OrgUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-14'; # DATE
+our $DATE = '2021-07-04'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.481'; # VERSION
+our $VERSION = '0.482'; # VERSION
 
 use 5.010;
 use strict;
@@ -287,7 +287,7 @@ App::OrgUtils - Some utilities for Org documents
 
 =head1 VERSION
 
-This document describes version 0.481 of App::OrgUtils (from Perl distribution App-OrgUtils), released on 2020-10-14.
+This document describes version 0.482 of App::OrgUtils (from Perl distribution App-OrgUtils), released on 2021-07-04.
 
 =head1 DESCRIPTION
 
@@ -321,15 +321,27 @@ following are the included scripts:
 
 =item * L<list-org-todos>
 
-=item * L<move-done-todos>
+=item * L<move-done-org-todos>
 
 =item * L<org2html>
 
 =item * L<org2html-wp>
 
+=item * L<orgdump>
+
+=item * L<orgdump-tiny>
+
+=item * L<orgstat>
+
 =item * L<stat-org-document>
 
 =back
+
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <sharyanto@cpan.org>
 
 =head1 FUNCTIONS
 
@@ -426,7 +438,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

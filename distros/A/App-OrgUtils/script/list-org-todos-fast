@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/ListOrgHeadlinesFast/list_org_todos
-# and generated automatically using Perinci::CmdLine::Gen version 0.497
+# and generated automatically using Perinci::CmdLine::Gen version 0.499
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-14'; # DATE
+our $DATE = '2021-07-04'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.481'; # VERSION
+our $VERSION = '0.482'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,7 +38,7 @@ list-org-todos-fast - List Org todos
 
 =head1 VERSION
 
-This document describes version 0.481 of list-org-todos-fast (from Perl distribution App-OrgUtils), released on 2020-10-14.
+This document describes version 0.482 of list-org-todos-fast (from Perl distribution App-OrgUtils), released on 2021-07-04.
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,8 @@ Usage:
      [--has-tags-json=s] [--is-done] [--isnt-done] [--json]
      [--lacks-tag=s+] [--lacks-tags-json=s] [--level=s] [--match=s]
      [--max-level=s] [--min-level=s] [--(no)naked-res]
-     [--page-result[=program]] [--parent-match=s] <input>
+     [--page-result[=program]] [--parent-match=s] [--view-result[=program]]
+     -- <input>
 
 =head1 DESCRIPTION
 
@@ -66,6 +67,8 @@ C<*> marks required options.
 
 Value is either a string or an array of strings.
 
+
+Can also be specified as the 1st command-line argument.
 
 =back
 
@@ -174,6 +177,10 @@ you want to pipe the result for more post-processing. In this case you can use
 
 Filter output through a pager.
 
+=item B<--view-result>
+
+View output using a viewer.
+
 =back
 
 =head2 Other options
@@ -246,7 +253,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

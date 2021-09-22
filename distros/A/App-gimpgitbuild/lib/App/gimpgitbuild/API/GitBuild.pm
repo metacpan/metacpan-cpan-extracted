@@ -1,5 +1,5 @@
 package App::gimpgitbuild::API::GitBuild;
-$App::gimpgitbuild::API::GitBuild::VERSION = '0.28.1';
+$App::gimpgitbuild::API::GitBuild::VERSION = '0.30.0';
 use strict;
 use warnings;
 use 5.014;
@@ -43,6 +43,12 @@ sub gegl_p
 {
     my $self = shift;
     return $self->install_base_dir . "/gegl";
+}
+
+sub gexiv2_p
+{
+    my $self = shift;
+    return $self->gegl_p();
 }
 
 sub base_git_clones_dir
@@ -109,7 +115,7 @@ App::gimpgitbuild::API::GitBuild - common API
 
 =head1 VERSION
 
-version 0.28.1
+version 0.30.0
 
 =head1 METHODS
 
@@ -120,6 +126,10 @@ The BABL install prefix.
 =head2 gegl_p
 
 The GEGL install prefix.
+
+=head2 gexiv2_p
+
+The gexiv2 install prefix.
 
 =head2 gimp_p
 

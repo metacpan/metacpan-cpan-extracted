@@ -4,7 +4,7 @@ package Mail::AuthenticationResults::Header::Base;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '2.20210914'; # VERSION
+our $VERSION = '2.20210915'; # VERSION
 use Scalar::Util qw{ weaken refaddr };
 use JSON;
 use Carp;
@@ -127,7 +127,7 @@ sub orphan {
 
 sub copy_children_from {
   my ( $self, $object ) = @_;
-  for my $original_entry ($object->children()->@*) {
+  for my $original_entry (@{$object->children()}) {
     my $entry = clone $original_entry;
     $entry->orphan if exists $entry->{ 'parent' };;
     $self->add_child( $entry );
@@ -426,7 +426,7 @@ Mail::AuthenticationResults::Header::Base - Base class for modelling parts of th
 
 =head1 VERSION
 
-version 2.20210914
+version 2.20210915
 
 =head1 DESCRIPTION
 

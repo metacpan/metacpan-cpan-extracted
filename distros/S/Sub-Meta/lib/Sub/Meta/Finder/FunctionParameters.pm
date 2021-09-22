@@ -82,7 +82,7 @@ __END__
 Sub::Meta::Finder::FunctionParameters - finder of Function::Parameters
 
 =head1 SYNOPSIS
-    
+
     use Sub::Meta::Creator;
     use Sub::Meta::Finder::FunctionParameters;
 

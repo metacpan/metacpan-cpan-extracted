@@ -1,6 +1,6 @@
 package HTTP::Any;
 
-our $VERSION = '0.15';
+our $VERSION = '1.01';
 
 1;
 
@@ -29,6 +29,11 @@ HTTP::Any - a common interface for HTTP clients (LWP, AnyEvent::HTTP, Curl)
 
  do_http($url, $opt, $cb);
 
+ or
+
+ my ($is_success, $body, $headers, $redirects) = do_http($url, $opt);
+
+
 =head1 MOTIVATION
 
 LWP, AnyEvent::HTTP, Curl - each of them has its advantages, disadvantages and peculiarities. The HTTP::Any modules were created during the process of investigation of the strong and weak sides of those above-mentioned HTTP clients. They allow quick switching between them to use the best one for each definite case.
@@ -50,6 +55,10 @@ Why would not make a simple one-line connection? Because of better flexibility a
  	HTTP::Any::LWP::do_http($ua, @_);
  }
 
+ or
+
+ my ($is_success, $body, $headers, $redirects) = HTTP::Any::LWP::do_http($ua, $url, $opt);
+
 =head3 AnyEvent
 
  use EV;
@@ -69,6 +78,10 @@ Why would not make a simple one-line connection? Because of better flexibility a
  	HTTP::Any::Curl::do_http(undef, $easy, $url, $opt, $cb);
  }
 
+ or
+
+ my ($is_success, $body, $headers, $redirects) = HTTP::Any::LWP::do_http($easy, $url, $opt);
+
 =head3 Curl with Multi
 
  use Net::Curl::Easy;
@@ -85,6 +98,8 @@ Why would not make a simple one-line connection? Because of better flexibility a
 
 =head2 CALL
 
+ # Callback API
+
  my $opt = { ... };
 
  my $cb = sub {
@@ -93,6 +108,11 @@ Why would not make a simple one-line connection? Because of better flexibility a
  }
 
  do_http($url, $opt, $cb);
+
+
+ # Return API
+
+ my ($is_success, $body, $headers, $redirects) = do_http($url, $opt);
 
 where:
 

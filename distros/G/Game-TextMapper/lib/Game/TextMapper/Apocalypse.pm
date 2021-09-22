@@ -19,6 +19,13 @@
 
 Game::TextMapper::Apocalypse - generate postapocalyptic landscape
 
+=head1 SYNOPSIS
+
+    use Modern::Perl;
+    use Game::TextMapper::Apocalypse;
+    my $map = Game::TextMapper::Apocalypse->new->generate_map();
+    print $map;
+
 =head1 DESCRIPTION
 
 This fills the map with random seed regions which then grow to fill the map.
@@ -27,8 +34,6 @@ Settlements are placed at random.
 
 Every mountain region is the source of a river. Rivers flow through regions that
 are not themselves mountains or a deserts. Rivers end in swamps.
-
-=head1 METHODS
 
 =cut
 
@@ -40,23 +45,87 @@ use Mojo::Base -base;
 
 my $log = Game::TextMapper::Log->get;
 
+=head1 ATTRIBUTES
+
+=head2 rows
+
+The height of the map, defaults to 10.
+
+    use Modern::Perl;
+    use Game::TextMapper::Apocalypse;
+    my $map = Game::TextMapper::Apocalypse->new(rows => 20)
+        ->generate_map;
+    print $map;
+
+=head2 cols
+
+The width of the map, defaults to 20.
+
+    use Modern::Perl;
+    use Game::TextMapper::Apocalypse;
+    my $map = Game::TextMapper::Apocalypse->new(cols => 30)
+        ->generate_map;
+    print $map;
+
+=head2 region_size
+
+The size of regions sharing the same terrain type, on average, defaults to 5
+hexes. The algorithm computes the number hexes, divides it by the region size,
+and that's the number of seeds it starts with (C<rows> × C<cols> ÷
+C<region_size>).
+
+    use Modern::Perl;
+    use Game::TextMapper::Apocalypse;
+    my $map = Game::TextMapper::Apocalypse->new(region_size => 3)
+        ->generate_map;
+    print $map;
+
+=head2 settlement_chance
+
+The chance of a hex containing a settlement, from 0 to 1, defaults to 0.1 (10%).
+
+    use Modern::Perl;
+    use Game::TextMapper::Apocalypse;
+    my $map = Game::TextMapper::Apocalypse->new(settlement_chance => 0.2)
+        ->generate_map;
+    print $map;
+
+=head2 loglevel
+
+By default, the log level is set by L<Game::TextMapper> from the config file. If
+you use the generator on its own, however, the log defaults to log level
+"debug". You might want to change that. The options are "error", "warn", "info"
+and "debug".
+
+    use Modern::Perl;
+    use Game::TextMapper::Apocalypse;
+    my $map = Game::TextMapper::Apocalypse->new(loglevel => 'error')
+        ->generate_map;
+    print $map;
+
+=cut
+
 has 'rows' => 10;
 has 'cols' => 20;
 has 'region_size' => 5;
 has 'settlement_chance' => 0.1;
+has 'loglevel';
 
 my @tiles = qw(forest desert mountain jungle swamp grass);
 my @settlements = qw(ruin fort cave);
 
+=head1 METHODS
+
 =head2 generate_map
 
-This method takes no arguments. Maps are always 20×10; region always 5 hexes and
-there is a 10% chance for settlements.
+This method takes no arguments. Set the properties of the map using the
+attributes.
 
 =cut
 
 sub generate_map {
   my $self = shift;
+  $log->level($self->loglevel) if $self->loglevel;
   my @coordinates = shuffle(0 .. $self->rows * $self->cols - 1);
   my $seeds = $self->rows * $self->cols / $self->region_size;
   my $tiles = [];

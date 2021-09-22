@@ -1,9 +1,9 @@
 package App::GitHubUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-12-24'; # DATE
+our $DATE = '2021-05-10'; # DATE
 our $DIST = 'App-GitHubUtils'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -30,6 +30,9 @@ directory.
 
 _
     args => {
+        github_cmd_config_profile=>{
+            schema => 'str*',
+        },
     },
     deps => {
         prog => 'github-cmd',
@@ -39,6 +42,8 @@ sub create_this_repo_on_github {
     require App::GitUtils;
     require Cwd;
     require IPC::System::Options;
+
+    my %args = @_;
 
     my $repo;
   SET_REPO_NAME:
@@ -62,7 +67,11 @@ sub create_this_repo_on_github {
     log_info "Creating repo '%s' ...", $repo;
 
     my ($out, $err);
-    IPC::System::Options::system({log=>1, capture_stdout=>\$out, capture_stderr=>\$err}, "github-cmd", "create-repo", $repo);
+    IPC::System::Options::system(
+        {log=>1, capture_stdout=>\$out, capture_stderr=>\$err},
+        "github-cmd",
+        defined($args{github_cmd_config_profile}) ? ("--config-profile", $args{github_cmd_config_profile}) : (),
+        "create-repo", $repo);
     my $exit = $?;
 
     if ($exit) {
@@ -215,7 +224,7 @@ App::GitHubUtils - Utilities related to GitHub
 
 =head1 VERSION
 
-This document describes version 0.006 of App::GitHubUtils (from Perl distribution App-GitHubUtils), released on 2020-12-24.
+This document describes version 0.007 of App::GitHubUtils (from Perl distribution App-GitHubUtils), released on 2021-05-10.
 
 =head1 DESCRIPTION
 
@@ -237,7 +246,7 @@ GitHub:
 
 Usage:
 
- create_this_repo_on_github() -> [status, msg, payload, meta]
+ create_this_repo_on_github(%args) -> [status, msg, payload, meta]
 
 Create this repo on github.
 
@@ -249,7 +258,14 @@ directory.
 
 This function is not exported.
 
-No arguments.
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<github_cmd_config_profile> => I<str>
+
+
+=back
 
 Returns an enveloped result (an array).
 
@@ -358,7 +374,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

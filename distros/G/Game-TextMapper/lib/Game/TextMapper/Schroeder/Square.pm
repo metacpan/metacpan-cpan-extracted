@@ -26,8 +26,6 @@ number of neighbours within one or two regions distance, how to pick a random
 neighbour direction, how to compute the coordinates of these neighbours, how to
 draw arrows towards these neighbours.
 
-This class is different from L<Game::TextMapper::Square>!
-
 =head1 SEE ALSO
 
 L<Game::TextMapper::Schroeder::Base>

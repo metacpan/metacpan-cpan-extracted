@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.13";
+our $VERSION = "0.14";
 
 use Scalar::Util ();
 
@@ -148,10 +148,13 @@ sub display {
     my $self = shift;
 
     my $s = '';
-    $s .= $self->type if $self->type;
-    $s .= ' ' if $s && $self->name;
-    $s .= ':' if $self->named;
-    $s .= $self->name if $self->name;
+    $s .= $self->type if $self->has_type;
+    if ($self->has_name) {
+        $s .= sprintf("%s%s%s",
+            $self->has_type ? ' ' : '',
+            $self->named    ? ':' : '',
+            $self->name);
+    }
     return $s;
 }
 

@@ -8570,6 +8570,7 @@ sub cells_list_objects_delete_worksheet_list_objects {
 # @param string $name Document name. (required)
 # @param string $sheet_name The worksheet name. (required)
 # @param int $listobjectindex list object index. (required)
+# @param string $format export format. (optional)
 # @param string $folder Document&#39;s folder. (optional)
 # @param string $storage_name storage name. (optional)
 {
@@ -8589,6 +8590,11 @@ sub cells_list_objects_delete_worksheet_list_objects {
         description => 'list object index.',
         required => '1',
     },
+    'format' => {
+        data_type => 'string',
+        description => 'export format.',
+        required => '0',
+    },
     'folder' => {
         data_type => 'string',
         description => 'Document&#39;s folder.',
@@ -8603,10 +8609,10 @@ sub cells_list_objects_delete_worksheet_list_objects {
     __PACKAGE__->method_documentation->{ 'cells_list_objects_get_worksheet_list_object' } = { 
     	summary => 'Get worksheet list object info by index.',
         params => $params,
-        returns => 'ListObjectResponse',
+        returns => 'string',
         };
 }
-# @return ListObjectResponse
+# @return string
 #
 sub cells_list_objects_get_worksheet_list_object {
     my ($self, %args) = @_;
@@ -8640,6 +8646,11 @@ sub cells_list_objects_get_worksheet_list_object {
         $header_params->{'Accept'} = $_header_accept;
     }
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'format'}) {
+        $query_params->{'format'} = $self->{api_client}->to_query_value($args{'format'});
+    }
 
     # query params
     if ( exists $args{'folder'}) {
@@ -8684,7 +8695,7 @@ sub cells_list_objects_get_worksheet_list_object {
     if (!$response) {
         return;
     }
-    my $_response_object = $self->{api_client}->deserialize('ListObjectResponse', $response);
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
     return $_response_object;
 }
 
@@ -24375,8 +24386,8 @@ sub cells_sparkline_groups_post_worksheet_sparkline_group {
     }
 
     # parse inputs
-    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/sparklinegroups/{sparklineIndex}';
-
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/sparklinegroups/{sparklineGroupIndex}';
+    
     my $_method = 'POST';
     my $query_params = {};
     my $header_params = {};
@@ -24419,7 +24430,7 @@ sub cells_sparkline_groups_post_worksheet_sparkline_group {
         my $_base_value = $self->{api_client}->to_path_value($args{'sparkline_group_index'});
         $_resource_path =~ s/$_base_variable/$_base_value/g;
     }
-
+    
     $self->{api_client}->check_access_token();
     my $_body_data;
     # body params
@@ -27421,7 +27432,7 @@ sub cells_workbook_put_convert_workbook {
     if ($_header_accept) {
         $header_params->{'Accept'} = $_header_accept;
     }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/octet-stream');
 
     # query params
     if ( exists $args{'format'}) {
@@ -34188,7 +34199,7 @@ sub upload_file {
     if ($_header_accept) {
         $header_params->{'Accept'} = $_header_accept;
     }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/octet-stream');
 
     # query params
     if ( exists $args{'storage_name'}) {

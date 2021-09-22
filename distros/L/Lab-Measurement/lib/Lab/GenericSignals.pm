@@ -1,5 +1,5 @@
 package Lab::GenericSignals;
-$Lab::GenericSignals::VERSION = '3.771';
+$Lab::GenericSignals::VERSION = '3.772';
 #ABSTRACT: Signal handling
 
 use v5.20;
@@ -35,7 +35,7 @@ Lab::GenericSignals - Signal handling
 
 =head1 VERSION
 
-version 3.771
+version 3.772
 
 =head1 COPYRIGHT AND LICENSE
 

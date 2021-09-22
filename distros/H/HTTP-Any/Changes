@@ -1,5 +1,11 @@
 Revision history for Perl extension HTTP::Any.
 
+1.01  2021-09-16
+	- fix name
+
+1.00  2021-09-14
+	-  Return API
+
 0.15  2021-06-21
 	- fix compressed for identity
 

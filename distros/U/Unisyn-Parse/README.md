@@ -6,9 +6,10 @@ Once there were many different character sets that were unified by [Unicode](htt
 Today we have many different programming languages, each with a slightly
 different syntax from all the others. The multiplicity of such syntaxes imposes
 unnecessary burdens on users and language designers.  [UniSyn](https://github.com/philiprbrenan/UnisynParse) is proposed as a
-common syntax that can be used by many different programming languages.
+common syntax that is easy to understand yet general enough to be used by many
+different programming languages.
 
-Advantages of having one uniform language syntax:
+## The advantages of having one uniform language syntax:
 
 - less of a burden on users to recall which of the many syntax schemes in
 current use is the relevant one for the programming language they are currently
@@ -38,7 +39,7 @@ loops and if statements with nested expressions:
 ```
      is
  sub          as
-        [array](https://en.wikipedia.org/wiki/Dynamic_array)             then
+        array             then
                     ==                    else
                  v1    v2         plus                  then
                                v3      v4         ==                     else
@@ -58,16 +59,15 @@ clearly within the three levels of operator precedence provided.
 ## Minimalism through Unicode
 
 This [module](https://en.wikipedia.org/wiki/Modular_programming) is part of the Earl Zero project: using Perl 5 to create a minimal,
-modern [Unicode](https://en.wikipedia.org/wiki/Unicode) based scripting language which generates x86 assembler [code](https://en.wikipedia.org/wiki/Computer_program) directly. An
-Earl Zero [program](https://en.wikipedia.org/wiki/Computer_program) is a single [Unicode](https://en.wikipedia.org/wiki/Unicode) expression with no key words: only expressions
-constructed from [user](https://en.wikipedia.org/wiki/User_(computing)) defined
-[unary](https://en.wikipedia.org/wiki/Unary_operation)
-and
+modern [Unicode](https://en.wikipedia.org/wiki/Unicode) based scripting language: Earl Zero. Earl Zero generates x86
+assembler [code](https://en.wikipedia.org/wiki/Computer_program) directly from a [program](https://en.wikipedia.org/wiki/Computer_program) consisting of a single Unisyn expression
+with no keywords; only expressions constructed from [user](https://en.wikipedia.org/wiki/User_(computing)) defined
+[unary](https://en.wikipedia.org/wiki/Unary_operation) and
 [binary](https://en.wikipedia.org/wiki/Binary_operation)
-[operators](https://en.wikipedia.org/wiki/Operator_(mathematics))
-are used to construct programs.
+[operators](https://en.wikipedia.org/wiki/Operator_(mathematics)) are used to
+construct Unisyn programs.
 
-Minimalism is an important part of Earl Zero; the "Hello World" [program](https://en.wikipedia.org/wiki/Computer_program) is:
+Minimalism is an important part of Earl Zero; for example, the "Hello World" [program](https://en.wikipedia.org/wiki/Computer_program) is:
 
 ```
 Hello World

@@ -179,7 +179,7 @@ format-tree.pl - Format (and annotate) trees for printing
 
 =head1 VERSION
 
-version 0.212530
+version 0.212650
 
 =head1 USAGE
 

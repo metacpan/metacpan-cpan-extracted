@@ -12,11 +12,11 @@ use base 'PDF::API2::Basic::PDF::String';
 
 use strict;
 
-our $VERSION = '2.041'; # VERSION
+our $VERSION = '2.042'; # VERSION
 
 =head1 NAME
 
-PDF::API2::Basic::PDF::Number - Numbers in PDF. Inherits from L<PDF::API2::Basic::PDF::String>
+PDF::API2::Basic::PDF::Number - Low-level PDF numeric object
 
 =head1 METHODS
 

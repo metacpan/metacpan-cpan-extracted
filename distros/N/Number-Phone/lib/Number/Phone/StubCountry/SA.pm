@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210602223300;
+our $VERSION = 1.20210921211833;
 
 my $formatters = [
                 {
@@ -91,17 +91,17 @@ my $validators = {
               };
 my %areanames = ();
 $areanames{ar} = {"96617", "أبها\/نجران\/جازان",
-"96614", "المدينة\ المنورة\/عرعر\/تبوك\/ينبع\ البحر",
 "96613", "الدمام\/الخبر\/الظهران",
 "96616", "حائل\/القصيم",
-"96612", "مكة\/جدة",
-"96611", "الرياض\/الخرج",};
-$areanames{en} = {"96612", "Makkah\/Jeddah",
-"96611", "Riyadh\/Kharj",
+"96611", "الرياض\/الخرج",
+"96614", "المدينة\ المنورة\/عرعر\/تبوك\/ينبع\ البحر",
+"96612", "مكة\/جدة",};
+$areanames{en} = {"96613", "Dammam\/Khobar\/Dahran",
 "96616", "Hail\/Qasim",
-"96613", "Dammam\/Khobar\/Dahran",
 "96617", "Abha\/Najran\/Jezan",
-"96614", "Madenah\/Arar\/Tabuk\/Yanbu",};
+"96614", "Madenah\/Arar\/Tabuk\/Yanbu",
+"96612", "Makkah\/Jeddah",
+"96611", "Riyadh\/Kharj",};
 
     sub new {
       my $class = shift;

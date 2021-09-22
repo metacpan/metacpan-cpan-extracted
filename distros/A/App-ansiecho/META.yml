@@ -27,12 +27,12 @@ no_index:
 provides:
   App::ansiecho:
     file: lib/App/ansiecho.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   Encode: '0'
   Getopt::EX: v1.24.1
   Getopt::EX::Colormap: '0'
-  Getopt::EX::Hashed: '0.9906'
+  Getopt::EX::Hashed: '0.9919'
   Getopt::EX::Long: '0'
   List::Util: '0'
   Pod::Usage: '0'
@@ -42,7 +42,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/App-ansiecho/issues
   homepage: https://github.com/kaz-utashiro/App-ansiecho
   repository: git://github.com/kaz-utashiro/App-ansiecho.git
-version: '0.03'
+version: '0.04'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

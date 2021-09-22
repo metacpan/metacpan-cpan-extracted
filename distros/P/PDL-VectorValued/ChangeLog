@@ -2,6 +2,19 @@
 ##
 ## Change log for perl distribution PDL::VectorValued
 
+v1.0.13 Mon, 20 Sep 2021 17:30:18 +0200 moocow
+	* cleaned up stale acknowledgements in docs
+
+v1.0.12 Sun, 19 Sep 2021 21:24:50 +0200 moocow
+	* removed stale vv_qsortvec and vv_qsortveci cruft
+	  - original motivation (bug in PDL-2.4.3) is long since fixed
+	  - vv_* methods are now just deprecated glob-aliases for the corresponding builtin PDL core functions
+
+v1.0.11 Thu, 16 Sep 2021 20:42:46 +0200 moocow
+	* replaced crufty $COMP(__X_size) with $SIZE(X) in Utils/utils.pd
+	  - at suggestion of Ed J, for upcoming PDL release
+	* added github repo to CPAN metadata
+
 v1.0.10 Wed, 07 Apr 2021 09:52:45 +0200 moocow
 	* applied Zaki Mughal's patch for PDL native complex types in PDL > 2.028
 	  - https://github.com/zmughal/PDL-VectorValued/compare/skip-complex-types

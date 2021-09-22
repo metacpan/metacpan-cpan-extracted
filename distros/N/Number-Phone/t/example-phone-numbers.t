@@ -21,6 +21,7 @@
         use lib 't/inc';
         use nptestutils;
 
+        use Scalar::Util qw(blessed);
         use Test::More;
 
         use Number::Phone;
@@ -1644,9 +1645,6 @@
 { class => 'Number::Phone::Lib', args => ['IR','+989123456789'], methods => ['is_mobile'] },
 { class => 'Number::Phone::Lib', args => ['IR','9123456789'], methods => ['is_mobile'] },
 { class => 'Number::Phone::Lib', args => ['+989123456789'], methods => ['is_mobile'] },
-{ class => 'Number::Phone::Lib', args => ['IR','+989932123456'], methods => ['is_ipphone'] },
-{ class => 'Number::Phone::Lib', args => ['IR','9932123456'], methods => ['is_ipphone'] },
-{ class => 'Number::Phone::Lib', args => ['+989932123456'], methods => ['is_ipphone'] },
 { class => 'Number::Phone::Lib', args => ['IR','+989601'], methods => ['is_specialrate'] },
 { class => 'Number::Phone::Lib', args => ['IR','9601'], methods => ['is_specialrate'] },
 { class => 'Number::Phone::Lib', args => ['+989601'], methods => ['is_specialrate'] },
@@ -2265,6 +2263,9 @@
 { class => 'Number::Phone::Lib', args => ['MO','+85366123456'], methods => ['is_mobile'] },
 { class => 'Number::Phone::Lib', args => ['MO','66123456'], methods => ['is_mobile'] },
 { class => 'Number::Phone::Lib', args => ['+85366123456'], methods => ['is_mobile'] },
+{ class => 'Number::Phone::Lib', args => ['MO','+8530800501'], methods => ['is_tollfree'] },
+{ class => 'Number::Phone::Lib', args => ['MO','0800501'], methods => ['is_tollfree'] },
+{ class => 'Number::Phone::Lib', args => ['+8530800501'], methods => ['is_tollfree'] },
 { class => 'Number::Phone', args => ['MP','+16702345678'], methods => ['is_fixed_line','is_geographic'] },
 { class => 'Number::Phone::Lib', args => ['MP','+16702345678'], methods => ['is_fixed_line','is_geographic'] },
 { class => 'Number::Phone', args => ['MP','6702345678'], methods => ['is_fixed_line','is_geographic'] },
@@ -2664,9 +2665,9 @@
 { class => 'Number::Phone::Lib', args => ['PG','+6752751234'], methods => ['is_ipphone'] },
 { class => 'Number::Phone::Lib', args => ['PG','2751234'], methods => ['is_ipphone'] },
 { class => 'Number::Phone::Lib', args => ['+6752751234'], methods => ['is_ipphone'] },
-{ class => 'Number::Phone::Lib', args => ['PH','+6321234567'], methods => ['is_fixed_line'] },
-{ class => 'Number::Phone::Lib', args => ['PH','21234567'], methods => ['is_fixed_line'] },
-{ class => 'Number::Phone::Lib', args => ['+6321234567'], methods => ['is_fixed_line'] },
+{ class => 'Number::Phone::Lib', args => ['PH','+63232345678'], methods => ['is_fixed_line'] },
+{ class => 'Number::Phone::Lib', args => ['PH','232345678'], methods => ['is_fixed_line'] },
+{ class => 'Number::Phone::Lib', args => ['+63232345678'], methods => ['is_fixed_line'] },
 { class => 'Number::Phone::Lib', args => ['PH','+639051234567'], methods => ['is_mobile'] },
 { class => 'Number::Phone::Lib', args => ['PH','9051234567'], methods => ['is_mobile'] },
 { class => 'Number::Phone::Lib', args => ['+639051234567'], methods => ['is_mobile'] },
@@ -3303,9 +3304,9 @@
 { class => 'Number::Phone::Lib', args => ['TO','+6760800222'], methods => ['is_tollfree'] },
 { class => 'Number::Phone::Lib', args => ['TO','0800222'], methods => ['is_tollfree'] },
 { class => 'Number::Phone::Lib', args => ['+6760800222'], methods => ['is_tollfree'] },
-{ class => 'Number::Phone::Lib', args => ['TO','+6765501234'], methods => ['is_specialrate'] },
-{ class => 'Number::Phone::Lib', args => ['TO','5501234'], methods => ['is_specialrate'] },
-{ class => 'Number::Phone::Lib', args => ['+6765501234'], methods => ['is_specialrate'] },
+{ class => 'Number::Phone::Lib', args => ['TO','+6765510123'], methods => ['is_ipphone'] },
+{ class => 'Number::Phone::Lib', args => ['TO','5510123'], methods => ['is_ipphone'] },
+{ class => 'Number::Phone::Lib', args => ['+6765510123'], methods => ['is_ipphone'] },
 { class => 'Number::Phone::Lib', args => ['TR','+902123456789'], methods => ['is_fixed_line'] },
 { class => 'Number::Phone::Lib', args => ['TR','2123456789'], methods => ['is_fixed_line'] },
 { class => 'Number::Phone::Lib', args => ['+902123456789'], methods => ['is_fixed_line'] },
@@ -3734,6 +3735,9 @@
                 $class eq "Number::Phone" && building_without_uk() &&
                 ($args->[-1] =~ /^\+44/ || $args->[0]  =~ /^(GB|UK|GG|JE|IM)$/)
             );
+        my $object = $class->new(@{$args});
+        my $obj_class = $object ? blessed($object) : "[undef]";
+        ok(defined($object), "$class->new(".join(", ", @{$args}).") returns an object: $obj_class") && 
         ok(
             # grep is because a number might need to be checked as is_geographic *or* is_fixed_line
             (grep { $class->new(@{$args})->$_() } @{$methods}),

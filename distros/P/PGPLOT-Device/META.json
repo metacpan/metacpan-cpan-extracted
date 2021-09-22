@@ -101,9 +101,11 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "List::Util" : "1.33",
             "PDL::Graphics::PGPLOT::Window" : "0",
             "PGPLOT" : "0",
             "Text::Abbrev" : "0",
+            "perl" : "5.01000",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -118,19 +120,18 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test2::V0" : "0",
-            "Test::More" : "0",
-            "perl" : "5.006"
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "PGPLOT::Device" : {
          "file" : "lib/PGPLOT/Device.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       },
       "PGPLOT::Device::PGWin" : {
          "file" : "lib/PGPLOT/Device/PGWin.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -145,7 +146,7 @@
          "web" : "https://gitlab.com/djerius/pgplot-device"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_spdx_expression" : "GPL-3.0-only"

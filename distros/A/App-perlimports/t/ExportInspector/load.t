@@ -5,9 +5,8 @@ use lib 'test-data/lib', 't/lib';
 
 use App::perlimports::ExportInspector ();
 use TestHelper qw( logger );
-use Test::More import =>
-    [ 'diag', 'done_testing', 'is_deeply', 'ok', 'subtest' ];
-use Test::Needs qw( Import::Into Moose );
+use Test::More import => [ 'done_testing', 'is_deeply', 'ok', 'subtest' ];
+use Test::Needs qw( Import::Into Moose Test::Most );
 use Test::Warnings ();
 
 sub ei {
@@ -126,6 +125,11 @@ subtest 'IO::Socket::INET' => sub {
     is_deeply( $ei->at_export_fail, [],             'at_export_fail' );
     is_deeply( $ei->at_export_tags, [],             'at_export_tags' );
     ok( $ei->has_implicit_exports, 'no implicit_exports' );
+};
+
+subtest 'Local::Explodes' => sub {
+    my ( $ei, $log ) = ei('Local::Explodes');
+    ok( $ei->has_fatal_error, 'has_fatal_error' );
 };
 
 done_testing();

@@ -10,7 +10,7 @@
 # ABSTRACT: Dump the configuration of an application
 
 package App::Cme::Command::dump ;
-$App::Cme::Command::dump::VERSION = '1.032';
+$App::Cme::Command::dump::VERSION = '1.033';
 use strict;
 use warnings;
 use 5.10.1;
@@ -29,6 +29,7 @@ sub validate_args {
     $self->check_unknown_args($args);
     $opt->{quiet} = 1; # don't want to mess up yaml output
     $self->process_args($opt,$args);
+    return;
 }
 
 sub opt_spec {
@@ -88,6 +89,7 @@ sub execute {
             :                       Dumper($perl_data) ; # Perl data structure
     }
     print $dump_string ;
+    return;
 }
 
 1;
@@ -104,7 +106,7 @@ App::Cme::Command::dump - Dump the configuration of an application
 
 =head1 VERSION
 
-version 1.032
+version 1.033
 
 =head1 SYNOPSIS
 

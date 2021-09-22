@@ -40,7 +40,6 @@
          "requires" : {
             "GraphQL" : "0.32",
             "JSON::Validator" : "2.01",
-            "JSON::Validator::OpenAPI::Mojolicious" : "0",
             "OpenAPI::Client" : "0.17",
             "perl" : "5.014"
          }
@@ -69,6 +68,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#graphql-perl"
    },
-   "version" : "0.21",
+   "version" : "0.22",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

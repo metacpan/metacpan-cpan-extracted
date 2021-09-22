@@ -1,6 +1,6 @@
 package Bio::MUST::Core::SeqMask::Pmsf;
 # ABSTRACT: Posterior mean site frequencies (PMSF) for sequence sites
-$Bio::MUST::Core::SeqMask::Pmsf::VERSION = '0.212530';
+$Bio::MUST::Core::SeqMask::Pmsf::VERSION = '0.212650';
 use Moose;
 use namespace::autoclean;
 
@@ -94,7 +94,7 @@ Bio::MUST::Core::SeqMask::Pmsf - Posterior mean site frequencies (PMSF) for sequ
 
 =head1 VERSION
 
-version 0.212530
+version 0.212650
 
 =head1 SYNOPSIS
 

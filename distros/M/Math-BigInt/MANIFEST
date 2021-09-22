@@ -50,8 +50,10 @@ t/bsstr-mbf.t
 t/bsstr-mbi.t
 t/buparrow-mbi.t
 t/calling-class-methods.t
+t/calling-constant.t
 t/calling-instance-methods.t
-t/calling.t
+t/calling-lib1.t
+t/calling-lib2.t
 t/config.t
 t/const_mbf.t
 t/constant.t
@@ -71,7 +73,8 @@ t/from_oct-mbf.t
 t/from_oct-mbi.t
 t/inf_nan.t
 t/isa.t
-t/lib_load.t
+t/lib_load-mbf-mbi.t
+t/lib_load-mbi-mbf.t
 t/Math/BigFloat/Subclass.pm
 t/Math/BigInt/BareCalc.pm
 t/Math/BigInt/Lib/Minimal.pm
@@ -85,6 +88,7 @@ t/mbimbf.inc
 t/mbimbf.t
 t/nan_cmp.t
 t/new-mbf.t
+t/new-mbi.t
 t/new_overloaded.t
 t/nparts-mbf.t
 t/nparts-mbi.t
@@ -153,6 +157,8 @@ xt/author/lib-arithmetic-binary-_nok.t
 xt/author/lib-arithmetic-binary-_pow.t
 xt/author/lib-arithmetic-binary-_root.dat
 xt/author/lib-arithmetic-binary-_root.t
+xt/author/lib-arithmetic-binary-_sadd.t
+xt/author/lib-arithmetic-binary-_ssub.t
 xt/author/lib-arithmetic-binary-_sub.dat
 xt/author/lib-arithmetic-binary-_sub.t
 xt/author/lib-arithmetic-ternary-_lsft.dat
@@ -244,9 +250,17 @@ xt/author/numify-mbf.t
 xt/author/numify-mbi.t
 xt/author/relop-mbi-mbf.t
 xt/release/cpan-changes.t
+xt/release/dist-manifest.t
+xt/release/distmeta.t
+xt/release/git.t
+xt/release/kwalitee.t
+xt/release/minimum-version.t
 xt/release/pod-coverage.t
+xt/release/pod-linkcheck.t
 xt/release/pod-syntax.t
 xt/release/portability.t
+xt/release/unused-vars.t
+xt/release/version.t
 xt/release/whitespaces.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

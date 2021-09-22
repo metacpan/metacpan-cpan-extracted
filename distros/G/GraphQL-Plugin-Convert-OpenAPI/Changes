@@ -1,3 +1,6 @@
+0.22 2021-09-22
+- switch from JSON::Validator::OpenAPI::Mojolicious to JSON::Validator - thanks @cliveholloway
+
 0.21 2021-09-09
 - update README to avoid build failures
 

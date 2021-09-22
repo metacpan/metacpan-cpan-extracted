@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Stream;
 use strict;
 use warnings;
 
-our $VERSION = '0.000084';
+our $VERSION = '0.000086';
 
 use Data::GUID;
 use List::Util qw/max/;
@@ -271,8 +271,6 @@ sub stream_set {
             return 0;
         },
         sub {
-            my @out;
-
             unless ($items) {
                 my $query = {
                     ($custom_query ? %$custom_query : ()),
@@ -309,11 +307,11 @@ sub stream_set {
                 }
 
                 my $data = $method ? $item->$method : $item->TO_JSON;
-                push @out => encode_json({type => $type, update => $update, data => $data}) . "\n";
+                return encode_json({type => $type, update => $update, data => $data}) . "\n";
             }
 
             $items = undef;
-            return @out;
+            return;
         },
     ];
 }

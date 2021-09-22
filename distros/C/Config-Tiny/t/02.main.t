@@ -17,7 +17,7 @@ use Test::More tests => 33;
 
 # Warning: There is another version line, in lib/Config/Tiny.pm.
 
-our $VERSION = '2.26';
+our $VERSION = '2.27';
 
 # --------------------
 
@@ -34,7 +34,7 @@ isa_ok( $Trivial, 'Config::Tiny' );
 ok( scalar keys %$Trivial == 0, 'new() returns an empty object' );
 
 # Try to read in a config
-my $Config = Config::Tiny->read( 'test.conf' );
+my $Config = Config::Tiny->read(File::Spec -> catfile('t', 'test.conf') );
 ok( $Config, 'read() returns true' );
 ok( ref $Config, 'read() returns a reference' );
 # Legitimate use of UNIVERSAL::isa

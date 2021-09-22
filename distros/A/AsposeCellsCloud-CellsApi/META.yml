@@ -20,7 +20,7 @@ provides:
     file: lib/AsposeCellsCloud/ApiFactory.pm
   AsposeCellsCloud::CellsApi:
     file: lib/AsposeCellsCloud/CellsApi.pm
-    version: 21.7
+    version: 21.8
   AsposeCellsCloud::LiteCellsApi:
     file: lib/AsposeCellsCloud/LiteCellsApi.pm
   AsposeCellsCloud::Configuration:
@@ -209,6 +209,8 @@ provides:
     file: lib/AsposeCellsCloud/Object/IconSet.pm
   AsposeCellsCloud::Object::ImageSaveOptions:
     file: lib/AsposeCellsCloud/Object/ImageSaveOptions.pm
+  AsposeCellsCloud::Object::ImportPictureOption:
+    file: lib/AsposeCellsCloud/Object/ImportPictureOption.pm
   AsposeCellsCloud::Object::ImportBatchDataOption:
     file: lib/AsposeCellsCloud/Object/ImportBatchDataOption.pm
   AsposeCellsCloud::Object::ImportCSVDataOption:
@@ -550,5 +552,5 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: 21.7
+version: 21.8
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

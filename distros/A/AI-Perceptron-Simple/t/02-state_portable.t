@@ -38,7 +38,7 @@ ok( -e $yaml_nerve_file, "Found the YAML perceptron." );
 ok( my $transfered_nerve = load_perceptron_yaml( $yaml_nerve_file ), "&loaded_perceptron_from_YAML" );
 
 is_deeply( $transfered_nerve, $perceptron, "&load_perceptron_yaml - correct data after loading" );
-
+is ( ref ($transfered_nerve), "AI::Perceptron::Simple", "Loaded back as a blessed object" );
 
 # test synonyms
 AI::Perceptron::Simple::preserve_as_yaml( $perceptron, $yaml_nerve_file );
@@ -47,7 +47,7 @@ ok( -e $yaml_nerve_file, "Synonym - Found the YAML perceptron." );
 ok( $transfered_nerve = AI::Perceptron::Simple::revive_from_yaml( $yaml_nerve_file ), "&revive_from_yaml is working correctly" );
 
 is_deeply( $transfered_nerve, $perceptron, "&revive_from_yaml - correct data after loading" );
-
+is ( ref ($transfered_nerve), "AI::Perceptron::Simple", "Loaded back as a blessed object" );
 
 done_testing();
 

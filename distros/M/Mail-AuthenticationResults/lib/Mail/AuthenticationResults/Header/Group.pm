@@ -4,7 +4,7 @@ package Mail::AuthenticationResults::Header::Group;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '2.20210914'; # VERSION
+our $VERSION = '2.20210915'; # VERSION
 use Scalar::Util qw{ refaddr };
 use Carp;
 
@@ -76,7 +76,7 @@ Mail::AuthenticationResults::Header::Group - Class modelling Groups of Authentic
 
 =head1 VERSION
 
-version 2.20210914
+version 2.20210915
 
 =head1 DESCRIPTION
 

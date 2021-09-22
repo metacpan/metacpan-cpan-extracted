@@ -28,16 +28,17 @@ static OP *S_make_croak_op(pTHX_ SV *message)
 
 #if HAVE_PERL_VERSION(5, 26, 0)
 #  define HAVE_OP_ARGCHECK
+
+#  include "make_argcheck_aux.c.inc"
 #endif
 
 #define make_argcheck_ops(required, optional, slurpy, subname)  S_make_argcheck_ops(aTHX_ required, optional, slurpy, subname)
 static OP *S_make_argcheck_ops(pTHX_ int required, int optional, char slurpy, SV *subname)
 {
+  int params = required + optional;
+
 #ifdef HAVE_OP_ARGCHECK
-  UNOP_AUX_item *aux = (UNOP_AUX_item *)PerlMemShared_malloc(sizeof(UNOP_AUX_item) * 3);
-  aux[0].iv = required;
-  aux[1].iv = optional;
-  aux[2].iv = slurpy;
+  UNOP_AUX_item *aux = make_argcheck_aux(params, optional, slurpy);
 
   return op_prepend_elem(OP_LINESEQ, newSTATEOP(0, NULL, NULL),
       op_prepend_elem(OP_LINESEQ, newUNOP_AUX(OP_ARGCHECK, 0, NULL, aux), NULL));
@@ -65,7 +66,7 @@ static OP *S_make_argcheck_ops(pTHX_ int required, int optional, char slurpy, SV
     ret = op_append_list(OP_LINESEQ, ret, checkop);
   }
 
-  {
+  if(!slurpy) {
     SV *message = newSVpvf("Too many arguments for subroutine '%" SVf "'", subname);
     /* @_ <= (required+optional) or die ... */
     OP *checkop =
@@ -74,11 +75,13 @@ static OP *S_make_argcheck_ops(pTHX_ int required, int optional, char slurpy, SV
           newBINOP(OP_LE, 0,
             /* scalar @_ */
             op_contextualize(newUNOP(OP_RV2AV, 0, newGVOP(OP_GV, 0, PL_defgv)), G_SCALAR),
-            newSVOP(OP_CONST, 0, newSViv(required + optional))),
+            newSVOP(OP_CONST, 0, newSViv(params))),
           make_croak_op(message)));
 
     ret = op_append_list(OP_LINESEQ, ret, checkop);
   }
+
+  /* TODO: If slurpy is % then maybe complain about odd number of leftovers */
 
   return ret;
 #endif

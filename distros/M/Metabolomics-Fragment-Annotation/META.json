@@ -33,9 +33,15 @@
       },
       "runtime" : {
          "requires" : {
+            "Class::Accessor" : "0.34",
+            "Class::Data::Inheritable" : "0.08",
+            "Date::Parse" : "2.30",
+            "DateTime" : "1.06",
             "File::Share" : "0.25",
             "HTML::Template" : "2.95",
             "JSON" : "2.90",
+            "LWP::Protocol::https" : "6.04",
+            "Log::Any" : "1.040",
             "Text::CSV" : "2.0",
             "Text::CSV_XS" : "1.39",
             "URI::Query" : "0.16",

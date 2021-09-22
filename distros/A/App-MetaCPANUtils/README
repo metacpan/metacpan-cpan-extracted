@@ -2,8 +2,8 @@ NAME
     App::MetaCPANUtils - CLI utilities related to MetaCPAN
 
 VERSION
-    This document describes version 0.004 of App::MetaCPANUtils (from Perl
-    distribution App-MetaCPANUtils), released on 2020-01-02.
+    This document describes version 0.005 of App::MetaCPANUtils (from Perl
+    distribution App-MetaCPANUtils), released on 2021-04-14.
 
 DESCRIPTION
     This distribution contains CLI utilities related to MetaCPAN:
@@ -13,6 +13,10 @@ DESCRIPTION
     *   list-metacpan-releases
 
     *   list-recent-metacpan-releases
+
+    *   open-metacpan-dist-page
+
+    *   open-metacpan-module-page
 
 FUNCTIONS
   list_metacpan_distributions
@@ -139,6 +143,50 @@ FUNCTIONS
 
     Return value: (any)
 
+  open_metacpan_dist_page
+    Usage:
+
+     open_metacpan_dist_page(%args) -> [status, msg, payload, meta]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dist* => *perl::distname*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  open_metacpan_module_page
+    Usage:
+
+     open_metacpan_module_page(%args) -> [status, msg, payload, meta]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   module* => *perl::modname*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
 ENVIRONMENT
   METACPANUTILS_DUMP_API_RESULT
     If set to true, will log the API result at the "trace" level.
@@ -165,6 +213,9 @@ SEE ALSO
     App::metacpansearch.
 
     MetaCPAN API Client: MetaCPAN::Client
+
+    this-mod-on-metacpan, this-dist-on-metacpan from
+    App::ThisDist::OnMetaCPAN.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

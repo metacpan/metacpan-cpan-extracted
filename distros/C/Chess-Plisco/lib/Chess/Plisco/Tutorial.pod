@@ -1,0 +1,996 @@
+=head1 NAME
+
+Chess::Plisco::Tutorial - An Introductory Tutorial to Chess Programming in
+Perl With C<Chess::Plisco>
+
+=head1 DESCRIPTION
+
+Let's start by explaining the fundamental data structures.
+
+=head2 Data Structures
+
+=head3 Bitboards
+
+A real chess board looks roughly likes this:
+
+      a   b   c   d   e   f   g   h
+    +---+---+---+---+---+---+---+---+
+  8 | r | n | b | q | k | b | n | r |
+    +---+---+---+---+---+---+---+---+
+  7 | p | p | p | p | p | p | p | p |
+    +---+---+---+---+---+---+---+---+
+  6 |   | . |   | . |   | . |   | . |
+    +---+---+---+---+---+---+---+---+
+  5 | . |   | . |   | . |   | . |   |
+    +---+---+---+---+---+---+---+---+
+  4 |   | . |   | . |   | . |   | . |
+    +---+---+---+---+---+---+---+---+
+  3 | . |   | . |   | . |   | . |   |
+    +---+---+---+---+---+---+---+---+
+  2 | P | P | P | P | P | P | P | P |
+    +---+---+---+---+---+---+---+---+
+  1 | R | N | B | Q | K | B | N | R |
+    +---+---+---+---+---+---+---+---+
+      a   b   c   d   e   f   g   h
+
+The board has eight columns, called "files", named "a" to "h", and eight
+rows, called "ranks", named "1" to "8". The initial position of the
+white king "K" is "e1", the intersection of the "e" file and the "1"st
+rank. Likewise, the white queen "Q" is on "d1", and the black king "k"
+and black queen "q" are initially located on "e8" and "d8" respectively.
+
+It is, of course, possible to use an intuitive board representation like
+an array of arrays or even a hash, and there are chess libraries that do
+exactly that. The main drawback of this approach is performance because
+all operations on the board imply expensive lookups and dereferencings.
+
+A more efficient representation takes advantage of the fact that a chess
+board has exactly 64 squares. Nowadays, most computers use integers of
+size 64. Therefore you can represent a chess board, more exactly one single
+aspect of a chess board, as a 64-bit integer, each bit representing
+exactly one square of the board.
+
+But with just one bit of information per square, you cannot represent a
+chess position, because there are 12 different pieces: Pawns, knights,
+bishops, rooks, queens, and kings in both black and white. The solution
+is to use multiple such bitboards, and combine them.
+
+A C<Chess::Plisco> instance is an array of arrays of integers, and the
+first few are:
+
+=over
+
+=item * C<white_pieces> - one bitboard for the white pieces
+
+=item * C<black_pieces> - one bitboard for the black pieces
+
+=item * C<pawns> - one bitboard for the pawns (of both colors)
+
+=item * C<knights> - one bitboard for the knights (of both colors)
+
+=item * C<bishops> - one bitboard for the bishops (of both colors)
+
+=item * C<rooks> - one bitboard for the rooks (of both colors)
+
+=item * C<queens> - one bitboard for the queens (of both colors)
+
+=item * C<kings> - one bitboard for the kings (of both colors)
+
+=item * C<in_check> - one bitboard for all pieces giving check (of the color
+not to move)
+
+=back
+
+Why is there no distinction between black and white pieces of a certain
+kind, for example black knights and white knights? The answer is
+performance and compactness. To get a bitboard with one bit set for each
+black knight, you simple do the bitwise AND of the two bitboards:
+
+    $black_knights = $b_pieces & $knights
+
+In other words: For each black knight, there must be one bit set in the
+bitboard of black pieces AND in the knight bitboard.
+
+Example: How to get a bitboard of white's regular (bishops, knights,
+rooks, and queens) pieces:
+
+    $w_pieces & ($knights | $bishops | $rooks | $queens)
+
+A lot of libraries do not use a separate bitboard for queens because the moves
+that a queen can make are just a superset of the moves of a bishop and the
+moves of a rook.  Having no bitboard for queens, can therefore speed up parts
+of the move generation but on the other hand requires a lot of extra
+branching (conditionals).  In the case of L<Chess::Plisco> it turned out
+that it is actually faster with a separate bitboard for the queens.
+
+=head3 Other Board Representations
+
+=head4 Forsyth-Edwards Notation FEN
+
+The Forsyth-Edwards Notation of a chess position is mostly used for data
+exchange between chess software. See for example
+L<https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation>
+for details.
+
+=head4 Extended Position Description EPD
+
+A similar notation to FEN is the L<https://en.wikipedia.org/wiki/Extended_Position_Description>.
+You can think of it as FEN with meta data.
+
+=head3 Coordinates and Squares
+
+The chess board is actually a Cartesian coordinate system. There are
+multiple ways, how a particular point in that coordinate system can be
+specified. In C<Chess-Plisco> we use the terms "coordinates",
+"squares", and "shifts", and you can convert between all of them with
+dedicated class methods:
+
+=over
+
+=item C<my $square = Chess::Plisco-E<gt>coordinatesToSquare($file, $rank)>
+
+=item C<my $shift = Chess::Plisco-E<gt>coordinatesToShift($file, $rank)>
+
+=item C<my $shift = Chess::Plisco-E<gt>squareToShift($square)>
+
+=item C<my ($file, $rank) = Chess::Plisco-E<gt>squareToCoordinates($square)>
+
+=item C<my $square = Chess::Plisco-E<gt>shiftToSquare($shift)>
+
+=item C<my ($file, $rank) = Chess::Plisco-E<gt>shiftToCoordinates($shift)>
+
+=back
+
+Additionally, we also have "shift masks" (see below).
+
+=head4 Coordinates
+
+When we talk of coordinates, we mean a pair of a file and a rank, but
+always as 0-based indexes. So the files "a" to "h" are indexed as
+0 ... 7, and the ranks "1" to "8" are indexed as 0 ... 7.
+
+=head4 Squares
+
+Squares are conventional coordinates like "e4" or "c7". They are only
+used for presentational purposes.
+
+=head4 Shifts
+
+A bitboard has 64 bits, and each bit stands for a particular square of
+the chess board:
+
+       a  b  c  d  e  f  g  h
+    8 56 57 58 59 60 61 62 63 8
+    7 48 49 50 51 52 53 54 55 7
+    6 40 41 42 43 44 45 46 47 6
+    5 32 33 34 35 36 37 38 39 5
+    4 24 25 26 27 28 29 30 31 4
+    3 16 17 18 19 20 21 22 23 3
+    2  8  9 10 11 12 13 14 15 2
+    1  0  1  2  3  4  5  6  7 1
+       a  b  c  d  e  f  g  h
+
+So the square "e4" is represented by the bit with the index 28 of a
+bitboard (actually the 29th bit if you count from 1). So, a better term
+may actually be "index" or "bit number".
+
+But you do not have to remember the mapping. Instead just use the constants
+C<CP_A1> for "a1", C<CP_A2> for "a2" and so on.
+
+=head4 Shift Masks
+
+How would you find out whether the square "e4" is occupied by a white
+piece? You create a bitboard (64-bit integer) where only the 28th bit is
+set and AND that with the bitboard of the white pieces. And you create a
+bitboard where only the 28th bit is set with a shift operation:
+
+    $e4_square = (1 << 28) | $w_pieces
+
+You "shift" the one 28 places to the left. And this is why the indexes
+or bit numbers are called "shifts" here. And a shift mask is a bitboard
+with exactly one bit set.
+
+The code will be better understandable if you replace the literal 28 with a
+constant:
+
+    $e4_square = (1 << CP_E4) | $w_pieces
+
+=head3 C<Chess::Plisco> Instances
+
+Unlike most Perl objects, instances of C<Chess::Plisco> are blessed
+array references. This design decision was taken because accessing
+accessing array elements is faster than accessing hash elements. But
+there is no need to remember the exact ordering of the array. You can
+either use dedicated macros that operate directly on
+C<Chess::Plisco> instances or use constants for the indexes:
+
+ use Chess::Plisco (:all);
+ use Chess::Plisco::Macro;
+ 
+ $pos = Chess::Plisco->new;
+ 
+ # Equivalent!
+ $w_pieces = $pos[CP_POS_WHITE_PIECES];
+ $pos[CP_POS_WHITE_PIECES] = $_pieces;
+ $w_pieces = cp_pos_white_pieces $pos;
+ cp_pos_white_pieces $pos = $w_pieces;
+
+=head3 Pieces
+
+The chess pieces are specified by an enumeration:
+
+=over
+
+=item * C<CP_NO_PIECE> 0
+
+=item * C<CP_PAWN> 1
+
+=item * C<CP_KNIGHT> 2
+
+=item * C<CP_BISHOP> 3
+
+=item * C<CP_ROOK> 4
+
+=item * C<CP_QUEEN> 5
+
+=item * C<CP_KING> 6
+
+=back
+
+The default values for each piece are defined by these constants in
+C<Chess::Plisco>:
+
+=over
+
+=item * C<CP_PAWN_VALUE> 100
+
+=item * C<CP_KNIGHT_VALUE> 300
+
+=item * C<CP_BISHOP_VALUE> 300
+
+=item * C<CP_ROOK_VALUE> 500
+
+=item * C<CP_QUEEN_VALUE> 900
+
+=back
+
+These constants can be overridden in derived classes. This is not
+recommended for the constants specifiying the pieces (see above), as the
+data values will not fit into the other structures.
+
+=head3 Moves
+
+=head4 Internal Move Representation
+
+A move in C<Chess::Plisco> is simply an integer. The individual bits of a
+move are:
+
+=over
+
+=item * 22 (21): side (0 for white, 1 for black) that moves
+
+=item * 19-21 (18-20): piece that gets captured if any
+
+=item * 16-18 (15-17): piece that moves (resp. piece)
+
+=item * 13-15 (12-14): promotion piece if any
+
+=item * 7-12 (6-11): from shift (0-63)
+
+=item * 1- 6 (0- 5): to shift (0-63)
+
+=back
+
+I<The numbers in parentheses are the 0-based bit numbers.>
+
+Only bits 1 to 15 are really needed to characterize a move, and the bits
+13 to 15 are only needed for pawn promotions. The other bits can be
+derived from the position that the move is applied to.
+
+Please note that the piece that gets captured and the color are added by
+L<Chess::Plisco/doMove> to the move.  They are I<not> set, when calling
+L<Chess::Plisco/pseudoLegalMoves> or L<Chess::Plisco/pseudoLegalAttacks>! 
+
+The piece that moves, is the piece that stands on the
+starting square.
+
+You do not have to remember the exact structure of a move but use macros
+resp. inline functions for accessing individual properties:
+
+=over
+
+=item * C<cp_move_to($move)>: the starting square as a shift
+
+=item * C<cp_move_from($move)>: the destination square as a shift
+
+=item * C<cp_move_promotion($move)>: the promotion piece if any
+
+=item * C<cp_move_piece($move)>: the attacking piece
+
+=item * C<cp_move_captured($move)>: the captured piece if any
+
+=back
+
+None of these macros can be used as l-values (on the left-hand side of
+an assignment)! For this, use other macros:
+
+=over
+
+=item * C<cp_move_set_to($move, $to)>: the starting square as a shift
+
+=item * C<cp_move_set_from($move, $from)>: the destination square as a shift
+
+=item * C<cp_move_set_promotion($move, $piece)>: the promotion piece
+
+=item * C<cp_move_set_piece($move, $piece)>: the attacking piece
+
+=item * C<cp_move_set_captured($move, $piece)>: a possible captured piece
+
+=back
+
+=head4 Parsing Moves
+
+The method C<parseMove()> can be used for creating a move.  It expects the
+move in either:
+
+=over 4
+
+=item Coordinate Notation
+
+=item Standard Algebraic Notation (SAN)
+
+=back
+
+The coordinate notation is the notation that most chess engines use.  It is
+simply the start and the destination square appended plus an optional piece
+to promote a pawn to, for example "b1c3" for the piece on square "b1" moving
+to "c3" or "e7d8q" for a pawn on "e7" capturing the piece on "d8" being promoted
+to a queen.
+
+Standard Algebraic Notation (SAN) is the notation conventionally used for
+describing chess games. You will find more information about it on the internet.
+
+Note that the move parser is very forgiving and accepts a lot of moves that
+are not complying with the standard.
+
+=head4 Making Moves Human-Readable
+
+The methods C<SAN> and C<moveCoordinateNotation> can be used to print a move in
+humand-readable format:
+
+    $pos->SAN($move);
+    # Nxe7#
+    $pos->moveCoordinateNotation($move);
+    # d6e7
+
+In general, you will prefer printing moves in Standard Algebraic Notation.
+
+=head2 Using Macros
+
+When dealing with chess programming you often find yourself executing
+small operations many times, more than often millions of times. You can,
+of course, write subroutines for these operations but the calling
+overhead sums up and contributes significantly to the execution time of
+your code.
+
+Even writing these routines in C does not help at all because the
+calling overhead is large compared to the execution time of the function
+body.
+
+This is why the module C<Chess::Plisco::Macro> exists. It makes a lot
+of small helper functions available, the names of which all begin with
+C<cp_>. You can use them more or less like functions but they are inlined
+into your code at compile-time.
+
+But this is only necessary, when performance is important. For normal
+purposes, you can just use regular instance methods instead of macros.
+
+But when you want to use the macros, there are a couple of caveats that you
+have to keep in mind:
+
+=head3 Use C<Chess::Plisco::Macro> and(!) C<Chess::Plisco>
+
+The macros in C<Chess::Plisco::Macro> make use of constants defined in
+C<Chess::Plisco>. If you do not import these constants, you will get
+strange errors. You should therefore start your own code with this
+boilerplate:
+
+ use strict;
+ use integer;
+ use Chess::Plisco qw(:all);
+ use Chess::Plisco::Macro;
+
+=head3 Use C<integer>
+
+Some of the macros will only work on integers. You must therefore always
+C<use integer> in the scope of your code.  Not doing so will result in
+errors!
+
+If you need floating point arithmetics, activate them only in the limited
+scope of a block:
+
+    {
+        no integer;
+        printf "avg. loss in centipedes: %g\n", $score / 100;
+    }
+
+=head3 Do Not Use Here Documents
+
+The translation currently chokes on here documents (E<lt>E<lt>EOF ...).
+
+=head3 Do not Create References to Macros
+
+Macros are not Perl subroutines. They are more or less stupidly replaced
+with chunks of code. Things like C<my $sub = \&cp_pos_white_pieces> may or
+may not cause a syntax error but they will never do what you expect.
+
+=head3 Be Prepared for Errors
+
+The macro expansion internally makes use of C<PPI::Document> and it
+therefore shares all of that module's inevitable limitations. And it
+adds a fair amount of its own shortcomings. The macro approach is rather
+an experiment than a production-ready general-purpose tool.
+
+=head2 Common Bitboard Operations
+
+Bitboards are fast and efficient but working with them is a little bit
+convoluted compared to more conventional representations of a chess
+board like two-dimensional arrays or hashes.
+
+=head3 Counting Pieces
+
+Task: Count the number of white pawns on the board.
+
+ use Chess::Plisco;
+ use Chess::Plisco::Macro;
+ 
+ my $pos = Chess::Plisco->new;
+ my $white_pawns = cp_pos_white_pieces($pos) & cp_pos_pawns($pos);
+ my $count;
+ cp_bitboard_popcount $white_pawns, $count;
+ print "There are $count white pawns on the board.\n";
+
+The important line is the last but one. The macro C<cp_bitboard_popcount>
+counts the number of bits set in an integer, and this is exactly what
+you need here.
+
+=head3 Iterating Bitboards
+
+Task: Print the square for every white pawn on the board.
+
+=head4 Conventional and Slow Approach
+
+Iterating over a bitboard can be done in an intuitive and straightforward way:
+
+    use integer;
+    use Chess::Plisco qw(:all);
+    use Chess::Plisco::Macro;
+
+    my $white_pawn_mask = cp_pos_white_pieces($pos) & cp_pos_pawns($pos);
+
+    foreach my $shift (0 .. 63) {
+        my $shift_mask = 1 << $shift;
+
+        if ($shift_mask & $white_pawn_mask) {
+            my $square = cp_shift_to_square $shift;
+            print "There is a white pawn on $square.\n";
+         }
+    }
+
+You basically shift a 1 bit subsequently to the left, and then test whether the
+corresponding bit is set in the bitboard.  There is nothing wrong with this
+approach and it is actually reasonably fast.
+
+=head4 Efficient and Fast Approach
+
+But there is a another technique that achieves the same result and is often
+faster:
+
+    use integer;
+    use Chess::Plisco qw(:all);
+    use Chess::Plisco::Macro;
+
+    my $pos = Chess::Plisco->new;
+    my $white_pawn_mask = cp_pos_white_pieces($pos) & cp_pos_pawns($pos);
+
+    while ($white_pawn_mask) {
+        my $shift = cp_bitboard_count_trailing_zbits $shift_mask;
+
+        my $square = cp_shift_to_square $shift;
+        print "There is a white pawn on $square.\n";
+
+        $white_pawn_mask = cp_bitboard_clear_least_set $white_pawn_mask;
+    }
+
+If you count the trailing zero bits with the macro
+C<cp_bitboard_count_trailing_zbits()> you get the position of that bit in the
+bitboard and you can now use that information for whatever you want to do.
+
+At the end of the loop body, you clear the least significant bit of the
+bitboard.  Therefore, the population count of the bitboard decreases by
+one with each iteration.
+
+If you want to benchmark both approaches, make sure to remove the expensive
+operations inside the loop body, that is the call to C<cp_shift_to_square()>
+and especially the print to the console.
+
+What you will find out is that the second approach runs around 10-15 %
+faster than the conventional approach.  On the one hand you have less
+iterations (8 vs. 64) but masking out the bits and especially counting the
+trailing zero bits outweighs that mostly.
+
+But if you replace "pawn" with "king" in the code, the 2nd variation runs
+around 700 % or seven times faster than the conventional approach.  This is
+because you always have exactly one loop iteration instead of 64.  And in
+the case of kings you could improve that even further by taking advantage of
+the fact that there is always exactly one white king on the board.  So you
+do not even need a loop.
+
+Most of the time, the bitboards you are dealing with are sparsely populated
+and it is advantageous to take the second approach.  Only in the exceptional
+case that you want to iterate over a bitboard with all pieces of one color
+or even all pieces of both colors, you are better off using the conventional
+approach.
+
+=head2 Game Play
+
+=head3 Initializing a Position
+
+You use the constructor to instantiate a chess position.  For the start
+position you call it with arguments.  If you have the position represented
+as a string in Forsyth-Edwards Notation (FEN) you pass that as an
+argument to the constructor:
+
+    $pos = Chess::Plisco->new;
+
+    # Or:
+
+    $fen = 'r4rk1/1p3pp1/1q2b2p/1B2R3/1Q2n3/1K2PN2/1PP3PP/7R w - - 3 22';
+    $pos = Chess::Plisco->new($fen);
+
+=head3 Making Moves
+
+Applying a move to a position usually requires first parsing a chess move
+as a string into the internal representation.  You then pass that move
+(which is just an integer) to the method C<doMove()>:
+
+    # Parse the move in one of the supported formats.
+    $move = $pos->parseMove('Nc3');
+    $move = $pos->parseMove('Nb1-c3');
+    $move = $pos->parseMove('b1c3');
+    $state = $pos->doMove($move) or die "illegal move";
+
+The method C<doMove()> returns a reference to an array containing state
+information needed to undo the move later.  If the move was illegal,
+the method returns a falsy value.
+
+=head3 Undoing Moves
+
+You will often find that you have to undo a move so that the position is
+reverted to the state before the move had been played.
+
+In general, there are two strategies for undoing moves in chess software.
+The brute force approach is to make a deep copy of the position and revert
+by copying back later, resp. by simply applying the move to the copy only and
+throwing it away.
+
+The other possibility is to undo all modifications made by applying the
+move.  This is, of course, more complicated but often faster than the brute
+force approach.
+
+L<Chess::Plisco> supports both approaches and currently the brute force
+approach seems to be faster (around 10-15 percent) but this maybe depends on
+the hardware or system.  The reason for that is that a shallow copy is
+sufficient for copying a L<Chess::Plisco> object which makes the copying really
+cheap, whereas undoing a move programmatically requires several dereferencings.
+
+But you are encouraged to try it out yourself.
+
+=head4 Undoing Moves Programmatically
+
+This is done with C<undoMove()>:
+
+    $state = $pos->doMove($move);
+    $pos->undoMove($state);
+
+Not all recovery information can be stored in the move itself.  Therefore,
+you have to pass the state information returned from C<doMove()> as the
+argument to C<undoMove()>.
+
+The state information is an array reference containing all information needed
+to rever the position.  The first element of that array is the move itself
+but with the captured piece and the color on move updated.  This is
+important to know, when you use L<Chess::Plisco/pseudoLegalMoves> resp.
+L<Chess::Plisco/pseudoLegalAttacks> because these methods do B<not> set
+a possibly captured piece and the color that made the move.
+
+=head4 Undoing Moves By Copying the Position
+
+How you do this depends a little bit on your exact requirements.  It will
+probably look something like this:
+
+    $copy = bless [@$pos], 'Chess::Plisco'; # or $copy = $pos->copy;
+    $pos->do_move($move);
+
+There is also a copy constructor C<copy()> but when you are really concerned
+about performance, then you probably choose the manual copying because it
+safes you a method call.
+
+=head3 Playing Games in PGN Format
+
+Playing games stored in Portable Game Notation PGN can be done with the
+external library L<Chess::PGN::Parse>.  Note that a PGN file can actually
+contain a collection of games, not just one:
+
+    $pos = Chess::Plisco->new;
+    $pgn = Chess::PGN::Parse->new('games.pgn') or die;
+    while ($pgn->read_game) {
+        $pgn->parse_game;
+        @san_moves = $pgn->moves;
+        foreach my $san_move (@san_moves) {
+            $move = $pos->parseMove($san_move)
+                or die "cannot parse move '$san_move'";
+            $pos->doMove($move)
+                or die "illegal move '$san_move'";
+        }
+    }
+
+=head2 Analyzing Positions
+
+L<Chess::Plisco> offers some high-level methods for analyzing chess
+positions.
+
+=head3 Listing Possible Moves
+
+You have two ways for doing this:
+
+    @moves = $pos->legalMoves;
+    foreach $move (@moves) {
+        print join '|', $pos->SAN($move), $pos->moveCoordinateNotation($move);
+    }
+
+Chess engines usually do not try out every legal move for each position but
+prune parts of the search tree by discarding moves which do not make sense.
+Therefore, the move generator in L<Chess::Plisco> works in two stages.
+The above example could be re-written like this:
+
+    @moves = $pos->pseudoLegalMoves;
+    foreach $move (@moves) {
+        $pos->doMove($move) or next;
+        $pos->undoMove($move);
+        print join '|', $pos->SAN($move), $pos->moveCoordinateNotation($move);
+    }
+
+The method C<pseudoLegalMoves> may return moves that violate the rules of
+chess.  But checking the rules is somewhat expensive.  If the loop above
+may be exited early (this will often happen in chess engines), then these
+extra checks are a waste of time, when you never actually consider the move.
+
+What exactly is a pseudo-legal move is implementation dependent and you should
+not rely on the current implementation.
+
+=head3 Visualizing Bitboards
+
+A bitboard, which is just a 64 bit integer, can be visualized in a
+chess-board-like manner with C<dumpBitboard()>.
+
+    print "white pieces: ", $pos->dumpBitboard($pos->[CP_POS_WHITE_PIECES]);
+
+There is also a method C<dumpAll()> which dumps all bitboards at once.
+
+=head3 Checking for Check
+
+Finding out whether the side to move is in check, can be done like this:
+
+    $checkers = $pos->[CP_POS_IN_CHECK];
+    # or: $checkers = cp_pos_in_check $pos;
+    if ($checkers) {
+        print "pieces giving check: ", $pos->dumpBitboard($checkers);
+    }
+
+In fact, what you get is not a boolean flag but a bitboard with the pieces
+that are giving check.
+
+=head3 Checking for Pieces
+
+Finding out whether a white piece is on "e4" can be done like this:
+
+    $shift = CP_E4;
+    # or $shift = $pos->squareToShift('e4');
+    # or $shift = $pos->coordinatesToShift(4, 0); 
+    $mask = 1 << $shift;
+    $is_white = $mask & $pos->[CP_POS_WHITE_PIECES];
+    # or: $is_white = $mask & cp_pos_white_pieces($pos);
+
+If you want to know whether it is a white king, you go like this:
+
+    $is_king = $mask & ($pos->[CP_POS_WHITE_PIECES] & $pos->[CP_POS_KINGS]);
+    # or: $is_king = $mask & (cp_pos_white_pieces($pos) & cp_pos_kings($pos));
+
+If you want to also check for the color, you additionally have to do the
+bitwise AND of the white or black bitboard.
+
+Finding out which piece is on a particular location can also be done with
+dedicated methods:
+
+    ($piece, $color) = $pos->pieceAtSquare('e4');
+    ($piece, $color) = $pos->pieceAtCoordinates(4, 3);
+    ($piece, $color) = $pos->pieceAtShift(27);
+    $piece = $pos->pieceAtSquare('e4');
+    $piece = $pos->pieceAtCoordinates(4, 3);
+    $piece = $pos->pieceAtShift(27);
+
+In array context, you get the piece and the color, in scalar context just the
+piece.  The piece is one of C<CP_NO_PIECE>, C<CP_PAWN>, C<CP_KNIGHT>, C<CP_BISHOP>,
+C<CP_QUEEN>, or C<CP_KING>, and the color one of C<CP_WHITE>, C<CP_BLACK>,
+or C<undef> if there is no piece at all at the specified location.
+
+=head3 Castling State
+
+The castling state is encoded with other state information in one single
+integer as a bit mask.  It is highly recommended that you use the dedicated
+methods from L<Chess::Plisco> or the macros from L<Chess::Plisco::Macro> for it:
+
+    $white_can_castle_king_side  = cp_pos_white_king_side_castling_right $pos;
+    # or $white_can_castle_king_side  = $pos->whiteKingSideCastlingRight;
+    $white_can_castle_queen_side = cp_pos_white_queen_side_castling_right $pos;
+    # or $white_can_castle_queen_side  = $pos->whiteQueenSideCastlingRight;
+    $black_can_castle_king_side  = cp_pos_black_king_side_castling_right $pos;
+    # or $black_can_castle_king_side  = $pos->blackKingSideCastlingRight;
+    $black_can_castle_queen_side = cp_pos_black_queen_side_castling_right $pos;
+    # or $black_can_castle_queen_side  = $pos->blackKingSideCastlingRight;
+
+=head3 En Passant
+
+Find out on which square en-passant capturing is possible:
+
+    $en_passant_shift = $pos->enPassantShift;
+    # or $en_passant_shift = cp_pos_en_passant_shift $pos;
+
+This will be 0 if capturing en passant is not possible in the particular
+position.  You may have to be careful to use this information because 0 is
+also the "shift" for the square "h1".  In doubt, go like this:
+
+    $ep_shift = cp_pos_en_passant_shift $pos;
+    if ($ep_shift && $ep_shift == $location) {
+        # do what you need ...
+    }
+
+=head3 Evading a Check
+
+A check can be defended in one of three ways:
+
+=over 4
+
+=item Moving the King
+
+This is always an option.
+
+=item Capturing the Piece Giving Check
+
+This is only an option if there is just one piece giving check (because you
+cannot capture multiple pieces at once).
+
+=item Blocking the Check With a Piece
+
+You can also block the check by moving a piece between the king and the
+opponent's piece giving check.  But this is not an option if multiple pieces
+give check, or if the piece giving check is a queen, a rook, or a knight.
+
+Why? If the piece giving check is a pawn, there is no space between it and
+the king, and a knight can jump over other pieces.
+
+=back
+
+This information is always stored in a L<Chess::Plisco> object:
+
+    $evasion_strategy = cp_pos_evasion $pos;
+    if (CP_EVASION_KING_MOVE == $evasion_strategy) {
+        say "king must move";
+    } elsif (CP_EVASION_CAPTURE == $evasion_strategy) {
+        say "king can move or piece giving check can be captured";
+    } elsif (CP_EVASION_ALL == $evasion_strategy) {
+        say "king can move, piece can be captured, or check can be blocked:",
+            $pos->dumpBitboard(cp_pos_evasion_squares($pos));
+    }
+
+Remember that the item at C<CP_POS_IN_CHECK> gives you a bitboard with all
+pieces giving check.  Alternatively, you can use the macro C<cp_pos_in_check>.
+
+The bitboard at C<CP_POS_EVASION_SQUARES> has bits set for all pieces giving
+check.
+
+=head2 Various Tricks
+
+=head3 Calculating the Number of Pieces
+
+The locations of pieces are usually represented as bitboards.  You therefore
+have to count the number of bits set on the bitboard.  This is conventionally
+called a population count or just "popcount".
+
+Example:
+
+    $occupancy = $pos->whitePieces | $pos->blackPieces;
+    # or $occupancy = cp_pos_white_pieces($pos) | cp_pos_black_pieces($pos);
+    $number_of_pieces = $pos->bitboardPopcount($pos->occupancy);
+    # or $number_of_pieces = cp_bitboard_popcount $occupancy;
+
+=head3 Is a Pawn Move a capture?
+
+If the distance between the start and the destination square of a pawn move
+is odd, it is a capture.  Keeping in mind that odd numbers (positive and
+negative) have the least significant bit set, and even numbers do not, you
+can do:
+
+    ($piece, $from, $to) =
+        ($pos->movePiece($move), $pos->moveFrom($move), $pos->moveTo($move));
+    if ($piece == CP_PAWN && ($from - $to) & 0x1) {
+        # Pawn capture.
+    }
+
+Alternatively with macros:
+
+    ($piece, $from, $to) =
+        (cp_move_piece($move), cp_move_from($move), $cp_move_to($move));
+    if ($piece == CP_PAWN && ($from - $to) & 0x1) {
+        # En-passant.
+    }
+
+=head3 Is a Move an En-Passant Capture?
+
+With or without macros this can be done as follows:
+
+    ($piece, $from, $to) =
+        ($pos->movePiece($move), $pos->moveFrom($move), $pos->moveTo($move));
+    $ep_shift = $pos->enPassantShift;
+    if ($ep_shift && $piece == CP_PAWN
+        && ($from - $to) & 0x && $to == $ep_shift) {
+        # En-passant.
+    }
+
+Alternatively with macros:
+
+    ($piece, $from, $to) =
+        (cp_move_piece($move), cp_move_from($move), $cp_move_to($move));
+    $ep_shift = cp_pos_en_passant_shift $pos;
+    if ($ep_shift && $piece == CP_PAWN
+        && ($from - $to) & 0x && $to == $ep_shift) {
+        # En-passant.
+    }
+
+It is crucial to check that en-passant is actually possible.  Otherwise you
+will miss an important edge case.  A black pawn can possibly capture a piece
+on "h1".  But the shift of "h1" is 0 and you must therefore check that the
+en-passant shift of the current position is not 0.
+
+=head3 Is a Move a Castling?
+
+Castlings are all king moves from "e1" to "c1" or "g1", or on the other side
+of the board from "e8" to "c8" or "g8".  But instead of checking all four
+cases it is enough to check whether the distance between the start and
+destination square is two or minus two.  And that can be done a lot faster:
+
+    ($piece, $from, $to) =
+        ($pos->movePiece($move), $pos->moveFrom($move), $pos->moveTo($move));
+    if ($piece == CP_KING && ((($from - $to) & 0x3) == 0x2)) {
+        # It is a castling.
+    }
+
+    # Or with macros:
+    ($piece, $from, $to) =
+        (cp_move_piece($move), cp_move_from($move), $cp_move_to($move));
+    if ($piece == CP_KING && ((($from - $to) & 0x3) == 0x2)) {
+        # It is a castling.
+    }
+
+=head3 Toggling Color
+
+C<CP_WHITE> is defined as 0 and C<CP_BLACK> is defined as 1.  Therefore,
+toggling a color is as easy as:
+
+    $color = !$color; # because CP_WHITE == !CP_BLACK
+
+=head3 Accessing the Bitboard for a Certain Piece
+
+If you want to get the bitboard for a certain kind of piece, you do not have
+to compare it against all six possible types.  Remember that an instance
+of L<Chess::Plisco> is an array reference, and the constants
+C<CP_PAWN>, C<CP_KNIGHT>, ..., <CP_KING> are chosen so that you can use them
+directly as an index into the object itself:
+
+    $piece = CP_ROOK; # or $piece = $pos->movePiece($move);
+    $bitboard = $pos->[$piece];
+
+The variable C<$bitboard> now contains the correct bitboard for the piece, no
+matter what exact piece it is.
+
+=head3 Accessing Own Pieces and Opponent's Pieces
+
+You will often want that your code works for both black and white.  The
+straight-forward way to do this uses a condition:
+
+    if ($pos->toMove == CP_WHITE) {
+        $my_pieces = $pos->whitePieces;
+        $their_pieces = $pos->blackPieces;
+    } else {
+        $my_pieces = $pos->whitePieces;
+        $their_pieces = $pos->blackPieces;
+    }
+
+But the array slots for the white and black pieces are adjacent and this is
+guaranteed not to change in the future.  And C<CP_WHITE> is defined as 0
+and C<CP_BLACK> as 1.  The above code can therefore be shorted a lot:
+
+    $my_pieces = $pos->[CP_POS_WHITE_PIECES + $pos->toMove];
+    $their_pieces = $pos->[CP_POS_WHITE_PIECES + !$pos->toMove];
+
+Remember that a negated 0 is a 1, and a negated 1 is a 0, see
+L</Toggling Color> above.
+
+=head3 Understanding C<rMagic> and C<bMagic>
+
+Both methods are called with two arguments, the shift of the starting square,
+and the occupancy of the board.
+
+Imagine that there is a white bishop on "e4", and the other pieces (black and
+white) are located as follows (capital letters standing for white pieces,
+lowercase letters standing for black pieces):
+
+      a b c d e f g h
+    8 r . k . . b . r 8
+    7 . p . . . . . . 7
+    6 . . n . . n . . 6
+    5 . . . . . . . . 5
+    4 . . . . B . . . 4
+    3 . . . . . . . . 3
+    2 . P P . . . . P 2
+    1 . . K . . N B R 1
+      a b c d e f g h
+
+How can that bishop move? It can reach d3 but not c2 because that is occupied
+by a pawn of the same color.  It can reach d5 B<and> c6 because c6 is
+occupied by an opponent's piece.  The other squares are f5, g6, h7, f3, and
+g2.
+
+But L</bMagic> cannot give you that result directly.  Try it out:
+
+    $fen = 'r1k2b1r/1p6/2n2n2/8/4B3/8/1PP4P/2K2NBR w - - 0 1';
+    $pos = Chess::Plisco->new($fen);
+    $targets = $pos->bMagic(CP_E4, $pos->occupancy);
+    print $pos->dumpBitboard($targets);
+
+It prints out:
+
+      a b c d e f g h
+    8 . . . . . . . . 8
+    7 . . . . . . . x 7
+    6 . . x . . . x . 6
+    5 . . . x . x . . 5
+    4 . . . . . . . . 4
+    3 . . . x . x . . 3
+    2 . . x . . . x . 2
+    1 . . . . . . . x 1
+      a b c d e f g h
+
+Almost correct but the white pawn on c2 is included which is not possible
+because the bishop cannot capture its own pawn.  In order to get the correct
+result you have to mask out the pieces of the same color:
+
+    $fen = 'r1k2b1r/1p6/2n2n2/8/4B3/8/1PP4P/2K2NBR w - - 0 1';
+    $pos = Chess::Plisco->new($fen);
+    $targets = $pos->bMagic(CP_E4, $pos->occupied)
+	    & ~$pos->[CP_POS_WHITE_PIECES + $pos->toMove];
+    print $pos->dumpBitboard($targets);
+
+Now the result is correct:
+
+      a b c d e f g h
+    8 . . . . . . . . 8
+    7 . . . . . . . x 7
+    6 . . x . . . x . 6
+    5 . . . x . x . . 5
+    4 . . . . . . . . 4
+    3 . . . x . x . . 3
+    2 . . . . . . x . 2
+    1 . . . . . . . x 1
+      a b c d e f g h

@@ -12,7 +12,7 @@ require XSLoader;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(minify);
 
-our $VERSION = 'v0.4.6';
+our $VERSION = 'v0.5.0';
 
 XSLoader::load( "Text::Minify::XS", $VERSION );
 
@@ -30,7 +30,7 @@ Text::Minify::XS - Simple text minification
 
 =head1 VERSION
 
-version v0.4.6
+version v0.5.0
 
 =head1 SYNOPSIS
 
@@ -39,6 +39,8 @@ version v0.4.6
   my $out = minify( $in );
 
 =head1 EXPORTS
+
+None by default.
 
 =head2 minify
 
@@ -84,8 +86,9 @@ L</SOURCE>.
 =head2 Malformed UTF-8
 
 Malformed UTF-8 characters may be be mangled or omitted from the
-output. You should ensure that the input string is properly encoded as
-UTF-8.
+output.  In extreme cases it may throw an exception in order to avoid
+memory overflows. You should ensure that the input string is properly
+encoded as UTF-8.
 
 =head1 SEE ALSO
 

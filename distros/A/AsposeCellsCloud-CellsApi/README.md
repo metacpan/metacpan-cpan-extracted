@@ -20,11 +20,10 @@ Perl Cloud SDK wraps Aspose.Cells Cloud API. The SDK enhances your Android apps 
 - Fetch the required shape from worksheet.
 - Leverage the power of named ranges.
 
-## Feature & Enhancements in Version 21.7
+## Feature & Enhancements in Version 21.8
 
-- Fix search API.
-- Fix split API.
-- Fix update metadata API.
+- Improvement for getting list object Api.
+- Add import Api.
  
 ## Read & Write Spreadsheet Formats
 

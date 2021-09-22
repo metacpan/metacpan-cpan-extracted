@@ -16,7 +16,7 @@ Native Method Declaration is written using Method Descriptor "native" in SPVM mo
 
   # SPVM/Foo/Bar.spvm
   class Foo::Bar {
-    native sub sum : int ($num1 : int, $num2 : int);
+    native static method sum : int ($num1 : int, $num2 : int);
   }
 
 =head2 SPVM Native Config File
@@ -404,19 +404,21 @@ For example, in the case of L<Complex_2d|SPVM::Complex_2d>, do the following.
 
 =head2 Call SPVM Method
 
-To call the SPVM method, first use the <a href="#native-api-native-sub-api-method_id">method_id</a> function or the <a href = "# native-api-native- Get the ID of the method using the sub-api-method_method_id ">method_method_id</a> function
+If you want to call a method, you get a method id using L<get_class_method_id|"get_class_method_id"> or L<get_instance_method_id|"get_instance_method_id">.
 
-  // For a method that is not a method
-  int32_t method_id = env->get_method_id(env, "Foo", "sum", "int (int, int)");
+L<get_class_method_id|"get_class_method_id"> get a method id of a class method.
 
-  // For method
-  int32_t method_id = env->get_method_id_by_object(env, object, "sum", "int (self, int, int)");
+L<get_instance_method_id|"get_instance_method_id"> get a method id of a instance method.
+
+  // Get method id of class method
+  int32_t method_id = env->get_class_method_id(env, "Foo", "sum", "int(int,int)");
+
+  // Get method id of instance method
+  int32_t method_id = env->get_instance_method_id(env, object, "sum", "int(int,int)");
 
 If method_id is less than 0, it means that the method was not found. It is safe to handle exceptions as follows.
 
-  if (method_id <0) {
-    SPVM_DIE ("Can't find sub id", "Foo/Bar.c", __LINE__);
-  }
+  if (method_id < 0) { return env->die(env, "Can't find method id", "Foo/Bar.c", __LINE__); }
 
 Set the SPVM method argument to stack before calling the method.
 
@@ -478,11 +480,11 @@ If you want to set the exception message yourself, you can create an exception m
 
 If no exception message is set, a default exception message will be set.
 
-Usually, "SPVM_DIE" is defined to make it easier to use, so it is better to use this.
+Usually, L<die|"die"">  is defined to make it easier to use, so it is better to use this.
 
-  SPVM_DIE ("Error. Values must be %d and %d", 3, 5, "Foo/Bar.c", __LINE__);
+  return env->die("Error. Values must be %d and %d", 3, 5, "Foo/Bar.c", __LINE__);
 
-SPVM_DIE can be used in the same way as the C language sprintf function. Be sure to include this file name in the second from the end, and the line number in the last argument. If the message exceeds 255 bytes, the excess is truncated.
+L<die|"die""> can be used in the same way as the C language sprintf function. Be sure to include this file name in the second from the end, and the line number in the last argument. If the message exceeds 255 bytes, the excess is truncated.
 
 The exception is stored in env.
 
@@ -496,13 +498,13 @@ The pointer type definition specifies the pointer_t descriptor in the SPVM class
   class MyTimeInfo : pointer_t {
 
     # Constructor
-    native sub new : MyTimeInfo ();
+    native static method new : MyTimeInfo ();
 
     # Get second
-    native sub sec : int ($self : self);
+    native method sec : int ();
 
     # Destructor
-    native sub DESTROY : ($self : self);
+    native method DESTROY : ();
   }
 
 It defines a new constructor, a method that takes seconds information called sec, and a destructor called DESTROY. These are Native Method.
@@ -751,31 +753,37 @@ Example:
 
   int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "int");
 
-=head2 get_method_id
+=head2 get_class_method_id
 
-  int32_t (*get_method_id)(SPVM_ENV* env, const char* class_name, const char* method_name, const char* signature);
+  int32_t (*get_class_method_id)(SPVM_ENV* env, const char* class_name, const char* method_name, const char* signature);
 
-Get the method ID by specifying the class name, method name, and signature. If no method exists, a value less than 0 is returned.
+Get a class method ID by the class name, the method name, and the method signature. If the class method does not exists, a negative value is returned.
 
-The signature has the following format: Must not contain white space.
+This ID is used by L<"call_class_method">.
+
+The method signature has the following format.
 
   ReturnValueType(ArgumentType1,ArgumentType2,...)
 
 Example:
 
-  int32_t method_id = env->get_method_id(env, "Foo", "func", "int(long,string)");
+  int32_t method_id = env->get_class_method_id(env, "Foo", "get", "int(long,string)");
 
-=head2 get_method_id_by_object
+=head2 get_instance_method_id
 
-  int32_t (*get_method_id_by_object)(SPVM_ENV* env, void* object, const char* method_name, const char* signature);
+  int32_t (*get_instance_method_id)(SPVM_ENV* env, void* object, const char* method_name, const char* signature);
 
-Get the method ID by specifying the object and method name. If the method does not exist, a value less than 0 is returned.
+Get a instance method ID by the object, the method name, and the method signatre. If the instance method does not exist, a negative value is returned.
 
-The signature is the same as the method_id signature.
+This ID is used by L<"call_instance_method">.
+
+The method signature has the following format,
+
+  ReturnValueType(ArgumentType1,ArgumentType2,...)
 
 Example:
 
-  int32_t method_id = env->get_method_id_by_object(env, object, "method", "int(self,long,string)");
+  int32_t method_id = env->get_instance_method_id(env, object, "get", "int(long,string)");
 
 =head2 new_object_raw
 
@@ -2138,9 +2146,9 @@ Example:
   void* value = env->get_class_var_object_by_name(env, "TestCase::NativeAPI", "$MINIMAL_VALUE", "TestCase::Minimal", &e, __FILE__, __LINE__);
   if (e) { return e; }
 
-=head2 call_spvm_method_by_name
+=head2 call_class_method_by_name
 
-  int32_t (*call_spvm_method_by_name)(SPVM_ENV* env,
+  int32_t (*call_class_method_by_name)(SPVM_ENV* env,
     const char* class_name, const char* method_name, const char* signature, SPVM_VALUE* stack,
     const char* file, int32_t line);
 
@@ -2158,14 +2166,13 @@ Example:
     output = stack[0].ival;
   }
 
-=head2 call_callback_method_by_name
+=head2 call_instance_method_by_name
 
-  int32_t (*call_callback_method_by_name)(SPVM_ENV* env, void* object,
+  int32_t (*call_instance_method_by_name)(SPVM_ENV* env, void* object,
     const char* method_name, const char* signature, SPVM_VALUE* stack,
     const char* file, int32_t line);
 
 Example:
-
 
 =head2 get_field_string_chars_by_name
 
@@ -2192,6 +2199,30 @@ Get the string which dump the object. The string is the same as the return value
   void* (*dump)(SPVM_ENV* env, void* object);
 
 Do the same as C<dump_raw>, and add the created string object to the mortal stack of the environment. Use this function in normal use instead of C<dump_raw>.
+
+=head2 call_class_method
+
+Alias for L<"call_spvm_method">
+
+=head2 call_instance_method
+
+Alias for L<"call_spvm_method">
+
+=head2 get_instance_method_id_static
+
+  int32_t (*get_instance_method_id_static)(SPVM_ENV* env, const char* class_name, const char* method_name, const char* signature);
+
+Get a instance method ID by the class name, the method name, and the method signature. If the instance method does not exists, a negative value is returned.
+
+This ID is used by L<"call_instance_method">.
+
+The method signature has the following format.
+
+  ReturnValueType(ArgumentType1,ArgumentType2,...)
+
+Example:
+
+  int32_t method_id = env->get_instance_method_id_static(env, "Foo", "get", "int(long,string)");
 
 =head1 Native API indexes
 
@@ -2221,8 +2252,8 @@ Native APIs have indexes which correspond to the names. These indexes are perman
   21 get_field_id
   22 get_field_offset
   23 get_class_var_id
-  24 get_method_id
-  25 get_method_id_by_object
+  24 get_class_method_id
+  25 get_instance_method_id
   26 new_object_raw
   27 new_object
   28 new_byte_array_raw
@@ -2355,6 +2386,9 @@ Native APIs have indexes which correspond to the names. These indexes are perman
   155 any_object_basic_type_id
   156 dump_raw
   157 dump
+  158 call_class_method
+  159 call_instance_method
+  160 get_instance_method_id_static
 
 =head1 Examples
 

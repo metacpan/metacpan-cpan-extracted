@@ -141,7 +141,7 @@ Each of field definitions will be coerced into an object of the L<Form::Tiny::Fi
 		required => 'soft',
 	);
 
-	# this is a dynamic field
+	# this is a dynamic field, which has access to form instance
 	form_field sub {
 		my ($self) = @_;
 
@@ -268,16 +268,44 @@ Keywords that are using the context are:
 
 =over
 
+=item * C<field_validator>
+
+	form_field 'my_field';
+	field_validator 'something went wrong' => sub { ... };
+
 =item * C<field_filter>
 
-This keyword will use the context if it is called with two arguments:
+	form_field 'my_field';
+	field_filter Str, sub { ... };
 
-	form_filed 'my_field';
-	field_filter Str, \&Form::Tiny::Utils::trim;
+=back
 
-It will completely ignore the context (and not reset it) if used with three arguments:
+=head2 Additional validators
 
-	field_filter my_field => Str, \&Form::Tiny::Utils::trim;
+Having types for fields is great, but often a need arise to have more validators than just a type. While in theory you can create a subtype that will satisfy that need, it can prove to be hard to get right. Instead, you can specify multiple field validators:
+
+	form_field 'positive_even_int' => (
+		type => Int,
+		message => 'must be an integer',
+	);
+
+	field_validator 'must be even' => sub {
+		shift() % 2 == 0
+	};
+
+	field_validator 'must be positive' => sub {
+		shift() > 0
+	};
+
+Validators consist of two parts - an error message that should be added to form in case validation fails, and a subroutine that will perform the check. This subroutine is passed a single value, which is current field value, and should return a boolean value - validation result.
+
+Additional validations will take place after the type is validated, and only if the type validation is successful. This means that:
+
+=over
+
+=item * these errors will not always end up in the error messages
+
+=item * you do not have to manually validate the value passed to the subroutines
 
 =back
 
@@ -410,11 +438,7 @@ An example filter that turns integers into their absolute values:
 
 	form_filter Int, sub { abs shift() };
 
-A filter can be also narrowed down to a single form field with C<field_filter> keyword:
-
-	field_filter my_field => Int, sub { abs shift() };
-
-You can also omit the field name, and in this case the current form context will be used:
+A filter can be also narrowed down to a single form field with C<field_filter> keyword, which will apply to the last field declared:
 
 	form_field 'my_field';
 	field_filter Int, sub { abs shift() };
@@ -422,6 +446,8 @@ You can also omit the field name, and in this case the current form context will
 One special keyword exists for string trimming using the filters system:
 
 	form_trim_strings;
+
+When the field is filtered, the form filters are applied before field filters. Each type of filter is applied in the order they were defined.
 
 =head2 Inline forms
 
@@ -578,6 +604,28 @@ It is possible for Form::Tiny forms to inherit from one another, but the feature
 	1;
 
 It is required that class parents are specified before any calls to Form::Tiny DSL have been made.
+
+=head3 Corinna compatibility
+
+Future Perl core object orientation system named Corinna, currently implemented in L<Object::Pad>, can also be used together with Form::Tiny:
+
+	use Object::Pad;
+
+	class ParentForm :repr(HASH)
+	{
+		use Form::Tiny -nomoo;
+
+		form_field 'f1';
+	}
+
+	class ChildForm isa ParentForm :repr(HASH)
+	{
+		use Form::Tiny -nomoo;
+
+		form_field 'f2';
+	}
+
+You must use C<:repr(HASH)> on the class for it to be able to store Moo properties, as well as use C<-nomoo> flag in Form::Tiny import. Other than that, it should work the same as with any other OO system.
 
 =head1 SEE ALSO
 

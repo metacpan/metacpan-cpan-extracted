@@ -1,0 +1,97 @@
+#!perl
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-04'; # DATE
+our $DIST = 'App-OrgUtils'; # DIST
+our $VERSION = '0.482'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+use open qw(:std :utf8);
+use Log::ger;
+
+use Org::Parser::Tiny;
+use Org::Dump;
+
+my $input = [<>];
+close STDIN; close ARGV; # so perl doesn't add ", <> line xx" upon dying
+
+my $doc = Org::Parser::Tiny->new->parse($input);
+print Org::Dump::dump_element($doc);
+
+1;
+# ABSTRACT: Dump Org document structure (using Org::Parser::Tiny)
+# PODNAME: orgdump-tiny
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+orgdump-tiny - Dump Org document structure (using Org::Parser::Tiny)
+
+=head1 VERSION
+
+This document describes version 0.482 of orgdump-tiny (from Perl distribution App-OrgUtils), released on 2021-07-04.
+
+=head1 SYNOPSIS
+
+ $ dump-org-structure-tiny   foo.org
+ $ dump-org-structure-tiny < bar.org
+
+Given an Org document like this:
+
+ text before first headline
+
+ * headline1
+ ** headline1.1
+ * headline2
+
+will output something like:
+
+ (Org::Parser::Tiny::Node::Document) {preamble=>"text before first headline\n\n"}
+ |-- (Org::Parser::Tiny::Node::Headline) {is_done=>0,is_todo=>0,level=>1,preamble=>"",raw=>"* headline1\n",title=>"headline1",todo_state=>""}
+ |   \-- (Org::Parser::Tiny::Node::Headline) {is_done=>0,is_todo=>0,level=>2,preamble=>"",raw=>"** headline1.1\n",title=>"headline1.1",todo_state=>""}
+ \-- (Org::Parser::Tiny::Node::Headline) {is_done=>0,is_todo=>0,level=>1,preamble=>"",raw=>"* headline2\n",title=>"headline2",todo_state=>""}
+
+=head1 DESCRIPTION
+
+This script parses input using L<Org::Parser::Tiny> and dump the structure using
+L<Org::Dump>. This script is mostly used for debugging.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-OrgUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-OrgUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-OrgUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<dump-org-structure>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

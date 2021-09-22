@@ -1,6 +1,6 @@
 package Git::CPAN::Patch::Release;
 our $AUTHORITY = 'cpan:YANICK';
-$Git::CPAN::Patch::Release::VERSION = '2.3.4';
+$Git::CPAN::Patch::Release::VERSION = '2.4.0';
 use strict;
 use warnings;
 use File::chdir;
@@ -239,7 +239,7 @@ Git::CPAN::Patch::Release
 
 =head1 VERSION
 
-version 2.3.4
+version 2.4.0
 
 =head1 AUTHOR
 
@@ -247,7 +247,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
+This software is copyright (c) 2021, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

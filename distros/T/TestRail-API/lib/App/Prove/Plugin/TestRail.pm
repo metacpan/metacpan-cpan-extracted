@@ -2,7 +2,7 @@
 # PODNAME: App::Prove::Plugin::TestRail
 
 package App::Prove::Plugin::TestRail;
-$App::Prove::Plugin::TestRail::VERSION = '0.048';
+$App::Prove::Plugin::TestRail::VERSION = '0.049';
 use strict;
 use warnings;
 use utf8;
@@ -76,7 +76,7 @@ App::Prove::Plugin::TestRail - Upload your TAP results to TestRail in realtime
 
 =head1 VERSION
 
-version 0.048
+version 0.049
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,78 @@
+{
+   "abstract" : "A distribution that only contains Pod",
+   "author" : [
+      "haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Acme-PodOnly",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {}
+      },
+      "runtime" : {
+         "requires" : {}
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::PodOnly" : {
+         "file" : "lib/Acme/PodOnly.pod",
+         "version" : "0.001003"
+      },
+      "Acme::PodOnly::MissingFile" : {
+         "file" : "lib/Acme/PodOnly/MissingFile.pod",
+         "version" : "0.001003"
+      },
+      "Acme::PodOnly::NoFile" : {
+         "version" : "0.001003"
+      },
+      "Acme::PodOnly::NoVersion" : {
+         "file" : "lib/Acme/PodOnly/NoVersion.pod"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Acme-PodOnly@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-PodOnly"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/haarg/Acme-PodOnly.git",
+         "web" : "https://github.com/haarg/Acme-PodOnly"
+      }
+   },
+   "version" : "0.001003",
+   "x_authority" : "cpan:HAARG",
+   "x_breaks" : {},
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

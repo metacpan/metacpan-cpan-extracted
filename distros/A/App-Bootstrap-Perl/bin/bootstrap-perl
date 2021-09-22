@@ -39,6 +39,8 @@ my $sourcetgz           = "/var/tmp/perl.tar.gz";
 my $blead               = 0;
 my $usethreads          = 1;
 my $bit64               = 1;
+my $taintsupport        = 1;
+my $silentnotaint       = 0;
 my $help                = 0;
 my $test                = 0;
 my $cpan                = 1;
@@ -152,17 +154,18 @@ sub print_and_qx_chomp {
 }
 
 sub _perl_base_name {
-        my ($perl_revision, $perl_version, $perl_subversion, $usethreads, $bit64, $gitdescribe, $gitchangeset, $exe_suffixes, $blead) = @_;
+        my ($perl_revision, $perl_version, $perl_subversion, $usethreads, $bit64, $taintsupport, $silentnotaint, $gitdescribe, $gitchangeset, $exe_suffixes, $blead) = @_;
         return join("-",
                     ($blead      ? "blead" : "$perl_revision.$perl_version"),
                     ($usethreads ? "" : "no" )."thread",
                     ($bit64      ? "" : "no" )."64bit",
+                    ($taintsupport ? "" : (($silentnotaint ? "silent" : "")."no"))."taint",
                     @$exe_suffixes,
                    );
 }
 
 sub _perl_exe_name {
-        my ($perl_revision, $perl_version, $perl_subversion, $usethreads, $bit64, $gitdescribe, $gitchangeset, $exe_suffixes, $blead) = @_;
+        my ($perl_revision, $perl_version, $perl_subversion, $usethreads, $bit64, $taintsupport, $silentnotaint, $gitdescribe, $gitchangeset, $exe_suffixes, $blead) = @_;
 
         return join("-",
                     "perl",
@@ -171,7 +174,7 @@ sub _perl_exe_name {
 }
 
 sub _perl_pathprefix {
-        my ($perl_revision, $perl_version, $perl_subversion, $usethreads, $bit64, $gitdescribe, $gitchangeset, $exe_suffixes, $blead) = @_;
+        my ($perl_revision, $perl_version, $perl_subversion, $usethreads, $bit64, $taintsupport, $silentnotaint, $gitdescribe, $gitchangeset, $exe_suffixes, $blead) = @_;
 
         return join("-",
                     $prefixbase."/perl",
@@ -195,6 +198,8 @@ my $ok = GetOptions (
                      "blead!"       => \$blead,
                      "usethreads!"  => \$usethreads,
                      "use64bit!"    => \$bit64,
+                     "taintsupport!" => \$taintsupport,
+                     "silentnotaint!" => \$silentnotaint,
                      "help|h"       => \$help,
                      "jobs|j=i"     => \$jobs,
                      "test|t"       => \$test,
@@ -405,10 +410,11 @@ unless (defined $perl_revision && defined $perl_version)
         exit 1;
 }
 
-my $codespeed_executable =            _perl_exe_name  ($perl_revision, $perl_version, $perl_subversion, $usethreads, $bit64, $gitdescribe, $gitchangeset, \@EXESUFFIXES, $blead);
-my $PREFIX               = $prefix || _perl_pathprefix($perl_revision, $perl_version, $perl_subversion, $usethreads, $bit64, $gitdescribe, $gitchangeset, \@EXESUFFIXES, $blead);
+my $codespeed_executable =            _perl_exe_name  ($perl_revision, $perl_version, $perl_subversion, $usethreads, $bit64, $taintsupport, $silentnotaint, $gitdescribe, $gitchangeset, \@EXESUFFIXES, $blead);
+my $PREFIX               = $prefix || _perl_pathprefix($perl_revision, $perl_version, $perl_subversion, $usethreads, $bit64, $taintsupport, $silentnotaint, $gitdescribe, $gitchangeset, \@EXESUFFIXES, $blead);
 my $USETHREADS           = $usethreads ? "-Dusethreads"  : "";
 my $BIT64                = $bit64      ? "-Duse64bitall" : "";
+my $TAINTSUPPORT         = $taintsupport ? "" : ($silentnotaint ? "-Accflags=-DSILENT_NO_TAINT_SUPPORT" : "-Accflags=-DNO_TAINT_SUPPORT");
 
 print $USER "\n";
 print $USER "============================================================\n\n";
@@ -486,7 +492,7 @@ EOUUCONFIG
 
         # ========== Configure ==========
 
-        print_and_system_out "cd $build_path_perl; sh Configure -der -Dusedevel $USETHREADS $BIT64 $CONFARGS -Dprefix=$PREFIX";
+        print_and_system_out "cd $build_path_perl; sh Configure -der -Dusedevel $USETHREADS $BIT64 $TAINTSUPPORT $CONFARGS -Dprefix=$PREFIX";
 
         # ========== make ==========
 
@@ -518,22 +524,33 @@ my $POD2TEXT = print_and_qx_chomp qq!ls -drt1 $PREFIX/bin/pod2text5.*.* | tail -
 my $CFG   = print_and_qx_chomp qq!$PERLDOC -l CPAN | sed -e "s/CPAN\.pm/CPAN\\/Config.pm/"!;
 my $MYCFG = print_and_qx_chomp qq!$PERLDOC -l CPAN | sed -e "s/CPAN\.pm/CPAN\\/MyConfig.pm/"!;
 
-print $USER "# CPAN:     $CPAN\n";
-print $USER "# PERL:     $PERL\n";
-print $USER "# PERLDOC:  $PERLDOC\n";
-print $USER "# POD2TEXT: $POD2TEXT\n";
-print $USER "# CPANCFG:  $CFG\n";
-
 my $bin_perl     = "$PREFIX/bin/perl";
 my $bin_cpan     = "$PREFIX/bin/cpan";
 my $bin_perldoc  = "$PREFIX/bin/perldoc";
 my $bin_pod2text = "$PREFIX/bin/pod2text";
+my $bin_mycpan   = "$PREFIX/bin/mycpan";
 
 # some dists don't find the versioned developer files
-print_and_system "if [ ! -e $bin_perl     ] ; then ln -sf $PERL     $bin_perl     ; fi";
-print_and_system "if [ ! -e $bin_cpan     ] ; then ln -sf $CPAN     $bin_cpan     ; fi";
-print_and_system "if [ ! -e $bin_perldoc  ] ; then ln -sf $PERLDOC  $bin_perldoc  ; fi";
-print_and_system "if [ ! -e $bin_pod2text ] ; then ln -sf $POD2TEXT $bin_pod2text ; fi";
+print_and_system "if [ ! -e $bin_perl     ] ; then ln -sf $PERL     $bin_perl     ; echo Created symlink $bin_perl ; else echo Already exists: $bin_perl ; fi";
+print_and_system "if [ ! -e $bin_cpan     ] ; then ln -sf $CPAN     $bin_cpan     ; echo Created symlink $bin_cpan ; else echo Already exists: $bin_cpan ; fi";
+print_and_system "if [ ! -e $bin_perldoc  ] ; then ln -sf $PERLDOC  $bin_perldoc  ; echo Created symlink $bin_perldoc ; else echo Already exists: $bin_perldoc ; fi";
+print_and_system "if [ ! -e $bin_pod2text ] ; then ln -sf $POD2TEXT $bin_pod2text ; echo Created symlink $bin_pod2text ; else echo Already exists: $bin_pod2text ; fi";
+
+# our own cpan cmd with explicit config
+if (not -e $bin_mycpan) {
+  open (my $MYCPAN, '>', $bin_mycpan) or die "Can not create $bin_mycpan";
+  print $MYCPAN qq{#! /bin/bash\n};
+  print $MYCPAN qq{$CPAN -j $CFG "\$\@"\n};
+  close $MYCPAN;
+  print_and_system qq!chmod +x $bin_mycpan!;
+}
+
+print $USER "# PERL:     $PERL\n";
+print $USER "# CPAN:     $CPAN\n";
+print $USER "# MYCPAN:   $bin_mycpan\n";
+print $USER "# PERLDOC:  $PERLDOC\n";
+print $USER "# POD2TEXT: $POD2TEXT\n";
+print $USER "# CPANCFG:  $CFG\n";
 
 sub bin_cpan { $bin_cpan || "" }
 
@@ -612,7 +629,7 @@ if ($cpan)
         }
 
         # force a CPAN.pm with all features we need, assume old-school CPAN.pm
-        print_and_system qq{if [ -L $bin_cpan -o ! -e $bin_cpan ] ; then /bin/rm -f $bin_cpan ; echo "force install CPAN" | $PERL -MCPAN -e shell ; fi};
+        print_and_system qq{if [ -L $bin_cpan -o ! -e $bin_cpan ] ; then echo Why?: /bin/rm -f $bin_cpan ; echo "force install CPAN" | $PERL -MCPAN -e shell ; fi};
 
         # once upon a time the cpan exe missed the executable bit - set it to be sure
         print_and_system qq!chmod +x $CPAN!;
@@ -621,6 +638,8 @@ if ($cpan)
         print $USER "*** INSTALL cpan dependencies\n";
 
         # install extended cpan toolchain; contains some "force" where we know they are really required
+        install_cpan_module($PERL, $bin_cpan, $CFG, NO_REINSTALL, FORCE, "CPAN::DistnameInfo");
+        install_cpan_module($PERL, $bin_cpan, $CFG, NO_REINSTALL, FORCE, "HTTP::Date");
         install_cpan_module($PERL, $bin_cpan, $CFG, NO_REINSTALL, FORCE, "ExtUtils::Config");
         install_cpan_module($PERL, $bin_cpan, $CFG, NO_REINSTALL, FORCE, "YAML::XS");
         install_cpan_module($PERL, $bin_cpan, $CFG, NO_REINSTALL, FORCE, "YAML");
@@ -628,7 +647,8 @@ if ($cpan)
         # try really hard with some modules until we find a version
         # that fits currrent Perl
         my %mod_dists = (
-                         "YAML" => [qw(MSTROUT/YAML-0.84.tar.gz
+                         "YAML" => [qw(TINITA/YAML-1.30.tar.gz
+                                       MSTROUT/YAML-0.84.tar.gz
                                        MSTROUT/YAML-0.83.tar.gz
                                        MSTROUT/YAML-0.82.tar.gz
                                        INGY/YAML-0.81.tar.gz
@@ -843,6 +863,26 @@ which is already the default. To build Perl without 64bit use:
 
   $ bootstrap-perl --nouse64bit
 
+=head3 taint support
+
+Perl can be built without taint support (C<-DNO_TAINT_SUPPORT>, C<-DSILENT_NO_TAINT_SUPPORT>).
+
+To build a Perl with taint support:
+
+  $ bootstrap-perl --taintsupport
+
+which is already the default.
+
+To build Perl without taint support use:
+
+  $ bootstrap-perl --notaintsupport
+
+To make the notaintsupport silent, combine it with --silentnotaint:
+
+  $ bootstrap-perl --notaintsupport --silentnotaint
+
+(sic, both are needed).
+
 =head3 version numbers vs. blead
 
 By default the Perl version number is derived from git-describe and
@@ -922,12 +962,12 @@ those benchmarks with no extra dependencies
 
 It uses a unified naming schema for it's installation PREFIX:
 
-  /$HOME/.bootstrapperl/$HOSTNAME/perl-5.<VERSION>-<(no)?thread>-<(no)?64bit>-<git-describe>
+  /$HOME/.bootstrapperl/$HOSTNAME/perl-5.<VERSION>-<(no)?thread>-<(no)?64bit>-<(no)?taint>-<git-describe>
 
 which leads to paths like this:
 
-  /home/ss5/.bootstrapperl/zomtec/perl-5.10-thread-64bit-v5.10.0
-  /home/ss5/.bootstrapperl/zomtec/perl-5.15-thread-64bit-v5.15.5-258-ge7d0a3f
+  /home/ss5/.bootstrapperl/zomtec/perl-5.10-thread-64bit-taint-v5.10.0
+  /home/ss5/.bootstrapperl/zomtec/perl-5.15-thread-64bit-taint-v5.15.5-258-ge7d0a3f
 
 This naming schema consist of the major version, basic configuration
 and I<git-describe>.
@@ -951,7 +991,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Steffen Schwigon.
+This software is copyright (c) 2021 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

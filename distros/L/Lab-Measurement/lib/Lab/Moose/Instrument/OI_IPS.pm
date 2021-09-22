@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::OI_IPS;
-$Lab::Moose::Instrument::OI_IPS::VERSION = '3.771';
+$Lab::Moose::Instrument::OI_IPS::VERSION = '3.772';
 #ABSTRACT: Oxford Instruments IPS Intelligent Power Supply
 
 use v5.20;
@@ -264,6 +264,9 @@ sub read_parameter {
         value => { isa => enum( [ ( 0 .. 24 ) ] ) },
     );
     my $result = $self->query( command => "R$value\r", %args );
+
+    # device bug: sometimes the value is returned with a leading 'R'
+    $result =~ s/^R//;
     return sprintf( "%e", $result );
 }
 
@@ -387,7 +390,7 @@ Lab::Moose::Instrument::OI_IPS - Oxford Instruments IPS Intelligent Power Supply
 
 =head1 VERSION
 
-version 3.771
+version 3.772
 
 =head1 SYNOPSIS
 

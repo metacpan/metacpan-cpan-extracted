@@ -6,6 +6,12 @@ use Sub::Meta::Parameters;
 use Sub::Meta::Returns;
 use Sub::Meta::Library;
 use Sub::Meta::Creator;
+use Sub::Meta::Finder::Default;
+use Sub::Meta::CreatorFunction;
+use Sub::Meta::Test;
+use Sub::Meta::Type;
+use Sub::Meta::TypeSub;
+use Types::Sub;
 
 pass;
 

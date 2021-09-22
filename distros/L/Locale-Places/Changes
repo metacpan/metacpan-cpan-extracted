@@ -1,5 +1,9 @@
 Revision history for Locale::Places
 
+0.06	Tue Sep 14 13:51:57 EDT 2021
+	If, after everything, nothing can be found, return the orginal place
+	Fix differences between handling CSV and SQL databases
+
 0.05	Mon Sep 13 09:25:24 EDT 2021
 	Looking for a translation from English to French of Durham, Bromley and Lambeth gave
 		error about more than one preferred entry

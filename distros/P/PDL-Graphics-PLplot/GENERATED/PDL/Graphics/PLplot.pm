@@ -26,7 +26,7 @@ use Carp qw(confess);
 
 our $VERSION;
 BEGIN {
-$VERSION = '0.77'
+$VERSION = '0.78'
 };
 
 =head1 NAME
@@ -44,8 +44,9 @@ PDL::Graphics::PLplot - Object-oriented interface from perl/PDL to the PLPLOT pl
   $pl->xyplot($x, $y);
   $pl->close;
 
-Only version 5.15.0+ of PLplot is supported, due to a C-level API change
-that is invisible at PDL-level.
+Only version 5.15.0+ of PLplot is fully supported, due to a C-level API change
+that is invisible at PDL-level. However, the library does support installation
+with PLplot 5.13.0+.
 
 For more information on PLplot, see
 
@@ -478,6 +479,7 @@ Specify how to label the X axis of the plot as a string of option letters:
   a: Draws axis, X-axis is horizontal line (y=0), and Y-axis is vertical line (x=0).
   b: Draws bottom (X) or left (Y) edge of frame.
   c: Draws top (X) or right (Y) edge of frame.
+  d: Plot labels as date / time. Values are assumed to be seconds since the epoch (as used by gmtime).
   f: Always use fixed point numeric labels.
   g: Draws a grid at the major tick interval.
   h: Draws a grid at the minor tick interval.
@@ -6531,7 +6533,10 @@ Calculate continuous time from broken-down time for current stream.
 
 =for ref
 
-Set format for date / time labels.  See the PLplot manual for more details.
+Set format for date / time labels. Labels must be configured to treat values as
+seconds since the epoch via the XBOX/YBOX flags. C<$fmt> is generally
+consistent with the POSIX strpformat/strftime flags, but see the PLplot manual
+for details.
 
 =cut
 

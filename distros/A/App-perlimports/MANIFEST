@@ -11,6 +11,7 @@ Makefile.PL
 README.md
 cpanfile
 dist.ini
+examples/tidy-libs-and-tests.sh
 git/hooks/pre-commit
 git/setup.sh
 lib/App/perlimports.pm
@@ -45,6 +46,7 @@ t/do-block.t
 t/dump-perl-exports.t
 t/dupes.t
 t/english.t
+t/explodes.t
 t/export-tags.t
 t/exported-variables.t
 t/find-bin.t
@@ -108,6 +110,7 @@ test-data/config-in-import.pl
 test-data/datetime.pl
 test-data/dupes.pl
 test-data/english.pl
+test-data/explodes.pl
 test-data/export-tags.pl
 test-data/exported-variables.pl
 test-data/find-bin.pl
@@ -127,6 +130,7 @@ test-data/inner-package.pl
 test-data/interpolation.pl
 test-data/lib/Local/After.pm
 test-data/lib/Local/CustomImport.pm
+test-data/lib/Local/Explodes.pm
 test-data/lib/Local/MooseTypeLibrary.pm
 test-data/lib/Local/MyOwnMoo.pm
 test-data/lib/Local/MyOwnMoose.pm

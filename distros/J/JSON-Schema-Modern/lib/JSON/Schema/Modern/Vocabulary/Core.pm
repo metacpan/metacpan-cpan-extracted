@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Core;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Core vocabulary
 
-our $VERSION = '0.517';
+our $VERSION = '0.519';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -40,6 +40,7 @@ sub keywords {
 }
 
 # supported metaschema URIs. is a subset of JSON::Schema::Modern::CACHED_METASCHEMAS
+# and an inversion of JSON::Schema::Modern::METASCHEMA_URIS
 my %version_uris = (
   'https://json-schema.org/draft/2020-12/schema'  => 'draft2020-12',
   'https://json-schema.org/draft/2019-09/schema'  => 'draft2019-09',
@@ -84,6 +85,8 @@ sub _traverse_keyword_id {
     $state->{initial_schema_uri} => {
       path => $state->{traversed_schema_path},
       canonical_uri => $state->{initial_schema_uri}->clone,
+      specification_version => $state->{spec_version}, # note! $schema keyword can change this
+      vocabularies => $state->{vocabularies}, # reference, not copy
     };
   return 1;
 }
@@ -91,18 +94,19 @@ sub _traverse_keyword_id {
 sub _eval_keyword_id {
   my ($self, $data, $schema, $state) = @_;
 
-  if (my $canonical_uri = $state->{document}->path_to_canonical_uri($state->{document_path}.$state->{schema_path})) {
-    $state->{initial_schema_uri} = $canonical_uri->clone;
-    $state->{traversed_schema_path} = $state->{traversed_schema_path}.$state->{schema_path};
-    $state->{document_path} = $state->{document_path}.$state->{schema_path};
-    $state->{schema_path} = '';
-    push @{$state->{dynamic_scope}}, $canonical_uri;
-
-    return 1;
-  }
-
+  my $schema_info = $state->{document}->path_to_resource($state->{document_path}.$state->{schema_path});
   # this should never happen, if the pre-evaluation traversal was performed correctly
-  abort($state, 'failed to resolve %s to canonical uri', $state->{keyword});
+  abort($state, 'failed to resolve %s to canonical uri', $state->{keyword}) if not $schema_info;
+
+  $state->{initial_schema_uri} = $schema_info->{canonical_uri}->clone;
+  $state->{traversed_schema_path} = $state->{traversed_schema_path}.$state->{schema_path};
+  $state->{document_path} = $state->{document_path}.$state->{schema_path};
+  $state->{schema_path} = '';
+  $state->{spec_version} = $schema_info->{specification_version};
+  $state->{vocabularies} = $schema_info->{vocabularies};
+  push @{$state->{dynamic_scope}}, $state->{initial_schema_uri};
+
+  return 1;
 }
 
 sub _traverse_keyword_schema {
@@ -110,7 +114,10 @@ sub _traverse_keyword_schema {
 
   return if not assert_keyword_type($state, $schema, 'string') or not assert_uri($state, $schema);
 
-  # note: we need not be at the document root, but simply adjacent to an $id
+  # "A JSON Schema resource is a schema which is canonically identified by an absolute URI."
+  # "A resource's root schema is its top-level schema object."
+  # note: we need not be at the document root, but simply adjacent to an $id (or be the at the
+  # document root)
   return E($state, '$schema can only appear at the schema resource root')
     if length($state->{schema_path});
 
@@ -119,24 +126,19 @@ sub _traverse_keyword_schema {
       join(', ', map '"'.$_.'"', sort keys %version_uris))
     if not $spec_version;
 
-  # The spec version cannot change as we traverse through a schema document, due to the race
-  # condition involved in supporting different core keyword semantics before we can parse the
-  # keywords that tell us what those semantics are.
-  # To support different dialects, we will record the local dialect in the document object for
-  # swapping out during evaluation and following $refs. We must also store a value to be populated
-  # into $state->{validate_formats}, if one of the format vocabularies is included.
-  return E($state, '"$schema" indicates a different version than that requested by \'specification_version\'')
-    if $state->{evaluator}->specification_version
-      and $spec_version ne $state->{evaluator}->specification_version;
-
-  return E($state, 'draft specification version cannot change within a single schema document')
-    if $spec_version ne $state->{spec_version} and length($state->{traversed_schema_path});
-
-  # we special-case this because the check in _eval for older drafts + $ref has already happened
+  # we special-case this because the check in _eval_subschema for older drafts + $ref has already happened
   return E($state, '$schema and $ref cannot be used together in older drafts')
     if exists $schema->{'$ref'} and $spec_version eq 'draft7';
 
   $state->{spec_version} = $spec_version;
+  $state->{vocabularies} = [ $state->{evaluator}->_vocabularies_by_spec_version($spec_version) ];
+
+  # remember, if we don't have a sibling $id, we must be at the document root with no identifiers
+  if (@{$state->{identifiers}}) {
+    $state->{identifiers}[-1]{specification_version} = $spec_version;
+    $state->{identifiers}[-1]{vocabularies} = $state->{vocabularies};
+  }
+
   return 1;
 }
 
@@ -166,6 +168,8 @@ sub _traverse_keyword_anchor {
     Mojo::URL->new->to_abs($canonical_uri)->fragment($schema->{$state->{keyword}}) => {
       path => $state->{traversed_schema_path}.$state->{schema_path},
       canonical_uri => $canonical_uri,
+      specification_version => $state->{spec_version},
+      vocabularies => $state->{vocabularies}, # reference, not copy
     };
   return 1;
 }
@@ -212,19 +216,20 @@ sub _eval_keyword_ref {
   my ($self, $data, $schema, $state) = @_;
 
   my $uri = Mojo::URL->new($schema->{'$ref'})->to_abs($state->{initial_schema_uri});
-  my ($subschema, $canonical_uri, $document, $document_path) = $state->{evaluator}->_fetch_schema_from_uri($uri);
-  abort($state, 'EXCEPTION: unable to find resource %s', $uri) if not defined $subschema;
+  my $schema_info = $state->{evaluator}->_fetch_from_uri($uri);
+  abort($state, 'EXCEPTION: unable to find resource %s', $uri) if not $schema_info;
 
-  return $self->eval($data, $subschema,
+  return $self->eval($data, $schema_info->{schema},
     +{
-      %{$document->evaluation_configs},
+      %{$schema_info->{document}->evaluation_configs},
       %$state,
       traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path}.'/$ref',
-      initial_schema_uri => $canonical_uri,
-      document => $document,
-      document_path => $document_path,
-      spec_version => $document->specification_version,
+      initial_schema_uri => $schema_info->{canonical_uri},
+      document => $schema_info->{document},
+      document_path => $schema_info->{document_path},
+      spec_version => $schema_info->{specification_version},
       schema_path => '',
+      vocabularies => $schema_info->{vocabularies}, # reference, not copy
     });
 }
 
@@ -234,26 +239,27 @@ sub _eval_keyword_recursiveRef {
   my ($self, $data, $schema, $state) = @_;
 
   my $uri = Mojo::URL->new($schema->{'$recursiveRef'})->to_abs($state->{initial_schema_uri});
-  my ($subschema, $canonical_uri, $document, $document_path) = $state->{evaluator}->_fetch_schema_from_uri($uri);
-  abort($state, 'EXCEPTION: unable to find resource %s', $uri) if not defined $subschema;
+  my $schema_info = $state->{evaluator}->_fetch_from_uri($uri);
+  abort($state, 'EXCEPTION: unable to find resource %s', $uri) if not $schema_info;
 
-  if (is_type('boolean', $subschema->{'$recursiveAnchor'}) and $subschema->{'$recursiveAnchor'}) {
+  if (is_type('boolean', $schema_info->{schema}{'$recursiveAnchor'}) and $schema_info->{schema}{'$recursiveAnchor'}) {
     $uri = Mojo::URL->new($schema->{'$recursiveRef'})
       ->to_abs($state->{recursive_anchor_uri} // $state->{initial_schema_uri});
-    ($subschema, $canonical_uri, $document, $document_path) = $state->{evaluator}->_fetch_schema_from_uri($uri);
-    abort($state, 'EXCEPTION: unable to find resource %s', $uri) if not defined $subschema;
+    $schema_info = $state->{evaluator}->_fetch_from_uri($uri);
+    abort($state, 'EXCEPTION: unable to find resource %s', $uri) if not $schema_info;
   }
 
-  return $self->eval($data, $subschema,
+  return $self->eval($data, $schema_info->{schema},
     +{
-      %{$document->evaluation_configs},
+      %{$schema_info->{document}->evaluation_configs},
       %$state,
       traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path}.'/$recursiveRef',
-      initial_schema_uri => $canonical_uri,
-      document => $document,
-      document_path => $document_path,
-      spec_version => $document->specification_version,
+      initial_schema_uri => $schema_info->{canonical_uri},
+      document => $schema_info->{document},
+      document_path => $schema_info->{document_path},
+      spec_version => $schema_info->{specification_version},
       schema_path => '',
+      vocabularies => $schema_info->{vocabularies}, # reference, not copy
     });
 }
 
@@ -263,37 +269,38 @@ sub _eval_keyword_dynamicRef {
   my ($self, $data, $schema, $state) = @_;
 
   my $uri = Mojo::URL->new($schema->{'$dynamicRef'})->to_abs($state->{initial_schema_uri});
-  my ($subschema, $canonical_uri, $document, $document_path) = $state->{evaluator}->_fetch_schema_from_uri($uri);
-  abort($state, 'EXCEPTION: unable to find resource %s', $uri) if not defined $subschema;
+  my $schema_info = $state->{evaluator}->_fetch_from_uri($uri);
+  abort($state, 'EXCEPTION: unable to find resource %s', $uri) if not $schema_info;
 
   # If the initially resolved starting point URI includes a fragment that was created by the
   # "$dynamicAnchor" keyword, ...
-  if (length $uri->fragment and exists $subschema->{'$dynamicAnchor'}
-      and $uri->fragment eq (my $anchor = $subschema->{'$dynamicAnchor'})) {
+  if (length $uri->fragment and exists $schema_info->{schema}{'$dynamicAnchor'}
+      and $uri->fragment eq (my $anchor = $schema_info->{schema}{'$dynamicAnchor'})) {
     # ...the initial URI MUST be replaced by the URI (including the fragment) for the outermost
     # schema resource in the dynamic scope that defines an identically named fragment with
     # "$dynamicAnchor".
     foreach my $base_scope (@{$state->{dynamic_scope}}) {
       $uri = Mojo::URL->new($base_scope)->fragment($anchor);
-      my ($dynamic_anchor_subschema) = $state->{evaluator}->_fetch_schema_from_uri($uri);
-      if ((($dynamic_anchor_subschema//{})->{'$dynamicAnchor'}//'') eq $anchor) {
-        ($subschema, $canonical_uri, $document, $document_path) = $state->{evaluator}->_fetch_schema_from_uri($uri);
-        abort($state, 'EXCEPTION: unable to find resource %s', $uri) if not defined $subschema;
+      my $dynamic_anchor_subschema_info = $state->{evaluator}->_fetch_from_uri($uri);
+      if (($dynamic_anchor_subschema_info->{schema}->{'$dynamicAnchor'}//'') eq $anchor) {
+        $schema_info = $state->{evaluator}->_fetch_from_uri($uri);
+        abort($state, 'EXCEPTION: unable to find resource %s', $uri) if not $schema_info;
         last;
       }
     }
   }
 
-  return $self->eval($data, $subschema,
+  return $self->eval($data, $schema_info->{schema},
     +{
-      %{$document->evaluation_configs},
+      %{$schema_info->{document}->evaluation_configs},
       %$state,
       traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path}.'/$dynamicRef',
-      initial_schema_uri => $canonical_uri,
-      document => $document,
-      document_path => $document_path,
-      spec_version => $document->specification_version,
+      initial_schema_uri => $schema_info->{canonical_uri},
+      document => $schema_info->{document},
+      document_path => $schema_info->{document_path},
+      spec_version => $schema_info->{specification_version},
       schema_path => '',
+      vocabularies => $schema_info->{vocabularies}, # reference, not copy
     });
 }
 
@@ -303,9 +310,7 @@ sub _traverse_keyword_vocabulary {
 
   my $valid = 1;
   foreach my $property (sort keys %{$schema->{'$vocabulary'}}) {
-    $valid = E($state, '$vocabulary/%s value is not a boolean', $property)
-      if not is_type('boolean', $schema->{'$vocabulary'}{$property});
-
+    $valid = 0 if not assert_keyword_type({ %$state, _schema_path_suffix => $property }, $schema, 'boolean');
     $valid = 0 if not assert_uri($state, $schema, $property);
   }
 
@@ -351,7 +356,7 @@ JSON::Schema::Modern::Vocabulary::Core - Implementation of the JSON Schema Core 
 
 =head1 VERSION
 
-version 0.517
+version 0.519
 
 =head1 DESCRIPTION
 

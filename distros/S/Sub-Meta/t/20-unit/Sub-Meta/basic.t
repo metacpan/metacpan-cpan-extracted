@@ -26,6 +26,23 @@ subtest 'set_sub' => sub {
     });
 };
 
+subtest 'set_sub / anon sub' => sub {
+    my $code = sub {};
+    my $meta = Sub::Meta->new;
+    is $meta->set_sub($code), $meta, 'set_sub';
+
+    is $meta, sub_meta({
+        sub         => $code,
+        subname     => '',
+        stashname   => 'main',
+        fullname    => 'main::',
+        subinfo     => ['main', undef],
+        file        => __FILE__,
+        line        => 30,
+        attribute   => [],
+    });
+};
+
 subtest 'set_fullname' => sub {
     my $meta = Sub::Meta->new;
     is $meta->set_fullname('Foo::Bar::baz'), $meta, 'set_fullname';

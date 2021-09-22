@@ -95,7 +95,7 @@ Sub::Meta->new(
     returns => Int,
 );
 
-# method hello(Str) -> Str 
+# method hello(Str) -> Str
 Sub::Meta->new(
     subname   => 'hello',
     args      => [{ message => Str }],
@@ -434,7 +434,7 @@ Accessor for attribute of subroutine reference.
     ```
 
     If the subroutine is set, it returns a attribute of subroutine, if not set, it returns undef.
-    e.g. `['method']`, `undef` 
+    e.g. `['method']`, `undef`
 
 - `has_attribute`
 
@@ -485,18 +485,10 @@ Accessor for parameters object of [Sub::Meta::Parameters](https://metacpan.org/p
 - `parameters`
 
     ```perl
-    method parameters() => Maybe[InstanceOf[Sub::Meta]]
+    method parameters() => InstanceOf[Sub::Meta::Parameters]
     ```
 
     If the parameters is set, it returns the parameters object.
-
-- `has_parameters`
-
-    ```perl
-    method has_parameters() => Bool
-    ```
-
-    Whether Sub::Meta has parameters or not.
 
 - `set_parameters($parameters)`
 
@@ -568,18 +560,10 @@ Accessor for returns object of [Sub::Meta::Returns](https://metacpan.org/pod/Sub
 - `returns`
 
     ```perl
-    method returns() => Maybe[InstanceOf[Sub::Meta]]
+    method returns() => InstanceOf[Sub::Meta::Returns]
     ```
 
     If the returns is set, it returns the returns object.
-
-- `has_returns`
-
-    ```perl
-    method has_returns() => Bool
-    ```
-
-    Whether Sub::Meta has returns or not.
 
 - `set_returns($returns)`
 
@@ -619,6 +603,10 @@ method is_same_interface(InstanceOf[Sub::Meta] $other_meta) => Bool
 A boolean value indicating whether the subroutine's interface is same or not.
 Specifically, check whether `subname`, `is_method`, `parameters` and `returns` are equal.
 
+### is\_strict\_same\_interface($other\_meta)
+
+Alias for `is_same_interface`
+
 ### is\_relaxed\_same\_interface($other\_meta)
 
 ```perl
@@ -627,13 +615,33 @@ method is_relaxed_same_interface(InstanceOf[Sub::Meta] $other_meta) => Bool
 
 A boolean value indicating whether the subroutine's interface is relaxed same or not.
 Specifically, check whether `subname`, `is_method`, `parameters` and `returns` satisfy
-the condition of `$self` side:
+the condition of `$self` side.
+
+#### Difference between `strict` and `relaxed`
+
+If it is `is_relaxed_same_interface` method, the conditions can be many.
+For example, the number of arguments can be many.
+The following code is a test to show the difference between strict and relaxed.
 
 ```perl
-my $meta = Sub::Meta->new;
-my $other = Sub::Meta->new(subname => 'foo');
-$meta->is_same_interface($other); # NG
-$meta->is_relaxed_same_interface($other); # OK. The reason is that $meta does not specify the subname.
+my @tests = (
+    {},                { subname => 'foo' },
+    {},                { args => [Int] },
+    { args => [Int] }, { args => [Int, Str] },
+    { args => [Int] }, { args => [Int], slurpy => Str },
+    { args => [Int] }, { args => [{ type => Int, name => '$a' }] },
+    {},                { returns => Int },
+    { returns => { scalar => Int } }, { returns => { scalar => Int, list => Int } },
+);
+
+while (@tests) {
+    my ($a, $b) = splice @tests, 0, 2;
+    my $meta = Sub::Meta->new($a);
+    my $other = Sub::Meta->new($b);
+
+    ok !$meta->is_strict_same_interface($other);
+    ok $meta->is_relaxed_same_interface($other);
+}
 ```
 
 ### is\_same\_interface\_inlined($other\_meta\_inlined)
@@ -641,6 +649,10 @@ $meta->is_relaxed_same_interface($other); # OK. The reason is that $meta does no
 ```perl
 method is_same_interface_inlined(InstanceOf[Sub::Meta] $other_meta) => Str
 ```
+
+### is\_strict\_same\_interface\_inlined($other\_meta)
+
+Alias for `is_same_interface_inlined`
 
 Returns inlined `is_same_interface` string:
 

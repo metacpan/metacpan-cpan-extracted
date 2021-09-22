@@ -10,9 +10,12 @@ package My::Awesome::Module;
 use strict;
 use warnings;
 
+use Redis;
 use Redis::OpenTracing;
 
-my $redis = Redis::OpenTracing->new( );
+my $redis = Redis::OpenTracing->new(
+    redis => Redis->new( ... )
+);
 
 my $value = $redis->get 'my-key';
 

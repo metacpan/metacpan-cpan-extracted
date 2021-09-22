@@ -1,6 +1,6 @@
 {
     "name" : "App-japerl",
-    "version" : "0.13",
+    "version" : "0.14",
     "abstract" : "JPerl-again Perl glocalization scripting environment",
     "author" : [
         "ina <ina@cpan.org>"
@@ -26,6 +26,7 @@
     "prereqs" : {
         "build" : {
             "requires" : {
+                "Config" : "0",
                 "ExtUtils::MakeMaker" : "5.4302",
                 "File::Basename" : "2.6",
                 "File::Copy" : "2.02",
@@ -33,12 +34,13 @@
                 "FindBin" : "1.42",
                 "Socket" : "0",
                 "lib" : "0",
-                "perl" : "5.005_03",
+                "perl" : "5.00503",
                 "strict" : "1.01"
             }
         },
         "configure" : {
             "requires" : {
+                "Config" : "0",
                 "ExtUtils::MakeMaker" : "5.4302",
                 "File::Basename" : "2.6",
                 "File::Copy" : "2.02",
@@ -46,12 +48,13 @@
                 "FindBin" : "1.42",
                 "Socket" : "0",
                 "lib" : "0",
-                "perl" : "5.005_03",
+                "perl" : "5.00503",
                 "strict" : "1.01"
             }
         },
         "runtime" : {
             "requires" : {
+                "Config" : "0",
                 "ExtUtils::MakeMaker" : "5.4302",
                 "File::Basename" : "2.6",
                 "File::Copy" : "2.02",
@@ -59,7 +62,7 @@
                 "FindBin" : "1.42",
                 "Socket" : "0",
                 "lib" : "0",
-                "perl" : "5.005_03",
+                "perl" : "5.00503",
                 "strict" : "1.01"
             }
         }

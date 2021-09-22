@@ -2488,6 +2488,33 @@ $mockObject->map_response(qr/\Q$VAR1\E/,HTTP::Response->new($VAR2, $VAR3, $VAR4,
 
 }
 
+{
+
+$VAR1 = 'index.php?/api/v2/get_priorities';
+$VAR2 = '200';
+$VAR3 = 'OK';
+$VAR4 = bless( {
+                 'connection' => 'close',
+                 'x-powered-by' => 'PHP/5.5.9-1ubuntu4.9',
+                 'client-response-num' => 1,
+                 'date' => 'Tue, 21 Sep 2021 20:59:52 GMT',
+                 'client-peer' => '192.168.122.217:80',
+                 'content-length' => '173',
+                 '::std_case' => {
+                                   'client-date' => 'Client-Date',
+                                   'x-powered-by' => 'X-Powered-By',
+                                   'client-response-num' => 'Client-Response-Num',
+                                   'client-peer' => 'Client-Peer'
+                                 },
+                 'client-date' => 'Thu, 16 Jul 2015 20:59:52 GMT',
+                 'content-type' => 'application/json; charset=utf-8',
+                 'server' => 'Apache/2.4.7 (Ubuntu)'
+               }, 'HTTP::Headers' );
+$VAR5 = '[{"id":1,"is_default":true,"name":"1 - Critical","priority":1,"short_name":"1 - Do"},{"id":4,"is_default":false,"name":"2 - Whatever","priority":2,"short_name":"2 - Don\'t"}]';
+$mockObject->map_response(qr/\Q$VAR1\E/,HTTP::Response->new($VAR2, $VAR3, $VAR4, $VAR5));
+
+}
+
 #Lock Mocks
 
 {

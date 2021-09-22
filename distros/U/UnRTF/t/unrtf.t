@@ -7,7 +7,7 @@ BEGIN {
 };
 
 sub require_file_on_new : Tests {
-  throws_ok { UnRTF->new } qr/Attribute.*file.*required/, 'file is required';
+  throws_ok { UnRTF->new } qr/Missing required.*: file/, 'file is required';
 }
 
 sub test_object : Tests {
@@ -17,7 +17,7 @@ sub test_object : Tests {
 
 sub convert_rtf_file_to_text : Tests {
   my $object = UnRTF->new(file => 't/samples/sample.rtf');
-  like($object->convert(format => 'text'), qr/# Translation from RTF performed by UnRTF/);
+  like($object->convert(format => 'text'), qr/#\s+Translation from RTF performed by UnRTF/);
 }
 
 sub convert_to_blank_if_dont_tell_format : Tests {

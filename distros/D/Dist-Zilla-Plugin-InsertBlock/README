@@ -3,9 +3,9 @@ NAME
     file
 
 VERSION
-    This document describes version 0.101 of
+    This document describes version 0.103 of
     Dist::Zilla::Plugin::InsertBlock (from Perl distribution
-    Dist-Zilla-Plugin-InsertBlock), released on 2021-02-21.
+    Dist-Zilla-Plugin-InsertBlock), released on 2021-09-16.
 
 SYNOPSIS
     In dist.ini:
@@ -38,6 +38,20 @@ SYNOPSIS
 
      ...
 
+     =head1 METHODS
+
+     =over 11
+
+     =back BEGIN_BLOCK: base_methods
+
+     =head2 meth1
+
+     =head2 meth2
+
+     =over 11
+
+     =back END_BLOCK: base_methods
+
     In lib/Foo/Bar.pm:
 
      ...
@@ -48,18 +62,32 @@ SYNOPSIS
 
      =head1 ATTRIBUTES
 
-     # INSERT_BLOCK: lib/Foo/Bar.pm base_attributes
+     # INSERT_BLOCK: lib/Foo/Base.pm base_attributes
 
      =head2 attr3
 
      ...
 
-DESCRIPTION
-    This plugin finds "# INSERT_BLOCK: <file> <name>" directive in your
-    POD/code, find the block of text named *name* in *file*, and inserts the
-    block of text to replace the directive.
+     =head1 METHODS
 
-    Block is marked/defined using either this syntax:
+     =INSERT_BLOCK: lib/Foo/Base.pm base_methods
+
+     =head2 meth3
+
+     ...
+
+DESCRIPTION
+    This plugin finds "# INSERT_BLOCK: <file> <name>" directives in your
+    POD/code. It then searches for a block of text named *name* in file
+    *file*, and inserts the content of the block to replace the directive.
+
+    A block is marked/defined using either this syntax:
+
+     # BEGIN_BLOCK: Name
+     ...
+     # END_BLOCK: Name
+
+    or this (for block inside POD):
 
      =for BEGIN_BLOCK: Name
 
@@ -67,17 +95,24 @@ DESCRIPTION
 
      =for END_BLOCK: Name
 
-    or this syntax:
+    or this "=over 11" workaround syntax (for blocks inside POD, in case
+    tools like Pod::Weaver remove "=for" directives):
 
-     # BEGIN_BLOCK: Name
+     =over 11
+
+     =back BEGIN_BLOCK: Name
+
      ...
-     # END_BLOCK: Name
+
+     =over 11
+
+     =back END_BLOCK: Name
 
     Block name is case-sensitive.
 
     This plugin can be useful to avoid repetition/manual copy-paste, e.g.
-    you want to list POD attributes, methods, etc from a base class into a
-    subclass.
+    when you want to list POD attributes, methods, etc from a base class
+    into a subclass.
 
   Options
     The "# INSERT_BLOCK" directive accepts an optional third argument for
@@ -97,13 +132,6 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Dist-Zilla-Plugin-InsertBlock>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-InsertBlock/issues>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     Dist::Zilla::Plugin::InsertBlock::FromModule
 
@@ -119,10 +147,34 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2016, 2015 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2016, 2015 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Ins
+    ertBlock>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

@@ -1,7 +1,7 @@
 package Git::CPAN::Patch::Command::Import;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: Import a module into a git repository
-$Git::CPAN::Patch::Command::Import::VERSION = '2.3.4';
+$Git::CPAN::Patch::Command::Import::VERSION = '2.4.0';
 use 5.20.0;
 
 use strict;
@@ -52,6 +52,7 @@ option check => (
     is => 'ro',
     isa => 'Bool',
     default => 1,
+    cmd_negate => 'nocheck',
     documentation => q{Verifies that the imported version is greater than what is already imported},
 );
 
@@ -255,9 +256,10 @@ END
 
         print $self->git_run('update-ref', '-m' => "import " . $release->dist_name, 'refs/remotes/cpan/master', $commit );
 
-        print $self->git_run( tag => 'v'.$release->dist_version, $commit );
+        my $tag_name = $release->dist_version =~ /^v/ ? $release->dist_version : 'v'.$release->dist_version;
+        print $self->git_run( tag => $tag_name, $commit );
 
-        say "created tag '@{[ 'v'.$release->dist_version ]}' ($commit)";
+        say "created tag '@{[ $tag_name ]}' ($commit)";
     }
 
     $self->git_run( config => 'cpan.module-name', $release->dist_name );
@@ -290,7 +292,7 @@ Git::CPAN::Patch::Command::Import - Import a module into a git repository
 
 =head1 VERSION
 
-version 2.3.4
+version 2.4.0
 
 =head1 SYNOPSIS
 
@@ -374,7 +376,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
+This software is copyright (c) 2021, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

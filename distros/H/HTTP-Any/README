@@ -1,4 +1,4 @@
-HTML::Any - a common interface for HTTP clients (LWP, AnyEvent::HTTP, Curl)
+HTTP::Any - a common interface for HTTP clients (LWP, AnyEvent::HTTP, Curl)
 ===========================================================================
 
 INSTALLATION
@@ -12,10 +12,10 @@ To install this module type the following:
 
 Also install:
 
- - Net::Curl to use HTML::Any::Curl
- - Net::Curl, EV and Net::Curl::Multi::EV to use HTML::Any::Curl with Multi
- - AnyEvent::HTTP, EV to use HTML::Any::AnyEvent
- - LWP to use HTML::Any::LWP
+ - Net::Curl to use HTTP::Any::Curl
+ - Net::Curl, EV and Net::Curl::Multi::EV to use HTTP::Any::Curl with Multi
+ - AnyEvent::HTTP, EV to use HTTP::Any::AnyEvent
+ - LWP to use HTTP::Any::LWP
 
 
 DOCUMENTATION

@@ -3,7 +3,7 @@
 # PODNAME: TestRail::Bin::Runs
 
 package TestRail::Bin::Runs;
-$TestRail::Bin::Runs::VERSION = '0.048';
+$TestRail::Bin::Runs::VERSION = '0.049';
 use strict;
 use warnings;
 use utf8;
@@ -71,7 +71,7 @@ TestRail::Bin::Runs - List runs in a TestRail project matching the provided filt
 
 =head1 VERSION
 
-version 0.048
+version 0.049
 
 =head1 SYNOPSIS
 

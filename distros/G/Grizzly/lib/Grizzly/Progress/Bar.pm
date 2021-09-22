@@ -1,4 +1,7 @@
 package Grizzly::Progress::Bar;
+
+# ABSTRACT: Runs a progress bar when called
+
 use strict;
 use warnings;
 
@@ -40,11 +43,11 @@ __END__
 
 =head1 NAME
 
-Grizzly::Progress::Bar
+Grizzly::Progress::Bar - Runs a progress bar when called
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head1 DESCRIPTION
 

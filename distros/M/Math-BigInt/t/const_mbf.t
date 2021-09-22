@@ -1,4 +1,4 @@
-#!perl
+# -*- mode: perl; -*-
 
 # test Math::BigFloat constants alone (w/o Math::BigInt loading)
 

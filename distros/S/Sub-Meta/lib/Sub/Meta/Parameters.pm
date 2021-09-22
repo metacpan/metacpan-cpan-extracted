@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.13";
+our $VERSION = "0.14";
 
 use Carp ();
 use Scalar::Util ();
@@ -23,25 +23,23 @@ sub new {
     my ($class, @args) = @_;
     my %args = @args == 1 ? %{$args[0]} : @args;
 
-    _croak 'parameters reqruires args' unless exists $args{args};
-
     my $self = bless \%args => $class;
-    $self->set_args($args{args});
-
-    $self->set_invocant(delete $args{invocant}) if exists $args{invocant};
-    $self->set_nshift(delete $args{nshift}) if exists $args{nshift};
-    $self->set_slurpy(delete $args{slurpy}) if $args{slurpy};
+    $self->set_args($args{args}) if exists $args{args};
+    $self->set_invocant(delete $args{invocant}) if defined $args{invocant};
+    $self->set_nshift(delete $args{nshift}) if defined $args{nshift};
+    $self->set_slurpy(delete $args{slurpy}) if defined $args{slurpy};
 
     return $self;
 }
 
 sub nshift()    { my $self = shift; return $self->{nshift} // 0 }
 sub slurpy()    { my $self = shift; return $self->{slurpy} }
-sub args()      { my $self = shift; return $self->{args} }
+sub args()      { my $self = shift; return $self->{args} // [] }
 sub invocant()  { my $self = shift; return $self->{invocant} }
-sub invocants() { my $self = shift; return defined $self->{invocant} ? [ $self->{invocant} ] : [] }
+sub invocants() { my $self = shift; return $self->has_invocant ? [ $self->{invocant} ] : [] }
 sub all_args()  { my $self = shift; return [ @{$self->invocants}, @{$self->args} ] }
 
+sub has_args()     { my $self = shift; return defined $self->{args} }
 sub has_invocant() { my $self = shift; return defined $self->{invocant} }
 sub has_slurpy()   { my $self = shift; return defined $self->{slurpy} }
 
@@ -233,7 +231,7 @@ sub is_relaxed_same_interface_inlined {
 
     push @src => sprintf("Scalar::Util::blessed(%s) && %s->isa('Sub::Meta::Parameters')", $v, $v);
 
-    push @src => $self->slurpy->is_relaxed_same_interface_inlined(sprintf('%s->slurpy', $v)) if $self->has_slurpy; 
+    push @src => $self->slurpy->is_relaxed_same_interface_inlined(sprintf('%s->slurpy', $v)) if $self->has_slurpy;
 
     push @src => sprintf('%d == %s->nshift', $self->nshift, $v);
 
@@ -250,7 +248,7 @@ sub is_relaxed_same_interface_inlined {
 sub error_message {
     my ($self, $other) = @_;
 
-    return sprintf('must be Sub::Meta::Parameters. got: %s', $other // '')
+    return sprintf('other parameters must be Sub::Meta::Parameters. got: %s', $other // 'Undef')
         unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Parameters');
 
     if ($self->has_slurpy) {
@@ -280,7 +278,7 @@ sub error_message {
 sub relaxed_error_message {
     my ($self, $other) = @_;
 
-    return sprintf('must be Sub::Meta::Parameters. got: %s', $other // '')
+    return sprintf('other parameters must be Sub::Meta::Parameters. got: %s', $other // 'Undef')
         unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Parameters');
 
     if ($self->has_slurpy) {
@@ -307,12 +305,24 @@ sub display {
     my $self = shift;
 
     my $s = '';
-    $s .= $self->invocant->display . ': '
-        if $self->invocant && $self->invocant->display;
+    if ($self->has_invocant) {
+        my $d = $self->invocant->display;
+        $s .= "$d: " if $d;
+    }
 
-    $s .= join ', ', map { $_->display } @{$self->args};
-    $s .= ', ' if $s && $self->slurpy;
-    $s .= $self->slurpy->display if $self->slurpy;
+    if ($self->has_args) {
+        $s .= join ', ', map { $_->display } @{$self->args};
+    }
+
+    if ($self->has_slurpy) {
+        $s .= ', ' if $s;
+        $s .= $self->slurpy->display;
+    }
+
+    if(!$self->has_args && !$self->has_slurpy) {
+        $s .= '*';
+    }
+
     return $s;
 }
 
@@ -388,6 +398,12 @@ Constructor of C<Sub::Meta::Parameters>.
     method args() => ArrayRef[InstanceOf[Sub::Meta::Param]]
 
 Subroutine arguments arrayref.
+
+=head3 has_args
+
+    method has_args() => Bool
+
+Whether Sub::Meta::Parameters has args or not.
 
 =head3 set_args
 
@@ -504,7 +520,7 @@ First element of invocants.
 
 Returns an arrayref of parameter objects for the variables into which initial arguments are shifted automatically. This will usually return () for normal functions and ('$self') for methods.
 
-=head3 has_invocant 
+=head3 has_invocant
 
     method has_invocant() => Bool
 

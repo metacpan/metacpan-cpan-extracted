@@ -1,6 +1,7 @@
+BEGIN { push @INC, '.' }
 use inc::Module::Install;
 
-RTx 'RT-Extension-HistoryFilter';
+RTx('RT-Extension-HistoryFilter', { remove_files => 1 });
 
 repository 'https://github.com/cloos/RT-Extension-HistoryFilter';
 

@@ -15,11 +15,11 @@ Locale::Places - Translate places using http://download.geonames.org/
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 METHODS
 
@@ -68,6 +68,7 @@ It also takes two other arguments:
 at least one of which must be given.
 If neither $to nor $from is given,
 the code makes a best guess based on the environment.
+If no translation can be found, returns place in the original language.
 
    use Locale::Places;
 
@@ -136,7 +137,7 @@ sub translate {
 			return $data;
 		}
 	} elsif(scalar(@places) > 1) {
-		@places = $self->{'gb'}->code2({ type => $from, data => $place, ispreferredname => 1, isshortname => 0 });
+		@places = $self->{'gb'}->code2({ type => $from, data => $place, ispreferredname => 1, isshortname => undef });
 		if(scalar(@places) == 1) {
 			if(my $data = $self->{'gb'}->data({ type => $to, code2 => $places[0] })) {
 				return $data;
@@ -146,11 +147,15 @@ sub translate {
 				if(my $data = $self->{'gb'}->data({ type => $to, code2 => $places[0] })) {
 					return $data;
 				}
+				# Can't find anything
+				return $place;
 			}
 		} elsif(scalar(@places) == 0) {
-			@places = $self->{'gb'}->code2({ type => $from, data => $place, isshortname => 0 });
-			if(my $data = $self->{'gb'}->data({ type => $to, code2 => $places[0] })) {
-				return $data;
+			@places = $self->{'gb'}->code2({ type => $from, data => $place, isshortname => undef });
+			if(scalar(@places) == 1) {
+				if(my $data = $self->{'gb'}->data({ type => $to, code2 => $places[0] })) {
+					return $data;
+				}
 			}
 		}
 		Carp::croak(__PACKAGE__, ": database has more than one preferred entry for $place in language $to");

@@ -26,7 +26,7 @@
   use strict;
   use warnings;
   use vars qw(%areanames %fixed_line_regexes %mobile_regexes);
-our $VERSION = 1.20210602223213;
+our $VERSION = 1.20210921211732;
 
 
 
@@ -10955,6 +10955,7 @@ our $VERSION = 1.20210602223213;
     '1443977' => "Baltimore\,\ MD",
     '1445' => "Philadelphia",
     '1447' => "Illinois",
+    '1448' => "Florida",
     '1450' => "Quebec",
     '1450218' => "Vaudreuil\-Dorion\,\ QC",
     '1450224' => "Pr\Ã\©vost\,\ QC",
@@ -15374,6 +15375,7 @@ our $VERSION = 1.20210602223213;
     '1580938' => "Shattuck\,\ OK",
     '1580994' => "Mooreland\,\ OK",
     '1581' => "Quebec",
+    '1582' => "Pennsylvania",
     '1585' => "New\ York",
     '1585218' => "Pittsford\,\ NY",
     '1585223' => "Fairport\,\ NY",
@@ -23119,6 +23121,7 @@ our $VERSION = 1.20210602223213;
     '1770995' => "Lawrenceville\,\ GA",
     '1770997' => "Riverdale\,\ GA",
     '1770998' => "Roswell\,\ GA",
+    '1771' => "Washington\ D\.C\.",
     '1772' => "Florida",
     '1772204' => "Port\ St\.\ Lucie\,\ FL",
     '1772219' => "Stuart\,\ FL",

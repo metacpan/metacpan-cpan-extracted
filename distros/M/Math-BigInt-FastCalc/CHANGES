@@ -1,3 +1,14 @@
+0.5011 2021-09-20
+
+ * Sync test files with Math-BigInt.
+
+ * Add missing documentation.
+
+ * Make the test files only print to the standard error when there is an actual
+   error.
+
+ * Miscellaneous changes and updates to author and release test files.
+
 0.5010 2021-06-23
 
  * Make it possible to specify a smaller base length than the default.
@@ -5,6 +16,8 @@
  * Update the SUPPORT information.
 
  * Sync test files with Math-BigInt.
+
+ * Add release test files.
 
 0.5009 2019-10-10
 

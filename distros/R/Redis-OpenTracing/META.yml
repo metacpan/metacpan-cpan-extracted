@@ -1,7 +1,7 @@
 ---
 abstract: 'Wrap Redis inside OpenTracing'
 author:
-  - unknown
+  - 'Theo van Hoesel <tvanhoesel@perceptyx.com'
 build_requires:
   ExtUtils::MakeMaker: '0'
   OpenTracing::Implementation: v0.31.0
@@ -11,7 +11,6 @@ build_requires:
   Test::MockObject: '0'
   Test::Most: '0'
   Test::OpenTracing::Integration: v0.102.1
-  Test::RedisServer: '0'
 configure_requires:
   ExtUtils::MakeMaker::CPANfile: '0.09'
 dynamic_config: 0
@@ -28,9 +27,8 @@ no_index:
 requires:
   Moo: '0'
   OpenTracing::AutoScope: v0.107.3
-  Redis: '0'
   Scalar::Util: '0'
   Syntax::Feature::Maybe: '0'
   Types::Standard: '0'
-version: v0.0.4
+version: v0.1.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

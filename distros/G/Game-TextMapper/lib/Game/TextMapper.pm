@@ -16,7 +16,7 @@
 
 package Game::TextMapper;
 
-our $VERSION = 1.02;
+our $VERSION = 1.03;
 
 use Game::TextMapper::Log;
 use Game::TextMapper::Point;
@@ -634,6 +634,12 @@ Game::TextMapper - a web app to generate maps based on text files
 The script parses a text description of a hex map and produces SVG output. Use
 your browser to view SVG files and use Inkscape to edit them.
 
+=head2 Tutorial
+
+Note that if you look at the help page
+L<online|https://campaignwiki.org/text-mapper/help> there are links to run all
+these examples.
+
 Here's a small example:
 
     grass attributes fill="green"
@@ -887,8 +893,7 @@ directory.
     0302 sand
     0303 sand
 
-
-=head3 Default library
+=head3 The default library
 
 Source of the map:
 L<http://themetalearth.blogspot.ch/2011/03/opd-entry.html>
@@ -934,7 +939,6 @@ L<https://campaignwiki.org/contrib/gridmapper.txt>
 
 Result:
 L<https://campaignwiki.org/text-mapper?type=square&map=include+gridmapper-example.txt>
-
 
 =head2 Large Areas
 
@@ -1067,44 +1071,81 @@ this into account when putting a license onto the map. Thus, if your map does
 not include the hex 0101, you can't use coordinates for the license text around
 the origin at (0,0) – you'll have to move it around.
 
-=head2 Random
+=head3 Smale
 
-The Random button generates a random landscape based on the algorithm
-developed by Erin D. Smale. See
-L<http://www.welshpiper.com/hex-based-campaign-design-part-1/> and
-L<http://www.welshpiper.com/hex-based-campaign-design-part-2/> for
-more information. The output uses the I<Gnomeyland> icons by Gregory
-B. MacKenzie. These are licensed under the Creative Commons
-Attribution-ShareAlike 3.0 Unported License. To view a copy of this
-license, visit L<http://creativecommons.org/licenses/by-sa/3.0/>.
+The default algorithm was developed by Erin D. Smale. See L<Hex-based Campaign
+Design (Part 1)|http://www.welshpiper.com/hex-based-campaign-design-part-1/> and
+L<Hex-based Campaign Design (Part
+2)|http://www.welshpiper.com/hex-based-campaign-design-part-2/> for more
+information.
 
-If you're curious: (11,11) is the starting hex.
+The output uses the I<Gnomeyland> icons by Gregory B. MacKenzie. These are
+licensed under the Creative Commons Attribution-ShareAlike 3.0 Unported License.
+To view a copy of this license, visit
+L<http://creativecommons.org/licenses/by-sa/3.0/>. If you use these maps in your
+works, you must take this into account.
 
-=head2 Alpine
+See L<Game::TextMapper::Smale> for more information.
 
-The Alpine button generates a random landscape based on an algorithm developed
-by Alex Schroeder. The output also uses the I<Gnomeyland> icons by Gregory B.
-MacKenzie. These are licensed under the Creative Commons Attribution-ShareAlike
-3.0 Unported License. To view a copy of this license, visit
-L<http://creativecommons.org/licenses/by-sa/3.0/>.
+=head3 Alpine
 
-=head2 Gridmapper
+The Alpine algorithm was developed by Alex Schroeder. See L<Alpine map generator
+1|https://alexschroeder.ch/wiki/2016-08-06_Alpine_Map_Generator> and L<Alpine
+map generator 2|https://alexschroeder.ch/wiki/2016-08-16_Alpine_Map_Generator>
+for more information.
 
-The Gridmapper button generates a random mini-dungeon based on the algorithm by
-Alex Schroeder and based on geomorph sketches by Robin Green.
+The output also uses the I<Gnomeyland> icons by Gregory B. MacKenzie. These are
+licensed under the Creative Commons Attribution-ShareAlike 3.0 Unported License.
+To view a copy of this license, visit
+L<http://creativecommons.org/licenses/by-sa/3.0/>. If you use these maps in your
+works, you must take this into account.
 
-=head2 Islands
+See L<Game::TextMapper::Schroeder::Alpine> for more information.
 
-The Island links generate a random landscape based on the algorithm by Alex
-Schroeder. The output also uses the I<Gnomeyland> icons by Gregory B. MacKenzie.
-These are licensed under the Creative Commons Attribution-ShareAlike 3.0
-Unported License. To view a copy of this license, visit
-L<http://creativecommons.org/licenses/by-sa/3.0/>.
+=head3 Apocalypse
 
-=head2 Traveller
+The Alpine algorithm was developed by Alex Schroeder. See L<Hex describing the
+post-apocalypse|https://alexschroeder.ch/wiki/2020-10-02_Hex_describing_the_post-apocalypse>
+for more information.
+
+The output uses the default library. This library is dedicated to the public.
+domain.
+
+See L<Game::TextMapper::Schroeder::Alpine> for more information.
+
+=head3 Gridmapper
+
+The Gridmapper algorithm was developed by Alex Schroeder and is based on
+geomorph sketches by Robin Green. See L<The Nine Forms of the Five Room
+Dungeon|https://gnomestew.com/the-nine-forms-of-the-five-room-dungeon/> by
+Matthew J. Neagley for more information.
+
+The output uses the Dungeons library. This library is dedicated to the public
+domain.
+
+See L<Game::TextMapper::Gridmapper> for more information.
+
+=head3 Islands
+
+The Island algorithm was developed by Alex Schroeder. See
+L<https://alexschroeder.ch/wiki/2020-04-25_Island_generator_using_J> and
+L<https://alexschroeder.ch/wiki/2020-05-01_Island_map_generator_and_Text_Mapper>
+for more information.
+
+The output also uses the I<Gnomeyland> icons by Gregory B. MacKenzie. These are
+licensed under the Creative Commons Attribution-ShareAlike 3.0 Unported License.
+To view a copy of this license, visit
+L<http://creativecommons.org/licenses/by-sa/3.0/>. If you use these maps in your
+works, you must take this into account.
+
+See L<Game::TextMapper::Schroeder::Islands> for more information.
+
+=head3 Traveller
 
 The Traveller link generates a random landscape based on Classic Traveller with
 additions by Vicky Radcliffe and Alex Schroeder.
+
+See L<Game::TextMapper::Traveller> for more information.
 
 =head2 Border Adjustments
 
@@ -1290,23 +1331,19 @@ library will access the files installed with the entire distribution.
 You can call the script from the command line. The B<render> command reads a map
 description from STDIN and prints it to STDOUT.
 
-    perl text-mapper.pl render < contrib/forgotten-depths.txt > forgotten-depths.svg
+    text-mapper render < contrib/forgotten-depths.txt > forgotten-depths.svg
+
+See L<Game::TextMapper::Command::render> for more.
 
 The B<random> command prints a random map description to STDOUT.
 
-    perl text-mapper.pl random > map.txt
+    text-mapper random > map.txt
+
+See L<Game::TextMapper::Command::random> for more.
 
 Thus, you can pipe the random map in order to render it:
 
-    perl text-mapper.pl random | perl text-mapper.pl render > map.svg
-
-You can read this documentation in a text terminal, too:
-
-    pod2text text-mapper.pl
-
-Alternatively:
-
-    perl text-mapper.pl get /help | w3m -T text/html
+    text-mapper random | text-mapper render > map.svg
 
 =cut
 

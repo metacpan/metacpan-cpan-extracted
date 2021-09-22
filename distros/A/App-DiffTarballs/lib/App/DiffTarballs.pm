@@ -1,9 +1,9 @@
 package App::DiffTarballs;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-09'; # DATE
+our $DATE = '2021-05-10'; # DATE
 our $DIST = 'App-DiffTarballs'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -26,8 +26,9 @@ $SPEC{diff_tarballs} = {
     summary => 'Diff contents of two tarballs',
     description => <<'_',
 
-This utility extracts the two tarballs to temporary directories and then perform
-`diff -ruN` against the two. It deletes the temporary directories afterwards.
+This utility extracts the two tarballs to temporary directories and then
+performs `diff -ruN` against the two. It deletes the temporary directories
+afterwards.
 
 _
     args => {
@@ -150,7 +151,7 @@ App::DiffTarballs - Diff contents of two tarballs
 
 =head1 VERSION
 
-This document describes version 0.004 of App::DiffTarballs (from Perl distribution App-DiffTarballs), released on 2021-05-09.
+This document describes version 0.005 of App::DiffTarballs (from Perl distribution App-DiffTarballs), released on 2021-05-10.
 
 =head1 SYNOPSIS
 
@@ -180,8 +181,9 @@ Examples:
 
 =back
 
-This utility extracts the two tarballs to temporary directories and then perform
-C<diff -ruN> against the two. It deletes the temporary directories afterwards.
+This utility extracts the two tarballs to temporary directories and then
+performs C<diff -ruN> against the two. It deletes the temporary directories
+afterwards.
 
 This function is not exported.
 

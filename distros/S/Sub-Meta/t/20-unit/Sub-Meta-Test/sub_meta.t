@@ -57,8 +57,8 @@ subtest 'Fail: invalid etc' => sub {
         [ 'line()',           D(), '<UNDEF>', '', 999, D() ],
         [ 'prototype()',      D(), '<UNDEF>', '', '$$', D() ],
         [ 'attribute()',      D(), '<UNDEF>', '', D(), D() ],
-        [ 'parameters()',     D(), '<UNDEF>', '', D(), D() ],
-        [ 'returns()',        D(), '<UNDEF>', '', D(), D() ],
+        [ 'parameters()',     D(), D(), 'eq', D(), D() ],
+        [ 'returns()',        D(), D(), 'eq', D(), D() ],
         [ 'is_constant()',    D(), !!0, 'eq', !!1, D() ],
         [ 'is_method()',      D(), !!0, 'eq', !!1, D() ],
         [ 'has_subname()',    D(), '', 'eq', !!1, D() ],
@@ -67,8 +67,6 @@ subtest 'Fail: invalid etc' => sub {
         [ 'has_line()',       D(), '', 'eq', !!1, D() ],
         [ 'has_prototype()',  D(), '', 'eq', !!1, D() ],
         [ 'has_attribute()',  D(), '', 'eq', !!1, D() ],
-        [ 'has_parameters()', D(), '', 'eq', !!1, D() ],
-        [ 'has_returns()',    D(), '', 'eq', !!1, D() ],
     ];
 };
 

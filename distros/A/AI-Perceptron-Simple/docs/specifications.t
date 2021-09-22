@@ -75,9 +75,18 @@ done_testing;
 #       [v] false_discovery_rate    [v] false_omission_rate    [v] balanced_accuracy
 #
 # Version 1.04
+#   [v] fix docs
+#   [v] change die to croak for file opening
+#   [v] fixed yaml nerve not loading back as an AI::Perceptron::Simple object
+#
+# Version 1.05
 #   -colorise the confusion matrix if option is enabled
+#       - sum: green
+#       - etc
 #   -add public function:
 #       -predict result from non-csv input (single row), might be useful when gui is involved
+#
+# Version 1.06
 #   -add a simple tutorial
 #   -smart tuning feature: automatically increase/decrease learning_rate in multiples in training stage
 #

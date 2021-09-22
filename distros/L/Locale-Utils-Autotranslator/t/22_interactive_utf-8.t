@@ -6,6 +6,7 @@ use warnings;
 use utf8;
 
 use Moo;
+use English qw($OS_ERROR $INPUT_RECORD_SEPARATOR);
 use Path::Tiny qw(path);
 use Test::More tests => 4;
 use Test::NoWarnings;
@@ -21,10 +22,21 @@ my @files = (
     't/LocaleData/STDIN.interactive.txt',
     't/LocaleData/STDIN.interactive_end.txt',
 );
+# \n OS compatible
+for (@files) {
+    open my $fhr, '<', $_ or die "openr $_: $OS_ERROR";
+    local $INPUT_RECORD_SEPARATOR = undef;
+    my $content = <$fhr>;
+    close $fhr;
+    $content =~ s{\r? \n}{\n}xmsg;
+    open my $fhw, '>', $_ or die "openw $_: $OS_ERROR";
+    print {$fhw} $content or die "print $_: $OS_ERROR";
+    close $fhw or die "close $_: $OS_ERROR";
+}
 {
     local $_ = shift @files;
     open STDIN, '<', $_
-        or die "Can't open '$_': $!";
+        or die "Can't open '$_': $OS_ERROR";
 }
 
 my $obj = Locale::Utils::Autotranslator::Interactive
@@ -34,7 +46,7 @@ my $obj = Locale::Utils::Autotranslator::Interactive
         my ( $self, $msgid, $msgstr ) = @_;
             local $_ = shift @files;
             open STDIN, '<', $_
-                or die "Can't open '$_': $!";
+                or die "Can't open '$_': $OS_ERROR";
             return 1;
         },
     )
@@ -61,7 +73,7 @@ unlink $output_filename;
 
 eq_or_diff
     [ split m{ \r? \n }xms, $content ],
-    [ split m{ \r? \n }xms, <<"EOT" ],
+    [ split m{ \n }xms, <<"EOT" ],
 msgid ""
 msgstr ""
 "Project-Id-Version: \\n"

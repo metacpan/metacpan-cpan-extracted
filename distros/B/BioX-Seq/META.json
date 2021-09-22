@@ -1,22 +1,23 @@
 {
    "abstract" : "a (very) basic biological sequence object",
    "author" : [
-      "Jeremy Volkening <jdv@base2bio.com>"
+      "Jeremy Volkening <volkening@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "BioX-Seq",
    "prereqs" : {
       "build" : {
          "requires" : {
-            "File::Which" : "0",
+            "Compress::BGZF" : "0",
+            "IPC::Cmd" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0"
          }
@@ -28,10 +29,9 @@
       },
       "runtime" : {
          "requires" : {
-            "Compress::BGZF" : "0",
             "Cwd" : "0",
             "File::Basename" : "0",
-            "File::Which" : "0",
+            "IPC::Cmd" : "0",
             "POSIX" : "0",
             "Scalar::Util" : "0"
          }
@@ -40,7 +40,7 @@
    "provides" : {
       "BioX::Seq" : {
          "file" : "lib/BioX/Seq.pm",
-         "version" : "0.007003"
+         "version" : "0.008002"
       },
       "BioX::Seq::Fetch" : {
          "file" : "lib/BioX/Seq/Fetch.pm"
@@ -70,6 +70,6 @@
          "url" : "https://github.com/jvolkening/p5-BioX-Seq"
       }
    },
-   "version" : "0.007003",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.008002",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

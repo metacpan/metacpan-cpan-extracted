@@ -257,7 +257,7 @@ sub _open {
 				file => $slurp_file
 			)};
 
-			# Don't use blank lines or comments
+			# Ignore blank lines or lines starting with # in the CSV file
 			unless($self->{no_entry}) {
 				@data = grep { $_->{'entry'} !~ /^\s*#/ } grep { defined($_->{'entry'}) } @data;
 			}
@@ -585,6 +585,12 @@ sub AUTOLOAD {
 		} else {
 			if($self->{'logger'}) {
 				$self->{'logger'}->debug("AUTOLOAD params $key isn't defined");
+			}
+			if($done_where) {
+				$query .= " AND $key IS NULL";
+			} else {
+				$query .= " WHERE $key IS NULL";
+				$done_where = 1;
 			}
 		}
 	}

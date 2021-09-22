@@ -1,4 +1,39 @@
 Revision history for SPVM
+0.9014  2021-09-21
+        [CHANGES]
+        * native api get_instance_method_id return -1 if the method is class method
+        * native api get_class_method_id return -1 if the method is not class method
+        * add native api get_instance_method_id_static
+        
+        [BUGFIXES]
+        * None
+
+0.9013  2021-09-14
+        [CHANGES]
+        * remove sub and self keyword and add method and static keyword. Sorry.
+          [Before]
+          sub foo : void  ($self : self) {}
+          sub bar: void  () {}
+          
+          [After]
+          method foo : void  () {}
+          static method bar : void  () {}
+        
+        * rename native api get_method_id_by_object to get_instance_method_id
+        * rename native api get_method_id to get_class_method_id
+        * Native api method signature don't need self.
+          [Before]
+          "int(self,long)"
+          [After]
+          "int(long)
+        * rename native api call_callback_method_by_name to call_instance_method_by_name
+        * rename native api call_spvm_method_by_name to call_class_method_by_name
+        * add native api call_class_method. This is alias for call_spvm_method
+        * add native api call_instance_method. This is alias for call_spvm_method
+        
+        [BUGFIXES]
+        * None
+
 0.9012  2021-09-10
         [CHANGES]
         * Exchange API call method string arugment copy count is reduced

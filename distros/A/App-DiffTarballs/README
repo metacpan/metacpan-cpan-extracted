@@ -2,8 +2,8 @@ NAME
     App::DiffTarballs - Diff contents of two tarballs
 
 VERSION
-    This document describes version 0.004 of App::DiffTarballs (from Perl
-    distribution App-DiffTarballs), released on 2021-05-09.
+    This document describes version 0.005 of App::DiffTarballs (from Perl
+    distribution App-DiffTarballs), released on 2021-05-10.
 
 SYNOPSIS
     See the included script diff-tarballs.
@@ -26,7 +26,7 @@ FUNCTIONS
          );
 
     This utility extracts the two tarballs to temporary directories and then
-    perform "diff -ruN" against the two. It deletes the temporary
+    performs "diff -ruN" against the two. It deletes the temporary
     directories afterwards.
 
     This function is not exported.

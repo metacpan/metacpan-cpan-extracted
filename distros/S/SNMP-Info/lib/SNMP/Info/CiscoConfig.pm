@@ -39,7 +39,7 @@ use SNMP::Info;
 
 our ($VERSION, %MIBS, %FUNCS, %GLOBALS, %MUNGE);
 
-$VERSION = '3.78';
+$VERSION = '3.80';
 
 %MIBS = (
     'CISCO-CONFIG-COPY-MIB' => 'ccCopyTable',

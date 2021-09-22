@@ -10,7 +10,7 @@
 # ABSTRACT: Modify the configuration of an application
 
 package App::Cme::Command::modify ;
-$App::Cme::Command::modify::VERSION = '1.032';
+$App::Cme::Command::modify::VERSION = '1.033';
 use strict;
 use warnings;
 use 5.10.1;
@@ -28,21 +28,21 @@ sub validate_args {
     $self->process_args($opt,$args);
     $self->usage_error("No modification instructions given on command line")
         unless @$args or $opt->{save};
+    return;
 }
 
 sub opt_spec {
     my ( $class, $app ) = @_;
     return ( 
         [ "backup:s"  => "Create a backup of configuration files before saving." ],
-        [ "verbose!" => "show execution of the modification instructions" ],
         $class->cme_global_options,
     );
 }
 
 sub usage_desc {
-  my ($self) = @_;
-  my $desc = $self->SUPER::usage_desc; # "%c COMMAND %o"
-  return "$desc [application] [file ] instructions";
+    my ($self) = @_;
+    my $desc = $self->SUPER::usage_desc; # "%c COMMAND %o"
+    return "$desc [application] [file ] instructions";
 }
 
 sub description {
@@ -65,6 +65,8 @@ sub execute {
     $root->deep_check; # consistency check
 
     $self->save($inst,$opt) ;
+
+    return;
 }
 
 1;
@@ -81,7 +83,7 @@ App::Cme::Command::modify - Modify the configuration of an application
 
 =head1 VERSION
 
-version 1.032
+version 1.033
 
 =head1 SYNOPSIS
 
@@ -132,7 +134,7 @@ See L<cme/"Global Options">.
 
 =over
 
-=item -save
+=item -savek
 
 Force a save even if no change was done. Useful to reformat the configuration file.
 

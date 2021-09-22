@@ -1,8 +1,10 @@
 Build.PL
 Changes
 hax/lexer-additions.c.inc
+hax/make_argcheck_aux.c.inc
 hax/make_argcheck_ops.c.inc
 hax/newOP_CUSTOM.c.inc
+hax/op_sibling.c.inc
 hax/perl-backcompat.c.inc
 hax/wrap_keyword_plugin.c.inc
 inc/Module/Build/with/XSTests.pm
@@ -42,6 +44,7 @@ t/43probing.t
 t/50flags-autosemi.t
 t/60line.t
 t/70infix.t
+t/71infix-wrapper.t
 t/99pod.t
 t/build.xs
 t/flags.xs

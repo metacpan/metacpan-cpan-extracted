@@ -1,5 +1,11 @@
 Revision history for Perl extension Form::Tiny.
 
+2.02 Sat Sep 18 16:00:00 2021
+	- new feature: additional field validators
+	- deprecate three parameter field filter
+	- deprecate Form::Tiny::Filter 'field' property
+	- fix and document Corinna compatibility
+
 2.01 Fri May 28 18:00:00 2021
 	- new feature: field filters
 	- new feature: after_error hook

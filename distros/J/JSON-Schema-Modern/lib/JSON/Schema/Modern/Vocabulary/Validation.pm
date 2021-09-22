@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Validation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Validation vocabulary
 
-our $VERSION = '0.517';
+our $VERSION = '0.519';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -13,7 +13,7 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use strictures 2;
 use List::Util 'any';
 use Ref::Util 0.100 'is_plain_arrayref';
-use JSON::Schema::Modern::Utilities qw(is_type is_equal is_elements_unique E assert_keyword_type assert_pattern);
+use JSON::Schema::Modern::Utilities qw(is_type is_equal is_elements_unique E assert_keyword_type assert_pattern jsonp);
 use Moo;
 use namespace::clean;
 
@@ -313,11 +313,11 @@ sub _traverse_keyword_dependentRequired {
 
   my $valid = 1;
   foreach my $property (sort keys %{$schema->{dependentRequired}}) {
-    $valid = E({ %$state, _schema_path_suffix => $property }, 'dependentRequired value is not an array'), next
+    $valid = E({ %$state, _schema_path_suffix => $property }, 'value is not an array'), next
       if not is_type('array', $schema->{dependentRequired}{$property});
 
     foreach my $index (0..$#{$schema->{dependentRequired}{$property}}) {
-      $valid = E({ %$state, _schema_path_suffix => $property }, 'element #%d is not a string', $index)
+      $valid = E({ %$state, _schema_path_suffix => [ $property, $index ] }, 'element #%d is not a string', $index)
         if not is_type('string', $schema->{dependentRequired}{$property}[$index]);
     }
 
@@ -374,7 +374,7 @@ JSON::Schema::Modern::Vocabulary::Validation - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.517
+version 0.519
 
 =head1 DESCRIPTION
 

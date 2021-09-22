@@ -10,7 +10,7 @@
 # ABSTRACT: Fix the configuration of an application
 
 package App::Cme::Command::fix ;
-$App::Cme::Command::fix::VERSION = '1.032';
+$App::Cme::Command::fix::VERSION = '1.033';
 use strict;
 use warnings;
 use 5.10.1;
@@ -25,6 +25,7 @@ sub validate_args {
     my ($self, $opt, $args) = @_;
     $self->check_unknown_args($args);
     $self->process_args($opt,$args);
+    return;
 }
 
 sub opt_spec {
@@ -58,12 +59,13 @@ sub execute {
     foreach my $path (@fix_from) {
         my $node_to_fix = $inst->config_root->grab($path);
         my $msg = "cme: running fix on ".$inst->name." configuration";
-        $msg .= "from node", $node_to_fix->name if $path;
+        $msg .= "from node ". $node_to_fix->name if $path;
         say $msg. "..." if $opt->{verbose};
         $node_to_fix->apply_fixes($opt->{fix_filter});
     }
 
     $self->save($inst,$opt) ;
+    return;
 }
 
 1;
@@ -80,7 +82,7 @@ App::Cme::Command::fix - Fix the configuration of an application
 
 =head1 VERSION
 
-version 1.032
+version 1.033
 
 =head1 SYNOPSIS
 

@@ -27,8 +27,18 @@ my $plversion = do "$maindir/OPTIONS!";
 
 my $tmpdir = tempdir( CLEANUP => 1 );
 
+# Test numbers to skip on incompatible versions of PLplot
+my %skip_num = (
+  '01' => qr/^5\.13\./,
+  '15' => qr/^5\.13\./,
+);
+
+my $plgver = plgver();
 foreach my $plplot_test_script (@scripts) {
   my ($num) = ($plplot_test_script =~ /x(\d\d)\.pl/);
+SKIP: {
+  skip "Skipping test script $num on PLplot $plgver", 1 if exists $skip_num{$num} && $plgver =~ $skip_num{$num};
+subtest "Test script: $num" => sub {
   (my $c_code = $plplot_test_script) =~ s/\.pl/c\.c/;
 
   # Compile C version
@@ -57,6 +67,8 @@ foreach my $plplot_test_script (@scripts) {
     (my $reffile = $perlfile) =~ s/x(\d\d)p/x${1}c/;
     cmp_files($perlfile, $reffile);
   }
+};
+}
 }
 
 done_testing;

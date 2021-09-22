@@ -8,11 +8,9 @@ build_requires:
   Test::More: '0.98'
   Test::TCP: '2.00'
 configure_requires:
-  CPAN::Meta: '0'
-  CPAN::Meta::Prereqs: '0'
-  Module::Build: '0.38'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v1.0.0, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,7 +29,7 @@ no_index:
 provides:
   Monoceros:
     file: lib/Monoceros.pm
-    version: '0.27'
+    version: '0.28'
   Monoceros::Server:
     file: lib/Monoceros/Server.pm
   Plack::Handler::Monoceros:
@@ -44,11 +42,16 @@ requires:
   Net::CIDR::Lite: '0'
   POSIX::getpeername: '0'
   Parallel::Prefork: '0.14'
-  Plack: '1.0023'
+  Plack: '1.0035'
   Starlet: '0.18'
   perl: '5.008005'
 resources:
   bugtracker: https://github.com/kazeburo/Monoceros/issues
   homepage: https://github.com/kazeburo/Monoceros
   repository: git://github.com/kazeburo/Monoceros.git
-version: '0.27'
+version: '0.28'
+x_contributors:
+  - 'Michael Kröll <michael.kroell@geizhals.at>'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

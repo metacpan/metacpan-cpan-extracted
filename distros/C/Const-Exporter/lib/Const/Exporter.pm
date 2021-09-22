@@ -7,7 +7,7 @@ use v5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = 'v1.2.0';
+our $VERSION = 'v1.2.1';
 
 use Carp;
 use Const::Fast;
@@ -243,7 +243,7 @@ Const::Exporter - Declare constants for export.
 
 =head1 VERSION
 
-version v1.2.0
+version v1.2.1
 
 =head1 SYNOPSIS
 

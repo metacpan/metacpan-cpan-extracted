@@ -37,6 +37,7 @@ my @files = (
     't/dump-perl-exports.t',
     't/dupes.t',
     't/english.t',
+    't/explodes.t',
     't/export-tags.t',
     't/exported-variables.t',
     't/find-bin.t',

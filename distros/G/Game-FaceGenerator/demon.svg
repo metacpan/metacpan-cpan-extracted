@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   width="11in"
+   height="8.5in"
+   viewBox="0 0 11 8.5"
+   id="svg1767"
+   sodipodi:docname="demon.svg"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)">
+  <style
+     id="style1744">
+    line, rect, circle, ellipse, path {
+    fill: white; stroke: #e5e5e5; stroke-width: 0.02;
+    }
+  </style>
+  <defs>
+    <g id="face">
+      <rect
+	 style="fill:#ffffff;stroke:#e5e5e5;stroke-width:0.02"
+	 y="0"
+	 x="0"
+	 id="rect1746"
+	 height="1.5"
+	 width="2" />
+      <path
+	 inkscape:connector-curvature="0"
+	 id="path5591"
+	 d="M 0.54606078,0.86141562 0.28333342,1.2091427 0.68772749,0.97217318"
+	 style="opacity:1;vector-effect:none;fill:#ffffff;fill-opacity:1;stroke:#e5e5e5;stroke-width:0.02;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+      <path
+	 sodipodi:nodetypes="cssssssc"
+	 inkscape:connector-curvature="0"
+	 id="ellipse1748"
+	 d="m 1.2643204,0.39452268 c 0.1818285,0.0361458 0.3106122,0.16380801 0.3477455,0.2862384 0.017785,0.0586391 -0.027869,0.20816326 -0.0054,0.2974965 C 1.6431814,1.123439 1.3326515,1.0896211 1.2422636,1.1623157 1.163939,1.2253085 1.1241521,1.1919255 0.99999998,1.1902271 0.6962718,1.1860721 0.53019953,1.1794708 0.44999999,0.89583331 0.29750206,0.35650143 0.58322153,0.12248474 1.0386364,0.28462118 1.3603673,0.39916361 1.6678893,0.28448025 1.868125,0.1297345"
+	 style="fill:#ffffff;stroke:#e5e5e5;stroke-width:0.02" />
+      <path
+	 sodipodi:nodetypes="cc"
+	 inkscape:connector-curvature="0"
+	 id="line1750"
+	 d="M 0.75742424,0.92416664 C 0.97034395,0.97723998 1.3524227,1.09683 1.275,0.94583328"
+	 style="fill:#ffffff;stroke:#e5e5e5;stroke-width:0.02" />
+      <line
+	 style="fill:#ffffff;stroke:#e5e5e5;stroke-width:0.02"
+	 id="line1752"
+	 y2="1.3958336"
+	 y1="0.3958334"
+	 x2="1"
+	 x1="1" />
+      <line
+	 style="fill:#ffffff;stroke:#e5e5e5;stroke-width:0.02"
+	 id="line1754"
+	 y2="0.94583321"
+	 y1="0.84583318"
+	 x2="1.275"
+	 x1="1.275" />
+      <line
+	 style="fill:#ffffff;stroke:#e5e5e5;stroke-width:0.02"
+	 id="line1756"
+	 y2="1.0458333"
+	 y1="0.74583322"
+	 x2="1.4125"
+	 x1="1.4125" />
+      <ellipse
+	 style="fill:#ffffff;stroke:#e5e5e5;stroke-width:0.02"
+	 ry="0.076212116"
+	 rx="0.12"
+	 id="circle1758"
+	 cy="1.0950001"
+	 cx="1" />
+      <path
+	 sodipodi:nodetypes="ccc"
+	 style="fill:#ffffff;stroke:#e5e5e5;stroke-width:0.02"
+	 inkscape:connector-curvature="0"
+	 id="path1762"
+	 d="M 0.99742424,1.1766665 C 0.95301894,1.1153951 0.94786742,1.0697562 1,1.0162121 1.049557,1.074908 1.049557,1.1231224 0.99742424,1.1766665 Z" />
+      <ellipse
+	 style="fill:#ffffff;stroke:#e5e5e5;stroke-width:0.01901473"
+	 id="circle1760"
+	 cy="0.77991641"
+	 cx="1.0111451"
+	 rx="0.1311451"
+	 ry="0.099250071" />
+      <path
+	 style="fill:#ffffff;stroke:#e5e5e5;stroke-width:0.01901473"
+	 inkscape:connector-curvature="0"
+	 id="path1764"
+	 d="m 1.0111451,0.87089578 a 0.32786277,0.16541679 0 0 1 0,-0.1902293 0.32786277,0.16541679 0 0 1 0,0.1902293 z" />
+      <path
+	 inkscape:connector-curvature="0"
+	 id="path5554"
+	 d="m 1.5918185,0.90568186 c 0.1776326,-0.048093 0.1881634,-0.023079 0.267879,-0.0283333"
+	 style="opacity:1;vector-effect:none;fill:#ffffff;fill-opacity:1;stroke:#e5e5e5;stroke-width:0.02;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+	 sodipodi:nodetypes="cc" />
+      <path
+	 style="opacity:1;vector-effect:none;fill:#ffffff;fill-opacity:1;stroke:#e5e5e5;stroke-width:0.02;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+	 d="M 0.54606078,0.54507585 0.28333342,0.19734847 0.68772749,0.43431825"
+	 id="path5575"
+	 inkscape:connector-curvature="0" />
+      <path
+	 style="opacity:1;vector-effect:none;fill:#ffffff;fill-opacity:1;stroke:#e5e5e5;stroke-width:0.02;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+	 d="M 0.83969727,0.40696982 C 0.79428507,0.31338393 0.73623216,0.34601017 0.60787895,0.14681822 0.70769595,0.13415152 0.74000874,0.16313412 0.83766854,0.20202792 1.0635061,0.29196962 1.2047247,0.35433766 1.1848488,0.42242435"
+	 id="path5597"
+	 inkscape:connector-curvature="0"
+	 sodipodi:nodetypes="ccsc" />
+      <path
+	 style="opacity:1;vector-effect:none;fill:#ffffff;fill-opacity:1;stroke:#e5e5e5;stroke-width:0.02;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+	 d="M 0.89121241,0.35030313 0.69287901,0.20090915 1.0869697,0.35030302 1.012273,0.35803026"
+	 id="path5604"
+	 inkscape:connector-curvature="0"
+	 sodipodi:nodetypes="cccc" />
+      <path
+	 style="fill:#ffffff;stroke:#e5e5e5;stroke-width:0.02"
+	 d="m 0.72212106,0.43189401 c 0.0943599,0.2483062 0.2168719,0.57474139 0.002576,0.79651539"
+	 id="line5613"
+	 inkscape:connector-curvature="0"
+	 sodipodi:nodetypes="cc" />
+      </g>
+    </defs>
+  <use xlink:href="#face" x="0.5" y="0.5" />
+  <use xlink:href="#face" x="2.5" y="0.5"/>
+  <use xlink:href="#face" x="4.5" y="0.5"/>
+  <use xlink:href="#face" x="6.5" y="0.5"/>
+  <use xlink:href="#face" x="8.5" y="0.5"/>
+
+  <use xlink:href="#face" x="0.5" y="2.0"/>
+  <use xlink:href="#face" x="2.5" y="2.0"/>
+  <use xlink:href="#face" x="4.5" y="2.0"/>
+  <use xlink:href="#face" x="6.5" y="2.0"/>
+  <use xlink:href="#face" x="8.5" y="2.0"/>
+
+  <use xlink:href="#face" x="0.5" y="3.5"/>
+  <use xlink:href="#face" x="2.5" y="3.5"/>
+  <use xlink:href="#face" x="4.5" y="3.5"/>
+  <use xlink:href="#face" x="6.5" y="3.5"/>
+  <use xlink:href="#face" x="8.5" y="3.5"/>
+
+  <use xlink:href="#face" x="0.5" y="5.0"/>
+  <use xlink:href="#face" x="2.5" y="5.0"/>
+  <use xlink:href="#face" x="4.5" y="5.0"/>
+  <use xlink:href="#face" x="6.5" y="5.0"/>
+  <use xlink:href="#face" x="8.5" y="5.0"/>
+
+  <use xlink:href="#face" x="0.5" y="6.5"/>
+  <use xlink:href="#face" x="2.5" y="6.5"/>
+  <use xlink:href="#face" x="4.5" y="6.5"/>
+  <use xlink:href="#face" x="6.5" y="6.5"/>
+  <use xlink:href="#face" x="8.5" y="6.5"/>
+
+</svg>

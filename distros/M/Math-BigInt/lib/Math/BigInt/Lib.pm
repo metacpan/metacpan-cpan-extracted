@@ -4,7 +4,7 @@ use 5.006001;
 use strict;
 use warnings;
 
-our $VERSION = '1.999823';
+our $VERSION = '1.999824';
 
 use Carp;
 
@@ -350,6 +350,44 @@ sub _inc {
 sub _dec {
     my ($class, $x) = @_;
     $class -> _sub($x, $class -> _one());
+}
+
+# Signed addition.
+
+sub _sadd {
+    my $class = shift;
+    my ($xa, $xs, $ya, $ys) = @_;
+
+    # If the signs are equal we can add them (-5 + -3 => -(5 + 3) => -8)
+    if ($xs eq $ys) {
+        $xa = $class -> _add($xa, $ya);
+    } else {
+        my $acmp = $class -> _acmp($xa, $ya);   # x = y
+        if ($acmp == 0) {
+            $xa = $class -> _zero();
+            $xs = '+';
+            return $xa, $xs;
+        }
+        if ($acmp > 0) {                        # x > y
+            $xa = $class -> _sub($xa, $ya);
+        } else {                                # x < y
+            $xa = $class -> _sub($ya, $xa, 1);
+            $xs = $ys;
+        }
+    }
+
+    $xs = '+' if $xs eq '-' && $class -> _is_zero($xa);     # no "-0"
+    return $xa, $xs;
+}
+
+# Signed subtraction.
+
+sub _ssub {
+    my $class = shift;
+    my ($xa, $xs, $ya, $ys) = @_;
+
+    $ys = $ys eq '+' ? '-' : '+';           # swap sign of second operand ...
+    $class -> _sadd($xa, $xs, $ya, $ys);    # ... and let _sadd() do the job
 }
 
 ##############################################################################
@@ -2140,24 +2178,38 @@ arbitrarily large.
 
 =item CLASS-E<gt>_add(OBJ1, OBJ2)
 
-Returns the result of adding OBJ2 to OBJ1.
+Addition. Returns the result of adding OBJ2 to OBJ1.
 
 =item CLASS-E<gt>_mul(OBJ1, OBJ2)
 
-Returns the result of multiplying OBJ2 and OBJ1.
+Multiplication. Returns the result of multiplying OBJ2 and OBJ1.
 
 =item CLASS-E<gt>_div(OBJ1, OBJ2)
 
-In scalar context, returns the quotient after dividing OBJ1 by OBJ2 and
-truncating the result to an integer. In list context, return the quotient and
-the remainder.
+Division. In scalar context, returns the quotient after dividing OBJ1 by OBJ2
+and truncating the result to an integer. In list context, return the quotient
+and the remainder.
 
 =item CLASS-E<gt>_sub(OBJ1, OBJ2, FLAG)
 
 =item CLASS-E<gt>_sub(OBJ1, OBJ2)
 
-Returns the result of subtracting OBJ2 by OBJ1. If C<flag> is false or omitted,
-OBJ1 might be modified. If C<flag> is true, OBJ2 might be modified.
+Subtraction. Returns the result of subtracting OBJ2 by OBJ1. If C<flag> is false
+or omitted, OBJ1 might be modified. If C<flag> is true, OBJ2 might be modified.
+
+=item CLASS-E<gt>_sadd(OBJ1, SIGN1, OBJ2, SIGN2)
+
+Signed addition. Returns the result of adding OBJ2 with sign SIGN2 to OBJ1 with
+sign SIGN1.
+
+    ($obj3, $sign3) = $class -> _sadd($obj1, $sign1, $obj2, $sign2);
+
+=item CLASS-E<gt>_ssub(OBJ1, SIGN1, OBJ2, SIGN2)
+
+Signed subtraction. Returns the result of subtracting OBJ2 with sign SIGN2 to
+OBJ1 with sign SIGN1.
+
+    ($obj3, $sign3) = $class -> _sadd($obj1, $sign1, $obj2, $sign2);
 
 =item CLASS-E<gt>_dec(OBJ)
 

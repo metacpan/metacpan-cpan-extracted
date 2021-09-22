@@ -1,0 +1,40 @@
+NAME
+
+  mb::JSON - a simple JSON parser for multibyte string
+
+SYNOPSIS
+
+  use mb::JSON;
+
+  $perldata = mb::JSON::parse($_);
+  $perldata = mb::JSON::parse();
+
+DESCRIPTION
+
+  This software consists of only single file and has few functions,
+  so it is easy to use and easy to understand.
+
+SUPPORTED PERL VERSIONS
+
+  perl version 5.00503 to newest perl
+
+SEE ALSO
+
+  The JavaScript Object Notation (JSON) Data Interchange Format
+  https://www.rfc-editor.org/rfc/rfc8259.txt
+
+  UTF-8, a transformation format of ISO 10646
+  https://www.rfc-editor.org/rfc/rfc3629.txt
+
+  JSON - JSON (JavaScript Object Notation) encoder/decoder
+  https://metacpan.org/dist/JSON
+
+  mb - run Perl script in MBCS encoding (not only CJK ;-)
+  https://metacpan.org/dist/mb
+
+  mb::Encode - provides MBCS encoder and decoder
+  https://metacpan.org/dist/mb-Encode
+
+  UTF8::R2 - makes UTF-8 scripting easy for enterprise use or LTS
+  https://metacpan.org/dist/UTF8-R2
+

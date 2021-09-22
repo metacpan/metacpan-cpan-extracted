@@ -1,0 +1,41 @@
+---
+abstract: "It's a PE Parser!"
+author:
+  - 'Sanko Robinson <sanko@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-dumpbin
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::dumpbin:
+    file: lib/App/dumpbin.pm
+    version: '0.02'
+requires:
+  File::Which: '0'
+  Path::Tiny: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/sanko/App-dumpbin/issues
+  homepage: https://github.com/sanko/App-dumpbin
+  repository: git://github.com/sanko/App-dumpbin.git
+version: '0.02'
+x_authority: cpan:SANKO
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

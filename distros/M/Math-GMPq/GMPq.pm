@@ -1,5 +1,6 @@
     package Math::GMPq;
     use strict;
+    use warnings;
     use Math::GMPq::Random;
     require Exporter;
     *import = \&Exporter::import;
@@ -33,6 +34,7 @@ use overload
     '/='   => \&overload_div_eq,
     '**='  => \&overload_pow_eq,
     '""'   => \&overload_string,
+    '0+'   => \&overload_num,
     '>'    => \&overload_gt,
     '>='   => \&overload_gte,
     '<'    => \&overload_lt,
@@ -57,7 +59,7 @@ Rmpq_get_d
 Rmpq_get_den Rmpq_get_num Rmpq_get_str Rmpq_init Rmpq_init_nobless Rmpq_inp_str
 Rmpq_inv Rmpq_mul Rmpq_mul_2exp Rmpq_neg Rmpq_numref Rmpq_out_str Rmpq_printf
 Rmpq_set Rmpq_set_d Rmpq_set_den Rmpq_set_f Rmpq_set_num Rmpq_set_si Rmpq_set_str
-Rmpq_set_NV Rmpq_cmp_NV
+Rmpq_set_NV Rmpq_get_NV Rmpq_cmp_NV
 Rmpq_set_ui Rmpq_set_z Rmpq_sgn
 Rmpq_sprintf Rmpq_snprintf
 Rmpq_sub Rmpq_swap
@@ -69,7 +71,7 @@ qgmp_randinit_set qgmp_randinit_default_nobless qgmp_randinit_mt_nobless
 qgmp_randinit_lc_2exp_nobless qgmp_randinit_lc_2exp_size_nobless qgmp_randinit_set_nobless
 qgmp_urandomb_ui qgmp_urandomm_ui
     );
-    our $VERSION = '0.46';
+    our $VERSION = '0.47';
     #$VERSION = eval $VERSION;
 
     Math::GMPq->DynaLoader::bootstrap($VERSION);
@@ -84,7 +86,7 @@ Rmpq_get_d
 Rmpq_get_den Rmpq_get_num Rmpq_get_str Rmpq_init Rmpq_init_nobless Rmpq_inp_str
 Rmpq_inv Rmpq_mul Rmpq_mul_2exp Rmpq_neg Rmpq_numref Rmpq_out_str Rmpq_printf
 Rmpq_set Rmpq_set_d Rmpq_set_den Rmpq_set_f Rmpq_set_num Rmpq_set_si Rmpq_set_str
-Rmpq_set_NV Rmpq_cmp_NV
+Rmpq_set_NV Rmpq_get_NV Rmpq_cmp_NV
 Rmpq_set_ui Rmpq_set_z Rmpq_sgn
 Rmpq_sprintf Rmpq_snprintf
 Rmpq_sub Rmpq_swap

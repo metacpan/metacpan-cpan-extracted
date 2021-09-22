@@ -1,4 +1,4 @@
-## $Id: VectorValued.pm 2869 2021-04-07 07:56:50Z moocow $
+## $Id$
 ##
 ## File: PDL::VectorValued.pm
 ## Author: Bryan Jurish <moocow@cpan.org>
@@ -27,7 +27,7 @@ our %EXPORT_TAGS =
   );
 
 ## VERSION was formerly set by PDL::VectorValued::Version, now use perl-reversion from Perl::Version instead
-our $VERSION = '1.0.10';
+our $VERSION = '1.0.13';
 
 ##======================================================================
 ## pod: header
@@ -271,7 +271,7 @@ PDL by Karl Glazebrook, Tuomas J. Lukka, Christian Soeller, and others.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2007, Bryan Jurish.  All rights reserved.
+Copyright (c) 2007-2021, Bryan Jurish.  All rights reserved.
 
 This package is free software.  You may redistribute it
 and/or modify it under the same terms as Perl itself.

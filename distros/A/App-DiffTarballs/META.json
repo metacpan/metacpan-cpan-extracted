@@ -73,7 +73,7 @@
          "web" : "https://github.com/perlancar/perl-App-DiffTarballs"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

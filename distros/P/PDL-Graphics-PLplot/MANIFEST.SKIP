@@ -72,3 +72,7 @@ PLplot.o
 PLplot.pm
 PLplot.xs
 temp
+
+^xt/
+
+^.github/

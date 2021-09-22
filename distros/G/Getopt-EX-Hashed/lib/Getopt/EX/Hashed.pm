@@ -1,6 +1,6 @@
 package Getopt::EX::Hashed;
 
-our $VERSION = '0.9918';
+our $VERSION = '0.9919';
 
 =head1 NAME
 
@@ -8,7 +8,7 @@ Getopt::EX::Hashed - Hash store object automation
 
 =head1 VERSION
 
-Version 0.9918
+Version 0.9919
 
 =head1 SYNOPSIS
 
@@ -150,7 +150,8 @@ sub new {
 	if (my $is = $param{is}) {
 	    no strict 'refs';
 	    my $access = $config->{ACCESSOR_PREFIX} . $name;
-	    *{"$class\::$access"} = _accessor($is, $name);
+	    *{"$class\::$access"} = _accessor($is, $name)
+		unless ${"$class\::"}{$access};
 	}
 	$obj->{$name} = $param{default};
     }
@@ -333,13 +334,15 @@ If array reference is given, multiple names can be declared at once.
 
     has [ 'left', 'right' ] => ( spec => "=i" );
 
+If the number of parameter is not even, first parameter is taken as
+C<spec>.  So the above example can be written as this:
+
+    has [ 'left', 'right' ] => "=i";
+
 If the name start with plus (C<+>), given parameters are added to
 current value.
 
     has '+left' => ( default => 1 );
-
-If the number of parameter is not even, first parameter is taken as
-C<spec>.
 
 Following parameters are available.
 
@@ -353,7 +356,7 @@ value C<ro> for read-only, C<rw> for read-write.
 If you want to make accessor for all following members, use
 C<configure> and set C<DEFAULT> parameter.
 
-    Getopt::EX::Hashed->configure( DEFAULT => is => 'rw' );
+    Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] );
 
 =item B<spec> => I<string>
 
@@ -535,9 +538,9 @@ parameter, later one in argument list has precedence.  Incremental
 call with C<+> is not affected.
 
 Typical use of DEFAULT is C<is> to prepare accessor method for all
-following hash entries.  Declare C<< is => '' >> to reset.
+following hash entries.  Declare C<< DEFAULT => [] >> to reset.
 
-    Getopt::EX::Hashed->configure(is => 'ro');
+    Getopt::EX::Hashed->configure(DEFAULT => [ is => 'ro' ]);
 
 =back
 

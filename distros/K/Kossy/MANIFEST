@@ -30,5 +30,10 @@ t/MyApp.pm
 t/kossy-connection/halt.t
 t/kossy-connection/halt_no_content.t
 t/kossy-connection/halt_text.t
+t/kossy-connection/render.t
+t/kossy-connection/render_json.t
+t/kossy/build_json_serializer.t
+t/kossy/build_text_xslate.t
+t/kossy/json_serializer.t
 META.yml
 MANIFEST

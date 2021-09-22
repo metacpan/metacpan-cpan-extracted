@@ -1,6 +1,6 @@
 package Lab::Connection::VISA;
 #ABSTRACT: VISA-type connection
-$Lab::Connection::VISA::VERSION = '3.771';
+$Lab::Connection::VISA::VERSION = '3.772';
 use v5.20;
 
 use strict;
@@ -50,7 +50,7 @@ Lab::Connection::VISA - VISA-type connection
 
 =head1 VERSION
 
-version 3.771
+version 3.772
 
 =head1 SYNOPSIS
 

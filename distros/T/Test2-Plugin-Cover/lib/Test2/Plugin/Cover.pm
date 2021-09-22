@@ -4,12 +4,13 @@ use warnings;
 
 use Test2::API qw/test2_add_callback_exit context/;
 use Path::Tiny qw/path/;
+use Storable qw/dclone/;
 use Carp qw/croak/;
 use File::Spec();
 
 my $SEP = File::Spec->catfile('', '');
 
-our $VERSION = '0.000024';
+our $VERSION = '0.000025';
 
 # Directly modifying this is a bad idea, but for the XS to work it needs to be
 # a package var, not a lexical.
@@ -17,17 +18,14 @@ our $FROM = '*';
 my $FROM_MODIFIED = 0;
 my $FROM_MANAGER;
 
-our $ROOT;
-BEGIN { $ROOT = "" . path('.')->realpath }
+our ($ENABLED, $ROOT, $LOAD_ROOT, %REPORT);
+BEGIN {
+    $ENABLED = 0;
+    $LOAD_ROOT = "" . path('.')->realpath;
+    $ROOT = $LOAD_ROOT;
+}
 
-our %REPORT;
-
-my %FILTER = (
-    $0 => 1,
-    __FILE__, 1,
-    File::Spec->rel2abs($0) => 1,
-    File::Spec->rel2abs(__FILE__) => 1,
-);
+my %FILTER;
 
 use XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -39,6 +37,13 @@ sub import {
     my $class = shift;
     my %params = @_;
 
+    if ($params{disabled}) {
+        $class->disable;
+        return;
+    }
+
+    $class->enable;
+
     return if $params{no_event};
 
     if ($IMPORTED++) {
@@ -46,9 +51,10 @@ sub import {
         return;
     }
 
+    $class->reload;
+
     my $ran = 0;
     $ROOT = "" . $params{root} if $params{root};
-    $ROOT //= "" . path('.')->realpath;
     my $callback = sub { return if $ran++; $class->report(%params, ctx => $_[0], root => $ROOT) };
 
     test2_add_callback_exit($callback);
@@ -56,6 +62,15 @@ sub import {
     # Fallback if we fork.
     eval 'END { local $?; $callback->() }; 1' or die $@;
 }
+
+sub reload {
+    $ROOT = $LOAD_ROOT // "" . path('.')->realpath;
+    %FILTER = map {-f $_ ? ($_ => 1) : ()} $0, __FILE__, File::Spec->rel2abs($0), File::Spec->rel2abs(__FILE__);
+}
+
+sub enabled { $ENABLED }
+sub enable  { $ENABLED = 1 }
+sub disable { $ENABLED = 0 }
 
 sub full_reset {
     reset_from();
@@ -225,9 +240,10 @@ sub _process {
     my $filter  = $class->can('filter');
     my $extract = $class->can('extract');
 
+    my $clone = dclone(\%REPORT);
     my %report;
 
-    for my $raw (keys %REPORT) {
+    for my $raw (keys %$clone) {
         next unless $raw;
         next if $FILTER{$raw};
 
@@ -237,23 +253,17 @@ sub _process {
         my $path = $class->$filter($file, %params) // next;
         next if $FILTER{$path};
 
-        my $from = $REPORT{$raw};
-
-        # Easy
-        if (!$report{$path}) {
-            $report{$path} = $from;
-            next;
-        }
+        my $from = $clone->{$raw};
 
         # Merge
-        my $into = $report{$path};
+        my $into = $report{$path} //= {};
 
         for my $sub (keys %$from) {
             if ($into->{$sub}) {
-                $into->{$sub} = {%{$into->{$sub}}, %{$from->{$sub}}};
+                $into->{$sub} = {%{dclone($into->{$sub})}, %{$from->{$sub}}};
             }
             else {
-                $into->{$sub} = $from->{$sub};
+                $into->{$sub} = dclone($from->{$sub}) if $from->{$sub};
             }
         }
     }
@@ -429,6 +439,19 @@ Please see the C<set_from()> documentation for details on values.
 =head1 CLASS METHODS
 
 =over 4
+
+=item $class->enable()
+
+=item $class->disable()
+
+=item $bool = $class->enabled()
+
+Toggle or check enabled status. When disabled no coverage is recorded.
+
+=item $class->reload()
+
+Reset filter if $0 or __FILE__ have changed. This is advanced usage, you will
+probably never need this.
 
 =item $val = $class->get_from()
 

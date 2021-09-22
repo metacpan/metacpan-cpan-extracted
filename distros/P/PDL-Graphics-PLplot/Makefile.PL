@@ -8,7 +8,7 @@ use Data::Dumper;
 use PDL::Core::Dev;
 
 my $PL_MAJOR = 5; # minimum required
-my $PL_MINOR = 15;
+my $PL_MINOR = 13;
 
 unlink ("OPTIONS!"); # remove file used to communicate with plplot.pd
 

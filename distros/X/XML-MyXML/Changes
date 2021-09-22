@@ -1,5 +1,9 @@
 Revision history for XML-MyXML
 
+1.07 2021-09-22T03:17:40Z
+
+    - minor internal changes
+
 1.06 2020-10-07T14:26:58Z
 
     - split file w/ 2 classes into one file per class

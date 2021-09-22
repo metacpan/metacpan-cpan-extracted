@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use File::Compare;
-use File::Which;
 use Test::More;
 use Test::Exception;
 use FindBin;

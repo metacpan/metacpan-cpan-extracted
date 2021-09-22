@@ -8,7 +8,7 @@ use base 'PDF::API2::Resource::XObject::Image';
 
 use strict;
 
-our $VERSION = '2.041'; # VERSION
+our $VERSION = '2.042'; # VERSION
 
 use Carp;
 use IO::File;

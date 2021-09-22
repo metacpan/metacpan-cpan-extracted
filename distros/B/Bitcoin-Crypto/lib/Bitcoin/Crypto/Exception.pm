@@ -1,8 +1,9 @@
 package Bitcoin::Crypto::Exception;
 
-our $VERSION = "1.001";
+our $VERSION = "1.002";
 
 use v5.10;
+use strict;
 use warnings;
 use Moo;
 use Types::Standard qw(Maybe Str ArrayRef);
@@ -149,6 +150,12 @@ sub as_string
 {
 
 	package Bitcoin::Crypto::Exception::Bech32InputData;
+	use parent -norequire, "Bitcoin::Crypto::Exception";
+}
+
+{
+
+	package Bitcoin::Crypto::Exception::Bech32Type;
 	use parent -norequire, "Bitcoin::Crypto::Exception";
 }
 

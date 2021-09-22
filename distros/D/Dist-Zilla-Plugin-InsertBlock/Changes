@@ -1,3 +1,16 @@
+0.103   2021-09-16  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Wording/grammar.
+
+
+0.102   2021-04-14  Released-By: PERLANCAR; Urgency: medium
+
+	- Introduce =over 11 + =back syntax to work around =for directives being
+	  removed by tools like Pod::Weaver.
+
+
 0.101   2021-02-21  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Use encoded_content() (content as bytes) instead of

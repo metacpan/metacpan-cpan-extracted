@@ -1,6 +1,6 @@
 requires                "Moo";
 requires                "OpenTracing::AutoScope",               '>= v0.107.3';
-requires                "Redis";
+suggests                "Redis::Fast";
 requires                "Scalar::Util";
 requires                "Syntax::Feature::Maybe";
 requires                "Types::Standard";
@@ -17,6 +17,4 @@ on 'test' => sub {
     requires            "Test::Mock::Redis";
     requires            "Test::Most";
     requires            "Test::OpenTracing::Integration",       '>= v0.102.1';
-    requires            "Test::RedisServer";
-    
 };

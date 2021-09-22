@@ -1,4 +1,4 @@
-#!perl
+# -*- mode: perl; -*-
 
 # Test use Math::BigFloat with => 'Math::BigInt::SomeSubclass';
 

@@ -22,6 +22,7 @@ my @files = (
     't/author-clean-namespaces.t',
     't/author-eof.t',
     't/author-eol.t',
+    't/author-leaks.t',
     't/author-minimum-version.t',
     't/author-no-tabs.t',
     't/author-pod-coverage.t',

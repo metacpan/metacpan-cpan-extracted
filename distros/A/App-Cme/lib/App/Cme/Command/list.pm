@@ -10,7 +10,7 @@
 # ABSTRACT: List applications handled by cme
 
 package App::Cme::Command::list ;
-$App::Cme::Command::list::VERSION = '1.032';
+$App::Cme::Command::list::VERSION = '1.033';
 use strict;
 use warnings;
 use 5.10.1;
@@ -26,7 +26,6 @@ installed Config::Model modules. Applications are divided in 3 categories:
 - user: for user applications (e.g. ssh configuration)
 - application: misc application like multistrap or Debian packaging
 EOD
-
 }
 
 sub opt_spec {
@@ -51,6 +50,7 @@ sub execute {
         next unless @$names;
         print $cat," ( ",$help{$cat}," ):\n  ", join( "\n  ", @$names ), "\n";
     }
+    return;
 }
 
 1;
@@ -67,7 +67,7 @@ App::Cme::Command::list - List applications handled by cme
 
 =head1 VERSION
 
-version 1.032
+version 1.033
 
 =head1 SYNOPSIS
 

@@ -2,78 +2,68 @@
 
 use v5.14;
 use warnings;
+use utf8;
 
 use Test::More;
 
 use B qw( svref_2object walkoptree );
 
+use B::Deparse;
+my $deparser = B::Deparse->new();
+
 use lib "t";
 use testcase "t::infix";
+
+BEGIN { plan skip_all => "No PL_infix_plugin" unless XS::Parse::Infix::HAVE_PL_INFIX_PLUGIN; }
 
 BEGIN { $^H{"t::infix/permit"} = 1; }
 
 {
-   my $result = t::infix::addfunc( 10, 20 );
-   is( $result, 30, 'add wrapper func' );
+   my $result = 10 add 20;
+   is( $result, 30, 'add infix operator' );
+
+   $result = 15 ⊕ 20;
+   is( $result, 27, 'xor infix operator' );
+
+   my $aref = ["|" intersperse qw( a b c )];
+   is_deeply( $aref, [qw( a | b | c )],
+      'intersperse infix operator' );
+
+   my @list = qw( x y z );
+   $aref = ["|" intersperse @list];
+   is_deeply( $aref, [qw( x | y | z )],
+      'intersperse infix operator on PADAV' );
 }
 
-sub count_ops
+sub is_deparsed
 {
-   my ( $code ) = @_;
-   my %opcounts;
+   my ( $sub, $exp, $name ) = @_;
 
-   # B::walkoptree() is stupid
-   #   https://github.com/Perl/perl5/issues/19101
-   no warnings 'once';
-   local *B::OP::collect_opnames = sub {
-      my ( $op ) = @_;
-      $opcounts{ $op->name }++ unless $op->name eq "null";
-   };
-   walkoptree( svref_2object( $code )->ROOT, "collect_opnames" );
+   my $got = $deparser->coderef2text( $sub );
 
-   return %opcounts;
+   # Deparsed output is '{ ... }'-wrapped
+   $got = ( $got =~ m/^{\n(.*)\n}$/s )[0];
+
+   # Deparsed output will have a lot of pragmata and so on; just grab the
+   # final line
+   $got = ( split m/\n/, $got )[-1];
+   $got =~ s/^\s+//;
+
+   is( $got, $exp, $name );
 }
 
-# callhecker rewrote the optree
 {
-   my %opcounts;
+   is_deparsed sub { $_[0] add $_[1] },
+      '$_[0] add $_[1];',
+      'deparsed call to infix operator';
 
-   %opcounts = count_ops sub { t::infix::addfunc( $_[0], $_[1] ) };
+   is_deparsed sub { $_[0] ⊕ $_[1] },
+      '$_[0] ⊕ $_[1];',
+      'deparsed operator yields UTF-8';
 
-   # If the callchecker ran correctly we should see one 'custom' op and no
-   # 'entersub's
-   ok(  $opcounts{custom},   'callchecker generated an OP_CUSTOM call' );
-   ok( !$opcounts{entersub}, 'callchecker removed an OP_ENTERSUB call' );
-
-   # Opchecker should ignore non-scalar args
-   %opcounts = count_ops sub { t::infix::addfunc( @_, "more" ) };
-   ok( !$opcounts{custom},   'No OP_CUSTOM call for DEFAV' );
-
-   %opcounts = count_ops sub { t::infix::addfunc( lhs(), rhs() ) };
-   ok( !$opcounts{custom},   'No OP_CUSTOM call for list ENTERSUB' );
-
-   # Opchecker still permits scalar entersub calls
-   %opcounts = count_ops sub { t::infix::addfunc( scalar lhs(), scalar rhs() ) };
-   ok(  $opcounts{custom},   'OP_CUSTOM call for scalar ENTERSUB' );
-}
-
-# wrapper func by coderef
-{
-   my $wrapper = \&t::infix::addfunc;
-   is( $wrapper->( 30, 40 ), 70, 'add wrapper func by CODE reference' );
-}
-
-# argument checking
-{
-   ok( !eval { t::infix::addfunc( 10, 20, 30 ) },
-      'Wrapper func fails for too many args' );
-   like( $@, qr/^Too many arguments for subroutine 't::infix::addfunc'/,
-      'Failure message for too many args' );
-
-   ok( !eval { t::infix::addfunc( 60 ) },
-      'Wrapper func fails for too few args' );
-   like( $@, qr/^Too few arguments for subroutine 't::infix::addfunc'/,
-      'Failure message for too few args' );
+   is_deparsed sub { "+" intersperse (1,2,3) },
+      q['+' intersperse (1, 2, 3);],
+      'deparsed call to infix operator with list RHS';
 }
 
 done_testing;

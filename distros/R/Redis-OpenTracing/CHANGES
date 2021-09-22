@@ -1,6 +1,18 @@
 CHANGE LOG
 ==========
- 
+
+
+2021-09-21 v0.1.1
+-----------------
+- Add MetaCPAN resources
+
+
+2021-09-14 v0.1.0
+-----------------
+- Make `redis` attribute required on instantiation.
+- No longer create a default Redis client, bring your own fancy one.
+- Fix issues with smoke tests, using an older `Test::MockObject`.
+
 
 2021-08-31 v0.0.4
 -----------------

@@ -1,8 +1,9 @@
 package Bitcoin::Crypto::Role::Key;
 
-our $VERSION = "1.001";
+our $VERSION = "1.002";
 
 use v5.10;
+use strict;
 use warnings;
 use Types::Standard qw(InstanceOf);
 use Crypt::PK::ECC;

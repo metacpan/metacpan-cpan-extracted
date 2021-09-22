@@ -1,0 +1,67 @@
+{
+    "name" : "App-GhostWork",
+    "version" : "0.02",
+    "abstract" : "Barcode Logger(When,Where,Who,What,toWhich,Why)",
+    "author" : [
+        "ina <ina@cpan.org>"
+    ],
+    "dynamic_config" : 1,
+    "generated_by" : "pmake.bat",
+    "license" : [
+        "perl_5"
+    ],
+    "meta-spec" : {
+        "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+        "version" : 2
+    },
+    "release_status" : "stable",
+    "resources" : {
+        "license" : [
+            "http://dev.perl.org/licenses/"
+        ],
+        "repository" : {
+            "url" : "https://github.com/ina-cpan/App-GhostWork"
+        }
+    },
+    "prereqs" : {
+        "build" : {
+            "requires" : {
+                "ExtUtils::MakeMaker" : "5.4302",
+                "File::Basename" : "2.6",
+                "File::Copy" : "2.02",
+                "File::Path" : "1.0401",
+                "FindBin" : "1.42",
+                "Socket" : "0",
+                "lib" : "0",
+                "perl" : "5.00503",
+                "strict" : "1.01"
+            }
+        },
+        "configure" : {
+            "requires" : {
+                "ExtUtils::MakeMaker" : "5.4302",
+                "File::Basename" : "2.6",
+                "File::Copy" : "2.02",
+                "File::Path" : "1.0401",
+                "FindBin" : "1.42",
+                "Socket" : "0",
+                "lib" : "0",
+                "perl" : "5.00503",
+                "strict" : "1.01"
+            }
+        },
+        "runtime" : {
+            "requires" : {
+                "ExtUtils::MakeMaker" : "5.4302",
+                "File::Basename" : "2.6",
+                "File::Copy" : "2.02",
+                "File::Path" : "1.0401",
+                "FindBin" : "1.42",
+                "Socket" : "0",
+                "lib" : "0",
+                "perl" : "5.00503",
+                "strict" : "1.01"
+            }
+        }
+    }
+}

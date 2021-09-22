@@ -1,0 +1,57 @@
+<svg version="1.1"
+     width="11in" height="8.5in"
+     viewBox="0 0 11 8.5"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink">
+
+  <style>
+    line, rect, circle, ellipse, path {
+    fill: white; stroke: #e5e5e5; stroke-width: 0.02;
+    }
+  </style>
+
+  <defs>
+    <g id="face">
+      <rect width="2" height="1.5" fill="none"/>
+      <ellipse cx="1" cy="0.75" rx="0.6" ry="0.36"/>
+      <line x1="0.25"   x2="1.75"   y1="0.75"  y2="0.75"/>
+      <line x1="1"      x2="1"      y1="0.25"  y2="1.25"/>
+      <line x1="1.275"  x2="1.275"  y1="0.7"   y2="0.8"/>
+      <line x1="1.4125" x2="1.4125" y1="0.6"   y2="0.9"/>
+      <circle cx="1" cy="0.97" r="0.12"/>
+      <circle cx="1" cy="0.53" r="0.12"/>
+      <path d="M1,1.08 A0.3,0.2 0 0,1 1,0.85 A0.3,0.2 0 0,1 1,1.08 Z"/>
+      <path d="M1,0.64 A0.3,0.2 0 0,1 1,0.41 A0.3,0.2 0 0,1 1,0.64 Z"/>
+    </g>
+  </defs>
+
+  <use xlink:href="#face" x="0.5" y="0.5" />
+  <use xlink:href="#face" x="2.5" y="0.5"/>
+  <use xlink:href="#face" x="4.5" y="0.5"/>
+  <use xlink:href="#face" x="6.5" y="0.5"/>
+  <use xlink:href="#face" x="8.5" y="0.5"/>
+
+  <use xlink:href="#face" x="0.5" y="2.0"/>
+  <use xlink:href="#face" x="2.5" y="2.0"/>
+  <use xlink:href="#face" x="4.5" y="2.0"/>
+  <use xlink:href="#face" x="6.5" y="2.0"/>
+  <use xlink:href="#face" x="8.5" y="2.0"/>
+
+  <use xlink:href="#face" x="0.5" y="3.5"/>
+  <use xlink:href="#face" x="2.5" y="3.5"/>
+  <use xlink:href="#face" x="4.5" y="3.5"/>
+  <use xlink:href="#face" x="6.5" y="3.5"/>
+  <use xlink:href="#face" x="8.5" y="3.5"/>
+
+  <use xlink:href="#face" x="0.5" y="5.0"/>
+  <use xlink:href="#face" x="2.5" y="5.0"/>
+  <use xlink:href="#face" x="4.5" y="5.0"/>
+  <use xlink:href="#face" x="6.5" y="5.0"/>
+  <use xlink:href="#face" x="8.5" y="5.0"/>
+
+  <use xlink:href="#face" x="0.5" y="6.5"/>
+  <use xlink:href="#face" x="2.5" y="6.5"/>
+  <use xlink:href="#face" x="4.5" y="6.5"/>
+  <use xlink:href="#face" x="6.5" y="6.5"/>
+  <use xlink:href="#face" x="8.5" y="6.5"/>
+</svg>

@@ -3,10 +3,6 @@
 
 ansiecho - Colored echo command using ANSI terminal sequence
 
-# VERSION
-
-Version 0.03
-
 # SYNOPSIS
 
 ansiecho \[ options \] args ...
@@ -26,7 +22,7 @@ Prefix Options:
     -s/-S SPEC         Produce ANSI sequence
     -c/-C SPEC ARG     Colorize next argument
     -f/-F FORMAT ARGS  Format arguments
-    -E                 Terminate -C -S -F effect
+       -E              Terminate -C -S -F effect
     -i/-a SPEC         Insert/Append ANSI sequence
 
 Example:
@@ -38,6 +34,10 @@ Example:
     ansiecho -C '555/(132,0,41)' d i g i t a l
 
     read -a color < <( ansiecho -S ZE K/544 K/454 K/445 )
+
+# VERSION
+
+Version 0.04
 
 # DESCRIPTION
 
@@ -91,9 +91,10 @@ Format string can be specified by **-f** option, and it behaves like a
     ansiecho -f '[ %5s : %5s : %5s ]' -c R RED -c G GREEN -c B BLUE
 
 As in above example, colored text can be given as an argument for
-**-f** option, and the string width is calculated as you expect.
+**-f** option, and the string width is calculated as you expect,
+including multibyte Unicode characters.
 
-Formatted result becomes a single argument, and can be a subject of
+Formatted result ends up to a single argument, and can be a subject of
 other operation.  In the next example, numbers are formatted, colored,
 and gave to other format.
 
@@ -122,22 +123,22 @@ Using **-S** option, you can set multiple ANSI sequences at once in a
 shell script.  Next **bash** code will initialize multiple variables
 with the sequence for given color specs.
 
-    read ZE C1 C2 C3 < <( ansiecho -S ZE K/544 K/454 K/445 )
+    read ZE C M Y < <( ansiecho -S ZE K/355 K/535 K/553 )
 
 Or you can set array variable.
 
-    read -a color < <( ansiecho -S ZE K/544 K/454 K/445 )
+    read -a color < <( ansiecho -S ZE K/533 K/353 K/335 )
 
 Then use this variable like:
 
-    echo "${C1} COLOR 1 ${ZE}"
-    echo "${C2} COLOR 2 ${ZE}"
-    echo "${C3} COLOR 3 ${ZE}"
+    echo "${C} Cyan     ${ZE}"
+    echo "${M} Mafenata ${ZE}"
+    echo "${Y} Yellow   ${ZE}"
 
     reset=${color[0]}
-    echo "${color[1]} COLOR 1 ${reset}"
-    echo "${color[2]} COLOR 2 ${reset}"
-    echo "${color[3]} COLOR 3 ${reset}"
+    echo "${color[1]} Red   ${reset}"
+    echo "${color[2]} Green ${reset}"
+    echo "${color[3]} Blue  ${reset}"
 
 # COMMAND OPTIONS
 
@@ -196,8 +197,8 @@ Then use this variable like:
     in the format string except `%%`.  Variable width and precision
     parameter `*` can be used like `%*s` or `%*.*s`.
 
-    Format string also can be made by **-f** option.  Next command works,
-    but second one is better.
+    Format string also can be made by **-f** option.  Next commands produce
+    same output, but second one looks better.
 
         ansiecho -f -f '%%%ds' 16 hello
 
@@ -205,8 +206,8 @@ Then use this variable like:
 
 - **-S** _spec_
 
-    If option `-S` found, all following argument is considered as a color
-    spec given to **-s** option, until option **-E** found.
+    If option `-S` found, all following arguments are considered as a
+    color spec given to **-s** option, until option **-E** is found.
 
     Next two commands are equivalent.
 

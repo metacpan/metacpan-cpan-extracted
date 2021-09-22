@@ -22,12 +22,12 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210602223301;
+our $VERSION = 1.20210921211833;
 
 my $formatters = [
                 {
                   'format' => '$1 $2',
-                  'leading_digits' => '[579]',
+                  'leading_digits' => '[57-9]',
                   'pattern' => '(\\d{3})(\\d{4})'
                 }
               ];
@@ -57,7 +57,7 @@ my $validators = {
         ',
                 'mobile' => '
           (?:
-            5\\d|
+            [58]\\d|
             7[013-7]
           )\\d{5}
         ',
@@ -78,19 +78,19 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en} = {"67836", "Sanma",
-"67822", "Port\ Vila\,\ Shefa",
+$areanames{en} = {"67823", "Port\ Vila\,\ Shefa",
 "67827", "Port\ Vila\,\ Shefa",
 "67828", "Port\ Vila\,\ Shefa",
-"67829", "Port\ Vila\,\ Shefa",
-"6788", "Tafea",
-"67823", "Port\ Vila\,\ Shefa",
-"67824", "Port\ Vila\,\ Shefa",
-"67825", "Port\ Vila\,\ Shefa",
-"6784", "Malampa",
-"67826", "Port\ Vila\,\ Shefa",
 "67837", "Luganville",
-"67838", "Penama\/Torba",};
+"67888", "Tafea",
+"67838", "Penama\/Torba",
+"6784", "Malampa",
+"67825", "Port\ Vila\,\ Shefa",
+"67836", "Sanma",
+"67829", "Port\ Vila\,\ Shefa",
+"67826", "Port\ Vila\,\ Shefa",
+"67824", "Port\ Vila\,\ Shefa",
+"67822", "Port\ Vila\,\ Shefa",};
 
     sub new {
       my $class = shift;

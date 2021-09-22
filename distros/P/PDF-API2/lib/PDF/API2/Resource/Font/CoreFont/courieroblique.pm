@@ -3,7 +3,7 @@ package PDF::API2::Resource::Font::CoreFont::courieroblique;
 use strict;
 use warnings;
 
-our $VERSION = '2.041'; # VERSION
+our $VERSION = '2.042'; # VERSION
 
 sub data { return {
     'fontname' => 'Courier-Oblique',

@@ -1,0 +1,119 @@
+#!perl
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-04'; # DATE
+our $DIST = 'App-OrgUtils'; # DIST
+our $VERSION = '0.482'; # VERSION
+
+use 5.010;
+use strict;
+use warnings;
+use open qw(:std :utf8);
+use Log::ger;
+
+use List::Util qw(sum);
+use Org::Parser;
+
+my $input = [<>];
+close STDIN; close ARGV; # so perl doesn't add ", <> line xx" upon dying
+
+my $doc = Org::Parser->new->parse($input);
+
+my %stats = (
+    num_objects => 0,
+    input_size_in_lines      => ~~@$input,
+    input_size_in_characters => sum(map {length} @$input),
+    tree_depth => 0,
+);
+
+$doc->walk(
+    sub {
+        my ($el, $level) = @_;
+        $stats{num_objects}++;
+
+        $stats{"num_objects_at_level_$level"}++;
+        $stats{tree_depth} = $level if $stats{tree_depth} < $level;
+
+        my $cl = ref($el); $cl =~ s/^Org::Element:://;
+        $stats{"num_objects_of_type_${cl}"}++;
+        if ($cl eq 'Headline') {
+            $stats{num_headlines}++;
+            my $level = $el->level;
+            $stats{"num_headlines_level_$level"}++;
+            if ($el->is_todo) {
+                $stats{num_todos}++;
+                if ($el->is_done) {
+                    $stats{num_todos_that_are_done}++;
+                } else {
+                    $stats{num_todos_that_are_undone}++;
+                }
+            }
+        }
+    }
+);
+
+for (sort keys %stats) {
+    print "$_\t$stats{$_}\n";
+}
+
+1;
+# ABSTRACT: Print statistics of an Org document
+# PODNAME: orgstat
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+orgstat - Print statistics of an Org document
+
+=head1 VERSION
+
+This document describes version 0.482 of orgstat (from Perl distribution App-OrgUtils), released on 2021-07-04.
+
+=head1 SYNOPSIS
+
+ % stat-org-document   foo.org
+ % stat-org-document < foo.org
+
+=head1 DESCRIPTION
+
+This script prints some statistics of an Org document.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-OrgUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-OrgUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-OrgUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<Org::Parser>
+
+L<dump-org-structure>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -4,7 +4,7 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '3.01';
+our $VERSION = '3.02';
 
 my @types;
 {
@@ -67,6 +67,15 @@ For RT 4.0, add this line:
 
 or add C<RT::Extension::HistoryFilter> to your existing C<@Plugins> line.
 
+=item For RT 4.2.3 or older, install a patch
+
+This step is required B<only> for RT versions 4.2.3 or older. Versions
+4.2.4 and newer have the changes included in the patch.
+
+Apply the patch as follows:
+
+    patch -p1 -d /path/to/rt < patches/select-widget-add-multiple.patch
+
 =item Clear your mason cache
 
     rm -rf /opt/rt4/var/mason_data/obj/*
@@ -81,7 +90,7 @@ Christian Loos <cloos@netsandbox.de>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (C) 2010-2018, Christian Loos.
+Copyright (C) 2010-2021, Christian Loos.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

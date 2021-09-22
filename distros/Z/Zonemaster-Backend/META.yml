@@ -43,6 +43,7 @@ requires:
   Moose: 2.04
   Parallel::ForkManager: 1.12
   Plack::Builder: 0
+  Plack::Middleware::ReverseProxy: 0
   Role::Tiny: 1.001003
   Router::Simple::Declare: 0
   Starman: 0
@@ -55,4 +56,4 @@ resources:
   bugtracker: https://github.com/zonemaster/zonemaster-backend/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/zonemaster/zonemaster-backend
-version: 6.2.0
+version: 7.0.0

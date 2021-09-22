@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package WebService::GoShippo;
-$WebService::GoShippo::VERSION = '0.0001';
+$WebService::GoShippo::VERSION = '0.0002';
 use HTTP::Thin;
 use HTTP::Request::Common qw/GET DELETE PUT POST/;
 use HTTP::CookieJar;
@@ -16,7 +16,7 @@ WebService::GoShippo - A simple client to L<Shippo's REST API|https://goshippo.c
 
 =head1 VERSION
 
-version 0.0001
+version 0.0002
 
 =head1 SYNOPSIS
 
@@ -93,7 +93,7 @@ you're having problems.  Hint hint.
     my $sales_tax = $taxjar->get('taxes', $order_information);
     if ($taxjar->debug_flag) {
         $log->info($taxjar->last_response->request->as_string);
-        $log->info($taxjar->last_response->content);
+        $log->info($taxjar->last_response->decoded_content);
     }
 
 =cut
@@ -268,6 +268,7 @@ sub _add_headers {
     my $request = shift;
     $request->header( Authorization => 'ShippoToken '.$self->token() );
     $request->header( 'Content-Type' => 'application/json' );
+    $request->header( 'Accept-Charset' => 'utf-8' );
     if ($self->version) {
         $request->header( 'Shippo-API-Version' => $self->version );
     }
@@ -287,12 +288,12 @@ sub _process_request {
 sub _process_response {
     my $self = shift;
     my $response = shift;
-    my $result = eval { from_json($response->decoded_content) }; 
+    my $result = eval { from_json($response->decoded_content, {utf8 => 1, }) }; 
     if ($@) {
         ouch 500, 'Server returned unparsable content.', { error => $@, content => $response->decoded_content };
     }
     elsif ($response->is_success) {
-        return from_json($response->content);
+        return $result;
     }
     else {
         ouch $response->code, $response->as_string;

@@ -30,4 +30,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Acme-CPANAuthors-Czech
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Acme-CPANAuthors-Czech
-version: '0.29'
+version: '0.30'

@@ -1,5 +1,9 @@
 Revision history for Perl extension App-ansicolumn
 
+1.13 2021-09-21T09:43:42Z
+
+    - Make -B as an alias for --border.
+
 1.12 2021-08-23T05:43:30Z
 
     - Improve option validation.

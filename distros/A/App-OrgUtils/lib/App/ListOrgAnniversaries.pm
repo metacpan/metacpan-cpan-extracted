@@ -1,7 +1,9 @@
 package App::ListOrgAnniversaries;
 
-our $DATE = '2020-10-14'; # DATE
-our $VERSION = '0.481'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-04'; # DATE
+our $DIST = 'App-OrgUtils'; # DIST
+our $VERSION = '0.482'; # VERSION
 
 use 5.010;
 use strict;
@@ -330,7 +332,7 @@ App::ListOrgAnniversaries - List all anniversaries in Org files
 
 =head1 VERSION
 
-This document describes version 0.481 of App::ListOrgAnniversaries (from Perl distribution App-OrgUtils), released on 2020-10-14.
+This document describes version 0.482 of App::ListOrgAnniversaries (from Perl distribution App-OrgUtils), released on 2021-07-04.
 
 =head1 SYNOPSIS
 
@@ -343,7 +345,7 @@ This document describes version 0.481 of App::ListOrgAnniversaries (from Perl di
 
 Usage:
 
- list_org_anniversaries(%args) -> [status, msg, payload, meta]
+ list_org_anniversaries(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List all anniversaries in Org files.
 
@@ -457,12 +459,12 @@ object, remember to set the correct time zone.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -488,7 +490,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

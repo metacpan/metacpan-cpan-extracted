@@ -6,9 +6,9 @@ use v5.16; # Mojolicious minimum version
 
 use Mojo::Base 'Mojolicious::Plugin';
 
-use Text::Minify::XS ();
+use Text::Minify::XS v0.4.8 ();
 
-our $VERSION = 'v0.2.0';
+our $VERSION = 'v0.2.1';
 
 sub register {
     my ($self, $app, $conf) = @_;
@@ -38,7 +38,7 @@ Mojolicious::Plugin::Text::Minify - remove HTML indentation on the fly
 
 =head1 VERSION
 
-version v0.2.0
+version v0.2.1
 
 =head1 SYNOPSIS
 

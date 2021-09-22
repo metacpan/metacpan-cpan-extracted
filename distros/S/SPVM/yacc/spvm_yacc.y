@@ -15,9 +15,10 @@
   #include "spvm_block.h"
   #include "spvm_list.h"
   #include "spvm_class.h"
+  #include "spvm_descriptor.h"
 %}
 
-%token <opval> CLASS HAS METHOD OUR ENUM MY SELF USE REQUIRE ALLOW
+%token <opval> CLASS HAS METHOD OUR ENUM MY USE REQUIRE ALLOW
 %token <opval> DESCRIPTOR
 %token <opval> IF UNLESS ELSIF ELSE FOR WHILE LAST NEXT SWITCH CASE DEFAULT BREAK EVAL
 %token <opval> NAME VAR_NAME CONSTANT EXCEPTION_VAR
@@ -29,7 +30,7 @@
 %type <opval> opt_classes classes class class_block
 %type <opval> opt_declarations declarations declaration
 %type <opval> enumeration enumeration_block opt_enumeration_values enumeration_values enumeration_value
-%type <opval> method anon_method opt_args args arg invocant has use require our
+%type <opval> method anon_method opt_args args arg has use require our
 %type <opval> opt_descriptors descriptors method_names opt_method_names
 %type <opval> opt_statements statements statement if_statement else_statement 
 %type <opval> for_statement while_statement switch_statement case_statement default_statement
@@ -175,8 +176,13 @@ init_block
       SPVM_OP* op_method = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_METHOD, compiler->cur_file, compiler->cur_line);
       SPVM_OP* op_method_name = SPVM_OP_new_op_name(compiler, "INIT", compiler->cur_file, compiler->cur_line);
       SPVM_OP* op_void_type = SPVM_OP_new_op_void_type(compiler, compiler->cur_file, compiler->cur_line);
+
+      SPVM_OP* op_list_descriptors = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_descriptor_static = SPVM_OP_new_op_descriptor(compiler, SPVM_DESCRIPTOR_C_ID_STATIC, compiler->cur_file, compiler->cur_line);
+      SPVM_OP_insert_child(compiler, op_list_descriptors, op_list_descriptors->first, op_descriptor_static);
+
       int32_t can_precompile = 0;
-      $$ = SPVM_OP_build_method(compiler, op_method, op_method_name, op_void_type, NULL, NULL, $2, NULL, NULL, 1, 0, can_precompile);
+      $$ = SPVM_OP_build_method(compiler, op_method, op_method_name, op_void_type, NULL, op_list_descriptors, $2, NULL, NULL, 1, 0, can_precompile);
     }
     
 use
@@ -299,11 +305,11 @@ method
 anon_method
   : opt_descriptors METHOD ':' type_or_void '(' opt_args opt_vaarg')' block
      {
-       int32_t is_begin = 0;
+       int32_t is_init = 0;
        int32_t is_anon = 1;
        int32_t can_precompile = 1;
        
-       $$ = SPVM_OP_build_method(compiler, $2, NULL, $4, $6, $1, $9, NULL, $7, is_begin, is_anon, can_precompile);
+       $$ = SPVM_OP_build_method(compiler, $2, NULL, $4, $6, $1, $9, NULL, $7, is_init, is_anon, can_precompile);
      }
   | '[' args ']' opt_descriptors METHOD ':' type_or_void '(' opt_args opt_vaarg')' block
      {
@@ -316,10 +322,10 @@ anon_method
          SPVM_OP_insert_child(compiler, op_list_args, op_list_args->last, $2);
        }
        
-       int32_t is_begin = 0;
+       int32_t is_init = 0;
        int32_t is_anon = 1;
        int32_t can_precompile = 1;
-       $$ = SPVM_OP_build_method(compiler, $5, NULL, $7, $9, $4, $12, op_list_args, $10, is_begin, is_anon, can_precompile);
+       $$ = SPVM_OP_build_method(compiler, $5, NULL, $7, $9, $4, $12, op_list_args, $10, is_init, is_anon, can_precompile);
      }
 
 opt_args
@@ -337,31 +343,6 @@ opt_args
         SPVM_OP_insert_child(compiler, op_list, op_list->last, $1);
         $$ = op_list;
       }
-    }
-  | invocant
-    {
-       // Add invocant to arguments
-       SPVM_OP* op_args = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
-       SPVM_OP_insert_child(compiler, op_args, op_args->last, $1);
-       
-       $$ = op_args;
-    }
-  | invocant ',' args
-    {
-      // Add invocant to arguments
-      SPVM_OP* op_args;
-      if ($3->id == SPVM_OP_C_ID_LIST) {
-        op_args = $3;
-      }
-      else {
-        SPVM_OP* op_list = SPVM_OP_new_op_list(compiler, $1->file, $1->line);
-        SPVM_OP_insert_child(compiler, op_list, op_list->last, $3);
-        op_args = op_list;
-      }
-      
-      SPVM_OP_insert_child(compiler, op_args, op_args->first, $1);
-       
-      $$ = op_args;
     }
 
 args
@@ -394,16 +375,6 @@ opt_vaarg
       $$ = NULL;
     }
   | DOT3
-
-invocant
-  : var ':' SELF
-    {
-      SPVM_TYPE* type = SPVM_TYPE_new(compiler);
-      type->is_self = 1;
-      SPVM_OP* op_type = SPVM_OP_new_op_type(compiler, type, $3->file, $3->line);
-      
-      $$ = SPVM_OP_build_arg(compiler, $1, op_type);
-    }
 
 opt_descriptors
   : /* Empty */
@@ -825,7 +796,7 @@ binary_op
     }
   | expression '-' expression
     {
-      SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_METHODTRACT, $2->file, $2->line);
+      SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_SUBTRACT, $2->file, $2->line);
       $$ = SPVM_OP_build_binary_op(compiler, op, $1, $3);
     }
   | expression MULTIPLY expression
@@ -1034,30 +1005,30 @@ array_access
 call_spvm_method
   : NAME '(' opt_expressions  ')'
     {
-      $$ = SPVM_OP_build_call_spvm_method(compiler, NULL, $1, $3);
+      $$ = SPVM_OP_build_call_method(compiler, NULL, $1, $3);
     }
   | basic_type ARROW method_name '(' opt_expressions  ')'
     {
-      $$ = SPVM_OP_build_call_spvm_method(compiler, $1, $3, $5);
+      $$ = SPVM_OP_build_call_method(compiler, $1, $3, $5);
     }
   | basic_type ARROW method_name
     {
       SPVM_OP* op_expressions = SPVM_OP_new_op_list(compiler, $1->file, $2->line);
-      $$ = SPVM_OP_build_call_spvm_method(compiler, $1, $3, op_expressions);
+      $$ = SPVM_OP_build_call_method(compiler, $1, $3, op_expressions);
     }
   | expression ARROW method_name '(' opt_expressions ')'
     {
-      $$ = SPVM_OP_build_call_spvm_method(compiler, $1, $3, $5);
+      $$ = SPVM_OP_build_call_method(compiler, $1, $3, $5);
     }
   | expression ARROW method_name
     {
       SPVM_OP* op_expressions = SPVM_OP_new_op_list(compiler, $1->file, $2->line);
-      $$ = SPVM_OP_build_call_spvm_method(compiler, $1, $3, op_expressions);
+      $$ = SPVM_OP_build_call_method(compiler, $1, $3, op_expressions);
     }
   | expression ARROW '(' opt_expressions ')'
     {
       SPVM_OP* op_method_name = SPVM_OP_new_op_name(compiler, "", $2->file, $2->line);
-      $$ = SPVM_OP_build_call_spvm_method(compiler, $1, op_method_name, $4);
+      $$ = SPVM_OP_build_call_method(compiler, $1, op_method_name, $4);
     }
 field_access
   : expression ARROW '{' field_name '}'

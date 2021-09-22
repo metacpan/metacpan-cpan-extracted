@@ -1,0 +1,9 @@
+Revision history for this software.
+
+0.02  2021-09-19 00:00:00
+  - rename parse() to mb::JSON::parse()
+  - created by INABA Hitoshi
+
+0.01  2021-09-18 00:00:00
+  - original version
+  - created by INABA Hitoshi

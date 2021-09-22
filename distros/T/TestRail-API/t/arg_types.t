@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use TestRail::API;
-use Test::More 'tests' => 143;
+use Test::More 'tests' => 145;
 use Test::Fatal;
 use Class::Inspector;
 use Test::LWP::UserAgent;
@@ -16,6 +16,7 @@ $tr->{'browser'}->map_response(qr/.*/, HTTP::Response->new('500', 'ERROR', ['Con
 #No-arg functions
 is( exception { capture { $tr->getCaseTypes()  } },undef,'getCaseTypes returns no error when no arguments are passed');
 is( exception { capture { $tr->getPossibleTestStatuses()  } },undef,'getPossibleTestStatuses returns no error when no arguments are passed');
+is( exception { capture { $tr->getPriorities()  } },undef,'getPriorities returns no error when no arguments are passed');
 is( exception { capture { $tr->getProjects()  } },undef,'getProjects returns no error when no arguments are passed');
 is( exception { capture { $tr->getTestResultFields()  } },undef,'getTestResultFields returns no error when no arguments are passed');
 is( exception { capture { $tr->getUsers()  } },undef,'getUsers returns no error when no arguments are passed');
@@ -43,6 +44,7 @@ isnt( exception { capture { $tr->getMilestoneByID()  } },undef,'getMilestoneByID
 isnt( exception { capture { $tr->getMilestoneByName()  } },undef,'getMilestoneByName returns error when no arguments are passed');
 isnt( exception { capture { $tr->getPlanByID()  } },undef,'getPlanByID returns error when no arguments are passed');
 isnt( exception { capture { $tr->getPlanByName()  } },undef,'getPlanByName returns error when no arguments are passed');
+isnt( exception { capture { $tr->getPriorityByName()  } },undef,'getPriorityByName returns error when no arguments are passed');
 isnt( exception { capture { $tr->getProjectByID()  } },undef,'getProjectByID returns error when no arguments are passed');
 isnt( exception { capture { $tr->getProjectByName()  } },undef,'getProjectByName returns error when no arguments are passed');
 isnt( exception { capture { $tr->getRunByID()  } },undef,'getRunByID returns error when no arguments are passed');

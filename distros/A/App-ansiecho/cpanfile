@@ -2,7 +2,7 @@ requires 'Encode';
 requires 'Getopt::EX', 'v1.24.1';
 requires 'Getopt::EX::Colormap';
 requires 'Getopt::EX::Long';
-requires 'Getopt::EX::Hashed', '0.9906';
+requires 'Getopt::EX::Hashed', '0.9919';
 requires 'List::Util';
 requires 'Pod::Usage';
 requires 'Text::ANSI::Printf', '2.01';

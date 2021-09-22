@@ -4,68 +4,81 @@ use strict;
 use warnings;
 use File::ShareDir::Dist ();
 use File::Which qw( which );
+use Path::Tiny;
 
 my $config = File::ShareDir::Dist::dist_config('FFI-ExtractSymbols');
 
 # ABSTRACT: Windows (and Cygwin) implementation for FFI::ExtractSymbols
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 return 1 if FFI::ExtractSymbols->can('extract_symbols') || $^O !~ /^(MSWin32|cygwin)$/;
 
-my $dumpbin = which('dumpbin');
-$dumpbin ||= $config->{'exe'}->{dumpbin};
+$FFI::ExtractSymbols::mode = 'mixed';
 
-if($dumpbin)
+#
+*FFI::ExtractSymbols::extract_symbols = sub
 {
-  # convert path to dumpbin to a spaceless version if it has
-  # spaces
-  $dumpbin = Win32::GetShortPathName($dumpbin) if $dumpbin =~ /\s/;
+  my($libpath, %callbacks) = @_;
+  $callbacks{$_} ||= sub {} for qw( export code data );
 
-  # use forward slashes
-  $dumpbin =~ s{\\}{/}g;
+  my $raw  = Path::Tiny->new($libpath)->slurp_raw;
 
-  # maybe we can tell the difference?
-  # N:\home\ollisg\dev\FFI-ExtractSymbols\.build\PxJz6vIGTh\libtest>dumpbin /symbols cygtest-1.dll|grep my_
-  # 017 00000080 SECT1  notype ()    External     | my_function
-  # 1F8 000001B0 SECT7  notype       External     | my_variable
-  $FFI::ExtractSymbols::mode = 'mixed';
+  #
+  return 1 if 0x5A4D != unpack 'v', substr $raw, 0, 2; # MZ signature failed
+  my $peo = unpack 'V', substr $raw, 0x3C, 4;
+  return 1 if "PE\0\0" ne substr $raw, $peo, 4; # PE signature failed
 
-  *FFI::ExtractSymbols::extract_symbols = sub
-  {
-    my($libpath, %callbacks) = @_;
-    $callbacks{$_} ||= sub {} for qw( export code data );
+  #
+  my ( $sizeOfOptionalHeader, undef, $magic ) = unpack 'vvv', substr $raw, $peo + 20, 8;
+  return 1 if !$sizeOfOptionalHeader;    # No optional COFF and thus no exports
+  my $pe32plus   = $magic == 0x20b;    # 32bit: Ox10b 64bit: 0x20b ROM?: 0x107
+  my $opt_header = substr $raw, $peo + 24, $sizeOfOptionalHeader;
 
-    # dumpbin requires a Windows path, not a POSIX one if you
-    # are running under cygwin
-    $libpath = Cygwin::posix_to_win_path($libpath) if $^O eq 'cygwin';
+  # COFF header
+  my $numberOfSections = unpack 'v', substr $raw, $peo + 6, 2;
 
-    # convert path to library to a spaceless version if it has spaces
-    $libpath = Win32::GetShortPathName($libpath) if $libpath =~ /\s/;
+  # Windows "optional" header
+  my $imageBase = $pe32plus ? unpack 'Q', substr $opt_header, 24, 8 : unpack 'V',
+    substr $opt_header, 28, 4;
+  my $numberOfRVAandSizes = unpack 'V', substr $opt_header, ( $pe32plus ? 108 : 112 ), 4;
+  my $sections; # local cache
+  my $sec_begin = $peo + 24 + $sizeOfOptionalHeader;
+  my $sec_data  = substr $raw, $sec_begin, $numberOfSections * 40;
+  for my $x ( 0 .. $numberOfSections - 1 ) {
+    my $sec_head = $sec_begin + ( $x * 40 );
+    my $sec_name = unpack 'Z*', substr $raw, $sec_head, 8;
+    $sections->{$sec_name} = [ unpack 'VV VVVV vv V', substr $raw, $sec_head + 8 ];
+  }
 
-    # use forward slashes
-    $libpath =~ s{\\}{/}g;
+  # dig into directory
+  my ( $edata_pos, $edata_len ) = unpack 'VV', substr $opt_header, $pe32plus ? 112 : 96, 8;
+  my @fields = unpack 'V10', substr $raw, _rva2offset($edata_pos, $sections), 40;
+  my ( $ptr_func, $ptr_name, $ptr_ord ) = map { _rva2offset( $fields[$_], $sections ) } 7 .. 9;
+  my %retval = ( name => unpack 'Z*', substr $raw, _rva2offset( $fields[3], $sections ), 256 );
+  my @ord    = unpack 'V' x $fields[5], substr $raw, $ptr_func, 4 * $fields[5];
 
-    foreach my $line (`$dumpbin /exports $libpath`)
-    {
-      # we do not differentiate between code and data
-      # with dumpbin extracts
-      if($line =~ /[0-9]+\s+[0-9]+\s+[0-9a-fA-F]+\s+([^\s]*)\s*$/)
-      {
-        my $symbol = $1;
-        $callbacks{export}->($symbol, $symbol);
-        $callbacks{code}  ->($symbol, $symbol);
-      }
+  for my $idx ( 0 .. $fields[5] ) {
+    my $ord_cur  = unpack 'v', substr $raw, $ptr_ord + ( 2 * $idx ), 2;
+    my $func_cur = $ord[$ord_cur];    # Match the ordinal to the function RVA
+    next if $idx > ( $fields[6] - 1 );
+    my $name_cur = unpack 'V',  substr $raw, $ptr_name + ( 4 * $idx ), 4;
+    my $symbol = unpack 'Z*', substr $raw, _rva2offset($name_cur, $sections), 512;
+    $ord_cur += $fields[4];           # Add the ordinal base value
+    $callbacks{export}->($symbol, $symbol);
+    $callbacks{code}  ->($symbol, $symbol);
+  }
+};
+
+sub _rva2offset
+{
+  my ($virtual, $sections) = @_;
+  for my $section ( values %$sections ) {
+    if ( ( $virtual >= $section->[1] ) and ( $virtual < $section->[1] + $section->[0] ) ) {
+      return $virtual - ( $section->[1] - $section->[3] );
     }
-
-    ();
-  };
+  }
 }
-else
-{
-  die "no implementation for FFI::ExtractSymbols";
-}
-
 
 1;
 
@@ -81,7 +94,7 @@ FFI::ExtractSymbols::Windows - Windows (and Cygwin) implementation for FFI::Extr
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 DESCRIPTION
 
@@ -100,7 +113,11 @@ instead.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Sanko Robinson (SANKO)
 
 =head1 COPYRIGHT AND LICENSE
 

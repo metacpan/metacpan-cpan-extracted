@@ -1,0 +1,7 @@
+severity = 4
+
+# remove when https://github.com/Perl-Critic/PPI/issues/194 is fixed
+[-Subroutines::ProhibitSubroutinePrototypes]
+
+[TestingAndDebugging::ProhibitNoWarnings]
+allow = experimental::postderef experimental::signatures

@@ -1,0 +1,7 @@
+package Module::Install::RTx;
+
+@remove_files = qw(
+    html/Widgets/Form/Select
+);
+
+1;

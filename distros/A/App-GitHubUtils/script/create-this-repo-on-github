@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/GitHubUtils/create_this_repo_on_github
-# and generated automatically using Perinci::CmdLine::Gen version 0.497
+# and generated automatically using Perinci::CmdLine::Gen version 0.498
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-12-24'; # DATE
+our $DATE = '2021-05-10'; # DATE
 our $DIST = 'App-GitHubUtils'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -41,15 +41,16 @@ create-this-repo-on-github - Create this repo on github
 
 =head1 VERSION
 
-This document describes version 0.006 of create-this-repo-on-github (from Perl distribution App-GitHubUtils), released on 2020-12-24.
+This document describes version 0.007 of create-this-repo-on-github (from Perl distribution App-GitHubUtils), released on 2021-05-10.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % create-this-repo-on-github [--debug] [--format=name] [--json]
-     [--log-level=level] [--(no)naked-res] [--page-result[=program]]
-     [--quiet] [--trace] [--verbose] [--view-result[=program]]
+ % create-this-repo-on-github [--debug] [--format=name]
+     [--github-cmd-config-profile=s] [--json] [--log-level=level]
+     [--(no)naked-res] [--page-result[=program]] [--quiet] [--trace]
+     [--verbose] [--view-result[=program]]
 
 =head1 DESCRIPTION
 
@@ -62,6 +63,14 @@ directory.
 =head1 OPTIONS
 
 C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--github-cmd-config-profile>=I<s>
+
+=back
 
 =head2 Logging options
 
@@ -206,7 +215,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

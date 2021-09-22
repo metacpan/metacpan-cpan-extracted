@@ -1,10 +1,14 @@
 package Grizzly::Command::quote;
+
+# ABSTRACT: Gets a stock quote for the given symbol
+
 use Grizzly -command;
 use strict;
 use warnings;
 
 use Finance::Quote;
 use Grizzly::Progress::Bar;
+use Term::ANSIColor;
 
 my $q = Finance::Quote->new("YahooJSON");
 
@@ -72,9 +76,11 @@ sub quote_info {
         $eps = 'n/a';
     }
 
+    my $title = colored( "Grizzly - Stock Quote Analysis", "blue" );
+
     print <<EOF,;
 
-Grizzly - Stock Quote Analysis
+$title
 
 Company: ========== $name
 Date: ============= $date
@@ -100,11 +106,11 @@ __END__
 
 =head1 NAME
 
-Grizzly::Command::quote
+Grizzly::Command::quote - Gets a stock quote for the given symbol
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head1 SYNOPSIS
 

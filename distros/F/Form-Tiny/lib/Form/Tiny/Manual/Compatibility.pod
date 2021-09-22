@@ -115,7 +115,30 @@ Starting from version I<2.00>, any backward incompatible changes will only be in
 
 =head2 Current deprecations
 
-None at the moment.
+=head3 Using three-argument field_filter (passing context explicitly)
+
+	# DEPRECATED
+	field_filter 'field_name', Type, sub { ... };
+
+	# OK - use context instead
+	form_field 'field_name';
+	field_filter Type, sub { ... };
+
+=head3 Using Form::Tiny::Filter 'field' property
+
+	# DEPRECATED
+	field_filter Form::Tiny::Filter->new(
+		field => 'field_name',
+		type => Type,
+		code => sub { ... },
+	);
+
+	# OK - use context instead
+	form_field 'field_name';
+	field_filter Form::Tiny::Filter->new(
+		type => Type,
+		code => sub { ... },
+	);
 
 =head1 SEE ALSO
 

@@ -5,6 +5,6 @@ use base 'PDF::API2::Resource';
 use strict;
 use warnings;
 
-our $VERSION = '2.041'; # VERSION
+our $VERSION = '2.042'; # VERSION
 
 1;

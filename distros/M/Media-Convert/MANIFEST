@@ -1,0 +1,28 @@
+lib/Media/Convert.pm
+lib/Media/Convert/Asset.pm
+lib/Media/Convert/Asset/Concat.pm
+lib/Media/Convert/Asset/PNGGen.pm
+lib/Media/Convert/Asset/Profile/copy.pm
+lib/Media/Convert/Asset/Profile/mp4.pm
+lib/Media/Convert/Asset/Profile/mpeg2.pm
+lib/Media/Convert/Asset/ProfileFactory.pm
+lib/Media/Convert/AvSync.pm
+lib/Media/Convert/CodecMap.pm
+lib/Media/Convert/Map.pm
+lib/Media/Convert/Normalizer.pm
+lib/Media/Convert/Normalizer/Bs1770gain.pm
+lib/Media/Convert/Normalizer/Ffmpeg.pm
+lib/Media/Convert/Normalizer/None.pm
+lib/Media/Convert/Pipe.pm
+MANIFEST			This list of files
+t/avsync.t
+t/concat.t
+t/convert.t
+t/normalize.t
+t/pnggen.t
+t/profiles.t
+t/testvids/bbb.mp4
+t/testvids/m-c.png
+t/testvids/m-c.svg
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

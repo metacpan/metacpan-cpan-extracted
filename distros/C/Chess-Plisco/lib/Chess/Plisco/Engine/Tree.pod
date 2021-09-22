@@ -1,0 +1,72 @@
+=for Pod::Coverage empty
+
+=head1 NAME
+
+Chess::Plisco::Engine::Tree - Plisco's search tee
+
+=head1 SYNOPSIS
+
+    my $tree = Chess::Plisco::Engine::Tree->new(Chess::Plisco::Engine::Position->new);
+
+=head1 DESCRIPTION
+
+A B<Chess::Plisco::Engine::Tree> holds all information for a current search (for
+the best move).
+
+=head1 PROPERTIES
+
+The tree has the following properties that you can read and manipulate
+directly.
+
+=over 4
+
+=item B<position>
+
+The current position as a L<Chess::Plisco::Engine::Position> object.
+
+=item B<start_time>
+
+Start time of the current search as an array of seconds and microseconds
+since the epoch (as returned by  L<Time::HiRes/gettimeofday>).
+
+=item B<allocated_time>
+
+The maximum time in ms to think about a move.
+
+=item B<nodes_to_tc>
+
+When that many nodes have been searched, the time left should be checked
+again.
+
+=item B<stop>
+
+A condvar of AniEvent that the engine sends the best mvoe to, when the search
+is done.
+
+=item B<watcher>
+
+An instance of a L<Chess::Plisco::Engine::InputWatcher> that is asked about 10
+times per second to check the command-line for input.
+
+=item B<thinking>
+
+Set to true if the engine is thinking.
+
+=item B<bestmove>
+
+The best move as a string.
+
+=item B<score>
+
+The current score of the position.
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (C) 2021 Guido Flohr <guido.flohr@cantanea.com>,
+all rights reserved.
+
+=head1 SEE ALSO
+
+L<Chess::Plisco::Engine::Position>, perl(1)

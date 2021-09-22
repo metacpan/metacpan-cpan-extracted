@@ -31,7 +31,7 @@ stock2ali.pl - Convert STOCKHOLM files to ALI files
 
 =head1 VERSION
 
-version 0.212530
+version 0.212650
 
 =head1 USAGE
 

@@ -38,7 +38,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-DiffTarballs
   homepage: https://metacpan.org/release/App-DiffTarballs
   repository: git://github.com/perlancar/perl-App-DiffTarballs.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

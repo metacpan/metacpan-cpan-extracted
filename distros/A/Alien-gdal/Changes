@@ -1,10 +1,14 @@
 Revision history for Alien::gdal
 
+1.26 2021-09-15
+    - alienfile: Add Geos lib dir to $ENV{LD_LIBRARY_PATH} to allow configure to pass
+      on non-Windows OSes for GDAL >=3.3.
+
 1.25 2021-09-11
-    - Disable more drivers by default so as not to exceed the linker limits.  
+    - Disable more drivers by default so as not to exceed the linker limits on windows.
 
 1.24 2021-05-11
-    - Trim dangling -L in LDFLAGS for source installs on Windows.
+    - Trim dangling -L in LDFLAGS for share installs on Windows.
       Possibly affect(s|ed) other OSes.
 
 1.23 2020-09-05

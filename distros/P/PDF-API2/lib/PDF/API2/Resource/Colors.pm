@@ -3,8 +3,9 @@ package PDF::API2::Resource::Colors;
 use strict;
 use warnings;
 
-our $VERSION = '2.041'; # VERSION
+our $VERSION = '2.042'; # VERSION
 
+# This is an amalgamation of the X11, SGML, and (X)HTML specification sets
 sub get_colors {
     return (
         aliceblue            => '#EFF7FF',

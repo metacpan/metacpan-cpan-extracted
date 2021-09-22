@@ -12,12 +12,11 @@ use base 'PDF::API2::Basic::PDF::Objind';
 
 use strict;
 
-our $VERSION = '2.041'; # VERSION
+our $VERSION = '2.042'; # VERSION
 
 =head1 NAME
 
-PDF::API2::Basic::PDF::Null - PDF Null type object.  This is a subclass of
-PDF::API2::Basic::PDF::Objind and cannot be subclassed.
+PDF::API2::Basic::PDF::Null - Low-level PDF null object
 
 =head1 METHODS
 

@@ -1,5 +1,10 @@
 Revision history for XS-Parse-Keyword
 
+0.16    2021-09-21
+        [CHANGES]
+         * Attempt automatic deparsing of infix operators
+         * Support certain kinds of list operands on RHS of infix operators
+
 0.15    2021-09-06
         [CHANGES]
          * Optional generation of wrapper functions around scalar-infix

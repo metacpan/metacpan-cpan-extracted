@@ -1,0 +1,30 @@
+commit a3929ed5687c2a23c214b742cd614d6e0a63e691
+Author: Espen Wiborg <Espen.Wiborg@telio.no>
+Date:   Wed Apr 9 18:15:46 2014 -0400
+
+    Make Widgets/Form/Select honor Multiple
+    
+    Even if you set Multiple => 1, you still get a dropdown.  Also ensure
+    that the "default"/empty value is selected if no CurrentValue is set;
+    this becomes much more visible with the multiple-select listbox.
+    
+    Resolves I#12447.
+
+diff --git a/share/html/Widgets/Form/Select b/share/html/Widgets/Form/Select
+index 08a7bdab2..903fa9bb8 100644
+--- a/share/html/Widgets/Form/Select
++++ b/share/html/Widgets/Form/Select
+@@ -80,11 +80,11 @@ $AlternativeLabel => loc('other...'),
+ 
+ $Multiple         => 0,
+ </%ARGS>
+-<select name="<% $Name %>">
++<select name="<% $Name %>" <% $Multiple ? 'multiple="multiple"' : '' |n%>>
+ 
+ % if ( $Default ) {
+ % my $selected = '';
+-% $selected = 'selected="selected"' unless @CurrentValue;
++% $selected = 'selected="selected"' unless $CurrentValue[0];
+ <option value="__empty_value__" <% $selected |n %>><% $DefaultLabel %></option>
+ % }
+ 

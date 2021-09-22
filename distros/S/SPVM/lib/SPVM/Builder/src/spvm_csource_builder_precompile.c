@@ -284,7 +284,7 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_add_add(SPVM_COMPILER* compiler, SPVM_STRIN
   SPVM_STRING_BUFFER_add(string_buffer, ";\n");
 }
 
-void SPVM_CSOURCE_BUILDER_PRECOMPILE_add_methodtract(SPVM_COMPILER* compiler, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in1_index, int32_t in2_index) {
+void SPVM_CSOURCE_BUILDER_PRECOMPILE_add_subtract(SPVM_COMPILER* compiler, SPVM_STRING_BUFFER* string_buffer, int32_t ctype_id, int32_t out_index, int32_t in1_index, int32_t in2_index) {
   SPVM_STRING_BUFFER_add(string_buffer, "  ");
   SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(compiler, string_buffer, ctype_id, out_index);
   SPVM_STRING_BUFFER_add(string_buffer, " = ");
@@ -1968,17 +1968,17 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_method_implementation(SPVM_COMPILER* 
       case SPVM_OPCODE_C_ID_ADD_DOUBLE:
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_add(compiler, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
-      case SPVM_OPCODE_C_ID_METHODTRACT_INT:
-        SPVM_CSOURCE_BUILDER_PRECOMPILE_add_methodtract(compiler, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2);
+      case SPVM_OPCODE_C_ID_SUBTRACT_INT:
+        SPVM_CSOURCE_BUILDER_PRECOMPILE_add_subtract(compiler, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
-      case SPVM_OPCODE_C_ID_METHODTRACT_LONG:
-        SPVM_CSOURCE_BUILDER_PRECOMPILE_add_methodtract(compiler, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2);
+      case SPVM_OPCODE_C_ID_SUBTRACT_LONG:
+        SPVM_CSOURCE_BUILDER_PRECOMPILE_add_subtract(compiler, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
-      case SPVM_OPCODE_C_ID_METHODTRACT_FLOAT:
-        SPVM_CSOURCE_BUILDER_PRECOMPILE_add_methodtract(compiler, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, opcode->operand2);
+      case SPVM_OPCODE_C_ID_SUBTRACT_FLOAT:
+        SPVM_CSOURCE_BUILDER_PRECOMPILE_add_subtract(compiler, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
-      case SPVM_OPCODE_C_ID_METHODTRACT_DOUBLE:
-        SPVM_CSOURCE_BUILDER_PRECOMPILE_add_methodtract(compiler, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, opcode->operand2);
+      case SPVM_OPCODE_C_ID_SUBTRACT_DOUBLE:
+        SPVM_CSOURCE_BUILDER_PRECOMPILE_add_subtract(compiler, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, opcode->operand2);
         break;
       case SPVM_OPCODE_C_ID_MULTIPLY_INT:
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_multiply(compiler, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, opcode->operand2);
@@ -3898,73 +3898,10 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_method_implementation(SPVM_COMPILER* 
         
         break;
       }
-      case SPVM_OPCODE_C_ID_CALL_METHOD_VOID:
-      case SPVM_OPCODE_C_ID_CALL_METHOD_BYTE:
-      case SPVM_OPCODE_C_ID_CALL_METHOD_SHORT:
-      case SPVM_OPCODE_C_ID_CALL_METHOD_INT:
-      case SPVM_OPCODE_C_ID_CALL_METHOD_LONG:
-      case SPVM_OPCODE_C_ID_CALL_METHOD_FLOAT:
-      case SPVM_OPCODE_C_ID_CALL_METHOD_DOUBLE:
-      case SPVM_OPCODE_C_ID_CALL_METHOD_OBJECT:
-      case SPVM_OPCODE_C_ID_CALL_METHOD_MULNUM_BYTE:
-      case SPVM_OPCODE_C_ID_CALL_METHOD_MULNUM_SHORT:
-      case SPVM_OPCODE_C_ID_CALL_METHOD_MULNUM_INT:
-      case SPVM_OPCODE_C_ID_CALL_METHOD_MULNUM_LONG:
-      case SPVM_OPCODE_C_ID_CALL_METHOD_MULNUM_FLOAT:
-      case SPVM_OPCODE_C_ID_CALL_METHOD_MULNUM_DOUBLE:
-      case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_VOID:
-      case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_BYTE:
-      case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_SHORT:
-      case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_INT:
-      case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_LONG:
-      case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_FLOAT:
-      case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_DOUBLE:
-      case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_OBJECT:
-      case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_MULNUM_BYTE:
-      case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_MULNUM_SHORT:
-      case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_MULNUM_INT:
-      case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_MULNUM_LONG:
-      case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_MULNUM_FLOAT:
-      case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_MULNUM_DOUBLE:
+      case SPVM_OPCODE_C_ID_CALL_CLASS_METHOD:
+      case SPVM_OPCODE_C_ID_CALL_INSTANCE_METHOD:
+      case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD:
       {
-        int8_t is_method;
-        switch (opcode_id) {
-          case SPVM_OPCODE_C_ID_CALL_METHOD_VOID:
-          case SPVM_OPCODE_C_ID_CALL_METHOD_BYTE:
-          case SPVM_OPCODE_C_ID_CALL_METHOD_SHORT:
-          case SPVM_OPCODE_C_ID_CALL_METHOD_INT:
-          case SPVM_OPCODE_C_ID_CALL_METHOD_LONG:
-          case SPVM_OPCODE_C_ID_CALL_METHOD_FLOAT:
-          case SPVM_OPCODE_C_ID_CALL_METHOD_DOUBLE:
-          case SPVM_OPCODE_C_ID_CALL_METHOD_OBJECT:
-          case SPVM_OPCODE_C_ID_CALL_METHOD_MULNUM_BYTE:
-          case SPVM_OPCODE_C_ID_CALL_METHOD_MULNUM_SHORT:
-          case SPVM_OPCODE_C_ID_CALL_METHOD_MULNUM_INT:
-          case SPVM_OPCODE_C_ID_CALL_METHOD_MULNUM_LONG:
-          case SPVM_OPCODE_C_ID_CALL_METHOD_MULNUM_FLOAT:
-          case SPVM_OPCODE_C_ID_CALL_METHOD_MULNUM_DOUBLE:
-            is_method = 1;
-            break;
-          case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_VOID:
-          case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_BYTE:
-          case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_SHORT:
-          case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_INT:
-          case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_LONG:
-          case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_FLOAT:
-          case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_DOUBLE:
-          case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_OBJECT:
-          case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_MULNUM_BYTE:
-          case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_MULNUM_SHORT:
-          case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_MULNUM_INT:
-          case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_MULNUM_LONG:
-          case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_MULNUM_FLOAT:
-          case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_MULNUM_DOUBLE:
-            is_method = 0;
-            break;
-          default:
-            assert(0);
-        }
-        
         int32_t var_id = opcode->operand0;
         int32_t decl_method_id = opcode->operand1;
 
@@ -3985,59 +3922,9 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_method_implementation(SPVM_COMPILER* 
         SPVM_STRING_BUFFER_add(string_buffer, "\n");
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
         
-        // Call method
-        if (is_method) {
-          SPVM_STRING_BUFFER_add(string_buffer, "    if (");
-          SPVM_STRING_BUFFER_add_method_access_id_name(string_buffer, class->name, decl_method_class_name, decl_method_name);
-          SPVM_STRING_BUFFER_add(string_buffer, " < 0) {\n");
-          SPVM_STRING_BUFFER_add(string_buffer, "      ");
-          SPVM_STRING_BUFFER_add_method_access_id_name(string_buffer, class->name, decl_method_class_name, decl_method_name);
-          SPVM_STRING_BUFFER_add(string_buffer, " = env->get_method_id(env, \"");
-          SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_method_class_name);
-          SPVM_STRING_BUFFER_add(string_buffer, "\", \"");
-          SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_method_name);
-          SPVM_STRING_BUFFER_add(string_buffer, "\", \"");
-          SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_method_signature);
-          SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
-          SPVM_STRING_BUFFER_add(string_buffer, "      if (");
-          SPVM_STRING_BUFFER_add_method_access_id_name(string_buffer, class->name, decl_method_class_name, decl_method_name);
-          SPVM_STRING_BUFFER_add(string_buffer, " < 0) {\n");
-          SPVM_STRING_BUFFER_add(string_buffer, "        void* exception = env->new_string_nolen_raw(env, \"Method not found ");
-          SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_method_class_name);
-          SPVM_STRING_BUFFER_add(string_buffer, " ");
-          SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_method_name);
-          SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
-          SPVM_STRING_BUFFER_add(string_buffer, "        env->set_exception(env, exception);\n");
-          SPVM_STRING_BUFFER_add(string_buffer, "        return 1;\n");
-          SPVM_STRING_BUFFER_add(string_buffer, "      }\n");
-          SPVM_STRING_BUFFER_add(string_buffer, "    }\n");
-          SPVM_STRING_BUFFER_add(string_buffer, "    int32_t call_spvm_method_id = ");
-          SPVM_STRING_BUFFER_add_method_access_id_name(string_buffer, class->name, decl_method_class_name, decl_method_name);
-          SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-        }
-        // Call method
-        else {
-          SPVM_STRING_BUFFER_add(string_buffer, "    void* object = ");
-          SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(compiler, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand2);
-          SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-          SPVM_STRING_BUFFER_add(string_buffer, "    int32_t call_spvm_method_id = env->get_method_id_by_object(env, object, \"");
-          SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_method_name);
-          SPVM_STRING_BUFFER_add(string_buffer, "\", \"");
-          SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_method_signature);
-          SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
-          SPVM_STRING_BUFFER_add(string_buffer, "    if (call_spvm_method_id == 0) {\n");
-          SPVM_STRING_BUFFER_add(string_buffer, "      void* exception = env->new_string_nolen_raw(env, \"Method not found ");
-          SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_method_class_name);
-          SPVM_STRING_BUFFER_add(string_buffer, " ");
-          SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_method_name);
-          SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
-          SPVM_STRING_BUFFER_add(string_buffer, "      env->set_exception(env, exception);\n");
-          SPVM_STRING_BUFFER_add(string_buffer, "      return 1;\n");
-          SPVM_STRING_BUFFER_add(string_buffer, "    }\n");
-        }
-        
         // Method inline expantion in same class
         if (decl_method->class->id == method->class->id && decl_method->flag & SPVM_METHOD_C_FLAG_PRECOMPILE) {
+          
           SPVM_STRING_BUFFER_add(string_buffer, "    exception_flag = SPVMPRECOMPILE__");
           SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_method_class_name);
           SPVM_STRING_BUFFER_add(string_buffer, (char*)"__");
@@ -4056,17 +3943,102 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_method_implementation(SPVM_COMPILER* 
         }
         // Call method
         else {
-          SPVM_STRING_BUFFER_add(string_buffer, "    exception_flag = env->call_spvm_method(env, call_spvm_method_id, stack);\n");
+          switch (opcode_id) {
+            case SPVM_OPCODE_C_ID_CALL_CLASS_METHOD: {
+              SPVM_STRING_BUFFER_add(string_buffer, "    if (");
+              SPVM_STRING_BUFFER_add_method_access_id_name(string_buffer, class->name, decl_method_class_name, decl_method_name);
+              SPVM_STRING_BUFFER_add(string_buffer, " < 0) {\n");
+              SPVM_STRING_BUFFER_add(string_buffer, "      ");
+              SPVM_STRING_BUFFER_add_method_access_id_name(string_buffer, class->name, decl_method_class_name, decl_method_name);
+              SPVM_STRING_BUFFER_add(string_buffer, " = env->get_class_method_id(env, \"");
+              SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_method_class_name);
+              SPVM_STRING_BUFFER_add(string_buffer, "\", \"");
+              SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_method_name);
+              SPVM_STRING_BUFFER_add(string_buffer, "\", \"");
+              SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_method_signature);
+              SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
+              SPVM_STRING_BUFFER_add(string_buffer, "      if (");
+              SPVM_STRING_BUFFER_add_method_access_id_name(string_buffer, class->name, decl_method_class_name, decl_method_name);
+              SPVM_STRING_BUFFER_add(string_buffer, " < 0) {\n");
+              SPVM_STRING_BUFFER_add(string_buffer, "        void* exception = env->new_string_nolen_raw(env, \"Method not found ");
+              SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_method_class_name);
+              SPVM_STRING_BUFFER_add(string_buffer, "->");
+              SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_method_name);
+              SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
+              SPVM_STRING_BUFFER_add(string_buffer, "        env->set_exception(env, exception);\n");
+              SPVM_STRING_BUFFER_add(string_buffer, "        return 1;\n");
+              SPVM_STRING_BUFFER_add(string_buffer, "      }\n");
+              SPVM_STRING_BUFFER_add(string_buffer, "    }\n");
+              SPVM_STRING_BUFFER_add(string_buffer, "    int32_t call_method_id = ");
+              SPVM_STRING_BUFFER_add_method_access_id_name(string_buffer, class->name, decl_method_class_name, decl_method_name);
+              SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+              
+              break;
+            }
+            case SPVM_OPCODE_C_ID_CALL_INSTANCE_METHOD: {
+              SPVM_STRING_BUFFER_add(string_buffer, "    if (");
+              SPVM_STRING_BUFFER_add_method_access_id_name(string_buffer, class->name, decl_method_class_name, decl_method_name);
+              SPVM_STRING_BUFFER_add(string_buffer, " < 0) {\n");
+              SPVM_STRING_BUFFER_add(string_buffer, "      ");
+              SPVM_STRING_BUFFER_add_method_access_id_name(string_buffer, class->name, decl_method_class_name, decl_method_name);
+              SPVM_STRING_BUFFER_add(string_buffer, " = env->get_instance_method_id_static(env, \"");
+              SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_method_class_name);
+              SPVM_STRING_BUFFER_add(string_buffer, "\", \"");
+              SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_method_name);
+              SPVM_STRING_BUFFER_add(string_buffer, "\", \"");
+              SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_method_signature);
+              SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
+              SPVM_STRING_BUFFER_add(string_buffer, "      if (");
+              SPVM_STRING_BUFFER_add_method_access_id_name(string_buffer, class->name, decl_method_class_name, decl_method_name);
+              SPVM_STRING_BUFFER_add(string_buffer, " < 0) {\n");
+              SPVM_STRING_BUFFER_add(string_buffer, "        void* exception = env->new_string_nolen_raw(env, \"Method not found ");
+              SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_method_class_name);
+              SPVM_STRING_BUFFER_add(string_buffer, "->");
+              SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_method_name);
+              SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
+              SPVM_STRING_BUFFER_add(string_buffer, "        env->set_exception(env, exception);\n");
+              SPVM_STRING_BUFFER_add(string_buffer, "        return 1;\n");
+              SPVM_STRING_BUFFER_add(string_buffer, "      }\n");
+              SPVM_STRING_BUFFER_add(string_buffer, "    }\n");
+              SPVM_STRING_BUFFER_add(string_buffer, "    int32_t call_method_id = ");
+              SPVM_STRING_BUFFER_add_method_access_id_name(string_buffer, class->name, decl_method_class_name, decl_method_name);
+              SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+              
+              break;
+            }
+            case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD: {
+              SPVM_STRING_BUFFER_add(string_buffer, "    void* object = stack[0].oval;");
+              SPVM_STRING_BUFFER_add(string_buffer, "    int32_t call_method_id = env->get_instance_method_id(env, object, \"");
+              SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_method_name);
+              SPVM_STRING_BUFFER_add(string_buffer, "\", \"");
+              SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_method_signature);
+              SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
+              SPVM_STRING_BUFFER_add(string_buffer, "    if (call_method_id == 0) {\n");
+              SPVM_STRING_BUFFER_add(string_buffer, "      void* exception = env->new_string_nolen_raw(env, \"Method not found ");
+              SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_method_class_name);
+              SPVM_STRING_BUFFER_add(string_buffer, "->");
+              SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_method_name);
+              SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
+              SPVM_STRING_BUFFER_add(string_buffer, "      env->set_exception(env, exception);\n");
+              SPVM_STRING_BUFFER_add(string_buffer, "      return 1;\n");
+              SPVM_STRING_BUFFER_add(string_buffer, "    }\n");
+              
+              break;
+            }
+            default: {
+              assert(0);
+            }
+          }
+          
+          SPVM_STRING_BUFFER_add(string_buffer, "    exception_flag = env->call_spvm_method(env, call_method_id, stack);\n");
         }
         
         // Call method
         SPVM_STRING_BUFFER_add(string_buffer, "    if (!exception_flag) {\n");
-        switch (opcode_id) {
-          case SPVM_OPCODE_C_ID_CALL_METHOD_VOID:
-          case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_VOID:
+        switch (decl_method->return_type_category_id) {
+          case SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_VOID:
             break;
-          case SPVM_OPCODE_C_ID_CALL_METHOD_BYTE:
-          case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_BYTE: {
+          case SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_BYTE: {
             SPVM_STRING_BUFFER_add(string_buffer, "      ");
             SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(compiler, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_BYTE, var_id);
             SPVM_STRING_BUFFER_add(string_buffer, " = ");
@@ -4074,8 +4046,7 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_method_implementation(SPVM_COMPILER* 
             SPVM_STRING_BUFFER_add(string_buffer, ";\n");
             break;
           }
-          case SPVM_OPCODE_C_ID_CALL_METHOD_SHORT:
-          case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_SHORT: {
+          case SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_SHORT: {
             SPVM_STRING_BUFFER_add(string_buffer, "      ");
             SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(compiler, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_SHORT, var_id);
             SPVM_STRING_BUFFER_add(string_buffer, " = ");
@@ -4083,8 +4054,7 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_method_implementation(SPVM_COMPILER* 
             SPVM_STRING_BUFFER_add(string_buffer, ";\n");
             break;
           }
-          case SPVM_OPCODE_C_ID_CALL_METHOD_INT:
-          case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_INT: {
+          case SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_INT: {
             SPVM_STRING_BUFFER_add(string_buffer, "      ");
             SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(compiler, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_INT, var_id);
             SPVM_STRING_BUFFER_add(string_buffer, " = ");
@@ -4092,8 +4062,7 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_method_implementation(SPVM_COMPILER* 
             SPVM_STRING_BUFFER_add(string_buffer, ";\n");
             break;
           }
-          case SPVM_OPCODE_C_ID_CALL_METHOD_LONG:
-          case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_LONG: {
+          case SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_LONG: {
             SPVM_STRING_BUFFER_add(string_buffer, "      ");
             SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(compiler, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_LONG, var_id);
             SPVM_STRING_BUFFER_add(string_buffer, " = ");
@@ -4101,8 +4070,7 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_method_implementation(SPVM_COMPILER* 
             SPVM_STRING_BUFFER_add(string_buffer, ";\n");
             break;
           }
-          case SPVM_OPCODE_C_ID_CALL_METHOD_FLOAT:
-          case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_FLOAT: {
+          case SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_FLOAT: {
             SPVM_STRING_BUFFER_add(string_buffer, "      ");
             SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(compiler, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_FLOAT, var_id);
             SPVM_STRING_BUFFER_add(string_buffer, " = ");
@@ -4110,8 +4078,7 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_method_implementation(SPVM_COMPILER* 
             SPVM_STRING_BUFFER_add(string_buffer, ";\n");
             break;
           }
-          case SPVM_OPCODE_C_ID_CALL_METHOD_DOUBLE:
-          case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_DOUBLE: {
+          case SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_DOUBLE: {
             SPVM_STRING_BUFFER_add(string_buffer, "      ");
             SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(compiler, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_DOUBLE, var_id);
             SPVM_STRING_BUFFER_add(string_buffer, " = ");
@@ -4119,15 +4086,13 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_method_implementation(SPVM_COMPILER* 
             SPVM_STRING_BUFFER_add(string_buffer, ";\n");
             break;
           }
-          case SPVM_OPCODE_C_ID_CALL_METHOD_OBJECT:
-          case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_OBJECT: {
+          case SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_OBJECT: {
             SPVM_STRING_BUFFER_add(string_buffer, "      SPVM_API_OBJECT_ASSIGN(&");
             SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(compiler, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_OBJECT, var_id);
             SPVM_STRING_BUFFER_add(string_buffer, ", stack[0].oval);\n");
             break;
           }
-          case SPVM_OPCODE_C_ID_CALL_METHOD_MULNUM_BYTE:
-          case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_MULNUM_BYTE: {
+          case SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_MULNUM_BYTE: {
             int32_t decl_method_return_type_width = opcode->operand3;
             for (int32_t field_index = 0; field_index < decl_method_return_type_width; field_index++) {
               SPVM_STRING_BUFFER_add(string_buffer, "      ");
@@ -4138,8 +4103,7 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_method_implementation(SPVM_COMPILER* 
             }
             break;
           }
-          case SPVM_OPCODE_C_ID_CALL_METHOD_MULNUM_SHORT:
-          case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_MULNUM_SHORT: {
+          case SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_MULNUM_SHORT: {
             int32_t decl_method_return_type_width = opcode->operand3;
             for (int32_t field_index = 0; field_index < decl_method_return_type_width; field_index++) {
               SPVM_STRING_BUFFER_add(string_buffer, "      ");
@@ -4150,8 +4114,7 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_method_implementation(SPVM_COMPILER* 
             }
             break;
           }
-          case SPVM_OPCODE_C_ID_CALL_METHOD_MULNUM_LONG:
-          case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_MULNUM_LONG: {
+          case SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_MULNUM_LONG: {
             int32_t decl_method_return_type_width = opcode->operand3;
             for (int32_t field_index = 0; field_index < decl_method_return_type_width; field_index++) {
               SPVM_STRING_BUFFER_add(string_buffer, "      ");
@@ -4162,8 +4125,7 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_method_implementation(SPVM_COMPILER* 
             }
             break;
           }
-          case SPVM_OPCODE_C_ID_CALL_METHOD_MULNUM_FLOAT:
-          case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_MULNUM_FLOAT: {
+          case SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_MULNUM_FLOAT: {
             int32_t decl_method_return_type_width = opcode->operand3;
             for (int32_t field_index = 0; field_index < decl_method_return_type_width; field_index++) {
               SPVM_STRING_BUFFER_add(string_buffer, "      ");
@@ -4174,8 +4136,7 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_method_implementation(SPVM_COMPILER* 
             }
             break;
           }
-          case SPVM_OPCODE_C_ID_CALL_METHOD_MULNUM_DOUBLE:
-          case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_MULNUM_DOUBLE: {
+          case SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_MULNUM_DOUBLE: {
             int32_t decl_method_return_type_width = opcode->operand3;
             for (int32_t field_index = 0; field_index < decl_method_return_type_width; field_index++) {
               SPVM_STRING_BUFFER_add(string_buffer, "      ");
@@ -4186,8 +4147,7 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_method_implementation(SPVM_COMPILER* 
             }
             break;
           }
-          case SPVM_OPCODE_C_ID_CALL_METHOD_MULNUM_INT:
-          case SPVM_OPCODE_C_ID_CALL_CALLBACK_METHOD_MULNUM_INT: {
+          case SPVM_METHOD_C_RETURN_TYPE_CATEGORY_ID_MULNUM_INT: {
             int32_t decl_method_return_type_width = opcode->operand3;
             for (int32_t field_index = 0; field_index < decl_method_return_type_width; field_index++) {
               SPVM_STRING_BUFFER_add(string_buffer, "      ");

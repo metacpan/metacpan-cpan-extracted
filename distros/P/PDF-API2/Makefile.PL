@@ -7,7 +7,7 @@ use 5.010000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Facilitates the creation and modification of PDF files",
+  "ABSTRACT" => "Create, modify, and examine PDF files",
   "AUTHOR" => "Steve Simms <steve\@deefs.net>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::Memory::Cycle" => 0
   },
-  "VERSION" => "2.041",
+  "VERSION" => "2.042",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -11,7 +11,7 @@ use Form::Tiny::Utils qw(trim create_anon_form_meta);
 
 use namespace::clean;
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 with 'Form::Tiny::Form';
 

@@ -27,18 +27,18 @@ SUBCLASS
 my $builder = $deployer->new(
     module_name        => 'BioX::Seq',
     license            => 'GPL_3',
-    dist_author        => q{Jeremy Volkening <jdv@base2bio.com>},
+    dist_author        => q{Jeremy Volkening <volkening@cpan.org>},
     configure_requires => {
         'Module::Build' => 0,
     },
     build_requires => {
-        'File::Which'     => 0,
+        'Compress::BGZF'  => 0,
+        'IPC::Cmd'        => 0,
         'Test::Exception' => 0,
         'Test::More'      => 0,
     },
     requires => {
-        'Compress::BGZF' => 0,
-        'File::Which'    => 0,
+        'IPC::Cmd'       => 0,
         'Scalar::Util'   => 0,
         'POSIX'          => 0,
         'Cwd'            => 0,

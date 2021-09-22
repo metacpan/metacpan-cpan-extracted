@@ -529,7 +529,7 @@ _init(...)
   SV* sv_env = sv_2mortal(newRV_inc(sviv_env));
   (void)hv_store(hv_self, "env", strlen("env"), SvREFCNT_inc(sv_env), 0);
   
-  SPVM_API_call_begin_blocks(env);
+  SPVM_API_call_init_blocks(env);
 }
 
 SV*
@@ -2180,7 +2180,7 @@ call_spvm_method(...)
   int32_t spvm_args_base = 3;
 
   // If class method, first argument is ignored
-  if (method->call_type_id == SPVM_METHOD_C_CALL_TYPE_ID_STATIC_METHOD) {
+  if (method->is_class_method) {
     spvm_args_base++;
   }
   

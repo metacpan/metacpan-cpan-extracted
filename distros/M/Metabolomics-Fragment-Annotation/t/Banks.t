@@ -2868,7 +2868,7 @@ BEGIN {
 		1
 		),
 		bless( {
-                 '_BIOACTIVE_' => undef,
+                 '_BIOACTIVE_' => bless( do{\(my $o = 1)}, 'JSON::PP::Boolean' ),
                  '_LOG_P_' => undef,
                  '_EXACT_MASS_' => '161.068807837',
                  '_IUPAC_' => undef,
@@ -7448,6 +7448,7 @@ BEGIN {
 	    my $oSpectra = $o->_getGcmsSpectraByMatchingPeaks($column_code, $list_mz, $delta) ;
 	    
 #	    print Dumper $oSpectra ;
+
 	    return($oSpectra) ;
 	}
 	## END

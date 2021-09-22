@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Project;
 use strict;
 use warnings;
 
-our $VERSION = '0.000084';
+our $VERSION = '0.000086';
 
 use Time::Elapsed qw/elapsed/;
 use List::Util qw/sum/;
@@ -322,7 +322,7 @@ sub _build_stat_sub_failures {
                 fails => $fails,
                 percent => $p,
                 rate => "$fails/$total ($p\%)",
-                last_fail => $rc - $last_fail,
+                last_fail => $last_fail,
             };
         }
     }
@@ -396,7 +396,7 @@ sub _build_stat_file_failures {
         rows => [
             map {
                 my $set = $files{$_};
-                [{}, $set->{rate}, $_, $rc - $set->{last_fail}]
+                [{}, $set->{rate}, $_, $set->{last_fail}]
             } grep { $_ } @sorted,
         ],
     };

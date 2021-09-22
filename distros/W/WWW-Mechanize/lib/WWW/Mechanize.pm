@@ -6,7 +6,7 @@ package WWW::Mechanize;
 use strict;
 use warnings;
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 use Tie::RefHash;
 use HTTP::Request 1.30;
@@ -1800,7 +1800,7 @@ WWW::Mechanize - Handy web browsing in a Perl object
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 SYNOPSIS
 
@@ -3349,8 +3349,8 @@ L<Mozilla::PublicSuffix> is installed.
 
 =item protocols_allowed
 
-This option is inherited directly from L<LWP::UserAgent>.  It allows you to
-whitelist the protocols you're willing to allow.
+This option is inherited directly from L<LWP::UserAgent>.  It may be used to
+allow arbitrary protocols.
 
     my $agent = WWW::Mechanize->new(
         protocols_allowed => [ 'http', 'https' ]
@@ -3361,8 +3361,8 @@ C<file:///etc/passwd>
 
 =item protocols_forbidden
 
-This option is also inherited directly from L<LWP::UserAgent>.  It allows you to
-blacklist the protocols you're unwilling to allow.
+This option is also inherited directly from L<LWP::UserAgent>.  It may be used
+to deny arbitrary protocols.
 
     my $agent = WWW::Mechanize->new(
         protocols_forbidden => [ 'file', 'mailto', 'ssh', ]

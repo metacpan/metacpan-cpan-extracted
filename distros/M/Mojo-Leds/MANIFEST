@@ -26,6 +26,7 @@ t/20-redirect.t
 t/30-restify_mongodb.t
 t/40-restify_dbix.t
 t/50-server_errors.t
+t/60-leds_app.t
 t/site/cfg/app.cfg
 t/site/lib/Skel.pm
 t/site/www/public/static.html

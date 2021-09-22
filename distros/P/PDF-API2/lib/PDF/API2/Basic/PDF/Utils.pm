@@ -10,11 +10,12 @@ package PDF::API2::Basic::PDF::Utils;
 
 use strict;
 
-our $VERSION = '2.041'; # VERSION
+our $VERSION = '2.042'; # VERSION
 
 =head1 NAME
 
-PDF::API2::Basic::PDF::Utils - Utility functions for PDF library
+PDF::API2::Basic::PDF::Utils - Convenience functions for creating low-level PDF
+objects
 
 =head1 DESCRIPTION
 

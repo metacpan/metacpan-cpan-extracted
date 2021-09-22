@@ -42,7 +42,7 @@ ansicolumn [options] [file ...]
     --runin=#            run-in width
     --runout=#           run-out width
     --[no-]pagebreak     allow page break
-    --border=#           print border
+    --border[=#]         print border
     --border-style=#     border style
     --[no-]ignore-space  ignore space in table output
     --[no-]isolation     page-end line isolation
@@ -55,7 +55,7 @@ ansicolumn [options] [file ...]
 
 =head1 VERSION
 
-Version 1.12
+Version 1.13
 
 =head1 DESCRIPTION
 
@@ -167,7 +167,7 @@ Insert empty line between every successive non-empty lines.
 
 Set page height and page mode on.  See L</CALCULATION> section.
 
-=item B<--column-unit>=#
+=item B<--column-unit>=#, B<--cu>=#
 
 Each columns are placed at the unit of 8 by default.  This option
 changes the number of the unit.
@@ -201,7 +201,7 @@ Default is both 2.
 Move to next pane when form feed character found.
 Default true.
 
-=item B<--border>[=I<style>]
+=item B<--border>[=I<style>], B<-B>[I<style>]
 
 Print border.  Enabled by B<--page> option automatically.  If the
 optional I<style> is given, it is used as a border style and precedes
@@ -283,7 +283,7 @@ as unicode name.
 Set the style how tab is expanded.  Select from C<dot>, C<symbol> or
 C<shade>.  Styles are defined in L<Text::ANSI::Fold> library.
 
-=item B<--ambiguous>=I<width_spec>
+=item B<--ambiguous>=C<wide>|C<narrow>
 
 Specifies how to treat Unicode ambiguous width characters.  Take a
 value of 'narrow' or 'wide.  Default is 'narrow'.

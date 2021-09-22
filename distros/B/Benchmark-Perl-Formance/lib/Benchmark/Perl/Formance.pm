@@ -1,9 +1,9 @@
 package Benchmark::Perl::Formance;
-# git description: v0.52-1-ge734e5c
+# git description: v0.54-2-g52509be
 
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Perl 5 performance benchmarking framework
-$Benchmark::Perl::Formance::VERSION = '0.53';
+$Benchmark::Perl::Formance::VERSION = '0.55';
 use 5.008;
 
 use warnings;
@@ -23,6 +23,9 @@ use Storable "fd_retrieve", "store_fd";
 use Sys::Hostname;
 use Sys::Info;
 use FindBin qw($Bin);
+
+use Module::Pluggable;
+use Module::Runtime qw/ require_module /;
 
 # comma separated list of default plugins - basically the non-troublemakers
 my $DEFAULT_PLUGINS = join ",", qw(DPath
@@ -115,6 +118,11 @@ my %CONFIG_KEYS = (
                             api_subversion
                             api_versionstring
 
+                            git_branch
+                            git_commit_id
+                            git_describe
+                            git_uncommitted_changes
+
                             gnulibc_version
                             dtrace
                             doublesize
@@ -155,29 +163,14 @@ sub new {
 
 sub load_all_plugins
 {
-        my $path = __FILE__;
-        $path =~ s,\.pmc?$,/Plugin,;
+    map {
+        my $version = $_->[1] ? $_->[0]->VERSION : '~';
+       (my $name    = $_->[0]) =~ s/.*::Plugin:://;
 
-        my %all_plugins;
-        finddepth ({ no_chdir => 1,
-                     follow   => 1,
-                     wanted   => sub { no strict 'refs';
-                                       my $fullname = $File::Find::fullname;
-                                       my $plugin   = $File::Find::name;
-                                       $plugin      =~ s,^$path/*,,;
-                                       $plugin      =~ s,/,::,;
-                                       $plugin      =~ s,\.pmc?$,,;
-
-                                       my $module = "Benchmark::Perl::Formance::Plugin::$plugin";
-                                       # eval { require $fullname };
-                                       eval "use $module"; ## no critic
-                                       my $version = $@ ? "~" : ${$module."::VERSION"};
-                                       $all_plugins{$plugin} = $version
-                                         if -f $fullname && $fullname =~ /\.pmc?$/;
-                               },
-                   },
-                   $path);
-        return %all_plugins;
+        $name => $version;
+    } 
+    map { [ $_ => eval { require_module($_) } ] } 
+        __PACKAGE__->plugins;
 }
 
 sub print_version
@@ -321,9 +314,11 @@ sub run_plugin
         return $res;
 }
 
-# That's specific to the Tapper wrapper around
-# Benchmark::Perl::Formance and should be replaced
-# with something generic
+# ,-----------------------------------------------------------
+# |
+# | That's specific to the Tapper wrapper around
+# | Benchmark::Perl::Formance and should be replaced
+# | with something generic
 sub _perl_gitversion {
         my $perlpath = "$^X";
         $perlpath    =~ s,/[^/]*$,,;
@@ -359,6 +354,8 @@ sub _perl_symbolic_name {
                 return $executable;
         }
 }
+# |
+# '-----------------------------------------------------------
 
 sub _get_hostname {
         my $host = "unknown-hostname";
@@ -406,13 +403,52 @@ sub _get_bootstrap_perl_meta {
         return map { ("$_" => $Config{$_}) } grep { /^bootstrap_perl/ } keys %Config;
 }
 
+# Convert value:
+#  - Perlish undef   --> 0
+#  - String "define" --> 1
+#  - everything else keep the same
+sub _booleanize_define {
+        my ($value) = @_;
+
+        if (not defined $value) {
+            return 0;
+        } elsif ($value eq "define") {
+            return 1;
+        } else {
+            return $value;
+        }
+}
+
+sub _taint_available {
+  require Scalar::Util;
+  require Cwd;
+  Scalar::Util::tainted(Cwd::getcwd());
+}
+
+sub _get_perl_config_notaintsupport {
+        my ($self) = @_;
+
+        my $config_args = $Config{config_args};
+        my $notaintsupport = 0; # standard
+        if ($config_args =~ /(SILENT_)?NO_TAINT_SUPPORT\b/) {
+            if ($config_args =~ /SILENT_NO_TAINT_SUPPORT\b/) {
+                $notaintsupport = 1; # no further check possible
+            } else {
+                $notaintsupport = 1 if not _taint_available();
+            }
+        }
+        return $notaintsupport;
+}
+
 sub _get_perl_config {
         my ($self) = @_;
 
         my @cfgkeys;
         my $showconfig = 4;
         push @cfgkeys, @{$CONFIG_KEYS{$_}} foreach 1..$showconfig;
-        return map { ("perlconfig_$_" => $Config{$_}) } @cfgkeys;
+        my %perlconfig = map { ("perlconfig_$_" => $Config{$_}) } @cfgkeys;
+        $perlconfig{perlconfig_derived_notaintsupport} = $self->_get_perl_config_notaintsupport();
+        return %perlconfig;
 }
 
 sub _get_perl_config_v {
@@ -486,6 +522,7 @@ sub _get_sysinfo {
         my %sysinfo = ();
         my $prefix = "sysinfo";
         my $cpu = (Sys::Info->new->device("CPU")->identify)[0];
+        $sysinfo{"${prefix}_hostname"} = _get_hostname;
         $sysinfo{join("_", $prefix, "cpu", $_)} = $cpu->{$_} foreach qw(name
                                                                         family
                                                                         model
@@ -529,10 +566,10 @@ sub generate_codespeed_data
 
 sub generate_BenchmarkAnythingData_data
 {
-        my ($self, $RESULTS) = @_;
+        my ($self, $RESULTS, $codespeed) = @_;
 
         # share a common dataset with Codespeed, yet prefix it
-        my %codespeed_meta = _codespeed_meta;
+        my %codespeed_meta = $codespeed ? _codespeed_meta : ();
         my %prefixed_codespeed_meta = map { ("codespeed_$_" => $codespeed_meta{$_}) } keys %codespeed_meta;
 
         my %platforminfo = $self->_get_platforminfo;
@@ -560,7 +597,9 @@ sub run {
         my $outfile        = "";
         my $platforminfo   = 0;
         my $codespeed      = 0;
-        my $tapper         = 0;
+        my $tap            = 0;
+        my $tap_plan       = 0;
+        my $tap_headers    = 0;
         my $benchmarkanything = 0;
         my $benchmarkanything_report = 0;
         my $cs_executable_suffix = "";
@@ -596,7 +635,9 @@ sub run {
                              "showconfig|c+"    => \$showconfig,
                              "platforminfo|p"   => \$platforminfo,
                              "codespeed"        => \$codespeed,
-                             "tapper"           => \$tapper,
+                             "tap"              => \$tap,
+                             "tap-plan"         => \$tap_plan,
+                             "tap-headers"      => \$tap_headers,
                              "benchmarkanything" => \$benchmarkanything,
                              "benchmarkanything-report" => \$benchmarkanything_report,
                              "cs-executable-suffix=s" => \$cs_executable_suffix,
@@ -610,7 +651,13 @@ sub run {
                             );
 
         # special meta options - order matters!
-        $benchmarkanything = 1 if $tapper; # legacy option
+        if ($tap or $tap_plan) {
+          $tapdescription    = 'perlformance results';
+          $outstyle          = 'yamlish';
+          $indent            = 2;
+          $platforminfo      = 1;
+          $showconfig        = 4;
+        }
         $benchmarkanything = 1 if $benchmarkanything_report;
         $platforminfo      = 1 if $benchmarkanything; # -p
         $showconfig        = 4 if $benchmarkanything; # -cccc
@@ -630,7 +677,9 @@ sub run {
                             showconfig     => $showconfig,
                             platforminfo   => $platforminfo,
                             codespeed      => $codespeed,
-                            tapper         => $tapper,
+                            tap            => $tap,
+                            tap_plan       => $tap_plan,
+                            tap_headers    => $tap_headers,
                             benchmarkanything => $benchmarkanything,
                             benchmarkanything_report => $benchmarkanything_report,
                             cs_executable_suffix => $cs_executable_suffix,
@@ -705,10 +754,10 @@ sub run {
                 $RESULTS{codespeed} = $self->generate_codespeed_data(\%RESULTS);
         }
 
-        # Tapper BenchmarkAnythingData blocks
-        if ($tapper or $benchmarkanything)
+        # TAP or BenchmarkAnythingData blocks
+        if ($tap or $tap_plan or $benchmarkanything)
         {
-                $RESULTS{BenchmarkAnythingData} = $self->generate_BenchmarkAnythingData_data(\%RESULTS);
+                $RESULTS{BenchmarkAnythingData} = $self->generate_BenchmarkAnythingData_data(\%RESULTS, $codespeed);
         }
 
         unbless (\%RESULTS);
@@ -799,6 +848,18 @@ sub print_results
         my $sub = "print_outstyle_$outstyle";
 
         my $output = $self->$sub($RESULTS);
+
+        # tap
+        my $tap_plan    = lc $self->{options}{tap_plan};
+        my $tap_headers = lc $self->{options}{tap_headers};
+        my $lead_tap    = '';
+        $lead_tap      .= "1..$tap_plan\n" if $tap_plan;
+        if ($tap_headers) {
+          $lead_tap    .= "# Test-suite-name: benchmark-perlformance\n";
+          $lead_tap    .= "# Test-machine-name: "._get_hostname."\n";
+        }
+
+        $output = $lead_tap.$output;
 
         if (my $outfile = $self->{options}{outfile})
         {
@@ -913,7 +974,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Steffen Schwigon.
+This software is copyright (c) 2021 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

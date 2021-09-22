@@ -1,3 +1,6 @@
+0.22 2021-09-15
+- switch from $PRIV(__x_size) to $SIZE(x)
+
 0.21 2021-08-12
 - fix test bug under at least 5.14.1 that had test compare complex numbers
 

@@ -3,7 +3,7 @@
 # PODNAME: TestRail::Bin::Lock
 
 package TestRail::Bin::Lock;
-$TestRail::Bin::Lock::VERSION = '0.048';
+$TestRail::Bin::Lock::VERSION = '0.049';
 use strict;
 use warnings;
 use utf8;
@@ -78,7 +78,7 @@ TestRail::Bin::Lock - Lock a test in a TestRail, and return the test name if suc
 
 =head1 VERSION
 
-version 0.048
+version 0.049
 
 =head1 SYNOPSIS
 

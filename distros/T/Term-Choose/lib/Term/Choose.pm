@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.737';
+our $VERSION = '1.739';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -1033,7 +1033,7 @@ sub __avail_screen_size {
 sub __current_layout {
     my ( $self ) = @_;
     my $all_in_first_row;
-    if ( $self->{layout} <= 1 && ! $self->{ll} ) {
+    if ( $self->{layout} <= 1 && ! $self->{ll} && ! $self->{max_cols} ) {
         my $firstrow_width = 0;
         for my $list_idx ( 0 .. $#{$self->{list}} ) {
             $firstrow_width += $self->{width_elements}[$list_idx] + $self->{pad};
@@ -1217,7 +1217,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.737
+Version 1.739
 
 =cut
 

@@ -29,8 +29,17 @@ enum XSParseInfixSelection {
   XPI_SELECT_MATCH_SMART,   /* any equality or other match operator, not including smartmatch */
 };
 
+/* lhs_flags, rhs_flags */
+enum {
+  XPI_OPERAND_TERM = 0, /* the "default" termexpr with no context */
+  /* other space reserved for other scalar types */
+  XPI_OPERAND_TERM_LIST = 6, /* term in list context */
+  XPI_OPERAND_LIST      = 7, /* list in list context */
+};
+
 struct XSParseInfixHooks {
-  U32 flags;
+  U16 flags;
+  U8 lhs_flags, rhs_flags;
   enum XSParseInfixClassification cls;
 
   const char *wrapper_func_name;

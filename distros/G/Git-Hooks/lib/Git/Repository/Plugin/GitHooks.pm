@@ -2,7 +2,7 @@ use warnings;
 
 package Git::Repository::Plugin::GitHooks;
 # ABSTRACT: A Git::Repository plugin with some goodies for hook developers
-$Git::Repository::Plugin::GitHooks::VERSION = '3.1.1';
+$Git::Repository::Plugin::GitHooks::VERSION = '3.2.0';
 use parent qw/Git::Repository::Plugin/;
 
 use v5.16.0;
@@ -1558,7 +1558,7 @@ Git::Repository::Plugin::GitHooks - A Git::Repository plugin with some goodies f
 
 =head1 VERSION
 
-version 3.1.1
+version 3.2.0
 
 =head1 SYNOPSIS
 

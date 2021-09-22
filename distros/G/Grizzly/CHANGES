@@ -1,3 +1,10 @@
+v0.103 2021.09.22
+
+    Added error handling for a missing NewsAPI key
+    Added ABSTRACT comments to the applictions libraries
+    Added Term:ANSIColor to the outputted text
+
+
 v0.102 2021.09.07
 
     Added CHANGES file

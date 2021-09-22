@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.517';
+our $VERSION = '0.519';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -14,7 +14,7 @@ use strictures 2;
 use B;
 use Carp 'croak';
 use JSON::MaybeXS 1.004001 'is_bool';
-use Ref::Util 0.100 qw(is_ref is_plain_arrayref is_plain_hashref);
+use Ref::Util 0.100 qw(is_ref is_plain_arrayref is_plain_hashref is_arrayref);
 use Scalar::Util 'blessed';
 use Storable 'dclone';
 use Feature::Compat::Try;
@@ -167,7 +167,7 @@ sub is_elements_unique {
 
 # shorthand for creating and appending json pointers
 sub jsonp {
-  return join('/', shift, map s/~/~0/gr =~ s!/!~1!gr, grep defined, @_);
+  return join('/', shift, map s/~/~0/gr =~ s!/!~1!gr, map +(is_arrayref($_) ? @$_ : $_), grep defined, @_);
 }
 
 # get all annotations produced for the current instance data location (that are visible to this
@@ -181,6 +181,7 @@ sub local_annotations {
 sub canonical_schema_uri {
   my ($state, @extra_path) = @_;
 
+  splice(@extra_path, -1, 1, @{$extra_path[-1]}) if @extra_path and is_arrayref($extra_path[-1]);
   my $uri = $state->{initial_schema_uri}->clone;
   $uri->fragment(($uri->fragment//'').jsonp($state->{schema_path}, @extra_path));
   $uri->fragment(undef) if not length($uri->fragment);
@@ -249,7 +250,12 @@ sub abort {
 sub assert_keyword_type {
   croak 'assert_keyword_type called in void context' if not defined wantarray;
   my ($state, $schema, $type) = @_;
-  return 1 if is_type($type, $schema->{$state->{keyword}});
+  my $value = $schema->{$state->{keyword}};
+  $value = is_plain_hashref($value) ? $value->{$state->{_schema_path_suffix}}
+      : is_plain_arrayref($value) ? $value->[$state->{_schema_path_suffix}]
+      : die 'unknown type'
+    if exists $state->{_schema_path_suffix};
+  return 1 if is_type($type, $value);
   E($state, '%s value is not a%s %s', $state->{keyword}, ($type =~ /^[aeiou]/ ? 'n' : ''), $type);
 }
 
@@ -323,7 +329,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.517
+version 0.519
 
 =head1 SYNOPSIS
 

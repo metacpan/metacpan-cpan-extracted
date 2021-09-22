@@ -76,9 +76,11 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Carp' => '0',
+                                      'List::Util' => '1.33',
                                       'PDL::Graphics::PGPLOT::Window' => '0',
                                       'PGPLOT' => '0',
                                       'Text::Abbrev' => '0',
+                                      'perl' => '5.01000',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -93,8 +95,7 @@ do { my $x = {
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
                                    'Test2::V0' => '0',
-                                   'Test::More' => '0',
-                                   'perl' => '5.006'
+                                   'Test::More' => '0'
                                  }
                  }
      };

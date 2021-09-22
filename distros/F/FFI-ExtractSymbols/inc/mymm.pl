@@ -10,7 +10,7 @@ sub myWriteMakefile
   my %args = @_;
 
   my $exe = {};
-  foreach my $name (qw( nm objdump dumpbin readelf ))
+  foreach my $name (qw( nm objdump readelf ))
   {
     $exe->{$name} = which($name);
     unless(defined $exe->{$name})
@@ -24,11 +24,6 @@ sub myWriteMakefile
 
   if($^O =~ /^(cygwin|MSWin32)$/)
   {
-    unless(defined $exe->{dumpbin})
-    {
-      print STDERR "dumpbin is required on this platform.\n";
-      exit;
-    }
     install_config_set 'FFI-ExtractSymbols', 'ms_windows' => 1;
   }
   else

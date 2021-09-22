@@ -1,3 +1,7 @@
+0.0002 - September 20, 2021
+ * Bugfix for not returning decoded content.  In the case where no UTF-8 content is sent to Shippo, but Shippo returns UTF-8 content, HTTP::Thin does not decode the content
+   correctly.  Ensure that content is decoded as UTF-8 all the time.
+
 0.0001 - June 18, 2019
  * Initial public release.
 

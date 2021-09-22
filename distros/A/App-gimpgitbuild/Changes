@@ -1,5 +1,10 @@
 Revision history for App-gimpgitbuild
 
+0.30.0   2021-09-19
+    - Build and install gexiv2 as well.
+        - shlomif has volunteered to comaintain gexiv2:
+        - https://mail.gnome.org/archives/gimp-developer-list/2021-September/msg00004.html
+
 0.28.1   2021-08-30
     - Restrict clean_install to the "build" mode.
 

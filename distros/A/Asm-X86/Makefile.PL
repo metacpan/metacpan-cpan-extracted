@@ -30,7 +30,7 @@ sub conf {
 
 WriteMakefile(
 	NAME			=> $mod_name,
-	AUTHOR			=> 'Bogdan Drozdowski <bogdro@cpan.org>',
+	AUTHOR			=> 'Bogdan Drozdowski <bogdro \at\ cpan . org>',
 	VERSION_FROM		=> $mod_file,
 	ABSTRACT_FROM		=> $mod_file,
 	PREREQ_PM => {
@@ -46,7 +46,7 @@ WriteMakefile(
 	MIN_PERL_VERSION	=> '5.006',	# just because of 'Exporter'
 	META_ADD		=> { provides => { $mod_name => {
 					file => $mod_file,
-					version => '0.61'
+					version => '0.62'
 					}
 				} },
 

@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/MetaCPANUtils.pm'
@@ -15,7 +15,9 @@ my @module_files = (
 my @scripts = (
     'script/list-metacpan-distributions',
     'script/list-metacpan-releases',
-    'script/list-recent-metacpan-releases'
+    'script/list-recent-metacpan-releases',
+    'script/open-metacpan-dist-page',
+    'script/open-metacpan-module-page'
 );
 
 # no fake home requested

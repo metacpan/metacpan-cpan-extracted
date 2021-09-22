@@ -1,5 +1,5 @@
 {
-   "abstract" : "Facilitates the creation and modification of PDF files",
+   "abstract" : "Create, modify, and examine PDF files",
    "author" : [
       "Steve Simms <steve@deefs.net>"
    ],
@@ -50,7 +50,7 @@
          "web" : "https://github.com/ssimms/pdfapi2"
       }
    },
-   "version" : "2.041",
+   "version" : "2.042",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.09",
    "x_spdx_expression" : "LGPL-2.1"

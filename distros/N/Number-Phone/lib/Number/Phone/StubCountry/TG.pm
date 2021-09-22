@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210602223301;
+our $VERSION = 1.20210921211833;
 
 my $formatters = [
                 {
@@ -66,24 +66,24 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"22826", "Kara\ region",
-"22825", "Central\ region",
-"22822", "Lome",
-"22824", "Plateaux\ region",
-"22827", "Savannah\ region",
-"22823", "Maritime\ region",};
 $areanames{es} = {"22827", "Región\ de\ Savannah",
-"22824", "Región\ Plateaux",
-"22823", "Región\ Marítima",
-"22825", "Región\ Central",
 "22826", "Región\ de\ Kara",
-"22822", "Lomé",};
-$areanames{fr} = {"22823", "Région\ Maritime",
-"22824", "Région\ des\ Plateaux",
-"22827", "Région\ des\ Savanes",
+"22823", "Región\ Marítima",
 "22822", "Lomé",
-"22826", "Région\ de\ la\ Kara",
-"22825", "Région\ Centrale",};
+"22824", "Región\ Plateaux",
+"22825", "Región\ Central",};
+$areanames{en} = {"22825", "Central\ region",
+"22824", "Plateaux\ region",
+"22822", "Lome",
+"22823", "Maritime\ region",
+"22826", "Kara\ region",
+"22827", "Savannah\ region",};
+$areanames{fr} = {"22825", "Région\ Centrale",
+"22824", "Région\ des\ Plateaux",
+"22822", "Lomé",
+"22827", "Région\ des\ Savanes",
+"22823", "Région\ Maritime",
+"22826", "Région\ de\ la\ Kara",};
 
     sub new {
       my $class = shift;

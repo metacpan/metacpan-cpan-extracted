@@ -2,16 +2,12 @@ package App::perlimports::Include;
 
 use Moo;
 
-our $VERSION = '0.000018';
+our $VERSION = '0.000019';
 
-use App::perlimports::ExportInspector ();
-use Class::Inspector                  ();
 use Data::Dumper qw( Dumper );
 use List::Util qw( any none uniq );
 use Memoize qw( memoize );
-use Module::Runtime qw( require_module );
 use MooX::StrictConstructor;
-use Path::Tiny qw( path );
 use PPI::Document 1.270 ();
 use PPIx::Utils::Classification qw( is_function_call is_perl_builtin );
 use Ref::Util qw( is_plain_arrayref is_plain_hashref );
@@ -376,6 +372,8 @@ sub _build_is_ignored {
     # This will be rewritten as "use Foo ();"
     return 0 if $self->_will_never_export;
 
+    return 1 if $self->_export_inspector->has_fatal_error;
+
     return 0 if $self->_export_inspector->is_oo_class;
 
     return 1 if $self->_export_inspector->is_moose_class;
@@ -387,7 +385,7 @@ sub _build_is_ignored {
     return 1
         if any { $_ eq 'Moo::Object' } @{ $self->_export_inspector->pkg_isa };
 
-    return $self->_export_inspector->uses_import_into ? 1 : 0;
+    return 0;
 }
 
 sub _build_is_translatable {
@@ -660,7 +658,7 @@ App::perlimports::Include - Encapsulate one use statement in a document
 
 =head1 VERSION
 
-version 0.000018
+version 0.000019
 
 =head1 METHODS
 

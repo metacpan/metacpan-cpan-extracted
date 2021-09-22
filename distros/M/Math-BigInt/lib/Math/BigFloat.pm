@@ -19,7 +19,7 @@ use warnings;
 use Carp qw< carp croak >;
 use Math::BigInt ();
 
-our $VERSION = '1.999823';
+our $VERSION = '1.999824';
 
 require Exporter;
 our @ISA        = qw/Math::BigInt/;
@@ -58,21 +58,21 @@ use overload
 
   # overload key: assign
 
-  '+='    =>      sub { $_[0]->badd($_[1]); },
+  '+='    =>      sub { $_[0] -> badd($_[1]); },
 
-  '-='    =>      sub { $_[0]->bsub($_[1]); },
+  '-='    =>      sub { $_[0] -> bsub($_[1]); },
 
-  '*='    =>      sub { $_[0]->bmul($_[1]); },
+  '*='    =>      sub { $_[0] -> bmul($_[1]); },
 
-  '/='    =>      sub { scalar $_[0]->bdiv($_[1]); },
+  '/='    =>      sub { scalar $_[0] -> bdiv($_[1]); },
 
-  '%='    =>      sub { $_[0]->bmod($_[1]); },
+  '%='    =>      sub { $_[0] -> bmod($_[1]); },
 
-  '**='   =>      sub { $_[0]->bpow($_[1]); },
+  '**='   =>      sub { $_[0] -> bpow($_[1]); },
 
-  '<<='   =>      sub { $_[0]->blsft($_[1]); },
+  '<<='   =>      sub { $_[0] -> blsft($_[1]); },
 
-  '>>='   =>      sub { $_[0]->brsft($_[1]); },
+  '>>='   =>      sub { $_[0] -> brsft($_[1]); },
 
 #  'x='    =>      sub { },
 
@@ -194,7 +194,7 @@ use overload
 
   '0+'    =>      sub { $_[0] -> numify(); },
 
-  '='     =>      sub { $_[0]->copy(); },
+  '='     =>      sub { $_[0] -> copy(); },
 
   ;
 
@@ -360,13 +360,32 @@ sub new {
     my $selfref = ref $self;
     my $class   = $selfref || $self;
 
+    # Make "require" work.
+
+    $class -> import() if $IMPORT == 0;
+
+    # Although this use has been discouraged for more than 10 years, people
+    # apparently still use it, so we still support it.
+
+    return $class -> bzero() unless @_;
+
     my ($wanted, @r) = @_;
 
-    # avoid numify-calls by not using || on $wanted!
+    if (!defined($wanted)) {
+        #if (warnings::enabled("uninitialized")) {
+        #    warnings::warn("uninitialized",
+        #                   "Use of uninitialized value in new()");
+        #}
+        return $class -> bzero(@r);
+    }
 
-    unless (defined $wanted) {
-        #carp("Use of uninitialized value in new");
-        return $self->bzero(@r);
+    if (!ref($wanted) && $wanted eq "") {
+        #if (warnings::enabled("numeric")) {
+        #    warnings::warn("numeric",
+        #                   q|Argument "" isn't numeric in new()|);
+        #}
+        #return $class -> bzero(@r);
+        return $class -> bnan(@r);
     }
 
     # Using $wanted->isa("Math::BigFloat") here causes a 'Deep recursion on
@@ -382,30 +401,18 @@ sub new {
         return $copy;
     }
 
-    $class->import() if $IMPORT == 0;             # make require work
-
     # If called as a class method, initialize a new object.
 
     $self = bless {}, $class unless $selfref;
-
-    # shortcut for bigints and its subclasses
-    if ((ref($wanted)) && $wanted -> can("as_number")) {
-        $self->{_m} = $wanted->as_number()->{value};  # get us a bigint copy
-        $self->{_e} = $LIB->_zero();
-        $self->{_es} = '+';
-        $self->{sign} = $wanted->sign();
-        return $self->bnorm();
-    }
-
-    # else: got a string or something masquerading as number (with overload)
 
     # Handle Infs.
 
     if ($wanted =~ /^\s*([+-]?)inf(inity)?\s*\z/i) {
         return $downgrade->new($wanted) if $downgrade;
         my $sgn = $1 || '+';
-        $self->{sign} = $sgn . 'inf';   # set a default sign for bstr()
-        return $self->binf($sgn);
+        $self = $class -> binf($sgn);
+        $self->round(@r) unless @r >= 2 && !defined($r[0]) && !defined($r[1]);
+        return $self;
     }
 
     # Handle explicit NaNs (not the ones returned due to invalid input).
@@ -565,6 +572,7 @@ sub from_hex {
     return if $selfref && $self->modify('from_hex');
 
     my $str = shift;
+    my @r = @_;
 
     # If called as a class method, initialize a new object.
 
@@ -640,10 +648,10 @@ sub from_hex {
             $self -> bmul($factor);
         }
 
-        return $self;
+        return $self -> round(@r);
     }
 
-    return $self->bnan();
+    return $self -> bnan(@r);
 }
 
 sub from_oct {
@@ -656,6 +664,7 @@ sub from_oct {
     return if $selfref && $self->modify('from_oct');
 
     my $str = shift;
+    my @r = @_;
 
     # If called as a class method, initialize a new object.
 
@@ -731,10 +740,10 @@ sub from_oct {
             $self -> bmul($factor);
         }
 
-        return $self;
+        return $self -> bround(@r);
     }
 
-    return $self->bnan();
+    return $self -> bnan(@r);
 }
 
 sub from_bin {
@@ -747,6 +756,7 @@ sub from_bin {
     return if $selfref && $self->modify('from_bin');
 
     my $str = shift;
+    my @r = @_;
 
     # If called as a class method, initialize a new object.
 
@@ -819,10 +829,10 @@ sub from_bin {
             $self -> bmul($factor);
         }
 
-        return $self;
+        return $self -> round(@r);
     }
 
-    return $self->bnan();
+    return $self->bnan(@r);
 }
 
 sub from_ieee754 {
@@ -839,6 +849,7 @@ sub from_ieee754 {
     my $enc;                # significand encoding (applies only to decimal)
     my $k;                  # storage width in bits
     my $b;                  # base
+    my @r = @_;
 
     if ($format =~ /^binary(\d+)\z/) {
         $k = $1;
@@ -907,7 +918,7 @@ sub from_ieee754 {
 
         unless (defined $in) {
             carp("Input is undefined");
-            return $self -> bzero();
+            return $self -> bzero(@r);
         }
 
         # Make sure input string is a string of zeros and ones.
@@ -978,7 +989,7 @@ sub from_ieee754 {
         } else {
             $self = $x;
         }
-        return $self;
+        return $self -> round(@r);
     }
 
     croak("The format '$format' is not yet supported.");
@@ -1462,7 +1473,7 @@ sub bcmp {
 
     # Handle all 'nan' cases.
 
-    return undef if ($x->{sign} eq $nan) || ($y->{sign} eq $nan);
+    return    if ($x->{sign} eq $nan) || ($y->{sign} eq $nan);
 
     # Handle all '+inf' and '-inf' cases.
 
@@ -1620,9 +1631,9 @@ sub bacmp {
 
     # handle +-inf and NaN's
     if ($x->{sign} !~ /^[+-]$/ || $y->{sign} !~ /^[+-]$/) {
-        return undef if (($x->{sign} eq $nan) || ($y->{sign} eq $nan));
-        return 0 if ($x->is_inf() && $y->is_inf());
-        return 1 if ($x->is_inf() && !$y->is_inf());
+        return    if (($x->{sign} eq $nan) || ($y->{sign} eq $nan));
+        return  0 if ($x->is_inf() && $y->is_inf());
+        return  1 if ($x->is_inf() && !$y->is_inf());
         return -1;
     }
 
@@ -4686,57 +4697,85 @@ sub import {
     my $class = shift;
     $IMPORT++;                  # remember we did import()
     my @a;                      # unrecognized arguments
-    my $lib = '';
-    my $lib_kind = 'try';
+    my $lib_param = '';
+    my $lib_value = '';
 
-    for (my $i = 0; $i <= $#_ ; $i++) {
-        croak "Error in import(): argument with index $i is undefined"
-          unless defined($_[$i]);
+    while (@_) {
+        my $param = shift;
 
-        if ($_[$i] eq ':constant') {
-            # This causes overlord er load to step in. 'binary' and 'integer'
-            # are handled by BigInt.
+        # Enable overloading of constants.
+
+        if ($param eq ':constant') {
             overload::constant float => sub { $class->new(shift); };
+            next;
         }
 
-        elsif ($_[$i] eq 'upgrade') {
-            # this causes upgrading
-            $upgrade = $_[$i+1];        # or undef to disable
-            $i++;
+        # Upgrading.
+
+        if ($param eq 'upgrade') {
+            $class -> upgrade(shift);
+            next;
         }
 
-        elsif ($_[$i] eq 'downgrade') {
-            # this causes downgrading
-            $downgrade = $_[$i+1];      # or undef to disable
-            $i++;
+        # Downgrading.
+
+        if ($param eq 'downgrade') {
+            $class -> downgrade(shift);
+            next;
         }
 
-        elsif ($_[$i] =~ /^(lib|try|only)\z/) {
+        # Accuracy.
+
+        if ($param eq 'accuracy') {
+            $class -> accuracy(shift);
+            next;
+        }
+
+        # Precision.
+
+        if ($param eq 'precision') {
+            $class -> precision(shift);
+            next;
+        }
+
+        # Rounding mode.
+
+        if ($param eq 'round_mode') {
+            $class -> round_mode(shift);
+            next;
+        }
+
+        # Backend library.
+
+        if ($param =~ /^(lib|try|only)\z/) {
             # alternative library
-            $lib = $_[$i+1] || '';
-            $lib_kind = $1;             # "lib", "try", or "only"
-            $i++;
+            $lib_param = $param;        # "lib", "try", or "only"
+            $lib_value = shift;
+            next;
         }
 
-        elsif ($_[$i] eq 'with') {
+        if ($param eq 'with') {
             # alternative class for our private parts()
             # XXX: no longer supported
-            # $LIB = $_[$i+1] || 'Calc';
+            # $LIB = shift() || 'Calc';
             # carp "'with' is no longer supported, use 'lib', 'try', or 'only'";
-            $i++;
+            shift;
+            next;
         }
 
-        else {
-            push @a, $_[$i];
-        }
+        # Unrecognized parameter.
+
+        push @a, $param;
     }
 
+    require Math::BigInt;
+
     my @import = ('objectify');
-    push @import, $lib_kind, $lib if $lib ne '';
+    push @import, $lib_param, $lib_value if $lib_param ne '';
     Math::BigInt -> import(@import);
 
     # find out which one was actually loaded
-    $LIB = Math::BigInt->config('lib');
+    $LIB = Math::BigInt -> config('lib');
 
     $class->export_to_level(1, $class, @a); # export wanted functions
 }
@@ -5839,53 +5878,34 @@ work.
 Math with the numbers is done (by default) by a module called
 Math::BigInt::Calc. This is equivalent to saying:
 
-    use Math::BigFloat lib => 'Calc';
+    use Math::BigFloat lib => "Calc";
 
 You can change this by using:
 
-    use Math::BigFloat lib => 'GMP';
+    use Math::BigFloat lib => "GMP";
 
-B<Note>: General purpose packages should not be explicit about the library
-to use; let the script author decide which is best.
+B<Note>: General purpose packages should not be explicit about the library to
+use; let the script author decide which is best.
 
 Note: The keyword 'lib' will warn when the requested library could not be
 loaded. To suppress the warning use 'try' instead:
 
-    use Math::BigFloat try => 'GMP';
+    use Math::BigFloat try => "GMP";
 
-If your script works with huge numbers and Calc is too slow for them,
-you can also for the loading of one of these libraries and if none
-of them can be used, the code will die:
+If your script works with huge numbers and Calc is too slow for them, you can
+also for the loading of one of these libraries and if none of them can be used,
+the code will die:
 
-    use Math::BigFloat only => 'GMP,Pari';
+    use Math::BigFloat only => "GMP,Pari";
 
-The following would first try to find Math::BigInt::Foo, then
-Math::BigInt::Bar, and when this also fails, revert to Math::BigInt::Calc:
+The following would first try to find Math::BigInt::Foo, then Math::BigInt::Bar,
+and when this also fails, revert to Math::BigInt::Calc:
 
-    use Math::BigFloat lib => 'Foo,Math::BigInt::Bar';
+    use Math::BigFloat lib => "Foo,Math::BigInt::Bar";
 
 See the respective low-level library documentation for further details.
 
-Please note that Math::BigFloat does B<not> use the denoted library itself,
-but it merely passes the lib argument to Math::BigInt. So, instead of the need
-to do:
-
-    use Math::BigInt lib => 'GMP';
-    use Math::BigFloat;
-
-you can roll it all into one line:
-
-    use Math::BigFloat lib => 'GMP';
-
-It is also possible to just require Math::BigFloat:
-
-    require Math::BigFloat;
-
-This will load the necessary things (like BigInt) when they are needed, and
-automatically.
-
-See L<Math::BigInt> for more details than you ever wanted to know about using
-a different low-level library.
+See L<Math::BigInt> for more details about using a different low-level library.
 
 =head2 Using Math::BigInt::Lite
 

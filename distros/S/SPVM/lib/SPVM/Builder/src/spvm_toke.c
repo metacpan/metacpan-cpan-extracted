@@ -463,7 +463,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         else if (*compiler->bufptr == '=') {
           compiler->bufptr++;
           SPVM_OP* op_special_assign = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_SPECIAL_ASSIGN);
-          op_special_assign->flag = SPVM_OP_C_FLAG_SPECIAL_ASSIGN_METHODTRACT;
+          op_special_assign->flag = SPVM_OP_C_FLAG_SPECIAL_ASSIGN_SUBTRACT;
           
           yylvalp->opval = op_special_assign;
           
@@ -1894,6 +1894,14 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   yylvalp->opval = op_descriptor;
                   return DESCRIPTOR;
                 }
+                else if (strcmp(keyword, "method") == 0) {
+                  SPVM_OP* op_method = SPVM_TOKE_newOP_with_keyword_start_pos(compiler, SPVM_OP_C_ID_METHOD, keyword_start_pos);
+                  yylvalp->opval = op_method;
+
+                  compiler->expect_method_name = 1;
+
+                  return METHOD;
+                }
                 break;
               }
               case 'n' : {
@@ -1989,19 +1997,14 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 break;
               }
               case 's' : {
-                if (strcmp(keyword, "self") == 0) {
-                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_SELF);
-                  return SELF;
+                if (strcmp(keyword, "static") == 0) {
+                  SPVM_OP* op_descriptor = SPVM_OP_new_op_descriptor(compiler, SPVM_DESCRIPTOR_C_ID_STATIC, compiler->cur_file, compiler->cur_line);
+                  yylvalp->opval = op_descriptor;
+                  return DESCRIPTOR;
                 }
                 else if (strcmp(keyword, "switch") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_SWITCH);
                   return SWITCH;
-                }
-                else if (strcmp(keyword, "sub") == 0) {
-                  yylvalp->opval = SPVM_TOKE_newOP_with_keyword_start_pos(compiler, SPVM_OP_C_ID_METHOD, keyword_start_pos);
-                  compiler->expect_method_name = 1;
-                  
-                  return METHOD;
                 }
                 else if (strcmp(keyword, "string") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_STRING);

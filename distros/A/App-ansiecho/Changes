@@ -1,5 +1,9 @@
 Revision history for Perl script App-ansiecho
 
+0.04 2021-09-17T23:29:11Z
+
+    - Use the latest interface of Getopt::EX::Hashed.
+
 0.03 2021-08-03T06:02:00Z
 
     - Deprecate -r option.

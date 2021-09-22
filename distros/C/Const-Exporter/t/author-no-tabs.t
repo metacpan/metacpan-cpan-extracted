@@ -33,6 +33,7 @@ my @files = (
     't/author-pod-linkcheck.t',
     't/author-pod-syntax.t',
     't/author-portability.t',
+    't/author-vars.t',
     't/empty-with-const.t',
     't/enums.t',
     't/etc/perlcritic.rc',

@@ -16,29 +16,35 @@ my %WriteMakefileArgs = (
   "EXE_FILES" => [
     "script/list-metacpan-distributions",
     "script/list-metacpan-releases",
-    "script/list-recent-metacpan-releases"
+    "script/list-recent-metacpan-releases",
+    "script/open-metacpan-dist-page",
+    "script/open-metacpan-module-page"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::MetaCPANUtils",
   "PREREQ_PM" => {
+    "Browser::Open" => 0,
     "Data::Sah::Coerce::perl::To_date::From_float::epoch" => 0,
     "Data::Sah::Coerce::perl::To_date::From_obj::datetime" => 0,
     "Data::Sah::Coerce::perl::To_date::From_obj::time_moment" => 0,
     "Data::Sah::Coerce::perl::To_date::From_str::iso8601" => 0,
     "Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_distname" => 0,
+    "Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modname" => 0,
     "Data::Sah::Coerce::perl::To_str::From_str::to_upper" => 0,
     "Data::Sah::Compiler::perl::TH::array" => 0,
     "Data::Sah::Compiler::perl::TH::bool" => 0,
     "Data::Sah::Compiler::perl::TH::date" => 0,
     "Data::Sah::Compiler::perl::TH::int" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
-    "Log::ger" => "0.037",
+    "Log::ger" => "0.038",
     "MetaCPAN::Client" => 0,
     "Perinci::CmdLine::Any" => 0,
     "Perinci::CmdLine::Lite" => "1.827",
     "Sah::Schema::cpan::distname" => 0,
     "Sah::Schema::cpan::pause_id" => "0.003",
+    "Sah::Schema::perl::distname" => 0,
+    "Sah::Schema::perl::modname" => "0.035",
     "Sah::Schema::posint" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -49,7 +55,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -57,11 +63,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Browser::Open" => 0,
   "Data::Sah::Coerce::perl::To_date::From_float::epoch" => 0,
   "Data::Sah::Coerce::perl::To_date::From_obj::datetime" => 0,
   "Data::Sah::Coerce::perl::To_date::From_obj::time_moment" => 0,
   "Data::Sah::Coerce::perl::To_date::From_str::iso8601" => 0,
   "Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_distname" => 0,
+  "Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modname" => 0,
   "Data::Sah::Coerce::perl::To_str::From_str::to_upper" => 0,
   "Data::Sah::Compiler::perl::TH::array" => 0,
   "Data::Sah::Compiler::perl::TH::bool" => 0,
@@ -71,12 +79,14 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Log::ger" => "0.037",
+  "Log::ger" => "0.038",
   "MetaCPAN::Client" => 0,
   "Perinci::CmdLine::Any" => 0,
   "Perinci::CmdLine::Lite" => "1.827",
   "Sah::Schema::cpan::distname" => 0,
   "Sah::Schema::cpan::pause_id" => "0.003",
+  "Sah::Schema::perl::distname" => 0,
+  "Sah::Schema::perl::modname" => "0.035",
   "Sah::Schema::posint" => 0,
   "Test::More" => 0,
   "strict" => 0,

@@ -9,6 +9,7 @@ lib/BioX/Seq/Stream/TwoBit.pm
 lib/BioX/Seq/Utils.pm
 LICENSE
 MANIFEST			This list of files
+MANIFEST.SKIP		This list of files
 META.json
 META.yml
 README.md
@@ -18,8 +19,13 @@ t/manifest.t
 t/pod-coverage.t
 t/pod.t
 t/test.t
+t/test_data/foobar.txt
+t/test_data/not_bgzip.fa.gz
+t/test_data/one_byte.fa
+t/test_data/large.fa.gz
 t/test_data/test.fa
 t/test_data/test.fq.bz2
+t/test_data/test2.fa
 t/test_data/test2.fa.gz
 t/test_data/test2.fa.gz.fai.cmp
 t/test_data/test2.fa.zst
@@ -27,4 +33,11 @@ t/test_data/test2.fq.dsrc
 t/test_data/test2.fq.fqz
 t/test_data/test3.2bit
 t/test_data/test4.fa
+t/test_data/test_bad.fa
+t/test_data/test_bad_header.fa
+t/test_data/test_duplicate_ids.fa
+t/test_data/test_one_line.fa
+t/test_data/test_one_line.fq
+t/test_data/test_space.fa
+t/test_data/test_weird_endings.fa
 t/util.t

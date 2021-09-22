@@ -3,30 +3,22 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.13";
+our $VERSION = "0.14";
 
 use Scalar::Util ();
-use Sub::Meta;
 use Sub::Identify;
+use Types::Standard qw(InstanceOf Str Ref);
+use Type::Params qw(compile Invocant);
 
-my %INFO;
-my %INDEX;
+our %INFO;
+our %INDEX;
 
-sub _croak { require Carp; goto &Carp::croak }
+my $SubMeta  = InstanceOf['Sub::Meta'];
+my $Callable = Ref['CODE'];
 
 sub register {
-    my ($class, $sub, $meta) = @_;
-    unless ($sub && $meta) {
-        _croak "arguments required coderef and submeta.";
-    }
-
-    unless (ref $sub && ref $sub eq 'CODE') {
-        _croak "required coderef: $sub";
-    }
-
-    unless (Scalar::Util::blessed($meta) && $meta->isa('Sub::Meta')) {
-        _croak "required an instance of Sub::Meta: $meta";
-    }
+    state $check = compile(Invocant, $Callable, $SubMeta);
+    my ($class, $sub, $meta) = $check->(@_);
 
     my $id = Scalar::Util::refaddr $sub;
     my ($stash, $subname) = Sub::Identify::get_code_info($sub);
@@ -46,10 +38,7 @@ sub register_list {
 
 sub get {
     my ($class, $sub) = @_;
-
-    unless (ref $sub && ref $sub eq 'CODE') {
-        _croak "required coderef: $sub";
-    }
+    return unless $Callable->check($sub);
 
     my $id = Scalar::Util::refaddr $sub;
     return $INFO{$id}
@@ -80,13 +69,12 @@ sub get_all_submeta_by_stash {
 }
 
 sub remove {
-    my ($class, $sub) = @_;
-
-    unless (ref $sub && ref $sub eq 'CODE') {
-        _croak "required coderef: $sub";
-    }
+    state $check = compile(Invocant, $Callable);
+    my ($class, $sub) = $check->(@_);
 
     my $id = Scalar::Util::refaddr $sub;
+    my ($stash, $subname) = Sub::Identify::get_code_info($sub);
+    delete $INDEX{$stash}{$subname};
     return delete $INFO{$id}
 }
 

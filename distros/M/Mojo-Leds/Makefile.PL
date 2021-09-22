@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "BSON::OID" => 0,
     "Mojolicious" => "8.23",
-    "Mojolicious::Plugin::AutoRoutePm" => 0,
+    "Mojolicious::Plugin::AutoRoutePm" => "0.14",
     "Mojolicious::Plugin::RenderFile" => 0,
     "Scalar::Util" => 0,
     "Tie::IxHash" => 0,
@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.08",
+  "VERSION" => "1.10",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,7 +45,7 @@ my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Mojolicious" => "8.23",
-  "Mojolicious::Plugin::AutoRoutePm" => 0,
+  "Mojolicious::Plugin::AutoRoutePm" => "0.14",
   "Mojolicious::Plugin::RenderFile" => 0,
   "Scalar::Util" => 0,
   "Test::More" => 0,

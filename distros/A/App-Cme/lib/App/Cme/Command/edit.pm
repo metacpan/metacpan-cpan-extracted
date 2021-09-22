@@ -10,7 +10,7 @@
 # ABSTRACT: Edit the configuration of an application
 
 package App::Cme::Command::edit ;
-$App::Cme::Command::edit::VERSION = '1.032';
+$App::Cme::Command::edit::VERSION = '1.033';
 use strict;
 use warnings;
 use 5.10.1;
@@ -25,6 +25,7 @@ sub validate_args {
     my ($self, $opt, $args) = @_;
     $self->check_unknown_args($args);
     $self->process_args($opt,$args);
+    return;
 }
 
 sub opt_spec {
@@ -90,15 +91,15 @@ sub execute {
 
         print "In case of error, check $err_file\n";
 
-        open( FH, "> $err_file" ) || die "Can't open $err_file: $!";
-        open STDERR, ">&FH";
+        open( my $fh, ">", $err_file ) || die "Can't open $err_file: $!";
+        open(STDERR, ">&", $fh);
 
         my $dialog = Config::Model::CursesUI->new();
 
         # engage in user interaction
         $dialog->start($model);
 
-        close FH;
+        close($fh);
     }
     elsif ( $ui_type eq 'tk' ) {
         die "cannot run Tk interface: Config::Model::TkUI is not installed, please use curses or shell or simple ui\n"
@@ -108,6 +109,7 @@ sub execute {
     else {
         die "Unsupported user interface: $ui_type";
     }
+    return;
 }
 
 1;
@@ -124,7 +126,7 @@ App::Cme::Command::edit - Edit the configuration of an application
 
 =head1 VERSION
 
-version 1.032
+version 1.033
 
 =head1 SYNOPSIS
 

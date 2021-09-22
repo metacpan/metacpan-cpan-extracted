@@ -18,18 +18,14 @@ my $invocant_self   = Sub::Meta::Param->new(invocant => 1, name => '$self');
 my $invocant_class  = Sub::Meta::Param->new(invocant => 1, name => '$class');
 my $slurpy          = Sub::Meta::Param->new(type => 'Num', name => '@numbers');
 
-
-subtest 'exception' => sub {
-    like dies { Sub::Meta::Parameters->new() },
-        qr/parameters reqruires args/, 'requires args';
-};
-
-
 note '==== TEST args ====';
 
-subtest 'no args' => sub {
-    my $meta = Sub::Meta::Parameters->new(args => []);
-    is $meta, sub_meta_parameters();
+subtest 'no arguments' => sub {
+    my $meta = Sub::Meta::Parameters->new();
+    is $meta, sub_meta_parameters({
+        has_args => !!0,
+        args     => [],
+    });
 };
 
 subtest 'empty args: { args => [] }' => sub {

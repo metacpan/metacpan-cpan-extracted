@@ -20,7 +20,7 @@ ok($image, q{new_api still works});
 
 $pdf = PDF::API2->new();
 $pdf->page->gfx->fillcolor('blue');
-my $pdf_string = $pdf->stringify();
+my $pdf_string = $pdf->to_string();
 
 # openScalar
 $pdf = PDF::API2->openScalar($pdf_string);
@@ -34,7 +34,7 @@ is(ref($page), 'PDF::API2::Page',
    q{importpage still works});
 
 # openpage
-$pdf2 = PDF::API2->open_scalar($pdf_string);
+$pdf2 = PDF::API2->from_string($pdf_string);
 $page = $pdf->openpage(1);
 is(ref($page), 'PDF::API2::Page',
    q{openpage still works});

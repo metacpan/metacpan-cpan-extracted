@@ -6,7 +6,7 @@ my %pm = map { $_ => "\$(INST_LIB)/$_" } "HTTP/Any.pm", map { "HTTP/Any/$_.pm" }
 
 WriteMakefile(
 	NAME         => "HTTP::Any",
-	ABSTRACT     => 'HTML::Any - a common interface for HTTP clients (LWP, AnyEvent::HTTP, Curl)',
+	ABSTRACT     => 'HTTP::Any - a common interface for HTTP clients (LWP, AnyEvent::HTTP, Curl)',
 	AUTHOR       => '<kni@cpan.org>',
 	LICENSE      => "perl",
 	VERSION_FROM => "HTTP/Any.pm",

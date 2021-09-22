@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.516-8-g049a952
+package JSON::Schema::Modern; # git description: v0.518-5-g85a95ab
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.517';
+our $VERSION = '0.519';
 
 use 5.016;  # for fc, unicode_strings features
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -15,7 +15,7 @@ use strictures 2;
 use JSON::MaybeXS;
 use Carp qw(croak carp);
 use List::Util 1.55 qw(pairs first uniqint);
-use Ref::Util 0.100 qw(is_ref is_plain_hashref is_plain_coderef);
+use Ref::Util 0.100 qw(is_ref is_hashref);
 use Mojo::URL;
 use Safe::Isa;
 use Path::Tiny;
@@ -25,7 +25,7 @@ use Module::Runtime 'use_module';
 use Moo;
 use MooX::TypeTiny 0.002002;
 use MooX::HandlesVia;
-use Types::Standard 1.010002 qw(Bool Int Str HasMethods Enum InstanceOf HashRef Dict CodeRef Optional slurpy);
+use Types::Standard 1.010002 qw(Bool Int Str HasMethods Enum InstanceOf HashRef Dict CodeRef Optional slurpy ArrayRef Undef ClassName);
 use Feature::Compat::Try;
 use JSON::Schema::Modern::Error;
 use JSON::Schema::Modern::Result;
@@ -33,13 +33,18 @@ use JSON::Schema::Modern::Document;
 use JSON::Schema::Modern::Utilities qw(get_type canonical_schema_uri E abort annotate_self);
 use namespace::clean;
 
-our @CARP_NOT = qw(JSON::Schema::Modern::Document);
+our @CARP_NOT = qw(
+  JSON::Schema::Modern::Document
+  JSON::Schema::Modern::Vocabulary
+  JSON::Schema::Modern::Vocabulary::Applicator
+);
 
 use constant SPECIFICATION_VERSION_DEFAULT => 'draft2020-12';
+use constant SPECIFICATION_VERSIONS_SUPPORTED => [qw(draft7 draft2019-09 draft2020-12)];
 
 has specification_version => (
   is => 'ro',
-  isa => Enum([qw(draft7 draft2019-09 draft2020-12)]),
+  isa => Enum(SPECIFICATION_VERSIONS_SUPPORTED),
 );
 
 has output_format => (
@@ -119,9 +124,9 @@ sub add_schema {
   croak 'cannot add a schema with a uri with a fragment' if defined $uri->fragment;
 
   if (not @_) {
-    my ($schema, $canonical_uri, $document, $document_path) = $self->_fetch_schema_from_uri($uri);
-    return if not defined $schema or not defined wantarray;
-    return $document;
+    my $schema_info = $self->_fetch_from_uri($uri);
+    return if not $schema_info or not defined wantarray;
+    return $schema_info->{document};
   }
 
   my $document = $_[0]->$_isa('JSON::Schema::Modern::Document') ? shift
@@ -131,9 +136,9 @@ sub add_schema {
       _evaluator => $self,  # used only for traversal during document construction
     );
 
-  die(!(caller())[0]->isa(__PACKAGE__)
+  croak(!(caller())[0]->isa(__PACKAGE__)
     ? join('; ', map $_->keyword_location.': '.$_->error, $document->errors)
-    : die JSON::Schema::Modern::Result->new(
+    : JSON::Schema::Modern::Result->new(
       output_format => $self->output_format,
       valid => 0,
       errors => [ $document->errors ],
@@ -158,7 +163,14 @@ sub add_schema {
   }
 
   if ("$uri") {
-    $self->_add_resources($uri => { path => '', canonical_uri => $document->canonical_uri, document => $document });
+    my $resource = $document->_get_resource($document->canonical_uri);
+    $self->_add_resources($uri => {
+        path => '',
+        canonical_uri => $document->canonical_uri,
+        specification_version => $resource->{specification_version},
+        vocabularies => $resource->{vocabularies},  # reference, not copy
+        document => $document,
+      });
   }
 
   return $document;
@@ -210,14 +222,7 @@ sub traverse {
     schema_path => '',                  # the rest of the path, since the last $id
     errors => [],
     spec_version => $spec_version,      # can change, iff nothing explicitly requested
-    # for now, this is hardcoded, but in the future we will wrap this in a dialect that starts off
-    # just with the Core vocabulary and then determine the actual vocabularies from the '$schema'
-    # keyword in the schema and the '$vocabulary' keyword in the metaschema.
-    vocabularies => [
-      (map use_module('JSON::Schema::Modern::Vocabulary::'.$_)->new,
-        qw(Core Applicator Validation FormatAnnotation Content MetaData),
-        $spec_version eq 'draft2020-12' ? 'Unevaluated' : ()),
-    ],
+    vocabularies => [ use_module('JSON::Schema::Modern::Vocabulary::Core') ], # will be filled in later
     identifiers => [],
     configs => {},
     callbacks => $config_override->{callbacks} // {},
@@ -225,7 +230,16 @@ sub traverse {
   };
 
   try {
-    $self->_traverse_subschema($schema_reference, $state);
+    $self->_traverse_subschema(
+      is_hashref($schema_reference) && !(exists $schema_reference->{'$schema'})
+        ? +{
+          # ensure that specification version and vocabularies are properly determined
+          '$schema' => $self->METASCHEMA_URIS->{$spec_version},
+          %$schema_reference,
+        }
+        : $schema_reference,
+      $state,
+    );
   }
   catch ($e) {
     if ($e->$_isa('JSON::Schema::Modern::Error')) {
@@ -256,51 +270,50 @@ sub evaluate {
 
   my $valid;
   try {
-    my ($schema, $canonical_uri, $document, $document_path);
+    my $schema_info;
 
     if (not is_ref($schema_reference) or $schema_reference->$_isa('Mojo::URL')) {
       # TODO: resolve $uri against base_uri
-      ($schema, $canonical_uri, $document, $document_path) = $self->_fetch_schema_from_uri($schema_reference);
+      $schema_info = $self->_fetch_from_uri($schema_reference);
     }
     else {
       # traverse is called via add_schema -> ::Document->new -> ::Document->BUILD
-      $document = $self->add_schema($base_uri, $schema_reference);
-      ($schema, $canonical_uri) = map $document->$_, qw(schema canonical_uri);
-      $document_path = '';
+      my $document = $self->add_schema($base_uri, $schema_reference);
+      my $base_resource = $document->_get_resource($document->canonical_uri)
+        || croak "couldn't get resource from '$base_uri'";
+
+      $schema_info = {
+        schema => $document->schema,
+        document => $document,
+        document_path => '',
+        (map +($_ => $base_resource->{$_}), qw(canonical_uri specification_version vocabularies)),
+      };
     }
 
     abort($state, 'EXCEPTION: unable to find resource %s', $schema_reference)
-      if not defined $schema;
+      if not $schema_info;
 
     $state = +{
       %$state,
       depth => 0,
-      initial_schema_uri => $canonical_uri, # the canonical URI as of the start or last $id, or the last traversed $ref
-      document => $document,                # the ::Document object containing this schema
-      document_path => $document_path,      # the path within the document of this schema, since the last $id or $ref traversal
-      dynamic_scope => [ $canonical_uri ],
+      initial_schema_uri => $schema_info->{canonical_uri}, # the canonical URI as of the start or last $id, or the last traversed $ref
+      document => $schema_info->{document},   # the ::Document object containing this schema
+      document_path => $schema_info->{document_path}, # the path within the document of this schema, since the last $id or $ref traversal
+      dynamic_scope => [ $schema_info->{canonical_uri} ],
       errors => [],
       annotations => [],
       seen => {},
-      spec_version => $document->specification_version,
-      # for now, this is hardcoded, but in the future the dialect will be determined by the
-      # traverse() pass on the schema and examination of the referenced metaschema.
-      vocabularies => [
-        (map use_module('JSON::Schema::Modern::Vocabulary::'.$_)->new,
-          qw(Core Applicator Validation),
-          $config_override->{validate_formats} // $self->validate_formats ? 'FormatAssertion' : 'FormatAnnotation',
-          qw(Content MetaData),
-          $document->specification_version eq 'draft2020-12' ? 'Unevaluated' : ()),
-      ],
+      spec_version => $schema_info->{specification_version},
+      vocabularies => $schema_info->{vocabularies},
       evaluator => $self,
-      %{$document->evaluation_configs},
+      %{$schema_info->{document}->evaluation_configs},
       (map {
         my $val = $config_override->{$_} // $self->$_;
         defined $val ? ( $_ => $val ) : ()
-      } qw(short_circuit collect_annotations annotate_unknown_keywords scalarref_booleans)),
+      } qw(validate_formats short_circuit collect_annotations annotate_unknown_keywords scalarref_booleans)),
     };
 
-    $valid = $self->_eval_subschema($data, $schema, $state);
+    $valid = $self->_eval_subschema($data, $schema_info->{schema}, $state);
     warn 'result is false but there are no errors' if not $valid and not @{$state->{errors}};
   }
   catch ($e) {
@@ -332,9 +345,10 @@ sub get {
   croak 'insufficient arguments' if @_ < 2;
   my ($self, $uri) = @_;
 
-  my ($subschema, $canonical_uri) = $self->_fetch_schema_from_uri($uri);
-  $subschema = dclone($subschema) if is_ref($subschema);
-  return !defined $subschema ? () : wantarray ? ($subschema, $canonical_uri) : $subschema;
+  my $schema_info = $self->_fetch_from_uri($uri);
+  return if not $schema_info;
+  my $subschema = is_ref($schema_info->{schema}) ? dclone($schema_info->{schema}) : $schema_info->{schema};
+  return wantarray ? ($subschema, $schema_info->{canonical_uri}) : $subschema;
 }
 
 ######## NO PUBLIC INTERFACES FOLLOW THIS POINT ########
@@ -374,7 +388,8 @@ sub _traverse_subschema {
   return E($state, 'invalid schema type: %s', $schema_type) if $schema_type ne 'object';
 
   my $valid = 1;
-  foreach my $vocabulary (@{$state->{vocabularies}}) {
+  for (my $idx = 0; $idx <= $#{$state->{vocabularies}}; ++$idx) {
+    my $vocabulary = $state->{vocabularies}[$idx];
     foreach my $keyword ($vocabulary->keywords($state->{spec_version})) {
       next if not exists $schema->{$keyword};
 
@@ -447,8 +462,14 @@ sub _eval_subschema {
   $state->{annotations} = [];
   my @new_annotations;
 
+  my @vocabularies = @{$state->{vocabularies}}; # override locally only (copy, not reference)
+  if ($state->{validate_formats}) {
+    s/^JSON::Schema::Modern::Vocabulary::Format\KAnnotation$/Assertion/ foreach @vocabularies;
+    require JSON::Schema::Modern::Vocabulary::FormatAssertion;
+  }
+
   ALL_KEYWORDS:
-  foreach my $vocabulary (@{$state->{vocabularies}}) {
+  foreach my $vocabulary (@vocabularies) {
     foreach my $keyword ($vocabulary->keywords($state->{spec_version})) {
       next if not exists $schema->{$keyword};
 
@@ -486,10 +507,14 @@ sub _eval_subschema {
 
 has _resource_index => (
   is => 'bare',
-  isa => HashRef[Dict[
+  isa => HashRef[my $resource_type = Dict[
       canonical_uri => InstanceOf['Mojo::URL'],
       path => Str,
+      specification_version => Enum(SPECIFICATION_VERSIONS_SUPPORTED),
       document => InstanceOf['JSON::Schema::Modern::Document'],
+      # the vocabularies used when evaluating instance data against schema
+      vocabularies => ArrayRef[ClassName->where(sub { $_->DOES('JSON::Schema::Modern::Vocabulary') })],
+      slurpy HashRef[Undef],  # no other fields allowed
     ]],
   handles_via => 'Hash',
   handles => {
@@ -508,6 +533,8 @@ has _resource_index => (
 around _add_resources => sub {
   my ($orig, $self) = (shift, shift);
 
+  $resource_type->($_[1]) if @_;  # check type of hash value against Dict
+
   my @resources;
   foreach my $pair (sort { $a->[0] cmp $b->[0] } pairs @_) {
     my ($key, $value) = @$pair;
@@ -517,6 +544,7 @@ around _add_resources => sub {
       if ($key ne '') {
         next if $existing->{path} eq $value->{path}
           and $existing->{canonical_uri} eq $value->{canonical_uri}
+          and $existing->{specification_version} eq $value->{specification_version}
           and $existing->{document} == $value->{document};
         croak 'uri "'.$key.'" conflicts with an existing schema resource';
       }
@@ -534,6 +562,20 @@ around _add_resources => sub {
 
     $self->$orig($key, $value);
   }
+};
+
+sub _vocabularies_by_spec_version {
+  my ($self, $spec_version) = @_;
+  return map use_module('JSON::Schema::Modern::Vocabulary::'.$_),
+    qw(Core Applicator Validation FormatAnnotation Content MetaData),
+    $spec_version eq 'draft2020-12' ? 'Unevaluated' : ();
+}
+
+# used for determining a default '$schema' keyword where there is none
+use constant METASCHEMA_URIS => {
+  'draft2020-12' => 'https://json-schema.org/draft/2020-12/schema',
+  'draft2019-09' => 'https://json-schema.org/draft/2019-09/schema',
+  'draft7' => 'http://json-schema.org/draft-07/schema#',
 };
 
 use constant CACHED_METASCHEMAS => {
@@ -599,22 +641,24 @@ sub _get_or_load_resource {
   return;
 };
 
-# returns a schema (which may not be at a document root), the canonical uri for that schema,
-# the JSON::Schema::Modern::Document object that holds that schema, and the path relative
-# to the document root for this schema.
+# returns information necessary to use a schema found at a particular URI:
+# - a schema (which may not be at a document root)
+# - the canonical uri for that schema,
+# - the JSON::Schema::Modern::Document object that holds that schema
+# - the path relative to the document root for this schema
 # creates a Document and adds it to the resource index, if not already present.
-sub _fetch_schema_from_uri {
+sub _fetch_from_uri {
   my ($self, $uri) = @_;
 
   $uri = Mojo::URL->new($uri) if not is_ref($uri);
   my $fragment = $uri->fragment;
 
-  my ($subschema, $canonical_uri, $document, $document_path);
   if (not length($fragment) or $fragment =~ m{^/}) {
     my $base = $uri->clone->fragment(undef);
     if (my $resource = $self->_get_or_load_resource($base)) {
-      $subschema = $resource->{document}->get($document_path = $resource->{path}.($fragment//''));
-      $document = $resource->{document};
+      my $subschema = $resource->{document}->get(my $document_path = $resource->{path}.($fragment//''));
+      return if not defined $subschema;
+      my $document = $resource->{document};
       my $closest_resource = first { !length($_->[1]{path})       # document root
           || length($document_path)
             && path($_->[1]{path})->subsumes($document_path) }    # path is above present location
@@ -622,20 +666,33 @@ sub _fetch_schema_from_uri {
         grep { not length Mojo::URL->new($_->[0])->fragment }     # omit anchors
         $document->resource_pairs;
 
-      $canonical_uri = $closest_resource->[1]{canonical_uri}->clone
+      my $canonical_uri = $closest_resource->[1]{canonical_uri}->clone
         ->fragment(substr($document_path, length($closest_resource->[1]{path})));
       $canonical_uri->fragment(undef) if not length($canonical_uri->fragment);
+      return {
+        schema => $subschema,
+        canonical_uri => $canonical_uri,
+        document => $document,
+        document_path => $document_path,
+        specification_version => $resource->{specification_version},
+        vocabularies => $resource->{vocabularies},  # reference, not copy
+      };
     }
   }
   else {  # we are following a URI with a plain-name fragment
     if (my $resource = $self->_get_resource($uri)) {
-      $subschema = $resource->{document}->get($document_path = $resource->{path});
-      $canonical_uri = $resource->{canonical_uri}->clone; # this is *not* the anchor-containing URI
-      $document = $resource->{document};
+      my $subschema = $resource->{document}->get($resource->{path});
+      return if not defined $subschema;
+      return {
+        schema => $subschema,
+        canonical_uri => $resource->{canonical_uri}->clone, # this is *not* the anchor-containing URI
+        document => $resource->{document},
+        document_path => $resource->{path},
+        specification_version => $resource->{specification_version},
+        vocabularies => $resource->{vocabularies},  # reference, not copy
+      };
     }
   }
-
-  return defined $subschema ? ($subschema, $canonical_uri, $document, $document_path) : ();
 }
 
 has _json_decoder => (
@@ -661,7 +718,7 @@ JSON::Schema::Modern - Validate data against a schema
 
 =head1 VERSION
 
-version 0.517
+version 0.519
 
 =head1 SYNOPSIS
 
@@ -795,7 +852,7 @@ or a URI string indicating the location where such a schema is located.
 =back
 
 Optionally, a hashref can be passed as a third parameter which allows changing the values of the
-L</short_circuit>, L</collect_annotations>, L</annotate_unknown_keywords> and/or
+L</short_circuit>, L</collect_annotations>, L</annotate_unknown_keywords>, L</scalarref_booleans> and/or
 L</validate_formats> settings for just this evaluation call.
 
 The result is a L<JSON::Schema::Modern::Result> object, which can also be used as a boolean.
@@ -829,7 +886,7 @@ or a URI string indicating the location where such a schema is located.
 =back
 
 Optionally, a hashref can be passed as a third parameter which allows changing the values of the
-L</short_circuit>, L</collect_annotations>, L</annotate_unknown_keywords> and/or
+L</short_circuit>, L</collect_annotations>, L</annotate_unknown_keywords>, L</scalarref_booleans> and/or
 L</validate_formats> settings for just this
 evaluation call.
 
@@ -906,7 +963,7 @@ For more information, see L<Cpanel::JSON::XS/MAPPING>.
 
 =head2 Format Validation
 
-By default, formats are treated only as annotations, not assertions. When L</validate_format> is
+By default, formats are treated only as annotations, not assertions. When L</validate_formats> is
 true, strings are also checked against the format as specified in the schema. At present the
 following formats are supported (use of any other formats than these will always evaluate as true):
 
@@ -1041,8 +1098,8 @@ changing the draft specification version semantics after construction time
 
 =head1 SECURITY CONSIDERATIONS
 
-The C<pattern> and C<patternProperties> keywords, and the C<regex> format validator,
-evaluate regular expressions from the schema.
+The C<pattern> and C<patternProperties> keywords evaluate regular expressions from the schema,
+and the C<regex> format validator evaluates regular expressions from the data.
 No effort is taken (at this time) to sanitize the regular expressions for embedded code or
 potentially pathological constructs that may pose a security risk, either via denial of service
 or by allowing exposure to the internals of your application. B<DO NOT USE SCHEMAS FROM UNTRUSTED

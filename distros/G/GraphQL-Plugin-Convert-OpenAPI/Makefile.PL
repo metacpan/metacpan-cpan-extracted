@@ -22,7 +22,6 @@ WriteMakefile(
   },
   PREREQ_PM => {
     'JSON::Validator' => '2.01', # fqn bundle fix
-    'JSON::Validator::OpenAPI::Mojolicious' => '0',
     'GraphQL' => '0.32', # new comment format
     'OpenAPI::Client' => '0.17', # "call_p" interface
   },

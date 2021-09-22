@@ -5,7 +5,7 @@
 ##======================================================================
 
 #require "../VectorValued/Version.pm"; ##-- use perl-reversion from Perl::Version instead
-my $VERSION = '1.0.10';
+my $VERSION = '1.0.13';
 pp_setversion($VERSION);
 
 require "../VectorValued/Dev.pm";
@@ -396,13 +396,10 @@ pp_addpm(<<'EOPM');
 =head1 Vector-Valued Sorting and Comparison
 
 The following functions are provided for lexicographic sorting of
-vectors, rsp. axis indices.   Note that vv_qsortvec() is functionally
-identical to the builtin PDL function qsortvec(), but also that
-the latter is broken in the stock PDL-2.4.3 distribution.  The version
-included here includes Chris Marshall's "uniqsortvec" patch, which
-is available here:
-
- http://sourceforge.net/tracker/index.php?func=detail&aid=1548824&group_id=612&atid=300612
+vectors, rsp. axis indices.   As of PDL::VectorValued v1.0.12, vv_qsortvec() and
+vv_qsortveci() are just deprecated aliases for the builtin PDL functions of the same names.
+Older versions of this module used a dedicated implementation as a workaround
+for a bug in PDL-2.4.3, which has long since been fixed.
 
 =cut
 
@@ -420,235 +417,45 @@ Lexicographically compare a pair of vectors.
 EOD
   );
 
+##------------------------------------------------------
+## vv_qsortvec(), vv_qsortveci() : compatibility wrappers for PDL::Ufunc::qsortvec(), PDL::Ufunc::qsortveci()
+pp_addpm(<<'EOPM');
+
+=head2 vv_qsortvec
+
+=for sig
+
+  Signature: (a(n,m); [o]b(n,m))
 
 
-##======================================================================
-## qsortvec drop-in replacement
-##  + adopted from patched $PDL_SRC_ROOT/Basic/Ufunc/ufunc.pd
-##     - nearly a verbatim copy: C names have been changed to protect the innocent
-##  + includes Chris Marshall's "uniqsortvec" patch, from:
-##     http://sourceforge.net/tracker/index.php?func=detail&aid=1548824&group_id=612&atid=300612
-##======================================================================
-
-# Internal utility sorting routine for median/qsort/qsortvec routines.
-#
-# note: we export them to the PDL Core structure for use in
-#       other modules (eg Image2D)
-foreach (keys %PDL::Types::typehash) {
-    my $type_info = $PDL::Types::typehash{$_};
-
-    # skip non-real value types (do not support comparison operators).
-    next if(exists $type_info->{real} && ! $type_info->{real});
-
-    my $ctype = $type_info->{ctype};
-    my $ppsym = $type_info->{ppsym};
-
-    pp_addhdr(<<"FOO"
-
-	/*******
-         * qsortvec helper routines
-	 *   --CED 21-Aug-2003
-	 */
-
-	/* Compare a vector in lexicographic order, returning the
-	 *  equivalent of "<=>". 
- 	 */
-      signed char pdl_vecval_cmpvec_$ppsym($ctype *a, $ctype *b, int n) {
-	int i;
-	for(i=0; i<n; a++,b++,i++) {
-	 if( *a < *b ) return -1;
-	 if( *a > *b ) return 1;
-	}
-	return 0;
-     }	
-
-      void pdl_vecval_qsortvec_$ppsym($ctype *xx, int n, PDL_Indx a, PDL_Indx b) {
-	PDL_Indx i,j, median_ind;
-
-	$ctype t;
-	i = a; 
-	j = b;
-
-	median_ind = (i+j)/2;
-
-	do {
-	  while( pdl_vecval_cmpvec_$ppsym( &(xx[n*i]), &(xx[n*median_ind]), n )  <  0 )
-		i++;
-	  while( pdl_vecval_cmpvec_$ppsym( &(xx[n*j]), &(xx[n*median_ind]), n )  >  0 )
-		j--;
-	  if(i<=j) {
-		int k;
-		$ctype *aa = &xx[n*i];
-	        $ctype *bb = &xx[n*j];
-		for( k=0; k<n; aa++,bb++,k++ ) {
-		  $ctype z;
-		  z = *aa;
-		  *aa = *bb;
-		  *bb = z;
-		}
-
-                if (median_ind==i)
-                  median_ind=j;
-                else if (median_ind==j)
-                  median_ind=i;
-
-	        i++;
-		j--;
-	  }
-	} while (i <= j);
-
-	if (a < j)
-	  pdl_vecval_qsortvec_$ppsym( xx, n, a, j );
-	if (i < b)
-	  pdl_vecval_qsortvec_$ppsym( xx, n, i, b );
-      }
-
-FOO
-	     );
-}
-
-my @vv_target_typechars = (qw(B S U L),
-			   (defined(&PDL::indx) ? 'N' : qw()),
-			   qw(Q F D),
-			  );
-
-# when copying the data over to the temporary array,
-# ignore the bad values and then only send the number
-# of good elements to the sort routines
-#
-sub generic_vecval_qsortvec {
-    my $pdl = shift;
-    my $ndim = shift;
-    return
-      ('$T'.join('',@vv_target_typechars)
-       .'('
-       .join(',', map {'pdl_vecval_qsortvec_'.$_} @vv_target_typechars)
-       .')'
-       .' ($P('.$pdl.'), '.$ndim.', 0, nn);'
-      );
-}
-
-pp_def(
-    'vv_qsortvec',
-    HandleBad => 1,
-    Pars => 'a(n,m); [o]b(n,m);',
-    Code =>
-    'int nn;
-     int nd;
-     loop(n,m) %{ $b() = $a(); %}
-     nn = ($COMP(__m_size))-1;
-     nd = $COMP(__n_size);
-     if ($SIZE(m) > 0) {
-      '.generic_vecval_qsortvec('b','nd').'
-     }',
-    Doc => '
 =for ref
 
-Drop-in replacement for qsortvec(),
-which is broken in the stock PDL-2.4.3 release.
-See PDL::Ufunc::qsortvec.
-',
-    BadDoc =>
-'
-Vectors with bad components should be moved to the end of the array.
-',
-      ); # pp_def vv_qsortvec
+Deprecated alias for L<PDL::Ufunc::qsortvec()|PDL::Ufunc/qsortvec>,
+which see for details.
 
 
-##======================================================================
-## vv_qsortveci: new
-##  + adopted from patched $PDL_SRC_ROOT/Basic/Ufunc/ufunc.pd
-##======================================================================
+=head2 vv_qsortveci
 
-# Internal utility sorting routine for vv_qsortveci
-foreach (keys %PDL::Types::typehash) {
-    my $type_info = $PDL::Types::typehash{$_};
+=for sig
 
-    # skip non-real value types (do not support comparison operators).
-    next if(exists $type_info->{real} && ! $type_info->{real});
+  Signature: (a(n,m); indx [o]ix(m))
 
-    my $ctype = $type_info->{ctype};
-    my $ppsym = $type_info->{ppsym};
-
-    pp_addhdr(<<"FOO"
-      /*-- vector-based sorted index acquisition --*/
-      void pdl_vecval_qsortvec_ind_$ppsym($ctype *xx, PDL_Indx *ix, int n, PDL_Indx a, PDL_Indx b) {
-	PDL_Indx i,j, median_ind, tmpi;
-
-	$ctype t;
-	i = a;
-	j = b;
-
-	median_ind = (i+j)/2; /*-- an index into ix, NOT into xx --*/
-
-	do {
-	  while( pdl_vecval_cmpvec_$ppsym( &(xx[n*ix[i]]), &(xx[n*ix[median_ind]]), n )  <  0 )
-                /*-- xx[ix[i]] < median --*/
-		i++;
-	  while( pdl_vecval_cmpvec_$ppsym( &(xx[n*ix[j]]), &(xx[n*ix[median_ind]]), n )  >  0 ) 
-                /*-- median < xx[ix[j]] --*/
-		j--;
-	  if(i<=j) {
-                tmpi  = ix[i];
-                ix[i] = ix[j];
-                ix[j] = tmpi;
-
-                if (median_ind==i)
-                  median_ind=j;
-                else if (median_ind==j)
-                  median_ind=i;
-
-	        i++;
-		j--;
-	  }
-	} while (i <= j);
-
-	if (a < j)
-	  pdl_vecval_qsortvec_ind_$ppsym( xx, ix, n, a, j );
-	if (i < b)
-	  pdl_vecval_qsortvec_ind_$ppsym( xx, ix, n, i, b );
-      }
-FOO
-	     );
-  }
-
-sub generic_vecval_qsortvec_ind {
-    my $pdl = shift;
-    my $ix  = shift;
-    my $ndim = shift;
-    return
-      ('$T'.join('',@vv_target_typechars)
-       .'('
-       .join(',', map {'pdl_vecval_qsortvec_ind_'.$_} @vv_target_typechars)
-       .')'
-       .'($P('.$pdl.'), $P('.$ix.'), '.$ndim.', 0, nn);'
-      );
-}
-
-pp_def(
-    'vv_qsortveci',
-    HandleBad => 1,
-    Pars => "a(n,m); $INDX \[o]ix(m);",
-    Code =>
-    'int nn, nd;
-     PDL_Indx mi=0;
-     loop(m) %{ $ix() = mi++; %}
-     nn = ($COMP(__m_size))-1;
-     nd = $COMP(__n_size);
-     if ($SIZE(m) > 0) {
-       '.generic_vecval_qsortvec_ind('a','ix','nd').'
-     }',
-    Doc => '
 =for ref
 
-Get lexicographic sort order of a matrix $a() viewed as a list of vectors.
-',
-    BadDoc =>
-'
-Vectors with bad components should be treated as last in  the lexicographic order.
-',
-    ); # pp_def vv_qsortveci
+Deprecated alias for L<PDL::Ufunc::qsortveci()|PDL::Ufunc/qsortveci>,
+which see for details.
 
+=cut
+
+BEGIN {
+  *vv_qsortvec = *PDL::vv_qsortvec = *PDL::qsortvec;
+  *vv_qsortveci = *PDL::vv_qsortveci = *PDL::qsortveci;
+}
+
+EOPM
+
+pp_add_exported('vv_qsortvec');
+pp_add_exported('vv_qsortveci');
 
 ##======================================================================
 ## Vector-Valued Set Operations
@@ -1197,12 +1004,6 @@ PDL by Karl Glazebrook, Tuomas J. Lukka, Christian Soeller, and others.
 Code for rlevec() and rldvec() derived from the PDL builtin functions
 rle() and rld() in $PDL_SRC_ROOT/Basic/Slices/slices.pd
 
-=item *
-
-Code for vv_qsortvec() copied nearly verbatim from the builtin PDL functions
-in $PDL_SRC_ROOT/Basic/Ufunc/ufunc.pd, with Chris Marshall's "uniqsortvec" patch.
-Code for vv_qsortveci() based on the same.
-
 =back
 
 =cut
@@ -1243,7 +1044,7 @@ the file.
 
 =item *
 
-All other parts copyright (c) 2007-2015, Bryan Jurish.  All rights reserved.
+All other parts copyright (c) 2007-2021, Bryan Jurish.  All rights reserved.
 
 This package is free software, and entirely without warranty.
 You may redistribute it and/or modify it under the same terms

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210602223300;
+our $VERSION = 1.20210921211832;
 
 my $formatters = [
                 {
@@ -184,40 +184,40 @@ my $validators = {
                 'voip' => '70\\d{8}'
               };
 my %areanames = ();
-$areanames{ko} = {"8252", "울산",
-"8251", "부산",
-"8244", "세종",
-"8264", "제주",
-"822", "서울",
+$areanames{ko} = {"8233", "강원",
 "8242", "대전",
-"8233", "강원",
 "8262", "광주",
-"8261", "전남",
+"8251", "부산",
+"8255", "경남",
 "8254", "경북",
-"8241", "충남",
-"8263", "전북",
 "8232", "인천",
 "8243", "충북",
-"8231", "경기",
+"8263", "전북",
+"8252", "울산",
+"8261", "전남",
+"8241", "충남",
+"822", "서울",
 "8253", "대구",
-"8255", "경남",};
-$areanames{en} = {"8263", "Jeonbuk",
-"8232", "Incheon",
-"8243", "Chungbuk",
-"8231", "Gyeonggi",
-"8253", "Daegu",
-"8255", "Gyeongnam",
+"8231", "경기",
+"8244", "세종",
+"8264", "제주",};
+$areanames{en} = {"8261", "Jeonnam",
 "8252", "Ulsan",
-"8251", "Busan",
+"8241", "Chungnam",
+"8253", "Daegu",
+"822", "Seoul",
+"8231", "Gyeonggi",
 "8244", "Sejong\ City",
 "8264", "Jeju",
-"822", "Seoul",
-"8242", "Daejeon",
-"8262", "Gwangju",
 "8233", "Gangwon",
-"8261", "Jeonnam",
+"8262", "Gwangju",
+"8251", "Busan",
+"8242", "Daejeon",
+"8255", "Gyeongnam",
 "8254", "Gyeongbuk",
-"8241", "Chungnam",};
+"8232", "Incheon",
+"8263", "Jeonbuk",
+"8243", "Chungbuk",};
 
     sub new {
       my $class = shift;

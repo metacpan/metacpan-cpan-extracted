@@ -1,0 +1,12 @@
+Revision history for Perl extension App-dumpbin
+
+0.02 2021-09-18T14:38:39Z
+
+	- Hand off to real dumpbin.exe if available
+	- Don't waste time parsing 64bit binaries on a 32bit machine
+	- Sort exports by ordinal value in script/dumpbin
+
+0.01 2021-09-17T18:02:35Z
+
+    - original version
+

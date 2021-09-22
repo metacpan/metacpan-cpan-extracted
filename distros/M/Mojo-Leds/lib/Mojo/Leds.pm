@@ -1,5 +1,5 @@
 package Mojo::Leds;
-$Mojo::Leds::VERSION = '1.08';
+$Mojo::Leds::VERSION = '1.10';
 use Mojo::Base 'Mojolicious';
 use Mojo::Log;
 use Mojo::File 'path';
@@ -61,28 +61,28 @@ sub startup() {
 Mojo::Leds - Leds aka Light Environment (emi) for Development System based on Mojolicious
 
 =for html <p>
-    <img alt="Top language: " src="https://img.shields.io/github/languages/top/emilianobruni/mojo-leds?style=plastic">
-    <img alt="github last commit" src="https://img.shields.io/github/last-commit/emilianobruni/mojo-leds?style=plastic">
     <a href="https://github.com/emilianobruni/mojo-leds/actions/workflows/test.yml">
         <img alt="github workflow tests" src="https://github.com/emilianobruni/mojo-leds/actions/workflows/test.yml/badge.svg">
     </a>
+    <img alt="Top language: " src="https://img.shields.io/github/languages/top/emilianobruni/mojo-leds">
+    <img alt="github last commit" src="https://img.shields.io/github/last-commit/emilianobruni/mojo-leds">
 </p>
 
 =head1 VERSION
 
-version 1.08
+version 1.10
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Leds is a Mojolicious app to use a filesystem similiar to classical web site
+Mojo::Leds is a L<Mojolicious> app to use a filesystem similiar to classical web site
 
 =encoding UTF-8
 
 =head1 DIFFERENCES WITH MOJOLICIOUS
 
-L<Mojolicious> applications use a filesystem structure closer to a CPAN distribution
+Mojolicious applications use a filesystem structure closer to a CPAN distribution
 which is not (IMHO) intuitive.
 
 This is a classical Mojolicios applications
@@ -117,6 +117,8 @@ C<public/js/example/welcome.js>.
 In Mojo::Leds this structure is quite different
 
     myapp                      # Application directory
+    |- cfg                     # Config directory
+       +- app.cfg              # App config file
     |- script                  # Script directory
     |  +- my_app               # Application script
     |- lib                     # Library directory
@@ -131,16 +133,17 @@ In Mojo::Leds this structure is quite different
         |- layouts
         |  +- default.html.ep  # Layout template
         +- welcome             # Welcome page: directory
-           |- page.pm          # Welcome page: controller
-           |- page.html.ep     # Welcome page: template
-           |- page.css         # Welcome page: CSS file
-           +- page.js          # Welcome page: JS file
+           |- index.pm         # Welcome page: controller
+           |- index.html.ep    # Welcome page: template
+           |- index.css        # Welcome page: CSS file
+           +- index.js         # Welcome page: JS file
 
 and here, controller, html code, css and js are all inside C<www/example/> directory.
 
 =head1 BUGS/CONTRIBUTING
 
 Please report any bugs through the web interface at L<https://github.com/EmilianoBruni/Mojo-Leds/issues>
+
 If you want to contribute changes or otherwise involve yourself in development, feel free to fork the Git repository from
 L<https://github.com/EmilianoBruni/Mojo-Leds/>.
 

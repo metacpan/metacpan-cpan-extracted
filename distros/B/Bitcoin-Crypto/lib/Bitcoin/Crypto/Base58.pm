@@ -1,8 +1,9 @@
 package Bitcoin::Crypto::Base58;
 
-our $VERSION = "1.001";
+our $VERSION = "1.002";
 
 use v5.10;
+use strict;
 use warnings;
 use Exporter qw(import);
 use Crypt::Misc qw(encode_b58b decode_b58b);

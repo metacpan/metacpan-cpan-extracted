@@ -2,6 +2,14 @@ Revision history for AI-Perceptron-Simple
 
 The specifications and offline documentation can be found in the "docs" directory
 
+Version 1.04    17 SEPTEMBER 2021
+* fixed some critical problems
+    * yml nerve not loading back as an AI::Perceptron::Simple object
+    * fix docs: missing parameter $nerve for:
+        * save_perceptron
+        * save_perceptron_yaml
+* changed die to croak for file opening
+
 Version 1.03    9 SEPTEMBER 2021
 * data processing subroutine available:
     * shuffle data

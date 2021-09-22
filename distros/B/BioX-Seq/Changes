@@ -1,5 +1,21 @@
 Revision history for BioX-Seq
 
+0.008002 2021-04-08
+         Use core module IPC::Cmd instead of File::Which to look for installed
+            programs (removes last non-core dependency)
+
+0.008001 2020-12-19
+         Bump minimum Perl version to 5.16 (older versions handle l-value
+            subroutines differently)
+
+0.008 2019-07-17
+         Bio::Seq objects return true in boolean tests (even when the sequence
+            is empty)
+
+0.007004 2019-01-11
+         Validate each FASTA sequence after parsing (can be turned off)
+         Much additional testing
+
 0.007003 2019-01-11
          Fix missing build dependency for Test::Exception
 

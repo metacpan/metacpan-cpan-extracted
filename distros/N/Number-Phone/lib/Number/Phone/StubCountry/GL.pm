@@ -22,14 +22,14 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210602223259;
+our $VERSION = 1.20210921211831;
 
 my $formatters = [
                 {
                   'format' => '$1 $2 $3',
                   'leading_digits' => '
             19|
-            [2-689]
+            [2-9]
           ',
                   'pattern' => '(\\d{2})(\\d{2})(\\d{2})'
                 }
@@ -41,6 +41,7 @@ my $validators = {
             19|
             3[1-7]|
             6[14689]|
+            70|
             8[14-79]|
             9\\d
           )\\d{4}
@@ -50,6 +51,7 @@ my $validators = {
             19|
             3[1-7]|
             6[14689]|
+            70|
             8[14-79]|
             9\\d
           )\\d{4}
@@ -62,31 +64,31 @@ my $validators = {
                 'voip' => '3[89]\\d{4}'
               };
 my %areanames = ();
-$areanames{en} = {"29987", "Kangaatsiaq",
-"29994", "Ilulissat",
-"29968", "Paamiut",
-"29995", "Uummannaq",
-"29989", "Aasiaat",
+$areanames{en} = {"29999", "Ittoqqortoormiit",
+"29935", "Nuuk",
 "29933", "Nuuk",
-"29931", "Nuuk",
 "29992", "Qeqertasuaq",
-"29997", "Qaanaaq",
-"29984", "Kangerlussuaq",
-"29998", "Tasiilaq",
-"29985", "Sisimiut",
-"29999", "Ittoqqortoormiit",
+"29994", "Ilulissat",
 "29964", "Qaqortoq",
+"29931", "Nuuk",
+"29968", "Paamiut",
 "29936", "Nuuk",
-"29961", "Nanortalik",
-"29932", "Nuuk",
+"29998", "Tasiilaq",
+"29984", "Kangerlussuaq",
+"29989", "Aasiaat",
+"29985", "Sisimiut",
+"29987", "Kangaatsiaq",
+"29966", "Narsaq",
 "29996", "Upernavik",
 "29981", "Maniitsoq",
-"29934", "Nuuk",
-"299691", "Ivittuut",
-"29966", "Narsaq",
-"29986", "Sisimiut",
 "29991", "Qasigannguit",
-"29935", "Nuuk",};
+"29986", "Sisimiut",
+"29961", "Nanortalik",
+"29997", "Qaanaaq",
+"29932", "Nuuk",
+"29934", "Nuuk",
+"29995", "Uummannaq",
+"299691", "Ivittuut",};
 
     sub new {
       my $class = shift;

@@ -8,12 +8,10 @@ MANIFEST
 README.md
 t/00_use_ok.t
 t/01_constructor_new.t
-t/01_ping_pong.t
 t/02_redis_noop.t
 t/03_dispatch.t
 t/04_context_awareness.t
 t/05_create_traces.t
 t/lib/Test/Mock/Redis/NoOp.pm
-t/lib/Test/RedisServer/Client.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

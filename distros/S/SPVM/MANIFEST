@@ -544,15 +544,7 @@ ppport.h
 README.md
 script/spvmcc
 solo/solo_Makefile.PL
-solo/SPVM/Byte.spvm
-solo/SPVM/Complex_2d.spvm
-solo/SPVM/Complex_2f.spvm
-solo/SPVM/Double.spvm
-solo/SPVM/Float.spvm
-solo/SPVM/Int.spvm
-solo/SPVM/Long.spvm
 solo/SPVM/Main.spvm
-solo/SPVM/Short.spvm
 solo/SPVM/TestCase.spvm
 solo/SPVM/TestCase/Allow.spvm
 solo/SPVM/TestCase/Callback1.spvm
@@ -561,6 +553,7 @@ solo/SPVM/TestCase/Comparator.spvm
 solo/SPVM/TestCase/Comparator/Byte.spvm
 solo/SPVM/TestCase/ComparatorAnon.spvm
 solo/SPVM/TestCase/Complex_2d.spvm
+solo/SPVM/TestCase/Complex_2f.spvm
 solo/SPVM/TestCase/ComplexCalc.spvm
 solo/SPVM/TestCase/Data/Weaken.spvm
 solo/SPVM/TestCase/Destructor.spvm

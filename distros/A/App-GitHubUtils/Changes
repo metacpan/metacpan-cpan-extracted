@@ -1,3 +1,9 @@
+0.007   2021-05-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Add option: --github-cmd-config-profile to pass to github-cmd
+	  CLI's --config-profile.
+
+
 0.006   2020-12-24  Released-By: PERLANCAR; Urgency: medium
 
 	- [incompatible change] Rename script create-the-github-repo ->

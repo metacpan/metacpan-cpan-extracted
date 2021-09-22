@@ -1,0 +1,32 @@
+=head1 NAME
+
+Acme::PodOnly - A distribution that only contains Pod
+
+=head1 SYNOPSIS
+
+  $ cpanm Acme::PodOnly
+
+=head1 DESCRIPTION
+
+This is a test for indexing a dist that only contains a Pod file, but includes
+provides data.
+
+=head1 AUTHOR
+
+haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>
+
+=head1 CONTRIBUTORS
+
+None so far.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2021 the Acme::PodOnly L</AUTHOR> and L</CONTRIBUTORS>
+as listed above.
+
+=head1 LICENSE
+
+This library is free software and may be distributed under the same terms
+as perl itself. See L<https://dev.perl.org/licenses/>.
+
+=cut

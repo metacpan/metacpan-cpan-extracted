@@ -69,6 +69,7 @@ subtest 'Fail: invalid etc' => sub {
         [ 'invocants()->[0]',                D(), '<DOES NOT EXIST>', '', D(), D() ],
         [ 'args_min()',                      D(), '0', 'eq', 1, D() ],
         [ 'args_max()',                      D(), '0', 'eq', 100, D() ],
+        [ 'has_args()',                      D(), !!1, 'eq', '', D() ],
         [ 'has_slurpy()',                    D(), '', 'eq', !!1, D() ],
         [ 'has_invocant()',                  D(), '', 'eq', !!1, D() ],
     ];

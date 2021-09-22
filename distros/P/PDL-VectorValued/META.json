@@ -32,12 +32,19 @@
       },
       "runtime" : {
          "requires" : {
-            "PDL" : "0",
+            "PDL" : "2.019",
             "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.10",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/moocow-the-bovine/PDL-VectorValued.git",
+         "web" : "https://github.com/moocow-the-bovine/PDL-VectorValued"
+      }
+   },
+   "version" : "v1.0.13",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

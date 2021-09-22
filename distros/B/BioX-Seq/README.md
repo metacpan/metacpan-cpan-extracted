@@ -21,11 +21,21 @@ INSTALLATION
 ------------
 
 To install this module, run the following commands:
-
+    
+    git clone https://github.com/jvolkening/p5-BioX-Seq.git
+    cd p5-BioX-Seq
 	perl Build.PL
 	./Build
 	./Build test
 	./Build install
+
+Or, with cpanminus:
+
+    cpanm BioX::Seq
+
+Or, with conda:
+
+    conda install -c bioconda perl-biox-seq
 
 SUPPORT AND DOCUMENTATION
 -------------------------
@@ -38,7 +48,7 @@ perldoc command.
 LICENSE AND COPYRIGHT
 ---------------------
 
-Copyright (C) 2014-2017 Jeremy Volkening <jdv@base2bio.com>
+Copyright (C) 2014-2020 Jeremy Volkening <jdv@base2bio.com>
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Library General Public License as published by the Free

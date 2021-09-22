@@ -174,13 +174,13 @@ EOF
 	Pars => '[phys]DL(2,n); [phys]D(2,n); [phys]DU(2,n); [io,phys]B(2,n,nrhs); int [o,phys]info()',
 	Code => generate_code '
 		$TFD(c,z)gtsv_(
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__nrhs_size)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(nrhs)},
 		$P(DL),
 		$P(D),
 		$P(DU),
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(info));
 ',
       Doc => '
@@ -255,7 +255,7 @@ EOF
 		char trau, travt;
 		$GENERIC() *rwork;
 		$GENERIC() tmp_work[2];
-		lwork = ($PRIV(__m_size) < $PRIV(__n_size)) ? 5*$PRIV(__m_size) : 5*$PRIV(__n_size);
+		lwork = ($SIZE(m) < $SIZE(n)) ? 5*$SIZE(m) : 5*$SIZE(n);
 		rwork = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
 		lwork = -1;
 
@@ -284,15 +284,15 @@ EOF
 		$TFD(c,z)gesvd_(
 		&trau,
 		&travt,
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(s),
 		$P(U),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		$P(VT),
-		&(integer){$PRIV(__s_size)},
+		&(integer){$SIZE(s)},
 		&tmp_work[0],
 		&lwork,
 		rwork,
@@ -304,15 +304,15 @@ EOF
 		$TFD(cgesvd_,zgesvd_)(
 		&trau,
 		&travt,
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(s),
 		$P(U),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		$P(VT),
-		&(integer){$PRIV(__s_size)},
+		&(integer){$SIZE(s)},
 		work,
 		&lwork,
 		rwork,
@@ -351,7 +351,7 @@ EOF
 		$GENERIC() *rwork;
 		$GENERIC() tmp_work[2];
 		
-		lwork = ($PRIV(__m_size) < $PRIV(__n_size)) ? $PRIV(__m_size) : $PRIV(__n_size);
+		lwork = ($SIZE(m) < $SIZE(n)) ? $SIZE(m) : $SIZE(n);
 		iwork = (integer *)malloc(lwork * 8 * sizeof(integer));
 
 		switch ($job())
@@ -374,15 +374,15 @@ EOF
 		lwork = -1;
 		$TFD(cgesdd_,zgesdd_)(
 		&tra,
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(s),
 		$P(U),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		$P(VT),
-		&(integer){$PRIV(__s_size)},
+		&(integer){$SIZE(s)},
 		&tmp_work[0],
 		&lwork,
 		rwork,
@@ -395,15 +395,15 @@ EOF
 		$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(cgesdd_,zgesdd_)(
 		&tra,
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(s),
 		$P(U),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		$P(VT),
-		&(integer){$PRIV(__s_size)},
+		&(integer){$SIZE(s)},
 		work,
 		&lwork,
 		rwork,
@@ -459,23 +459,23 @@ EOF
 		&pjobu,
 		&pjobv,
 		&pjobq,
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(p)},
 		$P(k),
 		$P(l),
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(B),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		$P(alpha),
 		$P(beta),
 		$P(U),
-		&(integer){$PRIV(__q_size)},
+		&(integer){$SIZE(q)},
 		$P(V),
-		&(integer){$PRIV(__s_size)},
+		&(integer){$SIZE(s)},
 		$P(Q),
-		&(integer){$PRIV(__u_size)},
+		&(integer){$SIZE(u)},
 		&twork[0],
 		&lwork,
 		rwork,
@@ -491,23 +491,23 @@ EOF
 		&pjobu,
 		&pjobv,
 		&pjobq,
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(p)},
 		$P(k),
 		$P(l),
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(B),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		$P(alpha),
 		$P(beta),
 		$P(U),
-		&(integer){$PRIV(__q_size)},
+		&(integer){$SIZE(q)},
 		$P(V),
-		&(integer){$PRIV(__s_size)},
+		&(integer){$SIZE(s)},
 		$P(Q),
-		&(integer){$PRIV(__u_size)},
+		&(integer){$SIZE(u)},
 		work,
 		&lwork,
 		rwork,
@@ -535,18 +535,18 @@ EOF
 			jvl = \'V\';
 		if ($jobvr())
 			jvr = \'V\';
-			rwork = ($GENERIC() *)malloc( 2 * $PRIV(__n_size) *  sizeof($GENERIC()));
+			rwork = ($GENERIC() *)malloc( 2 * $SIZE(n) *  sizeof($GENERIC()));
 		$TFD(cgeev_,zgeev_)(
 		&jvl,
 		&jvr,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(w),
 		$P(vl),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(vr),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		&tmp_work[0],
 		&lwork,
 		rwork,
@@ -558,14 +558,14 @@ EOF
 		$TFD(cgeev_,zgeev_)(
 		&jvl,
 		&jvr,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(w),
 		$P(vl),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(vr),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		work,
 		&lwork,
 		rwork,
@@ -619,20 +619,20 @@ EOF
 				break;
 			default: sens = \'N\';
 		}
-			rwork = ($GENERIC() *)malloc( 2 * $PRIV(__n_size) *  sizeof($GENERIC()));
+			rwork = ($GENERIC() *)malloc( 2 * $SIZE(n) *  sizeof($GENERIC()));
 		$TFD(cgeevx_,zgeevx_)(
 		&balanc,
 		&jvl,
 		&jvr,
 		&sens,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(w),
 		$P(vl),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(vr),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		$P(ilo),
 		$P(ihi),
 		$P(scale),
@@ -652,14 +652,14 @@ EOF
 		&jvl,
 		&jvr,
 		&sens,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(w),
 		$P(vl),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(vr),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		$P(ilo),
 		$P(ihi),
 		$P(scale),
@@ -698,17 +698,17 @@ EOF
 		$TFD(cggev_,zggev_)(
 		&pjobvl,
 		&pjobvr,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(alpha),
 		$P(beta),
 		$P(VL),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(VR),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		&tmp_work[0],
 		&lwork,
 		rwork,
@@ -721,17 +721,17 @@ EOF
 		$TFD(cggev_,zggev_)(
 		&pjobvl,
 		&pjobvr,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(alpha),
 		$P(beta),
 		$P(VL),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(VR),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		work,
 		&lwork,
 		rwork,
@@ -799,17 +799,17 @@ EOF
 		&pjobvl,
 		&pjobvr,
 		&psens,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(alpha),
 		$P(beta),
 		$P(VL),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(VR),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		$P(ilo),
 		$P(ihi),
 		$P(lscale),
@@ -834,17 +834,17 @@ EOF
 		&pjobvl,
 		&pjobvr,
 		&psens,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(alpha),
 		$P(beta),
 		$P(VL),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(VR),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		$P(ilo),
 		$P(ihi),
 		$P(lscale),
@@ -988,26 +988,26 @@ EOF
 
 		$GENERIC() tmp_work[2];
 		$GENERIC() *rwork, *work;
-		rwork = ($GENERIC() *) malloc ($PRIV(__n_size) * sizeof ($GENERIC()));
+		rwork = ($GENERIC() *) malloc ($SIZE(n) * sizeof ($GENERIC()));
 		$TFD(f,d)select_func    = $PRIV(select_func);
 
 		if ($jobvs())
 			jvs = \'V\';
 		if ($sort()){
 			psort = \'S\';
-			bwork  = (integer * ) malloc ($PRIV(__n_size) * sizeof (integer));
+			bwork  = (integer * ) malloc ($SIZE(n) * sizeof (integer));
 		}
              $TFD(c,z)gees_(
 		&jvs,
 		&psort,
 		$TFD(f,d)select_wrapper,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(sdim),
 		$P(w),
 		$P(vs),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		&tmp_work[0],
 		&lwork,
 		rwork,
@@ -1021,13 +1021,13 @@ EOF
 		&jvs,
 		&psort,
 		$TFD(f,d)select_wrapper,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(sdim),
 		$P(w),
 		$P(vs),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		work,
 		&lwork,
 		rwork,
@@ -1080,7 +1080,7 @@ EOF
 		char sens;
 
 		$GENERIC() *work, *rwork;
-		rwork = ($GENERIC() *) malloc ($PRIV(__n_size) * sizeof ($GENERIC()));
+		rwork = ($GENERIC() *) malloc ($SIZE(n) * sizeof ($GENERIC()));
 		$TFD(f,d)select_func    = $PRIV(select_func);
 
 
@@ -1088,22 +1088,22 @@ EOF
 			jvs = \'V\';
 		if ($sort()){
 			psort = \'S\';
-			bwork  = (integer * )  malloc ($PRIV(__n_size) * sizeof (integer));
+			bwork  = (integer * )  malloc ($SIZE(n) * sizeof (integer));
 		}
 
 		switch ($sense())
 		{
 			case 1: sens = \'E\';
-				lwork  = (integer ) ($PRIV(__n_size) * ($PRIV(__n_size)/2));
+				lwork  = (integer ) ($SIZE(n) * ($SIZE(n)/2));
 				break;
 			case 2: sens = \'V\';
-				lwork  = (integer ) ($PRIV(__n_size) * ($PRIV(__n_size)/2));
+				lwork  = (integer ) ($SIZE(n) * ($SIZE(n)/2));
 				break;
 			case 3: sens = \'B\';
-				lwork  = (integer ) ($PRIV(__n_size) * ($PRIV(__n_size)/2));
+				lwork  = (integer ) ($SIZE(n) * ($SIZE(n)/2));
 				break;
 			default: sens = \'N\';
-				 lwork = (integer ) ($PRIV(__n_size) * 2);
+				 lwork = (integer ) ($SIZE(n) * 2);
 		}
 		work  = ($GENERIC() * )malloc(2*lwork * sizeof ($GENERIC()));
 
@@ -1112,13 +1112,13 @@ EOF
 		&psort,
 		$TFD(f,d)select_wrapper,
 		&sens,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(sdim),
 		$P(w),
 		$P(vs),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		$P(rconde),
 		$P(rcondv),
 		work,
@@ -1318,25 +1318,25 @@ EOF
 			pjobvsr = \'V\';
 		if ($sort()){
 			psort = \'S\';
-			bwork = (integer *)malloc($PRIV(__n_size) *  sizeof(integer));
+			bwork = (integer *)malloc($SIZE(n) *  sizeof(integer));
 		}
 		$TFD(c,z)gges_(
 		&pjobvsl,
 		&pjobvsr,
 		&psort,
 		$TFD(f,d)gselect_wrapper,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(sdim),
 		$P(alpha),
 		$P(beta),
 		$P(VSL),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(VSR),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		&tmp_work[0],
 		&lwork,
 		rwork,
@@ -1352,18 +1352,18 @@ EOF
 		&pjobvsr,
 		&psort,
 		$TFD(f,d)gselect_wrapper,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(sdim),
 		$P(alpha),
 		$P(beta),
 		$P(VSL),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(VSR),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		work,
 		&lwork,
 		rwork,
@@ -1430,7 +1430,7 @@ EOF
 
 		if ($sort()){
 			psort = \'S\';
-			bwork = (integer *)malloc($PRIV(__n_size) *  sizeof(integer));
+			bwork = (integer *)malloc($SIZE(n) *  sizeof(integer));
 		}
 
 		switch ($sense())
@@ -1459,14 +1459,14 @@ EOF
 		// for this feature.
 
 		minwrk = $SIZE(n)  << 1;
-		maxwrk = $SIZE(n)  + $SIZE(n) * ilaenv_(&c__1, "ZGEQRF", " ", &(integer){$PRIV(__n_size)}, &c__1,
-		&(integer){$PRIV(__n_size)}, &c__0, (ftnlen)6, (ftnlen)1);
+		maxwrk = $SIZE(n)  + $SIZE(n) * ilaenv_(&c__1, "ZGEQRF", " ", &(integer){$SIZE(n)}, &c__1,
+		&(integer){$SIZE(n)}, &c__0, (ftnlen)6, (ftnlen)1);
 
 		if ($jobvsl())
 		{
 			integer i__1 = maxwrk;
 			integer i__2 = $SIZE(n) + $SIZE(n) * ilaenv_(&c__1, "ZUNGQR"
-		    		, " ", &(integer){$PRIV(__n_size)}, &c__1, &(integer){$PRIV(__n_size)}, &c_n1, (ftnlen)6, (ftnlen)1);
+		    		, " ", &(integer){$SIZE(n)}, &c__1, &(integer){$SIZE(n)}, &c_n1, (ftnlen)6, (ftnlen)1);
 	    		maxwrk = max(i__1,i__2);
 			pjobvsl = \'V\';
 		}
@@ -1481,18 +1481,18 @@ EOF
 		&psort,
 		$TFD(f,d)gselect_wrapper,
 		&psens,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(sdim),
 		$P(alpha),
 		$P(beta),
 		$P(VSL),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(VSR),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		$P(rconde),
 		$P(rcondv),
 		work,
@@ -1546,7 +1546,7 @@ EOF
 		integer lwork = -1;
 		$GENERIC() *rwork;
 		$GENERIC() tmp_work[2];
-		rwork = ($GENERIC() *) malloc ((3*$PRIV(__n_size)-2) * sizeof($GENERIC()));
+		rwork = ($GENERIC() *) malloc ((3*$SIZE(n)-2) * sizeof($GENERIC()));
 		if ($jobz())
 			jz = \'V\';
 		if ($uplo())
@@ -1555,9 +1555,9 @@ EOF
 		$TFD(cheev_,zheev_)(
 		&jz,
 		&puplo,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(w),
 		&tmp_work[0],
 		&lwork,
@@ -1570,9 +1570,9 @@ EOF
 		$TFD(cheev_,zheev_)(
 		&jz,
 		&puplo,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(w),
 		work,
 		&lwork,
@@ -1617,9 +1617,9 @@ EOF
 		$TFD(cheevd_,zheevd_)(
 		&jz,
 		&puplo,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(w),
 		&tmp_work[0],
 		&lwork,
@@ -1641,9 +1641,9 @@ EOF
 		$TFD(cheevd_,zheevd_)(
 		&jz,
 		&puplo,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(w),
 		work,
 		&lwork,
@@ -1708,9 +1708,9 @@ EOF
 		&jz,
 		&prange,
 		&puplo,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(vl),
 		$P(vu),
 		$P(il),
@@ -1719,7 +1719,7 @@ EOF
 		$P(m),
 		$P(w),
 		$P(z),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		&tmp_work[0],
 		&lwork,
 		rwork,
@@ -1734,9 +1734,9 @@ EOF
 		&jz,
 		&prange,
 		&puplo,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(vl),
 		$P(vu),
 		$P(il),
@@ -1745,7 +1745,7 @@ EOF
 		$P(m),
 		$P(w),
 		$P(z),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		work,
 		&lwork,
 		rwork,
@@ -1804,9 +1804,9 @@ EOF
 		&jz,
 		&prange,
 		&puplo,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(vl),
 		$P(vu),
 		$P(il),
@@ -1815,7 +1815,7 @@ EOF
 		$P(m),
 		$P(w),
 		$P(z),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		$P(isuppz),
 		&tmp_work[0],
 		&lwork,
@@ -1836,9 +1836,9 @@ EOF
 		&jz,
 		&prange,
 		&puplo,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(vl),
 		$P(vu),
 		$P(il),
@@ -1847,7 +1847,7 @@ EOF
 		$P(m),
 		$P(w),
 		$P(z),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		$P(isuppz),
 		work,
 		&lwork,
@@ -1896,11 +1896,11 @@ EOF
 		$P(itype),
 		&jz,
 		&puplo,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(w),
 		&tmp_work[0],
 		&lwork,
@@ -1914,11 +1914,11 @@ EOF
 		$P(itype),
 		&jz,
 		&puplo,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(w),
 		work,
 		&lwork,
@@ -1967,11 +1967,11 @@ EOF
 		$P(itype),
 		&jz,
 		&puplo,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(w),
 		&tmp_work[0],
 		&lwork,
@@ -1993,11 +1993,11 @@ EOF
 		$P(itype),
 		&jz,
 		&puplo,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(w),
 		work,
 		&lwork,
@@ -2062,11 +2062,11 @@ EOF
 		&jz,
 		&prange,
 		&puplo,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(vl),
 		$P(vu),
 		$P(il),
@@ -2075,7 +2075,7 @@ EOF
 		$P(m),
 		$P(w),
 		$P(Z),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		&tmp_work[0],
 		&lwork,
 		rwork,
@@ -2091,11 +2091,11 @@ EOF
 		&jz,
 		&prange,
 		&puplo,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(vl),
 		$P(vu),
 		$P(il),
@@ -2104,7 +2104,7 @@ EOF
 		$P(m),
 		$P(w),
 		$P(Z),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		work,
 		&lwork,
 		rwork,
@@ -2134,13 +2134,13 @@ EOF
 	Pars => '[io,phys]A(2,n,n);  [io,phys]B(2,n,m); int [o,phys]ipiv(n); int [o,phys]info()',
 	Code => generate_code '
 		$TFD(cgesv_,zgesv_)(
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(m)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ipiv),
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(info));
 ');
 pp_defc("gesvx",
@@ -2157,8 +2157,8 @@ EOF
 	Code => generate_code '
 		char ptrans, pfact, pequed;
 
-		$GENERIC() *work = ($GENERIC() *) malloc(4 * $PRIV(__n_size) *  sizeof($GENERIC()));
-		$GENERIC() *rwork  = ($GENERIC() *) malloc(4 * $PRIV(__n_size) *  sizeof($GENERIC()));
+		$GENERIC() *work = ($GENERIC() *) malloc(4 * $SIZE(n) *  sizeof($GENERIC()));
+		$GENERIC() *rwork  = ($GENERIC() *) malloc(4 * $SIZE(n) *  sizeof($GENERIC()));
 
 		switch ($trans())
 		{
@@ -2191,20 +2191,20 @@ EOF
 		$TFD(cgesvx_,zgesvx_)(
 		&pfact,
 		&ptrans,
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(m)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(af),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ipiv),
 		&pequed,
 		$P(r),
 		$P(c),
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(X),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(rcond),
 		$P(ferr),
 		$P(berr),
@@ -2257,13 +2257,13 @@ EOF
 
 		$TFD(csysv_,zsysv_)(
 		&puplo,
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(m)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ipiv),
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
                 &tmp_work[0],
 		&lwork,
 		$P(info));
@@ -2274,13 +2274,13 @@ EOF
 		$GENERIC() *work = ($GENERIC() *)malloc(2*lwork *  sizeof($GENERIC()));
 		$TFD(csysv_,zsysv_)(
 		&puplo,
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(m)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ipiv),
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
                 work,
 		&lwork,
 		$P(info));
@@ -2304,7 +2304,7 @@ EOF
 		char puplo = \'U\';
 		integer lwork = -1;
 
-		$GENERIC() *rwork = ($GENERIC() * )malloc ($PRIV(__n_size)* sizeof ($GENERIC()));
+		$GENERIC() *rwork = ($GENERIC() * )malloc ($SIZE(n)* sizeof ($GENERIC()));
 		$GENERIC() tmp_work[2];
 
 		if($fact())
@@ -2317,17 +2317,17 @@ EOF
 		$TFD(csysvx_,zsysvx_)(
 		&pfact,
 		&puplo,
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(m)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(af),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ipiv),
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(X),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(rcond),
 		$P(ferr),
 		$P(berr),
@@ -2343,17 +2343,17 @@ EOF
 		$TFD(csysvx_,zsysvx_)(
 		&pfact,
 		&puplo,
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(m)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(af),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ipiv),
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(X),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(rcond),
 		$P(ferr),
 		$P(berr),
@@ -2384,13 +2384,13 @@ EOF
 
 		$TFD(chesv_,zhesv_)(
 		&puplo,
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(m)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ipiv),
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
                 &tmp_work[0],
 		&lwork,
 		$P(info));
@@ -2401,13 +2401,13 @@ EOF
 		$GENERIC() *work = ($GENERIC() *)malloc(2*lwork *  sizeof($GENERIC()));
 		$TFD(chesv_,zhesv_)(
 		&puplo,
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(m)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ipiv),
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
                 work,
 		&lwork,
 		$P(info));
@@ -2438,7 +2438,7 @@ EOF
 		char puplo = \'U\';
 		integer lwork = -1;
 
-		$GENERIC() *rwork = ($GENERIC() * )malloc ($PRIV(__n_size)* sizeof ($GENERIC()));
+		$GENERIC() *rwork = ($GENERIC() * )malloc ($SIZE(n)* sizeof ($GENERIC()));
 		$GENERIC() tmp_work[2];
 
 		if($fact())
@@ -2451,17 +2451,17 @@ EOF
 		$TFD(chesvx_,zhesvx_)(
 		&pfact,
 		&puplo,
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(m)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(af),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ipiv),
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(X),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(rcond),
 		$P(ferr),
 		$P(berr),
@@ -2477,17 +2477,17 @@ EOF
 		$TFD(chesvx_,zhesvx_)(
 		&pfact,
 		&puplo,
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(m)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(af),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ipiv),
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(X),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(rcond),
 		$P(ferr),
 		$P(berr),
@@ -2523,12 +2523,12 @@ EOF
 
 		$TFD(cposv_,zposv_)(
 		&puplo,
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(m)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(info));
 ',
 Doc=>'
@@ -2568,24 +2568,24 @@ EOF
 		if ($uplo())
 			puplo = \'L\';
 
-		work = ($GENERIC() *) malloc(4 * $PRIV(__n_size) *  sizeof($GENERIC()));
-		rwork = ($GENERIC() *) malloc(2 * $PRIV(__n_size) *  sizeof($GENERIC()));
+		work = ($GENERIC() *) malloc(4 * $SIZE(n) *  sizeof($GENERIC()));
+		rwork = ($GENERIC() *) malloc(2 * $SIZE(n) *  sizeof($GENERIC()));
 
 		$TFD(cposvx_,zposvx_)(
 		&pfact,
 		&puplo,
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(m)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(af),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		&pequed,
 		$P(s),
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(X),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(rcond),
 		$P(ferr),
 		$P(berr),
@@ -2631,13 +2631,13 @@ EOF
 
 		$TFD(cgels_,zgels_)(
 		&ptrans,
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__q_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(q)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(B),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		&tmp_work[0],
 		&lwork,
 		$P(info));
@@ -2648,13 +2648,13 @@ EOF
 
 		$TFD(cgels_,zgels_)(
 		&ptrans,
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__q_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(q)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(B),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		work,
 		&lwork,
 		$P(info));
@@ -2690,16 +2690,16 @@ EOF
 		$GENERIC() tmp_work[2];
 		$GENERIC() *rwork;
 
-		rwork = ($GENERIC() *)malloc(2 * $PRIV(__m_size) * sizeof($GENERIC()));
+		rwork = ($GENERIC() *)malloc(2 * $SIZE(m) * sizeof($GENERIC()));
 
 		$TFD(cgelsy_,zgelsy_)(
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__q_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(q)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(B),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		$P(jpvt),
 		$P(rcond),
 		$P(rank),
@@ -2713,13 +2713,13 @@ EOF
 			$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 
 		$TFD(cgelsy_,zgelsy_)(
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__q_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(q)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(B),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		$P(jpvt),
 		$P(rcond),
 		$P(rank),
@@ -2750,18 +2750,18 @@ EOF
 		$GENERIC() tmp_work[2];
 		$GENERIC() *rwork;
 
-		lrwork = min($PRIV(__m_size), $PRIV(__n_size));
+		lrwork = min($SIZE(m), $SIZE(n));
 
 			rwork = ($GENERIC() *)malloc(5 * lrwork *  sizeof($GENERIC()));
 
 		$TFD(cgelss_,zgelss_)(
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__q_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(q)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(B),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		$P(s),
 		$P(rcond),
 		$P(rank),
@@ -2775,13 +2775,13 @@ EOF
 			$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 
 		$TFD(cgelss_,zgelss_)(
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__q_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(q)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(B),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		$P(s),
 		$P(rcond),
 		$P(rank),
@@ -2816,24 +2816,24 @@ EOF
 
 		smlsiz = ilaenv_(&c_nine, "CGELSD", " ", &c_zero, &c_zero, &c_zero, &c_zero, (ftnlen)6, (ftnlen)1);
 		size_i = (integer) (log(($GENERIC()) minmn / ($GENERIC()) (smlsiz + 1)) /log(2.)) + 1;
-		if ($PRIV(__m_size) >=  $PRIV(__n_size)){
-			rwork = ($GENERIC() *) malloc ((10*$PRIV(__n_size) + 2 * $PRIV(__n_size) * smlsiz + 8 * $PRIV(__n_size) * size_i + 3 * smlsiz * $PRIV(__q_size) + pow((smlsiz+1),2))  *  sizeof($GENERIC()));
+		if ($SIZE(m) >=  $SIZE(n)){
+			rwork = ($GENERIC() *) malloc ((10*$SIZE(n) + 2 * $SIZE(n) * smlsiz + 8 * $SIZE(n) * size_i + 3 * smlsiz * $SIZE(q) + pow((smlsiz+1),2))  *  sizeof($GENERIC()));
 		}
 		else{
-			rwork = ($GENERIC() *) malloc ((10*$PRIV(__m_size) + 2 * $PRIV(__m_size) * smlsiz + 8 * $PRIV(__m_size) * size_i + 3 * smlsiz * $PRIV(__q_size) + pow((smlsiz+1),2))  *  sizeof($GENERIC()));
+			rwork = ($GENERIC() *) malloc ((10*$SIZE(m) + 2 * $SIZE(m) * smlsiz + 8 * $SIZE(m) * size_i + 3 * smlsiz * $SIZE(q) + pow((smlsiz+1),2))  *  sizeof($GENERIC()));
 		}
 		nlvl = max(size_i, 0);
 		iwork = (integer *)malloc((3 * minmn * nlvl + 11 * minmn) *  sizeof(integer));
 
 
 		$TFD(cgelsd_,zgelsd_)(
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__q_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(q)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(B),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		$P(s),
 		$P(rcond),
 		$P(rank),
@@ -2848,13 +2848,13 @@ EOF
 			$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 
 		$TFD(cgelsd_,zgelsd_)(
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__q_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(q)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(B),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		$P(s),
 		$P(rcond),
 		$P(rank),
@@ -2885,13 +2885,13 @@ EOF
 		$GENERIC() tmp_work[2];
 
 		$TFD(cgglse_,zgglse_)(
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(p)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(B),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		$P(c),
 		$P(d),
 		$P(x),
@@ -2903,13 +2903,13 @@ EOF
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(cgglse_,zgglse_)(
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(p)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(B),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		$P(c),
 		$P(d),
 		$P(x),
@@ -2936,13 +2936,13 @@ EOF
 		$GENERIC() tmp_work[2];
 
 		$TFD(cggglm_,zggglm_)(
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(p)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(d),
 		$P(x),
 		$P(y),
@@ -2954,13 +2954,13 @@ EOF
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(cggglm_,zggglm_)(
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(p)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(d),
 		$P(x),
 		$P(y),
@@ -2988,10 +2988,10 @@ EOF
 	Pars => '[io,phys]A(2,m,n); int [o,phys]ipiv(p); int [o,phys]info()',
 	Code => generate_code '
 		$TFD(cgetrf_,zgetrf_)(
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(ipiv),
 		$P(info));
 ');
@@ -3006,10 +3006,10 @@ EOF
 	Pars => '[io,phys]A(2,m,n); int [o,phys]ipiv(p); int [o,phys]info()',
 	Code => generate_code '
 		$TFD(cgetf2_,zgetf2_)(
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(ipiv),
 		$P(info));
 ');
@@ -3030,9 +3030,9 @@ EOF
 
 		$TFD(csytrf_,zsytrf_)(
 		&puplo,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ipiv),
 		&tmp_work[0],
 		&lwork,
@@ -3043,9 +3043,9 @@ EOF
 		$GENERIC() *work = ($GENERIC() *)malloc(2*lwork *  sizeof($GENERIC()));
 		$TFD(csytrf_,zsytrf_)(
 		&puplo,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ipiv),
 		work,
 		&lwork,
@@ -3068,9 +3068,9 @@ EOF
 
 		$TFD(csytf2_,zsytf2_)(
 		&puplo,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ipiv),
 		$P(info));
 ');
@@ -3092,13 +3092,13 @@ EOF
 		if ($uplo())
 			puplo = \'L\';
 
-		lwork = (integer ) $PRIV(__n_size) * blocksiz;
+		lwork = (integer ) $SIZE(n) * blocksiz;
 		work = ($GENERIC() *)malloc(2*lwork *  sizeof($GENERIC()));
 		$TFD(chetrf_,zhetrf_)(
 		&puplo,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ipiv),
 		work,
 		&lwork,
@@ -3127,9 +3127,9 @@ EOF
 
 		$TFD(chetf2_,zhetf2_)(
 		&puplo,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ipiv),
 		$P(info));
 ',
@@ -3155,9 +3155,9 @@ EOF
 
 		$TFD(cpotrf_,zpotrf_)(
 		&puplo,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(info));
 ',
 Doc=>'
@@ -3182,9 +3182,9 @@ EOF
 
 		$TFD(cpotf2_,zpotf2_)(
 		&puplo,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(info));
 ',
 Doc => '
@@ -3207,9 +3207,9 @@ EOF
 		$GENERIC() tmp_work[2];
 
 		$TFD(cgetri_,zgetri_)(
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ipiv),
 		&tmp_work[0],
 		&lwork,
@@ -3219,9 +3219,9 @@ EOF
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(2*lwork *  sizeof($GENERIC()));
 		$TFD(cgetri_,zgetri_)(
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ipiv),
 		work,
 		&lwork,
@@ -3240,15 +3240,15 @@ EOF
 	Pars => '[io,phys]A(2,n,n); int uplo(); int [phys]ipiv(n); int [o,phys]info()',
 	Code => generate_code '
              char puplo = \'U\';
-		$GENERIC() *work = ($GENERIC() *)malloc(2*$PRIV(__n_size) *  sizeof($GENERIC()));
+		$GENERIC() *work = ($GENERIC() *)malloc(2*$SIZE(n) *  sizeof($GENERIC()));
 		if ($uplo())
 			puplo = \'L\';
 
 		$TFD(csytri_, zsytri_)(
 		&puplo,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ipiv),
 		work,
 		$P(info));
@@ -3264,15 +3264,15 @@ EOF
 	Pars => '[io,phys]A(2,n,n); int uplo(); int [phys]ipiv(n); int [o,phys]info()',
 	Code => generate_code '
              char puplo = \'U\';
-		$GENERIC() *work = ($GENERIC() *)malloc(2*$PRIV(__n_size) *  sizeof($GENERIC()));
+		$GENERIC() *work = ($GENERIC() *)malloc(2*$SIZE(n) *  sizeof($GENERIC()));
 		if ($uplo())
 			puplo = \'L\';
 
 		$TFD(chetri_, zhetri_)(
 		&puplo,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ipiv),
 		work,
 		$P(info));
@@ -3300,9 +3300,9 @@ EOF
 
 		$TFD(cpotri_,zpotri_)(
 		&puplo,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(info));
 ');
 
@@ -3324,9 +3324,9 @@ EOF
 		$TFD(ctrtri_, ztrtri_)(
 		&puplo,
 		&pdiag,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(info));
 ');
 
@@ -3348,9 +3348,9 @@ EOF
 		$TFD(ctrti2_, ztrti2_)(
 		&puplo,
 		&pdiag,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(info));
 ');
 
@@ -3371,13 +3371,13 @@ EOF
 
 		$TFD(cgetrs_,zgetrs_)(
 		&transp,
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(m)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ipiv),
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(info));
 ',
 	Doc=>'
@@ -3409,13 +3409,13 @@ EOF
 
 		$TFD(csytrs_,zsytrs_)(
 		&puplo,
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(m)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ipiv),
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(info));
 ');
 
@@ -3435,13 +3435,13 @@ EOF
 
 		$TFD(chetrs_,zhetrs_)(
 		&puplo,
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(m)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ipiv),
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(info));
 ',
 Doc => '
@@ -3467,12 +3467,12 @@ EOF
 
 		$TFD(cpotrs_,zpotrs_)(
 		&puplo,
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(m)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(info));
 ',
 
@@ -3510,12 +3510,12 @@ EOF
 		&puplo,
 		&ptrans,
 		&pdiag,
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(m)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(info));
 ', 
 	Doc=>'
@@ -3563,9 +3563,9 @@ EOF
 		&ptrans,
 		&pdiag,
 		&pnormin,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(x),
 		$P(scale),
 		$P(cnorm),
@@ -3597,17 +3597,17 @@ EOF
 	Pars => '[phys]A(2,n,n); int norm(); [phys]anorm(); [o,phys]rcond();int [o,phys]info()',
 	Code => generate_code '
              char pnorm = \'I\';
-		$GENERIC() *work = ($GENERIC() *) malloc(($PRIV(__n_size) * 4) *  sizeof($GENERIC()));
-		$GENERIC() *rwork = ($GENERIC() *) malloc(($PRIV(__n_size) * 2)*  sizeof(integer));
+		$GENERIC() *work = ($GENERIC() *) malloc(($SIZE(n) * 4) *  sizeof($GENERIC()));
+		$GENERIC() *rwork = ($GENERIC() *) malloc(($SIZE(n) * 2)*  sizeof(integer));
 
 		if($norm())
 			pnorm = \'O\';
 
 		$TFD(cgecon_,zgecon_)(
 		&pnorm,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(anorm),
 		$P(rcond),
 		work,
@@ -3629,15 +3629,15 @@ EOF
 	Code => generate_code '
              char puplo = \'U\';
 
-		$GENERIC() *work = ($GENERIC() *) malloc(($PRIV(__n_size) * 4) *  sizeof($GENERIC()));
+		$GENERIC() *work = ($GENERIC() *) malloc(($SIZE(n) * 4) *  sizeof($GENERIC()));
 		if($uplo())
 			puplo = \'L\';
 
 		$TFD(csycon_,zsycon_)(
 		&puplo,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ipiv),
 		$P(anorm),
 		$P(rcond),
@@ -3658,16 +3658,16 @@ EOF
 	Code => generate_code '
              char puplo = \'U\';
 
-		$GENERIC() *work = ($GENERIC() *) malloc(($PRIV(__n_size) * 4) *  sizeof($GENERIC()));
+		$GENERIC() *work = ($GENERIC() *) malloc(($SIZE(n) * 4) *  sizeof($GENERIC()));
 
 		if($uplo())
 			puplo = \'L\';
 
 		$TFD(checon_,zhecon_)(
 		&puplo,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ipiv),
 		$P(anorm),
 		$P(rcond),
@@ -3694,17 +3694,17 @@ EOF
 	Pars => '[phys]A(2,n,n); int uplo(); [phys]anorm(); [o,phys]rcond();int [o,phys]info()',
 	Code => generate_code '
              char puplo = \'U\';
-		$GENERIC() *work = ($GENERIC() *) malloc(($PRIV(__n_size) * 4) *  sizeof($GENERIC()));
-		$GENERIC() *rwork = ($GENERIC() *) malloc($PRIV(__n_size) *  sizeof(integer));
+		$GENERIC() *work = ($GENERIC() *) malloc(($SIZE(n) * 4) *  sizeof($GENERIC()));
+		$GENERIC() *rwork = ($GENERIC() *) malloc($SIZE(n) *  sizeof(integer));
 
 		if($uplo())
 			puplo = \'L\';
 
 		$TFD(cpocon_, zpocon_)(
 		&puplo,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(anorm),
 		$P(rcond),
 		work,
@@ -3733,8 +3733,8 @@ EOF
              char puplo = \'U\';
              char pdiag = \'N\';
              char pnorm = \'I\';
-		$GENERIC() *work = ($GENERIC() *) malloc(($PRIV(__n_size) * 4) *  sizeof($GENERIC()));
-		$GENERIC() *rwork = ($GENERIC() *) malloc($PRIV(__n_size) *  sizeof(integer));
+		$GENERIC() *work = ($GENERIC() *) malloc(($SIZE(n) * 4) *  sizeof($GENERIC()));
+		$GENERIC() *rwork = ($GENERIC() *) malloc($SIZE(n) *  sizeof(integer));
 
 		if($uplo())
 			puplo = \'L\';
@@ -3747,9 +3747,9 @@ EOF
 		&pnorm,
 		&puplo,
 		&pdiag,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(rcond),
 		work,
 		rwork,
@@ -3770,13 +3770,13 @@ EOF
 	Code => generate_code '
 		integer lwork = -1;
 		$GENERIC() tmp_work[2], *rwork;
-		rwork = ($GENERIC() *) malloc ($PRIV(__n_size) * 2  * sizeof($GENERIC()));
+		rwork = ($GENERIC() *) malloc ($SIZE(n) * 2  * sizeof($GENERIC()));
 
 		$TFD(cgeqp3_,zgeqp3_)(
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(jpvt),
 		$P(tau),
 		&tmp_work[0],
@@ -3788,10 +3788,10 @@ EOF
 		{
 				$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 			$TFD(cgeqp3_,zgeqp3_)(
-			&(integer){$PRIV(__m_size)},
-			&(integer){$PRIV(__n_size)},
+			&(integer){$SIZE(m)},
+			&(integer){$SIZE(n)},
 			$P(A),
-			&(integer){$PRIV(__m_size)},
+			&(integer){$SIZE(m)},
 			$P(jpvt),
 			$P(tau),
 			work,
@@ -3818,10 +3818,10 @@ EOF
 		$GENERIC() tmp_work[2];
 
 		$TFD(cgeqrf_,zgeqrf_)(
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(tau),
 		&tmp_work[0],
 		&lwork,
@@ -3831,10 +3831,10 @@ EOF
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(cgeqrf_,zgeqrf_)(
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(tau),
 		work,
 		&lwork,
@@ -3856,11 +3856,11 @@ EOF
 		integer lwork = -1;
 		$GENERIC() tmp_work[2];
 		$TFD(cungqr_, zungqr_)(
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__k_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(k)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(tau),
 		&tmp_work[0],
 		&lwork,
@@ -3870,11 +3870,11 @@ EOF
 		{
 			$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(cungqr_,zungqr_)(
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__k_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(k)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(tau),
 		work,
 		&lwork,
@@ -3912,14 +3912,14 @@ EOF
 		$TFD(cunmqr_,zunmqr_)(
 		&pside,
 		&ptrans,
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__k_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(k)},
 		$P(A),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		$P(tau),
 		$P(C),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		&tmp_work[0],
 		&lwork,
 		$P(info));
@@ -3930,14 +3930,14 @@ EOF
 		$TFD(cunmqr_,zunmqr_)(
 		&pside,
 		&ptrans,
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__k_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(k)},
 		$P(A),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		$P(tau),
 		$P(C),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		work,
 		&lwork,
 		$P(info));
@@ -3965,10 +3965,10 @@ EOF
 		$GENERIC() tmp_work[2];
 
 		$TFD(cgelqf_,zgelqf_)(
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(tau),
 		&tmp_work[0],
 		&lwork,
@@ -3978,10 +3978,10 @@ EOF
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(cgelqf_,zgelqf_)(
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(tau),
 		work,
 		&lwork,
@@ -4003,11 +4003,11 @@ EOF
 		integer lwork = -1;
 		$GENERIC() tmp_work[2];
 		$TFD(cunglq_,zunglq_)(
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__k_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(k)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(tau),
 		&tmp_work[0],
 		&lwork,
@@ -4017,11 +4017,11 @@ EOF
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(cunglq_,zunglq_)(
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__k_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(k)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(tau),
 		work,
 		&lwork,
@@ -4058,14 +4058,14 @@ EOF
 		$TFD(cunmlq_,zunmlq_)(
 		&pside,
 		&ptrans,
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__k_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(k)},
 		$P(A),
-		&(integer){$PRIV(__k_size)},
+		&(integer){$SIZE(k)},
 		$P(tau),
 		$P(C),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		&tmp_work[0],
 		&lwork,
 		$P(info));
@@ -4076,14 +4076,14 @@ EOF
 		$TFD(cunmlq_,zunmlq_)(
 		&pside,
 		&ptrans,
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__k_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(k)},
 		$P(A),
-		&(integer){$PRIV(__k_size)},
+		&(integer){$SIZE(k)},
 		$P(tau),
 		$P(C),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		work,
 		&lwork,
 		$P(info));
@@ -4112,10 +4112,10 @@ EOF
 		$GENERIC() tmp_work[2];
 
 		$TFD(cgeqlf_,zgeqlf_)(
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(tau),
 		&tmp_work[0],
 		&lwork,
@@ -4125,10 +4125,10 @@ EOF
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(cgeqlf_,zgeqlf_)(
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(tau),
 		work,
 		&lwork,
@@ -4151,11 +4151,11 @@ EOF
 		$GENERIC() tmp_work[2];
 
 		$TFD(cungql_,zungql_)(
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__k_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(k)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(tau),
 		&tmp_work[0],
 		&lwork,
@@ -4165,11 +4165,11 @@ EOF
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(cungql_,zungql_)(
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__k_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(k)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(tau),
 		work,
 		&lwork,
@@ -4206,14 +4206,14 @@ EOF
 		$TFD(cunmql_,zunmql_)(
 		&pside,
 		&ptrans,
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__k_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(k)},
 		$P(A),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		$P(tau),
 		$P(C),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		&tmp_work[0],
 		&lwork,
 		$P(info));
@@ -4224,14 +4224,14 @@ EOF
 		$TFD(cunmql_,zunmql_)(
 		&pside,
 		&ptrans,
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__k_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(k)},
 		$P(A),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		$P(tau),
 		$P(C),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		work,
 		&lwork,
 		$P(info));
@@ -4258,10 +4258,10 @@ EOF
 		integer lwork = -1;
 		$GENERIC() tmp_work[2];
 		$TFD(cgerqf_,zgerqf_)(
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(tau),
 		&tmp_work[0],
 		&lwork,
@@ -4271,10 +4271,10 @@ EOF
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(cgerqf_,zgerqf_)(
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(tau),
 		work,
 		&lwork,
@@ -4297,11 +4297,11 @@ EOF
 		$GENERIC() tmp_work[2];
 
 		$TFD(cungrq_,zungrq_)(
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__k_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(k)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(tau),
 		&tmp_work[0],
 		&lwork,
@@ -4311,11 +4311,11 @@ EOF
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(cungrq_,zungrq_)(
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__k_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(k)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(tau),
 		work,
 		&lwork,
@@ -4352,14 +4352,14 @@ EOF
 		$TFD(cunmrq_,zunmrq_)(
 		&pside,
 		&ptrans,
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__k_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(k)},
 		$P(A),
-		&(integer){$PRIV(__k_size)},
+		&(integer){$SIZE(k)},
 		$P(tau),
 		$P(C),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		&tmp_work[0],
 		&lwork,
 		$P(info));
@@ -4370,14 +4370,14 @@ EOF
 		$TFD(cunmrq_,zunmrq_)(
 		&pside,
 		&ptrans,
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__k_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(k)},
 		$P(A),
-		&(integer){$PRIV(__k_size)},
+		&(integer){$SIZE(k)},
 		$P(tau),
 		$P(C),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		work,
 		&lwork,
 		$P(info));
@@ -4405,10 +4405,10 @@ EOF
 		$GENERIC() tmp_work[2];
 
 		$TFD(ctzrzf_,ztzrzf_)(
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(tau),
 		&tmp_work[0],
 		&lwork,
@@ -4418,10 +4418,10 @@ EOF
 		{
 			$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(ctzrzf_,ztzrzf_)(
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(tau),
 		work,
 		&lwork,
@@ -4452,15 +4452,15 @@ EOF
 		$TFD(cunmrz_,zunmrz_)(
 		&pside,
 		&ptrans,
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__k_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(k)},
 		&kk,
 		$P(A),
-		&(integer){$PRIV(__k_size)},
+		&(integer){$SIZE(k)},
 		$P(tau),
 		$P(C),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		&tmp_work[0],
 		&lwork,
 		$P(info));
@@ -4471,15 +4471,15 @@ EOF
 		$TFD(cunmrz_,zunmrz_)(
 		&pside,
 		&ptrans,
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__k_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(k)},
 		&kk,
 		$P(A),
-		&(integer){$PRIV(__k_size)},
+		&(integer){$SIZE(k)},
 		$P(tau),
 		$P(C),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		work,
 		&lwork,
 		$P(info));
@@ -4509,11 +4509,11 @@ EOF
 		$GENERIC() tmp_work[2];
 
 		$TFD(cgehrd_,zgehrd_)(
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ilo),
 		$P(ihi),
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(tau),
 		&tmp_work[0],
 		&lwork,
@@ -4523,11 +4523,11 @@ EOF
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(2*lwork *  sizeof($GENERIC()));
 		$TFD(cgehrd_,zgehrd_)(
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ilo),
 		$P(ihi),
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(tau),
 		work,
 		&lwork,
@@ -4550,11 +4550,11 @@ EOF
 		$GENERIC() tmp_work[2];
 
 		$TFD(cunghr_,zunghr_)(
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ilo),
 		$P(ihi),
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(tau),
 		&tmp_work[0],
 		&lwork,
@@ -4564,11 +4564,11 @@ EOF
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(2*lwork *  sizeof($GENERIC()));
 		$TFD(cunghr_,zunghr_)(
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ilo),
 		$P(ihi),
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(tau),
 		work,
 		&lwork,
@@ -4616,14 +4616,14 @@ EOF
 		$TFD(chseqr_,zhseqr_)(
 		&pjob,
 		&pcompz,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ilo),
 		$P(ihi),
 		$P(H),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(w),
 		$P(Z),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		&tmp_work[0],
 		&lwork,
 		$P(info));
@@ -4634,14 +4634,14 @@ EOF
 		$TFD(chseqr_,zhseqr_)(
 		&pjob,
 		&pcompz,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ilo),
 		$P(ihi),
 		$P(H),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(w),
 		$P(Z),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		work,
 		&lwork,
 		$P(info));
@@ -4689,13 +4689,13 @@ EOF
 		&pside,
 		&phowmny,
 		$P(select),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(T),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(VL),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(VR),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		&mm,
 		$P(m), 
 		&work[$SIZE(n)],
@@ -4744,15 +4744,15 @@ EOF
 		&pside,
 		&phowmny,
 		$P(select),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(B),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(VL),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(VR),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		&mm,
 		$P(m), 
 		&work[2*$SIZE(n)],
@@ -4784,9 +4784,9 @@ EOF
 		}
 		$TFD(cgebal_,zgebal_)(
 		&pjob,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(ilo),
 		$P(ihi),
 		$P(scale),
@@ -4810,7 +4810,7 @@ EOF
 			case 1: pnorm = \'O\';
 				break;
 			case 2: pnorm = \'I\';
-				work = ($GENERIC() *)malloc($PRIV(__n_size) *  sizeof($GENERIC()));
+				work = ($GENERIC() *)malloc($SIZE(n) *  sizeof($GENERIC()));
 				break;
 			case 3: pnorm = \'F\';
 				break;
@@ -4819,10 +4819,10 @@ EOF
 
 		$b() = $TFD(clange_,zlange_)(
 		&pnorm,
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(m)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		work);
 		if ($norm() == 2)
 			free (work);
@@ -4844,10 +4844,10 @@ EOF
 		switch ($norm())
 		{
 			case 1: pnorm = \'O\';
-				work = ($GENERIC() *)malloc($PRIV(__n_size) *  sizeof($GENERIC()));
+				work = ($GENERIC() *)malloc($SIZE(n) *  sizeof($GENERIC()));
 				break;
 			case 2: pnorm = \'I\';
-				work = ($GENERIC() *)malloc($PRIV(__n_size) *  sizeof($GENERIC()));
+				work = ($GENERIC() *)malloc($SIZE(n) *  sizeof($GENERIC()));
 				break;
 			case 3: pnorm = \'F\';
 				break;
@@ -4859,9 +4859,9 @@ EOF
 		$b() = $TFD(clansy_,zlansy_)(
 		&pnorm,
 		&puplo,
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		work);
 		if ($norm() == 2 || $norm() == 1)
 			free (work);
@@ -4884,7 +4884,7 @@ EOF
 			case 1: pnorm = \'O\';
 				break;
 			case 2: pnorm = \'I\';
-				work = ($GENERIC() *)malloc($PRIV(__m_size) *  sizeof($GENERIC()));
+				work = ($GENERIC() *)malloc($SIZE(m) *  sizeof($GENERIC()));
 				break;
 			case 3: pnorm = \'F\';
 				break;
@@ -4899,10 +4899,10 @@ EOF
 		&pnorm,
 		&puplo,
 		&pdiag,
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		work);
 		if ($norm() == 2)
 			free (work);
@@ -4941,17 +4941,17 @@ EOF
 		$TFD(cgemm_,zgemm_)(
 		&ptransa,
 		&ptransb,
-		&(integer){$PRIV(__r_size)},
-		&(integer){$PRIV(__s_size)},
+		&(integer){$SIZE(r)},
+		&(integer){$SIZE(s)},
 		&kk,
 		$P(alpha),
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(B),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		$P(beta),
 		$P(C),
-		&(integer){$PRIV(__r_size)});
+		&(integer){$SIZE(r)});
 ',
 	Doc=>'
 
@@ -5003,17 +5003,17 @@ pp_def("rmcgemm",
 		CblasRowMajor,
 		ptransa,
 		ptransb,
-		$PRIV(__s_size),
-		$PRIV(__r_size),
+		$SIZE(s),
+		$SIZE(r),
 		kk,
 		$P(alpha),
 		$P(A),
-		$PRIV(__m_size),
+		$SIZE(m),
 		$P(B),
-		$PRIV(__p_size),
+		$SIZE(p),
 		$P(beta),
 		$P(C),
-		$PRIV(__r_size));
+		$SIZE(r));
 ',
 Doc=>'
 
@@ -5051,17 +5051,17 @@ EOF
 		$TFD(cgemm_,zgemm_)(
 		&ptrans,
 		&ptrans,
-		&(integer){$PRIV(__p_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(p)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(m)},
 		&alpha[0],
 		$P(B),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		&beta[0],
 		$P(C),
-		&(integer){$PRIV(__p_size)});
+		&(integer){$SIZE(p)});
 ');
 if ($config{STRASSEN}){
 pp_defc("smmult",
@@ -5080,17 +5080,17 @@ EOF
 		$TFD(cgemmb_,zgemmb_)(
 		&ptrans,
 		&ptrans,
-		&(integer){$PRIV(__p_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(p)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(m)},
 		&alpha[0],
 		$P(B),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		&beta[0],
 		$P(C),
-		&(integer){$PRIV(__p_size)});
+		&(integer){$SIZE(p)});
 ');
 }
 
@@ -5111,17 +5111,17 @@ EOF
 		$TFD(cgemm_,zgemm_)(
 		&btrans,
 		&atrans,
-		&(integer){$PRIV(__p_size)},
-		&(integer){$PRIV(__n_size)},
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(p)},
+		&(integer){$SIZE(n)},
+		&(integer){$SIZE(m)},
 		&alpha[0],
 		$P(B),
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		$P(A),
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		&beta[0],
 		$P(C),
-		&(integer){$PRIV(__p_size)});
+		&(integer){$SIZE(p)});
 ');
 
 pp_defc("syrk",
@@ -5149,14 +5149,14 @@ EOF
 		$TFD(csyrk_,zsyrk_)(
 		&puplo,
 		&ptrans,
-		&(integer){$PRIV(__p_size)},
+		&(integer){$SIZE(p)},
 		&kk,
 		$P(alpha),
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(beta),
 		$P(C),
-		&(integer){$PRIV(__p_size)});
+		&(integer){$SIZE(p)});
 ');
 
 if ($config{CBLAS}){
@@ -5188,14 +5188,14 @@ pp_def("rmcsyrk",
 		CblasRowMajor,
 		puplo,
 		ptrans,
-		$PRIV(__p_size),
+		$SIZE(p),
 		kk,
 		$P(alpha),
 		$P(A),
-		$PRIV(__m_size),
+		$SIZE(m),
 		$P(beta),
 		$P(C),
-		$PRIV(__p_size));
+		$SIZE(p));
 ',
 Doc=>'
 
@@ -5213,7 +5213,7 @@ EOF
        HandleBad => 0,
 	Pars => '[phys]a(2,n);int [phys]inca();[phys]b(2,n);int [phys]incb();[o,phys]c(2)',
 	Code =>  '
-		integer n = (integer ) $PRIV(__n_size)/$inca();
+		integer n = (integer ) $SIZE(n)/$inca();
 		$TFD(cdotu_,zdotu_)(
 		$P(c),
 		&n,
@@ -5231,7 +5231,7 @@ EOF
        HandleBad => 0,
 	Pars => '[phys]a(2,n);int [phys]inca();[phys]b(2,n);int [phys]incb();[o,phys]c(2)',
 	Code =>  '
-		integer n = (integer ) $PRIV(__n_size)/$inca();
+		integer n = (integer ) $SIZE(n)/$inca();
 		$TFD(cdotc_,zdotc_)(
 		$P(c),
 		&n,
@@ -5257,7 +5257,7 @@ EOF
        HandleBad => 0,
 	Pars => '[phys]a(2,n);int [phys]inca();[phys] alpha(2);[io,phys]b(2,n);int [phys]incb()',
 	Code =>  '
-		integer n = (integer ) $PRIV(__n_size)/$inca();
+		integer n = (integer ) $SIZE(n)/$inca();
 		$TFD(caxpy_,zaxpy_)(
 		&n,
 		$P(alpha),
@@ -5275,7 +5275,7 @@ EOF
        HandleBad => 0,
 	Pars => '[phys]a(2,n);int [phys]inca();[o,phys]b()',
 	Code =>  '
-		integer n = (integer ) $PRIV(__n_size)/$inca();
+		integer n = (integer ) $SIZE(n)/$inca();
 		$b() = $TFD(sc,dz)nrm2_(
 		&n,
 		$P(a),
@@ -5290,7 +5290,7 @@ EOF
        HandleBad => 0,
 	Pars => '[phys]a(2,n);int [phys]inca();[o,phys]b()',
 	Code =>  '
-		integer n = (integer ) $PRIV(__n_size)/$inca();
+		integer n = (integer ) $SIZE(n)/$inca();
 		$b() = $TFD(sc,dz)asum_(
 		&n,
 		$P(a),
@@ -5305,7 +5305,7 @@ EOF
         HandleBad => 0,
 	Pars => '[io,phys]a(2,n);int [phys]inca();[phys]scale(2)',
 	Code =>  '
-		integer n = (integer ) $PRIV(__n_size)/$inca();
+		integer n = (integer ) $SIZE(n)/$inca();
 		$TFD(cscal_,zscal_)(
 		&n,
 		$P(scale),
@@ -5320,7 +5320,7 @@ pp_def("sscal",
 	Code =>  '
 		extern int csscal_(integer *n, $GENERIC() *sa,
 		$GENERIC() *dx, integer *incx);
-		integer n = (integer ) $PRIV(__n_size)/$inca();
+		integer n = (integer ) $SIZE(n)/$inca();
 		csscal_( &n, $P(scale), $P(a), $P(inca));
 ',
 Doc=>'
@@ -5373,12 +5373,12 @@ EOF
 
 		$TFD(clacpy_,zlacpy_)(
 		&puplo,
-		&(integer){$PRIV(__m_size)},
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(m)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(B),
-		&(integer){$PRIV(__p_size)});
+		&(integer){$SIZE(p)});
 ');
 
 pp_defc("laswp",
@@ -5390,9 +5390,9 @@ EOF
 	Pars => '[io,phys]A(2,m,n); int [phys]k1(); int [phys]k2(); int [phys]ipiv(p);int [phys]inc()',
 	Code => '
 		$TFD(claswp_,zlaswp_)(
-		&(integer){$PRIV(__n_size)},
+		&(integer){$SIZE(n)},
 		$P(A),
-		&(integer){$PRIV(__m_size)},
+		&(integer){$SIZE(m)},
 		$P(k1),
 		$P(k2),
 		$P(ipiv),
@@ -5566,9 +5566,9 @@ EOF
 	for (;;)
 	{
 		i++;
-		$TFD(cgemm_,zgemm_)(&ptrans,&ptrans,&(integer){$PRIV(__n_size)},&(integer){$PRIV(__n_size)},
-			&(integer){$PRIV(__n_size)},&alpha[0],$P(Y),&(integer){$PRIV(__n_size)}, $P(A), &(integer){$PRIV(__n_size)},
-			&beta[0], p, &(integer){$PRIV(__n_size)});
+		$TFD(cgemm_,zgemm_)(&ptrans,&ptrans,&(integer){$SIZE(n)},&(integer){$SIZE(n)},
+			&(integer){$SIZE(n)},&alpha[0],$P(Y),&(integer){$SIZE(n)}, $P(A), &(integer){$SIZE(n)},
+			&beta[0], p, &(integer){$SIZE(n)});
 		
 		if (i == $SIZE(n)) break;
 

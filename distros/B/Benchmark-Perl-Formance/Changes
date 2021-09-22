@@ -1,5 +1,12 @@
 Revision history for Benchmark-Perl-Formance
 
+0.55      2021-09-17
+        - also check -DSILENT_NO_TAINT_SUPPORT for metainfo
+
+0.54      2021-09-16
+        - support for -DNO_TAINT_SUPPORT in metainfo
+        - options --tap et al. to generate TAP with embedded results
+
 0.53      2016-04-23
         - fix calling benchmarkanything reporting
 

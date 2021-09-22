@@ -63,7 +63,11 @@ sub mock_new {
     
     $mock->mock(
         connect     => sub { "OK" },
+    );
+    $mock->mock(
         ping        => sub { "PONG" },
+    );
+    $mock->mock(
         set         => sub { "OK" },
     );
     

@@ -1,5 +1,5 @@
 package Mojolicious::Command::Author::generate::leds_app;
-$Mojolicious::Command::Author::generate::leds_app::VERSION = '1.08';
+$Mojolicious::Command::Author::generate::leds_app::VERSION = '1.10';
 use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::Util qw(class_to_file class_to_path decamelize);
@@ -42,7 +42,7 @@ sub run {
     $self->render_to_rel_file( 'welcomecss', "$name/www/$dir/index.css" );
 
     # Static file
-    $self->render_to_rel_file( 'static', "$name/public/index.html" );
+    $self->render_to_rel_file( 'static', "$name/www/public/index.html" );
 
     # Test
     $self->render_to_rel_file( 'test', "$name/t/basic.t", { class => $class } );
@@ -61,7 +61,7 @@ Mojolicious::Command::Author::generate::leds_app - Mojo::Leds app generator comm
 
 =head1 VERSION
 
-version 1.08
+version 1.10
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,13 @@
 Revision history for App-Bootstrap-Perl
 
+0.18      2021-09-17
+        - additional --silentnotaint build option
+
+0.17      2021-09-16
+        - introduce --(no)taintsupport build option to build Perl
+          with -DNO_TAINT_SUPPORT and name subdirs accordingly
+        - generate 'mycpan' wrapper tool which pre-points to Config
+
 0.16      2019-04-26
         - no more App::Cpan usage, back to simple/stupid mode
 

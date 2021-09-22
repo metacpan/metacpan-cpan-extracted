@@ -11,7 +11,7 @@ use Form::Tiny::Error;
 use Form::Tiny::Utils qw(try get_package_form_meta);
 use Moo::Role;
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 has "input" => (
 	is => "ro",
@@ -292,6 +292,14 @@ sub form_meta
 
 	return get_package_form_meta($package);
 }
+
+# This fixes form inheritance for other role systems than Moose
+around DOES => sub {
+	my ($orig, $self, @args) = @_;
+
+	return Moo::Role::does_role($self, @args)
+		|| $self->$orig(@args);
+};
 
 1;
 

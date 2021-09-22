@@ -29,7 +29,13 @@ my %WriteMakefileArgs = (
         'File::Share' => '0.25',
         'JSON'	=> '2.90',
         'HTML::Template' => '2.95',
-        'URI::Query' => '0.16'
+        'URI::Query' => '0.16',
+        'Log::Any' => '1.040',
+        'Class::Data::Inheritable' => '0.08',
+        'Class::Accessor' => '0.34',
+        'DateTime' => '1.06',
+        'Date::Parse' => '2.30',
+        'LWP::Protocol::https' => '6.04'
     },
     
     test  => {TESTS => 't/*.t'},

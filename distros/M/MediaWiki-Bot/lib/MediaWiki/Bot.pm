@@ -2,7 +2,7 @@ package MediaWiki::Bot;
 use strict;
 use warnings;
 # ABSTRACT: a high-level bot framework for interacting with MediaWiki wikis
-our $VERSION = '5.006003'; # VERSION
+our $VERSION = '5.006004'; # VERSION
 
 use HTML::Entities 3.28;
 use Carp;
@@ -486,7 +486,7 @@ sub get_history {
     };
 
     $hash->{rvstartid} = $rvstartid if ($rvstartid);
-    $hash->{direction} = $direction if ($direction);
+    $hash->{rvdir}     = $direction if ($direction);
 
     my $res = $self->{api}->api($hash);
     return $self->_handle_api_error() unless $res;
@@ -1599,6 +1599,7 @@ sub search {
     my $hash = {
         action   => 'query',
         list     => 'search',
+        srnamespace => $ns,
         srsearch => $term,
         srwhat   => 'text',
         srlimit  => 'max',
@@ -1885,6 +1886,8 @@ sub contributions {
     my $user = shift;
     my $ns   = shift;
     my $opts = shift;
+    my $from = shift; # ucend
+    my $to   = shift; # ucstart
 
     if (ref $user eq 'ARRAY') {
         $user = join '|', map { my $u = $_; $u =~ s{^User:}{}; $u } @$user;
@@ -1906,6 +1909,8 @@ sub contributions {
         ucprop      => 'ids|title|timestamp|comment|flags',
         uclimit     => 'max',
     };
+    $query->{'ucstart'} = $to if defined $to;
+    $query->{'ucend'} = $from if defined $from;
     my $res = $self->{api}->list($query, $opts);
     return $self->_handle_api_error() unless $res->[0];
     return RET_TRUE if not ref $res; # Not a ref when using callback
@@ -2237,7 +2242,7 @@ MediaWiki::Bot - a high-level bot framework for interacting with MediaWiki wikis
 
 =head1 VERSION
 
-version 5.006003
+version 5.006004
 
 =head1 SYNOPSIS
 
@@ -3610,10 +3615,15 @@ B<References:> L<API:Usercontribs|https://www.mediawiki.org/wiki/API:Usercontrib
 
 =head2 contributions
 
-    my @contribs = $bot->contributions($user, $namespace, $options);
+    my @contribs = $bot->contributions($user, $namespace, $options, $from, $to);
 
-Returns an array of hashrefs of data for the user's contributions. $ns can be an
-arrayref of namespace numbers. $options can be specified as in L</linksearch>.
+Returns an array of hashrefs of data for the user's contributions. $namespace
+can be an arrayref of namespace numbers. $options can be specified as in
+L</linksearch>.
+$from and $to are optional timestamps. ISO 8601 date and time is recommended:
+2001-01-15T14:56:00Z, see L<https://www.mediawiki.org/wiki/Timestamp> for all
+possible formats.
+Note that $from (=ucend) has to be before $to (=ucstart), unlike direct API access.
 
 Specify an arrayref of users to get results for multiple users.
 
@@ -3722,7 +3732,7 @@ site near you, or see L<https://metacpan.org/module/MediaWiki::Bot/>.
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/MediaWiki-Bot/MediaWiki-Bot>
+The development version is on github at L<https://github.com/MediaWiki-Bot/MediaWiki-Bot>
 and may be cloned from L<git://github.com/MediaWiki-Bot/MediaWiki-Bot.git>
 
 =head1 BUGS AND LIMITATIONS
@@ -3778,7 +3788,7 @@ patch and bug report contributors
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by the MediaWiki::Bot team <perlwikibot@googlegroups.com>.
+This software is Copyright (c) 2021 by the MediaWiki::Bot team <perlwikibot@googlegroups.com>.
 
 This is free software, licensed under:
 

@@ -1,5 +1,9 @@
 Revision history for FFI-ExtractSymbols
 
+0.06      2021-09-21 14:47:12 -0600
+  - Parse Windows DLL using internal Pure-Perl implementation instead of
+    using dumpbin which typically requires Visual C++ (sanko++ gh#1, gh#13)
+
 0.05      2021-04-17 05:33:44 -0600
   - Use -D to gather dynamic symbols with recent Gnu nm (and compatible) (gh#7, gh#3)
 

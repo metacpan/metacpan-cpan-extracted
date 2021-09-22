@@ -1,6 +1,6 @@
 #!/usr/bin/perl
-
-# PODNAME: grizzly
+# ABSTRACT: Grizzly application script
+# PODNAME: Grizzly
 
 use strict;
 use warnings;
@@ -21,11 +21,11 @@ __END__
 
 =head1 NAME
 
-grizzly
+Grizzly - Grizzly application script
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head1 AUTHOR
 

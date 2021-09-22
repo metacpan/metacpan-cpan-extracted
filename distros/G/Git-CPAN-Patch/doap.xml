@@ -76,6 +76,18 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Peter Valdemar Mørch</foaf:name>
+      <foaf:mbox rdf:resource="mailto:peter@morch.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Reini Urban</foaf:name>
+      <foaf:mbox rdf:resource="mailto:RURBAN@cpan.org" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>sdeseille</foaf:name>
       <foaf:mbox rdf:resource="mailto:sebastien.deseille@gmail.com" />
     </foaf:Person>
@@ -107,8 +119,20 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Yanick Champoux</foaf:name>
+      <foaf:mbox rdf:resource="mailto:yanick@babyl.ca" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Yuval Kogman</foaf:name>
       <foaf:mbox rdf:resource="mailto:nothingmuch@woobling.org" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Zakariyya Mughal</foaf:name>
+      <foaf:mbox rdf:resource="mailto:zaki.mughal@gmail.com" />
     </foaf:Person>
   </helper>
   <license rdf:resource="http://dev.perl.org/licenses/" />
@@ -410,6 +434,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2.3.3</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2018-08-21</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2.3.4</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2018-08-24</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

@@ -1,5 +1,15 @@
 Revision history for JSON-Schema-Modern
 
+0.519     2021-09-21 03:56:13Z
+          - fix tests that were relying on an optional prereq
+
+0.518     2021-09-18 22:00:42Z
+          - skip some regex tests when Unicode library is too old for those
+            character classes being tested
+          - specification versions can now change, via the $schema keyword,
+            within schema resources in a single document or via $ref to another
+            resource
+
 0.517     2021-08-28 04:34:17Z
           - restore some optional modules used for format validation to the
             prereq list that were mistakenly dropped in version 0.515

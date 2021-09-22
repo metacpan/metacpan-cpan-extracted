@@ -2,7 +2,7 @@
 # PODNAME: TestRail::API
 
 package TestRail::API;
-$TestRail::API::VERSION = '0.048';
+$TestRail::API::VERSION = '0.049';
 
 use 5.010;
 
@@ -661,6 +661,38 @@ sub addCaseField {
     $self->{case_fields} = undef;
     return $self->_doRequest( "index.php?/api/v2/add_case_field", 'POST',
         $options );
+}
+
+sub getPriorities {
+    state $check = compile(Object);
+    my ($self) = $check->(@_);
+    return clone( $self->{'priority_cache'} )
+      if defined( $self->{'priority_cache'} );
+
+    my $priorities = $self->_doRequest("index.php?/api/v2/get_priorities");
+    return -500
+      if !$priorities || ( reftype($priorities) || 'undef' ) ne 'ARRAY';
+    $self->{'priority_cache'} = $priorities;
+
+    return clone $priorities;
+}
+
+sub getPriorityByName {
+    state $check = compile( Object, Str );
+    my ( $self, $name ) = $check->(@_);
+
+    my $priorities = $self->getPriorities();
+    return -500
+      if !$priorities || ( reftype($priorities) || 'undef' ) ne 'ARRAY';
+    foreach my $priority (@$priorities) {
+        return $priority if $priority->{'name'} eq $name;
+    }
+    confess("No such priority '$name'!");
+}
+
+sub priorityNamesToIds {
+    my ( $self, @names ) = @_;
+    return _X_in_my_Y( $self, $self->getPriorities(), 'id', @names );
 }
 
 #If you pass an array of case ids, it implies include_all is false
@@ -1453,7 +1485,7 @@ TestRail::API - Provides an interface to TestRail's REST api via HTTP
 
 =head1 VERSION
 
-version 0.048
+version 0.049
 
 =head1 SYNOPSIS
 
@@ -2031,6 +2063,45 @@ Output is cached in the case_fields parameter.  Cache is invalidated when addCas
 Returns HASHREF describing the case field you just added.
 
     $tr->addCaseField(%options)
+
+=head1 PRIORITY METHODS
+
+=head2 B<getPriorities ()>
+
+Gets possible priorities.
+
+Returns ARRAYREF of priority definition HASHREFs.
+
+    $tr->getPriorities();
+
+=head2 B<getPriorityByName (name)>
+
+Gets priority by name.
+
+=over 4
+
+=item STRING C<NAME> - Name of desired priority
+
+=back
+
+Returns priority definition HASHREF.
+Dies if named priority does not exist.
+
+    $tr->getPriorityByName();
+
+=head2 priorityNamesToIds(names)
+
+Convenience method to translate a list of priority names to TestRail priority IDs.
+
+=over 4
+
+=item ARRAY C<NAMES> - Array of priority names to translate to IDs.
+
+=back
+
+Returns ARRAY of priority IDs in the same order as the priority names passed.
+
+Throws an exception in the case of one (or more) of the names not corresponding to a valid priority.
 
 =head1 RUN METHODS
 

@@ -322,7 +322,7 @@ Optional flags: `bytes`
 
 ## $obj->attr('attrname' \[, 'attrvalue'\])
 
-Gets/Sets the value of the 'attrname' attribute of the top element. Returns undef if attribute does not exist. If called without the 'attrname' paramter, returns a hash with all attribute => value pairs. If setting with an attrvalue of `undef`, then removes that attribute entirely.
+Gets/Sets the value of the 'attrname' attribute of the top element. Returns undef if attribute does not exist. If called without the 'attrname' parameter, returns a hash with all attribute => value pairs. If setting with an attrvalue of `undef`, then removes that attribute entirely.
 
 Input parameters and output are all in character strings, rather than octets/bytes.
 

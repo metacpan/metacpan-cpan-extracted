@@ -121,28 +121,17 @@ if(!(-r 'lib/Locale/Places/databases/GB.csv')) {
 	}
 }
 
-my $pm = {
-	'lib/Locale/Places.pm' => 'blib/lib/Locale/Places.pm',
-	'lib/Locale/Places/DB.pm' => 'blib/lib/Locale/Places/DB.pm',
-	'lib/Locale/Places/DB/GB.pm' => 'blib/lib/Locale/Places/DB/GB.pm',
-};
+# my $pm = {
+	# 'lib/Locale/Places.pm' => 'blib/lib/Locale/Places.pm',
+	# 'lib/Locale/Places/DB.pm' => 'blib/lib/Locale/Places/DB.pm',
+	# 'lib/Locale/Places/DB/GB.pm' => 'blib/lib/Locale/Places/DB/GB.pm',
+# };
 
-my $make_sql;
-
-if(!$ENV{'AUTOMATED_TESTING'}) {
-	if(eval { require File::Which; }) {
-		File::Which->import();
-		if(which('csv2sqlite')) {
-			$make_sql = 1;
-		}
-	}
-}
-
-if($make_sql) {
-	$pm->{'lib/Locale/Places/databases/GB.sql'} = 'blib/lib/Locale/Places/databases/GB.sql';
-} else {
-	$pm->{'lib/Locale/Places/databases/GB.csv'} = 'blib/lib/Locale/Places/databases/GB.csv';
-}
+# if($ENV{'AUTOMATED_TESTING'}) {
+	# $pm->{'lib/Locale/Places/databases/GB.csv'} = 'blib/lib/Locale/Places/databases/GB.csv';
+# } else {
+	# $pm->{'lib/Locale/Places/databases/GB.sql'} = 'blib/lib/Locale/Places/databases/GB.sql';
+# }
 
 # For bin/create_sqlite
 my $build_requires = {
@@ -205,7 +194,7 @@ WriteMakefile(
 			}
 		},
 	}, PL_FILES => (defined($ENV{'AUTOMATED_TESTING'}) ? {} : {'bin/create_db.PL' => 'bin/create_db'}),
-	, PM => $pm,
+	# , PM => $pm,
 	# PPM_INSTALL_EXEC	=> 'bash',
 	# PPM_INSTALL_SCRIPT	=> 'bin/create_sqlite',
 	MIN_PERL_VERSION	=> '5.6.2'	# Probably would work, but never tested on earlier versions than this

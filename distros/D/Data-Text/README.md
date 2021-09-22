@@ -4,7 +4,7 @@ Data::Text - Class to handle text in an OO way
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # SYNOPSIS
 
@@ -38,6 +38,10 @@ Returns the length of the text.
 ## trim
 
 Removes leading and trailing spaces from the string.
+
+## rtrim
+
+Removes trailing spaces from the string.
 
 # AUTHOR
 

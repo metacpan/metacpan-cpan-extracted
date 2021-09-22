@@ -10,7 +10,7 @@
 # ABSTRACT: Check the configuration of an application
 
 package App::Cme::Command::check ;
-$App::Cme::Command::check::VERSION = '1.032';
+$App::Cme::Command::check::VERSION = '1.033';
 use strict;
 use warnings;
 use 5.10.1;
@@ -26,6 +26,7 @@ sub validate_args {
 
     $self->check_unknown_args($args);
     $self->process_args($opt,$args);
+    return;
 }
 
 sub opt_spec {
@@ -71,6 +72,8 @@ sub execute {
         warn "you can try 'cme fix $app' to fix the warnings shown above\n";
         die "Found $ouch warnings in strict mode\n" if $opt->{strict};
     }
+
+    return;
 }
 
 1;
@@ -87,7 +90,7 @@ App::Cme::Command::check - Check the configuration of an application
 
 =head1 VERSION
 
-version 1.032
+version 1.033
 
 =head1 SYNOPSIS
 

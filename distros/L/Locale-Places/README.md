@@ -4,7 +4,7 @@ Locale::Places - Translate places using http://download.geonames.org/
 
 # VERSION
 
-Version 0.05
+Version 0.06
 
 # METHODS
 
@@ -28,6 +28,7 @@ It also takes two other arguments:
 at least one of which must be given.
 If neither $to nor $from is given,
 the code makes a best guess based on the environment.
+If no translation can be found, returns place in the original language.
 
     use Locale::Places;
 

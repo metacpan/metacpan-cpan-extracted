@@ -13,7 +13,7 @@ use Data::Record::Serialize::Error { errors =>
         sqlite_backend
    )] }, -all;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Data::Record::Serialize::Types -types;
 
@@ -617,7 +617,7 @@ Data::Record::Serialize::Encode::dbi - store a record in a database
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 SYNOPSIS
 

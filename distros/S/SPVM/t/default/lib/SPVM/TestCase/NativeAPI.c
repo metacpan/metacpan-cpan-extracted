@@ -39,8 +39,8 @@ int32_t SPVM__TestCase__NativeAPI__check_native_api_indexes(SPVM_ENV* env, SPVM_
   if ((void*)&env->get_field_id != &env_array[21]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->get_field_offset != &env_array[22]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->get_class_var_id != &env_array[23]) { stack[0].ival = 0; return 0; }
-  if ((void*)&env->get_method_id != &env_array[24]) { stack[0].ival = 0; return 0; }
-  if ((void*)&env->get_method_id_by_object != &env_array[25]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->get_class_method_id != &env_array[24]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->get_instance_method_id != &env_array[25]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->new_object_raw != &env_array[26]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->new_object != &env_array[27]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->new_byte_array_raw != &env_array[28]) { stack[0].ival = 0; return 0; }
@@ -167,12 +167,15 @@ int32_t SPVM__TestCase__NativeAPI__check_native_api_indexes(SPVM_ENV* env, SPVM_
   if ((void*)&env->get_class_var_float_by_name != &env_array[149]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->get_class_var_double_by_name != &env_array[150]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->get_class_var_object_by_name != &env_array[151]) { stack[0].ival = 0; return 0; }
-  if ((void*)&env->call_spvm_method_by_name != &env_array[152]) { stack[0].ival = 0; return 0; }
-  if ((void*)&env->call_callback_method_by_name != &env_array[153]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->call_class_method_by_name != &env_array[152]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->call_instance_method_by_name != &env_array[153]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->get_field_string_chars_by_name != &env_array[154]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->any_object_basic_type_id != &env_array[155]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->dump_raw != &env_array[156]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->dump != &env_array[157]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->call_class_method != &env_array[158]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->call_instance_method != &env_array[159]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->get_instance_method_id_static != &env_array[160]) { stack[0].ival = 0; return 0; }
 
   stack[0].ival = 1;
 
@@ -1597,7 +1600,7 @@ int32_t SPVM__TestCase__NativeAPI__native_call_spvm_method(SPVM_ENV* env, SPVM_V
   (void)env;
   (void)stack;
   
-  int32_t method_id = env->get_method_id(env, "TestCase::NativeAPI", "my_value", "int(int)");
+  int32_t method_id = env->get_class_method_id(env, "TestCase::NativeAPI", "my_value", "int(int)");
   if (method_id < 0) {
     return 1;
   }
@@ -1620,14 +1623,68 @@ int32_t SPVM__TestCase__NativeAPI__native_call_spvm_method(SPVM_ENV* env, SPVM_V
   return 0;
 }
 
-int32_t SPVM__TestCase__NativeAPI__native_call_spvm_method_by_name(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__TestCase__NativeAPI__native_call_class_method(SPVM_ENV* env, SPVM_VALUE* stack) {
+  (void)env;
+  (void)stack;
+  
+  int32_t method_id = env->get_class_method_id(env, "TestCase::NativeAPI", "my_value", "int(int)");
+  if (method_id < 0) {
+    return 1;
+  }
+  int32_t output;
+  {
+    stack[0].ival = 5;
+    int32_t exception_flag = env->call_class_method(env, method_id, stack);
+    if (exception_flag) {
+      return 1;
+    }
+    output = stack[0].ival;
+  }
+  
+  stack[0].ival = 0;
+  
+  if (output == 5) {
+    stack[0].ival = 1;
+  }
+  
+  return 0;
+}
+
+int32_t SPVM__TestCase__NativeAPI__native_call_instance_method(SPVM_ENV* env, SPVM_VALUE* stack) {
+  (void)env;
+  (void)stack;
+  
+  int32_t method_id = env->get_class_method_id(env, "TestCase::NativeAPI", "my_value", "int(int)");
+  if (method_id < 0) {
+    return 1;
+  }
+  int32_t output;
+  {
+    stack[0].ival = 5;
+    int32_t exception_flag = env->call_instance_method(env, method_id, stack);
+    if (exception_flag) {
+      return 1;
+    }
+    output = stack[0].ival;
+  }
+  
+  stack[0].ival = 0;
+  
+  if (output == 5) {
+    stack[0].ival = 1;
+  }
+  
+  return 0;
+}
+
+int32_t SPVM__TestCase__NativeAPI__native_call_class_method_by_name(SPVM_ENV* env, SPVM_VALUE* stack) {
   (void)env;
   (void)stack;
   
   int32_t output;
   {
     stack[0].ival = 5;
-    int32_t exception_flag = env->call_spvm_method_by_name(env, "TestCase::NativeAPI", "my_value", "int(int)", stack, MFILE, __LINE__);
+    int32_t exception_flag = env->call_class_method_by_name(env, "TestCase::NativeAPI", "my_value", "int(int)", stack, MFILE, __LINE__);
     if (exception_flag) {
       return exception_flag;
     }
@@ -1643,14 +1700,14 @@ int32_t SPVM__TestCase__NativeAPI__native_call_spvm_method_by_name(SPVM_ENV* env
   return 0;
 }
 
-int32_t SPVM__TestCase__NativeAPI__native_call_spvm_method_by_name_exception(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__TestCase__NativeAPI__native_call_class_method_by_name_exception(SPVM_ENV* env, SPVM_VALUE* stack) {
   (void)env;
   (void)stack;
   
   int32_t output;
   {
     stack[0].ival = 5;
-    int32_t exception_flag = env->call_spvm_method_by_name(env, "TestCase::NativeAPI", "not_found", "int(int)", stack, MFILE, __LINE__);
+    int32_t exception_flag = env->call_class_method_by_name(env, "TestCase::NativeAPI", "not_found", "int(int)", stack, MFILE, __LINE__);
     if (exception_flag) {
       return exception_flag;
     }

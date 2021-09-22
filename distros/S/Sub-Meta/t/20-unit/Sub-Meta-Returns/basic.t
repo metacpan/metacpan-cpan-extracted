@@ -1,6 +1,7 @@
 use Test2::V0;
 
 use Sub::Meta::Returns;
+use Sub::Meta::Test qw(sub_meta_returns);
 
 sub Int() { return bless {}, 'Some::Type::Int' }
 sub Str() { return bless {}, 'Some::Type::Str' }
@@ -8,142 +9,112 @@ sub Str() { return bless {}, 'Some::Type::Str' }
 subtest 'empty' => sub {
     my $returns = Sub::Meta::Returns->new();
 
-    is $returns->scalar, undef;
-    is $returns->list, undef;
-    is $returns->void, undef;
-    is $returns->coerce, undef;
-
-    ok !$returns->has_scalar;
-    ok !$returns->has_list;
-    ok !$returns->has_void;
-    ok !$returns->has_coerce;
+    is $returns, sub_meta_returns({
+        scalar => undef,
+        list   => undef,
+        void   => undef,
+        coerce => undef,
+    });
 };
 
-subtest 'sinble object' => sub {
+subtest 'single object' => sub {
     my $returns = Sub::Meta::Returns->new( Int );
 
-    is $returns->scalar, Int;
-    is $returns->list, Int;
-    is $returns->void, Int;
-    is $returns->coerce, undef;
-
-    ok $returns->has_scalar;
-    ok $returns->has_list;
-    ok $returns->has_void;
-    ok !$returns->has_coerce;
+    is $returns, sub_meta_returns({
+        scalar => Int,
+        list   => Int,
+        void   => Int,
+        coerce => undef,
+    });
 };
 
-subtest 'sinble string' => sub {
+subtest 'single string' => sub {
     my $returns = Sub::Meta::Returns->new( 'Int' );
 
-    is $returns->scalar, 'Int';
-    is $returns->list, 'Int';
-    is $returns->void, 'Int';
-    is $returns->coerce, undef;
-
-    ok $returns->has_scalar;
-    ok $returns->has_list;
-    ok $returns->has_void;
-    ok !$returns->has_coerce;
+    is $returns, sub_meta_returns({
+        scalar => 'Int',
+        list   => 'Int',
+        void   => 'Int',
+        coerce => undef,
+    });
 };
 
 subtest 'arrayref' => sub {
     my $returns = Sub::Meta::Returns->new([ Int, Str ]);
 
-    is $returns->scalar, [ Int, Str ];
-    is $returns->list, [ Int, Str ];
-    is $returns->void, [ Int, Str ];
-    is $returns->coerce, undef;
-
-    ok $returns->has_scalar;
-    ok $returns->has_list;
-    ok $returns->has_void;
-    ok !$returns->has_coerce;
+    is $returns, sub_meta_returns({
+        scalar => [Int,Str],
+        list   => [Int,Str],
+        void   => [Int,Str],
+        coerce => undef,
+    });
 };
 
 subtest 'hashref' => sub {
     subtest 'empty' => sub {
         my $returns = Sub::Meta::Returns->new({});
 
-        is $returns->scalar, undef;
-        is $returns->list, undef;
-        is $returns->void, undef;
-        is $returns->coerce, undef;
-
-        ok !$returns->has_scalar;
-        ok !$returns->has_list;
-        ok !$returns->has_void;
-        ok !$returns->has_coerce;
+        is $returns, sub_meta_returns({
+            scalar => undef,
+            list   => undef,
+            void   => undef,
+            coerce => undef,
+        });
     };
 
     subtest 'specify scalar' => sub {
         my $returns = Sub::Meta::Returns->new({ scalar => Int });
 
-        is $returns->scalar, Int;
-        is $returns->list, undef;
-        is $returns->void, undef;
-        is $returns->coerce, undef;
-
-        ok $returns->has_scalar;
-        ok !$returns->has_list;
-        ok !$returns->has_void;
-        ok !$returns->has_coerce;
+        is $returns, sub_meta_returns({
+            scalar => Int,
+            list   => undef,
+            void   => undef,
+            coerce => undef,
+        });
     };
 
     subtest 'specify list' => sub {
         my $returns = Sub::Meta::Returns->new({ list => Int });
 
-        is $returns->scalar, undef;
-        is $returns->list, Int;
-        is $returns->void, undef;
-        is $returns->coerce, undef;
-
-        ok !$returns->has_scalar;
-        ok $returns->has_list;
-        ok !$returns->has_void;
-        ok !$returns->has_coerce;
+        is $returns, sub_meta_returns({
+            scalar => undef,
+            list   => Int,
+            void   => undef,
+            coerce => undef,
+        });
     };
 
     subtest 'specify void' => sub {
         my $returns = Sub::Meta::Returns->new({ void => Int });
 
-        is $returns->scalar, undef;
-        is $returns->list, undef;
-        is $returns->void, Int;
-        is $returns->coerce, undef;
-
-        ok !$returns->has_scalar;
-        ok !$returns->has_list;
-        ok $returns->has_void;
-        ok !$returns->has_coerce;
+        is $returns, sub_meta_returns({
+            scalar => undef,
+            list   => undef,
+            void   => Int,
+            coerce => undef,
+        });
     };
 
     subtest 'specify coerce' => sub {
         my $returns = Sub::Meta::Returns->new({ coerce => !!1 });
 
-        is $returns->scalar, undef;
-        is $returns->list, undef;
-        is $returns->void, undef;
-        is $returns->coerce, !!1;
-
-        ok !$returns->has_scalar;
-        ok !$returns->has_list;
-        ok !$returns->has_void;
-        ok $returns->has_coerce;
+        is $returns, sub_meta_returns({
+            scalar => undef,
+            list   => undef,
+            void   => undef,
+            coerce => !!1,
+        });
     };
 
     subtest 'mixed' => sub {
         my $returns = Sub::Meta::Returns->new({ scalar => Int, list => Str, void => [Int, Str], coerce => !!1 });
 
-        is $returns->scalar, Int;
-        is $returns->list, Str;
-        is $returns->void, [Int, Str];
-        is $returns->coerce, !!1; 
-
-        ok $returns->has_scalar;
-        ok $returns->has_list;
-        ok $returns->has_void;
-        ok $returns->has_coerce;
+        is $returns, sub_meta_returns({
+            scalar => Int,
+            list   => Str,
+            void   => [Int,Str],
+            coerce => !!1,
+        });
     };
 };
 
@@ -151,71 +122,56 @@ subtest 'list' => sub {
     subtest 'specify scalar' => sub {
         my $returns = Sub::Meta::Returns->new( scalar => Int );
 
-        is $returns->scalar, Int;
-        is $returns->list, undef;
-        is $returns->void, undef;
-        is $returns->coerce, undef;
-
-        ok $returns->has_scalar;
-        ok !$returns->has_list;
-        ok !$returns->has_void;
-        ok !$returns->has_coerce;
+        is $returns, sub_meta_returns({
+            scalar => Int,
+            list   => undef,
+            void   => undef,
+            coerce => undef,
+        });
     };
 
     subtest 'specify list' => sub {
         my $returns = Sub::Meta::Returns->new( list => Int );
 
-        is $returns->scalar, undef;
-        is $returns->list, Int;
-        is $returns->void, undef;
-        is $returns->coerce, undef;
-
-        ok !$returns->has_scalar;
-        ok $returns->has_list;
-        ok !$returns->has_void;
-        ok !$returns->has_coerce;
+        is $returns, sub_meta_returns({
+            scalar => undef,
+            list   => Int,
+            void   => undef,
+            coerce => undef,
+        });
     };
 
     subtest 'specify void' => sub {
         my $returns = Sub::Meta::Returns->new( void => Int );
 
-        is $returns->scalar, undef;
-        is $returns->list, undef;
-        is $returns->void, Int;
-        is $returns->coerce, undef;
-
-        ok !$returns->has_scalar;
-        ok !$returns->has_list;
-        ok $returns->has_void;
-        ok !$returns->has_coerce
+        is $returns, sub_meta_returns({
+            scalar => undef,
+            list   => undef,
+            void   => Int,
+            coerce => undef,
+        });
     };
 
     subtest 'specify coerce' => sub {
         my $returns = Sub::Meta::Returns->new( coerce => !!1 );
 
-        is $returns->scalar, undef;
-        is $returns->list, undef;
-        is $returns->void, undef;
-        is $returns->coerce, !!1;
-
-        ok !$returns->has_scalar;
-        ok !$returns->has_list;
-        ok !$returns->has_void;
-        ok $returns->has_coerce
+        is $returns, sub_meta_returns({
+            scalar => undef,
+            list   => undef,
+            void   => undef,
+            coerce => !!1,
+        });
     };
 
     subtest 'mixed' => sub {
         my $returns = Sub::Meta::Returns->new( scalar => Int, list => Str, void => [Int, Str], coerce => !!1 );
 
-        is $returns->scalar, Int;
-        is $returns->list, Str;
-        is $returns->void, [Int, Str];
-        is $returns->coerce, !!1;
-
-        ok $returns->has_scalar;
-        ok $returns->has_list;
-        ok $returns->has_void;
-        ok $returns->has_coerce
+        is $returns, sub_meta_returns({
+            scalar => Int,
+            list   => Str,
+            void   => [Int, Str],
+            coerce => !!1,
+        });
     };
 };
 

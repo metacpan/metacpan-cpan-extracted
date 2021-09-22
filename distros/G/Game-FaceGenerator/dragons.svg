@@ -1,0 +1,111 @@
+<svg version="1.1"
+     width="11in" height="8.5in"
+     viewBox="0 0 11 8.5"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink">
+
+  <style>
+    line, rect, circle, ellipse, path {
+    fill: white; stroke: #e5e5e5; stroke-width: 0.02;
+    }
+  </style>
+
+  <defs>
+    <g id="head">
+    <rect
+       width="2"
+       height="1.5"
+       fill="none"
+       id="rect1086" />
+    <path
+       sodipodi:nodetypes="cc"
+       inkscape:connector-curvature="0"
+       id="path5391"
+       d="M 0.94319419,1.089513 C 1.1497498,1.2961696 1.2267752,1.3150842 1.2673469,1.503708"
+       style="opacity:1;vector-effect:none;fill:#ffffff;fill-opacity:1;stroke:#e5e5e5;stroke-width:0.02;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <ellipse
+       cx="1.1041665"
+       cy="0.75"
+       rx="0.44645128"
+       ry="0.30770656"
+       id="ellipse1088"
+       style="fill:#ffffff;stroke:#e5e5e5;stroke-width:0.02" />
+    <rect
+       style="opacity:1;vector-effect:none;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.02000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect5393"
+       width="0.97020686"
+       height="0.17558265"
+       x="0.29488882"
+       y="0.87566233" />
+    <path
+       style="opacity:1;vector-effect:none;fill:#ffffff;fill-opacity:1;stroke:#e5e5e5;stroke-width:0.02;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 1.3866525,0.84639828 c 0,0 0.051045,0.38051892 -0.1328118,0.30614462 C 0.86519821,0.99532848 0.26337427,1.1502916 0.26337427,1.1502916 L 0.21159958,0.94319387"
+       id="path5379"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cscc" />
+    <path
+       d="M 1.3298496,0.56653717 C 1.3156385,0.34896857 1.5024764,0.35376147 1.5594577,0.21272888 1.6907239,0.43029749 1.4003372,0.67537217 1.3298496,0.56653717 Z"
+       id="path1102"
+       inkscape:connector-curvature="0"
+       style="fill:#ffffff;stroke:#e5e5e5;stroke-width:0.02"
+       sodipodi:nodetypes="ccc" />
+    <g
+       id="g5387"
+       transform="translate(0.09004238,0.05177436)">
+      <circle
+         id="circle1100"
+         r="0.12"
+         cy="0.52999997"
+         cx="1"
+         style="fill:#ffffff;stroke:#e5e5e5;stroke-width:0.02" />
+      <path
+         style="fill:#ffffff;stroke:#e5e5e5;stroke-width:0.02"
+         inkscape:connector-curvature="0"
+         id="path1104"
+         d="m 0.885,0.525 a 0.2,0.3 0 0 1 0.23,0 0.2,0.3 0 0 1 -0.23,0 z" />
+    </g>
+    <path
+       style="opacity:1;vector-effect:none;fill:#ffffff;fill-opacity:1;stroke:#e5e5e5;stroke-width:0.02;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 1.5509802,0.74960301 C 1.6550568,1.0999873 1.8109323,1.2579755 1.9989413,1.2966106"
+       id="path5361"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc" />
+    <path
+       sodipodi:nodetypes="cscsc"
+       inkscape:connector-curvature="0"
+       id="path5381"
+       d="m 0.67982053,0.64830556 c 0,0 -0.39655796,0.0158322 -0.53575241,0.12155695 -0.0894485,0.0679404 -0.09229376,0.26112269 -0.09229376,0.26112269 0,0 0.28548263,-0.0918739 0.33765891,-0.10805094 0.28556991,-0.0885395 0.77886653,0.0382681 0.77886653,0.0382681"
+       style="opacity:1;vector-effect:none;fill:#ffffff;fill-opacity:1;stroke:#e5e5e5;stroke-width:0.02;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    </g>
+  </defs>
+
+  <use xlink:href="#head" x="0.5" y="0.5" />
+  <use xlink:href="#head" x="2.5" y="0.5"/>
+  <use xlink:href="#head" x="4.5" y="0.5"/>
+  <use xlink:href="#head" x="6.5" y="0.5"/>
+  <use xlink:href="#head" x="8.5" y="0.5"/>
+
+  <use xlink:href="#head" x="0.5" y="2.0"/>
+  <use xlink:href="#head" x="2.5" y="2.0"/>
+  <use xlink:href="#head" x="4.5" y="2.0"/>
+  <use xlink:href="#head" x="6.5" y="2.0"/>
+  <use xlink:href="#head" x="8.5" y="2.0"/>
+
+  <use xlink:href="#head" x="0.5" y="3.5"/>
+  <use xlink:href="#head" x="2.5" y="3.5"/>
+  <use xlink:href="#head" x="4.5" y="3.5"/>
+  <use xlink:href="#head" x="6.5" y="3.5"/>
+  <use xlink:href="#head" x="8.5" y="3.5"/>
+
+  <use xlink:href="#head" x="0.5" y="5.0"/>
+  <use xlink:href="#head" x="2.5" y="5.0"/>
+  <use xlink:href="#head" x="4.5" y="5.0"/>
+  <use xlink:href="#head" x="6.5" y="5.0"/>
+  <use xlink:href="#head" x="8.5" y="5.0"/>
+
+  <use xlink:href="#head" x="0.5" y="6.5"/>
+  <use xlink:href="#head" x="2.5" y="6.5"/>
+  <use xlink:href="#head" x="4.5" y="6.5"/>
+  <use xlink:href="#head" x="6.5" y="6.5"/>
+  <use xlink:href="#head" x="8.5" y="6.5"/>
+</svg>

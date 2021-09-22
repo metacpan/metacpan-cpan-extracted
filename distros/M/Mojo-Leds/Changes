@@ -1,5 +1,11 @@
 Changelog for Mojo-Leds
 
+1.10 2021-09-20T13:49:00
+ - Add prereq to request Mojolicious::Plugin::AutoRoutePm >= 0.14
+
+1.09 2021-09-20T10:32:00
+ - Solved a bug in leds_app command where public folder isn't in right location
+
 1.08 2021-09-06T14:33:00
  - Moved from travis CI to GitHub workflow.
 

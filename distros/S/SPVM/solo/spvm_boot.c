@@ -53,9 +53,6 @@ int32_t main(int32_t argc, const char *argv[]) {
   }
   */
   
-  // Add include path
-  warn("AAAAAA %s", cur_script_dir);
-  
   SPVM_LIST_push(compiler->module_dirs, cur_script_dir);
   
   SPVM_COMPILER_compile(compiler);
@@ -67,11 +64,11 @@ int32_t main(int32_t argc, const char *argv[]) {
   // Create env
   SPVM_ENV* env = SPVM_API_create_env(compiler);
   
-  // Call begin blocks
-  SPVM_API_call_begin_blocks(env);
+  // Call init blocks
+  SPVM_API_call_init_blocks(env);
 
   // Class
-  int32_t method_id = SPVM_API_get_method_id(env, class_name, "main", "int(string[])");
+  int32_t method_id = SPVM_API_get_class_method_id(env, class_name, "main", "int(string[])");
   
   if (method_id < 0) {
     return -1;

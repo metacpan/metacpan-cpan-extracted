@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210602223300;
+our $VERSION = 1.20210921211833;
 
 my $formatters = [
                 {
@@ -63,6 +63,7 @@ my $formatters = [
                 {
                   'format' => '$1 $2 $3',
                   'leading_digits' => '
+            21|
             39|
             45|
             5[0137]|
@@ -138,6 +139,10 @@ my $validators = {
           )
         ',
                 'mobile' => '
+          211(?:
+            1\\d|
+            3[1-5]
+          )\\d{4}|
           (?:
             45|
             5[0137]|
@@ -153,70 +158,70 @@ my $validators = {
                 'voip' => '39\\d{7}'
               };
 my %areanames = ();
-$areanames{en} = {"4883", "Biala\ Podlaska",
-"4843", "Sieradz",
-"4816", "Przemyśl",
-"4895", "Gorzów\ Wielkopolski",
-"4868", "Zielona\ Góra",
-"4817", "Rzeszów",
-"4861", "Poznań",
-"4833", "Bielsko\-Biala",
-"4814", "Tarnów",
-"4812", "Kraków",
-"4858", "Gdańsk",
-"4815", "Tarnobrzeg",
-"4871", "Wroclaw",
-"4863", "Konin",
-"4848", "Radom",
-"4823", "Ciechanów",
-"4841", "Kielce",
-"4894", "Koszalin",
-"4881", "Lublin",
-"4855", "Elbląg",
-"4885", "Bialystok",
-"4867", "Pila",
-"4818", "Nowy\ Sącz",
-"4862", "Kalisz",
-"4822", "Warsaw",
-"4875", "Jelenia\ Góra",
-"4824", "Plock",
-"4829", "Ostrolęka",
-"4846", "Skierniewice",
-"4813", "Krosno",
-"4834", "Częstochowa",
-"4887", "Suwalki",
-"4825", "Siedlce",
-"4832", "Katowice",
-"4874", "Walbrzych",
-"4886", "Lomża",
-"4856", "Toruń",
-"4865", "Leszno",
-"4854", "Wloclawek",
-"4884", "Zamość",
-"4859", "Slupsk",
-"4889", "Olsztyn",
-"4877", "Opole",
-"4842", "Lódź",
-"4891", "Szczecin",
-"4876", "Legnica",
-"4844", "Piotrków\ Trybunalski",
-"4882", "Chelm",
-"4852", "Bydgoszcz",};
-$areanames{pl} = {"4867", "Piła",
-"4885", "Białystok",
+$areanames{pl} = {"4833", "Bielsko\-Biała",
+"4842", "Łódź",
+"4882", "Chełm",
 "4822", "Warszawa",
+"4887", "Suwałki",
+"4859", "Słupsk",
+"4854", "Włocławek",
 "4829", "Ostrołęka",
 "4824", "Płock",
 "4886", "Łomża",
-"4874", "Wałbrzych",
-"4887", "Suwałki",
-"4859", "Słupsk",
-"4842", "Łódź",
-"4854", "Włocławek",
-"4882", "Chełm",
+"4885", "Białystok",
+"4871", "Wrocław",
 "4883", "Biała\ Podlaska",
-"4833", "Bielsko\-Biała",
-"4871", "Wrocław",};
+"4874", "Wałbrzych",
+"4867", "Piła",};
+$areanames{en} = {"4854", "Wloclawek",
+"4855", "Elbląg",
+"4813", "Krosno",
+"4856", "Toruń",
+"4859", "Slupsk",
+"4834", "Częstochowa",
+"4877", "Opole",
+"4865", "Leszno",
+"4863", "Konin",
+"4848", "Radom",
+"4882", "Chelm",
+"4833", "Bielsko\-Biala",
+"4842", "Lódź",
+"4816", "Przemyśl",
+"4887", "Suwalki",
+"4815", "Tarnobrzeg",
+"4814", "Tarnów",
+"4861", "Poznań",
+"4822", "Warsaw",
+"4883", "Biala\ Podlaska",
+"4832", "Katowice",
+"4843", "Sieradz",
+"4868", "Zielona\ Góra",
+"4891", "Szczecin",
+"4862", "Kalisz",
+"4876", "Legnica",
+"4858", "Gdańsk",
+"4875", "Jelenia\ Góra",
+"4823", "Ciechanów",
+"4867", "Pila",
+"4874", "Walbrzych",
+"4852", "Bydgoszcz",
+"4841", "Kielce",
+"4881", "Lublin",
+"4824", "Plock",
+"4812", "Kraków",
+"4894", "Koszalin",
+"4829", "Ostrolęka",
+"4895", "Gorzów\ Wielkopolski",
+"4818", "Nowy\ Sącz",
+"4825", "Siedlce",
+"4871", "Wroclaw",
+"4844", "Piotrków\ Trybunalski",
+"4884", "Zamość",
+"4885", "Bialystok",
+"4846", "Skierniewice",
+"4817", "Rzeszów",
+"4889", "Olsztyn",
+"4886", "Lomża",};
 
     sub new {
       my $class = shift;

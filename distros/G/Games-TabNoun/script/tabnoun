@@ -1,0 +1,510 @@
+#!perl
+
+# FRAGMENT id=shcompgen-hint command=tabnoun
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Time::HiRes qw(time);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-09-21'; # DATE
+our $DIST = 'Games-TabNoun'; # DIST
+our $VERSION = '0.004'; # VERSION
+
+my %Opts = (
+    'data_file' => "$ENV{HOME}/.tabnoun.dat",
+);
+my $State = {
+    state => 'uninit',
+    num_completed_words => 0,
+};
+
+my $data_file_read;
+sub read_data_file {
+    return if $data_file_read;
+    require JSON::MaybeXS;
+    open my $fh, "<", $Opts{data_file} or return;
+    local $/;
+    my $content = <$fh>;
+    $State = JSON::MaybeXS::decode_json($content);
+    $data_file_read++;
+}
+
+sub write_data_file {
+    require JSON::MaybeXS;
+    open my $fh, ">", $Opts{data_file}
+        or die "Can't write to data file '$Opts{data_file}': $!\n";
+    print $fh JSON::MaybeXS::encode_json($State);
+}
+
+sub enter_high_scores {
+    # check if the game can be entered in high score list
+    $State->{high_scores} //= [];
+
+    if (@{ $State->{high_scores} } < 5 ||
+            $State->{score} > $State->{high_scores}[-1]{score}) {
+        print "Congratulations, you made the high scores list!\n\n";
+    }
+
+    push @{ $State->{high_scores} }, {
+        user  => $ENV{USER},
+        score => $State->{score},
+        time  => time(),
+    };
+    $State->{high_scores} = [
+        sort { ($b->{score}//0) <=> ($a->{score}//0) }
+            @{ $State->{high_scores} }
+    ];
+    splice @{ $State->{high_scores} }, 5
+        if @{ $State->{high_scores} } > 5;
+}
+
+sub print_high_scores {
+    require Text::Table::Sprintf;
+
+    $State->{high_scores} //= [];
+
+    say Text::Table::Sprintf::table(
+        header_row => 1,
+        rows => [
+            ['Name', 'Score', 'Time'],
+            map { [$_->{user}, $_->{score}, scalar(localtime $_->{time})] }
+                @{ $State->{high_scores} },
+        ],
+    );
+    print "\n";
+}
+
+sub gen_words {
+    require List::Util;
+    require WordList::EN::Adjective::TalkEnglish;
+    require WordList::EN::Adverb::TalkEnglish;
+    require WordList::EN::Noun::TalkEnglish;
+
+    my @nouns = WordList::EN::Noun::TalkEnglish->new->pick(1);
+    my @adjs  = WordList::EN::Adjective::TalkEnglish->new->pick(2);
+    my @advs  = WordList::EN::Adverb::TalkEnglish->new->pick(2);
+
+    $State->{current_words} = [List::Util::shuffle(@nouns, @adjs, @advs)];
+    $State->{current_word}  = $nouns[0];
+    $State->{start_time} = undef;
+    $State->{end_time}   = undef;
+}
+
+if ($ENV{COMP_LINE} || $ENV{COMMAND_LINE}) {
+
+    # inside tab completion
+
+    my $shell;
+    if ($ENV{COMP_SHELL}) {
+        ($shell = $ENV{COMP_SHELL}) =~ s!.+/!!;
+    } elsif ($ENV{COMMAND_LINE}) {
+        $shell = 'tcsh';
+    } else {
+        $shell = 'bash';
+    }
+
+    my ($words, $cword);
+    if ($ENV{COMP_LINE}) {
+        require Complete::Bash;
+        ($words,$cword) = @{ Complete::Bash::parse_cmdline(undef, undef, {truncate_current_word=>1}) };
+        ($words,$cword) = @{ Complete::Bash::join_wordbreak_words($words, $cword) };
+    } elsif ($ENV{COMMAND_LINE}) {
+        require Complete::Tcsh;
+        $shell //= 'tcsh';
+        ($words, $cword) = @{ Complete::Tcsh::parse_cmdline() };
+    }
+
+    shift @$words; $cword--; # strip program name
+    my $word = splice @$words, $cword, 1;
+
+    read_data_file();
+
+    require Complete::Util;
+    my $compres;
+
+    if ($State->{state} eq 'uninit') {
+        $compres = {message=>'Please run tabnoun first to init the game.'};
+    } else {
+        $State->{start_time} //= time();
+        $compres = Complete::Util::complete_array_elem(
+            word  => $word,
+            array => $State->{current_words},
+        );
+    }
+
+  FORMAT:
+    if ($shell eq 'bash') {
+        require Complete::Bash;
+        print Complete::Bash::format_completion(
+            $compres, {word=>$words->[$cword]});
+    } elsif ($shell eq 'fish') {
+        require Complete::Fish;
+        print Complete::Bash::format_completion(
+            $compres, {word=>$words->[$cword]});
+    } elsif ($shell eq 'tcsh') {
+        require Complete::Tcsh;
+        print Complete::Tcsh::format_completion($compres);
+    } elsif ($shell eq 'zsh') {
+        require Complete::Zsh;
+        print Complete::Zsh::format_completion($compres);
+    } else {
+        die "Unknown shell '$shell'";
+    }
+
+    write_data_file();
+    exit 0;
+
+} else {
+
+    # outside tab completion
+
+    require Getopt::Long;
+    Getopt::Long::Configure(
+        'no_ignore_case', 'bundling', 'auto_help', 'auto_version');
+    Getopt::Long::GetOptions(
+        "reset-game" => sub {
+            read_data_file();
+            $State->{state} = 'uninit';
+            $State->{num_completed_words} = 0;
+            $State->{score} = 0;
+            write_data_file();
+            exit 0;
+        },
+        "reset-high-scores" => sub {
+            read_data_file();
+            $State->{high_scores} = [];
+            write_data_file();
+            exit 0;
+        },
+        "high-scores" => sub {
+            read_data_file();
+            print_high_scores();
+            exit 0;
+        },
+    );
+
+    read_data_file();
+    if ($State->{state} eq 'uninit') {
+        require File::Which;
+        unless (File::Which::which("tabnoun")) {
+            print <<'_';
+
+tabnoun doesn't seem to be in your PATH. For proper game play, please put
+me in your PATH first.
+_
+            exit 1;
+        }
+        $State->{state} = 'play';
+        gen_words();
+        write_data_file();
+        print <<'_';
+
+Welcome to tabnoun, a game played with tab completion. You must first enable tab
+completion for your shell. Here's how to do it in bash:
+
+    % complete -C tabnoun tabnoun
+
+Or alternatively, install shcompgen from CPAN using 'cpanm -n App::shcompgen'.
+For instructions on how to enable tab completion for other shells, see manpage.
+
+The objective of the game is to select nouns 7 times as fast as possible, each
+from a list of 5 words. For each noun, you type "tabnoun " then press Tab (Tab)
+to see the list of words. You can now select the noun by typing it manually or
+by completing it using tab completion. After that, press Enter to clock in your
+time for the noun. Your points will be determined from how fast you entered the
+noun. Do the same for the rest of the nouns to get the total score.
+
+I'm ready to play! Are you? Type "tabnoun" and press Tab (Tab) to start.
+
+_
+        exit 0;
+    } elsif ($State->{state} eq 'play' && @ARGV) {
+        require Lingua::EN::Numbers::Ordinate;
+
+        $State->{num_completed_words}++;
+        $State->{end_time} = time();
+        $State->{start_time} //= $State->{end_time};
+        my $dur = sprintf("%.3f", $State->{end_time}-$State->{start_time});
+        my $nth = ($State->{num_completed_words} >= 7 ? "last" :
+                       Lingua::EN::Numbers::Ordinate::ordinate($State->{num_completed_words}));
+        if ($ARGV[0] eq $State->{current_word}) {
+            print "You entered the $nth word in $dur sec(s).";
+            my $excellent_time = 2;
+            my $good_time = 3;
+            my $fair_time = 4;
+            my $bonus = 0;
+            if ($dur <= $excellent_time) {
+                $bonus = 50;
+                print " Excellent!";
+            } elsif ($dur <= $good_time) {
+                $bonus = 30;
+                print " Good, but could be even better next time.";
+            } elsif ($dur <= $fair_time) {
+                $bonus = 10;
+                print " Not bad, try better next time.";
+            } else {
+                print " Too slow, really try better next time.";
+            }
+            my $point = $bonus + 50;
+            print " You get $point points.\n\n";
+            $State->{score} += $point;
+        } else {
+            print "You selected the wrong word, the correct word is $State->{current_word}.\n\n";
+        }
+        if ($State->{num_completed_words} >= 7) {
+            $State->{score} //= 0;
+            print "Game over. Your total score for this game: $State->{score}.\n\n";
+            enter_high_scores();
+            print_high_scores();
+            print "To play another game, press 'tabnoun <tab>' again.\n";
+            $State->{num_completed_words} = 0;
+            $State->{score} = 0;
+            gen_words();
+        } else {
+            print "Ready for the next word? Type 'tabnoun <tab>' again.\n";
+            gen_words();
+        }
+        write_data_file();
+    } else {
+        print <<'_';
+
+You are in a game play. Type "tabnoun" and press Tab (Tab) to continue playing.
+Or, if you want to reset the game, type "tabnoun --reset-game" and press Enter.
+
+_
+        exit 0;
+
+    }
+
+} # outside tab completion
+
+# ABSTRACT: Select nouns from list of words, as fast as possible
+# PODNAME: tabnoun
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+tabnoun - Select nouns from list of words, as fast as possible
+
+=head1 VERSION
+
+This document describes version 0.004 of tabnoun (from Perl distribution Games-TabNoun), released on 2021-09-21.
+
+=head1 SYNOPSIS
+
+A sample session:
+
+ % tabnoun
+
+ Welcome to tabnoun, a game played with tab completion. You must first enable tab
+ completion for your shell. Here's how to do it in bash:
+
+     % complete -C tabnoun tabnoun
+
+ Or alternatively, install shcompgen from CPAN using 'cpanm -n App::shcompgen'.
+ For instructions on how to enable tab completion for other shells, see manpage.
+
+ The objective of the game is to select nouns 7 times as fast as possible, each
+ from a list of 5 words. For each noun, you type "tabnoun " then press Tab (Tab)
+ to see the list of words. You can now select the noun by typing it manually or
+ by completing it using tab completion. After that, press Enter to clock in your
+ time for the noun. Your points will be determined from how fast you entered the
+ noun. Do the same for the rest of the nouns to get the total score.
+
+ I'm ready to play! Are you? Type "tabnoun" and press Tab (Tab) to start.
+
+ % tabnoun
+ actually     altogether   competition  educational  electronic
+ % tabnoun competition
+ You entered the 1st word in 2.280 sec(s). Good, but could be even better next time. You get 80 points.
+
+ Ready for the next word? Type 'tabnoun <tab>' again.
+ % tabnoun
+ civil          educational    fully          improvement    unfortunately
+ % tabnoun improvement
+ You entered the 2nd word in 2.743 sec(s). Good, but could be even better next time. You get 80 points.
+
+ Ready for the next word? Type 'tabnoun <tab>' again.
+ % tabnoun
+ beer        eventually  latter      sufficient  totally
+ % tabnoun beer
+ You entered the 3rd word in 1.558 sec(s). Excellent! You get 100 points.
+
+ Ready for the next word? Type 'tabnoun <tab>' again.
+ % tabnoun
+ difficult    explanation  seriously    strongly     tiny
+ % tabnoun explanation
+ You entered the 4th word in 1.791 sec(s). Excellent! You get 100 points.
+
+ Ready for the next word? Type 'tabnoun <tab>' again.
+ % tabnoun
+ extremely     greatly       introduction  powerful      remarkable
+ % tabnoun introduction
+ You entered the 5th word in 2.118 sec(s). Good, but could be even better next time. You get 80 points.
+
+ Ready for the next word? Type 'tabnoun <tab>' again.
+ % tabnoun
+ childhood    consistent   equally      rather       responsible
+ % tabnoun childhood
+ You entered the 6th word in 2.595 sec(s). Good, but could be even better next time. You get 80 points.
+
+ Ready for the next word? Type 'tabnoun <tab>' again.
+ % tabnoun
+ asleep     expensive  likely     rarely     secretary
+ % tabnoun secretary
+ You entered the last word in 3.053 sec(s). Not bad, try better next time. You get 60 points.
+
+ Game over. Your total score for this game: 580.
+
+ Congratulations, you made the high scores list!
+
+ +------+-------+--------------------------+
+ | Name | Score | Time                     |
+ +------+-------+--------------------------+
+ | u1   | 610   | Tue Sep 21 17:40:25 2021 |
+ | u1   | 600   | Tue Sep 21 17:39:51 2021 |
+ | u1   | 600   | Tue Sep 21 17:42:34 2021 |
+ | u1   | 580   | Tue Sep 21 19:07:10 2021 |
+ | u1   | 560   | Tue Sep 21 17:42:01 2021 |
+ +------+-------+--------------------------+
+
+
+ To play another game, press 'tabnoun <tab>' again.
+
+A demo screencast:
+
+=for html <img src="https://st.aticpan.org/source/PERLANCAR/Games-TabNoun-0.004/share/images/screencast1.gif" />
+
+
+=head1 DESCRIPTION
+
+Welcome to tabnoun, a game played with tab completion. You must first enable tab
+completion for your shell. Here's how to do it in the various shells:
+
+=over
+
+=item * bash
+
+ % complete -C tabnoun tabnoun
+
+Or alternatively, install L<shcompgen> from CPAN using C<cpanm -n
+App::shcompgen>.
+
+=item * tcsh
+
+ % complete tabnoun 'p/*/`tabnoun`/'
+
+Or alternatively, install L<shcompgen> from CPAN using C<cpanm -n
+App::shcompgen>.
+
+=item * zsh
+
+Put a file named C<_tabnoun> containing the text below somewhere to your
+C<fpath>:
+
+ #compdef tabnoun
+ _tabnoun() {
+   si=$IFS
+   compadd -- $(COMP_LINE=$BUFFER COMP_POINT=$CURSOR tabnoun)
+   IFS=$si
+ }
+ _tabnoun "$@"
+
+Or alternatively, install L<shcompgen> from CPAN using C<cpanm -n
+App::shcompgen>.
+
+=item * fish
+
+ % complete -c tabnoun -f -a '(begin; set -lx COMP_SHELL fish; set -lx COMP_LINE (commandline); set -lx COMP_POINT (commandline -C); tabnoun; end)'
+
+=back
+
+The objective of the game is to select nouns 7 times as fast as possible, each
+from a list of 5 words. For each noun, you type "tabnoun " then press Tab (Tab)
+to see the list of words. You can now select the noun by typing it manually or
+by completing it using tab completion. After that, press Enter to clock in your
+time for the noun. Your points will be determined from how fast you entered the
+noun. Do the same for the rest of the nouns to get the total score.
+
+=head1 OPTIONS
+
+=head2 --help
+
+Display help and exit.
+
+=head2 --version
+
+Display version and exit.
+
+=head2 --reset-game
+
+Reset game.
+
+=head2 --reset-high-scores
+
+Reset high scores.
+
+=head2 --high-scores
+
+Show high scores and exit.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Games-TabNoun>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Games-TabNoun>.
+
+=head1 SEE ALSO
+
+This game serves as a demo of the L<Complete> module family, including
+L<Complete::Bash>, L<Complete::Util>, and so on.
+
+Other games played by tab completion: L<Games::Tabnoun>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Games-TabNoun>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

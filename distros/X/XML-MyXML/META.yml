@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,10 +27,10 @@ no_index:
 provides:
   XML::MyXML:
     file: lib/XML/MyXML.pm
-    version: '1.06'
+    version: '1.07'
   XML::MyXML::Object:
     file: lib/XML/MyXML/Object.pm
-    version: '1.06'
+    version: '1.07'
 requires:
   Carp: '0'
   Encode: '0'
@@ -41,9 +41,10 @@ resources:
   bugtracker: https://github.com/akarelas/xml-myxml/issues
   homepage: https://github.com/akarelas/xml-myxml
   repository: git://github.com/akarelas/xml-myxml.git
-version: '1.06'
+version: '1.07'
 x_authority: cpan:KARJALA
 x_contributors:
   - 'Alexander Karelas <alex.karelas@gmail.com>'
+  - 'Gabor Szabo <gabor@szabgab.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

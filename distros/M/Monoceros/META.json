@@ -4,7 +4,7 @@
       "Masahiro Nagano <kazeburo@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v1.0.0",
+   "generated_by" : "Minilla/v3.1.10",
    "license" : [
       "perl_5"
    ],
@@ -28,16 +28,14 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "CPAN::Meta" : "0",
-            "CPAN::Meta::Prereqs" : "0",
-            "Module::Build" : "0.38"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -49,7 +47,7 @@
             "Net::CIDR::Lite" : "0",
             "POSIX::getpeername" : "0",
             "Parallel::Prefork" : "0.14",
-            "Plack" : "1.0023",
+            "Plack" : "1.0035",
             "Starlet" : "0.18",
             "perl" : "5.008005"
          },
@@ -72,7 +70,7 @@
    "provides" : {
       "Monoceros" : {
          "file" : "lib/Monoceros.pm",
-         "version" : "0.27"
+         "version" : "0.28"
       },
       "Monoceros::Server" : {
          "file" : "lib/Monoceros/Server.pm"
@@ -95,5 +93,11 @@
          "web" : "https://github.com/kazeburo/Monoceros"
       }
    },
-   "version" : "0.27"
+   "version" : "0.28",
+   "x_contributors" : [
+      "Michael Kröll <michael.kroell@geizhals.at>",
+      "Syohei YOSHIDA <syohex@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_static_install" : 1
 }

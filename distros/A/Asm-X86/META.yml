@@ -1,7 +1,7 @@
 ---
 abstract: 'List of instructions and registers of x86-compatible processors, validating and converting instructions and memory references.'
 author:
-  - 'Bogdan Drozdowski <bogdro@cpan.org>'
+  - 'Bogdan Drozdowski <bogdro \at\ cpan . org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
@@ -20,9 +20,9 @@ no_index:
 provides:
   Asm::X86:
     file: lib/Asm/X86.pm
-    version: '0.61'
+    version: '0.62'
 requires:
   Test::More: '0'
   perl: '5.006'
-version: '0.61'
+version: '0.62'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

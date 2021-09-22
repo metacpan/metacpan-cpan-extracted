@@ -55,6 +55,8 @@ subtest 'evaluate a document' => sub {
         path => '',
         canonical_uri => str('https://foo.com'),
         document => shallow($document),
+        specification_version => 'draft2020-12',
+        vocabularies => [ $js->_vocabularies_by_spec_version('draft2020-12') ],
       },
     },
     'resource index from the document is copied to the main object',
@@ -98,7 +100,7 @@ subtest 'evaluate a uri' => sub {
         },
       ],
     },
-    'evaluate a uri that is not yet loaded',
+    'evaluate with a uri that is not yet loaded',
   );
 
   cmp_deeply(
@@ -109,6 +111,8 @@ subtest 'evaluate a uri' => sub {
           path => '',
           canonical_uri => str($_),
           document => isa('JSON::Schema::Modern::Document'),
+          specification_version => 'draft2019-09',
+          vocabularies => [ $js->_vocabularies_by_spec_version('draft2019-09') ],
         }
       ),
       METASCHEMA,
@@ -168,6 +172,24 @@ subtest 'evaluate a uri' => sub {
     },
     'evaluate against the a fragment of the metaschema that does not exist',
   );
+
+  cmp_deeply(
+    $js->evaluate(
+      1,
+      METASCHEMA.'#does_not_exist',
+    )->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '',
+          keywordLocation => '',
+          error => 'EXCEPTION: unable to find resource '.METASCHEMA.'#does_not_exist',
+        },
+      ],
+    },
+    'evaluate against the a plain-name fragment of the metaschema that does not exist',
+  );
 };
 
 subtest 'add a uri resource' => sub {
@@ -181,6 +203,8 @@ subtest 'add a uri resource' => sub {
           METASCHEMA() => {
             path => '',
             canonical_uri => str(METASCHEMA),
+            specification_version => 'draft2019-09',
+            vocabularies => [ $js->_vocabularies_by_spec_version('draft2019-09') ],
           },
         ],
         canonical_uri => [ str(METASCHEMA) ],
@@ -243,10 +267,14 @@ subtest 'add a schema associated with a uri' => sub {
           'https://foo.com' => {
             path => '',
             canonical_uri => str('https://bar.com'),
+            specification_version => 'draft2020-12',
+            vocabularies => [ $js->_vocabularies_by_spec_version('draft2020-12') ],
           },
           'https://bar.com' => {
             path => '',
             canonical_uri => str('https://bar.com'),
+            specification_version => 'draft2020-12',
+            vocabularies => [ $js->_vocabularies_by_spec_version('draft2020-12') ],
           },
         ),
         canonical_uri => [ str('https://bar.com') ],
@@ -306,6 +334,8 @@ subtest 'add a schema associated with a uri' => sub {
         path => '',
         canonical_uri => str('https://bar.com'),
         document => shallow($document),
+        specification_version => 'draft2020-12',
+        vocabularies => [ $js->_vocabularies_by_spec_version('draft2020-12') ],
       } ), qw(https://foo.com https://bar.com https://bloop.com)
     },
     'now the document is available as all three uris',
@@ -327,6 +357,8 @@ subtest 'add a document without associating it with a uri' => sub {
           'https://bar.com' => {
             path => '',
             canonical_uri => str('https://bar.com'),
+            specification_version => 'draft2020-12',
+            vocabularies => [ $js->_vocabularies_by_spec_version('draft2020-12') ],
           },
         ],
         canonical_uri => [ str('https://bar.com') ],
@@ -339,7 +371,11 @@ subtest 'add a document without associating it with a uri' => sub {
     { $js->_resource_index },
     {
       'https://bar.com' => {
-        path => '', canonical_uri => str('https://bar.com'), document => shallow($document),
+        path => '',
+        canonical_uri => str('https://bar.com'),
+        document => shallow($document),
+        specification_version => 'draft2020-12',
+        vocabularies => [ $js->_vocabularies_by_spec_version('draft2020-12') ],
       },
     },
     'document only added under its canonical uri',
@@ -360,6 +396,8 @@ subtest 'add a schema without a uri' => sub {
           'https://bar.com' => {
             path => '',
             canonical_uri => str('https://bar.com'),
+            specification_version => 'draft2020-12',
+            vocabularies => [ $js->_vocabularies_by_spec_version('draft2020-12') ],
           },
         ],
         canonical_uri => [ str('https://bar.com') ],
@@ -372,7 +410,11 @@ subtest 'add a schema without a uri' => sub {
     { $js->_resource_index },
     {
       'https://bar.com' => {
-        path => '', canonical_uri => str('https://bar.com'), document => shallow($document),
+        path => '',
+        canonical_uri => str('https://bar.com'),
+        document => shallow($document),
+        specification_version => 'draft2020-12',
+        vocabularies => [ $js->_vocabularies_by_spec_version('draft2020-12') ],
       },
     },
     'document only added under its canonical uri',
@@ -545,11 +587,15 @@ subtest 'register a document against multiple uris; do not allow duplicate uris'
         path => '',
         canonical_uri => str('https://foo.com'),
         document => shallow($document),
+        specification_version => 'draft2020-12',
+        vocabularies => [ $js->_vocabularies_by_spec_version('draft2020-12') ],
       },
       'https://foo.com#fooanchor' => {
         path => '/$defs/foo',
         canonical_uri => str('https://foo.com#/$defs/foo'),
         document => shallow($document),
+        specification_version => 'draft2020-12',
+        vocabularies => [ $js->_vocabularies_by_spec_version('draft2020-12') ],
       },
     },
     'resource index from the document is copied to the main object',
@@ -561,14 +607,26 @@ subtest 'register a document against multiple uris; do not allow duplicate uris'
     { $js->_resource_index },
     my $main_resource_index = {
       'https://foo.com' => {
-        path => '', canonical_uri => str('https://foo.com'), document => shallow($document) },
+        path => '',
+        canonical_uri => str('https://foo.com'),
+        document => shallow($document),
+        specification_version => 'draft2020-12',
+        vocabularies => [ $js->_vocabularies_by_spec_version('draft2020-12') ],
+      },
       'https://foo.com#fooanchor' => {
         path => '/$defs/foo',
         canonical_uri => str('https://foo.com#/$defs/foo'),
         document => shallow($document),
+        specification_version => 'draft2020-12',
+        vocabularies => [ $js->_vocabularies_by_spec_version('draft2020-12') ],
       },
       'https://uri2.com' => {
-        path => '', canonical_uri => str('https://foo.com'), document => shallow($document) },
+        path => '',
+        canonical_uri => str('https://foo.com'),
+        document => shallow($document),
+        specification_version => 'draft2020-12',
+        vocabularies => [ $js->_vocabularies_by_spec_version('draft2020-12') ],
+      },
     },
     'add a secondary uri for the same document',
   );
@@ -576,8 +634,18 @@ subtest 'register a document against multiple uris; do not allow duplicate uris'
   cmp_deeply(
     { $document->resource_index },
     my $doc_resource_index = {
-      'https://foo.com' => { path => '', canonical_uri => str('https://foo.com') },
-      'https://foo.com#fooanchor' => { path => '/$defs/foo', canonical_uri => str('https://foo.com#/$defs/foo') },
+      'https://foo.com' => {
+        path => '',
+        canonical_uri => str('https://foo.com'),
+        specification_version => 'draft2020-12',
+        vocabularies => [ $js->_vocabularies_by_spec_version('draft2020-12') ],
+      },
+      'https://foo.com#fooanchor' => {
+        path => '/$defs/foo',
+        canonical_uri => str('https://foo.com#/$defs/foo'),
+        specification_version => 'draft2020-12',
+        vocabularies => [ $js->_vocabularies_by_spec_version('draft2020-12') ],
+      },
     },
     'secondary uri not also added to the document',
   );
@@ -616,7 +684,12 @@ subtest 'register a document against multiple uris; do not allow duplicate uris'
     { $js->_resource_index },
     {
       'https://uri4.com' => {
-        path => '', canonical_uri => str('https://foo.com'), document => shallow($document) },
+        path => '',
+        canonical_uri => str('https://foo.com'),
+        document => shallow($document),
+        specification_version => 'draft2020-12',
+        vocabularies => [ $js->_vocabularies_by_spec_version('draft2020-12') ],
+      },
       %$main_resource_index,
     },
     'new uri was added against the original document (no new document created)',

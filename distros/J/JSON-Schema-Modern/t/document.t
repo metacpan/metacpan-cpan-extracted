@@ -22,6 +22,8 @@ subtest 'boolean document' => sub {
         '' => {
           path => '',
           canonical_uri => str(''),
+          specification_version => 'draft2020-12',
+          vocabularies => ignore, # there are no keywords, so vocabularies doesn't matter
         },
       ],
       canonical_uri => [ str('') ],
@@ -50,6 +52,8 @@ subtest 'boolean document' => sub {
         'https://foo.com' => {
           path => '',
           canonical_uri => str('https://foo.com'),
+          specification_version => 'draft2020-12',
+          vocabularies => ignore, # there are no keywords, so vocabularies doesn't matter
         },
       ],
       canonical_uri => [ str('https://foo.com') ],
@@ -66,6 +70,8 @@ subtest 'object document' => sub {
         '' => {
           path => '',
           canonical_uri => str(''),
+          specification_version => 'draft2020-12',
+          vocabularies => [ JSON::Schema::Modern->_vocabularies_by_spec_version('draft2020-12') ],
         },
       ],
       canonical_uri => [ str('') ],
@@ -84,6 +90,8 @@ subtest 'object document' => sub {
         'https://foo.com' => {
           path => '',
           canonical_uri => str('https://foo.com'),
+          specification_version => 'draft2020-12',
+          vocabularies => [ JSON::Schema::Modern->_vocabularies_by_spec_version('draft2020-12') ],
         },
       ],
       canonical_uri => [ str('https://foo.com') ],
@@ -102,6 +110,8 @@ subtest 'object document' => sub {
         'https://bar.com' => {
           path => '',
           canonical_uri => str('https://bar.com'),
+          specification_version => 'draft2020-12',
+          vocabularies => [ JSON::Schema::Modern->_vocabularies_by_spec_version('draft2020-12') ],
         },
       ],
       canonical_uri => [ str('https://bar.com') ], # note canonical_uri has been overwritten
@@ -126,18 +136,26 @@ subtest 'object document' => sub {
         'https://foo.com' => {  # the originally-provided uri is only used for the root schema
           path => '',
           canonical_uri => str('https://bar.com'),
+          specification_version => 'draft2020-12',
+          vocabularies => [ JSON::Schema::Modern->_vocabularies_by_spec_version('draft2020-12') ],
         },
         'https://bar.com' => {
           path => '',
           canonical_uri => str('https://bar.com'),
+          specification_version => 'draft2020-12',
+          vocabularies => [ JSON::Schema::Modern->_vocabularies_by_spec_version('draft2020-12') ],
         },
         'https://bar.com#my_anchor' => {
           path => '/allOf/0',
           canonical_uri => str('https://bar.com#/allOf/0'),
+          specification_version => 'draft2020-12',
+          vocabularies => [ JSON::Schema::Modern->_vocabularies_by_spec_version('draft2020-12') ],
         },
         'https://bar.com/x/y/z.json' => {
           path => '/allOf/1',
           canonical_uri => str('https://bar.com/x/y/z.json'),
+          specification_version => 'draft2020-12',
+          vocabularies => [ JSON::Schema::Modern->_vocabularies_by_spec_version('draft2020-12') ],
         },
       ),
       canonical_uri => [ str('https://bar.com') ],
@@ -159,10 +177,15 @@ subtest 'object document' => sub {
     ),
     listmethods(
       resource_index => unordered_pairs(
-        '' => { path => '', canonical_uri => str('') },
+        '' => {
+          path => '', canonical_uri => str(''), specification_version => 'draft2020-12',
+          vocabularies => [ JSON::Schema::Modern->_vocabularies_by_spec_version('draft2020-12') ],
+        },
         'my_foo' => {
           path => '/$defs/foo',
           canonical_uri => str('my_foo'),
+          specification_version => 'draft2020-12',
+          vocabularies => [ JSON::Schema::Modern->_vocabularies_by_spec_version('draft2020-12') ],
         },
       ),
     ),
@@ -182,10 +205,15 @@ subtest 'object document' => sub {
     ),
     listmethods(
       resource_index => unordered_pairs(
-        '' => { path => '', canonical_uri => str('') },
+        '' => {
+          path => '', canonical_uri => str(''), specification_version => 'draft2020-12',
+          vocabularies => [ JSON::Schema::Modern->_vocabularies_by_spec_version('draft2020-12') ],
+        },
         'http://localhost:4242/my_foo' => {
           path => '/$defs/foo',
           canonical_uri => str('http://localhost:4242/my_foo'),
+          specification_version => 'draft2020-12',
+          vocabularies => [ JSON::Schema::Modern->_vocabularies_by_spec_version('draft2020-12') ],
         },
       ),
     ),
@@ -206,7 +234,10 @@ subtest '$id and $anchor as properties' => sub {
     ),
     listmethods(
       resource_index => [
-        '' => { path => '', canonical_uri => str('') },
+        '' => {
+          path => '', canonical_uri => str(''), specification_version => 'draft2020-12',
+          vocabularies => [ JSON::Schema::Modern->_vocabularies_by_spec_version('draft2020-12') ],
+        },
       ],
     ),
     'did not index the $id and $anchor properties as if they were identifier keywords',
@@ -227,10 +258,15 @@ subtest '$id with an empty fragment' => sub {
     ),
     listmethods(
       resource_index => unordered_pairs(
-        '' => { path => '', canonical_uri => str('') },
+        '' => {
+          path => '', canonical_uri => str(''), specification_version => 'draft2020-12',
+          vocabularies => [ JSON::Schema::Modern->_vocabularies_by_spec_version('draft2020-12') ],
+        },
         'http://localhost:4242/my_foo' => {
           path => '/$defs/foo',
           canonical_uri => str('http://localhost:4242/my_foo'),
+          specification_version => 'draft2020-12',
+          vocabularies => [ JSON::Schema::Modern->_vocabularies_by_spec_version('draft2020-12') ],
         },
       ),
     ),
@@ -338,18 +374,28 @@ subtest '$anchor and $id below an $id that is not at the document root' => sub {
       resource_index => unordered_pairs(
         'https://foo.com' => {
           path => '', canonical_uri => str('https://foo.com'),
+          specification_version => 'draft2020-12',
+          vocabularies => [ JSON::Schema::Modern->_vocabularies_by_spec_version('draft2020-12') ],
         },
         'https://bar.com' => {
           path => '/allOf/0', canonical_uri => str('https://bar.com'),
+          specification_version => 'draft2020-12',
+          vocabularies => [ JSON::Schema::Modern->_vocabularies_by_spec_version('draft2020-12') ],
         },
         'https://bar.com#my_anchor' => {
           path => '/allOf/0', canonical_uri => str('https://bar.com'),
+          specification_version => 'draft2020-12',
+          vocabularies => [ JSON::Schema::Modern->_vocabularies_by_spec_version('draft2020-12') ],
         },
         'https://bar.com#my_not' => {
           path => '/allOf/0/not', canonical_uri => str('https://bar.com#/not'),
+          specification_version => 'draft2020-12',
+          vocabularies => [ JSON::Schema::Modern->_vocabularies_by_spec_version('draft2020-12') ],
         },
         'https://bar.com/inner_id' => {
           path => '/allOf/0/not/not', canonical_uri => str('https://bar.com/inner_id'),
+          specification_version => 'draft2020-12',
+          vocabularies => [ JSON::Schema::Modern->_vocabularies_by_spec_version('draft2020-12') ],
         },
       ),
     ),
@@ -395,30 +441,45 @@ subtest 'JSON pointer and URI escaping' => sub {
     ),
     listmethods(
       resource_index => unordered_pairs(
-        '' => { path => '', canonical_uri => str('') },
+        '' => {
+          path => '', canonical_uri => str(''), specification_version => 'draft2020-12',
+          vocabularies => [ JSON::Schema::Modern->_vocabularies_by_spec_version('draft2020-12') ],
+        },
         'http://localhost:4242/~username' => {
           path => '/$defs/foo/patternProperties/~0',
           canonical_uri => str('http://localhost:4242/~username'),
+          specification_version => 'draft2020-12',
+          vocabularies => [ JSON::Schema::Modern->_vocabularies_by_spec_version('draft2020-12') ],
         },
         'http://localhost:4242/my_slash' => {
           path => '/$defs/foo/patternProperties/~1',
           canonical_uri => str('http://localhost:4242/my_slash'),
+          specification_version => 'draft2020-12',
+          vocabularies => [ JSON::Schema::Modern->_vocabularies_by_spec_version('draft2020-12') ],
         },
         'http://localhost:4242/~username/my_slash' => {
           path => '/$defs/foo/patternProperties/[~0~1]',
           canonical_uri => str('http://localhost:4242/~username/my_slash'),
+          specification_version => 'draft2020-12',
+          vocabularies => [ JSON::Schema::Modern->_vocabularies_by_spec_version('draft2020-12') ],
         },
         'http://localhost:4242/~username#tilde' => {
           path => '/$defs/foo/patternProperties/~0/properties/~0~1',
           canonical_uri => str('http://localhost:4242/~username#/properties/~0~1'),
+          specification_version => 'draft2020-12',
+          vocabularies => [ JSON::Schema::Modern->_vocabularies_by_spec_version('draft2020-12') ],
         },
         'http://localhost:4242/my_slash#slash' => {
           path => '/$defs/foo/patternProperties/~1/properties/~0~1',
           canonical_uri => str('http://localhost:4242/my_slash#/properties/~0~1'),
+          specification_version => 'draft2020-12',
+          vocabularies => [ JSON::Schema::Modern->_vocabularies_by_spec_version('draft2020-12') ],
         },
         'http://localhost:4242/~username/my_slash#tildeslash' => {
           path => '/$defs/foo/patternProperties/[~0~1]/properties/~0~1',
           canonical_uri => str('http://localhost:4242/~username/my_slash#/properties/~0~1'),
+          specification_version => 'draft2020-12',
+          vocabularies => [ JSON::Schema::Modern->_vocabularies_by_spec_version('draft2020-12') ],
         },
       ),
     ),
@@ -488,10 +549,8 @@ subtest 'resource collisions' => sub {
         '$id' => 'https://bar.com',
         '$anchor' => 'hello',
       },
-    )->{canonical_uri_index},
-    {
-      '' => str('https://bar.com'),
-    },
+    )->path_to_resource(''),
+    superhashof({ canonical_uri => str('https://bar.com') }),
     'the correct canonical uri is indexed in the inverted index',
   );
 };
@@ -507,6 +566,8 @@ subtest 'create document with explicit canonical_uri set to the same as root $id
         'https://foo.com/x/y/z' => {
           path => '',
           canonical_uri => str('https://foo.com/x/y/z'),
+          specification_version => 'draft2020-12',
+          vocabularies => [ JSON::Schema::Modern->_vocabularies_by_spec_version('draft2020-12') ],
         },
       ],
       canonical_uri => [ str('https://foo.com/x/y/z') ],

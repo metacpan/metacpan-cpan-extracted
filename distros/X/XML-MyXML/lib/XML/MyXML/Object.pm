@@ -7,7 +7,7 @@ use Encode;
 use Carp;
 use Scalar::Util qw/ weaken /;
 
-our $VERSION = "1.06";
+our $VERSION = "1.07";
 
 sub new {
     my $class = shift;

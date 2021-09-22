@@ -1,5 +1,14 @@
 Revision history for Perl extension Sub-Meta
 
+0.14 2021-09-18T11:46:38Z
+    [IMPROVEMENTS]
+    - feat: type constraints for subroutines and Sub::Meta #42
+    - add leak tests #47
+    - add @FINDER_CLASSES tests and docs #48
+
+    [INCOMPATIBLE CHANGES]
+    - improve: not requires args #45
+
 0.13 2021-05-01T04:28:01Z
     - update cpanfile and github action #43
 

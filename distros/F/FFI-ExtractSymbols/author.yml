@@ -8,6 +8,8 @@ pod_spelling_system:
     - DLLs
     - Posix
     - nm
+    - Sanko
+    - SANKO
 
 pod_coverage:
   skip: 0

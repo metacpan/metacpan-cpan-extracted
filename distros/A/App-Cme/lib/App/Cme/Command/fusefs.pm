@@ -10,7 +10,7 @@
 # ABSTRACT: Edit the configuration of an application with fuse
 
 package App::Cme::Command::fusefs ;
-$App::Cme::Command::fusefs::VERSION = '1.032';
+$App::Cme::Command::fusefs::VERSION = '1.033';
 use strict;
 use warnings;
 use 5.10.1;
@@ -35,6 +35,7 @@ sub validate_args {
     my $fd = $opt->{fuse_dir};
     die "Directory $fd does not exists\n" unless -d $fd;
 
+    return;
 }
 
 sub opt_spec {
@@ -93,6 +94,7 @@ sub execute {
     }
 
     # parent process simply exits
+    return;
 }
 
 1;
@@ -109,7 +111,7 @@ App::Cme::Command::fusefs - Edit the configuration of an application with fuse
 
 =head1 VERSION
 
-version 1.032
+version 1.033
 
 =head1 SYNOPSIS
 

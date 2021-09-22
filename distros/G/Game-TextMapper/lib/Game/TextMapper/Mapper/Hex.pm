@@ -29,6 +29,9 @@ generate the SVG for the entire map.
 
 This class is derived from L<Game::TextMapper::Mapper>.
 
+It uses L<Game::TextMapper::Point::Hex> to represent points (regions) and
+L<Game::TextMapper::Line::Hex> to represent lines.
+
 L<Game::TextMapper::Mapper::Square> is a similar class for square maps.
 
 =cut
@@ -36,7 +39,7 @@ L<Game::TextMapper::Mapper::Square> is a similar class for square maps.
 package Game::TextMapper::Mapper::Hex;
 
 use Game::TextMapper::Constants qw($dx $dy);
-use Game::TextMapper::Hex;
+use Game::TextMapper::Point::Hex;
 use Game::TextMapper::Line::Hex;
 
 use Modern::Perl '2018';
@@ -44,7 +47,7 @@ use Mojo::Base 'Game::TextMapper::Mapper';
 
 sub make_region {
   my $self = shift;
-  return Game::TextMapper::Hex->new(@_);
+  return Game::TextMapper::Point::Hex->new(@_);
 }
 
 sub make_line {
@@ -56,7 +59,7 @@ sub shape {
   my $self = shift;
   my $attributes = shift;
   my $points = join(" ", map {
-    sprintf("%.1f,%.1f", $_->[0], $_->[1]) } Game::TextMapper::Hex::corners());
+    sprintf("%.1f,%.1f", $_->[0], $_->[1]) } Game::TextMapper::Point::Hex::corners());
   return qq{<polygon $attributes points='$points' />};
 }
 

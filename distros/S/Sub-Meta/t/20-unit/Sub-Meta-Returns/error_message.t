@@ -6,8 +6,8 @@ use Sub::Meta::Test qw(test_error_message);
 subtest "{ scalar => 'Str' }" => sub {
     my $meta = Sub::Meta::Returns->new({ scalar => 'Str' });
     my @tests = (
-        fail       => undef,                                             qr/^must be Sub::Meta::Returns. got: /,
-        fail       => (bless {} => 'Some'),                              qr/^must be Sub::Meta::Returns. got: Some/,
+        fail       => undef,                                             qr/^other returns must be Sub::Meta::Returns. got: Undef/,
+        fail       => (bless {} => 'Some'),                              qr/^other returns must be Sub::Meta::Returns. got: Some/,
         fail       => { scalar => 'Int' },                               qr/^invalid scalar return. got: Int, expected: Str/,
         relax_pass => { scalar => 'Str', list => 'Str' },                qr/^should not have list return/,
         relax_pass => { scalar => 'Str', void => 'Str' },                qr/^should not have void return/,
@@ -21,6 +21,7 @@ subtest "{ list => 'Str' }" => sub {
     my $meta = Sub::Meta::Returns->new({ list => 'Str' });
     my @tests = (
         fail       => { list => 'Int' },                                 qr/^invalid list return. got: Int, expected: Str/,
+        fail       => {  },                                              qr/^invalid list return. got: , expected: Str/,
         relax_pass => { list => 'Str', scalar => 'Str' },                qr/^should not have scalar return/,
         relax_pass => { list => 'Str', void => 'Str' },                  qr/^should not have void return/,
         pass       => { list => 'Str' },                                 qr//,
@@ -33,6 +34,7 @@ subtest "{ void => 'Str' }" => sub {
     my $meta = Sub::Meta::Returns->new({ void => 'Str' });
     my @tests = (
         fail       => { void => 'Int' },                                 qr/^invalid void return. got: Int, expected: Str/,
+        fail       => {  },                                              qr/^invalid void return. got: , expected: Str/,
         relax_pass => { void => 'Str', scalar => 'Str' },                qr/^should not have scalar return/,
         relax_pass => { void => 'Str', list => 'Str' },                  qr/^should not have list return/,
         pass       => { void => 'Str' },                                 qr//,

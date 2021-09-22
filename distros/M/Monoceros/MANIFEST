@@ -16,5 +16,7 @@ t/04_chunked_req.t
 t/05_chunked_zero_length.t
 t/06_middleware.t
 t/07_harakiri.t
+t/08_max_reqs_per_child.t
+t/09_oneworker_onemaxrequest_onerequest_hang.t
 META.yml
 MANIFEST

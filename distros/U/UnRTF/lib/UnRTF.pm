@@ -1,6 +1,11 @@
 package UnRTF;
 use Modern::Perl;
-use Moose;
+use Moo;
+use Types::Standard qw(Str);
+use IPC::Cmd qw(run can_run);
+use Alien::UnRTF;
+use Env qw( @PATH );
+unshift @PATH, Alien::UnRTF->bin_dir;  # unrtf is now in $PATH
 
 =head1 NAME
 
@@ -21,23 +26,26 @@ See: L<http://www.gnu.org/software/unrtf>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2013 Joenio Costa
+Copyright (C) 2013-2021 Joenio Marques da Costa
 
 =cut
 
-has file => (is => 'rw', isa => 'Str', required => 1);
+has file => (is => 'rw', isa => Str, required => 1);
+
+sub BUILD {
+  die "Could not find unrtf command" unless can_run('unrtf');
+}
 
 sub unrtf {
-  open STDERR, '>', '/dev/null';
-  open(UNRTF, "unrtf @_ |") or die $!;
-  local $/ = undef;
-  my $OUTPUT = <UNRTF>;
-  close UNRTF;
-  $OUTPUT;
+  my( $success, $error_message, $full_buf, $stdout_buf, $stderr_buf ) =
+    run( command => [ 'unrtf', @_ ], verbose => 0 );
+  die "unrtf failure: @{[ join '', @$stderr_buf  ]}" if ! $success;
+  return join '', @$stdout_buf;
 }
 
 sub convert {
   my ($self, %args) = @_;
+  return '' unless $args{format};
   unrtf("--$args{format}", $self->file);
 }
 

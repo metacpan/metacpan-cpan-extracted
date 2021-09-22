@@ -1,7 +1,7 @@
 use 5.010;
 use alienfile;
 use Sort::Versions;
-use Env qw /@PATH/;
+use Env qw /@PATH @LD_LIBRARY_PATH/;
 use Path::Tiny qw /path/;
 
 my $on_windows = $^O =~ /mswin/i;
@@ -219,6 +219,7 @@ share {
       $^O eq 'MSWin32' ? '--without-hdf5' : (),  #  issues with strawberry perl hdf5 dlls
     );
     my @ld_flags;
+    my @ld_lib_path;
     #  system installs won't necessarily have dist dirs
     if (Alien::proj->install_type eq 'share') {
       push @with_args, '--with-proj=' . Alien::proj->dist_dir;
@@ -234,14 +235,18 @@ share {
       q{--with-proj-extra-lib-for-test="} . Alien::proj->libs . q{"};
     if (Alien::sqlite->install_type eq 'share') {
       push @with_args, '--with-sqlite3=' . Alien::sqlite->dist_dir;
-      push @ld_flags, 'LDFLAGS=' . Alien::sqlite->libs;
+      #push @ld_flags, 'LDFLAGS=' . Alien::sqlite->libs;
       #'-L/home/libraries/intel/sqlite/lib -lsqlite3'
     }
     if (Alien::geos::af->install_type eq 'share') {
       push @with_args,
           '--with-geos='
         . Alien::geos::af->bin_dir
-        . '/geos-config'; 
+        . '/geos-config';
+      #  build weirdness on linux with geos under cmake
+      if (!$on_windows) {
+        push @ld_lib_path, Alien::geos::af->dist_dir . '/lib';
+      }
     }
     #  an attempt to get hdf5 support under strawberry,
     #  but which did not work so now it is turned off
@@ -279,6 +284,8 @@ share {
     ## --with-curl=no
     #  not sure this is needed, or if it is to deal with a cirrus quirk 
     #local $ENV{LDFLAGS} = join ' ', @ld_flags;
+    #  hack
+    push @LD_LIBRARY_PATH, @ld_lib_path;
     build [
       #\&update_pkg_conf_path,
       \&cleanup_ldflags,

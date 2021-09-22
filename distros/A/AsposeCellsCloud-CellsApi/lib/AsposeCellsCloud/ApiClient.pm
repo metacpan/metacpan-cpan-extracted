@@ -67,9 +67,7 @@ sub new {
         'config' => $config,
         'get_access_token_time' =>$get_access_token_time,
     );
-
-
-
+  
     return bless \%args, $class;
 }
 
@@ -200,7 +198,8 @@ sub call_api {
   
     # update parameters based on authentication settings
     $self->update_params_for_auth($header_params, $query_params, $auth_settings ); 
-    
+  
+  
     my $_url = $self->{config}{base_url}."/" .$self->{config}{api_version} . $resource_path;
     if($get_token){
         $_url = $self->{config}{base_url} . $resource_path;
@@ -209,7 +208,8 @@ sub call_api {
     # build query 
     if (%$query_params) {
         $_url = ($_url . '?' . eval { URI::Query->new($query_params)->stringify });
-    }   
+    }
+  
   
     # body data
     $body_data = to_json($body_data->to_hash) if defined $body_data && $body_data->can('to_hash'); # model to json string
@@ -270,7 +270,8 @@ sub call_api {
     #proxy####################################################################
     # $self->{ua}=LWP::UserAgent->new(ssl_opts => { verify_hostname => 0 },);
     # $self->{ua}->proxy(['https'], "http://127.0.0.1:8888"); 
-    #printf $self->{ua}->ssl_opts;############################################
+    #printf $self->{ua}->ssl_opts;
+    ############################################
     $self->{ua}->timeout($self->{http_timeout} || $self->{config}{http_timeout});
     $self->{ua}->agent($self->{http_user_agent} || $self->{config}{http_user_agent});
     
