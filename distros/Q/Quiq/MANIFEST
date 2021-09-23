@@ -50,7 +50,9 @@ lib/Quiq/DestinationTree.pm
 lib/Quiq/Diff.pm
 lib/Quiq/Digest.pm
 lib/Quiq/DirHandle.pm
+lib/Quiq/Dumper.pm
 lib/Quiq/Duration.pm
+lib/Quiq/Eog.pm
 lib/Quiq/Epoch.pm
 lib/Quiq/ExampleCode.pm
 lib/Quiq/Excel/Writer.pm
@@ -138,6 +140,7 @@ lib/Quiq/LaTeX/LongTable.pm
 lib/Quiq/LineProcessor.pm
 lib/Quiq/LineProcessor/Line.pm
 lib/Quiq/List.pm
+lib/Quiq/LockedContent.pm
 lib/Quiq/LockedCounter.pm
 lib/Quiq/Math.pm
 lib/Quiq/Mechanize.pm
@@ -152,6 +155,7 @@ lib/Quiq/Parallel.pm
 lib/Quiq/Parameters.pm
 lib/Quiq/Path.pm
 lib/Quiq/Perl.pm
+lib/Quiq/PerlModule.pm
 lib/Quiq/PlotlyJs.pm
 lib/Quiq/PlotlyJs/Reference.pm
 lib/Quiq/PlotlyJs/TimeSeries.pm
@@ -174,6 +178,7 @@ lib/Quiq/Schedule.pm
 lib/Quiq/Sdoc/Producer.pm
 lib/Quiq/Section/Object.pm
 lib/Quiq/Section/Parser.pm
+lib/Quiq/Sendmail.pm
 lib/Quiq/Shell.pm
 lib/Quiq/SoapWsdlServiceCgi.pm
 lib/Quiq/SoapWsdlServiceCgi/Demo.pm
@@ -209,6 +214,7 @@ lib/Quiq/TimeLapse/Filename.pm
 lib/Quiq/TimeLapse/RangeDef.pm
 lib/Quiq/TimeLapse/Sequence.pm
 lib/Quiq/Timeseries/Synchronizer.pm
+lib/Quiq/Trash.pm
 lib/Quiq/TreeFormatter.pm
 lib/Quiq/Udl.pm
 lib/Quiq/Unindent.pm
@@ -268,7 +274,9 @@ t/bin/Quiq/DestinationTree.t
 t/bin/Quiq/Diff.t
 t/bin/Quiq/Digest.t
 t/bin/Quiq/DirHandle.t
+t/bin/Quiq/Dumper.t
 t/bin/Quiq/Duration.t
+t/bin/Quiq/Eog.t
 t/bin/Quiq/Epoch.t
 t/bin/Quiq/ExampleCode.t
 t/bin/Quiq/Excel/Writer.t
@@ -356,6 +364,7 @@ t/bin/Quiq/LaTeX/LongTable.t
 t/bin/Quiq/LineProcessor.t
 t/bin/Quiq/LineProcessor/Line.t
 t/bin/Quiq/List.t
+t/bin/Quiq/LockedContent.t
 t/bin/Quiq/LockedCounter.t
 t/bin/Quiq/Math.t
 t/bin/Quiq/Mechanize.t
@@ -370,6 +379,7 @@ t/bin/Quiq/Parallel.t
 t/bin/Quiq/Parameters.t
 t/bin/Quiq/Path.t
 t/bin/Quiq/Perl.t
+t/bin/Quiq/PerlModule.t
 t/bin/Quiq/PlotlyJs.t
 t/bin/Quiq/PlotlyJs/Reference.t
 t/bin/Quiq/PlotlyJs/TimeSeries.t
@@ -392,6 +402,7 @@ t/bin/Quiq/Schedule.t
 t/bin/Quiq/Sdoc/Producer.t
 t/bin/Quiq/Section/Object.t
 t/bin/Quiq/Section/Parser.t
+t/bin/Quiq/Sendmail.t
 t/bin/Quiq/Shell.t
 t/bin/Quiq/SoapWsdlServiceCgi.t
 t/bin/Quiq/SoapWsdlServiceCgi/Demo.t
@@ -427,6 +438,7 @@ t/bin/Quiq/TimeLapse/Filename.t
 t/bin/Quiq/TimeLapse/RangeDef.t
 t/bin/Quiq/TimeLapse/Sequence.t
 t/bin/Quiq/Timeseries/Synchronizer.t
+t/bin/Quiq/Trash.t
 t/bin/Quiq/TreeFormatter.t
 t/bin/Quiq/Udl.t
 t/bin/Quiq/Unindent.t

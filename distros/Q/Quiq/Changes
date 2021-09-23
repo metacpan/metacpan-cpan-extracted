@@ -1,3 +1,34 @@
+1.195 2021-08-08
+================
+
+[Quiq::Dumper]
+* Klasse hinzugefügt
+
+[Quiq::Eog]
+* Klasse hinzugefügt
+
+[Quiq::Image]
+* Doku bearbeitet
+
+[Quiq::LockedContent]
+* Klasse hinzugefügt
+
+[Quiq::Path]
+* entries() - um Tilde-Expansion erweitert
+* find() - um Optionen -excludeRoot und -sort erweitert
+
+[Quiq::PerlModule]
+* Klasse hinzugefügt
+
+[Quiq::Sendmail]
+* Klasse hinzugefügt]
+
+[Quiq::Shell]
+* Ausgabe im Destruktor verändert
+
+[Quiq::Trash]
+* Klasse hinzugefügt
+
 1.194 2021-08-08
 ================
 

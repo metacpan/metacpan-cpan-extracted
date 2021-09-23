@@ -1,0 +1,69 @@
+NAME
+
+    Task::AlienDev - Task bundle for Alien development
+
+VERSION
+
+    version 0.01
+
+SYNOPSIS
+
+     $ cpanm Task::AlienDev
+
+DESCRIPTION
+
+    This Task bundle is useful for those doing Alien development.
+    Installing it will give you these modules:
+
+    Alien::Build
+
+      Framework for writing Aliens.
+
+    Alien::MSYS
+
+      Is used on Windows to make autoconf style packages work.
+
+    App::af
+
+      The af command line application for working with alienfiles.
+
+    Dist::Zilla::MintingProfile::AlienBuild
+
+      The Dist::Zilla minting profile for creating Alien::Build based
+      Aliens.
+
+    Dist::Zilla::Plugin::AlienBuild
+
+      Some useful Dist::Zilla plugins useful for developing Alien::Build
+      based Aliens.
+
+    The latest versions as of when this Task was released should be
+    installed at minimum if they are not already installed.
+
+    Other prereqs may be added in the future if they are deemed useful for
+    Alien development.
+
+CAVEATS
+
+    This module does require Perl 5.22 or better currently because at least
+    some of its prereqs require that version. Note that Aliens authored
+    with these tools should work on Perls of at least 5.8.4 or better, so
+    this is just a development requirement.
+
+    This Task indirectly requires both Alien::FFI and Alien::Libarchive3.
+    If you do not want to build them from source or do not have internet
+    access where the build is happening you will want to pre-install libffi
+    and libarchive. On Debian based systems you can do that with sudo
+    apt-get update && sudo apt-get install libffi-dev libarchive-dev.
+
+AUTHOR
+
+    Graham Ollis <plicease@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2021 by Graham Ollis.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -9,6 +9,6 @@ $asn->prepare(q<
 >);
 my $out;
 $out = $asn->decode( pack("H*", "dfccd3fde3") );
-ok($out == "");
+ok(!$out);
 $out = $asn->decode( pack("H*", "b0805f92cb") );
-ok($out == "");
+ok(!$out);

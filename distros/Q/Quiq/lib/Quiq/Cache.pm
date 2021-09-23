@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.194';
+our $VERSION = '1.195';
 
 use Quiq::Digest;
 use Quiq::Path;
@@ -256,7 +256,7 @@ sub write {
 
 =head1 VERSION
 
-1.194
+1.195
 
 =head1 AUTHOR
 

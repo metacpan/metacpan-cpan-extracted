@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.194';
+our $VERSION = '1.195';
 
 use Quiq::Unindent;
 use Quiq::Hash;
@@ -570,7 +570,7 @@ sub instantiate {
 
 =head1 VERSION
 
-1.194
+1.195
 
 =head1 AUTHOR
 

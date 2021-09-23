@@ -6,7 +6,7 @@ subst - Greple module for text search and substitution
 
 =head1 VERSION
 
-Version 2.1403
+Version 2.2901
 
 =head1 SYNOPSIS
 
@@ -15,26 +15,29 @@ greple -Msubst --dict I<dictionary> [ options ]
   --dict      dictionary file
   --dictdata  dictionary data
 
-  --check=[ng,ok,any,outstand,all]
+  --check=[ng,ok,any,outstand,all,none]
   --select=N
   --linefold
   --stat
   --with-stat
   --stat-style=[default,dict]
+  --stat-item={match,expect,number,ok,ng}=[0,1]
+  --subst
   --diff
   --diffcmd command
-  --replace
   --create
+  --replace
+  --overwrite
   --[no-]warn-overlap
   --[no-]warn-include
 
 =head1 DESCRIPTION
 
-This B<greple> module supports check and substitution of text file
-using a dictionary file.
+This B<greple> module supports check and substitution of text files
+based on dictionary data.
 
-Dictionary file is given by B<--dict> option and contains pattern and
-expected string pairs.
+Dictionary file is given by B<--dict> option and each line contains
+pattern and expected string pairs.
 
     greple -Msubst --dict DICT
 
@@ -43,10 +46,10 @@ If the dictionary file contains following data:
     colou?r      color
     cent(er|re)  center
 
-Then above command find the first pattern which does not match the
-second string, that is "colour" and "centre" in this case.
+above command find the first pattern which does not match the second
+string, that is "colour" and "centre" in this case.
 
-Field "//" in dictionary file is ignored, so this file can be written
+Field "//" in dictionary data is ignored, so this file can be written
 like this:
 
     colou?r      //  color
@@ -61,6 +64,9 @@ Option B<--dictdata> can be used to provide dictionary data in command
 line.
 
     greple --dictdata $'colou?r color\ncent(er|re) center\n'
+
+Dictionary entry starting with a sharp sign (C<#>) is comment and
+ignored.
 
 =head2 Overlapped pattern
 
@@ -125,10 +131,30 @@ Print statistical information.  Works with B<--check> option.
 Option B<--with-stat> print statistics after normal output, while
 B<--stat> print only statistics.
 
-=item B<--stat-style>=[I<default>|I<dict>]
+=item B<--stat-style> [I<default>|I<dict>]
 
 Using B<--stat-style=dict> option with B<--stat> and B<--check=any>,
 you can get dictionary style output for your working document.
+
+=item B<--stat-item> I<item>=[0,1]
+
+Specify which item is shown up in stat information.  Default values
+are:
+
+    match=1
+    expect=1
+    number=1
+    ng=1
+    ok=1
+    dict=0
+
+If you don't need to see pattern field, use like this:
+
+    --stat-item match=0
+
+Multiple parameters can be set at once:
+
+    --stat-item match=number=0,ng=1,ok=1
 
 =item B<--subst>
 
@@ -145,15 +171,19 @@ Option B<-diff> produce diff output of original and converted text.
 Specify diff command name used by B<--diff> option.  Default is "diff
 -u".
 
+=item B<--create>
+
+Create new file and write the result.  Suffix ".new" is appended to
+original filename.
+
 =item B<--replace>
 
 Replace the target file by converted result.  Original file is renamed
 to backup name with ".bak" suffix.
 
-=item B<--create>
+=item B<--overwrite>
 
-Create new file and write the result.  Suffix ".new" is appended to
-original filename.
+Overwrite the target file by converted result with no backup.
 
 =item B<--[no-]warn-overlap>
 
@@ -197,6 +227,12 @@ Created from following guideline document.
     Japan Technical Communicators Association
     https://www.jtca.org/standardization/katakana_guide_3_20171222.pdf
 
+=item B<--jtca>
+
+Customized B<--jtca-katakana-guide>.  Original dictionary is
+automatically generated from published data.  This dictionary is
+customized for practical use.
+
 =item B<--exdict> jtf-style-guide-3.dict
 
 =item B<--jtf-style-guide>
@@ -210,6 +246,12 @@ Created from following guideline document.
     翻訳品質委員会
     https://www.jtf.jp/jp/style_guide/pdf/jtf_style_guide.pdf
 
+=item B<--jtf>
+
+Customized B<--jtf-style-guide>.  Original dictionary is automatically
+generated from published data.  This dictionary is customized for
+practical use.
+
 =item B<--exdict> sccc2.dict
 
 =item B<--sccc2>
@@ -218,6 +260,24 @@ Dictionary used for "C/C++ セキュアコーディング 第2版" published in
 2014.
 
     https://www.jpcert.or.jp/securecoding_book_2nd.html
+
+=item B<--exdict> ms-style-guide.dict
+
+=item B<--ms-style-guide>
+
+Dictionary generated from Microsoft localization style guide.
+
+    https://www.microsoft.com/ja-jp/language/styleguides
+
+Data is generated from this article:
+
+    https://www.atmarkit.co.jp/news/200807/25/microsoft.html
+
+=item B<--microsoft>
+
+Customized B<--ms-style-guide>.  Original dictionary is automatically
+generated from published data.  This dictionary is customized for
+practical use.
 
 =back
 
@@ -235,10 +295,18 @@ L<https://github.com/kaz-utashiro/greple>
 
 L<https://github.com/kaz-utashiro/greple-subst>
 
-https://www.jtca.org/standardization/katakana_guide_3_20171222.pdf
+L<https://www.jtca.org/standardization/katakana_guide_3_20171222.pdf>
 
-https://www.jtf.jp/jp/style_guide/styleguide_top.html,
-https://www.jtf.jp/jp/style_guide/pdf/jtf_style_guide.pdf
+L<https://www.jtf.jp/jp/style_guide/styleguide_top.html>,
+L<https://www.jtf.jp/jp/style_guide/pdf/jtf_style_guide.pdf>
+
+L<https://www.microsoft.com/ja-jp/language/styleguides>,
+L<https://www.atmarkit.co.jp/news/200807/25/microsoft.html>
+
+文化庁 国語施策・日本語教育 国語施策情報 内閣告示・内閣訓令 外来語の表記
+L<https://www.bunka.go.jp/kokugo_nihongo/sisaku/joho/joho/kijun/naikaku/gairai/index.html>
+
+L<https://qiita.com/kaz-utashiro/items/85add653a71a7e01c415>
 
 =head1 AUTHOR
 
@@ -246,7 +314,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright (C) 2017-2020 Kazumasa Utashiro.
+Copyright 2017-2021 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -254,12 +322,11 @@ it under the same terms as Perl itself.
 =cut
 
 
+use v5.14;
 package App::Greple::subst;
 
-our $VERSION = '2.1403';
+our $VERSION = '2.2901';
 
-use v5.14;
-use strict;
 use warnings;
 use utf8;
 use open IO => ':utf8';
@@ -269,7 +336,8 @@ our @EXPORT      = qw(
     &subst_initialize
     &subst_begin
     &subst_diff
-    &subst_create
+    &subst_divert
+    &subst_update
     &subst_show_stat
     &subst_search
     );
@@ -281,24 +349,13 @@ use Data::Dumper;
 use Text::ParseWords qw(shellwords);
 use Encode;
 use Getopt::EX::Colormap qw(colorize);
+use Getopt::EX::LabeledParam;
 use App::Greple::Common;
 use App::Greple::Pattern;
 use App::Greple::subst::Dict;
 
 use File::Share qw(:all);
 $ENV{GREPLE_SUBST_DICT} //= dist_dir 'App-Greple-subst';
-
-package App::Greple::subst::SmartString {
-    use List::Util qw(any);
-    sub new {
-	my($class, $var) = @_;
-	bless ref $var ? $var : \$var, $class;
-    }
-    sub is {
-	my $obj = shift;
-	any { $_ eq $$obj } @_;
-    }
-}
 
 our $debug = 0;
 our $remember_data = 1;
@@ -312,7 +369,6 @@ our $opt_dictname;
 our $opt_subst_diffcmd = "diff -u";
 our $opt_U;
 our $opt_check = 'outstand';
-my  $ss_check;
 our @opt_format;
 our @default_opt_format = ( '%s' );
 our $opt_subst_select;
@@ -321,6 +377,11 @@ our $opt_ignore_space = 1;
 our $opt_warn_overlap = 1;
 our $opt_warn_include = 0;
 our $opt_stat_style = "default";
+our @opt_stat_item;
+our %opt_stat_item = (
+    map( { $_ => 1 } qw(match expect number ng ok) ),
+    map( { $_ => 0 } qw(dict) ),
+    );
 our $opt_show_comment = 0;
 our $opt_show_numbers = 1;
 my %stat;
@@ -329,7 +390,7 @@ my $current_file;
 my $contents;
 my @subst_diffcmd;
 my $ignorechar_re;
-my $dict = new App::Greple::subst::Dict;
+my @dicts;
 
 sub debug {
     $debug = 1;
@@ -339,7 +400,9 @@ sub subst_initialize {
 
     state $once_called++ and return;
 
-    $ss_check = bless \$opt_check, "App::Greple::subst::SmartString";
+    Getopt::EX::LabeledParam
+	->new(HASH => \%opt_stat_item)
+	->load_params(@opt_stat_item);
 
     @subst_diffcmd = shellwords $opt_subst_diffcmd;
 
@@ -351,22 +414,27 @@ sub subst_initialize {
 	@subst_diffcmd = ("diff", "-U$opt_U");
     }
 
+    my $config = { linefold  => $opt_linefold,
+		   dictname  => $opt_dictname,
+		   printdict => $opt_printdict };
     for my $data (@opt_dictdata) {
-	if (utf8::is_utf8 $data) {
-	    $data = encode 'utf8', $data;
-	}
-	open my $fh, "<", \$data;
-	read_dict_fh($fh);
+	push @dicts, App::Greple::subst::Dict->new(
+	    DATA => $data,
+	    CONFIG => $config,
+	    );
     }
     for my $file (@opt_dictfile) {
 	if (-d $file) {
 	    warn "$file is directory\n";
 	    next;
 	}
-	read_dict($file);
+	push @dicts, App::Greple::subst::Dict->new(
+	    FILE => $file,
+	    CONFIG => $config,
+	    );
     }
 
-    if ($dict->words == 0) {
+    if (@dicts == 0) {
 	warn "Module -Msubst requires dictionary data.\n";
 	main::usage();
 	die;
@@ -384,12 +452,14 @@ sub subst_begin {
 #
 {
     my $diverted = 0;
+    my $buffer;
 
     sub divert_stdout {
+	$buffer = @_ ? shift : '/dev/null';
 	$diverted = $diverted == 0 ? 1 : return;
 	open  SUBST_STDOUT, '>&', \*STDOUT or die "open: $!";
 	close STDOUT;
-	open  STDOUT, '>', '/dev/null' or die "open: $!";
+	open  STDOUT, '>', $buffer or die "open: $!";
     }
 
     sub recover_stdout {
@@ -401,7 +471,7 @@ sub subst_begin {
 
 use Text::VisualWidth::PP;
 use Text::VisualPrintf qw(vprintf vsprintf);
-use List::Util qw(max);
+use List::Util qw(max any sum);
 
 sub vwidth {
     if (not defined $_[0] or length $_[0] == 0) {
@@ -414,32 +484,36 @@ my @match_list;
 
 sub subst_show_stat {
     my %arg = @_;
-    my @fromto = $dict->words;
     my($from_max, $to_max) = (0, 0);
-    my @show;
-    for my $i (0 .. $#fromto) {
-	my $p = $fromto[$i] // next;
-	if ($p->is_comment) {
-	    push @show, [ $i, $p, {} ];
-	    next;
+    my $i = -1;
+    my @show_list;
+    for my $dict (@dicts) {
+	my @fromto = $dict->words;
+	my @show;
+	for my $p (@fromto) {
+	    $i++;
+	    $p // die;
+	    if ($p->is_comment) {
+		push @show, [ $i, $p, {} ] if $opt_show_comment;
+		next;
+	    }
+	    my($from_re, $to) = ($p->string, $p->correct // '');
+	    my $hash = $match_list[$i] // {};
+	    my @keys = keys %{$hash};
+	    my @ng = grep { $_ ne $to } @keys;
+	    my @ok = grep { $_ eq $to } @keys;
+	    if    ($opt_check eq 'none'    ) { next if @keys != 0 }
+	    elsif ($opt_check eq 'any'     ) { next if @keys == 0 }
+	    elsif ($opt_check eq 'ok'      ) { next if @ok   == 0 }
+	    elsif ($opt_check eq 'ng'      ) { next if @ng   == 0 }
+	    elsif ($opt_check eq 'outstand') { next if @ng   == 0 }
+	    elsif ($opt_check eq 'all')      { }
+	    else { die }
+	    $from_max = max $from_max, vwidth $from_re;
+	    $to_max   = max $to_max  , vwidth $to;
+	    push @show, [ $i, $p, $hash ];
 	}
-	my($from_re, $to) = ($p->string, $p->correct // '');
-	my $hash = $match_list[$i] // {};
-	my @keys = keys %{$hash};
-	my @ng = grep { $_ ne $to } @keys;
-	my @ok = grep { $_ eq $to } @keys;
-	if      (is $ss_check 'none') {
-	    next if @keys;
-	} elsif (is $ss_check 'any') {
-	    next unless @keys;
-	} elsif (is $ss_check 'ng', 'outstand') {
-	    next unless @ng;
-	} elsif (is $ss_check 'ok') {
-	    next unless @ok;
-	}
-	$from_max = max $from_max, vwidth $from_re;
-	$to_max   = max $to_max  , vwidth $to;
-	push @show, [ $i, $p, $hash ];
+	push @show_list, [ $dict => \@show ];
     }
     if ($opt_show_numbers) {
 	no warnings 'uninitialized';
@@ -447,94 +521,47 @@ sub subst_show_stat {
 	    $stat{hit}, $stat{total},
 	    $stat{ng}, $stat{ok}, $stat{ng} + $stat{ok};
     }
-    for my $show (@show) {
-	my($i, $p, $hash) = @$show;
-	if ($p->is_comment) {
-	    say $p->comment if $opt_show_comment;
-	    next;
+    for my $show_list (@show_list) {
+	my($dict, $show) = @{$show_list};
+	next if @$show == 0;
+	my $dict_format = ">>> %s <<<\n";
+	if ($opt_stat_item{dict}) {
+	    print colorize('000/L24E', sprintf($dict_format, $dict->NAME));
 	}
-	my($from_re, $to) = ($p->string, $p->correct // '');
-	my @keys = keys %{$hash};
-	if ($opt_stat_style eq 'dict') {
-	    vprintf("%-${from_max}s // %s", $from_re // '', $to // '');
-	} else {
-	    vprintf("%${from_max}s => %-${to_max}s %4d:",
-		    $from_re // '', $to // '', $i + 1);
-	    for my $key ((sort { $hash->{$b} <=> $hash->{$a} }
-			  grep { $_ ne $to } @keys),
-			 (grep { $_ eq $to } @keys)) {
-		my $index = $key eq $to ? $i * 2 + 1 : $i * 2;
-		printf(" %s(%s)",
-		       main::index_color($index, $key),
-		       colorize($key eq $to ? 'B' : 'RD', $hash->{$key})
-		    );
+	for my $item (@$show) {
+	    my($i, $p, $hash) = @$item;
+	    if ($p->is_comment) {
+		say $p->comment if $opt_show_comment;
+		next;
 	    }
+	    my($from_re, $to) = ($p->string, $p->correct // '');
+	    my @keys = keys %{$hash};
+	    if ($opt_stat_style eq 'dict') {
+		vprintf("%-${from_max}s // %s", $from_re // '', $to // '');
+	    } else {
+		my @ng = sort { $hash->{$b} <=> $hash->{$a} } grep { $_ ne $to } @keys
+		    if $opt_stat_item{ng};
+		my @ok = grep { $_ eq $to } @keys
+		    if $opt_stat_item{ok};
+		vprintf("%${from_max}s => ", $from_re // '') if $opt_stat_item{match};
+		vprintf("%-${to_max}s",      $to // '')      if $opt_stat_item{expect};
+		vprintf(" %4d:",             $i + 1)         if $opt_stat_item{number};
+		for my $key (@ng, @ok) {
+		    my $index = $key eq $to ? $i * 2 + 1 : $i * 2;
+		    printf(" %s(%s)",
+			   main::index_color($index, $key),
+			   colorize($key eq $to ? 'DB' : 'DR', $hash->{$key})
+			);
+		}
+	    }
+	    print "\n";
 	}
-	print "\n";
     }
     $_ = "";
 }
 
-sub read_dict {
-    my $file = shift;
-    say $file if $opt_dictname;
-    open my $fh, "<", $file or die "$file: $!\n";
-    read_dict_fh($fh);
-}
-
-sub read_dict_fh {
-    my $fh = shift;
-    local $_;
-    my $flag = FLAG_REGEX;
-    $flag |= FLAG_COOK if $opt_linefold;
-    while (<$fh>) {
-	chomp;
-	say if $opt_printdict;
-	if (not /^\s*[^#]/) {
-	    $dict->add_comment($_);
-	    next;
-	}
-	my @param = grep { not m{^//+$} } split ' ';
-	splice @param, 0, -2; # leave last one or two
-	my($pattern, $correct) = @param;
-	$dict->add($pattern, $correct, flag => $flag);
-    }
-}
-
-sub mix_regions {
-    my $option = ref $_[0] eq 'HASH' ? shift : {};
-    my($old, $new) = @_;
-    return () if @$new == 0;
-    my @old = $option->{destructive} ? @{$old} : map [ @$_ ], @{$old};
-    my @new = $option->{destructive} ? @{$new} : map [ @$_ ], @{$new};
-    unless ($option->{nosort}) {
-	@new = sort({$a->[0] <=> $b->[0] || $b->[1] <=> $a->[1]
-			 ||  (@$a > 2 ? $a->[2] <=> $b->[2] : 0) }
-		    @new);
-    }
-    my @out;
-    my($include, $overlap) = @{$option}{qw(include overlap)};
-    while (@old and @new) {
-	while (@old and $old[0][1] <= $new[0][0]) {
-	    push @out, shift @old;
-	}
-	last if @old == 0;
-	while (@new and $new[0][1] <= $old[0][0]) {
-	    push @out, shift @new;
-	}
-	while (@new and $new[0][0] < $old[0][1]) {
-	    if ($old[0][0] <= $new[0][0] and $new[0][1] <= $old[0][1]) {
-		push @$include, [ $new[0], $old[0] ] if $include;
-	    } else {
-		push @$overlap, [ $new[0], $old[0] ] if $overlap;
-	    }
-	    shift @new;
-	}
-    }
-    @$old = ( @out, @old, @new );
-}
-
-use App::Greple::Regions qw(match_regions);
+use App::Greple::Regions qw(match_regions merge_regions filter_regions);
+use List::MoreUtils qw(pairwise);
 
 sub subst_search {
     my $text = $_;
@@ -544,76 +571,78 @@ sub subst_search {
     my @matched;
     my $index = -1;
     my @effective;
-    my $ng = is $ss_check qw(ng any all none);
-    my $ok = is $ss_check qw(ok any all none);
-    my $outstand = is $ss_check qw(outstand);
-    for my $p ($dict->words) {
-	$index++;
-	$p // next;
-	next if $p->is_comment;
-	my($from_re, $to) = ($p->string, $p->correct // '');
-	my @match = match_regions pattern => $p->regex;
-	$stat{total}++;
-	$stat{hit}++ if @match;
-	next if @match == 0 and $opt_check ne 'all';
-	my $hash = $match_list[$index] //= {};
-	my $callback = sub {
-	    my($ms, $me, $i, $matched) = @_;
-	    my $s = $matched =~ s/$ignorechar_re//gr;
-	    $hash->{$s}++;
-	    my $format = @opt_format[ $i % @opt_format ];
-	    sprintf($format,
-		    ($opt_subst && $to ne '' && $s ne $to) ?
-		    $to : $matched);
-	};
-	my(@ok, @ng);
-	for (@match) {
-	    my $matched = substr $text, $_->[0], $_->[1] - $_->[0];
-	    if ($matched =~ s/$ignorechar_re//gr ne $to) {
-		$_->[2] = $index * 2;
-		push @ng, $_;
-	    } else {
-		$_->[2] = $index * 2 + 1;
-		push @ok, $_;
+    my $ng = {ng=>1, any=>1, all=>1, none=>1}->{$opt_check} ;
+    my $ok = {ok=>1, any=>1, all=>1, none=>1}->{$opt_check} ;
+    my $outstand = $opt_check eq 'outstand';
+    for my $dict (@dicts) {
+	for my $p ($dict->words) {
+	    $index++;
+	    $p // next;
+	    next if $p->is_comment;
+	    my($from_re, $to) = ($p->string, $p->correct // '');
+	    my @match = match_regions pattern => $p->regex;
+
+	    ##
+	    ## Remove all overlapped matches.
+	    ##
+	    my($in, $over, $out, $im, $om) = filter_regions \@match, \@matched;
+	    @match = @$out;
+	    for my $warn (
+		[ "Include", $in,   $im, $opt_warn_include ],
+		[ "Overlap", $over, $om, $opt_warn_overlap ],
+		) {
+		my($kind, $list, $match, $show) = @$warn;
+		$show and @$list or next;
+		pairwise {
+		    warn sprintf("%s \"%s\" with \"%s\" by #%d /%s/ in %s at %d\n",
+				 $kind,
+				 substr($_, $a->[0], $a->[1] - $a->[0]),
+				 substr($_, $b->[0], $b->[1] - $b->[0]),
+				 $index + 1, $p->string,
+				 $current_file,
+				 $a->[0],
+			);
+		} @$list, @$match;
 	    }
-	    $_->[3] = $callback;
-	}
-	$stat{ng} += @ng;
-	$stat{ok} += @ok;
-	$effective[ $index * 2     ] = 1 if $ng || ( @ng && $outstand );
-	$effective[ $index * 2 + 1 ] = 1 if $ok || ( @ng && $outstand );
-	mix_regions {
-	    overlap => ( my $overlap = [] ),
-	    include => ( my $include = [] ),
-	    nosort  => 1,
-	}, \@matched, \@match;
-	##
-	## Warning
-	##
-	for my $warn (
-	    [ "Overlap", $overlap, $opt_warn_overlap ],
-	    [ "Include", $include, $opt_warn_include ],
-	    ) {
-	    my($kind, $list, $show) = @$warn;
-	    next unless $show;
-	    for my $info (@$list) {
-		my($new, $old) = @$info;
-		warn sprintf("%s \"%s\" with \"%s\" by #%d /%s/ in %s at %d\n",
-			     $kind,
-			     substr($_, $new->[0], $new->[1] - $new->[0]),
-			     substr($_, $old->[0], $old->[1] - $old->[0]),
-			     $index + 1, $p->string,
-			     $current_file,
-			     $new->[0],
-		    );
+
+	    $stat{total}++;
+	    $stat{hit}++ if @match;
+	    next if @match == 0 and $opt_check ne 'all';
+
+	    my $hash = $match_list[$index] //= {};
+	    my $callback = sub {
+		my($ms, $me, $i, $matched) = @_;
+		$stat{$i % 2 ? 'ok' : 'ng'}++;
+		my $s = $matched =~ s/$ignorechar_re//gr;
+		$hash->{$s}++;
+		my $format = @opt_format[ $i % @opt_format ];
+		sprintf($format,
+			($opt_subst && $to ne '' && $s ne $to) ?
+			$to : $matched);
+	    };
+	    my(@ok, @ng);
+	    for (@match) {
+		my $matched = substr $text, $_->[0], $_->[1] - $_->[0];
+		if ($matched =~ s/$ignorechar_re//gr ne $to) {
+		    $_->[2] = $index * 2;
+		    push @ng, $_;
+		} else {
+		    $_->[2] = $index * 2 + 1;
+		    push @ok, $_;
+		}
+		$_->[3] = $callback;
 	    }
+	    $effective[ $index * 2     ] = 1 if $ng || ( @ng && $outstand );
+	    $effective[ $index * 2 + 1 ] = 1 if $ok || ( @ng && $outstand );
+
+	    @matched = merge_regions { nojoin => 1 }, @matched, @match;
 	}
     }
     ##
     ## --select
     ##
     if (my $select = $opt_subst_select) {
-	my $max = $dict->words;
+	my $max = sum map { int $_->words } @dicts;
 	use Getopt::EX::Numbers;
 	my $numbers = Getopt::EX::Numbers->new(min => 1, max => $max);
 	my @select;
@@ -637,7 +666,7 @@ sub subst_diff {
 
     if ($remember_data) {
 	use IO::Pipe;
-	$io = new IO::Pipe;
+	$io = IO::Pipe->new;
 	my $pid = fork() // die "fork: $!\n";
 	if ($pid == 0) {
 	    $io->writer;
@@ -661,25 +690,44 @@ sub subst_diff {
     die "exec: $!\n";
 }
 
-sub subst_create {
+my $divert_buffer;
+
+sub subst_divert {
     my %arg = @_;
     my $filename = delete $arg{&FILELABEL};
 
-    my $suffix = $arg{suffix} || '.new';
+    $divert_buffer = '';
+    divert_stdout(\$divert_buffer);
+}
 
-    my $newname = do {
-	my $tmp = $filename . $suffix;
-	for (my $i = 1; -f $tmp; $i++) {
-	    $tmp = $filename . $suffix . "_$i";
+sub subst_update {
+    my %arg = @_;
+    my $filename = delete $arg{&FILELABEL};
+    my $newname = '';
+
+    recover_stdout() or die;
+    $divert_buffer = decode 'utf8', $divert_buffer;
+
+    if ($_ eq $divert_buffer) {
+	return;
+    }
+
+    if (my $suffix = $arg{suffix}) {
+	$newname = $filename . $suffix;
+	for (my $i = 1; -f $newname; $i++) {
+	    $newname = $filename . $suffix . "_$i";
 	}
-	$tmp;
-    };
+    }
 
     my $create = do {
 	if ($arg{replace}) {
-	    warn "rename $filename -> $newname\n";
-	    rename $filename, $newname or die "rename: $!\n";
-	    die if -f $filename;
+	    if ($newname ne '') {
+		warn "rename $filename -> $newname\n";
+		rename $filename, $newname or die "rename: $!\n";
+		die if -f $filename;
+	    } else {
+		warn "overwrite $filename\n";
+	    }
 	    $filename;
 	} else {
 	    warn "create $newname\n";
@@ -687,8 +735,9 @@ sub subst_create {
 	}
     };
 	
-    close STDOUT;
-    open  STDOUT, ">", $create or die "open: $!\n";
+    open my $fh, ">", $create or die "open: $create $!\n";
+    $fh->print($divert_buffer);
+    $fh->close;
 }
 
 1;
@@ -698,6 +747,7 @@ __DATA__
 builtin dict=s         @opt_dictfile
 builtin dictdata=s     @opt_dictdata
 builtin stat-style=s   $opt_stat_style
+builtin stat-item=s    @opt_stat_item
 builtin printdict!     $opt_printdict
 builtin dictname!      $opt_dictname
 builtin subst-format=s @opt_format
@@ -719,10 +769,11 @@ option default \
 	--begin subst_begin \
 	--le +&subst_search --no-regioncolor
 
-expand ++dump    --all --need 0 -h --nocolor
-option --diff    --subst ++dump --of &subst_diff
-option --create  --subst ++dump --begin subst_create
-option --replace --subst ++dump --begin subst_create(replace,suffix=.bak)
+expand ++dump      --all --need 0 -h --color=never
+option --diff      --subst ++dump --of &subst_diff
+option --create    --subst ++dump --begin subst_divert --end subst_update(suffix=.new)
+option --replace   --subst ++dump --begin subst_divert --end subst_update(replace,suffix=.bak)
+option --overwrite --subst ++dump --begin subst_divert --end subst_update(replace,suffix=)
 
 option --divert-stdout --prologue __PACKAGE__::divert_stdout \
 		       --epilogue __PACKAGE__::recover_stdout
@@ -733,11 +784,11 @@ autoload -Msubst::dyncmap --dyncmap
 
 help	--subst-color-light light terminal color
 option	--subst-color-light --colormap --dyncmap \
-	range=0-2,except=000:111:222,shift=3,even="555D/%s",odd="I;000/%s"
+	range=0-2,except=000:111:222,shift=3,even="555D/%s",odd="IU;000/%s"
 
 help	--subst-color-dark dark terminal color
 option	--subst-color-dark --colormap --dyncmap \
-	range=2-4,except=222:333:444,shift=1,even="DS;%s",odd="I;%s/L01"
+	range=2-4,except=222:333:444,shift=1,even="D;L01/%s",odd="IU;%s/L01"
 
 ##
 ## Handle included sample dictionaries.
@@ -749,7 +800,17 @@ option --exdictdir --prologue 'sub{ say "$ENV{GREPLE_SUBST_DICT}"; exit }'
 
 option --jtca-katakana-guide --exdict jtca-katakana-guide-3.dict
 option --jtf-style-guide     --exdict jtf-style-guide-3.dict
-option --sccc2               --exdict sccc2.dict
+option --ms-style-guide      --exdict ms-style-guide.dict
+
+option --sccc2     --exdict sccc2.dict
+option --jtca      --exdict jtca.dict
+option --jtf       --exdict jtf.dict
+option --microsoft --exdict ms-amend.dict --exdict ms-style-guide.dict
+
+# deprecated. don't use.
+option --ms --microsoft
+
+option --all-sample-dict --jtf --jtca --ms
 
 option --all-katakana	     --exdict all-katakana.dict
 

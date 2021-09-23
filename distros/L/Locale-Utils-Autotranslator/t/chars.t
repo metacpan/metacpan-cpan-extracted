@@ -31,6 +31,8 @@ find(
                 / \.svn /
                 | / \.git /
                 | / \.gitignore \z
+                | \Q/LocaleData/STDIN.interactive.linux.txt\E \z
+                | \Q/LocaleData/STDIN.interactive_end.linux.txt\E \z
             }xms and return;
             $File::Find::name =~ m{
                 (

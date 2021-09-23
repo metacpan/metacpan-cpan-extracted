@@ -18,8 +18,10 @@ t/21_api_mymemory_translated_net_utf-8.t
 t/22_interactive_utf-8.t
 t/31_test_examples_utf-8.t
 t/chars.t
-t/LocaleData/STDIN.interactive.txt
-t/LocaleData/STDIN.interactive_end.txt
+t/LocaleData/STDIN.interactive.linux.txt
+t/LocaleData/STDIN.interactive.windows.txt
+t/LocaleData/STDIN.interactive_end.linux.txt
+t/LocaleData/STDIN.interactive_end.windows.txt
 't/LocaleData/untranslated de_utf-8.po'
 t/perl_critic.t
 t/pod.t

@@ -1,6 +1,6 @@
 NAME
 
-    App::GhostWork - Barcode Logger(When,Where,Who,What,toWhich,Why)
+    App::GhostWork - Barcode Logger(When,Where,Who,What,toWhich,Why,Howmanysec)
 
 SYNOPSIS
 
@@ -12,21 +12,23 @@ SYNOPSIS
 
 DESCRIPTION
 
-    This software creates a log file from barcode data. The log file is in
-    LTSV format. Each record has the following labels.
+    This software creates log files from barcode data. The log files are in
+    LTSV format and CSV format. Each record of LTSV file has the following
+    labels.
 
-    -----------------------------------------------------
-    label:      meanings
-    -----------------------------------------------------
-    csv:        All columns by CSV format
-    when:       When barcode was read ?
-    where:      Where barcode was read ? (COMPUTERNAME)
-    who:        Who read the barcode ?
-    what:       What barcode read ?
-    towhich:    Which status after barcode was read ?
-    why:        Why become its status ? (optional)
-    looseid:    Moderately unique random numbers
-    -----------------------------------------------------
+    --------------------------------------------------------------
+    CSV-col  LTSV-label   meanings
+    --------------------------------------------------------------
+      1      csv          All columns by CSV format
+      2      when_        When barcode was read ?
+      3      where_       Where barcode was read ? (COMPUTERNAME)
+      4      who          Who read the barcode ?
+      5      what         What barcode read ?
+      6      towhich      Which status after barcode was read ?
+      7      why          Why become its status ? (optional)
+      8      howmanysec   How many seconds to make this record
+      9      looseid      Moderately unique random numbers
+    --------------------------------------------------------------
 
 COMMAND FILE NAME
 
@@ -47,18 +49,12 @@ COMMAND LINE PARAMETER(S)
 
 LOG FILE NAME
 
-    The barcode information is recorded in a log file with the following
+    The barcode information is recorded in log files with the following
     name.
     -----------------------------------------------------
     LOG/when/towhich/when-towhich-who.ltsv
+    LOG/when/towhich/when-towhich-who.csv
     -----------------------------------------------------
-
-***REMOVE_THIS_TIMESTAMP***
-
-    Working time per record can be calculated by comparing the "WHEN" of
-    adjacent records. The next record after the final work contains string
-    "***REMOVE_THIS_TIMESTAMP***" as "WHAT". If you want only barcode
-    records, you need to remove those records.
 
 AUTHOR
 

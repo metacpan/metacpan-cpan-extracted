@@ -33,6 +33,9 @@ BEGIN { $^H{"t::infix/permit"} = 1; }
    $aref = ["|" intersperse @list];
    is_deeply( $aref, [qw( x | y | z )],
       'intersperse infix operator on PADAV' );
+
+   is_deeply( [ (2, 4, 6) addpairs (1, 1, 1) ],
+      [ 3, 5, 7 ], 'addpairs infix operator' );
 }
 
 sub is_deparsed

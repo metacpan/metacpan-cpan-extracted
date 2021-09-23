@@ -1,0 +1,44 @@
+NAME
+
+    Dist::Zilla::MintingProfile::AlienBuild - A minimal Dist::Zilla minting
+    profile for Aliens
+
+VERSION
+
+    version 0.01
+
+SYNOPSIS
+
+     dzil new -P AlienBuild Alien::libfoo
+
+DESCRIPTION
+
+    This is a Dist::Zilla minting profile for creating Alien distributions
+    based on the Alien::Build framework. It uses a reasonable template and
+    the [@Starter] or [@Starter::Git] bundle plus the [AlienBuild] plugin.
+
+SEE ALSO
+
+    Alien
+
+    Alien::Build
+
+    alienfile
+
+    [@Starter]
+
+    [@Starter::Git]
+
+    [AlienBuild]
+
+AUTHOR
+
+    Graham Ollis <plicease@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2021 by Graham Ollis.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

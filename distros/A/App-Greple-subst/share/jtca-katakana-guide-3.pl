@@ -7,6 +7,8 @@ use warnings;
 use utf8;
 use open IO => ':utf8', ':std';
 
+do 'common.pl' or die;
+
 use Data::Dumper;
 {
     no warnings 'redefine';
@@ -180,7 +182,7 @@ while (<DATA>) {
 	next;
     };
     local %_ = ( '_' => $_, %+ );
-    next if length($_{kana} =~ s/ー$//r) < $opt->{minimum};
+    next if get_length($_{kana}) < $opt->{minimum};
 
     $_{categories} = [ split /,/, $_{category} ];
     $_{pattern} = $_{kana};
@@ -210,8 +212,8 @@ if ($opt->{reorder}) {
     use List::Util qw(first);
     for my $i (1 .. $#data) {
 	my $match =
-	    first { $data[$i]->{kana} =~ $data[$_]->{regex} } 0 .. $i - 1
-	    or next;
+	    (first { $data[$i]->{kana} =~ $data[$_]->{regex} } 0 .. $i - 1)
+	    // next;
 	splice @data, $match, 0 => splice @data, $i, 1;
     }
 }

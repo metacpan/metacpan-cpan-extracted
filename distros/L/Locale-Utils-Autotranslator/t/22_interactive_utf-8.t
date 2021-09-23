@@ -19,20 +19,16 @@ extends qw(
 my $output_filename = './translated interactive de_utf-8.po';
 local *STDIN;
 my @files = (
-    't/LocaleData/STDIN.interactive.txt',
-    't/LocaleData/STDIN.interactive_end.txt',
+    "\n" eq "\x{D}\x{A}"
+    ? (
+        't/LocaleData/STDIN.interactive.windwos.txt',
+        't/LocaleData/STDIN.interactive_end.windows.txt',
+    )
+    : (
+        't/LocaleData/STDIN.interactive.linux.txt',
+        't/LocaleData/STDIN.interactive_end.linux.txt',
+    ),
 );
-# \n OS compatible
-for (@files) {
-    open my $fhr, '<', $_ or die "openr $_: $OS_ERROR";
-    local $INPUT_RECORD_SEPARATOR = undef;
-    my $content = <$fhr>;
-    close $fhr;
-    $content =~ s{\r? \n}{\n}xmsg;
-    open my $fhw, '>', $_ or die "openw $_: $OS_ERROR";
-    print {$fhw} $content or die "print $_: $OS_ERROR";
-    close $fhw or die "close $_: $OS_ERROR";
-}
 {
     local $_ = shift @files;
     open STDIN, '<', $_

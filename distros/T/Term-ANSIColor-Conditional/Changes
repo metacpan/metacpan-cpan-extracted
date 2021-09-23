@@ -1,3 +1,10 @@
+0.009   2021-06-01  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Note that Term::ANSIColor now supports NO_COLOR.
+
+
 0.008   2020-08-10  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

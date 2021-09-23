@@ -3,34 +3,34 @@ require 5.008;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
+  'PL_FILES' => {},
+  'INSTALLDIRS' => 'site',
+  'EXE_FILES' => [],
+  'VERSION_FROM' => 'lib/Locale/Utils/Autotranslator.pm',
   'NAME' => 'Locale::Utils::Autotranslator',
   'PREREQ_PM' => {
-                   'URI' => 0,
-                   'Carp' => 0,
-                   'Locale::TextDomain::OO::Util::ExtractHeader' => 0,
-                   'LWP::UserAgent' => 0,
-                   'MooX::Types::MooseLike::Base' => 0,
-                   'Encode' => 0,
-                   'JSON' => 0,
                    'Test::Differences' => '0.60',
-                   'MooX::StrictConstructor' => 0,
-                   'Test::NoWarnings' => 0,
-                   'Test::More' => 0,
-                   'MooX::Types::MooseLike::Numeric' => 0,
-                   'Moo' => '1.003001',
-                   'Locale::PO' => '0.27',
-                   'HTTP::Request::Common' => 0,
-                   'namespace::autoclean' => 0,
                    'MooX::Types::MooseLike' => 0,
+                   'Moo' => '1.003001',
+                   'Test::Exception' => 0,
+                   'Test::More' => 0,
                    'Try::Tiny' => 0,
-                   'Path::Tiny' => 0,
-                   'HTML::Entities' => 0,
+                   'Encode' => 0,
+                   'LWP::UserAgent' => 0,
+                   'Locale::TextDomain::OO::Util::ExtractHeader' => 0,
+                   'Carp' => 0,
+                   'Test::NoWarnings' => 0,
+                   'URI' => 0,
+                   'MooX::StrictConstructor' => 0,
                    'Locale::TextDomain::OO::Util' => 0,
-                   'Test::Exception' => 0
-                 },
-  'VERSION_FROM' => 'lib/Locale/Utils/Autotranslator.pm',
-  'INSTALLDIRS' => 'site',
-  'PL_FILES' => {},
-  'EXE_FILES' => []
+                   'Locale::PO' => '0.27',
+                   'MooX::Types::MooseLike::Base' => 0,
+                   'Path::Tiny' => 0,
+                   'namespace::autoclean' => 0,
+                   'MooX::Types::MooseLike::Numeric' => 0,
+                   'JSON' => 0,
+                   'HTTP::Request::Common' => 0,
+                   'HTML::Entities' => 0
+                 }
 )
 ;

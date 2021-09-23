@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.194';
+our $VERSION = '1.195';
 
 =encoding utf8
 
@@ -220,7 +220,15 @@ L<Quiq::DirHandle> - Verzeichnis-Handle
 
 =item *
 
+L<Quiq::Dumper> - Ausgabe Datenstruktur
+
+=item *
+
 L<Quiq::Duration> - Rechnen und Konvertieren von Zeiträumen
+
+=item *
+
+L<Quiq::Eog> - Operationen mit eog
 
 =item *
 
@@ -572,6 +580,10 @@ L<Quiq::List> - Liste von Objekten
 
 =item *
 
+L<Quiq::LockedContent> - Persistenter Dateininhalt mit Lock
+
+=item *
+
 L<Quiq::LockedCounter> - Persistenter Zähler mit Lock
 
 =item *
@@ -625,6 +637,10 @@ L<Quiq::Path> - Dateisystem-Operationen
 =item *
 
 L<Quiq::Perl> - Erweiterte und abgesicherte Perl-Operationen
+
+=item *
+
+L<Quiq::PerlModule> - Perl-Modul
 
 =item *
 
@@ -717,6 +733,10 @@ L<Quiq::Section::Object> - Abschnitts-Objekt
 =item *
 
 L<Quiq::Section::Parser> - Parser für Abschnitte
+
+=item *
+
+L<Quiq::Sendmail> - Versende Mail mit sendmail
 
 =item *
 
@@ -856,6 +876,10 @@ L<Quiq::Timeseries::Synchronizer> - Rasterung/Synchronisation von Zeitreihen
 
 =item *
 
+L<Quiq::Trash> - Operationen auf dem Trash von XFCE
+
+=item *
+
 L<Quiq::TreeFormatter> - Erzeugung von Baumdarstellungen
 
 =item *
@@ -886,7 +910,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.194
+1.195
 
 =head1 AUTHOR
 

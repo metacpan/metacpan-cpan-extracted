@@ -3,9 +3,9 @@ package Term::ANSIColor::Conditional;
 ## no critic (Modules::ProhibitAutomaticExportation)
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-10'; # DATE
+our $DATE = '2021-06-01'; # DATE
 our $DIST = 'Term-ANSIColor-Conditional'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use strict 'subs', 'vars';
 use warnings;
@@ -75,7 +75,7 @@ Term::ANSIColor::Conditional - Colorize text only if color is enabled
 
 =head1 VERSION
 
-This document describes version 0.008 of Term::ANSIColor::Conditional (from Perl distribution Term-ANSIColor-Conditional), released on 2020-08-10.
+This document describes version 0.009 of Term::ANSIColor::Conditional (from Perl distribution Term-ANSIColor-Conditional), released on 2021-06-01.
 
 =head1 SYNOPSIS
 
@@ -104,9 +104,8 @@ How to determine "color is enabled":
 =back
 
 Note that Term::ANSIColor already supports conditional color via the
-C<ANSI_COLORS_DISABLED> environment variable, but it does not support the "more
-standard" C<NO_COLOR> and C<COLOR> variables, and it also does not check for
-interactive terminal.
+C<ANSI_COLORS_DISABLED> and C<NO_COLOR> environment variables, but it does not
+check for interactive terminal or the C<COLOR> environment variable.
 
 =for Pod::Coverage ^(.+)$
 
@@ -154,7 +153,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,28 @@
+=head1 NAME
+
+Stats::Fermi - calculating Fermi-Dirac statistics
+
+=head1 SYNOPSIS
+
+  use Stats::Fermi;
+
+=head1 DESCRIPTION
+
+
+
+=head2 EXPORT
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+koboldwiz, E<lt>koboldwiz@yahoo.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2021 by koboldwiz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.32.0 or,
+at your option, any later version of Perl 5 you may have available.
+

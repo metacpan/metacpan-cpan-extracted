@@ -1,30 +1,33 @@
 Revision history for Perl extension Locale::Utils::Autotranslator.
 
-1.015  Wed Sep 22 12:39:58 2021
+1.016  Wed Sep 23 07:55:32 2021
+- splitted test helper files (different line endings)
+
+1.015  Wed Sep 22 12:39:58 2021 (broken tests)
 - fixed \n in test file content
 
-1.014  Tue Sep 21 16:44:16 2021
+1.014  Tue Sep 21 16:44:16 2021 (broken tests)
 - fixed different \n in po/pot file
 - fixed different \n count in msgstr to msgid
 
-1.013  Mon Aug 31 11:54:38 2021
+1.013  Mon Aug 31 11:54:38 2021 (broken tests)
 - fixed different \n in test
 
-1.012  Mon Aug 30 12:31:12 2021
+1.012  Mon Aug 30 12:31:12 2021 (broken tests)
 - fixed different \n in test
   https://rt.cpan.org/Ticket/Display.html?id=139138
 
-1.011  Fri Aug 23 12:57:48 2021
+1.011  Fri Aug 23 12:57:48 2021 (broken tests)
 - fixed different \n in test
 
-1.010  Fri Aug 20 13:35:52 2021
+1.010  Fri Aug 20 13:35:52 2021 (broken tests)
 - fixed README only
 
-1.009  Fri Aug 20 13:02:16 2021
+1.009  Fri Aug 20 13:02:16 2021 (broken tests)
 - added Locale::Utils::Autotranslator::Interactive
 
 1.008  Mon Mar 26 17:02:48 2018
-- fixed warning i case of undef from API
+- fixed warning in case of undef from API
 
 1.007  Sun Jul 16 20:48:04 2017
 - remove Module::Build from makefile dependencies (2nd try)

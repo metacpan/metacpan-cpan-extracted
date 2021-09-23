@@ -1,0 +1,35 @@
+=head1 NAME
+
+Stats::Hawking - Perl extension for enhancing Random Number generators using
+Hawking Temperature in a Boltzmann Function/Distribution and a seed random. 
+
+=head1 SYNOPSIS
+
+  use Stats::Hawking;
+
+=head1 DESCRIPTION
+
+This software includes a random number generator function using Hawking 
+Temperature. 
+
+=head2 EXPORT
+
+Stats::Hawking::HTRandom->new->random0($solarmass_random);
+Stats::Hawking::HTRandom->new->random1;
+Stats::Hawking::HTRandom->new->random; ### using Boltzmann
+
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+koboldwiz, E<lt>koboldwiz@yahoo.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2021 by koboldwiz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.32.0 or,
+at your option, any later version of Perl 5 you may have available.
+

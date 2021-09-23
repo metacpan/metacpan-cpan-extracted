@@ -1,7 +1,7 @@
 {
     "name" : "App-GhostWork",
-    "version" : "0.02",
-    "abstract" : "Barcode Logger(When,Where,Who,What,toWhich,Why)",
+    "version" : "0.04",
+    "abstract" : "Barcode Logger(When,Where,Who,What,toWhich,Why,Howmanysec)",
     "author" : [
         "ina <ina@cpan.org>"
     ],

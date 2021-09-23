@@ -1,5 +1,5 @@
 package Minion::Backend::MongoDB;
-$Minion::Backend::MongoDB::VERSION = '1.09';
+$Minion::Backend::MongoDB::VERSION = '1.10';
 # ABSTRACT: MongoDB backend for Minion
 
 use 5.016;    # Minion requires this so we require this.
@@ -12,8 +12,6 @@ use BSON::Types qw(:all);
 use DateTime;
 use DateTime::Set;
 use DateTime::Span;
-use Mojo::IOLoop;
-use Mojo::Promise;
 use Mojo::URL;
 use MongoDB;
 use Sys::Hostname qw(hostname);
@@ -47,18 +45,9 @@ sub dequeue {
     my ( $self, $id, $wait, $options ) = @_;
 
     if ( ( my $job = $self->_try( $id, $options ) ) ) { return $job }
-    return undef if Mojo::IOLoop->is_running;
-
-    my $timer = Mojo::IOLoop->timer( $wait => sub { Mojo::IOLoop->stop } );
-    Mojo::Promise->new->resolve->then(
-        sub() {
-            Mojo::IOLoop->stop if ( $self->_await );
-        }
-    )->wait;
-    Mojo::IOLoop->remove($timer);
+    $self->_await($wait);
 
     return $self->_try( $id, $options );
-
 }
 
 sub enqueue {
@@ -346,11 +335,6 @@ sub new {
     my $db     = $client->db( $client->db_name );
 
     my $self = $class->SUPER::new( dbclient => $client, mongodb => $db );
-    Mojo::IOLoop->singleton->on(
-        reset => sub {
-            $self->mongodb->client->reconnect();
-        }
-    );
     return $self;
 }
 
@@ -505,7 +489,7 @@ sub repair {
     my @ids_to_delete;
     while ( my $doc = $docs->next ) {
         push @ids_to_delete, $doc->{_id}
-          unless ( scalar( @{$doc->{parents}} ) );
+          unless ( scalar( @{ $doc->{parents} } ) );
     }
     $jobs->delete_many( { _id => { '$in' => \@ids_to_delete } } );
 
@@ -661,16 +645,18 @@ sub worker_info {
 
 sub _await {
     my $self = shift;
-
-    my $last   = $self->{last} //= BSON::OID->new;
+    my $wait = shift || 0.5;
+    $wait *= 1000;
+    my $last =
+      $self->notifications->find_one( {}, {}, { sort => { _id => -1 } } )
+      ->{_id};
     my $cursor = $self->notifications->find(
         {
             _id   => { '$gt' => $last },
             '$or' => [ { c => 'created' }, { c => 'update_retries' } ]
         }
-    )->tailable_await(1);
-    return undef unless my @doc = $cursor->all;
-    $self->{last} = $doc[-1]->{_id};
+    )->tailable_await(1)->max_await_time_ms($wait);
+    return undef unless my $doc = $cursor->has_next;
     return 1;
 }
 
@@ -831,7 +817,7 @@ sub _reconnect_db {
             $_[1]->on(
                 dequeue => sub {
                     $_[1]->on(
-                        start => sub {
+                        spawn => sub {
                             $s->minion->backend->mongodb->client->reconnect();
                         }
                     );
@@ -1001,7 +987,7 @@ Minion::Backend::MongoDB - MongoDB backend for Minion
 
 =head1 VERSION
 
-version 1.09
+version 1.10
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,11 @@
 Revision history for XS-Parse-Keyword
 
+0.17    2021-09-23
+        [CHANGES]
+         * Support certain kinds of list operands on LHS of infix operators
+         * Generate wrapper functions around list-list infix operators, which
+           unpack their argument lists from two ARRAYrefs
+
 0.16    2021-09-21
         [CHANGES]
          * Attempt automatic deparsing of infix operators

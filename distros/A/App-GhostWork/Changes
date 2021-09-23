@@ -1,5 +1,16 @@
 Revision history for this software.
 
+0.04  2021-09-24 00:00:00
+  - output CSV file, too
+  - created by INABA Hitoshi
+
+0.03  2021-09-23 00:00:00
+  - rename LTSV-label 'when' to 'when_'
+  - rename LTSV-label 'where' to 'where_'
+  - add LTSV-label 'howmanysec' that means how many seconds used to make it
+  - add checking double scanned barcode
+  - created by INABA Hitoshi
+
 0.02  2021-09-21 00:00:00
   - fix 9001_podtest.t
   - created by INABA Hitoshi

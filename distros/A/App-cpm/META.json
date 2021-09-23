@@ -4,7 +4,7 @@
       "Shoichi Kaji <skaji@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.023, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -64,7 +64,6 @@
             "Module::cpmfile" : "0.001",
             "Parallel::Pipes" : "0.004",
             "Parse::PMFile" : "0.43",
-            "YAML::PP" : "0.026",
             "local::lib" : "2.000018",
             "parent" : "0",
             "perl" : "5.008001",
@@ -75,7 +74,7 @@
    "provides" : {
       "App::cpm" : {
          "file" : "lib/App/cpm.pm",
-         "version" : "0.997006"
+         "version" : "0.997007"
       },
       "App::cpm::CLI" : {
          "file" : "lib/App/cpm/CLI.pm"
@@ -168,7 +167,7 @@
          "web" : "https://github.com/skaji/cpm"
       }
    },
-   "version" : "0.997006",
+   "version" : "0.997007",
    "x_contributors" : [
       "Andrew Rodland <andrew@cleverdomain.org>",
       "Dave Rolsky <autarch@urth.org>",

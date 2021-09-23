@@ -76,6 +76,10 @@ static OP *new_op(pTHX_ const struct HooksAndData hd, U32 flags, OP *lhs, OP *rh
   return ret;
 }
 
+/* force_list nulls out the OP_LIST itself but preserves the OP_PUSHMARK
+ * inside it. This is essential or else op_contextualize() will null out
+ * both of them and we lose the mark
+ */
 /* copypasta from core's op.c */
 #define force_list(o, nullit)  S_force_list(aTHX_ o, nullit)
 static OP *S_force_list(pTHX_ OP *o, bool nullit)
@@ -92,7 +96,8 @@ static OP *S_force_list(pTHX_ OP *o, bool nullit)
   }
   if(nullit)
     op_null(o);
-  return o;
+  /* our copy also does this */
+  return op_contextualize(o, G_LIST);
 }
 
 #ifdef HAVE_PL_INFIX_PLUGIN
@@ -100,6 +105,15 @@ static OP *S_force_list(pTHX_ OP *o, bool nullit)
 OP *parse(pTHX_ OP *lhs, struct Perl_custom_infix *def)
 {
   struct Registration *reg = (struct Registration *)def;
+
+  switch(reg->hd.hooks->lhs_flags & 0x07) {
+    case XPI_OPERAND_TERM:
+      break;
+
+    case XPI_OPERAND_TERM_LIST:
+      lhs = force_list(lhs, TRUE);
+      break;
+  }
 
   /* TODO: maybe operator has a 'parse' hook? */
 
@@ -112,15 +126,11 @@ OP *parse(pTHX_ OP *lhs, struct Perl_custom_infix *def)
       break;
 
     case XPI_OPERAND_TERM_LIST:
-      /* force_list nulls out the OP_LIST itself but preserves the OP_PUSHMARK
-       * inside it. This is essential or else op_contextualize() will null out
-       * both of them and we lose the mark
-       */
-      rhs = op_contextualize(force_list(parse_termexpr(0), TRUE), G_LIST);
+      rhs = force_list(parse_termexpr(0), TRUE);
       break;
 
     case XPI_OPERAND_LIST:
-      rhs = op_contextualize(force_list(parse_listexpr(0), TRUE), G_LIST);
+      rhs = force_list(parse_listexpr(0), TRUE);
       break;
 
     default:
@@ -287,7 +297,7 @@ static OP *S_newSLUGOP(pTHX_ int idx)
   return op;
 }
 
-static void make_wrapper_func(pTHX_ const struct HooksAndData *hd, U8 rhs_type)
+static void make_wrapper_func(pTHX_ const struct HooksAndData *hd, U8 args_flags)
 {
   /* Prepare to make a new optree-based CV */
   I32 floor_ix = start_subparse(FALSE, 0);
@@ -300,7 +310,8 @@ static void make_wrapper_func(pTHX_ const struct HooksAndData *hd, U8 rhs_type)
   OP *body = NULL;
   OP *(*ckcall)(pTHX_ OP *, GV *, SV *) = NULL;
 
-  switch(rhs_type) {
+  switch(args_flags) {
+    /* scalar OP scalar */
     case XPI_OPERAND_TERM:
       body = op_append_list(OP_LINESEQ, body,
           make_argcheck_ops(2, 0, 0, funcname));
@@ -315,6 +326,7 @@ static void make_wrapper_func(pTHX_ const struct HooksAndData *hd, U8 rhs_type)
       ckcall = &ckcall_wrapper_func;
       break;
 
+    /* scalar OP list */
     case XPI_OPERAND_TERM_LIST:
     case XPI_OPERAND_LIST:
       body = op_append_list(OP_LINESEQ, body,
@@ -330,6 +342,29 @@ static void make_wrapper_func(pTHX_ const struct HooksAndData *hd, U8 rhs_type)
             force_list(newUNOP(OP_RV2AV, OPf_WANT_LIST, newGVOP(OP_GV, 0, PL_defgv)), TRUE)));
 
       /* no ckcall */
+      break;
+
+    /* list OP list */
+    case (XPI_OPERAND_TERM_LIST<<4) | XPI_OPERAND_TERM_LIST:
+    case (XPI_OPERAND_TERM_LIST<<4) | XPI_OPERAND_LIST:
+      body = op_append_list(OP_LINESEQ, body,
+          make_argcheck_ops(2, 0, 0, funcname));
+
+      body = op_append_list(OP_LINESEQ, body,
+          newSTATEOP(0, NULL, NULL));
+
+      /* Body of the function is  @{ $_[0] } OP @{ $_[1] } */
+      body = op_append_list(OP_LINESEQ, body,
+          new_op(aTHX_ *hd, 0,
+            force_list(newUNOP(OP_RV2AV, 0, newSLUGOP(0)), TRUE),
+            force_list(newUNOP(OP_RV2AV, 0, newSLUGOP(1)), TRUE)));
+
+      /* no ckcall */
+      break;
+
+    default:
+      croak("TODO: Unsure how to make wrapper func for args_flags=%02X\n",
+          args_flags);
       break;
   }
 
@@ -427,6 +462,30 @@ static void reg_builtin(pTHX_ const char *opname, enum XSParseInfixClassificatio
 
 void XSParseInfix_register(pTHX_ const char *opname, const struct XSParseInfixHooks *hooks, void *hookdata)
 {
+  switch(hooks->flags) {
+    case 0:
+      break;
+    default:
+      croak("Unrecognised XSParseInfixHooks.flags value 0x%X", hooks->flags);
+  }
+
+  switch(hooks->lhs_flags) {
+    case XPI_OPERAND_TERM:
+    case XPI_OPERAND_TERM_LIST:
+      break;
+    default:
+      croak("Unrecognised XSParseInfixHooks.lhs_flags value 0x%X", hooks->lhs_flags);
+  }
+
+  switch(hooks->rhs_flags) {
+    case XPI_OPERAND_TERM:
+    case XPI_OPERAND_TERM_LIST:
+    case XPI_OPERAND_LIST:
+      break;
+    default:
+      croak("Unrecognised XSParseInfixHooks.rhs_flags value 0x%X", hooks->rhs_flags);
+  }
+
   struct Registration *reg;
   Newx(reg, 1, struct Registration);
 
@@ -465,7 +524,7 @@ void XSParseInfix_register(pTHX_ const char *opname, const struct XSParseInfixHo
   }
 
   if(hooks->wrapper_func_name) {
-    make_wrapper_func(aTHX_ &reg->hd, (hooks->rhs_flags & 0x07));
+    make_wrapper_func(aTHX_ &reg->hd, (hooks->lhs_flags & 0x07) << 4 | (hooks->rhs_flags & 0x07));
   }
 
   if(hooks->ppaddr) {

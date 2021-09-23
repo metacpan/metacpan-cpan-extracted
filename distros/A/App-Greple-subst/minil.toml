@@ -1,5 +1,6 @@
 name = "App-Greple-subst"
 # badges = ["travis-ci.com"]
+badges = ['github-actions/test', 'metacpan']
 authority="cpan:UTASHIRO"
 
 module_maker="ModuleBuildTiny"

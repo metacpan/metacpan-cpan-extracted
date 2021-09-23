@@ -279,7 +279,7 @@ $desc = <<'ESQ';
 ESQ
 
 use lib 'lib';
-use Convert::ASN1;
+use Convert::ASN1 qw(:debug);
 use Convert::ASN1::Debug qw(asn_dump asn_hexdump);
 $asn = Convert::ASN1->new;
 $asn->prepare($desc) or die $asn->error;

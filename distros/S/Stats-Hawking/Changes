@@ -1,6 +1,14 @@
 Revision history for Perl extension Stats::Hawking.
 
-0.01  Mon Apr 12 20:39:34 2021
+0.1.3 Thu 23 sept 2021 2:19 am
+
+	added Boltzmann with Hawking Temperature random
+
+0.1.2 Thu 23 sept 2021
+
+	fixed lib, added random number generator class 
+
+0.1.1  Mon Apr 12 20:39:34 2021
 	- original version; created by h2xs 1.23 with options
 		-X -n Stats::Hawking
 

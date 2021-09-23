@@ -1,5 +1,13 @@
 Revision history for Perl extension Stats::Fermi.
 
+0.1.7 Thu 23 Sept 2021
+
+	fixed pod file
+
+0.1.6 Thu 23 Sept 2021
+
+	fixed libs
+
 0.1.3 Mon Apr 12 7:22 2021
 
 	bugfixes, package should be ready to use

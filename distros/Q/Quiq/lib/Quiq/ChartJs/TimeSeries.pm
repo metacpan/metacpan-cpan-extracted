@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.194';
+our $VERSION = '1.195';
 
 use Quiq::Json;
 use Quiq::Array;
@@ -819,7 +819,7 @@ Zoomen in die Daten. Wie? Plugin?
 
 =head1 VERSION
 
-1.194
+1.195
 
 =head1 AUTHOR
 

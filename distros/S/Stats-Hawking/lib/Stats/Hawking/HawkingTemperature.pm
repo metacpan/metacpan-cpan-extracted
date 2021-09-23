@@ -1,4 +1,4 @@
-package Stats::Fermi::DiracFunc;
+package Stats::Hawking::HawkingTemperature;
 
 sub new {
 	my ($class) = @_;

@@ -9,39 +9,91 @@ subst::Dict - Dictionary object for App::Greple::subst
 package App::Greple::subst::Dict {
 
     use v5.14;
-    use strict;
     use warnings;
     use utf8;
     use open IO => ':utf8', ':std';
-    use Encode qw(decode);
+    use Encode qw(encode decode);
+    use Data::Dumper;
 
-    sub new {
-	my $class = shift;
-	bless [], $class;
-    }
-
-    sub words_ref {
-	my $obj = shift;
-	$obj;
-    }
+    use Mo qw(default build); {
+	has VERSION => ;
+	has NAME    => ;
+	has FILE    => ;
+	has DATA    => ;
+	has LIST    => default => [] ;
+	has CONFIG  => default => {} ;
+	sub BUILD {
+	    my($obj, $args) = @_;
+	    if (my $file = $obj->FILE) {
+		$obj->read_file($file);
+	    }
+	    elsif (my $data = $obj->DATA) {
+		$obj->read_data($data);
+	    }
+	}
+    } no Mo;
 
     sub words {
 	my $obj = shift;
-	my $ref = $obj->words_ref;
-	@{$ref};
+	@{$obj->LIST};
     }
 
     sub add {
 	my $obj = shift;
-	my $ref = $obj->words_ref;
-	push @$ref, App::Greple::subst::Dict::Ent->new(@_);
+	push @{$obj->LIST}, App::Greple::subst::Dict::Ent->new(@_);
 	$obj;
     }
 
     sub add_comment {
 	my $obj = shift;
-	my $ref = $obj->words_ref;
-	push @$ref, App::Greple::subst::Dict::Ent->new_comment(@_);
+	push @{$obj->LIST}, App::Greple::subst::Dict::Ent->new_comment(@_);
+	$obj;
+    }
+
+    sub read_data {
+	my $obj = shift or die;
+	my $data = shift;
+	$obj->NAME("DATA");
+	if (utf8::is_utf8 $data) {
+	    $data = encode 'utf8', $data;
+	}
+	open my $fh, "<", \$data;
+	$obj->read_fh($fh);
+	$obj;
+    }
+
+    sub read_file {
+	my $obj = shift or die;
+	my $file = shift;
+	$obj->FILE($file);
+	$obj->NAME($file =~ s[.*/][]r);
+	say $file if $obj->CONFIG->{dictname};
+	open my $fh, "<", $file or die "$file: $!\n";
+	$obj->read_fh($fh);
+	$obj;
+    }
+
+    use App::Greple::Pattern;
+
+    sub read_fh {
+	my $obj = shift or die;
+	my $conf = $obj->CONFIG;
+	my $fh = shift;
+	local $_;
+	my $flag = FLAG_REGEX;
+	$flag |= FLAG_COOK if $conf->{linefold};
+	while (<$fh>) {
+	    chomp;
+	    say if $conf->{printdict};
+	    if (not /^\s*[^#]/) {
+		$obj->add_comment($_);
+		next;
+	    }
+	    my @param = grep { not m{^//+$} } split ' ';
+	    splice @param, 0, -2; # leave last one or two
+	    my($pattern, $correct) = @param;
+	    $obj->add($pattern, $correct, flag => $flag);
+	}
 	$obj;
     }
 
@@ -108,10 +160,9 @@ package App::Greple::subst::Dict {
 }
 
 package App::Greple::subst::Dict::Ent {
+
     use v5.14;
-    use strict;
     use warnings;
-    use utf8;
 
     use Exporter 'import';
     our @EXPORT_OK = qw(print_dict);
@@ -156,6 +207,7 @@ package App::Greple::subst::Dict::Ent {
 	my $obj = shift;
 	defined $obj->{COMMENT};
     }
+
 }
 
 1;

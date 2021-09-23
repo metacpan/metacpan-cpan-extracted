@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.10",
+   "generated_by" : "Minilla/v3.1.12",
    "license" : [
       "perl_5"
    ],
@@ -33,6 +33,8 @@
       },
       "develop" : {
          "requires" : {
+            "Data::Section" : "0.200007",
+            "Data::Section::Simple" : "0.07",
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
             "Test::PAUSE::Permissions" : "0.07",
@@ -42,19 +44,22 @@
       },
       "runtime" : {
          "requires" : {
-            "App::Greple" : "8.4002",
-            "Data::Section" : "0.200007",
+            "App::Greple" : "8.4601",
             "File::Share" : "0",
-            "Getopt::EX" : "v1.18.0",
-            "Getopt::EX::termcolor" : "1.06",
+            "Getopt::EX" : "0",
+            "Getopt::EX::termcolor" : "1.07",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "Mo" : "0",
             "Regexp::Assemble" : "0",
-            "Text::VisualPrintf" : "2.03",
+            "Text::VisualPrintf" : "4.01",
             "Text::VisualWidth::PP" : "0.05",
             "perl" : "v5.14.0"
          }
       },
       "test" : {
          "requires" : {
+            "Command::Runner" : "0",
             "Test::More" : "0.98"
          }
       }
@@ -62,16 +67,13 @@
    "provides" : {
       "App::Greple::subst" : {
          "file" : "lib/App/Greple/subst.pm",
-         "version" : "2.1403"
+         "version" : "2.2901"
       },
       "App::Greple::subst::Dict" : {
          "file" : "lib/App/Greple/subst/Dict.pm"
       },
       "App::Greple::subst::Dict::Ent" : {
          "file" : "lib/App/Greple/subst/Dict.pm"
-      },
-      "App::Greple::subst::SmartString" : {
-         "file" : "lib/App/Greple/subst.pm"
       },
       "App::Greple::subst::dyncmap" : {
          "file" : "lib/App/Greple/subst/dyncmap.pm"
@@ -88,7 +90,7 @@
          "web" : "https://github.com/kaz-utashiro/greple-subst"
       }
    },
-   "version" : "2.1403",
+   "version" : "2.2901",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

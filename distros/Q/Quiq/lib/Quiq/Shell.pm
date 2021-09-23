@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.194';
+our $VERSION = '1.195';
 
 use Time::HiRes ();
 use Quiq::Duration;
@@ -167,7 +167,8 @@ sub DESTROY {
         # printf $fd "%s%s: %s\n",$pre,$prog,$duration;
         my $esc = $self->{'cmdAnsiColor'};
         my $a = Quiq::AnsiColor->new($esc);
-        printf $fd $a->strLn($esc,sprintf "%s%s: %s",$pre,$prog,$duration);
+        # printf $fd $a->strLn($esc,sprintf "%s%s: %s",$pre,$prog,$duration);
+        printf $fd $a->strLn($esc,sprintf "%s%s",$pre,$duration);
     }
 
     return;
@@ -634,7 +635,7 @@ sub _logCmd {
 
 =head1 VERSION
 
-1.194
+1.195
 
 =head1 AUTHOR
 

@@ -3,11 +3,12 @@ abstract: 'Greple module for text search and substitution'
 author:
   - 'Kazumasa Utashiro'
 build_requires:
+  Command::Runner: '0'
   Test::More: '0.98'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,30 +27,30 @@ no_index:
 provides:
   App::Greple::subst:
     file: lib/App/Greple/subst.pm
-    version: '2.1403'
+    version: '2.2901'
   App::Greple::subst::Dict:
     file: lib/App/Greple/subst/Dict.pm
   App::Greple::subst::Dict::Ent:
     file: lib/App/Greple/subst/Dict.pm
-  App::Greple::subst::SmartString:
-    file: lib/App/Greple/subst.pm
   App::Greple::subst::dyncmap:
     file: lib/App/Greple/subst/dyncmap.pm
 requires:
-  App::Greple: '8.4002'
-  Data::Section: '0.200007'
+  App::Greple: '8.4601'
   File::Share: '0'
-  Getopt::EX: v1.18.0
-  Getopt::EX::termcolor: '1.06'
+  Getopt::EX: '0'
+  Getopt::EX::termcolor: '1.07'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  Mo: '0'
   Regexp::Assemble: '0'
-  Text::VisualPrintf: '2.03'
+  Text::VisualPrintf: '4.01'
   Text::VisualWidth::PP: '0.05'
   perl: v5.14.0
 resources:
   bugtracker: https://github.com/kaz-utashiro/greple-subst/issues
   homepage: https://github.com/kaz-utashiro/greple-subst
   repository: git://github.com/kaz-utashiro/greple-subst.git
-version: '2.1403'
+version: '2.2901'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

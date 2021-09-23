@@ -51,7 +51,7 @@ my @data = grep length, split qr/ ^ (.*)\n ◯.*\n ✕.*\n /mx, $data;
 
 use Regexp::Assemble;
 
-my $dict = new App::Greple::subst::Dict;
+my $dict = App::Greple::subst::Dict->new;
 
 while (my($a, $b) = splice @data, 0, 2) {
     for my $comment ( "#", "# $a", "#" ) {

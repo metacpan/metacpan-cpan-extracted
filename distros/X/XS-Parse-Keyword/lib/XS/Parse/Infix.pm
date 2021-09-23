@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Infix 0.16;
+package XS::Parse::Infix 0.17;
 
 use v5.14;
 use warnings;
@@ -113,7 +113,8 @@ The C<XSParseInfixHooks> structure provides the following fields which are
 used at various stages of parsing.
 
    struct XSParseInfixHooks {
-      U16 flags; U8 lhs_flags;  /* currently ignored */
+      U16 flags; /* currently ignored */
+      U8 lhs_flags;
       U8 rhs_flags;
       enum XSParseInfixClassification cls;
 
@@ -128,9 +129,8 @@ used at various stages of parsing.
 
 =head2 Flags
 
-The C<flags> and C<lhs_flags> fields are currently ignored. They are defined
-simply to reserve the space in case they are used in a later version. They
-should be set to zero.
+The C<flags> field is currently ignored. It is defined simply to reserve the
+space in case used in a later version. It should be set to zero.
 
 The C<rhs_flags> field gives details on how to parse and handle the right-hand
 side of the operator syntax. It should be set to one of the following constants:
@@ -153,6 +153,12 @@ The operand is a list expression. It will be forced into list context, the
 same as above.
 
 =back
+
+The C<lhs_flags> field gives details on how to handle the left-hand side of
+the operator syntax. It takes similar values to C<rhs_flags>, except that it
+does not accept the C<XPI_OPERAND_LIST> value. Parsing always happens on just
+a term expression, though it may be placed into list context (which therefore
+still permits things like parenthesized lists, or array variables).
 
 =head2 The Selection Stage
 
@@ -211,6 +217,13 @@ remaining arguments, however many there are, form the RHS:
    $result = $lhs OP @rhs;
 
    $result = WRAPPERFUNC( $lhs, @rhs );
+
+For operators whose LHS and RHS is a list, the wrapper function takes two
+arguments which must be array references containing the lists.
+
+   $result = @lhs OP @rhs;
+
+   $result = WRAPPERFUNC( \@lhs, \@rhs );
 
 This creates a convenience for accessing the operator from perls that do not
 support C<PL_infix_plugin>.
@@ -280,6 +293,20 @@ sub B::Deparse::_deparse_infix_named
       $opname,
       $self->deparse_binop_right( $op, $rhs, 14 );
 }
+
+=head1 TODO
+
+=over 4
+
+=item *
+
+Define entersub checker for C<list OP list> wrapper functions. Have it unwrap
+C<WRAPPERFUNC( \@lhs, \@rhs )> or C<WRAPPERFUNC( [LHS], [RHS] )> argument
+forms.
+
+=back
+
+=cut
 
 =head1 AUTHOR
 

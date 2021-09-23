@@ -18,7 +18,7 @@ name: Locale-Utils-Autotranslator
 provides:
   Locale::Utils::Autotranslator:
     file: lib/Locale/Utils/Autotranslator.pm
-    version: '1.015'
+    version: '1.016'
   Locale::Utils::Autotranslator::ApiMymemoryTranslatedNet:
     file: lib/Locale/Utils/Autotranslator/ApiMymemoryTranslatedNet.pm
     version: '1.010'
@@ -49,5 +49,5 @@ requires:
   perl: '5.008'
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.015'
+version: '1.016'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

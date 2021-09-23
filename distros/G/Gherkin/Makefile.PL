@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.012000;
+use 5.014000;
 
 use ExtUtils::MakeMaker;
 
@@ -18,11 +18,12 @@ my %WriteMakefileArgs = (
     "bin/gherkin-generate-tokens"
   ],
   "LICENSE" => "mit",
-  "MIN_PERL_VERSION" => "5.012000",
+  "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "Gherkin",
   "PREREQ_PM" => {
     "Class::XSAccessor" => 0,
     "Cpanel::JSON::XS" => 0,
+    "Cucumber::Messages" => 0,
     "Data::UUID" => 0,
     "Getopt::Long" => "2.36"
   },
@@ -32,7 +33,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "21.0.0",
+  "VERSION" => "22.0.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,6 +43,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Class::XSAccessor" => 0,
   "Cpanel::JSON::XS" => 0,
+  "Cucumber::Messages" => 0,
   "Data::UUID" => 0,
   "Getopt::Long" => "2.36",
   "Path::Class" => 0,

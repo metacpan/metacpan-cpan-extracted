@@ -1,14 +1,14 @@
 package App::GhostWork;
 ######################################################################
 #
-# App::GhostWork - Barcode Logger(When,Where,Who,What,toWhich,Why)
+# App::GhostWork - Barcode Logger(When,Where,Who,What,toWhich,Why,Howmanysec)
 #
 # https://metacpan.org/dist/App-GhostWork
 #
 # Copyright (c) 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSION = '0.02';
+$VERSION = '0.04';
 $VERSION = $VERSION;
 
 use 5.00503;
@@ -23,7 +23,7 @@ __END__
 
 =head1 NAME
 
-App::GhostWork - Barcode Logger(When,Where,Who,What,toWhich,Why)
+App::GhostWork - Barcode Logger(When,Where,Who,What,toWhich,Why,Howmanysec)
 
 =head1 SYNOPSIS
 
@@ -35,21 +35,23 @@ App::GhostWork - Barcode Logger(When,Where,Who,What,toWhich,Why)
 
 =head1 DESCRIPTION
 
-This software creates a log file from barcode data. The log file is in
-LTSV format. Each record has the following labels.
+This software creates log files from barcode data. The log files are in
+LTSV format and CSV format. Each record of LTSV file has the following
+labels.
 
-  -----------------------------------------------------
-  labels:     meanings
-  -----------------------------------------------------
-  csv:        All columns as CSV format
-  when:       When barcode was read ?
-  where:      Where barcode was read ? (COMPUTERNAME)
-  who:        Who read the barcode ?
-  what:       What barcode read ?
-  towhich:    Which status after barcode was read ?
-  why:        Why become its status ? (optional)
-  looseid:    Moderately unique random numbers
-  -----------------------------------------------------
+  --------------------------------------------------------------
+  CSV-col  LTSV-label   meanings
+  --------------------------------------------------------------
+    1      csv          All columns by CSV format
+    2      when_        When barcode was read ?
+    3      where_       Where barcode was read ? (COMPUTERNAME)
+    4      who          Who read the barcode ?
+    5      what         What barcode read ?
+    6      towhich      Which status after barcode was read ?
+    7      why          Why become its status ? (optional)
+    8      howmanysec   How many seconds to make this record
+    9      looseid      Moderately unique random numbers
+  --------------------------------------------------------------
 
 =head2 Command File Name
 
@@ -70,18 +72,12 @@ LTSV format. Each record has the following labels.
 
 =head2 Log File Name
 
-  The barcode information is recorded in a log file with the following
+  The barcode information is recorded in log files with the following
   name.
   -----------------------------------------------------
   LOG/when/towhich/when-towhich-who.ltsv
+  LOG/when/towhich/when-towhich-who.csv
   -----------------------------------------------------
-
-=head2 ***REMOVE_THIS_TIMESTAMP***
-
-Working time per record can be calculated by comparing the "WHEN" of
-adjacent records. The next record after the final work contains string
-"***REMOVE_THIS_TIMESTAMP***" as "WHAT". If you want only barcode
-records, you need to remove those records.
 
 =head1 AUTHOR
 

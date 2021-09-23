@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.023, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,7 +23,7 @@ no_index:
 provides:
   App::cpm:
     file: lib/App/cpm.pm
-    version: '0.997006'
+    version: '0.997007'
   App::cpm::CLI:
     file: lib/App/cpm/CLI.pm
   App::cpm::CircularDependency:
@@ -97,7 +97,6 @@ requires:
   Module::cpmfile: '0.001'
   Parallel::Pipes: '0.004'
   Parse::PMFile: '0.43'
-  YAML::PP: '0.026'
   local::lib: '2.000018'
   parent: '0'
   perl: '5.008001'
@@ -106,7 +105,7 @@ resources:
   bugtracker: https://github.com/skaji/cpm/issues
   homepage: https://github.com/skaji/cpm
   repository: https://github.com/skaji/cpm.git
-version: '0.997006'
+version: '0.997007'
 x_contributors:
   - 'Andrew Rodland <andrew@cleverdomain.org>'
   - 'Dave Rolsky <autarch@urth.org>'

@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.194';
+our $VERSION = '1.195';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -1492,7 +1492,7 @@ sub entries {
     my $argA = $this->parameters(1,1,\@_,
         -encoding => \$encoding,
     );
-    my $dir = shift @$argA;
+    my $dir = $this->expandTilde(shift @$argA);
 
     # Operation ausführen
 
@@ -1532,6 +1532,10 @@ werden gepruned, d.h. sie werden nicht durchsucht. Matcht ein Pfad
 die Pattern sowohl von -pattern als auch -exclude, hat der
 exclude-Pattern Vorrang, d.h. die Datei wird ausgeschlossen.
 
+=item -excludeRoot => $bool (Default: 0)
+
+Nimm das Wurzelverzeichnis $path nicht in die Pfadliste mit auf.
+
 =item -follow => $bool (Default: 1)
 
 Folge Symbolic Links.
@@ -1567,6 +1571,10 @@ Füge einen Slash (/) am Ende von Directory-Namen hinzu.
 
 Wirf keine Exception, wenn $path nicht existiert, sondern liefere
 undef bzw. eine leere Liste.
+
+=item -sort = $bool (Default: 0)
+
+Sortiere die Pfade alphanumerisch.
 
 =item -subPath => $bool (Default: 0)
 
@@ -1613,6 +1621,7 @@ sub find {
 
     my $decode = undef;
     my $exclude = undef;
+    my $excludeRoot = 0;
     my $follow = 1;
     my $leavesOnly = 0;
     my $olderThan = 0;
@@ -1620,6 +1629,7 @@ sub find {
     my $pattern = undef;
     my $slash = 0;
     my $sloppy = 0;
+    my $sort = 0;
     my $subPath = 0;
     my $testSub = undef;
     my $type = undef;
@@ -1629,6 +1639,7 @@ sub find {
         Quiq::Option->extract(\@_,
             -decode => \$decode,
             -exclude => \$exclude,
+            -excludeRoot => \$excludeRoot,
             -follow => \$follow,
             -leavesOnly => \$leavesOnly,
             -olderThan => \$olderThan,
@@ -1636,6 +1647,7 @@ sub find {
             -pattern => \$pattern,
             -slash => \$slash,
             -sloppy => \$sloppy,
+            -sort => \$sort,
             -subPath => \$subPath,
             -testSub => \$testSub,
             -type => \$type,
@@ -1670,6 +1682,10 @@ sub find {
 
     my $sub = sub {
         $File::Find::name =~ s|^\./||; # ./ am Anfang entfernen
+
+        if ($excludeRoot && $File::Find::name eq $dir) {
+            return;
+        }
 
         if ($exclude && $File::Find::name =~ /$exclude/) {
             if (-d) {
@@ -1740,6 +1756,10 @@ sub find {
             }
         }
         @paths = @arr;
+    }
+
+    if ($sort) {
+        @paths = sort @paths;
     }
 
     return wantarray? @paths: \@paths;
@@ -3640,7 +3660,7 @@ sub uid {
 
 =head1 VERSION
 
-1.194
+1.195
 
 =head1 AUTHOR
 

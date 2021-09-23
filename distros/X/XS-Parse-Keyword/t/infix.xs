@@ -91,6 +91,43 @@ static const struct XSParseInfixHooks hooks_intersperse = {
   .ppaddr = &pp_intersperse,
 };
 
+OP *pp_addpairs(pTHX)
+{
+  dSP;
+  U32 rhs_mark = POPMARK;
+  U32 lhs_mark = POPMARK;
+
+  U32 rhs_count = SP - (PL_stack_base + rhs_mark);
+  U32 lhs_count = rhs_mark - lhs_mark;
+
+  SP = PL_stack_base + lhs_mark;
+
+  SV **lhs = PL_stack_base + lhs_mark + 1;
+  SV **rhs = PL_stack_base + rhs_mark + 1;
+
+  PUSHMARK(SP);
+
+  while(lhs_count || rhs_count) {
+    mPUSHi(SvIV(*lhs) + SvIV(*rhs));
+
+    lhs++; lhs_count--;
+    rhs++; rhs_count--;
+  }
+
+  RETURN;
+}
+
+static const struct XSParseInfixHooks hooks_addpairs = {
+  .lhs_flags = XPI_OPERAND_TERM_LIST,
+  .rhs_flags = XPI_OPERAND_TERM_LIST,
+  .permit_hintkey = hintkey,
+  .cls = 0,
+
+  .wrapper_func_name = "t::infix::addpairsfunc",
+
+  .ppaddr = &pp_addpairs,
+};
+
 MODULE = t::infix  PACKAGE = t::infix
 
 BOOT:
@@ -101,3 +138,5 @@ BOOT:
   register_xs_parse_infix("⊕", &hooks_xor, NULL);
 
   register_xs_parse_infix("intersperse", &hooks_intersperse, NULL);
+
+  register_xs_parse_infix("addpairs", &hooks_addpairs, NULL);

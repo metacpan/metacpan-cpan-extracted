@@ -1,11 +1,8 @@
 lib/App/GhostWork.pm
-bin/101_RECEIVED.bat
+bin/101_GOT_LETTER.bat
 bin/201_PASS.bat
 bin/202_FAIL.bat
-bin/301_REPLIED.bat
-bin/Get-OnlyBarcodeRow.bat
-bin/Get-OnlyBarcodeRowCsvCol.bat
-bin/Get-OnlyCsvCol.bat
+bin/301_REPLIED_TO_LETTER.bat
 bin/GhostWork.bat
 bin/GhostWorkEnglish.bat
 bin/GhostWorkJapanese.bat

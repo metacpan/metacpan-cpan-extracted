@@ -155,7 +155,7 @@ sub test_tableOfContents : Test(1) {
     my $gen = Quiq::Sdoc::Producer->new;
     
     my $str = $gen->tableOfContents(
-        maxDepth=>3,
+        maxDepth => 3,
     );
     $self->is($str,qq|%TableOfContents:\n    maxDepth="3"\n\n|);
 }

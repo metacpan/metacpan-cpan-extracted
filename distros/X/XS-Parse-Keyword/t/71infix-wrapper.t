@@ -22,6 +22,9 @@ BEGIN { $^H{"t::infix/permit"} = 1; }
 
    my $aref = [ t::infix::interspersefunc( "Z", "a", "b" ) ];
    is_deeply( $aref, [qw( a Z b )], 'intersperse wrapper func' );
+
+   is_deeply( [ t::infix::addpairsfunc( [ 1, 2 ], [ 3, 4 ] ) ],
+      [ 4, 6 ], 'addpairs wrapper func' );
 }
 
 sub count_ops

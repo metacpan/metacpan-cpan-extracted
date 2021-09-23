@@ -124,7 +124,7 @@ Extension ::= SEQUENCE {
 
 AlgorithmIdentifier ::= SEQUENCE {
 	algorithm		OBJECT IDENTIFIER,
-	parameters		ANY
+	parameters		ANY OPTIONAL
 	}
 
 
@@ -398,7 +398,7 @@ while ( my $filename = shift ) {
 	decodeCert( $der_cert );
 }
 
-sub decodeCert() {
+sub decodeCert {
 	my $der_cert = shift;
 	#asn_dump( $der_cert );
 
