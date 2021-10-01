@@ -1,3 +1,41 @@
+0.61 2021-10-01
+
+ * Improve documentation related to floating point literals.
+
+ * Skip tests that fail due to Perl's broken handling of floating point literals
+   before v5.32.0.
+
+0.60 2021-09-28
+
+ * Separate the bigint, bignum, and bigrat pragmas.
+
+   - The bigint pragma now converts every numeric constant that represents an
+     integer to a Math::BigInt object. Non-integers are converted to
+     Math::BigInt NaNs. With the previous behaviour, only some numeric constant
+     integers were converted to a Math::BigInt.
+
+   - The bignum pragma now converts every numeric constant to a Math::BigFloat
+     object.
+
+   - The bigrat pragma now converts every numeric constant to a Math::BigRat
+     pragma.
+
+   The pragmas no longer activate upgrading and downgrading. The upgrading and
+   downgrading must now be activated explicitly. The rationale behind
+   deactivating it by default is that can cause infinite looping where objects
+   bounce back and forth between different classes. Explicitly requesting a
+   specific class doesn't always work either, because the object might be
+   automatically upgraded or downgraded to a different class.
+
+   Only one pragma can be used at a time in a given scope. Enabling one pragma
+   disables the others in the same scope.
+
+ * Implementat working version of "no bigint", "no bignum", and "no bigrat".
+   Previously, the upgrading and downgrading activated by, e.g., "use bigint"
+   was not deactivated by "no bigint".
+
+ * Sync behaviour with the Math-BigInt distribution.
+
 0.53 2021-07-12
 
  * Sync with the Math-BigInt distribution.

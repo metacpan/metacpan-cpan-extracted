@@ -18,6 +18,7 @@ my @files = (
     'lib/Net/Silverpeak/Orchestrator.pm',
     't/00-compile.t',
     't/api.t',
+    't/api_key_authentication.t',
     't/author-critic.t',
     't/author-distmeta.t',
     't/author-eol.t',

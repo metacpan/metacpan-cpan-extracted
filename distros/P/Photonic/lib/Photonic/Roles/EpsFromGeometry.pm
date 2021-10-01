@@ -1,5 +1,5 @@
 package Photonic::Roles::EpsFromGeometry;
-$Photonic::Roles::EpsFromGeometry::VERSION = '0.018';
+$Photonic::Roles::EpsFromGeometry::VERSION = '0.021';
 
 =encoding UTF-8
 
@@ -52,11 +52,11 @@ Photonic::Roles::EpsFromGeometry
 
 =head1 VERSION
 
-version 0.018
+version 0.021
 
 =head1 SYNOPSIS
 
-    package Photonic::LE::NP::OneH;
+    package Photonic::LE::NP::Haydock;
     use Moose;
     with 'Photonic::Roles::EpsFromGeometry';
 

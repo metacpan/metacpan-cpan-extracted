@@ -258,6 +258,7 @@ SPVM_ENV* SPVM_API_create_env(SPVM_COMPILER* compiler) {
     SPVM_API_call_spvm_method, // call_class_method
     SPVM_API_call_spvm_method, // call_instance_method
     SPVM_API_get_instance_method_id_static,
+    SPVM_API_get_bool_object_value,
   };
   
   SPVM_ENV* env = calloc(sizeof(env_init), 1);
@@ -1497,6 +1498,10 @@ int32_t SPVM_API_call_spvm_method_vm(SPVM_ENV* env, int32_t method_id, SPVM_VALU
       }
       case SPVM_OPCODE_C_ID_BOOL_DOUBLE: {
         int_vars[0] = !!double_vars[opcode->operand1];
+        break;
+      }
+      case SPVM_OPCODE_C_ID_BOOL_BOOL_OBJECT: {
+        int_vars[0] = !!env->get_bool_object_value(env, *(void**)&object_vars[opcode->operand1]);
         break;
       }
       case SPVM_OPCODE_C_ID_BOOL_OBJECT: {
@@ -5665,6 +5670,21 @@ SPVM_OBJECT* SPVM_API_new_string_raw(SPVM_ENV* env, const char* bytes, int32_t l
   }
 
   return object;
+}
+
+int32_t SPVM_API_get_filed_first_int(SPVM_ENV* env, SPVM_OBJECT* object) {
+
+  int32_t value = *(int32_t*)((intptr_t)object + env->object_header_byte_size);
+  
+  return value;
+}
+
+int32_t SPVM_API_get_bool_object_value(SPVM_ENV* env, SPVM_OBJECT* bool_object) {
+  (void)env;
+
+  int32_t value = SPVM_API_get_filed_first_int(env, bool_object);
+  
+  return value;
 }
 
 SPVM_OBJECT* SPVM_API_new_string(SPVM_ENV* env, const char* bytes, int32_t length) {

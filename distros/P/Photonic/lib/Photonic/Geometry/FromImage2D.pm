@@ -1,5 +1,5 @@
 package Photonic::Geometry::FromImage2D;
-$Photonic::Geometry::FromImage2D::VERSION = '0.018';
+$Photonic::Geometry::FromImage2D::VERSION = '0.021';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::Geometry::FromImage2D
 
 =head1 VERSION
 
-version 0.018
+version 0.021
 
 =head1 COPYRIGHT NOTICE
 
@@ -70,7 +70,7 @@ inverted. Its size must be odd along both directions.
 $L is the size of the unit cell along the cartesian axes. By
 default, it is the number of pixels.
 
-$i controls whether the characteriztic function ought to be
+$i controls whether the characteristic function ought to be
 inverted: 1 means invert, 0 don't invert. Default: 0
 
 =back
@@ -83,7 +83,7 @@ inverted: 1 means invert, 0 don't invert. Default: 0
 
 The filename containing the image
 
-=item * For the other accesors, see Photonic::Geometry
+=item * For the other accessors, see Photonic::Geometry
 
 =back
 

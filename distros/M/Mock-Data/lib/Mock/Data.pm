@@ -1,7 +1,7 @@
 package Mock::Data;
 
 # ABSTRACT: Extensible toolkit for generating mock data
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 use strict;
@@ -30,8 +30,7 @@ sub new {
 			: (@_ == 1 && ref $_[0] eq 'HASH')? $_[0]
 			: { @_ };
 		if (my $plugins= $args->{plugins}) {
-			$self= $self->load_plugin($_)
-				for ref $plugins? @$plugins : ( $plugins );
+			$self= $self->load_plugin(ref $plugins? @$plugins : ( $plugins ));
 		}
 		$self->add_generators($args->{generators})
 			if $args->{generators};
@@ -77,19 +76,21 @@ sub generator_state {
 
 
 sub load_plugin {
-	my ($self, $name)= @_;
-	return $self if $self->{_loaded_plugins}{$name};
-	my $class= "Mock::Data::Plugin::$name";
-	unless ($class->can('apply_mockdata_plugin')) {
-		Module::Runtime::require_module($class);
-		$class->can('apply_mockdata_plugin')
-			or Carp::croak("No such method ${class}->apply_mockdata_plugin");
+	my ($self, @names)= @_;
+	for my $name (@names) {
+		next if $self->{_loaded_plugins}{$name};
+		my $class= "Mock::Data::Plugin::$name";
+		unless ($class->can('apply_mockdata_plugin')) {
+			Module::Runtime::require_module($class);
+			$class->can('apply_mockdata_plugin')
+				or Carp::croak("No such method ${class}->apply_mockdata_plugin");
+		}
+		$self= $class->apply_mockdata_plugin($self);
+		ref($self) && ref($self)->isa(__PACKAGE__)
+			or Carp::croak("$class->apply_mockdata_plugin did not return a Mock::Data");
+		++$self->{_loaded_plugins}{$name};
 	}
-	my $new= $class->apply_mockdata_plugin($self);
-	ref($new) && ref($new)->isa(__PACKAGE__)
-		or Carp::croak("$class->apply_mockdata_plugin did not return a Mock::Data");
-	++$self->{_loaded_plugins}{$name};
-	return $new;
+	return $self;
 }
 
 
@@ -101,9 +102,8 @@ sub add_generators {
 		$gen= Mock::Data::Util::coerce_generator($gen);
 		$self->generators->{$name}= $gen;
 		delete $self->{_generator_cache}{$name};
-		if ($name =~ /::([^:]+)$/ and !defined $self->generators->{$1}) {
-			$self->generators->{$1}= $gen;
-		}
+		$self->generators->{$1} //= $gen
+			if $name =~ /::([^:]+)$/
 	}
 	$self;
 }
@@ -168,7 +168,8 @@ sub DESTROY {} # prevent AUTOLOAD from triggering on ->DESTROY
 
 
 sub import {
-	Mock::Data::Util->export_to_level(1, @_);
+	shift;
+	Mock::Data::Util->import_into(scalar caller, @_);
 }
 
 require Mock::Data::Util;
@@ -419,7 +420,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 COPYRIGHT AND LICENSE
 

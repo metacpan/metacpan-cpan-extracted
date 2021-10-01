@@ -26,6 +26,7 @@ t/01_run.t
 t/JA-bad.txt
 t/JA.dict
 t/JA.txt
+t/Runner.pm
 t/Util.pm
 t/data_shishin.docx
 t/data_shishin.txt

@@ -4,9 +4,13 @@ package Array::Iterator::BiDirectional;
 use strict;
 use warnings;
 
-our $VERSION = '0.130'; # VERSION
-
 use Array::Iterator;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-09-26'; # DATE
+our $DIST = 'Array-Iterator'; # DIST
+our $VERSION = '0.131'; # VERSION
+
 our @ISA = qw(Array::Iterator);
 
 sub has_previous {
@@ -32,16 +36,16 @@ sub previous {
 }
 
 sub get_previous {
-	my ($self) = @_;
-    return undef unless (($self->_current_index - 1) > 0);
-        $self->_iterated = 1;
-	return $self->_getItem($self->_iteratee, --$self->_current_index);
+    my ($self) = @_;
+    return undef unless (($self->_current_index - 1) > 0); ## no critic: Subroutines::ProhibitExplicitReturnUndef
+    $self->_iterated = 1;
+    return $self->_getItem($self->_iteratee, --$self->_current_index);
 }
 
 sub getPrevious { my $self = shift; $self->get_previous(@_) }
 
 sub look_back {
-	my ($self, $n) = @_;
+    my ($self, $n) = @_;
 
     if(not defined $n) { $n = 1 }
     elsif(not $n)      { die "look_back(0) doesn't make sense, did you mean get_previous()?" }
@@ -49,9 +53,9 @@ sub look_back {
 
     my $idx = $self->_current_index - ($n + 1);
 
-    return undef unless ($idx > 0);
+    return undef unless ($idx > 0); ## no critic: Subroutines::ProhibitExplicitReturnUndef
     $self->_iterated = 1;
-	return $self->_getItem($self->_iteratee, $idx);
+    return $self->_getItem($self->_iteratee, $idx);
 }
 
 sub lookBack { my $self = shift; $self->look_back(@_) }
@@ -71,7 +75,7 @@ Array::Iterator::BiDirectional - A subclass of Array::Iterator to allow forwards
 
 =head1 VERSION
 
-This document describes version 0.130 of Array::Iterator::BiDirectional (from Perl distribution Array-Iterator), released on 2021-08-09.
+This document describes version 0.131 of Array::Iterator::BiDirectional (from Perl distribution Array-Iterator), released on 2021-09-26.
 
 =head1 SYNOPSIS
 
@@ -133,17 +137,9 @@ Please visit the project's homepage at L<https://metacpan.org/release/Array-Iter
 
 Source repository is at L<https://github.com/perlancar/perl-Array-Iterator>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Array-Iterator>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
-This is a subclass of B<Array::Iterator>, please refer to it for more documenation.
+This is a subclass of B<Array::Iterator>, please refer to it for more documentation.
 
 =head1 AUTHOR
 
@@ -152,6 +148,23 @@ perlancar <perlancar@cpan.org>
 =head1 ORIGINAL AUTHOR
 
 stevan little, E<lt>stevan@iinteractive.comE<gt>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -168,5 +181,13 @@ L<http://www.iinteractive.com>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Array-Iterator>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

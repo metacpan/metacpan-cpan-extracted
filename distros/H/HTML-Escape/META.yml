@@ -13,7 +13,7 @@ configure_requires:
   Module::Build: '0.4005'
   Module::Build::Pluggable::PPPort: '0.01'
 dynamic_config: 0
-generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,7 +32,7 @@ no_index:
 provides:
   HTML::Escape:
     file: lib/HTML/Escape.pm
-    version: '1.10'
+    version: '1.11'
   HTML::Escape::PurePerl:
     file: lib/HTML/Escape/PurePerl.pm
 requires:
@@ -44,10 +44,12 @@ resources:
   bugtracker: https://github.com/tokuhirom/HTML-Escape/issues
   homepage: https://github.com/tokuhirom/HTML-Escape
   repository: git://github.com/tokuhirom/HTML-Escape.git
-version: '1.10'
+version: '1.11'
 x_contributors:
-  - 'Fuji, Goro <fuji.goro@dena.jp>'
-  - 'Shlomi Fish <shlomif@shlomifish.org>'
   - 'Aaron Crane <arc@cpan.org>'
+  - 'Fuji, Goro <fuji.goro@dena.jp>'
+  - 'Harald Jörg <haj@posteo.de>'
+  - 'Shlomi Fish <shlomif@shlomifish.org>'
   - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.017'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

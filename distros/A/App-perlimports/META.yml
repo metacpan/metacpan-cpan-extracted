@@ -35,15 +35,17 @@ requires:
   Capture::Tiny: '0'
   Class::Inspector: '1.36'
   Data::Dumper: '0'
+  Data::UUID: '0'
   File::Basename: '0'
   Getopt::Long::Descriptive: '0'
   List::Util: '0'
-  Log::Dispatch: '0'
+  Log::Dispatch: '2.70'
   Memoize: '0'
   Module::Runtime: '0'
   Moo: '0'
   Moo::Role: '0'
   MooX::StrictConstructor: '0'
+  PPI: '1.270'
   PPIx::Utils::Classification: '0'
   Path::Tiny: '0'
   Perl::Tidy: '20210402'
@@ -64,7 +66,7 @@ resources:
   bugtracker: https://github.com/oalders/App-perlimports/issues
   homepage: https://github.com/oalders/App-perlimports
   repository: https://github.com/oalders/App-perlimports.git
-version: '0.000019'
+version: '0.000023'
 x_Dist_Zilla:
   perl:
     version: '5.030002'
@@ -497,7 +499,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.000019
+          tag: v0.000023
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

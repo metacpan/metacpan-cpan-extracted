@@ -1,5 +1,5 @@
 package Net::Silverpeak::Orchestrator;
-$Net::Silverpeak::Orchestrator::VERSION = '0.001002';
+$Net::Silverpeak::Orchestrator::VERSION = '0.002000';
 # ABSTRACT: Silverpeak Orchestrator REST API client library
 
 use 5.024;
@@ -63,7 +63,9 @@ sub _build_user_agent ($self) {
 }
 
 sub _error_handler ($self, $res) {
-    my $error_message = $res->data;
+    my $error_message = ref $res->data eq 'HASH' && exists $res->data->{error}
+        ? $res->data->{error}
+        : $res->response->decoded_content;
 
     croak('error (' . $res->code . '): ' . $error_message);
 }
@@ -122,12 +124,42 @@ sub get_templategroup($self, $name) {
 }
 
 
+sub create_templategroup($self, $name, $data = {}) {
+    $data->{name} = $name;
+    my $res = $self->post('/gms/rest/template/templateCreate',
+        $data);
+    $self->_error_handler($res)
+        unless $res->code == 204;
+    return 1;
+}
+
+
+sub update_templates_of_templategroup($self, $name, $templatenames) {
+    croak('templates names must be passed as an arrayref')
+        unless ref $templatenames eq 'ARRAY';
+
+    my $res = $self->post('/gms/rest/template/templateSelection/' . $name,
+        $templatenames);
+    $self->_error_handler($res)
+        unless $res->code == 200;
+    return $res->data;
+}
+
+
 sub update_templategroup($self, $name, $data) {
     my $res = $self->post('/gms/rest/template/templateGroups/' . $name,
         $data);
     $self->_error_handler($res)
         unless $res->code == 200;
     return $res->data;
+}
+
+
+sub delete_templategroup($self, $name) {
+    my $res = $self->delete('/gms/rest/template/templateGroups/' . $name);
+    $self->_error_handler($res)
+        unless $res->code == 204;
+    return 1;
 }
 
 
@@ -165,6 +197,110 @@ sub list_applianceids_by_templategroupname($self, $name) {
     return \@appliance_ids;
 }
 
+
+sub list_addressgroups($self) {
+    my $res = $self->get('/gms/rest/ipObjects/addressGroup');
+    $self->_error_handler($res)
+        unless $res->code == 200;
+    return $res->data;
+}
+
+
+sub list_addressgroup_names($self) {
+    my $res = $self->get('/gms/rest/ipObjects/addressGroupNames');
+    $self->_error_handler($res)
+        unless $res->code == 200;
+    return $res->data;
+}
+
+
+sub get_addressgroup($self, $name) {
+    my $res = $self->get('/gms/rest/ipObjects/addressGroup/' . $name);
+    $self->_error_handler($res)
+        unless $res->code == 200;
+    return $res->data;
+}
+
+
+sub create_or_update_addressgroup($self, $name, $data) {
+    $data->{name} = $name;
+    $data->{type} = 'AG';
+    my $res = $self->post('/gms/rest/ipObjects/addressGroup', $data);
+    $self->_error_handler($res)
+        unless $res->code == 204;
+    return 1;
+}
+
+
+sub update_addressgroup($self, $name, $data) {
+    $data->{name} = $name;
+    $data->{type} = 'AG';
+    my $res = $self->put('/gms/rest/ipObjects/addressGroup', $data);
+    $self->_error_handler($res)
+        unless $res->code == 204;
+    return 1;
+}
+
+
+sub delete_addressgroup($self, $name) {
+    my $res = $self->delete('/gms/rest/ipObjects/addressGroup/' . $name);
+    $self->_error_handler($res)
+        unless $res->code == 204;
+    return 1;
+}
+
+
+sub list_servicegroups($self) {
+    my $res = $self->get('/gms/rest/ipObjects/serviceGroup');
+    $self->_error_handler($res)
+        unless $res->code == 200;
+    return $res->data;
+}
+
+
+sub list_servicegroup_names($self) {
+    my $res = $self->get('/gms/rest/ipObjects/serviceGroupNames');
+    $self->_error_handler($res)
+        unless $res->code == 200;
+    return $res->data;
+}
+
+
+sub get_servicegroup($self, $name) {
+    my $res = $self->get('/gms/rest/ipObjects/serviceGroup/' . $name);
+    $self->_error_handler($res)
+        unless $res->code == 200;
+    return $res->data;
+}
+
+
+sub create_or_update_servicegroup($self, $name, $data) {
+    $data->{name} = $name;
+    $data->{type} = 'SG';
+    my $res = $self->post('/gms/rest/ipObjects/serviceGroup', $data);
+    $self->_error_handler($res)
+        unless $res->code == 204;
+    return 1;
+}
+
+
+sub update_servicegroup($self, $name, $data) {
+    $data->{name} = $name;
+    $data->{type} = 'SG';
+    my $res = $self->put('/gms/rest/ipObjects/serviceGroup', $data);
+    $self->_error_handler($res)
+        unless $res->code == 204;
+    return 1;
+}
+
+
+sub delete_servicegroup($self, $name) {
+    my $res = $self->delete('/gms/rest/ipObjects/serviceGroup/' . $name);
+    $self->_error_handler($res)
+        unless $res->code == 204;
+    return 1;
+}
+
 1;
 
 __END__
@@ -179,7 +315,7 @@ Net::Silverpeak::Orchestrator - Silverpeak Orchestrator REST API client library
 
 =head1 VERSION
 
-version 0.001002
+version 0.002000
 
 =head1 SYNOPSIS
 
@@ -233,9 +369,33 @@ Returns an arrayref of template groups.
 
 Returns a template group by name.
 
+=head2 create_templategroup
+
+Takes a template group name and a hashref with its config.
+
+Returns true on success.
+
+Throws an exception on error.
+
+=head2 update_templates_of_templategroup
+
+Takes a template group name and an arrayref of template names.
+
+Returns true on success.
+
+Throws an exception on error.
+
 =head2 update_templategroup
 
 Takes a template group name and a hashref of template configs.
+
+Returns true on success.
+
+Throws an exception on error.
+
+=head2 delete_templategroup
+
+Takes a template group name.
 
 Returns true on success.
 
@@ -256,6 +416,78 @@ Returns a hashref of template to appliances associations.
 =head2 list_applianceids_by_templategroupname
 
 Returns an arrayref of appliance IDs a templategroup is assigned to.
+
+=head2 list_addressgroups
+
+Returns an arrayref of address groups.
+
+=head2 list_addressgroup_names
+
+Returns an arrayref of address group names.
+
+=head2 get_addressgroup
+
+Returns a address group by name.
+
+=head2 create_or_update_addressgroup
+
+Takes a address group name and a hashref of address group config.
+
+Returns true on success.
+
+Throws an exception on error.
+
+=head2 update_addressgroup
+
+Takes a address group name and a hashref of address group config.
+
+Returns true on success.
+
+Throws an exception on error.
+
+=head2 delete_addressgroup
+
+Takes a address group name.
+
+Returns true on success.
+
+Throws an exception on error.
+
+=head2 list_servicegroups
+
+Returns an arrayref of service groups.
+
+=head2 list_servicegroup_names
+
+Returns an arrayref of service group names.
+
+=head2 get_servicegroup
+
+Returns a service group by name.
+
+=head2 create_or_update_servicegroup
+
+Takes a service group name and a hashref of service group config.
+
+Returns true on success.
+
+Throws an exception on error.
+
+=head2 update_servicegroup
+
+Takes a service group name and a hashref of service group config.
+
+Returns true on success.
+
+Throws an exception on error.
+
+=head2 delete_servicegroup
+
+Takes a service group name.
+
+Returns true on success.
+
+Throws an exception on error.
 
 =head1 KNOWN SILVERPEAK ORCHESTRATOR BUGS
 

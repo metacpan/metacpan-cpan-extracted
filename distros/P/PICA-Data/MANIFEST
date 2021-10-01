@@ -36,6 +36,7 @@ t/10-data.t
 t/12-clean.t
 t/15-path.t
 t/16-match.t
+t/16-path-examples.t
 t/20-parser.t
 t/25-encoding.t
 t/30-writer.t
@@ -48,6 +49,7 @@ t/90-patch.t
 t/files/annotated.pica
 t/files/bgb.example
 t/files/dump.dat
+t/files/filter-test.pp
 t/files/pica.binary
 t/files/pica.json
 t/files/pica.plain

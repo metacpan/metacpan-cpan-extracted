@@ -1,9 +1,11 @@
+use strict; use warnings;
+
 package DBIx::Connector::Driver::mysql;
 
-use strict;
-use warnings;
-use base 'DBIx::Connector::Driver';
-our $VERSION = '0.56';
+use DBIx::Connector::Driver;
+
+our $VERSION = '0.57';
+our @ISA = qw( DBIx::Connector::Driver );
 
 sub _connect {
     my ($self, $dbh) = @_;
@@ -27,6 +29,7 @@ sub rollback_to {
 }
 
 1;
+
 __END__
 
 =head1 Name
@@ -62,7 +65,7 @@ functionality in C<fixup> mode.
 
 =head1 Authors
 
-This module was written and is maintained by:
+This module was written by:
 
 =over
 

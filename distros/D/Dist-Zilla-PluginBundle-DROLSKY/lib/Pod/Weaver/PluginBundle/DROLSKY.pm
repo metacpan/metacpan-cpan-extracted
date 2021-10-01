@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean -also => ['_exp'];
 
-our $VERSION = '1.19';
+our $VERSION = '1.20';
 
 use Dist::Zilla::Plugin::PodWeaver;
 use List::Util qw( first );
@@ -138,35 +138,6 @@ join "\n\n", (
         ? 'There is a mailing list available for users of this distribution,'
             . "\nL<mailto:"
             . $distmeta->{resources}{x_MailingList} . '>.'
-        : (),
-    ),
-    (
-        $distmeta->{resources}{x_IRC}
-        ? 'This distribution also has an IRC channel at' . "\nL<" . do {
-
-            # try to extract the channel
-            if (
-                my ( $network, $channel ) = (
-                    $distmeta->{resources}{x_IRC}
-                        =~ m!(?:://)?(\w+(?:\.\w+)*)/?(#\w+)!
-                )
-                ) {
-                'C<'
-                    . $channel
-                    . '> on C<'
-                    . $network . '>|'
-                    . $distmeta->{resources}{x_IRC};
-            }
-            else {
-                $distmeta->{resources}{x_IRC};
-            }
-            }
-            . '>.'
-        : (),
-    ),
-    (
-        ( $distmeta->{x_authority} // '' ) eq 'cpan:DROLSKY'
-        ? q{I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.}
         : (),
     ),
     )
@@ -322,7 +293,7 @@ Pod::Weaver::PluginBundle::DROLSKY - A plugin bundle for pod woven by DROLSKY
 
 =head1 VERSION
 
-version 1.19
+version 1.20
 
 =head1 SYNOPSIS
 
@@ -501,8 +472,6 @@ L<Dist::Zilla::PluginBundle::DROLSKY>
 =head1 SUPPORT
 
 Bugs may be submitted at L<https://github.com/autarch/Dist-Zilla-PluginBundle-DROLSKY/issues>.
-
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
 =head1 SOURCE
 

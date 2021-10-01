@@ -1,5 +1,5 @@
 package Photonic::LE::NR2::SHP;
-$Photonic::LE::NR2::SHP::VERSION = '0.018';
+$Photonic::LE::NR2::SHP::VERSION = '0.021';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::LE::NR2::SHP
 
 =head1 VERSION
 
-version 0.018
+version 0.021
 
 =head1 COPYRIGHT NOTICE
 
@@ -121,13 +121,13 @@ has 'ndims' =>(is=>'ro', isa=>'Int', init_arg=>undef, lazy=>1,
 
 sub BUILD {
     my $self=shift;
-    my $B=$self->nrf->nr->B;
+    my $B=$self->nrf->haydock->B;
     $self->_density($self->densityA*(1-$B)+$self->densityB*$B);
 }
 
 sub _ndims {
     my $self=shift;
-    return $self->nrf->nr->B->ndims;
+    return $self->nrf->haydock->B->ndims;
 }
 
 __PACKAGE__->meta->make_immutable;

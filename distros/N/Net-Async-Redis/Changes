@@ -1,5 +1,9 @@
 Revision history for Net-Async-Redis
 
+3.016     2021-09-26 02:23:34+08:00 Asia/Kuala_Lumpur
+    [New features]
+    - Added readonly methods from latest Redis, e.g. `->sort_ro` and `->bitfield_ro`
+
 3.015     2021-07-27 03:47:43+08:00 Asia/Kuala_Lumpur
     [Bugs fixed]
     - The CLUSTER INFO command generated warnings (RT138053, thanks to Nael for

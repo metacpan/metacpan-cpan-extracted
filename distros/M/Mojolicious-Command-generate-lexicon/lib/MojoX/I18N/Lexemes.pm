@@ -5,7 +5,7 @@ use warnings;
 
 use base 'Mojo::Base';
 
-our $VERSION = 0.994;
+our $VERSION = 0.995;
 
 use Mojo::Template;
 use Mojo::Server;
@@ -28,7 +28,7 @@ sub parse {
         for (my $j = 0; $j < @{$line}; $j += 2) {
             my $type  = $line->[$j];
             my $value = $line->[$j + 1] || '';
-            if ($value){
+            if ($value) {
                 $value =~ s/^\s*//;
             }
 
@@ -44,7 +44,7 @@ sub parse {
                 && $value
                 && substr($value, 0, length($self->helper) + 1) eq
                 $self->helper . ' ')
-                {
+            {
 
                 $args = substr $value, length($self->helper) + 1;
 
@@ -134,7 +134,7 @@ Sergey Zasenko, C<undef@cpan.org>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2015, Sergey Zasenko
+Copyright (C) 2015-2021, Serhii Zasenko
 
 This program is free software, you can redistribute it and/or modify it
 under the terms of the Artistic License version 2.0.

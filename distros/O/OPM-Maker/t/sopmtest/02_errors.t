@@ -18,7 +18,7 @@ my $textfile    = File::Spec->catfile( $dir, 'test.sopm' );
 my $invalid_xml = File::Spec->catfile( $dir, 'invalid.sopm' );
 
 {
-    my $error = 'Cannot parse .sopm:';
+    my $error = 'Invalid .opm';
 
     my $exec_output = capture_stdout {
         OPM::Maker::Command::sopmtest::execute( undef, {}, [ $textfile ] );
@@ -30,7 +30,7 @@ my $invalid_xml = File::Spec->catfile( $dir, 'invalid.sopm' );
 }
 
 {
-    my $error = 'Cannot parse .sopm:';
+    my $error = 'No file given';
 
     my $exec_output = capture_stdout {
         OPM::Maker::Command::sopmtest::execute( undef, {}, [ undef ] );
@@ -42,7 +42,7 @@ my $invalid_xml = File::Spec->catfile( $dir, 'invalid.sopm' );
 }
 
 {
-    my $error = 'Cannot parse .sopm:';
+    my $error = 'does not exist';
 
     my $exec_output = capture_stdout {
         OPM::Maker::Command::sopmtest::execute( undef, {}, [ '/tmp/does/not/exist_yet.sopm' ] );
@@ -54,7 +54,7 @@ my $invalid_xml = File::Spec->catfile( $dir, 'invalid.sopm' );
 }
 
 {
-    my $error = '.sopm is not valid:';
+    my $error = 'Invalid .opm';
 
     my $exec_output = capture_stdout {
         OPM::Maker::Command::sopmtest::execute( undef, {}, [ $invalid_xml ] );

@@ -1,9 +1,11 @@
+# no code
+## no critic: TestingAndDebugging::RequireUseStrict
 package ArrayData;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-18'; # DATE
+our $DATE = '2021-09-26'; # DATE
 our $DIST = 'ArrayData'; # DIST
-our $VERSION = '0.2.3'; # VERSION
+our $VERSION = '0.2.4'; # VERSION
 
 1;
 # ABSTRACT: Specification for ArrayData::*, modules that contains array data
@@ -24,7 +26,7 @@ ArrayData - Specification for ArrayData::*, modules that contains array data
 
 =head1 VERSION
 
-This document describes version 0.2.3 of ArrayData (from Perl distribution ArrayData), released on 2021-05-18.
+This document describes version 0.2.4 of ArrayData (from Perl distribution ArrayData), released on 2021-09-26.
 
 =head1 SYNOPSIS
 
@@ -44,7 +46,7 @@ array data are:
 
 =item * list of country names in English (L<ArrayData::CountryName::EN>)
 
-=item * list of Indonesian words from L<KBBI|https://kbbi.kemdikbud.go.id/> dictionary (L<ArrayData::Word::ID::KBBI>)
+=item * list of Indonesian words from L<KBBI|https://kbbi.kemdikbud.go.id/> dictionary (L<ArrayData::Lingua::Word::ID::KBBI>)
 
 Also under L<WordList::ID::KBBI>.
 
@@ -65,32 +67,40 @@ C<ArrayData::*> modules.
 
 =head1 NAMESPACE ORGANIZATION
 
+=head2 ArrayData
+
 C<ArrayData> (this module) is the specification.
 
-All the modules under C<ArrayData::*> should be modules with actual data (base
-classes should be put in C<ArrayDataBase::*>, roles in C<ArrayDataRole::*>).
+All the modules under C<ArrayData::*> should be modules with actual data.
 
-More specific subnamespaces for more specific types of elements:
+More specific subnamespaces for more specific topics and/or types of elements:
 
 =over
 
-=item * C<ArrayData::String::*>
+=item * C<ArrayData::Lingua::*>
 
-Strings. (But please see other more specific names.)
+See also: C<TableData::Lingua::*>.
 
-=item * C<ArrayData::Word::*>
+=item * C<ArrayData::Lingua::Word::*>
 
 Dictionary word lists (further classified as (further classified in
-C<ArrayData::Word::>I<LanguageCode>C<::*> e.g. L<ArrayData::Word::ID::KBBI>).
-These are designed to replace old L<WordList>::* modules.
+C<ArrayData::Lingua::Word::>I<LanguageCode>C<::*> e.g.
+L<ArrayData::Lingua::Word::ID::KBBI>). These are designed to replace old
+L<WordList>::* modules.
 
-=item * C<ArrayData::Phrase::*>
+See also: C<TableData::Lingua::Word::*>.
+
+=item * C<ArrayData::Lingua::Phrase::*>
 
 Phrase lists. Designed to replace old C<WordList::Phrase::*> modules.
 
+See also: C<TableData::Lingua::Phrase::*>.
+
 =item * C<ArrayData::CPAN::*>
 
-Arrays related to CPAN. Designed to replace old C<WordList::Domain::*> modules.
+Arrays related to CPAN. Designed to replace old C<WordList::CPAN::*> modules.
+
+See also: C<TableData::CPAN::*>.
 
 =item * C<ArrayData::Domain::*>
 
@@ -108,18 +118,44 @@ Numbers.
 
 =item * C<ArrayData::Password::*>
 
-Passwords. Designed to replace old C<WordList::HTTP::*> modules.
+Passwords. Designed to replace old C<WordList::Password::*> modules.
 
 =back
 
-C<ArrayDataBase::*> the base classes. C<ArrayDataBases::*> are main module names
-for distributions that bundle multiple base classes.
-
-C<ArrayDataRole::*> the roles. C<ArrayDataRoles::*> are main module names for
-distributions that bundle multiple roles.
+=head2 ArrayDataBundle
 
 C<ArrayDataBundle::*> are main module names for distributions that contain
 several C<ArrayData> modules.
+
+=head2 ArrayDataBase
+
+C<ArrayDataBase::*> are the base classes. C<ArrayDataBases::*> are main module
+names for distributions that bundle multiple base classes. Since ArrayData is
+largely role-based, it is expected that we do not have many of these base
+classes.
+
+=head2 ArrayDataBases
+
+C<ArrayDataBases::*> are main module names for distributions that bundle
+multiple base classes.
+
+=head2 ArrayDataRole
+
+C<ArrayDataRole::*> are the roles.
+
+=head2 ArrayDataRoles
+
+C<ArrayDataRoles::*> are main module names for distributions that bundle
+multiple roles.
+
+=head2 ArrayDataUtil
+
+C<ArrayDataRole::*> are for other utility modules related to ArrayData.
+
+=head2 ArrayDataUtils
+
+C<ArrayDataUtils::*> are main module names for distributions that bundle
+multiple C<ArrayDataUtil::*> modules.
 
 =head1 FAQ
 
@@ -156,14 +192,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/ArrayData>
 
 Source repository is at L<https://github.com/perlancar/perl-ArrayData>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-ArrayData/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<HashData>, L<TableData> are related projects.
@@ -175,11 +203,36 @@ L<HashData> & L<TableData> are a generalization and cleanup of the WordList API.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=ArrayData>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

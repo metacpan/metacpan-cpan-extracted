@@ -1,5 +1,5 @@
 package Photonic::LE::NR2::Field;
-$Photonic::LE::NR2::Field::VERSION = '0.018';
+$Photonic::LE::NR2::Field::VERSION = '0.021';
 
 
 =encoding UTF-8
@@ -10,7 +10,7 @@ Photonic::LE::NR2::Field
 
 =head1 VERSION
 
-version 0.018
+version 0.021
 
 =head1 COPYRIGHT NOTICE
 
@@ -58,13 +58,13 @@ the components.
 
 =over 4
 
-=item * new(nr=>$nr, nh=>$nh, smallE=>$smallE)
+=item * new(haydock=>$nr, nh=>$nh, smallE=>$smallE)
 
 Initializes the structure.
 
-$nr Photonic::LE::NR2::AllH is a Haydock calculator for the
+$nr Photonic::LE::NR2::Haydock is a Haydock calculator for the
 structure, *initialized* with the flag keepStates=>1
-(Photonic::Types::AllHSave, as defined in Photonic::Types).
+(Photonic::Types::HaydockSave, as defined in Photonic::Types).
 
 $nh is the maximum number of Haydock coefficients to use.
 
@@ -82,9 +82,9 @@ dielectric functions of the host $epsA and the particle $epsB.
 
 =over 4
 
-=item * nr
+=item * haydock
 
-Photonic::LE::NR2::AllH structure
+Photonic::LE::NR2::Haydock structure
 
 =item * nh
 
@@ -121,7 +121,7 @@ Real space field in format ri,xy,nx,ny,...
 
 =item * epsL
 
-Longitudinal dielectric response, obtained colateraly from last
+Longitudinal dielectric response, obtained colaterally from last
 evaluation of the field
 
 =back
@@ -138,14 +138,14 @@ evaluation of the field
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
-use Photonic::LE::NR2::AllH;
+use Photonic::LE::NR2::Haydock;
 use Photonic::Utils qw(cgtsv GtoR);
 use Photonic::Types;
 use Photonic::Iterator qw(nextval);
 use Moose;
 use MooseX::StrictConstructor;
 
-has 'nr'=>(is=>'ro', isa=>'Photonic::Types::AllHSave', required=>1,
+has 'haydock'=>(is=>'ro', isa=>'Photonic::Types::HaydockSave', required=>1,
            documentation=>'Haydock recursion calculator');
 has 'Es'=>(is=>'ro', isa=>'ArrayRef[Photonic::Types::PDLComplex]', init_arg=>undef,
            writer=>'_Es', documentation=>'Field coefficients');
@@ -172,7 +172,7 @@ has 'u'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=
 
 sub BUILD {
     my $self=shift;
-    $self->nr->run unless $self->nr->iteration;
+    $self->haydock->run unless $self->haydock->iteration;
 }
 
 sub evaluate {
@@ -180,12 +180,12 @@ sub evaluate {
     $self->_epsA(my $epsA=shift);
     $self->_epsB(my $epsB=shift);
     $self->_u(my $u=1/(1-$epsB/$epsA));
-    my $as=$self->nr->as;
-    my $bs=$self->nr->bs;
-    my $stateit=$self->nr->state_iterator;
+    my $as=$self->haydock->as;
+    my $bs=$self->haydock->bs;
+    my $stateit=$self->haydock->state_iterator;
     my $nh=$self->nh; #desired number of Haydock terms
     #don't go beyond available values.
-    $nh=$self->nr->iteration if $nh>=$self->nr->iteration;
+    $nh=$self->haydock->iteration if $nh>=$self->haydock->iteration;
     # calculate using lapack for tridiag system
     # solve \epsilon^LL \vec E^L=D^L.
     # At first take D=|0>
@@ -203,11 +203,11 @@ sub evaluate {
     my $Es= $result*$epsL;
     #states are nx,ny...
     #field is cartesian,nx,ny...
-    my @dims=$self->nr->B->dims; # actual dims of space
+    my @dims=$self->haydock->B->dims; # actual dims of space
     my $ndims=@dims; # num. of dims of space
     my $field_G=PDL->zeroes($ndims, @dims)->r2C;
     #field is cartesian, nx, ny...
-    my $nrGnorm = $self->nr->GNorm->r2C;
+    my $nrGnorm = $self->haydock->GNorm->r2C;
     for(my $n=0; $n<$nh; ++$n){
 	my $GPsi_G=($stateit->nextval->dummy(0) * $nrGnorm);#^G|psi_n>
 	#the result is cartesian, nx, ny,...
@@ -217,7 +217,7 @@ sub evaluate {
     $field_G *= $self->filter->(*1) if $self->has_filter;
     #get cartesian out of the way, fourier transform, put cartesian.
     my $field_R=GtoR($field_G, $ndims, 1);
-    $field_R*=$self->nr->B->nelem; #scale to have unit macroscopic field
+    $field_R*=$self->haydock->B->nelem; #scale to have unit macroscopic field
     #result is cartesian, nx, ny,...
     $self->_field($field_R);
     return $field_R;

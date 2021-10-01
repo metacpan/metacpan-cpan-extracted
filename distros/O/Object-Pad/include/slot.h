@@ -29,6 +29,6 @@ struct SlotMeta {
     }                                                                                     \
   }
 
-void ObjectPad__boot_slots(void);
+void ObjectPad__boot_slots(pTHX);
 
 #endif

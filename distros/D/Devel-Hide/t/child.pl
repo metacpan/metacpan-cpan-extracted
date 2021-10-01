@@ -2,7 +2,9 @@ use strict;
 use warnings;
 
 my $warnings;
-BEGIN { $SIG{__WARN__} = sub { $warnings++ } }
+BEGIN { $SIG{__WARN__} = sub {
+    $warnings++ if($_[0] =~ /^Devel::Hide/)
+} }
 my %args;
 BEGIN {
     %args = map {

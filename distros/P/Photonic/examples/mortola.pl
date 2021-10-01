@@ -1,4 +1,7 @@
 #! /usr/bin/env perl
+# run this from the top directory, not inside "examples"
+# use "-Ilib" to find the modules if not installed, eg:
+#     perl -Ilib examples/mortola.pl
 # Proof of Spinor (S) module using Mortola results
 
 =head1 COPYRIGHT NOTICE
@@ -40,9 +43,8 @@ use feature qw(say);
 
 use Getopt::Long;
 
-use lib qw(../../Photonic/lib);
 use Photonic::Geometry::FromEpsilon;
-use Photonic::LE::S::AllH;
+use Photonic::LE::S::Haydock;
 use Photonic::LE::S::EpsL;
 use PDL;
 use PDL::NiceSlice;
@@ -56,10 +58,10 @@ my $seed=12345;
 srand $seed;
 my $N=100;
 my $l=1;
-my $epsA=pdl(sprintf("%.2f %.2f", rand(),rand()))->complex;
-my $epsB=pdl(sprintf("%.2f %.2f", rand(),rand()))->complex;
-my $epsC=pdl(sprintf("%.2f %.2f", rand(),rand()))->complex;
-my $epsD=pdl(sprintf("%.2f %.2f", rand(),rand()))->complex;
+my $epsA=pdl(sprintf("%.2f+%.2fi", rand(),rand()));
+my $epsB=pdl(sprintf("%.2f+%.2fi", rand(),rand()));
+my $epsC=pdl(sprintf("%.2f+%.2fi", rand(),rand()));
+my $epsD=pdl(sprintf("%.2f+%.2fi", rand(),rand()));
 my $e=FourPhases($N,$epsA,$epsB,$epsC,$epsD);
 
 my %epsM=(
@@ -68,15 +70,14 @@ yy=>sqrt($epsA*$epsB*$epsC*$epsD*(1/$epsA+1/$epsB+1/$epsC+1/$epsD)*($epsA+$epsD)
 );
 
 my $filename="epsM_S_${seed}_eA${epsA}_eB${epsB}_eC${epsC}_eD${epsD}_N${N}_Nh${nh}"; $filename=~s/\./_/g; $filename.=".dat";
-open(OUT, ">", "../data/$filename") or die "Couldn't open $filename for writing. $!";
+open(OUT, ">", "data/$filename") or die "Couldn't open $filename for writing. $!";
 print OUT "#  dir epsM_re (Mortola)  epsM_im (Mortola)  epsM_re (Spinor)    epsM_im (Spinor) \n";
-my ($g,$allh,$nr)=(PDL->null,PDL->null,PDL->null);
 
 my %dir=(xx=>pdl(1,0),yy=>pdl(0,1));
 foreach my $x (keys %dir){
-    $g=Photonic::Geometry::FromEpsilon->new(epsilon=>$e,L=>pdl($l,$l),Direction0=>$dir{$x});
-    $allh=Photonic::LE::S::AllH->new(geometry=>$g, nh=>$nh);
-    $nr=Photonic::LE::S::EpsL->new(nr=>$allh,nh=>$nh);
+    my $g=Photonic::Geometry::FromEpsilon->new(epsilon=>$e,L=>pdl($l,$l),Direction0=>$dir{$x});
+    my $allh=Photonic::LE::S::Haydock->new(geometry=>$g, nh=>$nh);
+    my $nr=Photonic::LE::S::EpsL->new(haydock=>$allh,nh=>$nh);
     say OUT join " ", $x, $epsM{$x}->re, $epsM{$x}->im, $nr->epsL->re, $nr->epsL->im;
 
 }
@@ -108,16 +109,14 @@ sub FourPhases { #checkboard
     my $eC=shift;
     my $eD=shift;
 #    my $z=zeroes(2*$N+1,2*$N+1); #change to admit arbitrary lattice
-    $eB=($eB*ones($N,$N))->mv(0,-1);
-    my $z=$eB->glue(1,($eA*ones($N,$N+1))->mv(0,-1));
-    $eC=($eC*ones($N+1,$N))->mv(0,-1);
-    $z=$z->glue(0,($eC->glue(1,($eD*ones($N+1,$N+1))->mv(0,-1))));
-    $z=$z->mv(-1,0);
-    $z(,,$N).=($z(,,$N+1)+$z(,,$N-1))/2;
-    $z(,$N,).=($z(,$N+1,)+$z(,$N-1,))/2;
+    $eB=$eB*ones($N,$N);
+    my $z=$eB->glue(1,$eA*ones($N,$N+1));
+    $eC=$eC*ones($N+1,$N);
+    $z=$z->glue(0,$eC->glue(1,$eD*ones($N+1,$N+1)));
+    $z(,$N).=($z(,$N+1)+$z(,$N-1))/2;
+    $z($N,).=($z($N+1,)+$z($N-1,))/2;
     return $z;
 }
-
 
 sub eps{
     my $epsi=shift;
@@ -131,6 +130,3 @@ sub eps{
     my $eps=$eps_re+i*$eps_im;
     return ($h_nu, $eps);
 }
-
-
-

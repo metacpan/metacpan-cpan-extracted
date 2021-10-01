@@ -1,7 +1,5 @@
-#!/usr/bin/env perl -w
+use strict; use warnings;
 
-use strict;
-use warnings;
 use Test::More tests => 34;
 #use Test::More 'no_plan';
 
@@ -17,7 +15,7 @@ BEGIN {
 
 # Validate the subclasses.
 for my $dr (@SUBCLASSES) {
-    isa_ok $dr => $CLASS;
+    ok eval { $dr->isa( $CLASS ) }, "The class (or class-like) '$dr' isa '$CLASS'";
     can_ok $dr => qw(
         new
         ping

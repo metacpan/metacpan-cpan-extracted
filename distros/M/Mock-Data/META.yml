@@ -18,11 +18,12 @@ name: Mock-Data
 no_index: {}
 requires:
   Carp: '0'
-  Exporter: '0'
+  Exporter::Extensible: '0'
   Hash::Util: '0'
   List::Util: '0'
   MRO::Compat: '0'
   Module::Runtime: '0'
+  POSIX: '0'
   Scalar::Util: '0'
   Storable: '0'
   Unicode::UCD: '0'
@@ -35,7 +36,7 @@ requires:
 resources:
   bugtracker: https://github.com/nrdvana/perl-Mock-Data/issues
   repository: https://github.com/nrdvana/perl-Mock-Data.git
-version: '0.02'
+version: '0.03'
 x_generated_by_perl: v5.26.3
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

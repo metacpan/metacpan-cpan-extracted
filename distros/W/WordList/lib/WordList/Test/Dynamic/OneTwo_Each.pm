@@ -1,10 +1,5 @@
 package WordList::Test::Dynamic::OneTwo_Each;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-23'; # DATE
-our $DIST = 'WordList'; # DIST
-our $VERSION = '0.7.10'; # VERSION
-
 use strict;
 
 use WordList;
@@ -12,6 +7,11 @@ our @ISA = qw(WordList);
 
 use Role::Tiny::With;
 with 'WordListRole::FirstNextResetFromEach';
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-09-26'; # DATE
+our $DIST = 'WordList'; # DIST
+our $VERSION = '0.7.11'; # VERSION
 
 our $DYNAMIC = 1;
 
@@ -22,11 +22,11 @@ sub each_word {
 
     for ("one", "two") {
         my $ret = $code->($_);
-        return undef if defined $ret && $ret == -2;
+        return undef if defined $ret && $ret == -2; ## no critic: Subroutines::ProhibitExplicitReturnUndef
     }
 }
 
-our %STATS = ("shortest_word_len",3,"num_words_contains_unicode",0,"num_words_contain_nonword_chars",0,"longest_word_len",3,"num_words",2,"num_words_contain_whitespace",0,"num_words_contains_nonword_chars",0,"avg_word_len",3,"num_words_contain_unicode",0,"num_words_contains_whitespace",0); # STATS
+our %STATS = ("num_words_contains_unicode",0,"num_words_contains_nonword_chars",0,"shortest_word_len",3,"num_words_contains_whitespace",0,"num_words_contain_unicode",0,"num_words_contain_nonword_chars",0,"num_words",2,"longest_word_len",3,"avg_word_len",3,"num_words_contain_whitespace",0); # STATS
 
 1;
 # ABSTRACT: Wordlist that returns one, two (via implementing each_word())
@@ -43,7 +43,7 @@ WordList::Test::Dynamic::OneTwo_Each - Wordlist that returns one, two (via imple
 
 =head1 VERSION
 
-This document describes version 0.7.10 of WordList::Test::Dynamic::OneTwo_Each (from Perl distribution WordList), released on 2021-06-23.
+This document describes version 0.7.11 of WordList::Test::Dynamic::OneTwo_Each (from Perl distribution WordList), released on 2021-09-26.
 
 =head1 SYNOPSIS
 
@@ -79,6 +79,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/WordList>.
 
 Source repository is at L<https://github.com/perlancar/perl-WordList>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2020, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=WordList>
@@ -86,16 +114,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020, 2018, 2017, 2016 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

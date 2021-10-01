@@ -18,11 +18,11 @@ my $meta_merge = {
 WriteMakefile(
     NAME         => 'Mojolicious::Command::generate::lexicon',
     VERSION_FROM => 'lib/Mojolicious/Command/generate/lexicon.pm',
-    AUTHOR       => 'Sergey Zasenko <undef@cpan.org>',
+    AUTHOR       => 'Serhii Zasenko <undef@cpan.org>',
     PREREQ_PM    => {
         'File::Find'     => 0,
         'Getopt::Long'   => 0,
-        'Mojolicious'    => '6.0',
+        'Mojolicious'    => '9.21',
         'String::Escape' => 0,
     },
     TEST_REQUIRES => {

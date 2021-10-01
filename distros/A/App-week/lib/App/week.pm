@@ -1,5 +1,5 @@
 package App::week;
-our $VERSION = "1.0202";
+our $VERSION = "1.0203";
 
 use v5.14;
 use warnings;
@@ -43,7 +43,9 @@ use Getopt::EX::Hashed; {
 
     Getopt::EX::Hashed->configure(DEFAULT => [ is => 'ro' ]);
 
-    has ARGV => default => [];
+    has ARGV     => default => [];
+    has COLORMAP => is => 'rw';
+    has CM       => is => 'rw';
 
     my($sec, $min, $hour, $mday, $mon, $year) = CORE::localtime(time);
     has year => default => $year + 1900;
@@ -53,10 +55,6 @@ use Getopt::EX::Hashed; {
     has cell_width   => default => 22;
     has frame        => default => '  ';
     has frame_height => default => 1;
-
-    my %colormap = %DEFAULT_COLORMAP;
-    has COLORMAP => default => \%colormap;
-    has CM       => default => Getopt::EX::Colormap->new(HASH => \%colormap);
 
     # option params
     has help        => spec => ' h        ' ;
@@ -150,8 +148,10 @@ sub deal_option {
     my $app = shift;
 
     # load --colormap option
-    $app->CM
-	->load_params(@{$app->colormap});
+    my %colormap = %DEFAULT_COLORMAP;
+    $app->COLORMAP(\%colormap);
+    $app->CM(Getopt::EX::Colormap->new(HASH => \%colormap)
+	     ->load_params(@{$app->colormap}));
 
     # --colordump
     if ($app->colordump) {

@@ -28,6 +28,8 @@ my @files = (
     't/author-pod-syntax.t',
     't/author-portability.t',
     't/basic.t',
+    't/mode-prod.t',
+    't/mode.t',
     't/no-minify.t',
     't/release-check-manifest.t',
     't/release-fixme.t',

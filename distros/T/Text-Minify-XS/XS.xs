@@ -91,13 +91,16 @@ STATIC U8* TextMinify(pTHX_ U8* src, STRLEN len, STRLEN* packed) {
     ptr = trailing;
     UV c = *ptr;
     STRLEN skip = UTF8SKIP(ptr);
-    if (!UTF8_IS_INVARIANT(c))
+    if (!UTF8_IS_INVARIANT(c)) {
       c = utf8_to_uvchr_buf(ptr, ptr + skip, &skip);
       if (c == 0) {
         c = *ptr;
+      }
+    }
+    if (isEOL(c)) {
+      if ((int) skip <= 0) {
         skip = 1;
       }
-    if (isEOL(c)) {
       ptr += skip;
     }
   }

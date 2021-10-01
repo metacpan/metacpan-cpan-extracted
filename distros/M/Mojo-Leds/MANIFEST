@@ -8,6 +8,7 @@ Makefile.PL
 README
 lib/Mojo/Leds.pm
 lib/Mojo/Leds/Page.pm
+lib/Mojo/Leds/Plugin/CommonRoutes.pm
 lib/Mojo/Leds/Rest.pm
 lib/Mojo/Leds/Rest/DBIx.pm
 lib/Mojo/Leds/Rest/MongoDB.pm
@@ -27,6 +28,7 @@ t/30-restify_mongodb.t
 t/40-restify_dbix.t
 t/50-server_errors.t
 t/60-leds_app.t
+t/70-common_routes.t
 t/site/cfg/app.cfg
 t/site/lib/Skel.pm
 t/site/www/public/static.html

@@ -1,5 +1,5 @@
 package Photonic::WE::S::EpsilonP;
-$Photonic::WE::S::EpsilonP::VERSION = '0.018';
+$Photonic::WE::S::EpsilonP::VERSION = '0.021';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::S::EpsilonP
 
 =head1 VERSION
 
-version 0.018
+version 0.021
 
 =head1 COPYRIGHT NOTICE
 
@@ -50,7 +50,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 =head1 DESCRIPTION
 
 Calculates the macroscopic dielectric tensor component for a given fixed
-Photonic::WE::S::AllH structure as a function of the dielectric
+Photonic::WE::S::Haydock structure as a function of the dielectric
 functions of the components.
 
 NOTE: Only works for polarizations along principal directions.
@@ -63,7 +63,7 @@ NOTE: Only works for polarizations along principal directions.
 
 Initializes the structure.
 
-$h Photonic::WE::S::AllH describing the structure and some parametres.
+$h Photonic::WE::S::Haydock describing the structure and some parametres.
 
 $nh is the maximum number of Haydock coefficients to use.
 
@@ -90,7 +90,7 @@ NOTE: Only works along principal directions.
 
 The macroscopic dielectric projection of the last operation
 
-=item * All accesors of Photonic::WE::S::Wave
+=item * All accessors of Photonic::WE::S::Wave
 
 
 =back

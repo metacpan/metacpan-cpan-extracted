@@ -10,7 +10,7 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Plisco::Macro;
-$Chess::Plisco::Macro::VERSION = '0.2';
+$Chess::Plisco::Macro::VERSION = '0.3';
 use strict;
 
 use Filter::Util::Call;
@@ -55,6 +55,8 @@ _define cp_pos_signature => '$p', '$p->[CP_POS_SIGNATURE]';
 sub cp_pos_signature {}
 _define cp_pos_info => '$p', '$p->[CP_POS_INFO]';
 sub cp_pos_info {}
+_define cp_pos_reversible_clock => '$p', '$p->[CP_POS_REVERSIBLE_CLOCK]';
+sub cp_pos_reversible_clock {}
 
 _define cp_pos_info_castling_rights => '$i', '$i & 0xf';
 sub cp_pos_info_castling_rights {}
@@ -181,7 +183,10 @@ _define cp_move_set_color => '$m', '$c',
 sub cp_move_set_captured {}
 _define cp_move_coordinate_notation => '$m', 'cp_shift_to_square(cp_move_from $m) . cp_shift_to_square(cp_move_to $m) . CP_PIECE_CHARS->[CP_BLACK]->[cp_move_promote $m]';
 sub cp_move_coordinate_notation {}
-_define cp_move_equivalent => '$m1', '$m2', '(($m1 & 0x7fff) == ($m2 & 0x7fff))';
+_define cp_move_significant => '$m', '($m & 0x7fff)';
+sub cp_move_significant {}
+_define cp_move_equivalent => '$m1', '$m2',
+		'(cp_move_significant($m1) == cp_move_significant($m2))';
 sub cp_move_equivalent {}
 
 # Bitboard macros.
@@ -199,6 +204,8 @@ _define_from_file cp_bitboard_count_trailing_zbits => '$bb', 'countTrailingZbits
 sub cp_bitboard_count_trailing_zbits {}
 _define cp_bitboard_clear_least_set => '$bb', '(($bb) & (($bb) - 1))';
 sub cp_bitboard_clear_least_set {}
+_define cp_bitboard_more_than_one_set => '$bb', '($bb && ($bb & ($bb - 1)))';
+sub cp_bitboard_more_than_one_set {}
 
 # Magic moves.
 _define cp_mm_bmagic => '$s', '$o',

@@ -45,7 +45,7 @@
    "provides" : {
       "DateTime::Calendar::Julian" : {
          "file" : "lib/DateTime/Calendar/Julian.pm",
-         "version" : "0.105"
+         "version" : "0.106"
       }
    },
    "release_status" : "stable",
@@ -59,10 +59,10 @@
       ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/trwyant/perl-Date-Tolkien-Shire.git",
-         "web" : "https://github.com/trwyant/perl-Date-Tolkien-Shire"
+         "url" : "git://github.com/trwyant/perl-DateTime-Calendar-Julian.git",
+         "web" : "https://github.com/trwyant/perl-DateTime-Calendar-Julian"
       }
    },
-   "version" : "0.105",
+   "version" : "0.106",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

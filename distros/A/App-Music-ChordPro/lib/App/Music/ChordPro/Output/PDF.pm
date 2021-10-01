@@ -33,7 +33,6 @@ BEGIN {
 use Text::Layout;
 use String::Interpolate::Named;
 
-my $debug_spacing = 0;
 my $verbose = 0;
 
 # For regression testing, run perl with PERL_HASH_SEED set to zero.
@@ -49,11 +48,10 @@ sub generate_songbook {
     my $ps = $config->{pdf};
     my $pr = (__PACKAGE__."::Writer")->new( $ps, $pdfapi );
 
+    my $name = ::runtimeinfo("short");
+    $name =~ s/version.*/regression testing/ if $regtest;
     my %info = ( Title => $sb->{songs}->[0]->{meta}->{title}->[0],
-		 Creator =>
-		 $regtest
-		 ? "$options->{_name} (regression testing)"
-		 : "$options->{_name} $options->{_version}" );
+		 Creator => $name );
     while ( my ( $k, $v ) = each %{ $ps->{info} } ) {
 	next unless defined($v) && $v ne "";
 	$info{ucfirst($k)} = fmt_subst( $sb->{songs}->[0], $v );
@@ -302,7 +300,6 @@ sub generate_song {
     $suppress_empty_lyricsline = $::config->{settings}->{'suppress-empty-lyrics'};
     $inlinechords = $::config->{settings}->{'inline-chords'};
     $chordsunder  = $::config->{settings}->{'chords-under'};
-    $debug_spacing ||= $config->{debug}->{spacing} || $options->{debug};
     my $ps = $::config->clone->{pdf};
     my $pr = $opts->{pr};
     $ps->{pr} = $pr;
@@ -461,7 +458,7 @@ sub generate_song {
 	if ( $ps->{columns} <= 1 ) {
 	    warn("L=", $ps->{__leftmargin},
 	     ", R=", $ps->{__rightmargin},
-	     "\n") if $debug_spacing;
+	     "\n") if $config->{debug}->{spacing};
 	    return;
 	}
 	$x = $ps->{_leftmargin} + $ps->{columnoffsets}->[$col];
@@ -473,7 +470,7 @@ sub generate_song {
 	  if $col < $ps->{columns}-1;
 	warn("C=$col, L=", $ps->{__leftmargin},
 	     ", R=", $ps->{__rightmargin},
-	     "\n") if $debug_spacing;
+	     "\n") if $config->{debug}->{spacing};
 	$y = $ps->{_top};
 	$x += $ps->{_indent};
     };
@@ -544,7 +541,7 @@ sub generate_song {
 	$x = $ps->{__leftmargin};
 	if ( $ps->{headspace} ) {
 	    warn("Metadata for pageheading: ", ::dump($s->{meta}), "\n")
-	      if $options->{debug};
+	      if $config->{debug}->{meta};
 	    $y = $ps->{_margintop} + $ps->{headspace};
 	    $y -= font_bl($fonts->{title});
 	    $tpt->("title");
@@ -687,7 +684,7 @@ sub generate_song {
 	    while ( @chords ) {
 		my $x = $x - $ps->{_indent};
 		$checkspace->($vsp);
-		$pr->show_vpos( $y, 0 ) if $debug_spacing;
+		$pr->show_vpos( $y, 0 ) if $config->{debug}->{spacing};
 
 		for ( 1..$h ) {
 		    last unless @chords;
@@ -696,7 +693,7 @@ sub generate_song {
 		}
 
 		$y -= $vsp;
-		$pr->show_vpos( $y, 1 ) if $debug_spacing;
+		$pr->show_vpos( $y, 1 ) if $config->{debug}->{spacing};
 	    }
 	}
 	elsif ( $show eq "below" ) {
@@ -709,7 +706,7 @@ sub generate_song {
 	    while ( @chords ) {
 		$checkspace->($vsp);
 		my $x = $x - $ps->{_indent};
-		$pr->show_vpos( $y, 0 ) if $debug_spacing;
+		$pr->show_vpos( $y, 0 ) if $config->{debug}->{spacing};
 
 		for ( 1..$h ) {
 		    last unless @chords;
@@ -718,7 +715,7 @@ sub generate_song {
 		}
 
 		$y -= $vsp;
-		$pr->show_vpos( $y, 1 ) if $debug_spacing;
+		$pr->show_vpos( $y, 1 ) if $config->{debug}->{spacing};
 	    }
 	}
     };
@@ -756,7 +753,7 @@ sub generate_song {
 	if ( $elt->{type} ne "set" && !$did++ ) {
 	    # Insert top/left/right/bottom chord diagrams.
  	    $chorddiagrams->() unless $dctl->{show} eq "below";
-	    showlayout($ps) if $ps->{showlayout} || $debug_spacing;
+	    showlayout($ps) if $ps->{showlayout} || $config->{debug}->{spacing};
 	}
 
 	if ( $elt->{type} eq "empty" ) {
@@ -764,10 +761,10 @@ sub generate_song {
 	    warn("***SHOULD NOT HAPPEN1***")
 	      if $s->{structure} eq "structured";
 	    $vsp_ignorefirst = 0, next if $vsp_ignorefirst;
-	    $pr->show_vpos( $y, 0 ) if $debug_spacing;
+	    $pr->show_vpos( $y, 0 ) if $config->{debug}->{spacing};
 	    my $vsp = empty_vsp( $elt, $ps );
 	    $y -= $vsp;
-	    $pr->show_vpos( $y, 1 ) if $debug_spacing;
+	    $pr->show_vpos( $y, 1 ) if $config->{debug}->{spacing};
 	    next;
 	}
 
@@ -811,7 +808,7 @@ sub generate_song {
 	    # Add prespace if fit. Otherwise newpage.
 	    $checkspace->($vsp);
 
-	    $pr->show_vpos( $y, 0 ) if $debug_spacing;
+	    $pr->show_vpos( $y, 0 ) if $config->{debug}->{spacing};
 
 	    my $indent = 0;
 
@@ -832,7 +829,7 @@ sub generate_song {
 	    }
 
 	    # Substitute metadata in comments.
-	    if ( $elt->{type} =~ /^comment/ ) {
+	    if ( $elt->{type} =~ /^comment/ && !$elt->{indent} ) {
 		$elt = { %$elt };
 		# Flatten chords/phrases.
 		if ( $elt->{chords} ) {
@@ -881,7 +878,7 @@ sub generate_song {
 	    my $r = songline( $elt, $x, $y, $ps, song => $s, indent => $indent );
 
 	    $y -= $vsp;
-	    $pr->show_vpos( $y, 1 ) if $debug_spacing;
+	    $pr->show_vpos( $y, 1 ) if $config->{debug}->{spacing};
 
 	    unshift( @elts, $r ) if $r;
 	    next;
@@ -932,7 +929,7 @@ sub generate_song {
 
 	    my $vsp = grid_vsp( $elt, $ps );
 	    $checkspace->($vsp);
-	    $pr->show_vpos( $y, 0 ) if $debug_spacing;
+	    $pr->show_vpos( $y, 0 ) if $config->{debug}->{spacing};
 
 	    my $cells = $grid_margin->[2];
 	    $grid_cellwidth = ( $ps->{__rightmargin}
@@ -943,7 +940,7 @@ sub generate_song {
 	    warn("L=", $ps->{__leftmargin},
 		 ", R=", $ps->{__rightmargin},
 		 ", C=$cells, W=", $grid_cellwidth,
-		 "\n") if $debug_spacing;
+		 "\n") if $config->{debug}->{spacing};
 
 	    gridline( $elt, $x, $y,
 		      $grid_cellwidth,
@@ -952,7 +949,7 @@ sub generate_song {
 		      $ps );
 
 	    $y -= $vsp;
-	    $pr->show_vpos( $y, 1 ) if $debug_spacing;
+	    $pr->show_vpos( $y, 1 ) if $config->{debug}->{spacing};
 
 	    next;
 	}
@@ -973,12 +970,12 @@ sub generate_song {
 
 	    my $vsp = tab_vsp( $elt, $ps );
 	    $checkspace->($vsp);
-	    $pr->show_vpos( $y, 0 ) if $debug_spacing;
+	    $pr->show_vpos( $y, 0 ) if $config->{debug}->{spacing};
 
 	    songline( $elt, $x, $y, $ps );
 
 	    $y -= $vsp;
-	    $pr->show_vpos( $y, 1 ) if $debug_spacing;
+	    $pr->show_vpos( $y, 1 ) if $config->{debug}->{spacing};
 
 	    next;
 	}
@@ -1004,7 +1001,7 @@ sub generate_song {
 	    my $gety = sub {
 		my $h = shift;
 		$checkspace->($h);
-		$ps->{pr}->show_vpos( $y, 1 ) if $debug_spacing;
+		$ps->{pr}->show_vpos( $y, 1 ) if $config->{debug}->{spacing};
 		return $y;
 	    };
 
@@ -1020,17 +1017,20 @@ sub generate_song {
 	    }
 
 	    $y -= $vsp;
-	    $pr->show_vpos( $y, 1 ) if $debug_spacing;
+	    $pr->show_vpos( $y, 1 ) if $config->{debug}->{spacing};
 
 	    next;
 	}
 
 	if ( $elt->{type} eq "rechorus" ) {
 	    my $t = $ps->{chorus}->{recall};
+	    if ( $t->{type} !~ /^comment(?:_italic|_box)?$/ ) {
+		die("Config error: Invalid value for pdf.chorus.recall.type\n");
+	    }
+
 	    if ( $t->{quote} ) {
 		unshift( @elts, @{ $elt->{chorus} } ) if $elt->{chorus};
 	    }
-
 
 	    elsif ( $elt->{chorus}
 		    && $elt->{chorus}->[0]->{type} eq "set"
@@ -1064,12 +1064,12 @@ sub generate_song {
 	if ( $elt->{type} eq "tocline" ) {
 	    my $vsp = toc_vsp( $elt, $ps );
 	    $checkspace->($vsp);
-	    $pr->show_vpos( $y, 0 ) if $debug_spacing;
+	    $pr->show_vpos( $y, 0 ) if $config->{debug}->{spacing};
 
 	    tocline( $elt, $x, $y, $ps );
 
 	    $y -= $vsp;
-	    $pr->show_vpos( $y, 1 ) if $debug_spacing;
+	    $pr->show_vpos( $y, 1 ) if $config->{debug}->{spacing};
 	    next;
 	}
 
@@ -1123,7 +1123,8 @@ sub generate_song {
 		}
 		else {
 		    # Restore default.
-		    delete( $ps->{fonts}->{$1}->{color} );
+		    $ps->{fonts}->{$1}->{color} =
+		      $::config->{pdf}->{fonts}->{$1}->{color};
 		}
 	    }
 	    next;
@@ -1825,7 +1826,7 @@ sub imageline {
 	return "$!: " . $elt->{uri};
     }
 
-    warn("get_image ", $elt->{uri}, "\n") if $options->{debug};
+    warn("get_image ", $elt->{uri}, "\n") if $config->{debug}->{images};
     my $img = eval { $pr->get_image( $elt->{uri} ) };
     unless ( $img ) {
 	warn($@);
@@ -1859,7 +1860,7 @@ sub imageline {
 	    $scale = $ph / $h;
 	}
     }
-    warn("Image scale: $scale\n") if $options->{debug};
+    warn("Image scale: $scale\n") if $config->{debug}->{images};
     $h *= $scale;
     $w *= $scale;
     $x += ($pw - $w) / 2 if $opts->{center};
@@ -1872,9 +1873,9 @@ sub imageline {
 	prlabel( $ps, $tag, $x, $ytext );
     }
 
-    warn("add_image\n") if $options->{debug};
+    warn("add_image\n") if $config->{debug}->{images};
     $pr->add_image( $img, $x, $y, $w, $h, $opts->{border} || 0 );
-    warn("done\n") if $options->{debug};
+    warn("done\n") if $config->{debug}->{images};
 
     return $h;			# vertical size
 }
@@ -2376,7 +2377,7 @@ sub abc2image {
     my ( $s, $pr, $elt ) = @_;
 
     state $imgcnt = 0;
-    state $td = File::Temp::tempdir( CLEANUP => !$options->{debug} );
+    state $td = File::Temp::tempdir( CLEANUP => !$config->{debug}->{abc} );
 
     $imgcnt++;
     my $src  = File::Spec->catfile( $td, "tmp${imgcnt}.abc" );
@@ -2438,7 +2439,9 @@ sub abc2image {
 	       "-O", $svg0, $src, "\n" ) ) if ABCDEBUG;
     if ( sys( $abcm2ps, qw(-g -q -m0cm),
 	      "-w" . $pw . "pt",
-	      "-O", $svg0, $src ) ) {
+	      "-O", $svg0, $src )
+	 or
+	 ! -s $svg1 ) {
 	warn("Error in ABC embedding\n");
 	return;
     }
@@ -2510,7 +2513,7 @@ sub LYDEBUG() { $config->{debug}->{ly} }
 sub ly2image {
     my ( $s, $pr, $elt ) = @_;
     state $imgcnt = 0;
-    state $td = File::Temp::tempdir( CLEANUP => !$options->{debug} );
+    state $td = File::Temp::tempdir( CLEANUP => !$config->{debug}->{ly} );
     my $src  = File::Spec->catfile( $td, "tmp${imgcnt}.ly" );
     my $img  = File::Spec->catfile( $td, "tmp${imgcnt}.png" );
 
@@ -2613,7 +2616,7 @@ sub is_corefont {
 }
 
 sub _dump {
-    return unless $verbose;
+    return unless $config->{debug}->{fonts};
     my ( $ps ) = @_;
     print STDERR ("== Font family map\n");
     Text::Layout::FontConfig->new->_dump if $verbose;

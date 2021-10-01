@@ -1,5 +1,5 @@
 package Mail::DMARC::Report::Store::SQL;
-our $VERSION = '1.20210427';
+our $VERSION = '1.20210927';
 use strict;
 use warnings;
 
@@ -452,7 +452,7 @@ sub insert_rr_dkim {
     my ( $self, $row_id, $dkim ) = @_;
     my (@fields, @values);
     foreach ( qw/ domain selector result human_result / ) {
-        next if ! $dkim->{$_};
+        next if ! defined $dkim->{$_};
         if ( 'domain' eq $_ ) {
             push @fields, 'domain_id';
             push @values, $self->get_domain_id( $dkim->{domain} );
@@ -470,7 +470,7 @@ sub insert_rr_spf {
     my ( $self, $row_id, $spf ) = @_;
     my (@fields, @values);
     for ( qw/ domain scope result / ) {
-        next if ! $spf->{$_};
+        next if ! defined $spf->{$_};
         if ( 'domain' eq $_ ) {
             push @fields, 'domain_id';
             push @values, $self->get_domain_id( $spf->{domain} );
@@ -682,7 +682,7 @@ Mail::DMARC::Report::Store::SQL - store and retrieve reports from a SQL RDBMS
 
 =head1 VERSION
 
-version 1.20210427
+version 1.20210927
 
 =head1 DESCRIPTION
 

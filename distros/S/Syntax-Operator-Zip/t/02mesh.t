@@ -29,4 +29,11 @@ is_deeply( [ qw( one two three ) M ( 1 .. 2 ) ],
    is( scalar( ('z') M ('A'..'F') ), 12, 'mesh counts longest list on RHS' );
 }
 
+# Returned values are copies, not aliases
+{
+   my @n = (1..3);
+   $_++ for @n M ("x")x3;
+   is_deeply( \@n, [1..3], 'mesh returns copies of arguments' );
+}
+
 done_testing;

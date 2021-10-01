@@ -1,6 +1,6 @@
 package Plack::Middleware::Text::Minify;
 
-# ABSTRACT: minify text responses on the fly
+# ABSTRACT: remove HTML indentation on the fly
 
 use v5.9.3;
 
@@ -16,7 +16,7 @@ use Text::Minify::XS v0.4.8 ();
 
 # RECOMMEND PREREQ:  Ref::Util::XS
 
-our $VERSION = 'v0.2.1';
+our $VERSION = 'v0.2.2';
 
 sub call {
     my ($self, $env) = @_;
@@ -89,11 +89,11 @@ __END__
 
 =head1 NAME
 
-Plack::Middleware::Text::Minify - minify text responses on the fly
+Plack::Middleware::Text::Minify - remove HTML indentation on the fly
 
 =head1 VERSION
 
-version v0.2.1
+version v0.2.2
 
 =head1 SYNOPSIS
 

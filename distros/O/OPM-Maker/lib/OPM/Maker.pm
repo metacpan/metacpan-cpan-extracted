@@ -1,5 +1,5 @@
 package OPM::Maker;
-$OPM::Maker::VERSION = '1.00';
+$OPM::Maker::VERSION = '1.10';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ OPM::Maker - Module/App to build and test OPM packages for Znuny, OTOBO, ((OTRS)
 
 =head1 VERSION
 
-version 1.00
+version 1.10
 
 =head1 DESCRIPTION
 
@@ -61,6 +61,31 @@ Currently under development:
 =item * dbtest
 
 Check if the C<DatabaseInstall> and C<DatabaseUninstall> sections in your .sopm files are valid. And it checks for SQL keywords.
+
+=back
+
+=head1 PARSING HUGE FILES
+
+The commands C<index> and C<dependencies> parse ticketsystem addons. And those addons can become quite huge (the Znuny ITSM bundle
+is about 27M big). Usually the parser rejects such huge files, but that behaviour was changed as of version 1.10.
+
+Parsing XML files can lead to security issues (loading external entities, application runs out of memory, ...), so those commands
+work as follows:
+
+=over 4
+
+=item * Huge files (up to 30M) are parsed
+
+=item * If an environment variable OPM_MAX_SIZE is set, that is the max size for opm files
+
+If C<OPM_MAX_SIZE> is set to I<15M>, opm files bigger than 15 MBytes are rejected, if
+the variable is set to I<15000> opm files bigger than 15000 Bytes are rejected.
+
+=item * Loading external entities/DTD is disabled
+
+=item * Entities are not expanded
+
+=item * OPM_UNSECURE reverts the last two settings
 
 =back
 

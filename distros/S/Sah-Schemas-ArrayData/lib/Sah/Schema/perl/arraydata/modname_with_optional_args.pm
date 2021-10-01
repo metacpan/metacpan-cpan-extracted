@@ -1,45 +1,21 @@
 package Sah::Schema::perl::arraydata::modname_with_optional_args;
 
+use strict;
+use warnings;
+
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-17'; # DATE
+our $DATE = '2021-09-29'; # DATE
 our $DIST = 'Sah-Schemas-ArrayData'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
-our $schema = [str => {
-    summary => 'Perl ArrayData::* module name without the prefix (e.g. Word::ID::KBBI) with optional arguments (e.g. WordList=wordlist,EN::Enable)',
-    description => <<'_',
+use Sah::PSchema::perl::modname_with_optional_args;
 
-Perl ArrayData::* module name without the prefix, with optional arguments which
-will be used as instantiation arguments, just like the `-MMODULE=ARGS` shortcut
-that `perl` provides. Examples:
-
-    Word::ID::KBBI
-    WordList=wordlist,EN::Enable
-
-See also: `perl::arraydata::modname`.
-
-_
-    match => '\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*(?:=.*)?\z',
-
-    'x.perl.coerce_rules' => [
-        ['From_str::normalize_perl_modname', {ns_prefix=>'ArrayData'}],
-    ],
-
-    # XXX also provide completion for arguments
-    'x.completion' => ['perl_modname', {ns_prefix=>'ArrayData'}],
-
-
-    examples => [
-        {value=>'', valid=>0},
-        {value=>'Foo/Bar', valid=>1, validated_value=>'Foo::Bar'},
-        {value=>'Foo/Bar=a,1,b,2', valid=>1, validated_value=>'Foo::Bar=a,1,b,2'},
-        {value=>'Foo bar', valid=>0},
-    ],
-
-}, {}];
+our $schema = Sah::PSchema::perl::modname_with_optional_args->get_schema({
+    ns_prefix => "ArrayData",
+});
 
 1;
-# ABSTRACT: Perl ArrayData::* module name without the prefix (e.g. Word::ID::KBBI) with optional arguments (e.g. WordList=wordlist,EN::Enable)
+# ABSTRACT: 
 
 __END__
 
@@ -49,11 +25,11 @@ __END__
 
 =head1 NAME
 
-Sah::Schema::perl::arraydata::modname_with_optional_args - Perl ArrayData::* module name without the prefix (e.g. Word::ID::KBBI) with optional arguments (e.g. WordList=wordlist,EN::Enable)
+Sah::Schema::perl::arraydata::modname_with_optional_args -  
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::Schema::perl::arraydata::modname_with_optional_args (from Perl distribution Sah-Schemas-ArrayData), released on 2021-06-17.
+This document describes version 0.002 of Sah::Schema::perl::arraydata::modname_with_optional_args (from Perl distribution Sah-Schemas-ArrayData), released on 2021-09-29.
 
 =head1 SYNOPSIS
 
@@ -116,27 +92,6 @@ L<Perinci::CmdLine> to create a CLI:
 
  % ./myapp.pl --arg1 ...
 
-Sample data:
-
- ""  # INVALID
-
- "Foo/Bar"  # valid, becomes "Foo::Bar"
-
- "Foo/Bar=a,1,b,2"  # valid, becomes "Foo::Bar=a,1,b,2"
-
- "Foo bar"  # INVALID
-
-=head1 DESCRIPTION
-
-Perl ArrayData::* module name without the prefix, with optional arguments which
-will be used as instantiation arguments, just like the C<-MMODULE=ARGS> shortcut
-that C<perl> provides. Examples:
-
- Word::ID::KBBI
- WordList=wordlist,EN::Enable
-
-See also: C<perl::arraydata::modname>.
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schemas-ArrayData>.
@@ -145,6 +100,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 
 Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-ArrayData>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-ArrayData>
@@ -152,16 +135,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

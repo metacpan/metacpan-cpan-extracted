@@ -9,4 +9,17 @@ WriteMakefile(
     test            => {
         TESTS       => 't/*.t',
     },
+    'META_MERGE'	=> {
+        "meta-spec" => { version => 2 },
+        resources       => {
+            repository      => {
+                type            => 'git',
+                url             => 'https://github.com/Perceptyx/perl-redis-opentracing.git',
+                web             => 'https://github.com/Perceptyx/perl-redis-opentracing',
+            },
+            bugtracker      => {
+                web             => 'https://github.com/Perceptyx/perl-redis-opentracing/issues',
+            },
+        },
+    },
 );

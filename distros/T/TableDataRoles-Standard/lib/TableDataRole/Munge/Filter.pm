@@ -1,0 +1,252 @@
+package TableDataRole::Munge::Filter;
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Role::Tiny;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-09-29'; # DATE
+our $DIST = 'TableDataRoles-Standard'; # DIST
+our $VERSION = '0.013'; # VERSION
+
+with 'TableDataRole::Spec::Basic';
+
+sub new {
+    require Module::Load::Util;
+
+    my ($class, %args) = @_;
+
+    my $tabledata = delete $args{tabledata}
+        or die "Please supply 'tabledata' argument";
+    my $filter = delete $args{filter};
+    my $filter_hashref = delete $args{filter_hashref};
+    ($filter || $filter_hashref) or die "Please supply 'filter' or 'filter_hashref' argument";
+    for ($filter, $filter_hashref) {
+        next unless defined;
+        unless (ref $_ eq 'CODE') {
+            my $code = "package main; sub { no strict; no warnings; $_ }";
+            log_trace "Eval-ing: $code";
+            $_ = eval $code; ## no critic: BuiltinFunctions::ProhibitStringyEval
+            die if $@;
+        }
+    }
+    die "Unknown argument(s): ". join(", ", sort keys %args)
+        if keys %args;
+
+    $tabledata = Module::Load::Util::instantiate_class_with_optional_args({ns_prefix=>"TableData"}, $tabledata);
+    my $column_names = $tabledata->get_column_names;
+
+    bless {
+        tabledata => $tabledata,
+        column_names => $column_names,
+        column_idxs => {map {$column_names->[$_] => $_} 0..$#{$column_names}},
+        filter => $filter,
+        filter_hashref => $filter_hashref,
+        pos => 0, # iterator
+        # buffer => undef,
+    }, $class;
+}
+
+sub get_column_count {
+    my $self = shift;
+
+    scalar @{ $self->{column_names} };
+}
+
+sub get_column_names {
+    my $self = shift;
+    wantarray ? @{ $self->{column_names} } : $self->{column_names};
+}
+
+sub _fill_buffer {
+    my $self = shift;
+    return if $self->{buffer};
+    while (1) {
+        return unless $self->{tabledata}->has_next_item;
+        if ($self->{filter}) {
+            my $row = $self->{tabledata}->get_next_row_arrayref;
+            if ($self->{filter}->($row)) {
+                $self->{buffer} = $row;
+                return;
+            }
+        } else {
+            my $row = $self->{tabledata}->get_next_item;
+            my $row_hashref = { map {$self->{column_names}[$_] => $row->[$_]} 0..$#{$row} };
+            if ($self->{filter_hashref}->($row_hashref)) {
+                $self->{buffer} = $row;
+                return;
+            }
+        }
+    }
+}
+
+sub has_next_item {
+    my $self = shift;
+    return 1 if $self->{buffer};
+    $self->_fill_buffer;
+    return $self->{buffer} ? 1:0;
+}
+
+sub get_next_item {
+    my $self = shift;
+    $self->_fill_buffer;
+    die "StopIteration" unless $self->{buffer};
+    $self->{pos}++;
+    return delete $self->{buffer};
+}
+
+sub get_next_row_hashref {
+    my $self = shift;
+    my $row = $self->get_next_item;
+    +{ map {($self->{column_names}->[$_] => $row->[$_])} 0..$#{$row} };
+}
+
+sub get_iterator_pos {
+    my $self = shift;
+    $self->{pos};
+}
+
+sub reset_iterator {
+    my $self = shift;
+    $self->{tabledata}->reset_iterator;
+    $self->{pos} = 0;
+}
+
+1;
+# ABSTRACT: Role to filter rows from another tabledata
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+TableDataRole::Munge::Filter - Role to filter rows from another tabledata
+
+=head1 VERSION
+
+This document describes version 0.013 of TableDataRole::Munge::Filter (from Perl distribution TableDataRoles-Standard), released on 2021-09-29.
+
+=head1 SYNOPSIS
+
+To use this role and create a curried constructor:
+
+ package TableDataRole::MyTable;
+ use Role::Tiny;
+ with 'TableDataRole::Munge::Filter';
+ around new => sub {
+     my $orig = shift;
+     $orig->(@_,
+         tabledata => 'CPAN::Release::Static::2021',
+         filter_hashref => sub { my $row = shift; $row->{author} eq 'PERLANCAR' },
+     );
+ };
+
+ package TableData::MyTable;
+ use Role::Tiny::With;
+ with 'TableDataRole::MyTable';
+ 1;
+
+In code that uses your TableData class:
+
+ use TableData::MyTable;
+
+ my $td = TableData::MyTable->new;
+ ...
+
+=head1 DESCRIPTION
+
+=for Pod::Coverage ^(.+)$
+
+=head1 ROLES MIXED IN
+
+L<TableDataRole::Spec::Basic>
+
+=head1 PROVIDED METHODS
+
+=head2 new
+
+Usage:
+
+ my $obj = $class->new(%args);
+
+Constructor. Known arguments:
+
+=over
+
+=item * tabledata
+
+Required. Tabledata module name (without the C<TableData::> prefix) with
+optional arguments (see L<Module::Load::Util> for more details).
+
+=item * filter
+
+A coderef to filter the rows. Will be passed an arrayref which is the row to
+filter. Must return true if the row should be included, or false if otherwise.
+
+Either C<filter> B<or> C<filter_hashref> must be specified.
+
+=item * filter_hashref
+
+A coderef to filter the rows. Will be passed a B<hashref> which is the row to
+filter. Must return true if the row should be included, or false if otherwise.
+
+Either C<filter> B<or> C<filter_hashref> must be specified.
+
+=back
+
+Note that if your class wants to wrap this constructor in its own, you need to
+create another role first, as shown in the example in Synopsis.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/TableDataRoles-Standard>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-TableDataRoles-Standard>.
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=TableDataRoles-Standard>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

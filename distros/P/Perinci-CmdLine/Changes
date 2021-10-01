@@ -1,4 +1,9 @@
-1.811.0  2018-03-17 (PERLANCAR)
+1.909.0  2021-10-01  Released-By: PERLANCAR; Urgency: medium
+
+	 - Add POD: Perinci::CmdLine::Manual::HowTo::Debugging.
+
+
+1.811.0  2018-03-17  Released-By: PERLANCAR
 
          - Synchronize version with latest Perinci::CmdLine::Lite.
 
@@ -6,21 +11,21 @@
            a file in output, add list of tutorial pages to fill in later.
 
 
-1.77    2017-07-31 (PERLANCAR)
+1.77    2017-07-31  Released-By: PERLANCAR
 
         - Synchronize version with latest Perinci::CmdLine::Lite.
 
 	- Update documentation, replace mention of Log::Any with Log::ger.
 
 
-1.52    2017-07-07 (PERLANCAR)
+1.52    2017-07-07  Released-By: PERLANCAR
 
 	- Replace mention of DZP:GenShellCompletion with cpanm-shcompgen.
 
 	- [dist] Enable static install.
 
 
-1.51    2017-06-17 (PERLANCAR)
+1.51    2017-06-17  Released-By: PERLANCAR
 
 	- Mention tutorial blog posts on
 	  https://perlancar.wordpress.com/category/pericmd-tut/.
@@ -28,20 +33,20 @@
 	- Add FAQ section: Generating Documentation.
 
 
-1.50    2016-12-10 (PERLANCAR)
+1.50    2016-12-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Typo [RT#118566].
 
 
-1.49    2016-10-07 (PERLANCAR)
+1.49    2016-10-07  Released-By: PERLANCAR
 
         - Update and fix documentation (including contribution from Andy Jack,
           thanks).
 
 
-1.48    2015-10-22 (PERLANCAR)
+1.48    2015-10-22  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -52,7 +57,7 @@
 	  framework should one choose.
 
 
-1.47    2015-09-18 (PERLANCAR)
+1.47    2015-09-18  Released-By: PERLANCAR
 
         - Move manual from Perinci-CmdLine-Lite.
 
@@ -60,13 +65,13 @@
           details.
 
 
-1.46    2015-06-11 (PERLANCAR)
+1.46    2015-06-11  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Mention Perinci::CmdLine::Inline.
 
 
-1.45     2015-04-02 (PERLANCAR)
+1.45     2015-04-02  Released-By: PERLANCAR
 
          - Re-released as empty module just for convenience of linking.

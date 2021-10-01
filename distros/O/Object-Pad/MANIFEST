@@ -1,6 +1,9 @@
 Build.PL
 Changes
 hax/dumpers.c.inc
+hax/make_argcheck_aux.c.inc
+hax/make_argcheck_ops.c.inc
+hax/newOP_CUSTOM.c.inc
 hax/perl-additions.c.inc
 hax/perl-backcompat.c.inc
 include/class.h

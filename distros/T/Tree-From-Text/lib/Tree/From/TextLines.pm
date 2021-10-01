@@ -1,9 +1,9 @@
 package Tree::From::TextLines;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-04'; # DATE
+our $DATE = '2021-05-06'; # DATE
 our $DIST = 'Tree-From-Text'; # DIST
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 use 5.010001;
 use strict;
@@ -93,7 +93,7 @@ Tree::From::TextLines - Build a tree object from lines of text, each line indent
 
 =head1 VERSION
 
-This document describes version 0.020 of Tree::From::TextLines (from Perl distribution Tree-From-Text), released on 2020-02-04.
+This document describes version 0.021 of Tree::From::TextLines (from Perl distribution Tree-From-Text), released on 2021-05-06.
 
 =head1 SYNOPSIS
 
@@ -150,11 +150,11 @@ Please visit the project's homepage at L<https://metacpan.org/release/Tree-From-
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Tree-FromText>.
+Source repository is at L<https://github.com/perlancar/perl-Tree-From-Text>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Tree-From-Text>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Tree-From-Text/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -162,7 +162,7 @@ feature.
 
 =head1 SEE ALSO
 
-L<Tree::From::Struct>
+L<Tree::From::Struct>, L<Tree::From::ObjArray>
 
 =head1 AUTHOR
 
@@ -170,7 +170,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

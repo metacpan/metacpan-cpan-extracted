@@ -18,7 +18,7 @@ Perinci::CmdLine::Manual::Examples - Collection of examples
 
 =head1 VERSION
 
-This document describes version 1.811.0 of Perinci::CmdLine::Manual::Examples (from Perl distribution Perinci-CmdLine), released on 2018-03-17.
+This document describes version 1.909.0 of Perinci::CmdLine::Manual::Examples (from Perl distribution Perinci-CmdLine), released on 2021-10-01.
 
 =head1 DESCRIPTION
 
@@ -198,7 +198,7 @@ validation.
              schema  => [array => {of => 'str', min_len=>1}],
              req     => 1,
              pos     => 0,
-             greedy  => 1,
+             slurpy  => 1,
          },
          gender => {
              summary => 'The gender of the name(s)',
@@ -239,7 +239,7 @@ argument. C<name> is specified as having a type of array of strings. To set this
 argument from the CLI, you can either specify multiple times (e.g. C<--name
 NAME1 --name NAME2 ...>) or specify using JSON (i.e. C<--name-json JSONSTR>).
 
-Second, the C<name> argument specifies the C<greedy> property. This is used in
+Second, the C<name> argument specifies the C<slurpy> property. This is used in
 conjunction with the C<pos> property. It declares that the argument will gobble
 up command-line arguments from C<pos> to the end. So you can also specify the
 values of the C<name> argument with C<ARG1 ARG2 ...>.
@@ -891,14 +891,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Cm
 
 Source repository is at L<https://github.com/perlancar/perl-Perinci-CmdLine>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Perinci::CmdLine::Manual>
@@ -909,11 +901,36 @@ L<Perinci::Examples>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

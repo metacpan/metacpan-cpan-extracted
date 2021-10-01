@@ -1,5 +1,5 @@
 package Photonic::WE::R2::GreenP;
-$Photonic::WE::R2::GreenP::VERSION = '0.018';
+$Photonic::WE::R2::GreenP::VERSION = '0.021';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::R2::GreenP
 
 =head1 VERSION
 
-version 0.018
+version 0.021
 
 =head1 COPYRIGHT NOTICE
 
@@ -60,7 +60,7 @@ Based on the wave equation for a binary metamaterial, with a non-dissipative hos
 
 Initializes the structure.
 
-$h is a Photonic::WE::R2::AllH structure (required).
+$h is a Photonic::WE::R2::Haydock structure (required).
 
 $nh is the maximum number of Haydock coefficients to use (required).
 
@@ -79,7 +79,7 @@ value of the  dielectric functions of the particle $epsB.
 
 =item * haydock
 
-The WE::R2::AllH structure
+The WE::R2::Haydock structure
 
 =item * epsA epsB
 
@@ -123,7 +123,7 @@ Criteria of convergence. 0 means don't check.
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
-use Photonic::WE::R2::AllH;
+use Photonic::WE::R2::Haydock;
 use Photonic::Types;
 use Photonic::Utils qw(lentzCF);
 use List::Util qw(min);
@@ -143,7 +143,7 @@ has 'epsB'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writ
 has 'u'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=>'_u',
     documentation=>'Spectral variable');
 
-has 'haydock' =>(is=>'ro', isa=>'Photonic::WE::R2::AllH', required=>1);
+has 'haydock' =>(is=>'ro', isa=>'Photonic::WE::R2::Haydock', required=>1);
 has 'Gpp'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=>'_Gpp');
 has 'nhActual'=>(is=>'ro', isa=>'Num', init_arg=>undef,
                  writer=>'_nhActual');
@@ -156,12 +156,13 @@ sub BUILD {
 
 sub evaluate {
     my $self=shift;
-    $self->_epsA(my $epsA=$self->haydock->epsilon->r2C);
+    my $h = $self->haydock;
+    $self->_epsA(my $epsA=$h->epsilon->r2C);
     $self->_epsB(my $epsB=shift);
     $self->_u(my $u=1/(1-$epsB/$epsA));
-    my $as=PDL::r2C($self->haydock->as);
-    my $bcs=PDL::r2C($self->haydock->bcs);
-    my $min= min($self->nh, $self->haydock->iteration);
+    my $as=PDL::r2C($h->as);
+    my $bcs=PDL::r2C($h->bcs);
+    my $min= min($self->nh, $h->iteration);
     #    b0+a1/b1+a2/...
     #   lo debo convertir a
     #       u-a_0-g0g1b1^2/u-a1-g1g2b2^2/...
@@ -169,9 +170,9 @@ sub evaluate {
     my ($fn, $n)=lentzCF($u-$as, -$bcs, $min, $self->smallE);
     #If there are less available coefficients than $self->nh and all
     #of them were used, there is no remaining work to do, so, converged
-    $self->_converged($n<$min || $self->haydock->iteration<=$self->nh);
+    $self->_converged($n<$min || $h->iteration<=$self->nh);
     $self->_nhActual($n);
-    my $g0b02=$self->haydock->gs->[0]*$self->haydock->b2s->slice("(0)");
+    my $g0b02=$h->gs->slice("(0)")*$h->b2s->slice("(0)");
     $self->_Gpp($u*$g0b02/($epsA*$fn));
     return $self->Gpp;
 }

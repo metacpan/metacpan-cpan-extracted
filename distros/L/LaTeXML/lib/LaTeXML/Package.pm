@@ -103,7 +103,7 @@ our @EXPORT = (qw(&DefAutoload &DefExpandable
     &LookupLCcode &AssignLCcode
     &LookupUCcode &AssignUCcode
     &LookupDelcode &AssignDelcode
-    ),
+  ),
 
   # Random low-level token or string operations.
   qw(&CleanID &CleanLabel &CleanIndexKey  &CleanClassName &CleanBibKey &NormalizeBibKey &CleanURL
@@ -178,11 +178,11 @@ sub parsePrototype {
   elsif ($proto =~ s/^(.)//) {               # Match an active char
     ($cs) = TokenizeInternal($1)->unlist; }
   else {
-    Fatal('misdefined', $proto, $STATE->getStomach,
-      "Definition prototype doesn't have proper control sequence: \"$proto\""); }
+    Error('misdefined', $proto, $STATE->getStomach,
+      "Definition prototype doesn't have proper control sequence: \"$proto\"");
+    $proto = ''; }
   $proto =~ s/^\s*//;
-####  return ($cs, parseParameters($proto, $cs)); }
-  return ($cs, $proto); }
+  return ($cs, parseParameters($proto, $cs)); }
 
 # If a ReadFoo function exists (accessible from LaTeXML::Package::Pool),
 # then the parameter spec:
@@ -199,6 +199,7 @@ sub parseParameters {
   my ($proto, $for) = @_;
   my $p      = $proto;
   my @params = ();
+  $p =~ s/^\s+//; $p =~ s/\s+$//;
   while ($p) {
     # Handle possibly nested cases, such as {Number}
     if ($p =~ s/^(\{([^\}]*)\})\s*//) {
@@ -223,7 +224,7 @@ sub parseParameters {
       my @extra = map { TokenizeInternal($_) } split('\|', $extra || '');
       push(@params, LaTeXML::Core::Parameter->new($type, $spec, extra => [@extra])); }
     else {
-      Fatal('misdefined', $for, undef, "Unrecognized parameter specification at \"$proto\""); } }
+      Error('misdefined', $for, undef, "Unrecognized parameter specification at \"$proto\""); } }
   return (@params ? LaTeXML::Core::Parameters->new(@params) : undef); }
 
 # Convert a LaTeX-style argument spec to our Package form.
@@ -444,7 +445,7 @@ sub roman_aux {
   while ($n %= $div) {
     $div /= 10;
     my $d = int($n / $div);
-    if ($d % 5 == 4) { $s .= $rmletters[$p];               $d++; }
+    if ($d % 5 == 4) { $s .= $rmletters[$p]; $d++; }
     if ($d > 4)      { $s .= $rmletters[$p + int($d / 5)]; $d %= 5; }
     if ($d)          { $s .= $rmletters[$p] x $d; }
     $p -= 2; }
@@ -545,8 +546,8 @@ sub ComposeURL {
   $fragid = ToString($fragid);
   return CleanURL(join('',
       ($base ?
-          ($url =~ /^\w+:/ ? ''                            # already has protocol, so is absolute url
-          : $base . ($url =~ /^\// ? '' : '/'))            # else start w/base, possibly /
+          ($url =~ /^\w+:/ ? ''    # already has protocol, so is absolute url
+          : $base . ($url =~ /^\// ? '' : '/'))    # else start w/base, possibly /
         : ''),
       $url,
       ($fragid ? '#' . CleanID($fragid) : ''))); }
@@ -572,8 +573,8 @@ sub DefColumnType {
     my $char = $1;
     $proto =~ s/^\s*//;
     # Defer
-    #    $proto = parseParameters($proto, $char);
     #    $expansion = TokenizeInternal($expansion) unless ref $expansion;
+    $proto = parseParameters($proto, $char);
     DefMacroI(T_CS('\NC@rewrite@' . $char), $proto, $expansion); }
   else {
     Warn('expected', 'character', undef, "Expected Column specifier"); }
@@ -584,7 +585,7 @@ sub DefColumnType {
 #======================================================================
 # This is modelled on LaTeX's counter mechanisms, but since it also
 # provides support for ID's, even where there is no visible reference number,
-# it is defined in genera.
+# it is defined in general.
 # These id's should be both unique, and parallel the visible reference numbers
 # (as much as possible).  Also, for consistency, we add id's to unnumbered
 # document elements (eg from \section*); this requires an additional counter
@@ -786,7 +787,6 @@ sub MaybeNoteLabel {
 
 sub deactivateCounterScope {
   my ($ctr) = @_;
-  #  print STDERR "Unusing scopes for $ctr\n";
   if (my $scopes = LookupValue('scopes_for_counter:' . $ctr)) {
     map { $STATE->deactivateScope($_) } @$scopes; }
   foreach my $inner_ctr (@{ LookupValue('nested_counters_' . $ctr) || [] }) {
@@ -978,7 +978,12 @@ sub DefAutoload {
   $cs     = T_CS($csname)  unless ref $cs;
   if ($defnfile =~ /^(.*?)\.(pool|sty|cls)\.ltxml$/) {
     my ($name, $type) = ($1, $2);
-    if (!LookupValue($name . '.' . $type . '_loaded')) {    # if already loaded, DONT redefine!
+    # if already loaded, or set, DONT redefine!
+    if (!(
+        LookupValue($name . '.' . $type . '_loaded')       ||
+        LookupValue($name . '.' . $type . '.ltxml_loaded') ||
+        LookupMeaning($cs))) {
+
       DefMacroI($cs, undef, sub {
           $STATE->assign_internal('meaning', $csname => undef, 'global');    # UNDEFINE (no recurse)
           if    ($type eq 'pool') { LoadPool($name); }                       # Load appropriate definitions
@@ -1010,8 +1015,18 @@ sub DefExpandable {
 # Define a Macro: Essentially an alias for DefExpandable
 # For convenience, the $expansion can be a string which will be tokenized.
 my $macro_options = {    # [CONSTANT]
-  scope     => 1, locked => 1, mathactive => 1,
-  protected => 1, outer  => 1, long       => 1 };
+  scope            => 1, locked => 1, mathactive => 1,
+  protected        => 1, robust => 1, outer      => 1, long => 1,
+  nopackParameters => 1 };
+
+# Defines $cs as protected call to the mangled name "\cs ", which it returns
+sub defRobustCS {
+  my ($cs, %options) = @_;
+  my $defcs = T_CS($_[0]->getString . ' ');
+  $STATE->installDefinition(LaTeXML::Core::Definition::Expandable->new($cs, undef,
+      Tokens(T_CS('\protect'), $defcs), locked => $options{locked}),
+    $options{scope});    # should be \x@protect?
+  return $defcs; }
 
 sub DefMacro {
   my ($proto, $expansion, %options) = @_;
@@ -1026,9 +1041,10 @@ sub DefMacroI {
   #  elsif (!ref $expansion)     { $expansion = TokenizeInternal($expansion); }
   if ((length($cs) == 1) && $options{mathactive}) {
     $STATE->assignMathcode($cs => 0x8000, $options{scope}); }
-  $cs = coerceCS($cs);
-###  $paramlist = parseParameters($paramlist, $cs) if defined $paramlist && !ref $paramlist;
-  $STATE->installDefinition(LaTeXML::Core::Definition::Expandable->new($cs, $paramlist, $expansion, %options),
+  $cs        = coerceCS($cs);
+  $paramlist = parseParameters($paramlist, $cs) if defined $paramlist && !ref $paramlist;
+  my $defcs = ($options{robust} ? defRobustCS($cs, %options) : $cs);
+  $STATE->installDefinition(LaTeXML::Core::Definition::Expandable->new($defcs, $paramlist, $expansion, %options),
     $options{scope});
   AssignValue(ToString($cs) . ":locked" => 1, 'global') if $options{locked};
   return; }
@@ -1088,6 +1104,7 @@ sub DefConditionalI {
       Let($cs, T_CS('\iffalse')); }
     else {
       # For \ifcase, the parameter list better be a single Number !!
+      $paramlist = parseParameters($paramlist, $cs) if defined $paramlist && !ref $paramlist;
       $STATE->installDefinition(LaTeXML::Core::Definition::Conditional->new($cs, $paramlist, $test,
           conditional_type => 'if', %options),
         $options{scope}); }
@@ -1141,7 +1158,7 @@ my $primitive_options = {    # [CONSTANT]
   isPrefix     => 1, scope       => 1, mode => 1, font => 1,
   requireMath  => 1, forbidMath  => 1,
   beforeDigest => 1, afterDigest => 1,
-  bounded      => 1, locked      => 1, alias => 1,
+  bounded      => 1, locked      => 1, alias => 1, robust => 1,
   outer        => 1, long        => 1 };
 
 sub DefPrimitive {
@@ -1152,16 +1169,21 @@ sub DefPrimitive {
 
 sub DefPrimitiveI {
   my ($cs, $paramlist, $replacement, %options) = @_;
-#####  $replacement = sub { (); } unless defined $replacement;
   my $string = $replacement;
-  $replacement = sub { Box($string, undef, undef, Invocation($options{alias} || $cs, @_[1 .. $#_])); }
+  Warn('misdefined', $cs, undef, "Option alias ignored if replacement is not string")
+    if ref $replacement && defined $options{alias};
+  $replacement = sub { Box($string, undef, undef,
+      Invocation($options{alias} || $cs, @_[1 .. $#_]),
+      (defined $string ? () : (isEmpty => 1))); }    # Just marker for reversion?
     unless ref $replacement;
-  $cs = coerceCS($cs);
-###  $paramlist = parseParameters($paramlist, $cs) if defined $paramlist && !ref $paramlist;
+  $cs        = coerceCS($cs);
+  $paramlist = parseParameters($paramlist, $cs) if defined $paramlist && !ref $paramlist;
   my $mode    = $options{mode};
   my $bounded = $options{bounded};
+  # Not sure robust entirely makes sense for Primitives, other than LaTeXML vs LaTeX mismatch
+  my $defcs = ($options{robust} ? defRobustCS($cs, %options) : $cs);
   $STATE->installDefinition(LaTeXML::Core::Definition::Primitive
-      ->new($cs, $paramlist, $replacement,
+      ->new($defcs, $paramlist, $replacement,
       beforeDigest => flatten(($options{requireMath} ? (sub { requireMath($cs); }) : ()),
         ($options{forbidMath} ? (sub { forbidMath($cs); }) : ()),
         ($mode                ? (sub { $_[0]->beginMode($mode); })
@@ -1197,8 +1219,8 @@ sub DefRegister {
 
 sub DefRegisterI {
   my ($cs, $paramlist, $value, %options) = @_;
-  $cs = coerceCS($cs);
-###  $paramlist = parseParameters($paramlist, $cs) if defined $paramlist && !ref $paramlist;
+  $cs        = coerceCS($cs);
+  $paramlist = parseParameters($paramlist, $cs) if defined $paramlist && !ref $paramlist;
   my $type   = $register_types{ ref $value };
   my $name   = ToString($options{name} || $cs);
   my $getter = $options{getter}
@@ -1288,7 +1310,7 @@ my $constructor_options = {    # [CONSTANT]
   nargs        => 1,
   beforeDigest => 1, afterDigest => 1, beforeConstruct => 1, afterConstruct => 1,
   captureBody  => 1, scope       => 1, bounded         => 1, locked         => 1,
-  outer        => 1, long        => 1 };
+  outer        => 1, long        => 1, robust          => 1 };
 
 sub inferSizer {
   my ($sizer, $reversion) = @_;
@@ -1304,12 +1326,14 @@ sub DefConstructor {
 
 sub DefConstructorI {
   my ($cs, $paramlist, $replacement, %options) = @_;
-  $cs = coerceCS($cs);
-###  $paramlist = parseParameters($paramlist, $cs) if defined $paramlist && !ref $paramlist;
+  $cs        = coerceCS($cs);
+  $paramlist = parseParameters($paramlist, $cs) if defined $paramlist && !ref $paramlist;
   my $mode    = $options{mode};
   my $bounded = $options{bounded};
+  # Not sure robust entirely makes sense for Constructors, other than LaTeXML vs LaTeX mismatch
+  my $defcs = ($options{robust} ? defRobustCS($cs, %options) : $cs);
   $STATE->installDefinition(LaTeXML::Core::Definition::Constructor
-      ->new($cs, $paramlist, $replacement,
+      ->new($defcs, $paramlist, $replacement,
       beforeDigest => flatten(($options{requireMath} ? (sub { requireMath($cs); }) : ()),
         ($options{forbidMath} ? (sub { forbidMath($cs); }) : ()),
         ($mode                ? (sub { $_[0]->beginMode($mode); })
@@ -1322,13 +1346,14 @@ sub DefConstructorI {
       beforeConstruct => flatten($options{beforeConstruct}),
       afterConstruct  => flatten($options{afterConstruct}),
       nargs           => $options{nargs},
-      alias           => $options{alias},
-      reversion       => $options{reversion},
-      sizer           => inferSizer($options{sizer}, $options{reversion}),
-      captureBody     => $options{captureBody},
-      properties      => $options{properties} || {},
-      outer           => $options{outer},
-      long            => $options{long}),
+      alias           => (defined $options{alias} ? $options{alias}
+        : ($options{robust} ? $cs : undef)),
+      reversion   => $options{reversion},
+      sizer       => inferSizer($options{sizer}, $options{reversion}),
+      captureBody => $options{captureBody},
+      properties  => $options{properties} || {},
+      outer       => $options{outer},
+      long        => $options{long}),
     $options{scope});
   AssignValue(ToString($cs) . ":locked" => 1) if $options{locked};
   return; }
@@ -1437,13 +1462,16 @@ my $math_options = {    # [CONSTANT]
   scriptpos              => 1, operator_scriptpos => 1,
   stretchy               => 1, operator_stretchy  => 1,
   lpadding               => 1, rpadding           => 1,
-  beforeDigest           => 1, afterDigest        => 1, scope => 1, nogroup => 1, locked => 1,
+  beforeDigest           => 1, afterDigest        => 1,
+  scope                  => 1, nogroup            => 1, locked => 1,
+  protected              => 1, robust             => 1,
   revert_as              => 1,
   hide_content_reversion => 1 };    # DEPRECATE!
 my $simpletoken_options = {         # [CONSTANT]
-  name     => 1, meaning   => 1, omcd => 1, role => 1, mathstyle => 1,
-  lpadding => 1, rpadding  => 1,
-  font     => 1, scriptpos => 1, scope => 1, locked => 1 };
+  name      => 1, meaning   => 1, omcd => 1, role => 1, mathstyle => 1,
+  protected => 1, robust    => 1,
+  lpadding  => 1, rpadding  => 1,
+  font      => 1, scriptpos => 1, scope => 1, locked => 1 };
 
 sub DefMath {
   my ($proto, $presentation, %options) = @_;
@@ -1451,10 +1479,11 @@ sub DefMath {
   DefMathI(parsePrototype($proto), $presentation, %options);
   return; }
 
+DebuggableFeature('defmath', 'DefMath definitions');
+
 sub DefMathI {
   my ($cs, $paramlist, $presentation, %options) = @_;
-  $cs = coerceCS($cs);
-  # Can't defer parsing parameters since we need to know number of args!
+  $cs        = coerceCS($cs);
   $paramlist = parseParameters($paramlist, $cs) if defined $paramlist && !ref $paramlist;
   my $nargs   = ($paramlist ? scalar($paramlist->getParameters) : 0);
   my $csname  = $cs->getString;
@@ -1479,7 +1508,7 @@ sub DefMathI {
 
   # If single character, handle with a rewrite rule
   if (length($csname) == 1) {
-    ###print STDERR "Defining ".Stringify($cs)." as rewrite\n";
+    Debug("Defining " . Stringify($cs) . " as rewrite") if $LaTeXML::DEBUG{defmath};
     if ($csname ne ToString($presentation)) {
       $options{replace} = $presentation;
       delete $options{name}; }
@@ -1490,21 +1519,21 @@ sub DefMathI {
   elsif ((ref $presentation eq 'CODE')
     || ((ref $presentation)  && grep { $$_[1] == CC_ARG || $_->equals(T_PARAM) } $presentation->unlist)
     || (!(ref $presentation) && ($presentation =~ /\#\d|\\./))) {
-    ###print STDERR "Defining ".Stringify($cs)." as dual\n";
+    Debug("Defining " . Stringify($cs) . " as dual") if $LaTeXML::DEBUG{defmath};
     defmath_dual($cs, $paramlist, $presentation, %options); }
   # If no arguments, but the presentation involves macros, presumably with internal structure,
   # we'll wrap the presentation in ordet to capture the various semantic attributes
   elsif ((ref $presentation) && (grep { $_->isExecutable } $presentation->unlist)) {
-    ###print STDERR "Defining ".Stringify($cs)." as wrapped\n";
+    Debug("Defining " . Stringify($cs) . " as wrapped") if $LaTeXML::DEBUG{defmath};
     defmath_wrapped($cs, $presentation, %options); }
 
   # EXPERIMENT: Introduce an intermediate case for simple symbols
   # Define a primitive that will create a Box with the appropriate set of XMTok attributes.
   elsif (($nargs == 0) && !grep { !$$simpletoken_options{$_} } keys %options) {
-    ###print STDERR "Defining ".Stringify($cs)." as primitive\n";
+    Debug("Defining " . Stringify($cs) . " as primitive") if $LaTeXML::DEBUG{defmath};
     defmath_prim($cs, $paramlist, $presentation, %options); }
   else {
-    ###print STDERR "Defining ".Stringify($cs)." as constructor\n";
+    Debug("Defining " . Stringify($cs) . " as constructor") if $LaTeXML::DEBUG{defmath};
     defmath_cons($cs, $paramlist, $presentation, %options); }
   AssignValue($csname . ":locked" => 1) if $options{locked};
   return; }
@@ -1582,8 +1611,9 @@ sub defmath_dual {
   my $csname  = $cs->getString;
   my $cont_cs = T_CS($csname . "\@content");
   my $pres_cs = T_CS($csname . "\@presentation");
+  my $defcs   = ($options{robust} ? defRobustCS($cs, %options) : $cs);
   # Make the original CS expand into a DUAL invoking a presentation macro and content constructor
-  $STATE->installDefinition(LaTeXML::Core::Definition::Expandable->new($cs, $paramlist, sub {
+  $STATE->installDefinition(LaTeXML::Core::Definition::Expandable->new($defcs, $paramlist, sub {
         my ($self,  @args)  = @_;
         my ($cargs, $pargs) = dualize_arglist($presentation, @args);
         Invocation(T_CS('\lx@dual'),
@@ -1594,11 +1624,14 @@ sub defmath_dual {
             ($options{revert_as}
               ? (T_OTHER('revert_as'), T_OTHER('='), T_OTHER($options{revert_as})) : ())),
           Invocation($cont_cs, @$cargs),
-          Invocation($pres_cs, @$pargs))->unlist; }),
+          Invocation($pres_cs, @$pargs))->unlist; },
+      protected => $options{protected}),
     $options{scope});
   # Make the presentation macro.
   $presentation = TokenizeInternal($presentation) unless ref $presentation;
-  $STATE->installDefinition(LaTeXML::Core::Definition::Expandable->new($pres_cs, $paramlist, $presentation),
+  $STATE->installDefinition(LaTeXML::Core::Definition::Expandable->new($pres_cs, $paramlist,
+      $presentation,
+      protected => $options{protected}),
     $options{scope});
   my $nargs = ($paramlist ? scalar($paramlist->getParameters) : 0);
   my $cons_attr = "name='#name' meaning='#meaning' omcd='#omcd' decl_id='#decl_id' mathstyle='#mathstyle' lpadding='#lpadding' rpadding='#rpadding'";
@@ -1621,13 +1654,17 @@ sub defmath_wrapped {
   my $csname  = $cs->getString;
   my $wrap_cs = T_CS($csname . "\@wrapper");
   my $pres_cs = T_CS($csname . "\@presentation");
+  my $defcs   = ($options{robust} ? defRobustCS($cs, %options) : $cs);
   # Make the original CS expand into a wrapper constructor invoking a presentation
-  $STATE->installDefinition(LaTeXML::Core::Definition::Expandable->new($cs, undef,
-      Tokens($wrap_cs, T_BEGIN, $pres_cs, T_END)),
+  $STATE->installDefinition(LaTeXML::Core::Definition::Expandable->new($defcs, undef,
+      Tokens($wrap_cs, T_BEGIN, $pres_cs, T_END),
+      protected => $options{protected}),
     $options{scope});
   # Make the presentation macro.
   $presentation = TokenizeInternal($presentation) unless ref $presentation;
-  $STATE->installDefinition(LaTeXML::Core::Definition::Expandable->new($pres_cs, undef, $presentation),
+  $STATE->installDefinition(LaTeXML::Core::Definition::Expandable->new($pres_cs, undef,
+      $presentation,
+      protected => $options{protected}),
     $options{scope});
   # Make the wrapper constructor
   my $cons_attr = "name='#name' meaning='#meaning' omcd='#omcd' decl_id='#decl_id' mathstyle='#mathstyle' lpadding='#lpadding' rpadding='#rpadding'";
@@ -1670,14 +1707,15 @@ sub defmath_cons {
   $qpresentation =~ s/(\#|\&|\?|\\|<|>)/\\$1/g if $presentation;
   my $end_tok = (defined $presentation ? '>' . $qpresentation . '</ltx:XMTok>' : "/>");
   my $cons_attr = "name='#name' meaning='#meaning' omcd='#omcd' decl_id='#decl_id' mathstyle='#mathstyle' lpadding='#lpadding' rpadding='#rpadding'";
-  my $nargs = ($paramlist ? scalar($paramlist->getParameters) : 0);
+  my $nargs = ($paramlist       ? scalar($paramlist->getParameters) : 0);
+  my $defcs = ($options{robust} ? defRobustCS($cs, %options)        : $cs);
   if ((!defined $options{reversion}) && !$nargs && !(defined $options{alias})) {
     $options{reversion} = sub {
       (!$options{revert_as}
           || ($options{revert_as} eq 'content')
           || (($options{revert_as} eq 'context') && (($LaTeXML::DUAL_BRANCH || 'content') eq 'content'))
         ? $cs : $presentation->unlist); }; }
-  $STATE->installDefinition(LaTeXML::Core::Definition::Constructor->new($cs, $paramlist,
+  $STATE->installDefinition(LaTeXML::Core::Definition::Constructor->new($defcs, $paramlist,
       ($nargs == 0
           # If trivial presentation, allow it in Text
         ? ($presentation !~ /(?:\(|\)|\\)/
@@ -1713,21 +1751,17 @@ my $environment_options = {    # [CONSTANT]
 sub DefEnvironment {
   my ($proto, $replacement, %options) = @_;
   CheckOptions("DefEnvironment ($proto)", $environment_options, %options);
-##  $proto =~ s/^\{([^\}]+)\}\s*//; # Pull off the environment name as {name}
-##  my $paramlist=parseParameters($proto,"Environment $name");
-##  my $name = $1;
   my ($name, $paramlist) = Text::Balanced::extract_bracketed($proto, '{}');
   $name      =~ s/[\{\}]//g;
   $paramlist =~ s/^\s*//;
-##  $paramlist = parseParameters($paramlist, "Environment $name");
   DefEnvironmentI($name, $paramlist, $replacement, %options);
   return; }
 
 sub DefEnvironmentI {
   my ($name, $paramlist, $replacement, %options) = @_;
   my $mode = $options{mode};
-  $name = ToString($name) if ref $name;
-##  $paramlist = parseParameters($paramlist, $name) if defined $paramlist && !ref $paramlist;
+  $name      = ToString($name)                    if ref $name;
+  $paramlist = parseParameters($paramlist, $name) if defined $paramlist && !ref $paramlist;
   # This is for the common case where the environment is opened by \begin{env}
   my $sizer = inferSizer($options{sizer}, $options{reversion});
   $STATE->installDefinition(LaTeXML::Core::Definition::Constructor
@@ -1926,20 +1960,32 @@ sub FindFile_aux {
   # (2) those MAY be present in kpsewhich's DB (although our searchpaths take precedence!)
   # (3) BUT we want to avoid kpsewhich if we can, since it's slower
   # (4) depending on switches we may EXCLUDE .ltxml OR raw tex OR allow both.
-  my $paths       = LookupValue('SEARCHPATHS');
-  my $urlbase     = LookupValue('URLBASE');
-  my $nopaths     = LookupValue('REMOTE_REQUEST');
-  my $ltxml_paths = $nopaths ? [] : $paths;
+  # (5) we may allow interpreting raw TeX/sty/whatever files individually or broadly
+  # (6) but we may also want to override an apparently "versioned" file, preferring the ltxml
+  my $paths         = LookupValue('SEARCHPATHS');
+  my $urlbase       = LookupValue('URLBASE');
+  my $nopaths       = LookupValue('REMOTE_REQUEST');
+  my $ltxml_paths   = $nopaths ? [] : $paths;
+  my $interpreting  = LookupValue('INTERPRETING_DEFINITIONS');         # Globally allow interpretation
+  my $interpretable = LookupMapping('INTERPRETABLE_SOURCES', $file);   # Specifically allow
+
   # If we're looking for ltxml, look within our paths & installation first (faster than kpse)
-  if (!$options{noltxml}) {
-    if ($path = pathname_find("$file.ltxml", paths => $ltxml_paths, installation_subdir => 'Package')) {
-      return $path; }
-    elsif ($path = FindFile_fallback($file, $ltxml_paths, %options)) {
-      return $path; } }
-  # If we're looking for TeX, look within our paths & installation first (faster than kpse)
-  if (!$options{notex}
+  if (!$options{noltxml}
+    && ($path = pathname_find("$file.ltxml", paths => $ltxml_paths, installation_subdir => 'Package'))) {
+    return $path; }
+  # Else if we're interpreting rawtex, and can find the file as is, take it.
+  elsif (!$options{notex} && ($interpreting || $interpretable)
     && ($path = pathname_find($file, paths => $paths))) {
     return $path; }
+  # Else, look for similar fallback ltxml bindings
+  elsif (!$options{noltxml} && !$interpretable
+    && ($path = FindFile_fallback($file, $ltxml_paths, %options))) {
+    return $path; }
+  # Finally, look for raw tex in our paths, even if we're not interpreting(?) (faster than kpse)
+  elsif (!$options{notex} && !$interpreting
+    && ($path = pathname_find($file, paths => $paths))) {
+    return $path; }
+
   # Otherwise, pass on to kpsewhich
   # Depending on flags, maybe search for ltxml in texmf or for plain tex in ours!
   # The main point, though, is to we make only ONE (more) call.
@@ -1957,6 +2003,7 @@ sub FindFile_aux {
 
 sub FindFile_fallback {
   my ($file, $ltxml_paths, %options) = @_;
+
   # Supported:
   # Numeric suffixes (version nums, dates) with optional separators
   my $fallback_file = $file;
@@ -2054,7 +2101,7 @@ sub Input {
       loadTeXDefinitions($request, $path); }
     else {
       loadTeXContent($path); } }
-  else {                                     # Couldn't find anything?
+  else {    # Couldn't find anything?
     $STATE->noteStatus(missing => $request);
     # We presumably are trying to input Content; an error if we can't find it (contrast to Definitions)
     Error('missing_file', $request, $STATE->getStomach->getGullet,
@@ -2072,6 +2119,7 @@ sub loadLTXML {
     Error('misdefined', 'loadLTXML', $STATE->getStomach->getGullet,
       "You can't load LaTeXML binding using protocol $p");
     return; }
+  $pathname = pathname_absolute($pathname);
   my ($dir, $name, $type) = pathname_split($pathname);
   # Don't load if the requested path was loaded (with or without the .ltxml)
   # We want to check against the original request, but WITH the type
@@ -2088,6 +2136,7 @@ sub loadLTXML {
       # If we've opened anything, we should read it in completely.
       # But we'll assume that anything opened has already been processed by loadTeXDefinitions.
   });
+  Let(T_CS('\ver@' . $trequest), T_CS('\fmtversion'), 'global');
   return; }
 
 sub loadTeXDefinitions {
@@ -2121,7 +2170,7 @@ sub loadTeXDefinitions {
   $stomach->getGullet->readingFromMouth(
     LaTeXML::Core::Mouth->create($pathname,
       fordefinitions => 1, notes => 1,
-      content => LookupValue($pathname . '_contents')),
+      content        => LookupValue($pathname . '_contents')),
     sub {
       my ($gullet) = @_;
       my $token;
@@ -2130,6 +2179,7 @@ sub loadTeXDefinitions {
         $stomach->invokeToken($token); } });
   AssignValue('INTERPRETING_DEFINITIONS' => $was_interpreting);
   AssignValue('INCLUDE_STYLES'           => $was_including_styles);
+  Let(T_CS('\ver@' . $request), T_CS('\fmtversion'), 'global');
   return; }
 
 sub loadTeXContent {
@@ -2153,12 +2203,14 @@ sub loadTeXContent {
 # $code can be a sub (as a primitive), or a string to be expanded.
 # (effectively a macro)
 
+DebuggableFeature('packageoptions', 'Processing package & class options');
+
 sub DeclareOption {
   my ($option, $code) = @_;
   $option = ToString($option) if ref $option;
   PushValue('@declaredoptions', $option) if $option;
   my $cs = ($option ? '\ds@' . $option : '\default@ds');
-  # print STDERR "Declaring option: ".($option ? $option : '<default>')."\n";
+  Debug("Declaring option: " . ($option ? $option : '<default>')) if $LaTeXML::DEBUG{packageoptions};
   if ((!defined $code) || (ref $code eq 'CODE')) {
     DefPrimitiveI($cs, undef, $code); }
   else {
@@ -2170,7 +2222,7 @@ sub DeclareOption {
 sub PassOptions {
   my ($name, $ext, @options) = @_;
   PushValue('opt@' . $name . '.' . $ext, map { ToString($_) } @options);
-  # print STDERR "Passing to $name.$ext options: " . join(', ', @options) . "\n";
+  Debug("Passing to $name.$ext options: " . join(', ', @options)) if $LaTeXML::DEBUG{packageoptions};
   return; }
 
 # Process the options passed to the currently loading package or class.
@@ -2190,10 +2242,10 @@ sub ProcessOptions {
   my @curroptions     = @{ (defined($name) && defined($ext)
         && LookupValue('opt@' . $name . '.' . $ext)) || [] };
   my @classoptions = @{ LookupValue('class_options') || [] };
-  # print STDERR "\nProcessOptions for $name.$ext\n"
-  #   . "  declared: " . join(',', @declaredoptions) . "\n"
-  #   . "  provided: " . join(',', @curroptions) . "\n"
-  #   . "  class: " . join(',', @classoptions) . "\n";
+  Debug("ProcessOptions for $name.$ext\n"
+      . "  declared: " . join(',', @declaredoptions) . "\n"
+      . "  provided: " . join(',', @curroptions) . "\n"
+      . "  class: " . join(',', @classoptions)) if $LaTeXML::DEBUG{packageoptions};
 
   my $defaultcs = T_CS('\default@ds');
   # Execute options in declared order (unless \ProcessOptions*)
@@ -2222,7 +2274,7 @@ sub executeOption_internal {
   my ($option) = @_;
   my $cs = T_CS('\ds@' . $option);
   if ($STATE->lookupDefinition($cs)) {
-    # print STDERR "\nPROCESS OPTION $option\n";
+    Debug("PROCESS OPTION $option") if $LaTeXML::DEBUG{packageoptions};
     DefMacroI('\CurrentOption', undef, $option);
     AssignValue('@unusedoptionlist',
       [grep { $_ ne $option } @{ LookupValue('@unusedoptionlist') || [] }]);
@@ -2233,7 +2285,7 @@ sub executeOption_internal {
 
 sub executeDefaultOption_internal {
   my ($option) = @_;
-  # print STDERR "\nPROCESS DEFAULT OPTION $option\n";
+  Debug("PROCESS DEFAULT OPTION $option") if $LaTeXML::DEBUG{packageoptions};
   # presumably should NOT remove from @unusedoptionlist ?
   DefMacroI('\CurrentOption', undef, $option);
   Digest(T_CS('\default@ds'));
@@ -2270,13 +2322,13 @@ sub AddToMacro {
   else {
     DefMacroI($cs, undef, Tokens(map { $_->unlist }
           map { (blessed $_ ? $_ : TokenizeInternal($_)) } ($defn->getExpansion, @tokens)),
-      scope => 'global'); }
+      nopackParameters => 1, scope => 'global', locked => $$defn{locked}); }
   return; }
 
 #======================================================================
 my $inputdefinitions_options = {    # [CONSTANT]
   options          => 1, withoptions => 1, handleoptions => 1,
-  type             => 1, as_class    => 1, noltxml => 1, notex => 1, noerror => 1, after => 1,
+  type             => 1, as_class    => 1, noltxml       => 1, notex => 1, noerror => 1, after => 1,
   searchpaths_only => 1 };
 #   options=>[options...]
 #   withoptions=>boolean : pass options from calling class/package
@@ -2316,6 +2368,7 @@ sub InputDefinitions {
   if (my $file = FindFile($filename, type => $options{type},
       notex => $options{notex}, noltxml => $options{noltxml}, searchpaths_only => $options{searchpaths_only})) {
     if ($options{handleoptions}) {
+# Note: this is trying to emulate the LaTeX 2 (latex.ltx) use of \@pushfilename. For expl3, see expl3.sty.ltxml
       Digest(T_CS('\@pushfilename'));
       # For \RequirePackageWithOptions, pass the options from the outer class/style to the inner one.
       if (my $passoptions = $options{withoptions} && $prevname
@@ -2380,7 +2433,7 @@ sub InputDefinitions {
 
 my $require_options = {    # [CONSTANT]
   options => 1, withoptions => 1, type => 1, as_class => 1,
-  noltxml => 1, notex => 1, raw => 1, after => 1, searchpaths_only => 1 };
+  noltxml => 1, notex       => 1, raw  => 1, after    => 1, searchpaths_only => 1 };
 # This (& FindFile) needs to evolve a bit to support reading raw .sty (.def, etc) files from
 # the standard texmf directories.  Maybe even use kpsewhich itself (INSTEAD of pathname_find ???)
 # Another potentially useful option might be that if we are reading a raw file,
@@ -2451,7 +2504,7 @@ sub LoadPool {
   if (my $success = InputDefinitions($pool, type => 'pool', notex => 1, noerror => 1)) {
     return $success; }
   else {
-    Fatal('missing_file', "$pool.pool.ltxml", $STATE->getStomach->getGullet,
+    Error('missing_file', "$pool.pool.ltxml", $STATE->getStomach->getGullet,
       "Can't find binding for pool $pool (installation error)",
       maybeReportSearchPaths());
     return; } }
@@ -2615,7 +2668,6 @@ sub LookupColor {
 
 sub DefColor {
   my ($name, $color, $scope) = @_;
-  #print STDERR "DEFINE ".ToString($name)." => ".join(',',@$color)."\n";
   return unless ref $color;
   my ($model, @spec) = @$color;
   $scope = 'global' if $STATE->lookupDefinition(T_CS('\ifglobalcolors')) && IfCondition(T_CS('\ifglobalcolors'));
@@ -2865,7 +2917,7 @@ L</Macros>, which are expanded within the L<LaTeXML::Core::Gullet>;
 and L</Primitives>, which are digested within the L<LaTeXML::Core::Stomach>
 to produce L<LaTeXML::Core::Box>, L<LaTeXML::Core::List>.
 A key additional feature is the L</Constructors>:
-when digested they generate a L<LaTeXML::Core::Whatsit> which, upon absorbtion by
+when digested they generate a L<LaTeXML::Core::Whatsit> which, upon absorption by
 L<LaTeXML::Core::Document>, inserts text or XML fragments in the final document tree.
 
 
@@ -2886,7 +2938,7 @@ phases of LaTeX's imitation of TeX's digestive tract.
 
 =head3 Prototypes
 
-LaTeXML uses a more convienient method of specifying parameter patterns for
+LaTeXML uses a more convenient method of specifying parameter patterns for
 control sequences. The first argument to each of these defining forms
 (C<DefMacro>, C<DefPrimive>, etc) is a I<prototype> consisting of the control
 sequence being defined along with the specification of parameters required by the control sequence.
@@ -3046,6 +3098,19 @@ and will be deactivated when that section ends.
 This option controls whether this definition is locked from further
 changes in the TeX sources; this keeps local 'customizations' by an author
 from overriding important LaTeXML definitions and breaking the conversion.
+
+=item C<protected=E<gt>I<boolean>>
+
+Makes a definition "protected", in the sense of eTeX's C<\protected> directive.
+This inhibits expansion under certain circumstances.
+
+=item C<robust=E<gt>I<boolean>>
+
+Makes a definition "robust", in the sense of LaTeX's C<\DeclareRobustCommand>.
+This essentially creates an indirect macro definition which is preceded by C<\protect>.
+This inhibits expansion (and argument processing!) under certain circumstances.
+It usually only makes sense for macros, but may be useful for Primitives, Constructors
+and DefMath in cases where LaTeX would normally have created a macro that needs protection.
 
 =back
 
@@ -3298,9 +3363,9 @@ The Constructor is where LaTeXML really starts getting interesting;
 invoking the control sequence will generate an arbitrary XML
 fragment in the document tree.  More specifically: during digestion, the arguments
 will be read and digested, creating a L<LaTeXML::Core::Whatsit> to represent the object. During
-absorbtion by the L<LaTeXML::Core::Document>, the C<Whatsit> will generate the XML fragment according
+absorption by the L<LaTeXML::Core::Document>, the C<Whatsit> will generate the XML fragment according
 to I<replacement>. The I<replacement> can be C<I<code>($document,@args,%properties)>
-which is called during document absorbtion to create the appropriate XML
+which is called during document absorption to create the appropriate XML
 (See the methods of L<LaTeXML::Core::Document>).
 
 More conveniently, I<replacement> can be an pattern: simply a bit of XML as a string
@@ -3329,7 +3394,7 @@ were given.
 
 =item C<^>
 
-If the constuctor I<begins> with C<^>, the XML fragment is allowed to I<float up>
+If the constructor I<begins> with C<^>, the XML fragment is allowed to I<float up>
 to a parent node that is allowed to contain it, according to the Document Type.
 
 =back
@@ -3429,7 +3494,7 @@ This is used by environments and math.
 
 =item C<nargs=E<gt>I<nargs>>
 
-This gives a number of args for cases where it can't be infered directly
+This gives a number of args for cases where it can't be inferred directly
 from the I<prototype> (eg. when more args are explicitly read by hooks).
 
 =back
@@ -3584,7 +3649,7 @@ These options are the same as for L</Primitives>
 
 =item C<nargs=E<gt>I<nargs>>
 
-These options are the same as for L</DefConstructor>
+These options are the same as for L</Constructors>
 
 =item C<beforeDigest=E<gt>I<code>($stomach)>
 
@@ -3607,7 +3672,7 @@ but it applies to the C<\end{environment}> control sequence.
 
 =item C<afterDigest=E<gt>I<code>($stomach,$whatsit)>
 
-This hook is simlar to C<DefConstructor>'s C<afterDigest>
+This hook is similar to C<DefConstructor>'s C<afterDigest>
 but it applies to the C<\end{environment}> control sequence.
 Note, however that the Whatsit is only for the ending control sequence,
 I<not> the Whatsit for the environment as a whole.
@@ -3851,7 +3916,7 @@ The 2nd argument can be a I<string> (which will be tokenized and expanded)
 or I<tokens> (which will be macro expanded), to provide the value for the option,
 or it can be a code reference which is treated as a primitive for side-effect.
 
-If a package or class wants to accomodate options, it should start
+If a package or class wants to accommodate options, it should start
 with one or more C<DeclareOptions>, followed by C<ProcessOptions()>.
 
 =item C<PassOptions(I<name>, I<ext>, I<@options>); >
@@ -3880,7 +3945,7 @@ X<AtBeginDocument>
 Arranges for I<@stuff> to be carried out after the preamble, at the beginning of the document.
 I<@stuff> should typically be macro-level stuff, but carried out for side effect;
 it should be tokens, tokens lists, strings (which will be tokenized),
-or C<I<code>($gullet)> which would yeild tokens to be expanded.
+or C<I<code>($gullet)> which would yield tokens to be expanded.
 
 This operation is useful for style files loaded with C<--preload> or document specific
 customization files (ie. ending with C<.latexml>); normally the contents would be executed
@@ -4332,10 +4397,8 @@ Assign $value to be associated with the the string C<$name>, according
 to the given scoping rule.
 
 Values are also used to specify most configuration parameters (which can
-therefor also be scoped).  The recognized configuration parameters are:
+therefore also be scoped).  The recognized configuration parameters are:
 
- VERBOSITY         : the level of verbosity for debugging
-                     output, with 0 being default.
  STRICT            : whether errors (eg. undefined macros)
                      are fatal.
  INCLUDE_COMMENTS  : whether to preserve comments in the

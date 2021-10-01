@@ -1,9 +1,24 @@
+0.105   2021-09-24  Released-By: PERLANCAR; Urgency: medium
+
+	- Add option --eval (-e).
+
+
+0.104   2021-08-22  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with updated toolchain to tweak "EXAMPLES" POD
+          section.
+
+
 0.103   2021-08-22  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.
 
+        - [example] Update example: list-id-holidays -> list-idn-holidays.
+
         - [build] Rebuild with updated toolchain to prettify usage in POD and
-          move examples to separate EXAMPLES POD section.
+          move examples to separate "EXAMPLES" POD section.
 
 
 0.102   2021-01-13  Released-By: PERLANCAR; Urgency: medium

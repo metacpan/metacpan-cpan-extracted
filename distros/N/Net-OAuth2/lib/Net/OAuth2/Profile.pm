@@ -8,16 +8,17 @@
 
 package Net::OAuth2::Profile;
 use vars '$VERSION';
-$VERSION = '0.66';
+$VERSION = '0.67';
 
 
 use warnings;
 use strict;
 
+use Carp qw(carp croak confess);
+use MIME::Base64 qw(encode_base64);
 use LWP::UserAgent ();
 use URI            ();
 use JSON::MaybeXS  qw/decode_json/;
-use Carp           qw/confess carp/;
 use Scalar::Util   qw/blessed/;
 use Encode         qw/encode/;
 
@@ -148,7 +149,7 @@ sub add_token($$$)
     }
     elsif($scheme eq 'form-body')
     {   $request->headers->content_type eq MIME_URLENC
-            or die "embedding access token in request body is only valid "
+            or croak "embedding access token in request body is only valid "
                  . "for 'MIME_URLENC' content type";
 
         my $query_param = $opt || 'oauth_token';
@@ -168,12 +169,17 @@ sub build_request($$$)
 {   my ($self, $method, $uri_base, $params) = @_;
     my %params = ref $params eq 'HASH' ? %$params : @$params;
 
+    my $basic;
+
     # rfc6749 section "2.3.1. Client Password"
     # The Auth Header is always supported, but client_id/client_secret as
-    # parameters may be as well.  We do both when ->new(secrets_in_params)
+    # parameters may be as well.  We do the latter when ->new(secrets_in_params)
     # to support old servers.
-    delete @params{qw/client_id client_secret/}
-        unless $self->{NOP_show_secret};
+    unless ($self->{NOP_show_secret})
+    {
+        $basic = encode_base64("$params{client_id}:$params{client_secret}", '');
+        delete @params{qw/client_id client_secret/};
+    }
 
     my $request;
 
@@ -208,6 +214,8 @@ sub build_request($$$)
     $head->header(Host => $uri->host);
 
     $head->header(Connection => 'Keep-Alive');
+    $head->header(Authorization => "Basic $basic") if $basic;
+
     $request;
 }
 
@@ -241,7 +249,7 @@ sub params_from_response($$)
     }
     
     substr($content, 200) = '...' if length $content > 200;
-    die "failed oauth call $why: $error\n$content\n";
+    croak "failed oauth call $why: $error\n$content\n";
 }
 
 sub authorize_method()          {panic}  # user must use autorize url

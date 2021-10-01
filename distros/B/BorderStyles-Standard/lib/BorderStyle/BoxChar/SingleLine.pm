@@ -1,9 +1,9 @@
 package BorderStyle::BoxChar::SingleLine;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-19'; # DATE
+our $DATE = '2021-05-12'; # DATE
 our $DIST = 'BorderStyles-Standard'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use strict;
 use parent 'BorderStyleBase';
@@ -37,7 +37,7 @@ BorderStyle::BoxChar::SingleLine - Single line border with box-drawing character
 
 =head1 VERSION
 
-This document describes version 0.006 of BorderStyle::BoxChar::SingleLine (from Perl distribution BorderStyles-Standard), released on 2021-02-19.
+This document describes version 0.007 of BorderStyle::BoxChar::SingleLine (from Perl distribution BorderStyles-Standard), released on 2021-05-12.
 
 =head1 SYNOPSIS
 
@@ -57,9 +57,9 @@ To use with L<Text::ANSITable>:
  $t->add_row($rows->[$_]) for 1 .. $#{ $rows };
  print $t->draw;
 
-To use with L<Text::Table::Span>:
+To use with L<Text::Table::More>:
 
- use Text::Table::Span qw/generate_table/;
+ use Text::Table::More qw/generate_table/;
  my $rows =
    [
      ["ColumName1", "ColumnNameB", "ColumnNameC"],
@@ -91,7 +91,7 @@ Source repository is at L<https://github.com/perlancar/perl-BorderStyles-Standar
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-BorderStyles-Standard/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=BorderStyles-Standard>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

@@ -1,3 +1,10 @@
+0.061   2021-05-06  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [doc] Mention Tree::From::ObjArray.
+
+
 0.060   2020-04-14  Released-By: PERLANCAR; Urgency: medium
 
 	- Rename module/dist from Tree-ToText* to Tree-To-Text*.

@@ -90,6 +90,10 @@ information.
     Return a list consisting of (signed) numerator and (unsigned) denominator as
     BigInts.
 
+- dparts()
+
+    Returns the integer part and the fraction part.
+
 - numify()
 
         my $y = $x->numify();
@@ -403,6 +407,12 @@ information.
     so that $x = $q \* $y + $r. The remainer (modulo) is equal to what is returned
     by `$x->bmod($y)`.
 
+- binv()
+
+        $x->binv();
+
+    Inverse of $x.
+
 - bdec()
 
         $x->bdec();
@@ -580,6 +590,70 @@ information.
                                 undef
         trap_inf        RW      Trap +inf/-inf
                                 undef
+
+# NUMERIC LITERALS
+
+After `use Math::BigRat ':constant'` all numeric literals in the given scope
+are converted to `Math::BigRat` objects. This conversion happens at compile
+time. Every non-integer is convert to a NaN.
+
+For example,
+
+    perl -MMath::BigRat=:constant -le 'print 2**150'
+
+prints the exact value of `2**150`. Note that without conversion of constants
+to objects the expression `2**150` is calculated using Perl scalars, which
+leads to an inaccurate result.
+
+Please note that strings are not affected, so that
+
+    use Math::BigRat qw/:constant/;
+
+    $x = "1234567890123456789012345678901234567890"
+            + "123456789123456789";
+
+does give you what you expect. You need an explicit Math::BigRat->new() around
+at least one of the operands. You should also quote large constants to prevent
+loss of precision:
+
+    use Math::BigRat;
+
+    $x = Math::BigRat->new("1234567889123456789123456789123456789");
+
+Without the quotes Perl first converts the large number to a floating point
+constant at compile time, and then converts the result to a Math::BigRat object
+at run time, which results in an inaccurate result.
+
+## Hexadecimal, octal, and binary floating point literals
+
+Perl (and this module) accepts hexadecimal, octal, and binary floating point
+literals, but use them with care with Perl versions before v5.32.0, because some
+versions of Perl silently give the wrong result. Below are some examples of
+different ways to write the number decimal 314.
+
+Hexadecimal floating point literals:
+
+    0x1.3ap+8         0X1.3AP+8
+    0x1.3ap8          0X1.3AP8
+    0x13a0p-4         0X13A0P-4
+
+Octal floating point literals (with "0" prefix):
+
+    01.164p+8         01.164P+8
+    01.164p8          01.164P8
+    011640p-4         011640P-4
+
+Octal floating point literals (with "0o" prefix) (requires v5.34.0):
+
+    0o1.164p+8        0O1.164P+8
+    0o1.164p8         0O1.164P8
+    0o11640p-4        0O11640P-4
+
+Binary floating point literals:
+
+    0b1.0011101p+8    0B1.0011101P+8
+    0b1.0011101p8     0B1.0011101P8
+    0b10011101000p-2  0B10011101000P-2
 
 # BUGS
 

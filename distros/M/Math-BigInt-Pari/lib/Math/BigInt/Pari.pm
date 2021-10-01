@@ -8,7 +8,7 @@ use Math::BigInt::Lib 1.999801;
 
 our @ISA = qw< Math::BigInt::Lib >;
 
-our $VERSION = '1.3007';
+our $VERSION = '1.3008';
 
 use Math::Pari qw(PARI pari2pv gdivent bittest
                   gcmp gcmp0 gcmp1 gcd ifact gpui gmul
@@ -269,7 +269,6 @@ sub _sqrt {
 
 sub _root {
     # n'th root
-    my ($c, $x, $n) = @_;
 
     # Native version:
     return $_[1] = int(Math::Pari::sqrtn($_[1] + 0.5, $_[2]));
@@ -422,7 +421,7 @@ the same terms as Perl itself.
 =head1 AUTHOR
 
 Original Math::BigInt::Pari written by Benjamin Trott 2001,
-L<ben@rhumba.pair.com>.
+E<lt>ben@rhumba.pair.comE<gt>.
 
 Extended and maintained by Tels 2001-2007 L<http://bloodgate.com>
 

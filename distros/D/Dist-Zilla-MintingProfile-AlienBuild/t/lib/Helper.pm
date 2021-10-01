@@ -6,7 +6,7 @@ use warnings;
 package Alien::Build::Wizard::Chrome {
 
   use Moose;
-  use experimental qw( signatures );
+  use experimental qw( signatures postderef );
   use namespace::autoclean;
 
   our $use_default;
@@ -39,7 +39,7 @@ package Alien::Build::Wizard::Chrome {
     die "bad self" unless ref $self eq 'Alien::Build::Wizard::Chrome';
     Test2::V0::note(" [choose] $prompt");
     Test2::V0::note(" [options] @{$options}");
-    Test2::V0::note(" [default] $default") if defined $default;
+    Test2::V0::note(" [default] @{[ $default->@* ]}") if defined $default;
     unless($choose{$prompt})
     {
       if($use_default)
@@ -51,8 +51,8 @@ package Alien::Build::Wizard::Chrome {
       }
     }
     my $expected_default = $choose{$prompt}->[1];
-    die "unexpected default: $default (expected $expected_default)" if defined $expected_default && $expected_default ne $default;
-    my $answer = $choose{$prompt}->[0] // $default;
+    die "unexpected default: @{[ $default->@* ]} (expected $expected_default)" if defined $expected_default && $expected_default ne $default->[0];
+    my $answer = $choose{$prompt}->[0] // $default->[0];
     Test2::V0::note(" > $answer");
     $answer;
   }

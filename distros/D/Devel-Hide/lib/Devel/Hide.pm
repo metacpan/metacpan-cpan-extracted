@@ -4,7 +4,7 @@ use 5.006001;
 use strict;
 use warnings;
 
-our $VERSION = '0.0014';
+our $VERSION = '0.0015';
 
 # blech! package variables
 #

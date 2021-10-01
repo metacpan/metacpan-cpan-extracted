@@ -4,14 +4,14 @@ use warnings;
 use LWP::UserAgent;
 use JSON::MaybeXS qw( encode_json decode_json );
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 sub new {
     my ($class, %params) = @_;
     die 'api_key required' unless defined $params{api_key};
     return bless {
         debug   => $params{debug},
-        api_key => $params{api_key} || die 'api_key is required',
+        api_key => ($params{api_key} || die 'api_key is required'),
         ua      => LWP::UserAgent->new(
             timeout => exists $params{timeout} ? $params{timeout} : 5,
         ),
@@ -28,8 +28,10 @@ sub _request {
         'Content-Type' => 'application/json',
         ($params ? ('Content' => encode_json($params)) : ())
     );
-    return decode_json($res->decoded_content);
-
+    my $data;
+    eval { $data = decode_json($res->decoded_content) };
+    $data = { error => $res->decoded_content } unless $data;
+    return $data;
 }
 
 sub create_order {

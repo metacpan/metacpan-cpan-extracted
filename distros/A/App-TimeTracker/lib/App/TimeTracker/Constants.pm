@@ -1,7 +1,7 @@
 package App::TimeTracker::Constants;
 
 # ABSTRACT: App::TimeTracker pre-defined constants
-our $VERSION = '3.009'; # VERSION
+our $VERSION = '3.010'; # VERSION
 
 use strict;
 use warnings;
@@ -31,7 +31,7 @@ App::TimeTracker::Constants - App::TimeTracker pre-defined constants
 
 =head1 VERSION
 
-version 3.009
+version 3.010
 
 =head1 DESCRIPTION
 

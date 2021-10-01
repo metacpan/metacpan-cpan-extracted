@@ -40,7 +40,7 @@ provides:
     file: lib/App/cdif/default.pm
   App::sdif:
     file: lib/App/sdif.pm
-    version: v4.20.1
+    version: v4.20.2
   App::sdif::Divert:
     file: lib/App/sdif/Divert.pm
   App::sdif::LabelStack:
@@ -54,8 +54,8 @@ provides:
   App::sdif::default:
     file: lib/App/sdif/default.pm
 requires:
-  Getopt::EX: v1.24.2
-  Getopt::EX::Hashed: '0.9917'
+  Getopt::EX: v1.25.0
+  Getopt::EX::Hashed: '0.9920'
   Getopt::EX::termcolor: '1.07'
   List::Util: '1.45'
   Term::ReadKey: '0'
@@ -67,7 +67,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/sdif-tools/issues
   homepage: https://github.com/kaz-utashiro/sdif-tools
   repository: git://github.com/kaz-utashiro/sdif-tools.git
-version: 4.20.1
+version: 4.20.2
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

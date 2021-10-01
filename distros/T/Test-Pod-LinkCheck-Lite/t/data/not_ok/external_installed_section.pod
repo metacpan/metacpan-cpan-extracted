@@ -1,7 +1,7 @@
 =pod
 
 Link to a section of an external installed module -- to wit
-L<Scalar::Util::blessed()|Scalar::Util/blessed>.
+L<My::Test::Module::blessed()|My::Test::Module/blessed>.
 
 =cut
 

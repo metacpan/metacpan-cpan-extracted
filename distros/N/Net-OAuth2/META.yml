@@ -1,7 +1,7 @@
 ---
 abstract: 'OAuth2 authenticating client'
 author:
-  - 'Mark Overmeer <markov@cpan.org>'
+  - 'Thomas Uhle <uhle@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
@@ -16,19 +16,26 @@ name: Net-OAuth2
 no_index:
   directory:
     - t
-    - inc
+    - xt
 requires:
+  Carp: '0'
+  Encode: '0'
   HTTP::Request: '0'
+  HTTP::Response: '0'
   HTTP::Status: '0'
   JSON::MaybeXS: '0'
   LWP::UserAgent: '0'
+  MIME::Base64: '0'
   Scalar::Util: '0'
   Test::More: '0'
   URI: '0'
-  YAML: '0'
+  constant: '0'
+  strict: '0'
+  warnings: '0'
 resources:
-  homepage: http://perl.overmeer.net/CPAN/
+  bugtracker: https://gitlab.com/uhle/perl-net-oauth2/-/issues
+  homepage: https://search.cpan.org/~uhle/Net-OAuth2/
   license: http://dev.perl.org/licenses/
-  repository: https://github.com/markov2/perl5-Net-OAuth2.git
-version: '0.66'
+  repository: https://gitlab.com/uhle/perl-net-oauth2.git
+version: '0.67'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

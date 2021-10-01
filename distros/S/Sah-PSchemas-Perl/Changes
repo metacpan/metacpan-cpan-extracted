@@ -1,3 +1,9 @@
+0.009   2021-09-29  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Follow latest Sah::Schema::perl::modname_with_optional_args
+	  (0.039) which allows array form.
+
+
 0.008   2021-03-20  Released-By: PERLANCAR; Urgency: medium
 
 	- Add prereqs to Sah::Schema::perl::modname{,_with_optional_args}.

@@ -1,14 +1,14 @@
 package App::tabledata;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-11'; # DATE
-our $DIST = 'App-tabledata'; # DIST
-our $VERSION = '0.001'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-09-28'; # DATE
+our $DIST = 'App-tabledata'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 our %SPEC;
 
@@ -64,12 +64,18 @@ $SPEC{tabledata} = {
                 'list_columns',
                 'count_rows',
                 'pick_rows',
+                'head',
                 #'stat',
             ]}],
             default => 'dump_as_aoaos',
             cmdline_aliases => {
+                actions => {
+                    summary=>'List available actions (alias for --action=list_actions)',
+                    is_flag => 1,
+                    code => sub { my $args=shift; $args->{action} = 'list_actions' },
+                },
                 L => {
-                    summary=>'List installed TableData::*',
+                    summary=>'List installed TableData::* (alias for --action=list_installed)',
                     is_flag => 1,
                     code => sub { my $args=shift; $args->{action} = 'list_installed' },
                 },
@@ -78,6 +84,11 @@ $SPEC{tabledata} = {
                 #    is_flag => 1,
                 #    code => sub { my $args=shift; $args->{action} = 'list_cpan' },
                 #},
+                H => {
+                    summary=>'Get the first N row(s) (alias for --action=head)',
+                    is_flag => 1,
+                    code => sub { my $args=shift; $args->{action} = 'head' },
+                },
                 R => {
                     summary=>'Pick random rows from an TableData module',
                     is_flag => 1,
@@ -95,7 +106,7 @@ $SPEC{tabledata} = {
             cmdline_aliases => {l=>{}},
         },
         num => {
-            summary => 'Number of rows to pick (for -R)',
+            summary => 'Number of rows to get (e.g. for pick_rows or head action)',
             schema => 'posint*',
             default => 1,
             cmdline_aliases => {n=>{}},
@@ -134,6 +145,20 @@ sub tabledata {
         return [200, "OK", [$obj->pick_items(n=>$args{num})]];
     }
 
+    if ($action eq 'head') {
+        my @rows;
+        my $i = 0;
+        $obj->each_item(
+            sub {
+                push @rows, $_[0];
+                return 0 if ++$i >= $args{num};
+                1;
+            });
+        return [200, "OK", \@rows, {
+            'table.fields'=>[$obj->get_column_names],
+        }];
+    }
+
     if ($action eq 'list_columns') {
         return [200, "OK", [$obj->get_column_names]];
     }
@@ -151,13 +176,15 @@ sub tabledata {
     }
 
     if ($action eq 'dump_as_aohos') {
-        return [200, "OK", [$obj->get_all_rows_hashref],
-                {'table.fields'=>[$obj->get_column_names]}];
+        return [200, "OK", [$obj->get_all_rows_hashref], {
+            'table.fields'=>[$obj->get_column_names],
+        }];
     }
 
     # dump_as_aoaos
-    return [200, "OK", [$obj->get_all_rows_arrayref],
-            {'table.fields'=>[$obj->get_column_names]}];
+    return [200, "OK", [$obj->get_all_rows_arrayref], {
+        'table.fields'=>[$obj->get_column_names],
+    }];
 }
 
 1;
@@ -175,7 +202,7 @@ App::tabledata - Show content of TableData modules (plus a few other things)
 
 =head1 VERSION
 
-This document describes version 0.001 of App::tabledata (from Perl distribution App-tabledata), released on 2021-06-11.
+This document describes version 0.002 of App::tabledata (from Perl distribution App-tabledata), released on 2021-09-28.
 
 =head1 SYNOPSIS
 
@@ -206,7 +233,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<num> => I<posint> (default: 1)
 
-Number of rows to pick (for -R).
+Number of rows to get (e.g. for pick_rows or head action).
 
 
 =back
@@ -232,14 +259,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-tabled
 
 Source repository is at L<https://github.com/perlancar/perl-App-tabledata>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-tabledata>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<ArrayData> and C<ArrayData::*> modules.
@@ -248,11 +267,36 @@ L<ArrayData> and C<ArrayData::*> modules.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-tabledata>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

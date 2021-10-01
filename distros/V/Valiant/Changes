@@ -1,5 +1,12 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.001009 2021 October 01
+          - A lot of little bugfixes to the DBIC glue code, expecially when using nested
+          validations.  If you are using nested DBIC validations its not impossible stuff
+          is different (please report anything actually broken).
+          - Updates to the example application, most to the form helpers which you are free
+          to steal but expect them to continue to change until I have something CPAN worthy.
+          
 0.001008 2021 September 14
           - More changes to the way the exporter works.   Shouldn't break anything but this
           change will setup the code to be more compatible with Object::Pad, which is the

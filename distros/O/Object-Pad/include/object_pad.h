@@ -18,6 +18,7 @@ enum AccessorType {
   ACCESSOR_READER,
   ACCESSOR_WRITER,
   ACCESSOR_LVALUE_MUTATOR,
+  ACCESSOR_COMBINED,
 };
 
 struct AccessorGenerationCtx {

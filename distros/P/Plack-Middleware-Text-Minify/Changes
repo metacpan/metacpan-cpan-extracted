@@ -1,5 +1,12 @@
 Revision history for Plack-Middleware-Text-Minify:
 
+v0.2.2    2021-09-29 17:24:50+01:00 Europe/London
+  [Documentation]
+  - Change ABSTRACT to match corresponding Mojo plugin.
+
+  [Toolchain]
+  - Added merge conflict check before release.
+
 v0.2.1    2021-09-19 11:26:10+01:00 Europe/London
   [Bug Fixes]
   - Upgrade minimum version of Text::Minify::XS to v0.4.8 to improve

@@ -3,7 +3,7 @@ package Net::Async::Redis::Commands;
 use strict;
 use warnings;
 
-our $VERSION = '3.015'; # VERSION
+our $VERSION = '3.016'; # VERSION
 
 =head1 NAME
 
@@ -30,8 +30,10 @@ our %KEY_FINDER = (
     'APPEND' => 1,
     'BITCOUNT' => 1,
     'BITFIELD' => 1,
+    'BITFIELD_RO' => 1,
     'BITOP' => 3,
     'BITPOS' => 1,
+    'BLMPOP' => 3,
     'BLPOP' => 1,
     'BRPOP' => 1,
     'BZPOPMAX' => 1,
@@ -85,6 +87,7 @@ our %KEY_FINDER = (
     'LINDEX' => 1,
     'LINSERT' => 1,
     'LLEN' => 1,
+    'LMPOP' => 2,
     'LPOP' => 1,
     'LPOS' => 1,
     'LPUSH' => 1,
@@ -125,11 +128,13 @@ our %KEY_FINDER = (
     'SETNX' => 1,
     'SETRANGE' => 1,
     'SINTER' => 1,
+    'SINTERCARD' => 1,
     'SINTERSTORE' => 2,
     'SISMEMBER' => 1,
     'SMEMBERS' => 1,
     'SMISMEMBER' => 1,
     'SORT' => 1,
+    'SORT_RO' => 1,
     'SPOP' => 1,
     'SRANDMEMBER' => 1,
     'SREM' => 1,
@@ -164,6 +169,7 @@ our %KEY_FINDER = (
     'ZDIFFSTORE' => 3,
     'ZINCRBY' => 1,
     'ZINTER' => 2,
+    'ZINTERCARD' => 2,
     'ZINTERSTORE' => 3,
     'ZLEXCOUNT' => 1,
     'ZMSCORE' => 1,
@@ -188,7 +194,181 @@ our %KEY_FINDER = (
     'ZUNIONSTORE' => 3,
 );
 
+=head1 METHODS - Bitmap
+
+=head2 bitcount
+
+Count set bits in a string.
+
+=over 4
+
+=item * key
+
+=item * [start end]
+
+=back
+
+L<https://redis.io/commands/bitcount>
+
+=cut
+
+sub bitcount : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(BITCOUNT) => @args)
+}
+
+=head2 bitfield
+
+Perform arbitrary bitfield integer operations on strings.
+
+=over 4
+
+=item * key
+
+=item * [GET type offset]
+
+=item * [SET type offset value]
+
+=item * [INCRBY type offset increment]
+
+=item * [OVERFLOW WRAP|SAT|FAIL]
+
+=back
+
+L<https://redis.io/commands/bitfield>
+
+=cut
+
+sub bitfield : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(BITFIELD) => @args)
+}
+
+=head2 bitfield_ro
+
+Perform arbitrary bitfield integer operations on strings. Read-only variant of BITFIELD.
+
+=over 4
+
+=item * key
+
+=item * GET type offset
+
+=back
+
+L<https://redis.io/commands/bitfield-ro>
+
+=cut
+
+sub bitfield_ro : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(BITFIELD_RO) => @args)
+}
+
+=head2 bitop
+
+Perform bitwise operations between strings.
+
+=over 4
+
+=item * operation
+
+=item * destkey
+
+=item * key [key ...]
+
+=back
+
+L<https://redis.io/commands/bitop>
+
+=cut
+
+sub bitop : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(BITOP) => @args)
+}
+
+=head2 bitpos
+
+Find first bit set or clear in a string.
+
+=over 4
+
+=item * key
+
+=item * bit
+
+=item * [start [end]]
+
+=back
+
+L<https://redis.io/commands/bitpos>
+
+=cut
+
+sub bitpos : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(BITPOS) => @args)
+}
+
+=head2 getbit
+
+Returns the bit value at offset in the string value stored at key.
+
+=over 4
+
+=item * key
+
+=item * offset
+
+=back
+
+L<https://redis.io/commands/getbit>
+
+=cut
+
+sub getbit : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(GETBIT) => @args)
+}
+
+=head2 setbit
+
+Sets or clears the bit at offset in the string value stored at key.
+
+=over 4
+
+=item * key
+
+=item * offset
+
+=item * value
+
+=back
+
+L<https://redis.io/commands/setbit>
+
+=cut
+
+sub setbit : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(SETBIT) => @args)
+}
+
 =head1 METHODS - Cluster
+
+=head2 asking
+
+Sent by cluster clients after an -ASK redirect.
+
+L<https://redis.io/commands/asking>
+
+=cut
+
+sub asking : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(ASKING) => @args)
+}
 
 =head2 cluster_addslots
 
@@ -1079,6 +1259,8 @@ Set a key's time to live in seconds.
 
 =item * seconds
 
+=item * [NX|XX|GT|LT]
+
 =back
 
 L<https://redis.io/commands/expire>
@@ -1099,6 +1281,8 @@ Set the expiration for a key as a UNIX timestamp.
 =item * key
 
 =item * timestamp
+
+=item * [NX|XX|GT|LT]
 
 =back
 
@@ -1257,6 +1441,8 @@ Set a key's time to live in milliseconds.
 
 =item * milliseconds
 
+=item * [NX|XX|GT|LT]
+
 =back
 
 L<https://redis.io/commands/pexpire>
@@ -1277,6 +1463,8 @@ Set the expiration for a key as a UNIX timestamp specified in milliseconds.
 =item * key
 
 =item * milliseconds-timestamp
+
+=item * [NX|XX|GT|LT]
 
 =back
 
@@ -1469,6 +1657,35 @@ sub sort : method {
     $self->execute_command(qw(SORT) => @args)
 }
 
+=head2 sort_ro
+
+Sort the elements in a list, set or sorted set. Read-only variant of SORT.
+
+=over 4
+
+=item * key
+
+=item * [BY pattern]
+
+=item * [LIMIT offset count]
+
+=item * [GET pattern [GET pattern ...]]
+
+=item * [ASC|DESC]
+
+=item * [ALPHA]
+
+=back
+
+L<https://redis.io/commands/sort-ro>
+
+=cut
+
+sub sort_ro : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(SORT_RO) => @args)
+}
+
 =head2 touch
 
 Alters the last access time of a key(s). Returns the number of existing keys specified.
@@ -1490,7 +1707,7 @@ sub touch : method {
 
 =head2 ttl
 
-Get the time to live for a key.
+Get the time to live for a key in seconds.
 
 =over 4
 
@@ -2162,7 +2379,7 @@ Adds the specified elements to the specified HyperLogLog.
 
 =item * key
 
-=item * element [element ...]
+=item * [element [element ...]]
 
 =back
 
@@ -2242,6 +2459,33 @@ L<https://redis.io/commands/blmove>
 sub blmove : method {
     my ($self, @args) = @_;
     $self->execute_command(qw(BLMOVE) => @args)
+}
+
+=head2 blmpop
+
+Pop elements from a list, or block until one is available.
+
+=over 4
+
+=item * timeout
+
+=item * numkeys
+
+=item * [key [key ...]]
+
+=item * LEFT|RIGHT
+
+=item * [COUNT count]
+
+=back
+
+L<https://redis.io/commands/blmpop>
+
+=cut
+
+sub blmpop : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(BLMPOP) => @args)
 }
 
 =head2 blpop
@@ -2397,6 +2641,31 @@ L<https://redis.io/commands/lmove>
 sub lmove : method {
     my ($self, @args) = @_;
     $self->execute_command(qw(LMOVE) => @args)
+}
+
+=head2 lmpop
+
+Pop elements from a list.
+
+=over 4
+
+=item * numkeys
+
+=item * [key [key ...]]
+
+=item * LEFT|RIGHT
+
+=item * [COUNT count]
+
+=back
+
+L<https://redis.io/commands/lmpop>
+
+=cut
+
+sub lmpop : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(LMPOP) => @args)
 }
 
 =head2 lpop
@@ -2797,9 +3066,9 @@ Execute a Lua script server side.
 
 =item * numkeys
 
-=item * key [key ...]
+=item * [key [key ...]]
 
-=item * arg [arg ...]
+=item * [arg [arg ...]]
 
 =back
 
@@ -2847,9 +3116,9 @@ Execute a Lua script server side.
 
 =item * numkeys
 
-=item * key [key ...]
+=item * [key [key ...]]
 
-=item * arg [arg ...]
+=item * [arg [arg ...]]
 
 =back
 
@@ -4010,6 +4279,25 @@ sub sinter : method {
     $self->execute_command(qw(SINTER) => @args)
 }
 
+=head2 sintercard
+
+Intersect multiple sets and return the cardinality of the result.
+
+=over 4
+
+=item * key [key ...]
+
+=back
+
+L<https://redis.io/commands/sintercard>
+
+=cut
+
+sub sintercard : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(SINTERCARD) => @args)
+}
+
 =head2 sinterstore
 
 Intersect multiple sets and store the resulting set in a key.
@@ -4452,6 +4740,27 @@ L<https://redis.io/commands/zinter>
 sub zinter : method {
     my ($self, @args) = @_;
     $self->execute_command(qw(ZINTER) => @args)
+}
+
+=head2 zintercard
+
+Intersect multiple sorted sets and return the cardinality of the result.
+
+=over 4
+
+=item * numkeys
+
+=item * key [key ...]
+
+=back
+
+L<https://redis.io/commands/zintercard>
+
+=cut
+
+sub zintercard : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(ZINTERCARD) => @args)
 }
 
 =head2 zinterstore
@@ -5398,102 +5707,6 @@ sub append : method {
     $self->execute_command(qw(APPEND) => @args)
 }
 
-=head2 bitcount
-
-Count set bits in a string.
-
-=over 4
-
-=item * key
-
-=item * [start end]
-
-=back
-
-L<https://redis.io/commands/bitcount>
-
-=cut
-
-sub bitcount : method {
-    my ($self, @args) = @_;
-    $self->execute_command(qw(BITCOUNT) => @args)
-}
-
-=head2 bitfield
-
-Perform arbitrary bitfield integer operations on strings.
-
-=over 4
-
-=item * key
-
-=item * [GET type offset]
-
-=item * [SET type offset value]
-
-=item * [INCRBY type offset increment]
-
-=item * [OVERFLOW WRAP|SAT|FAIL]
-
-=back
-
-L<https://redis.io/commands/bitfield>
-
-=cut
-
-sub bitfield : method {
-    my ($self, @args) = @_;
-    $self->execute_command(qw(BITFIELD) => @args)
-}
-
-=head2 bitop
-
-Perform bitwise operations between strings.
-
-=over 4
-
-=item * operation
-
-=item * destkey
-
-=item * key [key ...]
-
-=back
-
-L<https://redis.io/commands/bitop>
-
-=cut
-
-sub bitop : method {
-    my ($self, @args) = @_;
-    $self->execute_command(qw(BITOP) => @args)
-}
-
-=head2 bitpos
-
-Find first bit set or clear in a string.
-
-=over 4
-
-=item * key
-
-=item * bit
-
-=item * [start]
-
-=item * [end]
-
-=back
-
-L<https://redis.io/commands/bitpos>
-
-=cut
-
-sub bitpos : method {
-    my ($self, @args) = @_;
-    $self->execute_command(qw(BITPOS) => @args)
-}
-
 =head2 decr
 
 Decrement the integer value of a key by one.
@@ -5551,27 +5764,6 @@ L<https://redis.io/commands/get>
 sub get : method {
     my ($self, @args) = @_;
     $self->execute_command(qw(GET) => @args)
-}
-
-=head2 getbit
-
-Returns the bit value at offset in the string value stored at key.
-
-=over 4
-
-=item * key
-
-=item * offset
-
-=back
-
-L<https://redis.io/commands/getbit>
-
-=cut
-
-sub getbit : method {
-    my ($self, @args) = @_;
-    $self->execute_command(qw(GETBIT) => @args)
 }
 
 =head2 getdel
@@ -5826,29 +6018,6 @@ sub set : method {
     $self->execute_command(qw(SET) => @args)
 }
 
-=head2 setbit
-
-Sets or clears the bit at offset in the string value stored at key.
-
-=over 4
-
-=item * key
-
-=item * offset
-
-=item * value
-
-=back
-
-L<https://redis.io/commands/setbit>
-
-=cut
-
-sub setbit : method {
-    my ($self, @args) = @_;
-    $self->execute_command(qw(SETBIT) => @args)
-}
-
 =head2 setex
 
 Set the value and expiration of a key.
@@ -6039,5 +6208,9 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2015-2021. Licensed under the same terms as Perl itself.
+This was autogenerated from the official Redis documentation, which is published
+under the L<Creative Commons Attribution-ShareAlike license|https://github.com/redis/redis-doc/blob/master/LICENSE>.
+
+The Perl code is copyright Tom Molesworth 2015-2021, and licensed under the same
+terms as Perl itself.
 

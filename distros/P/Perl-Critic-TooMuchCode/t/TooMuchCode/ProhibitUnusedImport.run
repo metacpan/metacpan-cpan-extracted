@@ -114,3 +114,37 @@ use lib $Bin . "/../../../../";
 use FindBin qw( $Bin );
 my $bar;
 print "Here it is: $Bin";
+
+## name re-exporting is a form of using. with @EXPORT_OK. github issue 18.
+## failures 0
+## cut
+
+use Foo qw( foo $bar @baz );
+our @EXPORT_OK = qw(foo $bar @baz);
+
+## name re-exporting is a form of using. with @EXPORT. github issue 18.
+## failures 0
+## cut
+
+use Foo qw( foo $bar @baz );
+our @EXPORT = qw(foo $bar @baz);
+
+## name re-exporting. with code sample from github issue 18.
+## failures 0
+## cut
+
+use Mojo::JSON qw(decode_json encode_json);
+
+  {
+      our @EXPORT_OK = qw(
+          decode_json
+          encode_json
+      );
+  }
+
+## name other var assigments with symbols in their literal forms should not be counted as usage
+## failures 3
+## cut
+
+use Foo qw(foo $bar @baz);
+my @foo = qw(foo $bar @baz);

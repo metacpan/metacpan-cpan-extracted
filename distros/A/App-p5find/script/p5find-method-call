@@ -3,9 +3,9 @@
 
 p5find-method-call is a program to find method invocations.
 
-=head1 Usage Examples
+=head1 Examples
 
-The output format should be compatible to C<grep -Hnr>. Each line consists of
+The output is formatted like the output of C<grep -Hnr>. Each line consists of
 colon-separated fields of filename, line number, and the content of that line.
 
 Here's the result of searching for method calls in perlbrew repository:
@@ -21,6 +21,7 @@ Here's the result of searching for method calls in perlbrew repository:
     lib/App/Perlbrew/Path/Installations.pm:23:	shift->_children ('App::Perlbrew::Path::Installation' => @_);
     lib/App/Perlbrew/Path/Installations.pm:27:	shift->children;
     lib/App/Perlbrew/Path/Root.pm:13:	shift->child (bin => @_);
+
 =cut
 
 use v5.18;
@@ -33,8 +34,9 @@ sub print_usage {
     print <<USAGE;
 p5find-variable-methods [switches] -- [path1] [path2]...
 
-  -h    show help message
-  --var Only the ones with variable names.
+  -h              show help message
+  --var           Only the ones with variable names.
+  --name <string> Only the ones with this particular name.
 
 For more documentation, see: perldoc p5find-method-call
 USAGE
@@ -45,6 +47,7 @@ GetOptions(
     \%opts,
     "h",
     "var",
+    "name=s",
 );
 
 if ($opts{h}) {
@@ -62,8 +65,9 @@ while( my $doc = $iter->() ) {
 
     my $method = p5_method_call_iterator($doc);
     while (my $op = $method->()) {
+        my $op_next = $op->snext_sibling;
+
         if ($opts{"var"}) {
-            my $op_next = $op->snext_sibling;
             next if $op_next->isa("PPI::Token::Word");
 
             # Weird case from PPI. Consider this code:
@@ -71,6 +75,10 @@ while( my $doc = $iter->() ) {
             # The "foo :" part is parsed as one token. Which is wrong.
             # Luckly it does not remove positive responoses if we exclude those here.
             next if $op_next->isa("PPI::Token::Label");
+        }
+
+        if ($opts{"name"}) {
+            next unless $op_next eq $opts{"name"};
         }
 
         my $ln = $op->line_number;

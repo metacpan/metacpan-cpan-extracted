@@ -1,5 +1,5 @@
 #############################################################################
-# Math/Big.pm -- usefull routines with Big numbers (BigInt/BigFloat)
+# Math/Big.pm -- useful routines with big numbers (Math::BigInt/Math::BigFloat)
 
 package Math::Big;
 
@@ -12,7 +12,7 @@ use Math::BigInt '1.97';
 use Math::BigFloat;
 use Exporter;
 
-our $VERSION   = '1.15';
+our $VERSION   = '1.16';
 our @ISA       = qw( Exporter );
 our @EXPORT_OK = qw( primes fibonacci base to_base hailstone factorial
                      euler bernoulli pi log
@@ -183,8 +183,8 @@ sub factorial
 sub bernoulli
   {
   # returns the nth Bernoulli number. In scalar context as Math::BigFloat
-  # fraction, in list context as two Math:BigFloats, which, if divided, give
-  # the same result. The series runs this:
+  # fraction, in list context as two Math:BigFloat objects, which, if divided,
+  # give the same result. The series runs this:
   # 1/6, 1/30, 1/42, 1/30, 5/66, 691/2730, etc
 
   # Since I do not have yet a way to compute this, I have a table of the
@@ -854,11 +854,11 @@ The number PI to C<$N> digits after the dot.
 
 	$log = log($number,$base,$A);
 
-Calculates the logarithmn of C<$number> to base C<$base>, with C<$A> digits accuracy
-and returns a new number as the result (leaving C<$number> alone).
+Calculates the logarithmn of C<$number> to base C<$base>, with C<$A> digits
+accuracy and returns a new number as the result (leaving C<$number> alone).
 
-BigInts are promoted to BigFloats, meaning you will never get a truncated
-integer result like when using C<Math::BigInt->blog()>.
+Math::BigInt objects are promoted to Math::BigFloat objects, meaning you will
+never get a truncated integer result like when using C<Math::BigInt->blog()>.
 
 =back
 
@@ -891,7 +891,7 @@ If you know of an algorithmn to calculate them, please drop me a note.
 =head1 BUGS
 
 Please report any bugs or feature requests to
-C<bug-math-bigrat at rt.cpan.org>, or through the web interface at
+C<bug-math-big at rt.cpan.org>, or through the web interface at
 L<https://rt.cpan.org/Ticket/Create.html?Queue=Math-Big>
 (requires login).
 We will be notified, and then you'll automatically be notified of progress on

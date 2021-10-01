@@ -6,11 +6,18 @@ use 5.010001;
 
 use ExtUtils::MakeMaker;
 
+use File::ShareDir::Install;
+$File::ShareDir::Install::INCLUDE_DOTFILES = 1;
+$File::ShareDir::Install::INCLUDE_DOTDIRS = 1;
+install_share dist => "share";
+
+
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Standard set of roles for TableData",
   "AUTHOR" => "perlancar <perlancar\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0
+    "ExtUtils::MakeMaker" => 0,
+    "File::ShareDir::Install" => "0.06"
   },
   "DISTNAME" => "TableDataRoles-Standard",
   "LICENSE" => "perl",
@@ -18,6 +25,10 @@ my %WriteMakefileArgs = (
   "NAME" => "TableDataRoles::Standard",
   "PREREQ_PM" => {
     "DBI" => 0,
+    "File::Basename" => 0,
+    "File::ShareDir" => 0,
+    "Log::ger" => "0.038",
+    "Module::Load::Util" => "0.004",
     "Role::Tiny" => 0,
     "Role::Tiny::With" => 0,
     "TableDataRole::Spec::Basic" => "0.2.0",
@@ -35,7 +46,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.009",
+  "VERSION" => "0.013",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,10 +56,14 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "DBD::SQLite" => 0,
   "DBI" => 0,
+  "File::Basename" => 0,
+  "File::ShareDir" => 0,
   "File::Spec" => 0,
   "File::Temp" => "0.2307",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Log::ger" => "0.038",
+  "Module::Load::Util" => "0.004",
   "Role::Tiny" => 0,
   "Role::Tiny::With" => 0,
   "TableDataRole::Spec::Basic" => "0.2.0",
@@ -71,3 +86,9 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
+
+{
+package
+MY;
+use File::ShareDir::Install qw(postamble);
+}

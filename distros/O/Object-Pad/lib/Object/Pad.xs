@@ -20,6 +20,7 @@
 #endif
 
 #include "perl-additions.c.inc"
+#include "newOP_CUSTOM.c.inc"
 
 #if HAVE_PERL_VERSION(5, 26, 0)
 #  define HAVE_PARSE_SUBSIGNATURE
@@ -643,7 +644,7 @@ static const struct XSParseKeywordHooks kwhooks_has = {
   .check = &check_has,
 
   .pieces = (const struct XSParseKeywordPieceType []){
-    XPK_LEXVARNAME(XPK_LEXVAR_SCALAR),
+    XPK_LEXVARNAME(XPK_LEXVAR_ANY),
     XPK_ATTRIBUTES,
     XPK_OPTIONAL(
       XPK_EQUALS,
@@ -674,11 +675,6 @@ static const char *phasertypename[] = {
 
 static bool parse_permit(pTHX_ void *hookdata)
 {
-  HV *hints = GvHV(PL_hintgv);
-
-  if(!hv_fetchs(hints, "Object::Pad/method", 0))
-    return false;
-
   if(!have_compclassmeta)
     croak("Cannot 'method' outside of 'class'");
 
@@ -970,6 +966,7 @@ static void parse_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *hook
 
 static struct XSParseSublikeHooks parse_method_hooks = {
   .flags           = XS_PARSE_SUBLIKE_FLAG_FILTERATTRS,
+  .permit_hintkey  = "Object::Pad/method",
   .permit          = parse_permit,
   .pre_subparse    = parse_pre_subparse,
   .filter_attr     = parse_filter_attr,
@@ -1139,9 +1136,9 @@ BOOT:
 
   register_xs_parse_keyword("requires", &kwhooks_requires, NULL);
 
-  boot_xs_parse_sublike(0.10); /* hookdata */
+  boot_xs_parse_sublike(0.13); /* permit_hintkey */
 
   register_xs_parse_sublike("method", &parse_method_hooks, (void *)PHASER_NONE);
 
   ObjectPad__boot_classes();
-  ObjectPad__boot_slots();
+  ObjectPad__boot_slots(aTHX);

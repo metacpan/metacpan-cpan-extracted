@@ -34,74 +34,61 @@ use warnings;
 use Test::More;
 
 BEGIN {
+    # refresh with: git grep -h '^package' lib/|sed -e 's/.* //' -e 's/;//'
     my @mods= qw(
-	     Photonic
-	     Photonic::Geometry
-	     Photonic::OneH
-	     Photonic::LE
-	     Photonic::Geometry::FromEpsilon
-	     Photonic::Geometry::FromB
-	     Photonic::Geometry::FromImage2D
-	     Photonic::Utils
-	     Photonic::CharacteristicFunctions
-	     Photonic::LE::NR2::OneH
-	     Photonic::LE::NR2::SHP
-	     Photonic::LE::NR2::EpsTensor
-	     Photonic::LE::NR2::Field
-	     Photonic::LE::NR2::EpsL
-	     Photonic::LE::NR2::SHChiTensor
-	     Photonic::LE::NR2::SH
-	     Photonic::LE::NR2::AllH
-	     Photonic::LE::S
-	     Photonic::LE::NP
-	     Photonic::LE::NR2
-	     Photonic::LE::NP::OneH
-	     Photonic::LE::NP::EpsTensor
-	     Photonic::LE::NP::EpsL
-	     Photonic::LE::NP::AllH
-	     Photonic::LE::S::OneH
-	     Photonic::LE::S::EpsTensor
-	     Photonic::LE::S::EpsL
-	     Photonic::LE::S::AllH
-	     Photonic::WE::R2::EpsilonTensor
-	     Photonic::WE::R2::OneH
-	     Photonic::WE::R2::GreenP
-	     Photonic::WE::R2::WaveP
-	     Photonic::WE::R2::EpsilonP
-	     Photonic::WE::R2::Green
-	     Photonic::WE::R2::WaveF
-	     Photonic::WE::R2::Field
-	     Photonic::WE::R2::GreenF
-	     Photonic::WE::R2::Wave
-	     Photonic::WE::R2::EpsilonTensorF
-	     Photonic::WE::R2::Metric
-	     Photonic::WE::R2::AllH
-	     Photonic::WE::S::EpsilonTensor
-	     Photonic::WE::S::OneH
-	     Photonic::WE::S::GreenP
-	     Photonic::WE::S::WaveP
-	     Photonic::WE::S::EpsilonP
-	     Photonic::WE::S::Green
-	     Photonic::WE::S::Field
-	     Photonic::WE::S::Wave
-	     Photonic::WE::S::Metric
-	     Photonic::WE::S::AllH
-	     Photonic::Roles::Geometry
-	     Photonic::Roles::OneH
-	     Photonic::Roles::KeepStates
-	     Photonic::Roles::ReorthogonalizeR
-	     Photonic::Roles::EpsL
-	     Photonic::Roles::ReorthogonalizeC
-	     Photonic::Roles::EpsParams
-	     Photonic::Roles::UseMask
-	     Photonic::Roles::Metric
-	     Photonic::Roles::AllH
-	     Photonic::WE
-	     Photonic::Types
-	     Photonic::AllH
+Photonic
+Photonic::CharacteristicFunctions
+Photonic::Geometry::FromB
+Photonic::Geometry::FromEpsilon
+Photonic::Geometry::FromImage2D
+Photonic::Iterator
+Photonic::LE::NP::EpsL
+Photonic::LE::NP::EpsTensor
+Photonic::LE::NP::Haydock
+Photonic::LE::NR2::EpsL
+Photonic::LE::NR2::EpsTensor
+Photonic::LE::NR2::Field
+Photonic::LE::NR2::Haydock
+Photonic::LE::NR2::SH
+Photonic::LE::NR2::SHChiTensor
+Photonic::LE::NR2::SHP
+Photonic::LE::S::EpsL
+Photonic::LE::S::EpsTensor
+Photonic::LE::S::Field
+Photonic::LE::S::Haydock
+Photonic::Roles::EpsFromGeometry
+Photonic::Roles::EpsL
+Photonic::Roles::EpsTensor
+Photonic::Roles::Geometry
+Photonic::Roles::Haydock
+Photonic::Roles::KeepStates
+Photonic::Roles::Metric
+Photonic::Roles::Reorthogonalize
+Photonic::Roles::UseMask
+Photonic::Types
+Photonic::Utils
+Photonic::WE::R2::EpsilonP
+Photonic::WE::R2::EpsilonTensor
+Photonic::WE::R2::Field
+Photonic::WE::R2::Green
+Photonic::WE::R2::GreenP
+Photonic::WE::R2::GreenS
+Photonic::WE::R2::Haydock
+Photonic::WE::R2::Metric
+Photonic::WE::R2::Wave
+Photonic::WE::R2::WaveP
+Photonic::WE::S::EpsilonP
+Photonic::WE::S::EpsilonTensor
+Photonic::WE::S::Field
+Photonic::WE::S::Green
+Photonic::WE::S::GreenP
+Photonic::WE::S::Haydock
+Photonic::WE::S::Metric
+Photonic::WE::S::Wave
+Photonic::WE::S::WaveP
 	);
     foreach(@mods){
-	use_ok( 'Photonic' ) || print "Bail out!\n";
+	use_ok( $_ ) || print "Bail out!\n";
     }
 
 }

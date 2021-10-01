@@ -67,6 +67,10 @@ sub is_deparsed
    is_deparsed sub { "+" intersperse (1,2,3) },
       q['+' intersperse (1, 2, 3);],
       'deparsed call to infix operator with list RHS';
+
+   is_deparsed sub { (1,2,3) addpairs (4,5,6) },
+      '(1, 2, 3) addpairs (4, 5, 6);',
+      'deparsed call to infix list/list operator';
 }
 
 done_testing;

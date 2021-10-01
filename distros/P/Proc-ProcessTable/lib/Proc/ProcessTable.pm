@@ -18,7 +18,7 @@ require DynaLoader;
 @EXPORT = qw(
     
 );
-$VERSION = '0.612';
+$VERSION = '0.634';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -268,7 +268,7 @@ to help make this work on your OS.
 
 =head1 AUTHOR
 
-D. Urist, durist@frii.com
+J. Bargsten, D. Urist
 
 =head1 SEE ALSO
 

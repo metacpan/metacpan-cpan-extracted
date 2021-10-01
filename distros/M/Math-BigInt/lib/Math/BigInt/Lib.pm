@@ -4,7 +4,7 @@ use 5.006001;
 use strict;
 use warnings;
 
-our $VERSION = '1.999824';
+our $VERSION = '1.999826';
 
 use Carp;
 
@@ -352,42 +352,54 @@ sub _dec {
     $class -> _sub($x, $class -> _one());
 }
 
-# Signed addition.
+# Signed addition. If the flag is false, $xa might be modified, but not $ya. If
+# the false is true, $ya might be modified, but not $xa.
 
 sub _sadd {
     my $class = shift;
-    my ($xa, $xs, $ya, $ys) = @_;
+    my ($xa, $xs, $ya, $ys, $flag) = @_;
+    my ($za, $zs);
 
     # If the signs are equal we can add them (-5 + -3 => -(5 + 3) => -8)
+
     if ($xs eq $ys) {
-        $xa = $class -> _add($xa, $ya);
-    } else {
-        my $acmp = $class -> _acmp($xa, $ya);   # x = y
-        if ($acmp == 0) {
-            $xa = $class -> _zero();
-            $xs = '+';
-            return $xa, $xs;
+        if ($flag) {
+            $za = $class -> _add($ya, $xa);
+        } else {
+            $za = $class -> _add($xa, $ya);
         }
-        if ($acmp > 0) {                        # x > y
-            $xa = $class -> _sub($xa, $ya);
-        } else {                                # x < y
-            $xa = $class -> _sub($ya, $xa, 1);
-            $xs = $ys;
-        }
+        $zs = $class -> _is_zero($za) ? '+' : $xs;
+        return $za, $zs;
     }
 
-    $xs = '+' if $xs eq '-' && $class -> _is_zero($xa);     # no "-0"
-    return $xa, $xs;
+    my $acmp = $class -> _acmp($xa, $ya);       # abs(x) = abs(y)
+
+    if ($acmp == 0) {                           # x = -y or -x = y
+        $za = $class -> _zero();
+        $zs = '+';
+        return $za, $zs;
+    }
+
+    if ($acmp > 0) {                            # abs(x) > abs(y)
+        $za = $class -> _sub($xa, $ya, $flag);
+        $zs = $xs;
+    } else {                                    # abs(x) < abs(y)
+        $za = $class -> _sub($ya, $xa, !$flag);
+        $zs = $ys;
+    }
+    return $za, $zs;
 }
 
-# Signed subtraction.
+# Signed subtraction. If the flag is false, $xa might be modified, but not $ya.
+# If the false is true, $ya might be modified, but not $xa.
 
 sub _ssub {
     my $class = shift;
-    my ($xa, $xs, $ya, $ys) = @_;
+    my ($xa, $xs, $ya, $ys, $flag) = @_;
 
-    $ys = $ys eq '+' ? '-' : '+';           # swap sign of second operand ...
-    $class -> _sadd($xa, $xs, $ya, $ys);    # ... and let _sadd() do the job
+    # Swap sign of second operand and let _sadd() do the job.
+    $ys = $ys eq '+' ? '-' : '+';
+    $class -> _sadd($xa, $xs, $ya, $ys, $flag);
 }
 
 ##############################################################################

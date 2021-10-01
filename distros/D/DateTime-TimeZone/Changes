@@ -1,3 +1,9 @@
+2.48    2021-09-24
+
+- This release is based on version 2021b of the Olson database. This release
+  includes contemporary changes for Jordan and Samoa.
+
+
 2.47    2021-01-24
 
 - This release is based on version 2021a of the Olson database. This release
@@ -15,7 +21,7 @@
 - Fixed handling of Etc/GMT[+-]XX zones. Confusingly, the POSIX interpretation
   is that Etc/GMT+1 is 1 hour _behind_ UTC, and Etc/GMT-1 is 1 hour
   ahead. This is the opposite of what this module started doing in the 2.38
-  release when it added support for these zones. Reportd by Matthew Horsfall
+  release when it added support for these zones. Reported by Matthew Horsfall
   (#47). Changes are based on his PR #48.
 
 

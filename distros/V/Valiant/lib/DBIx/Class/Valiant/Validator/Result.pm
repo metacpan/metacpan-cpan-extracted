@@ -22,7 +22,7 @@ sub validate_each {
 
   unless(defined $result) {
     my $rel_data = $record->relationship_info($attribute);
-    if($rel_data->{attrs}{accessor} eq 'single' && $rel_data->{attrs}{join_type} eq 'LEFT') {
+    if($rel_data->{attrs}{accessor} eq 'single' && $rel_data->{attrs}{join_type}||'' eq 'LEFT') {
       # Its an optional relation like 'might have' so its not an error to be undefined.
       return;
     } else {
@@ -44,7 +44,6 @@ sub validate_each {
     my ($attr, $message) = @_;
     $record->errors->add("${attribute}.${attr}", $message);
   });
-
 }
 
 1;

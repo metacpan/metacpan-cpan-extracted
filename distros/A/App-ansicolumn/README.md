@@ -22,6 +22,9 @@ ansicolumn \[options\] \[file ...\]
     -F                   full-width
     -p                   paragraph mode
 
+    -B[=#], --border[=#] print border with optiona style
+    -U[=#], --fillup[=#] fill-up unit (pane|page|none)
+
     --height=#           page height
     --column-unit=#      column unit (default 8)
     --linestyle=#        folding style (none|truncate|wrap|wordwrap)
@@ -30,11 +33,9 @@ ansicolumn \[options\] \[file ...\]
     --runin=#            run-in width
     --runout=#           run-out width
     --[no-]pagebreak     allow page break
-    --border[=#]         print border
     --border-style=#     border style
     --[no-]ignore-space  ignore space in table output
     --[no-]isolation     page-end line isolation
-    --fillup=#           fill-up unit (pane|page|none)
     --tabstop=#          tab-stop character
     --tabhead=#          tab-head character
     --tabspace=#         tab-space width
@@ -43,7 +44,7 @@ ansicolumn \[options\] \[file ...\]
 
 # VERSION
 
-Version 1.13
+Version 1.14
 
 # DESCRIPTION
 
@@ -145,6 +146,21 @@ default, from the standard input.
 
     Insert empty line between every successive non-empty lines.
 
+- **--border**\[=_style_\], **-B**\[_style_\]
+
+    Print border.  Enabled by **--page** option automatically.  If the
+    optional _style_ is given, it is used as a border style and precedes
+    to **--border-style** option.  Use **--border=none** to disable it.
+
+    Border style is specified by **--border-style** option.
+
+- **--fillup**\[=`pane`|`page`|`none`\], **-U**\[...\]
+
+    Fill up final pane or page by empty lines.  Parameter is optional and
+    considered as 'pane' by default.  Set by **--page** option
+    automatically.  Use **--fillup=none** if you want to explicitly disable
+    it.
+
 - **--height**=#
 
     Set page height and page mode on.  See ["CALCULATION"](#calculation) section.
@@ -182,14 +198,6 @@ default, from the standard input.
 
     Move to next pane when form feed character found.
     Default true.
-
-- **--border**\[=_style_\], **-B**\[_style_\]
-
-    Print border.  Enabled by **--page** option automatically.  If the
-    optional _style_ is given, it is used as a border style and precedes
-    to **--border-style** option.  Use **--border=none** to disable it.
-
-    Border style is specified by **--border-style** option.
 
 - **--border-style**=_style_, **--bs**=...
 
@@ -240,13 +248,6 @@ default, from the standard input.
     Allow the first line of a paragraph (continuous non-space lines) is
     placed at the bottom of a pane.  Default true.  If false, move it to
     the top of next pane.  Negated by **--document** option.
-
-- **--fillup**\[=`pane`|`page`|`none`\]
-
-    Fill up final pane or page by empty lines.  Parameter is optional and
-    considered as 'pane' by default.  Set by **--page** option
-    automatically.  Use **--fillup=none** if you want to explicitly disable
-    it.
 
 - **--tabstop**=#
 

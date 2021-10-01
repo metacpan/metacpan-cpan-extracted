@@ -36,6 +36,10 @@ Split records into multiple records for each level. Implies C<-o>.
 
 Count number of records, holdings, items, and fields.
 
+=head2 filter
+
+Filter records that include any of some given (sub)fields.
+
 =head2 fields/subfields/sf
 
 List distinct fields or subfields in the data. Provide an Avram schema 

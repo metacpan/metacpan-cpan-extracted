@@ -8,7 +8,7 @@ use constant TESTS_PER_DRIVER => 14;
 our @AvailableDrivers;
 
 BEGIN {
-  require("t/utils.pl");
+  require("./t/utils.pl");
   my $total = 3 + scalar(@AvailableDrivers) * TESTS_PER_DRIVER;
   if( not eval { require DBIx::DBSchema } ) {
     plan skip_all => "DBIx::DBSchema not installed";
@@ -22,7 +22,7 @@ BEGIN {
   use_ok("DBIx::SearchBuilder::Handle");
 }
 
-require_ok("t/testmodels.pl");
+require_ok("./t/testmodels.pl");
 
 foreach my $d ( @AvailableDrivers ) {
   SKIP: {

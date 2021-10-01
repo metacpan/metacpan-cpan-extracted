@@ -2,6 +2,13 @@ kind: pipeline
 name: default
 
 steps:
+  - name: Critic
+    depends_on:
+      - clone
+    image: gugod/perlcritic-reviewdog:latest
+    commands:
+      - perlcritic --quiet lib t script
+
   - name: Test
     image: perl:5.28.0
     commands:
@@ -12,6 +19,7 @@ steps:
   - name: Build
     image: perl:5.28.0
     depends_on:
+      - Critic
       - Test
     commands:
       - cpanm -q --notest --no-man-pages App::ModuleBuildTiny

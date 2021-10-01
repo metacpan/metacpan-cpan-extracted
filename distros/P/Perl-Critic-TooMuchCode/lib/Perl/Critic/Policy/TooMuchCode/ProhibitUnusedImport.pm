@@ -151,6 +151,25 @@ sub __get_symbol_usage {
         }
     }
 
+    # Gather usages in the exact form of:
+    #     our @EXPORT = qw( ... );
+    #     our @EXPORT_OK = qw( ... );
+    for my $st (@{ $doc->find('PPI::Statement::Variable') || [] }) {
+        next unless $st->schildren == 5;
+
+        my @children = $st->schildren;
+        next unless $children[0]->content() eq 'our'
+            && ($children[1]->content() eq '@EXPORT'
+                || $children[1]->content() eq '@EXPORT_OK')
+            && $children[2]->content() eq '='
+            && $children[3]->isa('PPI::Token::QuoteLike::Words')
+            && $children[4]->content() eq ';';
+
+        for my $w ($children[3]->literal) {
+            $usage->{ $w }++;
+        }
+    }
+
     return;
 }
 
@@ -198,7 +217,7 @@ situation:
 
 In this case,  C<My::Type::Library::Numeric> exports C<is_PositiveInt> as well
 as C<PositiveInt>.  Even though C<PositiveInt> has not specifically been called
-by the code, the import has clearly been used. In order to allow for this case,
+by the code, it should be considered as being used. In order to allow for this case,
 you can specify class names of Moose-like type libraries which you intend to
 import from.
 
@@ -208,8 +227,8 @@ A similar case exists for coercions:
     my $foo   = 'Bar';
     my $lower = to_LowerCaseStr($foo);
 
-In the above case, C<to_LowerCaseStr> has not specifically been called by the
-code, but the import has clearly been used.
+In the above case, C<LowerCaseStr> has not specifically been called by the
+code, but it should be considered as being used.
 
 The imports of C<is_*> and C<to_*> from the following modules be handled by
 default:

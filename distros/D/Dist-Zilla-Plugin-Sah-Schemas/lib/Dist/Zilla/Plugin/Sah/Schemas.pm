@@ -1,10 +1,5 @@
 package Dist::Zilla::Plugin::Sah::Schemas;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-30'; # DATE
-our $DIST = 'Dist-Zilla-Plugin-Sah-Schemas'; # DIST
-our $VERSION = '0.027'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -12,6 +7,11 @@ use Moose;
 
 use PMVersions::Util qw(version_from_pmversions);
 use Require::Hook::Source::DzilBuild;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-09-29'; # DATE
+our $DIST = 'Dist-Zilla-Plugin-Sah-Schemas'; # DIST
+our $VERSION = '0.029'; # VERSION
 
 with (
     'Dist::Zilla::Role::CheckPackageDeclared',
@@ -78,7 +78,7 @@ sub _load_schemas_modules {
 }
 
 sub munge_files {
-    no strict 'refs';
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
 
     my $self = shift;
 
@@ -192,6 +192,7 @@ sub munge_files {
                 name => $rname,
                 content => join(
                     "",
+                    "## no critic: TestingAndDebugging::RequireStrict\n",
                     "package $rpkg;\n",
                     "\n",
 
@@ -249,7 +250,7 @@ _
 }
 
 sub register_prereqs {
-    no strict 'refs';
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
     require Data::Sah::Resolve;
 
     my $self = shift;
@@ -273,7 +274,7 @@ sub register_prereqs {
 
     for my $mod (sort keys %{$self->{_our_schema_modules} // {}}) {
         my $nsch = ${"$mod\::schema"};
-        my $rsch = Data::Sah::Resolve::resolve_schema($nsch);
+        my $schr = Data::Sah::Resolve::resolve_schema($nsch);
         # add prereqs to XCompletion modules
         {
             my $xc = $nsch->[1]{'x.completion'};
@@ -291,7 +292,7 @@ sub register_prereqs {
             next unless $crr && @$crr;
             for my $rule (@$crr) {
                 next unless $rule =~ /\A\w+(::\w+)*\z/;
-                my $crmod = "Data::Sah::Coerce::perl::To_$rsch->[0]::$rule";
+                my $crmod = "Data::Sah::Coerce::perl::To_$schr->{type}::$rule";
                 next if $self->is_package_declared($crmod);
                 $self->log(["Adding prereq to %s", $crmod]);
                 $self->zilla->register_prereqs({phase=>'runtime'}, $crmod => version_from_pmversions($crmod) // 0);
@@ -316,7 +317,7 @@ Dist::Zilla::Plugin::Sah::Schemas - Plugin to use when building Sah-Schemas-* di
 
 =head1 VERSION
 
-This document describes version 0.027 of Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution Dist-Zilla-Plugin-Sah-Schemas), released on 2021-07-30.
+This document describes version 0.029 of Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution Dist-Zilla-Plugin-Sah-Schemas), released on 2021-09-29.
 
 =head1 SYNOPSIS
 
@@ -373,12 +374,6 @@ build, skip resolving the schema, skip parsing the schema and extracting
 prerequisites from the schema, the and skip creating the corresponding
 C<Sah::SchemaR::*> module.
 
-=head1 CONTRIBUTOR
-
-=for stopwords Steven Haryanto
-
-Steven Haryanto <sharyanto@cpan.org>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Dist-Zilla-Plugin-Sah-Schemas>.
@@ -386,14 +381,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Dist-Zilla
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Dist-Zilla-Plugin-Sah-Schemas>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Sah-Schemas>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -407,11 +394,42 @@ L<Sah> and L<Data::Sah>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto (on PC, Bandung)
+
+Steven Haryanto (on PC, Bandung) <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Sah-Schemas>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

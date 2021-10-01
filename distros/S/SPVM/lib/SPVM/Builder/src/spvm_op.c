@@ -182,6 +182,8 @@ const char* const* SPVM_OP_C_ID_NAMES(void) {
     "PRINT",
     "REFOP",
     "DUMP",
+    "TRUE",
+    "FALSE",
   };
   
   return id_names;
@@ -765,6 +767,13 @@ SPVM_OP* SPVM_OP_new_op_int_type(SPVM_COMPILER* compiler, const char* file, int3
   return op_type;
 }
 
+SPVM_OP* SPVM_OP_new_op_bool_object_type(SPVM_COMPILER* compiler, const char* file, int32_t line) {
+  SPVM_TYPE* type = SPVM_TYPE_create_bool_object_type(compiler);
+  SPVM_OP* op_type = SPVM_OP_new_op_type(compiler, type, file, line);
+  
+  return op_type;
+}
+
 SPVM_OP* SPVM_OP_new_op_long_type(SPVM_COMPILER* compiler, const char* file, int32_t line) {
   SPVM_TYPE* type = SPVM_TYPE_create_long_type(compiler);
   SPVM_OP* op_type = SPVM_OP_new_op_type(compiler, type, file, line);
@@ -929,6 +938,26 @@ SPVM_OP* SPVM_OP_build_default_statement(SPVM_COMPILER* compiler, SPVM_OP* op_de
   }
   
   return op_default;
+}
+
+SPVM_OP* SPVM_OP_new_op_true(SPVM_COMPILER* compiler, SPVM_OP* op) {
+  
+  const char* class_var_name = "$Bool::TRUE";
+  SPVM_OP* op_class_var_name = SPVM_OP_new_op_name(compiler, class_var_name, op->file, op->line);
+  SPVM_OP* op_class_var_access = SPVM_OP_build_class_var_access(compiler, op_class_var_name);
+  op_class_var_access->uv.class_var_access->inline_expansion = 1;
+
+  return op_class_var_access;
+}
+
+SPVM_OP* SPVM_OP_new_op_false(SPVM_COMPILER* compiler, SPVM_OP* op) {
+  
+  const char* class_var_name = "$Bool::FALSE";
+  SPVM_OP* op_class_var_name = SPVM_OP_new_op_name(compiler, class_var_name, op->file, op->line);
+  SPVM_OP* op_class_var_access = SPVM_OP_build_class_var_access(compiler, op_class_var_name);
+  op_class_var_access->uv.class_var_access->inline_expansion = 1;
+  
+  return op_class_var_access;
 }
 
 SPVM_OP* SPVM_OP_build_condition(SPVM_COMPILER* compiler, SPVM_OP* op_term_condition, int32_t is_not) {
@@ -1231,6 +1260,13 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
   SPVM_TYPE*  type = NULL;
   
   switch (op->id) {
+    case SPVM_OP_C_ID_TRUE:
+    case SPVM_OP_C_ID_FALSE:
+    {
+      SPVM_OP* op_type = SPVM_OP_new_op_bool_object_type(compiler, op->file, op->line);
+      type = op_type->uv.type;
+      break;
+    }
     case SPVM_OP_C_ID_RETURN:
     case SPVM_OP_C_ID_LOOP_INCREMENT:
     case SPVM_OP_C_ID_CONDITION:

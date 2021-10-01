@@ -3,8 +3,8 @@ NAME
     filesystem
 
 VERSION
-    This document describes version 0.000 of Tree::From::FS (from Perl
-    distribution Tree-From-FS), released on 2020-02-04.
+    This document describes version 0.000.1 of Tree::From::FS (from Perl
+    distribution Tree-From-FS), released on 2021-05-06.
 
 SYNOPSIS
 DESCRIPTION
@@ -25,11 +25,12 @@ HOMEPAGE
     <https://metacpan.org/release/Tree-From-FS>.
 
 SOURCE
-    Source repository is at <https://github.com/perlancar/perl-Tree-FromFS>.
+    Source repository is at
+    <https://github.com/perlancar/perl-Tree-From-FS>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Tree-From-FS>
+    <https://github.com/perlancar/perl-Tree-From-FS/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -37,14 +38,15 @@ BUGS
 SEE ALSO
     Role::TinyCommons::Tree
 
-    Other ways to create tree: Tree::From::Struct, Tree::From::Text,
-    Tree::From::TextLines, Tree::Create::Callback, Tree::Create::Size.
+    Other ways to create tree: Tree::From::Struct, Tree::From::ObjArray,
+    Tree::From::Text, Tree::From::TextLines, Tree::Create::Callback,
+    Tree::Create::Size.
 
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2021 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

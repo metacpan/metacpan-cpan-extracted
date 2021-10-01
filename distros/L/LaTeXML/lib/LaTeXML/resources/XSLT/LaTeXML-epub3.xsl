@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-/=====================================================================\ 
+/=====================================================================\
 |  LaTeXML-epub3.xsl                                                  |
 |  Stylesheet for converting LaTeXML documents to ePub3               |
 |=====================================================================|
@@ -43,18 +43,12 @@
     </xsl:element>
   </xsl:template>
 
-  <!-- Generate a meta -->
-  <xsl:template match="/" mode="head-content-type">
-    <xsl:text>&#x0A;</xsl:text>
-    <xsl:element name="meta" namespace="{$html_ns}">
-      <xsl:attribute name="charset">
-        <xsl:text>utf-8</xsl:text>
-      </xsl:attribute>
-    </xsl:element>
-  </xsl:template>
-
   <!-- RDFa is invalid in EPUB3, so just skip over it -->
   <xsl:template match="ltx:rdf">
   </xsl:template>
+
+  <!-- Linking to a text/plain data URL is invalid in EPUB3,
+       so just skip over it -->
+  <xsl:template match="ltx:listing[@data]" mode="begin"/>
 
 </xsl:stylesheet>

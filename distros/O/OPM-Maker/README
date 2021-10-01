@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.00
+    version 1.10
 
 DESCRIPTION
 
@@ -49,6 +49,32 @@ DESCRIPTION
 
       Check if the DatabaseInstall and DatabaseUninstall sections in your
       .sopm files are valid. And it checks for SQL keywords.
+
+PARSING HUGE FILES
+
+    The commands index and dependencies parse ticketsystem addons. And
+    those addons can become quite huge (the Znuny ITSM bundle is about 27M
+    big). Usually the parser rejects such huge files, but that behaviour
+    was changed as of version 1.10.
+
+    Parsing XML files can lead to security issues (loading external
+    entities, application runs out of memory, ...), so those commands work
+    as follows:
+
+      * Huge files (up to 30M) are parsed
+
+      * If an environment variable OPM_MAX_SIZE is set, that is the max
+      size for opm files
+
+      If OPM_MAX_SIZE is set to 15M, opm files bigger than 15 MBytes are
+      rejected, if the variable is set to 15000 opm files bigger than 15000
+      Bytes are rejected.
+
+      * Loading external entities/DTD is disabled
+
+      * Entities are not expanded
+
+      * OPM_UNSECURE reverts the last two settings
 
 AUTHOR
 

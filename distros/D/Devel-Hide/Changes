@@ -1,5 +1,10 @@
 Revision history for Perl extension Devel::Hide.
 
+0.0015      2021-09-28
+
+   - Test warnings more carefully to avoid spurious test failures caused by a
+     bug in Test2::Util (http://www.cpantesters.org/cpan/report/c01ff7be-1e8a-11ec-bc66-57723b537541)
+
 0.0014      2021-04-27
 
    - Bump version requirement of Test::More to one that supports note()

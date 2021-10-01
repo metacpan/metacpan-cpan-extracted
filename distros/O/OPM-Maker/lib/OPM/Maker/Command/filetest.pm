@@ -1,15 +1,17 @@
 package OPM::Maker::Command::filetest;
-$OPM::Maker::Command::filetest::VERSION = '1.00';
+$OPM::Maker::Command::filetest::VERSION = '1.10';
 # ABSTRACT: check if filelist in .sopm includes the files on your disk
 
 use strict;
 use warnings;
 
+use Carp qw(croak);
 use File::Find::Rule;
 use Path::Class ();
 use XML::LibXML;
 
 use OPM::Maker -command;
+use OPM::Maker::Utils qw(reformat_size);
 
 sub abstract {
     return "Check if filelist in .sopm includes the files on your disk";
@@ -32,9 +34,34 @@ sub validate_args {
 
 sub execute {
     my ($self, $opt, $args) = @_;
-    
+
     my $file = $args->[0];
-    my $parser = XML::LibXML->new;
+
+    my %opts;
+    if ( !$ENV{OPM_UNSECURE} ) {
+        %opts = (
+            no_network      => 1,
+            expand_entities => 0,
+        );
+    }
+
+    my $size = -s $file;
+
+    # if file is big, but not "too big"
+    my $max_size = 31_457_280;
+    if ( $ENV{OPM_MAX_SIZE} ) {
+        $max_size = reformat_size( $ENV{OPM_MAX_SIZE} );
+    }
+
+    if ( $size > $max_size ) {
+        croak "$file too big (max size: $max_size bytes)";
+    }
+
+    if ( $size > 10_000_000 ) {
+        $opts{huge} = 1;
+    }
+
+    my $parser = XML::LibXML->new( %opts );
     my $tree   = $parser->parse_file( $file );
     
     my $sopm_path = Path::Class::File->new( $file );
@@ -90,7 +117,7 @@ OPM::Maker::Command::filetest - check if filelist in .sopm includes the files on
 
 =head1 VERSION
 
-version 1.00
+version 1.10
 
 =head1 AUTHOR
 

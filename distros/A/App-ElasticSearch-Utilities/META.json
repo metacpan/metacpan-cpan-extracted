@@ -103,7 +103,7 @@
          "web" : "https://github.com/reyjrar/es-utils"
       }
    },
-   "version" : "8.1",
+   "version" : "8.2",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032001"
@@ -554,7 +554,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "release-8.1",
+                  "tag" : "release-8.2",
                   "tag_format" : "release-%v",
                   "tag_message" : "v%V"
                },

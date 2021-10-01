@@ -15,6 +15,7 @@ use strict;
 use warnings;
 use LaTeXML::Util::Pathname;
 use LaTeXML::Common::XML;
+use LaTeXML::Common::Error;
 use charnames qw(:full);
 use LaTeXML::Post;
 use base qw(LaTeXML::Post::Processor);
@@ -63,10 +64,8 @@ sub process {
       foreach my $type (sort keys %{ $LaTeXML::Post::CrossRef::MISSING{$severity} }) {
         my @items = keys %{ $LaTeXML::Post::CrossRef::MISSING{$severity}{$type} };
         $tempid ||= grep { $_ eq 'TEMPORARY_DOCUMENT_ID' } @items;
-        push(@msgs, $type . ": " . join(', ', @items)); }
-      if (@msgs) {
         my @args = ('expected', 'ids', undef,
-          "Missing items:\n  " . join(";\n  ", @msgs),
+          "Missing $type: " . join(',', @items),
           ($tempid ? "[Note TEMPORARY_DOCUMENT_ID is a stand-in ID for the main document.]" : ()));
         if    ($severity eq 'error') { Error(@args); }
         elsif ($severity eq 'warn')  { Warn(@args); }
@@ -233,7 +232,7 @@ sub fill_in_tocs {
       $lists = { toc => 1 };
       @list  = $self->gentoc_context($doc, $id, $show, $lists, $types); }
     $doc->addNodes($toc, ['ltx:toclist', {}, @list]) if @list; }
-  NoteProgressDetailed(" [Filled in $n TOCs]");
+  Debug("Filled in $n TOCs") if $LaTeXML::DEBUG{crossref};
   return; }
 
 # generate TOC for $id & its children,
@@ -318,7 +317,7 @@ sub fill_in_frags {
       if (my $fragid = $entry->getValue('fragid')) {
         $n++;
         $node->parentNode->setAttribute(fragid => $fragid); } } }
-  NoteProgressDetailed(" [Filled in fragment $n ids]");
+  Debug("Filled in fragment $n ids") if $LaTeXML::DEBUG{crossref};
   return; }
 
 # Fill in content text for any <... @idref..>'s or @labelref
@@ -356,11 +355,12 @@ sub fill_in_refs {
           $ref->setAttribute(title => $titlestring); } }
       if (!$ref->textContent && !element_nodes($ref)
         && !(($tag eq 'ltx:graphics') || ($tag eq 'ltx:picture'))) {
-        $doc->addNodes($ref, $self->generateRef($doc, $id, $show)); }
+        my $is_nameref = ($ref->getAttribute('class')||'') =~ 'ltx_refmacro_nameref';
+        $doc->addNodes($ref, $self->generateRef($doc, $id, $show, $is_nameref)); }
       if (my $entry = $$self{db}->lookup("ID:$id")) {
         $ref->setAttribute(stub => 1) if $entry->getValue('stub'); }
   } }
-  NoteProgressDetailed(" [Filled in $n refs]");
+  Debug("Filled in $n refs") if $LaTeXML::DEBUG{crossref};
   return; }
 
 # similar sorta thing for RDF about & resource labels & ids
@@ -389,7 +389,7 @@ sub fill_in_RDFa_refs {
             $ref->setAttribute($key => '#' . $id); } }
   } } }
   set_RDFa_prefixes($doc->getDocument, {});    # what prefixes??
-  NoteProgressDetailed(" [Filled in $n RDFa refs]");
+  Debug("Filled in $n RDFa refs") if $LaTeXML::DEBUG{crossref};
   return; }
 
 sub fill_in_mathlinks {
@@ -419,7 +419,7 @@ sub fill_in_mathlinks {
         if (my $tag = $entry->getValue('tag:short') || $entry->getValue('description')) {
           $sym->setAttribute(title => getTextContent($doc, $tag)); }
   } } }
-  NoteProgressDetailed(" [Filled in $n math links]");
+  Debug("Filled in $n math links") if $LaTeXML::DEBUG{crossref};
   return; }
 
 # Given a declaration entry (ltx:declare, or ltx:mark or ...)
@@ -453,7 +453,7 @@ sub fill_in_bibrefs {
   foreach my $bibref ($doc->findnodes('descendant::ltx:bibref')) {
     $n++;
     $doc->replaceNode($bibref, $self->make_bibcite($doc, $bibref)); }
-  NoteProgressDetailed(" [Filled in $n bibrefs]");
+  Debug("Filled in $n bibrefs") if $LaTeXML::DEBUG{crossref};
   return; }
 
 # Given a list of bibkeys, construct links to them.
@@ -593,7 +593,7 @@ sub make_bibcite {
             push(@r, $yysep, ' ', ['ltx:ref', $$next{attr}, @{ $$next{number} }]); }
           push(@stuff, ['ltx:sup', {}, @r]); }
         else {
-          print STDERR "CITE ignoring show key '$role'\n"; } }
+          Info('unexpected', $role, $doc, "CITE ignoring show key '$role'"); } }
       elsif ($show =~ s/^\{([^\}]*)\}//) {    # pass-thru literal, quoted with {}
         push(@stuff, $1) if $1; }
       elsif ($show =~ s/^~//) {               # Pass-thru spaces
@@ -643,7 +643,7 @@ sub generateURL {
 # (standing for the type prefix, refnum and title of the id'd object)
 # and any other random characters; the
 sub generateRef {
-  my ($self, $doc, $reqid, $reqshow) = @_;
+  my ($self, $doc, $reqid, $reqshow, $is_nameref) = @_;
   my $pending = '';
   my @stuff;
   # Try the requested show pattern, and if it fails, try a fallback of just the title or refnum
@@ -651,19 +651,19 @@ sub generateRef {
     my $id = $reqid;
     # Start with requested ID, add some from parent(s), if needed/until to make "useful" link content
     while (my $entry = $id && $$self{db}->lookup("ID:$id")) {
-      if (my @s = $self->generateRef_aux($doc, $entry, $show)) {
+      if (my @s = $self->generateRef_aux($doc, $entry, $show, $is_nameref)) {
         push(@stuff, $pending) if $pending;
         push(@stuff, @s);
         return @stuff if $self->checkRefContent($doc, @stuff);
         $pending = $$self{ref_join}; } # inside/outside this brace determines if text can START with the join.
       $id = $entry->getValue('parent'); } }
   if (!@stuff) {                       # Try first child for a title-less document?
-    my $entry = $$self{db}->lookup("ID:$reqid");
-    if (($entry->getValue('type') || '') eq 'ltx:document') {
-      foreach my $c (@{ $entry->getValue('children') }) {
-        if (my $centry = $$self{db}->lookup("ID:$c")) {
-          if (my @s = $self->generateRef_aux($doc, $centry, $reqshow)) {
-            push(@stuff, @s); last; } } } } }
+    if (my $entry = $$self{db}->lookup("ID:$reqid")) {
+      if (($entry->getValue('type') || '') eq 'ltx:document') {
+        foreach my $c (@{ $entry->getValue('children') }) {
+          if (my $centry = $$self{db}->lookup("ID:$c")) {
+            if (my @s = $self->generateRef_aux($doc, $centry, $reqshow, $is_nameref)) {
+              push(@stuff, @s); last; } } } } } }
   if (@stuff) {
     return @stuff; }
   else {
@@ -722,7 +722,7 @@ my %ref_fallbacks = (    # Alternative fields, when not found
 # The keywords are things like refnum, title, caption, etc
 # (possibly coming from ltx:tag or other data; see Scan)
 sub generateRef_aux {
-  my ($self, $doc, $entry, $show) = @_;
+  my ($self, $doc, $entry, $show, $is_nameref) = @_;
   my @stuff = ();
   my $OK    = 0;
   while ($show) {
@@ -737,6 +737,10 @@ sub generateRef_aux {
         last if $value; }
       if ($value) {
         $OK = 1;
+        if ($is_nameref) {
+          # yank out the tag if this is nameref
+          my ($first_child) = element_nodes($value);
+          $first_child->unbindNode if $first_child && ($doc->getQName($first_child) eq 'ltx:tag'); }
         push(@stuff, ['ltx:text', { class => $class }, $self->prepRefText($doc, $value)]); } }
     elsif ($show =~ s/^\{([^\}]*)\}//) {    # pass-thru literal, quoted with {}
       push(@stuff, $1) if $1; }
@@ -863,7 +867,7 @@ sub fillInGlossaryRef {
     if (!$ref->textContent && !element_nodes($ref)) {
       $doc->addNodes($ref, $key);
       $doc->addClass($ref, 'ltx_missing'); } }
-  NoteProgressDetailed(" [Filled in $n glossaryrefs]");
+  Debug("Filled in $n glossaryrefs") if $LaTeXML::DEBUG{crossref};
   return; }
 
 sub generateGlossaryRefTitle {

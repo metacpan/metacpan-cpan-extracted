@@ -1,5 +1,5 @@
 package Getopt::EX::Colormap;
-use version; our $VERSION = version->declare("v1.24.2");
+use version; our $VERSION = version->declare("v1.25.1");
 
 use v5.14;
 use warnings;
@@ -24,11 +24,13 @@ use Getopt::EX::LabeledParam;
 use Getopt::EX::Util;
 use Getopt::EX::Func qw(callable);
 
-our $RGB24       = $ENV{GETOPTEX_RGB24};
-our $LINEAR256   = $ENV{GETOPTEX_LINEAR256};
-our $LINEAR_GREY = $ENV{GETOPTEX_LINEARGREY};
-our $NO_RESET_EL = $ENV{GETOPTEX_NO_RESET_EL};
-our $SPLIT_ANSI  = $ENV{GETOPTEX_SPLIT_ANSI};
+our $NO_NO_COLOR //= $ENV{GETOPTEX_NO_NO_COLOR};
+our $NO_COLOR    //= !$NO_NO_COLOR && defined $ENV{NO_COLOR};
+our $RGB24       //= $ENV{COLORTERM}//'' eq 'truecolor' || $ENV{GETOPTEX_RGB24};
+our $LINEAR256   //= $ENV{GETOPTEX_LINEAR256};
+our $LINEAR_GREY //= $ENV{GETOPTEX_LINEARGREY};
+our $NO_RESET_EL //= $ENV{GETOPTEX_NO_RESET_EL};
+our $SPLIT_ANSI  //= $ENV{GETOPTEX_SPLIT_ANSI};
 
 my @nonlinear = do {
     map { ( $_->[0] ) x $_->[1] } (
@@ -143,32 +145,31 @@ my %numbers = (
     W => 37, w => 97,	# W : White
     );
 
+my $colorspec_re = qr{
+      (?<toggle> /)			 # /
+    | (?<reset> \^)			 # ^
+    | (?<hex>	 [0-9a-f]{6}		 # 24bit hex
+	     | \#[0-9a-f]{3,} )		 # generic hex
+    | (?<rgb>  \(\d+,\d+,\d+\) )	 # 24bit decimal
+    | (?<c256>	 [0-5][0-5][0-5]	 # 216 (6x6x6) colors
+	     | L(?:[01][0-9]|[2][0-5]) ) # 24 grey levels + B/W
+    | (?<c16>  [KRGYBMCW] )		 # 16 colors
+    | (?<efct> ~?[;NZDPIUFQSVX] )	 # effects
+    | (?<csi>  { (?<csi_name>[A-Z]+)	 # other CSI
+		 (?<P> \( )?		 # optional (
+		 (?<csi_param>[\d,;]*)	 # 0;1;2
+		 (?(<P>) \) )		 # closing )
+	       }
+	     | (?<csi_abbr>[E]) )	 # abbreviation
+    | < (?<name> \w+ ) >		 # <colorname>
+}xi;
+
 sub ansi_numbers {
     local $_ = shift // '';
     my @numbers;
     my $toggle = Getopt::EX::ToggleValue->new(value => 10);
 
-    while (m{\G
-	     (?:
-	       (?<toggle> /)				# /
-	     | (?<reset> \^)				# ^
-	     | (?<hex>    [0-9a-f]{6}			# 24bit hex
-	              | \#[0-9a-f]{3,} )		# generic hex
-	     | (?<rgb>  \(\d+,\d+,\d+\) )		# 24bit decimal
-	     | (?<c256>   [0-5][0-5][0-5]		# 216 (6x6x6) colors
-		      | L(?:[01][0-9]|[2][0-5]) )	# 24 grey levels + B/W
-	     | (?<c16>  [KRGYBMCW] )			# 16 colors
-	     | (?<efct> ~?[;NZDPIUFQSVX] )		# effects
-	     | (?<csi>  { (?<csi_name>[A-Z]+)		# other CSI
-			  (?<P> \( )?			# optional (
-			  (?<csi_param>[\d,;]*)		# 0;1;2
-			  (?(<P>) \) )			# closing )
-			}
-		      | (?<csi_abbr>[E]) )		# abbreviation
-	     | < (?<name> \w+ ) >			# <colorname>
-	     | (?<err>  .+ )				# error
-	     )
-	    }xig) {
+    while (m{\G (?: $colorspec_re | (?<err> .+ ) ) }xig) {
 	if ($+{toggle}) {
 	    $toggle->toggle;
 	}
@@ -302,9 +303,11 @@ sub ansi_code {
 
 sub ansi_pair {
     my $spec = shift;
+    my $el = 0;
     my $start = ansi_code $spec // '';
     my $end = $start eq '' ? '' : do {
 	if ($start =~ /(.*)(\e\[[0;]*K)(.*)/) {
+	    $el = 1;
 	    if ($3) {
 		$1 . EL . RESET;
 	    } else {
@@ -318,7 +321,7 @@ sub ansi_pair {
 	    }
 	}
     };
-    ($start, $end);
+    ($start, $end, $el);
 }
 
 sub colorize {
@@ -349,10 +352,17 @@ sub apply_color {
     if (callable $color) {
 	return $color->call for $text;
     }
+    elsif ($NO_COLOR) {
+        return $text;
+    }
     else {
-	my($s, $e) = @{ $cache->{$color} //= [ ansi_pair($color) ] };
+	my($s, $e, $el) = @{ $cache->{$color} //= [ ansi_pair($color) ] };
 	state $reset = qr{ \e\[[0;]*m (?: \e\[[0;]*[Km] )* }x;
-	$text =~ s/(^|$reset)([^\e\r\n]+)/${1}${s}${2}${e}/mg;
+	if ($el) {
+	    $text =~ s/(^|$reset)([^\e\r\n]*)/${1}${s}${2}${e}/mg;
+	} else {
+	    $text =~ s/(^|$reset)([^\e\r\n]+)/${1}${s}${2}${e}/mg;
+	}
 	return $text;
     }
 }
@@ -448,8 +458,7 @@ sub colortable12 {
 sub colortable24 {
     colortableN(
 	step   => 24,
-#	string => "\N{UPPER HALF BLOCK}",
-	string => "\N{U+2580}",
+	string => "\N{U+2580}", # "\N{UPPER HALF BLOCK}",
 	shift  => 1,
 	x => 1, y => 2, z => 4,
 	@_
@@ -1007,12 +1016,9 @@ behavior.
 
 Return colorized version of given text.
 
-B<colorize> produces 256 or 24bit colors depending on the value of
-C<$Getopt::EX::Colormap::RGB24> variable and environment
-C<GETOPTEX_RGB24>.
-
-B<colorize24> always produces 24bit color sequence for 24bit/12bit
-color spec.
+B<colorize> produces 256 or 24bit colors depending on the setting,
+while B<colorize24> always produces 24bit color sequence for
+24bit/12bit color spec.  See L<ENVIRONMENT>.
 
 =item B<ansi_code>(I<color_spec>)
 
@@ -1082,8 +1088,27 @@ terminal.
 However, some terminal, including Apple_Terminal, clear the text on
 the cursor when I<Erase Line> sequence is received at the rightmost
 column of the screen.  If you do not want this behavior, set module
-variable C<$Getopt::EX::Colormap::NO_RESET_EL> or
-C<GETOPTEX_NO_RESET_EL> environment.
+variable C<$NO_RESET_EL> or C<GETOPTEX_NO_RESET_EL> environment.
+
+
+=head1 ENVIRONMENT
+
+If the environment variable C<NO_COLOR> is set, regardless of its
+value, colorizing interface in this module never produce color
+sequence.  Primitive function such as C<ansi_code> is not the case.
+See L<https://no-color.org/>.
+
+If the module variable C<$NO_NO_COLOR> or C<GETOPTEX_NO_NO_COLOR>
+environment is true, C<NO_COLOR> value is ignored.
+
+B<color> method and B<colorize> function produces 256 or 24bit colors
+depending on the value of C<$RGB24> module variable.  Also 24bit mode
+is enabled when environment C<GETOPTEX_RGB24> is set or C<COLORTERM>
+is C<truecolor>.
+
+If the module variable C<$NO_RESET_EL> set, or C<GETOPTEX_NO_RESET_EL>
+environment, I<Erace Line> sequence is not produced after RESET code.
+See L<RESET SEQUENCE>.
 
 
 =head1 SEE ALSO
@@ -1096,6 +1121,25 @@ L<https://en.wikipedia.org/wiki/ANSI_escape_code>
 L<Graphics::ColorNames::X>
 
 L<https://en.wikipedia.org/wiki/X11_color_names>
+
+L<https://no-color.org/>
+
+=head1 AUTHOR
+
+Kazumasa Utashiro
+
+=head1 COPYRIGHT
+
+The following copyright notice applies to all the files provided in
+this distribution, including binary files, unless explicitly noted
+otherwise.
+
+Copyright 2015-2021 Kazumasa Utashiro
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 

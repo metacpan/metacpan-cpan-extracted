@@ -1,11 +1,38 @@
 SUPPORTED ATTRIBUTES
 ====================
-  uid		UID of process
-  pid		process ID
-  ppid		parent process ID
-  pgid		process group ID
-  winpid	Windows process ID
-  fname		file name
-  start		start time (seconds since the epoch)
-  ttynum	tty number of process
-  state		state of process
+  uid         UID of process
+  euid        Effective UID of process
+  suid        Saved UID of process
+  fuid        File UID of process
+  gid         GID of process
+  egid        Effective GID of process
+  sgid        Saved GID of process
+  fgid        File GID of process
+  pid         process ID
+  ppid        parent process ID
+  pgrp        process group
+  sess        session ID
+  priority    priority of process
+  ttynum      tty number of process
+  flags       flags of process
+  minflt      minor page faults
+  cminflt     child minor page faults
+  majflt      major page faults
+  cmajflt     child major page faults
+  utime       user mode time (microseconds)
+  stime       kernel mode time (microseconds)
+  cutime      child utime (microseconds)
+  cstime      child stime (microseconds)
+  time        user + system time (microseconds)
+  ctime       child user + system time (microseconds)
+  size        virtual memory size (bytes)
+  rss         resident set size (bytes)
+  fname       file name
+  start       start time (seconds since the epoch)
+  pctcpu      percent cpu used since process started
+  state       state of process
+  pctmem      percent memory
+  cmndline    full command line of process
+  exec        absolute filename (including path) of executed command
+  ttydev      path of process's tty
+  cwd         current directory of process

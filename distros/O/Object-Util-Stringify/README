@@ -1,0 +1,86 @@
+NAME
+    Object::Util::Stringify - Utility routines related to object
+    stringification
+
+VERSION
+    This document describes version 0.001 of Object::Util::Stringify (from
+    Perl distribution Object-Util-Stringify), released on 2021-09-28.
+
+SYNOPSIS
+     use Object::Util::Stringify qw(
+         set_stringify
+         unset_stringify
+     );
+
+     # An easy way to set what string an object should stringify to
+     set_stringify($obj, "oh my!");
+     print $obj; # => prints "oh my!"
+
+     # Remove stringification
+     unset_stringify($obj);
+     print $obj; # => prints the standard stringification, e.g. My::Package=HASH(0x562847e245e8)
+
+DESCRIPTION
+    Keywords: overload, stringify, stringification
+
+FUNCTIONS
+  set_stringify
+    Usage:
+
+     set_stringify($obj, $str);
+
+    Set object stringification to $str.
+
+  unset_stringify
+    Usage:
+
+     unset_stringify($obj);
+
+    Reset/remove object stringification.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Object-Util-Stringify>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Object-Util-Stringify>.
+
+SEE ALSO
+    overload
+
+    TPrintable
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Object-Util-Stringify
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

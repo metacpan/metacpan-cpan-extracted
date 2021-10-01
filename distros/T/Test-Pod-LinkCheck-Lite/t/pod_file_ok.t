@@ -44,7 +44,7 @@ BEGIN {
 	}
 	$inx = 0;
     }
-    splice @INC, $inx, 0, 'inc/Mock';
+    splice @INC, $inx, 0, 'inc/Mock', 't/data/_lib';
 
     no warnings qw{ once };
 

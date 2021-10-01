@@ -56,7 +56,7 @@ sub process {
     $self->addNavigation($tree, @nav) if @nav;
   }
   my $n = scalar(@docs);
-  NoteProgressDetailed(($n > 1 ? " [Split into in $n TOCs]" : "[not split]"));
+  NoteLog(($n > 1 ? " [Split into in $n TOCs]" : "[not split]"));
   return @docs; }
 
 # Get the nodes in the document that WILL BECOME separate "pages".
@@ -97,8 +97,10 @@ sub processPages {
   my ($self, $doc, @entries) = @_;
   my $rootid = $doc->getDocumentElement->getAttribute('xml:id');
   # Before any document surgery, copy inheritable attributes.
+  my $intoc = 0;    # Whether ANY children appear in toc
   foreach my $entry (@entries) {
     my $node = $$entry{node};
+    $intoc ||= ($node->getAttribute('inlist') || '') =~ /\btoc\b/;
     foreach my $attr (qw(xml:lang backgroundcolor)) {
       if (my $anc = $doc->findnode('ancestor-or-self::*[@' . $attr . '][1]', $node)) {
         $node->setAttribute($attr => $anc->getAttribute($attr)); } } }
@@ -117,6 +119,8 @@ sub processPages {
     while (@entries && @removed && $entries[0]->{node}->isSameNode($removed[0])) {
       my $entry = shift(@entries);
       my $page  = $$entry{node};
+      # If any pages go in toc, Assume siblings on their own page should go also
+      $page->setAttribute(inlist => 'toc') if $intoc && !$page->hasAttribute('inlist');
       $doc->removeNodes(shift(@removed));
       my $id       = $page->getAttribute('xml:id');
       my $tocentry = ['ltx:tocentry', {},
@@ -125,7 +129,7 @@ sub processPages {
       # Due to the way document building works, we remove & process children pages
       # BEFORE processing this page.
       my @childdocs = $self->processPages($doc, @{ $$entry{children} });
-      my $subdoc = $doc->newDocument($page, destination => $$entry{name},
+      my $subdoc    = $doc->newDocument($page, destination => $$entry{name},
         parentDocument => $doc, parent_id => $$entry{upid});
       $$entry{document} = $subdoc;
       push(@docs, $subdoc, @childdocs); }
@@ -163,12 +167,12 @@ sub getPageName {
   if (!$name) {
     if (($attr eq 'labels') && ($name = $page->getAttribute('xml:id'))) {
       Info('expected', $attr, $doc->getQName($page),
-        "Expected attribute '$attr' to create page pathname", "using id=$name");
+        "Using '$name' to create page pathname, instead of missing '$attr'");
       $attr = 'xml:id'; }
     else {
       $name = $self->generateUnnamedPageName;
       Info('expected', $attr, $doc->getQName($page),
-        "Expected attribute '$attr' to create page pathname", "using id=$name"); } }
+        "Using '$name' to create page pathname, instead of missing '$attr'"); } }
   if ($naming =~ /relative$/) {
     my $pname = $parent->getAttribute($attr);
     $pname =~ s/\s+.*//   if $pname;    # Truncate in case multiple labels.

@@ -1,5 +1,7 @@
 # -*- mode: org; -*-
 
+* DONE [2021-09-30 Sun] Add example/test with non Cartesian coordinates
+* TODO [2021-09-25 Sat] Check if it is clear that complexCoeffs is equivalent to non is_hermitian
 * DONE Return as, bs, b2s as pdl instead of array?
 * DONE Check upper iterations in continued fractions
 * DONE Factor out OneH?
@@ -9,7 +11,7 @@
 * TODO Merge exact surface SHG calculation with current surface calculation.
 * TODO Write and publish paper.
 * DONE Allow non-orthogonal unit vectors
-* TODO Allow saving states for reorthogonalization and reinitialization
+* DONE Allow saving states for reorthogonalization and reinitialization
   Done for reorthogonalization. Reinitialization pending.
 * DONE [2019-01-04 Fri] Generalize to three or more media nonretarded
 * DONE Complete spinor generalization.

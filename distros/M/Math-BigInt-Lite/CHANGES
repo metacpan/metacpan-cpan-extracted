@@ -1,3 +1,9 @@
+0.24 2021-09-28
+
+ * Add method bpi().
+
+ * Sync test with Math-BigInt distribution.
+
 0.23 2021-07-14
 
  * Sync with the Math-BigInt distribution.

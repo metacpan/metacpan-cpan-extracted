@@ -36,5 +36,57 @@ AtBeginDocument('\let\lx@orig@theadfont\theadfont'
 # And since folks SHOULD use \thead, we'll not bother guessing.
 AssignValue(GUESS_TABULAR_HEADERS => 0);
 
+# \diaghead (slopex,slopey) {width}{item A}{item B}
+# Note that A is generally the lower item
+# This macro arranges to wrap the args in a table,
+# with appropriate alignment based on slope.
+DefMacro('\diaghead OptionalPair {}{}{}', sub {
+    my ($gullet, $diag, $space, $A, $B) = @_;
+    my ($diagH, $diagV) = ($diag ? ($diag->getX->valueOf, $diag->getY->valueOf) : (5.0, -2.0));
+    my $flip = ($diagH < 0) ^ ($diagV < 0);
+    my ($Ap, $Bp) = ($flip ? ('l', 'r') : ('r', 'l'));
+    return Invocation(T_CS('\lx@diagheads'),
+      $diagH, $diagV, $space,
+      Invocation(T_CS('\lx@diag@head'), T_LETTER($Ap), $A),
+      Invocation(T_CS('\lx@diag@head'), T_LETTER($Bp), $B)); });
+# Ideally, we'd arrange a constructor whose reversion is simply #2
+DefMacro('\lx@diag@head{}{}',
+  #  '{\theadfont\begin{tabular}{#1}#2\end{tabular}}');
+  '{\theadfont\shortstack[#1]{#2}}');
+
+DefConstructor('\lx@diagheads {}{} {}{}{}',
+  "<ltx:picture width='&pxValue(#width)' height='&pxValue(#height)'>"
+    . "<ltx:line points='#line' stroke='black' stroke-width='0.4'/>"
+    . "<ltx:g transform='translate(#Ax,#Ay)' innerwidth='#Aw' innerheight='#Ah' innerdepth='#Ad'>"
+    . "<ltx:inline-block>#A</ltx:inline-block>"
+    . "</ltx:g>"
+    . "<ltx:g transform='translate(#Bx,#By)' innerwidth='#Bw' innerheight='#Bh' innerdepth='#Bd'>"
+    . "<ltx:inline-block>#B</ltx:inline-block>"
+    . "</ltx:g>"
+    . "</ltx:picture>",
+  reversion      => '\diaghead(#1,#2){#3}{#4}{#5}',
+  afterConstruct => sub { $_[0]->addClass($_[0]->getNode, 'ltx_nopad'); },
+  afterDigest    => sub {
+    my ($stomach, $whatsit) = @_;
+    my ($diagH, $diagV, $space, $A, $B) = $whatsit->getArgs;
+    $diagH = ToString($diagH) || 1;
+    $diagV = ToString($diagV) || 1;
+    my $flip = ($diagH < 0) ^ ($diagV < 0);
+    my ($Aw, $Ah, $Ad) = map { $_->pxValue } $A->getSize; $Ah += $Ad;
+    my ($Bw, $Bh, $Bd) = map { $_->pxValue } $B->getSize; $Bh += $Bd;
+    my $w     = $space->getWidth->pxValue;    # + tabcolsep
+    my $h     = $w * abs($diagV / $diagH);
+    my $line  = ($flip ? "0,$h $w,0" : "0,0, $w,$h");
+    my $Ax    = ($flip ? 0           : $w - $Aw);
+    my $Ay    = 0;
+    my $Bx    = ($flip ? $w - $Bw : 0);
+    my $By    = $h - $Bh;
+    my $pxppt = Dimension('1pt')->pxValue(10);
+    $whatsit->setProperties(
+      width => Dimension($w / $pxppt . 'pt'), height => Dimension($h / $pxppt . 'pt'),
+      A     => $A, Ax => $Ax, Ay => $Ay, Aw => $Aw, Ah => $Ah,
+      B     => $B, Bx => $Bx, By => $By, Bw => $Bw, Bh => $Bh,
+      line  => $line); }
+);
 #======================================================================
 1;

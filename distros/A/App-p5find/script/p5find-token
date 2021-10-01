@@ -1,0 +1,58 @@
+#!/usr/bin/env perl
+use v5.18;
+
+use App::p5find qw(p5_doc_iterator);
+use Getopt::Long;
+
+sub print_usage {
+    print <<USAGE;
+p5find-token [switches] token [path1] [path2]...
+
+  -h    show help message
+USAGE
+}
+
+my %opts;
+GetOptions(
+    \%opts,
+    "h",
+);
+
+if ($opts{h}) {
+    print_usage();
+    exit(0);
+}
+
+my $word = shift(@ARGV);
+my @paths = @ARGV;
+@paths = ('.') unless @paths;
+
+my $iter = p5_doc_iterator(@paths);
+while ( defined ( my $doc = $iter->() ) ) {
+    my %hits;
+    my $tokens = $doc->find(
+        sub {
+            my $op = $_[1];
+            return ($op->isa("PPI::Token") && $op->content eq $word)
+        }
+    ) or next;
+
+    for (my $i = 0; $i < @$tokens; $i++) {
+        my $op = $tokens->[$i];
+        my $ln = $op->line_number;
+        $hits{$ln} = 1;
+    }
+
+    if (%hits) {
+        my $file = $doc->filename;
+        my $line_number = 0;
+        open my $fh, "<", $file;
+        while(my $line = <$fh>) {
+            $line_number++;
+            if ($hits{$line_number}) {
+                print "${file}:${line_number}:${line}";
+            }
+        }
+        close($fh);
+    }
+}

@@ -1,5 +1,12 @@
 Revision history for Perl extension DBIx::SearchBuilder.
 
+1.71 2021-09-24
+ - Add dot to load utils in tests for perl 5.26+
+
+1.70 2021-09-24
+ - Enable queries processed with BuildSelectQuery and BuildSelectCountQuery
+   to use bind variables
+
 1.69 2021-01-20
 
  - New option to quote tablenames in queries, enabled automatically for MySQL 8

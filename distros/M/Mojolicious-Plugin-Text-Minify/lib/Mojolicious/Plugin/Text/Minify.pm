@@ -8,7 +8,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use Text::Minify::XS v0.4.8 ();
 
-our $VERSION = 'v0.2.1';
+our $VERSION = 'v0.2.2';
 
 sub register {
     my ($self, $app, $conf) = @_;
@@ -38,7 +38,7 @@ Mojolicious::Plugin::Text::Minify - remove HTML indentation on the fly
 
 =head1 VERSION
 
-version v0.2.1
+version v0.2.2
 
 =head1 SYNOPSIS
 
@@ -55,6 +55,10 @@ trailing whitespace from HTML content.
 
 If the C<mojox.no-minify> key in the stash is set to a true value,
 then the result will not be minified.
+
+You can also use of the minifier conditional on the application mode
+
+  plugin 'Text::Minify' if app->mode eq "production";
 
 Note that this is naive minifier which does not understand markup, so
 newlines will still be collapsed in HTML elements where whitespace is

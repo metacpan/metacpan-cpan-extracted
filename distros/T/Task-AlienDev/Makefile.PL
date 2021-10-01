@@ -3,7 +3,7 @@ BEGIN {
   my %missing = map {
     eval qq{ require $_ };
     $@ ? ($_=>1) : ()
-  } qw( strict warnings );
+  } qw( HTTP::Tiny strict warnings );
   if(%missing)
   {
     print "Your Perl is missing core modules: @{[ sort keys %missing ]}\n";
@@ -55,12 +55,17 @@ my %WriteMakefileArgs = (
     "Alien::MSYS"                             => "0.14",
     "App::af"                                 => "0.17",
     "Dist::Zilla::MintingProfile::AlienBuild" => "0.01",
-    "Dist::Zilla::Plugin::AlienBuild"         => "0.32"
+    "Dist::Zilla::Plugin::AlienBuild"         => "0.32",
+    "Env::ShellWords"                         => 0,
+    "File::Listing"                           => 0,
+    "Mojo::DOM58"                             => 0,
+    "Sort::Versions"                          => 0,
+    "URI"                                     => 0
   },
   "TEST_REQUIRES" => {
     "Test2::V0" => "0.000121"
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test"    => {
     "TESTS" => "t/*.t"
   }
@@ -72,7 +77,12 @@ my %FallbackPrereqs = (
   "App::af"                                 => "0.17",
   "Dist::Zilla::MintingProfile::AlienBuild" => "0.01",
   "Dist::Zilla::Plugin::AlienBuild"         => "0.32",
-  "Test2::V0"                               => "0.000121"
+  "Env::ShellWords"                         => 0,
+  "File::Listing"                           => 0,
+  "Mojo::DOM58"                             => 0,
+  "Sort::Versions"                          => 0,
+  "Test2::V0"                               => "0.000121",
+  "URI"                                     => 0
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

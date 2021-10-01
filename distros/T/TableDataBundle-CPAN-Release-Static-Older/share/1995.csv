@@ -1,0 +1,165 @@
+release,date,author,status,maturity,version,first,distribution,abstract
+Symdump-1.20,1995-08-16T14:12:18,ANDK,backpan,released,1.20,1,Symdump,"dump symbol names or the symbol table"
+Text-Trie-0.2,1995-08-19T22:00:00,ILYAZ,backpan,released,0.2,1,Text-Trie,
+MD5-1.1,1995-08-20T07:13:34,NWINT,backpan,released,1.1,,MD5,"Perl interface to the RSA Data Security Inc. MD5 Message-Digest Algorithm"
+Ioctl-0.5,1995-08-20T07:26:09,KJALB,cpan,released,0.5,,Ioctl,"provide auto-configuration utilities"
+FileKGlob,1995-08-20T07:27:16,TYEMQ,latest,released,0,1,FileKGlob,
+Curses-a8,1995-08-20T07:27:27,WPS,cpan,released,0,1,Curses,"terminal screen handling and optimization"
+Term-Info-1.0,1995-08-20T07:29:08,KJALB,cpan,released,1.0,1,Term-Info,
+SGI-FM-0.1,1995-08-20T07:29:54,AMOSS,backpan,released,0.1,1,SGI-FM,
+SGI-GL-0.2,1995-08-20T07:30:34,AMOSS,backpan,released,0.2,1,SGI-GL,
+SGI-SysCalls-0.1,1995-08-20T07:31:05,AMOSS,backpan,released,0.1,1,SGI-SysCalls,
+TclTk-b1,1995-08-20T09:19:39,MICB,cpan,released,0,1,TclTk,
+Tcl-b1,1995-08-20T09:21:54,MICB,cpan,released,0,1,Tcl,"Tcl extension module for Perl"
+Term-Gnuplot-0.2,1995-08-20T14:05:30,ILYAZ,backpan,released,0.2,1,Term-Gnuplot,"lowlevel graphics using gnuplot drawing routines."
+perl_archie.1.5,1995-08-20T14:48:11,GBOSS,latest,released,1.5,1,perl_archie,"Perl module to make Archie queries via Prospero requests"
+Sx-2.1,1995-08-20T15:38:05,FMC,backpan,released,2.1,1,Sx,"front-end to all the Athena and Xlib garbage for Perl GUI progamming"
+InitializeServer-1.0,1995-08-20T17:19:41,JACKS,backpan,released,1.0,1,InitializeServer,
+Prolog-alpha,1995-08-20T17:24:24,JACKS,backpan,released,0,1,Prolog-alpha,
+AlarmCall-1.1,1995-08-20T20:07:36,JACKS,backpan,released,1.1,1,AlarmCall,"A package to handle the logic in timing out calls with alarm() and an ALRM handler, allowing nested calls as well."
+CallerItem-1.0,1995-08-20T20:09:52,JACKS,backpan,released,1.0,1,CallerItem,"An object representing a function call from the stack of function calls."
+Date-GetDate-0.01a,1995-08-20T20:16:23,GBARR,backpan,released,0.01,1,Date-GetDate,
+DumpStack-1.1,1995-08-20T20:17:04,JACKS,backpan,released,1.1,1,DumpStack,"Access to the current stack of subroutine calls, and dumping the stack in a readable form. See also sigtrap."
+IPC_SysV,1995-08-20T20:23:19,JACKS,backpan,released,0,1,IPC_SysV,"ipc defines, structure manipulators and functions"
+MD5-1.2.1,1995-08-20T20:23:32,NWINT,backpan,released,v1.2.1,1,MD5,"Perl interface to the RSA Data Security Inc. MD5 Message-Digest Algorithm"
+MsqlPerl-1.01,1995-08-20T20:29:33,ANDK,backpan,released,1.01,1,MsqlPerl,
+Net-ext-a6,1995-08-20T20:30:48,SPIDB,backpan,released,0,1,Net-ext,"UDP sockets interface module"
+StatisticsDescriptive-1.1,1995-08-20T20:33:57,JKAST,cpan,released,1.1,1,StatisticsDescriptive,"Module of basic descriptive statistical functions."
+UNIVERSAL-1.0,1995-08-20T20:39:05,JACKS,backpan,released,1.0,1,UNIVERSAL,"default general behaviour for all objects."
+Usage-beta,1995-08-20T20:39:18,JACKS,backpan,released,0,1,Usage-beta,
+Des-perl-a1,1995-08-20T20:41:46,MICB,backpan,released,0,1,Des-perl,"Des extension module for Perl"
+MsqlPerl-1.02,1995-08-21T20:51:50,ANDK,backpan,released,1.02,,MsqlPerl,
+Tk-b8,1995-08-22T23:03:30,NI-S,backpan,released,0,1,Tk,"Locate directory of original perl script"
+Safe-b1,1995-08-24T12:36:38,MICB,cpan,released,0,1,Safe,"Safe extension module for Perl"
+perlvision,1995-08-27T05:29:01,AGUL,backpan,released,0,1,perlvision,
+Filter-1.06,1995-08-28T07:50:10,PMQS,backpan,released,1.06,1,Filter,"decrypt source filter"
+HTML-0.6,1995-08-29T08:51:46,GAND,latest,released,0.6,1,HTML,
+perl5db-kit-0.8,1995-08-30T19:12:09,ILYAZ,backpan,released,0.8,1,perl5db-kit,
+Roman-1.0,1995-09-01T07:57:16,OZAWA,cpan,released,1.0,1,Roman,"Perl module for conversion between Roman and Arabic numerals."
+Stem-0.1,1995-09-01T19:40:57,IANPX,cpan,released,0.1,1,Stem,
+Safe-b2,1995-09-01T21:17:14,MICB,cpan,released,0,1,Safe,"Safe extension module for Perl"
+perl5db-kit-0.9,1995-09-09T08:14:24,ILYAZ,backpan,released,0.9,1,perl5db-kit,
+ExtUtils-Peek-0.4,1995-09-13T04:32:00,ILYAZ,backpan,released,0.4,1,ExtUtils-Peek,"Shoot yourself in the foot. If you have gone that far, you do not need any documentation."
+pg95perl5-1.1.1,1995-09-13T08:23:00,YVESP,backpan,released,v1.1.1,1,pg95perl5,
+libwww-perl-5b5,1995-09-16T13:51:35,GAAS,backpan,released,5,1,libwww-perl,"Simple mirror utility for WWW"
+xsubpp-1.922,1995-09-24T12:08:15,PMQS,backpan,released,1.922,1,xsubpp,"compiler to convert Perl XS code into C code"
+etext0.4.7,1995-09-26T21:26:00,ILYAZ,backpan,released,v0.4.7,1,etext,"additional text widget subcommand for Tk distribution."
+SNMP-1.5b,1995-09-26T23:00:00,GSM,backpan,released,1.5,1,SNMP,
+EventDrivenServer-2.2,1995-09-28T08:20:38,JACKS,backpan,released,2.2,1,EventDrivenServer,"the all singing, all dancing server. Handles i/o driven clients, timer driven clients, and interrupt driven clients, all at the same time. Allows user defined events also. If there are any more types of clients, please tell me."
+SelfStubber,1995-09-28T09:31:51,JACKS,backpan,released,0,1,SelfStubber,"generate stubs for a SelfLoading module"
+SetDualVar-1.0,1995-09-28T17:48:59,KJALB,latest,released,1.0,1,SetDualVar,
+Ptty-0.01,1995-09-28T18:00:13,NI-S,latest,released,0.01,1,Ptty,
+OpenGL-0.2,1995-09-29T18:06:59,STANM,cpan,released,0.2,1,OpenGL,
+TermReadKey-2.03,1995-09-29T18:08:39,KJALB,backpan,released,2.03,1,TermReadKey,"provide auto-configuration utilities"
+HTML-QuickCheck-1.0b1,1995-10-01T11:20:25,YLU,cpan,released,1.0,1,HTML-QuickCheck,"a simple and fast HTML syntax checking package for perl 4 and perl 5"
+MsqlPerl-1.03,1995-10-01T13:37:58,ANDK,backpan,released,1.03,,MsqlPerl,
+MathPari_a3,1995-10-02T07:07:00,ILYAZ,backpan,released,3,1,MathPari_a,"Perl interface to PARI."
+Storable-0.1,1995-10-02T10:50:02,RAM,backpan,released,0.1,,Storable,"persistency for perl data structures"
+Term-Query-1.15,1995-10-02T18:13:13,AKSTE,backpan,released,1.15,1,Term-Query,
+sybperl-2b3,1995-10-03T00:35:00,MEWP,backpan,released,2,1,sybperl,"Sybase extensions to Perl"
+Parity-1.1,1995-10-03T22:24:32,WINKO,backpan,released,1.1,,Parity,
+perl5db-kit-0.91,1995-10-07T21:30:00,ILYAZ,backpan,released,0.91,,perl5db-kit,
+Religion-1.03,1995-10-09T02:52:25,KJALB,backpan,released,1.03,1,Religion,"Generate tracebacks and create and install die() and warn() handlers."
+perl5db-kit-0.92,1995-10-09T06:36:00,ILYAZ,backpan,released,0.92,,perl5db-kit,
+Quota-0.1a,1995-10-11T07:26:39,TOMZO,backpan,released,0.1,1,Quota,
+TermReadKey-2.04,1995-10-11T12:11:19,KJALB,backpan,released,2.04,,TermReadKey,"provide auto-configuration utilities"
+kit-2.0@34,1995-10-12T16:16:50,RAM,backpan,released,2.0,1,kit,
+dist-3.0@60,1995-10-12T16:21:34,RAM,backpan,released,3.0,1,dist,
+mailagent-3.0@44,1995-10-12T16:23:18,RAM,backpan,released,3.0,1,mailagent,
+cshar-3.0@15,1995-10-12T16:23:31,RAM,cpan,released,3.0,1,cshar,
+Comm.pl-1.3beta,1995-10-12T17:49:44,ERICA,backpan,released,1.3,1,Comm.pl,
+pg95perl5-1.2.0,1995-10-15T17:55:00,YVESP,backpan,released,v1.2.0,,pg95perl5,
+DBD-Informix-0.20pl0,1995-10-17T14:00:00,ADESC,backpan,released,0.20,1,DBD-Informix,
+QBase-0.02,1995-10-18T16:47:52,BENLI,backpan,released,0.02,1,QBase,
+Alias-1.00,1995-10-20T08:22:54,GSAR,backpan,released,1.00,1,Alias,"declare perl aliases and constants"
+c_plus_plus-0.1,1995-10-20T08:45:00,ILYAZ,latest,released,0.1,1,c_plus_plus,
+Table-1.01,1995-10-20T12:32:00,GUYDX,cpan,released,1.01,1,Table,
+MailTools-1.03,1995-10-21T04:25:33,GBARR,backpan,released,1.03,1,MailTools,"Simple interface to electronic mailing mechanisms"
+Religion-1.04,1995-10-21T04:27:11,KJALB,backpan,released,1.04,,Religion,"Generate tracebacks and create and install die() and warn() handlers."
+Alias-1.20,1995-10-22T23:20:59,GSAR,backpan,released,1.20,,Alias,"declare perl aliases and constants"
+etext0.5.0,1995-10-23T08:01:00,ILYAZ,backpan,released,v0.5.0,,etext,"additional text widget subcommand for Tk distribution."
+DateManip-4.2,1995-10-23T20:42:45,SBECK,backpan,released,4.2,1,DateManip,
+safecgiperl-b1,1995-10-24T13:29:00,MICB,cpan,released,0,1,safecgiperl,
+DBI-0.64,1995-10-27T08:14:00,TIMB,backpan,released,0.64,,DBI,
+Math-Approx-0.1,1995-10-27T09:41:00,ULPFR,cpan,released,0.1,1,Math-Approx,
+Math-Matrix-0.1,1995-10-27T09:42:00,ULPFR,cpan,released,0.1,1,Math-Matrix,
+File-Copy-1.4,1995-10-28T17:10:15,ASHER,backpan,released,1.4,1,File-Copy,"Copy files or filehandles"
+File-Copy-1.5,1995-10-30T21:57:11,ASHER,backpan,released,1.5,,File-Copy,"Copy files or filehandles"
+Sx-2.2,1995-10-31T10:15:00,FMC,backpan,released,2.2,,Sx,"front-end to all the Athena and Xlib garbage for Perl GUI progamming"
+sybperl-2.0,1995-11-02T10:13:02,MEWP,backpan,released,2.0,1,sybperl,"Sybase extensions to Perl"
+String-Approx-1.5,1995-11-02T17:19:34,JHI,backpan,released,1.5,1,String-Approx,"approximate matching and substitution"
+Parity-1.2,1995-11-02T18:10:18,WINKO,backpan,released,1.2,,Parity,
+Parext-1.1,1995-11-02T18:13:34,WINKO,backpan,released,1.1,1,Parext,
+BitCount-1.1,1995-11-02T18:15:13,WINKO,backpan,released,1.1,1,BitCount,
+DBD-QBase-0.03,1995-11-04T08:42:05,BENLI,latest,released,0.03,1,DBD-QBase,
+Statistics-ChiSquare-0.1,1995-11-05T20:14:24,JONO,cpan,released,0.1,1,Statistics-ChiSquare,"How random is your data?"
+DBD-mSQL-0.60pl7,1995-11-06T11:29:00,ADESC,backpan,released,0.60,1,DBD-mSQL,
+libwww-perl-5b6,1995-11-06T14:29:13,GAAS,backpan,released,5,1,libwww-perl,"Simple mirror utility for WWW"
+Socket-1.3,1995-11-09T22:44:00,TOMC,backpan,released,1.3,1,Socket,
+NIS-a2,1995-11-10T10:47:56,RIK,latest,released,0,1,NIS,"Interface to Sun's Network Information Service"
+NISPlus-a2,1995-11-10T12:44:51,RIK,backpan,released,0,1,NISPlus,
+Wais-2.0.10,1995-11-10T15:26:00,ULPFR,backpan,released,v2.0.10,1,Wais,
+FindBin-1.01,1995-11-14T11:18:43,GBARR,backpan,released,1.01,1,FindBin,"Locate directory of original perl script"
+iodbc-wwwtools-0.20b,1995-11-14T17:24:34,BJEPS,backpan,released,0.20,1,iodbc-wwwtools,
+Wais-2.0.11,1995-11-16T11:29:00,ULPFR,backpan,released,v2.0.11,,Wais,
+pod2fm-0.10,1995-11-17T02:22:18,PEASE,backpan,released,0.10,1,pod2fm,"convert pod format to FrameMaker documents and book file"
+Tk-SelFile-0.01,1995-11-17T02:23:59,ALSCH,cpan,released,0.01,1,Tk-SelFile,"a widget for choosing a file to read or write"
+Ar-0.2alpha,1995-11-19T01:10:52,RIK,backpan,released,0.2,1,Ar,"Interface to Remedy's Action Request (Version 1.2)"
+Data-Dumper-1.21,1995-11-19T22:29:08,GSAR,backpan,released,1.21,1,Data-Dumper,"stringified perl data structures, suitable for both printing and eval"
+Tk-SelFile-0.02,1995-11-20T16:33:46,ALSCH,latest,released,0.02,1,Tk-SelFile,"a widget for choosing a file to read or write"
+Net-Domain-1.06,1995-11-21T11:54:26,GBARR,backpan,released,1.06,,Net-Domain,"Attempt to evaluate the current host's internet name and domain"
+Net-SMTP-1.06,1995-11-21T11:54:32,GBARR,backpan,released,1.06,1,Net-SMTP,"implements SMTP Client"
+MailTools-1.04,1995-11-21T11:54:38,GBARR,backpan,released,1.04,,MailTools,"Simple interface to electronic mailing mechanisms"
+DateCalc-1.2a,1995-11-21T17:32:26,STBEY,backpan,released,1.2,1,DateCalc,
+Data-Dumper-1.22,1995-11-23T05:45:27,GSAR,backpan,released,1.22,,Data-Dumper,"stringified perl data structures, suitable for both printing and eval"
+CGI-Response-0.02,1995-11-23T23:32:40,MGH,backpan,released,0.02,1,CGI-Response,
+Math-Mathematica-1.0.4,1995-11-24T09:30:00,ULPFR,backpan,released,v1.0.4,,Math-Mathematica,"Communicate to Mathematica via MathLink"
+Math-Mathematica-1.0.5,1995-11-24T15:22:00,ULPFR,backpan,released,v1.0.5,,Math-Mathematica,"Communicate to Mathematica via MathLink"
+DBD-mSQL-0.60pl8,1995-11-24T16:18:00,ADESC,backpan,released,0.60,1,DBD-mSQL,
+CGI-Response-0.021,1995-11-25T04:45:51,MGH,backpan,released,0.021,,CGI-Response,
+CGI.pm-2.10,1995-11-25T09:21:00,LDS,backpan,released,2.10,1,CGI,"Simple Common Gateway Interface Class"
+DateCalc-1.2b,1995-11-27T09:54:50,STBEY,backpan,released,1.2,1,DateCalc,
+patched.gnumake.pdksh,1995-11-29T05:01:00,ILYAZ,backpan,released,0,1,patched.gnumake.pdksh,
+CGI-modules-2.73,1995-12-01T08:37:00,LDS,backpan,released,2.73,1,CGI-modules,"HTTP CGI Base Class with Handling of Multipart Forms"
+CGI-Response-0.03,1995-12-02T07:05:46,MGH,backpan,released,0.03,,CGI-Response,"Respond to CGI requests"
+SGMLSpm-1.03,1995-12-03T16:57:00,DMEGG,backpan,released,1.03,1,SGMLSpm,"class for postprocessing the output from the sgmls and nsgmls parsers."
+Data-Dumper-1.23,1995-12-04T03:12:16,GSAR,backpan,released,1.23,,Data-Dumper,"stringified perl data structures, suitable for both printing and eval"
+CGI-modules-2.74,1995-12-04T08:23:00,LDS,backpan,released,2.74,,CGI-modules,"HTTP CGI Base Class with Handling of Multipart Forms"
+ngb-100,1995-12-04T23:07:24,JAMCC,cpan,released,100,1,ngb,
+SGMLSpm-1.03ii,1995-12-07T11:30:00,DMEGG,backpan,released,1.03,1,SGMLSpm,"class for postprocessing the output from the sgmls and nsgmls parsers."
+Net-FTP-1.02,1995-12-10T18:04:29,GBARR,backpan,released,1.02,1,Net-FTP,"implements FTP Client"
+Net-FTP-1.08b,1995-12-11T13:47:23,GBARR,backpan,released,1.08,,Net-FTP,"Socket filedescriptor class"
+DateCalc-1.3,1995-12-11T15:22:19,STBEY,backpan,released,1.3,,DateCalc,
+OpenGL-0.3,1995-12-11T21:09:00,STANM,cpan,released,0.3,,OpenGL,
+SHA-1.0,1995-12-11T21:56:41,UWEH,cpan,released,1.0,1,SHA,"Perl interface to the NIST Secure Hash Algorithm"
+Filter-1.07,1995-12-11T23:04:38,PMQS,cpan,released,1.07,,Filter,"template for a decrypt source filter"
+perlSGML.1995Dec08,1995-12-13T12:50:10,EHOOD,backpan,released,08,1,perlSGML.1995Dec,
+Wais-2.1.0,1995-12-13T14:13:00,ULPFR,backpan,released,v2.1.0,,Wais,"access to freeWAIS-sf libraries"
+Term-ReadLine-0.8,1995-12-14T05:39:00,ILYAZ,backpan,released,0.8,1,Term-ReadLine,
+Set-IntegerFast-1.0,1995-12-14T13:43:37,STBEY,backpan,released,1.0,1,Set-IntegerFast,
+Filter-1.08,1995-12-15T21:04:27,PMQS,cpan,released,1.08,,Filter,"template for a decrypt source filter"
+Devel-Peek-0.5,1995-12-16T07:37:00,ILYAZ,backpan,released,0.5,1,Devel-Peek,"Shoot yourself in the foot. If you have gone that far, you do not need any documentation."
+MakeMaker-5.14,1995-12-16T16:26:25,ANDK,backpan,released,5.14,1,MakeMaker,"determine libraries to use and how to use them"
+Alias-2.0beta,1995-12-18T08:00:25,GSAR,backpan,released,2.0,,Alias,"declare symbolic aliases for perl data"
+Date-GetDate-1.02,1995-12-18T15:40:49,GBARR,backpan,released,1.02,,Date-GetDate,
+Array-PrintCols-1.2,1995-12-18T23:50:40,AKSTE,backpan,released,1.2,1,Array-PrintCols,
+Tk-b9,1995-12-19T01:56:04,NI-S,backpan,released,0,1,Tk,"Standard options supported by widgets"
+Devel-RegExp-0.1,1995-12-20T03:20:00,ILYAZ,latest,released,0.1,1,Devel-RegExp,
+mop-1.06,1995-12-20T08:34:11,PVERD,backpan,released,1.06,,mop,"Recursive descent parser generator (Alpha 1.06)."
+Getopt-Regex-0.01,1995-12-20T16:27:16,JARW,cpan,released,0.01,1,Getopt-Regex,"handle command line options flexibly using regular expressions"
+Tk-b9.01,1995-12-21T05:17:55,NI-S,backpan,released,9.01,1,Tk-b,"Standard options supported by widgets"
+isa-1.01,1995-12-21T12:08:26,GBARR,backpan,released,1.01,1,isa,
+Bib-1.18,1995-12-21T19:47:47,ERYQ,backpan,released,1.18,1,Bib,"parse Unix .bib files"
+MailArch-1.9,1995-12-22T18:30:37,LFINI,cpan,released,1.9,1,MailArch,
+MakeMaker-5.15,1995-12-23T23:41:00,ANDK,backpan,released,5.15,,MakeMaker,"determine libraries to use and how to use them"
+String-Scanf-1.1,1995-12-27T08:33:27,JHI,backpan,released,1.1,1,String-Scanf,"emulate the sscanf() of the C stdio library"
+Text-Template-0.1a,1995-12-27T21:43:48,MJD,cpan,released,0.1,1,Text-Template,
+CGI.pm-2.13,1995-12-28T09:08:00,LDS,backpan,released,2.13,,CGI,"Simple Common Gateway Interface Class"
+Wais-2.1.1,1995-12-28T15:37:00,ULPFR,backpan,released,v2.1.1,,Wais,"access to freeWAIS-sf libraries"
+Compress-Zlib-0.3,1995-12-28T18:26:34,PMQS,cpan,released,0.3,1,Compress-Zlib,"Interface to zlib compression library"
+Math-Trig-0.01,1995-12-29T11:34:24,JARW,backpan,released,0.01,1,Math-Trig,"Inverse and hyperbolic trigonemetric Functions"
+Math-Fortran-0.01,1995-12-29T11:34:29,JARW,cpan,released,0.01,1,Math-Fortran,"Perl implimentations of Fortrans sign and log10"
+Math-Derivative-0.01,1995-12-29T11:36:17,JARW,cpan,released,0.01,1,Math-Derivative,"Numeric 1st and 2nd order differentiation"
+Math-Spline-0.01,1995-12-29T11:36:21,JARW,cpan,released,0.01,1,Math-Spline,"Cubic Spline Interpolation of data"
+Math-Brent-0.01,1995-12-29T11:36:36,JARW,cpan,released,0.01,1,Math-Brent,"Single Dimensional Function Minimisation"
+Math-Amoeba-0.01,1995-12-29T11:38:13,JARW,cpan,released,0.01,1,Math-Amoeba,"Multidimensional Function Minimisation"

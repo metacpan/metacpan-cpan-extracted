@@ -1,15 +1,20 @@
 ## no critic: ControlStructures::ProhibitUnreachableCode
 package Perinci::CmdLine::Base;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-06'; # DATE
-our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.907'; # VERSION
-
+# put pragmas + Log::ger here
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
+
+# put other modules alphabetically here
+use IO::Interactive qw(is_interactive);
+
+# put global variables alphabetically here
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-10-01'; # DATE
+our $DIST = 'Perinci-CmdLine-Lite'; # DIST
+our $VERSION = '1.910'; # VERSION
 
 # this class can actually be a role instead of base class for pericmd &
 # pericmd-lite, but Mo is more lightweight than Role::Tiny (also R::T doesn't
@@ -190,7 +195,7 @@ our %copts = (
         summary => 'Set output format to json',
         handler => sub {
             my ($go, $val, $r) = @_;
-            $r->{format} = (-t STDOUT) ? 'json-pretty' : 'json';
+            $r->{format} = is_interactive(*STDOUT) ? 'json-pretty' : 'json';
         },
         tags => ['category:output'],
         key => 'format',
@@ -830,26 +835,10 @@ sub _read_env {
     log_trace("[pericmd] Checking env %s: %s", $env_name, $env);
     return [] unless defined $env;
 
-    # XXX is it "proper" to use Complete::* modules to parse cmdline, outside
-    # the context of completion?
-
-    my $words;
-    if ($r->{shell} eq 'bash') {
-        require Complete::Bash;
-        ($words, undef) = @{ Complete::Bash::parse_cmdline($env, 0) };
-    } elsif ($r->{shell} eq 'fish') {
-        ($words, undef) = @{ Complete::Base::parse_cmdline($env) };
-    } elsif ($r->{shell} eq 'tcsh') {
-        require Complete::Tcsh;
-        ($words, undef) = @{ Complete::Tcsh::parse_cmdline($env) };
-    } elsif ($r->{shell} eq 'zsh') {
-        require Complete::Bash;
-        ($words, undef) = @{ Complete::Bash::parse_cmdline($env) };
-    } else {
-        die "Unsupported shell '$r->{shell}'";
-    }
-    log_trace("[pericmd] Words from env: %s", $words);
-    $words;
+    require Text::ParseWords;
+    my @words = Text::ParseWords::shellwords($env);
+    log_trace("[pericmd] Words from env: %s", \@words);
+    \@words;
 }
 
 sub do_dump_object {
@@ -1417,7 +1406,7 @@ sub _parse_argv2 {
                 my $src = $as->{cmdline_src} // '';
 
                 # we only get from stdin if stdin is piped
-                $src = '' if $src eq 'stdin_or_args' && -t STDIN;
+                $src = '' if $src eq 'stdin_or_args' && is_interactive(*STDIN);
 
                 if ($src && $as->{req}) {
                     # don't complain, we will fill argument from other source
@@ -1592,7 +1581,7 @@ sub parse_cmdline_src {
                     my $prompt = Perinci::Object::rimeta($as)->langprop('cmdline_prompt') //
                         sprintf($self->default_prompt_template, $an);
                     print $prompt;
-                    my $iactive = (-t STDOUT);
+                    my $iactive = is_interactive(*STDOUT);
                     Term::ReadKey::ReadMode('noecho')
                           if $term_readkey_available && $iactive && $as->{is_password};
                     chomp($r->{args}{$an} = <STDIN>);
@@ -1637,7 +1626,7 @@ sub parse_cmdline_src {
                             $is_ary ? [<>] :
                                 do {local $/; ~~<>};
                     $r->{args}{"-cmdline_src_$an"} = $src;
-                } elsif ($src eq 'stdin_or_args' && !(-t STDIN)) {
+                } elsif ($src eq 'stdin_or_args' && !is_interactive(*STDIN)) {
                     unless (defined($r->{args}{$an})) {
                         $r->{args}{$an} = $do_stream ?
                             __gen_iter(\*STDIN, $as, $an) :
@@ -1745,7 +1734,7 @@ sub select_output_handle {
             last unless $pager; # ENV{PAGER} can be set 0/'' to disable paging
             log_trace("Paging output using %s", $pager);
             ## no critic (InputOutput::RequireBriefOpen)
-            open $handle, "| $pager";
+            open $handle, "|-", $pager;
         }
         $handle //= \*STDOUT;
     }
@@ -1948,7 +1937,7 @@ sub run {
     # EXPERIMENTAL, set default format to json if we are running in a pipeline
     # and the right side of the pipe is the 'td' program
     {
-        last if (-t STDOUT) || $r->{format};
+        last if is_interactive(*STDOUT) || $r->{format};
         last unless eval { require Pipe::Find; 1 };
         my $pipeinfo = Pipe::Find::get_stdout_pipe_process();
         last unless $pipeinfo;
@@ -2079,11 +2068,11 @@ sub run {
     $r->{format} //= $r->{meta}{'cmdline.default_format'};
     my $restore_orig_result;
     my $orig_result;
-    if (exists $r->{res}[3]{'cmdline.result.noninteractive'} && !(-t STDOUT)) {
+    if (exists $r->{res}[3]{'cmdline.result.noninteractive'} && !is_interactive(*STDOUT)) {
         $restore_orig_result = 1;
         $orig_result = $r->{res}[2];
         $r->{res}[2] = $r->{res}[3]{'cmdline.result.noninteractive'};
-    } elsif (exists $r->{res}[3]{'cmdline.result.interactive'} && -t STDOUT) {
+    } elsif (exists $r->{res}[3]{'cmdline.result.interactive'} && is_interactive(*STDOUT)) {
         $restore_orig_result = 1;
         $orig_result = $r->{res}[2];
         $r->{res}[2] = $r->{res}[3]{'cmdline.result.interactive'};
@@ -2154,9 +2143,17 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.907 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2021-08-06.
+This document describes version 1.910 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2021-10-01.
 
 =head1 DESCRIPTION
+
+Perinci::CmdLine is a command-line application framework. It allows you to
+create full-featured CLI applications easily and quickly.
+
+See L<Perinci::CmdLine::Manual> for more details.
+
+There is also a blog post series on Perinci::CmdLine tutorial:
+L<https://perlancar.wordpress.com/category/pericmd-tut/>
 
 =for Pod::Coverage ^(.+)$
 
@@ -2168,7 +2165,7 @@ If you execute C<run()>, this is what will happen, in order:
 
 =item * Detect if we are running under tab completion mode
 
-This is done by checking the existence of special environment varibles like
+This is done by checking the existence of special environment variables like
 C<COMP_LINE> (bash) or C<COMMAND_LINE> (tcsh). If yes, then jump to L</"PROGRAM
 FLOW (TAB COMPLETION)">. Otherwise, continue.
 
@@ -2209,7 +2206,7 @@ options and strip them. Unknown options at this time will be passed through.
 
 If user specifies common option like C<--help> or C<--version>, then action will
 be set to (respectively) C<help> and C<version> and the second step will be
-skipped. Otherwise we continue the the second step and action by default is set
+skipped. Otherwise we continue the second step and action by default is set
 to C<call>.
 
 At the end of the first step, we already know the subcommand name (of course, if
@@ -2312,12 +2309,17 @@ priority of each plugin for an event (flexibility), a "before-event-foo" plugin
 can cancel the "foo" event, an "after-event-foo" plugin can repeat the "foo"
 event.
 
-With plugin support, the hook_*() methods will be phased out eventually. Some
+With plugin support, the C<hook_*()> methods will be phased out eventually. Some
 features will be moved to plugins in subsequent releases. More plugins will be
 added, either in this distribution, or in separate distributions. More events
 will be added to add more "hooks".
 
 =head2 Plugin events
+
+Currently only a few events have been added, as not all C<hook_*()> methods have
+been converted to plugin events yet. More events will be added in the future.
+Also note that for all events there are the two additional C<before_$event> and
+C<after_$event> (included below for ease of search).
 
 =over
 
@@ -2327,6 +2329,10 @@ This event can be used to disable other plugins (see
 L<Perinci::CmdLine::Plugin::DisablePlugin>) or do things when a plugin is
 loaded.
 
+=item * before_activate_plugin
+
+=item * after_activate_plugin
+
 =item * validate_args
 
 Before this event, C<< $r->{args} >> is already set to the input arguments, but
@@ -2334,9 +2340,17 @@ they are not validated yet.
 
 After this event, C<< $r->{args} >> should have already been validated.
 
+=item * before_validate_args
+
+=item * after_validate_args
+
 =item * action
 
 After this event, C<< $r->{res} >> should have already been set to the result.
+
+=item * before_action
+
+=item * after_action
 
 =back
 
@@ -2410,7 +2424,7 @@ config file.
 =item * read_env => bool
 
 This is set in run() to signify that we will try to read env for default
-options. This settng can be turned off e.g. in common option C<no_env>. This is
+options. This setting can be turned off e.g. in common option C<no_env>. This is
 never set to true when C<read_env> attribute is set to false, which means that
 we never try to read environment.
 
@@ -2884,7 +2898,12 @@ command-line argument even though there is C<default_subcommand> defined).
 
 =head2 description => str
 
+A short description of the application.
+
 =head2 exit => bool (default: 1)
+
+Define the application exit behaviour.  A false value here allows hook code
+normally run directly before the application exits to be skipped.
 
 =head2 formats => array
 
@@ -2901,7 +2920,7 @@ Whether to allow unknown options.
 =head2 pass_cmdline_object => bool (default: 0)
 
 Whether to pass special argument C<-cmdline> containing the cmdline object to
-function. This can be overriden using the C<pass_cmdline_object> on a
+function. This can be overridden using the C<pass_cmdline_object> on a
 per-subcommand basis.
 
 In addition to C<-cmdline>, C<-cmdline_r> will also be passed, containing the
@@ -3031,7 +3050,12 @@ requested name only.
 
 =head2 summary => str
 
+Optional, displayed in description of the option in help/usage text.
+
 =head2 tags => array of str
+
+For grouping or categorizing subcommands, e.g. when displaying list of
+subcommands.
 
 =head2 url => str
 
@@ -3099,6 +3123,9 @@ more lightweight script.
 
 =head2 extra_urls_for_version => array of str
 
+An array of extra URLs for which version information is to be displayed for
+the action being performed.
+
 =head2 skip_format => bool
 
 If set to 1, assume that function returns raw text that need not be translated,
@@ -3126,15 +3153,15 @@ Whether to enable logging. Default is off. If true, will load L<Log::ger::App>.
 
 =head2 log_level => str
 
-Set default log level. Will be overriden by C<< $r->{log_level} >> which is set
+Set default log level. Will be overridden by C<< $r->{log_level} >> which is set
 from command-line options like C<--log-level>, C<--trace>, etc.
 
 =head1 METHODS
 
 =head2 $cmd->run() => ENVRES
 
-The main method to run your application. See L</"PROGRAM FLOW"> for more details
-on what this method does.
+The main method to run your application. See L</"PROGRAM FLOW (NORMAL)"> for
+more details on what this method does.
 
 =head2 $cmd->do_dump() => ENVRES
 
@@ -3285,6 +3312,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Cm
 
 Source repository is at L<https://github.com/perlancar/perl-Perinci-CmdLine-Lite>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Lite>
@@ -3292,16 +3347,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

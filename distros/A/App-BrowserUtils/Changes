@@ -1,3 +1,21 @@
+0.015   2021-09-27  Released-By: PERLANCAR; Urgency: low
+
+	- [cli pause-and-unpause-browsers] Tweak option --periods (--period
+	  for the singular version).
+
+
+0.014   2021-09-27  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [cli pause-and-unpause-browsers] [doc] Tweak Abstract.
+
+
+0.013   2021-09-27  Released-By: PERLANCAR; Urgency: medium
+
+	- Add utility: pause-and-unpause-browsers.
+
+
 0.012   2020-10-16  Released-By: PERLANCAR; Urgency: medium
 
 	- Fix copy-paste mistake in log statement.

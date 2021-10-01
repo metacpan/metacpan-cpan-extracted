@@ -4,7 +4,7 @@ Text::Minify::XS - Simple text minification
 
 # VERSION
 
-version v0.5.0
+version v0.5.1
 
 # SYNOPSIS
 
@@ -38,13 +38,6 @@ It does not recognise any form of markup, comments or text quoting.
 Nor does it remove extra whitespace in the middle of the line.
 
 # KNOWN ISSUES
-
-## Support for older Perl versions
-
-This module requires Perl v5.9.3 or newer.
-
-Pull requests to support older versions of Perl are welcome. See
-["SOURCE"](#source).
 
 ## Malformed UTF-8
 

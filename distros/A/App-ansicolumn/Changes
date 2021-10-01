@@ -1,5 +1,10 @@
 Revision history for Perl extension App-ansicolumn
 
+1.14 2021-09-28T08:28:21Z
+
+    - Introduce -U as a alias for --fillup.
+    - Use Getopt::EX with NO_COLOR and COLORTERM env support.
+
 1.13 2021-09-21T09:43:42Z
 
     - Make -B as an alias for --border.

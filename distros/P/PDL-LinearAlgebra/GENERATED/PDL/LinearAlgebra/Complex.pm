@@ -1,16 +1,14 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::LinearAlgebra::Complex;
 
 our @EXPORT_OK = qw(PDL::PP __Ccgtsv PDL::PP __Ncgtsv cgtsv PDL::PP __Ccgesvd PDL::PP __Ncgesvd cgesvd PDL::PP __Ccgesdd PDL::PP __Ncgesdd cgesdd PDL::PP __Ccggsvd PDL::PP __Ncggsvd cggsvd PDL::PP __Ccgeev PDL::PP __Ncgeev cgeev PDL::PP __Ccgeevx PDL::PP __Ncgeevx cgeevx PDL::PP __Ccggev PDL::PP __Ncggev cggev PDL::PP __Ccggevx PDL::PP __Ncggevx cggevx PDL::PP __Ccgees PDL::PP __Ncgees cgees PDL::PP __Ccgeesx PDL::PP __Ncgeesx cgeesx PDL::PP __Ccgges PDL::PP __Ncgges cgges PDL::PP __Ccggesx PDL::PP __Ncggesx cggesx PDL::PP __Ccheev PDL::PP __Ncheev cheev PDL::PP __Ccheevd PDL::PP __Ncheevd cheevd PDL::PP __Ccheevx PDL::PP __Ncheevx cheevx PDL::PP __Ccheevr PDL::PP __Ncheevr cheevr PDL::PP __Cchegv PDL::PP __Nchegv chegv PDL::PP __Cchegvd PDL::PP __Nchegvd chegvd PDL::PP __Cchegvx PDL::PP __Nchegvx chegvx PDL::PP __Ccgesv PDL::PP __Ncgesv cgesv PDL::PP __Ccgesvx PDL::PP __Ncgesvx cgesvx PDL::PP __Ccsysv PDL::PP __Ncsysv csysv PDL::PP __Ccsysvx PDL::PP __Ncsysvx csysvx PDL::PP __Cchesv PDL::PP __Nchesv chesv PDL::PP __Cchesvx PDL::PP __Nchesvx chesvx PDL::PP __Ccposv PDL::PP __Ncposv cposv PDL::PP __Ccposvx PDL::PP __Ncposvx cposvx PDL::PP __Ccgels PDL::PP __Ncgels cgels PDL::PP __Ccgelsy PDL::PP __Ncgelsy cgelsy PDL::PP __Ccgelss PDL::PP __Ncgelss cgelss PDL::PP __Ccgelsd PDL::PP __Ncgelsd cgelsd PDL::PP __Ccgglse PDL::PP __Ncgglse cgglse PDL::PP __Ccggglm PDL::PP __Ncggglm cggglm PDL::PP __Ccgetrf PDL::PP __Ncgetrf cgetrf PDL::PP __Ccgetf2 PDL::PP __Ncgetf2 cgetf2 PDL::PP __Ccsytrf PDL::PP __Ncsytrf csytrf PDL::PP __Ccsytf2 PDL::PP __Ncsytf2 csytf2 PDL::PP __Ccchetrf PDL::PP __Ncchetrf cchetrf PDL::PP __Cchetf2 PDL::PP __Nchetf2 chetf2 PDL::PP __Ccpotrf PDL::PP __Ncpotrf cpotrf PDL::PP __Ccpotf2 PDL::PP __Ncpotf2 cpotf2 PDL::PP __Ccgetri PDL::PP __Ncgetri cgetri PDL::PP __Ccsytri PDL::PP __Ncsytri csytri PDL::PP __Cchetri PDL::PP __Nchetri chetri PDL::PP __Ccpotri PDL::PP __Ncpotri cpotri PDL::PP __Cctrtri PDL::PP __Nctrtri ctrtri PDL::PP __Cctrti2 PDL::PP __Nctrti2 ctrti2 PDL::PP __Ccgetrs PDL::PP __Ncgetrs cgetrs PDL::PP __Ccsytrs PDL::PP __Ncsytrs csytrs PDL::PP __Cchetrs PDL::PP __Nchetrs chetrs PDL::PP __Ccpotrs PDL::PP __Ncpotrs cpotrs PDL::PP __Cctrtrs PDL::PP __Nctrtrs ctrtrs PDL::PP __Cclatrs PDL::PP __Nclatrs clatrs PDL::PP __Ccgecon PDL::PP __Ncgecon cgecon PDL::PP __Ccsycon PDL::PP __Ncsycon csycon PDL::PP __Cchecon PDL::PP __Nchecon checon PDL::PP __Ccpocon PDL::PP __Ncpocon cpocon PDL::PP __Cctrcon PDL::PP __Nctrcon ctrcon PDL::PP __Ccgeqp3 PDL::PP __Ncgeqp3 cgeqp3 PDL::PP __Ccgeqrf PDL::PP __Ncgeqrf cgeqrf PDL::PP __Ccungqr PDL::PP __Ncungqr cungqr PDL::PP __Ccunmqr PDL::PP __Ncunmqr cunmqr PDL::PP __Ccgelqf PDL::PP __Ncgelqf cgelqf PDL::PP __Ccunglq PDL::PP __Ncunglq cunglq PDL::PP __Ccunmlq PDL::PP __Ncunmlq cunmlq PDL::PP __Ccgeqlf PDL::PP __Ncgeqlf cgeqlf PDL::PP __Ccungql PDL::PP __Ncungql cungql PDL::PP __Ccunmql PDL::PP __Ncunmql cunmql PDL::PP __Ccgerqf PDL::PP __Ncgerqf cgerqf PDL::PP __Ccungrq PDL::PP __Ncungrq cungrq PDL::PP __Ccunmrq PDL::PP __Ncunmrq cunmrq PDL::PP __Cctzrzf PDL::PP __Nctzrzf ctzrzf PDL::PP __Ccunmrz PDL::PP __Ncunmrz cunmrz PDL::PP __Ccgehrd PDL::PP __Ncgehrd cgehrd PDL::PP __Ccunghr PDL::PP __Ncunghr cunghr PDL::PP __Cchseqr PDL::PP __Nchseqr chseqr PDL::PP __Cctrevc PDL::PP __Nctrevc ctrevc PDL::PP __Cctgevc PDL::PP __Nctgevc ctgevc PDL::PP __Ccgebal PDL::PP __Ncgebal cgebal PDL::PP __Cclange PDL::PP __Nclange clange PDL::PP __Cclansy PDL::PP __Nclansy clansy PDL::PP __Cclantr PDL::PP __Nclantr clantr PDL::PP __Ccgemm PDL::PP __Ncgemm cgemm PDL::PP __Ccmmult PDL::PP __Ncmmult cmmult PDL::PP __Cccrossprod PDL::PP __Nccrossprod ccrossprod PDL::PP __Ccsyrk PDL::PP __Ncsyrk csyrk PDL::PP __Ccdot PDL::PP __Ncdot cdot PDL::PP __Ccdotc PDL::PP __Ncdotc cdotc PDL::PP __Ccaxpy PDL::PP __Ncaxpy caxpy PDL::PP __Ccnrm2 PDL::PP __Ncnrm2 cnrm2 PDL::PP __Ccasum PDL::PP __Ncasum casum PDL::PP __Ccscal PDL::PP __Ncscal cscal PDL::PP sscal PDL::PP __Ccrotg PDL::PP __Ncrotg crotg PDL::PP __Cclacpy PDL::PP __Nclacpy clacpy PDL::PP __Cclaswp PDL::PP __Nclaswp claswp PDL::PP ctricpy PDL::PP cmstack PDL::PP __Cccharpol PDL::PP __Nccharpol ccharpol );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
-
 
 
    our $VERSION = '0.14';
@@ -83,10 +81,7 @@ These routines accept either float or double ndarrays.
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -3664,5 +3659,3 @@ in this distribution.
 # Exit with OK status
 
 1;
-
-		   

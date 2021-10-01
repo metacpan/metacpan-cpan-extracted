@@ -1,4 +1,4 @@
-#!perl
+# -*- mode: perl; -*-
 
 package Math::BigFloat::Trace;
 
@@ -13,7 +13,7 @@ our ($accuracy, $precision, $round_mode, $div_scale);
 
 our @ISA = qw(Exporter Math::BigFloat);
 
-our $VERSION = '0.53';
+our $VERSION = '0.61';
 
 use overload;                   # inherit overload from Math::BigFloat
 
@@ -23,8 +23,9 @@ $round_mode = 'even';
 $div_scale = 40;
 
 sub new {
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
+    shift;
+    #my $proto = shift;
+    #my $class = ref($proto) || $proto;
 
     my $value = shift;
     my $a = $accuracy;

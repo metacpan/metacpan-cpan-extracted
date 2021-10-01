@@ -8,7 +8,7 @@
 
 package Net::OAuth2::Profile::Password;
 use vars '$VERSION';
-$VERSION = '0.66';
+$VERSION = '0.67';
 
 use base 'Net::OAuth2::Profile';
 

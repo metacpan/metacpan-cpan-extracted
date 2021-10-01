@@ -1,5 +1,5 @@
 package Photonic::Geometry::FromB;
-$Photonic::Geometry::FromB::VERSION = '0.018';
+$Photonic::Geometry::FromB::VERSION = '0.021';
 
 =encoding UTF-8
 
@@ -39,7 +39,7 @@ use Moose;
 use MooseX::StrictConstructor;
 
 has 'B' =>(is=>'ro', isa=>'PDL', required=>1,
-	   documentation=>'Charateristic function');
+	   documentation=>'Characteristic function');
 
 with 'Photonic::Roles::Geometry';
 
@@ -55,7 +55,7 @@ Photonic::Geometry::FromB
 
 =head1 VERSION
 
-version 0.018
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -69,47 +69,33 @@ version 0.018
 Creates a geometry object to be used in a Photonic
 calculation from a characteristic function B. B is a pdl that takes
 the values 0 for each pixel or voxel within material A and 1 within
-=material B.
+material B.
+
+Consumes L<Photonic::Roles::Geometry>. Please see it for attributes.
 
 =head1 METHODS
 
 =over 4
 
-=item * new(B=>$pdl[, L=>$L])
+=item * new(B=>$pdl[, L=>$L] [,units=>$units])
 
 Creates a new Ph::G::FromB object
 
-$pdl is a boolean array with 1's and 0's representing the characteriztic
+$pdl is a boolean array with 1's and 0's representing the characteristic
 function within the unit cell. Its dimensions must be odd. Its number
 of dimensions is the dimension of space
 
 $L is the size of the unit cell along the cartesian axes. By
 default, it is the number of pixels.
 
-=back
-
-=head1 ACCESSORS (read only)
-
-=over 4
-
-=item * B
-
-The characteristic function as PDL
-
-=item * L
-
-Unit cell sizes as a B->ndims pdl.
+$units is an ndarray with the directions of the basis vectors of the
+lattice. $units(i,n) is the i-th coordinate of the n-th basis
+vector. By default, it is given by the cartesian directions.
 
 =back
 
 =head1 SEE ALSO
 
 L<Photonic::Roles::Geometry>
-
-=begin Pod::Coverage
-
-=head2    PI
-
-=end Pod::Coverage
 
 =cut

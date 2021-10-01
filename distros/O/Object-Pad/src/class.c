@@ -12,6 +12,7 @@
 
 #include "perl-backcompat.c.inc"
 #include "perl-additions.c.inc"
+#include "newOP_CUSTOM.c.inc"
 
 /* Empty MGVTBL simply for locating instance slots AV */
 static MGVTBL vtbl_slotsav = {};
@@ -1380,10 +1381,12 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *su
         meta->has_adjustparams = true;
 
       /* Mark that this class is applied to every role our supermetas have */
-      for(ClassMeta *c = supermeta; c; c = c->supermeta) {
+      ClassMeta *c;
+      for(c = supermeta; c; c = c->supermeta) {
         AV *roles = c->roles;
         U32 nroles = av_count(roles);
-        for(U32 i = 0; i < nroles; i++) {
+        U32 i;
+        for(i = 0; i < nroles; i++) {
           RoleEmbedding *embedding = (RoleEmbedding *)AvARRAY(roles)[i];
           ClassMeta *rolemeta = embedding->rolemeta;
 

@@ -1,7 +1,7 @@
 package Tree::To::TextLines;
 
-our $DATE = '2020-04-14'; # DATE
-our $VERSION = '0.060'; # VERSION
+our $DATE = '2021-05-06'; # DATE
+our $VERSION = '0.061'; # VERSION
 
 use 5.010001;
 use strict;
@@ -146,13 +146,13 @@ Tree::To::TextLines - Render a tree object as indented text lines
 
 =head1 VERSION
 
-This document describes version 0.060 of Tree::To::TextLines (from Perl distribution Tree-To-Text), released on 2020-04-14.
+This document describes version 0.061 of Tree::To::TextLines (from Perl distribution Tree-To-Text), released on 2021-05-06.
 
 =head1 SYNOPSIS
 
  use Tree::To::TextLines qw(render_tree_as_text);
 
- my $tree = ...; # you can build a tree e.g. using Tree::From::Struct or Tree::From::TextLines
+ my $tree = ...; # you can build a tree e.g. using Tree::From::Struct, Tree::From::ObjArray, or Tree::From::TextLines
 
 Using default option:
 
@@ -387,7 +387,7 @@ Source repository is at L<https://github.com/perlancar/perl-Tree-To-Text>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Tree-To-Text>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Tree-To-Text/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -397,7 +397,7 @@ feature.
 
 L<Tree::From::Text>, L<Tree::From::TextLines>
 
-L<Tree::From::Struct>
+L<Tree::From::Struct>, L<Tree::From::ObjArray>
 
 =head1 AUTHOR
 
@@ -405,7 +405,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

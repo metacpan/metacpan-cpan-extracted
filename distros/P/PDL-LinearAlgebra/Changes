@@ -1,3 +1,9 @@
+0.24 2021-10-01
+- change $PRIV() to $COMP()
+
+0.23 2021-09-25
+- fix mdet acting on complex matrices - thanks @wlmb
+
 0.22 2021-09-15
 - switch from $PRIV(__x_size) to $SIZE(x)
 
@@ -120,8 +126,7 @@
   * new routine mrcond
   * documentation corrections
   * add PDL.pm in prerequities (Makefile.PL)
-  
+
 0.01  Mon Aug 15 14:57:24 2005
 
   * Initial release
-

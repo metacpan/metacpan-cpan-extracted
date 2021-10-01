@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   version: '0.77'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,6 +23,7 @@ requires:
   DB_File: '0'
   File::Which: '0'
   Getopt::Long: '2.37'
+  IO::Handle: '0'
   IO::String: '0'
   Image::Size: '0'
   JSON::XS: '0'
@@ -39,6 +40,7 @@ requires:
   perl: '5.010001'
   version: '0'
 resources:
+  bugtracker: https://github.com/brucemiller/LaTeXML/issues
   repository: https://github.com/brucemiller/LaTeXML.git
-version: 0.8.5
+version: 0.8.6
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,587 @@
+release,date,author,status,maturity,version,first,distribution,abstract
+Alias-2.0,1996-01-01T09:01:58,GSAR,backpan,released,2.0,,Alias,"declare symbolic aliases for perl data"
+GetoptLong-2.0beta1,1996-01-01T09:13:41,JV,backpan,released,2.0,1,GetoptLong,"extended getopt processing"
+Include-1.01a,1996-01-02T16:54:50,GBARR,backpan,released,1.01,1,Include,
+Set-IntSpan-1.00,1996-01-02T18:52:13,SWMCD,backpan,released,1.00,1,Set-IntSpan,"Manages sets of integers"
+LTU-2.5,1996-01-03T18:25:37,TOMFA,backpan,released,2.5,1,LTU,"An implementation of Linear Threshold Units"
+Include-1.02a,1996-01-04T13:15:23,GBARR,backpan,released,1.02,,Include,"allow use #defines from C header files"
+pg95perl5-1.2.0,1996-01-04T17:36:52,MERGL,cpan,released,v1.2.0,1,pg95perl5,
+Penguin-1.0,1996-01-04T23:13:18,FSG,backpan,released,1.0,1,Penguin,"high level interface for mobile network code agents"
+PGP-1.0,1996-01-04T23:13:33,FSG,backpan,released,1.0,1,PGP,"interfaces for signing and authenticating documents using PGP 2.6.2"
+Log-Topics-0.02,1996-01-05T14:14:56,JARW,latest,released,0.02,1,Log-Topics,"control flow of logging messages"
+sybperl-2.01,1996-01-05T15:40:35,MEWP,backpan,released,2.01,,sybperl,"Sybase extensions to Perl"
+MakeMaker-5.16,1996-01-05T21:06:50,ANDK,backpan,released,5.16,,MakeMaker,"determine libraries to use and how to use them"
+Math-VecStat-0.02,1996-01-06T11:12:34,JARW,backpan,released,0.02,1,Math-VecStat,"Some basic numeric stats on vectors"
+Make-0.01,1996-01-08T10:29:39,NI-S,backpan,released,0.01,1,Make,"a perl 'make' replacement"
+Set-IntegerFast-1.1,1996-01-08T15:51:38,STBEY,backpan,released,1.1,,Set-IntegerFast,
+PGP-0.1alpha,1996-01-08T17:31:16,GEHIC,backpan,released,0.1,1,PGP,"perl module to work with PGP messages"
+DBD-mSQL-0.60pl9,1996-01-11T12:56:00,ADESC,backpan,released,0.60,1,DBD-mSQL,
+Screen-1.00,1996-01-13T08:48:23,MRKAE,cpan,released,1.00,1,Screen,
+perlref-5.001.2,1996-01-13T18:44:11,JV,backpan,released,v5.001.2,,perlref,
+FindBin-1.04,1996-01-17T17:37:07,GBARR,backpan,released,1.04,,FindBin,"Locate directory of original perl script"
+MLDBM-1.10,1996-01-19T07:15:18,GSAR,backpan,released,1.10,1,MLDBM,"store multi-level hash structure in single level tied hash"
+MakeMaker-5.17,1996-01-22T00:15:54,ANDK,backpan,released,5.17,1,MakeMaker,"utilities to write and check a MANIFEST file"
+Devel-Symdump-1.21,1996-01-22T01:01:25,ANDK,backpan,released,1.21,1,Devel-Symdump,"dump symbol names or the symbol table"
+Xbase-1.07,1996-01-24T21:54:06,PRATP,latest,released,1.07,1,Xbase,"Perl Module to Read Xbase DBF Files and Foxpro IDX indexes"
+Text-Template-0.1b,1996-01-25T19:43:51,MJD,cpan,released,0.1,1,Text-Template,"Expand template text with embedded Perl"
+Getopt-Mixed-1.006,1996-01-27T20:44:09,CJM,backpan,released,1.006,1,Getopt-Mixed,"getopt processing with both long and short options"
+News-Newsrc-1.00,1996-01-29T21:23:26,SWMCD,backpan,released,1.00,1,News-Newsrc,"manage newsrc files"
+PGP-0.2alpha,1996-01-29T22:23:41,GEHIC,backpan,released,0.2,,PGP,"perl module to work with PGP messages"
+File-Lock-0.9,1996-01-31T03:53:01,KJALB,latest,released,0.9,,File-Lock,
+sybperl-2.03,1996-01-31T16:38:50,MEWP,backpan,released,2.03,,sybperl,"Sybase extensions to Perl"
+DBD-Sybase-0.01,1996-02-02T14:43:33,MEWP,backpan,released,0.01,1,DBD-Sybase,
+perl5.002b3,1996-02-03T07:48:14,LWALL,backpan,released,5.002,,perl,"access Perl configuration information"
+EventServer-2.3,1996-02-07T17:46:23,JACKS,backpan,released,2.3,1,EventServer,"the all singing, all dancing server. Handles i/o driven clients, timer driven clients, and interrupt driven clients, all at the same time. Allows user defined events also. If there are any more types of clients, please tell me."
+Getopt-Mixed-1.008,1996-02-09T03:28:49,CJM,backpan,released,1.008,,Getopt-Mixed,"getopt processing with both long and short options"
+Safe-2.01,1996-02-10T20:04:44,TIMB,backpan,released,2.01,,Safe,"Compile and execute code in restricted compartments"
+llg-1.07,1996-02-12T14:28:35,YVESP,backpan,released,1.07,1,llg,"Lexical analyser generator (Alpha 1.07)."
+DBI-0.67,1996-02-15T22:07:00,TIMB,backpan,released,0.67,,DBI,
+OpenGL-0.4,1996-02-16T05:15:00,STANM,cpan,released,0.4,,OpenGL,
+MLDBM-1.20,1996-02-17T01:41:47,GSAR,backpan,released,1.20,,MLDBM,"store multi-level hash structure in single level tied hash"
+Usage-0.10,1996-02-17T11:38:34,JACKS,backpan,released,0.10,1,Usage,
+BSD-Resource-1.03,1996-02-17T14:18:25,JHI,backpan,released,1.03,1,BSD-Resource,"BSD process resource limit and priority functions"
+ConfigReader-0.5,1996-02-19T16:44:54,AMW,latest,released,0.5,1,ConfigReader,"Read directives from a configuration file."
+Math-VecStat-0.03,1996-02-20T08:18:53,JARW,backpan,released,0.03,,Math-VecStat,"Some basic numeric stats on vectors"
+Sybase-BCP-0.01,1996-02-20T13:01:46,MEWP,backpan,released,0.01,1,Sybase-BCP,"Simple front end to the Sybase BCP API"
+Statistics-LTU-2.7,1996-02-20T15:52:42,TOMFA,backpan,released,2.7,1,Statistics-LTU,"An implementation of Linear Threshold Units"
+Set-IntSpan-1.01,1996-02-22T20:49:28,SWMCD,backpan,released,1.01,,Set-IntSpan,"Manages sets of integers"
+PGPLOT1.0b_src,1996-02-23T06:30:00,KGB,backpan,released,1.0,1,PGPLOT,
+PGPLOT1.0a_src,1996-02-23T06:30:00,KGB,backpan,released,1.0,1,PGPLOT,
+News-Newsrc-1.01,1996-02-23T09:00:13,SWMCD,backpan,released,1.01,,News-Newsrc,"manage newsrc files"
+DateCalc-1.4,1996-02-26T16:33:45,STBEY,backpan,released,1.4,,DateCalc,
+ShowTable-1.12,1996-02-29T17:22:41,AKSTE,backpan,released,1.12,1,ShowTable,"Show data in nicely formatted columns"
+Sys-OutPut-1.5,1996-03-01T02:58:39,AKSTE,backpan,released,1.5,1,Sys-OutPut,"Perl module to help make output easier."
+makepatch-1.10,1996-03-01T11:22:22,JV,backpan,released,1.10,1,makepatch,
+perlpdf-5.002,1996-03-02T10:29:13,BMIDD,backpan,released,5.002,1,perlpdf,
+CGI_Imagemap-1.00,1996-03-02T11:01:57,MIKEH,cpan,released,1.00,1,CGI_Imagemap,"imagemap behavior for CGI programs"
+XSTEST-19960302,1996-03-02T20:10:41,DMR,latest,released,19960302,1,XSTEST,
+Text-German-0.02,1996-03-05T08:39:00,ULPFR,cpan,released,0.02,1,Text-German,
+perlindex-1.107,1996-03-10T11:07:00,ULPFR,cpan,released,1.107,1,perlindex,"index and query perl manual pages"
+Table-1.02,1996-03-10T12:32:00,GUYDX,cpan,released,1.02,,Table,
+Net-SMTP-1.07,1996-03-11T07:35:38,GBARR,backpan,released,1.07,,Net-SMTP,"Simple Mail transfer Protocol Client"
+Quota-0_2a,1996-03-12T15:42:50,TOMZO,backpan,released,0_2,,Quota,
+MD5-1.5.3,1996-03-14T11:34:22,NWINT,cpan,released,v1.5.3,,MD5,"Perl interface to the RSA Data Security Inc. MD5 Message-Digest Algorithm"
+DateCalc-1.5,1996-03-14T13:24:02,STBEY,backpan,released,1.5,,DateCalc,
+TermReadKey-2.05,1996-03-14T23:24:57,KJALB,backpan,released,2.05,,TermReadKey,"provide auto-configuration utilities"
+Curses-a9,1996-03-17T04:46:21,WPS,cpan,released,0,1,Curses,"terminal screen handling and optimization"
+HTTPD-Tools-0.52,1996-03-21T00:00:08,DOUGM,backpan,released,0.52,1,HTTPD-Tools,"Batch updates for HTTP server user databases"
+Opcode-1.00,1996-03-22T03:00:10,TIMB,backpan,released,1.00,1,Opcode,"Disable named opcodes when compiling perl code"
+DBD-mSQL-0.60pl10,1996-03-24T21:49:00,ADESC,backpan,released,0.60,1,DBD-mSQL,
+Math-ematica-1.006,1996-03-25T20:30:00,ULPFR,cpan,released,1.006,1,Math-ematica,"Communicate to Mathematica via MathLink"
+former-0.2beta,1996-03-27T20:09:20,GEHIC,latest,released,0.2,1,former,"Generic CGI script for processing forms"
+Net-Country-0.1,1996-03-28T07:41:00,ULPFR,cpan,released,0.1,1,Net-Country,
+sybperl-2.05,1996-03-28T23:44:04,MEWP,backpan,released,2.05,,sybperl,"Simple front end to the Sybase BCP API"
+Set-Scalar-0.002,1996-03-29T17:03:10,JHI,backpan,released,0.002,1,Set-Scalar,"the basic set operations for Perl scalar/reference data"
+perlhtml-5.002,1996-04-02T09:15:50,BMIDD,backpan,released,5.002,1,perlhtml,
+Tk-JPEG-b11,1996-04-02T23:15:36,NI-S,backpan,released,0,1,Tk-JPEG,
+File-Tools-2.0,1996-04-04T02:46:37,ASHER,backpan,released,2.0,1,File-Tools,"Copy files or filehandles"
+CGI-modules-2.75,1996-04-05T07:58:00,LDS,backpan,released,2.75,,CGI-modules,"HTTP CGI Base Class with Handling of Multipart Forms"
+GetoptLong-2.3,1996-04-05T19:11:02,JV,backpan,released,2.3,,GetoptLong,"extended processing of command line options"
+Alias-2.1,1996-04-06T21:37:32,GSAR,backpan,released,2.1,,Alias,"aspirations for Alias"
+Msql-RDBMS-0.10,1996-04-07T22:55:32,BJEPS,cpan,released,0.10,1,Msql-RDBMS,"Relational Database Management System for Msql"
+OS2-PrfDB-0_01,1996-04-09T03:29:00,ILYAZ,cpan,released,0_01,1,OS2-PrfDB,"Perl extension for access to OS/2 setting database."
+Tie-Dir-1.00,1996-04-09T08:13:46,GBARR,cpan,released,1.00,1,Tie-Dir,"class definition for reading directories via a tied hash"
+MD5-1.6,1996-04-09T12:23:01,NWINT,cpan,released,1.6,,MD5,
+Data-Dumper-2.00b,1996-04-09T15:54:26,GSAR,backpan,released,2.00,,Data-Dumper,"release history for Data::Dumper"
+Data-Dumper-2.01b,1996-04-10T04:25:17,GSAR,backpan,released,2.01,,Data-Dumper,"release history for Data::Dumper"
+Tk-b11.02,1996-04-10T22:08:38,NI-S,backpan,released,11.02,,Tk-b,"Use MakeMaker's uninstalled version of a package"
+Data-Dumper-2.02b,1996-04-13T07:14:35,GSAR,backpan,released,2.02,,Data-Dumper,"release history for Data::Dumper"
+DBD-Informix-0.20pl1,1996-04-17T06:45:00,ADESC,backpan,released,0.20,1,DBD-Informix,
+C-Scan-0_1,1996-04-18T10:13:00,ILYAZ,backpan,released,0_1,,C-Scan,"scan C language files for easily recognized constructs."
+One_Penguin-pre2,1996-04-18T15:08:53,FSG,cpan,released,0,1,One_Penguin,
+OS2-ExtAttr-0_01,1996-04-22T00:59:00,ILYAZ,cpan,released,0_01,1,OS2-ExtAttr,"Perl access to extended attributes."
+DBI-0.68,1996-04-22T10:22:00,TIMB,backpan,released,0.68,,DBI,
+Filter-1.09,1996-04-22T14:34:43,PMQS,cpan,released,1.09,,Filter,
+Proc-Forkfunc-96.042201,1996-04-22T18:49:00,MUIR,latest,released,96.042201,1,Proc-Forkfunc,"fork off a function"
+File-Slurp-96.042202,1996-04-22T21:18:00,MUIR,backpan,released,96.042202,1,File-Slurp,"single call read & write file routines; read directories"
+OS2-FTP-0_10,1996-04-23T00:29:00,ILYAZ,latest,released,0_10,1,OS2-FTP,
+OS2-UPM-0_10,1996-04-23T00:30:00,ILYAZ,latest,released,0_10,1,OS2-UPM,
+File-Flock-96.042302,1996-04-24T04:34:00,MUIR,backpan,released,96.042302,1,File-Flock,"file locking with flock"
+Tie-Dir-1.02,1996-04-26T13:24:56,GBARR,latest,released,1.02,,Tie-Dir,"class definition for reading directories via a tied hash"
+NNTPClient-0.26,1996-04-26T17:20:48,RVA,cpan,released,0.26,1,NNTPClient,"Perl 5 module to talk to NNTP (RFC977) server"
+SNMP-1.6,1996-04-27T10:29:00,GSM,backpan,released,1.6,,SNMP,
+Comm.pl-1.5beta,1996-04-29T19:16:52,ERICA,backpan,released,1.5,,Comm.pl,
+weblint-1.015,1996-04-29T20:44:00,NEILB,backpan,released,1.015,,weblint,
+Wais-2.109,1996-04-30T06:01:00,ULPFR,backpan,released,2.109,,Wais,"access to freeWAIS-sf libraries"
+MIME-parser-1.9,1996-04-30T16:28:13,ERYQ,backpan,released,1.9,,MIME-parser,"Encode string using quoted-printable encoding"
+CookBookA-19960430,1996-04-30T23:01:56,DMR,latest,released,19960430,1,CookBookA,"A data debugging tool for the XS programmer"
+CookBookB-19960430,1996-04-30T23:03:30,DMR,latest,released,19960430,1,CookBookB,"A data debugging tool for the XS programmer"
+ngb-101,1996-05-01T12:17:16,JAMCC,cpan,released,101,1,ngb,
+perlmenu.v3.3,1996-05-01T12:29:04,SKUNZ,backpan,released,v3.3,1,perlmenu,
+Search-0.2,1996-05-01T21:16:44,MIKEH,backpan,released,0.2,1,Search,"provide framework for multiple searches"
+FreezeThaw-0_2,1996-05-02T14:43:00,ILYAZ,backpan,released,0_2,,FreezeThaw,"converting Perl structures to strings and back."
+Ioctl-0_7,1996-05-03T12:53:29,KJALB,cpan,released,0_7,,Ioctl,
+Neural-0.03,1996-05-03T23:06:38,LUKKA,backpan,released,0.03,1,Neural,"Fast, compact vectors using arrays of double."
+NTodbc_v960503,1996-05-06T03:17:13,DAVEROTH,backpan,released,v960503,1,NTodbc,
+MakeMaker-5.32,1996-05-06T06:58:26,ANDK,backpan,released,5.32,,MakeMaker,"methods to override UN*X behaviour in ExtUtils::MakeMaker"
+Devel-embed-1_02,1996-05-06T20:53:43,DOUGM,backpan,released,1_02,1,Devel-embed,"Utilities for embedding Perl in C/C++ applications"
+Opcode-1.01,1996-05-07T05:51:17,TIMB,backpan,released,1.01,,Opcode,"Disable named opcodes when compiling perl code"
+ftp_eg,1996-05-07T13:59:24,GBARR,backpan,released,0,1,ftp_eg,
+perlhlp,1996-05-07T19:02:47,RURBAN,cpan,released,0,1,perlhlp,
+DBD-Oracle-0.30,1996-05-07T19:42:00,TIMB,backpan,released,0.30,,DBD-Oracle,"Perl access to Oracle databases for old oraperl scripts"
+DBD-Oracle-0.29,1996-05-07T19:42:00,TIMB,backpan,released,0.29,1,DBD-Oracle,"Perl access to Oracle databases for old oraperl scripts"
+DBI-0.69,1996-05-07T19:46:00,TIMB,backpan,released,0.69,,DBI,
+IO-1.07,1996-05-08T12:50:08,GBARR,backpan,released,1.07,1,IO,"supply seek based methods for I/O objects"
+ARSperl-1.2.2,1996-05-08T18:04:28,JMURPHY,backpan,released,v1.2.2,1,ARSperl,
+NTodbc_v960508,1996-05-08T23:23:02,DAVEROTH,backpan,released,v960508,,NTodbc,
+libwww-perl-5b13,1996-05-09T22:43:16,GAAS,backpan,released,5,1,libwww-perl,"libwww-perl cookbook"
+NISPlus-0.04-alpha,1996-05-12T14:10:21,RIK,cpan,released,0.04,,NISPlus,
+Time-modules-96.051301,1996-05-13T05:34:00,MUIR,backpan,released,96.051301,1,Time-modules,"simply report the number of days in a month"
+Compiler-a1,1996-05-13T11:39:00,MICB,backpan,released,0,1,Compiler,
+NTodbc_v960513,1996-05-13T20:52:50,DAVEROTH,backpan,released,v960513,,NTodbc,
+Text-Tabs+Wrap-96.051501,1996-05-16T03:32:00,MUIR,backpan,released,96.051501,,Text-Tabs+Wrap,"line wrapping to form simple paragraphs"
+GD-1.00,1996-05-17T08:12:00,LDS,backpan,released,1.00,1,GD,"Interface to Gd Graphics Library"
+DBD-DB2-0.55,1996-05-17T17:44:20,MHM,backpan,released,0.55,,DBD-DB2,
+Set-Scalar-0_003,1996-05-17T20:00:54,JHI,backpan,released,0_003,,Set-Scalar,"the basic set operations for Perl scalar/reference data"
+Net-FTP-1.18_1,1996-05-20T09:28:43,GBARR,backpan,developer,1.18_1,,Net-FTP,"TEMPORARY Socket filedescriptor class, so Net::FTP still works while IO::Socket is having a re-fit <GBARR>"
+Resources-1.00b,1996-05-20T21:37:56,FRANCOC,backpan,released,1.00,1,Resources,"handling application defaults in Perl."
+DBD-Oracle-0.31,1996-05-20T21:55:00,TIMB,backpan,released,0.31,,DBD-Oracle,"Perl access to Oracle databases for old oraperl scripts"
+etext0.5.3,1996-05-20T23:09:00,ILYAZ,backpan,released,v0.5.3,,etext,"Perl module for parsing of TeX."
+mod_perl-0.60a1,1996-05-21T02:07:05,DOUGM,backpan,released,0.60,1,mod_perl,"Perl interface to the Apache server API"
+mod_auth_dbi-0.50a1,1996-05-21T02:08:45,DOUGM,backpan,released,0.50,1,mod_auth_dbi,
+etext0.5.4,1996-05-21T02:32:00,ILYAZ,backpan,released,v0.5.4,,etext,"Perl module for parsing of TeX."
+Resources-1.01b,1996-05-21T04:58:41,FRANCOC,backpan,released,1.01,,Resources,"handling application defaults in Perl."
+mod_perl-0.60a2,1996-05-21T20:51:37,DOUGM,backpan,released,0.60,1,mod_perl,"Perl interface to the Apache server API"
+TimeDate-1.02,1996-05-22T16:03:54,GBARR,backpan,released,1.02,1,TimeDate,"miscellaneous timezone manipulations routines"
+Crypt-DES-1.0,1996-05-22T19:21:34,GARY,backpan,released,1.0,1,Crypt-DES,"Perl interface to DES block cipher"
+Crypt-MD5-1.6,1996-05-22T19:23:13,GARY,backpan,released,1.6,1,Crypt-MD5,"Perl interface to the RSA Data Security Inc. MD5 Message-Digest Algorithm"
+Crypt-IDEA-1.0,1996-05-22T19:23:16,GARY,cpan,released,1.0,1,Crypt-IDEA,"Perl interface to IDEA block cipher"
+Math-PRSG-1.0,1996-05-22T19:24:59,GARY,latest,released,1.0,1,Math-PRSG,"Perl interface to pseudo random sequence generator function."
+Math-BigInteger-1.0,1996-05-22T19:25:04,GARY,cpan,released,1.0,1,Math-BigInteger,"Arbitrary length integer extension module for Perl"
+Crypt-SHA-1.6,1996-05-22T19:25:07,GARY,backpan,released,1.6,1,Crypt-SHA,"Perl interface to the NIST Secure Hash Algorithm"
+Math-TrulyRandom-1.0,1996-05-22T19:26:52,GARY,latest,released,1.0,1,Math-TrulyRandom,"Perl interface to a truly random number generator function"
+CGI.pm-2.20,1996-05-22T22:30:00,LDS,backpan,released,2.20,,CGI,"Simple Common Gateway Interface Class"
+Pconvert-1.03,1996-05-23T12:41:00,ULPFR,backpan,released,1.03,1,Pconvert,"convert file formats"
+Logfile-0.112,1996-05-23T13:23:00,ULPFR,backpan,released,0.112,1,Logfile,"Perl extension for generating reports from logfiles"
+Proc-Simple-1.12,1996-05-23T16:36:24,MSCHILLI,backpan,released,1.12,,Proc-Simple,"launch and control background processes"
+ptkFAQ-0_03,1996-05-23T22:13:17,PVHP,latest,released,0_03,1,ptkFAQ,"Perl extension for testing Xlib extensibility."
+Win32GD_v960514,1996-05-25T16:14:30,DAVEROTH,backpan,released,v960514,1,Win32GD,"Interface to Gd Graphics Library"
+DateCalc-2.0,1996-05-25T19:35:42,STBEY,backpan,released,2.0,,DateCalc,
+libwww-perl-5.00,1996-05-26T14:01:51,GAAS,backpan,released,5.00,1,libwww-perl,"libwww-perl cookbook"
+DateCalc-2.1,1996-05-26T19:54:24,STBEY,backpan,released,2.1,,DateCalc,"Date Calculations"
+Win32GD_v960527,1996-05-27T20:16:41,DAVEROTH,backpan,released,v960527,,Win32GD,"Interface to Gd Graphics Library"
+hbp_403,1996-05-28T05:02:15,JDALLMAN,cpan,released,403,1,hbp,
+Win32odbc_v960528,1996-05-28T18:03:46,DAVEROTH,cpan,released,v960528,1,Win32odbc,
+Agent-2.91,1996-05-28T23:30:29,JDUNCAN,backpan,released,2.91,,Agent,"supplies agentspace methods for perl5."
+MsqlPerl-1.05,1996-05-29T17:19:13,ANDK,backpan,released,1.05,,MsqlPerl,"interactive shell with readline for msql"
+CGI.pm-2.21,1996-05-31T05:31:00,LDS,backpan,released,2.21,,CGI,"Simple Common Gateway Interface Class"
+mvend103,1996-05-31T19:43:59,MIKEH,backpan,released,103,1,mvend,"WWW Catalog Ordering"
+MsqlPerl-1.07,1996-06-01T21:20:56,ANDK,backpan,released,1.07,,MsqlPerl,"interactive shell with readline for msql"
+futils.02Jun96,1996-06-03T03:44:59,JOCASA,backpan,released,96,1,futils.02Jun,
+HyperCal_2.3,1996-06-03T13:33:40,RBOW,backpan,released,2.3,1,HyperCal,
+Stream-1.00,1996-06-03T13:56:35,GARY,latest,released,1.00,1,Stream,
+conference_1.4,1996-06-03T16:26:37,RBOW,backpan,released,1.4,1,conference,
+Set-IntSpan-1.02,1996-06-03T19:14:14,SWMCD,backpan,released,1.02,,Set-IntSpan,"Manages sets of integers"
+Class-Eroot-19960603,1996-06-03T20:17:52,DMR,latest,released,19960603,1,Class-Eroot,"struct/member template builder"
+Cdk-ext-4.7.0,1996-06-03T21:27:22,GLOVER,cpan,released,v4.7.0,1,Cdk-ext,
+traceFunc-0.1,1996-06-03T21:44:58,JOEHIL,latest,released,0.1,1,traceFunc,"trace function calls as they happen."
+Logfile-0.113,1996-06-04T12:41:00,ULPFR,backpan,released,0.113,,Logfile,"Perl extension for generating reports from logfiles"
+Net-FTP-1.18_2,1996-06-05T10:31:49,GBARR,backpan,developer,1.18_2,,Net-FTP,"FTP Client class"
+DBD-Oracle-0.32,1996-06-05T14:56:00,TIMB,backpan,released,0.32,,DBD-Oracle,"Perl access to Oracle databases for old oraperl scripts"
+POP3Client-1_14,1996-06-06T14:15:08,SDOWD,backpan,released,1_14,,POP3Client,"Perl 5 module to talk to a POP3 (RFC1081) server"
+Jeeves1.0,1996-06-06T20:55:02,SRIRAM,cpan,released,1.0,1,Jeeves,
+MIME-parser-1.10,1996-06-07T06:29:49,ERYQ,backpan,released,1.10,1,MIME-parser,"Encode string using quoted-printable encoding"
+Date-GetDate-2.00,1996-06-09T12:25:00,TOMC,backpan,released,2.00,,Date-GetDate,
+Socket-1.5,1996-06-09T12:32:00,TOMC,cpan,released,1.5,,Socket,
+Tk-FileDialog-1.3,1996-06-09T20:35:28,BPOWERS,latest,released,1.3,1,Tk-FileDialog,"A highly configurable File Dialog widget for Perl/Tk."
+Sybase-Login-1.2,1996-06-09T20:37:20,BPOWERS,backpan,released,1.2,1,Sybase-Login,"A highly configurable Login widget for Sybperl and Perl/Tk"
+Tk-WaitBox-1.2,1996-06-09T20:57:11,BPOWERS,cpan,released,1.2,1,Tk-WaitBox,"An Object Oriented Wait Dialog for Perl/Tk, of the Please Wait variety."
+Resources-1.02,1996-06-09T21:49:00,FRANCOC,backpan,released,1.02,,Resources,"handling application defaults in Perl."
+Set-IntSpan-1.03,1996-06-09T22:11:05,SWMCD,backpan,released,1.03,,Set-IntSpan,"Manages sets of integers"
+DBD-DB2-0.57,1996-06-10T04:54:52,MHM,backpan,released,0.57,,DBD-DB2,
+Win32Pipe_v960610,1996-06-10T07:33:31,DAVEROTH,cpan,released,v960610,1,Win32Pipe,
+Resources-1.03,1996-06-10T21:34:09,FRANCOC,cpan,released,1.03,,Resources,"handling application defaults in Perl."
+ExtUtils-embed-1.03,1996-06-11T02:48:29,DOUGM,backpan,released,1.03,1,ExtUtils-embed,"Utilities for embedding Perl in C/C++ applications"
+Tie-Watch-0.92,1996-06-11T04:40:47,LUSOL,backpan,released,0.92,1,Tie-Watch,"place watchpoints on Perl variables."
+Win32GD_v960611,1996-06-11T10:45:04,DAVEROTH,cpan,released,v960611,,Win32GD,"Interface to Gd Graphics Library"
+DBD-DB2-0.58,1996-06-12T18:04:53,MHM,backpan,released,0.58,,DBD-DB2,
+Pconvert-1.04,1996-06-13T12:48:00,ULPFR,cpan,released,1.04,,Pconvert,"convert file formats"
+conference_2.0,1996-06-13T13:11:58,RBOW,backpan,released,2.0,,conference,
+Time-modules-96.061301,1996-06-13T16:17:00,MUIR,backpan,released,96.061301,,Time-modules,"simply report the number of days in a month"
+postcard,1996-06-13T18:05:57,RBOW,backpan,released,0,1,postcard,
+Tie-Watch-0.93,1996-06-15T01:08:37,LUSOL,backpan,released,0.93,,Tie-Watch,"place watchpoints on Perl variables."
+Curses-1.0,1996-06-15T02:09:09,WPS,cpan,released,1.0,,Curses,"terminal screen handling and optimization"
+DBI-0.70,1996-06-16T21:08:00,TIMB,backpan,released,0.70,,DBI,
+CGI-Out-96.061703,1996-06-17T18:50:00,MUIR,backpan,released,96.061703,,CGI-Out,"buffer output when building CGI programs"
+CGI-Out-96.061704,1996-06-17T21:38:00,MUIR,backpan,released,96.061704,,CGI-Out,"buffer output when building CGI programs"
+ExtUtils-embed-1.04,1996-06-18T19:31:12,DOUGM,backpan,released,1.04,,ExtUtils-embed,"Utilities for embedding Perl in C/C++ applications"
+mod_perl-0.60a4,1996-06-18T19:41:55,DOUGM,backpan,released,0.60,1,mod_perl,"Perl interface to the Apache server API"
+DBD-Oracle-0.33,1996-06-18T23:17:00,TIMB,backpan,released,0.33,,DBD-Oracle,"Perl access to Oracle databases for old oraperl scripts"
+MakeMaker-5.33,1996-06-18T23:55:24,ANDK,backpan,released,5.33,,MakeMaker,"methods used by ExtUtils::MakeMaker"
+DBD-DB2-0.59,1996-06-21T14:10:35,MHM,backpan,released,0.59,,DBD-DB2,
+Mmap-a2,1996-06-21T15:21:00,MICB,latest,released,0,1,Mmap,"uses mmap to map in a file as a perl variable"
+DBD-Oracle-0.34,1996-06-22T00:14:00,TIMB,backpan,released,0.34,,DBD-Oracle,"Perl access to Oracle databases for old oraperl scripts"
+DBD-Oracle-0.35,1996-06-22T00:15:00,TIMB,backpan,released,0.35,,DBD-Oracle,"Perl access to Oracle databases for old oraperl scripts"
+libnet-1.00,1996-06-24T07:06:38,GBARR,backpan,released,1.00,1,libnet,"OO interface to users netrc file"
+IO-1.08,1996-06-24T07:36:40,GBARR,backpan,released,1.08,,IO,"supply object methods for filehandles"
+SortVersions-1_0,1996-06-24T09:36:47,KJALB,cpan,released,1_0,,SortVersions,"a perl 5 module for sorting of revision-like numbers"
+MIME-parser-1.11,1996-06-24T19:17:52,ERYQ,backpan,released,1.11,,MIME-parser,"class for parsed-and-decoded MIME message"
+TimeDate-1.03,1996-06-25T11:43:37,GBARR,backpan,released,1.03,1,TimeDate,"miscellaneous timezone manipulations routines"
+Compress-Zlib-0.4,1996-06-25T14:24:27,PMQS,cpan,released,0.4,,Compress-Zlib,"Interface to zlib compression library"
+Filter-1.10,1996-06-25T15:16:36,PMQS,cpan,released,1.10,,Filter,"template for a decrypt source filter"
+mod_perl-0.60a5,1996-06-25T15:49:56,DOUGM,backpan,released,0.60,1,mod_perl,"Perl interface to the Apache server API"
+DateCalc-2.2,1996-06-26T14:28:54,STBEY,backpan,released,2.2,,DateCalc,"Date Calculations"
+MsqlPerl-1.08,1996-06-27T01:19:00,ANDK,backpan,released,1.08,,MsqlPerl,"interactive shell with readline for msql"
+Pvm-0.9,1996-06-27T10:52:04,EWALKER,latest,released,0.9,1,Pvm,"Perl extension for the Parallel Virtual Machine (PVM) Message Passing System"
+DProf-19960626,1996-06-27T16:42:18,DMR,backpan,released,19960626,1,DProf,"a Perl code profiler"
+Sprite-3.1,1996-06-28T04:28:48,SHGUN,cpan,released,3.1,1,Sprite,"Perl 5.0 module to manipulate text delimited databases."
+Test-Harness-1.09,1996-06-28T21:50:15,ANDK,backpan,released,1.09,1,Test-Harness,"run perl standard test scripts with statistics"
+Term-ReadLine-0.91,1996-07-01T03:50:00,ILYAZ,backpan,released,0.91,,Term-ReadLine,"Perl interface to various readline packages. If no real package is found, substitutes stubs instead of basic functions."
+p9p0.11,1996-07-01T20:29:02,LUTHERH,cpan,released,0.11,1,p9p,"Plan 9-specific documentation for Perl"
+Devel-Peek-0.7,1996-07-02T00:17:00,ILYAZ,backpan,released,0.7,,Devel-Peek,"A data debugging tool for the XS programmer"
+Text-German-0.03,1996-07-02T07:40:00,ULPFR,cpan,released,0.03,,Text-German,"German grundform reduction"
+TimeDate-1.04,1996-07-02T07:42:41,GBARR,backpan,released,1.04,,TimeDate,"miscellaneous timezone manipulations routines"
+MsqlPerl-1.09,1996-07-02T08:40:40,ANDK,backpan,released,1.09,,MsqlPerl,"interactive shell with readline for msql"
+ExtUtils-embed-1.05,1996-07-02T13:53:58,DOUGM,backpan,released,1.05,,ExtUtils-embed,"Utilities for embedding Perl in C/C++ applications"
+weblint-1.017,1996-07-04T17:50:00,NEILB,backpan,released,1.017,,weblint,
+weblint-1.016,1996-07-04T17:50:00,NEILB,backpan,released,1.016,,weblint,
+weblint,1996-07-05T09:14:00,NEILB,backpan,released,0,1,weblint,
+p9p0.13,1996-07-05T16:06:11,LUTHERH,cpan,released,0.13,,p9p,"Plan 9-specific documentation for Perl"
+PodParse,1996-07-05T17:10:28,KJALB,backpan,released,0,1,PodParse,"Perl predefined variables"
+PodParse-0.1,1996-07-05T17:24:37,KJALB,backpan,released,0.1,,PodParse,"Perl predefined variables"
+p9p0.16,1996-07-06T14:58:05,LUTHERH,cpan,released,0.16,,p9p,"Plan 9-specific documentation for Perl"
+Devel-CoreStack-1.3,1996-07-07T19:35:40,ADESC,latest,released,1.3,1,Devel-CoreStack,"try to generate a stack dump from a core file"
+Test-Harness-1.11,1996-07-08T16:38:06,ANDK,backpan,released,1.11,,Test-Harness,"run perl standard test scripts with statistics"
+Test-Harness-1.12,1996-07-08T21:42:04,ANDK,backpan,released,1.12,,Test-Harness,"run perl standard test scripts with statistics"
+MIME-parser-1.12,1996-07-09T02:17:20,ERYQ,backpan,released,1.12,,MIME-parser,"class for parsed-and-decoded MIME message"
+MailFolder-0.01,1996-07-09T07:54:58,KJOHNSON,backpan,released,0.01,1,MailFolder,"A folder-independant interface to email folders."
+PodParse-0.02,1996-07-09T21:29:07,KJALB,backpan,released,0.02,1,PodParse,"Perl predefined variables"
+DBD-Oracle-0.36,1996-07-10T00:45:00,TIMB,backpan,released,0.36,,DBD-Oracle,"Perl access to Oracle databases for old oraperl scripts"
+DBI-0.71,1996-07-10T00:49:00,TIMB,backpan,released,0.71,,DBI,
+Math-Matrix-0.2,1996-07-10T16:25:00,ULPFR,cpan,released,0.2,,Math-Matrix,"Multiply and invert Matrices"
+SortVersions-1.1,1996-07-11T14:24:58,KJALB,cpan,released,1.1,1,SortVersions,"a perl 5 module for sorting of revision-like numbers"
+PodParse-0.03,1996-07-11T23:29:43,KJALB,backpan,released,0.03,,PodParse,"Perl predefined variables"
+Curses-DevKit-4.8,1996-07-12T05:10:22,GLOVER,cpan,released,4.8,1,Curses-DevKit,
+Tie-Watch-0.94,1996-07-12T19:02:09,LUSOL,backpan,released,0.94,,Tie-Watch,"place watchpoints on Perl variables."
+Business-CreditCard-0.1,1996-07-12T21:54:36,JONO,cpan,released,0.1,1,Business-CreditCard,"Validate/generate credit card checksums/names"
+ExtUtils-embed-1.06,1996-07-14T23:38:53,DOUGM,backpan,released,1.06,,ExtUtils-embed,"Utilities for embedding Perl in C/C++ applications"
+mod_perl-0.70b1,1996-07-14T23:39:07,DOUGM,backpan,released,0.70,,mod_perl,"Perl interface to the Apache server API"
+conference_2.2,1996-07-15T13:57:45,RBOW,backpan,released,2.2,,conference,
+HTML-Stream-1.19,1996-07-16T03:52:56,ERYQ,backpan,released,1.19,1,HTML-Stream,"HTML output stream class, and some markup utilities"
+conference_2.3,1996-07-16T14:42:10,RBOW,backpan,released,2.3,,conference,
+Wais-2.112,1996-07-16T14:57:00,ULPFR,backpan,released,2.112,,Wais,"access to freeWAIS-sf libraries"
+MailFolder-0.02,1996-07-17T01:52:23,KJOHNSON,backpan,released,0.02,,MailFolder,"A folder-independant interface to email folders."
+GD-1.01,1996-07-17T10:16:00,LDS,backpan,released,1.01,,GD,"Interface to Gd Graphics Library"
+cons_1.0,1996-07-17T22:54:31,BOBSIDE,backpan,released,1.0,1,cons,
+DateManip-5.03,1996-07-19T15:08:31,SBECK,backpan,released,5.03,,DateManip,"powerful date manipulation routines"
+MsqlPerl-1.10,1996-07-20T02:49:19,ANDK,backpan,released,1.10,,MsqlPerl,"interactive shell with readline for msql"
+jeffrey.perl,1996-07-21T15:00:38,JFRIEDL,cpan,released,0,1,jeffrey.perl,
+ExtUtils-Embed-1.07,1996-07-22T01:18:19,DOUGM,backpan,released,1.07,1,ExtUtils-Embed,"Utilities for embedding Perl in C/C++ applications"
+Wais-2.113,1996-07-22T13:56:00,ULPFR,backpan,released,2.113,,Wais,"access to freeWAIS-sf libraries"
+gettext-1.00,1996-07-22T18:40:26,PVANDRY,cpan,released,1.00,1,gettext,"message handling functions"
+File-BasicFLock-96.072401,1996-07-24T08:14:00,MUIR,backpan,released,96.072401,1,File-BasicFLock,"file locking with flock"
+HTML-Stream-1.24,1996-07-24T23:58:44,ERYQ,backpan,released,1.24,,HTML-Stream,"HTML output stream class, and some markup utilities"
+MIME-parser-1.13,1996-07-25T00:02:22,ERYQ,backpan,released,1.13,,MIME-parser,"class for parsed-and-decoded MIME message"
+IO-1.09,1996-07-26T08:49:37,GBARR,backpan,released,1.09,,IO,"supply object methods for filehandles"
+DBD-Oracle-0.37,1996-07-26T19:19:00,TIMB,backpan,released,0.37,,DBD-Oracle,"Perl access to Oracle databases for old oraperl scripts"
+mod_perl-0.76b1,1996-07-26T20:39:23,DOUGM,backpan,released,0.76,,mod_perl,"Perl interface to the Apache server API"
+Tie-Watch-0.95,1996-07-27T21:39:51,LUSOL,backpan,released,0.95,,Tie-Watch,"place watchpoints on Perl variables."
+TimeDate-1.05,1996-07-31T06:46:43,GBARR,backpan,released,1.05,,TimeDate,"miscellaneous timezone manipulations routines"
+DateManip-5.04,1996-08-01T18:14:02,SBECK,backpan,released,5.04,,DateManip,"powerful date manipulation routines"
+libwww-perl-5.01,1996-08-02T16:38:58,GAAS,backpan,released,5.01,,libwww-perl,"libwww-perl cookbook"
+MailFolder-0.03,1996-08-03T17:40:55,KJOHNSON,backpan,released,0.03,,MailFolder,"A folder-independant interface to email folders."
+Data-Flow-0.04,1996-08-04T22:18:00,ILYAZ,cpan,released,0.04,1,Data-Flow,"Perl extension for simple-minded recipe-controlled build of data."
+C-Scan-0.2,1996-08-05T01:57:00,ILYAZ,backpan,released,0.2,1,C-Scan,"scan C language files for easily recognized constructs."
+GetoptLong-2.4b1,1996-08-05T09:15:03,JV,backpan,released,2.4,,GetoptLong,"extended processing of command line options"
+Wais-2.114,1996-08-05T14:16:00,ULPFR,backpan,released,2.114,,Wais,"access to freeWAIS-sf libraries"
+Win32odbc_v960722,1996-08-06T02:45:38,DAVEROTH,backpan,released,v960722,,Win32odbc,
+CGI.pm-2.22,1996-08-07T09:24:00,LDS,backpan,released,2.22,,CGI,"Simple Common Gateway Interface Class"
+Image-Size-1.0,1996-08-07T16:20:58,RJRAY,backpan,released,1.0,1,Image-Size,
+PodFilter-0.01,1996-08-08T05:02:42,BRADAPP,backpan,released,0.01,1,PodFilter,"print selected sections of pod documentation on standard output"
+PodUsage-0.01,1996-08-08T05:04:22,BRADAPP,backpan,released,0.01,1,PodUsage,
+PodPlainText-0.01,1996-08-08T05:04:25,BRADAPP,backpan,released,0.01,1,PodPlainText,"function to convert POD data to formatted ASCII text"
+Wais-2.115,1996-08-08T05:16:00,ULPFR,backpan,released,2.115,,Wais,"access to freeWAIS-sf libraries"
+perl5.003_02a,1996-08-08T23:13:50,NI-S,backpan,developer,5.003_02,,perl,"access Perl configuration information"
+IniConf.pm-0.91,1996-08-09T20:29:33,SHUTTON,backpan,released,0.91,1,IniConf,"A Module for reading .ini-style configuration files"
+pod2ps-1.0.1,1996-08-09T20:45:26,JPRAVETZ,cpan,released,v1.0.1,1,pod2ps,
+perl5.003_02,1996-08-10T19:07:27,NI-S,backpan,released,5.003_02,,perl,"access Perl configuration information"
+GetoptLong-2.4b2,1996-08-10T19:49:37,JV,backpan,released,2.4,,GetoptLong,"extended processing of command line options"
+LibA2-0.002,1996-08-13T04:45:32,CJM,backpan,released,0.002,1,LibA2,
+MailTools-1.06,1996-08-13T09:42:17,GBARR,backpan,released,1.06,,MailTools,"mail utility functions"
+CGI.pm-2.23,1996-08-14T08:17:00,LDS,backpan,released,2.23,,CGI,"Simple Common Gateway Interface Class"
+MD5-1.7,1996-08-14T11:17:44,NWINT,cpan,released,1.7,,MD5,"Perl interface to the RSA Data Security Inc. MD5 Message-Digest Algorithm"
+CGI-Out-96.081401,1996-08-14T14:46:00,MUIR,backpan,released,96.081401,,CGI-Out,"buffer output when building CGI programs"
+PGP-0.3a,1996-08-14T19:41:51,GEHIC,latest,released,0.3,,PGP,"perl module to work with PGP messages"
+iodbc_ext_0_1,1996-08-15T20:39:19,JMAHAN,latest,released,0_1,1,iodbc_ext,"Perl extension for the iODBC API"
+PodSimplify-0.04,1996-08-16T19:14:10,KJALB,latest,released,0.04,1,PodSimplify,"Perl predefined variables"
+DBD-DB2-0.60,1996-08-16T20:49:34,MHM,backpan,released,0.60,,DBD-DB2,
+CGI-XA-0.22301-alpha,1996-08-17T22:23:11,ANDK,backpan,released,0.22301,1,CGI-XA,"Make things work with CGI.pm against Perl-Apache API"
+CGI-XA-0.22302-alpha,1996-08-18T15:47:28,ANDK,backpan,released,0.22302,,CGI-XA,"Clone of CGI.pm with less backwards compatibility and less namespace pollution"
+CGI-XA-0.22303-alpha,1996-08-19T14:02:22,ANDK,backpan,released,0.22303,,CGI-XA,"Clone of CGI.pm with less backwards compatibility and less namespace pollution"
+Wais-2.116,1996-08-19T15:39:00,ULPFR,cpan,released,2.116,,Wais,"access to freeWAIS-sf libraries"
+PodParser-1.00,1996-08-19T23:13:15,BRADAPP,cpan,released,1.00,1,PodParser,"print usage messages from embedded pod docs in files"
+DCE-Perl-0.11,1996-08-20T13:49:25,DOUGM,backpan,released,0.11,1,DCE-Perl,"Misc UUID functions"
+CGI.pm-2.24,1996-08-21T09:09:00,LDS,backpan,released,2.24,,CGI,"Simple Common Gateway Interface Class"
+Compiler-a2,1996-08-22T14:30:00,MICB,backpan,released,0,1,Compiler,
+Sort-PolySort-0.12,1996-08-24T08:09:53,DMACKS,backpan,released,0.12,1,Sort-PolySort,"general rules-based sorting of lists"
+Data-Dumper-2.03b,1996-08-26T14:36:59,GSAR,backpan,released,2.03,,Data-Dumper,"public release history for Data::Dumper"
+MLDBM-1.22,1996-08-26T14:38:48,GSAR,backpan,released,1.22,,MLDBM,"store multi-level hash structure in single level tied hash"
+News-Newsrc-1.02,1996-08-26T14:54:41,SWMCD,backpan,released,1.02,,News-Newsrc,"manage newsrc files"
+Penguin-Easy-1.1,1996-08-27T21:08:20,JDUNCAN,latest,released,1.1,1,Penguin-Easy,"provides easy access to Penguin module."
+perl5.003_03,1996-08-28T16:43:47,ANDYD,backpan,released,5.003_03,,perl,"access Perl configuration information"
+Data-Dumper-2.04b,1996-08-28T20:11:49,GSAR,backpan,released,2.04,,Data-Dumper,"public release history for Data::Dumper"
+Tk-b12,1996-08-29T00:19:01,NI-S,backpan,released,0,1,Tk,"Use MakeMaker's uninstalled version of a package"
+Parallel-Pvm-1.0,1996-08-29T00:21:45,EWALKER,cpan,released,1.0,1,Parallel-Pvm,"Perl extension for the Parallel Virtual Machine (PVM) Message Passing System"
+Text-Tabs+Wrap-96.082801,1996-08-29T06:10:00,MUIR,backpan,released,96.082801,,Text-Tabs+Wrap,"expand and unexpand tabs per the unix expand(1) and unexpand(1)"
+mvend200,1996-08-30T03:29:13,MIKEH,backpan,released,200,,mvend,"verify that a credit card number is valid and not expired"
+gen_tree-1.0,1996-08-31T21:16:43,STBEY,backpan,released,1.0,1,gen_tree,
+gen_tree-1.1,1996-09-01T12:31:55,STBEY,backpan,released,1.1,,gen_tree,
+Time-modules-96.090101,1996-09-02T02:33:00,MUIR,backpan,released,96.090101,,Time-modules,"simply report the number of days in a month"
+Text-Tabs+Wrap-96.090101,1996-09-02T02:37:00,MUIR,backpan,released,96.090101,,Text-Tabs+Wrap,"line wrapping to form simple paragraphs"
+Compiler-a3,1996-09-02T14:04:00,MICB,backpan,released,0,1,Compiler,"Generates cross reference reports for Perl programs"
+Bundle-PleaseIgnore-0.01,1996-09-02T22:49:35,ANDK,backpan,released,0.01,1,Bundle-PleaseIgnore,"Dummy Package to form a bundle"
+perl5.003_04,1996-09-02T23:25:30,ANDYD,backpan,released,5.003_04,,perl,"access Perl configuration information"
+MakeMaker-5.38,1996-09-03T22:04:35,ANDK,backpan,released,5.38,,MakeMaker,"methods to override UN*X behaviour in ExtUtils::MakeMaker"
+gen_tree-1.2,1996-09-04T18:47:54,STBEY,backpan,released,1.2,,gen_tree,
+Image-Size-1.1,1996-09-05T00:18:36,RJRAY,backpan,released,1.1,,Image-Size,"read the dimensions of an image in several popular formats"
+libnet-1.01,1996-09-05T07:03:36,GBARR,backpan,released,1.01,,libnet,"OO interface to users netrc file"
+AtExit-1.02,1996-09-05T19:25:21,BRADAPP,cpan,released,1.02,1,AtExit,"Register a subroutine to be invoked at program-exit time."
+C-Scan-0.3,1996-09-06T07:43:00,ILYAZ,backpan,released,0.3,,C-Scan,"scan C language files for easily recognized constructs."
+Image-Size-1.2,1996-09-06T15:50:57,RJRAY,backpan,released,1.2,,Image-Size,
+Tk400.200,1996-09-07T01:08:44,NI-S,backpan,released,400.200,,Tk,"Use MakeMaker's uninstalled version of a package"
+GD-1.10,1996-09-07T16:53:00,LDS,backpan,released,1.10,,GD,"Interface to Gd Graphics Library"
+eperl-1.4,1996-09-08T09:22:26,RSE,backpan,released,1.4,1,eperl,
+MsqlPerl-1.11,1996-09-08T13:46:13,ANDK,backpan,released,1.11,,MsqlPerl,"interactive shell with readline for msql"
+mvend201,1996-09-08T17:53:49,MIKEH,backpan,released,201,,mvend,"verify that a credit card number is valid and not expired"
+mod_perl-0.81,1996-09-08T22:13:32,DOUGM,backpan,released,0.81,,mod_perl,"Perl interface to the Apache server API"
+GD-1.11,1996-09-09T10:37:00,LDS,backpan,released,1.11,,GD,"Interface to Gd Graphics Library"
+DBD-Informix-0.22,1996-09-09T19:27:00,ADESC,backpan,released,0.22,,DBD-Informix,
+GD-1.12,1996-09-10T12:04:00,LDS,backpan,released,1.12,,GD,"Interface to Gd Graphics Library"
+CGI.pm-2.25,1996-09-10T14:23:00,LDS,backpan,released,2.25,,CGI,"Simple Common Gateway Interface Class"
+CPAN-0.17-alpha,1996-09-10T17:13:59,ANDK,backpan,released,0.17,1,CPAN,"query, download and build perl modules from CPAN sites"
+DBD-Informix-0.23,1996-09-10T17:57:00,ADESC,backpan,released,0.23,,DBD-Informix,
+CPAN-0.20-alpha,1996-09-10T20:51:00,ANDK,backpan,released,0.20,,CPAN,"query, download and build perl modules from CPAN sites"
+Term-ReadLine-0.92,1996-09-11T06:40:00,ILYAZ,backpan,released,0.92,,Term-ReadLine,"Perl interface to various readline packages. If no real package is found, substitutes stubs instead of basic functions."
+GD-1.13,1996-09-11T07:27:00,LDS,backpan,released,1.13,,GD,"Interface to Gd Graphics Library"
+IO-1.10,1996-09-11T11:26:42,GBARR,backpan,released,1.10,,IO,"supply seek based methods for I/O objects"
+libwww-perl-5.02,1996-09-11T16:19:57,GAAS,backpan,released,5.02,,libwww-perl,"libwww-perl cookbook"
+CPAN-0.26a,1996-09-12T05:53:35,ANDK,backpan,released,0.26,,CPAN,"query, download and build perl modules from CPAN sites"
+IO-1.11,1996-09-12T06:17:31,GBARR,backpan,released,1.11,,IO,"supply seek based methods for I/O objects"
+CPAN-0.27a,1996-09-12T14:01:39,ANDK,backpan,released,0.27,,CPAN,"query, download and build perl modules from CPAN sites"
+GD-1.14,1996-09-12T16:11:00,LDS,backpan,released,1.14,,GD,"Interface to Gd Graphics Library"
+perl5.003_05,1996-09-12T20:10:42,ANDYD,backpan,released,5.003_05,,perl,"access Perl configuration information"
+IO-1.11-1,1996-09-13T10:36:45,GBARR,backpan,released,1.11,,IO,"load various IO modules"
+OS2-SoftInstaller-0.01,1996-09-14T01:13:00,ILYAZ,cpan,released,0.01,1,OS2-SoftInstaller,"Perl extension for generation of daughter packages for IBM's Software Installer."
+Logfile-0.114,1996-09-16T06:05:00,ULPFR,backpan,released,0.114,,Logfile,"Perl extension for generating reports from logfiles"
+GetoptLong-2.4b3,1996-09-16T18:49:58,JV,backpan,released,2.4,,GetoptLong,"skeleton for GetOpt::Long and Pod::Usage"
+CPAN-0.28a,1996-09-16T20:18:59,ANDK,backpan,released,0.28,,CPAN,"query, download and build perl modules from CPAN sites"
+CPAN-0.29a,1996-09-17T17:14:51,ANDK,backpan,released,0.29,,CPAN,"query, download and build perl modules from CPAN sites"
+CPAN-0.30a,1996-09-19T05:24:17,ANDK,backpan,released,0.30,,CPAN,"query, download and build perl modules from CPAN sites"
+IO-1.12,1996-09-19T07:20:04,GBARR,backpan,released,1.12,,IO,"load various IO modules"
+CPAN-0.31a,1996-09-20T10:40:01,ANDK,backpan,released,0.31,,CPAN,"query, download and build perl modules from CPAN sites"
+CPAN-0.35a,1996-09-22T19:30:33,ANDK,backpan,released,0.35,,CPAN,"query, download and build perl modules from CPAN sites"
+CPAN-0.36a,1996-09-23T12:55:23,ANDK,backpan,released,0.36,,CPAN,"query, download and build perl modules from CPAN sites"
+CPAN-0.37a,1996-09-23T14:05:44,ANDK,backpan,released,0.37,,CPAN,"query, download and build perl modules from CPAN sites"
+DBD-Oracle-0.38,1996-09-23T16:26:00,TIMB,backpan,released,0.38,,DBD-Oracle,"Perl access to Oracle databases for old oraperl scripts"
+DBI-0.72,1996-09-23T16:33:00,TIMB,backpan,released,0.72,,DBI,
+DBD-Oracle-0.39,1996-09-23T18:07:00,TIMB,backpan,released,0.39,,DBD-Oracle,"Perl access to Oracle databases for old oraperl scripts"
+FCGI-0.25,1996-09-25T17:48:57,SKIMO,backpan,released,0.25,1,FCGI,
+DBD-Informix-0.24,1996-09-26T14:46:00,ADESC,backpan,released,0.24,1,DBD-Informix,
+Net-Ping-2.02,1996-09-27T04:36:18,RMOSE,cpan,released,2.02,,Net-Ping,"check a remote host for reachability"
+CPAN-0.39a,1996-09-27T12:52:07,ANDK,backpan,released,0.39,,CPAN,"query, download and build perl modules from CPAN sites"
+SyslogScan-0.21,1996-09-27T14:22:49,RHNELSON,cpan,released,0.21,1,SyslogScan,"Summarizes amount of mail routed through host, sorted by e-mail address"
+checkbot-1.39,1996-09-28T14:17:36,JJDG,backpan,released,1.39,1,checkbot,"WWW Link Verifier"
+MethodMaker-0.9,1996-09-28T19:57:12,PSEIBEL,cpan,released,0.9,1,MethodMaker,"a module for creating generic methods"
+CPAN-0.40a,1996-09-28T20:51:31,ANDK,backpan,released,0.40,,CPAN,"query, download and build perl modules from CPAN sites"
+NNML-1.04,1996-09-30T16:01:00,ULPFR,backpan,released,1.04,1,NNML,"update an nntp server with respect to another server"
+libwww-perl-5.03,1996-09-30T22:58:37,GAAS,backpan,released,5.03,,libwww-perl,"libwww-perl cookbook"
+Wais-2.117,1996-10-01T05:15:00,ULPFR,cpan,released,2.117,,Wais,"access to freeWAIS-sf libraries"
+NNML-1.05,1996-10-01T05:31:00,ULPFR,backpan,released,1.05,,NNML,"update an nntp server with respect to another server"
+CPAN-0.41a,1996-10-01T21:14:27,ANDK,backpan,released,0.41,,CPAN,"query, download and build perl modules from CPAN sites"
+NNML-1.06,1996-10-02T17:21:00,ULPFR,backpan,released,1.06,,NNML,"update an nntp server with respect to another server"
+DProf-19960930,1996-10-02T18:05:49,DMR,cpan,released,19960930,,DProf,"a Perl code profiler"
+GetoptLong-2.4,1996-10-02T21:18:25,JV,backpan,released,2.4,,GetoptLong,"skeleton for GetOpt::Long and Pod::Usage"
+Time-modules-96.100201,1996-10-03T05:26:00,MUIR,backpan,released,96.100201,,Time-modules,"simply report the number of days in a month"
+mod_perl-0.83_02,1996-10-04T15:50:31,DOUGM,backpan,developer,0.83_02,,mod_perl,"Make things work with CGI.pm against Perl-Apache API"
+WebMirror-1.0,1996-10-04T17:22:57,FLEITNER,cpan,released,1.0,1,WebMirror,"Simple WWW mirror program"
+Mirror-1.0,1996-10-04T17:26:12,FLEITNER,cpan,released,1.0,1,Mirror,"Simple FTP mirror program"
+DBD-DB2-0.61,1996-10-07T19:02:30,MHM,backpan,released,0.61,,DBD-DB2,
+NNML-1.07,1996-10-08T05:52:00,ULPFR,backpan,released,1.07,,NNML,"update an nntp server with respect to another server"
+plinstal,1996-10-08T07:36:00,ILYAZ,backpan,released,0,1,plinstal,
+plinstl0,1996-10-08T07:40:00,ILYAZ,backpan,released,0,1,plinstl,
+plreadme,1996-10-08T07:40:00,ILYAZ,backpan,released,0,1,plreadme,
+plINSTAL,1996-10-08T07:59:00,ILYAZ,backpan,released,0,1,plINSTAL,
+perl5.003_06,1996-10-08T21:59:27,ANDYD,backpan,released,5.003_06,,perl,"access Perl configuration information"
+mod_perl-0.83_03,1996-10-09T07:10:24,DOUGM,backpan,developer,0.83_03,,mod_perl,"Make things work with CGI.pm against Perl-Apache API"
+perlpdf-5.003_06,1996-10-10T05:18:45,BMIDD,backpan,developer,5.003_06,,perlpdf,
+perl5.003_07,1996-10-11T03:39:44,ANDYD,backpan,released,5.003_07,,perl,"access Perl configuration information"
+mod_perl-0.83_04,1996-10-14T03:46:54,DOUGM,backpan,developer,0.83_04,,mod_perl,"Make things work with CGI.pm against Perl-Apache API"
+DBD-Oracle-0.40,1996-10-15T00:55:00,TIMB,backpan,released,0.40,,DBD-Oracle,"Perl access to Oracle databases for old oraperl scripts"
+DBI-0.73,1996-10-15T00:58:00,TIMB,backpan,released,0.73,,DBI,
+mod_perl-0.83_05,1996-10-15T13:34:22,DOUGM,backpan,developer,0.83_05,,mod_perl,"Make things work with CGI.pm against Perl-Apache API"
+DateManip-5.05,1996-10-15T16:01:21,SBECK,backpan,released,5.05,,DateManip,"date manipulation routines"
+FCGI-0.26,1996-10-15T21:51:06,SKIMO,backpan,released,0.26,,FCGI,
+PDL1.00alpha_release,1996-10-16T04:06:22,KGB,backpan,released,1.00,1,PDL,
+Net_SSLeay.pm-0.04,1996-10-16T05:12:31,SAMPO,cpan,released,0.04,1,Net_SSLeay,"Perl extension for using Eric Young's implementation of SSL"
+gen_tree-2.1,1996-10-16T14:48:22,STBEY,backpan,released,2.1,,gen_tree,
+Parallel-Pvm-1.1,1996-10-16T16:19:25,EWALKER,cpan,released,1.1,,Parallel-Pvm,"Perl extension for the Parallel Virtual Machine (PVM) Message Passing System"
+bio_lib.pl.1.3,1996-10-17T01:48:13,JONG,backpan,released,1.3,1,bio_lib.pl,
+mod_perl-0.83_06,1996-10-17T03:48:27,DOUGM,backpan,developer,0.83_06,,mod_perl,"Make things work with CGI.pm against Perl-Apache API"
+NNML-1.08,1996-10-17T09:27:00,ULPFR,backpan,released,1.08,,NNML,"update an nntp server with respect to another server"
+OS2-Attrib-0.002,1996-10-17T19:12:57,CJM,backpan,released,0.002,1,OS2-Attrib,"Get or set OS/2 file attributes"
+fetch_1.1,1996-10-18T03:10:19,JONG,backpan,released,1.1,,fetch,
+MIME-tools-2.01a,1996-10-18T13:57:11,ERYQ,backpan,released,2.01,1,MIME-tools,"modules for parsing (and creating!) MIME entities"
+Time-HiRes-01.01,1996-10-18T14:02:06,DEWEG,backpan,released,01.01,,Time-HiRes,"Perl extension for ualarm, usleep, and gettimeofday"
+mod_perl-0.83_07,1996-10-18T22:18:01,DOUGM,backpan,developer,0.83_07,,mod_perl,"Make things work with CGI.pm against Perl-Apache API"
+Win32_AdminMisc_v961016,1996-10-20T00:06:39,DAVEROTH,cpan,released,v961016,1,Win32_AdminMisc,"manage network groups and users in perl"
+Win32_gd_v961016,1996-10-20T00:08:20,DAVEROTH,cpan,released,v961016,1,Win32_gd,"Interface to Gd Graphics Library"
+Win32odbc_v961017,1996-10-20T00:10:03,DAVEROTH,backpan,released,v961017,1,Win32odbc,
+PDL1.00_alpha_release,1996-10-20T08:43:46,KGB,backpan,released,1.00_,1,PDL,
+mod_perl-0.83_09,1996-10-21T01:37:29,DOUGM,backpan,developer,0.83_09,,mod_perl,"Make things work with CGI.pm against Perl-Apache API"
+File-Cmp-0.03,1996-10-21T16:35:33,JNH,backpan,released,0.03,1,File-Cmp,"compare files"
+libwww-perl-5.04,1996-10-22T10:39:33,GAAS,backpan,released,5.04,,libwww-perl,"libwww-perl cookbook"
+CGI.pm-2.26,1996-10-22T11:17:00,LDS,backpan,released,2.26,,CGI,"Simple Common Gateway Interface Class"
+VRML-0.85,1996-10-22T11:52:36,HPALM,backpan,released,0.85,1,VRML,"implements VRML primitives and extensions"
+MIME-tools-2.02a,1996-10-23T19:20:59,ERYQ,backpan,released,2.02,,MIME-tools,"modules for parsing (and creating!) MIME entities"
+WWW-Search-1.002,1996-10-23T21:59:11,JOHNH,backpan,released,1.002,1,WWW-Search,"Virtual base class for WWW searches"
+CGI.pm-2.27,1996-10-24T18:21:00,LDS,backpan,released,2.27,,CGI,"Simple Common Gateway Interface Class"
+mod_perl-0.83_10,1996-10-25T14:09:06,DOUGM,backpan,developer,0.83_10,,mod_perl,"Make things work with CGI.pm against Perl-Apache API"
+5.003_07-2.U,1996-10-25T15:17:56,ANDYD,backpan,released,0,1,5.003_07-2.U,"Perl interface to IEEE Std 1003.1"
+DateManip-5.06,1996-10-25T20:04:00,SBECK,backpan,released,5.06,,DateManip,"date manipulation routines"
+Win32odbc_v961025,1996-10-26T04:38:49,DAVEROTH,cpan,released,v961025,,Win32odbc,
+pg95perl5-1.3.1,1996-10-26T12:09:29,MERGL,backpan,released,v1.3.1,,pg95perl5,"Perl extension for Postgres95"
+File-PathConvert-0.1,1996-10-27T16:59:27,SHIGIO,cpan,released,0.1,1,File-PathConvert,"make an canonicalized absolute path name"
+mod_perl-0.84,1996-10-28T00:01:00,DOUGM,backpan,released,0.84,,mod_perl,"Make things work with CGI.pm against Perl-Apache API"
+FreezeThaw-0.3,1996-10-28T11:14:00,ILYAZ,cpan,released,0.3,1,FreezeThaw,"converting Perl structures to strings and back."
+MIME-tools-2.03,1996-10-28T18:27:36,ERYQ,backpan,released,2.03,,MIME-tools,"modules for parsing (and creating!) MIME entities"
+DBD-Oracle-0.43,1996-10-29T17:32:00,TIMB,backpan,released,0.43,,DBD-Oracle,"Perl access to Oracle databases for old oraperl scripts"
+MsqlCGI-0.8,1996-10-29T17:58:24,ALTITUDE,latest,released,0.8,1,MsqlCGI,
+WWW-Search-1.004,1996-10-31T01:59:01,JOHNH,backpan,released,1.004,,WWW-Search,"Virtual base class for WWW searches"
+Filter-1.11,1996-10-31T17:01:32,PMQS,cpan,released,1.11,,Filter,"template for a decrypt source filter"
+MIME-tools-2.04,1996-11-03T00:35:36,ERYQ,backpan,released,2.04,,MIME-tools,"modules for parsing (and creating!) MIME entities"
+PDL-PP-0.001,1996-11-03T00:51:53,LUKKA,backpan,released,0.001,1,PDL-PP,"Generate PDL routines from concise descriptions"
+PDL-PP-0.003,1996-11-04T02:10:24,LUKKA,backpan,released,0.003,,PDL-PP,"Generate PDL routines from concise descriptions"
+PDL-PP-0.004,1996-11-04T06:41:27,LUKKA,backpan,released,0.004,,PDL-PP,"Generate PDL routines from concise descriptions"
+PDL-Slatec-0.001,1996-11-04T06:41:30,LUKKA,backpan,released,0.001,1,PDL-Slatec,
+NNML-1.09,1996-11-05T16:29:00,ULPFR,backpan,released,1.09,,NNML,"update an nntp server with respect to another server"
+Wais-2.200,1996-11-05T17:27:00,ULPFR,cpan,released,2.200,,Wais,"access to freeWAIS-sf libraries"
+mvend202,1996-11-05T19:12:28,MIKEH,backpan,released,202,,mvend,"verify that a credit card number is valid and not expired"
+PDL-PP-0.005,1996-11-05T20:15:00,LUKKA,backpan,released,0.005,,PDL-PP,"Generate PDL routines from concise descriptions"
+SHA-1.1,1996-11-05T22:10:26,UWEH,cpan,released,1.1,,SHA,"Perl interface to the NIST Secure Hash Algorithm"
+PDL-Slatec-0.002,1996-11-06T07:42:55,LUKKA,backpan,released,0.002,,PDL-Slatec,
+PDL1.01dev_alpha_release,1996-11-06T08:33:56,KGB,backpan,released,1.01,,PDL,
+frogbak,1996-11-08T08:16:00,MUIR,latest,released,0,1,frogbak,
+Time-modules-96.110801,1996-11-08T08:58:00,MUIR,backpan,released,96.110801,,Time-modules,"simply report the number of days in a month"
+WWW-Search-1.005,1996-11-11T19:20:08,JOHNH,backpan,released,1.005,,WWW-Search,"a web-searching application demonstrating WWW::Search"
+GraphMaker-1.0,1996-11-11T19:21:55,FPIVARI,backpan,released,1.0,1,GraphMaker,
+pg95perl5-1.3.2,1996-11-11T21:40:28,MERGL,backpan,released,v1.3.2,,pg95perl5,"Perl extension for Postgres95"
+Getopt-Tabular-0.1,1996-11-12T04:56:20,GWARD,cpan,released,0.1,1,Getopt-Tabular,"table-driven argument parsing for Perl 5"
+cons_1.1,1996-11-12T20:59:37,BOBSIDE,cpan,released,1.1,,cons,
+mod_perl-0.85,1996-11-13T05:39:14,DOUGM,backpan,released,0.85,,mod_perl,"Make things work with CGI.pm against Perl-Apache API"
+mod_perl-0.85_01,1996-11-14T07:21:01,DOUGM,backpan,developer,0.85_01,,mod_perl,"Make things work with CGI.pm against Perl-Apache API"
+FileHandle-Multi-1.00,1996-11-14T17:12:37,NEMWS,backpan,released,1.00,1,FileHandle-Multi,"Print to multiple filehandles with one output call"
+sybperl-2.06,1996-11-15T19:03:35,MEWP,backpan,released,2.06,,sybperl,"Simple front end to the Sybase BCP API"
+CPAN-0.42a,1996-11-17T07:56:02,ANDK,backpan,released,0.42,,CPAN,"query, download and build perl modules from CPAN sites"
+CPAN-0.43a,1996-11-17T14:51:59,ANDK,backpan,released,0.43,,CPAN,"query, download and build perl modules from CPAN sites"
+PDL-PP-0.006,1996-11-18T07:12:17,LUKKA,backpan,released,0.006,,PDL-PP,"Generate PDL routines from concise descriptions"
+File-Flock-96.111802,1996-11-18T09:06:00,MUIR,backpan,released,96.111802,,File-Flock,"file locking with flock"
+PDL-PP-0.007,1996-11-19T04:56:53,LUKKA,backpan,released,0.007,,PDL-PP,"Generate PDL routines from concise descriptions"
+perl5.003_08,1996-11-19T07:27:23,CHIPS,backpan,released,5.003_08,,perl,"access Perl configuration information"
+PDL1.02dev_broken,1996-11-19T07:32:41,LUKKA,backpan,released,1.02,,PDL,
+DCE-Perl-0.14,1996-11-19T14:31:50,DOUGM,backpan,released,0.14,,DCE-Perl,"Perl extension for interfacing to the DCE login API"
+VRML-0.90,1996-11-22T14:33:20,HPALM,backpan,released,0.90,,VRML,"implements VRML Nodes independent of specification (1.x or 2.0)"
+Meschach-0.01,1996-11-22T15:14:07,EGROSS,backpan,released,0.01,1,Meschach,
+Fame-2,1996-11-22T22:39:21,TRIAS,backpan,released,2,1,Fame,"Perl5 access to FAME"
+PDL-PP-0.008,1996-11-23T05:07:55,LUKKA,backpan,released,0.008,,PDL-PP,"standard extensions for the PDL::PP preprocessor"
+pg95perl5-1.4.1,1996-11-24T09:43:32,MERGL,backpan,released,v1.4.1,,pg95perl5,"Perl extension for Postgres95"
+pg95perl5-1.4.2,1996-11-24T11:04:43,MERGL,backpan,released,v1.4.2,,pg95perl5,"Perl extension for Postgres95"
+EvaP-2.3.0,1996-11-25T00:13:07,LUSOL,backpan,released,v2.3.0,1,EvaP,
+VRML-0.91,1996-11-25T09:18:39,HPALM,backpan,released,0.91,,VRML,"implements VRML Nodes independent of specification (1.x or 2.0)"
+Image-Size-2.0,1996-11-25T21:33:52,RJRAY,backpan,released,2.0,,Image-Size,"read the dimensions of an image in several popular formats"
+TermReadKey-2.06,1996-11-26T07:10:58,KJALB,backpan,released,2.06,,TermReadKey,"provide auto-configuration utilities"
+perl5.003_09,1996-11-26T09:46:17,CHIPS,backpan,released,5.003_09,,perl,"access Perl configuration information"
+mod_perl-0.85_02,1996-11-27T17:19:02,DOUGM,backpan,developer,0.85_02,,mod_perl,"Embed a Perl interpreter in the Apache server"
+ExtUtils-DynaGlue-1.00a,1996-11-27T20:03:47,DOUGM,latest,released,1.00,1,ExtUtils-DynaGlue,"convert .h C header files to Perl extensions"
+ExtUtils-Embed-1.08,1996-11-27T21:28:19,DOUGM,backpan,released,1.08,,ExtUtils-Embed,"Utilities for embedding Perl in C/C++ applications"
+Exceptions-0.01,1996-11-27T21:57:59,PSEIBEL,cpan,released,0.01,,Exceptions,
+Class-MethodMaker-0.91,1996-11-28T00:21:31,PSEIBEL,cpan,released,0.91,1,Class-MethodMaker,"a module for creating generic methods"
+PDL1.03-alphadev2,1996-11-28T23:04:39,KGB,backpan,released,1.03,,PDL,
+GraphMaker-1.1,1996-11-29T13:33:33,FPIVARI,backpan,released,1.1,,GraphMaker,
+perl5.003_10,1996-11-30T01:22:23,CHIPS,backpan,released,5.003_10,,perl,"access Perl configuration information"
+ExtUtils-Embed-1.09,1996-11-30T01:23:13,DOUGM,backpan,released,1.09,,ExtUtils-Embed,"Utilities for embedding Perl in C/C++ applications"
+Image-Size-2.1,1996-11-30T01:25:01,RJRAY,backpan,released,2.1,,Image-Size,
+pod2texi-0.1,1996-11-30T01:25:18,KRISHPL,cpan,released,0.1,1,pod2texi,"Tutorial for XSUBs"
+DateCalc-2.3,1996-11-30T01:25:59,STBEY,backpan,released,2.3,,DateCalc,"Date Calculations"
+CPAN-0.44a,1996-11-30T17:04:28,ANDK,backpan,released,0.44,,CPAN,"query, download and build perl modules from CPAN sites"
+PDL-1.04,1996-11-30T18:43:33,LUKKA,backpan,released,1.04,,PDL,
+PDL-PP-0.009,1996-11-30T18:45:20,LUKKA,backpan,released,0.009,,PDL-PP,"standard extensions for the PDL::PP preprocessor"
+PDL-PP-0.010,1996-12-01T03:27:36,LUKKA,backpan,released,0.010,,PDL-PP,"standard extensions for the PDL::PP preprocessor"
+Alias-2.2,1996-12-01T04:10:24,GSAR,backpan,released,2.2,,Alias,"aspirations for Alias"
+CPAN-0.45a,1996-12-01T12:19:19,ANDK,backpan,released,0.45,,CPAN,"query, download and build perl modules from CPAN sites"
+CPAN-0.46a,1996-12-01T18:24:17,ANDK,backpan,released,0.46,,CPAN,"query, download and build perl modules from CPAN sites"
+Devel-Symdump-1.22,1996-12-02T02:57:26,ANDK,backpan,released,1.22,1,Devel-Symdump,"dump symbol names or the symbol table"
+Devel-Symdump-1.23,1996-12-02T11:19:41,ANDK,backpan,released,1.23,,Devel-Symdump,"dump symbol names or the symbol table"
+CGI.pm-2.28,1996-12-02T11:48:00,LDS,backpan,released,2.28,,CGI,"Simple Common Gateway Interface Class"
+Data-Dumper-2.05,1996-12-02T13:42:49,GSAR,backpan,released,2.05,,Data-Dumper,"public release history for Data::Dumper"
+VRML-0.92,1996-12-02T13:49:43,HPALM,backpan,released,0.92,,VRML,"implements VRML Nodes independent of specification (1.x or 2.0)"
+ARSperl-1.3,1996-12-02T15:52:31,JMURPHY,backpan,released,1.3,,ARSperl,
+Data-Dumper-2.06,1996-12-02T23:07:56,GSAR,backpan,released,2.06,,Data-Dumper,"public release history for Data::Dumper"
+Meschach-0.03,1996-12-03T16:05:13,EGROSS,latest,released,0.03,,Meschach,
+PDL-1.01,1996-12-03T23:40:30,KGB,backpan,released,1.01,1,PDL,
+POP3Client-1_15,1996-12-04T14:33:14,SDOWD,backpan,released,1_15,,POP3Client,"Perl 5 module to talk to a POP3 (RFC1081) server"
+SyslogScan-0.23,1996-12-04T18:55:10,RHNELSON,cpan,released,0.23,,SyslogScan,"Summarizes amount of mail routed through host, sorted by e-mail address"
+Apache-ePerl-0.10b,1996-12-04T20:54:49,MARKIM,backpan,released,0.10,1,Apache-ePerl,"Parse embedded perl code from HTML files on the fly"
+libwww-perl-5.05,1996-12-04T23:36:17,GAAS,backpan,released,5.05,,libwww-perl,"libwww-perl cookbook"
+mod_perl-0.85_03,1996-12-05T03:37:12,DOUGM,backpan,developer,0.85_03,,mod_perl,"Embed a Perl interpreter in the Apache server"
+vim45p04,1996-12-05T14:38:09,SKIMO,backpan,released,04,1,vim45p,
+vim4.5perl-04,1996-12-05T14:56:19,SKIMO,backpan,released,4.5,1,vim,
+sqltools_0.1,1996-12-05T19:29:31,RBOW,backpan,released,0.1,1,sqltools,
+perl5.003_11,1996-12-06T09:08:18,CHIPS,backpan,released,5.003_11,,perl,"access Perl configuration information"
+ExtUtils-Manifest-1.28,1996-12-06T14:26:08,ANDK,backpan,released,1.28,1,ExtUtils-Manifest,"utilities to write and check a MANIFEST file"
+VRML-0.94,1996-12-06T15:28:11,HPALM,backpan,released,0.94,,VRML,"implements VRML Nodes independent of specification (1.x or 2.0)"
+sqltools_0.2,1996-12-06T19:27:52,RBOW,backpan,released,0.2,1,sqltools,
+Data-Dumper-2.07,1996-12-07T17:28:27,GSAR,backpan,released,2.07,,Data-Dumper,"public release history for Data::Dumper"
+CGI.pm-2.29,1996-12-09T13:39:00,LDS,backpan,released,2.29,,CGI,"Simple Common Gateway Interface Class"
+CPAN-1.00,1996-12-10T00:58:25,ANDK,backpan,released,1.00,,CPAN,"query, download and build perl modules from CPAN sites"
+DBD-Informix-0.25,1996-12-10T05:13:53,JOHNL,backpan,released,0.25,,DBD-Informix,"Test Harness for DBD::Informix"
+CPAN-1.01,1996-12-10T10:17:15,ANDK,backpan,released,1.01,,CPAN,"query, download and build perl modules from CPAN sites"
+HTML-Stream-1.29,1996-12-10T17:55:45,ERYQ,backpan,released,1.29,,HTML-Stream,"HTML output stream class, and some markup utilities"
+HTML-Stream-1.29a,1996-12-10T18:07:30,ERYQ,backpan,released,1.29,,HTML-Stream,"HTML output stream class, and some markup utilities"
+DateManip-5.07,1996-12-10T19:05:24,SBECK,backpan,released,5.07,,DateManip,"date manipulation routines"
+SyslogScan-0.30,1996-12-10T20:38:53,RHNELSON,cpan,released,0.30,,SyslogScan,"Summarizes amount of mail routed through host, sorted by e-mail address"
+mod_perl-0.85_04,1996-12-10T23:17:33,DOUGM,backpan,developer,0.85_04,,mod_perl,"Embed a Perl interpreter in the Apache server"
+CPAN-1.02,1996-12-11T01:31:55,ANDK,backpan,released,1.02,,CPAN,"query, download and build perl modules from CPAN sites"
+String-BitCount-1.11,1996-12-11T14:37:48,WINKO,cpan,released,1.11,1,String-BitCount,
+String-Parity-1.31,1996-12-11T14:39:33,WINKO,cpan,released,1.31,1,String-Parity,
+PostgresPerl-1.3,1996-12-12T00:50:01,VKHERA,backpan,released,1.3,1,PostgresPerl,"Perl interface to the Postgres95 SQL database engine"
+DBD-DB2-0.62,1996-12-12T17:51:28,MHM,backpan,released,0.62,,DBD-DB2,
+Text-Tabs+Wrap-96.121201,1996-12-13T06:56:00,MUIR,backpan,released,96.121201,,Text-Tabs+Wrap,"line wrapping to form simple paragraphs"
+InfoBrief-0.10,1996-12-13T11:52:00,ULPFR,backpan,released,0.10,1,InfoBrief,"Perl extension for printing envelopes for Infobrief mailings according to the standards of the Deutsche Bundespost"
+Wais-2.201,1996-12-13T11:54:00,ULPFR,cpan,released,2.201,,Wais,"access to freeWAIS-sf libraries"
+Curses-1.01,1996-12-14T04:58:22,WPS,cpan,released,1.01,,Curses,"terminal screen handling and optimization"
+checkbot-1.44,1996-12-16T13:38:02,JJDG,backpan,released,1.44,,checkbot,"WWW Link Verifier"
+DBD-Ingres-0.02,1996-12-16T18:34:35,HTOUG,backpan,released,0.02,1,DBD-Ingres,"Perl access to Ingres databases for old ingperl scripts"
+MsqlPerl-1.12,1996-12-16T18:37:51,ANDK,backpan,released,1.12,,MsqlPerl,"interactive shell with readline for msql"
+mod_perl-0.85_06,1996-12-17T13:31:40,DOUGM,backpan,developer,0.85_06,,mod_perl,"Apache mod_perl installation instructions"
+Set-IntegerFast-2.0,1996-12-17T20:23:28,STBEY,backpan,released,2.0,,Set-IntegerFast,"Sets of Integers"
+perl5-byacc-patches-0.5,1996-12-17T22:59:29,JAKE,cpan,released,0.5,1,perl5-byacc-patches,"a class to encapsulate a filehandle as a stream;"
+WWW-Search-1.007,1996-12-17T23:46:36,JOHNH,backpan,released,1.007,,WWW-Search,"a web-searching application demonstrating WWW::Search"
+perl5.003_12,1996-12-19T04:59:47,CHIPS,backpan,released,5.003_12,,perl,"access Perl configuration information"
+mod_perl-0.86,1996-12-19T14:32:44,DOUGM,backpan,released,0.86,,mod_perl,"Apache mod_perl installation instructions"
+InfoBrief-0.11,1996-12-19T14:54:00,ULPFR,backpan,released,0.11,,InfoBrief,"Perl extension for printing envelopes for Infobrief mailings according to the standards of the Deutsche Bundespost"
+perl-5.003_13,1996-12-20T02:59:16,CHIPS,backpan,released,5.003_13,,perl,"access Perl configuration information"
+MakeMaker-5.39,1996-12-20T17:56:34,ANDK,backpan,released,5.39,,MakeMaker,"dummy program, does nothing"
+Quota-0_3a,1996-12-21T01:03:59,TOMZO,backpan,released,0_3,,Quota,
+CPAN-1.03,1996-12-21T03:10:23,ANDK,backpan,released,1.03,,CPAN,"query, download and build perl modules from CPAN sites"
+MsqlPerl-1.14,1996-12-21T12:41:14,ANDK,backpan,released,1.14,,MsqlPerl,"interactive shell with readline for msql"
+CPAN-1.04,1996-12-21T20:08:49,ANDK,backpan,released,1.04,,CPAN,"query, download and build perl modules from CPAN sites"
+CPAN-1.05,1996-12-22T13:04:58,ANDK,backpan,released,1.05,,CPAN,"query, download and build perl modules from CPAN sites"
+CPAN-1.06,1996-12-22T14:16:08,ANDK,backpan,released,1.06,,CPAN,"query, download and build perl modules from CPAN sites"
+net-ext-a8,1996-12-22T15:31:51,SPIDB,backpan,released,0,1,net-ext,"UNIX-domain sockets interface module"
+CPAN-1.07,1996-12-23T04:05:01,ANDK,backpan,released,1.07,,CPAN,"query, download and build perl modules from CPAN sites"
+PGForth1.0,1996-12-23T10:52:24,PETERGAL,cpan,released,1.0,1,PGForth,
+CPAN-1.08,1996-12-23T13:18:01,ANDK,backpan,released,1.08,,CPAN,"query, download and build perl modules from CPAN sites"
+libnet-1.02,1996-12-23T13:18:07,GBARR,backpan,released,1.02,,libnet,"OO interface to users netrc file"
+perl5.003_15,1996-12-23T22:09:26,CHIPS,backpan,released,5.003_15,,perl,"access Perl configuration information"
+CPAN-1.09,1996-12-24T00:46:19,ANDK,backpan,released,1.09,,CPAN,"query, download and build perl modules from CPAN sites"
+mod_perl-0.87,1996-12-24T04:19:35,DOUGM,backpan,released,0.87,,mod_perl,"Apache mod_perl installation instructions"
+IO-1.14,1996-12-24T10:33:00,GBARR,backpan,released,1.14,,IO,"load various IO modules"
+mod_perl-0.88,1996-12-24T20:41:28,DOUGM,backpan,released,0.88,,mod_perl,"Apache mod_perl installation instructions"
+perl5.003_16,1996-12-24T23:22:02,CHIPS,backpan,released,5.003_16,,perl,"access Perl configuration information"
+Tie-Watch-0.96,1996-12-25T15:01:02,LUSOL,backpan,released,0.96,,Tie-Watch,"place watchpoints on Perl variables."
+perl5.003_17,1996-12-27T20:20:05,CHIPS,backpan,released,5.003_17,,perl,"access Perl configuration information"
+Time-HiRes-01.02,1996-12-30T14:04:16,DEWEG,cpan,released,01.02,,Time-HiRes,"Perl extension for ualarm, usleep, and gettimeofday"
+tk401_add,1996-12-30T19:15:00,ILYAZ,cpan,released,0,1,tk401_add,
+mod_perl-0.89,1996-12-31T04:43:25,DOUGM,backpan,released,0.89,,mod_perl,"Apache mod_perl installation instructions"
+mod_perl-0.90,1996-12-31T07:52:56,DOUGM,backpan,released,0.90,,mod_perl,"Apache mod_perl installation instructions"
+perl5.003_18,1996-12-31T21:35:40,CHIPS,backpan,released,5.003_18,,perl,"access Perl configuration information"

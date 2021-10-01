@@ -1,9 +1,11 @@
+use strict; use warnings;
+
 package DBIx::Connector::Driver::Pg;
 
-use strict;
-use warnings;
-use base 'DBIx::Connector::Driver';
-our $VERSION = '0.56';
+use DBIx::Connector::Driver;
+
+our $VERSION = '0.57';
+our @ISA = qw( DBIx::Connector::Driver );
 
 sub savepoint {
     my ($self, $dbh, $name) = @_;
@@ -21,6 +23,7 @@ sub rollback_to {
 }
 
 1;
+
 __END__
 
 =head1 Name
@@ -48,7 +51,7 @@ strongly recommended.
 
 =head1 Authors
 
-This module was written and is maintained by:
+This module was written by:
 
 =over
 

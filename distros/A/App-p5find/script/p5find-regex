@@ -2,9 +2,9 @@
 
 =head1 Abstract
 
-p5find-regex is a program to find regular expressions in your perl5 code. This
-is not so trivial with a grep/ack command, since it's also non-trivial to have
-a regular expression matching all regular expressions.
+p5find-regex is a program to find regular expressions in perl5 code. This is
+less trivial with a grep/ack, since it's also non-trivial to write a regular
+expression matching all regular expressions.
 
 =head1 Examples
 
@@ -17,7 +17,7 @@ a regular expression matching all regular expressions.
 This program p5find-regexp locates regular expressions in perl source code
 under the given path.
 
-The output format should be compatible to C<grep -Hnr>. Each line consists of
+The output is formatted like the output of C<grep -Hnr>. Each line consists of
 colon-separated fields of filename, line number, and the content of that line.
 
 Here's a partial result of regexes found in perlbrew source code.
@@ -40,7 +40,7 @@ entire line.  In this display mode, an extra tab character ("\t") is added
 right in front of the regex so is easier to separate them visually and
 programatically by piping to C<cut -f 2->:
 
-    > ./script/p5find-regex -o ./lib | cut -f 2- | head
+    > {./script/p5find-regex -o ./lib | cut -f 2- | head
     
     //
     //

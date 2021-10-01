@@ -1,8 +1,8 @@
+use strict; use warnings;
+
 package DBIx::Connector::Driver;
 
-use strict;
-use warnings;
-our $VERSION = '0.56';
+our $VERSION = '0.57';
 
 DRIVERS: {
     my %DRIVERS;
@@ -80,7 +80,7 @@ sub rollback_to {
 
 ROLLBACKERR: {
     package DBIx::Connector::RollbackError;
-    our $VERSION = '0.56';
+    our $VERSION = '0.57';
     # an exception is always true
     use overload bool => sub {1}, '""' => 'as_string', fallback => 1;
 
@@ -95,17 +95,18 @@ ROLLBACKERR: {
     }
 
     package DBIx::Connector::TxnRollbackError;
-    our $VERSION = '0.56';
-    our @ISA = ('DBIx::Connector::RollbackError');
+    our $VERSION = '0.57';
+    our @ISA = qw( DBIx::Connector::RollbackError );
     sub _label    { 'Transaction' }
 
     package DBIx::Connector::SvpRollbackError;
-    our $VERSION = '0.56';
-    our @ISA = ('DBIx::Connector::RollbackError');
+    our $VERSION = '0.57';
+    our @ISA = qw( DBIx::Connector::RollbackError );
     sub _label    { 'Savepoint' }
 }
 
 1;
+
 __END__
 
 =head1 Name
@@ -211,7 +212,7 @@ examples.
 
 =head1 Authors
 
-This module was written and is maintained by:
+This module was written by:
 
 =over
 

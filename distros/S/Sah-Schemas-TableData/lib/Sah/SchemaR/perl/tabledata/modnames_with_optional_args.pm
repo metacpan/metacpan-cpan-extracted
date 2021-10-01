@@ -1,9 +1,10 @@
+## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::perl::tabledata::modnames_with_optional_args;
 
-our $DATE = '2021-06-11'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2021-09-29'; # DATE
+our $VERSION = '0.002'; # VERSION
 
-our $rschema = ["array",[{description=>"\nArray of Perl TableData::* module names without the prefix and optional args.\nEach element is of `perl::tabledata::modname` schema, e.g. `Locale::US::State`,\n`WordList=wordlist,EN::Enable`.\n\nContains coercion rule that expands wildcard, so you can specify:\n\n    Locale::US::*\n\nand it will be expanded to e.g.:\n\n    [\"Locale::US::State\", \"Locale::US::City\"]\n\nThe wildcard syntax supports jokers (`?`, `*`, `**`), brackets (`[abc]`), and\nbraces (`{one,two}`). See <pm:Module::List::Wildcard> for more details.\n\n",of=>["perl::tabledata::modname_with_optional_args",{req=>1},{}],summary=>"Array of Perl TableData::* module names without the prefix, with optional args, e.g. [\"Locale::US::State\", \"WordList=wordlist,EN::Enable\"]","x.element_completion"=>["perl_modname",{ns_prefix=>"TableData"}],"x.perl.coerce_rules"=>[["From_str_or_array::expand_perl_modname_wildcard",{ns_prefix=>"TableData"}]]}],["array"]];
+our $rschema = do{my$var={base=>"array",clsets_after_base=>[{description=>"\nArray of Perl TableData::* module names without the prefix and optional args.\nEach element is of `perl::tabledata::modname` schema, e.g. `Locale::US::State`,\n`WordList=wordlist,EN::Enable`.\n\nContains coercion rule that expands wildcard, so you can specify:\n\n    Locale::US::*\n\nand it will be expanded to e.g.:\n\n    [\"Locale::US::State\", \"Locale::US::City\"]\n\nThe wildcard syntax supports jokers (`?`, `*`, `**`), brackets (`[abc]`), and\nbraces (`{one,two}`). See <pm:Module::List::Wildcard> for more details.\n\n",of=>["perl::tabledata::modname_with_optional_args",{req=>1},{}],summary=>"Array of Perl TableData::* module names without the prefix, with optional args, e.g. [\"Locale::US::State\", \"WordList=wordlist,EN::Enable\"]","x.element_completion"=>["perl_modname",{ns_prefix=>"TableData"}],"x.perl.coerce_rules"=>[["From_str_or_array::expand_perl_modname_wildcard",{ns_prefix=>"TableData"}]]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["array"],type=>"array",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
 # ABSTRACT: Array of Perl TableData::* module names without the prefix, with optional args, e.g. ["Locale::US::State", "WordList=wordlist,EN::Enable"]
@@ -20,7 +21,7 @@ Sah::SchemaR::perl::tabledata::modnames_with_optional_args - Array of Perl Table
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::SchemaR::perl::tabledata::modnames_with_optional_args (from Perl distribution Sah-Schemas-TableData), released on 2021-06-11.
+This document describes version 0.002 of Sah::SchemaR::perl::tabledata::modnames_with_optional_args (from Perl distribution Sah-Schemas-TableData), released on 2021-09-29.
 
 =head1 DESCRIPTION
 
@@ -36,6 +37,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 
 Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-TableData>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-TableData>
@@ -43,16 +72,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

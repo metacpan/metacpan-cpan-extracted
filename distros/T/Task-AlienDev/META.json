@@ -107,6 +107,11 @@
             "App::af" : "0.17",
             "Dist::Zilla::MintingProfile::AlienBuild" : "0.01",
             "Dist::Zilla::Plugin::AlienBuild" : "0.32",
+            "Env::ShellWords" : "0",
+            "File::Listing" : "0",
+            "Mojo::DOM58" : "0",
+            "Sort::Versions" : "0",
+            "URI" : "0",
             "perl" : "5.022"
          }
       },
@@ -130,8 +135,8 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.01",
-   "x_generated_by_perl" : "v5.35.2",
+   "version" : "0.02",
+   "x_generated_by_perl" : "v5.35.4",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0

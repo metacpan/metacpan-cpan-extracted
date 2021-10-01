@@ -1,5 +1,13 @@
 .github/ISSUE_TEMPLATE/bug_report.md
+.github/ISSUE_TEMPLATE/config.yml
 .github/ISSUE_TEMPLATE/feature_request.md
+.github/ISSUE_TEMPLATE/usage_question.md
+.idea/google-ads-perl.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/perl5local.xml
+.idea/vcs.xml
+.idea/workspace.xml
 .perltidyrc
 Build.PL
 Changes
@@ -21,6 +29,8 @@ examples/account_management/update_user_access.pl
 examples/advanced_operations/add_ad_customizer.pl
 examples/advanced_operations/add_ad_group_bid_modifier.pl
 examples/advanced_operations/add_app_campaign.pl
+examples/advanced_operations/add_bidding_data_exclusion.pl
+examples/advanced_operations/add_bidding_seasonality_adjustment.pl
 examples/advanced_operations/add_display_upload_ad.pl
 examples/advanced_operations/add_dynamic_page_feed.pl
 examples/advanced_operations/add_dynamic_search_ads.pl

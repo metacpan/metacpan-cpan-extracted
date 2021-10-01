@@ -7,7 +7,7 @@ use Time::HiRes qw( time );
 use Moo;
 extends "Archive::BagIt";
 
-our $VERSION = '0.075'; # VERSION
+our $VERSION = '0.081'; # VERSION
 
 # ABSTRACT: A module to use IO::AIO to het better performance
 
@@ -72,7 +72,7 @@ Archive::BagIt::Fast - A module to use IO::AIO to het better performance
 
 =head1 VERSION
 
-version 0.075
+version 0.081
 
 =head1 NAME
 

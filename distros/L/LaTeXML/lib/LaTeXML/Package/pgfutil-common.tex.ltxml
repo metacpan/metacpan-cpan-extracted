@@ -19,12 +19,11 @@ use warnings;
 
 #======================================================================
 # Load pgf's TeX code for util-common, first
-InputDefinitions('pgfutil-common', type => 'tex', noltxml => 1)
-  || Warn(":missing:pgfutil-common.tex Couldn't find pgfutil-common.tex");
+InputDefinitions('pgfutil-common', type => 'tex', noltxml => 1);
 
 # Overwrite macros of interest
 
-DefMacro('\pgfutil@in@{}{}', sub {
+DefPrimitive('\pgfutil@in@{}{}', sub {
     AssignValue('pgfutilin_args', [ToString($_[1]), ToString($_[2])]);
     return; });
 
@@ -33,7 +32,6 @@ DefConditional('\ifpgfutil@in@', sub {
     my $element = $$args[0];
     my $list    = $$args[1];
     my $test    = (index($list, $element) != -1);
-    # print STDERR "-- Is $element in $list ? Answer: $test\n";
     return $test; });
 
 1;

@@ -42,7 +42,7 @@ make_default_store($fn);
 #Check haydock coefficients for simple 1D system
 my $B=zeroes(11)->xvals<5; #1D system
 my $g=Photonic::Geometry::FromB->new(B=>$B, Direction0=>pdl([1])); #long
-my $a=Photonic::LE::NR2::AllH->new(geometry=>$g, nh=>10);
+my $a=Photonic::LE::NR2::Haydock->new(geometry=>$g, nh=>10);
 $a->run;
 my $as=$a->as;
 my $bs=$a->bs;
@@ -55,7 +55,7 @@ ok(agree($b2s, $bs**2), "1D L b2==b^2");
 #View 1D system as 2D. Transverse direction
 my $Bt=zeroes(1,11)->yvals<5; #2D flat system
 my $gt=Photonic::Geometry::FromB->new(B=>$Bt, Direction0=>pdl([1,0])); #trans
-my $at=Photonic::LE::NR2::AllH->new(geometry=>$gt, nh=>10);
+my $at=Photonic::LE::NR2::Haydock->new(geometry=>$gt, nh=>10);
 $at->run;
 my $ast=$a->as;
 my $bst=$a->bs;
@@ -69,7 +69,7 @@ ok(agree($b2st, $bst**2), "1D T b2==b^2");
     #check reorthogonalize with square array
     my $Bs=zeroes(15,15)->rvals<5;
     my $gs=Photonic::Geometry::FromB->new(B=>$Bs, Direction0=>pdl([1,0]));
-    my $als=Photonic::LE::NR2::AllH
+    my $als=Photonic::LE::NR2::Haydock
 	->new(geometry=>$gs, nh=>2*15*15, reorthogonalize=>1,
 	      accuracy=>machine_epsilon(), noise=>machine_epsilon(),
 	      normOp=>1);
@@ -83,7 +83,7 @@ ok(agree($b2st, $bst**2), "1D T b2==b^2");
     #check reorthogonalize with square array. Data in file.
     my $Bs=zeroes(15,15)->rvals<5;
     my $gs=Photonic::Geometry::FromB->new(B=>$Bs, Direction0=>pdl([1,0]));
-    my $als=Photonic::LE::NR2::AllH
+    my $als=Photonic::LE::NR2::Haydock
 	->new(geometry=>$gs, nh=>2*15*15, reorthogonalize=>1,
 	      accuracy=>machine_epsilon(), noise=>machine_epsilon(),
 	      normOp=>1, stateFN=>$fn);

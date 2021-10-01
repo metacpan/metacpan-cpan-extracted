@@ -1,0 +1,12 @@
+#!/usr/bin/env perl
+use v5.18;
+use warnings;
+use File::Which qw(which);
+
+my $cmd = shift @ARGV;
+$cmd //= "help";
+
+my $finder = which("p5find-$cmd")
+    or die "Unknown: $cmd\n";
+
+exec($^X, $finder, @ARGV);

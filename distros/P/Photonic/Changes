@@ -1,3 +1,26 @@
+0.021 2021-10-01
+- Add example of honeycomb lattice for LE::NR2
+- Admit 'haydock' as an optional parameter in P::Roles::EpsTensor
+- Documentation P::LE::NR2::EpsTensor
+- Documentation P::Geometry::FromB
+
+0.020 2021-09-25
+- Admit Ed J (mohawk2) PR
+- Merge OneH and ALlH into Haydock
+- Inmutable objects. Response functions should be given at creation time
+- factorize lots of codes
+- use ndarrays instead of perl arrays
+- unify Reorthogonalize roles
+
+0.019 2021-09-24
+- Fix error in tests
+
+0.018 2021-07-20
+- Correct filtering of vector fields
+
+0.017 2021-06-26
+- switch from PDL::Complex to native-complex
+
 0.016 2021-05-30
 - Factor several repetitive tasks
 - use PDL::FFTW3's new ability to take PDL::Complex inputs

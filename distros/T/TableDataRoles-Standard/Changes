@@ -1,3 +1,30 @@
+0.013   2021-09-29  Released-By: PERLANCAR; Urgency: medium
+
+	- [role TableDataRole::Munge::Filter] Allow string form of 'filter'
+	  & 'filter_hashref' for ease of specification from command-line.
+
+	- Add Rinci metadata for constructors of TableData::*.
+
+
+0.012   2021-09-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Add roles: TableDataRole::Munge::Filter, TableDataRole::Munge::Concat.
+
+	- [role TableDataRole::Source::CSVInFile] add DESTROY() to reset
+	  __DATA__ position to beginning.
+
+
+0.011   2021-09-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Add roles: TableDataRole::Munge::Reverse, TableDataRole::Source::AOA.
+
+
+0.010   2021-09-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Add roles: TableDataRole::Source::CSVInFile,
+          TableDataRole::Source::CSVInFiles.
+
+
 0.009   2021-06-01  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
 	- [Incompatible change] Update to TableData 0.2.0.

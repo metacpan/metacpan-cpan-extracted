@@ -1,9 +1,17 @@
 Revision history for perl module Sys::Virt
 
+7.8.0 2021-10-01
+
+ - Add VIR_NWFILTER_BINDING_CREATE_VALIDATE constant
+ - Add support for virNetworkCreateXMLFlags and
+   associated flags
+ - Add virNodeDeviceGetAutostart, virNodeDeviceSetAutostart,
+   virNodeDeviceIsPersistent and virNodeDeviceIsActive.
+
 7.7.0 2021-09-01
 
  - Add support for virNWFilterDefineXMLFlags and
-   virNetworkDefineXMLFlags APIs and assoicated
+   virNetworkDefineXMLFlags APIs and associated
    flags
  - Add support for flags with existing
    virInterfaceDefineXML, virStoragePoolDefineXML

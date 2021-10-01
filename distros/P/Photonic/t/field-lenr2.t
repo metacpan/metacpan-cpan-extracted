@@ -31,7 +31,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 use strict;
 use warnings;
 use PDL;
-use Photonic::LE::NR2::AllH;
+use Photonic::LE::NR2::Haydock;
 use Photonic::LE::NR2::Field;
 use Photonic::LE::NR2::SHP;
 use Photonic::LE::NR2::SH;
@@ -46,8 +46,8 @@ my $eb=3+4*i;
 #Check field for simple 1D system
 my $B=zeroes(11)->xvals<5; #1D system
 my $gl=Photonic::Geometry::FromB->new(B=>$B, Direction0=>pdl([1])); #long
-my $nr=Photonic::LE::NR2::AllH->new(geometry=>$gl, nh=>10, keepStates=>1);
-my $flo=Photonic::LE::NR2::Field->new(nr=>$nr, nh=>10);
+my $haydock=Photonic::LE::NR2::Haydock->new(geometry=>$gl, nh=>10, keepStates=>1);
+my $flo=Photonic::LE::NR2::Field->new(haydock=>$haydock, nh=>10);
 my $flv=$flo->evaluate($ea, $eb);
 my $fla=1/$ea;
 my $flb=1/$eb;
@@ -59,8 +59,8 @@ ok(Cagree($flv, $flx), "1D long field") or diag "got: $flv\nexpected: $flx";
 #View 2D from 1D superlattice.
 my $Bt=zeroes(1,11)->yvals<5; #2D flat system
 my $gt=Photonic::Geometry::FromB->new(B=>$Bt, Direction0=>pdl([1,0])); #trans
-my $nt=Photonic::LE::NR2::AllH->new(geometry=>$gt, nh=>10, keepStates=>1);
-my $fto=Photonic::LE::NR2::Field->new(nr=>$nt, nh=>10, filter=>ones(1));
+my $nt=Photonic::LE::NR2::Haydock->new(geometry=>$gt, nh=>10, keepStates=>1);
+my $fto=Photonic::LE::NR2::Field->new(haydock=>$nt, nh=>10, filter=>ones(1));
 my $ftv=$fto->evaluate($ea, $eb);
 my $ftx=pdl(r2C(1), r2C(0));
 ok(Cagree($ftv, $ftx), "1D trans field");
@@ -70,8 +70,8 @@ my $nrshp=Photonic::LE::NR2::SHP->new(
   nrf=>$fto, densityA=>$dA, densityB=>$dB,
 );
 my $nrsh=Photonic::LE::NR2::SH->new(
-  shp=>$nrshp, epsA1=>$ea, epsB1=>$eb,
-  epsA2=>$ea*$ea, epsB2=>$eb*$eb, filterflag => 1
+  shp=>$nrshp, epsA1=>$ea, epsB1=>$eb, epsA2=>$ea*$ea, epsB2=>$eb*$eb,
+  filterflag => 1
 );
 my $got=$nrsh->dipolar;
 my $expected = pdl(<<'EOF');
@@ -323,11 +323,12 @@ ok(Cagree($got, $expected, 1e-46), "P2LMCalt") or diag "got: $got\nexpected: $ex
 my $chi=Photonic::LE::NR2::SHChiTensor->new(
   geometry=>$gl,
   densityA=>$dA, densityB=>$dB, nhf=>10, nh=>10,
+  epsA1=>$ea, epsB1=>$eb, epsA2=>$ea*$ea, epsB2=>$eb*$eb,
   keepStates=>1,
 );
 $got = Photonic::LE::NR2::SH->new(
-  shp=>$chi->nrshp->[0], epsA1=>$ea, epsB1=>$eb,
-  epsA2=>$ea*$ea, epsB2=>$eb*$eb, filterflag=>0
+  shp=>$chi->nrshp->[0], epsA1=>$ea, epsB1=>$eb,epsA2=>$ea*$ea, epsB2=>$eb*$eb,
+  filterflag=>0
 )->P2;
 $expected = pdl(<<'EOF');
 [
@@ -345,42 +346,42 @@ $expected = pdl(<<'EOF');
 ]
 EOF
 ok(Cagree($got, $expected, 1e-18), "SHChiTensor SHPs P2") or diag "got: $got\nexpected: $expected";
-$got = $chi->evaluate($ea, $eb, $ea*$ea, $eb*$eb);
+$got = $chi->evaluate;
 $expected = pdl(<<'EOF');
 [ [ [ 2.06087e-17+3.64698e-17i ] ] ]
 EOF
 ok(Cagree($got, $expected, 1e-41), "P2") or diag "got: $got\nexpected: $expected";
-$got = $chi->evaluate($ea, $eb, $ea*$ea, $eb*$eb, kind => 'f', mask => pdl(1));
+$got = $chi->evaluate(kind => 'f', mask => pdl(1));
 $expected = pdl(<<'EOF');
 [ [ [ 4.0239976e-18-9.855343e-19i ] ] ]
 EOF
 ok(Cagree($got, $expected, 1e-50), "P2") or diag "got: $got\nexpected: $expected";
-$got = $chi->evaluate($ea, $eb, $ea*$ea, $eb*$eb, kind => 'l');
+$got = $chi->evaluate(kind => 'l');
 $expected = pdl(<<'EOF');
 [ [ [ 1.4979937e-18+3.6442788e-18i ] ] ]
 EOF
 ok(Cagree($got, $expected, 1e-51), "selfConsistentVecL") or diag "got: $got\nexpected: $expected";
-$got = $chi->evaluate($ea, $eb, $ea*$ea, $eb*$eb, kind => 'a');
+$got = $chi->evaluate(kind => 'a');
 $expected = pdl(<<'EOF');
 [ [ [ -4.890401e-16+5.6504395e-16i ] ] ]
 EOF
 ok(Cagree($got, $expected, 1e-47), "P2LMCalt") or diag "got: $got\nexpected: $expected";
-$got = $chi->evaluate($ea, $eb, $ea*$ea, $eb*$eb, kind => 'd');
+$got = $chi->evaluate(kind => 'd');
 $expected = pdl(<<'EOF');
 [ [ [ 5.0464683e-18+2.5232341e-18i ] ] ]
 EOF
 ok(Cagree($got, $expected, 1e-50), "dipolar") or diag "got: $got\nexpected: $expected";
-$got = $chi->evaluate($ea, $eb, $ea*$ea, $eb*$eb, kind => 'q');
+$got = $chi->evaluate(kind => 'q');
 $expected = pdl(<<'EOF');
 [ [ [ 1.5770213e-19+3.1540427e-19i ] ] ]
 EOF
 ok(Cagree($got, $expected, 1e-50), "quadrupolar") or diag "got: $got\nexpected: $expected";
-$got = $chi->evaluate($ea, $eb, $ea*$ea, $eb*$eb, kind => 'e');
+$got = $chi->evaluate(kind => 'e');
 $expected = pdl(<<'EOF');
 [ [ [ 9.9352345e-18+1.5770213e-18i ] ] ]
 EOF
 ok(Cagree($got, $expected, 1e-50), "external") or diag "got: $got\nexpected: $expected";
-$got = $chi->evaluate($ea, $eb, $ea*$ea, $eb*$eb, kind => 'el');
+$got = $chi->evaluate(kind => 'el');
 $expected = pdl(<<'EOF');
 [ [ [ 7.2542982e-18+1.4193192e-18i ] ] ]
 EOF

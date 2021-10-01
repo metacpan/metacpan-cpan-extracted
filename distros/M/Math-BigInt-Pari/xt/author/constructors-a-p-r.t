@@ -1,4 +1,4 @@
-#!perl
+# -*- mode: perl; -*-
 
 # Test how accuracy and precision are set in the constructors. All of the
 # constructors need to be tested:

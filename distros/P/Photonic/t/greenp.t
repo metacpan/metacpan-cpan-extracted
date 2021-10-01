@@ -33,7 +33,7 @@ use warnings;
 use PDL;
 use Photonic::Geometry::FromEpsilon;
 use Photonic::WE::S::Metric;
-use Photonic::WE::S::AllH;
+use Photonic::WE::S::Haydock;
 use Photonic::WE::S::GreenP;
 
 use Test::More;
@@ -49,12 +49,12 @@ my $g=Photonic::Geometry::FromEpsilon
 my $m=Photonic::WE::S::Metric->new(
     geometry=>$g, epsilon=>pdl(1), wavenumber=>pdl(2e-5),
     wavevector=>pdl([1,0])*1e-8);
-my $a=Photonic::WE::S::AllH->new(metric=>$m,
+my $a=Photonic::WE::S::Haydock->new(metric=>$m,
    polarization=>pdl([1,0])->r2C, nh=>10);
 my $gr=Photonic::WE::S::GreenP->new(nh=>10, haydock=>$a);
 my $grv=$gr->Gpp;
 ok(Cagree($grv, ($f/$eb+(1-$f)/$ea)),  "1D long non retarded limit") or diag "got:$grv";
-$a=Photonic::WE::S::AllH->new(metric=>$m,
+$a=Photonic::WE::S::Haydock->new(metric=>$m,
    polarization=>pdl([0,1])->r2C, nh=>10);
 $gr=Photonic::WE::S::GreenP->new(nh=>10, haydock=>$a);
 $grv=$gr->Gpp;

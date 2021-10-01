@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.281';
+our $VERSION = '2.284';
 
 #use bytes; # required
 use Scalar::Util qw( looks_like_number );
@@ -146,9 +146,11 @@ sub get_databases {
 }
 
 
-sub tables_data { # not public
+sub tables_info { # not public
     my ( $sf, $dbh, $schema ) = @_;
-    my $table_data = {};
+    my $tables_info = {};
+    # The table names in the $tables_info keys are used in the tables menu but not in SQL code. To get the table names
+    # for SQL code it is used the 'quote_table' routine.
     my ( $table_schem, $table_name );
     if ( $sf->get_db_driver eq 'Pg' ) {
         $table_schem = 'pg_schema';
@@ -165,29 +167,28 @@ sub tables_data { # not public
     }
     my @keys = ( 'TABLE_CAT', $table_schem, $table_name, 'TABLE_TYPE' );
     my $sth = $dbh->table_info( undef, $schema, undef, undef );
-    my $info = $sth->fetchall_arrayref( { map { $_ => 1 } @keys } );
-    my %duplicates;
-    for my $href ( @$info ) {
-        next if $href->{TABLE_TYPE} eq 'INDEX';
-        next if $href->{TABLE_TYPE} =~ /^SYSTEM/ && ! $sf->{Plugin}{o}{G}{metadata};
-        my $table = $href->{$table_name};
-        if ( ! defined $schema && $duplicates{$table}++ ) {
-            # the $schema is undefined if: SQLite + attached databases
-            # if the $schema is undefined, then in SQL code is always used the fully
-            # qualified table name and never the table name in the hash key
-            if ( $duplicates{$table} == 2 ) {
-                my $tmp = delete $table_data->{$table};
-                my $first = '[' . join ']', grep { defined && length } @{$tmp}[0..2];
-                $table_data->{$first} = $tmp;
+    my $info_tables = $sth->fetchall_arrayref( { map { $_ => 1 } @keys } );
+    my %equal_table_names;
+    for my $info_table ( @$info_tables ) {
+        next if $info_table->{TABLE_TYPE} eq 'INDEX';
+        next if $info_table->{TABLE_TYPE} =~ /^SYSTEM/ && ! $sf->{Plugin}{o}{G}{metadata};
+        my $table;
+        if ( $sf->get_db_driver eq 'SQLite' && ! defined $schema ) {
+            # The $schema is undefined if: SQLite + attached databases
+            if ( $info_table->{$table_schem} =~ /^main\z/i ) {
+                $table = sprintf "[%s] %s", "\x{001f}" . $info_table->{$table_schem}, $info_table->{$table_name};
+                # \x{001f} keeps the main tables on top of the tables menu.
             }
-            $table = '[' . join ']', grep { defined && length } @{$href}{@keys[0..2]};
-            $table_data->{$table} = [ @{$href}{@keys} ];
+            else {
+                $table = sprintf "[%s] %s", $info_table->{$table_schem}, $info_table->{$table_name};
+            }
         }
         else {
-            $table_data->{$table} = [ @{$href}{@keys} ];
+            $table = $info_table->{$table_name};
         }
+        $tables_info->{$table} = [ @{$info_table}{@keys} ];
     }
-    return $table_data;
+    return $tables_info;
 }
 
 
@@ -376,7 +377,7 @@ App::DBBrowser::DB - Database plugin documentation.
 
 =head1 VERSION
 
-Version 2.281
+Version 2.284
 
 =head1 DESCRIPTION
 

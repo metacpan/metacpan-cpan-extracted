@@ -901,7 +901,7 @@ If uplo is true, A is lower triangular.
 		diag[i].i = ca[ind].i;
 	}
 
-	dfunc_wrapper(diag, $SIZE(n), $PRIV(func));
+	dfunc_wrapper(diag, $SIZE(n), $COMP(func));
 	for (i = 0; i < $SIZE(n); i++)
 	{
 		ind = subscr(i,i);

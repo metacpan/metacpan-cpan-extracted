@@ -74,17 +74,12 @@ passed with L<new()|Net::OAuth2::Client/"Constructors">, overruled/extended by t
 
 =back
 
-=head1 SEE ALSO
-
-This module is part of Net-OAuth2 distribution version 0.66,
-built on October 01, 2019. Website: F<http://perl.overmeer.net/CPAN/>.
-
 =head1 COPYRIGHTS
 
-Copyrights 2013-2019-2018 on the perl code and the related documentation
- by [Mark Overmeer <markov@cpan.org>] for SURFnet bv, The Netherlands.  For other contributors see ChangeLog.
+Copyrights 2013-2019 on the perl code and the related documentation
+ by [Mark Overmeer <markov@cpan.org>] for SURFnet bv, The Netherlands.  For other contributors see L</Changes>.
 
-Copyrights 2011-12 by Keith Grennan.
+Copyrights 2011-2012 by Keith Grennan.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

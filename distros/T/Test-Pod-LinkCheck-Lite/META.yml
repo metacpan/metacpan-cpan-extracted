@@ -20,10 +20,12 @@ no_index:
     - inc
     - t
     - xt
+  package:
+    - My_Parser
 provides:
   Test::Pod::LinkCheck::Lite:
     file: lib/Test/Pod/LinkCheck/Lite.pm
-    version: '0.007'
+    version: '0.008'
 requires:
   B::Keywords: '0'
   Carp: '0'
@@ -49,5 +51,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Pod-LinkCheck-Lite
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Test-Pod-LinkCheck-Lite.git
-version: '0.007'
+version: '0.008'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

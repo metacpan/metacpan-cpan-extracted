@@ -36,6 +36,8 @@ coordinate notation
 
 =item FEN (Forsyth-Edwards Notation) import and export
 
+=item EPD (Extended Position Notation) parser
+
 =item Static Exchange Evaluation (SEE)
 
 =item Zobrist Keys
@@ -272,7 +274,7 @@ Returns the number of half-moves made.  Initially, this is 0.  After white has
 made their first move, it is 1. After black has made their first move, it is
 2, and so on.
 
-=item B<halfMoveClock>
+=item B<reversibleClock>
 
 Returns the number of reversible moves immediately leading to the current
 position.  The following moves are irreversible:
@@ -304,6 +306,12 @@ the fact that they are necessarily the first king move.
 
 The half-move-clock is important because both players can claim a draw, when
 the half-move clock has reached 50.
+
+=item B<halfMoveClock>
+
+Like L</irreversibleClock> but only captures and pawn moves are considered
+irreversible. Changes to the castling state are ignored.  This is the value
+that is relevant for claiming a draw according to the 50-move Rule.
 
 =item B<signature>
 
@@ -481,6 +489,20 @@ L</moveCoordinateNotation>.
 Returns true if the significant parts of B<MOVE1> and B<MOVE2> are equivalent.
 This is the case, when the start and destination square, and a possible
 promotion piece are equal.
+
+Note that the piece that moves is I<not> significant because it can be
+retrieved from the position.  Nevertheless, the piece that moves is set by
+the methods L</pseudoLegalMoves> and L</pseudoLegalAttacks> on the moves
+returned.  If you store a best move in a transposition table make sure to
+keep that in mind, when you compare moves.
+
+Although, this is technically a class method you should keep in mind that 
+the redundant parts of the moves depend on the current position.
+
+=item B<moveSignificant(MOVE)>
+
+Returns B<MOVE> with all insignificant bits stripped off.  See
+L</moveEquivalent> for what is considered significant.
 
 Although, this is technically a class method you should keep in mind that 
 the redundant parts of the moves depend on the current position.
@@ -715,9 +737,22 @@ These methods can be used to analyze features of the current position.
 
 =over 4
 
+=item B<insufficientMaterial>
+
+Returns true if none of the two sides has sufficient material to win, false
+otherwise.
+
+This is B<not> a general-purpose draw detection but only checks the material
+of both sides.  If one side has at least a pawn, rook, or queen, the material
+is sufficient to mate.  A mate is also possible when both sides have at least
+one minor piece with the exception of king and bishop vs king and bishop.  This
+can only be won if the two bishops move on differently colored squares.
+
+One minor piece against a lone king is always a draw.
+
 =item B<attacked(SHIFT)>
 
-Returns true if the ssquare indicated by B<SHIFT> is attacked by a piece of
+Returns true if the square indicated by B<SHIFT> is attacked by a piece of
 the opponent.
 
 =item B<moveAttacked(MOVE|NOTATION)>
@@ -796,6 +831,11 @@ undefined.
 This does the same as the builtin function C<__builtin_ctzll> of the C
 compilers llvm and gcc.
 
+=item B<bitboardMoreThanOneSet(BITBOARD)>
+
+Returns a truthy value if more than one bit in B<BITBOARD> is set, false
+otherwise.
+
 =back
 
 =head2 Perft Methods
@@ -811,14 +851,17 @@ is computed from the resulting position, and finally the move is undone.
 
 =over 4
 
-=item B<perftByCopy(DEPTH)>
+=item B<perftByCopy(POSITION, DEPTH)>
 
-Does a performance test for the current position to depth B<DEPTH>.  Returns
+Does a performance test for position B<POSITION> to depth B<DEPTH>.  Returns
 the number of leaf nodes found.
 
 Instead of calling L</undoMove> the moves found are applied to a copy of the
 current position that is discarded later.  This is currently slightly faster
 than undoing the move programatically with L</undoMove>.
+
+Note that you have to pass a B<Chess::Plisco> instance as the first argument
+even when calling it as an instance method! This has performance reason.
 
 =item B<perftByUndo(DEPTH)>
 
@@ -993,6 +1036,10 @@ The number of half-moves made.  See also L</halfMoves>.
 
 The current value of the half-move clock.  See also L</halfMoveClock>.
 
+=item B<POS-E<gt>[CP_POS_IRREVERSIBLE_CLOCK]>
+
+The current value of the irreversible clock.  See also L</irreversibleClock>.
+
 =item B<POS-E<gt>[CP_POS_IN_CHECK]>
 
 Bitmask of pieces giving check.  See also L</inCheck>.
@@ -1098,6 +1145,14 @@ These are bitboards of all files ("a" to "h") of the chess board.
 =head3 CP_1_MASK .. CP_8_MASK
 
 These are bitboards of all ranks ("1" to "8") of the chess board.
+
+=head3 CP_WHITE_MASK
+
+Bitboard of all white squares (b1, d1, ... g8)
+
+=head3 CP_BLACK_MASK
+
+Bitboard of all black squares (a1, c1, ... h8)
 
 =head3 CP_FILE_A .. CP_FILE_H
 

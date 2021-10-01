@@ -1,5 +1,5 @@
 {
-   "abstract" : "a web app to combina random images into faces",
+   "abstract" : "a web app to combine random images into faces",
    "author" : [
       "Alex Schroeder"
    ],
@@ -34,6 +34,7 @@
       "runtime" : {
          "requires" : {
             "File::ShareDir" : "0",
+            "File::Slurper" : "0",
             "GD" : "0",
             "Modern::Perl" : "1.20180701",
             "Mojolicious" : "0",
@@ -52,6 +53,6 @@
          "web" : "https://alexschroeder.ch/cgit/face-generator/about/"
       }
    },
-   "version" : 1,
+   "version" : 1.02,
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

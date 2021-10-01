@@ -26,7 +26,7 @@ no_index:
 provides:
   App::week:
     file: lib/App/week.pm
-    version: '1.0202'
+    version: '1.0203'
   App::week::CalYear:
     file: lib/App/week/CalYear.pm
   App::week::colors:
@@ -40,7 +40,7 @@ provides:
 requires:
   Date::Japanese::Era: '0'
   Getopt::EX: v1.23.3
-  Getopt::EX::Hashed: '0.9917'
+  Getopt::EX::Hashed: '0.9920'
   Getopt::EX::i18n: '0.09'
   Getopt::EX::termcolor: '1.06'
   Hash::Util: '0'
@@ -52,7 +52,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/App-week/issues
   homepage: https://github.com/kaz-utashiro/App-week
   repository: git://github.com/kaz-utashiro/App-week.git
-version: '1.0202'
+version: '1.0203'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

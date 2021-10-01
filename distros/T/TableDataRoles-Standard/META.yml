@@ -12,6 +12,7 @@ build_requires:
   Test::More: '0.98'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -19,8 +20,94 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: TableDataRoles-Standard
+provides:
+  TableData::AOA:
+    file: lib/TableData/AOA.pm
+    version: '0.013'
+  TableData::AOH:
+    file: lib/TableData/AOH.pm
+    version: '0.013'
+  TableData::DBI:
+    file: lib/TableData/DBI.pm
+    version: '0.013'
+  TableData::Munge::Concat:
+    file: lib/TableData/Munge/Concat.pm
+    version: '0.013'
+  TableData::Munge::Filter:
+    file: lib/TableData/Munge/Filter.pm
+    version: '0.013'
+  TableData::Munge::Reverse:
+    file: lib/TableData/Munge/Reverse.pm
+    version: '0.013'
+  TableData::Sample::DeNiro:
+    file: lib/TableData/Sample/DeNiro.pm
+    version: '0.013'
+  TableData::Test::Source::AOA:
+    file: lib/TableData/Test/Source/AOA.pm
+    version: '0.013'
+  TableData::Test::Source::AOH:
+    file: lib/TableData/Test/Source/AOH.pm
+    version: '0.013'
+  TableData::Test::Source::CSVInDATA:
+    file: lib/TableData/Test/Source/CSVInDATA.pm
+    version: '0.013'
+  TableData::Test::Source::CSVInFile:
+    file: lib/TableData/Test/Source/CSVInFile.pm
+    version: '0.013'
+  TableData::Test::Source::CSVInFile::Select:
+    file: lib/TableData/Test/Source/CSVInFile/Select.pm
+    version: '0.013'
+  TableData::Test::Source::CSVInFiles:
+    file: lib/TableData/Test/Source/CSVInFiles.pm
+    version: '0.013'
+  TableData::Test::Source::DBI:
+    file: lib/TableData/Test/Source/DBI.pm
+    version: '0.013'
+  TableData::Test::Source::Iterator:
+    file: lib/TableData/Test/Source/Iterator.pm
+    version: '0.013'
+  TableDataRole::Munge::Concat:
+    file: lib/TableDataRole/Munge/Concat.pm
+    version: '0.013'
+  TableDataRole::Munge::Filter:
+    file: lib/TableDataRole/Munge/Filter.pm
+    version: '0.013'
+  TableDataRole::Munge::Reverse:
+    file: lib/TableDataRole/Munge/Reverse.pm
+    version: '0.013'
+  TableDataRole::Source::AOA:
+    file: lib/TableDataRole/Source/AOA.pm
+    version: '0.013'
+  TableDataRole::Source::AOH:
+    file: lib/TableDataRole/Source/AOH.pm
+    version: '0.013'
+  TableDataRole::Source::CSVInDATA:
+    file: lib/TableDataRole/Source/CSVInDATA.pm
+    version: '0.013'
+  TableDataRole::Source::CSVInFile:
+    file: lib/TableDataRole/Source/CSVInFile.pm
+    version: '0.013'
+  TableDataRole::Source::CSVInFiles:
+    file: lib/TableDataRole/Source/CSVInFiles.pm
+    version: '0.013'
+  TableDataRole::Source::DBI:
+    file: lib/TableDataRole/Source/DBI.pm
+    version: '0.013'
+  TableDataRole::Source::Iterator:
+    file: lib/TableDataRole/Source/Iterator.pm
+    version: '0.013'
+  TableDataRole::Util::CSV:
+    file: lib/TableDataRole/Util/CSV.pm
+    version: '0.013'
+  TableDataRoles::Standard:
+    file: lib/TableDataRoles/Standard.pm
+    version: '0.013'
 requires:
   DBI: '0'
+  File::Basename: '0'
+  File::ShareDir: '0'
+  Log::ger: '0.038'
+  Module::Load::Util: '0.004'
   Role::Tiny: '0'
   Role::Tiny::With: '0'
   TableDataRole::Spec::Basic: v0.2.0
@@ -33,7 +120,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=TableDataRoles-Standard
   homepage: https://metacpan.org/release/TableDataRoles-Standard
   repository: git://github.com/perlancar/perl-TableDataRoles-Standard.git
-version: '0.009'
+version: '0.013'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -113,7 +200,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.603'
+      version: '0.605'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -150,9 +237,20 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/CheckSelfDependency'
       version: '0.011'
     -
+      class: Dist::Zilla::Plugin::Git::Contributors
+      config:
+        Dist::Zilla::Plugin::Git::Contributors:
+          git_version: 2.25.1
+          include_authors: 0
+          include_releaser: 1
+          order_by: name
+          paths: []
+      name: '@Author::PERLANCAR/Git::Contributors'
+      version: '0.036'
+    -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
-      version: '0.006'
+      version: '0.009'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
@@ -165,6 +263,26 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::PERLANCAR/MetaConfig'
       version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: '@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+              version: '6.017'
+          include_underscores: 0
+        Dist::Zilla::Role::MetaProvider::Provider:
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
+          inherit_missing: '1'
+          inherit_version: '1'
+          meta_noindex: '1'
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
+      name: '@Author::PERLANCAR/MetaProvides::Package'
+      version: '2.004003'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::Authority
       name: '@Author::PERLANCAR/PERLANCAR::Authority'
@@ -270,6 +388,14 @@ x_Dist_Zilla:
               name: '@Author::PERLANCAR/Authors'
               version: '4.017'
             -
+              class: Pod::Weaver::Section::Contributors
+              name: '@Author::PERLANCAR/Contributors'
+              version: '0.009'
+            -
+              class: Pod::Weaver::Section::PERLANCAR::Contributing
+              name: '@Author::PERLANCAR/PERLANCAR/Contributing'
+              version: '0.292'
+            -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
               version: '4.017'
@@ -346,7 +472,7 @@ x_Dist_Zilla:
             - ':InstallModules'
             - ':TestFiles'
       name: '@Author::PERLANCAR/Test::Perl::Critic::Subset'
-      version: 3.001.005
+      version: 3.001.006
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
@@ -404,6 +530,10 @@ x_Dist_Zilla:
       name: DevelopX_Spec
       version: '6.017'
     -
+      class: Dist::Zilla::Plugin::Extras
+      name: 'lint-prereqs / assume-provided'
+      version: '0.03'
+    -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
       version: '6.017'
@@ -442,6 +572,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: '@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
       version: '6.017'
   zilla:
     class: Dist::Zilla::Dist::Builder

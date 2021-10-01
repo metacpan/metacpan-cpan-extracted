@@ -16,6 +16,9 @@ use testcase "t::infix";
 
 BEGIN { $^H{"t::infix/permit"} = 1; }
 
+# Newer perls generate OP_SREFGEN directly; older perls see only OP_REFGEN
+use constant REFGEN => $] >= 5.022 ? "srefgen" : "refgen";
+
 {
    my $result = t::infix::addfunc( 10, 20 );
    is( $result, 30, 'add wrapper func' );
@@ -44,7 +47,7 @@ sub count_ops
    return %opcounts;
 }
 
-# callhecker rewrote the optree
+# callchecker for scalar/scalar ops
 {
    my %opcounts;
 
@@ -52,7 +55,7 @@ sub count_ops
 
    # If the callchecker ran correctly we should see one 'custom' op and no
    # 'entersub's
-   ok( (scalar grep { m/^infix_0x/ } keys %opcounts),
+   ok( (scalar grep { m/^infix_add_0x/ } keys %opcounts),
       'callchecker generated an OP_CUSTOM call' );
    ok( !$opcounts{entersub}, 'callchecker removed an OP_ENTERSUB call' );
 
@@ -65,8 +68,58 @@ sub count_ops
 
    # Opchecker still permits scalar entersub calls
    %opcounts = count_ops sub { t::infix::addfunc( scalar lhs(), scalar rhs() ) };
-   ok( (scalar grep { m/^infix_0x/ } keys %opcounts),
+   ok( (scalar grep { m/^infix_add_0x/ } keys %opcounts),
       'OP_CUSTOM call for scalar ENTERSUB' );
+}
+
+# callchecker for list/list ops
+{
+   my $code;
+   my %opcounts;
+
+   my $aref = [1,2,3];
+   %opcounts = count_ops $code = sub { t::infix::addpairsfunc( $aref, $aref ) };
+   ok( (scalar grep { m/^infix_addpairs_0x/ } keys %opcounts),
+      'callchecker generated an OP_CUSTOM call for list/list' );
+   ok( !$opcounts{entersub}, 'callchecker removed an OP_ENTERSUB call for list/list' );
+   is( $opcounts{rv2av}, 2, 'callchecker made two OP_RV2AV' );
+   is_deeply( [ $code->() ], [ 2, 4, 6 ], 'result of callcheckered code for list/list' );
+
+   my @padav = (1,2,3);
+
+   %opcounts = count_ops $code = sub { t::infix::addpairsfunc( \@padav, \@padav ) };
+   ok( !$opcounts{srefgen}, 'callchecker made no OP_SREFGEN for \@padav' );
+   is_deeply( [ $code->() ], [ 2, 4, 6 ], 'result of callcheckered code for list/list on \@padav' );
+
+   our @pkgav = (1,2,3);
+
+   %opcounts = count_ops $code = sub { t::infix::addpairsfunc( \@pkgav, \@pkgav ) };
+   ok( !$opcounts{srefgen}, 'callchecker made no OP_SREFGEN for \@pkgav' );
+   is_deeply( [ $code->() ], [ 2, 4, 6 ], 'result of callcheckered code for list/list on \@pkgav' );
+
+   # stress-test it
+
+   %opcounts = count_ops $code = sub { t::infix::addpairsfunc( \@{ \@{ \@padav } }, \@{ \@{ \@padav } } ) };
+   # Preserve the two sets of inner ones but remove the outer ones
+   is( $opcounts{+REFGEN}, 4, 'callchecker removed one layer of OP_SREFGEN for stress-test' );
+   is_deeply( [ $code->() ], [ 2, 4, 6 ], 'result of callcheckered code for list/list on stress-test' );
+
+   package OneTwoThree {
+      use overload '@{}' => sub { return [1, 2, 3] };
+   }
+
+   $code = sub { t::infix::addpairsfunc( bless( {}, "OneTwoThree" ), \@padav ) };
+   is_deeply( [ $code->() ], [ 2, 4, 6 ], 'result of callcheckered code for list/list on blessed object' );
+
+   # anonlist remains on LHS
+   %opcounts = count_ops $code = sub { t::infix::addpairsfunc( [1,2,3], \@padav ) };
+   ok( $opcounts{anonlist}, 'callchecker left OP_ANONLIST on LHS' );
+   is_deeply( [ $code->() ], [ 2, 4, 6 ], 'result of callcheckered code for list/list on anonlist' );
+
+   # anonlist is unwrapped on RHS
+   %opcounts = count_ops $code = sub { t::infix::addpairsfunc( \@padav, [1,2,3] ) };
+   ok( !$opcounts{anonlist}, 'callchecker removed OP_ANONLIST on RHS' );
+   is_deeply( [ $code->() ], [ 2, 4, 6 ], 'result of callcheckered code for list/list on anonlist' );
 }
 
 # wrapper func by coderef
@@ -113,6 +166,22 @@ sub is_deparsed
    is_deparsed sub { t::infix::addfunc( $_[0], $_[1] ) },
       't::infix::addfunc($_[0], $_[1]);',
       'deparsed call to wrapper func';
+
+   my @padav;
+   our @pkgav;
+
+   is_deparsed sub { t::infix::addpairsfunc( $_[0], $_[1] ) },
+      't::infix::addpairsfunc($_[0], $_[1]);',
+      'deparsed call to list/list wrapper func on slugs';
+   is_deparsed sub { t::infix::addpairsfunc( \@padav, \@padav ) },
+      't::infix::addpairsfunc(\@padav, \@padav);',
+      'deparsed call to list/list wrapper func on padav';
+   is_deparsed sub { t::infix::addpairsfunc( \@pkgav, \@pkgav ) },
+      't::infix::addpairsfunc(\@pkgav, \@pkgav);',
+      'deparsed call to list/list wrapper func on pkgav';
+   is_deparsed sub { t::infix::addpairsfunc( [1,2], [3,4] ) },
+      't::infix::addpairsfunc([1, 2], [3, 4]);',
+      'deparsed call to list/list wrapper func on anonlist';
 }
 
 done_testing;

@@ -2,7 +2,7 @@ package Bio::MUST::Core::Ali;
 # ABSTRACT: Multiple sequence alignment
 # CONTRIBUTOR: Catherine COLSON <ccolson@doct.uliege.be>
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::MUST::Core::Ali::VERSION = '0.212650';
+$Bio::MUST::Core::Ali::VERSION = '0.212670';
 use Moose;
 use namespace::autoclean;
 
@@ -673,20 +673,21 @@ sub store_phylip {
     # optionally disable wrapping
     $chunk = $width if $chunk < 0;
 
+    # optionally clean seq
+    my @seqs = $self->all_seqs;
+       @seqs = map { $_->clone->gapify('X') } @seqs if $clean;
+
     # output Ali in sequential or interleaved format
     for (my $site = 0; $site < $width; $site += $chunk) {
 
         # leave empty line between chunks (but not after last chunk)
         print {$out} "\n" if $site;
 
-        for my $seq ($self->all_seqs) {
+        for my $seq (@seqs) {
 
             # print 10-chars ids only once
             # Note: full_ids are only truncated (use IdMapper for more)
             my $id = $site == 0 ? $seq->$method : q{};
-
-            # optionally clean seq
-            $seq = $seq->clone->gapify('X') if $clean;
 
             # print seq chunks in 10-state blocks
             # Note: We insert a space in the 11th column to ensure that more
@@ -824,7 +825,7 @@ Bio::MUST::Core::Ali - Multiple sequence alignment
 
 =head1 VERSION
 
-version 0.212650
+version 0.212670
 
 =head1 SYNOPSIS
 

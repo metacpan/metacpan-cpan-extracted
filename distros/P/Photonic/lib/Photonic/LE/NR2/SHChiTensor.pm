@@ -1,5 +1,5 @@
 package Photonic::LE::NR2::SHChiTensor;
-$Photonic::LE::NR2::SHChiTensor::VERSION = '0.018';
+$Photonic::LE::NR2::SHChiTensor::VERSION = '0.021';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::LE::NR2::SHChiTensor
 
 =head1 VERSION
 
-version 0.018
+version 0.021
 
 =head1 COPYRIGHT NOTICE
 
@@ -46,8 +46,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
    use Photonic::LE::NR2::SHChiTensor;
    my $chi=Photonic::LE::NR2::SHChiTensor->new(geometry=>$g,
            densityA=>$dA, densityB=>$dB, nh=>$nh, nhf=>$nhf,
+           epsA1=>$epsA1, epsB1=>$epsB1, epsA2=>$epsA2, epsB2=>$epsB2,
            filter=>$f, filterflag=>$ff);
-   my $chiTensor=$chi->evaluate($epsA1, $epsB1, $epsA2, $epsB2);
+   my $chiTensor=$chi->evaluate;
 
 =head1 DESCRIPTION
 
@@ -76,7 +77,7 @@ $ff is a (maybe smooth) cutoff function in reciprocal space to smothen the geome
 $smallH and $smallE are the criteria of convergence (default 1e-7) for
 haydock coefficients and continued fraction.
 
-=item * evaluate($epsA1, $epsB1, $epsA2, $epsB2, [kind=>$kind,] [mask=>$mask] )
+=item * evaluate([kind=>$kind,] [mask=>$mask] )
 
 Returns the macroscopic second Harmonic susceptibility function for a
 given value of the dielectric functions of the host $epsA and the
@@ -107,7 +108,7 @@ metamaterial
 
 =item * B dims r G GNorm L scale f
 
-Accesors handled by geometry.
+Accessors handled by geometry.
 
 =item * densityA, densityB
 
@@ -121,7 +122,7 @@ Maximum number of Haydock coefficients for field calculation
 
 Optional filter to multiply by in reciprocal space
 
-=item * epsA1, epsB1, epsA2, epsB2
+-=item * epsA1, epsB1, epsA2, epsB2
 
 Dielectric functions of components A and B at fundamental and SH frequency
 
@@ -166,7 +167,7 @@ use PDL::Lite;
 use PDL::NiceSlice;
 use PDL::MatrixOps;
 use PDL::IO::Storable;
-use Photonic::Utils qw(make_haydock tensor);
+use Photonic::Utils qw(make_haydock tensor incarnate_as);
 use Photonic::Types;
 use Photonic::LE::NR2::EpsTensor;
 use Moose;
@@ -203,14 +204,14 @@ has 'reorthogonalize'=>(is=>'ro', required=>1, default=>0,
 has 'filter'=>(is=>'ro', isa=>'PDL', predicate=>'has_filter',
                documentation=>'Optional reciprocal space filter');
 
-#accesors
-has 'epsA1'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=>'_epsA1',
+#accessors
+has 'epsA1'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', required => 1,
     documentation=>'Dielectric function of host');
-has 'epsB1'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=>'_epsB1',
+has 'epsB1'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', required => 1,
         documentation=>'Dielectric function of inclusions');
-has 'epsA2'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=>'_epsA2',
-    documentation=>'Dielectric function of host');
-has 'epsB2'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=>'_epsB2',
+has 'epsA2'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', required=>1,
+    documentation=>'Dielectric function of host at SH');
+has 'epsB2'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', required=>1,
         documentation=>'Dielectric function of inclusions');
 has 'nrshp' =>(is=>'ro', isa=>'ArrayRef[Photonic::LE::NR2::SHP]',
             init_arg=>undef, lazy=>1, builder=>'_build_nrshp',
@@ -240,23 +241,24 @@ my %KIND2METHOD = (
 );
 my %KIND2SUBTRACT = map +($_=>1), qw(f l a);
 
+
 sub evaluate {
     my $self=shift;
-    $self->_epsA1(my $epsA1=shift);
-    $self->_epsB1(my $epsB1=shift);
-    $self->_epsA2(my $epsA2=shift);
-    $self->_epsB2(my $epsB2=shift);
+    my $epsA1=$self->epsA1;
+    my $epsB1=$self->epsB1;
+    my $epsA2=$self->epsA2;
+    my $epsB2=$self->epsB2;
     my %options=@_; #the rest are options. Currently, kind and mask.
     my $kind=lc($options{kind}//'f');
     my $mask=$options{mask};
     my $nd=$self->geometry->B->ndims;
-    my $epsT=$self->epsTensor->evaluate($epsA2, $epsB2);
+    my $epsT=$self->epsTensor->epsTensor;
     my @P2M; #array of longitudinal polarizations along different directions.
     my $method = $KIND2METHOD{$kind};
     foreach(@{$self->nrshp}){
 	my $nrsh=Photonic::LE::NR2::SH->new(
-	    shp=>$_, epsA1=>$epsA1, epsB1=>$epsB1, epsA2=>$epsA2,
-	    epsB2=>$epsB2, filterflag=>0);
+	    shp=>$_, epsA1=>$epsA1, epsB1=>$epsB1, epsA2=>$epsA2, epsB2=>$epsB2,
+	    filterflag=>0);
 	# XorY,nx,ny
 	# dipolar, quadrupolar, external, full
 	my $P2 = $nrsh->$method;
@@ -264,7 +266,7 @@ sub evaluate {
 	    ->clump(-2) #linear index, XorY
 	    ->sumover  #XorY
 	    /$self->geometry->npoints;
-	my $k=$_->nrf->nr->geometry->Direction0;
+	my $k=$_->nrf->haydock->geometry->Direction0;
 	my $FPChi=$epsT-identity($nd); #four pi chi linear 2w
 	my $P2MLC=($k*$P2M)->sumover; #Longitudinal component
 	my $P2ML=$k*$P2MLC; #longitudinal projection
@@ -299,33 +301,20 @@ sub evaluate {
 
 sub _build_nrshp { # One Haydock coefficients calculator per direction0
     my $self=shift;
-    my $nr = make_haydock($self, 'Photonic::LE::NR2::AllH', $self->geometry->unitPairs, 1, qw(reorthogonalize use_mask mask));
-    my @nrshp;
-    foreach(@$nr){
-	my @args=(nr=>$_, nh=>$self->nhf, smallE=>$self->smallE);
-	push @args, filter=>$self->filter if $self->has_filter;
-	my $nrf=Photonic::LE::NR2::Field->new(@args);
-	my $nrshp=Photonic::LE::NR2::SHP->
-	    new(nrf=>$nrf, densityA=>$self->densityA,
-		densityB=>$self->densityB);
-	push @nrshp, $nrshp;
-    }
-    \@nrshp;
+    my $haydock = make_haydock($self, 'Photonic::LE::NR2::Haydock', $self->geometry->unitPairs, 1, qw(reorthogonalize use_mask mask));
+    my @args=(nh=>$self->nhf, smallE=>$self->smallE);
+    push @args, filter=>$self->filter if $self->has_filter;
+    [ map Photonic::LE::NR2::SHP->new(
+	    nrf=>Photonic::LE::NR2::Field->new(@args, haydock=>$_),
+	    densityA=>$self->densityA, densityB=>$self->densityB,
+    ), @$haydock ];
 }
 
+my @EPS_ATTRS = qw(geometry nh reorthogonalize smallH smallE);
 sub _build_epsTensor {
     my $self=shift;
-    my $geometry=$self->geometry;
-    my $nh=$self->nh; #desired number of Haydock terms
-    my $smallH=$self->smallH; #smallness
-    my $smallE=$self->smallE; #smallness
-    my $eT=Photonic::LE::NR2::EpsTensor
-	->new(geometry=>$self->geometry, nh=>$self->nh,
-	      reorthogonalize=>$self->reorthogonalize, smallH=>$self->smallH,
-	      smallE=>$self->smallE);
-    return $eT;
+    incarnate_as('Photonic::LE::NR2::EpsTensor', $self, \@EPS_ATTRS, epsA=>$self->epsA2, epsB=>$self->epsB2);
 }
-
 
 __PACKAGE__->meta->make_immutable;
 

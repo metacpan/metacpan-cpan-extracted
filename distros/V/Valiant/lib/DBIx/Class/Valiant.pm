@@ -217,13 +217,24 @@ See C<example> directory for web application using L<Catalyst> that uses this fo
 
 =head1 NESTED VALIDATIONS
 
-TBD for now see example in C<example> directory of the distribution.
+TBD for now see example in C<example> directory of the distribution and more examples in the tests
+directory.
 
 =head1 WARNINGS
 
 Besides the fact that nested is still considered beta code please be aware that you must
 be careful with how you expose a deeply nested interface.   If you simply pass fields from a web
-form you are potentially openning yourself to SQL injection and similar types of attacks.
+form you are potentially opening yourself to SQL injection and similar types of attacks.
+
+=head2 Many to Many
+
+Many to Many type relationships are supported to the best of my ability but since these types of
+fake relationships have lots of known issues you are more likely to run into edge cases.  In
+particular its a bad idea to have validations on both a m2m relations and also on the one to many
+relation that it bridges.   This is likely to result in false positive validation errors due to the
+way the resultset cache works (and doesn't work) for m2m.
+
+Happy to take patches for improvements to anyone that feels strongly about it.
 
 =head1 SEE ALSO
  

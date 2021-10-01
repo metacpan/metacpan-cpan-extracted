@@ -1,11 +1,11 @@
-#!perl
+# -*- mode: perl; -*-
 
 ###############################################################################
 
 use strict;
 use warnings;
 
-use Test::More tests => 50;
+use Test::More tests => $] >= 5.033008 ? 49 : 48;
 
 use bignum qw/oct hex/;
 
@@ -13,7 +13,7 @@ use bignum qw/oct hex/;
 # general tests
 
 my $x = 5;
-like(ref($x), qr/^Math::BigInt/, '$x = 5 makes $x a Math::BigInt'); # :constant
+is(ref($x), 'Math::BigFloat', '$x = 5 makes $x a Math::BigFloat'); # :constant
 
 is(2 + 2.5, 4.5, '2 + 2.5 = 4.5');
 $x = 2 + 3.5;
@@ -24,11 +24,8 @@ $x = 2 + 2.1;
 is(ref($x), 'Math::BigFloat', '$x = 2 + 2.1 makes $x a Math::BigFloat');
 
 $x = 2 ** 255;
-like(ref($x), qr/^Math::BigInt/, '$x = 2 ** 255 makes $x a Math::BigInt');
+is(ref($x), 'Math::BigFloat', '$x = 2 ** 255 makes $x a Math::BigFloat');
 
-# see if Math::BigInt constant and upgrading works
-is(Math::BigInt::bsqrt("12"), '3.464101615137754587054892683011744733886',
-   'Math::BigInt::bsqrt("12")');
 is(sqrt(12), '3.464101615137754587054892683011744733886',
    'sqrt(12)');
 
@@ -47,22 +44,26 @@ is(1/3, '0.3333333333333333333333333333333333333333', '1/3');
 ###############################################################################
 # accuracy and precision
 
-is(bignum->accuracy(),        undef,  'get accuracy');
-is(bignum->accuracy(12),      12,     'set accuracy to 12');
-is(bignum->accuracy(),        12,     'get accuracy again');
+is(bignum->accuracy(), undef, 'get accuracy');
+bignum->accuracy(12);
+is(bignum->accuracy(), 12, 'get accuracy again');
+bignum->accuracy(undef);
+is(bignum->accuracy(), undef, 'get accuracy again');
 
-is(bignum->precision(),       undef,  'get precision');
-is(bignum->precision(12),     12,     'set precision to 12');
-is(bignum->precision(),       12,     'get precision again');
+is(bignum->precision(), undef, 'get precision');
+bignum->precision(12);
+is(bignum->precision(), 12, 'get precision again');
+bignum->precision(undef);
+is(bignum->precision(), undef, 'get precision again');
 
-is(bignum->round_mode(),      'even', 'get round mode');
-is(bignum->round_mode('odd'), 'odd',  'set round mode');
-is(bignum->round_mode(),      'odd',  'get round mode again');
+is(bignum->round_mode(), 'even', 'get round mode');
+bignum->round_mode('odd');
+is(bignum->round_mode(), 'odd', 'get round mode again');
+bignum->round_mode('even');
+is(bignum->round_mode(), 'even', 'get round mode again');
 
 ###############################################################################
 # hex() and oct()
-
-my $class = 'Math::BigInt';
 
 my @table =
   (
@@ -95,8 +96,6 @@ my @table =
    [ 'oct("B1")',    1 ],
    [ 'oct(" 0b1")',  1 ],
 
-   #[ 'oct(0o1)',     1 ],       # requires Perl 5.33.8
-   [ 'oct("01")',    1 ],
    [ 'oct("0o1")',   1 ],
    [ 'oct("0O1")',   1 ],
    [ 'oct("o1")',    1 ],
@@ -105,12 +104,17 @@ my @table =
 
   );
 
+if ($] >= "5.033008") {         # must be quoted due to pragma
+    push @table, [ 'oct(0o1)', 1 ];
+}
+
 for my $entry (@table) {
     my ($test, $want) = @$entry;
+
     subtest $test, sub {
         plan tests => 2;
         my $got = eval $test;
         cmp_ok($got, '==', $want, 'the output value is correct');
-        is(ref($x), $class, 'the reference type is correct');
+        is(ref($x), "Math::BigFloat", 'the reference type is correct');
     };
 }

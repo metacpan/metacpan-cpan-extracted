@@ -48,6 +48,6 @@
          "web" : "https://github.com/pjacklam/p5-Math-BigInt-BitVect"
       }
    },
-   "version" : "1.17",
+   "version" : "1.18",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

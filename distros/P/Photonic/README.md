@@ -15,7 +15,7 @@ the same terms as the Perl 5 programming language system itself.
 
 ## References ##
 
- - W. Luis Mochán, Guillemo P. Ortiz, and Bernardo S. Mendoza,
+ - W. Luis Mochán, Guillermo P. Ortiz, and Bernardo S. Mendoza,
 *Efficient homogenization procedure for the calculation of optical properties of 3D nanostructured composites*,
 Optics Express **18** (21) 22119-22127 (2010).
 doi:10.1364/OE.18.022119

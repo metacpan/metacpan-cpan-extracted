@@ -9,7 +9,6 @@ README
 lib/Time/OlsonTZ/Data.pm
 lib/Time/OlsonTZ/Data.pm.tpl
 lib/Time/OlsonTZ/Data/Africa/Abidjan.tz
-lib/Time/OlsonTZ/Data/Africa/Accra.tz
 lib/Time/OlsonTZ/Data/Africa/Algiers.tz
 lib/Time/OlsonTZ/Data/Africa/Bissau.tz
 lib/Time/OlsonTZ/Data/Africa/Cairo.tz
@@ -44,13 +43,11 @@ lib/Time/OlsonTZ/Data/America/Argentina/San_Luis.tz
 lib/Time/OlsonTZ/Data/America/Argentina/Tucuman.tz
 lib/Time/OlsonTZ/Data/America/Argentina/Ushuaia.tz
 lib/Time/OlsonTZ/Data/America/Asuncion.tz
-lib/Time/OlsonTZ/Data/America/Atikokan.tz
 lib/Time/OlsonTZ/Data/America/Bahia.tz
 lib/Time/OlsonTZ/Data/America/Bahia_Banderas.tz
 lib/Time/OlsonTZ/Data/America/Barbados.tz
 lib/Time/OlsonTZ/Data/America/Belem.tz
 lib/Time/OlsonTZ/Data/America/Belize.tz
-lib/Time/OlsonTZ/Data/America/Blanc-Sablon.tz
 lib/Time/OlsonTZ/Data/America/Boa_Vista.tz
 lib/Time/OlsonTZ/Data/America/Bogota.tz
 lib/Time/OlsonTZ/Data/America/Boise.tz
@@ -62,9 +59,7 @@ lib/Time/OlsonTZ/Data/America/Cayenne.tz
 lib/Time/OlsonTZ/Data/America/Chicago.tz
 lib/Time/OlsonTZ/Data/America/Chihuahua.tz
 lib/Time/OlsonTZ/Data/America/Costa_Rica.tz
-lib/Time/OlsonTZ/Data/America/Creston.tz
 lib/Time/OlsonTZ/Data/America/Cuiaba.tz
-lib/Time/OlsonTZ/Data/America/Curacao.tz
 lib/Time/OlsonTZ/Data/America/Danmarkshavn.tz
 lib/Time/OlsonTZ/Data/America/Dawson.tz
 lib/Time/OlsonTZ/Data/America/Dawson_Creek.tz
@@ -115,7 +110,6 @@ lib/Time/OlsonTZ/Data/America/Miquelon.tz
 lib/Time/OlsonTZ/Data/America/Moncton.tz
 lib/Time/OlsonTZ/Data/America/Monterrey.tz
 lib/Time/OlsonTZ/Data/America/Montevideo.tz
-lib/Time/OlsonTZ/Data/America/Nassau.tz
 lib/Time/OlsonTZ/Data/America/New_York.tz
 lib/Time/OlsonTZ/Data/America/Nipigon.tz
 lib/Time/OlsonTZ/Data/America/Nome.tz
@@ -130,7 +124,6 @@ lib/Time/OlsonTZ/Data/America/Pangnirtung.tz
 lib/Time/OlsonTZ/Data/America/Paramaribo.tz
 lib/Time/OlsonTZ/Data/America/Phoenix.tz
 lib/Time/OlsonTZ/Data/America/Port-au-Prince.tz
-lib/Time/OlsonTZ/Data/America/Port_of_Spain.tz
 lib/Time/OlsonTZ/Data/America/Porto_Velho.tz
 lib/Time/OlsonTZ/Data/America/Puerto_Rico.tz
 lib/Time/OlsonTZ/Data/America/Punta_Arenas.tz
@@ -160,12 +153,10 @@ lib/Time/OlsonTZ/Data/America/Yakutat.tz
 lib/Time/OlsonTZ/Data/America/Yellowknife.tz
 lib/Time/OlsonTZ/Data/Antarctica/Casey.tz
 lib/Time/OlsonTZ/Data/Antarctica/Davis.tz
-lib/Time/OlsonTZ/Data/Antarctica/DumontDUrville.tz
 lib/Time/OlsonTZ/Data/Antarctica/Macquarie.tz
 lib/Time/OlsonTZ/Data/Antarctica/Mawson.tz
 lib/Time/OlsonTZ/Data/Antarctica/Palmer.tz
 lib/Time/OlsonTZ/Data/Antarctica/Rothera.tz
-lib/Time/OlsonTZ/Data/Antarctica/Syowa.tz
 lib/Time/OlsonTZ/Data/Antarctica/Troll.tz
 lib/Time/OlsonTZ/Data/Antarctica/Vostok.tz
 lib/Time/OlsonTZ/Data/Asia/Almaty.tz
@@ -365,7 +356,6 @@ lib/Time/OlsonTZ/Data/Pacific/Chatham.tz
 lib/Time/OlsonTZ/Data/Pacific/Chuuk.tz
 lib/Time/OlsonTZ/Data/Pacific/Easter.tz
 lib/Time/OlsonTZ/Data/Pacific/Efate.tz
-lib/Time/OlsonTZ/Data/Pacific/Enderbury.tz
 lib/Time/OlsonTZ/Data/Pacific/Fakaofo.tz
 lib/Time/OlsonTZ/Data/Pacific/Fiji.tz
 lib/Time/OlsonTZ/Data/Pacific/Funafuti.tz
@@ -374,6 +364,7 @@ lib/Time/OlsonTZ/Data/Pacific/Gambier.tz
 lib/Time/OlsonTZ/Data/Pacific/Guadalcanal.tz
 lib/Time/OlsonTZ/Data/Pacific/Guam.tz
 lib/Time/OlsonTZ/Data/Pacific/Honolulu.tz
+lib/Time/OlsonTZ/Data/Pacific/Kanton.tz
 lib/Time/OlsonTZ/Data/Pacific/Kiritimati.tz
 lib/Time/OlsonTZ/Data/Pacific/Kosrae.tz
 lib/Time/OlsonTZ/Data/Pacific/Kwajalein.tz

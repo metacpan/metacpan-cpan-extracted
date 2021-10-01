@@ -1,0 +1,42 @@
+#! perl
+
+use strict;
+use warnings;
+
+use alienfile;
+use Path::Tiny;
+
+my $pkg_name = 'pgplot';
+
+plugin 'Gather::IsolateDynamic';
+
+plugin PkgConfig => (
+   pkg_name => $pkg_name,
+);
+
+probe [ "pkg-config --exists $pkg_name" ];
+
+share {
+    # requires 'Alien::gmake';
+
+    start_url 'https://github.com/djerius/pgplot-autotool/releases/download/5.2.2-6/pgplot-5.2.2-6.tar.gz';
+    plugin Download => (
+       version => qr/(\d+\.\d+\.\d+-\d+)[.]tar[.].*$/,
+    );
+
+    plugin Extract => 'tar.gz';
+
+    plugin 'Build::Autoconf';
+    build [
+           '%{configure} CFLAGS=-fPIC ',
+           '%{make} all',
+           '%{make}',
+           '%{make} install',
+    ];
+};
+
+gather [
+  [ "pkg-config --modversion $pkg_name", \'%{.runtime.version}' ],
+  [ "pkg-config --cflags     $pkg_name", \'%{.runtime.cflags}'  ],
+  [ "pkg-config --libs       $pkg_name", \'%{.runtime.libs}'    ],
+];

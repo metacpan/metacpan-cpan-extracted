@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Infix 0.17;
+package XS::Parse::Infix 0.18;
 
 use v5.14;
 use warnings;
@@ -154,6 +154,31 @@ same as above.
 
 =back
 
+In addition the following extra bitflags are defined:
+
+=over 4
+
+=item XPI_OPERAND_ONLY_LOOK
+
+If set, the operator function promises that it will not mutate any of its
+passed values, nor allow leaking of direct alias pointers to them via return
+value or other locations.
+
+This flag is optional; omitting it when applicable will not change any
+observed behaviour. Setting it may enable certain optimisations to be
+performed.
+
+Currently, this flag simply enables an optimisation in the call-checker for
+infix operator wrapper functions that take list-shaped operands. This
+optimisation discards an C<OP_ANONLIST> operation which would create a
+temporary anonymous array reference for its operand values, allowing a slight
+saving of memory use and CPU time. This optimisation is only safe to perform
+if the operator does not mutate or retain aliases of any of the arguments, as
+otherwise the caller might see unexpected modifications or value references to
+the values passed.
+
+=back
+
 The C<lhs_flags> field gives details on how to handle the left-hand side of
 the operator syntax. It takes similar values to C<rhs_flags>, except that it
 does not accept the C<XPI_OPERAND_LIST> value. Parsing always happens on just
@@ -249,6 +274,43 @@ forms:
    WRAPPERFUNC( @args[0,1] );         # not a scalar
    WRAPPERFUNC( $lhs, otherfunc() );  # not a scalar
 
+The wrapper function for infix operators which take lists on both sides also
+has a call-checker which will attempt to inline the operator in similar
+circumstances. In addition to the optimisations described above for scalar
+operators, this checker will also inline an array-reference operator and omit
+the resulting dereference behaviour. Thus, the two following lines emit the
+same optree, without an C<OP_SREFGEN> or C<OP_RV2AV>:
+
+   @lhs OP @rhs;
+   WRAPPERFUNC( \@lhs, \@rhs );
+
+B<Note> that technically, this optimisation isn't strictly transparent in the
+odd cornercase that one of the referenced arrays is also the backing store for
+a blessed object reference, and that object class has a C<@{}> overload.
+
+   my @arr;
+   package SomeClass {
+      use overload '@{}' => sub { return ["values", "go", "here"]; };
+   }
+   bless \@arr, "SomeClass";
+
+   # this will not actually invoke the overload operator
+   WRAPPERFUNC( \@arr, [4, 5, 6] );
+
+As this cornercase relates to taking duplicate references to the same blessed
+object's backing store variable, it should not matter to any real code;
+regular objects that are passed by reference into the wrapper function will
+run their overload methods as normal.
+
+The callchecker for list operands can optionally also discard an op of the
+C<OP_ANONLIST> type, which is used by anonymous array-ref construction:
+
+   ($u, $v, $w) OP ($x, $y, $z);
+   WRAPPERFUNC( [$u, $v, $w], [$x, $y, $z] );
+
+This optimisation is only performed if the operator declared it safe to do so,
+via the C<XPI_OPERAND_ONLY_LOOK> flag.
+
 =cut
 
 =head1 DEPARSE
@@ -267,18 +329,64 @@ the infix operator is registered.
 
 =cut
 
-sub B::Deparse::_deparse_infix_wrapperfunc
+sub B::Deparse::_deparse_infix_wrapperfunc_scalarscalar
 {
    my ( $self, $wrapper_func_name, $op, $ctx ) = @_;
 
    my $lhs = $op->first;
    my $rhs = $op->last;
 
-   # Inspired by B::Deparse::pp_entersub
+   $_ = $self->deparse( $_, 6 ) for $lhs, $rhs;
 
-   my $args = join ", ", map { $self->deparse( $_, 6 ) } ( $lhs, $rhs );
+   return "$wrapper_func_name($lhs, $rhs)";
+}
 
-   return "$wrapper_func_name($args)";
+sub B::Deparse::_deparse_infix_wrapperfunc_listlist
+{
+   my ( $self, $wrapper_func_name, $op, $ctx ) = @_;
+
+   my $lhs = $op->first;
+   my $rhs = $op->last;
+
+   foreach my $var ( \$lhs, \$rhs ) {
+      my $argop = $$var;
+      my $kid;
+
+      if( $argop->name eq "null" and
+          $argop->first->name eq "pushmark" and
+          ($kid = $argop->first->sibling) and
+          B::Deparse::null($kid->sibling) ) {
+         my $add_refgen;
+
+         # A list of a single item
+         if( $kid->name eq "rv2av" and $kid->first->name ne "gv" ) {
+            $argop = $kid->first;
+         }
+         elsif( $kid->name eq "padav" or $kid->name eq "rv2av" ) {
+            $add_refgen++;
+         }
+         else {
+            print STDERR "Maybe UNWRAP list ${\ $kid->name }\n";
+         }
+
+         $$var = $self->deparse( $argop, 6 );
+
+         $$var = "\\$$var" if $add_refgen;
+      }
+      else {
+         # Pretend the entire list was anonlist
+         my @args;
+         $argop = $argop->first->sibling; # skip pushmark
+         while( not B::Deparse::null($argop) ) {
+            push @args, $self->deparse( $argop, 6 );
+            $argop = $argop->sibling;
+         }
+
+         $$var = "[" . join( ", ", @args ) . "]";
+      }
+   }
+
+   return "$wrapper_func_name($lhs, $rhs)";
 }
 
 sub B::Deparse::_deparse_infix_named
@@ -300,9 +408,9 @@ sub B::Deparse::_deparse_infix_named
 
 =item *
 
-Define entersub checker for C<list OP list> wrapper functions. Have it unwrap
-C<WRAPPERFUNC( \@lhs, \@rhs )> or C<WRAPPERFUNC( [LHS], [RHS] )> argument
-forms.
+Have the entersub checker for list/list operators unwrap arrayref or
+anon-array argument forms (C<WRAPPERFUNC( \@lhs, \@rhs )> or
+C<WRAPPERFUNC( [LHS], [RHS] )>).
 
 =back
 

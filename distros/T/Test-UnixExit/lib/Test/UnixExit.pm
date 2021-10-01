@@ -1,65 +1,70 @@
 # -*- Perl -*-
-#
-# Tests exit status words
 
 package Test::UnixExit;
-
 use 5.006;
 use strict;
 use warnings;
 use Carp qw(croak);
 use Test::Builder;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 require Exporter;
-use vars qw(@ISA @EXPORT);
-@ISA    = qw(Exporter);
-@EXPORT = qw(exit_is);
+use vars qw(@ISA @EXPORT @EXPORT_OK);
+@ISA       = qw(Exporter);
+@EXPORT    = qw(exit_is);
+@EXPORT_OK = qw(exit_is_nonzero);
 
 my $test = Test::Builder->new;
-my @keys = qw(code signal iscore);
 
 sub exit_is {
-    my ( $status, $expected_value, $name ) = @_;
+    my ( $status, $expect, $name ) = @_;
 
-    croak "Usage: status expected-value test-name"
-      if !defined $status
-      or !defined $expected_value;
+    unless ( defined $status and defined $expect ) {
+        croak "Usage: status expected-value [test-name]";
+    }
 
-    if ( $expected_value =~ m/^[0-9]+$/ ) {
-        $expected_value = { code => $expected_value };
-    } elsif ( ref $expected_value ne 'HASH' ) {
+    my $ref = ref $expect;
+    if ( $ref ne '' ) {
+        croak "expected-value must be integer or hash reference" unless $ref eq 'HASH';
+    } elsif ( $expect =~ m/^[0-9]+$/ ) {
+        $expect = { code => $expect };
+    } else {
         croak "expected-value must be integer or hash reference";
     }
-    for my $key (@keys) {
-        $expected_value->{$key} = 0
-          if !exists $expected_value->{$key}
-          or !defined $expected_value->{$key};
-    }
 
-    my $got_value;
-    $got_value->{code}   = $status >> 8;
-    $got_value->{signal} = $status & 127;
-    $got_value->{iscore} = $status & 128 ? 1 : 0;
+    my @sigattr = qw(code signal iscore);
+
+    my %got = (
+        code   => $status >> 8,
+        signal => $status & 127,
+        iscore => $status & 128 ? 1 : 0
+    );
 
     my $passed = 1;
-    for my $key (@keys) {
-        if ( $got_value->{$key} != $expected_value->{$key} ) {
-            $passed = 0;
-            last;
-        }
+    for my $attr (@sigattr) {
+        $expect->{$attr} = 0 unless defined $expect->{$attr};
+        $passed = 0 if $got{$attr} != $expect->{$attr};
     }
     $test->ok( $passed, $name );
 
+    # verbose by default as signal failures are rare (for me) and may be
+    # hard to reproduce
     $test->diag(
         sprintf
           "Got:      code=%-3d signal=%-2d iscore=%d\nExpected: code=%-3d signal=%-2d iscore=%d\n",
-        map( { $got_value->{$_} } @keys ),
-        map( { $expected_value->{$_} } @keys )
-    ) if !$passed;
+        map( { $got{$_} } @sigattr ),
+        map( { $expect->{$_} } @sigattr )
+    ) unless $passed;
 
     return $passed;
+}
+
+# for any non-zero exit code make the exit code 1
+sub exit_is_nonzero {
+    my ($status) = @_;
+    $status = 256 | ( $status & 255 ) unless $status >> 8 == 0;
+    return $status;
 }
 
 1;
@@ -67,63 +72,99 @@ __END__
 
 =head1 NAME
 
-Test::UnixExit - tests exit status words
+Test::UnixExit - test exit status words
 
 =head1 SYNOPSIS
 
+  # modules that exit status words could come from
   #use Expect;
   #use Test::Cmd;
-  #use Test::Most;
+
+  # probably necessary for other tests
+  use Test::Most;
+
   use Test::UnixExit;
 
-  # ... some call that sets $? here or $expect->exitstatus ...
+  # ... some code here that sets $? here or $expect->exitstatus ...
+  exit_is( $?, 0, "exit success" );
 
-  exit_is( $?, 0, "exited ok" );
+  # ... some code here that sets $? here or $expect->exitstatus ...
   exit_is( $?, { code => 0, signal => 2, iscore => 0 }, "SIGINT" );
+
+  # same, but with less typing (unset fields default to 0)
+  exit_is( $?, { signal => 2 }, "SIGINT" );
+
+  # turn all nonzero exit codes to 1
+  exit_is( Test::UnixExit::exit_is_nonzero($?), 1, "dies okay" );
 
 =head1 DESCRIPTION
 
-This module provides a means to check that the exit status word conforms
-to a particular pattern, including what signal and whether a core was
-generated; the simple C<<<$? >> 8 == 0>>> test discards those last
-two points. This code is most useful when testing external commands via
-C<system>, L<Test::Cmd>, or L<Expect>; perl code itself may instead be
-tested with other modules such as L<Test::Exit> or L<Test::Trap>.
+This module provides a means to check that the exit status word of a
+unix process exactly matches a specific exit code, signal number, and
+whether a core was generated; the simple C<<< $? >> 8 == 0 >>> test
+ignores two of these three attributes.
 
-Internally L<Test::Builder> is used, so this module might best be paired
-with L<Test::Most> (and is otherwise untested with other test modules).
+  # the incomplete test
+  is( $? >> 8, 0 );
 
-=head1 FUNCTION
+  # with this module becomes
+  exit_is( $?, 0 );
 
-The one function is exported by default. Sorry about that.
+This code is most useful when testing external commands via C<system>,
+L<Test::Cmd>, or L<Expect> and details are required beyond a simple "was
+$? zero or not" boolean. Perl code itself may be tested with modules
+such as L<Test::Exit> or L<Test::Trap>.
+
+=head1 FUNCTIONS
+
+B<exit_is> is exported by default.
 
 =over 4
 
-=item B<exit_is> I<status>, I<expected-value>, I<test-name>
+=item B<exit_is> I<status> I<expected-value> [ I<test-name> ]
 
 This function accepts a I<status> (the 16-bit return value from the
-C<wait(2)> call), an I<expected-value> as either an 8-bit exit code or a
-hash reference with various fields set, and an optional name of the
-test. Whether or not the test passed is the return value.
+C<wait(2)> call), an I<expected-value> as either an 8-bit exit code
+or a hash reference with various fields set, and an optional name
+for the test.
+
+The return value is whether or not the test passed.
 
 The fields for the hash reference are:
 
-    code   => 8-bit exit status number (WEXITSTATUS)
-    iscore => 1 or 0 if a core file was created or not
-    signal => what signal the process ate (WTERMSIG), if any
+  code   => 8-bit exit status number (WEXITSTATUS)
+  iscore => 1 or 0 if a core file was created or not
+  signal => what signal the process ate (WTERMSIG), if any
 
-Unspecified fields default to 0, though will be checked against the
-provided I<status-word>.
+Unspecified fields default to C<0>.
+
+=item B<exit_is_nonzero> I<status>
+
+B<exit_is> requires exact values. Use B<exit_is_nonzero> to change
+the code of an exit status word to 1 if any non-zero value is present.
+
+Returns the (possibly modified) exit status word.
+
+  # expect failure, but do not know what exit code will be used
+  # implicit: no core was generated and no signal was involved
+  exit_is( exit_is_nonzero($?), 1 );
+
+If you do not care about the I<signal> or I<iscore> portions of the exit
+status word then simpler tests such as
+
+  is(   $?, 0, "expect exit without error" );
+  isnt( $?, 0, "expect process to fail" );
+
+may suffice. In that case there is no need for this module. On the other
+hand, a program could change from a non-zero exit status word (OK) to
+non-zero exit status word with corefile (NOT OK) and you might want to
+know about that.
 
 =back
 
 =head1 BUGS
 
 =head2 Reporting Bugs
-
-Please report any bugs or feature requests to
-C<bug-test-unixexit at rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-UnixExit>.
 
 Patches might best be applied towards:
 
@@ -147,10 +188,19 @@ a particular way, and may be more suitable for testing code in a
 module over running a wrapper via the complication of a shell or
 virtual terminal.
 
-L<wait(2)> - note that shells are different from the system call in that
-the 16-bit status word is shoehorned into an 8-bit value available via
-the shell C<$?> variable, which is the same name as the variable Perl
-stores the 16-bit status word in. This can and does cause confusion.
+L<Test2::Suite> might have something suitable for testing unix exit
+status words in particular and external unix processes in general but I
+have not looked.
+
+L<sh(1)> vs. L<wait(2)> - note that the shell C<$?> variable differs
+from the 16-bit exit status word in that the signal number and core
+boolean flag are translated--the verb "mangled" also works here--into an
+8-bit value. The Perl C<$?> variable instead contains the 16-bit exit
+status word, a difference that can and does cause confusion.
+
+Perl code can adjust C<$?> inside an C<END> subroutine to (try to)
+mandate that particular exit codes are used when a process goes away.
+This only works if you control the code on that side of the fence.
 
 =head1 AUTHOR
 
@@ -161,6 +211,6 @@ thrig - Jeremy Mates (cpan:JMATES) C<< <jmates at cpan.org> >>
 Copyright (C) 2016 by Jeremy Mates
 
 This program is distributed under the (Revised) BSD License:
-L<http://www.opensource.org/licenses/BSD-3-Clause>
+L<https://www.opensource.org/licenses/BSD-3-Clause>
 
 =cut

@@ -1,20 +1,28 @@
 package Getopt::EX::Long;
-use version; our $VERSION = version->declare("v1.24.2");
+use version; our $VERSION = version->declare("v1.25.1");
 
 use v5.14;
 use warnings;
 use Carp;
 
+*REQUIRE_ORDER   = \$Getopt::Long::REQUIRE_ORDER;
+*PERMUTE         = \$Getopt::Long::PERMUTE;
+*RETURN_IN_ORDER = \$Getopt::Long::RETURN_IN_ORDER;
+
+*Configure       = \&Getopt::Long::Configure;
+*HelpMessage     = \&Getopt::Long::HelpMessage;
+*VersionMessage  = \&Getopt::Long::VersionMessage;
+
 use Exporter 'import';
-our @EXPORT      = ( 'GetOptions' );
-our @EXPORT_OK   = ( 'GetOptionsFromArray',
-		   # 'GetOptionsFromString',
-		     'Configure',
-		     'HelpMessage',
-		     'VersionMessage',
-		     'ExConfigure',
+our @EXPORT    = qw(&GetOptions $REQUIRE_ORDER $PERMUTE $RETURN_IN_ORDER);
+our @EXPORT_OK = ( '&GetOptionsFromArray',
+		 # '&GetOptionsFromString',
+		   '&Configure',
+		   '&HelpMessage',
+		   '&VersionMessage',
+		   '&ExConfigure',
     );
-our @ISA         = qw(Getopt::Long);
+our @ISA       = qw(Getopt::Long);
 
 use Data::Dumper;
 use Getopt::Long();
@@ -68,18 +76,6 @@ sub ExConfigure {
 	}
     }
     warn "Unknown option: ", Dumper \%opt if %opt;
-}
-
-sub Configure {
-    goto &Getopt::Long::Configure;
-}
-
-sub HelpMessage {
-    goto &Getopt::Long::HelpMessage;
-}
-
-sub VersionMessage {
-    goto &Getopt::Long::VersionMessage;
 }
 
 sub set_default {
@@ -165,7 +161,7 @@ Getopt::EX::Long - Getopt::Long compatible glue module
 =head1 SYNOPSIS
 
   use Getopt::EX::Long;
-  ExConfigure(...)
+  GetOptions(...);
 
   or
 
@@ -179,7 +175,7 @@ Getopt::EX::Long - Getopt::Long compatible glue module
 
 L<Getopt::EX::Long> is almost compatible to L<Getopt::Long> and you
 can just replace module declaration and it should work just same as
-before.
+before (See L<INCOMPATIBILITY> section).
 
 Besides working same, user can define their own option aliases and
 write dynamically loaded extension module.  If the command name is
@@ -238,9 +234,6 @@ B<Getopt::EX::Loader>.  Read its document for detail.
 =head1 INCOMPATIBILITY
 
 Subroutine B<GetOptionsFromString> is not supported.
-
-Variables C<$REQUIRE_ORDER>, C<$PERMUTE>, C<$RETURN_IN_ORDER> can not
-be exported.
 
 =head1 SEE ALSO
 

@@ -37,25 +37,26 @@ sub isPrefix {
 sub executeBeforeDigest {
   my ($self, $stomach) = @_;
   local $LaTeXML::Core::State::UNLOCKED = 1;
-  my $pre = $$self{beforeDigest};
-  return ($pre ? map { &$_($stomach) } grep { defined $_ } @$pre : ()); }
+  my @pre = grep { defined } @{ $$self{beforeDigest} || [] };
+  return (map { &$_($stomach) } @pre); }
 
 sub executeAfterDigest {
   my ($self, $stomach, @whatever) = @_;
   local $LaTeXML::Core::State::UNLOCKED = 1;
-  my $post = $$self{afterDigest};
-  return ($post ? map { &$_($stomach, @whatever) } grep { defined $_ } @$post : ()); }
+  my @post = grep { defined } @{ $$self{afterDigest} || [] };
+  return (map { &$_($stomach, @whatever) } @post); }
 
 # Digest the primitive; this should occur in the stomach.
 sub invoke {
   my ($self, $stomach) = @_;
   my $profiled = $STATE->lookupValue('PROFILING') && ($LaTeXML::CURRENT_TOKEN || $$self{cs});
-  my $tracing = $STATE->lookupValue('TRACINGCOMMANDS');
+  my $tracing  = $STATE->lookupValue('TRACINGCOMMANDS') || $LaTeXML::DEBUG{tracing};
   LaTeXML::Core::Definition::startProfiling($profiled, 'digest') if $profiled;
-  print STDERR '{' . $self->tracingCSName . "}\n" if $tracing;
+  Debug('{' . $self->tracingCSName . '}')                        if $tracing;
   my @result = ($self->executeBeforeDigest($stomach));
-  my @args   = $self->readArguments($stomach->getGullet);
-  print STDERR $self->tracingArgs(@args) . "\n" if $tracing && @args;
+  my $parms  = $$self{parameters};
+  my @args   = ($parms ? $parms->readArguments($stomach->getGullet, $self) : ());
+  Debug($self->tracingArgs(@args)) if $tracing && @args;
   push(@result,
     &{ $$self{replacement} }($stomach, @args),
     $self->executeAfterDigest($stomach));
@@ -77,7 +78,7 @@ sub equals {
 
 __END__
 
-=pod 
+=pod
 
 =head1 NAME
 
@@ -96,7 +97,7 @@ It extends L<LaTeXML::Core::Definition>.
 
 Primitive definitions may have lists of daemon subroutines, C<beforeDigest> and C<afterDigest>,
 that are executed before (and before the arguments are read) and after digestion.
-These should either end with C<return;>, C<()>, or return a list of digested 
+These should either end with C<return;>, C<()>, or return a list of digested
 objects (L<LaTeXML::Core::Box>, etc) that will be contributed to the current list.
 
 =head1 AUTHOR

@@ -48,7 +48,6 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::CheckStrictVersion' => '0',
                                       'Dist::Zilla::Plugin::CheckVersionIncrement' => '0',
                                       'Dist::Zilla::Plugin::CopyFilesFromBuild' => '0',
-                                      'Dist::Zilla::Plugin::DROLSKY::Role::CoreCounter' => '0',
                                       'Dist::Zilla::Plugin::EnsureChangesHasContent' => '0.02',
                                       'Dist::Zilla::Plugin::GenerateFile::FromShareDir' => '0.013',
                                       'Dist::Zilla::Plugin::Git::Check' => '0',

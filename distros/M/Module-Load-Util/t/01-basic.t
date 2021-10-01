@@ -17,7 +17,6 @@ subtest load_module_with_optional_args => sub {
     dies_ok { load_module_with_optional_args("Module::Load::Util::Test::NotFound") } 'not found -> dies';
     dies_ok { load_module_with_optional_args("Module::Load::Util::Test::Module=qux") } 'import() error -> dies';
     dies_ok { load_module_with_optional_args({module=>"Module::Load::Util::Test::Module"}) } 'unknown form -> dies';
-    dies_ok { load_module_with_optional_args(["Module::Load::Util::Test::Module"]) } 'array but not 2 elements (1) -> dies';
     dies_ok { load_module_with_optional_args(["Module::Load::Util::Test::Module", [], undef]) } 'array but not 2 elements (3) -> dies';
     dies_ok { load_module_with_optional_args(["Module::Load::Util::Test::Module", "x"]) } '2-element array: args not hashref/arrayref -> dies';
     dies_ok { load_module_with_optional_args("Foo Bar") } 'invalid syntax in module name -> dies (1)';

@@ -3,7 +3,7 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: App-GhostWork
-version: 0.04
+version: 0.05
 abstract: Barcode Logger(When,Where,Who,What,toWhich,Why,Howmanysec)
 author:
   - ina <ina@cpan.org>

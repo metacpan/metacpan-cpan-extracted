@@ -1,5 +1,5 @@
 package Photonic::WE::R2::Wave;
-$Photonic::WE::R2::Wave::VERSION = '0.018';
+$Photonic::WE::R2::Wave::VERSION = '0.021';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::R2::Wave
 
 =head1 VERSION
 
-version 0.018
+version 0.021
 
 =head1 COPYRIGHT NOTICE
 
@@ -86,7 +86,7 @@ response $epsA is taken from the metric.
 
 The macroscopic wave operator of the last operation
 
-=item * All accesors of L<Photonic::WE::R2::Green>
+=item * All accessors of L<Photonic::WE::R2::Green>
 
 =back
 

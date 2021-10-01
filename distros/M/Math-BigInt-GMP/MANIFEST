@@ -31,16 +31,6 @@ t/storable.t
 t/threads.t
 TODO
 typemap
-xt/author/batan-mbf.t
-xt/author/batan2-mbf.t
-xt/author/bexp-mbf.t
-xt/author/blog-mbf.t
-xt/author/blog-mbi.t
-xt/author/bmod-bdiv-mbi.t
-xt/author/bnok-mbi.t
-xt/author/bpi-mbf.t
-xt/author/btmod-btdiv-mbi.t
-xt/author/constructors-a-p-r.t
 xt/author/lib-arithmetic-binary-_add.dat
 xt/author/lib-arithmetic-binary-_add.t
 xt/author/lib-arithmetic-binary-_div.dat
@@ -61,6 +51,8 @@ xt/author/lib-arithmetic-binary-_nok.t
 xt/author/lib-arithmetic-binary-_pow.t
 xt/author/lib-arithmetic-binary-_root.dat
 xt/author/lib-arithmetic-binary-_root.t
+xt/author/lib-arithmetic-binary-_sadd.t
+xt/author/lib-arithmetic-binary-_ssub.t
 xt/author/lib-arithmetic-binary-_sub.dat
 xt/author/lib-arithmetic-binary-_sub.t
 xt/author/lib-arithmetic-ternary-_lsft.dat
@@ -148,14 +140,19 @@ xt/author/lib-property-_len.t
 xt/author/lib-property-_zeros.t
 xt/author/lib.ini
 xt/author/lib.t
-xt/author/numify-mbf.t
-xt/author/numify-mbi.t
-xt/author/relop-mbi-mbf.t
+xt/release/changelog.t
 xt/release/cpan-changes.t
+xt/release/dist-manifest.t
+xt/release/distmeta.t
+xt/release/git.t
+xt/release/kwalitee.t
+xt/release/minimum-version.t
 xt/release/pod-coverage.t
+xt/release/pod-linkcheck.t
 xt/release/pod-syntax.t
 xt/release/portability.t
-xt/release/test-version.t
+xt/release/unused-vars.t
+xt/release/version.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 SIGNATURE                                Public-key signature (added by MakeMaker)

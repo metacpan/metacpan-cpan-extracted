@@ -1,3 +1,10 @@
+0.131   2021-09-26  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Fix a few minor typos in POD (committer: Florian Schlichting).
+
+
 0.130   2021-08-09  Released-By: PERLANCAR; Urgency: medium
 
 	- Remove requirement of input list must not be of length 1 (GH#4).

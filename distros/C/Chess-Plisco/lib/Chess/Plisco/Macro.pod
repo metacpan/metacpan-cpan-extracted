@@ -255,6 +255,10 @@ Same as L<Chess::Plisco/blackQueenSideCastlingRight>.
 
 Same as L<Chess::Plisco/halfMoveClock>.
 
+=item B<cp_pos_reversible_clock(POS)>
+
+Same as L<Chess::Plisco/reversibleClock>.
+
 =item B<cp_pos_half_moves(POS)>
 
 Same as L<Chess::Plisco/halfMoves>.
@@ -411,6 +415,10 @@ Same as L<Chess::Plisco/moveSetColor> but modifies B<MOVE> directly.
 
 Same as L<Chess::Plisco/moveEquivalent>.
 
+=item B<cp_move_significant(MOVE)>
+
+Same as L<Chess::Plisco/moveSignificant>.
+
 =item B<cp_move_coordinate_notation(MOVE)>
 
 Same as L<Chess::Plisco/moveCoordinateNotation>.
@@ -464,17 +472,21 @@ Important! This works only under the "use integer" pragma!
 
 =item B<cp_bitboard_clear_least_set(BITBOARD)>
 
-Same as L<Chess::Plisco/clearLeastSet> but modifies B<BITBOARD> directly.
+Same as L<Chess::Plisco/bitboardClearLeastSet> but modifies B<BITBOARD> directly.
 
 Important! This works only under the "use integer" pragma!
 
 =item B<cp_bitboard_count_trailing_zbits(BITBOARD)>
 
-Same as L<Chess::Plisco/countTrailingZbits>.
+Same as L<Chess::Plisco/bitboardCountTrailingZbits>.
 
 =item B<cp_bitboard_count_isolated_trailing_zbits(BITBOARD)>
 
-Same as L<Chess::Plisco/countIsolatedTrailingZbits>.
+Same as L<Chess::Plisco/bitboardCountIsolatedTrailingZbits>.
+
+=item B<cp_bitboard_more_than_one_set(BITBOARD)>
+
+Same as L<Chess::Plisco/bitboardMoreThanOneSet>.
 
 =back
 

@@ -1,3 +1,9 @@
+0.18
+	- Released at 2021-09-29T08:43:04+0900
+	- ProhibitDuplicateLiteral: the parameter "whitelist" is renamed to "allowlist"
+	- ProhibitDuplicateLiteral: the parameter "whitelist_number" is removed
+	- ProhibitUnusedImport: Deal with the special form of assigning to @EXPORT and @EXPORT_OK. Github PR #29, issue #18
+
 0.17
 	- Released at 2021-09-20T20:44:45+0900
 	- ProhibitDuplicateLiteral: add "whitelist" parameter

@@ -1813,6 +1813,77 @@ sub DequoteName {
     return $name;
 }
 
+sub _ExtractBindValues {
+    my $self                = shift;
+    my $string              = shift;
+    my $default_escape_char = shift || q{'};
+    return $string unless defined $string;
+
+    my $placeholder = '';
+
+    my @chars       = split //, $string;
+    my $value       = '';
+    my $escape_char = $default_escape_char;
+
+    my @values;
+    my $in = 0;    # keep state in the loop: is it in a quote?
+    while ( defined( my $c = shift @chars ) ) {
+        my $escaped;
+        if ( $c eq $escape_char && $in ) {
+            if ( $escape_char eq q{'} ) {
+                if ( ( $chars[0] || '' ) eq q{'} ) {
+                    $c       = shift @chars;
+                    $escaped = 1;
+                }
+            }
+            else {
+                $c       = shift @chars;
+                $escaped = 1;
+            }
+        }
+
+        if ($in) {
+            if ( $c eq q{'} ) {
+                if ( !$escaped ) {
+                    push @values, $value;
+                    $in          = 0;
+                    $value       = '';
+                    $escape_char = $default_escape_char;
+                    $placeholder .= '?';
+                    next;
+                }
+            }
+            $value .= $c;
+        }
+        else {
+            if ( $c eq q{'} ) {
+                $in = 1;
+            }
+
+            # Handle quoted string like e'foo\\bar'
+            elsif ( lc $c eq 'e' && ( $chars[0] // '' ) eq q{'} ) {
+                $escape_char = '\\';
+            }
+
+            # Handle numbers
+            elsif ( $c =~ /[\d.]/ && $placeholder !~ /\w$/ ) {    # Do not catch Groups_1.Name
+                $value .= $c;
+                while ( ( $chars[0] // '' ) =~ /[\d.]/ ) {
+                    $value .= shift @chars;
+                }
+
+                push @values, $value;
+                $placeholder .= '?';
+                $value = '';
+            }
+            else {
+                $placeholder .= $c;
+            }
+        }
+    }
+    return ( $placeholder, @values );
+}
+
 sub _RequireQuotedTables { return 0 };
 
 =head2 DESTROY

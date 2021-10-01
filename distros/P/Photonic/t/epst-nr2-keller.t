@@ -45,9 +45,10 @@ my $Bk=zeroes(2*$Nk+1,2*$Nk+1);
 $Bk=((($Bk->xvals<$Nk) & ($Bk->yvals<$Nk))
    | (($Bk->xvals>$Nk) & ($Bk->yvals>$Nk)));
 my $gk=Photonic::Geometry::FromB->new(B=>$Bk); #trans
-my $eko=Photonic::LE::NR2::EpsTensor->new(geometry=>$gk, nh=>1000, reorthogonalize=>1);
-my $etva=$eko->evaluate($ea, $eb);
-my $etvb=$eko->evaluate($eb, $ea);
+my $ekoa=Photonic::LE::NR2::EpsTensor->new(geometry=>$gk, nh=>1000, reorthogonalize=>1, epsA=>$ea, epsB=>$eb);
+my $ekob=Photonic::LE::NR2::EpsTensor->new(geometry=>$gk, nh=>1000, reorthogonalize=>1, epsA=>$eb, epsB=>$ea);
+my $etva=$ekoa->epsTensor;
+my $etvb=$ekob->epsTensor;
 #warn "etva=$etva\n"; warn "etvb=$etvb\n";
 my $R=pdl([0,1],[-1,0]);
 my $mt=(($R(*1)*$etvb(:,:,*1))->transpose)->sumover;

@@ -1,7 +1,7 @@
 package App::TimeTracker::Command::Core;
 
 # ABSTRACT: App::TimeTracker Core commands
-our $VERSION = '3.009'; # VERSION
+our $VERSION = '3.010'; # VERSION
 
 use strict;
 use warnings;
@@ -472,8 +472,13 @@ sub cmd_init {
         exit;
     }
 
-    my @dirs    = $cwd->dir_list;
-    my $project = $dirs[-1];
+    my $project;
+    if( $self->has_current_project ) {
+        $project = $self->_current_project;
+    } else {
+        my @dirs    = $cwd->dir_list;
+        $project = $dirs[-1];
+    }
     my $fh      = $cwd->file('.tracker.json')->openw;
     say $fh <<EOCONFIG;
 {
@@ -482,7 +487,7 @@ sub cmd_init {
 EOCONFIG
 
     my $projects_file = $self->home->file('projects.json');
-    my $coder         = JSON::XS->new->utf8->pretty->relaxed;
+    my $coder         = JSON::XS->new->utf8->pretty->canonical->relaxed;
     if ( -e $projects_file ) {
         my $projects = $coder->decode( scalar $projects_file->slurp );
         $projects->{$project} =
@@ -704,6 +709,18 @@ sub _load_attribs_recalc_trackfile {
     );
 }
 
+sub _load_attribs_init {
+    my ( $class, $meta ) = @_;
+    $meta->add_attribute(
+        'project' => {
+            isa           => 'Str',
+            is            => 'ro',
+            documentation => 'Project name to initialize',
+            lazy_build    => 1,
+        }
+    );
+}
+
 sub _build_from {
     my $self = shift;
     if ( my $last = $self->last ) {
@@ -750,7 +767,7 @@ App::TimeTracker::Command::Core - App::TimeTracker Core commands
 
 =head1 VERSION
 
-version 3.009
+version 3.010
 
 =head1 CORE COMMANDS
 

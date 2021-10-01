@@ -1,4 +1,4 @@
-package Evo::Inference::FlyweightCharacter;
+package Evo::Inference::Flyweight;
 
 sub new {
 	my ($class) = @_;

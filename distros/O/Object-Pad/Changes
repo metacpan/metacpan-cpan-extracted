@@ -1,5 +1,16 @@
 Revision history for Object-Pad
 
+0.53    2021-09-29
+        [CHANGES]
+         * Support null-or-unary reader/writer accessors, called simply
+           `:accessor`
+
+        [BUGFIXES]
+         * Avoid some C99'isms which upset Windows compilers
+         * Remember to register pp_weaken() as a custom op
+         * Account for the newer OP_ARGCHECK aux structure of perl 5.31.5
+         * Set correct XPK_LEXVARNAME() type (related to RT139444)
+
 0.52    2021-08-25
         [BUGFIXES]
          * Remember to actually enable `use warnings` (RT139027)

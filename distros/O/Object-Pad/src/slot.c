@@ -12,6 +12,8 @@
 
 #include "perl-backcompat.c.inc"
 #include "perl-additions.c.inc"
+#include "make_argcheck_ops.c.inc"
+#include "newOP_CUSTOM.c.inc"
 
 SlotMeta *ObjectPad_mop_create_slot(pTHX_ SV *slotname, ClassMeta *classmeta)
 {
@@ -207,6 +209,7 @@ static void slothook_weak_post_construct(pTHX_ SlotMeta *slotmeta, SV *_hookdata
   sv_rvweaken(slot);
 }
 
+static XOP xop_weaken;
 static OP *pp_weaken(pTHX)
 {
   dSP;
@@ -317,8 +320,16 @@ static void S_generate_slot_accessor_method(pTHX_ SlotMeta *slotmeta, SV *mname,
       (classmeta->type == METATYPE_ROLE ? OPf_SPECIAL : 0) |
       (classmeta->repr << 8)));
 
+  int req_args = 0;
+  int opt_args = 0;
+
+  switch(type) {
+    case ACCESSOR_WRITER:   req_args = 1; break;
+    case ACCESSOR_COMBINED: opt_args = 1; break;
+  }
+
   ops = op_append_list(OP_LINESEQ, ops,
-    make_argcheck_ops((type == ACCESSOR_WRITER) ? 1 : 0, 0, 0, mname_fq));
+    make_argcheck_ops(req_args, opt_args, 0, mname_fq));
 
   ops = op_append_list(OP_LINESEQ, ops,
     newSLOTPADOP(OPpSLOTPAD_SV << 8, ctx.padix, slotmeta->slotix));
@@ -434,6 +445,39 @@ static struct SlotHookFuncs slothooks_mutator = {
   .gen_accessor_ops = &slothook_gen_mutator_ops,
 };
 
+/* :accessor */
+
+static void slothook_accessor_seal(pTHX_ SlotMeta *slotmeta, SV *hookdata)
+{
+  S_generate_slot_accessor_method(aTHX_ slotmeta, hookdata, ACCESSOR_COMBINED);
+}
+
+static void slothook_gen_accessor_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, enum AccessorType type, struct AccessorGenerationCtx *ctx)
+{
+  if(type != ACCESSOR_COMBINED)
+    return;
+
+  /* $slot = shift if @_ */
+  ctx->bodyop = newLOGOP(OP_AND, 0,
+    /* scalar @_ */
+    op_contextualize(newUNOP(OP_RV2AV, 0, newGVOP(OP_GV, 0, PL_defgv)), G_SCALAR),
+    /* $slot = shift */
+    newBINOP(OP_SASSIGN, 0,
+      newOP(OP_SHIFT, 0),
+      newPADxVOP(OP_PADSV, ctx->padix, 0, 0)));
+
+  ctx->retop = newLISTOP(OP_RETURN, 0,
+    newOP(OP_PUSHMARK, 0),
+    newPADxVOP(OP_PADSV, ctx->padix, 0, 0));
+}
+
+static struct SlotHookFuncs slothooks_accessor = {
+  .ver              = OBJECTPAD_ABIVERSION,
+  .apply            = &slothook_reader_apply, /* generate method name the same as :reader */
+  .seal_slot        = &slothook_accessor_seal,
+  .gen_accessor_ops = &slothook_gen_accessor_ops,
+};
+
 void ObjectPad_register_slot_attribute(pTHX_ const char *name, const struct SlotHookFuncs *funcs)
 {
   if(funcs->ver < 50)
@@ -452,11 +496,17 @@ void ObjectPad_register_slot_attribute(pTHX_ const char *name, const struct Slot
   register_slot_attribute(name, funcs);
 }
 
-void ObjectPad__boot_slots(void)
+void ObjectPad__boot_slots(pTHX)
 {
-  register_slot_attribute("weak",    &slothooks_weak);
-  register_slot_attribute("param",   &slothooks_param);
-  register_slot_attribute("reader",  &slothooks_reader);
-  register_slot_attribute("writer",  &slothooks_writer);
-  register_slot_attribute("mutator", &slothooks_mutator);
+  XopENTRY_set(&xop_weaken, xop_name, "weaken");
+  XopENTRY_set(&xop_weaken, xop_desc, "weaken an RV");
+  XopENTRY_set(&xop_weaken, xop_class, OA_UNOP);
+  Perl_custom_op_register(aTHX_ &pp_weaken, &xop_weaken);
+
+  register_slot_attribute("weak",     &slothooks_weak);
+  register_slot_attribute("param",    &slothooks_param);
+  register_slot_attribute("reader",   &slothooks_reader);
+  register_slot_attribute("writer",   &slothooks_writer);
+  register_slot_attribute("mutator",  &slothooks_mutator);
+  register_slot_attribute("accessor", &slothooks_accessor);
 }

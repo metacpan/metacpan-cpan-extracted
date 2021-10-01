@@ -1,0 +1,36 @@
+#!/usr/bin/env perl
+use v5.18;
+use App::p5find qw(p5_doc_iterator print_file_linenum_line);
+
+my @paths = (".");
+my @words;
+
+my $x;
+push(@words, $x) while(($x = shift @ARGV) ne "--");
+shift(@ARGV) if @ARGV && $ARGV[0] eq "--";
+@paths = @ARGV if @ARGV;
+
+for my $dir (@paths) {
+    my $iter = p5_doc_iterator($dir);
+    while ( defined ( my $doc = $iter->() ) ) {
+        my $statements = $doc->find("PPI::Statement") or next;
+        my $file = $doc->filename;
+
+        my %matched;
+        for my $it (@$statements) {
+            my $ln = $it->line_number;
+
+            my $fail = 0;
+            my $txt = "$it";
+            for my $w (@words) {
+                $fail = index($txt, $w) < 0;
+                last if $fail;
+            }
+            next if $fail;
+
+            $matched{$ln} = 1;
+        }
+
+        print_file_linenum_line( $file, \%matched );
+    }
+}

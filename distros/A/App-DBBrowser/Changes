@@ -1,6 +1,17 @@
 Revision history for App-DBBrowser
 
 
+2.284    2021-09-26
+        - Attached databases: do not allow 'main' and 'temp' as alias names.
+        - Code refactoring.
+
+2.283    2021-09-26
+        - Attached databases: update tables menu.
+
+2.282    2021-09-24
+        - Term::Choose::Util minimum version is '1.739'.
+        - Code refactoring.
+
 2.281    2021-08-29
         - Adapt the code to the updated Term::Choose.
 

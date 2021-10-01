@@ -1,5 +1,5 @@
 package OPM::Maker::Command::dbtest;
-$OPM::Maker::Command::dbtest::VERSION = '1.00';
+$OPM::Maker::Command::dbtest::VERSION = '1.10';
 # ABSTRACT: Test db definitions in .sopm files
 
 use strict;
@@ -44,7 +44,7 @@ OPM::Maker::Command::dbtest - Test db definitions in .sopm files
 
 =head1 VERSION
 
-version 1.00
+version 1.10
 
 =head1 AUTHOR
 

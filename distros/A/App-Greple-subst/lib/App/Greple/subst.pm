@@ -6,7 +6,7 @@ subst - Greple module for text search and substitution
 
 =head1 VERSION
 
-Version 2.2901
+Version 2.2904
 
 =head1 SYNOPSIS
 
@@ -21,7 +21,7 @@ greple -Msubst --dict I<dictionary> [ options ]
   --stat
   --with-stat
   --stat-style=[default,dict]
-  --stat-item={match,expect,number,ok,ng}=[0,1]
+  --stat-item={match,expect,number,ok,ng,dict}=[0,1]
   --subst
   --diff
   --diffcmd command
@@ -325,7 +325,7 @@ it under the same terms as Perl itself.
 use v5.14;
 package App::Greple::subst;
 
-our $VERSION = '2.2901';
+our $VERSION = '2.2904';
 
 use warnings;
 use utf8;
@@ -471,7 +471,7 @@ sub subst_begin {
 
 use Text::VisualWidth::PP;
 use Text::VisualPrintf qw(vprintf vsprintf);
-use List::Util qw(max any sum);
+use List::Util qw(max any sum first);
 
 sub vwidth {
     if (not defined $_[0] or length $_[0] == 0) {
@@ -662,27 +662,19 @@ sub subst_search {
 
 sub subst_diff {
     my $orig = $current_file;
-    my $io;
+    my $fh;
+    state $fdpath = first { -r "$_/0" } qw( /dev/fd /proc/self/fd );
 
-    if ($remember_data) {
-	use IO::Pipe;
-	$io = IO::Pipe->new;
-	my $pid = fork() // die "fork: $!\n";
-	if ($pid == 0) {
-	    $io->writer;
-	    binmode $io, ":encoding(utf8)";
-	    print $io $contents;
-	    exit;
-	}
-	$io->reader;
-    }
-
-    # clear close-on-exec flag
-    if ($io) {
+    if (!-r $orig and $fdpath and $remember_data) {
+	use IO::File;
 	use Fcntl;
-	my $fd = $io->fcntl(F_GETFD, 0) or die "fcntl F_GETFD: $!\n";
-	$io->fcntl(F_SETFD, $fd & ~FD_CLOEXEC) or die "fcntl F_SETFD: $!\n";
-	$orig = sprintf "/dev/fd/%d", $io->fileno;
+	$fh = new_tmpfile IO::File or die "new_tmpfile: $!\n";
+	$fh->binmode(':encoding(utf8)');
+	my $fd = $fh->fcntl(F_GETFD, 0) or die "fcntl F_GETFD: $!\n";
+	$fh->fcntl(F_SETFD, $fd & ~FD_CLOEXEC) or die "fcntl F_SETFD: $!\n";
+	$fh->printflush($contents);
+	$fh->seek(0, 0);
+	$orig = sprintf "%s/%d", $fdpath, $fh->fileno;
     }
 
     @subst_diffcmd or confess "Empty diff command";
@@ -734,7 +726,7 @@ sub subst_update {
 	    $newname;
 	}
     };
-	
+
     open my $fh, ">", $create or die "open: $create $!\n";
     $fh->print($divert_buffer);
     $fh->close;

@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::Query;
 use strict;
 use warnings;
 
-our $VERSION = '8.1'; # VERSION
+our $VERSION = '8.2'; # VERSION
 
 use App::ElasticSearch::Utilities qw(es_request es_indices);
 use App::ElasticSearch::Utilities::Aggregations;
@@ -358,7 +358,7 @@ sub add_bool {
         ## no critic
         no strict 'refs';
         my $set = $self->$section;
-        push @{ $set }, $bools{$section};
+        push @{ $set }, is_arrayref($bools{$section}) ? @{ $bools{$section} } : $bools{$section};
         my $setter = "set_$section";
         $self->$setter($set);
         ## use critic
@@ -395,7 +395,7 @@ App::ElasticSearch::Utilities::Query - Object representing ES Queries
 
 =head1 VERSION
 
-version 8.1
+version 8.2
 
 =head1 ATTRIBUTES
 

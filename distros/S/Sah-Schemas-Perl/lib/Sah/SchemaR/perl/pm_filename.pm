@@ -1,9 +1,10 @@
+## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::perl::pm_filename;
 
-our $DATE = '2021-07-20'; # DATE
-our $VERSION = '0.038'; # VERSION
+our $DATE = '2021-09-29'; # DATE
+our $VERSION = '0.039'; # VERSION
 
-our $rschema = ["str",[{description=>"\nUse this schema if you want to accept a filesystem path containing Perl module.\nThe value of this schema is in the convenience of CLI completion, as well as\ncoercion from module name.\n\nString containing filename of a Perl module. For convenience, when value is in\nthe form of:\n\n    Foo\n    Foo.pm\n    Foo::Bar\n    Foo/Bar\n    Foo/Bar.pm\n\nand a matching .pm file is found in `\@INC`, then it will be coerced (converted)\ninto the path of that .pm file, e.g.:\n\n    /home/ujang/perl5/perlbrew/perls/perl-5.24.0/lib/site_perl/5.24.0/Foo/Bar.pm\n\nTo prevent such coercion, you can use prefixing path, e.g.:\n\n    ./Foo::Bar\n    ../Foo/Bar\n    /path/to/Foo/Bar\n\nThis schema comes with convenience completion too.\n\n",summary=>"A .pm filename, e.g. /path/Foo.pm","x.completion"=>sub{package Sah::Schema::perl::pm_filename;require Complete::File;require Complete::Module;require Complete::Util;my(%args) = @_;my $word = $args{'word'};my @answers;push @answers, Complete::File::complete_file('word', $word);if ($word =~ m[\A\w*((?:::|/)\w+)*\z]) {push @answers, Complete::Module::complete_module('word', $word, 'find_pod', 0);}Complete::Util::combine_answers(@answers)},"x.perl.coerce_rules"=>["From_str::convert_perl_pm_to_path"]}],["str"]];
+our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nUse this schema if you want to accept a filesystem path containing Perl module.\nThe value of this schema is in the convenience of CLI completion, as well as\ncoercion from module name.\n\nString containing filename of a Perl module. For convenience, when value is in\nthe form of:\n\n    Foo\n    Foo.pm\n    Foo::Bar\n    Foo/Bar\n    Foo/Bar.pm\n\nand a matching .pm file is found in `\@INC`, then it will be coerced (converted)\ninto the path of that .pm file, e.g.:\n\n    /home/ujang/perl5/perlbrew/perls/perl-5.24.0/lib/site_perl/5.24.0/Foo/Bar.pm\n\nTo prevent such coercion, you can use prefixing path, e.g.:\n\n    ./Foo::Bar\n    ../Foo/Bar\n    /path/to/Foo/Bar\n\nThis schema comes with convenience completion too.\n\n",summary=>"A .pm filename, e.g. /path/Foo.pm","x.completion"=>sub{package Sah::Schema::perl::pm_filename;use warnings;use strict;require Complete::File;require Complete::Module;require Complete::Util;my(%args) = @_;my $word = $args{'word'};my @answers;push @answers, Complete::File::complete_file('word', $word);if ($word =~ m[\A\w*((?:::|/)\w+)*\z]) {push @answers, Complete::Module::complete_module('word', $word, 'find_pod', 0);}Complete::Util::combine_answers(@answers)},"x.perl.coerce_rules"=>["From_str::convert_perl_pm_to_path"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
 # ABSTRACT: A .pm filename, e.g. /path/Foo.pm
@@ -20,7 +21,7 @@ Sah::SchemaR::perl::pm_filename - A .pm filename, e.g. /path/Foo.pm
 
 =head1 VERSION
 
-This document describes version 0.038 of Sah::SchemaR::perl::pm_filename (from Perl distribution Sah-Schemas-Perl), released on 2021-07-20.
+This document describes version 0.039 of Sah::SchemaR::perl::pm_filename (from Perl distribution Sah-Schemas-Perl), released on 2021-09-29.
 
 =head1 DESCRIPTION
 
@@ -36,6 +37,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 
 Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Perl>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Perl>
@@ -43,16 +72,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

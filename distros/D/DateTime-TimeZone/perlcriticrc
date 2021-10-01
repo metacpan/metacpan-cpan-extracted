@@ -69,5 +69,6 @@ add_packages = Carp Test::Builder
 # Sometimes I want to write "return unless $x > 4"
 [-ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions]
 
+# We allow "second"
 [NamingConventions::ProhibitAmbiguousNames]
 forbid = abstract bases close contract last left no record right set

@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/BrowserUtils.pm'
@@ -15,6 +15,7 @@ my @module_files = (
 my @scripts = (
     'script/browsers-are-paused',
     'script/kill-browsers',
+    'script/pause-and-unpause-browsers',
     'script/pause-browsers',
     'script/ps-browsers',
     'script/restart-browsers',

@@ -59,7 +59,6 @@
       },
       "test" : {
          "requires" : {
-            "Command::Runner" : "0",
             "Test::More" : "0.98"
          }
       }
@@ -67,7 +66,7 @@
    "provides" : {
       "App::Greple::subst" : {
          "file" : "lib/App/Greple/subst.pm",
-         "version" : "2.2901"
+         "version" : "2.2904"
       },
       "App::Greple::subst::Dict" : {
          "file" : "lib/App/Greple/subst/Dict.pm"
@@ -90,7 +89,7 @@
          "web" : "https://github.com/kaz-utashiro/greple-subst"
       }
    },
-   "version" : "2.2901",
+   "version" : "2.2904",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

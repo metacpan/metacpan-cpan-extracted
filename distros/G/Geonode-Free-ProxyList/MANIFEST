@@ -1,0 +1,16 @@
+Changes
+lib/Geonode/Free/ProxyList.pm
+lib/Geonode/Free/Proxy.pm
+Makefile.PL
+MANIFEST
+README
+README.md
+t/00-load.t
+t/01-proxy.t
+t/02-proxylist.t
+t/97-manifest.t
+t/98-pod.t
+t/99-pod-coverage.t
+ignore.txt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

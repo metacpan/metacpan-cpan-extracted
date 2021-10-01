@@ -17,6 +17,8 @@ README
 t/basic.t
 t/data/_cpan/Metadata
 t/data/_http/status
+t/data/_lib/mu.pod
+t/data/_lib/My/Test/Module.pm
 t/data/not_ok/bug_other_distros.pod
 t/data/not_ok/external_installed_bad_section.pod
 t/data/not_ok/external_installed_section.pod

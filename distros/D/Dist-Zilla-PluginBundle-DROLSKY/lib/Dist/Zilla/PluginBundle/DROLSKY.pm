@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.19';
+our $VERSION = '1.20';
 
 use Devel::PPPort 3.42;
 use Dist::Zilla 6.0;
@@ -864,7 +864,7 @@ Dist::Zilla::PluginBundle::DROLSKY - DROLSKY's plugin bundle
 
 =head1 VERSION
 
-version 1.19
+version 1.20
 
 =head1 SYNOPSIS
 
@@ -1148,8 +1148,6 @@ This is more or less equivalent to the following F<dist.ini>:
 =head1 SUPPORT
 
 Bugs may be submitted at L<https://github.com/autarch/Dist-Zilla-PluginBundle-DROLSKY/issues>.
-
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
 =head1 SOURCE
 

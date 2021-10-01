@@ -8,16 +8,15 @@
 
 package Net::OAuth2::AccessToken;
 use vars '$VERSION';
-$VERSION = '0.66';
+$VERSION = '0.67';
 
 use warnings;
 use strict;
 
 our $VERSION;  # to be able to test in devel environment
 
+use Carp qw(croak);
 use JSON::MaybeXS qw/encode_json/;
-use URI::Escape   qw/uri_escape/;
-use Encode        qw/find_encoding/;
 
 # Attributes to be saved to preserve the session.
 my @session = qw/access_token token_type refresh_token expires_at
@@ -42,7 +41,7 @@ sub init($)
 
     # client is the pre-v0.50 name
     my $profile = $self->{NOA_profile} = $args->{profile} || $args->{client}
-        or die "::AccessToken needs profile object";
+        or croak "::AccessToken needs profile object";
 
     $self->{NOA_access_token}  = $args->{access_token};
     $self->{NOA_refresh_token} = $args->{refresh_token};

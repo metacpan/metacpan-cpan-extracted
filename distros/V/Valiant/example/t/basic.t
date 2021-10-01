@@ -618,17 +618,17 @@ BASIC1: {
     credit_cards => [
       {
         id => $cc_id[0],
-        card_number => "3423423423423423",
+        card_number => "3423423423423425",
         expiration => "2222-02-02",
       },
       {
         id => $cc_id[1],
-        card_number => "1111222233334444",
+        card_number => "1111222233334445",
         expiration => "233-i02-02",
       },
     ],
   });
-
+  
   is_deeply +{$person->errors->to_hash(full_messages=>1)}, +{
     last_name => [
       "Last Name is too short (minimum is 2 characters)",
@@ -677,11 +677,11 @@ BASIC1: {
 
   ok my $cc_rs = $person->credit_cards;
   ok my $cc1 = $cc_rs->next;
-    is $cc1->card_number, '3423423423423423';
+    is $cc1->card_number, '3423423423423425';
     is $cc1->expiration->ymd, '2222-02-02';
     is $cc1->id, $cc_id[0];
   ok my $cc2 = $cc_rs->next;
-    is $cc2->card_number, '1111222233334444';
+    is $cc2->card_number, '1111222233334445';
     is $cc2->get_column('expiration'), '233-i02-02';
     is $cc2->id, $cc_id[1];
   ok !$cc_rs->next;
@@ -839,6 +839,10 @@ NESTED2: {
     ok $pr3->is_removed;
   ok ! $pr_rs->next;
 
+  {
+    ok my $rs = $person->roles;
+  }
+
   ok my $cc_rs = $person->credit_cards;
   ok my $cc1 = $cc_rs->next;
     is $cc1->card_number, '3423423423423423';
@@ -936,7 +940,7 @@ NESTED_OK1: {
     ok $cc3->in_storage;
   ok !$cc_rs->next;
 
-  $person->valid;
+  ok $person->valid;
 }
 
 NESTED_OK2: {
@@ -973,7 +977,7 @@ NESTED_OK2: {
     ok $cc3->in_storage;
   ok !$cc_rs->next;
 
-  $person->valid;
+  ok $person->valid;
 }
 
 NESTED_FAIL4: {
@@ -1020,60 +1024,4 @@ NESTED_FAIL4: {
 
 }
 
-
 done_testing;
-
-__END__
-
-For relationship
-
-if the PK exists we must find the record if UPDATE_ONLY
-otherwise if there's a unique key we first trying to find that, but failing to finds is allowed (unless UPDATE_ONLY)
-if UPDATE_ONLY die if try to make a new record
-
-
-    person.person_roles.0.person_id   = 1
-    person.person_roles.0.role_id     = 10
-    person.person_roles.0._action     = 'delete'  (one of new, delete, selected (skip) )
-    person.person_roles.0._action     = 'selected'  # do the last when more than one
-
-
-    person.person_roles.0.person_id
-
-    use Devel::Dwarn;
-    Dwarn +{ $person->errors->to_hash(full_messages=>1) };
-
-
-    {
-  credit_cards => {
-    0 => {
-      card_number => "3423423423423423",
-      expiration => "2222-02-02",
-    },
-    1 => {
-      card_number => "53453454564564",
-      expiration => "2222-02-02",
-    },
-  },
-  first_name => "john",
-  last_name => "nap",
-  profile => {
-    address => "15604 Harry Lind Road",
-    birthday => "2000-02-13",
-    city => "Elgin",
-    id => 6,
-    phone_number => "16467081837",
-    state_id => 2,
-    zip => 78621,
-  },
-  roles => {
-    2 => {
-      id => 3,
-    },
-    3 => {
-      id => 4,
-    },
-  },
-  username => "jjn9",
-}
-

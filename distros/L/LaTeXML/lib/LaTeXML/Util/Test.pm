@@ -17,7 +17,8 @@ use Config;
 use base qw(Exporter);
 #  @Test::More::EXPORT);
 our @EXPORT = (qw(&latexml_ok &latexml_tests),
-  qw(&process_domstring &process_xmlfile &is_strings
+  qw(&process_domstring &process_xmlfile &process_htmlfile
+    &is_strings &get_filecontent
     &convert_texfile_as_test &serialize_dom_as_test),
   @Test::More::EXPORT);
 # Note that this is a singlet; the same Builder is shared.
@@ -45,7 +46,7 @@ sub latexml_tests {
     plan tests => (1
         + scalar(@core_tests)
         + scalar(@post_tests)
-        + 3 * scalar(@daemon_tests) - ($directory =~ /runtimes/ ? 2 : 0));    # !!
+        + 2 * scalar(@daemon_tests) - ($directory =~ /runtimes/ ? 1 : 0));    # !!
     if (eval { use_ok("LaTeXML::Core"); }) {
     SKIP: {
         my $requires = $options{requires} || {};    # normally a hash: test=>[files...]
@@ -69,9 +70,9 @@ sub latexml_tests {
         foreach my $name (@daemon_tests) {
           my $test = "$directory/$name";
         SKIP: {
-            skip("No file $test.xml and/or $test.status", 1)
-              unless ((-f "$test.xml") && (-f "$test.status"));
-            my $ntests = ($directory =~ /runtimes/ ? 1 : 3);
+            skip("No file $test.xml", 1)
+              unless (-f "$test.xml");
+            my $ntests = ($directory =~ /runtimes/ ? 1 : 2);
             next unless check_requirements($test, $ntests, $$requires{'*'}, $$requires{$name});
             daemon_ok($test, $directory, $options{generate});
           } } } }
@@ -91,7 +92,7 @@ sub check_requirements {
       @required_packages = @$reqmts; }
     elsif (ref $reqmts eq 'HASH') {
       @required_packages = (ref $$reqmts{packages} eq 'ARRAY' ? @{ $$reqmts{packages} } : $$reqmts{packages});
-      $texlive_min = $$reqmts{texlive_min} || 0; }
+      $texlive_min       = $$reqmts{texlive_min} || 0; }
     foreach my $reqmt (@required_packages) {
       if (pathname_kpsewhich($reqmt) || pathname_find($reqmt)) { }
       else {
@@ -198,6 +199,21 @@ sub process_xmlfile {
   else {
     return process_domstring($domstring, $name, $compare_kind); } }
 
+sub process_htmlfile {
+  my ($htmlpath, $name, $compare_kind) = @_;
+  my $domstring = eval {
+    my $dom = XML::LibXML->load_html(
+      location => $htmlpath,
+      # tags such as <article> or <math> are invalid?? ignore.
+      suppress_errors => 1,
+      recover         => 1,
+    );
+    $dom && $dom->toStringHTML(); };
+  if (!$domstring) {
+    do_fail($name, "Could not convert file $htmlpath to string: " . $@); return; }
+  else {
+    return process_domstring($domstring, $name, $compare_kind); } }
+
 sub process_domstring {
   my ($domstring, $name, $compare_kind) = @_;
   if ($compare_kind && $compare_kind eq 'words') {    # words
@@ -237,54 +253,51 @@ sub daemon_ok {
   my $opts = read_options("$base.spec", $base);
   push @$opts, (['destination', "$localname.test.xml"],
     ['log',                "/dev/null"],
-    ['timeout',            10],
+    ['quiet',              ''],
+    ['quiet',              ''],
+    ['quiet',              ''],
+    ['quiet',              ''],
     ['autoflush',          1],
     ['timestamp',          '0'],
     ['nodefaultresources', ''],
     ['xsltparameter',      'LATEXML_VERSION:TEST'],
     ['nocomments',         '']);
+####    ['timeout',            10],
 
   my $latexmlc = catfile($FindBin::Bin, '..', 'blib', 'script', 'latexmlc');
   $latexmlc =~ s/^\.\///;
   my $path_to_perl = $Config{perlpath};
 
-  my $invocation = $path_to_perl . " " . join(" ", map { ("-I", $_) } @INC) . " " . $latexmlc . ' ';
+  my @invocation = ($path_to_perl, (map { ('-I', $_) } @INC), $latexmlc);
   my $timed      = undef;
   foreach my $opt (@$opts) {
     if ($$opt[0] eq 'timeout') {    # Ensure .opt timeout takes precedence
       if ($timed) { next; } else { $timed = 1; }
     }
-    $invocation .= "--" . $$opt[0] . (length($$opt[1]) ? ('="' . $$opt[1] . '" ') : (' '));
+    push(@invocation, '--' . $$opt[0] . (length($$opt[1]) ? ('=' . $$opt[1]) : ''));
   }
-  $invocation .= " 2>$localname.test.status ";
   if (!$generate) {
     pathname_chdir($dir);
-    my $exit_code = system($invocation);
+    my $exit_code = system(@invocation);
     if ($exit_code != 0) {
       $exit_code = $exit_code >> 8;
     }
-    is($exit_code, 0, "latexmlc invocation for test $localname: $invocation yielded $!");
+    my $target_code = $localname =~ /fatal/ ? 1 : 0;
+    is($exit_code, $target_code, "latexmlc invocation for test $localname yielded $! . \nInvocation: \"" . join('" "', @invocation) . '"');
     pathname_chdir($current_dir);
     # Compare the just generated $base.test.xml to the previous $base.xml
     if (my $teststrings = process_xmlfile("$base.test.xml", $base)) {
       if (my $xmlstrings = process_xmlfile("$base.xml", $base)) {
         is_strings($teststrings, $xmlstrings, $base); } }
-
-    # Compare the just generated $base.test.status to the previous $base.status
-    if (my $teststatus = get_filecontent("$base.test.status", $base)) {
-      if (my $status = get_filecontent("$base.status", $base)) {
-        is_strings($teststatus, $status, $base); } }
-    unlink "$base.test.xml"    if -e "$base.test.xml";
-    unlink "$base.test.status" if -e "$base.test.status";
+    unlink "$base.test.xml" if -e "$base.test.xml";
   }
   else {
     #TODO: Skip 3 tests
-    print STDERR "$invocation\n";
+    print STDERR ('"' . join('" "', @invocation) . "\"\n");
     pathname_chdir($dir);
-    system($invocation);
+    system(@invocation);
     pathname_chdir($current_dir);
-    move("$base.test.xml",    "$base.xml")    if -e "$base.test.xml";
-    move("$base.test.status", "$base.status") if -e "$base.test.status";
+    move("$base.test.xml", "$base.xml") if -e "$base.test.xml";
   }
   return; }
 
@@ -331,11 +344,19 @@ sub texlive_version {
   if (defined $texlive_version) {
     return $texlive_version; }
   my $extra_flag = '';
-  if ($ENV{"APPVEYOR"}) {
-    # disabled under windows for now
-    return 0; }
-  if (my $tex = which("tex")) {
-    my $version_string = `$tex --version`;
+  if (defined $ENV{"LATEXML_TEST_TEXLIVE"}) {
+    return $ENV{"LATEXML_TEST_TEXLIVE"} + 0; }
+  my $tex;
+  # If kpsewhich specified, look for tex next to it
+  if (my $path = $ENV{LATEXML_KPSEWHICH}) {
+    if (($path =~ s/kpsewhich/tex/i) && (-X $path)) {
+      $tex = $path; } }
+  if (!$tex) {    # Else look for executable
+    $tex = which("tex"); }
+  if ($tex && open(my $texfh, '-|', $tex, '--version')) { # If we found one, hope it has TeX Live version in it's --version
+    my $version_string;
+    { local $/; $version_string = <$texfh>; }
+    close($texfh);
     if ($version_string =~ /TeX Live (\d+)/) {
       $texlive_version = int($1); }
     else {

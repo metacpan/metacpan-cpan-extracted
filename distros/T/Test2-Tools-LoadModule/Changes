@@ -1,3 +1,12 @@
+0.007		2021-09-24	T. R. Wyant
+    Correct generation of 'provides' metadata.  Thanks to Favio Poletti
+    for blogging
+    https://github.polettix.it/ETOOBUSY/2021/06/15/the-real-pause-workaround/,
+    and ultimately to Joel Berger for the pointer to
+    https://metacpan.org/pod/CPAN::Meta::Spec#no_index
+
+    Add Test2::Require to SEE ALSO documentation
+
 0.006		2021-03-29	T. R. Wyant
     Add rt.cpan.org back to bug reporting methods. Long live RT!.
 

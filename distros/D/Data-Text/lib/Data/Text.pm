@@ -3,6 +3,7 @@ package Data::Text;
 use warnings;
 use strict;
 use Carp;
+use String::Clean;
 use String::Util;
 
 =head1 NAME
@@ -11,11 +12,11 @@ Data::Text - Class to handle text in an OO way
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -143,6 +144,28 @@ sub rtrim {
 	return $self;
 }
 
+=head2	replace
+
+Replaces words.
+
+    use Data::Text;
+
+    my $dt = Data::Text->new();
+    $dt->append('Hello World');
+    $dt->replace({ 'Hello' => 'Goodbye dear' });
+    print $dt->as_string(), "\n";	# Outputs "Goodbye dear world"
+
+=cut
+
+sub replace {
+	my $self = shift;
+
+	$self->{'clean'} ||= String::Clean->new();
+	$self->{'text'} = $self->{'clean'}->replace(shift, $self->{'text'}, shift);
+
+	return $self;
+}
+
 =head1 AUTHOR
 
 Nigel Horne, C<< <njh at bandsman.co.uk> >>
@@ -150,6 +173,8 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 =head1 BUGS
 
 =head1 SEE ALSO
+
+L<String::Clean>, L<String::Util>
 
 =head1 SUPPORT
 

@@ -33,7 +33,7 @@ use warnings;
 use PDL;
 use Photonic::Geometry::FromEpsilon;
 use Photonic::WE::S::Metric;
-use Photonic::WE::S::OneH;
+use Photonic::WE::S::Haydock;
 
 use Test::More;
 use lib 't/lib';
@@ -49,7 +49,7 @@ my $g=Photonic::Geometry::FromEpsilon
 my $m=Photonic::WE::S::Metric->new(
     geometry=>$g, epsilon=>pdl(1), wavenumber=>pdl(2), wavevector=>pdl([1])
     );
-my $o=Photonic::WE::S::OneH->new(metric=>$m, polarization=>pdl([1])->r2C);
+my $o=Photonic::WE::S::Haydock->new(metric=>$m, polarization=>pdl([1])->r2C, nh=>3);
 $o->iterate;
 ok(Cagree(pdl($o->current_a), (1-$ea)*(1-$f)+(1-$eb)*$f), "1D a_0") or diag "got:", pdl($o->current_a);
 ok(Cagree(pdl($o->next_b2), ($eb-$ea)**2*$f*(1-$f)), "1D b_1^2");

@@ -1,3 +1,15 @@
+0.029   2021-09-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Add perlcritic exclude directive to generated Sah::SchemaR::*
+	  files.
+
+
+0.028   2021-09-29  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix one instance where we still assumed old
+	  Data::Sah::Resolve (0.009-) return structure.
+
+
 0.027   2021-07-30  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

@@ -27,5 +27,5 @@ resources:
   X_url: git://github.com/PDLPorters/pdl-fftw3.git
   X_web: http://github.com/PDLPorters/pdl-fftw3
   bugtracker: http://github.com/PDLPorters/pdl-fftw3/issues
-version: '0.16'
+version: '0.17'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

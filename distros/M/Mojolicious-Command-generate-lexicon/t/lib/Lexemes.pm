@@ -7,6 +7,6 @@ use base 'Mojolicious';
 
 sub startup {
 
-};
+}
 
 1;

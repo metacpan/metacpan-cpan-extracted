@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.19';
+our $VERSION = '1.20';
 
 use Module::Runtime qw( use_module );
 use String::RewritePrefix;
@@ -60,15 +60,13 @@ Dist::Zilla::Plugin::DROLSKY::License - Sets up default license and copyright ho
 
 =head1 VERSION
 
-version 1.19
+version 1.20
 
 =for Pod::Coverage .*
 
 =head1 SUPPORT
 
 Bugs may be submitted at L<https://github.com/autarch/Dist-Zilla-PluginBundle-DROLSKY/issues>.
-
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
 =head1 SOURCE
 

@@ -1,11 +1,11 @@
-#!perl
+# -*- mode: perl; -*-
 
 package Math::BigFloat::Constant;
 
 use strict;
 use warnings;
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 use Math::BigFloat '1.999802';
 our @ISA = qw( Math::BigFloat );
@@ -125,12 +125,12 @@ Math::BigFloat::Constant - arbitrary sized constant integers
 
   $x->round($A,$P,$round_mode); # round to accuracy or precision using mode $r
   $x->bround($N);               # accuracy: preserve $N digits
-  $x->bfround($N);              # round to $Nth digit, no-op for BigInts
+  $x->bfround($N);              # round to $Nth digit, no-op for Math::BigInt objects
 
   $x->bfloor();                 # return integer less or equal than $x
   $x->bceil();                  # return integer greater or equal than $x
-  $x->as_int();                 # return a copy of the object as BigInt
-  $x->as_number();              # return a copy of the object as BigInt
+  $x->as_int();                 # return a copy of the object as Math::BigInt
+  $x->as_number();              # return a copy of the object as Math::BigInt
 
   # The following do not modify their arguments, so they are allowed:
   bgcd(@values);                # greatest common divisor
@@ -147,11 +147,11 @@ Math::BigFloat::Constant - arbitrary sized constant integers
 
 =head1 DESCRIPTION
 
-With this module you can define constant BigFloats on a per-object basis. The
-usual C<use Math::BigFloat ':constant'> will catch B<all> floating point
-constants in the script at compile time, but will not let you create constant
-values on the fly, nor work for strings and/or floating point constants like
-C<1e5>.
+With this module you can define constant Math::BigFloat objects on a per-object
+basis. The usual C<use Math::BigFloat ':constant'> will catch B<all> floating
+point constants in the script at compile time, but will not let you create
+constant values on the fly, nor work for strings and/or floating point constants
+like C<1e5>.
 
 C<Math::BigFloat::Constant> is a true subclass of L<Math::BigFloat> and can
 do all the same things - except modifying any of the objects.
@@ -184,7 +184,7 @@ C<Math::BigFloat> object.
 =head1 BUGS
 
 Please report any bugs or feature requests to
-C<bug-math-bigrat at rt.cpan.org>, or through the web interface at
+C<bug-math-bigint-constant at rt.cpan.org>, or through the web interface at
 L<https://rt.cpan.org/Ticket/Create.html?Queue=Math-BigInt-Constant>
 (requires login).
 We will be notified, and then you'll automatically be notified of progress on

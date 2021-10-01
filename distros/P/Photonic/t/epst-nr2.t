@@ -43,8 +43,8 @@ my $eb=3+4*i;
 #Check haydock coefficients for simple 1D system
 my $B=zeroes(11)->xvals<5; #1D system
 my $gl=Photonic::Geometry::FromB->new(B=>$B); #long
-my $elo=Photonic::LE::NR2::EpsTensor->new(geometry=>$gl, nh=>10);
-my $elv=$elo->evaluate($ea, $eb);
+my $elo=Photonic::LE::NR2::EpsTensor->new(geometry=>$gl, nh=>10, epsA=>$ea, epsB=>$eb);
+my $elv=$elo->epsTensor;
 my $elx=1/((1-$gl->f)/$ea+$gl->f/$eb);
 ok(Cagree($elv, $elx), "1D long epsilon");
 is($elo->converged,1, "Converged");
@@ -52,8 +52,8 @@ is($elo->converged,1, "Converged");
 #View 2D from 1D superlattice.
 my $Bt=zeroes(1,11)->yvals<5; #2D flat system
 my $gt=Photonic::Geometry::FromB->new(B=>$Bt); #trans
-my $eto=Photonic::LE::NR2::EpsTensor->new(geometry=>$gt, nh=>10);
-my $etv=$eto->evaluate($ea, $eb);
+my $eto=Photonic::LE::NR2::EpsTensor->new(geometry=>$gt, nh=>10, epsA=>$ea, epsB=>$eb);
+my $etv=$eto->epsTensor;
 my $etx=(1-$gt->f)*$ea+$gt->f*$eb;
 my $etenx=pdl([$etx, r2C(0)],[r2C(0), $elx]);
 ok(Cagree($etv, $etenx), "1D trans epsilon") or diag "got:$etv\nexpected:$etenx";
@@ -62,8 +62,8 @@ is($eto->converged,1, "Converged");
 # Extend 1D superlattice to 4D (why not?)
 my $Bt4=zeroes(11,1,1,1)->xvals<5; #2D flat system
 my $gt4=Photonic::Geometry::FromB->new(B=>$Bt4); #trans
-my $eto4=Photonic::LE::NR2::EpsTensor->new(geometry=>$gt4, nh=>10);
-my $etv4=$eto4->evaluate($ea, $eb);
+my $eto4=Photonic::LE::NR2::EpsTensor->new(geometry=>$gt4, nh=>10, epsA=>$ea, epsB=>$eb);
+my $etv4=$eto4->epsTensor;
 my $etenx4=pdl([
     [$elx,   r2C(0),  r2C(0), r2C(0)],
     [r2C(0),  $etx,  r2C(0), r2C(0)],
@@ -81,9 +81,9 @@ $Bk=((($Bk->xvals<$Nk) & ($Bk->yvals<$Nk))
    | (($Bk->xvals>=$Nk) & ($Bk->yvals>=$Nk)));
 my $gk=Photonic::Geometry::FromB->new(B=>$Bk); #trans
 my $eko=Photonic::LE::NR2::EpsTensor->new(
-    geometry=>$gk, nh=>1000, reorthogonalize=>1, use_mask=>1);
-my $etva=$eko->evaluate($ea, $eb);
-my $etvb=$eko->evaluate($eb, $ea);
+    geometry=>$gk, nh=>1000, reorthogonalize=>1, use_mask=>1, epsA=>$ea, epsB=>$eb);
+my $etva=$eko->epsTensor;
+my $etvb=$eko->epsTensor;
 my $etvr=zeroes(2,2)->r2C;
 $etvr->((0),(0)).= $etvb->((1),(1));
 $etvr->((0),(1)).=-$etvb->((1),(0));

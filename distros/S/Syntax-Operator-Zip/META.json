@@ -22,12 +22,12 @@
       "configure" : {
          "requires" : {
             "Module::Build" : "0.4004",
-            "XS::Parse::Infix::Builder" : "0.17"
+            "XS::Parse::Infix::Builder" : "0.18"
          }
       },
       "runtime" : {
          "requires" : {
-            "XS::Parse::Infix" : "0.17",
+            "XS::Parse::Infix" : "0.18",
             "perl" : "5.014"
          }
       },
@@ -40,7 +40,7 @@
    "provides" : {
       "Syntax::Operator::Zip" : {
          "file" : "lib/Syntax/Operator/Zip.pm",
-         "version" : "0.01"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.01",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

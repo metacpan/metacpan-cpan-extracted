@@ -23,5 +23,5 @@ requires:
   perl: '5.006001'
 resources:
   repository: https://github.com/aferreira/cpan-Devel-Hide.git
-version: '0.0014'
+version: '0.0015'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

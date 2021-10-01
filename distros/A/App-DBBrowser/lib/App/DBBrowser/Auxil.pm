@@ -317,7 +317,7 @@ sub quote_table {
     if ( $sf->{o}{G}{quote_identifiers} ) {
         return $sf->{d}{dbh}->quote_identifier( @{$td}[@idx] );
     }
-    return join( $sf->{i}{sep_char}, grep { defined && length } @{$td}[@idx] );
+    return join( $sf->{i}{sep_char}, grep { length } @{$td}[@idx] );
 }
 
 
@@ -326,7 +326,7 @@ sub quote_col_qualified {
     if ( $sf->{o}{G}{quote_identifiers} ) {
         return $sf->{d}{dbh}->quote_identifier( @$cd );
     }
-    return join( $sf->{i}{sep_char}, grep { defined && length } @$cd );
+    return join( $sf->{i}{sep_char}, grep { length } @$cd );
 }
 
 

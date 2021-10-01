@@ -1,4 +1,4 @@
-#!perl
+# -*- mode: perl; -*-
 
 use strict;
 use warnings;
@@ -79,16 +79,10 @@ for (my $i = 0 ; $i <= $#data ; ++ $i) {
     subtest "_modinv() in list context: $test", sub {
         if ($out0 eq "undef") {
 
-            plan tests => 3;
+            plan tests => 1;
 
-            cmp_ok(scalar @got, "==", 2,
+            cmp_ok(scalar @got, "==", 0,
                    "'$test' gives two output args");
-
-            is($got[0], undef,
-               "'$test' first output arg is undef");
-
-            is($got[1], undef,
-               "'$test' second output arg is undef");
 
         } else {
 

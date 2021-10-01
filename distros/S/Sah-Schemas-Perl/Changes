@@ -1,3 +1,9 @@
+0.039   2021-09-29  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux][schema perl::modname_with_optional_args] Allow array form to
+	  make specifying arguments much more convenient, e.g. using JSON.
+
+
 0.038   2021-07-20  Released-By: PERLANCAR; Urgency: medium
 
 	- Remove warning with latest Test::Sah::Schema (0.010).

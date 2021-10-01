@@ -49,6 +49,6 @@
          "web" : "https://github.com/pjacklam/p5-Math-BigInt-Pari"
       }
    },
-   "version" : "1.3007",
+   "version" : "1.3008",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

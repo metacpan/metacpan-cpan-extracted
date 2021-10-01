@@ -1,9 +1,37 @@
 ==================================================
-Changes from 2019-09-02 00:00:00 +0000 to present.
+Changes from 2019-09-25 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 8.1 at 2021-09-01 00:43:37 +0000
+version 8.2 at 2021-09-24 21:30:53 +0000
+----------------------------------------
+
+  Change: 569436f7847833b3b3b20d15d14f753ab07c61aa
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2021-09-24 14:30:36 +0000
+
+    Prepping the 8.2 Release 
+
+  Change: ff914b2e69d3bf4c1862ad4970e119ab9a150e12
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2021-09-16 15:57:37 +0000
+
+    ES 7.x fixes + bonus
+
+    * Fix `::Query->add_bool()` for stricter parser in ES 7.x * Add
+    `value_count` as a valid aggregation for sorting 
+
+  Change: 963498bd7d45ba7480a8ef2ba82306bd98f9175c
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2021-08-31 20:25:48 +0000
+
+    Add --with-missing to es-search.pl
+
+    If specified, all terms aggregations will calculate the missing element as
+    'MISSING'. 
+
+----------------------------------------
+version 8.1 at 2021-09-01 00:43:28 +0000
 ----------------------------------------
 
   Change: dc6735a8f9fcb22c3bad773b759c47d4519dc2c1
@@ -442,63 +470,6 @@ version 7.4 at 2019-10-20 13:24:50 +0000
     This will enable automatic detection of and working with nested fields in
     the near term. Possibly other features in the long term. 
 
-----------------------------------------
-version 7.3 at 2019-09-08 18:32:53 +0000
-----------------------------------------
-
-  Change: 56b99467e968c2a4dcb6eeb5e49f62ff55213ca2
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-09-08 11:32:53 +0000
-
-    Release 7.3 ready to go 
-
-  Change: cb5e39b38c73c19f02def6851daecb257b228759
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-09-08 11:27:57 +0000
-
-    Fix search API for ES < 6.x
-
-    The `track_total_hits` was added in ES 6.0.0. Remove that parameter for
-    versions before 6.0.0. 
-
-  Change: 5a681c12f47a607293148b44be469a54dd490597
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-09-05 15:42:16 +0000
-
-    Add documentation for the new parameters and allow scroll to be undef
-
-    When working with aggregations, we need to disable the scroll, so allow
-    scroll to be undef. 
-
-  Change: 37fb74c14732e998163a2b46c8960717e69514b7
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-09-04 18:25:02 +0000
-
-    Fixes for ::Query to handle parameters better
-
-    Drop all the `Maybe` from `::Query`. Make handling non-array parameters in
-    the `bool` section of the query work. Added the following parameters:
-
-    * `search_type` - Set to an `Enum` consistent with viable ES options *
-    `track_scores` - Can be 'true' or 'false' * `track_total_hits` - Defaults
-    'true' * `rest_total_hits_as_int` - Defaults 'true' *
-    `minimum_should_match` - Allow users to control the minimum should
-
-    match parameter.
-
-    `es-search.pl` remove redundant parameters. Set `--tail` batch size to
-    `max-batch-size` and check if `size` is less than `max-batch-size` and just
-    return `size` docs instead of `max-batch-size` docs. 
-
-  Change: 350c919e7b7128c306bc4b5ef8237a9d2caf7910
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-09-04 17:24:28 +0000
-
-    Make ::Query->add_bool() more flexible
-
-    Now `add_bool()` supports adding multiple conditions at once. Allow users
-    to set `search_type` and `track_scores`. 
-
 =================================================
-Plus 79 releases after 2019-09-02 00:00:00 +0000.
+Plus 80 releases after 2019-09-25 00:00:00 +0000.
 =================================================

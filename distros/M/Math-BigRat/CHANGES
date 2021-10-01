@@ -1,3 +1,25 @@
+0.2619 2021-10-01
+
+ * Correct the handling of Inf and NaN in numify().
+
+ * Improve constant overloading. When numeric constants are overloaded
+   (with the ":constant" option) in Math::BigRat, every numeric constant
+   is converted to an object regardless of how it is written.
+
+0.2618 2021-09-28
+
+ * Add new method binv() for the inverse.
+
+ * Add new method dparts(), which returns the integer part and fraction part
+   of a number. For example, 9/4 is split into 2 and 1/4. This method is
+   equivalent to the Math::BigInt and Math::BigFloat methods with the same
+   name.
+
+ * Improve blog(). Handle cases $x->blog($b) where the numerator of $x
+   and/or $b is 1 as special.
+
+ * Sync tests with Math-BigInt.
+
 0.2617 2021-07-12
 
  * Fix CPAN RT #132712.

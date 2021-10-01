@@ -8,7 +8,7 @@ use Moo::Role;
 with 'Archive::BagIt::Role::Plugin';
 with 'Archive::BagIt::Role::Portability';
 # ABSTRACT: A role that handles all manifest files for a specific Algorithm
-our $VERSION = '0.075'; # VERSION
+our $VERSION = '0.081'; # VERSION
 
 has 'algorithm' => (
     is => 'rw',
@@ -114,11 +114,11 @@ sub _build_manifest_entries {
 
 
 sub _fill_digest_hashref {
-    my ($self, $bagit, $digestobj, $localname) = @_;
+    my ($self, $bagit, $localname) = @_;
     my $digest_hashref;
     my $fullname = File::Spec->catfile($bagit, $localname);
     my $calc_digest = $self->bagit->digest_callback();
-    $digest_hashref->{calculated_digest} = &$calc_digest($digestobj, $fullname);
+    $digest_hashref->{calculated_digest} = &$calc_digest($self->algorithm(), $fullname);
     $digest_hashref->{local_name} = $localname;
     $digest_hashref->{full_name} = $fullname;
     return $digest_hashref;
@@ -126,16 +126,17 @@ sub _fill_digest_hashref {
 
 
 # calc digest
-# expects digestobj, expected_ref, array_ref of filenames
+# expects expected_ref, array_ref of filenames
 # returns arrayref of hashes where each entry has
 # $tmp->{calculated_digest} = $digest;
 # $tmp->{expected_digest} = $expected_digest;
 # $tmp->{filename} = $filename;
 sub calc_digests {
-    my ($self, $bagit, $digestobj, $filenames_ref) = @_;
+    my ($self, $bagit, $filenames_ref) = @_;
+    #the parallel version fails with Parallel::Iterator, therefore back to serial version
     my @digest_hashes = map {
-            $self->_fill_digest_hashref($bagit, $digestobj, $_);
-        } @{$filenames_ref};
+        $self->_fill_digest_hashref($bagit, $_);
+    } @{ $filenames_ref };
     return \@digest_hashes;
 }
 
@@ -201,8 +202,7 @@ sub _verify_XXX_manifests {
         }
     }
     # all preconditions full filled, now calc all digests
-    my $digestobj = $self->algorithm();
-    my $digest_hashes_ref = $self->calc_digests($bagit, $digestobj, \@files);
+    my $digest_hashes_ref = $self->calc_digests($bagit, \@files);
     # compare digests
     if (defined $digest_hashes_ref && (ref $digest_hashes_ref eq 'ARRAY')) {
         foreach my $digest_entry (@{$digest_hashes_ref}) {
@@ -268,11 +268,10 @@ sub verify_tagmanifest {
 sub __create_xxmanifest {
     my ($self, $prefix, $files_ref) = @_;
     my $algo = $self->algorithm->name;
-    my $digestobj = $self->algorithm;
     my $bagit = $self->bagit->bag_path;
     my $manifest_file = File::Spec->catfile($self->bagit->metadata_path, "$prefix-${algo}.txt");
     # Generate digests for all of the files under ./data
-    my $digest_hashes_ref = $self->calc_digests($bagit, $digestobj, $files_ref);
+    my $digest_hashes_ref = $self->calc_digests($bagit, $files_ref);
     if (defined $digest_hashes_ref && (ref $digest_hashes_ref eq 'ARRAY')) {
         open(my $fh, ">:encoding(UTF-8)",$manifest_file) or croak("Cannot create $prefix-${algo}.txt: $!\n");
         foreach my $digest_entry (@{$digest_hashes_ref}) {
@@ -315,11 +314,11 @@ Archive::BagIt::Role::Manifest - A role that handles all manifest files for a sp
 
 =head1 VERSION
 
-version 0.075
+version 0.081
 
-=head2 calc_digests($bagit, $digestobj, $filenames_ref, $opts)
+=head2 calc_digests($bagit, $filenames_ref, $opts)
 
-Method to calculate and return all digests for a a list of files using a Digest-object. This method will be overwritten by C<Archive::BagIt::Fast>.
+Method to calculate and return all digests for a a list of files. This method will be overwritten by C<Archive::BagIt::Fast>.
 
 =head2 verify_manifest($payload_files, $return_all_errors)
 

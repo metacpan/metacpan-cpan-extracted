@@ -5,7 +5,7 @@ Getopt::EX::Hashed - Hash store object automation
 
 # VERSION
 
-Version 0.9919
+Version 0.9920
 
 # SYNOPSIS
 
@@ -15,11 +15,13 @@ Version 0.9919
     package App::foo;
 
     use Getopt::EX::Hashed;
-    has start  => ( spec => "=i s begin", default => 1 );
-    has end    => ( spec => "=i e" );
-    has file   => ( spec => "=s", is => 'rw', re => qr/^(?!\.)/ );
-    has score  => ( spec => '=i', min => 0, max => 100 );
-    has answer => ( spec => '=i', must => sub { $_[1] == 42 } );
+    has start    => ( spec => "=i s begin", default => 1 );
+    has end      => ( spec => "=i e" );
+    has file     => ( spec => "=s", is => 'rw', re => qr/^(?!\.)/ );
+    has score    => ( spec => '=i', min => 0, max => 100 );
+    has answer   => ( spec => '=i', must => sub { $_[1] == 42 } );
+    has mouse    => ( spec => '=s', any => [ 'Frankie', 'Benjy' ] );
+    has question => ( spec => '=s', re => qr/^(life|universe|everything)$/i);
     no  Getopt::EX::Hashed;
 
     sub run {
@@ -159,7 +161,26 @@ for common rules.
 
     Set the minimum and maximum limit for the argument.
 
-- **re** => qr/_pattern_/
+- **any** => _arrayref_ | qr/_regex_/
+
+    Set the valid string parameter list.  Each item is string or regex
+    reference.  The argument is valid when it is same as, or match to any
+    item of the given list.  If the value is not a arrayref, it is taken
+    as a single item list (regexpref usually).
+
+    Following declarations are almost equivalent, except second one is
+    case insensitive.
+
+        has question => '=s',
+            any => [ 'life', 'universe', 'everything ];
+
+        has question => '=s',
+            any => qr/^(life|universe|everything)$/i;
+
+- **re** => qr/_regex_/
+
+    This parameter will be deprecated soon, because **any** works same.
+    Don't use.
 
     Set the required regular expression pattern for the argument.
 

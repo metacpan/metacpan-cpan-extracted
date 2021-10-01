@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.52;
+package Object::Pad 0.53;
 
 use v5.14;
 use warnings;
@@ -440,6 +440,30 @@ I<Since version 0.28> all of these generated accessor methods will include
 argument checking similar to that used by subroutine signatures, to ensure the
 correct number of arguments are passed - usually zero, but exactly one in the
 case of a C<:writer> method.
+
+=head3 :accessor, :accessor(NAME)
+
+I<Since version 0.53.>
+
+Generates a combined reader-writer accessor method to set or return the value
+of the slot. These are only permitted for scalar slots. If no name is given,
+the name of the slot is used. A prefix character C<_> will be removed if
+present.
+
+This method takes either zero or one additional arguments. If an argument is
+passed, the value of the slot is set from this argument (even if it is
+C<undef>). If no argument is passed (i.e. C<scalar @_> is false) then the slot
+is not modified. In either case, the value of the slot is then returned.
+
+   has $slot :accessor;
+
+   # equivalent to
+   has $slot;
+
+   method slot {
+      $slot = shift if @_;
+      return $slot;
+   }
 
 =head3 :weak
 

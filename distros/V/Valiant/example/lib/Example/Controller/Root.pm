@@ -33,14 +33,6 @@ sub root :Chained(/) PathPart('') CaptureArgs(0) { }
     sub profile :Chained(auth) PathPart('profile') Args(0) {
       my ($self, $c) = @_;
       
-      my %params = %{$c->req->body_data||+{}};
-      %params = %{$params{person}} if exists $params{person};
-
-      Dwarn my $profile_params = $c->model('ProfileParams', a=>1);
-      Dwarn $profile_params->tags;
-      Dwarn "sdfsdfsdfsd";
-
-
       $c->stash(states => $c->model('Schema::State'));
       $c->stash(person => my $model = $c->model('Schema::Person')
         ->find(
@@ -51,17 +43,22 @@ sub root :Chained(/) PathPart('') CaptureArgs(0) { }
 
       $model->namespace('Example');
 
-      if($c->req->method eq 'POST') {
-        $params{roles} = [] unless exists($params{roles}) || exists($c->req->body_data->{person}) ; # Handle the delete all case
+      if(
+        ($c->req->method eq 'POST') && 
+        (my %params = %{ $c->req->body_data->{person}||+{} })
+      ) {
 
-        if(exists($c->req->body_data->{person})) {
-          $params{person_roles} = [] unless exists($params{person_roles});
-        }
+        my $add = delete $c->req->body_data->{add};
+        $params{person_roles} = [] unless exists($params{person_roles});
 
-        my $add = delete $params{add};
-      Dwarn \%params;
+        Dwarn ['params' => \%params];
+
         $model->context('profile')->update(\%params);
-        $model->build_related('credit_cards') if $add->{credit_cards};
+        
+        Dwarn ['errors' => +{ $model->errors->to_hash(full_messages=>1) }] if $model->invalid;
+
+        $model->build_related_if_empty('profile');
+        $model->build_related('credit_cards') if $add->{credit_cards}; # Doing this here means we don't trigger the 'too many' constraint :(
       }
     }
 

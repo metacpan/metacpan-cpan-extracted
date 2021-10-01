@@ -70,9 +70,9 @@ Math::BigInt::Constant - arbitrary sized constant integers
 
     $x->round($A,$P,$round_mode); # round to accuracy or precision using mode $r
     $x->bround($N);               # accuracy: preserve $N digits
-    $x->bfround($N);              # round to $Nth digit, no-op for BigInts
+    $x->bfround($N);              # round to $Nth digit, no-op for Math::BigInt objects
 
-    # The following do not modify their arguments in BigInt, so they are allowed:
+    # The following do not modify their arguments in Math::BigInt, so they are allowed:
     $x->bfloor();                 # return integer less or equal than $x
     $x->bceil();                  # return integer greater or equal than $x
 
@@ -84,17 +84,18 @@ Math::BigInt::Constant - arbitrary sized constant integers
     $x->length();                 # return number of digits in number
     $x->digit($n);                # extract N'th digit from number
 
-    $x->as_int();                 # return a copy of the object as BigInt
+    $x->as_int();                 # return a copy of the object as Math::BigInt
     $x->as_hex();                 # return number as hex string
     $x->as_bin();                 # return number as binary string
     $x->as_oct();                 # return number as octal string
 
 # DESCRIPTION
 
-With this module you can define constant BigInts on a per-object basis. The
-usual `use Math::BigInt ':constant'` will catch **all** integer constants
-in the script at compile time, but will not let you create constant values
-on the fly, nor work for strings and/or floating point constants like `1e5`.
+With this module you can define constant Math::BigInt objects on a per-object
+basis. The usual `use Math::BigInt ':constant'` will catch **all** integer
+constants in the script at compile time, but will not let you create constant
+values on the fly, nor work for strings and/or floating point constants like
+`1e5`.
 
 `Math::BigInt::Constant` is a true subclass of [Math::BigInt](https://metacpan.org/pod/Math%3A%3ABigInt) and can do all
 the same things - except modifying any of the objects.
@@ -127,7 +128,7 @@ A `Math::BigInt::Constant` object has all the same methods as a
 # BUGS
 
 Please report any bugs or feature requests to
-`bug-math-bigrat at rt.cpan.org`, or through the web interface at
+`bug-math-bigint-constant at rt.cpan.org`, or through the web interface at
 [https://rt.cpan.org/Ticket/Create.html?Queue=Math-BigInt-Constant](https://rt.cpan.org/Ticket/Create.html?Queue=Math-BigInt-Constant)
 (requires login).
 We will be notified, and then you'll automatically be notified of progress on

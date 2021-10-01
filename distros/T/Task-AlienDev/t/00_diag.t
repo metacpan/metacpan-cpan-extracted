@@ -15,8 +15,13 @@ $modules{$_} = $_ for qw(
   App::af
   Dist::Zilla::MintingProfile::AlienBuild
   Dist::Zilla::Plugin::AlienBuild
+  Env::ShellWords
   ExtUtils::MakeMaker
+  File::Listing
+  Mojo::DOM58
+  Sort::Versions
   Test2::V0
+  URI
 );
 
 

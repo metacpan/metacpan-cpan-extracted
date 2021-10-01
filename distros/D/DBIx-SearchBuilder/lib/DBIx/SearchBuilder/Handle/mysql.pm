@@ -323,6 +323,12 @@ sub DequoteName {
     return $name;
 }
 
+sub _ExtractBindValues {
+    my $self  = shift;
+    my $value = shift;
+    return $self->SUPER::_ExtractBindValues( $value, '\\' );
+}
+
 sub _IsMariaDB {
     my $self = shift;
 

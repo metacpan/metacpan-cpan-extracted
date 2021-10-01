@@ -1,12 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/tabledata/tabledata
-# and generated automatically using Perinci::CmdLine::Gen version 0.498
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-11'; # DATE
-our $DIST = 'App-tabledata'; # DIST
-our $VERSION = '0.001'; # VERSION
+# and generated automatically using Perinci::CmdLine::Gen version 0.500
 
 use 5.010001;
 use strict;
@@ -14,6 +9,11 @@ use warnings;
 use Log::ger;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-09-28'; # DATE
+our $DIST = 'App-tabledata'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/tabledata/tabledata",
@@ -39,18 +39,13 @@ tabledata - Show content of TableData modules (plus a few other things)
 
 =head1 VERSION
 
-This document describes version 0.001 of tabledata (from Perl distribution App-tabledata), released on 2021-06-11.
+This document describes version 0.002 of tabledata (from Perl distribution App-tabledata), released on 2021-09-28.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % tabledata [-L] [-R] [--action=s] [--config-path=path | -c]
-     [--config-profile=profile | -P] [--debug] [--detail] [--format=name]
-     [--json] [-l] [--log-level=level] [-n=s] [--(no)naked-res]
-     [--no-config | -C] [--no-detail] [--no-env] [--nodetail] [--num=s]
-     [--page-result[=program]] [--quiet] [--trace] [--verbose]
-     [--view-result[=program]] [module]
+% B<tabledata> [B<--action>=I<str>] [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--detail>|B<-l>|B<--no-detail>|B<--nodetail>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--no-env>] [B<--num>=I<posint>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<-H>|B<-L>|B<-R>|B<--actions>] [B<-n>=I<posint>] -- [I<module>]
 
 =head1 OPTIONS
 
@@ -68,7 +63,13 @@ Default value:
 
 Valid values:
 
- ["list_actions","list_installed","dump_as_aoaos","dump_as_aohos","dump_as_csv","list_columns","count_rows","pick_rows"]
+ ["list_actions","list_installed","dump_as_aoaos","dump_as_aohos","dump_as_csv","list_columns","count_rows","pick_rows","head"]
+
+=item B<--actions>
+
+List available actions (alias for --action=list_actions).
+
+See C<--action>.
 
 =item B<--detail>, B<-l>
 
@@ -78,15 +79,21 @@ Can also be specified as the 1st command-line argument.
 
 =item B<--num>=I<s>, B<-n>
 
-Number of rows to pick (for -R).
+Number of rows to get (e.g. for pick_rows or head action).
 
 Default value:
 
  1
 
+=item B<-H>
+
+Get the first N row(s) (alias for --action=head).
+
+See C<--action>.
+
 =item B<-L>
 
-List installed TableData::*.
+List installed TableData::* (alias for --action=list_installed).
 
 See C<--action>.
 
@@ -310,6 +317,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-tabled
 
 Source repository is at L<https://github.com/perlancar/perl-App-tabledata>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-tabledata>
@@ -317,16 +352,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

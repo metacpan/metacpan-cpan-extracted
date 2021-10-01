@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::FFTW3;
 
 our @EXPORT_OK = qw( fft1 ifft1 rfft1 rNfft1 irfft1 fft2 ifft2 rfft2 rNfft2 irfft2 fft3 ifft3 rfft3 rNfft3 irfft3 fft4 ifft4 rfft4 rNfft4 irfft4 fft5 ifft5 rfft5 rNfft5 irfft5 fft6 ifft6 rfft6 rNfft6 irfft6 fft7 ifft7 rfft7 rNfft7 irfft7 fft8 ifft8 rfft8 rNfft8 irfft8 fft9 ifft9 rfft9 rNfft9 irfft9 fft10 ifft10 rfft10 rNfft10 irfft10 fftn ifftn rfftn irfftn );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
-   our $VERSION = '0.16';
+   our $VERSION = '0.17';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::FFTW3 $VERSION;
+
 
 
 
@@ -308,6 +307,7 @@ under the terms of the GNU General Public License.
 
 use strict;
 use warnings;
+
 
 
 
@@ -1283,5 +1283,3 @@ sub irfftn  { _rank_springboard( "irfft", @_ ) }
 # Exit with OK status
 
 1;
-
-		   

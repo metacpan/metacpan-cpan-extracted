@@ -145,7 +145,7 @@ export-itol.pl - Download formatted trees from iTOL
 
 =head1 VERSION
 
-version 0.212650
+version 0.212670
 
 =head1 USAGE
 

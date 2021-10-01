@@ -39,7 +39,7 @@
 # more extensive use of Chess::Plisco::Macro.
 
 package Chess::Plisco;
-$Chess::Plisco::VERSION = '0.2';
+$Chess::Plisco::VERSION = '0.3';
 use strict;
 use integer;
 no warnings qw(portable);
@@ -49,7 +49,7 @@ use Locale::TextDomain qw('Chess-Plisco');
 use Scalar::Util qw(reftype);
 use Config;
 
-use Chess::Plisco::Macro;
+# Macros from Chess::Plisco::Macro are already expanded here!
 
 use base qw(Exporter);
 
@@ -89,7 +89,8 @@ use constant CP_POS_HALF_MOVE_CLOCK => 9;
 use constant CP_POS_INFO => 10;
 use constant CP_POS_EVASION_SQUARES => 11;
 use constant CP_POS_SIGNATURE => 12;
-use constant CP_POS_IN_CHECK => 13;
+use constant CP_POS_REVERSIBLE_CLOCK => 13;
+use constant CP_POS_IN_CHECK => 14;
 
 # How to evade a check?
 use constant CP_EVASION_ALL => 0;
@@ -200,6 +201,9 @@ use constant CP_RANK_5 => (4);
 use constant CP_RANK_6 => (5);
 use constant CP_RANK_7 => (6);
 use constant CP_RANK_8 => (7);
+
+use constant CP_WHITE_MASK => 0x5555555555555555;
+use constant CP_BLACK_MASK => 0xaaaaaaaaaaaaaaaa;
 
 use constant CP_PIECE_CHARS => [
 	['', 'P', 'N', 'B', 'R', 'Q', 'K'],
@@ -337,7 +341,7 @@ my @piece_values = (0, CP_PAWN_VALUE, CP_KNIGHT_VALUE, CP_BISHOP_VALUE,
 	CP_ROOK_VALUE, CP_QUEEN_VALUE);
 
 # Do not remove this line!
-# __BEGIN_MACROS__
+
 
 sub new {
 	my ($class, $fen) = @_;
@@ -345,32 +349,33 @@ sub new {
 	return $class->newFromFEN($fen) if defined $fen && length $fen;
 
 	my $self = bless [], $class;
-	cp_pos_white_pieces($self) = CP_1_MASK | CP_2_MASK;
-	cp_pos_black_pieces($self) = CP_8_MASK | CP_7_MASK,
-	cp_pos_kings($self) = (CP_1_MASK | CP_8_MASK) & CP_E_MASK;
-	cp_pos_queens($self) = (CP_D_MASK & CP_1_MASK)
+	$self->[CP_POS_WHITE_PIECES] = CP_1_MASK | CP_2_MASK;
+	$self->[CP_POS_BLACK_PIECES] = CP_8_MASK | CP_7_MASK,
+	$self->[CP_POS_KINGS] = (CP_1_MASK | CP_8_MASK) & CP_E_MASK;
+	$self->[CP_POS_QUEENS] = (CP_D_MASK & CP_1_MASK)
 			| (CP_D_MASK & CP_8_MASK);
-	cp_pos_rooks($self) = ((CP_A_MASK | CP_H_MASK) & CP_1_MASK)
+	$self->[CP_POS_ROOKS] = ((CP_A_MASK | CP_H_MASK) & CP_1_MASK)
 			| ((CP_A_MASK | CP_H_MASK) & CP_8_MASK);
-	cp_pos_bishops($self) = ((CP_C_MASK | CP_F_MASK) & CP_1_MASK)
+	$self->[CP_POS_BISHOPS] = ((CP_C_MASK | CP_F_MASK) & CP_1_MASK)
 			| ((CP_C_MASK | CP_F_MASK) & CP_8_MASK);
-	cp_pos_knights($self) = ((CP_B_MASK | CP_G_MASK) & CP_1_MASK)
+	$self->[CP_POS_KNIGHTS] = ((CP_B_MASK | CP_G_MASK) & CP_1_MASK)
 			| ((CP_B_MASK | CP_G_MASK) & CP_8_MASK);
-	cp_pos_pawns($self) = CP_2_MASK | CP_7_MASK;
-	cp_pos_half_move_clock($self) = 0;
-	cp_pos_half_moves($self) = 0;
+	$self->[CP_POS_PAWNS] = CP_2_MASK | CP_7_MASK;
+	$self->[CP_POS_HALF_MOVE_CLOCK] = 0;
+	$self->[CP_POS_REVERSIBLE_CLOCK] = 0;
+	$self->[CP_POS_HALF_MOVES] = 0;
 
 	my $info = 0;
-	_cp_pos_info_set_white_king_side_castling_right($info, 1);
-	_cp_pos_info_set_white_queen_side_castling_right($info, 1);
-	_cp_pos_info_set_black_king_side_castling_right($info, 1);
-	_cp_pos_info_set_black_queen_side_castling_right($info, 1);
-	_cp_pos_info_set_to_move($info, CP_WHITE);
-	_cp_pos_info_set_en_passant_shift($info, 0);
-	cp_pos_info($self) = $info;
+	($info = ($info & ~(1 << 0)) | (1 << 0));
+	($info = ($info & ~(1 << 1)) | (1 << 1));
+	($info = ($info & ~(1 << 2)) | (1 << 2));
+	($info = ($info & ~(1 << 3)) | (1 << 3));
+	($info = ($info & ~(1 << 4)) | (CP_WHITE << 4));
+	($info = ($info & ~(0x3f << 5)) | (0 << 5));
+	$self->[CP_POS_INFO] = $info;
 	
 	$self->__updateZobristKey;
-	_cp_pos_info_update $self, $info;
+	(do {	my $c = (($info & (1 << 4)) >> 4);	my $kings = $self->[CP_POS_KINGS]		& ($c ? $self->[CP_POS_BLACK_PIECES] : $self->[CP_POS_WHITE_PIECES]);	my $king_shift = (do {	my $A = $kings - 1 - ((($kings - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});	($info = ($info & ~(0x3f << 11)) | ($king_shift << 11));	my $checkers = $self->[CP_POS_IN_CHECK] = (do {	my $her_color = !$c;	my $her_pieces = $self->[CP_POS_WHITE_PIECES + $her_color];	my $occupancy = $self->[CP_POS_WHITE_PIECES + $c] | $her_pieces;	my $queens = $self->[CP_POS_QUEENS];	$her_pieces		& (($pawn_masks[$c]->[2]->[$king_shift] & $self->[CP_POS_PAWNS])			| ($knight_attack_masks[$king_shift] & $self->[CP_POS_KNIGHTS])			| ($king_attack_masks[$king_shift] & $self->[CP_POS_KINGS])			| (CP_MAGICMOVESBDB->[$king_shift][(((($occupancy) & CP_MAGICMOVES_B_MASK->[$king_shift]) * CP_MAGICMOVES_B_MAGICS->[$king_shift]) >> 55) & ((1 << (64 - 55)) - 1)] & ($queens | $self->[CP_POS_BISHOPS]))			| (CP_MAGICMOVESRDB->[$king_shift][(((($occupancy) & CP_MAGICMOVES_R_MASK->[$king_shift]) * CP_MAGICMOVES_R_MAGICS->[$king_shift]) >> 52) & ((1 << (64 - 52)) - 1)] & ($queens | $self->[CP_POS_ROOKS])));});	if ($checkers) {		if ($checkers & ($checkers - 1)) {			($info = ($info & ~(0x3 << 17)) | (CP_EVASION_KING_MOVE << 17));		} elsif ($checkers & ($self->[CP_POS_KNIGHTS] | ($self->[CP_POS_PAWNS]))) {			($info = ($info & ~(0x3 << 17)) | (CP_EVASION_CAPTURE << 17));			$self->[CP_POS_EVASION_SQUARES] = $checkers;		} else {			($info = ($info & ~(0x3 << 17)) | (CP_EVASION_ALL << 17));			my $piece_shift = (do {	my $A = $checkers - 1 - ((($checkers - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});			my ($attack_type, undef, $attack_ray) =				@{$common_lines[$king_shift]->[$piece_shift]};			if ($attack_ray) {				$self->[CP_POS_EVASION_SQUARES] = $attack_ray;			} else {				$self->[CP_POS_EVASION_SQUARES] = $checkers;			}		}	}	$self->[CP_POS_INFO] = $info;});
 	
 	return $self;
 }
@@ -476,11 +481,11 @@ sub newFromFEN {
 
 	my $popcount;
 
-	cp_bitboard_popcount $w_pieces & $kings, $popcount;
+	{ my $_b = $w_pieces & $kings; for ($popcount = 0; $_b; ++$popcount) { $_b &= $_b - 1; } };
 	if ($popcount != 1) {
 		die __"Illegal FEN: White must have exactly one king.\n";
 	}
-	cp_bitboard_popcount $b_pieces & $kings, $popcount;
+	{ my $_b = $b_pieces & $kings; for ($popcount = 0; $_b; ++$popcount) { $_b &= $_b - 1; } };
 	if ($popcount != 1) {
 		die __"Illegal FEN: Black must have exactly one king.\n";
 	}
@@ -497,12 +502,12 @@ sub newFromFEN {
 	$self->[CP_POS_PAWNS] = $pawns;
 
 	my $pos_info = 0;
-	_cp_pos_info_set_material($pos_info, $material);
+	($pos_info = (($pos_info & 0x7fffffff) | ($material << 19)));
 
 	if ('w' eq lc $color) {
-		_cp_pos_info_set_to_move($pos_info, CP_WHITE);
+		($pos_info = ($pos_info & ~(1 << 4)) | (CP_WHITE << 4));
 	} elsif ('b' eq lc $color) {
-		_cp_pos_info_set_to_move($pos_info, CP_BLACK);
+		($pos_info = ($pos_info & ~(1 << 4)) | (CP_BLACK << 4));
 	} else {
 		die __x"Illegal FEN: Side to move is neither 'w' nor 'b'.\n";
 	}
@@ -529,64 +534,64 @@ sub newFromFEN {
 	if ($castling =~ /K/) {
 		($piece_type, $piece_color) = $self->pieceAtShift(CP_H1);
 		if ($piece_type && $piece_type == CP_ROOK && $piece_color == CP_WHITE) {
-			_cp_pos_info_set_white_king_side_castling_right($pos_info, 1);
+			($pos_info = ($pos_info & ~(1 << 0)) | (1 << 0));
 		}
 	}
 	if ($castling =~ /Q/) {
 		($piece_type, $piece_color) = $self->pieceAtShift(CP_A1);
 		if ($piece_type && $piece_type == CP_ROOK && $piece_color == CP_WHITE) {
-			_cp_pos_info_set_white_queen_side_castling_right($pos_info, 1);
+			($pos_info = ($pos_info & ~(1 << 1)) | (1 << 1));
 		}
 	}
 	if ($castling =~ /k/) {
 		($piece_type, $piece_color) = $self->pieceAtShift(CP_H8);
 		if ($piece_type && $piece_type == CP_ROOK && $piece_color == CP_BLACK) {
-			_cp_pos_info_set_black_king_side_castling_right($pos_info, 1);
+			($pos_info = ($pos_info & ~(1 << 2)) | (1 << 2));
 		}
 	}
 	if ($castling =~ /q/) {
 		($piece_type, $piece_color) = $self->pieceAtShift(CP_A8);
 		if ($piece_type && $piece_type == CP_ROOK && $piece_color == CP_BLACK) {
-			_cp_pos_info_set_black_queen_side_castling_right($pos_info, 1);
+			($pos_info = ($pos_info & ~(1 << 3)) | (1 << 3));
 		}
 	}
 
-	my $to_move = cp_pos_info_to_move($pos_info);
+	my $to_move = (($pos_info & (1 << 4)) >> 4);
 	if ('-' eq $ep_square) {
-		_cp_pos_info_set_en_passant_shift($pos_info, 0);
+		($pos_info = ($pos_info & ~(0x3f << 5)) | (0 << 5));
 	} elsif ($to_move == CP_WHITE && $ep_square =~ /^[a-h]6$/) {
 		my $ep_shift = $self->squareToShift($ep_square);
 		if ((1 << ($ep_shift - 8)) & $self->[CP_POS_BLACK_PIECES]
 		    & $self->[CP_POS_PAWNS]) {
-			_cp_pos_info_set_en_passant_shift($pos_info, $self->squareToShift($ep_square));
+			($pos_info = ($pos_info & ~(0x3f << 5)) | ($self->squareToShift($ep_square) << 5));
 		}
 	} elsif ($to_move == CP_BLACK && $ep_square =~ /^[a-h]3$/) {
 		my $ep_shift = $self->squareToShift($ep_square);
 		if ((1 << ($ep_shift + 8)) & $self->[CP_POS_WHITE_PIECES]
 		    & $self->[CP_POS_PAWNS]) {
-			_cp_pos_info_set_en_passant_shift($pos_info, $self->squareToShift($ep_square));
+			($pos_info = ($pos_info & ~(0x3f << 5)) | ($self->squareToShift($ep_square) << 5));
 		}
 	}
 
-	cp_pos_info($self) = $pos_info;
+	$self->[CP_POS_INFO] = $pos_info;
 
 	if ($hmc !~ /^0|[1-9][0-9]*$/) {
 		$hmc = 0;
 	}
-	$self->[CP_POS_HALF_MOVE_CLOCK] = $hmc;
+	$self->[CP_POS_HALF_MOVE_CLOCK] = $self->[CP_POS_REVERSIBLE_CLOCK] = $hmc;
 
 	if ($moveno !~ /^[1-9][0-9]*$/) {
 		$moveno = 1;
 	}
 
-	if (cp_pos_to_move($self) == CP_WHITE) {
+	if (((($self->[CP_POS_INFO] & (1 << 4)) >> 4)) == CP_WHITE) {
 			$self->[CP_POS_HALF_MOVES] = ($moveno - 1) << 1;
 	} else {
 			$self->[CP_POS_HALF_MOVES] = (($moveno - 1) << 1) + 1;
 	}
 
 	$self->__updateZobristKey;
-	_cp_pos_info_update $self, $pos_info;
+	(do {	my $c = (($pos_info & (1 << 4)) >> 4);	my $kings = $self->[CP_POS_KINGS]		& ($c ? $self->[CP_POS_BLACK_PIECES] : $self->[CP_POS_WHITE_PIECES]);	my $king_shift = (do {	my $A = $kings - 1 - ((($kings - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});	($pos_info = ($pos_info & ~(0x3f << 11)) | ($king_shift << 11));	my $checkers = $self->[CP_POS_IN_CHECK] = (do {	my $her_color = !$c;	my $her_pieces = $self->[CP_POS_WHITE_PIECES + $her_color];	my $occupancy = $self->[CP_POS_WHITE_PIECES + $c] | $her_pieces;	my $queens = $self->[CP_POS_QUEENS];	$her_pieces		& (($pawn_masks[$c]->[2]->[$king_shift] & $self->[CP_POS_PAWNS])			| ($knight_attack_masks[$king_shift] & $self->[CP_POS_KNIGHTS])			| ($king_attack_masks[$king_shift] & $self->[CP_POS_KINGS])			| (CP_MAGICMOVESBDB->[$king_shift][(((($occupancy) & CP_MAGICMOVES_B_MASK->[$king_shift]) * CP_MAGICMOVES_B_MAGICS->[$king_shift]) >> 55) & ((1 << (64 - 55)) - 1)] & ($queens | $self->[CP_POS_BISHOPS]))			| (CP_MAGICMOVESRDB->[$king_shift][(((($occupancy) & CP_MAGICMOVES_R_MASK->[$king_shift]) * CP_MAGICMOVES_R_MAGICS->[$king_shift]) >> 52) & ((1 << (64 - 52)) - 1)] & ($queens | $self->[CP_POS_ROOKS])));});	if ($checkers) {		if ($checkers & ($checkers - 1)) {			($pos_info = ($pos_info & ~(0x3 << 17)) | (CP_EVASION_KING_MOVE << 17));		} elsif ($checkers & ($self->[CP_POS_KNIGHTS] | ($self->[CP_POS_PAWNS]))) {			($pos_info = ($pos_info & ~(0x3 << 17)) | (CP_EVASION_CAPTURE << 17));			$self->[CP_POS_EVASION_SQUARES] = $checkers;		} else {			($pos_info = ($pos_info & ~(0x3 << 17)) | (CP_EVASION_ALL << 17));			my $piece_shift = (do {	my $A = $checkers - 1 - ((($checkers - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});			my ($attack_type, undef, $attack_ray) =				@{$common_lines[$king_shift]->[$piece_shift]};			if ($attack_ray) {				$self->[CP_POS_EVASION_SQUARES] = $attack_ray;			} else {				$self->[CP_POS_EVASION_SQUARES] = $checkers;			}		}	}	$self->[CP_POS_INFO] = $pos_info;});
 
 	return $self;
 }
@@ -594,8 +599,8 @@ sub newFromFEN {
 sub pseudoLegalMoves {
 	my ($self) = @_;
 
-	my $pos_info = cp_pos_info $self;
-	my $to_move = cp_pos_info_to_move $pos_info;
+	my $pos_info = $self->[CP_POS_INFO];
+	my $to_move = (($pos_info & (1 << 4)) >> 4);
 	my $my_pieces = $self->[CP_POS_WHITE_PIECES + $to_move];
 	my $her_pieces = $self->[CP_POS_WHITE_PIECES + !$to_move];
 	my $occupancy = $my_pieces | $her_pieces;
@@ -606,18 +611,18 @@ sub pseudoLegalMoves {
 	# Generate king moves.  We take advantage of the fact that there is always
 	# exactly one king of each color on the board.  So there is no need for a
 	# loop.
-	my $king_mask = $my_pieces & cp_pos_kings $self;
+	my $king_mask = $my_pieces & $self->[CP_POS_KINGS];
 
-	my $from = cp_bitboard_count_isolated_trailing_zbits $king_mask;
+	my $from = (do {	my $A = $king_mask - 1 - ((($king_mask - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
 
 	$base_move = ($from << 6 | CP_KING << 15);
 
 	$target_mask = ~$my_pieces & $king_attack_masks[$from];
 
-	_cp_moves_from_mask $target_mask, @moves, $base_move;
+	while ($target_mask) {	push @moves, $base_move | (do {	my $B = $target_mask & -$target_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});	$target_mask = (($target_mask) & (($target_mask) - 1));};
 
-	my $in_check = cp_pos_in_check $self;
-	return @moves if $in_check && CP_EVASION_KING_MOVE == cp_pos_info_evasion($pos_info);
+	my $in_check = $self->[CP_POS_IN_CHECK];
+	return @moves if $in_check && CP_EVASION_KING_MOVE == (($pos_info & (0x3 << 17)) >> 17);
 
 	# Generate castlings.
 	# Mask out the castling rights for the side to move.
@@ -647,62 +652,62 @@ sub pseudoLegalMoves {
 	}
 
 	# Generate knight moves.
-	my $knight_mask = $my_pieces & cp_pos_knights $self;
+	my $knight_mask = $my_pieces & $self->[CP_POS_KNIGHTS];
 	while ($knight_mask) {
-		my $from = cp_bitboard_count_trailing_zbits $knight_mask;
+		my $from = (do {	my $B = $knight_mask & -$knight_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
 
 		$base_move = ($from << 6 | CP_KNIGHT << 15);
 	
 		$target_mask = ~$my_pieces & $knight_attack_masks[$from];
 
-		_cp_moves_from_mask $target_mask, @moves, $base_move;
+		while ($target_mask) {	push @moves, $base_move | (do {	my $B = $target_mask & -$target_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});	$target_mask = (($target_mask) & (($target_mask) - 1));};
 
-		$knight_mask = cp_bitboard_clear_least_set $knight_mask;
+		$knight_mask = (($knight_mask) & (($knight_mask) - 1));
 	}
 
 	# Generate bishop moves.
-	my $bishop_mask = $my_pieces & cp_pos_bishops $self;
+	my $bishop_mask = $my_pieces & $self->[CP_POS_BISHOPS];
 	while ($bishop_mask) {
-		my $from = cp_bitboard_count_trailing_zbits $bishop_mask;
+		my $from = (do {	my $B = $bishop_mask & -$bishop_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
 
 		$base_move = ($from << 6 | CP_BISHOP << 15);
 	
-		$target_mask = cp_mm_bmagic($from, $occupancy) & ($empty | $her_pieces);
+		$target_mask = CP_MAGICMOVESBDB->[$from][(((($occupancy) & CP_MAGICMOVES_B_MASK->[$from]) * CP_MAGICMOVES_B_MAGICS->[$from]) >> 55) & ((1 << (64 - 55)) - 1)] & ($empty | $her_pieces);
 
-		_cp_moves_from_mask $target_mask, @moves, $base_move;
+		while ($target_mask) {	push @moves, $base_move | (do {	my $B = $target_mask & -$target_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});	$target_mask = (($target_mask) & (($target_mask) - 1));};
 
-		$bishop_mask = cp_bitboard_clear_least_set $bishop_mask;
+		$bishop_mask = (($bishop_mask) & (($bishop_mask) - 1));
 	}
 
 	# Generate rook moves.
-	my $rook_mask = $my_pieces & cp_pos_rooks $self;
+	my $rook_mask = $my_pieces & $self->[CP_POS_ROOKS];
 	while ($rook_mask) {
-		my $from = cp_bitboard_count_trailing_zbits $rook_mask;
+		my $from = (do {	my $B = $rook_mask & -$rook_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
 
 		$base_move = ($from << 6 | CP_ROOK << 15);
 	
-		$target_mask = cp_mm_rmagic($from, $occupancy) & ($empty | $her_pieces);
+		$target_mask = CP_MAGICMOVESRDB->[$from][(((($occupancy) & CP_MAGICMOVES_R_MASK->[$from]) * CP_MAGICMOVES_R_MAGICS->[$from]) >> 52) & ((1 << (64 - 52)) - 1)] & ($empty | $her_pieces);
 
-		_cp_moves_from_mask $target_mask, @moves, $base_move;
+		while ($target_mask) {	push @moves, $base_move | (do {	my $B = $target_mask & -$target_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});	$target_mask = (($target_mask) & (($target_mask) - 1));};
 
-		$rook_mask = cp_bitboard_clear_least_set $rook_mask;
+		$rook_mask = (($rook_mask) & (($rook_mask) - 1));
 	}
 
 	# Generate queen moves.
-	my $queen_mask = $my_pieces & cp_pos_queens $self;
+	my $queen_mask = $my_pieces & $self->[CP_POS_QUEENS];
 	while ($queen_mask) {
-		my $from = cp_bitboard_count_trailing_zbits $queen_mask;
+		my $from = (do {	my $B = $queen_mask & -$queen_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
 
 		$base_move = ($from << 6 | CP_QUEEN << 15);
 	
 		$target_mask = 
-			(cp_mm_rmagic($from, $occupancy)
-				| cp_mm_bmagic($from, $occupancy))
+			(CP_MAGICMOVESRDB->[$from][(((($occupancy) & CP_MAGICMOVES_R_MASK->[$from]) * CP_MAGICMOVES_R_MAGICS->[$from]) >> 52) & ((1 << (64 - 52)) - 1)]
+				| CP_MAGICMOVESBDB->[$from][(((($occupancy) & CP_MAGICMOVES_B_MASK->[$from]) * CP_MAGICMOVES_B_MAGICS->[$from]) >> 55) & ((1 << (64 - 55)) - 1)])
 			& ($empty | $her_pieces);
 
-		_cp_moves_from_mask $target_mask, @moves, $base_move;
+		while ($target_mask) {	push @moves, $base_move | (do {	my $B = $target_mask & -$target_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});	$target_mask = (($target_mask) & (($target_mask) - 1));};
 
-		$queen_mask = cp_bitboard_clear_least_set $queen_mask;
+		$queen_mask = (($queen_mask) & (($queen_mask) - 1));
 	}
 
 	# Generate pawn moves.
@@ -712,29 +717,29 @@ sub pseudoLegalMoves {
 	my ($pawn_single_masks, $pawn_double_masks, $pawn_capture_masks) = 
 		@{$pawn_masks[$to_move]};
 
-	my $pawns = cp_pos_pawns $self;
+	my $pawns = $self->[CP_POS_PAWNS];
 
 	my $pawn_mask;
 
-	my $ep_shift = cp_pos_info_en_passant_shift $pos_info;
+	my $ep_shift = (($pos_info & (0x3f << 5)) >> 5);
 	my $ep_target_mask = $ep_shift ? (1 << $ep_shift) : 0; 
 
 	# Pawn single steps and captures w/o promotions.
 	$pawn_mask = $my_pieces & $pawns & $regular_mask;
 	while ($pawn_mask) {
-		my $from = cp_bitboard_count_trailing_zbits $pawn_mask;
+		my $from = (do {	my $B = $pawn_mask & -$pawn_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
 
 		$base_move = ($from << 6 | CP_PAWN << 15);
 		$target_mask = ($pawn_single_masks->[$from] & $empty)
 			| ($pawn_capture_masks->[$from] & ($her_pieces | $ep_target_mask));
-		_cp_moves_from_mask $target_mask, @moves, $base_move;
-		$pawn_mask = cp_bitboard_clear_least_set $pawn_mask;
+		while ($target_mask) {	push @moves, $base_move | (do {	my $B = $target_mask & -$target_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});	$target_mask = (($target_mask) & (($target_mask) - 1));};
+		$pawn_mask = (($pawn_mask) & (($pawn_mask) - 1));
 	}
 
 	# Pawn double steps.
 	$pawn_mask = $my_pieces & $pawns & $double_mask;
 	while ($pawn_mask) {
-		my $from = cp_bitboard_count_trailing_zbits $pawn_mask;
+		my $from = (do {	my $B = $pawn_mask & -$pawn_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
 		my $cross_mask = $pawn_single_masks->[$from] & $empty;
 
 		if ($cross_mask) {
@@ -744,19 +749,19 @@ sub pseudoLegalMoves {
 				push @moves, ($from << 6) | $to | CP_PAWN << 15;
 			}
 		}
-		$pawn_mask = cp_bitboard_clear_least_set $pawn_mask;
+		$pawn_mask = (($pawn_mask) & (($pawn_mask) - 1));
 	}
 
 	# Pawn promotions including captures.
 	$pawn_mask = $my_pieces & $pawns & ~$regular_mask;
 	while ($pawn_mask) {
-		my $from = cp_bitboard_count_trailing_zbits $pawn_mask;
+		my $from = (do {	my $B = $pawn_mask & -$pawn_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
 
 		$base_move = ($from << 6 | CP_PAWN << 15);
 		$target_mask = ($pawn_single_masks->[$from] & $empty)
 			| ($pawn_capture_masks->[$from] & ($her_pieces | $ep_target_mask));
-		_cp_promotion_moves_from_mask $target_mask, @moves, $base_move;
-		$pawn_mask = cp_bitboard_clear_least_set $pawn_mask;
+		while ($target_mask) {	my $base_move = $base_move | (do {	my $B = $target_mask & -$target_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});	push @moves,		$base_move | (CP_QUEEN << 12),		$base_move | (CP_ROOK << 12),		$base_move | (CP_BISHOP << 12),		$base_move | (CP_KNIGHT << 12);	$target_mask = (($target_mask) & (($target_mask) - 1));};
+		$pawn_mask = (($pawn_mask) & (($pawn_mask) - 1));
 	}
 
 	return @moves;
@@ -765,8 +770,8 @@ sub pseudoLegalMoves {
 sub pseudoLegalAttacks {
 	my ($self) = @_;
 
-	my $pos_info = cp_pos_info $self;
-	my $to_move = cp_pos_info_to_move $pos_info;
+	my $pos_info = $self->[CP_POS_INFO];
+	my $to_move = (($pos_info & (1 << 4)) >> 4);
 	my $my_pieces = $self->[CP_POS_WHITE_PIECES + $to_move];
 	my $her_pieces = $self->[CP_POS_WHITE_PIECES + !$to_move];
 	my $occupancy = $my_pieces | $her_pieces;
@@ -776,73 +781,73 @@ sub pseudoLegalAttacks {
 	# Generate king moves.  We take advantage of the fact that there is always
 	# exactly one king of each color on the board.  So there is no need for a
 	# loop.
-	my $king_mask = $my_pieces & cp_pos_kings $self;
+	my $king_mask = $my_pieces & $self->[CP_POS_KINGS];
 
-	my $from = cp_bitboard_count_isolated_trailing_zbits $king_mask;
+	my $from = (do {	my $A = $king_mask - 1 - ((($king_mask - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
 
 	$base_move = ($from << 6 | CP_KING << 15);
 
 	$target_mask = $her_pieces & $king_attack_masks[$from];
 
-	_cp_moves_from_mask $target_mask, @moves, $base_move;
+	while ($target_mask) {	push @moves, $base_move | (do {	my $B = $target_mask & -$target_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});	$target_mask = (($target_mask) & (($target_mask) - 1));};
 
 	# Generate knight moves.
-	my $knight_mask = $my_pieces & cp_pos_knights $self;
+	my $knight_mask = $my_pieces & $self->[CP_POS_KNIGHTS];
 	while ($knight_mask) {
-		my $from = cp_bitboard_count_trailing_zbits $knight_mask;
+		my $from = (do {	my $B = $knight_mask & -$knight_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
 
 		$base_move = ($from << 6 | CP_KNIGHT << 15);
 	
 		$target_mask = $her_pieces & $knight_attack_masks[$from];
 
-		_cp_moves_from_mask $target_mask, @moves, $base_move;
+		while ($target_mask) {	push @moves, $base_move | (do {	my $B = $target_mask & -$target_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});	$target_mask = (($target_mask) & (($target_mask) - 1));};
 
-		$knight_mask = cp_bitboard_clear_least_set $knight_mask;
+		$knight_mask = (($knight_mask) & (($knight_mask) - 1));
 	}
 
 	# Generate bishop moves.
-	my $bishop_mask = $my_pieces & cp_pos_bishops $self;
+	my $bishop_mask = $my_pieces & $self->[CP_POS_BISHOPS];
 	while ($bishop_mask) {
-		my $from = cp_bitboard_count_trailing_zbits $bishop_mask;
+		my $from = (do {	my $B = $bishop_mask & -$bishop_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
 
 		$base_move = ($from << 6 | CP_BISHOP << 15);
 	
-		$target_mask = cp_mm_bmagic($from, $occupancy) & $her_pieces;
+		$target_mask = CP_MAGICMOVESBDB->[$from][(((($occupancy) & CP_MAGICMOVES_B_MASK->[$from]) * CP_MAGICMOVES_B_MAGICS->[$from]) >> 55) & ((1 << (64 - 55)) - 1)] & $her_pieces;
 
-		_cp_moves_from_mask $target_mask, @moves, $base_move;
+		while ($target_mask) {	push @moves, $base_move | (do {	my $B = $target_mask & -$target_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});	$target_mask = (($target_mask) & (($target_mask) - 1));};
 
-		$bishop_mask = cp_bitboard_clear_least_set $bishop_mask;
+		$bishop_mask = (($bishop_mask) & (($bishop_mask) - 1));
 	}
 
 	# Generate rook moves.
-	my $rook_mask = $my_pieces & cp_pos_rooks $self;
+	my $rook_mask = $my_pieces & $self->[CP_POS_ROOKS];
 	while ($rook_mask) {
-		my $from = cp_bitboard_count_trailing_zbits $rook_mask;
+		my $from = (do {	my $B = $rook_mask & -$rook_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
 
 		$base_move = ($from << 6 | CP_ROOK << 15);
 	
-		$target_mask = cp_mm_rmagic($from, $occupancy) & $her_pieces;
+		$target_mask = CP_MAGICMOVESRDB->[$from][(((($occupancy) & CP_MAGICMOVES_R_MASK->[$from]) * CP_MAGICMOVES_R_MAGICS->[$from]) >> 52) & ((1 << (64 - 52)) - 1)] & $her_pieces;
 
-		_cp_moves_from_mask $target_mask, @moves, $base_move;
+		while ($target_mask) {	push @moves, $base_move | (do {	my $B = $target_mask & -$target_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});	$target_mask = (($target_mask) & (($target_mask) - 1));};
 
-		$rook_mask = cp_bitboard_clear_least_set $rook_mask;
+		$rook_mask = (($rook_mask) & (($rook_mask) - 1));
 	}
 
 	# Generate queen moves.
-	my $queen_mask = $my_pieces & cp_pos_queens $self;
+	my $queen_mask = $my_pieces & $self->[CP_POS_QUEENS];
 	while ($queen_mask) {
-		my $from = cp_bitboard_count_trailing_zbits $queen_mask;
+		my $from = (do {	my $B = $queen_mask & -$queen_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
 
 		$base_move = ($from << 6 | CP_QUEEN << 15);
 	
 		$target_mask = 
-			(cp_mm_rmagic($from, $occupancy)
-				| cp_mm_bmagic($from, $occupancy))
+			(CP_MAGICMOVESRDB->[$from][(((($occupancy) & CP_MAGICMOVES_R_MASK->[$from]) * CP_MAGICMOVES_R_MAGICS->[$from]) >> 52) & ((1 << (64 - 52)) - 1)]
+				| CP_MAGICMOVESBDB->[$from][(((($occupancy) & CP_MAGICMOVES_B_MASK->[$from]) * CP_MAGICMOVES_B_MAGICS->[$from]) >> 55) & ((1 << (64 - 55)) - 1)])
 			& $her_pieces;
 
-		_cp_moves_from_mask $target_mask, @moves, $base_move;
+		while ($target_mask) {	push @moves, $base_move | (do {	my $B = $target_mask & -$target_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});	$target_mask = (($target_mask) & (($target_mask) - 1));};
 
-		$queen_mask = cp_bitboard_clear_least_set $queen_mask;
+		$queen_mask = (($queen_mask) & (($queen_mask) - 1));
 	}
 
 	# Generate pawn moves.
@@ -852,34 +857,34 @@ sub pseudoLegalAttacks {
 	my ($pawn_single_masks, $pawn_double_masks, $pawn_capture_masks) = 
 		@{$pawn_masks[$to_move]};
 
-	my $pawns = cp_pos_pawns $self;
+	my $pawns = $self->[CP_POS_PAWNS];
 
 	my $pawn_mask;
 
-	my $ep_shift = cp_pos_info_en_passant_shift $pos_info;
+	my $ep_shift = (($pos_info & (0x3f << 5)) >> 5);
 	my $ep_target_mask = $ep_shift ? (1 << $ep_shift) : 0; 
 
 	# Pawn captures w/o promotions.
 	$pawn_mask = $my_pieces & $pawns & $regular_mask;
 	while ($pawn_mask) {
-		my $from = cp_bitboard_count_trailing_zbits $pawn_mask;
+		my $from = (do {	my $B = $pawn_mask & -$pawn_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
 
 		$base_move = ($from << 6 | CP_PAWN << 15);
 		$target_mask = ($pawn_capture_masks->[$from] & ($her_pieces | $ep_target_mask));
-		_cp_moves_from_mask $target_mask, @moves, $base_move;
-		$pawn_mask = cp_bitboard_clear_least_set $pawn_mask;
+		while ($target_mask) {	push @moves, $base_move | (do {	my $B = $target_mask & -$target_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});	$target_mask = (($target_mask) & (($target_mask) - 1));};
+		$pawn_mask = (($pawn_mask) & (($pawn_mask) - 1));
 	}
 
 	# Pawn promotions including captures.
 	$pawn_mask = $my_pieces & $pawns & ~$regular_mask;
 	while ($pawn_mask) {
-		my $from = cp_bitboard_count_trailing_zbits $pawn_mask;
+		my $from = (do {	my $B = $pawn_mask & -$pawn_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
 
 		$base_move = ($from << 6 | CP_PAWN << 15);
 		$target_mask = ($pawn_single_masks->[$from] & ~$her_pieces)
 			| ($pawn_capture_masks->[$from] & ($her_pieces | $ep_target_mask));
-		_cp_promotion_moves_from_mask $target_mask, @moves, $base_move;
-		$pawn_mask = cp_bitboard_clear_least_set $pawn_mask;
+		while ($target_mask) {	my $base_move = $base_move | (do {	my $B = $target_mask & -$target_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});	push @moves,		$base_move | (CP_QUEEN << 12),		$base_move | (CP_ROOK << 12),		$base_move | (CP_BISHOP << 12),		$base_move | (CP_KNIGHT << 12);	$target_mask = (($target_mask) & (($target_mask) - 1));};
+		$pawn_mask = (($pawn_mask) & (($pawn_mask) - 1));
 	}
 
 	return @moves;
@@ -890,15 +895,15 @@ sub __update {
 	my ($self) = @_;
 
 	# Update king's shift.
-	my $pos_info = cp_pos_info($self);
+	my $pos_info = $self->[CP_POS_INFO];
 
-	cp_pos_info($self) = $pos_info;
+	$self->[CP_POS_INFO] = $pos_info;
 }
 
 sub attacked {
 	my ($self, $shift) = @_;
 
-	return _cp_pos_color_attacked $self, cp_pos_to_move($self), $shift;
+	return (do {	my $her_color = !((($self->[CP_POS_INFO] & (1 << 4)) >> 4));	my $her_pieces = $self->[CP_POS_WHITE_PIECES + $her_color];	my $occupancy = $self->[CP_POS_WHITE_PIECES + ((($self->[CP_POS_INFO] & (1 << 4)) >> 4))] | $her_pieces;	my $queens = $self->[CP_POS_QUEENS];	$her_pieces		& (($pawn_masks[((($self->[CP_POS_INFO] & (1 << 4)) >> 4))]->[2]->[$shift] & $self->[CP_POS_PAWNS])			| ($knight_attack_masks[$shift] & $self->[CP_POS_KNIGHTS])			| ($king_attack_masks[$shift] & $self->[CP_POS_KINGS])			| (CP_MAGICMOVESBDB->[$shift][(((($occupancy) & CP_MAGICMOVES_B_MASK->[$shift]) * CP_MAGICMOVES_B_MAGICS->[$shift]) >> 55) & ((1 << (64 - 55)) - 1)] & ($queens | $self->[CP_POS_BISHOPS]))			| (CP_MAGICMOVESRDB->[$shift][(((($occupancy) & CP_MAGICMOVES_R_MASK->[$shift]) * CP_MAGICMOVES_R_MAGICS->[$shift]) >> 52) & ((1 << (64 - 52)) - 1)] & ($queens | $self->[CP_POS_ROOKS])));});
 }
 
 sub moveAttacked {
@@ -908,8 +913,8 @@ sub moveAttacked {
 		$move = $self->parseMove($move) or return;
 	}
 
-	my ($from, $to) = (cp_move_from($move), cp_move_to($move));
-	return _cp_pos_move_attacked $self, $from, $to;
+	my ($from, $to) = ((($move >> 6) & 0x3f), (($move) & 0x3f));
+	return (do {	my $my_color = ((($self->[CP_POS_INFO] & (1 << 4)) >> 4));	my $her_pieces = $self->[CP_POS_WHITE_PIECES + !$my_color];	my $occupancy = ($self->[CP_POS_WHITE_PIECES + $my_color] | $her_pieces) & ~(1 << $from);	my $queens = $self->[CP_POS_QUEENS];	$her_pieces		& (($pawn_masks[$my_color]->[2]->[$to] & $self->[CP_POS_PAWNS])			| ($knight_attack_masks[$to] & $self->[CP_POS_KNIGHTS])			| ($king_attack_masks[$to] & $self->[CP_POS_KINGS])			| (CP_MAGICMOVESBDB->[$to][(((($occupancy) & CP_MAGICMOVES_B_MASK->[$to]) * CP_MAGICMOVES_B_MAGICS->[$to]) >> 55) & ((1 << (64 - 55)) - 1)] & ($queens | $self->[CP_POS_BISHOPS]))			| (CP_MAGICMOVESRDB->[$to][(((($occupancy) & CP_MAGICMOVES_R_MASK->[$to]) * CP_MAGICMOVES_R_MAGICS->[$to]) >> 52) & ((1 << (64 - 52)) - 1)] & ($queens | $self->[CP_POS_ROOKS])));});
 }
 
 sub movePinned {
@@ -919,33 +924,39 @@ sub movePinned {
 		$move = $self->parseMove($move) or return;
 	}
 
-	my $to_move = cp_pos_to_move $self;
+	my $to_move = ((($self->[CP_POS_INFO] & (1 << 4)) >> 4));
 	my $my_pieces = $self->[CP_POS_WHITE_PIECES + $to_move];
 	my $her_pieces = $self->[CP_POS_WHITE_PIECES + !$to_move];
-	my ($from, $to) = (cp_move_from($move), cp_move_to($move));
+	my ($from, $to) = ((($move >> 6) & 0x3f), (($move) & 0x3f));
 
-	return _cp_pos_move_pinned $self, $from, $to, cp_pos_king_shift($self), $my_pieces, $her_pieces;
+	return ( do {	my $pinned;	my $king_ray = $common_lines[$from]->[((($self->[CP_POS_INFO] & (0x3f << 11)) >> 11))];	if ($king_ray) {		my ($is_rook, $ray_mask) = @$king_ray;		if (!((1 << $to) & $ray_mask)) {			if ($is_rook) {				my $rmagic = CP_MAGICMOVESRDB->[$from][((((($my_pieces | $her_pieces)) & CP_MAGICMOVES_R_MASK->[$from]) * CP_MAGICMOVES_R_MAGICS->[$from]) >> 52) & ((1 << (64 - 52)) - 1)] & $ray_mask;				$pinned = ($rmagic & (1 << ((($self->[CP_POS_INFO] & (0x3f << 11)) >> 11))))						&& ($rmagic & $her_pieces							& ($self->[CP_POS_QUEENS] | $self->[CP_POS_ROOKS]));			} else {				my $bmagic = CP_MAGICMOVESBDB->[$from][((((($my_pieces | $her_pieces)) & CP_MAGICMOVES_B_MASK->[$from]) * CP_MAGICMOVES_B_MAGICS->[$from]) >> 55) & ((1 << (64 - 55)) - 1)] & $ray_mask;				$pinned = ($bmagic & (1 << ((($self->[CP_POS_INFO] & (0x3f << 11)) >> 11))))						&& ($bmagic & $her_pieces							& ($self->[CP_POS_QUEENS] | $self->[CP_POS_BISHOPS]));			}		}	}	$pinned;});
 }
 
 sub moveEquivalent {
 	my ($self, $m1, $m2) = @_;
 
-	return cp_move_equivalent $m1, $m2;
+	return (($m1 & 0x7fff) == ($m2 & 0x7fff));
+}
+
+sub moveSignificant {
+	my ($self, $move) = @_;
+
+	return ($move & 0x7fff);
 }
 
 sub doMove {
 	my ($self, $move) = @_;
 
-	my $pos_info = cp_pos_info $self;
+	my $pos_info = $self->[CP_POS_INFO];
 	my ($from, $to, $promote, $piece) =
-		(cp_move_from($move), cp_move_to($move), cp_move_promote($move),
-		 cp_move_piece($move));
+		((($move >> 6) & 0x3f), (($move) & 0x3f), (($move >> 12) & 0x7),
+		 (($move >> 15) & 0x7));
 
-	my $to_move = cp_pos_info_to_move($pos_info);
+	my $to_move = (($pos_info & (1 << 4)) >> 4);
 	my $from_mask = 1 << $from;
 	my $to_mask = 1 << $to;
 	my $move_mask = (1 << $from) | $to_mask;
-	my $king_shift = cp_pos_info_king_shift($pos_info);
+	my $king_shift = (($pos_info & (0x3f << 11)) >> 11);
 	my $my_pieces = $self->[CP_POS_WHITE_PIECES + $to_move];
 	my $her_pieces = $self->[CP_POS_WHITE_PIECES + !$to_move];
 
@@ -959,16 +970,16 @@ sub doMove {
 	#
 	# Checks number two and three are done below, and only for king moves.
 	# Check number 4 is done below for en passant moves.
-	return if _cp_pos_move_pinned $self, $from, $to, $king_shift, $my_pieces, $her_pieces;
+	return if ( do {	my $pinned;	my $king_ray = $common_lines[$from]->[$king_shift];	if ($king_ray) {		my ($is_rook, $ray_mask) = @$king_ray;		if (!((1 << $to) & $ray_mask)) {			if ($is_rook) {				my $rmagic = CP_MAGICMOVESRDB->[$from][((((($my_pieces | $her_pieces)) & CP_MAGICMOVES_R_MASK->[$from]) * CP_MAGICMOVES_R_MAGICS->[$from]) >> 52) & ((1 << (64 - 52)) - 1)] & $ray_mask;				$pinned = ($rmagic & (1 << $king_shift))						&& ($rmagic & $her_pieces							& ($self->[CP_POS_QUEENS] | $self->[CP_POS_ROOKS]));			} else {				my $bmagic = CP_MAGICMOVESBDB->[$from][((((($my_pieces | $her_pieces)) & CP_MAGICMOVES_B_MASK->[$from]) * CP_MAGICMOVES_B_MAGICS->[$from]) >> 55) & ((1 << (64 - 55)) - 1)] & $ray_mask;				$pinned = ($bmagic & (1 << $king_shift))						&& ($bmagic & $her_pieces							& ($self->[CP_POS_QUEENS] | $self->[CP_POS_BISHOPS]));			}		}	}	$pinned;});
 
-	my $old_castling = my $new_castling = cp_pos_info_castling_rights $pos_info;
-	my $in_check = cp_pos_in_check $self;
-	my $ep_shift = cp_pos_info_en_passant_shift $pos_info;
+	my $old_castling = my $new_castling = $pos_info & 0xf;
+	my $in_check = $self->[CP_POS_IN_CHECK];
+	my $ep_shift = (($pos_info & (0x3f << 5)) >> 5);
 	my $zk_update = $ep_shift ? ($zk_ep_files[$ep_shift & 0x7]) : 0;
 
 	if ($piece == CP_KING) {
 		# Does the king move into check?
-		return if _cp_pos_move_attacked $self, $from, $to;
+		return if (do {	my $my_color = ((($self->[CP_POS_INFO] & (1 << 4)) >> 4));	my $her_pieces = $self->[CP_POS_WHITE_PIECES + !$my_color];	my $occupancy = ($self->[CP_POS_WHITE_PIECES + $my_color] | $her_pieces) & ~(1 << $from);	my $queens = $self->[CP_POS_QUEENS];	$her_pieces		& (($pawn_masks[$my_color]->[2]->[$to] & $self->[CP_POS_PAWNS])			| ($knight_attack_masks[$to] & $self->[CP_POS_KNIGHTS])			| ($king_attack_masks[$to] & $self->[CP_POS_KINGS])			| (CP_MAGICMOVESBDB->[$to][(((($occupancy) & CP_MAGICMOVES_B_MASK->[$to]) * CP_MAGICMOVES_B_MAGICS->[$to]) >> 55) & ((1 << (64 - 55)) - 1)] & ($queens | $self->[CP_POS_BISHOPS]))			| (CP_MAGICMOVESRDB->[$to][(((($occupancy) & CP_MAGICMOVES_R_MASK->[$to]) * CP_MAGICMOVES_R_MAGICS->[$to]) >> 52) & ((1 << (64 - 52)) - 1)] & ($queens | $self->[CP_POS_ROOKS])));});
 
 		# Castling?
 		if ((($from - $to) & 0x3) == 0x2) {
@@ -976,7 +987,7 @@ sub doMove {
 			return if $in_check;
 
 			# Is the field that the king has to cross attacked?
-			return if _cp_pos_color_attacked $self, $to_move, ($from + $to) >> 1;
+			return if (do {	my $her_color = !$to_move;	my $her_pieces = $self->[CP_POS_WHITE_PIECES + $her_color];	my $occupancy = $self->[CP_POS_WHITE_PIECES + $to_move] | $her_pieces;	my $queens = $self->[CP_POS_QUEENS];	$her_pieces		& (($pawn_masks[$to_move]->[2]->[($from + $to) >> 1] & $self->[CP_POS_PAWNS])			| ($knight_attack_masks[($from + $to) >> 1] & $self->[CP_POS_KNIGHTS])			| ($king_attack_masks[($from + $to) >> 1] & $self->[CP_POS_KINGS])			| (CP_MAGICMOVESBDB->[($from + $to) >> 1][(((($occupancy) & CP_MAGICMOVES_B_MASK->[($from + $to) >> 1]) * CP_MAGICMOVES_B_MAGICS->[($from + $to) >> 1]) >> 55) & ((1 << (64 - 55)) - 1)] & ($queens | $self->[CP_POS_BISHOPS]))			| (CP_MAGICMOVESRDB->[($from + $to) >> 1][(((($occupancy) & CP_MAGICMOVES_R_MASK->[($from + $to) >> 1]) * CP_MAGICMOVES_R_MAGICS->[($from + $to) >> 1]) >> 52) & ((1 << (64 - 52)) - 1)] & ($queens | $self->[CP_POS_ROOKS])));});
 
 			# The move is legal.  Move the rook.
 			my $rook_move_mask = $castling_rook_move_masks[$to];
@@ -989,7 +1000,7 @@ sub doMove {
 	} elsif ($in_check) {
 		# Early exits for check.  First handle the case that the piece is
 		# a pawn that gets captured en passant.
-		if (!(cp_pos_evasion_squares($self) & $to_mask)) {
+		if (!($self->[CP_POS_EVASION_SQUARES] & $to_mask)) {
 			# Exception: En passant capture if the capture pawn is the one
 			# that gives check.
 			if (!($piece == CP_PAWN && $to == $ep_shift
@@ -1010,13 +1021,13 @@ sub doMove {
 	my ($captured, $zk_captured) = (CP_NO_PIECE, CP_NO_PIECE);
 	my $captured_mask = 0;
 	if ($to_mask & $her_pieces) {
-		if ($to_mask & cp_pos_pawns($self)) {
+		if ($to_mask & $self->[CP_POS_PAWNS]) {
 			$captured = $zk_captured = CP_PAWN;
-		} elsif ($to_mask & cp_pos_knights($self)) {
+		} elsif ($to_mask & $self->[CP_POS_KNIGHTS]) {
 			$captured = $zk_captured = CP_KNIGHT;
-		} elsif ($to_mask & cp_pos_bishops($self)) {
+		} elsif ($to_mask & $self->[CP_POS_BISHOPS]) {
 			$captured = $zk_captured = CP_BISHOP;
-		} elsif ($to_mask & cp_pos_rooks($self)) {
+		} elsif ($to_mask & $self->[CP_POS_ROOKS]) {
 			$captured = $zk_captured = CP_ROOK;
 		} else {
 			$captured = $zk_captured = CP_QUEEN;
@@ -1030,40 +1041,47 @@ sub doMove {
 			$captured_mask = $ep_pawn_masks[$ep_shift];
 
 			# Removing the pawn may discover a check.
-			my $occupancy = (cp_pos_white_pieces($self) | cp_pos_black_pieces($self))
+			my $occupancy = ($self->[CP_POS_WHITE_PIECES] | $self->[CP_POS_BLACK_PIECES])
 					& ((~$move_mask) ^ $captured_mask);
-			if (cp_mm_bmagic($king_shift, $occupancy) & $her_pieces
-				& (cp_pos_bishops($self) | cp_pos_queens($self))) {
+			if (CP_MAGICMOVESBDB->[$king_shift][(((($occupancy) & CP_MAGICMOVES_B_MASK->[$king_shift]) * CP_MAGICMOVES_B_MAGICS->[$king_shift]) >> 55) & ((1 << (64 - 55)) - 1)] & $her_pieces
+				& ($self->[CP_POS_BISHOPS] | $self->[CP_POS_QUEENS])) {
 				return;
-			} elsif (cp_mm_rmagic($king_shift, $occupancy) & $her_pieces
-				& (cp_pos_rooks($self) | cp_pos_queens($self))) {
+			} elsif (CP_MAGICMOVESRDB->[$king_shift][(((($occupancy) & CP_MAGICMOVES_R_MASK->[$king_shift]) * CP_MAGICMOVES_R_MAGICS->[$king_shift]) >> 52) & ((1 << (64 - 52)) - 1)] & $her_pieces
+				& ($self->[CP_POS_ROOKS] | $self->[CP_POS_QUEENS])) {
 				return;
 			}
 			
 			$captured = CP_PAWN;
 			$zk_captured = CP_KING; # This is interpreted as an ep capture.
 		}
-		$self->[CP_POS_HALF_MOVE_CLOCK] = 0;
-		if (_cp_pawn_double_step $from, $to) {
-			_cp_pos_info_set_en_passant_shift($pos_info, ($from + (($to - $from) >> 1)));
+		$self->[CP_POS_HALF_MOVE_CLOCK]
+				= $self->[CP_POS_REVERSIBLE_CLOCK] = 0;
+		if ((!(($to - $from) & 0x9))) {
+			($pos_info = ($pos_info & ~(0x3f << 5)) | (($from + (($to - $from) >> 1)) << 5));
 		} else {
-			_cp_pos_info_set_en_passant_shift($pos_info, 0);
+			($pos_info = ($pos_info & ~(0x3f << 5)) | (0 << 5));
 		}
 	} elsif ($her_pieces & $to_mask) {
 		# No need to check for en passant because pawn moves reset the
 		# half-move clock anyway.
-		$self->[CP_POS_HALF_MOVE_CLOCK] = 0;
-		_cp_pos_info_set_en_passant_shift($pos_info, 0);
+		$self->[CP_POS_HALF_MOVE_CLOCK]
+				= $self->[CP_POS_REVERSIBLE_CLOCK] = 0;
+		($pos_info = ($pos_info & ~(0x3f << 5)) | (0 << 5));
+	} elsif ($old_castling != $new_castling) {
+		$self->[CP_POS_REVERSIBLE_CLOCK] = 0;
+		++$self->[CP_POS_HALF_MOVE_CLOCK];
+		($pos_info = ($pos_info & ~(0x3f << 5)) | (0 << 5));
 	} else {
 		++$self->[CP_POS_HALF_MOVE_CLOCK];
-		_cp_pos_info_set_en_passant_shift($pos_info, 0);
+		++$self->[CP_POS_REVERSIBLE_CLOCK];
+		($pos_info = ($pos_info & ~(0x3f << 5)) | (0 << 5));
 	}
 
 	# Move all pieces involved.
 	if ($captured != CP_NO_PIECE) {
 		$self->[CP_POS_WHITE_PIECES + !$to_move] ^= $captured_mask;
 		$self->[$captured] ^= $captured_mask;
-		cp_move_set_captured($move, $captured);
+		(($move) = (($move) & ~0x1c0000) | (($captured) & 0x7) << 18);
 	}
 
 	$self->[CP_POS_WHITE_PIECES + $to_move] ^= $move_mask;
@@ -1073,18 +1091,18 @@ sub doMove {
 	# it safes branches.  There is one edge case, where a pawn captures a
 	# rook that is on its initial position.  In that case, the castling
 	# rights may have to be updated.
-	_cp_pos_info_set_castling $pos_info, $new_castling;
+	($pos_info = ($pos_info & ~0xf) | $new_castling);
 
 	if ($promote) {
 		$self->[CP_POS_PAWNS] ^= $to_mask;
 		$self->[$promote] ^= $to_mask;
 	}
 
-	cp_move_set_color($move, $to_move);
+	(($move) = (($move) & ~0x20_0000) | (($to_move) & 0x1) << 21);
 	my @undo_info = ($move, $captured_mask, @state);
 
 	++$self->[CP_POS_HALF_MOVES];
-	_cp_pos_info_set_to_move($pos_info, !$to_move);
+	($pos_info = ($pos_info & ~(1 << 4)) | (!$to_move << 4));
 
 	# The material balance is stored in the most signicant bits.  It is
 	# already left-shifted 19 bit in the lookup table so that we can
@@ -1106,7 +1124,7 @@ sub doMove {
 
 	$self->[CP_POS_SIGNATURE] = $signature;
 
-	_cp_pos_info_update $self, $pos_info;
+	(do {	my $c = (($pos_info & (1 << 4)) >> 4);	my $kings = $self->[CP_POS_KINGS]		& ($c ? $self->[CP_POS_BLACK_PIECES] : $self->[CP_POS_WHITE_PIECES]);	my $king_shift = (do {	my $A = $kings - 1 - ((($kings - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});	($pos_info = ($pos_info & ~(0x3f << 11)) | ($king_shift << 11));	my $checkers = $self->[CP_POS_IN_CHECK] = (do {	my $her_color = !$c;	my $her_pieces = $self->[CP_POS_WHITE_PIECES + $her_color];	my $occupancy = $self->[CP_POS_WHITE_PIECES + $c] | $her_pieces;	my $queens = $self->[CP_POS_QUEENS];	$her_pieces		& (($pawn_masks[$c]->[2]->[$king_shift] & $self->[CP_POS_PAWNS])			| ($knight_attack_masks[$king_shift] & $self->[CP_POS_KNIGHTS])			| ($king_attack_masks[$king_shift] & $self->[CP_POS_KINGS])			| (CP_MAGICMOVESBDB->[$king_shift][(((($occupancy) & CP_MAGICMOVES_B_MASK->[$king_shift]) * CP_MAGICMOVES_B_MAGICS->[$king_shift]) >> 55) & ((1 << (64 - 55)) - 1)] & ($queens | $self->[CP_POS_BISHOPS]))			| (CP_MAGICMOVESRDB->[$king_shift][(((($occupancy) & CP_MAGICMOVES_R_MASK->[$king_shift]) * CP_MAGICMOVES_R_MAGICS->[$king_shift]) >> 52) & ((1 << (64 - 52)) - 1)] & ($queens | $self->[CP_POS_ROOKS])));});	if ($checkers) {		if ($checkers & ($checkers - 1)) {			($pos_info = ($pos_info & ~(0x3 << 17)) | (CP_EVASION_KING_MOVE << 17));		} elsif ($checkers & ($self->[CP_POS_KNIGHTS] | ($self->[CP_POS_PAWNS]))) {			($pos_info = ($pos_info & ~(0x3 << 17)) | (CP_EVASION_CAPTURE << 17));			$self->[CP_POS_EVASION_SQUARES] = $checkers;		} else {			($pos_info = ($pos_info & ~(0x3 << 17)) | (CP_EVASION_ALL << 17));			my $piece_shift = (do {	my $A = $checkers - 1 - ((($checkers - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});			my ($attack_type, undef, $attack_ray) =				@{$common_lines[$king_shift]->[$piece_shift]};			if ($attack_ray) {				$self->[CP_POS_EVASION_SQUARES] = $attack_ray;			} else {				$self->[CP_POS_EVASION_SQUARES] = $checkers;			}		}	}	$self->[CP_POS_INFO] = $pos_info;});
 
 	return \@undo_info;
 }
@@ -1117,11 +1135,11 @@ sub undoMove {
 	my ($move, $captured_mask, @state) = @$undo_info;
 
 	my ($from, $to, $promote, $piece, $captured) =
-		(cp_move_from($move), cp_move_to($move), cp_move_promote($move),
-		 cp_move_piece($move), cp_move_captured($move));
+		((($move >> 6) & 0x3f), (($move) & 0x3f), (($move >> 12) & 0x7),
+		 (($move >> 15) & 0x7), (($move >> 18) & 0x7));
 
 	my $move_mask = (1 << $from) | (1 << $to);
-	my $to_move = !cp_pos_to_move $self;
+	my $to_move = !((($self->[CP_POS_INFO] & (1 << 4)) >> 4));
 
 	# Castling?
 	if ($piece == CP_KING && ((($from - $to) & 0x3) == 0x2)) {
@@ -1150,93 +1168,93 @@ sub undoMove {
 	@$self[CP_POS_HALF_MOVE_CLOCK .. CP_POS_IN_CHECK] = @state;
 
 	# FIXME! Copy as well?
-	--(cp_pos_half_moves($self));
+	--($self->[CP_POS_HALF_MOVES]);
 }
 
 sub bMagic {
 	my ($self, $shift, $occupancy) = @_;
 
-	return cp_mm_bmagic $shift, $occupancy;
+	return CP_MAGICMOVESBDB->[$shift][(((($occupancy) & CP_MAGICMOVES_B_MASK->[$shift]) * CP_MAGICMOVES_B_MAGICS->[$shift]) >> 55) & ((1 << (64 - 55)) - 1)];
 }
 
 sub rMagic {
 	my ($self, $shift, $occupancy) = @_;
 
-	return cp_mm_rmagic $shift, $occupancy;
+	return CP_MAGICMOVESRDB->[$shift][(((($occupancy) & CP_MAGICMOVES_R_MASK->[$shift]) * CP_MAGICMOVES_R_MAGICS->[$shift]) >> 52) & ((1 << (64 - 52)) - 1)];
 }
 
 # Position info methods.
 sub castlingRights {
 	my ($self) = @_;
 
-	return cp_pos_castling_rights $self;
+	return ($self->[CP_POS_INFO] & 0xf);
 }
 
 sub whiteKingSideCastlingRight {
 	my ($self) = @_;
 
-	return cp_pos_white_king_side_castling_right($self);
+	return ($self->[CP_POS_INFO] & (1 << 0));
 }
 
 sub whiteQueenSideCastlingRight {
 	my ($self) = @_;
 
-	return cp_pos_white_queen_side_castling_right($self);
+	return ($self->[CP_POS_INFO] & (1 << 1));
 }
 
 sub blackKingSideCastlingRight {
 	my ($self) = @_;
 
-	return cp_pos_black_king_side_castling_right($self);
+	return ($self->[CP_POS_INFO] & (1 << 2));
 }
 
 sub blackQueenSideCastlingRight {
 	my ($self) = @_;
 
-	return cp_pos_black_queen_side_castling_right($self);
+	return ($self->[CP_POS_INFO] & (1 << 3));
 }
 
 sub toMove {
 	my ($self) = @_;
 
-	return cp_pos_to_move($self);
+	return ((($self->[CP_POS_INFO] & (1 << 4)) >> 4));
 }
 
 sub enPassantShift {
 	my ($self) = @_;
 
-	return cp_pos_en_passant_shift($self);
+	return ((($self->[CP_POS_INFO] & (0x3f << 5)) >> 5));
 }
 
 sub kingShift {
 	my ($self) = @_;
 
-	return cp_pos_king_shift($self);
+	return ((($self->[CP_POS_INFO] & (0x3f << 11)) >> 11));
 }
 
 sub evasion {
 	my ($self) = @_;
 
-	return cp_pos_evasion($self);
+	return ((($self->[CP_POS_INFO] & (0x3 << 17)) >> 17));
 }
 
 sub material {
 	my ($self) = @_;
 
-	return cp_pos_material($self);
+	return (($self->[CP_POS_INFO] >> 19));
 }
 
 # Move methods.
 sub moveFrom {
 	my (undef, $move) = @_;
 
-	return cp_move_from $move;
+	return (($move >> 6) & 0x3f);
 }
 
 sub moveSetFrom {
 	my (undef, $move, $from) = @_;
 
-	cp_move_set_from $move, $from;
+	(($move) = (($move) & ~0xfc0) | (($from) & 0x3f) << 6);
 
 	return $move;
 }
@@ -1244,13 +1262,13 @@ sub moveSetFrom {
 sub moveTo {
 	my (undef, $move) = @_;
 
-	return cp_move_to $move;
+	return (($move) & 0x3f);
 }
 
 sub moveSetTo {
 	my (undef, $move, $to) = @_;
 
-	cp_move_set_from $move, $to;
+	(($move) = (($move) & ~0xfc0) | (($to) & 0x3f) << 6);
 
 	return $move;
 }
@@ -1258,13 +1276,13 @@ sub moveSetTo {
 sub movePromote {
 	my (undef, $move) = @_;
 
-	return cp_move_promote $move;
+	return (($move >> 12) & 0x7);
 }
 
 sub moveSetPromote {
 	my (undef, $move, $promote) = @_;
 
-	cp_move_set_promote $move, $promote;
+	(($move) = (($move) & ~0x7000) | (($promote) & 0x7) << 12);
 
 	return $move;
 }
@@ -1272,13 +1290,13 @@ sub moveSetPromote {
 sub movePiece {
 	my (undef, $move) = @_;
 
-	return cp_move_piece $move;
+	return (($move >> 15) & 0x7);
 }
 
 sub moveSetPiece {
 	my (undef, $move, $piece) = @_;
 
-	cp_move_set_piece $move, $piece;
+	(($move) = (($move) & ~0x38000) | (($piece) & 0x7) << 15);
 
 	return $move;
 }
@@ -1286,13 +1304,13 @@ sub moveSetPiece {
 sub moveCaptured {
 	my (undef, $move) = @_;
 
-	return cp_move_captured $move;
+	return (($move >> 18) & 0x7);
 }
 
 sub moveSetCaptured {
 	my (undef, $move, $piece) = @_;
 
-	cp_move_set_captured $move, $piece;
+	(($move) = (($move) & ~0x1c0000) | (($piece) & 0x7) << 18);
 
 	return $move;
 }
@@ -1300,13 +1318,13 @@ sub moveSetCaptured {
 sub moveColor {
 	my (undef, $move) = @_;
 
-	return cp_move_color $move;
+	return (($move >> 21) & 0x1);
 }
 
 sub moveSetColor {
 	my (undef, $move, $color) = @_;
 
-	cp_move_set_color $move, $color;
+	(($move) = (($move) & ~0x20_0000) | (($color) & 0x1) << 21);
 
 	return $move;
 }
@@ -1314,7 +1332,7 @@ sub moveSetColor {
 sub moveCoordinateNotation {
 	my (undef, $move) = @_;
 
-	return cp_move_coordinate_notation $move;
+	return chr(97 + ((($move >> 6) & 0x3f) & 0x7)) . (1 + ((($move >> 6) & 0x3f) >> 3)) . chr(97 + ((($move) & 0x3f) & 0x7)) . (1 + ((($move) & 0x3f) >> 3)) . CP_PIECE_CHARS->[CP_BLACK]->[(($move >> 12) & 0x7)];
 }
 
 sub LAN {
@@ -1324,15 +1342,15 @@ sub LAN {
 sub SEE {
 	my ($self, $move) = @_;
 
-	my $to = cp_move_to $move;
-	my $from = cp_move_from $move;
+	my $to = (($move) & 0x3f);
+	my $from = (($move >> 6) & 0x3f);
 	my $not_from_mask = ~(1 << ($from));
-	my $pos_info = cp_pos_info($self);
-	my $ep_shift = cp_pos_info_en_passant_shift($pos_info);
+	my $pos_info = $self->[CP_POS_INFO];
+	my $ep_shift = (($pos_info & (0x3f << 5)) >> 5);
 	my $move_is_ep = ($ep_shift && $to == $ep_shift
-		&& cp_move_piece($move) == CP_PAWN);
-	my $white = cp_pos_white_pieces($self);
-	my $black = cp_pos_black_pieces($self);
+		&& (($move >> 15) & 0x7) == CP_PAWN);
+	my $white = $self->[CP_POS_WHITE_PIECES];
+	my $black = $self->[CP_POS_BLACK_PIECES];
 	my $occupancy = $white | $black;
 
 	# FIXME! This is possible without a branch.
@@ -1358,117 +1376,117 @@ sub SEE {
 	# For each attack vector we store the piece value shifted 8 bits to the
 	# right ORed with the from shift.
 
-	my $pawns = cp_pos_pawns($self);
+	my $pawns = $self->[CP_POS_PAWNS];
 	# We have to use the opposite pawn masks because we want to get the
 	# attacking squares of the target square, and not the attacked squares
 	# of the start square.
 	$mask = $pawn_masks[CP_BLACK]->[2]->[$to] & $pawns
 		& $white & $not_from_mask;
 	while ($mask) {
-		my $afrom = cp_bitboard_count_trailing_zbits $mask;
+		my $afrom = (do {	my $B = $mask & -$mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
 
 		push @white_attackers, ($afrom | $shifted_pawn_value);
-		$mask = cp_bitboard_clear_least_set($mask);
+		$mask = (($mask) & (($mask) - 1));
 	}
 	$mask = $pawn_masks[CP_WHITE]->[2]->[$to] & $pawns
 		& $black & $not_from_mask;
 	while ($mask) {
-		my $afrom = cp_bitboard_count_trailing_zbits $mask;
+		my $afrom = (do {	my $B = $mask & -$mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
 
 		push @black_attackers, ($afrom | $shifted_pawn_value);
-		$mask = cp_bitboard_clear_least_set($mask);
+		$mask = (($mask) & (($mask) - 1));
 	}
 
-	my $knights = cp_pos_knights($self);
+	my $knights = $self->[CP_POS_KNIGHTS];
 	my $shifted_knight_value = CP_KNIGHT_VALUE << 8;
 	$mask = $knight_attack_masks[$to] & $knights & $white & $not_from_mask;
 	while ($mask) {
-		my $afrom = cp_bitboard_count_trailing_zbits $mask;
+		my $afrom = (do {	my $B = $mask & -$mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
 
 		push @white_attackers, ($afrom | $shifted_knight_value);
-		$mask = cp_bitboard_clear_least_set($mask);
+		$mask = (($mask) & (($mask) - 1));
 	}
 	$mask = $knight_attack_masks[$to] & $knights & $black & $not_from_mask;
 	while ($mask) {
-		my $afrom = cp_bitboard_count_trailing_zbits $mask;
+		my $afrom = (do {	my $B = $mask & -$mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
 
 		push @black_attackers, ($afrom | $shifted_knight_value);
-		$mask = cp_bitboard_clear_least_set($mask);
+		$mask = (($mask) & (($mask) - 1));
 	}
 
-	my $bishop_mask = cp_mm_bmagic($to, $occupancy) & $not_from_mask;
-	my $rook_mask = cp_mm_rmagic($to, $occupancy) & $not_from_mask;
+	my $bishop_mask = CP_MAGICMOVESBDB->[$to][(((($occupancy) & CP_MAGICMOVES_B_MASK->[$to]) * CP_MAGICMOVES_B_MAGICS->[$to]) >> 55) & ((1 << (64 - 55)) - 1)] & $not_from_mask;
+	my $rook_mask = CP_MAGICMOVESRDB->[$to][(((($occupancy) & CP_MAGICMOVES_R_MASK->[$to]) * CP_MAGICMOVES_R_MAGICS->[$to]) >> 52) & ((1 << (64 - 52)) - 1)] & $not_from_mask;
 	my $queen_mask = $bishop_mask | $rook_mask;
 
-	my $bishops = cp_pos_bishops($self);
+	my $bishops = $self->[CP_POS_BISHOPS];
 	my $shifted_bishop_value = CP_BISHOP_VALUE << 8;
 	$mask = $bishop_mask & $bishops & $white;
 	while ($mask) {
-		my $afrom = cp_bitboard_count_trailing_zbits $mask;
+		my $afrom = (do {	my $B = $mask & -$mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
 
 		push @white_attackers, ($afrom | $shifted_bishop_value);
-		$mask = cp_bitboard_clear_least_set($mask);
+		$mask = (($mask) & (($mask) - 1));
 	}
 	$mask = $bishop_mask & $bishops & $black;
 	while ($mask) {
-		my $afrom = cp_bitboard_count_trailing_zbits $mask;
+		my $afrom = (do {	my $B = $mask & -$mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
 
 		push @black_attackers, ($afrom | $shifted_bishop_value);
-		$mask = cp_bitboard_clear_least_set($mask);
+		$mask = (($mask) & (($mask) - 1));
 	}
 
-	my $rooks = cp_pos_rooks($self);
+	my $rooks = $self->[CP_POS_ROOKS];
 	my $shifted_rook_value = CP_ROOK_VALUE << 8;
 	$mask = $rook_mask & $rooks & $white;
 	while ($mask) {
-		my $afrom = cp_bitboard_count_trailing_zbits $mask;
+		my $afrom = (do {	my $B = $mask & -$mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
 
 		push @white_attackers, ($afrom | $shifted_rook_value);
-		$mask = cp_bitboard_clear_least_set($mask);
+		$mask = (($mask) & (($mask) - 1));
 	}
 	$mask = $rook_mask & $rooks & $black;
 	while ($mask) {
-		my $afrom = cp_bitboard_count_trailing_zbits $mask;
+		my $afrom = (do {	my $B = $mask & -$mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
 
 		push @black_attackers, ($afrom | $shifted_rook_value);
-		$mask = cp_bitboard_clear_least_set($mask);
+		$mask = (($mask) & (($mask) - 1));
 	}
 
-	my $queens = cp_pos_queens($self);
+	my $queens = $self->[CP_POS_QUEENS];
 	my $shifted_queen_value = CP_QUEEN_VALUE << 8;
 	$mask = $queen_mask & $queens & $white;
 	while ($mask) {
-		my $afrom = cp_bitboard_count_trailing_zbits $mask;
+		my $afrom = (do {	my $B = $mask & -$mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
 
 		push @white_attackers, ($afrom | $shifted_queen_value);
-		$mask = cp_bitboard_clear_least_set($mask);
+		$mask = (($mask) & (($mask) - 1));
 	}
 	$mask = $queen_mask & $queens & $black;
 	while ($mask) {
-		my $afrom = cp_bitboard_count_trailing_zbits $mask;
+		my $afrom = (do {	my $B = $mask & -$mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
 
 		push @black_attackers, ($afrom | $shifted_queen_value);
-		$mask = cp_bitboard_clear_least_set($mask);
+		$mask = (($mask) & (($mask) - 1));
 	}
 
-	my $kings = cp_pos_kings($self);
+	my $kings = $self->[CP_POS_KINGS];
 	my $shifted_king_value = 9999 << 8;
 	$mask = $king_attack_masks[$to] & $kings & $white;
 	if ($mask) {
-		my $afrom = cp_bitboard_count_isolated_trailing_zbits $mask;
+		my $afrom = (do {	my $A = $mask - 1 - ((($mask - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
 
 		push @white_attackers, ($afrom | $shifted_king_value);
 	}
 	$mask = $king_attack_masks[$to] & $kings & $black;
 	if ($mask) {
-		my $afrom = cp_bitboard_count_isolated_trailing_zbits $mask;
+		my $afrom = (do {	my $A = $mask - 1 - ((($mask - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
 
 		push @black_attackers, ($afrom | $shifted_king_value);
 	}
 
 	$occupancy &= $not_from_mask;
 
-	my $promote = cp_move_promote($move);
+	my $promote = (($move >> 12) & 0x7);
 
 	my $captured;
 	if ($move_is_ep || ($to_mask & $pawns)) {
@@ -1486,9 +1504,9 @@ sub SEE {
 		$captured = CP_NO_PIECE;
 	}
 
-	my $side_to_move = !cp_pos_to_move($self);
+	my $side_to_move = !((($self->[CP_POS_INFO] & (1 << 4)) >> 4));
 	my @gain = ($piece_values[$captured]);
-	my $attacker_value = $piece_values[cp_move_piece($move)];
+	my $attacker_value = $piece_values[(($move >> 15) & 0x7)];
 	if ($promote) {
 		$attacker_value = $piece_values[$promote];
 		$gain[0] += $attacker_value - CP_PAWN_VALUE;
@@ -1515,19 +1533,19 @@ sub SEE {
 				|| (($from & 56) == ($to & 56));
 			my $piece;
 			if ($is_rook_move && ($obscured_mask & $sliding_rooks_mask)) {
-				$mask = $sliding_rooks_mask & cp_mm_rmagic($to, $occupancy);
+				$mask = $sliding_rooks_mask & CP_MAGICMOVESRDB->[$to][(((($occupancy) & CP_MAGICMOVES_R_MASK->[$to]) * CP_MAGICMOVES_R_MAGICS->[$to]) >> 52) & ((1 << (64 - 52)) - 1)];
 				$piece = CP_ROOK;
 			} elsif (!$is_rook_move && ($obscured_mask & $sliding_bishops_mask)) {
-				$mask = $sliding_bishops_mask & cp_mm_bmagic($to, $occupancy);
+				$mask = $sliding_bishops_mask & CP_MAGICMOVESBDB->[$to][(((($occupancy) & CP_MAGICMOVES_B_MASK->[$to]) * CP_MAGICMOVES_B_MAGICS->[$to]) >> 55) & ((1 << (64 - 55)) - 1)];
 				$piece = CP_BISHOP;
 			}
 			if ($obscured_mask & $mask) {
 				my $piece_mask;
 
 				if ($from > $to) {
-					$piece_mask = cp_bitboard_clear_but_most_set($obscured_mask & $mask);
+					$piece_mask = (do {	my $B = $obscured_mask & $mask;	if ($B & 0x8000_0000_0000_0000) {		0x8000_0000_0000_0000;	} else {		$B |= $B >> 1;		$B |= $B >> 2;		$B |= $B >> 4;		$B |= $B >> 8;		$B |= $B >> 16;		$B |= $B >> 32;		$B - ($B >> 1);	}});
 				} else {
-					$piece_mask = cp_bitboard_clear_but_least_set($obscured_mask & $mask);
+					$piece_mask = (($obscured_mask & $mask) & -($obscured_mask & $mask));
 				}
 				if ($piece_mask) {
 					my $color;
@@ -1545,7 +1563,7 @@ sub SEE {
 					# unmasked comparison.
 					my $attackers_array = $attackers[$color];
 					my $item = ($piece_values[$piece] << 8)
-						| cp_bitboard_count_isolated_trailing_zbits($piece_mask);
+						| (do {	my $A = $piece_mask - 1 - ((($piece_mask - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
 					unshift @$attackers_array, $item;
 					foreach my $i (0.. @$attackers_array - 2) {
 						last if $attackers_array->[$i] <= $attackers_array->[$i + 1];
@@ -1565,7 +1583,7 @@ sub SEE {
 		$from = $attacker_def & 0xff;
 
 		# Can we prune?
-		if (cp_max(-$gain[$depth - 1], $gain[$depth]) < 0) {
+		if ((((-$gain[$depth - 1]) > ($gain[$depth])) ? (-$gain[$depth - 1]) : ($gain[$depth])) < 0) {
 			last;
 		}
 
@@ -1575,7 +1593,7 @@ sub SEE {
 	}
 
 	while (--$depth) {
-		$gain[$depth - 1]= -(cp_max(-$gain[$depth - 1], $gain[$depth]));
+		$gain[$depth - 1]= -((((-$gain[$depth - 1]) > ($gain[$depth])) ? (-$gain[$depth - 1]) : ($gain[$depth])));
 	}
 
 	return $gain[0];
@@ -1593,47 +1611,47 @@ sub parseMove {
 	}
 
 	my $piece;
-	my $from_mask = 1 << (cp_move_from $move);
-	if ($from_mask & cp_pos_pawns($self)) {
+	my $from_mask = 1 << ((($move >> 6) & 0x3f));
+	if ($from_mask & $self->[CP_POS_PAWNS]) {
 		$piece = CP_PAWN;
-	} elsif ($from_mask & cp_pos_knights($self)) {
+	} elsif ($from_mask & $self->[CP_POS_KNIGHTS]) {
 		$piece = CP_KNIGHT;
-	} elsif ($from_mask & cp_pos_bishops($self)) {
+	} elsif ($from_mask & $self->[CP_POS_BISHOPS]) {
 		$piece = CP_BISHOP;
-	} elsif ($from_mask & cp_pos_rooks($self)) {
+	} elsif ($from_mask & $self->[CP_POS_ROOKS]) {
 		$piece = CP_ROOK;
-	} elsif ($from_mask & cp_pos_queens($self)) {
+	} elsif ($from_mask & $self->[CP_POS_QUEENS]) {
 		$piece = CP_QUEEN;
-	} elsif ($from_mask & cp_pos_kings($self)) {
+	} elsif ($from_mask & $self->[CP_POS_KINGS]) {
 		$piece = CP_KING;
 	} else {
 		require Carp;
 		Carp::croak(__"Illegal move: start square is empty.\n");
 	}
 
-	cp_move_set_piece($move, $piece);
+	(($move) = (($move) & ~0x38000) | (($piece) & 0x7) << 15);
 
 	my $captured = CP_NO_PIECE;
-	my $to_mask = 1 << (cp_move_to $move);
-	if ($to_mask & cp_pos_pawns($self)) {
+	my $to_mask = 1 << ((($move) & 0x3f));
+	if ($to_mask & $self->[CP_POS_PAWNS]) {
 		$captured = CP_PAWN;
-	} elsif ($to_mask & cp_pos_knights($self)) {
+	} elsif ($to_mask & $self->[CP_POS_KNIGHTS]) {
 		$captured = CP_KNIGHT;
-	} elsif ($to_mask & cp_pos_bishops($self)) {
+	} elsif ($to_mask & $self->[CP_POS_BISHOPS]) {
 		$captured = CP_BISHOP;
-	} elsif ($to_mask & cp_pos_rooks($self)) {
+	} elsif ($to_mask & $self->[CP_POS_ROOKS]) {
 		$captured = CP_ROOK;
-	} elsif ($to_mask & cp_pos_queens($self)) {
+	} elsif ($to_mask & $self->[CP_POS_QUEENS]) {
 		$captured = CP_QUEEN;
-	} elsif ($to_mask & cp_pos_kings($self)) {
+	} elsif ($to_mask & $self->[CP_POS_KINGS]) {
 		$captured = CP_KING;
 	} elsif ($piece == CP_PAWN && $self->enPassantShift
-	         && (cp_move_to($move)) == $self->enPassantShift) {
+	         && ((($move) & 0x3f)) == $self->enPassantShift) {
 		$captured = CP_PAWN;
 	}
-	cp_move_set_captured $move, $captured;
+	(($move) = (($move) & ~0x1c0000) | (($captured) & 0x7) << 18);
 
-	cp_move_set_color $move, $self->toMove;
+	(($move) = (($move) & ~0x20_0000) | (($self->toMove) & 0x1) << 21);
 
 	return $move;
 }
@@ -1650,8 +1668,8 @@ sub __parseUCIMove {
 	return if $to < 0;
 	return if $to > 63;
 
-	cp_move_set_from($move, $from);
-	cp_move_set_to($move, $to);
+	(($move) = (($move) & ~0xfc0) | (($from) & 0x3f) << 6);
+	(($move) = (($move) & ~0x3f) | (($to) & 0x3f));
 
 	if ($promote) {
 		my %pieces = (
@@ -1661,7 +1679,7 @@ sub __parseUCIMove {
 			n => CP_KNIGHT,
 		);
 
-		cp_move_set_promote($move, $pieces{lc $promote} or return);
+		(($move) = (($move) & ~0x7000) | (($pieces{lc $promote} or return) & 0x7) << 12);
 	}
 
 	return $move;
@@ -1671,7 +1689,7 @@ sub bitboardPopcount {
 	my (undef, $bitboard) = @_;
 
 	my $count;
-	cp_bitboard_popcount $bitboard, $count;
+	{ my $_b = $bitboard; for ($count = 0; $_b; ++$count) { $_b &= $_b - 1; } };
 
 	return $count;
 }
@@ -1679,25 +1697,82 @@ sub bitboardPopcount {
 sub bitboardClearLeastSet {
 	my (undef, $bitboard) = @_;
 
-	return cp_bitboard_clear_least_set $bitboard;
+	return (($bitboard) & (($bitboard) - 1));
 }
 
 sub bitboardClearButLeastSet {
 	my (undef, $bitboard) = @_;
 
-	return cp_bitboard_clear_but_least_set $bitboard;
+	return (($bitboard) & -($bitboard));
 }
 
 sub bitboardCountIsolatedTrailingZbits {
 	my (undef, $bitboard) = @_;
 
-	return cp_bitboard_count_isolated_trailing_zbits $bitboard;
+	return (do {	my $A = $bitboard - 1 - ((($bitboard - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
 }
 
 sub bitboardCountTrailingZbits {
 	my (undef, $bitboard) = @_;
 
-	return cp_bitboard_count_trailing_zbits $bitboard;
+	return (do {	my $B = $bitboard & -$bitboard;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
+}
+
+sub bitboardMoreThanOneSet {
+	my (undef, $bitboard) = @_;
+
+	return ($bitboard && ($bitboard & ($bitboard - 1)));
+}
+
+sub insufficientMaterial {
+	my ($self) = @_;
+
+	# FIXME! Once we distinguish black and white material (should we?),
+	# we can try to take an early exit here if any of the two sides has
+	# more material than a bishop.
+
+	# All of these are sufficient to mate.
+	if ($self->[CP_POS_PAWNS] | $self->[CP_POS_ROOKS] | $self->[CP_POS_QUEENS]) {
+		return;
+	}
+
+	# There is neither a queen nor a rook nor a pawn.  Two or more minor
+	# pieces on one side can always mate.
+	my $not_kings = ~$self->[CP_POS_KINGS];
+
+	my $white = $self->[CP_POS_WHITE_PIECES];
+	my $white_minor_pieces = $white & $not_kings;
+	if (($white_minor_pieces && ($white_minor_pieces & ($white_minor_pieces - 1)))) {
+		return;
+	}
+
+	my $black = $self->[CP_POS_BLACK_PIECES];
+	my $black_minor_pieces = $black & $not_kings;
+	if (($black_minor_pieces && ($black_minor_pieces & ($black_minor_pieces - 1)))) {
+		return;
+	}
+
+	# One minor piece against a lone king cannot mate.
+	if(!($white_minor_pieces && $black_minor_pieces)) {
+		return 1;
+	}
+
+	# Both sides have exactly one minor piece.  The only combination that
+	# is a draw is KBKB with bishops of different color.  That means, that
+	# both sides can mate if a knight is on the board.
+	if ($self->[CP_POS_KNIGHTS]) {
+		return;
+	}
+
+	# Every side has one bishop.  It is not necessarily a draw, if they are
+	# on different colored squares.
+	my $bishops = $self->[CP_POS_BISHOPS];
+	if (!!($white & $bishops & CP_WHITE_MASK)
+	    != !!($black & $bishops & CP_BLACK_MASK)) {
+		return;
+	}
+
+	return 1;
 }
 
 sub __updateZobristKey {
@@ -1711,97 +1786,97 @@ sub __updateZobristKey {
 
 	$piece_mask = $pawns & $white;
 	while ($piece_mask) {
-		my $shift = cp_bitboard_count_trailing_zbits $piece_mask;
-		$signature ^= _cp_zk_lookup(CP_PAWN, CP_WHITE, $shift);
-		$piece_mask = cp_bitboard_clear_least_set $piece_mask;
+		my $shift = (do {	my $B = $piece_mask & -$piece_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
+		$signature ^= $zk_pieces[(((CP_PAWN) << 7) | ((CP_WHITE) << 6) | ($shift)) - 128];
+		$piece_mask = (($piece_mask) & (($piece_mask) - 1));
 	}
 
 	$piece_mask = $pawns & $black;
 	while ($piece_mask) {
-		my $shift = cp_bitboard_count_trailing_zbits $piece_mask;
-		$signature ^= _cp_zk_lookup(CP_PAWN, CP_BLACK, $shift);
-		$piece_mask = cp_bitboard_clear_least_set $piece_mask;
+		my $shift = (do {	my $B = $piece_mask & -$piece_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
+		$signature ^= $zk_pieces[(((CP_PAWN) << 7) | ((CP_BLACK) << 6) | ($shift)) - 128];
+		$piece_mask = (($piece_mask) & (($piece_mask) - 1));
 	}
 
 	$piece_mask = $knights & $white;
 	while ($piece_mask) {
-		my $shift = cp_bitboard_count_trailing_zbits $piece_mask;
-		$signature ^= _cp_zk_lookup(CP_KNIGHT, CP_WHITE, $shift);
-		$piece_mask = cp_bitboard_clear_least_set $piece_mask;
+		my $shift = (do {	my $B = $piece_mask & -$piece_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
+		$signature ^= $zk_pieces[(((CP_KNIGHT) << 7) | ((CP_WHITE) << 6) | ($shift)) - 128];
+		$piece_mask = (($piece_mask) & (($piece_mask) - 1));
 	}
 
 	$piece_mask = $knights & $black;
 	while ($piece_mask) {
-		my $shift = cp_bitboard_count_trailing_zbits $piece_mask;
-		$signature ^= _cp_zk_lookup(CP_KNIGHT, CP_BLACK, $shift);
-		$piece_mask = cp_bitboard_clear_least_set $piece_mask;
+		my $shift = (do {	my $B = $piece_mask & -$piece_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
+		$signature ^= $zk_pieces[(((CP_KNIGHT) << 7) | ((CP_BLACK) << 6) | ($shift)) - 128];
+		$piece_mask = (($piece_mask) & (($piece_mask) - 1));
 	}
 
 	$piece_mask = $bishops & $white;
 	while ($piece_mask) {
-		my $shift = cp_bitboard_count_trailing_zbits $piece_mask;
-		$signature ^= _cp_zk_lookup(CP_BISHOP, CP_WHITE, $shift);
-		$piece_mask = cp_bitboard_clear_least_set $piece_mask;
+		my $shift = (do {	my $B = $piece_mask & -$piece_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
+		$signature ^= $zk_pieces[(((CP_BISHOP) << 7) | ((CP_WHITE) << 6) | ($shift)) - 128];
+		$piece_mask = (($piece_mask) & (($piece_mask) - 1));
 	}
 
 	$piece_mask = $bishops & $black;
 	while ($piece_mask) {
-		my $shift = cp_bitboard_count_trailing_zbits $piece_mask;
-		$signature ^= _cp_zk_lookup(CP_BISHOP, CP_BLACK, $shift);
-		$piece_mask = cp_bitboard_clear_least_set $piece_mask;
+		my $shift = (do {	my $B = $piece_mask & -$piece_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
+		$signature ^= $zk_pieces[(((CP_BISHOP) << 7) | ((CP_BLACK) << 6) | ($shift)) - 128];
+		$piece_mask = (($piece_mask) & (($piece_mask) - 1));
 	}
 
 	$piece_mask = $rooks & $white;
 	while ($piece_mask) {
-		my $shift = cp_bitboard_count_trailing_zbits $piece_mask;
-		$signature ^= _cp_zk_lookup(CP_ROOK, CP_WHITE, $shift);
-		$piece_mask = cp_bitboard_clear_least_set $piece_mask;
+		my $shift = (do {	my $B = $piece_mask & -$piece_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
+		$signature ^= $zk_pieces[(((CP_ROOK) << 7) | ((CP_WHITE) << 6) | ($shift)) - 128];
+		$piece_mask = (($piece_mask) & (($piece_mask) - 1));
 	}
 
 	$piece_mask = $rooks & $black;
 	while ($piece_mask) {
-		my $shift = cp_bitboard_count_trailing_zbits $piece_mask;
-		$signature ^= _cp_zk_lookup(CP_ROOK, CP_BLACK, $shift);
-		$piece_mask = cp_bitboard_clear_least_set $piece_mask;
+		my $shift = (do {	my $B = $piece_mask & -$piece_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
+		$signature ^= $zk_pieces[(((CP_ROOK) << 7) | ((CP_BLACK) << 6) | ($shift)) - 128];
+		$piece_mask = (($piece_mask) & (($piece_mask) - 1));
 	}
 
 	$piece_mask = $queens & $white;
 	while ($piece_mask) {
-		my $shift = cp_bitboard_count_trailing_zbits $piece_mask;
-		$signature ^= _cp_zk_lookup(CP_QUEEN, CP_WHITE, $shift);
-		$piece_mask = cp_bitboard_clear_least_set $piece_mask;
+		my $shift = (do {	my $B = $piece_mask & -$piece_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
+		$signature ^= $zk_pieces[(((CP_QUEEN) << 7) | ((CP_WHITE) << 6) | ($shift)) - 128];
+		$piece_mask = (($piece_mask) & (($piece_mask) - 1));
 	}
 
 	$piece_mask = $queens & $black;
 	while ($piece_mask) {
-		my $shift = cp_bitboard_count_trailing_zbits $piece_mask;
-		$signature ^= _cp_zk_lookup(CP_QUEEN, CP_BLACK, $shift);
-		$piece_mask = cp_bitboard_clear_least_set $piece_mask;
+		my $shift = (do {	my $B = $piece_mask & -$piece_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
+		$signature ^= $zk_pieces[(((CP_QUEEN) << 7) | ((CP_BLACK) << 6) | ($shift)) - 128];
+		$piece_mask = (($piece_mask) & (($piece_mask) - 1));
 	}
 
 	$piece_mask = $kings & $white;
 	while ($piece_mask) {
-		my $shift = cp_bitboard_count_trailing_zbits $piece_mask;
-		$signature ^= _cp_zk_lookup(CP_KING, CP_WHITE, $shift);
-		$piece_mask = cp_bitboard_clear_least_set $piece_mask;
+		my $shift = (do {	my $B = $piece_mask & -$piece_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
+		$signature ^= $zk_pieces[(((CP_KING) << 7) | ((CP_WHITE) << 6) | ($shift)) - 128];
+		$piece_mask = (($piece_mask) & (($piece_mask) - 1));
 	}
 
 	$piece_mask = $kings & $black;
 	while ($piece_mask) {
-		my $shift = cp_bitboard_count_trailing_zbits $piece_mask;
-		$signature ^= _cp_zk_lookup(CP_KING, CP_BLACK, $shift);
-		$piece_mask = cp_bitboard_clear_least_set $piece_mask;
+		my $shift = (do {	my $B = $piece_mask & -$piece_mask;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
+		$signature ^= $zk_pieces[(((CP_KING) << 7) | ((CP_BLACK) << 6) | ($shift)) - 128];
+		$piece_mask = (($piece_mask) & (($piece_mask) - 1));
 	}
 
-	my $pos_info = cp_pos_info $self;
-	my $ep_shift = cp_pos_info_en_passant_shift $pos_info;
+	my $pos_info = $self->[CP_POS_INFO];
+	my $ep_shift = (($pos_info & (0x3f << 5)) >> 5);
 	if ($ep_shift) {
 		$signature ^= $zk_ep_files[$ep_shift & 0x7];
 	}
-	my $castling = cp_pos_info_castling_rights $pos_info;
+	my $castling = $pos_info & 0xf;
 	$signature ^= $zk_castling[$castling];
 
-	if (cp_pos_info_to_move $pos_info) {
+	if ((($pos_info & (1 << 4)) >> 4)) {
 		$signature ^= $zk_color;
 	}
 
@@ -1813,7 +1888,7 @@ sub __updateZobristKey {
 sub __zobristKeyLookup {
 	my ($self, $piece, $color, $shift) = @_;
 
-	return _cp_zk_lookup($piece, $color, $shift);
+	return $zk_pieces[((($piece) << 7) | (($color) << 6) | ($shift)) - 128];
 }
 
 sub __zobristKeyLookupByIndex {
@@ -1871,15 +1946,66 @@ sub __zobristKeyDump {
 	return $output;
 }
 
+sub insufficientMaterial {
+	my ($self) = @_;
+
+	# FIXME! Once we distinguish black and white material (should we?),
+	# we can try to take an early exit here if any of the two sides has
+	# more material than a bishop.
+
+	# All of these are sufficient to mate.
+	if ($self->[CP_POS_PAWNS] | $self->[CP_POS_ROOKS] | $self->[CP_POS_QUEENS]) {
+		return;
+	}
+
+	# There is neither a queen nor a rook nor a pawn.  Two or more minor
+	# pieces on one side can always mate.
+	my $not_kings = ~$self->[CP_POS_KINGS];
+
+	my $white = $self->[CP_POS_WHITE_PIECES];
+	my $white_minor_pieces = $white & $not_kings;
+	if (($white_minor_pieces && ($white_minor_pieces & ($white_minor_pieces - 1)))) {
+		return;
+	}
+
+	my $black = $self->[CP_POS_BLACK_PIECES];
+	my $black_minor_pieces = $black & $not_kings;
+	if (($black_minor_pieces && ($black_minor_pieces & ($black_minor_pieces - 1)))) {
+		return;
+	}
+
+	# One minor piece against a lone king cannot mate.
+	if(!($white_minor_pieces && $black_minor_pieces)) {
+		return 1;
+	}
+
+	# Both sides have exactly one minor piece.  The only combination that
+	# is a draw is KBKB with bishops of different color.  That means, that
+	# both sides can mate if a knight is on the board.
+	if ($self->[CP_POS_KNIGHTS]) {
+		return;
+	}
+
+	# Every side has one bishop.  It is not necessarily a draw, if they are
+	# on different colored squares.
+	my $bishops = $self->[CP_POS_BISHOPS];
+	if (!!($white & $bishops & CP_WHITE_MASK)
+	    != !!($black & $bishops & CP_BLACK_MASK)) {
+		return;
+	}
+
+	return 1;
+}
+
 # Do not remove this line!
-# __END_MACROS__
+
 
 my @export_accessors = qw(
 	CP_POS_WHITE_PIECES CP_POS_BLACK_PIECES
 	CP_POS_KINGS CP_POS_QUEENS
 	CP_POS_ROOKS CP_POS_BISHOPS CP_POS_KNIGHTS CP_POS_PAWNS
-	CP_POS_HALF_MOVE_CLOCK CP_POS_HALF_MOVES
-	CP_POS_INFO
+	CP_POS_HALF_MOVE_CLOCK CP_POS_REVERSIBLE_CLOCK CP_POS_HALF_MOVES
+	CP_POS_INFO CP_POS_SIGNATURE
 	CP_POS_IN_CHECK CP_POS_EVASION_SQUARES
 );
 
@@ -1900,6 +2026,7 @@ my @export_board = qw(
 	CP_E_MASK CP_F_MASK CP_G_MASK CP_H_MASK
 	CP_1_MASK CP_2_MASK CP_3_MASK CP_4_MASK
 	CP_5_MASK CP_6_MASK CP_7_MASK CP_8_MASK
+	CP_WHITE_MASK CP_BLACK_MASK
 );
 
 my @export_pieces = qw(
@@ -2132,6 +2259,10 @@ sub halfMoves {
 
 sub halfMoveClock {
 	shift->[CP_POS_HALF_MOVE_CLOCK];
+}
+
+sub reversibleClock {
+	shift->[CP_POS_REVERSIBLE_CLOCK];
 }
 
 sub info {
@@ -2410,8 +2541,16 @@ sub RNG {
 sub __parseSAN {
 	my ($self, $move) = @_;
 
-	# First clean-up.
+	# First clean-up but in multiple steps.
 	my $san = $move;
+
+	# First delete whitespace and dots.
+	$san =~ s/[ \011-\015\.]//g;
+
+	# So that we can strip-off s possible en-passant notation.
+	$san =~ s/ep//gi;
+
+	# And now other noise.
 	$san =~ s/[^a-h0-8pnbrqko]//gi;
 
 	my $pattern;
@@ -2605,7 +2744,7 @@ sub perftByUndoWithOutput {
 }
 
 sub perftByCopyWithOutput {
-	my ($class, $pos, $depth, $fh) = @_;
+	my ($self, $depth, $fh) = @_;
 
 	return if $depth <= 0;
 
@@ -2614,9 +2753,9 @@ sub perftByCopyWithOutput {
 
 	my $nodes = 0;
 
-	my @moves = $pos->pseudoLegalMoves;
+	my @moves = $self->pseudoLegalMoves;
 	foreach my $move (@moves) {
-		my $copy = bless [@$pos], 'Chess::Plisco';
+		my $copy = bless [@$self], 'Chess::Plisco';
 		$copy->doMove($move) or next;
 
 		my $movestr = $copy->moveCoordinateNotation($move);
@@ -2626,7 +2765,7 @@ sub perftByCopyWithOutput {
 		my $subnodes;
 
 		if ($depth > 1) {
-			$subnodes = $class->perftByCopy($copy, $depth - 1);
+			$subnodes = $self->perftByCopy($copy, $depth - 1);
 		} else {
 			$subnodes = 1;
 		}
@@ -2901,21 +3040,6 @@ sub unapplyMove {
 	return if 'ARRAY' ne reftype $state;
 
 	return $self->undoMove($state);
-}
-
-sub insufficientMaterial {
-	my ($self) = @_;
-
-	# FIXME! Once we distinguish black and white material (should we?),
-	# we can try to take an early exit here if any of the two sides has
-	# more material than a bishop.
-
-	# All of these are sufficient to mate.
-	if ($self->[CP_POS_PAWNS] | $self->[CP_POS_ROOKS] | $self->[CP_POS_QUEENS]) {
-		return;
-	}
-
-	return 1;
 }
 
 sub dumpAll {

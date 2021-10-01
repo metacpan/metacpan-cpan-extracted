@@ -21,11 +21,11 @@ PGObject
 
 =head1 VERSION
 
-version 1.4.0
+version 1.5.0
 
 =cut
 
-our $VERSION = '1.4.0';
+our $VERSION = '1.5.0';
 
 
 =head1 SYNOPSIS
@@ -543,11 +543,17 @@ sub server_version {
     my $self = shift @_;
     my $dbname = (shift @_) || 'template1';
     my $version =
-           __PACKAGE__->new($self->export, (dbname => $dbname)
-                           )->connect->selectrow_array('SELECT version()');
-    my ($retval) = $version =~ /(\d+\.\d+\.\d+)/
-        or croak 'failed to extract version string';
-    return $retval;
+        __PACKAGE__->new($self->export, (dbname => $dbname)
+        )->connect->{pg_server_version};
+
+    my $retval = '';
+    while (1) {
+        $retval = ($version % 100) . $retval;
+        $version = int($version / 100);
+
+        return $retval unless $version;
+        $retval = ".$retval";
+    }
 }
 
 

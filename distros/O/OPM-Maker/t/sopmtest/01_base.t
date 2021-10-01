@@ -13,8 +13,9 @@ use_ok 'OPM::Maker::Command::sopmtest';
 
 my $dir  = File::Spec->rel2abs( dirname __FILE__ );
 my $sopm = File::Spec->catfile( $dir, '..', 'valid', 'TestSMTP', 'TestSMTP.sopm' );
-my $opm  = File::Spec->catfile( $dir, '..', 'valid', 'TestSMTP', 'TestSMTP-0.0.1.opm' );
+my $otobo_opm  = File::Spec->catfile( $dir, '..', 'valid', 'SecondSMTP', 'SecondSMTP-0.0.1.opm' );
 
 OPM::Maker::Command::sopmtest::execute( undef, {}, [ $sopm ] );
+OPM::Maker::Command::sopmtest::execute( undef, {}, [ $otobo_opm ] );
 
 done_testing();

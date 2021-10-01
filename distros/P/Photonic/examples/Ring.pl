@@ -40,8 +40,9 @@ use constant PI=>4*atan2(1,1);
 
 use Photonic::Geometry::FromB;
 use Photonic::LE::NR2::EpsL;
+use Photonic::LE::NR2::Haydock;
 use Photonic::WE::R2::Metric;
-use Photonic::WE::R2::AllH;
+use Photonic::WE::R2::Haydock;
 use Photonic::WE::R2::EpsilonP;
 use PDL;
 use PDL::NiceSlice;
@@ -101,11 +102,10 @@ my $elem=$epsBall->dim(0); # how many frequencies for calculation
 # Note that in Non-Retarded (NR#) approximation wavelength size $a
 # is very large compared with L
 my $gmtnr=Photonic::Geometry::FromB->new(B=>$B,L=>pdl($l*$a,$l*$a),Direction0=>pdl(0,1));
-# object $allh has access to Haydock's coefficientes
-my $allh=Photonic::LE::NR2::AllH->new(geometry=>$gmtnr, nh=>$nh);
-# object $nr has access to longitudinal components of macrsocopic
+# object $allh has access to Haydock's coefficients
+my $allh=Photonic::LE::NR2::Haydock->new(geometry=>$gmtnr, nh=>$nh);
+# object $nr has access to longitudinal components of macroscopic
 # tensor via EpsL attribute
-my $nr=Photonic::LE::NR2::EpsL->new(nr=>$allh, nh=>$nh);
 # that will be used to evaluate $er for different frequency below
 # where $er is the macroscopic dielectric tensor component in Direction0
 # polarization direction
@@ -124,7 +124,7 @@ my @out=(); # list for the output results
 #--------------------------------------------
 
 #------------------------------------------------------------
-# Begining of both Non Retarded (NR#) and Retarded (R#) caclulation
+# Beginning of both Non Retarded (NR#) and Retarded (R#) calculation
 # for each frequency
 #------------------------------------------------------------
 for(my $j=0;$j<$elem;$j++){
@@ -137,7 +137,8 @@ for(my $j=0;$j<$elem;$j++){
 # with the NR2 evaluate method the same Haydock coefficients are used
 # for all frequencies. The object $nr knows about it.
 # First argument is the host (epsA)
-    my $enr=$nr->evaluate($epsA->r2C,$epsB);
+    my $nr=Photonic::LE::NR2::EpsL->new(haydock=>$allh, nh=>$nh, epsA=>$epsA->r2C, epsB=>$epsB);
+    my $enr=$nr->epsL;
 # $enr is the macroscopic dielectric tensor (complex number) in \hat y=(0,1) Direction0
 #----------------------------------------------------------------------------------
 
@@ -150,7 +151,7 @@ for(my $j=0;$j<$elem;$j++){
     my $m=Photonic::WE::R2::Metric->new(geometry=>$gmtr, epsilon=>$epsA,
 					  wavenumber=>pdl($q),
 					  wavevector=>pdl([$k,0]));
-    my $h=Photonic::WE::R2::AllH->new(metric=>$m,
+    my $h=Photonic::WE::R2::Haydock->new(metric=>$m,
 					polarization=>pdl(0,1)->r2C, nh=>$nh);
     my $e=Photonic::WE::R2::EpsilonP->new(haydock=>$h, nh=>$nh);
     my $er=$e->evaluate($epsB);

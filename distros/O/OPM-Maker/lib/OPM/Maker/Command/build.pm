@@ -1,16 +1,18 @@
 package OPM::Maker::Command::build;
-$OPM::Maker::Command::build::VERSION = '1.00';
+$OPM::Maker::Command::build::VERSION = '1.10';
 use strict;
 use warnings;
 
 # ABSTRACT: Build OPM packages
 
+use Carp qw(croak);
 use MIME::Base64 ();
 use Sys::Hostname;
 use Path::Class ();
 use XML::LibXML;
 
 use OPM::Maker -command;
+use OPM::Maker::Utils qw(reformat_size);
 
 sub abstract {
     return "build package files for Znuny, OTOBO or ((OTRS)) Community Edition";
@@ -29,7 +31,7 @@ sub opt_spec {
 
 sub validate_args {
     my ($self, $opt, $args) = @_;
-    
+
     $self->usage_error( 'need path to .sopm' ) if
         !$args or 
         'ARRAY' ne ref $args or
@@ -40,16 +42,40 @@ sub validate_args {
 
 sub execute {
     my ($self, $opt, $args) = @_;
-    
+
     my $file = $args->[0];
-    
+
     my $hostname  = hostname;
     my @time      = localtime;
     my $timestamp = sprintf "%04d-%02d-%02d %02d:%02d:%02d", 
         $time[5]+1900, $time[4]+1, $time[3], 
         $time[2], $time[1], $time[0];
-    
-    my $parser = XML::LibXML->new;
+
+    my %opts;
+    if ( !$ENV{OPM_UNSECURE} ) {
+        %opts = (
+            no_network      => 1,
+            expand_entities => 0,
+        );
+    }
+
+    my $size = -s $file;
+
+    # if file is big, but not "too big"
+    my $max_size = 31_457_280;
+    if ( $ENV{OPM_MAX_SIZE} ) {
+        $max_size = reformat_size( $ENV{OPM_MAX_SIZE} );
+    }
+
+    if ( $size > $max_size ) {
+        croak "$file too big (max size: $max_size bytes)";
+    }
+
+    if ( $size > 10_000_000 ) {
+        $opts{huge} = 1;
+    }
+
+    my $parser = XML::LibXML->new( %opts );
     my $tree   = $parser->parse_file( $file );
     
     my $sopm_path = Path::Class::File->new( $file );
@@ -112,7 +138,7 @@ OPM::Maker::Command::build - Build OPM packages
 
 =head1 VERSION
 
-version 1.00
+version 1.10
 
 =head1 AUTHOR
 

@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::DROLSKY - DROLSKY's plugin bundle
 
 # VERSION
 
-version 1.19
+version 1.20
 
 # SYNOPSIS
 
@@ -286,8 +286,6 @@ This is more or less equivalent to the following `dist.ini`:
 # SUPPORT
 
 Bugs may be submitted at [https://github.com/autarch/Dist-Zilla-PluginBundle-DROLSKY/issues](https://github.com/autarch/Dist-Zilla-PluginBundle-DROLSKY/issues).
-
-I am also usually active on IRC as 'autarch' on `irc://irc.perl.org`.
 
 # SOURCE
 

@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.519';
+our $VERSION = '0.520';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -105,8 +105,8 @@ sub format {
             and ($keyword ne 'dependentRequired' or $error ne 'not all dependencies are satisfied')
         );
 
-        if ($keep and $keyword and $keyword =~ /^unevaluated(?:Items|Properties)$/
-            and $error !~ /"$keyword" keyword present, but/) {
+      if ($keep and $keyword and $keyword =~ /^unevaluated(?:Items|Properties)$/) {
+        if ($error !~ /"$keyword" keyword present, but/) {
           my $parent_keyword_location = join('/', head(-1, split('/', $_->keyword_location)));
           my $parent_instance_location = join('/', head(-1, split('/', $_->instance_location)));
 
@@ -117,6 +117,7 @@ sub format {
             and not grep m/^$parent_keyword_location/, keys %keyword_locations
           );
         }
+      }
 
       ++$instance_locations{$_->instance_location} if $keep;
       ++$keyword_locations{$_->keyword_location} if $keep;
@@ -170,7 +171,7 @@ JSON::Schema::Modern::Result - Contains the result of a JSON Schema evaluation
 
 =head1 VERSION
 
-version 0.519
+version 0.520
 
 =head1 SYNOPSIS
 

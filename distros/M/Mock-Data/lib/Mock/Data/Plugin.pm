@@ -1,11 +1,10 @@
 package Mock::Data::Plugin;
-use strict;
-use warnings;
-use Carp;
+use Exporter::Extensible -exporter_setup => 1;
+require Carp;
 our @CARP_NOT= qw( Mock::Data Mock::Data::Util );
 
 # ABSTRACT: Optional base class for Plugins
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 1;
@@ -32,7 +31,20 @@ The process of loading a plugin is exactly:
   require $plugin_class;
   $mock= $plugin_class->apply_mockdata_plugin($mock);
 
-The most common things a plugin might do in that method are
+=head1 EXTENDING
+
+If you do inherit from this class, you get the benefits of L<Exporter::Extensible>, and
+C<@CARP_NOT> linkage that makes L<Carp> errors point to the code that called into C<Mock::Data>
+rather than the code of C<Mock::Data> that called your plugin's function.
+
+  package Mock::Data::Plugin::MyPlugin;
+  use Mock::Data::Plugin -exporter_setup => 1;
+  sub apply_mockdata_plugin {
+    my $mock= shift;
+    ...
+  }
+
+The most common things a plugin might do in that method are:
 
 =over
 
@@ -63,7 +75,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,5 +1,5 @@
 package Photonic::WE::S::Field;
-$Photonic::WE::S::Field::VERSION = '0.018';
+$Photonic::WE::S::Field::VERSION = '0.021';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::S::Field
 
 =head1 VERSION
 
-version 0.018
+version 0.021
 
 =head1 COPYRIGHT NOTICE
 
@@ -57,13 +57,13 @@ the components.
 
 =over 4
 
-=item * new(nr=>$nr, nh=>$nh, smallE=>$smallE)
+=item * new(haydock=>$haydock, nh=>$nh, smallE=>$smallE)
 
 Initializes the structure.
 
-$nr Photonic::WE::S::AllH is a Haydock calculator for the
+$haydock Photonic::WE::S::Haydock is a Haydock calculator for the
 structure, *initialized* with the flag keepStates=>1
-(Photonic::Types::AllHSave, as defined in Photonic::Types).
+(Photonic::Types::HaydockSave, as defined in Photonic::Types).
 
 $nh is the maximum number of Haydock coefficients to use.
 
@@ -81,9 +81,9 @@ dielectric functions of the host $epsA and the particle $epsB.
 
 =over 4
 
-=item * nr
+=item * haydock
 
-Photonic::WE::S::AllH structure
+Photonic::WE::S::Haydock structure
 
 =item * nh
 
@@ -115,11 +115,11 @@ optional reciprocal space filter
 
 =item * field
 
-real space field in format RorI, cartesian, nx, ny,...
+real space field in format cartesian, nx, ny,...
 
 =item * epsL
 
-Longitudinal dielectric response, obtained colateraly from last
+Longitudinal dielectric response, obtained colaterally from last
 evaluation of the field
 
 =back
@@ -137,14 +137,14 @@ evaluation of the field
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
-use Photonic::WE::S::AllH;
+use Photonic::WE::S::Haydock;
 use Photonic::Utils qw(cgtsv GtoR);
 use Photonic::Types;
 use Photonic::Iterator;
 use Moose;
 use MooseX::StrictConstructor;
 
-has 'nr'=>(is=>'ro', isa=>'Photonic::Types::AllHSave', required=>1,
+has 'haydock'=>(is=>'ro', isa=>'Photonic::Types::HaydockSave', required=>1,
            documentation=>'Haydock recursion calculator');
 has 'Es'=>(is=>'ro', isa=>'ArrayRef[Photonic::Types::PDLComplex]', init_arg=>undef,
            writer=>'_Es', documentation=>'Field coefficients');
@@ -167,18 +167,18 @@ has 'smallE'=>(is=>'ro', isa=>'Num', required=>1, default=>1e-7,
 
 sub BUILD {
     my $self=shift;
-    $self->nr->run unless $self->nr->iteration;
+    $self->haydock->run unless $self->haydock->iteration;
 }
 
 sub evaluate {
     my $self=shift;
-    my $as=$self->nr->as;
-    my $bs=$self->nr->bs;
-    my $cs=$self->nr->cs;
-    my $stateit=$self->nr->state_iterator;
+    my $as=$self->haydock->as;
+    my $bs=$self->haydock->bs;
+    my $cs=$self->haydock->cs;
+    my $stateit=$self->haydock->state_iterator;
     my $nh=$self->nh; #desired number of Haydock terms
     #don't go beyond available values.
-    $nh=$self->nr->iteration if $nh>$self->nr->iteration;
+    $nh=$self->haydock->iteration if $nh>$self->haydock->iteration;
     # calculate using lapack for tridiag system
     my $diag = 1-$as->(0:$nh-1);
     # rotate complex zero from first to last element.
@@ -190,7 +190,7 @@ sub evaluate {
     #coefficients of g^{-1}E
     my $giEs= cgtsv($subdiag, $diag, $supradiag, $rhs);
     #states are xy,pm,nx,ny...
-    my @dims=$self->nr->B->dims; # actual dims of space
+    my @dims=$self->haydock->B->dims; # actual dims of space
     my $ndims=@dims; # num. of dims of space
     #field is xy,pm,nx,ny...
     my $field_G=PDL->zeroes($ndims, 2, @dims)->r2C;
@@ -201,18 +201,18 @@ sub evaluate {
 	$field_G+=$giE_G;
     }
     #
-    my $Es=$self->nr->applyMetric($field_G);
+    my $Es=$self->haydock->applyMetric($field_G);
     #Comment as normalization below makes it useless
-    #$Es*=$bs->((0))/$self->nr->metric->epsilon;
+    #$Es*=$bs->((0))/$self->haydock->metric->epsilon;
     my $Esp=$Es(:,(0)); # choose +k spinor component.
     my $e_0=1/($Esp->slice(":" . ",(0)" x $ndims)
-	       *$self->nr->polarization->conj)->sumover;
+	       *$self->haydock->polarization->conj)->sumover;
     # Normalize result so macroscopic field is 1.
     $Esp*=$e_0;
     $Esp *= $self->filter->(*1) if $self->has_filter;
     ##get cartesian out of the way, fourier transform, put cartesian.
     my $field_R=GtoR($Esp, $ndims, 1);
-    $field_R*=$self->nr->B->nelem; #scale to have unit macroscopic field
+    $field_R*=$self->haydock->B->nelem; #scale to have unit macroscopic field
     #result is xy,nx,ny...
     $self->_field($field_R);
     return $field_R;

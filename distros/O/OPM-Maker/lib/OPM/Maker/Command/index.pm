@@ -1,10 +1,11 @@
 package OPM::Maker::Command::index;
-$OPM::Maker::Command::index::VERSION = '1.00';
+$OPM::Maker::Command::index::VERSION = '1.10';
 use strict;
 use warnings;
 
 # ABSTRACT: Build index for an OPM repository
 
+use Carp qw(croak);
 use File::Basename;
 use File::Find::Rule;
 use MIME::Base64 ();
@@ -14,6 +15,7 @@ use XML::LibXML;
 use XML::LibXML::PrettyPrint;
 
 use OPM::Maker -command;
+use OPM::Maker::Utils qw(reformat_size);
 
 sub abstract {
     return "build index for an OPM repository";
@@ -55,7 +57,31 @@ sub execute {
     my $root_name;
     
     for my $opm_file ( sort @opm_files ) {
-        my $parser = XML::LibXML->new;
+        my $size = -s $opm_file;
+        my %opts;
+
+        if ( !$ENV{OPM_UNSECURE} ) {
+            %opts = (
+                no_network      => 1,
+                expand_entities => 0,
+            );
+        }
+
+        # if file is big, but not "too big"
+        my $max_size = 31_457_280;
+        if ( $ENV{OPM_MAX_SIZE} ) {
+            $max_size = reformat_size( $ENV{OPM_MAX_SIZE} );
+        }
+
+        if ( $size > $max_size ) {
+            croak "$opm_file too big (max size: $max_size bytes)";
+        }
+
+        if ( $size > 10_000_000 ) {
+            $opts{huge} = 1;
+        }
+
+        my $parser = XML::LibXML->new( %opts );
         my $tree   = $parser->parse_file( $opm_file );
         
         $tree->setStandalone( 0 );
@@ -142,7 +168,7 @@ OPM::Maker::Command::index - Build index for an OPM repository
 
 =head1 VERSION
 
-version 1.00
+version 1.10
 
 =head1 AUTHOR
 

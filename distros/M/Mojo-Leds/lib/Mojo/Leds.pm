@@ -1,5 +1,5 @@
 package Mojo::Leds;
-$Mojo::Leds::VERSION = '1.10';
+$Mojo::Leds::VERSION = '1.11';
 use Mojo::Base 'Mojolicious';
 use Mojo::Log;
 use Mojo::File 'path';
@@ -8,7 +8,9 @@ sub startup() {
     my $s = shift;
 
     # plugins
-    $s->plugin( Config => { file => 'cfg/app.cfg' } );
+    $s->plugin( Config => { default => {docs_root => 'www' }} );
+    $s->plugin( Config => { file => 'cfg/app.cfg' } )
+        if (-e $s->home->rel_file('cfg/app.cfg'));
 
     # log
     unless ( $s->app->mode eq 'development' ) {
@@ -70,7 +72,7 @@ Mojo::Leds - Leds aka Light Environment (emi) for Development System based on Mo
 
 =head1 VERSION
 
-version 1.10
+version 1.11
 
 =head1 SYNOPSIS
 

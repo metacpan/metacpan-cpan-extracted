@@ -1,12 +1,12 @@
 package Module::Load::Util;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-06'; # DATE
-our $DIST = 'Module-Load-Util'; # DIST
-our $VERSION = '0.004'; # VERSION
-
 use strict 'subs', 'vars';
 use Regexp::Pattern::Perl::Module ();
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-09-30'; # DATE
+our $DIST = 'Module-Load-Util'; # DIST
+our $VERSION = '0.006'; # VERSION
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
@@ -28,10 +28,10 @@ sub load_module_with_optional_args {
 
     my ($module, $args) = @_;
     if (ref $module_with_optional_args eq 'ARRAY') {
-        die "array form or module/class name must have 2 elements"
-            unless @$module_with_optional_args == 2;
+        die "array form or module/class name must have 1 or 2 elements"
+            unless @$module_with_optional_args == 1 || @$module_with_optional_args == 2;
         $module = $module_with_optional_args->[0];
-        $args = $module_with_optional_args->[1];
+        $args = $module_with_optional_args->[1] || [];
         $args = [%$args] if ref $args eq 'HASH';
         die "In array form of module/class name, the 2nd element must be ".
             "arrayref or hashref" unless ref $args eq 'ARRAY';
@@ -74,7 +74,7 @@ sub load_module_with_optional_args {
 
     my $do_import = defined $opts->{import} ? $opts->{import} : 1;
     if ($do_import) {
-        eval "package $target_package; $module->import(\@{\$args});";
+        eval "package $target_package; $module->import(\@{\$args});"; ## no critic: BuiltinFunctions::ProhibitStringyEval
         die if $@;
     }
 
@@ -117,11 +117,31 @@ Module::Load::Util - Some utility routines related to module loading
 
 =head1 VERSION
 
-This document describes version 0.004 of Module::Load::Util (from Perl distribution Module-Load-Util), released on 2021-02-06.
+This document describes version 0.006 of Module::Load::Util (from Perl distribution Module-Load-Util), released on 2021-09-30.
 
 =head1 SYNOPSIS
 
+ use Module::Load::Util qw(
+     load_module_with_optional_args
+     instantiate_class_with_optional_args
+ );
+
+ load_module_with_optional_args("Foo::Bar=import-arg1,import-arg2");
+ load_module_with_optional_args(["Foo::Bar", ["import-arg1", "import-arg2"]]);
+
+ my $obj = instantiate_class_with_optional_args("Some::Class=opt1,val1,opt2,val2");
+ my $obj = instantiate_class_with_optional_args(["Some::Class", {opt1=>"val1",opt2=>"val2"}]);
+
+See more examples in each function's documentation in the L</FUNCTIONS> section.
+
 =head1 DESCRIPTION
+
+This module provides some utility routines related to module loading. Currently
+what it offers now are the two functions L</load_module_with_optional_args> and
+L</instantiate_class_with_optional_args>. These functions are designed for use
+with command-line and/or plugin-based applications. You can specify
+module/class/plugin to load in a flexible format, as a string or 2-element
+array. Please see the function's documentation for more details.
 
 =head1 FUNCTIONS
 
@@ -250,14 +270,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Module-Loa
 
 Source repository is at L<https://github.com/perlancar/perl-Module-Load-Util>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Module-Load-Util/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Module::Load>
@@ -270,11 +282,36 @@ L<Sah::Schema::perl::modname_with_optional_args>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Load-Util>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

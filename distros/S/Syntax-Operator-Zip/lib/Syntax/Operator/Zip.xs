@@ -50,12 +50,12 @@ static OP *pp_zip(pTHX)
     AV *av = newAV();
 
     if(lhs < lhs_stop)
-      av_push(av, SvREFCNT_inc(*lhs++));
+      av_push(av, newSVsv(*lhs++));
     else
       av_push(av, &PL_sv_undef);
 
     if(rhs < rhs_stop)
-      av_push(av, SvREFCNT_inc(*rhs++));
+      av_push(av, newSVsv(*rhs++));
     else
       av_push(av, &PL_sv_undef);
 
@@ -66,8 +66,8 @@ static OP *pp_zip(pTHX)
 }
 
 struct XSParseInfixHooks infix_zip = {
-  .lhs_flags = XPI_OPERAND_TERM_LIST,
-  .rhs_flags = XPI_OPERAND_TERM_LIST,
+  .lhs_flags = XPI_OPERAND_TERM_LIST|XPI_OPERAND_ONLY_LOOK,
+  .rhs_flags = XPI_OPERAND_TERM_LIST|XPI_OPERAND_ONLY_LOOK,
   .permit_hintkey = "Syntax::Operator::Zip/Z",
   .cls = 0,
 
@@ -133,12 +133,12 @@ static OP *pp_mesh(pTHX)
 
   while(lhs < lhs_stop || rhs < rhs_stop) {
     if(lhs < lhs_stop)
-      PUSHs(*lhs++);
+      mPUSHs(newSVsv(*lhs++));
     else
       PUSHs(&PL_sv_undef);
 
     if(rhs < rhs_stop)
-      PUSHs(*rhs++);
+      mPUSHs(newSVsv(*rhs++));
     else
       PUSHs(&PL_sv_undef);
   }
@@ -147,8 +147,8 @@ static OP *pp_mesh(pTHX)
 }
 
 struct XSParseInfixHooks infix_mesh = {
-  .lhs_flags = XPI_OPERAND_TERM_LIST,
-  .rhs_flags = XPI_OPERAND_TERM_LIST,
+  .lhs_flags = XPI_OPERAND_TERM_LIST|XPI_OPERAND_ONLY_LOOK,
+  .rhs_flags = XPI_OPERAND_TERM_LIST|XPI_OPERAND_ONLY_LOOK,
   .permit_hintkey = "Syntax::Operator::Zip/Z",
   .cls = 0,
 
@@ -160,7 +160,7 @@ struct XSParseInfixHooks infix_mesh = {
 MODULE = Syntax::Operator::Zip    PACKAGE = Syntax::Operator::Zip
 
 BOOT:
-  boot_xs_parse_infix(0.17);
+  boot_xs_parse_infix(0.18);
 
   register_xs_parse_infix("Z", &infix_zip, NULL);
   register_xs_parse_infix("M", &infix_mesh, NULL);

@@ -30,8 +30,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Math::BigInt" : "1.999823",
-            "Math::BigRat" : "0.2616",
+            "Math::BigInt" : "1.999825",
+            "Math::BigRat" : "0.2618",
             "perl" : "5.010"
          }
       },
@@ -49,6 +49,6 @@
          "web" : "https://github.com/pjacklam/p5-bignum"
       }
    },
-   "version" : "0.53",
+   "version" : "0.61",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

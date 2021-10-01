@@ -9,7 +9,7 @@ require Carp;
 our @CARP_NOT= qw( Mock::Data Mock::Data::Util );
 
 # ABSTRACT: Utilities and optional base class for authoring generators
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 sub generate { Carp::croak "Unimplemented" }
@@ -103,7 +103,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 COPYRIGHT AND LICENSE
 

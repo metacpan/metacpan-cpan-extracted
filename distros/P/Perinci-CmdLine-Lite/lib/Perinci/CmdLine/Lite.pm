@@ -1,19 +1,23 @@
 package Perinci::CmdLine::Lite;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-06'; # DATE
-our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.907'; # VERSION
-
+# put pragmas + Log::ger here
 use 5.010001;
 # use strict; # already enabled by Mo
 # use warnings; # already enabled by Mo
 use Log::ger;
 
+# put other modules alphabetically here
+use IO::Interactive qw(is_interactive);
 use List::Util qw(first);
 use Mo qw(build default);
 #use Moo;
 extends 'Perinci::CmdLine::Base';
+
+# put global variables alphabetically here
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-10-01'; # DATE
+our $DIST = 'Perinci-CmdLine-Lite'; # DIST
+our $VERSION = '1.910'; # VERSION
 
 # when debugging, use this instead of the above because Mo doesn't give clear
 # error message if base class has errors.
@@ -114,7 +118,7 @@ my $setup_progress;
 sub _setup_progress_output {
     my $self = shift;
 
-    return unless $ENV{PROGRESS} // (-t STDOUT);
+    return unless $ENV{PROGRESS} // is_interactive(*STDOUT);
 
     require Progress::Any::Output;
     Progress::Any::Output->set("TermProgressBarColor");
@@ -260,7 +264,7 @@ sub hook_before_action {
             name => 'validate_args',
             r => $r,
             on_success => sub {
-                no strict 'refs';
+                no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
 
                 # to be cheap, we simply use "$ref" as key as cache key. to be
                 # proper, it should be hash of serialized content.
@@ -542,7 +546,7 @@ sub action_subcommands {
 }
 
 sub action_version {
-    no strict 'refs';
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
 
     my ($self, $r) = @_;
 
@@ -659,7 +663,7 @@ Perinci::CmdLine::Lite - A Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.907 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2021-08-06.
+This document describes version 1.910 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2021-10-01.
 
 =head1 SYNOPSIS
 
@@ -791,11 +795,7 @@ backend on the fly.
 
 =head1 REQUEST KEYS
 
-All those supported by L<Perinci::CmdLine::Base>, plus:
-
-=over
-
-=back
+All those supported by L<Perinci::CmdLine::Base>.
 
 =head1 RESULT METADATA
 
@@ -806,17 +806,17 @@ All those supported by L<Perinci::CmdLine::Base>, plus:
 If set to true, then when formatting to C<text> formats, this class won't print
 any newline to keep the data being printed unmodified.
 
-=head1 CONTRIBUTOR
-
-=for stopwords Steven Haryanto
-
-Steven Haryanto <sharyanto@cpan.org>
-
 =head1 ATTRIBUTES
 
 All the attributes of L<Perinci::CmdLine::Base>, plus:
 
-=head2 validate_args => bool (default: 1)
+=over
+
+=item * validate_args => bool (default: 1)
+
+Validate arguments using schema from metadata.
+
+=back
 
 =head1 METHODS
 
@@ -864,14 +864,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Cm
 
 Source repository is at L<https://github.com/perlancar/perl-Perinci-CmdLine-Lite>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Lite>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Perinci::CmdLine::Any>
@@ -884,11 +876,56 @@ L<Perinci::CmdLine::Inline>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTORS
+
+=for stopwords Paul Cochrane Steven Haryanto (on Asus Zenbook)
+
+=over 4
+
+=item *
+
+Paul Cochrane <paul.cochrane@posteo.de>
+
+=item *
+
+Paul Cochrane <paul@liekut.de>
+
+=item *
+
+Steven Haryanto (on Asus Zenbook) <stevenharyanto@gmail.com>
+
+=back
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Lite>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

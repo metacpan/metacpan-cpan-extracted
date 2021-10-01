@@ -74,6 +74,7 @@ sub attach_db {
 
             ALIAS: while ( 1 ) {
                 my $info = join( "\n", @tmp_info );
+                $ax->print_sql_info( $info );
                 # Readline
                 my $alias = $tf->readline( ##
                     'alias: ',
@@ -83,16 +84,22 @@ sub attach_db {
                 if ( ! length $alias ) {
                     last ALIAS;
                 }
-                elsif ( any { $_->[1] eq $alias } @$cur_attached, @$new_attached ) {
-                    my $prompt = "alias '$alias' already used:";
-                    my $info = join( "\n", @tmp_info );
+                elsif ( $alias =~ /^(?:main|temp)\z/i ) {
+                    my $prompt = "Alias '$alias' not allowed.";
                     # Choose
                     my $retry = $tc->choose(
-                        [ undef, 'New alias' ],
-                        { prompt => $prompt, info => $info, undef => $sf->{i}{back}, clear_screen => 1 }
+                        [ undef ],
+                        { prompt => $prompt, info => $info, undef => 'Continue with ENTER', clear_screen => 1 }
                     );
-                    $ax->print_sql_info( $info );
-                    last ALIAS if ! defined $retry;
+                    next ALIAS;
+                }
+                elsif ( any { $_->[1] eq $alias } @$cur_attached, @$new_attached ) {
+                    my $prompt = "Alias '$alias' already used.";
+                    # Choose
+                    my $retry = $tc->choose(
+                        [ undef ],
+                        { prompt => $prompt, info => $info, undef => 'Continue with ENTER', clear_screen => 1 }
+                    );
                     next ALIAS;
                 }
                 else {

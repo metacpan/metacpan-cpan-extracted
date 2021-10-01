@@ -1,5 +1,5 @@
 package Photonic::WE::R2::Metric;
-$Photonic::WE::R2::Metric::VERSION = '0.018';
+$Photonic::WE::R2::Metric::VERSION = '0.021';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::R2::Metric
 
 =head1 VERSION
 
-version 0.018
+version 0.021
 
 =head1 COPYRIGHT NOTICE
 

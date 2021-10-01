@@ -470,15 +470,15 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       SV *varname = lex_scan_lexvar();
       switch(SvPVX(varname)[0]) {
         case '$':
-          if(!piece->u.c & XPK_LEXVAR_SCALAR)
+          if(!(piece->u.c & XPK_LEXVAR_SCALAR))
             yycroak("Lexical scalars are not permitted");
           break;
         case '@':
-          if(!piece->u.c & XPK_LEXVAR_ARRAY)
+          if(!(piece->u.c & XPK_LEXVAR_ARRAY))
             yycroak("Lexical arrays are not permitted");
           break;
         case '%':
-          if(!piece->u.c & XPK_LEXVAR_HASH)
+          if(!(piece->u.c & XPK_LEXVAR_HASH))
             yycroak("Lexical hashes are not permitted");
           break;
       }

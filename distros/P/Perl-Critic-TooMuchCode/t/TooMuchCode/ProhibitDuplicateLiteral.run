@@ -15,7 +15,7 @@ print "Forty two";
 print "Forty two";
 
 ## name allowed duplicate string
-## parms { whitelist => '"Forty two"' }
+## parms { allowlist => '"Forty two"' }
 ## failures 0
 ## cut
 
@@ -23,7 +23,7 @@ print "Forty two";
 print "Forty two";
 
 ## name multiple allowed duplicate strings
-## parms { whitelist => '"Forty two" \'Forty three\'' }
+## parms { allowlist => '"Forty two" \'Forty three\'' }
 ## failures 0
 ## cut
 
@@ -66,7 +66,7 @@ if ($a < 42) {
 }
 
 ## name certain duplicate numbers are OK
-## parms { whitelist => '42' }
+## parms { allowlist => '42' }
 ## failures 0
 ## cut
 
@@ -76,7 +76,7 @@ if ($a < 42) {
   }
 }
 
-## name without whitelist
+## name without allowlist
 ## failures 2
 ## cut
 
@@ -87,8 +87,8 @@ if ($a < 42) {
   }
 }
 
-## name with whitelist
-## parms { whitelist => '42 "Hello World"' }
+## name with allowlist
+## parms { allowlist => '42 "Hello World"' }
 ## failures 0
 ## cut
 
@@ -99,8 +99,8 @@ if ($a < 42) {
   }
 }
 
-## name whitelisting numbers also whitelist their string counterpart
-## parms { whitelist => '42' }
+## name numbers and their string counterpart
+## parms { allowlist => '42' }
 ## failures 0
 ## cut
 
@@ -110,8 +110,8 @@ if ($a eq "42") {
   }
 }
 
-## name whitelisting strings also whitelist their numerical counterpart
-## parms { whitelist => '"42"' }
+## name strings and their numerical counterpart
+## parms { allowlist => '"42"' }
 ## failures 0
 ## cut
 

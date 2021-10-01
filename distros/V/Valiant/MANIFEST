@@ -47,8 +47,6 @@ example/sql/schemas/2020-09-28-64975-first.sql
 example/sql/sqitch.plan
 example/sql/verify/2020-09-28-64975-first.sql
 example/t/basic.t
-example/t/params-nested.t
-example/t/params.t
 example/var/db.db
 example/var/sqitch.db
 lib/DBIx/Class/Valiant.pm

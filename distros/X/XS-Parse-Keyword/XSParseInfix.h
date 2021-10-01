@@ -35,6 +35,9 @@ enum {
   /* other space reserved for other scalar types */
   XPI_OPERAND_TERM_LIST = 6, /* term in list context */
   XPI_OPERAND_LIST      = 7, /* list in list context */
+
+  /* Other bitflags */
+  XPI_OPERAND_ONLY_LOOK = (1<<3),
 };
 
 struct XSParseInfixHooks {

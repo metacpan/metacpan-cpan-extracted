@@ -2,6 +2,8 @@ Build.PL
 Changes
 LICENSE
 MANIFEST
+META.json
+META.yml
 README
 alpo
 alpo2
@@ -10,6 +12,4 @@ t/00-load.t
 t/alpo.t
 t/pod-coverage.t
 t/pod.t
-META.yml
-META.json
 SIGNATURE    Added here by Module::Build

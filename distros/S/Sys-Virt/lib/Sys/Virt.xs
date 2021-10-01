@@ -6958,12 +6958,18 @@ MODULE = Sys::Virt::Network  PACKAGE = Sys::Virt::Network
 
 
 virNetworkPtr
-_create_xml(con, xml)
+_create_xml(con, xml, flags=0)
       virConnectPtr con;
       const char *xml;
+      unsigned int flags;
     CODE:
-      if (!(RETVAL = virNetworkCreateXML(con, xml)))
-          _croak_error();
+      if (flags) {
+          if (!(RETVAL = virNetworkCreateXMLFlags(con, xml, flags)))
+              _croak_error();
+      } else {
+          if (!(RETVAL = virNetworkCreateXML(con, xml)))
+              _croak_error();
+      }
   OUTPUT:
       RETVAL
 
@@ -8087,6 +8093,48 @@ list_capabilities(dev)
           free(names[i]);
       }
       Safefree(names);
+
+
+void
+set_autostart(nodedev, autostart)
+      virNodeDevicePtr nodedev;
+      int autostart;
+  PPCODE:
+      if (virNodeDeviceSetAutostart(nodedev, autostart) < 0)
+          _croak_error();
+
+
+int
+get_autostart(nodedev)
+      virNodeDevicePtr nodedev;
+ PREINIT:
+      int autostart;
+    CODE:
+      if (virNodeDeviceGetAutostart(nodedev, &autostart) < 0)
+          _croak_error();
+      RETVAL = autostart;
+  OUTPUT:
+      RETVAL
+
+
+int
+is_active(nodedev)
+      virNodeDevicePtr nodedev;
+    CODE:
+      if ((RETVAL = virNodeDeviceIsActive(nodedev)) < 0)
+          _croak_error();
+  OUTPUT:
+      RETVAL
+
+
+int
+is_persistent(nodedev)
+      virNodeDevicePtr nodedev;
+    CODE:
+      if ((RETVAL = virNodeDeviceIsPersistent(nodedev)) < 0)
+          _croak_error();
+  OUTPUT:
+      RETVAL
 
 
 void
@@ -10310,6 +10358,8 @@ BOOT:
 
       REGISTER_CONSTANT(VIR_NETWORK_DEFINE_VALIDATE, DEFINE_VALIDATE);
 
+      REGISTER_CONSTANT(VIR_NETWORK_CREATE_VALIDATE, CREATE_VALIDATE);
+
       REGISTER_CONSTANT(VIR_NETWORK_UPDATE_COMMAND_NONE, UPDATE_COMMAND_NONE);
       REGISTER_CONSTANT(VIR_NETWORK_UPDATE_COMMAND_MODIFY, UPDATE_COMMAND_MODIFY);
       REGISTER_CONSTANT(VIR_NETWORK_UPDATE_COMMAND_DELETE, UPDATE_COMMAND_DELETE);
@@ -10351,6 +10401,7 @@ BOOT:
 
       stash = gv_stashpv( "Sys::Virt::NetworkPort", TRUE );
       REGISTER_CONSTANT(VIR_NETWORK_PORT_CREATE_RECLAIM, CREATE_RECLAIM);
+      REGISTER_CONSTANT(VIR_NETWORK_PORT_CREATE_VALIDATE, CREATE_VALIDATE);
 
       REGISTER_CONSTANT_STR(VIR_NETWORK_PORT_BANDWIDTH_IN_AVERAGE, BANDWIDTH_IN_AVERAGE);
       REGISTER_CONSTANT_STR(VIR_NETWORK_PORT_BANDWIDTH_IN_BURST, BANDWIDTH_IN_BURST);
@@ -10466,6 +10517,10 @@ BOOT:
 
       stash = gv_stashpv( "Sys::Virt::NWFilter", TRUE );
       REGISTER_CONSTANT(VIR_NWFILTER_DEFINE_VALIDATE, DEFINE_VALIDATE);
+
+
+      stash = gv_stashpv( "Sys::Virt::NWFilterBinding", TRUE );
+      REGISTER_CONSTANT(VIR_NWFILTER_BINDING_CREATE_VALIDATE, CREATE_VALIDATE);
 
 
       stash = gv_stashpv( "Sys::Virt::Stream", TRUE );

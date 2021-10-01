@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.01
+    version 0.02
 
 SYNOPSIS
 
@@ -39,6 +39,24 @@ DESCRIPTION
 
     The latest versions as of when this Task was released should be
     installed at minimum if they are not already installed.
+
+    In addition these modules, which are dynamic dependencies on some
+    platforms, are installed:
+
+    Env::ShellWords
+
+    File::Listing
+
+    HTTP::Tiny
+
+    Mojo::DOM58
+
+    Sort::Versions
+
+    URI
+
+    Having these dynamic dependencies pre-installed makes it easier to test
+    Aliens in both share and system modes.
 
     Other prereqs may be added in the future if they are deemed useful for
     Alien development.

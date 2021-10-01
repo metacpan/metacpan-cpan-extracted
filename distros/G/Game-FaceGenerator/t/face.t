@@ -21,6 +21,8 @@ use FindBin;
 use GD;
 use strict;
 use warnings;
+use File::Temp qw(tempdir);
+use File::Slurper qw(write_binary);
 
 my $t = Test::Mojo->new('Game::FaceGenerator');
 $t->app->config->{contrib} = 'share';
@@ -137,17 +139,23 @@ if ($ENV{AUTHOR_TEST}) {
   diag "Skipping some tests because AUTHOR_TEST is not set";
 }
 
+my $dir = tempdir(CLEANUP => 1);
+use Game::FaceGenerator::Core qw(dir);
+dir($dir);
+
 my $image = GD::Image->new(1, 30);
 my $white = $image->colorAllocate(255,255,255);
 my $black = $image->colorAllocate(  0,  0,  0);
 $image->rectangle(0, 0, $image->getBounds(), $white);
+
+write_binary("$dir/empty.png", $image->png);
+write_binary("$dir/edit.png", $image->png);
+
 $image->setPixel(0, 20, $black);
 
-my $dir = $t->app->config('contrib');
+mkdir "$dir/alex";
 my $file = "$dir/alex/test_all.png";
-open(my $fh, '>:raw', $file);
-print $fh $image->png();
-close($fh);
+write_binary($file, $image->png);
 
 $t->get_ok("/debug/alex/test");
 my $url = $t->tx->res->dom->at('a.edit')->attr('href');
@@ -173,7 +181,7 @@ for ($y = 0;
      && $y < $image->height - 1;
      $y++) {};
 
-is($y, 10, "Black dot moved up");
+is($y, 10, "Black at y=10");
 
 $t->get_ok($down)
     ->status_is(200);
@@ -185,7 +193,7 @@ for ($y = 0;
      && $y < $image->height - 1;
      $y++) {};
 
-is($y, 20, "Black dot moved down");
+is($y, 20, "Black at y=20");
 
 unlink($file);
 

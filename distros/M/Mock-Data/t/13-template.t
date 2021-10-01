@@ -11,6 +11,7 @@ my @tests= (
 	[ '{b x=5}',             'b(x=5)' ],
 	[ '{b x==5}',            'b(x==5)' ],
 	[ '{a x=6}{b c z=4 d}',  'a(x=6)b(x=c y=d z=4)' ],
+	[ '{a::b}',              'a_b' ],
 	# Invalid {} notation just results in no substitution performed
 	[ '{',                   '{' ],
 	[ 'x}',                  'x}' ],
@@ -48,6 +49,7 @@ for (@tests) {
 				$named{x}= shift if @_;
 				'a('.join(' ', map "$_=$named{$_}", sort keys %named).')';
 			},
+			'a::b' => sub { "a_b" },
 			# first positional param of b is 'x', then 'y'
 			b => sub {
 				my $mock= shift;

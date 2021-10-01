@@ -200,15 +200,28 @@ Schema->resultset("Role")->populate([
 
   $person->person_roles->delete;
   $person->update({ roles => [{  label => 'user' }] });
+  ok $person->valid;
   $person->discard_changes;
 
   {
-    my $new = 'superuser';
-    $person->update({
+    # there may be a problem with discard changes and how all this works
+    # I'm worried about that.
+    $person = Schema
+      ->resultset('Person')
+      ->find(
+        {'me.id'=>$person->id},
+        {prefetch=>{person_roles=>'role'}}
+      );
+
+    ok my $new = 'superuser';
+    is scalar($person->roles->all), 1, "One role only";
+    ok $person->update({
       roles => [{  label => $new }], 
-    });
+    }), 'Did update to role superuser';
 
     ok $person->valid;
+    ok $person->in_storage;
+    is scalar($person->roles->all), 1, "One role only";
     
     {
       is scalar @{$person->person_roles->get_cache||[]}, 1;
@@ -232,6 +245,79 @@ Schema->resultset("Role")->populate([
       ok my $next = $role_rs->next;
       is $next->label, $new;
     }
+  }
+
+  {
+    ok $person->in_storage;
+    ok !$person->is_changed;
+    $person->discard_changes;
+
+    $person = Schema->resultset('Person')->find({ 'me.id'=>$person->id }, { prefetch => [{person_roles => 'role' }] });
+
+    $person->context('min')->update({
+      roles => [],
+    });
+
+    ok $person->invalid;
+    {
+      my $rs = $person->person_roles;
+      ok my $row = $rs->next;
+      is $row->role->label, 'superuser';
+      ok $row->is_marked_for_deletion;
+      ok $row->role->is_pruned;
+      ok !$rs->next;
+    }
+    
+    is_deeply +{$person->errors->to_hash(full_messages=>1)}, +{
+      person_roles => [
+        "Person Roles has too few rows (minimum is 1)",
+      ],
+      roles => [
+        "Roles has too few rows (minimum is 1)",
+      ],
+    }, 'Got expected errors';
+  }
+
+  {
+    ok my $new_person = Schema->resultset('Person')->find(
+      { 'me.id'=>$person->id },
+      { prefetch => [{person_roles => 'role' }] }
+    );
+
+    $new_person->context('min')->update({
+      roles => [],
+    });
+
+    {
+      is scalar @{$new_person->person_roles->get_cache||[]}, 1;
+      ok my $rs = $new_person->person_roles;
+      {
+        ok my $row = $rs->next;
+        is $row->role->label, 'superuser';
+        ok $row->is_marked_for_deletion;
+      }
+      ok ! $rs->next;
+    }
+
+    {
+      is scalar @{$new_person->roles()->get_cache||[]}, 1;
+      ok my $rs = $new_person->roles;
+      {
+        ok my $row = $rs->next;
+        is $row->label, 'superuser';
+        ok $row->is_pruned;
+      }
+      ok ! $rs->next;
+    }
+
+    is_deeply +{$new_person->errors->to_hash(full_messages=>1)}, +{
+      person_roles => [
+        "Person Roles has too few rows (minimum is 1)",
+      ],
+      roles => [
+        "Roles has too few rows (minimum is 1)",
+      ],
+    }, 'Got expected errors';
   }
 }
 

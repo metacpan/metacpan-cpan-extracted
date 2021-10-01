@@ -2,7 +2,7 @@ package App::perlimports::Include;
 
 use Moo;
 
-our $VERSION = '0.000019';
+our $VERSION = '0.000023';
 
 use Data::Dumper qw( Dumper );
 use List::Util qw( any none uniq );
@@ -88,7 +88,6 @@ has _isa_test_builder_module => (
     is      => 'ro',
     isa     => Bool,
     lazy    => 1,
-    builder => '_build_isa_test_builder_module',
     default => sub { shift->_export_inspector->isa_test_builder },
 );
 
@@ -122,6 +121,14 @@ has _pad_imports => (
     is       => 'ro',
     isa      => Bool,
     init_arg => 'pad_imports',
+    default  => sub { 1 },
+);
+
+has _tidy_whitespace => (
+    is       => 'ro',
+    isa      => Bool,
+    init_arg => 'tidy_whitespace',
+    lazy     => 1,
     default  => sub { 1 },
 );
 
@@ -204,6 +211,14 @@ sub _build_imports {
 
         my @found_import;
         my $isa_symbol = $word->isa('PPI::Token::Symbol');
+
+        # Don't confuse my @Foo with a use of @Foo which is exported by a module.
+        if ( $isa_symbol && $word->content =~ m{\A(@|%|$)} ) {
+            my $previous_sibling = $word->sprevious_sibling;
+            if ( $previous_sibling && $previous_sibling->content eq 'my' ) {
+                next;
+            }
+        }
 
         # If a module exports %foo and we find $foo{bar}, $word->canonical
         # returns $foo and $word->symbol returns %foo
@@ -432,6 +447,11 @@ sub _build_formatted_ppi_statement {
     # Nothing to do here. Preserve the original statement.
     return $self->_include if $self->_is_ignored;
 
+    my $maybe_module_version
+        = $self->_include->module_version
+        ? q{ } . $self->_include->module_version
+        : q{};
+
     # In this case we either have a module which we know will never export
     # symbols or a module which can export but for which we haven't found any
     # imported symbols. In both cases we'll want to rewrite with an empty list
@@ -441,10 +461,7 @@ sub _build_formatted_ppi_statement {
         || !@{ $self->_imports } ) {
         return $self->_maybe_get_new_include(
             sprintf(
-                'use %s %s();', $self->module_name,
-                $self->_include->module_version
-                ? $self->_include->module_version . q{ }
-                : q{}
+                'use %s%s ();', $self->module_name, $maybe_module_version
             )
         );
     }
@@ -519,11 +536,9 @@ sub _build_formatted_ppi_statement {
         }
 
         $statement = sprintf(
-            keys %$args > 1 ? 'use %s%s( %s );' : 'use %s%s %s;',
+            keys %$args > 1 ? 'use %s%s ( %s );' : 'use %s%s %s;',
             $self->module_name,
-            $self->_include->module_version
-            ? q{ } . $self->_include->module_version . q{ }
-            : q{ },
+            $maybe_module_version,
             $formatted
         );
 
@@ -544,12 +559,9 @@ sub _build_formatted_ppi_statement {
             : 'use %s%s qw(%s%s%s);';
 
         $statement = sprintf(
-            $template, $self->module_name,
-            (
-                $self->_include->module_version
-                ? q{ } . $self->_include->module_version
-                : q{},
-            ),
+            $template,
+            $self->module_name,
+            $maybe_module_version,
             $padding,
             join(
                 q{ },
@@ -561,7 +573,11 @@ sub _build_formatted_ppi_statement {
 
     # Don't deal with Test::Builder classes here to keep it simple for now
     if ( length($statement) > 78 && !$self->_isa_test_builder_module ) {
-        $statement = sprintf( "use %s qw(\n", $self->module_name );
+        $statement = sprintf(
+            "use %s%s qw(\n",
+            $self->module_name,
+            $maybe_module_version,
+        );
         for ( @{ $self->_imports } ) {
             $statement .= "    $_\n";
         }
@@ -583,16 +599,17 @@ sub _maybe_get_new_include {
     my $doc       = PPI::Document->new( \$statement );
     my $includes
         = $doc->find( sub { $_[1]->isa('PPI::Statement::Include'); } );
-
-    my $check_string = $self->_include . q{};
-    $check_string =~ s{\s+}{ }g;
-
     my $rewrite = $includes->[0]->clone;
+
+    return $rewrite if $self->_tidy_whitespace;
 
     # If the only difference is spacing, we'll just return the original
     # statement rather than mess with the original formatting. This check is
     # naive, but should be good enough for now. It should reduce the churn
     # created by this script.
+    my $check_string = $self->_include . q{};
+    $check_string =~ s{\s+}{ }g;
+
     return ( "$rewrite" eq $check_string ) ? $self->_include : $rewrite;
 }
 
@@ -658,7 +675,7 @@ App::perlimports::Include - Encapsulate one use statement in a document
 
 =head1 VERSION
 
-version 0.000019
+version 0.000023
 
 =head1 METHODS
 

@@ -5,7 +5,7 @@ subst - Greple module for text search and substitution
 
 # VERSION
 
-Version 2.2901
+Version 2.2904
 
 # SYNOPSIS
 
@@ -20,7 +20,7 @@ greple -Msubst --dict _dictionary_ \[ options \]
     --stat
     --with-stat
     --stat-style=[default,dict]
-    --stat-item={match,expect,number,ok,ng}=[0,1]
+    --stat-item={match,expect,number,ok,ng,dict}=[0,1]
     --subst
     --diff
     --diffcmd command

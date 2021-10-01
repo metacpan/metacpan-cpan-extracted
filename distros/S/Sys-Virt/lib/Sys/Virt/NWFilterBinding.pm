@@ -84,6 +84,19 @@ Unbind the network port device from the filter
 
 =back
 
+=head2 NETWORK FILTER BINDING CREATION CONSTANTS
+
+When creating network filter bindings zero or more of the following
+constants may be used
+
+=over 4
+
+=item Sys::Virt::NWFilterBinding::CREATE_VALIDATE
+
+Validate the XML document against the XML schema
+
+=back
+
 =head1 AUTHORS
 
 Daniel P. Berrange <berrange@redhat.com>

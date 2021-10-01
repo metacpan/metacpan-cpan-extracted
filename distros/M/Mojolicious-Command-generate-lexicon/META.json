@@ -1,16 +1,16 @@
 {
    "abstract" : "unknown",
    "author" : [
-      "Sergey Zasenko <undef@cpan.org>"
+      "Serhii Zasenko <undef@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojolicious-Command-generate-lexicon",
    "no_index" : {
@@ -34,7 +34,7 @@
          "requires" : {
             "File::Find" : "0",
             "Getopt::Long" : "0",
-            "Mojolicious" : "6.0",
+            "Mojolicious" : "9.21",
             "String::Escape" : "0"
          }
       },
@@ -49,5 +49,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : 0.997
+   "version" : 0.998,
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

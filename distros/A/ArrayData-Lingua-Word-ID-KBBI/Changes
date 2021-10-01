@@ -1,0 +1,23 @@
+0.003   2021-09-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename module/dist from ArrayData::Word::ID::KBBI to
+	  ArrayData::Lingua::Word::ID::KBBI.
+
+
+0.002   2021-05-11  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 0.001 & 0.001.1.
+
+        - [dist] Build with Pod::Weaver::Plugin::ArrayData.
+
+
+0.001.1 2021-05-11  Released-By: PERLANCAR
+
+        - First release.
+
+        - UPDATE: rename release from 0.001 to 0.001.1 due to conflict.
+
+
+0.001   2021-05-07  Released-By: PERLANCAR
+
+        - First release, converted from WordList-ID-KBBI.

@@ -62,5 +62,10 @@ is $info, 0;
 $x = $x->dummy(0); # transpose; xchg rightly fails if 1-D
 $got = $A x $x;
 ok fapprox($got, $B->dummy(0)) or diag "got: $got";
+my $i=pdl('i'); # Can't use i() as it gets confused by PDL::Complex's i()
+my $complex_matrix=(1+sequence(2,2))*$i;
+$got=$complex_matrix->mdet;
+ok(fapprox($got, 2), "Complex mdet") or diag "got $got";
+
 
 done_testing;

@@ -30,8 +30,7 @@ use POSIX qw(floor ceil);
 
 #======================================================================
 # Load pgf's TeX code for math, first
-InputDefinitions('pgfmath.code', type => 'tex', noltxml => 1)
-  || Warn(":missing:pgfmath.code.tex Couldn't find pgfmath.code.tex");
+InputDefinitions('pgfmath.code', type => 'tex', noltxml => 1);
 
 #======================================================================
 # Then redefine math operations to be done directly in Perl.
@@ -70,19 +69,17 @@ sub pgfmathfactorial {
 #   <flag>Y<mantissa>e<exponent>] !!!
 # with flag for signs, nans, etc.
 # For the moment: fixed precision!
+# NOTE: Since this is for use in macros, it returns Tokens which will set \pgfmathresult,
+# but doesn't directly set it itself.
 sub pgfmathresult {
   my ($value) = @_;
   $value = sprintf("%06f", $value);
-  #print STDERR "ASSIGNING result as $value\n";
-  #  my @v = ExplodeText($value);
-  #print STDERR " that is ".join(' ',map { Stringify($_) } @v)."\n";
-  DefMacroI(T_CS('\pgfmathresult'), undef, Tokens(ExplodeText($value)));
-  return; }
+  return Tokens(T_CS('\def'), T_CS('\pgfmathresult'), T_BEGIN, ExplodeText($value), T_END); }
 
 DefMacro('\@@@show@mathresult{}', sub {
     my ($gulet, $result) = @_;
     $result = ToString(Expand($result));
-    print STDERR "RESULT $result\n";
+    Debug("RESULT $result");
     return; });
 
 #======================================================================
@@ -90,7 +87,7 @@ DefMacro('\@@@show@mathresult{}', sub {
 DefMacro('\@@@show@pgfmatharg@{}', sub {
     my ($gullet, $arg) = @_;
     $arg = ToString(Expand($arg));
-    print STDERR "MATH ARG $arg\n";
+    Debug("MATH ARG $arg");
     return; });
 
 # A plain argument that is expanded in the parameter type definition,
@@ -118,7 +115,7 @@ DefParameterType('pgfNumbers', sub {
         if ($cc == CC_END) {
           $level--;
           last unless $level;
-          if ($level == 1) {                               # Next number
+          if ($level == 1) {    # Next number
             push(@results, $result); $result = ''; $char = ''; } }
         elsif ($cc == CC_BEGIN) {
           if ($level == 1) { $char = ''; }
@@ -130,29 +127,29 @@ DefParameterType('pgfNumbers', sub {
       return [$token->getString]; } });
 
 DefMacro('\pgfmathpi@', sub {
-    pgfmathresult($PI); return; });
+    return pgfmathresult($PI); });
 DefMacro('\pgfmathe@', sub {
-    pgfmathresult($E); return; });
+    return pgfmathresult($E); });
 DefMacro('\pgfmathadd@ pgfNumber pgfNumber', sub {
-    pgfmathresult($_[1] + $_[2]); return });
+    return pgfmathresult($_[1] + $_[2]); });
 DefMacro('\pgfmathsubtract@ pgfNumber pgfNumber', sub {
-    pgfmathresult($_[1] - $_[2]); return });
+    return pgfmathresult($_[1] - $_[2]); });
 DefMacro('\pgfmathneg@ pgfNumber', sub {
-    pgfmathresult(-$_[1]); return });
+    return pgfmathresult(-$_[1]); });
 DefMacro('\pgfmathmultiply@ pgfNumber pgfNumber', sub {
-    pgfmathresult($_[1] * $_[2]); return });
+    return pgfmathresult($_[1] * $_[2]); });
 DefMacro('\pgfmathdivide@ pgfNumber pgfNumber', sub {
-    pgfmathresult($_[1] / pgfmath_divisor($_[2])); return });
+    return pgfmathresult($_[1] / pgfmath_divisor($_[2])); });
 DefMacro('\pgfmathpow@ pgfNumber pgfNumber', sub {
-    pgfmathresult($_[1]**$_[2]); return });
+    return pgfmathresult($_[1]**$_[2]); });
 DefMacro('\pgfmathabs@ pgfNumber', sub {
-    pgfmathresult(abs($_[1])); return });
+    return pgfmathresult(abs($_[1])); });
 DefMacro('\pgfmathround@ pgfNumber', sub {
-    pgfmathresult(round($_[1])); return });
+    return pgfmathresult(round($_[1])); });
 DefMacro('\pgfmathfloor@ pgfNumber', sub {
-    pgfmathresult(floor($_[1])); return });
+    return pgfmathresult(floor($_[1])); });
 DefMacro('\pgfmathceil@ pgfNumber', sub {
-    pgfmathresult(ceil($_[1])); return });
+    return pgfmathresult(ceil($_[1])); });
 #DefMacro('\pgfmathgcd@ pgfNumber pgfNumber', sub {
 
 # DefMacro('\pgfmathisprime@ pgfNumber pgfNumber', sub {
@@ -169,11 +166,11 @@ DefMacro('\pgfmathmin@ pgfNumbers', sub {
     my @args = @$args;
     return pgfmathresult(min(@args)); });
 DefMacro('\pgfmathsin@ pgfNumber', sub {
-    pgfmathresult(sin(pgfmathargradians($_[1]))); return });
+    return pgfmathresult(sin(pgfmathargradians($_[1]))); });
 DefMacro('\pgfmathcos@ pgfNumber', sub {
-    pgfmathresult(cos(pgfmathargradians($_[1]))); return });
+    return pgfmathresult(cos(pgfmathargradians($_[1]))); });
 DefMacro('\pgfmathtan@ pgfNumber', sub {
-    pgfmathresult(tan(pgfmathargradians($_[1]))); return });
+    return pgfmathresult(tan(pgfmathargradians($_[1]))); });
 # One mod is truncated (can be neg) other is floored, the latter should be capitalized?
 # Apparently mod towards 0
 sub pgfmath_mod_trunc {
@@ -196,39 +193,50 @@ DefMacro('\pgfmathmod@ pgfNumber pgfNumber', sub {
     my ($gullet, $arg1, $arg2) = @_;
     return pgfmathresult(pgfmath_mod_floor($arg1, $arg2)); });
 DefMacro('\pgfmathrad@ pgfNumber', sub {
-    pgfmathresult(deg2rad($_[1])); return });
+    return pgfmathresult(deg2rad($_[1])); });
 DefMacro('\pgfmathdeg@ pgfNumber', sub {
-    pgfmathresult(rad2deg($_[1])); return });
+    return pgfmathresult(rad2deg($_[1])); });
 DefMacro('\pgfmathatan@ pgfNumber', sub {
-    pgfmathresult(atan($_[1])); return });
-DefMacro('\pgfmathatantwo@ pgfNumber', sub {
-    pgfmathresult(atan2($_[1], $_[2])); return });
+    return pgfmathresult(rad2deg(atan($_[1]))); });
+DefMacro('\pgfmathatantwo@ pgfNumber pgfNumber', sub {
+    return pgfmathresult(rad2deg(atan2($_[1], $_[2]))); });
+# Reverse of tikz, but...
+Let(T_CS('\pgfmathatan2@'), T_CS('\pgfmathatantwo@'));
 DefMacro('\pgfmathasin@ pgfNumber', sub {
-    pgfmathresult(asin($_[1])); return });
+    return pgfmathresult(rad2deg(asin($_[1]))); });
 DefMacro('\pgfmathacos@ pgfNumber', sub {
-    pgfmathresult(acos($_[1])); return });
+    return pgfmathresult(rad2deg(acos($_[1]))); });
 DefMacro('\pgfmathcot@ pgfNumber', sub {
-    pgfmathresult(cot(pgfmathargradians($_[1]))); return });
+    return pgfmathresult(cot(pgfmathargradians($_[1]))); });
 DefMacro('\pgfmathsec@ pgfNumber', sub {
-    pgfmathresult(sec(pgfmathargradians($_[1]))); return });
+    return pgfmathresult(sec(pgfmathargradians($_[1]))); });
 DefMacro('\pgfmathcosec@ pgfNumber', sub {
-    pgfmathresult(cosec(pgfmathargradians($_[1]))); return });
+    return pgfmathresult(cosec(pgfmathargradians($_[1]))); });
 DefMacro('\pgfmathexp@ pgfNumber', sub {
-    pgfmathresult(exp($_[1])); return });
+    return pgfmathresult(exp($_[1])); });
 DefMacro('\pgfmathln@ pgfNumber', sub {
-    pgfmathresult(log($_[1])); return });
+    return pgfmathresult(log($_[1])); });
 DefMacro('\pgfmathlogten@ pgfNumber', sub {
-    pgfmathresult(log($_[1]) / $LOG10); return });
+    return pgfmathresult(log($_[1]) / $LOG10); });
 DefMacro('\pgfmathsqrt@ pgfNumber', sub {
-    pgfmathresult(sqrt($_[1])); return });
+    return pgfmathresult(sqrt($_[1])); });
 DefMacro('\pgfmathrnd@', sub {
-    pgfmathresult(rand()); return });
+    return pgfmathresult(rand()); });
 DefMacro('\pgfmathrand@', sub {
-    pgfmathresult(1 + rand(2)); return });
+    return pgfmathresult(1 + rand(2)); });
 DefMacro('\pgfmathfactorial@', sub {
-    pgfmathresult(pgfmathfactorial($_[1])); return });
+    return pgfmathresult(pgfmathfactorial($_[1])); });
 DefMacro('\pgfmathreciprocal@ pgfNumber', sub {
-    pgfmathresult(1 / pgfmath_divisor($_[1])); return });
+    return pgfmathresult(1 / pgfmath_divisor($_[1])); });
+
+# Stuff for computability with the calc package .
+DefMacro('\pgfmath@calc@real {}',     '#1');
+DefMacro('\pgfmath@calc@minof {}{}',  'min(#1,#2)');
+DefMacro('\pgfmath@calc@maxof {}{}',  'max(#1,#2)');
+DefMacro('\pgfmath@calc@ratio {}{}',  '#1/#2');
+DefMacro('\pgfmath@calc@widthof {}',  'width("#1")');
+DefMacro('\pgfmath@calc@heightof {}', 'height("#1")');
+DefMacro('\pgfmath@calc@depthof {}',  'depth("#1")');
 
 sub pgfmath_divisor {
   my $divisor = 0.0 + $_[0];
@@ -257,7 +265,7 @@ DefMacro('\@@@test@mathresult{}{}{}', sub {
         "PGF: '$pgfresult'",
         "LTX: '$lxresult'"); }
     else {
-      print STDERR "PGFParse OK '$input' => '$pgfresult' or '$lxresult'\n"; }
+      Debug("PGFParse OK '$input' => '$pgfresult' or '$lxresult'"); }
     return; });
 
 DefMacro('\pgfmath@smuggleone Until:\endgroup', sub {
@@ -292,8 +300,16 @@ sub pgfmathparse {
   my ($gullet, $tokens) = @_;
   SetCondition(T_CS('\ifpgfmathunitsdeclared'),     0, 'global');
   SetCondition(T_CS('\ifpgfmathmathunitsdeclared'), 0, 'global');
+  # Stuff for calc compatibility.
+  Let('\real',     '\pgfmath@calc@real');
+  Let('\minof',    '\pgfmath@calc@minof');
+  Let('\maxof',    '\pgfmath@calc@maxof');
+  Let('\ratio',    '\pgfmath@calc@ratio');
+  Let('\widthof',  '\pgfmath@calc@widthof');
+  Let('\heightof', '\pgfmath@calc@heightof');
+  Let('\depthof',  '\pgfmath@calc@depthof');
   my $string = (ref $tokens ? ToString(Expand($tokens)->stripBraces) : $tokens);
-  $string =~ s/^\s+//; $string =~ s/\s+$//;
+  $string =~ s/^\s+//; $string =~ s/\s+$//; $string =~ s/\s+/ /gs;
   my $input = $string;
   my $result;
   $PGMATH_UNITS_REGEXP
@@ -319,34 +335,30 @@ sub pgfmathparse {
     $result         = $PGFMATHGrammar->expr(\$string); }
 
   $result = $result || 0.0;
-  #  $result = "0.0" if $result eq "0";
-  #    print STDERR "  GOT " . (defined $result ? $result : '<fail>') . "\n";
+  $string =~ s/^[\)\]]+$//;    # Forgive excess trailing ) !?!?!?!?!
   if ($string) {
     Error('pgfparse', 'pgfparse', $gullet,
       "Parse of '$input' failed",
       "LTX: '$result'",
       "Left: $string"); }
-  #     print STDERR "  REMAINDER: $string\n" if $string;
   # There seem to be some pesky expectations for the results
   if ($result == 0.0) {
-    $result = "0"; }
+    $result = "0."; }
   # NOT really correct, but would like to use an internal to distinguish 1.0 from int(1.0)!!!
   elsif ($result == int($result)) {
-    $result = int($result); }
-  else {    # We don't want scientific notation output!!!
+    $result = int($result) . '.'; }
+  else {                       # We don't want scientific notation output!!!
     $result = sprintf("%f", $result); }
-###  print STDERR "PGFPARSE: '$input' => '$result'\n";
   return $result; }
 
 DefMacro('\lx@pgfmath@parseX{}', sub {
     my ($gullet, $tokens) = @_;
-    DefMacroI('\lx@pgfmathresult', undef, Tokens(Explode(pgfmathparse($gullet, $tokens))));
-    return; });
+    return Tokens(T_CS('\def'), T_CS('\lx@pgfmathresult'),
+      T_BEGIN, pgfmathparse($gullet, $tokens), T_END); });
 
 DefMacro('\lx@pgfmath@parse{}', sub {
     my ($gullet, $tokens) = @_;
-    DefMacroI('\pgfmathresult', undef, Tokens(Explode(pgfmathparse($gullet, $tokens))));
-    return; });
+    return pgfmathresult(pgfmathparse($gullet, $tokens)); });
 
 DefPrimitive('\pgfmathsetlength DefToken {}', sub {
     my ($stomach, $register, $tokens) = @_;
@@ -515,13 +527,14 @@ BEGIN {
     asin       => sub { rad2deg(asin($_[0])); },
     atan       => sub { rad2deg(atan($_[0])); },
     atan2      => sub { rad2deg(atan2($_[0], $_[1])); },
-    #    bin   => sub { },
-    ceil  => sub { ceil($_[0]); },
-    cos   => sub { cos(pgfmathargradians($_[0])); },
-    cosec => sub { cosec(pgfmathargradians($_[0])); },
-    cosh  => sub { cosh($_[0]); },
-    cot   => sub { cot(pgfmathargradians($_[0])); },
-    deg   => sub { rad2deg($_[0]); },
+    angle      => sub { rad2deg(atan2($_[0], $_[1])); },    # Assume same? Where's documentation?
+                                                            #    bin   => sub { },
+    ceil       => sub { ceil($_[0]); },
+    cos        => sub { cos(pgfmathargradians($_[0])); },
+    cosec      => sub { cosec(pgfmathargradians($_[0])); },
+    cosh       => sub { cosh($_[0]); },
+    cot        => sub { cot(pgfmathargradians($_[0])); },
+    deg        => sub { rad2deg($_[0]); },
     #    depth => sub { },
     exp       => sub { exp($_[0]); },
     factorial => sub { pgfmathfactorial($_[0]); },
@@ -634,7 +647,7 @@ expr :
     FUNCTION0 : /(?:e|pi|false|rand|rnd|true)/
         | /([a-zA-Z][a-zA-Z0-9]*)/ { LaTeXML::Package::Pool::pgfmath_checkuserconstant($item[1]); }
 
-    FUNCTION : /(?:abs|acos|asin|atan2|atan|bin|ceil|cos|cosec|cosh|cot|deg|exp|factorial|floor|frac|hex|Hex|int|iseven|isodd|isprime|ln|log10|log2|neg|not|oct|rad|real|round|sec|sign|sin|sinh|sqrt|tan|tanh|add|and|divide|div|equal|gcd|greater|less|max|min|mod|Mod|multiply|notequal|notgreater|notless|or|pow|random|subtract|ifthenelse|veclen)/
+    FUNCTION : /(?:abs|acos|asin|atan2|atan|angle|bin|ceil|cos|cosec|cosh|cot|deg|exp|factorial|floor|frac|hex|Hex|int|iseven|isodd|isprime|ln|log10|log2|neg|not|oct|rad|real|round|sec|sign|sin|sinh|sqrt|tan|tanh|add|and|divide|div|equal|gcd|greater|less|max|min|mod|Mod|multiply|notequal|notgreater|notless|or|pow|random|subtract|ifthenelse|veclen)/
         | /([a-zA-Z][a-zA-Z0-9]*)/ { LaTeXML::Package::Pool::pgfmath_checkuserfunction($item[1]); }
 # ? array|scalar
 # These take boxes!  depth|height|width

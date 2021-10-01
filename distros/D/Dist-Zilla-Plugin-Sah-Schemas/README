@@ -3,9 +3,9 @@ NAME
     Sah-Schemas-* distribution
 
 VERSION
-    This document describes version 0.027 of
+    This document describes version 0.029 of
     Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution
-    Dist-Zilla-Plugin-Sah-Schemas), released on 2021-07-30.
+    Dist-Zilla-Plugin-Sah-Schemas), released on 2021-09-29.
 
 SYNOPSIS
     In dist.ini:
@@ -46,9 +46,6 @@ CONFIGURATION
     extracting prerequisites from the schema, the and skip creating the
     corresponding "Sah::SchemaR::*" module.
 
-CONTRIBUTOR
-    Steven Haryanto <sharyanto@cpan.org>
-
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Dist-Zilla-Plugin-Sah-Schemas>.
@@ -56,14 +53,6 @@ HOMEPAGE
 SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Dist-Zilla-Plugin-Sah-Schemas>.
-
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Sah
-    -Schemas>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
     Pod::Weaver::Plugin::Sah::Schemas
@@ -75,10 +64,37 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTOR
+    Steven Haryanto (on PC, Bandung) <stevenharyanto@gmail.com>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016 by
-    perlancar@cpan.org.
+    perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Sah
+    -Schemas>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

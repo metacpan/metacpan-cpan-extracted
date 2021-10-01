@@ -1,56 +1,52 @@
 {
-   "abstract" : "tests exit status words",
+   "abstract" : "test exit status words",
    "author" : [
-      "Jeremy Mates <jmates@cpan.org>"
+      "Jeremy Mates <jeremy.mates@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "bsd"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Test-UnixExit",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {}
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.48",
-            "strict" : "0"
+            "Module::Build" : "0.4004"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Test::Builder" : "0",
-            "strict" : "0"
+            "Exporter" : "0",
+            "Test::Builder" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Test::Most" : "0",
-            "lib" : "0"
+            "Test::Most" : "0"
          }
       }
    },
-   "release_status" : "stable",
-   "version" : "0.01",
-   "x_homepageresources" : {
-      "repository" : {
-         "type" : "git",
-         "url" : "git://github.com/thrig/Test-UnixExit.git",
-         "web" : "https://github.com/thrig/Test-UnixExit"
+   "provides" : {
+      "Test::UnixExit" : {
+         "file" : "lib/Test/UnixExit.pm",
+         "version" : "0.02"
       }
    },
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/BSD-3-Clause"
+      ],
+      "repository" : {
+         "url" : "https://github.com/thrig/Test-UnixExit"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -12,7 +12,7 @@
 use strict;
 use integer;
 
-use Test::More tests => 30;
+use Test::More tests => 35;
 use Chess::Plisco qw(:all);
 use Chess::Plisco::Macro;
 
@@ -114,3 +114,23 @@ is(cp_bitboard_clear_but_most_set($bitboard), 0x8000_0000_0000_0000,
 $bitboard = 0x0000_0010_0000_0000;
 is(cp_bitboard_clear_but_most_set($bitboard), 0x0000_0010_0000_0000,
 	"cp_bitboard_clear_but_most_set($bitboard)");
+
+$bitboard = 0x0000_0000_0000_0000;
+ok(!cp_bitboard_more_than_one_set($bitboard),
+	"!cp_bitboard_more_than_one_set($bitboard)");
+
+$bitboard = 0x0000_0100_0000_0000;
+ok(!cp_bitboard_more_than_one_set($bitboard),
+	"!cp_bitboard_more_than_one_set($bitboard)");
+
+$bitboard = 0x8000_0000_0000_0000;
+ok(!cp_bitboard_more_than_one_set($bitboard),
+	"!cp_bitboard_more_than_one_set($bitboard)");
+
+$bitboard = 0x8000_0100_0000_0000;
+ok(cp_bitboard_more_than_one_set($bitboard),
+	"cp_bitboard_more_than_one_set($bitboard)");
+
+$bitboard = 0x0000_0100_0000_0001;
+ok(cp_bitboard_more_than_one_set($bitboard),
+	"cp_bitboard_more_than_one_set($bitboard)");

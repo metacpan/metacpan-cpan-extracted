@@ -41,7 +41,7 @@ use PDL::Graphics::Gnuplot;
 use Photonic::Geometry::FromB;
 use Photonic::CharacteristicFunctions qw(triangle isosceles ellipse);
 use Photonic::WE::R2::Metric;
-use Photonic::WE::R2::AllH;
+use Photonic::WE::R2::Haydock;
 use Photonic::WE::R2::Field;
 use Photonic::Utils qw(tile vectors2Dlist);
 
@@ -51,7 +51,7 @@ my $nh=10;
 my $small=1e-05;
 my $epsA=pdl(1.0);
 my $titulo="-22.0";
-my $epsB=r2C($titulo)+0.01*i;
+my $epsB=czip($titulo, 0.01);
 
 my $pdir=pdl([0,1]);
 my $l=10;#nm
@@ -61,11 +61,11 @@ my $circle=Photonic::Geometry::FromB->new(B=>$B,L=>$L,Direction0=>$pdir);
 my $m=Photonic::WE::R2::Metric->new(geometry=>$circle, epsilon=>$epsA,
 					  wavenumber=>pdl(0.1),
 					  wavevector=>pdl([0.01,0]));
-my $nr=Photonic::WE::R2::AllH->new(metric=>$m,keepStates=>1,
+my $nr=Photonic::WE::R2::Haydock->new(metric=>$m,keepStates=>1,
 					polarization=>$pdir->r2C, nh=>$nh);
-#my $nr=Photonic::WE::R2::AllH->new(geometry=>$circle,nh=>$nh,keepStates=>1);
-my $nrf=Photonic::WE::R2::Field->new(nr=>$nr, nh=>$nh, smallE=>$small);
-my $field=$nrf->evaluate($epsA->r2C, $epsB);
+#my $nr=Photonic::WE::R2::Haydock->new(geometry=>$circle,nh=>$nh,keepStates=>1);
+my $nrf=Photonic::WE::R2::Field->new(haydock=>$nr, nh=>$nh, smallE=>$small);
+my $field=$nrf->evaluate($epsB);
 say $field->info;
 
 my $wf=gpwin('x11', size=>[8,8],persist=>1,wait=>60); #initialice windows
@@ -75,8 +75,8 @@ plotfield($titulo, $field);
 sub plotfield {
     my $titulo=shift;
     my $field=shift;
-    my $fieldt=tile($field->mv(0,-1)->mv(0,-1),	3,3)->mv(-1,0)->mv(-1,0);
-    my $fieldabs=$fieldt->Cabs2->sumover->sqrt;
+    my $fieldt=tile($field->mv(0,-1), 3,3)->mv(-1,0);
+    my $fieldabs=$fieldt->abs2->sumover->sqrt;
     my $fieldR=$fieldt->re->norm; #real part normalized
     my $fieldI=$fieldt->im->norm; #imaginary part normalized
     $wf->plot(

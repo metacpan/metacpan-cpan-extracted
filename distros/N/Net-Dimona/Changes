@@ -1,0 +1,7 @@
+Revision history for Net-Dimona
+
+0.02	2021-09-24
+	* Chamadas sempre retornam estrutura de dados, mesmo em casos de erro.
+
+0.01	2021-08-25
+	* Primeiro release

@@ -16,15 +16,46 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Sah-Schemas-TableData
+provides:
+  Sah::Schema::perl::tabledata::modname:
+    file: lib/Sah/Schema/perl/tabledata/modname.pm
+    version: '0.002'
+  Sah::Schema::perl::tabledata::modname_with_optional_args:
+    file: lib/Sah/Schema/perl/tabledata/modname_with_optional_args.pm
+    version: '0.002'
+  Sah::Schema::perl::tabledata::modnames:
+    file: lib/Sah/Schema/perl/tabledata/modnames.pm
+    version: '0.002'
+  Sah::Schema::perl::tabledata::modnames_with_optional_args:
+    file: lib/Sah/Schema/perl/tabledata/modnames_with_optional_args.pm
+    version: '0.002'
+  Sah::SchemaR::perl::tabledata::modname:
+    file: lib/Sah/SchemaR/perl/tabledata/modname.pm
+    version: '0.002'
+  Sah::SchemaR::perl::tabledata::modname_with_optional_args:
+    file: lib/Sah/SchemaR/perl/tabledata/modname_with_optional_args.pm
+    version: '0.002'
+  Sah::SchemaR::perl::tabledata::modnames:
+    file: lib/Sah/SchemaR/perl/tabledata/modnames.pm
+    version: '0.002'
+  Sah::SchemaR::perl::tabledata::modnames_with_optional_args:
+    file: lib/Sah/SchemaR/perl/tabledata/modnames_with_optional_args.pm
+    version: '0.002'
+  Sah::Schemas::TableData:
+    file: lib/Sah/Schemas/TableData.pm
+    version: '0.002'
 requires:
   Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modname: '0'
   Perinci::Sub::XCompletion::perl_modname: '0'
+  Sah::PSchema::perl::modname_with_optional_args: '0.008'
   Sah::Schema::perl::modname: '0.035'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-TableData
   homepage: https://metacpan.org/release/Sah-Schemas-TableData
   repository: git://github.com/perlancar/perl-Sah-Schemas-TableData.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -40,7 +71,7 @@ x_Dist_Zilla:
           Module::Metadata: '1.000037'
           version: '0.006'
       name: Sah::Schemas
-      version: '0.022'
+      version: '0.029'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
       name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'
@@ -116,7 +147,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.604'
+      version: '0.605'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -166,7 +197,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
-      version: '0.006'
+      version: '0.009'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
@@ -179,6 +210,26 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::PERLANCAR/MetaConfig'
       version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: '@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+              version: '6.017'
+          include_underscores: 0
+        Dist::Zilla::Role::MetaProvider::Provider:
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
+          inherit_missing: '1'
+          inherit_version: '1'
+          meta_noindex: '1'
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
+      name: '@Author::PERLANCAR/MetaProvides::Package'
+      version: '2.004003'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::Authority
       name: '@Author::PERLANCAR/PERLANCAR::Authority'
@@ -288,6 +339,10 @@ x_Dist_Zilla:
               name: '@Author::PERLANCAR/Contributors'
               version: '0.009'
             -
+              class: Pod::Weaver::Section::PERLANCAR::Contributing
+              name: '@Author::PERLANCAR/PERLANCAR/Contributing'
+              version: '0.292'
+            -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
               version: '4.017'
@@ -368,7 +423,7 @@ x_Dist_Zilla:
             - ':InstallModules'
             - ':TestFiles'
       name: '@Author::PERLANCAR/Test::Perl::Critic::Subset'
-      version: 3.001.005
+      version: 3.001.006
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
@@ -464,6 +519,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: '@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
       version: '6.017'
   zilla:
     class: Dist::Zilla::Dist::Builder

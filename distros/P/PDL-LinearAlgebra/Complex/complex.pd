@@ -989,7 +989,7 @@ EOF
 		$GENERIC() tmp_work[2];
 		$GENERIC() *rwork, *work;
 		rwork = ($GENERIC() *) malloc ($SIZE(n) * sizeof ($GENERIC()));
-		$TFD(f,d)select_func    = $PRIV(select_func);
+		$TFD(f,d)select_func    = $COMP(select_func);
 
 		if ($jobvs())
 			jvs = \'V\';
@@ -1081,7 +1081,7 @@ EOF
 
 		$GENERIC() *work, *rwork;
 		rwork = ($GENERIC() *) malloc ($SIZE(n) * sizeof ($GENERIC()));
-		$TFD(f,d)select_func    = $PRIV(select_func);
+		$TFD(f,d)select_func    = $COMP(select_func);
 
 
 		if ($jobvs())
@@ -1310,7 +1310,7 @@ EOF
 		integer *bwork;
 
 		$GENERIC() tmp_work[2], *rwork;
-		$TFD(f,d)gselect_func    = $PRIV(select_func);
+		$TFD(f,d)gselect_func    = $COMP(select_func);
 		rwork = ($GENERIC() *)malloc(8 * $SIZE(n) *  sizeof($GENERIC()));	
 		if ($jobvsl())
 			pjobvsl = \'V\';
@@ -1424,7 +1424,7 @@ EOF
 		integer *bwork;
 		integer *iwork;
 		$GENERIC() *rwork = ($GENERIC() *)malloc(8 * $SIZE(n) *  sizeof($GENERIC()));	
-		$TFD(f,d)gselect_func    = $PRIV(select_func);
+		$TFD(f,d)gselect_func    = $COMP(select_func);
 		if ($jobvsr())
 			pjobvsr = \'V\';
 

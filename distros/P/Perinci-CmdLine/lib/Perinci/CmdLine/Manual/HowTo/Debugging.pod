@@ -1,0 +1,104 @@
+package Perinci::CmdLine::Manual::HowTo::Debugging; # just to make podweaver happy
+
+# AUTHORITY
+# DATE
+our $DIST = 'Perinci-CmdLine'; # DIST
+# VERSION
+
+1;
+# ABSTRACT: How-to guides related to debugging
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Perinci::CmdLine::Manual::HowTo::Debugging - How-to guides related to debugging
+
+=head1 VERSION
+
+This document describes version 1.909.0 of Perinci::CmdLine::Manual::HowTo::Debugging (from Perl distribution Perinci-CmdLine), released on 2021-10-01.
+
+=head1 DESCRIPTION
+
+If you encounter issues with Perinci::CmdLine, you can try these things to aid
+with debugging:
+
+B<Increase log level.> Perinci::CmdLine uses L<Log::ger>. If your command-line
+object is instantiated with C<log> attribute set to true, you just need to
+specify C<--verbose>, C<--debug>, or C<--trace> command-line options to see more
+logging statements:
+
+ % your-cli --verbose ...
+ % your-cli --debug ...
+ % your-cli --trace ...
+ % your-cli --log-level trace ... ;# ditto
+
+If your command-line object is not instantiated with C<log> attribute set to
+true, you can enable logging with:
+
+ % PERL5OPT=-MLog::ger::Screen LOG_LEVEL=info your-cli ...
+ % PERL5OPT=-MLog::ger::Screen DEBUG=1 your-cli ...
+ % PERL5OPT=-MLog::ger::Screen TRACE=1 your-cli ...
+
+B<Dump parsed arguments, internal data structures.> If seeing log statements
+does not give clue, you can try dumping various data structures. This can be
+done with plugins. For example, to dump parsed command-line arguments after
+validation and then exit, you can use the following command (setting log level
+to trace is helpful to see the program flow and at what points the plugins are
+triggered):
+
+ % PERINCI_CMDLINE_PLUGINS=-DumpArgs,-Exit@after_validate_args your-cli --trace ...
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Perinci-CmdLine>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Perinci-CmdLine>.
+
+=head1 SEE ALSO
+
+L<Log::ger>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

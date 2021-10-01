@@ -273,11 +273,13 @@ sub read_attribute_for_validation {
     } elsif($rel_type eq 'multi') {
       return $self->related_resultset($attribute);
     } else {
-      die "Can't read_attribute_for_validation for '$attribute' of rel_type '$rel_type' in @{[ref $self]}";
+      die "Cannot read_attribute_for_validation for '$attribute' of rel_type '$rel_type' in @{[ref $self]}";
     }
-
   }
-  debug 1, "Failing back to accessor for 'read_attribute_for_validation' for attribute $attribute";
+
+  debug 1, "Failing back to accessor for 'read_attribute_for_validation' for object @{[ ref $self ]} attribute $attribute";
+  debug 2, "Failing back @{[ $self->can($attribute) ? 'succeeds':'failed' ]}";
+
   return $self->$attribute if $self->can($attribute); 
 }
 
@@ -362,6 +364,14 @@ sub build_related_if_empty {
   return $self->build_related($related, $attrs);
 }
 
+# When this param is an array we only use the last value, this is to support
+# how checkboxes in HTML work (unchecked submits no value).
+sub _param_is_delete {
+  my ($value_proto) = shift;
+  my $value = ref($value_proto) ? $value_proto->[-1] : $value_proto;
+  return $value ? 1:0;
+}
+
 sub set_from_params_recursively {
   my ($self, %params) = @_;
   debug 2, "Starting 'set_from_params_recursively' for  @{[ ref $self ]}";
@@ -380,12 +390,15 @@ sub set_from_params_recursively {
     } elsif($self->can($param)) {
       # Right now this is only used by confirmation stuff
       $self->$param($params{$param});
-    } elsif($param eq '_delete' && $params{$param}) {
-      if($self->in_storage) {
-        debug 2, "Marking record @{[ ref $self ]}, id @{[ $self->id ]} for deletion";
-        $self->mark_for_deletion;
-      } else {
-        die "didn't deal with destroy on unsaved records";
+    } elsif( $param eq '_delete') {
+      if( _param_is_delete($params{$param}) ) {
+        if($self->in_storage) {
+          debug 2, "Marking record @{[ ref $self ]}, id @{[ $self->id ]} for deletion";
+          $self->mark_for_deletion;
+        } else {
+          debug 2, "Marking unsaved record @{[ ref $self ]}, id @{[ $self->id||'NA' ]} for deletion (wil be NOP)";
+          $self->mark_for_deletion;
+        }
       }
     } elsif($param eq '_restore' && $params{$param}) {
       if($self->in_storage) {
@@ -405,14 +418,6 @@ sub set_from_params_recursively {
         } else {
           die "didn't deal with action 'delete' on unsaved records";
         }
-      } elsif($action eq 'restore') {
-        if($self->in_storage) {
-          debug 3, "Unmarking record @{[ ref $self ]}, id @{[ $self->id ]} for deletion";
-          $self->unmark_for_deletion;
-          delete $params{_destroy}; 
-        } else {
-          die "didn't deal with restore on unsaved records";
-        }
       } elsif($action eq 'nop') {
         # Just skip, this is just a no op to deal with checkboxes and radio controls in HTML
       } else {
@@ -426,8 +431,8 @@ sub set_from_params_recursively {
 
 sub set_related_from_params {
   my ($self, $related, $params) = @_;
-  my $rel_data = $self->relationship_info($related);
 
+  my $rel_data = $self->relationship_info($related);
   unless($rel_data) {
     if(my $rel_data = $self->_m2m_metadata->{$related}) {
       debug 2, "Setting params for $related on @{[ ref $self ]} using rel_type m2m";
@@ -437,9 +442,9 @@ sub set_related_from_params {
 
   my $rel_type = $rel_data->{attrs}{accessor};
   debug 2, "Setting params for $related on @{[ ref $self ]} using rel_type $rel_type";
-
   return $self->set_single_related_from_params($related, $params) if $rel_type eq 'single'; 
   return $self->set_multi_related_from_params($related, $params) if $rel_type eq 'multi'; 
+
   die "Unhandled relationship type: $rel_type";
 }
 
@@ -465,6 +470,17 @@ sub set_m2m_related_from_params {
   debug 2, "Setting m2m relation '$related' for @{[ ref $self ]} via '$relation' => '$foreign_relation'";
 
   # TODO its possible we need to creeate the m2m cache here
+  # TODO We need to add PK columens to the @params_rows if we have them
+
+  #use Devel::Dwarn;
+  #Dwarn $self->result_source->_resolve_relationship_condition (
+  #  infer_values_based_on => +{},
+  #  rel_name => $relation,
+  #  self_result_object => $self,
+  #  foreign_alias => $relation,
+  #  self_alias => 'me',
+  #)->{inferred_values};
+  
   return $self->set_multi_related_from_params($relation, [ map { +{ $foreign_relation => $_ } } @param_rows ]);
 }
 
@@ -494,36 +510,111 @@ sub set_multi_related_from_params {
     die "We expect '$params' to be some sort of reference but its not!";
   }
 
-  # introspect $related
+  # Queue up some meta data here just once.  We get existing rows ans
+  # uniqiue key info (including PK info)
+  debug 2, "looking for $related cached or existing rows";
+  my @existing_rows = @{ $self->$related->get_cache||[] };
+  unless(@existing_rows) {
+    debug 2, "cache was empty so going to check DB"; ## TODO this is to support ->discard_changes but maybe not needed
+    @existing_rows = $self->$related->all;
+  }
+  debug 2, "Found @{[ scalar @existing_rows ]} existing rows for $related";
+  
   debug 2, "looking for uniques for $related";
-  my %uniques = $self->related_resultset($related)->result_source->unique_constraints;
+  my @primary_columns = $self->$related->result_source->primary_columns;
+  my %uniques = $self->$related->result_source->unique_constraints;
+  my @search_sets = ('primary');
+  my %nested = $self->result_class->accept_nested_for;
 
+  # Generally we alow finding the row via the PK only but the user can allow finding
+  # by any unique if that's what they really want.
+  if($nested{$related}{find_with_uniques}) {
+    push @search_sets, grep { $_ ne 'primary' } keys %uniques;
+  }
+
+  # Ok now build up the new rows
   my @related_models = ();
+  debug 2, "starting loop to update/create related $related (total @{[ scalar @param_rows ]} rows in loop)";
   foreach my $param_row (@param_rows) {
+    debug 3, "top of new loop on param_rows";
     delete $param_row->{_add};
     my $related_model;
     if(blessed $param_row) {
+      debug 1, "params are an object";
       $related_model = $param_row;
     } elsif( (ref($param_row)||'') eq 'HASH') {
-      foreach my $key (keys %uniques) {
-        my %possible = map { $_ => $param_row->{$_} } grep { exists $param_row->{$_} } @{ $uniques{$key}};
-        $related_model = $self->find_related($related, \%possible, {key=>$key}) if %possible;
-        if($related_model) {
-          debug 2, "Found related model '$related' for @{[ ref $self]} using key '$key'";
-          last;
+
+      # The first thing to do is to see if we can find a row either in the existing cache
+      # or in the DB, matched on the Primary key and (if enabled) unique keys.
+      my %keys_used_to_find = ();
+      SEARCH_UNIQUE_KEYS: foreach my $key (@search_sets) {
+        debug 2, "trying to find a row for $related using key $key";
+
+        my @key_columns = @{$uniques{$key}};
+        my %matching = map { $_ => $param_row->{$_} } grep { exists $param_row->{$_} } @key_columns;
+
+        next unless scalar(@key_columns) == scalar(keys(%matching)); # only match when its a full key match
+        debug 2, "key $key exists in params";
+
+        # Find matching if they exist in the cache
+        foreach my $row (@existing_rows) {
+          my %unique_fields = map { $_ => $row->get_column($_) } @key_columns;
+          my $a = join "", map { $_, $unique_fields{$_} } sort keys(%unique_fields);
+          my $b = join "", map { $_, $matching{$_} } sort keys(%matching);
+          if($a eq $b) {
+            $related_model = $row;
+            if($related_model) {
+              debug 2, "found related model for $related with $key in cache";
+              %keys_used_to_find = %matching;
+              last SEARCH_UNIQUE_KEYS
+            }
+          }
+        }
+
+        # If it doesn't match in the cache then we have to find it in the DB
+        unless($related_model) {
+          debug 2, "Trying to find $related in DB with key $key";
+          $related_model = $self->find_related($related, \%matching, +{key=>$key});
+          if($related_model) {
+            debug 2, "found related model for $related with $key in DB";
+            %keys_used_to_find = %matching;
+            last SEARCH_UNIQUE_KEYS
+          }
         }
       }
 
-      $related_model = $self->find_related($related, $param_row) unless $related_model || !%{$param_row}; # last resort, probably broken code but m2m seems to need it
-      debug 2, "Didn't find related model '$related' so making it" unless $related_model;
-      #$related_model = $self->new_related($related, $param_row) unless $related_model;
-      $related_model = $self->new_related($related, +{}) unless $related_model;
-      #$related_model->set_from_params_recursively(%$param_row);
+      # Ok so if we get here and there's no $related model that means the user did not give us
+      # enough info in $param_rows to find it either in the cache or in the DB (they didn't give us
+      # any uniques or PKs. But its now impossible they gave us enough info to find the row anyway.
+      # Sometimes you can find it if they gave you a relationship that was identifying or some combo
+      # of a relationship and when $self is in storage and has a PK that is FK to $related and part of
+      # a unique key.  Mostly we see this in m2m bridge style relationships.  For now we have this hack
+
+      debug 2, "Falling back to default find_related for $related using full param_row";
+      $related_model = $self->find_related($related, $param_row) unless $related_model || !%{$param_row};
+
+      # OK so we didnt find it via keys either in the cache or in the DB so that means
+      # we need to just create it.
+      unless($related_model) {
+        debug 2, "Didn't find related model '$related' so making it";
+        $related_model = $self->new_related($related, +{});
+      }
+      debug 2, "About to set_from_params_recursively for @{[ ref $related_model ]}";
+      
+      # Don't set params for the found keys (waste of time, no change)
+      my %params_for_recursive = %$param_row;
+      delete %params_for_recursive{ keys %keys_used_to_find} if %keys_used_to_find;
+      $related_model->set_from_params_recursively(%params_for_recursive);
+
+      # Ok, so after set_from_params_recursively if the $related_model is not in storage
+      # we 'might' have enough info to actually load it.
+      if(!$related_model->in_storage) {
+        my $copy = $related_model->get_from_storage(); # If we now have the full PK we can find it
+        $related_model = $copy if $copy;
+      }
     } else {
       die "Not sure what to do with $param_row";
     }
-    debug 2, "About to set_from_params_recursively for @{[ ref $related_model ]}";
-    $related_model->set_from_params_recursively(%$param_row) unless blessed $param_row;
     push @related_models, $related_model;
   }
 
@@ -534,12 +625,9 @@ sub set_multi_related_from_params {
     } 
   } grep { $_->in_storage } @related_models;
 
-  my $rs = $self->related_resultset($related);
-  unless(scalar @{$rs->get_cache||[]}) {
-    #die "You must prefetch rows for relation '$related'"; ## TODO not sure we want this
-  } 
-
-  while(my $current = $rs->next) {
+  debug 1, "Reviewing existing rows for relation $related (total @{[ scalar @existing_rows ]}) for deletion";
+  
+  foreach my $current (@existing_rows) {
     next if grep {
       my %fields = %$_;
       my @matches = grep { 
@@ -548,16 +636,25 @@ sub set_multi_related_from_params {
       scalar(@matches) == keys %fields ? 1 : 0;
     } @new_pks;
 
-    $current->mark_for_deletion if $current->in_storage; #Don't mark to delete if not already stored
+    debug 2, "ok its not a new one";
 
+    # Only mark for deletion if its actually in store.
     if($current->in_storage) {
+      debug 2, "Marking $current for deletion";
+      $current->mark_for_deletion;
+
+      # Mark its children as pruned, recursively
       my $cb; $cb = sub {
         my $row = shift;
+        debug 3, "marking $row to be pruned";
         $row->{__valiant_is_pruned} = 1;
         my @related = keys %{$row->{_relationship_data}||+{}};
         # TODO only do this for has_one, might_have, has_many
+        debug 3, "$row has related data to prune @{[ join ',', @related ]}";
         foreach $related(@related) {
+          debug 3, "checking $related for possible pruning";
           my @rows = @{$row->related_resultset($related)->get_cache||[]};
+          debug 3, "found @{[ scalar @rows ]} to be pruned";
           foreach my $inner_row (@rows) {
             $cb->($inner_row);
           }
@@ -707,12 +804,9 @@ sub set_single_related_from_params {
             debug 3, "Did not find result for $related so creating new result";
             $related_result = $self->new_related($related, $params);
           }
-          #    $self->set_from_related($related, $related_result);
+          $self->set_from_related($related, $related_result) unless $self->in_storage;
           $related_result->set_from_params_recursively(%$params);
         }
-
-
-
       }
     }
   }

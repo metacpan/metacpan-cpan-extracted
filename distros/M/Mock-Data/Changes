@@ -1,3 +1,10 @@
+0.03 - 2021-09-25
+  - New plugins: Number, Net, SQLTypes
+  - Mock::Data::load_plugin now accepts a list of plugin names
+  - Mock::Data::Plugin and Mock::Data::Util are now based on Exporter::Extensible
+  - Mock::Data::Util can export 'template' and 'charset' convenience constructors
+  - Mock::Data::Template now allows ':' in the generator name
+
 0.02 - 2021-09-06
   - Updated to support perl back to 5.10
   - Optimized the 'brute force' character set building

@@ -6,12 +6,15 @@ HTML::Escape - Extremely fast HTML escaping
 
     use HTML::Escape qw/escape_html/;
 
-    escape_html("<^o^>");
+    my $escaped = escape_html("<^o^>");
 
 # DESCRIPTION
 
 This modules provides a function which escapes HTML's special characters. It
-performs a similar function to PHP's htmlspecialchars.
+performs a similar function to PHP's htmlspecialchars.  It escapes the
+following characters:
+
+    " & ' < > ` { }
 
 This module uses XS for better performance, but it also provides a pure perl
 version.
@@ -21,7 +24,7 @@ version.
 - Is there also an unescape\_html?
 
     No. Unescaping HTML requires a lot of code, and we don't want to do it.
-    Please use [HTML::Entities](https://metacpan.org/pod/HTML::Entities) for it.
+    Please use [HTML::Entities](https://metacpan.org/pod/HTML%3A%3AEntities) for it.
 
 # BENCHMARK
 
@@ -37,7 +40,7 @@ Tokuhiro Matsuno &lt;tokuhirom AAJKLFJEF@ GMAIL COM>
 
 # SEE ALSO
 
-[Text::Xslate](https://metacpan.org/pod/Text::Xslate), [HTML::Entities](https://metacpan.org/pod/HTML::Entities)
+[Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate), [HTML::Entities](https://metacpan.org/pod/HTML%3A%3AEntities)
 
 # LICENSE
 

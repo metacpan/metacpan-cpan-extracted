@@ -1,7 +1,8 @@
-#!perl
+# -*- mode: perl; -*-
 
 use strict;
 use warnings;
+
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs =
@@ -25,9 +26,9 @@ my %WriteMakefileArgs =
    # A hash of modules that are needed to run the module.
 
    'PREREQ_PM'          => {
-                            'Math::BigInt'        => 1.999823,
-                            'Math::BigRat'        => 0.2616,
-                            #'Math::BigInt::Lite'  => 0.09,      # optional
+                            'Math::BigInt'        => 1.999825,
+                            'Math::BigRat'        => 0.2618,
+                            #'Math::BigInt::Lite'  => 0.03,      # optional
                            },
 
    # A hash of modules that are needed to test the module but not run or build

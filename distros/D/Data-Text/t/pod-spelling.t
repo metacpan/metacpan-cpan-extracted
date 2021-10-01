@@ -23,3 +23,4 @@ CPAN
 CPANTS
 GPL
 MetaCPAN
+rtrim

@@ -1,7 +1,7 @@
 package App::TimeTracker;
 
 # ABSTRACT: time tracking for impatient and lazy command line lovers
-our $VERSION = '3.009'; # VERSION
+our $VERSION = '3.010'; # VERSION
 
 use strict;
 use warnings;
@@ -307,7 +307,7 @@ App::TimeTracker - time tracking for impatient and lazy command line lovers
 
 =head1 VERSION
 
-version 3.009
+version 3.010
 
 =head1 SYNOPSIS
 
@@ -423,8 +423,7 @@ a bug, please feel free to L<fork|http://help.github.com/fork-a-repo/> the
 repo and send us L<pull requests|http://help.github.com/send-pull-requests/>
 to merge your changes.
 
-To report a bug, please B<do not> use the C<< issues >> feature from github;
-use RT instead.
+To report a bug, please use the C<< issues >> feature from GitHub.
 
 =head2 CPAN
 
@@ -442,17 +441,13 @@ CPAN, offering slightly different features:
 
 =head1 Viewing and reporting Bugs
 
-We use L<rt.cpan.org|http://rt.cpan.org> (thank you
-L<BestPractical|http://rt.bestpractical.com>) for bug reporting. Please do
-not use the C<issues> feature of github! We pay no attention to those...
-
 Please use this URL to view and report bugs:
 
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-TimeTracker>
+L<https://github.com/domm/App-TimeTracker/issues>
 
 =head1 CONTRIBUTORS
 
-Maros Kollar, Klaus Ita, Yanick Champoux, Lukas Rampa, David Schmidt, Michael Kröll, Thomas Sibley, Nelo Onyiah, Jozef Kutej, Roland Lammel, Ruslan Zakirov, Kartik Thakore, Tokuhiro Matsuno, Paul Cochrane, David Provost, Mohammad S Anwar, Håkon Hægland, Thomas Mantl
+Maros Kollar, Klaus Ita, Yanick Champoux, Lukas Rampa, David Schmidt, Michael Kröll, Thomas Sibley, Nelo Onyiah, Jozef Kutej, Roland Lammel, Ruslan Zakirov, Kartik Thakore, Tokuhiro Matsuno, Paul Cochrane, David Provost, Mohammad S Anwar, Håkon Hægland, Thomas Mantl, Zakariyya Mughal
 
 =head1 AUTHOR
 

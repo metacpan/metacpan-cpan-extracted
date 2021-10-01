@@ -1,5 +1,10 @@
 Revision history for Perl extension Getopt-EX-Hashed
 
+0.9920 2021-09-27T07:02:57Z
+
+    - Introduce "any" validator.
+    - Copy default data not to destroy DB.
+
 0.9919 2021-09-17T06:52:33Z
 
     - Define accessor method only once.

@@ -13,9 +13,9 @@ use Moo;
 use Test::Cmd ();
 use Test::Differences qw(eq_or_diff);
 use Test::More;
-use Test::UnixExit qw(exit_is);
+use Test::UnixExit qw(exit_is exit_is_nonzero);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 has cmd => (
     is      => 'rwp',
@@ -25,29 +25,29 @@ has cmd => (
         # command name, get rid of that dangly thing at the end, or
         # manually supply your own Test::Cmd object. 38 characters is
         # the longest command name I can find on my OpenBSD 6.5 system
-        if ($0 =~ m{^t/([A-Za-z0-9_][A-Za-z0-9_-]{0,127})\.t$}) {
+        if ( $0 =~ m{^t/([A-Za-z0-9_][A-Za-z0-9_-]{0,127})\.t$} ) {
             my $file = $1;
-            return Test::Cmd->new(prog => catfile(getcwd(), $1), workdir => '');
+            return Test::Cmd->new( prog => catfile( getcwd(), $1 ), workdir => '' );
         } else {
             croak "could not extract command name from $0";
         }
     },
 );
-has prog => (is => 'lazy',);
+has prog => ( is => 'lazy', );
 
 sub _build_prog { $_[0]->cmd->prog }
 
 sub BUILD {
-    my ($self, $args) = @_;
-    if (exists $args->{cmd} and !ref $args->{cmd}) {
+    my ( $self, $args ) = @_;
+    if ( exists $args->{cmd} and !ref $args->{cmd} ) {
         # TODO may need to fully qualify this path depending on how that
         # interacts with chdir (or if the caller is making any of those)
-        $self->_set_cmd(Test::Cmd->new(prog => $args->{cmd}, workdir => ''));
+        $self->_set_cmd( Test::Cmd->new( prog => $args->{cmd}, workdir => '' ) );
     }
 }
 
 sub run {
-    my ($self, %p) = @_;
+    my ( $self, %p ) = @_;
 
     $p{env} //= {};
     # no news is good news. and here is the default
@@ -56,28 +56,34 @@ sub run {
     $p{stdout} //= qr/^$/;
 
     my $cmd  = $self->cmd;
-    my $name = $cmd->prog . (exists $p{args} ? ' ' . $p{args} : '');
+    my $name = $cmd->prog . ( exists $p{args} ? ' ' . $p{args} : '' );
 
     local @ENV{ keys $p{env}->%* } = values $p{env}->%*;
 
-    $cmd->run(map { exists $p{$_} ? ($_ => $p{$_}) : () } qw(args chdir stdin));
+    $cmd->run( map { exists $p{$_} ? ( $_ => $p{$_} ) : () } qw(args chdir stdin) );
 
     # tests relative to the caller so the test failures don't point at
     # lines of this function
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    exit_is($?, $p{status}, "STATUS $name");
+    # probably should be paired with { status => 1 } and that the
+    # process being tested is expected to die (with some unknown
+    # status code)
+    my $status = $?;
+    $status = exit_is_nonzero( $status ) if $p{munge_status};
+
+    exit_is( $status, $p{status}, "STATUS $name" );
     # for some commands a regex suffices but for others want to compare
     # expected lines NOTE this is sloppy about trailing whitespace which
     # many but not all things may be forgiving of
-    if (ref $p{stdout} eq 'ARRAY') {
-        eq_or_diff([ map { s/\s+$//r } split $/, $cmd->stdout ],
-            $p{stdout}, 'STDOUT ' . $name);
+    if ( ref $p{stdout} eq 'ARRAY' ) {
+        eq_or_diff( [ map { s/\s+$//r } split $/, $cmd->stdout ],
+            $p{stdout}, 'STDOUT ' . $name );
     } else {
-        ok($cmd->stdout =~ m/$p{stdout}/, 'STDOUT ' . $name)
+        ok( $cmd->stdout =~ m/$p{stdout}/, 'STDOUT ' . $name )
           or diag 'STDOUT ' . $cmd->stdout;
     }
-    ok($cmd->stderr =~ m/$p{stderr}/, 'STDERR ' . $name)
+    ok( $cmd->stderr =~ m/$p{stderr}/, 'STDERR ' . $name )
       or diag 'STDERR ' . $cmd->stderr;
 
     # for when the caller needs to poke at the results for something not
@@ -94,13 +100,17 @@ Test::UnixCmdWrap - test unix commands with various assumptions
 
 =head1 SYNOPSIS
 
-in C<./t/echo.t> and assuming that an C<./echo> exists...
+In C<./t/echo.t> and assuming that an C<./echo> exists...
 
   use Test::More;
   use Test::UnixCmdWrap;
 
   # create testor for ./echo
   my $echo = Test::UnixCmdWrap->new;
+
+  # enable coverage of the (presumably Perl) program via
+  #`cover -delete`
+  #$ENV{PERL5OPT} = '-MDevel::Cover';
 
   # the program being tested
   $echo->prog;
@@ -129,7 +139,9 @@ in C<./t/echo.t> and assuming that an C<./echo> exists...
     Test::Cmd->new(prog => './script/echo', workdir => '')
   );
 
-  done_testing();
+  # additional tests via underlying object
+  my $o = $cmd->run( ... );
+  ok( $o->stdout =~ m/.../ );
 
 =head1 DESCRIPTION
 
@@ -190,6 +202,12 @@ Optional hash reference with local elements to add to C<%ENV> during the
 test. Other envrionment variables may need to be deleted from C<%ENV>
 prior to the tests, this only adds.
 
+=item I<munge_status>
+
+This will transform any non-zero exit code to C<1>. Probably should be
+paired with C<< status => 1 >> and a program that is expected to die
+with some random non-zero exit code.
+
 =item I<status>
 
 Optional unix exit status word, by default C<0>. See L<Test::UnixExit>
@@ -228,6 +246,15 @@ L<https://github.com/thrig/Test-UnixCmdWrap>
 Need to standardize on whether the program name is always qualified or
 not (complicated by the user possibly passing in a L<Test::Cmd> object
 with something else set).
+
+=over 4
+
+=item B<BUILD>
+
+Must be excluded from the L<Devel::Cover> based L<Pod::Coverage>
+checks somehow.
+
+=back
 
 =head1 SEE ALSO
 

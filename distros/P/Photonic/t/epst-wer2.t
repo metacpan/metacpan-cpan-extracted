@@ -33,7 +33,7 @@ use warnings;
 use PDL;
 use PDL::NiceSlice;
 use Photonic::WE::R2::Metric;
-use Photonic::WE::R2::AllH;
+use Photonic::WE::R2::Haydock;
 use Photonic::WE::R2::EpsilonP;
 use Photonic::WE::R2::EpsilonTensor;
 

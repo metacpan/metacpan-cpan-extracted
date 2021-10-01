@@ -3,10 +3,6 @@ use Test::More;
 use Data::Dumper;
 
 BEGIN {
-  if ( $^O eq 'cygwin' ) {
-    plan skip_all => 'Test irrelevant on cygwin';
-  }
-
   use_ok('Proc::ProcessTable');
 }
 

@@ -1,8 +1,8 @@
 =pod
 
-Link to external POD documentation, like L<perldelta|perldelta>.
+Link to external POD documentation, like L<mu|mu>.
 
-Or to L<vianame()|charnames/charnames::vianame(I<name>)>.
+Or to L<the mu author|mu/AUTHOR>.
 
 =cut
 

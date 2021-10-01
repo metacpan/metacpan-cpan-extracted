@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "String::Clean" : "0",
             "String::Util" : "0"
          }
       },
@@ -61,6 +62,6 @@
          "x_repository" : "https://github.com/nigelhorne/Data-Text"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

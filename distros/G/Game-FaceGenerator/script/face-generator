@@ -22,9 +22,13 @@ face-generator - a web app to combine random images into faces
 
 This command starts a web server using Mojolicious.
 
+In addition to the usual Mojolicious commands, this application also implements
+the C<random> command using L<Game::FaceGenerator::Command::random>.
+
 =head1 SEE ALSO
 
-For more information, see <Game::FaceGenerator>.
+For more information, see L<Game::FaceGenerator> and
+L<Game::FaceGenerator::Command::random>, and L<Mojolicious>.
 
 =head1 LICENSE
 
@@ -32,7 +36,8 @@ GNU Affero General Public License
 
 =cut
 
-use Modern::Perl;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
-require Game::FaceGenerator;
+my $res = require Game::FaceGenerator
+    or not defined $res and die "Cannot load Game::FaceGenerator: $!"
+    or not $res and die "Game::FaceGenerator did not return a true value\n";

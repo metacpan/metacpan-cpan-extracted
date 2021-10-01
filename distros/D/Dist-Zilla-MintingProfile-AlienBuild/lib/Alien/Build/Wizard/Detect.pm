@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use 5.022;
 
-package Alien::Build::Wizard::Detect 0.01 {
+package Alien::Build::Wizard::Detect 0.03 {
 
   use Moose;
   use Moose::Util::TypeConstraints;
@@ -137,7 +137,7 @@ Alien::Build::Wizard::Detect - Tarball detection class
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 SYNOPSIS
 

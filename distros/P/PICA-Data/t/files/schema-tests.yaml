@@ -240,7 +240,7 @@ tests:
     subfields:
       x:
         code: x
-        value: yaa
+        value: aa
         position: 2-3
         message: invalid value at position 2-3 of subfield 099X$x
 

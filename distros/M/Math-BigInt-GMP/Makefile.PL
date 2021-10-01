@@ -1,4 +1,4 @@
-#!perl
+# -*- mode: perl; -*-
 
 use strict;
 use warnings;
@@ -20,7 +20,7 @@ WriteMakefile
    'NAME'               => 'Math::BigInt::GMP',
    'VERSION_FROM'       => 'lib/Math/BigInt/GMP.pm',
    'AUTHOR'             => 'Peter John Acklam <pjacklam@gmail.com>',
-   'MIN_PERL_VERSION'   => 5.006001,
+   'MIN_PERL_VERSION'   => 5.008,
 
    # A hash of modules that are required to run Makefile.PL itself, but not to
    # run the distribution.

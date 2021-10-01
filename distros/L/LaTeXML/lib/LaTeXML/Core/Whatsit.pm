@@ -100,12 +100,17 @@ sub revert {
   my ($self) = @_;
   # WARNING: Forbidden knowledge?
   # (2) caching the reversion (which is a big performance boost)
+  my $defn = $self->getDefinition;
+  my $alignment;
   if (my $saved = ($LaTeXML::DUAL_BRANCH
       ? $$self{dual_reversion}{$LaTeXML::DUAL_BRANCH}
       : $$self{reversion})) {
     return $saved->unlist; }
+##  elsif($alignment = $$self{properties}{alignment}) {
+  elsif ((!$defn->getReversionSpec)
+    && ($alignment = $$self{properties}{alignment})) {
+    return $alignment->revert; }
   else {
-    my $defn  = $self->getDefinition;
     my $props = $$self{properties};
     # Find the appropriate reversion spec;
     # content_reversion or presntation_reversion if on dual branch
@@ -121,12 +126,13 @@ sub revert {
       else {
         my $alias = $defn->getAlias;
         if (defined $alias) {
-          push(@tokens, T_CS($alias)) if $alias ne ''; }
+          push(@tokens, (ref $alias ? $alias : T_CS($alias))) if $alias ne ''; }
         else {
           push(@tokens, $defn->getCS); }
         if (my $parameters = $defn->getParameters) {
           push(@tokens, $parameters->revertArguments($self->getArgs)); } }
       if (defined(my $body = $self->getBody)) {
+###      if (defined(my $body = $self->getBody || $self->getProperty('alignment'))) {
         push(@tokens, Revert($body));
         if (defined(my $trailer = $self->getTrailer)) {
           push(@tokens, Revert($trailer)); } } }
@@ -205,40 +211,29 @@ sub beAbsorbed {
 sub computeSize {
   my ($self, %options) = @_;
   # Use #body, if any, else ALL args !?!?!
-  # Eventually, possibly options like sizeFrom, or computeSize or....
   my $defn  = $self->getDefinition;
   my $props = $self->getPropertiesRef;
   my $sizer = $defn->getSizer;
-  my ($width, $height, $depth);
-  # If sizer is a function, call it
-  if (ref $sizer) {
-    ($width, $height, $depth) = &$sizer($self); }
-  else {
+  if (ref $sizer) {    # If sizer is a function, call it
+    return &$sizer($self); }
+  else {               # Else collect up args/body/boxes which represent this thing
     my @boxes = ();
     if (!defined $sizer) {    # Nothing specified? use #body if any, else sum all box args
-      @boxes = ($$self{properties}{body}
-        ? ($$self{properties}{body})
+      @boxes = ($$props{body}
+        ? ($$props{body})
         : (map { ((ref $_) && ($_->isaBox) ? $_->unlist : ()) } @{ $$self{args} })); }
     elsif (($sizer eq '0') || ($sizer eq '')) { }   # 0 size!
     elsif ($sizer =~ /^(#\w+)*$/) {                 # Else if of form '#digit' or '#prop', combine sizes
       while ($sizer =~ s/^#(\w+)//) {
         my $arg = $1;
-        push(@boxes, ($arg =~ /^\d+$/ ? $self->getArg($arg) : $$props{$arg})); } }
+        push(@boxes, ($arg =~ /^\d+$/ ? $self->getArg($arg) : $$props{$arg})); }
+      # Special case: If only a single object to be sized and it is a List, unlist it.
+      # This is so that whatsit's layout properties will be applied to the sequence
+      if ((scalar(@boxes) == 1) && ((ref $boxes[0]) eq 'LaTeXML::Core::List')) {
+        @boxes = $boxes[0]->unlist; } }
     else {
-      Warn('unexpected', $sizer, undef,
-        "Expected sizer to be a function, or arg or property specification, not '$sizer'"); }
-    my $font = $$props{font};
-    $options{width}   = $$props{width}   if $$props{width};
-    $options{height}  = $$props{height}  if $$props{height};
-    $options{depth}   = $$props{depth}   if $$props{depth};
-    $options{vattach} = $$props{vattach} if $$props{vattach};
-    $options{layout}  = $$props{layout}  if $$props{layout};
-    ($width, $height, $depth) = $font->computeBoxesSize([@boxes], %options); }
-  # Now, only set the dimensions that weren't already set.
-  $$props{cwidth}  = $width  unless defined $$props{width};
-  $$props{cheight} = $height unless defined $$props{height};
-  $$props{cdepth}  = $depth  unless defined $$props{depth};
-  return; }
+      push(@boxes, $sizer); }
+    return $$props{font}->computeBoxesSize([@boxes], %options); } }
 
 #======================================================================
 1;

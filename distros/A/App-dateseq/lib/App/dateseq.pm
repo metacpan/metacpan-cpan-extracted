@@ -1,13 +1,15 @@
 package App::dateseq;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-22'; # DATE
-our $DIST = 'App-dateseq'; # DIST
-our $VERSION = '0.103'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
+
+use Scalar::Util qw(blessed);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-09-24'; # DATE
+our $DIST = 'App-dateseq'; # DIST
+our $VERSION = '0.105'; # VERSION
 
 our %SPEC;
 
@@ -156,6 +158,18 @@ _
             schema => ['hash'],
             tags => ['category:formatting'],
         },
+        eval => {
+            summary => 'Run perl code for each date',
+            schema => 'str*',
+            tags => ['category:output'],
+            cmdline_aliases => {e=>{}},
+            description => <<'_',
+
+Specified perl code will receive the date as DateTime object in `$_`and expected
+to return result to print.
+
+_
+        },
     },
     examples => [
         {
@@ -286,6 +300,18 @@ _
             src_plang => 'bash',
             'x.doc.max_result_lines' => 10,
         },
+        {
+            summary => 'Print first and last days of each month of 2021',
+            src => q{[[prog]] 2021-01-01 2021-12-01 --increment '1 month' -e 'my $dt2 = $_->clone; $dt2->add(months=>1); $dt2->add(days => -1); $_->ymd . " " . $dt2->ymd'},
+            src_plang => 'bash',
+            'x.doc.max_result_lines' => 10,
+        },
+        {
+            summary => 'Print first and last timestamp (in ISO format) of each month of 2021',
+            src => q{[[prog]] 2021-01-01 2021-12-01 --increment '1 month' -e 'my $dt2 = $_->clone; $dt2->add(months=>1); $dt2->add(days => -1); $_->ymd . "T00:00:00 " . $dt2->ymd . "T23:59:59"'},
+            src_plang => 'bash',
+            'x.doc.max_result_lines' => 10,
+        },
     ],
     links => [
         {url=>'prog:durseq', summary=>'Produce sequence of date durations'},
@@ -386,6 +412,28 @@ sub dateseq {
         1;
     };
 
+    my $_eval_code;
+    if ($args{eval}) {
+        $_eval_code = eval "package main; sub { no strict; no warnings; $args{eval} }"; ## no critic: BuiltinFunctions::ProhibitStringyEval
+        die "Can't compile Perl code '$args{eval}': $@" if $@;
+    }
+
+    my $_format = sub {
+        my $dt = shift;
+        if ($_eval_code) {
+            my $res;
+            {
+                local $_ = $dt;
+                $res = $_eval_code->();
+                $res = $_ unless $res;
+                $res = $formatter->format_datetime($res) if blessed($res);
+            }
+            $res;
+        } else {
+            $formatter->format_datetime($dt);
+        }
+    };
+
     if (defined $args{to} || defined $args{limit}) {
         my @res;
         push @res, $args{header} if $args{header};
@@ -396,7 +444,7 @@ sub dateseq {
                 last if !$reverse && DateTime->compare($dt, $args{to}) > 0;
                 last if  $reverse && DateTime->compare($dt, $args{to}) < 0;
             }
-            push @res, $formatter->format_datetime($dt) if $code_filter->($dt);
+            push @res, $_format->($dt) if $code_filter->($dt);
             last if defined($args{limit}) && @res >= $args{limit};
             $dt = $reverse ? $dt - $args{increment} : $dt + $args{increment};
         }
@@ -419,10 +467,10 @@ sub dateseq {
         my $filtered_func = sub {
             while (1) {
                 my $dt = $func0->();
-                return undef unless defined $dt;
+                return undef unless defined $dt; ## no critic: Subroutines::ProhibitExplicitReturnUndef
                 last if $code_filter->($dt);
             }
-            $formatter->format_datetime($dt);
+            $_format->($dt);
         };
         return [200, "OK", $filtered_func, {schema=>'str*', stream=>1}];
     }
@@ -443,7 +491,7 @@ App::dateseq - Generate a sequence of dates
 
 =head1 VERSION
 
-This document describes version 0.103 of App::dateseq (from Perl distribution App-dateseq), released on 2021-08-22.
+This document describes version 0.105 of App::dateseq (from Perl distribution App-dateseq), released on 2021-09-24.
 
 =head1 FUNCTIONS
 
@@ -472,6 +520,13 @@ Only list business days (Mon-Fri), or non-business days.
 =item * B<business6> => I<bool>
 
 Only list business days (Mon-Sat), or non-business days.
+
+=item * B<eval> => I<str>
+
+Run perl code for each date.
+
+Specified perl code will receive the date as DateTime object in C<$_>and expected
+to return result to print.
 
 =item * B<exclude_dow> => I<date::dow_nums>
 
@@ -574,17 +629,26 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-datese
 
 Source repository is at L<https://github.com/perlancar/perl-App-dateseq>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-dateseq>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -592,5 +656,13 @@ This software is copyright (c) 2021, 2020, 2019, 2016, 2015 by perlancar <perlan
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-dateseq>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

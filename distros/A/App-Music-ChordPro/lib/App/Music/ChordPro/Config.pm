@@ -29,7 +29,7 @@ App::Music::ChordPro::Config - Configurator.
 
 This module first establishes a well-defined (builtin) configuration.
 
-Then it processes the config files specified by the envitronment and
+Then it processes the config files specified by the environment and
 adds the information to the global $config hash.
 
 The configurations files are 'relaxed' JSON files. This means that
@@ -62,11 +62,10 @@ sub configurator {
     }
     if ( keys(%$opts) ) {
 	$options = { %{$options//{}}, %$opts };
-	$options->{verbose} //= 0;
     }
 
     my @cfg;
-    my $verbose = $options->{verbose};
+    my $verbose = $options->{verbose} //= 0;
 
     # Load defaults.
     warn("Reading: <builtin>\n") if $verbose > 1;
@@ -109,8 +108,14 @@ sub configurator {
     warn("Process: $cfg->{_src}\n") if $verbose > 1;
 
     # Presets.
-    $cfg->{user}->{name} = $ENV{USER} || $ENV{LOGNAME} || lc(getlogin());
-    $cfg->{user}->{fullname} = eval { (getpwuid($<))[6] } || "";
+    if ( $options->{reference} ) {
+	$cfg->{user}->{name} = "chordpro";
+	$cfg->{user}->{fullname} = ::runtimeinfo("short");
+    }
+    else {
+	$cfg->{user}->{name} = $ENV{USER} || $ENV{LOGNAME} || lc(getlogin());
+	$cfg->{user}->{fullname} = eval { (getpwuid($<))[6] } || "";
+    }
 
     # Add some extra entries to prevent warnings.
     for ( qw(title subtitle footer) ) {
@@ -266,7 +271,7 @@ sub configurator {
     if ( $options->{verbose} > 1 ) {
 	my $cp = App::Music::ChordPro::Chords::get_parser() // "";
 	warn("Parsers:\n");
-	while ( my ($k, $v) = each %{App::Music::ChordPro::Chords::Parser::parsers()} ) {
+	while ( my ($k, $v) = each %{App::Music::ChordPro::Chords::Parser->parsers} ) {
 	    warn( "  $k",
 		  $v eq $cp ? " (active)": "",
 		  "\n");
@@ -308,7 +313,7 @@ sub get_config {
 	}
     }
     else {
-	die("Unrecognized config type: $file\n");
+	Carp::confess("Unrecognized config type: $file\n");
     }
 }
 
@@ -324,7 +329,7 @@ sub prep_configs {
     foreach my $c ( @{ $cfg->{include} } ) {
 	# Check for resource names.
 	if ( $c !~ m;[/.]; ) {
-	    $c = ::rsc_or_file($c);
+	    $c = ::rsc_or_file( $c, "config" );
 	}
 	elsif ( $dir ne ""
 		&& !File::Spec->file_name_is_absolute($c) ) {
@@ -355,7 +360,7 @@ sub process_config {
 	$cfg->{tuning} = [];
     }
 
-    App::Music::ChordPro::Chords->reset_parser;
+    App::Music::ChordPro::Chords::reset_parser;
     App::Music::ChordPro::Chords::Parser->reset_parsers;
     local $::config = hmerge( $::config, $cfg );
     if ( $cfg->{chords} ) {
@@ -1490,6 +1495,12 @@ sub default_config() {
 
     // For (debugging (internal use only)).
     "debug" : {
+        "config" : 0,
+        "fonts" : 0,
+        "images" : 0,
+        "layout" : 0,
+        "meta" : 0,
+        "mma" : 0,
         "spacing" : 0,
         "song" : 0,
   	"abc" : 0,
@@ -1522,6 +1533,7 @@ sub qd {
 }
 
 unless ( caller ) {
+    binmode STDOUT => ':utf8';
     print( default_config() );
     exit;
 }

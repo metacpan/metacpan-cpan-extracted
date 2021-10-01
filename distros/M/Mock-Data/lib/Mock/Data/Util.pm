@@ -1,16 +1,15 @@
 package Mock::Data::Util;
-use strict;
-use warnings;
+use Exporter::Extensible -exporter_setup => 1;
+export(qw(
+	uniform_set weighted_set inflate_template coerce_generator mock_data_subclass
+	charset template _parse_context _escape_str _dump
+));
+require Scalar::Util;
 require Carp;
 our @CARP_NOT= qw( Mock::Data Mock::Data::Generator );
-require Exporter;
-our @ISA= qw( Exporter );
-our @EXPORT_OK= qw( uniform_set weighted_set inflate_template coerce_generator mock_data_subclass
-	charset template _parse_context _escape_str
-);
 
 # ABSTRACT: Exportable functions to assist with declaring mock data
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 sub uniform_set {
@@ -44,7 +43,8 @@ sub inflate_template {
 
 sub coerce_generator {
 	my ($spec)= @_;
-	!ref $spec?              Mock::Data::Template->new($spec)
+	!defined $spec?          Carp::croak("Can't coerce undef to a generator")
+	: !ref $spec?            Mock::Data::Template->new($spec)
 	: ref $spec eq 'ARRAY'?  Mock::Data::Set->new(items => [map &_maybe_coerce_set_item, @$spec])
 	: ref $spec eq 'HASH'?   weighted_set(%$spec)
 	: ref $spec eq 'CODE'?   Mock::Data::GeneratorSub->new($spec)
@@ -118,11 +118,27 @@ sub _name_for_combined_isa {
 	$class . $suffix;
 }
 
+# For those cases where Data::Dumper is both overkill and insufficient...
 my %_escape_common= ( "\n" => '\n', "\t" => '\t', "\0" => '\0' );
 sub _escape_str {
 	my $str= shift;
 	$str =~ s/([^\x20-\x7E])/ $_escape_common{$1} || sprintf("\\x{%02X}",ord $1) /ge;
 	return $str;
+}
+sub _dump;
+sub _dump {
+	local $_= shift if @_;
+	!defined $_? 'undef'
+	: !ref $_? (Scalar::Util::looks_like_number($_)? $_ : '"'._escape_str($_).'"')
+	: ref $_ eq 'ARRAY'? '['.join(', ', map _dump, @$_).']'
+	: ref $_ eq 'HASH'? do {
+		my $hash= $_;
+		'{'.join(', ', map {
+			($_ =~ /^\w+\z/? $_ : '"'._escape_str($_).'"')
+			.' => '._dump($hash->{$_})
+		} sort keys %$hash).'}';
+	}
+	: "$_"
 }
 sub _parse_context {
 	return '"' . _escape_str(substr($_, defined $_[0]? $_[0] : pos, 10)) .'"';
@@ -153,6 +169,8 @@ Mock::Data::Util - Exportable functions to assist with declaring mock data
     inflate_template
     coerce_generator
     mock_data_subclass
+    charset
+    template
   /;
 
 =head1 DESCRIPTION
@@ -207,11 +225,7 @@ Returns a L<Mock::Data::Generator> wrapping the argument.  The following types a
 
 =over
 
-=item Scalar without "{"
-
-Returns a Generator that always returns the constant scalar.
-
-=item Scalar with "{"
+=item Scalar
 
 Returns a L<Mock::Data::Template> that performs template substitution on the string.
 
@@ -225,15 +239,15 @@ Returns a L</weighted_set>.
 
 =item CODE ref
 
-Returns the coderef, blessed as a generator.
+Returns a L<Mock::Data::GeneratorSub> wrapping the coderef.
 
 =item Regexp ref
 
 Returns a L<Mock::Data::Regex> generator.
 
-=item C<< $obj->can('compile' >>
+=item C<< $obj->can('generate') >>
 
-Any object which has a C<compile> method is returned as-is.
+Any object which has a C<generate> method is returned as-is.
 
 =back
 
@@ -255,7 +269,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 COPYRIGHT AND LICENSE
 

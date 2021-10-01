@@ -1,7 +1,7 @@
 =pod
 
 Link to an invalid section of an external installed module -- to wit
-L<Scalar::Util::fubar()|Scalar::Util/fubar>.
+L<My::Test::Module::fubar()|My::Test::Module/fubar>.
 
 =cut
 

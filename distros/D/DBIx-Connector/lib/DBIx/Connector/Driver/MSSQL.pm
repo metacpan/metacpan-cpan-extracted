@@ -1,9 +1,11 @@
+use strict; use warnings;
+
 package DBIx::Connector::Driver::MSSQL;
 
-use strict;
-use warnings;
-use base 'DBIx::Connector::Driver';
-our $VERSION = '0.56';
+use DBIx::Connector::Driver;
+
+our $VERSION = '0.57';
+our @ISA = qw( DBIx::Connector::Driver );
 
 sub savepoint {
     my ($self, $dbh, $name) = @_;
@@ -20,6 +22,7 @@ sub rollback_to {
 }
 
 1;
+
 __END__
 
 =head1 Name
@@ -43,7 +46,7 @@ Microsoft SQL server-specific implementations of the following methods:
 
 =head1 Authors
 
-This module was written and is maintained by:
+This module was written by:
 
 =over
 

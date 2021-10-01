@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.281';
+our $VERSION = '2.284';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -377,9 +377,11 @@ sub run {
 
                 my $tables_info;
                 if ( ! eval {
-                    # if a SQLite database has databases attached, set $schema to undef so 'table_info' in 'tables_data'
-                    # returns also the tables from the attached databases
-                    $tables_info = $plui->tables_data( $dbh, $sf->{i}{db_attached} ? undef : $schema );
+                    # if a SQLite database has databases attached, set $schema to undef so that '$dbh->table_info' in
+                    # 'tables_info' returns also the tables from the attached databases
+                    # if a SQLite database has databases attached, the fully qualified table name is used in the SQL
+                    # code regardless of the setting of the option 'qualified_table_name'.
+                    $tables_info = $plui->tables_info( $dbh, $sf->{i}{db_attached} ? undef : $schema );
                     1 }
                 ) {
                     $ax->print_error_message( $@ );
@@ -390,21 +392,15 @@ sub run {
                     last PLUGIN;
                 }
                 my ( $user_tables, $sys_tables ) = ( [], [] );
-                for my $table ( keys %$tables_info ) {
+                for my $table ( sort keys %$tables_info ) {
                     if ( $tables_info->{$table}[3] =~ /SYSTEM/ ) {
+                        # next if ! $sf->{o}{G}{metadata}; # already filtered in 'tables_info'
                         push @$sys_tables, $table;
                     }
                     else {
                         push @$user_tables, $table;
                     }
                 }
-                #if ( $sf->{i}{db_attached} ) {     # table menu: show the [alias] in front of the table name
-                #    for my $table ( @$user_tables ) {
-                #        my $tmp = delete $tables_info->{$table};
-                #        $table = '[' . $tmp->[1] . ']' . $tmp->[2];
-                #        $tables_info->{$table} = $tmp;
-                #    }
-                #}
                 $sf->{d}{tables_info} = $tables_info;
                 $sf->{d}{user_tables} = $user_tables;
                 $sf->{d}{sys_tables}  = $sys_tables;
@@ -419,12 +415,11 @@ sub run {
                         $table = delete $sf->{redo_table};
                     }
                     else {
-                        my $menu_table = [ $hidden, undef, map( "- $_", sort @$user_tables ) ];
-                        push @$menu_table, map( "  $_", sort @$sys_tables ) if $sf->{o}{G}{metadata};
-                        push @$menu_table, $from_subquery                   if $sf->{o}{enable}{m_derived};
-                        push @$menu_table, $join                            if $sf->{o}{enable}{join};
-                        push @$menu_table, $union                           if $sf->{o}{enable}{union};
-                        push @$menu_table, $db_setting                      if $sf->{o}{enable}{db_settings};
+                        my $menu_table = [ $hidden, undef, map( "- $_", @$user_tables ), map( "  $_", @$sys_tables ) ];
+                        push @$menu_table, $from_subquery if $sf->{o}{enable}{m_derived};
+                        push @$menu_table, $join          if $sf->{o}{enable}{join};
+                        push @$menu_table, $union         if $sf->{o}{enable}{union};
+                        push @$menu_table, $db_setting    if $sf->{o}{enable}{db_settings};
                         my $back = $auto_one == 3 ? $sf->{i}{_quit} : $sf->{i}{_back};
                         # Choose
                         my $idx_tbl = $tc->choose(
@@ -598,7 +593,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.281
+Version 2.284
 
 =head1 DESCRIPTION
 

@@ -81,7 +81,7 @@ use Sys::Virt::DomainSnapshot;
 use Sys::Virt::DomainCheckpoint;
 use Sys::Virt::Stream;
 
-our $VERSION = '7.7.0';
+our $VERSION = '7.8.0';
 require XSLoader;
 XSLoader::load('Sys::Virt', $VERSION);
 
@@ -293,7 +293,7 @@ sub define_domain {
     return Sys::Virt::Domain->_new(connection => $self, xml => $xml, nocreate => 1, flags => $flags);
 }
 
-=item my $net = $conn->create_network($xml);
+=item my $net = $conn->create_network($xml, $flags=0);
 
 Create a new network based on the XML description passed into the C<$xml>
 parameter. The returned object is an instance of the L<Sys::Virt::Network>
@@ -305,8 +305,9 @@ the hypervisor.
 sub create_network {
     my $self = shift;
     my $xml = shift;
+    my $flags = shift;
 
-    return Sys::Virt::Network->_new(connection => $self, xml => $xml);
+    return Sys::Virt::Network->_new(connection => $self, xml => $xml, flags => $flags);
 }
 
 =item my $net = $conn->define_network($xml, $flags = 0);
@@ -414,7 +415,7 @@ sub create_interface {
 }
 
 
-=item my $binding = $conn->create_nwfilter_binding($xml);
+=item my $binding = $conn->create_nwfilter_binding($xml, $flags=0);
 
 Create a new network filter binding based on the XML description passed into the C<$xml>
 parameter. The returned object is an instance of the L<Sys::Virt::NWFilterBinding>
@@ -425,8 +426,9 @@ class.
 sub create_nwfilter_binding {
     my $self = shift;
     my $xml = shift;
+    my $flags = shift || 0;
 
-    return Sys::Virt::NWFilterBinding->_new(connection => $self, xml => $xml);
+    return Sys::Virt::NWFilterBinding->_new(connection => $self, xml => $xml, flags => $flags);
 }
 
 

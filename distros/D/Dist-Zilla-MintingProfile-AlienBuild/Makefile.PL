@@ -3,7 +3,7 @@ BEGIN {
   my %missing = map {
     eval qq{ require $_ };
     $@ ? ($_=>1) : ()
-  } qw( constant experimental lib strict warnings );
+  } qw( Exporter constant experimental lib strict warnings );
   if(%missing)
   {
     print "Your Perl is missing core modules: @{[ sort keys %missing ]}\n";
@@ -57,6 +57,7 @@ my %WriteMakefileArgs = (
     "lib/Alien/Build/Wizard.pm"                   => "\$(INST_LIB)/Alien/Build/Wizard.pm",
     "lib/Alien/Build/Wizard/Chrome.pm"            => "\$(INST_LIB)/Alien/Build/Wizard/Chrome.pm",
     "lib/Alien/Build/Wizard/Detect.pm"            => "\$(INST_LIB)/Alien/Build/Wizard/Detect.pm",
+    "lib/Alien/Build/Wizard/Questions.pm"         => "\$(INST_LIB)/Alien/Build/Wizard/Questions.pm",
     "lib/Dist/Zilla/MintingProfile/AlienBuild.pm" => "\$(INST_LIB)/Dist/Zilla/MintingProfile/AlienBuild.pm",
     "lib/Dist/Zilla/Plugin/AlienBuild/Mint.pm"    => "\$(INST_LIB)/Dist/Zilla/Plugin/AlienBuild/Mint.pm"
   },
@@ -84,7 +85,7 @@ my %WriteMakefileArgs = (
     "Test::DZil"                   => 0,
     "Test::File::ShareDir::Module" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.03",
   "test"    => {
     "TESTS" => "t/*.t"
   }

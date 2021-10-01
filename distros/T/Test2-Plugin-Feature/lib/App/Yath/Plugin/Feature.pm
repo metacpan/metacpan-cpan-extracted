@@ -3,7 +3,7 @@ package App::Yath::Plugin::Feature;
 use strict;
 use warnings;
 
-our $VERSION = '0.001108';
+our $VERSION = '0.001111';
 
 use parent 'App::Yath::Plugin';
 use App::Yath::Options;
@@ -18,7 +18,7 @@ option_group {prefix => 'Feature', category => "Plugin feature"} => sub {
     option matching => (
         type         => 's',
         default      => 'first',
-        long_examples => [ ' mode' ],
+        long_examples => [ 'mode' ],
         description  => [ "Step function multiple matches behaviour:
                            `first` (default) selects first match,
                            `relaxed` warns and runs first match or
@@ -37,7 +37,7 @@ option_group {prefix => 'Feature', category => "Plugin feature"} => sub {
         #short        => 'o',
         type         => 's',
         default      => 'TAP',
-        long_examples => [ ' mode' ],
+        long_examples => [ 'mode' ],
         description  => [ "Output harness. Defaults to 'TermColor'. See 'Outputs'"],
     );
 
@@ -45,7 +45,7 @@ option_group {prefix => 'Feature', category => "Plugin feature"} => sub {
         #short        => 'c',
         type         => 's',
         default      => 'dark',
-        long_examples => [ ' mode' ],
+        long_examples => [ 'mode' ],
         description  => [ "Theme for 'TermColor'. `light` or `dark` (default)"],
         action        => sub {
             my ($prefix, $field, $raw, $norm, $slot, $settings, $handler) = @_;
@@ -59,20 +59,20 @@ option_group {prefix => 'Feature', category => "Plugin feature"} => sub {
 
     option steps => (
         type         => 'm',
-        long_examples => [ ' path' ],
+        long_examples => [ 'path' ],
         description  => [ "Include an extra step file, or directory of step files (as identified by *_steps.pl)"],
     );
 
     option config => (
         #short        => 'g',
         type         => 's',
-        long_examples => [ ' path' ],
+        long_examples => [ 'path' ],
         description  => [ "A YAML file containing configuration profiles"],
     );
 
     option i18n => (
         type         => 's',
-        long_examples => [ ' LANG' ],
+        long_examples => [ 'LANG' ],
         description  => [ 'List keywords for a particular language.',
                        '\'--i18n help\' lists all languages available.'],
 
@@ -82,14 +82,14 @@ option_group {prefix => 'Feature', category => "Plugin feature"} => sub {
         #short        => 'p',
         type         => 's',
         default      => 'default',
-        long_examples => [ ' name' ],
+        long_examples => [ 'name' ],
         description  => [ "Name of the profile to load from the above config file. Defaults to `default`"],
     );
 
     option extension => (
         #short        => 'e',
         type         => 's',
-        long_examples => [ ' Extension::Module', ' Extension::Module[string]' ],
+        long_examples => [ 'Extension::Module', ' Extension::Module[string]' ],
         description  => [ 'Load an extension. You can place a string in brackets ',
                           'at the end of the module name which will be eval\'d ',
                           'and passed to new() for the extension.'],
@@ -97,10 +97,10 @@ option_group {prefix => 'Feature', category => "Plugin feature"} => sub {
 
     option tags => (
         #short        => 't',
-        type         => 's',
-        long_examples => [ ' @tag', ' @tag1,@tag2', ' ~@tag' ],
+        type         => 'm',
+        long_examples => [ '@tag', ' @tag1,@tag2', ' ~@tag' ],
         description  => [ "Run scenarios tagged with '\@tag', ",
-                          "'\@tag1' and '\@tag2' or without '\@tag'"],
+                          "'\@tag1' or '\@tag2', or without '\@tag'"],
     );
 
     option debug_profile => (
@@ -111,7 +111,7 @@ option_group {prefix => 'Feature', category => "Plugin feature"} => sub {
 
     option option => (
         type         => 'm',
-        long_examples => [ ' KEY=VALUE' ],
+        long_examples => [ 'KEY=VALUE' ],
         description   => ['Support prove options syntax for drop-in compatibility',
                           'where KEY=VALUE is one of:',
                           ' config=path', ' profile=name', ' debug-profile',
@@ -149,7 +149,7 @@ sub munge_files {
        if ($tf->file =~ m/[.]feature$/) {
             my @args = ();
             foreach (qw(config debug_profile extension i18n
-                        matching output profile tags theme)) {
+                        matching output profile theme)) {
               push @args, "--$_", $settings->Feature->$_
                 if defined $settings->Feature->$_;
             }
@@ -158,6 +158,9 @@ sub munge_files {
                 && $settings->Feature->match;
             foreach (@{$settings->Feature->steps}) {
               push @args, '--steps', $_;
+            }
+            foreach (@{$settings->Feature->tags}) {
+              push @args, '--tags', $_;
             }
             $tf = Test2::Harness::TestFile->new(
                 file => $tf->file,
@@ -199,7 +202,7 @@ App::Yath::Plugin::Feature - Plugin to allow testing Pherkin files.
 
 =head1 VERSION
 
-version 0.001108
+version 0.001111
 
 =head1 SYNOPSIS
 

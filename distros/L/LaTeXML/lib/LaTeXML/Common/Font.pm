@@ -25,6 +25,7 @@ use base qw(LaTeXML::Common::Object);
 # including basic font information, color & background color
 # as well as encoding and language information.
 
+DebuggableFeature('size-detailed', "Show sizing of boxes in detail");
 # NOTE: This is now in Common that it may evolve to be useful in Post processing...
 
 my $DEFFAMILY     = 'serif';      # [CONSTANT]
@@ -54,9 +55,9 @@ my $FLAG_EMPH         = 0x10;
 # NOTE: This probably doesn't really belong in here...
 
 my %font_family = (
-  cmr  => { family => 'serif' },      cmss  => { family => 'sansserif' },
-  cmtt => { family => 'typewriter' }, cmvtt => { family => 'typewriter' },
-  cmti => { family => 'typewriter', shape => 'italic' },
+  cmr   => { family => 'serif' },      cmss  => { family => 'sansserif' },
+  cmtt  => { family => 'typewriter' }, cmvtt => { family => 'typewriter' },
+  cmti  => { family => 'typewriter', shape => 'italic' },
   cmfib => { family => 'serif' },      cmfr  => { family => 'serif' },
   cmdh  => { family => 'serif' },      cm    => { family => 'serif' },
   ptm   => { family => 'serif' },      ppl   => { family => 'serif' },
@@ -74,21 +75,21 @@ my %font_family = (
   pxr   => { family => 'serif' },      pxms  => { family => 'symbol' },
   pxsya => { family => 'symbol' },     pxsyb => { family => 'symbol' },
   futs  => { family => 'serif' },
-  uaq   => { family => 'serif' },      ugq   => { family => 'sansserif' },
-  eur   => { family => 'serif' },      eus   => { family => 'script' },
-  euf   => { family => 'fraktur' },    euex  => { family => 'symbol' },
+  uaq   => { family => 'serif' },   ugq  => { family => 'sansserif' },
+  eur   => { family => 'serif' },   eus  => { family => 'script' },
+  euf   => { family => 'fraktur' }, euex => { family => 'symbol' },
   # The following are actually math fonts.
   ms    => { family => 'symbol' },
-  ccm   => { family => 'serif', shape => 'italic' },
-  cmm   => { family => 'italic', encoding => 'OML' },
-  cmex  => { family => 'symbol', encoding => 'OMX' },       # Not really symbol, but...
-  cmsy  => { family => 'symbol', encoding => 'OMS' },
-  ccitt => { family => 'typewriter', shape => 'italic' },
-  cmbrm => { family => 'sansserif', shape => 'italic' },
-  futm  => { family => 'serif', shape => 'italic' },
-  futmi => { family => 'serif', shape => 'italic' },
-  txmi  => { family => 'serif', shape => 'italic' },
-  pxmi  => { family => 'serif', shape => 'italic' },
+  ccm   => { family => 'serif',      shape    => 'italic' },
+  cmm   => { family => 'italic',     encoding => 'OML' },
+  cmex  => { family => 'symbol',     encoding => 'OMX' },      # Not really symbol, but...
+  cmsy  => { family => 'symbol',     encoding => 'OMS' },
+  ccitt => { family => 'typewriter', shape    => 'italic' },
+  cmbrm => { family => 'sansserif',  shape    => 'italic' },
+  futm  => { family => 'serif',      shape    => 'italic' },
+  futmi => { family => 'serif',      shape    => 'italic' },
+  txmi  => { family => 'serif',      shape    => 'italic' },
+  pxmi  => { family => 'serif',      shape    => 'italic' },
   bbm   => { family => 'blackboard' },
   bbold => { family => 'blackboard' },
   bbmss => { family => 'blackboard' },
@@ -129,10 +130,10 @@ sub lookupFontShape {
 # extended logical font sizes, based on nominal document size of 10pts
 # Possibly should simply use absolute font point sizes, as declared in class...
 my %font_size = (
-  tiny   => 0.5, SMALL => 0.7, Small => 0.8,  small => 0.9,
-  normal => 1.0, large => 1.2, Large => 1.44, LARGE => 1.728,
-  huge => 2.074, Huge => 2.488,
-  big  => 1.2,   Big  => 1.6, bigg => 2.1, Bigg => 2.6,
+  tiny   => 0.5,   SMALL => 0.7, Small => 0.8,  small => 0.9,
+  normal => 1.0,   large => 1.2, Large => 1.44, LARGE => 1.728,
+  huge   => 2.074, Huge  => 2.488,
+  big    => 1.2,   Big   => 1.6, bigg => 2.1, Bigg => 2.6,
 );
 
 sub rationalizeFontSize {
@@ -200,6 +201,7 @@ sub new {
   my $encoding  = $options{encoding};
   my $language  = $options{language};
   my $mathstyle = $options{mathstyle};
+
   if ($options{forcebold}) {    # for compatibility
     $series = 'bold'; $options{forceseries} = 1; }
   my $flags = 0
@@ -207,8 +209,8 @@ sub new {
     | ($options{forceseries} ? $FLAG_FORCE_SERIES : 0)
     | ($options{forceshape}  ? $FLAG_FORCE_SHAPE  : 0);
   return $class->new_internal(
-    $family, $series, $shape, rationalizeFontSize($size),
-    $color, $bg, $opacity,
+    $family,    $series, $shape, rationalizeFontSize($size),
+    $color,     $bg,     $opacity,
     $encoding,  $language,
     $mathstyle, $flags); }
 
@@ -250,15 +252,15 @@ sub stringify {
   my ($fam, $ser, $shp, $siz, $col, $bkg, $opa, $enc, $lang, $mstyle, $flags) = @$self;
   $fam = 'serif' if $fam && ($fam eq 'math');
   return 'Font[' . join(',', map { Stringify($_) } grep { $_ }
-      (isDiff($fam, $DEFFAMILY) ? ($fam) : ()),
-    (isDiff($ser, $DEFSERIES)     ? ($ser) : ()),
-    (isDiff($shp, $DEFSHAPE)      ? ($shp) : ()),
-    (isDiff($siz, DEFSIZE())      ? ($siz) : ()),
-    (isDiff($col, $DEFCOLOR)      ? ($col) : ()),
-    (isDiff($bkg, $DEFBACKGROUND) ? ($bkg) : ()),
-    (isDiff($opa, $DEFOPACITY)    ? ($opa) : ()),
-    ($mstyle ? ($mstyle) : ()),
-    ($flags  ? ($flags)  : ()),
+      (isDiff($fam, $DEFFAMILY)   ? ($fam)    : ()),
+    (isDiff($ser, $DEFSERIES)     ? ($ser)    : ()),
+    (isDiff($shp, $DEFSHAPE)      ? ($shp)    : ()),
+    (isDiff($siz, DEFSIZE())      ? ($siz)    : ()),
+    (isDiff($col, $DEFCOLOR)      ? ($col)    : ()),
+    (isDiff($bkg, $DEFBACKGROUND) ? ($bkg)    : ()),
+    (isDiff($opa, $DEFOPACITY)    ? ($opa)    : ()),
+    ($mstyle                      ? ($mstyle) : ()),
+    ($flags                       ? ($flags)  : ()),
     )
     . ']'; }
 
@@ -286,9 +288,9 @@ sub makeConcrete {
   my ($family, $series, $shape, $size, $color, $bg, $opacity, $encoding, $lang, $mstyle, $flags) = @$self;
   my ($ofamily, $oseries, $oshape, $osize, $ocolor, $obg, $oopacity, $oencoding, $olang, $omstyle, $oflags) = @$concrete;
   return (ref $self)->new_internal(
-    $family || $ofamily, $series || $oseries, $shape || $oshape, $size || $osize,
-    $color || $ocolor, $bg || $obg, (defined $opacity ? $opacity : $oopacity),
-    $encoding || $oencoding, $lang || $olang, $mstyle || $omstyle,
+    $family   || $ofamily,   $series || $oseries, $shape || $oshape, $size || $osize,
+    $color    || $ocolor,    $bg     || $obg, (defined $opacity ? $opacity : $oopacity),
+    $encoding || $oencoding, $lang   || $olang, $mstyle || $omstyle,
     ($flags || 0) | ($oflags || 0)); }
 
 sub isDiff {
@@ -395,7 +397,6 @@ sub match_font {
       my $re   = '^Font\['
         . join(',', map { ($_ eq '*' ? "[^,]+" : "\Q$_\E") } @comp)
         . '\]$';
-      print STDERR "\nCreating re for \"$font1\" => $re\n";
       $regexp = $FONT_REGEXP_CACHE{$font1} = qr/$re/; } }
   return $font2 =~ /$regexp/; }
 
@@ -446,9 +447,11 @@ our %mathstylesize = (display => 1, text => 1,
 # NOTE: that we assume the size has already been adjusted for mathstyle, if necessary.
 sub computeStringSize {
   my ($self, $string) = @_;
+  if ((!defined $string) || ($string eq '') || ($self->getFamily eq 'nullfont')) {
+    return (Dimension(0), Dimension(0), Dimension(0)); }
   my $size = ($self->getSize || DEFSIZE() || 10); ## * $mathstylesize{ $self->getMathstyle || 'text' };
-  my $l = (defined $string ? length($string) : 0);
-  my $u = $size * 65535;
+  my $l    = (defined $string ? length($string) : 0);
+  my $u    = $size * 65535;
   return (Dimension(0.75 * $u * $l), Dimension(0.7 * $u), Dimension(0.2 * $u)); }
 
 # Get nominal width, height base ?
@@ -483,12 +486,17 @@ sub computeBoxesSize {
     $fillwidth = $fillwidth->valueOf; }    # get register
   my $maxwidth = $fillwidth && $fillwidth->valueOf;
   my @lines    = ();
-  my ($wd, $ht, $dp) = (0, 0, 0);
+  my ($wd, $ht, $dp)          = (0, 0, 0);
+  my ($minwd, $minht, $mindp) = (0, 0, 0);
   my $vattach = $options{vattach} || 'baseline';
-  foreach my $box (@$boxes) {
+  no warnings 'recursion';
+  # Flatten top-level Lists (orrr pass-thru $fillwidth ???)
+  my @boxes = map { (ref $_ eq 'LaTeXML::Core::List' ? $_->unlist : $_); } @$boxes;
+  foreach my $box (@boxes) {
     next unless defined $box;
     next if ref $box && !$box->can('getSize');    # Care!! Since we're asking ALL args/compoments
-    my ($w, $h, $d) = (ref $box ? $box->getSize(%options) : $font->computeStringSize($box));
+    ## Should any %options be inherited by the contained boxes?
+    my ($w, $h, $d) = (ref $box ? $box->getSize() : $font->computeStringSize($box));
     if (ref $w) {
       $wd += $w->valueOf; }
     else {
@@ -505,19 +513,11 @@ sub computeBoxesSize {
       Warn('expected', 'Dimension', undef,
         "Depth of " . Stringify($box) . " yielded a non-dimension: " . Stringify($d)); }
     if ((($options{layout} || '') eq 'vertical')    # EVERY box is a row?
-                                                    # || $box is a <ltx:break> (or similar)!!!!
-    ) {
+      || ((ref $box) && $box->getProperty('isBreak'))) {    # || $box is a linebreak
       push(@lines, [$wd, $ht, $dp]); $wd = $ht = $dp = 0; }
-    elsif ((defined $maxwidth) && ($wd >= $maxwidth)) {    # or we've reached the requested width
-          # Compounding errors with wild abandon.
-          # If an underlying box is too wide, we'll split it up into multiple rows
-          # [Rather than correctly break it?]
-          # BUT How do we know if it should break at alL!?!?!?!?!
-##     while ($wd >= $maxwidth) {
-##       push(@lines, [$maxwidth, $ht, $dp]); $wd = $wd - $maxwidth; }
-##      $ht = $h->valueOf; $dp = $d->valueOf;     # continue with the leftover
-      push(@lines, [$wd, $ht, $dp]); $wd = $ht = $dp = 0;
-    }
+    elsif ((defined $maxwidth) && ($wd >= $maxwidth)) {     # or we've reached the requested width
+          # Instead of a real linebreaking algorithm, just break off if too wide.
+      push(@lines, [$wd, $ht, $dp]); $wd = $ht = $dp = 0; }
   }
   if ($wd) {    # be sure to get last line
     push(@lines, [$wd, $ht, $dp]); }
@@ -543,9 +543,18 @@ sub computeBoxesSize {
     else {                            # default is baseline (of the 1st line)
       my $h = $lines[0][1];
       $dp = $ht + $dp - $h; $ht = $h; } }
+  $wd = max($minwd, $wd); $ht = max($minht, $ht); $dp = max($mindp, $dp);
   #print "BOXES SIZE ".($wd/65536)." x ".($ht/65536)." + ".($dp/65336)." for "
   #  .join(' ',grep {$_} map { Stringify($_) } @$boxes)."\n";
+  Debug("Size boxes " . join(',', map { $_ . '=' . ToString($options{$_}); } sort keys %options) . "\n"
+      . "  Boxes: " . join(',',  map { '[[' . ToString($_) . ']]'; } @$boxes) . "\n"
+      . "  Sizes: " . join("\n", map { _showsize(@$_); } @lines) . "\n"
+      . "  => " . _showsize($wd, $ht, $dp)) if $LaTeXML::DEBUG{'size-detailed'};
   return (Dimension($wd), Dimension($ht), Dimension($dp)); }
+
+sub _showsize {
+  my ($wd, $ht, $dp) = @_;
+  return ($wd / 65536) . " x " . ($ht / 65536) . " + " . ($dp / 65336); }
 
 sub isSticky {
   my ($self) = @_;
@@ -578,6 +587,7 @@ sub merge {
   my $encoding  = $options{encoding};
   my $language  = $options{language};
   my $mathstyle = $options{mathstyle};
+
   if ($options{forcebold}) {    # for compatibility
     $series = 'bold'; $options{forceseries} = 1; }
   my $flags = 0
@@ -587,24 +597,24 @@ sub merge {
 
   my $oflags = $$self[10];
   # Fallback to positional invocation:
-  $family = $$self[0] if (!defined $family) || ($oflags & $FLAG_FORCE_FAMILY);
-  $series = $$self[1] if (!defined $series) || ($oflags & $FLAG_FORCE_SERIES);
-  $shape  = $$self[2] if (!defined $shape)  || ($oflags & $FLAG_FORCE_SHAPE);
-  $size   = $$self[3] if (!defined $size);
-  $color  = $$self[4] if (!defined $color);
-  $bg     = $$self[5] if (!defined $bg);
+  $family    = $$self[0] if (!defined $family) || ($oflags & $FLAG_FORCE_FAMILY);
+  $series    = $$self[1] if (!defined $series) || ($oflags & $FLAG_FORCE_SERIES);
+  $shape     = $$self[2] if (!defined $shape)  || ($oflags & $FLAG_FORCE_SHAPE);
+  $size      = $$self[3] if (!defined $size);
+  $color     = $$self[4] if (!defined $color);
+  $bg        = $$self[5] if (!defined $bg);
   $opacity   = $$self[6] if (!defined $opacity);
   $encoding  = $$self[7] if (!defined $encoding);
   $language  = $$self[8] if (!defined $language);
   $mathstyle = $$self[9] if (!defined $mathstyle);
-  $flags = ($$self[10] || 0) | $flags;
+  $flags     = ($$self[10] || 0) | $flags;
 
   if (my $scale = $options{scale}) {
     $size = $scale * $size; }
   # Set the mathstyle, and also the size from the mathstyle
   # But we may need to scale that size against the existing or requested size.
   my $stylescale = ($$self[3] ? $$self[3] / $stylesize{ $$self[9] || 'display' } : 1);
-  if ($options{size}) { }    # Explicitly requested size, use it
+  if    ($options{size}) { }       # Explicitly requested size, use it
   elsif ($options{mathstyle}) {    # otherwise set the size from mathstyle
     $size = $stylescale * $stylesize{$mathstyle}; }
   elsif ($options{scripted}) {     # Or adjust both the mathstyle & size for scripts
@@ -620,7 +630,7 @@ sub merge {
   $flags &= ~$FLAG_EMPH if $mathstyle;    # Disable emph in math
 
   my $newfont = (ref $self)->new_internal($family, $series, $shape, $size,
-    $color, $bg, $opacity,
+    $color,     $bg, $opacity,
     $encoding,  $language,
     $mathstyle, $flags);
   if (my $specialize = $options{specialize}) {
@@ -664,7 +674,7 @@ sub specialize {
     $shape  = $defshape;                                                    # defaults, always.
     if ($series && ($series ne $DEFSERIES)) { $series = $defseries; } }
   return (ref $self)->new_internal($family, $series, $shape, $size,
-    $color, $bg, $opacity,
+    $color,    $bg, $opacity,
     $encoding, $language, $mathstyle, $flags); }
 
 # A special form of merge when copying/moving nodes to a new context,
@@ -702,10 +712,10 @@ sub purestyleChanges {
 sub mergePurestyle {
   my ($self, %stylechanges) = @_;
   my $new = $self->new_internal(@$self);
-  $$new[3] = $$self[3] * $stylechanges{scale} if $stylechanges{scale};
-  $$new[4] = $stylechanges{color}             if $stylechanges{color};
-  $$new[5] = $stylechanges{background}        if $stylechanges{background};
-  $$new[6] = $stylechanges{opacity}           if $stylechanges{opacity};
+  $$new[3] = $$self[3] * $stylechanges{scale}                            if $stylechanges{scale};
+  $$new[4] = $stylechanges{color}                                        if $stylechanges{color};
+  $$new[5] = $stylechanges{background}                                   if $stylechanges{background};
+  $$new[6] = $stylechanges{opacity}                                      if $stylechanges{opacity};
   $$new[9] = $stepmathstyle{ $$self[9] }{ $stylechanges{mathstylestep} } if $stylechanges{mathstylestep};
   return new; }
 

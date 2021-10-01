@@ -1,4 +1,3 @@
-Build.PL
 Changes
 lib/DBIx/Connector.pm
 lib/DBIx/Connector/Driver.pm
@@ -8,12 +7,11 @@ lib/DBIx/Connector/Driver/mysql.pm
 lib/DBIx/Connector/Driver/Oracle.pm
 lib/DBIx/Connector/Driver/Pg.pm
 lib/DBIx/Connector/Driver/SQLite.pm
-MANIFEST			This list of files
-META.json
-META.yml
-README.md
+Makefile.PL
+MANIFEST
 t/base.t
 t/driver.t
+t/lib/Hook/Guard.pm
 t/load.t
 t/run.t
 t/run_fixup.t
@@ -25,3 +23,8 @@ t/svp_ping.t
 t/txn.t
 t/txn_fixup.t
 t/txn_ping.t
+xt/pod-coverage.t
+xt/pod-spelling.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -141,19 +141,19 @@
    "provides" : {
       "Acme::Resume" : {
          "file" : "lib/Acme/Resume.pm",
-         "version" : "0.0104"
+         "version" : "0.0105"
       },
       "Acme::Resume::Internal" : {
          "file" : "lib/Acme/Resume/Internal.pm",
-         "version" : "0.0104"
+         "version" : "0.0105"
       },
       "Acme::Resume::MoopsParserTrait" : {
          "file" : "lib/Acme/Resume/MoopsParserTrait.pm",
-         "version" : "0.0104"
+         "version" : "0.0105"
       },
       "Acme::Resume::Moose" : {
          "file" : "lib/Acme/Resume/Moose.pm",
-         "version" : "0.0104"
+         "version" : "0.0105"
       }
    },
    "release_status" : "stable",

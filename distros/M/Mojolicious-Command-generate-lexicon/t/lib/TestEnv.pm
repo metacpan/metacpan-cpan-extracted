@@ -20,7 +20,7 @@ sub setup_i18n_tempdir {
 
     $self->free_i18n_tempdir if $self->i18n_tempdir;
 
-    $self->{cwd} = &getcwd;
+    $self->{cwd}         = &getcwd;
     $self->{i18ntempdir} = tempdir(CLEANUP => 1);
 
     foreach my $dir (qw(templates lib lib/Lexemes lib/Lexemes/I18N)) {
@@ -30,14 +30,14 @@ sub setup_i18n_tempdir {
     opendir(my $th, "$FindBin::Bin/templates/");
     while (my $template = readdir($th)) {
         next if $template eq '.' or $template eq '..';
-        copy (
+        copy(
             "$FindBin::Bin/templates/$template",
             $self->i18n_tempdir . "/templates/$template"
         ) or die $!;
     }
     close $th;
 
-    copy (
+    copy(
         "$FindBin::Bin/lib/Lexemes/I18N.pm",
         $self->i18n_tempdir . "/lib/Lexemes/I18N.pm"
     ) or die $!;
@@ -57,7 +57,7 @@ sub setup_i18n_tempdir {
 sub free_i18n_tempdir {
     my $self = shift;
     die 'Not setuped' unless defined $self->{i18ntempdir};
-    my $lib =  $self->i18n_tempdir . "/lib/";
+    my $lib = $self->i18n_tempdir . "/lib/";
 
     delete $self->{i18ntempdir};
     chdir delete $self->{cwd};

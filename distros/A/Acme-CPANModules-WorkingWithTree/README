@@ -3,13 +3,11 @@ NAME
     Perl
 
 VERSION
-    This document describes version 0.004 of
+    This document describes version 0.005 of
     Acme::CPANModules::WorkingWithTree (from Perl distribution
-    Acme-CPANModules-WorkingWithTree), released on 2020-03-01.
+    Acme-CPANModules-WorkingWithTree), released on 2021-05-06.
 
 DESCRIPTION
-    Working with tree data structure in Perl.
-
     Basics
 
     Perl classes to represent tree (node) structure: Tree::Object and
@@ -23,15 +21,19 @@ DESCRIPTION
 
     Creating
 
-    Tree::From::Struct, Tree::From::Text, Tree::From::TextLines,
-    Tree::Create::Callback, Tree::Create::Callback::ChildrenPerLevel,
-    Tree::Create::Size, Tree::From::FS.
+    Tree::From::Struct, Tree::From::ObjArray, Tree::From::Text,
+    Tree::From::TextLines, Tree::Create::Callback,
+    Tree::Create::Callback::ChildrenPerLevel, Tree::Create::Size,
+    Tree::From::FS.
 
     Data::Random::Tree.
 
     Visualizing as text
 
     Tree::To::Text, Tree::To::TextLines.
+
+    Text::Tree::Indented. This module accepts nested array of strings
+    instead of tree object.
 
     Visualizing as graphics
 
@@ -47,7 +49,7 @@ DESCRIPTION
 
     Roles
 
-    Role::TinyCommons::Tree.
+    Role::TinyCommons::Tree::Node, Role::TinyCommons::Tree::NodeMethods.
 
     Modules that produce or work with Role::TinyCommons::Tree-compliant tree
     objects
@@ -59,7 +61,7 @@ DESCRIPTION
     Data::CSel and its related modules: App::htmlsel, App::jsonsel,
     App::orgsel, App::podsel, App::ppisel, App::yamlsel, App::CSelUtils.
 
-INCLUDED MODULES
+ACME::CPANMODULES ENTRIES
     *   Tree::Object
 
     *   Tree::ObjectXS
@@ -71,6 +73,8 @@ INCLUDED MODULES
     *   Tree::Node
 
     *   Tree::From::Struct
+
+    *   Tree::From::ObjArray
 
     *   Tree::From::Text
 
@@ -90,11 +94,15 @@ INCLUDED MODULES
 
     *   Tree::To::TextLines
 
+    *   Text::Tree::Indented
+
     *   Tree::To::FS
 
     *   Tree::Shell
 
-    *   Role::TinyCommons::Tree
+    *   Role::TinyCommons::Tree::Node
+
+    *   Role::TinyCommons::Tree::NodeMethods
 
     *   Org::Parser
 
@@ -119,9 +127,16 @@ INCLUDED MODULES
     *   App::CSelUtils
 
 FAQ
-  What are ways to use this module?
-    Aside from reading it, you can install all the listed modules using
-    cpanmodules:
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanmodules CLI
+    (from App::cpanmodules distribution):
 
         % cpanmodules ls-entries WorkingWithTree | cpanm -n
 
@@ -129,9 +144,13 @@ FAQ
 
         % perl -MAcme::CM::Get=WorkingWithTree -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
 
-    This module also helps lcpan produce a more meaningful result for "lcpan
-    related-mods" when it comes to finding related modules for the modules
-    listed in this Acme::CPANModules module.
+    or directly:
+
+        % perl -MAcme::CPANModules::WorkingWithTree -E'say $_->{module} for @{ $Acme::CPANModules::WorkingWithTree::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -143,8 +162,8 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Work
-    ingWithTree>
+    <https://github.com/perlancar/perl-Acme-CPANModules-WorkingWithTree/issu
+    es>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -158,7 +177,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

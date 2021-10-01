@@ -2,7 +2,7 @@
 
 # ABSTRACT: run App::TimeTracker
 # PODNAME: tracker
-our $VERSION = '3.009'; # VERSION
+our $VERSION = '3.010'; # VERSION
 
 use strict;
 use warnings;
@@ -24,7 +24,7 @@ tracker - run App::TimeTracker
 
 =head1 VERSION
 
-version 3.009
+version 3.010
 
 =head1 SYNOPSIS
 

@@ -10,7 +10,7 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Plisco::Engine::InputWatcher;
-$Chess::Plisco::Engine::InputWatcher::VERSION = '0.2';
+$Chess::Plisco::Engine::InputWatcher::VERSION = '0.3';
 use strict;
 
 use IO::Select;
@@ -22,9 +22,16 @@ sub new {
 	my $sel = IO::Select->new($fh);
 
 	bless {
+		__handle => $fh,
 		__sel => $sel,
 		__input => '',
 	}, $class;
+}
+
+sub handle {
+	my ($self) = @_;
+
+	return $self->{__fh};
 }
 
 sub onInput {
@@ -47,7 +54,7 @@ sub check {
 	while (my @ready = $self->{__sel}->can_read(0)) {
 		foreach my $fh (@ready) {
 			my $offset = length $self->{__input};
-			my $bytes = $fh->sysread($self->{__input}, 2, $offset);
+			my $bytes = $fh->sysread($self->{__input}, 1, $offset);
 			if (!$bytes) {
 				$self->{__on_eof}->() if $self->{__on_eof};
 			} elsif ($self->{__input} =~ s/^(.*?)\n//) {

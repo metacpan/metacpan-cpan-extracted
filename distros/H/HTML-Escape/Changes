@@ -1,5 +1,14 @@
 Revision history for Perl extension HTML::Escape
 
+1.11 2021-09-27T04:11:20Z
+
+    commit 239b88f865305b59f7d193f0431fcd5c03df3dd3
+    Author: Harald Jörg <haj@posteo.de>
+    Date:   Sun Jan 13 11:56:25 2019 +0100
+
+        Add the list of escaped characters to the docs and clarify usage in the synopsis
+
+
 1.10 2016-03-15T03:16:39Z
 
     - Performance improvement.

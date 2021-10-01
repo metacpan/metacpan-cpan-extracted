@@ -33,12 +33,17 @@ lib/Proc/ProcessTable.pm
 lib/Proc/ProcessTable/Process.pm
 Makefile.PL
 MANIFEST			This list of files
+os/obstack.h
+os/obstack.c
+os/obstack_printf.c
 os/aix.c
 os/aix.h
 os/aix_getprocs.c
 os/aix_getprocs.h
 os/bsdi.c
 os/bsdi.h
+os/Cygwin.c
+os/Cygwin.h
 os/darwin.c
 os/darwin.h
 os/DecOSF.c

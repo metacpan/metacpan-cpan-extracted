@@ -1,3 +1,12 @@
+0.005   2021-05-06  Released-By: PERLANCAR; Urgency: medium
+
+	- Mention Tree::From::ObjArray, Text::Tree::Indented.
+
+        - Mention Role::TinyCommons::Tree::{Node,NodeMethods} instead of
+	  Role::TinyCommons::Tree (this is just main module name of a distro
+	  instead of actual role).
+
+
 0.004   2020-03-01  Released-By: PERLANCAR; Urgency: high
 
 	- Merge two releases 0.003 and 0.003.1.

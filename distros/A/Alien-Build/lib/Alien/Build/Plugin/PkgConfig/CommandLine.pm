@@ -7,7 +7,7 @@ use Alien::Build::Plugin;
 use Carp ();
 
 # ABSTRACT: Probe system and determine library or tool properties using the pkg-config command line interface
-our $VERSION = '2.41'; # VERSION
+our $VERSION = '2.42'; # VERSION
 
 
 has '+pkg_name' => sub {
@@ -203,7 +203,7 @@ Alien::Build::Plugin::PkgConfig::CommandLine - Probe system and determine librar
 
 =head1 VERSION
 
-version 2.41
+version 2.42
 
 =head1 SYNOPSIS
 
@@ -226,7 +226,10 @@ the best command line tools to accomplish this task.
 =head2 pkg_name
 
 The package name.  If this is a list reference then .pc files with all those package
-names must be present.
+names must be present.  The first name will be the primary and used by default once
+installed.  For the subsequent C<.pc> files you can use the
+L<Alien::Base alt method|Alien::Base/alt> to retrieve the alternate configurations
+once the L<Alien> is installed.
 
 =head2 atleast_version
 
@@ -298,7 +301,7 @@ Juan Julián Merelo Guervós (JJ)
 
 Joel Berger (JBERGER)
 
-Petr Pisar (ppisar)
+Petr Písař (ppisar)
 
 Lance Wicks (LANCEW)
 

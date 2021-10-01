@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.739';
+our $VERSION = '1.741';
 
 use Exporter qw( import );
 
@@ -32,8 +32,8 @@ sub validate_options {
                 }
             }
         }
-        elsif ( $valid->{$key} =~ /^Regexp/ ) {                                                                                                # Term::TablePrint prior to 0.138 use a string instead of a compiled regex
-        #    croak "$sub: option '$key' => the passed value has to be a regex quoted with the 'qr' operator." if ref $opt->{$key} ne 'Regexp'; # 22.06.2021  uncomment this after some time
+        elsif ( $valid->{$key} =~ /^Regexp/ ) {
+            croak "$sub: option '$key' => the passed value has to be a regex quoted with the 'qr' operator." if ref $opt->{$key} ne 'Regexp';
         }
         elsif ( ref $opt->{$key} ) {
             croak "$sub: option '$key' => a reference is not a valid value.";

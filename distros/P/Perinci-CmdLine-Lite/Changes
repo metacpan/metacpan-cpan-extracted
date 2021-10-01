@@ -1,3 +1,29 @@
+1.910   2021-10-01  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Do not use Complete::Bash::parse_cmdline() et al to
+	  parse command-line options from environment variable as they are
+	  indeed not suitable and will split e.g. a=b into three separate
+	  words; use core-module Text::ParseWords instead.
+
+
+1.909   2021-10-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Add plugin: Exit.
+
+
+1.908   2021-10-01  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Tweak documentation about plugin (list before_ & after_ events,
+          add note about currently only a few events have been added)
+
+        - [dist][committer Paul Cochrane] Add initial GitHub Actions
+          configuration.
+
+        - [internal] Make code pass standard perlcritic configuration.
+
+
 1.907   2021-08-06  Released-By: PERLANCAR; Urgency: medium
 
 	- Rename dependency Data::Clean::JSON -> Data::Clean::ForJSON

@@ -249,7 +249,7 @@ App::ElasticSearch::Utilities::Aggregations - Code to simplify creating and work
 
 =head1 VERSION
 
-version 8.1
+version 8.2
 
 =head1 FUNCTIONS
 

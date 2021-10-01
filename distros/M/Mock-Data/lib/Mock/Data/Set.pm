@@ -5,7 +5,7 @@ require Mock::Data::Generator;
 our @ISA= qw( Mock::Data::Generator );
 
 # ABSTRACT: Generator which returns one item from a set
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 sub new {
@@ -244,7 +244,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 COPYRIGHT AND LICENSE
 

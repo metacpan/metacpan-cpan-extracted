@@ -1,7 +1,7 @@
 package App::TimeTracker::Proto;
 
 # ABSTRACT: App::TimeTracker Proto Class
-our $VERSION = '3.009'; # VERSION
+our $VERSION = '3.010'; # VERSION
 
 use strict;
 use warnings;
@@ -82,7 +82,7 @@ has 'json_decoder' => ( is => 'ro', isa => 'JSON::XS', lazy_build => 1 );
 
 sub _build_json_decoder {
     my $self = shift;
-    return JSON::XS->new->utf8->pretty->relaxed;
+    return JSON::XS->new->utf8->pretty->canonical->relaxed;
 }
 
 sub run {
@@ -169,51 +169,45 @@ sub load_config {
     $opt_parser->getoptions( "project=s" => \$project );
 
     if ( defined $project ) {
+        $self->project($project);
         if ( my $project_config = $projects->{$project} ) {
-            $self->project($project);
             $dir = Path::Class::Dir->new($project_config);
         }
-        else {
-            say "Unknown project: $project";
-            $self->project($project);
-            $dir = Path::Class::Dir->new( '/ttfake', $project );
-        }
     }
+    if ($dir) {
+        my $try = 0;
+        $dir = $dir->absolute;
+    WALKUP: while ( $try++ < 30 ) {
+            my $config_file = $dir->file('.tracker.json');
+            my $this_config;
+            if ( -e $config_file ) {
+                push( @used_config_files, $config_file->stringify );
+                $this_config = $self->slurp_config($config_file);
+                $config = merge( $config, $this_config );
 
-    my $try = 0;
-    $dir = $dir->absolute;
-WALKUP: while ( $try++ < 30 ) {
-        my $config_file = $dir->file('.tracker.json');
-        my $this_config;
-        if ( -e $config_file ) {
-            push( @used_config_files, $config_file->stringify );
-            $this_config = $self->slurp_config($config_file);
-            $config = merge( $config, $this_config );
+                my @path    = $config_file->parent->dir_list;
+                my $project = exists $this_config->{project} ? $this_config->{project} : $path[-1];
+                $cfl->{$project} = $config_file->stringify;
+                $self->project($project)
+                    unless $self->has_project;
+            }
+            last WALKUP if $dir->parent eq $dir;
 
-            my @path    = $config_file->parent->dir_list;
-            my $project = $path[-1];
-            $cfl->{$project} = $config_file->stringify;
-            $self->project($project)
-                unless $self->has_project;
-
-        }
-        last WALKUP if $dir->parent eq $dir;
-
-        if ( my $parent = $this_config->{'parent'} ) {
-            if ( $projects->{$parent} ) {
-                $dir = Path::Class::file( $projects->{$parent} )->parent;
+            if ( my $parent = $this_config->{'parent'} ) {
+                if ( $projects->{$parent} ) {
+                    $dir = Path::Class::file( $projects->{$parent} )->parent;
+                }
+                else {
+                    $dir = $dir->parent;
+                    say
+                        "Cannot find project >$parent< that's specified as a parent in $config_file";
+                }
             }
             else {
                 $dir = $dir->parent;
-                say
-                    "Cannot find project >$parent< that's specified as a parent in $config_file";
             }
         }
-        else {
-            $dir = $dir->parent;
-        }
     }
-
     $self->_write_config_file_locations($cfl);
 
     if ( -e $self->global_config_file ) {
@@ -271,7 +265,7 @@ App::TimeTracker::Proto - App::TimeTracker Proto Class
 
 =head1 VERSION
 
-version 3.009
+version 3.010
 
 =head1 DESCRIPTION
 

@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.518-5-g85a95ab
+package JSON::Schema::Modern; # git description: v0.519-7-gc2fff3f
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.519';
+our $VERSION = '0.520';
 
 use 5.016;  # for fc, unicode_strings features
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -14,7 +14,7 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use strictures 2;
 use JSON::MaybeXS;
 use Carp qw(croak carp);
-use List::Util 1.55 qw(pairs first uniqint);
+use List::Util 1.55 qw(pairs first uniqint pairmap);
 use Ref::Util 0.100 qw(is_ref is_hashref);
 use Mojo::URL;
 use Safe::Isa;
@@ -25,7 +25,7 @@ use Module::Runtime 'use_module';
 use Moo;
 use MooX::TypeTiny 0.002002;
 use MooX::HandlesVia;
-use Types::Standard 1.010002 qw(Bool Int Str HasMethods Enum InstanceOf HashRef Dict CodeRef Optional slurpy ArrayRef Undef ClassName);
+use Types::Standard 1.010002 qw(Bool Int Str HasMethods Enum InstanceOf HashRef Dict CodeRef Optional slurpy ArrayRef Undef ClassName Tuple);
 use Feature::Compat::Try;
 use JSON::Schema::Modern::Error;
 use JSON::Schema::Modern::Result;
@@ -341,6 +341,8 @@ sub evaluate {
   );
 }
 
+# sub add_vocabulary { ... } # defined lower down...
+
 sub get {
   croak 'insufficient arguments' if @_ < 2;
   my ($self, $uri) = @_;
@@ -510,10 +512,10 @@ has _resource_index => (
   isa => HashRef[my $resource_type = Dict[
       canonical_uri => InstanceOf['Mojo::URL'],
       path => Str,
-      specification_version => Enum(SPECIFICATION_VERSIONS_SUPPORTED),
+      specification_version => my $spec_version_type = Enum(SPECIFICATION_VERSIONS_SUPPORTED),
       document => InstanceOf['JSON::Schema::Modern::Document'],
       # the vocabularies used when evaluating instance data against schema
-      vocabularies => ArrayRef[ClassName->where(sub { $_->DOES('JSON::Schema::Modern::Vocabulary') })],
+      vocabularies => ArrayRef[my $vocabulary_class_type = ClassName->where(q{$_->DOES('JSON::Schema::Modern::Vocabulary')})],
       slurpy HashRef[Undef],  # no other fields allowed
     ]],
   handles_via => 'Hash',
@@ -564,12 +566,71 @@ around _add_resources => sub {
   }
 };
 
-sub _vocabularies_by_spec_version {
-  my ($self, $spec_version) = @_;
-  return map use_module('JSON::Schema::Modern::Vocabulary::'.$_),
-    qw(Core Applicator Validation FormatAnnotation Content MetaData),
-    $spec_version eq 'draft2020-12' ? 'Unevaluated' : ();
+# $vocabulary uri (not its $id!) => [ spec_version, class ]
+has _vocabulary_classes => (
+  is => 'bare',
+  isa => HashRef[
+    Tuple[
+      $spec_version_type,
+      $vocabulary_class_type,
+    ]
+  ],
+  handles_via => 'Hash',
+  handles => {
+    _get_vocabulary_class => 'get',
+    _set_vocabulary_class => 'set',
+  },
+  lazy => 1,
+  default => sub {
+    +{
+      map { my $class = $_; pairmap { $a => [ $b, $class ] } $class->vocabulary }
+        map use_module('JSON::Schema::Modern::Vocabulary::'.$_),
+          qw(Core Applicator Validation FormatAssertion FormatAnnotation Content MetaData Unevaluated)
+    }
+  },
+);
+
+sub add_vocabulary {
+  my ($self, $classname) = @_;
+
+  $vocabulary_class_type->(use_module($classname));
+
+  # uri => version, uri => version
+  foreach my $pair (pairs $classname->vocabulary) {
+    my ($uri_string, $spec_version) = @$pair;
+    Str->where(q{my $uri = Mojo::URL->new($_); $uri->is_abs && !defined $uri->fragment})->($uri_string);
+    $spec_version_type->($spec_version);
+    $self->_set_vocabulary_class($uri_string => [ $spec_version, $classname ])
+  }
 }
+
+# $schema uri => [ spec_version, [ vocab classes ] ].
+has _metaschema_vocabulary_classes => (
+  is => 'bare',
+  isa => HashRef[
+    Tuple[
+      $spec_version_type,
+      ArrayRef[$vocabulary_class_type],
+    ]
+  ],
+  handles_via => 'Hash',
+  handles => {
+    _get_metaschema_vocabulary_classes => 'get',
+    _set_metaschema_vocabulary_classes => 'set',
+    __all_metaschema_vocabulary_classes => 'values',
+  },
+  lazy => 1,
+  default => sub {
+    my @modules = map use_module('JSON::Schema::Modern::Vocabulary::'.$_),
+      qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated);
+    +{
+      'https://json-schema.org/draft/2020-12/schema' => [ 'draft2020-12', [ @modules ] ],
+      do { pop @modules; () },
+      'https://json-schema.org/draft/2019-09/schema' => [ 'draft2019-09', \@modules ],
+      'http://json-schema.org/draft-07/schema#' => [ 'draft7', \@modules ],
+    },
+  },
+);
 
 # used for determining a default '$schema' keyword where there is none
 use constant METASCHEMA_URIS => {
@@ -718,7 +779,7 @@ JSON::Schema::Modern - Validate data against a schema
 
 =head1 VERSION
 
-version 0.519
+version 0.520
 
 =head1 SYNOPSIS
 
@@ -937,6 +998,18 @@ Returns C<undef> if the resource could not be found;
 if there were errors in the document, will die with these errors;
 otherwise returns the L<JSON::Schema::Modern::Document> that contains the added schema.
 
+=head2 add_vocabulary
+
+  $js->add_vocabulary('My::Custom::Vocabulary::Class');
+
+Makes a custom vocabulary class available to metaschemas that make use of this vocabulary.
+as described in the specification at
+L<"Meta-Schemas and Vocabularies"|https://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.8.1>.
+
+The class must compose the L<JSON::Schema::Modern::Vocabulary> role and implement the
+L<vocabulary|JSON::Schema::Modern::Vocabulary/vocabulary> and
+L<keywords|JSON::Schema::Modern::Vocabulary/keywords> methods.
+
 =head2 get
 
   my $schema = $js->get($uri);
@@ -1085,14 +1158,6 @@ loading schema documents from a local web application (e.g. L<Mojolicious>)
 =item *
 
 additional output formats beyond C<flag>, C<basic>, and C<terse> (L<https://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.12>)
-
-=item *
-
-examination of the C<$schema> keyword for deviation from the standard draft metaschemas, including changes to vocabulary behaviour
-
-=item *
-
-changing the draft specification version semantics after construction time
 
 =back
 

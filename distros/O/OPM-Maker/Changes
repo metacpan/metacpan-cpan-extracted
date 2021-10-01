@@ -1,5 +1,11 @@
 Changes file for OPM::Maker
-=================================
+===========================
+
+1.10 2021-10-01 17:11:00
+
+  + added support for huge files (see #7)
+  + Use OPM::Validate to validate opm files
+  + improve support for other ticketing systems
 
 1.00 2021-03-13 11:21:00
 

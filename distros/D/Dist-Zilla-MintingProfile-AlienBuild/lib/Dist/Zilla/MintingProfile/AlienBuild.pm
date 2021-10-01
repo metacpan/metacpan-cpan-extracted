@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use 5.022;
 
-package Dist::Zilla::MintingProfile::AlienBuild 0.01 {
+package Dist::Zilla::MintingProfile::AlienBuild 0.03 {
 
   use Moose;
   with 'Dist::Zilla::Role::MintingProfile::ShareDir';
@@ -27,7 +27,7 @@ Dist::Zilla::MintingProfile::AlienBuild - A minimal Dist::Zilla minting profile 
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -37,7 +37,7 @@ version 0.01
 
 This is a L<Dist::Zilla> minting profile for creating L<Alien> distributions
 based on the L<Alien::Build> framework.  It uses a reasonable template and the
-L<[@Starter]|Dist::Zilla::PluginBundle::AlienBuild> or
+L<[@Starter]|Dist::Zilla::PluginBundle::Starter> or
 L<[@Starter::Git]|Dist::Zilla::PluginBundle::Starter::Git> bundle plus the
 L<[AlienBuild]|Dist::Zilla::Plugin::AlienBuild> plugin.
 

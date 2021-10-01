@@ -50,6 +50,6 @@
          "web" : "https://github.com/pjacklam/p5-Math-BigInt-FastCalc"
       }
    },
-   "version" : "0.5011",
+   "version" : "0.5012",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

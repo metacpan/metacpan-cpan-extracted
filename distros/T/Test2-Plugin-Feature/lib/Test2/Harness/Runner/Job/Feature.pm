@@ -3,7 +3,7 @@ package Test2::Harness::Runner::Job::Feature;
 use strict;
 use warnings;
 
-our $VERSION = '0.001108';
+our $VERSION = '0.001111';
 
 use Test2::Harness::Util::HashBase;
 use parent 'Test2::Harness::Runner::Job';
@@ -42,7 +42,7 @@ Test2::Harness::Runner::Job::feature - Job runner.
 
 =head1 VERSION
 
-version 0.001108
+version 0.001111
 
 =head1 DESCRIPTION
 

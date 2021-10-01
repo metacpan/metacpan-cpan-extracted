@@ -19,7 +19,7 @@ use Test2::Util ();
 
 use base qw{ Exporter };
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 $VERSION =~ s/ _ //smxg;
 
 {
@@ -765,6 +765,8 @@ if you do so you must specify your desired imports explicitly, as (e.g.)
 L<Test::More|Test::More>
 
 L<Test2::V0|Test2::V0>
+
+L<Test2::Require|Test2::Require>
 
 L<Test2::Manual::Testing::Migrating|Test2::Manual::Testing::Migrating>
 

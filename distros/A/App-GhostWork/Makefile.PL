@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{App::GhostWork},
-    'VERSION'   => q{0.04},
+    'VERSION'   => q{0.05},
     'ABSTRACT'  => q{Barcode Logger(When,Where,Who,What,toWhich,Why,Howmanysec)},
     'PREREQ_PM' => {
         'ExtUtils::MakeMaker' => '5.4302',

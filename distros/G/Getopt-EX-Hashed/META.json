@@ -42,6 +42,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Clone" : "0",
             "List::Util" : "0",
             "perl" : "v5.14.0"
          }
@@ -56,7 +57,7 @@
    "provides" : {
       "Getopt::EX::Hashed" : {
          "file" : "lib/Getopt/EX/Hashed.pm",
-         "version" : "0.9919"
+         "version" : "0.9920"
       }
    },
    "release_status" : "stable",
@@ -70,7 +71,7 @@
          "web" : "https://github.com/kaz-utashiro/Getopt-EX-Hashed"
       }
    },
-   "version" : "0.9919",
+   "version" : "0.9920",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

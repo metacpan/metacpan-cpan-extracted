@@ -88,7 +88,7 @@ es-aggregate.pl - Multi-level aggregations in Elasticsearch
 
 =head1 VERSION
 
-version 8.1
+version 8.2
 
 =head1 SYNOPSIS
 

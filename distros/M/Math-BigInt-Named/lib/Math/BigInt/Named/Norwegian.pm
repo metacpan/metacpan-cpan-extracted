@@ -1,4 +1,4 @@
-#!perl
+# -*- mode: perl; -*-
 
 package Math::BigInt::Named::Norwegian;
 
@@ -8,7 +8,7 @@ use warnings;
 use Math::BigInt::Named;
 our @ISA = qw< Math::BigInt::Named >;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 my $SMALL = [ qw/
   null
@@ -227,7 +227,7 @@ __END__
 
 =head1 NAME
 
-Math::BigInt::Named::Norwegian - Math::BigInts that know their name in Norwegian
+Math::BigInt::Named::Norwegian - Math::BigInt objects that know their name in Norwegian
 
 =head1 SYNOPSIS
 
@@ -253,7 +253,7 @@ L<Math::BigInt::Named>.
 
     print Math::BigInt::Name -> name( 123 );
 
-Convert a BigInt to a name.
+Convert a Math::BigInt to a name.
 
 =head2 from_name()
 

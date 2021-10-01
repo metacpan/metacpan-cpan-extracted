@@ -54,7 +54,7 @@
    "provides" : {
       "Test2::Tools::LoadModule" : {
          "file" : "lib/Test2/Tools/LoadModule.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -72,6 +72,6 @@
          "web" : "https://github.com/trwyant/perl-Test2-Tools-LoadModule"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

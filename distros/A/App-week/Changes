@@ -1,5 +1,9 @@
 Revision history for Perl extension App-week
 
+1.0203 2021-09-28T19:02:18Z
+
+    - The latest Getopt::EX::Hashed clones default data.
+
 1.0202 2021-09-03T13:38:21Z
 
     - Support Solaris style tab and short month name.

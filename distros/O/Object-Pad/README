@@ -427,6 +427,31 @@ KEYWORDS
     ensure the correct number of arguments are passed - usually zero, but
     exactly one in the case of a :writer method.
 
+  :accessor, :accessor(NAME)
+
+    Since version 0.53.
+
+    Generates a combined reader-writer accessor method to set or return the
+    value of the slot. These are only permitted for scalar slots. If no
+    name is given, the name of the slot is used. A prefix character _ will
+    be removed if present.
+
+    This method takes either zero or one additional arguments. If an
+    argument is passed, the value of the slot is set from this argument
+    (even if it is undef). If no argument is passed (i.e. scalar @_ is
+    false) then the slot is not modified. In either case, the value of the
+    slot is then returned.
+
+       has $slot :accessor;
+    
+       # equivalent to
+       has $slot;
+    
+       method slot {
+          $slot = shift if @_;
+          return $slot;
+       }
+
   :weak
 
     Since version 0.44.

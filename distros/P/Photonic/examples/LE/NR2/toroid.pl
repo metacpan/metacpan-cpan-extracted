@@ -21,9 +21,8 @@ BEGIN { require List::Util; *luall = \&List::Util::all }
 use PDL;
 use PDL::NiceSlice;
 use PDL::Constants qw(PI);
-use PDL::Complex;
 use Photonic::Geometry::FromB;
-use Photonic::LE::NR2::AllH;
+use Photonic::LE::NR2::Haydock;
 use Photonic::LE::NR2::EpsL;
 
 my $ratio; # b/a for torus
@@ -68,15 +67,15 @@ my $r=zeroes($Nxy2, $Nxy2, $Nz2)->ndcoords-pdl($Nxy, $Nxy, $Nz); #positions arra
 my $B=(sqrt($r((0))**2+$r((1))**2)-$large_radius)**2+$r((2))**2 < $small_radius**2;
 my $gx=Photonic::Geometry::FromB->new(B=>$B, Direction0=>pdl(1,0,0));
 my $gz=Photonic::Geometry::FromB->new(B=>$B, Direction0=>pdl(0,0,1));
-my $nrx=Photonic::LE::NR2::AllH->new(geometry=>$gx, nh=>$Nh);
-my $nrz=Photonic::LE::NR2::AllH->new(geometry=>$gz, nh=>$Nh);
-my $epsx_calc=Photonic::LE::NR2::EpsL->new(nr=>$nrx, nh=>$Nh);
-my $epsz_calc=Photonic::LE::NR2::EpsL->new(nr=>$nrz, nh=>$Nh);
+my $nrx=Photonic::LE::NR2::Haydock->new(geometry=>$gx, nh=>$Nh);
+my $nrz=Photonic::LE::NR2::Haydock->new(geometry=>$gz, nh=>$Nh);
 say "#ratio Nxy Nz Nh f-nom f-act medium torus epsxx epszz";
 foreach(0..@eps_a-1){
     my ($ea, $eb)=(pdl($eps_a[$_])->r2C, pdl($eps_b[$_])->r2C);
-    my $resultx=$epsx_calc->evaluate($ea, $eb);
-    my $resultz=$epsz_calc->evaluate($ea, $eb);
+    my $epsx_calc=Photonic::LE::NR2::EpsL->new(haydock=>$nrx, nh=>$Nh, epsA=>$ea, epsB=>$eb);
+    my $epsz_calc=Photonic::LE::NR2::EpsL->new(haydock=>$nrz, nh=>$Nh, epsA=>$ea, epsB=>$eb);
+    my $resultx=$epsx_calc->epsL;
+    my $resultz=$epsz_calc->epsL;
     say sprintf "%.4f %d %d %d %.4f %.4f %.4f %.4f %.4f %.4f",
     $ratio, $Nxy, $Nz, $Nh, $fraction, $gx->f, $ea->re, $eb->re,
     $resultx->re, $resultz->re;

@@ -1,7 +1,7 @@
 /* vi: set ft=c : */
 
 #ifndef OpSIBLING
-#  define OpSIBLING(op)  (op->op_sibling)
+#  define OpSIBLING(op)  ((op)->op_sibling)
 #endif
 
 #ifndef OpMORESIB_set

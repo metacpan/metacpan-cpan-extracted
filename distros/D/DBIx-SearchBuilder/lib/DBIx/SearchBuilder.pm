@@ -4,12 +4,13 @@ package DBIx::SearchBuilder;
 use strict;
 use warnings;
 
-our $VERSION = "1.69";
+our $VERSION = "1.71";
 
 use Clone qw();
 use Encode qw();
 use Scalar::Util qw(blessed);
 use DBIx::SearchBuilder::Util qw/ sorted_values /;
+our $PREFER_BIND = $ENV{SB_PREFER_BIND};
 
 =head1 NAME
 
@@ -151,6 +152,8 @@ sub CleanSlate {
         group_by
         columns
         query_hint
+        _bind_values
+        _prefer_bind
     );
 
     #we have no limit statements. DoSearch won't work.
@@ -238,7 +241,7 @@ sub _DoSearch {
     delete $self->{'items'};
     $self->{'itemscount'} = 0;
 
-    my $records = $self->_Handle->SimpleQuery($QueryString);
+    my $records = $self->_Handle->SimpleQuery( $QueryString, @{ $self->{_bind_values} || [] } );
     return 0 unless $records;
 
     while ( my $row = $records->fetchrow_hashref() ) {
@@ -294,7 +297,7 @@ sub _DoCount {
     my $all  = shift || 0;
 
     my $QueryString = $self->BuildSelectCountQuery();
-    my $records     = $self->_Handle->SimpleQuery($QueryString);
+    my $records     = $self->_Handle->SimpleQuery( $QueryString, @{ $self->{_bind_values} || [] } );
     return 0 unless $records;
 
     my @row = $records->fetchrow_array();
@@ -419,9 +422,19 @@ sub _isLimited {
 
 
 
-=head2 BuildSelectQuery
+=head2 BuildSelectQuery PreferBind => 1|0
 
 Builds a query string for a "SELECT rows from Tables" statement for this SearchBuilder object
+
+If C<PreferBind> is true, the generated query will use bind variables where
+possible. If C<PreferBind> is not passed, it defaults to package variable
+C<$DBIx::SearchBuilder::PREFER_BIND>, which defaults to
+C<$ENV{SB_PREFER_BIND}>.
+
+To override global C<$DBIx::SearchBuilder::PREFER_BIND> for current object
+only, you can also set C<_prefer_bind> accordingly, e.g.
+
+    $sb->{_prefer_bind} = 1;
 
 =cut
 
@@ -433,6 +446,8 @@ sub BuildSelectQuery {
     my $QueryString = $self->_BuildJoins . " ";
     $QueryString .= $self->_WhereClause . " "
       if ( $self->_isLimited > 0 );
+
+    $self->_OptimizeQuery(\$QueryString, @_);
 
     my $QueryHint = $self->QueryHintFormatted;
 
@@ -461,7 +476,7 @@ sub BuildSelectQuery {
 
 
 
-=head2 BuildSelectCountQuery
+=head2 BuildSelectCountQuery PreferBind => 1|0
 
 Builds a SELECT statement to find the number of rows this SearchBuilder object would find.
 
@@ -477,7 +492,7 @@ sub BuildSelectCountQuery {
     $QueryString .= $self->_WhereClause . " "
       if ( $self->_isLimited > 0 );
 
-
+    $self->_OptimizeQuery(\$QueryString, @_);
 
     # DISTINCT query only required for multi-table selects
     if ($self->_isJoined) {
@@ -877,7 +892,7 @@ sub Limit {
                     warn "Collection in '$args{OPERATOR}' with more than one column selected, using first";
                     splice @{ $args{'VALUE'}{'columns'} }, 1;
                 }
-                $args{'VALUE'} = '('. $args{'VALUE'}->BuildSelectQuery .')';
+                $args{'VALUE'} = '('. $args{'VALUE'}->BuildSelectQuery(PreferBind => 0) .')';
                 $args{'QUOTEVALUE'} = 0;
             }
             elsif ( ref $args{'VALUE'} ) {
@@ -1868,6 +1883,22 @@ sub QueryHintFormatted {
     my $self = shift;
     my $QueryHint = $self->QueryHint;
     return $QueryHint ? " /* $QueryHint */ " : " ";
+}
+
+
+sub _OptimizeQuery {
+    my $self  = shift;
+    my $query = shift;
+
+    my %args = ( PreferBind => $self->{_prefer_bind} // $PREFER_BIND, @_ );
+
+    undef $self->{_bind_values};
+    if ( $args{PreferBind} ) {
+        ( $$query, my @bind_values ) = $self->_Handle->_ExtractBindValues($$query);
+        if (@bind_values) {
+            $self->{_bind_values} = \@bind_values;
+        }
+    }
 }
 
 =head1 DEPRECATED METHODS

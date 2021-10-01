@@ -1,5 +1,5 @@
 package HTML::FillInForm;
-
+our $VERSION = '2.22';
 use integer; # no floating point math so far!
 use strict; # and no funny business, either.
 
@@ -321,7 +321,7 @@ sub start {
     $self->{output} .= ' /' if $attr->{'/'};
     $self->{output} .= ">";
   } elsif ($tagname eq 'option'){
-    my $value = $self->_get_param($self->{selectName});
+    my $value = defined($self->{selectName}) ? $self->_get_param($self->{selectName}) : undef;
 
     # browsers do not pass selects with no selected options at all,
     # so hack around
@@ -424,7 +424,12 @@ sub _get_param {
   # traverse the list in reverse order for backwards compatibility
   # with the previous implementation.
   for my $o (reverse @{$self->{objects}}) {
-    my @v = $o->param($param);
+    my @v;
+    if ($o->can('multi_param')) {
+      @v = $o->multi_param($param);
+    } else {
+      @v = $o->param($param);
+    }
 
     next unless @v;
 
@@ -521,11 +526,29 @@ sub declaration {
 
 1;
 
-__END__
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
 HTML::FillInForm - Populates HTML Forms with data.
+
+=head1 VERSION
+
+version 2.22
+
+=head1 SYNOPSIS
+
+Fill HTML form with data.
+
+  $output = HTML::FillInForm->fill( \$html,   $q );
+  $output = HTML::FillInForm->fill( \@html,   [$q1,$q2] );
+  $output = HTML::FillInForm->fill( \*HTML,   \%data );
+  $output = HTML::FillInForm->fill( 't.html', [\%data1,%data2] );
+
+The HTML can be provided as a scalarref, arrayref, filehandle or file.  The data can come from one or more
+hashrefs, or objects which support a param() method, like CGI.pm, L<Apache::Request|Apache::Request>, etc. 
 
 =head1 DESCRIPTION
 
@@ -541,25 +564,13 @@ user to see and correct the error.
 2. You have just retrieved a record from a database and need to display it in
 an HTML form.
 
-=head1 SYNOPSIS
-
-Fill HTML form with data.
-
-  $output = HTML::FillInForm->fill( \$html,   $q );
-  $output = HTML::FillInForm->fill( \@html,   [$q1,$q2] );
-  $output = HTML::FillInForm->fill( \*HTML,   \%data );
-  $output = HTML::FillInForm->fill( 't.html', [\%data1,%data2] );
-
-The HTML can be provided as a scalarref, arrayref, filehandle or file.  The data can come from one or more
-hashrefs, or objects which support a param() method, like CGI.pm, L<Apache::Request|Apache::Request>, etc. 
-
 =head1 fill
 
 The basic syntax is seen above the Synopsis. There are a few additional options.
 
 =head2 Options
 
-=head3  target => 'form1'
+=head3 target => 'form1'
 
 Suppose you have multiple forms in a html file and only want to fill in one.
 
@@ -709,10 +720,6 @@ Using HTML::FillInForm from HTML::Mason is covered in the FAQ on
 the masonhq.com website at
 L<http://www.masonhq.com/?FAQ:HTTPAndHTML#h-how_can_i_populate_form_values_automatically_>
 
-=head1 VERSION
-
-This documentation describes HTML::FillInForm module version 2.1
-
 =head1 SECURITY
 
 Note that you might want to think about caching issues if you have password
@@ -747,13 +754,6 @@ insert CGI data into forms, but require that you mix HTML with Perl.
 There is a nice review of the module available here:
 L<http://www.perlmonks.org/index.pl?node_id=274534>
 
-=head1 AUTHOR
-
-(c) 2011 TJ Mather, tjmather@maxmind.com, L<http://www.maxmind.com/>
-
-All rights reserved. This package is free software; you can
-redistribute it and/or modify it under the same terms as Perl itself.
-
 =head1 SEE ALSO
 
 L<HTML::Parser|HTML::Parser>, 
@@ -783,3 +783,21 @@ Fixes, Bug Reports, Docs have been generously provided by:
   Andrew Creer                
 
 Thanks!
+
+=head1 AUTHOR
+
+TJ Mather, tjmather@maxmind.com
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2000 by TJ Mather, tjmather@maxmind.com.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+__END__
+
+# ABSTRACT: Populates HTML Forms with data.
+

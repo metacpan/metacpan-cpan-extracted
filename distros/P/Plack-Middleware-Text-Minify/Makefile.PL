@@ -7,7 +7,7 @@ use 5.009003;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "minify text responses on the fly",
+  "ABSTRACT" => "remove HTML indentation on the fly",
   "AUTHOR" => "Robert Rothenberg <rrwo\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "utf8" => 0
   },
-  "VERSION" => "v0.2.1",
+  "VERSION" => "v0.2.2",
   "test" => {
     "TESTS" => "t/*.t"
   }

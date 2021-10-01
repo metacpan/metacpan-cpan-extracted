@@ -5,7 +5,7 @@
       "Deyan Ginev <deyan.ginev@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -37,6 +37,7 @@
             "DB_File" : "0",
             "File::Which" : "0",
             "Getopt::Long" : "2.37",
+            "IO::Handle" : "0",
             "IO::String" : "0",
             "Image::Size" : "0",
             "JSON::XS" : "0",
@@ -57,12 +58,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/brucemiller/LaTeXML/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/brucemiller/LaTeXML.git",
          "web" : "https://github.com/brucemiller/LaTeXML"
       }
    },
-   "version" : "0.8.5",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.8.6",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -55,6 +55,16 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.1.1",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Perceptyx/perl-redis-opentracing/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Perceptyx/perl-redis-opentracing.git",
+         "web" : "https://github.com/Perceptyx/perl-redis-opentracing"
+      }
+   },
+   "version" : "v0.2.0",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

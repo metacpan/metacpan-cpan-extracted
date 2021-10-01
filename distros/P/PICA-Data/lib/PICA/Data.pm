@@ -1,7 +1,7 @@
 package PICA::Data;
 use v5.14.1;
 
-our $VERSION = '1.30';
+our $VERSION = '1.33';
 
 use Exporter 'import';
 our @EXPORT_OK
@@ -688,8 +688,8 @@ with C<pica_> (see L</SYNOPSIS>).
 
 =head2 match( $path, %options )
 
-Extract a list of subfield values from a PICA record based on a L<PICA::Path>
-expression and options.
+Extract the subfield values from a PICA record based on a L<PICA::Path>
+expression and options (see method C<match> of PICA::Path).
 
 =head2 values( $path )
 

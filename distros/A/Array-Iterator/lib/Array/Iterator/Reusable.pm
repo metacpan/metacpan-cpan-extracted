@@ -4,9 +4,13 @@ package Array::Iterator::Reusable;
 use strict;
 use warnings;
 
-our $VERSION = '0.130'; # VERSION
-
 use Array::Iterator;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-09-26'; # DATE
+our $DIST = 'Array-Iterator'; # DIST
+our $VERSION = '0.131'; # VERSION
+
 our @ISA = qw(Array::Iterator);
 
 sub reset {
@@ -30,7 +34,7 @@ Array::Iterator::Reusable - A subclass of Array::Iterator to allow reuse of iter
 
 =head1 VERSION
 
-This document describes version 0.130 of Array::Iterator::Reusable (from Perl distribution Array-Iterator), released on 2021-08-09.
+This document describes version 0.131 of Array::Iterator::Reusable (from Perl distribution Array-Iterator), released on 2021-09-26.
 
 =head1 SYNOPSIS
 
@@ -60,7 +64,7 @@ This is a subclass of Array::Iterator, only those methods that have been added a
 
 =item B<reset>
 
-This resets the interal counter of the iterator back to the start of the array.
+This resets the internal counter of the iterator back to the start of the array.
 
 =back
 
@@ -72,17 +76,9 @@ Please visit the project's homepage at L<https://metacpan.org/release/Array-Iter
 
 Source repository is at L<https://github.com/perlancar/perl-Array-Iterator>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Array-Iterator>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
-This is a subclass of B<Array::Iterator>, please refer to it for more documenation.
+This is a subclass of B<Array::Iterator>, please refer to it for more documentation.
 
 =head1 AUTHOR
 
@@ -91,6 +87,23 @@ perlancar <perlancar@cpan.org>
 =head1 ORIGINAL AUTHOR
 
 stevan little, E<lt>stevan@iinteractive.comE<gt>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -107,5 +120,13 @@ L<http://www.iinteractive.com>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Array-Iterator>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

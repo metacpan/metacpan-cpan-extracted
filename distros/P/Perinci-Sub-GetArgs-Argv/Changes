@@ -1,3 +1,8 @@
+0.847   2021-09-30  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Turn off warning about failing to parse as JSON/YAML.
+
+
 0.846   2021-07-29  Released-By: PERLANCAR; Urgency: medium
 
 	- Update to Data::Sah::Resolve 0.010.

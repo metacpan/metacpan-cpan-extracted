@@ -1,6 +1,6 @@
 package Getopt::EX::Hashed;
 
-our $VERSION = '0.9919';
+our $VERSION = '0.9920';
 
 =head1 NAME
 
@@ -8,7 +8,7 @@ Getopt::EX::Hashed - Hash store object automation
 
 =head1 VERSION
 
-Version 0.9919
+Version 0.9920
 
 =head1 SYNOPSIS
 
@@ -18,11 +18,13 @@ Version 0.9919
   package App::foo;
 
   use Getopt::EX::Hashed;
-  has start  => ( spec => "=i s begin", default => 1 );
-  has end    => ( spec => "=i e" );
-  has file   => ( spec => "=s", is => 'rw', re => qr/^(?!\.)/ );
-  has score  => ( spec => '=i', min => 0, max => 100 );
-  has answer => ( spec => '=i', must => sub { $_[1] == 42 } );
+  has start    => ( spec => "=i s begin", default => 1 );
+  has end      => ( spec => "=i e" );
+  has file     => ( spec => "=s", is => 'rw', re => qr/^(?!\.)/ );
+  has score    => ( spec => '=i', min => 0, max => 100 );
+  has answer   => ( spec => '=i', must => sub { $_[1] == 42 } );
+  has mouse    => ( spec => '=s', any => [ 'Frankie', 'Benjy' ] );
+  has question => ( spec => '=s', re => qr/^(life|universe|everything)$/i);
   no  Getopt::EX::Hashed;
 
   sub run {
@@ -40,6 +42,7 @@ use Hash::Util qw(lock_keys lock_keys_plus unlock_keys);
 use Carp;
 use Data::Dumper;
 use List::Util qw(first);
+use Clone qw(clone);
 
 # store metadata in caller context
 my  %__DB__;
@@ -153,7 +156,7 @@ sub new {
 	    *{"$class\::$access"} = _accessor($is, $name)
 		unless ${"$class\::"}{$access};
 	}
-	$obj->{$name} = $param{default};
+	$obj->{$name} = clone $param{default};
     }
     lock_keys %$obj if $config->{LOCK_KEYS};
     $obj;
@@ -265,6 +268,17 @@ my %tester = (
     max  => sub { $_[-1] <= $_->{max} },
     re   => sub { $_[-1] =~ $_->{re} },
     must => sub { &{$_->{must}} },
+    any  => sub {
+	my $any = $_->{any};
+	for (ref($any) eq 'ARRAY' ? @$any : $any) {
+	    if (ref($_) eq 'Regexp') {
+		$_[-1] =~ $_ and return 1;
+	    } else {
+		$_[-1] eq $_ and return 1;
+	    }
+	}
+	return 0;
+    },
     );
 
 sub _tester {
@@ -444,7 +458,26 @@ example, option B<--answer> takes only 42 as a valid value.
 
 Set the minimum and maximum limit for the argument.
 
-=item B<re> => qr/I<pattern>/
+=item B<any> => I<arrayref> | qr/I<regex>/
+
+Set the valid string parameter list.  Each item is string or regex
+reference.  The argument is valid when it is same as, or match to any
+item of the given list.  If the value is not a arrayref, it is taken
+as a single item list (regexpref usually).
+
+Following declarations are almost equivalent, except second one is
+case insensitive.
+
+    has question => '=s',
+        any => [ 'life', 'universe', 'everything ];
+
+    has question => '=s',
+        any => qr/^(life|universe|everything)$/i;
+
+=item B<re> => qr/I<regex>/
+
+This parameter will be deprecated soon, because B<any> works same.
+Don't use.
 
 Set the required regular expression pattern for the argument.
 

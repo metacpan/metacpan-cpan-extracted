@@ -45,8 +45,12 @@ note 'Load and test ./inc module Test2::Plugin::INC_Jail';
     }, 'main can not load Present';
 
     {
-	package
-	Module::Under::Test;
+	# No need to cargo-cult split the package statement across
+	# lines. Thanks to Flavio Poletti's "The Real Pause Workaround" at
+	# https://github.polettix.it/ETOOBUSY/2021/06/15/the-real-pause-workaround/
+	# and ultimately to Joel Berger's reference to CPAN::Meta::Spec:
+	# https://metacpan.org/pod/CPAN::Meta::Spec#no_index
+	package Module::Under::Test;
 
 	use Test2::V0;	# Have to import test routines
 

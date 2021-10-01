@@ -1,5 +1,5 @@
 {
-   "abstract" : "minify text responses on the fly",
+   "abstract" : "remove HTML indentation on the fly",
    "author" : [
       "Robert Rothenberg <rrwo@cpan.org>"
    ],
@@ -79,7 +79,7 @@
    "provides" : {
       "Plack::Middleware::Text::Minify" : {
          "file" : "lib/Plack/Middleware/Text/Minify.pm",
-         "version" : "v0.2.1"
+         "version" : "v0.2.2"
       }
    },
    "release_status" : "stable",
@@ -93,7 +93,7 @@
          "web" : "https://github.com/robrwo/Plack-Middleware-Text-Minify"
       }
    },
-   "version" : "v0.2.1",
+   "version" : "v0.2.2",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",

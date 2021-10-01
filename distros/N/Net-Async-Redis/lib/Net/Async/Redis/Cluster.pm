@@ -10,7 +10,7 @@ use parent qw(
     IO::Async::Notifier
 );
 
-our $VERSION = '3.015'; # VERSION
+our $VERSION = '3.016'; # VERSION
 
 =encoding utf8
 
@@ -383,7 +383,7 @@ async sub execute_command {
     } else {
         # So far our longest command name is 2 words
         my $key_idx = $Net::Async::Redis::Commands::KEY_FINDER{$cmd[0]};
-        $key_idx //= $Net::Async::Redis::Commands::KEY_FINDER{$cmd[0] . ' ' . $cmd[1]};
+        $key_idx //= $Net::Async::Redis::Commands::KEY_FINDER{$cmd[0] . ' ' . $cmd[1]} if @cmd > 1;
         die 'no index found for ' . join(' ', @cmd) unless defined $key_idx;
         $k = $cmd[$key_idx];
     }

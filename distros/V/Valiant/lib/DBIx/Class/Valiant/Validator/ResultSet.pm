@@ -27,16 +27,9 @@ sub validate_each {
   my ($self, $record, $attribute, $value, $opts) = @_;
 
   # If a row is marked to be deleted then don't bother to validate it.
-  # We use ->next and avoiod ->all because ->all resets the cache.
-  my @rows;
-  foreach my $row ( @{$value->get_cache||[]} ) {
-  #foreach my $row ( $value->all ) {
-    push @rows, $row unless $row->is_marked_for_deletion;
-  }
-
-  #my @rows = grep { not $_->is_marked_for_deletion } $value->all;
+  my @rows = grep { not $_->is_removed } @{$value->get_cache||[]};
   my $count = scalar(@rows);
-
+  
   # If there's zero $count and skip_if_empty is true (default is false) then
   # don't bother doing any more validations.
   if(!@rows) {

@@ -62,7 +62,7 @@ sub _new {
 	if ($params{nocreate}) {
 	    $self = Sys::Virt::Network::_define_xml($con,  $params{xml}, $params{flags});
 	} else {
-	    $self = Sys::Virt::Network::_create_xml($con,  $params{xml});
+	    $self = Sys::Virt::Network::_create_xml($con,  $params{xml}, $params{flags});
 	}
     } else {
 	die "address, id or uuid parameters are required";
@@ -238,6 +238,19 @@ sub get_port_by_uuid {
 
 This section documents constants that are used with various
 APIs described above
+
+=head2 NETWORK CREATION CONSTANTS
+
+When creating networks zero or more of the following
+constants may be used
+
+=over 4
+
+=item Sys::Virt::Network::CREATE_VALIDATE
+
+Validate the XML document against the XML schema
+
+=back
 
 =head2 LIST FILTERING
 

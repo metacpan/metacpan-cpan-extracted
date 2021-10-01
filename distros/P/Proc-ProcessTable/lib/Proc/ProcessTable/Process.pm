@@ -175,7 +175,7 @@ up-to-date information.
 
 =head1 AUTHOR
 
-D. Urist, durist@frii.com
+J. Bargsten, D. Urist
 
 =head1 SEE ALSO
 

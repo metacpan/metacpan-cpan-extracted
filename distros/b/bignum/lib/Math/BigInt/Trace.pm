@@ -1,4 +1,4 @@
-#!perl
+# -*- mode: perl; -*-
 
 package Math::BigInt::Trace;
 
@@ -13,7 +13,7 @@ our ($accuracy, $precision, $round_mode, $div_scale);
 
 our @ISA = qw(Exporter Math::BigInt);
 
-our $VERSION = '0.53';
+our $VERSION = '0.61';
 
 use overload;                   # inherit overload from Math::BigInt
 

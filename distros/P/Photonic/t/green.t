@@ -34,7 +34,7 @@ use PDL;
 use PDL::NiceSlice;
 use Photonic::Geometry::FromEpsilon;
 use Photonic::WE::S::Metric;
-use Photonic::WE::S::AllH;
+use Photonic::WE::S::Haydock;
 use Photonic::WE::S::Green;
 
 use Test::More tests => 4;

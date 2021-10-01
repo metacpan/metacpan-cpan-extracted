@@ -9,7 +9,7 @@ use OPM::Maker;
 OPM::Maker->run;
 
 package opmbuild;
-$opmbuild::VERSION = '1.00';
+$opmbuild::VERSION = '1.10';
 
 __END__
 
@@ -23,7 +23,7 @@ opmbuild - script to build/test OPM packages
 
 =head1 VERSION
 
-version 1.00
+version 1.10
 
 =head1 AUTHOR
 

@@ -3,8 +3,8 @@ NAME
     framework
 
 VERSION
-    This document describes version 1.907 of Perinci::CmdLine::Lite (from
-    Perl distribution Perinci-CmdLine-Lite), released on 2021-08-06.
+    This document describes version 1.910 of Perinci::CmdLine::Lite (from
+    Perl distribution Perinci-CmdLine-Lite), released on 2021-10-01.
 
 SYNOPSIS
     In "gen-random-num" script:
@@ -132,7 +132,7 @@ DESCRIPTION
     switch backend on the fly.
 
 REQUEST KEYS
-    All those supported by Perinci::CmdLine::Base, plus:
+    All those supported by Perinci::CmdLine::Base.
 
 RESULT METADATA
     All those supported by Perinci::CmdLine::Base, plus:
@@ -141,13 +141,13 @@ RESULT METADATA
     If set to true, then when formatting to "text" formats, this class won't
     print any newline to keep the data being printed unmodified.
 
-CONTRIBUTOR
-    Steven Haryanto <sharyanto@cpan.org>
-
 ATTRIBUTES
     All the attributes of Perinci::CmdLine::Base, plus:
 
-  validate_args => bool (default: 1)
+    *   validate_args => bool (default: 1)
+
+        Validate arguments using schema from metadata.
+
 METHODS
     All the methods of Perinci::CmdLine::Base, plus:
 
@@ -186,13 +186,6 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Perinci-CmdLine-Lite>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Lite>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     Perinci::CmdLine::Any
 
@@ -203,10 +196,40 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTORS
+    *   Paul Cochrane <paul.cochrane@posteo.de>
+
+    *   Paul Cochrane <paul@liekut.de>
+
+    *   Steven Haryanto (on Asus Zenbook) <stevenharyanto@gmail.com>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015,
-    2014 by perlancar@cpan.org.
+    2014 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Lite>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

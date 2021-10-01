@@ -6,7 +6,7 @@ package Bio::MUST::Core;
 # CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::VERSION = '0.212650';
+$Bio::MUST::Core::VERSION = '0.212670';
 use strict;
 use warnings;
 
@@ -41,7 +41,7 @@ Bio::MUST::Core - Core classes and utilities for Bio::MUST
 
 =head1 VERSION
 
-version 0.212650
+version 0.212670
 
 =head1 DESCRIPTION
 

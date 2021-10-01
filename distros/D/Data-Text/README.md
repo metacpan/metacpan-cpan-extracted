@@ -4,7 +4,7 @@ Data::Text - Class to handle text in an OO way
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # SYNOPSIS
 
@@ -43,6 +43,17 @@ Removes leading and trailing spaces from the string.
 
 Removes trailing spaces from the string.
 
+## replace
+
+Replaces words.
+
+    use Data::Text;
+
+    my $dt = Data::Text->new();
+    $dt->append('Hello World');
+    $dt->replace({ 'Hello' => 'Goodbye dear' });
+    print $dt->as_string(), "\n";       # Outputs "Goodbye dear world"
+
 # AUTHOR
 
 Nigel Horne, `<njh at bandsman.co.uk>`
@@ -50,6 +61,8 @@ Nigel Horne, `<njh at bandsman.co.uk>`
 # BUGS
 
 # SEE ALSO
+
+[String::Clean](https://metacpan.org/pod/String%3A%3AClean), [String::Util](https://metacpan.org/pod/String%3A%3AUtil)
 
 # SUPPORT
 

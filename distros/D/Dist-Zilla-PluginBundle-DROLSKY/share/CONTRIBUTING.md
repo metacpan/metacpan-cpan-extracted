@@ -123,8 +123,13 @@ to enforce a uniform coding style. This is tested as part of the author
 testing suite. You can install this and any other necessary non-Perl tools by
 running `./dev-bin/install-xt-tools.sh`.
 
-Please run this before committing your changes and address any issues it
-brings up.
+Then you can use `precious` to tidy and lint your code:
+
+    $> precious tidy -a
+    $> precious lint -a
+
+Please run `precious tidy -a` and `precious lint -a` before committing your
+changes and address any issues that it reports.
 
 You can also set up a git pre-commit hook that checks all changed files for
 linting issues by running `./git/setup.pl`.'

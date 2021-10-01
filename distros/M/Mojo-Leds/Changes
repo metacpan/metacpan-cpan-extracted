@@ -1,5 +1,8 @@
 Changelog for Mojo-Leds
 
+1.11 2021-09-24T15:55:00
+ - It's now possibile to not have a config file
+
 1.10 2021-09-20T13:49:00
  - Add prereq to request Mojolicious::Plugin::AutoRoutePm >= 0.14
 

@@ -124,6 +124,13 @@ t/invalid-schemas-draft2019-09/invalid-input.json
 t/invalid-schemas-draft2019-09/ref.json
 t/lib/Acceptance.pm
 t/lib/Helper.pm
+t/lib/MyVocabulary/BadEvaluationOrder.pm
+t/lib/MyVocabulary/BadVocabularySub1.pm
+t/lib/MyVocabulary/BadVocabularySub2.pm
+t/lib/MyVocabulary/BadVocabularySub3.pm
+t/lib/MyVocabulary/MissingRole.pm
+t/lib/MyVocabulary/MissingSub.pm
+t/lib/MyVocabulary/StringComparison.pm
 t/max_traversal_depth.t
 t/output_format.t
 t/pattern.t

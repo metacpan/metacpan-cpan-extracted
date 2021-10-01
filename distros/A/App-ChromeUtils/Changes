@@ -1,3 +1,8 @@
+0.009   2021-09-27  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLI: pause-and-unpause-chrome.
+
+
 0.008   2020-08-18  Released-By: PERLANCAR; Urgency: high
 
         - Merge releases 0.007 and 0.007.1.

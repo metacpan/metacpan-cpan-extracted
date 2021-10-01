@@ -3,7 +3,7 @@ package Bio::MUST::Core::Seq;
 # CONTRIBUTOR: Catherine COLSON <ccolson@doct.uliege.be>
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
 # CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
-$Bio::MUST::Core::Seq::VERSION = '0.212650';
+$Bio::MUST::Core::Seq::VERSION = '0.212670';
 use Moose;
 use MooseX::SemiAffordanceAccessor;
 use namespace::autoclean;
@@ -164,18 +164,20 @@ sub gapify {
     my $self = shift;
     my $char = shift // '*';                # defaults to gap
 
-    # original version: very general but much too slow on large matrices
-    # my $regex = $PROTMISS;                  # defaults to protein seq
-    #
-    # # in case of DNA ensure correct 'missification' (if applicable)
-    # unless ($self->is_protein) {
-    #     $regex = $DNAMISS;
-    #     $char = 'N' if $char =~ $DNAMISS;
-    # }
-    #
-    # ( my $seq = $self->seq ) =~ s{$regex}{$char}xmsg;
+    my $regex = $PROTMISS;                  # defaults to protein seq
 
-    # alternative version: hard-coding $char (if possible) gives a 250% boost
+    # in case of DNA ensure correct 'missification' (if applicable)
+    unless ($self->is_protein) {
+        $regex = $DNAMISS;
+        $char = 'N' if $char =~ $DNAMISS;
+    }
+
+    ( my $seq = $self->seq ) =~ s{$regex}{$char}xmsg;
+
+    # alternative versions developed due to a design error in Ali::store_phylip
+    # They are now commented because less general and not critical anymore.
+
+    # alt vers 1: hard-coding $char (if possible) gives a 250% boost
     # my $seq = $self->seq;
     # if ($self->is_protein) {
     #     if    ($char eq '*') {
@@ -200,31 +202,31 @@ sub gapify {
     #     }
     # }
 
-    # current version: hard-coded tr/// for 900% boost with s/// fall-back
+    # alt vers 2: hard-coded tr/// for 900% boost with s/// fall-back
     # Note: $PROTMISS and $DNAMISS regexes in Constants.pm are ignored!
-    my $seq = $self->seq;
-    if ($self->is_protein) {
-        if    ($char eq '*') {
-            $seq =~ tr{?XxBJOUZbjouz}{*};
-        }
-        elsif ($char eq 'X') {
-            $seq =~ tr{?XxBJOUZbjouz}{X};
-        }
-        else {
-            $seq =~ s{[?XxBJOUZbjouz]}{$char}xmsg;
-        }
-    }
-    else {
-        if    ($char eq '*') {
-            $seq =~ tr{?XxNnBDHKMRSVWYbdhkmrsvwy}{*};
-        }
-        elsif ($char eq 'X') {
-            $seq =~ tr{?XxNnBDHKMRSVWYbdhkmrsvwy}{N};
-        }
-        else {
-            $seq =~ s{[?XxNnBDHKMRSVWYbdhkmrsvwy]}{$char}xmsg;
-        }
-    }
+    # my $seq = $self->seq;
+    # if ($self->is_protein) {
+    #     if    ($char eq '*') {
+    #         $seq =~ tr{?XxBJOUZbjouz}{*};
+    #     }
+    #     elsif ($char eq 'X') {
+    #         $seq =~ tr{?XxBJOUZbjouz}{X};
+    #     }
+    #     else {
+    #         $seq =~ s{[?XxBJOUZbjouz]}{$char}xmsg;
+    #     }
+    # }
+    # else {
+    #     if    ($char eq '*') {
+    #         $seq =~ tr{?XxNnBDHKMRSVWYbdhkmrsvwy}{*};
+    #     }
+    #     elsif ($char eq 'X') {
+    #         $seq =~ tr{?XxNnBDHKMRSVWYbdhkmrsvwy}{N};
+    #     }
+    #     else {
+    #         $seq =~ s{[?XxNnBDHKMRSVWYbdhkmrsvwy]}{$char}xmsg;
+    #     }
+    # }
 
     $self->_set_seq($seq);
     return $self;
@@ -452,7 +454,7 @@ Bio::MUST::Core::Seq - Nucleotide or protein sequence
 
 =head1 VERSION
 
-version 0.212650
+version 0.212670
 
 =head1 SYNOPSIS
 

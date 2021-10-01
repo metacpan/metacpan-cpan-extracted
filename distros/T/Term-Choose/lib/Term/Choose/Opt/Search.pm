@@ -4,24 +4,31 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.739';
+our $VERSION = '1.741';
 
 use Term::Choose::Constants qw( ROW COL );
-use Term::Choose::Screen    qw( up clear_to_end_of_screen );
+use Term::Choose::Screen    qw( up clear_to_end_of_screen clear_screen show_cursor hide_cursor );
 
 
 sub __user_input {
-    my ( $self, $prompt ) = @_;
+    my ( $self, $prompt, $error, $default ) = @_;
     $self->{plugin}->__reset_mode( { mouse => $self->{mouse}, hide_cursor => $self->{hide_cursor} } );
     my $string;
     if ( ! eval {
         require Term::Form;
         Term::Form->VERSION(0.530);
         my $term = Term::Form->new();
-        $string = $term->readline( $prompt, { hide_cursor => 2, clear_screen => 2, color => $self->{color} } );
+        $string = $term->readline(
+            $prompt,
+            { info => $error, default => $default, hide_cursor => 2, clear_screen => length $error ? 1 : 2,
+              color => $self->{color} }
+        );
         1 }
     ) {
-        print "\r", clear_to_end_of_line();
+        print "\r", clear_screen();
+        if ( length $error ) {
+            print $error, "\n\r";
+        }
         print show_cursor() if ! $self->{hide_cursor};
         print $prompt;
         $string = <STDIN>;
@@ -35,20 +42,37 @@ sub __user_input {
 
 sub __search_begin {
     my ( $self ) = @_;
+    my ($search_regex, $error, $default );
+
+    USER_INPUT: while ( 1 ) {
+        my $search_str = $self->Term::Choose::Opt::Search::__user_input( '> search-pattern: ', $error, $default );
+        $error = '';
+        if ( ! length $search_str ) {
+            $self->Term::Choose::Opt::Search::__search_end();
+            return;
+        }
+        if ( ! eval {
+            if ( $self->{search} == 1 ) {
+                $search_regex = qr/$search_str/i;
+                $self->{search_info} = 'm/' . $search_str . '/i';
+            }
+            else {
+                $search_regex = qr/$search_str/;
+                $self->{search_info} = 'm/' . $search_str . '/';
+            }
+            'Teststring' =~ $search_regex;
+            1 }
+        ) {
+            $error = $@;
+            $default = $default eq $search_str ? '' : $search_str;
+            next USER_INPUT;
+        }
+        last USER_INPUT;
+    }
     $self->{map_search_list_index} = [];
-    my $search_str = $self->Term::Choose::Opt::Search::__user_input( '> search-pattern: ' );
-    if ( ! length $search_str ) {
-        $self->Term::Choose::Opt::Search::__search_end();
-        return;
-    }
-    $self->{search_info} = 'm/' . $search_str . '/';
-    if ( $self->{search} == 1 ) {
-        $search_str = '(?i)' . $search_str;
-        $self->{search_info} .= 'i';
-    }
     my $filtered_list = [];
     for my $i ( 0 .. $#{$self->{list}} ) {
-        if ( $self->{list}[$i] =~ /$search_str/ ) {
+        if ( $self->{list}[$i] =~ $search_regex ) {
             push @{$self->{map_search_list_index}}, $i;
             push @$filtered_list, $self->{list}[$i];
         }

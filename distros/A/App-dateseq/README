@@ -2,8 +2,8 @@ NAME
     App::dateseq - Generate a sequence of dates
 
 VERSION
-    This document describes version 0.103 of App::dateseq (from Perl
-    distribution App-dateseq), released on 2021-08-22.
+    This document describes version 0.105 of App::dateseq (from Perl
+    distribution App-dateseq), released on 2021-09-24.
 
 FUNCTIONS
   dateseq
@@ -27,6 +27,13 @@ FUNCTIONS
     *   business6 => *bool*
 
         Only list business days (Mon-Sat), or non-business days.
+
+    *   eval => *str*
+
+        Run perl code for each date.
+
+        Specified perl code will receive the date as DateTime object in
+        $_and expected to return result to print.
 
     *   exclude_dow => *date::dow_nums*
 
@@ -129,15 +136,24 @@ HOMEPAGE
 SOURCE
     Source repository is at <https://github.com/perlancar/perl-App-dateseq>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-dateseq>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 AUTHOR
     perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
 
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2021, 2020, 2019, 2016, 2015 by perlancar
@@ -145,4 +161,11 @@ COPYRIGHT AND LICENSE
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-dateseq>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

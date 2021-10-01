@@ -33,7 +33,7 @@ use warnings;
 use PDL;
 use PDL::NiceSlice;
 use Photonic::Geometry::FromB;
-use Photonic::LE::NR2::OneH;
+use Photonic::LE::NR2::Haydock;
 use Test::More;
 use lib 't/lib';
 use TestUtils;
@@ -41,7 +41,7 @@ use TestUtils;
 #Check haydock coefficients for simple 1D system
 my $B=zeroes(11)->xvals<5; #1D system
 my $g=Photonic::Geometry::FromB->new(B=>$B, Direction0=>pdl([1]));
-my $o=Photonic::LE::NR2::OneH->new(geometry=>$g);
+my $o=Photonic::LE::NR2::Haydock->new(geometry=>$g, nh=>3);
 $o->iterate;
 ok(agree(pdl($o->current_a), $g->f), "1D a_0") or diag "got=",$o->current_a, "\nexpected=", $g->f;
 ok(agree(pdl($o->next_b2), $g->f*(1-$g->f)), "1D b_1^2");

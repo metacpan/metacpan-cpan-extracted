@@ -4,7 +4,7 @@
       "Thomas Klausner <domm@plix.at>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -85,27 +85,27 @@
    "provides" : {
       "App::TimeTracker" : {
          "file" : "lib/App/TimeTracker.pm",
-         "version" : "3.009"
+         "version" : "3.010"
       },
       "App::TimeTracker::Command::Core" : {
          "file" : "lib/App/TimeTracker/Command/Core.pm",
-         "version" : "3.009"
+         "version" : "3.010"
       },
       "App::TimeTracker::Constants" : {
          "file" : "lib/App/TimeTracker/Constants.pm",
-         "version" : "3.009"
+         "version" : "3.010"
       },
       "App::TimeTracker::Data::Task" : {
          "file" : "lib/App/TimeTracker/Data/Task.pm",
-         "version" : "3.009"
+         "version" : "3.010"
       },
       "App::TimeTracker::Proto" : {
          "file" : "lib/App/TimeTracker/Proto.pm",
-         "version" : "3.009"
+         "version" : "3.010"
       },
       "App::TimeTracker::Utils" : {
          "file" : "lib/App/TimeTracker/Utils.pm",
-         "version" : "3.009"
+         "version" : "3.010"
       }
    },
    "release_status" : "stable",
@@ -120,9 +120,9 @@
          "web" : "https://github.com/domm/App-TimeTracker"
       }
    },
-   "version" : "3.009",
-   "x_generated_by_perl" : "v5.32.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "version" : "3.010",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

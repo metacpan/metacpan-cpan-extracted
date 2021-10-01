@@ -11,11 +11,11 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.005
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.006
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Perinci/CmdLine/Base.pm','lib/Perinci/CmdLine/Lite.pm','lib/Perinci/CmdLine/Plugin/DisablePlugin.pm','lib/Perinci/CmdLine/Plugin/DumpArgs.pm','lib/Perinci/CmdLine/Plugin/DumpR.pm','lib/Perinci/CmdLine/Plugin/DumpRes.pm','lib/Perinci/CmdLine/PluginBase.pm'];
+my $filenames = ['lib/Perinci/CmdLine/Base.pm','lib/Perinci/CmdLine/Lite.pm','lib/Perinci/CmdLine/Plugin/DisablePlugin.pm','lib/Perinci/CmdLine/Plugin/DumpArgs.pm','lib/Perinci/CmdLine/Plugin/DumpR.pm','lib/Perinci/CmdLine/Plugin/DumpRes.pm','lib/Perinci/CmdLine/Plugin/Exit.pm','lib/Perinci/CmdLine/PluginBase.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

@@ -228,8 +228,8 @@ with `pica_` (see ["SYNOPSIS"](#synopsis)).
 
 ## match( $path, %options )
 
-Extract a list of subfield values from a PICA record based on a [PICA::Path](https://metacpan.org/pod/PICA::Path)
-expression and options.
+Extract the subfield values from a PICA record based on a [PICA::Path](https://metacpan.org/pod/PICA::Path)
+expression and options (see method `match` of PICA::Path).
 
 ## values( $path )
 

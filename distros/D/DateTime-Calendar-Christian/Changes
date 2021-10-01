@@ -1,3 +1,7 @@
+0.12		2021-09-25	T. R. Wyant
+    Correct repository links in metadata.  Thanks to Keith Thompson for
+    finding and reporting this.
+
 0.11		2021-09-06	T. R. Wyant
     Correct generation of 'provides' metadata.  Thanks to Favio Poletti
     for blogging

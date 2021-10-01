@@ -5,11 +5,11 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-math-bigrat-pod.diff
 README
 README.md
 t/00sig.t
 t/01load.t
+t/badd-mbr.t
 t/big_ap.t
 t/bigfltpm.inc
 t/bigfltrt.t
@@ -17,8 +17,11 @@ t/bigrat.t
 t/bigratpm.inc
 t/bigratpm.t
 t/bigratup.t
+t/binv-mbr.t
 t/bitwise.t
 t/bnok-mbr.t
+t/const-mbr.t
+t/dparts-mbr.t
 t/hang.t
 t/Math/BigRat/Test.pm
 t/new-mbr.t

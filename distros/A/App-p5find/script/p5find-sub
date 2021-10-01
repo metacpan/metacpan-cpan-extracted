@@ -5,7 +5,7 @@ p5find-sub is a program to find subroutine definitions in your perl5 code.
 When invoked, it simply prints the location all subroutines, including the
 name-less ones.
 
-=head1 Usage Example
+=head1 Examples
 
 Here is a partial result for perlbrew repository:
 
@@ -31,6 +31,7 @@ To find a subroutine by its name, pass the name with C<--name> parameter:
 use v5.18;
 use warnings;
 use Getopt::Long 'GetOptions';
+use List::Util 'first';
 use App::p5find qw<p5_doc_iterator print_file_linenum_line>;
 
 sub print_usage {
@@ -48,6 +49,7 @@ GetOptions(
     \%opts,
     "h",
     "name=s",
+    "contains=s"
 );
 
 if ($opts{h}) {
@@ -86,10 +88,27 @@ while (my $doc = $iter->()) {
         my $el = $token->parent;
         my $sub_name = $el->isa("PPI::Statement::Sub") ? $el->name : "(anonymous)";
 
-        if ( !defined($wanted_sub_name) || $wanted_sub_name eq $sub_name ) {
+        my $hit = 0;
+        if ($opts{contains}) {
+            if (my @tok = grep { $_->significant } $el->tokens) {
+                for my $tok (@tok) {
+                    if ("$tok" eq $opts{contains}) {
+                        $hit = 1;
+                        last;
+                    }
+                }
+            }
+        }
+        elsif ( !defined($wanted_sub_name) || $wanted_sub_name eq $sub_name ) {
+            $hit = 1;
+        }
+
+
+        if ($hit) {
             my $ln = $token->line_number;
             $hits{$ln} = 1;
         }
+
     }
 
     if (%hits) {

@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::FormatAnnotation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Format-Annotation vocabulary
 
-our $VERSION = '0.519';
+our $VERSION = '0.520';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -19,12 +19,11 @@ use namespace::clean;
 with 'JSON::Schema::Modern::Vocabulary';
 
 sub vocabulary {
-  my ($self, $spec_version) = @_;
-  return
-      $spec_version eq 'draft2019-09' ? 'https://json-schema.org/draft/2019-09/vocab/format'
-    : $spec_version eq 'draft2020-12' ? 'https://json-schema.org/draft/2020-12/vocab/format-annotation'
-    : undef;
+  'https://json-schema.org/draft/2019-09/vocab/format' => 'draft2019-09',
+  'https://json-schema.org/draft/2020-12/vocab/format-annotation' => 'draft2020-12';
 }
+
+sub evaluation_order { 3 }
 
 sub keywords {
   qw(format);
@@ -55,11 +54,11 @@ JSON::Schema::Modern::Vocabulary::FormatAnnotation - Implementation of the JSON 
 
 =head1 VERSION
 
-version 0.519
+version 0.520
 
 =head1 DESCRIPTION
 
-=for Pod::Coverage vocabulary keywords
+=for Pod::Coverage vocabulary evaluation_order keywords
 
 =for stopwords metaschema
 

@@ -8,7 +8,7 @@ require Mock::Data::Generator;
 our @ISA= qw( Mock::Data::Generator );
 
 # ABSTRACT: Create a generator that plugs other templates into a string
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 sub new {
@@ -82,7 +82,7 @@ sub _parse_template {
 
 # Parse one of the curly-brace notations
 sub _parse_template_reference {
-	if (/\G\{(\w+)/gc) {
+	if (/\G\{([\w:]+)/gc) {
 		my $generator_name= $1;
 		my (@named_param, @pos_param);
 		if (/\G[ \t]+/gc) {
@@ -230,7 +230,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 COPYRIGHT AND LICENSE
 

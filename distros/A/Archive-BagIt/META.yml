@@ -36,37 +36,37 @@ no_index:
 provides:
   Archive::BagIt:
     file: lib/Archive/BagIt.pm
-    version: '0.075'
+    version: '0.081'
   Archive::BagIt::Base:
     file: lib/Archive/BagIt/Base.pm
-    version: '0.075'
+    version: '0.081'
   Archive::BagIt::Fast:
     file: lib/Archive/BagIt/Fast.pm
-    version: '0.075'
+    version: '0.081'
   Archive::BagIt::Plugin::Algorithm::MD5:
     file: lib/Archive/BagIt/Plugin/Algorithm/MD5.pm
-    version: '0.075'
+    version: '0.081'
   Archive::BagIt::Plugin::Algorithm::SHA512:
     file: lib/Archive/BagIt/Plugin/Algorithm/SHA512.pm
-    version: '0.075'
+    version: '0.081'
   Archive::BagIt::Plugin::Manifest::MD5:
     file: lib/Archive/BagIt/Plugin/Manifest/MD5.pm
-    version: '0.075'
+    version: '0.081'
   Archive::BagIt::Plugin::Manifest::SHA512:
     file: lib/Archive/BagIt/Plugin/Manifest/SHA512.pm
-    version: '0.075'
+    version: '0.081'
   Archive::BagIt::Role::Algorithm:
     file: lib/Archive/BagIt/Role/Algorithm.pm
-    version: '0.075'
+    version: '0.081'
   Archive::BagIt::Role::Manifest:
     file: lib/Archive/BagIt/Role/Manifest.pm
-    version: '0.075'
+    version: '0.081'
   Archive::BagIt::Role::Plugin:
     file: lib/Archive/BagIt/Role/Plugin.pm
-    version: '0.075'
+    version: '0.081'
   Archive::BagIt::Role::Portability:
     file: lib/Archive/BagIt/Role/Portability.pm
-    version: '0.075'
+    version: '0.081'
 recommends:
   IO::AIO: '0'
 requires:
@@ -90,7 +90,7 @@ requires:
   warnings: '0'
 resources:
   repository: https://art1pirat.spdns.org/art1/Archive-BagIt.git
-version: '0.075'
+version: '0.081'
 x_contributors:
   - 'Andreas Romeyke <art1@andreas-romeyke.de>'
   - 'Michiel Beijen <michiel.beijen@gmail.com>'
@@ -99,6 +99,6 @@ x_contributors:
   - 'Robert Schmidt <rob@c7a.ca>'
   - 'Russell McOrmond <rmcormond@crkn.ca>'
   - 'Russell McOrmond <russell.mcormond@canadiana.ca>'
-x_generated_by_perl: v5.28.1
+x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -82,6 +82,7 @@ sub pathname_make {
 # If pathname is absolute, dir starts with volume or '/'
 sub pathname_split {
   my ($pathname) = @_;
+  return unless defined $pathname;
   $pathname = pathname_canonical($pathname);
   my ($vol, $dir, $name) = File::Spec->splitpath($pathname);
   # Hmm, for /, we get $dir = / but we want $vol='/'  ?????
@@ -99,6 +100,7 @@ use Carp;
 # AND, care about symbolic links and collapsing ../ !!!
 sub pathname_canonical {
   my ($pathname) = @_;
+  return unless defined $pathname;
   if ($pathname =~ /^($LITERAL_RE)/) {
     return $pathname; }
   # Don't call pathname_is_absolute, etc, here, cause THEY call US!
@@ -139,6 +141,7 @@ sub pathname_type {
 # Note that this returns ONLY recognized protocols!
 sub pathname_protocol {
   my ($pathname) = @_;
+  return unless defined $pathname;
   return ($pathname =~ /^($PROTOCOL_RE|$LITERAL_RE)/ ? $1 : 'file'); }
 
 #======================================================================
@@ -196,6 +199,7 @@ sub pathname_is_reloadable {
 # we _could_ make relative...
 sub pathname_relative {
   my ($pathname, $base) = @_;
+  return unless defined $pathname;
   $pathname = pathname_canonical($pathname);
   return ($base && pathname_is_absolute($pathname) && !pathname_is_url($pathname)
     ? File::Spec->abs2rel($pathname, pathname_canonical($base))
@@ -203,13 +207,16 @@ sub pathname_relative {
 
 sub pathname_absolute {
   my ($pathname, $base) = @_;
+  return unless defined $pathname;
   $pathname = pathname_canonical($pathname);
   return (!pathname_is_absolute($pathname) && !pathname_is_url($pathname)
     ? File::Spec->rel2abs($pathname, ($base ? pathname_canonical($base) : pathname_cwd()))
     : $pathname); }
 
 sub pathname_to_url {
-  my $relative_pathname = pathname_relative($_[0]);
+  my ($pathname) = @_;
+  return unless defined $pathname;
+  my $relative_pathname = pathname_relative($pathname);
   if ($SEP ne '/') {
     $relative_pathname = join('/', split(/\Q$SEP\E/, $relative_pathname)); }
   return $relative_pathname; }
@@ -378,26 +385,29 @@ our $kpse_toolchain = "";
 
 sub pathname_kpsewhich {
   my (@candidates) = @_;
-  return             unless $kpsewhich;
+  return             unless $kpsewhich && @candidates;
   build_kpse_cache() unless $kpse_cache;
   foreach my $file (@candidates) {
     if (my $result = $$kpse_cache{$file}) {
       return $result; } }
   # If we've failed to read the cache, try directly calling kpsewhich
   # For multiple calls, this is slower in general. But MiKTeX, eg., doesn't use texmf ls-R files!
-  my $files = join(' ', @candidates);
-  if ($kpsewhich && (my $result = `"$kpsewhich" $files $kpse_toolchain`)) {
-    if ($result =~ /^\s*(.+?)\s*\n/s) {
-      return $1; } }
+  if ($kpse_toolchain) {
+    push(@candidates, $kpse_toolchain); }
+  if ($kpsewhich && open(my $resfh, '-|', $kpsewhich, @candidates)) {
+    my $result = <$resfh>;     # we only need the first line
+    { local $/; <$resfh>; }    # discard the rest of the output
+    close($resfh);             # ignore exit status (only one of @candidates exists, usually)
+    if ($result) {
+      chomp $result;
+      return $result; } }
   return; }
 
 sub build_kpse_cache {
-  $kpse_cache = {};    # At least we've tried.
+  $kpse_cache = {};            # At least we've tried.
   return unless $kpsewhich;
   # This finds ALL the directories looked for for any purposes, including docs, fonts, etc
-  if ($ENV{"APPVEYOR"}) {
-    $kpse_toolchain = "--miktex-admin";
-  }
+  $kpse_toolchain = "--miktex-admin" if ($ENV{"LATEXML_KPSEWHICH_MIKTEX_ADMIN"});
   my $texmf = `"$kpsewhich" --expand-var \'\\\$TEXMF\' $kpse_toolchain`; chomp($texmf);
   # These are directories which contain the tex related files we're interested in.
   # (but they're typically below where the ls-R indexes are!)

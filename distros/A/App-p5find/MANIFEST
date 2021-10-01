@@ -1,4 +1,5 @@
 .drone.yml
+.perlcriticrc
 Build.PL
 Changes
 LICENSE
@@ -9,11 +10,15 @@ README
 cpanfile
 lib/App/p5find.pm
 metamerge.json
+script/p5find
+script/p5find-help
 script/p5find-method-call
+script/p5find-num
 script/p5find-regex
+script/p5find-statement
 script/p5find-str
 script/p5find-sub
-script/p5find-token-word
+script/p5find-token
 script/p5find-unused-package
 script/p5find-words-used-only-once
 t/iter.t

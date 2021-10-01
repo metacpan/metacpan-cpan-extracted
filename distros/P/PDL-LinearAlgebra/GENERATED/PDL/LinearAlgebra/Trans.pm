@@ -1,4 +1,3 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
@@ -12,12 +11,11 @@ our @EXPORT_OK = qw(  mexp mexpts mlog msqrt mpow
 			sec asec sech asech 
 			cot acot acoth coth mfun
 			csc acsc csch acsch toreal pi PDL::PP geexp PDL::PP cgeexp PDL::PP ctrsqrt PDL::PP ctrfun );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
-
 
 
    our $VERSION = '0.14';
@@ -67,10 +65,7 @@ PDL routine sec. If you need to call it specify its origin module : PDL::Basic::
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -1399,5 +1394,3 @@ in this distribution.
 # Exit with OK status
 
 1;
-
-		   

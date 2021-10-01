@@ -1,3 +1,15 @@
+0.006   2021-09-30  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Add Synopsis & Description.
+
+
+0.005   2021-09-29  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Allow 1-element array form.
+
+
 0.004   2021-02-06  Released-By: PERLANCAR; Urgency: medium
 
 	- Add option: ns_prefixes.

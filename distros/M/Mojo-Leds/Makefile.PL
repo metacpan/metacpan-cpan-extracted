@@ -21,11 +21,14 @@ my %WriteMakefileArgs = (
     "Mojolicious" => "8.23",
     "Mojolicious::Plugin::AutoRoutePm" => "0.14",
     "Mojolicious::Plugin::RenderFile" => 0,
+    "Net::Domain" => 0,
     "Scalar::Util" => 0,
     "Tie::IxHash" => 0,
-    "boolean" => 0
+    "boolean" => 0,
+    "re" => 0
   },
   "TEST_REQUIRES" => {
+    "Data::Printer" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "Test::More" => 0,
@@ -33,7 +36,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.10",
+  "VERSION" => "1.11",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,16 +45,19 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "BSON::OID" => 0,
+  "Data::Printer" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Mojolicious" => "8.23",
   "Mojolicious::Plugin::AutoRoutePm" => "0.14",
   "Mojolicious::Plugin::RenderFile" => 0,
+  "Net::Domain" => 0,
   "Scalar::Util" => 0,
   "Test::More" => 0,
   "Tie::IxHash" => 0,
   "boolean" => 0,
   "lib" => 0,
+  "re" => 0,
   "strict" => 0,
   "warnings" => 0
 );

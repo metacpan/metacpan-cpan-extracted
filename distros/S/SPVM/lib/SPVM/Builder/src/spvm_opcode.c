@@ -319,6 +319,7 @@ const char* const* SPVM_OPCODE_C_ID_NAMES(void) {
     "BOOL_FLOAT",
     "BOOL_DOUBLE",
     "BOOL_OBJECT",
+    "BOOL_BOOL_OBJECT",
     "GOTO",
     "IF_EQ_ZERO",
     "IF_NE_ZERO",

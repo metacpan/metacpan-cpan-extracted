@@ -1,5 +1,5 @@
 package Photonic::Roles::Geometry;
-$Photonic::Roles::Geometry::VERSION = '0.018';
+$Photonic::Roles::Geometry::VERSION = '0.021';
 
 =encoding UTF-8
 
@@ -201,7 +201,7 @@ sub _build_pmGNorm { #normalized +- reciprocal lattice. Leave
 
 sub _build_f { #calculate filling fraction
     my $self=shift;
-    return $self->B->avg;
+    return $self->B->davg;
 }
 
 sub _build_unitPairs {
@@ -294,7 +294,7 @@ Photonic::Roles::Geometry
 
 =head1 VERSION
 
-version 0.018
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -308,11 +308,11 @@ version 0.018
 =item (for developers)
 
     package Photonic::Geometry::FromB;
-    $Photonic::Geometry::Geometry::VERSION = '0.018';
+    $Photonic::Geometry::Geometry::VERSION = '0.021';
     use namespace::autoclean;
     use Moose;
     has 'B' =>(is=>'ro', isa=>'PDL', required=>1,
-	       documentation=>'charateristic function');
+	       documentation=>'characteristic function');
     with 'Photonic::Roles::Geometry';
 
 =back

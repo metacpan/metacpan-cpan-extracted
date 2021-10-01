@@ -2,7 +2,7 @@ package PICA::Path;
 use v5.14.1;
 use utf8;
 
-our $VERSION = '1.30';
+our $VERSION = '1.33';
 
 use Carp qw(confess);
 use Scalar::Util qw(reftype);
@@ -97,7 +97,7 @@ sub parse {
     };
 }
 
-sub match_record {
+sub match {
     my ($self, $record, %args) = @_;
 
     my %default_args = (
@@ -158,6 +158,8 @@ sub match_record {
     return;
 
 }
+
+*match_record = *match;
 
 sub match_field {
     my ($self, $field) = @_;
@@ -375,30 +377,27 @@ substring end position
 
 Example record:
 
-    ...
+    use PICA::Data;
     use PICA::Path;
     
     # PICA::Data record
-    my $record = {
-        record => [
-            [ '005A', '', '0', '1234-5678' ],
-            [ '005A', '', '0', '1011-1213' ],
-            [ '009Q', '', 'u', 'http://example.org/', 'x', 'A', 'z', 'B', 'z', 'C' ],
-            [ '021A', '', 'a', 'Title', 'd', 'Supplement' ],
-            [ '031N', '', 'j', '1600', 'k', '1700', 'j', '1800', 'k', '1900', 'j', '2000' ],
-            [ '045F', '01', 'a', '001' ],
-            [ '045F', '02', 'a', '002' ],
-            [ '045U', '', 'e', '003', 'e', '004' ],
-            [ '045U', '', 'e', '005' ]
-        ],
-        _id => 1234
-    };
-    
+    my $record = PICA::Data->new(<<'PP');
+    005A $01234-5678
+    005A $01011-1213
+    009Q $uhttp://example.org/$xA$zB$zC
+    021A $aTitle$dSupplement
+    031N $j1600$k1700$j1800$k1900$j2000
+    045F/01 $a001
+    045F/02 $a002
+    045U $e003$e004
+    045U $e005
+    PP
+
     # create path
-    my $path = PICA::Path->new('021A$ab');
+    my $path = PICA::Path->new('021A$ad');
     
     # match record
-    my $match = $path->match_record($record);
+    my $match = $path->match($record);
     # $match = 'TitleSupplement'
 
 =head3 Match single field with no subfield repetition
@@ -621,6 +620,10 @@ supported.
 
 If option C<position_as_occurrence> is set, positions will be read as
 occurrences, e.g. C</2-4> is read as C<[2-4]>.
+
+=head2 match( $record, %options )
+
+Alias for C<match_record>.
 
 =head2 match_record( $record, %options )
 

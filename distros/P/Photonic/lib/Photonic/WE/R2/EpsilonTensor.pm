@@ -1,5 +1,5 @@
 package Photonic::WE::R2::EpsilonTensor;
-$Photonic::WE::R2::EpsilonTensor::VERSION = '0.018';
+$Photonic::WE::R2::EpsilonTensor::VERSION = '0.021';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::R2::EpsilonTensor
 
 =head1 VERSION
 
-version 0.018
+version 0.021
 
 =head1 COPYRIGHT NOTICE
 
@@ -87,7 +87,7 @@ response $epsA is taken from the metric.
 
 The macroscopic dielectric tensor of the last operation
 
-=item * All accesors of Photonic::WE::R2::Wave
+=item * All accessors of Photonic::WE::R2::Wave
 
 
 =back

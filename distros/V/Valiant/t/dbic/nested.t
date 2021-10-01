@@ -576,7 +576,10 @@ Schema->resultset("Role")->populate([
   });
 
   ok $person->valid;
+  is scalar(@{$person->person_roles->get_cache||[]}), 1, 'got expected cache size';
+  
   $person->discard_changes;
+
   is $person->username, 'jjn3';
   is $person->state->abbreviation, 'TX';
   my $rs = $person->person_roles->search({},{order_by=>'role_id ASC'});
@@ -584,6 +587,8 @@ Schema->resultset("Role")->populate([
   ok !$rs->next;
 
   $person->discard_changes;
+  $person = Schema->resultset('Person')->find({ 'me.id'=>$person->id }, { prefetch => [{person_roles => 'role' }] });
+
   $person->update({
     person_roles => [
         {role => {label=>'adminxx'}},
@@ -593,6 +598,26 @@ Schema->resultset("Role")->populate([
   });
 
   ok $person->invalid;
+  is $person->username, 'jjn3';
+  is $person->state->abbreviation, 'TX';
+
+  {
+    my $rs = $person->person_roles;
+    {
+      ok my $row = $rs->next;
+      is $row->role->label, 'adminxx';
+    }
+    {
+      ok my $row = $rs->next;
+      is $row->role->label, 'superuser';
+    }
+    {
+      ok my $row = $rs->next;
+      is $row->role->label, 'admin';
+    }
+    ok !$rs->next;
+  }
+  
   is_deeply +{$person->errors->to_hash(full_messages=>1)}, +{
     person_roles => [
       "Person Roles Is Invalid",

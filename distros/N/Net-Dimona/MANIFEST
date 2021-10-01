@@ -1,7 +1,9 @@
+Changes
 lib/Net/Dimona.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
+README.md
 t/0001-basic.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

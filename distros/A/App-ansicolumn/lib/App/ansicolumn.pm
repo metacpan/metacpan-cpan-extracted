@@ -1,6 +1,6 @@
 package App::ansicolumn;
 
-our $VERSION = "1.13";
+our $VERSION = "1.14";
 
 use v5.14;
 use warnings;
@@ -58,16 +58,17 @@ use Getopt::EX::Hashed; {
     has border_style        => ' =s   bs ' , default => 'vbar' ;
     has white_space         => ' !       ' , default => 2 ;
     has isolation           => ' !       ' , default => 2 ;
-    has fillup              => ' :s      ' ;
+    has fillup              => ' :s U    ' ;
     has fillup_str          => ' :s      ' , default => '' ;
     has ambiguous           => ' =s      ' , default => 'narrow' ;
     has discard_el          => ' !       ' , default => 1 ;
     has padchar             => ' =s      ' , default => ' ' ;
     has colormap            => ' =s@  cm ' , default => [] ;
 
-    has '+boundary'  => re => qr/^(none|word|space)$/;
-    has '+linestyle' => re => qr/^(none|wordwrap|wrap|truncate)$/;
-    has '+ambiguous' => re => qr/^(wide|narrow)$/ ;
+    has '+boundary'  => any => [ qw(none word space) ] ;
+    has '+linestyle' => any => [ qw(none wordwrap wrap truncate) ] ;
+    has '+fillup'    => any => [ qw(pane page none) ] ;
+    has '+ambiguous' => any => [ qw(wide narrow) ] ;
 
     has '+help' => action => sub {
 	pod2usage

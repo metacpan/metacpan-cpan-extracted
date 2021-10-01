@@ -1,6 +1,13 @@
 Revision history for Term::Choose
 
 
+1.741   2021-09-30
+    - Search: eval user input.
+    - Option 'skip_items': croaks if the value is not quoted with the 'qr' operator.
+
+1.740   2021-09-27
+    - Bugfix in Search.pm: import the required constants.
+
 1.739   2021-09-17
     - Undo the previous "bugfix".
     - Bugfix in current_layout.

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use 5.022;
 
-package Alien::Build::Wizard 0.01 {
+package Alien::Build::Wizard 0.03 {
 
   use Moose;
   use Moose::Util::TypeConstraints;
@@ -10,7 +10,10 @@ package Alien::Build::Wizard 0.01 {
   use experimental qw( signatures postderef );
   use Data::Section::Simple qw( get_data_section );
   use Alien::Build::Wizard::Detect;
+  use Alien::Build::Wizard::Questions qw( :all );
   use namespace::autoclean;
+
+  # ABSTRACT: Alien distribution creation wizard
 
   has detect => (
     is       => 'ro',
@@ -19,7 +22,7 @@ package Alien::Build::Wizard 0.01 {
     default => sub ($self) {
       for(1..20)
       {
-        my $url = $self->chrome->ask('Enter the full URL to the latest tarball (or zip, etc.) of the project you want to alienize.');
+        my $url = $self->chrome->ask(QUESTION_URL);
 
         if($url eq '')
         {
@@ -57,7 +60,7 @@ package Alien::Build::Wizard 0.01 {
     isa     => 'Str',
     lazy    => 1,
     default => sub ($self) {
-      $self->chrome->ask('What is the class name for your Alien?', 'Alien::' . $self->detect->name);
+      $self->chrome->ask(QUESTION_CLASS_NAME, 'Alien::' . $self->detect->name);
     },
   );
 
@@ -66,7 +69,18 @@ package Alien::Build::Wizard 0.01 {
     isa     => 'URI',
     lazy    => 1,
     default => sub ($self) {
-      $self->detect->uri;
+      if($self->latest)
+      {
+        my $url = $self->detect->uri->clone;
+        my $path = $url->path;
+        $path =~ s{/[^/]*?$}{};
+        $url->path($path);
+        return $url;
+      }
+      else
+      {
+        return $self->detect->uri;
+      }
     },
   );
 
@@ -75,7 +89,7 @@ package Alien::Build::Wizard 0.01 {
     isa     => 'Str',
     lazy    => 1,
     default => sub ($self) {
-      $self->chrome->ask('What is the human project name of the alienized package?', $self->detect->name);
+      $self->chrome->ask(QUESTION_HUMAN_NAME, $self->detect->name);
     },
   );
 
@@ -84,7 +98,7 @@ package Alien::Build::Wizard 0.01 {
     isa     => 'ArrayRef[Str]',
     lazy    => 1,
     default => sub ($self) {
-      [split /\s+/, $self->chrome->ask('Which pkg-config names (if any) should be used to detect system install?  You may space separate multiple names.', join ' ', $self->detect->pkg_config->@*)];
+      [split /\s+/, $self->chrome->ask(QUESTION_PKG_NAMES, join ' ', $self->detect->pkg_config->@*)];
     },
   );
 
@@ -132,8 +146,49 @@ package Alien::Build::Wizard 0.01 {
         $self->chrome->say("Multiple build systems were detected in the tarball; select the most reliable one of: @types");
       }
       my $default = $types[0];
-      $self->chrome->choose("Choose build system.", ['manual','autoconf','cmake','make'], $types[0]);
+      scalar $self->chrome->choose(QUESTION_BUILD_SYSTEM, ['manual','autoconf','cmake','make'], \@types);
     },
+  );
+
+  has alien_types => (
+    is      => 'ro',
+    isa     => 'HashRef[Int]',
+    lazy    => 1,
+    default => sub ($self) {
+      while(1)
+      {
+        my @types = $self->chrome->choose(QUESTION_ALIEN_TYPE, ['tool','xs','ffi'], ['xs']);
+        unless(@types)
+        {
+          $self->chrome->say("You must select at least one type");
+          next;
+        }
+        my %answer = map { $_ => 1 } @types;
+        return \%answer;
+      }
+    }
+  );
+
+  has latest => (
+    is      => 'ro',
+    isa     => 'Int',
+    lazy    => 1,
+    default => sub ($self) {
+      my $value = $self->chrome->choose(QUESTION_LATEST, ['latest','specific'], ['latest']);
+      $value eq 'latest' ? 1 : 0;
+    },
+  );
+
+  has prefix => (
+    is      => 'ro',
+    isa     => 'Str',
+    lazy    => 1,
+    default => sub ($self) {
+      my $path = $self->detect->uri->path;
+      my($file) = $path =~ /\/([^\/]*?)$/;
+      my($prefix) = $file =~ /^([^-^\.]+)/;
+      $prefix;
+    }
   );
 
   sub generate_content ($self)
@@ -141,7 +196,13 @@ package Alien::Build::Wizard 0.01 {
     my %files;
 
     require Template;
-    my $tt = Template->new;
+    my $tt = Template->new(
+      FILTERS => {
+        regex_escape => sub ($text) { $text =~ s/\./\\./gr },
+      },
+    );
+
+    my $pod = sub ($name) { "=$name" };
 
     {
       my $pm = 'lib/' . $self->class_name . ".pm";
@@ -149,7 +210,7 @@ package Alien::Build::Wizard 0.01 {
       my $template = get_data_section 'Module.pm';
       $template =~ s/\s+$/\n/;
       die "no template Module.pm" unless $template;
-      $tt->process(\$template, { wizard => $self }, \($files{$pm} = '')) or die $tt->error;
+      $tt->process(\$template, { wizard => $self, pod => $pod }, \($files{$pm} = '')) or die $tt->error;
     }
 
     foreach my $path (qw( alienfile t/basic.t ))
@@ -157,7 +218,7 @@ package Alien::Build::Wizard 0.01 {
       my $template = get_data_section $path;
       $template =~ s/\s+$/\n/;
       die "no template $path" unless $template;
-      $tt->process(\$template, { wizard => $self }, \($files{$path} = '')) or die $tt->error;
+      $tt->process(\$template, { wizard => $self, pod => $pod }, \($files{$path} = '')) or die $tt->error;
     }
 
     \%files;
@@ -175,11 +236,11 @@ package Alien::Build::Wizard;
 
 =head1 NAME
 
-Alien::Build::Wizard
+Alien::Build::Wizard - Alien distribution creation wizard
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -222,15 +283,83 @@ use 5.008004;
 
 1;
 
-=head1 NAME
+[% pod('head1') %] NAME
 
 [% wizard.class_name %] - Find or build [% wizard.human_name %]
 
-=head1 SYNOPSIS
+[% pod('head1') %] SYNOPSIS
+[%- IF wizard.alien_types.xs %]
 
- # TODO
+From L<ExtUtils::MakeMaker>:
 
-=head1 DESCRIPTION
+ use ExtUtils::MakeMaker;
+ use Alien::Base::Wrapper ();
+ 
+ WriteMakefile(
+   Alien::Base::Wrapper->new('[% wizard.class_name %]')->mm_args2(
+     NAME => 'FOO::XS',
+     ...
+   ),
+ );
+
+From L<Module::Build>:
+
+ use Module::Build;
+ use Alien::Base::Wrapper qw( [% wizard.class_name %] !export );
+ use [% wizard.class_name %];
+ 
+ my $build = Module::Build->new(
+   ...
+   configure_requires => {
+     'Alien::Base::Wrapper' => '0',
+     '[% wizard.class_name %]' => '0',
+     ...
+   },
+   Alien::Base::Wrapper->mb_args,
+   ...
+ );
+ 
+ $build->create_build_script;
+
+From L<Inline::C> / L<Inline::CPP> script:
+
+ use Inline 0.56 with => '[% wizard.class_name %]';
+
+From L<Dist::Zilla>
+
+ [@Filter]
+ -bundle = @Basic
+ -remove = MakeMaker
+ 
+ [Prereqs / ConfigureRequires]
+ [% wizard.class_name %] = 0
+ 
+ [MakeMaker::Awesome]
+ header = use Alien::Base::Wrapper qw( [% wizard.class_name %] !export );
+ WriteMakefile_arg = Alien::Base::Wrapper->mm_args
+[%- END %]
+[%- IF wizard.alien_types.ffi %]
+
+From L<FFI::Platypus>:
+
+ use FFI::Platypus;
+ use [% wizard.class_name %];
+ 
+ my $ffi = FFI::Platypus->new(
+   lib => [ [% wizard.class_name %]->dynamic_libs ],
+ );
+[%- END %]
+[%- IF wizard.alien_types.tool %]
+
+Command line tool:
+
+ use [% wizard.class_name %];
+ use Env qw( @PATH );
+ 
+ unshift @PATH, [% wizard.class_name %]->bin_dir;
+[%- END %]
+
+[% pod('head1') %] DESCRIPTION
 
 This distribution provides [% wizard.human_name %] so that it can be used by other
 Perl distributions that are on CPAN.  It does this by first trying to
@@ -239,21 +368,25 @@ will use that.  If it cannot be found, the source code will be downloaded
 from the internet and it will be installed in a private share location
 for the use of other modules.
 
-=head1 SEE ALSO
+[% pod('head1') %] SEE ALSO
 
-=over 4
+[% pod('over') %] 4
 
-=item L<Alien>
+[% pod('item') %] L<Alien>
 
 Documentation on the Alien concept itself.
 
-=item L<Alien::Base>
+[% pod('item') %] L<Alien::Base>
 
 The base class for this Alien.
 
-=back
+[% pod('item') %] L<Alien::Build::Manual::AlienUser>
 
-=cut
+Detailed manual for users of Alien classes.
+
+[% pod('back') %]
+
+[% pod('cut') %]
 
 @@ alienfile
 use alienfile;
@@ -270,7 +403,14 @@ probe sub { 'share' }
 
 share {
   start_url '[% wizard.start_url %]';
+[% IF wizard.latest -%]
+  plugin Download => (
+    filter  => qr/^[% wizard.prefix %].*[% wizard.extract_format | regex_escape %]$/,
+    version => qr/([0-9\.]+)/,
+  );
+[% ELSE -%]
   plugin Download => ();
+[% END -%]
 [% IF wizard.extract_format == 'fixme' -%]
 
   # archive format was not detected, see
@@ -285,11 +425,26 @@ share {
   ]
 [% ELSIF wizard.build_type == 'autoconf' -%]
   plugin 'Build::Autoconf';
+[% IF wizard.alien_types.tool AND wizard.alien_types.ffi -%]
   build [
-    '%{configure}',
+    '%{configure} --enable-static --disable-shared',
+    '%{make}',
+    '%{make install',
+  ];
+  ffi {
+    build [
+      '%{configure} --disabled-static --enabled-shared',
+      '%{make}',
+      '%{make install',
+    ];
+  }
+[% ELSE -%]
+  build [
+    '%{configure} --[% IF wizard.alien_types.xs %]enable[% ELSE %]disable[% END %]-static --[% IF wizard.alien_types.ffi %]enable[% ELSE %]disable[% END %]-shared',
     '%{make}',
     '%{make} install',
   ];
+[% END -%]
 [% ELSIF wizard.build_type == 'cmake' -%]
   plugin 'Build::CMake';
   build [

@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+# -*- mode; perl -*-
 
 # See https://rt.cpan.org/Ticket/Display.html?id=103517
 

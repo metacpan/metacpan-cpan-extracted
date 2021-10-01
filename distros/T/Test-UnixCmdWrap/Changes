@@ -1,5 +1,9 @@
 Revision history for Test-UnixCmdWrap
 
+0.03    2021-09-27
+        Add a munge_status parameter that munges non-zero exit status
+        codes to 1. Better code coverage.
+
 0.02    2019-08-13
         Cosmetic bugfix on name displayed in failed test. Add prog
         attribute to get at the program name being tested. Do not build

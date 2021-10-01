@@ -1,27 +1,33 @@
-Test::UnixExit - Tests exit status words
+Test::UnixExit - test exit status words
 
-To install this module, use CPAN, for example:
+this module can be installed using cpanm:
 
-  cpan Test::UnixExit
-
-Run perldoc(1) on Test::UnixExit for additional documentation.
+  cpanm Test::UnixExit
 
 
-For the source code, see:
+run perldoc(1) on Test::UnixExit for documentation
+
+
+for the source code, see:
 
 https://github.com/thrig/Test-UnixExit
 
-This can be built and installed by running:
+this can be built, tested, and installed by running:
 
-   perl Makefile.PL
-   make
-   make test
-   make install
+  perl Build.PL
+  ./Build test
+  ./Build install
 
 
-LICENSE AND COPYRIGHT
+to author a new release:
 
-Copyright (C) 2016 Jeremy Mates
-
-This program is distributed under the (Revised) BSD License:
-L<http://www.opensource.org/licenses/BSD-3-Clause>
+  ./Build testcover
+  cover -report compilation | less
+  export GPG_TTY=$(tty)
+  RELEASE_TESTING=1 TEST_SIGNATURE=1 ./Build test
+  ./Build disttest
+  git tag -u ... -s v...
+  ./Build dist
+  cpan-upload ...
+  git push ...
+  ./Build realclean

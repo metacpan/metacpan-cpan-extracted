@@ -32,7 +32,7 @@ use strict;
 use warnings;
 use PDL;
 use Photonic::WE::R2::Metric;
-use Photonic::WE::R2::AllH;
+use Photonic::WE::R2::Haydock;
 
 use Test::More;
 use lib 't/lib';
@@ -46,7 +46,7 @@ my $B=zeroes(11)->xvals<5; #1D system
 my $g=Photonic::Geometry::FromB->new(B=>$B); #long
 my $m=Photonic::WE::R2::Metric->new(geometry=>$g, epsilon=>pdl(1),
    wavenumber=>pdl(1), wavevector=>pdl([0.01]));
-my $a=Photonic::WE::R2::AllH->new(metric=>$m,
+my $a=Photonic::WE::R2::Haydock->new(metric=>$m,
    polarization=>pdl([1])->r2C, nh=>10);
 $a->run;
 my $as=$a->as;
@@ -64,7 +64,7 @@ ok(agree($b2s, $bs**2), "1D L b2==b^2");
     my $ms=Photonic::WE::R2::Metric->new(
 	geometry=>$gs, epsilon=>pdl(1), wavenumber=>pdl(.01),
 	wavevector=>pdl([.001,0]));
-    my $als=Photonic::WE::R2::AllH
+    my $als=Photonic::WE::R2::Haydock
 	->new(metric=>$ms, polarization=>r2C(pdl([0,1])), nh=>2*15*15,
 	      reorthogonalize=>1, accuracy=>machine_epsilon(),
 	      noise=>1e0*machine_epsilon(), normOp=>1e0, smallH=>1e-7);
@@ -81,7 +81,7 @@ ok(agree($b2s, $bs**2), "1D L b2==b^2");
     my $m1s=Photonic::WE::R2::Metric->new(
 	geometry=>$g1s, epsilon=>pdl(10), wavenumber=>pdl(3.6),
 	wavevector=>pdl([1.01*3.6,0]));
-    my $al1s=Photonic::WE::R2::AllH
+    my $al1s=Photonic::WE::R2::Haydock
 	->new(metric=>$m1s, polarization=>r2C(pdl([0,1])), nh=>3*21*21,
 	      reorthogonalize=>1, accuracy=>machine_epsilon(),
 	      noise=>1e3*machine_epsilon(), normOp=>1e0, smallH=>1e-7);
@@ -98,7 +98,7 @@ ok(agree($b2s, $bs**2), "1D L b2==b^2");
     my $m2s=Photonic::WE::R2::Metric->new(
 	geometry=>$g2s, epsilon=>pdl(10), wavenumber=>pdl(3.6),
 	wavevector=>pdl([1.01*3.6,0]));
-    my $al2s=Photonic::WE::R2::AllH
+    my $al2s=Photonic::WE::R2::Haydock
 	->new(metric=>$m2s, polarization=>r2C(pdl([0,1])), nh=>3*10*10,
 	      reorthogonalize=>1, accuracy=>machine_epsilon(),
 	      noise=>1e0*machine_epsilon(), normOp=>1e0, smallH=>1e-7,
@@ -116,7 +116,7 @@ ok(agree($b2s, $bs**2), "1D L b2==b^2");
     my $m2s=Photonic::WE::R2::Metric->new(
 	geometry=>$g2s, epsilon=>pdl(10), wavenumber=>pdl(3.6),
 	wavevector=>pdl([1.01*3.6,0]));
-    my $al2s=Photonic::WE::R2::AllH
+    my $al2s=Photonic::WE::R2::Haydock
 	->new(metric=>$m2s, polarization=>r2C(pdl([0,1])), nh=>3*10*10,
 	      reorthogonalize=>1, accuracy=>machine_epsilon(),
 	      noise=>1e0*machine_epsilon(), normOp=>1e0, smallH=>1e-7,

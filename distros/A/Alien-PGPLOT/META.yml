@@ -1,0 +1,67 @@
+---
+abstract: 'Build and Install the PGPLOT library'
+author:
+  - 'Diab Jerius <djerius@cpan.org>'
+build_requires:
+  Alien::Build: '0.32'
+  Alien::Build::MM: '0.32'
+  ExtUtils::MakeMaker: '6.52'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test2::V0: '0'
+  Test::Alien: '2.3901'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  Alien::Build: '2.3901'
+  Alien::Build::MM: '0.32'
+  ExtUtils::MakeMaker: '6.52'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-PGPLOT
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Alien::PGPLOT:
+    file: lib/Alien/PGPLOT.pm
+    version: '0.01'
+requires:
+  Alien::Base: '0'
+  base: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Alien-PGPLOT
+  repository: https://gitlab.com/djerius/alien-pgplot.git
+version: '0.01'
+x_alienfile:
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
+  requires:
+    share:
+      Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
+      Archive::Tar: '0'
+      Config: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      IO::Zlib: '0'
+      Mojo::DOM: '0'
+      Mojolicious: '7.00'
+      Net::SSLeay: '1.49'
+      Sort::Versions: '0'
+      URI: '0'
+      URI::Escape: '0'
+    system: {}
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: GPL-3.0-only

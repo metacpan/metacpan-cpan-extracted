@@ -32,7 +32,7 @@
          "requires" : {
             "Math::BigInt" : "1.999819",
             "XSLoader" : "0.02",
-            "perl" : "5.006001"
+            "perl" : "5.008"
          }
       },
       "test" : {
@@ -49,6 +49,6 @@
          "web" : "https://github.com/pjacklam/p5-Math-BigInt-GMP"
       }
    },
-   "version" : "1.6008",
+   "version" : "1.6009",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

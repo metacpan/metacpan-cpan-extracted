@@ -1,9 +1,9 @@
 package Dist::Zilla::Plugin::InsertCommandOutput;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-21'; # DATE
+our $DATE = '2021-06-07'; # DATE
 our $DIST = 'Dist-Zilla-Plugin-InsertCommandOutput'; # DIST
-our $VERSION = '0.054'; # VERSION
+our $VERSION = '0.055'; # VERSION
 
 use 5.010001;
 use strict;
@@ -32,7 +32,7 @@ sub munge_files {
 sub munge_file {
     my ($self, $file) = @_;
     my $content_as_bytes = $file->encoded_content;
-    if ($content_as_bytes =~ s{^#\s*COMMAND:\s*(.*)\s*(\R|\z)}{
+    if ($content_as_bytes =~ s{^#\s*COMMAND:\s*(.*)[ \t]*(\R|\z)}{
         my $output = $self->_command_output($1);
         $output .= "\n" unless $output =~ /\R\z/;
         $output;
@@ -72,7 +72,7 @@ Dist::Zilla::Plugin::InsertCommandOutput - Insert the output of command into you
 
 =head1 VERSION
 
-This document describes version 0.054 of Dist::Zilla::Plugin::InsertCommandOutput (from Perl distribution Dist-Zilla-Plugin-InsertCommandOutput), released on 2021-05-21.
+This document describes version 0.055 of Dist::Zilla::Plugin::InsertCommandOutput (from Perl distribution Dist-Zilla-Plugin-InsertCommandOutput), released on 2021-06-07.
 
 =head1 SYNOPSIS
 
@@ -94,6 +94,12 @@ inserted as-is). If command fails (C<$?> is non-zero), build will be aborted.
 
 =for Pod::Coverage .+
 
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar (@netbook-zenbook)
+
+perlancar (@netbook-zenbook) <perlancar@gmail.com>
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Dist-Zilla-Plugin-InsertCommandOutput>.
@@ -104,7 +110,7 @@ Source repository is at L<https://github.com/perlancar/perl-Dist-Zilla-Plugin-In
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Dist-Zilla-Plugin-InsertCommandOutput/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-InsertCommandOutput>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

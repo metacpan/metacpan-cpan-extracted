@@ -1,4 +1,4 @@
-#!perl
+# -*- mode: perl; -*-
 
 use strict;             # restrict unsafe constructs
 use warnings;           # enable optional warnings

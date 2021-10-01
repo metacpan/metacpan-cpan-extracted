@@ -1,0 +1,14 @@
+0.003   2021-09-29  Released-By: PERLANCAR; Urgency: medium
+
+	- [schema array_from_json, hash_from_json] Do not coerce if already
+	  a (hash/array) ref.
+
+
+0.002   2021-09-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Add schemas: array_from_json, hash_from_json.
+
+
+0.001   2021-09-29  Released-By: PERLANCAR
+
+        - First release.

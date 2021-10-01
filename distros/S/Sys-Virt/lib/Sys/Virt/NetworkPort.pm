@@ -145,6 +145,10 @@ constants may be used
 
 Providing configuration reclaiming a pre-existing network port.
 
+=item Sys::Virt::NetworkPort::CREATE_VALIDATE
+
+Validate the XML document against the XML schema
+
 =back
 
 

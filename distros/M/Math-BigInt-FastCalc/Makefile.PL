@@ -1,4 +1,4 @@
-# -*- mode: perl -*-
+# -*- mode: perl; -*-
 
 use strict;
 use warnings;

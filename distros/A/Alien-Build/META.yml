@@ -15,7 +15,7 @@ configure_requires:
   File::Which: '0'
   perl: '5.008004'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.020, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -47,7 +47,7 @@ resources:
   bugtracker: https://github.com/PerlAlien/Alien-Build/issues
   homepage: https://metacpan.org/pod/Alien::Build
   repository: git://github.com/PerlAlien/Alien-Build.git
-version: '2.41'
+version: '2.42'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Diab Jerius (DJERIUS)'
@@ -68,7 +68,7 @@ x_contributors:
   - 'Nicholas Shipp (nshp)'
   - 'Juan Julián Merelo Guervós (JJ)'
   - 'Joel Berger (JBERGER)'
-  - 'Petr Pisar (ppisar)'
+  - 'Petr Písař (ppisar)'
   - 'Lance Wicks (LANCEW)'
   - 'Ahmad Fatoum (a3f, ATHREEF)'
   - 'José Joaquín Atria (JJATRIA)'
@@ -78,7 +78,7 @@ x_contributors:
   - 'Paul Evans (leonerd, PEVANS)'
   - 'Håkon Hægland (hakonhagland, HAKONH)'
   - 'nick nauwelaerts (INPHOBIA)'
-x_generated_by_perl: v5.34.0
+x_generated_by_perl: v5.35.4
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

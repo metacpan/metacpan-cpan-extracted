@@ -213,11 +213,11 @@ examples.
 
             $log = log($number,$base,$A);
 
-    Calculates the logarithmn of `$number` to base `$base`, with `$A` digits accuracy
-    and returns a new number as the result (leaving `$number` alone).
+    Calculates the logarithmn of `$number` to base `$base`, with `$A` digits
+    accuracy and returns a new number as the result (leaving `$number` alone).
 
-    BigInts are promoted to BigFloats, meaning you will never get a truncated
-    integer result like when using `Math::BigInt-`blog()>.
+    Math::BigInt objects are promoted to Math::BigFloat objects, meaning you will
+    never get a truncated integer result like when using `Math::BigInt-`blog()>.
 
 # CAVEATS
 
@@ -240,7 +240,7 @@ has only 40 elements. So `bernoulli($x)` with $x > 42 will fail.
 # BUGS
 
 Please report any bugs or feature requests to
-`bug-math-bigrat at rt.cpan.org`, or through the web interface at
+`bug-math-big at rt.cpan.org`, or through the web interface at
 [https://rt.cpan.org/Ticket/Create.html?Queue=Math-Big](https://rt.cpan.org/Ticket/Create.html?Queue=Math-Big)
 (requires login).
 We will be notified, and then you'll automatically be notified of progress on

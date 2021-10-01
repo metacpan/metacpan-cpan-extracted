@@ -15,6 +15,7 @@ dist.ini
 lib/Alien/Build/Wizard.pm
 lib/Alien/Build/Wizard/Chrome.pm
 lib/Alien/Build/Wizard/Detect.pm
+lib/Alien/Build/Wizard/Questions.pm
 lib/Dist/Zilla/MintingProfile/AlienBuild.pm
 lib/Dist/Zilla/Plugin/AlienBuild/Mint.pm
 maint/cip-before-install
@@ -26,6 +27,7 @@ t/00_diag.t
 t/alien_build_wizard.t
 t/alien_build_wizard_chrome.t
 t/alien_build_wizard_detect.t
+t/alien_build_wizard_questions.t
 t/dist_zilla_mintingprofile_alienbuild.t
 t/dist_zilla_plugin_alienbuild_mint.t
 t/lib/Helper.pm

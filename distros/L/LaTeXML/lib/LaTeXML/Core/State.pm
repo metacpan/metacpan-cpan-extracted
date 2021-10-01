@@ -94,7 +94,6 @@ sub new {
     stomach => $options{stomach}, model => $options{model} }, $class;
   # Note that "100" is hardwired into TeX, The Program!!!
   $$self{value}{MAX_ERRORS} = [100];
-  $$self{value}{VERBOSITY}  = [0];
   # Standard TeX units, in scaled points
   $$self{value}{UNITS} = [{
       pt => 65536, pc => 12 * 65536, in => 72.27 * 65536, bp => 72.27 * 65536 / 72,
@@ -128,10 +127,19 @@ sub new {
 
 sub assign_internal {
   my ($self, $table, $key, $value, $scope) = @_;
+  # hotcode lookupDefinition for \globaldefs,
+  # since this is called extremely often and should be highly standardized
+  if (my $globaldefs = $$self{value}{'\globaldefs'}) {
+    if (my $global_value = $$globaldefs[0][0]) {
+      # magic TeX register override: \globaldefs
+      if ($global_value == 1) {
+        $scope = 'global'; }
+      elsif ($global_value == -1) {
+        $scope = 'local'; } } }
   $scope = ($$self{prefixes}{global} ? 'global' : 'local') unless defined $scope;
   if (exists $$self{tracing_definitions}{$key}) {
-    print STDERR "ASSIGN $key in $table " . ($scope ? "($scope)" : '') . " => " .
-      (ref $value ? $value->stringify : $value) . "\n"; }
+    Debug("ASSIGN $key in $table " . ($scope ? "($scope)" : '') . " => " .
+        (ref $value ? $value->stringify : $value)); }
   if ($scope eq 'global') {
     # Remove bindings made in all frames down-to & including the next lower locked frame
     my $frame;
@@ -152,7 +160,6 @@ sub assign_internal {
       $$self{undo}[0]{$table}{$key} = 1;
       unshift(@{ $$self{$table}{$key} }, $value); } }    # And push new binding.
   else {
-    # print STDERR "Assigning $key in stash $stash\n";
     assign_internal($self, 'stash', $scope, [], 'global') unless $$self{stash}{$scope}[0];
     push(@{ $$self{stash}{$scope}[0] }, [$table, $key, $value]);
     assign_internal($self, $table, $key, $value, 'local')
@@ -391,14 +398,8 @@ sub lookupConditional {
   return unless $token;
   my $defn;
   my $entry;
-  #  my $inmath = $self->lookupValue('IN_MATH');
-  my $cc = $$token[1];
-  my $lookupname =
-    ($CATCODE_ACTIVE_OR_CS[$cc]
-    ? $$token[0]
-    : $CATCODE_EXECUTABLE_PRIMITIVE_NAME[$cc]);
-  if ($lookupname
-    && ($entry = $$self{meaning}{$lookupname})
+  if ($CATCODE_ACTIVE_OR_CS[$$token[1]]
+    && ($entry = $$self{meaning}{ $$token[0] })
     && ($defn  = $$entry[0])
     # Can only be a token or definition; we only want defns that have conditional_type
     && ((ref $defn) ne 'LaTeXML::Core::Token')) {
@@ -411,20 +412,34 @@ sub lookupExpandable {
   return unless $token;
   my $defn;
   my $entry;
-  #  my $inmath = $self->lookupValue('IN_MATH');
-  my $cc = $$token[1];
-  my $lookupname =
-    ($CATCODE_ACTIVE_OR_CS[$cc]
-    ? $$token[0]
-    : $CATCODE_EXECUTABLE_PRIMITIVE_NAME[$cc]);
-  if ($lookupname
-    && ($entry = $$self{meaning}{$lookupname})
+  if ($CATCODE_ACTIVE_OR_CS[$$token[1]]
+    && ($entry = $$self{meaning}{ $$token[0] })
     && ($defn  = $$entry[0])
     # Can only be a token or definition; we want defns!
     && ((ref $defn) ne 'LaTeXML::Core::Token')
     && $$defn{isExpandable}
     && ($toplevel || !$$defn{isProtected})) { # is this the right logic here? don't expand unless digesting?
     return $defn; }
+  return; }
+
+# Whether token must be wrapped as dont_expand
+sub isDontExpandable {
+  my ($self, $token) = @_;
+  # Basically: a CS or Active token that is either not defined, or is expandable
+  # (but not \let to a token)
+  return unless $token;
+  my $defn;
+  my $entry;
+  #  my $inmath = $self->lookupValue('IN_MATH');
+  my $cc = $$token[1];
+  if ($CATCODE_ACTIVE_OR_CS[$cc]) {
+    my $lookupname = $$token[0];
+    if ($lookupname
+      && ($entry = $$self{meaning}{$lookupname})
+      && ($defn  = $$entry[0])) {
+      return ((ref $defn) ne 'LaTeXML::Core::Token') && $$defn{isExpandable}; }
+    else {
+      return 1; } }
   return; }
 
 # used for digestion
@@ -506,7 +521,8 @@ sub generateErrorStub {
     Error('undefined', $token, $caller, "The token " . $token->stringify . " is not defined.",
       "Defining it now as <ltx:ERROR/>");
     $self->installDefinition(LaTeXML::Core::Definition::Constructor->new($token, $params,
-        sub { $_[0]->makeError('undefined', $cs); }),
+        sub { $_[0]->makeError('undefined', $cs); },
+        sizer => 'X'),
       'global'); }
   return $token; }
 
@@ -521,7 +537,7 @@ sub pushFrame {
 sub popFrame {
   my ($self) = @_;
   if ($$self{undo}[0]{_FRAME_LOCK_}) {
-    Fatal('unexpected', '<endgroup>', $self->getStomach,
+    Error('unexpected', '<endgroup>', $self->getStomach,
       "Attempt to pop last locked stack frame"); }
   else {
     my $undo = shift(@{ $$self{undo} });
@@ -717,26 +733,42 @@ sub getStatus {
   my ($self, $type) = @_;
   return $$self{status}{$type}; }
 
+our $SUCCESS_MESSAGE = 'No obvious problems';
+
 sub getStatusMessage {
   my ($self) = @_;
   my $status = $$self{status};
   my @report = ();
-  push(@report, colorizeString("$$status{warning} warning" . ($$status{warning} > 1 ? 's' : ''), 'warning'))
-    if $$status{warning};
-  push(@report, colorizeString("$$status{error} error" . ($$status{error} > 1 ? 's' : ''), 'error'))
-    if $$status{error};
-  push(@report, "$$status{fatal} fatal error" . ($$status{fatal} > 1 ? 's' : ''))
-
-    if $$status{fatal};
-  my @undef = ($$status{undefined} ? keys %{ $$status{undefined} } : ());
-  push(@report, colorizeString(scalar(@undef) . " undefined macro" . (@undef > 1 ? 's' : '')
-        . "[" . join(', ', @undef) . "]", 'details'))
-    if @undef;
+  my $warning_status = $$status{warning} && colorizeString("$$status{warning} warning" . ($$status{warning} > 1 ? 's' : ''), 'warning');
+  my $error_status = $$status{error} && colorizeString("$$status{error} error" . ($$status{error} > 1 ? 's' : ''), 'error');
+  my $fatal_status = $$status{fatal} && colorizeString("$$status{fatal} fatal error" . ($$status{fatal} > 1 ? 's' : ''), 'fatal');
+  my @undef        = ($$status{undefined} ? keys %{ $$status{undefined} } : ());
+  my $undef_status = @undef && colorizeString(scalar(@undef) . " undefined macro" . (@undef > 1 ? 's' : '')
+      . "[" . join(', ', @undef) . "]", 'details');
   my @miss = ($$status{missing} ? keys %{ $$status{missing} } : ());
-  push(@report, colorizeString(scalar(@miss) . " missing file" . (@miss > 1 ? 's' : '')
-        . "[" . join(', ', @miss) . "]", 'details'))
-    if @miss;
-  return join('; ', @report) || colorizeString('No obvious problems', 'success'); }
+  my $missing_status = @miss && colorizeString(scalar(@miss) . " missing file" . (@miss > 1 ? 's' : '')
+      . "[" . join(', ', @miss) . "]", 'details');
+
+  my $success_status = $SUCCESS_MESSAGE;
+  if ($LaTeXML::Common::Error::IS_TERMINAL) {
+    $warning_status = $warning_status && colorizeString($warning_status, 'warning');
+    $error_status   = $error_status   && colorizeString($error_status,   'error');
+    $fatal_status   = $fatal_status   && colorizeString($fatal_status,   'fatal');
+    $undef_status   = $undef_status   && colorizeString($undef_status,   'details');
+    $missing_status = $missing_status && colorizeString($missing_status, 'details');
+    $success_status = colorizeString($success_status, 'success'); }
+
+  push(@report, $warning_status) if $warning_status;
+  push(@report, $error_status)   if $error_status;
+  push(@report, $fatal_status)   if $fatal_status;
+  push(@report, $undef_status)   if $undef_status;
+  push(@report, $missing_status) if $missing_status;
+
+  my $message = join('; ', @report) || $success_status;
+  $message .= " (See $LaTeXML::Common::Error::LOG_PATH)"
+    if ($$status{fatal} || $$status{error} || $$status{warning})
+    && $LaTeXML::Common::Error::LOG && !ref $LaTeXML::Common::Error::LOG_PATH;
+  return $message; }
 
 sub getStatusCode {
   my ($self) = @_;
@@ -766,7 +798,7 @@ C<LaTeXML::Core::State> - stores the current state of processing.
 
 A C<LaTeXML::Core::State> object stores the current state of processing.
 It recording catcodes, variables values, definitions and so forth,
-as well as mimicing TeX's scoping rules.
+as well as mimicking TeX's scoping rules.
 
 =head2 Access to State and Processing
 
@@ -785,7 +817,7 @@ Returns the current Model representing the document model.
 =head2 Scoping
 
 The assignment methods, described below, generally take a C<$scope> argument, which
-determines how the assignment is made.  The allowed values and thier implications are:
+determines how the assignment is made.  The allowed values and their implications are:
 
  global   : global assignment.
  local    : local assignment, within the current grouping.
@@ -833,10 +865,8 @@ Assign $value to be associated with the the string C<$name>, according
 to the given scoping rule.
 
 Values are also used to specify most configuration parameters (which can
-therefor also be scoped).  The recognized configuration parameters are:
+therefore also be scoped).  The recognized configuration parameters are:
 
- VERBOSITY         : the level of verbosity for debugging
-                     output, with 0 being default.
  STRICT            : whether errors (eg. undefined macros)
                      are fatal.
  INCLUDE_COMMENTS  : whether to preserve comments in the

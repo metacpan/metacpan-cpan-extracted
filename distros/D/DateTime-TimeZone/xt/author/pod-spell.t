@@ -15,7 +15,6 @@ AO
 API
 AQ
 Abidjan
-Accra
 Adak
 Adelaide
 Africa
@@ -45,7 +44,6 @@ Asia
 Astrakhan
 Asuncion
 Athens
-Atikokan
 Atlantic
 Atyrau
 Auckland
@@ -77,7 +75,6 @@ Bermuda
 Beulah
 Bishkek
 Bissau
-Blanc_Sablon
 Boa_Vista
 Bogota
 Boise
@@ -131,10 +128,8 @@ Copenhagen
 Cordoba
 Costa
 Costa_Rica
-Creston
 Cuiaba
 Cunha
-Curacao
 Czechia
 DK
 DM
@@ -157,7 +152,6 @@ Dhaka
 Dili
 Dubai
 Dublin
-DumontDUrville
 Dushanbe
 EE
 EET
@@ -171,7 +165,6 @@ Eirunepe
 El
 El_Aaiun
 El_Salvador
-Enderbury
 Eswatini
 Etheridge
 Eucla
@@ -262,6 +255,7 @@ KZ
 Kabul
 Kaliningrad
 Kamchatka
+Kanton
 Karachi
 Karen
 Kathmandu
@@ -357,7 +351,6 @@ Moscow
 NG
 NL
 Nairobi
-Nassau
 Nauru
 Ndjamena
 New_Salem
@@ -406,7 +399,6 @@ Pohnpei
 Pontianak
 Port_Moresby
 Port_au_Prince
-Port_of_Spain
 Porto_Velho
 Prague
 Puerto
@@ -479,7 +471,6 @@ Subclass
 Subclasses
 Swift_Current
 Sydney
-Syowa
 TF
 TG
 TJ

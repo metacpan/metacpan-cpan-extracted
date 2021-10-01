@@ -46,7 +46,7 @@ OPERATORS
 
        my @result = @lhs M @rhs;
     
-       # returns ($lhs[0], $rhs[0], $lhs[1], $rhs[1], ...)
+       # returns  $lhs[0], $rhs[0], $lhs[1], $rhs[1], ...
 
     Yields a list of the values from its operand lists, rearranged into
     pairs and flattened. If one of the operand lists is shorter than the

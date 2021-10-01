@@ -1,7 +1,7 @@
 {
    "abstract" : "OAuth2 authenticating client",
    "author" : [
-      "Mark Overmeer <markov@cpan.org>"
+      "Thomas Uhle <uhle@cpan.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
@@ -16,7 +16,7 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "xt"
       ]
    },
    "prereqs" : {
@@ -32,29 +32,38 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
+            "Encode" : "0",
             "HTTP::Request" : "0",
+            "HTTP::Response" : "0",
             "HTTP::Status" : "0",
             "JSON::MaybeXS" : "0",
             "LWP::UserAgent" : "0",
+            "MIME::Base64" : "0",
             "Scalar::Util" : "0",
             "Test::More" : "0",
             "URI" : "0",
-            "YAML" : "0"
+            "constant" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "http://perl.overmeer.net/CPAN/",
+      "bugtracker" : {
+         "web" : "https://gitlab.com/uhle/perl-net-oauth2/-/issues"
+      },
+      "homepage" : "https://search.cpan.org/~uhle/Net-OAuth2/",
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/markov2/perl5-Net-OAuth2.git",
-         "web" : "https://github.com/markov2/perl5-Net-OAuth2"
+         "url" : "https://gitlab.com/uhle/perl-net-oauth2.git",
+         "web" : "https://gitlab.com/uhle/perl-net-oauth2"
       }
    },
-   "version" : "0.66",
+   "version" : "0.67",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

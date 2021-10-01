@@ -12,12 +12,12 @@ Photonic - A perl package for calculations on photonics and metamaterials.
 
 =head1 VERSION
 
-Version 0.018
+Version 0.021
 
 =cut
 
 
-$Photonic::VERSION = '0.018';
+$Photonic::VERSION = '0.021';
 
 =head1 COPYRIGHT NOTICE
 
@@ -123,7 +123,7 @@ field of one Fourier component.
 
 =over 4
 
-=item L<Photonic::LE::NP::AllH>
+=item L<Photonic::LE::NP::Haydock>
 
 Obtain all the Haydock coefficients.
 
@@ -135,7 +135,7 @@ Calculate the longitudinal dielectric response.
 
 Calculate the dielectric tensor.
 
-=item L<Photonic::LE::NP::OneH>
+=item L<Photonic::LE::NP::Haydock>
 
 Calculator for one Haydock coefficient.
 
@@ -149,7 +149,7 @@ characteristic function.
 
 =over 4
 
-=item L<Photonic::LE::NR2::AllH>
+=item L<Photonic::LE::NR2::Haydock>
 
 Obtain all the Haydock coefficients.
 
@@ -165,7 +165,7 @@ Calculate the dielectric tensor.
 
 Calculate the microscopic field.
 
-=item L<Photonic::LE::NR2::OneH>
+=item L<Photonic::LE::NR2::Haydock>
 
 Calculator for one Haydock coefficient.
 
@@ -192,7 +192,7 @@ arbitrary number of phases, using the spinor representation.
 
 =over 4
 
-=item L<Photonic::LE::S::AllH>
+=item L<Photonic::LE::S::Haydock>
 
 Obtain all the Haydock coefficients.
 
@@ -208,7 +208,7 @@ Calculate the dielectric tensor.
 
 Calculate the microscopic field.
 
-=item L<Photonic::LE::S::OneH>
+=item L<Photonic::LE::S::Haydock>
 
 Calculator for one Haydock coefficient.
 
@@ -222,7 +222,7 @@ Group of roles to factor out related behavior.
 
 =over 4
 
-=item L<Photonic::Roles::AllH>
+=item L<Photonic::Roles::Haydock>
 
 Obtain all the Haydock coefficients.
 
@@ -246,19 +246,13 @@ Flag to keepstates.
 
 Roles factored out of the metric calculators.
 
-=item L<Photonic::Roles::OneH>
+=item L<Photonic::Roles::Haydock>
 
-Roles factored out of the calculatoin of one Haydock coefficient.
+Roles factored out of the calculation of one Haydock coefficient.
 
-=item L<Photonic::Roles::ReorthogonalizeC>
+=item L<Photonic::Roles::Reorthogonalize>
 
-Roles to keep Haydock states orthogonalized. Version for non-Hermitian
-operators and complex Haydock coefficients.
-
-=item L<Photonic::Roles::ReorthogonalizeR>
-
-Roles to keep Haydock states orthogonalized. Version for non-Hermitian
-operators and complex Haydock coefficients.
+Role to keep Haydock states orthogonalized.
 
 =item L<Photonic::Roles::UseMask>
 
@@ -285,11 +279,11 @@ equation.
 =item L<Photonic::WE::R2>
 
 Group of modules for binary metamaterials characterized by a
-characteriztic function.
+characteristic function.
 
 =over 4
 
-=item L<Photonic::WE::R2::AllH>
+=item L<Photonic::WE::R2::Haydock>
 
 Obtain all the Haydock coefficients.
 
@@ -322,7 +316,7 @@ Calculates the macroscopic Green tensor assuming it is symmetric.
 Retarded metric tensor of binary metamaterial with a non-dissipative
 host.
 
-=item L<Photonic::WE::R2::OneH>
+=item L<Photonic::WE::R2::Haydock>
 
 Calculate one Haydock coefficient.
 
@@ -344,7 +338,7 @@ dielectric function, using the spinor representation.
 
 =over 4
 
-=item L<Photonic::WE::S::AllH>
+=item L<Photonic::WE::S::Haydock>
 
 Obtain all the Haydock coefficients.
 
@@ -373,7 +367,7 @@ Calculate the macroscopic Green tensor projected onto some direction.
 Retarded metric tensor of binary metamaterial with a non-dissipative
 host.
 
-=item L<Photonic::WE::S::OneH>
+=item L<Photonic::WE::S::Haydock>
 
 Calculate one Haydock coefficient.
 

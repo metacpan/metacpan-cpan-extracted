@@ -32,7 +32,7 @@ use strict;
 use warnings;
 use PDL;
 use Photonic::Geometry::FromEpsilon;
-use Photonic::LE::NP::AllH;
+use Photonic::LE::NP::Haydock;
 
 use Test::More;
 use lib 't/lib';
@@ -47,7 +47,7 @@ my $f=6/11;
 my $eps=r2C($ea*(zeroes(11)->xvals<5)+ $eb*(zeroes(11)->xvals>=5));
 my $g=Photonic::Geometry::FromEpsilon
     ->new(epsilon=>$eps, Direction0=>pdl([1]));
-my $a=Photonic::LE::NP::AllH->new(geometry=>$g, nh=>10);
+my $a=Photonic::LE::NP::Haydock->new(geometry=>$g, nh=>10);
 $a->run;
 my $as=$a->as;
 my $bs=$a->bs;
@@ -62,7 +62,7 @@ ok(Cagree($b2s, $bs**2), "1D L b2==b^2");
 my $epst=r2C($ea*(zeroes(1,11)->xvals<5)+ $eb*(zeroes(1,11)->xvals>=5));
 my $gt=Photonic::Geometry::FromEpsilon
    ->new(epsilon=>$epst, Direction0=>pdl([1,0])); #trans
-my $at=Photonic::LE::NP::AllH->new(geometry=>$gt, nh=>10);
+my $at=Photonic::LE::NP::Haydock->new(geometry=>$gt, nh=>10);
 $at->run;
 my $ast=$a->as;
 my $bst=$a->bs;
@@ -77,7 +77,7 @@ ok(Cagree($b2st, $bst**2), "1D L b2==b^2");
     my $epss=$eb*(zeroes(15,15)->rvals<5)+$ea*(zeroes(15,15)->rvals>=5);
     my $gs=Photonic::Geometry::FromEpsilon
 	->new(epsilon=>$epss, Direction0=>pdl([1,0]));
-    my $als=Photonic::LE::NP::AllH
+    my $als=Photonic::LE::NP::Haydock
 	->new(geometry=>$gs, nh=>2*15*15, reorthogonalize=>1,
 	      accuracy=>machine_epsilon(), noise=>3*machine_epsilon(),
 	      normOp=>$eb->abs);
@@ -92,7 +92,7 @@ ok(Cagree($b2st, $bst**2), "1D L b2==b^2");
     my $epss=$eb*(zeroes(15,15)->rvals<5)+$ea*(zeroes(15,15)->rvals>=5);
     my $gs=Photonic::Geometry::FromEpsilon
 	->new(epsilon=>$epss, Direction0=>pdl([1,0]));
-    my $als=Photonic::LE::NP::AllH
+    my $als=Photonic::LE::NP::Haydock
 	->new(geometry=>$gs, nh=>2*15*15, reorthogonalize=>1,
 	      accuracy=>machine_epsilon(), noise=>3*machine_epsilon(),
 	      normOp=>$eb->abs, stateFN=>$fn);

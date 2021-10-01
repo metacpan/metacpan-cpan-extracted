@@ -17,6 +17,7 @@ chdir $sopmdir;
 my $sopm    = 'TestSMTP.sopm';
 
 my $success = OPM::Maker::Command::sopmtest->execute( {}, [ $sopm ] );
+diag $success;
 
 ok $success;
 

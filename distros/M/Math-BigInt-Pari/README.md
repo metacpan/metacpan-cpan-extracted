@@ -65,7 +65,7 @@ the same terms as Perl itself.
 # AUTHOR
 
 Original Math::BigInt::Pari written by Benjamin Trott 2001,
-[ben@rhumba.pair.com](https://metacpan.org/pod/ben%40rhumba.pair.com).
+<ben@rhumba.pair.com>.
 
 Extended and maintained by Tels 2001-2007 [http://bloodgate.com](http://bloodgate.com)
 

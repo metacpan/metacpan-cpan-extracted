@@ -1,3 +1,8 @@
+0.212670  2021-09-24 16:25:23+02:00 Europe/Brussels
+    - Changes
+      - Ali: refactored store_phylip method for speed (visible in ali2phylip.pl)
+      - Seq: rolled back changes to gapify method (to preserve generality)
+
 0.212650  2021-09-22 22:37:09+02:00 Europe/Brussels
     - Changes
       - Seq: refactored gapify method for speed (visible in ali2phylip.pl)

@@ -9,7 +9,7 @@ use File::Which qw( which );
 use Capture::Tiny qw( capture );
 
 # ABSTRACT: Default interpolator for Alien::Build
-our $VERSION = '2.41'; # VERSION
+our $VERSION = '2.42'; # VERSION
 
 sub _config
 {
@@ -250,7 +250,7 @@ Alien::Build::Interpolate::Default - Default interpolator for Alien::Build
 
 =head1 VERSION
 
-version 2.41
+version 2.42
 
 =head1 CONSTRUCTOR
 
@@ -446,7 +446,7 @@ Juan Julián Merelo Guervós (JJ)
 
 Joel Berger (JBERGER)
 
-Petr Pisar (ppisar)
+Petr Písař (ppisar)
 
 Lance Wicks (LANCEW)
 

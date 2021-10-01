@@ -46,7 +46,7 @@ EOF
 
 int main(void) { struct Perl_custom_infix def; return 0; }
 EOF
-   ) if $] >= 5.035;
+   ) if $] >= 5.035005;
 
    if( $have_pl_infix_plugin ) {
       print "Including support for core perl PL_infix_plugin\n";

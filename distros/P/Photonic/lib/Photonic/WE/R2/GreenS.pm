@@ -1,5 +1,5 @@
 package Photonic::WE::R2::GreenS;
-$Photonic::WE::R2::GreenS::VERSION = '0.018';
+$Photonic::WE::R2::GreenS::VERSION = '0.021';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::R2::GreenS
 
 =head1 VERSION
 
-version 0.018
+version 0.021
 
 =head1 COPYRIGHT NOTICE
 
@@ -102,7 +102,7 @@ Spectral variable
 
 =item * haydock
 
-Array of Photonic::WE::R2::AllH structures, one for each polarization
+Array of Photonic::WE::R2::Haydock structures, one for each polarization
 
 =item * greenP
 
@@ -135,7 +135,7 @@ fraction. 0 means don't check.
 
 use namespace::autoclean;
 use PDL::Lite;
-use Photonic::WE::R2::AllH;
+use Photonic::WE::R2::Haydock;
 use Photonic::WE::R2::GreenP;
 use Photonic::Types;
 use Photonic::Utils qw(tensor make_haydock make_greenp);
@@ -145,7 +145,7 @@ use MooseX::StrictConstructor;
 
 has 'metric'=>(is=>'ro', isa => 'Photonic::WE::R2::Metric',
        handles=>[qw(geometry B dims ndims r G GNorm L scale f)],required=>1);
-has 'haydock' =>(is=>'ro', isa=>'ArrayRef[Photonic::WE::R2::AllH]',
+has 'haydock' =>(is=>'ro', isa=>'ArrayRef[Photonic::WE::R2::Haydock]',
             init_arg=>undef, lazy=>1, builder=>'_build_haydock',
 	    documentation=>'Array of Haydock calculators');
 has 'greenP'=>(is=>'ro', isa=>'ArrayRef[Photonic::WE::R2::GreenP]',
@@ -187,7 +187,7 @@ sub evaluate {
 
 sub _build_haydock { # One Haydock coefficients calculator per direction0
     my ($self) = @_;
-    make_haydock($self, 'Photonic::WE::R2::AllH', $self->geometry->unitPairs, 0, qw(reorthogonalize use_mask mask));
+    make_haydock($self, 'Photonic::WE::R2::Haydock', $self->geometry->unitPairs, 0, qw(reorthogonalize use_mask mask));
 }
 
 sub _build_greenP {

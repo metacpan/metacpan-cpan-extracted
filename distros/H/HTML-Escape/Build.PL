@@ -14,11 +14,35 @@ use File::Basename;
 use File::Spec;
 
 my %args = (
-    license              => 'perl',
+    license              => 'perl_5',
     dynamic_config       => 0,
 
     configure_requires => {
-        'Module::Build' => 0.4005,
+        'Module::Build' => '0.4005',
+    },
+
+    requires => {
+        'Exporter' => '0',
+        'XSLoader' => '0',
+        'parent' => '0',
+        'perl' => '5.008008',
+    },
+
+    recommends => {
+    },
+
+    suggests => {
+    },
+
+    build_requires => {
+        'Devel::PPPort' => '3.20',
+        'ExtUtils::CBuilder' => '0',
+        'Module::Build::Pluggable::PPPort' => '0.04',
+        'Test::More' => '0.98',
+        'Test::Requires' => '0',
+    },
+
+    test_requires => {
     },
 
     name            => 'HTML-Escape',
@@ -26,7 +50,6 @@ my %args = (
     allow_pureperl => 1,
 
     script_files => [glob('script/*'), glob('bin/*')],
-    c_source     => [qw()],
     PL_files => {},
 
     test_files           => ((-d '.git' || $ENV{RELEASE_TESTING}) && -d 'xt') ? 't/ xt/' : 't/',
@@ -50,16 +73,4 @@ my $builder = Module::Build->subclass(
     }
 )->new(%args);
 $builder->create_build_script();
-
-use File::Copy;
-
-print "cp META.json MYMETA.json\n";
-copy("META.json","MYMETA.json") or die "Copy failed(META.json): $!";
-
-if (-f 'META.yml') {
-    print "cp META.yml MYMETA.yml\n";
-    copy("META.yml","MYMETA.yml") or die "Copy failed(META.yml): $!";
-} else {
-    print "There is no META.yml... You may install this module from the repository...\n";
-}
 

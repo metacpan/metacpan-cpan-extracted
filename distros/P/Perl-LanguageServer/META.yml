@@ -32,5 +32,5 @@ requires:
   perl: '5.014'
 resources:
   repository: https://github.com/richterger/Perl-LanguageServer.git
-version: v2.2.0
+version: v2.3.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

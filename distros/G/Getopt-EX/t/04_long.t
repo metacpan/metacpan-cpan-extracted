@@ -39,4 +39,24 @@ unshift @INC, $app_lib;
     unlink $rc_path or warn "$rc_path: $!\n";
 }
 
+{
+    use Getopt::EX::Long qw(Configure);
+
+    is($REQUIRE_ORDER,
+       $Getopt::Long::REQUIRE_ORDER,
+       "\$REQUIRE_ORDER = $REQUIRE_ORDER");
+    is($PERMUTE,
+       $Getopt::Long::PERMUTE,
+       "\$PERMUTE = $PERMUTE");
+    is($RETURN_IN_ORDER,
+       $Getopt::Long::RETURN_IN_ORDER,
+       "\$RETURN_IN_ORDER = $RETURN_IN_ORDER");
+
+    Configure("require_order");
+    is($Getopt::Long::order, $REQUIRE_ORDER, "Configure require_order");
+
+    Configure("permute");
+    is($Getopt::Long::order, $PERMUTE, "Configure permute");
+}
+
 done_testing;

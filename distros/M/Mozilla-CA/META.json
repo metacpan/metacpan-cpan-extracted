@@ -3,14 +3,14 @@
    "author" : [
       "Gisle Aas <gisle@activestate.com>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mozilla-CA",
    "no_index" : {
@@ -22,7 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -34,13 +34,28 @@
          "requires" : {
             "perl" : "5.006"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test" : "0"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Mozilla-CA"
+      },
+      "homepage" : "https://github.com/gisle/mozilla-ca",
+      "license" : [
+         "https://www.mozilla.org/media/MPL/2.0/index.txt"
+      ],
       "repository" : {
-         "url" : "http://github.com/gisle/mozilla-ca"
+         "type" : "git",
+         "url" : "https://github.com/gisle/mozilla-ca.git",
+         "web" : "https://github.com/gisle/mozilla-ca"
       }
    },
-   "version" : "20200520"
+   "version" : "20211001",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

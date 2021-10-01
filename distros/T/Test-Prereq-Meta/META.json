@@ -56,7 +56,7 @@
    "provides" : {
       "Test::Prereq::Meta" : {
          "file" : "lib/Test/Prereq/Meta.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -74,6 +74,6 @@
          "web" : "https://github.com/trwyant/perl-Test-Prereq-Meta"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

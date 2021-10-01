@@ -21,7 +21,7 @@ if (!$ENV{"CI"}) {
 # Obtain the rule pairs from MathGrammar, which we want to exhaustively test:
 my %grammar_dependencies = obtain_dependencies();
 
-my $opts = LaTeXML::Common::Config->new(input_limit => 100);
+my $opts = LaTeXML::Common::Config->new(input_limit => 100, verbosity=>-2);
 
 my $converter = LaTeXML->get_converter($opts);
 $converter->prepare_session($opts);
@@ -31,8 +31,16 @@ my %tested_dependencies = ();
 my @core_tests = parser_test_filenames();
 for my $test (@core_tests) {
   note("grammar coverage $test...");
-  my $response = $converter->convert($test);
-  my $regularized_log = $response->{log};
+  my $regularized_log = '';
+  my $response;
+  my $log_handle;
+  open($log_handle, ">>", \$regularized_log) or croak("Can't redirect STDERR to log! Dying...");
+  {
+    local *STDERR       = *$log_handle;
+    binmode(STDERR, ':encoding(UTF-8)');
+    $response = $converter->convert($test);
+#  my $regularized_log = $response->{log};
+    }
   # Preprocess split lines back to single lines, e.g.
   # 2|AnythingAn|>>Matched subrule:                    |
   #  |          |[modifierFormulae]<< (return value:   |
@@ -82,6 +90,10 @@ delete $grammar_dependencies{'argPunct'}{'VERTBAR'};
 delete $grammar_dependencies{'Expression'}{'punctExpr'}; # Unreachable, due to Formula -> punctExpr
 delete $grammar_dependencies{'aSuperscri'}{'AnyOp'};
 delete $grammar_dependencies{'aSuperscri'}{'Expression'};
+# These are odd to have been recorded, since at least the intention is that they are preceded by
+# aSubscript/aSuperscript. We have explicit tests for the relevant cases.
+delete $grammar_dependencies{'Superscrip'}{'endPunct'};
+delete $grammar_dependencies{'Subscript'}{'endPunct'};
 # forbid rules should never match, don't check them here.
 # TODO: We need tests for the always-failing productions!
 delete $grammar_dependencies{'doubtArgs'}{'forbidArgs'};

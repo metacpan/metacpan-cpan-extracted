@@ -1,0 +1,37 @@
+#!/usr/bin/env perl
+use v5.18;
+use Pod::Usage qw(pod2usage);
+pod2usage( "-verbose" => 2 );
+
+__END__
+
+=head1 Usages
+
+  p5find <object>           Find <object> in current code repository.
+
+  p5find <object> -h        See more deetails about finding <object>
+
+=head1 Objects
+
+p5find can locate various type of objects in, roughly in these
+categories. Some directly map to certain type of L<PPI::Token>, some
+are computed, some even depends on the state of code repository it is
+searching.
+
+=head2 Primitive type of objects
+
+  num
+  regex
+  str
+  sub
+  token
+
+=head2 Compound type of objects
+
+  method-call
+  statement
+
+=head2 Objects that should probably be removed
+
+  unused-packages
+  words-used-only-once

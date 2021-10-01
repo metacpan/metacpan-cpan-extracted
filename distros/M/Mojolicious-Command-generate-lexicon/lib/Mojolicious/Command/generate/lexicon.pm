@@ -7,25 +7,16 @@ use utf8;
 use Mojo::Base 'Mojolicious::Command';
 use String::Escape qw(qqbackslash);
 
-our $VERSION = 0.997;
+our $VERSION = 0.998;
 
 use File::Find;
 use Getopt::Long;
 
 use MojoX::I18N::Lexemes;
 
-__PACKAGE__->attr(description => <<'EOF');
-Generate lexicon file from templates.
-EOF
+has "description" => "Generate lexicon file from templates.";
 
-__PACKAGE__->attr(usage => <<"EOF");
-usage: $0 generate lexicon [language] [--behavior=save||reset] [templates]
-Options:
-  -b, --behavior=BEHAVIOR
-        Determine how to work with existent lexems, possible values:
-            save    save old lexicon values;
-            reset   delete old lexicon.
-EOF
+has "usage" => sub{shift->extract_usage};
 
 sub run {
     my $self     = shift;
@@ -33,15 +24,15 @@ sub run {
 
     my @templates;
     my $app;
-    if (ref $self->app eq 'CODE'){
+    if (ref $self->app eq 'CODE') {
         $app = $self->app->();
     }
-    else{
+    else {
         $app = $self->app;
     }
 
     my $verbose;
-    
+
     my $app_klass = ref $app;
     my $app_class = ref $app;
     $app_class =~ s{::}{/}g;
@@ -54,7 +45,7 @@ sub run {
 
     my $result = GetOptions(
         "behavior|b:s{1,1}" => \$behavior,
-        'verbose|v:1'        => \$verbose,
+        'verbose|v:1'       => \$verbose,
     );
     push @templates, $ARGV[0] if (defined $ARGV[0]);
 
@@ -70,21 +61,25 @@ sub run {
         );
     }
 
-    my $lexem_file = $app->home->rel_file("lib/$app_class/I18N/$language.pm");
-    my %oldlex     = ();
+    my $lexem_file =
+      $app->home->rel_file("lib/$app_class/I18N/$language.pm")->to_abs()
+      ->to_string();
+    my %oldlex = ();
 
     if (-e $lexem_file) {
         if ($language ne 'Skeleton') {
             if (lc $behavior eq 'save') {
                 %oldlex = eval {
                     local %INC = %INC;
-                    require $app->home->rel_file("lib/$app_class/I18N/$language.pm");
+                    require $app->home->rel_file(
+                        "lib/$app_class/I18N/$language.pm");
                     no strict 'refs';
                     %{*{"${app_klass}::I18N::${language}::Lexicon"}};
                 };
                 %oldlex = () if ($@);
             }
             elsif (lc $behavior eq 'reset') {
+
                 # Just proceed
             }
             else {
@@ -121,15 +116,20 @@ USAGE
     }
 
     # Output lexem
-    $self->render_to_file('package', $lexem_file, $app_klass, $language,
-        \%lexicon);
+    $self->render_to_file(
+        'package',
+        $lexem_file, {
+            app_class => $app_klass,
+            language  => $language,
+            lexicon   => \%lexicon
+        }
+    );
 }
 
 1;
 
 __DATA__
 @@ package
-% my ($app_class, $language, $lexicon) = @_;
 package <%= $app_class %>::I18N::<%= $language %>;
 use base '<%= $app_class %>::I18N';
 use utf8;
@@ -153,16 +153,31 @@ Mojolicious::Command::generate::lexicon - Generate Lexicon Command
 
 =head1 SYNOPSIS
 
-    $ ./script/my_mojolicious_app generate lexicon [language]
-        [--behavior=save||reset] [templates]
+    Usage: APPLICATION generate lexicon [LANGUAGE [OPTIONS [TEMPLATES]]]
 
-Or as perl module
+    ./script/my_app generate lexicon
+
+    ./script/my_app generate lexicon es -b save
+
+Options:
+  -b, --behavior=BEHAVIOR
+        Determines how to treat existing lexemes:
+            save    save old lexicon values
+            reset   delete old lexicon
+
+=head1 SYNOPSIS API
 
     use Mojolicious::Command::generate::lexicon;
 
     my $l = Mojolicious::Command::generate::lexicon->new;
-    $inflate->run($language, @files);
+    $l->run($language, @files);
 
+=head1 DESCRIPTION
+
+L<Mojolicious::Command::generate::lexicon> generates lexicon files from
+existing templates. During template parsing it searches for calls of C<l>, e.g.
+C<E<lt>%==l "Hello, world" %E<gt>>. All lexicons are written to
+C<lib/MyApp/I18N/E<lt>LANGUAGEE<gt>.pm> files.
 
 =head1 SEE ALSO
 
@@ -176,7 +191,7 @@ L<MojoX::I18N::Lexemes>
 
 =head1 AUTHOR
 
-Sergey Zasenko, C<undef@cpan.org>.
+Serhii Zasenko, C<undef@cpan.org>.
 
 =head1 CREDITS
 
@@ -192,7 +207,7 @@ Tetsuya Tatsumi
 
 =head1 COPYRIGHT
 
-Copyright (C) 2011-2016, Sergey Zasenko
+Copyright (C) 2011-2021, Serhii Zasenko
 
 This program is free software, you can redistribute it and/or modify it
 under the terms of the Artistic License version 2.0.

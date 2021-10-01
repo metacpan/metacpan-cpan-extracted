@@ -5,10 +5,10 @@ use warnings;
 
 use syntax 'maybe';
 
-our $VERSION = 'v0.1.1';
+our $VERSION = 'v0.2.0';
 
 use Moo;
-use Types::Standard qw/Maybe Object Str is_Str/;
+use Types::Standard qw/HashRef Maybe Object Str Value is_Str/;
 
 use OpenTracing::AutoScope;
 use Scalar::Util 'blessed';
@@ -42,44 +42,37 @@ sub _operation_name {
 
 
 
-has '_peer_address' => (
-    is => 'lazy',
-    isa => Maybe[ Str ],
+has 'tags' => (
+    is => 'ro',
+    isa => HashRef[Value],
+    default => sub { {} }, # an empty HashRef
 );
-
-sub _build__peer_address {
-    my ( $self ) = @_;
-    
-    return "@{[ $self->redis->{ server } ]}"
-        if exists $self->redis->{ server };
-    # currently, we're fine with any stringification of a blessed hashref too
-    # but for Redis, Redis::Fast, Test::Mock::Redis, this is just a string
-    
-    return
-}
 
 
 
 our $AUTOLOAD; # keep 'use strict' happy
 
 sub AUTOLOAD {
-    my $self = shift;
+    my ($self) = @_;
     
     my $method_call    = do { $_ = $AUTOLOAD; s/.*:://; $_ };
+    my $component_name = $self->_redis_client_class_name( );
     my $db_statement   = uc($method_call);
     my $operation_name = $self->_operation_name( $method_call );
-    my $peer_address   = $self->_peer_address( );
     
     my $method_wrap = sub {
+        my $self = shift;
         OpenTracing::AutoScope->start_guarded_span(
             $operation_name,
             tags => {
-                'component'     => __PACKAGE__,
+                'component'     => $component_name,
+                
+                %{ $self->tags( ) },
+                
                 'db.statement'  => $db_statement,
                 'db.type'       => 'redis',
-                maybe
-                'peer.address'  => $peer_address,
                 'span.kind'     => 'client',
+                
             },
         );
         

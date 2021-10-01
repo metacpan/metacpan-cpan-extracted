@@ -1722,7 +1722,7 @@ pp_def("gees",
 		$GENERIC() *wi, $GENERIC() *vs, integer *ldvs, $GENERIC() *work,
 		integer *lwork, integer *bwork, integer *info);
 		$GENERIC() tmp_work;
-		$TFD(f,d)select_function    = $PRIV(select_func);
+		$TFD(f,d)select_function    = $COMP(select_func);
 		if ($jobvs())
 			jvs = \'V\';
 		if ($sort()){
@@ -1892,7 +1892,7 @@ pp_def("geesx",
 		$GENERIC() *work, integer *lwork, integer *iwork, integer *liwork,
 		integer *bwork, integer *info);
 		$GENERIC() *work;
-		$TFD(f,d)select_function    = $PRIV(select_func);
+		$TFD(f,d)select_function    = $COMP(select_func);
 
 
 		if ($jobvs())
@@ -2160,7 +2160,7 @@ pp_def("gges",
 		integer *ldvsr, $GENERIC() *work, integer *lwork, logical *bwork,
 		integer *info);
 		$GENERIC() tmp_work;
-		$TFD(f,d)gselect_function    = $PRIV(select_func);
+		$TFD(f,d)gselect_function    = $COMP(select_func);
 		if ($jobvsl())
 			pjobvsl = \'V\';
 		if ($jobvsr())
@@ -2388,7 +2388,7 @@ pp_def("ggesx",
 		integer *ldvsr, $GENERIC() *rconde, $GENERIC() *rcondv,  $GENERIC() *work,
 		integer *lwork, integer *iwork, integer *liwork, logical *bwork,
 		integer *info);
-		$TFD(f,d)gselect_function    = $PRIV(select_func);
+		$TFD(f,d)gselect_function    = $COMP(select_func);
 		if ($jobvsr())
 			pjobvsr = \'V\';
 

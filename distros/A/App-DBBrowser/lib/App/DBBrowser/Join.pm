@@ -39,7 +39,8 @@ sub join_tables {
     my ( $sf ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tables = [ sort keys %{$sf->{d}{tables_info}} ];
+    #my $tables = [ sort keys %{$sf->{d}{tables_info}} ];
+    my $tables = [ @{$sf->{d}{user_tables}}, @{$sf->{d}{sys_tables}} ];
     ( $sf->{d}{col_names}, $sf->{d}{col_types} ) = $ax->column_names_and_types( $tables );
     my $join = {};
 

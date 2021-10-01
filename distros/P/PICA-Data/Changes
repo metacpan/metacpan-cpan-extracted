@@ -1,5 +1,18 @@
 Revision history for PICA::Data
 
+1.33 2021-09-29T14:14:11Z
+    - fix treatment of occurrence ranges in schema builder
+
+1.32 2021-09-29T09:44:13Z
+    - picadata: change color blue to magenta
+    - schema builder: rename 'total' number to 'records'
+      to align with Avram specification 0.7.0
+
+1.31 2021-09-24T08:34:41Z
+    - picadata: add command 'filter'
+    - add PICA Path method alias 'match'
+    - add record count to schema builder
+
 1.30 2021-08-17T16:46:36Z
     - picadata: Fix UTF-8 output of schema labels
     - picadata: allow to explain full Avram schema

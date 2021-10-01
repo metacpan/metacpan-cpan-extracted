@@ -1,5 +1,18 @@
 Revision history for Perl extension Getopt-EX
 
+v1.25.1 2021-09-29T16:50:11Z
+
+    - NO_COLOR is effective even the value is 0 or empty.
+    - Introduce NO_NO_COLOR to override NO_COLOR.
+
+v1.25.0 2021-09-27T23:04:25Z
+
+    - Export $REQUIRE_ORDER, $PERMUTE, $RETURN_IN_ORDER.
+    - Call &Configure, &HelpMessage, &VersionMessage directly.
+    - Produce EL sequence even for empty match.
+    - Support COLORTERM=truecolor.
+    - Support NO_COLOR environment.
+
 v1.24.2 2021-08-16T04:13:53Z
 
     - Evaluate anonymous function in "main" package so that

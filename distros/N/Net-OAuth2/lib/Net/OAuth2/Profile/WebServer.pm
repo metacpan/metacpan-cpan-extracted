@@ -8,15 +8,15 @@
 
 package Net::OAuth2::Profile::WebServer;
 use vars '$VERSION';
-$VERSION = '0.66';
+$VERSION = '0.67';
 
 use base 'Net::OAuth2::Profile';
 
 use warnings;
 use strict;
 
+use Carp qw(croak);
 use Net::OAuth2::AccessToken;
-use MIME::Base64  'encode_base64';
 use Scalar::Util  'blessed';
 
 use HTTP::Request     ();
@@ -90,10 +90,6 @@ sub get_access_token($@)
       , $params
       );
 
-    my $basic    = encode_base64 "$params->{client_id}:$params->{client_secret}"
-      , '';   # no new-lines!
-
-    $request->headers->header(Authorization => "Basic $basic");
     my $response = $self->request($request);
 
     Net::OAuth2::AccessToken->new
@@ -107,7 +103,7 @@ sub get_access_token($@)
 sub update_access_token($@)
 {   my ($self, $access, @req_params) = @_;
     my $refresh =  $access->refresh_token
-        or die 'unable to refresh token without refresh_token';
+        or croak 'unable to refresh token without refresh_token';
 
     my $req   = $self->build_request
       ( $self->refresh_token_method
@@ -119,12 +115,12 @@ sub update_access_token($@)
     my %data  = $self->params_from_response($resp, 'update token');
 
     my $token = $data{access_token}
-        or die "no access token found in refresh data";
+        or croak "no access token found in refresh data";
 
     my $type  = $data{token_type};
 
     my $exp   = $data{expires_in}
-        or die  "no expires_in found in refresh data";
+        or croak  "no expires_in found in refresh data";
 
     $access->update_token($token, $type, $exp+time(), $data{refresh_token});
 }

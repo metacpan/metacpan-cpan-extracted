@@ -180,7 +180,7 @@ sub __get_filter_info {
     $sf->{i}{occupied_term_height} += 1; # empty row
     $sf->{i}{occupied_term_height} += $count_static_rows;
     my $count_menu_rows = 0;
-    my $pad = 2; # 2 == Term::Choose option 'pad' default value
+    my $pad = 2; # the used default 'pad' value in Term::Choose
     if ( @{$pre//[]} + @{$choices//[]} ) {
         if ( ! $max_cols ) {
             my $term_w = get_term_width();
@@ -194,16 +194,14 @@ sub __get_filter_info {
             if ( $r <= 1 ) {
                 $count_menu_rows = 1;
             }
-            elsif ( $longest * 2 + $pad > $term_w ) {
-                $count_menu_rows = @tmp_cols;
-            }
             else {
                 my $joined_cols = $longest;
-                my $cols_in_a_row = 1;
+                my $cols_in_a_row = 0;
                 while ( $joined_cols < $term_w ) {
-                    $joined_cols += 2 + $longest;
+                    $joined_cols += $pad + $longest;
                     ++$cols_in_a_row;
                 }
+                $cols_in_a_row ||= 1;
                 $count_menu_rows = int( @tmp_cols / $cols_in_a_row );
                 if ( @tmp_cols % $cols_in_a_row ) {
                     $count_menu_rows++;

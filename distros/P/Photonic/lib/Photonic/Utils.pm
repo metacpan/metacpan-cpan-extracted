@@ -1,5 +1,5 @@
 package Photonic::Utils;
-$Photonic::Utils::VERSION = '0.018';
+$Photonic::Utils::VERSION = '0.021';
 
 =encoding UTF-8
 
@@ -41,6 +41,7 @@ require Exporter;
     HProd MHProd EProd VSProd SProd
     linearCombineIt lentzCF any_complex tensor
     make_haydock make_greenp
+    incarnate_as
     wave_operator apply_longitudinal_projection make_dyads
     cgtsv lu_decomp lu_solve
 );
@@ -69,7 +70,7 @@ sub linearCombineIt { #complex linear combination of states from iterator
 }
 
 sub any_complex {
-    grep ref $_ && !$_->type->real, @_;
+    grep ref $_ && ($_->isnull || !$_->type->real), @_;
 }
 
 sub wave_operator {
@@ -101,11 +102,9 @@ my @HAYDOCK_PARAMS = qw(
 sub make_haydock {
   my ($self, $class, $pairs, $add_geom, @extra_attributes) = @_;
   # This must change if G is not symmetric
-  [ map $class->new(
+  [ map incarnate_as($class, $self, [ @HAYDOCK_PARAMS, @extra_attributes ],
       _haydock_extra($self, $_, $add_geom),
-      map +($_ => $self->$_), @HAYDOCK_PARAMS, @extra_attributes
-    ), $pairs->dog
-  ];
+  ), $pairs->dog ];
 }
 
 sub _haydock_extra {
@@ -117,11 +116,16 @@ sub _haydock_extra {
 
 my @GREENP_PARAMS = qw(nh smallE);
 sub make_greenp {
-  my ($self, $class) = @_;
-  [ map $class->new(
-      haydock=>$_,
-      map +($_ => $self->$_), @GREENP_PARAMS), @{$self->haydock}
+  my ($self, $class, $method) = @_;
+  $method ||= 'haydock';
+  [ map incarnate_as($class, $self, \@GREENP_PARAMS, haydock=>$_),
+      @{$self->$method}
   ];
+}
+
+sub incarnate_as {
+  my ($class, $self, $with, @extra) = @_;
+  $class->new((map +($_ => $self->$_), @$with), @extra);
 }
 
 sub HProd { #Hermitean product between two fields. skip first 'skip' dims
@@ -133,9 +137,8 @@ sub HProd { #Hermitean product between two fields. skip first 'skip' dims
 	unless $ndims == $second->ndims;
     my $prod=$first->conj*$second;
     # clump all except skip dimensions, protecto index and sum.
-    my $result=$prod->reorder($skip..$ndims-1,0..$skip-1)->clump(-$skip-1)
+    $prod->reorder($skip..$ndims-1,0..$skip-1)->clump(-$skip-1)
 	->sumover;
-    return $result;
 }
 
 sub MHProd { #Hermitean product between two fields with metric. skip
@@ -148,14 +151,13 @@ sub MHProd { #Hermitean product between two fields with metric. skip
     my $ndims=$first->ndims;
     die "Dimensions should be equal" unless $ndims == $second->ndims;
     carp "We don't trust the skip argument in MHProd yet" if $skip;
-    # I'm not sure about the skiped dimensions in the next line. Is it right?
+    # I'm not sure about the skipped dimensions in the next line. Is it right?
     my $sliced = $second->dummy(1);
     my $mprod=($metric*$sliced)->sumover;
     die "Dimensions should be equal" unless $ndims == $mprod->ndims;
     my $prod=$first->conj*$mprod;
-    my $result=$prod->reorder($skip..$ndims-1,0..$skip-1)->clump(-$skip-1)
+    $prod->reorder($skip..$ndims-1,0..$skip-1)->clump(-$skip-1)
 	->sumover;
-    return $result;
 }
 
 sub EProd { #Euclidean product between two fields in reciprocal
@@ -177,11 +179,10 @@ sub EProd { #Euclidean product between two fields in reciprocal
     }
     my $prod=$first_mG*$second;
     # clump all except skip dimensions, protecto index and sum.
-    my $result=$prod #s1:s2:nx:ny
+    $prod #s1:s2:nx:ny
 	->reorder($skip..$ndims-1,0..$skip-1) #nx:ny:s1:s2
 	->clump(-$skip-1) #nx*ny:s1:s2
 	->sumover; #s1:s2
-    return $result;
 }
 
 sub SProd { #Spinor product between two fields in reciprocal
@@ -205,11 +206,10 @@ sub SProd { #Spinor product between two fields in reciprocal
     }
     my $prod=$first_mG*$second; #pmk,s1,s2,nx,ny
     # clump all except skip dimensions, protect sum.
-    my $result=$prod #rori,pmk, s1,s2,nx,ny
+    $prod #pmk, s1,s2,nx,ny
 	->reorder($skip+1..$ndims-1,0..$skip) #nx,ny,pmk,s1,s2
 	->clump(-$skip-1)  #nx*ny*pmk, s1, s2
 	->sumover; #s1, s2
-    return $result;
 }
 
 sub VSProd { #Vector-Spinor product between two vector fields in reciprocal
@@ -231,11 +231,10 @@ sub VSProd { #Vector-Spinor product between two vector fields in reciprocal
     }
     my $prod=$first_mG*$second; #xy:pm:nx:ny
     # clump all except xy.
-    my $result=$prod #xy:pm::nx:ny
+    $prod #xy:pm::nx:ny
 	->reorder(2..$ndims-1,0,1) #nx:ny:xy:pm
 	->clump(-1)  #nx*ny*xy*pm
 	->sumover;
-    return $result;
 }
 
 sub RtoG { #transform a 'complex' scalar, vector or tensorial field
@@ -377,7 +376,7 @@ sub apply_longitudinal_projection {
     ($eGpsi_G*$gnorm) #^Ge^G|psi>
 	# i:nx:ny:...
 	->sumover; #^G.epsilon^G|psi>
-    #Result is ^G.epsilon^G|psi>, ri:nx:ny...
+    #Result is ^G.epsilon^G|psi>, nx:ny...
 }
 
 sub make_dyads {
@@ -414,7 +413,7 @@ Photonic::Utils
 
 =head1 VERSION
 
-version 0.018
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -436,43 +435,43 @@ ndarray and $it is an iterator for the corresponding states.
 
 =item * $p=HProd($a, $b, $skip)
 
-Hermitean product <a|b> of two 2x.... 'complex' multidimensional
-pdls $a and $b. If $skip is present, preserve the first 1+$skip
-_dimensions (the first dimension is RorI) before adding up.
+Hermitean product <a|b> of two 'complex' multidimensional
+pdls $a and $b. If $skip is present, preserve the first $skip
+dimensions before adding up.
 
 =item * $p=MHProd($a, $b, $m, $skip)
 
-Hermitean product <a|m|b> of two 2x.... 'complex' multidimensional
+Hermitean product <a|m|b> of two 'complex' multidimensional
 pdls $a and $b representing vector fields using metric $m. If $skip is
-present, preserve the first 1+$skip dimensions (the first dimension
-is RorI) before adding up. (Might not be functional yet, or might be wrong)
+present, preserve the first $skip dimensions before adding up.
+(Might not be functional yet, or might be wrong)
 
 =item * $p=EProd($a, $b, $skip)
 
-Euclidean product <a|b> of two 2x.... 'complex' multidimensional
+Euclidean product <a|b> of two 'complex' multidimensional
 pdls $a and $b in reciprocal space. If $skip is present, preserve the
-first 1+$skip dimensions (the first dimension is RorI) before adding up.
+first $skip dimensions before adding up.
 
 =item * $p=SProd($a, $b, $skip)
 
-Spinor product <a|b> of two 2x.... 'complex' multidimensional
+Spinor product <a|b> of two 'complex' multidimensional
 pdls $a and $b in reciprocal space. If $skip is present, preserve the
-first 2+$skip dimensions (the first dimension is RorI and the second
+first 1+$skip dimensions (the first dimension is
 the spinor dimension) before adding up.
 
 =item * $p=VSProd($a, $b)
 
-Vector-Spinor product <a|b> of two 2x...'complex' multidimensional
+Vector-Spinor product <a|b> of two 'complex' multidimensional
 pdls $a and $b in reciprocal space. For the vector-spinor field
-dimensions are like ri:xy:pm:nx:ny.
+dimensions are like xy:pm:nx:ny.
 
 =item * $psiG = RtoG($psiR, $ndims, $skip)
 
 Transforms a $ndims-dimensional 'complex' scalar, vector or tensor
 field $psiR that is a function of position within the unit cell to a
-complex field $psiG that is a function of the reciprocal vectors. The
-first dimension must be 2, as the values are complex. The next $skip
-dimensions are skiped (0 for a scalar, 1 for a vector, 2 for a
+complex field $psiG that is a function of the reciprocal vectors.
+The first $skip
+dimensions are skipped (0 for a scalar, 1 for a vector, 2 for a
 2-tensor field). The Fourier transform is performed over the
 following $ndims dimensions.
 
@@ -519,15 +518,23 @@ a wave operator.
 Given an object and a classname, construct an array-ref of objects of
 that class, with relevant fields copied from the object.
 
+=item * incarnate_as
+
+  my $new_obj = incarnate_as('New::Class', $obj, [qw(f1 f2)], other => $value);
+
+Given an object and a classname, an array-ref of attribute-names, and
+then key/value pairs, returns a new object of the given class, with the
+given object's given attributes plus the additional ones.
+
 =item * cgtsv
 
 Solves a general complex tridiagonal system of equations.
 
        $b = cgtsv($c, $d, $e, $b);
 
-where C<$c(2,0..$n-2)> is the subdiagonal, C<$d(2,0..$n-1)> the diagonal and
-C<$e(2,0..$n-2)> the supradiagonal of an $nX$n tridiagonal complex
-double precision matrix. C<$b(2,0..$n-1)> is the right hand side
+where C<$c(0..$n-2)> is the subdiagonal, C<$d(0..$n-1)> the diagonal and
+C<$e(0..$n-2)> the supradiagonal of an $nX$n tridiagonal complex
+double precision matrix. C<$b(0..$n-1)> is the right hand side
 vector. C<$b> is replaced by the solution. Dies if gets an error.
 
 =item * lu_decomp

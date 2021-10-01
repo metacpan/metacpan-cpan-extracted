@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 12 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 13 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/ChromeUtils.pm'
@@ -18,6 +18,7 @@ my @scripts = (
     'script/chrome-is-running',
     'script/kill-chrome',
     'script/list-chrome-profiles',
+    'script/pause-and-unpause-chrome',
     'script/pause-chrome',
     'script/ps-chrome',
     'script/restart-chrome',

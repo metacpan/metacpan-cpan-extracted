@@ -1,5 +1,5 @@
 package Photonic::LE::NR2::EpsTensor;
-$Photonic::LE::NR2::EpsTensor::VERSION = '0.018';
+$Photonic::LE::NR2::EpsTensor::VERSION = '0.021';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::LE::NR2::EpsTensor
 
 =head1 VERSION
 
-version 0.018
+version 0.021
 
 =head1 COPYRIGHT NOTICE
 
@@ -44,8 +44,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 =head1 SYNOPSIS
 
    use Photonic::LE::NR2::EpsTensor;
-   my $eps=Photonic::LE::NR2::EpsTensor->new(geometry=>$g);
-   my $epsilonTensor=$eps->evaluate($epsA, $epsB);
+   my $eps=Photonic::LE::NR2::EpsTensor->new(geometry=>$g, epsA=>$epsA, epsB=>$epsB, nh=>$nh);
+   my $epsilonTensor=$eps->epsTensor;
 
 =head1 DESCRIPTION
 
@@ -53,37 +53,12 @@ Calculates the macroscopic dielectric tensor for a given fixed
 Photonic::Geometry structure as a function of the dielectric
 functions of the components.
 
-=head1 METHODS
+Consumes L<Photonic::Roles::EpsTensor>, L<Photonic::Roles::KeepStates>,
+L<Photonic::Roles::UseMask> - please see those for attributes.
+
+=head1 ATTRIBUTES
 
 =over 4
-
-=item * new(geometry=>$g, nh=>$nh, smallH=>$smallH, smallE=>$smallE, keepStates=>$k)
-
-Initializes the structure.
-
-$g Photonic::Geometry describing the structure
-
-$nh is the maximum number of Haydock coefficients to use.
-
-$smallH and $smallE are the criteria of convergence (default 1e-7) for
-the Haydock coefficients and the tensor calculations.
-
-$k is a flag to keep states in Haydock calculations (default 0)
-
-=item * evaluate($epsA, $epsB)
-
-Returns the macroscopic dielectric function for a given value of the
-dielectric functions of the host $epsA and the particle $epsB.
-
-=back
-
-=head1 ACCESSORS (read only)
-
-=over 4
-
-=item * keepStates
-
-Value of flag to keep Haydock states
 
 =item * epsA
 
@@ -91,105 +66,32 @@ Dielectric function of component A
 
 =item * epsB
 
-Dielectric function of componente B
-
-=item * u
-
-Spectral variable
-
-=item * nr
-
-Array of Photonic::LE::NR2::AllH structures, one for each direction
-
-=item * epsL
-
-Array of Photonic::LE::NR2::EpsL structures, one for each direction.
-
-=item * epsTensor
-
-The dielectric tensor
-
-=item * nh
-
-The maximum number of Haydock coefficients to use.
-
-=item * converged
-
-Flags that the last calculation converged before using up all coefficients
-
-=item * smallH smallE
-
-Criteria of convergence for Haydock and epsilon calculations. 0 means
-don't check.
-    *Check last remark*
+Dielectric function of component B
 
 =back
 
 =cut
 
 use namespace::autoclean;
-use PDL::Lite;
-use Photonic::Utils qw(tensor make_haydock);
-use List::Util qw(all);
-use Photonic::LE::NR2::AllH;
+use Photonic::LE::NR2::Haydock;
 use Photonic::LE::NR2::EpsL;
 use Photonic::Types;
 use Moose;
 use MooseX::StrictConstructor;
 
-has 'geometry'=>(is=>'ro', isa => 'Photonic::Types::Geometry',
-    handles=>[qw(B ndims dims r G GNorm L scale f)],required=>1
-);
-has 'reorthogonalize'=>(is=>'ro', required=>1, default=>0,
-         documentation=>'Reorthogonalize haydock flag');
-has 'nr' =>(is=>'ro', isa=>'ArrayRef[Photonic::LE::NR2::AllH]',
-            init_arg=>undef, lazy=>1, builder=>'_build_nr',
-            documentation=>'Array of Haydock calculators');
-has 'epsL'=>(is=>'ro', isa=>'ArrayRef[Photonic::LE::NR2::EpsL]',
-             init_arg=>undef, lazy=>1, builder=>'_build_epsL',
-             documentation=>'Array of epsilon calculators');
-has 'epsTensor'=>(is=>'ro', isa=>'PDL', init_arg=>undef, writer=>'_epsTensor',
-             documentation=>'Dielectric Tensor from last evaluation');
-has 'converged'=>(is=>'ro', init_arg=>undef, writer=>'_converged',
-             documentation=>
-                  'All EpsL evaluations converged in last evaluation');
-has 'nh' =>(is=>'ro', isa=>'Num', required=>1,
-	    documentation=>'Desired no. of Haydock coefficients');
-has 'smallH'=>(is=>'ro', isa=>'Num', required=>1, default=>1e-7,
-    	    documentation=>'Convergence criterium for Haydock coefficients');
-has 'smallE'=>(is=>'ro', isa=>'Num', required=>1, default=>1e-7,
-    	    documentation=>'Convergence criterium for use of Haydock coeff.');
-has 'epsA'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=>'_epsA',
+has allh_class=>(is=>'ro', default=>'Photonic::LE::NR2::Haydock');
+has allh_attrs=>(is=>'ro', default=>sub{[qw(reorthogonalize use_mask mask)]});
+has epsl_class=>(is=>'ro', default=>'Photonic::LE::NR2::EpsL');
+has epsl_attrs=>(is=>'ro', default=>sub{[qw(nh smallE epsA epsB)]});
+
+has 'epsA'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', required => 1,
     documentation=>'Dielectric function of host');
-has 'epsB'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=>'_epsB',
+has 'epsB'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', required => 1,
         documentation=>'Dielectric function of inclusions');
-has 'u'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=>'_u',
-    documentation=>'Spectral variable');
 
-with 'Photonic::Roles::KeepStates', 'Photonic::Roles::UseMask';
+with 'Photonic::Roles::UseMask', 'Photonic::Roles::EpsTensor', 'Photonic::Roles::KeepStates';
 
-sub evaluate {
-    my $self=shift;
-    $self->_epsA(my $epsA=shift);
-    $self->_epsB(my $epsB=shift);
-    $self->_u(my $u=1/(1-$epsB/$epsA));
-    my $epsTensor=tensor(pdl([map $_->evaluate($epsA, $epsB), @{$self->epsL}]), $self->geometry->unitDyadsLU, $self->geometry->B->ndims, 2);
-    $self->_converged(all { $_->converged } @{$self->epsL});
-    return $epsTensor;
-}
-
-sub _build_nr { # One Haydock coefficients calculator per direction0
-    my $self=shift;
-    make_haydock($self, 'Photonic::LE::NR2::AllH', $self->geometry->unitPairs, 1, qw(reorthogonalize use_mask mask));
-}
-
-sub _build_epsL {
-    my $self=shift;
-    [ map Photonic::LE::NR2::EpsL->new(nr=>$_, nh=>$self->nh, smallE=>$self->smallE), @{$self->nr} ];
-}
 
 __PACKAGE__->meta->make_immutable;
 
 1;
-
-__END__

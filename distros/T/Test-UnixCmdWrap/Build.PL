@@ -28,7 +28,7 @@ my $builder = Module::Build->new(
         'Test::Cmd'         => '0',
         'Test::Differences' => '0',
         'Test::More'        => '0',
-        'Test::UnixExit'    => '0',
+        'Test::UnixExit'    => '0.02',
     },
     sign           => 1,
     add_to_cleanup => ['Test-UnixCmdWrap-*'],

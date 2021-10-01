@@ -1,5 +1,5 @@
 package Photonic::Roles::UseMask;
-$Photonic::Roles::UseMask::VERSION = '0.018';
+$Photonic::Roles::UseMask::VERSION = '0.021';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::Roles::UseMask
 
 =head1 VERSION
 
-version 0.018
+version 0.021
 
 =head1 COPYRIGHT NOTICE
 

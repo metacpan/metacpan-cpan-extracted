@@ -18,6 +18,7 @@ use File::Spec;
 use Chess::Plisco qw(:all);
 
 sub report_failure;
+sub significant_for_repetition;
 
 eval { require Chess::PGN::Parse };
 if ($@) {
@@ -44,6 +45,7 @@ my $seconds_per_test = $ENV{CP_SECONDS_PER_TEST} || 10;
 
 my $started = time;
 my $done_tests = 0;
+my %signatures;
 GAME: while ($pgn->read_game) {
 	my $pos = Chess::Plisco->new;
 
@@ -53,6 +55,8 @@ GAME: while ($pgn->read_game) {
 	my @fen = ($pos->toFEN);
 	my @signatures = ($pos->signature);
 	my @positions = ($pos->copy);
+
+	$signatures{$pos->signature}->{significant_for_repetition $pos->toFEN} = 1;
 
 	my $sans = $pgn->moves;
 
@@ -74,9 +78,14 @@ GAME: while ($pgn->read_game) {
 			ok $undo_info, "do move $san for position $pos";
 		}
 		push @undo_infos, $undo_info;
+		my $fen = $pos->toFEN;
 		push @fen, $pos->toFEN;
+
+		my $signature = $pos->signature;
 		push @signatures, $pos->signature;
 		
+		$signatures{$signature}->{significant_for_repetition $fen} = 1;
+
 		my $copy_from_fen = Chess::Plisco->new($fen[-1]);
 		if ($pos->signature != $copy_from_fen->signature) {
 			my $sig_from_pos = $copy_from_fen->signature;
@@ -129,6 +138,14 @@ GAME: while ($pgn->read_game) {
 	}
 }
 
+my @collisions;
+foreach my $signature (keys %signatures) {
+	my $positions = $signatures{$signature};
+	++$collisions[-1 + keys %$positions];
+}
+
+is((scalar @collisions), 1, "no Zobrist key collisions in test set");
+
 done_testing;
 
 sub report_failure {
@@ -165,4 +182,12 @@ EOF
 	ok $pos->consistent;
 
 	exit 1;
+}
+
+sub significant_for_repetition {
+	my ($fen) = @_;
+
+	$fen =~ s/[0-9]+ [0-9]+$//;
+
+	return $fen;
 }

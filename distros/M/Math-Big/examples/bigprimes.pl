@@ -18,8 +18,8 @@ my $two = Math::BigInt->new(2);
 
 # some new() are to make stop Perl from calculating things like 1234 ** 4321
 # at compile time. (we want to see run-time behaviuor)
-# Also there is len(), since the old BigInt has not got length() and we want
-# this script to be comparable between old and new version.
+# Also there is len(), since the old Math::BigInt has not got length() and we
+# want this script to be comparable between old and new version.
 
 print "\n# Sophie Germain prime with 7119 digits:\n";
 $x = Math::BigInt->new(72021) * Math::BigInt->new(2)->bpow(23630); $x--;

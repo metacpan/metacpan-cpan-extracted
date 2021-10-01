@@ -14,7 +14,7 @@ Alien::Build::Plugin::Extract - Extract Alien::Build plugins
 
 =head1 VERSION
 
-version 2.41
+version 2.42
 
 =head1 SYNOPSIS
 
@@ -26,8 +26,8 @@ version 2.41
 =head1 DESCRIPTION
 
 Extract plugins extract packages that have been downloaded from the internet.
-Unless you are doing something unusual you will likely want to use the 
-L<Alien::Build::Plugin::Extract::Negotiate> plugin to select the best 
+Unless you are doing something unusual you will likely want to use the
+L<Alien::Build::Plugin::Extract::Negotiate> plugin to select the best
 Extract plugin available.
 
 =over 4
@@ -90,7 +90,7 @@ Juan Julián Merelo Guervós (JJ)
 
 Joel Berger (JBERGER)
 
-Petr Pisar (ppisar)
+Petr Písař (ppisar)
 
 Lance Wicks (LANCEW)
 

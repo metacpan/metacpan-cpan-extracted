@@ -10,7 +10,7 @@ our @EXPORT = qw( alien_diag );
 our @EXPORT_OK = @EXPORT;
 
 # ABSTRACT: Print out standard diagnostic for Aliens in the test step.
-our $VERSION = '2.41'; # VERSION
+our $VERSION = '2.42'; # VERSION
 
 
 sub alien_diag ($@)
@@ -79,7 +79,7 @@ Test::Alien::Diag - Print out standard diagnostic for Aliens in the test step.
 
 =head1 VERSION
 
-version 2.41
+version 2.42
 
 =head1 SYNOPSIS
 
@@ -142,7 +142,7 @@ Juan Julián Merelo Guervós (JJ)
 
 Joel Berger (JBERGER)
 
-Petr Pisar (ppisar)
+Petr Písař (ppisar)
 
 Lance Wicks (LANCEW)
 

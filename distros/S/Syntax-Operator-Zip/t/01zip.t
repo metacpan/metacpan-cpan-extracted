@@ -29,4 +29,11 @@ is_deeply( [ qw( one two three ) Z ( 1 .. 2 ) ],
    is( scalar( ('z') Z ('A'..'F') ), 6, 'zip counts longest list on RHS' );
 }
 
+# Returned values are copies, not aliases
+{
+   my @n = (1..3);
+   $_->[0]++ for @n Z ("x")x3;
+   is_deeply( \@n, [1..3], 'zip returns copies of arguments' );
+}
+
 done_testing;

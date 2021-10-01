@@ -51,6 +51,6 @@
          "url" : "http://github.com/garu/Net-Dimona"
       }
    },
-   "version" : 0.01,
+   "version" : 0.02,
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

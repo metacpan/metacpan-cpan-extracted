@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.739';
+our $VERSION = '1.741';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -76,7 +76,7 @@ sub _valid_options {
         no_spacebar         => 'Array_Int',
         tabs_info           => 'Array_Int',
         tabs_prompt         => 'Array_Int',
-        skip_items          => 'Regexp', # experimental
+        skip_items          => 'Regexp',
         empty               => 'Str',
         footer              => 'Str',
         info                => 'Str',
@@ -216,8 +216,7 @@ sub __get_key {
     my $key;
     if ( defined $self->{skip_items} ) {
         my $idx = $self->{rc2idx}[$self->{pos}[ROW]][$self->{pos}[COL]];
-        # if ( $self->{list}[$idx] =~ $self->{skip_items} ) { # 22.06.2021
-        if ( $self->{list}[$idx] =~ /$self->{skip_items}/ ) {
+        if ( $self->{list}[$idx] =~ $self->{skip_items} ) {
             $key = $self->Term::Choose::Opt::SkipItems::__key_skipped();
         }
     }
@@ -233,6 +232,12 @@ sub __modify_options {
     my ( $self ) = @_;
     ############################## remove this with the next release
     if ( $self->{layout} == 3 ) {
+        my @caller = caller( 2 );
+        print "@caller[1,2]\n";
+        print "Term::Choose::choose\n";
+        print "Option 'layout': 3 is not a valid value.\n";
+        print "Press ENTER to continue:";
+        my $dummy = <>;
         $self->{layout} = 2;
     }
     ##############################
@@ -1217,7 +1222,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.739
+Version 1.741
 
 =cut
 
@@ -1503,10 +1508,6 @@ Sets the string displayed on the screen instead an empty string.
 
 (default: "<empty>")
 
-=head3 f3 RENAMED and REMOVED
-
-This option is now called I<search>.
-
 =head3 footer
 
 Add a string in the bottom line.
@@ -1702,8 +1703,6 @@ Set the behavior of C<Ctrl-F>.
 2 - case-sensitive search
 
 =head3 skip_items
-
-This option is experimental.
 
 When navigating through the list, the elements that match the regex pattern passed with this option will be skipped.
 

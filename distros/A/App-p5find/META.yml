@@ -2,11 +2,12 @@
 abstract: 'A collection of programs for locating certain constructs in Perl5 code.'
 author:
   - 'Kang-min Liu <gugod@gugod.org>'
-build_requires: {}
+build_requires:
+  Test2::V0: '0'
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'App::ModuleBuildTiny version 0.027, CPAN::Meta::Converter version 2.150010'
+generated_by: 'App::ModuleBuildTiny version 0.029, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,16 +16,16 @@ name: App-p5find
 provides:
   App::p5find:
     file: lib/App/p5find.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   File::Next: '0'
   PPI: '0'
   PPIx::QuoteLike: '0'
-  Test2::V0: '0'
+  Pod::Usage: '0'
 resources:
   bugtracker: https://github.com/gugod/App-p5find/issues
   repository: https://github.com/gugod/App-p5find.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: MIT
 x_static_install: '1'

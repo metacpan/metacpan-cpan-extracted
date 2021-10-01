@@ -1,12 +1,12 @@
 package Sah::PSchema::perl::modname_with_optional_args;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-03-20'; # DATE
-our $DIST = 'Sah-PSchemas-Perl'; # DIST
-our $VERSION = '0.008'; # VERSION
-
 use strict;
 use warnings;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-09-29'; # DATE
+our $DIST = 'Sah-PSchemas-Perl'; # DIST
+our $VERSION = '0.009'; # VERSION
 
 sub meta {
     my $class = shift;
@@ -27,19 +27,50 @@ sub meta {
             },
         },
         args_rels => {
-            choose_one => [qw/ns_prefix ns_prefixes/],
+            req_one => [qw/ns_prefix ns_prefixes/],
         },
     };
 }
 
 sub get_schema {
-    require Sah::Schema::perl::modname_with_optional_args; # for scan_prereqs
+    # we follow Sah::Schema::perl::modname_with_optional_args
+    require Regexp::Pattern::Perl::Module;
 
     my ($class, $args, $merge) = @_;
 
-    return ["perl::modname_with_optional_args" => {
+
+    my $schema_str = [str => {
+        match => '\\A(?:' . $Regexp::Pattern::Perl::Module::RE{perl_modname_with_optional_args}{pat} . ')\\z',
         'x.perl.coerce_rules' => [
-            'From_str::normalize_perl_modname',
+            ['From_str::normalize_perl_modname', {
+                ($args->{ns_prefixes} ? (ns_prefixes => $args->{ns_prefixes}) : (ns_prefix => $args->{ns_prefix})),
+            }],
+        ],
+        'x.completion' => ['perl_modname', {
+            ($args->{ns_prefixes} ? (ns_prefixes => $args->{ns_prefixes}) : (ns_prefix => $args->{ns_prefix})),
+            recurse=>$args->{complete_recurse},
+            recurse_matching=>'all-at-once',
+        }],
+    }];
+
+    my $schema_ary = [array_from_json => {
+        min_len => 1,
+        max_len => 2,
+        elems => [
+            $schema_str,
+            ["any", {
+                req=>1,
+                of=>[
+                    ["array",{req=>1}],
+                    ["hash",{req=>1}]],
+            }],
+        ],
+    }];
+
+    return ["any", {
+        of => [
+            $schema_ary,
+            $schema_str,
         ],
 
         'x.completion' => ['perl_modname' => {
@@ -67,7 +98,7 @@ Sah::PSchema::perl::modname_with_optional_args - Perl module name with optional 
 
 =head1 VERSION
 
-This document describes version 0.008 of Sah::PSchema::perl::modname_with_optional_args (from Perl distribution Sah-PSchemas-Perl), released on 2021-03-20.
+This document describes version 0.009 of Sah::PSchema::perl::modname_with_optional_args (from Perl distribution Sah-PSchemas-Perl), released on 2021-09-29.
 
 =head1 DESCRIPTION
 
@@ -83,14 +114,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-PSchem
 
 Source repository is at L<https://github.com/perlancar/perl-Sah-PSchemas-Perl>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Sah-PSchemas-Perl/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Sah::Schema::perl::modname_with_optional_args>
@@ -99,11 +122,36 @@ L<Sah::Schema::perl::modname_with_optional_args>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-PSchemas-Perl>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

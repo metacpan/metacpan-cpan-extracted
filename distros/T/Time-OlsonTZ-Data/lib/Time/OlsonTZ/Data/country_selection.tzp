@@ -1733,9 +1733,9 @@ use strict;
 				timezone_name => "Pacific/Kiritimati",
 			},
 			"Phoenix Islands" => {
-				location_coords => "-0308-17105",
+				location_coords => "-0247-17143",
 				olson_description => "Phoenix Islands",
-				timezone_name => "Pacific/Enderbury",
+				timezone_name => "Pacific/Kanton",
 			},
 		},
 	},
@@ -3159,7 +3159,7 @@ use strict;
 		olson_name => "Tonga",
 		regions => {
 			"" => {
-				location_coords => "-2110-17510",
+				location_coords => "-210800-1751200",
 				olson_description => "",
 				timezone_name => "Pacific/Tongatapu",
 			},

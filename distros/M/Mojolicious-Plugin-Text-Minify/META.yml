@@ -25,7 +25,7 @@ name: Mojolicious-Plugin-Text-Minify
 provides:
   Mojolicious::Plugin::Text::Minify:
     file: lib/Mojolicious/Plugin/Text/Minify.pm
-    version: v0.2.1
+    version: v0.2.2
 requires:
   Mojolicious: '0'
   Text::Minify::XS: v0.4.8
@@ -33,7 +33,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/Mojolicious-Plugin-Text-Minify/issues
   repository: git://github.com/robrwo/Mojolicious-Plugin-Text-Minify.git
-version: v0.2.1
+version: v0.2.2
 x_authority: cpan:RRWO
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

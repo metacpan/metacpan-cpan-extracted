@@ -111,6 +111,25 @@ Delete a node device whose configuration was previously defined using the
 C<define_node_device> method in L<Sys::Virt>. The C<$flags> parameter is
 currently unused and defaults to zero.
 
+=item $flag = $dev->get_autostart();
+
+Return a true value if the node device is configured to automatically
+start upon boot. Return false, otherwise
+
+=item $dev->set_autostart($flag)
+
+Set the state of the autostart flag, which determines whether the
+node device will automatically start upon boot of the host OS.
+
+=item $dev->is_active()
+
+Returns a true value if the node device is currently running
+
+=item $dev->is_persistent()
+
+Returns a true value if the node device has a persistent configuration
+file defined
+
 =item $dev->destroy()
 
 Destroy the virtual device releasing any OS resources associated

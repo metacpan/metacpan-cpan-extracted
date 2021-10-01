@@ -7,7 +7,8 @@
 :.
 : Copyright (c) 2021 INABA Hitoshi "ina@cpan.org" in a CPAN
 :#####################################################################
-set VERSION=0.04
+setlocal
+set VERSION=0.05
 
 rem default message by English
 if "%Q_WHO%"==""                set Q_WHO=Your name?
@@ -21,7 +22,6 @@ if "%INFO_ANY_KEY_TO_EXIT%"=="" set INFO_ANY_KEY_TO_EXIT=Press any key to exit.
 :BEGIN
     color 0F
     pushd %~dp0
-    setlocal
     set COUNT=1
     set FS=	
 
@@ -140,6 +140,7 @@ if "%INFO_ANY_KEY_TO_EXIT%"=="" set INFO_ANY_KEY_TO_EXIT=Press any key to exit.
     set CSV=%WHEN%,%WHERE%,%WHO%,%WHAT%,%TOWHICH%,%WHY%,%HOWMANYSEC%,%LOOSEID%
     echo %CSV%>>%OUTPUT%.csv
     echo csv:%CSV%%FS%when_:%WHEN%%FS%where_:%WHERE%%FS%who:%WHO%%FS%what:%WHAT%%FS%towitch:%TOWHICH%%FS%why:%WHY%%FS%howmanysec:%HOWMANYSEC%%FS%looseid:%LOOSEID%>>%OUTPUT%.ltsv
+    echo {"csv":"%CSV%","when_":"%WHEN%","where_":"%WHERE%","who":"%WHO%","what":"%WHAT%","towitch":"%TOWHICH%","why":"%WHY%","howmanysec":"%HOWMANYSEC%","looseid":"%LOOSEID%"},>>%OUTPUT%.json5
     set /a COUNT=%COUNT%+1
 
 :END_WHILE

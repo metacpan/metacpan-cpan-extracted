@@ -1,5 +1,5 @@
 package Photonic::WE::R2::Field;
-$Photonic::WE::R2::Field::VERSION = '0.018';
+$Photonic::WE::R2::Field::VERSION = '0.021';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::R2::Field
 
 =head1 VERSION
 
-version 0.018
+version 0.021
 
 =head1 COPYRIGHT NOTICE
 
@@ -45,7 +45,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 
    use Photonic::WE::R2::Field;
    my $nrf=Photonic::WE::R2::Field->new(...);
-   my $field=$nrf->evaluate($epsA, $epsB);
+   my $field=$nrf->evaluate($epsB);
 
 =head1 DESCRIPTION
 
@@ -57,23 +57,24 @@ the components.
 
 =over 4
 
-=item * new(nr=>$nr, nh=>$nh, smallE=>$smallE)
+=item * new(haydock=>$haydock, nh=>$nh, smallE=>$smallE)
 
 Initializes the structure.
 
-$nr Photonic::WE::R2::AllH is a Haydock calculator for the
+$haydock Photonic::WE::R2::Haydock is a Haydock calculator for the
 structure, *initialized* with the flag keepStates=>1
-(Photonic::Types::AllHSave, as defined in Photonic::Types).
+(Photonic::Types::HaydockSave, as defined in Photonic::Types).
 
 $nh is the maximum number of Haydock coefficients to use.
 
 $smallE is the criteria of convergence (default 1e-7) for
 Field calculations
 
-=item * evaluate($epsA, $epsB...)
+=item * evaluate($epsB)
 
 Returns the microscopic electric field for given
-dielectric functions of the host $epsA and the particle $epsB.
+dielectric functions of the host (which it gets from the Haydock
+calculator's epsilon) and the particle $epsB.
 
 =back
 
@@ -81,9 +82,9 @@ dielectric functions of the host $epsA and the particle $epsB.
 
 =over 4
 
-=item * nr
+=item * haydock
 
-Photonic::WE::R2::AllH structure
+Photonic::WE::R2::Haydock structure
 
 =item * nh
 
@@ -95,7 +96,8 @@ Criteria of convergence. 0 means don't check.
 
 =item * epsA
 
-Dielectric function of component A
+Dielectric function of component A, which it gets from the Haydock
+calculator's epsilon.
 
 =item * epsB
 
@@ -115,7 +117,7 @@ optional reciprocal space filter
 
 =item * field
 
-real space field in format RorI, cartesian, nx, ny,...
+real space field in format cartesian, nx, ny,...
 
 =back
 
@@ -131,14 +133,14 @@ real space field in format RorI, cartesian, nx, ny,...
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
-use Photonic::WE::R2::AllH;
+use Photonic::WE::R2::Haydock;
 use Photonic::Utils qw(cgtsv GtoR);
 use Photonic::Types;
 use Photonic::Iterator;
 use Moose;
 use MooseX::StrictConstructor;
 
-has 'nr'=>(is=>'ro', isa=>'Photonic::Types::AllHSave', required=>1,
+has 'haydock'=>(is=>'ro', isa=>'Photonic::Types::HaydockSave', required=>1,
            documentation=>'Haydock recursion calculator');
 has 'Es'=>(is=>'ro', isa=>'ArrayRef[Photonic::Types::PDLComplex]', init_arg=>undef,
            writer=>'_Es', documentation=>'Field coefficients');
@@ -161,21 +163,21 @@ has 'u'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef, writer=
 
 sub BUILD {
     my $self=shift;
-    $self->nr->run unless $self->nr->iteration;
+    $self->haydock->run unless $self->haydock->iteration;
 }
 
 sub evaluate {
     my $self=shift;
     $self->_epsB(my $epsB=shift);
-    $self->_epsA(my $epsA=$self->nr->epsilon->r2C);
+    $self->_epsA(my $epsA=$self->haydock->epsilon->r2C);
     $self->_u(my $u=1/(1-$epsB/$epsA));
-    my $as=$self->nr->as;
-    my $bs=$self->nr->bs;
-    my $cs=$self->nr->cs;
-    my $stateit=$self->nr->state_iterator;
+    my $as=$self->haydock->as;
+    my $bs=$self->haydock->bs;
+    my $cs=$self->haydock->cs;
+    my $stateit=$self->haydock->state_iterator;
     my $nh=$self->nh; #desired number of Haydock terms
     #don't go beyond available values.
-    $nh=$self->nr->iteration if $nh>$self->nr->iteration;
+    $nh=$self->haydock->iteration if $nh>$self->haydock->iteration;
     # calculate using lapack for tridiag system
     my $diag=$u - $as->(0:$nh-1);
     # rotate complex zero from first to last element.
@@ -188,7 +190,7 @@ sub evaluate {
     my $giEs = cgtsv($subdiag, $diag, $supradiag, $rhs);
     #states are xy,nx,ny...
     #field is xy,nx,ny...
-    my @dims=$self->nr->B->dims; # actual dims of space
+    my @dims=$self->haydock->B->dims; # actual dims of space
     my $ndims=@dims; # num. of dims of space
     my $field_G=PDL->zeroes($ndims, @dims)->r2C;
     #print $field_G->info, "\n";
@@ -198,15 +200,15 @@ sub evaluate {
 	$field_G+=$giE_G;
     }
     #
-    my $Es=$self->nr->applyMetric($field_G);
+    my $Es=$self->haydock->applyMetric($field_G);
     my $e_0=1/($Es->slice(":" . ",(0)" x $ndims)
-	       *$self->nr->polarization->conj)->sumover;
+	       *$self->haydock->polarization->conj)->sumover;
     # Normalize result so macroscopic field is 1.
     $Es*=$e_0;
     $Es *= $self->filter->(*1) if $self->has_filter;
     ##get cartesian out of the way, fourier transform, put cartesian.
     my $field_R=GtoR($Es, $ndims, 1);
-    $field_R*=$self->nr->B->nelem; #scale to have unit macroscopic field
+    $field_R*=$self->haydock->B->nelem; #scale to have unit macroscopic field
     #result is cartesian, nx, ny,...
     $self->_field($field_R);
     return $field_R;

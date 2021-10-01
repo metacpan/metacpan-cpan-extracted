@@ -1,4 +1,16 @@
 Revision history for Syntax-Operator-Zip
 
+0.03    2021-10-01
+        [BUGFIXES]
+         * t/95benchmark.t requires List::Util v1.56; skip the (entirely
+           optional) test if not available
+
+0.02    2021-09-29
+        [CHANGES]
+         * Set the XPI_OPERAND_ONLY_LOOK flag so we get anonlist optimisations
+
+        [BUGFIXES]
+         * Make sure to return copies of arguments, not aliases to them
+
 0.01    2021-09-23
         First version, released on an unsuspecting world.

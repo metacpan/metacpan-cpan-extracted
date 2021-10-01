@@ -3,16 +3,19 @@ use lib 't/lib';
 use Helper;
 use experimental qw( signatures postderef );
 use Alien::Build::Wizard;
+use Alien::Build::Wizard::Questions qw( :all );
 
 %Alien::Build::Wizard::Chrome::ask = (
-  'What is the class name for your Alien?' => [ 'Alien::libfrooble', 'Alien::auto' ],
-  'What is the human project name of the alienized package?' => [ 'libfrooble', 'auto' ],
-  'Enter the full URL to the latest tarball (or zip, etc.) of the project you want to alienize.' => ['corpus/alien_build_wizard/auto-1.2.3.tar'],
-  'Which pkg-config names (if any) should be used to detect system install?  You may space separate multiple names.' => ['baz  frooble', 'bar foo'],
+  QUESTION_URL()        => ['corpus/alien_build_wizard/auto-1.2.3.tar'],
+  QUESTION_CLASS_NAME() => [ 'Alien::libfrooble', 'Alien::auto' ],
+  QUESTION_HUMAN_NAME() => [ 'libfrooble', 'auto' ],
+  QUESTION_PKG_NAMES()  => ['baz  frooble', 'bar foo'],
 );
 
 %Alien::Build::Wizard::Chrome::choose = (
-  'Choose build system.' => ['cmake','autoconf'],
+  QUESTION_BUILD_SYSTEM() => ['cmake','autoconf'],
+  QUESTION_ALIEN_TYPE()   => ['tool', 'xs'],
+  QUESTION_LATEST()       => ['latest'],
 );
 
 is(

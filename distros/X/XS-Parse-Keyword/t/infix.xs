@@ -108,7 +108,8 @@ OP *pp_addpairs(pTHX)
   PUSHMARK(SP);
 
   while(lhs_count || rhs_count) {
-    mPUSHi(SvIV(*lhs) + SvIV(*rhs));
+    IV val = SvIV(*lhs) + SvIV(*rhs);
+    mPUSHi(val);
 
     lhs++; lhs_count--;
     rhs++; rhs_count--;
@@ -119,7 +120,7 @@ OP *pp_addpairs(pTHX)
 
 static const struct XSParseInfixHooks hooks_addpairs = {
   .lhs_flags = XPI_OPERAND_TERM_LIST,
-  .rhs_flags = XPI_OPERAND_TERM_LIST,
+  .rhs_flags = XPI_OPERAND_TERM_LIST|XPI_OPERAND_ONLY_LOOK, /* only on RHS so we can test the logic */
   .permit_hintkey = hintkey,
   .cls = 0,
 

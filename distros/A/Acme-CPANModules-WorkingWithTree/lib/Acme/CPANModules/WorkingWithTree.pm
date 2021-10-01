@@ -1,9 +1,9 @@
 package Acme::CPANModules::WorkingWithTree;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-01'; # DATE
+our $DATE = '2021-05-06'; # DATE
 our $DIST = 'Acme-CPANModules-WorkingWithTree'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use strict;
 use Acme::CPANModulesUtil::Misc;
@@ -23,9 +23,10 @@ Memory-efficient tree nodes in Perl: <pm:Tree::Node>.
 
 **Creating**
 
-<pm:Tree::From::Struct>, <pm:Tree::From::Text>, <pm:Tree::From::TextLines>,
-<pm:Tree::Create::Callback>, <pm:Tree::Create::Callback::ChildrenPerLevel>,
-<pm:Tree::Create::Size>, <pm:Tree::From::FS>.
+<pm:Tree::From::Struct>, <pm:Tree::From::ObjArray>, <pm:Tree::From::Text>,
+<pm:Tree::From::TextLines>, <pm:Tree::Create::Callback>,
+<pm:Tree::Create::Callback::ChildrenPerLevel>, <pm:Tree::Create::Size>,
+<pm:Tree::From::FS>.
 
 <pm:Data::Random::Tree>.
 
@@ -33,6 +34,9 @@ Memory-efficient tree nodes in Perl: <pm:Tree::Node>.
 **Visualizing as text**
 
 <pm:Tree::To::Text>, <pm:Tree::To::TextLines>.
+
+<pm:Text::Tree::Indented>. This module accepts nested array of strings instead
+of tree object.
 
 
 **Visualizing as graphics**
@@ -51,7 +55,7 @@ Special kinds of trees: TODO.
 
 **Roles**
 
-<pm:Role::TinyCommons::Tree>.
+<pm:Role::TinyCommons::Tree::Node>, <pm:Role::TinyCommons::Tree::NodeMethods>.
 
 
 **Modules that produce or work with Role::TinyCommons::Tree-compliant tree objects**
@@ -89,11 +93,9 @@ Acme::CPANModules::WorkingWithTree - Working with tree data structure in Perl
 
 =head1 VERSION
 
-This document describes version 0.004 of Acme::CPANModules::WorkingWithTree (from Perl distribution Acme-CPANModules-WorkingWithTree), released on 2020-03-01.
+This document describes version 0.005 of Acme::CPANModules::WorkingWithTree (from Perl distribution Acme-CPANModules-WorkingWithTree), released on 2021-05-06.
 
 =head1 DESCRIPTION
-
-Working with tree data structure in Perl.
 
 B<Basics>
 
@@ -108,15 +110,19 @@ Memory-efficient tree nodes in Perl: L<Tree::Node>.
 
 B<Creating>
 
-L<Tree::From::Struct>, L<Tree::From::Text>, L<Tree::From::TextLines>,
-L<Tree::Create::Callback>, L<Tree::Create::Callback::ChildrenPerLevel>,
-L<Tree::Create::Size>, L<Tree::From::FS>.
+L<Tree::From::Struct>, L<Tree::From::ObjArray>, L<Tree::From::Text>,
+L<Tree::From::TextLines>, L<Tree::Create::Callback>,
+L<Tree::Create::Callback::ChildrenPerLevel>, L<Tree::Create::Size>,
+L<Tree::From::FS>.
 
 L<Data::Random::Tree>.
 
 B<Visualizing as text>
 
 L<Tree::To::Text>, L<Tree::To::TextLines>.
+
+L<Text::Tree::Indented>. This module accepts nested array of strings instead
+of tree object.
 
 B<Visualizing as graphics>
 
@@ -132,7 +138,7 @@ Special kinds of trees: TODO.
 
 B<Roles>
 
-L<Role::TinyCommons::Tree>.
+L<Role::TinyCommons::Tree::Node>, L<Role::TinyCommons::Tree::NodeMethods>.
 
 B<Modules that produce or work with Role::TinyCommons::Tree-compliant tree objects>
 
@@ -144,7 +150,7 @@ L<Data::CSel> and its related modules: L<App::htmlsel>, L<App::jsonsel>,
 L<App::orgsel>, L<App::podsel>, L<App::ppisel>, L<App::yamlsel>,
 L<App::CSelUtils>.
 
-=head1 INCLUDED MODULES
+=head1 ACME::CPANMODULES ENTRIES
 
 =over
 
@@ -159,6 +165,8 @@ L<App::CSelUtils>.
 =item * L<Tree::Node>
 
 =item * L<Tree::From::Struct>
+
+=item * L<Tree::From::ObjArray>
 
 =item * L<Tree::From::Text>
 
@@ -178,11 +186,15 @@ L<App::CSelUtils>.
 
 =item * L<Tree::To::TextLines>
 
+=item * L<Text::Tree::Indented>
+
 =item * L<Tree::To::FS>
 
 =item * L<Tree::Shell>
 
-=item * L<Role::TinyCommons::Tree>
+=item * L<Role::TinyCommons::Tree::Node>
+
+=item * L<Role::TinyCommons::Tree::NodeMethods>
 
 =item * L<Org::Parser>
 
@@ -210,10 +222,17 @@ L<App::CSelUtils>.
 
 =head1 FAQ
 
-=head2 What are ways to use this module?
+=head2 What is an Acme::CPANModules::* module?
 
-Aside from reading it, you can install all the listed modules using
-L<cpanmodules>:
+An Acme::CPANModules::* module, like this module, contains just a list of module
+names that share a common characteristics. It is a way to categorize modules and
+document CPAN. See L<Acme::CPANModules> for more details.
+
+=head2 What are ways to use this Acme::CPANModules module?
+
+Aside from reading this Acme::CPANModules module's POD documentation, you can
+install all the listed modules (entries) using L<cpanmodules> CLI (from
+L<App::cpanmodules> distribution):
 
     % cpanmodules ls-entries WorkingWithTree | cpanm -n
 
@@ -221,9 +240,13 @@ or L<Acme::CM::Get>:
 
     % perl -MAcme::CM::Get=WorkingWithTree -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
 
-This module also helps L<lcpan> produce a more meaningful result for C<lcpan
-related-mods> when it comes to finding related modules for the modules listed
-in this Acme::CPANModules module.
+or directly:
+
+    % perl -MAcme::CPANModules::WorkingWithTree -E'say $_->{module} for @{ $Acme::CPANModules::WorkingWithTree::LIST->{entries} }' | cpanm -n
+
+This Acme::CPANModules module also helps L<lcpan> produce a more meaningful
+result for C<lcpan related-mods> command when it comes to finding related
+modules for the modules listed in this Acme::CPANModules module.
 
 =head1 HOMEPAGE
 
@@ -235,7 +258,7 @@ Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-Wor
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-WorkingWithTree>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Acme-CPANModules-WorkingWithTree/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -253,7 +276,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

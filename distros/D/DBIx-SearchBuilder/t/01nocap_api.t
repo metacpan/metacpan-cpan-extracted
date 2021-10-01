@@ -3,7 +3,7 @@
 use strict;
 
 use Test::More;
-BEGIN { require "t/utils.pl" }
+BEGIN { require "./t/utils.pl" }
 
 use vars qw(@SPEC_METHODS @MODULES);
 my @SPEC_METHODS = qw(AUTOLOAD DESTROY CLONE);

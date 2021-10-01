@@ -49,8 +49,8 @@ if ( $mmv >= 6.4501 ) {
 	    license	=> 'http://dev.perl.org/licenses/',
 	    repository	=> {
 		type	=> 'git',
-		url	=> 'git://github.com/trwyant/perl-Date-Tolkien-Shire.git',
-		web	=> 'https://github.com/trwyant/perl-Date-Tolkien-Shire',
+		url	=> 'git://github.com/trwyant/perl-DateTime-Calendar-Julian.git',
+		web	=> 'https://github.com/trwyant/perl-DateTime-Calendar-Julian',
 	    },
 	},
 	provides(),

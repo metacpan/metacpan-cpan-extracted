@@ -3,11 +3,12 @@ package App::perlimports::Document;
 use Moo;
 use utf8;
 
-our $VERSION = '0.000019';
+our $VERSION = '0.000023';
 
 use App::perlimports::Annotations     ();
 use App::perlimports::ExportInspector ();
 use App::perlimports::Include         ();
+use App::perlimports::Sandbox         ();
 use File::Basename qw( fileparse );
 use List::Util qw( any uniq );
 use Module::Runtime qw( module_notional_filename );
@@ -207,6 +208,14 @@ has tidied_document => (
     builder => '_build_tidied_document',
 );
 
+has _tidy_whitespace => (
+    is       => 'ro',
+    isa      => Bool,
+    init_arg => 'tidy_whitespace',
+    lazy     => 1,
+    default  => sub { 1 },
+);
+
 has _verbose => (
     is       => 'ro',
     isa      => Bool,
@@ -231,6 +240,7 @@ around BUILDARGS => sub {
 };
 
 my %default_ignore = (
+    'Carp::Always'                   => 1,
     'Data::Printer'                  => 1,
     'DDP'                            => 1,
     'Devel::Confess'                 => 1,
@@ -834,6 +844,7 @@ sub _build_tidied_document {
             logger           => $self->logger,
             original_imports => $self->original_imports->{ $include->module },
             pad_imports      => $self->_padding,
+            tidy_whitespace  => $self->_tidy_whitespace,
         );
         my $elem;
         try {
@@ -862,6 +873,18 @@ sub _build_tidied_document {
                 $self->_remove_with_trailing_characters($include);
                 next;
             }
+        }
+
+        # Let's see if the import itself might break something
+        if ( my $err
+            = App::perlimports::Sandbox::eval_pkg( $elem->module, "$elem" ) )
+        {
+            $self->logger->warning(
+                sprintf(
+                    'New include (%s) triggers error (%s)', $elem, $err
+                )
+            );
+            next;
         }
 
         # https://github.com/Perl-Critic/PPI/issues/189
@@ -983,7 +1006,7 @@ App::perlimports::Document - Make implicit imports explicit
 
 =head1 VERSION
 
-version 0.000019
+version 0.000023
 
 =head2 inspector_for( $module_name )
 

@@ -2,12 +2,14 @@ use strict;
 use warnings;
 use 5.022;
 
-package Alien::Build::Wizard::Chrome 0.01 {
+package Alien::Build::Wizard::Chrome 0.03 {
 
   use Moose;
   use experimental qw( signatures postderef );
   use Term::Clui ();
   use namespace::autoclean;
+
+  # ABSTRACT: Wizard chrome
 
   sub ask ($self, $prompt, $default=undef) {
     $self->say($prompt);
@@ -15,6 +17,11 @@ package Alien::Build::Wizard::Chrome 0.01 {
   }
 
   sub choose ($self, $prompt, $options, $default=undef) {
+    no warnings 'redefine';
+    local *Term::Clui::get_default = sub {
+      return undef unless defined $default && ref $default eq 'ARRAY';
+      wantarray ? $default->@* : $default->[0];      ## no critic (Community::Wantarray)
+    };
     Term::Clui::choose($prompt, $options->@*);
   }
 
@@ -34,11 +41,11 @@ __END__
 
 =head1 NAME
 
-Alien::Build::Wizard::Chrome
+Alien::Build::Wizard::Chrome - Wizard chrome
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 SYNOPSIS
 

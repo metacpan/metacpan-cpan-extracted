@@ -3,7 +3,7 @@ package App::perlimports::CLI;
 use Moo;
 use utf8;
 
-our $VERSION = '0.000019';
+our $VERSION = '0.000023';
 
 use App::perlimports           ();
 use App::perlimports::Document ();
@@ -132,11 +132,20 @@ sub _build_args {
             { default => 1 },
         ],
         [],
+        [
+            'tidy-whitespace!',
+            'reformat use statements even when changes are only whitespace',
+            { default => 1 },
+        ],
+        [],
         [],
         [ 'version', 'Print installed version', { shortcircuit => 1 } ],
         [
             'log-level|l=s', 'Print messages to STDERR',
             { default => 'error' }
+        ],
+        [
+            'log-filename=s', 'Log messages to file rather than STDERR',
         ],
         [ 'help', "Print usage message and exit", { shortcircuit => 1 } ],
         [
@@ -226,10 +235,19 @@ sub run {
         ? $self->logger
         : Log::Dispatch->new(
         outputs => [
-            [
+            $opts->log_filename ? [
+                'File',
+                binmode   => ':encoding(UTF-8)',
+                filename  => $opts->log_filename,
+                min_level => $opts->log_level,
+                mode      => '>>',
+                newline   => 1,
+                ]
+            : [
                 'Screen',
                 min_level => $opts->log_level,
                 newline   => 1,
+                stderr    => 1,
                 utf8      => 1,
             ]
         ]
@@ -289,7 +307,7 @@ App::perlimports::CLI - CLI arg parsing for C<perlimports>
 
 =head1 VERSION
 
-version 0.000019
+version 0.000023
 
 =head1 DESCRIPTION
 

@@ -12,7 +12,7 @@ require XSLoader;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(minify);
 
-our $VERSION = 'v0.5.0';
+our $VERSION = 'v0.5.1';
 
 XSLoader::load( "Text::Minify::XS", $VERSION );
 
@@ -30,7 +30,7 @@ Text::Minify::XS - Simple text minification
 
 =head1 VERSION
 
-version v0.5.0
+version v0.5.1
 
 =head1 SYNOPSIS
 
@@ -75,13 +75,6 @@ It does not recognise any form of markup, comments or text quoting.
 Nor does it remove extra whitespace in the middle of the line.
 
 =head1 KNOWN ISSUES
-
-=head2 Support for older Perl versions
-
-This module requires Perl v5.9.3 or newer.
-
-Pull requests to support older versions of Perl are welcome. See
-L</SOURCE>.
 
 =head2 Malformed UTF-8
 

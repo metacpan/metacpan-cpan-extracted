@@ -44,6 +44,9 @@ our %EXPORT_TAGS = (constructors
       &SawNotation &IsNotationAllowed
       &isMatchingClose &Fence)]);
 
+DebuggableFeature('recdescent', "Trace Parse::RecDescent");
+our $MATHPARSE_PROGRESS_QUANTUM = 100;
+
 # ================================================================================
 sub new {
   my ($class, %options) = @_;
@@ -61,29 +64,31 @@ sub parseMath {
   $self->clear;    # Not reentrant!
   $self->cleanupScripts($document);
   if (my @math = $document->findnodes('descendant-or-self::ltx:XMath[not(ancestor::ltx:XMath)]')) {
-    NoteBegin("Math Parsing"); NoteProgress(scalar(@math) . " formulae ...");
+    my $proc = "Math Parsing " . scalar(@math) . " formulae ...";
+    ProgressSpinup($proc);
 #### SEGFAULT TEST
 ####    $document->doctest("before parse",1);
     foreach my $math (@math) {
       $self->parse($math, $document); }
+    ProgressSpindown($proc);
 
-    NoteProgress("\nMath parsing succeeded:"
+    NoteLog("Math parsing succeeded:"
         . join('', map { "\n   $_: "
             . colorizeString($$self{passed}{$_} . "/" . ($$self{passed}{$_} + $$self{failed}{$_}), ($$self{failed}{$_} == 0 ? 'success' : 'warning')) }
           grep { $$self{passed}{$_} + $$self{failed}{$_} }
-          keys %{ $$self{passed} }) . "\n");
+          keys %{ $$self{passed} }));
     if (my @unk = keys %{ $$self{unknowns} }) {
-      NoteProgress("Symbols assumed as simple identifiers (with # of occurences):\n   "
-          . join(', ', map { "'" . colorizeString("$_", 'warning') . "' ($$self{unknowns}{$_})" } sort @unk) . "\n");
+      NoteLog("Symbols assumed as simple identifiers (with # of occurences):\n   "
+          . join(', ', map { "'" . colorizeString("$_", 'warning') . "' ($$self{unknowns}{$_})" } sort @unk));
       if (!$STATE->lookupValue('MATHPARSER_SPECULATE')) {
-        NoteProgress("Set MATHPARSER_SPECULATE to speculate on possible notations.\n"); } }
+        NoteLog("Set MATHPARSER_SPECULATE to speculate on possible notations."); } }
     if (my @funcs = keys %{ $$self{maybe_functions} }) {
-      NoteProgress("Possibly used as functions?\n  "
+      NoteLog("Possibly used as functions?\n  "
           . join(', ', map { "'$_' ($$self{maybe_functions}{$_}/$$self{unknowns}{$_} usages)" }
-            sort @funcs) . "\n"); }
+            sort @funcs)); }
+  }
 #### SEGFAULT TEST
 ####    $document->doctest("IN scope",1);
-    NoteEnd("Math Parsing"); }
 #### SEGFAULT TEST
 ####    $document->doctest("OUT of scope",1);
   return $document; }
@@ -107,7 +112,6 @@ sub cleanupScripts {
     if ($role =~ /^(?:PRE|POST|FLOAT)(:?SUB|SUPER)SCRIPT$/) {
       my @refs = $document->findnodes("descendant-or-self::ltx:XMRef[\@idref = '$appid']");
       if (scalar(@refs)) {
-#        print STDERR "\nREPLACING SCRIPT REF: found " . scalar(@refs) . " references to " . ToString($app) . "\n";
         my $script = $app->firstChild;
         my ($scriptref) = LaTeXML::Package::createXMRefs($document, $script);
         $document->unRecordID($appid);    # no longer refers to the app
@@ -160,9 +164,12 @@ sub clear {
   $$self{unknowns}        = {};
   $$self{maybe_functions} = {};
   $$self{n_parsed}        = 0;
+  $$self{progress}        = 0;
   return; }
 
-our %EXCLUDED_PRETTYNAME_ATTRIBUTES = (fontsize => 1, opacity => 1);
+our %EXCLUDED_PRETTYNAME_ATTRIBUTES = (
+  fontsize => 1, opacity         => 1,
+  color    => 1, backgroundcolor => 1);
 
 sub token_prettyname {
   my ($node) = @_;
@@ -313,14 +320,14 @@ sub parse_rec {
   elsif (my $result = $self->parse_single($node, $document, $rule)) {
     $$self{passed}{$tag}++;
     if ($tag eq 'ltx:XMath') {    # Replace the content of XMath with parsed result
-      NoteProgress('[' . ++$$self{n_parsed} . ']');
+      ProgressStep() if ($$self{progress}++ % $MATHPARSE_PROGRESS_QUANTUM) == 0;
       map { $document->unRecordNodeIDs($_) } element_nodes($node);
       # unbindNode followed by (append|replace)Tree (which removes ID's) should be safe
       map { $_->unbindNode() } $node->childNodes;
       $document->appendTree($node, $result);
       $result = [element_nodes($node)]->[0]; }
     else {                        # Replace the whole node for XMArg, XMWrap; preserve some attributes
-      NoteProgressDetailed($TAG_FEEDBACK{$tag} || '.');
+      ProgressStep() if ($$self{progress}++ % $MATHPARSE_PROGRESS_QUANTUM) == 0;
       # Copy all attributes
       my $resultid = p_getAttribute($result, 'xml:id');
       my %attr     = map { (getQName($_) => $_->getValue) }
@@ -342,7 +349,7 @@ sub parse_rec {
       foreach my $key (keys %attr) {
         next unless ($key =~ /^_/) || $document->canHaveAttribute($rtag, $key);
         my $value = $attr{$key};
-        if ($key eq 'xml:id') {     # Since we're moving the id...bookkeeping
+        if ($key eq 'xml:id') {    # Since we're moving the id...bookkeeping
           $document->unRecordID($value);
           $node->removeAttribute('xml:id'); }
         if ($isarr) { $$result[1]{$key} = $value; }
@@ -358,10 +365,7 @@ sub parse_rec {
     return $result; }
   else {
     $self->parse_kludge($node, $document);
-    if ($tag eq 'ltx:XMath') {
-      NoteProgress('[F' . ++$$self{n_parsed} . ']'); }
-    elsif ($tag eq 'ltx:XMArg') {
-      NoteProgressDetailed('-a'); }
+    ProgressStep() if ($$self{progress}++ % $MATHPARSE_PROGRESS_QUANTUM) == 0;
     $$self{failed}{$tag}++;
     return; } }
 
@@ -393,10 +397,10 @@ sub parse_children {
    #       # if so, we probably want to mark things as having already been parsed.
    #       my $refnode = realizeXMNode($child);
    #       if(getQName($refnode) ne 'ltx:XMTok'){ # Anything referenced with structure...
-   #         print STDERR "PRE-PARSING Ref'd node: ".ToString($child)." == ".ToString($refnode). "\n";
+   #         Debug("PRE-PARSING Ref'd node: ".ToString($child)." == ".ToString($refnode));
    # ##        $self->parse_rec($refnode,'Anything',$document);
    #         $self->parse_children($refnode,$document);
-   #         print STDERR "NOW REFERENCES: ".ToString(realizeXMNode($child))."\n";
+   #         Debug("NOW REFERENCES: ".ToString(realizeXMNode($child)));
    #  } }
   }
   return; }
@@ -436,7 +440,7 @@ sub filter_hints {
             my $p = $prev->getAttribute('_phantom');
             $prev->setAttribute(_space   => $s + $pts);
             $prev->setAttribute(_phantom => $p || $ph); }
-          else {                                 # Else save it for the next token.
+          else {    # Else save it for the next token.
             $pending_space += $pts;
             $pending_phantom = $ph; } } }
       # If XMHint is referenced??
@@ -658,16 +662,15 @@ sub parse_single {
       unshift(@punct, $p); }
   }
 
-  if ($LaTeXML::MathParser::DEBUG) {
+  if ($LaTeXML::DEBUG{recdescent}) {
     $::RD_TRACE = 1;    # Turn on MathGrammar tracing
                         #    my $box = $document->getNodeBox($LaTeXML::MathParser::XNODE);
     my $box = $document->getNodeBox($mathnode);
-    print STDERR "\n" . ('=' x 60) .
-      "\nParsing formula \"" . ToString($box) . "\""
-      . "\n from " . ToString($box->getLocator)
-      . "\n == \"" . join(' ', map { node_string($_, $document) } @nodes) . "\""
-      . "\n == " . ToString($mathnode)
-      . "\n"; }
+    Debug(('=' x 60) .
+        "\nParsing formula \"" . ToString($box) . "\""
+        . "\n from " . ToString($box->getLocator)
+        . "\n == \"" . join(' ', map { node_string($_, $document) } @nodes) . "\""
+        . "\n == " . ToString($mathnode)); }
 
   if (scalar(@nodes) < 2) {    # Too few nodes? What's to parse?
     $result = $nodes[0] || Absent(); }
@@ -686,8 +689,8 @@ sub parse_single {
       $result = ['ltx:XMDual', {},
         LaTeXML::Package::createXMRefs($document, $result),
         ['ltx:XMWrap', {}, $result, @punct]]; }    # or perhaps: Apply, punctuated???
-    if ($LaTeXML::MathParser::DEBUG) {
-      print STDERR "\n=>" . printNode($result) . "\n" . ('=' x 60) . "\n"; }
+    if ($LaTeXML::DEBUG{recdescent}) {
+      Debug("=>" . printNode($result) . "\n" . ('=' x 60)); }
     return $result; } }
 
 sub node_to_lexeme {
@@ -847,7 +850,7 @@ my $FAILURE_POSTTOKENS = 1;    # [CONSTANT]
 
 sub failureReport {
   my ($self, $document, $mathnode, $rule, $unparsed, @nodes) = @_;
-  if ($LaTeXML::MathParser::STRICT || (($STATE->lookupValue('VERBOSITY') || 0) > 1)) {
+  if ($LaTeXML::MathParser::STRICT || (($LaTeXML::Common::Error::VERBOSITY || 0) > 1)) {
     my $loc = "";
     # If we haven't already done it for this formula, show the original TeX.
     if (!$LaTeXML::MathParser::WARNED) {
@@ -951,7 +954,7 @@ sub textrec {
 
 sub textrec_apply {
   my ($name, $op, @args) = @_;
-  my $role = $op->getAttribute('role') || 'Unknown';
+  my $role = ((ref $op ne 'ARRAY') && $op->getAttribute('role')) || 'Unknown';
   if (($role =~ /^(SUB|SUPER)SCRIPTOP$/) && (($op->getAttribute('scriptpos') || '') =~ /^pre\d+$/)) {
     # Note that this will likely get parenthesized due to high bp
     return (5000, textrec($op) . " " . textrec($args[1]) . " " . textrec($args[0])); }
@@ -1036,7 +1039,7 @@ sub p_getValue {
       return $$node[1]{name}; } }
   elsif (ref $node eq 'XML::LibXML::Text') {
     return $node->textContent; }
-  else {                                            # ????
+  else {    # ????
     return $node; } }
 
 sub p_getTokenMeaning {
@@ -1233,6 +1236,7 @@ sub extract_separators {
         . p_getValue($p)
         . spacingToString(getXMHintSpacing(p_getAttribute($p, 'rpadding')));
       push(@args, shift(@stuff)); } }    # Collect the next expression.
+  @args = grep { $_ } @args;    # drop all undef args, trailing punct could have added an undef
   return ($punct, @args); }
 
 # ================================================================================
@@ -1302,7 +1306,7 @@ sub Fence {
   my $n  = int(($nargs - 2 + 1) / 2);
   my @p  = map { p_getValue(realizeXMNode(@stuff[2 * $_])) } 1 .. $n - 1;
   my $op = ($n == 0
-    ? 'list'                                    # ?
+    ? 'list'    # ?
     : ($n == 1
       ? $enclose1{ $o . '@' . $c }
       : ($n == 2
@@ -1360,6 +1364,9 @@ sub NewFormula {
 
 sub NewList {
   my (@stuff) = @_;
+  # drop placeholder token for missing trailing punct, if any
+  if (scalar(@stuff) > 1 && (p_getTokenMeaning($stuff[-1]) eq 'absent')) {
+    pop(@stuff); }
   if (@stuff == 1) {
     return $stuff[0]; }
   else {
@@ -1459,10 +1466,9 @@ sub ReplacedBy {
   if (my $lostid = p_getAttribute($lostnode, 'xml:id')) {
     # Could be we want to generate an id for $keepnode, here?
     if (my $keepid = p_getAttribute($keepnode, 'xml:id')) {
-      #      print STDERR "LOST $lostid use instead $keepid\n";
       $$LaTeXML::MathParser::LOSTNODES{$lostid} = $keepid; }
     else {
-      print STDERR "LOST $lostid but no replacement!\n"; } }
+      Warn('expected', 'id', undef, "LOST $lostid but no replacement!\n"); } }
 
   # The following recurses into the two trees,
   # This is on the assumption that they are "equivalent" trees
@@ -1498,12 +1504,24 @@ sub NewScript {
   # Get "inner" (content) base, if the base is a dual it may be more relevant
   if (p_getQName($rbase) eq 'ltx:XMDual') {
     ($ibase) = p_element_nodes($rbase); }
-  my ($bx, $bl) = (p_getAttribute($base, 'scriptpos')
-      || p_getAttribute($ibase, 'scriptpos')
-      || 'post') =~ /^(pre|mid|post)?(\d+)?$/;
+  elsif (p_getQName($rbase) eq 'ltx:XMApp') {
+    my ($op, $a1, @rest) = p_element_nodes($rbase);
+    if ((p_getQName($op) eq 'ltx:XMTok')
+      && ((p_getAttribute($op, 'role') || '') =~ /^(FLOAT|POST)?(SUB|SUPER)SCRIPT(OP)?$/)) {
+      $ibase = $op; } }
+  my @bsp = grep { $_ } (p_getAttribute($rbase, 'scriptpos'),
+    p_getAttribute($rbase, 'scriptpos'),
+    p_getAttribute($ibase, 'scriptpos'),
+    'post');
+  my ($bx) = grep { $_ } map { /^(pre|mid|post)?(\d+)?$/ && $1; } @bsp;
+  my ($bl) = grep { $_ } map { /^(pre|mid|post)?(\d+)?$/ && $2; } @bsp;
   my ($sx, $sl) = (p_getAttribute($rscript, 'scriptpos') || 'post') =~ /^(pre|mid|post)?(\d+)?$/;
+  $bl = ($sl || 1) unless $bl;
+  $sl = ($bl || 1) unless $sl;
+  $sx = ($bl == $sl ? $bx : 'post') unless $sx;
   my ($mode, $y) = p_getAttribute($rscript, 'role') =~ /^(FLOAT|POST)?(SUB|SUPER)SCRIPT$/;
-  my $x    = ($pos ? $pos : ($mode eq 'FLOAT' ? 'pre' : $bx || 'post'));
+  my $x = ($pos ? $pos : ($mode eq 'FLOAT' ? 'pre'
+      : ($bl == $sl ? $bx : $sx) || 'post'));
   my $lpad = ($x eq 'pre') && p_getAttribute($rscript, 'lpadding');
   my $rpad = ($x ne 'pre') && p_getAttribute($rscript, 'rpadding');
   my $t;
@@ -1522,7 +1540,6 @@ sub NewScript {
   # Record whether this script was a floating one
   $$app[1]{_wasfloat}  = 1     if $mode eq 'FLOAT';
   $$app[1]{_bumplevel} = $l    if $bumped;
-  $$app[1]{scriptpos}  = $bx   if $bx   && ($bx ne 'post');
   $$app[1]{lpadding}   = $lpad if $lpad && !$$app[1]{lpadding};    # better to add?
   $$app[1]{rpadding}   = $rpad if $rpad && !$$app[1]{rpadding};    # better to add?
   return $app; }

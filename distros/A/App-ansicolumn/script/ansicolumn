@@ -34,6 +34,9 @@ ansicolumn [options] [file ...]
     -F                   full-width
     -p                   paragraph mode
 
+    -B[=#], --border[=#] print border with optiona style
+    -U[=#], --fillup[=#] fill-up unit (pane|page|none)
+
     --height=#           page height
     --column-unit=#      column unit (default 8)
     --linestyle=#        folding style (none|truncate|wrap|wordwrap)
@@ -42,11 +45,9 @@ ansicolumn [options] [file ...]
     --runin=#            run-in width
     --runout=#           run-out width
     --[no-]pagebreak     allow page break
-    --border[=#]         print border
     --border-style=#     border style
     --[no-]ignore-space  ignore space in table output
     --[no-]isolation     page-end line isolation
-    --fillup=#           fill-up unit (pane|page|none)
     --tabstop=#          tab-stop character
     --tabhead=#          tab-head character
     --tabspace=#         tab-space width
@@ -55,7 +56,7 @@ ansicolumn [options] [file ...]
 
 =head1 VERSION
 
-Version 1.13
+Version 1.14
 
 =head1 DESCRIPTION
 
@@ -163,6 +164,21 @@ terminal width, unless B<--pane-width> is specified.
 
 Insert empty line between every successive non-empty lines.
 
+=item B<--border>[=I<style>], B<-B>[I<style>]
+
+Print border.  Enabled by B<--page> option automatically.  If the
+optional I<style> is given, it is used as a border style and precedes
+to B<--border-style> option.  Use B<--border=none> to disable it.
+
+Border style is specified by B<--border-style> option.
+
+=item B<--fillup>[=C<pane>|C<page>|C<none>], B<-U>[...]
+
+Fill up final pane or page by empty lines.  Parameter is optional and
+considered as 'pane' by default.  Set by B<--page> option
+automatically.  Use B<--fillup=none> if you want to explicitly disable
+it.
+
 =item B<--height>=#
 
 Set page height and page mode on.  See L</CALCULATION> section.
@@ -200,14 +216,6 @@ Default is both 2.
 
 Move to next pane when form feed character found.
 Default true.
-
-=item B<--border>[=I<style>], B<-B>[I<style>]
-
-Print border.  Enabled by B<--page> option automatically.  If the
-optional I<style> is given, it is used as a border style and precedes
-to B<--border-style> option.  Use B<--border=none> to disable it.
-
-Border style is specified by B<--border-style> option.
 
 =item B<--border-style>=I<style>, B<--bs>=...
 
@@ -258,13 +266,6 @@ Default true.  Negated by B<--document> option.
 Allow the first line of a paragraph (continuous non-space lines) is
 placed at the bottom of a pane.  Default true.  If false, move it to
 the top of next pane.  Negated by B<--document> option.
-
-=item B<--fillup>[=C<pane>|C<page>|C<none>]
-
-Fill up final pane or page by empty lines.  Parameter is optional and
-considered as 'pane' by default.  Set by B<--page> option
-automatically.  Use B<--fillup=none> if you want to explicitly disable
-it.
 
 =item B<--tabstop>=#
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.47';
+our $VERSION = '2.48';
 
 use parent 'Class::Singleton', 'DateTime::TimeZone';
 
@@ -47,7 +47,7 @@ DateTime::TimeZone::UTC - The UTC time zone
 
 =head1 VERSION
 
-version 2.47
+version 2.48
 
 =head1 SYNOPSIS
 

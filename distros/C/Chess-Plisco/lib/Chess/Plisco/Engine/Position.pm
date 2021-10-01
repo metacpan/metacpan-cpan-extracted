@@ -10,14 +10,14 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Plisco::Engine::Position;
-$Chess::Plisco::Engine::Position::VERSION = '0.2';
+$Chess::Plisco::Engine::Position::VERSION = '0.3';
 use strict;
 use integer;
 
-use Chess::Position qw(:all);
-use Chess::Position::Macro;
+use Chess::Plisco qw(:all);
+use Chess::Plisco::Macro;
 
-use base qw(Chess::Position);
+use base qw(Chess::Plisco);
 
 # Slightly different piece values.
 use constant CP_POS_KNIGHT_VALUE => 320;
@@ -103,6 +103,15 @@ my @king_end_game_square_table = (
 
 # __BEGIN_MACROS__
 
+use constant PAWN_PHASE => 0;
+use constant KNIGHT_PHASE => 1;
+use constant BISHOP_PHASE => 1;
+use constant ROOK_PHASE => 2;
+use constant QUEEN_PHASE => 4;
+use constant TOTAL_PHASE => PAWN_PHASE * 16
+	+ KNIGHT_PHASE * 4 + BISHOP_PHASE * 4
+	+ ROOK_PHASE * 4 + QUEEN_PHASE * 2;
+
 sub evaluate {
 	my ($self) = @_;
 
@@ -122,101 +131,92 @@ sub evaluate {
 	my $white_kings = $white_pieces & $self->[CP_POS_KINGS];
 	my $black_kings = $black_pieces & $self->[CP_POS_KINGS];
 
-	# We count the number of pieces, 1 for each pawn and 2 for minor pieces,
-	# 3 for the rooks, and 5 for the queens.  That makes per side 8 + 2 * 4
-	# + 2 * 3 + 5 = 27 or 54 in total.  Only one queen per side is counted,
-	# so that promotions do not change the value in the wrong direction.
-	#
-	# FIXME! All this is better updated in doMove() and undoMove().
-	my $weighted_popcount = 0;
+	my $phase = TOTAL_PHASE;
 
 	while ($white_pawns) {
-		my $shift = cp_bb_count_trailing_zbits $white_pawns;
+		my $shift = cp_bitboard_count_trailing_zbits $white_pawns;
 		$score += $pawn_square_table[63 - $shift];
-		$white_pawns = cp_bb_clear_least_set $white_pawns;
-		++$weighted_popcount;
+		$white_pawns = cp_bitboard_clear_least_set $white_pawns;
+		$phase -= PAWN_PHASE;
 	}
 
 	while ($black_pawns) {
-		my $shift = cp_bb_count_trailing_zbits $black_pawns;
+		my $shift = cp_bitboard_count_trailing_zbits $black_pawns;
 		$score -= $pawn_square_table[$shift];
-		$black_pawns = cp_bb_clear_least_set $black_pawns;
-		++$weighted_popcount;
+		$black_pawns = cp_bitboard_clear_least_set $black_pawns;
+		$phase -= PAWN_PHASE;
 	}
 
 	while ($white_knights) {
-		my $shift = cp_bb_count_trailing_zbits $white_knights;
+		my $shift = cp_bitboard_count_trailing_zbits $white_knights;
 		$score += $knight_square_table[63 - $shift];
-		$white_knights = cp_bb_clear_least_set $white_knights;
-		$weighted_popcount += 2;
+		$white_knights = cp_bitboard_clear_least_set $white_knights;
+		$phase -= KNIGHT_PHASE;
 	}
 
 	while ($black_knights) {
-		my $shift = cp_bb_count_trailing_zbits $black_knights;
+		my $shift = cp_bitboard_count_trailing_zbits $black_knights;
 		$score -= $knight_square_table[$shift];
-		$black_knights = cp_bb_clear_least_set $black_knights;
-		$weighted_popcount += 2;
+		$black_knights = cp_bitboard_clear_least_set $black_knights;
+		$phase -= KNIGHT_PHASE;
 	}
 
 	while ($white_bishops) {
-		my $shift = cp_bb_count_trailing_zbits $white_bishops;
+		my $shift = cp_bitboard_count_trailing_zbits $white_bishops;
 		$score += $bishop_square_table[63 - $shift];
-		$white_bishops = cp_bb_clear_least_set $white_bishops;
-		$weighted_popcount += 2;
+		$white_bishops = cp_bitboard_clear_least_set $white_bishops;
+		$phase -= BISHOP_PHASE;
 	}
 
 	while ($black_bishops) {
-		my $shift = cp_bb_count_trailing_zbits $black_bishops;
+		my $shift = cp_bitboard_count_trailing_zbits $black_bishops;
 		$score -= $bishop_square_table[$shift];
-		$black_bishops = cp_bb_clear_least_set $black_bishops;
-		$weighted_popcount += 2;
+		$black_bishops = cp_bitboard_clear_least_set $black_bishops;
+		$phase -= BISHOP_PHASE;
 	}
 
 	while ($white_rooks) {
-		my $shift = cp_bb_count_trailing_zbits $white_rooks;
+		my $shift = cp_bitboard_count_trailing_zbits $white_rooks;
 		$score += $rook_square_table[63 - $shift];
-		$white_rooks = cp_bb_clear_least_set $white_rooks;
-		$weighted_popcount += 3;
+		$white_rooks = cp_bitboard_clear_least_set $white_rooks;
+		$phase -= ROOK_PHASE;
 	}
 
 	while ($black_rooks) {
-		my $shift = cp_bb_count_trailing_zbits $black_rooks;
+		my $shift = cp_bitboard_count_trailing_zbits $black_rooks;
 		$score -= $rook_square_table[$shift];
-		$black_rooks = cp_bb_clear_least_set $black_rooks;
-		$weighted_popcount += 3;
+		$black_rooks = cp_bitboard_clear_least_set $black_rooks;
+		$phase -= ROOK_PHASE;
 	}
 
-	# FIXME! For kings and queens there is no need to count them for the
-	# weighted popcount. We can therefore mask out those squares that have
-	# a value of 0 if we precalculate a mask for the other squares.
-	$weighted_popcount += 5 if $white_queens;
+	# Count them only once.
+	$phase -= QUEEN_PHASE if $white_queens;
 	while ($white_queens) {
-		my $shift = cp_bb_count_trailing_zbits $white_queens;
+		my $shift = cp_bitboard_count_trailing_zbits $white_queens;
 		$score += $queen_square_table[63 - $shift];
-		$white_queens = cp_bb_clear_least_set $white_queens;
+		$white_queens = cp_bitboard_clear_least_set $white_queens;
 	}
 
-	$weighted_popcount += 5 if $black_queens;
+	# Count them only once.
+	$phase -= QUEEN_PHASE if $black_queens;
 	while ($black_queens) {
-		my $shift = cp_bb_count_trailing_zbits $black_queens;
+		my $shift = cp_bitboard_count_trailing_zbits $black_queens;
 		$score -= $queen_square_table[$shift];
-		$black_queens = cp_bb_clear_least_set $black_queens;
+		$black_queens = cp_bitboard_clear_least_set $black_queens;
 	}
 
-	my $middle_game_weight = $weighted_popcount;
-	my $end_game_weight = 54 - $middle_game_weight;
-	my $white_king_shift = cp_bb_count_trailing_zbits $white_kings;
-	my $black_king_shift = cp_bb_count_trailing_zbits $black_kings;
-	$score += ($middle_game_weight
-		* $king_middle_game_square_table[63 - $white_king_shift] / 54);
-	$score -= ($middle_game_weight
-		* $king_middle_game_square_table[$black_king_shift] / 54);
-	$score += ($end_game_weight
-		* $king_end_game_square_table[63 - $white_king_shift] / 54);
-	$score -= ($end_game_weight
-		* $king_end_game_square_table[$black_king_shift] / 54);
+	$phase = 0 if $phase < 0;
+	$phase = ($phase * 256 + (TOTAL_PHASE / 2)) / TOTAL_PHASE;
 
-	$score += $self->material;
+	my $white_king_shift = cp_bitboard_count_trailing_zbits $white_kings;
+	my $black_king_shift = cp_bitboard_count_trailing_zbits $black_kings;
+	my $opening_score = $score + $king_middle_game_square_table[63 - $white_king_shift]
+		- $king_middle_game_square_table[$black_king_shift];
+	my $endgame_score = $score + $king_end_game_square_table[63 - $black_king_shift]
+		- $king_end_game_square_table[$black_king_shift];
+	$score = (($opening_score * (TOTAL_PHASE - $phase))
+			+ ($endgame_score * $phase)) / TOTAL_PHASE
+		+ $self->material;
 
 	return (cp_pos_to_move($self)) ? -$score : $score;
 }

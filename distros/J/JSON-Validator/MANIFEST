@@ -1,4 +1,3 @@
-.pls_cache/index
 Changes
 CONTRIBUTING.md
 lib/JSON/Validator.pm
@@ -35,7 +34,6 @@ lib/JSON/Validator/Store.pm
 lib/JSON/Validator/Util.pm
 Makefile.PL
 MANIFEST			This list of files
-README.md
 t/00-basic.t
 t/bundle.t
 t/coerce-default.t

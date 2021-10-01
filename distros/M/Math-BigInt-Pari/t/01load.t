@@ -1,4 +1,4 @@
-#!perl
+# -*- mode: perl; -*-
 
 use strict;             # restrict unsafe constructs
 use warnings;           # enable optional warnings
@@ -31,5 +31,8 @@ my $pari_minor      = int($pari_ver_exp / 1e3) % 1e3;
 my $pari_patchlevel =     $pari_ver_exp        % 1e3;
 my $pari_ver        = "$pari_major.$pari_minor.$pari_patchlevel";
 
+diag("");
+diag(sprintf("%12s %s\n", 'Version', 'Library'));
+diag(sprintf("%12s %s\n", '-------', '-------'));
 diag(sprintf("%12s %s\n", $pari_ver, 'PARI'));
 diag("");

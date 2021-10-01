@@ -626,12 +626,10 @@ contain a collection of games, not just one:
     $pgn = Chess::PGN::Parse->new('games.pgn') or die;
     while ($pgn->read_game) {
         $pgn->parse_game;
-        @san_moves = $pgn->moves;
-        foreach my $san_move (@san_moves) {
-            $move = $pos->parseMove($san_move)
-                or die "cannot parse move '$san_move'";
-            $pos->doMove($move)
-                or die "illegal move '$san_move'";
+        @san = @{$pgn->moves};
+        foreach my $san (@san) {
+            my $status = $pos->applyMove($san)
+                or die "illegal or invalid move '$san'";
         }
     }
 

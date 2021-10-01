@@ -1,5 +1,9 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.20.2 2021-09-29T02:53:59Z
+
+    - Fix-up missing short option of watchdiff.
+
 4.20.1 2021-09-07T02:29:49Z
 
     - Introduce --runin/--runout works with --margin option.

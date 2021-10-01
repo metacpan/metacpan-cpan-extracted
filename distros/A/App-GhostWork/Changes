@@ -1,5 +1,9 @@
 Revision history for this software.
 
+0.05  2021-09-25 00:00:00
+  - output JSON5 file, too
+  - created by INABA Hitoshi
+
 0.04  2021-09-24 00:00:00
   - output CSV file, too
   - created by INABA Hitoshi

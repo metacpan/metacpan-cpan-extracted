@@ -1,6 +1,6 @@
 # NAME
 
-Math::BigInt::Named - Math::BigInts that know their name in some languages
+Math::BigInt::Named - Math::BigInt objects that know their name in some languages
 
 # SYNOPSIS
 
@@ -23,15 +23,15 @@ This is a subclass of Math::BigInt and adds support for named numbers.
 
 ## name()
 
-    print Math::BigInt::Name->name( 123 );
+    print Math::BigInt::Named->name( 123 );
 
-Convert a BigInt to a name.
+Convert a Math::BigInt to a name.
 
 ## from\_name()
 
-    my $bigint = Math::BigInt::Name->from_name('hundertzwanzig');
+    my $bigint = Math::BigInt::Named->from_name('hundertzwanzig');
 
-Create a Math::BigInt::Name from a name string. **Not yet implemented!**
+Create a Math::BigInt::Named from a name string. **Not yet implemented!**
 
 # BUGS
 

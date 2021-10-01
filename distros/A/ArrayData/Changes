@@ -1,3 +1,18 @@
+0.2.4   2021-09-26  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 0.2.3 and 0.2.3.2.
+
+
+0.2.3.2 2021-09-26  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 0.2.2 and 0.2.2.2.
+
+	- Tweak recommended subnamespaces: Word::* -> Lingua::Word::*,
+	  Phrase::* -> Lingua::Phrase::*; fix some copy-pasted typos.
+
+        - UPDATE: Rename release 0.2.3 to 0.2.3.2 due to conflict.
+
+
 0.2.3   2021-05-18  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] apply_roles(): Search also Role::TinyCommons::Collection
@@ -5,6 +20,15 @@
 	  any namespace.
 
 	- [doc] Add example for apply_roles().
+
+
+0.2.2.2  2021-05-12  Released-By: PERLANCAR; Urgency: low
+
+	- No spec changes.
+
+	- Introduce ArrayDataUtil::* namespace.
+
+        - UPDATE: rename release from 0.2.2 to 0.2.2.2 due to conflict.
 
 
 0.2.2   2021-05-07  Released-By: PERLANCAR; Urgency: medium

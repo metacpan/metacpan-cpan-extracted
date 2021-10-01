@@ -50,6 +50,7 @@ GetOptions(\%OPT, qw(
     top=s
     interval=s
     with=s@
+    with-missing
     or
 ));
 
@@ -208,7 +209,7 @@ foreach my $presence ( qw( exists missing ) ) {
     }
 }
 
-my %SUPPORTED_AGGREGATIONS = map {$_=>'simple_value'} qw(cardinality sum min max avg);
+my %SUPPORTED_AGGREGATIONS = map {$_=>'simple_value'} qw(cardinality sum min max avg value_count);
 my $agg_header = '';
 if( exists $OPT{top} ) {
     my @top = split /:/, $OPT{top};
@@ -246,10 +247,13 @@ if( exists $OPT{top} ) {
             # Skip invalid elements
             next unless defined $field and defined $size and $size > 0;
 
+            my %params = ();
             my $id = "$type-$field";
             # If a term agg and we haven't used this field name, simplify it
             if( $type =~ /terms$/ && !$sub_agg{$field} ) {
                 $id = $field;
+                $params{size} = $size;
+                $params{missing} = 'MISSING' if $OPT{'with-missing'};
             }
 
             if( $type =~ /histogram|stats|percentiles/ && !$OPT{'no-implications'} ) {
@@ -260,17 +264,20 @@ if( exists $OPT{top} ) {
             $sub_agg{$id} = {
                 $type => {
                     field => $field,
-                    $type =~ /terms/ ? (size  => $size) : (),
                     $type eq 'percentiles' ? ( percents => [split /,/, $pcts] ) : (),
                     $type eq 'histogram'   ? ( interval => $hi ) :  (),
+                    %params,
                 }
             };
         }
     }
 
+    my %params = ();
+    $params{missing} = 'MISSING' if $OPT{'with-missing'} and $top_agg eq 'terms';
+
     my $field = shift @agg_fields;
     $agg_header = "count\tpct\t" . $field;
-    $agg{$top_agg} = { field => $field };
+    $agg{$top_agg} = { field => $field, %params };
 
     if( $OPT{'bg-filter'} && $top_agg eq 'significant_terms' ) {
         my $bgf = App::ElasticSearch::Utilities::QueryString->new();
@@ -732,7 +739,7 @@ es-search.pl - Provides a CLI for quick searches of data in ElasticSearch daily 
 
 =head1 VERSION
 
-version 8.1
+version 8.2
 
 =head1 SYNOPSIS
 
@@ -989,6 +996,10 @@ Other examples:
     --with percentiles:out_bytes
     --with percentiles:out_bytes:50,95,99
     --with histogram:out_bytes:1024
+
+=item B<with-missing>
+
+For terms aggregations, adds a C<MISSING> bucket.
 
 =item B<bg-filter>
 

@@ -5,7 +5,7 @@ use warnings;
 use 5.008004;
 
 # ABSTRACT: Extend Alien::Base with roles!
-our $VERSION = '2.41'; # VERSION
+our $VERSION = '2.42'; # VERSION
 
 
 1;
@@ -22,7 +22,7 @@ Alien::Role - Extend Alien::Base with roles!
 
 =head1 VERSION
 
-version 2.41
+version 2.42
 
 =head1 SYNOPSIS
 
@@ -32,7 +32,6 @@ version 2.41
  use Role::Tiny::With qw( with );
  
  with 'Alien::Role::Dino';
- with 'Alien::Role::Alt';
  
  1;
 
@@ -44,9 +43,9 @@ course write subclasses that extend L<Alien::Base>, but then you have
 to either stick with just one subclass or deal with multiple inheritance!
 It is recommended that you use L<Role::Tiny> since it can be used on
 plain old Perl classes which is good since L<Alien::Base> doesn't use
-anything fancy like L<Moose> or L<Moo>.  There are two working examples
+anything fancy like L<Moose> or L<Moo>.  There is one working example
 that use this technique that are worth checking out in the event you
-are interested: L<Alien::Role::Dino> and L<Alien::Role::Alt>.
+are interested: L<Alien::Role::Dino>.
 
 This class itself doesn't do anything, it just documents the technique.
 
@@ -63,8 +62,6 @@ This class itself doesn't do anything, it just documents the technique.
 =item L<Alien::Build>
 
 =item L<Alien::Role::Dino>
-
-=item L<Alien::Role::Alt>
 
 =back
 
@@ -110,7 +107,7 @@ Juan Julián Merelo Guervós (JJ)
 
 Joel Berger (JBERGER)
 
-Petr Pisar (ppisar)
+Petr Písař (ppisar)
 
 Lance Wicks (LANCEW)
 

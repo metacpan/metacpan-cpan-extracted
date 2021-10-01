@@ -91,19 +91,19 @@ our $XML_NS   = 'http://www.w3.org/XML/1998/namespace';    # [CONSTANT]
 # XML Utilities
 sub element_nodes {
   my ($node) = @_;
-  return grep { $_->nodeType == XML_ELEMENT_NODE } $node->childNodes; }
+  return ($node ? grep { $_->nodeType == XML_ELEMENT_NODE } $node->childNodes : ()); }
 
 sub text_in_node {
   my ($node) = @_;
-  return join("\n", map { $_->data } grep { $_->nodeType == XML_TEXT_NODE } $node->childNodes); }
+  return ($node ? join("\n", map { $_->data } grep { $_->nodeType == XML_TEXT_NODE } $node->childNodes) : ''); }
 
 sub isTextNode {
   my ($node) = @_;
-  return $node->nodeType == XML_TEXT_NODE; }
+  return ($node ? $node->nodeType == XML_TEXT_NODE : 0); }
 
 sub isElementNode {
   my ($node) = @_;
-  return $node->nodeType == XML_ELEMENT_NODE; }
+  return ($node ? $node->nodeType == XML_ELEMENT_NODE : 0); }
 
 # Is $child a child of $parent?
 sub isChild {
@@ -163,7 +163,7 @@ sub append_nodes {
 sub clear_node {
   my ($node) = @_;
   return map { $node->removeChild($_) }
-    grep { ($_->nodeType == XML_ELEMENT_NODE) || ($_->nodeType == XML_TEXT_NODE) }
+    grep     { ($_->nodeType == XML_ELEMENT_NODE) || ($_->nodeType == XML_TEXT_NODE) }
     $node->childNodes; }
 
 # We have to be _extremely_ careful when rearranging trees when using XML::LibXML!!!
@@ -215,79 +215,6 @@ sub initialize_catalogs {
   foreach my $catalog (pathname_findall('LaTeXML.catalog', installation_subdir => '.')) {
     XML::LibXML->load_catalog($catalog); }
   return; }
-
-# FINISH THIS EXPERIMENT LATER....
-
-# We need to be able to find various XML resources: XSLT, RelaxNG and other random xml.
-# Catalogs provide one means to provide a level of abstraction in pathname location.
-# But at least at the top level, files ought to be searched for according to the current
-# search paths (being command line arguments, relative to source files, etc);
-# Possibly files might be referred to within XML files that libxml is already parsing
-# and these could benefit from the searchpath approach?
-#
-# We can also provide InputCallbacks to the various XML::LibXML objects that allow
-# us to programatically find & read these XML items according to the searchpaths.
-# One problem is that we don't have (from this level of the API)
-# a clean method of accessing the current search paths!
-# Another problem is that embedded references to oddly-located relative files will usually
-# get turned into paths relative to the top-level document that libxml is currently reading!
-# So, we'll be given an absolute path before we have a chance to search the searchpaths for it!
-#
-# Perhaps we should even handle the catalog functionality here?
-#
-# How should we find the searchpaths?????
-# Note also that if you use relative pathnames to refer to xml objects from within another,
-# that libxml2 will already have _assumed_ that it is relative to the base document!
-# That is, we're getting an absolute path, here.  Of course, the original request
-# could have been an absolute path, so we probably shouldn't be blithely rewriting abs paths!!!
-# We could take over the whole catalog business, however...
-# sub initialize_input_callbacks {
-#   my($object,%options) = @_;
-# #  return;
-#   # THIS IS TOTALLY WRONG!!!! Figure out how we'll find out about search paths!
-#   my $paths = $LaTeXML::SEARCHPATHS;
-#   # options might be installation_subdirs, or such pathname_find things.
-#   my $cb = XML::LibXML::InputCallback->new();
-#   $cb->register_callbacks([
-#      sub {                      # Matcher
-#        my($uri)=@_;
-#        print STDERR "INPUT CHECK: $uri\n";
-#        # We don't want to do the search here, 'cause we'll have to do it again in open!
-#        return 0 if $uri =~ m|^file://|;                 # pass on absolute pathnames
-#        return 0 if pathname_is_absolute($uri);          # a
-# #       if($uri =~ /^urn:x-LaTeXML:([^:]*):(.*)$/){
-#        print STDERR "INPUT ACCEPT: $uri\n";
-#        return 1; },
-#      sub {                      # Opener
-#        my($uri)=@_;
-#        my $handle;
-#        $uri =~ s|^file://||;
-#        # WARNING!!! Kludge alert!
-#        my @paths = ('.');
-#        push(@paths, @$LaTeXML::SEARCHPATHS) if $LaTeXML::SEARCHPATHS;
-#        push(@paths, @{$LaTeXML::POST{searchpaths}}) if $LaTeXML::POST;
-#        push(@paths, $LaTeXML::DOCUMENT->getSearchPaths) if $LaTeXML::DOCUMENT;
-#        if(my $pathname =  pathname_find($uri,
-#                                         # types => ['xsl'], installation_subdir => 'resources/XSLT',
-#                                         paths=>[@paths])){
-#          open($handle,$pathname);
-#          return $handle; }
-#        else {
-#          Error('missing-file',$uri,undef,
-#                "Couldn't find file '$uri' in search paths",
-#                "Search paths were ".join(',',@paths));
-#          return; }},
-#      sub {                      # Reader
-#        my($handle,$length)=@_;
-#        my $buffer;
-#        read($handle,$buffer,$length);
-#        return $buffer; },
-#      sub {                      # Closer
-#        my($handle)=@_;
-#        close($handle);
-#        return; }]);
-#   $object->input_callbacks($cb);
-#   return; }
 
 #======================================================================
 # Odd place for this utility, but it is needed in both conversion & post
@@ -391,8 +318,6 @@ our $xml_libxml_version;    # [CONFIGURATION]
 BEGIN {
   $xml_libxml_version = $XML::LibXML::VERSION;
   $xml_libxml_version =~ s/_\d+$//;
-###  print STDERR "XML::LibXML Version $XML::LibXML::VERSION => $xml_libxml_version\n";
-
   if ($xml_libxml_version < 1.63) {
     *XML::LibXML::Document::toString = *encoding_XML_LibXML_Document_toString; }
   if ($xml_libxml_version < 1.59) {
@@ -403,3 +328,106 @@ BEGIN {
 
 #======================================================================
 1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+C<LaTeXML::Common::XML> - XML utilities
+
+=head1 DESCRIPTION
+
+This module provides utilities for accessing XML,
+along with some patches to XML::LibXML.
+
+
+=over 4
+
+=item C<element_nodes($node)>
+
+Returns a list of the element children of C<$node>.
+
+=item C<text_in_node($node)>
+
+Returns the string combining the text nodes within C<$node>.
+
+=item C<isTeXtNode($node)>
+
+Checks whether C<$node> is a text node.
+
+=item C<isElementNode($node)>
+
+Checks whether C<$node> is a element node.
+
+=item C<isChild($child,$parent)>
+
+Checks whether C<$child> is a child of C<$parent>.
+
+=item C<isDecscendant($child,$parent)>
+
+Checks whether C<$child> is a descendant of C<$parent>.
+
+=item C<isDecscendantOrSelf($child,$parent)>
+
+Checks whether C<$child> is a descendant of, or the same as, C<$parent>.
+
+=item C<new_node($nsURI,$tag,$children,%attributes)>
+
+Creates a new element node with tag C<$tag> (in the namespace C<$nsURI>),
+with the children in the array ref C<$children> (if any) and assigning the
+given attributes.
+
+=item C<append_nodes($node,@children)>
+
+Appends the given children to C<$node>.
+
+=item C<clear_node($node)>
+
+Removes all element and text children from C<$node>.
+
+=item C<maybe_clone($node)>
+
+Clones C<$node> if it has a parent, otherwise returns it.
+
+=item C<copy_attributes($to,$from)>
+
+Copy all attributes from C<$from> to C<$to>.
+
+=item C<rename_attribute($node,$from,$to)>
+
+Rename the attribute C<$from> to C<$to> on the node C<$node>.
+
+=item C<remove_attr($node,@attr)>
+
+Remove the given attributes from C<$node>.
+
+=item C<get_attr($node,@attr)>
+
+Returns the list of values for the given attributes on C<$node>
+
+=item C<initialize_catalogs()>
+
+Initialize XML::LibXML to recognize the catalogs given in LaTeXML.catalogs.
+
+=item C<set_RDFa_prefixes($document,$map)>
+
+This method scans the document's RDFa attributes, extracting the prefixes used.
+These prefixes are then filtered through a C<$map> of known RDFa prefixes
+and the ones allowed are declared globally for the document
+via the C<prefix> attribute of its root element.
+
+=back
+
+=head1 AUTHOR
+
+Bruce Miller <bruce.miller@nist.gov>,
+Deyan Ginev <deyan.ginev@nist.gov>
+
+=head1 COPYRIGHT
+
+Public domain software, produced as part of work done by the
+United States Government & not subject to copyright in the US.
+
+=cut

@@ -11,5 +11,13 @@ BEGIN {
 use strict;
 use warnings;
 
-use Test::Perl::Critic (-profile => "perlcritic.rc") x!! -e "perlcritic.rc";
-all_critic_ok();
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.006
+
+use Test::Perl::Critic (-profile => "") x!! -e "";
+
+my $filenames = ['lib/Perinci/CmdLine.pm','lib/Perinci/CmdLine/Manual.pod','lib/Perinci/CmdLine/Manual/Examples.pod','lib/Perinci/CmdLine/Manual/FAQ.pod','lib/Perinci/CmdLine/Manual/HowTo/Debugging.pod'];
+unless ($filenames && @$filenames) {
+    $filenames = -d "blib" ? ["blib"] : ["lib"];
+}
+
+all_critic_ok(@$filenames);

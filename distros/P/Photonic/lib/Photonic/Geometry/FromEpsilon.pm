@@ -1,5 +1,5 @@
 package Photonic::Geometry::FromEpsilon;
-$Photonic::Geometry::FromEpsilon::VERSION = '0.018';
+$Photonic::Geometry::FromEpsilon::VERSION = '0.021';
 
 =encoding UTF-8
 
@@ -44,7 +44,7 @@ has 'epsilon'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', required=>1,
 		documentation=>'Dielectric function as function of position');
 
 has 'B' =>(is=>'ro', isa=>'PDL', init_arg=>undef, builder=>'_B', lazy=>1,
-	   documentation=>'Charateristic function');
+	   documentation=>'Characteristic function');
 
 with 'Photonic::Roles::Geometry';
 
@@ -76,7 +76,7 @@ Photonic::Geometry::FromEpsilon
 
 =head1 VERSION
 
-version 0.018
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -100,7 +100,7 @@ cell.
 
 Creates a new Ph::G::FromEpsilon object
 
-$pdl is a 2:nx,ny,nz complex pdl whose value is the complex dielectric function for
+$pdl is a nx,ny,nz complex pdl whose value is the complex dielectric function for
 each point (nx,ny,nz) within the unit cell. The number
 of dimensions of its real and imaginary parts are the dimension of
 space, and each dimension is the number of voxels of the unit cell along the

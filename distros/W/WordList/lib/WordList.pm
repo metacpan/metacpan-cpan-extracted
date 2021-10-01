@@ -1,10 +1,5 @@
 package WordList;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-23'; # DATE
-our $DIST = 'WordList'; # DIST
-our $VERSION = '0.7.10'; # VERSION
-
 use strict 'subs', 'vars';
 
 use WordListBase ();
@@ -14,6 +9,11 @@ our @ISA = qw(WordListBase);
 # use Role::Tiny::With;
 # with 'WordListRole::WordList';
 # END IFUNBUILT
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-09-26'; # DATE
+our $DIST = 'WordList'; # DIST
+our $VERSION = '0.7.11'; # VERSION
 
 sub new {
     my $class = shift;
@@ -70,7 +70,7 @@ sub first_word {
 }
 
 sub pick {
-    my ($self, $n, $allow_duplicates) = @_; # but this implementaiton never produces duplicates
+    my ($self, $n, $allow_duplicates) = @_; # but this implementation never produces duplicates
 
     $n = 1 if !defined $n;
     die "Please specify a positive number of words to pick" if $n < 1;
@@ -83,6 +83,7 @@ sub pick {
             sub {
                 $i++;
                 $word = $_[0] if rand($i) < 1;
+                1;
             }
         );
         return $word;
@@ -101,6 +102,7 @@ sub pick {
                 # algorithm from Learning Perl, slightly modified
                 rand($i) < @words and splice @words, rand(@words), 1, $_[0];
             }
+            1;
         }
     );
     @words;
@@ -148,7 +150,7 @@ WordList - Specification and base class for WordList::*, modules that contain wo
 
 =head1 VERSION
 
-This document describes version 0.7.10 of WordList (from Perl distribution WordList), released on 2021-06-23.
+This document describes version 0.7.11 of WordList (from Perl distribution WordList), released on 2021-09-26.
 
 =head1 SYNOPSIS
 
@@ -269,12 +271,6 @@ implemented in terms of C<first_word()> and C<next_word()>, and
 C<word_exists()>, C<pick()>, and C<all_words()> are implemented in terms of
 C<each_word()>.
 
-=head1 CONTRIBUTOR
-
-=for stopwords perlancar (on netbook-dell-xps13)
-
-perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
-
 =head1 METHODS
 
 =head2 new
@@ -374,14 +370,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/WordList>.
 
 Source repository is at L<https://github.com/perlancar/perl-WordList>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=WordList>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 Related projects: L<ArrayData>, L<HashData>, L<TableData> are newer projects
@@ -399,11 +387,36 @@ CLI's are provided in L<App::wordlist> (L<wordlist>), L<App::WordListUtils>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=WordList>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

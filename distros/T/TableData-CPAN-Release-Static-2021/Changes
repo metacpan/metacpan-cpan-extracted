@@ -1,0 +1,11 @@
+20210928.1  2021-09-28  Released-By: PERLANCAR
+
+            - No functional changes.
+
+            - [build] Rebuild after enabling TableData dzil and Pod::Weaver
+              plugin.
+
+
+20210928.0  2021-09-28  Released-By: PERLANCAR
+
+            - First release.

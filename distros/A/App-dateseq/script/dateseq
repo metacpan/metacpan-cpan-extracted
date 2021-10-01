@@ -1,18 +1,18 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/dateseq/dateseq
-# and generated automatically using Perinci::CmdLine::Gen version 0.499
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-22'; # DATE
-our $DIST = 'App-dateseq'; # DIST
-our $VERSION = '0.103'; # VERSION
+# and generated automatically using Perinci::CmdLine::Gen version 0.500
 
 use 5.010001;
 use strict;
 use warnings;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-09-24'; # DATE
+our $DIST = 'App-dateseq'; # DIST
+our $VERSION = '0.105'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/dateseq/dateseq",
@@ -38,13 +38,13 @@ dateseq - Generate a sequence of dates
 
 =head1 VERSION
 
-This document describes version 0.103 of dateseq (from Perl distribution App-dateseq), released on 2021-08-22.
+This document describes version 0.105 of dateseq (from Perl distribution App-dateseq), released on 2021-09-24.
 
 =head1 SYNOPSIS
 
 Usage:
 
-% B<dateseq> [B<--business>|B<--no-business>|B<--nobusiness>] [B<--business6>|B<--no-business6>|B<--nobusiness6>] [(B<--exclude-dow>=I<date::dow_nums>)+] [(B<--exclude-month>=I<date::month_nums>)+] [B<--format-class-attrs>=I<s>] [B<--format-class>=I<perl::modname>] [B<--format>=I<name>|B<--json>] [B<--header>=I<str>] [(B<--include-dow>=I<date::dow_nums>)+] [(B<--include-month>=I<date::month_nums>)+] [B<--limit-monthly>=I<posint>] [B<--limit-yearly>=I<posint>] [B<--limit>=I<posint>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--reverse>|B<-r>] [B<--strftime>=I<str>] [B<--exclude-dow-json>=I<json>] [B<--exclude-month-json>=I<json>] [B<--format-class-attrs-json>=I<json>] [B<--include-dow-json>=I<json>] [B<--include-month-json>=I<json>] [B<-f>=I<str>] [B<-n>=I<posint>] -- [I<from>] [I<to>] [I<increment>]
+% B<dateseq> [B<--business>|B<--no-business>|B<--nobusiness>] [B<--business6>|B<--no-business6>|B<--nobusiness6>] [B<--eval>=I<str>] [(B<--exclude-dow>=I<date::dow_nums>)+] [(B<--exclude-month>=I<date::month_nums>)+] [B<--format-class-attrs>=I<s>] [B<--format-class>=I<perl::modname>] [B<--format>=I<name>|B<--json>] [B<--header>=I<str>] [(B<--include-dow>=I<date::dow_nums>)+] [(B<--include-month>=I<date::month_nums>)+] [B<--limit-monthly>=I<posint>] [B<--limit-yearly>=I<posint>] [B<--limit>=I<posint>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--reverse>|B<-r>] [B<--strftime>=I<str>] [B<--exclude-dow-json>=I<json>] [B<--exclude-month-json>=I<json>] [B<--format-class-attrs-json>=I<json>] [B<--include-dow-json>=I<json>] [B<--include-month-json>=I<json>] [B<-e>=I<str>] [B<-f>=I<str>] [B<-n>=I<posint>] -- [I<from>] [I<to>] [I<increment>]
 
 =head1 DESCRIPTION
 
@@ -210,6 +210,14 @@ will print something like:
 
 =over
 
+=item B<--eval>=I<s>, B<-e>
+
+Run perl code for each date.
+
+Specified perl code will receive the date as DateTime object in `$_`and expected
+to return result to print.
+
+
 =item B<--format>=I<s>
 
 Choose output format, e.g. json, text.
@@ -303,8 +311,6 @@ For fish and zsh, install L<shcompgen> as described above.
 
 =head1 EXAMPLES
 
-Examples:
-
 Generate "infinite" dates from today:
 
  % dateseq
@@ -321,11 +327,11 @@ Generate dates from 2015-01-01 to 2015-01-31:
 Generate dates from yesterday to 2 weeks from now:
 
  % dateseq yesterday "2 weeks from now"
- 2021-08-21T00:00:00
- 2021-08-22T00:00:00
+ 2021-09-23T00:00:00
+ 2021-09-24T00:00:00
  ... 12 more lines ...
- 2021-09-04T00:00:00
- 2021-09-05T00:00:00
+ 2021-10-07T00:00:00
+ 2021-10-08T00:00:00
 
 Generate dates from 2015-01-31 to 2015-01-01 (reverse):
 
@@ -481,6 +487,34 @@ Use %q (see DateTimeX::strftimeq):
  2021-01-14
  2021-01-15
 
+Print first and last days of each month of 2021:
+
+ % dateseq 2021-01-01 2021-12-01 --increment '1 month' -e 'my $dt2 = $_->clone; $dt2->add(months=>1); $dt2->add(days => -1); $_->ymd . " " . $dt2->ymd'
+ 2021-01-01 2021-01-31
+ 2021-02-01 2021-02-28
+ 2021-03-01 2021-03-31
+ 2021-04-01 2021-04-30
+ 2021-05-01 2021-05-31
+ ... 3 more lines ...
+ 2021-09-01 2021-09-30
+ 2021-10-01 2021-10-31
+ 2021-11-01 2021-11-30
+ 2021-12-01 2021-12-31
+
+Print first and last timestamp (in ISO format) of each month of 2021:
+
+ % dateseq 2021-01-01 2021-12-01 --increment '1 month' -e 'my $dt2 = $_->clone; $dt2->add(months=>1); $dt2->add(days => -1); $_->ymd . "T00:00:00 " . $dt2->ymd . "T23:59:59"'
+ 2021-01-01T00:00:00 2021-01-31T23:59:59
+ 2021-02-01T00:00:00 2021-02-28T23:59:59
+ 2021-03-01T00:00:00 2021-03-31T23:59:59
+ 2021-04-01T00:00:00 2021-04-30T23:59:59
+ 2021-05-01T00:00:00 2021-05-31T23:59:59
+ ... 3 more lines ...
+ 2021-09-01T00:00:00 2021-09-30T23:59:59
+ 2021-10-01T00:00:00 2021-10-31T23:59:59
+ 2021-11-01T00:00:00 2021-11-30T23:59:59
+ 2021-12-01T00:00:00 2021-12-31T23:59:59
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-dateseq>.
@@ -488,14 +522,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-datese
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-App-dateseq>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-dateseq>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -511,11 +537,36 @@ L<seq-pl>. Perl variant of seq.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2021, 2020, 2019, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-dateseq>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

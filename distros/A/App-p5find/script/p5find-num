@@ -1,0 +1,57 @@
+#!/usr/bin/env perl
+use v5.20;
+
+use feature qw(signatures);
+no warnings qw(experimental::signatures);
+
+use App::p5find qw<iter_each p5_doc_iterator p5_find_iterator print_file_linenum_line>;
+
+use Getopt::Long;
+
+sub print_usage {
+    print <<USAGE;
+Usage: p5find-num [switches] [--] [dir...]
+  -h    show this help message.
+
+USAGE
+}
+
+my %opts;
+GetOptions(
+    \%opts,
+    "h",
+);
+
+if ($opts{h}) {
+    print_usage();
+    exit(0);
+}
+
+my @paths = @ARGV;
+@paths = ('.') unless @paths;
+
+iter_each(
+    p5_doc_iterator(@paths),
+    sub ($doc) {
+        my %matched;
+        iter_each(
+            p5_find_iterator($doc, sub { $_[1]->isa("PPI::Token::Number") }),
+            sub ($num) {
+                $matched{ $num->line_number } = 1;
+            }
+        );
+
+        if (%matched) {
+            print_file_linenum_line($doc->filename, \%matched);
+        }
+    }
+);
+
+__END__
+
+=head1 Usage
+
+This program parse perl code and find the lines with numbers it. It is
+similar to "grep", but specialized for findding numerical literals.
+
+=cut

@@ -34,7 +34,7 @@ use PDL;
 use PDL::NiceSlice;
 use Photonic::Geometry::FromEpsilon;
 use Photonic::WE::S::Metric;
-use Photonic::WE::S::AllH;
+use Photonic::WE::S::Haydock;
 use Photonic::WE::S::EpsilonP;
 use Photonic::WE::S::EpsilonTensor;
 
@@ -128,7 +128,7 @@ $et=Photonic::WE::S::EpsilonTensor->new(nh=>1000, metric=>$m,
 $etv=$et->epsilonTensor->((1),(1));
 ok(Cagree($epstm, $etv, 1e-4), "Epsilon agrees with transfer matrix. Complex case.");
 
-my $h=Photonic::WE::S::AllH->new(nh=>1000, metric=>$m,
+my $h=Photonic::WE::S::Haydock->new(nh=>1000, metric=>$m,
    polarization=>r2C(pdl [0,1]), reorthogonalize=>1);
 $et=Photonic::WE::S::EpsilonP->new(nh=>1000, haydock=>$h);
 $etv=$et->epsilon;

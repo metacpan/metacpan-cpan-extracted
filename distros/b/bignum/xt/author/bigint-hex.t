@@ -1,9 +1,9 @@
-#!perl
+# -*- mode: perl; -*-
 
 use strict;
 use warnings;
 
-use Test::More tests => 507068;
+use Test::More tests => 253534;
 
 use Algorithm::Combinatorics qw< variations >;
 
@@ -37,6 +37,9 @@ for my $k (0 .. @$elements) {
         my $got_warn  = $warnings[$i];
 
         is($got_val,  $want_val,  qq|hex("$str") (output)|);
-        is($got_warn, $want_warn, qq|hex("$str") (warning)|);
+
+        # We warn about invalid characters when CORE::hex() doesn't, so
+        # comparing the warnings won't work.
+        #is($got_warn, $want_warn, qq|hex("$str") (warning)|);
     }
 }

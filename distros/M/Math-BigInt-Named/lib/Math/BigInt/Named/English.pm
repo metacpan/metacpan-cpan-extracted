@@ -1,4 +1,4 @@
-#!perl
+# -*- mode: perl; -*-
 
 package Math::BigInt::Named::English;
 
@@ -8,7 +8,7 @@ use warnings;
 use Math::BigInt::Named;
 our @ISA = qw< Math::BigInt::Named >;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 my $SMALL = [ qw/
   zero
@@ -208,7 +208,7 @@ __END__
 
 =head1 NAME
 
-Math::BigInt::Named::English - Math::BigInts that know their name in English
+Math::BigInt::Named::English - Math::BigInt objects that know their name in English
 
 =head1 SYNOPSIS
 
@@ -234,7 +234,7 @@ L<Math::BigInt::Named>.
 
     print Math::BigInt::Name -> name( 123 );
 
-Convert a BigInt to a name.
+Convert a Math::BigInt to a name.
 
 =head2 from_name()
 

@@ -1,3 +1,8 @@
+0.014   2021-10-01  Released-By: PERLANCAR; Urgency: medium
+
+	- [cli cek-bpom-products] Enable reading config & env.
+
+
 0.013   2021-02-19  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

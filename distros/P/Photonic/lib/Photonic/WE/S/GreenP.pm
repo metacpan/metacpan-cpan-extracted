@@ -1,5 +1,5 @@
 package Photonic::WE::S::GreenP;
-$Photonic::WE::S::GreenP::VERSION = '0.018';
+$Photonic::WE::S::GreenP::VERSION = '0.021';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::S::GreenP
 
 =head1 VERSION
 
-version 0.018
+version 0.021
 
 =head1 COPYRIGHT NOTICE
 
@@ -50,7 +50,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 =head1 DESCRIPTION
 
 Calculates the dielectric function for a given fixed
-Photonic::WE::S::AllH structure as a function of the dielectric
+Photonic::WE::S::Haydock structure as a function of the dielectric
 functions of the components.
 
 =head1 METHODS
@@ -61,7 +61,7 @@ functions of the components.
 
 Initializes the structure.
 
-$h is a Photonic::WE::S::AllH structure (required).
+$h is a Photonic::WE::S::Haydock structure (required).
 
 $nh is the maximum number of Haydock coefficients to use (required).
 
@@ -80,7 +80,7 @@ value of the  dielectric functions of the particle $epsB.
 
 =item * haydock
 
-The WE::S::AllH structure
+The WE::S::Haydock structure
 
 =item * epsA epsB
 
@@ -119,7 +119,7 @@ Criteria of convergence. 0 means don't check.
 
 use namespace::autoclean;
 use PDL::Lite;
-use Photonic::WE::S::AllH;
+use Photonic::WE::S::Haydock;
 use Photonic::Types;
 use Photonic::Utils qw(lentzCF);
 use List::Util qw(min);
@@ -132,7 +132,7 @@ has 'smallH'=>(is=>'ro', isa=>'Num', required=>1, default=>1e-7,
     	    documentation=>'Convergence criterium for Haydock coefficients');
 has 'smallE'=>(is=>'ro', isa=>'Num', required=>1, default=>1e-7,
     	    documentation=>'Convergence criterium for use of Haydock coeff.');
-has 'haydock' =>(is=>'ro', isa=>'Photonic::WE::S::AllH', required=>1);
+has 'haydock' =>(is=>'ro', isa=>'Photonic::WE::S::Haydock', required=>1);
 has 'nhActual'=>(is=>'ro', isa=>'Num', init_arg=>undef,
                  writer=>'_nhActual');
 has 'converged'=>(is=>'ro', isa=>'Num', init_arg=>undef, writer=>'_converged');
@@ -142,11 +142,12 @@ has 'Gpp'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef,
 
 sub _build_Gpp {
     my $self=shift;
-    $self->haydock->run unless $self->haydock->iteration;
-    my $epsR=$self->haydock->epsilonR;
-    my $as=$self->haydock->as;
-    my $bcs=$self->haydock->bcs;
-    my $min= min($self->nh, $self->haydock->iteration);
+    my $h = $self->haydock;
+    $h->run unless $h->iteration;
+    my $epsR=$h->epsilonR;
+    my $as=$h->as;
+    my $bcs=$h->bcs;
+    my $min= min($self->nh, $h->iteration);
     #    b0+a1/b1+a2/...
     #	lo debo convertir a
     #       1-a_0-g0g1b1^2/1-a1-g1g2b2^2/...
@@ -154,9 +155,9 @@ sub _build_Gpp {
     my ($fn, $n)=lentzCF(1-$as, -$bcs, $min, $self->smallE);
     #If there are less available coefficients than $self->nh and all
     #of them were used, there is no remaining work to do, so, converged
-    $self->_converged($n<$min || $self->haydock->iteration<=$self->nh);
+    $self->_converged($n<$min || $h->iteration<=$self->nh);
     $self->_nhActual($n);
-    my $g0b02=$self->haydock->gs->[0]*$self->haydock->b2s->slice("(0)");
+    my $g0b02=$h->gs->slice("(0)")*$h->b2s->slice("(0)");
     return $g0b02/($epsR*$fn);
 }
 

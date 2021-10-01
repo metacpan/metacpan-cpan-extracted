@@ -1,4 +1,4 @@
-#!perl
+# -*- mode: perl; -*-
 
 package Math::BigInt::Named;
 
@@ -11,7 +11,7 @@ use Carp qw( carp croak );
 use Math::BigInt 1.97;
 our @ISA = qw(Math::BigInt);
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 # Globals.
 
@@ -40,7 +40,7 @@ sub name {
     # output the name of the number
     my $x = shift;
 
-    # make Math::BigInt::Name -> name(123) work
+    # make Math::BigInt::Named -> name(123) work
     $x = $x -> new(shift) unless ref($x);
 
     return 'NaN' if $x -> is_nan();
@@ -91,7 +91,7 @@ sub name {
 }
 
 sub from_name {
-    # Create a Math::BigInt::Name from a name string. Not implemented.
+    # Create a Math::BigInt::Named from a name string. Not implemented.
 
     my $x = Math::BigInt -> bnan();
 }
@@ -104,7 +104,7 @@ __END__
 
 =head1 NAME
 
-Math::BigInt::Named - Math::BigInts that know their name in some languages
+Math::BigInt::Named - Math::BigInt objects that know their name in some languages
 
 =head1 SYNOPSIS
 
@@ -127,15 +127,15 @@ This is a subclass of Math::BigInt and adds support for named numbers.
 
 =head2 name()
 
-    print Math::BigInt::Name->name( 123 );
+    print Math::BigInt::Named->name( 123 );
 
-Convert a BigInt to a name.
+Convert a Math::BigInt to a name.
 
 =head2 from_name()
 
-    my $bigint = Math::BigInt::Name->from_name('hundertzwanzig');
+    my $bigint = Math::BigInt::Named->from_name('hundertzwanzig');
 
-Create a Math::BigInt::Name from a name string. B<Not yet implemented!>
+Create a Math::BigInt::Named from a name string. B<Not yet implemented!>
 
 =head1 BUGS
 

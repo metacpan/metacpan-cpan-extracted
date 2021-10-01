@@ -107,7 +107,7 @@ sub compileSchema {
 
 sub loadCompiledSchema {
   my ($self, $file) = @_;
-  NoteBegin("Loading compiled schema $file");
+  ProgressSpinup("Loading compiled schema $file");
   my $MODEL;
   open($MODEL, '<', $file) or Fatal('I/O', $file, undef, "Cannot open Compiled Model $file for reading", $!);
   my $line;
@@ -127,7 +127,7 @@ sub loadCompiledSchema {
       Fatal('internal', $file, undef, "Compiled model '$file' is malformatted at \"$line\""); }
   }
   close($MODEL);
-  NoteEnd("Loading compiled schema $file");
+  ProgressSpindown("Loading compiled schema $file");
   return; }
 
 #**********************************************************************
@@ -253,7 +253,7 @@ sub encodeQName {
 # NOTE: Reconsider how _Capture_ & _WildCard_ should be integrated!?!
 sub getNodeQName {
   my ($self, $node) = @_;
-  my $type = $node->nodeType;
+  my $type = ($node ? $node->nodeType : -1);
   if ($type == XML_TEXT_NODE) {
     return '#PCDATA'; }
   elsif ($type == XML_DOCUMENT_NODE) {
@@ -429,13 +429,13 @@ sub isInSchemaClass {
 #**********************************************************************
 sub describeModel {
   my ($self) = @_;
-  print STDERR "Doctype\n";
+  Debug("Doctype");
   foreach my $tag (sort keys %{ $$self{tagprop} }) {
     if (my $model = $$self{tagprop}{$tag}{model}) {
       if (keys %$model) {
-        print STDERR "$tag can contain " . join(', ', sort keys %{ $$self{tagprop}{$tag}{model} }) . "\n"; } }
+        Debug("$tag can contain " . join(', ', sort keys %{ $$self{tagprop}{$tag}{model} })); } }
     else {
-      print STDERR "$tag is empty\n"; }
+      Debug("$tag is empty"); }
   }
   return; }
 

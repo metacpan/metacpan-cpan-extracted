@@ -8,7 +8,7 @@ package App::GhostWork;
 # Copyright (c) 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSION = '0.04';
+$VERSION = '0.05';
 $VERSION = $VERSION;
 
 use 5.00503;
@@ -36,21 +36,22 @@ App::GhostWork - Barcode Logger(When,Where,Who,What,toWhich,Why,Howmanysec)
 =head1 DESCRIPTION
 
 This software creates log files from barcode data. The log files are in
-LTSV format and CSV format. Each record of LTSV file has the following
-labels.
+CSV format, LTSV format, and JSON5 format. Each record has the following
+fields.
 
   --------------------------------------------------------------
-  CSV-col  LTSV-label   meanings
+           LTSV-label
+  CSV-col  JSON5-label  meanings
   --------------------------------------------------------------
-    1      csv          All columns by CSV format
-    2      when_        When barcode was read ?
-    3      where_       Where barcode was read ? (COMPUTERNAME)
-    4      who          Who read the barcode ?
-    5      what         What barcode read ?
-    6      towhich      Which status after barcode was read ?
-    7      why          Why become its status ? (optional)
-    8      howmanysec   How many seconds to make this record
-    9      looseid      Moderately unique random numbers
+           csv          All columns by CSV format
+    1      when_        When barcode was read ?
+    2      where_       Where barcode was read ? (COMPUTERNAME)
+    3      who          Who read the barcode ?
+    4      what         What barcode read ?
+    5      towhich      Which status after barcode was read ?
+    6      why          Why become its status ? (optional)
+    7      howmanysec   How many seconds to make this record
+    8      looseid      Moderately unique random numbers
   --------------------------------------------------------------
 
 =head2 Command File Name
@@ -75,8 +76,9 @@ labels.
   The barcode information is recorded in log files with the following
   name.
   -----------------------------------------------------
-  LOG/when/towhich/when-towhich-who.ltsv
   LOG/when/towhich/when-towhich-who.csv
+  LOG/when/towhich/when-towhich-who.ltsv
+  LOG/when/towhich/when-towhich-who.json5
   -----------------------------------------------------
 
 =head1 AUTHOR

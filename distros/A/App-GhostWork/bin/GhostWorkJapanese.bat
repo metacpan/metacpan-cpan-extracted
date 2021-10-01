@@ -10,6 +10,7 @@ echo:   [Q] は [Q]uit  の略でプログラムを終了します。
 echo:   [R] は [R]etry の略で直前の操作をやり直せます。
 echo:
 
+setlocal
 set Q_WHO=あなたの名前は？
 set Q_TOWHICH=どの工程を行いますか？
 set Q_WHAT=どの帳票ですか？
@@ -18,5 +19,5 @@ set INFO_LOGFILE_IS=ログファイルは
 set INFO_DOUBLE_SCANNED=エラー発生：直前と同じバーコードです。
 set INFO_ANY_KEY_TO_EXIT=何かキーを押すと終了します。
 
-GhostWork %*
-
+call GhostWork.bat %*
+endlocal

@@ -3,7 +3,9 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1801;
+use Test::More tests => 3601;
+
+use Scalar::Util qw< refaddr >;
 
 ###############################################################################
 # Read and load configuration file and backend library.
@@ -39,12 +41,6 @@ die $@ if $@;
 
 ###############################################################################
 
-my $scalar_util_ok = eval { require Scalar::Util; };
-Scalar::Util -> import('refaddr') if $scalar_util_ok;
-
-diag "Skipping some tests since Scalar::Util is not installed."
-  unless $scalar_util_ok;
-
 can_ok($LIB, '_sadd');
 
 my @data;
@@ -77,10 +73,13 @@ for (my $i = 0 ; $i <= $#data ; ++ $i) {
     my ($in0, $in1, $in2, $in3, $out0, $out1) = @{ $data[$i] };
 
     my ($x, $y, @got);
+    my $test;
 
-    my $test = qq|\$x = $LIB->_new("$in0"); |
-             . qq|\$y = $LIB->_new("$in2"); |
-             . qq|\@got = $LIB->_sadd(\$x, "$in1", \$y, "$in3");|;
+    # $LIB -> _sadd($xabs, $xsgn, $yabs, $ysgn)
+
+    $test = qq|\$x = $LIB->_new("$in0"); |
+          . qq|\$y = $LIB->_new("$in2"); |
+          . qq|\@got = $LIB->_sadd(\$x, "$in1", \$y, "$in3");|;
 
     diag("\n$test\n\n") if $ENV{AUTHOR_DEBUGGING};
 
@@ -90,7 +89,7 @@ for (my $i = 0 ; $i <= $#data ; ++ $i) {
     subtest "_sadd() in list context: $test", sub {
         plan tests => 11;
 
-        cmp_ok(scalar @got, '==', 2,
+        cmp_ok(scalar(@got), '==', 2,
                "'$test' gives two output args");
 
         is(ref($got[0]), $REF,
@@ -108,12 +107,8 @@ for (my $i = 0 ; $i <= $#data ; ++ $i) {
         is($got[1], $out1,
            "'$test' second output arg has the right value");
 
-      SKIP: {
-            skip "Scalar::Util not available", 1 unless $scalar_util_ok;
-
-            isnt(refaddr($got[0]), refaddr($y),
-                 "'$test' output arg is not the second input arg");
-        }
+        isnt(refaddr($got[0]), refaddr($y),
+             "'$test' output arg is not the third input arg");
 
         is(ref($x), $REF,
            "'$test' first input arg is still a $REF");
@@ -122,9 +117,57 @@ for (my $i = 0 ; $i <= $#data ; ++ $i) {
            "'$test' first input arg has the correct value");
 
         is(ref($y), $REF,
-           "'$test' second input arg is still a $REF");
+           "'$test' third input arg is still a $REF");
 
         is($LIB->_str($y), $in2,
-           "'$test' second input arg is unmodified");
+           "'$test' third input arg is unmodified");
+    };
+
+    # $LIB -> _sadd($xabs, $xsgn, $yabs, $ysgn, 1)
+
+    $test = qq|\$x = $LIB->_new("$in0"); |
+          . qq|\$y = $LIB->_new("$in2"); |
+          . qq|\@got = $LIB->_sadd(\$x, "$in1", \$y, "$in3", 1);|;
+
+    diag("\n$test\n\n") if $ENV{AUTHOR_DEBUGGING};
+
+    eval $test;
+    is($@, "", "'$test' gives emtpy \$\@");
+
+    subtest "_sadd() in list context: $test", sub {
+        plan tests => 11;
+
+        cmp_ok(scalar(@got), '==', 2,
+               "'$test' gives two output args");
+
+        is(ref($got[0]), $REF,
+           "'$test' first output arg is a $REF");
+
+        is($LIB->_check($got[0]), 0,
+           "'$test' first output arg is valid");
+
+        is($LIB->_str($got[0]), $out0,
+           "'$test' first output arg has the right value");
+
+        is(ref($got[1]), '',
+           "'$test' second output arg is a scalar");
+
+        is($got[1], $out1,
+           "'$test' second output arg has the right value");
+
+        isnt(refaddr($got[0]), refaddr($x),
+             "'$test' output arg is not the first input arg");
+
+        is(ref($x), $REF,
+           "'$test' first input arg is still a $REF");
+
+        is($LIB->_str($x), $in0,
+           "'$test' first input arg is unmodified");
+
+        is(ref($y), $REF,
+           "'$test' third input arg is still a $REF");
+
+        ok($LIB->_str($y) eq $out0 || $LIB->_str($y) eq $in2,
+           "'$test' third input arg has the correct value");
     };
 }

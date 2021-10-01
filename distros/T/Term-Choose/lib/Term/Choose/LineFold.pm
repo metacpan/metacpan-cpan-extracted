@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.739';
+our $VERSION = '1.741';
 
 use Exporter qw( import );
 
@@ -70,7 +70,7 @@ sub print_columns {
 
 
 sub cut_to_printwidth {
-    my ( $str, $avail_width, $return_rest ) = @_;   # return_remainder
+    my ( $str, $avail_width, $return_remainder ) = @_;
     my $count = 0;
     my $total = 0;
     for my $i ( 0 .. ( length( $str ) - 1 ) ) {
@@ -80,16 +80,16 @@ sub cut_to_printwidth {
         }
         if ( ( $total = $total + $cache->[$c] ) > $avail_width ) {
             if ( ( $total - $cache->[$c] ) < $avail_width ) {
-                return substr( $str, 0, $count ) . ' ', substr( $str, $count ) if $return_rest;
+                return substr( $str, 0, $count ) . ' ', substr( $str, $count ) if $return_remainder;
                 return substr( $str, 0, $count ) . ' ';
             }
-            return substr( $str, 0, $count ), substr( $str, $count ) if $return_rest;
+            return substr( $str, 0, $count ), substr( $str, $count ) if $return_remainder;
             return substr( $str, 0, $count );
 
         }
         ++$count;
     }
-    return $str, '' if $return_rest;
+    return $str, '' if $return_remainder;
     return $str;
 }
 

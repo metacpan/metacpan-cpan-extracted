@@ -19,7 +19,7 @@ use warnings;
 # I generate code for up to 10-dimensional FFTs
 my $maxrank = 10;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 pp_setversion($VERSION);
 
 pp_addpm( {At => 'Top'}, slurp('README.pod') . <<'EOF' );
@@ -257,5 +257,5 @@ sub slurp
   local $/ = undef;
   my $contents = <FD>;
   close FD;
-  return qq{#line 0 "$filename"\n\n} . $contents;
+  return qq{\n#line 0 "$filename"\n\n} . $contents;
 }

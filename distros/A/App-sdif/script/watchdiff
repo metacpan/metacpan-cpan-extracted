@@ -25,23 +25,23 @@ use Getopt::EX::Hashed 'has'; {
 
     Getopt::EX::Hashed->configure(DEFAULT => [ is => 'ro' ]);
 
-    has help     => spec => ' h      ' ;
-    has version  => spec => ' v      ' ;
-    has debug    => spec => ' d      ' ;
-    has unit     => spec => '    =s  ' , default => '';
-    has diff     => spec => '    =s  ' ;
-    has exec     => spec => ' e  =s@ ' , default => [];
-    has refresh  => spec => '    :1  ' , default => 1;
-    has interval => spec => '    =i  ' , default => 2;
-    has count    => spec => '    =i  ' , default => 1000;
-    has clear    => spec => '    !   ' , default => 1;
-    has silent   => spec => ' s  !   ' , default => 0;
-    has mark     => spec => ' M  !   ' , default => 0;
-    has old      => spec => ' O  !   ' , default => 0;
-    has date     => spec => ' D  !   ' , default => 1;
-    has newline  => spec => ' N  !   ' , default => 1;
-    has colormap => spec => ' cm =s@ ' , default => [];
-    has plain    => spec => ' p      ' ,
+    has help     => ' h      ' ;
+    has version  => ' v      ' ;
+    has debug    => ' d      ' ;
+    has unit     => '    =s  ' , default => '';
+    has diff     => '    =s  ' ;
+    has exec     => ' e  =s@ ' , default => [];
+    has refresh  => ' r  :1  ' , default => 1;
+    has interval => ' i  =i  ' , default => 2;
+    has count    => ' c  =i  ' , default => 1000;
+    has clear    => '    !   ' , default => 1;
+    has silent   => ' s  !   ' , default => 0;
+    has mark     => ' M  !   ' , default => 0;
+    has old      => ' O  !   ' , default => 0;
+    has date     => ' D  !   ' , default => 1;
+    has newline  => ' N  !   ' , default => 1;
+    has colormap => ' cm =s@ ' , default => [];
+    has plain    => ' p      ' ,
 	action   => sub {
 	    $_->{date} = $_->{newline} = 0;
 	};
@@ -184,10 +184,6 @@ exit;
 
 watchdiff - repeat command and watch a difference
 
-=head1 VERSION
-
-Version 4.20.1
-
 =head1 SYNOPSIS
 
 watchdiff option -- command
@@ -205,6 +201,10 @@ Options:
 	--[no]clear         clear screen after output (default on)
 	--diff=command      diff command used to compare result
 	--unit=unit         comparison unit (word/char/mecab)
+
+=head1 VERSION
+
+Version 4.20.2
 
 =head1 EXAMPLES
 

@@ -32,7 +32,7 @@ use strict;
 use warnings;
 use PDL;
 use Photonic::Geometry::FromEpsilon;
-use Photonic::LE::S::OneH;
+use Photonic::LE::S::Haydock;
 
 use Test::More;
 use lib 't/lib';
@@ -45,7 +45,7 @@ my $f=6/11;
 my $eps=r2C($ea*(zeroes(11)->xvals<5)+ $eb*(zeroes(11)->xvals>=5));
 my $g=Photonic::Geometry::FromEpsilon
     ->new(epsilon=>$eps, Direction0=>pdl([1]));
-my $o=Photonic::LE::S::OneH->new(geometry=>$g);
+my $o=Photonic::LE::S::Haydock->new(geometry=>$g, nh=>3);
 $o->iterate;
 ok(Cagree(pdl($o->current_a), $ea*(1-$f)+$eb*$f), "1D a_0");
 ok(Cagree(pdl($o->next_b2), ($eb-$ea)**2*$f*(1-$f)), "1D b_1^2");

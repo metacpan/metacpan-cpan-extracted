@@ -15,10 +15,10 @@ $| = 1;
 my $recommend_versions =
   {
    #'Math::BigInt::Calc'        => '1.999819',
-   'Math::BigInt::FastCalc'    => '0.5010',
-   'Math::BigInt::GMP'         => '1.60018',
-   'Math::BigInt::Pari'        => '1.3007',
-   'Math::BigInt::BitVect'     => '1.17',
+   'Math::BigInt::FastCalc'    => '0.5006',
+   'Math::BigInt::GMP'         => '1.6000',
+   'Math::BigInt::Pari'        => '1.3000',
+   'Math::BigInt::BitVect'     => '1.13',
    'Math::BigInt::GMPz'        => '0.0005',
   };
 
@@ -78,6 +78,7 @@ my %WriteMakefileArgs =
    'PREREQ_PM'          => {
                             'Math::Complex'       => 1.36,
                             'Carp'                => 1.22,
+                            'Scalar::Util'        => 0,
                            },
 
    # A hash of modules that are needed to test the module but not run or build

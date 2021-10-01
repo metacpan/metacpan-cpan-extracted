@@ -1,4 +1,19 @@
+0.001111  2021-09-26 00:14:35-04:00 America/Toronto
+
+    - Fix Changelog
+
+0.001110  2021-09-25 23:02:34-04:00 America/Toronto
+
+    - Fix switch type for multiple tags
+
+0.001109  2021-09-25 18:21:13-04:00 America/Toronto
+
+    - Allow multiple tags
+
 0.001108  2021-03-15 20:17:37-04:00 America/Toronto
+
+    - Standardize file names
+    - Fix main module location
 
 0.001106  2021-02-23 13:39:08-05:00 America/Toronto
 

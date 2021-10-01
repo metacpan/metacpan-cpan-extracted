@@ -182,6 +182,8 @@ enum {
   SPVM_OP_C_ID_PRINT,
   SPVM_OP_C_ID_REFOP,
   SPVM_OP_C_ID_DUMP,
+  SPVM_OP_C_ID_TRUE,
+  SPVM_OP_C_ID_FALSE,
 };
 
 const char* const* SPVM_OP_C_ID_NAMES(void);
@@ -367,6 +369,7 @@ SPVM_OP* SPVM_OP_new_op_float_type(SPVM_COMPILER* compiler, const char* file, in
 SPVM_OP* SPVM_OP_new_op_double_type(SPVM_COMPILER* compiler, const char* file, int32_t line);
 SPVM_OP* SPVM_OP_new_op_string_type(SPVM_COMPILER* compiler, const char* file, int32_t line);
 SPVM_OP* SPVM_OP_new_op_undef_type(SPVM_COMPILER* compiler, const char* file, int32_t line);
+SPVM_OP* SPVM_OP_new_op_bool_type(SPVM_COMPILER* compiler, const char* file, int32_t line);
 SPVM_OP* SPVM_OP_new_op_byte_ref_type(SPVM_COMPILER* compiler, const char* file, int32_t line);
 SPVM_OP* SPVM_OP_new_op_short_ref_type(SPVM_COMPILER* compiler, const char* file, int32_t line);
 SPVM_OP* SPVM_OP_new_op_int_ref_type(SPVM_COMPILER* compiler, const char* file, int32_t line);
@@ -412,5 +415,8 @@ int32_t SPVM_OP_is_op_term_mutable(SPVM_COMPILER* compiler, SPVM_OP* op);
 SPVM_OP* SPVM_OP_sibling(SPVM_COMPILER* compiler, SPVM_OP* op);
 
 int32_t SPVM_OP_get_list_elements_count(SPVM_COMPILER* compiler, SPVM_OP* op_list);
+
+SPVM_OP* SPVM_OP_new_op_true(SPVM_COMPILER* compiler, SPVM_OP* op);
+SPVM_OP* SPVM_OP_new_op_false(SPVM_COMPILER* compiler, SPVM_OP* op);
 
 #endif

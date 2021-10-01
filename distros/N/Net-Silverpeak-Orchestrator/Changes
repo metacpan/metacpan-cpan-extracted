@@ -1,6 +1,33 @@
 Revision history for Net-Silverpeak-Orchestrator
 
+0.002000  2021-09-27 17:47:29+02:00 Europe/Vienna
+
+0.002000  2021-09-27 17:42:44+02:00 Europe/Vienna
+    - fix hardcoded template group name instead of
+      NET_SILVERPEAK_ORCHESTRATOR_POLICY environment variable
+    - skip appliance tests if Orchestrator has none assigned
+    - don't expect existing template group NET_SILVERPEAK_ORCHESTRATOR_POLICY
+      for tests but create it
+    - add create_templategroup method
+    - add update_templates_of_templategroup method
+    - add delete_templategroup method
+    - add list_addressgroup_names method
+    - add list_addressgroups method
+    - add create_or_update_addressgroup method
+    - add get_addressgroup method
+    - add delete_addressgroup method
+    - add update_addressgroup method
+    - add list_servicegroup_names method
+    - add list_servicegroups method
+    - add create_or_update_servicegroup method
+    - add get_servicegroup method
+    - add delete_servicegroup method
+    - add update_servicegroup method
+    - handle error responses that don't contain the expected error attribute
+    - update API tests for Silverpeak Orchestrator version 9.1
+
 0.001002  2021-02-19 07:35:30+01:00 Europe/Vienna
+    - fix Data::Dumper::Concise usage in t/api.t
 
 0.001001  2021-02-18 10:53:53+01:00 Europe/Vienna
     - initial release

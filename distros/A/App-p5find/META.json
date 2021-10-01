@@ -4,7 +4,7 @@
       "Kang-min Liu <gugod@gugod.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.027",
+   "generated_by" : "App::ModuleBuildTiny version 0.029",
    "license" : [
       "mit"
    ],
@@ -21,7 +21,7 @@
       },
       "develop" : {
          "requires" : {
-            "App::ModuleBuildTiny" : "0.027"
+            "App::ModuleBuildTiny" : "0.029"
          }
       },
       "runtime" : {
@@ -29,6 +29,11 @@
             "File::Next" : "0",
             "PPI" : "0",
             "PPIx::QuoteLike" : "0",
+            "Pod::Usage" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
             "Test2::V0" : "0"
          }
       }
@@ -36,7 +41,7 @@
    "provides" : {
       "App::p5find" : {
          "file" : "lib/App/p5find.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -50,8 +55,8 @@
          "web" : "https://github.com/gugod/App-p5find"
       }
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.06",
    "x_spdx_expression" : "MIT",
    "x_static_install" : "1"
 }

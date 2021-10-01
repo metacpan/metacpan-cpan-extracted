@@ -16,7 +16,8 @@ Redis::OpenTracing - Wrap Redis inside OpenTracing
     use Redis::OpenTracing;
     
     my $redis = Redis::OpenTracing->new(
-        redis => Redis->new( ... ),
+        redis => Redis->new( ),
+        tags  => { 'peer.address' => '127.0.0.1:6379' },
     );
     
     my $value = $redis->get( 'my-key' );
@@ -46,18 +47,37 @@ Creates a new C<Redis::OpenTracing> client.
 
     my $redis = Redis::OpenTracing->new(
         redis => Redis::Fast->new,
+        tags  => {
+            'component'    => 'Perl5 Redis::Fast 0.31',
+            'peer.address' => '127.0.0.1:6379',
+        }
     );
 
 =over
 
-=item Required Parameter(s)
+=item Required Named Parameter(s)
 
 =over
 
-=item C<redis>
+=item C<redis> (C<Object>)
 
 A (existing) Redis client. This must be something like an instance of L<Redis>,
 and implement its methods to work properly.
+
+=back
+
+=item Optional Named Parameter(s)
+
+=over
+
+=item C<tags> (C<HashRef[Values]>)
+
+A hash reference that can hold tags being used for span enrichment. OpenTracing
+expects the following tags: C<component>, C<db.statement>, C<db.type>,
+C<span.kind>, and C<peer.address>. The C<component> can be set, but defaults to
+the classname of the C<redis> client. It is strongly advised to provide a the
+C<peer.addres>, which can not be easily extracted at a reliable way. The other
+tags can  not be changed and are hard coded.
 
 =back
 

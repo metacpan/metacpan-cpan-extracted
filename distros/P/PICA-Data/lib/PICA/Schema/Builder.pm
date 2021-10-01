@@ -1,9 +1,8 @@
 package PICA::Schema::Builder;
 use v5.14.1;
 
-our $VERSION = '1.30';
+our $VERSION = '1.33';
 
-use PICA::Schema qw(field_identifier);
 use Scalar::Util qw(reftype);
 use Storable qw(dclone);
 
@@ -11,7 +10,7 @@ use parent 'PICA::Schema';
 
 sub new {
     my $class = shift;
-    bless {fields => {}, total => 0, @_}, $class;
+    bless {fields => {}, records => 0, @_}, $class;
 }
 
 sub add {
@@ -24,9 +23,9 @@ sub add {
     foreach (@$record) {
         my ($tag, $occ, @content) = @$_;
 
-        my $id = field_identifier($_);
+        my $id = $self->field_identifier($_);
 
-        # check whether field is repeated within thin record
+        # check whether field is repeated within this record
         if ($field_identifiers{$id}) {
             $fields->{$id}{repeatable} = \1;
         }
@@ -34,12 +33,13 @@ sub add {
             $field_identifiers{$id} = 1;
         }
 
-        # field has not been inspected yet
+        # field has not been seen in any record
         if (!$fields->{$id}) {
             next if $self->{ignore_unknown};
-            $fields->{$id} = {total => 0, tag => $tag, subfields => {},};
+            $fields->{$id}
+                = {total => 0, records => 0, tag => $tag, subfields => {},};
             $fields->{$id}{occurrence} = $occ if $occ > 0 && length $id gt 4;
-            $fields->{$id}{required}   = \1 unless $self->{total};
+            $fields->{$id}{required} = \1 unless $self->{records};
         }
 
         my $subfields = $fields->{$id}{subfields};
@@ -68,7 +68,12 @@ sub add {
             delete $subfields->{$_}{required};
         }
 
+        # count total number of this field
         $fields->{$id}{total}++;
+    }
+
+    for (grep {exists $fields->{$_}} keys %field_identifiers) {
+        $fields->{$_}{records}++;
     }
 
     # fields not given in this record are not required
@@ -76,7 +81,7 @@ sub add {
         delete $fields->{$_}{required};
     }
 
-    $self->{total}++;
+    $self->{records}++;
 }
 
 sub schema {
@@ -109,18 +114,43 @@ PICA::Schema::Builder - Create Avram Schema from examples
 
 An L<Avram Schema|https://format.gbv.de/schema/avram/specification> can be
 created automatically from L<PICA::Data> records. The result contains a list of
-field that have been used in any of the inspected records. The schema can tell
-which fields occurr in all records (C<required>), whether a field has been
-repeated in a record (C<repeatable>), and the same information for subfields
-(C<subfields>). Subfield order is not taken into account.
+field that have been used in any of the inspected records. The schema can tell:
+
+=over
+
+=item
+
+the number of inspected C<records>
+
+=item
+
+which C<fields> and their C<subfields> have been found in records
+
+=item
+
+the C<total> number each field has been found and the number of C<records>
+with each field.
+
+=item
+
+which of the fields occurr in all records (C<required>)
+
+=item
+
+whether a field has been repeated in a record (C<repeatable>)
+
+=back
+
+And information about requiredness and repeatability for subfields.
+Subfield order is not taken into account.
 
 This class is a subclass of L<PICA::Schema>.
 
 =head1 CONSTRUCTOR
 
 The builder can be initialized with information of an existing builder or
-schema, in particular C<fields> and C<total>. Option C<ignore_unknown> will
-ignore fields not already specified in C<fields>.
+schema, in particular C<fields>, C<total>, and C<records>. Option
+C<ignore_unknown> will ignore fields not already specified in C<fields>.
 
 =head1 METHODS
 

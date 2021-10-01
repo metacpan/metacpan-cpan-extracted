@@ -22,6 +22,8 @@ use LaTeXML::Util::Pathname;
 use Encode qw(decode);
 use base qw(LaTeXML::Common::Object);
 
+our $READLINE_PROGRESS_QUANTUM = 25;
+
 # Factory method;
 # Create an appropriate Mouth
 # options are
@@ -55,7 +57,7 @@ sub new {
   my $self = bless { source => $options{source},
     shortsource    => $options{shortsource},
     fordefinitions => ($options{fordefinitions} ? 1 : 0),
-    notes          => ($options{notes} ? 1 : 0),
+    notes          => ($options{notes}          ? 1 : 0),
   }, $class;
   $self->openString($string);
   $self->initialize;
@@ -65,7 +67,7 @@ sub openString {
   my ($self, $string) = @_;
   #  if (0){
   if (defined $string) {
-    if (utf8::is_utf8($string)) { }    # If already utf7
+    if    (utf8::is_utf8($string)) { }                                    # If already utf7
     elsif (my $encoding = $STATE->lookupValue('PERL_INPUT_ENCODING')) {
      # Note that if chars in the input cannot be decoded, they are replaced by \x{FFFD}
      # I _think_ that for TeX's behaviour we actually should turn such un-decodeable chars in to space(?).
@@ -87,7 +89,7 @@ sub initialize {
     my $source = defined($$self{source}) ? ($$self{source} || 'Literal String') : 'Anonymous String';
     $$self{note_message} = "Processing " . ($$self{fordefinitions} ? "definitions" : "content")
       . " " . $source;
-    NoteBegin($$self{note_message}); }
+    ProgressSpinup($$self{note_message}); }
   if ($$self{fordefinitions}) {
     $$self{saved_at_cc}            = $STATE->lookupCatcode('@');
     $$self{SAVED_INCLUDE_COMMENTS} = $STATE->lookupValue('INCLUDE_COMMENTS');
@@ -97,16 +99,19 @@ sub initialize {
 
 sub finish {
   my ($self) = @_;
-  $$self{buffer} = [];
-  $$self{lineno} = 0;
-  $$self{colno}  = 0;
-  $$self{chars}  = [];
-  $$self{nchars} = 0;
+  return if $$self{finished};
+  $$self{finished} = 1;
+  $$self{buffer}   = [];
+  $$self{lineno}   = 0;
+  $$self{colno}    = 0;
+  $$self{chars}    = [];
+  $$self{nchars}   = 0;
+
   if ($$self{fordefinitions}) {
     $STATE->assignCatcode('@' => $$self{saved_at_cc});
     $STATE->assignValue(INCLUDE_COMMENTS => $$self{SAVED_INCLUDE_COMMENTS}); }
   if ($$self{notes}) {
-    NoteEnd($$self{note_message}); }
+    ProgressSpindown($$self{note_message}); }
   return; }
 
 # This is (hopefully) a platform independent way of splitting a string
@@ -114,8 +119,11 @@ sub finish {
 # Note that TeX considers newlines to be \r, ie CR, ie ^^M
 sub splitLines {
   my ($string) = @_;
-  $string =~ s/(?:\015\012|\015|\012)/\r/sg;    #  Normalize remaining
-  return split("\r", $string); }                # And split.
+  my @lines = split(/\r\n|\r|\n/s, $string, -1);
+  # split returns an extra empty string if $string ends with an EOL
+  # this must be removed
+  if (@lines && $lines[-1] eq '') { pop(@lines); }
+  return @lines; }
 
 # This is (hopefully) a correct way to split a line into "chars",
 # or what is probably more desired is "Grapheme clusters" (even "extended")
@@ -131,7 +139,7 @@ sub getNextLine {
   my ($self) = @_;
   return unless scalar(@{ $$self{buffer} });
   my $line = shift(@{ $$self{buffer} });
-  return (scalar(@{ $$self{buffer} }) ? $line . "\r" : $line); }    # No CR on last line!
+  return $line; }
 
 sub hasMoreInput {
   my ($self) = @_;
@@ -203,7 +211,7 @@ sub handle_escape {    # Read control sequence
       $cs .= $ch; }
     # We WILL skip spaces, but not till next token is read (in case catcode changes!!!!)
     $$self{skipping_spaces} = 1;
-    $$self{colno}--; }
+    $$self{colno}-- if (defined $cc) && ($cc != CC_LETTER); }
   return T_CS($cs); }
 
 sub handle_EOL {
@@ -221,7 +229,7 @@ sub handle_space {
   my ($ch, $cc);
   # Skip any following spaces!
   while ((($ch, $cc) = getNextChar($self)) && (defined $ch) && (($cc == CC_SPACE) || ($cc == CC_EOL))) { }
-  $$self{colno}-- if ($$self{colno} < $$self{nchars});
+  $$self{colno}-- if ($$self{colno} <= $$self{nchars}) && (defined $ch);    # backup at nonspace/eol
   return T_SPACE; }
 
 sub handle_comment {
@@ -230,7 +238,12 @@ sub handle_comment {
   $$self{colno} = $$self{nchars};
   my $comment = join('', @{ $$self{chars} }[$n .. $$self{nchars} - 1]);
   $comment =~ s/^\s+//; $comment =~ s/\s+$//;
-  return ($comment && $STATE->lookupValue('INCLUDE_COMMENTS') ? T_COMMENT($comment) : undef); }
+  if ($comment && $STATE->lookupValue('INCLUDE_COMMENTS')) {
+    return T_COMMENT($comment); }
+  elsif (($STATE->lookupValue('PRESERVE_NEWLINES') || 0) > 1) {
+    return T_MARKER('EOL'); }                                               # Required EOL during \read
+  else {
+    return; } }
 
 # These cache the (presumably small) set of distinct letters, etc
 # converted to Tokens.
@@ -246,21 +259,21 @@ my %ACTIVE = ();
 # Possibly want to think about caching (common) letters, etc to keep from
 # creating tokens like crazy... or making them more compact... or ???
 my @DISPATCH = (    # [CONSTANT]
-  \&handle_escape,    # T_ESCAPE
-  sub { ($_[1] eq '{' ? T_BEGIN : Token($_[1], CC_BEGIN)) },    # T_BEGIN
-  sub { ($_[1] eq '}' ? T_END   : Token($_[1], CC_END)) },      # T_END
-  sub { ($_[1] eq '$' ? T_MATH  : Token($_[1], CC_MATH)) },     # T_MATH
-  sub { ($_[1] eq '&' ? T_ALIGN : Token($_[1], CC_ALIGN)) },    # T_ALIGN
-  \&handle_EOL,                                                 # T_EOL
-  sub { ($_[1] eq '#' ? T_PARAM : Token($_[1], CC_PARAM)) },    # T_PARAM
-  sub { ($_[1] eq '^' ? T_SUPER : Token($_[1], CC_SUPER)) },    # T_SUPER
-  sub { ($_[1] eq '_' ? T_SUB   : Token($_[1], CC_SUB)) },      # T_SUB
-  sub { undef; },                                               # T_IGNORE (we'll read next token)
-  \&handle_space,                                               # T_SPACE
+  \&handle_escape,                                                      # T_ESCAPE
+  sub { ($_[1] eq '{' ? T_BEGIN : Token($_[1], CC_BEGIN)) },            # T_BEGIN
+  sub { ($_[1] eq '}' ? T_END   : Token($_[1], CC_END)) },              # T_END
+  sub { ($_[1] eq '$' ? T_MATH  : Token($_[1], CC_MATH)) },             # T_MATH
+  sub { ($_[1] eq '&' ? T_ALIGN : Token($_[1], CC_ALIGN)) },            # T_ALIGN
+  \&handle_EOL,                                                         # T_EOL
+  sub { ($_[1] eq '#' ? T_PARAM : Token($_[1], CC_PARAM)) },            # T_PARAM
+  sub { ($_[1] eq '^' ? T_SUPER : Token($_[1], CC_SUPER)) },            # T_SUPER
+  sub { ($_[1] eq '_' ? T_SUB   : Token($_[1], CC_SUB)) },              # T_SUB
+  sub { undef; },    # T_IGNORE (we'll read next token)
+  \&handle_space,    # T_SPACE
   sub { $LETTER{ $_[1] } || ($LETTER{ $_[1] } = T_LETTER($_[1])); },    # T_LETTER
   sub { $OTHER{ $_[1] }  || ($OTHER{ $_[1] }  = T_OTHER($_[1])); },     # T_OTHER
   sub { $ACTIVE{ $_[1] } || ($ACTIVE{ $_[1] } = T_ACTIVE($_[1])); },    # T_ACTIVE
-  \&handle_comment,                                                     # T_COMMENT
+  \&handle_comment,          # T_COMMENT
   sub { T_OTHER($_[1]); }    # T_INVALID (we could get unicode!)
 );
 
@@ -276,48 +289,55 @@ sub readToken {
       $$self{lineno}++;
       $$self{colno} = 0;
       my $line = $self->getNextLine;
+      # For \read, we have to return something for EOL, and handle implicit final newline
+      my $read_mode = (($STATE->lookupValue('PRESERVE_NEWLINES') || 0) > 1);
+      my $eolch     = "\r";
+      if (my $eol = $STATE->lookupDefinition(T_CS('\endlinechar'))) {
+        $eol   = $eol->valueOf()->valueOf;
+        $eolch = (($eol > 0) && ($eol <= 255) ? chr($eol) : undef); }
       if (!defined $line) {    # Exhausted the input.
+        my $eolcc    = ((defined $eolch) && $STATE->lookupCatcode($eolch)) // CC_OTHER;
+        my $eoftoken = $read_mode && (defined $eolch) && !$$self{at_eof} && $$self{source}
+          && ($eolcc == CC_EOL ? T_CS('\par')
+          : Token($eolch, $eolcc));
         $$self{at_eof} = 1;
         $$self{chars}  = [];
         $$self{nchars} = 0;
+        return $eoftoken if $eoftoken;
         return; }
-      # Remove trailing space, but NOT a control space!  End with CR (not \n) since this gets tokenized!
-      $line =~ s/((\\ )*)\s*$/$1/s;
-      # Then append the appropriaate \endlinechar, or "\r"
-      if (my $eol = $STATE->lookupDefinition(T_CS('\endlinechar'))) {
-        # \endlinechar<0 or >255 means no character is appended
-        $eol = $eol->valueOf()->valueOf;
-        $line .= chr($eol) if $eol >= 0 and $eol <= 255; }
-      else {
-        $line .= "\r"; }
+      # Remove trailing spaces from external sources
+      if ($$self{source}) { $line =~ s/ *$//s; }
+      # Then append the appropriate \endlinechar, or "\r";
+      $line .= $eolch if defined $eolch;
+
       $$self{chars}  = splitChars($line);
       $$self{nchars} = scalar(@{ $$self{chars} });
+      # In state N, skip spaces
       while (($$self{colno} < $$self{nchars})
         # DIRECT ACCESS to $STATE's catcode table!!!
         && (($$STATE{catcode}{ $$self{chars}[$$self{colno}] }[0] || CC_OTHER) == CC_SPACE)) {
         $$self{colno}++; }
-
+      # If upcoming line is empty, and there is no recognizable EOL, fake one
+      return T_MARKER('EOL') if $read_mode
+        && ($$self{colno} >= $$self{nchars}) && ((!defined $eolch) || ($eolch ne "\r"));
       # Sneak a comment out, every so often.
-      if ((($$self{lineno} % 25) == 0) && $STATE->lookupValue('INCLUDE_COMMENTS')) {
+      if ((($$self{lineno} % $READLINE_PROGRESS_QUANTUM) == 0) && $STATE->lookupValue('INCLUDE_COMMENTS')) {
         return T_COMMENT("**** " . ($$self{shortsource} || 'String') . " Line $$self{lineno} ****"); }
     }
-    if ($$self{skipping_spaces}) {    # Skip spaces now
+    if ($$self{skipping_spaces}) {    # In state S, skip spaces
       my ($ch, $cc);
-      while ((($ch, $cc) = getNextChar($self)) && $ch && ($cc == CC_SPACE)) { }
-      $$self{colno}-- if ($$self{colno} < $$self{nchars});
+      while ((($ch, $cc) = getNextChar($self)) && (defined $ch) && ($cc == CC_SPACE)) { }
+      $$self{colno}-- if ($$self{colno} <= $$self{nchars}) && (defined $cc) && ($cc != CC_SPACE);
       if ((defined $cc) && ($cc == CC_EOL)) {    # If we've got an EOL
-            # if in \read mode, leave the EOL to be turned into a T_SPACE
-        if (($STATE->lookupValue('PRESERVE_NEWLINES') || 0) > 1) { }
-        else {    # else skip it.
-          getNextChar($self);
-          $$self{colno}-- if ($$self{colno} < $$self{nchars}); } }
+        getNextChar($self);
+        $$self{colno}-- if ($$self{colno} < $$self{nchars}); }
       $$self{skipping_spaces} = 0; }
 
     # ==== Extract next token from line.
     my ($ch, $cc) = getNextChar($self);
     my $token = (defined $cc ? $DISPATCH[$cc] : undef);
     $token = &$token($self, $ch) if ref $token eq 'CODE';
-    return $token if defined $token;    # Else, repeat till we get something or run out.
+    return $token if defined $token;             # Else, repeat till we get something or run out.
 
   }
   return; }
@@ -346,7 +366,8 @@ sub readRawLine {
   my $line;
   if ($$self{colno} < $$self{nchars}) {
     $line = join('', @{ $$self{chars} }[$$self{colno} .. $$self{nchars} - 1]);
-    # End lines with \n, not CR, since the result will be treated as strings
+    # strip the final carriage return, if it has been added back
+    $line =~ s/\r$//s;
     $$self{colno} = $$self{nchars}; }
   elsif ($noread) {
     $line = ''; }
@@ -356,11 +377,11 @@ sub readRawLine {
       $$self{at_eof} = 1;
       $$self{chars}  = []; $$self{nchars} = 0; $$self{colno} = 0; }
     else {
+      $line =~ s/ *$//s;
       $$self{lineno}++;
       $$self{chars}  = splitChars($line);
       $$self{nchars} = scalar(@{ $$self{chars} });
       $$self{colno}  = $$self{nchars}; } }
-  $line =~ s/\s*$//s if defined $line;    # Is this right?
   return $line; }
 
 sub isEOL {
@@ -369,19 +390,14 @@ sub isEOL {
   # We have to peek past any to-be-skipped spaces!!!!
   if ($$self{skipping_spaces}) {
     my ($ch, $cc);
-    while ((($ch, $cc) = getNextChar($self)) && $ch && ($cc == CC_SPACE)) { }
-    $$self{colno}-- if ($$self{colno} < $$self{nchars});
+    while ((($ch, $cc) = getNextChar($self)) && (defined $ch) && ($cc == CC_SPACE)) { }
+    $$self{colno}-- if ($$self{colno} <= $$self{nchars}) && (defined $cc) && ($cc != CC_SPACE);
     if ((defined $cc) && ($cc == CC_EOL)) {    # If we've got an EOL
-          # if in \read mode, leave the EOL to be turned into a T_SPACE
-      if (($STATE->lookupValue('PRESERVE_NEWLINES') || 0) > 1) { }
-      else {    # else skip it.
-        getNextChar($self);
-        $$self{colno}-- if ($$self{colno} < $$self{nchars}); } }
-  }
+      getNextChar($self);
+      $$self{colno}-- if ($$self{colno} < $$self{nchars}); } }
   my $eol = $$self{colno} >= $$self{nchars};
   $$self{colno} = $savecolno;
-  return $eol;
-}
+  return $eol; }
 #======================================================================
 1;
 

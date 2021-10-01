@@ -36,7 +36,7 @@ our @EXPORT = (qw(
 #
 # An Alignment object is a sort of fake Whatsit;
 # It takes some magic to sneak it into the Digestion stream
-# (see TeX.pool \@open@alignment), but it needs to be created
+# (see TeX.pool \@start@alignment), but it needs to be created
 # BEFORE the contents of the alignment are digested,
 # since we stuff a lot of information into it
 # (row, column boxes, borders, spacing, etc...)
@@ -48,6 +48,7 @@ our @EXPORT = (qw(
 # because an Alignment currently doesn't know what CS created it (debugging!);
 # Also, it would better connect the things being constructed, reversion, etc.
 #======================================================================
+DebuggableFeature('alignment', "Debug guessing headers of alignments/tables");
 
 # Create a new Alignment.
 # %data can contain:
@@ -62,11 +63,12 @@ our @EXPORT = (qw(
 sub new {
   my ($class, %data) = @_;
   my $self = bless {%data}, $class;
-  $$self{template} = LaTeXML::Core::Alignment::Template->new() unless $$self{template};
-  $$self{template} = parseAlignmentTemplate($$self{template})  unless ref $$self{template};
-  $$self{rows}     = [];
+  $$self{template}       = LaTeXML::Core::Alignment::Template->new() unless $$self{template};
+  $$self{template}       = parseAlignmentTemplate($$self{template})  unless ref $$self{template};
+  $$self{rows}           = [];
   $$self{current_column} = 0;
   $$self{current_row}    = undef;
+  $$self{level}          = $STATE->getFrameDepth;
   $$self{properties}     = {} unless $$self{properties};
   # Copy any attribute width, height, depth to main properties.
   if (my $attributes = $$self{properties}{attributes}) {
@@ -119,14 +121,14 @@ sub rows {
 
 sub addLine {
   my ($self, $border, @cols) = @_;
-  my $row = $$self{current_row};
-  if (@cols) {
-    foreach my $c (@cols) {
-      my $colspec = $row->column($c);
-      $$colspec{border} .= $border; } }
-  else {
-    foreach my $colspec (@{ $$row{columns} }) {
-      $$colspec{border} .= $border; } }
+  if (my $row = $$self{current_row}) {
+    if (@cols) {
+      foreach my $c (@cols) {
+        my $colspec = $row->column($c);
+        $$colspec{border} .= $border; } }
+    else {
+      foreach my $colspec (@{ $$row{columns} }) {
+        $$colspec{border} .= $border; } } }
   return; }
 
 sub nextColumn {
@@ -139,13 +141,23 @@ sub nextColumn {
     $colspec = $$self{current_row}->column($$self{current_column}); }
   return $colspec; }
 
+sub lastColumn {
+  my ($self) = @_;
+  my $row = $$self{current_row};
+  return unless $row;
+  $$self{current_column} = scalar @{ $$row{columns} };
+  return $row->column($$self{current_column}); }
+
 sub currentColumnNumber {
   my ($self) = @_;
   return $$self{current_column}; }
 
 sub currentRowNumber {
   my ($self) = @_;
-  return scalar(@{ $$self{rows} }); }
+  my $n = 0;
+  foreach my $row (@{ $$self{rows} }) {
+    $n++ unless $$row{pseudorow}; }
+  return $n; }
 
 sub currentColumn {
   my ($self) = @_;
@@ -166,6 +178,81 @@ sub addAfterRow {
   $$self{current_row}{after} = [@{ $$self{current_row}{after} || [] }, @boxes];
   return; }
 
+sub omitColumn {
+  my ($self) = @_;
+  if (my $column = $self->currentColumn) {
+    $$column{omitted} = 1; }
+  return; }
+
+sub omitNextColumn {
+  my ($self) = @_;
+  if (my $column = $$self{current_row} && $$self{current_row}->column($$self{current_column} + 1)) {
+    $$column{omitted} = 1; }
+  return; }
+
+sub getColumnBefore {
+  my ($self) = @_;
+  my $column;
+  if (($column = $self->currentColumn) && !$$column{omitted}) {
+    return Tokens(T_CS('\@column@before'), @{ $$column{before} }); }
+  else {
+    return Tokens(); } }
+
+sub getColumnAfter {
+  my ($self) = @_;
+  my $column;
+  if (($column = $self->currentColumn) && !$$column{omitted}) {
+    # Possible \@@eat@space ??? (if LaTeX style???)
+    return Tokens(@{ $$column{after} }, T_CS('\@column@after')); }
+  else {
+    return Tokens(); } }
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# Support for building an alignment's Rows & Columns
+
+sub startRow {
+  my ($self, $pseudorow) = @_;
+  $self->newRow;
+  my $stomach = $STATE->getStomach;
+  $stomach->bgroup;    # Grouping around ROW!
+  if ($pseudorow) {
+    $self->currentRow->{pseudorow} = 1; }
+  else {
+    push(@LaTeXML::LIST, $stomach->digest(T_CS('\@row@before'))); }
+  $$self{in_row} = 1;
+  $STATE->assignValue(alignmentStartColumn => 0);    # ???
+  return; }
+
+sub endRow {
+  my ($self) = @_;
+  return unless $$self{in_row};
+  $self->endColumn() if $$self{in_column};
+  $STATE->getStomach->egroup;                        # Grouping around ROW!
+                                                     #  Digest(T_CS('\@row@after'));
+  $$self{in_row} = undef;
+  return; }
+
+sub startColumn {
+  my ($self, $pseudorow) = @_;
+  if (!$$self{in_row}) {
+    $self->startRow($pseudorow); }
+  elsif ($pseudorow) {
+    $self->currentRow->{pseudorow} = 1; }
+  $STATE->getStomach->bgroup;    # Grouping around CELL!
+                                 # Note: a VERY round-about way of tracking the column spanning!
+  $STATE->assignValue(alignmentStartColumn => $self->currentColumnNumber);
+  my $colspec = $self->nextColumn;
+  $LaTeXML::ALIGN_STATE = 1000000;
+  $$self{in_column} = 1;
+  return; }
+
+sub endColumn {
+  my ($self) = @_;
+  return unless $$self{in_column};
+  $STATE->getStomach->egroup;    # Grouping around CELL!
+  $$self{in_column} = undef;
+  return; }
+
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # Making the Alignment act like a Whatsit
 sub toString {
@@ -179,50 +266,24 @@ sub stringify {
 
 sub revert {
   my ($self) = @_;
-  return $self->getBody->revert; }
+  if ($LaTeXML::DUAL_BRANCH && ($LaTeXML::DUAL_BRANCH eq 'content') && $$self{content_reversion}) {
+    return $$self{content_reversion}->unlist; }
+  return $$self{reversion}->unlist; }
 
-sub computeSize_internal {
-  my ($self) = @_;
-  $self->normalizeAlignment;
-  my @rowheights = ();
-  my @colwidths  = ();
-  # add \baselineskip between rows? Or max the row heights with it ...
-  my $base = $STATE->lookupDefinition(T_CS('\baselineskip'))->valueOf->valueOf;
-  foreach my $row (@{ $$self{rows} }) {
-    # Do we need to account for any space in the $$row{before} or $$row{after}?
-    my @cols  = @{ $$row{columns} };
-    my $ncols = scalar(@cols);
-    if (my $short = $ncols - scalar(@colwidths)) {
-      push(@colwidths, map { 0 } 1 .. $short); }
-    my ($rowh, $rowd) = ($base * 0.7, $base * 0.3);
-    for (my $i = 0 ; $i < $ncols ; $i++) {
-      my $cell = $cols[$i];
-      next if $$cell{skipped};
-      next unless $$cell{boxes};
-      my ($w, $h, $d) = $$cell{boxes}->getSize(align => $$cell{align}, width => $$cell{width},
-        vattach => $$cell{vattach});
-      if (($$cell{colspan} || 1) == 1) {
-        $colwidths[$i] = max($colwidths[$i], $w->valueOf); }
-      else { }    # Could check afterwards that spanned columns are wide enough?
-      if (($$cell{rowspan} || 1) == 1) {
-        $rowh = max($rowh, $h->valueOf);
-        $rowd = max($rowd, $d->valueOf); }
-      else { }    # Ditto spanned rows
-    }
-    push(@rowheights, $rowh + $rowd + 0.5 * $base); }    # somehow our heights are way too short????
-  return ([@rowheights],[@colwidths]); }
+sub setReversion {
+  my ($self, $tokens) = @_;
+  $$self{reversion} = $tokens;
+  return; }
+
+sub setContentReversion {
+  my ($self, $tokens) = @_;
+  $$self{content_reversion} = $tokens;
+  return; }
 
 sub computeSize {
-  my ($self, %options) = @_;
-  my ($rowheights, $colwidths) = $self->computeSize_internal();
-  my $props      = $self->getPropertiesRef;
-  my $ww = Dimension(sum(@$colwidths));
-  my $hh = Dimension(sum(@$rowheights));
-  my $dd = Dimension(0);
-  $$props{width}  = $ww unless defined $$props{width};
-  $$props{height} = $hh unless defined $$props{height};
-  $$props{depth}  = $dd unless defined $$props{depth};
-  return; }
+  my ($self) = @_;
+  $self->normalizeAlignment;
+  return ($$self{cwidth}, $$self{cheight}, $$self{cdepth}); }
 
 #======================================================================
 # Constructing the XML for the alignment.
@@ -233,11 +294,23 @@ sub beAbsorbed {
   my $body   = $self->getBody;
   my $ismath = $$self{isMath};
   $self->normalizeAlignment;
+  my @rows = @{ $$self{rows} };
+  return unless @rows;
   # We _should_ attach boxes to the alignment and rows,
   # but (ATM) we've only got sensible boxes for the cells.
-  &{ $$self{openContainer} }($document, ($attr ? %$attr : ()));
-  foreach my $row (@{ $$self{rows} }) {
-    &{ $$self{openRow} }($document, 'xml:id' => $$row{id}, tags => $$row{tags});
+  &{ $$self{openContainer} }($document, ($attr ? %$attr : ()),
+    cwidth       => $$self{cwidth}, cheight => $$self{cheight}, cdepth => $$self{cdepth},
+    rowheights   => $$self{rowheights},
+    columnwidths => $$self{columnwidths},
+  );
+  foreach my $row (@rows) {
+    my $vpad = $$row{padding};
+    &{ $$self{openRow} }($document,
+      'xml:id' => $$row{id}, tags => $$row{tags},
+      # Which properties do we expose to the constructor?
+      x      => $$row{x}, y => $$row{y},
+      cwidth => $$row{cwidth}, cheight => $$row{cheight}, cdepth => $$row{cdepth},
+    );
     if (my $before = $$row{before}) {
       map { $document->absorb($_) } @$before; }
     foreach my $cell (@{ $$row{columns} }) {
@@ -245,14 +318,19 @@ sub beAbsorbed {
       # Normalize the border attribute
       my $border = join(' ', sort(map { split(/ */, $_) } $$cell{border} || ''));
       $border =~ s/(.) \1/$1$1/g;
-      my $empty = !$$cell{boxes} || !scalar($$cell{boxes}->unlist);
+      my $empty = $$cell{empty} || !$$cell{boxes} || !scalar($$cell{boxes}->unlist);
       $$cell{cell} = &{ $$self{openColumn} }($document,
-        align => $$cell{align}, width => $$cell{width},
+        align   => $$cell{align}, width => $$cell{width},
         vattach => $$cell{vattach},
-        (($$cell{colspan} || 1) != 1 ? (colspan => $$cell{colspan}) : ()),
-        (($$cell{rowspan} || 1) != 1 ? (rowspan => $$cell{rowspan}) : ()),
-        ($border ? (border => $border) : ()),
-        ($$cell{thead} ? (thead => join(' ', sort keys %{ $$cell{thead} })) : ()));
+        ($vpad                       ? (cssstyle => 'padding-bottom:' . ToString($vpad))     : ()),
+        (($$cell{colspan} || 1) != 1 ? (colspan  => $$cell{colspan})                         : ()),
+        (($$cell{rowspan} || 1) != 1 ? (rowspan  => $$cell{rowspan})                         : ()),
+        ($border                     ? (border   => $border)                                 : ()),
+        ($$cell{thead}               ? (thead    => join(' ', sort keys %{ $$cell{thead} })) : ()),
+        # Which properties do we expose to the constructor?
+        x      => $$cell{x}, y => $$cell{y},
+        cwidth => $$cell{cwidth}, cheight => $$cell{cheight}, cdepth => $$cell{cdepth},
+      );
       if (!$empty) {
         local $LaTeXML::BOX = $$cell{boxes};
         $document->openElement('ltx:XMArg', rule => 'Anything,') if $ismath;    # Hacky!
@@ -269,7 +347,6 @@ sub beAbsorbed {
   # [This should be an afterConstruct somewhere?]
   # If requested to guess headers & we're not nested inside another tabular
   if (!$document->findnodes("ancestor::ltx:tabular", $node)) {
-##    my $hashead = $document->findnodes('descendant::ltx:td[contains(@class,"thead")]', $node);
     my $hashead = $document->findnodes('descendant::ltx:td[@thead]', $node);
     # If requested && no cells are already marked as being thead, apply heuristic
     if ($self->getProperty('guess_headers') && !$hashead) {
@@ -303,14 +380,158 @@ sub beAbsorbed {
 sub normalizeAlignment {
   my ($self) = @_;
   return if $$self{normalized};
-  my $ismath = $$self{isMath};
-  my $preserve = $$self{isMath} || $self->getProperty('preserve_structure');
+  #======================================================================
+  $self->normalize_cell_sizes();
+  $self->normalize_mark_spans();
+  $self->normalize_prune_rows();
+  $self->normalize_prune_columns();
+  $self->normalize_sum_sizes();
+  #======================================================================
+  $$self{normalized} = 1;
+  return; }
 
+# Compute (approximate) sizes of all cells
+sub normalize_cell_sizes {
+  my ($self) = @_;
+  # Examines: boxes, align, vattach
+  # Sets: cwidth, cheight, cdepth (per cell) & empty
+  foreach my $row (@{ $$self{rows} }) {
+    # Do we need to account for any space in the $$row{before} or $$row{after}?
+    foreach my $cell (@{ $$row{columns} }) {
+      if (my $boxes = $$cell{boxes}) {
+        my ($w, $h, $d, $cw, $ch, $cd)
+          = $boxes->getSize(align => $$cell{align}, width => $$cell{width},
+          vattach => $$cell{vattach});
+        Debug("CELL (" . join(',', map { $_ . "=" . ToString($$cell{$_}); } qw(align width vattach))
+            . ") size " . showSize($cw, $ch, $cd)
+            . " Boxes=" . ToString($boxes)) if $LaTeXML::DEBUG{halign} && $LaTeXML::DEBUG{size};
+        my $empty =
+          ((!$cw) || $cw->valueOf < 1)
+          || (((!$ch) || $ch->valueOf < 1)
+          && ((!$cd) || $cd->valueOf < 1))
+          || !(grep { !$_->getProperty('isSpace'); } $boxes->unlist);
+        $$cell{cwidth}  = $w || Dimension(0);
+        $$cell{cheight} = $h || Dimension(0);
+        $$cell{cdepth}  = $d || Dimension(0);
+        $$cell{empty}   = $empty;
+        $$cell{align}   = undef if $empty; }
+      else {
+        $$cell{empty} = 1; }
+  } }
+  return; }
+
+sub showSize {
+  my ($w, $h, $d) = @_;
+  return '[' . ToString($w) . ' x ' . ToString($h) . ' + ' . ToString($d) . ']'; }
+
+sub normalize_sum_sizes {
+  my ($self)     = @_;
+  my @rowheights = ();
+  my @colwidths  = ();
+  my @colrights  = ();
+  my @collefts   = ();
+  # Uses cell's cwidth,cheight,cdepth
+  # Computes net row & column sizes & positions
+  # add spacing between rows? Or only from \\[..] ?
+  my $strut = $self->getProperty('strut') || Dimension(0);
+  my $hs    = $strut->multiply(0.7);
+  my $ds    = $strut->multiply(0.3);
+  my @rows  = @{ $$self{rows} };
+  my $nrows = scalar(@rows);
+
+  for (my $i = 0 ; $i < $nrows ; $i++) {
+    my $row   = $rows[$i];
+    my @cols  = @{ $$row{columns} };
+    my $ncols = scalar(@cols);
+    if (my $short = $ncols - scalar(@colwidths)) {    # Extend column arrays, if needed
+      push(@colwidths, map { 0 } 1 .. $short);
+      push(@collefts,  map { 0 } 1 .. $short);
+      push(@colrights, map { 0 } 1 .. $short); }
+    my ($rowh, $rowd) = (0, 0);
+    my ($rowt, $rowb) = (($$row{tpadding} ? $$row{tpadding}->valueOf : 0),
+      ($$row{bpadding} ? $$row{bpadding}->valueOf : 0));
+    for (my $j = 0 ; $j < $ncols ; $j++) {
+      my $cell = $cols[$j];
+      next if $$cell{skipped};
+      next unless $$cell{boxes};
+      my $w = $$cell{cwidth};
+      my $h = $$cell{cheight};
+      my $d = $$cell{cdepth};
+      my $t = $$cell{tpadding};
+      my $b = $$cell{bpadding};
+      my $r = $$cell{rpadding};
+      my $l = $$cell{lpadding};
+
+      if (($$cell{colspan} || 1) == 1) {
+        $colwidths[$j] = max($colwidths[$j], $w->valueOf) if $w;
+        $collefts[$j]  = max($collefts[$j],  $l->valueOf) if $l;
+        $colrights[$j] = max($colrights[$j], $r->valueOf) if $r; }
+      if (($$cell{rowspan} || 1) == 1) {
+        $rowh = max($rowh, $h->valueOf) if $h;
+        $rowd = max($rowd, $d->valueOf) if $d;
+        $rowt = max($rowt, $t->valueOf) if $t;
+        $rowb = max($rowb, $b->valueOf) if $b; }
+      else { }    # Ditto spanned rows
+    }
+    $$row{cheight}  = Dimension($rowh)->larger($hs);
+    $$row{cdepth}   = Dimension($rowd)->larger($ds);
+    $$row{tpadding} = Dimension($rowt);
+    $$row{bpadding} = Dimension($rowb);
+    # NOTE: Should be storing column widths to; individually, as well as per-column!
+    push(@rowheights, $rowh + $rowd); }    # somehow our heights are way too short????
+  ## Now compute the positions
+  my @rowpos = ();
+  my @colpos = ();
+  my $y      = 0;
+  # Row & column positions: left,top
+  for (my $i = 0 ; $i < scalar(@rowheights) ; $i++) {
+    my $row = $rows[$i];
+    $y += $$row{tpadding}->valueOf if $$row{tpadding};
+    $rowpos[$i] = Dimension($y);
+    $y += $$row{cheight}->valueOf  if $$row{cheight};
+    $y += $$row{cdepth}->valueOf   if $$row{cdepth};
+    $y += $$row{bpadding}->valueOf if $$row{bpadding}; }
+  my $x = 0;
+  for (my $j = 0 ; $j < scalar(@colwidths) ; $j++) {
+    $x += $collefts[$j];
+    $colpos[$j] = Dimension($x);
+    $x += $colwidths[$j];
+    $x += $colrights[$j]; }
+  $$self{cwidth}  = Dimension($x);
+  $$self{cheight} = Dimension($y);    # or account for vertical position of array as a whole?
+  $$self{cdepth}  = Dimension(0);
+  for (my $i = 0 ; $i < scalar(@rowheights) ; $i++) {
+    my $row   = $rows[$i];
+    my @cols  = @{ $$row{columns} };
+    my $ncols = scalar(@cols);
+    $$row{x}      = $colpos[0]; $$row{y} = $rowpos[$i];
+    $$row{cwidth} = Dimension($x);
+    for (my $j = 0 ; $j < $ncols ; $j++) {
+      my $cell = $cols[$j];
+      ## NOTE Should do some further positioning (depending on align!!)
+      ## my $dx = Dimension($colwidths[$j])->subtract($$cell{cwidth})->divide(2);
+      $$cell{x} = $colpos[$j]; $$cell{y} = $rowpos[$i];
+      Debug("CELL[$j,$i] " . showSize($$cell{cwidth}, $$cell{cheight}, $$cell{cdepth})
+          . " @ " . ToString($$cell{x}) . "," . ToString($$cell{y})
+          . " w/ " . join(',', map { $_ . '=' . ToString($$cell{$_}); }
+            (qw(align vattach skipped colspan rowspan))))
+        if $LaTeXML::DEBUG{halign} && $LaTeXML::DEBUG{size};
+  } }
+  $$self{columnwidths} = [map { Dimension($_); } @colwidths];
+  $$self{rowheights}   = [map { Dimension($_); } @rowheights];
+  Debug("ALIGNMENT " . showSize($$self{cwidth}, $$self{cheight}, $$self{cdepth}))
+    if $LaTeXML::DEBUG{halign} && $LaTeXML::DEBUG{size};
+  return; }
+
+# Mark any cells that are covered by rowspan or colspan
+sub normalize_mark_spans {
+  my ($self) = @_;
+  # Examines: rowspan, colspan, pseudorow, empty
+  # Sets: skipped, colspanned, rowspanned
   my @rows = @{ $$self{rows} };
-  # Mark any cells that are covered by rowspans
   for (my $i = 0 ; $i < scalar(@rows) ; $i++) {
-    my @row = @{ $rows[$i]->{columns} };
-
+    my $row = $rows[$i];
+    my @row = @{ $$row{columns} };
     for (my $j = 0 ; $j < scalar(@row) ; $j++) {
       my $col = $row[$j];
       my ($nc, $nr);
@@ -319,74 +540,92 @@ sub normalizeAlignment {
         foreach (my $jj = $j + 1 ; $jj < $j + $nc ; $jj++) {
           my $ccol = $row[$jj];
           $$ccol{skipped}    = 1;
-          $$ccol{colspanned} = $j;    # note that this column is spanned by column $j
-          if (my $nr = $$ccol{rowspan}) {    # If this spanned column has rowspan
-            $$col{rowspan} = $nr; } } }      # copy rowspan to initial column
+          $$ccol{colspanned} = $j;            # note that this column is spanned by column $j
+          if (my $cnr = $$ccol{rowspan}) {    # If this spanned column has rowspan
+            $$col{rowspan} = $cnr; } } }      # copy rowspan to initial column
       if (($nr = $$col{rowspan} || 1) > 1) {    # If this column spans rows
         my $nr_orig = $nr;
-        my $nc = $$col{colspan} || 1;
+        my $ncspan  = $$col{colspan} || 1;
         # Mark all spanned columns in following rows as skipped.
-        for (my $ii = $i + 1 ; $ii < $i + $nr ; $ii++) {
+        my $nrc = $nr;
+        my $ii;
+        for ($ii = $i + 1 ; $nrc ; $ii++) {
           # Prescan the columns to make sure they're empty!
-          my $rowempty = 1;
-          my $rrow     = $rows[$ii];
+          my $rowempty  = 1;
+          my $rrow      = $rows[$ii];
+          my $rowpseudo = $$rrow{pseudorow};
+          $nrc-- unless $rowpseudo;
           if ($rrow) {
-            for (my $jj = $j ; $jj < $j + $nc ; $jj++) {
+            for (my $jj = $j ; $jj < $j + $ncspan ; $jj++) {
               if (my $ccol = $$rrow{columns}[$jj]) {
                 if (!$$ccol{empty}) {
                   $rowempty = 0; } } } }
-          if (!$rrow || !$rowempty) {
+          if    (!$nrc) { }
+          elsif (!$rrow || !$rowempty) {
             # Prescan the columns to make sure they're empty!
-            $nr = $$col{rowspan} = $ii - $i;
+            my $oldnr = $nr;
+            $nr  = $$col{rowspan} = $nr - $nrc;
+            $nrc = 0;
             Info('unexpected', 'rowspan', undef,
-              "Rowspan in cell($i,$j) covers non-empty cells; truncating."); }
+              "Rowspan $oldnr in cell($i,$j) covers non-empty cells; truncating.to $nr"); }
           elsif ($rrow) {
-            for (my $jj = $j ; $jj < $j + $nc ; $jj++) {
+            for (my $jj = $j ; $jj < $j + $ncspan ; $jj++) {
               if (my $ccol = $$rrow{columns}[$jj]) {
                 $$ccol{skipped}    = 1;
-                $$ccol{rowspanned} = $i; } } }    # note that this column is spanned by row $i
-        }
-        # And, if the last (skipped) columns have a bottom border, copy that to the rowspanned col
-        if (my $rrow = $rows[$i + $nr - 1]) {
+                $$ccol{rowspanned} = $i; } } } }    # note that this column is spanned by row $i
+            # And, if the last (skipped) columns have a bottom border, copy that to the rowspanned col
+        if (my $rrow = $rows[$ii - 1]) {
           my $sborder = '';
           for (my $jj = $j ; $jj < $j + $nc ; $jj++) {
             if (my $ccol = $$rrow{columns}[$jj]) {
               my $border = $$ccol{border} || '';
-              $border =~ s/[^bB]//g;              # mask all but bottom border
+              $border =~ s/[^bB]//g;    # mask all but bottom border
               $sborder = $border unless $sborder; } }
           $$col{border} .= $sborder if $sborder; }
   } } }
+  return; }
 
-#  if (!$ismath) {                       # Best not to do this in math? At least not in equationgroups!
 # Now scan for and remove empty rows & columns
 # but copying borders and adjusting rowspan's & colspan's appropriately.
-# First, do rows.
+sub normalize_prune_rows {
+  my ($self) = @_;
+  # Examines: rowspan,rowspanned, border, pseudorow, empty
+  # Sets: border, rowspan
+  my $preserve = $$self{isMath} || $self->getProperty('preserve_structure');
+  # First, do rows.
+  my @rows     = @{ $$self{rows} };
   my @filtered = ();
   for (my $i = 0 ; $i < scalar(@rows) ; $i++) {
     my $row = $rows[$i];
-    foreach my $col (@{ $$row{columns} }) {    # Mark all empty columns
-      $$col{empty} = 1 unless $$col{boxes} && $$col{boxes}->unlist; }
     if (grep { !$$_{empty} } @{ $$row{columns} }) {    # Not empty! so keep it
       push(@filtered, $row); }
     elsif (my $next = $rows[$i + 1]) {    # Remove empty row, but copy top border to NEXT row
       if ($preserve) {
-        push(@filtered, $row); next; }    # don't remove inner rows from math
+        push(@filtered, $row); next; }    # don't remove inner rows from math EXCEPT last row!!
       my $nc = scalar(@{ $$row{columns} });
+      my ($pruneh, $pruned) = (0, 0);
       for (my $j = 0 ; $j < $nc ; $j++) {
         my $col = $$row{columns}[$j];
-        if (defined $$col{rowspanned}) {
+        $pruneh = max($pruneh, $$col{cheight}->valueOf) if $$col{cheight};
+        $pruned = max($pruned, $$col{cdepth}->valueOf)  if $$col{cdepth};
+        if (!$$row{pseudorow} && defined $$col{rowspanned}) {
           $rows[$$col{rowspanned}]{columns}[$j]{rowspan}--; }    # Decrement rowspan of spanning column
         my $border = $$col{border} || '';
         $border =~ s/[^tTbB]//g;                                 # mask all but top & bottom border
         $border =~ s/b/t/g;                                      # but convert to top
         $border =~ s/B/T/g;                                      # but convert to top
-        $$next{columns}[$j]{border} .= $border; } }              # add to next row
+        $$next{columns}[$j]{border} .= $border; }                # add to NEXT row
+          # This tpadding should be combined w/any extra rowspacing from \\[dim] !
+      $$next{tpadding} = Dimension($pruneh + $pruned) if $pruneh + $pruned; }    # And save padding.
     else {    # Remove empty last row, but copy top border to bottom of prev.
       my $prev = $filtered[-1];
       my $nc   = scalar(@{ $$row{columns} });
+      my ($pruneh, $pruned) = (0, 0);
       for (my $j = 0 ; $j < $nc ; $j++) {
         my $col = $$row{columns}[$j];
-        if (defined $$col{rowspanned}) {
+        $pruneh = max($pruneh, $$col{cheight}->valueOf) if $$col{cheight};
+        $pruned = max($pruned, $$col{cdepth}->valueOf)  if $$col{cdepth};
+        if (!$$row{pseudorow} && defined $$col{rowspanned}) {
           $rows[$$col{rowspanned}]{columns}[$j]{rowspan}--; }    # Decrement rowspan of spanning column
         my $border = $$col{border} || '';
         $border =~ s/[^tT]//g;                                   # mask all but top border
@@ -395,38 +634,45 @@ sub normalizeAlignment {
         my $ccol = $$prev{columns}[$j];
         if (defined $$ccol{rowspanned}) {                        # skip to spanning column if rowspanned!
           $ccol = $rows[$$ccol{rowspanned}]{columns}[$j]; }
-        $$ccol{border} .= $border; } }                           # add to previous row.
+        $$ccol{border} .= $border; }                             # add to PREVIOUS row.
+      $$prev{bpadding} = Dimension($pruneh + $pruned) if $pruneh + $pruned; }    # And save padding.
   }
   @rows = @filtered;
   $$self{rows} = [@filtered];
-  #return;
-  # Now columns.
+  return; }
+
+sub normalize_prune_columns {
+  my ($self) = @_;
+  my $preserve = $$self{isMath} || $self->getProperty('preserve_structure');
+  # Now prune empty columns.
   if (!$preserve) {    # Don't remove empty columns from math.
-    my $nc = 0;
+    my @rows = @{ $$self{rows} };
+    my $nc   = 0;
     foreach my $row (@rows) {
       my $n = scalar(@{ $$row{columns} });
       $nc = $n if $n > $nc; }
-    for (my $j = $nc - 1 ; $j >= 0 ; $j--) {
+    for (my $j = $nc - 1 ; $j >= 0 ; $j--) {    # Prune from RIGHT!
       if (!grep { (defined $$_{columns}[$j]) && !$$_{columns}[$j]{empty} } @rows) {    # Empty!
+        my $prunew = 0;
         foreach my $row (@rows) {
           if (my $col = $$row{columns}[$j]) {
             if (defined $$col{colspanned}) {
               $$row{columns}[$$col{colspanned}]{colspan}--; }    # Decrement colspan of spanning column
+            $prunew = max($prunew, $$col{cwidth}) if $$col{cwidth};
             my $border = $$col{border} || '';
             if ($j > 0) {
               my $prev = $$row{columns}[$j - 1];
               if (my $jj = $$prev{colspanned}) {
                 $prev = $$row{columns}[$jj]; }
-              $border =~ s/[^rRlL]//g;                           # mask all but left border
-              $border =~ s/l/r/g;                                # convert to right
-              $border =~ s/L/R/g;                                # convert to right
+              $border =~ s/[^rRlL]//g;                              # mask all but left border
+              $border =~ s/l/r/g;                                   # convert to right
+              $border =~ s/L/R/g;                                   # convert to right
               $$prev{border} .= $border;
               if (my @preserve = preservedBoxes($$col{boxes})) {    # Copy boxes over, in case side effects?
                 $$prev{boxes} = LaTeXML::Core::List($$prev{boxes}
                   ? ($$prev{boxes}->unlist, @preserve) : @preserve); }
             }
             elsif (my $next = $$row{columns}[1]) {
-              my $border = $$col{border} || '';
               $border =~ s/[^rRlL]//g;                              # mask all but left & right border
               $border =~ s/r/l/g;                                   # but convert to left
               $border =~ s/R/L/g;                                   # but convert to left
@@ -436,9 +682,30 @@ sub normalizeAlignment {
                   ? (@preserve, $$next{boxes}->unlist) : @preserve); }
             }    # Now, remove the column
             $$row{columns} = [grep { $_ ne $col } @{ $$row{columns} }];
-    } } } }
-  }
-  $$self{normalized} = 1;
+        } }
+        if ($j) {    # If not 1st row, add right padding to previous column
+          foreach my $row (@rows) {
+            if (my $col = $$row{columns}[$j - 1]) {
+              $$col{rpadding} = Dimension($prunew); } } }
+        else {       # Else add left padding to (newly) first column
+          foreach my $row (@rows) {    # And add the padding to previous column
+            if (my $col = $$row{columns}[0]) {
+              $$col{lpadding} = Dimension($prunew); } } }
+  } } }
+  return; }
+
+sub show_row {
+  my ($i, $row) = @_;
+  Debug("\nRow[$i]:" . join(', ', map { $_ . '=' . ToString($$row{$_}); }
+        grep { $_ ne 'columns'; } sort keys %$row));
+  my @c = @{ $$row{columns} };
+  for (my $j = 1 ; @c ; $j++) {
+    show_col($i, $j, shift(@c)); }
+  return; }
+
+sub show_col {
+  my ($i, $j, $col) = @_;
+  Debug("Column[$i,$j]:" . join(', ', map { $_ . '=' . ToString($$col{$_}); } sort keys %$col));
   return; }
 
 sub preservedBoxes {
@@ -461,26 +728,19 @@ sub ReadAlignmentTemplate {
   my $nopens = 0;
   while (my $open = $gullet->readToken) {
     if ($open->equals(T_BEGIN)) { $nopens++; }
-    else { $gullet->unread($open); last; } }
+    else                        { $gullet->unread($open); last; } }
   my $defn;
   while (my $op = $gullet->readToken) {
-    if ($op->equals(T_SPACE)) { }
+    if    ($op->equals(T_SPACE)) { }
     elsif ($op->equals(T_END)) {
       while (--$nopens && ($op = $gullet->readToken)->equals(T_END)) { }
       last unless $nopens;
       $gullet->unread($op); }
     elsif (defined($defn = $STATE->lookupDefinition(T_CS('\NC@rewrite@' . ToString($op))))
       && $defn->isExpandable) {
-      # A variation on $defn->invoke, so we can reconstruct the reversion
-      my @args = $defn->readArguments($gullet);
-      if (my $exp = $defn->doInvocation($gullet, @args)) {    # This just expanded into other stuff
-        $gullet->unread(@{$exp}); }
-      else {
-        push(@tokens, $op);
-        if (my $param = $defn->getParameters) {
-          push(@tokens, $param->revertArguments(@args)); } } }
-    elsif ($op->equals(T_BEGIN)) {                            # Wrong, but a safety valve
-      $gullet->unread($gullet->readBalanced->unlist); }
+      $gullet->unread($defn->invoke($gullet, 1)); }
+    elsif ($op->equals(T_BEGIN)) {    # Wrong, but a safety valve
+      $gullet->unread($gullet->readBalanced); }
     else {
       Warn('unexpected', $op, $gullet, "Unrecognized tabular template '" . Stringify($op) . "'"); }
     last unless $nopens; }
@@ -510,13 +770,13 @@ sub guess_alignment_headers {
   my ($document, $table, $alignment) = @_;
   # Assume that headers don't make sense for nested tables.
   # OR Maybe we should only do this within table environments???
-  return if $document->findnodes("ancestor::ltx:tabular", $table);
+  return if !$table || $document->findnodes("ancestor::ltx:tabular", $table);
 
   my $tag = $document->getModel->getNodeQName($table);
   my $x;
-  print STDERR "\n" . ('=' x 50) . "\nGuessing alignment headers for "
-    . (($x = $document->findnode('ancestor-or-self::*[@xml:id]', $table)) ? $x->getAttribute('xml:id') : $tag) . "\n"
-    if $LaTeXML::Core::Alignment::DEBUG;
+  Debug(('=' x 50) . "\nGuessing alignment headers for "
+      . (($x = $document->findnode('ancestor-or-self::*[@xml:id]', $table)) ? $x->getAttribute('xml:id') : $tag))
+    if $LaTeXML::DEBUG{alignment};
 
   my $ismath = $tag eq 'ltx:XMArray';
   local $LaTeXML::TR = ($ismath ? 'ltx:XMRow'  : 'ltx:tr');
@@ -534,7 +794,7 @@ sub guess_alignment_headers {
   if (alignment_characterize_lines($document, 0, 0, @rows)) { }
   # This usually does something unpleasant
 ##  else {
-##    print STDERR "Retry characterizing lines in reverse\n" if $LaTeXML::Core::Alignment::DEBUG;
+##    Debug("Retry characterizing lines in reverse") if $LaTeXML::DEBUG{alignment};
 ##    $reversed=alignment_characterize_lines(0,1,reverse(@rows)); }
   alignment_characterize_lines($document, 1, 0, @cols);
   # Did we go overboard?
@@ -542,7 +802,7 @@ sub guess_alignment_headers {
   foreach my $r (@rows) {
     foreach my $c (@$r) {
       $n{ $$c{cell_type} }++; } }
-  print STDERR "$n{h} header, $n{d} data cells\n" if $LaTeXML::Core::Alignment::DEBUG;
+  Debug("$n{h} header, $n{d} data cells") if $LaTeXML::DEBUG{alignment};
   if ($n{d} == 1) {    # Or any other heuristic?
     $n{h} = 0;
     foreach my $r (@rows) {
@@ -557,7 +817,7 @@ sub guess_alignment_headers {
     $document->addClass($table, 'ltx_guessed_headers'); }
 
   # Debugging report!
-  summarize_alignment([@rows], [@cols]) if $LaTeXML::Core::Alignment::DEBUG;
+  summarize_alignment([@rows], [@cols]) if $LaTeXML::DEBUG{alignment};
   return; }
 
 #======================================================================
@@ -660,13 +920,13 @@ sub collect_alignment_rows {
 
   # Now, do some border massaging...
   for (my $r = 0 ; $r < $nrows ; $r++) {
-    $rows[$r][0]{l} = $v;
-    $rows[$r][0]{r} = $rows[$r][1]{l} if ($ncols > 1) && $rows[$r][1]{l};
+    $rows[$r][0]{l}          = $v;
+    $rows[$r][0]{r}          = $rows[$r][1]{l}          if ($ncols > 1) && $rows[$r][1]{l};
     $rows[$r][$ncols - 1]{l} = $rows[$r][$ncols - 2]{r} if ($ncols > 1) && $rows[$r][$ncols - 2]{r};
     $rows[$r][$ncols - 1]{r} = $v; }
   for (my $c = 0 ; $c < $ncols ; $c++) {
-    $rows[0][$c]{t} = $h;
-    $rows[0][$c]{b} = $rows[1][$c]{t} if ($nrows > 1) && $rows[1][$c]{t};
+    $rows[0][$c]{t}          = $h;
+    $rows[0][$c]{b}          = $rows[1][$c]{t}          if ($nrows > 1) && $rows[1][$c]{t};
     $rows[$nrows - 1][$c]{t} = $rows[$nrows - 2][$c]{b} if ($nrows > 1) && $rows[$nrows - 2][$c]{b};
     $rows[$nrows - 1][$c]{b} = $h; }
   for (my $r = 1 ; $r < $nrows - 1 ; $r++) {
@@ -675,19 +935,18 @@ sub collect_alignment_rows {
       $rows[$r][$c]{b} = $rows[$r + 1][$c]{t} if $rows[$r + 1][$c]{t};
       $rows[$r][$c]{l} = $rows[$r][$c - 1]{r} if $rows[$r][$c - 1]{r};
       $rows[$r][$c]{r} = $rows[$r][$c + 1]{l} if $rows[$r][$c + 1]{l}; } }
-  if ($LaTeXML::Core::Alignment::DEBUG) {
-    print STDERR "\nCell characterizations:\n";
+  if ($LaTeXML::DEBUG{alignment}) {
+    Debug("Cell characterizations:");
     for (my $r = 0 ; $r < $nrows ; $r++) {
       for (my $c = 0 ; $c < $ncols ; $c++) {
         my $col = $rows[$r][$c];
-        print STDERR "[$r,$c]=>" . ($$col{cell_type} || '?')
-          . ($$col{align} ? $ALIGNMENT_CODE{ $$col{align} } : ' ')
-          . ($$col{content_class} || '?')
-          . ' ' . $$col{content_length}
-          . ' ' . $$col{border} . "=>" . join('', grep { $$col{$_} } qw(t r b l))
-          . (($$col{rowspan} || 1) > 1 ? " rowspan=" . $$col{rowspan} : '')
-          . (($$col{colspan} || 1) > 1 ? " colspan=" . $$col{colspan} : '')
-          . "\n"; } } }
+        Debug("[$r,$c]=>" . ($$col{cell_type} || '?')
+            . ($$col{align} ? $ALIGNMENT_CODE{ $$col{align} } : ' ')
+            . ($$col{content_class} || '?')
+            . ' ' . $$col{content_length}
+            . ' ' . $$col{border} . "=>" . join('', grep { $$col{$_} } qw(t r b l))
+            . (($$col{rowspan} || 1) > 1 ? " rowspan=" . $$col{rowspan} : '')
+            . (($$col{colspan} || 1) > 1 ? " colspan=" . $$col{colspan} : '')); } } }
   return @rows; }
 
 # Return one of: i(nteger), t(ext), m(ath), ? (unknown) or '_' (empty) (or some combination)
@@ -748,8 +1007,8 @@ sub alignment_characterize_lines {
   my $n = scalar(@lines);
   return if $n < 2;
   local @::TABLINES = @lines;
-  print STDERR "\nCharacterizing $n " . ($axis ? "columns" : "rows") . "\n   "
-    if $LaTeXML::Core::Alignment::DEBUG;
+  Debug("Characterizing $n " . ($axis ? "columns" : "rows"))
+    if $LaTeXML::DEBUG{alignment};
 
   # Establish a scale of differences for the table.
   my ($diffhi, $difflo, $diffavg) = (0, 99999999, 0);
@@ -760,31 +1019,31 @@ sub alignment_characterize_lines {
     $difflo = $d if $d < $difflo; }
   $diffavg = $diffavg / ($n - 1);
   if ($diffhi < 0.05) {    # virtually no differences.
-    print STDERR "Lines are almost identical => Fail\n" if $LaTeXML::Core::Alignment::DEBUG;
+    Debug("Lines are almost identical => Fail") if $LaTeXML::DEBUG{alignment};
     return; }
   if (($n > 2) && (($diffhi - $difflo) < $diffhi * 0.5)) { # differences too similar to establish pattern
-    print STDERR "Differences between lines are almost identical => Fail\n"
-      if $LaTeXML::Core::Alignment::DEBUG;
+    Debug("Differences between lines are almost identical => Fail")
+      if $LaTeXML::DEBUG{alignment};
     return; }
   #  local $::TAB_THRESHOLD = $difflo + 0.4*($diffhi-$difflo);
   local $::TAB_THRESHOLD = $difflo + 0.3 * ($diffhi - $difflo);
   #  local $::TAB_THRESHOLD = $difflo + 0.2*($diffhi-$difflo);
   #  local $::TAB_THRESHOLD = $diffavg;
   local $::TAB_AXIS = $axis;
-  print STDERR "\nDifferences $difflo -- $diffhi => threshold = $::TAB_THRESHOLD\n"
-    if $LaTeXML::Core::Alignment::DEBUG;
+  Debug("Differences $difflo -- $diffhi => threshold = $::TAB_THRESHOLD")
+    if $LaTeXML::DEBUG{alignment};
   # Find the first hump in differences. These are candidates for header lines.
-  print STDERR "Scanning for headers\n   " if $LaTeXML::Core::Alignment::DEBUG;
+  Debug("Scanning for headers") if $LaTeXML::DEBUG{alignment};
   my $diff;
   my ($minh, $maxh) = (1, 1);
   while (($diff = alignment_compare($axis, 1, $reversed, $maxh - 1, $maxh)) < $::TAB_THRESHOLD) {
     $maxh++; }
   return if $maxh > $MAX_ALIGNMENT_HEADER_LINES;    # too many before even finding diffs? give up!
-       #  while( alignment_compare($axis,1,$reversed,$maxh,$maxh+1) > $difflo + ($diff-$difflo)/6){
+      #  while( alignment_compare($axis,1,$reversed,$maxh,$maxh+1) > $difflo + ($diff-$difflo)/6){
   while (alignment_compare($axis, 1, $reversed, $maxh, $maxh + 1) > $::TAB_THRESHOLD) {
     $maxh++; }
-  $maxh = $MAX_ALIGNMENT_HEADER_LINES if $maxh > $MAX_ALIGNMENT_HEADER_LINES;
-  print STDERR "\nFound from $minh--$maxh potential headers\n" if $LaTeXML::Core::Alignment::DEBUG;
+  $maxh = $MAX_ALIGNMENT_HEADER_LINES                if $maxh > $MAX_ALIGNMENT_HEADER_LINES;
+  Debug("Found from $minh--$maxh potential headers") if $LaTeXML::DEBUG{alignment};
 
   my $nn = scalar(@{ $lines[0] }) - 1;
   # The sets of lines 1--$minh, .. 1--$maxh are potential headers.
@@ -810,7 +1069,7 @@ sub alignment_characterize_lines {
 # Test whether $nhead lines makes a good fit for the headers
 sub alignment_test_headers {
   my ($nhead) = @_;
-  print STDERR "Testing $nhead headers\n" if $LaTeXML::Core::Alignment::DEBUG;
+  Debug("Testing $nhead headers") if $LaTeXML::DEBUG{alignment};
   my ($headlength, $datalength) = (0, 0);
   my @heads = (0 .. $nhead - 1);    # The indices of heading lines.
   $headlength = alignment_max_content_length($headlength, 0, $nhead - 1);
@@ -819,11 +1078,12 @@ sub alignment_test_headers {
   # Watch out for the assumed header being really data that is a repeated pattern.
   my $nrep = scalar(@::TABLINES) / $nhead;
   if (($nhead > 1) && ($nrep == int($nrep))) {
-    print STDERR "Check for apparent header repeated $nrep times\n" if $LaTeXML::Core::Alignment::DEBUG;
+    Debug("Check for apparent header repeated $nrep times") if $LaTeXML::DEBUG{alignment};
     my $matched = 1;
     for (my $r = 1 ; $r < $nrep ; $r++) {
       $matched &&= alignment_match_head(0, $r * $nhead, $nhead); }
-    print STDERR "Repeated headers: " . ($matched ? "Matched=> Fail" : "Nomatch => Succeed") . "\n" if $LaTeXML::Core::Alignment::DEBUG;
+    Debug("Repeated headers: " . ($matched ? "Matched=> Fail" : "Nomatch => Succeed"))
+      if $LaTeXML::DEBUG{alignment};
     return if $matched; }
 
   # And find a following grouping of data lines.
@@ -858,38 +1118,38 @@ sub alignment_test_headers {
       $nextline += $nd; }
     else { return; } }
   # Header content seems too large relative to data?
-  print STDERR "header content = $headlength; data content = $datalength\n"
-    if $LaTeXML::Core::Alignment::DEBUG;
+  Debug("header content = $headlength; data content = $datalength")
+    if $LaTeXML::DEBUG{alignment};
 ##  if(($headlength > 10) && (0.3*$headlength > $datalength)){
   if (($headlength > 10) && (0.25 * $headlength > $datalength)) {
-    print STDERR "header content too much longer than data content\n"
-      if $LaTeXML::Core::Alignment::DEBUG;
+    Debug("header content too much longer than data content")
+      if $LaTeXML::DEBUG{alignment};
     return; }
   # Or if a header cell has "large" content?
   if ($headlength >= 1000) {    # Or if a header cell has "large" content?
-    print STDERR "header content too large\n"
-      if $LaTeXML::Core::Alignment::DEBUG;
+    Debug("header content too large")
+      if $LaTeXML::DEBUG{alignment};
     return; }
 
-  print STDERR "Succeeded with $nhead headers\n" if $LaTeXML::Core::Alignment::DEBUG;
+  Debug("Succeeded with $nhead headers") if $LaTeXML::DEBUG{alignment};
   return @heads; }
 
 sub alignment_match_head {
   my ($p1, $p2, $nhead) = @_;
-  print STDERR "Try match $nhead header lines from $p1 to $p2\n   " if $LaTeXML::Core::Alignment::DEBUG;
+  Debug("Try match $nhead header lines from $p1 to $p2") if $LaTeXML::DEBUG{alignment};
   my $nh = alignment_match_lines($p1, $p2, $nhead);
   my $ok = $nhead == $nh;
-  print STDERR "\nMatched $nh header lines => " . ($ok ? "Succeed" : "Failed") . "\n" if $LaTeXML::Core::Alignment::DEBUG;
+  Debug("Matched $nh header lines => " . ($ok ? "Succeed" : "Failed")) if $LaTeXML::DEBUG{alignment};
   return ($ok ? $nhead : 0); }
 
 sub alignment_match_data {
   my ($p1, $p2, $ndata) = @_;
-  print STDERR "Try match $ndata data lines from $p1 to $p2\n   "
-    if $LaTeXML::Core::Alignment::DEBUG;
+  Debug("Try match $ndata data lines from $p1 to $p2")
+    if $LaTeXML::DEBUG{alignment};
   my $nd = alignment_match_lines($p1, $p2, $ndata);
   my $ok = ($nd * 1.0) / $ndata > 0.66;
-  print STDERR "\nMatched $nd data lines => " . ($ok ? "Succeed" : "Failed") . "\n"
-    if $LaTeXML::Core::Alignment::DEBUG;
+  Debug("Matched $nd data lines => " . ($ok ? "Succeed" : "Failed"))
+    if $LaTeXML::DEBUG{alignment};
   return ($ok ? $nd : 0); }
 
 # Match the $n lines starting at $i2 to those starting at $i1.
@@ -905,8 +1165,8 @@ sub alignment_match_lines {
 # but also accept `continuation' data lines.
 sub alignment_skip_data {
   my ($i) = @_;
-  return 0 if $i >= scalar(@::TABLINES);
-  print STDERR "Scanning for data\n   " if $LaTeXML::Core::Alignment::DEBUG;
+  return 0                   if $i >= scalar(@::TABLINES);
+  Debug("Scanning for data") if $LaTeXML::DEBUG{alignment};
   my $n = 1;
   while ($i + $n < scalar(@::TABLINES)) {
     last if (alignment_compare($::TAB_AXIS, 1, 0, $i + $n - 1, $i + $n) >= $::TAB_THRESHOLD)
@@ -914,7 +1174,7 @@ sub alignment_skip_data {
       && (($n < 2)
       || (scalar(grep { $$_{content_class} eq '_' } @{ $::TABLINES[$i + $n] }) <= 0.4 * scalar($::TABLINES[0])));
     $n++; }
-  print STDERR "\nFound $n data lines at $i\n" if $LaTeXML::Core::Alignment::DEBUG;
+  Debug("Found $n data lines at $i") if $LaTeXML::DEBUG{alignment};
   return ($n >= $MIN_ALIGNMENT_DATA_LINES ? $n : 0); }
 
 sub XXXalignment_max_content_length {
@@ -946,12 +1206,12 @@ sub alignment_max_content_length {
 #    mx=>{'_'=>0.1, m=>0.2, i=>0.2, t=>0.2, '?'=>0.2, mx=>0.0});
 
 my %cell_class_diff = (    # [CONSTANT]
-  '_' => { '_' => 0.0,  m => 0.05, i => 0.05, t  => 0.05, '?' => 0.05, mx => 0.05 },
-  m   => { '_' => 0.05, m => 0.0,  i => 0.1,  mx => 0.2 },
-  i   => { '_' => 0.05, m => 0.1,  i => 0.0,  mx => 0.2 },
-  t   => { '_' => 0.05, t   => 0.0, mx => 0.2 },
-  '?' => { '_' => 0.05, '?' => 0.0, mx => 0.2 },
-  mx  => { '_' => 0.05, m   => 0.2, i  => 0.2, t => 0.2, '?' => 0.2, mx => 0.0 });
+  '_' => { '_' => 0.0,  m   => 0.05, i  => 0.05, t  => 0.05, '?' => 0.05, mx => 0.05 },
+  m   => { '_' => 0.05, m   => 0.0,  i  => 0.1,  mx => 0.2 },
+  i   => { '_' => 0.05, m   => 0.1,  i  => 0.0,  mx => 0.2 },
+  t   => { '_' => 0.05, t   => 0.0,  mx => 0.2 },
+  '?' => { '_' => 0.05, '?' => 0.0,  mx => 0.2 },
+  mx  => { '_' => 0.05, m   => 0.2,  i  => 0.2, t => 0.2, '?' => 0.2, mx => 0.0 });
 
 # Compare two lines along $axis (0=row,1=column), returning a measure of the difference.
 # The borders are compared differently if
@@ -961,7 +1221,7 @@ sub alignment_compare {
   my ($axis, $foradjacency, $reversed, $p1, $p2) = @_;
   my $line1 = $::TABLINES[$p1];
   my $line2 = $::TABLINES[$p2];
-  return 0 if !($line1 && $line2);
+  return 0      if !($line1 && $line2);
   return 999999 if $line1 xor $line2;
   my @cells1 = @$line1;
   my @cells2 = @$line2;
@@ -993,7 +1253,7 @@ sub alignment_compare {
       $diff += 0.3 * scalar(grep { $$cell1{$_} != $$cell2{$_} } qw(r l t b)); }
   }
   $diff /= $ncells;
-  print STDERR "$p1-$p2 => $diff; " if $LaTeXML::Core::Alignment::DEBUG;
+  Debug("$p1-$p2 => $diff; ") if $LaTeXML::DEBUG{alignment};
   return $diff; }
 
 #======================================================================
@@ -1002,31 +1262,25 @@ sub summarize_alignment {
   my ($rows, $cols) = @_;
   my $r = 0;
   my ($nrows, $ncols) = (scalar(@$rows), scalar(@{ $$rows[0] }));
-  print STDERR "\n";
   foreach my $cell (@{ $$rows[0] }) {
-    print STDERR ' ' . ($$cell{t} ? ('-' x 6) : (' ' x 6)); }
-  print STDERR "\n";
+    Debug(' ' . ($$cell{t} ? ('-' x 6) : (' ' x 6))); }
   foreach my $row (@$rows) {
     my $maxb = 0;
-    print STDERR ($$row[0]{l} ? ('|' x $$row[0]{l}) : ' ');
+    Debug(($$row[0]{l} ? ('|' x $$row[0]{l}) : ' '));
     foreach my $cell (@$row) {
-      print STDERR sprintf(" %4s ",
-        ($$cell{cell_type} || '?')
-          . ($$cell{align} ? $ALIGNMENT_CODE{ $$cell{align} } : ' ')
-          . ($$cell{content_class} || '?')
-          . ($$cell{r} ? ('|' x $$cell{r}) : ' '));
+      Debug(sprintf(" %4s ",
+          ($$cell{cell_type} || '?')
+            . ($$cell{align} ? $ALIGNMENT_CODE{ $$cell{align} } : ' ')
+            . ($$cell{content_class} || '?')
+            . ($$cell{r} ? ('|' x $$cell{r}) : ' ')));
       $maxb = $$cell{b} if $$cell{b} > $maxb; }
-    #    print STDERR sprintf("%.3f",alignment_compare(0,1,$$rows[$r],$$rows[$r+1])) if ($r < $nrows-1);
-    print STDERR "\n";
+    #    Debug(sprintf("%.3f",alignment_compare(0,1,$$rows[$r],$$rows[$r+1])) if ($r < $nrows-1));
     for (my $b = 0 ; $b < $maxb ; $b++) {
       foreach my $cell (@$row) {
-        print STDERR ' ' . ($b < $$cell{b} ? ('-' x 6) : (' ' x 6)); }
-      print STDERR "\n"; }
+        Debug(' ' . ($b < $$cell{b} ? ('-' x 6) : (' ' x 6))); } }
     $r++; }
-  print STDERR "   ";
   #  for(my $c = 0; $c < $ncols-1; $c++){
-  #    print STDERR sprintf(" %.3f ",alignment_compare(1,1,$$cols[$c],$$cols[$c+1])); }
-  print STDERR "\n";
+  #    Debug(sprintf(" %.3f ",alignment_compare(1,1,$$cols[$c],$$cols[$c+1]))); }
   return; }
 
 #======================================================================

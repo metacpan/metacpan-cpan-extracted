@@ -1,14 +1,14 @@
 package App::FirefoxUtils;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-18'; # DATE
-our $DIST = 'App-FirefoxUtils'; # DIST
-our $VERSION = '0.015'; # VERSION
-
 use 5.010001;
 use strict 'subs', 'vars';
 use warnings;
 use Log::ger;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-09-27'; # DATE
+our $DIST = 'App-FirefoxUtils'; # DIST
+our $VERSION = '0.016'; # VERSION
 
 our %SPEC;
 
@@ -51,6 +51,19 @@ $SPEC{unpause_firefox} = {
 };
 sub unpause_firefox {
     App::BrowserUtils::_do_browser('unpause', 'firefox', @_);
+}
+
+$SPEC{pause_and_unpause_firefox} = {
+    v => 1.1,
+    summary => "Pause and unpause Firefox alternately",
+    description => $App::BrowserUtils::desc_pause_and_unpause,
+    args => {
+        %App::BrowserUtils::args_common,
+        %App::BrowserUtils::argopt_periods,
+    },
+};
+sub pause_and_unpause_firefox {
+    App::BrowserUtils::_do_browser('pause_and_unpause', 'firefox', @_);
 }
 
 $SPEC{firefox_has_processes} = {
@@ -158,7 +171,7 @@ App::FirefoxUtils - Utilities related to Firefox
 
 =head1 VERSION
 
-This document describes version 0.015 of App::FirefoxUtils (from Perl distribution App-FirefoxUtils), released on 2020-08-18.
+This document describes version 0.016 of App::FirefoxUtils (from Perl distribution App-FirefoxUtils), released on 2021-09-27.
 
 =head1 SYNOPSIS
 
@@ -179,6 +192,8 @@ This distribution includes several utilities related to Firefox:
 =item * L<kill-firefox>
 
 =item * L<list-firefox-profiles>
+
+=item * L<pause-and-unpause-firefox>
 
 =item * L<pause-firefox>
 
@@ -201,7 +216,7 @@ This distribution includes several utilities related to Firefox:
 
 Usage:
 
- firefox_has_processes(%args) -> [status, msg, payload, meta]
+ firefox_has_processes(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Check whether Firefox has processes.
 
@@ -222,12 +237,12 @@ Kill browser processes that belong to certain user(s) only.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -237,7 +252,7 @@ Return value:  (any)
 
 Usage:
 
- firefox_is_paused(%args) -> [status, msg, payload, meta]
+ firefox_is_paused(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Check whether Firefox is paused.
 
@@ -260,12 +275,12 @@ Kill browser processes that belong to certain user(s) only.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -275,7 +290,7 @@ Return value:  (any)
 
 Usage:
 
- firefox_is_running(%args) -> [status, msg, payload, meta]
+ firefox_is_running(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Check whether Firefox is running.
 
@@ -301,12 +316,78 @@ Kill browser processes that belong to certain user(s) only.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 pause_and_unpause_firefox
+
+Usage:
+
+ pause_and_unpause_firefox(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Pause and unpause Firefox alternately.
+
+A modern browser now runs complex web pages and applications. Despite browser's
+power management feature, these pages/tabs on the browser often still eat
+considerable CPU cycles even though they only run in the background. Pausing
+(kill -STOP) the browser processes is a simple and effective way to stop CPU
+eating on Unix and prolong your laptop battery life. It can be performed
+whenever you are not using your browser for a little while, e.g. when you are
+typing on an editor or watching a movie. When you want to use your browser
+again, simply unpause (kill -CONT) it.
+
+The C<pause-and-unpause> action pause and unpause browser in an alternate
+fashion, by default every 5 minutes and 30 seconds. This is a compromise to save
+CPU time most of the time but then give time for web applications in the browser
+to catch up during the unpause window (e.g. for WhatsApp Web to display new
+messages and sound notification.) It can be used when you are not browsing but
+still want to be notified by web applications from time to time.
+
+If you run this routine, it will start pausing and unpausing browser. When you
+want to use the browser, press Ctrl-C to interrupt the routine. Then after you
+are done with the browser and want to pause-and-unpause again, you can re-run
+this routine.
+
+You can customize the periods via the C<periods> option.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<periods> => I<array[duration]>
+
+Pause and unpause times, in seconds.
+
+For example, to pause for 5 minutes, then unpause 10 seconds, then pause for 2
+minutes, then unpause for 30 seconds (then repeat the pattern), you can use:
+
+ 300,10,120,30
+
+=item * B<users> => I<array[unix::local_uid]>
+
+Kill browser processes that belong to certain user(s) only.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -316,17 +397,18 @@ Return value:  (any)
 
 Usage:
 
- pause_firefox(%args) -> [status, msg, payload, meta]
+ pause_firefox(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Pause (kill -STOP) Firefox.
 
 A modern browser now runs complex web pages and applications. Despite browser's
 power management feature, these pages/tabs on the browser often still eat
-considerable CPU cycles even though they only run in the background. Stopping
+considerable CPU cycles even though they only run in the background. Pausing
 (kill -STOP) the browser processes is a simple and effective way to stop CPU
-eating on Unix. It can be performed whenever you are not using your browser for
-a little while, e.g. when you are typing on an editor or watching a movie. When
-you want to use your browser again, simply unpause it.
+eating on Unix and prolong your laptop battery life. It can be performed
+whenever you are not using your browser for a little while, e.g. when you are
+typing on an editor or watching a movie. When you want to use your browser
+again, simply unpause (kill -CONT) it.
 
 This function is not exported.
 
@@ -343,12 +425,12 @@ Kill browser processes that belong to certain user(s) only.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -358,7 +440,7 @@ Return value:  (any)
 
 Usage:
 
- ps_firefox(%args) -> [status, msg, payload, meta]
+ ps_firefox(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List Firefox processes.
 
@@ -377,12 +459,12 @@ Kill browser processes that belong to certain user(s) only.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -392,7 +474,7 @@ Return value:  (any)
 
 Usage:
 
- restart_firefox(%args) -> [status, msg, payload, meta]
+ restart_firefox(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Restart firefox.
 
@@ -424,12 +506,12 @@ Pass -dry_run=E<gt>1 to enable simulation mode.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -439,7 +521,7 @@ Return value:  (any)
 
 Usage:
 
- start_firefox(%args) -> [status, msg, payload, meta]
+ start_firefox(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Start firefox if not already started.
 
@@ -471,12 +553,12 @@ Pass -dry_run=E<gt>1 to enable simulation mode.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -486,7 +568,7 @@ Return value:  (any)
 
 Usage:
 
- terminate_firefox(%args) -> [status, msg, payload, meta]
+ terminate_firefox(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Terminate  (kill -KILL) Firefox.
 
@@ -505,12 +587,12 @@ Kill browser processes that belong to certain user(s) only.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -520,7 +602,7 @@ Return value:  (any)
 
 Usage:
 
- unpause_firefox(%args) -> [status, msg, payload, meta]
+ unpause_firefox(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Unpause (resume, continue, kill -CONT) Firefox.
 
@@ -539,12 +621,12 @@ Kill browser processes that belong to certain user(s) only.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -555,14 +637,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Firefo
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-App-FirefoxUtils>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-FirefoxUtils>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -581,11 +655,36 @@ L<App::BrowserUtils>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-FirefoxUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

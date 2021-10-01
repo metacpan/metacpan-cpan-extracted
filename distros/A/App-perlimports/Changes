@@ -1,5 +1,24 @@
 Revision history for App-perlimports
 
+0.000023  2021-09-29 18:50:41Z
+    - Eval import() statements before changing them (GH#40) (Olaf Alders)
+    - Don't consider "my @Foo" to be a use of an imported "@Foo" (GH#40) (Olaf
+      Alders)
+
+0.000022  2021-09-27 01:31:43Z
+    - Ensure PPI 1.270 is required in cpanfile (Reported by Slaven Rezić in
+      #39)
+
+0.000021  2021-09-25 23:51:02Z
+    - Document how to configure Code::TidyAll and precious
+    - Add Carp::Always to ignored modules
+    - Require Log::Dispatch 2.70
+
+0.000020  2021-09-23 22:49:41Z
+    - Add a --log-filename parameter (GH#37) (Olaf Alders)
+    - Add a --[no-]tidy-whitespace param (GH#38) (Olaf Alders)
+    - Fix disappearing module version numbers (GH#38) (Olaf Alders)
+
 0.000019  2021-09-17 19:20:44Z
     - Ignore modules with import errors (GH#35) (Olaf Alders)
     - Stop special-casing Import::Into (GH#35) (Olaf Alders)

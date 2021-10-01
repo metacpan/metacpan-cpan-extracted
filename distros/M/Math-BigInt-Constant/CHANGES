@@ -1,3 +1,7 @@
+1.13 2021-09-28
+
+ * Correct typos and improve wording in the documentation.
+
 1.12 2021-07-14
 
  * Convert test files t/pod.t and t/pod_cov.t into t/release-pod.t and

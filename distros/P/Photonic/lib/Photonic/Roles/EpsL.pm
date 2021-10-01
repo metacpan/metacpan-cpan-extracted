@@ -1,5 +1,5 @@
 package Photonic::Roles::EpsL;
-$Photonic::Roles::EpsL::VERSION = '0.018';
+$Photonic::Roles::EpsL::VERSION = '0.021';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::Roles::EpsL
 
 =head1 VERSION
 
-version 0.018
+version 0.021
 
 =head1 COPYRIGHT NOTICE
 
@@ -44,15 +44,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 =head1 SYNOPSIS
 
    use Photonic::LE::NR2::EpsL;
-   my $eps=Photonic::LE::NR2::EpsL->new(nr=>$nr, nh=>$nh);
-   my $epsilonLongitudinal=$eps->evaluate($epsA, $epsB);
+   my $eps=Photonic::LE::NR2::EpsL->new(haydock=>$haydock, nh=>$nh, epsA=>$eA, epsB=>$eb);
+   my $epsilonLongitudinal=$eps->epsL;
 
 =over 4
 
 =item (for developers)
 
     package Photonic::LE::NR2::EpsL;
-    $Photonic::LE::NR2::EpsL::VERSION= '0.018';
+    $Photonic::LE::NR2::EpsL::VERSION= '0.021';
     use namespace::autoclean;
     use Moose;
     with 'Photonic::Roles::EpsL';
@@ -63,59 +63,37 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 =head1 DESCRIPTION
 
 Calculates the macroscopic longitudinal dielectric function for a
-given fixed Photonic::...::AllH structure as a function of the
+given fixed Photonic::...::Haydock structure as a function of the
 dielectric functions of the components.
 
-=head1 METHODS
+The consuming class needs to supply these methods to inform lazy-building
+of C<epsL>:
 
 =over 4
 
-=item * new(nr=>$nr, nh=>$nh, smallE=>$smallE)
-
-Initializes the structure.
-
-$nr is a Photonic::...::AllH structure (required).
-
-$nh is the maximum number of Haydock coefficients to use (required).
-
-$smallE is the criteria of convergence for the continued fraction
-(defaults to 1e-7)
-
-=item * evaluate($epsA, $epsB)
-
-Returns the macroscopic dielectric function for a given value of the
-dielectric functions of the host $epsA and the particle $epsB.
+=item * _build_epsL
 
 =back
 
-=head1 ACCESSORS (read only)
+=head1 ATTRIBUTES
 
 =over 4
 
-=item * nr
+=item * haydock
 
-The ...::AllH structure
-
-=item * epsA epsB
-
-The dielectric functions of component A and component B used in the
-last calculation.
-
-=item * u
-
-The spectral variable used in the last calculation
+The ...::Haydock structure
 
 =item * epsL
 
-The longitudinal macroscopic function obtained in the last calculation.
+The longitudinal macroscopic function calculated from the parameters (lazy-built).
 
 =item * nh
 
-The maximum number of Haydock coefficients to use.
+The maximum number of Haydock coefficients to use (required).
 
 =item * nhActual
 
-The actual number of Haydock coefficients used in the last calculation
+The actual number of Haydock coefficients used in the calculation
 
 =item * converged
 
@@ -125,6 +103,7 @@ Flags that the last calculation converged before using up all coefficients
 
 Criteria of convergence for continued fraction. 0 means don't
 check.
+(defaults to 1e-7)
 
 =back
 
@@ -139,13 +118,14 @@ check.
 use Moose::Role;
 use Photonic::Types;
 
-has 'nr' =>(is=>'ro', isa=>'Photonic::Types::AllH', required=>1);
+requires '_build_epsL';
+
+has 'haydock' =>(is=>'ro', isa=>'Photonic::Types::Haydock', required=>1);
 has 'nh' =>(is=>'ro', isa=>'Num', required=>1, lazy=>1, builder=>'_nh',
 	    documentation=>'Desired no. of Haydock coefficients');
 has 'smallE'=>(is=>'ro', isa=>'Num', required=>1, default=>1e-7,
     	    documentation=>'Convergence criterium for use of Haydock coeff.');
-has 'epsL'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', init_arg=>undef,
-	     writer=>'_epsL',
+has 'epsL'=>(is=>'ro', isa=>'Photonic::Types::PDLComplex', lazy => 1, builder => '_build_epsL',
 	     documentation=>'Value of dielectric function'  );
 has 'nhActual'=>(is=>'ro', isa=>'Num', init_arg=>undef,
 		 writer=>'_nhActual',
@@ -156,12 +136,12 @@ has 'converged'=>(is=>'ro', isa=>'Num', init_arg=>undef,
 
 sub BUILD {
     my $self=shift;
-    $self->nr->run unless $self->nr->iteration;
+    $self->haydock->run unless $self->haydock->iteration;
 }
 
 sub _nh { #build desired number of Haydock coeffs to use.
     my $self=shift;
-    return $self->nr->nh; #defaults to coefficients desired
+    return $self->haydock->nh; #defaults to coefficients desired
 }
 
 no Moose::Role;

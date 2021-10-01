@@ -27,7 +27,7 @@ my $build = Module::Build->new(
          # Technically probably would work on 5.16 but doesn't:
          #   https://rt.cpan.org/Ticket/Display.html?id=132930
       'XS::Parse::Keyword' => '0.10',
-      'XS::Parse::Sublike' => '0.10', # hookdata
+      'XS::Parse::Sublike' => '0.13',
    },
    test_requires => {
       'Data::Dump' => 0,
@@ -38,7 +38,7 @@ my $build = Module::Build->new(
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
       'XS::Parse::Keyword::Builder' => '0.10',
-      'XS::Parse::Sublike::Builder' => '0.10',
+      'XS::Parse::Sublike::Builder' => '0.13',
    },
    license => 'perl',
    create_license => 1,

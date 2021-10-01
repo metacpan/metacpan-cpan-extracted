@@ -15,23 +15,25 @@ class Colour {
    has $red   :reader            :writer;
    has $green :reader(get_green) :writer;
    has $blue  :mutator;
+   has $white :accessor;
 
    BUILD {
-      ( $red, $green, $blue ) = @_;
+      ( $red, $green, $blue, $white ) = @_;
    }
 
-   method rgb {
-      ( $red, $green, $blue );
+   method rgbw {
+      ( $red, $green, $blue, $white );
    }
 }
 
 # readers
 {
-   my $col = Colour->new(50, 60, 70);
+   my $col = Colour->new(50, 60, 70, 80);
 
    is( $col->red,       50, '$col->red' );
    is( $col->get_green, 60, '$col->get_green' );
    is( $col->blue,      70, '$col->blue' );
+   is( $col->white,     80, '$col->white' );
 
    # Reader complains if given any arguments
    my $LINE = __LINE__+1;
@@ -48,9 +50,10 @@ class Colour {
    $col->set_red( 80 );
    is( $col->set_green( 90 ), $col, '->set_* writer returns invocant' );
    $col->blue = 100;
+   $col->white( 110 );
 
-   is_deeply( [ $col->rgb ], [ 80, 90, 100 ],
-      '$col->rgb after writers' );
+   is_deeply( [ $col->rgbw ], [ 80, 90, 100, 110 ],
+      '$col->rgbw after writers' );
 
    # Writer complains if not given enough arguments
    my $LINE = __LINE__+1;

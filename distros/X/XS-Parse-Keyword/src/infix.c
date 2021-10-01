@@ -23,6 +23,11 @@
 #  define HAVE_OP_ISA
 #endif
 
+#if HAVE_PERL_VERSION(5,20,0)
+   /* assert() can be used as an expression */
+#  define HAVE_ASSERT_AS_EXPRESSION
+#endif
+
 /* These only became full API macros at perl v5.22, but they're available as
  * the full Perl_... name before that
  */
@@ -38,10 +43,63 @@
 #  define G_LIST  G_ARRAY
 #endif
 
+#ifndef XS_INTERNAL
+/* copypasta from perl-v5.16.0/XSUB.h */
+#  if defined(__CYGWIN__) && defined(USE_DYNAMIC_LOADING)
+#    define XS_INTERNAL(name) STATIC XSPROTO(name)
+#  endif
+#  if defined(__SYMBIAN32__)
+#    define XS_INTERNAL(name) EXPORT_C STATIC XSPROTO(name)
+#  endif
+#  ifndef XS_INTERNAL
+#    if defined(HASATTRIBUTE_UNUSED) && !defined(__cplusplus)
+#      define XS_INTERNAL(name) STATIC void name(pTHX_ CV* cv __attribute__unused__)
+#    else
+#      ifdef __cplusplus
+#        define XS_INTERNAL(name) static XSPROTO(name)
+#      else
+#        define XS_INTERNAL(name) STATIC XSPROTO(name)
+#      endif
+#    endif
+#  endif
+#endif
+
 struct HooksAndData {
   const struct XSParseInfixHooks *hooks;
   void *data;
 };
+
+enum OperandShape {
+  SHAPE_SCALARSCALAR,
+  SHAPE_SCALARLIST,
+  SHAPE_LISTLIST,
+};
+
+static enum OperandShape operand_shape(const struct HooksAndData *hd)
+{
+  U8 args_flags = (hd->hooks->lhs_flags & 0x07) << 4 | (hd->hooks->rhs_flags & 0x07);
+
+  switch(args_flags) {
+    /* scalar OP scalar */
+    case XPI_OPERAND_TERM:
+      return SHAPE_SCALARSCALAR;
+
+    /* scalar OP list */
+    case XPI_OPERAND_TERM_LIST:
+    case XPI_OPERAND_LIST:
+      return SHAPE_SCALARLIST;
+
+    /* list OP list */
+    case (XPI_OPERAND_TERM_LIST<<4) | XPI_OPERAND_TERM_LIST:
+    case (XPI_OPERAND_TERM_LIST<<4) | XPI_OPERAND_LIST:
+      return SHAPE_LISTLIST;
+
+    default:
+      croak("TODO: Unsure how to classify operand shape of args_flags=%02X\n",
+          args_flags);
+      break;
+  }
+}
 
 struct Registration;
 struct Registration {
@@ -76,13 +134,13 @@ static OP *new_op(pTHX_ const struct HooksAndData hd, U32 flags, OP *lhs, OP *rh
   return ret;
 }
 
-/* force_list nulls out the OP_LIST itself but preserves the OP_PUSHMARK
- * inside it. This is essential or else op_contextualize() will null out
- * both of them and we lose the mark
+/* force_list_keeping_pushmark nulls out the OP_LIST itself but preserves
+ * the OP_PUSHMARK inside it. This is essential or else op_contextualize()
+ * will null out both of them and we lose the mark
  */
 /* copypasta from core's op.c */
-#define force_list(o, nullit)  S_force_list(aTHX_ o, nullit)
-static OP *S_force_list(pTHX_ OP *o, bool nullit)
+#define force_list_keeping_pushmark(o)  S_force_list(aTHX_ o)
+static OP *S_force_list(pTHX_ OP *o)
 {
   if(!o || o->op_type != OP_LIST) {
     OP *rest = NULL;
@@ -94,10 +152,73 @@ static OP *S_force_list(pTHX_ OP *o, bool nullit)
     if(rest)
       op_sibling_splice(o, cLISTOPo->op_last, 0, rest);
   }
-  if(nullit)
-    op_null(o);
-  /* our copy also does this */
+  op_null(o);
   return op_contextualize(o, G_LIST);
+}
+
+static bool op_extract_onerefgen(OP *o, OP **kidp)
+{
+  OP *first;
+  switch(o->op_type) {
+    case OP_SREFGEN:
+      first = cUNOPo->op_first;
+      if(first->op_type == OP_NULL && first->op_targ == OP_LIST &&
+          (*kidp = cLISTOPx(first)->op_first))
+        return TRUE;
+      break;
+
+    case OP_REFGEN:
+      first = cUNOPo->op_first;
+      if(first->op_type == OP_NULL && first->op_targ == OP_LIST &&
+#ifdef HAVE_ASSERT_AS_EXPRESSION
+          (assert(cLISTOPx(first)->op_first->op_type == OP_PUSHMARK), 1) &&
+#endif
+          (*kidp = OpSIBLING(cLISTOPx(first)->op_first)) &&
+          !OpSIBLING(*kidp))
+        return TRUE;
+
+      op_dump(first);
+  }
+
+  return FALSE;
+}
+
+#define unwrap_list(o, may_unwrap_anonlist)  S_unwrap_list(aTHX_ o, may_unwrap_anonlist)
+static OP *S_unwrap_list(pTHX_ OP *o, bool may_unwrap_anonlist)
+{
+  OP *kid;
+
+  /* Look out for some sort of \THING */
+  if(op_extract_onerefgen(o, &kid)) {
+    if(kid->op_type == OP_PADAV) {
+      /* \@padav can just yield the array directly */
+      cLISTOPx(cUNOPo->op_first)->op_first = NULL;
+      op_free(o);
+
+      kid->op_flags &= ~(OPf_MOD|OPf_REF);
+      return force_list_keeping_pushmark(kid);
+    }
+    if(kid->op_type == OP_RV2AV) {
+      /* we can just yield this op directly at this point. It might be \@pkgav
+       * or something else, but whatever it is we might as well do it
+       */
+      cLISTOPx(cUNOPo->op_first)->op_first = NULL;
+      op_free(o);
+
+      kid->op_flags &= ~(OPf_MOD|OPf_REF);
+      return force_list_keeping_pushmark(kid);
+    }
+  }
+
+  /* We might be permitted to unwrap a [THING] */
+  if(may_unwrap_anonlist &&
+      o->op_type == OP_ANONLIST) {
+    /* Just turn it into a list and we're already done */
+    o->op_type = OP_LIST;
+    return force_list_keeping_pushmark(o);
+  }
+
+  return force_list_keeping_pushmark(newUNOP(OP_RV2AV, 0, o));
 }
 
 #ifdef HAVE_PL_INFIX_PLUGIN
@@ -111,7 +232,7 @@ OP *parse(pTHX_ OP *lhs, struct Perl_custom_infix *def)
       break;
 
     case XPI_OPERAND_TERM_LIST:
-      lhs = force_list(lhs, TRUE);
+      lhs = force_list_keeping_pushmark(lhs);
       break;
   }
 
@@ -126,11 +247,11 @@ OP *parse(pTHX_ OP *lhs, struct Perl_custom_infix *def)
       break;
 
     case XPI_OPERAND_TERM_LIST:
-      rhs = force_list(parse_termexpr(0), TRUE);
+      rhs = force_list_keeping_pushmark(parse_termexpr(0));
       break;
 
     case XPI_OPERAND_LIST:
-      rhs = force_list(parse_listexpr(0), TRUE);
+      rhs = force_list_keeping_pushmark(parse_listexpr(0));
       break;
 
     default:
@@ -238,10 +359,33 @@ OP *XSParseInfix_new_op(pTHX_ const struct XSParseInfixInfo *info, U32 flags, OP
   return newBINOP(info->opcode, flags, lhs, rhs);
 }
 
-static OP *ckcall_wrapper_func(pTHX_ OP *op, GV *namegv, SV *ckobj)
+static bool op_yields_oneval(OP *o)
 {
-  struct HooksAndData *hd = NUM2PTR(struct HooksAndData *, SvUV(ckobj));
+  if(OP_GIMME(o, 0) == G_SCALAR)
+    return TRUE;
 
+  if(PL_opargs[o->op_type] & OA_RETSCALAR)
+    return TRUE;
+
+  /* It might still yield a single value, we'll just have to check harder */
+  switch(o->op_type) {
+    case OP_REFGEN:
+    {
+      OP *list = cUNOPo->op_first;
+      OP *kid;
+      assert(cLISTOPx(list)->op_first->op_type == OP_PUSHMARK);
+      if((kid = OpSIBLING(cLISTOPx(list)->op_first)) &&
+         !OpSIBLING(kid) &&
+         (kid->op_flags & OPf_REF))
+        return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+static bool extract_wrapper2_args(pTHX_ OP *op, OP **leftp, OP **rightp)
+{
   assert(op->op_type == OP_ENTERSUB);
 
   /* Attempt to extract the LHS and RHS operands, if we can find them */
@@ -256,27 +400,27 @@ static OP *ckcall_wrapper_func(pTHX_ OP *op, GV *namegv, SV *ckobj)
 
   OP *left = OpSIBLING(kid);
   if(!left)
-    return op;
-  if(OP_GIMME(left, 0) != G_SCALAR)
-    return op;
+    return FALSE;
+  if(!op_yields_oneval(left))
+    return FALSE;
 
   OP *right = OpSIBLING(left);
   if(!right)
-    return op;
-  if(OP_GIMME(right, 0) != G_SCALAR)
-    return op;
+    return FALSE;
+  if(!op_yields_oneval(right))
+    return FALSE;
 
   kid = OpSIBLING(right);
   if(!kid)
-    return op;
+    return FALSE;
   if(OpSIBLING(kid))
-    return op;
+    return FALSE;
 
   /* Check that kid is now OP_NULL[ OP_GV ] */
   if(kid->op_type != OP_NULL || kid->op_targ != OP_RV2CV)
-    return op;
+    return FALSE;
   if(cUNOPx(kid)->op_first->op_type != OP_GV)
-    return op;
+    return FALSE;
 
   /* Splice out these two args and throw away the old optree */
   OpMORESIB_set(left, NULL);
@@ -284,9 +428,36 @@ static OP *ckcall_wrapper_func(pTHX_ OP *op, GV *namegv, SV *ckobj)
   OpMORESIB_set(pushmark, kid);
   op_free(op);
 
-  /* Now build a new optree */
-  op = new_op(aTHX_ *hd, 0, left, right);
-  return op;
+  OpLASTSIB_set(left, NULL);
+  OpLASTSIB_set(right, NULL);
+
+  *leftp  = left;
+  *rightp = right;
+  return TRUE;
+}
+
+static OP *ckcall_wrapper_func_scalarscalar(pTHX_ OP *op, GV *namegv, SV *ckobj)
+{
+  struct HooksAndData *hd = NUM2PTR(struct HooksAndData *, SvUV(ckobj));
+
+  OP *left, *right;
+  if(!extract_wrapper2_args(aTHX_ op, &left, &right))
+    return op;
+
+  return new_op(aTHX_ *hd, 0, left, right);
+}
+
+static OP *ckcall_wrapper_func_listlist(pTHX_ OP *op, GV *namegv, SV *ckobj)
+{
+  struct HooksAndData *hd = NUM2PTR(struct HooksAndData *, SvUV(ckobj));
+
+  OP *left, *right;
+  if(!extract_wrapper2_args(aTHX_ op, &left, &right))
+    return op;
+
+  return new_op(aTHX_ *hd, 0,
+      unwrap_list(left,  hd->hooks->lhs_flags & XPI_OPERAND_ONLY_LOOK),
+      unwrap_list(right, hd->hooks->rhs_flags & XPI_OPERAND_ONLY_LOOK));
 }
 
 #define newSLUGOP(idx)  S_newSLUGOP(aTHX_ idx)
@@ -297,7 +468,7 @@ static OP *S_newSLUGOP(pTHX_ int idx)
   return op;
 }
 
-static void make_wrapper_func(pTHX_ const struct HooksAndData *hd, U8 args_flags)
+static void make_wrapper_func(pTHX_ const struct HooksAndData *hd)
 {
   /* Prepare to make a new optree-based CV */
   I32 floor_ix = start_subparse(FALSE, 0);
@@ -310,9 +481,8 @@ static void make_wrapper_func(pTHX_ const struct HooksAndData *hd, U8 args_flags
   OP *body = NULL;
   OP *(*ckcall)(pTHX_ OP *, GV *, SV *) = NULL;
 
-  switch(args_flags) {
-    /* scalar OP scalar */
-    case XPI_OPERAND_TERM:
+  switch(operand_shape(hd)) {
+    case SHAPE_SCALARSCALAR:
       body = op_append_list(OP_LINESEQ, body,
           make_argcheck_ops(2, 0, 0, funcname));
 
@@ -323,12 +493,10 @@ static void make_wrapper_func(pTHX_ const struct HooksAndData *hd, U8 args_flags
       body = op_append_list(OP_LINESEQ, body,
           new_op(aTHX_ *hd, 0, newSLUGOP(0), newSLUGOP(1)));
 
-      ckcall = &ckcall_wrapper_func;
+      ckcall = &ckcall_wrapper_func_scalarscalar;
       break;
 
-    /* scalar OP list */
-    case XPI_OPERAND_TERM_LIST:
-    case XPI_OPERAND_LIST:
+    case SHAPE_SCALARLIST:
       body = op_append_list(OP_LINESEQ, body,
           make_argcheck_ops(1, 0, '@', funcname));
 
@@ -339,14 +507,12 @@ static void make_wrapper_func(pTHX_ const struct HooksAndData *hd, U8 args_flags
       body = op_append_list(OP_LINESEQ, body,
           new_op(aTHX_ *hd, 0,
             newOP(OP_SHIFT, 0),
-            force_list(newUNOP(OP_RV2AV, OPf_WANT_LIST, newGVOP(OP_GV, 0, PL_defgv)), TRUE)));
+            force_list_keeping_pushmark(newUNOP(OP_RV2AV, OPf_WANT_LIST, newGVOP(OP_GV, 0, PL_defgv)))));
 
       /* no ckcall */
       break;
 
-    /* list OP list */
-    case (XPI_OPERAND_TERM_LIST<<4) | XPI_OPERAND_TERM_LIST:
-    case (XPI_OPERAND_TERM_LIST<<4) | XPI_OPERAND_LIST:
+    case SHAPE_LISTLIST:
       body = op_append_list(OP_LINESEQ, body,
           make_argcheck_ops(2, 0, 0, funcname));
 
@@ -356,15 +522,10 @@ static void make_wrapper_func(pTHX_ const struct HooksAndData *hd, U8 args_flags
       /* Body of the function is  @{ $_[0] } OP @{ $_[1] } */
       body = op_append_list(OP_LINESEQ, body,
           new_op(aTHX_ *hd, 0,
-            force_list(newUNOP(OP_RV2AV, 0, newSLUGOP(0)), TRUE),
-            force_list(newUNOP(OP_RV2AV, 0, newSLUGOP(1)), TRUE)));
+            force_list_keeping_pushmark(newUNOP(OP_RV2AV, 0, newSLUGOP(0))),
+            force_list_keeping_pushmark(newUNOP(OP_RV2AV, 0, newSLUGOP(1)))));
 
-      /* no ckcall */
-      break;
-
-    default:
-      croak("TODO: Unsure how to make wrapper func for args_flags=%02X\n",
-          args_flags);
+      ckcall = &ckcall_wrapper_func_listlist;
       break;
   }
 
@@ -377,8 +538,8 @@ static void make_wrapper_func(pTHX_ const struct HooksAndData *hd, U8 args_flags
     cv_set_call_checker(cv, ckcall, newSVuv(PTR2UV(hd)));
 }
 
-static XS(deparse_infix);
-static XS(deparse_infix)
+XS_INTERNAL(deparse_infix);
+XS_INTERNAL(deparse_infix)
 {
   dXSARGS;
   struct Registration *reg = XSANY.any_ptr;
@@ -424,7 +585,16 @@ static XS(deparse_infix)
     PUSHs(ST(2));
     PUTBACK;
 
-    call_method("_deparse_infix_wrapperfunc", G_SCALAR);
+    switch(operand_shape(&reg->hd)) {
+      case SHAPE_SCALARSCALAR:
+      case SHAPE_SCALARLIST: /* not really */
+        call_method("_deparse_infix_wrapperfunc_scalarscalar", G_SCALAR);
+        break;
+
+      case SHAPE_LISTLIST:
+        call_method("_deparse_infix_wrapperfunc_listlist", G_SCALAR);
+        break;
+    }
 
     SPAGAIN;
     ret = SvREFCNT_inc(POPs);
@@ -469,7 +639,7 @@ void XSParseInfix_register(pTHX_ const char *opname, const struct XSParseInfixHo
       croak("Unrecognised XSParseInfixHooks.flags value 0x%X", hooks->flags);
   }
 
-  switch(hooks->lhs_flags) {
+  switch(hooks->lhs_flags & ~(XPI_OPERAND_ONLY_LOOK)) {
     case XPI_OPERAND_TERM:
     case XPI_OPERAND_TERM_LIST:
       break;
@@ -477,7 +647,7 @@ void XSParseInfix_register(pTHX_ const char *opname, const struct XSParseInfixHo
       croak("Unrecognised XSParseInfixHooks.lhs_flags value 0x%X", hooks->lhs_flags);
   }
 
-  switch(hooks->rhs_flags) {
+  switch(hooks->rhs_flags & ~(XPI_OPERAND_ONLY_LOOK)) {
     case XPI_OPERAND_TERM:
     case XPI_OPERAND_TERM_LIST:
     case XPI_OPERAND_LIST:
@@ -524,14 +694,19 @@ void XSParseInfix_register(pTHX_ const char *opname, const struct XSParseInfixHo
   }
 
   if(hooks->wrapper_func_name) {
-    make_wrapper_func(aTHX_ &reg->hd, (hooks->lhs_flags & 0x07) << 4 | (hooks->rhs_flags & 0x07));
+    make_wrapper_func(aTHX_ &reg->hd);
   }
 
   if(hooks->ppaddr) {
     XOP *xop;
     Newx(xop, 1, XOP);
 
-    SV *namesv = newSVpvf("B::Deparse::pp_infix_0x%p", hooks->ppaddr);
+    /* Use both the opname for human-readability, and the address of its
+     * ppfunc for disambiguating in case of name clashes
+     */
+    SV *namesv = newSVpvf("B::Deparse::pp_infix_%s_0x%p", opname, hooks->ppaddr);
+    if(reg->opname_is_WIDE)
+      SvUTF8_on(namesv);
     SAVEFREESV(namesv);
 
     XopENTRY_set(xop, xop_name, savepv(SvPVX(namesv) + sizeof("B::Deparse::pp")));

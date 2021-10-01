@@ -4,7 +4,7 @@ DateTime::TimeZone - Time zone object base class and factory
 
 # VERSION
 
-version 2.47
+version 2.48
 
 # SYNOPSIS
 
@@ -267,8 +267,6 @@ datetime@perl.org list.
 
 datetime@perl.org mailing list
 
-http://datetime.perl.org/
-
 The tools directory of the DateTime::TimeZone distribution includes
 two scripts that may be of interest to some people.  They are
 parse\_olson and tests\_from\_zdump.  Please run them with the --help
@@ -276,12 +274,7 @@ flag to see what they can be used for.
 
 # SUPPORT
 
-Support for this module is provided via the datetime@perl.org email list. See
-http://datetime.perl.org/wiki/datetime/page/Mailing\_List for details.
-
-Please submit bugs to the CPAN RT system at
-http://rt.cpan.org/NoAuth/ReportBug.html?Queue=datetime%3A%3Atimezone
-or via email at bug-datetime-timezone@rt.cpan.org.
+Support for this module is provided via the datetime@perl.org email list.
 
 Bugs may be submitted at [https://github.com/houseabsolute/DateTime-TimeZone/issues](https://github.com/houseabsolute/DateTime-TimeZone/issues).
 

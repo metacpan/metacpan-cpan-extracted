@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Syntax::Operator::Zip 0.01;
+package Syntax::Operator::Zip 0.03;
 
 use v5.14;
 use warnings;
@@ -89,7 +89,7 @@ in the result contains exactly two items.
 
    my @result = @lhs M @rhs;
 
-   # returns ($lhs[0], $rhs[0], $lhs[1], $rhs[1], ...)
+   # returns  $lhs[0], $rhs[0], $lhs[1], $rhs[1], ...
 
 Yields a list of the values from its operand lists, rearranged into pairs and
 flattened. If one of the operand lists is shorter than the other, the missing
