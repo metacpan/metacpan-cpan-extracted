@@ -2,8 +2,8 @@
 use strict;
 use warnings;
 
-my $parentDir = '/home/mojo/perl/Netstack/lib';
-my $partInfo  = '.+\.pm$|.+\.pl$|.+\.t$';   #正则表达
+my $parentDir = '/home/mojo/perl/Netstack';
+my $partInfo  = '.+\.pm$|.+\.pl$|.+\.t$';  #正则表达
 
 &search_file( $parentDir, $partInfo );
 

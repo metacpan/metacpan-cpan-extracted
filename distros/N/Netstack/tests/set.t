@@ -397,8 +397,8 @@ ok(
         mins => [ 4, 9,  12 ],
         maxs => [ 7, 10, 15 ]
       )
-    ) eq 'equal';
+    ) eq 'containButNotEqual';
   },
-  ' interSet'
+  ' interSet函数比对结果'
 );
 

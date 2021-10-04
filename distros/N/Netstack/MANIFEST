@@ -20,4 +20,7 @@ lib/Netstack/Utils/Date.pm
 lib/Netstack/Utils/Ip.pm
 lib/Netstack/Utils/Mail.pm
 lib/Netstack/Utils/Set.pm
+tests/cache.t
+tests/date.t
+tests/ip.t
 tests/set.t

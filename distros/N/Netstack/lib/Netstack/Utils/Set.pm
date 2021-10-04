@@ -43,10 +43,10 @@ around BUILDARGS => sub {
     );
   }
   elsif ( @_ == 2
-          and defined $_[0]
-          and defined $_[1]
-          and $_[0] =~ /^\d+$/o
-          and $_[1] =~ /^\d+$/o )
+    and defined $_[0]
+    and defined $_[1]
+    and $_[0] =~ /^\d+$/o
+    and $_[1] =~ /^\d+$/o )
   {
     # 确保 MIN MAX 按顺序存放
     my ( $MIN, $MAX ) = $_[0] < $_[1] ? ( $_[0], $_[1] ) : ( $_[1], $_[0] );
@@ -281,7 +281,7 @@ sub compare {
 #------------------------------------------------------------------------------
 sub isEqual {
   my ( $self, $setObj ) = @_;
-  return ( $self->mins->@* ~~ $setObj->mins->@* and $self->maxs->@* ~~ $setObj->maxs->@*  );
+  return ( $self->mins->@* ~~ $setObj->mins->@* and $self->maxs->@* ~~ $setObj->maxs->@* );
 }
 
 #------------------------------------------------------------------------------
@@ -289,7 +289,7 @@ sub isEqual {
 #------------------------------------------------------------------------------
 sub notEqual {
   my ( $self, $setObj ) = @_;
-  return !( $self->mins->@* ~~ $setObj->mins->@* and $self->maxs->@* ~~ $setObj->maxs->@*  );
+  return !( $self->mins->@* ~~ $setObj->mins->@* and $self->maxs->@* ~~ $setObj->maxs->@* );
 }
 
 #------------------------------------------------------------------------------
@@ -379,7 +379,6 @@ sub interSet {
     return $setObj;
   }
 
-
   my $i = 0;
   my $j = 0;
   while ( $i < $self->length and $j < $setObj->length ) {
@@ -406,17 +405,19 @@ sub interSet {
 #------------------------------------------------------------------------------
 sub interRange {
   my ( $self, $rangeSet1, $rangeSet2 ) = @_;
-  my $min =( $rangeSet1->[0] < $rangeSet2->[0] )
-      ? $rangeSet1->[0]
-      : $rangeSet2->[0];
-  my $max =( $rangeSet1->[1] > $rangeSet2->[1] )
-      ? $rangeSet1->[1]
-      : $rangeSet2->[1];
+  my $min
+    = ( $rangeSet1->[0] < $rangeSet2->[0] )
+    ? $rangeSet1->[0]
+    : $rangeSet2->[0];
+  my $max
+    = ( $rangeSet1->[1] > $rangeSet2->[1] )
+    ? $rangeSet1->[1]
+    : $rangeSet2->[1];
 
   # 返回计算结果
-  return ($min > $max)
+  return ( $min > $max )
     ? undef
-    : ($min, $max);
+    : ( $min, $max );
 }
 
 #------------------------------------------------------------------------------

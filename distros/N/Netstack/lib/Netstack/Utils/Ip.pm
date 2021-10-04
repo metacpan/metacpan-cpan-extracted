@@ -213,7 +213,8 @@ sub changeMaskToNumForm {
 sub changeWildcardToMaskForm {
   my ( $self, $wildcard ) = @_;
   if ( $wildcard =~ $self->addrRegex ) {
-    my ( $p1, $p2, $p3, $p4 ) = ( $1 ^ 255, $2 ^ 255, $3 ^ 255, $4 ^ 255 );
+    my ( $a1, $a2, $a3, $a4 ) = split( /\./, $wildcard );
+    my ( $p1, $p2, $p3, $p4 ) = ( $a1 ^ 255, $a2 ^ 255, $a3 ^ 255, $a4 ^ 255 );
     my $mask = "$p1.$p2.$p3.$p4";
     return $mask;
   }

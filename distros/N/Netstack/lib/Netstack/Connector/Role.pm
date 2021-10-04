@@ -379,8 +379,7 @@ sub execCommands {
   # 初始化 commands 属性
   $self->setCommands( \@commands );
   # 遍历接受到的命令行
-  while ( $self->commands->@* ) {
-    my $cmd = pop $self->commands->@*;
+  while ( my $cmd = pop $self->commands->@* ) {
     # 自动跳过空白行
     next if $cmd =~ /^\s*$/;
     # 执行具体的脚本
