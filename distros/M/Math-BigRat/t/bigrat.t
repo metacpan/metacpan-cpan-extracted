@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 202;
+use Test::More tests => 201;
 
 # basic testing of Math::BigRat
 
@@ -421,15 +421,6 @@ subtest qq|$mbr -> new("NaN") -> numify()| => sub {
     is(ref($x), "", '$x is a scalar');
     ok(isnumeric($x), '$x is numeric');
     cmp_ok($x, "!=", $nan, '$x has the right value');   # Note: NaN != NaN
-};
-
-subtest qq|$mbr -> new("4/3") -> numify()| => sub {
-    plan tests => 3;
-
-    $x = $mbr -> new("4/3") -> numify();
-    is(ref($x), "", '$x is a scalar');
-    ok(isnumeric($x), '$x is numeric');
-    cmp_ok($x, "==", 4/3, '$x has the right value');
 };
 
 ##############################################################################

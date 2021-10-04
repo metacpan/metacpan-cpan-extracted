@@ -1,5 +1,9 @@
 Revision history for this software.
 
+0.32  2021-10-03 00:00:00
+  - expands wildcard arguments of command line on Microsoft Windows
+  - created by INABA Hitoshi
+
 0.31  2021-08-26 00:00:00
   - escape "@{^CAPTURE}" to "@{[mb::_CAPTURE()]}", not "@{[join $", mb::_CAPTURE()]}"
   - created by INABA Hitoshi

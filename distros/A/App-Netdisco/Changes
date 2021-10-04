@@ -1,10 +1,21 @@
+2.049006 - 2021-10-03
+
+  [ENHANCEMENTS]
+
+  * support for IPv6 neighbors in NXOS SSHCollector
+  * netdisco-web can use PORT environment variable for --port option
+
+  [BUG FIXES]
+
+  * #816 skip duplicate bssid on ports on wireless discovery
+
 2.049005 - 2021-09-09
 
   [ENHANCEMENTS]
 
   * #811 change duplicate job status from 'error' to 'info'
 
-  [BUG FIXES
+  [BUG FIXES]
 
   * #809 fix crash in Node search due to regexp translation perl to SQL
 

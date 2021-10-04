@@ -10,21 +10,22 @@ authors, join gtk-perl-list@gnome.org at lists.gnome.org.
 
 This module is available from [CPAN](https://metacpan.org/pod/Gtk3::ImageView).
 
-To install it from source instead, type the following:
+To install it from source instead install [Dist::Zilla](https://metacpan.org/pod/Dist::Zilla), then type the following:
 
 ```shell
-perl Makefile.PL
-make
-make test
-make install
+dzil install
 ```
 
 To avoid installing to a system directory, you can change the installation
 prefix at Makefile.PL time with
 
 ```shell
-perl Makefile.PL PREFIX=/some/other/place
+dzil install --install-command='cpanm -l /tmp/foo .'
 ```
+
+Or you can use `dzil build` to get the directory of the release in current dir, cd there, and build/install it with via generated Makefile.PL manually.
+
+`dzil help`, [dzil.org](http://dzil.org) and [Dist::Zilla::Tutorial](https://metacpan.org/pod/Dist::Zilla::Tutorial#BUILDING-YOUR-DIST) have more details.
 
 This will install the module to the subdirectory lib/perl5 under the given
 prefix.  If this is not already in perl's include path, you'll need to tell
@@ -48,12 +49,6 @@ perl -I /some/other/place/lib/perl5/site_perl yourscript
 
 ```shell
 use lib '/some/other/place/lib/perl5/site_perl';
-```
-
-To build the documentation as html, run:
-
-```shell
-make html
 ```
 
 ## DEPENDENCIES

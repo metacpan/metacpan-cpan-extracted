@@ -4,13 +4,13 @@
       "Raphael Seebacher <raphael@seebachers.ch>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.84, CPAN::Meta::Converter version 2.132830",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "AnyEvent-STOMP-Client",
    "no_index" : {
@@ -21,6 +21,11 @@
    },
    "prereqs" : {
       "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
@@ -40,5 +45,6 @@
          "web" : "https://github.com/raphiniert/AnyEvent-STOMP-Client"
       }
    },
-   "version" : "0.39"
+   "version" : "0.40",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

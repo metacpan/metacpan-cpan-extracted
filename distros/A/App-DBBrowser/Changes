@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.285    2021-10-03
+        - Term::TablePrint minimum version is '0.145'.
+
 2.284    2021-09-26
         - Attached databases: do not allow 'main' and 'temp' as alias names.
         - Code refactoring.

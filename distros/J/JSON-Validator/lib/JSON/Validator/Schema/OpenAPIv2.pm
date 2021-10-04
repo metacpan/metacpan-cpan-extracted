@@ -1,7 +1,6 @@
 package JSON::Validator::Schema::OpenAPIv2;
 use Mojo::Base 'JSON::Validator::Schema::Draft4';
 
-use JSON::Validator::Ref;
 use JSON::Validator::Util qw(E data_type negotiate_content_type schema_type);
 use Mojo::Collection;
 
@@ -12,7 +11,7 @@ my %SKIP_KEYWORDS_IN_PATH = map { ($_, 1) } qw(description parameters servers su
 
 has errors => sub {
   my $self      = shift;
-  my $validator = $self->new(%$self, allow_invalid_ref => 0)->resolve($self->specification);
+  my $validator = $self->new(%$self)->resolve($self->specification);
   return [$validator->coerce({})->validate($self->resolve->data)];
 };
 
@@ -22,26 +21,17 @@ has specification => 'http://swagger.io/v2/schema.json';
 sub add_default_response {
   my ($self, $params) = ($_[0], shift->_params_for_add_default_response(@_));
 
-  my $definitions = $self->data->{definitions}      ||= {};
-  my $ref         = $definitions->{$params->{name}} ||= $params->{schema};
-  my %schema      = ('$ref' => "#/definitions/$params->{name}");
-  tie %schema, 'JSON::Validator::Ref', $ref, $schema{'$ref'}, $schema{'$ref'};
+  my $definitions = $self->data->{definitions} ||= {};
+  $definitions->{$params->{name}} ||= $params->{schema};
+  my $ref = {'$ref' => "#/definitions/$params->{name}"};
+  $self->_register_ref($ref, schema => $definitions->{$params->{name}});
 
   for my $route ($self->routes->each) {
     my $op = $self->get([paths => @$route{qw(path method)}]);
-    $op->{responses}{$_} ||= {description => $params->{description}, schema => \%schema} for @{$params->{status}};
+    for my $status (@{$params->{status}}) {
+      $op->{responses}{$status} ||= {description => $params->{description}, schema => $ref};
+    }
   }
-
-  return $self;
-}
-
-sub allow_invalid_ref {
-  my $self = shift;
-  return $self->{allow_invalid_ref} || 0 unless @_;
-
-  delete $self->{errors};
-  $self->{allow_invalid_ref} = shift;
-  $self->data($self->{data}) if $self->{data};
 
   return $self;
 }
@@ -75,22 +65,6 @@ sub coerce {
   return $self->SUPER::coerce(@_) if @_;
   $self->{coerce} ||= {booleans => 1, numbers => 1, strings => 1};
   return $self->{coerce};
-}
-
-sub data {
-  my $self = shift;
-  return $self->{data} ||= {} unless @_;
-
-  if ($self->allow_invalid_ref) {
-    my $clone = $self->new(%$self, allow_invalid_ref => 0);
-    $self->{data} = $clone->data(shift)->bundle({replace => 1})->data;
-  }
-  else {
-    $self->{data} = $self->_resolve(shift);
-  }
-
-  delete $self->{errors};
-  return $self;
 }
 
 sub new {
@@ -152,10 +126,12 @@ sub routes {
 
   my @operations;
   for my $path (@sorted_paths) {
-    next unless my $methods = $self->get([paths => $path]);
-    for my $method (sort keys %$methods) {
+    next unless my $path_item = $self->get([paths => $path]);
+    $path_item = $self->get($path_item->{'$ref'} =~ s!^#!!r) if $path_item->{'$ref'};
+
+    for my $method (sort keys %$path_item) {
       next if $method =~ $X_RE or $SKIP_KEYWORDS_IN_PATH{$method};
-      push @operations, {method => $method, operation_id => $methods->{$method}{operationId}, path => $path};
+      push @operations, {method => $method, operation_id => $path_item->{$method}{operationId}, path => $path};
     }
   }
 
@@ -215,10 +191,15 @@ sub _build_formats {
   };
 }
 
+sub _bundle_ref_path_expand {
+  my ($self, $ref) = @_;
+  return $ref =~ m!\b(definitions|parameters|responses)/(.+)$! ? ($1, $2) : ('definitions', $ref);
+}
+
 sub _coerce_arrays {
   my ($self, $val, $param) = @_;
   my $data_type   = data_type $val->{value};
-  my $schema_type = schema_type $param;
+  my $schema_type = schema_type $param->{schema} || $param;    # $param->{schema} is for OpenAPIv3
   return $val->{value} = [$val->{value}] if $schema_type eq 'array' and $data_type ne 'array';
   return $val->{value} = @{$val->{value}} ? $val->{value}[-1] : undef
     if $schema_type ne 'array' and $data_type eq 'array';
@@ -263,11 +244,7 @@ sub _default_response_schema {
   };
 }
 
-sub _definitions_path_for_ref {
-  my ($self, $ref) = @_;
-  my $path = Mojo::Path->new($ref->fqn =~ m!^.*#/(definitions|parameters|responses/.+)$!)->to_dir->parts;
-  return $path->[0] ? $path : ['definitions'];
-}
+sub _extract_ref_from_schema { $_[1]->{'$ref'} =~ /^\w+$/ ? "#/definitions/$_[1]->{'$ref'}" : $_[1]->{'$ref'} }
 
 sub _find_all_nodes {
   my ($self, $pointer, $leaf) = @_;
@@ -279,6 +256,18 @@ sub _find_all_nodes {
     push @path, $p;
     my $node = $self->get([@path]);
     push @found, $node->{$leaf} if ref $node->{$leaf} eq 'ARRAY';
+  }
+
+  # Resolve all $ref before returning the data
+  for my $items (@found) {
+    for my $schema (@$items) {
+      my %seen;
+      while (ref $schema eq 'HASH' and $schema->{'$ref'} and !ref $schema->{'$ref'}) {
+        last if $seen{$schema}++;
+        $schema = $self->_refs->{$schema}{schema}
+          // Carp::confess(qq(resolve() must be called before validate() to lookup "$schema->{'$ref'}".));
+      }
+    }
   }
 
   return @found;
@@ -305,12 +294,6 @@ sub _params_for_add_default_response {
 
 sub _prefix_error_path {
   return join '', "/$_[0]", $_[1] =~ /\w/ ? ($_[1]) : ();
-}
-
-sub _resolve_ref {
-  my ($self, $ref_url, $base_url, $root) = @_;
-  $ref_url = "#/definitions/$ref_url" if $ref_url =~ /^\w+$/;
-  return $self->SUPER::_resolve_ref($ref_url, $base_url, $root);
 }
 
 sub _validate_body {
@@ -341,6 +324,8 @@ sub _validate_body {
 
   return;
 }
+
+sub _validate_id { }
 
 sub _validate_request_or_response {
   my ($self, $direction, $parameters, $get) = @_;
@@ -375,20 +360,21 @@ sub _validate_request_or_response {
 }
 
 sub _validate_type_file {
-  my ($self, $data, $path, $schema) = @_;
-  return unless $schema->{required} and (not defined $data or not length $data);
-  return E $path => 'Missing property.';
+  my ($self, $data, $state) = @_;
+  return unless $state->{schema}{required} and (not defined $data or not length $data);
+  return E $state->{path}, 'Missing property.';
 }
 
 sub _validate_type_object {
-  my ($self, $data, $path, $schema) = @_;
+  my ($self, $data, $state) = @_;
+  my ($path, $schema) = @$state{qw(path schema)};
   return E $path, [object => type => data_type $data] if ref $data ne 'HASH';
   return shift->SUPER::_validate_type_object(@_) unless $self->{validate_request};
 
   my (@errors, %ro);
   for my $name (keys %{$schema->{properties} || {}}) {
     next unless $schema->{properties}{$name}{readOnly};
-    push @errors, E "$path/$name", "Read-only." if exists $data->{$name};
+    push @errors, E [@$path, $name], "Read-only." if exists $data->{$name};
     $ro{$name} = 1;
   }
 
@@ -396,17 +382,17 @@ sub _validate_type_object {
 
   my $discriminator = $schema->{discriminator};
   if ($discriminator and !$self->{inside_discriminator}) {
-    return E $path, "Discriminator $discriminator has no value." unless my $name    = $data->{$discriminator};
-    return E $path, "No definition for discriminator $name."     unless my $dschema = $self->get("/definitions/$name");
-    local $self->{inside_discriminator} = 1;    # prevent recursion
-    return $self->_validate($data, $path, $dschema);
+    return E $path, "Discriminator $discriminator has no value." unless my $name = $data->{$discriminator};
+    return E $path, "No definition for discriminator $name."     unless my $ds   = $self->get("/definitions/$name");
+    local $self->{inside_discriminator} = 1;
+    return $self->_validate($data, $self->_state($state, schema => $ds));
   }
 
   return (
     @errors,
-    $self->_validate_type_object_min_max($_[1], $path, $schema),
-    $self->_validate_type_object_dependencies($_[1], $path, $schema),
-    $self->_validate_type_object_properties($_[1], $path, $schema),
+    $self->_validate_type_object_min_max($_[1], $state),
+    $self->_validate_type_object_dependencies($_[1], $state),
+    $self->_validate_type_object_properties($_[1], $state),
   );
 }
 
@@ -518,18 +504,6 @@ Default: C<[400, 401, 404, 500, 501]>.
 
 =back
 
-=head2 allow_invalid_ref
-
-  $bool   = $schema->allow_invalid_ref;
-  $schema = $schema->allow_invalid_ref(1);
-
-Setting this to true will replace all C<$ref>s in the schema before validating
-it. This can be useful if you have a complex schema that you want to split into
-different files where OpenAPIv2 normally does not allow you to.
-
-Setting this attribute will not work if the schema has recursive C<$ref>s.
-
-This method is highly EXPERIMENTAL, and it is not advices to use this method.
 
 =head2 base_url
 
@@ -550,16 +524,6 @@ Coercion is enabled by default, since headers, path parts, query parameters,
 ... are in most cases strings.
 
 See also L<JSON::Validator/coerce>.
-
-=head2 data
-
-  my $hash_ref = $schema->data;
-  my $schema   = $schema->data($bool);
-  my $schema   = $schema->data($hash_ref);
-  my $schema   = $schema->data($url);
-
-Same as L</JSON::Validator::Schema/data>, but will bundle the schema if
-L</allow_invalid_ref> is set.
 
 =head2 new
 

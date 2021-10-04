@@ -14,6 +14,8 @@ SYNOPSIS
   $ perl mb.pm -e uhc       MBCS_Perl_script.pl
   $ perl mb.pm -e utf8      MBCS_Perl_script.pl
   $ perl mb.pm -e wtf8      MBCS_Perl_script.pl
+  
+  C:\WINDOWS> perl mb.pm script.pl ??-DOS-like *wildcard* available
 
 DESCRIPTION
 

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.741';
+our $VERSION = '1.742';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -37,7 +37,7 @@ sub new {
     my $instance_defaults = _defaults();
     if ( defined $opt ) {
         croak "new: the (optional) argument must be a HASH reference" if ref $opt ne 'HASH';
-        validate_options( _valid_options(), $opt );
+        validate_options( _valid_options(), $opt, 'new' );
         for my $key ( keys %$opt ) {
             $instance_defaults->{$key} = $opt->{$key} if defined $opt->{$key};
         }
@@ -276,7 +276,7 @@ sub __choose {
     croak "choose: the first argument must be an ARRAY reference" if ref $orig_list_ref ne 'ARRAY';
     if ( defined $opt ) {
         croak "choose: the (optional) second argument must be a HASH reference" if ref $opt ne 'HASH';
-        validate_options( _valid_options(), $opt );
+        validate_options( _valid_options(), $opt, 'choose' );
         for my $key ( keys %$opt ) {
             $self->{$key} = $opt->{$key} if defined $opt->{$key};
         }
@@ -1222,7 +1222,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.741
+Version 1.742
 
 =cut
 

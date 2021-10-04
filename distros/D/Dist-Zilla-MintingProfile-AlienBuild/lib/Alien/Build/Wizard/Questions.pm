@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use 5.022;
 
-package Alien::Build::Wizard::Questions 0.03 {
+package Alien::Build::Wizard::Questions 0.04 {
 
   use Exporter qw( import );
   use constant QUESTION_URL          => 'Enter the full URL to the latest tarball (or zip, etc.) of the project you want to alienize.';
@@ -41,7 +41,7 @@ Alien::Build::Wizard::Questions - List of questions
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

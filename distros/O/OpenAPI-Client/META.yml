@@ -18,13 +18,13 @@ no_index:
     - t
     - inc
 requires:
-  JSON::Validator: '4.19'
-  Mojolicious::Plugin::OpenAPI: '4.04'
+  JSON::Validator: '4.25'
+  Mojolicious::Plugin::OpenAPI: '4.06'
 resources:
   bugtracker: https://github.com/jhthorsen/openapi-client/issues
   homepage: https://github.com/jhthorsen/openapi-client
   repository: https://github.com/jhthorsen/openapi-client.git
-version: '1.02'
+version: '1.03'
 x_contributors:
   - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
   - 'Ed J <etj@cpan.org>'

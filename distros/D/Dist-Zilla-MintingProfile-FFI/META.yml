@@ -1,0 +1,40 @@
+---
+abstract: 'A minimal Dist::Zilla minting profile for FFI'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Path::Tiny: '0'
+  Test2::V0: '0.000121'
+  Test::DZil: '0'
+  Test::File::ShareDir::Module: '0'
+  perl: '5.020'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+  perl: '5.020'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-MintingProfile-FFI
+requires:
+  Dist::Zilla::File::InMemory: '0'
+  Dist::Zilla::Role::FileGatherer: '0'
+  Dist::Zilla::Role::FileMunger: '0'
+  Dist::Zilla::Role::MintingProfile::ShareDir: '0'
+  Dist::Zilla::Role::ModuleMaker: '0'
+  Moose: '0'
+  namespace::autoclean: '0'
+  perl: '5.020'
+resources:
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/PerlFFI/Dist-Zilla-MintingProfile-FFI/issues
+  homepage: https://metacpan.org/pod/Dist::Zilla::MintingProfile::FFI
+  repository: git://github.com/PerlFFI/Dist-Zilla-MintingProfile-FFI.git
+version: '0.01'
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_use_unsafe_inc: 0

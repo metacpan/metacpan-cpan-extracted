@@ -18,5 +18,5 @@ is(PI, "3141592653589793238462643383279502884197/"
 # These tests should actually produce big rationals, but this is not yet
 # implemented. Fixme!
 
-is(bexp(1, 10), "2.718281828", 'bexp(1, 10)');
-is(bpi(10),     "3.141592654", 'bpi(10)');
+is(bexp(1, 10), "679570457/250000000", 'bexp(1, 10)');
+is(bpi(10),     "1570796327/500000000", 'bpi(10)');

@@ -1,16 +1,14 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::Stats::Kmeans;
 
 our @EXPORT_OK = qw( random_cluster iv_cluster PDL::PP _random_cluster PDL::PP which_cluster PDL::PP assign PDL::PP centroid PDL::PP _d_p2l );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
-
 
 
    
@@ -26,8 +24,6 @@ use Carp;
 use PDL::LiteF;
 use PDL::NiceSlice;
 use PDL::Stats::Basic;
-
-$PDL::onlinedoc->scan(__FILE__) if $PDL::onlinedoc;
 
 =head1 NAME
 
@@ -48,6 +44,8 @@ Implement a basic k-means procedure,
     use PDL::Stats;
 
     my ($data, $idv, $ido) = rtable( $file );
+    # or generate random data:
+    $data = grandom(200, 2); # two vars as below
 
     my ($cluster, $centroid, $ss_centroid, $cluster_last);
 
@@ -59,8 +57,7 @@ Implement a basic k-means procedure,
       $cluster_last = $cluster;
       ($centroid, $ss_centroid) = $data->centroid( $cluster );
       $cluster = $data->assign( $centroid );
-    }
-    while ( sum(abs($cluster - $cluster_last)) > 0 );
+    } while sum(abs($cluster - $cluster_last)) > 0;
 
 or, use the B<kmeans> function provided here,
 
@@ -89,13 +86,12 @@ plot the clusters if there are only 2 vars in $data,
 
 =head1 FUNCTIONS
 
-
-
 =cut
 
 
 
 
+#line 75 "Kmeans/kmeans.pd"
 
 # my tmp var for PDL 2.007 slice upate
 my $_tmp;
@@ -126,7 +122,6 @@ sub random_cluster {
   } while (PDL::any $cluster->sumover == 0 );
   return $cluster;
 }
-
 
 
 
@@ -309,6 +304,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
+#line 432 "Kmeans/kmeans.pd"
+
 sub _scree_ind {
   # use as scree cutoff the point with max distance to the line formed
   # by the 1st and last points in $self
@@ -344,11 +341,12 @@ sub _d_point2line {
 
 
 
-
 *_d_p2l = \&PDL::_d_p2l;
 
 
 
+
+#line 495 "Kmeans/kmeans.pd"
 
 =head2 kmeans
 
@@ -614,27 +612,10 @@ Usage:
 sub PDL::iv_cluster {
   my ($var_ref) = @_;
 
-    # pdl->uniq puts elem in order. so instead list it to maintain old order
-  if (ref $var_ref eq 'PDL') {
-    $var_ref = $var_ref->squeeze;
-    $var_ref->getndims > 1 and
-      croak "multidim pdl passed for single var!";
-    $var_ref = [ list $var_ref ];
-  }
-
   my ($var, $map_ref) = PDL::Stats::Basic::_array_to_pdl( $var_ref );
-  my $var_a = zeroes( short, $var->nelem, $var->max + 1 );
+  my $var_a = yvals( short, $var->nelem, $var->max->sclr + 1 ) == $var;
 
-  for my $l (0 .. $var->max) {
-    my $v = $var_a( ,$l);
-    ($_tmp = $v->index( which $var == $l )) .= 1;
-  }
-
-  if ($var->badflag) {
-    my $ibad = which $var->isbad;
-    ($_tmp = $var_a($ibad, )) .= -1;
-    $var_a->inplace->setvaltobad(-1);
-  }
+  $var_a = $var_a->setbadif( $var->isbad ) if $var->badflag;
 
   return wantarray? ($var_a, $map_ref) : $var_a;
 }
@@ -649,7 +630,7 @@ Default options (case insensitive):
   ABS   => 1,     # high pos and neg loadings on a comp in same cluster
   NCOMP => undef, # max number of components to consider. determined by
                   # scree plot black magic if not specified
-  PLOT  => 1,     # pca scree plot with cutoff at NCOMP
+  PLOT  => 0,     # pca scree plot with cutoff at NCOMP
 
 Usage:
 
@@ -679,7 +660,7 @@ sub PDL::pca_cluster {
     ABS   => 1,     # high pos and neg loadings on a comp in same cluster
     NCOMP => undef, # max number of components to consider. determined by
                     # scree plot black magic if not specified
-    PLOT  => 1,     # pca scree plot with cutoff at NCOMP
+    PLOT  => 0,     # pca scree plot with cutoff at NCOMP
   );
   $opt and $opt{uc $_} = $opt->{$_} for (keys %$opt);
 
@@ -731,7 +712,6 @@ All rights reserved. There is no warranty. You are allowed to redistribute this 
 =cut
 
 
-
 ;
 
 
@@ -739,5 +719,3 @@ All rights reserved. There is no warranty. You are allowed to redistribute this 
 # Exit with OK status
 
 1;
-
-		   

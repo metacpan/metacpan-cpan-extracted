@@ -134,7 +134,7 @@ I<-log> => "I<logfile>"
 Specify path to a log file.  If a valid and writable file is specified, A line will be 
 appended to this file every time one or more streams is successfully fetched for a url.
 
-DEFAULT i<-none> (no logging).
+DEFAULT I<-none-> (no logging).
 
 I<-logfmt> specifies a format string for lines written to the log file.
 
@@ -144,7 +144,7 @@ The valid field I<[variables]> are:  [stream]: The url of the first/best stream 
 [site]:  The site name (Apple).  [url]:  The url searched for streams.  
 [time]: Perl timestamp when the line was logged.  [title], [artist], [album], 
 [description], [year], [genre], [total], [albumartist]:  The corresponding field data 
-returned (or "-na", if no value).
+returned (or "I<-na->", if no value).
 
 =item $podcast->B<get>(['playlist'])
 
@@ -189,15 +189,21 @@ separated by a slash ("/").
 Returns the podcast's, album's, episode's or song clip's title, 
 or (long description).  
 
-=item $podcast->B<getIconURL>()
+=item $podcast->B<getIconURL>(['artist'])
 
 Returns the url for the podcast's / album's "cover art" icon image, 
 if any.
+If B<'artist'> is specified, the channel artist's icon url is returned, 
+if any.  Note:  This requires StreamFinder::Apple to also fetch the 
+channel artist's (AlbumArtist) url as this icon is currently not included 
+on the podcast's page.
 
-=item $podcast->B<getIconData>()
+=item $podcast->B<getIconData>(['artist'])
 
 Returns a two-element array consisting of the extension (ie. "png", 
 "gif", "jpeg", etc.) and the actual icon image (binary data), if any.
+If B<'artist'> is specified, the channel artist's icon data is returned, 
+if any.
 
 =item $podcast->B<getImageURL>()
 
@@ -511,6 +517,47 @@ sub new
 	bless $self, $class;   #BLESS IT!
 
 	return $self;
+}
+
+sub getIconURL
+{
+	my $self = shift;
+	return $self->{'iconurl'}  unless (defined($_[0]) && $_[0] =~ /^\-?artist/i);
+
+	unless ($self->{'articonurl'}) {
+		my $html = '';
+		return ''  unless ($self->{'albumartist'});
+
+		my $url2fetch = $self->{'albumartist'};
+		print STDERR "-0(Fetch Apple Channel for alt. icon from $url2fetch): \n"  if ($DEBUG);
+		my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});
+		$ua->timeout($self->{'timeout'});
+		$ua->cookie_jar({});
+		$ua->env_proxy;
+		my $response = $ua->get($url2fetch);
+		if ($response->is_success) {
+			$html = $response->decoded_content;
+		} else {
+			print STDERR $response->status_line  if ($DEBUG);
+			my $no_wget = system('wget','-V');
+			unless ($no_wget) {
+				print STDERR "\n..trying wget...\n"  if ($DEBUG);
+				$html = `wget -t 2 -T 20 -O- -o /dev/null \"$url2fetch\" 2>/dev/null `;
+			}
+		}
+
+		print STDERR "-1: html=$html=\n"  if ($DEBUG > 1);
+		return undef  unless ($html);
+
+		my ($pre, $post) = split(/\"included\"\:/, $html, 2);
+		$html = '';
+
+		$self->{'articonurl'} = ($pre =~ m#\<img\s+class\=\".*?src\=\"([^\"]+)#s) ? $1 : '';
+		$self->{'articonurl'} = ($pre =~ /\s+srcset\=\"([^\"\s]+)/s) ? $1 : ''
+				if ($self->{'articonurl'} !~ /^http/);
+		print STDERR "--ART ICON URL=".$self->{'articonurl'}."=\n"  if ($DEBUG);
+	}
+	return $self->{'articonurl'};
 }
 
 1

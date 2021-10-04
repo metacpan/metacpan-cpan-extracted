@@ -3,9 +3,7 @@ package PDL::Stats;
 use strict;
 use warnings;
 
-our $VERSION = '0.79';
-
-$PDL::onlinedoc->scan(__FILE__) if $PDL::onlinedoc;
+our $VERSION = '0.80';
 
 sub import {
   my $pkg = (caller())[0];

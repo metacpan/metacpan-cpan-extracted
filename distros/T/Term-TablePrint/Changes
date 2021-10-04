@@ -1,6 +1,13 @@
 Revision history for Term::TablePrint
 
 
+0.145   2021-10-03
+        - Columns with numbers: bugfix column width.
+        - Code refactoring.
+
+0.144   2021-10-02
+        - Update validate_options.
+
 0.143   2021-08-29
         - Adapt the code to the updated Term::Choose.
 

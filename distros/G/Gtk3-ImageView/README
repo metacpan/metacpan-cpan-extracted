@@ -1,0 +1,198 @@
+NAME
+    Gtk3::ImageView - Image viewer widget for Gtk3
+
+VERSION
+    9
+
+SYNOPSIS
+     use Gtk3::ImageView;
+     Gtk3->init;
+
+     $window = Gtk3::Window->new();
+
+     $view = Gtk3::ImageView->new;
+     $view->set_pixbuf($pixbuf, TRUE);
+     $window->add($view);
+
+     $window->show_all;
+
+DESCRIPTION
+    The Gtk3::ImageView widget allows the user to zoom, pan and select the
+    specified image and provides hooks to allow additional tools, e.g.
+    painter, to be created and used.
+
+    Gtk3::ImageView is a Gtk3 port of Gtk2::ImageView.
+
+    To discuss Gtk3::ImageView or gtk3-perl, ask questions and flame/praise
+    the authors, join gtk-perl-list@gnome.org at lists.gnome.org.
+
+SUBROUTINES/METHODS
+  $view->set_pixbuf( $pixbuf, $zoom_to_fit )
+    Defines the image to view. The optional zoom_to_fit parameter specifies
+    whether to zoom to fit the image or not.
+
+  $view->get_pixbuf
+    Returns the image currently being viewed.
+
+  $view->get_pixbuf_size
+    Returns a hash of containing the size of the current image in width and
+    height keys.
+
+  $view->set_zoom($zoom)
+    Specifies the zoom level.
+
+  $view->get_zoom
+    Returns the current zoom level.
+
+  $view->set_zoom_to_fit($zoom_to_fit, $limit)
+    Specifies whether to zoom to fit or not. If limit is defined, such
+    automatic zoom will not zoom more than it. If the limit is undefined,
+    the previously set limit is used, initially it's unlimited.
+
+  $view->zoom_to_box( $box, $additional_factor )
+    Specifies a box to zoom to, including an additional zoom factor
+
+  $view->zoom_to_selection($context_factor)
+    Zooms to the current selection, plus an addition zoom factor. Shortcut
+    for
+
+     $view->zoom_to_box( $view->get_selection, $context_factor );
+
+  $view->get_zoom_to_fit
+    Returns whether the view is currently zoom to fit or not.
+
+  $view->zoom_in
+    Increases the current zoom by "zoom-step" times (defaults to 2).
+
+  $view->zoom_out
+    Decreases the current zoom by "zoom-step" times (defaults to 2).
+
+  $view->zoom_to_fit
+    Shortcut for
+
+     $view->set_zoom_to_fit(TRUE);
+
+  $view->set_fitting( $value )
+    Shortcut for
+
+     $view->set_zoom_to_fit($value, 1);
+
+    which means that it won't stretch a small image to a large window.
+    Provided (despite the ambiguous name) for compatibility with
+    Gtk2::ImageView.
+
+  $view->set_offset( $x, $y )
+    Set the current view offset (i.e. pan position).
+
+  $view->set_offset
+    Returns the current view offset (i.e. pan position).
+
+  $view->get_viewport
+    Returns a hash containing the position and size of the current viewport.
+
+  $view->set_tool
+    Set the current tool (i.e. mode) - an object of a subclass of
+    "Gtk3::ImageView::Tool".
+
+    Here are some known subclasses of it:
+
+    *
+     "Gtk3::ImageView::Tool::Dragger" allows the image to be dragged when
+     zoomed.
+
+    *
+     "Gtk3::ImageView::Tool::Selector" allows the user to select a
+     rectangular area of the image.
+
+    *
+     "Gtk3::ImageView::Tool::SelectorDragger" selects or drags with
+     different mouse buttons.
+
+    Don't rely too much on how Tool currently interacts with ImageView.
+
+  $view->get_tool
+    Returns the current tool (i.e. mode).
+
+  $view->set_selection($selection)
+    Set the current selection as a hash of position and size.
+
+  $view->get_selection
+    Returns the current selection as a hash of position and size.
+
+  $view->set_resolution_ratio($ratio)
+    Set the ratio of the resolutions in the x and y directions, allowing
+    images with non-square pixels to be correctly displayed.
+
+  $view->get_resolution_ratio
+    Returns the current resolution ratio.
+
+  $view->set_interpolation
+    The interpolation method to use, from "cairo_filter_t"
+    <https://www.cairographics.org/manual/cairo-cairo-pattern-t.html#cairo-f
+    ilter-t> type. Possible values are lowercase strings like "nearest". To
+    use different interpolation depending on zoom, set it in the
+    "zoom-changed" signal.
+
+  $view->get_interpolation
+    Returns the current interpolation method.
+
+DIAGNOSTICS
+CONFIGURATION AND ENVIRONMENT
+DEPENDENCIES
+INCOMPATIBILITIES
+  Porting from Gtk2::ImageView
+    *
+     "set_from_pixbuf()" was renamed to "set_pixbuf()" and now its second
+     argument means "zoom_to_fit()" instead of "set_fitting()".
+
+    *
+     "set_fitting(TRUE)" used to be the default, now you need to call it
+     explicitly if you want that behavior. However, once it's called, new
+     calls to "set_from_pixbuf()" won't reset it, see "set_zoom_to_fit()"
+     for more details..
+
+    *
+     Drag and drop now can be triggered by subscribing to "dnd-start"
+     signal, and calling "$view->drag_begin_with_coordinates()" from the
+     handler. "drag_source_set()" won't work.
+
+    *
+     "Gtk2::ImageView::ScrollWin" replacement is not yet implemented.
+
+    *
+     "set_transp()" is now available through CSS
+     <https://developer.gnome.org/gtk3/stable/chap-css-overview.html>
+     instead, e.g. via
+
+      .imageview.transparent {
+          background-image: url('checkers.svg');
+      }
+
+    *
+     "set_interpolation()" now accepts "cairo_filter_t"
+     <https://www.cairographics.org/manual/cairo-cairo-pattern-t.html#cairo-
+     filter-t> instead of "GdkInterpType"
+     <https://developer.gnome.org/gdk-pixbuf/stable/gdk-pixbuf-Scaling.html#
+     GdkInterpType>.
+
+BUGS AND LIMITATIONS
+    This should be rewritten on C, and Perl bindings should be provided via
+    Glib Object Introspection.
+
+AUTHOR
+    Jeffrey Ratcliffe, <jffry@posteo.net>
+
+    Alexey Sokolov <sokolov@google.com>
+
+LICENSE AND COPYRIGHT
+    Copyright (C) 2018--2020 by Jeffrey Ratcliffe
+
+    Copyright (C) 2020 by Google LLC
+
+    Modelled after the GtkImageView C widget by Björn Lindqvist
+    <bjourne@gmail.com>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.5 or, at
+    your option, any later version of Perl 5 you may have available.
+

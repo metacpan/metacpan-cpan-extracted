@@ -1,16 +1,14 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::Stats::Distr;
 
 our @EXPORT_OK = qw( PDL::PP mme_beta PDL::PP pdf_beta PDL::PP mme_binomial PDL::PP pmf_binomial PDL::PP mle_exp PDL::PP pdf_exp PDL::PP mme_gamma PDL::PP pdf_gamma PDL::PP mle_gaussian PDL::PP pdf_gaussian PDL::PP mle_geo PDL::PP pmf_geo PDL::PP mle_geosh PDL::PP pmf_geosh PDL::PP mle_lognormal PDL::PP mme_lognormal PDL::PP pdf_lognormal PDL::PP mme_nbd PDL::PP pmf_nbd PDL::PP mme_pareto PDL::PP pdf_pareto PDL::PP mle_poisson PDL::PP pmf_poisson PDL::PP pmf_poisson_stirling PDL::PP _pmf_poisson_factorial );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
-
 
 
    
@@ -28,14 +26,6 @@ use warnings;
 use Carp;
 use PDL::LiteF;
 
-$PDL::onlinedoc->scan(__FILE__) if $PDL::onlinedoc;
-
-eval {
-  require PDL::Graphics::PGPLOT::Window;
-  PDL::Graphics::PGPLOT::Window->import( 'pgwin' );
-};
-my $PGPLOT = 1 if !$@;
-
 my $DEV = ($^O =~ /win/i)? '/png' : '/xs';
 
 =head1 NAME
@@ -51,7 +41,8 @@ Parameter estimate is maximum likelihood estimate when there is closed form esti
     use PDL::LiteF;
     use PDL::Stats::Distr;
 
-      # do a frequency (probability) plot with fitted normal curve
+    # do a frequency (probability) plot with fitted normal curve
+    my $data = grandom(100)->abs;
 
     my ($xvals, $hist) = $data->hist;
 
@@ -86,10 +77,7 @@ Or, play with different distributions with B<plot_distr> :)
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -950,6 +938,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
+#line 1139 "Distr/distr.pd"
+
 =head2 pmf_poisson_factorial
 
 =for sig
@@ -977,13 +967,14 @@ sub PDL::pmf_poisson_factorial {
 
 
 
-
 *_pmf_poisson_factorial = \&PDL::_pmf_poisson_factorial;
 
 
 
 ;
 
+
+#line 1201 "Distr/distr.pd"
 
 =head2 plot_distr
 
@@ -1022,10 +1013,7 @@ Usage:
 
 *plot_distr = \&PDL::plot_distr;
 sub PDL::plot_distr {
-  if (!$PGPLOT) {
-    carp "No PDL::Graphics::PGPLOT, no plot :(";
-    return;
-  }
+  require PDL::Graphics::PGPLOT::Window;
   my ($self, @distr) = @_;
 
   my %opt = (
@@ -1045,26 +1033,25 @@ sub PDL::plot_distr {
     if grep { /(?:binomial)|(?:geo)|(?:nbd)|(?:poisson)/ } @distr;
 
   my ($range, $step, $step_int);
-  $range = $self->max - $self->min;
+  $range = $self->max->sclr - $self->min->sclr;
   $step  = $range / $opt{MAXBN};
   $step_int = ($range <= $opt{MAXBN})? 1 
             :                          PDL::ceil( $range / $opt{MAXBN} )
             ;
-    # use min to make it pure scalar for sequence()
-  $opt{MAXBN} = PDL::ceil( $range / $step )->min;
+  $opt{MAXBN} = PDL::ceil( $range / $step )->min->sclr;
 
-  my $hist = $self->double->histogram($step, $self->min, $opt{MAXBN});
+  my $hist = $self->double->histogram($step, $self->min->sclr, $opt{MAXBN});
     # turn fre into prob
   $hist /= $self->dim(0);
 
-  my $xvals = $self->min + sequence( $opt{MAXBN} ) * $step;
+  my $xvals = $self->min->sclr + sequence( $opt{MAXBN} ) * $step;
   my $xvals_int
-    = PDL::ceil($self->min) + sequence( $opt{MAXBN} ) * $step_int;
+    = PDL::ceil($self->min->sclr) + sequence( $opt{MAXBN} ) * $step_int;
   $xvals_int = $xvals_int->where( $xvals_int <= $xvals->max )->sever;
 
   my $win = $opt{WIN};
   if (!$win) {
-    $win = pgwin( Dev=>$opt{DEV} );
+    $win = PDL::Graphics::PGPLOT::Window::pgwin( Dev=>$opt{DEV} );
     $win->env($xvals->minmax,0,1, {XTitle=>'xvals', YTitle=>'probability'});
   }
 
@@ -1107,7 +1094,7 @@ sub PDL::plot_distr {
     };
     carp $@ if $@;
   }
-  $win->legend(\@text, ($xvals->min + $xvals->max)/2, .95,
+  $win->legend(\@text, ($xvals->min->sclr + $xvals->max->sclr)/2, .95,
                {COLOR=>[$opt{COLOR}+1 .. $c], TextFraction=>.75} );
   $win->close
     unless defined $opt{WIN};
@@ -1135,9 +1122,6 @@ All rights reserved. There is no warranty. You are allowed to redistribute this 
 
 
 
-
 # Exit with OK status
 
 1;
-
-		   

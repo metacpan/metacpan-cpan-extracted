@@ -102,7 +102,7 @@ sub t_ols {
     ss_total => 10,
     ss_model => 7.5,
   );
-  my $sum;
+  my $sum = pdl 0;
   $sum += sum(abs($a{$_} - $m{$_}))
     for (keys %a);
   return $sum;
@@ -126,7 +126,7 @@ sub t_ols_bad {
     ss_total => 10,
     ss_model => 7.5,
   );
-  my $sum;
+  my $sum = pdl 0;
   $sum += sum(abs($a{$_} - $m{$_}))
     for (keys %a);
   return $sum;
@@ -143,7 +143,7 @@ F_change  => pdl(3, 3),
 F_df      => pdl(1, 2),
 R2_change => pdl(.15, .15),
   );
-  my $sum;
+  my $sum = pdl 0;
   $sum += sum($a{$_} - $m{$_})
     for (keys %a);
   return $sum;
@@ -218,6 +218,11 @@ SKIP: {
   skip 'no PDL::Fit::LM', 1 if $@;
 
   is( tapprox( t_logistic(), 0 ), 1, 'logistic' );
+
+  my $y = pdl( 0, 0, 0, 1, 1 );
+  my $x = pdl(2, 3, 5, 5, 5);
+  my %m = $y->logistic( $x, {COV=>1} );
+  isnt $m{cov}, undef, 'get cov from logistic if ask';
 };
 sub t_logistic {
   my $y = pdl( 0, 0, 0, 1, 1 );
@@ -474,7 +479,7 @@ SKIP: {
 sub t_anova_rptd_mixed_backend {
     my ($d,$s,$w,$b,$ans) = @_;
     my %m = $d->anova_rptd($s,$w,$b,{ivnm=>['within','between'],btwn=>[1],plot=>0, v=>0});
-    my $error;
+    my $error = pdl 0;
     $error += $m{$_} - $$ans{$_} foreach keys %$ans;
     return $error;
 }

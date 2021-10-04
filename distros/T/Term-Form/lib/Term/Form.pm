@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.538';
+our $VERSION = '0.539';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form read_line );
 
@@ -42,7 +42,8 @@ sub new {
     my $instance_defaults = _defaults();
     if ( defined $opt ) {
         croak "new: The (optional) argument is not a HASH reference." if ref $opt ne 'HASH';
-        validate_options( _valid_options( 'new' ), $opt );
+        my $caller = 'new';
+        validate_options( _valid_options( $caller ), $opt, $caller );
         for my $key ( keys %$opt ) {
             $instance_defaults->{$key} = $opt->{$key} if defined $opt->{$key};
         }
@@ -451,7 +452,8 @@ sub readline {
         croak "readline: the (optional) second argument must be a string or a HASH reference";
     }
     if ( %$opt ) {
-        validate_options( _valid_options( 'readline' ), $opt );
+        my $caller = 'readline';
+        validate_options( _valid_options( $caller ), $opt, $caller );
         for my $key ( keys %$opt ) {
             $self->{$key} = $opt->{$key} if defined $opt->{$key};
         }
@@ -1161,7 +1163,8 @@ sub fill_form {
     croak "'fill_form': the (optional) second argument must be a HASH reference" if ref $opt ne 'HASH';
     return [] if ! @$orig_list; ##
     if ( %$opt ) {
-        validate_options( _valid_options( 'fill_form' ), $opt );
+        my $caller = 'fill_form';
+        validate_options( _valid_options( $caller ), $opt, $caller );
         for my $key ( keys %$opt ) {
             $self->{$key} = $opt->{$key} if defined $opt->{$key};
         }
@@ -1576,7 +1579,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.538
+Version 0.539
 
 =cut
 

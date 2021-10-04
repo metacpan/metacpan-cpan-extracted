@@ -1,5 +1,8 @@
 Revision history for Perl module AnyEvent::STOMP::Client.
 
+0.40  2021-10-02
+      - Properly propagate low-level errors and error messages in the on_error callback (by @kbucheli)
+
 0.39  2014-02-12
       - Made connect method of AnyEvent::STOMP::Client not die.
       - Implemented on_error callback in AnyEvent::STOMP::Client::All.

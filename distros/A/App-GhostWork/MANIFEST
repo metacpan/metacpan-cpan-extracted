@@ -4,8 +4,11 @@ bin/201_PASS.bat
 bin/202_FAIL.bat
 bin/301_REPLIED_TO_LETTER.bat
 bin/GhostWork.bat
+bin/GhostWork.pl4.bat
 bin/GhostWorkEnglish.bat
+bin/GhostWorkEnglish.pl4.bat
 bin/GhostWorkJapanese.bat
+bin/GhostWorkJapanese.pl4.bat
 README
 Changes
 META.yml

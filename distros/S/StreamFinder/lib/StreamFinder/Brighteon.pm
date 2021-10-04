@@ -152,7 +152,7 @@ I<-log> => "I<logfile>"
 Specify path to a log file.  If a valid and writable file is specified, A line will be 
 appended to this file every time one or more streams is successfully fetched for a url.
 
-DEFAULT i<-none> (no logging).
+DEFAULT I<-none-> (no logging).
 
 I<-logfmt> specifies a format string for lines written to the log file.
 
@@ -162,7 +162,7 @@ The valid field I<[variables]> are:  [stream]: The url of the first/best stream 
 [site]:  The site name (Brighteon).  [url]:  The url searched for streams.  
 [time]: Perl timestamp when the line was logged.  [title], [artist], [album], 
 [description], [year], [genre], [total], [albumartist]:  The corresponding field data 
-returned (or "-na", if no value).
+returned (or "I<-na->", if no value).
 
 =item $video->B<get>()
 
@@ -196,14 +196,18 @@ Returns the video's Brighteon ID (alphanumeric).
 
 Returns the video's title, or (long description).  
 
-=item $video->B<getIconURL>()
+=item $video->B<getIconURL>(['artist'])
 
 Returns the URL for the video's "cover art" icon image, if any.
+If B<'artist'> is specified, the channel artist's icon url is returned, 
+if any.
 
-=item $video->B<getIconData>()
+=item $video->B<getIconData>(['artist'])
 
 Returns a two-element array consisting of the extension (ie. "png", 
 "gif", "jpeg", etc.) and the actual icon image (binary data), if any.
+If B<'artist'> is specified, the channel artist's icon data is returned, 
+if any.
 
 =item $video->B<getImageURL>()
 
@@ -508,6 +512,11 @@ sub new
 	$self->{'iconurl'} = ($html =~ m#\<link\s+rel\=\"image_src\"\s+href\=\"([^\"]+)#) ? $1 : '';
 	$self->{'iconurl'} ||= $1  if ($html =~ m#\<img\s+src\=\"([^\"]+)\"\s+alt\=\"channel[\s\-\_]+image\"\/\>#);
 
+	if ($html =~ m#\<div\s+class\=\"author\"(.+?)\<\/div\>#s) {
+		my $authorstuff = $1;
+		$self->{'articonurl'} = $1  if ($authorstuff =~ m# src\=\"([^\"]+)#s);
+		print STDERR "---CHANNEL ICON URL=".$self->{'articonurl'}."=\n"  if ($DEBUG);
+	}
 	print STDERR "\n--ID=".$self->{'id'}."=\n--ARTIST=".$self->{'artist'}."=\n--TITLE=".$self->{'title'}."=\n--CNT=".$self->{'cnt'}."=\n--ICON=".$self->{'iconurl'}."=\n--DESC=".$self->{'description'}."=\n--streams=".join('|',@{$self->{'streams'}})."=\n"  if ($DEBUG);
 
 	#IF WE DIDN'T FIND ANY STREAMS IN THE PAGE, TRY youtube-dl:

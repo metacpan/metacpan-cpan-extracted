@@ -1,6 +1,3 @@
-# TODO 'further details' ======= =========
-
-
 do('../Config');
 our $VERSION = '0.14';
 pp_setversion($VERSION);
@@ -19,11 +16,12 @@ pp_addhdr('
 }
 
 pp_addhdr('
-#include <math.h>
-
-#if defined(PDL_CORE_VERSION) && PDL_CORE_VERSION < 10
-typedef PDL_Long PDL_Indx;
+#ifndef PDL /* this is needed for PDL pre-2.058 */
+#define PDL PDL_LinearAlgebra_Complex
+Core* PDL = NULL; PDL_COMMENT("Structure hold core C functions")
 #endif
+
+#include <math.h>
 
 typedef PDL_Long logical;
 typedef PDL_Long integer;
@@ -870,104 +868,10 @@ EOF
 
 
 pp_addhdr('
-static SV*   fselect_func;
-PDL_Long fselect_wrapper(float *p)
-{
-   dSP ;
-
-   int count;
-   long ret;
-   SV *pdl1;
-   HV *bless_stash;
-
-   pdl *pdl;
-   PDL_Indx odims[1];
-
-   PDL_Indx dims[] = {2,1};
-   pdl = PDL->pdlnew();
-   PDL->setdims (pdl, dims, 2);
-   pdl->datatype = PDL_F;
-   pdl->data = p;
-   pdl->state |= PDL_DONTTOUCHDATA | PDL_ALLOCATED;
-   bless_stash = gv_stashpv("PDL::Complex", 0);
-
-   ENTER ;   SAVETMPS ;   PUSHMARK(sp) ;
-
-    pdl1 = sv_newmortal();
-    PDL->SetSV_PDL(pdl1, pdl);
-    pdl1 = sv_bless(pdl1, bless_stash); /* bless in PDL::Complex  */
-    XPUSHs(pdl1);
-
-   PUTBACK ;
-
-   count = perl_call_sv(fselect_func, G_SCALAR);
-
-   SPAGAIN;
-
-   if (count !=1)
-      croak("Error calling perl function\n");
-
-
-   // For pdl_free
-   odims[0] = 0;
-   PDL->setdims (pdl, odims, 0);
-   pdl->state &= ~ (PDL_ALLOCATED |PDL_DONTTOUCHDATA);
-   pdl->data=NULL;
-   ret = (long ) POPl ;
-   PUTBACK ;   FREETMPS ;   LEAVE ;
-   return ret;
-
-}
-
-static SV*   dselect_func;
-PDL_Long dselect_wrapper(double *p)
-{
-   dSP ;
-
-   int count;
-   long ret;
-   SV *pdl1;
-   HV *bless_stash;
-
-   pdl *pdl;
-   PDL_Indx odims[1];
-
-   PDL_Indx dims[] = {2,1};
-   pdl = PDL->pdlnew();
-   PDL->setdims (pdl, dims, 2);
-   pdl->datatype = PDL_D;
-   pdl->data = p;
-   pdl->state |= PDL_DONTTOUCHDATA | PDL_ALLOCATED;
-   bless_stash = gv_stashpv("PDL::Complex", 0);
-
-   ENTER ;   SAVETMPS ;   PUSHMARK(sp) ;
-
-    pdl1 = sv_newmortal();
-    PDL->SetSV_PDL(pdl1, pdl);
-    pdl1 = sv_bless(pdl1, bless_stash); /* bless in PDL::Complex  */
-    XPUSHs(pdl1);
-
-   PUTBACK ;
-
-   count = perl_call_sv(dselect_func, G_SCALAR);
-
-   SPAGAIN;
-
-   if (count !=1)
-      croak("Error calling perl function\n");
-
-
-   // For pdl_free
-   odims[0] = 0;
-   PDL->setdims (pdl, odims, 0);
-   pdl->state &= ~ (PDL_ALLOCATED |PDL_DONTTOUCHDATA);
-   pdl->data=NULL;
-   ret = (long ) POPl ;
-   PUTBACK ;   FREETMPS ;   LEAVE ;
-   return ret;
-
-}
-
+void fselect_func_set(SV* func);
+void dselect_func_set(SV* func);
+PDL_Long fselect_wrapper(float *p);
+PDL_Long dselect_wrapper(double *p);
 ');
 
 pp_defc("gees",
@@ -989,7 +893,7 @@ EOF
 		$GENERIC() tmp_work[2];
 		$GENERIC() *rwork, *work;
 		rwork = ($GENERIC() *) malloc ($SIZE(n) * sizeof ($GENERIC()));
-		$TFD(f,d)select_func    = $COMP(select_func);
+		$TFD(f,d)select_func_set($COMP(select_func));
 
 		if ($jobvs())
 			jvs = \'V\';
@@ -1081,7 +985,7 @@ EOF
 
 		$GENERIC() *work, *rwork;
 		rwork = ($GENERIC() *) malloc ($SIZE(n) * sizeof ($GENERIC()));
-		$TFD(f,d)select_func    = $COMP(select_func);
+		$TFD(f,d)select_func_set($COMP(select_func));
 
 
 		if ($jobvs())
@@ -1156,141 +1060,11 @@ Complex version of geesx
 
 
 pp_addhdr('
-static SV*   fgselect_func;
-PDL_Long fgselect_wrapper(float *p, float *q)
-{
-   dSP ;
-
-   int count;
-   long ret;
-   SV *svpdl1, *svpdl2;
-   HV *bless_stash;
-
-   pdl *pdl1, *pdl2;
-   PDL_Indx odims[1];
-
-   PDL_Indx dims[] = {2,1};
-   pdl1 = PDL->pdlnew();
-   PDL->setdims (pdl1, dims, 2);
-   pdl1->datatype = PDL_F;
-   pdl1->data = p;
-   pdl1->state |= PDL_DONTTOUCHDATA | PDL_ALLOCATED;
-   pdl2 = PDL->pdlnew();
-   PDL->setdims (pdl2, dims, 2);
-   pdl2->datatype = PDL_F;
-   pdl2->data = q;
-   pdl2->state |= PDL_DONTTOUCHDATA | PDL_ALLOCATED;
-
-
-
-   bless_stash = gv_stashpv("PDL::Complex", 0);
-
-   ENTER ;   SAVETMPS ;   PUSHMARK(sp) ;
-
-    svpdl1 = sv_newmortal();
-    PDL->SetSV_PDL(svpdl1, pdl1);
-    svpdl1 = sv_bless(svpdl1, bless_stash); /* bless in PDL::Complex  */
-    
-    svpdl2 = sv_newmortal();
-    PDL->SetSV_PDL(svpdl2, pdl2);
-    svpdl2 = sv_bless(svpdl2, bless_stash); /* bless in PDL::Complex  */
-    
-    XPUSHs(svpdl1);
-    XPUSHs(svpdl2);
-
-   PUTBACK ;
-
-   count = perl_call_sv(fgselect_func, G_SCALAR);
-
-   SPAGAIN;
-
-   if (count !=1)
-      croak("Error calling perl function\n");
-
-
-   // For pdl_free
-   odims[0] = 0;
-   PDL->setdims (pdl1, odims, 0);
-   pdl1->state &= ~ (PDL_ALLOCATED |PDL_DONTTOUCHDATA);
-   pdl1->data=NULL;
-
-   PDL->setdims (pdl2, odims, 0);
-   pdl1->state &= ~ (PDL_ALLOCATED |PDL_DONTTOUCHDATA);
-   pdl1->data=NULL;
-
-   ret = (long ) POPl ;
-   PUTBACK ;   FREETMPS ;   LEAVE ;
-   return ret;
-
-}
-
-static SV*   dgselect_func;
-PDL_Long dgselect_wrapper(double *p, double *q)
-{
-   dSP ;
-
-   int count;
-   long ret;
-   SV *svpdl1, *svpdl2;
-   HV *bless_stash;
-
-   pdl *pdl1, *pdl2;
-   PDL_Indx odims[1];
-
-   PDL_Indx dims[] = {2,1};
-   pdl1 = PDL->pdlnew();
-   PDL->setdims (pdl1, dims, 2);
-   pdl1->datatype = PDL_D;
-   pdl1->data = p;
-   pdl1->state |= PDL_DONTTOUCHDATA | PDL_ALLOCATED;
-   pdl2 = PDL->pdlnew();
-   PDL->setdims (pdl2, dims, 2);
-   pdl2->datatype = PDL_D;
-   pdl2->data = q;
-   pdl2->state |= PDL_DONTTOUCHDATA | PDL_ALLOCATED;
-
-   bless_stash = gv_stashpv("PDL::Complex", 0);
-
-
-   ENTER ;   SAVETMPS ;   PUSHMARK(sp) ;
-
-    svpdl1 = sv_newmortal();
-    PDL->SetSV_PDL(svpdl1, pdl1);
-    svpdl1 = sv_bless(svpdl1, bless_stash); /* bless in PDL::Complex  */
-    svpdl2 = sv_newmortal();
-    PDL->SetSV_PDL(svpdl2, pdl2);
-    svpdl2 = sv_bless(svpdl2, bless_stash); /* bless in PDL::Complex  */
-
-    XPUSHs(svpdl1);
-    XPUSHs(svpdl2);
-
-   PUTBACK ;
-
-   count = perl_call_sv(dgselect_func, G_SCALAR);
-
-   SPAGAIN;
-
-   if (count !=1)
-      croak("Error calling perl function\n");
-
-
-   // For pdl_free
-   odims[0] = 0;
-   PDL->setdims (pdl1, odims, 0);
-   pdl1->state &= ~ (PDL_ALLOCATED |PDL_DONTTOUCHDATA);
-   pdl1->data=NULL;
-   PDL->setdims (pdl2, odims, 0);
-   pdl2->state &= ~ (PDL_ALLOCATED |PDL_DONTTOUCHDATA);
-   pdl2->data=NULL;
-
-   ret = (long ) POPl ;
-   PUTBACK ;   FREETMPS ;   LEAVE ;
-   return ret;
-
-}
-
+void fgselect_func_set(SV* func);
+void dgselect_func_set(SV* func);
+PDL_Long fgselect_wrapper(float *p);
+PDL_Long dgselect_wrapper(double *p);
 ');
-
 
 pp_defc("gges",
        _decl => <<'EOF',
@@ -1310,7 +1084,7 @@ EOF
 		integer *bwork;
 
 		$GENERIC() tmp_work[2], *rwork;
-		$TFD(f,d)gselect_func    = $COMP(select_func);
+		$TFD(f,d)gselect_func_set($COMP(select_func));
 		rwork = ($GENERIC() *)malloc(8 * $SIZE(n) *  sizeof($GENERIC()));	
 		if ($jobvsl())
 			pjobvsl = \'V\';
@@ -1424,7 +1198,7 @@ EOF
 		integer *bwork;
 		integer *iwork;
 		$GENERIC() *rwork = ($GENERIC() *)malloc(8 * $SIZE(n) *  sizeof($GENERIC()));	
-		$TFD(f,d)gselect_func    = $COMP(select_func);
+		$TFD(f,d)gselect_func_set($COMP(select_func));
 		if ($jobvsr())
 			pjobvsr = \'V\';
 
@@ -5510,30 +5284,8 @@ EOT
 );
 
 pp_addhdr('
-void cftrace(int n, void *a1, void *a2)
-{
-  float *mat = a1, *res = a2;
-  int i;
-  res[0] = mat[0];
-  res[1] = mat[1];
-  for (i = 1; i < n; i++)
-  {
-   	res[0] += mat[(i*(n+1))*2];
-   	res[1] += mat[(i*(n+1))*2+1];
-  }
-}
-void cdtrace(int n, void *a1, void *a2)
-{
-  double *mat = a1, *res = a2;
-  int i;
-  res[0] = mat[0];
-  res[1] = mat[1];
-  for (i = 1; i < n; i++)
-  {
-   	res[0] += mat[(i*(n+1))*2];
-   	res[1] += mat[(i*(n+1))*2+1];
-  }
-}
+void cftrace(int n, void *a1, void *a2);
+void cdtrace(int n, void *a1, void *a2);
 ');
 
 pp_defc('charpol',

@@ -60,6 +60,7 @@ t/v2-tutorial.t
 t/v2-validate-schema.t
 t/v3-basic.t
 t/v3-body.t
+t/v3-bundle.t
 t/v3-defaults.t
 t/v3-file.t
 t/v3-invalid_file_refs.t

@@ -1,0 +1,144 @@
+NAME
+    Tags::HTML - Tags helper abstract class.
+
+SYNOPSIS
+     use Tags::HTML;
+
+     my $obj = Tags::HTML->new(%params);
+     $obj->process;
+     $obj->process_css;
+
+METHODS
+  "new"
+     my $obj = Tags::HTML->new(%params);
+
+    Constructor.
+
+    Returns instance of class.
+
+    *       "css"
+
+            'CSS::Struct::Output' object for process_css processing.
+
+            Default value is undef.
+
+    *       "tags"
+
+            'Tags::Output' object for process processing.
+
+            Default value is undef.
+
+  "process"
+     $obj->process;
+
+    Process Tags structure.
+
+    Returns undef.
+
+  "process_css"
+     $obj->process_css;
+
+    Process CSS::Struct structure.
+
+    Returns undef.
+
+ERRORS
+     new():
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+             Parameter 'css' must be a 'CSS::Struct::Output::*' class.
+             Parameter 'tags' must be a 'Tags::Output::*' class.
+
+     process():
+             Need to be implemented in inherited class in _process() method.
+             Parameter 'tags' isn't defined.
+
+     process_css():
+             Need to be implemented in inherited class in _process_css() method.
+             Parameter 'css' isn't defined.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     package Foo;
+
+     use base qw(Tags::HTML);
+
+     sub _process {
+             my ($self, $value) = @_;
+
+             $self->{'tags'}->put(
+                     ['b', 'div'],
+                     ['d', $value],
+                     ['e', 'div'],
+             );
+
+             return;
+     }
+
+     sub _process_css {
+             my ($self, $color) = @_;
+
+             $self->{'css'}->put(
+                     ['s', 'div'],
+                     ['d', 'background-color', $color],
+                     ['e'],
+             );
+
+             return;
+     }
+
+     package main;
+
+     use CSS::Struct::Output::Indent;
+     use Tags::Output::Indent;
+
+     # Object.
+     my $css = CSS::Struct::Output::Indent->new;
+     my $tags = Tags::Output::Indent->new;
+     my $obj = Foo->new(
+             'css' => $css,
+             'tags' => $tags,
+     );
+
+     # Process indicator.
+     $obj->process_css('red');
+     $obj->process('value');
+
+     # Print out.
+     print "CSS\n";
+     print $css->flush."\n\n";
+     print "HTML\n";
+     print $tags->flush."\n";
+
+     # Output:
+     # CSS
+     # div {
+     #      background-color: red;
+     # }
+     #
+     # HTML
+     # <div>
+     #   value
+     # </div>
+
+DEPENDENCIES
+    Class::Utils, Error::Pure.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Tags-HTML>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © Michal Josef Špaček 2021
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

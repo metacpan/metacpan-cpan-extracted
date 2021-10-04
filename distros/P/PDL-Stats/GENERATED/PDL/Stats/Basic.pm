@@ -1,16 +1,14 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::Stats::Basic;
 
 our @EXPORT_OK = qw( binomial_test rtable which_id PDL::PP stdv PDL::PP stdv_unbiased PDL::PP var PDL::PP var_unbiased PDL::PP se PDL::PP ss PDL::PP skew PDL::PP skew_unbiased PDL::PP kurt PDL::PP kurt_unbiased PDL::PP cov PDL::PP cov_table PDL::PP corr PDL::PP corr_table PDL::PP t_corr PDL::PP n_pair PDL::PP corr_dev PDL::PP t_test PDL::PP t_test_nev PDL::PP t_test_paired );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
-
 
 
    
@@ -25,8 +23,6 @@ use DynaLoader;
 use PDL::LiteF;
 use PDL::NiceSlice;
 use Carp;
-
-$PDL::onlinedoc->scan(__FILE__) if $PDL::onlinedoc;
 
 eval { require PDL::Core; require PDL::GSL::CDF; };
 my $CDF = 1 if !$@;
@@ -63,10 +59,7 @@ or
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -866,6 +859,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
+#line 1252 "Basic/stats_basic.pd"
+
 =head2 binomial_test
 
 =for Sig
@@ -917,8 +912,6 @@ sub PDL::binomial_test {
 Reads either file or file handle*. Returns observation x variable pdl and var and obs ids if specified. Ids in perl @ ref to allow for non-numeric ids. Other non-numeric entries are treated as missing, which are filled with $opt{MISSN} then set to BAD*. Can specify num of data rows to read from top but not arbitrary range.
 
 *If passed handle, it will not be closed here.
-
-*PDL::Bad::setvaltobad only works consistently with the default TYPE double before PDL-2.4.4_04.
 
 =for options
 
@@ -1262,6 +1255,7 @@ sub which_id {
 
 sub _array_to_pdl {
   my ($var_ref) = @_;
+  $var_ref = [ $var_ref->list ] if UNIVERSAL::isa($var_ref, 'PDL');
 
   my (%level, $l);
   $l = 0;
@@ -1301,7 +1295,6 @@ All rights reserved. There is no warranty. You are allowed to redistribute this 
 =cut
 
 
-
 ;
 
 
@@ -1309,5 +1302,3 @@ All rights reserved. There is no warranty. You are allowed to redistribute this 
 # Exit with OK status
 
 1;
-
-		   

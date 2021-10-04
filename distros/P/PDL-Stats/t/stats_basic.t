@@ -1,5 +1,3 @@
-#!/usr/bin/perl 
-
 use strict;
 use warnings;
 use Test::More;
@@ -29,6 +27,13 @@ is( tapprox( $a->skew, 0 ), 1, "sample skewness of $a");
 is( tapprox( $a->skew_unbiased, 0 ), 1, "unbiased sample skewness of $a");
 is( tapprox( $a->kurt, -1.3 ), 1, "sample kurtosis of $a");
 is( tapprox( $a->kurt_unbiased, -1.2 ), 1, "unbiased sample kurtosis of $a");
+
+{
+  ok(tapprox($_->ss, (($_ - $_->avg)**2)->sum), "ss for $_") for
+    pdl('[1 1 1 1 2 3 4 4 4 4 4 4]'),
+    pdl('[1 2 2 2 3 3 3 3 4 4 5 5]'),
+    pdl('[1 1 1 2 2 3 3 4 4 5 5 5]');
+}
 
 my $a_bad = sequence 6;
 $a_bad->setbadat(-1);

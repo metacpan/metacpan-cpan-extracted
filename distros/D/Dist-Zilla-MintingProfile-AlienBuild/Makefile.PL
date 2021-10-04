@@ -85,7 +85,7 @@ my %WriteMakefileArgs = (
     "Test::DZil"                   => 0,
     "Test::File::ShareDir::Module" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test"    => {
     "TESTS" => "t/*.t"
   }

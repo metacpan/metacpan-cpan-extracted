@@ -1,10 +1,10 @@
 bignum
 
-bignum - transparent big number support
+bigint/bigrat/bignum - transparent big number support
 
 INSTALLATION
 
-To install this module, unpack the distribution file, and run the following
+To install these modules, unpack the distribution file, and run the following
 commands:
 
     perl Makefile.PL
@@ -17,6 +17,8 @@ SUPPORT AND DOCUMENTATION
 After installing, you can find documentation for these modules with the
 perldoc command.
 
+    perldoc bigint
+    perldoc bigrat
     perldoc bignum
 
 You can also look for information at:
@@ -28,7 +30,7 @@ You can also look for information at:
         https://rt.cpan.org/Dist/Display.html?Name=bignum
 
     MetaCPAN
-        https://metacpan.org/release/bignum>
+        https://metacpan.org/release/bignum
 
     CPAN Testers Matrix
         http://matrix.cpantesters.org/?dist=bignum
@@ -36,11 +38,13 @@ You can also look for information at:
     CPAN Ratings
         https://cpanratings.perl.org/dist/bignum
 
-COPYRIGHT AND LICENCE
+COPYRIGHT
 
 Copyright 2002-2007 Tels, L<http://bloodgate.com>.
 
 Copyright 2014- Peter John Acklam L<pjacklam@gmail.com>.
+
+LICENCE
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

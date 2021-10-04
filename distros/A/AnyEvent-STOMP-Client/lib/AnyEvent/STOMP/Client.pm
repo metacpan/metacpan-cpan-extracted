@@ -11,7 +11,7 @@ use AnyEvent::Handle;
 use List::Util 'max';
 
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 
 my $EOL = chr(10);
@@ -73,6 +73,13 @@ sub new {
         }
     }
 
+    $self->set_exception_cb(
+        sub {
+            my ($exception, $eventname) = @_;
+            $self->event('ERROR', $self->{host}, $self->{port}, "$eventname: $exception");
+        }
+    );
+
     return bless $self, $class;
 }
 
@@ -100,16 +107,22 @@ sub connect {
             $self->send_frame('CONNECT', $self->{connect_headers});
         },
         on_connect_error => sub {
-            shift->destroy;
+            my ($handle, $error_message) = @_;
+            $handle->destroy;
             undef $self->{handle};
             $self->{connected} = 0;
-            $self->event('TRANSPORT_CONNECT_ERROR', $self->{host}, $self->{port}, $!);
+            $self->event('TRANSPORT_CONNECT_ERROR', $self->{host}, $self->{port}, $error_message);
         },
         on_error => sub {
-            shift->destroy;
-            undef $self->{handle};
-            $self->{connected} = 0;
-            $self->event('CONNECTION_LOST', $self->{host}, $self->{port}, $!);
+            my ($handle, $fatal, $error_message) = @_;
+            $self->event('ERROR', $self->{host}, $self->{port}, $error_message);
+            if ($fatal) {
+                undef $self->{handle};
+                $self->{connected} = 0;
+                # $handle->destroy() will be called automatically after this callback, see
+                # https://metacpan.org/pod/AnyEvent::Handle#on_error-=%3E-$cb-%3E($handle,-$fatal,-$message)
+                $self->event('CONNECTION_LOST', $self->{host}, $self->{port}, $error_message);
+            }
         },
         on_read => sub {
             $self->read_frame;
@@ -141,7 +154,7 @@ sub disconnect {
     }
     else {
         my $receipt_id = $self->get_uuid;
-        
+
         $self->send_frame('DISCONNECT', {receipt => $receipt_id,});
 
         $self->before_receipt(
@@ -280,7 +293,7 @@ sub subscribe {
         my $header = {
             destination => $destination,
             id => $subscription_id,
-            ack => $ack_mode, 
+            ack => $ack_mode,
             %$additional_headers,
         };
 
@@ -358,7 +371,7 @@ sub header_string2hash {
             $result_hashref->{$1} = $2 unless defined $result_hashref->{$1};
         }
     }
-    
+
     return $result_hashref;
 }
 
@@ -455,7 +468,7 @@ sub ack {
     unless ($ack_id) {
         croak "I do really need the message's ack header to ACK it.";
     }
-    
+
     my $header = {id => $ack_id,};
     $header->{transaction} = $transaction if (defined $transaction);
 
@@ -468,7 +481,7 @@ sub nack {
     unless ($ack_id) {
         croak "I do really need the message's ack header to NACK it.";
     }
-    
+
     my $header = {id => $ack_id,};
     $header->{transaction} = $transaction if (defined $transaction);
 
@@ -699,9 +712,9 @@ AnyEvent and Object::Event.
 =head1 SYNOPSIS
 
   use AnyEvent::STOMP::Client;
-  
+
   my $stomp_client = new AnyEvent::STOMP::Client()
-    
+
   $stomp_client->connect();
 
   $stomp_client->on_connected(
@@ -777,7 +790,7 @@ C<< my $client = AnyEvent::STOMP::Client->new(
     {'login' => 'guest', 'passcode' => 'guest', 'virtual-host' => 'foo'}
 ); >>
 
-=head2 $client = connect 
+=head2 $client = connect
 
 Connect to the specified  STOMP message broker. Croaks if you already
 established a connection.
@@ -977,7 +990,7 @@ Parameters passed to the callback: C<$self>, C<$host>, C<$port>.
 Invoked when either the C<on_error> callback specified in the
 C<AnyEvent::Handle> constructor is called, or when no more
 heartbeats arrive from the server.
-Parameters passed to the callback: C<$self>, C<$host>, C<$port>.
+Parameters passed to the callback: C<$self>, C<$host>, C<$port>, C<$error_message>.
 
 =head3 $guard = $client->on_connect_error $callback
 
@@ -1025,8 +1038,7 @@ C<$self>, C<$header_hashref>.
 
 =head3 $guard = $client->on_error $callback
 
-Invoked when an ERROR frame is received. Parameters passed to the callback:
-C<$self>, C<$header_hashref>, C<$body>.
+Invoked when an ERROR frame is received. Parameters passed to the callback: C<$self>, C<$host>, C<$port>, C<$error_message>.
 
 =head3 $guard = $client->on_subscribed $callback
 

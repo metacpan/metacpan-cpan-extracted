@@ -6,7 +6,7 @@ use warnings;
 
 use Carp qw< carp croak >;
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 use Exporter;
 our @ISA            = qw( Exporter );
@@ -16,26 +16,38 @@ our @EXPORT         = qw( inf NaN );
 use overload;
 use Math::BigFloat;
 
+my $obj_class = "Math::BigFloat";
+
 ##############################################################################
 
 sub accuracy {
     my $self = shift;
-    Math::BigFloat -> accuracy(@_);
+    $obj_class -> accuracy(@_);
 }
 
 sub precision {
     my $self = shift;
-    Math::BigFloat -> precision(@_);
+    $obj_class -> precision(@_);
 }
 
 sub round_mode {
     my $self = shift;
-    Math::BigFloat -> round_mode(@_);
+    $obj_class -> round_mode(@_);
 }
 
 sub div_scale {
     my $self = shift;
-    Math::BigFloat -> div_scale(@_);
+    $obj_class -> div_scale(@_);
+}
+
+sub upgrade {
+    my $self = shift;
+    $obj_class -> upgrade(@_);
+}
+
+sub downgrade {
+    my $self = shift;
+    $obj_class -> downgrade(@_);
 }
 
 sub in_effect {
@@ -85,14 +97,14 @@ sub _float_constant {
         $str =~ /^0[Bb]/ and
         $nstr = Math::BigInt -> bin_str_to_dec_flt_str($str))
     {
-        return Math::BigFloat -> new($nstr);
+        return $obj_class -> new($nstr);
     }
 
     # If we get here, there is a bug in the code above this point.
 
     warn "Internal error: unable to handle literal constant '$str'.",
       " This is a bug, so please report this to the module author.";
-    return Math::BigFloat -> bnan();
+    return $obj_class -> bnan();
 }
 
 #############################################################################
@@ -113,9 +125,9 @@ sub _hex_core {
         my $chrs = $2;
         $chrs =~ tr/_//d;
         $chrs = '0' unless CORE::length $chrs;
-        $x = Math::BigFloat -> from_hex($chrs);
+        $x = $obj_class -> from_hex($chrs);
     } else {
-        $x = Math::BigFloat -> bzero();
+        $x = $obj_class -> bzero();
     }
 
     # Warn about trailing garbage.
@@ -153,7 +165,7 @@ sub _oct_core {
             my $chrs = $2;
             $chrs =~ tr/_//d;
             $chrs = '0' unless CORE::length $chrs;
-            $x = Math::BigFloat -> from_bin($chrs);
+            $x = $obj_class -> from_bin($chrs);
         }
 
         # Warn about trailing garbage.
@@ -174,7 +186,7 @@ sub _oct_core {
         my $chrs = $2;
         $chrs =~ tr/_//d;
         $chrs = '0' unless CORE::length $chrs;
-        $x = Math::BigFloat -> from_oct($chrs);
+        $x = $obj_class -> from_oct($chrs);
     }
 
     # Warn about trailing garbage. CORE::oct() only warns about 8 and 9, but it
@@ -247,7 +259,7 @@ sub unimport {
 }
 
 sub import {
-    my $self = shift;
+    my $class = shift;
 
     $^H{bignum} = 1;                            # we are in effect
     $^H{bigint} = undef;
@@ -258,57 +270,87 @@ sub import {
         _override();
     }
 
-    # some defaults
-    my $lib      = '';
-    my $lib_kind = 'try';
-
     my @import = ();
-    my @a = ();
-    my ($ver, $trace);                          # version? trace?
+    my @a = ();                         # unrecognized arguments
+    my $ver;                            # version?
 
     while (@_) {
         my $param = shift;
+
+        # Upgrading.
+
         if ($param eq 'upgrade') {
-            # this causes upgrading
-            push @import, 'upgrade', shift;
-        } elsif ($param eq 'downgrade') {
-            # this causes downgrading
-            push @import, 'downgrade', shift;
-        } elsif ($param =~ /^(l|lib|try|only)$/) {
-            # this causes a different low lib to take care...
-            $lib_kind = $param;
-            $lib_kind = 'lib' if $lib_kind eq 'l';
-            $lib = shift() || '';
-        } elsif ($param =~ /^(a|accuracy)$/) {
-            push @import, 'accuracy', shift;
-        } elsif ($param =~ /^(p|precision)$/) {
-            push @import, 'precision', shift;
-        } elsif ($param =~ /^(v|version)$/) {
-            $ver = 1;
-        } elsif ($param =~ /^(t|trace)$/) {
-            $trace = 1;
-        } elsif ($param =~ /^(PI|e|bexp|bpi|hex|oct)\z/) {
-            push @a, $param;
-        } else {
-            croak("Unknown option '$param'");
+            $class -> upgrade(shift);
+            next;
         }
+
+        # Downgrading.
+
+        if ($param eq 'downgrade') {
+            $class -> downgrade(shift);
+            next;
+        }
+
+        # Accuracy.
+
+        if ($param =~ /^a(ccuracy)?$/) {
+            $class -> accuracy(shift);
+            next;
+        }
+
+        # Precision.
+
+        if ($param =~ /^p(recision)?$/) {
+            $class -> precision(shift);
+            next;
+        }
+
+        # Rounding mode.
+
+        if ($param eq 'round_mode') {
+            $class -> round_mode(shift);
+            next;
+        }
+
+        # Backend library.
+
+        if ($param =~ /^(l|lib|try|only)$/) {
+            push @import, $param eq 'l' ? 'lib' : $param;
+            push @import, shift() if @_;
+            next;
+        }
+
+        if ($param =~ /^(v|version)$/) {
+            $ver = 1;
+            next;
+        }
+
+        if ($param =~ /^(t|trace)$/) {
+            $obj_class .= "::Trace";
+            eval "require $obj_class";
+            die $@ if $@;
+            next;
+        }
+
+        if ($param =~ /^(PI|e|bexp|bpi|hex|oct)\z/) {
+            push @a, $param;
+            next;
+        }
+
+        croak("Unknown option '$param'");
     }
 
-    my $class = "Math::BigFloat";
-    if ($trace) {
-        require Math::BigFloat::Trace;
-        $class = "Math::BigFloat::Trace";
-    }
-    push @import, $lib_kind => $lib if $lib ne '';
-    $class -> import(@import);
+    $obj_class -> import(@import);
 
     if ($ver) {
-        print "bignum\t\t\t v$VERSION\n";
-        my $config = $class -> config();
-        print " lib => $config->{lib} v$config->{lib_version}\n";
-        print $class, "\t\t v", $class -> VERSION, "\n";
+        printf "%-31s v%s\n", $class, $class -> VERSION();
+        printf " lib => %-23s v%s\n",
+          $obj_class -> config("lib"), $obj_class -> config("lib_version");
+        printf "%-31s v%s\n", $obj_class, $obj_class -> VERSION();
         exit;
     }
+
+    $class -> export_to_level(1, $class, @a);   # export inf, NaN, etc.
 
     overload::constant
 
@@ -319,7 +361,7 @@ sub import {
         integer => sub {
             #printf "Value '%s' handled by the 'integer' sub.\n", $_[0];
             my $str = shift;
-            return Math::BigFloat -> new($str);
+            return $obj_class -> new($str);
         },
 
         # This takes care of each number written with a decimal point and/or
@@ -339,30 +381,39 @@ sub import {
         binary => sub {
             #printf "# Value '%s' handled by the 'binary' sub.\n", $_[0];
             my $str = shift;
-            return Math::BigFloat -> new($str) if $str =~ /^0[XxBb]/;
-            Math::BigFloat -> from_oct($str);
+            return $obj_class -> new($str) if $str =~ /^0[XxBb]/;
+            $obj_class -> from_oct($str);
         };
-
-    # if another big* was already loaded:
-    my ($package) = caller();
-
-    no strict 'refs';
-    if (!defined *{"${package}::inf"}) {
-        $self->export_to_level(1, $self, @a);   # export inf and NaN
-    }
 }
 
-sub inf () { Math::BigFloat -> binf(); }
-sub NaN () { Math::BigFloat -> bnan(); }
+sub inf () { $obj_class -> binf(); }
+sub NaN () { $obj_class -> bnan(); }
 
 # This should depend on the current accuracy/precision. Fixme!
-sub PI  () { Math::BigFloat -> new('3.141592653589793238462643383279502884197'); }
-sub e   () { Math::BigFloat -> new('2.718281828459045235360287471352662497757'); }
+sub PI  () { $obj_class -> new('3.141592653589793238462643383279502884197'); }
+sub e   () { $obj_class -> new('2.718281828459045235360287471352662497757'); }
 
-sub bpi ($) { Math::BigFloat -> bpi(@_); }
+sub bpi ($) {
+    my $up = Math::BigFloat -> upgrade();   # get current upgrading, if any ...
+    Math::BigFloat -> upgrade(undef);       # ... and disable
+
+    my $x = Math::BigFloat -> bpi(@_);
+
+    Math::BigFloat -> upgrade($up);         # reset the upgrading
+
+    return $x;
+}
+
 sub bexp ($$) {
-    my $x = Math::BigFloat -> new($_[0]);
-    $x -> bexp($_[1]);
+    my $up = Math::BigFloat -> upgrade();   # get current upgrading, if any ...
+    Math::BigFloat -> upgrade(undef);       # ... and disable
+
+    my $x = Math::BigFloat -> new(shift);
+    $x -> bexp(@_);
+
+    Math::BigFloat -> upgrade($up);         # reset the upgrading
+
+    return $x;
 }
 
 1;
@@ -379,26 +430,28 @@ bignum - transparent big number support for Perl
 
     use bignum;
 
-    $x = 2 + 4.5,"\n";              # Math::BigFloat 6.5
-    print 2 ** 512 * 0.1,"\n";      # really is what you think it is
-    print inf * inf,"\n";           # prints inf
-    print NaN * 3,"\n";             # prints NaN
+    $x = 2 + 4.5;                       # Math::BigFloat 6.5
+    print 2 ** 512 * 0.1;               # Math::BigFloat 134...09.6
+    print inf + 42;                     # Math::BigFloat inf
+    print NaN * 7;                      # Math::BigFloat NaN
+    print hex("0x1234567890123490");    # Perl v5.10.0 or later
 
     {
         no bignum;
-        print 2 ** 256,"\n";        # a normal Perl scalar now
+        print 2 ** 256;                 # a normal Perl scalar now
     }
 
     # for older Perls, import into current package:
     use bignum qw/hex oct/;
-    print hex("0x1234567890123490"),"\n";
-    print oct("01234567890123490"),"\n";
+    print hex("0x1234567890123490");
+    print oct("01234567890123490");
 
 =head1 DESCRIPTION
 
+All numeric literals in the given scope are converted to Math::BigFloat objects.
+
 All operators (including basic math operations) except the range operator C<..>
-are overloaded. All literal numeric constants are converted to Math::BigFloat
-objects.
+are overloaded.
 
 So, the following:
 
@@ -435,16 +488,15 @@ overloading of '..' is not yet possible in Perl (as of v5.8.0):
 
 =head2 Options
 
-bignum recognizes some options that can be passed while loading it via use.
-The options can (currently) be either a single letter form, or the long form.
-The following options exist:
+C<bignum> recognizes some options that can be passed while loading it via via
+C<use>. The following options exist:
 
-=over 2
+=over 4
 
 =item a or accuracy
 
 This sets the accuracy for all math operations. The argument must be greater
-than or equal to zero. See Math::BigInt's bround() function for details.
+than or equal to zero. See Math::BigInt's bround() method for details.
 
     perl -Mbignum=a,50 -le 'print sqrt(20)'
 
@@ -453,9 +505,9 @@ Note that setting precision and accuracy at the same time is not possible.
 =item p or precision
 
 This sets the precision for all math operations. The argument can be any
-integer. Negative values mean a fixed number of digits after the dot, while
-a positive value rounds to this digit left from the dot. 0 or 1 mean round to
-integer. See Math::BigInt's bfround() function for details.
+integer. Negative values mean a fixed number of digits after the dot, while a
+positive value rounds to this digit left from the dot. 0 means round to integer.
+See Math::BigInt's bfround() method for details.
 
     perl -Mbignum=p,-50 -le 'print sqrt(20)'
 
@@ -463,54 +515,71 @@ Note that setting precision and accuracy at the same time is not possible.
 
 =item t or trace
 
-This enables a trace mode and is primarily for debugging bignum or
-Math::BigInt/Math::BigFloat.
+This enables a trace mode and is primarily for debugging.
 
-=item l or lib
+=item l, lib, try, or only
 
 Load a different math lib, see L<Math Library>.
 
     perl -Mbignum=l,GMP -e 'print 2 ** 512'
-
-Currently there is no way to specify more than one library on the command
-line. This means the following does not work:
-
-    perl -Mbignum=l,GMP,Pari -e 'print 2 ** 512'
-
-This will be hopefully fixed soon ;)
+    perl -Mbignum=lib,GMP -e 'print 2 ** 512'
+    perl -Mbignum=try,GMP -e 'print 2 ** 512'
+    perl -Mbignum=only,GMP -e 'print 2 ** 512'
 
 =item hex
 
-Override the built-in hex() method with a version that can handle big
-numbers. This overrides it by exporting it to the current package. Under
-Perl v5.10.0 and higher, this is not so necessary, as hex() is lexically
-overridden in the current scope whenever the bignum pragma is active.
+Override the built-in hex() method with a version that can handle big numbers.
+This overrides it by exporting it to the current package. Under Perl v5.10.0 and
+higher, this is not so necessary, as hex() is lexically overridden in the
+current scope whenever the C<bignum> pragma is active.
 
 =item oct
 
-Override the built-in oct() method with a version that can handle big
-numbers. This overrides it by exporting it to the current package. Under
-Perl v5.10.0 and higher, this is not so necessary, as oct() is lexically
-overridden in the current scope whenever the bigint pragma is active.
+Override the built-in oct() method with a version that can handle big numbers.
+This overrides it by exporting it to the current package. Under Perl v5.10.0 and
+higher, this is not so necessary, as oct() is lexically overridden in the
+current scope whenever the C<bignum> pragma is active.
 
 =item v or version
 
-This prints out the name and version of all modules used and then exits.
+this prints out the name and version of the modules and then exits.
 
     perl -Mbignum=v
 
 =back
 
-=head2 Methods
+=head2 Math Library
 
-Beside import() and AUTOLOAD() there are only a few other methods.
+Math with the numbers is done (by default) by a backend library module called
+Math::BigInt::Calc. The default is equivalent to saying:
 
-Since all numbers are now objects, you can use all functions that are part of
-the Math::BigInt or Math::BigFloat API. It is wise to use only the bxxx()
-notation, and not the fxxx() notation, though. This makes it possible that the
-underlying object might morph into a different class than Math::BigFloat.
+    use bignum lib => 'Calc';
 
-=head2 Caveats
+you can change this by using:
+
+    use bignum lib => 'GMP';
+
+The following would first try to find Math::BigInt::Foo, then Math::BigInt::Bar,
+and if this also fails, revert to Math::BigInt::Calc:
+
+    use bignum lib => 'Foo,Math::BigInt::Bar';
+
+Using c<lib> warns if none of the specified libraries can be found and
+L<Math::BigInt> fell back to one of the default libraries. To suppress this
+warning, use c<try> instead:
+
+    use bignum try => 'GMP';
+
+If you want the code to die instead of falling back, use C<only> instead:
+
+    use bignum only => 'GMP';
+
+Please see respective module documentation for further details.
+
+=head2 Method calls
+
+Since all numbers are now objects, you can use all methods that are part of the
+Math::BigFloat API.
 
 But a warning is in order. When using the following to make a copy of a number,
 only a shallow copy will be made.
@@ -518,18 +587,14 @@ only a shallow copy will be made.
     $x = 9; $y = $x;
     $x = $y = 7;
 
-If you want to make a real copy, use the following:
-
-    $y = $x->copy();
-
-Using the copy or the original with overloaded math is okay, e.g. the
-following work:
+Using the copy or the original with overloaded math is okay, e.g., the following
+work:
 
     $x = 9; $y = $x;
     print $x + 1, " ", $y,"\n";     # prints 10 9
 
-but calling any method that modifies the number directly will result in
-B<both> the original and the copy being destroyed:
+but calling any method that modifies the number directly will result in B<both>
+the original and the copy being destroyed:
 
     $x = 9; $y = $x;
     print $x->badd(1), " ", $y,"\n";        # prints 10 10
@@ -540,15 +605,17 @@ B<both> the original and the copy being destroyed:
     $x = 9; $y = $x;
     print $x->bmul(2), " ", $y,"\n";        # prints 18 18
 
-Using methods that do not modify, but test the contents works:
+Using methods that do not modify, but test that the contents works:
 
     $x = 9; $y = $x;
     $z = 9 if $x->is_zero();                # works fine
 
-See the documentation about the copy constructor and C<=> in overload, as
-well as the documentation in Math::BigInt for further details.
+See the documentation about the copy constructor and C<=> in overload, as well
+as the documentation in Math::BigFloat for further details.
 
-=over 2
+=head2 Methods
+
+=over 4
 
 =item inf()
 
@@ -564,9 +631,9 @@ handle bareword C<NaN> properly.
 
     # perl -Mbignum=e -wle 'print e'
 
-Returns Euler's number C<e>, aka exp(1).
+Returns Euler's number C<e>, aka exp(1)
 
-=item PI()
+=item PI
 
     # perl -Mbignum=PI -wle 'print PI'
 
@@ -574,10 +641,10 @@ Returns PI.
 
 =item bexp()
 
-    bexp($power,$accuracy);
+    bexp($power, $accuracy);
 
-Returns Euler's number C<e> raised to the appropriate power, to
-the wanted accuracy.
+Returns Euler's number C<e> raised to the appropriate power, to the wanted
+accuracy.
 
 Example:
 
@@ -595,7 +662,8 @@ Example:
 
 =item upgrade()
 
-Return the class that numbers are upgraded to, if any.
+Return the class that numbers are upgraded to, is in fact returning
+C<Math::BigFloat-E<gt>upgrade()>.
 
 =item in_effect()
 
@@ -613,59 +681,9 @@ This method only works on Perl v5.9.4 or later.
 
 =back
 
-=head2 Math Library
-
-Math with the numbers is done (by default) by a module called
-Math::BigInt::Calc. This is equivalent to saying:
-
-    use bignum lib => 'Calc';
-
-You can change this by using:
-
-    use bignum lib => 'GMP';
-
-The following would first try to find Math::BigInt::Foo, then
-Math::BigInt::Bar, and when this also fails, revert to Math::BigInt::Calc:
-
-    use bignum lib => 'Foo,Math::BigInt::Bar';
-
-Please see respective module documentation for further details.
-
-Using C<lib> warns if none of the specified libraries can be found and
-L<Math::BigInt> did fall back to one of the default libraries.
-To suppress this warning, use C<try> instead:
-
-    use bignum try => 'GMP';
-
-If you want the code to die instead of falling back, use C<only> instead:
-
-    use bignum only => 'GMP';
-
-=head2 INTERNAL FORMAT
-
-The numbers are stored as objects, and their internals might change at anytime,
-especially between math operations. The objects also might belong to different
-classes, like Math::BigInt, or Math::BigFloat. Mixing them together, even
-with normal scalars is not extraordinary, but normal and expected.
-
-You should not depend on the internal format, all accesses must go through
-accessor methods. E.g. looking at $x->{sign} is not a bright idea since there
-is no guaranty that the object in question has such a hashkey, nor is a hash
-underneath at all.
-
-=head2 SIGN
-
-The sign is either '+', '-', 'NaN', '+inf' or '-inf' and stored separately.
-You can access it with the sign() method.
-
-A sign of 'NaN' is used to represent the result when input arguments are not
-numbers or as a result of 0/0. '+inf' and '-inf' represent plus respectively
-minus infinity. You will get '+inf' when dividing a positive number by 0, and
-'-inf' when dividing any negative number by 0.
-
 =head1 CAVEATS
 
-=over 2
+=over 4
 
 =item Hexadecimal, octal, and binary floating point literals
 
@@ -675,24 +693,37 @@ versions of Perl silently give the wrong result.
 
 =item Operator vs literal overloading
 
-C<bignum> works by overloading handling of integer and floating point literals,
-converting them L<Math::BigFloat> objects.
+C<bigrat> works by overloading handling of integer and floating point literals,
+converting them to L<Math::BigRat> objects.
 
 This means that arithmetic involving only string values or string literals are
 performed using Perl's built-in operators.
 
 For example:
 
-    use bignum;
+    use bigrat;
     my $x = "900000000000000009";
     my $y = "900000000000000007";
     print $x - $y;
 
-will output C<0> on default 32-bit builds, since C<bigrat> never sees the string
-literals. To ensure the expression is all treated as C<Math::BigInt> or
-C<Math::BigFloat> objects, use a literal number in the expression:
+outputs C<0> on default 32-bit builds, since C<bignum> never sees the string
+literals. To ensure the expression is all treated as C<Math::BigFloat> objects,
+use a literal number in the expression:
 
     print +(0+$x) - $y;
+
+=item Ranges
+
+Perl does not allow overloading of ranges, so you can neither safely use ranges
+with C<bignum> endpoints, nor is the iterator variable a C<Math::BigFloat>.
+
+    use 5.010;
+    for my $i (12..13) {
+      for my $j (20..21) {
+        say $i ** $j;  # produces a floating-point number,
+                       # not an object
+      }
+    }
 
 =item in_effect()
 
@@ -700,17 +731,17 @@ This method only works on Perl v5.9.4 or later.
 
 =item hex()/oct()
 
-C<bigint> overrides these routines with versions that can also handle
-big integer values. Under Perl prior to version v5.9.4, however, this
-will not happen unless you specifically ask for it with the two
-import tags "hex" and "oct" - and then it will be global and cannot be
-disabled inside a scope with "no bigint":
+C<bignum> overrides these routines with versions that can also handle big
+integer values. Under Perl prior to version v5.9.4, however, this will not
+happen unless you specifically ask for it with the two import tags "hex" and
+"oct" - and then it will be global and cannot be disabled inside a scope with
+C<no bignum>:
 
-    use bigint qw/hex oct/;
+    use bignum qw/hex oct/;
 
     print hex("0x1234567890123456");
     {
-        no bigint;
+        no bignum;
         print hex("0x1234567890123456");
     }
 
@@ -718,9 +749,9 @@ The second call to hex() will warn about a non-portable constant.
 
 Compare this to:
 
-    use bigint;
+    use bignum;
 
-    # will warn only under older than v5.9.4
+    # will warn only under Perl older than v5.9.4
     print hex("0x1234567890123456");
 
 =back
@@ -730,20 +761,20 @@ Compare this to:
 Some cool command line examples to impress the Python crowd ;)
 
     perl -Mbignum -le 'print sqrt(33)'
-    perl -Mbignum -le 'print 2*255'
-    perl -Mbignum -le 'print 4.5+2*255'
+    perl -Mbignum -le 'print 2**255'
+    perl -Mbignum -le 'print 4.5+2**255'
     perl -Mbignum -le 'print 3/7 + 5/7 + 8/3'
     perl -Mbignum -le 'print 123->is_odd()'
     perl -Mbignum -le 'print log(2)'
     perl -Mbignum -le 'print exp(1)'
     perl -Mbignum -le 'print 2 ** 0.5'
     perl -Mbignum=a,65 -le 'print 2 ** 0.2'
-    perl -Mbignum=a,65,l,GMP -le 'print 7 ** 7777'
+    perl -Mbignum=l,GMP -le 'print 7 ** 7777'
 
 =head1 BUGS
 
 Please report any bugs or feature requests to
-C<bug-math-bigint at rt.cpan.org>, or through the web interface at
+C<bug-bignum at rt.cpan.org>, or through the web interface at
 L<https://rt.cpan.org/Ticket/Create.html?Queue=bignum> (requires login).
 We will be notified, and then you'll automatically be notified of
 progress on your bug as I make changes.

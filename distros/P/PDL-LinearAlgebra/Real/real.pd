@@ -34,11 +34,12 @@ pp_addhdr('
 }
 
 pp_addhdr('
-#include <math.h>
-
-#if defined(PDL_CORE_VERSION) && PDL_CORE_VERSION < 10
-typedef PDL_Long PDL_Indx;
+#ifndef PDL /* this is needed for PDL pre-2.058 */
+#define PDL PDL_LinearAlgebra_Real
+Core* PDL = NULL; PDL_COMMENT("Structure hold core C functions")
 #endif
+
+#include <math.h>
 
 /* avoid annoying warnings */
 typedef PDL_Long logical;
@@ -1638,73 +1639,12 @@ and rcondv, see section 4.11 of LAPACK User\'s Guide.
 
 ');
 
-
 pp_addhdr('
-static SV*   fselect_function;
-PDL_Long fselection_wrapper(float *wr, float *wi)
-{
-	dSP ;
-	long  choice;
-	int retval;
-
-	ENTER ;
-	SAVETMPS ;
-
-	PUSHMARK(sp) ;
-	XPUSHs(sv_2mortal(newSVnv((double ) *wr)));
-	XPUSHs(sv_2mortal(newSVnv((double ) *wi)));
-	PUTBACK ;
-
-	retval = perl_call_sv(fselect_function, G_SCALAR);
-
-	SPAGAIN;
-
-	if (retval != 1)
-		croak("Error calling perl function\n");
-
-	choice = (long ) POPl ;  /* Return value */
-
-	PUTBACK ;
-	FREETMPS ;
-	LEAVE ;
-
-	return choice;
-}
-
-static SV*   dselect_function;
-PDL_Long dselection_wrapper(double *wr, double *wi)
-{
-	dSP ;
-	long  choice;
-	int retval;
-
-	ENTER ;
-	SAVETMPS ;
-
-	PUSHMARK(sp) ;
-	XPUSHs(sv_2mortal(newSVnv(*wr)));
-	XPUSHs(sv_2mortal(newSVnv(*wi)));
-	PUTBACK ;
-
-	retval = perl_call_sv(dselect_function, G_SCALAR);
-
-	SPAGAIN;
-
-	if (retval != 1)
-		croak("Error calling perl function\n");
-
-	choice = (long ) POPl ;  /* Return value */
-
-	PUTBACK ;
-	FREETMPS ;
-	LEAVE ;
-
-	return choice;
-}
-
-
+void fselect_func_set(SV* func);
+void dselect_func_set(SV* func);
+PDL_Long fselect_wrapper(float *wr, float *wi);
+PDL_Long dselect_wrapper(double *wr, double *wi);
 ');
-
 
 pp_def("gees",
        HandleBad => 0,
@@ -1722,7 +1662,8 @@ pp_def("gees",
 		$GENERIC() *wi, $GENERIC() *vs, integer *ldvs, $GENERIC() *work,
 		integer *lwork, integer *bwork, integer *info);
 		$GENERIC() tmp_work;
-		$TFD(f,d)select_function    = $COMP(select_func);
+		$TFD(f,d)select_func_set($COMP(select_func));
+
 		if ($jobvs())
 			jvs = \'V\';
 		if ($sort()){
@@ -1733,7 +1674,7 @@ pp_def("gees",
 		$TFD(s,d)gees_(
 		&jvs,
 		&psort,
-		$TFD(f,d)selection_wrapper,
+		$TFD(f,d)select_wrapper,
 		&(integer){$SIZE(n)},
 		$P(A),
 		&(integer){$SIZE(n)},
@@ -1752,7 +1693,7 @@ pp_def("gees",
 		$TFD(s,d)gees_(
 		&jvs,
 		&psort,
-		$TFD(f,d)selection_wrapper,
+		$TFD(f,d)select_wrapper,
 		&(integer){$SIZE(n)},
 		$P(A),
 		&(integer){$SIZE(n)},
@@ -1892,7 +1833,7 @@ pp_def("geesx",
 		$GENERIC() *work, integer *lwork, integer *iwork, integer *liwork,
 		integer *bwork, integer *info);
 		$GENERIC() *work;
-		$TFD(f,d)select_function    = $COMP(select_func);
+		$TFD(f,d)select_func_set($COMP(select_func));
 
 
 		if ($jobvs())
@@ -1933,7 +1874,7 @@ pp_def("geesx",
 		$TFD(s,d)geesx_(
 		&jvs,
 		&psort,
-		$TFD(f,d)selection_wrapper,
+		$TFD(f,d)select_wrapper,
 		&sens,
 		&(integer){$SIZE(n)},
 		$P(A),
@@ -2078,69 +2019,10 @@ the form
 ');
 
 pp_addhdr('
-static SV*   fgselect_function;
-PDL_Long fgselection_wrapper(float *zr, float *zi, float *d)
-{
-	dSP ;
-	long  choice;
-	int retval;
-
-	ENTER ;
-	SAVETMPS ;
-
-	PUSHMARK(sp) ;
-	XPUSHs(sv_2mortal(newSVnv((double)  *zr)));
-	XPUSHs(sv_2mortal(newSVnv((double)  *zi)));
-	XPUSHs(sv_2mortal(newSVnv((double)  *d)));
-	PUTBACK ;
-
-	retval = perl_call_sv(fgselect_function, G_SCALAR);
-
-	SPAGAIN;
-
-	if (retval != 1)
-		croak("Error calling perl function\n");
-
-	choice = (long ) POPl ;  /* Return value */
-
-	PUTBACK ;
-	FREETMPS ;
-	LEAVE ;
-
-	return choice;
-}
-static SV*   dgselect_function;
-PDL_Long dgselection_wrapper(double *zr, double *zi, double *d)
-{
-	dSP ;
-	long  choice;
-	int retval;
-
-	ENTER ;
-	SAVETMPS ;
-
-	PUSHMARK(sp) ;
-	XPUSHs(sv_2mortal(newSVnv(*zr)));
-	XPUSHs(sv_2mortal(newSVnv(*zi)));
-	XPUSHs(sv_2mortal(newSVnv(*d)));
-	PUTBACK ;
-
-	retval = perl_call_sv(dgselect_function, G_SCALAR);
-
-	SPAGAIN;
-
-	if (retval != 1)
-		croak("Error calling perl function\n");
-
-	choice = (long ) POPl ;  /* Return value */
-
-	PUTBACK ;
-	FREETMPS ;
-	LEAVE ;
-
-	return choice;
-}
-
+void fgselect_func_set(SV* func);
+void dgselect_func_set(SV* func);
+PDL_Long fgselect_wrapper(float *zr, float *zi, float *d);
+PDL_Long dgselect_wrapper(double *zr, double *zi, double *d);
 ');
 
 pp_def("gges",
@@ -2160,7 +2042,7 @@ pp_def("gges",
 		integer *ldvsr, $GENERIC() *work, integer *lwork, logical *bwork,
 		integer *info);
 		$GENERIC() tmp_work;
-		$TFD(f,d)gselect_function    = $COMP(select_func);
+		$TFD(f,d)gselect_func_set($COMP(select_func));
 		if ($jobvsl())
 			pjobvsl = \'V\';
 		if ($jobvsr())
@@ -2173,7 +2055,7 @@ pp_def("gges",
 		&pjobvsl,
 		&pjobvsr,
 		&psort,
-		$TFD(f,d)gselection_wrapper,
+		$TFD(f,d)gselect_wrapper,
 		&(integer){$SIZE(n)},
 		$P(A),
 		&(integer){$SIZE(n)},
@@ -2199,7 +2081,7 @@ pp_def("gges",
 		&pjobvsl,
 		&pjobvsr,
 		&psort,
-		$TFD(f,d)gselection_wrapper,
+		$TFD(f,d)gselect_wrapper,
 		&(integer){$SIZE(n)},
 		$P(A),
 		&(integer){$SIZE(n)},
@@ -2388,7 +2270,7 @@ pp_def("ggesx",
 		integer *ldvsr, $GENERIC() *rconde, $GENERIC() *rcondv,  $GENERIC() *work,
 		integer *lwork, integer *iwork, integer *liwork, logical *bwork,
 		integer *info);
-		$TFD(f,d)gselect_function    = $COMP(select_func);
+		$TFD(f,d)gselect_func_set($COMP(select_func));
 		if ($jobvsr())
 			pjobvsr = \'V\';
 
@@ -2443,7 +2325,7 @@ pp_def("ggesx",
 		&pjobvsl,
 		&pjobvsr,
 		&psort,
-		$TFD(f,d)gselection_wrapper,
+		$TFD(f,d)gselect_wrapper,
 		&psens,
 		&(integer){$SIZE(n)},
 		$P(A),
@@ -10908,22 +10790,8 @@ EOT
 
 
 pp_addhdr('
-float ftrace(int n, float *mat)
-{
-  int i;
-  float sum = mat[0];
-  for (i = 1; i < n; i++)
-   	sum += mat[i*(n+1)];
-  return sum;
-}
-double dtrace(int n, double *mat)
-{
-  int i;
-  double sum = mat[0];
-  for (i = 1; i < n; i++)
-   	sum += mat[i*(n+1)];
-  return sum;
-}
+float ftrace(int n, float *mat);
+double dtrace(int n, double *mat);
 ');
 pp_def(
 	'charpol',

@@ -149,7 +149,7 @@ I<-log> => "I<logfile>"
 Specify path to a log file.  If a valid and writable file is specified, A line will be 
 appended to this file every time one or more streams is successfully fetched for a url.
 
-DEFAULT i<-none> (no logging).
+DEFAULT I<-none-> (no logging).
 
 I<-logfmt> specifies a format string for lines written to the log file.
 
@@ -160,7 +160,7 @@ The valid field I<[variables]> are:  [stream]: The url of the first/best stream 
 iframe, if found - see I<-noiframes> option above to prevent this feature).  
 [url]:  The url searched for streams.  [time]: Perl timestamp when the line was logged.  
 [title], [artist], [album], [description], [year], [genre], [total], [albumartist]:  
-The corresponding field data returned (or "-na", if no value).
+The corresponding field data returned (or "I<-na->", if no value).
 
 =item $video->B<get>()
 
@@ -194,14 +194,20 @@ Returns the video's YouTube ID (numeric).
 
 Returns the station's title, or (long description).  
 
-=item $video->B<getIconURL>()
+=item $video->B<getIconURL>(['artist'])
 
 Returns the URL for the video's "cover art" icon image, if any.
+If B<'artist'> is specified, the channel artist's icon url is returned, 
+if any.  NOTE:  The B<'artist'> option will return an empty string if 
+the <-fast> option is used.
 
-=item $video->B<getIconData>()
+=item $video->B<getIconData>(['artist'])
 
 Returns a two-element array consisting of the extension (ie. "png", 
 "gif", "jpeg", etc.) and the actual icon image (binary data), if any.
+If B<'artist'> is specified, the channel artist's icon data is returned, 
+if any.  NOTE:  The B<'artist'> option will return an empty string if 
+the <-fast> option is used.
 
 =item $video->B<getImageURL>()
 
@@ -427,7 +433,7 @@ RETRYIT:
 			$ua->env_proxy;
 		 	my $response = $ua->get($url);
 		 	$html = $response->decoded_content  if ($response->is_success);
-		 	if ($html =~ /\<\!DOCTYPE\s+(?:html|text)/i) {  #IF WE'RE AN HTML DOCK (NOT A STREAM!), THEN FETCH THE WHOLE THING:
+		 	if ($html =~ /\<\!DOCTYPE\s+(?:html|text)/i) {  #IF WE'RE AN HTML DOC. (NOT A STREAM!), THEN FETCH THE WHOLE THING:
 				$ua->max_size(undef);  #(NOW OK TO FETCH THE WHOLE DOCUMENT)
 			 	my $response = $ua->get($url);
 			 	$html = $response->decoded_content  if ($response->is_success);
@@ -449,6 +455,20 @@ RETRYIT:
 					}
 				}
 				return $embedded_video  if (defined($embedded_video) && $embedded_video->count() > 0);
+				if ($html =~ /\bRumble\s*\(\"play\"\,\s+\{\"video\"\:\"([a-z0-9\-\_]+)\"/si) {
+					#EXTRACT CERTAIN EMBEDDED RUMBLE VIDEOS NOT NECESSARILY IN AN IFRAME:
+					my $embeddedURL = 'https://rumble.com/embed/' . $1;
+					my $haveStreamFinder = 0;
+					eval { require 'StreamFinder.pm'; $haveStreamFinder = 1; };
+					if ($haveStreamFinder) {
+						my %globalArgs = (-noiframes => 1, -debug => $DEBUG);
+						foreach my $arg (qw(log logfmt)) {
+							$globalArgs{$arg} = $self->{$arg}  if (defined($self->{$arg}) && $self->{$arg});
+						}
+						$embedded_video = new StreamFinder($embeddedURL, %globalArgs);
+						return $embedded_video  if (defined($embedded_video) && $embedded_video->count() > 0);
+					}
+				}
 			}
 		}
 		print STDERR "..1:No MP4 streams found, try again for any (audio, etc.)...\n"  if ($DEBUG);
@@ -521,6 +541,13 @@ RETRYIT:
 			my $one = $1;
 			$self->{'year'} = $1  if ($one =~ /(\d\d\d\d)/);
 		}
+		$self->{'articonurl'} = $1  if ($html =~ m#(?:\"CHANNEL\"\,\"image\"|\"videoOwnerRenderer\")\:\{\"thumbnails"\:\[\{\"url\"\:\"([^\"]+)#s);
+		print  "--YT:2 CHANNEL ICON URL1=".$self->{'articonurl'}."=\n"  if ($DEBUG);
+		unless ($self->{'articonurl'}) {
+			my $ownerstuff = $1  if ($html =~ m#\"videoOwnerRenderer\"\:\{([^\}]+)#s);
+			$self->{'articonurl'} = $1  if ($ownerstuff =~ /\"url\"\:\"([^\"]+)/);
+		}
+		print  "--YT:2 CHANNEL ICON URL2=".$self->{'articonurl'}."=\n"  if ($DEBUG);
 	}
 	$self->{'total'} = $self->{'cnt'};
 	$self->{'imageurl'} = $self->{'iconurl'};

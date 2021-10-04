@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.48';
+our $VERSION = '2.49';
 
 use Cwd 3;
 use Try::Tiny;
@@ -283,7 +283,7 @@ DateTime::TimeZone::Local::Unix - Determine the local system's time zone on Unix
 
 =head1 VERSION
 
-version 2.48
+version 2.49
 
 =head1 SYNOPSIS
 
@@ -365,8 +365,6 @@ exception.
 =head1 SUPPORT
 
 Bugs may be submitted at L<https://github.com/houseabsolute/DateTime-TimeZone/issues>.
-
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
 =head1 SOURCE
 

@@ -6,238 +6,193 @@ use base 'Gtk3::ImageView::Tool';
 use Glib qw(TRUE FALSE);    # To get TRUE and FALSE
 use List::Util qw(min);
 use Readonly;
-Readonly my $CURSOR_PIXELS => 5;
-Readonly my $RIGHT_BUTTON  => 3;
+Readonly my $RIGHT_BUTTON => 3;
+Readonly my $EDGE_WIDTH   => 5;
 
-our $VERSION = 9;
-
-my %cursorhash = (
-    lower => {
-        lower => 'nw-resize',
-        mid   => 'w-resize',
-        upper => 'sw-resize',
-    },
-    mid => {
-        lower => 'n-resize',
-        mid   => 'crosshair',
-        upper => 's-resize',
-    },
-    upper => {
-        lower => 'ne-resize',
-        mid   => 'e-resize',
-        upper => 'se-resize',
-    },
-);
+our $VERSION = '10';
 
 sub button_pressed {
-    my $self  = shift;
-    my $event = shift;
-
-    # Don't block context menu
+    my ( $self, $event ) = @_;
     if ( $event->button == $RIGHT_BUTTON ) {
         return FALSE;
     }
-
-    $self->{drag_start} = { x => undef, y => undef };
-    $self->{dragging}   = TRUE;
-    $self->view->update_cursor( $event->x, $event->y );
-    $self->_update_selection($event);
-    return TRUE;
+    my $type = $self->cursor_type_at_point( $event->x, $event->y );
+    if ( $type eq 'grab' ) {
+        $type                 = 'grabbing';
+        $self->{drag_start_x} = int( $event->x + 0.5 );
+        $self->{drag_start_y} = int( $event->y + 0.5 );
+    }
+    $self->{dragging} = $type;
+    $self->_update_selection( $event->x, $event->y );
+    return FALSE;
 }
 
 sub button_released {
-    my $self  = shift;
-    my $event = shift;
-    $self->{dragging} = FALSE;
+    my ( $self, $event ) = @_;
+    if ( $event->button == $RIGHT_BUTTON ) {
+        return FALSE;
+    }
+    if ( $self->{dragging} ) {
+        $self->_update_selection( $event->x, $event->y );
+    }
+    $self->{dragging} = undef;
     $self->view->update_cursor( $event->x, $event->y );
-    $self->_update_selection($event);
-    return;
+    return FALSE;
 }
 
 sub motion {
-    my $self  = shift;
-    my $event = shift;
-    if ( not $self->{dragging} ) { return FALSE }
-    $self->_update_selection($event);
-    return;
+    my ( $self, $event ) = @_;
+    if ( $self->{dragging} ) {
+        $self->_update_selection( $event->x, $event->y );
+    }
+    return FALSE;
+}
+
+sub cursor_type_at_point {    ## no critic (ProhibitExcessComplexity);
+    my ( $self, $x, $y ) = @_;
+    if ( $self->{dragging} ) {
+        return $self->{dragging};
+    }
+    my $selection = $self->view->get_selection;
+    if ( !defined $selection ) {
+        return 'crosshair';
+    }
+    my $edge_width = $EDGE_WIDTH * $self->view->get('scale-factor');
+    my ( $sx1, $sy1 ) =
+      $self->view->to_widget_coords( $selection->{x}, $selection->{y} );
+    my ( $sx2, $sy2 ) = $self->view->to_widget_coords(
+        $selection->{x} + $selection->{width},
+        $selection->{y} + $selection->{height}
+    );
+    if (   $x < $sx1 - $edge_width
+        || $x > $sx2 + $edge_width
+        || $y < $sy1 - $edge_width
+        || $y > $sy2 + $edge_width )
+    {
+        return 'crosshair';
+    }
+    if (   $x > $sx1 + $edge_width
+        && $x < $sx2 - $edge_width
+        && $y > $sy1 + $edge_width
+        && $y < $sy2 - $edge_width )
+    {
+        return 'grab';
+    }
+
+# This makes it possible for the selection to be smaller than edge_width and still be resizeable in all directions
+    my $leftish = $x < ( $sx1 + $sx2 ) / 2;
+    my $topish  = $y < ( $sy1 + $sy2 ) / 2;
+    if ( $y > $sy1 + $edge_width && $y < $sy2 - $edge_width ) {
+        if ($leftish) {
+            return 'w-resize';
+        }
+        else {
+            return 'e-resize';
+        }
+    }
+    if ( $x > $sx1 + $edge_width && $x < $sx2 - $edge_width ) {
+        if ($topish) {
+            return 'n-resize';
+        }
+        else {
+            return 's-resize';
+        }
+    }
+    if ($leftish) {
+        if ($topish) {
+            return 'nw-resize';
+        }
+        else {
+            return 'sw-resize';
+        }
+    }
+    else {
+        if ($topish) {
+            return 'ne-resize';
+        }
+        else {
+            return 'se-resize';
+        }
+    }
 }
 
 sub _update_selection {
-    my ( $self, $event ) = @_;
-    my ( $x, $y, $x2, $y2, $x_old, $y_old, $x2_old, $y2_old );
-    if ( not defined $self->{h_edge} ) { $self->{h_edge} = 'mid' }
-    if ( not defined $self->{v_edge} ) { $self->{v_edge} = 'mid' }
-    if ( $self->{h_edge} eq 'lower' ) {
-        $x  = $event->x;
-        $x2 = $self->{drag_start}{x};
+    my ( $self, $x, $y ) = @_;
+    my $selection = $self->view->get('selection-float') // {
+        x      => 0,
+        y      => 0,
+        width  => 0,
+        height => 0,
+    };
+    my ( $sel_x1, $sel_y1 ) =
+      $self->view->to_widget_coords( $selection->{x}, $selection->{y} );
+    my ( $sel_x2, $sel_y2 ) = $self->view->to_widget_coords(
+        $selection->{x} + $selection->{width},
+        $selection->{y} + $selection->{height}
+    );
+    my $type = $self->{dragging};
+    if ( $type eq 'grabbing' ) {
+        my $off_x = $x - $self->{drag_start_x};
+        my $off_y = $y - $self->{drag_start_y};
+        $sel_x1 += $off_x;
+        $sel_x2 += $off_x;
+        $sel_y1 += $off_y;
+        $sel_y2 += $off_y;
+        $self->{drag_start_x} = $x;
+        $self->{drag_start_y} = $y;
     }
-    elsif ( $self->{h_edge} eq 'upper' ) {
-        $x  = $self->{drag_start}{x};
-        $x2 = $event->x;
+    if ( $type eq 'crosshair' ) {
+        $sel_x1 = $x;
+        $sel_x2 = $x;
+        $sel_y1 = $y;
+        $sel_y2 = $y;
+        $type   = 'se-resize';
     }
-    if ( $self->{v_edge} eq 'lower' ) {
-        $y  = $event->y;
-        $y2 = $self->{drag_start}{y};
+    my $flip_we = 0;
+    my $flip_ns = 0;
+    if ( $type =~ /w-resize/smx ) {
+        $sel_x1 = $x;
+        if ( $x > $sel_x2 ) { $flip_we = 'e' }
     }
-    elsif ( $self->{v_edge} eq 'upper' ) {
-        $y  = $self->{drag_start}{y};
-        $y2 = $event->y;
+    if ( $type =~ /e-resize/smx ) {
+        $sel_x2 = $x;
+        if ( $x < $sel_x1 ) { $flip_we = 'w' }
     }
-    if ( $self->{h_edge} eq 'mid' and $self->{v_edge} eq 'mid' ) {
-        $x  = $self->{drag_start}{x};
-        $y  = $self->{drag_start}{y};
-        $x2 = $event->x;
-        $y2 = $event->y;
+    if ( $type =~ /n.?-resize/smx ) {
+        $sel_y1 = $y;
+        if ( $y > $sel_y2 ) { $flip_ns = 's' }
     }
-    else {
-        my $selection = $self->view->get_selection;
-        if ( not defined $x or not defined $y ) {
-            ( $x_old, $y_old ) =
-              $self->view->to_widget_coords( $selection->{x}, $selection->{y} );
-        }
-        if ( not defined $x2 or not defined $y2 ) {
-            ( $x2_old, $y2_old ) = $self->view->to_widget_coords(
-                $selection->{x} + $selection->{width},
-                $selection->{y} + $selection->{height}
-            );
-        }
-        if ( not defined $x ) {
-            $x = $x_old;
-        }
-        if ( not defined $x2 ) {
-            $x2 = $x2_old;
-        }
-        if ( not defined $y ) {
-            $y = $y_old;
-        }
-        if ( not defined $y2 ) {
-            $y2 = $y2_old;
-        }
+    if ( $type =~ /s.?-resize/smx ) {
+        $sel_y2 = $y;
+        if ( $y < $sel_y1 ) { $flip_ns = 'n' }
     }
-    my ( $w, $h ) =
-      $self->view->to_image_distance( abs $x2 - $x, abs $y2 - $y );
-    ( $x, $y ) =
-      $self->view->to_image_coords( min( $x, $x2 ), min( $y, $y2 ) );
+    my ( $w, $h ) = $self->view->to_image_distance( abs( $sel_x2 - $sel_x1 ),
+        abs( $sel_y2 - $sel_y1 ) );
+    my ( $img_x, $img_y ) =
+      $self->view->to_image_coords( min( $sel_x1, $sel_x2 ),
+        min( $sel_y1, $sel_y2 ) );
     $self->view->set_selection(
         {
-            x      => int( $x + 0.5 ),
-            y      => int( $y + 0.5 ),
-            width  => int( $w + 0.5 ),
-            height => int( $h + 0.5 )
+            x      => $img_x,
+            y      => $img_y,
+            width  => $w,
+            height => $h,
         }
     );
+
+    # Prepare for next mouse event
+    # If we are dragging, a corner cursor must stay as a corner cursor,
+    # a left/right cursor must stay as left/right,
+    # and a top/bottom cursor must stay as top/bottom
+    if ($flip_we) {
+        $type =~ s/[we]-/$flip_we-/smx;
+    }
+    if ($flip_ns) {
+        $type =~ s/^[ns]/$flip_ns/smx;
+    }
+    $self->{dragging} = $type;
+    $self->view->update_cursor( $x, $y );
     return;
-}
-
-sub cursor_type_at_point {
-    my ( $self, $x, $y ) = @_;
-
-    my $selection = $self->view->get_selection;
-    if ( defined $selection ) {
-        my ( $sx1, $sy1 ) =
-          $self->view->to_widget_coords( $selection->{x}, $selection->{y} );
-        my ( $sx2, $sy2 ) = $self->view->to_widget_coords(
-            $selection->{x} + $selection->{width},
-            $selection->{y} + $selection->{height}
-        );
-
-        # If we are dragging, a corner cursor must stay as a corner cursor,
-        # a left/right cursor must stay as left/right,
-        # and a top/bottom cursor must stay as top/bottom
-        if ( $self->{dragging} ) {
-            $self->_update_dragged_edge( 'x', $x, $sx1, $sx2 );
-            $self->_update_dragged_edge( 'y', $y, $sy1, $sy2 );
-            if ( $self->{h_edge} eq 'mid' ) {
-                if ( $self->{v_edge} eq 'mid' ) {
-                    $self->{h_edge}     = 'upper';
-                    $self->{v_edge}     = 'upper';
-                    $self->{drag_start} = { x => $x, y => $y };
-                }
-                else {
-                    if ( not defined $self->{drag_start}{x} ) {
-                        $self->{drag_start}{x} =
-                          $self->{v_edge} eq 'lower' ? $sx2 : $sx1;
-                    }
-                }
-            }
-            elsif ( $self->{v_edge} eq 'mid' ) {
-                if ( not defined $self->{drag_start}{y} ) {
-                    $self->{drag_start}{y} =
-                      $self->{h_edge} eq 'lower' ? $sy2 : $sy1;
-                }
-            }
-        }
-        else {
-            $self->_update_undragged_edge( 'h_edge', $x, $y, $sx1, $sy1, $sx2,
-                $sy2 );
-            $self->_update_undragged_edge( 'v_edge', $y, $x, $sy1, $sx1, $sy2,
-                $sx2 );
-        }
-    }
-    else {
-        if ( $self->{dragging} ) {
-            $self->{drag_start} = { x => $x, y => $y };
-            ( $self->{h_edge}, $self->{v_edge} ) = qw( upper upper );
-        }
-        else {
-            ( $self->{h_edge}, $self->{v_edge} ) = qw( mid mid );
-        }
-    }
-    return $cursorhash{ $self->{h_edge} }{ $self->{v_edge} };
-}
-
-sub _update_dragged_edge {
-    my ( $self, $direction, $s, $s1, $s2 ) = @_;
-    my $edge = ( $direction eq 'x' ? 'h' : 'v' ) . '_edge';
-    if ( $self->{$edge} eq 'lower' ) {
-        if ( defined $self->{drag_start}{$direction} ) {
-            if ( $s > $self->{drag_start}{$direction} ) {
-                $self->{$edge} = 'upper';
-            }
-            else {
-                $self->{$edge} = 'lower';
-            }
-        }
-        else {
-            $self->{drag_start}{$direction} = $s2;
-            $self->{$edge} = 'lower';
-        }
-    }
-    elsif ( $self->{$edge} eq 'upper' ) {
-        if ( defined $self->{drag_start}{$direction} ) {
-            if ( $s < $self->{drag_start}{$direction} ) {
-                $self->{$edge} = 'lower';
-            }
-            else {
-                $self->{$edge} = 'upper';
-            }
-        }
-        else {
-            $self->{drag_start}{$direction} = $s1;
-            $self->{$edge} = 'upper';
-        }
-    }
-    return;
-}
-
-sub _update_undragged_edge {
-    my ( $self, $edge, @coords ) = @_;
-    my ( $x, $y, $sx1, $sy1, $sx2, $sy2 ) = @coords;
-    $self->{$edge} = 'mid';
-    if ( _between( $y, $sy1, $sy2 ) ) {
-        if ( _between( $x, $sx1 - $CURSOR_PIXELS, $sx1 + $CURSOR_PIXELS ) ) {
-            $self->{$edge} = 'lower';
-        }
-        elsif ( _between( $x, $sx2 - $CURSOR_PIXELS, $sx2 + $CURSOR_PIXELS ) ) {
-            $self->{$edge} = 'upper';
-        }
-    }
-    return;
-}
-
-sub _between {
-    my ( $value, $lower, $upper ) = @_;
-    return ( $value > $lower and $value < $upper );
 }
 
 # compatibility layer

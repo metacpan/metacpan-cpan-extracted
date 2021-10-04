@@ -4,7 +4,7 @@ Template::Mustache - Drawing Mustaches on Perl for fun and profit
 
 # VERSION
 
-version 1.3.3
+version 1.3.4
 
 # SYNOPSIS
 
@@ -276,12 +276,12 @@ Accessor to the `delimiters` attribute.
 my $tree = $mustache->parsed;
 ```
 
-Returns the [Template::Mustache::Token::Template](https://metacpan.org/pod/Template::Mustache::Token::Template) object representing
+Returns the [Template::Mustache::Token::Template](https://metacpan.org/pod/Template%3A%3AMustache%3A%3AToken%3A%3ATemplate) object representing
 the parsed template.
 
 ## parser
 
-Returns the instance of [Template::Mustache::Parser](https://metacpan.org/pod/Template::Mustache::Parser) used by the object.
+Returns the instance of [Template::Mustache::Parser](https://metacpan.org/pod/Template%3A%3AMustache%3A%3AParser) used by the object.
 
 ## partials( { partial\_name => $partial, ... } )
 
@@ -318,7 +318,7 @@ my $mustache = Template::Mustache->new(
 print $Template::Mustache::GRAMMAR;
 ```
 
-The [Parse::RecDescent](https://metacpan.org/pod/Parse::RecDescent) grammar used to parse Mustache templates.
+The [Parse::RecDescent](https://metacpan.org/pod/Parse%3A%3ARecDescent) grammar used to parse Mustache templates.
 
 # SEE ALSO
 
@@ -332,10 +332,10 @@ The [Parse::RecDescent](https://metacpan.org/pod/Parse::RecDescent) grammar used
 
 - [Text::Handlebars](https://metacpan.org/pod/Text::Handlebars)
 
-    _Handlebars_ is another templating language heavily inspired and very similar to _Mustache_. [Text::Handlebars](https://metacpan.org/pod/Text::Handlebars)
-    is an implementation of it using [Text::Xslate](https://metacpan.org/pod/Text::Xslate).
+    _Handlebars_ is another templating language heavily inspired and very similar to _Mustache_. [Text::Handlebars](https://metacpan.org/pod/Text%3A%3AHandlebars)
+    is an implementation of it using [Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate).
 
-- [Mustache::Simple](https://metacpan.org/pod/Mustache::Simple)
+- [Mustache::Simple](https://metacpan.org/pod/Mustache%3A%3ASimple)
 
     Another module implementing Mustache templates.
 
@@ -347,7 +347,7 @@ The [Parse::RecDescent](https://metacpan.org/pod/Parse::RecDescent) grammar used
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2011 by Pieter van de Bruggen.
+This software is copyright (c) 2021, 2019, 2018, 2017, 2016, 2015, 2011 by Pieter van de Bruggen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

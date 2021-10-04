@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.131';
+our $VERSION = '0.132';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf );
@@ -30,7 +30,8 @@ sub new {
     my $instance_defaults = _defaults();
     if ( defined $opt ) {
         croak "Options have to be passed as a HASH reference." if ref $opt ne 'HASH';
-        validate_options( _valid_options( 'new' ), $opt );
+        my $caller = 'new';
+        validate_options( _valid_options( $caller ), $opt, $caller );
         for my $key ( keys %$opt ) {
             $instance_defaults->{$key} = $opt->{$key} if defined $opt->{$key};
         }
@@ -67,14 +68,9 @@ sub __prepare_opt {
     }
     croak "Options have to be passed as a HASH reference." if ref $opt ne 'HASH';
     if ( %$opt ) {
-        my $sub =  ( caller( 1 ) )[3];
-        $sub =~ s/^.+::(?:__)?([^:]+)\z/$1/;
-        if ( ! eval {
-            validate_options( _valid_options( $sub ), $opt );
-            1 }
-        ) {
-            croak "$sub: $@";
-        }
+        my $caller = ( caller( 1 ) )[3];
+        $caller =~ s/^.+::(?:__)?([^:]+)\z/$1/;
+        validate_options( _valid_options( $caller ), $opt, $caller );
         my $defaults = _defaults();
         for my $key ( keys %$opt ) {
             if ( ! defined $opt->{$key} && defined $defaults->{$key} ) {
@@ -87,7 +83,7 @@ sub __prepare_opt {
         ###############################################################
         if ( $self->{layout} == 3 ) {
             $self->{layout} = 2;
-            my @message = ( $sub, 'Option "layout": \'3\' is no longer a valid value.' );
+            my @message = ( $caller, 'Option "layout": \'3\' is no longer a valid value.' );
             my $prompt = join "\n", @message;
             choose(
                 [ 'Continue with ENTER' ],
@@ -1001,7 +997,7 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.131
+Version 0.132
 
 =cut
 

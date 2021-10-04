@@ -14,10 +14,9 @@ use List::Util qw(min);
 use Scalar::Util qw(blessed);
 use Carp;
 use Readonly;
-Readonly my $HALF     => 0.5;
 Readonly my $MAX_ZOOM => 100;
 
-our $VERSION = 9;
+our $VERSION = '10';
 
 use Glib::Object::Subclass Gtk3::DrawingArea::, signals => {
     'zoom-changed' => {
@@ -34,9 +33,9 @@ use Glib::Object::Subclass Gtk3::DrawingArea::, signals => {
     },
     'dnd-start' => {
         param_types => [
-            'Glib::Float',                  # x
-            'Glib::Float',                  # y
-            'Glib::UInt',                   # button
+            'Glib::Float',    # x
+            'Glib::Float',    # y
+            'Glib::UInt',     # button
         ],
         return_type => 'Glib::Boolean',
         flags       => ['run-last'],
@@ -95,20 +94,26 @@ use Glib::Object::Subclass Gtk3::DrawingArea::, signals => {
         'Gdk::Rectangle hash of selected region',       # blurb
         [qw/readable writable/]                         # flags
     ),
+    Glib::ParamSpec->scalar(
+        'selection-float',                                            # name
+        'Selection float',                                            # nick
+        'Gdk::Rectangle hash of selected region (floating point)',    # blurb
+        [qw/readable writable/]                                       # flags
+    ),
     Glib::ParamSpec->boolean(
-        'zoom-to-fit',                                  # name
-        'Zoom to fit',                                  # nickname
+        'zoom-to-fit',                                                # name
+        'Zoom to fit',                                                # nickname
         'Whether the zoom factor is automatically calculated to fit the window'
-        ,                                               # blurb
-        TRUE,                                           # default
-        [qw/readable writable/]                         # flags
+        ,                                                             # blurb
+        TRUE,                                                         # default
+        [qw/readable writable/]                                       # flags
     ),
     Glib::ParamSpec->float(
-        'zoom-to-fit-limit',                                         # name
-        'Zoom to fit limit',                                         # nickname
-        'When zooming automatically, don\'t zoom more than this',    # blurb
-        0.0001,                                                      # minimum
-        100.0,                                                       # maximum
+        'zoom-to-fit-limit',                                          # name
+        'Zoom to fit limit',                                          # nickname
+        'When zooming automatically, don\'t zoom more than this',     # blurb
+        0.0001,                                                       # minimum
+        100.0,                                                        # maximum
         100.0,                     # default_value
         [qw/readable writable/]    # flags
     ),
@@ -192,7 +197,7 @@ sub SET_PROPERTY {
                     $invalidate = TRUE;
                 }
             }
-            when ('resolution-ratio') {
+            when ('resolution_ratio') {
                 $self->{$name} = $newval;
                 $invalidate = TRUE;
             }
@@ -201,14 +206,31 @@ sub SET_PROPERTY {
                 $invalidate = TRUE;
             }
             when ('selection') {
-                if (   ( defined $newval xor defined $oldval )
-                    or $oldval->{x} != $newval->{x}
-                    or $oldval->{y} != $newval->{y}
-                    or $oldval->{width} != $newval->{width}
-                    or $oldval->{height} != $newval->{height} )
-                {
+                if ( _selections_nequal( $oldval, $newval ) ) {
+                    $self->{$name}           = $newval;
+                    $self->{selection_float} = $newval;
+                    $invalidate              = TRUE;
+                    $self->signal_emit( 'selection-changed', $newval );
+                }
+            }
+            when ('selection_float') {
+                if ( _selections_nequal( $oldval, $newval ) ) {
                     $self->{$name} = $newval;
-                    $invalidate = TRUE;
+                    my $x1 = int( $newval->{x} + 0.5 );
+                    my $y1 = int( $newval->{y} + 0.5 );
+                    my $x2 = int( $newval->{x} + $newval->{width} + 0.5 );
+                    my $y2 = int( $newval->{y} + $newval->{height} + 0.5 );
+                    $self->{selection} = {
+                        x      => $x1,
+                        y      => $y1,
+                        width  => $x2 - $x1,
+                        height => $y2 - $y1,
+                    };
+
+# Even for the float selection, w/h should be int; otherwise dragging the selection looks funny
+                    $self->{$name}->{width}  = $x2 - $x1;
+                    $self->{$name}->{height} = $y2 - $y1;
+                    $invalidate              = TRUE;
                     $self->signal_emit( 'selection-changed', $newval );
                 }
             }
@@ -230,6 +252,17 @@ sub SET_PROPERTY {
         }
     }
     return;
+}
+
+sub _selections_nequal {
+    my ( $oldval, $newval ) = @_;
+    return (
+             ( defined $newval xor defined $oldval )
+          or $oldval->{x} != $newval->{x}
+          or $oldval->{y} != $newval->{y}
+          or $oldval->{width} != $newval->{width}
+          or $oldval->{height} != $newval->{height}
+    );
 }
 
 sub set_pixbuf {
@@ -452,9 +485,9 @@ sub set_zoom_to_fit {
 
 sub zoom_to_box {
     my ( $self, $box, $additional_factor ) = @_;
-    if ( not defined $box ) { return }
-    if ( not defined $box->{x} )          { $box->{x}          = 0 }
-    if ( not defined $box->{y} )          { $box->{y}          = 0 }
+    if ( not defined $box )               { return }
+    if ( not defined $box->{x} )          { $box->{x} = 0 }
+    if ( not defined $box->{y} )          { $box->{y} = 0 }
     if ( not defined $additional_factor ) { $additional_factor = 1 }
     my $allocation = $self->get_allocation;
     my $ratio      = $self->get_resolution_ratio;
@@ -618,7 +651,7 @@ sub set_selection {
     if ( $selection->{y} + $selection->{height} > $pixbuf_size->{height} ) {
         $selection->{height} = $pixbuf_size->{height} - $selection->{y};
     }
-    $self->set( 'selection', $selection );
+    $self->set( 'selection-float', $selection );
     return;
 }
 

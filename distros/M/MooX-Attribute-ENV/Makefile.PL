@@ -14,7 +14,6 @@ WriteMakefile(
   },
   TEST_REQUIRES => {
     'Test::More' => '0.88', # done_testing
-    'Test::Exception' => '0.42',
   },
   PREREQ_PM => {
     'Moo' => '0',
@@ -29,6 +28,9 @@ WriteMakefile(
         type => 'git',
         url => 'git@github.com:mohawk2/moox-attribute-env.git',
         web => 'https://github.com/mohawk2/moox-attribute-env',
+      },
+      bugtracker  => {
+        web => 'https://github.com/mohawk2/moox-attribute-env/issues',
       },
       license => [ 'http://dev.perl.org/licenses/' ],
     },
@@ -45,7 +47,7 @@ WriteMakefile(
 );
 
 sub MY::postamble {
-  <<EOF;
+  -d '.git' ? <<EOF : '';
 pure_all :: README.md
 
 README.md : \$(VERSION_FROM)

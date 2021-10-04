@@ -1,3 +1,10 @@
+1.999827 2021-10-03
+
+ * Improve error message for missing library argument.
+
+ * Skip tests that don't work on older Perls. Also skip tests that compare
+   floating point numbers.
+
 1.999826 2021-10-01
 
  * Improve documentation related to floating point literals.
@@ -15,7 +22,7 @@
    Math::BigInt, every numeric constant that represent an integer is converted
    to an object regardless of how it is written. All finite non-integers are
    converted to a NaN.
-   
+
  * When numeric constants are overloaded (with the ":constant" option) in
    Math::BigFloat, every numeric constant is converted to an object regardless
    of how it is written.

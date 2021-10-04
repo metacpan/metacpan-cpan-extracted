@@ -23,7 +23,7 @@ use warnings;
 use Carp          qw< carp croak >;
 use Scalar::Util  qw< blessed >;
 
-our $VERSION = '1.999826';
+our $VERSION = '1.999827';
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -4305,6 +4305,8 @@ sub import {
 
             # Get the list of user-specified libraries.
 
+            croak "Library argument for import parameter '$param' is missing"
+              unless @_;
             my $libs = shift;
             croak "Library argument for import parameter '$param' is undefined"
               unless defined($libs);
@@ -4399,8 +4401,8 @@ sub import {
     # Any non-':constant' stuff is handled by our parent, Exporter
 
     if (@a) {
-        $class->SUPER::import(@a);            # need it for subclasses
-        $class->export_to_level(1, $class, @a); # need it for MBF
+        $class->SUPER::import(@a);              # need it for subclasses
+        $class->export_to_level(1, $class, @a); # need it for Math::BigFlaot
     }
 
     # We might not have loaded any backend library yet, either because the user

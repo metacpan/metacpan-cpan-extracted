@@ -1,6 +1,10 @@
 Revision history for Term::Choose
 
 
+1.742   2021-10-02
+    - Update ValidateOptions.
+    - Update user_input.
+
 1.741   2021-09-30
     - Search: eval user input.
     - Option 'skip_items': croaks if the value is not quoted with the 'qr' operator.

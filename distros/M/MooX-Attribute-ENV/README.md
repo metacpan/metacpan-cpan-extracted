@@ -20,6 +20,11 @@ MooX::Attribute::ENV - Allow Moo attributes to get their values from %ENV
       is => 'ro',
       env_key => 'attr_val',
     );
+    # look for $ENV{attr_val} and $ENV{next_val}, in that order
+    has some => (
+      is => 'ro',
+      env_key => [ 'attr_val', 'next_val' ],
+    );
     # looks for $ENV{otherattr} and $ENV{OTHERATTR}, then any default
     has otherattr => (
       is => 'ro',
@@ -47,9 +52,9 @@ MooX::Attribute::ENV - Allow Moo attributes to get their values from %ENV
 # DESCRIPTION
 
 This is a [Moo](https://metacpan.org/pod/Moo) extension. It allows other attributes for ["has" in Moo](https://metacpan.org/pod/Moo#has). If
-any of these are given, then instead of the normal value-setting "chain"
-for attributes of given, default; the chain will be given, environment,
-default.
+any of these are given, then ["BUILDARGS" in Moo](https://metacpan.org/pod/Moo#BUILDARGS) is wrapped so that values
+for object attributes can, if not supplied in the normal construction
+process, come from the environment.
 
 The environment will be searched for either the given case, or upper case,
 version of the names discussed below.
@@ -67,6 +72,10 @@ Boolean. If true, the name is the attribute, no prefix.
 
 String. If true, the name is the given value, no prefix.
 
+or
+
+ArrayRef. A list of names that will be checked in given order.
+
 ## env\_prefix
 
 String. The prefix is the given value.
@@ -78,7 +87,7 @@ replaced with `_`.
 
 # AUTHOR
 
-Ed J, porting John Napiorkowski's excellent [MooseX::Attribute::ENV](https://metacpan.org/pod/MooseX::Attribute::ENV).
+Ed J, porting John Napiorkowski's excellent [MooseX::Attribute::ENV](https://metacpan.org/pod/MooseX%3A%3AAttribute%3A%3AENV).
 
 # LICENCE
 

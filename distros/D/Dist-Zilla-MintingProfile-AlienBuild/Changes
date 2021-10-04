@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-MintingProfile-AlienBuild},
 
+0.04      2021-10-02 20:53:22 -0600
+  - Fix bug where Changes file was generated incorrectly (gh#17)
+
 0.03      2021-09-26 17:46:19 -0600
   - Customize alienfile for use with the latest or specific
     version of the alienized package (gh#8, gh#16)

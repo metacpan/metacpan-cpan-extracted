@@ -31,7 +31,7 @@ WriteMakefile(
     x_IRC => 'irc://irc.perl.org/#pdl',
   },
   CONFIGURE_REQUIRES =>  {
-    "PDL" => 0,
+    "PDL" => '2.047',
   },
   PREREQ_PM => {
     "PDL" => '2.047', # ci() -> i()

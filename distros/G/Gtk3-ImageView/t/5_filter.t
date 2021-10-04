@@ -111,4 +111,4 @@ is_deeply(
 );
 
 cmp_ok( $fullblue_x, '<', $x, 'sharp edge should be within blurred edge (1)' );
-cmp_ok( $x, '<', $blurred_x, 'sharp edge should be within blurred edge (2)' );
+cmp_ok( $x, '<', $blurred_x,  'sharp edge should be within blurred edge (2)' );

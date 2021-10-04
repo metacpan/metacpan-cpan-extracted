@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 pp_add_exported('', 'ols_t', 'anova', 'anova_rptd', 'dummy_code', 'effect_code', 'effect_code_w', 'interaction_code', 'ols', 'ols_rptd', 'r2_change', 'logistic', 'pca', 'pca_sorti', 'plot_means', 'plot_residuals', 'plot_screes');
 
 pp_addpm({At=>'Top'}, <<'EOD');
@@ -14,19 +12,12 @@ use PDL::NiceSlice;
 use PDL::Stats::Basic;
 use PDL::Stats::Kmeans;
 
-$PDL::onlinedoc->scan(__FILE__) if $PDL::onlinedoc;
-
 eval { require PDL::Core; require PDL::GSL::CDF; };
 my $CDF = 1 if !$@;
 
 eval { require PDL::Slatec; };
 my $SLATEC = 1 if !$@;
-
-eval {
-  require PDL::Graphics::PGPLOT::Window;
-  PDL::Graphics::PGPLOT::Window->import( 'pgwin' );
-};
-my $PGPLOT = 1 if !$@;
+my $MATINV = $SLATEC ? \&PDL::Slatec::matinv : \&inv;
 
 my $DEV = ($^O =~ /win/i)? '/png' : '/xs';
 
@@ -599,7 +590,7 @@ Deviance residual for logistic regression.
 
 );
 
-pp_addpm(<<'EOD');
+pp_addpm pp_line_numbers(__LINE__, <<'EOD');
 
 # my tmp var for PDL 2.007 slice upate
 my $_tmp;
@@ -733,50 +724,60 @@ Usage:
 
 *ols_t = \&PDL::ols_t;
 sub PDL::ols_t {
+  _ols_common(1, @_);
+}
+
+sub _ols_common {
+  my $threaded = shift;
+  my $opt = pop @_ if ref $_[-1] eq 'HASH';
     # y [n], ivs [n x attr] pdl
-  my ($y, $ivs, $opt) = @_;
-  my %opt = ( CONST => 1 );
+  my ($y, $ivs) = @_;
+  my %opt = (
+    CONST => 1,
+    PLOT  => 0,
+    WIN    => undef,      # for plotting
+  );
   $opt and $opt{uc $_} = $opt->{$_} for (keys %$opt);
 
-#  $y = $y->squeeze;
+  if (!$threaded) {
+    $y = $y->squeeze;
+    $y->getndims > 1 and
+      croak "use ols_t for threaded version";
+  }
+
   $ivs = $ivs->dummy(1) if $ivs->getndims == 1;
+
+  ($y, $ivs) = _rm_bad_value( $y, $ivs ) if !$threaded;
+
     # set up ivs and const as ivs
   $opt{CONST} and
     $ivs = $ivs->glue( 1, ones($ivs->dim(0)) );
 
   # Internally normalise data
   # (double) it or ushort y and sequence iv won't work right
-  my $ymean = $y->abs->sumover->double / $y->dim(0);
+  my $ymean = $y->abs->avgover->double;
   ($_tmp = $ymean->where( $ymean==0 )) .= 1;
-  my $y2 = $y / $ymean->dummy(0);
- 
+  my $y2 = $y / ($threaded ? $ymean->dummy(0) : $ymean);
+
   # Do the fit
-     
+
   my $Y = $ivs x $y2->dummy(0);
 
-  my $C;
-
-  if ( $SLATEC ) {
-    $C = PDL::Slatec::matinv( $ivs x $ivs->xchg(0,1) );
-  }
-  else {
-    $C = inv( $ivs x $ivs->xchg(0,1) );
-  }
+  my $C = &$MATINV( $ivs x $ivs->xchg(0,1) ); # avoid niceslice
 
     # Fitted coefficients vector
   my $coeff = PDL::squeeze( $C x $Y );
-
   $coeff = $coeff->dummy(0)
-    if $coeff->getndims == 1 and $y->getndims > 1;
-  $coeff *= $ymean->dummy(0);        # Un-normalise
-
-  return $coeff
-    unless wantarray; 
+    if $threaded and $coeff->getndims == 1 and $y->getndims > 1;
+  $coeff *= ($threaded ? $ymean->dummy(0) : $ymean); # Un-normalise
 
   my %ret;
 
     # ***$coeff x $ivs looks nice but produces nan on successive tries***
-  $ret{y_pred} = sumover( $coeff->dummy(1) * $ivs->xchg(0,1) );
+  $ret{y_pred} = sumover( ($threaded ? $coeff->dummy(1) : $coeff) * $ivs->transpose );
+  $opt{PLOT} and $y->plot_residuals( $ret{y_pred}, \%opt );
+  return $coeff unless wantarray;
+
   $ret{ss_total} = $opt{CONST}? $y->ss : sumover( $y ** 2 );
   $ret{ss_residual} = $y->sse( $ret{y_pred} );
   $ret{ss_model} = $ret{ss_total} - $ret{ss_residual};
@@ -784,10 +785,41 @@ sub PDL::ols_t {
 
   my $n_var = $opt{CONST}? $ivs->dim(1) - 1 : $ivs->dim(1);
   $ret{F_df} = pdl( $n_var, $y->dim(0) - $ivs->dim(1) );
-  $ret{F}
-    = $ret{ss_model} / $ret{F_df}->(0) / ($ret{ss_residual} / $ret{F_df}->(1));
+  $ret{F} = $ret{ss_model} / $ret{F_df}->(0)
+    / ($ret{ss_residual} / $ret{F_df}->(1));
   $ret{F_p} = 1 - $ret{F}->gsl_cdf_fdist_P( $ret{F_df}->dog )
     if $CDF;
+
+  if (!$threaded) {
+    my $se_b = ones( $coeff->dims? $coeff->dims : 1 );
+
+    $opt{CONST} and
+      ($_tmp = $se_b(-1)) .= sqrt( $ret{ss_residual} / $ret{F_df}->(1) * $C(-1,-1) );
+
+      # get the se for bs by successivly regressing each iv by the rest ivs
+    if ($ivs->dim(1) > 1) {
+      for my $k (0 .. $n_var-1) {
+        my @G = grep { $_ != $k } (0 .. $n_var-1);
+        my $G = $ivs->dice_axis(1, \@G);
+        $opt{CONST} and
+          $G = $G->glue( 1, ones($ivs->dim(0)) );
+        my $b_G = $ivs( ,$k)->ols( $G, {CONST=>0,PLOT=>0} );
+
+        my $ss_res_k = $ivs( ,$k)->squeeze->sse( sumover($b_G * $G->transpose) );
+
+        ($_tmp = $se_b($k)) .= sqrt( $ret{ss_residual} / $ret{F_df}->(1) / $ss_res_k );
+      }
+    }
+    else {
+      ($_tmp = $se_b(0))
+        .= sqrt( $ret{ss_residual} / $ret{F_df}->(1) / sum( $ivs( ,0)**2 ) );
+    }
+
+    $ret{b_se} = $se_b;
+    $ret{b_t} = $coeff / $ret{b_se};
+    $ret{b_p} = 2 * ( 1 - $ret{b_t}->abs->gsl_cdf_tdist_P( $ret{F_df}->(1) ) )
+      if $CDF;
+  }
 
   for (keys %ret) { ref $ret{$_} eq 'PDL' and $ret{$_} = $ret{$_}->squeeze };
 
@@ -888,6 +920,9 @@ Analysis of variance. Uses type III sum of squares for unbalanced data.
 
 Dependent variable should be a 1D pdl. Independent variables can be passed as 1D perl array ref or 1D pdl.
 
+Will only calculate p-value (C<F_p>) if there are more samples than the
+product of categories of all the IVs.
+
 Supports bad value (by ignoring missing or BAD values in dependent and independent variables list-wise).
 
 =for options
@@ -896,8 +931,9 @@ Default options (case insensitive):
 
     V      => 1,          # carps if bad value in variables
     IVNM   => [],         # auto filled as ['IV_0', 'IV_1', ... ]
-    PLOT   => 1,          # plots highest order effect
+    PLOT   => 0,          # plots highest order effect
                           # can set plot_means options here
+    WIN    => undef,      # for plotting
 
 =for usage
 
@@ -907,51 +943,51 @@ Usage:
 
     perldl> p $y = qsort ceil( random(12)*5 )
     [1 1 2 2 2 3 3 4 4 4 5 5]
-    
+
     # IV for types of apple
 
     perldl> p $a = sequence(12) % 3 + 1
     [1 2 3 1 2 3 1 2 3 1 2 3]
 
     # IV for whether we baked the apple
-    
+
     perldl> @b = qw( y y y y y y n n n n n n )
 
     perldl> %m = $y->anova( $a, \@b, { IVNM=>['apple', 'bake'] } )
-    
+
     perldl> p "$_\t$m{$_}\n" for (sort keys %m)
     # apple # m
     [
      [2.5   3 3.5]
     ]
-    
+
     # apple # se
     [
      [0.64549722 0.91287093 0.64549722]
     ]
-    
+
     # apple ~ bake # m
     [
      [1.5 1.5 2.5]
      [3.5 4.5 4.5]
     ]
-    
+
     # apple ~ bake # se
     [
      [0.5 0.5 0.5]
      [0.5 0.5 0.5]
     ]
-    
+
     # bake # m
     [
      [ 1.8333333  4.1666667]
     ]
-    
+
     # bake # se
     [
      [0.30731815 0.30731815]
     ]
-    
+
     F       7.6
     F_df    [5 6]
     F_p     0.0141586545851857
@@ -980,116 +1016,8 @@ Usage:
 
 *anova = \&PDL::anova;
 sub PDL::anova {
-  my $opt = pop @_
-    if ref $_[-1] eq 'HASH';
   my ($y, @ivs_raw) = @_;
-  croak "Mismatched number of elements in DV and IV. Are you passing IVs the old-and-abandoned way?"
-    if (ref $ivs_raw[0] eq 'ARRAY') and (@{ $ivs_raw[0] } != $y->nelem);
-
-  for (@ivs_raw) {
-    croak "too many dims in IV!"
-      if ref $_ eq 'PDL' and $_->squeeze->ndims > 1;
-  }
-
-  my %opt = (
-    IVNM   => [],      # auto filled as ['IV_0', 'IV_1', ... ]
-    PLOT   => 1,       # plots highest order effect
-    V      => 1,       # carps if bad value
-  );
-  $opt and $opt{uc $_} = $opt->{$_} for (keys %$opt);
-  $opt{IVNM} = [ map { "IV_$_" } (0 .. $#ivs_raw) ]
-    if !$opt{IVNM} or !@{$opt{IVNM}};
-  my @idv = @{ $opt{IVNM} };
-
-  my %ret;
-
-  $y = $y->squeeze;
-    # create new vars here so we don't mess up original caller @
-  my @pdl_ivs_raw = map {
-    my $var = (ref $_ eq 'PDL')? [list $_] : $_;
-    scalar PDL::Stats::Basic::_array_to_pdl $var;
-  } @ivs_raw;
-
-  my $pdl_ivs_raw = pdl \@pdl_ivs_raw;
-    # explicit set badflag if any iv had bad value because pdl() removes badflag
-  $pdl_ivs_raw->badflag( scalar grep { $_->badflag } @pdl_ivs_raw );
-
-  ($y, $pdl_ivs_raw) = _rm_bad_value( $y, $pdl_ivs_raw );
-
-  if ($opt{V} and $y->nelem < $pdl_ivs_raw[0]->nelem) {
-    printf STDERR "%d subjects with missing data removed\n", $pdl_ivs_raw[0]->nelem - $y->nelem;
-  }
-
-    # dog preserves data flow
-  @pdl_ivs_raw = map {$_->copy} $pdl_ivs_raw->dog;
-
-  my ($ivs_ref, $i_cmo_ref)
-    = _effect_code_ivs( \@pdl_ivs_raw );
-
-  ($ivs_ref, $i_cmo_ref, my( $idv, $ivs_cm_ref ))
-    = _add_interactions( $ivs_ref, $i_cmo_ref, \@idv, \@pdl_ivs_raw );
-
-    # add const here
-  my $ivs = PDL->null->glue( 1, @$ivs_ref );
-  $ivs = $ivs->glue(1, ones $ivs->dim(0));
-
-  my $b_full = $y->ols_t( $ivs, {CONST=>0} );
-
-  $ret{ss_total} = $y->ss;
-  $ret{ss_residual} = $y->sse( sumover( $b_full * $ivs->xchg(0,1) ) );
-  $ret{ss_model} = $ret{ss_total} - $ret{ss_residual};
-  $ret{F_df} = pdl($ivs->dim(1) - 1, $y->nelem - ($ivs->dim(1) - 1) -1);
-  $ret{ms_model} = $ret{ss_model} / $ret{F_df}->(0);
-  $ret{ms_residual} = $ret{ss_residual} / $ret{F_df}->(1);
-  $ret{F} = $ret{ms_model} / $ret{ms_residual};
-  $ret{F_p} = 1 - $ret{F}->gsl_cdf_fdist_P( $ret{F_df}->dog )
-    if $CDF;
-
-  # get IV ss from $ivs_ref instead of $ivs pdl
-
-  for my $k (0 .. $#$ivs_ref) {
-    my (@G, $G, $b_G);
-    @G = grep { $_ != $k } (0 .. $#$ivs_ref);
- 
-    if (@G) {
-      $G = PDL->null->glue( 1, @$ivs_ref[@G] );
-      $G = $G->glue(1, ones $G->dim(0));
-    }
-    else {
-      $G = ones( $y->dim(0) );
-    }
-    $b_G = $y->ols_t( $G, {CONST=>0} );
-
-    $ret{ "| $idv->[$k] | ss" }
-      = $y->sse( sumover($b_G * $G->transpose) ) - $ret{ss_residual};
-    $ret{ "| $idv->[$k] | F_df" }
-      = pdl( $ivs_ref->[$k]->dim(1), $ret{F_df}->(1)->copy )->squeeze;
-    $ret{ "| $idv->[$k] | ms" }
-      = $ret{ "| $idv->[$k] | ss" } / $ret{ "| $idv->[$k] | F_df" }->(0);
-    $ret{ "| $idv->[$k] | F" }
-      = $ret{ "| $idv->[$k] | ms" } / $ret{ms_residual};
-    $ret{ "| $idv->[$k] | F_p" }
-      = 1 - $ret{ "| $idv->[$k] | F" }->gsl_cdf_fdist_P( $ret{ "| $idv->[$k] | F_df" }->dog )
-      if $CDF;
-  }
-
-  for (keys %ret) { $ret{$_} = $ret{$_}->squeeze };
-
-  my $cm_ref = _cell_means( $y, $ivs_cm_ref, $i_cmo_ref, $idv, \@pdl_ivs_raw );
-    # sort bc we can't count on perl % internal key order implementation
-  @ret{ sort keys %$cm_ref } = @$cm_ref{ sort keys %$cm_ref };
-
-  my $highest = join(' ~ ', @{ $opt{IVNM} });
-  $cm_ref->{"# $highest # m"}->plot_means( $cm_ref->{"# $highest # se"}, {%opt, IVNM=>$idv} )
-    if $opt{PLOT};
-
-  return %ret;
-}
-
-sub _old_interface_check {
-  my ($n, $ivs_ref) = @_;
-  return 1
-    if (ref $ivs_ref->[0][0] eq 'ARRAY') and (@{ $ivs_ref->[0][0] } != $n);
+  anova_rptd($y, undef, @ivs_raw);
 }
 
 sub _effect_code_ivs {
@@ -1207,6 +1135,9 @@ sub _combinations {
 
 Repeated measures and mixed model anova. Uses type III sum of squares. The standard error (se) for the means are based on the relevant mean squared error from the anova, ie it is pooled across levels of the effect.
 
+Will only calculate p-value (C<F_p>) if there are more samples than the
+product of categories of all the IVs.
+
 anova_rptd supports bad value in the dependent and independent variables. It automatically removes bad data listwise, ie remove a subject's data if there is any cell missing for the subject.
 
 Default options (case insensitive):
@@ -1214,8 +1145,9 @@ Default options (case insensitive):
     V      => 1,    # carps if bad value in dv
     IVNM   => [],   # auto filled as ['IV_0', 'IV_1', ... ]
     BTWN   => [],   # indices of between-subject IVs (matches IVNM indices)
-    PLOT   => 1,    # plots highest order effect
+    PLOT   => 0,    # plots highest order effect
                     # see plot_means() for more options
+    WIN    => undef,      # for plotting
 
 Usage:
 
@@ -1320,6 +1252,9 @@ sub PDL::anova_rptd {
   my $opt = pop @_
     if ref $_[-1] eq 'HASH';
   my ($y, $subj, @ivs_raw) = @_;
+  confess "Expected 1-D data, instead: ", $y->info if $y->ndims != 1;
+  croak "Mismatched number of elements in DV and IV. Are you passing IVs the old-and-abandoned way?"
+    if (ref $ivs_raw[0] eq 'ARRAY') and (@{ $ivs_raw[0] } != $y->nelem);
 
   for (@ivs_raw) {
     croak "too many dims in IV!"
@@ -1329,8 +1264,11 @@ sub PDL::anova_rptd {
   my %opt = (
     V      => 1,    # carps if bad value in dv
     IVNM   => [],   # auto filled as ['IV_0', 'IV_1', ... ]
+    ( !defined($subj) ? () : (
     BTWN   => [],   # indices of between-subject IVs (matches IVNM indices)
-    PLOT   => 1,    # plots highest order effect
+    )),
+    PLOT   => 0,    # plots highest order effect
+    WIN    => undef,      # for plotting
   );
   $opt and $opt{uc $_} = $opt->{$_} for (keys %$opt);
   $opt{IVNM} = [ map { "IV_$_" } 0 .. $#ivs_raw ]
@@ -1339,32 +1277,38 @@ sub PDL::anova_rptd {
 
   my %ret;
 
-    # create new vars here so we don't mess up original caller @
-  my ($sj, @pdl_ivs_raw)
-    = map { my $var = (ref $_ eq 'PDL')? [list $_] : $_;
-            scalar PDL::Stats::Basic::_array_to_pdl $var;
-          } ( $subj, @ivs_raw );
-
-    # delete bad data listwise ie remove subj if any cell missing
   $y = $y->squeeze;
+  my @pdl_ivs_raw = map scalar PDL::Stats::Basic::_array_to_pdl($_), @ivs_raw;
   my $pdl_ivs_raw = pdl \@pdl_ivs_raw;
     # explicit set badflag because pdl() removes badflag
   $pdl_ivs_raw->badflag( scalar grep { $_->badflag } @pdl_ivs_raw );
+  my $sj;
+  if (defined($subj)) {
+    # delete bad data listwise ie remove subj if any cell missing
+    $sj = PDL::Stats::Basic::_array_to_pdl($subj);
+    my $ibad = which( $y->isbad | nbadover($pdl_ivs_raw->transpose) );
 
-  my $ibad = which( $y->isbad | nbadover($pdl_ivs_raw->transpose) );
-
-  my $sj_bad = $sj($ibad)->uniq;
-  if ($sj_bad->nelem) {
-    print STDERR $sj_bad->nelem . " subjects with missing data removed\n"
-      if $opt{V};
-    $sj = $sj->setvaltobad($_)
-      for (list $sj_bad);
-    my $igood = which $sj->isgood;
-    for ($y, $sj, @pdl_ivs_raw) {
-      $_ = $_( $igood )->sever;
-      $_->badflag(0);
+    my $sj_bad = $sj($ibad)->uniq;
+    if ($sj_bad->nelem) {
+      print STDERR $sj_bad->nelem . " subjects with missing data removed\n"
+        if $opt{V};
+      $sj = $sj->setvaltobad($_)
+        for (list $sj_bad);
+      my $igood = which $sj->isgood;
+      for ($y, $sj, @pdl_ivs_raw) {
+        $_ = $_( $igood )->sever;
+        $_->badflag(0);
+      }
     }
+  } else {
+    ($y, $pdl_ivs_raw) = _rm_bad_value( $y, $pdl_ivs_raw );
+    if ($opt{V} and $y->nelem < $pdl_ivs_raw[0]->nelem) {
+      printf STDERR "%d subjects with missing data removed\n", $pdl_ivs_raw[0]->nelem - $y->nelem;
+    }
+      # dog preserves data flow
+    @pdl_ivs_raw = map {$_->copy} $pdl_ivs_raw->dog;
   }
+
     # code for ivs and cell mean in diff @s: effect_code vs iv_cluster
   my ($ivs_ref, $i_cmo_ref)
     = _effect_code_ivs( \@pdl_ivs_raw );
@@ -1373,92 +1317,129 @@ sub PDL::anova_rptd {
     = _add_interactions( $ivs_ref, $i_cmo_ref, \@idv, \@pdl_ivs_raw );
 
     # matches $ivs_ref, with an extra last pdl for subj effect
-  my $err_ref
-    = _add_errors( $sj, $ivs_ref, $idv, \@pdl_ivs_raw, \%opt );
+  my $err_ref = defined($subj) ?
+    _add_errors( $sj, $ivs_ref, $idv, \@pdl_ivs_raw, \%opt )
+    : [];
 
     # stitch together
-  my $ivs = PDL->null->glue( 1, @$ivs_ref );
-  $ivs = $ivs->glue(1, grep { defined($_) and ref($_) } @$err_ref);
+  my $ivs = PDL->null->glue( 1, @$ivs_ref, grep defined($_) && ref($_), @$err_ref);
   $ivs = $ivs->glue(1, ones $ivs->dim(0));
   my $b_full = $y->ols_t( $ivs, {CONST=>0} );
 
   $ret{ss_total} = $y->ss;
   $ret{ss_residual} = $y->sse( sumover( $b_full * $ivs->xchg(0,1) ) );
 
-  my @full = (@$ivs_ref, @$err_ref);
-  EFFECT: for my $k (0 .. $#full) {
-    my $e = ($k > $#$ivs_ref)?  '| err' : '';
-    my $i = ($k > $#$ivs_ref)?  $k - @$ivs_ref : $k;
+  if (defined $subj) {
+    my @full = (@$ivs_ref, @$err_ref);
+    EFFECT: for my $k (0 .. $#full) {
+      my $e = ($k > $#$ivs_ref)?  '| err' : '';
+      my $i = ($k > $#$ivs_ref)?  $k - @$ivs_ref : $k;
 
-    if (!defined $full[$k]) {     # ss_residual as error
-      $ret{ "| $idv->[$i] |$e ss" } = $ret{ss_residual};
-        # highest ord inter for purely within design, (p-1)*(q-1)*(n-1)
-      $ret{ "| $idv->[$i] |$e df" }
-        = pdl(map { $_->dim(1) } @full[0 .. $#ivs_raw])->prodover;
-      $ret{ "| $idv->[$i] |$e df" }
-        *= ref($full[-1])?   $full[-1]->dim(1)
-        :                    $err_ref->[$err_ref->[-1]]->dim(1)
-        ;
-      $ret{ "| $idv->[$i] |$e ms" }
-        = $ret{ "| $idv->[$i] |$e ss" } / $ret{ "| $idv->[$i] |$e df" };
-    }
-    elsif (ref $full[$k]) {       # unique error term
-      my (@G, $G, $b_G);
-      @G = grep { $_ != $k and defined $full[$_] } (0 .. $#full);
-   
-      next EFFECT
-        unless @G;
-  
-      $G = PDL->null->glue( 1, grep { ref $_ } @full[@G] );
-      $G = $G->glue(1, ones $G->dim(0));
-      $b_G = $y->ols_t( $G, {CONST=>0} );
-  
-      if ($k == $#full) {
-        $ret{ss_subject}
-          = $y->sse(sumover($b_G * $G->transpose)) - $ret{ss_residual};
-      }
-      else {
-        $ret{ "| $idv->[$i] |$e ss" }
-          = $y->sse(sumover($b_G * $G->transpose)) - $ret{ss_residual};
+      if (!defined $full[$k]) {     # ss_residual as error
+        $ret{ "| $idv->[$i] |$e ss" } = $ret{ss_residual};
+          # highest ord inter for purely within design, (p-1)*(q-1)*(n-1)
         $ret{ "| $idv->[$i] |$e df" }
-          = $full[$k]->dim(1);
+          = pdl(map { $_->dim(1) } @full[0 .. $#ivs_raw])->prodover;
+        $ret{ "| $idv->[$i] |$e df" }
+          *= ref($full[-1])?   $full[-1]->dim(1)
+          :                    $err_ref->[$err_ref->[-1]]->dim(1)
+          ;
         $ret{ "| $idv->[$i] |$e ms" }
           = $ret{ "| $idv->[$i] |$e ss" } / $ret{ "| $idv->[$i] |$e df" };
       }
+      elsif (ref $full[$k]) {       # unique error term
+        my (@G, $G, $b_G);
+        @G = grep { $_ != $k and defined $full[$_] } (0 .. $#full);
+     
+        next EFFECT
+          unless @G;
+    
+        $G = PDL->null->glue( 1, grep { ref $_ } @full[@G] );
+        $G = $G->glue(1, ones $G->dim(0));
+        $b_G = $y->ols_t( $G, {CONST=>0} );
+    
+        if ($k == $#full) {
+          $ret{ss_subject}
+            = $y->sse(sumover($b_G * $G->transpose)) - $ret{ss_residual};
+        }
+        else {
+          $ret{ "| $idv->[$i] |$e ss" }
+            = $y->sse(sumover($b_G * $G->transpose)) - $ret{ss_residual};
+          $ret{ "| $idv->[$i] |$e df" }
+            = $full[$k]->dim(1);
+          $ret{ "| $idv->[$i] |$e ms" }
+            = $ret{ "| $idv->[$i] |$e ss" } / $ret{ "| $idv->[$i] |$e df" };
+        }
+      }
+      else {                        # repeating error term
+        if ($k == $#full) {
+          $ret{ss_subject} = $ret{"| $idv->[$full[$k]] |$e ss"};
+        }
+        else {
+          $ret{ "| $idv->[$i] |$e ss" } = $ret{"| $idv->[$full[$k]] |$e ss"};
+          $ret{ "| $idv->[$i] |$e df" } = $ret{"| $idv->[$full[$k]] |$e df"};
+          $ret{ "| $idv->[$i] |$e ms" }
+            = $ret{ "| $idv->[$i] |$e ss" } / $ret{ "| $idv->[$i] |$e df" };
+        }
+      }
     }
-    else {                        # repeating error term
-      if ($k == $#full) {
-        $ret{ss_subject} = $ret{"| $idv->[$full[$k]] |$e ss"};
+      # have all iv, inter, and error effects. get F and F_p
+    for (0 .. $#$ivs_ref) {
+      $ret{ "| $idv->[$_] | F" }
+        = $ret{ "| $idv->[$_] | ms" } / $ret{ "| $idv->[$_] || err ms" };
+      $ret{ "| $idv->[$_] | F_p" }
+        = 1 - $ret{ "| $idv->[$_] | F" }->gsl_cdf_fdist_P(
+          $ret{ "| $idv->[$_] | df" }, $ret{ "| $idv->[$_] || err df" } )
+        if $CDF and $ret{ "| $idv->[$_] || err df" } > 0;
+    }
+  } else {
+    $ret{ss_model} = $ret{ss_total} - $ret{ss_residual};
+    $ret{F_df} = pdl($ivs->dim(1) - 1, $y->nelem - ($ivs->dim(1) - 1) -1);
+    $ret{ms_model} = $ret{ss_model} / $ret{F_df}->(0);
+    $ret{ms_residual} = $ret{ss_residual} / $ret{F_df}->(1);
+    $ret{F} = $ret{ms_model} / $ret{ms_residual};
+    $ret{F_p} = 1 - $ret{F}->gsl_cdf_fdist_P( $ret{F_df}->dog )
+      if $CDF and $ret{F_df}->(1) > 0;
+
+    # get IV ss from $ivs_ref instead of $ivs pdl
+
+    for my $k (0 .. $#$ivs_ref) {
+      my ($G);
+      my @G = grep $_ != $k, 0 .. $#$ivs_ref;
+      if (@G) {
+        $G = PDL->null->glue( 1, @$ivs_ref[@G] );
+        $G = $G->glue(1, ones $G->dim(0));
       }
       else {
-        $ret{ "| $idv->[$i] |$e ss" } = $ret{"| $idv->[$full[$k]] |$e ss"};
-        $ret{ "| $idv->[$i] |$e df" } = $ret{"| $idv->[$full[$k]] |$e df"};
-        $ret{ "| $idv->[$i] |$e ms" }
-          = $ret{ "| $idv->[$i] |$e ss" } / $ret{ "| $idv->[$i] |$e df" };
+        $G = ones( $y->dim(0) );
       }
+      my $b_G = $y->ols_t( $G, {CONST=>0} );
+
+      $ret{ "| $idv->[$k] | ss" }
+        = $y->sse( sumover($b_G * $G->transpose) ) - $ret{ss_residual};
+      $ret{ "| $idv->[$k] | F_df" }
+        = pdl( $ivs_ref->[$k]->dim(1), $ret{F_df}->(1)->copy )->squeeze;
+      $ret{ "| $idv->[$k] | ms" }
+        = $ret{ "| $idv->[$k] | ss" } / $ret{ "| $idv->[$k] | F_df" }->(0);
+      $ret{ "| $idv->[$k] | F" }
+        = $ret{ "| $idv->[$k] | ms" } / $ret{ms_residual};
+      $ret{ "| $idv->[$k] | F_p" }
+        = 1 - $ret{ "| $idv->[$k] | F" }->gsl_cdf_fdist_P( $ret{ "| $idv->[$k] | F_df" }->dog )
+        if $CDF and $ret{ "| $idv->[$k] | F_df" }->(1) > 0;
     }
-  }
-    # have all iv, inter, and error effects. get F and F_p
-  for (0 .. $#$ivs_ref) {
-    $ret{ "| $idv->[$_] | F" }
-      = $ret{ "| $idv->[$_] | ms" } / $ret{ "| $idv->[$_] || err ms" };
-    $ret{ "| $idv->[$_] | F_p" }
-      = 1 - $ret{ "| $idv->[$_] | F" }->gsl_cdf_fdist_P(
-        $ret{ "| $idv->[$_] | df" }, $ret{ "| $idv->[$_] || err df" } )
-      if $CDF;
   }
 
   for (keys %ret) {ref $ret{$_} eq 'PDL' and $ret{$_} = $ret{$_}->squeeze};
 
   my $cm_ref
     = _cell_means( $y, $ivs_cm_ref, $i_cmo_ref, $idv, \@pdl_ivs_raw );
-  my @ls = map { $_->uniq->nelem } @pdl_ivs_raw;
-  $cm_ref
-    = _fix_rptd_se( $cm_ref, \%ret, $opt{'IVNM'}, \@ls, $sj->uniq->nelem );
-
+  if (defined $subj) {
+    my @ls = map { $_->uniq->nelem } @pdl_ivs_raw;
+    $cm_ref
+      = _fix_rptd_se( $cm_ref, \%ret, $opt{'IVNM'}, \@ls, $sj->uniq->nelem );
+  }
     # integrate mean and se into %ret
-    # sort bc we can't count on perl % internal key order implementation
-  @ret{ sort keys %$cm_ref } = @$cm_ref{ sort keys %$cm_ref };
+  @ret{ keys %$cm_ref } = values %$cm_ref;
 
   my $highest = join(' ~ ', @{ $opt{IVNM} });
   $cm_ref->{"# $highest # m"}->plot_means( $cm_ref->{"# $highest # se"}, 
@@ -1637,28 +1618,10 @@ Supports BAD value (missing or 'BAD' values result in the corresponding pdl elem
 sub PDL::effect_code {
   my ($var_ref) = @_;
 
-    # pdl->uniq sorts elems. so instead list it to maintain old order
-  if (ref $var_ref eq 'PDL') {
-    $var_ref = $var_ref->squeeze;
-    $var_ref->getndims > 1 and
-      croak "multidim pdl passed for single var!";
-    $var_ref = [ list $var_ref ];
-  }
-
   my ($var, $map_ref) = PDL::Stats::Basic::_array_to_pdl( $var_ref );
-  my $var_e = zeroes float, $var->nelem, $var->max;
-
-  for my $l (0 .. $var->max - 1) {
-    my $v = $var_e( ,$l);
-    ($_tmp = $v->index( which $var == $l )) .= 1;
-    ($_tmp = $v->index( which $var == $var->max )) .= -1;
-  }
-
-  if ($var->badflag) {
-    my $ibad = which $var->isbad;
-    ($_tmp = $var_e($ibad, )) .= -99;
-    $var_e = $var_e->setvaltobad(-99);
-  }
+  my $var_e = yvals( float, $var->nelem, $var->max ) == $var;
+  ($_tmp = $var_e(which( $var == $var->max ), )) .= -1;
+  $var_e = $var_e->setbadif( $var->isbad ) if $var->badflag;
 
   return wantarray? ($var_e, $map_ref) : $var_e;
 }
@@ -1688,19 +1651,15 @@ sub PDL::effect_code_w {
 
   my ($var_e, $map_ref) = effect_code( $var_ref );
 
-  if ($var_e->sum == 0) {
-    return wantarray? ($var_e, $map_ref) : $var_e;
-  }
+  return wantarray ? ($var_e, $map_ref) : $var_e if $var_e->sum == 0;
 
-  for (0..$var_e->dim(1)-1) {
-    my $factor = $var_e( ,$_);
-    my $pos = which $factor == 1;
-    my $neg = which $factor == -1;
-    my $w = $pos->nelem / $neg->nelem;
-    ($_tmp = $factor($neg)) *= $w;
-  }
+  my $pos = $var_e == 1;
+  my $neg = $var_e == -1;
+  my $w = $pos->sumover / $neg->sumover;
+  my $neg_ind = $neg->whichND;
+  ($_tmp = $var_e->indexND($neg_ind)) *= $w($neg_ind((1)));
 
-  return wantarray? ($var_e, $map_ref) : $var_e;
+  return wantarray ? ($var_e, $map_ref) : $var_e;
 }
 
 =head2 interaction_code
@@ -1758,7 +1717,8 @@ IVs ($x) should be pdl dims $y->nelem or $y->nelem x n_iv. Do not supply the con
 Default options (case insensitive): 
 
     CONST  => 1,
-    PLOT   => 1,   # see plot_residuals() for plot options
+    PLOT   => 0,   # see plot_residuals() for plot options
+    WIN    => undef,      # for plotting
 
 =for usage
 
@@ -1802,103 +1762,7 @@ Usage:
 
 *ols = \&PDL::ols;
 sub PDL::ols {
-    # y [n], ivs [n x attr] pdl
-  my ($y, $ivs, $opt) = @_;
-  my %opt = (
-    CONST => 1,
-    PLOT  => 1,
-  );
-  $opt and $opt{uc $_} = $opt->{$_} for (keys %$opt);
-
-  $y = $y->squeeze;
-  $y->getndims > 1 and
-    croak "use ols_t for threaded version";
-
-  $ivs = $ivs->dummy(1) if $ivs->getndims == 1;
-
-  ($y, $ivs) = _rm_bad_value( $y, $ivs );
-
-    # set up ivs and const as ivs
-  $opt{CONST} and
-    $ivs = $ivs->glue( 1, ones($ivs->dim(0)) );
-
-  # Internally normalise data
-  
-  my $ymean = (abs($y)->sum)/($y->nelem);
-  $ymean = 1 if $ymean == 0;
-  my $y2 = $y / $ymean;
- 
-  # Do the fit
-     
-  my $Y = $ivs x $y2->dummy(0);
-
-  my $C;
-  if ( $SLATEC ) {
-    $C = PDL::Slatec::matinv( $ivs x $ivs->xchg(0,1) );
-  }
-  else {
-    $C = inv( $ivs x $ivs->xchg(0,1) );
-  }
-
-    # Fitted coefficients vector
-  my $coeff = PDL::squeeze( $C x $Y );
-     $coeff *= $ymean;        # Un-normalise
-
-  my %ret;
-
-    # ***$coeff x $ivs looks nice but produces nan on successive tries***
-  $ret{y_pred} = sumover( $coeff * $ivs->transpose );
-
-  $opt{PLOT} and $y->plot_residuals( $ret{y_pred}, \%opt );
-
-  return $coeff
-    unless wantarray;
-
-  $ret{b} = $coeff;
-  $ret{ss_total} = $opt{CONST}? $y->ss : sum( $y ** 2 );
-  $ret{ss_residual} = $y->sse( $ret{y_pred} );
-  $ret{ss_model} = $ret{ss_total} - $ret{ss_residual};
-  $ret{R2} = $ret{ss_model} / $ret{ss_total};
-
-  my $n_var = $opt{CONST}? $ivs->dim(1) - 1 : $ivs->dim(1);
-  $ret{F_df} = pdl( $n_var, $y->nelem - $ivs->dim(1) );
-  $ret{F} = $ret{ss_model} / $ret{F_df}->(0)
-          / ( $ret{ss_residual} / $ret{F_df}->(1) );
-  $ret{F_p} = 1 - $ret{F}->gsl_cdf_fdist_P( $ret{F_df}->dog )
-    if $CDF;
-
-  my $se_b = ones( $coeff->dims? $coeff->dims : 1 );
-
-  $opt{CONST} and 
-    ($_tmp = $se_b(-1)) .= sqrt( $ret{ss_residual} / $ret{F_df}->(1) * $C(-1,-1) );
-
-    # get the se for bs by successivly regressing each iv by the rest ivs
-  if ($ivs->dim(1) > 1) {
-    for my $k (0 .. $n_var-1) {
-      my @G = grep { $_ != $k } (0 .. $n_var-1);
-      my $G = $ivs->dice_axis(1, \@G);
-      $opt{CONST} and
-        $G = $G->glue( 1, ones($ivs->dim(0)) );
-      my $b_G = $ivs( ,$k)->ols( $G, {CONST=>0,PLOT=>0} );
-
-      my $ss_res_k = $ivs( ,$k)->squeeze->sse( sumover($b_G * $G->transpose) );
-
-      ($_tmp = $se_b($k)) .= sqrt( $ret{ss_residual} / $ret{F_df}->(1) / $ss_res_k );
-    }
-  }
-  else {
-    ($_tmp = $se_b(0))
-      .= sqrt( $ret{ss_residual} / $ret{F_df}->(1) / sum( $ivs( ,0)**2 ) );
-  }
-
-  $ret{b_se} = $se_b;
-  $ret{b_t} = $ret{b} / $ret{b_se};
-  $ret{b_p} = 2 * ( 1 - $ret{b_t}->abs->gsl_cdf_tdist_P( $ret{F_df}->(1) ) )
-    if $CDF;
-
-  for (keys %ret) { ref $ret{$_} eq 'PDL' and $ret{$_} = $ret{$_}->squeeze };
-
-  return %ret;
+  _ols_common(0, @_);
 }
 
 sub _rm_bad_value {
@@ -2106,6 +1970,9 @@ Usage:
     iter	12
     y_pred	[0.10715577 0.23683909 ... 0.76316091 0.89284423]
 
+    # to get the covariance out, supply a true value for the COV option:
+    perldl> %m = $y->logistic( $x, {COV=>1} )
+    perldl> p $m{cov};
 
 =cut
 
@@ -2147,6 +2014,7 @@ sub PDL::logistic {
   my $n0 = $self->where($self == 0)->nelem;
   my $n1 = $self->nelem - $n0;
 
+  $ret{cov} = $cov if $opt{COV};
   $ret{D0} = -2*($n0 * log($n0 / $self->nelem) + $n1 * log($n1 / $self->nelem));
   $ret{Dm} = sum( $self->dvrs( $yfit ) ** 2 );
   $ret{Dm_chisq} = $ret{D0} - $ret{Dm};
@@ -2249,8 +2117,9 @@ Principal component analysis. Based on corr instead of cov (bad values are ignor
 Default options (case insensitive):
 
     CORR  => 1,     # boolean. use correlation or covariance
-    PLOT  => 1,     # calls plot_screes by default
+    PLOT  => 0,     # calls plot_screes by default
                     # can set plot_screes options here
+    WIN    => undef,      # for plotting
 
 =for usage
 
@@ -2296,7 +2165,8 @@ sub PDL::pca {
 
   my %opt = (
     CORR  => 1,
-    PLOT  => 1,
+    PLOT  => 0,
+    WIN    => undef,      # for plotting
   );
   $opt and $opt{uc $_} = $opt->{$_} for (keys %$opt);
 
@@ -2319,7 +2189,7 @@ sub PDL::pca {
   $eigval = $eigval($ind_sorted)->sever;
 
     # var x axis
-  my $var     = $eigval / $eigval->sum;
+  my $var     = $eigval / $eigval->sum->sclr;
   my $loadings;
   if ($opt{CORR}) {
     $loadings = $eigvec * sqrt( $eigval->transpose );
@@ -2444,13 +2314,10 @@ Or like this:
 
 *plot_means = \&PDL::plot_means;
 sub PDL::plot_means {
+  require PDL::Graphics::PGPLOT::Window;
   my $opt = pop @_
     if ref $_[-1] eq 'HASH';
   my ($self, $se) = @_;
-  if (!$PGPLOT) {
-    carp "No PDL::Graphics::PGPLOT, no plot :(";
-    return;
-  }
   $self = $self->squeeze;
   if ($self->ndims > 4) {
     carp "Data is > 4D. No plot here.";
@@ -2478,7 +2345,7 @@ sub PDL::plot_means {
   $self = $self->reshape(@dims)->sever;
   $se = $se->reshape(@dims)->sever
     if defined $se;
-  @iD = reverse sort { $a<=>$b } @dims
+  @iD = reverse list qsorti pdl @dims
     if $opt{AUTO};
 
     # $iD[0] on x axis
@@ -2488,7 +2355,7 @@ sub PDL::plot_means {
   
   my $w = $opt{WIN};
   if (!defined $w) {
-    $w = pgwin(DEV=>$opt{DEV}, NX=>$nx, NY=>$ny,
+    $w = PDL::Graphics::PGPLOT::Window::pgwin(DEV=>$opt{DEV}, NX=>$nx, NY=>$ny,
                  SIZE=>[$opt{SIZE}*$nx, $opt{SIZE}*$ny], UNIT=>3);
   }
 
@@ -2565,10 +2432,7 @@ Default options (case insensitive):
 
 *plot_residuals = \&PDL::plot_residuals;
 sub PDL::plot_residuals {
-  if (!$PGPLOT) {
-    carp "No PDL::Graphics::PGPLOT, no plot :(";
-    return;
-  }
+  require PDL::Graphics::PGPLOT::Window;
   my $opt = pop @_
     if ref $_[-1] eq 'HASH';
   my ($y, $y_pred) = @_;
@@ -2588,7 +2452,7 @@ sub PDL::plot_residuals {
   my $win = $opt{WIN};
 
   if (!$win) {
-   $win = pgwin(DEV=>$opt{DEV}, SIZE=>[$opt{SIZE}, $opt{SIZE}], UNIT=>3);
+   $win = PDL::Graphics::PGPLOT::Window::pgwin(DEV=>$opt{DEV}, SIZE=>[$opt{SIZE}, $opt{SIZE}], UNIT=>3);
    $win->env( $y_pred->minmax, $residuals->minmax,
      {XTITLE=>'predicted value', YTITLE=>'residuals',
       AXIS=>['BCNT', 'BCNST'], Border=>1,} );
@@ -2635,10 +2499,7 @@ Usage:
 
 *plot_scores = \&PDL::plot_scores;
 sub PDL::plot_scores {
-  if (!$PGPLOT) {
-    carp "No PDL::Graphics::PGPLOT, no plot :(";
-    return;
-  }
+  require PDL::Graphics::PGPLOT::Window;
   my $opt = pop @_
     if ref $_[-1] eq 'HASH';
   my ($self, $eigvec) = @_;
@@ -2663,11 +2524,11 @@ sub PDL::plot_scores {
   $z = $z( ,$i)->sever;
 
   my $win = $opt{WIN};
-  my $max = pdl($z, $scores)->abs->ceil->max;
+  my $max = pdl($z, $scores)->abs->ceil->max->sclr;
   if (!$win) {
-   $win = pgwin(DEV=>$opt{DEV}, SIZE=>[$opt{SIZE}, $opt{SIZE}], UNIT=>3);
+   $win = PDL::Graphics::PGPLOT::Window::pgwin(DEV=>$opt{DEV}, SIZE=>[$opt{SIZE}, $opt{SIZE}], UNIT=>3);
    $win->env(-$max, $max, -$max, $max,
-     {XTitle=>"Compoment $opt{COMP}->[0]", YTitle=>"Component $opt{COMP}->[1]",
+     {XTitle=>"Component $opt{COMP}->[0]", YTitle=>"Component $opt{COMP}->[1]",
      AXIS=>['ABCNST', 'ABCNST'], Border=>1, });
   }
 
@@ -2717,10 +2578,7 @@ Or, because NCOMP is used so often, it is allowed a shortcut,
 *plot_scree = \&PDL::plot_screes;      # here for now for compatibility
 *plot_screes = \&PDL::plot_screes;
 sub PDL::plot_screes {
-  if (!$PGPLOT) {
-    carp "No PDL::Graphics::PGPLOT, no plot :(";
-    return;
-  }
+  require PDL::Graphics::PGPLOT::Window;
   my $opt = pop @_
     if ref $_[-1] eq 'HASH';
   my ($self, $ncomp) = @_;
@@ -2747,15 +2605,15 @@ sub PDL::plot_screes {
   my $win = $opt{WIN};
 
   if (!$win) {
-   $win = pgwin(DEV=>$opt{DEV}, SIZE=>[$opt{SIZE}, $opt{SIZE}], UNIT=>3);
+   $win = PDL::Graphics::PGPLOT::Window::pgwin(DEV=>$opt{DEV}, SIZE=>[$opt{SIZE}, $opt{SIZE}], UNIT=>3);
    $win->env(0, $ncomp-1, 0, 1,
-     {XTitle=>'Compoment', YTitle=>'Proportion of Variance Accounted for',
+     {XTitle=>'Component', YTitle=>'Proportion of Variance Accounted for',
      AXIS=>['BCNT', 'BCNST'], Border=>1, });
   }
 
   $win->points(sequence($ncomp), $self(0:$ncomp-1, ),
         {CHARSIZE=>2, COLOR=>$opt{COLOR}, PLOTLINE=>1} );
-  $win->line( pdl($opt{CUT}-.5, $opt{CUT}-.5), pdl(-.05, $self->max+.05),
+  $win->line( pdl($opt{CUT}-.5, $opt{CUT}-.5), pdl(-.05, $self->max->sclr+.05),
         {COLOR=>15} )
     if $opt{CUT};
   $win->close

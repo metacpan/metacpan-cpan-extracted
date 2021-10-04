@@ -7,11 +7,13 @@ lib/bignum.pm
 lib/bigrat.pm
 lib/Math/BigFloat/Trace.pm
 lib/Math/BigInt/Trace.pm
+lib/Math/BigRat/Trace.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README
+README.md
 t/00sig.t
 t/01load.t
 t/bigexp.t

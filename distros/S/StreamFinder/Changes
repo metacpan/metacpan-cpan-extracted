@@ -300,3 +300,10 @@ Revision history for StreamFinder
         video streams.
         - StreamFinder::SermonAudio - Handle additional "alternate" URLs as 
         well as video streams they can contain.  Also try harder to find icon.
+1.60    2021/10/02
+        - Add 'artist' option to getIconURL() and getIconData() functions, 
+        (Currently only Apple, Brighteon, and Youtube) to return the "channel" 
+        (AlbumArtist) icon instead of the individual podcast icon.  We may add 
+        this more of the other sites later, but this will likely require an 
+        additional, separate fetch of the channel page.
+        - Small doc. touchups.

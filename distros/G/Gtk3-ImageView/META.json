@@ -4,26 +4,30 @@
       "Jeffrey Ratcliffe <jffry@posteo.net>",
       "Alexey Sokolov <sokolov@google.com>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Gtk3-ImageView",
    "no_index" : {
       "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
          "t",
-         "inc"
+         "xt"
       ]
    },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Glib" : "1.210"
          }
       },
       "configure" : {
@@ -31,23 +35,72 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "perl" : "5.006"
+         }
+      },
       "runtime" : {
          "requires" : {
-            "Glib" : "1.21",
+            "Cairo" : "0",
+            "Carp" : "0",
+            "Glib" : "1.210",
+            "Glib::Object::Subclass" : "0",
             "Gtk3" : "0",
-            "Readonly" : "0"
+            "List::Util" : "0",
+            "Readonly" : "0",
+            "Scalar::Util" : "0",
+            "base" : "0",
+            "feature" : "0",
+            "if" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
             "Carp::Always" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
             "Image::Magick" : "0",
+            "MIME::Base64" : "0",
             "Test::Deep" : "0",
-            "Test::Differences" : "0",
             "Test::MockObject" : "0",
             "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
             "Try::Tiny" : "0"
          }
+      }
+   },
+   "provides" : {
+      "Gtk3::ImageView" : {
+         "file" : "lib/Gtk3/ImageView.pm",
+         "version" : "10"
+      },
+      "Gtk3::ImageView::Tool" : {
+         "file" : "lib/Gtk3/ImageView/Tool.pm",
+         "version" : "10"
+      },
+      "Gtk3::ImageView::Tool::Dragger" : {
+         "file" : "lib/Gtk3/ImageView/Tool/Dragger.pm",
+         "version" : "10"
+      },
+      "Gtk3::ImageView::Tool::Selector" : {
+         "file" : "lib/Gtk3/ImageView/Tool/Selector.pm",
+         "version" : "10"
+      },
+      "Gtk3::ImageView::Tool::SelectorDragger" : {
+         "file" : "lib/Gtk3/ImageView/Tool/SelectorDragger.pm",
+         "version" : "10"
       }
    },
    "release_status" : "stable",
@@ -55,12 +108,16 @@
       "bugtracker" : {
          "web" : "https://github.com/carygravel/gtk3-imageview/issues"
       },
+      "homepage" : "https://github.com/carygravel/gtk3-imageview",
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/carygravel/gtk3-imageview.git",
          "web" : "https://github.com/carygravel/gtk3-imageview"
       }
    },
-   "version" : "9",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "10",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "JSON::XS version 4.03",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
+

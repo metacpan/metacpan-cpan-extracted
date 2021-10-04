@@ -3,21 +3,24 @@ abstract: 'An event-based non-blocking STOMP 1.2 client based on AnyEvent and Ob
 author:
   - 'Raphael Seebacher <raphael@seebachers.ch>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.84, CPAN::Meta::Converter version 2.132830'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: AnyEvent-STOMP-Client
 no_index:
   directory:
     - t
     - inc
 requires:
-  AnyEvent: 7.05
-  Object::Event: 1.23
+  AnyEvent: '7.05'
+  Object::Event: '1.23'
 resources:
   repository: git://github.com/raphiniert/AnyEvent-STOMP-Client.git
-version: 0.39
+version: '0.40'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

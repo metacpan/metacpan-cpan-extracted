@@ -1,3 +1,16 @@
+0.62 2021-10-03
+
+ * Add support for multiple options in import(), so that one can use, e.g.,
+
+    use bignum accuracy => 20, lib => "GMP";
+
+ * Make sure the bigrat pragma always returns Math::BigRat objects.
+
+ * Make the "trace" option work as indended, or at least according to what I
+   believe is the intention.
+
+ * Improve documentation. Fix typos, improve wording, add more examples etc.
+
 0.61 2021-10-01
 
  * Improve documentation related to floating point literals.

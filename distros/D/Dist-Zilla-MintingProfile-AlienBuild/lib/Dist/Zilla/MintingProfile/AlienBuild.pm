@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use 5.022;
 
-package Dist::Zilla::MintingProfile::AlienBuild 0.03 {
+package Dist::Zilla::MintingProfile::AlienBuild 0.04 {
 
   use Moose;
   with 'Dist::Zilla::Role::MintingProfile::ShareDir';
@@ -27,7 +27,7 @@ Dist::Zilla::MintingProfile::AlienBuild - A minimal Dist::Zilla minting profile 
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

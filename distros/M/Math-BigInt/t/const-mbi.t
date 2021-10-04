@@ -34,13 +34,19 @@ my $x;
 
 # These are handled by "binary".
 
-$x= 0xff;
+$x = 0xff;
 is($x, "255", "hexadecimal integer literal 0xff");
 is(ref($x), $class, "value is a $class");
 
-$x= 0XFF;
-is($x, "255", "hexadecimal integer literal 0XFF");
-is(ref($x), $class, "value is a $class");
+SKIP: {
+    # Hexadecimal literals using the "0X" prefix require v5.14.0.
+    skip "perl v5.14.0 required for hexadecimal integer literals"
+      . " with '0X' prefix", "2" if $] < "5.014";
+
+    $x = eval "0XFF";
+    is($x, "255", "hexadecimal integer literal 0XFF");
+    is(ref($x), $class, "value is a $class");
+}
 
 $x = 0377;
 is($x, "255", "octal integer literal 0377");
@@ -62,9 +68,15 @@ $x = 0b11111111;
 is($x, "255", "binary integer literal 0b11111111");
 is(ref($x), $class, "value is a $class");
 
-$x = 0B11111111;
-is($x, "255", "binary integer literal 0B11111111");
-is(ref($x), $class, "value is a $class");
+SKIP: {
+    # Binary literals using the "0B" prefix require v5.14.0.
+    skip "perl v5.14.0 required for binary integer literals"
+      . " with '0B' prefix", "2" if $] < "5.014";
+
+    $x = eval "0B11111111";
+    is($x, "255", "binary integer literal 0B11111111");
+    is(ref($x), $class, "value is a $class");
+}
 
 # These are handled by "float".
 

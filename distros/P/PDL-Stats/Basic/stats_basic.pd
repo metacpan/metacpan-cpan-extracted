@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 pp_add_exported('', 'binomial_test', 'rtable', 'which_id', 
 );
 
@@ -8,8 +6,6 @@ pp_addpm({At=>'Top'}, <<'EOD');
 use PDL::LiteF;
 use PDL::NiceSlice;
 use Carp;
-
-$PDL::onlinedoc->scan(__FILE__) if $PDL::onlinedoc;
 
 eval { require PDL::Core; require PDL::GSL::CDF; };
 my $CDF = 1 if !$@;
@@ -1252,7 +1248,7 @@ Paired sample t-test.
   ',
 );
 
-pp_addpm(<<'EOD');
+pp_addpm pp_line_numbers(__LINE__, <<'EOD');
 
 =head2 binomial_test
 
@@ -1305,8 +1301,6 @@ sub PDL::binomial_test {
 Reads either file or file handle*. Returns observation x variable pdl and var and obs ids if specified. Ids in perl @ ref to allow for non-numeric ids. Other non-numeric entries are treated as missing, which are filled with $opt{MISSN} then set to BAD*. Can specify num of data rows to read from top but not arbitrary range.
 
 *If passed handle, it will not be closed here.
-
-*PDL::Bad::setvaltobad only works consistently with the default TYPE double before PDL-2.4.4_04.
 
 =for options
 
@@ -1650,6 +1644,7 @@ sub which_id {
 
 sub _array_to_pdl {
   my ($var_ref) = @_;
+  $var_ref = [ $var_ref->list ] if UNIVERSAL::isa($var_ref, 'PDL');
 
   my (%level, $l);
   $l = 0;

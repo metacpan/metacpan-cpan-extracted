@@ -8,7 +8,7 @@ use Readonly;
 Readonly my $FLOAT_EPS    => 0.01;
 Readonly my $RIGHT_BUTTON => 3;
 
-our $VERSION = 9;
+our $VERSION = '10';
 
 sub button_pressed {
     my $self  = shift;
@@ -19,8 +19,8 @@ sub button_pressed {
         return FALSE;
     }
 
-    $self->{drag_start} = { x => $event->x, y => $event->y };
-    $self->{dnd_start}  = { x => $event->x, y => $event->y };
+    $self->{drag_start}   = { x => $event->x, y => $event->y };
+    $self->{dnd_start}    = { x => $event->x, y => $event->y };
     $self->{dnd_eligible} = TRUE;
     $self->{dragging}     = TRUE;
     $self->{button}       = $event->button;

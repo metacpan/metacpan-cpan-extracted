@@ -1,0 +1,858 @@
+#!/usr/bin/env perl
+
+##################################################################################################################################
+#                                                                                                                                #
+# Gene Expression Omnibus (GEO): Cancer Prognostic Datasets Retriever                                                            #
+# ~    ~          ~              ~      ~          ~        ~                                                                    #        
+#                                                                                                                                # 
+#                                                                                                                                #
+# geoCancerPrognosticDatasetsRetriever, version 1.0                                                                              #
+# -----------------------------------------------------                                                                          #
+#                                                                                                                                #
+# Last Update: 04/09/21                                                                                                          #
+#                                                                                                                                #
+# Author:    Abbas Alameer <abbas.alameer@ku.edu.kw>,                                                                            #
+#          Bioinformatics and Molecular Modelling Group,                                                                         #
+#                      Kuwait University                                                                                         #
+#                                                                                                                                #
+# Please email queries, suggestions, and possible bug information to the above author.                                           #
+#                                                                                                                                #
+# Brief Description:                                                                                                             #
+# ------------------                                                                                                             #
+#                                                                                                                                #
+# Gene Expression Omnibus (GEO) Cancer Prognostic Datasets Retriever is a Bioinformatics tool for cancer prognostic dataset      #
+# retrieval from the GEO database. It requires a GeoDatasets input file listing all GSE dataset entries for a specific cancer    #
+# (ex. Bladder cancer), obtained as a download from the GEO database. This Bioinformatics tool functions by applying two         #
+# heuristic filters to examine individual GSE dataset entries listed in a GEO DataSets input file. The Prognostic text filter    #
+# flags for prognostic keywords (ex. “prognosis” or “survival”) used by clinical science researchers and present in the          #
+# title/abstract entries of a GSE dataset. If found, this tool retrieves those flagged datasets. Next, the second filter         #
+# (Prognostic Signature filter) filters these datasets further by applying prognostic signature pattern matching                 #
+# (Perl regular expression signatures) to identify if the GSE dataset is a likely prognostic dataset.                            #
+#                                                                                                                                #
+#                                                                                                                                #
+# The prerequisite for running this program in a UNIX or Linux environment is:                                                   #
+# ----------------------------------------------------------------------------                                                   #
+#                                                                                                                                #
+# 1. cURL: If using a Ubuntu-based system, the program will assist the user in installing curl, otherwise manual installation    #
+#          is required.                                                                                                          #
+#                                                                                                                                #
+# Program Usage:                                                                                                                 #
+# --------------                                                                                                                 #
+#                                                                                                                                #
+# ./geoCancerPrognosticDatasetsRetriever -h [-d CANCER TYPE] [-p PLATFORMS_CODES]                                                #
+#                                                                                                                                #
+##################################################################################################################################
+
+
+
+#import standard Perl modules
+use strict;
+#use diagnostics;
+use warnings;
+use Term::ANSIColor;
+use Cwd;
+use Getopt::Std;
+use LWP::Simple;
+use File::Basename;
+
+
+#variables
+my %options 	          = (); #hash for storing command line switches and arguments
+my $input_file;
+my $formatted_input_file  = "formatted-input.dat";
+my $cancer_type;
+my $output_file;
+my $platform_gpl;
+my $regex_platform;
+my $line;
+my $flag;
+my $prog_flag;
+my $wget_flag;
+my $human_flag;
+my $i                     = 0;
+my $keyword_count         = 0;
+my $more_count            = 0;
+my $ftp_keyword_count     = 0;
+my $extra_count           = 0;
+my $filter2_count         = 0;
+my %simple_hash           = ();
+my ($cwd, $prog_path)     = (cwd()) x 2; #get path of the current working directory 		          
+($prog_path)              = split(/bin/, "$cwd");
+my $current_date_time     = date_time();
+my $run_dir;
+my @GEO_list              = ();
+my $input_command_line;
+
+
+#run start-up.
+start_up();
+
+#check that "LWP::Protocol::https" is installed on current system.
+module_check();
+
+#check for input switches/arguments.
+input_parameters_check();
+			
+#check for curl binary on current system.
+check_curl();
+
+#format the input file.
+format_input($input_file, $formatted_input_file);
+
+#run main processing events of geo_CPDR and output results.
+main($formatted_input_file, $output_file);
+
+
+
+
+
+
+###################################################
+#                                                 #
+#             SUBROUTINES BELOW                   #
+#             -----------------                   #
+#                                                 #
+###################################################
+
+############################ SUBROUTINE 1 #######################################################
+#check if CPAN module (LWP::Protocol::https) is installed on current system and install if not found.
+sub module_check {
+	
+	my $cpan_module = "LWP::Protocol::https";
+
+	eval "use $cpan_module";
+
+	if ($@) { 
+
+		print color ("red"), "CPAN module: \"$cpan_module\" not found...\n", color("reset");
+		print color ("green"), "Preparing one time installation of $cpan_module....\nInstalling cpanm....\n", color("reset");
+		#install cpanm to make installing other modules easier
+		system ("cpan App::cpanminus");
+		print color ("green"), "done\n", color("reset");
+		print color ("green"), "Installing $cpan_module....\n", color("reset");
+		#now install LWP::Protocol::https module
+		system ("cpanm $cpan_module");
+		print color ("green"), "done\n", color("reset");
+	}
+}
+############################ SUBROUTINE 2 #######################################################
+#get the current date and time.
+sub date_time {
+	
+    my ($sec, $min, $hour, $mday, $mon, $yr, $wday, $yday, $isdst) = localtime();
+    my $ctime = localtime();
+    my $time_hour;
+    my $time_minutes; 
+                                       #hour  #minutes
+    if ($ctime =~ m/^\w+\s+\w+\s+\d+\s+(\d+)\:(\d+)\:\d+\s+\d+/) {
+		
+		$time_hour = $1;
+		$time_minutes = $2;
+	}
+	
+    my $month    = $mon + 1;
+    my $year     = $yr + 1900;
+    $current_date_time = "$year-0$month-$mday\_h$time_hour$time_minutes";
+}
+############################ SUBROUTINE 3 #######################################################
+#This subroutine prints the program details at start-up.
+sub start_up {
+	
+	print color ("yellow"),"  
+######################################################################
+#                                                                    #
+#           GEO Cancer Prognostic Datasets Retriever v1.0            #
+#           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~            #
+#                                                                    #
+#              Author: Abbas Alameer, Kuwait University              #
+#                         abbas.alameer\@ku.edu.kw                    #
+#                                                                    #
+#                                                                    #
+#                       Developed in March/September 2021            #
+#                     and released under GPLv2 license               #
+#                                                                    #
+######################################################################\n\n\n" , color("reset");
+}
+############################ SUBROUTINE 4 #######################################################
+#This subroutine checks all command line input switches and arguments and warns user if something 
+#is missing.
+sub input_parameters_check {
+
+my $error_message = "Error: The following arguments are missing: CANCER_TYPE PLATFORM_CODES\n";
+my $help_message1  = "Usage: geoCancerPrognosticDatasetsRetriever -d \"CANCER_TYPE\" -p \"PLATFORMS_CODES\"";
+my $help_message2  = "Mandatory arguments:
+  CANCER_TYPE           type of the cancer as query search term
+  PLATFORM_CODES        list of GPL platform codes
+
+  Optional arguments:
+  -h                    show help message and exit";
+ 
+	#parse command line switches and their arguments into a hash.
+	getopts("hd:p:", \%options);
+	
+    #Check for help switch and, if present, output help text.
+	if ($options{h}) {
+
+		print color ("green"), "$help_message1", color("reset");
+		print color ("green"), "\n$help_message2\n", color("reset");
+		exit;
+	}
+	
+	elsif ($options{d} and $options{p}) {
+		
+		print color ("green"), "Checking input parameters...", color("reset");
+		mini();
+	}
+	
+	elsif (!$options{d} or !$options{p}) {
+			
+		print color ("green"), "$help_message1\n$help_message2\n", color("reset");
+		print color ("red"), $error_message, color("reset");
+		exit;	
+	} 
+	
+	sub mini {
+		
+		print color ("green"), "done\n", color("reset");
+		
+		my $restart_input_file;
+		my $temp_filename = "$options{d}";
+		my ($query_term_1, $query_term_2) = split ( / /, $temp_filename );
+		#add dash in cancer type query search term.
+		$cancer_type = uc ( join ( '-', $query_term_1, $query_term_2 ) );
+		my $cancer = "$query_term_1";
+		my @files = glob("$prog_path/data/$cancer\_cancer_GEO_*.txt");
+		my @sorted_files = sort {$b cmp $a} @files;
+		$run_dir = "$prog_path/results/$cancer_type\_GEO-files";
+		
+		foreach my $file (@sorted_files) {
+			
+			$restart_input_file = basename($file);
+			last;
+		}
+
+		#If an old run file was found, prompt the user with choices to make.
+		if (-e "$run_dir") {
+			
+			print color ("red"), "$cancer_type\_GEO-files directory exists...This run was not completed\n", color("reset");
+			my $text = "";
+			my $ok = timed_response( sub { 	
+			
+				print color ("red"), "Do you want to resume an interrupted execution [r], or start a new one [n]? (r/n)\nDefault selection will be [n] after 10 seconds...\n", color("reset"); $text = <STDIN>; 
+			
+			}, 10);
+			
+			chomp($text);
+
+			if ($text eq "r") {
+				
+				print color ("green"), "Resuming analysis using input file: $restart_input_file\n", color("reset");
+				$platform_gpl= uc($options{p});
+				my $regex1 = join( '', ( split(/GPL/, $platform_gpl) ) );
+				$regex_platform = join( '|', ( split(/ /, $regex1) ) );
+				$input_file = $restart_input_file;
+				$output_file = "$cancer_type.out";
+			}
+			
+			#this is when the user selects "n", or types nothing/ or 10 seconds elapse -> defaults to "n"
+			else {
+
+				print color ("green"), "Starting new analysis...\n", color("reset");
+				system ("rm -r $run_dir"); #remove old results output directory
+				new_run($query_term_1);
+			}
+
+			sub timed_response {
+
+				my ($f, $sec) = @_;
+
+				return eval {
+			  
+					local $SIG{ALRM} = sub { die };
+					alarm($sec);
+					$f->();
+					alarm(0);
+					1;
+				};
+			}	
+		}
+
+		#else no "interrupted" run directory was found. Start a new run.
+		else {
+			
+			new_run($query_term_1);
+		}
+
+		sub new_run {
+			
+			my $cancer = $_[0];
+			print color ("green"), "Downloading input file for \"$cancer\" cancer from GeoDatasets...", color("reset");
+			$input_file  = download_geo_input($options{d});
+			print color ("green"), "done\n", color("reset");
+			system ("mkdir $run_dir"); #create results output directory
+			$platform_gpl= uc($options{p});
+			my $regex1 = join( '', ( split(/GPL/, $platform_gpl) ) );
+			$regex_platform = join( '|', ( split(/ /, $regex1) ) );
+			$output_file = "$cancer_type.out";
+			
+			#Check for the presence of the input file.
+			unless (-e "$prog_path/data/$input_file") {
+		
+				print color ("red"), "Input file: $input_file was not found.\n", color("reset");
+				exit;
+			}
+		}	
+	}
+	
+	my $local_query = $options{d};
+	my $local_gpl    = $options{p};
+	$input_command_line = "User input command: ./geoCancerPrognosticDatasetsRetriever -d \"$local_query\" -p \"$local_gpl\"";
+}
+############################ SUBROUTINE 5 #######################################################
+# The following code was reused from the NCBI's NBK25501 reference textbook.
+# See: https://www.ncbi.nlm.nih.gov/books/NBK25501/
+# It was adapted in this subroutine with additional modifications.
+sub download_geo_input {
+
+    my $query    = $_[0];
+    my ($cancer) = split(/ /, $query);
+    my $geo_db   = 'gds';
+    my $base     = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/';
+    my $url      = $base . "esearch.fcgi?db=$geo_db&term=$query&usehistory=y";
+    my $output   = get($url);                               
+    my $web      = $1 if ($output =~ /<WebEnv>(\S+)<\/WebEnv>/);   
+    my $key      = $1 if ($output =~ /<QueryKey>(\d+)<\/QueryKey>/);    
+
+    #assemble the efetch URL
+    $url         = $base . "efetch.fcgi?db=$geo_db&query_key=$key&WebEnv=$web";
+    $url        .= "&rettype=abstract&retmode=text";
+    
+    my $data     = get($url);
+    
+    #Check for a GeoDatasets timeout error and abort run, if found.
+    if (!$data) {
+		
+		print color ("red"), "\nThe download from GeoDatasets was not successful...\nA GeoDatasets timeout error was detected: current run aborted...\nPlease restart the run...\n", color("reset");
+		exit; #abort current run
+	}
+
+    #add date & time to current input file download
+	my $geo_datasets_file = "$cancer\_cancer_GEO_$current_date_time.txt"; 
+    
+    open(FH, ">$prog_path/data/$geo_datasets_file") or die "Cannot open file for writing the GDS input:$!\n";
+    binmode(FH, ":utf8");
+    
+    print FH "$data";
+
+    close(FH);
+    
+    return $geo_datasets_file;
+}
+############################ SUBROUTINE 6 #######################################################
+#This subroutine performs minor formatting of a GEO input file to merge the title and abstract 
+#lines together to prevent the regex lines from missing potential keyword hits in the 'title' 
+#line.
+sub format_input {
+	
+	my $raw_input 	=	$_[0];
+	my $out_file  	=	$_[1];
+	my $concatenate;
+	
+	print color ("green"), "Formatting Input: $input_file...", color("reset");
+	
+	open (IN, "$prog_path/data/$raw_input") or die "Cannot open file for reformatting: $raw_input. $!.\n";
+	open (OUT, '>', "$prog_path/data/$out_file") or die "Cannot open file for writing reformatted data: $out_file $!\n";
+	
+	while ($line = <IN>) {
+			
+		#title line check only
+		if ($line =~ m/(^\d+\.\s+.*)/) { 
+			
+			$concatenate = $line;
+			chomp($concatenate);
+		}
+ 			
+		#abstract line
+		elsif ($line !~ m/(^\d+\.\s+.*)/) {
+			
+			$concatenate .= "$line";
+			print OUT "$concatenate";
+			$concatenate  = ""; #reinitialize variable for next entry.
+		}	
+	}
+	
+	print color ("green"), "done\n", color("reset");
+	
+	close (IN);
+	close (OUT);
+}
+############################ SUBROUTINE 7 #######################################################
+#Check for the presence of curl in the $PATH. If not found, install on an Ubuntu system or if 
+#not Ubuntu, prompt user to install it manually.
+sub check_curl {
+	
+	#check for the presence of curl binary
+	my $check = qx{which curl};
+	
+	#if no curl binary was found, install it on Ubuntu/Ubuntu-based systems
+	if (!$check) {
+			
+		#check if current system is Ubuntu/or Ubuntu-based
+		my $ubuntu = qx{uname -a};
+			
+		if ($ubuntu=~ /.+ubuntu.+/ig) {
+			
+			print color ("red"), "curl binary was not found: follow onscreen instructions/input your password for its installation...\n\n", color("reset");
+			system("sudo apt -y install curl"); #install curl
+			print "done\n";	
+		} 
+			
+		else { 
+				
+			print "curl is not found on this system: install it on your system.\n"; 
+		}	
+	}
+}
+############################ SUBROUTINE 8 #######################################################
+#This subroutine runs the main processing steps, while running other subroutines to continue the 
+#processing pipeline.
+sub main {
+	
+	my $main_formatted_input_file  = $_[0];
+	my $main_output_file           = $_[1];
+	
+	print color ("green"), "Analyzing Input: $main_formatted_input_file file...\n", color("reset");
+
+	#open input file
+	open (FH, "$prog_path/data/$main_formatted_input_file") or die "Cannot open file: $main_formatted_input_file $!\n";
+
+	#open output file
+	open (FH2, '>', "$prog_path/results/$main_output_file") or die "Cannot open file for writing data: $!\n";
+    
+	while ($line = <FH>) {
+			
+		if ($line =~ m/.*(prognosis|prognostic|prognostically|prognosticator|survival|survive|survives|survived|surviving).*/ig) { 
+		#if ($line =~ m/.*(progno.+\s?|surviv.+\s?).*/ig) {
+			
+			$flag = 1; 
+			$prog_flag = 1; 
+			next; 
+		}
+		#this conditional activates when the above keywords are not found and only "more..." is found. 
+		#Note this conditional implicitly doesn't get executed if both the desired keyword and "more..." are found.
+		elsif ($line =~ m/.+(more\.\.\.)/ig) { 	
+			
+			$flag = 1; 
+			$wget_flag = 1; 
+			next;
+		}
+		
+		elsif ($line =~ m/(^Organism:\s+Homo\s+sapiens.*)/ig) { 
+			
+			$simple_hash{'Organism_line'} = "$1";
+			$human_flag = 1; 
+			next; 
+		}
+		
+		elsif ($line =~ m/^Type:.+/) { next; }
+		
+		#elsif ($line =~ m/.*Platform.?:\s+GPL(570|96|97)\s+.+/) {
+		elsif ($line =~ m/.*Platform.?:\s+GPL($regex_platform)\s+.+/) {	
+			
+			$i++;
+			$flag = 1;
+			print "$i.\n$line$simple_hash{'Organism_line'}\n";
+			print FH2 "$i.\n$line$simple_hash{'Organism_line'}\n";
+			
+			if ($wget_flag) { 
+				
+				print color ("green"), "Found 'more...': Checking abstract further...\n", color("reset");
+				print FH2 "Found 'more...': Checking abstract further...\n"; 
+			}
+			
+			next;
+		} 
+		
+		#this regex will probably get alot of unwanted entries, but you can determine if they are legitimate 
+		#if their samples are written in the output file for one of the 3 GPL570/97/96 platforms.
+		elsif ($line =~ m/.*related\s+Platform.?.+/) {
+							
+			$i++;
+			#Keep flag off to prevent particular GSE datasets - with unlisted platform data - from being processed. 
+			#This action possibly reduces the FP rate.
+			#$flag = 1;
+			$flag = 0;  
+			print "$i.\n$line$simple_hash{'Organism_line'}\n";
+			print FH2 "$i.\n$line$simple_hash{'Organism_line'}\n";
+			next;
+		} 
+		
+		if ($flag) {
+				
+					      #FTP line main                              #GSE/GDS_code
+			if ($line =~ m/^FTP.+(ftp:\/\/ftp.ncbi.nlm.nih.gov\/geo\/.+\/.+\/)(.+)\//) {
+				
+				my $ftp_line1 = $1;
+				my $gse_code = $2;				
+				my $ftp_command = "$ftp_line1" . "$gse_code" . "/";
+				my $link = "$ftp_command" . "soft/$gse_code" . "_family.soft.gz";
+				
+				print $line;
+				print FH2 $line;
+				
+				#Check if GDS file is found, then move to next line. Only GSE soft files are desired.
+				if ($gse_code =~ m/GDS.*/ig) { 
+					 
+					#print $line; print FH2 $line;
+					next; 
+				}
+					
+				if ($prog_flag && $human_flag) { 
+					
+					print color ("yellow"), "Prognostic Text: <Prognostic keywords found>\n", color("reset");
+					print FH2 "Prognostic Text filter: <Prognostic keywords found>\n";
+					
+					$prog_flag = 0; 
+					$human_flag = 0; 
+					$keyword_count++; 
+					
+					my $unzip_file = download_soft_file($link, $gse_code); #download soft file and store filename in variable $unzip_file.
+					my %local_hash = prognostic_signature_finder($unzip_file);
+					
+					if (exists ($local_hash{$unzip_file})) { print FH2 "$local_hash{$unzip_file}\n"; }
+				}
+				
+				elsif ($wget_flag && $human_flag) {
+					
+					$more_count++; 
+					
+					my %local_hash;
+					($ftp_keyword_count, %local_hash) = soft_file_abstract_check($link, $gse_code);
+					
+					my $current_file = $gse_code . "_family.soft";
+					if (exists ($local_hash{$current_file})) { print FH2 "$local_hash{$current_file}\n"; }
+					if ($ftp_keyword_count) { $keyword_count++; $extra_count++; } #update keyword count, if a keyword was found in a soft file.
+					
+					$wget_flag = 0;
+					$human_flag = 0;
+				}
+				
+				next;
+			}
+				
+			elsif ($line =~ m/^Series.+/) {		
+				#print "$line\n"; print FH2 "$line\n";
+				print "\n";
+				next; 
+			}
+			
+			elsif ($line =~ m/^Sample.+/) {
+				#print "$line\n"; #print FH2 "$line\n";
+				print "\n";
+				next;
+			}
+				
+			else { 
+				
+				$flag = 0;
+				$prog_flag = 0;
+				$wget_flag = 0;
+				$human_flag = 0;
+				next;	
+			}
+		}	
+	}
+	
+	print color ("green"), "Analysis complete.\n", color("reset");
+	print color ("green"), "$input_command_line\n\n", color("reset");
+	
+	system ("rm $prog_path\/data\/$main_formatted_input_file");
+	
+	my ($main_output_file_1, $main_outputout_file_2) = split (/\./, $main_output_file);
+	my $main_output_file_timestamped = $main_output_file_1 . "_" . $current_date_time . "." . $main_outputout_file_2;
+	
+	system("mv $prog_path/results/$main_output_file $prog_path/results/$main_output_file_timestamped");
+	
+	print color ("green"), "===========================================================================\n", color("reset");
+	print FH2 "===========================================================================\n";
+	print color ("green"), "Check results\/", color("reset");
+	print color ("blue"), "$main_output_file_timestamped ", color("reset");
+	print color ("green"), "to see the results.\n", color("reset");
+	print color ("green"), "Total prognostic datasets found: $filter2_count\n";
+	print FH2 "Total prognostic datasets found:\t$filter2_count\n";
+
+	foreach my $i (0 .. $#GEO_list) {
+	
+		my ($GSE_dataset) = split(/_/, "$GEO_list[$i]");
+		my $j = $i + 1;
+		print color ("green"), "[$j] $GSE_dataset\n";
+		print FH2 "[$j] $GSE_dataset\n";
+	} 
+
+	close(FH);
+	close(FH2);
+	
+	#check if output file is empty and if it is, then defined GPL series were not present in the user's input file. Alert user.
+	is_file_empty($main_output_file_timestamped);
+
+	#append date and time stamp to current run_dir in the results directory
+	system("mv $run_dir $run_dir\_$current_date_time");
+}
+############################ SUBROUTINE 9 #######################################################
+#This subroutine checks if the output file is empty. If it is, then defined GPL series were not 
+#present in user's input file.
+sub is_file_empty {
+		
+	open my $check_file, '<', "$prog_path/results/$_[0]"; 
+	my $first_line = <$check_file>;
+
+	if ($first_line =~ m/^=+/) {
+		
+		print color ("red"), "No GPL series \"$platform_gpl\" were found in $input_file\n", color("reset"); 
+	}
+
+	close $check_file;
+}
+############################ SUBROUTINE 10 #######################################################
+#This subroutine is called by other subroutines when a SOFT file download 
+#is needed for further analysis.
+sub download_soft_file {
+		
+	my $dsf_wget_file 	= $_[0];
+	my $dsf_gse_id 		= $_[1];
+	my $dsf_zip_file    = $dsf_gse_id . "_family.soft.gz";
+	my $dsf_unzip_file  = $dsf_gse_id . "_family.soft";
+	
+	#Check for the presence of a ".gz file" for the current GSE dataset. 
+	#If found, this means there is a potential incomplete/or corrupted download.
+	#Delete file to restart download.
+	if (-e "$cwd/$dsf_zip_file") { 
+		
+		print color ("red"), "\"$dsf_zip_file\" zip file exists\n", color("reset");
+		print color ("red"), "Deleting corrupted file...", color("reset");
+		system("rm $dsf_zip_file"); 
+		print color ("red"), "done\n", color("reset");
+	}
+	
+	print color ("green"), "Downloading $dsf_gse_id soft file...\n", color("reset");
+	
+	if (-e "$run_dir/$dsf_unzip_file") {
+		
+		print color ("red"), "\"$dsf_unzip_file\" unzipped file exists\n", color("reset");	
+	}
+	
+	else {
+		
+		#system("touch curl_log.txt"); #create a curl log file.
+		system("curl -O -C - $dsf_wget_file");
+		
+		print color ("green"), "...done\n", color("reset");	
+		print color ("green"), "Unzipping file...", color("reset"); #unzip file
+		
+		system ("gunzip $dsf_zip_file");
+		system ("mv *.soft $run_dir");
+		
+		print color ("green"), "done\n", color("reset");
+	}
+	
+	return $dsf_unzip_file;
+}
+############################ SUBROUTINE 11 #######################################################
+#This subroutine checks the GSE entries' full abstract for prognostic keywords. If the input 
+#file's abstract is incomplete, "more..." is found. It calls the download_soft_file() to download 
+#the .soft file and then checks for prognostic keywords. If keywords are detected, it calls the 
+#prognostic_signature_finder() to check for prognostic signatures in the same .soft file
+sub soft_file_abstract_check {
+	
+	my $wget_file     = $_[0];
+	my $gse_id        = $_[1];
+	my $wget_counter  = 0;
+	my $unzip_file    = download_soft_file($wget_file, $gse_id); #download soft file and store filename in variable $unzip_file.
+	
+	#open soft file and search for prognostic keywords in all GSE entry abstracts.
+	open (SOFT, "$run_dir/$unzip_file") or die "Cannot open file: $unzip_file $!\n";
+
+	while (<SOFT>) {
+		
+		if ($_=~ m/^!Series_summary.+(prognosis|prognostic|prognostically|prognosticator|survival|survive|survives|survived|surviving).+/ig) {
+		#if ($line =~ m/^!Series_summary.+(progno.+\s?|surviv.+\s?).*/ig) {
+			$wget_counter++;	
+		}
+		
+		else { next; }
+	}
+	
+	close (SOFT);
+	
+	if ($wget_counter) { 
+		
+		print color ("yellow"), "Prognostic Text filter: <Prognostic keywords found>\n", color("reset");
+		print FH2 "Prognostic Text filter: <Prognostic keywords found>\n";
+		my %local_hash = prognostic_signature_finder($unzip_file);
+		
+		#returns count (i.e. 1 => minimum no. of occurrence of keyword), which will be added to count value from main script.
+		#and returns a copy of the result of prognostic_signature_finder().
+		return (1, %local_hash);
+		
+	} else {
+		
+		print color ("yellow"), "Prognostic Text filter: <No prognostic keywords found>\n", color("reset");
+		print FH2 "Prognostic Text filter: <No prognostic keywords found>\n";
+		return 0;
+	}
+}
+############################ SUBROUTINE 12 #######################################################
+#This subroutine uses regular expression analysis to detect prognostic signature patterns. 
+#The regexes are based on over 50 parsed signatures used for different cancer types.
+sub prognostic_signature_finder {
+
+	my $soft_file             = $_[0];
+	my %hash_signature        = ();
+	my $soft_line             = "";
+	my $regex_tail            = '(:|=)\s*(alive.*|no\sdeath|dea(d|th.*)|deceased|NED|DOD|DOC|0\s|1\s|no|yes|.*patient|died.*|alive|surviv(al|ed)|living|long|short|Y|N|NED|DOD|AWD|Exitus)';
+	my $regex_keyword_type_A  = '(.*stat?us.*|.*(dea(d|th)|.*alive).*|.*\srecur\s.*|.*Die.*)' . $regex_tail;
+	my $regex_keyword_type_B  = '(dss.?event\s?\(.+\)|dfs.*\w+|drfs.*|e\.dmfs.*|e\.rfs.*|e?\.?os.*)' . $regex_tail;
+	my $regex_keyword_type_C  = '((Overall)?\s?survival.*|(overall)?.?event.*|outcome.*|prognosis.*|comort.*|evolution.*)' . $regex_tail;
+	my $regex_keyword_type_Ca = '(Overall)?\s?survival\s.*(:|=)\s*(\d*)';
+	my $outcome_1             = "Prognostic Signature filter: <Prognostic signature found>\n";
+	my $outcome_2             = "Prognostic Signature filter: <No data found>\n";
+	my $i                     = 0;
+	
+	#open SOFT file and read its contents
+	open (KEY, "$run_dir/$soft_file") or die "Cannot open $soft_file: $!";
+	
+	while ($soft_line = <KEY>) {
+	
+		#regexes are evaluated according to their predominance from A - C
+		if ($soft_line =~ /^!Sample_characteristics_ch1 = $regex_keyword_type_A/ig) { 
+		
+			print color ("yellow"), "$outcome_1", color("reset"); 
+			print color ("green"), "$soft_line", color("reset");
+			$hash_signature{"$soft_file"} = "$outcome_1";
+			$i++; 
+			last;
+		} 
+				
+		elsif ($soft_line =~ /^!Sample_characteristics_ch1 = $regex_keyword_type_B/ig) { 
+			
+			print color ("yellow"), "$outcome_1", color("reset"); 
+			print color ("green"), "$soft_line", color("reset");
+			$hash_signature{"$soft_file"} = "$outcome_1";
+			$i++;
+			last;
+		}
+				
+		elsif ($soft_line =~ /^!Sample_characteristics_ch1 = $regex_keyword_type_C/ig) { 
+			
+			print color ("yellow"), "$outcome_1", color("reset"); 
+			print color ("green"), "$soft_line", color("reset"); 
+			$hash_signature{"$soft_file"} = "$outcome_1";
+			$i++;
+			last;
+		}
+		
+		elsif ($soft_line =~ /^!Sample_characteristics_ch1 = $regex_keyword_type_Ca/ig) { 
+			
+			print color ("yellow"), "$outcome_1", color("reset");  
+			print color ("green"), "$soft_line", color("reset");
+			$hash_signature{"$soft_file"} = "$outcome_1";
+			$i++; 
+			last;
+		}
+		
+	}
+
+	#Alert user if no prognostic signature was found in the current GSE .soft file
+	unless ($i) { 
+		
+		print color ("yellow"), "$outcome_2", color("reset");
+		$hash_signature{"$soft_file"} = "$outcome_2"; 
+		
+	}
+	
+	else {
+		
+			#store current dataset in an array
+			push (@GEO_list, "$soft_file");
+	}
+	
+	#count total flagged datasets found by the Prognostic Signature filter
+	$filter2_count += $i;
+	
+	return %hash_signature;
+	
+	close (KEY);
+}
+
+exit 0;
+
+=pod 
+
+=encoding utf8
+
+=head1 NAME
+
+GeoCancerPrognosticDatasetsRetriever - GEO Cancer Prognostic Datasets Retriever is a bioinformatics tool for cancer prognostic dataset retrieval from the GEO website.
+
+=head1 SYNOPSIS
+
+    Usage: geoCancerPrognosticDatasetsRetriever -d "CANCER_TYPE" -p "PLATFORMS_CODES"
+
+An example command using "bladder cancer" as a query: 
+
+    geoCancerPrognosticDatasetsRetriever -d "bladder cancer" -p "GPL570 GPL97 GPL96"
+
+The input and output files of geoCancerPrognosticDatasetsRetriever will be found in the `/data/` and `/results/` directories, respectively.
+
+=head1 DESCRIPTION
+
+Gene Expression Omnibus (GEO) Cancer Prognostic Datasets Retriever is a bioinformatics tool for cancer prognostic dataset retrieval from the GEO database. It requires a GeoDatasets input file listing all GSE dataset entries for a specific cancer (for example, bladder cancer), obtained as a download from the GEO database. This bioinformatics tool functions by applying two heuristic filters to examine individual GSE dataset entries listed in a GEO DataSets input file. The Prognostic Text filter flags for prognostic keywords (ex. "prognosis" or "survival") used by clinical scientists and present in the title/abstract entries of a GSE dataset. If found, this tool retrieves those flagged datasets. Next, the second filter (Prognostic Signature filter) filters these datasets further by applying prognostic signature pattern matching (Perl regular expression signatures) to identify if the GSE dataset is a likely prognostic dataset.
+
+=head1 INSTALLATION
+
+geoCancerPrognosticDatasetsRetriever can be used on any Linux or macOS machines. To run the program, you need to have the cURL program (version 7.68.0 or later) installed on your computer.
+
+By default, cURL is installed on all macOS versions. cURL may not be installed on Linux and would need to be manually installed through a Linux distribution’s software centre. It will be installed automatically on Linux Ubuntu by geoCancerPrognosticDatasetsRetriever.
+
+Manual install:
+
+    $ perl Makefile.PL
+    $ make
+    $ make install
+
+=head1 DATA FILE
+
+The required input file is a GEO DataSets file obtainable as a download  from GEO DataSets, upon querying for any particular cancer (for example, bladder cancer) in geoCancerPrognosticDatasetsRetriever.
+
+=head1 HELP
+
+Help information can be read by typing the following command: 
+
+    geoCancerPrognosticDatasetsRetriever -h
+
+This command will print the following instructions:
+
+Usage: geoCancerPrognosticDatasetsRetriever -h
+
+Mandatory arguments:
+
+    CANCER_TYPE           type of the cancer as query search term
+    PLATFORM_CODES        list of GPL platform codes
+
+    Optional arguments:
+    -h                    show help message and exit
+
+=head1 AUTHOR
+
+Abbas Alameer (Bioinformatics and Molecular Modelling Group, Kuwait University), in collaboration with Davide Chicco (University of Toronto)
+
+For information, please contact Abbas Alameer at abbas.alameer(AT)ku.edu.kw
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2021 by Abbas Alameer, Kuwait University
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License, version 2 (GPLv2).
+
+=cut

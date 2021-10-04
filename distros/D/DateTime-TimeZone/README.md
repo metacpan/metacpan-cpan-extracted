@@ -4,7 +4,7 @@ DateTime::TimeZone - Time zone object base class and factory
 
 # VERSION
 
-version 2.48
+version 2.49
 
 # SYNOPSIS
 
@@ -277,8 +277,6 @@ flag to see what they can be used for.
 Support for this module is provided via the datetime@perl.org email list.
 
 Bugs may be submitted at [https://github.com/houseabsolute/DateTime-TimeZone/issues](https://github.com/houseabsolute/DateTime-TimeZone/issues).
-
-I am also usually active on IRC as 'autarch' on `irc://irc.perl.org`.
 
 # SOURCE
 

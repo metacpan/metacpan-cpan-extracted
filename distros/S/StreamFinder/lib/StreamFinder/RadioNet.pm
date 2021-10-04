@@ -122,7 +122,7 @@ I<-log> => "I<logfile>"
 Specify path to a log file.  If a valid and writable file is specified, A line will be 
 appended to this file every time one or more streams is successfully fetched for a url.
 
-DEFAULT i<-none> (no logging).
+DEFAULT I<-none-> (no logging).
 
 I<-logfmt> specifies a format string for lines written to the log file.
 
@@ -132,7 +132,7 @@ The valid field I<[variables]> are:  [stream]: The url of the first/best stream 
 [site]:  The site name (RadioNet).  [url]:  The url searched for streams.  
 [time]: Perl timestamp when the line was logged.  [title], [artist], [album], 
 [description], [year], [genre], [total], [albumartist]:  The corresponding field data 
-returned (or "-na", if no value).
+returned (or "I<-na->", if no value).
 
 =item $station->B<get>()
 

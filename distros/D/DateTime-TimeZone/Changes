@@ -1,3 +1,9 @@
+2.49    2021-10-02
+
+- This release is based on version 2021c of the Olson database. This release
+  fixes the zone links for Atlantic/Jan_Mayen and America/Virgin.
+
+
 2.48    2021-09-24
 
 - This release is based on version 2021b of the Olson database. This release

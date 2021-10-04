@@ -18,10 +18,9 @@ use warnings;
 
 use Carp          qw< carp croak >;
 use Scalar::Util  qw< blessed >;
+use Math::BigInt  qw< >;
 
-use Math::BigInt ();
-
-our $VERSION = '1.999826';
+our $VERSION = '1.999827';
 
 require Exporter;
 our @ISA        = qw/Math::BigInt/;
@@ -4539,9 +4538,9 @@ sub numify {
 sub import {
     my $class = shift;
     $IMPORT++;                  # remember we did import()
+
+    my @import = ('objectify');
     my @a;                      # unrecognized arguments
-    my $lib_param = '';
-    my $lib_value = '';
 
     while (@_) {
         my $param = shift;
@@ -4606,9 +4605,8 @@ sub import {
         # Backend library.
 
         if ($param =~ /^(lib|try|only)\z/) {
-            # alternative library
-            $lib_param = $param;        # "lib", "try", or "only"
-            $lib_value = shift;
+            push @import, $param;
+            push @import, shift() if @_;
             next;
         }
 
@@ -4626,10 +4624,6 @@ sub import {
         push @a, $param;
     }
 
-    require Math::BigInt;
-
-    my @import = ('objectify');
-    push @import, $lib_param, $lib_value if $lib_param ne '';
     Math::BigInt -> import(@import);
 
     # find out which one was actually loaded

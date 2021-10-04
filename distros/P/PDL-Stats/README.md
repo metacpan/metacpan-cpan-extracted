@@ -18,23 +18,34 @@ Of course, they also work in perl scripts.
 
 - PDL
 
-  Perl Data Language. Preferably installed with a Fortran compiler. A few methods (logistic regression and all plotting methods) will only work with a Fortran compiler and some methods (ordinary least squares regression and pca) work much faster with a Fortran compiler.
+  Perl Data Language. Preferably installed with a Fortran compiler. A
+  few methods (logistic regression and all plotting methods) will only
+  work with a Fortran compiler and some methods (ordinary least squares
+  regression and pca) work much faster with a Fortran compiler.
 
-  The recommended PDL version is 2.4.8. PDL-2.4.7 introduced a bug in lu_decomp() which caused a few functions in PDL::Stats::GLM to fail. Otherwise the minimum compatible PDL version is 2.4.4.
+  The required PDL version is 2.057.
 
 - GSL (Optional)
 
-  GNU Scientific Library. This is required by PDL::Stats::Distr and PDL::GSL::CDF, the latter of which provides p-values for PDL::Stats::GLM. GSL is otherwise NOT required for the core PDL::Stats modules to work, ie Basic, Kmeans, and GLM.
+  GNU Scientific Library. This is required by PDL::Stats::Distr
+  and PDL::GSL::CDF, the latter of which provides p-values for
+  PDL::Stats::GLM. GSL is otherwise NOT required for the core PDL::Stats
+  modules to work, ie Basic, Kmeans, and GLM.
 
 - PGPLOT (Optional)
 
-  PDL-Stats currently uses PGPLOT for plotting. There are three pgplot/PGPLOT modules, which cause much confusion upon installation. First there is the pgplot Fortran library. Then there is the perl PGPLOT module, which is the perl interface to pgplot. Finally there is PDL::Graphics::PGPLOT, which depends on pgplot and PGPLOT, that PDL-Stats uses for plotting.
+  PDL-Stats currently uses PGPLOT for plotting. There are
+  three pgplot/PGPLOT modules, which cause much confusion upon
+  installation. First there is the pgplot Fortran library. Then there is
+  the perl PGPLOT module, which is the perl interface to pgplot. Finally
+  there is PDL::Graphics::PGPLOT, which depends on pgplot and PGPLOT,
+  that PDL-Stats uses for plotting.
 
 ## INSTALLATION
 
-### *nix
+### \*nix
 
-For standard perl module installation in *nix environment form source, to install all included modules, extract the files from the archive by entering this at a shell,
+For standard perl module installation in \*nix environment form source, to install all included modules, extract the files from the archive by entering this at a shell,
 
     tar xvf PDL-Stats-xxx.tar.gz
 
@@ -56,7 +67,7 @@ If you don't have permission to run sudo, you can specify an alternative path,
     make test
     make install
 
-then add /home/user/my_perl_lib to your PERL5LIB environment variable.
+then add `/home/user/my_perl_lib` to your PERL5LIB environment variable.
 
 If you have trouble installing PDL, you can look for help at the PDL wiki or PDL mailing list.
 
@@ -82,20 +93,19 @@ etc.
 You can also look for information at:
 
     Home
-      http://pdl-stats.sourceforge.net
+      https://github.com/PDLPorters/PDL-Stats
 
     Search CPAN
-      http://search.cpan.org/dist/PDL-Stats/
+      https://metacpan.org/dist/PDL-Stats
 
-    Mailing list
+    Mailing list (low traffic, open a GitHub issue instead)
       https://lists.sourceforge.net/lists/listinfo/pdl-stats-help
 
 If you notice a bug or have a request, please submit a report at
 
-      http://sourceforge.net/projects/pdl-stats/support
+[https://github.com/PDLPorters/PDL-Stats/issues](https://github.com/PDLPorters/PDL-Stats/issues)
 
 If you would like to help develop or maintain the package, please email me at the address below.
-
 
 ## COPYRIGHT AND LICENCE
 

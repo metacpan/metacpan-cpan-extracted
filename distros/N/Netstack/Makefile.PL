@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.016;
+use 5.018;
 
 use ExtUtils::MakeMaker;
 
@@ -14,24 +14,27 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Netstack",
   "LICENSE" => "bsd",
-  "MIN_PERL_VERSION" => "5.016",
+  "MIN_PERL_VERSION" => "5.018",
   "NAME" => "Netstack",
   "PREREQ_PM" => {
+    "Carp" => 0,
+    "DBIx::Custom" => 0,
     "Digest::MD5" => 0,
     "Encode" => 0,
     "Expect" => 0,
-    "Firewall::Utils::Set" => 0,
-    "Mojo::Util" => 0,
+    "Mail::Sender" => 0,
     "Moose" => 0,
     "Moose::Role" => 0,
+    "POSIX" => 0,
     "Try::Tiny" => 0,
     "autodie" => 0,
+    "experimental" => 0,
     "namespace::autoclean" => 0,
     "strict" => 0,
     "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.010",
   "test" => {
     "TESTS" => ""
   }
@@ -39,15 +42,18 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
+  "DBIx::Custom" => 0,
   "Digest::MD5" => 0,
   "Encode" => 0,
   "Expect" => 0,
-  "Firewall::Utils::Set" => 0,
-  "Mojo::Util" => 0,
+  "Mail::Sender" => 0,
   "Moose" => 0,
   "Moose::Role" => 0,
+  "POSIX" => 0,
   "Try::Tiny" => 0,
   "autodie" => 0,
+  "experimental" => 0,
   "namespace::autoclean" => 0,
   "strict" => 0,
   "utf8" => 0,

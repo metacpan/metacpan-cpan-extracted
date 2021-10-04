@@ -5,6 +5,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
 t/basic.t
+t/multi_key.t
 xt/manifest.t
 xt/pod-coverage.t
 xt/pod.t

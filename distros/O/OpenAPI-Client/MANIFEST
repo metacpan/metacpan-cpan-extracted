@@ -4,15 +4,14 @@ lib/Mojolicious/Command/openapi.pm
 lib/OpenAPI/Client.pm
 Makefile.PL
 MANIFEST			This list of files
-README.md
 t/00-basic.t
+t/base-url.t
 t/body-validation.t
 t/client.t
 t/command-local-with-ref.t
 t/command-local.t
 t/command-remote.t
 t/command.t
-t/default-base-url.t
 t/json-request.t
 t/path-templating.t
 t/spec.json

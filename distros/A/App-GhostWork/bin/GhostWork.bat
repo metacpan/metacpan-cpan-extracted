@@ -8,7 +8,7 @@
 : Copyright (c) 2021 INABA Hitoshi "ina@cpan.org" in a CPAN
 :#####################################################################
 setlocal
-set VERSION=0.05
+set VERSION=0.06
 
 rem default message by English
 if "%Q_WHO%"==""                set Q_WHO=Your name?

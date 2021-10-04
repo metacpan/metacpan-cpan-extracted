@@ -49,6 +49,6 @@
          "web" : "https://github.com/pjacklam/p5-bignum"
       }
    },
-   "version" : "0.61",
+   "version" : "0.62",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

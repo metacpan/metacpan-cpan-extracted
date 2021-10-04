@@ -41,7 +41,7 @@ requires:
 resources:
   bugtracker: http://github.com/ylavoie/Test2-Plugin-Feature/issues
   repository: http://github.com/ylavoie/Test2-Plugin-Feature/
-version: '0.001111'
+version: '0.001112'
 x_contributors:
   - 'Yves Lavoie <ylavoie@yveslavoie.com>'
 x_generated_by_perl: v5.32.1

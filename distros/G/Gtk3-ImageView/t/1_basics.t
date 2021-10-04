@@ -49,8 +49,8 @@ SKIP: {
         {
             x      => 0,
             y      => num( -12, 0.001 ),
-            width  => num( 70, 0.001 ),
-            height => num( 70, 0.001 ),
+            width  => num( 70,  0.001 ),
+            height => num( 70,  0.001 ),
         },
         'get_viewport'
     );
@@ -183,7 +183,8 @@ SKIP: {
     my $rect = $view->get_viewport;
     ok(
         (
-                  $rect->x == 0 and $rect->y == 0
+                  $rect->x == 0
+              and $rect->y == 0
               and $rect->width == 50
               and $rect->height == 50
         ),
@@ -195,7 +196,8 @@ SKIP: {
     $rect = $view->get_draw_rect;
     ok(
         (
-                  $rect->x == 25 and $rect->y == 25
+                  $rect->x == 25
+              and $rect->y == 25
               and $rect->width == 50
               and $rect->height == 50
         ),

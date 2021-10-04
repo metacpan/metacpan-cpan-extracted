@@ -6,7 +6,7 @@ use warnings;
 
 use Carp qw< carp croak >;
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 use Exporter;
 our @ISA            = qw( Exporter );
@@ -16,26 +16,38 @@ our @EXPORT         = qw( inf NaN );
 use overload;
 use Math::BigRat;
 
+my $obj_class = "Math::BigRat";
+
 ##############################################################################
 
 sub accuracy {
     my $self = shift;
-    Math::BigRat -> accuracy(@_);
+    $obj_class -> accuracy(@_);
 }
 
 sub precision {
     my $self = shift;
-    Math::BigRat -> precision(@_);
+    $obj_class -> precision(@_);
 }
 
 sub round_mode {
     my $self = shift;
-    Math::BigRat -> round_mode(@_);
+    $obj_class -> round_mode(@_);
 }
 
 sub div_scale {
     my $self = shift;
-    Math::BigRat -> div_scale(@_);
+    $obj_class -> div_scale(@_);
+}
+
+sub upgrade {
+    my $self = shift;
+    $obj_class -> upgrade(@_);
+}
+
+sub downgrade {
+    my $self = shift;
+    $obj_class -> downgrade(@_);
 }
 
 sub in_effect {
@@ -85,14 +97,14 @@ sub _float_constant {
         $str =~ /^0[Bb]/ and
         $nstr = Math::BigInt -> bin_str_to_dec_flt_str($str))
     {
-        return Math::BigRat -> new($nstr);
+        return $obj_class -> new($nstr);
     }
 
     # If we get here, there is a bug in the code above this point.
 
     warn "Internal error: unable to handle literal constant '$str'.",
       " This is a bug, so please report this to the module author.";
-    return Math::BigRat -> bnan();
+    return $obj_class -> bnan();
 }
 
 #############################################################################
@@ -113,9 +125,9 @@ sub _hex_core {
         my $chrs = $2;
         $chrs =~ tr/_//d;
         $chrs = '0' unless CORE::length $chrs;
-        $x = Math::BigRat -> from_hex($chrs);
+        $x = $obj_class -> from_hex($chrs);
     } else {
-        $x = Math::BigRat -> bzero();
+        $x = $obj_class -> bzero();
     }
 
     # Warn about trailing garbage.
@@ -153,7 +165,7 @@ sub _oct_core {
             my $chrs = $2;
             $chrs =~ tr/_//d;
             $chrs = '0' unless CORE::length $chrs;
-            $x = Math::BigRat -> from_bin($chrs);
+            $x = $obj_class -> from_bin($chrs);
         }
 
         # Warn about trailing garbage.
@@ -174,7 +186,7 @@ sub _oct_core {
         my $chrs = $2;
         $chrs =~ tr/_//d;
         $chrs = '0' unless CORE::length $chrs;
-        $x = Math::BigRat -> from_oct($chrs);
+        $x = $obj_class -> from_oct($chrs);
     }
 
     # Warn about trailing garbage. CORE::oct() only warns about 8 and 9, but it
@@ -247,7 +259,7 @@ sub unimport {
 }
 
 sub import {
-    my $self = shift;
+    my $class = shift;
 
     $^H{bigrat} = 1;                            # we are in effect
     $^H{bigint} = undef;
@@ -258,57 +270,87 @@ sub import {
         _override();
     }
 
-    # some defaults
-    my $lib      = '';
-    my $lib_kind = 'try';
-
     my @import = ();
-    my @a = ();
-    my ($ver, $trace);                          # version? trace?
+    my @a = ();                         # unrecognized arguments
+    my $ver;                            # version?
 
     while (@_) {
         my $param = shift;
+
+        # Upgrading.
+
         if ($param eq 'upgrade') {
-            # this causes upgrading
-            push @import, 'upgrade', shift;
-        } elsif ($param eq 'downgrade') {
-            # this causes downgrading
-            push @import, 'downgrade', shift;
-        } elsif ($param =~ /^(l|lib|try|only)$/) {
-            # this causes a different low lib to take care...
-            $lib_kind = $param;
-            $lib_kind = 'lib' if $lib_kind eq 'l';
-            $lib = shift() || '';
-        } elsif ($param =~ /^(a|accuracy)$/) {
-            push @import, 'accuracy', shift;
-        } elsif ($param =~ /^(p|precision)$/) {
-            push @import, 'precision', shift;
-        } elsif ($param =~ /^(v|version)$/) {
-            $ver = 1;
-        } elsif ($param =~ /^(t|trace)$/) {
-            $trace = 1;
-        } elsif ($param =~ /^(PI|e|bexp|bpi|hex|oct)\z/) {
-            push @a, $param;
-        } else {
-            croak("Unknown option '$param'");
+            $class -> upgrade(shift);
+            next;
         }
+
+        # Downgrading.
+
+        if ($param eq 'downgrade') {
+            $class -> downgrade(shift);
+            next;
+        }
+
+        # Accuracy.
+
+        if ($param =~ /^a(ccuracy)?$/) {
+            $class -> accuracy(shift);
+            next;
+        }
+
+        # Precision.
+
+        if ($param =~ /^p(recision)?$/) {
+            $class -> precision(shift);
+            next;
+        }
+
+        # Rounding mode.
+
+        if ($param eq 'round_mode') {
+            $class -> round_mode(shift);
+            next;
+        }
+
+        # Backend library.
+
+        if ($param =~ /^(l|lib|try|only)$/) {
+            push @import, $param eq 'l' ? 'lib' : $param;
+            push @import, shift() if @_;
+            next;
+        }
+
+        if ($param =~ /^(v|version)$/) {
+            $ver = 1;
+            next;
+        }
+
+        if ($param =~ /^(t|trace)$/) {
+            $obj_class .= "::Trace";
+            eval "require $obj_class";
+            die $@ if $@;
+            next;
+        }
+
+        if ($param =~ /^(PI|e|bexp|bpi|hex|oct)\z/) {
+            push @a, $param;
+            next;
+        }
+
+        croak("Unknown option '$param'");
     }
 
-    my $class = "Math::BigRat";
-    if ($trace) {
-        require Math::BigRat::Trace;
-        $class = "Math::BigRat::Trace";
-    }
-    push @import, $lib_kind => $lib if $lib ne '';
-    $class -> import(@import);
+    $obj_class -> import(@import);
 
     if ($ver) {
-        print "bigrat\t\t\t v$VERSION\n";
-        my $config = $class -> config();
-        print " lib => $config->{lib} v$config->{lib_version}\n";
-        print $class, "\t\t v", $class -> VERSION, "\n";
+        printf "%-31s v%s\n", $class, $class -> VERSION();
+        printf " lib => %-23s v%s\n",
+          $obj_class -> config("lib"), $obj_class -> config("lib_version");
+        printf "%-31s v%s\n", $obj_class, $obj_class -> VERSION();
         exit;
     }
+
+    $class -> export_to_level(1, $class, @a);   # export inf, NaN, etc.
 
     overload::constant
 
@@ -319,7 +361,7 @@ sub import {
         integer => sub {
             #printf "Value '%s' handled by the 'integer' sub.\n", $_[0];
             my $str = shift;
-            return Math::BigRat -> new($str);
+            return $obj_class -> new($str);
         },
 
         # This takes care of each number written with a decimal point and/or
@@ -339,35 +381,39 @@ sub import {
         binary => sub {
             #printf "# Value '%s' handled by the 'binary' sub.\n", $_[0];
             my $str = shift;
-            return Math::BigRat -> new($str) if $str =~ /^0[XxBb]/;
-            Math::BigRat -> from_oct($str);
+            return $obj_class -> new($str) if $str =~ /^0[XxBb]/;
+            $obj_class -> from_oct($str);
         };
-
-    # if another big* was already loaded:
-    my ($package) = caller();
-
-    no strict 'refs';
-    if (!defined *{"${package}::inf"}) {
-        $self->export_to_level(1, $self, @a);   # export inf and NaN
-    }
 }
 
-sub inf () { Math::BigRat -> binf(); }
-sub NaN () { Math::BigRat -> bnan(); }
+sub inf () { $obj_class -> binf(); }
+sub NaN () { $obj_class -> bnan(); }
 
 # This should depend on the current accuracy/precision. Fixme!
-sub PI  () { Math::BigRat -> new('3.141592653589793238462643383279502884197'); }
-sub e   () { Math::BigRat -> new('2.718281828459045235360287471352662497757'); }
+sub PI  () { $obj_class -> new('3.141592653589793238462643383279502884197'); }
+sub e   () { $obj_class -> new('2.718281828459045235360287471352662497757'); }
 
-sub bpi ($) {           # should return a Math::BigRat. Fixme!
-    local $Math::BigFloat::upgrade;
-    Math::BigFloat -> bpi(@_);
+sub bpi ($) {
+    my $up = Math::BigFloat -> upgrade();   # get current upgrading, if any ...
+    Math::BigFloat -> upgrade(undef);       # ... and disable
+
+    my $x = Math::BigFloat -> bpi(@_);
+
+    Math::BigFloat -> upgrade($up);         # reset the upgrading
+
+    return $obj_class -> new($x);
 }
 
-sub bexp ($$) {         # should return a Math::BigRat. Fixme!
-    local $Math::BigFloat::upgrade;
-    my $x = Math::BigFloat -> new($_[0]);
-    $x -> bexp($_[1]);
+sub bexp ($$) {
+    my $up = Math::BigFloat -> upgrade();   # get current upgrading, if any ...
+    Math::BigFloat -> upgrade(undef);       # ... and disable
+
+    my $x = Math::BigFloat -> new(shift);
+    $x -> bexp(@_);
+
+    Math::BigFloat -> upgrade($up);         # reset the upgrading
+
+    return $obj_class -> new($x);
 }
 
 1;
@@ -384,44 +430,143 @@ bigrat - transparent big rational number support for Perl
 
     use bigrat;
 
-    print 2 + 4.5,"\n";             # Math::BigRat 13/2
-    print 1/3 + 1/4,"\n";           # produces 7/12
+    print 2 + 4.5;                      # Math::BigRat 13/2
+    print 1/3 + 1/4;                    # Math::BigRat 7/12
+    print inf + 42;                     # Math::BigRat inf
+    print NaN * 7;                      # Math::BigRat NaN
+    print hex("0x1234567890123490");    # Perl v5.10.0 or later
 
     {
         no bigrat;
-        print 1/3,"\n";             # 0.33333...
+        print 1/3;                      # 0.33333...
     }
 
     # for older Perls, import into current package:
     use bigrat qw/hex oct/;
-    print hex("0x1234567890123490"),"\n";
-    print oct("01234567890123490"),"\n";
+    print hex("0x1234567890123490");
+    print oct("01234567890123490");
 
 =head1 DESCRIPTION
 
+All numeric literal in the given scope are converted to Math::BigRat objects.
+
 All operators (including basic math operations) except the range operator C<..>
-are overloaded. All literal numeric constants are converted to Math::BigRat
-objects.
+are overloaded.
+
+So, the following:
+
+    use bigrat;
+    $x = 1234;
+
+creates a Math::BigRat and stores a reference to in $x. This happens
+transparently and behind your back, so to speak.
+
+You can see this with the following:
+
+    perl -Mbigrat -le 'print ref(1234)'
+
+Since numbers are actually objects, you can call all the usual methods from
+Math::BigRat on them. This even works to some extent on expressions:
+
+    perl -Mbigrat -le '$x = 1234; print $x->bdec()'
+    perl -Mbigrat -le 'print 1234->copy()->binc();'
+    perl -Mbigrat -le 'print 1234->copy()->binc->badd(6);'
+    perl -Mbigrat -le 'print +(1234)->copy()->binc()'
+
+(Note that print doesn't do what you expect if the expression starts with
+'(' hence the C<+>)
+
+You can even chain the operations together as usual:
+
+    perl -Mbigrat -le 'print 1234->copy()->binc->badd(6);'
+    1241
+
+Please note the following does not work as expected (prints nothing), since
+overloading of '..' is not yet possible in Perl (as of v5.8.0):
+
+    perl -Mbigrat -le 'for (1..2) { print ref($_); }'
+
+=head2 Options
+
+C<bigrat> recognizes some options that can be passed while loading it via
+C<use>. The following options exist:
+
+=over 4
+
+=item a or accuracy
+
+This sets the accuracy for all math operations. The argument must be greater
+than or equal to zero. See Math::BigInt's bround() method for details.
+
+    perl -Mbigrat=a,50 -le 'print sqrt(20)'
+
+Note that setting precision and accuracy at the same time is not possible.
+
+=item p or precision
+
+This sets the precision for all math operations. The argument can be any
+integer. Negative values mean a fixed number of digits after the dot, while a
+positive value rounds to this digit left from the dot. 0 means round to integer.
+See Math::BigInt's bfround() method for details.
+
+    perl -Mbigrat=p,-50 -le 'print sqrt(20)'
+
+Note that setting precision and accuracy at the same time is not possible.
+
+=item t or trace
+
+This enables a trace mode and is primarily for debugging.
+
+=item l, lib, try, or only
+
+Load a different math lib, see L<Math Library>.
+
+    perl -Mbigrat=l,GMP -e 'print 2 ** 512'
+    perl -Mbigrat=lib,GMP -e 'print 2 ** 512'
+    perl -Mbigrat=try,GMP -e 'print 2 ** 512'
+    perl -Mbigrat=only,GMP -e 'print 2 ** 512'
+
+=item hex
+
+Override the built-in hex() method with a version that can handle big numbers.
+This overrides it by exporting it to the current package. Under Perl v5.10.0 and
+higher, this is not so necessary, as hex() is lexically overridden in the
+current scope whenever the C<bigrat> pragma is active.
+
+=item oct
+
+Override the built-in oct() method with a version that can handle big numbers.
+This overrides it by exporting it to the current package. Under Perl v5.10.0 and
+higher, this is not so necessary, as oct() is lexically overridden in the
+current scope whenever the C<bigrat> pragma is active.
+
+=item v or version
+
+this prints out the name and version of the modules and then exits.
+
+    perl -Mbigrat=v
+
+=back
 
 =head2 Math Library
 
-Math with the numbers is done (by default) by a module called
-Math::BigInt::Calc. This is equivalent to saying:
+Math with the numbers is done (by default) by a backend library module called
+Math::BigInt::Calc. The default is equivalent to saying:
 
     use bigrat lib => 'Calc';
 
-You can change this by using:
+you can change this by using:
 
     use bigrat lib => 'GMP';
 
 The following would first try to find Math::BigInt::Foo, then Math::BigInt::Bar,
-and when this also fails, revert to Math::BigInt::Calc:
+and if this also fails, revert to Math::BigInt::Calc:
 
     use bigrat lib => 'Foo,Math::BigInt::Bar';
 
-Using C<lib> warns if none of the specified libraries can be found and
-L<Math::BigInt> did fall back to one of the default libraries. To suppress this
-warning, use C<try> instead:
+Using c<lib> warns if none of the specified libraries can be found and
+L<Math::BigInt> fell back to one of the default libraries. To suppress this
+warning, use c<try> instead:
 
     use bigrat try => 'GMP';
 
@@ -429,26 +574,48 @@ If you want the code to die instead of falling back, use C<only> instead:
 
     use bigrat only => 'GMP';
 
-Please see respective module documentation for further details.
+Please see the respective module documentation for further details.
 
-=head2 Sign
+=head2 Method calls
 
-The sign is either '+', '-', 'NaN', '+inf' or '-inf'.
+Since all numbers are now objects, you can use all methods that are part of the
+Math::BigRat API.
 
-A sign of 'NaN' is used to represent the result when input arguments are not
-numbers or as a result of 0/0. '+inf' and '-inf' represent plus respectively
-minus infinity. You will get '+inf' when dividing a positive number by 0, and
-'-inf' when dividing any negative number by 0.
+But a warning is in order. When using the following to make a copy of a number,
+only a shallow copy will be made.
+
+    $x = 9; $y = $x;
+    $x = $y = 7;
+
+Using the copy or the original with overloaded math is okay, e.g., the following
+work:
+
+    $x = 9; $y = $x;
+    print $x + 1, " ", $y,"\n";     # prints 10 9
+
+but calling any method that modifies the number directly will result in B<both>
+the original and the copy being destroyed:
+
+    $x = 9; $y = $x;
+    print $x->badd(1), " ", $y,"\n";        # prints 10 10
+
+    $x = 9; $y = $x;
+    print $x->binc(1), " ", $y,"\n";        # prints 10 10
+
+    $x = 9; $y = $x;
+    print $x->bmul(2), " ", $y,"\n";        # prints 18 18
+
+Using methods that do not modify, but test that the contents works:
+
+    $x = 9; $y = $x;
+    $z = 9 if $x->is_zero();                # works fine
+
+See the documentation about the copy constructor and C<=> in overload, as well
+as the documentation in Math::BigFloat for further details.
 
 =head2 Methods
 
-Since all numbers are not objects, you can use all functions that are part of
-the Math::BigInt or Math::BigFloat API. It is wise to use only the bxxx()
-notation, and not the fxxx() notation, though. This makes you independent on the
-fact that the underlying object might morph into a different class than
-Math::BigFloat.
-
-=over 2
+=over 4
 
 =item inf()
 
@@ -474,10 +641,10 @@ Returns PI.
 
 =item bexp()
 
-    bexp($power,$accuracy);
+    bexp($power, $accuracy);
 
-Returns Euler's number C<e> raised to the appropriate power, to
-the wanted accuracy.
+Returns Euler's number C<e> raised to the appropriate power, to the wanted
+accuracy.
 
 Example:
 
@@ -495,16 +662,17 @@ Example:
 
 =item upgrade()
 
-Return the class that numbers are upgraded to, if any.
+Return the class that numbers are upgraded to, is in fact returning
+C<Math::BigRat-E<gt>upgrade()>.
 
 =item in_effect()
 
     use bigrat;
 
-    print "in effect\n" if bigrat::in_effect;     # true
+    print "in effect\n" if bigrat::in_effect;       # true
     {
         no bigrat;
-        print "in effect\n" if bigrat::in_effect; # false
+        print "in effect\n" if bigrat::in_effect;   # false
     }
 
 Returns true or false if C<bigrat> is in effect in the current scope.
@@ -513,119 +681,9 @@ This method only works on Perl v5.9.4 or later.
 
 =back
 
-=head2 MATH LIBRARY
-
-Math with the numbers is done (by default) by a module called
-
-=head2 Caveat
-
-But a warning is in order. When using the following to make a copy of a number,
-only a shallow copy will be made.
-
-    $x = 9; $y = $x;
-    $x = $y = 7;
-
-If you want to make a real copy, use the following:
-
-    $y = $x->copy();
-
-Using the copy or the original with overloaded math is okay, e.g. the following
-work:
-
-    $x = 9; $y = $x;
-    print $x + 1, " ", $y,"\n";     # prints 10 9
-
-but calling any method that modifies the number directly will result in B<both>
-the original and the copy being destroyed:
-
-    $x = 9; $y = $x;
-    print $x->badd(1), " ", $y,"\n";        # prints 10 10
-
-    $x = 9; $y = $x;
-    print $x->binc(1), " ", $y,"\n";        # prints 10 10
-
-    $x = 9; $y = $x;
-    print $x->bmul(2), " ", $y,"\n";        # prints 18 18
-
-Using methods that do not modify, but testthe contents works:
-
-    $x = 9; $y = $x;
-    $z = 9 if $x->is_zero();                # works fine
-
-See the documentation about the copy constructor and C<=> in overload, as well
-as the documentation in Math::BigInt for further details.
-
-=head2 Options
-
-bigrat recognizes some options that can be passed while loading it via use. The
-options can (currently) be either a single letter form, or the long form. The
-following options exist:
-
-=over 2
-
-=item a or accuracy
-
-This sets the accuracy for all math operations. The argument must be greater
-than or equal to zero. See Math::BigInt's bround() function for details.
-
-    perl -Mbigrat=a,50 -le 'print sqrt(20)'
-
-Note that setting precision and accuracy at the same time is not possible.
-
-=item p or precision
-
-This sets the precision for all math operations. The argument can be any
-integer. Negative values mean a fixed number of digits after the dot, while a
-positive value rounds to this digit left from the dot. 0 or 1 mean round to
-integer. See Math::BigInt's bfround() function for details.
-
-    perl -Mbigrat=p,-50 -le 'print sqrt(20)'
-
-Note that setting precision and accuracy at the same time is not possible.
-
-=item t or trace
-
-This enables a trace mode and is primarily for debugging bigrat or
-Math::BigInt/Math::BigFloat.
-
-=item l or lib
-
-Load a different math lib, see L<MATH LIBRARY>.
-
-    perl -Mbigrat=l,GMP -e 'print 2 ** 512'
-
-Currently there is no way to specify more than one library on the command
-line. This means the following does not work:
-
-    perl -Mbigrat=l,GMP,Pari -e 'print 2 ** 512'
-
-This will be hopefully fixed soon ;)
-
-=item hex
-
-Override the built-in hex() method with a version that can handle big numbers.
-This overrides it by exporting it to the current package. Under Perl v5.10.0 and
-higher, this is not so necessary, as hex() is lexically overridden in the
-current scope whenever the bigrat pragma is active.
-
-=item oct
-
-Override the built-in oct() method with a version that can handle big numbers.
-This overrides it by exporting it to the current package. Under Perl v5.10.0 and
-higher, this is not so necessary, as oct() is lexically overridden in the
-current scope whenever the bigrat pragma is active.
-
-=item v or version
-
-This prints out the name and version of all modules used and then exits.
-
-    perl -Mbigrat=v
-
-=back
-
 =head1 CAVEATS
 
-=over 2
+=over 4
 
 =item Hexadecimal, octal, and binary floating point literals
 
@@ -648,11 +706,24 @@ For example:
     my $y = "900000000000000007";
     print $x - $y;
 
-will output C<0> on default 32-bit builds, since C<bigrat> never sees the string
+outputs C<0> on default 32-bit builds, since C<bigrat> never sees the string
 literals. To ensure the expression is all treated as C<Math::BigRat> objects,
 use a literal number in the expression:
 
     print +(0+$x) - $y;
+
+=item Ranges
+
+Perl does not allow overloading of ranges, so you can neither safely use ranges
+with C<bigrat> endpoints, nor is the iterator variable a C<Math::BigRat>.
+
+    use 5.010;
+    for my $i (12..13) {
+      for my $j (20..21) {
+        say $i ** $j;  # produces a floating-point number,
+                       # not an object
+      }
+    }
 
 =item in_effect()
 
@@ -660,17 +731,17 @@ This method only works on Perl v5.9.4 or later.
 
 =item hex()/oct()
 
-C<bigint> overrides these routines with versions that can also handle big
+C<bigrat> overrides these routines with versions that can also handle big
 integer values. Under Perl prior to version v5.9.4, however, this will not
 happen unless you specifically ask for it with the two import tags "hex" and
 "oct" - and then it will be global and cannot be disabled inside a scope with
-"no bigint":
+C<no bigrat>:
 
-    use bigint qw/hex oct/;
+    use bigrat qw/hex oct/;
 
     print hex("0x1234567890123456");
     {
-        no bigint;
+        no bigrat;
         print hex("0x1234567890123456");
     }
 
@@ -678,7 +749,7 @@ The second call to hex() will warn about a non-portable constant.
 
 Compare this to:
 
-    use bigint;
+    use bigrat;
 
     # will warn only under Perl older than v5.9.4
     print hex("0x1234567890123456");
@@ -688,18 +759,19 @@ Compare this to:
 =head1 EXAMPLES
 
     perl -Mbigrat -le 'print sqrt(33)'
-    perl -Mbigrat -le 'print 2*255'
-    perl -Mbigrat -le 'print 4.5+2*255'
+    perl -Mbigrat -le 'print 2**255'
+    perl -Mbigrat -le 'print 4.5+2**255'
     perl -Mbigrat -le 'print 3/7 + 5/7 + 8/3'
     perl -Mbigrat -le 'print 12->is_odd()';
     perl -Mbigrat=l,GMP -le 'print 7 ** 7777'
 
 =head1 BUGS
 
-For information about bugs and how to report them, see the BUGS section in the
-documentation available with the perldoc command.
-
-    perldoc bignum
+Please report any bugs or feature requests to
+C<bug-bignum at rt.cpan.org>, or through the web interface at
+L<https://rt.cpan.org/Ticket/Create.html?Queue=bignum> (requires login).
+We will be notified, and then you'll automatically be notified of
+progress on your bug as I make changes.
 
 =head1 SUPPORT
 
@@ -707,10 +779,31 @@ You can find documentation for this module with the perldoc command.
 
     perldoc bigrat
 
-For more information, see the SUPPORT section in the documentation available
-with the perldoc command.
+You can also look for information at:
 
-    perldoc bignum
+=over 4
+
+=item * GitHub
+
+L<https://github.com/pjacklam/p5-bignum>
+
+=item * RT: CPAN's request tracker
+
+L<https://rt.cpan.org/Dist/Display.html?Name=bignum>
+
+=item * MetaCPAN
+
+L<https://metacpan.org/release/bignum>
+
+=item * CPAN Testers Matrix
+
+L<http://matrix.cpantesters.org/?dist=bignum>
+
+=item * CPAN Ratings
+
+L<https://cpanratings.perl.org/dist/bignum>
+
+=back
 
 =head1 LICENSE
 
@@ -734,7 +827,7 @@ L<Math::BigInt::FastCalc>, L<Math::BigInt::Pari> and L<Math::BigInt::GMP>.
 
 =item *
 
-Peter John Acklam E<lt>pjacklam@gmail.comE<gt>, 2014-.
+Maintained by Peter John Acklam E<lt>pjacklam@gmail.comE<gt>, 2014-.
 
 =back
 

@@ -3,7 +3,7 @@ package Test2::Plugin::Feature;
 use strict;
 use warnings;
 
-our $VERSION = '0.001111';
+our $VERSION = '0.001112';
 
 1;
 
@@ -17,7 +17,7 @@ Test2::Plugin::Feature - Plugin to allow testing Pherkin files.
 
 =head1 VERSION
 
-version 0.001111
+version 0.001112
 
 =head1 SYNOPSIS
 

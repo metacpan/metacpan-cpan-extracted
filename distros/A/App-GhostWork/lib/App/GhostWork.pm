@@ -8,7 +8,7 @@ package App::GhostWork;
 # Copyright (c) 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSION = '0.05';
+$VERSION = '0.06';
 $VERSION = $VERSION;
 
 use 5.00503;

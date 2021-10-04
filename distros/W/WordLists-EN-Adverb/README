@@ -1,0 +1,46 @@
+NAME
+    WordLists::EN::Adverb - Collection of English adverbs
+
+VERSION
+    This document describes version 0.002 of WordLists::EN::Adverb (from
+    Perl distribution WordLists-EN-Adverb), released on 2021-03-05.
+
+DESCRIPTION
+    This distribution contains the following wordlist modules:
+
+    *   WordList::EN::Adverb::TalkEnglish
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/WordLists-EN-Adverb>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-WordLists-EN-Adverb>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-WordLists-EN-Adverb/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    TablesCollection::Words::EN::Adverbs
+
+    WordLists::EN::Noun, WordLists::EN::Adjective
+
+    WordList
+
+    The wordlists can be used for games, e.g. Games::Hangman,
+    Games::TabNoun.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

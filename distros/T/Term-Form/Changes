@@ -1,6 +1,9 @@
 Revision history for Term::Form
 
 
+0.539   2021-10-02
+        - Update 'validate_options'.
+
 0.538   2021-08-24
         - Update move-around keys.
         - __write_screen: bugfix cursor position.

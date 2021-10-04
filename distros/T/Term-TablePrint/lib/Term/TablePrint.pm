@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.143';
+our $VERSION = '0.145';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -37,7 +37,7 @@ sub new {
     my $instance_defaults = _defaults();
     if ( defined $opt ) {
         croak "new: The (optional) argument is not a HASH reference." if ref $opt ne 'HASH';
-        validate_options( _valid_options(), $opt );
+        validate_options( _valid_options(), $opt, 'new' );
         for my $key ( keys %$opt ) {
             $instance_defaults->{$key} = $opt->{$key} if defined $opt->{$key};
         }
@@ -166,7 +166,7 @@ sub print_table {
             print hide_cursor;
         }
         ###############################################################################################
-        validate_options( _valid_options(), $opt );
+        validate_options( _valid_options(), $opt, 'print_table' );
         for my $key ( keys %$opt ) {
             $self->{$key} = $opt->{$key} if defined $opt->{$key};
         }
@@ -475,36 +475,37 @@ sub __copy_table {
 sub __calc_col_width {
     my ( $self, $tbl_copy, $progress ) = @_;
     my $count = $progress->set_progress_bar();            #
-    my $w_head  = [];
-    my $w_cols  = [ ( 1 ) x @{$tbl_copy->[0]} ];
-    my $w_int   = [ ( 0 ) x @{$tbl_copy->[0]} ];
-    my $w_fract = [ ( 0 ) x @{$tbl_copy->[0]} ];
-    my $ds = quotemeta( $self->{decimal_separator} );
     my @col_idx = ( 0 .. $#{$tbl_copy->[0]} );
+    my $col_count = @col_idx;
+    my $w_head = [];
+    my $w_cols = [ ( 1 ) x $col_count ];
+    my $w_int   = [ ( 0 ) x $col_count ];
+    my $w_fract = [ ( 0 ) x $col_count ];
+    my $ds = quotemeta( $self->{decimal_separator} );
     my $col_names = shift @$tbl_copy;
-    for my $i ( @col_idx ) {
-        $w_head->[$i] = print_columns( $col_names->[$i] );
+    for my $col ( @col_idx ) {
+        $w_head->[$col] = print_columns( $col_names->[$col] );
     }
-    for my $row ( @$tbl_copy ) {
-        for my $i ( @col_idx ) {
+
+    for my $row ( 0 .. $#$tbl_copy ) {
+        for my $col ( @col_idx ) {
             my $width;
-            if ( ! length $row->[$i] ) {
-                $width = 0;
+            if ( ! length $tbl_copy->[$row][$col] ) {
+                # nothing to do
             }
-            elsif ( $row->[$i] =~/^([-+]?[0-9]*)($ds[0-9]+)?\z/ ) {
-                $width = length( $row->[$i] );
-                if ( defined $1 && length( $1 ) > $w_int->[$i] ) {
-                    $w_int->[$i] = length $1;
+            elsif ( $tbl_copy->[$row][$col] =~/^([-+]?[0-9]*)($ds[0-9]+)?\z/ ) {
+                if ( defined $1 && length $1 > $w_int->[$col] ) {
+                    $w_int->[$col] = length $1;
                 }
-                if ( defined $2 && length( $2 ) > $w_fract->[$i] ) {
-                    $w_fract->[$i] = length $2;
+                if ( defined $2 && length $2 > $w_fract->[$col] ) {
+                    $w_fract->[$col] = length $2;
                 }
             }
             else {
-                $width = print_columns( $row->[$i] );
-            }
-            if ( $width > $w_cols->[$i] ) {
-                $w_cols->[$i] = $width;
+                my $width = print_columns( $tbl_copy->[$row][$col] );
+                if ( $width > $w_cols->[$col] ) {
+                    $w_cols->[$col] = $width;
+                }
             }
         }
         if ( $progress->{count_progress_bars} ) {         #
@@ -513,6 +514,11 @@ sub __calc_col_width {
             }                                             #
             ++$count;                                     #
         }                                                 #
+    }
+    for my $col ( @col_idx ) {
+        if ( $w_int->[$col] + $w_fract->[$col] > $w_cols->[$col] ) {
+            $w_cols->[$col] = $w_int->[$col] + $w_fract->[$col];
+        }
     }
     unshift @$tbl_copy, $col_names;
     if ( $progress->{count_progress_bars} ) {             #
@@ -532,9 +538,9 @@ sub __calc_avail_col_width {
         # auto cut
         HEAD: while ( 1 ) {
             my $count = 0;
-            for my $i ( 0 .. $#$w_head ) {
-                if ( $w_head->[$i] > $w_cols_calc->[$i] ) {
-                    ++$w_cols_calc->[$i];
+            for my $col ( 0 .. $#$w_head ) {
+                if ( $w_head->[$col] > $w_cols_calc->[$col] ) {
+                    ++$w_cols_calc->[$col];
                     ++$count;
                     last HEAD if ( $sum + $count ) == $avail_w;
                 }
@@ -556,15 +562,15 @@ sub __calc_avail_col_width {
         MIN: while ( $sum > $avail_w ) {
             ++$percent;
             my $count = 0;
-            for my $i ( 0 .. $#w_cols_tmp ) {
-                if ( $min_width >= $w_cols_tmp[$i] ) {
+            for my $col ( 0 .. $#w_cols_tmp ) {
+                if ( $min_width >= $w_cols_tmp[$col] ) {
                     next;
                 }
-                if ( $min_width >= _minus_x_percent( $w_cols_tmp[$i], $percent ) ) {
-                    $w_cols_tmp[$i] = $min_width;
+                if ( $min_width >= _minus_x_percent( $w_cols_tmp[$col], $percent ) ) {
+                    $w_cols_tmp[$col] = $min_width;
                 }
                 else {
-                    $w_cols_tmp[$i] = _minus_x_percent( $w_cols_tmp[$i], $percent );
+                    $w_cols_tmp[$col] = _minus_x_percent( $w_cols_tmp[$col], $percent );
                 }
                 ++$count;
             }
@@ -577,9 +583,9 @@ sub __calc_avail_col_width {
 
             REST: while ( 1 ) {
                 my $count = 0;
-                for my $i ( 0 .. $#w_cols_tmp ) {
-                    if ( $w_cols_tmp[$i] < $w_cols_calc->[$i] ) {
-                        $w_cols_tmp[$i]++;
+                for my $col ( 0 .. $#w_cols_tmp ) {
+                    if ( $w_cols_tmp[$col] < $w_cols_calc->[$col] ) {
+                        $w_cols_tmp[$col]++;
                         $rest--;
                         $count++;
                         last REST if $rest == 0;
@@ -646,14 +652,17 @@ sub __cols_to_string {
                 $str = $str . unicode_sprintf( $tbl_copy->[$row][$col], $w_cols_calc->[$col] );
             }
             if ( $self->{color} ) {
-                my $r = $row;
-                if ( defined $tbl_orig->[$r][$col] ) {
-                    my @color = $tbl_orig->[$r][$col] =~ /(\e\[[\d;]*m)/g;
+                if ( defined $tbl_orig->[$row][$col] ) {
+                    my @color = $tbl_orig->[$row][$col] =~ /(\e\[[\d;]*m)/g;
                     $str =~ s/\x{feff}/shift @color/ge;
-                    $str = $str . $color[-1] if @color;
+                    if ( @color ) {
+                        $str = $str . $color[-1];
+                    }
                 }
             }
-            $str = $str . $tab if $col != $#$w_cols_calc;
+            if ( $col != $#$w_cols_calc ) {
+                $str = $str . $tab;
+            }
         }
         #$str = $str . RESET if $self->{color};
         $tbl_copy->[$row] = $str;   # overwrite $tbl_copy to save memory
@@ -795,9 +804,11 @@ sub __header_sep {
     my $tab = ( '-' x int( $self->{tab_w} / 2 ) ) . '|' . ( '-' x int( $self->{tab_w} / 2 ) );
     my $header_sep = '';
     my $w_cols_calc= $vw->{w_cols_calc};
-    for my $i ( 0 .. $#$w_cols_calc ) {
-        $header_sep .= '-' x $w_cols_calc->[$i];
-        $header_sep .= $tab if $i != $#$w_cols_calc;
+    for my $col ( 0 .. $#$w_cols_calc ) {
+        $header_sep .= '-' x $w_cols_calc->[$col];
+        if ( $col != $#$w_cols_calc ) {
+            $header_sep .= $tab;
+        }
     }
     return $header_sep;
 }
@@ -857,7 +868,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.143
+Version 0.145
 
 =cut
 
@@ -1089,7 +1100,7 @@ String displayed above the table.
 
 =head3 search
 
-Set the behavior of C<Ctrl-F> key.
+Set the behavior of C<Ctrl-F>.
 
 0 - off
 

@@ -96,6 +96,7 @@ sub new
 	$self->{'year'} = '';
 	$self->{'genre'} = '';
 	$self->{'iconurl'} = '';
+	$self->{'articonurl'} = '';
 	$self->{'streams'} = [];
 	$self->{'cnt'} = 0;
 	$self->{'total'} = 0;
@@ -214,20 +215,24 @@ sub getTitle
 sub getIconURL
 {
 	my $self = shift;
-	return $self->{'iconurl'};  #URL TO THE STATION'S THUMBNAIL ICON, IF ANY.
+	return (defined($_[0]) && $_[0] =~ /^\-?artist/i)
+			? $self->{'articonurl'} : $self->{'iconurl'};  #URL TO THE STATION'S THUMBNAIL ICON, IF ANY.
 }
 
 sub getIconData
 {
 	my $self = shift;
-	return ()  unless ($self->{'iconurl'});
+
+	my $whichurl = (defined($_[0]) && $_[0] =~ /^\-?artist/i)
+			? 'articonurl' : 'iconurl';
+	return ()  unless ($self->{$whichurl});
 
 	my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
 	$ua->timeout($self->{'timeout'});
 	$ua->cookie_jar({});
 	$ua->env_proxy;
 	my $art_image = '';
-	my $response = $ua->get($self->{'iconurl'});
+	my $response = $ua->get($self->{$whichurl});
 	if ($response->is_success) {
 		$art_image = $response->decoded_content;
 	} else {
@@ -235,13 +240,13 @@ sub getIconData
 		my $no_wget = system('wget','-V');
 		unless ($no_wget) {
 			print STDERR "\n..trying wget...\n"  if ($DEBUG);
-			my $iconUrl = $self->{'iconurl'};
+			my $iconUrl = $self->{$whichurl};
 			$art_image = `wget -t 2 -T 20 -O- -o /dev/null \"$iconUrl\" 2>/dev/null `;
 		}
 	}
 	return ()  unless ($art_image);
 
-	(my $image_ext = $self->{'iconurl'}) =~ s/^.+\.//;
+	(my $image_ext = $self->{$whichurl}) =~ s/^.+\.//;
 	$image_ext =~ s/[^A-Za-z].*$//;
 
 	return ($image_ext, $art_image);

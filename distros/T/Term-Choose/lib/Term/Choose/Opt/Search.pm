@@ -4,10 +4,10 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.741';
+our $VERSION = '1.742';
 
 use Term::Choose::Constants qw( ROW COL );
-use Term::Choose::Screen    qw( up clear_to_end_of_screen clear_screen show_cursor hide_cursor );
+use Term::Choose::Screen    qw( up clear_to_end_of_screen show_cursor hide_cursor );
 
 
 sub __user_input {
@@ -25,7 +25,7 @@ sub __user_input {
         );
         1 }
     ) {
-        print "\r", clear_screen();
+        print "\r", clear_to_end_of_screen();
         if ( length $error ) {
             print $error, "\n\r";
         }

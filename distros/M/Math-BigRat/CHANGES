@@ -1,3 +1,8 @@
+0.2620 2021-10-03
+
+ * Skip tests that don't work on older Perls. Also skip tests that compare
+   floating point numbers.
+
 0.2619 2021-10-01
 
  * Correct the handling of Inf and NaN in numify().

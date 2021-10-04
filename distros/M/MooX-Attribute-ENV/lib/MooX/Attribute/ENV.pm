@@ -1,6 +1,6 @@
 package MooX::Attribute::ENV;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 # this bit would be MooX::Utils but without initial _ on func name
 use strict;
@@ -44,9 +44,11 @@ sub import {
 }
 
 sub _lookup_env {
-  my ($envkey) = @_;
-  return $ENV{$envkey} if exists $ENV{$envkey};
-  return $ENV{uc $envkey} if exists $ENV{uc $envkey};
+  my @env_keys = ref $_[0] eq 'ARRAY' ? @{ $_[0] } : $_[0];
+  foreach my $envkey ( @env_keys ) {
+      return $ENV{$envkey} if exists $ENV{$envkey};
+      return $ENV{uc $envkey} if exists $ENV{uc $envkey};
+  }
   undef;
 }
 
@@ -67,7 +69,7 @@ sub _generate_key {
     $target =~ s/:+/_/g;
     return "${target}_$attr";
   }
-  undef;
+  undef; # uncoverable statement
 }
 
 =head1 NAME
@@ -96,6 +98,11 @@ MooX::Attribute::ENV - Allow Moo attributes to get their values from %ENV
     is => 'ro',
     env_key => 'attr_val',
   );
+  # look for $ENV{attr_val} and $ENV{next_val}, in that order
+  has some => (
+    is => 'ro',
+    env_key => [ 'attr_val', 'next_val' ],
+  );
   # looks for $ENV{otherattr} and $ENV{OTHERATTR}, then any default
   has otherattr => (
     is => 'ro',
@@ -123,9 +130,9 @@ MooX::Attribute::ENV - Allow Moo attributes to get their values from %ENV
 =head1 DESCRIPTION
 
 This is a L<Moo> extension. It allows other attributes for L<Moo/has>. If
-any of these are given, then instead of the normal value-setting "chain"
-for attributes of given, default; the chain will be given, environment,
-default.
+any of these are given, then L<Moo/BUILDARGS> is wrapped so that values
+for object attributes can, if not supplied in the normal construction
+process, come from the environment.
 
 The environment will be searched for either the given case, or upper case,
 version of the names discussed below.
@@ -142,6 +149,10 @@ Boolean. If true, the name is the attribute, no prefix.
 =head2 env_key
 
 String. If true, the name is the given value, no prefix.
+
+or
+
+ArrayRef. A list of names that will be checked in given order.
 
 =head2 env_prefix
 

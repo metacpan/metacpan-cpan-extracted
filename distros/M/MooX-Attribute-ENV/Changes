@@ -1,3 +1,9 @@
+0.04 2021-10-03
+- build fixes
+
+0.03 2021-10-03
+- add ability to search multiple keys - thanks @vanHoesel
+
 0.02 2019-03-15
  - partition out ENV-related attribute keys so Moose not blow up
 

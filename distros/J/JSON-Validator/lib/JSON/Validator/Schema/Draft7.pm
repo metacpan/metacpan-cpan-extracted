@@ -34,9 +34,7 @@ sub _build_formats {
   };
 }
 
-sub _definitions_path_for_ref { ['$defs'] }
-sub _id_key                   {'$id'}
-
+*_resolve_object                    = \&JSON::Validator::Schema::Draft6::_resolve_object;
 *_validate_number_max               = \&JSON::Validator::Schema::Draft6::_validate_number_max;
 *_validate_number_min               = \&JSON::Validator::Schema::Draft6::_validate_number_min;
 *_validate_type_array               = \&JSON::Validator::Schema::Draft6::_validate_type_array;

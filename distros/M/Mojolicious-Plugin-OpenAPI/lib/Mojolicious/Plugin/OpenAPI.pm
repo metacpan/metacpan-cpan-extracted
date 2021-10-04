@@ -8,7 +8,7 @@ use Mojolicious::Plugin::OpenAPI::Parameters;
 
 use constant DEBUG => $ENV{MOJO_OPENAPI_DEBUG} || 0;
 
-our $VERSION = '4.06';
+our $VERSION = '5.00';
 
 has route     => sub {undef};
 has validator => sub { JSON::Validator::Schema->new; };
@@ -17,9 +17,11 @@ sub register {
   my ($self, $app, $config) = @_;
 
   $self->validator(JSON::Validator->new->schema($config->{url} || $config->{spec})->schema);
-  $self->validator->coerce($config->{coerce})               if defined $config->{coerce};
-  $self->validator->allow_invalid_ref(1)                    if $config->{allow_invalid_ref};
-  $self->_set_schema_version($config->{version_from_class}) if $config->{version_from_class};
+  $self->validator->coerce($config->{coerce}) if defined $config->{coerce};
+
+  if (my $class = $config->{version_from_class} // ref $app) {
+    $self->validator->data->{info}{version} = sprintf '%s', $class->VERSION if $class->VERSION;
+  }
 
   my $errors = $config->{skip_validating_specification} ? [] : $self->validator->errors;
   die @$errors if @$errors;
@@ -294,11 +296,6 @@ sub _self {
   return +(map { $_->[1] } grep { $path =~ /^$_->[0]/ } @{$c->stash('openapi.base_paths')})[0];
 }
 
-sub _set_schema_version {
-  my ($self, $class) = @_;
-  $self->validator->data->{info}{version} = $class->VERSION;
-}
-
 1;
 
 =encoding utf8
@@ -484,13 +481,6 @@ the L</ATTRIBUTES> after you load the plugin.
 
 C<%config> can have:
 
-=head3 allow_invalid_ref
-
-The OpenAPI specification does not allow "$ref" at every level, but setting
-this flag to a true value will ignore the $ref check.
-
-Note that setting this attribute is discourage.
-
 =head3 coerce
 
 See L<JSON::Validator/coerce> for possible values that C<coerce> can take.
@@ -584,9 +574,8 @@ specification is written in perl, instead of JSON or YAML.
 Can be used to overridden C</info/version> in the API specification, from the
 return value from the C<VERSION()> method in C<version_from_class>.
 
-This will only have an effect if "version" is "0".
-
-Defaults to the current C<$app>.
+Defaults to the current C<$app>. This can be disabled by setting the
+"version_from_class" to zero (0).
 
 =head1 AUTHORS
 

@@ -2,8 +2,8 @@ NAME
     Tree::From::Struct - Build a tree object from hash structure
 
 VERSION
-    This document describes version 0.040 of Tree::From::Struct (from Perl
-    distribution Tree-From-Struct), released on 2020-02-04.
+    This document describes version 0.041 of Tree::From::Struct (from Perl
+    distribution Tree-From-Struct), released on 2021-05-06.
 
 SYNOPSIS
     In your tree node class My/Person.pm:
@@ -46,6 +46,14 @@ SYNOPSIS
               ]},
          ]});
 
+    This tree is visualized as follows:
+
+     Andi
+       ├─Budi
+       └─Cinta
+           ├─Deni
+           └─Eno
+
 DESCRIPTION
     Building a tree manually can be tedious: you have to connect the parent
     and the children nodes together:
@@ -62,7 +70,7 @@ DESCRIPTION
      ...
 
     This module provides a convenience function to build a tree of objects
-    in a single command. It connect the parent and children nodes for you.
+    in a single command. It connects the parent and children nodes for you.
 
     The class can be any class that provides "parent" and "children"
     methods. See Role::TinyCommons::Tree::Node for more details.
@@ -79,11 +87,11 @@ HOMEPAGE
 
 SOURCE
     Source repository is at
-    <https://github.com/perlancar/perl-Tree-FromStruct>.
+    <https://github.com/perlancar/perl-Tree-From-Struct>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Tree-From-Struct>
+    <https://github.com/perlancar/perl-Tree-From-Struct/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -92,6 +100,9 @@ SEE ALSO
     Role::TinyCommons::Tree::FromStruct if you want to use this
     functionality via consuming a role.
 
+    Another way to create tree from a nested array of objects:
+    Tree::From::ObjArray.
+
     Other ways to create tree: Tree::From::Text, Tree::From::TextLines,
     Tree::Create::Callback, Tree::Create::Size.
 
@@ -99,7 +110,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2021 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

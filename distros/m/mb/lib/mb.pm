@@ -11,7 +11,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.31';
+$VERSION = '0.32';
 $VERSION = $VERSION;
 
 # internal use
@@ -213,6 +213,39 @@ END
             die "$0(@{[__LINE__]}): can't run as module.\n";
         }
         $quote = q{'};
+    }
+
+    # @ARGV wildcard globbing
+    if ($OSNAME =~ /MSWin32/) {
+        my @argv = ();
+        for (@ARGV) {
+
+            # has space
+            if (/\A (?:$x)*? [ ] /oxms) {
+                if (my @glob = mb::dosglob(qq{"$_"})) {
+                    push @argv, @glob;
+                }
+                else {
+                    push @argv, $_;
+                }
+            }
+
+            # has wildcard metachar
+            elsif (/\A (?:$x)*? [*?] /oxms) {
+                if (my @glob = mb::dosglob($_)) {
+                    push @argv, @glob;
+                }
+                else {
+                    push @argv, $_;
+                }
+            }
+
+            # no wildcard globbing
+            else {
+                push @argv, $_;
+            }
+        }
+        @ARGV = @argv;
     }
 
     # run octet-oriented script
@@ -5107,6 +5140,8 @@ mb - run Perl script in MBCS encoding (not only CJK ;-)
   $ perl mb.pm -e utf8      MBCS_Perl_script.pl
   $ perl mb.pm -e wtf8      MBCS_Perl_script.pl
 
+  C:\WINDOWS> perl mb.pm script.pl ??-DOS-like *wildcard* available
+
   MBCS subroutines:
     mb::chop(...);
     mb::chr(...);
@@ -6135,6 +6170,88 @@ To install this software without make, type the following:
   qr/[[:^word:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^word:]])]})/ ]}@{[mb::_m_passed()]}}
   qr/[[:^xdigit:]]/                          qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^xdigit:]])]})/ ]}@{[mb::_m_passed()]}}
   ----------------------------------------------------------------------------------------------------------------------
+
+=head1 Command-line Wildcard Expansion on Microsoft Windows
+
+cmd.exe that is default command shell of Microsoft Windows doesn't expand
+wildcard arguments supplied onto command line. But this software helps it.
+
+  # @ARGV wildcard globbing
+  if ($OSNAME =~ /MSWin32/) {
+      my @argv = ();
+      for (@ARGV) {
+  
+          # has space
+          if (/\A (?:$x)*? [ ] /oxms) {
+              if (my @glob = mb::dosglob(qq{"$_"})) {
+                  push @argv, @glob;
+              }
+              else {
+                  push @argv, $_;
+              }
+          }
+  
+          # has wildcard metachar
+          elsif (/\A (?:$x)*? [*?] /oxms) {
+              if (my @glob = mb::dosglob($_)) {
+                  push @argv, @glob;
+              }
+              else {
+                  push @argv, $_;
+              }
+          }
+  
+          # no wildcard globbing
+          else {
+              push @argv, $_;
+          }
+      }
+      @ARGV = @argv;
+  }
+
+=head1 Yet Another Future of Multibyte Perl
+
+JPerl is very useful software. -- Oops, note, this "JPerl" means "Japanized Perl"
+or "Japanese Perl". Therefore, it is unrelated to JPerl of the following.
+
+ jperl -  Jamie's PERL scripts for bioinformatics
+ https://code.google.com/archive/p/jperl/
+
+ Jon Perl jperl
+ https://github.com/jperl
+
+Now, the last version of JPerl is 5.005_04 and is not maintained now.
+
+Japanization maintainer WATANABE Hirofumi said,
+
+  "Because WATANABE am tired I give over maintaing JPerl."
+
+at Slide #15: "The future of JPerl" in "jperlconf.ppt" on The Perl Confernce
+Japan 1998. And he taught us on [Tokyo.pm] jus Benkyoukai at 1999-09-09,
+
+  http://mail.pm.org/pipermail/tokyo-pm/1999-September/001854.html
+  save as: SJIS.pm
+  
+  package SJIS;
+  use Filter::Util::Call;
+  sub multibyte_filter {
+      my $status;
+      if (($status = filter_read()) > 0 ) {
+          s/([\x81-\x9f\xe0-\xef])([\x40-\x7e\x80-\xfc])/
+              sprintf("\\x%02x\\x%02x",ord($1),ord($2))
+          /eg;
+      }
+      $status;
+  }
+  sub import {
+      filter_add(\&multibyte_filter);
+  }
+  1;
+
+(Unfortunately, Filter::Util::Call module requires Perl 5.6, so I couldn't
+use it on Perl 5.00503 that's my home.)
+
+I am excited about this software and Perl's future --- I hope you are too.
 
 =head1 DEPENDENCIES
 

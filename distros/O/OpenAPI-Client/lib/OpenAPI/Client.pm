@@ -4,12 +4,12 @@ use Mojo::EventEmitter -base;
 use Carp ();
 use JSON::Validator;
 use Mojo::UserAgent;
-use Mojo::Util 'deprecated';
 use Mojo::Promise;
+use Scalar::Util qw(blessed);
 
 use constant DEBUG => $ENV{OPENAPI_CLIENT_DEBUG} || 0;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 my $BASE = __PACKAGE__;
 
@@ -43,7 +43,8 @@ sub new {
   $class = $class->_url_to_class($specification);
   _generate_class($class, $specification, $attrs) unless $class->isa($BASE);
 
-  my $self = bless $attrs, $class;
+  my $self = $class->SUPER::new($attrs);
+  $self->base_url(Mojo::URL->new($self->{base_url})) if $self->{base_url} and !blessed $self->{base_url};
   $self->ua->transactor->name('Mojo-OpenAPI (Perl)') unless $self->{ua};
 
   if (my $app = delete $self->{app}) {
@@ -73,8 +74,9 @@ use Mojo::Base '$BASE';
 HERE
 
   Mojo::Util::monkey_patch($class => validator => sub {$schema});
+  return unless $schema->can('routes');    # In case it is not an OpenAPI spec
 
-  for my $route ($schema->can('routes') ? $schema->routes->each : ()) {
+  for my $route ($schema->routes->each) {
     next unless $route->{operation_id};
     warn "[$class] Add method $route->{operation_id}() for $route->{method} $route->{path}\n" if DEBUG;
     $class->_generate_method_bnb($route->{operation_id} => $route);
@@ -229,24 +231,21 @@ Feedback is appreciated.
 
 =head2 Open API specification
 
-The specification given to L</new> need to point to a valid OpenAPI document,
-in either JSON or YAML format. Example:
+The specification given to L</new> need to point to a valid OpenAPI document.
+This document can be OpenAPI v2.x or v3.x, and it can be in either JSON or YAML
+format. Example:
 
-  ---
-  swagger: 2.0
-  host: api.example.com
-  basePath: /api
-  schemes: [ "http" ]
+  openapi: 3.0.1
+  info:
+    title: Swagger Petstore
+    version: 1.0.0
+  servers:
+  - url: http://petstore.swagger.io/v1
   paths:
-    /foo:
+    /pets:
       get:
         operationId: listPets
-        parameters:
-        - name: limit
-          in: query
-          type: integer
-        responses:
-          200: { ... }
+        ...
 
 C<host>, C<basePath> and the first item in C<schemes> will be used to construct
 L</base_url>. This can be altered at any time, if you need to send data to a
@@ -289,11 +288,19 @@ L<Mojo::Transaction/res> for some of the most used methods in that class.
 
 =head2 Custom server URL
 
-If you want to request a different server than what is specified in
-the Open API document:
+If you want to request a different server than what is specified in the Open
+API document, you can change the L</base_url>:
 
-  $client->base_url->host("other.server.com");
-  $client = OpenAPI::Client->new("file:///path/to/api.json", base_url => "http://example.com");
+  # Pass on a Mojo::URL object to the constructor
+  $base_url = Mojo::URL->new("http://example.com");
+  $client1 = OpenAPI::Client->new("file:///path/to/api.json", base_url => $base_url);
+
+  # A plain string will be converted to a Mojo::URL object
+  $client2 = OpenAPI::Client->new("file:///path/to/api.json", base_url => "http://example.com");
+
+  # Change the base_url after the client has been created
+  $client3 = OpenAPI::Client->new("file:///path/to/api.json");
+  $client3->base_url->host("other.example.com");
 
 =head2 Custom content
 
@@ -336,7 +343,8 @@ Note that this usage of C<env()> is currently EXPERIMENTAL:
   $base_url = $client->base_url;
 
 Returns a L<Mojo::URL> object with the base URL to the API. The default value
-comes from C<schemes>, C<basePath> and C<host> in the Open API specification.
+comes from C<schemes>, C<basePath> and C<host> in the OpenAPI v2 specification
+or from C<servers> in the OpenAPI v3 specification.
 
 =head2 ua
 
@@ -410,12 +418,12 @@ See L<JSON::Validator/coerce>. Default to "booleans,numbers,strings".
   $validator = $class->validator;
 
 Returns a L<JSON::Validator::Schema::OpenAPIv2> object for a generated class.
-Not that this is a global variable, so changing the object will affect all
-instances.
+Note that this is a global variable, so changing the object will affect all
+instances returned by L</new>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017-2020, Jan Henning Thorsen
+Copyright (C) 2017-2021, Jan Henning Thorsen
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.

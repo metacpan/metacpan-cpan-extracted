@@ -30,6 +30,10 @@ has packageattr => (
   is => 'ro',
   env_package_prefix => 1,
 );
+# non-env to exercise handling of that
+has nonenvattr => (
+  is => 'ro',
+);
 
 package main;
 
@@ -58,7 +62,7 @@ test_with_env(prefixattr => { xxx_prefixattr => 5 }, 5);
 test_with_env(packageattr => { MYMOD_PACKAGEATTR => 6 }, 6);
 test_with_env(packageattr => { MyMod_packageattr => 6 }, 6);
 
-my $obj = MyMod->new;
+my $obj = MyMod->new({});
 is $obj->has_attr, !1, 'if no env set or value given, predicate false';
 
 done_testing;

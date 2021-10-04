@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.48';
+our $VERSION = '2.49';
 
 our @ALL =
 qw(
@@ -1776,7 +1776,7 @@ our %LINKS =
   'Asia/Ulan_Bator' => 'Asia/Ulaanbaatar',
   'Asia/Vientiane' => 'Asia/Bangkok',
   'Atlantic/Faeroe' => 'Atlantic/Faroe',
-  'Atlantic/Jan_Mayen' => 'Europe/Berlin',
+  'Atlantic/Jan_Mayen' => 'Europe/Oslo',
   'Atlantic/St_Helena' => 'Africa/Abidjan',
   'Australia/ACT' => 'Australia/Sydney',
   'Australia/Canberra' => 'Australia/Sydney',
@@ -1890,7 +1890,7 @@ our %LINKS =
 
 ;
 
-sub OlsonVersion { '2021b' }
+sub OlsonVersion { '2021c' }
 
 
 1;
@@ -3555,7 +3555,7 @@ A linked zone is an alias from one name to another.
   Asia/Ulan_Bator => Asia/Ulaanbaatar
   Asia/Vientiane => Asia/Bangkok
   Atlantic/Faeroe => Atlantic/Faroe
-  Atlantic/Jan_Mayen => Europe/Berlin
+  Atlantic/Jan_Mayen => Europe/Oslo
   Atlantic/St_Helena => Africa/Abidjan
   Australia/ACT => Australia/Sydney
   Australia/Canberra => Australia/Sydney

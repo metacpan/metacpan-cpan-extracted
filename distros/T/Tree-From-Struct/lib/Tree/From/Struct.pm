@@ -1,9 +1,9 @@
 package Tree::From::Struct;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-04'; # DATE
+our $DATE = '2021-05-06'; # DATE
 our $DIST = 'Tree-From-Struct'; # DIST
-our $VERSION = '0.040'; # VERSION
+our $VERSION = '0.041'; # VERSION
 
 require Code::Includable::Tree::FromStruct;
 
@@ -32,7 +32,7 @@ Tree::From::Struct - Build a tree object from hash structure
 
 =head1 VERSION
 
-This document describes version 0.040 of Tree::From::Struct (from Perl distribution Tree-From-Struct), released on 2020-02-04.
+This document describes version 0.041 of Tree::From::Struct (from Perl distribution Tree-From-Struct), released on 2021-05-06.
 
 =head1 SYNOPSIS
 
@@ -76,6 +76,14 @@ In your code to build a tree:
           ]},
      ]});
 
+This tree is visualized as follows:
+
+ Andi
+   ├─Budi
+   └─Cinta
+       ├─Deni
+       └─Eno
+
 =head1 DESCRIPTION
 
 Building a tree manually can be tedious: you have to connect the parent and
@@ -93,7 +101,7 @@ the children nodes together:
  ...
 
 This module provides a convenience function to build a tree of objects in a
-single command. It connect the parent and children nodes for you.
+single command. It connects the parent and children nodes for you.
 
 The class can be any class that provides C<parent> and C<children> methods. See
 L<Role::TinyCommons::Tree::Node> for more details.
@@ -112,11 +120,11 @@ Please visit the project's homepage at L<https://metacpan.org/release/Tree-From-
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Tree-FromStruct>.
+Source repository is at L<https://github.com/perlancar/perl-Tree-From-Struct>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Tree-From-Struct>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Tree-From-Struct/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -127,6 +135,9 @@ feature.
 L<Role::TinyCommons::Tree::FromStruct> if you want to use this functionality via
 consuming a role.
 
+Another way to create tree from a nested array of objects:
+L<Tree::From::ObjArray>.
+
 Other ways to create tree: L<Tree::From::Text>, L<Tree::From::TextLines>,
 L<Tree::Create::Callback>, L<Tree::Create::Size>.
 
@@ -136,7 +147,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

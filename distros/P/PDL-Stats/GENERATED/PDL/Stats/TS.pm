@@ -1,16 +1,14 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::Stats::TS;
 
 our @EXPORT_OK = qw(PDL::PP _acf PDL::PP _acvf PDL::PP diff PDL::PP inte PDL::PP dseason PDL::PP _fill_ma PDL::PP filter_exp PDL::PP filter_ma PDL::PP mae PDL::PP mape PDL::PP wmape PDL::PP portmanteau PDL::PP _pred_ar );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
-
 
 
    
@@ -50,14 +48,6 @@ use PDL::NiceSlice;
 use PDL::Stats::Basic;
 use PDL::Stats::Kmeans;
 
-$PDL::onlinedoc->scan(__FILE__) if $PDL::onlinedoc;
-
-eval {
-  require PDL::Graphics::PGPLOT::Window;
-  PDL::Graphics::PGPLOT::Window->import( 'pgwin' );
-};
-my $PGPLOT = 1 if !$@;
-
 my $DEV = ($^O =~ /win/i)? '/png' : '/xs';
 
 
@@ -68,10 +58,7 @@ my $DEV = ($^O =~ /win/i)? '/png' : '/xs';
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -87,6 +74,8 @@ my $DEV = ($^O =~ /win/i)? '/png' : '/xs';
 
 
 
+
+#line 113 "TS/ts.pd"
 
 =head2 acf
 
@@ -156,7 +145,6 @@ sub PDL::acvf {
   $h ||= $self->dim(0) - 1;
   return $self->_acvf($h+1);
 }
-
 
 
 
@@ -257,6 +245,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
+#line 363 "TS/ts.pd"
+
 =head2 fill_ma
 
 =for sig
@@ -287,7 +277,6 @@ sub PDL::fill_ma {
 
   return $x_filled;
 }
-
 
 
 
@@ -533,6 +522,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
+#line 701 "TS/ts.pd"
+
 =head2 pred_ar
 
 =for sig
@@ -592,11 +583,12 @@ sub PDL::pred_ar {
 
 
 
-
 *_pred_ar = \&PDL::_pred_ar;
 
 
 
+
+#line 791 "TS/ts.pd"
 
 =head2 season_m
 
@@ -608,7 +600,7 @@ Default options (case insensitive):
 
     START_POSITION => 0,     # series starts at this position in season
     MISSING        => -999,  # internal mark for missing points in season
-    PLOT  => 1,              # boolean
+    PLOT  => 0,              # boolean
       # see PDL::Graphics::PGPLOT::Window for next options
     WIN   => undef,          # pass pgwin object for more plotting control
     DEV   => '/xs',          # open and close dev for plotting if no WIN
@@ -629,15 +621,14 @@ sub PDL::season_m {
   my %opt = (
     START_POSITION => 0,     # series starts at this position in season
     MISSING        => -999,  # internal mark for missing points in season
-    PLOT  => 1,
+    PLOT  => 0,
     WIN   => undef,          # pass pgwin object for more plotting control
     DEV   => $DEV,           # see PDL::Graphics::PGPLOT for more info
     COLOR => 1,
   );
   $opt and $opt{uc $_} = $opt->{$_} for (keys %$opt);
-  if ($opt{PLOT} and !$PGPLOT) {
-    carp "No PDL::Graphics::PGPLOT, no plot :(";
-    $opt{PLOT} = 0;
+  if ($opt{PLOT}) {
+    require PDL::Graphics::PGPLOT::Window;
   }
 
   my $n_season = ($self->dim(0) + $opt{START_POSITION}) / $d;
@@ -660,7 +651,7 @@ sub PDL::season_m {
   if ($opt{PLOT}) {
     my $w = $opt{WIN};
     if (!$w) {
-      $w = pgwin( Dev=>$opt{DEV} );
+      $w = PDL::Graphics::PGPLOT::Window::pgwin( Dev=>$opt{DEV} );
       $w->env( 0, $d-1, $m->minmax,
               {XTitle=>'period', YTitle=>'mean'} );
     }
@@ -669,9 +660,6 @@ sub PDL::season_m {
     if ($m->squeeze->ndims < 2) {
       $w->errb( sequence($d), $m, sqrt( $ms / $s->sumover ),
                {COLOR=>$opt{COLOR}} );
-    }
-    else {
-      carp "errb does not support multi dim pdl";
     }
     $w->close
       unless $opt{WIN};
@@ -701,38 +689,34 @@ See PDL::Graphics::PGPLOT for detailed graphing options.
 
 *plot_dseason = \&PDL::plot_dseason;
 sub PDL::plot_dseason {
+  require PDL::Graphics::PGPLOT::Window;
   my ($self, $d, $opt) = @_;
   !defined($d) and croak "please set season period length";
   $self = $self->squeeze;
 
   my $dsea;
-  if ($PGPLOT) {
-    my %opt = (
-        WIN   => undef,
-        DEV   => $DEV,
-        COLOR => 1,       # data point color
-    );
-    $opt and $opt{uc $_} = $opt->{$_} for (keys %$opt);
+  my %opt = (
+      WIN   => undef,
+      DEV   => $DEV,
+      COLOR => 1,       # data point color
+  );
+  $opt and $opt{uc $_} = $opt->{$_} for (keys %$opt);
 
-    $dsea = $self->dsea($d);
+  $dsea = $self->dseason($d);
 
-    my $w = $opt{WIN};
-    if (!$opt{WIN}) {
-      $w = pgwin( $opt{DEV} );
-      $w->env( 0, $self->dim(0)-1, $self->minmax,
-            {XTitle=>'T', YTitle=>'DV'} );
-    }
-
-    my $missn = ushort $self->max + 1;   # ushort in case precision issue
-    $w->line( sequence($self->dim(0)), $dsea->setbadtoval( $missn ),
-             {COLOR=>$opt{COLOR}+1, MISSING=>$missn} );
-    $w->points( sequence($self->dim(0)), $self, {COLOR=>$opt{COLOR}} );
-    $w->close
-      unless $opt{WIN};
+  my $w = $opt{WIN};
+  if (!$opt{WIN}) {
+    $w = PDL::Graphics::PGPLOT::Window::pgwin( $opt{DEV} );
+    $w->env( 0, $self->dim(0)-1, $self->minmax,
+          {XTitle=>'T', YTitle=>'DV'} );
   }
-  else {
-    carp "Please install PDL::Graphics::PGPLOT for plotting";
-  }
+
+  my $missn = ushort $self->max->sclr + 1;   # ushort in case precision issue
+  $w->line( sequence($self->dim(0)), $dsea->setbadtoval( $missn ),
+           {COLOR=>$opt{COLOR}+1, MISSING=>$missn} );
+  $w->points( sequence($self->dim(0)), $self, {COLOR=>$opt{COLOR}} );
+  $w->close
+    unless $opt{WIN};
 
   return $dsea; 
 }
@@ -747,21 +731,6 @@ sub PDL::filt_exp {
 sub PDL::filt_ma {
   print STDERR "filt_ma() deprecated since version 0.5.0. Please use filter_ma() instead\n";
   return filter_ma( @_ );
-}
-
-*dsea = \&PDL::dsea;
-sub PDL::dsea {
-  print STDERR "dsea() deprecated since version 0.5.0. Please use dseason() instead\n";
-  return dseason( @_ );
-}
-
-*plot_season = \&PDL::plot_season;
-sub PDL::plot_season {
-  print STDERR "plot_season() deprecated since version 0.5.0. Please use season_m() instead\n";
-  my ($self, $d, $opt) = @_;
-  $opt and $opt{uc $_} = $opt->{$_} for (keys %$opt);
-  $opt->{PLOT} = 1;
-  return $self->season_m( $d, $opt );
 }
 
 =head1 METHODS
@@ -793,45 +762,41 @@ Usage:
 
 *plot_acf = \&PDL::plot_acf;
 sub PDL::plot_acf {
+  require PDL::Graphics::PGPLOT::Window;
   my $opt = pop @_
     if ref $_[-1] eq 'HASH';
   my ($self, $h) = @_;
   my $r = $self->acf($h);
     
-  if ($PGPLOT) {
-    my %opt = (
-        SIG => 0.05,
-        DEV => $DEV,
-    );
-    $opt and $opt{uc $_} = $opt->{$_} for (keys %$opt);
+  my %opt = (
+      SIG => 0.05,
+      DEV => $DEV,
+  );
+  $opt and $opt{uc $_} = $opt->{$_} for (keys %$opt);
 
-    my $w = pgwin( Dev=>$opt{DEV} );
-    $w->env(-1, $h+1, -1.05, 1.05, {XTitle=>'lag', YTitle=>'acf'});
-    $w->line(pdl(-1,$h+1), zeroes(2));   # x axis
+  my $w = PDL::Graphics::PGPLOT::Window::pgwin( Dev=>$opt{DEV} );
+  $w->env(-1, $h+1, -1.05, 1.05, {XTitle=>'lag', YTitle=>'acf'});
+  $w->line(pdl(-1,$h+1), zeroes(2));   # x axis
 
-    my $y_sig = ($opt{SIG} == 0.10)?   1.64485362695147
-              : ($opt{SIG} == 0.05)?   1.95996398454005
-              : ($opt{SIG} == 0.01)?   2.5758293035489
-              : ($opt{SIG} == 0.001)?  3.29052673149193
-              :                        0
-              ;
-    unless ($y_sig) {
-      carp "SIG outside of recognized value. default to 0.05";
-      $y_sig = 1.95996398454005;
-    }
-
-    $w->line( pdl(-1,$h+1), ones(2) * $y_sig / sqrt($self->dim(0)),
-              { LINESTYLE=>"Dashed" } );
-    $w->line( pdl(-1,$h+1), ones(2) * $y_sig / sqrt($self->dim(0)) * -1,
-              { LINESTYLE=>"Dashed" } );
-    for my $lag (0..$h) {
-      $w->line( ones(2)*$lag, pdl(0, $r($lag)) );
-    }
-    $w->close;
+  my $y_sig = ($opt{SIG} == 0.10)?   1.64485362695147
+            : ($opt{SIG} == 0.05)?   1.95996398454005
+            : ($opt{SIG} == 0.01)?   2.5758293035489
+            : ($opt{SIG} == 0.001)?  3.29052673149193
+            :                        0
+            ;
+  unless ($y_sig) {
+    carp "SIG outside of recognized value. default to 0.05";
+    $y_sig = 1.95996398454005;
   }
-  else {
-    carp "Please install PDL::Graphics::PGPLOT::Window for plotting";
+
+  $w->line( pdl(-1,$h+1), ones(2) * $y_sig / sqrt($self->dim(0)),
+            { LINESTYLE=>"Dashed" } );
+  $w->line( pdl(-1,$h+1), ones(2) * $y_sig / sqrt($self->dim(0)) * -1,
+            { LINESTYLE=>"Dashed" } );
+  for my $lag (0..$h) {
+    $w->line( ones(2)*$lag, pdl(0, $r($lag)) );
   }
+  $w->close;
 
   return $r;
 }
@@ -851,7 +816,6 @@ All rights reserved. There is no warranty. You are allowed to redistribute this 
 =cut
 
 
-
 ;
 
 
@@ -859,5 +823,3 @@ All rights reserved. There is no warranty. You are allowed to redistribute this 
 # Exit with OK status
 
 1;
-
-		   
