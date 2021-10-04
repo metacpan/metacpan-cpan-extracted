@@ -1,10 +1,10 @@
 # MathML::itex2MML
 #
-# Copyright, Jacques Distler 2018-19.
+# Copyright, Jacques Distler 2018-21.
 # All Rights Reserved.
 # Licensed under the Perl Artistic License.
 #
-# Version: 1.6.0
+# Version: 1.6.1
 
 package MathML::itex2MML;
 
@@ -13,7 +13,7 @@ use warnings;
 
 use base qw(Exporter);
 use base qw(DynaLoader);
-our $VERSION = '1.6.0';
+our $VERSION = '1.6.1';
 
 package MathML::itex2MMLc;
 bootstrap MathML::itex2MML;

@@ -1,6 +1,10 @@
 Revision history for OPM::Validate
 ========================================
 
+1.10   2021-10-01 12:40:00
+
+    * Improve/Fix regular expression to validate .opm/.sopm files
+
 1.00   2021-03-14 08:48:00
 
     * Renamed OTRS::OPM::Validate to OPM::Validate as we support

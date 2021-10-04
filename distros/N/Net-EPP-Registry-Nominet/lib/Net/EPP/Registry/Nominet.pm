@@ -28,7 +28,7 @@ use constant EPP_XMLNS	=> 'urn:ietf:params:xml:ns:epp-1.0';
 use vars qw($Error $Code $Message);
 
 BEGIN {
-	our $VERSION = '0.05';
+	our $VERSION = '0.06';
 }
 
 # file-scoped lexicals
@@ -1444,6 +1444,7 @@ sub list_tags {
 	my $infData = $response->getNode($spec[1], 'listData');
 	my $taglist = [];
 	for my $node ($infData->childNodes) {
+		next unless $node->nodeType == XML::LibXML::XML_ELEMENT_NODE;
 		push @$taglist, $self->_tag_infData_to_hash ($node);
 	}
 	return $taglist;
@@ -1475,10 +1476,10 @@ sub hello {
 	}
 	my $frame = Net::EPP::Frame::Hello->new;
 
-	warn "Sending XML = \n" . $frame . "\n" if $Debug;
+	warn "Sending XML = \n" . $frame . "\n" if $Debug > 1;
 	my $greeting = $self->request($frame);
-	warn "Response XML = \n" . $greeting->toString() . "\n" if ($Debug
-	and defined $greeting);
+	warn "Response XML = \n" . $greeting->toString() . "\n"
+		if ($Debug > 1 && defined $greeting);
 
 	unless ($greeting) {
 		$Error = sprintf("Server returned a %d code", $Code);
@@ -1743,7 +1744,7 @@ Pete Houston <cpan@openstrike.co.uk>
 
 =head1 Licence
 
-This software is copyright © 2013-2020 by Pete Houston. It is released
+This software is copyright © 2013-2021 by Pete Houston. It is released
 under the Artistic Licence (version 2) and the
 GNU General Public Licence (version 2).
 

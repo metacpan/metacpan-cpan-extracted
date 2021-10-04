@@ -37,7 +37,7 @@ sub start_server {
     if($res_path && (-d $res_path)){
       my @resources = File::Find::Rule->directory->name('resources')->extras({follow => $resources_paths_follow})->in( $res_path );
       print STDERR '['.localtime()."] resources: ". join('|',@resources)."\n";
-      Treex::PML::SetResourcePaths(@resources);
+      Treex::PML::AddResourcePath(@resources);
     }
   }
   $server->run();

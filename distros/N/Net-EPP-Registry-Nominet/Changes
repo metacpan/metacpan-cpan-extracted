@@ -1,3 +1,11 @@
+0.06 2021-10-04
+
+    - Fix hello() so it only reports the XML for Debug > 1
+
+0.05_01 2021-07-09
+
+    - Fix and test list_tags (RT 137485)
+
 0.05 2020-02-07
 
     - No changes from 0.04_01

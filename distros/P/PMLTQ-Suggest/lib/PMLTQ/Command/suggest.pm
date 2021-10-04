@@ -1,6 +1,6 @@
 package PMLTQ::Command::suggest;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Command::suggest::VERSION = '1.1.0';
+$PMLTQ::Command::suggest::VERSION = '1.1.1';
 # ABSTRACT: Return query for given nodes
 
 use PMLTQ::Base 'PMLTQ::Command';

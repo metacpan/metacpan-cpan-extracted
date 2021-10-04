@@ -6,12 +6,27 @@ Simple http server that can be used as an part of [PMLTQ::Server](https://github
 
 Suggest server returns a PML-TQ query for given nodes.
 
-# Parameters
+# Execution
+
+Module provides two different access to suggest service.
+
+## Suggest server
+
+**Parameters**
 
 - `--port` port to run on, defaults to **8071**
 - `--host` what to bind to, defaults to **localhost**
-- `--data-dir` directory with PML files **required**
+- `--resources-path` path to recources - server finds and adds all 'resource' directories within this path
+- `--resources-path-follow` flag specifies whether symlinks shoud be followed
+
+
+## PMLTQ Command
+
 
 # Installation
+
+```
+cpan PMLTQ::Suggest
+```
 
 

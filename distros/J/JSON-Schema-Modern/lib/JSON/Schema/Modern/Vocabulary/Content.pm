@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Content;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Content vocabulary
 
-our $VERSION = '0.520';
+our $VERSION = '0.521';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -81,7 +81,7 @@ JSON::Schema::Modern::Vocabulary::Content - Implementation of the JSON Schema Co
 
 =head1 VERSION
 
-version 0.520
+version 0.521
 
 =head1 DESCRIPTION
 

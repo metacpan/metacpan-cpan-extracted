@@ -18,7 +18,7 @@ use Test::More;
 use Time::Piece;
 
 if (defined $ENV{NOMTAG} and defined $ENV{NOMPASS}) {
-	plan tests => 15;
+	plan tests => 21;
 } else {
 	plan skip_all => 'Cannot connect to testbed without NOMTAG and NOMPASS';
 }
@@ -88,17 +88,31 @@ $epp = new_ok ('Net::EPP::Registry::Nominet', [ ote => 1,
 my $taglist = $epp->list_tags;
 ok ($taglist, 'Tag list defined');
 is (ref $taglist, 'ARRAY', 'Tag list is an arrayref');
+my $numtags = $#$taglist + 1;
 cmp_ok ($#$taglist, '>', 100,
-	'Tag list has many entries (' . ($#$taglist + 1) . ')');
+	"Tag list has many entries ($numtags)");
 
 # Check one entry for attributes
 my $onetag = $taglist->[0];
 for my $key (qw/registrar-tag name handshake trad-name/) {
 	ok (exists $onetag->{$key}, "Tag in list has $key key");
 }
+# RT 137485
+isnt $onetag->{'registrar-tag'}, '', 'TAG name is not empty string';
+
 my $res = grep { $_->{'trad-name'} } @$taglist;
 cmp_ok ($res, '>', 0, 'At least one has a trad_name');
-cmp_ok ($res, '<', scalar (@$taglist), 'At least one has no trad_name');
+cmp_ok ($res, '<', $numtags, 'At least one has no trad_name');
+$res = grep { $_->{'registrar-tag'} } @$taglist;
+is $res, $numtags, 'All have true TAG names';
+$res = grep { $_->{'name'} } @$taglist;
+is $res, $numtags, 'All have true names';
+my $hy = grep { $_->{'handshake'} eq 'Y' } @$taglist;
+my $hn = grep { $_->{'handshake'} eq 'N' } @$taglist;
+is $hy + $hn, $numtags, 'All have handshake as Y or N';
+cmp_ok $hy, '>', 0, 'At least one has handshake Y';
+cmp_ok $hn, '>', 0, 'At least one has handshake N';
+
 
 ok ($epp->logout(), 'Logout successful');
 

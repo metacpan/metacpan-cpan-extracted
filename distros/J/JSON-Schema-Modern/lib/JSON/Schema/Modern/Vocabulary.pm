@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Base role for JSON Schema vocabulary classes
 
-our $VERSION = '0.520';
+our $VERSION = '0.521';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -89,7 +89,7 @@ JSON::Schema::Modern::Vocabulary - Base role for JSON Schema vocabulary classes
 
 =head1 VERSION
 
-version 0.520
+version 0.521
 
 =head1 SYNOPSIS
 
@@ -101,8 +101,6 @@ version 0.520
 
 This package is the role which all all vocabulary classes for L<JSON::Schema::Modern>
 must compose, describing the basic structure expected of a vocabulary class.
-
-User-defined custom vocabularies are not supported at this time.
 
 =head1 ATTRIBUTES
 

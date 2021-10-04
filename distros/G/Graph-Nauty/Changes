@@ -1,3 +1,9 @@
+0.3.7 2021-10-04
+
+    - Replaced av_top_index() with av_len() to retain backwards
+      compatibility with older Perl versions (GH#1). Removed ppport.h.
+    - Fixed memory leaks in XS code.
+
 0.3.6 2021-06-07
 
     - Adapted the code to work with Graph v0.9717 and later (GH#8).

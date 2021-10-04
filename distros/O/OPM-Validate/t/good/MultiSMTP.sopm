@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<otrs_package version="1.0">
+    <!-- GENERATED WITH OTRS::OPM::Maker::Command::sopm (1.4) -->
+    <Name>MultiSMTP</Name>
+    <Version>6.0.1</Version>
+    <Framework>6.0.x</Framework>
+    <Vendor>Perl-Services.de</Vendor>
+    <URL>http://www.perl-services.de</URL>
+    <Description Lang="de">Ein Modul, mit dem man mehrere SMTP-Server für OTRS nutzen kann.</Description>
+    <Description Lang="en">A module that allows OTRS to use several SMTP servers.</Description>
+    <Description Lang="hu">Egy modul, amely lehetővé teszi az OTRS-nek több SMTP-kiszolgáló használatát.</Description>
+    <Description Lang="ru">Модуль, который позволяет OTRS использовать несколько SMTP-серверов.</Description>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <Filelist>
+        <File Permission="644" Location="Kernel/Config/Files/XML/MultiSMTP.xml" />
+        <File Permission="644" Location="Kernel/Language/de_MultiSMTP.pm" />
+        <File Permission="644" Location="Kernel/Language/hu_MultiSMTP.pm" />
+        <File Permission="644" Location="Kernel/Language/ru_MultiSMTP.pm" />
+        <File Permission="644" Location="Kernel/Language/zh_CN_MultiSMTP.pm" />
+        <File Permission="644" Location="Kernel/Modules/AdminMultiSMTP.pm" />
+        <File Permission="644" Location="Kernel/Output/HTML/Templates/Standard/AdminMultiSMTPForm.tt" />
+        <File Permission="644" Location="Kernel/Output/HTML/Templates/Standard/AdminMultiSMTPList.tt" />
+        <File Permission="644" Location="Kernel/System/Email/MultiSMTP.pm" />
+        <File Permission="644" Location="Kernel/System/Email/MultiSMTP/SMTP.pm" />
+        <File Permission="644" Location="Kernel/System/Email/MultiSMTP/SMTPS.pm" />
+        <File Permission="644" Location="Kernel/System/Email/MultiSMTP/SMTPTLS.pm" />
+        <File Permission="644" Location="Kernel/System/MultiSMTP.pm" />
+        <File Permission="644" Location="doc/MultiSMTP.json" />
+        <File Permission="644" Location="doc/en/MultiSMTP.pod" />
+        <File Permission="644" Location="doc/hu/MultiSMTP.pod" />
+        <File Permission="644" Location="doc/ru/MultiSMTP.pod" />
+    </Filelist>
+    <DatabaseInstall Type="post">
+        <TableCreate Name="ps_multi_smtp">
+            <Column Name="id" Required="true" Type="INTEGER" AutoIncrement="true" PrimaryKey="true" />
+            <Column Name="type" Required="true" Type="VARCHAR" Size="250" />
+            <Column Name="host" Required="true" Type="VARCHAR" Size="250" />
+            <Column Name="smtp_user" Required="true" Type="VARCHAR" Size="200" />
+            <Column Name="smtp_password" Required="true" Type="VARCHAR" Size="250" />
+            <Column Name="port" Required="true" Type="VARCHAR" Size="250" />
+            <Column Name="comments" Required="false" Type="VARCHAR" Size="250" />
+            <Column Name="encrypted" Required="true" Type="SMALLINT" />
+            <Column Name="create_time" Required="true" Type="DATE" />
+            <Column Name="create_by" Required="true" Type="INTEGER" />
+            <Column Name="valid_id" Required="true" Type="SMALLINT" />
+            <Column Name="change_time" Required="true" Type="DATE" />
+            <Column Name="change_by" Required="true" Type="INTEGER" />
+            <ForeignKey ForeignTable="users">
+                <Reference Local="create_by" Foreign="id" />
+                <Reference Local="change_by" Foreign="id" />
+            </ForeignKey>
+            <ForeignKey ForeignTable="valid">
+                <Reference Local="valid_id" Foreign="id" />
+            </ForeignKey>
+        </TableCreate>
+        <TableCreate Name="ps_multi_smtp_address">
+            <Column Name="id" Required="true" Type="INTEGER" AutoIncrement="true" PrimaryKey="true" />
+            <Column Name="smtp_id" Required="true" Type="INTEGER" />
+            <Column Name="address" Required="true" Type="VARCHAR" Size="250" />
+        </TableCreate>
+    </DatabaseInstall>
+    <DatabaseUpgrade Type="post">
+        <TableAlter Name="ps_multi_smtp" Version="3.1.1">
+            <ColumnAdd Name="comments" Required="false" Type="VARCHAR" Size="250" />
+        </TableAlter>
+        <TableAlter Name="ps_multi_smtp" Version="3.2.2">
+            <ColumnChange NameNew="stmp_user" NameOld="user" Required="true" Type="VARCHAR" Size="200" />
+            <ColumnChange NameNew="stmp_password" NameOld="password" Required="true" Type="VARCHAR" Size="250" />
+        </TableAlter>
+    </DatabaseUpgrade>
+    <DatabaseUninstall Type="pre">
+        <TableDrop Name="ps_multi_smtp_address" />
+        <TableDrop Name="ps_multi_smtp" />
+    </DatabaseUninstall>
+    <IntroInstall Type="post" Lang="en" Title="Change Email sender module"><![CDATA[
+            To send the email through different SMTP servers, set the SysConfig option SendmailModule<br />
+ in group "Framework" and subgroup "Core::Sendmail" to <br />
+MultiSMTP.<br /><br />
+    ]]></IntroInstall>
+    <IntroInstall Type="post" Lang="de" Title="E-Mail-Modul ändern"><![CDATA[
+            Zur Nutzung unterschiedlicher SMTP-Server müssen Sie die Einstellung SendmailModule in der SysConfig<br />
+ ändern. Die Option können Sie in der Gruppe<br />
+"Framework" und Subgruppe "Core::Sendmail" finden.<br /><br />
+    ]]></IntroInstall>
+</otrs_package>

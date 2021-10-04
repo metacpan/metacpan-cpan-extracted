@@ -75183,3 +75183,9 @@ K/KU/KUERBIS/Term-TablePrint-0.145.tar.gz
 P/PE/PERLANCAR/Tree-From-Struct-0.041.tar.gz
 P/PE/PERLANCAR/WordLists-EN-Adverb-0.002.tar.gz
 C/CA/CARELINE/Netstack-0.011.tar.gz
+M/ME/MERKYS/Graph-Nauty-0.3.7.tar.gz
+E/ET/ETHER/JSON-Schema-Modern-0.521.tar.gz
+D/DI/DISTLER/MathML-itex2MML-1.6.1.tar.gz
+H/HO/HOUSTON/Net-EPP-Registry-Nominet-0.06.tar.gz
+P/PE/PERLSRVDE/OPM-Validate-1.10.tar.gz
+M/MA/MATY/PMLTQ-Suggest-1.1.1.tar.gz
