@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::AndroidInput;
-$Playwright::AndroidInput::VERSION = '0.015';
+$Playwright::AndroidInput::VERSION = '0.016';
 use parent 'Playwright::Base';
 
 sub new {
@@ -20,7 +20,7 @@ sub new {
 
 sub tap {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'tap',
         object  => $self->{guid},
@@ -28,29 +28,9 @@ sub tap {
     );
 }
 
-sub swipe {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'swipe',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub press {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'press',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub type {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'type',
         object  => $self->{guid},
@@ -60,7 +40,7 @@ sub type {
 
 sub drag {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'drag',
         object  => $self->{guid},
@@ -68,9 +48,29 @@ sub drag {
     );
 }
 
+sub press {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'press',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub swipe {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'swipe',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
 sub on {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'on',
         object  => $self->{guid},
@@ -80,7 +80,7 @@ sub on {
 
 sub evaluate {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'evaluate',
         object  => $self->{guid},
@@ -90,7 +90,7 @@ sub evaluate {
 
 sub evaluateHandle {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'evaluateHandle',
         object  => $self->{guid},
@@ -112,7 +112,7 @@ Playwright::AndroidInput - Automatically generated class for Playwright::Android
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 CONSTRUCTOR
 
@@ -129,18 +129,6 @@ Execute the AndroidInput::tap playwright routine.
 
 See L<https://playwright.dev/api/class-AndroidInput#AndroidInput-tap> for more information.
 
-=head2 swipe(@args)
-
-Execute the AndroidInput::swipe playwright routine.
-
-See L<https://playwright.dev/api/class-AndroidInput#AndroidInput-swipe> for more information.
-
-=head2 press(@args)
-
-Execute the AndroidInput::press playwright routine.
-
-See L<https://playwright.dev/api/class-AndroidInput#AndroidInput-press> for more information.
-
 =head2 type(@args)
 
 Execute the AndroidInput::type playwright routine.
@@ -152,6 +140,18 @@ See L<https://playwright.dev/api/class-AndroidInput#AndroidInput-type> for more 
 Execute the AndroidInput::drag playwright routine.
 
 See L<https://playwright.dev/api/class-AndroidInput#AndroidInput-drag> for more information.
+
+=head2 press(@args)
+
+Execute the AndroidInput::press playwright routine.
+
+See L<https://playwright.dev/api/class-AndroidInput#AndroidInput-press> for more information.
+
+=head2 swipe(@args)
+
+Execute the AndroidInput::swipe playwright routine.
+
+See L<https://playwright.dev/api/class-AndroidInput#AndroidInput-swipe> for more information.
 
 =head2 on(@args)
 

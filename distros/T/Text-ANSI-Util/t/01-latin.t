@@ -143,10 +143,17 @@ subtest "ta_wrap" => sub {
     is($res, $cres, "color code in parabreak")
         or diag dump([split /^/, $cres], [split /^/, $res]);
 
-    # XXX fli opt
-    # XXX fli deduced
-    # XXX fli opt
-    # XXX sli deduced
+    $res  = ta_wrap("12345 123", 7, {flindent=>"xx", slindent=>"x"});
+    $cres = "xx12345\nx123";
+    is($res, $cres, "flindent & slindent opts (no color codes)")
+        or diag dump([split /^/, $cres], [split /^/, $res]);
+
+    $res  = ta_wrap("\e[1m1\e[0m23\e[31m45 123\e[0m", 7, {flindent=>"xx", slindent=>"x"});
+    $cres = "xx\e[1m1\e[0m23\e[31m45\e[0m\n\e[31mx123\e[0m";
+    is($res, $cres, "flindent & slindent opts (with color codes)")
+        or diag dump([split /^/, $cres], [split /^/, $res]);
+
+    # XXX flindent & slindent deduced
     # XXX pad opt
 
     $res = ta_wrap("12345 123", 10, {return_stats=>1});

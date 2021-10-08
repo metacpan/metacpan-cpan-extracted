@@ -5,7 +5,7 @@ package Config::XrmDatabase::Types;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Type::Utils -all;
 use Types::Standard qw( Enum CodeRef );
@@ -44,7 +44,7 @@ Config::XrmDatabase::Types - Types for Config::XrmDatabase;
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SUPPORT
 

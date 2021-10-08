@@ -182,14 +182,18 @@ Returns the video's Vimeo ID (numeric).
 
 Returns the video's title, or (long description).  
 
-=item $video->B<getIconURL>()
+=item $video->B<getIconURL>(['artist'])
 
 Returns the URL for the video's "cover art" icon image, if any.
+If B<'artist'> is specified, the channel artist's icon url is returned, 
+if any.
 
-=item $video->B<getIconData>()
+=item $video->B<getIconData>(['artist'])
 
 Returns a two-element array consisting of the extension (ie. "png", 
 "gif", "jpeg", etc.) and the actual icon image (binary data), if any.
+If B<'artist'> is specified, the channel artist's icon data is returned, 
+if any.
 
 =item $video->B<getImageURL>()
 
@@ -430,6 +434,8 @@ sub new
 			}
 			if ($cnt) {
 				$self->{'artist'} = $1  if ($html =~ s#\"owner\"\:\{.*?\"name\"\:\"([^\"]+)\"#STREAMFINDERMARK#s);
+				$self->{'articonurl'} = $1  if ($html =~ m#STREAMFINDERMARK.*?\"img\"\:\"([^\"]+)\"#s);
+				print "----ALT ART (CHANNEL) ICON=".$self->{'articonurl'}."=\n"  if ($DEBUG);
 				$self->{'albumartist'} = $1  if ($html =~ s#STREAMFINDERMARK.*?\"url\"\:\"([^\"]+)\"##s);
 			}
 		}
@@ -496,6 +502,7 @@ RETRYIT:
 	$self->{'title'} = uri_unescape($self->{'title'});
 	$self->{'description'} ||= $self->{'title'};
 	$self->{'iconurl'} ||= $self->{'imageurl'}  if ($self->{'imageurl'});
+	$self->{'iconurl'} ||= $self->{'articonurl'}  if ($self->{'articonurl'});
 	$self->{'total'} = $self->{'cnt'};
 	$self->{'Url'} = ($self->{'total'} > 0) ? $self->{'streams'}->[0] : '';
 	print STDERR "--SUCCESS: 1st stream=".$self->{'Url'}."= total=".$self->{'total'}."=\n"

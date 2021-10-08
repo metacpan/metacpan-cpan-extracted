@@ -9,6 +9,10 @@ describe 'My test' => sub {
 	it 'returns correctly' => sub {
 		is(Module::Code::foo(), 'bar');
 	};
+
+	it "is inside provetdd" => sub {
+		ok($ENV{IS_PROVETDD});
+	};
 };
 
-runtests;
+runtests(@ARGV) unless caller;

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.53;
+package Object::Pad 0.54;
 
 use v5.14;
 use warnings;
@@ -362,11 +362,14 @@ the role.
 =head2 has
 
    has $var;
-   has $var = EXPR;
    has @var;
    has %var;
 
    has $var :ATTR ATTR...;
+
+   has $var = EXPR;
+
+   has $var { BLOCK };
 
 Declares that the instances of the class or role have a member field of the
 given name. This member field (called a "slot") will be accessible as a
@@ -385,7 +388,29 @@ which will be assigned into the slot of every instance during the constructor
 before the C<BUILD> blocks are invoked. I<Since version 0.29> this expression
 does not have to be a compiletime constant, though it is evaluated exactly
 once, at runtime, after the class definition has been parsed. It is not
-evaluated individually for every object instance of that class.
+evaluated individually for every object instance of that class. I<Since
+version 0.54> this is also permitted on array and hash slots.
+
+=head3 Slot Initialiser Blocks
+
+I<Since version 0.54> a deferred statement block is also permitted, on any
+slot variable type. This is an B<experimental> feature that permits code to be
+executed as part of the instance constructor, rather than running just once
+when the class is set up. Code in a slot initialisation block is roughly
+equivalent to being placed in a C<BUILD> or C<ADJUST> block.
+
+Control flow that attempts to leave a slot initialiser block is not permitted.
+This includes any C<return> expression, any C<next/last/redo> outside of a
+loop, with a dynamically-calculated label expression, or with a label that it
+doesn't appear in. C<goto> statements are also currently forbidden, though
+known-safe ones may be permitted in future.
+
+Loop control expressions that are known at compiletime to affect a loop that
+they appear within are permitted.
+
+   has $slot { foreach(@list) { next; } }       # this is fine
+
+   has $slot { LOOP: while(1) { last LOOP; } }  # this is fine too
 
 The following slot attributes are supported:
 
@@ -485,13 +510,18 @@ This is only permitted on scalar slots. If no name is given, the name of the
 slot is used. A single prefix character C<_> will be removed if present.
 
 Any slot that has C<:param> but does not have a default initialisation
-expression becomes a required argument to the constructor. Attempting to
-invoke the constructor without a named argument for this will throw an
+expression or block becomes a required argument to the constructor. Attempting
+to invoke the constructor without a named argument for this will throw an
 exception. In order to make a parameter optional, make sure to give it a
 default expression - even if that expression is C<undef>:
 
    has $x :param;          # this is required
    has $z :param = undef;  # this is optional
+
+Any slot that has a C<:param> and an initialisation block will only run the
+code in the block if required by the constructor. If a named parameter is
+passed to the constructor for this slot, then its code block will not be
+executed.
 
 Values for slots are assigned by the constructor before any C<BUILD> blocks
 are invoked.

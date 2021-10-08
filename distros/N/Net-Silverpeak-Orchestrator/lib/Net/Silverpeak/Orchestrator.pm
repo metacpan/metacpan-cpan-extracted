@@ -1,5 +1,5 @@
 package Net::Silverpeak::Orchestrator;
-$Net::Silverpeak::Orchestrator::VERSION = '0.002000';
+$Net::Silverpeak::Orchestrator::VERSION = '0.003000';
 # ABSTRACT: Silverpeak Orchestrator REST API client library
 
 use 5.024;
@@ -301,6 +301,32 @@ sub delete_servicegroup($self, $name) {
     return 1;
 }
 
+
+sub list_domain_applications($self, $resource_key='userDefined') {
+    my $res = $self->get('/gms/rest/applicationDefinition/dnsClassification',
+        { resourceKey => $resource_key });
+    $self->_error_handler($res)
+        unless $res->code == 200;
+    return $res->data;
+}
+
+
+sub create_or_update_domain_application($self, $domain, $data) {
+    $data->{domain} = $domain;
+    my $res = $self->post('/gms/rest/applicationDefinition/dnsClassification2/domain', $data);
+    $self->_error_handler($res)
+        unless $res->code == 200;
+    return 1;
+}
+
+
+sub delete_domain_application($self, $domain) {
+    my $res = $self->delete('/gms/rest/applicationDefinition/dnsClassification/' . $domain);
+    $self->_error_handler($res)
+        unless $res->code == 200;
+    return 1;
+}
+
 1;
 
 __END__
@@ -315,7 +341,7 @@ Net::Silverpeak::Orchestrator - Silverpeak Orchestrator REST API client library
 
 =head1 VERSION
 
-version 0.002000
+version 0.003000
 
 =head1 SYNOPSIS
 
@@ -484,6 +510,27 @@ Throws an exception on error.
 =head2 delete_servicegroup
 
 Takes a service group name.
+
+Returns true on success.
+
+Throws an exception on error.
+
+=head2 list_domain_applications
+
+Returns an arrayref of domain name applications for a resource key which
+defaults to 'userDefined'.
+
+=head2 create_or_update_domain_application
+
+Takes a domain name application domain, not name, and a hashref of its config.
+
+Returns true on success.
+
+Throws an exception on error.
+
+=head2 delete_domain_application
+
+Takes a domain name, not application name.
 
 Returns true on success.
 

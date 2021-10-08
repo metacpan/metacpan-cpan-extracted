@@ -15,9 +15,9 @@ extends 'Perinci::CmdLine::Base';
 
 # put global variables alphabetically here
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-01'; # DATE
+our $DATE = '2021-10-02'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.910'; # VERSION
+our $VERSION = '1.911'; # VERSION
 
 # when debugging, use this instead of the above because Mo doesn't give clear
 # error message if base class has errors.
@@ -663,7 +663,7 @@ Perinci::CmdLine::Lite - A Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.910 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2021-10-01.
+This document describes version 1.911 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2021-10-02.
 
 =head1 SYNOPSIS
 

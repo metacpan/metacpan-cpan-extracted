@@ -10,9 +10,9 @@ use Log::ger;
 
 # put global variables alphabetically here
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-01'; # DATE
+our $DATE = '2021-10-02'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.910'; # VERSION
+our $VERSION = '1.911'; # VERSION
 
 sub meta {
     return {
@@ -84,7 +84,7 @@ Perinci::CmdLine::Plugin::DisablePlugin
 
 =head1 VERSION
 
-This document describes version 1.910 of Perinci::CmdLine::Plugin::DisablePlugin (from Perl distribution Perinci-CmdLine-Lite), released on 2021-10-01.
+This document describes version 1.911 of Perinci::CmdLine::Plugin::DisablePlugin (from Perl distribution Perinci-CmdLine-Lite), released on 2021-10-02.
 
 =head1 SYNOPSIS
 

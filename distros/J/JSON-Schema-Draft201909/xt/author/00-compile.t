@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More 0.94;
 
-plan tests => 14;
+plan tests => 7;
 
 my @module_files = (
     'JSON/Schema/Draft201909.pm',
@@ -14,14 +14,7 @@ my @module_files = (
     'JSON/Schema/Draft201909/Document.pm',
     'JSON/Schema/Draft201909/Error.pm',
     'JSON/Schema/Draft201909/Result.pm',
-    'JSON/Schema/Draft201909/Utilities.pm',
-    'JSON/Schema/Draft201909/Vocabulary.pm',
-    'JSON/Schema/Draft201909/Vocabulary/Applicator.pm',
-    'JSON/Schema/Draft201909/Vocabulary/Content.pm',
-    'JSON/Schema/Draft201909/Vocabulary/Core.pm',
-    'JSON/Schema/Draft201909/Vocabulary/Format.pm',
-    'JSON/Schema/Draft201909/Vocabulary/MetaData.pm',
-    'JSON/Schema/Draft201909/Vocabulary/Validation.pm'
+    'JSON/Schema/Draft201909/Utilities.pm'
 );
 
 

@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::PlaywrightException;
-$Playwright::PlaywrightException::VERSION = '0.015';
+$Playwright::PlaywrightException::VERSION = '0.016';
 use parent 'Playwright::Base';
 
 sub new {
@@ -20,7 +20,7 @@ sub new {
 
 sub on {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'on',
         object  => $self->{guid},
@@ -30,7 +30,7 @@ sub on {
 
 sub evaluate {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'evaluate',
         object  => $self->{guid},
@@ -40,7 +40,7 @@ sub evaluate {
 
 sub evaluateHandle {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'evaluateHandle',
         object  => $self->{guid},
@@ -62,7 +62,7 @@ Playwright::PlaywrightException - Automatically generated class for Playwright::
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 CONSTRUCTOR
 

@@ -1,0 +1,709 @@
+# PODNAME: Iterator::Flex::Manual::Overview
+# ABSTRACT: An Abstract overview of Iterators
+
+__END__
+
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
+=head1 NAME
+
+Iterator::Flex::Manual::Overview - An Abstract overview of Iterators
+
+=head1 VERSION
+
+version 0.14
+
+=head1 DESCRIPTION
+
+=head2 Iterator life-cycle
+
+There are four iterator states:
+
+=over
+
+=item 1
+
+L<initialized|/Initialized State>
+
+=item 2
+
+L<iteration|/Iteration State>
+
+=item 3
+
+L<exhausted|/Exhausted State>
+
+=item 4
+
+L<error|/Error State>
+
+=back
+
+An iterator typically moves sequentially from
+L<initialized|/Initialized State>
+to L<iteration|/Iteration State>
+to L<exhausted|/Exhausted State>.
+
+Non-sequential transitions may occur from I<non-error> states when
+
+=over
+
+=item *
+
+a data source is empty to begin with, in which case L</next> will
+transition from the L<initialized state|/Initialized State> directly to the
+L<exhausted state|/Exhausted State>.
+
+=item *
+
+something goes wrong, in which case the iterator will transition to
+the L<error state|/Error State>.
+
+=item *
+
+the iterator is L</reset>, in which case it transitions to the
+L<initialized state|/Initialized State>.
+
+=back
+
+Attempts to transition from an L<error state|/Error State> to another
+state result in undefined behavior.
+
+=head3 Initialized State
+
+An iterator is in the I<initialized> state immediately after it has been
+constructed, or if it has been L<reset|/reset>.
+
+In the initialized state,
+
+=over
+
+=item *
+
+L</next> will attempt to retrieve the first element from the data stream.
+
+=over
+
+=item *
+
+If the data stream is empty, the iterator transitions to the
+L</Exhausted State> and signals exhaustion.
+
+=item *
+
+If there was an error the iterator transitions to the L</Error State>
+and signals error.
+
+=item *
+
+otherwise, the iterator transitions to the L</Iteration State> and the
+element is returned.
+
+=back
+
+=item *
+
+L</prev> and L</current> (if they are supported) return an indeterminate value.
+
+=back
+
+=head3 Iteration State
+
+An iterator is in the I<iteration> state if the last call to L</next> successfully
+returned data.
+
+In the iteration state,
+
+=over
+
+=item *
+
+L</next> will attempt to retrieve the next element from the data stream.
+
+=over
+
+=item *
+
+If the data stream is empty, the iterator transitions to the
+L</Exhausted State> and signals exhaustion.
+
+=item *
+
+If there was an error, the iterator transitions to the L</Error State>
+and signals error.
+
+=item *
+
+otherwise, the element is returned.
+
+=back
+
+=item *
+
+L</prev> returns
+
+=over
+
+=item *
+
+an indeterminate value If the previous call to L</next> transitioned
+the iterator from the L</Initialized State>
+
+=item *
+
+otherwise, the value returned by the penultimate successful call to
+L</next>.
+
+=back
+
+=item *
+
+L</current> returns the value returned by the last successful call to
+L</next>.
+
+=back
+
+=head3 Exhausted State
+
+An iterator enters the I<exhausted> state after a call to L</next> when the iterator
+determines that there are no more data to retrieve.
+
+In this state,
+
+=over
+
+=item *
+
+L</prev> returns
+
+=over
+
+=item *
+
+an indeterminate value if the last L</next> call transitioned the
+iterator from the L</Initialized State>;
+
+=item *
+
+otherwise, the value returned by the penultimate successful call to L</next>.
+
+=back
+
+=item *
+
+L</current> returns an indeterminate value.
+
+=back
+
+For example, if the data are I<1, 2, 3>, the following expressions, executed
+in order, are all true.
+
+     1	 $iter->prev    == ?;  # indeterminate; in initialized state
+     2	 $iter->current == ?;  # indeterminate; in initialized state
+     3
+     4	 $iter->next    == 1;  # in iteration state
+     5	 $iter->prev    == ?;  # indeterminate
+     6	 $iter->current == 1;
+     7
+     8	 $iter->next    == 2;
+     9	 $iter->prev    == 1;  # from line 4
+    10	 $iter->current == 2;
+    11
+    12	 $iter->next    == 3;
+    13	 $iter->prev    == 2;
+    14	 $iter->current == 3;
+    15
+    16	 $iter->next;          # signals exhaustion;
+    17
+    18	 $iter->is_exhausted == 1;
+    19
+    20	 $iter->prev    == 3;
+    21	 $iter->current == ?;  # indeterminate
+    22	 $iter->next;          # still signals exhaustion;
+
+=head3 Error State
+
+An iterator transitions to the I<error> state when the iterator has
+determined that something went wrong.
+
+=head2 Signaling State Transitions
+
+The iterator signals transitions to the L<exhausted|/Exhausted State>
+and L<error|/Error State> states.
+
+=head3 Transitions to the Exhausted State
+
+Signaling exhaustion (via the C<signal_exhaustion> method) results in one of following actions:
+
+=over
+
+=item *
+
+throwing an exception of type C<Iterator::Flex::Failure::Exhausted>; or
+
+=item *
+
+returning a sentinel value
+
+=back
+
+The choice is made by the I<user> of the iterator; iterators use a generic signaling mechanism.
+
+=head3 Transitions to the Error State
+
+Signaling error (via the C<signal_error> method) results in one of following actions:
+
+=over
+
+=item *
+
+Throwing an exception of type C<Iterator::Flex::Failure::Error>.
+
+=back
+
+=head2 Capabilities
+
+C<Iterator::Flex> iterators have a single required capability, L</next>, as well as a number
+of optional capabilities.
+
+=head3 Required Capabilities
+
+=head4 next
+
+  # these are equivalent
+  $value = $iter->next;
+  $value = $iter->();
+
+This provides the ability to return the next element from the
+iterator. During the first call to L</next> the iterator transitions
+from the L<initialized state|/Initialized State> to another
+(L<iteration|/Iteration State>, L<exhausted|/Exhausted State>
+or L<error|/Error State>).
+
+If it has made it to the L<iteration state|/Iteration State>, it
+returns a valid value, otherwise, it signals either
+L<exhaustion|/Transitions to the Exhausted State>  or L<error|/Transitions to the Error State>.
+
+Invoking I<next> will either result in a valid value, or, if the
+iterator is exhausted, an indication of exhaustion, which may either
+be
+
+=over
+
+=item *
+
+A sentinel value, indicated by the I<Iterator::Flex::Role::Exhaustion::Return> role.
+
+=item *
+
+An exception,  indicated by the I<Iterator::Flex::Role::Exhaustion::Throw> role.
+
+=back
+
+=head3 Optional Capabilities
+
+=head4 prev
+
+  $value = $iter->prev;
+
+If the iterator is in the L<iteration state|/Iteration State>, it returns the
+value returned by the penultimate L</next> operation. If the last L</next>
+operation transitioned the iterator from the L<initialized state|/Initialized State>,
+it returns an indeterminate value.
+
+In any other state, it returns an indeterminate value.
+
+=head4 current
+
+  $value = $iter->current;
+
+If the iterator is in the L<iteration state|/Iteration State>, returns the
+value returned by the last L</next> operation.
+
+In any other state, it returns an indeterminate value.
+
+=head4 rewind
+
+  $iter->rewind;
+
+If the iterator is in the L<iteration state|/Iteration State>, ensures that
+the next L</next> operation will retrieve the first element from the
+data stream.
+
+Rewinding maintains the correctness of the L</prev> and L</current>
+capabilities, enabling cyclic iterators.
+
+For example, if the data are I<1, 2, 3>, the following expressions, executed
+in order, are all true.
+
+     1	 $iter->prev    == ?;  # indeterminate; in initialized state
+     2	 $iter->current == ?;  # indeterminate; in initialized state
+     3
+     4	 $iter->next    == 1;  # in iteration state
+     5	 $iter->prev    == ?;  # indeterminate
+     6	 $iter->current == 1;
+     7
+     8	 $iter->next    == 2;
+     9	 $iter->prev    == 1;  # from line 4
+    10	 $iter->current == 2;
+    11
+    12	 $iter->rewind;
+    13
+    14	 $iter->prev    == 1;  # no change
+    15	 $iter->current == 2;  # no change
+    16
+    17	 $iter->next    == 1;  # start all over
+    18	 $iter->current == 1;
+    19	 $iter->prev    == 2;  # from line 8
+    20
+    21	 $iter->next    == 2;
+    22	 $iter->current == 2;
+    23	 $iter->prev    == 1;  # from line 17
+
+=head4 reset
+
+  $iter->reset;
+
+Transitions the iterator to the L<initialized state|/Initialized State>.
+
+For example, if the data are I<1, 2, 3>, the following expressions, executed
+in order, are all true.
+
+     1	 $iter->prev    == ?;  # indeterminate; in initialized state
+     2	 $iter->current == ?;  # indeterminate; in initialized state
+     3
+     4	 $iter->next    == 1;  # in iteration state
+     5	 $iter->prev    == ?;  # indeterminate
+     6	 $iter->current == 1;
+     7
+     8	 $iter->next    == 2;
+     9	 $iter->prev    == 1;  # from line 4
+    10	 $iter->current == 2;
+    11
+    12	 $iter->reset;
+    14
+    15	 $iter->prev    == ?;  # indeterminate; in initialized state
+    16	 $iter->current == ?;  # indeterminate; in initialized state
+    17
+    18	 $iter->next    == 1;  # in iteration state
+    19	 $iter->prev    == ?;  # indeterminate
+    20	 $iter->current == 1;
+    21
+    22	 $iter->next    == 2;
+    23	 $iter->prev    == 1;  # from line 18
+    24	 $iter->current == 2;
+    25
+
+=head4 freeze
+
+  $state = $iter->freeze;
+  $iter = ithaw( $state );
+
+C<freeze> serializes the state of the iterator and the data stream so that the state
+can be saved and later restored. This puts significant constraints on
+the nature of the data source.
+
+C<ithaw> is a I<subroutine> (not a method) which is the opposite of
+L</freeze>.  Given a serialized iterator, it reconstitute it so that
+it behaves exactly as it would before it was frozen.  Under the hood
+it calls the C<thaw> method.
+
+=head2 Iterator Parameters
+
+Parameters are passed to iterator and attribute generators, either
+through the convenience functions in L<Iterator::Flex::Common>, the
+constructors in L<Iterator::Flex::Factory> or the constructors in
+bespoke iterator classes which subclass L<Iterator::Flex::Base>.
+
+=head3 Classes of Parameters
+
+There are three classes of parameters used by iterators and adapters:
+
+=over
+
+=item *
+
+I<Model> parameters are specific to a type of iterator.  For example, the
+L<cache|Iterator::Flex::Cache> iterator has a model parameter for the
+cache L<capacity|Iterator::Flex::Cache/capacity>.
+
+=item *
+
+I<Interface> parameters provide implementations of the capabilities that the
+iterator provides.
+
+=item *
+
+I<Signal> parameters define how the iterator signals exhaustion or error.
+
+=back
+
+Signal and Interface parameters are also called I<General Parameters>.
+
+=head3 Interface Parameters
+
+=over
+
+=item C<_self>
+
+A reference to a lexical variable which will be set by the iterator
+generator to a reference to the iterator object.  This is used only if
+the iterator class consumes the
+L<Iterator::Flex::Role::Next::ClosedSelf> role.
+
+=item C<_name>
+
+The name of the iterator to be used in error messages.  If not specified, it is set
+to the iterator class.
+
+=item C<state>
+
+A reference to a lexical variable which will reflect whether the state
+is one of L<exhaustion|/Exhausted State>, L<error|/Error State>, or
+something else.  This is used if the iterator class consumes the
+L<Iterator::Flex::Role::State::Closure> role.  (The alternative is for
+the state to be stored in the iterator registry by consuming the
+L<Iterator::Flex::Role::State::Registry> role).
+
+Using this functionality the state stored in the lexical variable can
+be accessed directly from iterator closures and compared to one of the
+constants C<IterState_EXHAUSTED> or C<IterState_ERROR> (see
+L<Iterator::Flex::Utils/Iterator State Constants>).
+
+The state is also queryable via the
+L<is_exhausted|Iterator::Flex::Base/is_exhausted> and
+L<is_error|Iterator::Flex::Base/is_error> iterator object methods.
+
+=item C<class>
+
+The class which will consume iterator roles and from which the object
+will be instantiated.  This option is only used by
+L<Iterator::Flex::Factory> generators.  It defaults to
+L<Iterator::Flex::Base>.
+
+=item C<next>
+
+A code reference which returns the next element in the data source.
+This will be made available as the object method C<next>, but
+may also be invoked directly as a subroutine (e.g. C<$next->()> ).
+
+Access to the iterator object can be obtained by either:
+
+=over
+
+=item *
+
+specifying the L</_self> parameter
+and applying the L<Iterator::Flex::Role::Next::ClosedSelf>
+role to the class.
+
+=item *
+
+applying the L<Iterator::Flex::Role::Wrap::Self> role.  The results
+in the creation of a wrapper ensuring that the code reference is
+always invoked as an object method.
+
+=back
+
+=item C<prev>
+
+A code reference which returns the value retrieved by the penultimate
+call to L</next>.  This will be made available as the object method C<prev>.
+
+This is used only if the iterator class consumes the
+L<Iterator::Flex::Role::Prev::Closure> role.
+
+Classes constructed via the L<Iterator::Flex::Factory> constructors will automatically
+be composed with the L<Iterator::Flex::Role::Prev::Method> if the L</prev> parameter
+is not specified and the class specified by the L</class> parameter provides a C<prev>
+object method.
+
+Bespoke classes should apply the L<Iterator::Flex::Role::Prev::Method>
+role using the L<Iterator::Flex::Base/_add_roles> class method.
+
+=item C<current>
+
+A code reference which returns the value retrieved by the last call to L</next>.
+This will be made available as the object method C<current>.
+
+This is used only if the iterator class consumes the
+L<Iterator::Flex::Role::Current::Closure> role.
+
+Classes constructed via the L<Iterator::Flex::Factory> constructors will automatically
+be composed with the L<Iterator::Flex::Role::Current::Method> if the L</prev> parameter
+is not specified and the class specified by the L</class> parameter provides a C<prev>
+object method.
+
+Bespoke classes should apply the L<Iterator::Flex::Role::Current::Method>
+role using the L<Iterator::Flex::Base/_add_roles> class method.
+
+=item C<reset>
+
+A code reference which will restore the iterator to the L<initialized
+state|/Initialized State>.
+
+This is used only if the iterator class consumes the
+L<Iterator::Flex::Role::Reset::Closure> role.
+
+Classes constructed via the L<Iterator::Flex::Factory> constructors will automatically
+be composed with the L<Iterator::Flex::Role::Reset::Method> if the L</prev> parameter
+is not specified and the class specified by the L</class> parameter provides a C<prev>
+object method.
+
+Bespoke classes should apply the L<Iterator::Flex::Role::Reset::Method>
+role using the L<Iterator::Flex::Base/_add_roles> class method.
+
+The state variable (accessible via the
+L<is_exhausted|Iterator::Flex::Base/is_exhausted> and
+L<is_error|Iterator::Flex::Base/is_error> iterator object methods)
+will automatically be reset.
+
+If the iterator is an adapter depending upon other iterators, they
+will automatically be reset.
+
+=item C<rewind>
+
+A code reference which will ensure that the next call to L</next> returns the first
+element in the data stream.
+
+This is used only if the iterator class consumes the
+L<Iterator::Flex::Role::Rewind::Closure> role.
+
+Classes constructed via the L<Iterator::Flex::Factory> constructors will automatically
+be composed with the L<Iterator::Flex::Role::Rewind::Method> if the L</prev> parameter
+is not specified and the class specified by the L</class> parameter provides a C<prev>
+object method.
+
+Bespoke classes should apply the L<Iterator::Flex::Role::Rewind::Method>
+role using the L<Iterator::Flex::Base/_add_roles> class method.
+
+If the iterator is an adapter depending upon other iterators, they
+will automatically be rewound.
+
+=item C<freeze>
+
+A code reference which returns a serialized version of the iterator.
+See L<Iterator::Flex::Manual::Serialization> and
+L<Iterator::Flex::Manual::Caveats/Serialization>.
+
+=item C<methods>
+
+A hash whose keys are method names and whose values are coderefs.
+These will be added as methods to the iterator class.
+Useful for making a set of closures available as methods.
+
+=item C<_depends>
+
+A list of iterator objects that the adapter depends upon. Used by
+iterator adapters.  Automatically added by L<Iterator::Flex::Factory>
+constructors.  Bespoke classes must provide this explicitly.
+
+=back
+
+=head3 Signal Exhaustion
+
+=over
+
+=item C<input_exhaustion>
+
+This applies only to iterator adapters, and indicates how the consumed iterator signals exhaustion.
+It may have one of the following values:
+
+=over
+
+=item C<throw>
+
+Throw an exception of L<Iterator::Flex::Failure::Exhaustion|Iterator::Flex::Failure/Exhaustion>.
+
+=item C<< [ throw => 'passthrough' ] >>
+
+Only for adapters; the consumed iterator will throw on exhaustion; let that exception propagate.
+
+=item C<< [ throw => $coderef ] >>
+
+Invoke C<$coderef>.  If it does not throw, an exception of
+L<Iterator::Flex::Failure::Exhaustion|Iterator::Flex::Failure/Exhaustion>. will
+be thrown.
+
+=item C<return>
+
+For both iterators and adapters, indicates that a sentinel value of
+c<undef> will be returned.
+
+=item C<< [ return => $value ] >>
+
+For both iterators and adapters, indicates that the specified sentinel value will be returned.
+
+=back
+
+=item C<exhaustion>
+
+This applies to both iterators and  adapters, and indicates how they signal exhaustion.
+It takes the same values as L</input_exhaustion>
+
+=item C<error>
+
+This applies to both iterators and  adapters, and indicates how they signal error.
+It may have one of the following values:
+
+=over
+
+=item C<throw>
+
+Throw an exception of L<Iterator::Flex::Failure::Error|Iterator::Flex::Failure/Error>.
+
+=item C<< [ throw => $coderef ] >>
+
+Invoke C<$coderef>.  If it does not throw, an exception of  L<Iterator::Flex::Failure::Error|Iterator::Flex::Failure/Error>. will be thrown.
+
+=back
+
+=back
+
+=head1 SUPPORT
+
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-iterator-flex@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Iterator-Flex>
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/iterator-flex
+
+and may be cloned from
+
+  https://gitlab.com/djerius/iterator-flex.git
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<Iterator::Flex|Iterator::Flex>
+
+=item *
+
+L<Iterator::Flex::Manual|Iterator::Flex::Manual>
+
+=back
+
+=head1 AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

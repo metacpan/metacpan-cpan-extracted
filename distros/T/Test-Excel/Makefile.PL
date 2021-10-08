@@ -11,7 +11,7 @@ WriteMakefile(
     VERSION_FROM       => 'lib/Test/Excel.pm',
     ABSTRACT_FROM      => 'lib/Test/Excel.pm',
     LICENSE            => 'artistic_2',
-    MIN_PERL_VERSION   => 5.006,
+    MIN_PERL_VERSION   => 5.010,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
     },
@@ -32,7 +32,7 @@ WriteMakefile(
     clean => { FILES => 'Test-Excel-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
-        provides    => { 'Test::Excel' => { file => 'lib/Test/Excel.pm', version => '1.49' } },
+        provides    => { 'Test::Excel' => { file => 'lib/Test/Excel.pm', version => '1.50' } },
         resources   => {
             repository => {
                 type => 'git',

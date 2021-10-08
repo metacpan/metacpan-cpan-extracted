@@ -185,14 +185,18 @@ Returns the video's Rumble ID (alphanumeric).
 
 Returns the video's title, or (long description).  
 
-=item $video->B<getIconURL>()
+=item $video->B<getIconURL>(['artist'])
 
 Returns the URL for the video's "cover art" icon image, if any.
+If B<'artist'> is specified, the channel artist's icon url is returned, 
+if any.
 
-=item $video->B<getIconData>()
+=item $video->B<getIconData>(['artist'])
 
 Returns a two-element array consisting of the extension (ie. "png", 
 "gif", "jpeg", etc.) and the actual icon image (binary data), if any.
+If B<'artist'> is specified, the channel artist's icon data is returned, 
+if any.
 
 =item $video->B<getImageURL>()
 
@@ -431,7 +435,11 @@ sub new
 			$self->{'iconurl'} ||= $1  if ($html =~ m#\<meta\s+property\=\"?og\:image\"?\s+content\=\"?([^\<]+)\<#s);
 			$self->{'iconurl'} =~ s/\"$//;
 			$self->{'imageurl'} = $self->{'iconurl'};
-		
+			if ($html =~ m#i\.user\-image\-\-img\-\-id\-[0-9a-f]+\s+\{([^\}]+)#s) {
+				my $stuff = $1;
+				$self->{'articonurl'} = $1  if ($stuff =~ m#url\(([^\)]+)#);
+			}
+
 			if ($html =~ m#Published(.+?)\<span#s) {
 				my $published = $1;
 				$self->{'year'} = $1  if ($published =~ /(\d\d\d\d)/);
@@ -523,6 +531,7 @@ sub new
 		$self->{$field} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/eg;
 	}
 	$self->{'title'} =~ s/\s+\-\s+$self->{'artist'}\s*$//;  #CONVERT "Title - Artist" => "Title"
+	$self->{'iconurl'} ||= $self->{'articonurl'}  if ($self->{'articonurl'});
 	$self->{'imageurl'} = $self->{'iconurl'};
 	$self->{'total'} = $self->{'cnt'};
 	$self->{'Url'} = ($self->{'cnt'} > 0) ? $self->{'streams'}->[0] : '';

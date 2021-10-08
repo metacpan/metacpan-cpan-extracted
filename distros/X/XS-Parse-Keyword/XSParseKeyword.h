@@ -10,6 +10,7 @@ struct XSParseKeywordPieceType {
     char                                  c;      /* LITERALCHAR */
     const char                           *str;    /* LITERALSTR */
     const struct XSParseKeywordPieceType *pieces; /* SCOPEs */
+    void                                (*callback)(pTHX_ void *hookdata); /* SETUP */
   } u;
 };
 
@@ -42,6 +43,8 @@ enum {
 
   XS_PARSE_KEYWORD_INFIX = 0x40,      /* infix */
 
+  XS_PARSE_KEYWORD_SETUP = 0x70,      /* invokes callback, emits nothing */
+
   XS_PARSE_KEYWORD_SEQUENCE = 0x80,   /* contained */
   XS_PARSE_KEYWORD_REPEATED,          /* i, contained */
   XS_PARSE_KEYWORD_CHOICE,            /* i, contained */
@@ -65,10 +68,12 @@ enum {
   XPK_TYPEFLAG_SPECIAL  = (1<<17), /* on XPK_BLOCK: scoped
                                       on XPK_LEXVAR: my */
 
-  /* These three are shifted versions of perl's G_VOID, G_SCALAR, G_ARRAY */
+  /* These three are shifted versions of perl's G_VOID, G_SCALAR, G_LIST */
   XPK_TYPEFLAG_G_VOID   = (1<<18),
   XPK_TYPEFLAG_G_SCALAR = (2<<18),
-  XPK_TYPEFLAG_G_LIST   = (3<<18), /* yes it's called LIST, not ARRAY */
+  XPK_TYPEFLAG_G_LIST   = (3<<18),
+
+  XPK_TYPEFLAG_ENTERLEAVE = (1<<20), /* wrap ENTER/LEAVE pair around the item */
 };
 
 #define XPK_BLOCK_flags(flags) {.type = XS_PARSE_KEYWORD_BLOCK|(flags), .u.pieces = NULL}
@@ -77,8 +82,12 @@ enum {
 #define XPK_BLOCK_SCALARCTX    XPK_BLOCK_flags(XPK_TYPEFLAG_SPECIAL|XPK_TYPEFLAG_G_SCALAR)
 #define XPK_BLOCK_LISTCTX      XPK_BLOCK_flags(XPK_TYPEFLAG_SPECIAL|XPK_TYPEFLAG_G_LIST)
 
-#define XPK_PREFIXED_BLOCK(...) \
-  {.type = XS_PARSE_KEYWORD_BLOCK, .u.pieces = (const struct XSParseKeywordPieceType []){ __VA_ARGS__, {0} }}
+#define XPK_PREFIXED_BLOCK_flags(flags,...) \
+  {.type = XS_PARSE_KEYWORD_BLOCK|flags, .u.pieces = (const struct XSParseKeywordPieceType []){ __VA_ARGS__, {0} }}
+#define XPK_PREFIXED_BLOCK(...)            XPK_PREFIXED_BLOCK_flags(0, __VA_ARGS__)
+#define XPK_PREFIXED_BLOCK_ENTERLEAVE(...) XPK_PREFIXED_BLOCK_flags(XPK_TYPEFLAG_ENTERLEAVE, __VA_ARGS__)
+
+#define XPK_SETUP(setup)       {.type = XS_PARSE_KEYWORD_SETUP, .u.callback = setup}
 
 #define XPK_ANONSUB {.type = XS_PARSE_KEYWORD_ANONSUB}
 

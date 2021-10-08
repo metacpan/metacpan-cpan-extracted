@@ -1,0 +1,20 @@
+Revision history for Perl extension Geo::GoogleEarth::Pluggable::Plugin::AsGeoJSON.
+
+0.05 2021-10-06
+  - Cleaned up for public release on GitHub and CPAN
+  - Moved from BSD to MIT license
+  - Updated module to not import json decode function
+
+0.04 2016-07-15
+  - Moved Polygon and MultiPolygon logic to Geo::GoogleEarth::Pluggable and left only a simple wrapper.
+  - Added example script Geo-GoogleEarth-Pluggable-Plugin-AsGeoJSON-example.pl
+  - Added LineString Support
+
+0.03 2016-07-14
+  - Added initial support for Polygon and MultiPolygon
+
+0.02 2016-07-13
+  - Fixed Unsupported Type logic
+
+0.01 2016-07-13
+  - original version

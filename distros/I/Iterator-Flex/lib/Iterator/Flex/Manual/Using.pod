@@ -1,0 +1,132 @@
+# PODNAME: Iterator::Flex::Manual::Using
+# ABSTRACT: How to use an Iterator::Flex iterator
+
+__END__
+
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
+=head1 NAME
+
+Iterator::Flex::Manual::Using - How to use an Iterator::Flex iterator
+
+=head1 VERSION
+
+version 0.14
+
+=head1 DESCRIPTION
+
+=head2 Construction
+
+The first thing to do is to construct one.  L<Iterator::Flex::Common> provides
+a number of easy-to-use front-ends, so
+
+=head2 Iteration
+
+=head2 Exhaustion
+
+=head2 Errors
+
+=head1 METHODS
+
+Not all iterators support all methods.
+
+=over
+
+=item prev
+
+  $value = $iter->prev;
+
+Returns the previous value of the iterator.  If the iterator was never
+advanced, this returns C<undef>.  If the iterator is exhausted, this
+returns the last retrieved value.
+
+=item current
+
+  $value = $iter->current;
+
+Returns the current value of the iterator.  If the iterator was never
+advanced, this returns undef.  If the iterator is exhausted, this
+returns C<undef>.
+
+=item next
+
+  $value = $iter->next;
+
+Return the next value from the iterator.
+
+=item rewind
+
+  $iter->rewind;
+
+Resets the iterator so that the next value returned is the very first
+value.  It should not affect the results of the L</prev> and L</current>
+methods.
+
+=item reset
+
+  $iter->reset;
+
+Resets the iterator to its initial state.  The iterator's state is not
+changed.
+
+=item is_exhausted
+
+  $iter->is_exhausted;
+
+True if the iterator is in the L<exhausted state|Iterator::Flex::Manual::Overview/Exhausted State>.
+
+=item is_error
+
+  $iter->is_error;
+
+True if the iterator is in the L<error state|Iterator::Flex::Manual::Overview/Error State>.
+
+=back
+
+=head1 SUPPORT
+
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-iterator-flex@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Iterator-Flex>
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/iterator-flex
+
+and may be cloned from
+
+  https://gitlab.com/djerius/iterator-flex.git
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<Iterator::Flex|Iterator::Flex>
+
+=item *
+
+L<Iterator::Flex::Manual|Iterator::Flex::Manual>
+
+=back
+
+=head1 AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

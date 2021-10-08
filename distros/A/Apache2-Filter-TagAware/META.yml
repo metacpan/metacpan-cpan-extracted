@@ -1,21 +1,25 @@
 ---
-name: Apache2-Filter-TagAware
-version: 0.02
+abstract: 'Tag Awareness for Apache2::Filter'
 author:
-  - Adam Prime (adam.prime@utoronto.ca)
-abstract: Tag Awareness for Apache2::Filter
-license: perl
-resources:
-  license: http://dev.perl.org/licenses/
-requires:
-  mod_perl2: 2
+  - 'Adam Prime (adam.prime@utoronto.ca)'
 build_requires:
-  Apache::Test: 1.12
+  Apache::Test: '1.12'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Apache2-Filter-TagAware
 provides:
   Apache2::Filter::TagAware:
     file: lib/Apache2/Filter/TagAware.pm
-    version: 0.02
-generated_by: Module::Build version 0.2808
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+    version: '0.03'
+requires:
+  mod_perl2: '2'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

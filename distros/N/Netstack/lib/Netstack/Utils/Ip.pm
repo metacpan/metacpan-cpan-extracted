@@ -14,8 +14,8 @@ use Netstack::Utils::Set;
 has addrRegex => (
   is      => 'ro',
   default => sub {
-    my $self = shift;
-    return qr/^(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})$/;
+    qr/^(?:(?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})\.){3}
+    (?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})$/mx;
   }
 );
 
@@ -25,9 +25,11 @@ has addrRegex => (
 has rangeRegex => (
   is      => 'ro',
   default => sub {
-    my $self = shift;
-    return
-      qr/^(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})-(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})$/;
+    qr/^(?:(?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})\.){3}
+    (?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})
+    -
+    (?:(?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})\.){3}
+    (?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})$/mx;
   },
 );
 
@@ -37,9 +39,10 @@ has rangeRegex => (
 has subRangeRegex => (
   is      => 'ro',
   default => sub {
-    my $self = shift;
-    return
-      qr/^(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})-(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})$/;
+    qr/^(?:(?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})\.){3}
+    (?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})
+    -
+    (?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})$/mx;
   },
 );
 
@@ -49,9 +52,10 @@ has subRangeRegex => (
 has ipMask => (
   is      => 'ro',
   default => sub {
-    my $self = shift;
-    return
-      qr/^(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\/(?:[1-9]|[12][0-9]|3[0-2])$/;
+    qr/^(?:(?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})\.){3}
+    (?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})
+    \/
+    (?:[1-9]|[12][0-9]|3[0-2])$/mx;
   },
 );
 
@@ -61,11 +65,62 @@ has ipMask => (
 has ipRange => (
   is      => 'ro',
   default => sub {
-    my $self = shift;
-    return
-      qr/(^(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})-(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})$)|(^(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})-(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})$)/;
+    qr/(^(?:(?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})\.){3}
+    (?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})
+    -
+    (?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})$)
+    |
+    (^(?:(?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})\.){3}
+    (?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})
+    -
+    (?:(?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})\.){3}
+    (?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})$)/mx;
   },
 );
+
+#------------------------------------------------------------------------------
+# isIpv4 检验是否为 V4 地址
+#------------------------------------------------------------------------------
+sub isIpv4 {
+  my $ip = shift || return;
+
+  # Check for invalid chars
+  unless ( $ip =~ m/^[\d\.]+$/ ) {
+    return 0;
+  }
+
+  if ( $ip =~ m/^\./ ) {
+    return 0;
+  }
+
+  if ( $ip =~ m/\.$/ ) {
+    return 0;
+  }
+
+  # Single Numbers are considered to be IPv4
+  if ( $ip =~ m/^(\d+)$/ and $1 < 256 ) { return 1 }
+
+  # Count quads
+  my $n = ( $ip =~ tr/\./\./ );
+
+  # IPv4 must have from 1 to 4 quads
+  unless ( $n >= 0 and $n < 4 ) {
+    return 0;
+  }
+
+  # Check for empty quads
+  if ( $ip =~ m/\.\./ ) {
+    return 0;
+  }
+
+  foreach ( split /\./, $ip ) {
+    # Check for invalid quads
+    unless ( $_ >= 0 and $_ < 256 ) {
+      return 0;
+    }
+  }
+  return 1;
+}
 
 #------------------------------------------------------------------------------
 # 定义 Netstack::Utils::Ip 方法属性
@@ -75,40 +130,58 @@ sub getRangeFromIpRange {
   # 入参检查
   confess __PACKAGE__ . "必须提供 ipRange (min, max)"
     unless ( defined $ipMin and defined $ipMax );
+  confess __PACKAGE__ . "must provide two ipv4 object"
+    unless ( isIpv4($ipMin) and isIpv4($ipMax) );
 
+  # 将 ipaddr 转换为十进制
   my $min = $self->changeIpToInt($ipMin);
   my $max = $self->changeIpToInt($ipMax);
+  # 返回计算结果
   return wantarray
     ? ( $min, $max )
     : Netstack::Utils::Set->new( $min, $max );
 }
 
 #------------------------------------------------------------------------------
-# getRangeFromIpMask 通过 ip/mask掩码方式生产 IpSet
+# getRangeFromIpMask 通过 ip/mask掩码方式生成 IpSet 集合对象
 #------------------------------------------------------------------------------
 sub getRangeFromIpMask {
   my ( $self, $ip, $mask ) = @_;
 
   # 匹配 1.1.1.1-2.2.2.2 样式
-  if ( $ip =~ $self->rangeRegex ) {
+  if (
+    $ip =~ /^(?:(?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})\.){3}
+    (?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})
+    -
+    (?:(?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})\.){3}
+    (?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})$/mx
+    )
+  {
     my ( $min, $max ) = split( /-/, $ip );
     return $self->getRangeFromIpRange( $min, $max );
   }
   # 匹配 1.1.1.1-30 样式
-  elsif ( $ip =~ $self->subRangeRegex ) {
-    my ( $min, $max ) = split( /-/, $ip );
+  elsif (
+    $ip =~ /^(?:(?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})\.){3}
+    (?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})
+    -
+    (?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})$/mx
+    )
+  {
+    my ( $min, $suffix ) = split( /-/, $ip );
     # 异常拦截
-    confess __PACKAGE__ . "请正常填写$max，确保处于(0 .. 255)" if $max < 0 || $max > 255;
-    my ($prefix) = $min =~ /^(\d+\.\d+\.\d+\.)/;
-    $prefix .= $max;
-    return $self->getRangeFromIpRange( $min, $prefix );
+    confess __PACKAGE__ . "请正常填写$suffix，确保处于(0 .. 255)" if $suffix < 0 || $suffix > 255;
+    my ($max) = $min =~ /^(\d+\.\d+\.\d+\.)/;
+    $max .= $suffix;
+    return $self->getRangeFromIpRange( $min, $max );
   }
   # 兜底的处理逻辑，兼容 1.1.1.1 或 1.1.1.1/32
-  $ip   = $self->changeIpToInt($ip);
+  my $ipToInt = $self->changeIpToInt($ip);
   $mask = $self->changeMaskToNumForm( $mask // 32 );
-  my $maskString = ( '1' x $mask ) . ( '0' x ( 32 - $mask ) );
-  my $min        = $ip & oct( "0b" . $maskString );
-  my $max        = $min + oct( "0b" . ( '1' x ( 32 - $mask ) ) );
+  my $maskStr = ( '1' x $mask ) . ( '0' x ( 32 - $mask ) );
+  my $min     = $ipToInt & oct( "0b" . $maskStr );
+  my $max     = $min + oct( "0b" . ( '1' x ( 32 - $mask ) ) );
+  # 返回计算结果
   return wantarray
     ? ( $min, $max )
     : Netstack::Utils::Set->new( $min, $max );
@@ -120,18 +193,14 @@ sub getRangeFromIpMask {
 sub getNetIpFromIpMask {
   my ( $self, $ip, $mask ) = @_;
   $mask = $self->changeMaskToNumForm($mask) // 32;
-  my $netIp;
 
-  if ( $mask == 32 ) {
-    $netIp = $ip;
-  }
-  else {
-    $ip = $self->changeIpToInt($ip);
-    my $maskString = ( '1' x $mask ) . ( '0' x ( 32 - $mask ) );
-    my $netIpNum   = $ip & oct( "0b" . $maskString );
-    $netIp = $self->changeIntToIp($netIpNum);
-  }
-  return $netIp;
+  # 检查是否主机ip
+  return $ip if $mask == 32;
+  # 非主机ip转换为10进制
+  my $ipInt    = $self->changeIpToInt($ip);
+  my $maskStr  = ( '1' x $mask ) . ( '0' x ( 32 - $mask ) );
+  my $netIpNum = $ipInt & oct( "0b" . $maskStr );
+  return $self->changeIntToIp($netIpNum);
 }
 
 #------------------------------------------------------------------------------
@@ -143,11 +212,12 @@ sub changeIntToIp {
   confess "ERROR: 调用changeIntToIp异常，入参需保证在[0 .. 4294967295]之间"
     unless ( $num >= 0 and $num <= 4294967295 );
   # 将数字转为 32 位 二进制格式，每隔8位代表 IPV4 的一部分，使用 . 连结
-  my $ip = join(
+  my $ipaddr = join(
     '.', map { oct( "0b" . $_ ) }
       split( /(?=(?:[01]{8})+$)/, sprintf( "%032b", $num ) )
   );
-  return $ip;
+  # 返回计算结果
+  return $ipaddr;
 }
 
 #------------------------------------------------------------------------------
@@ -157,8 +227,12 @@ sub changeIpToInt {
   my ( $self, $addr ) = @_;
   confess __PACKAGE__ . "必须提供正确的IPv4地址 $addr" unless defined $addr;
   # IPV4 样式判断
-  unless ( $addr =~ $self->addrRegex ) {
-    if ( $addr =~ /any/i ) {
+  unless (
+    $addr =~ /^(?:(?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})\.){3}
+  (?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})$/mx
+    )
+  {
+    if ( $addr =~ /any|all/i ) {
       $addr = "0.0.0.0";
     }
     else {
@@ -179,12 +253,15 @@ sub changeIpToInt {
 #------------------------------------------------------------------------------
 sub changeMaskToNumForm {
   my ( $self, $mask ) = @_;
-
   # 入参校验
   confess __PACKAGE__ . "ERROR: 调用changeMaskToNumForm异常，请正确提供 mask，如255.0.0.0"
-    if not defined $mask;
+    unless defined $mask;
 
-  if ( $mask =~ $self->addrRegex ) {
+  if (
+    $mask =~ /^(?:(?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})\.){3}
+  (?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})$/mx
+    )
+  {
     my $IpStr = sprintf( "%032b", $self->changeIpToInt($mask) );
     if ( $IpStr =~ /01/ ) {
       confess "ERROR: 函数changeMaskToNumForm入参校验不通过，请正确填写入参";
@@ -212,9 +289,14 @@ sub changeMaskToNumForm {
 #------------------------------------------------------------------------------
 sub changeWildcardToMaskForm {
   my ( $self, $wildcard ) = @_;
-  if ( $wildcard =~ $self->addrRegex ) {
-    my ( $a1, $a2, $a3, $a4 ) = split( /\./, $wildcard );
-    my ( $p1, $p2, $p3, $p4 ) = ( $a1 ^ 255, $a2 ^ 255, $a3 ^ 255, $a4 ^ 255 );
+  if (
+    $wildcard =~ /(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.
+         (25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.
+         (25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.
+         (25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])/mx
+    )
+  {
+    my ( $p1, $p2, $p3, $p4 ) = ( $1 ^ 255, $2 ^ 255, $3 ^ 255, $4 ^ 255 );
     my $mask = "$p1.$p2.$p3.$p4";
     return $mask;
   }
@@ -230,7 +312,11 @@ sub changeMaskToIpForm {
   my ( $self, $mask ) = @_;
 
   # 本身就匹配正则表达式
-  if ( $mask =~ $self->addrRegex ) {
+  if (
+    $mask =~ /^(?:(?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})\.){3}
+    (?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})$/mx
+    )
+  {
     return $mask;
   }
   # 处于正常区间
@@ -256,13 +342,14 @@ sub getIpMaskFromRange {
     if not defined $min || not defined $max;
   # 异常拦截
   confess "请正确填写 min max 区间值，必须介于 (0 .. 4294967295)之间"
-    if ( $min < 0 || $max < 0 ) || ( $min > 4294967295 || $max > 4294967295 );
+    unless ( $min >= 0 and $min <= 4294967295 )
+    and ( $max >= 0 || $max <= 4294967295 );
 
   # 将最小值转为 IPADDR
   my $minIp = $self->changeIntToIp($min);
   # 集合区间计数
-  my $temp = $max - $min + 1;
-  my $mask = int( 32 - log($temp) / log(2) );
+  my $range = $max - $min + 1;
+  my $mask  = int( 32 - log($range) / log(2) );
   # TODOS：数学计算
   if (  $min == ( $min & ( ( 1 << 32 ) - ( 1 << ( 32 - $mask ) ) ) )
     and $max == $min + ( 1 << ( 32 - $mask ) ) - 1 )
@@ -278,18 +365,21 @@ sub getIpMaskFromRange {
 # getRangeFromService => Services 切割
 #------------------------------------------------------------------------------
 sub getRangeFromService {
-  my ( $self,  $service ) = @_;
-  my ( $proto, $port )    = split( '/', $service );
-  my $protoValue;
+  my ( $self, $service ) = @_;
+  # 异常拦截
+  confess __PACKAGE__ . " Error: 必须提供服务端口如TCP/80"
+    unless defined $service;
+  # 切割变量
+  my ( $proto, $port ) = split( '/', $service );
 
   # 边界条件处理
-  if ( $proto eq '0' or $proto =~ /any/i ) {
+  my $protoNum;
+  if ( $proto eq '0' or $proto =~ /any|all/i ) {
     return wantarray
       ? ( 0, 16777215 )
       : Netstack::Utils::Set->new( 0, 16777215 );
   }
   elsif ( $proto =~ /tcp|udp|icmp|\d+/i ) {
-    my $protoNum;
     if ( $proto =~ /tcp/i ) {
       $protoNum = 6;
     }
@@ -302,21 +392,25 @@ sub getRangeFromService {
     elsif ( $proto =~ /\d+/i ) {
       $protoNum = $proto;
     }
-    # 协议代码移位计算
-    $protoValue = $protoNum << 16;
   }
-  my ( $portMin, $portMax );
+  # 协议代码移位计算
+  my $protoValue = $protoNum << 16;
+
+  my ( $min, $max );
   if ( defined $port ) {
-    ( $portMin, $portMax ) = split( /-|\s+/, $port );
-    $portMax = $portMin if not defined $portMax or $portMax =~ /^\s*/s;
+    ( $min, $max ) = split( /-|\s+/, $port );
+    $max //= $min;
+    confess __PACKAGE__ . "必须确保服务端口处于区间 (0 .. 65535)"
+      unless ( $min >= 0 and $min <= 65535 )
+      and ( $max >= 0 and $max <= 65535 );
   }
   else {
-    $portMin = 0;
-    $portMax = 0;
+    $min = 0;
+    $max = 0;
   }
   return wantarray
-    ? ( $protoValue + $portMin, $protoValue + $portMax )
-    : Netstack::Utils::Set->new( $protoValue + $portMin, $protoValue + $portMax );
+    ? ( $protoValue + $min, $protoValue + $max )
+    : Netstack::Utils::Set->new( $protoValue + $min, $protoValue + $max );
 }
 
 __PACKAGE__->meta->make_immutable;

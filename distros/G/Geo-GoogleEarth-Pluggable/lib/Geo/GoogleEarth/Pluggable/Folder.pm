@@ -11,7 +11,7 @@ use base qw{Method::Autoload};
 use Geo::GoogleEarth::Pluggable::NetworkLink;
 use Geo::GoogleEarth::Pluggable::LookAt;
 
-our $VERSION ='0.14';
+our $VERSION='0.17';
 
 =head1 NAME
 

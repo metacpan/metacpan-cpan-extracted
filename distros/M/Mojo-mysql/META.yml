@@ -1,7 +1,7 @@
 ---
 abstract: 'Mojolicious and Async MySQL/MariaDB'
 author:
-  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
+  - 'Dan Book <grinnz@grinnz.com>'
 build_requires:
   Test::More: '0.90'
 configure_requires:
@@ -26,7 +26,7 @@ resources:
   bugtracker: https://github.com/jhthorsen/mojo-mysql/issues
   homepage: https://github.com/jhthorsen/mojo-mysql
   repository: https://github.com/jhthorsen/mojo-mysql.git
-version: '1.23'
+version: '1.24'
 x_contributors:
   - 'Curt Hochwender <hochwender@centurytel.net>'
   - 'Dan Book <dbook@cpan.org>'

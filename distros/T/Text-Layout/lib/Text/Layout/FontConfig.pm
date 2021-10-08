@@ -10,7 +10,7 @@ use Carp;
 
 
 
-our $VERSION = "0.021";
+our $VERSION = "0.022";
 
 use Text::Layout::FontDescriptor;
 
@@ -95,6 +95,12 @@ sub new {
 	$loader = $atts{loader};
     }
     return $self;
+}
+
+sub reset {
+    my ( $self ) = @_;
+    %fonts = ();
+    @dirs = ();
 }
 
 =over

@@ -11,17 +11,17 @@ use Apache2::Const -compile => qw(OK DECLINED);
 sub handler {
     my $f = shift;
     my $r = $f->r;
-    
+
     my $ctx = $f->ctx;
 
     if (!$ctx){
         $ctx = {};
         $r->headers_out->unset( 'Content-Length' );
-	$ctx->{'fixed_headers'} = 1;
-	$r->warn('unset cl');
+        $ctx->{'fixed_headers'} = 1;
+        $r->warn('unset cl');
         $f->ctx($ctx);
     }
-    
+
     while ($f->read(my $buffer, 500)) {
         # filter stuff here
         $f->print($buffer . qq[ sup! ]);

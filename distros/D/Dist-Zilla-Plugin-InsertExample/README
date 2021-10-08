@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.14
+    version 0.15
 
 SYNOPSIS
 
@@ -60,6 +60,15 @@ OPTIONS
     Remove the #!/usr/bin/perl, use strict; or use warnings; from the
     beginning of your example before inserting them into the POD.
 
+    If "match_boiler_barrier" is also set, it instead removes all lines
+    up-to and including the line matched by "match_boiler_barrier".
+
+ match_boiler_barrier
+
+    A regular expression matching a line indicating the end of boilerplate.
+    This option may be used multiple times. It must be used in conjunction
+    with "remove_boiler".
+
  indent
 
     Specifies the number of spaces to indent by. This is 1 by default,
@@ -70,7 +79,11 @@ OPTIONS
 
 AUTHOR
 
-    Graham Ollis <plicease@cpan.org>
+    Author: Graham Ollis <plicease@cpan.org>
+
+    Contributors:
+
+    Diab Jerius (DJERIUS)
 
 COPYRIGHT AND LICENSE
 

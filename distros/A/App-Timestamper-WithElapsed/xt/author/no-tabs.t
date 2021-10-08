@@ -9,7 +9,9 @@ use Test::NoTabs;
 my @files = (
     'bin/timestamper-with-elapsed',
     'lib/App/Timestamper/WithElapsed.pm',
-    't/00-compile.t'
+    't/00-compile.t',
+    't/data/nums.txt',
+    't/output-flag.t'
 );
 
 notabs_ok($_) foreach @files;

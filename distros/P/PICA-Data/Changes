@@ -1,5 +1,9 @@
 Revision history for PICA::Data
 
+1.34 2021-10-05T07:16:02Z
+    - support x-counter field identifiers in schemas
+    - remove occurrence zero (/00) in schemas
+
 1.33 2021-09-29T14:14:11Z
     - fix treatment of occurrence ranges in schema builder
 

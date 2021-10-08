@@ -31,14 +31,6 @@ use constant approx_eps_single => 1e-3;
 
 my $Nplans = 0;
 
-sub other2native {
-  my ($other) = @_;
-  my @other_dims = $other->dims;
-  shift @other_dims; # drop initial 2
-  $other = cplx $other if !UNIVERSAL::isa($other, 'PDL::Complex');
-  zeroes(cdouble, @other_dims) + $other->re + $other->im * PDL::_ci();
-}
-
 # 1D basic test
 {
   my $x = sequence(10)->cat(sequence(10)**2)->mv(-1,0);
@@ -73,8 +65,8 @@ sub other2native {
   ok_should_make_plan( all( approx( ifft1(fft1($x)), $x, approx_eps_double) ),
                       "Basic 1D complex FFT - inverse(forward) should be the same (normalized)" );
 
-  my $x_nat = other2native($x_cplx);
-  ok_should_make_plan( all( approx( fft1($x_nat), other2native($Xref), approx_eps_double) ),
+  my $x_nat = $x_cplx->as_native;
+  ok_should_make_plan( all( approx( fft1($x_nat), $Xref->cplx->as_native, approx_eps_double) ),
                       "Basic 1D native complex FFT" );
 
   ok_should_make_plan( all( approx( ifft1(fft1($x_nat)), $x_nat, approx_eps_double) ),
@@ -85,14 +77,14 @@ sub other2native {
 {
   my $x_cplx = zeroes(2, 11, 1)->complex;
   $x_cplx->slice(':,0') .= 1;
-  my $x_nat = other2native($x_cplx);
+  my $x_nat = $x_cplx->as_native;
   my $with_cplx = ifft1($x_cplx);
   my $with_nat = ifft1($x_nat);
-  ok all(approx $with_nat, other2native($with_cplx), approx_eps_double), 'ifft1 native matches PDL::Complex'
+  ok all(approx $with_nat, $with_cplx->as_native, approx_eps_double), 'ifft1 native matches PDL::Complex'
     or diag "got:$with_nat\nexpected:$with_cplx";
   $with_cplx = ifftn($x_cplx, 1);
   $with_nat = ifftn($x_nat, 1);
-  ok all(approx $with_nat, other2native($with_cplx), approx_eps_double), 'ifftn native matches PDL::Complex'
+  ok all(approx $with_nat, $with_cplx->as_native, approx_eps_double), 'ifftn native matches PDL::Complex'
     or diag "got:$with_nat\nexpected:$with_cplx";
 }
 
@@ -114,8 +106,8 @@ sub other2native {
   ok_should_make_plan( all( approx( fft2($x), $Xref, approx_eps_double) ),
      "Basic 2D complex FFT - double precision" );
 
-  my $x_nat = other2native($x);
-  ok_should_make_plan( all( approx( fft2($x_nat), other2native($Xref), approx_eps_double) ),
+  my $x_nat = $x->cplx->as_native;
+  ok_should_make_plan( all( approx( fft2($x_nat), $Xref->cplx->as_native, approx_eps_double) ),
      "Basic 2D native complex FFT - double precision" );
 
   ok_should_make_plan( all( approx( fft2(float $x), float($Xref), approx_eps_single) ),
@@ -181,9 +173,9 @@ sub other2native {
   ok_should_reuse_plan( all( approx( $f, $Xref, approx_eps_double) ),
      "1D FFTs threaded inside a 3D ndarray" );
 
-  my $x_nat = other2native($x);
+  my $x_nat = $x->cplx->as_native;
   my $f_nat = fft1($x_nat);
-  ok_should_reuse_plan( all( approx( $f_nat, other2native($Xref), approx_eps_double) ),
+  ok_should_reuse_plan( all( approx( $f_nat, $Xref->cplx->as_native, approx_eps_double) ),
      "1D native complex FFTs threaded inside a 3D ndarray" );
 }
 
@@ -522,7 +514,7 @@ sub other2native {
   ok_should_make_plan( all( approx( $fx6, $fx6_ref_input, approx_eps_double) ),
                        "rfft basic test - forward - 6long" );
   my $fx6_nat = rNfft1($x6);
-  my $fx6_ref_input_nat = other2native($fx6_ref_input);
+  my $fx6_ref_input_nat = $fx6_ref_input->cplx->as_native;
   ok_should_reuse_plan( all( approx( $fx6_nat, $fx6_ref_input_nat, approx_eps_double) ),
                        "rfft basic test - native forward - 6long" );
 

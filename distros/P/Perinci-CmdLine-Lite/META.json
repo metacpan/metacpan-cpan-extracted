@@ -101,35 +101,35 @@
    "provides" : {
       "Perinci::CmdLine::Base" : {
          "file" : "lib/Perinci/CmdLine/Base.pm",
-         "version" : "1.910"
+         "version" : "1.911"
       },
       "Perinci::CmdLine::Lite" : {
          "file" : "lib/Perinci/CmdLine/Lite.pm",
-         "version" : "1.910"
+         "version" : "1.911"
       },
       "Perinci::CmdLine::Plugin::DisablePlugin" : {
          "file" : "lib/Perinci/CmdLine/Plugin/DisablePlugin.pm",
-         "version" : "1.910"
+         "version" : "1.911"
       },
       "Perinci::CmdLine::Plugin::DumpArgs" : {
          "file" : "lib/Perinci/CmdLine/Plugin/DumpArgs.pm",
-         "version" : "1.910"
+         "version" : "1.911"
       },
       "Perinci::CmdLine::Plugin::DumpR" : {
          "file" : "lib/Perinci/CmdLine/Plugin/DumpR.pm",
-         "version" : "1.910"
+         "version" : "1.911"
       },
       "Perinci::CmdLine::Plugin::DumpRes" : {
          "file" : "lib/Perinci/CmdLine/Plugin/DumpRes.pm",
-         "version" : "1.910"
+         "version" : "1.911"
       },
       "Perinci::CmdLine::Plugin::Exit" : {
          "file" : "lib/Perinci/CmdLine/Plugin/Exit.pm",
-         "version" : "1.910"
+         "version" : "1.911"
       },
       "Perinci::CmdLine::PluginBase" : {
          "file" : "lib/Perinci/CmdLine/PluginBase.pm",
-         "version" : "1.910"
+         "version" : "1.911"
       }
    },
    "release_status" : "stable",
@@ -144,7 +144,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-CmdLine-Lite"
       }
    },
-   "version" : "1.910",
+   "version" : "1.911",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

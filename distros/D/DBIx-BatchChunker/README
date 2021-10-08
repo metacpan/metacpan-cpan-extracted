@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version v0.940.4
+    version v0.941.0
 
 SYNOPSIS
 
@@ -381,17 +381,13 @@ ATTRIBUTES
     loop. If the loop hits the end point, it will run another maximum ID
     check in the DB, and adjust max_id accordingly. If it somehow cannot
     run a DB check (no "rs" or "max_stmt" available, for example), the last
-    chunk will check all the way to $DB_MAX_ID.
+    chunk will just be one at the end of max_id + chunk_size.
 
     This is useful if the entire table is expected to be processed, and you
     don't want to miss any new rows that come up between "calculate_ranges"
     and the end of the loop.
 
     Turned off by default.
-
-    NOTE: If your RDBMS has a problem with a number as high as whatever ~0
-    reports, you may want to set the $DB_MAX_ID global variable in this
-    module to something lower.
 
   single_rows
 
@@ -599,6 +595,35 @@ PRIVATE METHODS
     Prints out a standard debug status line, if debug is enabled. What it
     prints is generally uniform, but it depends on the processing action.
     Most of the data is pulled from "loop_state".
+
+CAVEATS
+
+ Big Number Support
+
+    If the module detects that the ID numbers are no longer safe for
+    standard Perl NV storage, it will automatically switch to using
+    Math::BigInt and Math::BigFloat for big number support. If any blessed
+    numbers are already being used to define the attributes, this will also
+    switch on the support.
+
+ String-based IDs
+
+    If you're working with VARCHAR types or other string-based IDs to
+    represent integers, these may be subject to whatever string-based
+    comparison rules your RDBMS uses when calculating with MIN/MAX or using
+    BETWEEN. Row counting and chunk size scaling will try to compensate,
+    but will be mixing string-based comparisons from the RDBMS and
+    Perl-based integer math.
+
+    Using the CAST function may help, but it may also cause critical
+    indexes to be ignored, especially if the function is used on the
+    left-hand side against the column. Strings with the exact same length
+    may be safe from comparison weirdness, but YMMV.
+
+    Non-integer inputs from ID columns, such as GUIDs or other alphanumeric
+    strings, are not currently supported. They would have to be converted
+    to integers via SQL, and doing so may run into a similar risk of having
+    your RDBMS ignore indexes.
 
 SEE ALSO
 

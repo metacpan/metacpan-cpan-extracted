@@ -11,11 +11,11 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.005
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.006
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/ImageMagickUtils.pm','script/calc-image-resized-size','script/downsize-image','script/image-resize-notation-to-human'];
+my $filenames = ['lib/App/ImageMagickUtils.pm','script/calc-image-resized-size','script/convert-image-to','script/convert-image-to-pdf','script/downsize-image','script/image-resize-notation-to-human'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

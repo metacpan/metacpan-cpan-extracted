@@ -1,0 +1,13 @@
+Revision history for perl module Mojo::WebSocket::PubSub
+
+0.04 2021-10-05T15:38:00
+    - Activate keepalive
+
+0.03 2021-10-05T14:31:00
+    - Added a missed required library which can give errors in some system.
+
+0.02 2021-10-04T15:33:00
+    - Removed usage of ->%* syntax in code
+
+0.01 2021-10-04T15:15:00
+    - First Version

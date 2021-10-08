@@ -30,4 +30,9 @@ BEGIN { $^H{"t::pieces/permit"} = 1; }
    is( $ret, 123+456, 'result of pieceprefixedblock' );
 }
 
+{
+   my $ret = pieceprefixedblock_VAR { "$VAR, world!" };
+   is( $ret, "(Hello, world!)", 'result of pieceprefixedblock_VAR' );
+}
+
 done_testing;

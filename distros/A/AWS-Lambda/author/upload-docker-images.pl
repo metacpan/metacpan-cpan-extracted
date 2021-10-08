@@ -25,6 +25,9 @@ my $flavors = {
 
 FROM amazon/aws-lambda-provided:alami
 
+# Use the custom runtime perl in preference to the system perl
+ENV PATH=/opt/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
 RUN cd /opt && \\
     curl -sSL https://shogo82148-lambda-perl-runtime-us-east-1.s3.amazonaws.com/perl-$version-runtime.zip -o runtime.zip && \\
     unzip runtime.zip && rm runtime.zip
@@ -54,14 +57,20 @@ EOF
 # You add your function code and dependencies to the base image and
 # then run it as a container image on AWS Lambda.
 
-# the amazon/aws-lambda-provided:al2 image doesn't have curl and unzip,
-# so we use the build-provided.al2 image here
-FROM lambci/lambda:build-provided.al2
+# the amazon/aws-lambda-provided:al2 image doesn't have unzip,
+# so we use the amazonlinux:2 image here
+FROM public.ecr.aws/amazonlinux/amazonlinux:2
+RUN yum install -y curl unzip
 RUN cd /opt && \\
-    curl -sSL https://shogo82148-lambda-perl-runtime-us-east-1.s3.amazonaws.com/perl-$version-runtime-al2.zip -o runtime.zip && \\
+    case \$(uname -m) in "x86_64") ARCH=x86_64;; "aarch64") ARCH=arm64;; *) echo "unknown architecture: \$(uname -m)"; exit 1;; esac && \\
+    curl -sSL https://shogo82148-lambda-perl-runtime-us-east-1.s3.amazonaws.com/perl-$version-runtime-al2-\$ARCH.zip -o runtime.zip && \\
     unzip runtime.zip && rm runtime.zip
 
-FROM amazon/aws-lambda-provided:al2
+FROM public.ecr.aws/lambda/provided:al2
+
+# Use the custom runtime perl in preference to the system perl
+ENV PATH=/opt/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
 COPY --from=0 /opt /opt
 RUN ln -s /opt/bootstrap /var/runtime/bootstrap
 EOF
@@ -90,6 +99,9 @@ EOF
 # then run it as a container image on AWS Lambda.
 
 FROM amazon/aws-lambda-provided:alami
+
+# Use the custom runtime perl in preference to the system perl
+ENV PATH=/opt/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 RUN cd /opt && \\
     curl -sSL https://shogo82148-lambda-perl-runtime-us-east-1.s3.amazonaws.com/perl-$version-runtime.zip -o runtime.zip && \\
@@ -124,19 +136,30 @@ EOF
 # You add your function code and dependencies to the base image and
 # then run it as a container image on AWS Lambda.
 
-# the amazon/aws-lambda-provided:al2 image doesn't have curl and unzip,
-# so we use the build-provided.al2 image here
-FROM lambci/lambda:build-provided.al2
+# the amazon/aws-lambda-provided:al2 image doesn't have unzip,
+# so we use the amazonlinux:2 image here
+FROM public.ecr.aws/amazonlinux/amazonlinux:2
+RUN yum install -y curl unzip
 RUN cd /opt && \\
-    curl -sSL https://shogo82148-lambda-perl-runtime-us-east-1.s3.amazonaws.com/perl-$version-runtime-al2.zip -o runtime.zip && \\
+    case \$(uname -m) in "x86_64") ARCH=x86_64;; "aarch64") ARCH=arm64;; *) echo "unknown architecture: \$(uname -m)"; exit 1;; esac && \\
+    curl -sSL https://shogo82148-lambda-perl-runtime-us-east-1.s3.amazonaws.com/perl-$version-runtime-al2-\$ARCH.zip -o runtime.zip && \\
     unzip runtime.zip && rm runtime.zip
+
+FROM public.ecr.aws/amazonlinux/amazonlinux:2
+RUN yum install -y curl unzip
 RUN cd /opt && \\
-    curl -sSL https://shogo82148-lambda-perl-runtime-us-east-1.s3.amazonaws.com/perl-$version-paws-al2.zip -o paws.zip && \\
+    case \$(uname -m) in "x86_64") ARCH=x86_64;; "aarch64") ARCH=arm64;; *) echo "unknown architecture: \$(uname -m)"; exit 1;; esac && \\
+    curl -sSL https://shogo82148-lambda-perl-runtime-us-east-1.s3.amazonaws.com/perl-$version-paws-al2-\$ARCH.zip -o paws.zip && \\
     unzip paws.zip && rm paws.zip
 
-FROM amazon/aws-lambda-provided:al2
+FROM public.ecr.aws/lambda/provided:al2
+
+# Use the custom runtime perl in preference to the system perl
+ENV PATH=/opt/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
 COPY --from=0 /opt /opt
 RUN ln -s /opt/bootstrap /var/runtime/bootstrap
+COPY --from=1 /opt /opt
 EOF
         },
         'dependencies' => sub {
@@ -160,6 +183,9 @@ EOF
             $version =~ s/[.]/-/;
             return <<"EOF";
 FROM lambci/lambda:build-provided
+
+# Use the custom runtime perl in preference to the system perl
+ENV PATH=/opt/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 RUN cd /opt && \\
     curl -sSL https://shogo82148-lambda-perl-runtime-us-east-1.s3.amazonaws.com/perl-$version-runtime.zip -o runtime.zip && \\
@@ -186,6 +212,9 @@ EOF
             $version =~ s/[.]/-/;
             return <<"EOF";
 FROM lambci/lambda:build-provided.al2
+
+# Use the custom runtime perl in preference to the system perl
+ENV PATH=/opt/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 RUN cd /opt && \\
     curl -sSL https://shogo82148-lambda-perl-runtime-us-east-1.s3.amazonaws.com/perl-$version-runtime-al2.zip -o runtime.zip && \\
@@ -217,6 +246,9 @@ EOF
             return <<"EOF";
 FROM lambci/lambda:build-provided
 
+# Use the custom runtime perl in preference to the system perl
+ENV PATH=/opt/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
 RUN cd /opt && \\
     curl -sSL https://shogo82148-lambda-perl-runtime-us-east-1.s3.amazonaws.com/perl-$version-runtime.zip -o runtime.zip && \\
     unzip runtime.zip && rm runtime.zip
@@ -246,6 +278,9 @@ EOF
             $version =~ s/[.]/-/;
             return <<"EOF";
 FROM lambci/lambda:build-provided.al2
+
+# Use the custom runtime perl in preference to the system perl
+ENV PATH=/opt/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 RUN cd /opt && \\
     curl -sSL https://shogo82148-lambda-perl-runtime-us-east-1.s3.amazonaws.com/perl-$version-runtime-al2.zip -o runtime.zip && \\
@@ -375,12 +410,15 @@ FROM lambci/lambda:build-provided.al2
 RUN cd /opt && \\
     curl -sSL https://shogo82148-lambda-perl-runtime-us-east-1.s3.amazonaws.com/perl-$version-runtime-al2.zip -o runtime.zip && \\
     unzip runtime.zip && rm runtime.zip
+
+FROM lambci/lambda:build-provided.al2
 RUN cd /opt && \\
     curl -sSL https://shogo82148-lambda-perl-runtime-us-east-1.s3.amazonaws.com/perl-$version-paws-al2.zip -o paws.zip && \\
     unzip paws.zip && rm paws.zip
 
 FROM lambci/lambda:provided.al2
 COPY --from=0 /opt /opt
+COPY --from=1 /opt /opt
 EOF
         },
         'dependencies' => sub {
@@ -556,4 +594,4 @@ if ($subcommand eq 'build') {
     build();
 }
 
-1
+1;

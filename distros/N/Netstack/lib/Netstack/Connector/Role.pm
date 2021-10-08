@@ -11,7 +11,7 @@ use Moose::Role;
 use namespace::autoclean;
 
 #------------------------------------------------------------------------------
-# 继承 Netstack::Connector::Role 必须实现的方法
+# 继承 Netstack::Config::Connector::Role 必须实现的方法
 #------------------------------------------------------------------------------
 requires '_buildPrompt';
 requires '_buildCommands';
@@ -20,7 +20,7 @@ requires '_buildBufferCode';
 requires 'runCommands';
 
 #------------------------------------------------------------------------------
-# 定义设备联结 Netstack::Connector::Role 方法属性
+# 定义设备联结 Netstack::Config::Connector::Role 方法属性
 #------------------------------------------------------------------------------
 has exp => (
   is      => 'ro',
@@ -48,7 +48,6 @@ has password => (
 
 has port => (
   is        => 'ro',
-  default   => '22',
   predicate => 'hasPort'
 );
 
@@ -60,6 +59,8 @@ has enPassword => (
 
 has proto => (
   is       => 'ro',
+  traits   => ["Enumeration"],
+  enum     => [qw/ssh telnet/],
   required => 1,
   default  => 'ssh',
 );
@@ -192,17 +193,45 @@ sub login {
 }
 
 #------------------------------------------------------------------------------
+# _spawn_command 根据协议生成登录脚本
+#------------------------------------------------------------------------------
+sub _spawn_command {
+  my ( $self, $args ) = @_;
+  $args //= '';
+  # 初始化变量
+  my $command;
+
+  # 绑定已有变量
+  my $user  = $self->username;
+  my $host  = $self->host;
+  my $port  = $self->port;
+  my $proto = $self->proto;
+
+  # 判断是否定义非标端口
+  if ( $self->hasPort ) {
+    # 根据不同协议生成脚本，telnet 协议兼容性可能有问题
+    if ( $proto =~ /telnet/i ) {
+      $command = $proto . " $args" . " -l $user $host $port";
+    }
+    elsif ( $proto =~ /ssh/i ) {
+      $command = $proto . " $args" . " -l $user $host -p $port";
+    }
+  }
+  else {
+    $command = $proto . " $args" . " -l $user $host";
+  }
+
+  # 返回计算结果
+  return $command;
+}
+
+#------------------------------------------------------------------------------
 # connect 设备联机登录
 #------------------------------------------------------------------------------
 sub connect {
   my ( $self, $args ) = @_;
-  # 检查是否携带变量并初始化
-  $args = defined $args ? $args : '';
-  # # 检查是否携带端口信息
-  $args . " -p $self->{port}" if $self->hasPort;
 
   # 初始化变量
-  my $host     = $self->host;
   my $username = $self->username;
   my $password = $self->password;
 
@@ -217,7 +246,7 @@ sub connect {
 
   # 设置登录逻辑
   my $status  = 1;
-  my $command = $self->proto . " $args" . " -l $username $host";
+  my $command = $self->_spawn_command($args);
   # 尝试登录设备并执行异常拦截
   $self->spawn($command) || confess __PACKAGE__ . " case0) Cannot spawn $command: $!\n";
 
@@ -303,7 +332,7 @@ sub waitfor {
   ];
 
   # 动态加载交互式代码
-  my @ret = $exp->expect( 15, $codeARef->@* );
+  my @ret = $self->expect( 15, $codeARef->@* );
   # 异常捕捉
   if ( defined $ret[1] ) {
     confess __PACKAGE__ . " 节点($self->{host})脚本执行期间捕捉到异常：$ret[3] . $ret[1]";

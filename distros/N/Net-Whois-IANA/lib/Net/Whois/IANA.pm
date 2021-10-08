@@ -1,5 +1,5 @@
 package Net::Whois::IANA;
-$Net::Whois::IANA::VERSION = '0.46';
+$Net::Whois::IANA::VERSION = '0.47';
 use 5.006;
 
 use strict;
@@ -610,7 +610,7 @@ Net::Whois::IANA - Net::Whois::IANA - A universal WHOIS data extractor.
 
 =head1 VERSION
 
-version 0.46
+version 0.47
 
 =head1 SYNOPSIS
 
@@ -629,28 +629,34 @@ version 0.46
 
 =head1 DESCRIPTION
 
-  Various Net::Whois and IP:: modules have been created.
+Various Net::Whois and IP:: modules have been created.
 This is just something I had to write because none of them s
 uited my purpose. It is conceptually based on Net::Whois::IP
 by Ben Schmitz <bschmitz@orbitz.com>, but differs from it by
 a few points:
 
-  * It is object-oriented.
-  * It has a few immediate methods for representing some whois
-  fields.
-  * It allows the user to specify explicitly which whois servers
-  to query, and those servers might even not be of the four main
-  registries mentioned above.
-  * It has more robust error handling.
+=over
 
-  Net::Whois::IANA was designed to provide a mechanism to lookup
+=item It is object-oriented.
+
+=item It has a few immediate methods for representing some whois fields.
+
+=item It allows the user to specify explicitly which whois servers
+to query, and those servers might even not be of the four main
+registries mentioned above.
+
+=item It has more robust error handling.
+
+=back
+
+Net::Whois::IANA was designed to provide a mechanism to lookup
 whois information and store most descriptive part of it (descr,
 netname and country fields) in the object. This mechanism is
 supposed to be attached to a log parser (for example an Apache
 web server log) to provide various accounting and statistics
 information.
 
-  The query is performed in a roundrobin system over all four
+The query is performed in a roundrobin system over all four
 registries until a valid entry is found. The valid entry stops
 the main query loop and the object with information is returned.
 Unfortunately, the output formats of each one of the registries
@@ -659,79 +665,11 @@ some common ground was always found and the assignment of the
 information into the query object is based upon this common
 ground, whatever misleading it might be.
 
-  The query to the RIPE and APNIC registries are always performed
+The query to the RIPE and APNIC registries are always performed
 with a '-r' flag to avoid blocking of the querying IP. Thus, the
 contact info for the given entry is not obtainable with this
 module. The query to the ARIN registry is performed with a '+'
 flag to force the colon-separated output of the information.
-
-=head2 EXPORT
-
-  For the convenience of the user, basic list of IANA servers
-(@IANA) and their mapping to host names and ports (%IANA) are
-being exported.
-
-  Also the following methods are being exported:
-
-  $iana->whois_query(-ip=>$ip,-whois=>$whois|-mywhois=>\%mywhois) :
-
-    Perform the query on the ip specified by $ip. You can limit
-  the lookup to a single server (of the IANA list) by specifying
-  '-whois=>$whois' pair or you can provide a set of your own
-  servers by specifying the '-mywhois=>\%mywhois' pair. The latter
-  one overrides all of the IANA list for lookup. You can also set
-  -debug option in order to trigger some verbosity in the output.
-
-  $iana->descr()
-
-    Returns some of the "descr:" field contents of the queried IP.
-
-  $iana->netname()
-
-    Returns the "netname:" field contents of the queried IP.
-
-  $iana->country()
-
-    Returns "country:" field contents of the queried IP. Useful
-  to combine with the Geography::Countries module.
-
-  $iana->inetnum()
-
-    Returns the IP range of the queried IP. Often it is contained
-  within the inetnum field, but it is calculated for LACNIC.
-
-  $iana->status()
-
-    Returns the "status:" field contents of the queried IP.
-
-  $iana->source()
-
-    Returns the "source:" field contents of the queried IP.
-
-  $iana->server()
-
-    Returns the server that returned most valuable ntents of
-  the queried IP.
-
-  $iana->cidr()
-
-    Returns an array in CIDR notation (1.2.3.4/5) of the IP's registered
-  range.
-
-  $iana->fullinfo()
-
-    Returns the complete output of the query.
-
-  $iana->is_mine($ip,@cidrrange)
-
-    Checks if the ip is within one of the CIDR ranges given by
-  @cidrrange. Returns 0 if none, 1 if a range matches.
-
-  $iana->abuse()
-
-    Yields the best guess for the potential abuse report email address
-  candidate. This is not a very reliable thing, but sometimes it proves
-  useful.
 
 =head1 NAME
 
@@ -739,19 +677,88 @@ Net::Whois::IANA - A universal WHOIS data extractor.
 
 =head1 ABSTRACT
 
-  This is a simple module to extract the descriptive whois
+This is a simple module to extract the descriptive whois
 information about various IPs as they are stored in the four
 regional whois registries of IANA - RIPE (Europe, Middle East)
 APNIC (Asia/Pacific), ARIN (North America), AFRINIC (Africa)
 and LACNIC (Latin American & Caribbean).
 
-  It is designed to serve statistical harvesters of various
+It is designed to serve statistical harvesters of various
 access logs and likewise, therefore it only collects partial
 and [rarely] unprecise information.
 
+=head1 METHODS
+
+For the convenience of the user, basic list of IANA servers
+(@IANA) and their mapping to host names and ports (%IANA) are
+being exported.
+
+Also the following methods are being exported:
+
+=head2 $iana->whois_query
+
+Perform the query on the ip specified by $ip. You can limit
+the lookup to a single server (of the IANA list) by specifying
+'-whois=>$whois' pair or you can provide a set of your own
+servers by specifying the '-mywhois=>\%mywhois' pair. The latter
+one overrides all of the IANA list for lookup. You can also set
+-debug option in order to trigger some verbosity in the output.
+
+    $iana->whois_query(-ip=>$ip,-whois=>$whois|-mywhois=>\%mywhois)
+
+=head2 $iana->descr()
+
+Returns some of the "descr:" field contents of the queried IP.
+
+=head2 $iana->netname()
+
+Returns the "netname:" field contents of the queried IP.
+
+=head2 $iana->country()
+
+Returns "country:" field contents of the queried IP. Useful
+to combine with the Geography::Countries module.
+
+=head2 $iana->inetnum()
+
+Returns the IP range of the queried IP. Often it is contained
+within the inetnum field, but it is calculated for LACNIC.
+
+=head2 $iana->status()
+
+Returns the "status:" field contents of the queried IP.
+
+=head2 $iana->source()
+
+Returns the "source:" field contents of the queried IP.
+
+=head2 $iana->server()
+
+Returns the server that returned most valuable ntents of
+the queried IP.
+
+=head2 $iana->cidr()
+
+Returns an array in CIDR notation (1.2.3.4/5) of the IP's registered range.
+
+=head2 $iana->fullinfo()
+
+Returns the complete output of the query.
+
+=head2 $iana->is_mine($ip,@cidrrange)
+
+Checks if the ip is within one of the CIDR ranges given by
+@cidrrange. Returns 0 if none, 1 if a range matches.
+
+=head2 $iana->abuse()
+
+Yields the best guess for the potential abuse report email address
+candidate. This is not a very reliable thing, but sometimes it proves
+useful.
+
 =head1 BUGS
 
-  As stated many times before, this module is not completely
+As stated many times before, this module is not completely
 homogeneous and precise because of the differences between
 outputs of the IANA servers and because of some inconsistencies
 within each one of them. Its primary target is to collect info
@@ -760,7 +767,7 @@ might be optimized.
 
 =head1 CAVEATS
 
-  The introduction of AFRINIC server may create some confusion
+The introduction of AFRINIC server may create some confusion
 among servers. It might be that some entries are existant either in
 both ARIN and AFRINIC or in both RIPE and AFRINIC, and some do not
 exist at all. Moreover, there is a border confusion between Middle
@@ -771,8 +778,21 @@ server sometimes. This redirection is not reflected yet by the package.
 
 =head1 SEE ALSO
 
-  Net::Whois::IP, Net::Whois::RIPE, IP::Country,
-  Geography::Countries, Net::CIDR, NetAddr::IP,
+=over
+
+=item Net::Whois::IP
+
+=item Net::Whois::RIPE
+
+=item IP::Country
+
+=item Geography::Countries
+
+=item Net::CIDR
+
+=item NetAddr::IP
+
+=back
 
 =head1 AUTHOR
 

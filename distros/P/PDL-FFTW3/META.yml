@@ -20,12 +20,12 @@ no_index:
     - t
     - inc
 requires:
-  PDL: '2.047'
+  PDL: '2.049'
 resources:
   IRC: irc://irc.perl.org/#pdl
   X_type: git
   X_url: git://github.com/PDLPorters/pdl-fftw3.git
   X_web: http://github.com/PDLPorters/pdl-fftw3
   bugtracker: http://github.com/PDLPorters/pdl-fftw3/issues
-version: '0.17'
+version: '0.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -2,8 +2,8 @@ NAME
     Text::ANSI::Util - Routines for text containing ANSI color codes
 
 VERSION
-    This document describes version 0.232 of Text::ANSI::Util (from Perl
-    distribution Text-ANSI-Util), released on 2021-04-14.
+    This document describes version 0.233 of Text::ANSI::Util (from Perl
+    distribution Text-ANSI-Util), released on 2021-08-08.
 
 SYNOPSIS
      use Text::ANSI::Util qw(
@@ -93,6 +93,9 @@ DESCRIPTION
         "\e[1;0m" or "\e[31;47;0m" is not recognized, only "\e[0m" is. I
         believe this should not be a problem with most real-world text out
         there.
+
+CONTRIBUTOR
+    Steven Haryanto (on PC) <stevenharyanto@gmail.com>
 
 FUNCTIONS
   ta_add_color_resets(@text) => LIST
@@ -238,15 +241,15 @@ FUNCTIONS
 
     *   flindent => STR
 
-        First line indent. See Text::WideChar::Util for more details.
+        First line indent. Currently must not contain ANSI color codes or
+        wide characters.
 
     *   slindent => STR
 
-        First line indent. See Text::WideChar::Util for more details.
+        Subsequent line indent. Currently must not contain ANSI color codes
+        or wide characters.
 
     *   tab_width => INT (default: 8)
-
-        First line indent. See Text::WideChar::Util for more details.
 
     *   pad => BOOL (default: 0)
 
@@ -308,7 +311,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-Text-ANSI-Util/issues>
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-ANSI-Util>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -330,8 +333,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2016, 2015, 2014, 2013 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2021, 2016, 2015, 2014, 2013 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

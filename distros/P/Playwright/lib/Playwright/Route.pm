@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Route;
-$Playwright::Route::VERSION = '0.015';
+$Playwright::Route::VERSION = '0.016';
 use parent 'Playwright::Base';
 
 sub new {
@@ -18,19 +18,9 @@ sub new {
     return $self->SUPER::new(%options);
 }
 
-sub abort {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'abort',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub request {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'request',
         object  => $self->{guid},
@@ -38,19 +28,9 @@ sub request {
     );
 }
 
-sub continue {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'continue',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub fulfill {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'fulfill',
         object  => $self->{guid},
@@ -58,9 +38,29 @@ sub fulfill {
     );
 }
 
+sub abort {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'abort',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub continue {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'continue',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
 sub on {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'on',
         object  => $self->{guid},
@@ -70,7 +70,7 @@ sub on {
 
 sub evaluate {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'evaluate',
         object  => $self->{guid},
@@ -80,7 +80,7 @@ sub evaluate {
 
 sub evaluateHandle {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'evaluateHandle',
         object  => $self->{guid},
@@ -102,7 +102,7 @@ Playwright::Route - Automatically generated class for Playwright::Route
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 CONSTRUCTOR
 
@@ -113,29 +113,29 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 abort(@args)
-
-Execute the Route::abort playwright routine.
-
-See L<https://playwright.dev/api/class-Route#Route-abort> for more information.
-
 =head2 request(@args)
 
 Execute the Route::request playwright routine.
 
 See L<https://playwright.dev/api/class-Route#Route-request> for more information.
 
-=head2 continue(@args)
-
-Execute the Route::continue playwright routine.
-
-See L<https://playwright.dev/api/class-Route#Route-continue> for more information.
-
 =head2 fulfill(@args)
 
 Execute the Route::fulfill playwright routine.
 
 See L<https://playwright.dev/api/class-Route#Route-fulfill> for more information.
+
+=head2 abort(@args)
+
+Execute the Route::abort playwright routine.
+
+See L<https://playwright.dev/api/class-Route#Route-abort> for more information.
+
+=head2 continue(@args)
+
+Execute the Route::continue playwright routine.
+
+See L<https://playwright.dev/api/class-Route#Route-continue> for more information.
 
 =head2 on(@args)
 

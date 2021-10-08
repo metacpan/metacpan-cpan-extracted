@@ -1,5 +1,5 @@
 package App::Timestamper::WithElapsed;
-$App::Timestamper::WithElapsed::VERSION = '0.4.0';
+$App::Timestamper::WithElapsed::VERSION = '0.6.0';
 use strict;
 use warnings;
 use 5.014;
@@ -55,6 +55,18 @@ sub _from_start
     return $self->{_from_start};
 }
 
+sub _output_fn
+{
+    my $self = shift;
+
+    if (@_)
+    {
+        $self->{_output_fn} = shift;
+    }
+
+    return $self->{_output_fn};
+}
+
 sub _init
 {
     my ( $self, $args ) = @_;
@@ -63,11 +75,13 @@ sub _init
     my $absolute;
     my $from_start;
     my $help;
+    my $output_fn;
     GetOptionsFromArray(
         $argv,
         'absolute!'   => \$absolute,
         'from-start!' => \$from_start,
         'h|help'      => \$help,
+        'o|output=s'  => \$output_fn,
     ) or die $!;
     if ($help)
     {
@@ -86,6 +100,7 @@ EOF
     }
     $self->_absolute($absolute);
     $self->_from_start($from_start);
+    $self->_output_fn($output_fn);
     return;
 }
 
@@ -93,6 +108,12 @@ sub run
 {
     my $self = shift;
     my $loop = IO::Async::Loop->new;
+    my $out_fh;
+    if ( defined( my $output_fn = $self->_output_fn ) )
+    {
+        open $out_fh, ">:encoding(utf-8)", $output_fn;
+        $out_fh->autoflush(1);
+    }
 
     my $last_line_time = time();
     my $init_time      = $self->_from_start ? ( $last_line_time + 0 ) : 0;
@@ -107,7 +128,7 @@ sub run
                 printf "\r%.8f since start", $t - $init_time;
 
                 return;
-            }
+                }
             : sub {
                 my $t = time();
                 printf "\r%.8f elapsed", $t - $last_line_time;
@@ -122,6 +143,10 @@ sub run
         chomp $l;
         my $s = sprintf( "%.8f    %s", $t - $init_time, $l );
         printf "\r%-70s\n", $s;
+        if ( defined $out_fh )
+        {
+            $out_fh->printf( "%.8f\t%s\n", $t, $l );
+        }
         return;
     };
 
@@ -142,6 +167,10 @@ sub run
             {
                 $out->( time(), $$buffref );
                 $loop->stop();
+                if ( defined $out_fh )
+                {
+                    close $out_fh;
+                }
             }
 
             return 0;
@@ -171,7 +200,7 @@ seconds since the last received line.
 
 =head1 VERSION
 
-version 0.4.0
+version 0.6.0
 
 =head1 SYNOPSIS
 

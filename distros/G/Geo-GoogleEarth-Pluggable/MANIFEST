@@ -5,6 +5,8 @@ lib/Geo/GoogleEarth/Pluggable/Base.pm
 lib/Geo/GoogleEarth/Pluggable/Contrib/LinearRing.pm
 lib/Geo/GoogleEarth/Pluggable/Contrib/LineString.pm
 lib/Geo/GoogleEarth/Pluggable/Contrib/Point.pm
+lib/Geo/GoogleEarth/Pluggable/Contrib/Polygon.pm
+lib/Geo/GoogleEarth/Pluggable/Contrib/MultiPolygon.pm
 lib/Geo/GoogleEarth/Pluggable/Folder.pm
 lib/Geo/GoogleEarth/Pluggable/LookAt.pm
 lib/Geo/GoogleEarth/Pluggable/NetworkLink.pm
@@ -18,12 +20,14 @@ lib/Geo/GoogleEarth/Pluggable/Plugin/Style.pm
 LICENSE
 Makefile.PL
 MANIFEST
-README
+README.md
 t/001_load.t
 t/002_document.t
 t/003_Folder.t
 t/003_Point.t
 t/004_Snippet.t
+t/005_Polygon.t
+t/006_MultiPolygon.t
 Todo
 scripts/generate-kml.pl
 scripts/Geo-GoogleEarth-Pluggable-Folder.pl
@@ -57,4 +61,5 @@ scripts/Geo-GoogleEarth-Pluggable-Snippet.pl
 scripts/Geo-GoogleEarth-Pluggable-Snippet.pl.kml
 scripts/Geo-GoogleEarth-Pluggable-Snippet.pl.kmz
 perl-Geo-GoogleEarth-Pluggable.spec
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

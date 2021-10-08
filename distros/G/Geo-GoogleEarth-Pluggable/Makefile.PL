@@ -14,4 +14,20 @@ WriteMakefile(
                      'Module::Pluggable'        => 0,
                      'Package::New'             => 0,
                     },
+    LICENSE          => 'bsd',
+    META_MERGE       => {
+          'meta-spec' =>  { version => 2 },
+          'resources' =>  {
+                            homepage   => 'https://github.com/mrdvt92/perl-Geo-GoogleEarth-Pluggable',
+                            bugtracker => {
+                                web  => 'https://github.com/mrdvt92/perl-Geo-GoogleEarth-Pluggable/issues',
+                            },
+                            repository => {
+                                type => 'git',
+                                url  => 'git@github.com:mrdvt92/perl-Geo-GoogleEarth-Pluggable.git',
+                                web  => 'https://github.com/mrdvt92/perl-Geo-GoogleEarth-Pluggable.git',
+                            },
+                          },
+                        },
+
 );

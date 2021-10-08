@@ -107,14 +107,15 @@ file.
 =head1 DESCRIPTION
 
 StreamFinder accepts a webpage URL for a valid radio station, video, or podcast 
-URL on supported websites and returns the actual stream URL(s), title, and cover 
-art icon for that station / podcast / video.  The purpose is that one needs one 
-of these URLs in order to have the option to stream the station / podcast / 
-video in one's own choice of media player software rather than using their web 
-browser and accepting flash, ads, javascript, cookies, trackers, web-bugs, and 
-other crapware associated with that method of play.  The author uses his own 
-custom all-purpose media player called "Fauxdacious" (his custom forked 
-version of the open-source "Audacious" audio player).  "Fauxdacious" 
+/ episode URL on supported websites and returns the actual stream URL(s), 
+title, and cover art icon for that station / podcast / video.  The purpose is 
+that one needs one of these URLs in order to have the option to stream the 
+station / podcast / video in one's own choice of media player software rather 
+than using their web browser and accepting flash, ads, javascript, cookies, 
+trackers, web-bugs, and other crapware associated with that method of play.  
+The author created and uses his own custom all-purpose media player called 
+"Fauxdacious" media player (his custom forked version of the open-source 
+"Audacious" audio player).  "Fauxdacious" 
 (L<https://wildstar84.wordpress.com/fauxdacious/>) incorporates this module to 
 decode and play streams, along with their titles / station names, and station 
 / podcast / video icons! 
@@ -142,12 +143,6 @@ webpage URL (not supported by any of the other submodules) for streams.
 
 NOTE:  StreamFinder::Reciva has been removed, as that site has now closed down.
 
-NOTE:  Facebook (Streamfinder::Facebook) has been removed because 
-logging into Facebook via the call to youtube-dl is now interpreted by 
-Facebook as a "rogue app. login" and will cause them to LOCK your account 
-and FORCE you to change your password the next time you log in 
-to Facebook!
-
 NOTE:  For some sites, ie. Youtube, Vimeo, Apple, Spreaker, Castbox, Google, 
 etc. the "station" object actually refers to a specific video or podcast, but 
 functions the same way.
@@ -165,22 +160,23 @@ podcast, along with at least a "title" (station name / video or podcast
 title) and an icon image URL ("iconurl" - if found).  Additional information 
 that MAY be fetched is a (larger?) banner image ("imageurl"), a (longer?) 
 "description", an "artist" / author, a "genre", and / or a "year" (podcasts, 
-videos, etc.).  Some sites also provide station's FCC call letters 
-("fccid").  For icon and image URLs, functions exist (getIconData() 
-and getImageData() to fetch the actual binary data and mime type for 
-downloading to local storage for use by your application or preferred media 
-player.  NOTE:  StreamFinder::Anystream is not able to return much beyond 
-the stream URLs it finds, please see it's POD documentation for details on 
-what it is able to return.
+videos, etc.), an AlbumArtist / channel URL, and possibly a second 
+icon image for the channel (podcasts and videos).  Some sites also provide 
+radio stations' FCC call letters ("fccid").  For icon and image URLs, 
+functions exist (getIconData() and getImageData()) to fetch the actual binary 
+data and mime type for downloading to local storage for use by your 
+application or preferred media player.  NOTE:  StreamFinder::Anystream is not 
+able to return much beyond the stream URLs it finds, but please see it's POD 
+documentation for details on what it is able to return.
 
 If you have another streaming site that is not supported, first, make sure 
 you have B<youtube-dl> installed and see if B<StreamFinder::Youtube> can 
-successfully fetch it.  If not, then please file a feature request via email 
-or the CPAN bug system, or (for faster service), provide a Perl patch module 
-/ program source that can extract some or all of the necessary information 
-for streams on that site and I'll consider it!  The easiest way to do this 
-is to take one of the existing submodules, copy it to 
-"StreamFinder::I<YOURSITE>.pm and modify it (and the POD docs) to your 
+successfully fetch any streams for it.  If not, then please file a feature 
+request via email or the CPAN bug system, or (for faster service), provide a 
+Perl patch module / program source that can extract some or all of the 
+necessary information for streams on that site and I'll consider it!  The 
+easiest way to do this is to take one of the existing submodules, copy it to 
+"StreamFinder::I<YOURSITE>.pm" and modify it (and the POD docs) to your 
 specific site's needs, test it on several of their pages (see the "SYNOPSIS" 
 code above), and send it to me (That's what I do when I want to add a 
 new site)!
@@ -209,13 +205,14 @@ I<options> can vary depending on the type of site that is
 being queried.  One option common to all sites is I<-debug>, which 
 turns on debugging output.  A numeric option can follow specifying 
 the level (0, 1, or 2).  0 is none, 1 is basic, 2 is detailed.  
-Default:  B<1> (if I<-debug> is specified).
+Default:  B<1> (if I<-debug> is specified).  Warning: 2 will dump a ton 
+of output (mostly the HTML of the web page being parsed!
 
 One specific option (I<-omit>, added as of v1.45) permits omitting 
-specific submodules which are currently installed.  For example, to 
-NOT handle Youtube videos nor use the fallback "Anystream" module, 
-specify:  I<-omit> => I<"Youtube,Anystream">, which will cause 
-StreamFinder::Anystream and StreamFinder::Youtube to not be used 
+specific submodules which are currently installed from being considered.  
+For example, to NOT handle Youtube videos nor use the fallback 
+"Anystream" module, specify:  I<-omit> => I<"Youtube,Anystream">, which 
+will cause StreamFinder::Anystream and StreamFinder::Youtube to not be used 
 for the stream search.  Default is for all installed submodules to be 
 considered.
 
@@ -475,7 +472,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.60';
+our $VERSION = '1.61';
 our $DEBUG = 0;
 
 require Exporter;

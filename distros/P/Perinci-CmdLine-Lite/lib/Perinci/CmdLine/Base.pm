@@ -12,9 +12,9 @@ use IO::Interactive qw(is_interactive);
 
 # put global variables alphabetically here
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-01'; # DATE
+our $DATE = '2021-10-02'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.910'; # VERSION
+our $VERSION = '1.911'; # VERSION
 
 # this class can actually be a role instead of base class for pericmd &
 # pericmd-lite, but Mo is more lightweight than Role::Tiny (also R::T doesn't
@@ -2143,7 +2143,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.910 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2021-10-01.
+This document describes version 1.911 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2021-10-02.
 
 =head1 DESCRIPTION
 

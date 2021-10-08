@@ -1,0 +1,150 @@
+# PODNAME: Iterator::Flex::Manual::Glossary
+# ABSTRACT: Glossary
+
+__END__
+
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
+=head1 NAME
+
+Iterator::Flex::Manual::Glossary - Glossary
+
+=head1 VERSION
+
+version 0.14
+
+=head1 NAME
+
+Iterator::Flex::Manual::Glossary
+
+=head1 GLOSSARY
+
+=head2 I<iterable object>
+
+An I<iterable object> is an object which can be wrapped by an L<Iterator::Flex::Base> based iterator,
+and which has one or more of the following:
+
+=over
+
+=item *
+
+C<__iter__> or C<iter> methods
+
+=item *
+
+C<__next__> or C<next> methods
+
+=item *
+
+an overloaded C<< <> >> operator
+
+These should return the next item.
+
+=item *
+
+an overloaded C<< &{} >> operator
+
+This should return a code reference which returns the next item.  The coderef
+will be called as
+
+  $next = $coderef->( $obj )
+
+=item *
+
+an overloaded C<< @{} >> operator
+
+This should return a code reference which returns an array reference.   The coderef
+will be called as
+
+  $next = $coderef->( $obj )
+
+=back
+
+Additionally, if the object has the following methods, they are used
+to implement the L<prev|Iterator::Flex::Manual::Overview/prev> and  L<current|Iterator::Flex::Manual::Overview/current> capabilities.
+
+=over
+
+=item *
+
+C<__prev__> or C<prev>
+
+=item *
+
+C<__current__> or C<current>
+
+=back
+
+=head2 I<iterable thing>
+
+An I<iterable thing> is an entity which can be wrapped by an L<Iterator::Flex::Base> based iterator.
+
+It may be one of the following:
+
+=over
+
+=item *
+
+an L</iterable object>
+
+=item *
+
+an arrayref
+
+=item *
+
+a coderef, which must return the next element in the iteration.
+
+=item *
+
+a globref, assumed to be a filehandle.
+
+=back
+
+=head1 SUPPORT
+
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-iterator-flex@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Iterator-Flex>
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/iterator-flex
+
+and may be cloned from
+
+  https://gitlab.com/djerius/iterator-flex.git
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<Iterator::Flex|Iterator::Flex>
+
+=item *
+
+L<Iterator::Flex::Manual|Iterator::Flex::Manual>
+
+=back
+
+=head1 AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

@@ -27,6 +27,7 @@ $modules{$_} = $_ for qw(
   Template
   Term::Clui
   Test2::V0
+  Test::Alien::Build
   Test::DZil
   Test::File::ShareDir::Module
   URI

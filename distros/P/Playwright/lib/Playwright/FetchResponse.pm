@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::FetchResponse;
-$Playwright::FetchResponse::VERSION = '0.015';
+$Playwright::FetchResponse::VERSION = '0.016';
 use parent 'Playwright::Base';
 
 sub new {
@@ -20,7 +20,7 @@ sub new {
 
 sub headersArray {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'headersArray',
         object  => $self->{guid},
@@ -28,29 +28,9 @@ sub headersArray {
     );
 }
 
-sub statusText {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'statusText',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub json {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'json',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub text {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'text',
         object  => $self->{guid},
@@ -58,19 +38,9 @@ sub text {
     );
 }
 
-sub url {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'url',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub dispose {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'dispose',
         object  => $self->{guid},
@@ -78,19 +48,9 @@ sub dispose {
     );
 }
 
-sub status {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'status',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub ok {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'ok',
         object  => $self->{guid},
@@ -98,11 +58,11 @@ sub ok {
     );
 }
 
-sub headers {
+sub json {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
-        command => 'headers',
+        command => 'json',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -110,7 +70,7 @@ sub headers {
 
 sub body {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'body',
         object  => $self->{guid},
@@ -118,9 +78,49 @@ sub body {
     );
 }
 
+sub status {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'status',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub statusText {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'statusText',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub url {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'url',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub headers {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'headers',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
 sub on {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'on',
         object  => $self->{guid},
@@ -130,7 +130,7 @@ sub on {
 
 sub evaluate {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'evaluate',
         object  => $self->{guid},
@@ -140,7 +140,7 @@ sub evaluate {
 
 sub evaluateHandle {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'evaluateHandle',
         object  => $self->{guid},
@@ -162,7 +162,7 @@ Playwright::FetchResponse - Automatically generated class for Playwright::FetchR
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 CONSTRUCTOR
 
@@ -179,29 +179,11 @@ Execute the FetchResponse::headersArray playwright routine.
 
 See L<https://playwright.dev/api/class-FetchResponse#FetchResponse-headersArray> for more information.
 
-=head2 statusText(@args)
-
-Execute the FetchResponse::statusText playwright routine.
-
-See L<https://playwright.dev/api/class-FetchResponse#FetchResponse-statusText> for more information.
-
-=head2 json(@args)
-
-Execute the FetchResponse::json playwright routine.
-
-See L<https://playwright.dev/api/class-FetchResponse#FetchResponse-json> for more information.
-
 =head2 text(@args)
 
 Execute the FetchResponse::text playwright routine.
 
 See L<https://playwright.dev/api/class-FetchResponse#FetchResponse-text> for more information.
-
-=head2 url(@args)
-
-Execute the FetchResponse::url playwright routine.
-
-See L<https://playwright.dev/api/class-FetchResponse#FetchResponse-url> for more information.
 
 =head2 dispose(@args)
 
@@ -209,29 +191,47 @@ Execute the FetchResponse::dispose playwright routine.
 
 See L<https://playwright.dev/api/class-FetchResponse#FetchResponse-dispose> for more information.
 
-=head2 status(@args)
-
-Execute the FetchResponse::status playwright routine.
-
-See L<https://playwright.dev/api/class-FetchResponse#FetchResponse-status> for more information.
-
 =head2 ok(@args)
 
 Execute the FetchResponse::ok playwright routine.
 
 See L<https://playwright.dev/api/class-FetchResponse#FetchResponse-ok> for more information.
 
-=head2 headers(@args)
+=head2 json(@args)
 
-Execute the FetchResponse::headers playwright routine.
+Execute the FetchResponse::json playwright routine.
 
-See L<https://playwright.dev/api/class-FetchResponse#FetchResponse-headers> for more information.
+See L<https://playwright.dev/api/class-FetchResponse#FetchResponse-json> for more information.
 
 =head2 body(@args)
 
 Execute the FetchResponse::body playwright routine.
 
 See L<https://playwright.dev/api/class-FetchResponse#FetchResponse-body> for more information.
+
+=head2 status(@args)
+
+Execute the FetchResponse::status playwright routine.
+
+See L<https://playwright.dev/api/class-FetchResponse#FetchResponse-status> for more information.
+
+=head2 statusText(@args)
+
+Execute the FetchResponse::statusText playwright routine.
+
+See L<https://playwright.dev/api/class-FetchResponse#FetchResponse-statusText> for more information.
+
+=head2 url(@args)
+
+Execute the FetchResponse::url playwright routine.
+
+See L<https://playwright.dev/api/class-FetchResponse#FetchResponse-url> for more information.
+
+=head2 headers(@args)
+
+Execute the FetchResponse::headers playwright routine.
+
+See L<https://playwright.dev/api/class-FetchResponse#FetchResponse-headers> for more information.
 
 =head2 on(@args)
 

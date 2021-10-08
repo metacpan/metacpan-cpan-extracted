@@ -1,3 +1,7 @@
+1.212780  2021-10-05 16:22:33+00:00 UTC
+ Joelle Maslak <jmaslak@antelope.net>
+ * [bugfix] Fixed regex to properly color transceiver rx light levels > 1.00
+
 1.212302  2021-08-18 15:49:37+00:00 UTC
  Joelle Maslak <jmaslak@antelope.net>
  * [feature] Colorize interface & BGP descriptions

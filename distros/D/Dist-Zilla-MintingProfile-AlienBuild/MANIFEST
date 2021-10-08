@@ -9,6 +9,7 @@ Makefile.PL
 README
 author.yml
 corpus/alien_build_wizard/auto-1.2.3.tar
+corpus/alien_build_wizard__ci/libpalindrome.tar.gz
 corpus/alien_build_wizard_detect/auto-1.2.3.tar
 corpus/dist_zilla_mintingprofile_alienbuild/config.ini
 dist.ini
@@ -25,6 +26,7 @@ profiles/default/profile.ini
 profiles/default/skel/Changes
 t/00_diag.t
 t/alien_build_wizard.t
+t/alien_build_wizard__ci.t
 t/alien_build_wizard_chrome.t
 t/alien_build_wizard_detect.t
 t/alien_build_wizard_questions.t

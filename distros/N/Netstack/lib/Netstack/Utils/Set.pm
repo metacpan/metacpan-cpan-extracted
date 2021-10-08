@@ -3,7 +3,7 @@ package Netstack::Utils::Set;
 #------------------------------------------------------------------------------
 # 加载扩展模块功能
 #------------------------------------------------------------------------------
-use 5.018;
+use 5.016;
 use Moose;
 use namespace::autoclean;
 use POSIX;
@@ -69,7 +69,7 @@ sub BUILD {
   my $lengthOfMin = $self->mins->@*;
   my $lengthOfMax = $self->maxs->@*;
 
-  # 约束性检查
+  # 约束性检查 | 集合对象成员数必须相等、确保集合对象的 min < max
   if ( $lengthOfMin != $lengthOfMax ) {
     push @ERROR, 'Attribute (mins) and (maxs) must has same length at constructor ' . __PACKAGE__;
   }
@@ -79,6 +79,7 @@ sub BUILD {
       last;
     }
   }
+  # 异常拦截
   if ( @ERROR > 0 ) {
     confess join( ', ', @ERROR );
   }
@@ -88,12 +89,15 @@ sub BUILD {
 # 集合对象空间长度
 #------------------------------------------------------------------------------
 sub length {
-  my $self        = shift;
+  my $self = shift;
+  # 集合对象长度
   my $lengthOfMin = $self->mins->@*;
   my $lengthOfMax = $self->maxs->@*;
+
   # 边界条件检查
   confess "ERROR: Attribute (mins) 's length($lengthOfMin) not equal (maxs) 's length($lengthOfMax)"
     if $lengthOfMin != $lengthOfMax;
+  # 返回计算结果
   return $lengthOfMin;
 }
 
@@ -133,7 +137,7 @@ sub addToSet {
   # 确保集合对象的顺序
   ( $MIN, $MAX ) = $MIN > $MAX ? ( $MAX, $MIN ) : ( $MIN, $MAX );
 
-  # 检查是否存在集合对象
+  # 检查是否存在集合对象，空集合对象直接插入数据
   my $length = $self->length;
   if ( $length == 0 ) {
     $self->mins( [$MIN] );
@@ -143,17 +147,21 @@ sub addToSet {
 
   my $minArray = $self->mins;
   my $maxArray = $self->maxs;
-  # 遍历集合对象 minArray(本身线性递增)
+
+  # 遍历集合对象 minArray(本身线性递增) | 非空集合则需要确定插入点
   my $index;
   for ( my $i = 0; $i < $length; $i++ ) {
+    # 从最小成员对象开始查找，插入点落在集合区间左开部分
     if ( $MIN < $minArray->[$i] ) {
       $index = $i;
       last;
     }
   }
 
-  # 未命中已有的 minArray 集合对象
+  # 找了一圈仍未确定插入点，则必定在最后一个集合区间
   $index = $length if not defined $index;
+
+  # 确定插入点填充实际数据
   my ( @min, @max );
   push @min, $minArray->@[ 0 .. $index - 1 ];
   push @max, $maxArray->@[ 0 .. $index - 1 ];
@@ -161,6 +169,8 @@ sub addToSet {
   push @max, $MAX;
   push @min, $minArray->@[ $index .. $length - 1 ];
   push @max, $maxArray->@[ $index .. $length - 1 ];
+
+  # 数据绑定
   $self->mins( \@min );
   $self->maxs( \@max );
 }
@@ -170,9 +180,11 @@ sub addToSet {
 #------------------------------------------------------------------------------
 sub mergeToSet {
   my $self = shift;
+  # 入参是否为一个集合对象
   if ( @_ == 1 and ref( $_[0] ) eq __PACKAGE__ ) {
     my $setObj = $_[0];
     my $length = $setObj->length;
+    # 遍历集合对象并合并数据
     for ( my $i = 0; $i < $length; $i++ ) {
       $self->_mergeToSet( $setObj->mins->[$i], $setObj->maxs->[$i] );
     }
@@ -200,12 +212,14 @@ sub _mergeToSet {
 
   my $minArray = $self->mins;
   my $maxArray = $self->maxs;
+  # 索引位置在数组长度区间各偏移一个单位
   my ( $minIndex, $maxIndex ) = ( -1, $length );
 
+  # 边际递减确定合并数据的区间，合并数据可能跨界（分布在多个集合区间）
   MIN: {
     for ( my $i = 0; $i < $length; $i++ ) {
       # 命中集合对象区间 ($minArray, $maxArray)
-      if ( $MIN >= $minArray->[$i] and $MIN <= $maxArray->[$i] + 1 ) {
+      if ( $MIN >= $minArray->[$i] and $MIN <= $maxArray->[$i] ) {
         $minIndex = $i;
         last MIN;
       }
@@ -215,6 +229,7 @@ sub _mergeToSet {
         last MIN;
       }
       # 命中集合对象区间 ($minArray, $maxArray) 右开区间 | 比最大还大
+      # 集合对象可能存在多个不连续区间，该动作代表移位计算（当前区间不满足要求）
       else {
         $minIndex++;
       }
@@ -224,7 +239,7 @@ sub _mergeToSet {
   MAX: {
     for ( my $j = $length - 1; $j >= $minIndex; $j-- ) {
       # 命中集合对象区间 ($minArray, $maxArray)
-      if ( $MAX >= $minArray->[$j] - 1 and $MAX <= $maxArray->[$j] ) {
+      if ( $MAX >= $minArray->[$j] and $MAX <= $maxArray->[$j] ) {
         $maxIndex = $j;
         last MAX;
       }
@@ -234,6 +249,7 @@ sub _mergeToSet {
         last MAX;
       }
       # 命中集合对象区间 ($minArray, $maxArray) 左开区间，比最小还小
+      # 集合对象可能存在多个不连续区间，该动作代表移位计算（当前区间不满足要求）
       else {
         $maxIndex--;
       }
@@ -241,18 +257,21 @@ sub _mergeToSet {
     $maxIndex -= 0.5;
   }
 
-  # 向上向下取证 POSIX::ceil(0.5) = 1, POSIX::floor(-0.5) = -1
-  my $minIndexInt     = POSIX::ceil($minIndex);
-  my $maxIndexInt     = POSIX::floor($maxIndex);
+  # 分别向上向下取整 POSIX::ceil(0.5) = 1, POSIX::floor(-0.5) = -1
+  my $minIndexInt = POSIX::ceil($minIndex);
+  my $maxIndexInt = POSIX::floor($maxIndex);
+  # 是否命中已有集合区间
   my $isMinIndexInSet = ( $minIndex == $minIndexInt ) ? 1 : 0;
   my $isMaxIndexInSet = ( $maxIndex == $maxIndexInt ) ? 1 : 0;
+  # 已确定插入点合并数据
   my ( @min, @max );
   push @min, $minArray->@[ 0 .. $minIndexInt - 1 ];
   push @max, $maxArray->@[ 0 .. $minIndexInt - 1 ];
-  push @min, $isMinIndexInSet ? $minArray->[$minIndexInt] : $MIN;
-  push @max, $isMaxIndexInSet ? $maxArray->[$maxIndexInt] : $MAX;
+  push @min, $isMinIndexInSet ? $minArray->[$minIndex] : $MIN;
+  push @max, $isMaxIndexInSet ? $maxArray->[$maxIndex] : $MAX;
   push @min, $minArray->@[ $maxIndexInt + 1 .. $length - 1 ];
   push @max, $maxArray->@[ $maxIndexInt + 1 .. $length - 1 ];
+  # 数据绑定
   $self->mins( \@min );
   $self->maxs( \@max );
 }
@@ -277,7 +296,7 @@ sub compare {
 }
 
 #------------------------------------------------------------------------------
-# isEqual 两个集合对象完全相同
+# isEqual 两个集合对象完全相同 | "~~ 判断两个数组对象是否相等"
 #------------------------------------------------------------------------------
 sub isEqual {
   my ( $self, $setObj ) = @_;
@@ -285,7 +304,7 @@ sub isEqual {
 }
 
 #------------------------------------------------------------------------------
-# notEqual 两个集合对象不等性判断
+# notEqual 两个集合对象不等性判断 | 基于isEqual取反
 #------------------------------------------------------------------------------
 sub notEqual {
   my ( $self, $setObj ) = @_;
@@ -297,6 +316,7 @@ sub notEqual {
 #------------------------------------------------------------------------------
 sub isContain {
   my ( $self, $setObj ) = @_;
+  # 完全一致
   if ( $self->isEqual($setObj) ) {
     return 1;
   }
@@ -310,8 +330,11 @@ sub isContain {
 #------------------------------------------------------------------------------
 sub _isContain {
   my ( $self, $setObj ) = @_;
+  # 复刻一份self集合对象
   my $copyOfSelf = Netstack::Utils::Set->new($self);
+  # 合并B集合对象到A集合对象
   $copyOfSelf->mergeToSet($setObj);
+  # 将A集合与$copyOfSelf比较，合并B集合对象的没有发生改变，代表B为A的子集
   return $self->isEqual($copyOfSelf);
 }
 
@@ -346,8 +369,11 @@ sub isBelong {
 #------------------------------------------------------------------------------
 sub _isBelong {
   my ( $self, $setObj ) = @_;
+  # 复刻B集合对象
   my $copyOfSetObj = Netstack::Utils::Set->new($setObj);
+  # 将A对象合并到复刻的B集合对象
   $copyOfSetObj->mergeToSet($self);
+  # 判断B对象与合并A的复刻B对象是否相等，合并过来没发生改变，代表A为B的子集
   return $setObj->isEqual($copyOfSetObj);
 }
 
@@ -379,20 +405,27 @@ sub interSet {
     return $setObj;
   }
 
+  # 遍历两个集合对象
   my $i = 0;
   my $j = 0;
   while ( $i < $self->length and $j < $setObj->length ) {
     my @rangeSet1 = ( $self->mins->[$i],   $self->maxs->[$i] );
     my @rangeSet2 = ( $setObj->mins->[$j], $setObj->maxs->[$j] );
+    # 两个数组的最大最小值|可能返回 undef
     my ( $min, $max ) = $self->interRange( \@rangeSet1, \@rangeSet2 );
+    # 如果定义了 min 则合并到初始化的集合对象
     $result->_mergeToSet( $min, $max ) if defined $min;
+
+    # B对象比A对象的最大值还大，自增A对象区间值
     if ( $setObj->maxs->[$j] > $self->maxs->[$i] ) {
       $i++;
     }
+    # B对象的最大值和A对象的最大值相等
     elsif ( $setObj->maxs->[$j] == $self->maxs->[$i] ) {
       $i++;
       $j++;
     }
+    # B对象比A对象的最小值还小，自增B对象区间值
     else {
       $j++;
     }
@@ -433,7 +466,7 @@ for my $func (qw/ addToSet _mergeToSet /) {
 }
 
 #------------------------------------------------------------------------------
-# 集合对象比较函数钩子函数，确保被检查对象必须为集合对象
+# 集合对象比较函数钩子函数，确保入参为集合对象
 #------------------------------------------------------------------------------
 for my $func (qw/ compare isEqual isContain _isContain isContainButNotEqual isBelong _isBelong isBelongButNotEqual /) {
   before $func => sub {

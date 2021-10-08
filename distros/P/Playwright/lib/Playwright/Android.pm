@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Android;
-$Playwright::Android::VERSION = '0.015';
+$Playwright::Android::VERSION = '0.016';
 use parent 'Playwright::Base';
 
 sub new {
@@ -18,19 +18,9 @@ sub new {
     return $self->SUPER::new(%options);
 }
 
-sub setDefaultTimeout {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'setDefaultTimeout',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub devices {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'devices',
         object  => $self->{guid},
@@ -38,9 +28,19 @@ sub devices {
     );
 }
 
+sub setDefaultTimeout {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'setDefaultTimeout',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
 sub on {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'on',
         object  => $self->{guid},
@@ -50,7 +50,7 @@ sub on {
 
 sub evaluate {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'evaluate',
         object  => $self->{guid},
@@ -60,7 +60,7 @@ sub evaluate {
 
 sub evaluateHandle {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'evaluateHandle',
         object  => $self->{guid},
@@ -82,7 +82,7 @@ Playwright::Android - Automatically generated class for Playwright::Android
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 CONSTRUCTOR
 
@@ -93,17 +93,17 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 setDefaultTimeout(@args)
-
-Execute the Android::setDefaultTimeout playwright routine.
-
-See L<https://playwright.dev/api/class-Android#Android-setDefaultTimeout> for more information.
-
 =head2 devices(@args)
 
 Execute the Android::devices playwright routine.
 
 See L<https://playwright.dev/api/class-Android#Android-devices> for more information.
+
+=head2 setDefaultTimeout(@args)
+
+Execute the Android::setDefaultTimeout playwright routine.
+
+See L<https://playwright.dev/api/class-Android#Android-setDefaultTimeout> for more information.
 
 =head2 on(@args)
 

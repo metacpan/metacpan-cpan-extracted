@@ -64,5 +64,6 @@ requires 'nextUnParsedLine';
 requires 'backtrack';
 requires 'ignore';
 requires 'getUnParsedLines';
+requires '_buildLineParsedFlags';
 
 1;

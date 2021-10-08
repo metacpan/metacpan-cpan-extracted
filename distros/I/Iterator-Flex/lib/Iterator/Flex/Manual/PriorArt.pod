@@ -1,0 +1,122 @@
+# PODNAME: Iterator::Flex::Manual::PriorArt
+# ABSTRACT: Other Iterator Models
+
+__END__
+
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory Raku
+
+=head1 NAME
+
+Iterator::Flex::Manual::PriorArt - Other Iterator Models
+
+=head1 VERSION
+
+version 0.14
+
+=head1 DESCRIPTION
+
+Iterators are not new.
+
+=head2 Other Languages
+
+These languages provide official iterator facilities, namely classes
+whose objects retrieve data from a source (similar to this package).
+There's a range in how they signal exhaustion:
+
+=over
+
+=item *
+
+Python, throws an exception C<StopIteration>;
+
+=item *
+
+Raku returns a special sentinel value C<IterationEnd>;
+
+=item *
+
+JavaScript returns an object with C<value> and C<done> properties, with C<done> false;
+
+=item *
+
+Ruby (via the Enumerator class) raises the C<StopIteration> exception;
+
+=item *
+
+Java throws a C<NoSuchElementException> exception.
+
+=back
+
+=head2 C++
+
+L<C++|https://en.cppreference.com/w/cpp/iterator> arguably has the
+most complicated model of iterators, as they can insert as well
+as retrieve.  They're also a very different model from other
+languages, so not comparable.
+
+=head2 Perl
+
+And Perl... Well, Perl doesn't provide an official iterator, so Perl
+can signal exhaustion any way it wants. This is great unless you need to use
+an iterator which doesn't fit your exhaustion model.  In any case,
+see L<Iterator::Flex::Manual::Alien>.
+
+=over
+
+=item *
+
+L<Iterator>
+
+=item *
+
+L<Iterator::Simple>
+
+=back
+
+=head1 SUPPORT
+
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-iterator-flex@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Iterator-Flex>
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/iterator-flex
+
+and may be cloned from
+
+  https://gitlab.com/djerius/iterator-flex.git
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<Iterator::Flex|Iterator::Flex>
+
+=item *
+
+L<Iterator::Flex::Manual|Iterator::Flex::Manual>
+
+=back
+
+=head1 AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

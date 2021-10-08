@@ -1,18 +1,18 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Math/Image/CalcResized/image_resize_notation_to_human
-# and generated automatically using Perinci::CmdLine::Gen version 0.497
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-12-24'; # DATE
-our $DIST = 'App-ImageMagickUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+# and generated automatically using Perinci::CmdLine::Gen version 0.500
 
 use 5.010001;
 use strict;
 use warnings;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-10-05'; # DATE
+our $DIST = 'App-ImageMagickUtils'; # DIST
+our $VERSION = '0.005'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Math/Image/CalcResized/image_resize_notation_to_human",
@@ -38,71 +38,13 @@ image-resize-notation-to-human - Translate ImageMagick-like resize notation (e.g
 
 =head1 VERSION
 
-This document describes version 0.004 of image-resize-notation-to-human (from Perl distribution App-ImageMagickUtils), released on 2020-12-24.
+This document describes version 0.005 of image-resize-notation-to-human (from Perl distribution App-ImageMagickUtils), released on 2021-10-05.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % image-resize-notation-to-human [--format=name] [--json]
-     [--(no)naked-res] [--page-result[=program]] [--view-result[=program]]
-     <resize>
-
-Examples:
-
- % image-resize-notation-to-human ''
- no resizing
-
- % image-resize-notation-to-human 50%
- scale to 50%
-
- % image-resize-notation-to-human 50%x50%
- scale width to 50%, height to 50%
-
- % image-resize-notation-to-human 720
- set width to 720px
-
- % image-resize-notation-to-human '720>'
- shrink width to 720px
-
- % image-resize-notation-to-human 720^
- enlarge width to 720px
-
- % image-resize-notation-to-human x720
- set height to 720px
-
- % image-resize-notation-to-human 'x720>'
- shrink height to 720px
-
- % image-resize-notation-to-human x720^
- enlarge height to 720px
-
- % image-resize-notation-to-human 640x480
- fit image inside 640x480
-
- % image-resize-notation-to-human 640x480^
- fit image to fit 640x480 inside it
-
- % image-resize-notation-to-human '640x480>'
- shrink image to fit inside 640x480
-
- % image-resize-notation-to-human '640x480<'
- enlarge image to fit 640x480 inside it
-
- % image-resize-notation-to-human 640x480!
- set dimension to 640x480
-
- % image-resize-notation-to-human '720^>'
- shrink shortest side to 720px
-
- % image-resize-notation-to-human '720^<'
- enlarge shortest side to 720px
-
- % image-resize-notation-to-human '^720>'
- shrink longest side to 720px
-
- % image-resize-notation-to-human '^720<'
- enlarge longest side to 720px
+% B<image-resize-notation-to-human> [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] -- E<lt>I<resize>E<gt>
 
 =head1 OPTIONS
 
@@ -113,6 +55,8 @@ C<*> marks required options.
 =over
 
 =item B<--resize>=I<s>*
+
+Can also be specified as the 1st command-line argument.
 
 =back
 
@@ -211,6 +155,62 @@ It is also recommended to install L<shcompgen> (see above).
 
 For fish and zsh, install L<shcompgen> as described above.
 
+=head1 EXAMPLES
+
+ % image-resize-notation-to-human ''
+ no resizing
+
+ % image-resize-notation-to-human 50%
+ scale to 50%
+
+ % image-resize-notation-to-human 50%x50%
+ scale width to 50%, height to 50%
+
+ % image-resize-notation-to-human 720
+ set width to 720px
+
+ % image-resize-notation-to-human '720>'
+ shrink width to 720px
+
+ % image-resize-notation-to-human 720^
+ enlarge width to 720px
+
+ % image-resize-notation-to-human x720
+ set height to 720px
+
+ % image-resize-notation-to-human 'x720>'
+ shrink height to 720px
+
+ % image-resize-notation-to-human x720^
+ enlarge height to 720px
+
+ % image-resize-notation-to-human 640x480
+ fit image inside 640x480
+
+ % image-resize-notation-to-human 640x480^
+ fit image to fit 640x480 inside it
+
+ % image-resize-notation-to-human '640x480>'
+ shrink image to fit inside 640x480
+
+ % image-resize-notation-to-human '640x480<'
+ enlarge image to fit 640x480 inside it
+
+ % image-resize-notation-to-human 640x480!
+ set dimension to 640x480
+
+ % image-resize-notation-to-human '720^>'
+ shrink shortest side to 720px
+
+ % image-resize-notation-to-human '720^<'
+ enlarge shortest side to 720px
+
+ % image-resize-notation-to-human '^720>'
+ shrink longest side to 720px
+
+ % image-resize-notation-to-human '^720<'
+ enlarge longest side to 720px
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-ImageMagickUtils>.
@@ -219,23 +219,40 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-ImageM
 
 Source repository is at L<https://github.com/perlancar/perl-App-ImageMagickUtils>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-ImageMagickUtils/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ImageMagickUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

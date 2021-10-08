@@ -47,7 +47,7 @@ use SNMP::Info::DocsisHE;
 
 our ($VERSION, %GLOBALS, %MIBS, %FUNCS, %PORTSTAT, %MUNGE);
 
-$VERSION = '3.80';
+$VERSION = '3.81';
 
 %MIBS = (
     %SNMP::Info::MIBS,         %SNMP::Info::Bridge::MIBS,
@@ -105,8 +105,8 @@ sub model {
 
 sub vendor {
     my $l2    = shift;
-    my $model = $l2->model();
-    my $descr = $l2->description();
+    my $model = $l2->model() || '';
+    my $descr = $l2->description() || '';
 
     if ( $model =~ /hp/i or $descr =~ /\bhp\b/i ) {
         return 'hp';

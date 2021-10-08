@@ -1,0 +1,32 @@
+NAME
+    Mojo::WebSocket::PubSub - A Mojolicious publish/subscribe channels based
+    on websocket.
+
+VERSION
+    version 0.04
+
+SYNOPSIS
+DESCRIPTION
+    A Mojolicious publish/subscribe channels based on websocket.
+
+BUGS/CONTRIBUTING
+    Please report any bugs through the web interface at
+    <https://github.com/EmilianoBruni/mojo-websocket-pubsub/issues> If you
+    want to contribute changes or otherwise involve yourself in development,
+    feel free to fork the Git repository from
+    <https://github.com/EmilianoBruni/mojo-websocket-pubsub/>.
+
+SUPPORT
+    You can find this documentation with the perldoc command too.
+
+        perldoc Mojo::WebSocket::PubSub
+
+AUTHOR
+    Emiliano Bruni <info@ebruni.it>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by Emiliano Bruni.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,3 +1,9 @@
+0.233   2021-08-08  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix][function ta_wrap] Fix handling of flindent & slindent
+	  options (GH#1).
+
+
 0.232   2021-04-14  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

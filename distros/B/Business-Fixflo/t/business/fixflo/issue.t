@@ -48,6 +48,7 @@ can_ok(
 		TenantNotes
 		Address
 		Id
+		InactiveJobs
 		InvoiceRecipient
         IsCommunal
         Job

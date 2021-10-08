@@ -12,6 +12,7 @@
 
 #include "perl-backcompat.c.inc"
 #include "perl-additions.c.inc"
+#include "optree-additions.c.inc"
 #include "make_argcheck_ops.c.inc"
 #include "newOP_CUSTOM.c.inc"
 
@@ -24,6 +25,8 @@ SlotMeta *ObjectPad_mop_create_slot(pTHX_ SV *slotname, ClassMeta *classmeta)
   slotmeta->class = classmeta;
   slotmeta->slotix = classmeta->next_slotix;
   slotmeta->defaultsv = NULL;
+  slotmeta->defaultexpr = NULL;
+  slotmeta->paramname = NULL;
 
   slotmeta->hooks = NULL;
 
@@ -66,6 +69,8 @@ static void S_mop_slot_set_param(pTHX_ SlotMeta *slotmeta, SV *paramname)
   parammeta->name = SvREFCNT_inc(paramname);
   parammeta->slot = slotmeta;
   parammeta->slotix = slotmeta->slotix;
+
+  slotmeta->paramname = SvREFCNT_inc(paramname);
 
   hv_store_ent(parammap, paramname, (SV *)parammeta, 0);
 }
@@ -223,7 +228,7 @@ static void slothook_weak_gen_accessor(pTHX_ SlotMeta *slotmeta, SV *hookdata, e
     return;
 
   ctx->post_bodyops = op_append_list(OP_LINESEQ, ctx->post_bodyops,
-    newUNOP_CUSTOM(&pp_weaken, 0, newPADxVOP(OP_PADSV, ctx->padix, 0, 0)));
+    newUNOP_CUSTOM(&pp_weaken, 0, newPADxVOP(OP_PADSV, 0, ctx->padix)));
 }
 
 static struct SlotHookFuncs slothooks_weak = {
@@ -375,7 +380,7 @@ static void slothook_gen_reader_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, enum
 
   ctx->retop = newLISTOP(OP_RETURN, 0,
     newOP(OP_PUSHMARK, 0),
-    newPADxVOP(OP_PADSV, ctx->padix, 0, 0));
+    newPADxVOP(OP_PADSV, 0, ctx->padix));
 }
 
 static struct SlotHookFuncs slothooks_reader = {
@@ -405,11 +410,11 @@ static void slothook_gen_writer_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, enum
 
   ctx->bodyop = newBINOP(OP_SASSIGN, 0,
     newOP(OP_SHIFT, 0),
-    newPADxVOP(OP_PADSV, ctx->padix, 0, 0));
+    newPADxVOP(OP_PADSV, 0, ctx->padix));
 
   ctx->retop = newLISTOP(OP_RETURN, 0,
     newOP(OP_PUSHMARK, 0),
-    newPADxVOP(OP_PADSV, PADIX_SELF, 0, 0));
+    newPADxVOP(OP_PADSV, 0, PADIX_SELF));
 }
 
 static struct SlotHookFuncs slothooks_writer = {
@@ -435,7 +440,7 @@ static void slothook_gen_mutator_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, enu
 
   ctx->retop = newLISTOP(OP_RETURN, 0,
     newOP(OP_PUSHMARK, 0),
-    newPADxVOP(OP_PADSV, ctx->padix, 0, 0));
+    newPADxVOP(OP_PADSV, 0, ctx->padix));
 }
 
 static struct SlotHookFuncs slothooks_mutator = {
@@ -464,11 +469,11 @@ static void slothook_gen_accessor_ops(pTHX_ SlotMeta *slotmeta, SV *hookdata, en
     /* $slot = shift */
     newBINOP(OP_SASSIGN, 0,
       newOP(OP_SHIFT, 0),
-      newPADxVOP(OP_PADSV, ctx->padix, 0, 0)));
+      newPADxVOP(OP_PADSV, 0, ctx->padix)));
 
   ctx->retop = newLISTOP(OP_RETURN, 0,
     newOP(OP_PUSHMARK, 0),
-    newPADxVOP(OP_PADSV, ctx->padix, 0, 0));
+    newPADxVOP(OP_PADSV, 0, ctx->padix));
 }
 
 static struct SlotHookFuncs slothooks_accessor = {

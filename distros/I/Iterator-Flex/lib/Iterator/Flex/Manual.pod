@@ -1,0 +1,104 @@
+# PODNAME: Iterator::Flex::Manual
+# ABSTRACT: Index of Iterator::Flex Manuals
+
+__END__
+
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
+=head1 NAME
+
+Iterator::Flex::Manual - Index of Iterator::Flex Manuals
+
+=head1 VERSION
+
+version 0.14
+
+=head1 DESCRIPTION
+
+=over
+
+=item *
+
+L<Iterator::Flex::Manual::Alien> - Interfacing with other Perl iterators
+
+=item *
+
+L<Iterator::Flex::Manual::Authoring> - How to write an iterator
+
+=item *
+
+L<Iterator::Flex::Manual::Basics> - Iterator Basics
+
+=item *
+
+L<Iterator::Flex::Manual::Caveats> - Caveats
+
+=item *
+
+L<Iterator::Flex::Manual::Glossary> - A Glossary
+
+=item *
+
+L<Iterator::Flex::Manual::Internals> - how things work under the hood
+
+=item *
+
+L<Iterator::Flex::Manual::Overview> - An Abstract overview of Iterators
+
+=item *
+
+L<Iterator::Flex::Manual::PriorArt> - Other Iterator Models
+
+=item *
+
+L<Iterator::Flex::Manual::Serialization> - How to serialize and deserialize an iterator
+
+=item *
+
+L<Iterator::Flex::Manual::Using> - How to use an Iterator::Flex iterator
+
+=back
+
+=head1 SUPPORT
+
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-iterator-flex@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Iterator-Flex>
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/iterator-flex
+
+and may be cloned from
+
+  https://gitlab.com/djerius/iterator-flex.git
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<Iterator::Flex|Iterator::Flex>
+
+=back
+
+=head1 AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

@@ -1,6 +1,6 @@
 # -*- perl -*-
 
-use Test::More tests => 17;
+use Test::More tests => 19;
 
 BEGIN { use_ok( 'Geo::GoogleEarth::Pluggable' ); }
 
@@ -12,6 +12,8 @@ BEGIN { use_ok( 'Geo::GoogleEarth::Pluggable::Base' ); }
 BEGIN { use_ok( 'Geo::GoogleEarth::Pluggable::Contrib::LinearRing' ); }
 BEGIN { use_ok( 'Geo::GoogleEarth::Pluggable::Contrib::LineString' ); }
 BEGIN { use_ok( 'Geo::GoogleEarth::Pluggable::Contrib::Point' ); }
+BEGIN { use_ok( 'Geo::GoogleEarth::Pluggable::Contrib::Polygon' ); }
+BEGIN { use_ok( 'Geo::GoogleEarth::Pluggable::Contrib::MultiPolygon' ); }
 BEGIN { use_ok( 'Geo::GoogleEarth::Pluggable::Folder' ); }
 BEGIN { use_ok( 'Geo::GoogleEarth::Pluggable::LookAt' ); }
 BEGIN { use_ok( 'Geo::GoogleEarth::Pluggable::NetworkLink' ); }

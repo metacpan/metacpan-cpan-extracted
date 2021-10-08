@@ -1,0 +1,493 @@
+# PODNAME: Iterator::Flex::Manual::Authoring
+# ABSTRACT: How to write an iterator
+
+__END__
+
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
+=head1 NAME
+
+Iterator::Flex::Manual::Authoring - How to write an iterator
+
+=head1 VERSION
+
+version 0.14
+
+=head1 DESCRIPTION
+
+Iterators are constructed by passing an attribute hash (call it
+C<%AttrHash>) to a factory, which uses it to construct an appropriate
+iterator class, instantiate it, and return it to the user.
+
+First we'll create the hash, then figure out how to make it available
+to the factory.
+
+=head2 The Attribute Hash
+
+The attribute hash (whose contents are documented much greater detail
+in L<Iterator::Flex::Manual::Overview/Iterator Parameters>) describes
+the iterator's capabilities and provides implementations.
+
+The heart of L<Iterator::Flex> iterators is the C<next> capability,
+which I<must> be implemented as a closure. Other capabilities are
+optional and may be either closures or methods.
+
+=head3 next
+
+C<next> has two responsibilities:
+
+=over
+
+=item *
+
+return the next data element
+
+=item *
+
+signal exhaustion
+
+=back
+
+It usually also ensures that the C<current> and C<previous>
+capabilities return the proper values.  Because it is called most
+often, it should be as efficient as possible.
+
+As mentioned above, C<next> I<must> be implemented as a closure. It
+has to keep track of state on its own, as it may not be passed any.
+
+To illustrate, here's the entry in C<%AttrHash> for the C<next>
+closure for L<Iterator::Flex::Array>:
+
+ next => sub {
+     if ( $next == $len ) {
+         # if first time through, set current
+         $prev = $current
+           if ! $self->is_exhausted;
+         return $current = $self->signal_exhaustion;
+     }
+     $prev    = $current;
+     $current = $next++;
+
+     return $arr->[$current];
+ },
+
+The first thing to notice is that there are a number of closed over
+variables that are defined outside of the subroutine.
+
+It's cheap to retain the state of an array (it's just an index), so we
+can easily keep track of C<$next>, C<$prev>, C<$current>, and provide
+the additional L<prev|Iterator::Flex::Manual::Overview/prev> and
+L<current|Iterator::Flex::Manual::Overview/current> capabilities.  We
+also keep track of the array, C<$arr>, and its length C<$len>.
+
+Finally, there's C<$self>, which is a handle to the iterator's
+object. It's not used for any performance critical work.
+
+These must all be properly initialized; more on that later.
+
+=head4 Exhaustion Phase
+
+The code is divided into two sections; the first deals with data exhaustion:
+
+     if ( $next == $len ) {
+         # if first time through, set prev
+         $prev = $current
+           if ! $self->is_exhausted;
+         return $current = $self->signal_exhaustion;
+     }
+
+Every time the iterator is invoked, the exhaustion state is
+determined. If it is exhausted, the iterator can start using
+L<Iterator::Flex>'s exhaustion facilities.
+
+Recall that an iterator may signal exhaustion by throwing an exception
+or returning a sentinel value.  The iterator itself doesn't care; it
+just calls the C<signal_exhaustion> method, which will first set the
+C<is_exhausted> predicate and then either return a sentinel value or
+throw an exception (which the iterator should I<not> catch).  In the
+former case, the iterator should pass that sentinel value on to the
+caller.
+
+Unlike in some iterator models, calling C<next> after the iterator is
+exhausted is always a defined operation, always resulting in the same
+behavior.  C<next> should thus I<always> call C<signal_exhaustion> when
+exhausted, even if the iterator has already signaled exhaustion.
+
+=head4 Iteration Phase
+
+The second part of the code takes care of returning the correct data
+and setting the iterator up for the succeeding call to C<next>. It
+also ensures that the I<< L<current|Iterator::Flex::Manual::Overview/current> >>
+and I<< L<prev|Iterator::Flex::Manual::Overview/prev> >> capabilities will
+return the proper values:
+
+     $prev    = $current;
+     $current = $next++;
+
+     return $arr->[$current];
+
+=head4 Initialization Phase
+
+Finally, we'll get to the iterator initialization phase, which may make
+more sense now that we've gone through the other phases.  Recall that
+we are using closed over variables to keep track of state. That means
+our C<next> sub must be created for every iterator so it can close
+over the current set of lexical variables.
+
+Our code should look something like this:
+
+  # initialize lexical variables here
+  ...
+
+  %attrHash = (
+     next => sub { ... } # as above, closing over lexical variables
+  };
+
+We need to initialize C<$next>, C<$prev>, C<$current>, C<$arr>, C<$len>, and
+C<$self>.
+
+The first five are easy
+
+  # initialize lexical variables here
+  my $next = 0;
+  my $prev = undef;
+  my $current = undef;
+  my $arr = \@array ;  # <-- this is passed in from the user "somehow"
+  my $len = @array;
+
+Now, what about C<$self>? Why is it a closed over variable, rather
+than being passed as a parameter to the C<next> sub?  The answer is
+that C<next> is I<not> a method. L<Iterator::Flex> allows it to be treated as one, e.g.
+
+  $iter->next
+
+is valid, but for efficiency the iterator can be called
+directly as a subroutine, e.g.,
+
+  $iter->();
+
+skipping the overhead of an object method call. In this case, there's
+no way to pass in C<$self>, so where does it come from and how is it
+initialized?  The answer is the closed over variable C<$self>, and
+another entry in the attribute hash, C<_self> which contains a
+reference to C<$self> that the iterator factory will use to initialize
+C<$self>.
+
+  # initialize lexical variables here
+  ...
+  my $self;
+
+  %attrHash = (
+     _self => \$self,
+     next => sub { ... } # as above, closing over lexical variables
+  };
+
+=head3 Other capabilities
+
+For completeness, here's are the rest of the capabilities, except for
+C<freeze>, which complicates things quite a bit, and which we'll get
+into later.
+
+ reset   => sub { $prev = $current = undef;  $next = 0; },
+ rewind  => sub { $next = 0; },
+ prev    => sub { return defined $prev ? $arr->[$prev] : undef; },
+ current => sub { return defined $current ? $arr->[$current] : undef; },
+
+=head3 Wrapping up
+
+At this point C<%AttrHash> is functionally complete. The only thing left unknown is
+the array to iterate over, which has to be kept variable, so wrapping the above
+code into a subroutine
+
+ sub configure ( $array ) {
+
+     # initialize lexical variables here
+     ...
+
+     my %AttrHash = ( ... );
+     return \%AttrHash;
+ }
+
+=head2 Passing the C<%AttrHash> to the factory
+
+Now we're ready to use the C<%AttrHash> to construct an
+iterator. Iterators may be constructed on-the-fly, or may be
+formalized as classes.
+
+=head3 A one-off iterator
+
+This approach uses L<Iterator::Flex::Factory/construct_from_attrs> to create an
+iterator object from a hash describing the iterator capabilities:
+
+  my @array = ( 1..100 );
+  my $AttrHash = construct( \@array );
+  $iter = Iterator::Flex::Factorye->construct_from_attrs( $AttrHash, \%opts );
+
+In addition to C<%AttrHash>, C<construct_from_attrs> takes another options hash, which
+is where the exhaustion policy is set.
+
+In this case, we can choose one of the following entries
+
+=over
+
+=item *
+
+exhaustion => 'throw';
+
+On exhaustion, throw an exception object of class C<Iterator::Flex::Failure::Exhausted>.
+
+=item *
+
+exhaustion => [ return => $sentinel ];
+
+On exhaustion, return the specified sentinel value.
+
+=back
+
+The default is
+
+  exhaustion => [ return => undef ];
+
+At this point C<$iter> is initialized and ready for use.
+
+=head3 An iterator class
+
+Creating a class requires a few steps more, and gives the following benefits:
+
+=over
+
+=item *
+
+A much cleaner interface, e.g.
+
+  $iter = Iterator::Flex::Array->new( \@array );
+
+vs. the multi-liner above.
+
+=item *
+
+The ability to freeze and thaw the iterator
+
+=item *
+
+some of the construction costs can be moved from run time to compile  time.
+
+=back
+
+An iterator class must
+
+=over
+
+=item *
+
+subclass L<Iterator::Flex::Base>;
+
+=item *
+
+provide two class methods, C<new> and C<construct>; and
+
+=item *
+
+register its capabilities.
+
+=back
+
+=head4 new
+
+The C<new> method converts from the API most comfortable to your usage
+to the internal API used by L<Iterator::Flex::Base>.  By convention,
+the last argument should be reserved for a hashref containing general
+iterator arguments (such as the C<exhaustion> key).  This hashref is
+documented in L<Iterator::Flex::Base/new_from_attrs>.
+
+The super class' constructor takes two arguments: a variable containing
+iterator specific data (state), and the above-mentioned general
+argument hash.  The state variable can take any form, it is not
+interpreted by the C<Iterator::Flex> framework.
+
+Here's the code for L<Iterator::Flex::Array/new>:
+
+  sub new ( $class, $array, $pars={} ) {
+      $class->_throw( parameter => "argument must be an ARRAY reference" )
+        unless Ref::Util::is_arrayref( $array );
+      $class->SUPER::new( { array => $array }, $pars );
+  }
+
+It's pretty simple. It saves the general options hash if present,
+stores the passed array (the state) in a hash, and passes both of
+them to the super class' constructor.  ( A hash is used here because
+L<Iterator::Flex::Array> can be serialized, and extra state is
+required to do so).
+
+=head4 construct
+
+The C<construct> class method's duty is to return a C<%AttrHash>.
+It's called as
+
+  $AttrHash = $class->construct( $state );
+
+where C<$state> is the state variable passed to
+L<Iterator::Flex::Base/new>.  Unsurprisingly, it is remarkably similar
+to the C<construct> subroutine developed earlier.
+
+There are a few differences:
+
+=over
+
+=item *
+
+The signature changes, as this is a class method, rather than a subroutine.
+
+=item *
+
+There are additional C<%AttrHash> entries available: C<_roles>, which
+supports run-time enabling of capabilities and C<freeze>, which
+supports serialization.
+
+=item *
+
+Capabilities other than C<next> can be implemented as actual class
+methods, rather than closures.  This decreases the cost of creating
+iterators (because they only need to be compiled once, rather than for
+every instance of the iterator) but increases run time costs, as they
+cannot use closed over variables to access state information.
+
+=back
+
+=head4 Registering Capabilities
+
+Unlike when using L<Iterator::Flex::Factory/construct_from_attr>,
+which helpfully looks at C<%AttrHash> to determine which capabilities
+are provided (albeit at run time), classes are encouraged to register
+their capabilities at compile time via the C<_add_roles> method.  For
+the example iterator class, this would be done via
+
+  __PACKAGE__->_add_roles( qw[
+        State::Registry
+        Next::ClosedSelf
+        Rewind::Closure
+        Reset::Closure
+        Prev::Closure
+        Current::Closure
+  ] );
+
+(These are all accepted shorthand for roles in the
+L<Iterator::Flex::Role> namespace.)
+
+If capabilities must be added at run time, use the C<_roles> entry in C<%AttrHash>.
+
+The specific roles used here are:
+
+=over
+
+=item Next::ClosedSelf
+
+This indicates that the C<next> capability uses a closed over C<$self> variable,
+and that C<Iterator::Flex> should use the C<_self> hash entry to initialize it.
+
+=item State::Registry
+
+This indicates that the exhaustion state should be stored in the central iterator Registry.
+Another implementation uses a closed over variable (and the role C<State::Closure>).
+See L<Iterator::Flex::Manual::Internals/Exhaustion>.
+
+=item Reset::Closure
+
+=item Prev::Closure
+
+=item Current::Closure
+
+=item Rewind::Closure
+
+These indicate that the named capability is present and implemented as a closure.
+
+=back
+
+=head4 All together
+
+  package My::Array;
+
+  use strict;
+  use warnings;
+
+  use parent 'Iterator::Flex::Base';
+
+  sub new {
+      my $class = shift;
+      my $gpar = Ref::Util::is_hashref( $_[-1] ) ? pop : {};
+
+      $class->_throw( parameter => "argument must be an ARRAY reference" )
+        unless Ref::Util::is_arrayref( $_[0] );
+
+      $class->SUPER::new( { array => $_[0] }, $gpar );
+  }
+
+  sub configure {
+     my ( $class, $state ) = @_;
+
+     # initialize lexical variables here
+     ...
+     my $arr = $state->{array};
+
+     my %AttrHash = ( ... );
+     return \%AttrHash;
+ }
+
+  __PACKAGE__->_add_roles( qw[
+        State::Registry
+        Next::ClosedSelf
+        Rewind::Closure
+        Reset::Closure
+        Prev::Closure
+        Current::Closure
+  ] );
+
+  1;
+
+=head1 SUPPORT
+
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-iterator-flex@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Iterator-Flex>
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/iterator-flex
+
+and may be cloned from
+
+  https://gitlab.com/djerius/iterator-flex.git
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<Iterator::Flex|Iterator::Flex>
+
+=item *
+
+L<Iterator::Flex::Manual|Iterator::Flex::Manual>
+
+=back
+
+=head1 AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

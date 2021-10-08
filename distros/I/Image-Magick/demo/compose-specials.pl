@@ -10,11 +10,11 @@
 # method "Modulate".
 #
 # Essentially each image is equivelent to
-#   convert logo: -crop 80x80+140+60 +repage \
+#   magick logo: -crop 80x80+140+60 +repage \
 #           -size 60x60 gradient:black-white \
 #           -alpha set miff:- |\
-#    composite -  -geometry +10+10 -virtual-pixel gray \
-#              -dissolve 70x30   show:
+#   magick - -geometry +10+10 -virtual-pixel gray \
+#            -dissolve 70x30  show:
 # for various composition methods.
 #
 use strict;

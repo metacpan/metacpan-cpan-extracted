@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 package Playwright::ServerReaper;
-$Playwright::ServerReaper::VERSION = '0.015';
+$Playwright::ServerReaper::VERSION = '0.016';
 use strict;
 use warnings;
 

@@ -1,3 +1,9 @@
+0.003   2021-05-12  Released-By: PERLANCAR; Urgency: medium
+
+	- Replace example using Text::Table::Span with one using
+	  Text::Table::More.
+
+
 0.002   2021-02-19  Released-By: PERLANCAR; Urgency: medium
 
 	- Show example with Text::Table::Span and Text::ANSITable.

@@ -53,9 +53,22 @@ sub get_project {
 sub update_project_external_tag {
     my ($self, $project, $external_tag) = @_;
 
+    my $project_name = $project->name;
+    my $project_description = $project->description;
+
+    # Why do we use double encode?
+    # Because project_update_project method expects a double encoded strings for string data in project model
+
+    utf8::encode($project_name);
+    utf8::encode($project_name);
+    if ($project_description) {
+        utf8::encode($project_description);
+        utf8::encode($project_description);
+    }
+
     my %args = (
-        name            => $project->name,
-        description     => $project->description,
+        name            => $project_name,
+        description     => $project_description,
         deadline        => $project->deadline,
         clientId        => $project->client_id,
         domainId        => $project->domain_id,
@@ -102,7 +115,7 @@ sub get_all_projects {
 }
 
 sub upload_file {
-    my ( $self, $path, $filename, $external_id, $target_languages ) = @_;
+    my ( $self, $path, $filename, $external_id, $meta_info, $target_languages ) = @_;
 
     my %args;
     $args{targetLanguages} = $target_languages
@@ -126,6 +139,8 @@ sub upload_file {
     );
     $args{external_id} = $external_id 
       if defined $external_id;
+    $args{meta_info} = $meta_info
+      if defined $meta_info;
     $args{disassemble_algorithm_name} =
       $self->{rundata}->{disassemble_algorithm_name}
       if defined $self->{rundata}->{disassemble_algorithm_name};

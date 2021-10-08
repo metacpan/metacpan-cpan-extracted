@@ -26,7 +26,7 @@ my $build = Module::Build->new(
       'perl' => '5.018', # pad_add_name_pvn, pad_add_name_pvs, gv_init_pvn
          # Technically probably would work on 5.16 but doesn't:
          #   https://rt.cpan.org/Ticket/Display.html?id=132930
-      'XS::Parse::Keyword' => '0.10',
+      'XS::Parse::Keyword' => '0.19',
       'XS::Parse::Sublike' => '0.13',
    },
    test_requires => {
@@ -37,7 +37,7 @@ my $build = Module::Build->new(
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
-      'XS::Parse::Keyword::Builder' => '0.10',
+      'XS::Parse::Keyword::Builder' => '0.19',
       'XS::Parse::Sublike::Builder' => '0.13',
    },
    license => 'perl',

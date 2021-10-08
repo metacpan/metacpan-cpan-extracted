@@ -3,8 +3,8 @@ NAME
     convention
 
 VERSION
-    This document describes version 0.003 of Acme::CPANModules::COLOR (from
-    Perl distribution Acme-CPANModules-COLOR), released on 2021-03-27.
+    This document describes version 0.004 of Acme::CPANModules::COLOR (from
+    Perl distribution Acme-CPANModules-COLOR), released on 2021-05-10.
 
 DESCRIPTION
     The NO_COLOR convention (see https://no-color.org) lets user disable
@@ -30,6 +30,8 @@ ACME::CPANMODULES ENTRIES
     *   App::abgrep
 
     *   App::diffdb
+
+    *   App::DiffTarballs
 
     *   App::diffwc
 
@@ -111,7 +113,8 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-Acme-CPANModules-COLOR/issues>
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-COLO
+    R>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

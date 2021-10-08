@@ -11,6 +11,8 @@ my $post_diag;
 
 $modules{$_} = $_ for qw(
   Dist::Zilla::File::InMemory
+  Dist::Zilla::Plugin::DynamicPrereqs
+  Dist::Zilla::PluginBundle::Starter
   Dist::Zilla::Role::FileGatherer
   Dist::Zilla::Role::FileMunger
   Dist::Zilla::Role::MintingProfile::ShareDir

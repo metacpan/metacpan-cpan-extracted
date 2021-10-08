@@ -27,8 +27,9 @@ static OP *S_make_croak_op(pTHX_ SV *message)
 }
 
 #if HAVE_PERL_VERSION(5, 26, 0)
-#  include "make_argcheck_aux.c.inc"
 #  define HAVE_OP_ARGCHECK
+
+#  include "make_argcheck_aux.c.inc"
 #endif
 
 #define make_argcheck_ops(required, optional, slurpy, subname)  S_make_argcheck_ops(aTHX_ required, optional, slurpy, subname)
@@ -65,7 +66,7 @@ static OP *S_make_argcheck_ops(pTHX_ int required, int optional, char slurpy, SV
     ret = op_append_list(OP_LINESEQ, ret, checkop);
   }
 
-  {
+  if(!slurpy) {
     SV *message = newSVpvf("Too many arguments for subroutine '%" SVf "'", subname);
     /* @_ <= (required+optional) or die ... */
     OP *checkop =
@@ -79,6 +80,8 @@ static OP *S_make_argcheck_ops(pTHX_ int required, int optional, char slurpy, SV
 
     ret = op_append_list(OP_LINESEQ, ret, checkop);
   }
+
+  /* TODO: If slurpy is % then maybe complain about odd number of leftovers */
 
   return ret;
 #endif

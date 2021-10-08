@@ -5,7 +5,9 @@ struct SlotMeta {
   SV *name;
   ClassMeta *class;
   SV *defaultsv;
+  OP *defaultexpr; /* at most one of defaultsv or defaultexpr should be set */
   SLOTOFFSET slotix;
+  SV *paramname;
   AV *hooks; /* NULL, or AV of raw pointers directly to SlotHook structs */
 };
 

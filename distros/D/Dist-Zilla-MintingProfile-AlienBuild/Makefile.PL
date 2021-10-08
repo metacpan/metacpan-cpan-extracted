@@ -82,10 +82,11 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Test2::V0"                    => "0.000121",
+    "Test::Alien::Build"           => 0,
     "Test::DZil"                   => 0,
     "Test::File::ShareDir::Module" => 0
   },
-  "VERSION" => "0.04",
+  "VERSION" => "0.05",
   "test"    => {
     "TESTS" => "t/*.t"
   }
@@ -107,6 +108,7 @@ my %FallbackPrereqs = (
   "Template"                                    => 0,
   "Term::Clui"                                  => 0,
   "Test2::V0"                                   => "0.000121",
+  "Test::Alien::Build"                          => 0,
   "Test::DZil"                                  => 0,
   "Test::File::ShareDir::Module"                => 0,
   "URI"                                         => 0,

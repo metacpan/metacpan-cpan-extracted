@@ -1,5 +1,5 @@
 package Playwright;
-$Playwright::VERSION = '0.015';
+$Playwright::VERSION = '0.016';
 use strict;
 use warnings;
 
@@ -263,7 +263,7 @@ Playwright - Perl client for Playwright
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
@@ -464,6 +464,20 @@ It's a similar story with Download classes:
 Remember when doing an await() with playwright-perl you are waiting on a remote process on a server to complete, which can time out.
 You may wish to spawn a subprocess using a different tool to download very large files.
 If this is not an option, consider increasing the timeout on the LWP object used by the Playwright object (it's the 'ua' member of the class).
+
+=head2 Doing arbitrary requests
+
+When you either want to test APIs (or not look like a scraper/crawler) you'll want to issue arbitrary requests, such as POST/HEAD/DELETE et cetera.
+Here's how you go about that:
+
+    print "HEAD http://google.com : \n";
+    my $fr = $page->_request();
+    my $resp = $fr->fetch("http://google.com", { method => "HEAD" });
+    print Dumper($resp->headers());
+    print "200 OK\n" if $resp->status() == 200;
+
+The _request() method will give you a Playwright::FetchRequest object, which you can then call whichever methods you like upon.
+When you call fetch (or get, post, etc) you will then be returned a Playwright::FetchResponse object.
 
 =head1 INSTALLATION NOTE
 

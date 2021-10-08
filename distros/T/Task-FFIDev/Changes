@@ -1,5 +1,8 @@
 Revision history for Task-FFIDev},
 
+0.02      2021-10-06 08:27:09 -0600
+  - Add [DynamicPrereqs] dzil plugin prereq (gh#2)
+
 0.01      2021-10-02 21:50:00 -0600
   - initial version
 

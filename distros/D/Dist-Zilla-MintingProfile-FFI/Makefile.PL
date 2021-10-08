@@ -59,6 +59,8 @@ my %WriteMakefileArgs = (
   },
   "PREREQ_PM" => {
     "Dist::Zilla::File::InMemory"                 => 0,
+    "Dist::Zilla::Plugin::DynamicPrereqs"         => 0,
+    "Dist::Zilla::PluginBundle::Starter"          => "5.0.0",
     "Dist::Zilla::Role::FileGatherer"             => 0,
     "Dist::Zilla::Role::FileMunger"               => 0,
     "Dist::Zilla::Role::MintingProfile::ShareDir" => 0,
@@ -72,7 +74,7 @@ my %WriteMakefileArgs = (
     "Test::DZil"                   => 0,
     "Test::File::ShareDir::Module" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test"    => {
     "TESTS" => "t/*.t"
   }
@@ -80,6 +82,8 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Dist::Zilla::File::InMemory"                 => 0,
+  "Dist::Zilla::Plugin::DynamicPrereqs"         => 0,
+  "Dist::Zilla::PluginBundle::Starter"          => "5.0.0",
   "Dist::Zilla::Role::FileGatherer"             => 0,
   "Dist::Zilla::Role::FileMunger"               => 0,
   "Dist::Zilla::Role::MintingProfile::ShareDir" => 0,

@@ -1,6 +1,8 @@
 #ifndef __OBJECT_PAD__CLASS_H__
 #define __OBJECT_PAD__CLASS_H__
 
+#include "suspended_compcv.h"
+
 typedef struct AdjustBlock {
   unsigned int is_adjustparams : 1;
   CV *cv;
@@ -28,7 +30,6 @@ struct ClassMeta {
   AV *slots;           /* each elem is a raw pointer directly to a SlotMeta */
   AV *methods;         /* each elem is a raw pointer directly to a MethodMeta */
   HV *parammap;        /* NULL, or each elem is a raw pointer directly at a ParamMeta */
-  SV *requireslots;    /* NULL, or the PV is a bitmap of which slots are required params */
   AV *requiremethods;  /* each elem is an SVt_PV giving a name */
   CV *initslots;       /* the INITSLOTS method body */
   AV *buildblocks;     /* the BUILD {} phaser blocks; each elem is a CV* directly */
@@ -39,6 +40,8 @@ struct ClassMeta {
 
   COP *tmpcop;         /* a COP to use during generated constructor */
   CV *methodscope;     /* a temporary CV used just during compilation of a `method` */
+
+  SuspendedCompCVBuffer initslots_compcv; /* temporary PL_compcv + associated state during initslots */
 
   union {
     /* Things that only true classes have */

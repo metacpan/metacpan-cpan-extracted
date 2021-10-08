@@ -17,6 +17,7 @@ meta-spec:
 name: Task-FFIDev
 requires:
   Dist::Zilla::MintingProfile::FFI: '0.01'
+  Dist::Zilla::Plugin::DynamicPrereqs: '0.039'
   Dist::Zilla::Plugin::FFI: '1.04'
   FFI::C: '0.10'
   FFI::CheckLib: '0.28'
@@ -31,8 +32,8 @@ resources:
   bugtracker: https://github.com/PerlFFI/Task-FFIDev/issues
   homepage: https://metacpan.org/pod/Task::FFIDev
   repository: git://github.com/PerlFFI/Task-FFIDev.git
-version: '0.01'
-x_generated_by_perl: v5.34.0
+version: '0.02'
+x_generated_by_perl: v5.35.4
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

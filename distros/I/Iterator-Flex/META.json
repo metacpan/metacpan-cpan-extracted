@@ -1,0 +1,308 @@
+{
+   "abstract" : "Iterators with flexible behaviors",
+   "author" : [
+      "Diab Jerius <djerius@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.020, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Iterator-Flex",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::BumpVersionAfterRelease" : "0",
+            "Dist::Zilla::Plugin::CheckMetaResources" : "0",
+            "Dist::Zilla::Plugin::CopyFilesFromRelease" : "0",
+            "Dist::Zilla::Plugin::EnsureChangesHasContent" : "0",
+            "Dist::Zilla::Plugin::EnsurePrereqsInstalled" : "0",
+            "Dist::Zilla::Plugin::FileFinder::ByName" : "0",
+            "Dist::Zilla::Plugin::GatherDir" : "0",
+            "Dist::Zilla::Plugin::GatherDir::Template" : "0",
+            "Dist::Zilla::Plugin::InsertCopyright" : "0",
+            "Dist::Zilla::Plugin::InsertExample" : "0",
+            "Dist::Zilla::Plugin::MetaJSON" : "0",
+            "Dist::Zilla::Plugin::MetaNoIndex" : "0",
+            "Dist::Zilla::Plugin::MetaProvides::Package" : "0",
+            "Dist::Zilla::Plugin::MetaResources" : "0",
+            "Dist::Zilla::Plugin::ModuleBuildTiny" : "0",
+            "Dist::Zilla::Plugin::NextRelease" : "0",
+            "Dist::Zilla::Plugin::PodSyntaxTests" : "0",
+            "Dist::Zilla::Plugin::PodWeaver" : "0",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
+            "Dist::Zilla::Plugin::Prereqs::AuthorDeps" : "0",
+            "Dist::Zilla::Plugin::Readme::Brief" : "0",
+            "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0",
+            "Dist::Zilla::Plugin::Regenerate" : "0",
+            "Dist::Zilla::Plugin::RewriteVersion" : "0",
+            "Dist::Zilla::Plugin::RunExtraTests" : "0",
+            "Dist::Zilla::Plugin::Test::CPAN::Changes" : "0",
+            "Dist::Zilla::Plugin::Test::CPAN::Meta::JSON" : "0",
+            "Dist::Zilla::Plugin::Test::CleanNamespaces" : "0",
+            "Dist::Zilla::Plugin::Test::Compile" : "0",
+            "Dist::Zilla::Plugin::Test::DistManifest" : "0",
+            "Dist::Zilla::Plugin::Test::NoBreakpoints" : "0",
+            "Dist::Zilla::Plugin::Test::NoTabs" : "0",
+            "Dist::Zilla::Plugin::Test::Perl::Critic" : "0",
+            "Dist::Zilla::Plugin::Test::PodSpelling" : "0",
+            "Dist::Zilla::Plugin::Test::ReportPrereqs" : "0",
+            "Dist::Zilla::Plugin::Test::UnusedVars" : "0",
+            "Dist::Zilla::Plugin::Test::Version" : "0",
+            "Dist::Zilla::PluginBundle::Basic" : "0",
+            "Dist::Zilla::PluginBundle::Filter" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Weaver::Plugin::StopWords" : "0",
+            "Pod::Weaver::Section::Contributors" : "0",
+            "Pod::Weaver::Section::SeeAlso" : "0",
+            "Pod::Weaver::Section::Support" : "0",
+            "Software::License::GPL_3" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::CleanNamespaces" : "0.15",
+            "Test::DistManifest" : "0",
+            "Test::More" : "0.88",
+            "Test::NoBreakpoints" : "0.15",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "0",
+            "Test::Spelling" : "0.12",
+            "Test::Vars" : "0.015",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Method::Modifiers" : "0",
+            "List::Util" : "1.33",
+            "Module::Runtime" : "0",
+            "Package::Variant" : "0",
+            "Ref::Util" : "0",
+            "Role::Tiny" : "2.002004",
+            "custom::failures" : "0",
+            "experimental" : "0",
+            "namespace::clean" : "0",
+            "perl" : "v5.28.0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Data::Dump" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test2::V0" : "0",
+            "Test::Lib" : "0",
+            "Test::More" : "0",
+            "aliased" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Iterator::Flex" : {
+         "file" : "lib/Iterator/Flex.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Array" : {
+         "file" : "lib/Iterator/Flex/Array.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::ArrayLike" : {
+         "file" : "lib/Iterator/Flex/ArrayLike.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Base" : {
+         "file" : "lib/Iterator/Flex/Base.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Cache" : {
+         "file" : "lib/Iterator/Flex/Cache.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Common" : {
+         "file" : "lib/Iterator/Flex/Common.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Cycle" : {
+         "file" : "lib/Iterator/Flex/Cycle.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Factory" : {
+         "file" : "lib/Iterator/Flex/Factory.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Failure" : {
+         "file" : "lib/Iterator/Flex/Failure.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Freeze" : {
+         "file" : "lib/Iterator/Flex/Freeze.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Grep" : {
+         "file" : "lib/Iterator/Flex/Grep.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Map" : {
+         "file" : "lib/Iterator/Flex/Map.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Method" : {
+         "file" : "lib/Iterator/Flex/Method.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Method::Maker" : {
+         "file" : "lib/Iterator/Flex/Method.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Product" : {
+         "file" : "lib/Iterator/Flex/Product.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Role" : {
+         "file" : "lib/Iterator/Flex/Role.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Role::Current::Closure" : {
+         "file" : "lib/Iterator/Flex/Role/Current/Closure.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Role::Current::Method" : {
+         "file" : "lib/Iterator/Flex/Role/Current/Method.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Role::Error::Throw" : {
+         "file" : "lib/Iterator/Flex/Role/Error/Throw.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Role::Exhaustion::ImportedReturn" : {
+         "file" : "lib/Iterator/Flex/Role/Exhaustion/ImportedReturn.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Role::Exhaustion::ImportedThrow" : {
+         "file" : "lib/Iterator/Flex/Role/Exhaustion/ImportedThrow.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Role::Exhaustion::PassthroughThrow" : {
+         "file" : "lib/Iterator/Flex/Role/Exhaustion/PassthroughThrow.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Role::Exhaustion::Return" : {
+         "file" : "lib/Iterator/Flex/Role/Exhaustion/Return.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Role::Exhaustion::Throw" : {
+         "file" : "lib/Iterator/Flex/Role/Exhaustion/Throw.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Role::Freeze" : {
+         "file" : "lib/Iterator/Flex/Role/Freeze.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Role::Next::ClosedSelf" : {
+         "file" : "lib/Iterator/Flex/Role/Next/ClosedSelf.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Role::Next::Closure" : {
+         "file" : "lib/Iterator/Flex/Role/Next/Closure.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Role::Prev::Closure" : {
+         "file" : "lib/Iterator/Flex/Role/Prev/Closure.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Role::Prev::Method" : {
+         "file" : "lib/Iterator/Flex/Role/Prev/Method.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Role::Reset::Closure" : {
+         "file" : "lib/Iterator/Flex/Role/Reset/Closure.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Role::Reset::Method" : {
+         "file" : "lib/Iterator/Flex/Role/Reset/Method.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Role::Rewind::Closure" : {
+         "file" : "lib/Iterator/Flex/Role/Rewind/Closure.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Role::Rewind::Method" : {
+         "file" : "lib/Iterator/Flex/Role/Rewind/Method.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Role::State::Closure" : {
+         "file" : "lib/Iterator/Flex/Role/State/Closure.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Role::State::Registry" : {
+         "file" : "lib/Iterator/Flex/Role/State/Registry.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Role::Utils" : {
+         "file" : "lib/Iterator/Flex/Role/Utils.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Role::Wrap::Return" : {
+         "file" : "lib/Iterator/Flex/Role/Wrap/Return.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Role::Wrap::Self" : {
+         "file" : "lib/Iterator/Flex/Role/Wrap/Self.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Role::Wrap::Throw" : {
+         "file" : "lib/Iterator/Flex/Role/Wrap/Throw.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Sequence" : {
+         "file" : "lib/Iterator/Flex/Sequence.pm",
+         "version" : "0.14"
+      },
+      "Iterator::Flex::Utils" : {
+         "file" : "lib/Iterator/Flex/Utils.pm",
+         "version" : "0.14"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-iterator-flex@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Iterator-Flex"
+      },
+      "repository" : {
+         "url" : "https://gitlab.com/djerius/iterator-flex.git",
+         "web" : "https://gitlab.com/djerius/iterator-flex"
+      }
+   },
+   "version" : "0.14",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
+   "x_spdx_expression" : "GPL-3.0-only"
+}
+

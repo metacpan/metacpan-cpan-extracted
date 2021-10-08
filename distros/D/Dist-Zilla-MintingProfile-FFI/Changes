@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-MintingProfile-FFI},
 
+0.02      2021-10-06 08:34:30 -0600
+  - Fixed prereq bug where [@Starter] and [DynamicPrereqs] 
+    were not installed by default (gh#2)
+
 0.01      2021-10-02 21:20:33 -0600
   - initial version
 

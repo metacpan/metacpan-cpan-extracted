@@ -24,6 +24,10 @@
 
 #include "lexer-additions.c.inc"
 
+#ifndef G_LIST
+#  define G_LIST  G_ARRAY
+#endif
+
 /* yycroak() is a long function and hard to emulate or copy-paste for our
  * purposes; we'll reïmplement a smaller version of it
  *
@@ -135,11 +139,11 @@ typedef struct
   };
 } XSParseKeywordPiece_v1;
 
-static bool probe_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKeywordPieceType *piece);
-static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKeywordPieceType *piece);
-static void parse_pieces(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKeywordPieceType *pieces);
+static bool probe_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKeywordPieceType *piece, void *hookdata);
+static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKeywordPieceType *piece, void *hookdata);
+static void parse_pieces(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKeywordPieceType *pieces, void *hookdata);
 
-static bool probe_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKeywordPieceType *piece)
+static bool probe_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKeywordPieceType *piece, void *hookdata)
 {
   int argi = *argidx;
 
@@ -186,7 +190,7 @@ static bool probe_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       if(lex_peek_unichar(0) != '{')
         return FALSE;
 
-      parse_piece(aTHX_ argsv, argidx, piece);
+      parse_piece(aTHX_ argsv, argidx, piece, hookdata);
       return TRUE;
 
     case XS_PARSE_KEYWORD_IDENT:
@@ -219,12 +223,19 @@ static bool probe_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       return TRUE;
     }
 
+    case XS_PARSE_KEYWORD_SETUP:
+      croak("ARGH probe_piece() should never see XS_PARSE_KEYWORD_SETUP!");
+
     case XS_PARSE_KEYWORD_SEQUENCE:
-      if(!probe_piece(aTHX_ argsv, argidx, piece->u.pieces + 0))
+    {
+      const struct XSParseKeywordPieceType *pieces = piece->u.pieces;
+
+      if(!probe_piece(aTHX_ argsv, argidx, pieces++, hookdata))
         return FALSE;
 
-      parse_pieces(aTHX_ argsv, argidx, piece->u.pieces + 1);
+      parse_pieces(aTHX_ argsv, argidx, pieces, hookdata);
       return TRUE;
+    }
 
     case XS_PARSE_KEYWORD_CHOICE:
     {
@@ -232,7 +243,7 @@ static bool probe_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       THISARG.i = 0;
       (*argidx)++; /* tentative */
       while(choices->type) {
-        if(probe_piece(aTHX_ argsv, argidx, choices + 0)) {
+        if(probe_piece(aTHX_ argsv, argidx, choices + 0, hookdata)) {
           return TRUE;
         }
         choices++;
@@ -247,7 +258,7 @@ static bool probe_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       const struct XSParseKeywordPieceType *choices = piece->u.pieces;
       (*argidx)++; /* tentative */
       while(choices->type) {
-        if(probe_piece(aTHX_ argsv, argidx, choices + 0)) {
+        if(probe_piece(aTHX_ argsv, argidx, choices + 0, hookdata)) {
           THISARG.i = choices[1].type;
           return TRUE;
         }
@@ -261,23 +272,23 @@ static bool probe_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
     {
       const struct XSParseKeywordPieceType *pieces = piece->u.pieces;
       (*argidx)++; /* tentative */
-      if(!probe_piece(aTHX_ argsv, argidx, pieces + 1)) {
+      if(!probe_piece(aTHX_ argsv, argidx, pieces + 1, hookdata)) {
         (*argidx)--;
         return FALSE;
       }
       /* we're now committed */
       THISARG.i = 1;
       if(pieces[2].type)
-        parse_pieces(aTHX_ argsv, argidx, pieces + 2);
+        parse_pieces(aTHX_ argsv, argidx, pieces + 2, hookdata);
 
-      if(!probe_piece(aTHX_ argsv, argidx, pieces + 0))
+      if(!probe_piece(aTHX_ argsv, argidx, pieces + 0, hookdata))
         return TRUE;
 
       while(1) {
-        parse_pieces(aTHX_ argsv, argidx, pieces + 1);
+        parse_pieces(aTHX_ argsv, argidx, pieces + 1, hookdata);
         THISARG.i++;
 
-        if(!probe_piece(aTHX_ argsv, argidx, pieces + 0))
+        if(!probe_piece(aTHX_ argsv, argidx, pieces + 0, hookdata))
           break;
       }
       return TRUE;
@@ -287,35 +298,35 @@ static bool probe_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       if(lex_peek_unichar(0) != '(')
         return FALSE;
 
-      parse_piece(aTHX_ argsv, argidx, piece);
+      parse_piece(aTHX_ argsv, argidx, piece, hookdata);
       return TRUE;
 
     case XS_PARSE_KEYWORD_BRACKETSCOPE:
       if(lex_peek_unichar(0) != '[')
         return FALSE;
 
-      parse_piece(aTHX_ argsv, argidx, piece);
+      parse_piece(aTHX_ argsv, argidx, piece, hookdata);
       return TRUE;
 
     case XS_PARSE_KEYWORD_BRACESCOPE:
       if(lex_peek_unichar(0) != '{')
         return FALSE;
 
-      parse_piece(aTHX_ argsv, argidx, piece);
+      parse_piece(aTHX_ argsv, argidx, piece, hookdata);
       return TRUE;
 
     case XS_PARSE_KEYWORD_CHEVRONSCOPE:
       if(lex_peek_unichar(0) != '<')
         return FALSE;
 
-      parse_piece(aTHX_ argsv, argidx, piece);
+      parse_piece(aTHX_ argsv, argidx, piece, hookdata);
       return TRUE;
   }
 
   croak("TODO: probe_piece on type=%d\n", type);
 }
 
-static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKeywordPieceType *piece)
+static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKeywordPieceType *piece, void *hookdata)
 {
   int argi = *argidx;
 
@@ -336,10 +347,11 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
   bool is_special  = !!(piece->type & XPK_TYPEFLAG_SPECIAL);
   U8 want = 0;
   switch(piece->type & (3 << 18)) {
-    case XPK_TYPEFLAG_G_VOID:   want = G_VOID; break;
+    case XPK_TYPEFLAG_G_VOID:   want = G_VOID;   break;
     case XPK_TYPEFLAG_G_SCALAR: want = G_SCALAR; break;
-    case XPK_TYPEFLAG_G_LIST:   want = G_ARRAY; break;
+    case XPK_TYPEFLAG_G_LIST:   want = G_LIST;   break;
   }
+  bool is_enterleave = !!(piece->type & XPK_TYPEFLAG_ENTERLEAVE);
 
   U32 type = piece->type & 0xFFFF;
 
@@ -361,11 +373,25 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
 
     case XS_PARSE_KEYWORD_BLOCK:
     {
+      if(is_enterleave)
+        ENTER;
+
       I32 save_ix = block_start(1);
 
       if(piece->u.pieces) {
         /* The prefix pieces */
-        parse_pieces(aTHX_ argsv, argidx, piece->u.pieces);
+        const struct XSParseKeywordPieceType *pieces = piece->u.pieces;
+
+        while(pieces->type) {
+          if(pieces->type == XS_PARSE_KEYWORD_SETUP)
+            (pieces->u.callback)(aTHX_ hookdata);
+          else {
+            parse_piece(aTHX_ argsv, argidx, pieces, hookdata);
+            lex_read_space(0);
+          }
+
+          pieces++;
+        }
 
         if(*argidx > argi) {
           argi = *argidx;
@@ -393,6 +419,10 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
         THISARG.op = op_contextualize(THISARG.op, want);
 
       (*argidx)++;
+
+      if(is_enterleave)
+        LEAVE;
+
       return;
     }
 
@@ -552,6 +582,9 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       return;
     }
 
+    case XS_PARSE_KEYWORD_SETUP:
+      croak("ARGH parse_piece() should never see XS_PARSE_KEYWORD_SETUP!");
+
     case XS_PARSE_KEYWORD_SEQUENCE:
     {
       const struct XSParseKeywordPieceType *pieces = piece->u.pieces;
@@ -559,28 +592,28 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       if(is_optional) {
         THISARG.i = 0;
         (*argidx)++;
-        if(!probe_piece(aTHX_ argsv, argidx, pieces))
+        if(!probe_piece(aTHX_ argsv, argidx, pieces, hookdata))
           return;
         THISARG.i++;
         pieces++;
       }
 
-      parse_pieces(aTHX_ argsv, argidx, pieces);
+      parse_pieces(aTHX_ argsv, argidx, pieces, hookdata);
       return;
     }
 
     case XS_PARSE_KEYWORD_REPEATED:
       THISARG.i = 0;
       (*argidx)++;
-      while(probe_piece(aTHX_ argsv, argidx, piece->u.pieces + 0)) {
+      while(probe_piece(aTHX_ argsv, argidx, piece->u.pieces + 0, hookdata)) {
         THISARG.i++;
-        parse_pieces(aTHX_ argsv, argidx, piece->u.pieces + 1);
+        parse_pieces(aTHX_ argsv, argidx, piece->u.pieces + 1, hookdata);
       }
       return;
 
     case XS_PARSE_KEYWORD_CHOICE:
     case XS_PARSE_KEYWORD_TAGGEDCHOICE:
-      if(!probe_piece(aTHX_ argsv, argidx, piece)) {
+      if(!probe_piece(aTHX_ argsv, argidx, piece, hookdata)) {
         THISARG.i = -1;
         (*argidx)++;
       }
@@ -590,10 +623,10 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       THISARG.i = 0;
       (*argidx)++;
       while(1) {
-        parse_pieces(aTHX_ argsv, argidx, piece->u.pieces + 1);
+        parse_pieces(aTHX_ argsv, argidx, piece->u.pieces + 1, hookdata);
         THISARG.i++;
 
-        if(!probe_piece(aTHX_ argsv, argidx, piece->u.pieces + 0))
+        if(!probe_piece(aTHX_ argsv, argidx, piece->u.pieces + 0, hookdata))
           break;
       }
       return;
@@ -609,7 +642,7 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       lex_expect_unichar('(');
       lex_read_space(0);
 
-      parse_pieces(aTHX_ argsv, argidx, piece->u.pieces);
+      parse_pieces(aTHX_ argsv, argidx, piece->u.pieces, hookdata);
 
       lex_expect_unichar(')');
 
@@ -626,7 +659,7 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       lex_expect_unichar('[');
       lex_read_space(0);
 
-      parse_pieces(aTHX_ argsv, argidx, piece->u.pieces);
+      parse_pieces(aTHX_ argsv, argidx, piece->u.pieces, hookdata);
 
       lex_expect_unichar(']');
 
@@ -643,7 +676,7 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       lex_expect_unichar('{');
       lex_read_space(0);
 
-      parse_pieces(aTHX_ argsv, argidx, piece->u.pieces);
+      parse_pieces(aTHX_ argsv, argidx, piece->u.pieces, hookdata);
 
       lex_expect_unichar('}');
 
@@ -660,7 +693,7 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       lex_expect_unichar('<');
       lex_read_space(0);
 
-      parse_pieces(aTHX_ argsv, argidx, piece->u.pieces);
+      parse_pieces(aTHX_ argsv, argidx, piece->u.pieces, hookdata);
 
       lex_expect_unichar('>');
 
@@ -670,11 +703,11 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
   croak("TODO: parse_piece on type=%d\n", type);
 }
 
-static void parse_pieces(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKeywordPieceType *pieces)
+static void parse_pieces(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKeywordPieceType *pieces, void *hookdata)
 {
   size_t idx;
   for(idx = 0; pieces[idx].type; idx++) {
-    parse_piece(aTHX_ argsv, argidx, pieces + idx);
+    parse_piece(aTHX_ argsv, argidx, pieces + idx, hookdata);
     lex_read_space(0);
   }
 }
@@ -695,9 +728,9 @@ static int parse(pTHX_ OP **op, struct Registration *reg)
 
   size_t argidx = 0;
   if(hooks->build)
-    parse_pieces(aTHX_ argsv, &argidx, hooks->pieces);
+    parse_pieces(aTHX_ argsv, &argidx, hooks->pieces, reg->hookdata);
   else
-    parse_piece(aTHX_ argsv, &argidx, &hooks->piece1);
+    parse_piece(aTHX_ argsv, &argidx, &hooks->piece1, reg->hookdata);
 
   if(hooks->flags & XPK_FLAG_AUTOSEMI) {
     lex_read_space(0);

@@ -33,7 +33,7 @@ is(
     call generate_content => hash {
       field 'lib/Alien/libfrooble.pm' => match qr/^package Alien::libfrooble;/;
       field 'alienfile'               => match qr/^use alienfile;/;
-      field 't/basic.t'               => match qr/^use Test[2]::V0;/;
+      field 't/alien_libfrooble.t'    => match qr/^use Test[2]::V0;/;
       end;
     };
     call sub ($wiz) {

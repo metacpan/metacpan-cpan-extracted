@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 package App::RouterColorizer;
-$App::RouterColorizer::VERSION = '1.212302';
+$App::RouterColorizer::VERSION = '1.212780';
 use Moose;
 
 use feature 'signatures';
@@ -51,7 +51,7 @@ our @BGCOLORS = (
 our $NUM      = qr/$RE{num}{real}/;
 our $INT      = qr/$RE{num}{int}{-sign => ''}/;
 our $POSINT   = qr/(?!0)$INT/;
-our $LOWLIGHT = qr/ (?: -30\. [0-9]{2} ) | (?: [ -2 [5-9] \. [0-9]{2} ) /xx;
+our $LOWLIGHT = qr/ (?: -30\. [0-9]{2} ) | (?: -2 [5-9] \. [0-9]{2} ) /xx;
 our $LIGHT    = qr/ (?: $NUM ) | (?: N\/A ) /xx;
 
 our $IPV4CIDR = qr/ $RE{net}{IPv4}
@@ -423,7 +423,7 @@ App::RouterColorizer - Colorize router CLI output
 
 =head1 VERSION
 
-version 1.212302
+version 1.212780
 
 =head1 DESCRIPTION
 

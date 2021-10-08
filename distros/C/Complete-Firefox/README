@@ -2,14 +2,16 @@ NAME
     Complete::Firefox - Completion routines related to Firefox
 
 VERSION
-    This document describes version 0.001 of Complete::Firefox (from Perl
-    distribution Complete-Firefox), released on 2020-04-18.
+    This document describes version 0.002 of Complete::Firefox (from Perl
+    distribution Complete-Firefox), released on 2021-05-09.
 
 FUNCTIONS
   complete_firefox_profile_name
     Usage:
 
      complete_firefox_profile_name(%args) -> any
+
+    Complete from a list of Firefox profile names.
 
     This function is not exported by default, but exportable.
 
@@ -43,7 +45,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

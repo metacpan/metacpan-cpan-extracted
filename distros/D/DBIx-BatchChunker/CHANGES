@@ -1,6 +1,17 @@
 Changelog for DBIx-BatchChunker
 
-v0.940.4 2021-02-17T20:41:05
+v0.941.0 2021-10-08T16:18:37
+ - Update README (Brendan Byrd)
+ - Pull request #9: SM-2967 (Taylor Wilkerson)
+ - Support process_past_max without $DB_MAX_ID and $ls->max_end (Brendan
+   Byrd)
+ - Reduce spacing on debug messages with excessively long IDs (Brendan
+   Byrd)
+ - Add big-id.t and CAVEATS POD (Brendan Byrd)
+ - Add big number support using Math::BigInt/BigFloat (Brendan Byrd)
+ - Add t/*.db to .gitignore (Brendan Byrd)
+
+v0.940.4 2021-02-17T20:40:55
  - Update README (Brendan Byrd)
  - Enforce sane minimum baseline versions in the cpanfile (Brendan Byrd)
 
@@ -30,9 +41,6 @@ v0.940.1 2020-05-08T19:25:47
  - Move xt tests where they belong (Andrew Hewus Fresh)
  - Convert to Dist::Zilla::PluginBundle::Author::GSG (Andrew Hewus Fresh)
 
-v0.940.0 2019-08-06T22:24:54
- - No changes found
-
 0.94 2019-08-06T22:24:54
  - Fix attribute typo in SYNOPSIS (Brendan Byrd)
  - Update version date in CHANGES (Brendan Byrd)
@@ -40,6 +48,9 @@ v0.940.0 2019-08-06T22:24:54
    (Brendan Byrd)
  - SM-1828: Prep for new version 0.94 (Brendan Byrd)
  - SM-1828: Change boolean $rs calls to "defined $rs" (Brendan Byrd)
+
+v0.940.0 2019-08-06T22:24:54
+ - No changes found
 
 0.93 2019-01-09T20:08:59
  - SM-1647: Prep for new version 0.93 (Brendan Byrd)

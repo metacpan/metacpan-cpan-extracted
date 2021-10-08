@@ -1,5 +1,11 @@
 Revision history for Object-Pad
 
+0.54    2021-10-07
+        [CHANGES]
+         * Support slot initialiser blocks; don't invoke blocks for values
+           passed by :param
+         * Support slot default values on non-scalars
+
 0.53    2021-09-29
         [CHANGES]
          * Support null-or-unary reader/writer accessors, called simply

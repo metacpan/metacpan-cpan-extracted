@@ -22,6 +22,7 @@ use Smartcat::App::Utils;
 
 use Carp;
 use Log::Any qw($log);
+use JSON qw/encode_json/;
 
 # How many documents to delete at a time
 # (there's a limitation on the number of the document due to
@@ -276,12 +277,13 @@ sub upload {
     my $filename = prepare_document_name( $rundata->{project_workdir}, $path, $rundata->{filetype},
         $target_languages[0] );
 
-    my $external_id;
+    my $meta_info;
     if ( $rundata->{extract_id_from_name}){
-        $external_id = &get_file_id( $path );
+        my $file_id = &get_file_id( $path );
+        $meta_info = encode_json( { file_id => $file_id } );
     }
 
-    my $documents = $self->app->project_api->upload_file( $path, $filename, $external_id,
+    my $documents = $self->app->project_api->upload_file( $path, $filename, undef, $meta_info,
         \@target_languages );
     $log->info( "Created documents ids:\n  "
           . join( ', ', map { $_->id } @$documents ) );

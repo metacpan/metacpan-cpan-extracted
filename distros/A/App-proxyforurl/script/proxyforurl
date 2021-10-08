@@ -8,20 +8,18 @@ get '/pac', [format => [qw(js)]], => 'pac';
 
 get '/gethostbyname' => sub {
   my $c = shift;
+  return $c->render(text => "Host missing.", status => 400) unless my $host = $c->param('host');
+  return $c->render(text => $host) unless $host =~ /[a-z]/;
 
   local $! = 0;
+  local $? = 0;
+  my @addr = gethostbyname($c->param('host'));
+  $! ||= $?;
+  return $c->render(text => "No IP found: $!", status => 400) if $!;
 
-  if (my $host = $c->param('host')) {
-    return $c->render(text => $host) unless $host =~ /[a-z]/;
-    my @addr = gethostbyname($c->param('host'));
-    return $c->render(text => "$!", status => 400) if $!;
-    @addr = map { inet_ntoa($_) } @addr[4 .. $#addr];
-    return $c->render(text => $addr[0]) if @addr;
-    return $c->render(text => "No IP found for $host.", status => 400);
-  }
-  else {
-    return $c->render(text => "Host missing.", status => 400);
-  }
+  @addr = map { inet_ntoa($_) } @addr[4 .. $#addr];
+  return $c->render(text => $addr[0]) if @addr;
+  return $c->render(text => "No IP found for $host.", status => 400);
   },
   'gethostbyname';
 

@@ -9,7 +9,9 @@ use Test::EOL;
 my @files = (
     'bin/timestamper-with-elapsed',
     'lib/App/Timestamper/WithElapsed.pm',
-    't/00-compile.t'
+    't/00-compile.t',
+    't/data/nums.txt',
+    't/output-flag.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

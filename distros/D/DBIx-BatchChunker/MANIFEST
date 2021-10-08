@@ -20,6 +20,7 @@ t/author-pod-coverage.t
 t/author-pod.t
 t/author-strict.t
 t/author-version.t
+t/big-id.t
 t/construct.t
 t/dbh-dbic_storage.t
 t/dbh-legacy.t

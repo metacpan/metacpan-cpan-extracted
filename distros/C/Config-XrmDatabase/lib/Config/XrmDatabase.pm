@@ -5,7 +5,7 @@ package Config::XrmDatabase;
 use v5.26;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Feature::Compat::Try;
 
@@ -246,7 +246,7 @@ sub query ( $self, $class, $name, %iopt ) {
           if Ref::Util::is_coderef( $opt{on_failure} );
 
         query_failure->throw(
-            "unable to match name: '$name'; class : '$class'" )
+            "unable to match name: '@{[ name_arr_to_str($name) ]} '; class : '@{[ name_arr_to_str($class) ]}'" )
           if $opt{on_failure} eq QUERY_ON_FAILURE_THROW;
 
         return undef;
@@ -745,7 +745,7 @@ Config::XrmDatabase - Pure Perl X Resource Manager Database
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

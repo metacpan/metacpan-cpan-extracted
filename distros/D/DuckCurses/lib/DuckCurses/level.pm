@@ -38,12 +38,30 @@ sub move_right {
 	$self->{x}++;
 }
 
+sub move_up {
+	my ($self) = @_;
+
+	$self->{y}--;
+}
+
+sub move_down {
+	my ($self) = @_;
+
+	$self->{y}++;
+}
+
 ### adding enemies/entities to the level
 
 sub add_entity {
 	my ($self, $e) = @_;
 
 	push (@{ $self->{entities} }, $e);
+}
+
+sub add_enemy {
+	my ($self, $en) = @_;
+
+	push (@{ $self->{entities} }, $en);
 }
 
 ### print status data (PCs and NPCs) to screen

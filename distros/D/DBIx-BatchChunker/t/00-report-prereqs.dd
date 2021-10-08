@@ -26,7 +26,7 @@ do { my $x = {
                                       'Term::ProgressBar' => '2.14',
                                       'Time::HiRes' => '0',
                                       'Type::Utils' => '0',
-                                      'Types::Common::Numeric' => '0',
+                                      'Types::Numbers' => 'v1.0.0',
                                       'Types::Standard' => '1.00',
                                       'namespace::clean' => '0'
                                     }

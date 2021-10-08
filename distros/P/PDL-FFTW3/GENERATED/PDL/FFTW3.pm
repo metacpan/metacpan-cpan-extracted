@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.17';
+   our $VERSION = '0.18';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::FFTW3 $VERSION;

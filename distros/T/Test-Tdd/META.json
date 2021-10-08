@@ -4,7 +4,7 @@
       "Rogerio Chaves <rogeriocfj@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -41,6 +41,7 @@
          "requires" : {
             "Devel::Peek" : "0",
             "File::Spec" : "0",
+            "Moose" : "2.2015",
             "Test::Differences" : "0",
             "Test::Spec" : "0",
             "lib" : "0"
@@ -56,8 +57,9 @@
          "web" : "https://github.com/rogeriochaves/perl-tdd-runner"
       }
    },
-   "version" : "0.007",
-   "x_generated_by_perl" : "v5.18.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
+   "version" : "0.009",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

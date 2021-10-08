@@ -14,6 +14,8 @@ $modules{$_} = $_ for qw(
   Encode
   ExtUtils::MakeMaker
   Moose
+  Moose::Util::TypeConstraints
+  MooseX::Types::Moose
   Test2::V0
 );
 

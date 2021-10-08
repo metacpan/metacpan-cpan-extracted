@@ -1,0 +1,103 @@
+# PODNAME: Iterator::Flex::Manual::Serialization
+# ABSTRACT: Serializing iterators
+
+__END__
+
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
+=head1 NAME
+
+Iterator::Flex::Manual::Serialization - Serializing iterators
+
+=head1 VERSION
+
+version 0.14
+
+=head1 DESCRIPTION
+
+=over
+
+=item freeze I<optional>
+
+A subroutine which returns an array reference with the following elements, in the specified order :
+
+=over
+
+=item 1
+
+The name of the package containing the thaw subroutine.
+
+=item 2
+
+The name of the thaw subroutine.
+
+=item 3
+
+The data to be passed to the thaw routine.  The routine will be called
+as:
+
+  thaw( @{$data}, ?$depends );
+
+if C<$data> is an arrayref,
+
+  thaw( %{$data}, ?( depends => $depends )  );
+
+if C<$data> is a hashref, or
+
+  thaw( $data, ?$depends );
+
+for any other type of data.
+
+Dependencies are passed to the thaw routine only if they are present.
+
+=back
+
+=back
+
+=head1 SUPPORT
+
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-iterator-flex@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Iterator-Flex>
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/iterator-flex
+
+and may be cloned from
+
+  https://gitlab.com/djerius/iterator-flex.git
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<Iterator::Flex|Iterator::Flex>
+
+=item *
+
+L<Iterator::Flex::Manual|Iterator::Flex::Manual>
+
+=back
+
+=head1 AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

@@ -4,8 +4,10 @@ use warnings;
 use Geo::GoogleEarth::Pluggable::Contrib::Point;
 use Geo::GoogleEarth::Pluggable::Contrib::LineString;
 use Geo::GoogleEarth::Pluggable::Contrib::LinearRing;
+use Geo::GoogleEarth::Pluggable::Contrib::Polygon;
+use Geo::GoogleEarth::Pluggable::Contrib::MultiPolygon;
 
-our $VERSION='0.13';
+our $VERSION='0.17';
 
 =head1 NAME
 
@@ -38,6 +40,72 @@ Constructs a new Placemark Point object and appends it to the parent folder obje
 sub Point {
   my $self=shift; #This will be a Geo::GoogleEarth::Pluggable::Folder object
   my $obj=Geo::GoogleEarth::Pluggable::Contrib::Point->new(document=>$self->document, @_);
+  $self->data($obj);
+  return $obj;
+}
+
+=head2 Polygon
+
+  $folder->Polygon(
+                   name        => "My Polygon",
+                   coordinates => [
+                                    [ #outerBoundaryIs
+                                      [ -95.74356, 29.61974 ],
+                                      [ -95.74868, 29.62188 ],
+                                      [ -95.74857, 29.62210 ],
+                                      [ -95.74256, 29.62266 ],
+                                      [ -95.74356, 29.61974 ],
+                                    ],
+                                    \@innerBoundaryIs1,
+                                    \@innerBoundaryIs2,
+                                    \@innerBoundaryIs3,
+                                  ],
+                   style       => $style,
+                   open        => 1,
+                   description => $html,
+                  ),
+
+=cut
+
+sub Polygon {
+  my $self = shift; #This will be a Geo::GoogleEarth::Pluggable::Folder object
+  my $obj  = Geo::GoogleEarth::Pluggable::Contrib::Polygon->new(document=>$self->document, @_);
+  $self->data($obj);
+  return $obj;
+}
+
+=head2 MultiPolygon
+
+  $folder->MultiPolygon(
+                        name        => "My MultiPolygon",
+                        coordinates => [ #MultiGeometry
+                                         [ #Polygon1
+                                           [
+                                             [ -95.45662, 29.77814 ],
+                                             [ -95.45668, 29.77809 ],
+                                             [ -95.45675, 29.77814 ],
+                                             [ -95.45669, 29.77820 ],
+                                             [ -95.45662, 29.77814 ],
+                                           ],
+                                           \@innerBoundaryIs1,
+                                         ],
+                                         [ #Polygon2
+                                           [
+                                             [ -95.45677, 29.77785 ],
+                                             [ -95.45683, 29.77780 ],
+                                             [ -95.45689, 29.77785 ],
+                                             [ -95.45683, 29.77791 ],
+                                             [ -95.45677, 29.77785 ],
+                                           ],
+                                         ],
+                                       ],
+                       );
+
+=cut
+
+sub MultiPolygon {
+  my $self = shift; #This will be a Geo::GoogleEarth::Pluggable::Folder object
+  my $obj  = Geo::GoogleEarth::Pluggable::Contrib::MultiPolygon->new(document=>$self->document, @_);
   $self->data($obj);
   return $obj;
 }

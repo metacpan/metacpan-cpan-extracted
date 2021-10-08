@@ -1,9 +1,22 @@
-0.003   2021-03-27  Released-By: PERLANCAR; Urgency: low
+0.004   2021-05-09  Released-By: PERLANCAR; Urgency: medium
+
+        - Merge releases 0.002.999 and 0.003.
+
+
+0.003   2021-05-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Add entry: App::DiffTarballs.
+
+
+0.002.999 2021-03-27  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.
 
         - [build] Rebuild with newer Pod::From::Acme::CPANModules (0.008) to
           update POD heading names.
+
+        - UPDATE 2021-03-27: rename version from 0.003 to 0.002.999 due to
+          conflict.
 
 
 0.002   2020-09-15  Released-By: PERLANCAR; Urgency: low

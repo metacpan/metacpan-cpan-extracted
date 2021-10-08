@@ -87,7 +87,7 @@ EOW
         "Karen Etheridge <ether\@cpan.org>"
       ],
       "dist_name" => "JSON-Schema-Draft201909",
-      "dist_version" => "0.129",
+      "dist_version" => "0.130",
       "license" => "perl",
       "module_name" => "JSON::Schema::Draft201909",
       "recursive_test_files" => 1,
@@ -95,7 +95,6 @@ EOW
         "Import::Into" => 0,
         "JSON::Schema::Modern" => "0.515",
         "Moo" => 0,
-        "Moo::Role" => 0,
         "if" => 0,
         "namespace::clean" => 0,
         "perl" => "5.016",
@@ -104,44 +103,18 @@ EOW
         "warnings" => 0
       },
       "test_requires" => {
-        "Feature::Compat::Try" => 0,
         "File::Spec" => 0,
-        "JSON::MaybeXS" => 0,
-        "JSON::PP" => 0,
-        "List::Util" => "1.50",
         "Module::Metadata" => 0,
-        "Path::Tiny" => 0,
-        "Safe::Isa" => 0,
-        "Test::Deep" => 0,
-        "Test::JSON::Schema::Acceptance" => "1.008",
-        "Test::Memory::Cycle" => 0,
-        "Test::More" => "0.96",
-        "Test::Warnings" => 0,
-        "constant" => 0,
-        "lib" => 0,
-        "open" => 0,
+        "Test::More" => 0,
         "perl" => "5.016"
       }
     );
 
 
     my %fallback_build_requires = (
-      "Feature::Compat::Try" => 0,
       "File::Spec" => 0,
-      "JSON::MaybeXS" => 0,
-      "JSON::PP" => 0,
-      "List::Util" => "1.50",
       "Module::Metadata" => 0,
-      "Path::Tiny" => 0,
-      "Safe::Isa" => 0,
-      "Test::Deep" => 0,
-      "Test::JSON::Schema::Acceptance" => "1.008",
-      "Test::Memory::Cycle" => 0,
-      "Test::More" => "0.96",
-      "Test::Warnings" => 0,
-      "constant" => 0,
-      "lib" => 0,
-      "open" => 0,
+      "Test::More" => 0,
       "perl" => "5.016"
     );
 

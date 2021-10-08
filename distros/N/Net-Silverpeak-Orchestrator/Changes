@@ -1,6 +1,7 @@
 Revision history for Net-Silverpeak-Orchestrator
 
-0.002000  2021-09-27 17:47:29+02:00 Europe/Vienna
+0.003000  2021-10-05 13:38:29+02:00 Europe/Vienna
+    - add domain name application support
 
 0.002000  2021-09-27 17:42:44+02:00 Europe/Vienna
     - fix hardcoded template group name instead of

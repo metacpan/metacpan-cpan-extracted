@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Dialog;
-$Playwright::Dialog::VERSION = '0.015';
+$Playwright::Dialog::VERSION = '0.016';
 use parent 'Playwright::Base';
 
 sub new {
@@ -18,11 +18,21 @@ sub new {
     return $self->SUPER::new(%options);
 }
 
-sub dismiss {
+sub accept {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
-        command => 'dismiss',
+        command => 'accept',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub defaultValue {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'defaultValue',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -30,7 +40,7 @@ sub dismiss {
 
 sub type {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'type',
         object  => $self->{guid},
@@ -40,7 +50,7 @@ sub type {
 
 sub message {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'message',
         object  => $self->{guid},
@@ -48,21 +58,11 @@ sub message {
     );
 }
 
-sub defaultValue {
+sub dismiss {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
-        command => 'defaultValue',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub accept {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'accept',
+        command => 'dismiss',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -70,7 +70,7 @@ sub accept {
 
 sub on {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'on',
         object  => $self->{guid},
@@ -80,7 +80,7 @@ sub on {
 
 sub evaluate {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'evaluate',
         object  => $self->{guid},
@@ -90,7 +90,7 @@ sub evaluate {
 
 sub evaluateHandle {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'evaluateHandle',
         object  => $self->{guid},
@@ -112,7 +112,7 @@ Playwright::Dialog - Automatically generated class for Playwright::Dialog
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 CONSTRUCTOR
 
@@ -123,11 +123,17 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 dismiss(@args)
+=head2 accept(@args)
 
-Execute the Dialog::dismiss playwright routine.
+Execute the Dialog::accept playwright routine.
 
-See L<https://playwright.dev/api/class-Dialog#Dialog-dismiss> for more information.
+See L<https://playwright.dev/api/class-Dialog#Dialog-accept> for more information.
+
+=head2 defaultValue(@args)
+
+Execute the Dialog::defaultValue playwright routine.
+
+See L<https://playwright.dev/api/class-Dialog#Dialog-defaultValue> for more information.
 
 =head2 type(@args)
 
@@ -141,17 +147,11 @@ Execute the Dialog::message playwright routine.
 
 See L<https://playwright.dev/api/class-Dialog#Dialog-message> for more information.
 
-=head2 defaultValue(@args)
+=head2 dismiss(@args)
 
-Execute the Dialog::defaultValue playwright routine.
+Execute the Dialog::dismiss playwright routine.
 
-See L<https://playwright.dev/api/class-Dialog#Dialog-defaultValue> for more information.
-
-=head2 accept(@args)
-
-Execute the Dialog::accept playwright routine.
-
-See L<https://playwright.dev/api/class-Dialog#Dialog-accept> for more information.
+See L<https://playwright.dev/api/class-Dialog#Dialog-dismiss> for more information.
 
 =head2 on(@args)
 

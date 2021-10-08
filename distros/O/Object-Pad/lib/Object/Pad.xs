@@ -14,12 +14,16 @@
 #include "XSParseSublike.h"
 
 #include "perl-backcompat.c.inc"
+#include "sv_setrv.c.inc"
 
 #ifdef HAVE_DMD_HELPER
 #  include "DMD_helper.h"
 #endif
 
 #include "perl-additions.c.inc"
+#include "forbid_outofblock_ops.c.inc"
+#include "force_list_keeping_pushmark.c.inc"
+#include "optree-additions.c.inc"
 #include "newOP_CUSTOM.c.inc"
 
 #if HAVE_PERL_VERSION(5, 26, 0)
@@ -585,6 +589,7 @@ static int build_has(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, 
   int argi = 0;
 
   SV *name = args[argi++]->sv;
+  char sigil = SvPV_nolen(name)[0];
 
   SlotMeta *slotmeta = mop_class_add_slot(compclassmeta, name);
   SvREFCNT_dec(name);
@@ -610,31 +615,90 @@ static int build_has(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, 
    * because scalar assignment tries to peephole far too deply into us and
    * everything breaks... :/
    */
-  bool has_defexpr = args[argi++]->i;
-  if(has_defexpr) {
-    if(SvPV_nolen(name)[0] != '$')
-      croak("Can only attach a default expression to a 'has' default");
+  switch(args[argi++]->i) {
+    case -1:
+      /* no expr */
+      break;
 
-    OP *op = args[argi++]->op;
+    case 0:
+    {
+      OP *op = args[argi++]->op;
 
-    if(!op || PL_parser->error_count) {
-      return 0;
-    }
+      slotmeta->defaultsv = newSV(0);
 
-    slotmeta->defaultsv = newSV(0);
-
-    *out = newBINOP(OP_SASSIGN, 0,
-      op,
       /* An OP_CONST whose op_type is OP_CUSTOM.
-       * This way we avoid the opchecker and finalizer doing bad things to
-       * our defaultsv SV by setting it SvREADONLY_on().
+       * This way we avoid the opchecker and finalizer doing bad things to our
+       * defaultsv SV by setting it SvREADONLY_on().
        */
-      newSVOP_CUSTOM(PL_ppaddr[OP_CONST], 0, SvREFCNT_inc(slotmeta->defaultsv)));
+      OP *slotop = newSVOP_CUSTOM(PL_ppaddr[OP_CONST], 0, SvREFCNT_inc(slotmeta->defaultsv));
+
+      OP *lhs, *rhs;
+
+      switch(sigil) {
+        case '$':
+          *out = newBINOP(OP_SASSIGN, 0, op_contextualize(op, G_SCALAR), slotop);
+          break;
+
+        case '@':
+          sv_setrv_noinc(slotmeta->defaultsv, (SV *)newAV());
+          lhs = newUNOP(OP_RV2AV, OPf_MOD|OPf_REF, slotop);
+          goto slot_array_hash_common;
+
+        case '%':
+          sv_setrv_noinc(slotmeta->defaultsv, (SV *)newHV());
+          lhs = newUNOP(OP_RV2HV, OPf_MOD|OPf_REF, slotop);
+          goto slot_array_hash_common;
+
+slot_array_hash_common:
+          rhs = op_contextualize(op, G_LIST);
+          *out = newBINOP(OP_AASSIGN, 0,
+            force_list_keeping_pushmark(rhs),
+            force_list_keeping_pushmark(lhs));
+          break;
+      }
+    }
+    break;
+
+    case 1:
+    {
+      OP *op = args[argi++]->op;
+      U8 want = 0;
+
+      forbid_outofblock_ops(op, "a slot initialiser block");
+
+      switch(sigil) {
+        case '$':
+          want = G_SCALAR;
+          break;
+        case '@':
+        case '%':
+          want = G_LIST;
+          break;
+      }
+
+      slotmeta->defaultexpr = op_contextualize(op_scope(op), want);
+    }
+    break;
   }
 
   mop_slot_seal(slotmeta);
 
   return KEYWORD_PLUGIN_STMT;
+}
+
+static void setup_parse_has_initexpr(pTHX_ void *hookdata)
+{
+  CV *was_compcv = PL_compcv;
+
+  resume_compcv_and_save(&compclassmeta->initslots_compcv);
+
+  /* Set up this new block as if the current compiler context were its scope */
+
+  if(CvOUTSIDE(PL_compcv))
+    SvREFCNT_dec(CvOUTSIDE(PL_compcv));
+
+  CvOUTSIDE(PL_compcv)     = (CV *)SvREFCNT_inc(was_compcv);
+  CvOUTSIDE_SEQ(PL_compcv) = PL_cop_seqmax;
 }
 
 static const struct XSParseKeywordHooks kwhooks_has = {
@@ -646,9 +710,10 @@ static const struct XSParseKeywordHooks kwhooks_has = {
   .pieces = (const struct XSParseKeywordPieceType []){
     XPK_LEXVARNAME(XPK_LEXVAR_ANY),
     XPK_ATTRIBUTES,
-    XPK_OPTIONAL(
-      XPK_EQUALS,
-      XPK_TERMEXPR
+    XPK_CHOICE(
+      XPK_SEQUENCE(XPK_EQUALS, XPK_TERMEXPR),
+      XPK_PREFIXED_BLOCK_ENTERLEAVE(XPK_SETUP(&setup_parse_has_initexpr)),
+      {0}
     ),
     {0}
   },

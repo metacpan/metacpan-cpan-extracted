@@ -11,6 +11,7 @@ my $post_diag;
 
 $modules{$_} = $_ for qw(
   Dist::Zilla::MintingProfile::FFI
+  Dist::Zilla::Plugin::DynamicPrereqs
   Dist::Zilla::Plugin::FFI
   ExtUtils::MakeMaker
   FFI::C

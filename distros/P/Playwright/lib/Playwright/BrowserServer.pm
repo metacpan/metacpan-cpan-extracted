@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::BrowserServer;
-$Playwright::BrowserServer::VERSION = '0.015';
+$Playwright::BrowserServer::VERSION = '0.016';
 use parent 'Playwright::Base';
 
 sub new {
@@ -20,7 +20,7 @@ sub new {
 
 sub kill {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'kill',
         object  => $self->{guid},
@@ -28,19 +28,9 @@ sub kill {
     );
 }
 
-sub close {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'close',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub wsEndpoint {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'wsEndpoint',
         object  => $self->{guid},
@@ -48,9 +38,19 @@ sub wsEndpoint {
     );
 }
 
+sub close {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'close',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
 sub process {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'process',
         object  => $self->{guid},
@@ -60,7 +60,7 @@ sub process {
 
 sub on {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'on',
         object  => $self->{guid},
@@ -70,7 +70,7 @@ sub on {
 
 sub evaluate {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'evaluate',
         object  => $self->{guid},
@@ -80,7 +80,7 @@ sub evaluate {
 
 sub evaluateHandle {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'evaluateHandle',
         object  => $self->{guid},
@@ -102,7 +102,7 @@ Playwright::BrowserServer - Automatically generated class for Playwright::Browse
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 CONSTRUCTOR
 
@@ -119,17 +119,17 @@ Execute the BrowserServer::kill playwright routine.
 
 See L<https://playwright.dev/api/class-BrowserServer#BrowserServer-kill> for more information.
 
-=head2 close(@args)
-
-Execute the BrowserServer::close playwright routine.
-
-See L<https://playwright.dev/api/class-BrowserServer#BrowserServer-close> for more information.
-
 =head2 wsEndpoint(@args)
 
 Execute the BrowserServer::wsEndpoint playwright routine.
 
 See L<https://playwright.dev/api/class-BrowserServer#BrowserServer-wsEndpoint> for more information.
+
+=head2 close(@args)
+
+Execute the BrowserServer::close playwright routine.
+
+See L<https://playwright.dev/api/class-BrowserServer#BrowserServer-close> for more information.
 
 =head2 process(@args)
 

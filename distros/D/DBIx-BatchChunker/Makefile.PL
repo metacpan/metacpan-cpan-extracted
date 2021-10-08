@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "Term::ProgressBar" => "2.14",
     "Time::HiRes" => 0,
     "Type::Utils" => 0,
-    "Types::Common::Numeric" => 0,
+    "Types::Numbers" => "1.0.0",
     "Types::Standard" => "1.00",
     "namespace::clean" => 0
   },
@@ -51,7 +51,7 @@ my %WriteMakefileArgs = (
     "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "v0.940.4",
+  "VERSION" => "v0.941.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -83,7 +83,7 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "Time::HiRes" => 0,
   "Type::Utils" => 0,
-  "Types::Common::Numeric" => 0,
+  "Types::Numbers" => "1.0.0",
   "Types::Standard" => "1.00",
   "base" => 0,
   "lib" => 0,

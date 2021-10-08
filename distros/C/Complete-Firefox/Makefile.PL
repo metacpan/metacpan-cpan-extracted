@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Complete::Util" => "0.608",
     "Exporter" => "5.57",
-    "Firefox::Util::Profile" => 0,
+    "Firefox::Util::Profile" => "0.005",
     "strict" => 0,
     "warnings" => 0
   },
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,7 +40,7 @@ my %FallbackPrereqs = (
   "Complete::Util" => "0.608",
   "Exporter" => "5.57",
   "File::Spec" => 0,
-  "Firefox::Util::Profile" => 0,
+  "Firefox::Util::Profile" => "0.005",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Test::More" => 0,

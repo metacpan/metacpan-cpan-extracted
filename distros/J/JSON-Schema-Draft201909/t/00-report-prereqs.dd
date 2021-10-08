@@ -39,7 +39,6 @@ do { my $x = {
                                       'Import::Into' => '0',
                                       'JSON::Schema::Modern' => '0.515',
                                       'Moo' => '0',
-                                      'Moo::Role' => '0',
                                       'if' => '0',
                                       'namespace::clean' => '0',
                                       'perl' => '5.016',
@@ -53,22 +52,9 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
-                                   'Feature::Compat::Try' => '0',
                                    'File::Spec' => '0',
-                                   'JSON::MaybeXS' => '0',
-                                   'JSON::PP' => '0',
-                                   'List::Util' => '1.50',
                                    'Module::Metadata' => '0',
-                                   'Path::Tiny' => '0',
-                                   'Safe::Isa' => '0',
-                                   'Test::Deep' => '0',
-                                   'Test::JSON::Schema::Acceptance' => '1.008',
-                                   'Test::Memory::Cycle' => '0',
-                                   'Test::More' => '0.96',
-                                   'Test::Warnings' => '0',
-                                   'constant' => '0',
-                                   'lib' => '0',
-                                   'open' => '0',
+                                   'Test::More' => '0',
                                    'perl' => '5.016'
                                  }
                  },

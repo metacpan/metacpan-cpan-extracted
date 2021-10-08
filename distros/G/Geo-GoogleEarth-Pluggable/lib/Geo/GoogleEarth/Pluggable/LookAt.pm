@@ -4,7 +4,7 @@ use warnings;
 use base qw{Geo::GoogleEarth::Pluggable::Constructor};
 use XML::LibXML::LazyBuilder qw{E};
 
-our $VERSION="0.14";
+our $VERSION='0.17';
 
 =head1 NAME
 
@@ -61,7 +61,7 @@ Returns the object type.
 
 =cut
 
-sub type {"LookAt"};
+sub type {'LookAt'};
 
 =head2 latitude
 
@@ -69,8 +69,8 @@ sub type {"LookAt"};
 
 sub latitude {
   my $self=shift;
-  $self->{"latitude"}=shift if @_;
-  return $self->{"latitude"};
+  $self->{'latitude'}=shift if @_;
+  return $self->{'latitude'};
 }
 
 =head2 longitude
@@ -79,8 +79,8 @@ sub latitude {
 
 sub longitude {
   my $self=shift;
-  $self->{"longitude"}=shift if @_;
-  return $self->{"longitude"};
+  $self->{'longitude'}=shift if @_;
+  return $self->{'longitude'};
 }
 
 =head2 range
@@ -89,8 +89,8 @@ sub longitude {
 
 sub range {
   my $self=shift;
-  $self->{"range"}=shift if @_;
-  return $self->{"range"};
+  $self->{'range'}=shift if @_;
+  return $self->{'range'};
 }
 
 =head2 tilt
@@ -99,8 +99,8 @@ sub range {
 
 sub tilt {
   my $self=shift;
-  $self->{"tilt"}=shift if @_;
-  return $self->{"tilt"};
+  $self->{'tilt'}=shift if @_;
+  return $self->{'tilt'};
 }
 
 =head2 heading
@@ -109,8 +109,8 @@ sub tilt {
 
 sub heading {
   my $self=shift;
-  $self->{"heading"}=shift if @_;
-  return $self->{"heading"};
+  $self->{'heading'}=shift if @_;
+  return $self->{'heading'};
 }
 
 =head2 node

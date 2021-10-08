@@ -5,8 +5,6 @@ Text::Layout provides methods for Pango style text formatting. Where
 possible the methods have identical names and (near) identical
 behaviour as their Pango counterparts.
 
-See https://developer.gnome.org/pango/stable/pango-Layout-Objects.html.
-
 Text::Layout uses backend modules to render the marked up text.
 Backends are included for:
 
@@ -44,6 +42,14 @@ Example:
 
     # Render it, passing the text context.
     $layout->show( $x, $y, $ctx );
+
+SEE ALSO
+
+Description of the Pango Markup Language:
+https://docs.gtk.org/Pango/pango_markup.html#pango-markup.
+
+Documentation of the Pango Layout class:
+https://docs.gtk.org/Pango/class.Layout.html.
 
 INSTALLATION
 

@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Worker;
-$Playwright::Worker::VERSION = '0.015';
+$Playwright::Worker::VERSION = '0.016';
 use parent 'Playwright::Base';
 
 sub new {
@@ -18,39 +18,9 @@ sub new {
     return $self->SUPER::new(%options);
 }
 
-sub url {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'url',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub evaluateHandle {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'evaluateHandle',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub close {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'close',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub evaluate {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'evaluate',
         object  => $self->{guid},
@@ -58,9 +28,19 @@ sub evaluate {
     );
 }
 
+sub evaluateHandle {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'evaluateHandle',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
 sub waitForClose {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'waitForClose',
         object  => $self->{guid},
@@ -68,9 +48,29 @@ sub waitForClose {
     );
 }
 
+sub url {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'url',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub close {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'close',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
 sub on {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'on',
         object  => $self->{guid},
@@ -92,7 +92,7 @@ Playwright::Worker - Automatically generated class for Playwright::Worker
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 CONSTRUCTOR
 
@@ -103,11 +103,11 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 url(@args)
+=head2 evaluate(@args)
 
-Execute the Worker::url playwright routine.
+Execute the Worker::evaluate playwright routine.
 
-See L<https://playwright.dev/api/class-Worker#Worker-url> for more information.
+See L<https://playwright.dev/api/class-Worker#Worker-evaluate> for more information.
 
 =head2 evaluateHandle(@args)
 
@@ -115,23 +115,23 @@ Execute the Worker::evaluateHandle playwright routine.
 
 See L<https://playwright.dev/api/class-Worker#Worker-evaluateHandle> for more information.
 
-=head2 close(@args)
-
-Execute the Worker::close playwright routine.
-
-See L<https://playwright.dev/api/class-Worker#Worker-close> for more information.
-
-=head2 evaluate(@args)
-
-Execute the Worker::evaluate playwright routine.
-
-See L<https://playwright.dev/api/class-Worker#Worker-evaluate> for more information.
-
 =head2 waitForClose(@args)
 
 Execute the Worker::waitForClose playwright routine.
 
 See L<https://playwright.dev/api/class-Worker#Worker-waitForClose> for more information.
+
+=head2 url(@args)
+
+Execute the Worker::url playwright routine.
+
+See L<https://playwright.dev/api/class-Worker#Worker-url> for more information.
+
+=head2 close(@args)
+
+Execute the Worker::close playwright routine.
+
+See L<https://playwright.dev/api/class-Worker#Worker-close> for more information.
 
 =head2 on(@args)
 

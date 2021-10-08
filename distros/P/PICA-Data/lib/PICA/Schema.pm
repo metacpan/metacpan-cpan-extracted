@@ -1,7 +1,7 @@
 package PICA::Schema;
 use v5.14.1;
 
-our $VERSION = '1.33';
+our $VERSION = '1.34';
 
 use Scalar::Util qw(reftype);
 use Storable qw(dclone);
@@ -13,6 +13,7 @@ our @EXPORT_OK = qw(field_identifier check_value clean_pica);
 
 sub new {
     my ($class, $schema) = @_;
+    cleanup_field_schedule($schema->{fields});
     bless $schema, $class;
 }
 
@@ -261,24 +262,69 @@ sub check_value {
     return;
 }
 
-sub field_identifier {
-    my $fields = reftype $_[0] eq 'HASH' ? shift->{fields} : undef;
-    my ($tag, $occ) = @{$_[0]};
+sub cleanup_field_schedule {
+    my ($fields) = @_;
 
-    $occ
-        = (substr($tag, 0, 1) ne '2' && $occ > 0)
-        ? sprintf("%02d", $occ)
-        : '';
-
-    if ($fields && !exists $fields->{"$tag/$occ"}) {
-
-        # TODO: we could create an index to speed up this slow lookup
-        for my $id (keys %$fields) {
-            return $id
-                if $id =~ /^$tag\/(..)-(..)$/ && $occ >= $1 && $occ <= $2;
+    # allow ..../00 as field identifier
+    for (grep {$_ =~ qr{/00$}} keys %$fields) {
+        my $tag = substr $_, 0, 4;
+        if ($fields->{$tag}) {
+            warn "duplicated field $_ is removed from schedule\n";
+            delete $fields->{$_};
         }
+        else {
+            $fields->{$tag} = delete $fields->{$_};
+        }
+    }
 
-        # TODO: support x fields with field counter
+    # TODO: detect overlap of ranges (not required by Avram specification)
+}
+
+sub field_identifier {
+
+    $_[0]->{_ranges} = 1 if reftype $_[0] eq 'HASH';
+
+    my $fields = reftype $_[0] eq 'HASH' ? shift->{fields} : undef;
+
+    my ($tag, $occ, @sf) = @{$_[0]};
+    my $level = substr $tag, 0, 1;
+
+    $occ = ($level ne '2' && $occ > 0) ? sprintf("%02d", $occ) : '';
+
+    if ($fields) {
+        return "$tag/$occ" if exists $fields->{"$tag/$occ"};
+
+# Find matching occurrence range
+        # (TODO: create an index to speed up this slow lookup?)
+
+        return $_
+            for grep {$_ =~ /^$tag\/(..)-(..)$/ && $occ >= $1 && $occ <= $2}
+            sort keys %$fields;
+
+        if ($level eq '2') {
+
+            # get value of first subfield $x
+            my $x;
+            for my $i (0 .. $#sf) {
+                if ($i % 2 && $sf[$i - 1] eq 'x') {
+                    $x = $sf[$i];
+                    last;
+                }
+            }
+
+            # find field definition with matching field counter
+            if ($x =~ /^[0-9][0-9]?$/) {
+                return "${tag}x$x" if exists $fields->{"${tag}x$x"};
+
+                return $_
+                    for grep {
+                           $_ =~ /^${tag}x(..?)-(..?)$/
+                        && $x >= $1
+                        && $x <= $2
+                        && length $1 == length $x
+                    } sort keys %$fields;
+            }
+        }
     }
 
     return $occ ne '' ? "$tag/$occ" : $tag;

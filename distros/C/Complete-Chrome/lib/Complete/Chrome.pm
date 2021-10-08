@@ -1,9 +1,9 @@
 package Complete::Chrome;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-19'; # DATE
+our $DATE = '2021-05-09'; # DATE
 our $DIST = 'Complete-Chrome'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -23,6 +23,7 @@ $SPEC{':package'} = {
 
 $SPEC{complete_chrome_profile_name} = {
     v => 1.1,
+    summary => 'Complete from a list of Google Chrome profile names',
     args => {
         word => {
             schema => 'str*',
@@ -63,7 +64,7 @@ Complete::Chrome - Completion routines related to Google Chrome
 
 =head1 VERSION
 
-This document describes version 0.001 of Complete::Chrome (from Perl distribution Complete-Chrome), released on 2020-04-19.
+This document describes version 0.002 of Complete::Chrome (from Perl distribution Complete-Chrome), released on 2021-05-09.
 
 =for Pod::Coverage .+
 
@@ -75,6 +76,8 @@ This document describes version 0.001 of Complete::Chrome (from Perl distributio
 Usage:
 
  complete_chrome_profile_name(%args) -> any
+
+Complete from a list of Google Chrome profile names.
 
 This function is not exported by default, but exportable.
 
@@ -117,7 +120,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

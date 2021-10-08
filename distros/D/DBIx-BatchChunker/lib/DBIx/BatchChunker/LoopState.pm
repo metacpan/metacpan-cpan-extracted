@@ -3,15 +3,17 @@ package DBIx::BatchChunker::LoopState;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Loop state object for DBIx::BatchChunker
 use version;
-our $VERSION = 'v0.940.4'; # VERSION
+our $VERSION = 'v0.941.0'; # VERSION
 
 use Moo;
 use MooX::StrictConstructor;
 
-use Types::Standard        qw( InstanceOf ArrayRef HashRef Int Str Num Maybe );
-use Types::Common::Numeric qw( PositiveNum PositiveOrZeroNum );
+use Types::Standard qw( InstanceOf ArrayRef HashRef Int Str Num Maybe );
+use Types::Numbers  qw( UnsignedInt PositiveNum PositiveOrZeroNum FloatSafeNum );
 use Type::Utils;
 
+use Math::BigInt upgrade => 'Math::BigFloat';
+use Math::BigFloat;
 use Time::HiRes qw( time );
 
 # Don't export the above, but don't conflict with StrictConstructor, either
@@ -97,7 +99,7 @@ sub _mark_timer { shift->timer(time); }
 
 has start => (
     is       => 'rw',
-    isa      => Maybe[Int],
+    isa      => Maybe[UnsignedInt],
     lazy     => 1,
     default  => sub { shift->batch_chunker->min_id },
 );
@@ -111,7 +113,7 @@ has start => (
 
 has end => (
     is       => 'rw',
-    isa      => Int,
+    isa      => UnsignedInt,
     lazy     => 1,
     default  => sub {
         my $self = shift;
@@ -128,25 +130,9 @@ has end => (
 
 has prev_end => (
     is       => 'rw',
-    isa      => Int,
+    isa      => UnsignedInt,
     lazy     => 1,
     default  => sub { shift->start - 1 },
-);
-
-#pod =head2 max_end
-#pod
-#pod The maximum ending ID.  This will be C<$DB_MAX_ID> if L</process_past_max> is set.
-#pod
-#pod =cut
-
-has max_end => (
-    is       => 'rw',
-    isa      => Int,
-    lazy     => 1,
-    default  => sub {
-        my $bc = shift->batch_chunker;
-        $bc->process_past_max ? $DBIx::BatchChunker::DB_MAX_ID : $bc->max_id
-    },
 );
 
 #pod =head2 last_range
@@ -187,8 +173,11 @@ sub _reset_last_timings { shift->last_timings([]) }
 
 has multiplier_range => (
     is       => 'rw',
-    isa      => PositiveOrZeroNum,
-    default  => 0,
+    isa      => FloatSafeNum,
+    lazy     => 1,
+    default  => sub {
+        shift->batch_chunker->_use_bignums ? Math::BigFloat->new(0) : 0;
+    },
 );
 
 #pod =head2 multiplier_step
@@ -201,8 +190,11 @@ has multiplier_range => (
 
 has multiplier_step => (
     is       => 'rw',
-    isa      => PositiveNum,
-    default  => 1,
+    isa      => FloatSafeNum,
+    lazy     => 1,
+    default  => sub {
+        shift->batch_chunker->_use_bignums ? Math::BigFloat->new(1) : 1;
+    },
 );
 
 #pod =head2 checked_count
@@ -226,7 +218,7 @@ has checked_count => (
 
 has chunk_size => (
     is       => 'rw',
-    isa      => Int,
+    isa      => UnsignedInt,
     lazy     => 1,
     default  => sub { shift->batch_chunker->chunk_size },
 );
@@ -239,7 +231,7 @@ has chunk_size => (
 
 has chunk_count => (
     is       => 'rw',
-    isa      => Maybe[Int],
+    isa      => Maybe[UnsignedInt],
     default  => undef,
 );
 
@@ -279,6 +271,11 @@ sub _reset_chunk_state {
     $ls->multiplier_range(0);
     $ls->multiplier_step (1);
     $ls->checked_count   (0);
+
+    if ($ls->batch_chunker->_use_bignums) {
+        $ls->multiplier_range( Math::BigFloat->new(0) );
+        $ls->multiplier_step ( Math::BigFloat->new(1) );
+    }
 }
 
 1;
@@ -295,7 +292,7 @@ DBIx::BatchChunker::LoopState - Loop state object for DBIx::BatchChunker
 
 =head1 VERSION
 
-version v0.940.4
+version v0.941.0
 
 =head1 SYNOPSIS
 
@@ -353,10 +350,6 @@ beginning of the loop.
 
 Last "processed" value of L</end>.  This also includes skipped blocks.  Used in L</start>
 calculations and to determine if the end of the loop has been reached.
-
-=head2 max_end
-
-The maximum ending ID.  This will be C<$DB_MAX_ID> if L</process_past_max> is set.
 
 =head2 last_range
 

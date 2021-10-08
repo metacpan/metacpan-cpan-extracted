@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use 5.022;
 
-package Alien::Build::Wizard::Chrome 0.04 {
+package Alien::Build::Wizard::Chrome 0.05 {
 
   use Moose;
   use experimental qw( signatures postderef );
@@ -45,7 +45,7 @@ Alien::Build::Wizard::Chrome - Wizard chrome
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

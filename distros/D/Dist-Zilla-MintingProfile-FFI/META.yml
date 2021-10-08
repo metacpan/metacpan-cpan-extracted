@@ -21,6 +21,8 @@ meta-spec:
 name: Dist-Zilla-MintingProfile-FFI
 requires:
   Dist::Zilla::File::InMemory: '0'
+  Dist::Zilla::Plugin::DynamicPrereqs: '0'
+  Dist::Zilla::PluginBundle::Starter: v5.0.0
   Dist::Zilla::Role::FileGatherer: '0'
   Dist::Zilla::Role::FileMunger: '0'
   Dist::Zilla::Role::MintingProfile::ShareDir: '0'
@@ -33,8 +35,8 @@ resources:
   bugtracker: https://github.com/PerlFFI/Dist-Zilla-MintingProfile-FFI/issues
   homepage: https://metacpan.org/pod/Dist::Zilla::MintingProfile::FFI
   repository: git://github.com/PerlFFI/Dist-Zilla-MintingProfile-FFI.git
-version: '0.01'
-x_generated_by_perl: v5.34.0
+version: '0.02'
+x_generated_by_perl: v5.35.4
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

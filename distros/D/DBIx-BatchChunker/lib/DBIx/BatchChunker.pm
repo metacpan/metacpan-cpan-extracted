@@ -3,18 +3,20 @@ package DBIx::BatchChunker;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Run large database changes safely
 use version;
-our $VERSION = 'v0.940.4'; # VERSION
+our $VERSION = 'v0.941.0'; # VERSION
 
 use Moo;
 use MooX::StrictConstructor;
 
 use CLDR::Number;
 
-use Types::Standard        qw( Any Item Str Num Bool Undef ArrayRef HashRef CodeRef InstanceOf Tuple Maybe Optional slurpy );
-use Types::Common::Numeric qw( PositiveInt PositiveOrZeroInt PositiveOrZeroNum );
+use Types::Standard        qw( Str Bool Undef ArrayRef HashRef CodeRef InstanceOf Tuple Maybe Optional slurpy );
+use Types::Numbers         qw( NumRange UnsignedInt PerlSafeInt PositiveInt PositiveOrZeroNum );
 use Type::Utils;
 
 use List::Util        1.33 (qw( min max sum any first ));  # has any/all/etc.
+use Math::BigInt upgrade => 'Math::BigFloat';
+use Math::BigFloat;
 use POSIX                   qw( ceil );
 use Scalar::Util            qw( blessed weaken );
 use Term::ProgressBar 2.14;                          # with silent option
@@ -25,7 +27,8 @@ use DBIx::BatchChunker::LoopState;
 # Don't export the above, but don't conflict with StrictConstructor, either
 use namespace::clean -except => [qw< new meta >];
 
-our $DB_MAX_ID = ~0;  # used for progress_past_max
+# This is now an unused, dummy variable
+our $DB_MAX_ID = ~0;
 
 #pod =encoding utf8
 #pod
@@ -514,7 +517,7 @@ has coderef => (
 #pod =cut
 
 has chunk_size => (
-    is       => 'ro',
+    is       => 'rw',
     isa      => PositiveInt,
     required => 0,
     default  => 1000,
@@ -571,15 +574,12 @@ has 'sleep' => (
 #pod Boolean that controls whether to check past the L</max_id> during the loop.  If the loop
 #pod hits the end point, it will run another maximum ID check in the DB, and adjust C<max_id>
 #pod accordingly.  If it somehow cannot run a DB check (no L</rs> or L</max_stmt> available,
-#pod for example), the last chunk will check all the way to C<$DB_MAX_ID>.
+#pod for example), the last chunk will just be one at the end of C<< max_id + chunk_size >>.
 #pod
 #pod This is useful if the entire table is expected to be processed, and you don't want to
 #pod miss any new rows that come up between L</calculate_ranges> and the end of the loop.
 #pod
 #pod Turned off by default.
-#pod
-#pod B<NOTE:> If your RDBMS has a problem with a number as high as whatever C<~0> reports,
-#pod you may want to set the C<$DB_MAX_ID> global variable in this module to something lower.
 #pod
 #pod =cut
 
@@ -637,11 +637,9 @@ has single_rows => (
 has min_chunk_percent => (
     is       => 'ro',
     isa      => Type::Utils::declare(
-        name       => 'PositiveZeroToOneNum',
-        parent     => Num,
-        constraint => sub { $_ >= 0 && $_ <= 1 },
-        inlined    => sub { undef, qq($_ >= 0 && $_ <= 1) },
-        message    => sub { 'Must be a number between 0 and 1' },
+        name    => 'PositiveZeroToOneNum',
+        parent  => NumRange->parameterize(0, 1),
+        message => sub { 'Must be a number between 0 and 1' },
     ),
     required => 0,
     default  => 0.5,
@@ -662,13 +660,80 @@ has min_chunk_percent => (
 
 has min_id => (
     is       => 'rw',
-    isa      => PositiveOrZeroInt,
+    isa      => UnsignedInt,
 );
 
 has max_id => (
     is       => 'rw',
-    isa      => PositiveOrZeroInt,
+    isa      => UnsignedInt,
 );
+
+# Big number handling
+has _use_bignums => (
+    is       => 'rw',
+    isa      => Bool,
+    default  => 0,
+    trigger  => \&_upgrade_attrs_to_bigint,
+);
+
+my @BIGNUM_BC_ATTRS = (qw< chunk_size min_id max_id >);
+my @BIGNUM_LS_ATTRS = (qw< start end prev_end multiplier_range multiplier_step chunk_size chunk_count >);
+
+sub _check_bignums {
+    my ($self) = shift;
+    return 1 if $self->_use_bignums;  # already checked these
+
+    # Auto-set _use_bignums if we detect that we need it
+    my $set_bignums = 0;
+
+    # If other values are passed, check those, too
+    foreach my $val (@_) {
+        next unless defined $val;
+        $set_bignums = 1 if blessed $val || !PerlSafeInt->check($val);
+    }
+
+    # Check BatchChunker attributes
+    foreach my $attr (@BIGNUM_BC_ATTRS) {
+        my $val = $self->$attr();
+        next unless defined $val;
+        $set_bignums = 1 if blessed $val || !PerlSafeInt->check($val);
+    }
+
+    # Check LoopState attributes
+    if (my $ls = $self->loop_state) {
+        foreach my $attr (@BIGNUM_LS_ATTRS) {
+            my $val = $ls->$attr();
+            next unless defined $val;
+            $set_bignums = 1 if blessed $val || !PerlSafeInt->check($val);
+        }
+    }
+
+    $self->_use_bignums(1) if $set_bignums;
+    return $set_bignums;
+}
+
+sub _upgrade_attrs_to_bigint {
+    my ($self, $is_on) = @_;
+    return unless $is_on;
+
+    # Fix BatchChunker attributes
+    foreach my $attr (@BIGNUM_BC_ATTRS) {
+        my $val = $self->$attr();
+        next unless defined $val;  # nothing to upgrade
+        next if blessed $val;      # already upgraded
+        $self->$attr( Math::BigInt->new($val) );
+    }
+
+    # Fix LoopState attributes
+    my $ls = $self->loop_state;
+    return unless $ls;
+    foreach my $attr (@BIGNUM_LS_ATTRS) {
+        my $val = $ls->$attr();
+        next unless defined $val;  # nothing to upgrade
+        next if blessed $val;      # already upgraded
+        $ls->$attr( Math::BigInt->new($val) );
+    }
+}
 
 #pod =head3 loop_state
 #pod
@@ -792,6 +857,7 @@ sub BUILD {
     my $self = shift;
     # Make sure id_name gets fixed at the right time
     $self->_fix_id_name( $self->id_name );
+    $self->_check_bignums;
 }
 
 #pod =head1 CONSTRUCTORS
@@ -922,8 +988,19 @@ sub calculate_ranges {
     # Set the ranges and return
     return 0 unless defined $min_id && defined $max_id;
 
-    $self->min_id( int $min_id );
-    $self->max_id( int $max_id );
+    # This would be the primary spot where we notice we need to upgrade, so check the values before
+    # we attempt to mangle them.
+    if ($self->_check_bignums($min_id, $max_id)) {
+        $min_id = Math::BigFloat->new($min_id)->as_int;
+        $max_id = Math::BigFloat->new($max_id)->as_int;
+    }
+    else {
+        $min_id = int $min_id;
+        $max_id = int $max_id;
+    }
+
+    $self->min_id($min_id);
+    $self->max_id($max_id);
 
     return 1;
 }
@@ -977,6 +1054,7 @@ sub calculate_ranges {
 
 sub execute {
     my $self = shift;
+    $self->_check_bignums;
 
     my $count;
     if (defined $self->min_id && defined $self->max_id) {
@@ -1011,13 +1089,13 @@ sub execute {
     }) );
 
     # Da loop
-    while ($ls->prev_end < $ls->max_end || $ls->start) {
+    while ($ls->prev_end < $self->max_id || $ls->start) {
         $ls->multiplier_range($ls->multiplier_range + $ls->multiplier_step);
         $ls->start           ($ls->prev_end + 1) unless defined $ls->start;   # this could be already set because of early 'next' calls
         $ls->end(
             min(
                 $ls->start + ceil($ls->multiplier_range * $ls->chunk_size) - 1, # ceil, because multiplier_* could be fractional
-                $ls->max_end, # ensure we never exceed max_end
+                $self->max_id,  # ensure we never exceed max_id
             )
         );
         $ls->chunk_count     (undef);
@@ -1069,23 +1147,24 @@ sub _process_block {
     # Figure out if the row count is worth the work
     my $chunk_rs;
     my $count_stmt = $self->count_stmt;
+    my $chunk_count;
     if ($count_stmt && defined $self->dbic_storage) {
         $self->_dbic_block_runner( run => sub {
-            $self->loop_state->chunk_count( $self->dbic_storage->dbh->selectrow_array(
+            $chunk_count = $self->dbic_storage->dbh->selectrow_array(
                 @$count_stmt,
                 (@$count_stmt == 1 ? undef : ()),
                 $ls->start, $ls->end,
-            ) );
+            );
         });
     }
     elsif ($count_stmt) {
-        $ls->chunk_count( $conn->run(sub {
+        $chunk_count = $conn->run(sub {
             $_->selectrow_array(
                 @$count_stmt,
                 (@$count_stmt == 1 ? undef : ()),
                 $ls->start, $ls->end,
             );
-        }) );
+        });
     }
     elsif (defined $rs) {
         $chunk_rs = $rs->search({
@@ -1093,9 +1172,12 @@ sub _process_block {
         });
 
         $self->_dbic_block_runner( run => sub {
-            $self->loop_state->chunk_count( $chunk_rs->count );
+            $chunk_count = $chunk_rs->count;
         });
     }
+
+    $chunk_count = Math::BigInt->new($chunk_count) if $self->_check_bignums($chunk_count);
+    $ls->chunk_count($chunk_count);
 
     return unless $self->_chunk_count_checker;
 
@@ -1206,12 +1288,12 @@ sub _process_past_max_checker {
     my $progress = $ls->progress_bar;
 
     return 1 unless $self->process_past_max;
-    return 1 unless $ls->end > $self->max_id;
+    return 1 unless $ls->end >= $self->max_id;
 
     # No checks for DIY, if they didn't include a max_stmt
     unless (defined $self->rsc || $self->max_stmt) {
-        # There's no way to size this, so skip past the max as one block
-        $ls->end($ls->max_end);
+        # There's no way to size this, so add one more chunk
+        $ls->end($self->max_id + $ls->chunk_size);
         return 1;
     }
 
@@ -1235,34 +1317,35 @@ sub _process_past_max_checker {
     }
     $ls->_mark_timer;  # the above query shouldn't impact runtimes
 
+    # Convert $new_max_id if necessary
+    $new_max_id = Math::BigInt->new($new_max_id) if $self->_check_bignums($new_max_id);
+
     if (!$new_max_id || $new_max_id eq '0E0') {
         # No max: No affected rows to change
         $progress->message('No max ID found; nothing left to process...') if $self->debug;
-        $ls->end($ls->max_end);
+        $ls->end($self->max_id);
 
         $ls->prev_check('no max');
         return 0;
     }
     elsif ($new_max_id > $self->max_id) {
         # New max ID
-        $progress->message( sprintf 'New max ID set from %u to %u', $self->max_id, $new_max_id ) if $self->debug;
+        $progress->message( sprintf 'New max ID set from %s to %s', $self->max_id, $new_max_id ) if $self->debug;
         $self->max_id($new_max_id);
         $progress->target( $new_max_id - $self->min_id + 1 );
         $progress->update( $progress->last_update );
     }
     elsif ($new_max_id == $self->max_id) {
         # Same max ID
-        $progress->message( sprintf 'Found max ID %u; same as end', $new_max_id ) if $self->debug;
-        $ls->max_end($new_max_id);
+        $progress->message( sprintf 'Found max ID %s; same as end', $new_max_id ) if $self->debug;
     }
     else {
         # Max too low
-        $progress->message( sprintf 'Found max ID %u; ignoring...', $new_max_id ) if $self->debug;
-        $ls->max_end($self->max_id);
+        $progress->message( sprintf 'Found max ID %s; ignoring...', $new_max_id ) if $self->debug;
     }
 
-    # Run another boundary check with the new max_end value
-    $ls->end( min($ls->end, $ls->max_end) );
+    # Run another boundary check with the new max_id value
+    $ls->end( min($ls->end, $self->max_id) );
 
     return 1;
 }
@@ -1335,9 +1418,9 @@ sub _chunk_count_checker {
         $ls->prev_check('too many checks');
         return 1;
     }
-    elsif ($ls->end >= $ls->max_end) {
+    elsif ($ls->end >= $self->max_id) {
         # At the end: Just process it
-        $ls->prev_check('at max_end');
+        $ls->prev_check('at max_id');
         return 1;
     }
     elsif ($chunk_percent < $self->min_chunk_percent) {
@@ -1486,11 +1569,21 @@ sub _print_debug_status {
         maximum_fraction_digits => 2,
     );
 
-    my $message = sprintf(
-        'IDs %6u to %6u %9s, %9s rows found',
-        $ls->start, $ls->end, $action,
-        $integer->format( $ls->chunk_count ),
-    );
+    my $message;
+    if ($ls->start < 1_000_000_000 && $ls->end < 1_000_000_000) {
+        $message = sprintf(
+            'IDs %6u to %6u %9s, %9s rows found',
+            $ls->start, $ls->end, $action,
+            $integer->format( $ls->chunk_count ),
+        );
+    }
+    else {
+        $message = sprintf(
+            'IDs %s to %s %s, %s rows found',
+            $ls->start, $ls->end, $action,
+            $ls->chunk_count,
+        );
+    }
 
     $message .= sprintf(
         ' (%4s of chunk size)',
@@ -1511,9 +1604,40 @@ sub _print_debug_status {
         ;
     }
 
+    # Reduce spacing if the numbers are too large
+    if ($ls->start > 1_000_000_000 || $ls->end > 1_000_000_000) {
+        $message =~ s/\s+/ /g;
+        $message =~ s/\(\s+/\(/g;
+    }
+
     return $ls->progress_bar->message($message);
 }
 
+#pod =head1 CAVEATS
+#pod
+#pod =head2 Big Number Support
+#pod
+#pod If the module detects that the ID numbers are no longer safe for standard Perl NV
+#pod storage, it will automatically switch to using L<Math::BigInt> and L<Math::BigFloat> for
+#pod big number support.  If any blessed numbers are already being used to define the
+#pod attributes, this will also switch on the support.
+#pod
+#pod =head2 String-based IDs
+#pod
+#pod If you're working with C<VARCHAR> types or other string-based IDs to represent integers,
+#pod these may be subject to whatever string-based comparison rules your RDBMS uses when
+#pod calculating with C<MIN>/C<MAX> or using C<BETWEEN>.  Row counting and chunk size scaling
+#pod will try to compensate, but will be mixing string-based comparisons from the RDBMS and
+#pod Perl-based integer math.
+#pod
+#pod Using the C<CAST> function may help, but it may also cause critical indexes to be
+#pod ignored, especially if the function is used on the left-hand side against the column.
+#pod Strings with the exact same length may be safe from comparison weirdness, but YMMV.
+#pod
+#pod Non-integer inputs from ID columns, such as GUIDs or other alphanumeric strings, are not
+#pod currently supported.  They would have to be converted to integers via SQL, and doing so
+#pod may run into a similar risk of having your RDBMS ignore indexes.
+#pod
 #pod =head1 SEE ALSO
 #pod
 #pod L<DBIx::BulkLoader::Mysql>, L<DBIx::Class::BatchUpdate>, L<DBIx::BulkUtil>
@@ -1534,7 +1658,7 @@ DBIx::BatchChunker - Run large database changes safely
 
 =head1 VERSION
 
-version v0.940.4
+version v0.941.0
 
 =head1 SYNOPSIS
 
@@ -1880,15 +2004,12 @@ between the two.
 Boolean that controls whether to check past the L</max_id> during the loop.  If the loop
 hits the end point, it will run another maximum ID check in the DB, and adjust C<max_id>
 accordingly.  If it somehow cannot run a DB check (no L</rs> or L</max_stmt> available,
-for example), the last chunk will check all the way to C<$DB_MAX_ID>.
+for example), the last chunk will just be one at the end of C<< max_id + chunk_size >>.
 
 This is useful if the entire table is expected to be processed, and you don't want to
 miss any new rows that come up between L</calculate_ranges> and the end of the loop.
 
 Turned off by default.
-
-B<NOTE:> If your RDBMS has a problem with a number as high as whatever C<~0> reports,
-you may want to set the C<$DB_MAX_ID> global variable in this module to something lower.
 
 =head3 single_rows
 
@@ -2081,6 +2202,31 @@ Increments the progress bar.
 Prints out a standard debug status line, if debug is enabled.  What it prints is
 generally uniform, but it depends on the processing action.  Most of the data is
 pulled from L</loop_state>.
+
+=head1 CAVEATS
+
+=head2 Big Number Support
+
+If the module detects that the ID numbers are no longer safe for standard Perl NV
+storage, it will automatically switch to using L<Math::BigInt> and L<Math::BigFloat> for
+big number support.  If any blessed numbers are already being used to define the
+attributes, this will also switch on the support.
+
+=head2 String-based IDs
+
+If you're working with C<VARCHAR> types or other string-based IDs to represent integers,
+these may be subject to whatever string-based comparison rules your RDBMS uses when
+calculating with C<MIN>/C<MAX> or using C<BETWEEN>.  Row counting and chunk size scaling
+will try to compensate, but will be mixing string-based comparisons from the RDBMS and
+Perl-based integer math.
+
+Using the C<CAST> function may help, but it may also cause critical indexes to be
+ignored, especially if the function is used on the left-hand side against the column.
+Strings with the exact same length may be safe from comparison weirdness, but YMMV.
+
+Non-integer inputs from ID columns, such as GUIDs or other alphanumeric strings, are not
+currently supported.  They would have to be converted to integers via SQL, and doing so
+may run into a similar risk of having your RDBMS ignore indexes.
 
 =head1 SEE ALSO
 

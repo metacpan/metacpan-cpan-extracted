@@ -20,7 +20,7 @@ Perinci::CmdLine::Manual::HowTo::Debugging - How-to guides related to debugging
 
 =head1 VERSION
 
-This document describes version 1.909.0 of Perinci::CmdLine::Manual::HowTo::Debugging (from Perl distribution Perinci-CmdLine), released on 2021-10-01.
+This document describes version 1.909.1 of Perinci::CmdLine::Manual::HowTo::Debugging (from Perl distribution Perinci-CmdLine), released on 2021-10-03.
 
 =head1 DESCRIPTION
 
@@ -52,6 +52,9 @@ to trace is helpful to see the program flow and at what points the plugins are
 triggered):
 
  % PERINCI_CMDLINE_PLUGINS=-DumpArgs,-Exit@after_validate_args your-cli --trace ...
+
+B<Logging other components.> See L<Log::ger::For::LWP>,
+L<Log::ger::For::HTTP::Tiny>, L<Log::ger::For::DBI>, L<Log::ger::DBI::Query>.
 
 =head1 HOMEPAGE
 

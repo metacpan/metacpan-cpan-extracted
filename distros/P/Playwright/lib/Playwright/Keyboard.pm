@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Keyboard;
-$Playwright::Keyboard::VERSION = '0.015';
+$Playwright::Keyboard::VERSION = '0.016';
 use parent 'Playwright::Base';
 
 sub new {
@@ -18,19 +18,9 @@ sub new {
     return $self->SUPER::new(%options);
 }
 
-sub up {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'up',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub type {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'type',
         object  => $self->{guid},
@@ -38,29 +28,9 @@ sub type {
     );
 }
 
-sub press {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'press',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub down {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'down',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub insertText {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'insertText',
         object  => $self->{guid},
@@ -68,9 +38,39 @@ sub insertText {
     );
 }
 
+sub up {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'up',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub down {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'down',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub press {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'press',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
 sub on {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'on',
         object  => $self->{guid},
@@ -80,7 +80,7 @@ sub on {
 
 sub evaluate {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'evaluate',
         object  => $self->{guid},
@@ -90,7 +90,7 @@ sub evaluate {
 
 sub evaluateHandle {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'evaluateHandle',
         object  => $self->{guid},
@@ -112,7 +112,7 @@ Playwright::Keyboard - Automatically generated class for Playwright::Keyboard
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 CONSTRUCTOR
 
@@ -123,23 +123,23 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 up(@args)
-
-Execute the Keyboard::up playwright routine.
-
-See L<https://playwright.dev/api/class-Keyboard#Keyboard-up> for more information.
-
 =head2 type(@args)
 
 Execute the Keyboard::type playwright routine.
 
 See L<https://playwright.dev/api/class-Keyboard#Keyboard-type> for more information.
 
-=head2 press(@args)
+=head2 insertText(@args)
 
-Execute the Keyboard::press playwright routine.
+Execute the Keyboard::insertText playwright routine.
 
-See L<https://playwright.dev/api/class-Keyboard#Keyboard-press> for more information.
+See L<https://playwright.dev/api/class-Keyboard#Keyboard-insertText> for more information.
+
+=head2 up(@args)
+
+Execute the Keyboard::up playwright routine.
+
+See L<https://playwright.dev/api/class-Keyboard#Keyboard-up> for more information.
 
 =head2 down(@args)
 
@@ -147,11 +147,11 @@ Execute the Keyboard::down playwright routine.
 
 See L<https://playwright.dev/api/class-Keyboard#Keyboard-down> for more information.
 
-=head2 insertText(@args)
+=head2 press(@args)
 
-Execute the Keyboard::insertText playwright routine.
+Execute the Keyboard::press playwright routine.
 
-See L<https://playwright.dev/api/class-Keyboard#Keyboard-insertText> for more information.
+See L<https://playwright.dev/api/class-Keyboard#Keyboard-press> for more information.
 
 =head2 on(@args)
 

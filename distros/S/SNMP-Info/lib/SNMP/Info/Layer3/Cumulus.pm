@@ -44,7 +44,7 @@ use SNMP::Info::IEEE802dot3ad 'agg_ports_lag';
 
 our ($VERSION, %GLOBALS, %MIBS, %FUNCS, %MUNGE);
 
-$VERSION = '3.80';
+$VERSION = '3.81';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,
@@ -80,7 +80,8 @@ sub os_ver {
     my $descr   = $netsnmp->description();
 
 # STRING: "Cumulus Linux version 3.5.1 running on innotek GmbH VirtualBox"
-    return $1 if ( defined ($descr) && $descr =~ /^Cumulus Linux.+(\d+\.\d+\.\d+)\s/ );
+# STRING: "Cumulus-Linux 4.1.1 (Linux Kernel 4.19.94-1+cl4u3)"
+    return $1 if ( defined ($descr) && $descr =~ /^Cumulus(?: |-)Linux.+(\d+\.\d+\.\d+)\s/ );
     return;
 }
 

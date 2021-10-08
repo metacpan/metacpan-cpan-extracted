@@ -1,14 +1,20 @@
 Build.PL
 Changes
 hax/dumpers.c.inc
+hax/forbid_outofblock_ops.c.inc
+hax/force_list_keeping_pushmark.c.inc
 hax/make_argcheck_aux.c.inc
 hax/make_argcheck_ops.c.inc
 hax/newOP_CUSTOM.c.inc
+hax/op_sibling_splice.c.inc
+hax/optree-additions.c.inc
 hax/perl-additions.c.inc
 hax/perl-backcompat.c.inc
+hax/sv_setrv.c.inc
 include/class.h
 include/object_pad.h
 include/slot.h
+include/suspended_compcv.h
 lib/Object/mop-class.xsi
 lib/Object/mop-method.xsi
 lib/Object/mop-slot.xsi
@@ -26,6 +32,7 @@ META.yml
 README
 src/class.c
 src/slot.c
+src/suspended_compcv.c
 t/00use.t
 t/01method.t
 t/02slots.t
@@ -43,6 +50,7 @@ t/22slots-accesssors.t
 t/23slots-signatures.t
 t/24slots-constructor.t
 t/25slots-weak.t
+t/26slots-initexpr.t
 t/30unit-class.t
 t/31pad-outside.t
 t/40role.t

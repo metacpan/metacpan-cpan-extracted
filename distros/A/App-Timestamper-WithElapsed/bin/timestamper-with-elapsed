@@ -20,7 +20,7 @@ seconds since the last received line.
 
 =head1 VERSION
 
-version 0.4.0
+version 0.6.0
 
 =head1 SYNOPSIS
 
@@ -41,6 +41,12 @@ from-epoch seconds.
 Display the seconds since the start of the process.
 
 [Added at version 0.4.0.]
+
+=head2 --output [filename] | -o [filename]
+
+Output the raw timestamps and lines to a file.
+
+[Added at version 0.6.0.]
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

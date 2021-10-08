@@ -591,4 +591,37 @@ subtest_buffered 'service groups' => sub {
         'delete_servicegroup ok');
 };
 
+subtest_buffered 'applications' => sub {
+    is($orchestrator->list_domain_applications,
+        bag {
+            all_items hash {
+                field domain => match qr/^[a-zA-Z0-9\-\.]+$/;
+                field name => match qr/^[a-zA-Z0-9_\-\.]+$/;
+                field description => E();
+                field priority => validator(sub{ $_ >= 0 && $_ <= 100 });
+                field disabled => check_isa('JSON::PP::Boolean');
+
+                end();
+            };
+
+            end();
+        },
+        'list_domain_applications ok');
+
+    ok($orchestrator->create_or_update_domain_application('acme.example.net', {
+            name        => 'acme_example_net',
+            priority    => 100,
+        }),
+        'create using create_or_update_domain_application ok');
+
+    ok($orchestrator->create_or_update_domain_application('acme.example.net', {
+            name        => 'acme.example.net',
+            priority    => 90,
+        }),
+        'update using create_or_update_domain_application ok');
+
+    ok($orchestrator->delete_domain_application('acme.example.net'),
+        'delete_domain_application ok');
+};
+
 done_testing();

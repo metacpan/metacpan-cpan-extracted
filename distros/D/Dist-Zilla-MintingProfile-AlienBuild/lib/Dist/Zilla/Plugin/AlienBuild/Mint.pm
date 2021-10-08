@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use 5.022;
 
-package Dist::Zilla::Plugin::AlienBuild::Mint 0.04 {
+package Dist::Zilla::Plugin::AlienBuild::Mint 0.05 {
 
   use Moose;
   with 'Dist::Zilla::Role::FileGatherer', 'Dist::Zilla::Role::ModuleMaker';
@@ -96,7 +96,7 @@ Dist::Zilla::Plugin::AlienBuild::Mint - Generate module and alienfile for use wi
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

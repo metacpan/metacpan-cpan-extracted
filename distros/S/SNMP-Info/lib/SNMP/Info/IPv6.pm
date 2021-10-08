@@ -45,7 +45,7 @@ use constant {
     IPV6MIB => 3,
 };
 
-$VERSION = '3.80';
+$VERSION = '3.81';
 
 
 
@@ -349,7 +349,7 @@ sub ipv6_addr_prefixlength {
                 # Remove interface specific part from vrf interfaces
                 if ($row =~ /^((\d+\.){17}\d+)/) { $row = $1 }
                 # Remove the OID part from the value
-                my $val = $ipv6_addr_prefix->{$row};
+                my $val = $ipv6_addr_prefix->{$row} || '';
                 if ( $val =~ /^.+?((?:\d+\.){19}(\d+))$/ ) {
                     $val = $2;
                     $return->{$row} = $val;
@@ -363,7 +363,7 @@ sub ipv6_addr_prefixlength {
 
 sub ipv6_addr {
     my $info = shift;
-    my $return;
+    my $return = {};
     my $indexes = $info->ipv6_index();
     foreach my $row (keys %$indexes) {
         my @parts = split(/\./, $row);
@@ -377,8 +377,8 @@ sub ipv6_addr {
         my $addrsize = shift @parts; # First element now is addrsize, should be 16
         if ($is_valid && $addrsize == 16) {
             $return->{$row} = join(':', unpack('(H4)*', pack('C*', @parts)));
-        } else {
-            warn sprintf("%s: unable to decode table index to IPv6 address. Raw data is [%s].\n", &_my_sub_name, $row);
+        } elsif ($info->debug()) {
+            printf("%s: unable to decode table index to IPv6 address. Raw data is [%s].\n", &_my_sub_name, $row);
         }
     }
     return $return;

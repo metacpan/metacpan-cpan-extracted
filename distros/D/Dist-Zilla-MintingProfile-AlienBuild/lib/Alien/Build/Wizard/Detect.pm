@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use 5.022;
 
-package Alien::Build::Wizard::Detect 0.04 {
+package Alien::Build::Wizard::Detect 0.05 {
 
   use Moose;
   use Moose::Util::TypeConstraints;
@@ -56,7 +56,9 @@ package Alien::Build::Wizard::Detect 0.04 {
       my $res = $ua->get($self->uri);
       die $res->status_line
         unless $res->is_success;
-      \$res->decoded_content;
+      defined $res->decoded_content
+        ? \$res->decoded_content
+        : \$res->content;
     },
   );
 
@@ -137,7 +139,7 @@ Alien::Build::Wizard::Detect - Tarball detection class
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

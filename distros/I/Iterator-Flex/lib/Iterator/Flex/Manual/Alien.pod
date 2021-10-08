@@ -1,0 +1,106 @@
+# PODNAME: Iterator::Flex::Manual::Alien
+# ABSTRACT: Interfacing with non- Iterator::Flex things.
+
+__END__
+
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
+=head1 NAME
+
+Iterator::Flex::Manual::Alien - Interfacing with non- Iterator::Flex things.
+
+=head1 VERSION
+
+version 0.14
+
+=head1 DESCRIPTION
+
+L<Iterator::Flex> provides transparent access to iterators available
+on CPAN (see L<Iterator::Flex::Manual::PriorArt>), as well as things
+which are L<iterable|Iterator::Flex::Manual::Glossary/iterable thing>,
+such as arrays (or objects which act like arrays), or globrefs (or
+objects which act like them), or objects which provide iterator
+methods.
+
+For these, L<Iterator::Flex::Common/iter> is the
+family-friendly front end; L<under the hood|/UNDER THE HOOD>
+L<Iterator::Flex::Factory/construct_from_iterable> does the heavy
+lifting.
+
+There's also L<Iterator::Flex::ArrayLike>, which interfaces
+to objects which can provide a length and an element accessor.
+
+=head1 UNDER THE HOOD
+
+=head2 Other iterators
+
+Interfacing is accomplished by creating a proxy iterator which translates
+
+=over
+
+=item 1
+
+Invocation
+
+=item 2
+
+Exhaustion signalling
+
+=back
+
+and forwards other capability invocations to the source iterator.
+
+=head2 Invocation
+
+Some iterators are objects which are invoked via a method call, others
+are code references which can be called directly. L<Iterator::Flex> always
+works with code references, so in the former case, a closure must be
+created.
+
+=head1 SUPPORT
+
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-iterator-flex@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Iterator-Flex>
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/iterator-flex
+
+and may be cloned from
+
+  https://gitlab.com/djerius/iterator-flex.git
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<Iterator::Flex|Iterator::Flex>
+
+=item *
+
+L<Iterator::Flex::Manual|Iterator::Flex::Manual>
+
+=back
+
+=head1 AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Video;
-$Playwright::Video::VERSION = '0.015';
+$Playwright::Video::VERSION = '0.016';
 use parent 'Playwright::Base';
 
 sub new {
@@ -18,29 +18,9 @@ sub new {
     return $self->SUPER::new(%options);
 }
 
-sub saveAs {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'saveAs',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub delete {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'delete',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub path {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'path',
         object  => $self->{guid},
@@ -48,9 +28,29 @@ sub path {
     );
 }
 
+sub delete {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'delete',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub saveAs {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'saveAs',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
 sub on {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'on',
         object  => $self->{guid},
@@ -60,7 +60,7 @@ sub on {
 
 sub evaluate {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'evaluate',
         object  => $self->{guid},
@@ -70,7 +70,7 @@ sub evaluate {
 
 sub evaluateHandle {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'evaluateHandle',
         object  => $self->{guid},
@@ -92,7 +92,7 @@ Playwright::Video - Automatically generated class for Playwright::Video
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 CONSTRUCTOR
 
@@ -103,11 +103,11 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 saveAs(@args)
+=head2 path(@args)
 
-Execute the Video::saveAs playwright routine.
+Execute the Video::path playwright routine.
 
-See L<https://playwright.dev/api/class-Video#Video-saveAs> for more information.
+See L<https://playwright.dev/api/class-Video#Video-path> for more information.
 
 =head2 delete(@args)
 
@@ -115,11 +115,11 @@ Execute the Video::delete playwright routine.
 
 See L<https://playwright.dev/api/class-Video#Video-delete> for more information.
 
-=head2 path(@args)
+=head2 saveAs(@args)
 
-Execute the Video::path playwright routine.
+Execute the Video::saveAs playwright routine.
 
-See L<https://playwright.dev/api/class-Video#Video-path> for more information.
+See L<https://playwright.dev/api/class-Video#Video-saveAs> for more information.
 
 =head2 on(@args)
 

@@ -5,7 +5,7 @@ use warnings;
 use 5.020;
 
 # ABSTRACT: Task bundle for FFI development
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 
 1;
@@ -22,7 +22,7 @@ Task::FFIDev - Task bundle for FFI development
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -42,6 +42,10 @@ L<Dist::Zilla> minting profile for creating L<FFI::Platypus> bindings.
 =item L<Dist::Zilla::Plugin::FFI>
 
 L<Dist::Zilla> plugins useful for FFI
+
+=item L<Dist::Zilla::Plugin::DynamicPrereqs>
+
+L<Dist::Zilla> plugin for dynamic prereqs.  Allows your FFI to use L<Alien>s in fallback mode.
 
 =item L<FFI::C>
 

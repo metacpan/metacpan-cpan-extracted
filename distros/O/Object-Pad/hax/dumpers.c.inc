@@ -36,9 +36,23 @@ static void S_padlist_dump_depth(pTHX_ PADLIST *padlist, I32 depth)
 
 #define padlist_dump(pl)  padlist_dump_depth(pl, 1)
 
-static void debug_sv_summary(const SV *sv)
+#define debug_sv_summary(sv)  S_debug_sv_summary(aTHX_ sv)
+static void S_debug_sv_summary(pTHX_ const SV *sv)
 {
   const char *type;
+
+  if(sv == &PL_sv_undef) {
+    fprintf(stderr, "SV=undef");
+    return;
+  }
+  if(sv == &PL_sv_no) {
+    fprintf(stderr, "SV=false");
+    return;
+  }
+  if(sv == &PL_sv_yes) {
+    fprintf(stderr, "SV=true");
+    return;
+  }
 
   switch(SvTYPE(sv)) {
     case SVt_NULL: type = "NULL"; break;
@@ -67,24 +81,34 @@ static void debug_sv_summary(const SV *sv)
   if(SvTEMP(sv))
     fprintf(stderr, ",TEMP");
 
-  if(SvROK(sv))
-    fprintf(stderr, ",ROK");
-  else {
-    if(SvIOK(sv))
-      fprintf(stderr, ",IV=%" IVdf, SvIVX(sv));
-    if(SvUOK(sv))
-      fprintf(stderr, ",UV=%" UVuf, SvUVX(sv));
-    if(SvPOK(sv)) {
-      fprintf(stderr, ",PVX=\"%.10s\"", SvPVX((SV *)sv));
-      if(SvCUR(sv) > 10)
-        fprintf(stderr, "...");
-    }
+  switch(SvTYPE(sv)) {
+    case SVt_PVAV:
+      fprintf(stderr, ",FILL=%d", AvFILL((AV *)sv));
+      break;
+
+    default:
+      /* regular scalars */
+      if(SvROK(sv))
+        fprintf(stderr, ",ROK");
+      else {
+        if(SvIOK(sv))
+          fprintf(stderr, ",IV=%" IVdf, SvIVX(sv));
+        if(SvUOK(sv))
+          fprintf(stderr, ",UV=%" UVuf, SvUVX(sv));
+        if(SvPOK(sv)) {
+          fprintf(stderr, ",PVX=\"%.10s\"", SvPVX((SV *)sv));
+          if(SvCUR(sv) > 10)
+            fprintf(stderr, "...");
+        }
+      }
+      break;
   }
 
   fprintf(stderr, "}");
 }
 
-static void debug_showstack(const char *name)
+#define debug_showstack(name)  S_debug_showstack(aTHX_ name)
+static void S_debug_showstack(pTHX_ const char *name)
 {
   SV **sp;
 
@@ -117,60 +141,66 @@ static struct {
   const char *name;
   const char *argspec;
 } saves[] = {
-  { "ALLOC",               "@" },
-  { "CLEARPADRANGE",       "r" },
-  { "CLEARSV",             "x" },
-  { "REGCONTEXT",          "@" },
-  { "TMPSFLOOR",           " I" },
-  { "BOOL",                "b*" },
-  { "COMPILE_WARNINGS",    " p" },
-  { "COMPPAD",             " *" },
-  { "FREECOPHH",           " *" },
-  { "FREEOP",              " o" },
-  { "FREEPV",              " p" },
-  { "FREESV",              " s" },
-  { "I16",                 "i*" },
-  { "I32_SMALL",           "i*" },
-  { "I8",                  "i*" },
-  { "INT_SMALL",           "i*" },
-  { "MORTALIZESV",         " s" },
-  { "NSTAB",               " s" },
-  { "OP",                  " *" },
-  { "PARSER",              " *" },
-  { "STACK_POS",           " i" },
-  { "READONLY_OFF",        " s" },
-  { "FREEPADNAME",         " *" },
-  { "AV",                  " ga" },
-  { "DESTRUCTOR",          " &*" },
-  { "DESTRUCTOR_X",        " &*" },
-  { "GENERIC_PVREF",       " pP" },
-  { "GENERIC_SVREF",       " Ss" },
-  { "GP",                  " g*" },
-  { "GVSV",                " gs" },
-  { "HINTS",               " T*" },
-  { "HPTR",                " sS" },
-  { "HV",                  " gh" },
-  { "I32",                 " i*" },
-  { "INT",                 " ip" },
-  { "ITEM",                " ss" },
-  { "IV",                  " I*" },
-  { "LONG",                " *l" },
-  { "PPTR",                " pP" },
-  { "SAVESWITCHSTACK",     " aa" },
-  { "SHARED_PVREF",        " Pp" },
-  { "SPTR",                " sS" },
-  { "STRLEN",              " I*" },
-  { "SV",                  " gs" },
-  { "SVREF",               " Ss" },
-  { "VPTR",                " **" },
-  { "ADELETE",             " ia" },
-  { "APTR",                " sS" },
-  { "HELEM",               " hss" },
-  { "PADSV_AND_MORTALIZE", " s*U" },
-  { "SET_SVFLAGS",         " suu" },
-  { "GVSLOT",              " gSs" },
-  { "AELEM",               " aIs" },
-  { "DELETE",              " pih" }
+  [SAVEt_ALLOC]               = { "ALLOC",               "@" },
+  [SAVEt_CLEARPADRANGE]       = { "CLEARPADRANGE",       "r" },
+  [SAVEt_CLEARSV]             = { "CLEARSV",             "x" },
+  [SAVEt_REGCONTEXT]          = { "REGCONTEXT",          "@" },
+  [SAVEt_TMPSFLOOR]           = { "TMPSFLOOR",           " I" },
+  [SAVEt_BOOL]                = { "BOOL",                "b*" },
+  [SAVEt_COMPILE_WARNINGS]    = { "COMPILE_WARNINGS",    " p" },
+  [SAVEt_COMPPAD]             = { "COMPPAD",             " *" },
+  [SAVEt_FREECOPHH]           = { "FREECOPHH",           " *" },
+  [SAVEt_FREEOP]              = { "FREEOP",              " o" },
+  [SAVEt_FREEPV]              = { "FREEPV",              " p" },
+  [SAVEt_FREESV]              = { "FREESV",              " s" },
+  [SAVEt_I16]                 = { "I16",                 "i*" },
+  [SAVEt_I32_SMALL]           = { "I32_SMALL",           "i*" },
+  [SAVEt_I8]                  = { "I8",                  "i*" },
+  [SAVEt_INT_SMALL]           = { "INT_SMALL",           "i*" },
+  [SAVEt_MORTALIZESV]         = { "MORTALIZESV",         " s" },
+  [SAVEt_NSTAB]               = { "NSTAB",               " s" },
+  [SAVEt_OP]                  = { "OP",                  " *" },
+  [SAVEt_PARSER]              = { "PARSER",              " *" },
+  [SAVEt_STACK_POS]           = { "STACK_POS",           " i" },
+  [SAVEt_READONLY_OFF]        = { "READONLY_OFF",        " s" },
+  [SAVEt_FREEPADNAME]         = { "FREEPADNAME",         " *" },
+#ifdef SAVEt_STRLEN_SMALL
+  [SAVEt_STRLEN_SMALL]        = { "STRLEN_SMALL",        "i*" },
+#endif
+  [SAVEt_AV]                  = { "AV",                  " ga" },
+  [SAVEt_DESTRUCTOR]          = { "DESTRUCTOR",          " &*" },
+  [SAVEt_DESTRUCTOR_X]        = { "DESTRUCTOR_X",        " &*" },
+  [SAVEt_GENERIC_PVREF]       = { "GENERIC_PVREF",       " pP" },
+  [SAVEt_GENERIC_SVREF]       = { "GENERIC_SVREF",       " Ss" },
+  [SAVEt_GP]                  = { "GP",                  " g*" },
+  [SAVEt_GVSV]                = { "GVSV",                " gs" },
+  [SAVEt_HINTS]               = { "HINTS",               " T*" },
+  [SAVEt_HPTR]                = { "HPTR",                " sS" },
+  [SAVEt_HV]                  = { "HV",                  " gh" },
+  [SAVEt_I32]                 = { "I32",                 " i*" },
+  [SAVEt_INT]                 = { "INT",                 " ip" },
+  [SAVEt_ITEM]                = { "ITEM",                " ss" },
+  [SAVEt_IV]                  = { "IV",                  " I*" },
+  [SAVEt_LONG]                = { "LONG",                " *l" },
+  [SAVEt_PPTR]                = { "PPTR",                " pP" },
+  [SAVEt_SAVESWITCHSTACK]     = { "SAVESWITCHSTACK",     " aa" },
+  [SAVEt_SHARED_PVREF]        = { "SHARED_PVREF",        " Pp" },
+  [SAVEt_SPTR]                = { "SPTR",                " sS" },
+  [SAVEt_STRLEN]              = { "STRLEN",              " I*" },
+  [SAVEt_SV]                  = { "SV",                  " gs" },
+  [SAVEt_SVREF]               = { "SVREF",               " Ss" },
+  [SAVEt_VPTR]                = { "VPTR",                " **" },
+  [SAVEt_ADELETE]             = { "ADELETE",             " ia" },
+  [SAVEt_APTR]                = { "APTR",                " sS" },
+  [SAVEt_HELEM]               = { "HELEM",               " hss" },
+  [SAVEt_PADSV_AND_MORTALIZE] = { "PADSV_AND_MORTALIZE", " s*U" },
+  [SAVEt_SET_SVFLAGS]         = { "SET_SVFLAGS",         " suu" },
+  [SAVEt_GVSLOT]              = { "GVSLOT",              " gSs" },
+  [SAVEt_AELEM]               = { "AELEM",               " aIs" },
+  [SAVEt_DELETE]              = { "DELETE",              " pih" },
+#ifdef SAVEt_HINTS_HH
+  [SAVEt_HINTS_HH]            = { "HINTS_HH",            " T*h" },
+#endif
 };
 
 static void S_savestack_dump(pTHX)

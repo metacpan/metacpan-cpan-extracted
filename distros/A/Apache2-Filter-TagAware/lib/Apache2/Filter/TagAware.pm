@@ -13,11 +13,11 @@ Apache2::Filter::TagAware - Tag Awareness for Apache2::Filter
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
-=cut 
+=cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -56,19 +56,23 @@ our $VERSION = '0.02';
 
 =head1 DESCRIPTION
 
-Apache2::Filter::TagAware is a subclass of C<Apache2::Filter> which 
-ensures that the read method will not return a split tag. What constitutes 
+Apache2::Filter::TagAware is a subclass of C<Apache2::Filter> which
+ensures that the read method will not return a split tag. What constitutes
 a split tag is definable by the filter.
 
 =head2 new
 
   $f = Apache2::Filter::TagAware->new($f,%args);
 
+=over 4
+
 =item tag_regexp
 
 a regular expression which defines a split tag.  defaults to '(<[^>]*)$'
 
-=cut 
+=back
+
+=cut
 
 sub new {
     my ($class,$f,%args) = @_;
@@ -84,13 +88,13 @@ sub new {
   $f->read($buffer, $bytes)
 
 When read is called, $bytes are read from the underlying stream. The number of
-bytes returned from the call will vary depending on the size of any tag that 
-might be open. It may return 0 bytes for a few calls then return a chunk of 
-the stream 3 times the size of what you were asking for on the next. There's 
-not really anything that can be done about this other than to use a buffer 
-size that's "big enough", whatever that means in your context.  Obviously, 
-returning 0 from read would basically break the page whenever you ran into a 
-tag that was larger than your buffer, so in that situation read will return 
+bytes returned from the call will vary depending on the size of any tag that
+might be open. It may return 0 bytes for a few calls then return a chunk of
+the stream 3 times the size of what you were asking for on the next. There's
+not really anything that can be done about this other than to use a buffer
+size that's "big enough", whatever that means in your context.  Obviously,
+returning 0 from read would basically break the page whenever you ran into a
+tag that was larger than your buffer, so in that situation read will return
 '0e0', aka zero but true to alleviate the problem.
 
 =cut
@@ -102,59 +106,56 @@ sub read {
     #
     # $context is used to store state
     #
-    my $context;
+    my $context = $self->SUPER::ctx();
     #
     # if there is no context yet, set up
     # our default context
     #
-    unless ($self->SUPER::ctx) {
+    if (!$context) {
         $context = { extra => undef, };
     }
-    #
-    # if there is already a context stash it in
-    # $context
-    #
-    $context ||= $self->SUPER::ctx;
+
     my $tag_regexp = $context->{'tag_regexp'} || '(<[^>]*)$';
     #
     # originally, i was trying to not return more than $bytes, but if there
     # is a tag larger than the buffer, that won't work, so now we just read
     # $bytes no matter what.
     #
-    #my $ret_val = $self->SUPER::read($buffer, $bytes - length($context->{extra} || ''));
     my $ret_val = $self->SUPER::read($buffer, $bytes);
-    $log->info('got buffer: '. $buffer);
+    $buffer ||= '';
+    $log->info('read buffer: '. $buffer ? $buffer : '');
     #
     # if there is something extra in our context, prepend
     # it to what we just read
     #
-    $buffer = $context->{extra} . $buffer if $context->{extra};
-    $log->info('extra buffer: '. $buffer);
+    if ($context->{extra}) {
+        $buffer = $context->{extra} . $buffer;
+        $log->info('prepended extra buffer: '. $buffer);
+    }
     #
     # if our buffer ends in a split tag ('<strong' eg)
     # save processing the tag for later
     #
     if (($context->{extra}) = $buffer =~ m/$tag_regexp/) {
         $buffer = substr($buffer, 0, - length($context->{extra}));
+        $log->info('trimmed buffer: '. $buffer);
+        $log->info('trimmed: ' . length($context->{extra}));
     }
-    $log->info('trimmed buffer: '. $buffer);
-    $log->info('e: ' . length($context->{extra}));
-    $log->info('b: ' . length($buffer));
 
-    if (length($context->{extra}) >= $bytes ) {
+    if ($context->{extra} && length($context->{extra}) >= $bytes ) {
         $r->warn($r->uri . qq[ has a tag that is larger than $bytes.]);
     }
 
     if ($self->seen_eos) {
         # we've seen the end of the data stream
-        # pass back the extra data too, because 
-	# we shouldn't get called again
-	$log->info('seen eos');
-	if ($context->{extra}) {
+        # pass back the extra data too, because
+        # we shouldn't get called again
+        $log->info('seen eos');
+        if ($context->{extra}) {
             $buffer .= $context->{extra};
-	    $context->{extra} = undef;
-	}
-	$log->info('se buffer post:'. $buffer);
+            $context->{extra} = undef;
+        }
+        $log->info('se buffer post:'. $buffer);
     }
     else {
         # there's more data to come
@@ -170,9 +171,9 @@ sub read {
     $log->info('sending back buffer: '. $buffer);
     $_[1] = $buffer;
     my $length = length ($buffer);
-    if (!$self->seen_eos && !$length){
+    if (!$self->seen_eos && !$length && $context->{extra}){
         $length = '0e0';
-	$log->info('returning 0 but true');
+        $log->info('returning 0 but true');
     }
     return $length;
 }
@@ -181,12 +182,12 @@ sub read {
 
 See Apache2::Filter docs, behaves identically, at least on the surface.
 
-=cut 
+=cut
 
 #
 # ctx is overridden as well because we need to use it too.
 # If they are passing in something to store in the context
-# i'm just sticking 
+# i'm just sticking
 #
 sub ctx {
     my ($self, $args) = @_;
@@ -208,7 +209,7 @@ sub ctx {
     # of the actual context, if it doesn't have a value, explicitly return
     # undef
     #
-    return $real_ctx->{theirs} || undef; 
+    return $real_ctx->{theirs} || undef;
 }
 
 1;
@@ -216,14 +217,14 @@ sub ctx {
 =head1 CAVEATS
 
 the $bytes you pass in to read is used as a guideline for the maximum number
-of bytes that read will return, but it will not always be less than $bytes. 
+of bytes that read will return, but it will not always be less than $bytes.
 If there is a tag in your document larger than $bytes you'll eventually get
 a chunk of page returned that's larger than $bytes, since that tag will not
 be split.
 
 =head1 AUTHOR AND COPYRIGHT
 
-Copyright 2007, Adam Prime (adam.prime@utoronto.ca) 
+Copyright 2007, Adam Prime (adam.prime@utoronto.ca)
 
 This software is free. It is licensed under the same terms as Perl itself.
 

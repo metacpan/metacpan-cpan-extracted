@@ -41,7 +41,7 @@
             "Term::ProgressBar" : "2.14",
             "Time::HiRes" : "0",
             "Type::Utils" : "0",
-            "Types::Common::Numeric" : "0",
+            "Types::Numbers" : "v1.0.0",
             "Types::Standard" : "1.00",
             "namespace::clean" : "0"
          }
@@ -76,11 +76,11 @@
    "provides" : {
       "DBIx::BatchChunker" : {
          "file" : "lib/DBIx/BatchChunker.pm",
-         "version" : "v0.940.4"
+         "version" : "v0.941.0"
       },
       "DBIx::BatchChunker::LoopState" : {
          "file" : "lib/DBIx/BatchChunker/LoopState.pm",
-         "version" : "v0.940.4"
+         "version" : "v0.941.0"
       }
    },
    "release_status" : "stable",
@@ -94,7 +94,7 @@
          "web" : "https://github.com/GrantStreetGroup/DBIx-BatchChunker"
       }
    },
-   "version" : "v0.940.4",
+   "version" : "v0.941.0",
    "x_generated_by_perl" : "v5.18.2",
    "x_serialization_backend" : "JSON::XS version 4.02",
    "x_spdx_expression" : "Artistic-2.0",

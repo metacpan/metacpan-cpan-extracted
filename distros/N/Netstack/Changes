@@ -1,0 +1,27 @@
+0.015   2021-10-07
+  [ENHANCEMENTS]
+  - 调整 Netstack::Uitls::Ip::getRangeFromIpMask 代码，兼容3种样式ipaddr
+    1) ipRange: 1.1.1.1-2.2.2.2;
+    2) subRange: 1.1.1.1-100;
+    3) singleIp: 1.1.1.1;
+
+0.014   2021-10-07
+  [ENHANCEMENTS]
+  - 修复 Netstack::Connector::Role 模块定义；
+
+0.013   2021-10-07
+  [ENHANCEMENTS]
+  - 修复 Netstack::Uitls::Set addSet 游标bug；
+  - 修复 Netstack::Config::Content::Static 游标末端指针bug；
+  - 新增 Netstack::Connector::Role::_spawn_command 方法，支持定义非标协议端口；
+  - 新增 Netstack 项目测试用例，本次新增 Utils 模块测试逻辑；
+  [OTHER]
+  - 完善 Netstack::Utils::Set 代码注释；
+  - 完善 Netstack::Utils::Ip  代码注释；
+
+0.012   2021-10-06
+  [ENHANCEMENTS]
+  - 修正 Uitls::Ip 功能函数；
+  [OTHER]
+  - 完善 Utils::Set 代码注释；
+  - 完善 Utils::Ip  代码注释；

@@ -11,7 +11,11 @@
 #undef register_class_attribute
 
 #include "perl-backcompat.c.inc"
+#include "sv_setrv.c.inc"
+
 #include "perl-additions.c.inc"
+#include "force_list_keeping_pushmark.c.inc"
+#include "optree-additions.c.inc"
 #include "newOP_CUSTOM.c.inc"
 
 /* Empty MGVTBL simply for locating instance slots AV */
@@ -123,6 +127,74 @@ void ObjectPad_mop_class_apply_attribute(pTHX_ ClassMeta *classmeta, const char 
 
 /* TODO: get attribute */
 
+#define get_classmeta_for(self)  S_get_classmeta_for(aTHX_ self)
+static ClassMeta *S_get_classmeta_for(pTHX_ SV *self)
+{
+  HV *selfstash = SvSTASH(SvRV(self));
+  GV **gvp = (GV **)hv_fetchs(selfstash, "META", 0);
+  if(!gvp)
+    croak("Unable to find ClassMeta for %" SVf, SVfARG(HvNAME(selfstash)));
+
+  return NUM2PTR(ClassMeta *, SvUV(SvRV(GvSV(*gvp))));
+}
+
+#define make_instance_slots(classmeta, slotsav, roleoffset)  S_make_instance_slots(aTHX_ classmeta, slotsav, roleoffset)
+static void S_make_instance_slots(pTHX_ const ClassMeta *classmeta, AV *slotsav, SLOTOFFSET roleoffset)
+{
+  assert(classmeta->type == METATYPE_ROLE || roleoffset == 0);
+
+  if(classmeta->start_slotix) {
+    /* Superclass actually has some slots */
+    assert(classmeta->supermeta->sealed);
+
+    make_instance_slots(classmeta->supermeta, slotsav, 0);
+  }
+
+  AV *slots = classmeta->slots;
+  I32 nslots = av_count(slots);
+
+  av_extend(slotsav, classmeta->next_slotix - 1 + roleoffset);
+
+  I32 i;
+  for(i = 0; i < nslots; i++) {
+    SlotMeta *slotmeta = (SlotMeta *)AvARRAY(slots)[i];
+    char sigil = SvPV_nolen(slotmeta->name)[0];
+
+    assert(av_count(slotsav) == slotmeta->slotix + roleoffset);
+
+    switch(sigil) {
+      case '$':
+        av_push(slotsav, newSV(0));
+        break;
+
+      case '@':
+        av_push(slotsav, newRV_noinc((SV *)newAV()));
+        break;
+
+      case '%':
+        av_push(slotsav, newRV_noinc((SV *)newHV()));
+        break;
+
+      default:
+        croak("ARGH: not sure how to handle a slot sigil %c\n", sigil);
+    }
+  }
+
+  AV *roles = classmeta->roles;
+  I32 nroles = av_count(roles);
+
+  assert(classmeta->type == METATYPE_CLASS || nroles == 0);
+
+  for(i = 0; i < nroles; i++) {
+    RoleEmbedding *embedding = (RoleEmbedding *)AvARRAY(roles)[i];
+    ClassMeta *rolemeta = embedding->rolemeta;
+
+    assert(rolemeta->sealed);
+
+    make_instance_slots(rolemeta, slotsav, embedding->offset);
+  }
+}
+
 SV *ObjectPad_get_obj_slotsav(pTHX_ SV *self, enum ReprType repr, bool create)
 {
   SV *rv = SvRV(self);
@@ -141,36 +213,21 @@ SV *ObjectPad_get_obj_slotsav(pTHX_ SV *self, enum ReprType repr, bool create)
         croak("Not a HASH reference");
       SV **slotssvp = hv_fetchs((HV *)rv, "Object::Pad/slots", create);
       if(create && !SvOK(*slotssvp))
-        sv_setrv(*slotssvp, (SV *)newAV());
+        sv_setrv_noinc(*slotssvp, (SV *)newAV());
 
       /* A method invoked during a superclass constructor of a classic perl
        * class might encounter $self without slots. If this is the case we'll
-       * invoke initslots now to create it.
+       * have to create the slots now
        *   https://rt.cpan.org/Ticket/Display.html?id=132263
        */
       if(!slotssvp) {
-        HV *selfstash = SvSTASH(SvRV(self));
-        GV **gvp = (GV **)hv_fetchs(selfstash, "META", 0);
-        if(!gvp)
-          croak("Unable to find ClassMeta for %" SVf, SVfARG(HvNAME(selfstash)));
+        struct ClassMeta *classmeta = get_classmeta_for(self);
+        AV *slotsav = newAV();
 
-        struct ClassMeta *classmeta = NUM2PTR(ClassMeta *, SvUV(SvRV(GvSV(*gvp))));
+        make_instance_slots(classmeta, slotsav, 0);
 
-        dSP;
-
-        ENTER;
-        EXTEND(SP, 1);
-        PUSHMARK(SP);
-        mPUSHs(newSVsv(self));
-        PUTBACK;
-
-        assert(classmeta->initslots);
-        call_sv((SV *)classmeta->initslots, G_VOID);
-
-        PUTBACK;
-        LEAVE;
-
-        slotssvp = hv_fetchs((HV *)rv, "Object::Pad/slots", 0);
+        slotssvp = hv_fetchs((HV *)rv, "Object::Pad/slots", TRUE);
+        sv_setrv_noinc(*slotssvp, (SV *)slotsav);
       }
       if(!SvROK(*slotssvp) || SvTYPE(SvRV(*slotssvp)) != SVt_PVAV)
         croak("Expected $self->{\"Object::Pad/slots\"} to be an ARRAY reference");
@@ -497,6 +554,44 @@ static void S_apply_roles(pTHX_ ClassMeta *dst, ClassMeta *src)
   }
 }
 
+static OP *pp_alias_params(pTHX)
+{
+  dSP;
+  PADOFFSET padix = PADIX_INITSLOTS_PARAMS;
+
+  SV *params = POPs;
+
+  if(SvTYPE(params) != SVt_PVHV)
+    RETURN;
+
+  SAVESPTR(PAD_SVl(padix));
+  PAD_SVl(padix) = SvREFCNT_inc(params);
+  save_freesv(params);
+
+  RETURN;
+}
+
+static OP *pp_croak_from_constructor(pTHX)
+{
+  dSP;
+
+  /* Walk up the caller stack to find the COP of the first caller; i.e. the
+   * first one that wasn't in src/class.c
+   */
+  I32 count = 0;
+  const PERL_CONTEXT *cx;
+  while((cx = caller_cx(count, NULL))) {
+    const char *copfile = CopFILE(cx->blk_oldcop);
+    if(!copfile|| strNE(copfile, "src/class.c")) {
+      PL_curcop = cx->blk_oldcop;
+      break;
+    }
+    count++;
+  }
+
+  croak_sv(POPs);
+}
+
 static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
 {
   OP *ops = NULL;
@@ -504,20 +599,14 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
 
   ENTER;
 
-  if(!PL_compcv) {
-    /* We require the initslots CV to have a CvOUTSIDE, or else cv_clone()
-     * will segv when we compose role slots. Any class dynamically generated
-     * by string eval() will likely not get one, because it won't inherit a
-     * PL_compcv here. We'll fake it up
-     *   See also  https://rt.cpan.org/Ticket/Display.html?id=137952
-     */
-    SAVEVPTR(PL_compcv);
-    PL_compcv = find_runcv(0);
+  I32 floor_ix = PL_savestack_ix;
+  {
+    SAVEI32(PL_subline);
+    save_item(PL_subname);
 
-    assert(PL_compcv);
+    resume_compcv(&meta->initslots_compcv);
   }
 
-  I32 floor_ix = start_subparse(FALSE, 0);
   SAVEFREESV(PL_compcv);
 
   I32 save_ix = block_start(TRUE);
@@ -534,17 +623,17 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
    * perls. For now we'll take the small performance hit of RV2AV every time
    */
 
-  extend_pad_vars(meta);
-
-  intro_my();
-
   enum ReprType repr = meta->repr;
 
   ops = op_append_list(OP_LINESEQ, ops,
-    newMETHSTARTOP(OPf_MOD |
+    newMETHSTARTOP(0 |
       (meta->type == METATYPE_ROLE ? OPf_SPECIAL : 0) |
       (repr << 8))
   );
+
+  ops = op_append_list(OP_LINESEQ, ops,
+    newUNOP_CUSTOM(&pp_alias_params, 0,
+      newOP(OP_SHIFT, OPf_SPECIAL)));
 
   /* TODO: Icky horrible implementation; if our slotoffset > 0 then
    * we must be a subclass
@@ -563,7 +652,9 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
     /* Build an OP_ENTERSUB for supermeta's initslots */
     OP *op = NULL;
     op = op_append_list(OP_LIST, op,
-      newPADxVOP(OP_PADSV, PADIX_SELF, 0, 0));
+      newPADxVOP(OP_PADSV, 0, PADIX_SELF));
+    op = op_append_list(OP_LIST, op,
+      newPADxVOP(OP_PADHV, OPf_REF, PADIX_INITSLOTS_PARAMS));
     op = op_append_list(OP_LIST, op,
       newSVOP(OP_CONST, 0, (SV *)supermeta->initslots));
 
@@ -571,25 +662,11 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
       op_convert_list(OP_ENTERSUB, OPf_WANT_VOID|OPf_STACKED, op));
   }
 
-  /* TODO: If in some sort of debug mode: insert equivalent of
-   *   if((av_count(self)) != start_slotix)
-   *     croak("ARGH: Expected self to have %d slots by now\n", start_slotix);
-   */
-
   AV *slots = meta->slots;
   I32 nslots = av_count(slots);
 
   {
     CopLINE_set(PL_curcop, __LINE__);
-
-    /* To make an OP_PUSH we have to build a generic OP_LIST then call
-     * op_convert_list() on it later
-     */
-    ops = op_append_list(OP_LINESEQ, ops,
-      newSTATEOP(0, NULL, NULL));
-
-    OP *itemops = op_append_elem(OP_LIST, NULL,
-      newPADxVOP(OP_PADAV, PADIX_SLOTS, OPf_MOD|OPf_REF, 0));
 
     for(i = 0; i < nslots; i++) {
       SlotMeta *slotmeta = (SlotMeta *)AvARRAY(slots)[i];
@@ -598,46 +675,95 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
 
       switch(sigil) {
         case '$':
-          /* push ..., $defaultsv */
+        {
+          OP *valueop = NULL;
 
-          /* An OP_CONST whose op_type is OP_CUSTOM.
-           * This way we avoid the opchecker and finalizer doing bad things to
-           * our defaultsv SV by setting it SvREADONLY_on().
-           */
-          op = newSVOP_CUSTOM(PL_ppaddr[OP_CONST], 0, slotmeta->defaultsv ? slotmeta->defaultsv : &PL_sv_undef);
+          if(slotmeta->defaultexpr) {
+            valueop = slotmeta->defaultexpr;
+          }
+          else if(slotmeta->defaultsv) {
+            /* An OP_CONST whose op_type is OP_CUSTOM.
+             * This way we avoid the opchecker and finalizer doing bad things
+             * to our defaultsv SV by setting it SvREADONLY_on()
+             */
+            valueop = newSVOP_CUSTOM(PL_ppaddr[OP_CONST], 0, slotmeta->defaultsv);
+          }
+
+          if(slotmeta->paramname) {
+            SV *paramname = slotmeta->paramname;
+
+            if(!valueop)
+              valueop = newUNOP_CUSTOM(&pp_croak_from_constructor, 0,
+                newSVOP(OP_CONST, 0,
+                  newSVpvf("Required parameter '%" SVf "' is missing for %" SVf " constructor",
+                    SVfARG(paramname), SVfARG(meta->name))));
+
+            valueop = newCONDOP(0,
+              /* exists $params{$paramname} */
+              newUNOP(OP_EXISTS, 0,
+                newBINOP(OP_HELEM, 0,
+                  newPADxVOP(OP_PADHV, OPf_REF, PADIX_INITSLOTS_PARAMS),
+                  newSVOP(OP_CONST, 0, SvREFCNT_inc(paramname)))),
+
+              /* ? delete $params{$paramname} */
+              newUNOP(OP_DELETE, 0,
+                newBINOP(OP_HELEM, 0,
+                  newPADxVOP(OP_PADHV, OPf_REF, PADIX_INITSLOTS_PARAMS),
+                  newSVOP(OP_CONST, 0, SvREFCNT_inc(paramname)))),
+
+              /* : valueop or die */
+              valueop);
+          }
+
+          if(valueop)
+            op = newBINOP(OP_SASSIGN, 0,
+              valueop,
+              /* $slots[$idx] */
+              newAELEMOP(0,
+                newPADxVOP(OP_PADAV, OPf_MOD|OPf_REF, PADIX_SLOTS),
+                slotmeta->slotix));
           break;
+        }
         case '@':
-          /* push ..., [] */
-          op = newLISTOP(OP_ANONLIST, OPf_SPECIAL, newOP(OP_PUSHMARK, 0), NULL);
-          break;
         case '%':
-          /* push ..., {} */
-          op = newLISTOP(OP_ANONHASH, OPf_SPECIAL, newOP(OP_PUSHMARK, 0), NULL);
+        {
+          OP *valueop = NULL;
+          U16 coerceop = (sigil == '%') ? OP_RV2HV : OP_RV2AV;
+
+          if(slotmeta->defaultexpr) {
+            valueop = slotmeta->defaultexpr;
+          }
+          else if(slotmeta->defaultsv) {
+            valueop = newUNOP(coerceop, 0,
+                newSVOP_CUSTOM(PL_ppaddr[OP_CONST], 0, slotmeta->defaultsv));
+          }
+
+          if(valueop) {
+            /* $slots[$idx]->@* or ->%* */
+            OP *lhs = force_list_keeping_pushmark(newUNOP(coerceop, OPf_MOD|OPf_REF,
+                        newAELEMOP(0,
+                          newPADxVOP(OP_PADAV, OPf_MOD|OPf_REF, PADIX_SLOTS),
+                          slotmeta->slotix)));
+
+            op = newBINOP(OP_AASSIGN, 0,
+                force_list_keeping_pushmark(valueop),
+                lhs);
+          }
           break;
+        }
 
         default:
-          croak("ARGV: notsure how to handle a slot sigil %c\n", sigil);
+          croak("ARGH: not sure how to handle a slot sigil %c\n", sigil);
       }
 
-      if(op) {
-        op_contextualize(op, G_SCALAR);
-        itemops = op_append_elem(OP_LIST, itemops, op);
-      }
-    }
+      if(!op)
+        continue;
 
-    if(!nslots) {
-      itemops = op_append_elem(OP_LIST, itemops, newOP(OP_STUB, OPf_PARENS));
-    }
-
-    ops = op_append_list(OP_LINESEQ, ops,
-      op_convert_list(OP_PUSH, OPf_WANT_VOID, itemops));
-
-    if(!itemops->op_targ) {
-      /* op_convert_list ought to have allocated a pad temporary for push, but
-       * it didn't. Technically only -DDEBUGGING perls will notice this,
-       * because OP_PUSH in G_VOID doesn't use its targ, but it's polite to
-       * provide one all the same. */
-      itemops->op_targ = pad_alloc(itemops->op_type, SVs_PADTMP);
+      /* TODO: grab a COP at the initexpr time */
+      ops = op_append_list(OP_LINESEQ, ops,
+        newSTATEOP(0, NULL, NULL));
+      ops = op_append_list(OP_LINESEQ, ops,
+        op);
     }
   }
 
@@ -661,7 +787,9 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
 
     OP *op = NULL;
     op = op_append_list(OP_LIST, op,
-      newPADxVOP(OP_PADSV, PADIX_SELF, 0, 0));
+      newPADxVOP(OP_PADSV, 0, PADIX_SELF));
+    op = op_append_list(OP_LIST, op,
+      newPADxVOP(OP_PADHV, OPf_REF, PADIX_INITSLOTS_PARAMS));
     op = op_append_list(OP_LIST, op,
       newSVOP(OP_CONST, 0, (SV *)embed_cv(rolemeta->initslots, embedding)));
 
@@ -713,28 +841,6 @@ void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
 
       croak("Class %" SVf " does not provide a required method named '%" SVf "'",
         SVfARG(meta->name), SVfARG(mname));
-    }
-  }
-
-  HV *parammap = meta->parammap;
-  if(parammap) {
-    SLOTOFFSET nslots = meta->next_slotix;
-
-    SV *requireslots = meta->requireslots = newSV((nslots + 7) / 8);
-    SvPOK_on(requireslots); SvCUR_set(requireslots, (nslots + 7) / 8);
-
-    Zero(SvPVX(requireslots), SvCUR(requireslots), char);
-
-    hv_iterinit(parammap);
-
-    HE *iter;
-    while((iter = hv_iternext(parammap))) {
-      ParamMeta *parammeta = (ParamMeta *)HeVAL(iter);
-      if(parammeta->slot && parammeta->slot->defaultsv)
-        continue;
-
-      SLOTOFFSET slotix = parammeta->slotix;
-      SvPVX(requireslots)[slotix / 8] |= (1 << (slotix % 8));
     }
   }
 
@@ -854,7 +960,7 @@ XS_INTERNAL(injected_constructor)
     LEAVE;
   }
 
-  bool need_initslots = true;
+  bool need_makeslots = true;
 
   if(!meta->cls.foreign_new) {
     HV *stash = gv_stashsv(class, 0);
@@ -921,7 +1027,7 @@ XS_INTERNAL(injected_constructor)
 
     /* It's possible a foreign superclass constructor invoked a `method` and
      * thus initslots has already been called. Check here and set
-     * need_initslots false if so.
+     * need_makeslots false if so.
      */
 
     switch(meta->repr) {
@@ -935,14 +1041,14 @@ XS_INTERNAL(injected_constructor)
           croak("Expected %" SVf "->SUPER::new to return a blessed HASH reference", class);
         }
 
-        need_initslots = !hv_exists(MUTABLE_HV(rv), "Object::Pad/slots", 17);
+        need_makeslots = !hv_exists(MUTABLE_HV(rv), "Object::Pad/slots", 17);
         break;
 
       case REPR_MAGIC:
       case_REPR_MAGIC:
         /* Anything goes */
 
-        need_initslots = !mg_findext(rv, PERL_MAGIC_ext, &vtbl_slotsav);
+        need_makeslots = !mg_findext(rv, PERL_MAGIC_ext, &vtbl_slotsav);
         break;
 
       case REPR_AUTOSELECT:
@@ -954,23 +1060,16 @@ XS_INTERNAL(injected_constructor)
     sv_2mortal(self);
   }
 
-  if(need_initslots) {
-    /* Run initslots */
-    CopLINE_set(PL_curcop, __LINE__);
+  AV *slotsav;
 
-    ENTER;
-    EXTEND(SP, 1);
-    PUSHMARK(SP);
-    PUSHs(self);
-    PUTBACK;
-
-    assert(meta->initslots);
-    call_sv((SV *)meta->initslots, G_VOID);
-
-    LEAVE;
+  if(need_makeslots) {
+    slotsav = (AV *)get_obj_slotsav(self, meta->repr, TRUE);
+    make_instance_slots(meta, slotsav, 0);
+  }
+  else {
+    slotsav = (AV *)get_obj_slotsav(self, meta->repr, FALSE);
   }
 
-  AV *slotsav = (AV *)get_obj_slotsav(self, meta->repr, 0);
   SV **slotsv = AvARRAY(slotsav);
 
   if(meta->slothooks_postslots || meta->slothooks_construct) {
@@ -1002,73 +1101,44 @@ XS_INTERNAL(injected_constructor)
   }
 
   HV *paramhv = NULL;
-  if(meta->has_adjustparams)
-    paramhv = (HV *)sv_2mortal((SV *)newHV());
-
   if(meta->parammap || meta->has_adjustparams) {
-    /* Assign params from parammap */
-    CopLINE_set(PL_curcop, __LINE__);
-
-    HV *parammap = meta->parammap;
-    SV *missingslots = meta->requireslots ? newSVsv(meta->requireslots) : NULL;
-    if(missingslots)
-      SAVEFREESV(missingslots);
-
-    char *missingvec = missingslots ? SvPVX(missingslots) : NULL;
+    paramhv = newHV();
+    SAVEFREESV((SV *)paramhv);
 
     if(av_count(args) % 2)
       warn("Odd-length list passed to %" SVf " constructor", class);
 
+    /* TODO: I'm sure there's an newHV_from_AV() around somewhere */
     SV **argsv = AvARRAY(args);
 
     IV idx;
     for(idx = 0; idx < av_count(args); idx += 2) {
       SV *name  = argsv[idx];
-      SV *value = argsv[idx+1];
+      SV *value = idx < av_count(args)-1 ? argsv[idx+1] : &PL_sv_undef;
 
-      HE *he = parammap ? hv_fetch_ent(parammap, name, 0, 0) : NULL;
-      if(he) {
-        ParamMeta *parammeta = (ParamMeta *)HeVAL(he);
-        SLOTOFFSET slotix = parammeta->slotix;
-
-        SV *slot = slotsv[slotix];
-
-        sv_setsv_mg(slot, value);
-        missingvec[slotix / 8] &= ~(1 << (slotix % 8));
-      }
-      else {
-        if(!paramhv)
-          paramhv = (HV *)sv_2mortal((SV *)newHV());
-
-        hv_store_ent(paramhv, name, SvREFCNT_inc(value), 0);
-      }
+      hv_store_ent(paramhv, name, SvREFCNT_inc(value), 0);
     }
+  }
 
-    /* missingvec should be all zeroes if no missing arguments */
-    for(idx = 0; missingslots && idx < SvCUR(missingslots); idx++) {
-      if(!missingvec[idx])
-        continue;
+  {
+    /* Run initslots */
+    ENTER;
+    SAVEVPTR(PL_curcop);
+    PL_curcop = prevcop;
 
-      /* We now have at least one missing param so we're going to throw an
-       * exception. It doesn't matter if this path is a little slow.
-       * Hash iteration order is effectively random, so it's arbitrary which
-       * one of the missing params we'll find.
-       */
-      hv_iterinit(meta->parammap);
+    EXTEND(SP, 2);
+    PUSHMARK(SP);
+    PUSHs(self);
+    if(paramhv)
+      PUSHs((SV *)paramhv);
+    else
+      PUSHs(&PL_sv_undef);
+    PUTBACK;
 
-      HE *iter;
-      while((iter = hv_iternext(meta->parammap))) {
-        SLOTOFFSET slotix = ((ParamMeta *)HeVAL(iter))->slotix;
+    assert(meta->initslots);
+    call_sv((SV *)meta->initslots, G_VOID);
 
-        if(!(missingvec[slotix / 8] & (1 << (slotix % 8))))
-          continue;
-
-        /* TODO: Consider accumulating a list of all missing param names */
-        PL_curcop = prevcop;
-        croak("Required parameter '%s' is missing for %" SVf " constructor",
-          HePV(iter, PL_na), meta->name);
-      }
-    }
+    LEAVE;
   }
 
   if(meta->buildblocks) {
@@ -1263,7 +1333,6 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *su
   meta->slots   = newAV();
   meta->methods = newAV();
   meta->parammap = NULL;
-  meta->requireslots = NULL;
   meta->requiremethods = newAV();
   meta->repr   = REPR_AUTOSELECT;
   meta->supermeta = NULL;
@@ -1299,6 +1368,40 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *su
 #if HAVE_PERL_VERSION(5, 20, 0)
     PL_parser->preambling = NOLINE;
 #endif
+  }
+
+  /* Prepare meta->initslots for containing a CV parsing operation */
+  {
+    if(!PL_compcv) {
+      /* We require the initslots CV to have a CvOUTSIDE, or else cv_clone()
+       * will segv when we compose role slots. Any class dynamically generated
+       * by string eval() will likely not get one, because it won't inherit a
+       * PL_compcv here. We'll fake it up
+       *   See also  https://rt.cpan.org/Ticket/Display.html?id=137952
+       */
+      SAVEVPTR(PL_compcv);
+      PL_compcv = find_runcv(0);
+
+      assert(PL_compcv);
+    }
+
+    I32 floor_ix = start_subparse(FALSE, 0);
+
+    extend_pad_vars(meta);
+
+    /* Skip padix==3 so we're aligned again */
+    if(meta->type != METATYPE_ROLE)
+      pad_add_name_pvs("", 0, NULL, NULL);
+
+    PADOFFSET padix = pad_add_name_pvs("%params", 0, NULL, NULL);
+    if(padix != PADIX_INITSLOTS_PARAMS)
+      croak("ARGH: Expected that padix[%%params] = 4");
+
+    intro_my();
+
+    suspend_compcv(&meta->initslots_compcv);
+
+    LEAVE_SCOPE(floor_ix);
   }
 
   meta->tmpcop = (COP *)newSTATEOP(0, NULL, NULL);

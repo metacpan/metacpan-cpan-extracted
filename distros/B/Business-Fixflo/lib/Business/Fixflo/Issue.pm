@@ -48,6 +48,7 @@ use Business::Fixflo::Property;
     FaultTree
     Firstname
     Id
+    InactiveJobs
     InvoiceRecipient
     IsCommunal
     Landlord
@@ -102,6 +103,7 @@ has [ qw/
     FaultTree
     Firstname
     Id
+    InactiveJobs
     InvoiceRecipient
     IsCommunal
     Job

@@ -232,6 +232,32 @@ PIECES AND PIECE TYPES
     pieces, before the block itself is parsed, ensuring any new lexical
     variables are now visible.
 
+    In addition, the following extra piece types are recognised here:
+
+    XPK_SETUP
+
+         void setup(pTHX_ void *hookdata);
+      
+         XPK_SETUP(&setup)
+
+      atomic, emits nothing.
+
+      This piece type runs a function given by pointer. Typically this
+      function may be used to introduce new lexical state into the parser,
+      or in some other way have some side-effect on the parsing context of
+      the block to be parsed.
+
+ XPK_PREFIXED_BLOCK_ENTERLEAVE
+
+    A variant of XPK_PREFIXED_BLOCK which additionally wraps the entire
+    parsing operation, including the block_start(), block_end() and any
+    calls to XPK_SETUP functions, within a ENTER/LEAVE pair.
+
+    This should not make a difference to the standard parser pieces
+    provided here, but may be useful behaviour for the code in the setup
+    function, especially if it wishes to modify parser state and use the
+    savestack to ensure it is restored again when parsing has finished.
+
  XPK_ANONSUB
 
     atomic, emits op.

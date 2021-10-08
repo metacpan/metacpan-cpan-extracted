@@ -1,7 +1,9 @@
 package Text::ANSI::BaseUtil;
 
-our $DATE = '2021-04-14'; # DATE
-our $VERSION = '0.232'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-08-08'; # DATE
+our $DIST = 'Text-ANSI-Util'; # DIST
+our $VERSION = '0.233'; # VERSION
 
 use 5.010001;
 use strict;
@@ -77,6 +79,20 @@ sub _ta_mbswidth0 {
 sub ta_mbswidth {
     my $text = shift;
     ta_mbswidth_height($text)->[0];
+}
+
+sub _indent_width {
+    my ($indent, $tab_width) = @_;
+    my $w = 0;
+    for (split //, $indent) {
+        if ($_ eq "\t") {
+            # go to the next tab
+            $w = $tab_width * (int($w/$tab_width) + 1);
+        } else {
+            $w += 1;
+        }
+    }
+    $w;
 }
 
 sub _ta_wrap {
@@ -269,9 +285,9 @@ sub _ta_wrap {
         my $tw = $opts->{tab_width} // 8;
         die "Please specify a positive tab width" unless $tw > 0;
         my $optfli  = $opts->{flindent};
-        my $optfliw; $optfliw = Text::WideChar::Util::_get_indent_width($is_mb, $optfli, $tw) if defined $optfli;
+        my $optfliw; $optfliw = $is_mb ? Text::WideChar::Util::_mbs_indent_width($optfli, $tw) : _indent_width($optfli, $tw) if defined $optfli;
         my $optsli  = $opts->{slindent};
-        my $optsliw; $optsliw = Text::WideChar::Util::_get_indent_width($is_mb, $optsli, $tw) if defined $optsli;
+        my $optsliw; $optsliw = $is_mb ? Text::WideChar::Util::_mbs_indent_width($optsli, $tw) : _indent_width($optsli, $tw) if defined $optsli;
         my $optkts  = $opts->{keep_trailing_space} // 0;
         my $pad = $opts->{pad};
         my $x = 0;
@@ -308,36 +324,37 @@ sub _ta_wrap {
             }
 
             if ($is_parastart) {
-                # this is the start of paragraph, determine indents
-                if (defined $optfli) {
+                unless (defined $fli) {
+                    # this is the start of paragraph, determine indents
+
                     $fli  = $optfli;
                     $fliw = $optfliw;
-                } else {
                     if ($termt eq 's') {
-                        $fli  = $pterm;
-                        $fliw = Text::WideChar::Util::_get_indent_width($is_mb, $fli, $tw);
+                        $fli  //= $pterm;
+                        $fliw //= $is_mb ? Text::WideChar::Util::_mbs_indent_width($fli, $tw) : _indent_width($fli, $tw);
                     } else {
-                        $fli  = "";
-                        $fliw = 0;
+                        $fli  //= "";
+                        $fliw //= 0;
                     }
-                    #say "D:deduced fli from text [$fli] ($fliw)";
-                    my $j = $i;
-                    $sli = undef;
-                    while ($j < @terms && $termst[$j] ne 'p') {
-                        if ($termst[$j] eq 's') {
-                            if ($pterms[$j] =~ /\n([ \t]+)/) {
-                                $sli  = $1;
-                                $sliw = Text::WideChar::Util::_get_indent_width($is_mb, $sli, $tw);
-                                last;
+
+                    $sli  = $optsli;
+                    $sliw = $optsliw;
+                    unless (defined $sli) {
+                        my $j = $i;
+                        while ($j < @terms && $termst[$j] ne 'p') {
+                            if ($termst[$j] eq 's') {
+                                if ($pterms[$j] =~ /\n([ \t]+)/) {
+                                    $sli  = $1;
+                                    $sliw = $is_mb ? Text::WideChar::Util::_mbs_indent_width($sli, $tw) : _indent_width($sli, $tw);
+                                    last;
+                                }
                             }
+                            $j++;
                         }
-                        $j++;
                     }
-                    if (!defined($sli)) {
-                        $sli  = "";
-                        $sliw = 0;
-                    }
-                    #say "D:deduced sli from text [$sli] ($sliw)";
+                    $sli  //= "";
+                    $sliw //= 0;
+
                     die "Subsequent indent must be less than width" if $sliw >= $width;
                 }
 
@@ -837,7 +854,7 @@ Text::ANSI::BaseUtil - Base for Text::ANSI::{Util,WideUtil}
 
 =head1 VERSION
 
-This document describes version 0.232 of Text::ANSI::BaseUtil (from Perl distribution Text-ANSI-Util), released on 2021-04-14.
+This document describes version 0.233 of Text::ANSI::BaseUtil (from Perl distribution Text-ANSI-Util), released on 2021-08-08.
 
 =for Pod::Coverage .*
 
@@ -851,7 +868,7 @@ Source repository is at L<https://github.com/perlancar/perl-Text-ANSI-Util>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Text-ANSI-Util/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-ANSI-Util>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -863,7 +880,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2016, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

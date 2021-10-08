@@ -96,6 +96,9 @@ enum {
 
   /* for role methods */
   PADIX_EMBEDDING = 3,
+
+  /* during initslots */
+  PADIX_INITSLOTS_PARAMS = 4,
 };
 
 /* Function prototypes */

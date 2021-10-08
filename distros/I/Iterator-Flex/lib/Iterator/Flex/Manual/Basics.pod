@@ -1,0 +1,281 @@
+# PODNAME: Iterator::Flex::Manual::Basics
+# ABSTRACT: Iterator Basics
+
+__END__
+
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
+=head1 NAME
+
+Iterator::Flex::Manual::Basics - Iterator Basics
+
+=head1 VERSION
+
+version 0.14
+
+=head1 DESCRIPTION
+
+=head2 Introduction
+
+An iterator is something which encapsulates a source of data and
+parcels it out one chunk at a time. Iterators usually need to keep track
+of the state of the data stream and which chunk they should next return.
+
+For example, imagine iterating through an array, returning one element
+at a time.  The state required would be the array and the index
+of the next element to return.   Here's a simple iterator which
+uses a hash to keep track of state
+
+  sub iterate ( $state ) {
+     my $array = $state->{array};
+     return $state{index} > $#$array ? undef : $array->[$state{index}++];
+  }
+
+We could use this via:
+
+   my %state  = ( array => [ 0.. 20 ], index => 0 );
+
+  while ( defined( my $value = iterate( \%state ) ) ) {
+    say $value;
+  }
+
+This illustrates the three typical
+L<phases|Iterator::Flex::Manual::Overview/Iterator lifecycle> of an
+iterator:
+
+=over
+
+=item 1
+
+L<Initialized|/Iterator::Flex::Manual::Overview/Initialized State>:
+The iterator's state has been set up.
+
+=item 2
+
+L<Iteration|/Iterator::Flex::Manual::Overview/Iteration State>: The
+iterator has returned at least one element of data, but may not know
+if there are more.
+
+=item 3
+
+L<Exhaustion|/Iterator::Flex::Manual::Overview/Exhaustion State>: The iterator has definitely run out of data.
+
+=back
+
+(There's a fourth state, L<Error|/Iterator::Flex::Manual::Overview/Error State>.)
+
+=head2 Returning Data and Signaling Exhaustion or Error
+
+=head3 Iterator Exhaustion
+
+Exhaustion is traditionally signaled via:
+
+=over
+
+=item 1
+
+Returning a I<sentinel> value;
+
+=item 2
+
+Throwing an exception.
+
+=item 3
+
+Setting a Boolean predicate in a multi-valued return, e.g.
+
+ { value => $value, success => $bool }
+
+=back
+
+There's no right way to do it, just different trade-offs; see
+L<Iterator::Flex::Manual::PriorArt> for how other languages and Perl
+modules handle it.
+
+Returning a sentinel value is often good enough, but only if that
+value doesn't exist in your data stream.  In our example iterator, it
+returns C<undef> when it has exhausted the data source.  However,
+imagine that the array contains temperature measurements taken at
+uniform intervals; an C<undef> value may indicate that there was a
+problem taking a measurement (similar to how one would use C<null> in
+a database), e.g.
+
+    my @Temp = ( 22, 23.2, undef, 24, ... );
+
+The iterator itself happily keeps going until it runs out of data, but
+when it returns the C<undef> value, our example code above interprets it as
+the iterator signaling exhaustion and will stop querying the iterator.
+Obviously that's wrong.
+
+One option is to use a value that knowingly can't occur. If your
+temperature is measured in Kelvin, which is always positive, a
+negative value can be a sentinel.  However, that requires that the
+sentinel value be an input parameter to the iterator.
+
+L<Iterator::Flex> provides a C<<
+L<signal_exhaustion|/Iterator::Flex::Base/signal_exhaustion> >> method
+which currently supports either returning a user defined sentinel or
+throwing an exception.
+
+=head3 Iterator Error
+
+Similar issues arise when the iterator must signal an error.  For
+example, if the iterator retrieves from a database and there is a
+connection issue, the client code must be alerted.  This can be
+done via any of the methods specified in L</Iterator Exhaustion>.
+
+Most implementations (language or Perl modules) don't provide an
+explicit specification of how to handle this.  L<Iterator::Flex>
+provides a C<< L<signal_error|/Iterator::Flex::Base/signal_error> >>
+method which currently supports throwing an exception.
+
+=head2 Iterator Capabilities
+
+Apart from state, an iterator is mostly defined by its capabilities.
+The only one required is L</next>, which retrieves a value,
+
+There are a limited set of additional capabilities which are not
+appropriate to all data sources or iterators, so they are optional.
+
+Some capabilities can be emulated by iterator adapters.  The supported
+capabilities are documented in L<Iterator::Flex::Manual::Overview>,
+and are
+
+=over
+
+=item *
+
+L<next|Iterator::Flex::Manual::Overview/next>
+
+=item *
+
+L<current|Iterator::Flex::Manual::Overview/current>
+
+=item *
+
+L<prev|Iterator::Flex::Manual::Overview/prev>
+
+=item *
+
+L<rewind|Iterator::Flex::Manual::Overview/rewind>
+
+=item *
+
+L<reset|Iterator::Flex::Manual::Overview/reset>
+
+=item *
+
+L<freeze|Iterator::Flex::Manual::Overview/freeze>
+
+=item *
+
+L<thaw|Iterator::Flex::Manual::Overview/thaw>
+
+=back
+
+=head2 Iterator Generators
+
+An I<iterator generator> creates an iterator from a data source, which
+may be real (such as a data structure in memory, a database, etc.), or
+virtual (such as a sequence of numbers). L<Iterator::Flex> provides
+iterator generators via convenience wrappers and classes for:
+arrays (L<iarray|/Iterator::Flex::Common/iarray>,
+L<Iterator::Flex::Array>), numeric sequences
+(L<iseq|/Iterator::Flex::Common/iseq>, L<Iterator::Flex::Sequence>),
+array like objects (L<Iterator::Flex::ArrayLike>).
+
+For others, writing an iterator is straightforward; see
+L<Iterator::Flex::Manual::Authoring>.
+
+=head2 Iterator Adapters
+
+An I<iterator adapter> acts as a filter or modifier on the output of another iterator.
+Applying an adapter to an iterator results in another iterator, which can be used as
+input to another adapter.
+
+L<Iterator::Flex> provides adapters both via convenience wrappers and
+classes for
+
+=over
+
+=item grep
+
+L<igrep|/Iterator::Flex::Common/igrep>, L<Iterator::Flex::Grep>)
+
+=item map
+
+L<imap|/Iterator::Flex::Common/imap>, L<Iterator::Flex::Map>
+
+=item cycle
+
+L<icycle|/Iterator::Flex::Common/icycle>, L<Iterator::Flex::Cycle>
+
+=item Cartesian product
+
+L<iproduct|/Iterator::Flex::Common/iproduct>,
+L<Iterator::Flex::Product>
+
+=item Caching/Buffering
+
+L<icache|/Iterator::Flex::Common/icache>, L<Iterator::Flex::Cache>
+
+=item Continuous Serialization
+
+L<ifreeze|/Iterator::Flex::Common/ifreeze>, L<Iterator::Flex::Freeze>
+
+=back
+
+=head3 Iterator Wrappers
+
+There are a number of existing iterator packages on CPAN (see
+L<Iterator::Flex::Manual::PriorArt>).  L<Iterator::Flex> can wrap
+those iterators so that they can be used within the L<Iterator::Flex>
+framework.  See L<Iterator::Flex::Manual::Alien>.
+
+=head1 SUPPORT
+
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-iterator-flex@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Iterator-Flex>
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/iterator-flex
+
+and may be cloned from
+
+  https://gitlab.com/djerius/iterator-flex.git
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<Iterator::Flex|Iterator::Flex>
+
+=item *
+
+L<Iterator::Flex::Manual|Iterator::Flex::Manual>
+
+=back
+
+=head1 AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

@@ -4,6 +4,7 @@ PerlSwitches -I@ServerRoot@/../lib
 PerlModule My::TestFilter50
 PerlModule My::TestFilter200
 PerlModule My::TestFilter2048
+PerlModule My::ResponseHandler
 
 Alias /50 @DocumentRoot@
 <Location /50>
@@ -23,4 +24,22 @@ Alias /2048 @DocumentRoot@
 Alias /normal_filtered @DocumentRoot@
 <Location /normal>
     PerlOutputFilterHandler My::NormalFilter
+</Location>
+
+<Location /perl50>
+    SetHandler perl-script
+    PerlResponseHandler My::ResponseHandler
+    PerlOutputFilterHandler My::TestFilter50
+</Location>
+
+<Location /perl200>
+    SetHandler perl-script
+    PerlResponseHandler My::ResponseHandler
+    PerlOutputFilterHandler My::TestFilter200
+</Location>
+
+<Location /perl2048>
+    SetHandler perl-script
+    PerlResponseHandler My::ResponseHandler
+    PerlOutputFilterHandler My::TestFilter2048
 </Location>

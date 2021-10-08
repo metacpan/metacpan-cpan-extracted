@@ -163,14 +163,18 @@ Returns the podcast's title, or (long description).  Podcasts
 on Spreaker can have separate descriptions, but for podcasts, 
 it is always the podcast's title.
 
-=item $podcast->B<getIconURL>()
+=item $podcast->B<getIconURL>(['artist'])
 
 Returns the URL for the podcast's "cover art" icon image, if any.
+If B<'artist'> is specified, the channel artist's icon url is returned, 
+if any.
 
-=item $podcast->B<getIconData>()
+=item $podcast->B<getIconData>(['artist'])
 
 Returns a two-element array consisting of the extension (ie. "png", 
 "gif", "jpeg", etc.) and the actual icon image (binary data), if any.
+If B<'artist'> is specified, the channel artist's icon data is returned, 
+if any.
 
 =item $podcast->B<getImageURL>()
 
@@ -438,6 +442,10 @@ TRYIT:
 			$self->{'iconurl'} = $1  if ($iconhtml =~ m#\s+src\=\"([^\"]+)\"#s);
 		}
 	}
+	if ($html =~ m#\<meta\s+itemprop\=\"image\"\s+content\=\"([^\"]+)#) {
+		$self->{'articonurl'} = HTML::Entities::decode_entities($1);
+	}
+	print STDERR "--articon=".$self->{'articonurl'}."=\n"  if ($DEBUG);
 	if ($html =~ s#\s+class\=\"track\_head\_info\_show\"\>(.+?)\<\/span\>##s) {
 		my $albumartisthtml = $1;
 		$self->{'albumartist'} = $urlroot . $1  if ($albumartisthtml =~ s#^.+?\s+href\=\"([^\"]+)\"\s*\>?\s*##s);

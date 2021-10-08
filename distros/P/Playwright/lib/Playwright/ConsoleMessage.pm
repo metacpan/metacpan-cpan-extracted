@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::ConsoleMessage;
-$Playwright::ConsoleMessage::VERSION = '0.015';
+$Playwright::ConsoleMessage::VERSION = '0.016';
 use parent 'Playwright::Base';
 
 sub new {
@@ -20,7 +20,7 @@ sub new {
 
 sub args {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'args',
         object  => $self->{guid},
@@ -28,19 +28,9 @@ sub args {
     );
 }
 
-sub text {
-    my $self = shift;
-    return $self->_request(
-        args    => [@_],
-        command => 'text',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub location {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'location',
         object  => $self->{guid},
@@ -48,9 +38,19 @@ sub location {
     );
 }
 
+sub text {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'text',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
 sub type {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'type',
         object  => $self->{guid},
@@ -60,7 +60,7 @@ sub type {
 
 sub on {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'on',
         object  => $self->{guid},
@@ -70,7 +70,7 @@ sub on {
 
 sub evaluate {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'evaluate',
         object  => $self->{guid},
@@ -80,7 +80,7 @@ sub evaluate {
 
 sub evaluateHandle {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'evaluateHandle',
         object  => $self->{guid},
@@ -102,7 +102,7 @@ Playwright::ConsoleMessage - Automatically generated class for Playwright::Conso
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 CONSTRUCTOR
 
@@ -119,17 +119,17 @@ Execute the ConsoleMessage::args playwright routine.
 
 See L<https://playwright.dev/api/class-ConsoleMessage#ConsoleMessage-args> for more information.
 
-=head2 text(@args)
-
-Execute the ConsoleMessage::text playwright routine.
-
-See L<https://playwright.dev/api/class-ConsoleMessage#ConsoleMessage-text> for more information.
-
 =head2 location(@args)
 
 Execute the ConsoleMessage::location playwright routine.
 
 See L<https://playwright.dev/api/class-ConsoleMessage#ConsoleMessage-location> for more information.
+
+=head2 text(@args)
+
+Execute the ConsoleMessage::text playwright routine.
+
+See L<https://playwright.dev/api/class-ConsoleMessage#ConsoleMessage-text> for more information.
 
 =head2 type(@args)
 

@@ -5,7 +5,7 @@ use XML::LibXML::LazyBuilder qw{E};
 use warnings;
 use strict;
 
-our $VERSION='0.09';
+our $VERSION='0.17';
 our $PACKAGE=__PACKAGE__;
 
 =head1 NAME

@@ -1,0 +1,19 @@
+0.004   2021-10-05  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename module/dist TableDataBundle-{,Perl-}CPAN-Release.
+
+
+0.003   2021-09-28  Released-By: PERLANCAR; Urgency: medium
+
+	- [optimize] Make TableData::CPAN::Release::Static::FromNewest
+	  start giving first row faster.
+
+
+0.002   2021-09-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Add module: TableData::CPAN::Release::Static::Reverse.
+
+
+0.001   2021-09-28  Released-By: PERLANCAR
+
+        - First release.

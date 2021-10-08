@@ -1,9 +1,9 @@
 package Acme::CPANModules::COLOR;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-03-27'; # DATE
+our $DATE = '2021-05-10'; # DATE
 our $DIST = 'Acme-CPANModules-COLOR'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our $LIST = {
     summary => "Modules that follow the COLOR & NO_COLOR convention",
@@ -29,6 +29,7 @@ _
         {module=>'AppBase::Grep'},
         {module=>'App::abgrep', script=>'abgrep'},
         {module=>'App::diffdb'},
+        {module=>'App::DiffTarballs'},
         {module=>'App::diffwc'},
         {module=>'App::hr'},
         {module=>'App::riap'},
@@ -73,7 +74,7 @@ Acme::CPANModules::COLOR - Modules that follow the COLOR & NO_COLOR convention
 
 =head1 VERSION
 
-This document describes version 0.003 of Acme::CPANModules::COLOR (from Perl distribution Acme-CPANModules-COLOR), released on 2021-03-27.
+This document describes version 0.004 of Acme::CPANModules::COLOR (from Perl distribution Acme-CPANModules-COLOR), released on 2021-05-10.
 
 =head1 DESCRIPTION
 
@@ -101,6 +102,8 @@ If you know of other modules that should be listed here, please contact me.
 =item * L<App::abgrep>
 
 =item * L<App::diffdb>
+
+=item * L<App::DiffTarballs>
 
 =item * L<App::diffwc>
 
@@ -186,7 +189,7 @@ Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-COL
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Acme-CPANModules-COLOR/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-COLOR>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

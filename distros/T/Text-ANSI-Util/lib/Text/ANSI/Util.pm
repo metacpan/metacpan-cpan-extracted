@@ -1,9 +1,9 @@
 package Text::ANSI::Util;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-14'; # DATE
+our $DATE = '2021-08-08'; # DATE
 our $DIST = 'Text-ANSI-Util'; # DIST
-our $VERSION = '0.232'; # VERSION
+our $VERSION = '0.233'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -48,7 +48,7 @@ Text::ANSI::Util - Routines for text containing ANSI color codes
 
 =head1 VERSION
 
-This document describes version 0.232 of Text::ANSI::Util (from Perl distribution Text-ANSI-Util), released on 2021-04-14.
+This document describes version 0.233 of Text::ANSI::Util (from Perl distribution Text-ANSI-Util), released on 2021-08-08.
 
 =head1 SYNOPSIS
 
@@ -141,6 +141,12 @@ C<\e[31;47;0m> is not recognized, only C<\e[0m> is. I believe this should not be
 a problem with most real-world text out there.
 
 =back
+
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto (on PC)
+
+Steven Haryanto (on PC) <stevenharyanto@gmail.com>
 
 =head1 FUNCTIONS
 
@@ -294,15 +300,15 @@ Options:
 
 =item * flindent => STR
 
-First line indent. See Text::WideChar::Util for more details.
+First line indent. Currently must not contain ANSI color codes or wide
+characters.
 
 =item * slindent => STR
 
-First line indent. See Text::WideChar::Util for more details.
+Subsequent line indent. Currently must not contain ANSI color codes or wide
+characters.
 
 =item * tab_width => INT (default: 8)
-
-First line indent. See Text::WideChar::Util for more details.
 
 =item * pad => BOOL (default: 0)
 
@@ -376,7 +382,7 @@ Source repository is at L<https://github.com/perlancar/perl-Text-ANSI-Util>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Text-ANSI-Util/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-ANSI-Util>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -402,7 +408,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2016, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

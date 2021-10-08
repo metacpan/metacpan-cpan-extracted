@@ -45,7 +45,7 @@ use SNMP::Info::Layer3;
 
 our ($VERSION, %FUNCS, %GLOBALS, %MIBS, %MUNGE);
 
-$VERSION = '3.80';
+$VERSION = '3.81';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,
@@ -551,10 +551,6 @@ Returns reference to the map between IID and physical Port.
   slot = (int(Interface index / Index factor)) + Slot offset
 
   The physical port name is returned as slot.port.
-
-=item $baystack->i_ignore()
-
-Returns reference to hash of IIDs to ignore.
 
 =item $baystack->i_mac()
 

@@ -8,6 +8,13 @@ use Test::Tdd::Runner;
 use Getopt::Long;
 Getopt::Long::Configure('bundling');
 
+my ($argv_index) = grep { $ARGV[$_] eq "--" } 0..(scalar @ARGV - 1);
+my @argv_override = ();
+if ($argv_index) {
+	@argv_override = splice @ARGV, $argv_index;
+	shift @argv_override;
+}
+
 my $help;
 my @watch = ();
 my @includes = ();
@@ -26,6 +33,7 @@ show_usage() if $help;
 my @test_files = @ARGV;
 show_usage() unless @test_files;
 
+@ARGV = @argv_override;
 Test::Tdd::Runner::start(\@watch, \@test_files);
 
 
@@ -38,6 +46,7 @@ Options:
   -I            Library paths to include
   -w, --watch   Folders to watch, default to ./lib and ./t folders
   -h, --help    Print this message
+  --            Anything after -- will be passed to \@ARGV (e.g. provetdd t/Test.t -- foobar)
 EOF
 	exit 1;
 }

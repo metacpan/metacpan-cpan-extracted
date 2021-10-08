@@ -87,6 +87,12 @@ sub failure ( $which ) {
         };
 
         isa_ok( $res, ['Config::XrmDatabase::Failure::query'], 'exception' );
+        like( "$res",
+              qr/ \Qxmh.toc.messagefunctions.incorporate.activeForeground\E
+                  .*
+                 \QWhat.Me.Worry.About.Anything\E
+                /x
+            );
     };
 
     subtest 'code' => sub {

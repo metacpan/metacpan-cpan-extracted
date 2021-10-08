@@ -169,14 +169,18 @@ Returns the podcast's title, or (long description).  Podcasts
 on Castbox can have separate descriptions, but for podcasts, 
 it is always the podcast's title.
 
-=item $podcast->B<getIconURL>()
+=item $podcast->B<getIconURL>(['artist'])
 
 Returns the URL for the podcast's "cover art" icon image, if any.
+If B<'artist'> is specified, the channel artist's icon url is returned, 
+if any.
 
-=item $podcast->B<getIconData>()
+=item $podcast->B<getIconData>(['artist'])
 
 Returns a two-element array consisting of the extension (ie. "png", 
 "gif", "jpeg", etc.) and the actual icon image (binary data), if any.
+If B<'artist'> is specified, the channel artist's icon data is returned, 
+if any.
 
 =item $podcast->B<getImageURL>()
 
@@ -463,9 +467,15 @@ sub new
 	$self->{'description'} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
 	$self->{'iconurl'} ||= ($html =~ s#\<meta\s+property\=\"(?:og|twitter)\:image\"\s+content\=\"([^\"]+)\"\s*\/\>##s) ? $1 : '';
 	$self->{'iconurl'} ||= $1  if ($html =~ s#\"\,\"image\"\:\"([^\"]+)\"\}\}\]\}##s);
+	if ($html =~ m#\{\"\@context\"\:\"http\:\/\/schema\.org\"\,\"(.+?)</script>#s) {
+		(my $stuff = $1) =~ s#^.*?\"Channels\"\,\"image\"\:\"##s;
+		$self->{'articonurl'} = $1  if ($stuff =~ m#\"image\"\:\"([^\"]+)#);
+	}
+	print STDERR "--articon=".$self->{'articonurl'}."=\n"  if ($DEBUG);
+	$self->{'iconurl'} ||= $self->{'articonurl'}  if ($self->{'articonurl'});
 	$self->{'imageurl'} ||= $self->{'iconurl'};
+
 	$self->{'album'} = $1  if ($html =~ m#\<h1\s+class\=\"author ellipsis\"\>([^\<]+)#);
-#	if ($html =~ s#\"\s+class\=\"breadcrumb\-text\"\>\s*\<a\s+href\=\"(\/channel\/[^\"]+)\"\>([^\<]+)\<\/\a\>\<\/span\>##s) {
 	if ($html =~ s#\"\s+class\=\"breadcrumb\-text\"\>\s*\<a\s+href\=\"(\/channel\/[^\"]+)\"\>([^\<]+)##s) {
 		$self->{'albumartist'} = $urlroot . $1;
 		$self->{'artist'} = $2;

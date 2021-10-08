@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::FetchRequest;
-$Playwright::FetchRequest::VERSION = '0.015';
+$Playwright::FetchRequest::VERSION = '0.016';
 use parent 'Playwright::Base';
 
 sub new {
@@ -20,7 +20,7 @@ sub new {
 
 sub post {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'post',
         object  => $self->{guid},
@@ -28,9 +28,19 @@ sub post {
     );
 }
 
+sub dispose {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'dispose',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
 sub fetch {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'fetch',
         object  => $self->{guid},
@@ -38,9 +48,19 @@ sub fetch {
     );
 }
 
+sub storageState {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'storageState',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
 sub get {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'get',
         object  => $self->{guid},
@@ -50,7 +70,7 @@ sub get {
 
 sub on {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'on',
         object  => $self->{guid},
@@ -60,7 +80,7 @@ sub on {
 
 sub evaluate {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'evaluate',
         object  => $self->{guid},
@@ -70,7 +90,7 @@ sub evaluate {
 
 sub evaluateHandle {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'evaluateHandle',
         object  => $self->{guid},
@@ -92,7 +112,7 @@ Playwright::FetchRequest - Automatically generated class for Playwright::FetchRe
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 CONSTRUCTOR
 
@@ -109,11 +129,23 @@ Execute the FetchRequest::post playwright routine.
 
 See L<https://playwright.dev/api/class-FetchRequest#FetchRequest-post> for more information.
 
+=head2 dispose(@args)
+
+Execute the FetchRequest::dispose playwright routine.
+
+See L<https://playwright.dev/api/class-FetchRequest#FetchRequest-dispose> for more information.
+
 =head2 fetch(@args)
 
 Execute the FetchRequest::fetch playwright routine.
 
 See L<https://playwright.dev/api/class-FetchRequest#FetchRequest-fetch> for more information.
+
+=head2 storageState(@args)
+
+Execute the FetchRequest::storageState playwright routine.
+
+See L<https://playwright.dev/api/class-FetchRequest#FetchRequest-storageState> for more information.
 
 =head2 get(@args)
 

@@ -2,11 +2,15 @@ use strict;
 use warnings;
 use 5.020;
 
-package Dist::Zilla::Plugin::InsertExample 0.14 {
+package Dist::Zilla::Plugin::InsertExample 0.15 {
 
   use Moose;
+
+  use Moose::Util::TypeConstraints;
+  use MooseX::Types::Moose qw(ArrayRef Str RegexpRef);
+
   use Encode qw( encode );
-  use List::Util qw( first );
+  use List::Util qw( first any );
   use experimental qw( signatures postderef );
 
   # ABSTRACT: Insert example into your POD from a file
@@ -18,7 +22,17 @@ package Dist::Zilla::Plugin::InsertExample 0.14 {
   };
 
   has remove_boiler => (is => 'ro', isa => 'Int');
+  {
+      my $type = subtype as ArrayRef[RegexpRef];
+      coerce $type, from ArrayRef[Str], via { [map { qr/$_/ } @$_ ]};
+      has matches_boiler_barrier => ( is => 'ro', isa => $type, coerce => 1, default => sub { [] } );
+  }
+
   has indent        => (is => 'ro', isa => 'Int', default => 1);
+
+
+  sub mvp_aliases { +{ qw( match_boiler_barrier  matches_boiler_barrier ) } }
+  sub mvp_multivalue_args { qw( matches_boiler_barrier ) }
 
   sub munge_files ($self)
   {
@@ -54,17 +68,34 @@ package Dist::Zilla::Plugin::InsertExample 0.14 {
 
     my $indent = ' ' x $self->indent;
 
+    my $in_boiler = 1;
+    my $found_content = 0;
     while(my $line = <$fh>)
     {
       if($self->remove_boiler)
       {
-        next if $line =~ /^\s*$/;
-        next if $line =~ /^#!\/usr\/bin\/perl/;
-        next if $line =~ /^#!\/usr\/bin\/env perl/;
-        next if $line =~ /^use strict;$/;
-        next if $line =~ /^use warnings;$/;
+          if( $self->matches_boiler_barrier->@* )
+          {
+              if($in_boiler)
+              {
+                  $in_boiler = 0 if any { $line =~ $_ } $self->matches_boiler_barrier->@*;
+                  next;
+              }
+          }
+          else
+          {
+              next if $line =~ /^\s*$/;
+              next if $line =~ /^#!\/usr\/bin\/perl/;
+              next if $line =~ /^#!\/usr\/bin\/env perl/;
+              next if $line =~ /^use strict;$/;
+              next if $line =~ /^use warnings;$/;
+          }
         return '' if eof $fh;
       }
+      # get rid of any blank lines before the content.
+      next if $line =~ /^\s*$/ && ! $found_content;
+      ++$found_content;
+
       return join "\n", map { "$indent$_" } split /\n/, $line . do { local $/; my $rest = <$fh>; defined $rest ? $rest : '' };
     }
 
@@ -87,7 +118,7 @@ Dist::Zilla::Plugin::InsertExample - Insert example into your POD from a file
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -145,6 +176,15 @@ source root.
 Remove the C<#!/usr/bin/perl>, C<use strict;> or C<use warnings;> from
 the beginning of your example before inserting them into the POD.
 
+If L</match_boiler_barrier> is also set, it instead removes all lines up-to
+and including the line matched by L</match_boiler_barrier>.
+
+=head2 match_boiler_barrier
+
+A regular expression matching a line indicating the end of
+boilerplate.  This option may be used multiple times.
+It must be used in conjunction with L</remove_boiler>.
+
 =head2 indent
 
 Specifies the number of spaces to indent by.  This is 1 by default,
@@ -155,7 +195,11 @@ and it won't be a verbatim paragraph at all.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Diab Jerius (DJERIUS)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,0 +1,58 @@
+{
+   "abstract" : "Generates GoogleEarth Documents",
+   "author" : [
+      "Michael R. Davis (domain=>michaelrdavis,tld=>com,account=>perl)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Geo-GoogleEarth-Pluggable",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Zip" : "0",
+            "IO::Scalar" : "0",
+            "Method::Autoload" : "0",
+            "Module::Pluggable" : "0",
+            "Package::New" : "0",
+            "Scalar::Util" : "0",
+            "Test::Simple" : "0.44",
+            "XML::LibXML::LazyBuilder" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mrdvt92/perl-Geo-GoogleEarth-Pluggable/issues"
+      },
+      "homepage" : "https://github.com/mrdvt92/perl-Geo-GoogleEarth-Pluggable",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mrdvt92/perl-Geo-GoogleEarth-Pluggable.git"
+      }
+   },
+   "version" : "0.17"
+}

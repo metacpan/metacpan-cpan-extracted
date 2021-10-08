@@ -1,5 +1,10 @@
 Revision history for XS-Parse-Keyword
 
+0.19    2021-10-05
+        [CHANGES]
+         * Defined XPK_PREFIXED_BLOCK_ENTERLEAVE and XPK_SETUP for customizing
+           the parser context around blocks
+
 0.18    2021-09-28
         [CHANGES]
          * Define the XPI_OPERAND_ONLY_LOOK flag

@@ -1,0 +1,283 @@
+#!/usr/bin/perl
+#
+# yapphp -- Front end to the Parse::Yapphp module
+#
+# Copyright © 1998, 1999, 2000, 2001, Francois Desarmenien.
+# Copyright © 2017 William N. Braswell, Jr.
+# Copyright © 2018 Oliver Schieche (PHP portions)
+# All Rights Reserved.
+# (see the pod text in Parse::Yapphp module for use and distribution rights)
+#
+#
+
+=encoding UTF-8
+
+=head1 NAME
+
+yapphp - A perl frontend to the Parse::Yapphp module
+
+
+=head1 SYNOPSYS
+
+yapphp [options] I<grammar>[.yp]
+
+yapphp I<-V>
+
+yapphp I<-h>
+
+
+=head1 DESCRIPTION
+
+yapphp is a frontend to the Parse::Yapphp module, which lets you compile
+Parse::Yapphp grammar input files into PHP LALR(1) OO parser modules.
+
+=head1 OPTIONS
+
+Options, as of today, are all optionals :-)
+
+=over 4
+
+=item I<-v>, I<--verbose>
+
+Creates a file F<grammar>.output describing your parser. It will
+show you a summary of conflicts, rules, the DFA (Deterministic
+Finite Automaton) states and overall usage of the parser.
+
+=item I<-N>, I<--no-line-numbers>
+
+Disable source file line numbering embedded in your parser module.
+I don't know why one should need it, but it's there.
+
+=item I<-m module>, I<--module=module>
+
+Define main parser's PHP class name. F<module> may include a namespace
+prefix. If, for example, the module name is C<Foo\\Bar\\My\\Parser>, the
+parser's class name is C<Parser>, its namespace and that of the supporting
+lexer interface and parser driver is C<Foo\\Bar\\My>.
+
+=item I<-d directory>, I<--directory=directory>
+
+Write generated output files to F<directory>.
+
+=item I<-o outfile>, I<--output=outfile>
+
+This option is really unnecessary but is provided to allow
+for custom output file naming. Output files' names are derived from the
+C<--module> parameter by default and there's no good reason to not rely on
+this. Nonetheless, the C<--output> option overrides this behavior, creating
+F<outfile>, F<outfile.driver.php> and F<outfile.lexer_interface.php>.
+
+=item I<-t filename>, I<--template=filename>
+
+The I<-t filename> option allows you to specify a file which should be 
+used as template for generating the parser output.  The default is to 
+use the internal template defined in F<Parse::Yapphp::Output.pm>.
+For how to write your own template and which substitutions are available,
+have a look to the module F<Parse::Yapphp::Output.pm> : it should be obvious. 
+
+=item I<grammar>
+
+The input grammar file. If no suffix is given, and the file does not exists,
+an attempt to open the file with a suffix of  F<.yp> is tried before exiting.
+
+=item I<-V>
+
+Display current version of Parse::Yapphp and gracefully exits.
+
+=item I<-h>
+
+Display the usage screen.
+
+=back
+
+=head1 BUGS
+
+None known now :-)
+
+=head1 AUTHOR
+
+William N. Braswell, Jr. <wbraswell_cpan@NOSPAM.nym.hush.com>
+
+Oliver Schieche <schiecheo@cpan.NOSPAM.org>
+
+(Remove "NOSPAM" respectively.)
+
+=head1 COPYRIGHT
+
+Copyright © 1998, 1999, 2000, 2001, Francois Desarmenien.
+Copyright © 2017 William N. Braswell, Jr.
+Copyright © 2018 Oliver Schieche (PHP portions)
+
+See Parse::Yapphp(3) for legal use and distribution rights
+
+=head1 SEE ALSO
+
+Parse::Yapphp(3) Perl(1) yacc(1) bison(1)
+
+
+=cut
+
+require 5.004;
+
+use File::Basename;
+use Getopt::Long ':config' => 'bundling';
+use Config;
+use Parse::Yapphp;
+
+use strict;
+use warnings;
+
+sub Usage {
+	my ($prog)=(fileparse($0,'\..*'))[0];
+	die <<EOF;
+
+Usage:	$prog [options] grammar[.yp]
+  or	$prog -V
+  or	$prog -h
+
+    -m module   Give your parser module the name <module>
+                default is <grammar>
+    -d dirname  Write generated classes to <dirname> directory.
+    -v          Create a file <grammar>.output describing your parser
+    -N          Disable source file line numbering embedded in your parser
+    -o outfile  Create the file <outfile> for your parser module
+                Default is <grammar>.pm or, if -m A::Module::Name is
+                specified, Name.pm
+    -t filename Uses the file <filename> as a template for creating the parser
+                module file.  Default is to use internal template defined
+                in Parse::Yapphp::Output
+
+    grammar     The grammar file. If no suffix is given, and the file
+                does not exists, .yp is added
+
+    -V          Display current version of Parse::Yapphp and gracefully exits
+    -h          Display this help screen
+
+EOF
+}
+
+my %options;
+
+GetOptions(
+    'h|help'                => \&Usage,
+
+    'd|directory=s'         => \$options{'directory'},
+    'm|module=s'            => \$options{'module'},
+    'N|no-line-numbers'     => \$options{'skip_linenumbers'},
+    'o|output=s'            => \$options{'output'},
+
+    'v|verbose'             => \$options{'debugoutput'},
+    'V|version'             => \$options{'showversion'}
+) or Usage();
+
+if ($options{'showversion'}) {
+    Usage() if @ARGV;
+
+    print "This is Parse::Yapphp version $Parse::Yapphp::Driver::VERSION.\n";
+    exit(0);
+}
+
+
+# -t <filename> ($options{'template'}) option allows a file to be specified which 
+# contains a 'template' to be used when generating the parser; 
+# if defined, we open and read the file.   
+
+if ($options{'template'}) {
+    local $/ = undef;
+
+    open my $fp, '<', $options{'template'} or die "Failed to open '$options{template}' for reading: $!\n";
+    $options{'template'} = <$fp>;
+    close $fp;
+}
+
+unless (scalar @ARGV == 1) {
+    Usage();
+}
+
+my ($filename) = $ARGV[0];
+my ($base,$path,$suffix) = fileparse($filename,'\..*');
+
+$path = $options{'directory'} if $options{'directory'};
+
+unless (-r $filename) {
+    if ($suffix ne '.yp') {
+        $filename .= '.yp';
+    }
+
+    die "Cannot open $filename for reading.\n" unless -r $filename;
+};
+
+my ($parser) = Parse::Yapphp->new(inputfile => $filename);
+my ($warnings) = $parser->Warnings();
+
+print STDERR $warnings if $warnings;
+
+if ($options{'debugoutput'}) {
+	my ($output) = "$path$base.output";
+	my ($tmp);
+
+    open my $fp, '>', $output or die "Cannot create $base.output for writing.\n";
+
+	print $fp "Warnings:\n---------\n$tmp\n" if $tmp = $parser->Warnings();
+	print $fp "Conflicts:\n----------\n$tmp\n" if $tmp = $parser->Conflicts();
+	print $fp "Rules:\n------\n";
+	print $fp $parser->ShowRules()."\n";
+	print $fp "States:\n-------\n";
+	print $fp $parser->ShowDfa()."\n";
+	print $fp "Summary:\n--------\n";
+	print $fp $parser->Summary();
+    
+	close $fp;
+}
+
+my ($outfile) = "$path$base.php";
+my ($package) = "$base";
+my ($namespace) = 'Parser';
+my ($driverfile, $lexerfile);
+
+if ($options{'module'}) {
+    $package = $options{'module'};
+    $package =~ m{^(?:(?<namespace>.*)\\)?(?<classname>[^\\]+)$};
+	$namespace = $+{namespace};
+	$package = $+{classname};
+    $outfile = "$path$package.php";
+}
+
+unless ($options{'output'}) {
+    $driverfile = "$path${package}Driver.php";
+	$lexerfile = "${path}LexerInterface.php";
+} else {
+    $outfile = $options{'output'};
+
+    if ($outfile =~ m{^(.*)[.]php$}) {
+        $driverfile = "${1}Driver.php";
+		$lexerfile = 'LexerInterface.php';
+    } else {
+        $driverfile = "$outfile.driver.php"; # not our fault the parser filename is screwed
+		$lexerfile = "$outfile.lexer_interface.php";
+    }
+}
+
+my ($parser_src, $driver_src, $lexer_src) = $parser->Output(
+    classname  => $package,
+    linenumbers => $options{'skip_linenumbers'} ? 0 : 1,
+    template    => $options{'template'},
+    namespace   => $namespace);
+
+open my $fp, '>', $outfile or die "Cannot open $outfile for writing.\n";
+print $fp $parser_src;
+close $fp;
+
+print STDERR "Wrote $outfile.\n";
+
+open $fp, '>', $driverfile or die "Cannot open $driverfile for writing.\n";
+print $fp $driver_src;
+close $fp;
+
+print STDERR "Wrote $driverfile.\n";
+
+open $fp, '>', $lexerfile or die "Cannot open $lexerfile for writing.\n";
+print $fp $lexer_src;
+close $fp;
+
+print STDERR "Wrote $lexerfile.\n";

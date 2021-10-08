@@ -1,0 +1,82 @@
+# PODNAME: Iterator::Flex::Manual::Caveats
+# ABSTRACT: Caveats
+
+__END__
+
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
+=head1 NAME
+
+Iterator::Flex::Manual::Caveats - Caveats
+
+=head1 VERSION
+
+version 0.14
+
+=head1 DESCRIPTION
+
+=head2 Serialization
+
+Serialization is a work in progress
+
+Most of the machinery is in place, but it requires some cleanup
+
+=over
+
+=item *
+
+The freeze code must be made available via the L<Iterator::Flex::Manual::Overview/freeze> parameter.
+It should be possible to use an object method.
+
+This is a simple fix: convert the single L<Iterator::Flex::Role::Freeze> role into
+separate C<Iterator::Flex::Role::Freeze::Closure>  and C<Iterator::Flex::Role::Freeze::Method> roles.
+
+=back
+
+=head1 SUPPORT
+
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-iterator-flex@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Iterator-Flex>
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/iterator-flex
+
+and may be cloned from
+
+  https://gitlab.com/djerius/iterator-flex.git
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<Iterator::Flex|Iterator::Flex>
+
+=item *
+
+L<Iterator::Flex::Manual|Iterator::Flex::Manual>
+
+=back
+
+=head1 AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

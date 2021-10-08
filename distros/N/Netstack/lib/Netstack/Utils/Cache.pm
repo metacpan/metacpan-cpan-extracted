@@ -3,7 +3,7 @@ package Netstack::Utils::Cache;
 #------------------------------------------------------------------------------
 # 加载扩展模块功能
 #------------------------------------------------------------------------------
-use 5.018;
+use 5.016;
 use Moose;
 use namespace::autoclean;
 
@@ -29,20 +29,24 @@ sub get {
 #------------------------------------------------------------------------------
 sub set {
   my $self = shift;
-  confess __PACKAGE__ . " ERROR: 必须提供键值对" if @_ < 2;
-  # 初始化变量
+  confess __PACKAGE__ . " ERROR: 必须提供键值对格式(cacheType, key, value)" if @_ < 2;
+  # 获取
   my $value   = pop;
   my $lastKey = pop;
-  my @keys    = @_;
-  my $ref     = $self->cache;
+
+  my @keys = @_;
+  my $ref  = $self->cache;
   # 提供2个以上入参
   my @step;
   while ( my $key = shift @keys ) {
     push @step, $key;
+    # 检查是否已定义缓存对象
     if ( not exists $ref->{$key} ) {
       $ref->{$key} = undef;
     }
+    # 此处实现嵌套
     $ref = $ref->{$key};
+    # 格式校验
     if ( defined $ref and ref($ref) ne 'HASH' ) {
       confess "ERROR: cache->" . join( '->', @step ) . " not a valid HashRef";
     }
@@ -56,9 +60,11 @@ sub set {
 sub clear {
   my $self = shift;
   my @keys = @_;
+  # 携带参数则删除具体的缓存对象，否则情况所有的缓存
   if (@keys) {
     my $lastKey = pop @keys;
-    my $ref     = $self->locate(@keys);
+    # 检索缓存对象
+    my $ref = $self->locate(@keys);
     if ( defined $ref and ref($ref) eq 'HASH' ) {
       delete( $ref->{$lastKey} );
     }
@@ -81,6 +87,7 @@ sub locate {
     if ( not exists $ref->{$key} ) {
       return;
     }
+    # 此处实现嵌套
     $ref = $ref->{$key};
   }
   return $ref;

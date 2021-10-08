@@ -19,7 +19,7 @@ use warnings;
 # I generate code for up to 10-dimensional FFTs
 my $maxrank = 10;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 pp_setversion($VERSION);
 
 pp_addpm( {At => 'Top'}, slurp('README.pod') . <<'EOF' );

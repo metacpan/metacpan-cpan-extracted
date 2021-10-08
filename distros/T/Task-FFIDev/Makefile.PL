@@ -51,36 +51,38 @@ my %WriteMakefileArgs = (
     "lib/Task/FFIDev.pm" => "\$(INST_LIB)/Task/FFIDev.pm"
   },
   "PREREQ_PM" => {
-    "Dist::Zilla::MintingProfile::FFI" => "0.01",
-    "Dist::Zilla::Plugin::FFI"         => "1.04",
-    "FFI::C"                           => "0.10",
-    "FFI::CheckLib"                    => "0.28",
-    "FFI::Platypus"                    => "1.55",
-    "FFI::Platypus::Type::Enum"        => "0.06",
-    "FFI::Platypus::Type::PtrObject"   => "0.03",
-    "PeekPoke::FFI"                    => "0.02",
-    "Test2::Tools::FFI"                => "0.06"
+    "Dist::Zilla::MintingProfile::FFI"    => "0.01",
+    "Dist::Zilla::Plugin::DynamicPrereqs" => "0.039",
+    "Dist::Zilla::Plugin::FFI"            => "1.04",
+    "FFI::C"                              => "0.10",
+    "FFI::CheckLib"                       => "0.28",
+    "FFI::Platypus"                       => "1.55",
+    "FFI::Platypus::Type::Enum"           => "0.06",
+    "FFI::Platypus::Type::PtrObject"      => "0.03",
+    "PeekPoke::FFI"                       => "0.02",
+    "Test2::Tools::FFI"                   => "0.06"
   },
   "TEST_REQUIRES" => {
     "Test2::V0" => "0.000121"
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test"    => {
     "TESTS" => "t/*.t"
   }
 );
 
 my %FallbackPrereqs = (
-  "Dist::Zilla::MintingProfile::FFI" => "0.01",
-  "Dist::Zilla::Plugin::FFI"         => "1.04",
-  "FFI::C"                           => "0.10",
-  "FFI::CheckLib"                    => "0.28",
-  "FFI::Platypus"                    => "1.55",
-  "FFI::Platypus::Type::Enum"        => "0.06",
-  "FFI::Platypus::Type::PtrObject"   => "0.03",
-  "PeekPoke::FFI"                    => "0.02",
-  "Test2::Tools::FFI"                => "0.06",
-  "Test2::V0"                        => "0.000121"
+  "Dist::Zilla::MintingProfile::FFI"    => "0.01",
+  "Dist::Zilla::Plugin::DynamicPrereqs" => "0.039",
+  "Dist::Zilla::Plugin::FFI"            => "1.04",
+  "FFI::C"                              => "0.10",
+  "FFI::CheckLib"                       => "0.28",
+  "FFI::Platypus"                       => "1.55",
+  "FFI::Platypus::Type::Enum"           => "0.06",
+  "FFI::Platypus::Type::PtrObject"      => "0.03",
+  "PeekPoke::FFI"                       => "0.02",
+  "Test2::Tools::FFI"                   => "0.06",
+  "Test2::V0"                           => "0.000121"
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

@@ -1,16 +1,16 @@
 package App::ImageMagickUtils;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-12-24'; # DATE
-our $DIST = 'App-ImageMagickUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
 
 use Perinci::Exporter;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-10-05'; # DATE
+our $DIST = 'App-ImageMagickUtils'; # DIST
+our $VERSION = '0.005'; # VERSION
 
 our %SPEC;
 
@@ -170,6 +170,100 @@ sub downsize_image {
     [200];
 }
 
+$SPEC{convert_image_to} = {
+    v => 1.1,
+    summary => 'Convert images using ImageMagick\'s \'convert\' utility, with multiple file support and automatic output naming',
+    description => <<'_',
+
+This is a simple wrapper to ImageMagick's `convert` utility to let you process
+multiple files using a single command:
+
+    % convert-image-to --to pdf *.jpg
+
+is basically equivalent to:
+
+    % for f in *.jpg; do convert "$f" "$f.pdf"; done
+
+_
+    args => {
+        %arg0_files,
+        to => {
+            schema => ['str*', match=>qr/\A\w+\z/],
+            req => 1,
+            examples => [qw/pdf jpg png/], # for tab completion
+        },
+    },
+    #features => {
+    #    dry_run => 1,
+    #},
+    deps => {
+        prog => 'convert',
+    },
+    examples => [
+    ],
+};
+sub convert_image_to {
+    require IPC::System::Options;
+    require Perinci::Object;
+    require Process::Status;
+
+    my %args = @_;
+
+    my $to = $args{to} or return [400, "Please specify target format in `to`"];
+
+    my $envres = Perinci::Object::envresmulti();
+    for my $file (@{$args{files}}) {
+        log_info "Processing file %s ...", $file;
+        IPC::System::Options::system(
+            {log=>1},
+            "convert", $file, "$file.$to",
+        );
+        my $ps = Process::Status->new;
+
+        if ($ps->is_success) {
+            $envres->add_result(200, "OK", {item_id=>$file});
+        } else {
+            $envres->add_result(500, "Failed (exit code ".$ps->exitstatus.")", {item_id=>$file});
+        }
+    }
+    $envres->as_struct;
+}
+
+$SPEC{convert_image_to_pdf} = {
+    v => 1.1,
+    summary => 'Convert images to PDF using ImageMagick\'s \'convert\' utility',
+    description => <<'_',
+
+This is a wrapper to `convert-image-to`, with `--to` set to `pdf`:
+
+    % convert-image-to-pdf *.jpg
+
+is equivalent to:
+
+    % convert-image-to --to pdf *.jpg
+
+which in turn is equivalent to:
+
+    % for f in *.jpg; do convert "$f" "$f.pdf"; done
+
+_
+    args => {
+        %arg0_files,
+    },
+    #features => {
+    #    dry_run => 1,
+    #},
+    deps => {
+        prog => 'convert',
+    },
+    examples => [
+    ],
+};
+sub convert_image_to_pdf {
+    my %args = @_;
+    convert_image_to(%args, to=>'pdf');
+}
+
 1;
 # ABSTRACT: Utilities related to ImageMagick
 
@@ -185,16 +279,103 @@ App::ImageMagickUtils - Utilities related to ImageMagick
 
 =head1 VERSION
 
-This document describes version 0.004 of App::ImageMagickUtils (from Perl distribution App-ImageMagickUtils), released on 2020-12-24.
+This document describes version 0.005 of App::ImageMagickUtils (from Perl distribution App-ImageMagickUtils), released on 2021-10-05.
 
 =head1 FUNCTIONS
+
+
+=head2 convert_image_to
+
+Usage:
+
+ convert_image_to(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Convert images using ImageMagick's 'convert' utility, with multiple file support and automatic output naming.
+
+This is a simple wrapper to ImageMagick's C<convert> utility to let you process
+multiple files using a single command:
+
+ % convert-image-to --to pdf *.jpg
+
+is basically equivalent to:
+
+ % for f in *.jpg; do convert "$f" "$f.pdf"; done
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<files>* => I<array[filename]>
+
+=item * B<to>* => I<str>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 convert_image_to_pdf
+
+Usage:
+
+ convert_image_to_pdf(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Convert images to PDF using ImageMagick's 'convert' utility.
+
+This is a wrapper to C<convert-image-to>, with C<--to> set to C<pdf>:
+
+ % convert-image-to-pdf *.jpg
+
+is equivalent to:
+
+ % convert-image-to --to pdf *.jpg
+
+which in turn is equivalent to:
+
+ % for f in *.jpg; do convert "$f" "$f.pdf"; done
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<files>* => I<array[filename]>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
 
 
 =head2 downsize_image
 
 Usage:
 
- downsize_image(%args) -> [status, msg, payload, meta]
+ downsize_image(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Reduce image size, by default via compressing to JPEG quality 40 and downsizing to 1024p.
 
@@ -245,12 +426,12 @@ Pass -dry_run=E<gt>1 to enable simulation mode.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -262,23 +443,40 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-ImageM
 
 Source repository is at L<https://github.com/perlancar/perl-App-ImageMagickUtils>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-ImageMagickUtils/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ImageMagickUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

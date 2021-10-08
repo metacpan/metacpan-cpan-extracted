@@ -42,7 +42,7 @@ if( eval "require Alien::FFTW3" ) {
     chomp($cflags, $libs);
 }
 
-my @package = qw(FFTW3.pd FFTW3 PDL::FFTW3);
+my @package = (qw(FFTW3.pd FFTW3 PDL::FFTW3), undef, 1);
 my %descriptor = pdlpp_stdargs(\@package);
 
 $descriptor{VERSION_FROM} = 'FFTW3.pd';
@@ -60,7 +60,7 @@ $descriptor{depend} = { 'FFTW3.pm' => join(' ', qw(template_complex.c template_r
                                                    FFTW3_header_include.pm)) };
 
 $descriptor{PREREQ_PM} = {
-  'PDL' => '2.047', # ci gone, use _ci
+  'PDL' => '2.049', # as_native
 };
 $descriptor{CONFIGURE_REQUIRES} = {
   'PDL::Core::Dev' =>0,

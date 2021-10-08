@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Keyword 0.18;
+package XS::Parse::Keyword 0.19;
 
 use v5.14;
 use warnings;
@@ -245,6 +245,35 @@ use of C<XPK_LEXVAR_MY>.
 A call to C<intro_my()> is automatically made at the end of the prefix pieces,
 before the block itself is parsed, ensuring any new lexical variables are now
 visible.
+
+In addition, the following extra piece types are recognised here:
+
+=over 4
+
+=item XPK_SETUP
+
+   void setup(pTHX_ void *hookdata);
+
+   XPK_SETUP(&setup)
+
+I<atomic, emits nothing.>
+
+This piece type runs a function given by pointer. Typically this function may
+be used to introduce new lexical state into the parser, or in some other way
+have some side-effect on the parsing context of the block to be parsed.
+
+=back
+
+=head2 XPK_PREFIXED_BLOCK_ENTERLEAVE
+
+A variant of C<XPK_PREFIXED_BLOCK> which additionally wraps the entire parsing
+operation, including the C<block_start()>, C<block_end()> and any calls to
+C<XPK_SETUP> functions, within a C<ENTER>/C<LEAVE> pair.
+
+This should not make a difference to the standard parser pieces provided here,
+but may be useful behaviour for the code in the setup function, especially if
+it wishes to modify parser state and use the savestack to ensure it is
+restored again when parsing has finished.
 
 =head2 XPK_ANONSUB
 

@@ -38,7 +38,7 @@ use SNMP::Info::Layer3;
 
 our ($VERSION, %GLOBALS, %FUNCS, %MIBS, %MUNGE);
 
-$VERSION = '3.80';
+$VERSION = '3.81';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,
@@ -73,6 +73,18 @@ $VERSION = '3.80';
 );
 
 %MUNGE = ( %SNMP::Info::Layer3::MUNGE, );
+
+sub layers {
+    my $dlink = shift;
+
+    my $layers = $dlink->SUPER::layers();
+    if ($layers) {
+        substr $layers, 5, 1, "1";
+        substr $layers, 6, 1, "1";
+    }
+
+    return $layers;
+}
 
 sub model {
     my $dlink=shift;
@@ -232,6 +244,10 @@ See L<SNMP::Info::Layer3/"Required MIBs"> for its own MIB requirements.
 These are methods that return scalar value from SNMP
 
 =over
+
+=item $dlink->layers()
+
+Makes sure to always report layer 2 and 3.
 
 =item $dlink->model()
 

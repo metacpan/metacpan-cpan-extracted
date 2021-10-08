@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Error;
-$Playwright::Error::VERSION = '0.015';
+$Playwright::Error::VERSION = '0.016';
 use parent 'Playwright::Base';
 
 sub new {
@@ -20,7 +20,7 @@ sub new {
 
 sub name {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'name',
         object  => $self->{guid},
@@ -30,7 +30,7 @@ sub name {
 
 sub message {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'message',
         object  => $self->{guid},
@@ -40,7 +40,7 @@ sub message {
 
 sub stack {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'stack',
         object  => $self->{guid},
@@ -50,7 +50,7 @@ sub stack {
 
 sub on {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'on',
         object  => $self->{guid},
@@ -60,7 +60,7 @@ sub on {
 
 sub evaluate {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'evaluate',
         object  => $self->{guid},
@@ -70,7 +70,7 @@ sub evaluate {
 
 sub evaluateHandle {
     my $self = shift;
-    return $self->_request(
+    return $self->_api_request(
         args    => [@_],
         command => 'evaluateHandle',
         object  => $self->{guid},
@@ -92,7 +92,7 @@ Playwright::Error - Automatically generated class for Playwright::Error
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 CONSTRUCTOR
 

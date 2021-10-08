@@ -1,0 +1,65 @@
+#
+# Calc.yp
+# 
+# Parse::Yapp input grammar example.
+#
+# This file is PUBLIC DOMAIN 
+#
+#
+%right  '='
+%left   '-' '+'
+%left   '*' '/'
+%left   NEG
+%right  '^'
+
+%%
+input:  #empty
+        |   input line  { $_[1][] = $_[2];
+                    return $_[1]; }
+;
+
+line:       '\n'
+        |   exp '\n'            { print "$_[1]\n" }
+		|	error '\n' { $this->YYErrok() }
+;
+
+exp:        NUM
+        |   VAR                 { $this->YYData->VARS->{$_[1]} = null }
+        |   VAR '=' exp         { $this->YYData->VARS->{$_[1]} = $_[3] }
+        |   exp '+' exp         { return $_[1] + $_[3] }
+        |   exp '-' exp         { return $_[1] - $_[3] }
+        |   exp '*' exp         { return $_[1] * $_[3] }
+        |   exp '/' exp         {
+                                    if ($_[3]) {
+                                        return $_[1] / $_[3];
+                                    }
+
+                                    $this->YYData->ERRMSG = "Illegal division by zero.\n";
+                                    $this->YYError();
+                                }
+        |   '-' exp %prec NEG   { return -$_[2] }
+        |   exp '^' exp         { return $_[1] ** $_[3] }
+        |   '(' exp ')'         { return $_[2] }
+;
+
+%%
+
+public function _Error()
+{
+    if (!isset($this->YYData->ERRMSG)) {
+        print "Syntax error.\n";
+    } else {
+        echo $this->YYData->ERRMSG, "\n";
+        unset($this->YYData->ERRMSG);
+    }
+}
+
+public function _Lexer(MyParser $parser)
+{
+    return ['', undef];
+}
+
+public function Run()
+{
+    return $this->YYParse(['yylex' => [$this, '_Lexer'], 'yyerror' => [$this, '_Error']]);
+}

@@ -2,7 +2,7 @@ NAME
     Apache2::Filter::TagAware - Tag Awareness for Apache2::Filter
 
 VERSION
-    version 0.02
+    version 0.03
 
 SYNOPSIS
       package Your::FancyFilter;
@@ -47,7 +47,8 @@ DESCRIPTION
       $f = Apache2::Filter::TagAware->new($f,%args);
 
     tag_regexp
-    a regular expression which defines a split tag. defaults to '(<[^>]*)$'
+        a regular expression which defines a split tag. defaults to
+        '(<[^>]*)$'
 
   read
       $f->read($buffer, $bytes)

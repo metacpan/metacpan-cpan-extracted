@@ -10,7 +10,7 @@ use Carp;
 
 
 
-our $VERSION = "0.021";
+our $VERSION = "0.022";
 
 =head1 NAME
 
@@ -1453,10 +1453,10 @@ sub nyi {
 =head1 SEE ALSO
 
 Description of the Pango Markup Language:
-L<https://developer.gnome.org/pygtk/stable/pango-markup-language.html>.
+L<https://docs.gtk.org/Pango/pango_markup.html#pango-markup>.
 
 Documentation of the Pango Layout class:
-L<https://developer.gnome.org/pango/stable/pango-Layout-Objects.html>.
+L<https://docs.gtk.org/Pango/class.Layout.html>.
 
 L<PDF::API2>, L<PDF::Builder>, L<HarfBuzz::Shaper>, L<Font::TTF>.
 

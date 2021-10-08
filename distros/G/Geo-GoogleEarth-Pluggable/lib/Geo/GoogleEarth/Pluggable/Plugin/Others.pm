@@ -2,7 +2,7 @@ package Geo::GoogleEarth::Pluggable::Plugin::Others;
 use strict;
 use warnings;
 
-our $VERSION='0.09';
+our $VERSION='0.17';
 
 =head1 NAME
 

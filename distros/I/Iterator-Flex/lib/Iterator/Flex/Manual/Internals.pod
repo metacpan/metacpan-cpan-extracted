@@ -1,0 +1,238 @@
+# PODNAME: Iterator::Flex::Manual::Internals
+# ABSTRACT: How Things Work
+
+__END__
+
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
+=head1 NAME
+
+Iterator::Flex::Manual::Internals - How Things Work
+
+=head1 VERSION
+
+version 0.14
+
+=head1 DESCRIPTION
+
+=head2 Object
+
+An iterator is an object.  It is composed from a base class
+(L<Iterator::Flex::Base>) and a number of roles.  (Some iterators use
+a subclass of L<Iterator::Flex::Base>, but they should be rewritten as
+roles.)
+
+The object is a blessed code reference (not a hash).  This allows the
+iterator to be called without method lookup overhead:
+
+  $iter = iterator { ... };
+  $value = $iter->();
+
+The roles incorporate optional capabilities or different ways of implementing
+a behavior (e.g., signaling exhaustion via throwing an exception versus returning
+a sentinel).  They are also used to implement interfaces to alien iterators.
+
+=head2 Object Attributes
+
+Storage for object attributes is done via the "inside-out" object model.  Attributes
+are stored in the C<%Iterator::Flex::Utils::Registry> hash, keyed off of the internal
+memory address of the object obtained via L<Scalar::Util/refaddr>.
+The entry in the registry is deleted upon object destruction.
+
+Each registry entry is a hash, with the following structure (constants
+for the keys are available from L<Iterator::Flex::Utils>):
+
+  $Registry{ref address}
+    + -- { +ITERATOR }
+         + -- { +CURRENT }
+         + -- { +METHODS }
+         + -- { +NEXT }
+         + -- { +PREV }
+         + -- { +RESET }
+         + -- { +REWIND }
+         + -- { +STATE }
+         + -- { +_DEPENDS }
+         + -- { +_NAME }
+         + -- { +_ROLES }
+    + -- { +GENERAL }
+         + -- { +INPUT_EXHAUSTION }
+         + -- { +EXHAUSTION }
+         + -- { +ERROR }
+
+=head2 Object Construction
+
+There are two steps to object construction:
+
+=over
+
+=item 1
+
+Class construction
+
+=item 2
+
+Object iteration
+
+=back
+
+=head3 Class Construction
+
+Classes can be constructed using the
+L<factory|Iterator::Flex::Factory> or via L<Iterator::Flex::Base> or a
+subclass thereof.
+
+The fundamental constructor is
+C<Iterator::Flex::Base::new_from_attrs>.  Everything else calls it. It
+accepts two hash arguments, one for parameters specific to the
+particular iterator, the other for specifying general behaviors, such
+as how the iterator should signal exhaustion or error.
+
+=head4 Roles
+
+=over
+
+=item
+
+L<Iterator::Flex::Role>
+
+=item
+
+L<Iterator::Flex::Role::Freeze>
+
+=item
+
+L<Iterator::Flex::Role::Current::Method>
+
+=item
+
+L<Iterator::Flex::Role::Current::Closure>
+
+=item
+
+L<Iterator::Flex::Role::Next::Closure>
+
+=item
+
+L<Iterator::Flex::Role::Next::ClosedSelf>
+
+=item
+
+L<Iterator::Flex::Role::Reset::Method>
+
+=item
+
+L<Iterator::Flex::Role::Reset::Closure>
+
+=item
+
+L<Iterator::Flex::Role::Exhaustion::Return>
+
+=item
+
+L<Iterator::Flex::Role::Exhaustion::PassthroughThrow>
+
+=item
+
+L<Iterator::Flex::Role::Exhaustion::Throw>
+
+=item
+
+L<Iterator::Flex::Role::Exhaustion::ImportedReturn>
+
+=item
+
+L<Iterator::Flex::Role::Exhaustion::ImportedThrow>
+
+=item
+
+L<Iterator::Flex::Role::Rewind::Method>
+
+=item
+
+L<Iterator::Flex::Role::Rewind::Closure>
+
+=item
+
+L<Iterator::Flex::Role::State::Registry>
+
+=item
+
+L<Iterator::Flex::Role::State::Closure>
+
+=item
+
+L<Iterator::Flex::Role::Utils>
+
+=item
+
+L<Iterator::Flex::Role::Wrap::Return>
+
+=item
+
+L<Iterator::Flex::Role::Wrap::Self>
+
+=item
+
+L<Iterator::Flex::Role::Wrap::Throw>
+
+=item
+
+L<Iterator::Flex::Role::Prev::Method>
+
+=item
+
+L<Iterator::Flex::Role::Prev::Closure>
+
+=item
+
+L<Iterator::Flex::Role::Error::Throw>
+
+=back
+
+=head1 SUPPORT
+
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-iterator-flex@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Iterator-Flex>
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/iterator-flex
+
+and may be cloned from
+
+  https://gitlab.com/djerius/iterator-flex.git
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<Iterator::Flex|Iterator::Flex>
+
+=item *
+
+L<Iterator::Flex::Manual|Iterator::Flex::Manual>
+
+=back
+
+=head1 AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

@@ -304,6 +304,9 @@ Revision history for StreamFinder
         - Add 'artist' option to getIconURL() and getIconData() functions, 
         (Currently only Apple, Brighteon, and Youtube) to return the "channel" 
         (AlbumArtist) icon instead of the individual podcast icon.  We may add 
-        this more of the other sites later, but this will likely require an 
+        this to more of the other sites later, but this will likely require an 
         additional, separate fetch of the channel page.
         - Small doc. touchups.
+1.61    2021/10/03
+        - Add 'artist' icon option (see v1.60 changes) to StreamFinder::Rumble, 
+        StreamFinder::Castbox, and StreamFinder::Spreaker.

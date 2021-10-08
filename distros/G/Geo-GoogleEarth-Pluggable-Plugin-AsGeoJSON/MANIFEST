@@ -1,0 +1,14 @@
+Changes
+LICENSE
+Makefile.PL
+MANIFEST
+README.md
+t/001_load.t
+t/002_Point.t
+t/999_Junk.t
+lib/Geo/GoogleEarth/Pluggable/Plugin/AsGeoJSON.pm
+perl-Geo-GoogleEarth-Pluggable-Plugin-AsGeoJSON.spec
+scripts/database-connections-config.ini
+scripts/Geo-GoogleEarth-Pluggable-Plugin-AsGeoJSON-example.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

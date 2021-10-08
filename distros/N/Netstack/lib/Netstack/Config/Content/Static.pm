@@ -5,14 +5,13 @@ package Netstack::Config::Content::Static;
 #------------------------------------------------------------------------------
 use 5.016;
 use utf8;
-use Encode;
 use Moose;
 use namespace::autoclean;
 use Digest::MD5;
 use Netstack::Utils::Date;
 
 #------------------------------------------------------------------------------
-# 定义 Content::Static 方法属性
+# 定义 Netstack::Config::Content::Static 方法属性
 #------------------------------------------------------------------------------
 # 解析配置文件为字符串数组
 has config => (
@@ -37,7 +36,7 @@ has confContent => (
 has cursor => (
   is      => 'ro',
   isa     => 'Int',
-  default => 0,
+  default => 1,
 );
 
 #------------------------------------------------------------------------------
@@ -56,9 +55,8 @@ has '+confSign' => (
 
 # 配置解析时间，多次解析相同配置，该属性可以明确什么时候执行了解析动作
 has '+timestamp' => (
-  required => 0,
-  lazy     => 1,
-  builder  => '_buildTimestamp',
+  isa     => 'Str',
+  default => sub { Netstack::Utils::Date->new->getLocalDate }
 );
 
 #------------------------------------------------------------------------------
@@ -79,14 +77,6 @@ sub _buildConfContent {
 }
 
 #------------------------------------------------------------------------------
-# _buildTimestamp 生成配置解析时间戳
-#------------------------------------------------------------------------------
-sub _buildTimestamp {
-  my $self = shift;
-  return Netstack::Utils::Date->new->getLocalDate;
-}
-
-#------------------------------------------------------------------------------
 # _buildLineParsedFlags 生成配置解析标志位，为每行配置设置初始状态为0
 #------------------------------------------------------------------------------
 sub _buildLineParsedFlags {
@@ -99,7 +89,7 @@ sub _buildLineParsedFlags {
 #------------------------------------------------------------------------------
 sub goToHead {
   my $self = shift;
-  $self->cursor = 0;
+  $self->{cursor} = 0;
 }
 
 #------------------------------------------------------------------------------
@@ -107,16 +97,11 @@ sub goToHead {
 #------------------------------------------------------------------------------
 sub nextLine {
   my $self = shift;
-  # 初始化变量
-  my $result;
   # 游标边界
   if ( $self->cursor < $self->config->$#* ) {
-    # 提前当前游标配置
-    $result = $self->config->[ $self->cursor ];
     # 游标自增
-    $self->cursor++;
+    $self->{cursor}++;
   }
-  return $result;
 }
 
 #------------------------------------------------------------------------------
@@ -126,60 +111,57 @@ sub prevLine {
   my $self = shift;
   # 游标边界条件处理 | 游标大于 0 才有上一行的概念
   if ( $self->cursor > 0 ) {
-    $self->cursor--;
-    return $self->config->[ $self->cursor ];
+    $self->{cursor}--;
   }
 }
 
 #------------------------------------------------------------------------------
-# 获取后续非解析配置
+# nextUnParsedLine 获取后续非解析配置 | 用于 while 循环体
 #------------------------------------------------------------------------------
 sub nextUnParsedLine {
   my $self = shift;
   my $result;
 
-  # 未到达配置底部且已解析当前配置，则自动跳过本次解析
+  # 未到达配置底部且已解析当前行配置，则自动跳过本次解析
   # 自顶向下解析 => 保证顺序解析 | cursor
   # 保证只解析从未解析的条目 => ParseFlag 与 cursor 绑定 对应同一行配置
   while ( $self->cursor < $self->config->$#* and $self->getParseFlag == 1 ) {
-    $self->cursor++;
+    $self->{cursor}++;
   }
 
   # 获取下一行未解析配置
   if ( $self->cursor < $self->config->$#* ) {
-    # 未解析过配置行
+    # 为当前行设置 flag（代表已经解析），同时游标自增
+    $self->setParseFlag;
+    $self->{cursor}++;
+    # 下一行配置 | 正常情况下是没有解析过的
     $result = $self->config->[ $self->cursor ];
 
-    # 确保找到未解析的非空配置行
+    # 参数检查：确保找到未解析的非空配置行
     while ( not defined $result or $result =~ /^\s*$/ ) {
-
       # 即便是空行也打上已解析的标记，游标向下走
       $self->setParseFlag;
-      $self->cursor++;
+      $self->{cursor}++;
 
-      # 将游标移动到未解析的配置行
+      # 参数检查：将游标移动到未解析的配置行
       while ( $self->cursor < $self->config->$#* and $self->getParseFlag == 1 ) {
-        $self->cursor++;
+        $self->{cursor}++;
       }
       # 获取非空行且未解析的配置信息
-      if ( $self->cursor < $self->config->$#* ) {
+      if ( $self->cursor <= $self->config->$#* ) {
         $result = $self->config->[ $self->cursor ];
       }
       else {
         return;
       }
     }
-
-    # 为解析的命令行打印 flag，同时游标自增
-    $self->setParseFlag;
-    $self->cursor++;
   }
 
   # 去除首尾空白字符串
   chomp $result if defined $result;
 
   # 将字符串解码为 utf8 返回 | 从右往左运算
-  return ( decode_utf8 $result);
+  return $result;
 }
 
 #------------------------------------------------------------------------------
@@ -189,9 +171,10 @@ sub backtrack {
   my $self = shift;
   if ( $self->cursor > 0 ) {
     # 将游标跳上一级
-    $self->cursor--;
+    $self->{cursor}--;
     # 同时设置上一级游标未解析状态
     $self->setParseFlag(0);
+    return 1;
   }
 }
 
@@ -222,7 +205,7 @@ sub getUnParsedLines {
 #------------------------------------------------------------------------------
 sub getParseFlag {
   my $self = shift;
-  if ( $self->cursor >= 0 and $self->cursor < $self->config->$#* ) {
+  if ( $self->cursor >= 0 and $self->cursor <= $self->config->$#* ) {
     return $self->lineParsedFlags->[ $self->cursor ];
   }
 }
@@ -232,7 +215,7 @@ sub getParseFlag {
 #------------------------------------------------------------------------------
 sub setParseFlag {
   my ( $self, $flag ) = @_;
-  if ( $self->cursor >= 0 and $self->cursor < scalar( $self->config->@* ) ) {
+  if ( $self->cursor >= 0 and $self->cursor <= $self->config->$#* ) {
     $self->lineParsedFlags->[ $self->cursor ] = $flag // 1;
   }
 }

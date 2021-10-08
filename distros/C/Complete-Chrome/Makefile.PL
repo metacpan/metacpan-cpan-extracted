@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Complete::Chrome",
   "PREREQ_PM" => {
-    "Chrome::Util::Profile" => 0,
+    "Chrome::Util::Profile" => "0.004",
     "Complete::Util" => "0.608",
     "Exporter" => "5.57",
     "strict" => 0,
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Chrome::Util::Profile" => 0,
+  "Chrome::Util::Profile" => "0.004",
   "Complete::Util" => "0.608",
   "Exporter" => "5.57",
   "File::Spec" => 0,

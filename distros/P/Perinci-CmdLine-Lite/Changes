@@ -1,9 +1,22 @@
+1.911   2021-10-02  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Edit previous Changes for clarity.
+
+
 1.910   2021-10-01  Released-By: PERLANCAR; Urgency: medium
 
-	- [bugfix] Do not use Complete::Bash::parse_cmdline() et al to
-	  parse command-line options from environment variable as they are
-	  indeed not suitable and will split e.g. a=b into three separate
-	  words; use core-module Text::ParseWords instead.
+	- [bugfix] Do not use Complete::Bash::parse_cmdline() et al to parse
+	  command-line options from environment variable as they are indeed not
+	  suitable and will split e.g. a=b into three separate words; use
+	  core-module Text::ParseWords instead. This bug affected parsing of
+	  "PROGNAME_OPT" environment variables, e.g. in:
+
+           % PROGNAME_OPT="--foo=val1 --bar=val2" progname --baz
+
+          the command-line arguments incorrectly became ("--foo", "=", "val1",
+          "--bar", "=", "val2", "--baz").
 
 
 1.909   2021-10-01  Released-By: PERLANCAR; Urgency: medium

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use 5.022;
 
-package Alien::Build::Wizard 0.04 {
+package Alien::Build::Wizard 0.05 {
 
   use Moose;
   use Moose::Util::TypeConstraints;
@@ -218,7 +218,9 @@ package Alien::Build::Wizard 0.04 {
       my $template = get_data_section $path;
       $template =~ s/\s+$/\n/;
       die "no template $path" unless $template;
-      $tt->process(\$template, { wizard => $self, pod => $pod }, \($files{$path} = '')) or die $tt->error;
+      my $store_path = $path;
+      $store_path = "t/@{[ lc($self->class_name =~ s/::/_/gr) ]}.t" if $path eq 't/basic.t';
+      $tt->process(\$template, { wizard => $self, pod => $pod }, \($files{$store_path} = '')) or die $tt->error;
     }
 
     \%files;
@@ -240,7 +242,7 @@ Alien::Build::Wizard - Alien distribution creation wizard
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -294,7 +296,7 @@ From L<ExtUtils::MakeMaker>:
 
  use ExtUtils::MakeMaker;
  use Alien::Base::Wrapper ();
- 
+
  WriteMakefile(
    Alien::Base::Wrapper->new('[% wizard.class_name %]')->mm_args2(
      NAME => 'FOO::XS',
@@ -307,7 +309,7 @@ From L<Module::Build>:
  use Module::Build;
  use Alien::Base::Wrapper qw( [% wizard.class_name %] !export );
  use [% wizard.class_name %];
- 
+
  my $build = Module::Build->new(
    ...
    configure_requires => {
@@ -318,7 +320,7 @@ From L<Module::Build>:
    Alien::Base::Wrapper->mb_args,
    ...
  );
- 
+
  $build->create_build_script;
 
 From L<Inline::C> / L<Inline::CPP> script:
@@ -330,10 +332,10 @@ From L<Dist::Zilla>
  [@Filter]
  -bundle = @Basic
  -remove = MakeMaker
- 
+
  [Prereqs / ConfigureRequires]
  [% wizard.class_name %] = 0
- 
+
  [MakeMaker::Awesome]
  header = use Alien::Base::Wrapper qw( [% wizard.class_name %] !export );
  WriteMakefile_arg = Alien::Base::Wrapper->mm_args
@@ -344,7 +346,7 @@ From L<FFI::Platypus>:
 
  use FFI::Platypus;
  use [% wizard.class_name %];
- 
+
  my $ffi = FFI::Platypus->new(
    lib => [ [% wizard.class_name %]->dynamic_libs ],
  );
@@ -355,7 +357,7 @@ Command line tool:
 
  use [% wizard.class_name %];
  use Env qw( @PATH );
- 
+
  unshift @PATH, [% wizard.class_name %]->bin_dir;
 [%- END %]
 
@@ -398,7 +400,7 @@ plugin PkgConfig => [% IF wizard.pkg_names.size > 1 %][[% FOREACH name IN wizard
 # See Alien::Build::Plugin::Probe and
 # Alien::Build::Plugin::PkgConfig for common
 # probe plugins.
-probe sub { 'share' }
+probe sub { 'share' };
 [% END -%]
 
 share {
@@ -422,25 +424,25 @@ share {
   build [
     # TODO
     # See https://metacpan.org/pod/alienfile#build
-  ]
+  ];
 [% ELSIF wizard.build_type == 'autoconf' -%]
   plugin 'Build::Autoconf';
 [% IF wizard.alien_types.tool AND wizard.alien_types.ffi -%]
   build [
     '%{configure} --enable-static --disable-shared',
     '%{make}',
-    '%{make install',
+    '%{make} install',
   ];
   ffi {
     build [
-      '%{configure} --disabled-static --enabled-shared',
+      '%{configure} --disable-static --enable-shared',
       '%{make}',
-      '%{make install',
+      '%{make} install',
     ];
-  }
+  };
 [% ELSE -%]
   build [
-    '%{configure} --[% IF wizard.alien_types.xs %]enable[% ELSE %]disable[% END %]-static --[% IF wizard.alien_types.ffi %]enable[% ELSE %]disable[% END %]-shared',
+    '%{configure} --[% IF wizard.alien_types.xs OR wizard.alien_types.tool %]enable[% ELSE %]disable[% END %]-static --[% IF wizard.alien_types.ffi %]enable[% ELSE %]disable[% END %]-shared',
     '%{make}',
     '%{make} install',
   ];
@@ -473,4 +475,33 @@ use [% wizard.class_name %];
 alien_diag '[% wizard.class_name %]';
 alien_ok '[% wizard.class_name %]';
 
+[%- IF wizard.alien_types.tool %]
+# run_ok([ ... ])
+#   ->success
+#   ->out_like(qr/ ... /);
+
+[%- END %]
+[%- IF wizard.alien_types.xs %]
+# my $xs = <<'END';
+# #include "EXTERN.h"
+# #include "perl.h"
+# #include "XSUB.h"
+# ...
+#
+# MODULE = main PACKAGE = main
+#
+# ...
+# END
+# xs_ok $xs, with_subtest {
+#   ...
+# };
+
+[%- END %]
+[%- IF wizard.alien_types.ffi %]
+# ffi_ok { symbols => [...] }, with_subtest {
+#   my $ffi = shift;
+#   ...
+# };
+
+[%- END %]
 done_testing;

@@ -4,7 +4,7 @@ App::proxyforurl - An online proxy PAC file parser
 
 # VERSION
 
-0.09
+0.10
 
 # DESCRIPTION
 

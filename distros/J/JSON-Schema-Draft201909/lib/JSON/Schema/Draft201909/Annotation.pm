@@ -4,7 +4,7 @@ package JSON::Schema::Draft201909::Annotation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: (DEPRECATED) Contains a single annotation from a JSON Schema evaluation
 
-our $VERSION = '0.129';
+our $VERSION = '0.130';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -30,7 +30,7 @@ JSON::Schema::Draft201909::Annotation - (DEPRECATED) Contains a single annotatio
 
 =head1 VERSION
 
-version 0.129
+version 0.130
 
 =head1 DESCRIPTION
 

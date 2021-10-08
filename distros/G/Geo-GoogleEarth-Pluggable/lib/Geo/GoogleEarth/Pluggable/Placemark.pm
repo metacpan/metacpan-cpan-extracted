@@ -5,7 +5,7 @@ use warnings;
 use Scalar::Util qw{reftype blessed};
 use XML::LibXML::LazyBuilder qw{E};
 
-our $VERSION='0.14';
+our $VERSION='0.17';
 
 =head1 NAME
 
@@ -139,7 +139,7 @@ sub coordinates {
 
 sub coordinates_stringify {
   my $self=shift;
-  my $data=$self->coordinates;
+  my $data=@_ ? shift : $self->coordinates;
   my $string="";
   if (ref($data) eq "ARRAY") {
     $string=join(" ", map {$self->point_stringify($_)} @$data);

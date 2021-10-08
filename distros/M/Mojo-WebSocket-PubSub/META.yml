@@ -1,0 +1,50 @@
+---
+abstract: 'A Mojolicious publish/subscribe channels based on websocket.'
+author:
+  - 'Emiliano Bruni <info@ebruni.it>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-WebSocket-PubSub
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Mojo::WebSocket::PubSub:
+    file: lib/Mojo/WebSocket/PubSub.pm
+    version: '0.04'
+  Mojo::WebSocket::PubSub::Syntax:
+    file: lib/Mojo/WebSocket/PubSub/Syntax.pm
+    version: '0.04'
+  Mojolicious::Plugin::PubSub::WebSocket:
+    file: lib/Mojolicious/Plugin/PubSub/WebSocket.pm
+    version: '0.04'
+requires:
+  Mojolicious: '9.00'
+  Time::HiRes: '0'
+  perl: '5.010'
+resources:
+  homepage: https://github.com/EmilianoBruni/mojo-websocket-pubsub
+  repository: https://github.com/EmilianoBruni/mojo-websocket-pubsub.git
+version: '0.04'
+x_generated_by_perl: v5.32.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

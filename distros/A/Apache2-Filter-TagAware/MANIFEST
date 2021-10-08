@@ -12,9 +12,10 @@ t/htdocs/index.50.html
 t/htdocs/index.html
 t/loads.t
 t/My/NormalFilter.pm
+t/My/ResponseHandler.pm
 t/My/slurp.pm
 t/My/TestFilter200.pm
 t/My/TestFilter2048.pm
 t/My/TestFilter50.pm
 t/pod_coverage.t
-t/TEST.PL
+META.json

@@ -39,7 +39,7 @@
    "provides" : {
       "Perinci::CmdLine" : {
          "file" : "lib/Perinci/CmdLine.pm",
-         "version" : "v1.909.0"
+         "version" : "v1.909.1"
       }
    },
    "release_status" : "stable",
@@ -54,7 +54,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-CmdLine"
       }
    },
-   "version" : "1.909.0",
+   "version" : "1.909.1",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

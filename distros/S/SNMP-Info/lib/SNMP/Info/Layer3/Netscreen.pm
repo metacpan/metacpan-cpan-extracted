@@ -41,7 +41,7 @@ use SNMP::Info::IEEE802dot11;
 
 our ($VERSION, %FUNCS, %GLOBALS, %MIBS, %MUNGE);
 
-$VERSION = '3.80';
+$VERSION = '3.81';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,
@@ -310,10 +310,6 @@ sub i_mtu {
         $i_mtu{$iid} = $i_type->{ $ns_i_map->{$iid} };
     }
     return \%i_mtu;
-}
-
-sub i_ignore {
-    return;
 }
 
 sub i_speed {
@@ -642,10 +638,6 @@ Defaults to C<insIfDescr> if available, uses C<nsIfName> if not.
 Description of the interface. Uses C<insIfDescr> if available, C<nsIfName>
 if not.
 
-=item $netscreen->i_ignore()
-
-Returns without defining any interfaces to ignore.
-
 =item $netscreen->i_index()
 
 Default SNMP IID to Interface index.
@@ -804,4 +796,3 @@ See L<SNMP::Info::Layer3/"TABLE METHODS"> for details.
 See L<SNMP::Info::IEEE802dot11/"TABLE METHODS"> for details.
 
 =cut
-

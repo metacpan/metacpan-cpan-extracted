@@ -1,0 +1,5 @@
+::Base is more than a base class. It adds methods like construct and to_iterator which don't belong in a base class.
+Investigate serializing Sub::Quote routines
+update documentation for Base->construct_from_object and construct_from_iterable
+add iterator which provides access to the next-in-line iterator
+add role for boolean overload if iterator can detect if it will produce additional values.

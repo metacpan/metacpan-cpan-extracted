@@ -126,7 +126,7 @@ ie. https://www.youtube.com/watch?v=B<video-id>, or just I<video-id>
 If I<-fast> is specified (set to 1 (true)), a separate probe of the 
 page to fetch the video's title and artist is skipped.  This is useful 
 if you know the video is NOT a YouTube video or you don't care about 
-the title, or artist (youtube channel's owner) fields.
+the artist (youtube channel's owner), artist icon, fields, etc.
 
 The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  
 If 1 then only secure ("https://") streams will be returned.  Default for 
@@ -199,7 +199,7 @@ Returns the station's title, or (long description).
 Returns the URL for the video's "cover art" icon image, if any.
 If B<'artist'> is specified, the channel artist's icon url is returned, 
 if any.  NOTE:  The B<'artist'> option will return an empty string if 
-the <-fast> option is used.
+the B<-fast> option is used.
 
 =item $video->B<getIconData>(['artist'])
 
@@ -207,7 +207,7 @@ Returns a two-element array consisting of the extension (ie. "png",
 "gif", "jpeg", etc.) and the actual icon image (binary data), if any.
 If B<'artist'> is specified, the channel artist's icon data is returned, 
 if any.  NOTE:  The B<'artist'> option will return an empty string if 
-the <-fast> option is used.
+the B<-fast> option is used.
 
 =item $video->B<getImageURL>()
 

@@ -1,5 +1,5 @@
 package Playwright::Base;
-$Playwright::Base::VERSION = '0.015';
+$Playwright::Base::VERSION = '0.016';
 use strict;
 use warnings;
 
@@ -62,7 +62,7 @@ sub _coerce ( $spec, %args ) {
     return %args;
 }
 
-sub _request ( $self, %args ) {
+sub _api_request ( $self, %args ) {
 
     %args = Playwright::Base::_coerce( $self->{spec}, %args );
 
@@ -108,7 +108,7 @@ Playwright::Base - Object representing Playwright pages
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head2 DESCRIPTION
 

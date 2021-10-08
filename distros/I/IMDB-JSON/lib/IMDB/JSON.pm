@@ -10,7 +10,7 @@ Search IMDB for a specific title, process the result and extract the JSON script
 
 package IMDB::JSON;
 
-$IMDB::JSON::VERSION = "0.04";
+$IMDB::JSON::VERSION = "0.05";
 
 use strict;
 use HTML::TokeParser;
@@ -117,6 +117,18 @@ sub _result {
 	# Process the results data (must be reference scalar!)
 	my $p = HTML::TokeParser->new(\$data);
 
+	$self->{_cur_id} = '';
+	# <meta property="imdb:pageConst" content="tt11125620"/>
+	while(my $t = $p->get_tag('meta')){
+		if($t->[1]->{content} =~ /(tt\d+)/){
+			$self->{_cur_id} = $1;
+			last;
+		} else {
+			use Data::Dumper; print Dumper($t);
+		}
+	}
+
+	$p = HTML::TokeParser->new(\$data);
 	# Walk down to the results section
 	while(my $t = $p->get_tag('div')){
 		last if($t->[1]->{class} eq 'lister-item mode-simple');
@@ -188,7 +200,10 @@ sub _get_json {
 
 		return;
 	} else {
-		return ($self->{raw_json} ? $json : decode_json($json));
+		my $jsn = decode_json($json);
+		$jsn->{id} = $self->{_cur_id};
+
+		return ($self->{raw_json} ? $json : $jsn);
 	}
 }
 
@@ -201,7 +216,7 @@ Returns JSON results for B<imdb_id>
 sub byid {
 	my ($self, $id) = @_;
 
-	my $data = $self->_get($self->{base_url} . '/title/' . $id);
+	my $data = $self->_get($self->{base_url} . '/title/' . $id . '/');
 
 	return if !$data;
 

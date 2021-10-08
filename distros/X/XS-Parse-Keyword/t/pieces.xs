@@ -124,6 +124,15 @@ static int build_infix_opname(pTHX_ OP **out, XSParseKeywordPiece *arg0, void *h
   return KEYWORD_PLUGIN_EXPR;
 }
 
+static void setup_block_VAR(pTHX_ void *hookdata)
+{
+  char *varname = hookdata;
+  PADOFFSET padix = pad_add_name_pvn(varname, strlen(varname), 0, NULL, NULL);
+  intro_my();
+
+  sv_setpvs(PAD_SVl(padix), "Hello");
+}
+
 static const struct XSParseKeywordHooks hooks_block = {
   .permit_hintkey = hintkey,
 
@@ -151,6 +160,13 @@ static const struct XSParseKeywordHooks hooks_prefixedblock = {
     {0}
   },
   .build = &build_prefixedblock,
+};
+
+static const struct XSParseKeywordHooks hooks_prefixedblock_VAR = {
+  .permit_hintkey = hintkey,
+
+  .piece1 = XPK_PREFIXED_BLOCK( XPK_SETUP(&setup_block_VAR) ),
+  .build1 = &build_expr,
 };
 
 static const struct XSParseKeywordHooks hooks_anonsub = {
@@ -271,6 +287,7 @@ BOOT:
   register_xs_parse_keyword("pieceblock_list",   &hooks_block_list,   NULL);
 
   register_xs_parse_keyword("pieceprefixedblock", &hooks_prefixedblock, NULL);
+  register_xs_parse_keyword("pieceprefixedblock_VAR", &hooks_prefixedblock_VAR, "$VAR");
 
   register_xs_parse_keyword("pieceanonsub", &hooks_anonsub, NULL);
   register_xs_parse_keyword("piecetermexpr", &hooks_termexpr, NULL);

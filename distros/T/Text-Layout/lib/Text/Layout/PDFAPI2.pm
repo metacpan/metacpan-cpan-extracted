@@ -24,6 +24,7 @@ sub new {
     if ( !$fc || $fc->{__PDF__} ne $data[0] ) {
 	# Init cache.
 	$fc = { __PDF__ => $data[0] };
+	Text::Layout::FontConfig->reset;
     }
     $self;
 }
@@ -84,14 +85,15 @@ sub render {
 	}
     }
 
-    $text->save;
+    # $text->save;		# doesn't do anything
     foreach my $fragment ( @{ $self->{_content} } ) {
 	next unless length($fragment->{text});
 	my $f = $fragment->{font};
 	my $font = $f->get_font($self);
 	unless ( $font ) {
+	    carp("Can't happen?");
 	    $f = $self->{_currentfont};
-	    $font = $f->getfont;
+	    $font = $f->getfont($self);
 	}
 	$text->strokecolor( $fragment->{color} );
 	$text->fillcolor( $fragment->{color} );
@@ -137,7 +139,7 @@ sub render {
 	    $x += $maxw;
 	}
     }
-    $text->restore;
+    # $text->restore;		# doesn't do anything
 }
 
 #### API
@@ -148,8 +150,9 @@ sub bbox {
 	my $f = $_->{font};
 	my $font = $f->get_font($self);
 	unless ( $font ) {
+	    carp("Can't happen?");
 	    $f = $self->{_currentfont};
-	    $font = $f->getfont;
+	    $font = $f->getfont($self);
 	}
 	my $upem = 1000;	# as delivered by PDF::API2
 	my $size = $_->{size};

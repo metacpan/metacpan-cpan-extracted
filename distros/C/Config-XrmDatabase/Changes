@@ -1,5 +1,12 @@
 Revision history for Config-XrmDatabase
 
+0.07      2021-10-07 16:51:22-04:00 America/New_York
+
+  [BUG FIX]
+
+    * error message thrown on error didn't convert from internal
+      representation
+
 0.06      2021-09-09 17:16:32-04:00 America/New_York
 
   [BUG FIX]

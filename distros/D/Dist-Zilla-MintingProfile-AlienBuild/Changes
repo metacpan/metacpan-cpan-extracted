@@ -1,5 +1,14 @@
 Revision history for Dist-Zilla-MintingProfile-AlienBuild},
 
+0.05      2021-10-05 05:59:09 -0600
+  - Test name is now based on the generated class name (gh#18)
+  - Test now includes basic template (commented out) for tool,
+    XS and FFI tests (gh#7, gh#18)
+  - Fixed syntax error in generated alienfile recipe if you selected
+    both XS and FFI alien types (gh#18)
+  - More extensive CI testing fixed a number of additional
+    syntax errors (gh#19)
+
 0.04      2021-10-02 20:53:22 -0600
   - Fix bug where Changes file was generated incorrectly (gh#17)
 

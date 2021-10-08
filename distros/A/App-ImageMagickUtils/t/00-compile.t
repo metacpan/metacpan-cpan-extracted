@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/ImageMagickUtils.pm'
@@ -14,6 +14,8 @@ my @module_files = (
 
 my @scripts = (
     'script/calc-image-resized-size',
+    'script/convert-image-to',
+    'script/convert-image-to-pdf',
     'script/downsize-image',
     'script/image-resize-notation-to-human'
 );

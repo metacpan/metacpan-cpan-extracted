@@ -8,7 +8,7 @@ requires 'Scalar::Util';
 requires 'Term::ProgressBar', '2.14';   # with silent option
 requires 'Time::HiRes';
 requires 'Type::Utils';
-requires 'Types::Common::Numeric';
+requires 'Types::Numbers', 'v1.0.0';    # has T:C:N aliases
 requires 'Types::Standard', '1.00';     # sane minimum baseline
 requires 'namespace::clean';
 

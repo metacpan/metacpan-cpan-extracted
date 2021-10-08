@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use base qw{Package::New};
 
-our $VERSION='0.14';
+our $VERSION='0.17';
 
 =head1 NAME
 
